@@ -14,6 +14,8 @@
  * limitations under the License.
  */
 
+@file:Suppress("Deprecation")
+
 package androidx.compose.foundation.layout
 
 import android.content.Context

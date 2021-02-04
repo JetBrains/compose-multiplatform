@@ -128,6 +128,7 @@ import androidx.compose.ui.unit.dp
     showDialog = true
 }
 
+@Suppress("Deprecation")
 @Composable private fun KotlinSnippet10() {
     ConstraintLayout {
 

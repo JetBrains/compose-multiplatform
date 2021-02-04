@@ -14,6 +14,8 @@
  * limitations under the License.
  */
 
+@file:Suppress("Deprecation")
+
 package androidx.compose.foundation.layout
 
 import android.util.Log
@@ -52,12 +54,24 @@ import androidx.constraintlayout.core.widgets.ConstraintWidgetContainer
 import androidx.constraintlayout.core.widgets.Optimizer
 import androidx.constraintlayout.core.widgets.analyzer.BasicMeasure
 
+private const val DeprecationMessage = "ConstraintLayout was moved to the " +
+    "androidx.constraintlayout library and will be " +
+    "removed from androidx.compose.foundation.layout. You need to add a dependency on " +
+    "androidx.constraintlayout:constraintlayout-compose:1.0.0-alpha01"
+
 /**
  * Layout that positions its children according to the constraints between them.
  *
  * Example usage:
  * @sample androidx.compose.foundation.layout.samples.DemoInlineDSL
  */
+@Deprecated(
+    DeprecationMessage,
+    ReplaceWith(
+        "ConstraintLayout(modifier, content)",
+        "androidx.constraintlayout.compose.ConstraintLayout"
+    )
+)
 @Composable
 fun ConstraintLayout(
     modifier: Modifier = Modifier,
@@ -111,6 +125,13 @@ fun ConstraintLayout(
  * Example usage:
  * @sample androidx.compose.foundation.layout.samples.DemoConstraintSet
  */
+@Deprecated(
+    DeprecationMessage,
+    ReplaceWith(
+        "ConstraintLayout(modifier, content)",
+        "androidx.constraintlayout.compose.ConstraintLayout"
+    )
+)
 @Composable
 fun ConstraintLayout(
     constraintSet: ConstraintSet,
@@ -139,40 +160,48 @@ fun ConstraintLayout(
 /**
  * Represents a layout within a [ConstraintLayout].
  */
+@Deprecated(DeprecationMessage)
 class ConstrainedLayoutReference(val id: Any) {
     /**
      * The start anchor of this layout. Represents left in LTR layout direction, or right in RTL.
      */
+    @Deprecated(DeprecationMessage)
     val start = ConstraintLayoutBaseScope.VerticalAnchor(id, -2)
 
     /**
      * The left anchor of this layout.
      */
+    @Deprecated(DeprecationMessage)
     val absoluteLeft = ConstraintLayoutBaseScope.VerticalAnchor(id, 0)
 
     /**
      * The top anchor of this layout.
      */
+    @Deprecated(DeprecationMessage)
     val top = ConstraintLayoutBaseScope.HorizontalAnchor(id, 0)
 
     /**
      * The end anchor of this layout. Represents right in LTR layout direction, or left in RTL.
      */
+    @Deprecated(DeprecationMessage)
     val end = ConstraintLayoutBaseScope.VerticalAnchor(id, -1)
 
     /**
      * The right anchor of this layout.
      */
+    @Deprecated(DeprecationMessage)
     val absoluteRight = ConstraintLayoutBaseScope.VerticalAnchor(id, 1)
 
     /**
      * The bottom anchor of this layout.
      */
+    @Deprecated(DeprecationMessage)
     val bottom = ConstraintLayoutBaseScope.HorizontalAnchor(id, 1)
 
     /**
      * The baseline anchor of this layout.
      */
+    @Deprecated(DeprecationMessage)
     val baseline = ConstraintLayoutBaseScope.BaselineAnchor(id)
 }
 
@@ -180,6 +209,7 @@ class ConstrainedLayoutReference(val id: Any) {
  * Common scope for [ConstraintLayoutScope] and [ConstraintSetScope], the content being shared
  * between the inline DSL API and the ConstraintSet-based API.
  */
+@Deprecated(DeprecationMessage)
 abstract class ConstraintLayoutBaseScope {
     protected val tasks = mutableListOf<(State) -> Unit>()
 
@@ -191,12 +221,14 @@ abstract class ConstraintLayoutBaseScope {
      * Represents a vertical anchor (e.g. start/end of a layout, guideline) that layouts
      * can link to in their `Modifier.constrainAs` or `constrain` blocks.
      */
+    @Deprecated(DeprecationMessage)
     data class VerticalAnchor internal constructor(internal val id: Any, internal val index: Int)
 
     /**
      * Represents a horizontal anchor (e.g. top/bottom of a layout, guideline) that layouts
      * can link to in their `Modifier.constrainAs` or `constrain` blocks.
      */
+    @Deprecated(DeprecationMessage)
     data class HorizontalAnchor internal constructor(internal val id: Any, internal val index: Int)
 
     /**
@@ -204,11 +236,13 @@ abstract class ConstraintLayoutBaseScope {
      * layouts can link to in their `Modifier.constrainAs` or `constrain` blocks.
      */
     // TODO(popam): investigate if this can be just a HorizontalAnchor
+    @Deprecated(DeprecationMessage)
     data class BaselineAnchor internal constructor(internal val id: Any)
 
     /**
      * Creates a guideline at a specific offset from the start of the [ConstraintLayout].
      */
+    @Deprecated(DeprecationMessage)
     fun createGuidelineFromStart(offset: Dp): VerticalAnchor {
         val id = createId()
         tasks.add { state ->
@@ -222,6 +256,7 @@ abstract class ConstraintLayoutBaseScope {
     /**
      * Creates a guideline at a specific offset from the left of the [ConstraintLayout].
      */
+    @Deprecated(DeprecationMessage)
     fun createGuidelineFromAbsoluteLeft(offset: Dp): VerticalAnchor {
         val id = createId()
         tasks.add { state -> state.verticalGuideline(id).apply { start(offset) } }
@@ -233,6 +268,7 @@ abstract class ConstraintLayoutBaseScope {
      * A [fraction] of 0f will correspond to the start of the [ConstraintLayout], while 1f will
      * correspond to the end.
      */
+    @Deprecated(DeprecationMessage)
     fun createGuidelineFromStart(fraction: Float): VerticalAnchor {
         val id = createId()
         tasks.add { state ->
@@ -253,6 +289,7 @@ abstract class ConstraintLayoutBaseScope {
      * correspond to the right.
      */
     // TODO(popam, b/157781990): this is not really percenide
+    @Deprecated(DeprecationMessage)
     fun createGuidelineFromAbsoluteLeft(fraction: Float): VerticalAnchor {
         val id = createId()
         tasks.add { state -> state.verticalGuideline(id).apply { percent(fraction) } }
@@ -262,6 +299,7 @@ abstract class ConstraintLayoutBaseScope {
     /**
      * Creates a guideline at a specific offset from the end of the [ConstraintLayout].
      */
+    @Deprecated(DeprecationMessage)
     fun createGuidelineFromEnd(offset: Dp): VerticalAnchor {
         val id = createId()
         tasks.add { state ->
@@ -275,6 +313,7 @@ abstract class ConstraintLayoutBaseScope {
     /**
      * Creates a guideline at a specific offset from the right of the [ConstraintLayout].
      */
+    @Deprecated(DeprecationMessage)
     fun createGuidelineFromAbsoluteRight(offset: Dp): VerticalAnchor {
         val id = createId()
         tasks.add { state -> state.verticalGuideline(id).apply { end(offset) } }
@@ -286,6 +325,7 @@ abstract class ConstraintLayoutBaseScope {
      * A [fraction] of 0f will correspond to the end of the [ConstraintLayout], while 1f will
      * correspond to the start.
      */
+    @Deprecated(DeprecationMessage)
     fun createGuidelineFromEnd(fraction: Float): VerticalAnchor {
         return createGuidelineFromStart(1f - fraction)
     }
@@ -295,6 +335,7 @@ abstract class ConstraintLayoutBaseScope {
      * A [fraction] of 0f will correspond to the right of the [ConstraintLayout], while 1f will
      * correspond to the left.
      */
+    @Deprecated(DeprecationMessage)
     fun createGuidelineFromAbsoluteRight(fraction: Float): VerticalAnchor {
         return createGuidelineFromAbsoluteLeft(1f - fraction)
     }
@@ -302,6 +343,7 @@ abstract class ConstraintLayoutBaseScope {
     /**
      * Creates a guideline at a specific offset from the top of the [ConstraintLayout].
      */
+    @Deprecated(DeprecationMessage)
     fun createGuidelineFromTop(offset: Dp): HorizontalAnchor {
         val id = createId()
         tasks.add { state -> state.horizontalGuideline(id).apply { start(offset) } }
@@ -313,6 +355,7 @@ abstract class ConstraintLayoutBaseScope {
      * A [fraction] of 0f will correspond to the top of the [ConstraintLayout], while 1f will
      * correspond to the bottom.
      */
+    @Deprecated(DeprecationMessage)
     fun createGuidelineFromTop(fraction: Float): HorizontalAnchor {
         val id = createId()
         tasks.add { state -> state.horizontalGuideline(id).apply { percent(fraction) } }
@@ -322,6 +365,7 @@ abstract class ConstraintLayoutBaseScope {
     /**
      * Creates a guideline at a specific offset from the bottom of the [ConstraintLayout].
      */
+    @Deprecated(DeprecationMessage)
     fun createGuidelineFromBottom(offset: Dp): HorizontalAnchor {
         val id = createId()
         tasks.add { state -> state.horizontalGuideline(id).apply { end(offset) } }
@@ -333,6 +377,7 @@ abstract class ConstraintLayoutBaseScope {
      * A [fraction] of 0f will correspond to the bottom of the [ConstraintLayout], while 1f will
      * correspond to the top.
      */
+    @Deprecated(DeprecationMessage)
     fun createGuidelineFromBottom(fraction: Float): HorizontalAnchor {
         return createGuidelineFromTop(1f - fraction)
     }
@@ -340,6 +385,7 @@ abstract class ConstraintLayoutBaseScope {
     /**
      * Creates and returns a start barrier, containing the specified elements.
      */
+    @Deprecated(DeprecationMessage)
     fun createStartBarrier(
         vararg elements: ConstrainedLayoutReference,
         margin: Dp = 0.dp
@@ -361,6 +407,7 @@ abstract class ConstraintLayoutBaseScope {
     /**
      * Creates and returns a left barrier, containing the specified elements.
      */
+    @Deprecated(DeprecationMessage)
     fun createAbsoluteLeftBarrier(
         vararg elements: ConstrainedLayoutReference,
         margin: Dp = 0.dp
@@ -377,6 +424,7 @@ abstract class ConstraintLayoutBaseScope {
     /**
      * Creates and returns a top barrier, containing the specified elements.
      */
+    @Deprecated(DeprecationMessage)
     fun createTopBarrier(
         vararg elements: ConstrainedLayoutReference,
         margin: Dp = 0.dp
@@ -393,6 +441,7 @@ abstract class ConstraintLayoutBaseScope {
     /**
      * Creates and returns an end barrier, containing the specified elements.
      */
+    @Deprecated(DeprecationMessage)
     fun createEndBarrier(
         vararg elements: ConstrainedLayoutReference,
         margin: Dp = 0.dp
@@ -414,6 +463,7 @@ abstract class ConstraintLayoutBaseScope {
     /**
      * Creates and returns a right barrier, containing the specified elements.
      */
+    @Deprecated(DeprecationMessage)
     fun createAbsoluteRightBarrier(
         vararg elements: ConstrainedLayoutReference,
         margin: Dp = 0.dp
@@ -430,6 +480,7 @@ abstract class ConstraintLayoutBaseScope {
     /**
      * Creates and returns a bottom barrier, containing the specified elements.
      */
+    @Deprecated(DeprecationMessage)
     fun createBottomBarrier(
         vararg elements: ConstrainedLayoutReference,
         margin: Dp = 0.dp
@@ -447,6 +498,7 @@ abstract class ConstraintLayoutBaseScope {
      * Creates a horizontal chain including the referenced layouts.
      */
     // TODO(popam, b/157783937): this API should be improved
+    @Deprecated(DeprecationMessage)
     fun createHorizontalChain(
         vararg elements: ConstrainedLayoutReference,
         chainStyle: ChainStyle = ChainStyle.Spread
@@ -465,6 +517,7 @@ abstract class ConstraintLayoutBaseScope {
      * Creates a vertical chain including the referenced layouts.
      */
     // TODO(popam, b/157783937): this API should be improved
+    @Deprecated(DeprecationMessage)
     fun createVerticalChain(
         vararg elements: ConstrainedLayoutReference,
         chainStyle: ChainStyle = ChainStyle.Spread
@@ -484,12 +537,14 @@ abstract class ConstraintLayoutBaseScope {
  * Scope used by the inline DSL of [ConstraintLayout].
  */
 @LayoutScopeMarker
+@Deprecated(DeprecationMessage)
 class ConstraintLayoutScope internal constructor() : ConstraintLayoutBaseScope() {
     /**
      * Creates one [ConstrainedLayoutReference], which needs to be assigned to a layout within the
      * [ConstraintLayout] as part of [Modifier.constrainAs]. To create more references at the
      * same time, see [createRefs].
      */
+    @Deprecated(DeprecationMessage)
     fun createRef() = ConstrainedLayoutReference(createId())
 
     /**
@@ -497,11 +552,13 @@ class ConstraintLayoutScope internal constructor() : ConstraintLayoutBaseScope()
      * to layouts within the [ConstraintLayout] as part of [Modifier.constrainAs]. To create just
      * one reference, see [createRef].
      */
+    @Deprecated(DeprecationMessage)
     fun createRefs() = ConstrainedLayoutReferences()
 
     /**
      * Convenience API for creating multiple [ConstrainedLayoutReference] via [createRefs].
      */
+    @Deprecated(DeprecationMessage)
     inner class ConstrainedLayoutReferences internal constructor() {
         operator fun component1() = createRef()
         operator fun component2() = createRef()
@@ -525,6 +582,7 @@ class ConstraintLayoutScope internal constructor() : ConstraintLayoutBaseScope()
      * [Modifier] that defines the constraints, as part of a [ConstraintLayout], of the layout
      * element.
      */
+    @Deprecated(DeprecationMessage)
     fun Modifier.constrainAs(
         ref: ConstrainedLayoutReference,
         constrainBlock: ConstrainScope.() -> Unit
@@ -548,16 +606,19 @@ class ConstraintLayoutScope internal constructor() : ConstraintLayoutBaseScope()
  * Scope used by the [ConstraintSet] DSL.
  */
 @LayoutScopeMarker
+@Deprecated(DeprecationMessage)
 class ConstraintSetScope internal constructor() : ConstraintLayoutBaseScope() {
     /**
      * Creates one [ConstrainedLayoutReference] corresponding to the [ConstraintLayout] element
      * with [id].
      */
+    @Deprecated(DeprecationMessage)
     fun createRefFor(id: Any) = ConstrainedLayoutReference(id)
 
     /**
      * Specifies the constraints associated to the layout identified with [ref].
      */
+    @Deprecated(DeprecationMessage)
     fun constrain(
         ref: ConstrainedLayoutReference,
         constrainBlock: ConstrainScope.() -> Unit
@@ -570,6 +631,7 @@ class ConstraintSetScope internal constructor() : ConstraintLayoutBaseScope() {
 /**
  * The style of a horizontal or vertical chain.
  */
+@Deprecated(DeprecationMessage)
 class ChainStyle internal constructor(
     internal val style: SolverChain,
     internal val bias: Float? = null
@@ -578,24 +640,28 @@ class ChainStyle internal constructor(
         /**
          * A chain style that evenly distributes the contained layouts.
          */
+        @Deprecated(DeprecationMessage)
         val Spread = ChainStyle(SolverChain.SPREAD)
 
         /**
          * A chain style where the first and last layouts are affixed to the constraints
          * on each end of the chain and the rest are evenly distributed.
          */
+        @Deprecated(DeprecationMessage)
         val SpreadInside = ChainStyle(SolverChain.SPREAD_INSIDE)
 
         /**
          * A chain style where the contained layouts are packed together and placed to the
          * center of the available space.
          */
+        @Deprecated(DeprecationMessage)
         val Packed = Packed(0.5f)
 
         /**
          * A chain style where the contained layouts are packed together and placed in
          * the available space according to a given [bias].
          */
+        @Deprecated(DeprecationMessage)
         fun Packed(bias: Float) = ChainStyle(SolverChain.PACKED, bias)
     }
 }
@@ -612,6 +678,7 @@ private class ConstraintLayoutParentData(
  * Scope used by `Modifier.constrainAs`.
  */
 @LayoutScopeMarker
+@Deprecated(DeprecationMessage)
 class ConstrainScope internal constructor(internal val id: Any) {
     internal val tasks = mutableListOf<(State) -> Unit>()
     internal fun applyTo(state: State) = tasks.forEach { it(state) }
@@ -620,46 +687,55 @@ class ConstrainScope internal constructor(internal val id: Any) {
      * Reference to the [ConstraintLayout] itself, which can be used to specify constraints
      * between itself and its children.
      */
+    @Deprecated(DeprecationMessage)
     val parent = ConstrainedLayoutReference(SolverState.PARENT)
 
     /**
      * The start anchor of the layout - can be constrained using [VerticalAnchorable.linkTo].
      */
+    @Deprecated(DeprecationMessage)
     val start = VerticalAnchorable(id, -2)
 
     /**
      * The left anchor of the layout - can be constrained using [VerticalAnchorable.linkTo].
      */
+    @Deprecated(DeprecationMessage)
     val absoluteLeft = VerticalAnchorable(id, 0)
 
     /**
      * The top anchor of the layout - can be constrained using [HorizontalAnchorable.linkTo].
      */
+    @Deprecated(DeprecationMessage)
     val top = HorizontalAnchorable(id, 0)
 
     /**
      * The end anchor of the layout - can be constrained using [VerticalAnchorable.linkTo].
      */
+    @Deprecated(DeprecationMessage)
     val end = VerticalAnchorable(id, -1)
 
     /**
      * The right anchor of the layout - can be constrained using [VerticalAnchorable.linkTo].
      */
+    @Deprecated(DeprecationMessage)
     val absoluteRight = VerticalAnchorable(id, 1)
 
     /**
      * The bottom anchor of the layout - can be constrained using [HorizontalAnchorable.linkTo].
      */
+    @Deprecated(DeprecationMessage)
     val bottom = HorizontalAnchorable(id, 1)
 
     /**
      * The [FirstBaseline] of the layout - can be constrained using [BaselineAnchorable.linkTo].
      */
+    @Deprecated(DeprecationMessage)
     val baseline = BaselineAnchorable(id)
 
     /**
      * The width of the [ConstraintLayout] child.
      */
+    @Deprecated(DeprecationMessage)
     var width: Dimension = Dimension.wrapContent
         set(value) {
             field = value
@@ -673,6 +749,7 @@ class ConstrainScope internal constructor(internal val id: Any) {
     /**
      * The height of the [ConstraintLayout] child.
      */
+    @Deprecated(DeprecationMessage)
     var height: Dimension = Dimension.wrapContent
         set(value) {
             field = value
@@ -687,6 +764,7 @@ class ConstrainScope internal constructor(internal val id: Any) {
      * Represents a vertical side of a layout (i.e start and end) that can be anchored using
      * [linkTo] in their `Modifier.constrainAs` blocks.
      */
+    @Deprecated(DeprecationMessage)
     inner class VerticalAnchorable internal constructor(
         internal val id: Any,
         internal val index: Int
@@ -695,6 +773,7 @@ class ConstrainScope internal constructor(internal val id: Any) {
          * Adds a link towards a [ConstraintLayoutBaseScope.VerticalAnchor].
          */
         // TODO(popam, b/158069248): add parameter for gone margin
+        @Deprecated(DeprecationMessage)
         fun linkTo(anchor: ConstraintLayoutBaseScope.VerticalAnchor, margin: Dp = 0.dp) {
             tasks.add { state ->
                 with(state.constraints(id)) {
@@ -713,6 +792,7 @@ class ConstrainScope internal constructor(internal val id: Any) {
      * Represents a horizontal side of a layout (i.e top and bottom) that can be anchored using
      * [linkTo] in their `Modifier.constrainAs` blocks.
      */
+    @Deprecated(DeprecationMessage)
     inner class HorizontalAnchorable internal constructor(
         internal val tag: Any,
         internal val index: Int
@@ -721,6 +801,7 @@ class ConstrainScope internal constructor(internal val id: Any) {
          * Adds a link towards a [ConstraintLayoutBaseScope.HorizontalAnchor].
          */
         // TODO(popam, b/158069248): add parameter for gone margin
+        @Deprecated(DeprecationMessage)
         fun linkTo(anchor: ConstraintLayoutBaseScope.HorizontalAnchor, margin: Dp = 0.dp) {
             tasks.add { state ->
                 with(state.constraints(id)) {
@@ -736,11 +817,13 @@ class ConstrainScope internal constructor(internal val id: Any) {
      * Represents the [FirstBaseline] of a layout that can be anchored
      * using [linkTo] in their `Modifier.constrainAs` blocks.
      */
+    @Deprecated(DeprecationMessage)
     inner class BaselineAnchorable internal constructor(internal val id: Any) {
         /**
          * Adds a link towards a [ConstraintLayoutBaseScope.BaselineAnchor].
          */
         // TODO(popam, b/158069248): add parameter for gone margin
+        @Deprecated(DeprecationMessage)
         fun linkTo(anchor: ConstraintLayoutBaseScope.BaselineAnchor, margin: Dp = 0.dp) {
             tasks.add { state ->
                 with(state.constraints(id)) {
@@ -754,6 +837,7 @@ class ConstrainScope internal constructor(internal val id: Any) {
      * Adds both start and end links towards other [ConstraintLayoutBaseScope.HorizontalAnchor]s.
      */
     // TODO(popam, b/158069248): add parameter for gone margin
+    @Deprecated(DeprecationMessage)
     fun linkTo(
         start: ConstraintLayoutBaseScope.VerticalAnchor,
         end: ConstraintLayoutBaseScope.VerticalAnchor,
@@ -772,6 +856,7 @@ class ConstrainScope internal constructor(internal val id: Any) {
      * Adds both top and bottom links towards other [ConstraintLayoutBaseScope.HorizontalAnchor]s.
      */
     // TODO(popam, b/158069248): add parameter for gone margin
+    @Deprecated(DeprecationMessage)
     fun linkTo(
         top: ConstraintLayoutBaseScope.HorizontalAnchor,
         bottom: ConstraintLayoutBaseScope.HorizontalAnchor,
@@ -791,6 +876,7 @@ class ConstrainScope internal constructor(internal val id: Any) {
      * other [ConstraintLayoutBaseScope.HorizontalAnchor]s.
      */
     // TODO(popam, b/158069248): add parameter for gone margin
+    @Deprecated(DeprecationMessage)
     fun linkTo(
         start: ConstraintLayoutBaseScope.VerticalAnchor,
         top: ConstraintLayoutBaseScope.HorizontalAnchor,
@@ -811,6 +897,7 @@ class ConstrainScope internal constructor(internal val id: Any) {
      * Adds all start, top, end, bottom links towards the corresponding anchors of [other].
      * This will center the current layout inside or around (depending on size) [other].
      */
+    @Deprecated(DeprecationMessage)
     fun centerTo(other: ConstrainedLayoutReference) {
         linkTo(other.start, other.top, other.end, other.bottom)
     }
@@ -820,6 +907,7 @@ class ConstrainScope internal constructor(internal val id: Any) {
      * This will center horizontally the current layout inside or around (depending on size)
      * [other].
      */
+    @Deprecated(DeprecationMessage)
     fun centerHorizontallyTo(other: ConstrainedLayoutReference) {
         linkTo(other.start, other.end)
     }
@@ -829,6 +917,7 @@ class ConstrainScope internal constructor(internal val id: Any) {
      * This will center vertically the current layout inside or around (depending on size)
      * [other].
      */
+    @Deprecated(DeprecationMessage)
     fun centerVerticallyTo(other: ConstrainedLayoutReference) {
         linkTo(other.top, other.bottom)
     }
@@ -837,6 +926,7 @@ class ConstrainScope internal constructor(internal val id: Any) {
      * Adds start and end links towards a vertical [anchor].
      * This will center the current layout around the vertical [anchor].
      */
+    @Deprecated(DeprecationMessage)
     fun centerAround(anchor: ConstraintLayoutBaseScope.VerticalAnchor) {
         linkTo(anchor, anchor)
     }
@@ -845,6 +935,7 @@ class ConstrainScope internal constructor(internal val id: Any) {
      * Adds top and bottom links towards a horizontal [anchor].
      * This will center the current layout around the horizontal [anchor].
      */
+    @Deprecated(DeprecationMessage)
     fun centerAround(anchor: ConstraintLayoutBaseScope.HorizontalAnchor) {
         linkTo(anchor, anchor)
     }
@@ -937,20 +1028,24 @@ private fun createId() = object : Any() {}
 // TODO(popam, b/157781841): It is unfortunate that this interface is top level in
 // `foundation-layout`. This will be ok if we move constraint layout to its own module or at
 // least subpackage.
+@Deprecated(DeprecationMessage)
 interface Dimension {
     /**
      * A [Dimension] that can be assigned both min and max bounds.
      */
+    @Deprecated(DeprecationMessage)
     interface Coercible : Dimension
 
     /**
      * A [Dimension] that can be assigned a min bound.
      */
+    @Deprecated(DeprecationMessage)
     interface MinCoercible : Dimension
 
     /**
      * A [Dimension] that can be assigned a max bound.
      */
+    @Deprecated(DeprecationMessage)
     interface MaxCoercible : Dimension
 
     companion object {
@@ -961,6 +1056,7 @@ interface Dimension {
          * To make the value fixed (respected regardless the [ConstraintSet]), [value] should
          * be used instead.
          */
+        @Deprecated(DeprecationMessage)
         fun preferredValue(dp: Dp): Dimension.Coercible =
             DimensionDescription { state -> SolverDimension.Suggested(state.convertDimension(dp)) }
 
@@ -968,6 +1064,7 @@ interface Dimension {
          * Creates a [Dimension] representing a fixed dp size. The size will not change
          * according to the constraints in the [ConstraintSet].
          */
+        @Deprecated(DeprecationMessage)
         fun value(dp: Dp): Dimension =
             DimensionDescription { state -> SolverDimension.Fixed(state.convertDimension(dp)) }
 
@@ -977,6 +1074,7 @@ interface Dimension {
          * To make the value fixed (respected regardless the [ConstraintSet]), [wrapContent]
          * should be used instead.
          */
+        @Deprecated(DeprecationMessage)
         val preferredWrapContent: Dimension.Coercible
             get() = DimensionDescription { SolverDimension.Suggested(WRAP_DIMENSION) }
 
@@ -984,6 +1082,7 @@ interface Dimension {
          * A [Dimension] with fixed wrap content behavior. The size will not change
          * according to the constraints in the [ConstraintSet].
          */
+        @Deprecated(DeprecationMessage)
         val wrapContent: Dimension
             get() = DimensionDescription { SolverDimension.Fixed(WRAP_DIMENSION) }
 
@@ -991,12 +1090,14 @@ interface Dimension {
          * A [Dimension] that spreads to match constraints. Links should be specified from both
          * sides corresponding to this dimension, in order for this to work.
          */
+        @Deprecated(DeprecationMessage)
         val fillToConstraints: Dimension
             get() = DimensionDescription { SolverDimension.Suggested(SPREAD_DIMENSION) }
 
         /**
          * A [Dimension] that is a percent of the parent in the corresponding direction.
          */
+        @Deprecated(DeprecationMessage)
         fun percent(percent: Float): Dimension =
             // TODO(popam, b/157880732): make this nicer when possible in future solver releases
             DimensionDescription { SolverDimension.Percent(0, percent).suggested(0) }
@@ -1006,48 +1107,56 @@ interface Dimension {
 /**
  * Sets the lower bound of the current [Dimension] to be the wrap content size of the child.
  */
+@Deprecated(DeprecationMessage)
 val Dimension.Coercible.atLeastWrapContent: Dimension.MaxCoercible
     get() = (this as DimensionDescription).also { it.minSymbol = WRAP_DIMENSION }
 
 /**
  * Sets the lower bound of the current [Dimension] to a fixed [dp] value.
  */
+@Deprecated(DeprecationMessage)
 fun Dimension.Coercible.atLeast(dp: Dp): Dimension.MaxCoercible =
     (this as DimensionDescription).also { it.min = dp }
 
 /**
  * Sets the upper bound of the current [Dimension] to a fixed [dp] value.
  */
+@Deprecated(DeprecationMessage)
 fun Dimension.Coercible.atMost(dp: Dp): Dimension.MinCoercible =
     (this as DimensionDescription).also { it.max = dp }
 
 /**
  * Sets the upper bound of the current [Dimension] to be the wrap content size of the child.
  */
+@Deprecated(DeprecationMessage)
 val Dimension.Coercible.atMostWrapContent: Dimension.MinCoercible
     get() = (this as DimensionDescription).also { it.maxSymbol = WRAP_DIMENSION }
 
 /**
  * Sets the lower bound of the current [Dimension] to a fixed [dp] value.
  */
+@Deprecated(DeprecationMessage)
 fun Dimension.MinCoercible.atLeastWrapContent(dp: Dp): Dimension =
     (this as DimensionDescription).also { it.min = dp }
 
 /**
  * Sets the lower bound of the current [Dimension] to be the wrap content size of the child.
  */
+@Deprecated(DeprecationMessage)
 val Dimension.MinCoercible.atLeastWrapContent: Dimension
     get() = (this as DimensionDescription).also { it.minSymbol = WRAP_DIMENSION }
 
 /**
  * Sets the upper bound of the current [Dimension] to a fixed [dp] value.
  */
+@Deprecated(DeprecationMessage)
 fun Dimension.MaxCoercible.atMost(dp: Dp): Dimension =
     (this as DimensionDescription).also { it.max = dp }
 
 /**
  * Sets the upper bound of the current [Dimension] to be the [Wrap] size of the child.
  */
+@Deprecated(DeprecationMessage)
 val Dimension.MaxCoercible.atMostWrapContent: Dimension
     get() = (this as DimensionDescription).also { it.maxSymbol = WRAP_DIMENSION }
 
@@ -1081,6 +1190,7 @@ internal class DimensionDescription internal constructor(
  * Immutable description of the constraints used to layout the children of a [ConstraintLayout].
  */
 @Immutable
+@Deprecated(DeprecationMessage)
 interface ConstraintSet {
     /**
      * Applies the [ConstraintSet] to a state.
@@ -1091,6 +1201,7 @@ interface ConstraintSet {
 /**
  * Creates a [ConstraintSet].
  */
+@Deprecated(DeprecationMessage)
 fun ConstraintSet(description: ConstraintSetScope.() -> Unit) = object : ConstraintSet {
     override fun applyTo(state: State, measurables: List<Measurable>) {
         measurables.forEach { measurable ->
@@ -1105,6 +1216,7 @@ fun ConstraintSet(description: ConstraintSetScope.() -> Unit) = object : Constra
 /**
  * The state of the [ConstraintLayout] solver.
  */
+@Deprecated(DeprecationMessage)
 class State(val density: Density) : SolverState() {
     var rootIncomingConstraints: Constraints = Constraints()
     lateinit var layoutDirection: LayoutDirection
