@@ -1772,7 +1772,7 @@ package androidx.compose.ui.layout {
     method @Deprecated @androidx.compose.runtime.Stable public int toIntPx-0680j_4(float);
     method @androidx.compose.runtime.Stable public float toPx--R2X_6o(long);
     method @androidx.compose.runtime.Stable public float toPx-0680j_4(float);
-    method @androidx.compose.runtime.Stable public androidx.compose.ui.geometry.Rect toRect(androidx.compose.ui.unit.Bounds);
+    method @androidx.compose.runtime.Stable public androidx.compose.ui.geometry.Rect toRect(androidx.compose.ui.unit.DpRect);
     method @androidx.compose.runtime.Stable public long toSp-0680j_4(float);
     method @androidx.compose.runtime.Stable public long toSp-XSAIIZE(float);
     method @androidx.compose.runtime.Stable public long toSp-XSAIIZE(int);
