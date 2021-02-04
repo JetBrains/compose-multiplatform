@@ -21,7 +21,9 @@ package androidx.compose.integration.docs.lifecycle
 
 import androidx.activity.OnBackPressedCallback
 import androidx.activity.OnBackPressedDispatcher
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.Button
@@ -39,10 +41,12 @@ import androidx.compose.runtime.Stable
 import androidx.compose.runtime.State
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.key
+import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.produceState
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.rememberUpdatedState
+import androidx.compose.ui.Modifier
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlin.random.Random
@@ -94,7 +98,7 @@ private object LifecycleSnippet4 {
     fun MoviesScreen(movies: List<Movie>) {
         LazyColumn {
             items(movies) { movie ->
-                key(movie.id) { // Use movie.id as key
+                key(movie.id) { // Unique ID for this movie
                     MovieOverview(movie)
                 }
             }
@@ -114,33 +118,8 @@ private object LifecycleSnippet5 {
     }
 }
 
-private object LifecycleSnippet6 {
-    @Composable
-    fun MyComposable() {
-        DisposableEffect(Unit) {
-            // Initial composition. The composable is added to the UI tree.
-
-            onDispose {
-                // The composable is removed from the UI tree.
-            }
-        }
-        /* ... */
-    }
-}
-
-private object LifecycleSnippet7 {
-    @Composable
-    fun MyComposable() {
-
-        SideEffect {
-            // The composable went through a recomposition
-        }
-        /* ... */
-    }
-}
-
 @ExperimentalMaterialApi
-private object LifecycleSnippet8 {
+private object LifecycleSnippet6 {
     @Composable
     fun MyScreen(
         state: UiState<List<Movie>>,
@@ -170,7 +149,7 @@ private object LifecycleSnippet8 {
 }
 
 @ExperimentalMaterialApi
-private object LifecycleSnippet9 {
+private object LifecycleSnippet7 {
     @Composable
     fun MoviesScreen(scaffoldState: ScaffoldState = rememberScaffoldState()) {
 
@@ -195,7 +174,7 @@ private object LifecycleSnippet9 {
     }
 }
 
-private object LifecycleSnippet10 {
+private object LifecycleSnippet8 {
     @Composable
     fun LandingScreen(onTimeout: () -> Unit) {
 
@@ -214,7 +193,7 @@ private object LifecycleSnippet10 {
     }
 }
 
-private object LifecycleSnippet11 {
+private object LifecycleSnippet9 {
     @Composable
     fun BackHandler(backDispatcher: OnBackPressedDispatcher, onBack: () -> Unit) {
 
@@ -244,7 +223,7 @@ private object LifecycleSnippet11 {
     }
 }
 
-private object LifecycleSnippet12 {
+private object LifecycleSnippet10 {
     @Composable
     fun BackHandler(
         backDispatcher: OnBackPressedDispatcher,
@@ -274,7 +253,7 @@ private object LifecycleSnippet12 {
     }
 }
 
-private object LifecycleSnippet13 {
+private object LifecycleSnippet11 {
     @Composable
     fun loadNetworkImage(
         url: String,
@@ -300,31 +279,29 @@ private object LifecycleSnippet13 {
     }
 }
 
-private object LifecycleSnippet14 {
+private object LifecycleSnippet12 {
     @Composable
-    fun GreetingScreen(
-        user: State<User>,
-        weather: State<Weather>
-    ) {
+    fun TodoList(highPriorityKeywords: List<String> = listOf("Review", "Unblock", "Compose")) {
 
-        val greeting = derivedStateOf { prepareGreeting(user.value, weather.value) }
+        val todoTasks = remember { mutableStateListOf<String>() }
 
-        Column {
-            // Changing either `user` or `weather` will cause `prepareGreeting` to
-            // execute again and, subsequently, `GreetingMessage` will recompose
-            // but it won't trigger this composable, `GreetingScreen`, to recompose
-            GreetingMessage(greeting)
-            /* ... */
+        // Calculate high priority tasks only when the todoTasks or highPriorityKeywords
+        // change, not on every recomposition
+        val highPriorityTasks by remember(todoTasks, highPriorityKeywords) {
+            derivedStateOf { todoTasks.filter { it.containsWord(highPriorityKeywords) } }
         }
-    }
 
-    @Composable
-    fun GreetingMessage(greeting: State<Greeting>) {
-        Text("Hi ${greeting.value.name}")
+        Box(Modifier.fillMaxSize()) {
+            LazyColumn {
+                items(highPriorityTasks) { /* ... */ }
+                items(todoTasks) { /* ... */ }
+            }
+            /* Rest of the UI where users can add elements to the list */
+        }
     }
 }
 
-private object LifecycleSnippet15 {
+private object LifecycleSnippet13 {
     @Composable
     fun BackHandler(backDispatcher: OnBackPressedDispatcher, onBack: () -> Unit) {
         // START - DO NOT COPY IN CODE SNIPPET
@@ -385,3 +362,5 @@ private class User
 private class Weather
 private class Greeting(val name: String)
 private fun prepareGreeting(user: User, weather: Weather) = Greeting("haha")
+
+private fun String.containsWord(input: List<String>): Boolean = false
