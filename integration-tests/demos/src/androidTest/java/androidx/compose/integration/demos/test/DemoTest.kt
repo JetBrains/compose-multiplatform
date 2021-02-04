@@ -43,7 +43,6 @@ import androidx.test.filters.FlakyTest
 import androidx.test.filters.LargeTest
 import androidx.test.filters.MediumTest
 import com.google.common.truth.Truth.assertThat
-import org.junit.Ignore
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -91,10 +90,6 @@ class DemoTest {
     }
 
     @Test
-    @Ignore(
-        "b/179181757: Test crashes on 'AndroidView > Complex Touch Interop > Compose in " +
-            "Android in Compose in Android'"
-    )
     fun navigateThroughAllDemos_1() {
         navigateThroughAllDemos(SplitDemoCategories[0])
     }
