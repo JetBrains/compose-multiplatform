@@ -170,8 +170,6 @@ internal fun CoreTextField(
     onValueChange: (TextFieldValue) -> Unit,
     modifier: Modifier = Modifier,
     textStyle: TextStyle = TextStyle.Default,
-    // TODO(b/179071523): Deprecate and remove onImeActionPerformed.
-    onImeActionPerformed: (ImeAction) -> Unit = {},
     visualTransformation: VisualTransformation = VisualTransformation.None,
     onTextLayout: (TextLayoutResult) -> Unit = {},
     onTextInputStarted: (SoftwareKeyboardController) -> Unit = {},
@@ -236,7 +234,6 @@ internal fun CoreTextField(
         density,
         resourceLoader,
         onValueChange,
-        onImeActionPerformed,
         keyboardActions,
         focusManager,
         selectionBackgroundColor
@@ -248,9 +245,6 @@ internal fun CoreTextField(
     }
     val onImeActionPerformedWrapper: (ImeAction) -> Unit = { imeAction ->
         state.keyboardActionRunner.runAction(imeAction)
-
-        // TODO(b/179071523): Deprecate and remove onImeActionPerformed.
-        state.onImeActionPerformed(imeAction)
     }
 
     state.processor.onNewState(value, textInputService, state.inputSession)
@@ -587,9 +581,6 @@ internal class TextFieldState(
      */
     var showSelectionHandleEnd by mutableStateOf(false)
 
-    var onImeActionPerformed: (ImeAction) -> Unit = {}
-        private set
-
     val keyboardActionRunner: KeyboardActionRunner = KeyboardActionRunner()
 
     var onValueChange: (TextFieldValue) -> Unit = {}
@@ -598,7 +589,6 @@ internal class TextFieldState(
     /** The paint used to draw highlight background for selected text. */
     val selectionPaint: Paint = Paint()
 
-    // TODO(ralu): Replace this function with a TextFieldState.apply{ ... } at the call site.
     fun update(
         visualText: AnnotatedString,
         textStyle: TextStyle,
@@ -606,13 +596,11 @@ internal class TextFieldState(
         density: Density,
         resourceLoader: Font.ResourceLoader,
         onValueChange: (TextFieldValue) -> Unit,
-        onImeActionPerformed: (ImeAction) -> Unit,
         keyboardActions: KeyboardActions,
         focusManager: FocusManager,
         selectionBackgroundColor: Color
     ) {
         this.onValueChange = onValueChange
-        this.onImeActionPerformed = onImeActionPerformed
         this.selectionPaint.color = selectionBackgroundColor
         this.keyboardActionRunner.apply {
             this.keyboardActions = keyboardActions
