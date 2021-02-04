@@ -17,7 +17,6 @@
 package androidx.compose.material
 
 import androidx.compose.animation.core.AnimationEndReason
-import androidx.compose.animation.core.ManualAnimationClock
 import androidx.compose.foundation.ScrollState
 import androidx.compose.foundation.animation.scrollBy
 import androidx.compose.foundation.gestures.Scrollable
@@ -33,7 +32,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.testutils.MockAnimationClock
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.gesture.nestedscroll.nestedScroll
@@ -42,7 +40,6 @@ import androidx.compose.ui.platform.InspectableValue
 import androidx.compose.ui.platform.LocalViewConfiguration
 import androidx.compose.ui.platform.isDebugInspectorInfoEnabled
 import androidx.compose.ui.platform.testTag
-import androidx.compose.ui.test.ExperimentalTestApi
 import androidx.compose.ui.test.center
 import androidx.compose.ui.test.centerX
 import androidx.compose.ui.test.centerY
@@ -80,11 +77,8 @@ class SwipeableTest {
 
     private val swipeableTag = "swipeableTag"
 
-    private lateinit var clock: ManualAnimationClock
-
     @Before
     fun init() {
-        clock = ManualAnimationClock(initTimeMillis = 0L)
         isDebugInspectorInfoEnabled = true
     }
 
@@ -98,8 +92,9 @@ class SwipeableTest {
      */
     @Test
     fun swipeable_horizontalSwipe() {
-        val state = SwipeableState("A", clock)
+        lateinit var state: SwipeableState<String>
         setSwipeableContent {
+            state = rememberSwipeableState("A")
             Modifier.swipeable(
                 state = state,
                 anchors = mapOf(0f to "A", 100f to "B"),
@@ -146,8 +141,9 @@ class SwipeableTest {
      */
     @Test
     fun swipeable_verticalSwipe() {
-        val state = SwipeableState("A", clock)
+        lateinit var state: SwipeableState<String>
         setSwipeableContent {
+            state = rememberSwipeableState("A")
             Modifier.swipeable(
                 state = state,
                 anchors = mapOf(0f to "A", 100f to "B"),
@@ -194,8 +190,9 @@ class SwipeableTest {
      */
     @Test
     fun swipeable_disabled_horizontal() {
-        val state = SwipeableState("A", clock)
+        lateinit var state: SwipeableState<String>
         setSwipeableContent {
+            state = rememberSwipeableState("A")
             Modifier.swipeable(
                 state = state,
                 anchors = mapOf(0f to "A", 100f to "B"),
@@ -229,8 +226,9 @@ class SwipeableTest {
      */
     @Test
     fun swipeable_disabled_vertical() {
-        val state = SwipeableState("A", clock)
+        lateinit var state: SwipeableState<String>
         setSwipeableContent {
+            state = rememberSwipeableState("A")
             Modifier.swipeable(
                 state = state,
                 anchors = mapOf(0f to "A", 100f to "B"),
@@ -264,8 +262,9 @@ class SwipeableTest {
      */
     @Test
     fun swipeable_reverseDirection_horizontal() {
-        val state = SwipeableState("A", clock)
+        lateinit var state: SwipeableState<String>
         setSwipeableContent {
+            state = rememberSwipeableState("A")
             Modifier.swipeable(
                 state = state,
                 anchors = mapOf(0f to "A", 100f to "B"),
@@ -306,8 +305,9 @@ class SwipeableTest {
      */
     @Test
     fun swipeable_reverseDirection_vertical() {
-        val state = SwipeableState("A", clock)
+        lateinit var state: SwipeableState<String>
         setSwipeableContent {
+            state = rememberSwipeableState("A")
             Modifier.swipeable(
                 state = state,
                 anchors = mapOf(0f to "A", 100f to "B"),
@@ -348,8 +348,10 @@ class SwipeableTest {
      */
     @Test
     fun swipeable_updatedWhenSwiping() {
-        val state = SwipeableState("A", clock)
+        rule.mainClock.autoAdvance = false
+        lateinit var state: SwipeableState<String>
         setSwipeableContent {
+            state = rememberSwipeableState("A")
             Modifier.swipeable(
                 state = state,
                 anchors = mapOf(0f to "A", 100f to "B"),
@@ -400,9 +402,10 @@ class SwipeableTest {
     @Test
     @LargeTest
     fun swipeable_thresholds_fixed_small() {
-        val state = SwipeableState("A", clock)
+        lateinit var state: SwipeableState<String>
         val offsetDp = with(rule.density) { 35.toDp() }
         setSwipeableContent {
+            state = rememberSwipeableState("A")
             Modifier.swipeable(
                 state = state,
                 anchors = mapOf(0f to "A", 100f to "B"),
@@ -454,9 +457,10 @@ class SwipeableTest {
     @Test
     @LargeTest
     fun swipeable_thresholds_fixed_large() {
-        val state = SwipeableState("A", clock)
+        lateinit var state: SwipeableState<String>
         val offsetDp = with(rule.density) { 65.toDp() }
         setSwipeableContent {
+            state = rememberSwipeableState("A")
             Modifier.swipeable(
                 state = state,
                 anchors = mapOf(0f to "A", 100f to "B"),
@@ -508,8 +512,9 @@ class SwipeableTest {
     @Test
     @LargeTest
     fun swipeable_thresholds_fractional_half() {
-        val state = SwipeableState("A", clock)
+        lateinit var state: SwipeableState<String>
         setSwipeableContent {
+            state = rememberSwipeableState("A")
             Modifier.swipeable(
                 state = state,
                 anchors = mapOf(0f to "A", 100f to "B"),
@@ -561,8 +566,9 @@ class SwipeableTest {
     @Test
     @LargeTest
     fun swipeable_thresholds_fractional_quarter() {
-        val state = SwipeableState("A", clock)
+        lateinit var state: SwipeableState<String>
         setSwipeableContent {
+            state = rememberSwipeableState("A")
             Modifier.swipeable(
                 state = state,
                 anchors = mapOf(0f to "A", 100f to "B"),
@@ -614,8 +620,9 @@ class SwipeableTest {
     @Test
     @LargeTest
     fun swipeable_thresholds_fractional_threeQuarters() {
-        val state = SwipeableState("A", clock)
+        lateinit var state: SwipeableState<String>
         setSwipeableContent {
+            state = rememberSwipeableState("A")
             Modifier.swipeable(
                 state = state,
                 anchors = mapOf(0f to "A", 100f to "B"),
@@ -667,9 +674,10 @@ class SwipeableTest {
     @Test
     @LargeTest
     fun swipeable_thresholds_mixed() {
-        val state = SwipeableState("A", clock)
+        lateinit var state: SwipeableState<String>
         val offsetDp = with(rule.density) { 35.toDp() }
         setSwipeableContent {
+            state = rememberSwipeableState("A")
             Modifier.swipeable(
                 state = state,
                 anchors = mapOf(0f to "A", 100f to "B"),
@@ -727,8 +735,9 @@ class SwipeableTest {
     @Test
     @LargeTest
     fun swipeable_thresholds_custom() {
-        val state = SwipeableState("A", clock)
+        lateinit var state: SwipeableState<String>
         setSwipeableContent {
+            state = rememberSwipeableState("A")
             Modifier.swipeable(
                 state = state,
                 anchors = mapOf(0f to "A", 100f to "B"),
@@ -788,9 +797,10 @@ class SwipeableTest {
      */
     @Test
     fun swipeable_velocityThreshold() {
-        val state = SwipeableState("A", clock)
+        lateinit var state: SwipeableState<String>
         val velocityThresholdDp = with(rule.density) { 500.toDp() }
         setSwipeableContent {
+            state = rememberSwipeableState("A")
             Modifier.swipeable(
                 state = state,
                 anchors = mapOf(0f to "A", 100f to "B"),
@@ -838,8 +848,9 @@ class SwipeableTest {
      */
     @Test
     fun swipeable_cannotSkipStatesByFlinging() {
-        val state = SwipeableState("A", clock)
+        lateinit var state: SwipeableState<String>
         setSwipeableContent {
+            state = rememberSwipeableState("A")
             Modifier.swipeable(
                 state = state,
                 anchors = mapOf(0f to "A", 100f to "B", 200f to "C"),
@@ -865,8 +876,10 @@ class SwipeableTest {
      */
     @Test
     fun swipeable_overflow() {
-        val state = SwipeableState("A", clock)
+        rule.mainClock.autoAdvance = false
+        lateinit var state: SwipeableState<String>
         setSwipeableContent {
+            state = rememberSwipeableState("A")
             Modifier.swipeable(
                 state = state,
                 anchors = mapOf(0f to "A"),
@@ -915,9 +928,10 @@ class SwipeableTest {
      */
     @Test
     fun swipeable_resistance_atMinBound() {
-        val state = SwipeableState("A", clock)
+        lateinit var state: SwipeableState<String>
         val resistance = ResistanceConfig(100f, 5f, 0f)
         setSwipeableContent {
+            state = rememberSwipeableState("A")
             Modifier.swipeable(
                 state = state,
                 anchors = mapOf(0f to "A"),
@@ -947,9 +961,10 @@ class SwipeableTest {
      */
     @Test
     fun swipeable_resistance_atMaxBound() {
-        val state = SwipeableState("A", clock)
+        lateinit var state: SwipeableState<String>
         val resistance = ResistanceConfig(100f, 0f, 5f)
         setSwipeableContent {
+            state = rememberSwipeableState("A")
             Modifier.swipeable(
                 state = state,
                 anchors = mapOf(0f to "A"),
@@ -980,8 +995,9 @@ class SwipeableTest {
     @Test
     @LargeTest
     fun swipeable_targetValue() {
-        val state = SwipeableState("A", clock)
+        lateinit var state: SwipeableState<String>
         setSwipeableContent {
+            state = rememberSwipeableState("A")
             Modifier.swipeable(
                 state = state,
                 anchors = mapOf(0f to "A", 100f to "B"),
@@ -1025,8 +1041,10 @@ class SwipeableTest {
      */
     @Test
     fun swipeable_progress() {
-        val state = SwipeableState("A", clock)
+        rule.mainClock.autoAdvance = false
+        lateinit var state: SwipeableState<String>
         setSwipeableContent {
+            state = rememberSwipeableState("A")
             Modifier.swipeable(
                 state = state,
                 anchors = mapOf(0f to "A", 100f to "B"),
@@ -1084,8 +1102,10 @@ class SwipeableTest {
      */
     @Test
     fun swipeable_direction() {
-        val state = SwipeableState("A", clock)
+        rule.mainClock.autoAdvance = false
+        lateinit var state: SwipeableState<String>
         setSwipeableContent {
+            state = rememberSwipeableState("A")
             Modifier.swipeable(
                 state = state,
                 anchors = mapOf(0f to "A", 100f to "B"),
@@ -1133,9 +1153,11 @@ class SwipeableTest {
      */
     @Test
     fun swipeable_progress_multipleSwipes() {
-        val state = SwipeableState("A", clock)
+        rule.mainClock.autoAdvance = false
+        lateinit var state: SwipeableState<String>
         var slop = 0f
         setSwipeableContent {
+            state = rememberSwipeableState("A")
             slop = LocalViewConfiguration.current.touchSlop
             Modifier.swipeable(
                 state = state,
@@ -1153,14 +1175,11 @@ class SwipeableTest {
         }
 
         rule.onNodeWithTag(swipeableTag).performGesture {
-            swipe(
-                start = center,
-                end = Offset(x = center.x + 125f - slop, y = center.y)
-            )
-            swipe(
-                start = center,
-                end = Offset(x = center.x - 25f, y = center.y)
-            )
+            swipe(start = center, end = center + Offset(125f - slop, 0f))
+        }
+        rule.mainClock.advanceTimeByFrame()
+        rule.onNodeWithTag(swipeableTag).performGesture {
+            swipe(start = center, end = center - Offset(25f, 0f))
         }
 
         rule.runOnIdle {
@@ -1180,21 +1199,18 @@ class SwipeableTest {
         }
 
         rule.onNodeWithTag(swipeableTag).performGesture {
-            swipe(
-                start = center,
-                end = Offset(x = center.x - 125f + slop, y = center.y)
-            )
-            swipe(
-                start = center,
-                end = Offset(x = center.x + 25f, y = center.y)
-            )
+            swipe(start = center, end = center - Offset(125f - slop, 0f))
+        }
+        rule.mainClock.advanceTimeByFrame()
+        rule.onNodeWithTag(swipeableTag).performGesture {
+            swipe(start = center, end = center + Offset(25f, 0f))
         }
 
         rule.runOnIdle {
             assertThat(state.value).isEqualTo("B")
             assertThat(state.progress.from).isEqualTo("B")
             assertThat(state.progress.to).isEqualTo("A")
-            assertThat(state.progress.fraction).isEqualTo(1 - state.offset.value / 100)
+            assertThat(state.progress.fraction).isWithin(1e-6f).of(1 - state.offset.value / 100)
         }
 
         advanceClock()
@@ -1212,9 +1228,11 @@ class SwipeableTest {
      */
     @Test
     fun swipeable_direction_multipleSwipes() {
-        val state = SwipeableState("A", clock)
+        rule.mainClock.autoAdvance = false
+        lateinit var state: SwipeableState<String>
         var slop = 0f
         setSwipeableContent {
+            state = rememberSwipeableState("A")
             slop = LocalViewConfiguration.current.touchSlop
             Modifier.swipeable(
                 state = state,
@@ -1230,14 +1248,12 @@ class SwipeableTest {
         }
 
         rule.onNodeWithTag(swipeableTag).performGesture {
-            swipe(
-                start = center,
-                end = Offset(x = center.x + 125f - slop, y = center.y)
-            )
-            swipe(
-                start = center,
-                end = Offset(x = center.x - 25f, y = center.y)
-            )
+            swipe(start = center, end = center + Offset(125f - slop, 0f))
+        }
+        // draggable needs to recompose to toggle startDragImmediately
+        rule.mainClock.advanceTimeByFrame()
+        rule.onNodeWithTag(swipeableTag).performGesture {
+            swipe(start = center, end = center - Offset(25f, 0f))
         }
 
         rule.runOnIdle {
@@ -1253,14 +1269,12 @@ class SwipeableTest {
         }
 
         rule.onNodeWithTag(swipeableTag).performGesture {
-            swipe(
-                start = center,
-                end = Offset(x = center.x - 125f + slop, y = center.y)
-            )
-            swipe(
-                start = center,
-                end = Offset(x = center.x + 25f, y = center.y)
-            )
+            swipe(start = center, end = center - Offset(125f - slop, 0f))
+        }
+        // draggable needs to recompose to toggle startDragImmediately
+        rule.mainClock.advanceTimeByFrame()
+        rule.onNodeWithTag(swipeableTag).performGesture {
+            swipe(start = center, end = center + Offset(25f, 0f))
         }
 
         rule.runOnIdle {
@@ -1281,8 +1295,9 @@ class SwipeableTest {
      */
     @Test
     fun swipeable_snapTo() {
-        val state = SwipeableState("A", clock)
+        lateinit var state: SwipeableState<String>
         setSwipeableContent {
+            state = rememberSwipeableState("A")
             Modifier.swipeable(
                 state = state,
                 anchors = mapOf(0f to "A", 100f to "B"),
@@ -1309,8 +1324,10 @@ class SwipeableTest {
      */
     @Test
     fun swipeable_animateTo() {
-        val state = SwipeableState("A", clock)
+        rule.mainClock.autoAdvance = false
+        lateinit var state: SwipeableState<String>
         setSwipeableContent {
+            state = rememberSwipeableState("A")
             Modifier.swipeable(
                 state = state,
                 anchors = mapOf(0f to "A", 100f to "B"),
@@ -1344,8 +1361,9 @@ class SwipeableTest {
      */
     @Test
     fun swipeable_animateTo_onEnd() {
-        val state = SwipeableState("A", clock)
+        lateinit var state: SwipeableState<String>
         setSwipeableContent {
+            state = rememberSwipeableState("A")
             Modifier.swipeable(
                 state = state,
                 anchors = mapOf(0f to "A", 100f to "B"),
@@ -1369,8 +1387,10 @@ class SwipeableTest {
      */
     @Test
     fun swipeable_animateTo_onEnd_interrupted() {
-        val state = SwipeableState("A", clock)
+        rule.mainClock.autoAdvance = false
+        lateinit var state: SwipeableState<String>
         setSwipeableContent {
+            state = rememberSwipeableState("A")
             Modifier.swipeable(
                 state = state,
                 anchors = mapOf(0f to "A", 100f to "B"),
@@ -1521,11 +1541,10 @@ class SwipeableTest {
 
     @Test
     fun testInspectorValue() {
-        val state = SwipeableState("A", MockAnimationClock())
         val anchors = mapOf(0f to "A", 100f to "B")
         rule.setContent {
             val modifier = Modifier.swipeable(
-                state = state,
+                state = rememberSwipeableState("A"),
                 anchors = anchors,
                 orientation = Orientation.Horizontal
             ) as InspectableValue
@@ -1670,7 +1689,6 @@ class SwipeableTest {
         }
     }
 
-    @OptIn(ExperimentalTestApi::class)
     @Test
     fun swipeable_nestedScroll_postFlings() = runBlocking {
         lateinit var swipeableState: SwipeableState<String>
@@ -1766,7 +1784,7 @@ class SwipeableTest {
     ) = performSwipe(y = -offset, velocity = velocity)
 
     private fun advanceClock() {
-        clock.clockTimeMillis += 100000L
+        rule.mainClock.advanceTimeBy(100_000L)
     }
 
     private fun performSwipe(x: Float = 0f, y: Float = 0f, velocity: Float? = null) {

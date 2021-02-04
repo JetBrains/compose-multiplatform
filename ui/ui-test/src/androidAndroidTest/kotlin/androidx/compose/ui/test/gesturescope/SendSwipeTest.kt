@@ -16,18 +16,16 @@
 
 package androidx.compose.ui.test.gesturescope
 
-import androidx.compose.animation.core.FloatExponentialDecaySpec
 import androidx.compose.foundation.ScrollState
-import androidx.compose.foundation.animation.FlingConfig
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.wrapContentSize
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Providers
-import androidx.compose.testutils.MockAnimationClock
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
@@ -166,12 +164,9 @@ class SendSwipeTest {
     @Test
     fun swipeScrollable() {
         val touchSlop = TestTouchSlop
-        val scrollState = ScrollState(
-            initial = 0f,
-            flingConfig = FlingConfig(FloatExponentialDecaySpec()),
-            animationClock = MockAnimationClock()
-        )
+        lateinit var scrollState: ScrollState
         rule.setContent {
+            scrollState = rememberScrollState(0f)
             Providers(LocalViewConfiguration provides FakeViewConfiguration) {
                 with(LocalDensity.current) {
                     // Scrollable with a viewport the size of 10 boxes
