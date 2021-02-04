@@ -34,34 +34,7 @@ import androidx.compose.ui.unit.LayoutDirection
 /**
  * The default animation clock used for animations when an explicit clock isn't provided.
  */
-@Deprecated(
-    "Renamed to LocalAnimationClock",
-    replaceWith = ReplaceWith(
-        "LocalAnimationClock",
-        "androidx.compose.ui.platform.LocalAnimationClock"
-    )
-)
-val AmbientAnimationClock get() = LocalAnimationClock
-
-/**
- * The default animation clock used for animations when an explicit clock isn't provided.
- */
 val LocalAnimationClock = staticCompositionLocalOf<AnimationClockObservable>()
-
-/**
- * The CompositionLocal that can be used to trigger autofill actions.
- * Eg. [Autofill.requestAutofillForNode].
- */
-@get:ExperimentalComposeUiApi
-@ExperimentalComposeUiApi
-@Deprecated(
-    "Renamed to LocalAutofill",
-    replaceWith = ReplaceWith(
-        "LocalAutofill",
-        "androidx.compose.ui.platform.LocalAutofill"
-    )
-)
-val AmbientAutofill get() = LocalAutofill
 
 /**
  * The CompositionLocal that can be used to trigger autofill actions.
@@ -79,36 +52,7 @@ val LocalAutofill = staticCompositionLocalOf<Autofill?>()
  */
 @get:ExperimentalComposeUiApi
 @ExperimentalComposeUiApi
-@Deprecated(
-    "Renamed to LocalAutofillTree",
-    replaceWith = ReplaceWith(
-        "LocalAutofillTree",
-        "androidx.compose.ui.platform.LocalAutofillTree"
-    )
-)
-val AmbientAutofillTree get() = LocalAutofillTree
-
-/**
- * The CompositionLocal that can be used to add
- * [AutofillNode][import androidx.compose.ui.autofill.AutofillNode]s to the autofill tree. The
- * [AutofillTree] is a temporary data structure that will be replaced by Autofill Semantics
- * (b/138604305).
- */
-@get:ExperimentalComposeUiApi
-@ExperimentalComposeUiApi
 val LocalAutofillTree = staticCompositionLocalOf<AutofillTree>()
-
-/**
- * The CompositionLocal to provide communication with platform clipboard service.
- */
-@Deprecated(
-    "Renamed to LocalClipboardManager",
-    replaceWith = ReplaceWith(
-        "LocalClipboardManager",
-        "androidx.compose.ui.platform.LocalClipboardManager"
-    )
-)
-val AmbientClipboardManager get() = LocalClipboardManager
 
 /**
  * The CompositionLocal to provide communication with platform clipboard service.
@@ -123,36 +67,7 @@ val LocalClipboardManager = staticCompositionLocalOf<ClipboardManager>()
  * [DP][androidx.compose.ui.unit.Dp] is provided and it must be converted in the body of [Layout]
  * or [DrawModifier].
  */
-@Deprecated(
-    "Renamed to LocalDensity",
-    replaceWith = ReplaceWith(
-        "LocalDensity",
-        "androidx.compose.ui.platform.LocalDensity"
-    )
-)
-val AmbientDensity get() = LocalDensity
-
-/**
- * Provides the [Density] to be used to transform between [density-independent pixel
- * units (DP)][androidx.compose.ui.unit.Dp] and [pixel units][androidx.compose.ui.unit.Px] or
- * [scale-independent pixel units (SP)][androidx.compose.ui.unit.TextUnit] and
- * [pixel units][androidx.compose.ui.unit.Px]. This is typically used when a
- * [DP][androidx.compose.ui.unit.Dp] is provided and it must be converted in the body of [Layout]
- * or [DrawModifier].
- */
 val LocalDensity = staticCompositionLocalOf<Density>()
-
-/**
- * The CompositionLocal that can be used to control focus within Compose.
- */
-@Deprecated(
-    "Renamed to LocalFocusManager",
-    replaceWith = ReplaceWith(
-        "LocalFocusManager",
-        "androidx.compose.ui.platform.LocalFocusManager"
-    )
-)
-val AmbientFocusManager get() = LocalFocusManager
 
 /**
  * The CompositionLocal that can be used to control focus within Compose.
@@ -165,34 +80,7 @@ val LocalFocusManager = staticCompositionLocalOf<FocusManager>()
  * Use [androidx.compose.ui.res.fontResource] instead.
  * @suppress
  */
-@Deprecated(
-    "Renamed to LocalFontLoader",
-    replaceWith = ReplaceWith(
-        "LocalFontLoader",
-        "androidx.compose.ui.platform.LocalFontLoader"
-    )
-)
-val AmbientFontLoader get() = LocalFontLoader
-
-/**
- * The CompositionLocal to provide platform font loading methods.
- *
- * Use [androidx.compose.ui.res.fontResource] instead.
- * @suppress
- */
 val LocalFontLoader = staticCompositionLocalOf<Font.ResourceLoader>()
-
-/**
- * The CompositionLocal to provide haptic feedback to the user.
- */
-@Deprecated(
-    "Renamed to LocalHapticFeedback",
-    replaceWith = ReplaceWith(
-        "LocalHapticFeedback",
-        "androidx.compose.ui.platform.LocalHapticFeedback"
-    )
-)
-val AmbientHapticFeedback get() = LocalHapticFeedback
 
 /**
  * The CompositionLocal to provide haptic feedback to the user.
@@ -202,31 +90,7 @@ val LocalHapticFeedback = staticCompositionLocalOf<HapticFeedback>()
 /**
  * The CompositionLocal to provide the layout direction.
  */
-@Deprecated(
-    "Renamed to LocalLayoutDirection",
-    replaceWith = ReplaceWith(
-        "LocalLayoutDirection",
-        "androidx.compose.ui.platform.LocalLayoutDirection"
-    )
-)
-val AmbientLayoutDirection get() = LocalLayoutDirection
-
-/**
- * The CompositionLocal to provide the layout direction.
- */
 val LocalLayoutDirection = staticCompositionLocalOf<LayoutDirection>()
-
-/**
- * The CompositionLocal to provide communication with platform text input service.
- */
-@Deprecated(
-    "Renamed to LocalTextInputService",
-    replaceWith = ReplaceWith(
-        "LocalTextInputService",
-        "androidx.compose.ui.platform.LocalTextInputService"
-    )
-)
-val AmbientTextInputService get() = LocalTextInputService
 
 /**
  * The CompositionLocal to provide communication with platform text input service.
@@ -236,31 +100,7 @@ val LocalTextInputService = staticCompositionLocalOf<TextInputService?>()
 /**
  * The CompositionLocal to provide text-related toolbar.
  */
-@Deprecated(
-    "Renamed to LocalTextToolbar",
-    replaceWith = ReplaceWith(
-        "LocalTextToolbar",
-        "androidx.compose.ui.platform.LocalTextToolbar"
-    )
-)
-val AmbientTextToolbar get() = LocalTextToolbar
-
-/**
- * The CompositionLocal to provide text-related toolbar.
- */
 val LocalTextToolbar = staticCompositionLocalOf<TextToolbar>()
-
-/**
- * The CompositionLocal to provide functionality related to URL, e.g. open URI.
- */
-@Deprecated(
-    "Renamed to LocalUriHandler",
-    replaceWith = ReplaceWith(
-        "LocalUriHandler",
-        "androidx.compose.ui.platform.LocalUriHandler"
-    )
-)
-val AmbientUriHandler get() = LocalUriHandler
 
 /**
  * The CompositionLocal to provide functionality related to URL, e.g. open URI.
@@ -270,31 +110,7 @@ val LocalUriHandler = staticCompositionLocalOf<UriHandler>()
 /**
  * The CompositionLocal that provides the ViewConfiguration.
  */
-@Deprecated(
-    "Renamed to LocalViewConfiguration",
-    replaceWith = ReplaceWith(
-        "LocalViewConfiguration",
-        "androidx.compose.ui.platform.LocalViewConfiguration"
-    )
-)
-val AmbientViewConfiguration get() = LocalViewConfiguration
-
-/**
- * The CompositionLocal that provides the ViewConfiguration.
- */
 val LocalViewConfiguration = staticCompositionLocalOf<ViewConfiguration>()
-
-/**
- * The CompositionLocal that provides information about the window that hosts the current [Owner].
- */
-@Deprecated(
-    "Renamed to LocalWindowInfo",
-    replaceWith = ReplaceWith(
-        "LocalWindowInfo",
-        "androidx.compose.ui.platform.LocalWindowInfo"
-    )
-)
-val AmbientWindowInfo get() = LocalWindowInfo
 
 /**
  * The CompositionLocal that provides information about the window that hosts the current [Owner].

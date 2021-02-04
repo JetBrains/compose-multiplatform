@@ -230,22 +230,6 @@ fun Text(
  *
  * @see ProvideTextStyle
  */
-@Deprecated(
-    "Renamed to LocalTextStyle",
-    replaceWith = ReplaceWith(
-        "LocalTextStyle",
-        "androidx.compose.material.LocalTextStyle"
-    )
-)
-val AmbientTextStyle get() = LocalTextStyle
-
-/**
- * CompositionLocal containing the preferred [TextStyle] that will be used by [Text] components by
- * default. To set the value for this CompositionLocal, see [ProvideTextStyle] which will merge any
- * missing [TextStyle] properties with the existing [TextStyle] set in this CompositionLocal.
- *
- * @see ProvideTextStyle
- */
 val LocalTextStyle = compositionLocalOf(structuralEqualityPolicy()) { TextStyle.Default }
 
 // TODO: b/156598010 remove this and replace with fold definition on the backing CompositionLocal

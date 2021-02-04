@@ -847,3 +847,20 @@ internal sealed class AlignmentLineProvider {
         }
     }
 }
+
+/**
+ * Used to specify how a layout chooses its own size when multiple behaviors are possible.
+ */
+// TODO(popam): remove this when Flow is reworked
+internal enum class SizeMode {
+    /**
+     * Minimize the amount of free space by wrapping the children,
+     * subject to the incoming layout constraints.
+     */
+    Wrap,
+    /**
+     * Maximize the amount of free space by expanding to fill the available space,
+     * subject to the incoming layout constraints.
+     */
+    Expand
+}

@@ -160,12 +160,6 @@ interface ColumnScope {
         )
     )
 
-    @Deprecated(
-        "alignWithSiblings was renamed to alignBy.",
-        ReplaceWith("alignBy(alignmentLine)")
-    )
-    fun Modifier.alignWithSiblings(alignmentLine: VerticalAlignmentLine) = alignBy(alignmentLine)
-
     /**
      * Size the element's height proportional to its [weight] relative to other weighted sibling
      * elements in the [Column]. The parent will divide the vertical space remaining after measuring
@@ -228,13 +222,6 @@ interface ColumnScope {
             }
         )
     )
-
-    @Deprecated(
-        "alignWithSiblings was renamed to alignBy.",
-        ReplaceWith("alignBy(alignmentLineBlock)")
-    )
-    fun Modifier.alignWithSiblings(alignmentLineBlock: (Measured) -> Int) =
-        alignBy(alignmentLineBlock)
 
     companion object : ColumnScope
 }

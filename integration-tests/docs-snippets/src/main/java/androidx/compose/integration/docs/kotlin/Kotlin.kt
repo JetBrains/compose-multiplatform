@@ -22,7 +22,6 @@ package androidx.compose.integration.docs.kotlin
 
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.ConstraintLayout
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.Button
@@ -128,6 +127,8 @@ import androidx.compose.ui.unit.dp
     showDialog = true
 }
 
+// TODO: uncomment when constraint layout for compose releases, and add that dependency
+/*
 @Suppress("Deprecation")
 @Composable private fun KotlinSnippet10() {
     ConstraintLayout {
@@ -140,7 +141,7 @@ import androidx.compose.ui.unit.dp
 
         // ...
     }
-}
+}*/
 
 /*
 Fakes needed for snippets to build:

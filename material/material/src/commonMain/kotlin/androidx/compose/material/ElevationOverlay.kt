@@ -33,22 +33,6 @@ import kotlin.math.ln
  *
  * @see ElevationOverlay
  */
-@Deprecated(
-    "Renamed to LocalElevationOverlay",
-    replaceWith = ReplaceWith(
-        "LocalElevationOverlay",
-        "androidx.compose.material.LocalElevationOverlay"
-    )
-)
-val AmbientElevationOverlay: ProvidableCompositionLocal<ElevationOverlay?>
-    get() = LocalElevationOverlay
-
-/**
- * CompositionLocal containing the [ElevationOverlay] used by [Surface] components. Provide
- * `null` to turn off [ElevationOverlay]s for the children within this CompositionLocal..
- *
- * @see ElevationOverlay
- */
 val LocalElevationOverlay: ProvidableCompositionLocal<ElevationOverlay?> =
     staticCompositionLocalOf { DefaultElevationOverlay }
 

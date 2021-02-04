@@ -29,13 +29,6 @@ import androidx.compose.foundation.gestures.ScrollScope
 import androidx.compose.foundation.gestures.Scrollable
 import androidx.compose.foundation.gestures.ScrollableController
 import androidx.compose.foundation.gestures.scrollable
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.ColumnScope
-import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.RowScope
-import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Stable
 import androidx.compose.runtime.getValue
@@ -46,7 +39,6 @@ import androidx.compose.runtime.saveable.Saver
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.structuralEqualityPolicy
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.composed
 import androidx.compose.ui.draw.clipToBounds
@@ -65,7 +57,6 @@ import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.semantics.verticalScrollAxisRange
 import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.LayoutDirection
-import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.launch
 import kotlin.math.roundToInt
 
@@ -241,114 +232,6 @@ class ScrollState(
             restore = { ScrollState(it, flingConfig, animationClock, interactionState) }
         )
     }
-}
-
-/**
- * Variation of [Column] that scrolls when content is bigger than its height.
- *
- * The content of the [ScrollableColumn] is clipped to its bounds.
- *
- * @param modifier modifier for this [ScrollableColumn]
- * @param scrollState state of the scroll, such as current offset and max offset
- * @param verticalArrangement The vertical arrangement of the layout's children
- * @param horizontalAlignment The horizontal alignment of the layout's children
- * @param reverseScrollDirection reverse the direction of scrolling, when `true`, [ScrollState
- * .value] = 0 will mean bottom, when `false`, [ScrollState.value] = 0 will mean top
- * @param isScrollEnabled param to enable or disable touch input scrolling. If you own
- * [ScrollState], you still can call [ScrollState.smoothScrollTo] and other methods on it.
- * @param contentPadding convenience param to specify padding around content. This will add
- * padding for the content after it has been clipped, which is not possible via [modifier] param
- */
-@Composable
-@Deprecated(
-    "Prefer to use LazyColumn instead. Or you can use Column(Modifier.verticalScroll" +
-        "(rememberScrollState()) if your scrolling content is small enough.",
-    ReplaceWith(
-        "LazyColumn(modifier = modifier, contentPadding = contentPadding, " +
-            "reverseLayout = reverseScrollDirection, horizontalAlignment = horizontalAlignment) {" +
-            "\n // use `item` for separate elements like headers" +
-            "\n // and `items` for lists of identical elements" +
-            "\n item (content)" +
-            "\n }",
-        "androidx.compose.foundation.lazy.LazyColumn"
-    )
-)
-fun ScrollableColumn(
-    modifier: Modifier = Modifier,
-    scrollState: ScrollState = rememberScrollState(0f),
-    verticalArrangement: Arrangement.Vertical = Arrangement.Top,
-    horizontalAlignment: Alignment.Horizontal = Alignment.Start,
-    reverseScrollDirection: Boolean = false,
-    isScrollEnabled: Boolean = true,
-    contentPadding: PaddingValues = PaddingValues(0.dp),
-    content: @Composable ColumnScope.() -> Unit
-) {
-    Column(
-        modifier = modifier
-            .verticalScroll(
-                scrollState,
-                isScrollEnabled,
-                reverseScrolling = reverseScrollDirection
-            )
-            .padding(contentPadding),
-        verticalArrangement = verticalArrangement,
-        horizontalAlignment = horizontalAlignment,
-        content = content
-    )
-}
-
-/**
- * Variation of [Row] that scrolls when content is bigger than its width.
- *
- * The content of the [ScrollableRow] is clipped to its bounds.
- *
- * @param modifier modifier for this [ScrollableRow]
- * @param scrollState state of the scroll, such as current offset and max offset
- * @param horizontalArrangement The horizontal arrangement of the layout's children
- * @param verticalAlignment The vertical alignment of the layout's children
- * @param reverseScrollDirection reverse the direction of scrolling, when `true`, [ScrollState
- * .value] = 0 will mean right, when `false`, [ScrollState.value] = 0 will mean left
- * @param isScrollEnabled param to enable or disable touch input scrolling. If you own
- * [ScrollState], you still can call [ScrollState.smoothScrollTo] and other methods on it.
- * @param contentPadding convenience param to specify padding around content. This will add
- * padding for the content after it has been clipped, which is not possible via [modifier] param.
- */
-@Composable
-@Deprecated(
-    "Prefer to use LazyRow instead. Or you can use Row(Modifier.horizontalScroll" +
-        "(rememberScrollState()) if your scrolling content is small enough.",
-    ReplaceWith(
-        "LazyRow(modifier = modifier, contentPadding = contentPadding, " +
-            "reverseLayout = reverseScrollDirection, verticalAlignment = verticalAlignment) {" +
-            "\n // use `item` for separate elements like headers" +
-            "\n // and `items` for lists of identical elements" +
-            "\n item (content)" +
-            "\n }",
-        "androidx.compose.foundation.lazy.LazyRow"
-    )
-)
-fun ScrollableRow(
-    modifier: Modifier = Modifier,
-    scrollState: ScrollState = rememberScrollState(0f),
-    horizontalArrangement: Arrangement.Horizontal = Arrangement.Start,
-    verticalAlignment: Alignment.Vertical = Alignment.Top,
-    reverseScrollDirection: Boolean = false,
-    isScrollEnabled: Boolean = true,
-    contentPadding: PaddingValues = PaddingValues(0.dp),
-    content: @Composable RowScope.() -> Unit
-) {
-    Row(
-        modifier = modifier
-            .horizontalScroll(
-                scrollState,
-                isScrollEnabled,
-                reverseScrolling = reverseScrollDirection
-            )
-            .padding(contentPadding),
-        horizontalArrangement = horizontalArrangement,
-        verticalAlignment = verticalAlignment,
-        content = content
-    )
 }
 
 /**

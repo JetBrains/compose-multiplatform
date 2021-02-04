@@ -26,7 +26,7 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.gesture.tapGestureFilter
 import androidx.compose.ui.layout.Layout
 import androidx.compose.ui.layout.onGloballyPositioned
-import androidx.compose.ui.platform.AmbientDensity
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.DesktopOwner
 import androidx.compose.ui.platform.DesktopOwnersAmbient
 import androidx.compose.ui.platform.setContent
@@ -105,7 +105,7 @@ private fun PopupLayout(
     content: @Composable () -> Unit
 ) {
     val owners = DesktopOwnersAmbient.current
-    val density = AmbientDensity.current
+    val density = LocalDensity.current
 
     val parentBounds = remember { mutableStateOf(IntRect.Zero) }
 

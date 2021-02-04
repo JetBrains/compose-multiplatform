@@ -121,23 +121,6 @@ public fun interface RippleAlpha {
  */
 @get:ExperimentalRippleApi
 @ExperimentalRippleApi
-@Deprecated(
-    "Renamed to LocalRippleTheme",
-    replaceWith = ReplaceWith(
-        "LocalRippleTheme",
-        "androidx.compose.material.ripple.LocalRippleTheme"
-    )
-)
-public val AmbientRippleTheme: ProvidableCompositionLocal<RippleTheme> get() = LocalRippleTheme
-
-/**
- * CompositionLocal used for providing [RippleTheme] down the tree.
- *
- * See [RippleTheme.defaultRippleColor] and [RippleTheme.defaultRippleAlpha] functions for the
- * default implementations for color and alpha.
- */
-@get:ExperimentalRippleApi
-@ExperimentalRippleApi
 public val LocalRippleTheme: ProvidableCompositionLocal<RippleTheme> =
     staticCompositionLocalOf { DebugRippleTheme }
 
