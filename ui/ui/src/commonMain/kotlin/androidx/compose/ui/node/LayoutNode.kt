@@ -1084,8 +1084,8 @@ internal class LayoutNode : Measurable, Remeasurement, OwnerScope, LayoutInfo, C
      * Execute your code within the [block] if you want some code to not be observed for the
      * model reads even if you are currently inside some observed scope like measuring.
      */
-    internal fun ignoreModelReads(block: () -> Unit) {
-        requireOwner().snapshotObserver.pauseSnapshotReadObservation(block)
+    internal fun withNoSnapshotReadObservation(block: () -> Unit) {
+        requireOwner().snapshotObserver.withNoSnapshotReadObservation(block)
     }
 
     internal fun dispatchOnPositionedCallbacks() {

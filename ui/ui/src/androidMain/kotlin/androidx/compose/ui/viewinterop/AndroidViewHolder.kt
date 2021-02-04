@@ -157,12 +157,12 @@ internal abstract class AndroidViewHolder(
 
     override fun onAttachedToWindow() {
         super.onAttachedToWindow()
-        snapshotObserver.enableStateUpdatesObserving(true)
+        snapshotObserver.start()
     }
 
     override fun onDetachedFromWindow() {
         super.onDetachedFromWindow()
-        snapshotObserver.enableStateUpdatesObserving(false)
+        snapshotObserver.stop()
         // remove all observations:
         snapshotObserver.clear()
     }

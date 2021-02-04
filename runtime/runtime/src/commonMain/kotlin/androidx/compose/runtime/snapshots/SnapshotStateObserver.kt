@@ -16,13 +16,12 @@
 
 package androidx.compose.runtime.snapshots
 
-import androidx.compose.runtime.ExperimentalComposeApi
-import androidx.compose.runtime.collection.mutableVectorOf
 import androidx.compose.runtime.TestOnly
 import androidx.compose.runtime.collection.IdentityScopeMap
+import androidx.compose.runtime.collection.mutableVectorOf
 import androidx.compose.runtime.synchronized
 
-@ExperimentalComposeApi
+@Suppress("NotCloseable") // we can't implement AutoCloseable from commonMain
 class SnapshotStateObserver(private val onChangedExecutor: (callback: () -> Unit) -> Unit) {
     private val applyObserver: (Set<Any>, Snapshot) -> Unit = { applied, _ ->
         var hasValues = false
@@ -76,7 +75,7 @@ class SnapshotStateObserver(private val onChangedExecutor: (callback: () -> Unit
     private var isObserving = false
 
     /**
-     * `true` when [pauseObservingReads] is called and read observations should no
+     * `true` when [withNoObservations] is called and read observations should no
      * longer be considered invalidations for the `onCommit` callback.
      */
     private var isPaused = false
@@ -87,36 +86,27 @@ class SnapshotStateObserver(private val onChangedExecutor: (callback: () -> Unit
     private var currentMap: ApplyMap<*>? = null
 
     /**
-     * Remove all hooks used to track changes.
-     */
-    fun dispose() {
-        require(!isObserving) { "Cannot dispose an observer while observing" }
-        if (applyUnsubscribe != null) {
-            enableStateUpdatesObserving(false)
-        }
-    }
-
-    /**
      * Executes [block], observing state object reads during its execution.
      *
-     * The [target] and [onChanged] are associated with any values that are read so that when
-     * those values change, [onChanged] can be called with the [target] parameter.
+     * The [scope] and [onValueChangedForScope] are associated with any values that are read so
+     * that when those values change, [onValueChangedForScope] can be called with the [scope]
+     * parameter.
      *
-     * Observation for [target] will be paused when a new [observeReads] call is made or when
-     * [pauseObservingReads] is called.
+     * Observation for [scope] will be paused when a new [observeReads] call is made or when
+     * [withNoObservations] is called.
      *
-     * Any previous observation with the given [target] and [onChanged] will be cleared when
-     * the [onChanged] is called for [target]. The [onChanged] should trigger a new [observeReads]
-     * call to resubscribe to changes. They may also be cleared using [removeObservationsFor]
-     * or [clear].
+     * Any previous observation with the given [scope] and [onValueChangedForScope] will be
+     * cleared when the [onValueChangedForScope] is called for [scope]. The
+     * [onValueChangedForScope] should trigger a new [observeReads] call to resubscribe to
+     * changes. They may also be cleared using [clearIf] or [clear].
      */
-    fun <T : Any> observeReads(target: T, onChanged: (T) -> Unit, block: () -> Unit) {
+    fun <T : Any> observeReads(scope: T, onValueChangedForScope: (T) -> Unit, block: () -> Unit) {
         val oldMap = currentMap
         val oldPaused = isPaused
-        val applyMap = synchronized(applyMaps) { ensureMap(onChanged) }
+        val applyMap = synchronized(applyMaps) { ensureMap(onValueChangedForScope) }
         val oldScope = applyMap.currentScope
 
-        applyMap.currentScope = target
+        applyMap.currentScope = scope
         currentMap = applyMap
         isPaused = false
 
@@ -140,7 +130,7 @@ class SnapshotStateObserver(private val onChangedExecutor: (callback: () -> Unit
      * Stops observing state object reads while executing [block]. State object reads may be
      * restarted by calling [observeReads] inside [block].
      */
-    fun pauseObservingReads(block: () -> Unit) {
+    fun withNoObservations(block: () -> Unit) {
         val oldPaused = isPaused
         isPaused = true
         try {
@@ -151,24 +141,24 @@ class SnapshotStateObserver(private val onChangedExecutor: (callback: () -> Unit
     }
 
     /**
-     * Clears all model read observations for a given [target]. This clears values for all
+     * Clears all model read observations for a given [scope]. This clears values for all
      * `onCommit` methods passed in [observeReads].
      */
-    fun clear(target: Any) {
+    fun clear(scope: Any) {
         synchronized(applyMaps) {
             applyMaps.forEach { commitMap ->
-                commitMap.map.removeValueIf { scope ->
-                    scope === target
+                commitMap.map.removeValueIf {
+                    it === scope
                 }
             }
         }
     }
 
     /**
-     * Remove observations using [predicate] to identify target scopes to be removed. This is
+     * Remove observations using [predicate] to identify scope scopes to be removed. This is
      * used when a scope is no longer in the hierarchy and should not receive any callbacks.
      */
-    fun removeObservationsFor(predicate: (scope: Any) -> Boolean) {
+    fun clearIf(predicate: (scope: Any) -> Boolean) {
         synchronized(applyMaps) {
             applyMaps.forEach { applyMap ->
                 applyMap.map.removeValueIf(predicate)
@@ -177,18 +167,17 @@ class SnapshotStateObserver(private val onChangedExecutor: (callback: () -> Unit
     }
 
     /**
-     * Starts or stops watching for model commits based on [enabled].
+     * Starts watching for state commits.
      */
-    fun enableStateUpdatesObserving(enabled: Boolean) {
-        require(enabled == (applyUnsubscribe == null)) {
-            "Called twice with the same enabled value: $enabled"
-        }
-        applyUnsubscribe = if (enabled) {
-            Snapshot.registerApplyObserver(applyObserver)
-        } else {
-            applyUnsubscribe?.dispose()
-            null
-        }
+    fun start() {
+        applyUnsubscribe = Snapshot.registerApplyObserver(applyObserver)
+    }
+
+    /**
+     * Stops watching for state commits.
+     */
+    fun stop() {
+        applyUnsubscribe?.dispose()
     }
 
     /**
@@ -212,14 +201,14 @@ class SnapshotStateObserver(private val onChangedExecutor: (callback: () -> Unit
     }
 
     /**
-     * Calls the `onChanged` callback for the given targets.
+     * Calls the `onChanged` callback for the given scopes.
      */
     private fun callOnChanged() {
         applyMaps.forEach { applyMap ->
-            val targets = applyMap.invalidated
-            if (targets.isNotEmpty()) {
-                applyMap.callOnChanged(targets)
-                targets.clear()
+            val scopes = applyMap.invalidated
+            if (scopes.isNotEmpty()) {
+                applyMap.callOnChanged(scopes)
+                scopes.clear()
             }
         }
     }
@@ -242,14 +231,14 @@ class SnapshotStateObserver(private val onChangedExecutor: (callback: () -> Unit
     }
 
     /**
-     * Used to tie an [onChanged] to its target by type. This works around some difficulties in
+     * Used to tie an [onChanged] to its scope by type. This works around some difficulties in
      * unchecked casts with kotlin.
      */
     @Suppress("UNCHECKED_CAST")
     private class ApplyMap<T : Any>(val onChanged: (T) -> Unit) {
         /**
          * Map (key = model, value = scope). These are the models that have been
-         * read during the target's [SnapshotStateObserver.observeReads].
+         * read during the scope's [SnapshotStateObserver.observeReads].
          */
         val map = IdentityScopeMap<T>()
 
@@ -271,11 +260,11 @@ class SnapshotStateObserver(private val onChangedExecutor: (callback: () -> Unit
         }
 
         /**
-         * Calls the `onCommit` callback for targets affected by the given committed values.
+         * Calls the `onCommit` callback for scopes affected by the given committed values.
          */
-        fun callOnChanged(targets: Collection<Any>) {
-            targets.forEach { target ->
-                onChanged(target as T)
+        fun callOnChanged(scopes: Collection<Any>) {
+            scopes.forEach { scope ->
+                onChanged(scope as T)
             }
         }
     }
