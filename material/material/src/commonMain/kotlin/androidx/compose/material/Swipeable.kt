@@ -27,6 +27,7 @@ import androidx.compose.animation.core.AnimationSpec
 import androidx.compose.animation.core.SpringSpec
 import androidx.compose.foundation.InteractionState
 import androidx.compose.foundation.gestures.draggable
+import androidx.compose.foundation.gestures.rememberDraggableState
 import androidx.compose.material.SwipeableDefaults.AnimationSpec
 import androidx.compose.material.SwipeableDefaults.StandardResistanceFactor
 import androidx.compose.material.SwipeableDefaults.VelocityThreshold
@@ -579,10 +580,11 @@ fun <T> Modifier.swipeable(
         startDragImmediately = state.isAnimationRunning,
         onDragStopped = { velocity ->
             state.performFling(velocity) {}
+        },
+        state = rememberDraggableState { delta ->
+            state.holder.snapTo(state.holder.value + delta)
         }
-    ) { delta ->
-        state.holder.snapTo(state.holder.value + delta)
-    }
+    )
 }
 
 /**

@@ -208,8 +208,19 @@ package androidx.compose.foundation.gestures {
     method public static suspend Object? verticalDrag-Pd94rOk(androidx.compose.ui.input.pointer.AwaitPointerEventScope, long pointerId, kotlin.jvm.functions.Function1<? super androidx.compose.ui.input.pointer.PointerInputChange,kotlin.Unit> onDrag, kotlin.coroutines.Continuation<? super java.lang.Boolean> p);
   }
 
+  public interface DragScope {
+    method public void dragBy(float pixels);
+  }
+
   public final class DraggableKt {
-    method public static androidx.compose.ui.Modifier draggable(androidx.compose.ui.Modifier, androidx.compose.ui.gesture.scrollorientationlocking.Orientation orientation, optional boolean enabled, optional boolean reverseDirection, optional androidx.compose.foundation.InteractionState? interactionState, optional boolean startDragImmediately, optional kotlin.jvm.functions.Function1<? super androidx.compose.ui.geometry.Offset,kotlin.Unit> onDragStarted, optional kotlin.jvm.functions.Function1<? super java.lang.Float,kotlin.Unit> onDragStopped, kotlin.jvm.functions.Function2<? super androidx.compose.ui.unit.Density,? super java.lang.Float,kotlin.Unit> onDrag);
+    method public static androidx.compose.foundation.gestures.DraggableState DraggableState(kotlin.jvm.functions.Function1<? super java.lang.Float,kotlin.Unit> onDelta);
+    method public static androidx.compose.ui.Modifier draggable(androidx.compose.ui.Modifier, androidx.compose.foundation.gestures.DraggableState state, androidx.compose.ui.gesture.scrollorientationlocking.Orientation orientation, optional boolean enabled, optional androidx.compose.foundation.InteractionState? interactionState, optional boolean startDragImmediately, optional kotlin.jvm.functions.Function3<? super kotlinx.coroutines.CoroutineScope,? super androidx.compose.ui.geometry.Offset,? super kotlin.coroutines.Continuation<? super kotlin.Unit>,?> onDragStarted, optional kotlin.jvm.functions.Function3<? super kotlinx.coroutines.CoroutineScope,? super java.lang.Float,? super kotlin.coroutines.Continuation<? super kotlin.Unit>,?> onDragStopped, optional boolean reverseDirection);
+    method @androidx.compose.runtime.Composable public static androidx.compose.foundation.gestures.DraggableState rememberDraggableState(kotlin.jvm.functions.Function1<? super java.lang.Float,kotlin.Unit> onDelta);
+  }
+
+  public interface DraggableState {
+    method public void dispatchRawDelta(float delta);
+    method public suspend Object? drag(optional androidx.compose.foundation.MutatePriority dragPriority, kotlin.jvm.functions.Function2<? super androidx.compose.foundation.gestures.DragScope,? super kotlin.coroutines.Continuation<? super kotlin.Unit>,?> block, kotlin.coroutines.Continuation<? super kotlin.Unit> p);
   }
 
   public final class ForEachGestureKt {

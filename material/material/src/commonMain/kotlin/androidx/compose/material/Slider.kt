@@ -29,6 +29,7 @@ import androidx.compose.foundation.animation.defaultFlingConfig
 import androidx.compose.foundation.focusable
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.gestures.draggable
+import androidx.compose.foundation.gestures.rememberDraggableState
 import androidx.compose.foundation.indication
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxWithConstraints
@@ -186,7 +187,7 @@ fun Slider(
             interactionState = interactionState,
             onDragStopped = { velocity -> gestureEndAction(velocity) },
             startDragImmediately = position.holder.isRunning,
-            onDrag = {
+            state = rememberDraggableState {
                 position.snapTo(position.holder.value + it)
             }
         )

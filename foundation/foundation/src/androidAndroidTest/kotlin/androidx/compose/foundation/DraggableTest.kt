@@ -17,6 +17,7 @@
 package androidx.compose.foundation
 
 import androidx.compose.foundation.gestures.draggable
+import androidx.compose.foundation.gestures.rememberDraggableState
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.preferredSize
 import androidx.compose.runtime.Composable
@@ -25,6 +26,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.composed
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.gesture.scrollorientationlocking.Orientation
 import androidx.compose.ui.platform.InspectableValue
@@ -402,7 +404,10 @@ class DraggableTest {
     @Test
     fun testInspectableValue() {
         rule.setContent {
-            val modifier = Modifier.draggable(Orientation.Horizontal) {} as InspectableValue
+            val modifier = Modifier.draggable(
+                orientation = Orientation.Horizontal,
+                state = rememberDraggableState { }
+            ) as InspectableValue
             assertThat(modifier.nameFallback).isEqualTo("draggable")
             assertThat(modifier.valueOverride).isNull()
             assertThat(modifier.inspectableElements.map { it.name }.asIterable()).containsExactly(
@@ -413,7 +418,7 @@ class DraggableTest {
                 "startDragImmediately",
                 "onDragStarted",
                 "onDragStopped",
-                "onDrag",
+                "state",
             )
         }
     }
@@ -430,5 +435,28 @@ class DraggableTest {
                 )
             }
         }
+    }
+
+    private fun Modifier.draggable(
+        orientation: Orientation,
+        enabled: Boolean = true,
+        reverseDirection: Boolean = false,
+        interactionState: InteractionState? = null,
+        startDragImmediately: Boolean = false,
+        onDragStarted: (startedPosition: Offset) -> Unit = {},
+        onDragStopped: (velocity: Float) -> Unit = {},
+        onDrag: (Float) -> Unit
+    ): Modifier = composed {
+        val state = rememberDraggableState(onDrag)
+        draggable(
+            orientation = orientation,
+            enabled = enabled,
+            reverseDirection = reverseDirection,
+            interactionState = interactionState,
+            startDragImmediately = startDragImmediately,
+            onDragStarted = { onDragStarted(it) },
+            onDragStopped = { onDragStopped(it) },
+            state = state
+        )
     }
 }
