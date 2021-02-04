@@ -17,6 +17,7 @@ package androidx.compose.desktop.examples.popupexample
 
 import androidx.compose.desktop.AppManager
 import androidx.compose.desktop.AppWindow
+import androidx.compose.desktop.SwingPanel
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -36,9 +37,9 @@ import androidx.compose.material.RadioButton
 import androidx.compose.material.Surface
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -48,11 +49,15 @@ import androidx.compose.ui.input.pointer.pointerMoveFilter
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.Notifier
 import androidx.compose.ui.window.Popup
 import androidx.compose.ui.window.Tray
 import androidx.compose.ui.window.WindowDraggableArea
+import java.awt.event.ActionListener
+import java.awt.event.ActionEvent
 import java.awt.Toolkit
+import javax.swing.JButton
 
 @Composable
 fun content() {
@@ -69,6 +74,8 @@ fun content() {
             tray.remove()
         }
     }
+
+    val dialogState = remember { mutableStateOf(false) }
 
     Surface(
         modifier = Modifier.fillMaxSize(),
@@ -123,6 +130,8 @@ fun content() {
                 Column(modifier = Modifier.padding(start = 30.dp, top = 50.dp)) {
                     Button("Show Popup", { AppState.popupState.value = true }, Color(232, 182, 109))
                     Spacer(modifier = Modifier.height(30.dp))
+                    Button("Open dialog", { dialogState.value = true })
+                    Spacer(modifier = Modifier.height(30.dp))
                     Button(
                         text = "New window...",
                         onClick = {
@@ -168,12 +177,15 @@ fun content() {
                     Button("Increment amount", { AppState.amount.value++ }, Color(150, 232, 150))
                     Spacer(modifier = Modifier.height(30.dp))
                     Button("Exit app", { AppManager.exit() }, Color(232, 100, 100))
+                    Spacer(modifier = Modifier.height(30.dp))
+                    SwingActionButton("JButton", { AppState.amount.value++ })
                 }
                 Column(
                     modifier = Modifier.padding(start = 30.dp, top = 50.dp, end = 30.dp)
                         .background(color = Color(255, 255, 255, 10))
                         .fillMaxWidth()
                 ) {
+                    Spacer(modifier = Modifier.height(130.dp))
                     Row {
                         Checkbox(
                             checked = AppState.undecorated.value,
@@ -242,6 +254,21 @@ fun content() {
             Modifier.fillMaxSize().background(color = Color(0, 0, 0, 200))
         )
     }
+
+    if (dialogState.value) {
+        val dismiss = {
+            dialogState.value = false
+            println("Dialog window is dismissed.")
+        }
+        Dialog(
+            onDismissRequest = dismiss
+        ) {
+            WindowContent(
+                AppState.amount,
+                onClose = dismiss
+            )
+        }
+    }
 }
 
 @Composable
@@ -292,9 +319,9 @@ fun WindowContent(amount: MutableState<Int>, onClose: () -> Unit) {
             TextBox(text = "Increment amount?")
             Spacer(modifier = Modifier.height(30.dp))
             Row {
-                Button(text = "Yes", onClick = { amount.value++ })
+                Button(text = "Yes", onClick = { amount.value++ }, size = IntSize(100, 35))
                 Spacer(modifier = Modifier.width(30.dp))
-                Button(text = "Close", onClick = { onClose.invoke() })
+                Button(text = "Close", onClick = { onClose.invoke() }, size = IntSize(100, 35))
             }
         }
     }
@@ -351,7 +378,7 @@ fun TextBox(text: String = "", modifier: Modifier = Modifier.height(30.dp)) {
 @Composable
 fun RadioButton(text: String, state: MutableState<Boolean>) {
     Box(
-        modifier = Modifier.height(35.dp),
+        modifier = Modifier.height(35.dp).padding(start = 20.dp, bottom = 5.dp),
         contentAlignment = Alignment.Center
     ) {
         RadioButton(
@@ -380,4 +407,24 @@ actual fun Modifier.hover(
 
 private fun image(url: String): java.awt.Image {
     return Toolkit.getDefaultToolkit().getImage(url)
+}
+
+@Composable
+fun SwingActionButton(text: String, action: (() -> Unit)? = null) {
+    SwingPanel(
+        background = Color(55, 55, 55),
+        modifier = Modifier.preferredSize(200.dp, 35.dp),
+        componentBlock = {
+            JButton(text).apply {
+                addActionListener(object : ActionListener {
+                    public override fun actionPerformed(e: ActionEvent) {
+                        action?.invoke()
+                    }
+                })
+            }
+        },
+        update = { component ->
+            component.setText("$text:${AppState.amount.value}")
+        }
+    )
 }

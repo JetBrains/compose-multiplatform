@@ -17,13 +17,45 @@ package androidx.compose.desktop
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionContext
+import java.awt.Component
+import java.awt.event.ComponentAdapter
+import java.awt.event.ComponentEvent
 import javax.swing.JFrame
+import javax.swing.JLayeredPane
+import org.jetbrains.skiko.ClipComponent
 
+/**
+ * ComposeWindow is a window for building UI using Compose for Desktop.
+ * ComposeWindow inherits javax.swing.JFrame.
+ * @param parent The parent AppFrame that wraps the ComposeWindow.
+ */
 class ComposeWindow(val parent: AppFrame) : JFrame() {
     internal val layer = ComposeLayer()
+    private val pane = JLayeredPane()
+    private val clipMap = mutableMapOf<Component, ClipComponent>()
 
     init {
-        contentPane.add(layer.component)
+        pane.setLayout(null)
+        pane.add(layer.component, Integer.valueOf(1))
+        addComponentListener(object : ComponentAdapter() {
+            override fun componentResized(e: ComponentEvent) {
+                layer.wrapped.setSize(pane.width, pane.height)
+            }
+        })
+        contentPane.add(pane)
+    }
+
+    override fun add(component: Component): Component {
+        val clipComponent = ClipComponent(component)
+        clipMap.put(component, clipComponent)
+        layer.wrapped.clipComponents.add(clipComponent)
+        return pane.add(component, Integer.valueOf(0))
+    }
+
+    override fun remove(component: Component) {
+        layer.wrapped.clipComponents.remove(clipMap.get(component)!!)
+        clipMap.remove(component)
+        pane.remove(component)
     }
 
     /**

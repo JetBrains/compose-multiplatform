@@ -16,24 +16,37 @@
 package androidx.compose.desktop
 
 import androidx.compose.runtime.Composable
-import java.awt.GridLayout
-import javax.swing.JPanel
+import androidx.compose.runtime.Providers
+import java.awt.Color
+import java.awt.Component
+import java.awt.event.ComponentAdapter
+import java.awt.event.ComponentEvent
+import javax.swing.JLayeredPane
 import javax.swing.SwingUtilities.isEventDispatchThread
+import org.jetbrains.skiko.ClipComponent
 
 /**
- * ComposePanel is panel for building UI using Compose for Desktop.
+ * ComposePanel is a panel for building UI using Compose for Desktop.
  */
-class ComposePanel : JPanel() {
+class ComposePanel : JLayeredPane() {
     init {
         check(isEventDispatchThread()) {
             "ComposePanel should be created inside AWT Event Dispatch Thread" +
                 " (use SwingUtilities.invokeLater).\n" +
                 "Creating from another thread isn't supported."
         }
-        layout = GridLayout(1, 1)
+        setBackground(Color.white)
+        setLayout(null)
+
+        addComponentListener(object : ComponentAdapter() {
+            override fun componentResized(e: ComponentEvent) {
+                layer?.wrapped?.setSize(width, height)
+            }
+        })
     }
 
-    private var layer: ComposeLayer? = null
+    internal var layer: ComposeLayer? = null
+    private val clipMap = mutableMapOf<Component, ClipComponent>()
     private var content: (@Composable () -> Unit)? = null
 
     /**
@@ -52,10 +65,29 @@ class ComposePanel : JPanel() {
 
     private fun initContent() {
         if (layer != null && content != null) {
-            layer!!.setContent(
-                content = content!!
-            )
+            layer!!.setContent {
+                Providers(
+                    LocalLayerContainer provides this,
+                    content = content!!
+                )
+            }
         }
+    }
+
+    override fun add(component: Component): Component {
+        if (layer == null) {
+            return component
+        }
+        val clipComponent = ClipComponent(component)
+        clipMap.put(component, clipComponent)
+        layer!!.wrapped.clipComponents.add(clipComponent)
+        return super.add(component, Integer.valueOf(0))
+    }
+
+    override fun remove(component: Component) {
+        layer!!.wrapped.clipComponents.remove(clipMap.get(component)!!)
+        clipMap.remove(component)
+        super.remove(component)
     }
 
     override fun addNotify() {
@@ -64,15 +96,14 @@ class ComposePanel : JPanel() {
         // After [super.addNotify] is called we can safely initialize the layer and composable
         // content.
         layer = ComposeLayer()
-        add(layer!!.component)
-
+        super.add(layer!!.component, Integer.valueOf(1))
         initContent()
     }
 
     override fun removeNotify() {
         if (layer != null) {
             layer!!.dispose()
-            remove(layer!!.component)
+            super.remove(layer!!.component)
         }
 
         super.removeNotify()
