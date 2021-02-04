@@ -33,7 +33,6 @@ import androidx.compose.foundation.text.BasicText
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Providers
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.testutils.MockAnimationClock
 import androidx.compose.testutils.assertPixels
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -892,13 +891,8 @@ class ScrollTest {
 
     @Test
     fun testInspectorValue() {
-        val state = ScrollState(
-            initial = 0f,
-            flingConfig = FlingConfig(FloatExponentialDecaySpec()),
-            animationClock = MockAnimationClock()
-        )
         rule.setContent {
-            val modifier = Modifier.verticalScroll(state) as InspectableValue
+            val modifier = Modifier.verticalScroll(rememberScrollState(0f)) as InspectableValue
             assertThat(modifier.nameFallback).isEqualTo("scroll")
             assertThat(modifier.valueOverride).isNull()
             assertThat(modifier.inspectableElements.map { it.name }.asIterable()).containsExactly(
