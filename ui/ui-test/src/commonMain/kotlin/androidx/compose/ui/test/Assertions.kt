@@ -158,6 +158,9 @@ fun SemanticsNodeInteraction.assertContentDescriptionContains(
 /**
  * Asserts that the node's text equals the given [value].
  *
+ * If the node is a text field, it will compare input text and other texts that the text field
+ * might have, for example label or placeholder.
+ *
  * Throws [AssertionError] if the node's value is not equal to `value`, or if the node has no value
  *
  * @param ignoreCase Whether case should be ignored.
@@ -171,6 +174,9 @@ fun SemanticsNodeInteraction.assertTextEquals(
 
 /**
  * Asserts that the node's text contains the given [value] as a substring.
+ *
+ * If the node is a text field, it will compare input text and other texts that the text field
+ * might have, for example label or placeholder.
 
  * Throws [AssertionError] if the node's value does not contain `value`, or if the node has no value
  *
@@ -181,36 +187,6 @@ fun SemanticsNodeInteraction.assertTextContains(
     value: String,
     ignoreCase: Boolean = false
 ): SemanticsNodeInteraction = assert(hasText(value, substring = true, ignoreCase = ignoreCase))
-
-/**
- * Asserts the text field's input is equal to the given [value].
- *
- * Throws [AssertionError] if the text field node's value is not equal to `value`, or if the node
- * has no value
- *
- * @param ignoreCase Whether case should be ignored.
- * @see SemanticsProperties.EditableText
- */
-fun SemanticsNodeInteraction.assertEditableTextEquals(
-    value: String,
-    ignoreCase: Boolean = false
-): SemanticsNodeInteraction =
-    assert(hasEditableText(value, ignoreCase = ignoreCase))
-
-/**
- * Asserts the text field's input is equal to the given [value].
- *
- * Throws [AssertionError] if the text field node's value does not contain `value`, or if the node
- * has no value
- *
- * @param ignoreCase Whether case should be ignored.
- * @see SemanticsProperties.EditableText
- */
-fun SemanticsNodeInteraction.assertEditableTextContains(
-    value: String,
-    ignoreCase: Boolean = false
-): SemanticsNodeInteraction =
-    assert(hasEditableText(value, substring = true, ignoreCase = ignoreCase))
 
 /**
  * Asserts the node's value equals the given value.

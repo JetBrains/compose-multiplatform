@@ -30,10 +30,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.testTag
-import androidx.compose.ui.semantics.SemanticsProperties
-import androidx.compose.ui.test.SemanticsMatcher
-import androidx.compose.ui.test.SemanticsNodeInteraction
-import androidx.compose.ui.test.SemanticsNodeInteractionsProvider
 import androidx.compose.ui.test.captureToImage
 import androidx.compose.ui.test.center
 import androidx.compose.ui.test.click
@@ -120,7 +116,7 @@ class TextSelectionColorsScreenshotTest {
         }
 
         // Click once to focus text field
-        rule.onTextFieldNode()
+        rule.onNodeWithText(Text)
             .performGesture {
                 click()
                 longClick()
@@ -129,7 +125,7 @@ class TextSelectionColorsScreenshotTest {
         rule.waitForIdle()
 
         // Long click to start text selection
-        rule.onTextFieldNode()
+        rule.onNodeWithText(Text)
             .performGesture {
                 longClick(Offset(width / 5f, height / 2f))
             }
@@ -153,7 +149,7 @@ class TextSelectionColorsScreenshotTest {
         }
 
         // Click once to focus text field
-        rule.onTextFieldNode()
+        rule.onNodeWithText(Text)
             .performGesture {
                 click()
                 longClick()
@@ -162,7 +158,7 @@ class TextSelectionColorsScreenshotTest {
         rule.waitForIdle()
 
         // Long click to start text selection
-        rule.onTextFieldNode()
+        rule.onNodeWithText(Text)
             .performGesture {
                 longClick(Offset(width / 5f, height / 2f))
             }
@@ -210,9 +206,6 @@ private fun TextFieldTestContent(textSelectionColors: TextSelectionColors) {
         }
     }
 }
-
-private fun SemanticsNodeInteractionsProvider.onTextFieldNode(): SemanticsNodeInteraction =
-    onNode(SemanticsMatcher.keyIsDefined(SemanticsProperties.EditableText))
 
 private const val Text = "Selected text"
 private const val Tag = "TestTag"

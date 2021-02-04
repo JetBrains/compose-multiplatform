@@ -157,53 +157,53 @@ class AssertsTest {
     }
 
     @Test
-    fun assertEditableText_isOk() {
+    fun assertTextFieldText_isOk() {
         rule.setContent {
             BoundaryNode { testTag = "test"; editableText = AnnotatedString("Hello World") }
         }
 
         rule.onNodeWithTag("test")
-            .assertEditableTextEquals("Hello World")
+            .assertTextEquals("Hello World")
     }
 
     @Test(expected = AssertionError::class)
-    fun assertEditableText_fails() {
+    fun assertTextFieldText_fails() {
         rule.setContent {
             BoundaryNode { testTag = "test"; editableText = AnnotatedString("Hello World") }
         }
 
         rule.onNodeWithTag("test")
-            .assertEditableTextEquals("Hello")
+            .assertTextEquals("Hello")
     }
 
     @Test
-    fun assertEditableText_substring_isOk() {
+    fun assertTextFieldText_substring_isOk() {
         rule.setContent {
             BoundaryNode { testTag = "test"; editableText = AnnotatedString("Hello World") }
         }
 
         rule.onNodeWithTag("test")
-            .assertEditableTextContains("Hello")
+            .assertTextContains("Hello")
     }
 
     @Test(expected = AssertionError::class)
-    fun assertEditableText_substring_fails() {
+    fun assertTextFieldText_substring_fails() {
         rule.setContent {
             BoundaryNode { testTag = "test"; editableText = AnnotatedString("Hello World") }
         }
 
         rule.onNodeWithTag("test")
-            .assertEditableTextContains("hello")
+            .assertTextContains("hello")
     }
 
     @Test
-    fun assertEditableText_substring_ignoreCase_isOk() {
+    fun assertTextFieldText_substring_ignoreCase_isOk() {
         rule.setContent {
             BoundaryNode { testTag = "test"; editableText = AnnotatedString("Hello World") }
         }
 
         rule.onNodeWithTag("test")
-            .assertEditableTextContains("hello", ignoreCase = true)
+            .assertTextContains("hello", ignoreCase = true)
     }
 
     @Composable
