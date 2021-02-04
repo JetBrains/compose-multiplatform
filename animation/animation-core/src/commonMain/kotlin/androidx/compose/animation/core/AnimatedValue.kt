@@ -23,7 +23,7 @@ import androidx.compose.animation.core.AnimationEndReason.Interrupted
 import androidx.compose.animation.core.AnimationEndReason.TargetReached
 
 /**
- * This is the base class for [AnimatedValue]. It contains all the functionality of AnimatedValue.
+ * This is the base class for [AnimatedFloat]. It contains all the functionality of AnimatedValue.
  * It is intended to be used as a base class for the other classes (such as [AnimatedFloat] to build
  * on top of.
  *
@@ -232,27 +232,6 @@ sealed class BaseAnimatedValue<T, V : AnimationVector>(
 }
 
 /**
- * AnimatedValue is an animatable value holder. It can hold any type of value, and automatically
- * animate the value change when the value is changed via [animateTo]. AnimatedValue supports value
- * change during an ongoing value change animation. When that happens, a new animation will
- * transition AnimatedValue from its current value (i.e. value at the point of interruption) to the
- * new target. This ensures that the value change is always continuous.
- *
- * @param typeConverter Converter for converting value type [T] to [AnimationVector], and vice versa
- * @param clock The animation clock used to drive the animation.
- * @param visibilityThreshold Threshold at which the animation may round off to its target value.
- */
-@Deprecated("Please use Animatable instead")
-abstract class AnimatedValue<T, V : AnimationVector>(
-    typeConverter: TwoWayConverter<T, V>,
-    clock: AnimationClockObservable,
-    visibilityThreshold: T? = null
-) : BaseAnimatedValue<T, V>(typeConverter, clock, visibilityThreshold) {
-    val velocity: V
-        get() = velocityVector
-}
-
-/**
  * This class inherits most of the functionality from BaseAnimatedValue. In addition, it tracks
  * velocity and supports the definition of bounds. Once bounds are defined using [setBounds], the
  * animation will consider itself finished when it reaches the upper or lower bound, even when the
@@ -336,8 +315,6 @@ abstract class AnimatedFloat(
 
 /**
  * Typealias for lambda that will be invoked when fling animation ends.
- * Unlike [AnimatedValue.animateTo] onEnd, this lambda includes 3rd param remainingVelocity,
- * that represents velocity that wasn't consumed after fling finishes.
  */
 @Deprecated("Please use Animatable instead")
 // TODO: Consolidate onAnimationEnd and onEnd
@@ -423,53 +400,6 @@ fun AnimatedFloat.fling(
 }
 
 private const val Unset: Long = -1
-
-/**
- * Factory method for creating an [AnimatedValue] object, and initialize the value field to
- * [initVal].
- *
- * @param initVal Initial value to initialize the animation to.
- * @param typeConverter Converter for converting value type [T] to [AnimationVector], and vice versa
- * @param clock The animation clock used to drive the animation.
- * @param visibilityThreshold Threshold at which the animation may round off to its target value.
- */
-@Deprecated(
-    "AnimatedValue has been deprecated. Please use Animatable instead",
-    replaceWith = ReplaceWith(
-        "Animatable(initVal, typeConverter, visibilityThreshold)",
-        "androidx.compose.animation.Animatable",
-    )
-)
-fun <T, V : AnimationVector> AnimatedValue(
-    initVal: T,
-    typeConverter: TwoWayConverter<T, V>,
-    clock: AnimationClockObservable,
-    visibilityThreshold: T? = null
-): AnimatedValue<T, V> =
-    AnimatedValueImpl(initVal, typeConverter, clock, visibilityThreshold)
-
-/**
- * Factory method for creating an [AnimatedVector] object, and initialize the value field to
- * [initVal].
- *
- * @param initVal Initial value to initialize the animation to.
- * @param clock The animation clock used to drive the animation.
- * @param visibilityThreshold Threshold at which the animation may round off to its target value.
- */
-@Deprecated(
-    "AnimatedVector has been deprecated. Please use Animatable instead",
-    replaceWith = ReplaceWith(
-        "Animatable(initVal, TwoWayConverter({ it }, { it }), visibilityThreshold)",
-        "androidx.compose.animation.Animatable",
-    )
-)
-fun <V : AnimationVector> AnimatedVector(
-    initVal: V,
-    clock: AnimationClockObservable,
-    visibilityThreshold: V = initVal.newInstanceOfValue(Spring.DefaultDisplacementThreshold)
-): AnimatedValue<V, V> =
-    AnimatedValueImpl(initVal, TwoWayConverter({ it }, { it }), clock, visibilityThreshold)
-
 /**
  * Factory method for creating an [AnimatedFloat] object, and initialize the value field to
  * [initVal].
@@ -491,16 +421,6 @@ fun AnimatedFloat(
     visibilityThreshold: Float = Spring.DefaultDisplacementThreshold
 ): AnimatedFloat = AnimatedFloatImpl(initVal, clock, visibilityThreshold)
 
-// Private impl for AnimatedValue
-private class AnimatedValueImpl<T, V : AnimationVector>(
-    initVal: T,
-    typeConverter: TwoWayConverter<T, V>,
-    clock: AnimationClockObservable,
-    visibilityThreshold: T? = null
-) : AnimatedValue<T, V>(typeConverter, clock, visibilityThreshold) {
-    override var value: T = initVal
-}
-
 // Private impl for AnimatedFloat
 private class AnimatedFloatImpl(
     initVal: Float,
@@ -508,10 +428,4 @@ private class AnimatedFloatImpl(
     visibilityThreshold: Float
 ) : AnimatedFloat(clock, visibilityThreshold) {
     override var value: Float = initVal
-}
-
-private fun <V : AnimationVector> V.newInstanceOfValue(value: Float): V {
-    return newInstance().apply {
-        (0 until size).forEach { set(it, value) }
-    }
 }

@@ -42,8 +42,7 @@ private val defaultAnimation = spring<Float>()
  * be updated by the animation until the animation finishes.
  *
  * Note, [animateFloatAsState] cannot be canceled/stopped without removing this composable function
- * from the tree. See [animatedFloat][androidx.compose.animation.animatedFloat] for cancelable
- * animations.
+ * from the tree. See [Animatable] for cancelable animations.
  *
  * @sample androidx.compose.animation.core.samples.AlphaAnimationSample
  *
@@ -96,8 +95,7 @@ fun animateFloatAsState(
  * updated by the animation until the animation finishes.
  *
  * Note, [animateDpAsState] cannot be canceled/stopped without removing this composable function
- * from the tree. See [animatedValue][androidx.compose.animation.animatedValue] for cancelable
- * animations.
+ * from the tree. See [Animatable] for cancelable animations.
  *
  * @sample androidx.compose.animation.core.samples.DpAnimationSample
  *
@@ -134,8 +132,7 @@ private val dpDefaultSpring = spring<Dp>(visibilityThreshold = Dp.VisibilityThre
  * updated by the animation until the animation finishes.
  *
  * Note, [animateSizeAsState] cannot be canceled/stopped without removing this composable function
- * from the tree. See [animatedValue][androidx.compose.animation.animatedValue] for cancelable
- * animations.
+ * from the tree. See [Animatable] for cancelable animations.
  *
  *     val size: Size by animateSizeAsState(
  *         if (selected) Size(20f, 20f) else Size(10f, 10f))
@@ -173,8 +170,7 @@ private val sizeDefaultSpring = spring(visibilityThreshold = Size.VisibilityThre
  * continuously be updated by the animation until the animation finishes.
  *
  * Note, [animateOffsetAsState] cannot be canceled/stopped without removing this composable function
- * from the tree. See [animatedValue][androidx.compose.animation.animatedValue] for cancelable
- * animations.
+ * from the tree. See [Animatable] for cancelable animations.
  *
  * @sample androidx.compose.animation.core.samples.AnimateOffsetSample
  *
@@ -208,8 +204,7 @@ private val offsetDefaultSpring = spring(visibilityThreshold = Offset.Visibility
  * updated by the animation until the animation finishes.
  *
  * Note, [animateRectAsState] cannot be canceled/stopped without removing this composable function
- * from the tree. See [animatedValue][androidx.compose.animation.animatedValue] for cancelable
- * animations.
+ * from the tree. See [Animatable] for cancelable animations.
  *
  *    val bounds: Rect by animateRectAsState(
  *        if (enabled) Rect(0f, 0f, 100f, 100f) else Rect(8f, 8f, 80f, 80f))
@@ -244,8 +239,7 @@ private val rectDefaultSpring = spring(visibilityThreshold = Rect.VisibilityThre
  * updated by the animation until the animation finishes.
  *
  * Note, [animateIntAsState] cannot be canceled/stopped without removing this composable function
- * from the tree. See [animatedValue][androidx.compose.animation.animatedValue] for cancelable
- * animations.
+ * from the tree. See [Animatable] for cancelable animations.
  *
  * @param targetValue Target value of the animation
  * @param animationSpec The animation that will be used to change the value through time. Physics
@@ -277,8 +271,7 @@ private val intDefaultSpring = spring(visibilityThreshold = Int.VisibilityThresh
  * continuously be updated by the animation until the animation finishes.
  *
  * Note, [animateIntOffsetAsState] cannot be canceled/stopped without removing this composable
- * function from the tree. See [animatedValue][androidx.compose.animation.animatedValue] for
- * cancelable animations.
+ * function from the tree. See [Animatable] for cancelable animations.
  *
  * @sample androidx.compose.animation.core.samples.AnimateOffsetSample
  *
@@ -312,8 +305,7 @@ private val intOffsetDefaultSpring = spring(visibilityThreshold = IntOffset.Visi
  * be updated by the animation until the animation finishes.
  *
  * Note, [animateIntSizeAsState] cannot be canceled/stopped without removing this composable function
- * from the tree. See [animatedValue][androidx.compose.animation.animatedValue] for cancelable
- * animations.
+ * from the tree. See [Animatable] for cancelable animations.
  *
  * @param targetValue Target value of the animation
  * @param animationSpec The animation that will be used to change the value through time. Physics
@@ -345,8 +337,7 @@ private val intSizeDefaultSpring = spring(visibilityThreshold = IntSize.Visibili
  * updated by the animation until the animation finishes.
  *
  * Note, [animateValueAsState] cannot be canceled/stopped without removing this composable function
- * from the tree. See [animatedValue][androidx.compose.animation.animatedValue] for cancelable
- * animations.
+ * from the tree. See [Animatable] for cancelable animations.
  *
  * @sample androidx.compose.animation.core.samples.ArbitraryValueTypeTransitionSample
  *
