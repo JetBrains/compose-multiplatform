@@ -24,14 +24,18 @@ import androidx.compose.foundation.layout.preferredSize
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.testutils.assertPixelColor
 import androidx.compose.testutils.assertPixels
 import androidx.compose.testutils.assertShape
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.isFocused
 import androidx.compose.ui.focus.onFocusChanged
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.RectangleShape
+import androidx.compose.ui.graphics.SolidColor
+import androidx.compose.ui.graphics.toPixelMap
 import androidx.compose.ui.test.captureToImage
 import androidx.compose.ui.test.hasSetTextAction
 import androidx.compose.ui.test.junit4.createComposeRule
@@ -70,7 +74,7 @@ class TextFieldCursorTest {
                     .preferredSize(width, height)
                     .background(Color.White)
                     .onFocusChanged { if (it.isFocused) isFocused = true },
-                cursorColor = Color.Red
+                cursorBrush = SolidColor(Color.Red)
             )
         }
 
@@ -84,6 +88,45 @@ class TextFieldCursorTest {
                 .captureToImage()
                 .assertCursor(2.dp, this)
         }
+    }
+
+    @Test
+    @SdkSuppress(minSdkVersion = Build.VERSION_CODES.O)
+    fun textFieldFocused_cursorWithBrush() = with(rule.density) {
+        val width = 10.dp
+        val height = 20.dp
+        var isFocused = false
+        rule.setContent {
+            BasicTextField(
+                value = "",
+                onValueChange = {},
+                textStyle = TextStyle(color = Color.White, background = Color.White),
+                modifier = Modifier
+                    .preferredSize(width, height)
+                    .background(Color.White)
+                    .onFocusChanged { if (it.isFocused) isFocused = true },
+                cursorBrush = Brush.verticalGradient(
+                    // make a brush double color at the beginning and end so we have stable
+                    // colors at the ends
+                    listOf(
+                        Color.Blue,
+                        Color.Blue,
+                        Color.Green,
+                        Color.Green
+                    )
+                )
+            )
+        }
+
+        rule.onNode(hasSetTextAction()).performClick()
+        rule.mainClock.advanceTimeUntil { isFocused }
+
+        rule.mainClock.advanceTimeBy(100)
+
+        val bitmap = rule.onNode(hasSetTextAction())
+            .captureToImage().toPixelMap()
+        bitmap.assertPixelColor(Color.Blue, x = 0, y = 10)
+        bitmap.assertPixelColor(Color.Green, x = 0, y = bitmap.height - 10)
     }
 
     @Test
@@ -105,7 +148,7 @@ class TextFieldCursorTest {
                         .preferredSize(width, height)
                         .background(Color.White)
                         .onFocusChanged { if (it.isFocused) isFocused = true },
-                    cursorColor = Color.Red
+                    cursorBrush = SolidColor(Color.Red)
                 )
             }
         }
@@ -153,7 +196,7 @@ class TextFieldCursorTest {
                         .preferredSize(width, height)
                         .background(Color.White)
                         .onFocusChanged { if (it.isFocused) isFocused = true },
-                    cursorColor = Color.Unspecified
+                    cursorBrush = SolidColor(Color.Unspecified)
                 )
             }
         }
@@ -205,7 +248,7 @@ class TextFieldCursorTest {
                         .preferredSize(width, height)
                         .background(Color.White)
                         .onFocusChanged { if (it.isFocused) isFocused = true },
-                    cursorColor = Color.Red
+                    cursorBrush = SolidColor(Color.Red)
                 )
             }
         }

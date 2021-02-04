@@ -56,6 +56,8 @@ import androidx.compose.ui.platform.LocalTextInputService
 import androidx.compose.ui.platform.LocalTextToolbar
 import androidx.compose.foundation.text.selection.LocalTextSelectionColors
 import androidx.compose.foundation.text.selection.SimpleLayout
+import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.semantics.copyText
 import androidx.compose.ui.semantics.cutText
 import androidx.compose.ui.semantics.disabled
@@ -69,7 +71,6 @@ import androidx.compose.ui.semantics.pasteText
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.semantics.setSelection
 import androidx.compose.ui.semantics.setText
-import androidx.compose.ui.semantics.text
 import androidx.compose.ui.semantics.textSelectionRange
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.ExperimentalTextApi
@@ -136,7 +137,8 @@ import kotlin.math.roundToInt
  * present on this TextField. You can create and pass in your own remembered [InteractionState]
  * if you want to read the [InteractionState] and customize the appearance / behavior of this
  * TextField in different [Interaction]s.
- * @param cursorColor Color of the cursor. If [Color.Unspecified], there will be no cursor drawn
+ * @param cursorBrush [Brush] to paint cursor with. If [SolidColor] with [Color.Unspecified]
+ * provided, there will be no cursor drawn
  * @param softWrap Whether the text should break at soft line breaks. If false, the glyphs in the
  * text will be positioned as if there was unlimited horizontal space.
  * @param maxLines The maximum height in terms of maximum number of visible lines. Should be
@@ -174,7 +176,7 @@ internal fun CoreTextField(
     onTextLayout: (TextLayoutResult) -> Unit = {},
     onTextInputStarted: (SoftwareKeyboardController) -> Unit = {},
     interactionState: InteractionState? = null,
-    cursorColor: Color = Color.Unspecified,
+    cursorBrush: Brush = SolidColor(Color.Unspecified),
     softWrap: Boolean = true,
     maxLines: Int = Int.MAX_VALUE,
     imeOptions: ImeOptions = ImeOptions.Default,
@@ -447,7 +449,7 @@ internal fun CoreTextField(
     }
 
     val cursorModifier =
-        Modifier.cursor(state, value, offsetMapping, cursorColor, enabled && !readOnly)
+        Modifier.cursor(state, value, offsetMapping, cursorBrush, enabled && !readOnly)
 
     DisposableEffect(manager) {
         onDispose { manager.hideSelectionToolbar() }

@@ -27,8 +27,9 @@ import androidx.compose.ui.composed
 import androidx.compose.ui.draw.drawWithContent
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Rect
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.isSpecified
+import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.graphics.SolidColor
+import androidx.compose.ui.graphics.isUnspecified
 import androidx.compose.ui.text.input.OffsetMapping
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
@@ -38,15 +39,15 @@ internal fun Modifier.cursor(
     state: TextFieldState,
     value: TextFieldValue,
     offsetMapping: OffsetMapping,
-    cursorColor: Color,
+    cursorBrush: Brush,
     enabled: Boolean
 ) = if (enabled) composed {
     // this should be a disposable clock, but it's not available in this module
     // however, we only launch one animation and guarantee that we stop it (via snap) in dispose
     val cursorAlpha = remember { Animatable(0f) }
-
-    if (state.hasFocus && value.selection.collapsed && cursorColor.isSpecified) {
-        LaunchedEffect(cursorColor, value.annotatedString) {
+    val isBrushSpecified = !(cursorBrush is SolidColor && cursorBrush.value.isUnspecified)
+    if (state.hasFocus && value.selection.collapsed && isBrushSpecified) {
+        LaunchedEffect(cursorBrush, value.annotatedString) {
             cursorAlpha.animateTo(0f, cursorAnimationSpec)
         }
         drawWithContent {
@@ -62,7 +63,7 @@ internal fun Modifier.cursor(
                     .coerceAtMost(size.width - cursorWidth / 2)
 
                 drawLine(
-                    cursorColor,
+                    cursorBrush,
                     Offset(cursorX, cursorRect.top),
                     Offset(cursorX, cursorRect.bottom),
                     alpha = cursorAlphaValue,

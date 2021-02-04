@@ -36,6 +36,7 @@ import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.RectangleShape
+import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.layout.Layout
 import androidx.compose.ui.layout.Placeable
@@ -608,7 +609,7 @@ internal fun OutlinedTextFieldLayout(
         enabled = enabled,
         readOnly = readOnly,
         textStyle = textStyle,
-        cursorColor = cursorColor,
+        cursorBrush = SolidColor(cursorColor),
         visualTransformation = visualTransformation,
         keyboardOptions = keyboardOptions,
         keyboardActions = keyboardActions,
