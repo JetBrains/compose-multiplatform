@@ -872,9 +872,7 @@ internal class AndroidComposeViewAccessibilityDelegateCompat(val view: AndroidCo
                 return success
             }
             AccessibilityNodeInfoCompat.ACTION_COPY -> {
-                return node.config.getOrNull(SemanticsActions.CopyText)?.let {
-                    it.action()
-                } ?: false
+                return node.config.getOrNull(SemanticsActions.CopyText)?.action?.invoke() ?: false
             }
         }
 
@@ -885,18 +883,11 @@ internal class AndroidComposeViewAccessibilityDelegateCompat(val view: AndroidCo
         // Actions can't be performed when disabled.
         when (action) {
             AccessibilityNodeInfoCompat.ACTION_CLICK -> {
-                return if (node.config.contains(SemanticsActions.OnClick)) {
-                    node.config[SemanticsActions.OnClick].action()
-                } else {
-                    false
-                }
+                return node.config.getOrNull(SemanticsActions.OnClick)?.action?.invoke() ?: false
             }
             AccessibilityNodeInfoCompat.ACTION_LONG_CLICK -> {
-                return if (node.config.contains(SemanticsActions.OnLongClick)) {
-                    node.config[SemanticsActions.OnLongClick].action()
-                } else {
-                    false
-                }
+                return node.config.getOrNull(SemanticsActions.OnLongClick)?.action?.invoke()
+                    ?: false
             }
             AccessibilityNodeInfoCompat.ACTION_SCROLL_FORWARD,
             AccessibilityNodeInfoCompat.ACTION_SCROLL_BACKWARD,
@@ -921,7 +912,8 @@ internal class AndroidComposeViewAccessibilityDelegateCompat(val view: AndroidCo
                         if (action == AccessibilityNodeInfoCompat.ACTION_SCROLL_BACKWARD) {
                             increment = -increment
                         }
-                        return setProgressAction.action(rangeInfo.current + increment)
+                        return setProgressAction.action?.invoke(rangeInfo.current + increment)
+                            ?: false
                     }
                 }
 
@@ -942,10 +934,10 @@ internal class AndroidComposeViewAccessibilityDelegateCompat(val view: AndroidCo
                         ) &&
                         xScrollState.value() < xScrollState.maxValue()
                     ) {
-                        return scrollAction.action(
+                        return scrollAction.action?.invoke(
                             node.globalBounds.right - node.globalBounds.left,
                             0f
-                        )
+                        ) ?: false
                     }
                     if ((
                         (
@@ -960,10 +952,10 @@ internal class AndroidComposeViewAccessibilityDelegateCompat(val view: AndroidCo
                         ) &&
                         xScrollState.value() > 0
                     ) {
-                        return scrollAction.action(
+                        return scrollAction.action?.invoke(
                             -(node.globalBounds.right - node.globalBounds.left),
                             0f
-                        )
+                        ) ?: false
                     }
                 }
                 val yScrollState =
@@ -982,10 +974,10 @@ internal class AndroidComposeViewAccessibilityDelegateCompat(val view: AndroidCo
                         ) &&
                         yScrollState.value() < yScrollState.maxValue()
                     ) {
-                        return scrollAction.action(
+                        return scrollAction.action?.invoke(
                             0f,
                             node.globalBounds.bottom - node.globalBounds.top
-                        )
+                        ) ?: false
                     }
                     if ((
                         (
@@ -1000,10 +992,10 @@ internal class AndroidComposeViewAccessibilityDelegateCompat(val view: AndroidCo
                         ) &&
                         yScrollState.value() > 0
                     ) {
-                        return scrollAction.action(
+                        return scrollAction.action?.invoke(
                             0f,
                             -(node.globalBounds.bottom - node.globalBounds.top)
-                        )
+                        ) ?: false
                     }
                 }
                 return false
@@ -1015,48 +1007,31 @@ internal class AndroidComposeViewAccessibilityDelegateCompat(val view: AndroidCo
                 ) {
                     return false
                 }
-                return if (node.config.contains(SemanticsActions.SetProgress)) {
-                    node.config[SemanticsActions.SetProgress].action(
-                        arguments.getFloat(
-                            AccessibilityNodeInfoCompat.ACTION_ARGUMENT_PROGRESS_VALUE
-                        )
-                    )
-                } else {
-                    false
-                }
+                return node.config.getOrNull(SemanticsActions.SetProgress)?.action?.invoke(
+                    arguments.getFloat(AccessibilityNodeInfoCompat.ACTION_ARGUMENT_PROGRESS_VALUE)
+                ) ?: false
             }
             AccessibilityNodeInfoCompat.ACTION_SET_TEXT -> {
                 val text = arguments?.getString(
                     AccessibilityNodeInfoCompat.ACTION_ARGUMENT_SET_TEXT_CHARSEQUENCE
                 )
-                return node.config.getOrNull(SemanticsActions.SetText)?.let {
-                    it.action(AnnotatedString(text ?: ""))
-                } ?: false
+                return node.config.getOrNull(SemanticsActions.SetText)
+                    ?.action?.invoke(AnnotatedString(text ?: "")) ?: false
             }
             AccessibilityNodeInfoCompat.ACTION_PASTE -> {
-                return node.config.getOrNull(SemanticsActions.PasteText)?.let {
-                    it.action()
-                } ?: false
+                return node.config.getOrNull(SemanticsActions.PasteText)?.action?.invoke() ?: false
             }
             AccessibilityNodeInfoCompat.ACTION_CUT -> {
-                return node.config.getOrNull(SemanticsActions.CutText)?.let {
-                    it.action()
-                } ?: false
+                return node.config.getOrNull(SemanticsActions.CutText)?.action?.invoke() ?: false
             }
             AccessibilityNodeInfoCompat.ACTION_EXPAND -> {
-                return node.config.getOrNull(SemanticsActions.Expand)?.let {
-                    it.action()
-                } ?: false
+                return node.config.getOrNull(SemanticsActions.Expand)?.action?.invoke() ?: false
             }
             AccessibilityNodeInfoCompat.ACTION_COLLAPSE -> {
-                return node.config.getOrNull(SemanticsActions.Collapse)?.let {
-                    it.action()
-                } ?: false
+                return node.config.getOrNull(SemanticsActions.Collapse)?.action?.invoke() ?: false
             }
             AccessibilityNodeInfoCompat.ACTION_DISMISS -> {
-                return node.config.getOrNull(SemanticsActions.Dismiss)?.let {
-                    it.action()
-                } ?: false
+                return node.config.getOrNull(SemanticsActions.Dismiss)?.action?.invoke() ?: false
             }
             // TODO: handling for other system actions
             else -> {
@@ -1104,8 +1079,10 @@ internal class AndroidComposeViewAccessibilityDelegateCompat(val view: AndroidCo
             }
             val textLayoutResults = mutableListOf<TextLayoutResult>()
             // Note now it only works for single Text/TextField until we fix the merging issue.
+            val getLayoutResult = node.config[SemanticsActions.GetTextLayoutResult]
+                .action?.invoke(textLayoutResults)
             val textLayoutResult: TextLayoutResult
-            if (node.config[SemanticsActions.GetTextLayoutResult].action(textLayoutResults)) {
+            if (getLayoutResult == true) {
                 textLayoutResult = textLayoutResults[0]
             } else {
                 return
@@ -1754,11 +1731,11 @@ internal class AndroidComposeViewAccessibilityDelegateCompat(val view: AndroidCo
             // Hide all selection controllers used for adjusting selection
             // since we are doing so explicitly by other means and these
             // controllers interact with how selection behaves. From TextView.java.
-            return node.config[SemanticsActions.SetSelection].action(
+            return node.config[SemanticsActions.SetSelection].action?.invoke(
                 start,
                 end,
                 traversalMode
-            )
+            ) ?: false
         }
         if (start == end && end == accessibilityCursorPosition) {
             return false
@@ -1841,7 +1818,9 @@ internal class AndroidComposeViewAccessibilityDelegateCompat(val view: AndroidCo
                 //  fix the merging issue.
                 val textLayoutResults = mutableListOf<TextLayoutResult>()
                 val textLayoutResult: TextLayoutResult
-                if (node.config[SemanticsActions.GetTextLayoutResult].action(textLayoutResults)) {
+                val getLayoutResult = node.config[SemanticsActions.GetTextLayoutResult]
+                    .action?.invoke(textLayoutResults)
+                if (getLayoutResult == true) {
                     textLayoutResult = textLayoutResults[0]
                 } else {
                     return null

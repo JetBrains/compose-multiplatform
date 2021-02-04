@@ -220,72 +220,68 @@ object SemanticsActions {
     /**
      * @see SemanticsPropertyReceiver.getTextLayoutResult
      */
-    val GetTextLayoutResult = SemanticsPropertyKey<AccessibilityAction<
-            (MutableList<TextLayoutResult>) -> Boolean>>("GetTextLayoutResult")
+    val GetTextLayoutResult =
+        ActionPropertyKey<(MutableList<TextLayoutResult>) -> Boolean>("GetTextLayoutResult")
 
     /**
      * @see SemanticsPropertyReceiver.onClick
      */
-    val OnClick = SemanticsPropertyKey<AccessibilityAction<() -> Boolean>>("OnClick")
+    val OnClick = ActionPropertyKey<() -> Boolean>("OnClick")
 
     /**
      * @see SemanticsPropertyReceiver.onLongClick
      */
-    val OnLongClick = SemanticsPropertyKey<AccessibilityAction<() -> Boolean>>("OnLongClick")
+    val OnLongClick = ActionPropertyKey<() -> Boolean>("OnLongClick")
 
     /**
      * @see SemanticsPropertyReceiver.scrollBy
      */
-    val ScrollBy =
-        SemanticsPropertyKey<AccessibilityAction<(x: Float, y: Float) -> Boolean>>("ScrollBy")
+    val ScrollBy = ActionPropertyKey<(x: Float, y: Float) -> Boolean>("ScrollBy")
 
     /**
      * @see SemanticsPropertyReceiver.setProgress
      */
-    val SetProgress =
-        SemanticsPropertyKey<AccessibilityAction<(progress: Float) -> Boolean>>("SetProgress")
+    val SetProgress = ActionPropertyKey<(progress: Float) -> Boolean>("SetProgress")
 
     /**
      * @see SemanticsPropertyReceiver.setSelection
      */
-    val SetSelection = SemanticsPropertyKey<
-        AccessibilityAction<(Int, Int, Boolean) -> Boolean>>("SetSelection")
+    val SetSelection = ActionPropertyKey<(Int, Int, Boolean) -> Boolean>("SetSelection")
 
     /**
      * @see SemanticsPropertyReceiver.setText
      */
-    val SetText = SemanticsPropertyKey<
-        AccessibilityAction<(AnnotatedString) -> Boolean>>("SetText")
+    val SetText = ActionPropertyKey<(AnnotatedString) -> Boolean>("SetText")
 
     /**
      * @see SemanticsPropertyReceiver.copyText
      */
-    val CopyText = SemanticsPropertyKey<AccessibilityAction<() -> Boolean>>("CopyText")
+    val CopyText = ActionPropertyKey<() -> Boolean>("CopyText")
 
     /**
      * @see SemanticsPropertyReceiver.cutText
      */
-    val CutText = SemanticsPropertyKey<AccessibilityAction<() -> Boolean>>("CutText")
+    val CutText = ActionPropertyKey<() -> Boolean>("CutText")
 
     /**
      * @see SemanticsPropertyReceiver.pasteText
      */
-    val PasteText = SemanticsPropertyKey<AccessibilityAction<() -> Boolean>>("PasteText")
+    val PasteText = ActionPropertyKey<() -> Boolean>("PasteText")
 
     /**
      * @see SemanticsPropertyReceiver.expand
      */
-    val Expand = SemanticsPropertyKey<AccessibilityAction<() -> Boolean>>("Expand")
+    val Expand = ActionPropertyKey<() -> Boolean>("Expand")
 
     /**
      * @see SemanticsPropertyReceiver.collapse
      */
-    val Collapse = SemanticsPropertyKey<AccessibilityAction<() -> Boolean>>("Collapse")
+    val Collapse = ActionPropertyKey<() -> Boolean>("Collapse")
 
     /**
      * @see SemanticsPropertyReceiver.dismiss
      */
-    val Dismiss = SemanticsPropertyKey<AccessibilityAction<() -> Boolean>>("Dismiss")
+    val Dismiss = ActionPropertyKey<() -> Boolean>("Dismiss")
 
     /**
      * @see SemanticsPropertyReceiver.customActions
@@ -354,9 +350,11 @@ class SemanticsPropertyKey<T>(
  * @param action The function to invoke when this action is performed. The function should return
  * a boolean result indicating whether the action is successfully handled. For example, a scroll
  * forward action should return false if the widget is not enabled or has reached the end of the
- * list.
+ * list. If multiple semantics blocks with the same AccessibilityAction are provided, the
+ * resulting AccessibilityAction's label/action will be the label/action of the outermost
+ * modifier with this key and nonnull label/action, or null if no nonnull label/action is found.
  */
-class AccessibilityAction<T : Function<Boolean>>(val label: CharSequence?, val action: T) {
+class AccessibilityAction<T : Function<Boolean>>(val label: String?, val action: T?) {
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
         if (other !is AccessibilityAction<*>) return false
@@ -378,6 +376,20 @@ class AccessibilityAction<T : Function<Boolean>>(val label: CharSequence?, val a
     }
 }
 
+internal fun <T : Function<Boolean>> ActionPropertyKey(
+    name: String
+): SemanticsPropertyKey<AccessibilityAction<T>> {
+    return SemanticsPropertyKey(
+        name = name,
+        mergePolicy = { parentValue, childValue ->
+            AccessibilityAction(
+                parentValue?.label ?: childValue.label,
+                parentValue?.action ?: childValue.action
+            )
+        }
+    )
+}
+
 /**
  * Custom accessibility action.
  *
@@ -385,7 +397,7 @@ class AccessibilityAction<T : Function<Boolean>>(val label: CharSequence?, val a
  * @param action The function to invoke when this action is performed. The function should have no
  * arguments and return a boolean result indicating whether the action is successfully handled.
  */
-class CustomAccessibilityAction(val label: CharSequence, val action: () -> Boolean) {
+class CustomAccessibilityAction(val label: String, val action: () -> Boolean) {
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
         if (other !is CustomAccessibilityAction) return false
@@ -706,7 +718,7 @@ var SemanticsPropertyReceiver.customActions by SemanticsActions.CustomActions
  */
 fun SemanticsPropertyReceiver.getTextLayoutResult(
     label: String? = null,
-    action: (MutableList<TextLayoutResult>) -> Boolean
+    action: ((MutableList<TextLayoutResult>) -> Boolean)?
 ) {
     this[SemanticsActions.GetTextLayoutResult] = AccessibilityAction(label, action)
 }
@@ -717,7 +729,7 @@ fun SemanticsPropertyReceiver.getTextLayoutResult(
  * @param label Optional label for this action.
  * @param action Action to be performed when the [SemanticsActions.OnClick] is called.
  */
-fun SemanticsPropertyReceiver.onClick(label: String? = null, action: () -> Boolean) {
+fun SemanticsPropertyReceiver.onClick(label: String? = null, action: (() -> Boolean)?) {
     this[SemanticsActions.OnClick] = AccessibilityAction(label, action)
 }
 
@@ -727,7 +739,7 @@ fun SemanticsPropertyReceiver.onClick(label: String? = null, action: () -> Boole
  * @param label Optional label for this action.
  * @param action Action to be performed when the [SemanticsActions.OnLongClick] is called.
  */
-fun SemanticsPropertyReceiver.onLongClick(label: String? = null, action: () -> Boolean) {
+fun SemanticsPropertyReceiver.onLongClick(label: String? = null, action: (() -> Boolean)?) {
     this[SemanticsActions.OnLongClick] = AccessibilityAction(label, action)
 }
 
@@ -741,7 +753,7 @@ fun SemanticsPropertyReceiver.onLongClick(label: String? = null, action: () -> B
  */
 fun SemanticsPropertyReceiver.scrollBy(
     label: String? = null,
-    action: (x: Float, y: Float) -> Boolean
+    action: ((x: Float, y: Float) -> Boolean)?
 ) {
     this[SemanticsActions.ScrollBy] = AccessibilityAction(label, action)
 }
@@ -754,7 +766,7 @@ fun SemanticsPropertyReceiver.scrollBy(
  * @param label Optional label for this action.
  * @param action Action to be performed when the [SemanticsActions.SetProgress] is called.
  */
-fun SemanticsPropertyReceiver.setProgress(label: String? = null, action: (Float) -> Boolean) {
+fun SemanticsPropertyReceiver.setProgress(label: String? = null, action: ((Float) -> Boolean)?) {
     this[SemanticsActions.SetProgress] = AccessibilityAction(label, action)
 }
 
@@ -766,7 +778,10 @@ fun SemanticsPropertyReceiver.setProgress(label: String? = null, action: (Float)
  * @param label Optional label for this action.
  * @param action Action to be performed when the [SemanticsActions.SetText] is called.
  */
-fun SemanticsPropertyReceiver.setText(label: String? = null, action: (AnnotatedString) -> Boolean) {
+fun SemanticsPropertyReceiver.setText(
+    label: String? = null,
+    action: ((AnnotatedString) -> Boolean)?
+) {
     this[SemanticsActions.SetText] = AccessibilityAction(label, action)
 }
 
@@ -781,11 +796,7 @@ fun SemanticsPropertyReceiver.setText(label: String? = null, action: (AnnotatedS
  */
 fun SemanticsPropertyReceiver.setSelection(
     label: String? = null,
-    action: (
-        startIndex: Int,
-        endIndex: Int,
-        traversalMode: Boolean
-    ) -> Boolean
+    action: ((startIndex: Int, endIndex: Int, traversalMode: Boolean) -> Boolean)?
 ) {
     this[SemanticsActions.SetSelection] = AccessibilityAction(label, action)
 }
@@ -798,7 +809,7 @@ fun SemanticsPropertyReceiver.setSelection(
  */
 fun SemanticsPropertyReceiver.copyText(
     label: String? = null,
-    action: () -> Boolean
+    action: (() -> Boolean)?
 ) {
     this[SemanticsActions.CopyText] = AccessibilityAction(label, action)
 }
@@ -811,7 +822,7 @@ fun SemanticsPropertyReceiver.copyText(
  */
 fun SemanticsPropertyReceiver.cutText(
     label: String? = null,
-    action: () -> Boolean
+    action: (() -> Boolean)?
 ) {
     this[SemanticsActions.CutText] = AccessibilityAction(label, action)
 }
@@ -830,7 +841,7 @@ fun SemanticsPropertyReceiver.cutText(
  */
 fun SemanticsPropertyReceiver.pasteText(
     label: String? = null,
-    action: () -> Boolean
+    action: (() -> Boolean)?
 ) {
     this[SemanticsActions.PasteText] = AccessibilityAction(label, action)
 }
@@ -843,7 +854,7 @@ fun SemanticsPropertyReceiver.pasteText(
  */
 fun SemanticsPropertyReceiver.expand(
     label: String? = null,
-    action: () -> Boolean
+    action: (() -> Boolean)?
 ) {
     this[SemanticsActions.Expand] = AccessibilityAction(label, action)
 }
@@ -856,7 +867,7 @@ fun SemanticsPropertyReceiver.expand(
  */
 fun SemanticsPropertyReceiver.collapse(
     label: String? = null,
-    action: () -> Boolean
+    action: (() -> Boolean)?
 ) {
     this[SemanticsActions.Collapse] = AccessibilityAction(label, action)
 }
@@ -869,7 +880,7 @@ fun SemanticsPropertyReceiver.collapse(
  */
 fun SemanticsPropertyReceiver.dismiss(
     label: String? = null,
-    action: () -> Boolean
+    action: (() -> Boolean)?
 ) {
     this[SemanticsActions.Dismiss] = AccessibilityAction(label, action)
 }

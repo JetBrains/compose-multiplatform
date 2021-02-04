@@ -485,6 +485,28 @@ class AndroidComposeViewAccessibilityDelegateCompatTest {
     }
 
     @Test
+    fun testActionCanBeNull() {
+        val actionLabel = "send"
+        val semanticsNode = createSemanticsNodeWithProperties(1, true) {
+            onClick(label = actionLabel, action = null)
+        }
+        accessibilityDelegate.populateAccessibilityNodeInfoProperties(1, info, semanticsNode)
+
+        // When action is null here, should we still think it is clickable? Should we add the action
+        // to AccessibilityNodeInfo?
+        assertTrue(info.isClickable)
+        assertTrue(
+            containsAction(
+                info,
+                AccessibilityNodeInfoCompat.AccessibilityActionCompat(
+                    AccessibilityNodeInfoCompat.ACTION_CLICK,
+                    actionLabel
+                )
+            )
+        )
+    }
+
+    @Test
     fun notSendScrollEvent_whenOnlyScrollAxisRangeMaxValueChanges() {
         val oldSemanticsNode = createSemanticsNodeWithProperties(1, true) {
             this.verticalScrollAxisRange = ScrollAxisRange({ 0f }, { 0f }, false)
