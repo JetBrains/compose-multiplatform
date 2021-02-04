@@ -22,8 +22,9 @@ import androidx.compose.ui.focus.FocusState.ActiveParent
 import androidx.compose.ui.focus.FocusState.Captured
 import androidx.compose.ui.focus.FocusState.Disabled
 import androidx.compose.ui.focus.FocusState.Inactive
-import androidx.compose.ui.gesture.PointerInputModifierImpl
 import androidx.compose.ui.gesture.TapGestureFilter
+import androidx.compose.ui.input.pointer.PointerInputFilter
+import androidx.compose.ui.input.pointer.PointerInputModifier
 
 interface FocusManager {
     /**
@@ -142,3 +143,6 @@ internal class FocusManagerImpl(
         return focusModifier.focusNode.moveFocus(focusDirection)
     }
 }
+
+private data class PointerInputModifierImpl(override val pointerInputFilter: PointerInputFilter) :
+    PointerInputModifier

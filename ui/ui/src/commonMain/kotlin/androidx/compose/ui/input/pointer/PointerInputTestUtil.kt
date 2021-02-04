@@ -132,38 +132,3 @@ internal fun PointerInputHandler.invokeOverPasses(
         this.invoke(pointerEvent, it, size)
     }
 }
-
-/**
- * Simulates the dispatching of [event] to [this] on all [PointerEventPass]es in their standard
- * order.
- *
- * @param event The event to dispatch.
- */
-internal fun ((CustomEvent, PointerEventPass) -> Unit).invokeOverAllPasses(
-    event: CustomEvent
-) {
-    invokeOverPasses(
-        event,
-        listOf(
-            PointerEventPass.Initial,
-            PointerEventPass.Main,
-            PointerEventPass.Final
-        )
-    )
-}
-
-/**
- * Simulates the dispatching of [event] to [this] on all [PointerEventPass]es in their standard
- * order.
- *
- * @param event The event to dispatch.
- * @param pointerEventPasses The [PointerEventPass]es to pass to each call to [this].
- */
-internal fun ((CustomEvent, PointerEventPass) -> Unit).invokeOverPasses(
-    event: CustomEvent,
-    pointerEventPasses: List<PointerEventPass>
-) {
-    pointerEventPasses.forEach { pass ->
-        this.invoke(event, pass)
-    }
-}

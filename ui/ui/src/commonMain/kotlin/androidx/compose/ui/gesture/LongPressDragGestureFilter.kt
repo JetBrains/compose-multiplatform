@@ -23,13 +23,12 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.composed
 import androidx.compose.ui.geometry.Offset
-import androidx.compose.ui.gesture.customevents.LongPressFiredEvent
-import androidx.compose.ui.input.pointer.CustomEvent
-import androidx.compose.ui.input.pointer.CustomEventDispatcher
 import androidx.compose.ui.input.pointer.PointerEvent
 import androidx.compose.ui.input.pointer.PointerEventPass
 import androidx.compose.ui.input.pointer.PointerId
+import androidx.compose.ui.input.pointer.PointerInputChange
 import androidx.compose.ui.input.pointer.PointerInputFilter
+import androidx.compose.ui.input.pointer.PointerInputModifier
 import androidx.compose.ui.input.pointer.anyPositionChangeConsumed
 import androidx.compose.ui.input.pointer.changedToDown
 import androidx.compose.ui.input.pointer.changedToUp
@@ -148,7 +147,7 @@ fun Modifier.longPressDragGestureFilter(
     glue.longPressDragObserver = longPressDragObserver
 
     rawDragGestureFilter(glue.dragObserver, glue::dragEnabled)
-        .then(PointerInputModifierImpl(glue))
+        .then(LongPointerInputModifierImpl(glue))
         .longPressGestureFilter(glue.onLongPress)
 }
 
@@ -227,7 +226,7 @@ internal fun Modifier.longPressGestureFilter(
     val scope = rememberCoroutineScope()
     val filter = remember { LongPressGestureFilter(scope) }
     filter.onLongPress = onLongPress
-    PointerInputModifierImpl(filter)
+    LongPointerInputModifierImpl(filter)
 }
 
 internal class LongPressGestureFilter(
@@ -245,11 +244,6 @@ internal class LongPressGestureFilter(
     private var state = State.Idle
     private val pointerPositions = linkedMapOf<PointerId, Offset>()
     private var job: Job? = null
-    private lateinit var customEventDispatcher: CustomEventDispatcher
-
-    override fun onInit(customEventDispatcher: CustomEventDispatcher) {
-        this.customEventDispatcher = customEventDispatcher
-    }
 
     override fun onPointerEvent(
         pointerEvent: PointerEvent,
@@ -307,17 +301,24 @@ internal class LongPressGestureFilter(
         }
     }
 
-    override fun onCustomEvent(customEvent: CustomEvent, pass: PointerEventPass) {
-        if (
-            state == State.Primed &&
-            customEvent is LongPressFiredEvent &&
-            pass == PointerEventPass.Initial
-        ) {
-            // If we are primed but something else fired long press, we should reset.
-            // Doesn't matter what pass we are on, just choosing one so we only reset once.
-            resetToIdle()
+    // TODO(shepshapard): This continues to be very confusing to use.  Have to come up with a better
+//  way of easily expressing this.
+    /**
+     * Utility method that determines if any pointers are currently in [bounds].
+     *
+     * A pointer is considered in bounds if it is currently down and it's current
+     * position is within the provided [bounds]
+     *
+     * @return True if at least one pointer is in bounds.
+     */
+    private fun List<PointerInputChange>.anyPointersInBounds(bounds: IntSize) =
+        fastAny {
+            it.pressed &&
+                it.position.x >= 0 &&
+                it.position.x < bounds.width &&
+                it.position.y >= 0 &&
+                it.position.y < bounds.height
         }
-    }
 
     override fun onCancel() {
         resetToIdle()
@@ -326,7 +327,6 @@ internal class LongPressGestureFilter(
     private fun fireLongPress() {
         state = State.Fired
         onLongPress.invoke(pointerPositions.asIterable().first().value)
-        customEventDispatcher.dispatchCustomEvent(LongPressFiredEvent)
     }
 
     private fun primeToFire() {
@@ -343,3 +343,7 @@ internal class LongPressGestureFilter(
         pointerPositions.clear()
     }
 }
+
+private data class LongPointerInputModifierImpl(
+    override val pointerInputFilter: PointerInputFilter
+) : PointerInputModifier

@@ -243,9 +243,6 @@ internal class SuspendingPointerInputFilter(
 
     private var currentEvent: PointerEvent? = null
 
-    override fun onInit(customEventDispatcher: CustomEventDispatcher) {
-    }
-
     /**
      * Actively registered input handlers from currently ongoing calls to [awaitPointerEventScope].
      * Must use `synchronized(pointerHandlers)` to access.
@@ -359,9 +356,6 @@ internal class SuspendingPointerInputFilter(
         dispatchPointerEvent(cancelEvent, PointerEventPass.Final)
 
         lastPointerEvent = null
-    }
-
-    override fun onCustomEvent(customEvent: CustomEvent, pass: PointerEventPass) {
     }
 
     override suspend fun <R> awaitPointerEventScope(

@@ -438,7 +438,7 @@ package androidx.compose.ui.gesture {
 
   public final class DragGestureFilterKt {
     method @Deprecated public static androidx.compose.ui.Modifier dragGestureFilter(androidx.compose.ui.Modifier, androidx.compose.ui.gesture.DragObserver dragObserver, optional boolean startDragImmediately);
-    method @Deprecated public static androidx.compose.ui.Modifier rawDragGestureFilter(androidx.compose.ui.Modifier, androidx.compose.ui.gesture.DragObserver dragObserver, optional kotlin.jvm.functions.Function0<java.lang.Boolean>? canStartDragging, optional androidx.compose.ui.gesture.scrollorientationlocking.Orientation? orientation);
+    method @Deprecated public static androidx.compose.ui.Modifier rawDragGestureFilter(androidx.compose.ui.Modifier, androidx.compose.ui.gesture.DragObserver dragObserver, optional kotlin.jvm.functions.Function0<java.lang.Boolean>? canStartDragging);
     method @Deprecated public static androidx.compose.ui.Modifier rawPressStartGestureFilter(androidx.compose.ui.Modifier, kotlin.jvm.functions.Function1<? super androidx.compose.ui.geometry.Offset,kotlin.Unit> onPressStart, optional boolean enabled, optional androidx.compose.ui.input.pointer.PointerEventPass executionPass);
   }
 
@@ -447,9 +447,6 @@ package androidx.compose.ui.gesture {
     method @Deprecated public default long onDrag-k-4lQ0M(long dragDistance);
     method @Deprecated public default void onStart-k-4lQ0M(long downPosition);
     method @Deprecated public default void onStop-k-4lQ0M(long velocity);
-  }
-
-  public final class GestureUtilsKt {
   }
 
   public final class LongPressDragGestureFilterKt {
@@ -526,9 +523,6 @@ package androidx.compose.ui.gesture.scrollorientationlocking {
 }
 
 package androidx.compose.ui.gesture.util {
-
-  public final class PolyFitLeastSquaresKt {
-  }
 
   public final class VelocityTracker {
     ctor public VelocityTracker();
@@ -1468,15 +1462,6 @@ package androidx.compose.ui.input.pointer {
     property public final long positionChange;
   }
 
-  public interface CustomEvent {
-  }
-
-  public interface CustomEventDispatcher {
-    method public void dispatchCustomEvent(androidx.compose.ui.input.pointer.CustomEvent event);
-    method public void releaseHitPaths(java.util.Set<androidx.compose.ui.input.pointer.PointerId> pointerIds);
-    method public void retainHitPaths(java.util.Set<androidx.compose.ui.input.pointer.PointerId> pointerIds);
-  }
-
   public final class HitPathTrackerKt {
   }
 
@@ -1557,8 +1542,6 @@ package androidx.compose.ui.input.pointer {
     ctor public PointerInputFilter();
     method public final long getSize-YbymL2g();
     method public abstract void onCancel();
-    method public void onCustomEvent(androidx.compose.ui.input.pointer.CustomEvent customEvent, androidx.compose.ui.input.pointer.PointerEventPass pass);
-    method public void onInit(androidx.compose.ui.input.pointer.CustomEventDispatcher customEventDispatcher);
     method public abstract void onPointerEvent-d1fqKvQ(androidx.compose.ui.input.pointer.PointerEvent pointerEvent, androidx.compose.ui.input.pointer.PointerEventPass pass, long bounds);
     property public final long size;
   }
