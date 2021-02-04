@@ -27,6 +27,7 @@ import androidx.compose.ui.unit.dp
 /**
  * Receiver scope which is used by [LazyColumn] and [LazyRow].
  */
+@LazyScopeMarker
 interface LazyListScope {
     /**
      * Adds a single item.
