@@ -19,12 +19,8 @@
 package androidx.compose.animation
 
 import androidx.compose.animation.core.AnimatedFloat
-import androidx.compose.animation.core.AnimatedValue
 import androidx.compose.animation.core.AnimationClockObservable
-import androidx.compose.animation.core.AnimationVector
-import androidx.compose.animation.core.AnimationVector4D
 import androidx.compose.animation.core.Spring
-import androidx.compose.animation.core.TwoWayConverter
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Stable
 import androidx.compose.runtime.getValue
@@ -32,39 +28,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.structuralEqualityPolicy
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalAnimationClock
-
-/**
- * The animatedValue effect creates an [AnimatedValue] and positionally memoizes it. When the
- * [AnimatedValue] object gets its value updated, components that rely on that value will be
- * automatically recomposed.
- *
- * @param initVal Initial value to set [AnimatedValue] to.
- * @param converter A value type converter for transforming any type T to an animatable type (i.e.
- *                  Floats, Vector2D, Vector3D, etc)
- * @param visibilityThreshold Visibility threshold for the animatedValue to consider itself
- * finished.
- */
-@Composable
-@Deprecated(
-    "animatedValue has been deprecated. Please use remember { Animatable } instead",
-    replaceWith = ReplaceWith(
-        "remember { Animatable(initVal, converter, visibilityThreshold) }",
-        "androidx.compose.animation.core.Animatable",
-        "androidx.compose.runtime.remember"
-    )
-)
-fun <T, V : AnimationVector> animatedValue(
-    initVal: T,
-    converter: TwoWayConverter<T, V>,
-    visibilityThreshold: T? = null,
-    clock: AnimationClockObservable = LocalAnimationClock.current
-): AnimatedValue<T, V> = clock.asDisposableClock().let { disposableClock ->
-    remember(disposableClock) {
-        AnimatedValueModel(initVal, converter, disposableClock, visibilityThreshold)
-    }
-}
 
 /**
  * The animatedValue effect creates an [AnimatedFloat] and positionally memoizes it. When the
@@ -91,62 +55,6 @@ fun animatedFloat(
 }
 
 /**
- * The animatedValue effect creates an [AnimatedValue] of [Color] and positionally memoizes it. When
- * the [AnimatedValue] object gets its value updated, components that rely on that value will be
- * automatically recomposed.
- *
- * @param initVal Initial value to set [AnimatedValue] to.
- */
-@Composable
-@Deprecated(
-    "animatedColor has been deprecated. Please use remember { Animatable } instead",
-    replaceWith = ReplaceWith(
-        "remember { Animatable(initVal) }",
-        "androidx.compose.animation.Animatable",
-        "androidx.compose.runtime.remember"
-    )
-)
-fun animatedColor(
-    initVal: Color,
-    clock: AnimationClockObservable = LocalAnimationClock.current
-): AnimatedValue<Color, AnimationVector4D> = clock.asDisposableClock().let { disposableClock ->
-    remember(disposableClock) {
-        AnimatedValueModel(
-            initialValue = initVal,
-            typeConverter = (Color.VectorConverter)(initVal.colorSpace),
-            clock = disposableClock
-        )
-    }
-}
-
-/**
- * Model class for [AnimatedValue]. This class tracks the value field change, so that composables
- * that read from this field can get promptly recomposed as the animation updates the value.
- *
- * @param initialValue The overridden value field that can only be mutated by animation
- * @param typeConverter The converter for converting any value of type [T] to an
- *                      [AnimationVector] type
- * @param clock The animation clock that will be used to drive the animation
- * @param visibilityThreshold Threshold at which the animation may round off to its target value.
- */
-@Stable
-@Deprecated(
-    "AnimatedValueModel has been deprecated. Please use Animatable instead",
-    replaceWith = ReplaceWith(
-        "Animatable(initialVal, typeConverter, visibilityThreshold)",
-        "androidx.compose.animation.Animatable",
-    )
-)
-class AnimatedValueModel<T, V : AnimationVector>(
-    initialValue: T,
-    typeConverter: TwoWayConverter<T, V>,
-    clock: AnimationClockObservable,
-    visibilityThreshold: T? = null
-) : AnimatedValue<T, V>(typeConverter, clock, visibilityThreshold) {
-    override var value: T by mutableStateOf(initialValue, structuralEqualityPolicy())
-}
-
-/**
  * Model class for [AnimatedFloat]. This class tracks the value field change, so that composables
  * that read from this field can get promptly recomposed as the animation updates the value.
  *
@@ -156,14 +64,7 @@ class AnimatedValueModel<T, V : AnimationVector>(
  *                            enough to the target to terminate
  */
 @Stable
-@Deprecated(
-    "AnimatedFloatModel has been deprecated. Please use Animatable instead",
-    replaceWith = ReplaceWith(
-        "Animatable(initialVal, visibilityThreshold)",
-        "androidx.compose.animation.Animatable",
-    )
-)
-class AnimatedFloatModel(
+private class AnimatedFloatModel(
     initialValue: Float,
     clock: AnimationClockObservable,
     visibilityThreshold: Float = Spring.DefaultDisplacementThreshold

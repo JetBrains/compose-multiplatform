@@ -59,16 +59,8 @@ package androidx.compose.animation.core {
     property public final float velocity;
   }
 
-  @Deprecated public abstract class AnimatedValue<T, V extends androidx.compose.animation.core.AnimationVector> extends androidx.compose.animation.core.BaseAnimatedValue<T,V> {
-    ctor @Deprecated public AnimatedValue(androidx.compose.animation.core.TwoWayConverter<T,V> typeConverter, androidx.compose.animation.core.AnimationClockObservable clock, T? visibilityThreshold);
-    method @Deprecated public final V getVelocity();
-    property public final V velocity;
-  }
-
   public final class AnimatedValueKt {
     method @Deprecated public static androidx.compose.animation.core.AnimatedFloat AnimatedFloat(float initVal, androidx.compose.animation.core.AnimationClockObservable clock, optional float visibilityThreshold);
-    method @Deprecated public static <T, V extends androidx.compose.animation.core.AnimationVector> androidx.compose.animation.core.AnimatedValue<T,V> AnimatedValue(T? initVal, androidx.compose.animation.core.TwoWayConverter<T,V> typeConverter, androidx.compose.animation.core.AnimationClockObservable clock, optional T? visibilityThreshold);
-    method @Deprecated public static <V extends androidx.compose.animation.core.AnimationVector> androidx.compose.animation.core.AnimatedValue<V,V> AnimatedVector(V initVal, androidx.compose.animation.core.AnimationClockObservable clock, optional V visibilityThreshold);
     method @Deprecated public static void fling(androidx.compose.animation.core.AnimatedFloat, float startVelocity, optional androidx.compose.animation.core.FloatDecayAnimationSpec decay, optional kotlin.jvm.functions.Function3<? super androidx.compose.animation.core.AnimationEndReason,? super java.lang.Float,? super java.lang.Float,kotlin.Unit>? onEnd);
     method @Deprecated public static void fling(androidx.compose.animation.core.AnimatedFloat, float startVelocity, optional androidx.compose.animation.core.FloatDecayAnimationSpec decay, kotlin.jvm.functions.Function1<? super java.lang.Float,androidx.compose.animation.core.TargetAnimation> adjustTarget, optional kotlin.jvm.functions.Function3<? super androidx.compose.animation.core.AnimationEndReason,? super java.lang.Float,? super java.lang.Float,kotlin.Unit>? onEnd);
   }
