@@ -39,6 +39,7 @@ import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.performScrollTo
 import androidx.test.espresso.Espresso
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import androidx.test.filters.FlakyTest
 import androidx.test.filters.LargeTest
 import androidx.test.filters.MediumTest
 import com.google.common.truth.Truth.assertThat
@@ -99,6 +100,7 @@ class DemoTest {
     }
 
     @Test
+    @FlakyTest(bugId = 179339732)
     fun navigateThroughAllDemos_2() {
         navigateThroughAllDemos(SplitDemoCategories[1])
     }
