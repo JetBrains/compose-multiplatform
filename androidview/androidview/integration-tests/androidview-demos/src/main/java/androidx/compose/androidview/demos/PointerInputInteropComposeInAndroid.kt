@@ -155,7 +155,7 @@ open class ComposeTapInAndroidTap : ComponentActivity() {
             val currentColor = remember { mutableStateOf(Color.LightGray) }
 
             val tap =
-                Modifier.pointerInput {
+                Modifier.pointerInput(Unit) {
                     detectTapGestures {
                         currentColor.value =
                             if (currentColor.value == Color.Blue) Color.Yellow else Color.Blue

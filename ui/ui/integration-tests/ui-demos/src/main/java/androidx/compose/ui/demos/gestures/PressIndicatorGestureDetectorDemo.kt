@@ -64,7 +64,7 @@ fun PressIndicatorGestureFilterDemo() {
             Modifier.fillMaxSize()
                 .wrapContentSize(Alignment.Center)
                 .preferredSize(192.dp)
-                .pointerInput {
+                .pointerInput(Unit) {
                     detectTapGestures(
                         onPress = {
                             onStart.invoke(it)

@@ -86,7 +86,7 @@ class SendDoubleClickTest(private val config: TestConfig) {
         rule.setContent {
             ClickableTestBox(
                 Modifier
-                    .pointerInput { detectTapGestures(onDoubleTap = ::recordDoubleClick) }
+                    .pointerInput(Unit) { detectTapGestures(onDoubleTap = ::recordDoubleClick) }
                     .then(recorder)
             )
         }

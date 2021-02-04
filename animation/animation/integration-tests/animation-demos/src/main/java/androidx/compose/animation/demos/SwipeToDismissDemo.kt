@@ -84,7 +84,7 @@ private fun Modifier.swipeToDismiss(index: Int): Modifier = composed {
     LaunchedEffect(index) {
         animatedOffset.snapTo(0f)
     }
-    this.pointerInput {
+    this.pointerInput(Unit) {
         coroutineScope {
             while (true) {
                 val pointerId = awaitPointerEventScope {

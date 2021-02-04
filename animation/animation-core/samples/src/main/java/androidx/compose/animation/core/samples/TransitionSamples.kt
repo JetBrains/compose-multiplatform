@@ -62,7 +62,7 @@ fun GestureAnimationSample() {
     // enum class ComponentState { Pressed, Released }
     var useRed by remember { mutableStateOf(false) }
     var toState by remember { mutableStateOf(ComponentState.Released) }
-    val modifier = Modifier.pointerInput {
+    val modifier = Modifier.pointerInput(Unit) {
         detectTapGestures(
             onPress = {
                 toState = ComponentState.Pressed
@@ -243,7 +243,7 @@ fun DoubleTapToLikeSample() {
         }
 
         Box(
-            Modifier.fillMaxSize().pointerInput {
+            Modifier.fillMaxSize().pointerInput(Unit) {
                 detectTapGestures(
                     onDoubleTap = {
                         // This creates a new `MutableTransitionState` object. When a new

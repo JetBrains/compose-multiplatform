@@ -98,7 +98,7 @@ private fun PressableContainer(
 
     val gestureDetectors =
         Modifier
-            .pointerInput {
+            .pointerInput(Unit) {
                 detectTapGestures(
                     onPress = {
                         onStart.invoke(it)
@@ -107,7 +107,7 @@ private fun PressableContainer(
                     }
                 )
             }
-            .pointerInput {
+            .pointerInput(Unit) {
                 detectTapGestures(
                     onTap = onTap,
                     onDoubleTap = onDoubleTap,

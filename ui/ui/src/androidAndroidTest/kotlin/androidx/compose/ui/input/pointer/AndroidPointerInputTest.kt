@@ -423,10 +423,10 @@ class AndroidPointerInputTest {
             container.setContent {
                 FillLayout(
                     Modifier
-                        .pointerInput {
+                        .pointerInput(Unit) {
                             detectTapGestures { tapLatch.countDown() }
                         }.then(
-                            if (tap2Enabled) Modifier.pointerInput {
+                            if (tap2Enabled) Modifier.pointerInput(Unit) {
                                 detectTapGestures { tapLatch2.countDown() }
                             } else Modifier
                         ).onGloballyPositioned { positionedLatch.countDown() }

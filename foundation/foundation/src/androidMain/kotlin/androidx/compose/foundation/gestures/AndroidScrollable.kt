@@ -59,7 +59,7 @@ internal actual fun Modifier.touchScrollable(
                 }
             }
         }
-        Modifier.pointerInput(scrollLambda)
+        Modifier.pointerInput(Unit, scrollLambda)
     }
 )
 

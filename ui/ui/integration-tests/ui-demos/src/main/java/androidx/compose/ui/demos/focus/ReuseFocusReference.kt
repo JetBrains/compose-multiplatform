@@ -62,13 +62,13 @@ fun ReuseFocusRequesterDemo() {
             CurrentShape.Circle -> Circle(
                 modifier = Modifier
                     .focusRequester(focusRequester)
-                    .pointerInput { detectTapGestures { focusRequester.requestFocus() } },
+                    .pointerInput(Unit) { detectTapGestures { focusRequester.requestFocus() } },
                 nextShape = { shape = CurrentShape.Square }
             )
             CurrentShape.Square -> Square(
                 modifier = Modifier
                     .focusRequester(focusRequester)
-                    .pointerInput { detectTapGestures { focusRequester.requestFocus() } },
+                    .pointerInput(Unit) { detectTapGestures { focusRequester.requestFocus() } },
                 nextShape = { shape = CurrentShape.Circle }
             )
         }

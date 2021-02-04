@@ -368,7 +368,7 @@ fun ModalDrawerLayout(
         val anchors = mapOf(minValue to DrawerValue.Closed, maxValue to DrawerValue.Open)
         val isRtl = LocalLayoutDirection.current == LayoutDirection.Rtl
         val blockClicks = if (drawerState.isOpen) {
-            Modifier.pointerInput { detectTapGestures {} }
+            Modifier.pointerInput(Unit) { detectTapGestures {} }
         } else {
             Modifier
         }
@@ -499,7 +499,7 @@ fun BottomDrawerLayout(
         val blockClicks = if (drawerState.isClosed) {
             Modifier
         } else {
-            Modifier.pointerInput { detectTapGestures {} }
+            Modifier.pointerInput(Unit) { detectTapGestures {} }
         }
         Box(
             Modifier
@@ -581,7 +581,7 @@ private fun Scrim(
     color: Color
 ) {
     val dismissDrawer = if (open) {
-        Modifier.pointerInput { detectTapGestures { onClose() } }
+        Modifier.pointerInput(onClose) { detectTapGestures { onClose() } }
     } else {
         Modifier
     }

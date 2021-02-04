@@ -51,7 +51,7 @@ fun ZoomableSample() {
         Box(
             Modifier
                 .zoomable(zoomableController)
-                .pointerInput {
+                .pointerInput(Unit) {
                     detectTapGestures(onDoubleTap = { zoomableController.smoothScaleBy(4f) })
                 }
                 .fillMaxSize()

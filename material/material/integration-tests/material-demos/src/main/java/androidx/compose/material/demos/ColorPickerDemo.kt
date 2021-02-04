@@ -99,7 +99,7 @@ private fun ColorPicker(onColorChange: (Color) -> Unit) {
         val colorWheel = remember(diameter) { ColorWheel(diameter) }
 
         var isDragging by remember { mutableStateOf(false) }
-        val inputModifier = Modifier.pointerInput {
+        val inputModifier = Modifier.pointerInput(Unit) {
             detectDragGestures { change, _ ->
                 isDragging = true
                 val newPosition = change.position

@@ -56,7 +56,7 @@ fun DoubleTapToLikeDemo() {
     }
 
     Box(
-        Modifier.fillMaxSize().pointerInput {
+        Modifier.fillMaxSize().pointerInput(Unit) {
             detectTapGestures(
                 onDoubleTap = {
                     // This creates a new `MutableTransitionState` object. When a new

@@ -158,7 +158,7 @@ fun Slider(
             }
         }
 
-        val press = Modifier.pointerInput {
+        val press = Modifier.pointerInput(Unit) {
             detectTapGestures(
                 onPress = { pos ->
                     position.holder.snapTo(if (isRtl) maxPx - pos.x else pos.x)

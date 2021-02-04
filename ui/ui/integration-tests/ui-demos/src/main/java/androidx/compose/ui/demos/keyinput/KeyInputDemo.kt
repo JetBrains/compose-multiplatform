@@ -72,7 +72,7 @@ private fun FocusableText(text: MutableState<String>) {
             .focusRequester(focusRequester)
             .onFocusChanged { color = if (it.isFocused) Color.Green else Color.Black }
             .focusModifier()
-            .pointerInput { detectTapGestures { focusRequester.requestFocus() } }
+            .pointerInput(Unit) { detectTapGestures { focusRequester.requestFocus() } }
             .onKeyEvent {
                 if (it.type == KeyDown) {
                     text.value = StringBuilder(text.value)

@@ -125,18 +125,89 @@ interface PointerInputScope : Density {
  * pointer input events. Extension functions on [PointerInputScope] or [AwaitPointerEventScope]
  * may be defined to perform higher-level gesture detection.
  */
+@Deprecated("Effect keys are now required parameters", ReplaceWith("pointerInput(Unit, block)"))
 fun Modifier.pointerInput(
+    block: suspend PointerInputScope.() -> Unit
+): Modifier = pointerInput(Unit, block)
+
+/**
+ * Create a modifier for processing pointer input within the region of the modified element.
+ *
+ * [pointerInput] [block]s may call [PointerInputScope.awaitPointerEventScope] to install a pointer
+ * input handler that can [AwaitPointerEventScope.awaitPointerEvent] to receive and consume
+ * pointer input events. Extension functions on [PointerInputScope] or [AwaitPointerEventScope]
+ * may be defined to perform higher-level gesture detection.
+ */
+fun Modifier.pointerInput(
+    key1: Any?,
     block: suspend PointerInputScope.() -> Unit
 ): Modifier = composed(
     inspectorInfo = debugInspectorInfo {
         name = "pointerInput"
-        this.properties["block"] = block
+        properties["key1"] = key1
+        properties["block"] = block
     }
 ) {
     val density = LocalDensity.current
     val viewConfiguration = LocalViewConfiguration.current
     remember(density) { SuspendingPointerInputFilter(viewConfiguration, density) }.apply {
-        LaunchedEffect(this) {
+        LaunchedEffect(this, key1) {
+            block()
+        }
+    }
+}
+
+/**
+ * Create a modifier for processing pointer input within the region of the modified element.
+ *
+ * [pointerInput] [block]s may call [PointerInputScope.awaitPointerEventScope] to install a pointer
+ * input handler that can [AwaitPointerEventScope.awaitPointerEvent] to receive and consume
+ * pointer input events. Extension functions on [PointerInputScope] or [AwaitPointerEventScope]
+ * may be defined to perform higher-level gesture detection.
+ */
+fun Modifier.pointerInput(
+    key1: Any?,
+    key2: Any?,
+    block: suspend PointerInputScope.() -> Unit
+): Modifier = composed(
+    inspectorInfo = debugInspectorInfo {
+        name = "pointerInput"
+        properties["key1"] = key1
+        properties["key2"] = key2
+        properties["block"] = block
+    }
+) {
+    val density = LocalDensity.current
+    val viewConfiguration = LocalViewConfiguration.current
+    remember(density) { SuspendingPointerInputFilter(viewConfiguration, density) }.apply {
+        LaunchedEffect(this, key1, key2) {
+            block()
+        }
+    }
+}
+
+/**
+ * Create a modifier for processing pointer input within the region of the modified element.
+ *
+ * [pointerInput] [block]s may call [PointerInputScope.awaitPointerEventScope] to install a pointer
+ * input handler that can [AwaitPointerEventScope.awaitPointerEvent] to receive and consume
+ * pointer input events. Extension functions on [PointerInputScope] or [AwaitPointerEventScope]
+ * may be defined to perform higher-level gesture detection.
+ */
+fun Modifier.pointerInput(
+    vararg keys: Any?,
+    block: suspend PointerInputScope.() -> Unit
+): Modifier = composed(
+    inspectorInfo = debugInspectorInfo {
+        name = "pointerInput"
+        properties["keys"] = keys
+        properties["block"] = block
+    }
+) {
+    val density = LocalDensity.current
+    val viewConfiguration = LocalViewConfiguration.current
+    remember(density) { SuspendingPointerInputFilter(viewConfiguration, density) }.apply {
+        LaunchedEffect(this, *keys) {
             block()
         }
     }
