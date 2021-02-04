@@ -91,9 +91,6 @@ if(AndroidXUiPlugin.isMultiplatformEnabled(project)) {
                 dependsOn jvmMain
             }
             desktopMain {
-                dependencies {
-                    api(KOTLIN_COROUTINES_SWING)
-                }
                 dependsOn jvmMain
             }
 
