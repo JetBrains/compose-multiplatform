@@ -22,6 +22,7 @@ import androidx.compose.foundation.animation.FlingConfig
 import androidx.compose.foundation.animation.smoothScrollBy
 import androidx.compose.foundation.gestures.Scrollable
 import androidx.compose.foundation.gestures.ScrollableController
+import androidx.compose.foundation.gestures.rememberScrollableController
 import androidx.compose.foundation.gestures.scrollable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.preferredSize
@@ -29,7 +30,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
-import androidx.compose.testutils.MockAnimationClock
 import androidx.compose.testutils.advanceClockOnMainThreadMillis
 import androidx.compose.testutils.monotonicFrameAnimationClockOf
 import androidx.compose.ui.Alignment
@@ -1082,13 +1082,11 @@ class ScrollableTest {
 
     @Test
     fun testInspectorValue() {
-        val controller = ScrollableController(
-            consumeScrollDelta = { it },
-            flingConfig = FlingConfig(decayAnimation = FloatExponentialDecaySpec()),
-            animationClock = MockAnimationClock()
-        )
         rule.setContent {
-            val modifier = Modifier.scrollable(Orientation.Vertical, controller) as InspectableValue
+            val modifier = Modifier.scrollable(
+                Orientation.Vertical,
+                rememberScrollableController { it }
+            ) as InspectableValue
             assertThat(modifier.nameFallback).isEqualTo("scrollable")
             assertThat(modifier.valueOverride).isNull()
             assertThat(modifier.inspectableElements.map { it.name }.asIterable()).containsExactly(

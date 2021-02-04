@@ -17,7 +17,6 @@
 package androidx.compose.material
 
 import android.os.Build
-import androidx.compose.animation.core.ManualAnimationClock
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
@@ -57,7 +56,6 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.MediumTest
 import androidx.test.filters.SdkSuppress
 import com.google.common.truth.Truth
-import org.junit.Before
 import org.junit.Ignore
 import org.junit.Rule
 import org.junit.Test
@@ -75,15 +73,8 @@ class BottomSheetScaffoldTest {
 
     private val sheetContent = "frontLayerTag"
 
-    private lateinit var clock: ManualAnimationClock
-
     private fun advanceClock() {
-        clock.clockTimeMillis += 100000L
-    }
-
-    @Before
-    fun init() {
-        clock = ManualAnimationClock(initTimeMillis = 0L)
+        rule.mainClock.advanceTimeBy(100_000L)
     }
 
     @Test
@@ -108,8 +99,7 @@ class BottomSheetScaffoldTest {
         rule.setContent {
             BottomSheetScaffold(
                 scaffoldState = rememberBottomSheetScaffoldState(
-                    bottomSheetState =
-                        rememberBottomSheetState(initialValue = BottomSheetValue.Expanded)
+                    bottomSheetState = rememberBottomSheetState(BottomSheetValue.Expanded)
                 ),
                 sheetContent = {
                     Box(Modifier.fillMaxWidth().height(300.dp).testTag(sheetContent))
@@ -126,11 +116,11 @@ class BottomSheetScaffoldTest {
 
     @Test
     fun bottomSheetScaffold_testExpandAction_whenCollapsed() {
-        val bottomSheetState = BottomSheetState(BottomSheetValue.Collapsed, clock = clock)
         rule.setContent {
             BottomSheetScaffold(
-                scaffoldState =
-                    rememberBottomSheetScaffoldState(bottomSheetState = bottomSheetState),
+                scaffoldState = rememberBottomSheetScaffoldState(
+                    bottomSheetState = rememberBottomSheetState(BottomSheetValue.Collapsed)
+                ),
                 sheetContent = {
                     Box(Modifier.fillMaxWidth().height(300.dp).testTag(sheetContent))
                 },
@@ -153,11 +143,11 @@ class BottomSheetScaffoldTest {
 
     @Test
     fun bottomSheetScaffold_testCollapseAction_whenExpanded() {
-        val bottomSheetState = BottomSheetState(BottomSheetValue.Expanded, clock = clock)
         rule.setContent {
             BottomSheetScaffold(
-                scaffoldState =
-                    rememberBottomSheetScaffoldState(bottomSheetState = bottomSheetState),
+                scaffoldState = rememberBottomSheetScaffoldState(
+                    bottomSheetState = rememberBottomSheetState(BottomSheetValue.Expanded)
+                ),
                 sheetContent = {
                     Box(Modifier.fillMaxWidth().height(300.dp).testTag(sheetContent))
                 },
@@ -180,8 +170,9 @@ class BottomSheetScaffoldTest {
 
     @Test
     fun backdropScaffold_revealAndConceal_manually() {
-        val bottomSheetState = BottomSheetState(BottomSheetValue.Collapsed, clock = clock)
+        lateinit var bottomSheetState: BottomSheetState
         rule.setContent {
+            bottomSheetState = rememberBottomSheetState(BottomSheetValue.Collapsed)
             BottomSheetScaffold(
                 scaffoldState =
                     rememberBottomSheetScaffoldState(bottomSheetState = bottomSheetState),
@@ -217,8 +208,9 @@ class BottomSheetScaffoldTest {
 
     @Test
     fun bottomSheetScaffold_revealBySwiping() {
-        val bottomSheetState = BottomSheetState(BottomSheetValue.Collapsed, clock = clock)
+        lateinit var bottomSheetState: BottomSheetState
         rule.setContent {
+            bottomSheetState = rememberBottomSheetState(BottomSheetValue.Collapsed)
             BottomSheetScaffold(
                 scaffoldState =
                     rememberBottomSheetScaffoldState(bottomSheetState = bottomSheetState),
@@ -255,8 +247,9 @@ class BottomSheetScaffoldTest {
 
     @Test
     fun bottomSheetScaffold_revealBySwiping_gesturesDisabled() {
-        val bottomSheetState = BottomSheetState(BottomSheetValue.Collapsed, clock = clock)
+        lateinit var bottomSheetState: BottomSheetState
         rule.setContent {
+            bottomSheetState = rememberBottomSheetState(BottomSheetValue.Collapsed)
             BottomSheetScaffold(
                 scaffoldState =
                     rememberBottomSheetScaffoldState(bottomSheetState = bottomSheetState),
