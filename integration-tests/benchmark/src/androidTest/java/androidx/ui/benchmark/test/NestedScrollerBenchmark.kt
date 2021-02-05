@@ -63,17 +63,26 @@ class NestedScrollerBenchmark {
 
     @Test
     fun changeScroll_measure() {
-        benchmarkRule.toggleStateBenchmarkMeasure(nestedScrollerCaseFactory)
+        benchmarkRule.toggleStateBenchmarkMeasure(
+            nestedScrollerCaseFactory,
+            toggleCausesRecompose = false
+        )
     }
 
     @Test
     fun changeScroll_layout() {
-        benchmarkRule.toggleStateBenchmarkLayout(nestedScrollerCaseFactory)
+        benchmarkRule.toggleStateBenchmarkLayout(
+            nestedScrollerCaseFactory,
+            toggleCausesRecompose = false
+        )
     }
 
     @Test
     fun changeScroll_draw() {
-        benchmarkRule.toggleStateBenchmarkDraw(nestedScrollerCaseFactory)
+        benchmarkRule.toggleStateBenchmarkDraw(
+            nestedScrollerCaseFactory,
+            toggleCausesRecompose = false
+        )
     }
 
     @Test

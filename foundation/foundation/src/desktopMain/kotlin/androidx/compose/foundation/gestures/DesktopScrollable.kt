@@ -20,7 +20,6 @@ package androidx.compose.foundation.gestures
 
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.composed
-import androidx.compose.ui.gesture.ScrollCallback
 import androidx.compose.ui.gesture.scrollorientationlocking.Orientation
 import androidx.compose.ui.input.mouse.MouseScrollUnit
 import androidx.compose.ui.input.mouse.mouseScrollFilter
@@ -31,20 +30,13 @@ import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.dp
 import kotlin.math.sqrt
 
-internal actual fun Modifier.touchScrollable(
-    scrollCallback: ScrollCallback,
-    orientation: Orientation,
-    enabled: Boolean,
-    startScrollImmediately: Boolean
-): Modifier = this
-
 // TODO(demin): implement smooth scroll animation on Windows
 // TODO(demin): implement touchpad bounce physics on MacOS
 // TODO(demin): maybe we need to differentiate different linux environments (Gnome/KDE)
 // TODO(demin): do we need support real line scrolling (i.e. scroll by 3 text lines)?
 internal actual fun Modifier.mouseScrollable(
-    scrollCallback: ScrollCallback,
-    orientation: Orientation
+    orientation: Orientation,
+    onScroll: (Float) -> Unit
 ): Modifier = composed {
     val density = LocalDensity.current
     val desktopPlatform = DesktopPlatformAmbient.current
@@ -56,7 +48,7 @@ internal actual fun Modifier.mouseScrollable(
                 Orientation.Vertical -> bounds.height
                 Orientation.Horizontal -> bounds.width
             }
-            scrollCallback.onScroll(-config.toScrollOffset(event.delta, scrollBounds))
+            onScroll(-config.toScrollOffset(event.delta, scrollBounds))
             true
         } else {
             false

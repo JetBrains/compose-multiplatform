@@ -16,13 +16,14 @@
 
 package androidx.compose.ui.test.gesturescope
 
+import androidx.compose.animation.core.FloatExponentialDecaySpec
+import androidx.compose.animation.core.generateDecayAnimationSpec
 import androidx.compose.foundation.ScrollState
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.wrapContentSize
-import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Providers
@@ -164,9 +165,8 @@ class SendSwipeTest {
     @Test
     fun swipeScrollable() {
         val touchSlop = TestTouchSlop
-        lateinit var scrollState: ScrollState
+        val scrollState = ScrollState(initial = 0f)
         rule.setContent {
-            scrollState = rememberScrollState(0f)
             Providers(LocalViewConfiguration provides FakeViewConfiguration) {
                 with(LocalDensity.current) {
                     // Scrollable with a viewport the size of 10 boxes
@@ -174,7 +174,11 @@ class SendSwipeTest {
                         Modifier
                             .testTag("scrollable")
                             .size(100.toDp(), 1000.toDp())
-                            .verticalScroll(scrollState)
+                            .verticalScroll(
+                                scrollState,
+                                flingSpec = FloatExponentialDecaySpec()
+                                    .generateDecayAnimationSpec()
+                            )
                     ) {
                         repeat(100) {
                             ClickableTestBox()
@@ -184,11 +188,9 @@ class SendSwipeTest {
             }
         }
 
-        rule.runOnIdle {
-            assertThat(scrollState.value).isEqualTo(0f)
-            // numBoxes * boxHeight - viewportHeight = 100 * 100 - 1000
-            assertThat(scrollState.maxValue).isEqualTo(9000f)
-        }
+        assertThat(scrollState.value).isEqualTo(0f)
+        // numBoxes * boxHeight - viewportHeight = 100 * 100 - 1000
+        assertThat(scrollState.maxValue).isEqualTo(9000f)
 
         val swipeDistance = 800f - touchSlop
         rule.onNodeWithTag("scrollable").performGesture {
@@ -202,10 +204,8 @@ class SendSwipeTest {
             up()
         }
 
-        rule.runOnIdle {
-            assertThat(scrollState.value).isAlmostEqualTo(swipeDistance, 1e-3f)
-            assertThat(scrollState.maxValue).isEqualTo(9000f)
-        }
+        assertThat(scrollState.value).isAlmostEqualTo(swipeDistance, 1e-3f)
+        assertThat(scrollState.maxValue).isEqualTo(9000f)
     }
 
     private fun SinglePointerInputRecorder.assertSwipeIsUp() {

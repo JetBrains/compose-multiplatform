@@ -47,46 +47,58 @@ fun NestedScrollDemo() {
             .padding(PaddingValues(30.dp))
     ) {
         repeat(6) { outerOuterIndex ->
-            LazyColumn(
-                modifier = Modifier.fillMaxSize().border(3.dp, Color.Black).height(350.dp)
-                    .background(Color.Yellow),
-                contentPadding = PaddingValues(60.dp)
-            ) {
-                repeat(3) { outerIndex ->
-                    item {
-                        Column(
-                            Modifier
-                                .fillMaxSize()
-                                .border(3.dp, Color.Blue)
-                                .height(150.dp)
-                                .background(Color.White)
-                                .verticalScroll(rememberScrollState())
-                                .padding(PaddingValues(30.dp))
-                        ) {
-                            repeat(6) { innerIndex ->
-                                Box(
-                                    Modifier
-                                        .height(38.dp)
-                                        .fillMaxWidth()
-                                        .background(Color.Magenta)
-                                        .border(2.dp, Color.Yellow),
-                                    contentAlignment = Alignment.Center
-                                ) {
-                                    Text(
-                                        text = "$outerOuterIndex : $outerIndex : $innerIndex",
-                                        fontSize = 24.sp
-                                    )
-                                }
-                            }
-                        }
-                    }
+            OuterLvl1(outerOuterIndex)
+        }
+    }
+}
 
-                    item {
-                        Spacer(Modifier.height(5.dp))
-                    }
-                }
+@Composable
+private fun OuterLvl1(outerOuterIndex: Int) {
+    LazyColumn(
+        modifier = Modifier.fillMaxSize()
+            .border(3.dp, Color.Black)
+            .height(350.dp)
+            .background(Color.Yellow),
+        contentPadding = PaddingValues(60.dp)
+    ) {
+        repeat(3) { outerIndex ->
+            item {
+                InnerColumn(outerOuterIndex, outerIndex)
             }
-            Spacer(Modifier.height(5.dp))
+
+            item {
+                Spacer(Modifier.height(5.dp))
+            }
+        }
+    }
+    Spacer(Modifier.height(5.dp))
+}
+
+@Composable
+private fun InnerColumn(outerOuterIndex: Int, outerIndex: Int) {
+    Column(
+        Modifier
+            .fillMaxSize()
+            .border(3.dp, Color.Blue)
+            .height(150.dp)
+            .background(Color.White)
+            .verticalScroll(rememberScrollState())
+            .padding(PaddingValues(30.dp))
+    ) {
+        repeat(10) { innerIndex ->
+            Box(
+                Modifier
+                    .height(38.dp)
+                    .fillMaxWidth()
+                    .background(Color.Magenta)
+                    .border(2.dp, Color.Yellow),
+                contentAlignment = Alignment.Center
+            ) {
+                Text(
+                    text = "$outerOuterIndex : $outerIndex : $innerIndex",
+                    fontSize = 24.sp
+                )
+            }
         }
     }
 }

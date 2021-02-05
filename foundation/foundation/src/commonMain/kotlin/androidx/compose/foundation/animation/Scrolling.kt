@@ -19,7 +19,7 @@ package androidx.compose.foundation.animation
 import androidx.compose.animation.core.AnimationSpec
 import androidx.compose.animation.core.VectorConverter
 import androidx.compose.animation.core.spring
-import androidx.compose.foundation.gestures.Scrollable
+import androidx.compose.foundation.gestures.ScrollableState
 import androidx.compose.runtime.withFrameNanos
 
 /**
@@ -33,7 +33,7 @@ import androidx.compose.runtime.withFrameNanos
  *
  * @return the amount of scroll consumed
  */
-suspend fun Scrollable.smoothScrollBy(
+suspend fun ScrollableState.smoothScrollBy(
     value: Float,
     spec: AnimationSpec<Float> = spring()
 ): Float {
@@ -83,9 +83,7 @@ suspend fun Scrollable.smoothScrollBy(
  * @param value number of pixels to scroll by
  * @return the amount of scroll consumed
  */
-suspend fun Scrollable.scrollBy(
-    value: Float
-): Float {
+suspend fun ScrollableState.scrollBy(value: Float): Float {
     var consumed = 0f
     scroll {
         consumed = scrollBy(value)

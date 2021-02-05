@@ -16,6 +16,7 @@
 
 package androidx.compose.foundation.lazy
 
+import androidx.compose.animation.core.DecayAnimationSpec
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.PaddingValues
@@ -215,6 +216,8 @@ private class LazyListScopeImpl : LazyListScope {
  * to add a spacing between items and specify the arrangement of the items when we have not enough
  * of them to fill the whole minimum size.
  * @param verticalAlignment the vertical alignment applied to the items
+ * @param flingSpec fling animation configuration to use when drag ends with velocity. If
+ * `null`, default fling configuration will be used.
  * @param content a block which describes the content. Inside this block you can use methods like
  * [LazyListScope.item] to add a single item or [LazyListScope.items] to add a list of items.
  */
@@ -227,6 +230,7 @@ fun LazyRow(
     horizontalArrangement: Arrangement.Horizontal =
         if (!reverseLayout) Arrangement.Start else Arrangement.End,
     verticalAlignment: Alignment.Vertical = Alignment.Top,
+    flingSpec: DecayAnimationSpec<Float>? = null,
     content: LazyListScope.() -> Unit
 ) {
     val scope = LazyListScopeImpl()
@@ -240,6 +244,7 @@ fun LazyRow(
         verticalAlignment = verticalAlignment,
         horizontalArrangement = horizontalArrangement,
         isVertical = false,
+        flingSpec = flingSpec,
         reverseLayout = reverseLayout,
         headerIndexes = scope.headersIndexes ?: emptyList()
     ) { index ->
@@ -268,6 +273,8 @@ fun LazyRow(
  * to add a spacing between items and specify the arrangement of the items when we have not enough
  * of them to fill the whole minimum size.
  * @param horizontalAlignment the horizontal alignment applied to the items.
+ * @param flingSpec fling animation configuration to use when drag ends with velocity. If
+ * `null`, default fling configuration will be used.
  * @param content a block which describes the content. Inside this block you can use methods like
  * [LazyListScope.item] to add a single item or [LazyListScope.items] to add a list of items.
  */
@@ -280,6 +287,7 @@ fun LazyColumn(
     verticalArrangement: Arrangement.Vertical =
         if (!reverseLayout) Arrangement.Top else Arrangement.Bottom,
     horizontalAlignment: Alignment.Horizontal = Alignment.Start,
+    flingSpec: DecayAnimationSpec<Float>? = null,
     content: LazyListScope.() -> Unit
 ) {
     val scope = LazyListScopeImpl()
@@ -293,6 +301,7 @@ fun LazyColumn(
         horizontalAlignment = horizontalAlignment,
         verticalArrangement = verticalArrangement,
         isVertical = true,
+        flingSpec = flingSpec,
         reverseLayout = reverseLayout,
         headerIndexes = scope.headersIndexes ?: emptyList()
     ) { index ->

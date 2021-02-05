@@ -20,12 +20,14 @@ package androidx.compose.foundation.animation
 
 import androidx.compose.animation.core.AnimatedFloat
 import androidx.compose.animation.core.AnimationSpec
+import androidx.compose.animation.core.DecayAnimationSpec
 import androidx.compose.animation.core.FloatDecayAnimationSpec
 import androidx.compose.animation.core.FloatExponentialDecaySpec
 import androidx.compose.animation.core.OnAnimationEnd
 import androidx.compose.animation.core.SpringSpec
 import androidx.compose.animation.core.TargetAnimation
 import androidx.compose.animation.core.fling
+import androidx.compose.animation.core.generateDecayAnimationSpec
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Immutable
 import kotlin.math.abs
@@ -82,6 +84,13 @@ class FlingConfig(
 fun defaultFlingConfig(
     adjustTarget: (Float) -> TargetAnimation? = { null }
 ): FlingConfig = actualFlingConfig(adjustTarget)
+
+/**
+ * Default [DecayAnimationSpec] representing a fling curve.
+ */
+@Composable
+fun defaultFlingSpec(): DecayAnimationSpec<Float> =
+    actualFlingConfig { null }.decayAnimation.generateDecayAnimationSpec()
 
 @Composable
 internal expect fun actualFlingConfig(adjustTarget: (Float) -> TargetAnimation?): FlingConfig

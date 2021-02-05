@@ -18,7 +18,6 @@ package androidx.compose.foundation.gestures
 
 import androidx.compose.animation.core.AnimationClockObservable
 import androidx.compose.animation.core.AnimationClockObserver
-import androidx.compose.foundation.animation.defaultFlingConfig
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.size
 import androidx.compose.runtime.Composable
@@ -65,7 +64,7 @@ class DesktopScrollableTest {
                 Modifier
                     .scrollable(
                         orientation = Orientation.Vertical,
-                        controller = context.controller()
+                        state = context.controller()
                     )
                     .size(10.dp, 20.dp)
             )
@@ -98,7 +97,7 @@ class DesktopScrollableTest {
                 Modifier
                     .scrollable(
                         orientation = Orientation.Vertical,
-                        controller = context.controller()
+                        state = context.controller()
                     )
                     .size(10.dp, 20.dp)
             )
@@ -131,7 +130,7 @@ class DesktopScrollableTest {
                 Modifier
                     .scrollable(
                         orientation = Orientation.Vertical,
-                        controller = context.controller()
+                        state = context.controller()
                     )
                     .size(10.dp, 20.dp)
             )
@@ -156,7 +155,7 @@ class DesktopScrollableTest {
                 Modifier
                     .scrollable(
                         orientation = Orientation.Vertical,
-                        controller = context.controller()
+                        state = context.controller()
                     )
                     .size(10.dp, 20.dp)
             )
@@ -181,7 +180,7 @@ class DesktopScrollableTest {
                 Modifier
                     .scrollable(
                         orientation = Orientation.Vertical,
-                        controller = column.controller()
+                        state = column.controller()
                     )
                     .size(10.dp, 20.dp)
             )
@@ -201,11 +200,7 @@ class DesktopScrollableTest {
             private set
 
         @Composable
-        fun controller() = ScrollableController(
-            ::consumeScrollDelta,
-            defaultFlingConfig(),
-            TestAnimationClock()
-        )
+        fun controller() = ScrollableState(::consumeScrollDelta)
 
         private fun consumeScrollDelta(delta: Float): Float {
             offset += delta

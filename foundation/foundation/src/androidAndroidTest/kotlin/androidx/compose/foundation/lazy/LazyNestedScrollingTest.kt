@@ -16,7 +16,7 @@
 
 package androidx.compose.foundation.lazy
 
-import androidx.compose.foundation.gestures.rememberScrollableController
+import androidx.compose.foundation.gestures.ScrollableState
 import androidx.compose.foundation.gestures.scrollable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Spacer
@@ -35,6 +35,7 @@ import androidx.compose.ui.unit.dp
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.MediumTest
 import com.google.common.truth.Truth
+import kotlinx.coroutines.runBlocking
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -51,17 +52,18 @@ class LazyNestedScrollingTest {
     private val dragOffsetWithTouchSlop = expectedDragOffset + TestTouchSlop
 
     @Test
-    fun column_nestedScrollingBackwardInitially() {
+    fun column_nestedScrollingBackwardInitially() = runBlocking {
         val items = (1..3).toList()
         var draggedOffset = 0f
+        val scrollable = ScrollableState {
+            draggedOffset += it
+            it
+        }
         rule.setContentWithTestViewConfiguration {
             Box(
                 Modifier.scrollable(
                     orientation = Orientation.Vertical,
-                    controller = rememberScrollableController {
-                        draggedOffset += it
-                        it
-                    }
+                    state = scrollable
                 )
             ) {
                 LazyColumn(Modifier.size(100.dp).testTag(LazyTag)) {
@@ -85,17 +87,18 @@ class LazyNestedScrollingTest {
     }
 
     @Test
-    fun column_nestedScrollingBackwardOnceWeScrolledForwardPreviously() {
+    fun column_nestedScrollingBackwardOnceWeScrolledForwardPreviously() = runBlocking {
         val items = (1..3).toList()
         var draggedOffset = 0f
+        val scrollable = ScrollableState {
+            draggedOffset += it
+            it
+        }
         rule.setContentWithTestViewConfiguration {
             Box(
                 Modifier.scrollable(
                     orientation = Orientation.Vertical,
-                    controller = rememberScrollableController {
-                        draggedOffset += it
-                        it
-                    }
+                    state = scrollable
                 )
             ) {
                 LazyColumn(Modifier.size(100.dp).testTag(LazyTag)) {
@@ -129,17 +132,18 @@ class LazyNestedScrollingTest {
     }
 
     @Test
-    fun column_nestedScrollingForwardWhenTheFullContentIsInitiallyVisible() {
+    fun column_nestedScrollingForwardWhenTheFullContentIsInitiallyVisible() = runBlocking {
         val items = (1..2).toList()
         var draggedOffset = 0f
+        val scrollable = ScrollableState {
+            draggedOffset += it
+            it
+        }
         rule.setContentWithTestViewConfiguration {
             Box(
                 Modifier.scrollable(
                     orientation = Orientation.Vertical,
-                    controller = rememberScrollableController {
-                        draggedOffset += it
-                        it
-                    }
+                    state = scrollable
                 )
             ) {
                 LazyColumn(Modifier.size(100.dp).testTag(LazyTag)) {
@@ -163,17 +167,18 @@ class LazyNestedScrollingTest {
     }
 
     @Test
-    fun column_nestedScrollingForwardWhenScrolledToTheEnd() {
+    fun column_nestedScrollingForwardWhenScrolledToTheEnd() = runBlocking {
         val items = (1..3).toList()
         var draggedOffset = 0f
+        val scrollable = ScrollableState {
+            draggedOffset += it
+            it
+        }
         rule.setContentWithTestViewConfiguration {
             Box(
                 Modifier.scrollable(
                     orientation = Orientation.Vertical,
-                    controller = rememberScrollableController {
-                        draggedOffset += it
-                        it
-                    }
+                    state = scrollable
                 )
             ) {
                 LazyColumn(Modifier.size(100.dp).testTag(LazyTag)) {
@@ -202,17 +207,18 @@ class LazyNestedScrollingTest {
     }
 
     @Test
-    fun row_nestedScrollingBackwardInitially() {
+    fun row_nestedScrollingBackwardInitially() = runBlocking {
         val items = (1..3).toList()
         var draggedOffset = 0f
+        val scrollable = ScrollableState {
+            draggedOffset += it
+            it
+        }
         rule.setContentWithTestViewConfiguration {
             Box(
                 Modifier.scrollable(
                     orientation = Orientation.Horizontal,
-                    controller = rememberScrollableController {
-                        draggedOffset += it
-                        it
-                    }
+                    state = scrollable
                 )
             ) {
                 LazyRow(
@@ -238,17 +244,18 @@ class LazyNestedScrollingTest {
     }
 
     @Test
-    fun row_nestedScrollingBackwardOnceWeScrolledForwardPreviously() {
+    fun row_nestedScrollingBackwardOnceWeScrolledForwardPreviously() = runBlocking {
         val items = (1..3).toList()
         var draggedOffset = 0f
+        val scrollable = ScrollableState {
+            draggedOffset += it
+            it
+        }
         rule.setContentWithTestViewConfiguration {
             Box(
                 Modifier.scrollable(
                     orientation = Orientation.Horizontal,
-                    controller = rememberScrollableController {
-                        draggedOffset += it
-                        it
-                    }
+                    state = scrollable
                 )
             ) {
                 LazyRow(
@@ -284,17 +291,18 @@ class LazyNestedScrollingTest {
     }
 
     @Test
-    fun row_nestedScrollingForwardWhenTheFullContentIsInitiallyVisible() {
+    fun row_nestedScrollingForwardWhenTheFullContentIsInitiallyVisible() = runBlocking {
         val items = (1..2).toList()
         var draggedOffset = 0f
+        val scrollable = ScrollableState {
+            draggedOffset += it
+            it
+        }
         rule.setContentWithTestViewConfiguration {
             Box(
                 Modifier.scrollable(
                     orientation = Orientation.Horizontal,
-                    controller = rememberScrollableController {
-                        draggedOffset += it
-                        it
-                    }
+                    state = scrollable
                 )
             ) {
                 LazyRow(
@@ -320,17 +328,18 @@ class LazyNestedScrollingTest {
     }
 
     @Test
-    fun row_nestedScrollingForwardWhenScrolledToTheEnd() {
+    fun row_nestedScrollingForwardWhenScrolledToTheEnd() = runBlocking {
         val items = (1..3).toList()
         var draggedOffset = 0f
+        val scrollable = ScrollableState {
+            draggedOffset += it
+            it
+        }
         rule.setContentWithTestViewConfiguration {
             Box(
                 Modifier.scrollable(
                     orientation = Orientation.Horizontal,
-                    controller = rememberScrollableController {
-                        draggedOffset += it
-                        it
-                    }
+                    state = scrollable
                 )
             ) {
                 LazyRow(
