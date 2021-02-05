@@ -465,75 +465,8 @@ package androidx.compose.ui.gesture {
     method @Deprecated public static androidx.compose.ui.Modifier pressIndicatorGestureFilter(androidx.compose.ui.Modifier, optional kotlin.jvm.functions.Function1<? super androidx.compose.ui.geometry.Offset,kotlin.Unit>? onStart, optional kotlin.jvm.functions.Function0<kotlin.Unit>? onStop, optional kotlin.jvm.functions.Function0<kotlin.Unit>? onCancel, optional boolean enabled);
   }
 
-  @Deprecated public interface ScrollCallback {
-    method @Deprecated public default void onCancel();
-    method @Deprecated public default float onScroll(float scrollDistance);
-    method @Deprecated public default void onStart-k-4lQ0M(long downPosition);
-    method @Deprecated public default void onStop(float velocity);
-  }
-
-  public final class ScrollGestureFilterKt {
-    method @Deprecated public static androidx.compose.ui.Modifier scrollGestureFilter(androidx.compose.ui.Modifier, androidx.compose.ui.gesture.ScrollCallback scrollCallback, androidx.compose.ui.gesture.scrollorientationlocking.Orientation orientation, optional boolean startDragImmediately);
-  }
-
   public final class TapGestureFilterKt {
     method @Deprecated public static androidx.compose.ui.Modifier tapGestureFilter(androidx.compose.ui.Modifier, kotlin.jvm.functions.Function1<? super androidx.compose.ui.geometry.Offset,kotlin.Unit> onTap);
-  }
-
-}
-
-package androidx.compose.ui.gesture.nestedscroll {
-
-  public interface NestedScrollConnection {
-    method public default suspend Object? onPostFling-k5p9STU(long consumed, long available, kotlin.coroutines.Continuation<? super androidx.compose.ui.unit.Velocity> p);
-    method public default long onPostScroll-l-UAZDg(long consumed, long available, androidx.compose.ui.gesture.nestedscroll.NestedScrollSource source);
-    method public default suspend Object? onPreFling-bHeVL4A(long available, kotlin.coroutines.Continuation<? super androidx.compose.ui.unit.Velocity> p);
-    method public default long onPreScroll-vG6bCaM(long available, androidx.compose.ui.gesture.nestedscroll.NestedScrollSource source);
-  }
-
-  public final class NestedScrollDelegatingWrapperKt {
-  }
-
-  public final class NestedScrollDispatcher {
-    ctor public NestedScrollDispatcher();
-    method public suspend Object? dispatchPostFling-k5p9STU(long consumed, long available, kotlin.coroutines.Continuation<? super androidx.compose.ui.unit.Velocity> p);
-    method public long dispatchPostScroll-l-UAZDg(long consumed, long available, androidx.compose.ui.gesture.nestedscroll.NestedScrollSource source);
-    method public suspend Object? dispatchPreFling-bHeVL4A(long available, kotlin.coroutines.Continuation<? super androidx.compose.ui.unit.Velocity> p);
-    method public long dispatchPreScroll-vG6bCaM(long available, androidx.compose.ui.gesture.nestedscroll.NestedScrollSource source);
-    method public kotlinx.coroutines.CoroutineScope getCoroutineScope();
-    property public final kotlinx.coroutines.CoroutineScope coroutineScope;
-  }
-
-  public final class NestedScrollModifierKt {
-    method public static androidx.compose.ui.Modifier nestedScroll(androidx.compose.ui.Modifier, androidx.compose.ui.gesture.nestedscroll.NestedScrollConnection connection, optional androidx.compose.ui.gesture.nestedscroll.NestedScrollDispatcher? dispatcher);
-  }
-
-  public enum NestedScrollSource {
-    enum_constant public static final androidx.compose.ui.gesture.nestedscroll.NestedScrollSource Drag;
-    enum_constant public static final androidx.compose.ui.gesture.nestedscroll.NestedScrollSource Fling;
-  }
-
-}
-
-package androidx.compose.ui.gesture.scrollorientationlocking {
-
-  public enum Orientation {
-    enum_constant public static final androidx.compose.ui.gesture.scrollorientationlocking.Orientation Horizontal;
-    enum_constant public static final androidx.compose.ui.gesture.scrollorientationlocking.Orientation Vertical;
-  }
-
-}
-
-package androidx.compose.ui.gesture.util {
-
-  public final class VelocityTracker {
-    ctor public VelocityTracker();
-    method public void addPosition-OX7LsLU(long timeMillis, long position);
-    method public long calculateVelocity-9UxMQ8M();
-    method public void resetTracking();
-  }
-
-  public final class VelocityTrackerKt {
   }
 
 }
@@ -1439,6 +1372,39 @@ package androidx.compose.ui.input.key {
 
 }
 
+package androidx.compose.ui.input.nestedscroll {
+
+  public interface NestedScrollConnection {
+    method public default suspend Object? onPostFling-k5p9STU(long consumed, long available, kotlin.coroutines.Continuation<? super androidx.compose.ui.unit.Velocity> p);
+    method public default long onPostScroll-61dr0bI(long consumed, long available, androidx.compose.ui.input.nestedscroll.NestedScrollSource source);
+    method public default suspend Object? onPreFling-bHeVL4A(long available, kotlin.coroutines.Continuation<? super androidx.compose.ui.unit.Velocity> p);
+    method public default long onPreScroll-ScU7Jk8(long available, androidx.compose.ui.input.nestedscroll.NestedScrollSource source);
+  }
+
+  public final class NestedScrollDelegatingWrapperKt {
+  }
+
+  public final class NestedScrollDispatcher {
+    ctor public NestedScrollDispatcher();
+    method public suspend Object? dispatchPostFling-k5p9STU(long consumed, long available, kotlin.coroutines.Continuation<? super androidx.compose.ui.unit.Velocity> p);
+    method public long dispatchPostScroll-61dr0bI(long consumed, long available, androidx.compose.ui.input.nestedscroll.NestedScrollSource source);
+    method public suspend Object? dispatchPreFling-bHeVL4A(long available, kotlin.coroutines.Continuation<? super androidx.compose.ui.unit.Velocity> p);
+    method public long dispatchPreScroll-ScU7Jk8(long available, androidx.compose.ui.input.nestedscroll.NestedScrollSource source);
+    method public kotlinx.coroutines.CoroutineScope getCoroutineScope();
+    property public final kotlinx.coroutines.CoroutineScope coroutineScope;
+  }
+
+  public final class NestedScrollModifierKt {
+    method public static androidx.compose.ui.Modifier nestedScroll(androidx.compose.ui.Modifier, androidx.compose.ui.input.nestedscroll.NestedScrollConnection connection, optional androidx.compose.ui.input.nestedscroll.NestedScrollDispatcher? dispatcher);
+  }
+
+  public enum NestedScrollSource {
+    enum_constant public static final androidx.compose.ui.input.nestedscroll.NestedScrollSource Drag;
+    enum_constant public static final androidx.compose.ui.input.nestedscroll.NestedScrollSource Fling;
+  }
+
+}
+
 package androidx.compose.ui.input.pointer {
 
   public final class AndroidMouseKt {
@@ -1589,6 +1555,20 @@ package androidx.compose.ui.input.pointer {
     method public static androidx.compose.ui.Modifier pointerInput(androidx.compose.ui.Modifier, Object? key1, kotlin.jvm.functions.Function2<? super androidx.compose.ui.input.pointer.PointerInputScope,? super kotlin.coroutines.Continuation<? super kotlin.Unit>,?> block);
     method public static androidx.compose.ui.Modifier pointerInput(androidx.compose.ui.Modifier, Object? key1, Object? key2, kotlin.jvm.functions.Function2<? super androidx.compose.ui.input.pointer.PointerInputScope,? super kotlin.coroutines.Continuation<? super kotlin.Unit>,?> block);
     method public static androidx.compose.ui.Modifier pointerInput(androidx.compose.ui.Modifier, Object![]? keys, kotlin.jvm.functions.Function2<? super androidx.compose.ui.input.pointer.PointerInputScope,? super kotlin.coroutines.Continuation<? super kotlin.Unit>,?> block);
+  }
+
+}
+
+package androidx.compose.ui.input.pointer.util {
+
+  public final class VelocityTracker {
+    ctor public VelocityTracker();
+    method public void addPosition-OX7LsLU(long timeMillis, long position);
+    method public long calculateVelocity-9UxMQ8M();
+    method public void resetTracking();
+  }
+
+  public final class VelocityTrackerKt {
   }
 
 }

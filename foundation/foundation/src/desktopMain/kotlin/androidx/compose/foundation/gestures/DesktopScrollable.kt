@@ -20,8 +20,8 @@ package androidx.compose.foundation.gestures
 
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.composed
-import androidx.compose.ui.gesture.scrollorientationlocking.Orientation
 import androidx.compose.ui.input.mouse.MouseScrollUnit
+import androidx.compose.ui.input.mouse.MouseScrollOrientation
 import androidx.compose.ui.input.mouse.mouseScrollFilter
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.DesktopPlatform
@@ -43,8 +43,8 @@ internal actual fun Modifier.mouseScrollable(
     val config = PlatformScrollConfig(density, desktopPlatform)
 
     mouseScrollFilter { event, bounds ->
-        if (orientation == event.orientation) {
-            val scrollBounds = when (event.orientation) {
+        if (isOrientationMatches(orientation, event.orientation)) {
+            val scrollBounds = when (orientation) {
                 Orientation.Vertical -> bounds.height
                 Orientation.Horizontal -> bounds.width
             }
@@ -53,6 +53,17 @@ internal actual fun Modifier.mouseScrollable(
         } else {
             false
         }
+    }
+}
+
+fun isOrientationMatches(
+    orientation: Orientation,
+    mouseOrientation: MouseScrollOrientation
+): Boolean {
+    return if (mouseOrientation == MouseScrollOrientation.Horizontal) {
+        orientation == Orientation.Horizontal
+    } else {
+        orientation == Orientation.Vertical
     }
 }
 

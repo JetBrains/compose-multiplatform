@@ -24,8 +24,8 @@ import androidx.compose.ui.focus.FocusModifier
 import androidx.compose.ui.focus.FocusOrderModifier
 import androidx.compose.ui.focus.FocusRequesterModifier
 import androidx.compose.ui.geometry.Offset
-import androidx.compose.ui.gesture.nestedscroll.NestedScrollDelegatingWrapper
-import androidx.compose.ui.gesture.nestedscroll.NestedScrollModifier
+import androidx.compose.ui.input.nestedscroll.NestedScrollDelegatingWrapper
+import androidx.compose.ui.input.nestedscroll.NestedScrollModifier
 import androidx.compose.ui.graphics.Canvas
 import androidx.compose.ui.input.key.KeyInputModifier
 import androidx.compose.ui.input.pointer.PointerInputFilter

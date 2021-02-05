@@ -1,20 +1,10 @@
 // Baseline format: 1.0
-CallbackMethodName: androidx.compose.ui.gesture.ScrollCallback#onStart-k-4lQ0M(long):
-    Callback method names must follow the on<Something> style: onStart-k-4lQ0M
-
-
 GetterSetterNames: androidx.compose.ui.graphics.GraphicsLayerScope#getClip():
     Symmetric method for `setClip` must be named `isClip`; was `getClip`
 GetterSetterNames: androidx.compose.ui.input.pointer.ConsumedData#getDownChange():
     Symmetric method for `setDownChange` must be named `isDownChange`; was `getDownChange`
 GetterSetterNames: androidx.compose.ui.platform.AbstractComposeView#getShowLayoutBounds():
     Symmetric method for `setShowLayoutBounds` must be named `isShowLayoutBounds`; was `getShowLayoutBounds`
-
-
-ListenerLast: androidx.compose.ui.gesture.ScrollGestureFilterKt#scrollGestureFilter(androidx.compose.ui.Modifier, androidx.compose.ui.gesture.ScrollCallback, androidx.compose.ui.gesture.scrollorientationlocking.Orientation, boolean) parameter #2:
-    Listeners should always be at end of argument list (method `scrollGestureFilter`)
-ListenerLast: androidx.compose.ui.gesture.ScrollGestureFilterKt#scrollGestureFilter(androidx.compose.ui.Modifier, androidx.compose.ui.gesture.ScrollCallback, androidx.compose.ui.gesture.scrollorientationlocking.Orientation, boolean) parameter #3:
-    Listeners should always be at end of argument list (method `scrollGestureFilter`)
 
 
 MissingNullability: androidx.compose.ui.graphics.TransformOrigin#toString-impl(long):

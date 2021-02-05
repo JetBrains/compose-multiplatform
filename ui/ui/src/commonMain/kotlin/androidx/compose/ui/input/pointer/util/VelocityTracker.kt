@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package androidx.compose.ui.gesture.util
+package androidx.compose.ui.input.pointer.util
 
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.unit.Velocity

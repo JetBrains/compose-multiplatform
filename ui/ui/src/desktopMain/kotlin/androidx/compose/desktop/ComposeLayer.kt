@@ -19,8 +19,8 @@ package androidx.compose.desktop
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Composition
 import androidx.compose.runtime.CompositionContext
-import androidx.compose.ui.gesture.scrollorientationlocking.Orientation
 import androidx.compose.ui.input.mouse.MouseScrollEvent
+import androidx.compose.ui.input.mouse.MouseScrollOrientation
 import androidx.compose.ui.input.mouse.MouseScrollUnit
 import androidx.compose.ui.platform.DesktopComponent
 import androidx.compose.ui.platform.DesktopOwner
@@ -212,9 +212,9 @@ internal class ComposeLayer {
 
         // There are no other way to detect horizontal scrolling in AWT
         orientation = if (isShiftDown) {
-            Orientation.Horizontal
+            MouseScrollOrientation.Horizontal
         } else {
-            Orientation.Vertical
+            MouseScrollOrientation.Vertical
         }
     )
 
