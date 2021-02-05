@@ -1,5 +1,5 @@
 /*
- * Copyright 2020 The Android Open Source Project
+ * Copyright 2021 The Android Open Source Project
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,27 +14,17 @@
  * limitations under the License.
  */
 
-@file:OptIn(InternalComposeApi::class)
 package androidx.compose.runtime
 
-import androidx.test.ext.junit.runners.AndroidJUnit4
-import androidx.test.filters.MediumTest
-import org.junit.Ignore
-import org.junit.Rule
-import org.junit.Test
-import org.junit.runner.RunWith
+import androidx.compose.runtime.mock.compositionTest
+import androidx.compose.runtime.mock.expectNoChanges
+import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertNotEquals
 
-@MediumTest
-@RunWith(AndroidJUnit4::class)
-class CompoundHashKeyTests : BaseComposeTest() {
-    @get:Rule
-    override val activityRule = makeTestActivityRule()
-
+class CompoundHashKeyTests {
     @Test // b/157905524
-    @Ignore("b/179279455")
-    fun testWithSubCompose() {
+    fun testWithSubCompose() = compositionTest {
         val outerKeys = mutableListOf<Int>()
         val innerKeys = mutableListOf<Int>()
         val invalidates = mutableListOf<RecomposeScope>()
@@ -45,10 +35,10 @@ class CompoundHashKeyTests : BaseComposeTest() {
         @Composable
         fun recordHashKeys() {
             invalidates.add(currentRecomposeScope)
-            outerKeys.add(currentComposer.compoundKeyHash)
-            subCompose {
+            outerKeys.add(currentCompositeKeyHash)
+            TestSubcomposition {
                 invalidates.add(currentRecomposeScope)
-                innerKeys.add(currentComposer.compoundKeyHash)
+                innerKeys.add(currentCompositeKeyHash)
             }
         }
 
@@ -60,20 +50,21 @@ class CompoundHashKeyTests : BaseComposeTest() {
                     recordHashKeys()
                 }
             }
-        }.then {
-            assertEquals(2, outerKeys.size)
-            assertEquals(2, innerKeys.size)
-            assertNotEquals(outerKeys[0], outerKeys[1])
-            assertNotEquals(innerKeys[0], innerKeys[1])
-
-            firstOuter.addAll(outerKeys)
-            outerKeys.clear()
-            firstInner.addAll(innerKeys)
-            innerKeys.clear()
-            invalidateComposition()
-        }.then {
-            assertEquals(firstInner, innerKeys)
-            assertEquals(firstOuter, outerKeys)
         }
+        assertEquals(2, outerKeys.size)
+        assertEquals(2, innerKeys.size)
+        assertNotEquals(outerKeys[0], outerKeys[1])
+        assertNotEquals(innerKeys[0], innerKeys[1])
+
+        firstOuter.addAll(outerKeys)
+        outerKeys.clear()
+        firstInner.addAll(innerKeys)
+        innerKeys.clear()
+        invalidateComposition()
+
+        expectNoChanges()
+
+        assertEquals(firstInner, innerKeys)
+        assertEquals(firstOuter, outerKeys)
     }
 }
