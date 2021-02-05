@@ -24,6 +24,7 @@ import androidx.compose.foundation.LocalIndication
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.draggable
+import androidx.compose.foundation.gestures.rememberDraggableState
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -48,8 +49,9 @@ fun PriorityInteractionStateSample() {
 
     val draggable = Modifier.draggable(
         orientation = Orientation.Horizontal,
-        interactionState = interactionState
-    ) { /* update some business state here */ }
+        interactionState = interactionState,
+        state = rememberDraggableState { /* update some business state here */ }
+    )
 
     // Use InteractionState to determine how this component should appear during transient UI states
     // In this example we are using a 'priority' system, such that we ignore multiple states, and
@@ -93,8 +95,9 @@ fun MultipleInteractionStateSample() {
 
     val draggable = Modifier.draggable(
         orientation = Orientation.Horizontal,
-        interactionState = interactionState
-    ) { /* update some business state here */ }
+        interactionState = interactionState,
+        state = rememberDraggableState { /* update some business state here */ }
+    )
 
     val clickable = Modifier.clickable(
         interactionState = interactionState,
