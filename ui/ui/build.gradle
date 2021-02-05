@@ -52,9 +52,6 @@ dependencies {
         api project(":compose:ui:ui-unit")
         api "androidx.annotation:annotation:1.1.0"
 
-        // TODO: Remove this when removing the deprecated ComponentActivity.setContent extension
-        api project(":activity:activity-ktx")
-
         // This has stub APIs for access to legacy Android APIs, so we don't want
         // any dependency on this module.
         compileOnly project(":compose:ui:ui-android-stubs")
@@ -151,7 +148,6 @@ if(AndroidXUiPlugin.isMultiplatformEnabled(project)) {
                 // any dependency on this module.
                 compileOnly project(":compose:ui:ui-android-stubs")
                 api "androidx.annotation:annotation:1.1.0"
-                api project(":activity:activity-ktx")
                 implementation "androidx.autofill:autofill:1.0.0"
                 implementation(KOTLIN_COROUTINES_ANDROID)
 

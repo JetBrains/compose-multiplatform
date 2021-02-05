@@ -19,7 +19,6 @@ import android.os.Build
 import android.util.Log
 import android.view.View
 import android.view.ViewGroup
-import androidx.activity.ComponentActivity
 import androidx.annotation.MainThread
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Composition
@@ -58,43 +57,6 @@ internal actual fun subcomposeInto(
     parent
 ).apply {
     setContent(composable)
-}
-
-/**
- * Composes the given composable into the given activity. The [content] will become the root view
- * of the given activity.
- *
- * [Composition.dispose] is called automatically when the Activity is destroyed.
- *
- * @param parent The parent composition reference to coordinate scheduling of composition updates
- * @param content A `@Composable` function declaring the UI contents
- */
-// TODO: Remove the androidx.activity dependency from this module when removing this
-@Deprecated(
-    "Moved to the androidx.activity:activity-compose artifact",
-    replaceWith = ReplaceWith(
-        "this.setContent(parent, content)",
-        "androidx.activity.compose.setContent"
-    )
-)
-fun ComponentActivity.setContent(
-    parent: CompositionContext? = null,
-    content: @Composable () -> Unit
-) {
-    val existingComposeView = window.decorView
-        .findViewById<ViewGroup>(android.R.id.content)
-        .getChildAt(0) as? ComposeView
-
-    if (existingComposeView != null) with(existingComposeView) {
-        setParentCompositionContext(parent)
-        setContent(content)
-    } else ComposeView(this).apply {
-        // Set content and parent **before** setContentView
-        // to have ComposeView create the composition on attach
-        setParentCompositionContext(parent)
-        setContent(content)
-        setContentView(this, DefaultLayoutParams)
-    }
 }
 
 /**

@@ -98,9 +98,7 @@ import androidx.compose.ui.viewinterop.AndroidViewHolder
 import androidx.core.view.ViewCompat
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleOwner
-import androidx.lifecycle.ViewModelStoreOwner
 import androidx.lifecycle.ViewTreeLifecycleOwner
-import androidx.lifecycle.ViewTreeViewModelStoreOwner
 import androidx.savedstate.SavedStateRegistryOwner
 import androidx.savedstate.ViewTreeSavedStateRegistryOwner
 import java.lang.reflect.Method
@@ -632,10 +630,6 @@ internal class AndroidComposeView(context: Context) :
             val lifecycleOwner = ViewTreeLifecycleOwner.get(this) ?: throw IllegalStateException(
                 "Composed into the View which doesn't propagate ViewTreeLifecycleOwner!"
             )
-            val viewModelStoreOwner =
-                ViewTreeViewModelStoreOwner.get(this) ?: throw IllegalStateException(
-                    "Composed into the View which doesn't propagate ViewTreeViewModelStoreOwner!"
-                )
             val savedStateRegistryOwner =
                 ViewTreeSavedStateRegistryOwner.get(this) ?: throw IllegalStateException(
                     "Composed into the View which doesn't propagate" +
@@ -643,7 +637,6 @@ internal class AndroidComposeView(context: Context) :
                 )
             val viewTreeOwners = ViewTreeOwners(
                 lifecycleOwner = lifecycleOwner,
-                viewModelStoreOwner = viewModelStoreOwner,
                 savedStateRegistryOwner = savedStateRegistryOwner
             )
             this.viewTreeOwners = viewTreeOwners
@@ -763,10 +756,6 @@ internal class AndroidComposeView(context: Context) :
          * The [LifecycleOwner] associated with this owner.
          */
         val lifecycleOwner: LifecycleOwner,
-        /**
-         * The [ViewModelStoreOwner] associated with this owner.
-         */
-        val viewModelStoreOwner: ViewModelStoreOwner,
         /**
          * The [SavedStateRegistryOwner] associated with this owner.
          */
