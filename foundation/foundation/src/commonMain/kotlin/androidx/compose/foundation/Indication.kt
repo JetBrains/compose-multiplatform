@@ -17,7 +17,6 @@
 package androidx.compose.foundation
 
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.RememberObserver
 import androidx.compose.runtime.Stable
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.staticCompositionLocalOf
@@ -30,11 +29,11 @@ import androidx.compose.ui.platform.debugInspectorInfo
 
 /**
  * Indication represents visual effects that occur when certain interactions happens. For
- * example: showing a ripple effect when a component is touched, or a highlight when a component
+ * example: showing a ripple effect when a component is pressed, or a highlight when a component
  * is focused.
  *
  * An instance of Indication is a factory that is required to produce [IndicationInstance]s on
- * demand for each component that uses an [indication] modifier using [createInstance].
+ * demand for each component that uses an [indication] modifier using [rememberUpdatedInstance].
  *
  * Indication is typically provided throughout the hierarchy through [LocalIndication] - you can
  * provide a custom Indication to [LocalIndication] to change the default [Indication] used for
@@ -44,12 +43,21 @@ import androidx.compose.ui.platform.debugInspectorInfo
 interface Indication {
 
     /**
-     * Creates a new [IndicationInstance]. Typically this will be called by [indication],
-     * so one [IndicationInstance] will be used for one component that draws [Indication],
-     * such as a button.
+     * [remember]s a new [IndicationInstance], and updates its state when [interactionState]
+     * changes. Typically this will be called by [indication], so one [IndicationInstance] will be
+     * used for one component that draws [Indication], such as a button.
+     *
+     * Implementations of this function should observe state changes inside [interactionState],
+     * using them to launch animations / state changes inside [IndicationInstance] that will then
+     * be reflected inside [IndicationInstance.drawIndication].
+     *
+     * @param interactionState the [InteractionState] containing the current interactions the
+     * returned [IndicationInstance] should represent
+     * @return an [IndicationInstance] that represents the current interactions present in
+     * [interactionState]
      */
     @Composable
-    fun createInstance(): IndicationInstance
+    fun rememberUpdatedInstance(interactionState: InteractionState): IndicationInstance
 }
 
 /**
@@ -57,33 +65,23 @@ interface Indication {
  * certain interactions, such as press or focus.
  *
  * IndicationInstances can be stateful or stateless, and are created by
- * [Indication.createInstance] - they should be used in-place and not re-used between different
- * [indication] modifiers.
+ * [Indication.rememberUpdatedInstance] - they should be used in-place and not re-used between
+ * different [indication] modifiers.
  */
 interface IndicationInstance {
 
     /**
-     * Draws visual effects based on [InteractionState].
+     * Draws visual effects for the current interactions present on this component.
      *
-     * Usually, in this method indication reads [InteractionState] to observe its value and draw
-     * any visuals to reflect this state. Refer to the [Interaction] to see what states are
-     * possible and draw visual effects when [InteractionState] contains them.
+     * Typically this function will read state within this instance that is mutated by
+     * [Indication.rememberUpdatedInstance]. This allows [IndicationInstance] to just read state
+     * and draw visual effects, and not actually change any state itself.
      *
      * This method MUST call [ContentDrawScope.drawContent] at some point in order to draw the
      * component itself underneath any indication. Typically this is called at the beginning, so
      * that indication can be drawn as an overlay on top.
-     *
-     * @param interactionState [InteractionState] representing the combined state of interactions
-     * occurring on the component the indication is drawn for.
      */
-    fun ContentDrawScope.drawIndication(interactionState: InteractionState)
-
-    /**
-     * Callback which is invoked when this [IndicationInstance] is removed from composition. Use
-     * this callback to free up any allocated resources, stop on-going animations, and other
-     * related cleanup.
-     */
-    fun onDispose() {}
+    fun ContentDrawScope.drawIndication()
 }
 
 /**
@@ -99,13 +97,13 @@ interface IndicationInstance {
  */
 fun Modifier.indication(
     interactionState: InteractionState,
-    indication: Indication? = null
+    indication: Indication?
 ) = composed(
     factory = {
         val resolvedIndication = indication ?: NoIndication
-        val instance = resolvedIndication.createInstance()
-        remember(interactionState, instance) {
-            IndicationModifier(interactionState, instance)
+        val instance = resolvedIndication.rememberUpdatedInstance(interactionState)
+        remember(instance) {
+            IndicationModifier(instance)
         }
     },
     inspectorInfo = debugInspectorInfo {
@@ -128,13 +126,15 @@ val LocalIndication = staticCompositionLocalOf<Indication> {
 
 private object NoIndication : Indication {
     private object NoIndicationInstance : IndicationInstance {
-        override fun ContentDrawScope.drawIndication(interactionState: InteractionState) {
+        override fun ContentDrawScope.drawIndication() {
             drawContent()
         }
     }
 
     @Composable
-    override fun createInstance(): IndicationInstance = NoIndicationInstance
+    override fun rememberUpdatedInstance(interactionState: InteractionState): IndicationInstance {
+        return NoIndicationInstance
+    }
 }
 
 /**
@@ -142,8 +142,10 @@ private object NoIndication : Indication {
  */
 private object DefaultDebugIndication : Indication {
 
-    private object DefaultDebugIndicationInstance : IndicationInstance {
-        override fun ContentDrawScope.drawIndication(interactionState: InteractionState) {
+    private class DefaultDebugIndicationInstance(
+        private val interactionState: InteractionState
+    ) : IndicationInstance {
+        override fun ContentDrawScope.drawIndication() {
             drawContent()
             if (interactionState.contains(Interaction.Pressed)) {
                 drawRect(color = Color.Black.copy(alpha = 0.3f), size = size)
@@ -152,29 +154,18 @@ private object DefaultDebugIndication : Indication {
     }
 
     @Composable
-    override fun createInstance(): IndicationInstance {
-        return DefaultDebugIndicationInstance
+    override fun rememberUpdatedInstance(interactionState: InteractionState): IndicationInstance {
+        return remember(interactionState) { DefaultDebugIndicationInstance(interactionState) }
     }
 }
 
 private class IndicationModifier(
-    val interactionState: InteractionState,
     val indicationInstance: IndicationInstance
-) : RememberObserver, DrawModifier {
+) : DrawModifier {
 
     override fun ContentDrawScope.draw() {
         with(indicationInstance) {
-            drawIndication(interactionState)
+            drawIndication()
         }
-    }
-
-    override fun onRemembered() { }
-
-    override fun onForgotten() {
-        indicationInstance.onDispose()
-    }
-
-    override fun onAbandoned() {
-        indicationInstance.onDispose()
     }
 }

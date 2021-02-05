@@ -25,6 +25,7 @@ import androidx.compose.foundation.IndicationInstance
 import androidx.compose.foundation.Interaction
 import androidx.compose.foundation.InteractionState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.RememberObserver
 import androidx.compose.runtime.Stable
 import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateListOf
@@ -111,7 +112,7 @@ private class Ripple(
     private val color: State<Color>,
 ) : Indication {
     @Composable
-    override fun createInstance(): IndicationInstance {
+    override fun rememberUpdatedInstance(interactionState: InteractionState): IndicationInstance {
         val theme = LocalRippleTheme.current
         val color = rememberUpdatedState(
             if (color.value.isSpecified) {
@@ -122,8 +123,8 @@ private class Ripple(
         )
         val rippleAlpha = theme.rippleAlpha()
         val scope = rememberCoroutineScope()
-        return remember(this, rippleAlpha, scope) {
-            RippleIndicationInstance(bounded, radius, color, rippleAlpha, scope)
+        return remember(this, interactionState, rippleAlpha, scope) {
+            RippleIndicationInstance(interactionState, bounded, radius, color, rippleAlpha, scope)
         }
     }
 
@@ -150,12 +151,13 @@ private class Ripple(
 
 @ExperimentalRippleApi
 private class RippleIndicationInstance constructor(
+    private val interactionState: InteractionState,
     private val bounded: Boolean,
     private val radius: Dp,
     private val color: State<Color>,
     private val rippleAlpha: RippleAlpha,
     private val scope: CoroutineScope
-) : IndicationInstance {
+) : RememberObserver, IndicationInstance {
 
     private val stateLayer = StateLayer(bounded, rippleAlpha, scope)
 
@@ -163,7 +165,7 @@ private class RippleIndicationInstance constructor(
     private var currentPressPosition: Offset? = null
     private var currentRipple: RippleAnimation? = null
 
-    override fun ContentDrawScope.drawIndication(interactionState: InteractionState) {
+    override fun ContentDrawScope.drawIndication() {
         val color = color.value
         val targetRadius = if (radius.isUnspecified) {
             getRippleEndRadius(bounded, size)
@@ -218,7 +220,24 @@ private class RippleIndicationInstance constructor(
         }
     }
 
-    override fun onDispose() {
+    private var timesRememembered = 0
+
+    override fun onRemembered() {
+        timesRememembered++
+    }
+
+    override fun onForgotten() {
+        timesRememembered--
+        if (timesRememembered == 0) {
+            onDispose()
+        }
+    }
+
+    override fun onAbandoned() {
+        onDispose()
+    }
+
+    private fun onDispose() {
         ripples.clear()
         currentRipple = null
     }
