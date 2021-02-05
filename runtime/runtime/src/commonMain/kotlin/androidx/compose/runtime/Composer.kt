@@ -1161,7 +1161,6 @@ internal class ComposerImpl(
         groupNodeCountStack.clear()
         entersStack.clear()
         providersInvalidStack.clear()
-        invalidateStack.clear()
         reader.close()
         compoundKeyHash = 0
         childrenComposing = 0
@@ -1373,7 +1372,6 @@ internal class ComposerImpl(
      */
     internal fun applyChanges() {
         trace("Compose:applyChanges") {
-            invalidateStack.clear()
             val invalidationAnchors = slotTable.read { reader ->
                 invalidations.map { reader.anchor(it.location) to it }
             }
@@ -2903,6 +2901,7 @@ internal class ComposerImpl(
         nodeExpected = false
         startedGroup = false
         startedGroups.clear()
+        invalidateStack.clear()
         clearUpdatedNodeCounts()
     }
 
@@ -3013,6 +3012,10 @@ internal class ComposerImpl(
 
         override val effectCoroutineContext: CoroutineContext
             get() = parentContext.effectCoroutineContext
+
+        @OptIn(ExperimentalComposeApi::class)
+        override val recomposeCoroutineContext: CoroutineContext
+            get() = composition.recomposeCoroutineContext
 
         override fun composeInitial(
             composition: ControlledComposition,

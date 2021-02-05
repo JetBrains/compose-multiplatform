@@ -22,15 +22,28 @@ import androidx.compose.runtime.mock.Text
 import androidx.compose.runtime.mock.compositionTest
 import androidx.compose.runtime.mock.expectNoChanges
 import androidx.compose.runtime.snapshots.Snapshot
+import kotlinx.coroutines.CoroutineName
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.ObsoleteCoroutinesApi
+import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.newSingleThreadContext
+import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.test.TestCoroutineDispatcher
 import kotlinx.coroutines.test.runBlockingTest
 import kotlinx.coroutines.withContext
 import kotlinx.coroutines.withTimeoutOrNull
 import org.junit.Test
+import java.util.concurrent.CountDownLatch
+import java.util.concurrent.TimeUnit
+import java.util.concurrent.atomic.AtomicInteger
+import java.util.concurrent.atomic.AtomicLong
+import kotlin.coroutines.EmptyCoroutineContext
 import kotlin.test.assertEquals
+import kotlin.test.assertNotEquals
 import kotlin.test.assertNotNull
 import kotlin.test.assertTrue
 
@@ -214,18 +227,23 @@ class RecomposerTests {
         var state1 by mutableStateOf(1)
         var state2 by mutableStateOf(1)
 
-        @Composable fun validate(a: A?) {
+        @Composable
+        fun validate(a: A?) {
             assertNotNull(a)
         }
 
-        @Composable fun use(@Suppress("UNUSED_PARAMETER") i: Int) { }
+        @Composable
+        fun use(@Suppress("UNUSED_PARAMETER") i: Int) {
+        }
 
-        @Composable fun useA(a: A = A()) {
+        @Composable
+        fun useA(a: A = A()) {
             validate(a)
             use(state2)
         }
 
-        @Composable fun test() {
+        @Composable
+        fun test() {
             use(state1)
             useA()
         }
@@ -241,6 +259,140 @@ class RecomposerTests {
         state2 = 2
         advance()
         advance()
+    }
+
+    @Test
+    @OptIn(ExperimentalComposeApi::class)
+    fun concurrentRecompositionOffMainThread() = runBlocking<Unit> {
+        val dispatcher = TestCoroutineDispatcher()
+        withContext(dispatcher) {
+            val clock = TestMonotonicFrameClock(this)
+            withContext(clock) {
+                val recomposer = Recomposer(coroutineContext)
+                launch {
+                    recomposer.runRecomposeConcurrentlyAndApplyChanges(Dispatchers.Default)
+                }
+
+                val composition = Composition(UnitApplier(), recomposer)
+                val threadLog = Channel<Thread>(Channel.BUFFERED)
+                lateinit var recomposeScope: RecomposeScope
+                composition.setContent {
+                    threadLog.offer(Thread.currentThread())
+                    val scope = currentRecomposeScope
+                    SideEffect {
+                        recomposeScope = scope
+                    }
+                }
+
+                val firstCompositionThread = threadLog.receive()
+
+                recomposeScope.invalidate()
+                dispatcher.advanceUntilIdle()
+
+                val secondCompositionThread = threadLog.receive()
+                assertNotEquals(firstCompositionThread, secondCompositionThread)
+
+                recomposer.close()
+                dispatcher.advanceUntilIdle()
+            }
+        }
+    }
+
+    @Test
+    @OptIn(ExperimentalComposeApi::class)
+    fun concurrentRecompositionInvalidationDuringComposition() = runBlocking {
+        val dispatcher = TestCoroutineDispatcher()
+        val clock = AutoTestFrameClock()
+        withContext(dispatcher + clock) {
+            val recomposer = Recomposer(coroutineContext)
+            launch {
+                recomposer.runRecomposeConcurrentlyAndApplyChanges(Dispatchers.Default)
+            }
+
+            val composition = Composition(UnitApplier(), recomposer)
+            var longRecomposition by mutableStateOf(false)
+            val longRecompositionLatch = CountDownLatch(1)
+            val applyCount = AtomicInteger(0)
+            val recomposeLatch = CountDownLatch(2)
+            composition.setContent {
+                recomposeLatch.countDown()
+                if (longRecomposition) {
+                    longRecompositionLatch.await()
+                }
+                SideEffect {
+                    applyCount.incrementAndGet()
+                }
+            }
+
+            assertEquals(1, applyCount.get(), "applyCount after initial composition")
+
+            Snapshot.withMutableSnapshot {
+                longRecomposition = true
+            }
+
+            assertTrue(recomposeLatch.await(5, TimeUnit.SECONDS), "recomposeLatch await timed out")
+            assertEquals(1, applyCount.get(), "applyCount after starting long recomposition")
+
+            longRecompositionLatch.countDown()
+            recomposer.awaitIdle()
+
+            assertEquals(2, applyCount.get(), "applyCount after long recomposition")
+
+            recomposer.close()
+        }
+    }
+
+    @Test
+    @OptIn(ExperimentalComposeApi::class, ObsoleteCoroutinesApi::class)
+    fun concurrentRecompositionOnCompositionSpecificContext() = runBlocking(AutoTestFrameClock()) {
+        val recomposer = Recomposer(coroutineContext)
+        launch {
+            recomposer.runRecomposeConcurrentlyAndApplyChanges(Dispatchers.Default)
+        }
+
+        newSingleThreadContext("specialThreadPool").use { pool ->
+            val composition = Composition(UnitApplier(), recomposer, pool)
+            var recomposition by mutableStateOf(false)
+            val recompositionThread = Channel<Thread>(1)
+            composition.setContent {
+                if (recomposition) {
+                    recompositionThread.offer(Thread.currentThread())
+                }
+            }
+
+            Snapshot.withMutableSnapshot {
+                recomposition = true
+            }
+
+            assertTrue(
+                withTimeoutOrNull(3_000) {
+                    recompositionThread.receive()
+                }?.name?.contains("specialThreadPool") == true,
+                "recomposition did not occur on expected thread"
+            )
+
+            recomposer.close()
+        }
+    }
+
+    @Test
+    @OptIn(ExperimentalComposeApi::class)
+    fun compositionRecomposeContextDelegation() {
+        val recomposer = Recomposer(EmptyCoroutineContext)
+        val parent = Composition(UnitApplier(), recomposer, CoroutineName("testParent"))
+        lateinit var child: ControlledComposition
+        parent.setContent {
+            val parentContext = rememberCompositionContext()
+            SideEffect {
+                child = ControlledComposition(UnitApplier(), parentContext)
+            }
+        }
+
+        assertEquals(
+            "testParent",
+            child.recomposeCoroutineContext[CoroutineName]?.name,
+            "child did not inherit parent recomposeCoroutineContext"
+        )
     }
 }
 
@@ -311,4 +463,12 @@ private fun RecomposeTestComponentsB(
 @Composable
 private fun Wrapper(content: @Composable () -> Unit) {
     content()
+}
+
+private class AutoTestFrameClock : MonotonicFrameClock {
+    private val time = AtomicLong(0)
+
+    override suspend fun <R> withFrameNanos(onFrame: (frameTimeNanos: Long) -> R): R {
+        return onFrame(time.getAndAdd(16_000_000))
+    }
 }
