@@ -88,8 +88,10 @@ private fun JavaCompile.configureWithErrorProne() {
 
             "-XepExcludedPaths:.*/(build/generated|build/errorProne|external)/.*",
 
-            // Disable the following checks.
+            // We allow inter library RestrictTo usage.
             "-Xep:RestrictTo:OFF",
+
+            // Disable the following checks.
             "-Xep:ObjectToString:OFF",
             "-Xep:CatchAndPrintStackTrace:OFF",
             "-Xep:MixedMutabilityReturnType:OFF",
