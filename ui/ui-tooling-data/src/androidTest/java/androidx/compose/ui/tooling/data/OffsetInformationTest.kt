@@ -14,14 +14,8 @@
  * limitations under the License.
  */
 
-package androidx.compose.ui.tooling.inspector
+package androidx.compose.ui.tooling.data
 
-import androidx.compose.ui.tooling.CompositionDataRecord
-import androidx.compose.ui.tooling.Inspectable
-import androidx.compose.ui.tooling.ToolingTest
-import androidx.compose.ui.tooling.data.Group
-import androidx.compose.ui.tooling.data.UiToolingDataApi
-import androidx.compose.ui.tooling.data.asTree
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.MediumTest
 import junit.framework.TestCase
@@ -52,17 +46,17 @@ class OffsetInformationTest : ToolingTest() {
 
         assertArrayEquals(
             arrayListOf(
-                "MyComposeTheme" to 1659,
-                "Column" to 1684,
-                "Text" to 1741,
-                "Greeting" to 1984,
-                "Text" to 2819,
-                "Surface" to 2099,
-                "Button" to 2144,
-                "Text" to 2167,
-                "Surface" to 2016,
-                "TextButton" to 2333,
-                "Row" to 2474
+                "MyComposeTheme" to 1603,
+                "Column" to 1628,
+                "Text" to 1685,
+                "Greeting" to 1928,
+                "Text" to 2763,
+                "Surface" to 2043,
+                "Button" to 2088,
+                "Text" to 2111,
+                "Surface" to 1960,
+                "TextButton" to 2277,
+                "Row" to 2418
             ),
             offsets
         )
