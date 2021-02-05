@@ -158,7 +158,7 @@ private class SubcomposeLayoutState :
     }
 
     private fun subcompose(node: LayoutNode, nodeState: NodeState) {
-        node.ignoreModelReads {
+        node.withNoSnapshotReadObservation {
             val content = nodeState.content
             nodeState.composition = subcomposeInto(
                 container = node,

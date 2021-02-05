@@ -34,7 +34,7 @@ class SnapshotStateObserverTests {
         val state = mutableStateOf(0)
         val stateObserver = SnapshotStateObserver { it() }
         try {
-            stateObserver.enableStateUpdatesObserving(true)
+            stateObserver.start()
 
             val onChangeListener: (String) -> Unit = { affected ->
                 assertEquals(data, affected)
@@ -53,7 +53,7 @@ class SnapshotStateObserverTests {
 
             assertEquals(1, changes)
         } finally {
-            stateObserver.dispose()
+            stateObserver.stop()
         }
     }
 
@@ -86,7 +86,7 @@ class SnapshotStateObserverTests {
         }
         val stateObserver = SnapshotStateObserver { it() }
         try {
-            stateObserver.enableStateUpdatesObserving(true)
+            stateObserver.start()
 
             stateObserver.observeReads(strStage1, onChangeStage1) {
                 stage1Model.value
@@ -112,7 +112,7 @@ class SnapshotStateObserverTests {
             assertEquals(1, stage2Changes)
             assertEquals(1, stage3Changes)
         } finally {
-            stateObserver.dispose()
+            stateObserver.stop()
         }
     }
 
@@ -151,7 +151,7 @@ class SnapshotStateObserverTests {
 
         val stateObserver = SnapshotStateObserver { it() }
         try {
-            stateObserver.enableStateUpdatesObserving(true)
+            stateObserver.start()
 
             stateObserver.observeReads(stage2Info1, onChangeState2Listener) {
                 stage2Data1.value
@@ -175,7 +175,7 @@ class SnapshotStateObserverTests {
             assertEquals(1, stage2Changes1)
             assertEquals(1, stage2Changes2)
         } finally {
-            stateObserver.dispose()
+            stateObserver.stop()
         }
     }
 
@@ -192,7 +192,7 @@ class SnapshotStateObserverTests {
 
         val stateObserver = SnapshotStateObserver { it() }
         try {
-            stateObserver.enableStateUpdatesObserving(true)
+            stateObserver.start()
 
             stateObserver.observeReads(info, onChangeListener) {
                 // Create a sub-snapshot
@@ -213,7 +213,7 @@ class SnapshotStateObserverTests {
 
             assertEquals(1, changes)
         } finally {
-            stateObserver.dispose()
+            stateObserver.stop()
         }
     }
 
@@ -224,7 +224,7 @@ class SnapshotStateObserverTests {
 
         runSimpleTest { stateObserver, state ->
             stateObserver.observeReads(data, { _ -> changes++ }) {
-                stateObserver.pauseObservingReads {
+                stateObserver.withNoObservations {
                     state.value
                 }
             }
@@ -240,8 +240,8 @@ class SnapshotStateObserverTests {
 
         runSimpleTest { stateObserver, state ->
             stateObserver.observeReads(data, { _ -> changes++ }) {
-                stateObserver.pauseObservingReads {
-                    stateObserver.pauseObservingReads {
+                stateObserver.withNoObservations {
+                    stateObserver.withNoObservations {
                         state.value
                     }
                     state.value
@@ -274,7 +274,7 @@ class SnapshotStateObserverTests {
 
         runSimpleTest { stateObserver, state ->
             stateObserver.observeReads(data, { _ -> changes1++ }) {
-                stateObserver.pauseObservingReads {
+                stateObserver.withNoObservations {
                     stateObserver.observeReads(data, { _ -> changes2++ }) {
                         state.value
                     }
@@ -291,13 +291,13 @@ class SnapshotStateObserverTests {
         val stateObserver = SnapshotStateObserver { it() }
         val state = mutableStateOf(0)
         try {
-            stateObserver.enableStateUpdatesObserving(true)
+            stateObserver.start()
             Snapshot.notifyObjectsInitialized()
             block(stateObserver, state)
             state.value++
             Snapshot.sendApplyNotifications()
         } finally {
-            stateObserver.dispose()
+            stateObserver.stop()
         }
     }
 }
