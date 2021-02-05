@@ -267,8 +267,7 @@ class AndroidXPlugin : Plugin<Project> {
         }
 
         project.extensions.getByType<LibraryAndroidComponentsExtension>().apply {
-            @Suppress("deprecation")
-            beforeUnitTest(selector().withBuildType("release")) { unitTest ->
+            beforeUnitTests(selector().withBuildType("release")) { unitTest ->
                 unitTest.enabled = false
             }
         }
