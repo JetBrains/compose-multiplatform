@@ -41,7 +41,7 @@ class DesktopSvgResourcesTest {
         val window = TestComposeWindow(width = 200, height = 200)
         window.setContent {
             Image(
-                svgResource("androidx/compose/ui/res/star-size-100.svg"),
+                painterResource("androidx/compose/ui/res/star-size-100.svg"),
                 contentDescription = "Star"
             )
         }
@@ -55,7 +55,7 @@ class DesktopSvgResourcesTest {
         val window = TestComposeWindow(width = 200, height = 200)
         window.setContent {
             Image(
-                svgResource("androidx/compose/ui/res/star-size-unspecified.svg"),
+                painterResource("androidx/compose/ui/res/star-size-unspecified.svg"),
                 contentDescription = "Star"
             )
         }
@@ -69,7 +69,7 @@ class DesktopSvgResourcesTest {
         val window = TestComposeWindow(width = 200, height = 200)
         window.setContent {
             Image(
-                svgResource("androidx/compose/ui/res/star-viewbox-unspecified.svg"),
+                painterResource("androidx/compose/ui/res/star-viewbox-unspecified.svg"),
                 contentDescription = "Star"
             )
         }
@@ -83,7 +83,7 @@ class DesktopSvgResourcesTest {
         val window = TestComposeWindow(width = 200, height = 200)
         window.setContent {
             Image(
-                svgResource("androidx/compose/ui/res/star-size-100.svg"),
+                painterResource("androidx/compose/ui/res/star-size-100.svg"),
                 contentDescription = "Star",
                 modifier = Modifier.size(50.dp)
             )
@@ -98,7 +98,7 @@ class DesktopSvgResourcesTest {
         val window = TestComposeWindow(width = 200, height = 300)
         window.setContent {
             Image(
-                svgResource("androidx/compose/ui/res/star-size-100.svg"),
+                painterResource("androidx/compose/ui/res/star-size-100.svg"),
                 contentDescription = "Star",
                 contentScale = ContentScale.FillBounds,
                 modifier = Modifier.fillMaxSize()
@@ -114,7 +114,7 @@ class DesktopSvgResourcesTest {
         val window = TestComposeWindow(width = 200, height = 300)
         window.setContent {
             Image(
-                svgResource("androidx/compose/ui/res/star-viewbox-unspecified.svg"),
+                painterResource("androidx/compose/ui/res/star-viewbox-unspecified.svg"),
                 contentDescription = "Star",
                 contentScale = ContentScale.FillBounds,
                 modifier = Modifier.fillMaxSize()

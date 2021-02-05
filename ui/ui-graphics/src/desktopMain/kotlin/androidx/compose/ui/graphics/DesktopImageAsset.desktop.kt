@@ -73,6 +73,14 @@ internal actual fun ActualImageBitmap(
  *
  * @return Loaded image file represented as an [ImageBitmap]
  */
+@Deprecated(
+    "Use useResource(path, ::loadImageBitmap)",
+    replaceWith = ReplaceWith(
+        "useResource(path) { loadImageBitmap(it) }",
+        "androidx.compose.ui.res.useResource",
+        "androidx.compose.ui.res.loadImageBitmap"
+    )
+)
 fun imageFromResource(path: String): ImageBitmap =
     Image.makeFromEncoded(loadResource(path)).asImageBitmap()
 

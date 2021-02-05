@@ -16,7 +16,12 @@
 
 package androidx.compose.ui.graphics
 
-private val os = System.getProperty("os.name").lowercase()
+import androidx.compose.ui.res.loadImageBitmap
+import androidx.compose.ui.res.useResource
+
+private val os = System.getProperty("os.name")!!.lowercase()
 internal val isLinux = os.startsWith("linux")
 internal val isWindows = os.startsWith("win")
 internal val isMacOs = os.startsWith("mac")
+
+fun loadResourceBitmap(path: String) = useResource(path, ::loadImageBitmap)
