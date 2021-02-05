@@ -108,6 +108,7 @@ val ALLOW_RERUNNING_TASKS = setOf(
     "testDebugUnitTest",
     "stripArchiveForPartialDejetification",
     "verifyDependencyVersions",
+    "zipConstrainedTestConfigsWithApks",
     "zipTestConfigsWithApks",
     "zipHtmlResultsOfTestDebugUnitTest",
     "zipXmlResultsOfTestDebugUnitTest",
