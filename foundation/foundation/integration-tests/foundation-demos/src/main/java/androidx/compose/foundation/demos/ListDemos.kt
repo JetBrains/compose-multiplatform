@@ -18,7 +18,6 @@ package androidx.compose.foundation.demos
 
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Interaction
-import androidx.compose.foundation.InteractionState
 import androidx.compose.foundation.animation.smoothScrollBy
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -133,8 +132,7 @@ private fun ListAddRemoveItemsDemo() {
 @OptIn(ExperimentalLayout::class)
 @Composable
 private fun ListHoistedStateDemo() {
-    val interactionState = remember { InteractionState() }
-    val state = rememberLazyListState(interactionState = interactionState)
+    val state = rememberLazyListState()
     var lastScrollDescription: String by remember { mutableStateOf("") }
     Column {
         Row {
@@ -186,8 +184,8 @@ private fun ListHoistedStateDemo() {
                 fontSize = 20.sp
             )
             Text(
-                "Dragging: ${interactionState.contains(Interaction.Dragged)}, " +
-                    "Flinging: ${state.isAnimationRunning}",
+                "Dragging: ${state.interactionState.contains(Interaction.Dragged)}, " +
+                    "Flinging: ${state.isScrollInProgress}",
                 fontSize = 20.sp
             )
         }

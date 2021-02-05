@@ -17,12 +17,9 @@
 package androidx.compose.foundation.textfield
 
 import android.os.Build
-import androidx.compose.animation.core.FloatExponentialDecaySpec
-import androidx.compose.animation.core.ManualAnimationClock
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.InteractionState
 import androidx.compose.foundation.ScrollState
-import androidx.compose.foundation.animation.FlingConfig
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -33,8 +30,8 @@ import androidx.compose.foundation.text.TextFieldScrollerPosition
 import androidx.compose.foundation.text.TextLayoutResultProxy
 import androidx.compose.foundation.text.maxLinesHeight
 import androidx.compose.foundation.text.textFieldScroll
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.foundation.text.textFieldScrollable
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
@@ -71,6 +68,7 @@ import androidx.test.filters.LargeTest
 import androidx.test.filters.MediumTest
 import androidx.test.filters.SdkSuppress
 import com.google.common.truth.Truth.assertThat
+import kotlinx.coroutines.runBlocking
 import org.junit.After
 import org.junit.Before
 import org.junit.Rule
@@ -378,7 +376,7 @@ class TextFieldScrollTest {
     }
 
     @Test
-    fun textFieldScroll_testNestedScrolling() {
+    fun textFieldScroll_testNestedScrolling() = runBlocking {
         val size = 300.dp
         val text = """
             First Line
@@ -388,12 +386,9 @@ class TextFieldScrollTest {
         """.trimIndent()
 
         val textFieldScrollPosition = TextFieldScrollerPosition()
-        val scrollerPosition = ScrollState(
-            0f,
-            FlingConfig(FloatExponentialDecaySpec()),
-            ManualAnimationClock(0)
-        )
+        val scrollerPosition = ScrollState(0f)
         var touchSlop = 0f
+        val height = 60.dp
 
         rule.setContent {
             touchSlop = LocalViewConfiguration.current.touchSlop
@@ -403,7 +398,7 @@ class TextFieldScrollTest {
                     .verticalScroll(scrollerPosition)
             ) {
                 ScrollableContent(
-                    modifier = Modifier.preferredSize(size, 50.dp),
+                    modifier = Modifier.preferredSize(size, height),
                     scrollerPosition = textFieldScrollPosition,
                     text = text,
                     isVertical = true
@@ -413,36 +408,28 @@ class TextFieldScrollTest {
             }
         }
 
-        rule.runOnIdle {
-            assertThat(textFieldScrollPosition.offset).isEqualTo(0f)
-            assertThat(textFieldScrollPosition.maximum).isGreaterThan(0f)
-            assertThat(scrollerPosition.value).isEqualTo(0f)
-        }
+        assertThat(textFieldScrollPosition.offset).isEqualTo(0f)
+        assertThat(textFieldScrollPosition.maximum).isGreaterThan(0f)
+        assertThat(scrollerPosition.value).isEqualTo(0f)
 
         with(rule.density) {
             val x = 10.dp.toPx()
-            val start = Offset(x, 40.dp.toPx())
-            // not to exceed 50dp
-            val slopStartY = minOf(40.dp.toPx() + touchSlop, 49.dp.toPx())
+            val desiredY = textFieldScrollPosition.maximum + 10.dp.roundToPx()
+            val nearEdge = (height - 1.dp)
+            // not to exceed size
+            val slopStartY = minOf(desiredY + touchSlop, nearEdge.toPx())
             val slopStart = Offset(x, slopStartY)
             val end = Offset(x, 0f)
             rule.onNodeWithTag(TextfieldTag)
                 .performGesture {
-                    // scroll first two lines
                     swipe(slopStart, end)
-                    // scroll last two lines
-                    swipe(start, end)
-                    // scroll Scrollable column
-                    swipe(start, end)
                 }
         }
 
-        rule.runOnIdle {
-            assertThat(textFieldScrollPosition.offset).isGreaterThan(0f)
-            assertThat(textFieldScrollPosition.offset)
-                .isWithin(0.5f).of(textFieldScrollPosition.maximum)
-            assertThat(scrollerPosition.value).isGreaterThan(0f)
-        }
+        assertThat(textFieldScrollPosition.offset).isGreaterThan(0f)
+        assertThat(textFieldScrollPosition.offset)
+            .isWithin(0.5f).of(textFieldScrollPosition.maximum)
+        assertThat(scrollerPosition.value).isGreaterThan(0f)
     }
 
     private fun ComposeContentTestRule.setupHorizontallyScrollableContent(

@@ -19,7 +19,7 @@ package androidx.compose.ui.demos.gestures
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.gestures.detectTapGestures
-import androidx.compose.foundation.gestures.rememberScrollableController
+import androidx.compose.foundation.gestures.rememberScrollableState
 import androidx.compose.foundation.gestures.scrollable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -90,7 +90,7 @@ private fun DrawerLayout(drawerWidth: Dp, content: @Composable ColumnScope.() ->
     Box(
         Modifier.scrollable(
             orientation = Orientation.Horizontal,
-            controller = rememberScrollableController { scrollDistance ->
+            state = rememberScrollableState { scrollDistance ->
                 val originalOffset = currentOffset.value
                 currentOffset.value =
                     (currentOffset.value + scrollDistance).coerceIn(minOffset, maxOffset)
@@ -131,7 +131,7 @@ private fun Scrollable(orientation: Orientation, content: @Composable () -> Unit
         content = content,
         modifier = Modifier.scrollable(
             orientation = orientation,
-            controller = rememberScrollableController { scrollDistance ->
+            state = rememberScrollableState { scrollDistance ->
                 val resultingOffset = offset.value + scrollDistance
                 val toConsume =
                     when {

@@ -46,7 +46,8 @@ import androidx.compose.ui.demos.focus.CustomFocusOrderDemo
 import androidx.compose.ui.demos.focus.FocusInDialogDemo
 import androidx.compose.ui.demos.focus.FocusInPopupDemo
 import androidx.compose.ui.demos.focus.FocusManagerMoveFocusDemo
-import androidx.compose.ui.samples.NestedScrollSample
+import androidx.compose.ui.demos.gestures.NestedScrollDispatchDemo
+import androidx.compose.ui.samples.NestedScrollConnectionSample
 
 private val GestureDemos = DemoCategory(
     "Gestures",
@@ -89,7 +90,13 @@ private val GestureDemos = DemoCategory(
                 ComposableDemo("Pointer Input During Sub Comp") { PointerInputDuringSubComp() }
             )
         ),
-        ComposableDemo("New nested scroll") { NestedScrollSample() }
+        DemoCategory(
+            "New nested scroll",
+            listOf(
+                ComposableDemo("Nested scroll connection") { NestedScrollConnectionSample() },
+                ComposableDemo("Nested scroll dispatch") { NestedScrollDispatchDemo() }
+            )
+        )
     )
 )
 

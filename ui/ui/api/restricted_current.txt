@@ -485,9 +485,9 @@ package androidx.compose.ui.gesture {
 package androidx.compose.ui.gesture.nestedscroll {
 
   public interface NestedScrollConnection {
-    method public default void onPostFling-Pv53iXo(long consumed, long available, kotlin.jvm.functions.Function1<? super androidx.compose.ui.unit.Velocity,kotlin.Unit> onFinished);
+    method public default suspend Object? onPostFling-k5p9STU(long consumed, long available, kotlin.coroutines.Continuation<? super androidx.compose.ui.unit.Velocity> p);
     method public default long onPostScroll-l-UAZDg(long consumed, long available, androidx.compose.ui.gesture.nestedscroll.NestedScrollSource source);
-    method public default long onPreFling-TH1AsA0(long available);
+    method public default suspend Object? onPreFling-bHeVL4A(long available, kotlin.coroutines.Continuation<? super androidx.compose.ui.unit.Velocity> p);
     method public default long onPreScroll-vG6bCaM(long available, androidx.compose.ui.gesture.nestedscroll.NestedScrollSource source);
   }
 
@@ -496,10 +496,12 @@ package androidx.compose.ui.gesture.nestedscroll {
 
   public final class NestedScrollDispatcher {
     ctor public NestedScrollDispatcher();
-    method public void dispatchPostFling-uYzo7IE(long consumed, long available);
+    method public suspend Object? dispatchPostFling-k5p9STU(long consumed, long available, kotlin.coroutines.Continuation<? super androidx.compose.ui.unit.Velocity> p);
     method public long dispatchPostScroll-l-UAZDg(long consumed, long available, androidx.compose.ui.gesture.nestedscroll.NestedScrollSource source);
-    method public long dispatchPreFling-TH1AsA0(long available);
+    method public suspend Object? dispatchPreFling-bHeVL4A(long available, kotlin.coroutines.Continuation<? super androidx.compose.ui.unit.Velocity> p);
     method public long dispatchPreScroll-vG6bCaM(long available, androidx.compose.ui.gesture.nestedscroll.NestedScrollSource source);
+    method public kotlinx.coroutines.CoroutineScope getCoroutineScope();
+    property public final kotlinx.coroutines.CoroutineScope coroutineScope;
   }
 
   public final class NestedScrollModifierKt {

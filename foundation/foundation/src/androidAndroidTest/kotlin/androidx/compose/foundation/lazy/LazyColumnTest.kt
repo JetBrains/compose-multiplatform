@@ -16,10 +16,9 @@
 
 package androidx.compose.foundation.lazy
 
-import androidx.compose.animation.core.FloatExponentialDecaySpec
-import androidx.compose.animation.core.ManualAnimationClock
+import androidx.compose.animation.core.advanceClockMillis
+import androidx.compose.animation.core.exponentialDecay
 import androidx.compose.animation.core.snap
-import androidx.compose.foundation.animation.FlingConfig
 import androidx.compose.foundation.animation.smoothScrollBy
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
@@ -33,8 +32,8 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.sizeIn
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.text.BasicText
-import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.Providers
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -46,6 +45,7 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.platform.LocalViewConfiguration
 import androidx.compose.ui.platform.ViewConfiguration
 import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.test.ExperimentalTestApi
 import androidx.compose.ui.test.SemanticsNodeInteraction
 import androidx.compose.ui.test.assertCountEquals
 import androidx.compose.ui.test.assertHeightIsEqualTo
@@ -65,6 +65,7 @@ import androidx.compose.ui.test.onChildren
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performGesture
+import androidx.compose.ui.test.runBlockingWithManualClock
 import androidx.compose.ui.test.swipeUp
 import androidx.compose.ui.test.swipeWithVelocity
 import androidx.compose.ui.unit.Density
@@ -896,17 +897,15 @@ class LazyColumnTest {
         }
     }
 
+    @OptIn(ExperimentalTestApi::class)
     @Test
-    fun isAnimationRunningUpdate() {
+    fun isAnimationRunningUpdate() = runBlockingWithManualClock { clock ->
         val items by mutableStateOf((1..20).toList())
-        val clock = ManualAnimationClock(0L)
-        val state = LazyListState(
-            flingConfig = FlingConfig(FloatExponentialDecaySpec()),
-            animationClock = clock
-        )
+        val state = LazyListState()
         rule.setContentWithTestViewConfiguration {
             LazyColumn(
                 Modifier.size(100.dp).testTag(LazyListTag),
+                flingSpec = exponentialDecay(),
                 state = state
             ) {
                 items(items) {
@@ -917,24 +916,21 @@ class LazyColumnTest {
 
         rule.runOnIdle {
             assertThat(state.firstVisibleItemIndex).isEqualTo(0)
-            assertThat(state.isAnimationRunning).isEqualTo(false)
+            assertThat(state.isScrollInProgress).isEqualTo(false)
         }
 
         rule.onNodeWithTag(LazyListTag)
             .performGesture { swipeUp() }
 
-        rule.runOnIdle {
-            clock.clockTimeMillis += 100
-            assertThat(state.firstVisibleItemIndex).isNotEqualTo(0)
-            assertThat(state.isAnimationRunning).isEqualTo(true)
-        }
+        clock.advanceClockMillis(100L)
+
+        assertThat(state.firstVisibleItemIndex).isNotEqualTo(0)
+        assertThat(state.isScrollInProgress).isEqualTo(true)
 
         rule.onNodeWithTag(LazyListTag)
             .performGesture { down(center) }
 
-        rule.runOnIdle {
-            assertThat(state.isAnimationRunning).isEqualTo(false)
-        }
+        assertThat(state.isScrollInProgress).isEqualTo(false)
     }
 
     @Test

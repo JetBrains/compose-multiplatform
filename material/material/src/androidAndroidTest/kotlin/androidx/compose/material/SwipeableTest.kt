@@ -19,7 +19,6 @@ package androidx.compose.material
 import androidx.compose.animation.core.AnimationEndReason
 import androidx.compose.foundation.ScrollState
 import androidx.compose.foundation.animation.scrollBy
-import androidx.compose.foundation.gestures.Scrollable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
@@ -1739,7 +1738,7 @@ class SwipeableTest {
         assertThat(swipeableState.value).isEqualTo("B")
         assertThat(scrollState.value).isEqualTo(0f)
         // set value again to test overshoot
-        (scrollState as Scrollable).scrollBy(500f)
+        scrollState.scrollBy(500f)
 
         rule.runOnIdle {
             assertThat(swipeableState.value).isEqualTo("B")

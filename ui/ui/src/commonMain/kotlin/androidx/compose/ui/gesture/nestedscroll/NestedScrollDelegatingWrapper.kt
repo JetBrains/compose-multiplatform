@@ -22,8 +22,7 @@ import androidx.compose.ui.node.DelegatingLayoutNodeWrapper
 import androidx.compose.ui.node.LayoutNode
 import androidx.compose.ui.node.LayoutNodeWrapper
 import androidx.compose.ui.unit.Velocity
-import androidx.compose.ui.unit.minus
-import androidx.compose.ui.unit.plus
+import kotlinx.coroutines.CoroutineScope
 
 internal class NestedScrollDelegatingWrapper(
     wrapped: LayoutNodeWrapper,
@@ -36,6 +35,12 @@ internal class NestedScrollDelegatingWrapper(
             modifier.dispatcher.parent = value
             childScrollConnection.parent = value ?: NoOpConnection
             field = value
+        }
+
+    private var coroutineScopeEvaluation: () -> CoroutineScope?
+        get() = modifier.dispatcher.calculateNestedScrollScope
+        set(value) {
+            modifier.dispatcher.calculateNestedScrollScope = value
         }
 
     // save last modifier until the next onModifierChanged() call to understand if we got new
@@ -82,7 +87,9 @@ internal class NestedScrollDelegatingWrapper(
             localLastModifier.connection !== modifier.connection ||
             localLastModifier.dispatcher !== modifier.dispatcher
         if (modifierChanged && isAttached) {
-            parentConnection = super.findPreviousNestedScrollWrapper()?.childScrollConnection
+            val parent = super.findPreviousNestedScrollWrapper()
+            parentConnection = parent?.childScrollConnection
+            coroutineScopeEvaluation = parent?.coroutineScopeEvaluation ?: coroutineScopeEvaluation
             refreshChildrenWithParentConnection(childScrollConnection)
             lastModifier = modifier
         }
@@ -105,6 +112,8 @@ internal class NestedScrollDelegatingWrapper(
         }
         nestedScrollChildrenResult.forEach {
             it.parentConnection = newParent
+            it.coroutineScopeEvaluation =
+                { this.coroutineScopeEvaluation.invoke() }
         }
     }
 
@@ -154,28 +163,16 @@ private class ParentWrapperNestedScrollConnection(
         return selfConsumed + parentConsumed
     }
 
-    override fun onPreFling(available: Velocity): Velocity {
+    override suspend fun onPreFling(available: Velocity): Velocity {
         val parentPreConsumed = parent.onPreFling(available)
         val selfPreConsumed = self.onPreFling(available - parentPreConsumed)
         return parentPreConsumed + selfPreConsumed
     }
 
-    override fun onPostFling(
-        consumed: Velocity,
-        available: Velocity,
-        onFinished: (Velocity) -> Unit
-    ) {
-        val selfEnd = { selfConsumed: Velocity ->
-            val parentEnd = { parentConsumed: Velocity ->
-                onFinished.invoke(selfConsumed + parentConsumed)
-            }
-            parent.onPostFling(
-                consumed + selfConsumed,
-                available - selfConsumed,
-                parentEnd
-            )
-        }
-        self.onPostFling(consumed, available, selfEnd)
+    override suspend fun onPostFling(consumed: Velocity, available: Velocity): Velocity {
+        val selfConsumed = self.onPostFling(consumed, available)
+        val parentConsumed = parent.onPostFling(consumed + selfConsumed, available - selfConsumed)
+        return selfConsumed + parentConsumed
     }
 }
 
@@ -194,13 +191,7 @@ private val NoOpConnection: NestedScrollConnection = object : NestedScrollConnec
     ): Offset =
         Offset.Zero
 
-    override fun onPreFling(available: Velocity): Velocity = Velocity.Zero
+    override suspend fun onPreFling(available: Velocity): Velocity = Velocity.Zero
 
-    override fun onPostFling(
-        consumed: Velocity,
-        available: Velocity,
-        onFinished: (Velocity) -> Unit
-    ) {
-        onFinished.invoke(Velocity.Zero)
-    }
+    override suspend fun onPostFling(consumed: Velocity, available: Velocity) = Velocity.Zero
 }
