@@ -81,11 +81,11 @@ import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.input.EditProcessor
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.ImeOptions
-import androidx.compose.ui.text.input.NO_SESSION
 import androidx.compose.ui.text.input.OffsetMapping
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.input.TextInputService
+import androidx.compose.ui.text.input.TextInputSession
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.Density
 import kotlin.math.max
@@ -240,7 +240,8 @@ internal fun CoreTextField(
         state.keyboardActionRunner.runAction(imeAction)
     }
 
-    state.processor.reset(value, textInputService, state.inputSession)
+    // notify the EditProcessor of value every recomposition
+    state.processor.reset(value, state.inputSession)
 
     val manager = remember { TextFieldSelectionManager() }
     manager.offsetMapping = offsetMapping
@@ -283,7 +284,7 @@ internal fun CoreTextField(
     val focusRequestTapModifier = Modifier.focusRequestTapModifier(
         enabled = enabled,
         onTap = { offset ->
-            tapToFocus(state, focusRequester, textInputService, !readOnly)
+            tapToFocus(state, focusRequester, !readOnly)
             if (state.hasFocus) {
                 if (!state.selectionIsOn) {
                     state.layoutResult?.let { layoutResult ->
@@ -343,16 +344,17 @@ internal fun CoreTextField(
                 state.showSelectionHandleEnd = manager.isSelectionHandleInVisibleBound(false)
             }
             state.layoutResult?.let { layoutResult ->
-                TextFieldDelegate.notifyFocusedRect(
-                    value,
-                    state.textDelegate,
-                    layoutResult.value,
-                    it,
-                    textInputService,
-                    state.inputSession,
-                    state.hasFocus,
-                    offsetMapping
-                )
+                state.inputSession?.let { inputSession ->
+                    TextFieldDelegate.notifyFocusedRect(
+                        value,
+                        state.textDelegate,
+                        layoutResult.value,
+                        it,
+                        inputSession,
+                        state.hasFocus,
+                        offsetMapping
+                    )
+                }
             }
         }
         state.layoutResult?.innerTextFieldCoordinates = it
@@ -408,7 +410,7 @@ internal fun CoreTextField(
         onClick {
             // according to the documentation, we still need to provide proper semantics actions
             // even if the state is 'disabled'
-            tapToFocus(state, focusRequester, textInputService, !readOnly)
+            tapToFocus(state, focusRequester, !readOnly)
             true
         }
         onLongClick {
@@ -515,7 +517,7 @@ internal class TextFieldState(
     var textDelegate: TextDelegate
 ) {
     val processor = EditProcessor()
-    var inputSession = NO_SESSION
+    var inputSession: TextInputSession? = null
 
     /**
      * This should be a state as every time we update the value we need to redraw it.
@@ -618,13 +620,12 @@ internal class TextFieldState(
 private fun tapToFocus(
     state: TextFieldState,
     focusRequester: FocusRequester,
-    textInputService: TextInputService?,
     allowKeyboard: Boolean
 ) {
     if (!state.hasFocus) {
         focusRequester.requestFocus()
     } else if (allowKeyboard) {
-        textInputService?.showSoftwareKeyboard(state.inputSession)
+        state.inputSession?.showSoftwareKeyboard()
     }
 }
 
@@ -646,32 +647,28 @@ private fun notifyTextInputServiceOnFocusChange(
             imeOptions,
             onValueChange,
             onImeActionPerformed
-        )
-        if (state.inputSession != NO_SESSION) {
-            onTextInputStarted(SoftwareKeyboardController(textInputService, state.inputSession))
-        }
-        state.layoutCoordinates?.let { coords ->
-            state.layoutResult?.let { layoutResult ->
-                TextFieldDelegate.notifyFocusedRect(
-                    value,
-                    state.textDelegate,
-                    layoutResult.value,
-                    coords,
-                    textInputService,
-                    state.inputSession,
-                    state.hasFocus,
-                    offsetMapping
-                )
+        ).also { newSession ->
+            onTextInputStarted(SoftwareKeyboardController(newSession))
+
+            state.layoutCoordinates?.let { coords ->
+                state.layoutResult?.let { layoutResult ->
+                    TextFieldDelegate.notifyFocusedRect(
+                        value,
+                        state.textDelegate,
+                        layoutResult.value,
+                        coords,
+                        newSession,
+                        state.hasFocus,
+                        offsetMapping
+                    )
+                }
             }
         }
     } else {
-        TextFieldDelegate.onBlur(
-            textInputService,
-            state.inputSession,
-            state.processor,
-            false,
-            onValueChange
-        )
+        state.inputSession?.let { session ->
+            TextFieldDelegate.onBlur(session, state.processor, onValueChange)
+        }
+        state.inputSession = null
     }
 }
 

@@ -77,6 +77,7 @@ import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.ImeOptions
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
+import androidx.compose.ui.text.input.PlatformTextInputService
 import androidx.compose.ui.text.input.TextInputService
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
@@ -810,7 +811,8 @@ class TextFieldTest {
 
     @Test
     fun testTextField_imeActionAndKeyboardTypePropagatedDownstream() {
-        val textInputService = mock<TextInputService>()
+        val platformTextInputService = mock<PlatformTextInputService>()
+        val textInputService = TextInputService(platformTextInputService)
         rule.setContent {
             CompositionLocalProvider(
                 LocalTextInputService provides textInputService
@@ -832,7 +834,7 @@ class TextFieldTest {
         rule.onNodeWithTag(TextfieldTag).performClick()
 
         rule.runOnIdle {
-            verify(textInputService, atLeastOnce()).startInput(
+            verify(platformTextInputService, atLeastOnce()).startInput(
                 value = any(),
                 imeOptions = eq(
                     ImeOptions(
