@@ -24,6 +24,7 @@ import androidx.compose.ui.unit.Constraints
  * Receiver scope being used by the item content parameter of LazyColumn/Row.
  */
 @Stable
+@LazyScopeMarker
 interface LazyItemScope {
     /**
      * Have the content fill the [Constraints.maxWidth] and [Constraints.maxHeight] of the parent
