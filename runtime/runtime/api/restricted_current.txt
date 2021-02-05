@@ -863,16 +863,16 @@ package androidx.compose.runtime.snapshots {
   public final class SnapshotStateMapKt {
   }
 
-  @androidx.compose.runtime.ExperimentalComposeApi public final class SnapshotStateObserver {
+  public final class SnapshotStateObserver {
     ctor public SnapshotStateObserver(kotlin.jvm.functions.Function1<? super kotlin.jvm.functions.Function0<kotlin.Unit>,kotlin.Unit> onChangedExecutor);
-    method public void clear(Object target);
+    method public void clear(Object scope);
     method public void clear();
-    method public void dispose();
-    method public void enableStateUpdatesObserving(boolean enabled);
+    method public void clearIf(kotlin.jvm.functions.Function1<java.lang.Object,java.lang.Boolean> predicate);
     method @org.jetbrains.annotations.TestOnly public void notifyChanges(java.util.Set<?> changes, androidx.compose.runtime.snapshots.Snapshot snapshot);
-    method public <T> void observeReads(T target, kotlin.jvm.functions.Function1<? super T,kotlin.Unit> onChanged, kotlin.jvm.functions.Function0<kotlin.Unit> block);
-    method public void pauseObservingReads(kotlin.jvm.functions.Function0<kotlin.Unit> block);
-    method public void removeObservationsFor(kotlin.jvm.functions.Function1<java.lang.Object,java.lang.Boolean> predicate);
+    method public <T> void observeReads(T scope, kotlin.jvm.functions.Function1<? super T,kotlin.Unit> onValueChangedForScope, kotlin.jvm.functions.Function0<kotlin.Unit> block);
+    method public void start();
+    method public void stop();
+    method public void withNoObservations(kotlin.jvm.functions.Function0<kotlin.Unit> block);
   }
 
   public interface StateObject {

@@ -47,8 +47,8 @@ internal class OwnerSnapshotObserver(onChangedExecutor: (callback: () -> Unit) -
      * be skipped from the observing we disable if before calling the block, execute block and
      * then enable it again.
      */
-    internal fun pauseSnapshotReadObservation(block: () -> Unit) {
-        observer.pauseObservingReads(block)
+    internal fun withNoSnapshotReadObservation(block: () -> Unit) {
+        observer.withNoObservations(block)
     }
 
     /**
@@ -78,7 +78,7 @@ internal class OwnerSnapshotObserver(onChangedExecutor: (callback: () -> Unit) -
     }
 
     internal fun clearInvalidObservations() {
-        observer.removeObservationsFor { !(it as OwnerScope).isValid }
+        observer.clearIf { !(it as OwnerScope).isValid }
     }
 
     internal fun clear(target: Any) {
@@ -86,11 +86,11 @@ internal class OwnerSnapshotObserver(onChangedExecutor: (callback: () -> Unit) -
     }
 
     internal fun startObserving() {
-        observer.enableStateUpdatesObserving(true)
+        observer.start()
     }
 
     internal fun stopObserving() {
-        observer.enableStateUpdatesObserving(false)
+        observer.stop()
         observer.clear()
     }
 }

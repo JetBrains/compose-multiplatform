@@ -63,7 +63,7 @@ class SnapshotStateObserverBenchmark : ComposeBenchmarkBase() {
                 }
             }
         }
-        stateObserver.enableStateUpdatesObserving(true)
+        stateObserver.start()
         setupObservations()
         Snapshot.sendApplyNotifications()
     }
@@ -71,7 +71,7 @@ class SnapshotStateObserverBenchmark : ComposeBenchmarkBase() {
     @After
     fun teardown() {
         runOnUiThread {
-            stateObserver.enableStateUpdatesObserving(false)
+            stateObserver.stop()
         }
     }
 
@@ -120,7 +120,7 @@ class SnapshotStateObserverBenchmark : ComposeBenchmarkBase() {
             nodeSet.addAll(nodes)
 
             benchmarkRule.measureRepeated {
-                stateObserver.removeObservationsFor { node ->
+                stateObserver.clearIf { node ->
                     node in nodeSet
                 }
                 random = Random(0)
