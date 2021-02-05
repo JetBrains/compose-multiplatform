@@ -24,6 +24,7 @@ import androidx.compose.ui.input.pointer.PointerEvent
 import androidx.compose.ui.input.pointer.PointerEventPass
 import androidx.compose.ui.input.pointer.PointerInputChange
 import androidx.compose.ui.input.pointer.PointerInputFilter
+import androidx.compose.ui.input.pointer.PointerInputModifier
 import androidx.compose.ui.input.pointer.anyPositionChangeConsumed
 import androidx.compose.ui.input.pointer.changedToDown
 import androidx.compose.ui.input.pointer.changedToUpIgnoreConsumed
@@ -89,7 +90,7 @@ fun Modifier.pressIndicatorGestureFilter(
     filter.onStop = onStop
     filter.onCancel = onCancel
     filter.setEnabled(enabled)
-    PointerInputModifierImpl(filter)
+    PressPointerInputModifierImpl(filter)
 }
 
 internal class PressIndicatorGestureFilter : PointerInputFilter() {
@@ -218,6 +219,25 @@ internal class PressIndicatorGestureFilter : PointerInputFilter() {
         }
     }
 
+    // TODO(shepshapard): This continues to be very confusing to use.  Have to come up with a better
+//  way of easily expressing this.
+    /**
+     * Utility method that determines if any pointers are currently in [bounds].
+     *
+     * A pointer is considered in bounds if it is currently down and it's current
+     * position is within the provided [bounds]
+     *
+     * @return True if at least one pointer is in bounds.
+     */
+    private fun List<PointerInputChange>.anyPointersInBounds(bounds: IntSize) =
+        fastAny {
+            it.pressed &&
+                it.position.x >= 0 &&
+                it.position.x < bounds.width &&
+                it.position.y >= 0 &&
+                it.position.y < bounds.height
+        }
+
     override fun onCancel() {
         if (state == State.Started) {
             state = State.Idle
@@ -229,3 +249,7 @@ internal class PressIndicatorGestureFilter : PointerInputFilter() {
         Disabled, Idle, Started
     }
 }
+
+private data class PressPointerInputModifierImpl(
+    override val pointerInputFilter: PointerInputFilter
+) : PointerInputModifier

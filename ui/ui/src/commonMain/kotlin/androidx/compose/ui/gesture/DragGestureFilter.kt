@@ -23,15 +23,13 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.composed
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.gesture.scrollorientationlocking.Orientation
-import androidx.compose.ui.gesture.scrollorientationlocking.ScrollOrientationLocker
 import androidx.compose.ui.gesture.util.VelocityTracker
-import androidx.compose.ui.input.pointer.CustomEvent
-import androidx.compose.ui.input.pointer.CustomEventDispatcher
 import androidx.compose.ui.input.pointer.PointerEvent
 import androidx.compose.ui.input.pointer.PointerEventPass
 import androidx.compose.ui.input.pointer.PointerId
 import androidx.compose.ui.input.pointer.PointerInputChange
 import androidx.compose.ui.input.pointer.PointerInputFilter
+import androidx.compose.ui.input.pointer.PointerInputModifier
 import androidx.compose.ui.input.pointer.changedToDown
 import androidx.compose.ui.input.pointer.changedToDownIgnoreConsumed
 import androidx.compose.ui.input.pointer.changedToUp
@@ -222,17 +220,9 @@ fun Modifier.dragGestureFilter(
  * When multiple pointers are touching the detector, the drag distance is taken as the average of
  * all of the pointers.
  *
- * Note: Changing the value of [orientation] will reset the gesture filter such that it will not
- * respond to input until new pointers are detected.
- *
  * @param dragObserver The callback interface to report all events related to dragging.
  * @param canStartDragging If set, Before dragging is started ([DragObserver.onStart] is called),
  *                         canStartDragging is called to check to see if it is allowed to start.
- * @param orientation Limits the directions under which dragging can occur to those that are
- *                    within the provided orientation, locks pointers that are used to drag in
- *                    the given orientation to that orientation, and ignores pointers that are
- *                    locked to other orientations.  If no orientation is provided, does none of
- *                    the above.
  */
 
 // TODO(b/129784010): Consider also allowing onStart, onDrag, and onStop to be set individually
@@ -241,20 +231,18 @@ fun Modifier.dragGestureFilter(
 fun Modifier.rawDragGestureFilter(
     dragObserver: DragObserver,
     canStartDragging: (() -> Boolean)? = null,
-    orientation: Orientation? = null
 ): Modifier = composed(
     inspectorInfo = debugInspectorInfo {
         name = "rawDragGestureFilter"
         properties["dragObserver"] = dragObserver
         properties["canStartDragging"] = canStartDragging
-        properties["orientation"] = orientation
     }
 ) {
     val filter = remember { RawDragGestureFilter() }
     filter.dragObserver = dragObserver
     filter.canStartDragging = canStartDragging
-    filter.orientation = orientation
-    PointerInputModifierImpl(filter)
+    filter.orientation = null
+    DragPointerInputModifierImpl(filter)
 }
 
 internal class RawDragGestureFilter : PointerInputFilter() {
@@ -266,11 +254,6 @@ internal class RawDragGestureFilter : PointerInputFilter() {
     internal var orientation: Orientation? = null
 
     private var started = false
-    internal lateinit var scrollOrientationLocker: ScrollOrientationLocker
-
-    override fun onInit(customEventDispatcher: CustomEventDispatcher) {
-        scrollOrientationLocker = ScrollOrientationLocker(customEventDispatcher)
-    }
 
     override fun onPointerEvent(
         pointerEvent: PointerEvent,
@@ -278,8 +261,6 @@ internal class RawDragGestureFilter : PointerInputFilter() {
         bounds: IntSize
     ) {
         val changes = pointerEvent.changes
-
-        scrollOrientationLocker.onPointerInputSetup(changes, pass)
 
         if (pass == PointerEventPass.Initial) {
             if (started) {
@@ -296,14 +277,6 @@ internal class RawDragGestureFilter : PointerInputFilter() {
         if (pass == PointerEventPass.Main) {
 
             // Get the changes for pointers that are relevant to us due to orientation locking.
-            val applicableChanges =
-                with(orientation) {
-                    if (this != null) {
-                        scrollOrientationLocker.getPointersFor(changes, this)
-                    } else {
-                        changes
-                    }
-                }
 
             // Handle up changes, which includes removing individual pointer VelocityTrackers
             // and potentially calling onStop().
@@ -318,7 +291,7 @@ internal class RawDragGestureFilter : PointerInputFilter() {
                     // This pointer is up (consumed or not), so we should stop tracking
                     // information about it.  If the pointer is not locked out of our
                     // orientation, get the velocity tracker because this might be a fling.
-                    if (it.changedToUp() && applicableChanges.contains(it)) {
+                    if (it.changedToUp() && changes.contains(it)) {
                         velocityTracker = velocityTrackers.remove(it.id)
                     } else if (it.changedToUpIgnoreConsumed()) {
                         velocityTrackers.remove(it.id)
@@ -400,26 +373,11 @@ internal class RawDragGestureFilter : PointerInputFilter() {
                 var totalDx = 0f
                 var totalDy = 0f
 
-                val verticalPointers =
-                    scrollOrientationLocker.getPointersFor(
-                        movedChanges,
-                        Orientation.Vertical
-                    )
-                val horizontalPointers =
-                    scrollOrientationLocker.getPointersFor(
-                        movedChanges,
-                        Orientation.Horizontal
-                    )
-
                 movedChanges.fastForEach {
-                    if (horizontalPointers.contains(it) && orientation !=
-                        Orientation.Vertical
-                    ) {
+                    if (movedChanges.contains(it)) {
                         totalDx += it.positionChange().x
                     }
-                    if (verticalPointers.contains(it) && orientation !=
-                        Orientation.Horizontal
-                    ) {
+                    if (movedChanges.contains(it)) {
                         totalDy += it.positionChange().y
                     }
                 }
@@ -432,13 +390,6 @@ internal class RawDragGestureFilter : PointerInputFilter() {
                         started = true
                         dragObserver.onStart(downPositions.values.averagePosition())
                         downPositions.clear()
-                    }
-
-                    orientation?.let {
-                        scrollOrientationLocker.attemptToLockPointers(
-                            movedChanges,
-                            it
-                        )
                     }
 
                     val consumed = dragObserver.onDrag(
@@ -454,8 +405,6 @@ internal class RawDragGestureFilter : PointerInputFilter() {
                 }
             }
         }
-
-        scrollOrientationLocker.onPointerInputTearDown(changes, pass)
     }
 
     override fun onCancel() {
@@ -465,12 +414,7 @@ internal class RawDragGestureFilter : PointerInputFilter() {
             started = false
             dragObserver.onCancel()
         }
-        scrollOrientationLocker.onCancel()
         reset()
-    }
-
-    override fun onCustomEvent(customEvent: CustomEvent, pass: PointerEventPass) {
-        scrollOrientationLocker.onCustomEvent(customEvent, pass)
     }
 
     private fun reset() {
@@ -574,7 +518,7 @@ fun Modifier.rawPressStartGestureFilter(
     filter.onPressStart = onPressStart
     filter.setEnabled(enabled = enabled)
     filter.setExecutionPass(executionPass)
-    PointerInputModifierImpl(filter)
+    DragPointerInputModifierImpl(filter)
 }
 
 internal class RawPressStartGestureFilter : PointerInputFilter() {
@@ -631,13 +575,11 @@ internal class RawPressStartGestureFilter : PointerInputFilter() {
 }
 
 internal fun Modifier.dragSlopExceededGestureFilter(
-    onDragSlopExceeded: () -> Unit,
-    orientation: Orientation? = null
+    onDragSlopExceeded: () -> Unit
 ): Modifier = composed(
     inspectorInfo = debugInspectorInfo {
         name = "dragSlopExceededGestureFilter"
         properties["onDragSlopExceeded"] = onDragSlopExceeded
-        properties["orientation"] = orientation
     }
 ) {
     val touchSlop = with(LocalDensity.current) { TouchSlop.toPx() }
@@ -645,8 +587,7 @@ internal fun Modifier.dragSlopExceededGestureFilter(
         DragSlopExceededGestureFilter(touchSlop)
     }
     filter.onDragSlopExceeded = onDragSlopExceeded
-    filter.setDraggableData(orientation, null)
-    PointerInputModifierImpl(filter)
+    DragPointerInputModifierImpl(filter)
 }
 
 internal class DragSlopExceededGestureFilter(
@@ -659,29 +600,8 @@ internal class DragSlopExceededGestureFilter(
     private var passedSlop = false
 
     private var canDrag: ((Direction) -> Boolean)? = null
-    private var orientation: Orientation? = null
 
     var onDragSlopExceeded: () -> Unit = {}
-
-    lateinit var scrollOrientationLocker: ScrollOrientationLocker
-    lateinit var customEventDispatcher: CustomEventDispatcher
-
-    fun setDraggableData(orientation: Orientation?, canDrag: ((Direction) -> Boolean)?) {
-        this.orientation = orientation
-        this.canDrag = { direction ->
-            when {
-                orientation == Orientation.Horizontal && direction == Direction.UP -> false
-                orientation == Orientation.Horizontal && direction == Direction.DOWN -> false
-                orientation == Orientation.Vertical && direction == Direction.LEFT -> false
-                orientation == Orientation.Vertical && direction == Direction.RIGHT -> false
-                else -> canDrag?.invoke(direction) ?: true
-            }
-        }
-    }
-
-    override fun onInit(customEventDispatcher: CustomEventDispatcher) {
-        scrollOrientationLocker = ScrollOrientationLocker(customEventDispatcher)
-    }
 
     override fun onPointerEvent(
         pointerEvent: PointerEvent,
@@ -691,24 +611,14 @@ internal class DragSlopExceededGestureFilter(
 
         val changes = pointerEvent.changes
 
-        scrollOrientationLocker.onPointerInputSetup(changes, pass)
-
         if (pass == PointerEventPass.Main || pass == PointerEventPass.Final) {
 
             // Filter changes for those that we can interact with due to our orientation.
-            val applicableChanges =
-                with(orientation) {
-                    if (this != null) {
-                        scrollOrientationLocker.getPointersFor(changes, this)
-                    } else {
-                        changes
-                    }
-                }
 
             if (!passedSlop) {
 
                 // Get current average change.
-                val averagePositionChange = getAveragePositionChange(applicableChanges)
+                val averagePositionChange = getAveragePositionChange(changes)
                 val dx = averagePositionChange.x
                 val dy = averagePositionChange.y
 
@@ -769,17 +679,10 @@ internal class DragSlopExceededGestureFilter(
                 reset()
             }
         }
-
-        scrollOrientationLocker.onPointerInputTearDown(changes, pass)
     }
 
     override fun onCancel() {
-        scrollOrientationLocker.onCancel()
         reset()
-    }
-
-    override fun onCustomEvent(customEvent: CustomEvent, pass: PointerEventPass) {
-        scrollOrientationLocker.onCustomEvent(customEvent, pass)
     }
 
     private fun reset() {
@@ -827,3 +730,7 @@ private fun Offset.verticalDirection() =
         this.y > 0f -> Direction.DOWN
         else -> null
     }
+
+private data class DragPointerInputModifierImpl(
+    override val pointerInputFilter: PointerInputFilter
+) : PointerInputModifier

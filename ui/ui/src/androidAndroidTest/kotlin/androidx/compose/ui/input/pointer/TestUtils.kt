@@ -111,10 +111,6 @@ internal class SpyGestureModifier : PointerInputModifier {
             override fun onCancel() {
                 // Nothing
             }
-
-            override fun onCustomEvent(customEvent: CustomEvent, pass: PointerEventPass) {
-                // Nothing
-            }
         }
 
     // We only need this because IR compiler doesn't like converting lambdas to Runnables
@@ -207,20 +203,13 @@ internal fun pointerEventOf(
 
 internal class PointerInputFilterMock(
     val log: MutableList<LogEntry> = mutableListOf(),
-    val initHandler: ((CustomEventDispatcher) -> Unit)? = null,
     val pointerEventHandler: PointerEventHandler? = null,
-    val onCustomEvent: ((CustomEvent, PointerEventPass) -> Unit)? = null,
     layoutCoordinates: LayoutCoordinates? = null
 ) :
     PointerInputFilter() {
 
     init {
         this.layoutCoordinates = layoutCoordinates ?: LayoutCoordinatesStub(true)
-    }
-
-    override fun onInit(customEventDispatcher: CustomEventDispatcher) {
-        log.add(OnInitEntry())
-        initHandler?.invoke(customEventDispatcher)
     }
 
     override fun onPointerEvent(
@@ -242,30 +231,13 @@ internal class PointerInputFilterMock(
     override fun onCancel() {
         log.add(OnCancelEntry(this))
     }
-
-    override fun onCustomEvent(customEvent: CustomEvent, pass: PointerEventPass) {
-        log.add(
-            OnCustomEventEntry(
-                this,
-                customEvent,
-                pass
-            )
-        )
-        onCustomEvent?.invoke(customEvent, pass)
-    }
 }
-
-internal fun List<LogEntry>.getOnInitLog() = filterIsInstance<OnInitEntry>()
 
 internal fun List<LogEntry>.getOnPointerEventLog() = filterIsInstance<OnPointerEventEntry>()
 
 internal fun List<LogEntry>.getOnCancelLog() = filterIsInstance<OnCancelEntry>()
 
-internal fun List<LogEntry>.getOnCustomEventLog() = filterIsInstance<OnCustomEventEntry>()
-
 internal sealed class LogEntry
-
-internal class OnInitEntry : LogEntry()
 
 internal data class OnPointerEventEntry(
     val pointerInputFilter: PointerInputFilter,
@@ -276,12 +248,6 @@ internal data class OnPointerEventEntry(
 
 internal class OnCancelEntry(
     val pointerInputFilter: PointerInputFilter
-) : LogEntry()
-
-internal data class OnCustomEventEntry(
-    val pointerInputFilter: PointerInputFilter,
-    val customEvent: CustomEvent,
-    val pass: PointerEventPass
 ) : LogEntry()
 
 internal fun internalPointerEventOf(vararg changes: PointerInputChange) =
