@@ -21,7 +21,6 @@ import android.widget.TextView
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.MediumTest
 import junit.framework.TestCase
-import org.junit.After
 import org.junit.Ignore
 import org.junit.Rule
 import org.junit.Test
@@ -33,11 +32,6 @@ import kotlin.test.assertTrue
 @MediumTest
 @RunWith(AndroidJUnit4::class)
 class RestartTests : BaseComposeTest() {
-
-    @After
-    fun teardown() {
-        clearRoots()
-    }
 
     @get:Rule
     override val activityRule = makeTestActivityRule()

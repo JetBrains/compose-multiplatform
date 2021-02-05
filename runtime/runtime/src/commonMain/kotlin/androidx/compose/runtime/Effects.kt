@@ -21,6 +21,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.launch
+import kotlin.coroutines.EmptyCoroutineContext
 
 /**
  * Schedule [effect] to run when the current composition completes successfully and applies
@@ -394,4 +395,78 @@ fun LaunchedEffect(
 ) {
     val applyContext = currentComposer.applyCoroutineContext
     remember(*keys) { LaunchedEffectImpl(applyContext, block) }
+}
+
+@PublishedApi
+internal class CompositionScopedCoroutineScopeCanceller(
+    val coroutineScope: CoroutineScope
+) : RememberObserver {
+    override fun onRemembered() {
+        // Nothing to do
+    }
+
+    override fun onForgotten() {
+        coroutineScope.cancel()
+    }
+
+    override fun onAbandoned() {
+        coroutineScope.cancel()
+    }
+}
+
+@PublishedApi
+@OptIn(ExperimentalComposeApi::class, InternalComposeApi::class)
+internal fun createCompositionCoroutineScope(
+    coroutineContext: CoroutineContext,
+    composer: Composer
+) = if (coroutineContext[Job] != null) {
+    CoroutineScope(
+        Job().apply {
+            completeExceptionally(
+                IllegalArgumentException(
+                    "CoroutineContext supplied to " +
+                        "rememberCoroutineScope may not include a parent job"
+                )
+            )
+        }
+    )
+} else {
+    val applyContext = composer.applyCoroutineContext
+    CoroutineScope(applyContext + Job(applyContext[Job]) + coroutineContext)
+}
+
+/**
+ * Return a [CoroutineScope] bound to this point in the composition using the optional
+ * [CoroutineContext] provided by [getContext]. [getContext] will only be called once and the same
+ * [CoroutineScope] instance will be returned across recompositions.
+ *
+ * This scope will be [cancelled][CoroutineScope.cancel] when this call leaves the composition.
+ * The [CoroutineContext] returned by [getContext] may not contain a [Job] as this scope is
+ * considered to be a child of the composition.
+ *
+ * The default dispatcher of this scope if one is not provided by the context returned by
+ * [getContext] will be the applying dispatcher of the composition's [Recomposer].
+ *
+ * Use this scope to launch jobs in response to callback events such as clicks or other user
+ * interaction where the response to that event needs to unfold over time and be cancelled if the
+ * composable managing that process leaves the composition. Jobs should never be launched into
+ * **any** coroutine scope as a side effect of composition itself. For scoped ongoing jobs
+ * initiated by composition, see [LaunchedEffect].
+ *
+ * This function will not throw if preconditions are not met, as composable functions do not yet
+ * fully support exceptions. Instead the returned scope's [CoroutineScope.coroutineContext] will
+ * contain a failed [Job] with the associated exception and will not be capable of launching
+ * child jobs.
+ */
+@Composable
+inline fun rememberCoroutineScope(
+    getContext: @DisallowComposableCalls () -> CoroutineContext = { EmptyCoroutineContext }
+): CoroutineScope {
+    val composer = currentComposer
+    val wrapper = remember {
+        CompositionScopedCoroutineScopeCanceller(
+            createCompositionCoroutineScope(getContext(), composer)
+        )
+    }
+    return wrapper.coroutineScope
 }

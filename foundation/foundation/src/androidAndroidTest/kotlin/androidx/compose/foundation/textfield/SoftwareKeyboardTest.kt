@@ -19,7 +19,7 @@ package androidx.compose.foundation.textfield
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.text.BasicTextField
-import androidx.compose.runtime.Providers
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
@@ -57,7 +57,7 @@ class SoftwareKeyboardTest {
 
         val onTextInputStarted: (SoftwareKeyboardController) -> Unit = mock()
         rule.setContent {
-            Providers(
+            CompositionLocalProvider(
                 LocalTextInputService provides textInputService
             ) {
                 val state = remember { mutableStateOf("") }

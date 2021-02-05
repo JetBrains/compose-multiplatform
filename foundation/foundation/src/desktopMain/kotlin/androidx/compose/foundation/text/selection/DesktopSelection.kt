@@ -19,7 +19,7 @@
 package androidx.compose.foundation.text.selection
 
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.Providers
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.layout.Layout
@@ -117,7 +117,7 @@ internal fun DesktopSelectionContainer(
         }
     }
 
-    Providers(LocalSelectionRegistrar provides registrarImpl) {
+    CompositionLocalProvider(LocalSelectionRegistrar provides registrarImpl) {
         Wrap(modifier) {
             content()
         }

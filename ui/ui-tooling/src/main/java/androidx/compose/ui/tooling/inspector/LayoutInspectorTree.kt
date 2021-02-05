@@ -17,7 +17,7 @@
 package androidx.compose.ui.tooling.inspector
 
 import android.view.View
-import androidx.compose.runtime.CompositionData
+import androidx.compose.runtime.tooling.CompositionData
 import androidx.compose.runtime.InternalComposeApi
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.layout.GraphicLayerInfo
@@ -70,7 +70,7 @@ private val unwantedCalls = setOf(
     "remember",
     "Inspectable",
     "Layout",
-    "Providers",
+    "CompositionLocalProvider",
     "SelectionContainer",
     "SelectionLayout"
 )

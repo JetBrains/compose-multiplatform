@@ -28,7 +28,7 @@ import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.Providers
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
@@ -446,7 +446,7 @@ class ScrollbarTest {
     }
 
     @Composable
-    private fun withTestEnvironment(content: @Composable () -> Unit) = Providers(
+    private fun withTestEnvironment(content: @Composable () -> Unit) = CompositionLocalProvider(
         ScrollbarStyleAmbient provides ScrollbarStyle(
             minimalHeight = 16.dp,
             thickness = 8.dp,

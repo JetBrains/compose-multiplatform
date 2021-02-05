@@ -44,7 +44,6 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.test.runBlockingTest
-import kotlin.test.AfterTest
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertNotEquals
@@ -57,12 +56,6 @@ fun Container(content: @Composable () -> Unit) = content()
 @OptIn(ExperimentalComposeApi::class, InternalComposeApi::class)
 @Suppress("unused")
 class CompositionTests {
-
-    @AfterTest
-    fun teardown() {
-        clearRoots()
-    }
-
     @Test
     fun simple() = compositionTest {
         compose {

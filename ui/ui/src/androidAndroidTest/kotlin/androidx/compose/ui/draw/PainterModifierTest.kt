@@ -25,7 +25,7 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.Providers
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.testutils.assertPixels
 import androidx.compose.ui.AlignTopLeft
 import androidx.compose.ui.Alignment
@@ -679,7 +679,7 @@ class PainterModifierTest {
     ) {
         val p = TestPainter(containerWidth, containerHeight)
         val layoutDirection = if (rtl) LayoutDirection.Rtl else LayoutDirection.Ltr
-        Providers(LocalLayoutDirection provides layoutDirection) {
+        CompositionLocalProvider(LocalLayoutDirection provides layoutDirection) {
             AtLeastSize(
                 modifier = Modifier.background(Color.White)
                     .paint(p, alpha = alpha, colorFilter = colorFilter),

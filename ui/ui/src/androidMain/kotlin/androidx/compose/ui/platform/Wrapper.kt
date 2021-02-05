@@ -23,11 +23,11 @@ import androidx.annotation.MainThread
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Composition
 import androidx.compose.runtime.CompositionContext
-import androidx.compose.runtime.CompositionData
+import androidx.compose.runtime.tooling.CompositionData
 import androidx.compose.runtime.ExperimentalComposeApi
 import androidx.compose.runtime.InternalComposeApi
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.Providers
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.Recomposer
 import androidx.compose.runtime.currentComposer
 import androidx.compose.runtime.tooling.LocalInspectionTables
@@ -47,17 +47,13 @@ private val TAG = "Wrapper"
 // instead.
 @MainThread
 @OptIn(ExperimentalComposeApi::class)
-internal actual fun subcomposeInto(
+internal actual fun createSubcomposition(
     container: LayoutNode,
-    parent: CompositionContext,
-    composable: @Composable () -> Unit
+    parent: CompositionContext
 ): Composition = Composition(
-    container,
     UiApplier(container),
     parent
-).apply {
-    setContent(composable)
-}
+)
 
 /**
  * Composes the given composable into the given view.
@@ -99,8 +95,7 @@ private fun doSetContent(
         )
         enableDebugInspectorInfo()
     }
-    @OptIn(ExperimentalComposeApi::class)
-    val original = Composition(owner.root, UiApplier(owner.root), parent)
+    val original = Composition(UiApplier(owner.root), parent)
     val wrapped = owner.view.getTag(R.id.wrapped_composition_tag)
         as? WrappedComposition
         ?: WrappedComposition(owner, original).also {
@@ -163,7 +158,7 @@ private class WrappedComposition(
                         LaunchedEffect(owner) { owner.keyboardVisibilityEventLoop() }
                         LaunchedEffect(owner) { owner.boundsUpdatesEventLoop() }
 
-                        Providers(LocalInspectionTables provides inspectionTable) {
+                        CompositionLocalProvider(LocalInspectionTables provides inspectionTable) {
                             ProvideAndroidCompositionLocals(owner, content)
                         }
                     }

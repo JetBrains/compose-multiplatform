@@ -19,7 +19,7 @@ package androidx.compose.foundation.lazy
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.size
-import androidx.compose.runtime.Providers
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.platform.testTag
@@ -320,7 +320,7 @@ class LazyArrangementsTest {
 
     fun composeRowWith(arrangement: Arrangement.Horizontal, layoutDirection: LayoutDirection) {
         rule.setContent {
-            Providers(LocalLayoutDirection provides layoutDirection) {
+            CompositionLocalProvider(LocalLayoutDirection provides layoutDirection) {
                 LazyRow(
                     horizontalArrangement = arrangement,
                     modifier = Modifier.size(containerSize)

@@ -20,7 +20,7 @@ import androidx.activity.ComponentActivity
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Immutable
 import androidx.compose.runtime.MutableState
-import androidx.compose.runtime.Providers
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -173,7 +173,7 @@ private fun App(
     primaryTracker: CompositionTracker,
     secondaryTracker: CompositionTracker
 ) {
-    Providers(LocalTestTheme provides theme) {
+    CompositionLocalProvider(LocalTestTheme provides theme) {
         CheapPrimaryColorConsumer(primaryTracker)
         ExpensiveSecondaryColorConsumer(secondaryTracker)
         CheapPrimaryColorConsumer(primaryTracker)

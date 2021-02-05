@@ -21,6 +21,7 @@ import androidx.compose.runtime.snapshots.MutableSnapshot
 import androidx.compose.runtime.snapshots.Snapshot
 import androidx.compose.runtime.snapshots.SnapshotApplyResult
 import androidx.compose.runtime.snapshots.fastForEach
+import androidx.compose.runtime.tooling.CompositionData
 import kotlinx.collections.immutable.persistentSetOf
 import kotlinx.coroutines.CancellableContinuation
 import kotlinx.coroutines.CancellationException
@@ -286,6 +287,33 @@ class Recomposer(
             get() = this@Recomposer.hasPendingWork
         override val changeCount: Long
             get() = this@Recomposer.changeCount
+        fun saveStateAndDisposeForHotReload(): List<HotReloadable> {
+            val compositions = synchronized(stateLock) { knownCompositions.toList() }
+            return compositions
+                .mapNotNull { it as? CompositionImpl }
+                .map { HotReloadable(it).apply { clearContent() } }
+        }
+    }
+
+    private class HotReloadable(
+        private val composition: CompositionImpl
+    ) {
+        private var composable: @Composable () -> Unit = composition.composable
+        fun clearContent() {
+            if (composition.isRoot) {
+                composition.setContent { }
+            }
+        }
+
+        fun resetContent() {
+            composition.composable = composable
+        }
+
+        fun recompose() {
+            if (composition.isRoot) {
+                composition.setContent(composable)
+            }
+        }
     }
 
     private val recomposerInfo = RecomposerInfoImpl()
@@ -609,10 +637,6 @@ class Recomposer(
     internal override val compoundHashKey: Int
         get() = RecomposerCompoundHashKey
 
-    // Collecting key sources happens at the level of a composer; starts as false
-    internal override val collectingKeySources: Boolean
-        get() = false
-
     // Collecting parameter happens at the level of a composer; starts as false
     internal override val collectingParameterInformation: Boolean
         get() = false
@@ -643,7 +667,7 @@ class Recomposer(
 
     companion object {
 
-        private val _runningRecomposers = MutableStateFlow(persistentSetOf<RecomposerInfo>())
+        private val _runningRecomposers = MutableStateFlow(persistentSetOf<RecomposerInfoImpl>())
 
         /**
          * An observable [Set] of [RecomposerInfo]s for currently
@@ -653,7 +677,7 @@ class Recomposer(
         val runningRecomposers: StateFlow<Set<RecomposerInfo>>
             get() = _runningRecomposers
 
-        private fun addRunning(info: RecomposerInfo) {
+        private fun addRunning(info: RecomposerInfoImpl) {
             while (true) {
                 val old = _runningRecomposers.value
                 val new = old.add(info)
@@ -661,12 +685,27 @@ class Recomposer(
             }
         }
 
-        private fun removeRunning(info: RecomposerInfo) {
+        private fun removeRunning(info: RecomposerInfoImpl) {
             while (true) {
                 val old = _runningRecomposers.value
                 val new = old.remove(info)
                 if (old === new || _runningRecomposers.compareAndSet(old, new)) break
             }
+        }
+
+        internal fun saveStateAndDisposeForHotReload(): Any {
+            // NOTE: when we move composition/recomposition onto multiple threads, we will want
+            // to ensure that we pause recompositions before this call.
+            return _runningRecomposers.value.flatMap { it.saveStateAndDisposeForHotReload() }
+        }
+
+        internal fun loadStateAndComposeForHotReload(token: Any) {
+            // NOTE: when we move composition/recomposition onto multiple threads, we will want
+            // to ensure that we pause recompositions before this call.
+            @Suppress("UNCHECKED_CAST")
+            val holders = token as List<HotReloadable>
+            holders.forEach { it.resetContent() }
+            holders.forEach { it.recompose() }
         }
     }
 }

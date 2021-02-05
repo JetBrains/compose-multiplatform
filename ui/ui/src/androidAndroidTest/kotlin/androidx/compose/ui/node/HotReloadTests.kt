@@ -22,7 +22,6 @@ import androidx.activity.compose.setContent
 import androidx.compose.foundation.layout.Box
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.SideEffect
-import androidx.compose.runtime.clearRoots
 import androidx.compose.runtime.simulateHotReload
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
@@ -34,7 +33,6 @@ import androidx.compose.ui.test.junit4.createAndroidComposeRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.MediumTest
-import org.junit.After
 import org.junit.Assert.assertTrue
 import org.junit.Rule
 import org.junit.Test
@@ -45,11 +43,6 @@ import java.util.concurrent.TimeUnit
 @MediumTest
 @RunWith(AndroidJUnit4::class)
 class HotReloadTests {
-    @After
-    fun teardown() {
-        clearRoots()
-    }
-
     @get:Rule
     val rule = createAndroidComposeRule<TestActivity>()
 

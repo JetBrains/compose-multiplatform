@@ -17,7 +17,7 @@
 package androidx.compose.foundation.text
 
 import androidx.compose.foundation.layout.width
-import androidx.compose.runtime.Providers
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.platform.LocalDensity
@@ -67,7 +67,7 @@ class CoreTextFieldSoftWrapTest {
         var width: Int? = null
 
         rule.setContent {
-            Providers(LocalDensity provides density) {
+            CompositionLocalProvider(LocalDensity provides density) {
                 CoreTextField(
                     value = TextFieldValue(string),
                     onValueChange = {},
@@ -104,7 +104,7 @@ class CoreTextFieldSoftWrapTest {
         var width: Int? = null
 
         rule.setContent {
-            Providers(LocalDensity provides density) {
+            CompositionLocalProvider(LocalDensity provides density) {
                 CoreTextField(
                     value = TextFieldValue(string),
                     onValueChange = {},

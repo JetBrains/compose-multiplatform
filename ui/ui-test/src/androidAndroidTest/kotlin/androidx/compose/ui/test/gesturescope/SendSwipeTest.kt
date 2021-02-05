@@ -26,7 +26,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.Providers
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
@@ -167,7 +167,7 @@ class SendSwipeTest {
         val touchSlop = TestTouchSlop
         val scrollState = ScrollState(initial = 0f)
         rule.setContent {
-            Providers(LocalViewConfiguration provides FakeViewConfiguration) {
+            CompositionLocalProvider(LocalViewConfiguration provides FakeViewConfiguration) {
                 with(LocalDensity.current) {
                     // Scrollable with a viewport the size of 10 boxes
                     Column(

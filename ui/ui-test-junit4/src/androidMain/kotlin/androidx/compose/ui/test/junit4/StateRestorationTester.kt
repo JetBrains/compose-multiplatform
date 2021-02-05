@@ -17,7 +17,7 @@
 package androidx.compose.ui.test.junit4
 
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.Providers
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -83,7 +83,7 @@ class StateRestorationTester(private val composeTestRule: ComposeContentTestRule
                 "a SaveableStateRegistry implementation via LocalSaveableStateRegistry"
         }
         val restorationRegistry = remember { RestorationRegistry(original) }
-        Providers(LocalSaveableStateRegistry provides restorationRegistry) {
+        CompositionLocalProvider(LocalSaveableStateRegistry provides restorationRegistry) {
             if (restorationRegistry.shouldEmitChildren) {
                 content(restorationRegistry)
             }

@@ -18,7 +18,7 @@ package androidx.compose.material
 
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.runtime.Providers
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
@@ -187,7 +187,7 @@ class SwitchTest {
         rule.setMaterialContent {
 
             // Box is needed because otherwise the control will be expanded to fill its parent
-            Providers(LocalLayoutDirection provides LayoutDirection.Rtl) {
+            CompositionLocalProvider(LocalLayoutDirection provides LayoutDirection.Rtl) {
                 Box {
                     Switch(
                         modifier = Modifier.testTag(defaultSwitchTag),

@@ -22,7 +22,7 @@ import androidx.activity.ComponentActivity
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.text.CoreText
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.Providers
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
@@ -272,7 +272,7 @@ class SelectionContainerTest {
 
         val layoutDirection = if (isRtl) LayoutDirection.Rtl else LayoutDirection.Ltr
         rule.setContent {
-            Providers(
+            CompositionLocalProvider(
                 LocalHapticFeedback provides hapticFeedback,
                 LocalLayoutDirection provides layoutDirection
             ) {

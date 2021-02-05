@@ -22,7 +22,7 @@ import androidx.compose.foundation.layout.preferredWidth
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.Providers
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.platform.LocalDensity
@@ -194,7 +194,7 @@ private fun DefaultWidthTextField(
         style = FontStyle.Normal
     )
 
-    Providers(LocalDensity provides density) {
+    CompositionLocalProvider(LocalDensity provides density) {
         androidx.compose.foundation.layout.Box {
             BasicTextField(
                 value = text,

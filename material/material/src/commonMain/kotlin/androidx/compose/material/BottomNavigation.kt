@@ -32,7 +32,7 @@ import androidx.compose.foundation.layout.preferredHeight
 import androidx.compose.foundation.selection.selectable
 import androidx.compose.material.ripple.rememberRipple
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.Providers
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
@@ -225,7 +225,7 @@ private fun BottomNavigationTransition(
 
     val color = lerp(inactiveColor, activeColor, animationProgress)
 
-    Providers(
+    CompositionLocalProvider(
         LocalContentColor provides color.copy(alpha = 1f),
         LocalContentAlpha provides color.alpha,
     ) {

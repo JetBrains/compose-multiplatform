@@ -27,7 +27,7 @@ import androidx.compose.foundation.layout.preferredWidth
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.sizeIn
 import androidx.compose.foundation.layout.width
-import androidx.compose.runtime.Providers
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
@@ -509,7 +509,7 @@ class LazyRowTest {
     @Test
     fun scrollsLeftInRtl() {
         rule.setContentWithTestViewConfiguration {
-            Providers(LocalLayoutDirection provides LayoutDirection.Rtl) {
+            CompositionLocalProvider(LocalLayoutDirection provides LayoutDirection.Rtl) {
                 Box(Modifier.preferredWidth(100.dp)) {
                     LazyRow(Modifier.testTag(LazyListTag)) {
                         items(4) {

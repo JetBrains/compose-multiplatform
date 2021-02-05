@@ -18,8 +18,7 @@ package androidx.compose.ui.platform
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Composition
 import androidx.compose.runtime.CompositionContext
-import androidx.compose.runtime.ExperimentalComposeApi
-import androidx.compose.runtime.Providers
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.node.LayoutNode
 
@@ -30,14 +29,13 @@ import androidx.compose.ui.node.LayoutNode
  *        If null then default root composition will be used.
  * @param content A `@Composable` function declaring the UI contents
  */
-@OptIn(ExperimentalComposeApi::class)
 internal fun DesktopOwner.setContent(
     parent: CompositionContext? = null,
     content: @Composable () -> Unit
 ): Composition {
     GlobalSnapshotManager.ensureStarted()
 
-    val composition = Composition(root, DesktopUiApplier(root), parent ?: container.recomposer)
+    val composition = Composition(DesktopUiApplier(root), parent ?: container.recomposer)
     composition.setContent {
         ProvideDesktopAmbients(this) {
             content()
@@ -55,7 +53,7 @@ internal fun DesktopOwner.setContent(
 @OptIn(ExperimentalComposeUiApi::class)
 @Composable
 private fun ProvideDesktopAmbients(owner: DesktopOwner, content: @Composable () -> Unit) {
-    Providers(
+    CompositionLocalProvider(
         DesktopOwnersAmbient provides owner.container,
         SelectionTrackerAmbient provides owner.selectionTracker
     ) {
@@ -68,15 +66,10 @@ private fun ProvideDesktopAmbients(owner: DesktopOwner, content: @Composable () 
     }
 }
 
-@OptIn(ExperimentalComposeApi::class)
-internal actual fun subcomposeInto(
+internal actual fun createSubcomposition(
     container: LayoutNode,
-    parent: CompositionContext,
-    composable: @Composable () -> Unit
+    parent: CompositionContext
 ): Composition = Composition(
-    container,
     DesktopUiApplier(container),
     parent
-).apply {
-    setContent(composable)
-}
+)

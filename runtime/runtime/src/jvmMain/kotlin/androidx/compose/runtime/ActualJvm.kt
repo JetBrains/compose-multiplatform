@@ -35,8 +35,6 @@ internal actual open class ThreadLocal<T> actual constructor(
     }
 }
 
-internal actual typealias WeakHashMap<K, V> = java.util.WeakHashMap<K, V>
-
 internal actual fun identityHashCode(instance: Any?): Int = System.identityHashCode(instance)
 
 @PublishedApi

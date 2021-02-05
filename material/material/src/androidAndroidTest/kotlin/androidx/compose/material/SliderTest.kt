@@ -16,7 +16,7 @@
 
 package androidx.compose.material
 
-import androidx.compose.runtime.Providers
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
@@ -236,7 +236,7 @@ class SliderTest {
         var slop = 0f
 
         rule.setMaterialContent {
-            Providers(LocalLayoutDirection provides LayoutDirection.Rtl) {
+            CompositionLocalProvider(LocalLayoutDirection provides LayoutDirection.Rtl) {
                 slop = LocalViewConfiguration.current.touchSlop
                 Slider(
                     modifier = Modifier.testTag(tag),
@@ -270,7 +270,7 @@ class SliderTest {
         val state = mutableStateOf(0f)
 
         rule.setMaterialContent {
-            Providers(LocalLayoutDirection provides LayoutDirection.Rtl) {
+            CompositionLocalProvider(LocalLayoutDirection provides LayoutDirection.Rtl) {
                 Slider(
                     modifier = Modifier.testTag(tag),
                     value = state.value,

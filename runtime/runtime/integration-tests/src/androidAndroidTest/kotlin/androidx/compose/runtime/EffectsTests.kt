@@ -24,7 +24,6 @@ import androidx.test.filters.MediumTest
 import junit.framework.TestCase.assertEquals
 import junit.framework.TestCase.assertNull
 import junit.framework.TestCase.assertTrue
-import org.junit.After
 import org.junit.Ignore
 import org.junit.Rule
 import org.junit.Test
@@ -38,11 +37,6 @@ class EffectsTests : BaseComposeTest() {
         override fun equals(other: Any?): Boolean {
             return false
         }
-    }
-
-    @After
-    fun teardown() {
-        clearRoots()
     }
 
     @get:Rule
@@ -565,7 +559,7 @@ class EffectsTests : BaseComposeTest() {
         }
 
         compose {
-            Providers(Foo provides current) {
+            CompositionLocalProvider(Foo provides current) {
                 Bar()
             }
         }.then { activity ->
@@ -593,7 +587,7 @@ class EffectsTests : BaseComposeTest() {
 
         @Composable fun SimpleComposable() {
             scope = currentRecomposeScope
-            Providers(MyCompositionLocal provides compositionLocalValue++) {
+            CompositionLocalProvider(MyCompositionLocal provides compositionLocalValue++) {
                 SimpleComposable2()
                 Button(id = 123)
             }
@@ -637,7 +631,7 @@ class EffectsTests : BaseComposeTest() {
 
         @Composable fun SimpleComposable() {
             scope = currentRecomposeScope
-            Providers(MyCompositionLocal provides compositionLocalValue++) {
+            CompositionLocalProvider(MyCompositionLocal provides compositionLocalValue++) {
                 SimpleComposable2()
                 Button(id = 123)
             }

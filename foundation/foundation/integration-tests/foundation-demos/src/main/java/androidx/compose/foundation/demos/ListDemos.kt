@@ -49,7 +49,7 @@ import androidx.compose.material.Button
 import androidx.compose.material.LocalTextStyle
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.Providers
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -239,7 +239,7 @@ private fun ListWithIndexSample() {
 
 @Composable
 private fun RtlListDemo() {
-    Providers(LocalLayoutDirection provides LayoutDirection.Rtl) {
+    CompositionLocalProvider(LocalLayoutDirection provides LayoutDirection.Rtl) {
         LazyRow(Modifier.fillMaxWidth()) {
             items(100) {
                 Text(

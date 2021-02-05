@@ -33,7 +33,7 @@ import androidx.compose.material.ripple.RippleAlpha
 import androidx.compose.material.ripple.RippleTheme
 import androidx.compose.material.ripple.rememberRipple
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.Providers
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
@@ -437,7 +437,7 @@ class MaterialRippleThemeTest {
 
         rule.setContent {
             MaterialTheme {
-                Providers(LocalRippleTheme provides rippleTheme) {
+                CompositionLocalProvider(LocalRippleTheme provides rippleTheme) {
                     Surface(contentColor = contentColor) {
                         Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
                             RippleBox(interactionState, rememberRipple())
@@ -479,7 +479,7 @@ class MaterialRippleThemeTest {
 
         rule.setContent {
             MaterialTheme {
-                Providers(LocalRippleTheme provides rippleTheme) {
+                CompositionLocalProvider(LocalRippleTheme provides rippleTheme) {
                     Surface(contentColor = contentColor) {
                         Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
                             RippleBox(interactionState, rememberRipple())
@@ -522,7 +522,7 @@ class MaterialRippleThemeTest {
 
         rule.setContent {
             MaterialTheme {
-                Providers(LocalRippleTheme provides rippleTheme) {
+                CompositionLocalProvider(LocalRippleTheme provides rippleTheme) {
                     Surface(contentColor = Color.Black) {
                         Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
                             RippleBox(interactionState, rememberRipple())
@@ -586,7 +586,7 @@ class MaterialRippleThemeTest {
 
         rule.setContent {
             MaterialTheme {
-                Providers(LocalRippleTheme provides theme) {
+                CompositionLocalProvider(LocalRippleTheme provides theme) {
                     Surface(contentColor = Color.Black) {
                         // Create ripple where contentColor is black
                         val ripple = rememberRipple()

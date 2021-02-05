@@ -16,7 +16,7 @@
 
 package androidx.compose.ui.window
 
-import androidx.compose.runtime.Providers
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.DisposableEffect
@@ -42,7 +42,7 @@ class DesktopPopupTest {
         var actualAmbientValue = 0
 
         rule.setContent {
-            Providers(ambient provides 3) {
+            CompositionLocalProvider(ambient provides 3) {
                 Popup {
                     actualAmbientValue = ambient.current
                 }
@@ -81,7 +81,7 @@ class DesktopPopupTest {
         var densityInsidePopup = 0f
 
         rule.setContent {
-            Providers(LocalDensity provides density) {
+            CompositionLocalProvider(LocalDensity provides density) {
                 Popup {
                     densityInsidePopup = LocalDensity.current.density
                 }

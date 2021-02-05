@@ -17,7 +17,7 @@ package androidx.compose.desktop
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionContext
-import androidx.compose.runtime.Providers
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.compositionLocalOf
 import androidx.compose.ui.platform.Keyboard
 import androidx.compose.ui.unit.IntOffset
@@ -409,7 +409,7 @@ class AppWindow : AppFrame {
         content: @Composable () -> Unit
     ) {
         window.setContent(parentComposition) {
-            Providers(
+            CompositionLocalProvider(
                 LocalAppWindow provides this,
                 LocalLayerContainer provides window,
                 content = content

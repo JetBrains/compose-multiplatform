@@ -23,7 +23,7 @@ import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Shapes
 import androidx.compose.material.Typography
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.Providers
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.unit.dp
 
 @Composable
@@ -51,7 +51,7 @@ fun DesktopTheme(
         hoverColor = MaterialTheme.colors.onSurface.copy(alpha = 0.50f)
     ),
     content: @Composable () -> Unit
-) = Providers(
+) = CompositionLocalProvider(
     ScrollbarStyleAmbient provides scrollbar,
     content = content
 )

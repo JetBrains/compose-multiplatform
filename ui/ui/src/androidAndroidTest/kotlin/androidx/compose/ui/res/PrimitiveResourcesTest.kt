@@ -16,7 +16,7 @@
 
 package androidx.compose.ui.res
 
-import androidx.compose.runtime.Providers
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.test.R
 import androidx.compose.ui.test.junit4.createComposeRule
@@ -41,7 +41,7 @@ class PrimitiveResourcesTest {
         val context = InstrumentationRegistry.getInstrumentation().targetContext
 
         rule.setContent {
-            Providers(LocalContext provides context) {
+            CompositionLocalProvider(LocalContext provides context) {
                 assertThat(integerResource(R.integer.integer_value)).isEqualTo(123)
             }
         }
@@ -52,7 +52,7 @@ class PrimitiveResourcesTest {
         val context = InstrumentationRegistry.getInstrumentation().targetContext
 
         rule.setContent {
-            Providers(LocalContext provides context) {
+            CompositionLocalProvider(LocalContext provides context) {
                 assertThat(integerArrayResource(R.array.integer_array))
                     .isEqualTo(intArrayOf(234, 345))
             }
@@ -64,7 +64,7 @@ class PrimitiveResourcesTest {
         val context = InstrumentationRegistry.getInstrumentation().targetContext
 
         rule.setContent {
-            Providers(LocalContext provides context) {
+            CompositionLocalProvider(LocalContext provides context) {
                 assertThat(booleanResource(R.bool.boolean_value)).isTrue()
             }
         }
@@ -75,7 +75,7 @@ class PrimitiveResourcesTest {
         val context = InstrumentationRegistry.getInstrumentation().targetContext
 
         rule.setContent {
-            Providers(LocalContext provides context) {
+            CompositionLocalProvider(LocalContext provides context) {
                 assertThat(dimensionResource(R.dimen.dimension_value)).isEqualTo(32.dp)
             }
         }

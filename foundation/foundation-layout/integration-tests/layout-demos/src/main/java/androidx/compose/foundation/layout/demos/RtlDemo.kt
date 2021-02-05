@@ -29,7 +29,7 @@ import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.Providers
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -61,10 +61,10 @@ fun RtlDemo() {
         )
         CustomLayout(false)
         Text("WITH CONSTRAINTS", Modifier.align(Alignment.CenterHorizontally))
-        Providers(LocalLayoutDirection provides LayoutDirection.Ltr) {
+        CompositionLocalProvider(LocalLayoutDirection provides LayoutDirection.Ltr) {
             LayoutWithConstraints("LD: set LTR via CompositionLocal")
         }
-        Providers(LocalLayoutDirection provides LayoutDirection.Rtl) {
+        CompositionLocalProvider(LocalLayoutDirection provides LayoutDirection.Rtl) {
             LayoutWithConstraints("LD: set RTL via CompositionLocal")
         }
         LayoutWithConstraints(text = "LD: locale")
@@ -109,7 +109,7 @@ private fun TestRowWithModifier() {
     Row {
         Box(boxSize.background(Color.Red)) {}
         Box(boxSize.background(Color.Green)) {}
-        Providers(LocalLayoutDirection provides LayoutDirection.Ltr) {
+        CompositionLocalProvider(LocalLayoutDirection provides LayoutDirection.Ltr) {
             Row {
                 Box(boxSize.background(Color.Magenta)) {}
                 Box(boxSize.background(Color.Yellow)) {}

@@ -25,7 +25,7 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.MediumTest
 import junit.framework.TestCase.assertEquals
 import junit.framework.TestCase.assertFalse
-import org.junit.After
+
 import org.junit.Ignore
 import org.junit.Rule
 import org.junit.Test
@@ -81,12 +81,6 @@ class Person(name: String, age: Int) : StateObject {
 @MediumTest
 @RunWith(AndroidJUnit4::class)
 class ModelViewTests : BaseComposeTest() {
-
-    @After
-    fun teardown() {
-        clearRoots()
-    }
-
     @get:Rule
     override val activityRule = makeTestActivityRule()
 

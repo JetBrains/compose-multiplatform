@@ -24,7 +24,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.text.BasicText
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.Providers
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.testutils.assertAgainstGolden
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
@@ -174,7 +174,7 @@ class TextSelectionColorsScreenshotTest {
 @OptIn(InternalTextApi::class)
 @Composable
 private fun TextTestContent(textSelectionColors: TextSelectionColors) {
-    Providers(LocalTextSelectionColors provides textSelectionColors) {
+    CompositionLocalProvider(LocalTextSelectionColors provides textSelectionColors) {
         Row(Modifier.testTag(Tag), horizontalArrangement = Arrangement.spacedBy(20.dp)) {
             // Manually draw selection handles as we cannot screenshot the ones drawn in the popup
             DefaultSelectionHandle(
@@ -200,7 +200,7 @@ private fun TextTestContent(textSelectionColors: TextSelectionColors) {
 
 @Composable
 private fun TextFieldTestContent(textSelectionColors: TextSelectionColors) {
-    Providers(LocalTextSelectionColors provides textSelectionColors) {
+    CompositionLocalProvider(LocalTextSelectionColors provides textSelectionColors) {
         Box(Modifier.testTag(Tag)) {
             BasicTextField(value = Text, onValueChange = {})
         }

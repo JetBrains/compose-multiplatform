@@ -32,8 +32,6 @@ import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Call
 import androidx.compose.material.icons.filled.FavoriteBorder
-import androidx.compose.runtime.InternalComposeApi
-import androidx.compose.runtime.resetSourceInfo
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
@@ -75,8 +73,6 @@ class LayoutInspectorTreeTest : ToolingTest() {
 
     @Before
     fun before() {
-        @OptIn(InternalComposeApi::class)
-        resetSourceInfo()
         density = Density(activity)
         view = activityTestRule.activity.findViewById<ViewGroup>(android.R.id.content)
         isDebugInspectorInfoEnabled = true

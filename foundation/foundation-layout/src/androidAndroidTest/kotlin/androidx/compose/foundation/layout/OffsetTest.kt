@@ -17,7 +17,7 @@
 package androidx.compose.foundation.layout
 
 import android.os.Build
-import androidx.compose.runtime.Providers
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
@@ -104,7 +104,7 @@ class OffsetTest : LayoutTest() {
         var positionX = 0
         var positionY = 0
         rule.setContent {
-            Providers((LocalLayoutDirection provides LayoutDirection.Rtl)) {
+            CompositionLocalProvider((LocalLayoutDirection provides LayoutDirection.Rtl)) {
                 Box(
                     Modifier.testTag("box")
                         .wrapContentSize(Alignment.TopEnd)
@@ -164,7 +164,7 @@ class OffsetTest : LayoutTest() {
         var positionX = 0
         var positionY = 0
         rule.setContent {
-            Providers((LocalLayoutDirection provides LayoutDirection.Rtl)) {
+            CompositionLocalProvider((LocalLayoutDirection provides LayoutDirection.Rtl)) {
                 Box(
                     Modifier.testTag("box")
                         .wrapContentSize(Alignment.TopEnd)
@@ -224,7 +224,7 @@ class OffsetTest : LayoutTest() {
         var positionX = 0
         var positionY = 0
         rule.setContent {
-            Providers((LocalLayoutDirection provides LayoutDirection.Rtl)) {
+            CompositionLocalProvider((LocalLayoutDirection provides LayoutDirection.Rtl)) {
                 Box(
                     Modifier.testTag("box")
                         .wrapContentSize(Alignment.TopEnd)
@@ -287,7 +287,7 @@ class OffsetTest : LayoutTest() {
         var positionX = 0
         var positionY = 0
         rule.setContent {
-            Providers((LocalLayoutDirection provides LayoutDirection.Rtl)) {
+            CompositionLocalProvider((LocalLayoutDirection provides LayoutDirection.Rtl)) {
                 Box(
                     Modifier.testTag("box")
                         .wrapContentSize(Alignment.TopEnd)

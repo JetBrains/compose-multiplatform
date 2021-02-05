@@ -17,8 +17,10 @@
 @file:OptIn(InternalComposeApi::class)
 package androidx.compose.runtime
 
+import androidx.compose.runtime.tooling.CompositionData
 import kotlin.math.max
 import kotlin.math.min
+import androidx.compose.runtime.tooling.CompositionGroup
 
 // Nomenclature -
 // Address      - an absolute offset into the array ignoring its gap. See Index below.
@@ -2560,7 +2562,7 @@ private fun IntArray.updateGroupSize(address: Int, value: Int) {
     this[address * Group_Fields_Size + Size_Offset] = value
 }
 
-fun IntArray.slice(indices: Iterable<Int>): List<Int> {
+private fun IntArray.slice(indices: Iterable<Int>): List<Int> {
     val list = mutableListOf<Int>()
     for (index in indices) {
         list.add(get(index))

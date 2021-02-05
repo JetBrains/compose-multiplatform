@@ -39,7 +39,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.ExperimentalComposeApi
-import androidx.compose.runtime.Providers
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.Stable
 import androidx.compose.runtime.State
 import androidx.compose.runtime.getValue
@@ -1999,7 +1999,7 @@ class AndroidLayoutDrawTest {
         val layoutDirection = Ref<LayoutDirection>()
         activityTestRule.runOnUiThreadIR {
             activity.setContent {
-                Providers(LocalLayoutDirection provides LayoutDirection.Rtl) {
+                CompositionLocalProvider(LocalLayoutDirection provides LayoutDirection.Rtl) {
                     FixedSize(
                         size = 50,
                         modifier = Modifier.drawBehind {
@@ -2032,7 +2032,7 @@ class AndroidLayoutDrawTest {
         }
         activityTestRule.runOnUiThreadIR {
             activity.setContent {
-                Providers(LocalLayoutDirection provides LayoutDirection.Rtl) {
+                CompositionLocalProvider(LocalLayoutDirection provides LayoutDirection.Rtl) {
                     FixedSize(
                         size = 50,
                         modifier = layoutModifier

@@ -28,7 +28,7 @@ import androidx.compose.foundation.layout.preferredHeight
 import androidx.compose.foundation.layout.preferredWidth
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.Providers
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
@@ -93,7 +93,7 @@ fun TopAppBar(
             Spacer(TitleInsetWithoutIcon)
         } else {
             Row(TitleIconModifier, verticalAlignment = Alignment.CenterVertically) {
-                Providers(
+                CompositionLocalProvider(
                     LocalContentAlpha provides ContentAlpha.high,
                     content = navigationIcon
                 )
@@ -105,11 +105,14 @@ fun TopAppBar(
             verticalAlignment = Alignment.CenterVertically
         ) {
             ProvideTextStyle(value = MaterialTheme.typography.h6) {
-                Providers(LocalContentAlpha provides ContentAlpha.high, content = title)
+                CompositionLocalProvider(
+                    LocalContentAlpha provides ContentAlpha.high,
+                    content = title
+                )
             }
         }
 
-        Providers(LocalContentAlpha provides ContentAlpha.medium) {
+        CompositionLocalProvider(LocalContentAlpha provides ContentAlpha.medium) {
             Row(
                 Modifier.fillMaxHeight(),
                 horizontalArrangement = Arrangement.End,
