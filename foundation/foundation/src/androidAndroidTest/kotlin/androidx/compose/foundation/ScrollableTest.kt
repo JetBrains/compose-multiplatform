@@ -16,9 +16,7 @@
 
 package androidx.compose.foundation
 
-import androidx.compose.animation.core.FloatExponentialDecaySpec
 import androidx.compose.animation.core.ManualFrameClock
-import androidx.compose.animation.core.generateDecayAnimationSpec
 import androidx.compose.foundation.animation.smoothScrollBy
 import androidx.compose.foundation.gestures.ScrollableState
 import androidx.compose.foundation.gestures.scrollable
@@ -76,9 +74,6 @@ class ScrollableTest {
 
     private val scrollableBoxTag = "scrollableBox"
 
-    private val decayAnimationSpec = FloatExponentialDecaySpec()
-        .generateDecayAnimationSpec<Float>()
-
     @Before
     fun before() {
         isDebugInspectorInfoEnabled = true
@@ -102,8 +97,7 @@ class ScrollableTest {
         setScrollableContent {
             Modifier.scrollable(
                 state = controller,
-                orientation = Orientation.Horizontal,
-                flingSpec = decayAnimationSpec
+                orientation = Orientation.Horizontal
             )
         }
         rule.onNodeWithTag(scrollableBoxTag).performGesture {
@@ -157,8 +151,7 @@ class ScrollableTest {
         setScrollableContent {
             Modifier.scrollable(
                 state = controller,
-                orientation = Orientation.Vertical,
-                flingSpec = decayAnimationSpec
+                orientation = Orientation.Vertical
             )
         }
         rule.onNodeWithTag(scrollableBoxTag).performGesture {
@@ -214,7 +207,6 @@ class ScrollableTest {
             Modifier.scrollable(
                 state = controller,
                 orientation = Orientation.Horizontal,
-                flingSpec = decayAnimationSpec,
                 enabled = enabled.value
             )
         }
@@ -258,7 +250,6 @@ class ScrollableTest {
         setScrollableContent {
             Modifier.scrollable(
                 state = controller,
-                flingSpec = decayAnimationSpec,
                 orientation = Orientation.Horizontal
             )
         }
@@ -292,7 +283,6 @@ class ScrollableTest {
         )
         setScrollableContent {
             Modifier.scrollable(
-                flingSpec = decayAnimationSpec,
                 orientation = Orientation.Vertical,
                 state = controller
             )
@@ -323,7 +313,6 @@ class ScrollableTest {
         setScrollableContent {
             if (emit.value) {
                 Modifier.scrollable(
-                    flingSpec = decayAnimationSpec,
                     orientation = Orientation.Horizontal,
                     state = controller
                 )
@@ -387,7 +376,6 @@ class ScrollableTest {
                     modifier = Modifier
                         .size(300.dp)
                         .scrollable(
-                            flingSpec = decayAnimationSpec,
                             state = outerState,
                             orientation = Orientation.Horizontal
                         )
@@ -396,8 +384,6 @@ class ScrollableTest {
                         modifier = Modifier.testTag(scrollableBoxTag)
                             .size(300.dp)
                             .scrollable(
-                                flingSpec = FloatExponentialDecaySpec()
-                                    .generateDecayAnimationSpec(),
                                 state = innerState,
                                 orientation = Orientation.Horizontal
                             )
@@ -455,7 +441,6 @@ class ScrollableTest {
                         .size(300.dp)
                         .scrollable(
                             state = outerState,
-                            flingSpec = decayAnimationSpec,
                             orientation = Orientation.Horizontal
                         )
                 ) {
@@ -465,8 +450,6 @@ class ScrollableTest {
                             .size(300.dp)
                             .scrollable(
                                 state = innerState,
-                                flingSpec = FloatExponentialDecaySpec()
-                                    .generateDecayAnimationSpec(),
                                 orientation = Orientation.Horizontal
                             )
                     )
@@ -534,8 +517,6 @@ class ScrollableTest {
                             modifier = Modifier.size(300.dp)
                                 .testTag(scrollableBoxTag)
                                 .scrollable(
-                                    flingSpec = FloatExponentialDecaySpec()
-                                        .generateDecayAnimationSpec(),
                                     state = controller,
                                     orientation = Orientation.Horizontal
                                 )
@@ -610,7 +591,6 @@ class ScrollableTest {
                             modifier = Modifier.size(300.dp)
                                 .testTag(scrollableBoxTag)
                                 .scrollable(
-                                    flingSpec = decayAnimationSpec,
                                     state = controller,
                                     orientation = Orientation.Horizontal
                                 )
@@ -653,9 +633,7 @@ class ScrollableTest {
             Box {
                 Box(
                     modifier = Modifier.size(300.dp)
-
                         .scrollable(
-                            flingSpec = decayAnimationSpec,
                             state = controller,
                             orientation = Orientation.Horizontal
                         )
@@ -726,7 +704,6 @@ class ScrollableTest {
                     Box(
                         modifier = Modifier.size(300.dp)
                             .scrollable(
-                                flingSpec = decayAnimationSpec,
                                 state = parentController,
                                 orientation = Orientation.Horizontal
                             )
@@ -735,7 +712,6 @@ class ScrollableTest {
                             Modifier.size(200.dp)
                                 .testTag(scrollableBoxTag)
                                 .scrollable(
-                                    flingSpec = decayAnimationSpec,
                                     enabled = false,
                                     orientation = Orientation.Horizontal,
                                     state = childController
@@ -778,7 +754,6 @@ class ScrollableTest {
 
         setScrollableContent {
             Modifier.scrollable(
-                flingSpec = decayAnimationSpec,
                 interactionState = interactionState,
                 orientation = Orientation.Horizontal,
                 state = controller
@@ -831,7 +806,6 @@ class ScrollableTest {
                             .size(100.dp)
                             .scrollable(
                                 interactionState = interactionState,
-                                flingSpec = decayAnimationSpec,
                                 orientation = Orientation.Horizontal,
                                 state = controller
                             )
@@ -878,7 +852,7 @@ class ScrollableTest {
                 "state",
                 "enabled",
                 "reverseDirection",
-                "flingSpec",
+                "flingBehavior",
                 "interactionState",
             )
         }

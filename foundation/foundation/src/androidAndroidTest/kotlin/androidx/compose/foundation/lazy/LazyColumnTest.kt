@@ -17,7 +17,6 @@
 package androidx.compose.foundation.lazy
 
 import androidx.compose.animation.core.advanceClockMillis
-import androidx.compose.animation.core.exponentialDecay
 import androidx.compose.animation.core.snap
 import androidx.compose.foundation.animation.smoothScrollBy
 import androidx.compose.foundation.layout.Box
@@ -917,7 +916,6 @@ class LazyColumnTest {
         rule.setContentWithTestViewConfiguration {
             LazyColumn(
                 Modifier.requiredSize(100.dp).testTag(LazyListTag),
-                flingSpec = exponentialDecay(),
                 state = state
             ) {
                 items(items) {

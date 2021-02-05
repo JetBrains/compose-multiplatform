@@ -17,12 +17,13 @@
 package androidx.compose.foundation
 
 import androidx.compose.animation.core.AnimationSpec
-import androidx.compose.animation.core.DecayAnimationSpec
 import androidx.compose.animation.core.SpringSpec
+import androidx.compose.foundation.animation.FlingBehavior
 import androidx.compose.foundation.animation.scrollBy
 import androidx.compose.foundation.animation.smoothScrollBy
 import androidx.compose.foundation.gestures.Orientation
 import androidx.compose.foundation.gestures.ScrollScope
+import androidx.compose.foundation.gestures.ScrollableDefaults
 import androidx.compose.foundation.gestures.ScrollableState
 import androidx.compose.foundation.gestures.scrollable
 import androidx.compose.runtime.Composable
@@ -184,21 +185,21 @@ class ScrollState(initial: Float) : ScrollableState {
  *
  * @param state state of the scroll
  * @param enabled whether or not scrolling via touch input is enabled
- * @param flingSpec fling animation configuration to use when drag ends with velocity. If `null`,
- * default fling configuration will be used.
+ * @param flingBehavior logic describing fling behavior when drag has finished with velocity. If
+ * `null`, default from [ScrollableDefaults.flingBehavior] will be used.
  * @param reverseScrolling reverse the direction of scrolling, when `true`, 0 [ScrollState.value]
  * will mean bottom, when `false`, 0 [ScrollState.value] will mean top
  */
 fun Modifier.verticalScroll(
     state: ScrollState,
     enabled: Boolean = true,
-    flingSpec: DecayAnimationSpec<Float>? = null,
+    flingBehavior: FlingBehavior? = null,
     reverseScrolling: Boolean = false
 ) = scroll(
     state = state,
     isScrollable = enabled,
     reverseScrolling = reverseScrolling,
-    flingSpec = flingSpec,
+    flingBehavior = flingBehavior,
     isVertical = true
 )
 
@@ -213,28 +214,28 @@ fun Modifier.verticalScroll(
  *
  * @param state state of the scroll
  * @param enabled whether or not scrolling via touch input is enabled
- * @param flingSpec fling animation configuration to use when drag ends with velocity. If `null`,
- * default fling configuration will be used.
+ * @param flingBehavior logic describing fling behavior when drag has finished with velocity. If
+ * `null`, default from [ScrollableDefaults.flingBehavior] will be used.
  * @param reverseScrolling reverse the direction of scrolling, when `true`, 0 [ScrollState.value]
  * will mean right, when `false`, 0 [ScrollState.value] will mean left
  */
 fun Modifier.horizontalScroll(
     state: ScrollState,
     enabled: Boolean = true,
-    flingSpec: DecayAnimationSpec<Float>? = null,
+    flingBehavior: FlingBehavior? = null,
     reverseScrolling: Boolean = false
 ) = scroll(
     state = state,
     isScrollable = enabled,
     reverseScrolling = reverseScrolling,
-    flingSpec = flingSpec,
+    flingBehavior = flingBehavior,
     isVertical = false
 )
 
 private fun Modifier.scroll(
     state: ScrollState,
     reverseScrolling: Boolean,
-    flingSpec: DecayAnimationSpec<Float>?,
+    flingBehavior: FlingBehavior?,
     isScrollable: Boolean,
     isVertical: Boolean
 ) = composed(
@@ -275,7 +276,7 @@ private fun Modifier.scroll(
             reverseDirection = if (!isVertical && isRtl) reverseScrolling else !reverseScrolling,
             enabled = isScrollable,
             interactionState = state.interactionState,
-            flingSpec = flingSpec,
+            flingBehavior = flingBehavior,
             state = state
         )
         val layout = ScrollingLayoutModifier(state, reverseScrolling, isVertical)
@@ -285,7 +286,7 @@ private fun Modifier.scroll(
         name = "scroll"
         properties["state"] = state
         properties["reverseScrolling"] = reverseScrolling
-        properties["flingSpec"] = flingSpec
+        properties["flingBehavior"] = flingBehavior
         properties["isScrollable"] = isScrollable
         properties["isVertical"] = isVertical
     }

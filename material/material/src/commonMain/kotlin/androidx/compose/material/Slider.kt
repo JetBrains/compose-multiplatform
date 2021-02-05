@@ -17,15 +17,10 @@
 package androidx.compose.material
 
 import androidx.compose.animation.core.Animatable
-import androidx.compose.animation.core.TargetAnimation
 import androidx.compose.animation.core.TweenSpec
-import androidx.compose.animation.core.calculateTargetValue
-import androidx.compose.animation.core.generateDecayAnimationSpec
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.Interaction
 import androidx.compose.foundation.InteractionState
-import androidx.compose.foundation.animation.FlingConfig
-import androidx.compose.foundation.animation.defaultFlingConfig
 import androidx.compose.foundation.focusable
 import androidx.compose.foundation.gestures.Orientation
 import androidx.compose.foundation.gestures.detectTapGestures
@@ -139,28 +134,14 @@ fun Slider(
         val minPx = 0f
         position.setBounds(minPx, maxPx)
 
-        val flingConfig = sliderFlingConfig(position, position.anchorsPx)
         val gestureEndAction: (Float) -> Unit = { velocity: Float ->
-            if (flingConfig != null) {
+            if (position.anchorsPx.isNotEmpty()) {
+                val now = position.holder.value
+                val point = position.anchorsPx.minByOrNull { abs(it - now) }
+                val target = point ?: now
                 scope.launch {
-                    val decaySpec = flingConfig.decayAnimation.generateDecayAnimationSpec<Float>()
-                    val projectedTarget = decaySpec.calculateTargetValue(
-                        position.holder.value,
-                        velocity
-                    )
-                    val targetAnimation = flingConfig.adjustTarget(projectedTarget)
-                    if (targetAnimation != null) {
-                        position.holder.animateTo(
-                            targetAnimation.target,
-                            targetAnimation.animation,
-                            initialVelocity = velocity
-                        ) {
-                            position.onHolderValueUpdated(this.value)
-                        }
-                    } else {
-                        position.holder.animateDecay(velocity, decaySpec) {
-                            position.onHolderValueUpdated(this.value)
-                        }
+                    position.holder.animateTo(target, SliderToTickAnimation, velocity) {
+                        position.onHolderValueUpdated(this.value)
                     }
                     onValueChangeFinished?.invoke()
                 }
@@ -341,24 +322,6 @@ private fun scale(a1: Float, b1: Float, x1: Float, a2: Float, b2: Float) =
 // Calculate the 0..1 fraction that `pos` value represents between `a` and `b`
 private fun calcFraction(a: Float, b: Float, pos: Float) =
     (if (b - a == 0f) 0f else (pos - a) / (b - a)).coerceIn(0f, 1f)
-
-@Composable
-private fun sliderFlingConfig(
-    value: SliderPosition,
-    anchors: List<Float>
-): FlingConfig? {
-    return if (anchors.isEmpty()) {
-        null
-    } else {
-        val adjustTarget: (Float) -> TargetAnimation? = { _ ->
-            val now = value.holder.value
-            val point = anchors.minByOrNull { abs(it - now) }
-            val adjusted = point ?: now
-            TargetAnimation(adjusted, SliderToTickAnimation)
-        }
-        defaultFlingConfig(adjustTarget = adjustTarget)
-    }
-}
 
 private fun Modifier.sliderSemantics(
     value: Float,
