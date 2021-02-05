@@ -36,7 +36,6 @@ import androidx.compose.runtime.setValue
 import androidx.compose.runtime.staticCompositionLocalOf
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.lifecycle.LifecycleOwner
-import androidx.lifecycle.ViewModelStoreOwner
 import androidx.savedstate.SavedStateRegistryOwner
 
 /**
@@ -67,17 +66,6 @@ val LocalSavedStateRegistryOwner = staticCompositionLocalOf<SavedStateRegistryOw
  * The CompositionLocal containing the current Compose [View].
  */
 val LocalView = staticCompositionLocalOf<View>()
-
-/**
- * The CompositionLocal containing the current [ViewModelStoreOwner].
- */
-@Suppress("DeprecatedCallableAddReplaceWith")
-@Deprecated(
-    "It was moved to androidx.lifecycle.viewmodel.compose package. You should add a " +
-        "dependency on androidx.lifecycle:lifecycle-viewmodel.compose:1.0.0-alpha01 in order to " +
-        "use it"
-)
-val LocalViewModelStoreOwner = staticCompositionLocalOf<ViewModelStoreOwner>()
 
 @Composable
 @OptIn(ExperimentalComposeUiApi::class, InternalAnimationApi::class)
@@ -122,9 +110,7 @@ internal fun ProvideAndroidCompositionLocals(
         LocalLifecycleOwner provides viewTreeOwners.lifecycleOwner,
         LocalSavedStateRegistryOwner provides viewTreeOwners.savedStateRegistryOwner,
         LocalSaveableStateRegistry provides saveableStateRegistry,
-        LocalView provides owner.view,
-        @Suppress("DEPRECATION")
-        LocalViewModelStoreOwner provides viewTreeOwners.viewModelStoreOwner
+        LocalView provides owner.view
     ) {
         ProvideCommonCompositionLocals(
             owner = owner,
