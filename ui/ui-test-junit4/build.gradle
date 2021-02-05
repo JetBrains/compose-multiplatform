@@ -34,7 +34,7 @@ dependencies {
 
     if(!AndroidXUiPlugin.isMultiplatformEnabled(project)) {
         api project(":compose:ui:ui-test")
-        api "androidx.activity:activity:1.2.0-alpha02"
+        api "androidx.activity:activity:1.2.0-rc01"
         api(ANDROIDX_TEST_EXT_JUNIT)
         api(JUNIT)
 
@@ -83,7 +83,7 @@ if(AndroidXUiPlugin.isMultiplatformEnabled(project)) {
             androidMain.dependencies {
                 api(JUNIT)
                 api(ANDROIDX_TEST_EXT_JUNIT)
-                api "androidx.activity:activity:1.2.0-alpha02"
+                api "androidx.activity:activity:1.2.0-rc01"
                 implementation project(":activity:activity-compose")
 
                 implementation(ANDROIDX_TEST_RULES)

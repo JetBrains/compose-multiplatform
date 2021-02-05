@@ -37,7 +37,7 @@ dependencies {
          * corresponding block below
          */
 
-        api "androidx.activity:activity:1.2.0-alpha02"
+        api "androidx.activity:activity:1.2.0-rc01"
         api project(":compose:ui:ui-test-junit4")
         api project(":test-screenshot")
 
@@ -76,7 +76,7 @@ if (AndroidXUiPlugin.isMultiplatformEnabled(project)) {
             }
 
             androidMain.dependencies {
-                api "androidx.activity:activity:1.2.0-alpha02"
+                api "androidx.activity:activity:1.2.0-rc01"
                 implementation project(":activity:activity-compose")
                 api project(":compose:ui:ui-test-junit4")
                 api project(":test-screenshot")
