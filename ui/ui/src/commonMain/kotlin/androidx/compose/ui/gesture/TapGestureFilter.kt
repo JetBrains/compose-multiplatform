@@ -20,14 +20,12 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.composed
 import androidx.compose.ui.geometry.Offset
-import androidx.compose.ui.gesture.customevents.DelayUpEvent
-import androidx.compose.ui.gesture.customevents.DelayUpMessage
-import androidx.compose.ui.input.pointer.CustomEvent
 import androidx.compose.ui.input.pointer.PointerEvent
 import androidx.compose.ui.input.pointer.PointerEventPass
 import androidx.compose.ui.input.pointer.PointerId
 import androidx.compose.ui.input.pointer.PointerInputChange
 import androidx.compose.ui.input.pointer.PointerInputFilter
+import androidx.compose.ui.input.pointer.PointerInputModifier
 import androidx.compose.ui.input.pointer.anyPositionChangeConsumed
 import androidx.compose.ui.input.pointer.changedToDown
 import androidx.compose.ui.input.pointer.changedToUp
@@ -53,10 +51,6 @@ import androidx.compose.ui.util.fastForEach
  * - While it has at least one pointer touching it, no [PointerInputChange] has had any
  *   movement consumed (as that would indicate that something in the heirarchy moved and this a
  *   press should be cancelled.
- * - It also fully cooperates with [DelayUpEvent] [CustomEvent]s it receives such that it will delay
- *   calling [onTap] if all of it's up events are being blocked.  If it was being blocked and later
- *   is allowed to fire it's up event (which is [onTap]) it will do so and consume the delayed up
- *   custom event such that no other gesture filters will also respond to the delayed up.
  *
  *   @param onTap Called when a tap has occurred.
  */
@@ -80,7 +74,7 @@ fun Modifier.tapGestureFilter(
 ) {
     val filter = remember { TapGestureFilter() }
     filter.onTap = onTap
-    PointerInputModifierImpl(filter)
+    TapPointerInputModifierImpl(filter)
 }
 
 /**
@@ -99,7 +93,7 @@ internal fun Modifier.noConsumptionTapGestureFilter(
     val filter = remember { TapGestureFilter() }
     filter.onTap = onTap
     filter.consumeChanges = false
-    PointerInputModifierImpl(filter)
+    TapPointerInputModifierImpl(filter)
 }
 
 internal class TapGestureFilter : PointerInputFilter() {
@@ -187,37 +181,27 @@ internal class TapGestureFilter : PointerInputFilter() {
         }
     }
 
+    // TODO(shepshapard): This continues to be very confusing to use.  Have to come up with a better
+//  way of easily expressing this.
+    /**
+     * Utility method that determines if any pointers are currently in [bounds].
+     *
+     * A pointer is considered in bounds if it is currently down and it's current
+     * position is within the provided [bounds]
+     *
+     * @return True if at least one pointer is in bounds.
+     */
+    private fun List<PointerInputChange>.anyPointersInBounds(bounds: IntSize) =
+        fastAny {
+            it.pressed &&
+                it.position.x >= 0 &&
+                it.position.x < bounds.width &&
+                it.position.y >= 0 &&
+                it.position.y < bounds.height
+        }
+
     override fun onCancel() {
         reset()
-    }
-
-    override fun onCustomEvent(customEvent: CustomEvent, pass: PointerEventPass) {
-        if (!primed || pass != PointerEventPass.Main || customEvent !is DelayUpEvent) {
-            return
-        }
-
-        if (customEvent.message == DelayUpMessage.DelayUp) {
-            // If the message is to DelayUp, track all currently down pointers that are also ones
-            // we are supposed to block the up event for.
-            customEvent.pointers.forEach {
-                if (downPointers.contains(it)) {
-                    upBlockedPointers.add(it)
-                }
-            }
-            return
-        }
-
-        upBlockedPointers.removeAll(customEvent.pointers)
-        if (upBlockedPointers.isEmpty() && downPointers.isEmpty()) {
-            if (customEvent.message == DelayUpMessage.DelayedUpNotConsumed) {
-                // If the up was not consumed, then we can fire our callback and consume it.
-                onTap.invoke(lastPxPosition!!)
-                customEvent.message = DelayUpMessage.DelayedUpConsumed
-            }
-            // At this point, we were primed, no pointers were down, and we are unblocked, so we
-            // are at least resetting.
-            reset()
-        }
     }
 
     private fun reset() {
@@ -227,3 +211,7 @@ internal class TapGestureFilter : PointerInputFilter() {
         lastPxPosition = null
     }
 }
+
+private data class TapPointerInputModifierImpl(
+    override val pointerInputFilter: PointerInputFilter
+) : PointerInputModifier

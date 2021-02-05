@@ -19,7 +19,7 @@ package androidx.compose.ui.input.mouse
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.composed
-import androidx.compose.ui.gesture.PointerInputModifierImpl
+import androidx.compose.ui.input.pointer.PointerInputModifier
 import androidx.compose.ui.gesture.scrollorientationlocking.Orientation
 import androidx.compose.ui.input.pointer.PointerEvent
 import androidx.compose.ui.input.pointer.PointerEventPass
@@ -96,7 +96,7 @@ fun Modifier.mouseScrollFilter(
 ): Modifier = composed {
     val filter = remember(::MouseScrollEventFilter)
     filter.onMouseScroll = onMouseScroll
-    PointerInputModifierImpl(filter)
+    MousePointerInputModifierImpl(filter)
 }
 
 internal class MouseScrollEventFilter : PointerInputFilter() {
@@ -114,3 +114,7 @@ internal class MouseScrollEventFilter : PointerInputFilter() {
         return isAttached && onMouseScroll(event, size)
     }
 }
+
+private data class MousePointerInputModifierImpl(
+    override val pointerInputFilter: PointerInputFilter
+) : PointerInputModifier

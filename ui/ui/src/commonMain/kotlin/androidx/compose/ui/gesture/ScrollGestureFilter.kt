@@ -23,7 +23,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.composed
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.gesture.scrollorientationlocking.Orientation
-import androidx.compose.ui.gesture.scrollorientationlocking.ScrollOrientationLocker
 import androidx.compose.ui.input.pointer.PointerEventPass
 import androidx.compose.ui.platform.debugInspectorInfo
 
@@ -97,7 +96,7 @@ interface ScrollCallback {
  *
  * This gesture filter also disambiguates amongst other scrollGestureFilters such that for all
  * pointers that this gesture filter uses to scroll in the given [orientation], other
- * scrollGestureFilters (or other clients of [ScrollOrientationLocker]) will not use those same
+ * scrollGestureFilters will not use those same
  * pointers to drag in the other [orientation].  Likewise, this scrollGestureFilter will not use
  * pointers to drag if they are already being used to drag in a different orientation.
  *
@@ -136,12 +135,8 @@ fun Modifier.scrollGestureFilter(
     // TODO(b/146427920): There is a gap here where RawPressStartGestureDetector can cause a call to
     //  DragObserver.onStart but if the pointer doesn't move and releases, (or if cancel is called)
     //  The appropriate callbacks to DragObserver will not be called.
-    rawDragGestureFilter(
-        coordinator.rawDragObserver,
-        coordinator::enabledOrStarted,
-        orientation
-    )
-        .dragSlopExceededGestureFilter(coordinator::enableDrag, orientation)
+    rawDragGestureFilter(coordinator.rawDragObserver, coordinator::enabledOrStarted)
+        .dragSlopExceededGestureFilter(coordinator::enableDrag)
         .rawPressStartGestureFilter(
             coordinator::startDrag,
             startDragImmediately,

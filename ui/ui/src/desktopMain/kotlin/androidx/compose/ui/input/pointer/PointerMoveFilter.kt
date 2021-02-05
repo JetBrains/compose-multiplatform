@@ -20,7 +20,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.composed
 import androidx.compose.ui.geometry.Offset
-import androidx.compose.ui.gesture.PointerInputModifierImpl
 import androidx.compose.ui.unit.IntSize
 
 /**
@@ -39,7 +38,7 @@ fun Modifier.pointerMoveFilter(
     filter.onEnterHandler = onEnter
     filter.onExitHandler = onExit
     filter.onMoveHandler = onMove
-    PointerInputModifierImpl(filter)
+    MovePointerInputModifierImpl(filter)
 }
 
 internal class PointerMoveEventFilter : PointerInputFilter() {
@@ -55,3 +54,7 @@ internal class PointerMoveEventFilter : PointerInputFilter() {
 
     override fun onCancel() = Unit
 }
+
+private data class MovePointerInputModifierImpl(
+    override val pointerInputFilter: PointerInputFilter
+) : PointerInputModifier

@@ -14,14 +14,8 @@
  * limitations under the License.
  */
 
-package androidx.compose.ui.gesture.customevents
+package androidx.compose.ui.gesture.scrollorientationlocking
 
-import androidx.compose.ui.input.pointer.CustomEvent
-import androidx.compose.ui.input.pointer.PointerInputFilter
-
-/**
- * Dispatched to indicate that a [PointerInputFilter] that responds to a pointer touching a
- * region of the UI for a period of time has fired it's associated callback such that any other
- * [PointerInputFilter] that may be waiting to fire, should no longer do so.
- */
-internal object LongPressFiredEvent : CustomEvent
+enum class Orientation {
+    Vertical, Horizontal
+}
