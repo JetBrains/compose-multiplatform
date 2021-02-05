@@ -37,7 +37,7 @@ import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
-import androidx.compose.runtime.Providers
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -125,7 +125,7 @@ class TextFieldTest {
         var isFocused = false
         rule.setContent {
             val state = remember { mutableStateOf("") }
-            Providers(
+            CompositionLocalProvider(
                 LocalTextInputService provides inputService
             ) {
                 BasicTextField(
@@ -164,7 +164,7 @@ class TextFieldTest {
             .thenReturn(inputSessionToken)
 
         rule.setContent {
-            Providers(
+            CompositionLocalProvider(
                 LocalTextInputService provides textInputService
             ) {
                 TextFieldApp()
@@ -235,7 +235,7 @@ class TextFieldTest {
             .thenReturn(inputSessionToken)
 
         rule.setContent {
-            Providers(
+            CompositionLocalProvider(
                 LocalTextInputService provides textInputService
             ) {
                 OnlyDigitsApp()
@@ -294,7 +294,7 @@ class TextFieldTest {
 
         val onTextLayout: (TextLayoutResult) -> Unit = mock()
         rule.setContent {
-            Providers(
+            CompositionLocalProvider(
                 LocalTextInputService provides textInputService
             ) {
                 val state = remember { mutableStateOf("") }

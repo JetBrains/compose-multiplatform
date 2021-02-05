@@ -18,7 +18,7 @@ package androidx.compose.foundation.lazy
 
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.size
-import androidx.compose.runtime.Providers
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.platform.testTag
@@ -365,7 +365,7 @@ class LazyListsReverseLayoutTest {
     @Test
     fun row_rtl_emitTwoElementsAsOneItem_positionedReversed() {
         rule.setContentWithTestViewConfiguration {
-            Providers(LocalLayoutDirection provides LayoutDirection.Rtl) {
+            CompositionLocalProvider(LocalLayoutDirection provides LayoutDirection.Rtl) {
                 LazyRow(
                     reverseLayout = true
                 ) {
@@ -386,7 +386,7 @@ class LazyListsReverseLayoutTest {
     @Test
     fun row_rtl_emitTwoItems_positionedReversed() {
         rule.setContentWithTestViewConfiguration {
-            Providers(LocalLayoutDirection provides LayoutDirection.Rtl) {
+            CompositionLocalProvider(LocalLayoutDirection provides LayoutDirection.Rtl) {
                 LazyRow(
                     reverseLayout = true
                 ) {
@@ -410,7 +410,7 @@ class LazyListsReverseLayoutTest {
     fun row_rtl_scrollForwardHalfWay() {
         lateinit var state: LazyListState
         rule.setContentWithTestViewConfiguration {
-            Providers(LocalLayoutDirection provides LayoutDirection.Rtl) {
+            CompositionLocalProvider(LocalLayoutDirection provides LayoutDirection.Rtl) {
                 LazyRow(
                     reverseLayout = true,
                     state = rememberLazyListState().also { state = it },

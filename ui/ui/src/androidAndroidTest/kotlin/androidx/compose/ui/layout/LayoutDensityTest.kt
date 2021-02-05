@@ -16,7 +16,7 @@
 
 package androidx.compose.ui.layout
 
-import androidx.compose.runtime.Providers
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
@@ -45,7 +45,7 @@ class LayoutDensityTest {
         var measureScopeDensity = 0f
         var measureScopeFontScale = 0f
         rule.setContent {
-            Providers(LocalDensity provides Density(localDensity, localFontScale)) {
+            CompositionLocalProvider(LocalDensity provides Density(localDensity, localFontScale)) {
                 Layout({}) { _, _ ->
                     measureScopeDensity = density
                     measureScopeFontScale = fontScale

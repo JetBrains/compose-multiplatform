@@ -17,6 +17,8 @@
 package androidx.compose.ui.graphics.vector
 
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.Composition
+import androidx.compose.runtime.CompositionContext
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.getValue
@@ -136,6 +138,28 @@ class VectorPainter internal constructor() : Painter() {
         }
     }
 
+    private var composition: Composition? = null
+
+    private fun composeVector(
+        parent: CompositionContext,
+        composable: @Composable (viewportWidth: Float, viewportHeight: Float) -> Unit
+    ): Composition {
+        val existing = composition
+        val next = if (existing == null || existing.isDisposed) {
+            Composition(
+                VectorApplier(vector.root),
+                parent
+            )
+        } else {
+            existing
+        }
+        composition = next
+        next.setContent {
+            composable(vector.viewportWidth, vector.viewportHeight)
+        }
+        return next
+    }
+
     private var isDirty by mutableStateOf(true)
 
     @Composable
@@ -151,7 +175,6 @@ class VectorPainter internal constructor() : Painter() {
             this.viewportHeight = viewportHeight
         }
         val composition = composeVector(
-            vector,
             rememberCompositionContext(),
             content
         )

@@ -16,7 +16,6 @@
 
 package androidx.compose.runtime.tooling
 
-import androidx.compose.runtime.CompositionData
 import androidx.compose.runtime.InternalComposeApi
 import androidx.compose.runtime.staticCompositionLocalOf
 

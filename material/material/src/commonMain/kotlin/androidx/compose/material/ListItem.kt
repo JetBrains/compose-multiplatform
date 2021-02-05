@@ -23,7 +23,7 @@ import androidx.compose.foundation.layout.preferredHeightIn
 import androidx.compose.foundation.layout.preferredSizeIn
 import androidx.compose.foundation.layout.preferredWidthIn
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.Providers
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.AlignmentLine
@@ -417,7 +417,7 @@ private fun applyTextStyle(
 ): @Composable (() -> Unit)? {
     if (icon == null) return null
     return {
-        Providers(LocalContentAlpha provides contentAlpha) {
+        CompositionLocalProvider(LocalContentAlpha provides contentAlpha) {
             ProvideTextStyle(textStyle, icon)
         }
     }

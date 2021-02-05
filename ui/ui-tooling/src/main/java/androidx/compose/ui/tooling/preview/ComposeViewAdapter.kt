@@ -30,7 +30,7 @@ import androidx.compose.animation.core.Transition
 import androidx.compose.runtime.AtomicReference
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Composition
-import androidx.compose.runtime.Providers
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.currentComposer
 import androidx.compose.runtime.mutableStateOf
@@ -387,7 +387,7 @@ internal class ComposeViewAdapter : FrameLayout {
         // We need to replace the FontResourceLoader to avoid using ResourcesCompat.
         // ResourcesCompat can not load fonts within Layoutlib and, since Layoutlib always runs
         // the latest version, we do not need it.
-        Providers(LocalFontLoader provides LayoutlibFontResourceLoader(context)) {
+        CompositionLocalProvider(LocalFontLoader provides LayoutlibFontResourceLoader(context)) {
             Inspectable(slotTableRecord, content)
         }
     }

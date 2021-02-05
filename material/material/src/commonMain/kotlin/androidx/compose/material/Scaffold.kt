@@ -20,7 +20,7 @@ import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Immutable
-import androidx.compose.runtime.Providers
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.Stable
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.staticCompositionLocalOf
@@ -274,7 +274,7 @@ private fun ScaffoldLayout(
             }
 
             val bottomBarPlaceables = subcompose(ScaffoldLayoutContent.BottomBar) {
-                Providers(
+                CompositionLocalProvider(
                     LocalFabPlacement provides fabPlacement,
                     content = bottomBar
                 )

@@ -33,7 +33,7 @@ import androidx.compose.foundation.shape.CornerSize
 import androidx.compose.material.ripple.rememberRipple
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.Providers
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.Stable
 import androidx.compose.runtime.State
 import androidx.compose.runtime.remember
@@ -95,7 +95,7 @@ fun FloatingActionButton(
         contentColor = contentColor,
         elevation = elevation.elevation(interactionState).value
     ) {
-        Providers(LocalContentAlpha provides contentColor.alpha) {
+        CompositionLocalProvider(LocalContentAlpha provides contentColor.alpha) {
             ProvideTextStyle(MaterialTheme.typography.button) {
                 Box(
                     modifier = Modifier

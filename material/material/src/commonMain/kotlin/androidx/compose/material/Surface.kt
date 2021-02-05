@@ -21,7 +21,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Box
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.Providers
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
@@ -99,7 +99,7 @@ fun Surface(
     } else {
         color
     }
-    Providers(
+    CompositionLocalProvider(
         LocalContentColor provides contentColor,
         LocalAbsoluteElevation provides absoluteElevation
     ) {

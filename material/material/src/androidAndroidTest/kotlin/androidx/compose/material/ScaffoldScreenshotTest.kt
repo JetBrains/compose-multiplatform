@@ -27,7 +27,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.Menu
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.Providers
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.testutils.assertAgainstGolden
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalLayoutDirection
@@ -653,7 +653,7 @@ private fun ScreenshotScaffold(
 
     val layoutDirection = if (rtl) LayoutDirection.Rtl else LayoutDirection.Ltr
 
-    Providers(LocalLayoutDirection provides layoutDirection) {
+    CompositionLocalProvider(LocalLayoutDirection provides layoutDirection) {
         Box(
             Modifier
                 .fillMaxSize(0.5f)

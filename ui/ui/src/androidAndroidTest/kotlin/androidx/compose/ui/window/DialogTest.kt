@@ -17,7 +17,7 @@ package androidx.compose.ui.window
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.text.BasicText
-import androidx.compose.runtime.Providers
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.compositionLocalOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -260,7 +260,7 @@ class DialogTest {
         val compositionLocal = compositionLocalOf<Float>()
         var value = 0f
         rule.setContent {
-            Providers(compositionLocal provides 1f) {
+            CompositionLocalProvider(compositionLocal provides 1f) {
                 Dialog(onDismissRequest = {}) {
                     value = compositionLocal.current
                 }

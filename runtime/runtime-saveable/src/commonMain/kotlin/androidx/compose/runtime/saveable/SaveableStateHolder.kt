@@ -19,7 +19,7 @@ package androidx.compose.runtime.saveable
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.ExperimentalComposeApi
-import androidx.compose.runtime.Providers
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.key
 import androidx.compose.runtime.remember
 
@@ -83,7 +83,7 @@ private class SaveableStateHolderImpl(
                 }
                 RegistryHolder(key)
             }
-            Providers(
+            CompositionLocalProvider(
                 LocalSaveableStateRegistry provides registryHolder.registry,
                 content = content
             )

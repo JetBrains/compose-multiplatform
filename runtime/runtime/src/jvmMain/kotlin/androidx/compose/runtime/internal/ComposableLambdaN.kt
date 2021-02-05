@@ -26,13 +26,13 @@ import kotlin.jvm.functions.FunctionN
 private const val SLOTS_PER_INT = 10
 
 @Stable
-@ComposeCompilerApi
-class ComposableLambdaN<R>(
+@OptIn(ComposeCompilerApi::class)
+internal class ComposableLambdaNImpl(
     val key: Int,
     private val tracked: Boolean,
     private val sourceInformation: String?,
     override val arity: Int
-) : FunctionN<R> {
+) : ComposableLambdaN {
     private var _block: Any? = null
 
     fun update(block: Any, composer: Composer?) {
@@ -56,7 +56,7 @@ class ComposableLambdaN<R>(
         return realParams
     }
 
-    override fun invoke(vararg args: Any?): R {
+    override fun invoke(vararg args: Any?): Any? {
         val realParams = realParamCount(args.size)
         val c = args[realParams] as Composer
         val allArgsButLast = args.slice(0 until args.size - 1).toTypedArray()
@@ -70,7 +70,7 @@ class ComposableLambdaN<R>(
             c.recordReadOf(this)
         }
         @Suppress("UNCHECKED_CAST")
-        val result = (_block as FunctionN<*>)(*allArgsButLast, dirty) as R
+        val result = (_block as FunctionN<*>)(*allArgsButLast, dirty)
         c.endRestartGroup()?.updateScope { nc, _ ->
             val params = args.slice(0 until realParams).toTypedArray()
             @Suppress("UNUSED_VARIABLE")
@@ -87,6 +87,10 @@ class ComposableLambdaN<R>(
     }
 }
 
+@Stable
+@ComposeCompilerApi
+interface ComposableLambdaN : FunctionN<Any?>
+
 @Suppress("unused")
 @ComposeCompilerApi
 fun composableLambdaN(
@@ -96,16 +100,16 @@ fun composableLambdaN(
     sourceInformation: String?,
     arity: Int,
     block: Any
-): ComposableLambdaN<*> {
+): ComposableLambdaN {
     composer.startReplaceableGroup(key)
     val slot = composer.rememberedValue()
     val result = if (slot === Composer.Empty) {
-        val value = ComposableLambdaN<Any>(key, tracked, sourceInformation, arity)
+        val value = ComposableLambdaNImpl(key, tracked, sourceInformation, arity)
         composer.updateRememberedValue(value)
         value
     } else {
         @Suppress("UNCHECKED_CAST")
-        slot as ComposableLambdaN<Any>
+        slot as ComposableLambdaNImpl
     }
     result.update(block, composer)
     composer.endReplaceableGroup()
@@ -117,11 +121,12 @@ fun composableLambdaN(
 fun composableLambdaNInstance(
     key: Int,
     tracked: Boolean,
+    sourceInformation: String?,
     arity: Int,
     block: Any
-): ComposableLambdaN<*> = ComposableLambdaN<Any>(
+): ComposableLambdaN = ComposableLambdaNImpl(
     key,
     tracked,
-    null,
+    sourceInformation,
     arity
 ).apply { update(block, null) }

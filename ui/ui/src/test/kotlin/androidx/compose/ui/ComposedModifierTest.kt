@@ -211,7 +211,6 @@ fun compose(
     block: @Composable () -> Unit
 ): Composition {
     return Composition(
-        Any(),
         EmptyApplier(),
         recomposer
     ).apply {

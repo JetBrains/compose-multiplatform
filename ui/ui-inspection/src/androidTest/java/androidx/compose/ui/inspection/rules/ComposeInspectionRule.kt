@@ -18,7 +18,7 @@ package androidx.compose.ui.inspection.rules
 
 import android.app.Activity
 import android.view.inspector.WindowInspector
-import androidx.compose.runtime.CompositionData
+import androidx.compose.runtime.tooling.CompositionData
 import androidx.compose.ui.R
 import androidx.compose.ui.platform.ViewRootForTest
 import androidx.inspection.testing.InspectorTester

@@ -16,7 +16,7 @@
 
 package androidx.compose.material
 
-import androidx.compose.runtime.Providers
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.test.filters.MediumTest
@@ -68,7 +68,7 @@ class ContentAlphaTest(private val colors: Colors, private val debugParameterNam
         rule.setContent {
             MaterialTheme(colors) {
                 Surface {
-                    Providers(LocalContentAlpha provides ContentAlpha.high) {
+                    CompositionLocalProvider(LocalContentAlpha provides ContentAlpha.high) {
                         assertThat(LocalContentAlpha.current)
                             .isEqualTo(ReducedContrastHighContentAlpha)
                     }
@@ -82,7 +82,7 @@ class ContentAlphaTest(private val colors: Colors, private val debugParameterNam
         rule.setContent {
             MaterialTheme(colors) {
                 Surface {
-                    Providers(LocalContentAlpha provides ContentAlpha.medium) {
+                    CompositionLocalProvider(LocalContentAlpha provides ContentAlpha.medium) {
                         assertThat(LocalContentAlpha.current)
                             .isEqualTo(ReducedContrastMediumContentAlpha)
                     }
@@ -96,7 +96,7 @@ class ContentAlphaTest(private val colors: Colors, private val debugParameterNam
         rule.setContent {
             MaterialTheme(colors) {
                 Surface {
-                    Providers(LocalContentAlpha provides ContentAlpha.disabled) {
+                    CompositionLocalProvider(LocalContentAlpha provides ContentAlpha.disabled) {
                         assertThat(LocalContentAlpha.current)
                             .isEqualTo(ReducedContrastDisabledContentAlpha)
                     }
@@ -123,7 +123,7 @@ class ContentAlphaTest(private val colors: Colors, private val debugParameterNam
         rule.setContent {
             MaterialTheme(colors) {
                 Surface(color = colors.primary) {
-                    Providers(LocalContentAlpha provides ContentAlpha.high) {
+                    CompositionLocalProvider(LocalContentAlpha provides ContentAlpha.high) {
                         assertThat(LocalContentAlpha.current)
                             .isEqualTo(HighContrastHighContentAlpha)
                     }
@@ -137,7 +137,7 @@ class ContentAlphaTest(private val colors: Colors, private val debugParameterNam
         rule.setContent {
             MaterialTheme(colors) {
                 Surface(color = colors.primary) {
-                    Providers(LocalContentAlpha provides ContentAlpha.medium) {
+                    CompositionLocalProvider(LocalContentAlpha provides ContentAlpha.medium) {
                         assertThat(LocalContentAlpha.current)
                             .isEqualTo(HighContrastMediumContentAlpha)
                     }
@@ -151,7 +151,7 @@ class ContentAlphaTest(private val colors: Colors, private val debugParameterNam
         rule.setContent {
             MaterialTheme(colors) {
                 Surface(color = colors.primary) {
-                    Providers(LocalContentAlpha provides ContentAlpha.disabled) {
+                    CompositionLocalProvider(LocalContentAlpha provides ContentAlpha.disabled) {
                         assertThat(LocalContentAlpha.current)
                             .isEqualTo(HighContrastDisabledContentAlpha)
                     }
@@ -177,7 +177,7 @@ class ContentAlphaTest(private val colors: Colors, private val debugParameterNam
             MaterialTheme(colors) {
                 val contentColor = Color(0.9f, 0.9f, 0.9f)
                 Surface(contentColor = contentColor) {
-                    Providers(LocalContentAlpha provides ContentAlpha.high) {
+                    CompositionLocalProvider(LocalContentAlpha provides ContentAlpha.high) {
                         val expectedAlpha = if (colors.isLight) {
                             HighContrastHighContentAlpha
                         } else {
@@ -196,7 +196,7 @@ class ContentAlphaTest(private val colors: Colors, private val debugParameterNam
             MaterialTheme(colors) {
                 val contentColor = Color(0.9f, 0.9f, 0.9f)
                 Surface(contentColor = contentColor) {
-                    Providers(LocalContentAlpha provides ContentAlpha.medium) {
+                    CompositionLocalProvider(LocalContentAlpha provides ContentAlpha.medium) {
                         val expectedAlpha = if (colors.isLight) {
                             HighContrastMediumContentAlpha
                         } else {
@@ -215,7 +215,7 @@ class ContentAlphaTest(private val colors: Colors, private val debugParameterNam
             MaterialTheme(colors) {
                 val contentColor = Color(0.9f, 0.9f, 0.9f)
                 Surface(contentColor = contentColor) {
-                    Providers(LocalContentAlpha provides ContentAlpha.disabled) {
+                    CompositionLocalProvider(LocalContentAlpha provides ContentAlpha.disabled) {
                         val expectedAlpha = if (colors.isLight) {
                             HighContrastDisabledContentAlpha
                         } else {
@@ -234,7 +234,7 @@ class ContentAlphaTest(private val colors: Colors, private val debugParameterNam
             MaterialTheme(colors) {
                 val contentColor = Color(0.1f, 0.1f, 0.1f)
                 Surface(contentColor = contentColor) {
-                    Providers(LocalContentAlpha provides ContentAlpha.high) {
+                    CompositionLocalProvider(LocalContentAlpha provides ContentAlpha.high) {
                         val expectedAlpha = if (colors.isLight) {
                             ReducedContrastHighContentAlpha
                         } else {
@@ -253,7 +253,7 @@ class ContentAlphaTest(private val colors: Colors, private val debugParameterNam
             MaterialTheme(colors) {
                 val contentColor = Color(0.1f, 0.1f, 0.1f)
                 Surface(contentColor = contentColor) {
-                    Providers(LocalContentAlpha provides ContentAlpha.medium) {
+                    CompositionLocalProvider(LocalContentAlpha provides ContentAlpha.medium) {
                         val expectedAlpha = if (colors.isLight) {
                             ReducedContrastMediumContentAlpha
                         } else {
@@ -272,7 +272,7 @@ class ContentAlphaTest(private val colors: Colors, private val debugParameterNam
             MaterialTheme(colors) {
                 val contentColor = Color(0.1f, 0.1f, 0.1f)
                 Surface(contentColor = contentColor) {
-                    Providers(LocalContentAlpha provides ContentAlpha.disabled) {
+                    CompositionLocalProvider(LocalContentAlpha provides ContentAlpha.disabled) {
                         val expectedAlpha = if (colors.isLight) {
                             ReducedContrastDisabledContentAlpha
                         } else {

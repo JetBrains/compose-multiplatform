@@ -23,7 +23,6 @@ import kotlin.contracts.ExperimentalContracts
  * Maps values to a set of scopes using the [identityHashCode] for both the value and the
  * scope for uniqueness.
  */
-@Suppress("NOTHING_TO_INLINE")
 @OptIn(ExperimentalContracts::class)
 internal class IdentityScopeMap<T : Any> {
     /**
@@ -57,6 +56,7 @@ internal class IdentityScopeMap<T : Any> {
     /**
      * Returns the value at the given [index] order in the map.
      */
+    @Suppress("NOTHING_TO_INLINE")
     private inline fun valueAt(index: Int): Any {
         return values[valueOrder[index]]!!
     }

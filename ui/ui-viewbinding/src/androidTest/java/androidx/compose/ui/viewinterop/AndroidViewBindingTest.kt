@@ -18,7 +18,7 @@ package androidx.compose.ui.viewinterop
 
 import android.os.Build
 import androidx.compose.foundation.layout.size
-import androidx.compose.runtime.Providers
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.testutils.assertPixels
 import androidx.compose.ui.Modifier
@@ -94,7 +94,7 @@ class AndroidViewBindingTest {
             val size = 50.dp
             val density = Density(3f)
             val sizeIpx = with(density) { size.roundToPx() }
-            Providers(LocalDensity provides density) {
+            CompositionLocalProvider(LocalDensity provides density) {
                 AndroidViewBinding(
                     TestLayoutBinding::inflate,
                     Modifier.size(size).onGloballyPositioned {

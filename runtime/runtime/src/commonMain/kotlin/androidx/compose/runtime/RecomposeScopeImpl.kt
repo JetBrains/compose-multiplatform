@@ -28,19 +28,6 @@ interface RecomposeScope {
 }
 
 /**
- * Returns an object which can be used to invalidate the current scope at this point in composition.
- * This object can be used to manually cause recompositions.
- */
-val currentRecomposeScope: RecomposeScope
-    @ReadOnlyComposable
-    @OptIn(InternalComposeApi::class)
-    @Composable get() {
-        val scope = currentComposer.recomposeScope ?: error("no recompose scope found")
-        currentComposer.recordUsed(scope)
-        return scope
-    }
-
-/**
  * A RecomposeScope is created for a region of the composition that can be recomposed independently
  * of the rest of the composition. The composer will position the slot table to the location
  * stored in [anchor] and call [block] when recomposition is requested. It is created by

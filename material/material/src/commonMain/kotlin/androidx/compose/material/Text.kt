@@ -19,7 +19,7 @@ package androidx.compose.material
 import androidx.compose.foundation.text.BasicText
 import androidx.compose.foundation.text.InlineTextContent
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.Providers
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.compositionLocalOf
 import androidx.compose.runtime.structuralEqualityPolicy
 import androidx.compose.ui.Modifier
@@ -243,5 +243,5 @@ val LocalTextStyle = compositionLocalOf(structuralEqualityPolicy()) { TextStyle.
 @Composable
 fun ProvideTextStyle(value: TextStyle, content: @Composable () -> Unit) {
     val mergedStyle = LocalTextStyle.current.merge(value)
-    Providers(LocalTextStyle provides mergedStyle, content = content)
+    CompositionLocalProvider(LocalTextStyle provides mergedStyle, content = content)
 }

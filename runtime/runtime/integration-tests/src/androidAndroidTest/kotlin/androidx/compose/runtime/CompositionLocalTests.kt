@@ -65,7 +65,7 @@ class CompositionLocalTests : BaseComposeTest() {
         compose {
             assertEquals("Default", someTextCompositionLocal.current)
             assertEquals(1, someIntCompositionLocal.current)
-            Providers(
+            CompositionLocalProvider(
                 someTextCompositionLocal provides "Test1",
                 someIntCompositionLocal provides 12,
                 someOtherIntProvider provides 42,
@@ -81,7 +81,7 @@ class CompositionLocalTests : BaseComposeTest() {
                     someOtherIntCompositionLocal.current
                 )
                 assertEquals(50, someStaticInt.current)
-                Providers(
+                CompositionLocalProvider(
                     someTextCompositionLocal provides "Test2",
                     someStaticInt provides 60
                 ) {
@@ -126,7 +126,7 @@ class CompositionLocalTests : BaseComposeTest() {
         var someText = "Unmodified"
         compose {
             invalidates.add(currentRecomposeScope)
-            Providers(
+            CompositionLocalProvider(
                 someTextCompositionLocal provides someText
             ) {
                 ReadStringCompositionLocal(
@@ -154,7 +154,7 @@ class CompositionLocalTests : BaseComposeTest() {
         var someText = "Unmodified"
         compose {
             invalidates.add(currentRecomposeScope)
-            Providers(
+            CompositionLocalProvider(
                 staticStringCompositionLocal provides someText
             ) {
                 ReadStringCompositionLocal(
@@ -182,7 +182,7 @@ class CompositionLocalTests : BaseComposeTest() {
         compose {
             invalidates.add(currentRecomposeScope)
 
-            Providers(
+            CompositionLocalProvider(
                 someTextCompositionLocal provides someText,
                 someIntCompositionLocal provides 0
             ) {
@@ -195,7 +195,7 @@ class CompositionLocalTests : BaseComposeTest() {
                     )
                     assertEquals(0, someIntCompositionLocal.current)
 
-                    Providers(
+                    CompositionLocalProvider(
                         someIntCompositionLocal provides 42
                     ) {
                         assertEquals(
@@ -231,7 +231,7 @@ class CompositionLocalTests : BaseComposeTest() {
         compose {
             invalidates.add(currentRecomposeScope)
 
-            Providers(
+            CompositionLocalProvider(
                 staticSomeTextCompositionLocal provides someText,
                 staticSomeIntCompositionLocal provides 0
             ) {
@@ -247,7 +247,7 @@ class CompositionLocalTests : BaseComposeTest() {
                     assertEquals(someText, staticSomeTextCompositionLocal.current)
                     assertEquals(0, staticSomeIntCompositionLocal.current)
 
-                    Providers(
+                    CompositionLocalProvider(
                         staticSomeIntCompositionLocal provides 42
                     ) {
                         assertEquals(someText, staticSomeTextCompositionLocal.current)
@@ -276,7 +276,7 @@ class CompositionLocalTests : BaseComposeTest() {
         compose {
             invalidates.add(currentRecomposeScope)
 
-            Providers(
+            CompositionLocalProvider(
                 someTextCompositionLocal provides someText,
                 someIntCompositionLocal provides 0
             ) {
@@ -292,7 +292,7 @@ class CompositionLocalTests : BaseComposeTest() {
                     )
                     assertEquals(0, someIntCompositionLocal.current)
 
-                    Providers(
+                    CompositionLocalProvider(
                         someIntCompositionLocal provides 42
                     ) {
                         assertEquals(
@@ -332,7 +332,7 @@ class CompositionLocalTests : BaseComposeTest() {
         compose {
             invalidates.add(currentRecomposeScope)
 
-            Providers(
+            CompositionLocalProvider(
                 staticSomeTextCompositionLocal provides someText,
                 staticSomeIntCompositionLocal provides 0
             ) {
@@ -349,7 +349,7 @@ class CompositionLocalTests : BaseComposeTest() {
                     assertEquals(someText, staticSomeTextCompositionLocal.current)
                     assertEquals(0, staticSomeIntCompositionLocal.current)
 
-                    Providers(
+                    CompositionLocalProvider(
                         staticSomeIntCompositionLocal provides 42
                     ) {
                         assertEquals(someText, staticSomeTextCompositionLocal.current)
@@ -384,7 +384,7 @@ class CompositionLocalTests : BaseComposeTest() {
         compose {
             invalidates.add(currentRecomposeScope)
 
-            Providers(
+            CompositionLocalProvider(
                 staticSomeTextCompositionLocal provides someText,
                 staticSomeIntCompositionLocal provides 0
             ) {
@@ -432,7 +432,7 @@ class CompositionLocalTests : BaseComposeTest() {
         val someStaticString = staticCompositionLocalOf { "Default" }
         var shouldRead = false
         compose {
-            Providers(
+            CompositionLocalProvider(
                 someStaticString provides "Provided A"
             ) {
                 Observe {
@@ -470,7 +470,7 @@ class CompositionLocalTests : BaseComposeTest() {
         compose {
             Observe {
                 invalidates.add(currentRecomposeScope)
-                Providers(
+                CompositionLocalProvider(
                     someDataCompositionLocal provides SomeData("provided")
                 ) {
                     ReadSomeDataCompositionLocal(someDataCompositionLocal)
@@ -508,9 +508,7 @@ class CompositionLocalTests : BaseComposeTest() {
         val ref = Ref<CompositionContext>()
         narrowInvalidateForReference(ref = ref)
         return {
-//            @OptIn(ExperimentalComposeApi::class)
 //            Composition(
-//                container,
 //                UiApplier(container),
 //                ref.value
 //            ).apply {

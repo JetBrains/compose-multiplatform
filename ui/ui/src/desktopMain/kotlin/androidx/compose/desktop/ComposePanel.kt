@@ -16,7 +16,7 @@
 package androidx.compose.desktop
 
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.Providers
+import androidx.compose.runtime.CompositionLocalProvider
 import java.awt.Color
 import java.awt.Component
 import java.awt.event.ComponentAdapter
@@ -66,7 +66,7 @@ class ComposePanel : JLayeredPane() {
     private fun initContent() {
         if (layer != null && content != null) {
             layer!!.setContent {
-                Providers(
+                CompositionLocalProvider(
                     LocalLayerContainer provides this,
                     content = content!!
                 )

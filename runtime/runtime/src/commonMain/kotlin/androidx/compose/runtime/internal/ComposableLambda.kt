@@ -44,39 +44,13 @@ internal fun differentBits(slot: Int): Int = bitsForSlot(0b10, slot)
  * multiple levels of composable functions.
  */
 @Stable
-@ComposeCompilerApi
+@OptIn(ComposeCompilerApi::class)
 /* ktlint-disable parameter-list-wrapping */ // TODO(https://github.com/pinterest/ktlint/issues/921): reenable
-class ComposableLambda<
-    P1, P2, P3, P4, P5, P6, P7, P8, P9, P10, P11, P12, P13, P14, P15, P16,
-    P17, P18, R>(
+internal class ComposableLambdaImpl(
     val key: Int,
     private val tracked: Boolean,
     private val sourceInformation: String?
-) :
-    Function2<Composer, Int, R>,
-    Function3<P1, Composer, Int, R>,
-    Function4<P1, P2, Composer, Int, R>,
-    Function5<P1, P2, P3, Composer, Int, R>,
-    Function6<P1, P2, P3, P4, Composer, Int, R>,
-    Function7<P1, P2, P3, P4, P5, Composer, Int, R>,
-    Function8<P1, P2, P3, P4, P5, P6, Composer, Int, R>,
-    Function9<P1, P2, P3, P4, P5, P6, P7, Composer, Int, R>,
-    Function10<P1, P2, P3, P4, P5, P6, P7, P8, Composer, Int, R>,
-    Function11<P1, P2, P3, P4, P5, P6, P7, P8, P9, Composer, Int, R>,
-    Function13<P1, P2, P3, P4, P5, P6, P7, P8, P9, P10, Composer, Int, Int, R>,
-    Function14<P1, P2, P3, P4, P5, P6, P7, P8, P9, P10, P11, Composer, Int, Int, R>,
-    Function15<P1, P2, P3, P4, P5, P6, P7, P8, P9, P10, P11, P12, Composer, Int, Int, R>,
-    Function16<P1, P2, P3, P4, P5, P6, P7, P8, P9, P10, P11, P12, P13, Composer, Int, Int, R>,
-    Function17<P1, P2, P3, P4, P5, P6, P7, P8, P9, P10, P11, P12, P13, P14, Composer, Int,
-        Int, R>,
-    Function18<P1, P2, P3, P4, P5, P6, P7, P8, P9, P10, P11, P12, P13, P14, P15, Composer,
-        Int, Int, R>,
-    Function19<P1, P2, P3, P4, P5, P6, P7, P8, P9, P10, P11, P12, P13, P14, P15, P16,
-        Composer, Int, Int, R>,
-    Function20<P1, P2, P3, P4, P5, P6, P7, P8, P9, P10, P11, P12, P13, P14, P15, P16, P17,
-        Composer, Int, Int, R>,
-    Function21<P1, P2, P3, P4, P5, P6, P7, P8, P9, P10, P11, P12, P13, P14, P15, P16, P17, P18,
-        Composer, Int, Int, R> {
+) : ComposableLambda {
     private var _block: Any? = null
     private var scope: RecomposeScope? = null
     private var scopes: MutableList<RecomposeScope>? = null
@@ -139,25 +113,25 @@ class ComposableLambda<
         }
     }
 
-    override operator fun invoke(c: Composer, changed: Int): R {
+    override operator fun invoke(c: Composer, changed: Int): Any? {
         c.startRestartGroup(key, sourceInformation)
         trackRead(c)
         val dirty = changed or if (c.changed(this)) differentBits(0) else sameBits(0)
-        val result = (_block as (c: Composer, changed: Int) -> R)(c, dirty)
+        val result = (_block as (c: Composer, changed: Int) -> Any?)(c, dirty)
         c.endRestartGroup()?.updateScope(this as (Composer, Int) -> Unit)
         return result
     }
 
-    override operator fun invoke(p1: P1, c: Composer, changed: Int): R {
+    override operator fun invoke(p1: Any?, c: Composer, changed: Int): Any? {
         c.startRestartGroup(key, sourceInformation)
         trackRead(c)
         val dirty = changed or if (c.changed(this)) differentBits(1) else sameBits(1)
         val result = (
             _block as (
-                p1: P1,
+                p1: Any?,
                 c: Composer,
                 changed: Int
-            ) -> R
+            ) -> Any?
             )(
             p1,
             c,
@@ -167,11 +141,11 @@ class ComposableLambda<
         return result
     }
 
-    override operator fun invoke(p1: P1, p2: P2, c: Composer, changed: Int): R {
+    override operator fun invoke(p1: Any?, p2: Any?, c: Composer, changed: Int): Any? {
         c.startRestartGroup(key, sourceInformation)
         trackRead(c)
         val dirty = changed or if (c.changed(this)) differentBits(2) else sameBits(2)
-        val result = (_block as (p1: P1, p2: P2, c: Composer, changed: Int) -> R)(
+        val result = (_block as (p1: Any?, p2: Any?, c: Composer, changed: Int) -> Any?)(
             p1,
             p2,
             c,
@@ -181,18 +155,18 @@ class ComposableLambda<
         return result
     }
 
-    override operator fun invoke(p1: P1, p2: P2, p3: P3, c: Composer, changed: Int): R {
+    override operator fun invoke(p1: Any?, p2: Any?, p3: Any?, c: Composer, changed: Int): Any? {
         c.startRestartGroup(key, sourceInformation)
         trackRead(c)
         val dirty = changed or if (c.changed(this)) differentBits(3) else sameBits(3)
         val result = (
             _block as (
-                p1: P1,
-                p2: P2,
-                p3: P3,
+                p1: Any?,
+                p2: Any?,
+                p3: Any?,
                 c: Composer,
                 changed: Int
-            ) -> R
+            ) -> Any?
             )(
             p1,
             p2,
@@ -205,25 +179,25 @@ class ComposableLambda<
     }
 
     override operator fun invoke(
-        p1: P1,
-        p2: P2,
-        p3: P3,
-        p4: P4,
+        p1: Any?,
+        p2: Any?,
+        p3: Any?,
+        p4: Any?,
         c: Composer,
         changed: Int
-    ): R {
+    ): Any? {
         c.startRestartGroup(key, sourceInformation)
         trackRead(c)
         val dirty = changed or if (c.changed(this)) differentBits(4) else sameBits(4)
         val result = (
             _block as (
-                p1: P1,
-                p2: P2,
-                p3: P3,
-                p4: P4,
+                p1: Any?,
+                p2: Any?,
+                p3: Any?,
+                p4: Any?,
                 c: Composer,
                 changed: Int
-            ) -> R
+            ) -> Any?
             )(
             p1,
             p2,
@@ -239,27 +213,27 @@ class ComposableLambda<
     }
 
     override operator fun invoke(
-        p1: P1,
-        p2: P2,
-        p3: P3,
-        p4: P4,
-        p5: P5,
+        p1: Any?,
+        p2: Any?,
+        p3: Any?,
+        p4: Any?,
+        p5: Any?,
         c: Composer,
         changed: Int
-    ): R {
+    ): Any? {
         c.startRestartGroup(key, sourceInformation)
         trackRead(c)
         val dirty = changed or if (c.changed(this)) differentBits(5) else sameBits(5)
         val result = (
             _block as (
-                p1: P1,
-                p2: P2,
-                p3: P3,
-                p4: P4,
-                p5: P5,
+                p1: Any?,
+                p2: Any?,
+                p3: Any?,
+                p4: Any?,
+                p5: Any?,
                 c: Composer,
                 changed: Int
-            ) -> R
+            ) -> Any?
             )(
             p1,
             p2,
@@ -276,29 +250,29 @@ class ComposableLambda<
     }
 
     override operator fun invoke(
-        p1: P1,
-        p2: P2,
-        p3: P3,
-        p4: P4,
-        p5: P5,
-        p6: P6,
+        p1: Any?,
+        p2: Any?,
+        p3: Any?,
+        p4: Any?,
+        p5: Any?,
+        p6: Any?,
         c: Composer,
         changed: Int
-    ): R {
+    ): Any? {
         c.startRestartGroup(key, sourceInformation)
         trackRead(c)
         val dirty = changed or if (c.changed(this)) differentBits(6) else sameBits(6)
         val result = (
             _block as (
-                p1: P1,
-                p2: P2,
-                p3: P3,
-                p4: P4,
-                p5: P5,
-                p6: P6,
+                p1: Any?,
+                p2: Any?,
+                p3: Any?,
+                p4: Any?,
+                p5: Any?,
+                p6: Any?,
                 c: Composer,
                 changed: Int
-            ) -> R
+            ) -> Any?
             )(
             p1,
             p2,
@@ -316,31 +290,31 @@ class ComposableLambda<
     }
 
     override operator fun invoke(
-        p1: P1,
-        p2: P2,
-        p3: P3,
-        p4: P4,
-        p5: P5,
-        p6: P6,
-        p7: P7,
+        p1: Any?,
+        p2: Any?,
+        p3: Any?,
+        p4: Any?,
+        p5: Any?,
+        p6: Any?,
+        p7: Any?,
         c: Composer,
         changed: Int
-    ): R {
+    ): Any? {
         c.startRestartGroup(key, sourceInformation)
         trackRead(c)
         val dirty = changed or if (c.changed(this)) differentBits(7) else sameBits(7)
         val result = (
             _block as (
-                p1: P1,
-                p2: P2,
-                p3: P3,
-                p4: P4,
-                p5: P5,
-                p6: P6,
-                p7: P7,
+                p1: Any?,
+                p2: Any?,
+                p3: Any?,
+                p4: Any?,
+                p5: Any?,
+                p6: Any?,
+                p7: Any?,
                 c: Composer,
                 changed: Int
-            ) -> R
+            ) -> Any?
             )(
             p1,
             p2,
@@ -359,33 +333,33 @@ class ComposableLambda<
     }
 
     override operator fun invoke(
-        p1: P1,
-        p2: P2,
-        p3: P3,
-        p4: P4,
-        p5: P5,
-        p6: P6,
-        p7: P7,
-        p8: P8,
+        p1: Any?,
+        p2: Any?,
+        p3: Any?,
+        p4: Any?,
+        p5: Any?,
+        p6: Any?,
+        p7: Any?,
+        p8: Any?,
         c: Composer,
         changed: Int
-    ): R {
+    ): Any? {
         c.startRestartGroup(key, sourceInformation)
         trackRead(c)
         val dirty = changed or if (c.changed(this)) differentBits(8) else sameBits(8)
         val result = (
             _block as (
-                p1: P1,
-                p2: P2,
-                p3: P3,
-                p4: P4,
-                p5: P5,
-                p6: P6,
-                p7: P7,
-                p8: P8,
+                p1: Any?,
+                p2: Any?,
+                p3: Any?,
+                p4: Any?,
+                p5: Any?,
+                p6: Any?,
+                p7: Any?,
+                p8: Any?,
                 c: Composer,
                 changed: Int
-            ) -> R
+            ) -> Any?
             )(
             p1,
             p2,
@@ -405,35 +379,35 @@ class ComposableLambda<
     }
 
     override operator fun invoke(
-        p1: P1,
-        p2: P2,
-        p3: P3,
-        p4: P4,
-        p5: P5,
-        p6: P6,
-        p7: P7,
-        p8: P8,
-        p9: P9,
+        p1: Any?,
+        p2: Any?,
+        p3: Any?,
+        p4: Any?,
+        p5: Any?,
+        p6: Any?,
+        p7: Any?,
+        p8: Any?,
+        p9: Any?,
         c: Composer,
         changed: Int
-    ): R {
+    ): Any? {
         c.startRestartGroup(key, sourceInformation)
         trackRead(c)
         val dirty = changed or if (c.changed(this)) differentBits(9) else sameBits(9)
         val result = (
             _block as (
-                p1: P1,
-                p2: P2,
-                p3: P3,
-                p4: P4,
-                p5: P5,
-                p6: P6,
-                p7: P7,
-                p8: P8,
-                p9: P9,
+                p1: Any?,
+                p2: Any?,
+                p3: Any?,
+                p4: Any?,
+                p5: Any?,
+                p6: Any?,
+                p7: Any?,
+                p8: Any?,
+                p9: Any?,
                 c: Composer,
                 changed: Int
-            ) -> R
+            ) -> Any?
             )(
             p1,
             p2,
@@ -454,39 +428,39 @@ class ComposableLambda<
     }
 
     override operator fun invoke(
-        p1: P1,
-        p2: P2,
-        p3: P3,
-        p4: P4,
-        p5: P5,
-        p6: P6,
-        p7: P7,
-        p8: P8,
-        p9: P9,
-        p10: P10,
+        p1: Any?,
+        p2: Any?,
+        p3: Any?,
+        p4: Any?,
+        p5: Any?,
+        p6: Any?,
+        p7: Any?,
+        p8: Any?,
+        p9: Any?,
+        p10: Any?,
         c: Composer,
         changed: Int,
         changed1: Int
-    ): R {
+    ): Any? {
         c.startRestartGroup(key, sourceInformation)
         trackRead(c)
         val dirty = changed1 or if (c.changed(this)) differentBits(10) else sameBits(10)
         val result = (
             _block as (
-                p1: P1,
-                p2: P2,
-                p3: P3,
-                p4: P4,
-                p5: P5,
-                p6: P6,
-                p7: P7,
-                p8: P8,
-                p9: P9,
-                p10: P10,
+                p1: Any?,
+                p2: Any?,
+                p3: Any?,
+                p4: Any?,
+                p5: Any?,
+                p6: Any?,
+                p7: Any?,
+                p8: Any?,
+                p9: Any?,
+                p10: Any?,
                 c: Composer,
                 changed: Int,
                 changed1: Int
-            ) -> R
+            ) -> Any?
             )(
             p1,
             p2,
@@ -509,41 +483,41 @@ class ComposableLambda<
     }
 
     override operator fun invoke(
-        p1: P1,
-        p2: P2,
-        p3: P3,
-        p4: P4,
-        p5: P5,
-        p6: P6,
-        p7: P7,
-        p8: P8,
-        p9: P9,
-        p10: P10,
-        p11: P11,
+        p1: Any?,
+        p2: Any?,
+        p3: Any?,
+        p4: Any?,
+        p5: Any?,
+        p6: Any?,
+        p7: Any?,
+        p8: Any?,
+        p9: Any?,
+        p10: Any?,
+        p11: Any?,
         c: Composer,
         changed: Int,
         changed1: Int
-    ): R {
+    ): Any? {
         c.startRestartGroup(key, sourceInformation)
         trackRead(c)
         val dirty = changed1 or if (c.changed(this)) differentBits(11) else sameBits(11)
         val result = (
             _block as (
-                p1: P1,
-                p2: P2,
-                p3: P3,
-                p4: P4,
-                p5: P5,
-                p6: P6,
-                p7: P7,
-                p8: P8,
-                p9: P9,
-                p10: P10,
-                p11: P11,
+                p1: Any?,
+                p2: Any?,
+                p3: Any?,
+                p4: Any?,
+                p5: Any?,
+                p6: Any?,
+                p7: Any?,
+                p8: Any?,
+                p9: Any?,
+                p10: Any?,
+                p11: Any?,
                 c: Composer,
                 changed: Int,
                 changed1: Int
-            ) -> R
+            ) -> Any?
             )(
             p1,
             p2,
@@ -567,43 +541,43 @@ class ComposableLambda<
     }
 
     override operator fun invoke(
-        p1: P1,
-        p2: P2,
-        p3: P3,
-        p4: P4,
-        p5: P5,
-        p6: P6,
-        p7: P7,
-        p8: P8,
-        p9: P9,
-        p10: P10,
-        p11: P11,
-        p12: P12,
+        p1: Any?,
+        p2: Any?,
+        p3: Any?,
+        p4: Any?,
+        p5: Any?,
+        p6: Any?,
+        p7: Any?,
+        p8: Any?,
+        p9: Any?,
+        p10: Any?,
+        p11: Any?,
+        p12: Any?,
         c: Composer,
         changed: Int,
         changed1: Int
-    ): R {
+    ): Any? {
         c.startRestartGroup(key, sourceInformation)
         trackRead(c)
         val dirty = changed1 or if (c.changed(this)) differentBits(12) else sameBits(12)
         val result = (
             _block as (
-                p1: P1,
-                p2: P2,
-                p3: P3,
-                p4: P4,
-                p5: P5,
-                p6: P6,
-                p7: P7,
-                p8: P8,
-                p9: P9,
-                p10: P10,
-                p11: P11,
-                p12: P12,
+                p1: Any?,
+                p2: Any?,
+                p3: Any?,
+                p4: Any?,
+                p5: Any?,
+                p6: Any?,
+                p7: Any?,
+                p8: Any?,
+                p9: Any?,
+                p10: Any?,
+                p11: Any?,
+                p12: Any?,
                 c: Composer,
                 changed: Int,
                 changed1: Int
-            ) -> R
+            ) -> Any?
             )(
             p1,
             p2,
@@ -628,45 +602,45 @@ class ComposableLambda<
     }
 
     override operator fun invoke(
-        p1: P1,
-        p2: P2,
-        p3: P3,
-        p4: P4,
-        p5: P5,
-        p6: P6,
-        p7: P7,
-        p8: P8,
-        p9: P9,
-        p10: P10,
-        p11: P11,
-        p12: P12,
-        p13: P13,
+        p1: Any?,
+        p2: Any?,
+        p3: Any?,
+        p4: Any?,
+        p5: Any?,
+        p6: Any?,
+        p7: Any?,
+        p8: Any?,
+        p9: Any?,
+        p10: Any?,
+        p11: Any?,
+        p12: Any?,
+        p13: Any?,
         c: Composer,
         changed: Int,
         changed1: Int
-    ): R {
+    ): Any? {
         c.startRestartGroup(key, sourceInformation)
         trackRead(c)
         val dirty = changed1 or if (c.changed(this)) differentBits(13) else sameBits(13)
         val result = (
             _block as (
-                p1: P1,
-                p2: P2,
-                p3: P3,
-                p4: P4,
-                p5: P5,
-                p6: P6,
-                p7: P7,
-                p8: P8,
-                p9: P9,
-                p10: P10,
-                p11: P11,
-                p12: P12,
-                p13: P13,
+                p1: Any?,
+                p2: Any?,
+                p3: Any?,
+                p4: Any?,
+                p5: Any?,
+                p6: Any?,
+                p7: Any?,
+                p8: Any?,
+                p9: Any?,
+                p10: Any?,
+                p11: Any?,
+                p12: Any?,
+                p13: Any?,
                 c: Composer,
                 changed: Int,
                 changed1: Int
-            ) -> R
+            ) -> Any?
             )(
             p1,
             p2,
@@ -709,47 +683,47 @@ class ComposableLambda<
     }
 
     override operator fun invoke(
-        p1: P1,
-        p2: P2,
-        p3: P3,
-        p4: P4,
-        p5: P5,
-        p6: P6,
-        p7: P7,
-        p8: P8,
-        p9: P9,
-        p10: P10,
-        p11: P11,
-        p12: P12,
-        p13: P13,
-        p14: P14,
+        p1: Any?,
+        p2: Any?,
+        p3: Any?,
+        p4: Any?,
+        p5: Any?,
+        p6: Any?,
+        p7: Any?,
+        p8: Any?,
+        p9: Any?,
+        p10: Any?,
+        p11: Any?,
+        p12: Any?,
+        p13: Any?,
+        p14: Any?,
         c: Composer,
         changed: Int,
         changed1: Int
-    ): R {
+    ): Any? {
         c.startRestartGroup(key, sourceInformation)
         trackRead(c)
         val dirty = changed1 or if (c.changed(this)) differentBits(14) else sameBits(14)
         val result = (
             _block as (
-                p1: P1,
-                p2: P2,
-                p3: P3,
-                p4: P4,
-                p5: P5,
-                p6: P6,
-                p7: P7,
-                p8: P8,
-                p9: P9,
-                p10: P10,
-                p11: P11,
-                p12: P12,
-                p13: P13,
-                p14: P14,
+                p1: Any?,
+                p2: Any?,
+                p3: Any?,
+                p4: Any?,
+                p5: Any?,
+                p6: Any?,
+                p7: Any?,
+                p8: Any?,
+                p9: Any?,
+                p10: Any?,
+                p11: Any?,
+                p12: Any?,
+                p13: Any?,
+                p14: Any?,
                 c: Composer,
                 changed: Int,
                 changed1: Int
-            ) -> R
+            ) -> Any?
             )(
             p1,
             p2,
@@ -794,49 +768,49 @@ class ComposableLambda<
     }
 
     override operator fun invoke(
-        p1: P1,
-        p2: P2,
-        p3: P3,
-        p4: P4,
-        p5: P5,
-        p6: P6,
-        p7: P7,
-        p8: P8,
-        p9: P9,
-        p10: P10,
-        p11: P11,
-        p12: P12,
-        p13: P13,
-        p14: P14,
-        p15: P15,
+        p1: Any?,
+        p2: Any?,
+        p3: Any?,
+        p4: Any?,
+        p5: Any?,
+        p6: Any?,
+        p7: Any?,
+        p8: Any?,
+        p9: Any?,
+        p10: Any?,
+        p11: Any?,
+        p12: Any?,
+        p13: Any?,
+        p14: Any?,
+        p15: Any?,
         c: Composer,
         changed: Int,
         changed1: Int
-    ): R {
+    ): Any? {
         c.startRestartGroup(key, sourceInformation)
         trackRead(c)
         val dirty = changed1 or if (c.changed(this)) differentBits(15) else sameBits(15)
         val result = (
             _block as (
-                p1: P1,
-                p2: P2,
-                p3: P3,
-                p4: P4,
-                p5: P5,
-                p6: P6,
-                p7: P7,
-                p8: P8,
-                p9: P9,
-                p10: P10,
-                p11: P11,
-                p12: P12,
-                p13: P13,
-                p14: P14,
-                p15: P15,
+                p1: Any?,
+                p2: Any?,
+                p3: Any?,
+                p4: Any?,
+                p5: Any?,
+                p6: Any?,
+                p7: Any?,
+                p8: Any?,
+                p9: Any?,
+                p10: Any?,
+                p11: Any?,
+                p12: Any?,
+                p13: Any?,
+                p14: Any?,
+                p15: Any?,
                 c: Composer,
                 changed: Int,
                 changed1: Int
-            ) -> R
+            ) -> Any?
             )(
             p1,
             p2,
@@ -883,51 +857,51 @@ class ComposableLambda<
     }
 
     override operator fun invoke(
-        p1: P1,
-        p2: P2,
-        p3: P3,
-        p4: P4,
-        p5: P5,
-        p6: P6,
-        p7: P7,
-        p8: P8,
-        p9: P9,
-        p10: P10,
-        p11: P11,
-        p12: P12,
-        p13: P13,
-        p14: P14,
-        p15: P15,
-        p16: P16,
+        p1: Any?,
+        p2: Any?,
+        p3: Any?,
+        p4: Any?,
+        p5: Any?,
+        p6: Any?,
+        p7: Any?,
+        p8: Any?,
+        p9: Any?,
+        p10: Any?,
+        p11: Any?,
+        p12: Any?,
+        p13: Any?,
+        p14: Any?,
+        p15: Any?,
+        p16: Any?,
         c: Composer,
         changed: Int,
         changed1: Int
-    ): R {
+    ): Any? {
         c.startRestartGroup(key, sourceInformation)
         trackRead(c)
         val dirty = changed1 or if (c.changed(this)) differentBits(16) else sameBits(16)
         val result = (
             _block as (
-                p1: P1,
-                p2: P2,
-                p3: P3,
-                p4: P4,
-                p5: P5,
-                p6: P6,
-                p7: P7,
-                p8: P8,
-                p9: P9,
-                p10: P10,
-                p11: P11,
-                p12: P12,
-                p13: P13,
-                p14: P14,
-                p15: P15,
-                p16: P16,
+                p1: Any?,
+                p2: Any?,
+                p3: Any?,
+                p4: Any?,
+                p5: Any?,
+                p6: Any?,
+                p7: Any?,
+                p8: Any?,
+                p9: Any?,
+                p10: Any?,
+                p11: Any?,
+                p12: Any?,
+                p13: Any?,
+                p14: Any?,
+                p15: Any?,
+                p16: Any?,
                 c: Composer,
                 changed: Int,
                 changed1: Int
-            ) -> R
+            ) -> Any?
             )(
             p1,
             p2,
@@ -976,53 +950,53 @@ class ComposableLambda<
     }
 
     override operator fun invoke(
-        p1: P1,
-        p2: P2,
-        p3: P3,
-        p4: P4,
-        p5: P5,
-        p6: P6,
-        p7: P7,
-        p8: P8,
-        p9: P9,
-        p10: P10,
-        p11: P11,
-        p12: P12,
-        p13: P13,
-        p14: P14,
-        p15: P15,
-        p16: P16,
-        p17: P17,
+        p1: Any?,
+        p2: Any?,
+        p3: Any?,
+        p4: Any?,
+        p5: Any?,
+        p6: Any?,
+        p7: Any?,
+        p8: Any?,
+        p9: Any?,
+        p10: Any?,
+        p11: Any?,
+        p12: Any?,
+        p13: Any?,
+        p14: Any?,
+        p15: Any?,
+        p16: Any?,
+        p17: Any?,
         c: Composer,
         changed: Int,
         changed1: Int
-    ): R {
+    ): Any? {
         c.startRestartGroup(key, sourceInformation)
         trackRead(c)
         val dirty = changed1 or if (c.changed(this)) differentBits(17) else sameBits(17)
         val result = (
             _block as (
-                p1: P1,
-                p2: P2,
-                p3: P3,
-                p4: P4,
-                p5: P5,
-                p6: P6,
-                p7: P7,
-                p8: P8,
-                p9: P9,
-                p10: P10,
-                p11: P11,
-                p12: P12,
-                p13: P13,
-                p14: P14,
-                p15: P15,
-                p16: P16,
-                p17: P17,
+                p1: Any?,
+                p2: Any?,
+                p3: Any?,
+                p4: Any?,
+                p5: Any?,
+                p6: Any?,
+                p7: Any?,
+                p8: Any?,
+                p9: Any?,
+                p10: Any?,
+                p11: Any?,
+                p12: Any?,
+                p13: Any?,
+                p14: Any?,
+                p15: Any?,
+                p16: Any?,
+                p17: Any?,
                 c: Composer,
                 changed: Int,
                 changed1: Int
-            ) -> R
+            ) -> Any?
             )(
             p1,
             p2,
@@ -1073,55 +1047,55 @@ class ComposableLambda<
     }
 
     override operator fun invoke(
-        p1: P1,
-        p2: P2,
-        p3: P3,
-        p4: P4,
-        p5: P5,
-        p6: P6,
-        p7: P7,
-        p8: P8,
-        p9: P9,
-        p10: P10,
-        p11: P11,
-        p12: P12,
-        p13: P13,
-        p14: P14,
-        p15: P15,
-        p16: P16,
-        p17: P17,
-        p18: P18,
+        p1: Any?,
+        p2: Any?,
+        p3: Any?,
+        p4: Any?,
+        p5: Any?,
+        p6: Any?,
+        p7: Any?,
+        p8: Any?,
+        p9: Any?,
+        p10: Any?,
+        p11: Any?,
+        p12: Any?,
+        p13: Any?,
+        p14: Any?,
+        p15: Any?,
+        p16: Any?,
+        p17: Any?,
+        p18: Any?,
         c: Composer,
         changed: Int,
         changed1: Int
-    ): R {
+    ): Any? {
         c.startRestartGroup(key, sourceInformation)
         trackRead(c)
         val dirty = changed1 or if (c.changed(this)) differentBits(18) else sameBits(18)
         val result = (
             _block as (
-                p1: P1,
-                p2: P2,
-                p3: P3,
-                p4: P4,
-                p5: P5,
-                p6: P6,
-                p7: P7,
-                p8: P8,
-                p9: P9,
-                p10: P10,
-                p11: P11,
-                p12: P12,
-                p13: P13,
-                p14: P14,
-                p15: P15,
-                p16: P16,
-                p17: P17,
-                p18: P18,
+                p1: Any?,
+                p2: Any?,
+                p3: Any?,
+                p4: Any?,
+                p5: Any?,
+                p6: Any?,
+                p7: Any?,
+                p8: Any?,
+                p9: Any?,
+                p10: Any?,
+                p11: Any?,
+                p12: Any?,
+                p13: Any?,
+                p14: Any?,
+                p15: Any?,
+                p16: Any?,
+                p17: Any?,
+                p18: Any?,
                 c: Composer,
                 changed: Int,
                 changed1: Int
-            ) -> R
+            ) -> Any?
             )(
             p1,
             p2,
@@ -1181,9 +1155,38 @@ private fun RecomposeScope?.replacableWith(other: RecomposeScope) =
             )
         )
 
-@OptIn(ComposeCompilerApi::class)
-private typealias CLambda = ComposableLambda<Any, Any, Any, Any, Any, Any, Any, Any, Any, Any,
-    Any, Any, Any, Any, Any, Any, Any, Any, Any>
+@ComposeCompilerApi
+@Stable
+interface ComposableLambda :
+    Function2<Composer, Int, Any?>,
+    Function3<Any?, Composer, Int, Any?>,
+    Function4<Any?, Any?, Composer, Int, Any?>,
+    Function5<Any?, Any?, Any?, Composer, Int, Any?>,
+    Function6<Any?, Any?, Any?, Any?, Composer, Int, Any?>,
+    Function7<Any?, Any?, Any?, Any?, Any?, Composer, Int, Any?>,
+    Function8<Any?, Any?, Any?, Any?, Any?, Any?, Composer, Int, Any?>,
+    Function9<Any?, Any?, Any?, Any?, Any?, Any?, Any?, Composer, Int, Any?>,
+    Function10<Any?, Any?, Any?, Any?, Any?, Any?, Any?, Any?, Composer, Int, Any?>,
+    Function11<Any?, Any?, Any?, Any?, Any?, Any?, Any?, Any?, Any?, Composer, Int, Any?>,
+    Function13<Any?, Any?, Any?, Any?, Any?, Any?, Any?, Any?, Any?, Any?, Composer, Int, Int,
+        Any?>,
+    Function14<Any?, Any?, Any?, Any?, Any?, Any?, Any?, Any?, Any?, Any?, Any?, Composer, Int, Int,
+        Any?>,
+    Function15<Any?, Any?, Any?, Any?, Any?, Any?, Any?, Any?, Any?, Any?, Any?, Any?, Composer,
+        Int, Int, Any?>,
+    Function16<Any?, Any?, Any?, Any?, Any?, Any?, Any?, Any?, Any?, Any?, Any?, Any?, Any?,
+        Composer, Int, Int, Any?>,
+    Function17<Any?, Any?, Any?, Any?, Any?, Any?, Any?, Any?, Any?, Any?, Any?, Any?, Any?, Any?,
+        Composer, Int,
+        Int, Any?>,
+    Function18<Any?, Any?, Any?, Any?, Any?, Any?, Any?, Any?, Any?, Any?, Any?, Any?, Any?, Any?,
+        Any?, Composer, Int, Int, Any?>,
+    Function19<Any?, Any?, Any?, Any?, Any?, Any?, Any?, Any?, Any?, Any?, Any?, Any?, Any?, Any?,
+        Any?, Any?, Composer, Int, Int, Any?>,
+    Function20<Any?, Any?, Any?, Any?, Any?, Any?, Any?, Any?, Any?, Any?, Any?, Any?, Any?, Any?,
+        Any?, Any?, Any?, Composer, Int, Int, Any?>,
+    Function21<Any?, Any?, Any?, Any?, Any?, Any?, Any?, Any?, Any?, Any?, Any?, Any?, Any?, Any?,
+        Any?, Any?, Any?, Any?, Composer, Int, Int, Any?>
 
 @Suppress("unused")
 @ComposeCompilerApi
@@ -1193,15 +1196,15 @@ fun composableLambda(
     tracked: Boolean,
     sourceInformation: String?,
     block: Any
-): CLambda {
+): ComposableLambda {
     composer.startReplaceableGroup(key)
     val slot = composer.rememberedValue()
     val result = if (slot === Composer.Empty) {
-        val value = CLambda(key, tracked, sourceInformation)
+        val value = ComposableLambdaImpl(key, tracked, sourceInformation)
         composer.updateRememberedValue(value)
         value
     } else {
-        slot as CLambda
+        slot as ComposableLambdaImpl
     }
     result.update(block)
     composer.endReplaceableGroup()
@@ -1210,5 +1213,10 @@ fun composableLambda(
 
 @Suppress("unused")
 @ComposeCompilerApi
-fun composableLambdaInstance(key: Int, tracked: Boolean, sourceInformation: String?, block: Any) =
-    CLambda(key, tracked, sourceInformation).apply { update(block) }
+fun composableLambdaInstance(
+    key: Int,
+    tracked: Boolean,
+    sourceInformation: String?,
+    block: Any
+): ComposableLambda =
+    ComposableLambdaImpl(key, tracked, sourceInformation).apply { update(block) }

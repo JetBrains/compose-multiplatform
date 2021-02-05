@@ -30,7 +30,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.Providers
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
@@ -250,14 +250,14 @@ internal fun Decoration(
     content: @Composable () -> Unit
 ) {
     val colorAndEmphasis = @Composable {
-        Providers(LocalContentColor provides contentColor) {
+        CompositionLocalProvider(LocalContentColor provides contentColor) {
             if (contentAlpha != null) {
-                Providers(
+                CompositionLocalProvider(
                     LocalContentAlpha provides contentAlpha,
                     content = content
                 )
             } else {
-                Providers(
+                CompositionLocalProvider(
                     LocalContentAlpha provides contentColor.alpha,
                     content = content
                 )

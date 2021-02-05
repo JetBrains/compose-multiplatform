@@ -21,7 +21,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.preferredSize
 import androidx.compose.foundation.layout.width
-import androidx.compose.runtime.Providers
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.compositionLocalOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -209,7 +209,7 @@ class PopupTest {
         val compositionLocal = compositionLocalOf<Float>()
         var value = 0f
         rule.setContent {
-            Providers(compositionLocal provides 1f) {
+            CompositionLocalProvider(compositionLocal provides 1f) {
                 Popup {
                     value = compositionLocal.current
                 }
@@ -224,7 +224,7 @@ class PopupTest {
     fun preservesLayoutDirection() {
         var value = LayoutDirection.Ltr
         rule.setContent {
-            Providers(LocalLayoutDirection provides LayoutDirection.Rtl) {
+            CompositionLocalProvider(LocalLayoutDirection provides LayoutDirection.Rtl) {
                 Popup {
                     value = LocalLayoutDirection.current
                 }

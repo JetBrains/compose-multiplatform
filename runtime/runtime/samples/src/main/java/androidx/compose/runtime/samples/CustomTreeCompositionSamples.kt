@@ -66,7 +66,7 @@ fun CustomTreeComposition() {
         parent: CompositionContext,
         content: @Composable () -> Unit
     ): Composition {
-        return Composition(this, NodeApplier(this), parent).apply {
+        return Composition(NodeApplier(this), parent).apply {
             setContent(content)
         }
     }

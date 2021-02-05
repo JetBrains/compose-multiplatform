@@ -30,7 +30,7 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.shape.CutCornerShape
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.Providers
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -289,7 +289,7 @@ class ButtonTest {
         rule.setMaterialContent {
             surface = MaterialTheme.colors.surface
             primary = MaterialTheme.colors.primary
-            Providers(LocalShapes provides Shapes(small = shape)) {
+            CompositionLocalProvider(LocalShapes provides Shapes(small = shape)) {
                 Button(modifier = Modifier.testTag("myButton"), onClick = {}, elevation = null) {
                     Box(Modifier.preferredSize(10.dp, 10.dp))
                 }

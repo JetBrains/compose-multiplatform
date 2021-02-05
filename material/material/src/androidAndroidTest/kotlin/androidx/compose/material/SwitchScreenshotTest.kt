@@ -20,7 +20,7 @@ import android.os.Build
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.wrapContentSize
-import androidx.compose.runtime.Providers
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.testutils.assertAgainstGolden
@@ -84,7 +84,7 @@ class SwitchScreenshotTest {
     fun switchTest_checked_rtl() {
         rule.setMaterialContent {
             Box(wrapperModifier) {
-                Providers(LocalLayoutDirection provides LayoutDirection.Rtl) {
+                CompositionLocalProvider(LocalLayoutDirection provides LayoutDirection.Rtl) {
                     Switch(checked = true, onCheckedChange = { })
                 }
             }
@@ -120,7 +120,7 @@ class SwitchScreenshotTest {
     fun switchTest_unchecked_rtl() {
         rule.setMaterialContent {
             Box(wrapperModifier) {
-                Providers(LocalLayoutDirection provides LayoutDirection.Rtl) {
+                CompositionLocalProvider(LocalLayoutDirection provides LayoutDirection.Rtl) {
                     Switch(checked = false, onCheckedChange = { })
                 }
             }

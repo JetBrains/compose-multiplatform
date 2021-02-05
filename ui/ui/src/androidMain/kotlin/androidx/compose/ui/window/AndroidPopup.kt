@@ -31,7 +31,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionContext
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.Immutable
-import androidx.compose.runtime.Providers
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.compositionLocalOf
 import androidx.compose.runtime.derivedStateOf
@@ -260,7 +260,7 @@ internal val LocalPopupTestTag = compositionLocalOf { "DEFAULT_TEST_TAG" }
 
 @Composable
 internal fun PopupTestTag(tag: String, content: @Composable () -> Unit) {
-    Providers(LocalPopupTestTag provides tag, content = content)
+    CompositionLocalProvider(LocalPopupTestTag provides tag, content = content)
 }
 
 // TODO(soboleva): Look at module dependencies so that we can get code reuse between

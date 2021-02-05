@@ -22,7 +22,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.preferredSize
-import androidx.compose.runtime.Providers
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.testutils.assertPixels
 import androidx.compose.testutils.assertShape
 import androidx.compose.ui.Modifier
@@ -158,7 +158,7 @@ class SurfaceTest {
         var contentColor: Color = Color.Unspecified
         val expectedColor = Color.Blue
         rule.setMaterialContent {
-            Providers(LocalContentColor provides Color.Red) {
+            CompositionLocalProvider(LocalContentColor provides Color.Red) {
                 Surface(
                     Modifier.composed {
                         contentColor = LocalContentColor.current

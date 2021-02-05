@@ -34,7 +34,7 @@ import androidx.compose.ui.node.LayoutNode.LayoutState
 import androidx.compose.ui.node.MeasureBlocks
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalLayoutDirection
-import androidx.compose.ui.platform.subcomposeInto
+import androidx.compose.ui.platform.createSubcomposition
 import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.LayoutDirection
 
@@ -161,6 +161,7 @@ private class SubcomposeLayoutState :
         node.withNoSnapshotReadObservation {
             val content = nodeState.content
             nodeState.composition = subcomposeInto(
+                existing = nodeState.composition,
                 container = node,
                 parent = compositionContext ?: error("parent composition reference not set"),
                 // Do not optimize this by passing nodeState.content directly; the additional
@@ -169,6 +170,22 @@ private class SubcomposeLayoutState :
                 composable = { content() }
             )
         }
+    }
+
+    private fun subcomposeInto(
+        existing: Composition?,
+        container: LayoutNode,
+        parent: CompositionContext,
+        composable: @Composable () -> Unit
+    ): Composition {
+        return if (existing == null || existing.isDisposed) {
+            createSubcomposition(container, parent)
+        } else {
+            existing
+        }
+            .apply {
+                setContent(composable)
+            }
     }
 
     private fun disposeAfterIndex(currentIndex: Int) {

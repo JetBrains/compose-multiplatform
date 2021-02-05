@@ -21,7 +21,6 @@ import android.view.View
 import androidx.core.os.HandlerCompat
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.MediumTest
-import org.junit.After
 import org.junit.Assert.assertEquals
 import org.junit.Rule
 import org.junit.Test
@@ -36,11 +35,6 @@ import kotlin.test.assertTrue
 
 @RunWith(AndroidJUnit4::class)
 class ComposeIntoTests : BaseComposeTest() {
-    @After
-    fun teardown() {
-        clearRoots()
-    }
-
     @get:Rule
     override val activityRule = makeTestActivityRule()
 

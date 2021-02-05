@@ -17,7 +17,7 @@
 package androidx.compose.foundation.layout
 
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.Providers
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -258,7 +258,7 @@ class BoxTest : LayoutTest() {
         val childPosition = Array(9) { Ref<Offset>() }
         show {
             Box(Modifier.wrapContentSize(Alignment.TopStart)) {
-                Providers(LocalLayoutDirection provides LayoutDirection.Rtl) {
+                CompositionLocalProvider(LocalLayoutDirection provides LayoutDirection.Rtl) {
                     Box(
                         Modifier
                             .preferredSize(tripleSizeDp)

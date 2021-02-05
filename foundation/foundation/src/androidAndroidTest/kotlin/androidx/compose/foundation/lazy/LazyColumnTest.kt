@@ -34,7 +34,7 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.text.BasicText
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
-import androidx.compose.runtime.Providers
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
@@ -1274,7 +1274,7 @@ internal fun ComposeContentTestRule.setContentWithTestViewConfiguration(
     composable: @Composable () -> Unit
 ) {
     this.setContent {
-        Providers(LocalViewConfiguration provides FakeViewConfiguration) {
+        CompositionLocalProvider(LocalViewConfiguration provides FakeViewConfiguration) {
             composable()
         }
     }

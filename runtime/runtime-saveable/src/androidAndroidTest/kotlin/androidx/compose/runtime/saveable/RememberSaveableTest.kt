@@ -17,7 +17,7 @@
 package androidx.compose.runtime.saveable
 
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.Providers
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
@@ -389,7 +389,7 @@ private fun WrapRegistry(
     wrap: @Composable (SaveableStateRegistry) -> SaveableStateRegistry,
     content: @Composable () -> Unit
 ) {
-    Providers(
+    CompositionLocalProvider(
         LocalSaveableStateRegistry provides wrap(LocalSaveableStateRegistry.current!!),
         content = content
     )
