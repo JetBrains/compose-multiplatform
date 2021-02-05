@@ -1,8 +1,8 @@
 package example.imageviewer.view
 
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.ScrollableRow
 import androidx.compose.foundation.background
+import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -12,6 +12,8 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.preferredHeight
 import androidx.compose.foundation.layout.preferredSize
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.ScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.material.MaterialTheme
@@ -142,7 +144,8 @@ fun setToolBar(
                     .align(Alignment.CenterVertically),
                 shape = CircleShape
             ) {
-                ScrollableRow {
+                val state = rememberScrollState(0f)
+                Row(modifier = Modifier.horizontalScroll(state)) {
                     Row {
                         for (type in FilterType.values()) {
                             FilterButton(content, type)

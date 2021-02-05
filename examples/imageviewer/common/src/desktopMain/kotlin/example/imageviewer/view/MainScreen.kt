@@ -1,7 +1,6 @@
 package example.imageviewer.view
 
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.ScrollableColumn
 import androidx.compose.foundation.VerticalScrollbar
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -20,7 +19,10 @@ import androidx.compose.foundation.layout.preferredSize
 import androidx.compose.foundation.layout.preferredWidth
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.rememberScrollbarAdapter
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.ScrollState
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.Card
 import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.material.Divider
@@ -269,7 +271,7 @@ fun setScrollableArea(content: ContentState) {
         .padding(end = 8.dp)
     ) {
         val stateVertical = rememberScrollState(0f)
-        ScrollableColumn(scrollState = stateVertical) {
+        Column(modifier = Modifier.verticalScroll(stateVertical)) {
             var index = 1
             Column {
                 for (picture in content.getMiniatures()) {
