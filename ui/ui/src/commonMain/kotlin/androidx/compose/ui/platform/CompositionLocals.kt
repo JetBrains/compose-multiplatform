@@ -16,7 +16,6 @@
 
 package androidx.compose.ui.platform
 
-import androidx.compose.animation.core.AnimationClockObservable
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.staticCompositionLocalOf
@@ -30,11 +29,6 @@ import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.input.TextInputService
 import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.LayoutDirection
-
-/**
- * The default animation clock used for animations when an explicit clock isn't provided.
- */
-val LocalAnimationClock = staticCompositionLocalOf<AnimationClockObservable>()
 
 /**
  * The CompositionLocal that can be used to trigger autofill actions.
@@ -121,12 +115,10 @@ val LocalWindowInfo = staticCompositionLocalOf<WindowInfo>()
 @Composable
 internal fun ProvideCommonCompositionLocals(
     owner: Owner,
-    animationClock: AnimationClockObservable,
     uriHandler: UriHandler,
     content: @Composable () -> Unit
 ) {
     CompositionLocalProvider(
-        LocalAnimationClock provides animationClock,
         LocalAutofill provides owner.autofill,
         LocalAutofillTree provides owner.autofillTree,
         LocalClipboardManager provides owner.clipboardManager,

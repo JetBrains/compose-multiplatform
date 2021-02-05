@@ -16,8 +16,6 @@
 
 package androidx.compose.foundation.gestures
 
-import androidx.compose.animation.core.AnimationClockObservable
-import androidx.compose.animation.core.AnimationClockObserver
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.size
 import androidx.compose.runtime.Composable
@@ -206,10 +204,5 @@ class DesktopScrollableTest {
             offset += delta
             return delta
         }
-    }
-
-    private class TestAnimationClock : AnimationClockObservable {
-        override fun subscribe(observer: AnimationClockObserver) = Unit
-        override fun unsubscribe(observer: AnimationClockObserver) = Unit
     }
 }

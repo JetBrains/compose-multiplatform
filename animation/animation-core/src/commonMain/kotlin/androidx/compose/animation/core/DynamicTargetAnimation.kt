@@ -53,23 +53,16 @@ class TargetAnimation(
  */
 enum class AnimationEndReason {
     /**
-     * Animation has successfully reached the [BaseAnimatedValue.targetValue] value
-     * and come to stop
-     */
-    @Deprecated("Renamed to AnimationEndReason.Finished")
-    TargetReached,
-    /**
      * Animation was interrupted, e.g by another animation
      */
     Interrupted,
     /**
      * Animation will be forced to end when its value reaches upper/lower bound (if they have
-     * been defined, e.g via [AnimatedFloat.setBounds])
+     * been defined, e.g via [Animatable.updateBounds])
      *
-     * Unlike [TargetReached], when an animation ends due to [BoundReached], it often falls short
+     * Unlike [Finished], when an animation ends due to [BoundReached], it often falls short
      * from its initial target, and the remaining velocity is often non-zero. Both the end value
-     * and the remaining velocity can be obtained via `onEnd` param in [AnimatedFloat.fling]
-     * callback
+     * and the remaining velocity can be obtained via [AnimationResult].
      */
     BoundReached,
     // TODO: deprecate TargetReached

@@ -1,10 +1,6 @@
 // Signature format: 4.0
 package androidx.compose.animation {
 
-  public final class AnimatedValueEffectsKt {
-    method @Deprecated @androidx.compose.runtime.Composable public static androidx.compose.animation.core.AnimatedFloat animatedFloat(float initVal, optional float visibilityThreshold, optional androidx.compose.animation.core.AnimationClockObservable clock);
-  }
-
   public final class AnimatedVisibilityKt {
     method @androidx.compose.animation.ExperimentalAnimationApi @androidx.compose.runtime.Composable public static void AnimatedVisibility(boolean visible, optional androidx.compose.ui.Modifier modifier, optional androidx.compose.animation.EnterTransition enter, optional androidx.compose.animation.ExitTransition exit, optional boolean initiallyVisible, kotlin.jvm.functions.Function0<kotlin.Unit> content);
     method @androidx.compose.animation.ExperimentalAnimationApi @androidx.compose.runtime.Composable public static void AnimatedVisibility(androidx.compose.foundation.layout.RowScope, boolean visible, optional androidx.compose.ui.Modifier modifier, optional androidx.compose.animation.EnterTransition enter, optional androidx.compose.animation.ExitTransition exit, optional boolean initiallyVisible, kotlin.jvm.functions.Function0<kotlin.Unit> content);
@@ -21,19 +17,6 @@ package androidx.compose.animation {
 
   public final class CrossfadeKt {
     method @androidx.compose.runtime.Composable public static <T> void Crossfade(T? targetState, optional androidx.compose.ui.Modifier modifier, optional androidx.compose.animation.core.FiniteAnimationSpec<java.lang.Float> animationSpec, kotlin.jvm.functions.Function1<? super T,kotlin.Unit> content);
-  }
-
-  public final class DisposableAnimationClock implements androidx.compose.animation.core.AnimationClockObservable {
-    ctor public DisposableAnimationClock(androidx.compose.animation.core.AnimationClockObservable clock);
-    method public void dispose();
-    method public boolean isDisposed();
-    method public void subscribe(androidx.compose.animation.core.AnimationClockObserver observer);
-    method public void unsubscribe(androidx.compose.animation.core.AnimationClockObserver observer);
-    property public final boolean isDisposed;
-  }
-
-  public final class DisposableAnimationClockKt {
-    method @androidx.compose.runtime.Composable public static androidx.compose.animation.DisposableAnimationClock asDisposableClock(androidx.compose.animation.core.AnimationClockObservable);
   }
 
   public final class EnterExitTransitionKt {

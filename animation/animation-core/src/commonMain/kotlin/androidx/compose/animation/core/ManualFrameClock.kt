@@ -21,25 +21,12 @@ import androidx.compose.runtime.MonotonicFrameClock
 
 /**
  * A [MonotonicFrameClock] built on a [BroadcastFrameClock] that keeps track of the current time.
- *
- * For backwards compatibility with the older [ManualAnimationClock][androidx.animation
- * .ManualAnimationClock], which immediately calls the subscriber's callback with the current
- * time, supply [dispatchOnSubscribe] to the constructor.
  */
 // TODO(b/163462047): Consider propagating the onNewAwaiters callback from BroadcastFrameClock
 class ManualFrameClock
-@Deprecated(
-    message = "dispatchOnSubscribe should only be used for backwards compatibility when this " +
-        "MonotonicFrameClock is used as an AnimationClockObservable in places where " +
-        "ManualAnimationClock was used before.",
-    replaceWith = ReplaceWith("ManualFrameClock(initialTime)")
-)
 constructor(
     initialTime: Long = 0L,
-    internal val dispatchOnSubscribe: Boolean
 ) : MonotonicFrameClock {
-    @Suppress("DEPRECATION")
-    constructor(initialTime: Long = 0L) : this(initialTime, false)
 
     private val broadcastClock = BroadcastFrameClock()
 
