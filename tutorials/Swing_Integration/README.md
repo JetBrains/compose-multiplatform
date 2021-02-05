@@ -202,14 +202,11 @@ fun main() {
                 Button("1. Compose Button: increment", inc)
                 Spacer(modifier = Modifier.height(20.dp))
 
-                Box(
-                    modifier = Modifier.size(270.dp, 90.dp)
-                ) {
-                    SwingPanel(
-                        component = swingBox(dec),
-                        background = Color.White
-                    )
-                }
+                SwingPanel(
+                    background = Color.White,
+                    modifier = Modifier.size(270.dp, 90.dp),
+                    componentBlock = { swingBox(dec) }
+                )
 
                 Spacer(modifier = Modifier.height(20.dp))
                 Button("2. Compose Button: increment", inc)
