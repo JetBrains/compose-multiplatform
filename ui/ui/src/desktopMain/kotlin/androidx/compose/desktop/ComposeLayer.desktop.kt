@@ -188,6 +188,7 @@ internal class ComposeLayer {
                 )
             }
         }
+        wrapped.focusTraversalKeysEnabled = false
         wrapped.addKeyListener(object : KeyAdapter() {
             override fun keyPressed(event: KeyEvent) = events.post {
                 owners.onKeyPressed(event)

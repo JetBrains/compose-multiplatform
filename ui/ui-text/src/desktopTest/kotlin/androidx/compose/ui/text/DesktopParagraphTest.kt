@@ -92,6 +92,46 @@ class DesktopParagraphTest {
         }
     }
 
+    @Test
+    fun getLineEnd() {
+        with(defaultDensity) {
+            val text = ""
+            val paragraph = simpleParagraph(
+                text = text,
+                style = TextStyle(fontSize = 50.sp)
+            )
+
+            Truth.assertThat(paragraph.getLineEnd(0, true))
+                .isEqualTo(0)
+        }
+        with(defaultDensity) {
+            val text = "ab\n\nc"
+            val paragraph = simpleParagraph(
+                text = text,
+                style = TextStyle(fontSize = 50.sp)
+            )
+
+            Truth.assertThat(paragraph.getLineEnd(0, true))
+                .isEqualTo(2)
+            Truth.assertThat(paragraph.getLineEnd(1, true))
+                .isEqualTo(3)
+            Truth.assertThat(paragraph.getLineEnd(2, true))
+                .isEqualTo(5)
+        }
+        with(defaultDensity) {
+            val text = "ab\n"
+            val paragraph = simpleParagraph(
+                text = text,
+                style = TextStyle(fontSize = 50.sp)
+            )
+
+            Truth.assertThat(paragraph.getLineEnd(0, true))
+                .isEqualTo(2)
+            Truth.assertThat(paragraph.getLineEnd(1, true))
+                .isEqualTo(3)
+        }
+    }
+
     private fun simpleParagraph(
         text: String = "",
         style: TextStyle? = null,

@@ -52,28 +52,28 @@ actual inline class Key(val keyCode: Long) {
          *
          * May also be synthesized from trackball motions.
          */
-        actual val DirectionUp = Key(KeyEvent.VK_KP_UP)
+        actual val DirectionUp = Key(KeyEvent.VK_UP)
 
         /**
          * Down Arrow Key / Directional Pad Down key.
          *
          * May also be synthesized from trackball motions.
          */
-        actual val DirectionDown = Key(KeyEvent.VK_KP_DOWN)
+        actual val DirectionDown = Key(KeyEvent.VK_DOWN)
 
         /**
          * Left Arrow Key / Directional Pad Left key.
          *
          * May also be synthesized from trackball motions.
          */
-        actual val DirectionLeft = Key(KeyEvent.VK_KP_LEFT)
+        actual val DirectionLeft = Key(KeyEvent.VK_LEFT)
 
         /**
          * Right Arrow Key / Directional Pad Right key.
          *
          * May also be synthesized from trackball motions.
          */
-        actual val DirectionRight = Key(KeyEvent.VK_KP_RIGHT)
+        actual val DirectionRight = Key(KeyEvent.VK_RIGHT)
 
         /** '0' key. */
         actual val Zero = Key(KeyEvent.VK_0)
@@ -307,7 +307,7 @@ actual inline class Key(val keyCode: Long) {
         actual val PageUp = Key(KeyEvent.VK_PAGE_UP)
 
         /** Page Down key. */
-        actual val PageDown = Key(KeyEvent.VK_PAGE_UP)
+        actual val PageDown = Key(KeyEvent.VK_PAGE_DOWN)
 
         /** F1 key. */
         actual val F1 = Key(KeyEvent.VK_F1)
@@ -413,6 +413,9 @@ actual inline class Key(val keyCode: Long) {
         /** Numeric keypad ')' key. */
         actual val NumPadRightParenthesis = Key(KeyEvent.VK_RIGHT_PARENTHESIS, KEY_LOCATION_NUMPAD)
 
+        actual val MoveHome = Key(KeyEvent.VK_HOME)
+        actual val MoveEnd = Key(KeyEvent.VK_END)
+
         // Unsupported Keys. These keys will never be sent by the desktop. However we need unique
         // keycodes so that these constants can be used in a when statement without a warning.
         actual val SoftLeft = Key(-1000000001)
@@ -443,8 +446,6 @@ actual inline class Key(val keyCode: Long) {
         actual val Envelope = Key(-1000000026)
         actual val Function = Key(-1000000027)
         actual val Break = Key(-1000000028)
-        actual val MoveHome = Key(-1000000029)
-        actual val MoveEnd = Key(-1000000030)
         actual val Number = Key(-1000000031)
         actual val HeadsetHook = Key(-1000000032)
         actual val Focus = Key(-1000000033)

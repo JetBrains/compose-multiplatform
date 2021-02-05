@@ -62,7 +62,6 @@ import org.jetbrains.skija.paragraph.RectHeightMode
 import org.jetbrains.skija.paragraph.RectWidthMode
 import org.jetbrains.skija.paragraph.TextBox
 import java.lang.UnsupportedOperationException
-import java.nio.charset.Charset
 import java.util.WeakHashMap
 import kotlin.math.floor
 import org.jetbrains.skija.Rect as SkRect
@@ -149,16 +148,21 @@ internal class DesktopParagraph(
         get() = paragraphIntrinsics.maxIntrinsicWidth
 
     override val firstBaseline: Float
-        get() = para.getLineMetrics().firstOrNull()?.run { baseline.toFloat() } ?: 0f
+        get() = lineMetrics.firstOrNull()?.run { baseline.toFloat() } ?: 0f
 
     override val lastBaseline: Float
-        get() = para.getLineMetrics().lastOrNull()?.run { baseline.toFloat() } ?: 0f
+        get() = lineMetrics.lastOrNull()?.run { baseline.toFloat() } ?: 0f
 
     override val didExceedMaxLines: Boolean
         get() = para.didExceedMaxLines()
 
     override val lineCount: Int
-        get() = para.lineNumber.toInt()
+        // workaround for https://bugs.chromium.org/p/skia/issues/detail?id=11321
+        get() = if (text == "") {
+            1
+        } else {
+            para.lineNumber.toInt()
+        }
 
     override val placeholderRects: List<Rect?>
         get() =
@@ -188,50 +192,58 @@ internal class DesktopParagraph(
             Rect(box.rect.right, box.rect.top, box.rect.right + cursorWidth, box.rect.bottom)
         } ?: Rect(0f, 0f, cursorWidth, paragraphIntrinsics.builder.defaultHeight)
 
-    override fun getLineLeft(lineIndex: Int): Float {
-        println("Paragraph.getLineLeft $lineIndex")
-        return 0.0f
-    }
+    override fun getLineLeft(lineIndex: Int): Float =
+        lineMetrics.getOrNull(lineIndex)?.left?.toFloat() ?: 0f
 
-    override fun getLineRight(lineIndex: Int): Float {
-        println("Paragraph.getLineRight $lineIndex")
-        return 0.0f
-    }
+    override fun getLineRight(lineIndex: Int): Float =
+        lineMetrics.getOrNull(lineIndex)?.right?.toFloat() ?: 0f
 
     override fun getLineTop(lineIndex: Int) =
-        para.lineMetrics.getOrNull(lineIndex)?.let { line ->
+        lineMetrics.getOrNull(lineIndex)?.let { line ->
             floor((line.baseline - line.ascent).toFloat())
         } ?: 0f
 
     override fun getLineBottom(lineIndex: Int) =
-        para.lineMetrics.getOrNull(lineIndex)?.let { line ->
+        lineMetrics.getOrNull(lineIndex)?.let { line ->
             floor((line.baseline + line.descent).toFloat())
         } ?: 0f
 
     private fun lineMetricsForOffset(offset: Int): LineMetrics? {
-        // For some reasons SkParagraph Line metrics use (UTF-8) byte offsets for start and end
-        // indexes
-        val byteOffset = text.substring(0, offset).toByteArray(Charset.forName("UTF-8")).size
-        val metrics = para.lineMetrics
+        val metrics = lineMetrics
         for (line in metrics) {
-            if (byteOffset < line.endIndex) {
+            if (offset < line.endIndex) {
                 return line
             }
+        }
+        if (metrics.isEmpty()) {
+            return null
         }
         return metrics.last()
     }
 
-    override fun getLineHeight(lineIndex: Int) = para.lineMetrics[lineIndex].height.toFloat()
+    override fun getLineHeight(lineIndex: Int) = lineMetrics[lineIndex].height.toFloat()
 
-    override fun getLineWidth(lineIndex: Int) = para.lineMetrics[lineIndex].width.toFloat()
+    override fun getLineWidth(lineIndex: Int) = lineMetrics[lineIndex].width.toFloat()
 
-    override fun getLineStart(lineIndex: Int) = para.lineMetrics[lineIndex].startIndex.toInt()
+    override fun getLineStart(lineIndex: Int) = lineMetrics[lineIndex].startIndex.toInt()
 
     override fun getLineEnd(lineIndex: Int, visibleEnd: Boolean) =
         if (visibleEnd) {
-            para.lineMetrics[lineIndex].endExcludingWhitespaces.toInt()
+            val metrics = lineMetrics[lineIndex]
+            // workarounds for https://bugs.chromium.org/p/skia/issues/detail?id=11321 :(
+            // we are waiting for fixes
+            if (lineIndex > 0 && metrics.startIndex < lineMetrics[lineIndex - 1].endIndex) {
+                metrics.endIndex.toInt()
+            } else if (
+                metrics.startIndex < text.length &&
+                text[metrics.startIndex.toInt()] == '\n'
+            ) {
+                metrics.startIndex.toInt()
+            } else {
+                metrics.endExcludingWhitespaces.toInt()
+            }
         } else {
-            para.lineMetrics[lineIndex].endIndex.toInt()
+            lineMetrics[lineIndex].endIndex.toInt()
         }
 
     override fun isLineEllipsized(lineIndex: Int) = false
@@ -252,6 +264,20 @@ internal class DesktopParagraph(
             getHorizontalPositionBackward(offset) ?: getHorizontalPositionForward(offset) ?: 0f
         }
     }
+
+    // workaround for https://bugs.chromium.org/p/skia/issues/detail?id=11321 :(
+    private val lineMetrics: Array<LineMetrics>
+        get() = if (text == "") {
+            val height = paragraphIntrinsics.builder.defaultHeight.toDouble()
+            arrayOf(
+                LineMetrics(
+                    0, 0, 0, 0, true,
+                    height, 0.0, height, height, 0.0, 0.0, height, 0
+                )
+            )
+        } else {
+            para.lineMetrics
+        }
 
     private fun getBoxForwardByOffset(offset: Int): TextBox? {
         var to = offset + 1
@@ -309,8 +335,13 @@ internal class DesktopParagraph(
         return box.rect.toComposeRect()
     }
 
-    override fun getWordBoundary(offset: Int) = para.getWordBoundary(offset).let {
-        TextRange(it.start, it.end)
+    override fun getWordBoundary(offset: Int): TextRange {
+        if (text[offset].isWhitespace()) {
+            return TextRange(offset, offset)
+        }
+        para.getWordBoundary(offset).let {
+            return TextRange(it.start, it.end)
+        }
     }
 
     override fun paint(

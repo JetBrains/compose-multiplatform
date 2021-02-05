@@ -1,5 +1,3 @@
-// ktlint-disable filename
-
 /*
  * Copyright 2021 The Android Open Source Project
  *
@@ -16,6 +14,21 @@
  * limitations under the License.
  */
 
-package androidx.compose.foundation
+package androidx.compose.foundation.text
 
-internal actual typealias AtomicReference<V> = java.util.concurrent.atomic.AtomicReference<V>
+import java.text.BreakIterator
+
+internal actual fun StringBuilder.appendCodePointX(codePoint: Int): StringBuilder =
+    this.appendCodePoint(codePoint)
+
+internal actual fun String.findPrecedingBreak(index: Int): Int {
+    val it = BreakIterator.getCharacterInstance()
+    it.setText(this)
+    return it.preceding(index)
+}
+
+internal actual fun String.findFollowingBreak(index: Int): Int {
+    val it = BreakIterator.getCharacterInstance()
+    it.setText(this)
+    return it.following(index)
+}

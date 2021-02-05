@@ -70,7 +70,10 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.focusOrder
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shadow
@@ -107,6 +110,7 @@ private const val title = "Desktop Compose Elements"
 
 val italicFont = FontFamily(Font("NotoSans-Italic.ttf"))
 
+@OptIn(ExperimentalComposeUiApi::class)
 fun main() {
     Window(title, IntSize(1024, 850)) {
         App()
@@ -169,13 +173,11 @@ private fun LeftColumn(modifier: Modifier) = Box(modifier.fillMaxSize()) {
     )
 }
 
+@OptIn(ExperimentalComposeUiApi::class)
 @Composable
 private fun ScrollableContent(scrollState: ScrollState) {
     val amount = remember { mutableStateOf(0) }
     val animation = remember { mutableStateOf(true) }
-    val text = remember {
-        mutableStateOf("Hello \uD83E\uDDD1\uD83C\uDFFF\u200D\uD83E\uDDB0\nПривет")
-    }
     Column(Modifier.fillMaxSize().verticalScroll(scrollState)) {
         Text(
             text = "Привет! 你好! Desktop Compose ${amount.value}",
@@ -407,6 +409,10 @@ private fun ScrollableContent(scrollState: ScrollState) {
             label = { Text(text = "Input1") }
         )
 
+        val (focusItem1, focusItem2) = FocusRequester.createRefs()
+        val text = remember {
+            mutableStateOf("Hello \uD83E\uDDD1\uD83C\uDFFF\u200D\uD83E\uDDB0")
+        }
         TextField(
             value = text.value,
             onValueChange = { text.value = it },
@@ -414,6 +420,7 @@ private fun ScrollableContent(scrollState: ScrollState) {
             placeholder = {
                 Text(text = "Important input")
             },
+            maxLines = 1,
             modifier = Modifier.shortcuts {
                 on(Key.MetaLeft + Key.ShiftLeft + Key.Enter) {
                     text.value = "Cleared with shift!"
@@ -421,7 +428,25 @@ private fun ScrollableContent(scrollState: ScrollState) {
                 on(Key.MetaLeft + Key.Enter) {
                     text.value = "Cleared!"
                 }
+            }.focusOrder(focusItem1) {
+                next = focusItem2
             }
+        )
+
+        var text2 by remember {
+            val initText = buildString {
+                (1..1000).forEach {
+                    append("$it\n")
+                }
+            }
+            mutableStateOf(initText)
+        }
+        TextField(
+            text2,
+            modifier = Modifier.height(200.dp).focusOrder(focusItem2) {
+                previous = focusItem1
+            },
+            onValueChange = { text2 = it }
         )
 
         Row {
