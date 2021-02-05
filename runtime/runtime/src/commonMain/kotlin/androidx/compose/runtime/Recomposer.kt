@@ -497,9 +497,6 @@ class Recomposer(
         effectJob.cancel()
     }
 
-    @Deprecated("renamed to cancel(); consider close() for your use case", ReplaceWith("cancel()"))
-    fun shutDown() = cancel()
-
     /**
      * Close this [Recomposer]. Once all effects launched by managed compositions complete,
      * any active call to [runRecomposeAndApplyChanges] will return normally and this [Recomposer]
@@ -602,12 +599,6 @@ class Recomposer(
             // TODO(chuckj): Consider lifting this restriction by forcing a recompose
         }
     }
-
-    /**
-     * Returns true if any pending invalidations have been scheduled.
-     */
-    @Deprecated("Replaced by hasPendingWork", ReplaceWith("hasPendingWork"))
-    fun hasInvalidations(): Boolean = hasPendingWork
 
     /**
      * `true` if this [Recomposer] has any pending work scheduled, regardless of whether or not
