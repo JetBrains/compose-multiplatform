@@ -37,7 +37,6 @@ import androidx.compose.ui.graphics.nativeCanvas
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
-import androidx.core.content.ContextCompat
 import kotlin.math.roundToInt
 
 @Suppress("SetTextI18n")
@@ -56,7 +55,7 @@ fun AndroidViewSample() {
 @Sampled
 @Composable
 fun AndroidDrawableInDrawScopeSample() {
-    val drawable = ContextCompat.getDrawable(LocalContext.current, R.drawable.sample_drawable)
+    val drawable = LocalContext.current.getDrawable(R.drawable.sample_drawable)
     Box(
         modifier = Modifier.size(100.dp)
             .drawBehind {
