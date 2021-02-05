@@ -15,6 +15,7 @@ import org.gradle.work.InputChanges
 import org.jetbrains.compose.desktop.application.dsl.MacOSSigningSettings
 import org.jetbrains.compose.desktop.application.dsl.TargetFormat
 import org.jetbrains.compose.desktop.application.internal.*
+import org.jetbrains.compose.desktop.application.internal.validation.ValidatedMacOSSigningSettings
 import org.jetbrains.compose.desktop.application.internal.validation.validate
 import java.io.File
 import javax.inject.Inject
@@ -151,26 +152,44 @@ abstract class AbstractJPackageTask @Inject constructor(
     @get:Optional
     internal val nonValidatedMacBundleID: Property<String?> = objects.nullableProperty()
 
+    @get:Optional
     @get:Nested
-    internal lateinit var nonValidatedMacSigningSettings: MacOSSigningSettings
+    internal var nonValidatedMacSigningSettings: MacOSSigningSettings? = null
 
-    private fun validateSigning() =
-        nonValidatedMacSigningSettings.validate(nonValidatedMacBundleID)
+    private inline fun <T> withValidatedMacOSSigning(fn: (ValidatedMacOSSigningSettings) -> T): T? =
+        nonValidatedMacSigningSettings?.let { nonValidated ->
+            if (currentOS == OS.MacOS && nonValidated.sign.get()) {
+                fn(nonValidated.validate(nonValidatedMacBundleID))
+            } else null
+        }
 
     @get:LocalState
     protected val signDir: Provider<Directory> = project.layout.buildDirectory.dir("compose/tmp/sign")
 
     override fun makeArgs(tmpDir: File): MutableList<String> = super.makeArgs(tmpDir).apply {
-        if (targetFormat == TargetFormat.AppImage) {
+        if (targetFormat == TargetFormat.AppImage || appImage.orNull == null) {
+            // Args, that can only be used, when creating an app image or an installer w/o --app-image parameter
             cliArg("--input", tmpDir)
-            check(runtimeImage.isPresent) { "runtimeImage must be set for ${TargetFormat.AppImage}" }
-            check(!appImage.isPresent) { "appImage must not be set for ${TargetFormat.AppImage}" }
             cliArg("--runtime-image", runtimeImage)
             cliArg("--main-jar", launcherMainJar.ioFile.name)
             cliArg("--main-class", launcherMainClass)
-        } else {
-            check(!runtimeImage.isPresent) { "runtimeImage must not be set for $targetFormat" }
-            check(appImage.isPresent) { "appImage must be set for $targetFormat" }
+
+            when (currentOS) {
+                OS.Windows -> {
+                    cliArg("--win-console", winConsole)
+                }
+            }
+            cliArg("--icon", iconFile)
+            launcherArgs.orNull?.forEach {
+                cliArg("--arguments", it)
+            }
+            launcherJvmArgs.orNull?.forEach {
+                cliArg("--java-options", it)
+            }
+        }
+
+        if (targetFormat != TargetFormat.AppImage) {
+            // Args, that can only be used, when creating an installer
             cliArg("--app-image", appImage)
             cliArg("--install-dir", installationPath)
             cliArg("--license-file", licenseFile)
@@ -201,37 +220,23 @@ abstract class AbstractJPackageTask @Inject constructor(
         cliArg("--dest", destinationDir)
         cliArg("--verbose", verbose)
 
-        cliArg("--icon", iconFile)
-
         cliArg("--name", packageName)
         cliArg("--description", packageDescription)
         cliArg("--copyright", packageCopyright)
         cliArg("--app-version", packageVersion)
         cliArg("--vendor", packageVendor)
 
-        launcherArgs.orNull?.forEach {
-            cliArg("--arguments", it)
-        }
-        launcherJvmArgs.orNull?.forEach {
-            cliArg("--java-options", it)
-        }
-
         when (currentOS) {
             OS.MacOS -> {
                 cliArg("--mac-package-name", macPackageName)
                 cliArg("--mac-package-identifier", nonValidatedMacBundleID)
 
-                if (nonValidatedMacSigningSettings.sign.get()) {
-                    val signing = validateSigning()
+                withValidatedMacOSSigning { signing ->
                     cliArg("--mac-sign", true)
                     cliArg("--mac-signing-key-user-name", signing.identity)
                     cliArg("--mac-signing-keychain", signing.keychain)
                     cliArg("--mac-package-signing-prefix", signing.prefix)
-
                 }
-            }
-            OS.Windows -> {
-                cliArg("--win-console", winConsole)
             }
         }
     }
@@ -241,7 +246,7 @@ abstract class AbstractJPackageTask @Inject constructor(
 
         // todo: parallel processing
         val fileProcessor =
-            if (currentOS == OS.MacOS && nonValidatedMacSigningSettings.sign.get()) {
+            withValidatedMacOSSigning { signing ->
                 val tmpDirForSign = signDir.ioFile
                 fileOperations.delete(tmpDirForSign)
                 tmpDirForSign.mkdirs()
@@ -249,9 +254,9 @@ abstract class AbstractJPackageTask @Inject constructor(
                 MacJarSignFileCopyingProcessor(
                     tempDir = tmpDirForSign,
                     execOperations = execOperations,
-                    signing = validateSigning()
+                    signing = signing
                 )
-            } else SimpleFileCopyingProcessor
+            } ?: SimpleFileCopyingProcessor
 
         if (inputChanges.isIncremental) {
             logger.debug("Updating working dir incrementally: $workingDir")

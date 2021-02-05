@@ -59,19 +59,12 @@ internal fun Project.configurePackagingTasks(apps: Collection<Application>) {
             destinationDir.set(project.layout.buildDirectory.dir("compose/tmp/${app.name}/runtime"))
         }
 
-        val createDistributable = tasks.composeTask<AbstractJPackageTask>(
-            taskName("createDistributable", app),
-            args = listOf(TargetFormat.AppImage)
-        ) {
-            configurePackagingTask(app, createRuntimeImage = createRuntimeImage)
-        }
-
         val packageFormats = app.nativeDistributions.targetFormats.map { targetFormat ->
             val packageFormat = tasks.composeTask<AbstractJPackageTask>(
                 taskName("package", app, targetFormat.name),
                 args = listOf(targetFormat)
             ) {
-                configurePackagingTask(app, createAppImage = createDistributable)
+                configurePackagingTask(app, createRuntimeImage = createRuntimeImage)
             }
 
             if (targetFormat.isCompatibleWith(OS.MacOS)) {
@@ -102,6 +95,13 @@ internal fun Project.configurePackagingTasks(apps: Collection<Application>) {
 
         val packageUberJarForCurrentOS = project.tasks.composeTask<Jar>(taskName("package", app, "uberJarForCurrentOS")) {
             configurePackageUberJarForCurrentOS(app)
+        }
+
+        val createDistributable = tasks.composeTask<AbstractJPackageTask>(
+            taskName("createDistributable", app),
+            args = listOf(TargetFormat.AppImage)
+        ) {
+            configurePackagingTask(app, createRuntimeImage = createRuntimeImage)
         }
 
         val runDistributable = project.tasks.composeTask<AbstractRunDistributableTask>(

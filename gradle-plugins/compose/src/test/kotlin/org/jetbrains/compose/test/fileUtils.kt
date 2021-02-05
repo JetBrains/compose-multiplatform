@@ -9,5 +9,15 @@ fun File.modify(fn: (String) -> String) {
 }
 
 fun File.checkExists(): File = apply {
-    check(exists()) { "File does not exist: $absolutePath" }
+    check(exists()) {
+        buildString {
+            appendln("Requested file does not exist: $absolutePath")
+            parentFile?.listFiles()?.let { siblingFiles ->
+                appendln("Other files in the same directory: ${parentFile.absolutePath}")
+                siblingFiles.forEach {
+                    appendln("  * ${it.name}")
+                }
+            }
+        }
+    }
 }

@@ -24,7 +24,8 @@ abstract class AbstractNotarizationTask(
     internal val nonValidatedBundleID: Property<String?> = objects.nullableProperty()
 
     @get:Nested
-    internal lateinit var nonValidatedNotarizationSettings: MacOSNotarizationSettings
+    @get:Optional
+    internal var nonValidatedNotarizationSettings: MacOSNotarizationSettings? = null
 
     internal fun validateNotarization() =
         nonValidatedNotarizationSettings.validate(nonValidatedBundleID)
