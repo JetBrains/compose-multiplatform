@@ -155,12 +155,12 @@ private class Updater<T : Component>(
     }
 
     init {
-        snapshotObserver.enableStateUpdatesObserving(true)
+        snapshotObserver.start()
         performUpdate()
     }
 
     fun dispose() {
-        snapshotObserver.enableStateUpdatesObserving(false)
+        snapshotObserver.stop()
         snapshotObserver.clear()
         isDisposed = true
     }
