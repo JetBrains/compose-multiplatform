@@ -15,6 +15,10 @@ A plugin demonstrates Jetpack compose capabilities on IntelliJ Platform
         <!-- Add your extensions here -->
     </extensions>
 
+    <applicationListeners>
+        <listener class="com.jetbrains.compose.theme.intellij.ThemeChangeListener" topic="com.intellij.ide.ui.LafManagerListener" />
+    </applicationListeners>
+
     <actions>
         <!-- Add your actions here -->
         <action id="com.jetbrains.compose.ComposeDemoAction" class="com.jetbrains.compose.ComposeDemoAction"
