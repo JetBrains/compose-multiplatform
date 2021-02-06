@@ -39,17 +39,17 @@ import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.android.InternalPlatformTextApi
 import androidx.compose.ui.text.android.style.BaselineShiftSpan
 import androidx.compose.ui.text.android.style.FontFeatureSpan
-import androidx.compose.ui.text.android.style.FontSpan
-import androidx.compose.ui.text.android.style.FontWeightStyleSpan
 import androidx.compose.ui.text.android.style.LetterSpacingSpanEm
 import androidx.compose.ui.text.android.style.LetterSpacingSpanPx
 import androidx.compose.ui.text.android.style.LineHeightSpan
 import androidx.compose.ui.text.android.style.ShadowSpan
 import androidx.compose.ui.text.android.style.SkewXSpan
+import androidx.compose.ui.text.android.style.TypefaceSpan
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontSynthesis
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.intersect
 import androidx.compose.ui.text.intl.Locale
 import androidx.compose.ui.text.intl.LocaleList
 import androidx.compose.ui.text.platform.TypefaceAdapter
@@ -63,20 +63,14 @@ import androidx.compose.ui.unit.TextUnitType
 import androidx.compose.ui.unit.isUnspecified
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.util.fastForEach
+import androidx.compose.ui.util.fastForEachIndexed
 import kotlin.math.ceil
 import kotlin.math.roundToInt
-
-// FontSpan and LetterSpacingSpanPx/LetterSpacingSpanSP has lower priority than normal spans. So
-// they have negative priority.
-// Meanwhile, FontSpan needs to be applied before LetterSpacing.
-private const val SPAN_PRIORITY_FONT = -1
-private const val SPAN_PRIORITY_LETTERSPACING = -2
 
 private data class SpanRange(
     val span: Any,
     val start: Int,
-    val end: Int,
-    val priority: Int
+    val end: Int
 )
 
 internal fun Spannable.setSpan(span: Any, start: Int, end: Int) {
@@ -147,6 +141,12 @@ internal fun Spannable.setSpanStyles(
     density: Density,
     typefaceAdapter: TypefaceAdapter
 ) {
+
+    setFontAttributes(spanStyles, typefaceAdapter)
+
+    // LetterSpacingSpanPx/LetterSpacingSpanSP has lower priority than normal spans. Because
+    // letterSpacing relies on the fontSize on [Paint] to compute Px/Sp from Em. So it must be
+    // applied after all spans that changes the fontSize.
     val lowPrioritySpans = ArrayList<SpanRange>()
 
     for (spanStyleRange in spanStyles) {
@@ -158,12 +158,10 @@ internal fun Spannable.setSpanStyles(
         setSpanStyle(
             spanStyleRange,
             density,
-            lowPrioritySpans,
-            typefaceAdapter
+            lowPrioritySpans
         )
     }
 
-    lowPrioritySpans.sortBy { it.priority }
     lowPrioritySpans.fastForEach { (span, start, end) ->
         setSpan(span, start, end)
     }
@@ -172,8 +170,7 @@ internal fun Spannable.setSpanStyles(
 private fun Spannable.setSpanStyle(
     spanStyleRange: AnnotatedString.Range<SpanStyle>,
     density: Density,
-    lowPrioritySpans: ArrayList<SpanRange>,
-    typefaceAdapter: TypefaceAdapter
+    lowPrioritySpans: ArrayList<SpanRange>
 ) {
     val start = spanStyleRange.start
     val end = spanStyleRange.end
@@ -191,8 +188,6 @@ private fun Spannable.setSpanStyle(
 
     setFontFeatureSettings(style.fontFeatureSettings, start, end)
 
-    setFontStyleAndWeight(style.fontStyle, style.fontWeight, start, end)
-
     setGeometricTransform(style.textGeometricTransform, start, end)
 
     setLocaleList(style.localeList, start, end)
@@ -201,16 +196,89 @@ private fun Spannable.setSpanStyle(
 
     setShadow(style.shadow, start, end)
 
-    createFontFamilySpan(style.fontFamily, style.fontSynthesis, typefaceAdapter)?.let {
-        lowPrioritySpans.add(
-            SpanRange(it, start, end, SPAN_PRIORITY_FONT)
-        )
-    }
-
     createLetterSpacingSpan(style.letterSpacing, density)?.let {
         lowPrioritySpans.add(
-            SpanRange(it, start, end, SPAN_PRIORITY_LETTERSPACING)
+            SpanRange(it, start, end)
         )
+    }
+}
+
+@OptIn(InternalPlatformTextApi::class)
+private fun Spannable.setFontAttributes(
+    spanStyles: List<AnnotatedString.Range<SpanStyle>>,
+    typefaceAdapter: TypefaceAdapter
+) {
+    val fontRelatedSpanStyles = spanStyles.filter {
+        it.item.hasFontAttributes() || it.item.fontSynthesis != null
+    }
+    flattenStylesAndApply(fontRelatedSpanStyles) { spanStyle, start, end ->
+        setSpan(
+            TypefaceSpan(
+                typefaceAdapter.create(
+                    fontFamily = spanStyle.fontFamily,
+                    fontWeight = spanStyle.fontWeight ?: FontWeight.Normal,
+                    fontStyle = spanStyle.fontStyle ?: FontStyle.Normal,
+                    fontSynthesis = spanStyle.fontSynthesis ?: FontSynthesis.All
+                )
+            ),
+            start,
+            end,
+            Spanned.SPAN_EXCLUSIVE_EXCLUSIVE
+        )
+    }
+}
+
+/**
+ * Flatten styles in the [spanStyles], so that overlapping styles are merged, and then apply the
+ * [block] on the merged [SpanStyle].
+ *
+ * @param spanStyles the input [SpanStyle] ranges to be flattened.
+ * @param block the function to be applied on the merged [SpanStyle].
+ */
+internal fun flattenStylesAndApply(
+    spanStyles: List<AnnotatedString.Range<SpanStyle>>,
+    block: (SpanStyle, Int, Int) -> Unit
+) {
+    if (spanStyles.size <= 1) {
+        if (spanStyles.isNotEmpty()) {
+            block(spanStyles[0].item, spanStyles[0].start, spanStyles[0].end)
+        }
+        return
+    }
+
+    val spanCount = spanStyles.size
+    val transitionOffsets = Array(spanCount * 2) { 0 }
+    spanStyles.fastForEachIndexed { idx, spanStyle ->
+        transitionOffsets[idx] = spanStyle.start
+        transitionOffsets[idx + spanCount] = spanStyle.end
+    }
+    transitionOffsets.sort()
+
+    var lastTransitionOffsets = transitionOffsets.first()
+    for (transitionOffset in transitionOffsets) {
+        // There might be duplicated transition offsets, we skip them here.
+        if (transitionOffset == lastTransitionOffsets) {
+            continue
+        }
+
+        // Check all spans that intersects with this transition range.
+        var mergedSpanStyle: SpanStyle? = null
+        for (spanStyle in spanStyles) {
+            if (
+                intersect(lastTransitionOffsets, transitionOffset, spanStyle.start, spanStyle.end)
+            ) {
+                if (mergedSpanStyle == null) {
+                    mergedSpanStyle = SpanStyle()
+                }
+                mergedSpanStyle = mergedSpanStyle.merge(spanStyle.item)
+            }
+        }
+
+        if (mergedSpanStyle != null) {
+            block(mergedSpanStyle, lastTransitionOffsets, transitionOffset)
+        }
+
+        lastTransitionOffsets = transitionOffset
     }
 }
 
@@ -229,25 +297,6 @@ private fun createLetterSpacingSpan(
         }
         TextUnitType.Unspecified -> {
             null
-        }
-    }
-}
-
-@OptIn(InternalPlatformTextApi::class)
-private fun createFontFamilySpan(
-    fontFamily: FontFamily?,
-    fontSynthesis: FontSynthesis?,
-    typefaceAdapter: TypefaceAdapter
-): MetricAffectingSpan? {
-    return fontFamily?.let {
-        FontSpan { weight, isItalic ->
-            createTypeface(
-                fontFamily = it,
-                weight = weight,
-                isItalic = isItalic,
-                fontSynthesis = fontSynthesis,
-                typefaceAdapter = typefaceAdapter
-            )
         }
     }
 }
@@ -301,24 +350,6 @@ private fun Spannable.setGeometricTransform(
         if (it.skewX != 0f) {
             setSpan(SkewXSpan(it.skewX), start, end)
         }
-    }
-}
-
-@OptIn(InternalPlatformTextApi::class)
-private fun Spannable.setFontStyleAndWeight(
-    fontStyle: FontStyle?,
-    fontWeight: FontWeight?,
-    start: Int,
-    end: Int
-) {
-    if (fontStyle != null || fontWeight != null) {
-        val weight = fontWeight?.weight ?: 0
-        val fontStyleMode = when (fontStyle) {
-            FontStyle.Normal -> FontWeightStyleSpan.STYLE_NORMAL
-            FontStyle.Italic -> FontWeightStyleSpan.STYLE_ITALIC
-            else -> FontWeightStyleSpan.STYLE_NONE
-        }
-        setSpan(FontWeightStyleSpan(weight, fontStyleMode), start, end)
     }
 }
 
