@@ -58,10 +58,10 @@ internal class ComposableLambdaNImpl(
 
     override fun invoke(vararg args: Any?): Any? {
         val realParams = realParamCount(args.size)
-        val c = args[realParams] as Composer
+        var c = args[realParams] as Composer
         val allArgsButLast = args.slice(0 until args.size - 1).toTypedArray()
         val lastChanged = args[args.size - 1] as Int
-        c.startRestartGroup(key, sourceInformation)
+        c = c.startRestartGroup(key, sourceInformation)
         val dirty = lastChanged or if (c.changed(this))
             differentBits(realParams)
         else
