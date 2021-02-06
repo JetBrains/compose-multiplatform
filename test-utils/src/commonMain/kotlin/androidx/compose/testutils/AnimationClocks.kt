@@ -17,26 +17,10 @@
 package androidx.compose.testutils
 
 import androidx.compose.animation.core.ManualFrameClock
-import androidx.compose.animation.core.MonotonicFrameAnimationClock
 import androidx.compose.animation.core.advanceClockMillis
-import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import kotlinx.coroutines.yield
-import kotlin.coroutines.CoroutineContext
-
-/**
- * Creates a [MonotonicFrameAnimationClock] from the given [coroutineContext]'s clock. A new
- * coroutine scope is created from the [coroutineContext].
- *
- * @see MonotonicFrameAnimationClock
- */
-fun monotonicFrameAnimationClockOf(
-    coroutineContext: CoroutineContext
-): MonotonicFrameAnimationClock =
-    MonotonicFrameAnimationClock(
-        CoroutineScope(coroutineContext)
-    )
 
 /**
  * Advances the clock on the main dispatcher.

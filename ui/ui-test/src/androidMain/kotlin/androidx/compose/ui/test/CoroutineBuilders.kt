@@ -17,7 +17,6 @@
 package androidx.compose.ui.test
 
 import androidx.compose.animation.core.ManualFrameClock
-import androidx.compose.animation.core.MonotonicFrameAnimationClock
 import androidx.compose.animation.core.advanceClockMillis
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -59,26 +58,12 @@ import kotlinx.coroutines.yield
  * }
  * ```
  * Here, `MyAnimation` is an animation that takes frames from the `animationClock` passed to it.
- *
- * It is good practice to add the animation clock to the parameters of an animation state to
- * improve testability. For example, [DrawerState][androidx.compose.material.DrawerState] accepts
- * an animation clock in the form of [AnimationClockObservable][androidx.compose.animation.core
- * .AnimationClockObservable]. Wrap the [ManualFrameClock] in a [MonotonicFrameAnimationClock]
- * and pass the wrapped clock if you want to manually drive such animations.
- *
- * @param compatibleWithManualAnimationClock If set to `true`, and this clock is used in a
- * [MonotonicFrameAnimationClock], will make the MonotonicFrameAnimationClock behave the same
- * as [ManualAnimationClock][androidx.compose.animation.core.ManualAnimationClock] and send the
- * first frame immediately upon subscription. Avoid reliance on this if possible. `false` by
- * default.
  */
 @ExperimentalTestApi
 fun <R> runBlockingWithManualClock(
-    compatibleWithManualAnimationClock: Boolean = false,
     block: suspend CoroutineScope.(clock: ManualFrameClock) -> R
 ) {
-    @Suppress("DEPRECATION")
-    val clock = ManualFrameClock(0L, compatibleWithManualAnimationClock)
+    val clock = ManualFrameClock(0L)
     return runBlocking(clock) {
         block(clock)
         while (clock.hasAwaiters) {

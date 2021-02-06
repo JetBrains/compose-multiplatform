@@ -16,8 +16,6 @@
 
 package androidx.compose.material
 
-import androidx.compose.animation.asDisposableClock
-import androidx.compose.animation.core.AnimationClockObservable
 import androidx.compose.animation.core.AnimationEndReason
 import androidx.compose.animation.core.TweenSpec
 import androidx.compose.foundation.Canvas
@@ -33,6 +31,7 @@ import androidx.compose.foundation.layout.preferredSizeIn
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Stable
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.Saver
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Modifier
@@ -41,7 +40,6 @@ import androidx.compose.ui.gesture.scrollorientationlocking.Orientation
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.input.pointer.pointerInput
-import androidx.compose.ui.platform.LocalAnimationClock
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.semantics.dismiss
@@ -52,6 +50,7 @@ import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.util.lerp
+import kotlinx.coroutines.launch
 import kotlin.math.roundToInt
 
 /**
@@ -93,7 +92,6 @@ enum class BottomDrawerValue {
  * State of the [ModalDrawer] composable.
  *
  * @param initialValue The initial value of the state.
- * @param clock The animation clock that will be used to drive the animations.
  * @param confirmStateChange Optional callback invoked to confirm or veto a pending state change.
  */
 @Suppress("NotCloseable")
@@ -101,11 +99,9 @@ enum class BottomDrawerValue {
 @Stable
 class DrawerState(
     initialValue: DrawerValue,
-    clock: AnimationClockObservable,
     confirmStateChange: (DrawerValue) -> Boolean = { true }
 ) : SwipeableState<DrawerValue>(
     initialValue = initialValue,
-    clock = clock,
     animationSpec = AnimationSpec,
     confirmStateChange = confirmStateChange
 ) {
@@ -113,57 +109,39 @@ class DrawerState(
      * Whether the drawer is open.
      */
     val isOpen: Boolean
-        get() = value == DrawerValue.Open
+        get() = currentValue == DrawerValue.Open
 
     /**
      * Whether the drawer is closed.
      */
     val isClosed: Boolean
-        get() = value == DrawerValue.Closed
+        get() = currentValue == DrawerValue.Closed
 
     /**
-     * Open the drawer with an animation.
+     * Open the drawer with animation and suspend until it if fully opened or animation has been
+     * cancelled.
      *
-     * @param onOpened Optional callback invoked when the drawer has finished opening.
+     * @return the reason the open animation ended
      */
-    fun open(onOpened: (() -> Unit)? = null) {
-        animateTo(
-            DrawerValue.Open,
-            onEnd = { endReason, endValue ->
-                if (endReason != AnimationEndReason.Interrupted && endValue == DrawerValue.Open) {
-                    onOpened?.invoke()
-                }
-            }
-        )
-    }
+    suspend fun open(): AnimationEndReason = animateTo(DrawerValue.Open)
 
     /**
-     * Close the drawer with an animation.
+     * Close the drawer with animation and suspend until it if fully closed or animation has been
+     * cancelled.
      *
-     * @param onClosed Optional callback invoked when the drawer has finished closing.
+     * @return the reason the close animation ended
      */
-    fun close(onClosed: (() -> Unit)? = null) {
-        animateTo(
-            DrawerValue.Closed,
-            onEnd = { endReason, endValue ->
-                if (endReason != AnimationEndReason.Interrupted && endValue == DrawerValue.Closed) {
-                    onClosed?.invoke()
-                }
-            }
-        )
-    }
+    suspend fun close(): AnimationEndReason = animateTo(DrawerValue.Closed)
 
     companion object {
         /**
          * The default [Saver] implementation for [DrawerState].
          */
-        fun Saver(
-            clock: AnimationClockObservable,
-            confirmStateChange: (DrawerValue) -> Boolean
-        ) = Saver<DrawerState, DrawerValue>(
-            save = { it.value },
-            restore = { DrawerState(it, clock, confirmStateChange) }
-        )
+        fun Saver(confirmStateChange: (DrawerValue) -> Boolean) =
+            Saver<DrawerState, DrawerValue>(
+                save = { it.currentValue },
+                restore = { DrawerState(it, confirmStateChange) }
+            )
     }
 }
 
@@ -171,18 +149,15 @@ class DrawerState(
  * State of the [BottomDrawer] composable.
  *
  * @param initialValue The initial value of the state.
- * @param clock The animation clock that will be used to drive the animations.
  * @param confirmStateChange Optional callback invoked to confirm or veto a pending state change.
  */
 @Suppress("NotCloseable")
 @OptIn(ExperimentalMaterialApi::class)
 class BottomDrawerState(
     initialValue: BottomDrawerValue,
-    clock: AnimationClockObservable,
     confirmStateChange: (BottomDrawerValue) -> Boolean = { true }
 ) : SwipeableState<BottomDrawerValue>(
     initialValue = initialValue,
-    clock = clock,
     animationSpec = AnimationSpec,
     confirmStateChange = confirmStateChange
 ) {
@@ -190,73 +165,43 @@ class BottomDrawerState(
      * Whether the drawer is open.
      */
     val isOpen: Boolean
-        get() = value == BottomDrawerValue.Open
+        get() = currentValue == BottomDrawerValue.Open
 
     /**
      * Whether the drawer is closed.
      */
     val isClosed: Boolean
-        get() = value == BottomDrawerValue.Closed
+        get() = currentValue == BottomDrawerValue.Closed
 
     /**
      * Whether the drawer is expanded.
      */
     val isExpanded: Boolean
-        get() = value == BottomDrawerValue.Expanded
+        get() = currentValue == BottomDrawerValue.Expanded
 
     /**
-     * Open the drawer with an animation.
+     * Open the drawer with animation and suspend until it if fully opened or animation has been
+     * cancelled.
      *
-     * @param onOpened Optional callback invoked when the drawer has finished opening.
+     * @return the reason the open animation ended
      */
-    fun open(onOpened: (() -> Unit)? = null) {
-        animateTo(
-            BottomDrawerValue.Open,
-            onEnd = { endReason, endValue ->
-                if (endReason != AnimationEndReason.Interrupted &&
-                    endValue == BottomDrawerValue.Open
-                ) {
-                    onOpened?.invoke()
-                }
-            }
-        )
-    }
+    suspend fun open(): AnimationEndReason = animateTo(BottomDrawerValue.Open)
 
     /**
-     * Close the drawer with an animation.
+     * Close the drawer with animation and suspend until it if fully closed or animation has been
+     * cancelled.
      *
-     * @param onClosed Optional callback invoked when the drawer has finished closing.
+     * @return the reason the close animation ended
      */
-    fun close(onClosed: (() -> Unit)? = null) {
-        animateTo(
-            BottomDrawerValue.Closed,
-            onEnd = { endReason, endValue ->
-                if (endReason != AnimationEndReason.Interrupted &&
-                    endValue == BottomDrawerValue.Closed
-                ) {
-                    onClosed?.invoke()
-                }
-            }
-        )
-    }
+    suspend fun close() = animateTo(BottomDrawerValue.Closed)
 
     /**
-     * Expand the drawer with an animation.
+     * Expand the drawer with animation and suspend until it if fully expanded or animation has
+     * been cancelled.
      *
-     * @param onExpanded Optional callback invoked when the drawer has finished expanding.
+     * @return the reason the expand animation ended
      */
-    fun expand(onExpanded: (() -> Unit)? = null) {
-        animateTo(
-            BottomDrawerValue.Expanded,
-            onEnd = { endReason, endValue ->
-                if (endReason != AnimationEndReason.Interrupted &&
-                    endValue == BottomDrawerValue.Expanded
-                ) {
-                    onExpanded?.invoke()
-                }
-            }
-        )
-    }
+    suspend fun expand() = animateTo(BottomDrawerValue.Expanded)
 
     internal val nestedScrollConnection = this.PreUpPostDownNestedScrollConnection
 
@@ -264,18 +209,16 @@ class BottomDrawerState(
         /**
          * The default [Saver] implementation for [BottomDrawerState].
          */
-        fun Saver(
-            clock: AnimationClockObservable,
-            confirmStateChange: (BottomDrawerValue) -> Boolean
-        ) = Saver<BottomDrawerState, BottomDrawerValue>(
-            save = { it.value },
-            restore = { BottomDrawerState(it, clock, confirmStateChange) }
-        )
+        fun Saver(confirmStateChange: (BottomDrawerValue) -> Boolean) =
+            Saver<BottomDrawerState, BottomDrawerValue>(
+                save = { it.currentValue },
+                restore = { BottomDrawerState(it, confirmStateChange) }
+            )
     }
 }
 
 /**
- * Create and [remember] a [DrawerState] with the default animation clock.
+ * Create and [remember] a [DrawerState].
  *
  * @param initialValue The initial value of the state.
  * @param confirmStateChange Optional callback invoked to confirm or veto a pending state change.
@@ -285,17 +228,13 @@ fun rememberDrawerState(
     initialValue: DrawerValue,
     confirmStateChange: (DrawerValue) -> Boolean = { true }
 ): DrawerState {
-    val clock = LocalAnimationClock.current.asDisposableClock()
-    return rememberSaveable(
-        clock,
-        saver = DrawerState.Saver(clock, confirmStateChange)
-    ) {
-        DrawerState(initialValue, clock, confirmStateChange)
+    return rememberSaveable(saver = DrawerState.Saver(confirmStateChange)) {
+        DrawerState(initialValue, confirmStateChange)
     }
 }
 
 /**
- * Create and [remember] a [BottomDrawerState] with the default animation clock.
+ * Create and [remember] a [BottomDrawerState].
  *
  * @param initialValue The initial value of the state.
  * @param confirmStateChange Optional callback invoked to confirm or veto a pending state change.
@@ -305,12 +244,8 @@ fun rememberBottomDrawerState(
     initialValue: BottomDrawerValue,
     confirmStateChange: (BottomDrawerValue) -> Boolean = { true }
 ): BottomDrawerState {
-    val clock = LocalAnimationClock.current.asDisposableClock()
-    return rememberSaveable(
-        clock,
-        saver = BottomDrawerState.Saver(clock, confirmStateChange)
-    ) {
-        BottomDrawerState(initialValue, clock, confirmStateChange)
+    return rememberSaveable(saver = BottomDrawerState.Saver(confirmStateChange)) {
+        BottomDrawerState(initialValue, confirmStateChange)
     }
 }
 
@@ -355,6 +290,7 @@ fun ModalDrawer(
     scrimColor: Color = DrawerDefaults.scrimColor,
     content: @Composable () -> Unit
 ) {
+    val scope = rememberCoroutineScope()
     BoxWithConstraints(modifier.fillMaxSize()) {
         val modalDrawerConstraints = constraints
         // TODO : think about Infinite max bounds case
@@ -389,7 +325,7 @@ fun ModalDrawer(
             }
             Scrim(
                 open = drawerState.isOpen,
-                onClose = { drawerState.close() },
+                onClose = { scope.launch { drawerState.close() } },
                 fraction = { calculateFraction(minValue, maxValue, drawerState.offset.value) },
                 color = scrimColor
             )
@@ -406,7 +342,7 @@ fun ModalDrawer(
                     .semantics {
                         paneTitle = Strings.NavigationMenu
                         if (drawerState.isOpen) {
-                            dismiss(action = { drawerState.close(); true })
+                            dismiss(action = { scope.launch { drawerState.close() }; true })
                         }
                     }
                     .offset { IntOffset(drawerState.offset.value.roundToInt(), 0) }
@@ -466,6 +402,7 @@ fun BottomDrawer(
     scrimColor: Color = DrawerDefaults.scrimColor,
     content: @Composable () -> Unit
 ) {
+    val scope = rememberCoroutineScope()
     BoxWithConstraints(modifier.fillMaxSize()) {
         val modalDrawerConstraints = constraints
         // TODO : think about Infinite max bounds case
@@ -517,7 +454,7 @@ fun BottomDrawer(
             }
             Scrim(
                 open = drawerState.isOpen,
-                onClose = { drawerState.close() },
+                onClose = { scope.launch { drawerState.close() } },
                 fraction = {
                     // as we scroll "from height to 0" , need to reverse fraction
                     1 - calculateFraction(openValue, maxValue, drawerState.offset.value)
@@ -536,7 +473,7 @@ fun BottomDrawer(
                     .semantics {
                         paneTitle = Strings.NavigationMenu
                         if (drawerState.isOpen) {
-                            dismiss(action = { drawerState.close(); true })
+                            dismiss(action = { scope.launch { drawerState.close() }; true })
                         }
                     }.offset { IntOffset(0, drawerState.offset.value.roundToInt()) },
                 shape = drawerShape,

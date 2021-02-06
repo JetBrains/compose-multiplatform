@@ -79,6 +79,7 @@ private val colors = listOf(
 @Composable
 fun SimpleScaffoldWithTopBar() {
     val scaffoldState = rememberScaffoldState()
+    val scope = rememberCoroutineScope()
     Scaffold(
         scaffoldState = scaffoldState,
         drawerContent = { Text("Drawer content") },
@@ -88,7 +89,7 @@ fun SimpleScaffoldWithTopBar() {
                 navigationIcon = {
                     IconButton(
                         onClick = {
-                            scaffoldState.drawerState.open()
+                            scope.launch { scaffoldState.drawerState.open() }
                         }
                     ) {
                         Icon(Icons.Filled.Menu, contentDescription = "Localized description")
@@ -162,7 +163,7 @@ fun ScaffoldWithBottomBarAndCutout() {
             BottomAppBar(cutoutShape = fabShape) {
                 IconButton(
                     onClick = {
-                        scaffoldState.drawerState.open()
+                        coroutineScope.launch { scaffoldState.drawerState.open() }
                     }
                 ) {
                     Icon(Icons.Filled.Menu, contentDescription = "Localized description")

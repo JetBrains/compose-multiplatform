@@ -56,6 +56,7 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.MediumTest
 import androidx.test.filters.SdkSuppress
 import com.google.common.truth.Truth
+import kotlinx.coroutines.runBlocking
 import org.junit.Ignore
 import org.junit.Rule
 import org.junit.Test
@@ -169,13 +170,14 @@ class BottomSheetScaffoldTest {
     }
 
     @Test
-    fun backdropScaffold_revealAndConceal_manually() {
+    fun backdropScaffold_revealAndConceal_manually(): Unit = runBlocking {
         lateinit var bottomSheetState: BottomSheetState
         rule.setContent {
             bottomSheetState = rememberBottomSheetState(BottomSheetValue.Collapsed)
             BottomSheetScaffold(
-                scaffoldState =
-                    rememberBottomSheetScaffoldState(bottomSheetState = bottomSheetState),
+                scaffoldState = rememberBottomSheetScaffoldState(
+                    bottomSheetState = bottomSheetState
+                ),
                 sheetContent = {
                     Box(Modifier.fillMaxWidth().height(300.dp).testTag(sheetContent))
                 },
@@ -187,18 +189,14 @@ class BottomSheetScaffoldTest {
         rule.onNodeWithTag(sheetContent)
             .assertTopPositionInRootIsEqualTo(rule.rootHeight() - peekHeight)
 
-        rule.runOnIdle {
-            bottomSheetState.expand()
-        }
+        bottomSheetState.expand()
 
         advanceClock()
 
         rule.onNodeWithTag(sheetContent)
             .assertTopPositionInRootIsEqualTo(rule.rootHeight() - 300.dp)
 
-        rule.runOnIdle {
-            bottomSheetState.collapse()
-        }
+        bottomSheetState.collapse()
 
         advanceClock()
 
@@ -212,8 +210,9 @@ class BottomSheetScaffoldTest {
         rule.setContent {
             bottomSheetState = rememberBottomSheetState(BottomSheetValue.Collapsed)
             BottomSheetScaffold(
-                scaffoldState =
-                    rememberBottomSheetScaffoldState(bottomSheetState = bottomSheetState),
+                scaffoldState = rememberBottomSheetScaffoldState(
+                    bottomSheetState = bottomSheetState
+                ),
                 sheetContent = {
                     Box(Modifier.fillMaxWidth().height(300.dp).testTag(sheetContent))
                 },
@@ -223,7 +222,7 @@ class BottomSheetScaffoldTest {
         }
 
         rule.runOnIdle {
-            Truth.assertThat(bottomSheetState.value).isEqualTo(BottomSheetValue.Collapsed)
+            Truth.assertThat(bottomSheetState.currentValue).isEqualTo(BottomSheetValue.Collapsed)
         }
 
         rule.onNodeWithTag(sheetContent)
@@ -232,7 +231,7 @@ class BottomSheetScaffoldTest {
         advanceClock()
 
         rule.runOnIdle {
-            Truth.assertThat(bottomSheetState.value).isEqualTo(BottomSheetValue.Expanded)
+            Truth.assertThat(bottomSheetState.currentValue).isEqualTo(BottomSheetValue.Expanded)
         }
 
         rule.onNodeWithTag(sheetContent)
@@ -241,7 +240,7 @@ class BottomSheetScaffoldTest {
         advanceClock()
 
         rule.runOnIdle {
-            Truth.assertThat(bottomSheetState.value).isEqualTo(BottomSheetValue.Collapsed)
+            Truth.assertThat(bottomSheetState.currentValue).isEqualTo(BottomSheetValue.Collapsed)
         }
     }
 
@@ -251,8 +250,9 @@ class BottomSheetScaffoldTest {
         rule.setContent {
             bottomSheetState = rememberBottomSheetState(BottomSheetValue.Collapsed)
             BottomSheetScaffold(
-                scaffoldState =
-                    rememberBottomSheetScaffoldState(bottomSheetState = bottomSheetState),
+                scaffoldState = rememberBottomSheetScaffoldState(
+                    bottomSheetState = bottomSheetState
+                ),
                 sheetContent = {
                     Box(Modifier.fillMaxWidth().height(300.dp).testTag(sheetContent))
                 },
@@ -263,7 +263,7 @@ class BottomSheetScaffoldTest {
         }
 
         rule.runOnIdle {
-            Truth.assertThat(bottomSheetState.value).isEqualTo(BottomSheetValue.Collapsed)
+            Truth.assertThat(bottomSheetState.currentValue).isEqualTo(BottomSheetValue.Collapsed)
         }
 
         rule.onNodeWithTag(sheetContent)
@@ -272,13 +272,13 @@ class BottomSheetScaffoldTest {
         advanceClock()
 
         rule.runOnIdle {
-            Truth.assertThat(bottomSheetState.value).isEqualTo(BottomSheetValue.Collapsed)
+            Truth.assertThat(bottomSheetState.currentValue).isEqualTo(BottomSheetValue.Collapsed)
         }
     }
 
     @Test
     @Ignore("unignore once animation sync is ready (b/147291885)")
-    fun bottomSheetScaffold_drawer_manualControl() {
+    fun bottomSheetScaffold_drawer_manualControl() = runBlocking {
         var drawerChildPosition: Offset = Offset.Zero
         lateinit var scaffoldState: BottomSheetScaffoldState
         rule.setContent {
@@ -311,13 +311,9 @@ class BottomSheetScaffoldTest {
             }
         }
         Truth.assertThat(drawerChildPosition.x).isLessThan(0f)
-        rule.runOnUiThread {
-            scaffoldState.drawerState.open()
-        }
+        scaffoldState.drawerState.open()
         Truth.assertThat(drawerChildPosition.x).isLessThan(0f)
-        rule.runOnUiThread {
-            scaffoldState.drawerState.close()
-        }
+        scaffoldState.drawerState.close()
         Truth.assertThat(drawerChildPosition.x).isLessThan(0f)
     }
 
@@ -358,7 +354,7 @@ class BottomSheetScaffoldTest {
     }
 
     @Test
-    fun bottomSheetScaffold_fab_position() {
+    fun bottomSheetScaffold_fab_position(): Unit = runBlocking {
         val fabTag = "fab"
         var fabSize: IntSize = IntSize.Zero
         lateinit var scaffoldState: BottomSheetScaffoldState
@@ -390,9 +386,7 @@ class BottomSheetScaffoldTest {
                 rule.rootHeight() - peekHeight - fabSize.height.toDp() / 2
             )
         }
-        rule.runOnUiThread {
-            scaffoldState.bottomSheetState.expand()
-        }
+        scaffoldState.bottomSheetState.expand()
         advanceClock()
 
         with(rule.density) {

@@ -201,7 +201,7 @@ class ScrollableTest {
 
     @Test
     @OptIn(ExperimentalTestApi::class)
-    fun scrollable_disabledWontCallLambda() = runBlockingWithManualClock(true) { clock ->
+    fun scrollable_disabledWontCallLambda() = runBlockingWithManualClock { clock ->
         val enabled = mutableStateOf(true)
         var total = 0f
         val controller = ScrollableState(

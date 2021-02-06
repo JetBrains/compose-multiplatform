@@ -16,29 +16,20 @@
 
 package androidx.compose.ui.test.junit4
 
-import androidx.compose.animation.core.InternalAnimationApi
-import androidx.compose.animation.core.MonotonicFrameAnimationClock
-import androidx.compose.animation.core.rootAnimationClockFactory
 import org.junit.rules.TestRule
 import org.junit.runner.Description
 import org.junit.runners.model.Statement
 
+// TODO: figure out what we should do with this test rule?
 internal class MonotonicFrameClockTestRule : TestRule {
 
     override fun apply(base: Statement, description: Description?): Statement {
         return AnimationClockStatement(base)
     }
 
-    @OptIn(InternalAnimationApi::class)
     private inner class AnimationClockStatement(private val base: Statement) : Statement() {
         override fun evaluate() {
-            val oldFactory = rootAnimationClockFactory
-            rootAnimationClockFactory = { MonotonicFrameAnimationClock(it) }
-            try {
-                base.evaluate()
-            } finally {
-                rootAnimationClockFactory = oldFactory
-            }
+            base.evaluate()
         }
     }
 }

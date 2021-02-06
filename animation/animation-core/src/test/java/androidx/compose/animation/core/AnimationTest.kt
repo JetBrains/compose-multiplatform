@@ -17,7 +17,6 @@
 package androidx.compose.animation.core
 
 import org.junit.Assert.assertEquals
-import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.junit.runners.JUnit4
@@ -25,13 +24,6 @@ import java.lang.Long.max
 
 @RunWith(JUnit4::class)
 class AnimationTest {
-    private lateinit var clock: ManualAnimationClock
-
-    @Before
-    fun setup() {
-        clock = ManualAnimationClock(0L)
-    }
-
     @Test
     fun testSnap() {
         val snap1D = VectorizedSnapSpec<AnimationVector1D>(200)

@@ -57,11 +57,11 @@ fun BackdropScaffoldSample() {
                 title = { Text("Backdrop scaffold") },
                 navigationIcon = {
                     if (scaffoldState.isConcealed) {
-                        IconButton(onClick = { scaffoldState.reveal() }) {
+                        IconButton(onClick = { scope.launch { scaffoldState.reveal() } }) {
                             Icon(Icons.Default.Menu, contentDescription = "Localized description")
                         }
                     } else {
-                        IconButton(onClick = { scaffoldState.conceal() }) {
+                        IconButton(onClick = { scope.launch { scaffoldState.conceal() } }) {
                             Icon(Icons.Default.Close, contentDescription = "Localized description")
                         }
                     }
@@ -90,7 +90,7 @@ fun BackdropScaffoldSample() {
                     ListItem(
                         Modifier.clickable {
                             selection.value = it
-                            scaffoldState.conceal()
+                            scope.launch { scaffoldState.conceal() }
                         },
                         text = { Text("Select $it") }
                     )
