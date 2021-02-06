@@ -595,3 +595,9 @@ class Counter {
 
     operator fun get(key: String) = counts[key] ?: 0
 }
+
+private class Trigger() {
+    val count = mutableStateOf(0)
+    fun subscribe() { count.value }
+    fun recompose() { count.value += 1 }
+}

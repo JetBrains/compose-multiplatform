@@ -1,5 +1,5 @@
 /*
- * Copyright 2020 The Android Open Source Project
+ * Copyright 2021 The Android Open Source Project
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,140 +14,125 @@
  * limitations under the License.
  */
 
-@file:OptIn(ExperimentalComposeApi::class)
 package androidx.compose.runtime
 
-import android.widget.TextView
-import androidx.test.ext.junit.runners.AndroidJUnit4
-import androidx.test.filters.MediumTest
-import org.junit.After
-import org.junit.Ignore
-import org.junit.Rule
-import org.junit.Test
-import org.junit.runner.RunWith
+import androidx.compose.runtime.mock.Text
+import androidx.compose.runtime.mock.compositionTest
+import androidx.compose.runtime.mock.expectChanges
+import androidx.compose.runtime.mock.expectNoChanges
+import androidx.compose.runtime.mock.validate
 import kotlin.test.assertEquals
+import kotlin.test.Test
 import kotlin.test.assertFalse
 import kotlin.test.assertTrue
 
 // Create a normal (dynamic) CompositionLocal with a string value
-val someTextCompositionLocal = compositionLocalOf { "Default" }
+val LocalSomeTextComposition = compositionLocalOf { "Default" }
 
 // Create a normal (dynamic) CompositionLocal with an int value
-val someIntCompositionLocal = compositionLocalOf { 1 }
+val LocalSomeIntComposition = compositionLocalOf { 1 }
 
 // Create a non-overridable CompositionLocal provider key
-private val someOtherIntProvider = compositionLocalOf { 1 }
+private val LocalSomeOtherIntProvider = compositionLocalOf { 1 }
 
 // Make public the consumer key.
-val someOtherIntCompositionLocal: CompositionLocal<Int> = someOtherIntProvider
+val LocalSomeOtherIntComposition: CompositionLocal<Int> = LocalSomeOtherIntProvider
 
 // Create a static CompositionLocal with an int value
-val someStaticInt = staticCompositionLocalOf { 40 }
+val LocalSomeStaticInt = staticCompositionLocalOf { 40 }
 
-@MediumTest
-@RunWith(AndroidJUnit4::class)
-class CompositionLocalTests : BaseComposeTest() {
+class CompositionLocalTests {
 
     @Composable
-    @Suppress("Deprecation", "UNUSED_PARAMETER")
-    fun Text(value: String, id: Int = 100) {}
-
-    @Composable
-    fun ReadStringCompositionLocal(compositionLocal: CompositionLocal<String>, id: Int = 100) {
-        Text(value = compositionLocal.current, id = id)
+    fun ReadStringCompositionLocal(compositionLocal: CompositionLocal<String>) {
+        Text(value = compositionLocal.current)
     }
 
-    @get:Rule
-    override val activityRule = makeTestActivityRule()
-
     @Test
-    fun testCompositionLocalApi() {
+    fun testCompositionLocalApi() = compositionTest {
         compose {
-            assertEquals("Default", someTextCompositionLocal.current)
-            assertEquals(1, someIntCompositionLocal.current)
+            assertEquals("Default", LocalSomeTextComposition.current)
+            assertEquals(1, LocalSomeIntComposition.current)
             CompositionLocalProvider(
-                someTextCompositionLocal provides "Test1",
-                someIntCompositionLocal provides 12,
-                someOtherIntProvider provides 42,
-                someStaticInt provides 50
+                LocalSomeTextComposition provides "Test1",
+                LocalSomeIntComposition provides 12,
+                LocalSomeOtherIntProvider provides 42,
+                LocalSomeStaticInt provides 50
             ) {
                 assertEquals(
                     "Test1",
-                    someTextCompositionLocal.current
+                    LocalSomeTextComposition.current
                 )
-                assertEquals(12, someIntCompositionLocal.current)
+                assertEquals(12, LocalSomeIntComposition.current)
                 assertEquals(
                     42,
-                    someOtherIntCompositionLocal.current
+                    LocalSomeOtherIntComposition.current
                 )
-                assertEquals(50, someStaticInt.current)
+                assertEquals(50, LocalSomeStaticInt.current)
                 CompositionLocalProvider(
-                    someTextCompositionLocal provides "Test2",
-                    someStaticInt provides 60
+                    LocalSomeTextComposition provides "Test2",
+                    LocalSomeStaticInt provides 60
                 ) {
                     assertEquals(
                         "Test2",
-                        someTextCompositionLocal.current
+                        LocalSomeTextComposition.current
                     )
                     assertEquals(
                         12,
-                        someIntCompositionLocal.current
+                        LocalSomeIntComposition.current
                     )
                     assertEquals(
                         42,
-                        someOtherIntCompositionLocal.current
+                        LocalSomeOtherIntComposition.current
                     )
-                    assertEquals(60, someStaticInt.current)
+                    assertEquals(60, LocalSomeStaticInt.current)
                 }
                 assertEquals(
                     "Test1",
-                    someTextCompositionLocal.current
+                    LocalSomeTextComposition.current
                 )
-                assertEquals(12, someIntCompositionLocal.current)
+                assertEquals(12, LocalSomeIntComposition.current)
                 assertEquals(
                     42,
-                    someOtherIntCompositionLocal.current
+                    LocalSomeOtherIntComposition.current
                 )
-                assertEquals(50, someStaticInt.current)
+                assertEquals(50, LocalSomeStaticInt.current)
             }
-            assertEquals("Default", someTextCompositionLocal.current)
-            assertEquals(1, someIntCompositionLocal.current)
-        }.then {
-            // Force the composition to run
+            assertEquals("Default", LocalSomeTextComposition.current)
+            assertEquals(1, LocalSomeIntComposition.current)
         }
     }
 
     @Test
-    @Ignore("b/179279455")
-    fun recompose_Dynamic() {
-        val tvId = 100
+    fun recompose_Dynamic() = compositionTest {
         val invalidates = mutableListOf<RecomposeScope>()
         fun doInvalidate() = invalidates.forEach { it.invalidate() }.also { invalidates.clear() }
         var someText = "Unmodified"
         compose {
             invalidates.add(currentRecomposeScope)
             CompositionLocalProvider(
-                someTextCompositionLocal provides someText
+                LocalSomeTextComposition provides someText
             ) {
                 ReadStringCompositionLocal(
-                    compositionLocal = someTextCompositionLocal,
-                    id = tvId
+                    compositionLocal = LocalSomeTextComposition
                 )
             }
-        }.then { activity ->
-            assertEquals(someText, activity.findViewById<TextView>(100).text)
-
-            someText = "Modified"
-            doInvalidate()
-        }.then { activity ->
-            assertEquals(someText, activity.findViewById<TextView>(100).text)
         }
+
+        fun validate() {
+            validate {
+                Text(someText)
+            }
+        }
+
+        someText = "Modified"
+        doInvalidate()
+        expectChanges()
+        validate()
     }
 
     @Test
-    @Ignore("b/179279455")
-    fun recompose_Static() {
-        val tvId = 100
+    fun recompose_Static() = compositionTest {
         val invalidates = mutableListOf<RecomposeScope>()
         fun doInvalidate() = invalidates.forEach { it.invalidate() }.also { invalidates.clear() }
         val staticStringCompositionLocal = staticCompositionLocalOf { "Default" }
@@ -158,24 +143,26 @@ class CompositionLocalTests : BaseComposeTest() {
                 staticStringCompositionLocal provides someText
             ) {
                 ReadStringCompositionLocal(
-                    compositionLocal = staticStringCompositionLocal,
-                    id = tvId
+                    compositionLocal = staticStringCompositionLocal
                 )
             }
-        }.then { activity ->
-            assertEquals(someText, activity.findViewById<TextView>(100).text)
-
-            someText = "Modified"
-            doInvalidate()
-        }.then { activity ->
-            assertEquals(someText, activity.findViewById<TextView>(100).text)
         }
+
+        fun validate() {
+            validate {
+                Text(someText)
+            }
+        }
+        validate()
+
+        someText = "Modified"
+        doInvalidate()
+        expectChanges()
+        validate()
     }
 
     @Test
-    @Ignore("b/179279455")
-    fun subCompose_Dynamic() {
-        val tvId = 100
+    fun subCompose_Dynamic() = compositionTest {
         val invalidates = mutableListOf<RecomposeScope>()
         fun doInvalidate() = invalidates.forEach { it.invalidate() }.also { invalidates.clear() }
         var someText = "Unmodified"
@@ -183,46 +170,48 @@ class CompositionLocalTests : BaseComposeTest() {
             invalidates.add(currentRecomposeScope)
 
             CompositionLocalProvider(
-                someTextCompositionLocal provides someText,
-                someIntCompositionLocal provides 0
+                LocalSomeTextComposition provides someText,
+                LocalSomeIntComposition provides 0
             ) {
-                ReadStringCompositionLocal(compositionLocal = someTextCompositionLocal, id = tvId)
+                ReadStringCompositionLocal(compositionLocal = LocalSomeTextComposition)
 
-                subCompose {
+                TestSubcomposition {
                     assertEquals(
                         someText,
-                        someTextCompositionLocal.current
+                        LocalSomeTextComposition.current
                     )
-                    assertEquals(0, someIntCompositionLocal.current)
+                    assertEquals(0, LocalSomeIntComposition.current)
 
                     CompositionLocalProvider(
-                        someIntCompositionLocal provides 42
+                        LocalSomeIntComposition provides 42
                     ) {
                         assertEquals(
                             someText,
-                            someTextCompositionLocal.current
+                            LocalSomeTextComposition.current
                         )
                         assertEquals(
                             42,
-                            someIntCompositionLocal.current
+                            LocalSomeIntComposition.current
                         )
                     }
                 }
             }
-        }.then {
-            assertEquals(someText, it.findViewById<TextView>(tvId).text)
+        }
 
-            someText = "Modified"
-            doInvalidate()
-        }.then {
-            assertEquals(someText, it.findViewById<TextView>(tvId).text)
-        }.done()
+        fun validate() {
+            validate {
+                Text(someText)
+            }
+        }
+
+        someText = "Modified"
+        doInvalidate()
+        expectChanges()
+        validate()
     }
 
     @Test
-    @Ignore("b/179279455")
-    fun subCompose_Static() {
-        val tvId = 100
+    fun subCompose_Static() = compositionTest {
         val invalidates = mutableListOf<RecomposeScope>()
         fun doInvalidate() = invalidates.forEach { it.invalidate() }.also { invalidates.clear() }
         val staticSomeTextCompositionLocal = staticCompositionLocalOf { "Default" }
@@ -240,10 +229,9 @@ class CompositionLocalTests : BaseComposeTest() {
 
                 ReadStringCompositionLocal(
                     compositionLocal = staticSomeTextCompositionLocal,
-                    id = tvId
                 )
 
-                subCompose {
+                TestSubcomposition {
                     assertEquals(someText, staticSomeTextCompositionLocal.current)
                     assertEquals(0, staticSomeIntCompositionLocal.current)
 
@@ -255,20 +243,22 @@ class CompositionLocalTests : BaseComposeTest() {
                     }
                 }
             }
-        }.then {
-            assertEquals(someText, it.findViewById<TextView>(tvId).text)
+        }
 
-            someText = "Modified"
-            doInvalidate()
-        }.then {
-            assertEquals(someText, it.findViewById<TextView>(tvId).text)
-        }.done()
+        fun validate() {
+            validate {
+                Text(someText)
+            }
+        }
+
+        someText = "Modified"
+        doInvalidate()
+        expectChanges()
+        validate()
     }
 
     @Test
-    @Ignore("b/179279455")
-    fun deferredSubCompose_Dynamic() {
-        val tvId = 100
+    fun deferredSubCompose_Dynamic() = compositionTest {
         val invalidates = mutableListOf<RecomposeScope>()
         fun doInvalidate() = invalidates.forEach { it.invalidate() }.also { invalidates.clear() }
         var someText = "Unmodified"
@@ -277,52 +267,54 @@ class CompositionLocalTests : BaseComposeTest() {
             invalidates.add(currentRecomposeScope)
 
             CompositionLocalProvider(
-                someTextCompositionLocal provides someText,
-                someIntCompositionLocal provides 0
+                LocalSomeTextComposition provides someText,
+                LocalSomeIntComposition provides 0
             ) {
                 ReadStringCompositionLocal(
-                    compositionLocal = someTextCompositionLocal,
-                    id = tvId
+                    compositionLocal = LocalSomeTextComposition,
                 )
 
-                doSubCompose = deferredSubCompose {
+                doSubCompose = testDeferredSubcomposition {
                     assertEquals(
                         someText,
-                        someTextCompositionLocal.current
+                        LocalSomeTextComposition.current
                     )
-                    assertEquals(0, someIntCompositionLocal.current)
+                    assertEquals(0, LocalSomeIntComposition.current)
 
                     CompositionLocalProvider(
-                        someIntCompositionLocal provides 42
+                        LocalSomeIntComposition provides 42
                     ) {
                         assertEquals(
                             someText,
-                            someTextCompositionLocal.current
+                            LocalSomeTextComposition.current
                         )
                         assertEquals(
                             42,
-                            someIntCompositionLocal.current
+                            LocalSomeIntComposition.current
                         )
                     }
                 }
             }
-        }.then {
-            assertEquals(someText, it.findViewById<TextView>(tvId).text)
-            doSubCompose()
+        }
 
-            someText = "Modified"
-            doInvalidate()
-        }.then {
-            assertEquals(someText, it.findViewById<TextView>(tvId).text)
+        fun validate() {
+            validate {
+                Text(someText)
+            }
+        }
+        validate()
+        doSubCompose()
 
-            doSubCompose()
-        }.done()
+        someText = "Modified"
+        doInvalidate()
+        expectChanges()
+        validate()
+
+        doSubCompose()
     }
 
     @Test
-    @Ignore("b/179279455")
-    fun deferredSubCompose_Static() {
-        val tvId = 100
+    fun deferredSubCompose_Static() = compositionTest {
         val invalidates = mutableListOf<RecomposeScope>()
         fun doInvalidate() = invalidates.forEach { it.invalidate() }.also { invalidates.clear() }
         var someText = "Unmodified"
@@ -340,11 +332,10 @@ class CompositionLocalTests : BaseComposeTest() {
                 assertEquals(0, staticSomeIntCompositionLocal.current)
 
                 ReadStringCompositionLocal(
-                    compositionLocal = staticSomeTextCompositionLocal,
-                    id = tvId
+                    compositionLocal = staticSomeTextCompositionLocal
                 )
 
-                doSubCompose = deferredSubCompose {
+                doSubCompose = testDeferredSubcomposition {
 
                     assertEquals(someText, staticSomeTextCompositionLocal.current)
                     assertEquals(0, staticSomeIntCompositionLocal.current)
@@ -357,23 +348,26 @@ class CompositionLocalTests : BaseComposeTest() {
                     }
                 }
             }
-        }.then {
-            assertEquals(someText, it.findViewById<TextView>(tvId).text)
-            doSubCompose()
+        }
 
-            someText = "Modified"
-            doInvalidate()
-        }.then {
-            assertEquals(someText, it.findViewById<TextView>(tvId).text)
+        fun validate() {
+            validate {
+                Text(someText)
+            }
+        }
+        validate()
+        doSubCompose()
 
-            doSubCompose()
-        }.done()
+        someText = "Modified"
+        doInvalidate()
+        expectChanges()
+        validate()
+
+        doSubCompose()
     }
 
     @Test
-    @Ignore("b/179279455")
-    fun deferredSubCompose_Nested_Static() {
-        val tvId = 100
+    fun deferredSubCompose_Nested_Static() = compositionTest {
         val invalidates = mutableListOf<RecomposeScope>()
         fun doInvalidate() = invalidates.forEach { it.invalidate() }.also { invalidates.clear() }
         var someText = "Unmodified"
@@ -392,41 +386,42 @@ class CompositionLocalTests : BaseComposeTest() {
                 assertEquals(0, staticSomeIntCompositionLocal.current)
 
                 ReadStringCompositionLocal(
-                    compositionLocal = staticSomeTextCompositionLocal,
-                    id = tvId
+                    compositionLocal = staticSomeTextCompositionLocal
                 )
 
-                doSubCompose1 = deferredSubCompose {
+                doSubCompose1 = testDeferredSubcomposition {
 
                     assertEquals(someText, staticSomeTextCompositionLocal.current)
                     assertEquals(0, staticSomeIntCompositionLocal.current)
 
-                    doSubCompose2 = deferredSubCompose {
+                    doSubCompose2 = testDeferredSubcomposition {
                         assertEquals(someText, staticSomeTextCompositionLocal.current)
                         assertEquals(0, staticSomeIntCompositionLocal.current)
                     }
                 }
             }
-        }.then {
-            assertEquals(someText, it.findViewById<TextView>(tvId).text)
-            doSubCompose1()
-        }.then {
-            doSubCompose2()
-        }.then {
-            someText = "Modified"
-            doInvalidate()
-        }.then {
-            assertEquals(someText, it.findViewById<TextView>(tvId).text)
+        }
 
-            doSubCompose1()
-        }.then {
-            doSubCompose2()
-        }.done()
+        fun validate() {
+            validate {
+                Text(someText)
+            }
+        }
+        validate()
+        doSubCompose1()
+        doSubCompose2()
+
+        someText = "Modified"
+        doInvalidate()
+        expectChanges()
+        validate()
+
+        doSubCompose1()
+        doSubCompose2()
     }
 
     @Test
-    @Ignore("b/179279455")
-    fun insertShouldSeePreviouslyProvidedValues() {
+    fun insertShouldSeePreviouslyProvidedValues() = compositionTest {
         val invalidates = mutableListOf<RecomposeScope>()
         fun doInvalidate() = invalidates.forEach { it.invalidate() }.also { invalidates.clear() }
         val someStaticString = staticCompositionLocalOf { "Default" }
@@ -435,24 +430,28 @@ class CompositionLocalTests : BaseComposeTest() {
             CompositionLocalProvider(
                 someStaticString provides "Provided A"
             ) {
-                Observe {
-                    invalidates.add(currentRecomposeScope)
-                    if (shouldRead)
-                        ReadStringCompositionLocal(someStaticString)
-                }
+                invalidates.add(currentRecomposeScope)
+                if (shouldRead)
+                    ReadStringCompositionLocal(someStaticString)
             }
-        }.then {
-            assertEquals(null, it.findViewById<TextView?>(100))
-            shouldRead = true
-            doInvalidate()
-        }.then {
-            assertEquals("Provided A", it.findViewById<TextView>(100).text)
         }
+
+        fun validate() {
+            validate {
+                if (shouldRead)
+                    Text("Provided A")
+            }
+        }
+        validate()
+
+        shouldRead = true
+        doInvalidate()
+        expectChanges()
+        validate()
     }
 
     @Test
-    @Ignore("b/179279455")
-    fun providingANewDataClassValueShouldNotRecompose() {
+    fun providingANewDataClassValueShouldNotRecompose() = compositionTest {
         val invalidates = mutableListOf<RecomposeScope>()
         fun doInvalidate() = invalidates.forEach { it.invalidate() }.also { invalidates.clear() }
         val someDataCompositionLocal = compositionLocalOf(structuralEqualityPolicy()) { SomeData() }
@@ -460,63 +459,26 @@ class CompositionLocalTests : BaseComposeTest() {
 
         @Composable
         fun ReadSomeDataCompositionLocal(
-            compositionLocal: CompositionLocal<SomeData>,
-            id: Int = 100
+            compositionLocal: CompositionLocal<SomeData>
         ) {
             composed = true
-            Text(value = compositionLocal.current.value, id = id)
+            Text(value = compositionLocal.current.value)
         }
 
         compose {
-            Observe {
-                invalidates.add(currentRecomposeScope)
-                CompositionLocalProvider(
-                    someDataCompositionLocal provides SomeData("provided")
-                ) {
-                    ReadSomeDataCompositionLocal(someDataCompositionLocal)
-                }
+            invalidates.add(currentRecomposeScope)
+            CompositionLocalProvider(
+                someDataCompositionLocal provides SomeData("provided")
+            ) {
+                ReadSomeDataCompositionLocal(someDataCompositionLocal)
             }
-        }.then {
-            assertTrue(composed)
-            composed = false
-
-            doInvalidate()
-        }.then {
-            assertFalse(composed)
         }
-    }
 
-    @After
-    fun ensureNoSubcomposePending() {
-        activityRule.activity.uiThread {
-            val hasInvalidations = Recomposer.runningRecomposers.value.any { it.hasPendingWork }
-            assertFalse(hasInvalidations, "Pending changes detected after test completed")
-        }
-    }
-
-    class Ref<T : Any> {
-        lateinit var value: T
-    }
-
-    @Composable fun narrowInvalidateForReference(ref: Ref<CompositionContext>) {
-        ref.value = rememberCompositionContext()
-    }
-
-    @Suppress("UNUSED_PARAMETER")
-    @Composable fun deferredSubCompose(block: @Composable () -> Unit): () -> Unit {
-//        val container = remember { View(activity) }
-        val ref = Ref<CompositionContext>()
-        narrowInvalidateForReference(ref = ref)
-        return {
-//            Composition(
-//                UiApplier(container),
-//                ref.value
-//            ).apply {
-//                setContent {
-//                    block()
-//                }
-//            }
-        }
+        assertTrue(composed)
+        composed = false
+        doInvalidate()
+        expectNoChanges()
+        assertFalse(composed)
     }
 }
 
