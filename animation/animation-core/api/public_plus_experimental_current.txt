@@ -365,9 +365,6 @@ package androidx.compose.animation.core {
   @kotlin.RequiresOptIn(message="This API is internal to library.") @kotlin.annotation.Target(allowedTargets={kotlin.annotation.AnnotationTarget, kotlin.annotation.AnnotationTarget, kotlin.annotation.AnnotationTarget}) public @interface InternalAnimationApi {
   }
 
-  public final class InternalAnimationApiKt {
-  }
-
   @androidx.compose.runtime.Immutable public final class KeyframesSpec<T> implements androidx.compose.animation.core.DurationBasedAnimationSpec<T> {
     ctor public KeyframesSpec(androidx.compose.animation.core.KeyframesSpec.KeyframesSpecConfig<T> config);
     method public androidx.compose.animation.core.KeyframesSpec.KeyframesSpecConfig<T> getConfig();

@@ -24,7 +24,6 @@ import androidx.compose.testutils.ComposeTestCase
 import androidx.compose.testutils.benchmark.android.AndroidTestCase
 import androidx.compose.testutils.createAndroidComposeBenchmarkRunner
 import androidx.compose.ui.test.InternalTestApi
-import androidx.compose.ui.test.junit4.DisableTransitionsTestRule
 import org.junit.rules.RuleChain
 import org.junit.rules.TestRule
 import org.junit.runner.Description
@@ -33,10 +32,7 @@ import org.junit.runners.model.Statement
 /**
  * Rule to be used to run Compose / Android benchmarks.
  */
-class ComposeBenchmarkRule(
-    private val enableTransitions: Boolean = false
-) : TestRule {
-
+class ComposeBenchmarkRule : TestRule {
     @Suppress("DEPRECATION")
     private val activityTestRule =
         androidx.test.rule.ActivityTestRule(ComponentActivity::class.java)
@@ -46,8 +42,7 @@ class ComposeBenchmarkRule(
     override fun apply(base: Statement, description: Description?): Statement {
         @OptIn(InternalTestApi::class)
         return RuleChain
-            .outerRule(DisableTransitionsTestRule(!enableTransitions))
-            .around(benchmarkRule)
+            .outerRule(benchmarkRule)
             .around(activityTestRule)
             .apply(base, description)
     }
