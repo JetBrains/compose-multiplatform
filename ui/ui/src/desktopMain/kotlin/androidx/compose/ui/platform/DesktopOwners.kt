@@ -15,7 +15,6 @@
  */
 package androidx.compose.ui.platform
 
-import androidx.compose.animation.core.MonotonicFrameAnimationClock
 import androidx.compose.runtime.BroadcastFrameClock
 import androidx.compose.runtime.Recomposer
 import androidx.compose.runtime.staticCompositionLocalOf
@@ -69,9 +68,6 @@ internal class DesktopOwners(
     private val frameClock = BroadcastFrameClock(::invalidate)
     private val coroutineContext = dispatcher + frameClock
 
-    internal val animationClock = MonotonicFrameAnimationClock(
-        CoroutineScope(coroutineScope.coroutineContext + coroutineContext)
-    )
     internal val recomposer = Recomposer(coroutineContext)
     internal val platformInputService: DesktopPlatformInput = DesktopPlatformInput(component)
 

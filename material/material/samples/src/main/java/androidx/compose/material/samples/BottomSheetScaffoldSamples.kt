@@ -78,7 +78,11 @@ fun BottomSheetScaffoldSample() {
             ) {
                 Text("Sheet content")
                 Spacer(Modifier.preferredHeight(20.dp))
-                Button(onClick = { scaffoldState.bottomSheetState.collapse() }) {
+                Button(
+                    onClick = {
+                        scope.launch { scaffoldState.bottomSheetState.collapse() }
+                    }
+                ) {
                     Text("Click to collapse sheet")
                 }
             }
@@ -88,7 +92,7 @@ fun BottomSheetScaffoldSample() {
             TopAppBar(
                 title = { Text("Bottom sheet scaffold") },
                 navigationIcon = {
-                    IconButton(onClick = { scaffoldState.drawerState.open() }) {
+                    IconButton(onClick = { scope.launch { scaffoldState.drawerState.open() } }) {
                         Icon(Icons.Default.Menu, contentDescription = "Localized description")
                     }
                 }
@@ -116,7 +120,7 @@ fun BottomSheetScaffoldSample() {
             ) {
                 Text("Drawer content")
                 Spacer(Modifier.preferredHeight(20.dp))
-                Button(onClick = { scaffoldState.drawerState.close() }) {
+                Button(onClick = { scope.launch { scaffoldState.drawerState.close() } }) {
                     Text("Click to close drawer")
                 }
             }

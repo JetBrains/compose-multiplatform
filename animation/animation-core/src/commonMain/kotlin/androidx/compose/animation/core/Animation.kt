@@ -28,8 +28,7 @@ package androidx.compose.animation.core
  * __Note__: [Animation] does not track the lifecycle of an animation. It merely reacts to play time
  * change and returns the new value/velocity as a result. It can be used as a building block for
  * more lifecycle aware animations. In contrast, [Animatable] and [Transition] are
- * stateful and manage their own lifecycles, and subscribe/unsubscribe from an
- * [AnimationClockObservable] as needed.
+ * stateful and manage their own lifecycles.
  *
  * @see [Animatable]
  * @see [updateTransition]

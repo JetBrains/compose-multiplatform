@@ -55,6 +55,7 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.MediumTest
 import androidx.test.filters.SdkSuppress
 import com.google.common.truth.Truth.assertThat
+import kotlinx.coroutines.runBlocking
 import org.junit.Ignore
 import org.junit.Rule
 import org.junit.Test
@@ -230,7 +231,7 @@ class ScaffoldTest {
 
     @Test
     @Ignore("unignore once animation sync is ready (b/147291885)")
-    fun scaffold_drawer_manualControl() {
+    fun scaffold_drawer_manualControl(): Unit = runBlocking {
         var drawerChildPosition: Offset = Offset.Zero
         lateinit var scaffoldState: ScaffoldState
         rule.setContent {
@@ -260,13 +261,9 @@ class ScaffoldTest {
             }
         }
         assertThat(drawerChildPosition.x).isLessThan(0f)
-        rule.runOnUiThread {
-            scaffoldState.drawerState.open()
-        }
+        scaffoldState.drawerState.open()
         assertThat(drawerChildPosition.x).isLessThan(0f)
-        rule.runOnUiThread {
-            scaffoldState.drawerState.close()
-        }
+        scaffoldState.drawerState.close()
         assertThat(drawerChildPosition.x).isLessThan(0f)
     }
 

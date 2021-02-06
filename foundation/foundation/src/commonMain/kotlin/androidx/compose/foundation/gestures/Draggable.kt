@@ -190,7 +190,7 @@ fun Modifier.draggable(
     val startImmediatelyState = rememberUpdatedState(startDragImmediately)
     val interactionStateState = rememberUpdatedState(interactionState)
     val onDragStartedState = rememberUpdatedState(onDragStarted)
-    val dragStateState = rememberUpdatedState(state)
+    val updatedDraggableState = rememberUpdatedState(state)
     val onDragStoppedState = rememberUpdatedState(onDragStopped)
     val dragBlock: suspend PointerInputScope.() -> Unit = remember {
         {
@@ -202,7 +202,7 @@ fun Modifier.draggable(
                 startDragImmediately = startImmediatelyState,
                 onDragStarted = onDragStartedState,
                 onDragStopped = onDragStoppedState,
-                dragState = dragStateState
+                dragState = updatedDraggableState
             )
         }
     }

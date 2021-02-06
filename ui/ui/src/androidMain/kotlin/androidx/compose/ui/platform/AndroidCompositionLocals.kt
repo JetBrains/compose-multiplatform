@@ -19,8 +19,6 @@ package androidx.compose.ui.platform
 import android.content.Context
 import android.content.res.Configuration
 import android.view.View
-import androidx.compose.animation.core.InternalAnimationApi
-import androidx.compose.animation.core.rootAnimationClockFactory
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.ExperimentalComposeApi
@@ -30,7 +28,6 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.neverEqualPolicy
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.LocalSaveableStateRegistry
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.staticCompositionLocalOf
@@ -68,18 +65,13 @@ val LocalSavedStateRegistryOwner = staticCompositionLocalOf<SavedStateRegistryOw
 val LocalView = staticCompositionLocalOf<View>()
 
 @Composable
-@OptIn(ExperimentalComposeUiApi::class, InternalAnimationApi::class)
+@OptIn(ExperimentalComposeUiApi::class)
 internal fun ProvideAndroidCompositionLocals(
     owner: AndroidComposeView,
     content: @Composable () -> Unit
 ) {
     val view = owner
     val context = view.context
-    val scope = rememberCoroutineScope()
-    val rootAnimationClock = remember(scope) {
-        rootAnimationClockFactory(scope)
-    }
-
     var configuration by remember {
         mutableStateOf(
             context.resources.configuration,
@@ -114,7 +106,6 @@ internal fun ProvideAndroidCompositionLocals(
     ) {
         ProvideCommonCompositionLocals(
             owner = owner,
-            animationClock = rootAnimationClock,
             uriHandler = uriHandler,
             content = content
         )

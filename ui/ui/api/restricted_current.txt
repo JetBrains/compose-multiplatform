@@ -2122,7 +2122,6 @@ package androidx.compose.ui.platform {
   }
 
   public final class CompositionLocalsKt {
-    method public static androidx.compose.runtime.ProvidableCompositionLocal<androidx.compose.animation.core.AnimationClockObservable> getLocalAnimationClock();
     method @androidx.compose.ui.ExperimentalComposeUiApi public static androidx.compose.runtime.ProvidableCompositionLocal<androidx.compose.ui.autofill.Autofill> getLocalAutofill();
     method @androidx.compose.ui.ExperimentalComposeUiApi public static androidx.compose.runtime.ProvidableCompositionLocal<androidx.compose.ui.autofill.AutofillTree> getLocalAutofillTree();
     method public static androidx.compose.runtime.ProvidableCompositionLocal<androidx.compose.ui.platform.ClipboardManager> getLocalClipboardManager();
