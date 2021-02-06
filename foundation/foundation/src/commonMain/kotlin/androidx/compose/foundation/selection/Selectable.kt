@@ -17,8 +17,7 @@
 package androidx.compose.foundation.selection
 
 import androidx.compose.foundation.Indication
-import androidx.compose.foundation.Interaction
-import androidx.compose.foundation.InteractionState
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.LocalIndication
 import androidx.compose.foundation.Strings
 import androidx.compose.foundation.clickable
@@ -41,9 +40,9 @@ import androidx.compose.ui.semantics.stateDescription
  * If you want to make an item support on/off capabilities without being part of a set, consider
  * using [Modifier.toggleable]
  *
- * This version has no [InteractionState] or [Indication] parameters, default indication from
- * [LocalIndication] will be used. To specify [InteractionState] or [Indication], use another
- * overload.
+ * This version has no [MutableInteractionSource] or [Indication] parameters, default
+ * indication from [LocalIndication] will be used. To specify [MutableInteractionSource] or
+ * [Indication], use another overload.
  *
  * @sample androidx.compose.foundation.samples.SelectableSample
  *
@@ -72,7 +71,7 @@ fun Modifier.selectable(
         selected = selected,
         enabled = enabled,
         role = role,
-        interactionState = remember { InteractionState() },
+        interactionSource = remember { MutableInteractionSource() },
         indication = LocalIndication.current,
         onClick = onClick
     )
@@ -88,14 +87,14 @@ fun Modifier.selectable(
  * If you want to make an item support on/off capabilities without being part of a set, consider
  * using [Modifier.toggleable]
  *
- * This version requires both [InteractionState] and [Indication] to work properly. Use another
+ * This version requires both [MutableInteractionSource] and [Indication] to work properly. Use another
  * overload if you don't need these parameters.
  *
  * @sample androidx.compose.foundation.samples.SelectableSample
  *
  * @param selected whether or not this item is selected in a mutually exclusion set
- * @param interactionState [InteractionState] that will be updated when this element is
- * pressed, using [Interaction.Pressed]
+ * @param interactionSource [MutableInteractionSource] that will be used to emit
+ * press events when this selectable is being pressed.
  * @param indication indication to be shown when the modified element is pressed. By default,
  * the indication from [LocalIndication] will be used. Set to `null` to show no indication, or
  * current value from [LocalIndication] to show theme default
@@ -107,7 +106,7 @@ fun Modifier.selectable(
  */
 fun Modifier.selectable(
     selected: Boolean,
-    interactionState: InteractionState,
+    interactionSource: MutableInteractionSource,
     indication: Indication?,
     enabled: Boolean = true,
     role: Role? = null,
@@ -117,7 +116,7 @@ fun Modifier.selectable(
         Modifier.clickable(
             enabled = enabled,
             role = role,
-            interactionState = interactionState,
+            interactionSource = interactionSource,
             indication = indication,
             onClick = onClick
         ).semantics {
@@ -130,7 +129,7 @@ fun Modifier.selectable(
         properties["selected"] = selected
         properties["enabled"] = enabled
         properties["role"] = role
-        properties["interactionState"] = interactionState
+        properties["interactionSource"] = interactionSource
         properties["indication"] = indication
         properties["onClick"] = onClick
     }

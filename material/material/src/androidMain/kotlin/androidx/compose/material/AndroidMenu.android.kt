@@ -17,12 +17,12 @@
 package androidx.compose.material
 
 import androidx.compose.animation.core.MutableTransitionState
-import androidx.compose.foundation.InteractionState
+import androidx.compose.foundation.interaction.Interaction
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.RowScope
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
@@ -113,10 +113,10 @@ fun DropdownMenu(
  * @param enabled Controls the enabled state of the menu item - when `false`, the menu item
  * will not be clickable and [onClick] will not be invoked
  * @param contentPadding the padding applied to the content of this menu item
- * @param interactionState the [InteractionState] representing the different [Interaction]s
- * present on this DropdownMenuItem. You can create and pass in your own remembered
- * [InteractionState] if you want to read the [InteractionState] and customize the appearance /
- * behavior of this DropdownMenuItem in different [Interaction]s.
+ * @param interactionSource the [MutableInteractionSource] representing the stream of
+ * [Interaction]s for this DropdownMenuItem. You can create and pass in your own remembered
+ * [MutableInteractionSource] if you want to observe [Interaction]s and customize the
+ * appearance / behavior of this DropdownMenuItem in different [Interaction]s.
  */
 @Composable
 fun DropdownMenuItem(
@@ -124,7 +124,7 @@ fun DropdownMenuItem(
     modifier: Modifier = Modifier,
     enabled: Boolean = true,
     contentPadding: PaddingValues = MenuDefaults.DropdownMenuItemContentPadding,
-    interactionState: InteractionState = remember { InteractionState() },
+    interactionSource: MutableInteractionSource = remember { MutableInteractionSource() },
     content: @Composable RowScope.() -> Unit
 ) {
     DropdownMenuItemContent(
@@ -132,7 +132,7 @@ fun DropdownMenuItem(
         modifier = modifier,
         enabled = enabled,
         contentPadding = contentPadding,
-        interactionState = interactionState,
+        interactionSource = interactionSource,
         content = content
     )
 }

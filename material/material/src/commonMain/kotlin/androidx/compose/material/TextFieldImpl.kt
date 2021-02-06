@@ -22,9 +22,8 @@ import androidx.compose.animation.core.animateFloat
 import androidx.compose.animation.core.spring
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.core.updateTransition
-import androidx.compose.foundation.ExperimentalFoundationApi
-import androidx.compose.foundation.Interaction
-import androidx.compose.foundation.InteractionState
+import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.interaction.collectIsFocusedAsState
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
@@ -62,7 +61,6 @@ internal enum class TextFieldType {
  * Implementation of the [TextField] and [OutlinedTextField]
  */
 @Composable
-@OptIn(ExperimentalFoundationApi::class)
 internal fun TextFieldImpl(
     type: TextFieldType,
     enabled: Boolean,
@@ -82,7 +80,7 @@ internal fun TextFieldImpl(
     keyboardActions: KeyboardActions,
     maxLines: Int = Int.MAX_VALUE,
     onTextInputStarted: (SoftwareKeyboardController) -> Unit,
-    interactionState: InteractionState,
+    interactionSource: MutableInteractionSource,
     shape: Shape,
     colors: TextFieldColors
 ) {
@@ -92,7 +90,7 @@ internal fun TextFieldImpl(
     }
     val mergedTextStyle = textStyle.merge(TextStyle(color = textColor))
 
-    val isFocused = interactionState.contains(Interaction.Focused)
+    val isFocused = interactionSource.collectIsFocusedAsState().value
     val inputState = when {
         isFocused -> InputPhase.Focused
         value.text.isEmpty() -> InputPhase.UnfocusedEmpty
@@ -112,7 +110,7 @@ internal fun TextFieldImpl(
                         labelProgress
                     )
                     Decoration(
-                        contentColor = colors.labelColor(enabled, isError, interactionState).value,
+                        contentColor = colors.labelColor(enabled, isError, interactionSource).value,
                         typography = labelAnimatedStyle,
                         content = label
                     )
@@ -147,7 +145,7 @@ internal fun TextFieldImpl(
                     maxLines = maxLines,
                     visualTransformation = visualTransformation,
                     onTextInputStarted = onTextInputStarted,
-                    interactionState = interactionState,
+                    interactionSource = interactionSource,
                     decoratedPlaceholder = decoratedPlaceholder,
                     decoratedLabel = decoratedLabel,
                     leading = leading,
@@ -157,7 +155,7 @@ internal fun TextFieldImpl(
                     labelProgress = labelProgress,
                     indicatorWidth = indicatorWidth,
                     indicatorColor =
-                        colors.indicatorColor(enabled, isError, interactionState).value,
+                        colors.indicatorColor(enabled, isError, interactionSource).value,
                     backgroundColor = colors.backgroundColor(enabled).value,
                     cursorColor = colors.cursorColor(isError).value,
                     shape = shape
@@ -177,7 +175,7 @@ internal fun TextFieldImpl(
                     maxLines = maxLines,
                     visualTransformation = visualTransformation,
                     onTextInputStarted = onTextInputStarted,
-                    interactionState = interactionState,
+                    interactionSource = interactionSource,
                     decoratedPlaceholder = decoratedPlaceholder,
                     decoratedLabel = decoratedLabel,
                     leading = leading,
@@ -187,7 +185,7 @@ internal fun TextFieldImpl(
                     labelProgress = labelProgress,
                     indicatorWidth = indicatorWidth,
                     indicatorColor =
-                        colors.indicatorColor(enabled, isError, interactionState).value,
+                        colors.indicatorColor(enabled, isError, interactionSource).value,
                     cursorColor = colors.cursorColor(isError).value
                 )
             }

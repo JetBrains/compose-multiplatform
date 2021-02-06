@@ -19,8 +19,8 @@ package androidx.compose.material
 import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.AnimationSpec
 import androidx.compose.animation.core.SpringSpec
-import androidx.compose.foundation.InteractionState
 import androidx.compose.foundation.gestures.DraggableState
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.gestures.Orientation
 import androidx.compose.foundation.gestures.draggable
 import androidx.compose.material.SwipeableDefaults.AnimationSpec
@@ -530,7 +530,8 @@ internal fun <T : Any> rememberSwipeableStateFor(
  * @param enabled Whether this [swipeable] is enabled and should react to the user's input.
  * @param reverseDirection Whether to reverse the direction of the swipe, so a top to bottom
  * swipe will behave like bottom to top, and a left to right swipe will behave like right to left.
- * @param interactionState Optional [InteractionState] that will passed on to [Modifier.draggable].
+ * @param interactionSource Optional [MutableInteractionSource] that will passed on to
+ * the internal [Modifier.draggable].
  * @param resistance Controls how much resistance will be applied when swiping past the bounds.
  * @param velocityThreshold The threshold (in dp per second) that the end velocity has to exceed
  * in order to animate to the next state, even if the positional [thresholds] have not been reached.
@@ -543,7 +544,7 @@ fun <T> Modifier.swipeable(
     orientation: Orientation,
     enabled: Boolean = true,
     reverseDirection: Boolean = false,
-    interactionState: InteractionState? = null,
+    interactionSource: MutableInteractionSource? = null,
     thresholds: (from: T, to: T) -> ThresholdConfig = { _, _ -> FixedThreshold(56.dp) },
     resistance: ResistanceConfig? = resistanceConfig(anchors.keys),
     velocityThreshold: Dp = VelocityThreshold
@@ -555,7 +556,7 @@ fun <T> Modifier.swipeable(
         properties["orientation"] = orientation
         properties["enabled"] = enabled
         properties["reverseDirection"] = reverseDirection
-        properties["interactionState"] = interactionState
+        properties["interactionSource"] = interactionSource
         properties["thresholds"] = thresholds
         properties["resistance"] = resistance
         properties["velocityThreshold"] = velocityThreshold
@@ -590,7 +591,7 @@ fun <T> Modifier.swipeable(
         orientation = orientation,
         enabled = enabled,
         reverseDirection = reverseDirection,
-        interactionState = interactionState,
+        interactionSource = interactionSource,
         startDragImmediately = state.isAnimationRunning,
         onDragStopped = { velocity -> launch { state.performFling(velocity) } },
         state = state.draggableState

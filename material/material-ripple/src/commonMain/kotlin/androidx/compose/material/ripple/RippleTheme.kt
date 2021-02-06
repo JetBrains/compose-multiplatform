@@ -16,7 +16,7 @@
 
 package androidx.compose.material.ripple
 
-import androidx.compose.foundation.Interaction
+import androidx.compose.foundation.interaction.Interaction
 import androidx.compose.material.ripple.RippleTheme.Companion.defaultRippleAlpha
 import androidx.compose.material.ripple.RippleTheme.Companion.defaultRippleColor
 import androidx.compose.runtime.Composable
@@ -103,10 +103,10 @@ public interface RippleTheme {
 /**
  * RippleAlpha defines the alpha of the ripple / state layer for different [Interaction]s.
  *
- * @property draggedAlpha the alpha used when the ripple is [Interaction.Dragged]
+ * @property draggedAlpha the alpha used when the ripple is dragged
  * @property focusedAlpha not currently supported
  * @property hoveredAlpha not currently supported
- * @property pressedAlpha the alpha used when the ripple is [Interaction.Pressed]
+ * @property pressedAlpha the alpha used when the ripple is pressed
  */
 @Immutable
 public class RippleAlpha(

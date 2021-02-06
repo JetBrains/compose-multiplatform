@@ -16,8 +16,8 @@
 
 package androidx.compose.material
 
-import androidx.compose.foundation.Interaction
-import androidx.compose.foundation.InteractionState
+import androidx.compose.foundation.interaction.Interaction
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.size
@@ -48,10 +48,10 @@ import androidx.compose.ui.unit.dp
  * @param modifier optional [Modifier] for this IconButton
  * @param enabled whether or not this IconButton will handle input events and appear enabled for
  * semantics purposes
- * @param interactionState the [InteractionState] representing the different [Interaction]s
- * present on this IconButton. You can create and pass in your own remembered
- * [InteractionState] if you want to read the [InteractionState] and customize the appearance /
- * behavior of this IconButton in different [Interaction]s.
+ * @param interactionSource the [MutableInteractionSource] representing the stream of
+ * [Interaction]s for this IconButton. You can create and pass in your own remembered
+ * [MutableInteractionSource] if you want to observe [Interaction]s and customize the
+ * appearance / behavior of this IconButton in different [Interaction]s.
  * @param content the content (icon) to be drawn inside the IconButton. This is typically an
  * [Icon].
  */
@@ -60,7 +60,7 @@ fun IconButton(
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
     enabled: Boolean = true,
-    interactionState: InteractionState = remember { InteractionState() },
+    interactionSource: MutableInteractionSource = remember { MutableInteractionSource() },
     content: @Composable () -> Unit
 ) {
     Box(
@@ -69,7 +69,7 @@ fun IconButton(
                 onClick = onClick,
                 enabled = enabled,
                 role = Role.Button,
-                interactionState = interactionState,
+                interactionSource = interactionSource,
                 indication = rememberRipple(bounded = false, radius = RippleRadius)
             )
             .then(IconButtonSizeModifier),
@@ -88,10 +88,10 @@ fun IconButton(
  * @param modifier optional [Modifier] for this IconToggleButton
  * @param enabled enabled whether or not this [IconToggleButton] will handle input events and appear
  * enabled for semantics purposes
- * @param interactionState the [InteractionState] representing the different [Interaction]s
- * present on this IconToggleButton. You can create and pass in your own remembered
- * [InteractionState] if you want to read the [InteractionState] and customize the appearance /
- * behavior of this IconToggleButton in different [Interaction]s.
+ * @param interactionSource the [MutableInteractionSource] representing the stream of
+ * [Interaction]s for this IconToggleButton. You can create and pass in your own remembered
+ * [MutableInteractionSource] if you want to observe [Interaction]s and customize the
+ * appearance / behavior of this IconToggleButton in different [Interaction]s.
  * @param content the content (icon) to be drawn inside the IconToggleButton. This is typically an
  * [Icon].
  */
@@ -101,7 +101,7 @@ fun IconToggleButton(
     onCheckedChange: (Boolean) -> Unit,
     modifier: Modifier = Modifier,
     enabled: Boolean = true,
-    interactionState: InteractionState = remember { InteractionState() },
+    interactionSource: MutableInteractionSource = remember { MutableInteractionSource() },
     content: @Composable () -> Unit
 ) {
     Box(
@@ -110,7 +110,7 @@ fun IconToggleButton(
             onValueChange = onCheckedChange,
             enabled = enabled,
             role = Role.Checkbox,
-            interactionState = interactionState,
+            interactionSource = interactionSource,
             indication = rememberRipple(bounded = false, radius = RippleRadius)
         ).then(IconButtonSizeModifier),
         contentAlignment = Alignment.Center

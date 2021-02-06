@@ -20,8 +20,8 @@ import androidx.compose.animation.core.FastOutSlowInEasing
 import androidx.compose.animation.core.TweenSpec
 import androidx.compose.animation.core.VectorizedAnimationSpec
 import androidx.compose.animation.core.animateFloatAsState
-import androidx.compose.foundation.Interaction
-import androidx.compose.foundation.InteractionState
+import androidx.compose.foundation.interaction.Interaction
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
@@ -132,10 +132,10 @@ fun BottomNavigation(
  * @param label optional text label for this item
  * @param alwaysShowLabel whether to always show the label for this item. If false, the label will
  * only be shown when this item is selected.
- * @param interactionState the [InteractionState] representing the different [Interaction]s
- * present on this BottomNavigationItem. You can create and pass in your own remembered
- * [InteractionState] if you want to read the [InteractionState] and customize the appearance /
- * behavior of this BottomNavigationItem in different [Interaction]s.
+ * @param interactionSource the [MutableInteractionSource] representing the stream of
+ * [Interaction]s for this BottomNavigationItem. You can create and pass in your own remembered
+ * [MutableInteractionSource] if you want to observe [Interaction]s and customize the
+ * appearance / behavior of this BottomNavigationItem in different [Interaction]s.
  * @param selectedContentColor the color of the text label and icon when this item is selected,
  * and the color of the ripple.
  * @param unselectedContentColor the color of the text label and icon when this item is not selected
@@ -149,7 +149,7 @@ fun RowScope.BottomNavigationItem(
     enabled: Boolean = true,
     label: @Composable (() -> Unit)? = null,
     alwaysShowLabel: Boolean = true,
-    interactionState: InteractionState = remember { InteractionState() },
+    interactionSource: MutableInteractionSource = remember { MutableInteractionSource() },
     selectedContentColor: Color = LocalContentColor.current,
     unselectedContentColor: Color = selectedContentColor.copy(alpha = ContentAlpha.medium)
 ) {
@@ -171,7 +171,7 @@ fun RowScope.BottomNavigationItem(
                 onClick = onClick,
                 enabled = enabled,
                 role = Role.Tab,
-                interactionState = interactionState,
+                interactionSource = interactionSource,
                 indication = ripple
             )
             .weight(1f),

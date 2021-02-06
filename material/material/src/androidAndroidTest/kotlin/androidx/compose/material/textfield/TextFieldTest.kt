@@ -20,8 +20,9 @@ import android.content.Context
 import android.os.Build
 import android.view.View
 import android.view.inputmethod.InputMethodManager
-import androidx.compose.foundation.Interaction
-import androidx.compose.foundation.InteractionState
+import androidx.compose.foundation.interaction.FocusInteraction
+import androidx.compose.foundation.interaction.Interaction
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -47,6 +48,7 @@ import androidx.compose.material.setMaterialContentForSizeAssertions
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.testutils.assertShape
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
@@ -92,6 +94,9 @@ import com.nhaarman.mockitokotlin2.atLeastOnce
 import com.nhaarman.mockitokotlin2.eq
 import com.nhaarman.mockitokotlin2.mock
 import com.nhaarman.mockitokotlin2.verify
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.launch
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -156,54 +161,89 @@ class TextFieldTest {
     fun testTextFields_singleFocus() {
         val textField1Tag = "TextField1"
         val textField2Tag = "TextField2"
-        val interactionState1 = InteractionState()
-        val interactionState2 = InteractionState()
+        val interactionSource1 = MutableInteractionSource()
+        val interactionSource2 = MutableInteractionSource()
+
+        var scope: CoroutineScope? = null
 
         rule.setMaterialContent {
+            scope = rememberCoroutineScope()
             Column {
                 TextField(
                     modifier = Modifier.testTag(textField1Tag),
                     value = "input1",
                     onValueChange = {},
                     label = {},
-                    interactionState = interactionState1
+                    interactionSource = interactionSource1
                 )
                 TextField(
                     modifier = Modifier.testTag(textField2Tag),
                     value = "input2",
                     onValueChange = {},
                     label = {},
-                    interactionState = interactionState2
+                    interactionSource = interactionSource2
                 )
             }
+        }
+
+        val interactions1 = mutableListOf<Interaction>()
+        val interactions2 = mutableListOf<Interaction>()
+
+        scope!!.launch {
+            interactionSource1.interactions.collect { interactions1.add(it) }
+        }
+        scope!!.launch {
+            interactionSource2.interactions.collect { interactions2.add(it) }
+        }
+
+        rule.runOnIdle {
+            assertThat(interactions1).isEmpty()
+            assertThat(interactions2).isEmpty()
         }
 
         rule.onNodeWithTag(textField1Tag).performClick()
 
         rule.runOnIdle {
-            assertThat(interactionState1.contains(Interaction.Focused)).isTrue()
-            assertThat(interactionState2.contains(Interaction.Focused)).isFalse()
+            // Not asserting total size as we have other interactions here too
+            assertThat(interactions1.filterIsInstance<FocusInteraction.Focus>()).hasSize(1)
+            assertThat(interactions2).isEmpty()
         }
 
         rule.onNodeWithTag(textField2Tag).performClick()
 
         rule.runOnIdle {
-            assertThat(interactionState1.contains(Interaction.Focused)).isFalse()
-            assertThat(interactionState2.contains(Interaction.Focused)).isTrue()
+            // Not asserting total size as we have other interactions here too
+            assertThat(interactions1.filterIsInstance<FocusInteraction.Focus>()).hasSize(1)
+            assertThat(interactions1.filterIsInstance<FocusInteraction.Unfocus>()).hasSize(1)
+            assertThat(interactions2.filterIsInstance<FocusInteraction.Focus>()).hasSize(1)
+            assertThat(interactions2.filterIsInstance<FocusInteraction.Unfocus>()).isEmpty()
         }
     }
 
     @Test
     fun testTextField_getFocus_whenClickedOnSurfaceArea() {
-        val interactionState = InteractionState()
+        val interactionSource = MutableInteractionSource()
+        var scope: CoroutineScope? = null
+
         rule.setMaterialContent {
+            scope = rememberCoroutineScope()
             TextField(
                 modifier = Modifier.testTag(TextfieldTag),
                 value = "input",
                 onValueChange = {},
                 label = {},
-                interactionState = interactionState
+                interactionSource = interactionSource
             )
+        }
+
+        val interactions = mutableListOf<Interaction>()
+
+        scope!!.launch {
+            interactionSource.interactions.collect { interactions.add(it) }
+        }
+
+        rule.runOnIdle {
+            assertThat(interactions).isEmpty()
         }
 
         // Click on (2, 2) which is Surface area and outside input area
@@ -211,8 +251,9 @@ class TextFieldTest {
             click(Offset(2f, 2f))
         }
 
-        rule.runOnIdleWithDensity {
-            assertThat(interactionState.contains(Interaction.Focused)).isTrue()
+        rule.runOnIdle {
+            // Not asserting total size as we have other interactions here too
+            assertThat(interactions.filterIsInstance<FocusInteraction.Focus>()).hasSize(1)
         }
     }
 
@@ -879,7 +920,6 @@ class TextFieldTest {
     @LargeTest
     @SdkSuppress(minSdkVersion = Build.VERSION_CODES.O)
     fun testTextField_alphaNotApplied_toCustomBackgroundColorAndTransparentColors() {
-        val interactionState = InteractionState()
 
         rule.setMaterialContent {
             Box(Modifier.background(color = Color.White)) {
@@ -895,7 +935,6 @@ class TextFieldTest {
                     trailingIcon = {
                         Icon(Icons.Default.Favorite, null, tint = Color.Transparent)
                     },
-                    interactionState = interactionState,
                     colors = TextFieldDefaults.textFieldColors(
                         backgroundColor = Color.Blue,
                         focusedIndicatorColor = Color.Transparent,
@@ -921,9 +960,6 @@ class TextFieldTest {
             )
 
         rule.onNodeWithTag(TextfieldTag).performClick()
-        rule.runOnIdle {
-            assertThat(interactionState.contains(Interaction.Focused)).isTrue()
-        }
 
         rule.onNodeWithTag(TextfieldTag)
             .captureToImage()

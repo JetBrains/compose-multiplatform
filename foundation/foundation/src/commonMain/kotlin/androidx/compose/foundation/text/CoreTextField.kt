@@ -17,9 +17,9 @@
 
 package androidx.compose.foundation.text
 
-import androidx.compose.foundation.Interaction
-import androidx.compose.foundation.InteractionState
+import androidx.compose.foundation.interaction.Interaction
 import androidx.compose.foundation.gestures.Orientation
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.text.selection.LocalTextSelectionColors
 import androidx.compose.foundation.text.selection.SimpleLayout
@@ -118,9 +118,6 @@ import kotlin.math.roundToInt
  * @param onValueChange Called when the input service updates the values in [TextFieldValue].
  * @param modifier optional [Modifier] for this text field.
  * @param textStyle Style configuration that applies at character level such as color, font etc.
- * @param onImeActionPerformed Called when the input service requested an IME action. When the
- * input service emitted an IME action, this callback is called with the emitted IME action. Note
- * that this IME action may be different from what you specified in [imeAction].
  * @param visualTransformation The visual transformation filter for changing the visual
  * representation of the input. By default no visual transformation is applied.
  * @param onTextLayout Callback that is executed when a new text layout is calculated.
@@ -128,10 +125,10 @@ import kotlin.math.roundToInt
  * communicating with platform text input service, e.g. software keyboard on Android. Called with
  * [SoftwareKeyboardController] instance which can be used for requesting input show/hide software
  * keyboard.
- * @param interactionState The [InteractionState] representing the different [Interaction]s
- * present on this TextField. You can create and pass in your own remembered [InteractionState]
- * if you want to read the [InteractionState] and customize the appearance / behavior of this
- * TextField in different [Interaction]s.
+ * @param interactionSource the [MutableInteractionSource] representing the stream of
+ * [Interaction]s for this CoreTextField. You can create and pass in your own remembered
+ * [MutableInteractionSource] if you want to observe [Interaction]s and customize the
+ * appearance / behavior of this CoreTextField in different [Interaction]s.
  * @param cursorBrush [Brush] to paint cursor with. If [SolidColor] with [Color.Unspecified]
  * provided, there will be no cursor drawn
  * @param softWrap Whether the text should break at soft line breaks. If false, the glyphs in the
@@ -164,7 +161,7 @@ internal fun CoreTextField(
     visualTransformation: VisualTransformation = VisualTransformation.None,
     onTextLayout: (TextLayoutResult) -> Unit = {},
     onTextInputStarted: (SoftwareKeyboardController) -> Unit = {},
-    interactionState: InteractionState? = null,
+    interactionSource: MutableInteractionSource? = null,
     cursorBrush: Brush = SolidColor(Color.Unspecified),
     softWrap: Boolean = true,
     maxLines: Int = Int.MAX_VALUE,
@@ -257,7 +254,7 @@ internal fun CoreTextField(
     val focusModifier = Modifier.textFieldFocusModifier(
         enabled = enabled,
         focusRequester = focusRequester,
-        interactionState = interactionState
+        interactionSource = interactionSource
     ) {
         if (state.hasFocus == it.isFocused) {
             return@textFieldFocusModifier
@@ -305,7 +302,7 @@ internal fun CoreTextField(
         Modifier.longPressDragGestureFilter(manager.touchSelectionObserver, enabled)
 
     val pointerModifier = if (isInTouchMode) {
-        Modifier.pressGestureFilter(interactionState = interactionState, enabled = enabled)
+        Modifier.pressGestureFilter(interactionSource = interactionSource, enabled = enabled)
             .then(selectionModifier)
             .then(focusRequestTapModifier)
     } else {
@@ -445,7 +442,7 @@ internal fun CoreTextField(
     // Modifiers that should be applied to the outer text field container. Usually those include
     // gesture and semantics modifiers.
     val decorationBoxModifier = modifier
-        .textFieldScrollable(scrollerPosition, interactionState, enabled)
+        .textFieldScrollable(scrollerPosition, interactionSource, enabled)
         .then(pointerModifier)
         .then(semanticsModifier)
         .then(focusModifier)

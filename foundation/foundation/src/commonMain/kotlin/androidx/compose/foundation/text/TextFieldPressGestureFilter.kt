@@ -16,35 +16,67 @@
 
 package androidx.compose.foundation.text
 
-import androidx.compose.foundation.Interaction
-import androidx.compose.foundation.InteractionState
+import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.interaction.PressInteraction
 import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.composed
+import kotlinx.coroutines.launch
 import androidx.compose.foundation.legacygestures.pressIndicatorGestureFilter
 
 /**
- * Required for the press [InteractionState] consistency for TextField.
+ * Required for the press [MutableInteractionSource] consistency for TextField.
  */
 @Suppress("ModifierInspectorInfo", "DEPRECATION")
 internal fun Modifier.pressGestureFilter(
-    interactionState: InteractionState?,
+    interactionSource: MutableInteractionSource?,
     enabled: Boolean = true
 ): Modifier = if (enabled) composed {
-    DisposableEffect(interactionState) {
+    val scope = rememberCoroutineScope()
+    val pressedInteraction = remember { mutableStateOf<PressInteraction.Press?>(null) }
+    DisposableEffect(interactionSource) {
         onDispose {
-            interactionState?.removeInteraction(Interaction.Pressed)
+            pressedInteraction.value?.let { oldValue ->
+                val interaction = PressInteraction.Cancel(oldValue)
+                interactionSource?.tryEmit(interaction)
+                pressedInteraction.value = null
+            }
         }
     }
     pressIndicatorGestureFilter(
         onStart = {
-            interactionState?.addInteraction(Interaction.Pressed, it)
+            scope.launch {
+                // Remove any old interactions if we didn't fire stop / cancel properly
+                pressedInteraction.value?.let { oldValue ->
+                    val interaction = PressInteraction.Cancel(oldValue)
+                    interactionSource?.emit(interaction)
+                    pressedInteraction.value = null
+                }
+                val interaction = PressInteraction.Press(it)
+                interactionSource?.emit(interaction)
+                pressedInteraction.value = interaction
+            }
         },
         onStop = {
-            interactionState?.removeInteraction(Interaction.Pressed)
+            scope.launch {
+                pressedInteraction.value?.let {
+                    val interaction = PressInteraction.Release(it)
+                    interactionSource?.emit(interaction)
+                    pressedInteraction.value = null
+                }
+            }
         },
         onCancel = {
-            interactionState?.removeInteraction(Interaction.Pressed)
+            scope.launch {
+                pressedInteraction.value?.let {
+                    val interaction = PressInteraction.Cancel(it)
+                    interactionSource?.emit(interaction)
+                    pressedInteraction.value = null
+                }
+            }
         }
     )
 } else this

@@ -16,8 +16,8 @@
 
 package androidx.compose.material
 
-import androidx.compose.foundation.Interaction
-import androidx.compose.foundation.InteractionState
+import androidx.compose.foundation.interaction.Interaction
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.defaultMinSize
 import androidx.compose.foundation.layout.padding
@@ -112,10 +112,10 @@ import kotlin.math.roundToInt
  * input service (e.g. software keyboard on Android) has been established. Called with the
  * [SoftwareKeyboardController] instance that can be used to request to show or hide the software
  * keyboard
- * @param interactionState the [InteractionState] representing the different [Interaction]s
- * present on this OutlinedTextField. You can create and pass in your own remembered
- * [InteractionState] if you want to read the [InteractionState] and customize the appearance /
- * behavior of this OutlinedTextField in different [Interaction]s.
+ * @param interactionSource the [MutableInteractionSource] representing the stream of
+ * [Interaction]s for this OutlinedTextField. You can create and pass in your own remembered
+ * [MutableInteractionSource] if you want to observe [Interaction]s and customize the
+ * appearance / behavior of this OutlinedTextField in different [Interaction]s.
  * @param colors [TextFieldColors] that will be used to resolve color of the text and content
  * (including label, placeholder, leading and trailing icons, border) for this text field in
  * different states. See [TextFieldDefaults.outlinedTextFieldColors]
@@ -139,7 +139,7 @@ fun OutlinedTextField(
     singleLine: Boolean = false,
     maxLines: Int = Int.MAX_VALUE,
     onTextInputStarted: (SoftwareKeyboardController) -> Unit = {},
-    interactionState: InteractionState = remember { InteractionState() },
+    interactionSource: MutableInteractionSource = remember { MutableInteractionSource() },
     colors: TextFieldColors = TextFieldDefaults.outlinedTextFieldColors()
 ) {
     var textFieldValueState by remember { mutableStateOf(TextFieldValue(text = value)) }
@@ -168,7 +168,7 @@ fun OutlinedTextField(
         keyboardActions = keyboardActions,
         maxLines = maxLines,
         onTextInputStarted = onTextInputStarted,
-        interactionState = interactionState,
+        interactionSource = interactionSource,
         colors = colors
     )
 }
@@ -228,10 +228,10 @@ fun OutlinedTextField(
  * input service (e.g. software keyboard on Android) has been established. Called with the
  * [SoftwareKeyboardController] instance that can be used to request to show or hide the software
  * keyboard
- * @param interactionState the [InteractionState] representing the different [Interaction]s
- * present on this OutlinedTextField. You can create and pass in your own remembered
- * [InteractionState] if you want to read the [InteractionState] and customize the appearance /
- * behavior of this OutlinedTextField in different [Interaction]s
+ * @param interactionSource the [MutableInteractionSource] representing the stream of
+ * [Interaction]s for this OutlinedTextField. You can create and pass in your own remembered
+ * [MutableInteractionSource] if you want to observe [Interaction]s and customize the
+ * appearance / behavior of this OutlinedTextField in different [Interaction]s.
  * @param colors [TextFieldColors] that will be used to resolve color of the text and content
  * (including label, placeholder, leading and trailing icons, border) for this text field in
  * different states. See [TextFieldDefaults.outlinedTextFieldColors]
@@ -255,7 +255,7 @@ fun OutlinedTextField(
     singleLine: Boolean = false,
     maxLines: Int = Int.MAX_VALUE,
     onTextInputStarted: (SoftwareKeyboardController) -> Unit = {},
-    interactionState: InteractionState = remember { InteractionState() },
+    interactionSource: MutableInteractionSource = remember { MutableInteractionSource() },
     colors: TextFieldColors = TextFieldDefaults.outlinedTextFieldColors()
 ) {
     TextFieldImpl(
@@ -277,7 +277,7 @@ fun OutlinedTextField(
         keyboardActions = keyboardActions,
         maxLines = maxLines,
         onTextInputStarted = onTextInputStarted,
-        interactionState = interactionState,
+        interactionSource = interactionSource,
         shape = RectangleShape,
         colors = colors
     )
@@ -297,7 +297,7 @@ internal fun OutlinedTextFieldLayout(
     maxLines: Int = Int.MAX_VALUE,
     visualTransformation: VisualTransformation,
     onTextInputStarted: (SoftwareKeyboardController) -> Unit,
-    interactionState: InteractionState,
+    interactionSource: MutableInteractionSource,
     decoratedPlaceholder: @Composable ((Modifier) -> Unit)?,
     decoratedLabel: @Composable (() -> Unit)?,
     leading: @Composable (() -> Unit)?,
@@ -339,7 +339,7 @@ internal fun OutlinedTextFieldLayout(
         visualTransformation = visualTransformation,
         keyboardOptions = keyboardOptions,
         keyboardActions = keyboardActions,
-        interactionState = interactionState,
+        interactionSource = interactionSource,
         onTextInputStarted = onTextInputStarted,
         singleLine = singleLine,
         maxLines = maxLines,

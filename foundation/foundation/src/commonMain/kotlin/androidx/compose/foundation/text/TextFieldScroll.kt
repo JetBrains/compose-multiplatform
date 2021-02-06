@@ -16,7 +16,7 @@
 
 package androidx.compose.foundation.text
 
-import androidx.compose.foundation.InteractionState
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.gestures.Orientation
 import androidx.compose.foundation.gestures.rememberScrollableState
 import androidx.compose.foundation.gestures.scrollable
@@ -51,13 +51,13 @@ import kotlin.math.roundToInt
 // Scrollable
 internal fun Modifier.textFieldScrollable(
     scrollerPosition: TextFieldScrollerPosition,
-    interactionState: InteractionState? = null,
+    interactionSource: MutableInteractionSource? = null,
     enabled: Boolean = true
 ) = composed(
     inspectorInfo = debugInspectorInfo {
         name = "textFieldScrollable"
         properties["scrollerPosition"] = scrollerPosition
-        properties["interactionState"] = interactionState
+        properties["interactionSource"] = interactionSource
         properties["enabled"] = enabled
     }
 ) {
@@ -79,7 +79,7 @@ internal fun Modifier.textFieldScrollable(
         orientation = scrollerPosition.orientation,
         reverseDirection = reverseDirection,
         state = controller,
-        interactionState = interactionState,
+        interactionSource = interactionSource,
         enabled = enabled && scrollerPosition.maximum != 0f
     )
     scroll

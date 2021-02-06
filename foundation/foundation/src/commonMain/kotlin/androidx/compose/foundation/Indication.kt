@@ -16,8 +16,11 @@
 
 package androidx.compose.foundation
 
+import androidx.compose.foundation.interaction.InteractionSource
+import androidx.compose.foundation.interaction.collectIsPressedAsState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Stable
+import androidx.compose.runtime.State
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.staticCompositionLocalOf
 import androidx.compose.ui.graphics.drawscope.ContentDrawScope
@@ -43,21 +46,22 @@ import androidx.compose.ui.platform.debugInspectorInfo
 interface Indication {
 
     /**
-     * [remember]s a new [IndicationInstance], and updates its state when [interactionState]
-     * changes. Typically this will be called by [indication], so one [IndicationInstance] will be
-     * used for one component that draws [Indication], such as a button.
+     * [remember]s a new [IndicationInstance], and updates its state based on [Interaction]s
+     * emitted via [interactionSource] . Typically this will be called by [indication],
+     * so one [IndicationInstance] will be used for one component that draws [Indication], such
+     * as a button.
      *
-     * Implementations of this function should observe state changes inside [interactionState],
-     * using them to launch animations / state changes inside [IndicationInstance] that will then
-     * be reflected inside [IndicationInstance.drawIndication].
+     * Implementations of this function should observe [Interaction]s using [interactionSource],
+     * using them to launch animations / state changes inside [IndicationInstance] that will
+     * then be reflected inside [IndicationInstance.drawIndication].
      *
-     * @param interactionState the [InteractionState] containing the current interactions the
-     * returned [IndicationInstance] should represent
-     * @return an [IndicationInstance] that represents the current interactions present in
-     * [interactionState]
+     * @param interactionSource the [InteractionSource] representing the stream of
+     * [Interaction]s the returned [IndicationInstance] should represent
+     * @return an [IndicationInstance] that represents the stream of [Interaction]s emitted by
+     * [interactionSource]
      */
     @Composable
-    fun rememberUpdatedInstance(interactionState: InteractionState): IndicationInstance
+    fun rememberUpdatedInstance(interactionSource: InteractionSource): IndicationInstance
 }
 
 /**
@@ -89,19 +93,19 @@ interface IndicationInstance {
  *
  * @sample androidx.compose.foundation.samples.IndicationSample
  *
- * @param interactionState [InteractionState] that will be used by [indication] to draw visual
- * effects - this [InteractionState] represents the combined state of all interactions currently
- * present on this component.
+ * @param interactionSource [InteractionSource] that will be used by [indication] to draw
+ * visual effects - this [InteractionSource] represents the stream of [Interaction]s for this
+ * component.
  * @param indication [Indication] used to draw visual effects. If `null`, no visual effects will
  * be shown for this component.
  */
 fun Modifier.indication(
-    interactionState: InteractionState,
+    interactionSource: InteractionSource,
     indication: Indication?
 ) = composed(
     factory = {
         val resolvedIndication = indication ?: NoIndication
-        val instance = resolvedIndication.rememberUpdatedInstance(interactionState)
+        val instance = resolvedIndication.rememberUpdatedInstance(interactionSource)
         remember(instance) {
             IndicationModifier(instance)
         }
@@ -109,7 +113,7 @@ fun Modifier.indication(
     inspectorInfo = debugInspectorInfo {
         name = "indication"
         properties["indication"] = indication
-        properties["interactionState"] = interactionState
+        properties["interactionSource"] = interactionSource
     }
 )
 
@@ -132,7 +136,7 @@ private object NoIndication : Indication {
     }
 
     @Composable
-    override fun rememberUpdatedInstance(interactionState: InteractionState): IndicationInstance {
+    override fun rememberUpdatedInstance(interactionSource: InteractionSource): IndicationInstance {
         return NoIndicationInstance
     }
 }
@@ -143,19 +147,22 @@ private object NoIndication : Indication {
 private object DefaultDebugIndication : Indication {
 
     private class DefaultDebugIndicationInstance(
-        private val interactionState: InteractionState
+        private val isPressed: State<Boolean>
     ) : IndicationInstance {
         override fun ContentDrawScope.drawIndication() {
             drawContent()
-            if (interactionState.contains(Interaction.Pressed)) {
+            if (isPressed.value) {
                 drawRect(color = Color.Black.copy(alpha = 0.3f), size = size)
             }
         }
     }
 
     @Composable
-    override fun rememberUpdatedInstance(interactionState: InteractionState): IndicationInstance {
-        return remember(interactionState) { DefaultDebugIndicationInstance(interactionState) }
+    override fun rememberUpdatedInstance(interactionSource: InteractionSource): IndicationInstance {
+        val isPressed = interactionSource.collectIsPressedAsState()
+        return remember(interactionSource) {
+            DefaultDebugIndicationInstance(isPressed)
+        }
     }
 }
 
