@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package androidx.compose.foundation.animation
+package androidx.compose.animation
 
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.Density
@@ -23,7 +23,7 @@ import kotlin.math.ln
 import kotlin.math.sign
 
 // copy-paste of
-// src/androidMain/kotlin/androidx/compose/foundation/animation/AndroidFlingCalculator.kt
+// src/androidMain/kotlin/androidx/compose/foundation/animation/AndroidFlingCalculator.android.kt
 
 /**
  * Earth's gravity in SI units (m/s^2); used to compute deceleration based on friction.

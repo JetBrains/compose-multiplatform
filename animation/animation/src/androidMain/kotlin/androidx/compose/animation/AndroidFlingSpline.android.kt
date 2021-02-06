@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package androidx.compose.foundation.animation
+package androidx.compose.animation
 
 import kotlin.math.abs
 import kotlin.math.ln

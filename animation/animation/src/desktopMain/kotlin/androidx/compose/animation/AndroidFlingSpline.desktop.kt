@@ -14,13 +14,13 @@
  * limitations under the License.
  */
 
-package androidx.compose.foundation.animation
+package androidx.compose.animation
 
 import kotlin.math.abs
 import kotlin.math.ln
 
 // copy-paste of
-// src/androidMain/kotlin/androidx/compose/foundation/animation/AndroidFlingSpline.kt
+// src/androidMain/kotlin/androidx/compose/foundation/animation/AndroidFlingSpline.android.kt
 
 private const val Inflection = 0.35f // Tension lines cross at (Inflection, 1)
 private const val StartTension = 0.5f

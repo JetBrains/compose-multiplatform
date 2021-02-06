@@ -16,7 +16,7 @@
 
 package androidx.compose.foundation.lazy
 
-import androidx.compose.foundation.animation.FlingBehavior
+import androidx.compose.foundation.gestures.FlingBehavior
 import androidx.compose.foundation.assertNotNestingScrollableContainers
 import androidx.compose.foundation.gestures.Orientation
 import androidx.compose.foundation.gestures.scrollable

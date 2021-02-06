@@ -1,5 +1,5 @@
 /*
- * Copyright 2020 The Android Open Source Project
+ * Copyright 2021 The Android Open Source Project
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,12 +14,12 @@
  * limitations under the License.
  */
 
-package androidx.compose.foundation.animation
+package androidx.compose.foundation.gestures
 
 import androidx.compose.animation.core.AnimationSpec
 import androidx.compose.animation.core.VectorConverter
 import androidx.compose.animation.core.spring
-import androidx.compose.foundation.gestures.ScrollableState
+import androidx.compose.foundation.MutatePriority
 import androidx.compose.runtime.withFrameNanos
 
 /**
@@ -89,4 +89,16 @@ suspend fun ScrollableState.scrollBy(value: Float): Float {
         consumed = scrollBy(value)
     }
     return consumed
+}
+
+/**
+ * Stop and suspend until any ongoing animation, smooth scrolling, fling, or any other scroll
+ * occurring via [ScrollableState.scroll] is terminated.
+ *
+ * @param scrollPriority scrolls that run with this priority or lower will be stopped
+ */
+suspend fun ScrollableState.stopScroll(scrollPriority: MutatePriority = MutatePriority.Default) {
+    scroll(scrollPriority) {
+        // do nothing, just lock the mutex so other scroll actors are cancelled
+    }
 }

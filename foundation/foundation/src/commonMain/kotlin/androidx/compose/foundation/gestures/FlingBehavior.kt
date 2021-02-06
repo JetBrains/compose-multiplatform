@@ -1,5 +1,5 @@
 /*
- * Copyright 2019 The Android Open Source Project
+ * Copyright 2021 The Android Open Source Project
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,28 +14,13 @@
  * limitations under the License.
  */
 
-package androidx.compose.foundation.animation
-
-import androidx.compose.animation.core.DecayAnimationSpec
-import androidx.compose.foundation.gestures.ScrollScope
-import androidx.compose.runtime.Composable
-
-/**
- * Create and remember default [DecayAnimationSpec] representing a default fling curve for a
- * platform.
- */
-@Composable
-fun rememberDefaultDecayAnimationSpec(): DecayAnimationSpec<Float> =
-    rememberActualDecayAnimationSpec()
-
-@Composable
-internal expect fun rememberActualDecayAnimationSpec(): DecayAnimationSpec<Float>
+package androidx.compose.foundation.gestures
 
 /**
  * Interface to specify fling behavior.
  *
- * When drag has ended with velocity in [androidx.compose.foundation.gestures.scrollable],
- * [performFling] is invoked to perform fling animation and update state via [ScrollScope.scrollBy]
+ * When drag has ended with velocity in [scrollable], [performFling] is invoked to perform fling
+ * animation and update state via [ScrollScope.scrollBy]
  */
 interface FlingBehavior {
     /**

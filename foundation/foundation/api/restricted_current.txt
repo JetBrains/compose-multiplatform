@@ -116,9 +116,9 @@ package androidx.compose.foundation {
   }
 
   public final class ScrollKt {
-    method public static androidx.compose.ui.Modifier horizontalScroll(androidx.compose.ui.Modifier, androidx.compose.foundation.ScrollState state, optional boolean enabled, optional androidx.compose.foundation.animation.FlingBehavior? flingBehavior, optional boolean reverseScrolling);
+    method public static androidx.compose.ui.Modifier horizontalScroll(androidx.compose.ui.Modifier, androidx.compose.foundation.ScrollState state, optional boolean enabled, optional androidx.compose.foundation.gestures.FlingBehavior? flingBehavior, optional boolean reverseScrolling);
     method @androidx.compose.runtime.Composable public static androidx.compose.foundation.ScrollState rememberScrollState(optional float initial);
-    method public static androidx.compose.ui.Modifier verticalScroll(androidx.compose.ui.Modifier, androidx.compose.foundation.ScrollState state, optional boolean enabled, optional androidx.compose.foundation.animation.FlingBehavior? flingBehavior, optional boolean reverseScrolling);
+    method public static androidx.compose.ui.Modifier verticalScroll(androidx.compose.ui.Modifier, androidx.compose.foundation.ScrollState state, optional boolean enabled, optional androidx.compose.foundation.gestures.FlingBehavior? flingBehavior, optional boolean reverseScrolling);
   }
 
   @androidx.compose.runtime.Stable public final class ScrollState implements androidx.compose.foundation.gestures.ScrollableState {
@@ -141,46 +141,6 @@ package androidx.compose.foundation {
   public static final class ScrollState.Companion {
     method public androidx.compose.runtime.saveable.Saver<androidx.compose.foundation.ScrollState,?> getSaver();
     property public final androidx.compose.runtime.saveable.Saver<androidx.compose.foundation.ScrollState,?> Saver;
-  }
-
-}
-
-package androidx.compose.foundation.animation {
-
-  public final class AndroidFlingCalculatorKt {
-  }
-
-  public final class AndroidFlingConfigKt {
-  }
-
-  public final class AndroidFlingDecaySpecKt {
-    method public static <T> androidx.compose.animation.core.DecayAnimationSpec<T> androidFlingDecay(androidx.compose.ui.unit.Density density);
-  }
-
-  public final class AndroidFlingSplineKt {
-  }
-
-  public interface FlingBehavior {
-    method public suspend Object? performFling(androidx.compose.foundation.gestures.ScrollScope, float initialVelocity, kotlin.coroutines.Continuation<? super java.lang.Float> p);
-  }
-
-  public final class FlingBehaviorKt {
-    method @androidx.compose.runtime.Composable public static androidx.compose.animation.core.DecayAnimationSpec<java.lang.Float> rememberDefaultDecayAnimationSpec();
-  }
-
-  public final class FloatAndroidFlingDecaySpec implements androidx.compose.animation.core.FloatDecayAnimationSpec {
-    ctor public FloatAndroidFlingDecaySpec(androidx.compose.ui.unit.Density density);
-    method public float getAbsVelocityThreshold();
-    method public long getDurationNanos(float initialValue, float initialVelocity);
-    method public float getTargetValue(float initialValue, float initialVelocity);
-    method public float getValueFromNanos(long playTimeNanos, float initialValue, float initialVelocity);
-    method public float getVelocityFromNanos(long playTimeNanos, float initialValue, float initialVelocity);
-    property public float absVelocityThreshold;
-  }
-
-  public final class ScrollingKt {
-    method public static suspend Object? scrollBy(androidx.compose.foundation.gestures.ScrollableState, float value, kotlin.coroutines.Continuation<? super java.lang.Float> p);
-    method public static suspend Object? smoothScrollBy(androidx.compose.foundation.gestures.ScrollableState, float value, optional androidx.compose.animation.core.AnimationSpec<java.lang.Float> spec, optional kotlin.coroutines.Continuation<? super java.lang.Float> p);
   }
 
 }
@@ -221,6 +181,10 @@ package androidx.compose.foundation.gestures {
     method public suspend Object? drag(optional androidx.compose.foundation.MutatePriority dragPriority, kotlin.jvm.functions.Function2<? super androidx.compose.foundation.gestures.DragScope,? super kotlin.coroutines.Continuation<? super kotlin.Unit>,?> block, kotlin.coroutines.Continuation<? super kotlin.Unit> p);
   }
 
+  public interface FlingBehavior {
+    method public suspend Object? performFling(androidx.compose.foundation.gestures.ScrollScope, float initialVelocity, kotlin.coroutines.Continuation<? super java.lang.Float> p);
+  }
+
   public final class ForEachGestureKt {
     method public static suspend Object? forEachGesture(androidx.compose.ui.input.pointer.PointerInputScope, kotlin.jvm.functions.Function2<? super androidx.compose.ui.input.pointer.PointerInputScope,? super kotlin.coroutines.Continuation<? super kotlin.Unit>,?> block, kotlin.coroutines.Continuation<? super kotlin.Unit> p);
   }
@@ -240,17 +204,23 @@ package androidx.compose.foundation.gestures {
     method public suspend Object? tryAwaitRelease(kotlin.coroutines.Continuation<? super java.lang.Boolean> p);
   }
 
+  public final class ScrollExtensionsKt {
+    method public static suspend Object? scrollBy(androidx.compose.foundation.gestures.ScrollableState, float value, kotlin.coroutines.Continuation<? super java.lang.Float> p);
+    method public static suspend Object? smoothScrollBy(androidx.compose.foundation.gestures.ScrollableState, float value, optional androidx.compose.animation.core.AnimationSpec<java.lang.Float> spec, optional kotlin.coroutines.Continuation<? super java.lang.Float> p);
+    method public static suspend Object? stopScroll(androidx.compose.foundation.gestures.ScrollableState, optional androidx.compose.foundation.MutatePriority scrollPriority, optional kotlin.coroutines.Continuation<? super kotlin.Unit> p);
+  }
+
   public interface ScrollScope {
     method public float scrollBy(float pixels);
   }
 
   public final class ScrollableDefaults {
-    method @androidx.compose.runtime.Composable public androidx.compose.foundation.animation.FlingBehavior flingBehavior();
+    method @androidx.compose.runtime.Composable public androidx.compose.foundation.gestures.FlingBehavior flingBehavior();
     field public static final androidx.compose.foundation.gestures.ScrollableDefaults INSTANCE;
   }
 
   public final class ScrollableKt {
-    method public static androidx.compose.ui.Modifier scrollable(androidx.compose.ui.Modifier, androidx.compose.foundation.gestures.ScrollableState state, androidx.compose.foundation.gestures.Orientation orientation, optional boolean enabled, optional boolean reverseDirection, optional androidx.compose.foundation.animation.FlingBehavior? flingBehavior, optional androidx.compose.foundation.InteractionState? interactionState);
+    method public static androidx.compose.ui.Modifier scrollable(androidx.compose.ui.Modifier, androidx.compose.foundation.gestures.ScrollableState state, androidx.compose.foundation.gestures.Orientation orientation, optional boolean enabled, optional boolean reverseDirection, optional androidx.compose.foundation.gestures.FlingBehavior? flingBehavior, optional androidx.compose.foundation.InteractionState? interactionState);
   }
 
   public interface ScrollableState {
@@ -263,7 +233,6 @@ package androidx.compose.foundation.gestures {
   public final class ScrollableStateKt {
     method public static androidx.compose.foundation.gestures.ScrollableState ScrollableState(kotlin.jvm.functions.Function1<? super java.lang.Float,java.lang.Float> consumeScrollDelta);
     method @androidx.compose.runtime.Composable public static androidx.compose.foundation.gestures.ScrollableState rememberScrollableState(kotlin.jvm.functions.Function1<? super java.lang.Float,java.lang.Float> consumeScrollDelta);
-    method public static suspend Object? stopScroll(androidx.compose.foundation.gestures.ScrollableState, optional androidx.compose.foundation.MutatePriority scrollPriority, optional kotlin.coroutines.Continuation<? super kotlin.Unit> p);
   }
 
   public final class TapGestureDetectorKt {
@@ -317,8 +286,8 @@ package androidx.compose.foundation.lazy {
   }
 
   public final class LazyDslKt {
-    method @androidx.compose.runtime.Composable public static void LazyColumn(optional androidx.compose.ui.Modifier modifier, optional androidx.compose.foundation.lazy.LazyListState state, optional androidx.compose.foundation.layout.PaddingValues contentPadding, optional boolean reverseLayout, optional androidx.compose.foundation.layout.Arrangement.Vertical verticalArrangement, optional androidx.compose.ui.Alignment.Horizontal horizontalAlignment, optional androidx.compose.foundation.animation.FlingBehavior flingBehavior, kotlin.jvm.functions.Function1<? super androidx.compose.foundation.lazy.LazyListScope,kotlin.Unit> content);
-    method @androidx.compose.runtime.Composable public static void LazyRow(optional androidx.compose.ui.Modifier modifier, optional androidx.compose.foundation.lazy.LazyListState state, optional androidx.compose.foundation.layout.PaddingValues contentPadding, optional boolean reverseLayout, optional androidx.compose.foundation.layout.Arrangement.Horizontal horizontalArrangement, optional androidx.compose.ui.Alignment.Vertical verticalAlignment, optional androidx.compose.foundation.animation.FlingBehavior flingBehavior, kotlin.jvm.functions.Function1<? super androidx.compose.foundation.lazy.LazyListScope,kotlin.Unit> content);
+    method @androidx.compose.runtime.Composable public static void LazyColumn(optional androidx.compose.ui.Modifier modifier, optional androidx.compose.foundation.lazy.LazyListState state, optional androidx.compose.foundation.layout.PaddingValues contentPadding, optional boolean reverseLayout, optional androidx.compose.foundation.layout.Arrangement.Vertical verticalArrangement, optional androidx.compose.ui.Alignment.Horizontal horizontalAlignment, optional androidx.compose.foundation.gestures.FlingBehavior flingBehavior, kotlin.jvm.functions.Function1<? super androidx.compose.foundation.lazy.LazyListScope,kotlin.Unit> content);
+    method @androidx.compose.runtime.Composable public static void LazyRow(optional androidx.compose.ui.Modifier modifier, optional androidx.compose.foundation.lazy.LazyListState state, optional androidx.compose.foundation.layout.PaddingValues contentPadding, optional boolean reverseLayout, optional androidx.compose.foundation.layout.Arrangement.Horizontal horizontalArrangement, optional androidx.compose.ui.Alignment.Vertical verticalAlignment, optional androidx.compose.foundation.gestures.FlingBehavior flingBehavior, kotlin.jvm.functions.Function1<? super androidx.compose.foundation.lazy.LazyListScope,kotlin.Unit> content);
     method public static inline <T> void items(androidx.compose.foundation.lazy.LazyListScope, java.util.List<? extends T> items, optional kotlin.jvm.functions.Function1<? super T,?>? key, kotlin.jvm.functions.Function2<? super androidx.compose.foundation.lazy.LazyItemScope,? super T,kotlin.Unit> itemContent);
     method public static inline <T> void items(androidx.compose.foundation.lazy.LazyListScope, T![] items, optional kotlin.jvm.functions.Function1<? super T,?>? key, kotlin.jvm.functions.Function2<? super androidx.compose.foundation.lazy.LazyItemScope,? super T,kotlin.Unit> itemContent);
     method public static inline <T> void itemsIndexed(androidx.compose.foundation.lazy.LazyListScope, java.util.List<? extends T> items, optional kotlin.jvm.functions.Function2<? super java.lang.Integer,? super T,?>? key, kotlin.jvm.functions.Function3<? super androidx.compose.foundation.lazy.LazyItemScope,? super java.lang.Integer,? super T,kotlin.Unit> itemContent);

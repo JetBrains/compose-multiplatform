@@ -17,7 +17,7 @@
 package androidx.compose.foundation
 
 import androidx.compose.animation.core.ManualFrameClock
-import androidx.compose.foundation.animation.smoothScrollBy
+import androidx.compose.foundation.gestures.smoothScrollBy
 import androidx.compose.foundation.gestures.ScrollableState
 import androidx.compose.foundation.gestures.scrollable
 import androidx.compose.foundation.layout.Box

@@ -19,8 +19,8 @@ import android.os.Handler
 import android.os.Looper
 import androidx.annotation.RequiresApi
 import androidx.compose.animation.core.advanceClockMillis
-import androidx.compose.foundation.animation.scrollBy
-import androidx.compose.foundation.animation.smoothScrollBy
+import androidx.compose.foundation.gestures.scrollBy
+import androidx.compose.foundation.gestures.smoothScrollBy
 import androidx.compose.foundation.gestures.ScrollableState
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column

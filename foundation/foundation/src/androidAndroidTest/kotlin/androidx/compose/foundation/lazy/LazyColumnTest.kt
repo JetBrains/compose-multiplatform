@@ -18,7 +18,7 @@ package androidx.compose.foundation.lazy
 
 import androidx.compose.animation.core.advanceClockMillis
 import androidx.compose.animation.core.snap
-import androidx.compose.foundation.animation.smoothScrollBy
+import androidx.compose.foundation.gestures.smoothScrollBy
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer

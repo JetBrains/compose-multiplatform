@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package androidx.compose.foundation.animation
+package androidx.compose.animation
 
 import androidx.compose.animation.core.DecayAnimationSpec
 import androidx.compose.animation.core.generateDecayAnimationSpec
@@ -23,11 +23,11 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.platform.LocalDensity
 
 @Composable
-internal actual fun rememberActualDecayAnimationSpec(): DecayAnimationSpec<Float> {
+actual fun defaultDecayAnimationSpec(): DecayAnimationSpec<Float> {
     // This function will internally update the calculation of fling decay when the density changes,
     // but the reference to the returned spec will not change across calls.
     val density = LocalDensity.current
     return remember(density.density) {
-        DesktopFlingDecaySpec(density).generateDecayAnimationSpec()
+        DesktopDefaultDecayAnimationSpec(density).generateDecayAnimationSpec()
     }
 }
