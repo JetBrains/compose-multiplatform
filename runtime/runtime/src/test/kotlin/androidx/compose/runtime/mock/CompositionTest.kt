@@ -53,12 +53,12 @@ fun compositionTest(block: suspend CompositionTestScope.() -> Unit) = runBlockin
                 composition.setContent(block)
             }
 
-            override fun advance(): Boolean {
+            override fun advance(ignorePendingWork: Boolean): Boolean {
                 val changeCount = recomposer.changeCount
                 Snapshot.sendApplyNotifications()
                 if (recomposer.hasPendingWork) {
                     advanceTimeBy(5_000)
-                    check(!recomposer.hasPendingWork) {
+                    check(ignorePendingWork || !recomposer.hasPendingWork) {
                         "Potentially infinite recomposition, still recomposing after advancing"
                     }
                 }
@@ -86,7 +86,7 @@ interface CompositionTestScope : TestCoroutineScope {
      * Advance the state which executes any pending compositions, if any. Returns true if
      * advancing resulted in changes being applied.
      */
-    fun advance(): Boolean
+    fun advance(ignorePendingWork: Boolean = false): Boolean
 
     /**
      * The root mock view of the mock views being composed.
