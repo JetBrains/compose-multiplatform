@@ -53,17 +53,6 @@ package androidx.compose.runtime {
   @kotlin.annotation.MustBeDocumented @kotlin.annotation.Retention(kotlin.annotation.AnnotationRetention) @kotlin.annotation.Target(allowedTargets={kotlin.annotation.AnnotationTarget, kotlin.annotation.AnnotationTarget, kotlin.annotation.AnnotationTarget, kotlin.annotation.AnnotationTarget, kotlin.annotation.AnnotationTarget}) public @interface Composable {
   }
 
-  @Deprecated @kotlin.annotation.MustBeDocumented @kotlin.annotation.Retention(kotlin.annotation.AnnotationRetention) @kotlin.annotation.Target(allowedTargets={kotlin.annotation.AnnotationTarget, kotlin.annotation.AnnotationTarget, kotlin.annotation.AnnotationTarget, kotlin.annotation.AnnotationTarget}) public @interface ComposableContract {
-    method @Deprecated public abstract boolean preventCapture() default false;
-    method @Deprecated public abstract boolean readonly() default false;
-    method @Deprecated public abstract boolean restartable() default true;
-    method @Deprecated public abstract boolean tracked() default true;
-    property public abstract boolean preventCapture;
-    property public abstract boolean readonly;
-    property public abstract boolean restartable;
-    property public abstract boolean tracked;
-  }
-
   public final class ComposablesKt {
     method @androidx.compose.runtime.Composable public static inline <T extends java.lang.Object, reified E extends androidx.compose.runtime.Applier<?>> void ComposeNode(kotlin.jvm.functions.Function0<? extends T> factory, kotlin.jvm.functions.Function1<? super androidx.compose.runtime.Updater<T>,? extends kotlin.Unit> update);
     method @androidx.compose.runtime.Composable public static inline <T extends java.lang.Object, reified E extends androidx.compose.runtime.Applier<?>> void ComposeNode(kotlin.jvm.functions.Function0<? extends T> factory, kotlin.jvm.functions.Function1<? super androidx.compose.runtime.Updater<T>,? extends kotlin.Unit> update, kotlin.jvm.functions.Function0<? extends kotlin.Unit> content);
@@ -324,10 +313,8 @@ package androidx.compose.runtime {
     method public long getChangeCount();
     method public boolean getHasPendingWork();
     method public kotlinx.coroutines.flow.Flow<androidx.compose.runtime.Recomposer.State> getState();
-    method @Deprecated public boolean hasInvalidations();
     method public suspend Object? join(kotlin.coroutines.Continuation<? super kotlin.Unit> p);
     method public suspend Object? runRecomposeAndApplyChanges(kotlin.coroutines.Continuation<? super kotlin.Unit> p);
-    method @Deprecated public void shutDown();
     property public final long changeCount;
     property public final boolean hasPendingWork;
     property public final kotlinx.coroutines.flow.Flow<androidx.compose.runtime.Recomposer.State> state;
@@ -604,13 +591,11 @@ package androidx.compose.runtime.snapshots {
     method public final inline <T> T! enter(kotlin.jvm.functions.Function0<? extends T> block);
     method public int getId();
     method public abstract boolean getReadOnly();
-    method @Deprecated public final boolean getReadonly();
     method public abstract androidx.compose.runtime.snapshots.Snapshot getRoot();
     method public abstract boolean hasPendingChanges();
     method public abstract androidx.compose.runtime.snapshots.Snapshot takeNestedSnapshot(optional kotlin.jvm.functions.Function1<java.lang.Object,kotlin.Unit>? readObserver);
     property public int id;
     property public abstract boolean readOnly;
-    property @Deprecated public final boolean readonly;
     property public abstract androidx.compose.runtime.snapshots.Snapshot root;
     field public static final androidx.compose.runtime.snapshots.Snapshot.Companion Companion;
   }
@@ -658,18 +643,12 @@ package androidx.compose.runtime.snapshots {
     field public static final androidx.compose.runtime.snapshots.SnapshotApplyResult.Success INSTANCE;
   }
 
-  public final class SnapshotFlowKt {
-    method @Deprecated @androidx.compose.runtime.ExperimentalComposeApi public static inline <R> R! withMutableSnapshot(kotlin.jvm.functions.Function0<? extends R> block);
-  }
-
   public final class SnapshotIdSetKt {
   }
 
   public final class SnapshotKt {
     method public static <T extends androidx.compose.runtime.snapshots.StateRecord> T readable(T, androidx.compose.runtime.snapshots.StateObject state);
     method public static <T extends androidx.compose.runtime.snapshots.StateRecord> T readable(T, androidx.compose.runtime.snapshots.StateObject state, androidx.compose.runtime.snapshots.Snapshot snapshot);
-    method @Deprecated public static androidx.compose.runtime.snapshots.MutableSnapshot takeMutableSnapshot(optional kotlin.jvm.functions.Function1<java.lang.Object,kotlin.Unit>? readObserver, optional kotlin.jvm.functions.Function1<java.lang.Object,kotlin.Unit>? writeObserver);
-    method @Deprecated public static androidx.compose.runtime.snapshots.Snapshot takeSnapshot(optional kotlin.jvm.functions.Function1<java.lang.Object,kotlin.Unit>? readObserver);
     method public static inline <T extends androidx.compose.runtime.snapshots.StateRecord, R> R! withCurrent(T, kotlin.jvm.functions.Function1<? super T,? extends R> block);
     method public static inline <T extends androidx.compose.runtime.snapshots.StateRecord, R> R! writable(T, androidx.compose.runtime.snapshots.StateObject state, androidx.compose.runtime.snapshots.Snapshot snapshot, kotlin.jvm.functions.Function1<? super T,? extends R> block);
     method public static inline <T extends androidx.compose.runtime.snapshots.StateRecord, R> R! writable(T, androidx.compose.runtime.snapshots.StateObject state, kotlin.jvm.functions.Function1<? super T,? extends R> block);
