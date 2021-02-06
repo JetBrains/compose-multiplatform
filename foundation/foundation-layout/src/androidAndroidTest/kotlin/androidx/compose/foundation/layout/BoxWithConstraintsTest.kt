@@ -30,7 +30,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.Stable
 import androidx.compose.runtime.State
-import androidx.compose.runtime.emptyContent
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -278,7 +277,7 @@ class BoxWithConstraintsTest : LayoutTest() {
                     actualConstraints = constraints
                     assertEquals(1, latch.count)
                     latch.countDown()
-                    Container(width = 100, height = 100, content = emptyContent())
+                    Container(width = 100, height = 100) {}
                 }
             }
         }
@@ -442,7 +441,7 @@ class BoxWithConstraintsTest : LayoutTest() {
                             }
                         }
                     }
-                    Container(100, 100, Modifier, emptyContent())
+                    Container(100, 100, Modifier) {}
                 }
             }
         }
@@ -507,7 +506,7 @@ class BoxWithConstraintsTest : LayoutTest() {
                         BoxWithConstraints {
                             assertEquals(1, innerComposeLatch.count)
                             innerComposeLatch.countDown()
-                            Layout(content = emptyContent()) { _, _ ->
+                            Layout(content = {}) { _, _ ->
                                 assertEquals(1, innerMeasureLatch.count)
                                 innerMeasureLatch.countDown()
                                 layout(100, 100) {

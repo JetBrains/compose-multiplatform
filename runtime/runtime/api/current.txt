@@ -83,11 +83,6 @@ package androidx.compose.runtime {
   @kotlin.RequiresOptIn(level=kotlin.RequiresOptIn.Level, message="This API is intended to be targeted by the Compose Compiler Plugin and not called " + "directly.") @kotlin.annotation.Target(allowedTargets={kotlin.annotation.AnnotationTarget, kotlin.annotation.AnnotationTarget, kotlin.annotation.AnnotationTarget, kotlin.annotation.AnnotationTarget}) public @interface ComposeCompilerApi {
   }
 
-  public final class ComposeKt {
-    method @Deprecated @androidx.compose.runtime.Stable public static kotlin.jvm.functions.Function0<kotlin.Unit> emptyContent();
-    method @Deprecated public static inline kotlin.jvm.functions.Function0<kotlin.Unit> orEmpty(kotlin.jvm.functions.Function0<kotlin.Unit>?);
-  }
-
   public interface Composer {
     method @androidx.compose.runtime.ComposeCompilerApi public <V, T> void apply(V? value, kotlin.jvm.functions.Function2<? super T,? super V,kotlin.Unit> block);
     method @androidx.compose.runtime.InternalComposeApi public androidx.compose.runtime.CompositionContext buildContext();
