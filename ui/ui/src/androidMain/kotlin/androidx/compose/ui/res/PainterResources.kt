@@ -22,15 +22,14 @@ import androidx.annotation.DrawableRes
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.graphics.ImageBitmap
-import androidx.compose.ui.graphics.nativeCanvas
 import androidx.compose.ui.graphics.drawscope.drawIntoCanvas
-import androidx.compose.ui.graphics.imageFromResource
+import androidx.compose.ui.graphics.nativeCanvas
 import androidx.compose.ui.graphics.painter.BitmapPainter
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.graphics.vector.ImageVector
-import androidx.compose.ui.graphics.vector.rememberVectorPainter
 import androidx.compose.ui.graphics.vector.VectorPainter
 import androidx.compose.ui.graphics.vector.compat.seekToStartTag
+import androidx.compose.ui.graphics.vector.rememberVectorPainter
 import androidx.compose.ui.platform.LocalContext
 
 /**
@@ -95,7 +94,7 @@ private fun loadVectorResource(theme: Resources.Theme, res: Resources, id: Int):
  */
 private fun loadImageBitmapResource(res: Resources, id: Int): ImageBitmap {
     try {
-        return imageFromResource(res, id)
+        return ImageBitmap.imageResource(res, id)
     } catch (throwable: Throwable) {
         throw IllegalArgumentException(errorMessage)
     }

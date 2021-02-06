@@ -86,6 +86,11 @@ interface ImageBitmap {
      * be used as a signal to upload textures to the GPU to eventually be rendered
      */
     fun prepareToDraw()
+
+    /**
+     * Provide an empty companion object to hang platform-specific companion extensions onto.
+     */
+    companion object { } // ktlint-disable no-empty-class-body
 }
 
 /**

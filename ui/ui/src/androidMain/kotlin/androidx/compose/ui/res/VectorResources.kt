@@ -18,7 +18,6 @@ package androidx.compose.ui.res
 
 import android.content.res.Resources
 import android.content.res.XmlResourceParser
-import android.util.TypedValue
 import android.util.Xml
 import androidx.annotation.DrawableRes
 import androidx.compose.runtime.Composable
@@ -29,7 +28,6 @@ import androidx.compose.ui.graphics.vector.compat.isAtEnd
 import androidx.compose.ui.graphics.vector.compat.parseCurrentVectorNode
 import androidx.compose.ui.graphics.vector.compat.seekToStartTag
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.util.trace
 import org.xmlpull.v1.XmlPullParserException
 
 /**
@@ -43,71 +41,17 @@ import org.xmlpull.v1.XmlPullParserException
  * @return the vector data associated with the resource
  */
 @Composable
-internal fun lowLevelVectorResource(@DrawableRes id: Int): ImageVector {
+fun ImageVector.Companion.vectorResource(@DrawableRes id: Int): ImageVector {
     val context = LocalContext.current
     val res = context.resources
     val theme = context.theme
     return remember(id) {
-        loadVectorResource(theme, res, id)
-    }
-}
-
-/**
- * Load a [ImageVector] from an Android resource id
- * This is useful for querying top level properties of the [ImageVector]
- * such as it's intrinsic width and height to be able to size components
- * based off of it's dimensions appropriately
- *
- * Note: This API is transient and will be likely removed for encouraging async resource loading.
- *
- * For loading generic loading of rasterized or vector assets see [painterResource]
- */
-@Composable
-@Suppress("DEPRECATION")
-@Deprecated("vectorResource has been deprecated.  Use painterResource instead")
-fun vectorResource(@DrawableRes id: Int): ImageVector = lowLevelVectorResource(id)
-
-/**
- * Load the vector drawable in background thread.
- *
- * Until resource loading complete, this function returns deferred vector drawable resource with
- * [PendingResource]. Once the loading finishes, recompose is scheduled and this function will
- * return deferred vector drawable resource with [LoadedResource] or [FailedResource].
- *
- * For loading generic loading of rasterized or vector assets see [painterResource]
- *
- * @param id the resource identifier
- * @param pendingResource an optional resource to be used during loading instead.
- * @param failedResource an optional resource to be used if resource loading failed.
- * @return the deferred vector drawable resource.
- */
-@Composable
-@Suppress("DEPRECATION")
-@Deprecated("loadVectorResource has been deprecated.  Use painterResource instead")
-fun loadVectorResource(
-    id: Int,
-    pendingResource: ImageVector? = null,
-    failedResource: ImageVector? = null
-): DeferredResource<ImageVector> {
-    val context = LocalContext.current
-    val res = context.resources
-    val theme = context.theme
-
-    val value = remember { TypedValue() }
-    res.getValue(id, value, true)
-    // We use the file path as a key of the request cache.
-    // TODO(nona): Add density to the key?
-    val key = value.string!!.toString() // Vector drawable must have path in resource.
-
-    return loadResource(key, pendingResource, failedResource) {
-        trace("Vector Resource Loading") {
-            loadVectorResource(theme, res, id)
-        }
+        vectorResource(theme, res, id)
     }
 }
 
 @Throws(XmlPullParserException::class)
-internal fun loadVectorResource(
+fun ImageVector.Companion.vectorResource(
     theme: Resources.Theme? = null,
     res: Resources,
     resId: Int,

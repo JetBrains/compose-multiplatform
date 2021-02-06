@@ -21,8 +21,9 @@ import android.util.AttributeSet
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.graphics.vector.AnimatedVectorTarget
 import androidx.compose.ui.graphics.vector.AnimatedImageVector
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.loadAnimatorResource
-import androidx.compose.ui.res.loadVectorResource
+import androidx.compose.ui.res.vectorResource
 import org.xmlpull.v1.XmlPullParser
 
 private const val TagAnimatedVector = "animated-vector"
@@ -70,7 +71,7 @@ internal fun XmlPullParser.parseAnimatedImageVector(
             }
         }
         AnimatedImageVector(
-            loadVectorResource(theme, res, drawableId),
+            ImageVector.vectorResource(theme, res, drawableId),
             targets
         )
     }

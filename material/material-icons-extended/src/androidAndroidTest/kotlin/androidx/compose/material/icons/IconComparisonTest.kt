@@ -14,8 +14,6 @@
  * limitations under the License.
  */
 
-@file:Suppress("DEPRECATION")
-
 package androidx.compose.material.icons
 
 import android.graphics.Bitmap
@@ -211,7 +209,7 @@ private fun ImageVector.copy(name: String): ImageVector {
 private fun String.toImageVector(): ImageVector {
     val context = LocalContext.current
     val resId = context.resources.getIdentifier(this, "drawable", context.packageName)
-    return vectorResource(resId)
+    return ImageVector.vectorResource(resId)
 }
 
 /**
