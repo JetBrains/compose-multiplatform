@@ -29,7 +29,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.composed
 import androidx.compose.ui.input.pointer.PointerEvent
 import androidx.compose.ui.input.pointer.PointerInputScope
-import androidx.compose.ui.input.pointer.anyPositionChangeConsumed
+import androidx.compose.ui.input.pointer.positionChangeConsumed
 import androidx.compose.ui.input.pointer.consumeAllChanges
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.input.pointer.positionChanged
@@ -154,7 +154,7 @@ private suspend fun PointerInputScope.detectZoom(
         awaitFirstDown(requireUnconsumed = false)
         do {
             val event = awaitPointerEvent()
-            val canceled = event.changes.fastAny { it.anyPositionChangeConsumed() }
+            val canceled = event.changes.fastAny { it.positionChangeConsumed() }
             if (!canceled) {
                 val zoomChange = event.calculateZoom()
                 if (!pastTouchSlop) {

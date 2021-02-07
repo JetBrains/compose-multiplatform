@@ -35,7 +35,7 @@ internal fun down(
         durationMillis,
         Offset(x, y),
         false,
-        ConsumedData(Offset.Zero, false)
+        ConsumedData()
     )
 
 internal fun PointerInputChange.moveTo(durationMillis: Long, x: Float = 0f, y: Float = 0f) =

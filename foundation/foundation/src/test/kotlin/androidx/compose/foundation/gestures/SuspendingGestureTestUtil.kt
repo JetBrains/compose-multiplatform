@@ -134,7 +134,7 @@ internal class SuspendingGestureTestUtil(
             previousUptimeMillis = lastTime,
             previousPosition = Offset(x, y),
             previousPressed = false,
-            ConsumedData(Offset.Zero, false)
+            ConsumedData()
         )
         activePointers[change.id] = change
         invokeOverAllPasses(change, initial, main, final)

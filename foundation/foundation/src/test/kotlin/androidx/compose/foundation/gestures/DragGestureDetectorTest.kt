@@ -17,7 +17,7 @@
 package androidx.compose.foundation.gestures
 
 import androidx.compose.ui.geometry.Offset
-import androidx.compose.ui.input.pointer.anyPositionChangeConsumed
+import androidx.compose.ui.input.pointer.positionChangeConsumed
 import androidx.compose.ui.input.pointer.changedToUpIgnoreConsumed
 import androidx.compose.ui.input.pointer.consumeAllChanges
 import androidx.compose.ui.input.pointer.consumePositionChange
@@ -75,7 +75,7 @@ class DragGestureDetectorTest(dragType: GestureType) {
             onDragCancel = { gestureCanceled = true }
         ) { change, dragAmount ->
             if (change.positionChange().y > 0f || !consumePositiveOnly) {
-                change.consumePositionChange(0f, change.positionChange().y)
+                change.consumePositionChange()
                 dragged = true
                 dragDistance += dragAmount
             }
@@ -88,7 +88,7 @@ class DragGestureDetectorTest(dragType: GestureType) {
             onDragCancel = { gestureCanceled = true }
         ) { change, dragAmount ->
             if (change.positionChange().x > 0f || !consumePositiveOnly) {
-                change.consumePositionChange(change.positionChange().x, 0f)
+                change.consumePositionChange()
                 dragged = true
                 dragDistance += dragAmount
             }
@@ -103,7 +103,7 @@ class DragGestureDetectorTest(dragType: GestureType) {
                     if (change.positionChange().y > 0f || !consumePositiveOnly) {
                         dragged = true
                         dragDistance = overSlop
-                        change.consumePositionChange(0f, change.positionChange().y)
+                        change.consumePositionChange()
                     }
                 }
                 if (slopChange != null || sloppyDetector) {
@@ -135,7 +135,7 @@ class DragGestureDetectorTest(dragType: GestureType) {
                         if (change.positionChange().x > 0f || !consumePositiveOnly) {
                             dragged = true
                             dragDistance = overSlop
-                            change.consumePositionChange(change.positionChange().x, 0f)
+                            change.consumePositionChange()
                         }
                     }
                 if (slopChange != null || sloppyDetector) {
@@ -345,7 +345,7 @@ class DragGestureDetectorTest(dragType: GestureType) {
                 (dragMotion * 2f) + crossDragMotion,
                 final = {
                     // This should have priority because it has moved more than the other direction.
-                    assertTrue(anyPositionChangeConsumed())
+                    assertTrue(positionChangeConsumed())
                 }
             )
                 .up()

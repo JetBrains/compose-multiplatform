@@ -396,8 +396,8 @@ internal class RawDragGestureFilter : PointerInputFilter() {
                         )
                     )
 
-                    movedChanges.fastForEach {
-                        it.consumePositionChange(consumed.x, consumed.y)
+                    if (consumed.x != 0f || consumed.y != 0f) {
+                        movedChanges.fastForEach { it.consumePositionChange() }
                     }
                 }
             }

@@ -166,10 +166,6 @@ private fun Modifier.dragForEachGesture(
     scrollLogic: State<ScrollingLogic>
 ): Modifier {
     fun isVertical() = orientation.value == Vertical
-    fun PointerInputChange.consume(amount: Float) = this.consumePositionChange(
-        consumedDx = if (isVertical()) 0f else amount,
-        consumedDy = if (isVertical()) amount else 0f
-    )
 
     fun Offset.axisValue() = this.run { if (isVertical()) y else x }
 
@@ -185,7 +181,7 @@ private fun Modifier.dragForEachGesture(
                 down to initialDelta
             } else {
                 val onSlopPassed = { event: PointerInputChange, overSlop: Float ->
-                    event.consume(event.position.axisValue())
+                    event.consumePositionChange()
                     initialDelta = overSlop
                 }
                 val result = if (isVertical()) {
@@ -221,7 +217,7 @@ private fun Modifier.dragForEachGesture(
                                 dispatchScroll(delta, NestedScrollSource.Drag)
                             }
                         }
-                        event.consume(delta)
+                        event.consumePositionChange()
                     }
                     result = if (isVertical()) {
                         verticalDrag(drag.id, dragTick)

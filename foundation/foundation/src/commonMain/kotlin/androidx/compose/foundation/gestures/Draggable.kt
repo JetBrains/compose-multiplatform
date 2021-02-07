@@ -222,10 +222,6 @@ private suspend fun PointerInputScope.dragForEachGesture(
         forEachGesture {
 
             fun isVertical() = orientation.value == Orientation.Vertical
-            fun PointerInputChange.consume(amount: Float) = this.consumePositionChange(
-                consumedDx = if (isVertical()) 0f else amount,
-                consumedDy = if (isVertical()) amount else 0f
-            )
 
             suspend fun DragScope.performDrag(
                 initialDelta: Float,
@@ -239,7 +235,7 @@ private suspend fun PointerInputScope.dragForEachGesture(
                         velocityTracker.addPosition(event.uptimeMillis, event.position)
                         val delta =
                             event.positionChange().run { if (isVertical()) y else x }
-                        event.consume(delta)
+                        event.consumePositionChange()
                         if (enabled.value) {
                             dragBy(if (reverseDirection.value) delta * -1 else delta)
                         }
@@ -263,7 +259,7 @@ private suspend fun PointerInputScope.dragForEachGesture(
                     down
                 } else {
                     val postTouchSlop = { event: PointerInputChange, offset: Float ->
-                        event.consume(event.position.run { if (isVertical()) y else x })
+                        event.consumePositionChange()
                         initialDelta = offset
                     }
                     val afterSlopResult = if (isVertical()) {

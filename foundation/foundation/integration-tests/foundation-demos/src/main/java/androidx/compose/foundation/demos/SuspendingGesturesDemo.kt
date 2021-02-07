@@ -60,7 +60,6 @@ import androidx.compose.ui.input.pointer.PointerType
 import androidx.compose.ui.input.pointer.consumeAllChanges
 import androidx.compose.ui.input.pointer.consumePositionChange
 import androidx.compose.ui.input.pointer.pointerInput
-import androidx.compose.ui.input.pointer.positionChange
 import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.IntSize
@@ -235,7 +234,7 @@ fun TouchSlopDragGestures() {
                                 (offsetPx + dragDistance).coerceIn(0f, width - 50.dp.toPx())
                             val consumed = newOffset - offsetPx
                             if (consumed != 0f) {
-                                change.consumePositionChange(change.positionChange().x, 0f)
+                                change.consumePositionChange()
                                 offset = newOffset.toDp()
                             }
                         }
@@ -263,10 +262,7 @@ fun TouchSlopDragGestures() {
                                     .coerceIn(0f, height - 50.dp.toPx())
                                 val consumed = newOffset - offsetPx
                                 if (consumed != 0f) {
-                                    change.consumePositionChange(
-                                        0f,
-                                        change.positionChange().y
-                                    )
+                                    change.consumePositionChange()
                                     offset = newOffset.toDp()
                                 }
                             }
@@ -301,7 +297,7 @@ fun OrientationLockDragGestures() {
             size = it
         }.pointerInput(Unit) {
             detectVerticalDragGestures { change, dragAmount ->
-                change.consumePositionChange(0f, change.positionChange().y)
+                change.consumePositionChange()
                 offsetY = (offsetY.toPx() + dragAmount)
                     .coerceIn(0f, size.height.toFloat() - 50.dp.toPx()).toDp()
             }
@@ -315,7 +311,7 @@ fun OrientationLockDragGestures() {
                 .fillMaxHeight()
                 .pointerInput(Unit) {
                     detectHorizontalDragGestures { change, dragAmount ->
-                        change.consumePositionChange(change.positionChange().x, 0f)
+                        change.consumePositionChange()
                         offsetX = (offsetX.toPx() + dragAmount)
                             .coerceIn(0f, size.width.toFloat() - 50.dp.toPx()).toDp()
                     }

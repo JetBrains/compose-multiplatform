@@ -1422,12 +1422,14 @@ package androidx.compose.ui.input.pointer {
   }
 
   public final class ConsumedData {
+    ctor public ConsumedData(boolean positionChange, boolean downChange);
+    ctor public ConsumedData();
     method public boolean getDownChange();
-    method public long getPositionChange-F1C5BW0();
+    method public boolean getPositionChange();
     method public void setDownChange(boolean p);
-    method public void setPositionChange-k-4lQ0M(long p);
+    method public void setPositionChange(boolean p);
     property public final boolean downChange;
-    property public final long positionChange;
+    property public final boolean positionChange;
   }
 
   public final class HitPathTrackerKt {
@@ -1449,16 +1451,16 @@ package androidx.compose.ui.input.pointer {
 
   public final class PointerEventKt {
     method public static boolean anyChangeConsumed(androidx.compose.ui.input.pointer.PointerInputChange);
-    method public static boolean anyPositionChangeConsumed(androidx.compose.ui.input.pointer.PointerInputChange);
     method public static boolean changedToDown(androidx.compose.ui.input.pointer.PointerInputChange);
     method public static boolean changedToDownIgnoreConsumed(androidx.compose.ui.input.pointer.PointerInputChange);
     method public static boolean changedToUp(androidx.compose.ui.input.pointer.PointerInputChange);
     method public static boolean changedToUpIgnoreConsumed(androidx.compose.ui.input.pointer.PointerInputChange);
     method public static void consumeAllChanges(androidx.compose.ui.input.pointer.PointerInputChange);
     method public static void consumeDownChange(androidx.compose.ui.input.pointer.PointerInputChange);
-    method public static void consumePositionChange(androidx.compose.ui.input.pointer.PointerInputChange, float consumedDx, float consumedDy);
+    method public static void consumePositionChange(androidx.compose.ui.input.pointer.PointerInputChange);
     method public static boolean isOutOfBounds-MReStF0(androidx.compose.ui.input.pointer.PointerInputChange, long size);
     method public static long positionChange(androidx.compose.ui.input.pointer.PointerInputChange);
+    method public static boolean positionChangeConsumed(androidx.compose.ui.input.pointer.PointerInputChange);
     method public static long positionChangeIgnoreConsumed(androidx.compose.ui.input.pointer.PointerInputChange);
     method public static boolean positionChanged(androidx.compose.ui.input.pointer.PointerInputChange);
     method public static boolean positionChangedIgnoreConsumed(androidx.compose.ui.input.pointer.PointerInputChange);

@@ -82,7 +82,7 @@ internal class PointerInputEventProcessor(val root: LayoutNode) {
         // TODO(shepshapard): Don't allocate on every call.
         return ProcessResult(
             dispatchedToSomething,
-            resultingChanges.changes.any { (_, value) -> value.anyPositionChangeConsumed() }
+            resultingChanges.changes.any { (_, value) -> value.positionChangeConsumed() }
         )
     }
 
