@@ -434,43 +434,6 @@ package androidx.compose.ui.focus {
 
 }
 
-package androidx.compose.ui.gesture {
-
-  public final class DragGestureFilterKt {
-    method @Deprecated public static androidx.compose.ui.Modifier dragGestureFilter(androidx.compose.ui.Modifier, androidx.compose.ui.gesture.DragObserver dragObserver, optional boolean startDragImmediately);
-    method @Deprecated public static androidx.compose.ui.Modifier rawDragGestureFilter(androidx.compose.ui.Modifier, androidx.compose.ui.gesture.DragObserver dragObserver, optional kotlin.jvm.functions.Function0<java.lang.Boolean>? canStartDragging);
-    method @Deprecated public static androidx.compose.ui.Modifier rawPressStartGestureFilter(androidx.compose.ui.Modifier, kotlin.jvm.functions.Function1<? super androidx.compose.ui.geometry.Offset,kotlin.Unit> onPressStart, optional boolean enabled, optional androidx.compose.ui.input.pointer.PointerEventPass executionPass);
-  }
-
-  @Deprecated public interface DragObserver {
-    method @Deprecated public default void onCancel();
-    method @Deprecated public default long onDrag-k-4lQ0M(long dragDistance);
-    method @Deprecated public default void onStart-k-4lQ0M(long downPosition);
-    method @Deprecated public default void onStop-k-4lQ0M(long velocity);
-  }
-
-  public final class LongPressDragGestureFilterKt {
-    method @Deprecated public static androidx.compose.ui.Modifier longPressDragGestureFilter(androidx.compose.ui.Modifier, androidx.compose.ui.gesture.LongPressDragObserver longPressDragObserver);
-  }
-
-  @Deprecated public interface LongPressDragObserver {
-    method @Deprecated public default void onCancel();
-    method @Deprecated public default long onDrag-k-4lQ0M(long dragDistance);
-    method @Deprecated public default void onDragStart();
-    method @Deprecated public default void onLongPress-k-4lQ0M(long pxPosition);
-    method @Deprecated public default void onStop-k-4lQ0M(long velocity);
-  }
-
-  public final class PressIndicatorGestureFilterKt {
-    method @Deprecated public static androidx.compose.ui.Modifier pressIndicatorGestureFilter(androidx.compose.ui.Modifier, optional kotlin.jvm.functions.Function1<? super androidx.compose.ui.geometry.Offset,kotlin.Unit>? onStart, optional kotlin.jvm.functions.Function0<kotlin.Unit>? onStop, optional kotlin.jvm.functions.Function0<kotlin.Unit>? onCancel, optional boolean enabled);
-  }
-
-  public final class TapGestureFilterKt {
-    method @Deprecated public static androidx.compose.ui.Modifier tapGestureFilter(androidx.compose.ui.Modifier, kotlin.jvm.functions.Function1<? super androidx.compose.ui.geometry.Offset,kotlin.Unit> onTap);
-  }
-
-}
-
 package androidx.compose.ui.graphics {
 
   public final class GraphicsLayerModifierKt {

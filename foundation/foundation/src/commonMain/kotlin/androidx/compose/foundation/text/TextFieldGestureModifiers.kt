@@ -26,11 +26,11 @@ import androidx.compose.ui.focus.FocusState
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.geometry.Offset
-import androidx.compose.ui.gesture.DragObserver
-import androidx.compose.ui.gesture.LongPressDragObserver
-import androidx.compose.ui.gesture.dragGestureFilter
-import androidx.compose.ui.gesture.longPressDragGestureFilter
-import androidx.compose.ui.gesture.tapGestureFilter
+import androidx.compose.foundation.legacygestures.DragObserver
+import androidx.compose.foundation.legacygestures.LongPressDragObserver
+import androidx.compose.foundation.legacygestures.dragGestureFilter
+import androidx.compose.foundation.legacygestures.longPressDragGestureFilter
+import androidx.compose.foundation.legacygestures.tapGestureFilter
 
 // Touch selection
 internal fun Modifier.longPressDragGestureFilter(
