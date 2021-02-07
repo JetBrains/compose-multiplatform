@@ -34,6 +34,7 @@ at https://android.googlesource.com/platform/frameworks/support.
        * [Swing interoperability](tutorials/Swing_Integration)
    * [components](components) - custom components of Compose for Desktop
        * [Video Player](components/VideoPlayer)
+       * [Split Pane](components/SplitPane)
        
 ## Getting latest version of Compose for Desktop ##
 
