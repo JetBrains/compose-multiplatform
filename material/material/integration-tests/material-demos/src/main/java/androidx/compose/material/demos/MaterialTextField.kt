@@ -180,7 +180,7 @@ fun MaterialTextFieldDemo() {
                         trailingIcon = {
                             if (trailingChecked) Icon(Icons.Filled.Info, "Info")
                         },
-                        isErrorValue = selectedOption == Option.Error,
+                        isError = selectedOption == Option.Error,
                         modifier = Modifier.requiredWidth(300.dp)
                     )
                 TextFieldType.Outlined ->
@@ -201,7 +201,7 @@ fun MaterialTextFieldDemo() {
                         trailingIcon = {
                             if (trailingChecked) Icon(Icons.Filled.Info, "Info")
                         },
-                        isErrorValue = selectedOption == Option.Error,
+                        isError = selectedOption == Option.Error,
                         modifier = Modifier.requiredWidth(300.dp)
                     )
             }
