@@ -93,7 +93,7 @@ fun SimpleAlignByInRow() {
         // effect.
         Box(
             modifier = Modifier.size(80.dp, 40.dp)
-                .alignBy { it.height / 2 }
+                .alignBy { it.measuredHeight / 2 }
                 .background(Color.Magenta)
         )
         Text(

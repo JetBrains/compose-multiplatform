@@ -28,30 +28,38 @@ import androidx.compose.ui.unit.LayoutDirection
  *
  * A `Placeable` should never be stored between measure calls.
  */
-abstract class Placeable {
+abstract class Placeable : Measured {
     /**
-     * The width, in pixels, of the measured layout, as seen by the parent. This is usually the
-     * `width` value passed into [MeasureScope.layout], but will be different if the layout does
-     * not respect its incoming constraints, so the width will be coerced inside the min and
-     * max width.
+     * The width, in pixels, of the measured layout, as seen by the parent. This will usually
+     * coincide with the measured width of the layout (aka the `width` value passed into
+     * [MeasureScope.layout]), but can be different if the layout does not respect its
+     * incoming constraints: in these cases the width will be coerced inside the min and
+     * max width constraints - to access the actual width that the layout measured itself to,
+     * use [measuredWidth].
      */
     var width: Int = 0
         private set
 
     /**
-     * The height, in pixels, of the measured layout, as seen by the parent. This is usually the
-     * `height` value passed into [MeasureScope.layout], but can be different if the layout does
-     * not respect its incoming constraints, so the height will be coerced inside the min and
-     * max height.
+     * The height, in pixels, of the measured layout, as seen by the parent. This will usually
+     * coincide with the measured height of the layout (aka the `height` value passed
+     * into [MeasureScope.layout]), but can be different if the layout does not respect its
+     * incoming constraints: in these cases the height will be coerced inside the min and
+     * max height constraints - to access the actual height that the layout measured itself to,
+     * use [measuredHeight].
      */
     var height: Int = 0
         private set
 
     /**
-     * Returns the position of an [alignment line][AlignmentLine],
-     * or [AlignmentLine.Unspecified] if the line is not provided.
+     * The measured width of the layout. This might not respect the measurement constraints.
      */
-    abstract operator fun get(line: AlignmentLine): Int
+    override val measuredWidth: Int get() = measuredSize.width
+
+    /**
+     * The measured height of the layout. This might not respect the measurement constraints.
+     */
+    override val measuredHeight: Int get() = measuredSize.height
 
     /**
      * The measured size of this Placeable. This might not respect [measurementConstraints].
@@ -68,10 +76,6 @@ abstract class Placeable {
                 measurementConstraints.maxHeight
             )
         }
-
-    internal val measuredWidth get() = measuredSize.width
-
-    internal val measuredHeight get() = measuredSize.height
 
     /**
      * Positions the [Placeable] at [position] in its parent's coordinate system.

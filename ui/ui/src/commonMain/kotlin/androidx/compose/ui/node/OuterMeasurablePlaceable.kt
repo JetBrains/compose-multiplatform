@@ -89,6 +89,7 @@ internal class OuterMeasurablePlaceable(
             measurementConstraints = constraints
             lastProvidedAlignmentLines.clear()
             lastProvidedAlignmentLines.putAll(layoutNode.providedAlignmentLines)
+            val outerWrapperPreviousMeasuredSize = outerWrapper.size
             owner.snapshotObserver.observeMeasureSnapshotReads(layoutNode) {
                 outerWrapper.measure(constraints)
             }
@@ -96,20 +97,24 @@ internal class OuterMeasurablePlaceable(
             if (layoutNode.providedAlignmentLines != lastProvidedAlignmentLines) {
                 layoutNode.onAlignmentsChanged()
             }
-            val previousSize = measuredSize
-            val newWidth = outerWrapper.width
-            val newHeight = outerWrapper.height
-            if (newWidth != previousSize.width ||
-                newHeight != previousSize.height
-            ) {
-                measuredSize = IntSize(newWidth, newHeight)
-                return true
-            }
+            val sizeChanged = outerWrapper.size != outerWrapperPreviousMeasuredSize ||
+                outerWrapper.width != width ||
+                outerWrapper.height != height
+            // We are using the coerced wrapper size here to avoid double offset in layout coop.
+            measuredSize = IntSize(outerWrapper.width, outerWrapper.height)
+            return sizeChanged
         }
         return false
     }
 
-    override fun get(line: AlignmentLine): Int = outerWrapper[line]
+    // We are setting our measuredSize to match the coerced outerWrapper size, to prevent
+    // double offseting for layout cooperation. However, this means that here we need
+    // to override these getters to make the measured values correct in Measured.
+    // TODO(popam): clean this up
+    override val measuredWidth: Int get() = outerWrapper.measuredWidth
+    override val measuredHeight: Int get() = outerWrapper.measuredHeight
+
+    override fun get(alignmentLine: AlignmentLine): Int = outerWrapper[alignmentLine]
 
     override fun placeAt(
         position: IntOffset,

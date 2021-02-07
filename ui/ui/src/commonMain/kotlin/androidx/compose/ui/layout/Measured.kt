@@ -17,22 +17,22 @@
 package androidx.compose.ui.layout
 
 /**
- * Read-only wrapper over [Placeable] that exposes the measurement result with no placing ability.
+ * A [Measured] corresponds to a layout that has been measured by its parent layout.
  */
-inline class Measured(internal val placeable: Placeable) {
+interface Measured {
     /**
-     * The measured width of the layout.
+     * The measured width of the layout. This might not respect the measurement constraints.
      */
-    val width: Int get() = placeable.measuredWidth
+    val measuredWidth: Int
 
     /**
-     * The measured height of the layout.
+     * The measured height of the layout. This might not respect the measurement constraints.
      */
-    val height: Int get() = placeable.measuredHeight
+    val measuredHeight: Int
 
     /**
      * Returns the position of an [alignment line][AlignmentLine],
-     * or `null` if the line is not provided.
+     * or [AlignmentLine.Unspecified] if the line is not provided.
      */
-    operator fun get(alignmentLine: AlignmentLine): Int = placeable[alignmentLine]
+    operator fun get(alignmentLine: AlignmentLine): Int
 }

@@ -817,8 +817,8 @@ internal class LayoutNode : Measurable, Remeasurement, OwnerScope, LayoutInfo, C
      * Returns the alignment line value for a given alignment line without affecting whether
      * the flag for whether the alignment line was read.
      */
-    internal fun getAlignmentLine(line: AlignmentLine): Int? {
-        val linePos = alignmentLines[line] ?: return null
+    internal fun getAlignmentLine(alignmentLine: AlignmentLine): Int? {
+        val linePos = alignmentLines[alignmentLine] ?: return null
         var pos = Offset(linePos.toFloat(), linePos.toFloat())
         var wrapper = innerLayoutNodeWrapper
         while (wrapper != outerLayoutNodeWrapper) {
@@ -826,7 +826,7 @@ internal class LayoutNode : Measurable, Remeasurement, OwnerScope, LayoutInfo, C
             wrapper = wrapper.wrappedBy!!
         }
         pos = wrapper.toParentPosition(pos)
-        return if (line is HorizontalAlignmentLine) {
+        return if (alignmentLine is HorizontalAlignmentLine) {
             pos.y.roundToInt()
         } else {
             pos.x.roundToInt()
