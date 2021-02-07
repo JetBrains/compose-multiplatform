@@ -37,21 +37,21 @@ import javax.swing.SwingUtilities
 val NoOpUpdate: Component.() -> Unit = {}
 
 /**
- * Composes an AWT/Swing component obtained from [componentBlock]. The [componentBlock]
+ * Composes an AWT/Swing component obtained from [factory]. The [factory]
  * block will be called to obtain the [Component] to be composed. The Swing component is
  * placed on top of the Compose layer.
  * The [update] block runs due to recomposition, this is the place to set [Component] properties
  * depending on state. When state changes, the block will be reexecuted to set the new properties.
  *
  * @param background Background color of SwingPanel
- * @param componentBlock The block creating the [Component] to be composed.
+ * @param factory The block creating the [Component] to be composed.
  * @param modifier The modifier to be applied to the layout.
  * @param update The callback to be invoked after the layout is inflated.
  */
 @Composable
 public fun <T : Component> SwingPanel(
     background: Color = Color.White,
-    componentBlock: () -> T,
+    factory: () -> T,
     modifier: Modifier = Modifier,
     update: (T) -> Unit = NoOpUpdate
 ) {
@@ -80,13 +80,13 @@ public fun <T : Component> SwingPanel(
         }
     )
 
-    DisposableEffect(componentBlock) {
-        componentInfo.component = componentBlock()
+    DisposableEffect(factory) {
+        componentInfo.factory = factory()
         componentInfo.layout = JPanel().apply {
             setLayout(BorderLayout(0, 0))
-            add(componentInfo.component)
+            add(componentInfo.factory)
         }
-        componentInfo.updater = Updater(componentInfo.component, update)
+        componentInfo.updater = Updater(componentInfo.factory, update)
         container.add(componentInfo.layout)
         onDispose {
             container.remove(componentInfo.layout)
@@ -111,7 +111,7 @@ private fun parseColor(color: Color): java.awt.Color {
 
 private class ComponentInfo<T : Component> {
     lateinit var layout: Container
-    lateinit var component: T
+    lateinit var factory: T
     lateinit var updater: Updater<T>
 }
 

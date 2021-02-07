@@ -77,7 +77,7 @@ fun ComposeInAndroidInComposeEtcTargetingDemo() {
 
             AndroidView(
                 modifier = Modifier.fillMaxHeight(),
-                viewBlock = {
+                factory = {
                     FrameLayout(context).apply {
                         setPadding(100, 100, 100, 100)
                         setBackgroundColor(0xFF888888.toInt())

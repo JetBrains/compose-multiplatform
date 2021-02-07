@@ -193,7 +193,7 @@ private object InteropSnippet5 {
         // Adds view to Compose
         AndroidView(
             modifier = Modifier.fillMaxSize(), // Occupy the max size in the Compose UI tree
-            viewBlock = { context ->
+            factory = { context ->
                 // Creates custom view
                 CustomView(context).apply {
                     // Sets up listeners for View -> Compose communication
