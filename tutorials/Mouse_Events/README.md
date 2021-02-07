@@ -14,8 +14,10 @@ so code like this will work on both platforms:
 
 ```kotlin
 import androidx.compose.desktop.Window
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.Text
 import androidx.compose.runtime.mutableStateOf
@@ -31,12 +33,13 @@ fun main() = Window(title = "Compose for Desktop", size = IntSize(400, 400)) {
     Box(contentAlignment = Alignment.Center, modifier = Modifier.fillMaxWidth()) {
         var text = remember { mutableStateOf("Click magenta box!") }
         Column {
+            @OptIn(ExperimentalFoundationApi::class)
             Box(
                 modifier = Modifier
                     .background(Color.Magenta)
                     .fillMaxWidth(0.7f)
                     .fillMaxHeight(0.2f)
-                    .clickable(
+                    .combinedClickable(
                         onClick = {
                             text.value = "Click! ${count.value++}"
                         },

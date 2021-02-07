@@ -1,6 +1,6 @@
 buildscript {
     // __LATEST_COMPOSE_RELEASE_VERSION__
-    val composeVersion = System.getenv("COMPOSE_TEMPLATE_COMPOSE_VERSION") ?: "0.3.0-build146"
+    val composeVersion = System.getenv("COMPOSE_TEMPLATE_COMPOSE_VERSION") ?: "0.3.0-build150"
 
     repositories {
         // TODO: remove after new build is published
@@ -14,7 +14,7 @@ buildscript {
         classpath("org.jetbrains.compose:compose-gradle-plugin:$composeVersion")
         classpath("com.android.tools.build:gradle:4.0.1")
         // __KOTLIN_COMPOSE_VERSION__
-        classpath(kotlin("gradle-plugin", version = "1.4.21-2"))
+        classpath(kotlin("gradle-plugin", version = "1.4.30"))
     }
 }
 

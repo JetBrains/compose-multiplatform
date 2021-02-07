@@ -187,7 +187,7 @@ To get the properties of a window, it is enough to have a link to the current or
 1. Using the global environment:
 
 ```kotlin
-import androidx.compose.desktop.AppWindowAmbient
+import androidx.compose.desktop.LocalAppWindow
 import androidx.compose.desktop.Window
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -203,7 +203,7 @@ fun main() {
     val windowPos = mutableStateOf(IntOffset.Zero)
 
     Window {
-        val current = AppWindowAmbient.current
+        val current = LocalAppWindow.current
 
         // Content
         Box(
@@ -214,9 +214,7 @@ fun main() {
                 Text(text = "Location: ${windowPos.value}")
                 Button(
                     onClick = {
-                        if (current != null) {
-                            windowPos.value = IntOffset(current.x, current.y)
-                        }
+                        windowPos.value = IntOffset(current.x, current.y)
                     }
                 ) {
                     Text(text = "Print window location")
@@ -281,14 +279,14 @@ Using the following methods, you can change the properties of the AppWindow:
 6. setMenuBar(menuBar: MenuBar) - window menu bar
 
 ```kotlin
-import androidx.compose.desktop.AppWindowAmbient
+import androidx.compose.desktop.LocalAppWindow
 import androidx.compose.desktop.Window
 import androidx.compose.material.Text
 import androidx.compose.material.Button
 
 fun main() {
     Window {
-        val window = AppWindowAmbient.current!!
+        val window = LocalAppWindow.current
         // Content
         Button(
             onClick = {

@@ -173,7 +173,7 @@ fun TextBox(text: String = "Item") {
 
 Scrollbars support themes to change their appearance. The example below shows how to use the DesktopTheme appearance for the scrollbar.
 
-```kotlin
+``` kotlin
 import androidx.compose.desktop.DesktopTheme
 import androidx.compose.desktop.Window
 import androidx.compose.foundation.background
