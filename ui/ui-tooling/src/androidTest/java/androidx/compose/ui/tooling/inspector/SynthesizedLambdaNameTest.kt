@@ -16,7 +16,6 @@
 
 package androidx.compose.ui.tooling.inspector
 
-import androidx.test.filters.SmallTest
 import com.google.common.truth.Truth.assertThat
 import org.junit.Test
 
@@ -34,7 +33,6 @@ private fun withArguments(a1: () -> Unit = {}, a2: () -> Unit = {}): List<() -> 
  * There is code in Studio that relies on this format.
  * If this test should start to fail, please check the LambdaResolver in the Layout Inspector.
  */
-@SmallTest
 @Suppress("JoinDeclarationAndAssignment")
 class SynthesizedLambdaNameTest {
     private val cls = SynthesizedLambdaNameTest::class.java.name
