@@ -1908,6 +1908,10 @@ package androidx.compose.ui.platform {
     property public final boolean showLayoutBounds;
   }
 
+  public interface AccessibilityManager {
+    method public long calculateRecommendedTimeoutMillis(long originalTimeoutMillis, optional boolean containsIcons, optional boolean containsText, optional boolean containsControls);
+  }
+
   public final class AndroidClipboardManager_androidKt {
   }
 
@@ -1983,6 +1987,7 @@ package androidx.compose.ui.platform {
   }
 
   public final class CompositionLocalsKt {
+    method public static androidx.compose.runtime.ProvidableCompositionLocal<androidx.compose.ui.platform.AccessibilityManager> getLocalAccessibilityManager();
     method @androidx.compose.ui.ExperimentalComposeUiApi public static androidx.compose.runtime.ProvidableCompositionLocal<androidx.compose.ui.autofill.Autofill> getLocalAutofill();
     method @androidx.compose.ui.ExperimentalComposeUiApi public static androidx.compose.runtime.ProvidableCompositionLocal<androidx.compose.ui.autofill.AutofillTree> getLocalAutofillTree();
     method public static androidx.compose.runtime.ProvidableCompositionLocal<androidx.compose.ui.platform.ClipboardManager> getLocalClipboardManager();

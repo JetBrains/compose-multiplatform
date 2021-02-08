@@ -31,6 +31,11 @@ import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.LayoutDirection
 
 /**
+ * The CompositionLocal to provide communication with platform accessibility service.
+ */
+val LocalAccessibilityManager = staticCompositionLocalOf<AccessibilityManager?> { null }
+
+/**
  * The CompositionLocal that can be used to trigger autofill actions.
  * Eg. [Autofill.requestAutofillForNode].
  */
@@ -141,6 +146,7 @@ internal fun ProvideCommonCompositionLocals(
     content: @Composable () -> Unit
 ) {
     CompositionLocalProvider(
+        LocalAccessibilityManager provides owner.accessibilityManager,
         LocalAutofill provides owner.autofill,
         LocalAutofillTree provides owner.autofillTree,
         LocalClipboardManager provides owner.clipboardManager,

@@ -23,6 +23,7 @@ import androidx.compose.ui.focus.FocusManager
 import androidx.compose.ui.graphics.Canvas
 import androidx.compose.ui.hapticfeedback.HapticFeedback
 import androidx.compose.ui.input.key.KeyEvent
+import androidx.compose.ui.platform.AccessibilityManager
 import androidx.compose.ui.platform.ClipboardManager
 import androidx.compose.ui.platform.TextToolbar
 import androidx.compose.ui.platform.ViewConfiguration
@@ -56,6 +57,11 @@ internal interface Owner {
      * Provide clipboard manager to the user. Use the Android version of clipboard manager.
      */
     val clipboardManager: ClipboardManager
+
+    /**
+     * Provide accessibility manager to the user. Use the Android version of accessibility manager.
+     */
+    val accessibilityManager: AccessibilityManager
 
     /**
      * Provide toolbar for text-related actions, such as copy, paste, cut etc.
