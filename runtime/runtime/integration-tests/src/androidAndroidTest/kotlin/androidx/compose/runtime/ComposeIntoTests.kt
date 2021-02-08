@@ -44,7 +44,6 @@ class ComposeIntoTests : BaseComposeTest() {
         val activity = activityRule.activity
 
         var initializationCount = 0
-        @OptIn(ExperimentalComposeApi::class)
         val composable = @Composable {
             DisposableEffect(Unit) {
                 initializationCount++

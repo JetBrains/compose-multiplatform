@@ -193,7 +193,6 @@ private class Node(val name: String) {
     override fun toString() = name + children.joinToString(",", "(", ")")
 }
 
-@OptIn(ExperimentalComposeApi::class)
 private class NodeApplier(root: Node) : AbstractApplier<Node>(root) {
     override fun insertTopDown(index: Int, instance: Node) {
         current.children.add(index, instance)

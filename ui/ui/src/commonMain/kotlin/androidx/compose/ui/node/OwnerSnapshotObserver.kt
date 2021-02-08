@@ -16,14 +16,12 @@
 
 package androidx.compose.ui.node
 
-import androidx.compose.runtime.ExperimentalComposeApi
 import androidx.compose.runtime.snapshots.SnapshotStateObserver
 
 /**
  * Performs snapshot observation for blocks like draw and layout which should be re-invoked
  * automatically when the snapshot value has been changed.
  */
-@OptIn(ExperimentalComposeApi::class)
 @Suppress("CallbackName") // TODO rename this and SnapshotStateObserver. b/173401548
 internal class OwnerSnapshotObserver(onChangedExecutor: (callback: () -> Unit) -> Unit) {
 

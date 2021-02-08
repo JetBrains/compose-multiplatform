@@ -18,7 +18,6 @@ package androidx.compose.ui.input.pointer
 
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.layout.Box
-import androidx.compose.runtime.ExperimentalComposeApi
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
@@ -240,7 +239,6 @@ class SuspendingPointerInputFilterTest {
         )
     }
 
-    @OptIn(ExperimentalComposeApi::class)
     @Test
     @MediumTest
     fun testRestartPointerInput() = runBlocking {

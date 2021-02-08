@@ -17,7 +17,6 @@
 package androidx.compose.ui.node
 
 import androidx.activity.compose.setContent
-import androidx.compose.runtime.ExperimentalComposeApi
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.snapshots.Snapshot
@@ -378,7 +377,6 @@ class ModelReadsTest {
                     if (model.value == 1) {
                         // this will trigger remeasure request for this node we currently measure
                         model.value = 2
-                        @OptIn(ExperimentalComposeApi::class)
                         Snapshot.sendApplyNotifications()
                     }
                     latch.countDown()
@@ -416,7 +414,6 @@ class ModelReadsTest {
                             if (!modelAlreadyChanged) {
                                 // this will trigger remeasure request for this node we layout
                                 remeasureModel.value = 1
-                                @OptIn(ExperimentalComposeApi::class)
                                 Snapshot.sendApplyNotifications()
                                 // the remeasure will also include another relayout and we don't
                                 // want to loop and request remeasure again
@@ -456,7 +453,6 @@ class ModelReadsTest {
                     if (remeasureModel.value != 0) {
                         // this will trigger relayout request for this node we currently measure
                         relayoutModel.value = 1
-                        @OptIn(ExperimentalComposeApi::class)
                         Snapshot.sendApplyNotifications()
                     }
                     remeasureLatch.countDown()
@@ -493,7 +489,6 @@ class ModelReadsTest {
                         if (model.value == 1) {
                             // this will trigger relayout request for this node we currently layout
                             model.value = 2
-                            @OptIn(ExperimentalComposeApi::class)
                             Snapshot.sendApplyNotifications()
                         }
                         latch.countDown()

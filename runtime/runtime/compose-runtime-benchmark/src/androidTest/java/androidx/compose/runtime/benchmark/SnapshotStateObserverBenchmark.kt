@@ -19,7 +19,6 @@ package androidx.compose.runtime.benchmark
 import android.os.Handler
 import android.os.Looper
 import androidx.benchmark.junit4.measureRepeated
-import androidx.compose.runtime.ExperimentalComposeApi
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.snapshots.Snapshot
@@ -36,7 +35,6 @@ import kotlin.random.Random
 
 @LargeTest
 @RunWith(AndroidJUnit4::class)
-@OptIn(ExperimentalComposeApi::class)
 class SnapshotStateObserverBenchmark : ComposeBenchmarkBase() {
     companion object {
         private const val ScopeCount = 1000

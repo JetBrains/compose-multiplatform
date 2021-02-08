@@ -17,10 +17,8 @@
 package androidx.compose.runtime.mock
 
 import androidx.compose.runtime.AbstractApplier
-import androidx.compose.runtime.ExperimentalComposeApi
 
 @Suppress("EXTENSION_SHADOWED_BY_MEMBER")
-@OptIn(ExperimentalComposeApi::class)
 class ViewApplier(root: View) : AbstractApplier<View>(root) {
     var onBeginChangesCalled = 0
         private set

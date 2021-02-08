@@ -14,11 +14,8 @@
  * limitations under the License.
  */
 
-@file:OptIn(ExperimentalComposeApi::class)
-
 package androidx.compose.runtime.snapshots
 
-import androidx.compose.runtime.ExperimentalComposeApi
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableStateOf
 import kotlin.test.Test

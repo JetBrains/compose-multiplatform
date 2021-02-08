@@ -41,7 +41,6 @@ class DisposeTests : BaseComposeTest() {
         val log = mutableListOf<String>()
 
         lateinit var recomposeScope: RecomposeScope
-        @OptIn(ExperimentalComposeApi::class)
         val composable = @Composable {
             recomposeScope = currentRecomposeScope
             DisposableEffect(NeverEqualObject) {

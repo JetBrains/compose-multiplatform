@@ -16,7 +16,6 @@
 
 package androidx.compose.ui.platform
 
-import androidx.compose.runtime.ExperimentalComposeApi
 import androidx.compose.runtime.snapshots.Snapshot
 import androidx.compose.runtime.snapshots.ObserverHandle
 import kotlinx.coroutines.CoroutineScope
@@ -44,14 +43,12 @@ internal object GlobalSnapshotManager {
 
     private val scheduleScope = CoroutineScope(Dispatchers.Swing + SupervisorJob())
 
-    @OptIn(ExperimentalComposeApi::class)
     fun ensureStarted() {
         if (started.compareAndSet(false, true)) {
             removeWriteObserver = Snapshot.registerGlobalWriteObserver(globalWriteObserver)
         }
     }
 
-    @OptIn(ExperimentalComposeApi::class)
     private val globalWriteObserver: (Any) -> Unit = {
         // Race, but we don't care too much if we end up with multiple calls scheduled.
         if (!commitPending) {

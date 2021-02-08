@@ -16,7 +16,6 @@
 
 package androidx.compose.runtime.snapshots
 
-import androidx.compose.runtime.ExperimentalComposeApi
 import androidx.compose.runtime.mutableStateMapOf
 import kotlin.test.Test
 import kotlin.test.assertEquals
@@ -449,7 +448,6 @@ class SnapshotStateMapTests {
         }
     }
 
-    @OptIn(ExperimentalComposeApi::class)
     @Test
     fun validateMapsCanBeSnapshot() {
         val map = defaultMap()

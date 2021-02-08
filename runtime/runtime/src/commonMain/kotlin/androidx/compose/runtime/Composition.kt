@@ -240,7 +240,6 @@ internal class CompositionImpl(
         composer.composeContent(content)
     }
 
-    @OptIn(ExperimentalComposeApi::class)
     override fun dispose() {
         if (!disposed) {
             disposed = true

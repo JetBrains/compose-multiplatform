@@ -19,7 +19,6 @@ package androidx.compose.ui
 import androidx.compose.runtime.Applier
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Composition
-import androidx.compose.runtime.ExperimentalComposeApi
 import androidx.compose.runtime.InternalComposeApi
 import androidx.compose.runtime.Recomposer
 import androidx.compose.runtime.RecomposeScope
@@ -205,7 +204,7 @@ class ComposedModifierTest {
     }
 }
 
-@OptIn(InternalComposeApi::class, ExperimentalComposeApi::class)
+@OptIn(InternalComposeApi::class)
 fun compose(
     recomposer: Recomposer,
     block: @Composable () -> Unit
@@ -229,7 +228,6 @@ internal class TestFrameClock : MonotonicFrameClock {
     override suspend fun <R> withFrameNanos(onFrame: (Long) -> R): R = onFrame(frameCh.receive())
 }
 
-@OptIn(ExperimentalComposeApi::class)
 class EmptyApplier : Applier<Unit> {
     override val current: Unit = Unit
     override fun down(node: Unit) {}

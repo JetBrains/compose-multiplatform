@@ -14,12 +14,11 @@
  * limitations under the License.
  */
 
-@file:OptIn(InternalComposeApi::class, ExperimentalComposeApi::class)
+@file:OptIn(InternalComposeApi::class)
 
 package androidx.compose.runtime.snapshots
 
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.ExperimentalComposeApi
 import androidx.compose.runtime.InternalComposeApi
 import androidx.compose.runtime.ThreadLocal
 import androidx.compose.runtime.synchronized
@@ -1071,7 +1070,6 @@ internal class NestedReadonlySnapshot(
     init { parent.nestedActivated(this) }
     override val readOnly get() = true
     override val root: Snapshot get() = parent.root
-    @OptIn(ExperimentalComposeApi::class)
     override fun takeNestedSnapshot(readObserver: ((Any) -> Unit)?) =
         parent.takeNestedSnapshot(readObserver)
     override fun notifyObjectsInitialized() {
@@ -1101,7 +1099,6 @@ internal class NestedReadonlySnapshot(
 
     override val modified: HashSet<StateObject>? get() = null
     override val writeObserver: ((Any) -> Unit)? get() = null
-    @OptIn(ExperimentalComposeApi::class)
     override fun recordModified(state: StateObject) = parent.recordModified(state)
 
     override fun nestedDeactivated(snapshot: Snapshot) = unsupported()
@@ -1280,7 +1277,6 @@ internal class TransparentObserverMutableSnapshot(
         @Suppress("UNUSED_PARAMETER")
         set(value) { unsupported() }
 
-    @OptIn(ExperimentalComposeApi::class)
     override var invalid get() = currentSnapshot.invalid
         @Suppress("UNUSED_PARAMETER")
         set(value) = unsupported()
@@ -1298,7 +1294,6 @@ internal class TransparentObserverMutableSnapshot(
     override fun apply(): SnapshotApplyResult =
         currentSnapshot.apply()
 
-    @OptIn(ExperimentalComposeApi::class)
     override fun recordModified(state: StateObject) =
         currentSnapshot.recordModified(state)
 
@@ -1313,7 +1308,6 @@ internal class TransparentObserverMutableSnapshot(
         mergedWriteObserver(writeObserver, this.writeObserver)
     )
 
-    @OptIn(ExperimentalComposeApi::class)
     override fun notifyObjectsInitialized() = currentSnapshot.notifyObjectsInitialized()
 
     // The following should never be called.
@@ -1569,7 +1563,6 @@ internal fun <T : StateRecord> T.writableRecord(state: StateObject, snapshot: Sn
 
     // Otherwise, make a copy of the readable data and mark it as born in this snapshot, making it
     // writable.
-    @OptIn(ExperimentalComposeApi::class)
     val newData = newWritableRecord(state, snapshot)
 
     snapshot.recordModified(state)

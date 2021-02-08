@@ -415,7 +415,7 @@ internal class CompositionScopedCoroutineScopeCanceller(
 }
 
 @PublishedApi
-@OptIn(ExperimentalComposeApi::class, InternalComposeApi::class)
+@OptIn(InternalComposeApi::class)
 internal fun createCompositionCoroutineScope(
     coroutineContext: CoroutineContext,
     composer: Composer

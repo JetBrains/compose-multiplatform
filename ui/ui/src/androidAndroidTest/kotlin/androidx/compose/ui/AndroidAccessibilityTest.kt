@@ -36,7 +36,6 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.selection.toggleable
 import androidx.compose.foundation.text.BasicText
 import androidx.compose.foundation.text.BasicTextField
-import androidx.compose.runtime.ExperimentalComposeApi
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -94,10 +93,7 @@ import org.mockito.internal.matchers.apachecommons.ReflectionEquals
 
 @LargeTest
 @RunWith(AndroidJUnit4::class)
-@OptIn(
-    ExperimentalFoundationApi::class,
-    ExperimentalComposeApi::class
-)
+@OptIn(ExperimentalFoundationApi::class)
 class AndroidAccessibilityTest {
     @get:Rule
     val rule = createAndroidComposeRule<ComponentActivity>()

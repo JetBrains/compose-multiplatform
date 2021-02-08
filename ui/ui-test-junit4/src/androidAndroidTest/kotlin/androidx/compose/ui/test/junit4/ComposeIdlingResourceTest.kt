@@ -28,7 +28,6 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.ExperimentalComposeApi
 import androidx.compose.runtime.State
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -148,7 +147,6 @@ class ComposeIdlingResourceTest {
             wasIdleBeforeApplySnapshot = composeIdlingResource.isIdleNow
 
             // Apply the snapshot
-            @OptIn(ExperimentalComposeApi::class)
             Snapshot.sendApplyNotifications()
 
             // Record idleness after this snapshot is applied
