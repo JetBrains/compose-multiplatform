@@ -42,7 +42,6 @@ import androidx.compose.ui.test.up
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import androidx.test.ext.junit.runners.AndroidJUnit4
-import androidx.test.filters.FlakyTest
 import androidx.test.filters.MediumTest
 import androidx.test.filters.SdkSuppress
 import androidx.test.screenshot.AndroidXScreenshotTestRule
@@ -173,7 +172,6 @@ class SwitchScreenshotTest {
     }
 
     @Test
-    @FlakyTest // b/178409086 Fails on Cuttlefish API 29 consistently
     fun switchTest_unchecked_animateToChecked() {
         rule.setMaterialContent {
             val isChecked = remember { mutableStateOf(false) }
@@ -199,7 +197,6 @@ class SwitchScreenshotTest {
     }
 
     @Test
-    @FlakyTest // b/178409086 Fails on Cuttlefish API 29 consistently
     @Suppress("DEPRECATION") // Due to clockTestRule
     fun switchTest_checked_animateToUnchecked() {
         rule.setMaterialContent {
