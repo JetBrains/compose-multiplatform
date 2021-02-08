@@ -6,8 +6,6 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import org.jetbrains.compose.animation.SingleDirectionMoveState
 
-private const val Horizontal = true
-
 typealias SplitterState = SingleDirectionMoveState
 
 data class MinimalSizes(
@@ -19,21 +17,18 @@ data class MinimalSizes(
 fun VerticalSplitPane(
     splitterState: SplitterState,
     modifier: Modifier = Modifier,
-    content: SplitPaneContext.() -> Unit
+    content: SplitPaneScope.() -> Unit
 ) {
-    val bet: Betrayer = Betrayer.apply(content)
+    val bet: Betrayer = Betrayer().apply(content)
 
     SplitPane(
         modifier,
-        !Horizontal,
-        splitterState.apply { minValue = bet.firstPlaceableMinimalSize.value },
-        MinimalSizes(
-            bet.firstPlaceableMinimalSize,
-            bet.secondPlaceableMinimalSize
-        ),
+        isHorizontal = false,
+        splitterState,
+        bet.minimalSizes,
         bet.firstPlaceableContent,
         bet.secondPlaceableContent,
-        { Separator(!Horizontal, splitterState::smoothMoveBy)}
+        { Splitter(isHorizontal = false, splitterState::smoothMoveBy)}
     )
 }
 
@@ -41,25 +36,22 @@ fun VerticalSplitPane(
 fun HorizontalSplitPane(
     splitterState: SplitterState,
     modifier: Modifier = Modifier,
-    content: SplitPaneContext.() -> Unit
+    content: SplitPaneScope.() -> Unit
 ) {
-    val bet: Betrayer = Betrayer.apply(content)
+    val bet = Betrayer().apply(content)
     SplitPane(
         modifier,
-        Horizontal,
-        splitterState.apply { minValue = bet.firstPlaceableMinimalSize.value },
-        MinimalSizes(
-            bet.firstPlaceableMinimalSize,
-            bet.secondPlaceableMinimalSize
-        ),
+        isHorizontal = true,
+        splitterState,
+        bet.minimalSizes,
         bet.firstPlaceableContent,
         bet.secondPlaceableContent,
-        { Separator(Horizontal, splitterState::smoothMoveBy)}
+        { Splitter(isHorizontal = true, splitterState::smoothMoveBy)}
     )
 }
 
 @Composable
-expect fun Separator(
+expect fun Splitter(
     isHorizontal: Boolean,
     consumeMovement: (delta: Float) -> Unit
 )
