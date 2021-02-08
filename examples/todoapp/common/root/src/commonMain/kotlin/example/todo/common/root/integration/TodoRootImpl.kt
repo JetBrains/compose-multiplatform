@@ -13,13 +13,13 @@ import example.todo.common.edit.TodoEdit
 import example.todo.common.main.TodoMain
 import example.todo.common.root.TodoRoot
 import example.todo.common.root.TodoRoot.Child
-import example.todo.common.root.TodoRoot.Dependencies
 import example.todo.common.utils.Consumer
 
 internal class TodoRootImpl(
     componentContext: ComponentContext,
-    dependencies: Dependencies
-) : TodoRoot, ComponentContext by componentContext, Dependencies by dependencies {
+    private val todoMain: (ComponentContext, Consumer<TodoMain.Output>) -> TodoMain,
+    private val todoEdit: (ComponentContext, itemId: Long, Consumer<TodoEdit.Output>) -> TodoEdit
+) : TodoRoot, ComponentContext by componentContext {
 
     private val router =
         router<Configuration, Child>(
@@ -32,26 +32,9 @@ internal class TodoRootImpl(
 
     private fun createChild(configuration: Configuration, componentContext: ComponentContext): Child =
         when (configuration) {
-            is Configuration.Main -> Child.Main(todoMain(componentContext))
-            is Configuration.Edit -> Child.Edit(todoEdit(componentContext, itemId = configuration.itemId))
+            is Configuration.Main -> Child.Main(todoMain(componentContext, Consumer(::onMainOutput)))
+            is Configuration.Edit -> Child.Edit(todoEdit(componentContext, configuration.itemId, Consumer(::onEditOutput)))
         }
-
-    private fun todoMain(componentContext: ComponentContext): TodoMain =
-        TodoMain(
-            componentContext = componentContext,
-            dependencies = object : TodoMain.Dependencies, Dependencies by this {
-                override val mainOutput: Consumer<TodoMain.Output> = Consumer(::onMainOutput)
-            }
-        )
-
-    private fun todoEdit(componentContext: ComponentContext, itemId: Long): TodoEdit =
-        TodoEdit(
-            componentContext = componentContext,
-            dependencies = object : TodoEdit.Dependencies, Dependencies by this {
-                override val itemId: Long = itemId
-                override val editOutput: Consumer<TodoEdit.Output> = Consumer(::onEditOutput)
-            }
-        )
 
     private fun onMainOutput(output: TodoMain.Output): Unit =
         when (output) {
