@@ -22,7 +22,7 @@ import androidx.compose.ui.input.pointer.PointerEvent
 import androidx.compose.ui.input.pointer.PointerEventPass
 import androidx.compose.ui.input.pointer.PointerInputChange
 import androidx.compose.ui.input.pointer.PointerInputScope
-import androidx.compose.ui.input.pointer.anyPositionChangeConsumed
+import androidx.compose.ui.input.pointer.positionChangeConsumed
 import androidx.compose.ui.input.pointer.changedToDown
 import androidx.compose.ui.input.pointer.changedToDownIgnoreConsumed
 import androidx.compose.ui.input.pointer.changedToUp
@@ -217,7 +217,7 @@ suspend fun AwaitPointerEventScope.waitForUpOrCancellation(): PointerInputChange
         // Check for cancel by position consumption. We can look on the Final pass of the
         // existing pointer event because it comes after the Main pass we checked above.
         val consumeCheck = awaitPointerEvent(PointerEventPass.Final)
-        if (consumeCheck.changes.fastAny { it.anyPositionChangeConsumed() }) {
+        if (consumeCheck.changes.fastAny { it.positionChangeConsumed() }) {
             return null
         }
     }

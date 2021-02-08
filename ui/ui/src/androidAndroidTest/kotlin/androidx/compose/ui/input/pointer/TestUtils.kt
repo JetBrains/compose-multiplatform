@@ -321,8 +321,8 @@ internal class PointerInputChangeSubject(
     }
 
     fun nothingConsumed() {
-        check("consumed.downChange").that(actual.consumed.downChange).isEqualTo(false)
-        check("consumed.positionChange").that(actual.consumed.positionChange).isEqualTo(Offset.Zero)
+        downNotConsumed()
+        positionChangeNotConsumed()
     }
 
     fun downConsumed() {
@@ -333,13 +333,14 @@ internal class PointerInputChangeSubject(
         check("consumed.downChange").that(actual.consumed.downChange).isEqualTo(false)
     }
 
-    fun positionChangeConsumed(expected: Offset) {
+    fun positionChangeConsumed() {
         check("consumed.positionChangeConsumed")
-            .that(actual.consumed.positionChange).isEqualTo(expected)
+            .that(actual.consumed.positionChange).isEqualTo(true)
     }
 
     fun positionChangeNotConsumed() {
-        positionChangeConsumed(Offset.Zero)
+        check("consumed.positionChange not Consumed")
+            .that(actual.consumed.positionChange).isEqualTo(false)
     }
 
     fun isStructurallyEqualTo(expected: PointerInputChange) {

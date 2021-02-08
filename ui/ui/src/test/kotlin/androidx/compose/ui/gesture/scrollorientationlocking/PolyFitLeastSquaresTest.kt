@@ -16,8 +16,8 @@
 
 package androidx.compose.ui.gesture.scrollorientationlocking
 
-import androidx.compose.ui.gesture.util.PolynomialFit
-import androidx.compose.ui.gesture.util.polyFitLeastSquares
+import androidx.compose.ui.input.pointer.util.PolynomialFit
+import androidx.compose.ui.input.pointer.util.polyFitLeastSquares
 import com.google.common.truth.Truth.assertThat
 import org.junit.Test
 import org.junit.runner.RunWith

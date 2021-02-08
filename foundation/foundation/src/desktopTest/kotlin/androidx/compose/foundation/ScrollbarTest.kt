@@ -32,11 +32,11 @@ import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
-import androidx.compose.ui.gesture.scrollorientationlocking.Orientation
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.input.mouse.MouseScrollEvent
 import androidx.compose.ui.input.mouse.MouseScrollUnit
+import androidx.compose.ui.input.mouse.MouseScrollOrientation
 import androidx.compose.ui.platform.DesktopPlatform
 import androidx.compose.ui.platform.DesktopPlatformAmbient
 import androidx.compose.ui.platform.testTag
@@ -359,7 +359,7 @@ class ScrollbarTest {
 
     private fun ComposeTestRule.performMouseScroll(x: Int, y: Int, delta: Float) {
         (this as DesktopComposeTestRule).window.onMouseScroll(
-            x, y, MouseScrollEvent(MouseScrollUnit.Line(delta), Orientation.Vertical)
+            x, y, MouseScrollEvent(MouseScrollUnit.Line(delta), MouseScrollOrientation.Vertical)
         )
     }
 

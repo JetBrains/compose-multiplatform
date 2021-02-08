@@ -29,7 +29,7 @@ import androidx.compose.ui.input.pointer.PointerId
 import androidx.compose.ui.input.pointer.PointerInputChange
 import androidx.compose.ui.input.pointer.PointerInputFilter
 import androidx.compose.ui.input.pointer.PointerInputModifier
-import androidx.compose.ui.input.pointer.anyPositionChangeConsumed
+import androidx.compose.ui.input.pointer.positionChangeConsumed
 import androidx.compose.ui.input.pointer.changedToDown
 import androidx.compose.ui.input.pointer.changedToUp
 import androidx.compose.ui.input.pointer.changedToUpIgnoreConsumed
@@ -294,7 +294,7 @@ internal class LongPressGestureFilter(
         if (
             pass == PointerEventPass.Final &&
             state != State.Idle &&
-            changes.fastAny { it.anyPositionChangeConsumed() }
+            changes.fastAny { it.positionChangeConsumed() }
         ) {
             // If we are anything but Idle and something consumed movement, reset.
             resetToIdle()

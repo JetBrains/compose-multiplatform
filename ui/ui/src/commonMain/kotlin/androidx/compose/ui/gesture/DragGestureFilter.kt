@@ -22,8 +22,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.composed
 import androidx.compose.ui.geometry.Offset
-import androidx.compose.ui.gesture.scrollorientationlocking.Orientation
-import androidx.compose.ui.gesture.util.VelocityTracker
+import androidx.compose.ui.input.pointer.util.VelocityTracker
 import androidx.compose.ui.input.pointer.PointerEvent
 import androidx.compose.ui.input.pointer.PointerEventPass
 import androidx.compose.ui.input.pointer.PointerId
@@ -241,7 +240,6 @@ fun Modifier.rawDragGestureFilter(
     val filter = remember { RawDragGestureFilter() }
     filter.dragObserver = dragObserver
     filter.canStartDragging = canStartDragging
-    filter.orientation = null
     DragPointerInputModifierImpl(filter)
 }
 
@@ -251,7 +249,6 @@ internal class RawDragGestureFilter : PointerInputFilter() {
 
     internal lateinit var dragObserver: DragObserver
     internal var canStartDragging: (() -> Boolean)? = null
-    internal var orientation: Orientation? = null
 
     private var started = false
 
@@ -399,8 +396,8 @@ internal class RawDragGestureFilter : PointerInputFilter() {
                         )
                     )
 
-                    movedChanges.fastForEach {
-                        it.consumePositionChange(consumed.x, consumed.y)
+                    if (consumed.x != 0f || consumed.y != 0f) {
+                        movedChanges.fastForEach { it.consumePositionChange() }
                     }
                 }
             }

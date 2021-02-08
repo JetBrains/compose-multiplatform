@@ -542,10 +542,7 @@ private class ConsumeMovementGestureFilter(val consumeMovement: Boolean) : Point
     ) {
         if (consumeMovement) {
             pointerEvent.changes.fastForEach {
-                it.consumePositionChange(
-                    it.positionChange().x,
-                    it.positionChange().y
-                )
+                it.consumePositionChange()
             }
         }
     }

@@ -19,7 +19,6 @@ package androidx.compose.ui.input.mouse
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.size
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.gesture.scrollorientationlocking.Orientation
 import androidx.compose.ui.platform.TestComposeWindow
 import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.IntSize
@@ -53,11 +52,11 @@ class MouseScrollFilterTest {
         window.onMouseScroll(
             x = 0,
             y = 0,
-            event = MouseScrollEvent(MouseScrollUnit.Line(3f), Orientation.Vertical)
+            event = MouseScrollEvent(MouseScrollUnit.Line(3f), MouseScrollOrientation.Vertical)
         )
 
         assertThat(actualEvent?.delta).isEqualTo(MouseScrollUnit.Line(3f))
-        assertThat(actualEvent?.orientation).isEqualTo(Orientation.Vertical)
+        assertThat(actualEvent?.orientation).isEqualTo(MouseScrollOrientation.Vertical)
         assertThat(actualBounds).isEqualTo(IntSize(20, 40))
     }
 
@@ -81,7 +80,7 @@ class MouseScrollFilterTest {
         window.onMouseScroll(
             x = 20,
             y = 0,
-            event = MouseScrollEvent(MouseScrollUnit.Line(3f), Orientation.Vertical)
+            event = MouseScrollEvent(MouseScrollUnit.Line(3f), MouseScrollOrientation.Vertical)
         )
 
         assertThat(actualEvent).isEqualTo(null)
@@ -119,13 +118,13 @@ class MouseScrollFilterTest {
         window.onMouseScroll(
             x = 0,
             y = 0,
-            event = MouseScrollEvent(MouseScrollUnit.Line(3f), Orientation.Horizontal)
+            event = MouseScrollEvent(MouseScrollUnit.Line(3f), MouseScrollOrientation.Horizontal)
         )
 
         assertThat(actualEvent1).isEqualTo(null)
         assertThat(actualBounds1).isEqualTo(null)
         assertThat(actualEvent2?.delta).isEqualTo(MouseScrollUnit.Line(3f))
-        assertThat(actualEvent2?.orientation).isEqualTo(Orientation.Horizontal)
+        assertThat(actualEvent2?.orientation).isEqualTo(MouseScrollOrientation.Horizontal)
         assertThat(actualBounds2).isEqualTo(IntSize(10, 20))
     }
 
@@ -156,7 +155,7 @@ class MouseScrollFilterTest {
         window.onMouseScroll(
             x = 0,
             y = 0,
-            event = MouseScrollEvent(MouseScrollUnit.Line(3f), Orientation.Horizontal)
+            event = MouseScrollEvent(MouseScrollUnit.Line(3f), MouseScrollOrientation.Horizontal)
         )
 
         assertThat(actualEvent).isEqualTo(null)
@@ -187,11 +186,11 @@ class MouseScrollFilterTest {
         window.onMouseScroll(
             x = 0,
             y = 0,
-            event = MouseScrollEvent(MouseScrollUnit.Line(3f), Orientation.Horizontal)
+            event = MouseScrollEvent(MouseScrollUnit.Line(3f), MouseScrollOrientation.Horizontal)
         )
 
         assertThat(actualEvent?.delta).isEqualTo(MouseScrollUnit.Line(3f))
-        assertThat(actualEvent?.orientation).isEqualTo(Orientation.Horizontal)
+        assertThat(actualEvent?.orientation).isEqualTo(MouseScrollOrientation.Horizontal)
         assertThat(actualBounds).isEqualTo(IntSize(20, 40))
     }
 
@@ -227,13 +226,13 @@ class MouseScrollFilterTest {
         window.onMouseScroll(
             x = 0,
             y = 0,
-            event = MouseScrollEvent(MouseScrollUnit.Line(-1f), Orientation.Horizontal)
+            event = MouseScrollEvent(MouseScrollUnit.Line(-1f), MouseScrollOrientation.Horizontal)
         )
 
         assertThat(actualEvent1).isEqualTo(null)
         assertThat(actualBounds1).isEqualTo(null)
         assertThat(actualEvent2?.delta).isEqualTo(MouseScrollUnit.Line(-1f))
-        assertThat(actualEvent2?.orientation).isEqualTo(Orientation.Horizontal)
+        assertThat(actualEvent2?.orientation).isEqualTo(MouseScrollOrientation.Horizontal)
         assertThat(actualBounds2).isEqualTo(IntSize(10, 20))
     }
 
@@ -265,11 +264,11 @@ class MouseScrollFilterTest {
         window.onMouseScroll(
             x = 0,
             y = 0,
-            event = MouseScrollEvent(MouseScrollUnit.Page(1f), Orientation.Horizontal)
+            event = MouseScrollEvent(MouseScrollUnit.Page(1f), MouseScrollOrientation.Horizontal)
         )
 
         assertThat(actualEvent?.delta).isEqualTo(MouseScrollUnit.Page(1f))
-        assertThat(actualEvent?.orientation).isEqualTo(Orientation.Horizontal)
+        assertThat(actualEvent?.orientation).isEqualTo(MouseScrollOrientation.Horizontal)
         assertThat(actualBounds).isEqualTo(IntSize(20, 40))
     }
 
@@ -298,11 +297,11 @@ class MouseScrollFilterTest {
         window.onMouseScroll(
             x = 0,
             y = 0,
-            event = MouseScrollEvent(MouseScrollUnit.Page(1f), Orientation.Horizontal)
+            event = MouseScrollEvent(MouseScrollUnit.Page(1f), MouseScrollOrientation.Horizontal)
         )
 
         assertThat(actualEvent?.delta).isEqualTo(MouseScrollUnit.Page(1f))
-        assertThat(actualEvent?.orientation).isEqualTo(Orientation.Horizontal)
+        assertThat(actualEvent?.orientation).isEqualTo(MouseScrollOrientation.Horizontal)
         assertThat(actualBounds).isEqualTo(IntSize(20, 40))
     }
 }

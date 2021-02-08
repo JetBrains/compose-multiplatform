@@ -23,6 +23,8 @@ import androidx.compose.foundation.Interaction
 import androidx.compose.foundation.InteractionState
 import androidx.compose.foundation.MutatePriority
 import androidx.compose.foundation.animation.defaultFlingSpec
+import androidx.compose.foundation.gestures.Orientation.Horizontal
+import androidx.compose.foundation.gestures.Orientation.Vertical
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.State
@@ -32,19 +34,16 @@ import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.composed
 import androidx.compose.ui.geometry.Offset
-import androidx.compose.ui.gesture.nestedscroll.NestedScrollConnection
-import androidx.compose.ui.gesture.nestedscroll.NestedScrollDispatcher
-import androidx.compose.ui.gesture.nestedscroll.NestedScrollSource
-import androidx.compose.ui.gesture.nestedscroll.nestedScroll
-import androidx.compose.ui.gesture.scrollorientationlocking.Orientation
-import androidx.compose.ui.gesture.scrollorientationlocking.Orientation.Horizontal
-import androidx.compose.ui.gesture.scrollorientationlocking.Orientation.Vertical
-import androidx.compose.ui.gesture.util.VelocityTracker
+import androidx.compose.ui.input.nestedscroll.NestedScrollConnection
+import androidx.compose.ui.input.nestedscroll.NestedScrollDispatcher
+import androidx.compose.ui.input.nestedscroll.NestedScrollSource
+import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.input.pointer.PointerInputChange
 import androidx.compose.ui.input.pointer.PointerInputScope
 import androidx.compose.ui.input.pointer.consumePositionChange
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.input.pointer.positionChange
+import androidx.compose.ui.input.pointer.util.VelocityTracker
 import androidx.compose.ui.platform.debugInspectorInfo
 import androidx.compose.ui.unit.Velocity
 import kotlinx.coroutines.CancellationException
@@ -167,10 +166,6 @@ private fun Modifier.dragForEachGesture(
     scrollLogic: State<ScrollingLogic>
 ): Modifier {
     fun isVertical() = orientation.value == Vertical
-    fun PointerInputChange.consume(amount: Float) = this.consumePositionChange(
-        consumedDx = if (isVertical()) 0f else amount,
-        consumedDy = if (isVertical()) amount else 0f
-    )
 
     fun Offset.axisValue() = this.run { if (isVertical()) y else x }
 
@@ -186,7 +181,7 @@ private fun Modifier.dragForEachGesture(
                 down to initialDelta
             } else {
                 val onSlopPassed = { event: PointerInputChange, overSlop: Float ->
-                    event.consume(event.position.axisValue())
+                    event.consumePositionChange()
                     initialDelta = overSlop
                 }
                 val result = if (isVertical()) {
@@ -222,7 +217,7 @@ private fun Modifier.dragForEachGesture(
                                 dispatchScroll(delta, NestedScrollSource.Drag)
                             }
                         }
-                        event.consume(delta)
+                        event.consumePositionChange()
                     }
                     result = if (isVertical()) {
                         verticalDrag(drag.id, dragTick)

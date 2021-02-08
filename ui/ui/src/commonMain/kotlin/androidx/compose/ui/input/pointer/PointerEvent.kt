@@ -78,6 +78,7 @@ abstract class PointerInputFilter {
      */
     val size: IntSize
         get() = layoutCoordinates?.size ?: IntSize.Zero
+
     @Suppress("DEPRECATION")
     internal val position: IntOffset
         get() = layoutCoordinates?.run { localToGlobal(Offset.Zero).round() } ?: IntOffset.Zero
@@ -163,7 +164,7 @@ enum class PointerType {
  * @param previousPosition The [Offset] of the previous pointer event, offset to the
  * [position] and relative to the containing element.
  * @param previousPressed `true` if the pointer event was considered "pressed." For example , if
- * a finter was touching the screen or a mouse button was pressed, [previousPressed] would be
+ * a finger was touching the screen or a mouse button was pressed, [previousPressed] would be
  * `true`.
  * @param consumed Which aspects of this change have been consumed.
  * @param type The device type that produced the event, such as [mouse][PointerType.Mouse],
@@ -212,13 +213,13 @@ class PointerInputChange(
 inline class PointerId(val value: Long)
 
 /**
- * Describes what aspects of, and how much of, a change has been consumed.
+ * Describes what aspects of a change has been consumed.
  *
- * @param positionChange The amount of change to the position that has been consumed.
+ * @param positionChange True if a position change in this event has been consumed.
  * @param downChange True if a change to down or up has been consumed.
  */
 class ConsumedData(
-    var positionChange: Offset = Offset.Companion.Zero,
+    var positionChange: Boolean = false,
     var downChange: Boolean = false
 )
 
@@ -293,33 +294,29 @@ fun PointerInputChange.positionChangedIgnoreConsumed() =
 fun PointerInputChange.positionChange() = this.positionChangeInternal(false)
 
 /**
- * The distance that the pointer has moved on the screen, ignoring any distance that may have been
- * consumed.
+ * The distance that the pointer has moved on the screen, ignoring the fact that it might have
+ * been consumed.
  */
 fun PointerInputChange.positionChangeIgnoreConsumed() = this.positionChangeInternal(true)
+
 private fun PointerInputChange.positionChangeInternal(ignoreConsumed: Boolean = false): Offset {
     val previousPosition = previousPosition
     val currentPosition = position
 
     val offset = currentPosition - previousPosition
 
-    return if (!ignoreConsumed) {
-        offset - consumed.positionChange
-    } else {
-        offset
-    }
+    return if (!ignoreConsumed && consumed.positionChange) Offset.Zero else offset
 }
 
 /**
- * True if any of this [PointerInputChange]'s movement has been consumed.
+ * True if this [PointerInputChange]'s movement has been consumed.
  */
-fun PointerInputChange.anyPositionChangeConsumed() =
-    consumed.positionChange.x != 0f || consumed.positionChange.y != 0f
+fun PointerInputChange.positionChangeConsumed() = consumed.positionChange
 
 /**
  * True if any aspect of this [PointerInputChange] has been consumed.
  */
-fun PointerInputChange.anyChangeConsumed() = anyPositionChangeConsumed() || consumed.downChange
+fun PointerInputChange.anyChangeConsumed() = positionChangeConsumed() || consumed.downChange
 
 /**
  * Consume the up or down change of this [PointerInputChange] if there is an up or down change to
@@ -332,27 +329,20 @@ fun PointerInputChange.consumeDownChange() {
 }
 
 /**
- * Consumes some portion of the position change of this [PointerInputChange].
- *
- * @param consumedDx The amount of position change on the x axis to consume.
- * @param consumedDy The amount of position change on the y axis to consume.
+ * Consume position change if there is any
  */
-fun PointerInputChange.consumePositionChange(
-    consumedDx: Float,
-    consumedDy: Float
-) {
-    // TODO(shepshapard): Handle case where consumption would make the consumption total to be
-    //  less than the total change.
-    consumed.positionChange += Offset(consumedDx, consumedDy)
+fun PointerInputChange.consumePositionChange() {
+    if (positionChange() != Offset.Zero) {
+        consumed.positionChange = true
+    }
 }
 
 /**
  * Consumes all changes associated with the [PointerInputChange]
  */
 fun PointerInputChange.consumeAllChanges() {
-    val remainingPositionChange = this.positionChange()
     this.consumeDownChange()
-    this.consumePositionChange(remainingPositionChange.x, remainingPositionChange.y)
+    this.consumePositionChange()
 }
 
 /**
