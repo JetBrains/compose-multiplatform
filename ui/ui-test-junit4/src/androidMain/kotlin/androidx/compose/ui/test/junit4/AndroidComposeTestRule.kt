@@ -256,23 +256,7 @@ class AndroidComposeTestRule<R : TestRule, A : ComponentActivity>(
     }
 
     override fun waitForIdle() {
-        check(!isOnUiThread()) {
-            "Functions that involve synchronization (Assertions, Actions, Synchronization; " +
-                "e.g. assertIsSelected(), doClick(), runOnIdle()) cannot be run " +
-                "from the main thread. Did you nest such a function inside " +
-                "runOnIdle {}, runOnUiThread {} or setContent {}?"
-        }
-
-        // First wait until we have a compose root (in case an Activity is being started)
-        composeRootRegistry.waitForComposeRoots()
-        // Then await composition(s)
-        runEspressoOnIdle()
-
-        // TODO(b/155774664): waitForComposeRoots() may be satisfied by a compose root from an
-        //  Activity that is about to be paused, in cases where a new Activity is being started.
-        //  That means that ComposeRootRegistry.getComposeRoots() may still return an empty list
-        //  between now and when the new Activity has created its compose root, even though
-        //  waitForComposeRoots() suggests that we are now guaranteed one.
+        testOwner.waitForIdle(atLeastOneRootExpected = true)
     }
 
     override suspend fun awaitIdle() {
@@ -427,17 +411,32 @@ class AndroidComposeTestRule<R : TestRule, A : ComponentActivity>(
             return androidx.compose.ui.test.junit4.runOnUiThread(action)
         }
 
-        override fun getRoots(): Set<RootForTest> {
+        internal fun waitForIdle(atLeastOneRootExpected: Boolean) {
+            check(!isOnUiThread()) {
+                "Functions that involve synchronization (Assertions, Actions, Synchronization; " +
+                    "e.g. assertIsSelected(), doClick(), runOnIdle()) cannot be run " +
+                    "from the main thread. Did you nest such a function inside " +
+                    "runOnIdle {}, runOnUiThread {} or setContent {}?"
+            }
+
+            // First wait until we have a compose root (in case an Activity is being started)
+            composeRootRegistry.waitForComposeRoots(atLeastOneRootExpected)
+            // Then await composition(s)
+            runEspressoOnIdle()
+
+            // TODO(b/155774664): waitForComposeRoots() may be satisfied by a compose root from an
+            //  Activity that is about to be paused, in cases where a new Activity is being started.
+            //  That means that ComposeRootRegistry.getComposeRoots() may still return an empty list
+            //  between now and when the new Activity has created its compose root, even though
+            //  waitForComposeRoots() suggests that we are now guaranteed one.
+        }
+
+        override fun getRoots(atLeastOneRootExpected: Boolean): Set<RootForTest> {
             // TODO(pavlis): Instead of returning a flatMap, let all consumers handle a tree
             //  structure. In case of multiple AndroidOwners, add a fake root
-            waitForIdle()
+            waitForIdle(atLeastOneRootExpected)
 
-            return composeRootRegistry.getRegisteredComposeRoots().also {
-                // TODO(b/153632210): This check should be done by callers of getOwners()
-                check(it.isNotEmpty()) {
-                    "No compose views found in the app. Is your Activity resumed?"
-                }
-            }
+            return composeRootRegistry.getRegisteredComposeRoots()
         }
 
         private fun ViewRootForTest.getTextInputServiceOrDie(): TextInputServiceForTests {

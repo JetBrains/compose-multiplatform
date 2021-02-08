@@ -74,18 +74,22 @@ class SemanticsNodeInteraction constructor(
      */
     private var lastSeenSemantics: String? = null
 
-    internal fun fetchSemanticsNodes(errorMessageOnFail: String? = null): SelectionResult {
+    internal fun fetchSemanticsNodes(
+        atLeastOneRootRequired: Boolean,
+        errorMessageOnFail: String? = null
+    ): SelectionResult {
         if (nodeIds == null) {
             return selector
                 .map(
-                    testContext.getAllSemanticsNodes(useUnmergedTree),
+                    testContext.getAllSemanticsNodes(atLeastOneRootRequired, useUnmergedTree),
                     errorMessageOnFail.orEmpty()
                 )
                 .apply { nodeIds = selectedNodes.map { it.id }.toList() }
         }
 
         return SelectionResult(
-            testContext.getAllSemanticsNodes(useUnmergedTree).filter { it.id in nodeIds!! }
+            testContext.getAllSemanticsNodes(atLeastOneRootRequired, useUnmergedTree)
+                .filter { it.id in nodeIds!! }
         )
     }
 
@@ -112,7 +116,10 @@ class SemanticsNodeInteraction constructor(
      * @throws [AssertionError] if the assert fails.
      */
     fun assertDoesNotExist() {
-        val result = fetchSemanticsNodes("Failed: assertDoesNotExist.")
+        val result = fetchSemanticsNodes(
+            atLeastOneRootRequired = false,
+            errorMessageOnFail = "Failed: assertDoesNotExist."
+        )
         if (result.selectedNodes.isNotEmpty()) {
             throw AssertionError(
                 buildErrorMessageForCountMismatch(
@@ -147,7 +154,7 @@ class SemanticsNodeInteraction constructor(
         val finalErrorMessage = errorMessageOnFail
             ?: "Failed: assertExists."
 
-        val result = fetchSemanticsNodes(finalErrorMessage)
+        val result = fetchSemanticsNodes(atLeastOneRootRequired = true, finalErrorMessage)
         if (result.selectedNodes.count() != 1) {
             if (result.selectedNodes.isEmpty() && lastSeenSemantics != null) {
                 // This means that node we used to have is no longer in the tree.
@@ -213,19 +220,28 @@ class SemanticsNodeInteractionCollection constructor(
      * Note: Accessing this object involves synchronization with your UI. If you are accessing this
      * multiple times in one atomic operation, it is better to cache the result instead of calling
      * this API multiple times.
+     *
+     * @param atLeastOneRootRequired Whether to throw an error in case there is no compose
+     * content in the current test app.
+     * @param errorMessageOnFail Custom error message to append when this fails to retrieve the
+     * nodes.
      */
-    fun fetchSemanticsNodes(errorMessageOnFail: String? = null): List<SemanticsNode> {
+    fun fetchSemanticsNodes(
+        atLeastOneRootRequired: Boolean = true,
+        errorMessageOnFail: String? = null
+    ): List<SemanticsNode> {
         if (nodeIds == null) {
             return selector
                 .map(
-                    testContext.getAllSemanticsNodes(useUnmergedTree),
+                    testContext.getAllSemanticsNodes(atLeastOneRootRequired, useUnmergedTree),
                     errorMessageOnFail.orEmpty()
                 )
                 .apply { nodeIds = selectedNodes.map { it.id }.toList() }
                 .selectedNodes
         }
 
-        return testContext.getAllSemanticsNodes(useUnmergedTree).filter { it.id in nodeIds!! }
+        return testContext.getAllSemanticsNodes(atLeastOneRootRequired, useUnmergedTree)
+            .filter { it.id in nodeIds!! }
     }
 
     /**
