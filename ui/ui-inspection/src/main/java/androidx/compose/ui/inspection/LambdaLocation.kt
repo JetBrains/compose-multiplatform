@@ -15,10 +15,24 @@
  */
 package androidx.compose.ui.inspection
 
+import android.util.Log
+
 data class LambdaLocation(val fileName: String, val startLine: Int, val endLine: Int) {
     companion object {
         init {
-            System.loadLibrary("compose_inspection_jni")
+            // TODO(b/179314197): Can we avoid try/catch by setting up by...
+            //  - linking differently?
+            //  - making sure previous classloader that loaded this was GC'ed
+            //  - Searching list of already loaded libraries?
+            try {
+                System.loadLibrary("compose_inspection_jni")
+            } catch (e: UnsatisfiedLinkError) {
+                Log.w(
+                    "ComposeLayoutInspector",
+                    "Swallowing loadLibrary exception. Already loaded by a previous classloader?",
+                    e
+                )
+            }
         }
 
         fun resolve(o: Any): LambdaLocation? {
