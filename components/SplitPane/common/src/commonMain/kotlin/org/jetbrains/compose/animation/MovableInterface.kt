@@ -7,5 +7,8 @@ interface SingleDirectionMoveScope {
 interface SingleDirectionMovable {
     suspend fun move(
         block: suspend SingleDirectionMoveScope.() -> Unit
-    ): Unit
+    )
+
+    val isMoveInProgress: Boolean
+
 }
