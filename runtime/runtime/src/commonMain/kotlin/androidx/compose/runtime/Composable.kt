@@ -50,10 +50,6 @@ package androidx.compose.runtime
     // foo: (@Composable () -> Unit) -> Unit
     AnnotationTarget.TYPE_PARAMETER,
 
-    // (DEPRECATED) composable property declarations
-    // @Composable val foo: Int get() { ... }
-    AnnotationTarget.PROPERTY,
-
     // composable property getters and setters
     // val foo: Int @Composable get() { ... }
     // var bar: Int
