@@ -169,7 +169,6 @@ package androidx.compose.runtime {
   }
 
   public final class CompositionContextKt {
-    method @Deprecated @androidx.compose.runtime.Composable public static androidx.compose.runtime.CompositionContext rememberCompositionReference();
   }
 
   public final class CompositionKt {
