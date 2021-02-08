@@ -17,9 +17,9 @@
 package androidx.compose.ui.inspection.proto
 
 import androidx.compose.ui.inspection.LambdaLocation
-import androidx.compose.ui.tooling.inspector.InspectorNode
-import androidx.compose.ui.tooling.inspector.NodeParameter
-import androidx.compose.ui.tooling.inspector.ParameterType
+import androidx.compose.ui.inspection.inspector.InspectorNode
+import androidx.compose.ui.inspection.inspector.NodeParameter
+import androidx.compose.ui.inspection.inspector.ParameterType
 import layoutinspector.compose.inspection.LayoutInspectorComposeProtocol.Bounds
 import layoutinspector.compose.inspection.LayoutInspectorComposeProtocol.ComposableNode
 import layoutinspector.compose.inspection.LayoutInspectorComposeProtocol.LambdaValue

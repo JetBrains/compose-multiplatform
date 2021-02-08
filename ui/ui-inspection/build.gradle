@@ -31,13 +31,25 @@ plugins {
 dependencies {
     kotlinPlugin project(":compose:compiler:compiler")
     implementation("androidx.annotation:annotation:1.1.0")
-    implementation(KOTLIN_STDLIB)
+    // Following dependencies will be provided by inspected app itself
+    // because compose:ui-inspector can be run only in app with compose:ui:ui
+    // thus all its transitive dependencies will be present too.
+    compileOnly(KOTLIN_STDLIB)
     compileOnly(projectOrArtifact(":inspection:inspection"))
     compileOnly(project(":compose:runtime:runtime"))
     compileOnly(project(":compose:ui:ui"))
-    compileOnly(project(":compose:ui:ui-tooling"))
+    // we ignore its transitive dependencies, because ui-inspection should
+    // depend on them as "compile-only" deps.
+    implementation(project(":compose:ui:ui-tooling-data"), {
+        transitive(false)
+    })
+    implementation(KOTLIN_REFLECT, {
+        exclude group: "org.jetbrains.kotlin", module: "kotlin-stdlib"
+    })
+    androidTestImplementation(KOTLIN_STDLIB)
     androidTestImplementation(KOTLIN_COROUTINES_ANDROID)
-    androidTestImplementation(project(":compose:ui:ui-tooling"))
+    androidTestImplementation(project(":compose:ui:ui-tooling-data"))
+    androidTestImplementation(project(":compose:ui:ui"))
     androidTestImplementation(project(":compose:material:material"))
     androidTestImplementation(project(":inspection:inspection-testing"))
     androidTestImplementation(project(":activity:activity-compose"))
