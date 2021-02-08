@@ -52,7 +52,6 @@ import androidx.compose.foundation.text.selection.SelectionRegistrar
 import androidx.compose.ui.semantics.getTextLayoutResult
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.AnnotatedString
-import androidx.compose.ui.text.ExperimentalTextApi
 import androidx.compose.ui.text.InternalTextApi
 import androidx.compose.ui.text.Placeholder
 import androidx.compose.ui.text.TextDelegate
@@ -93,7 +92,7 @@ private typealias InlineContentRange = AnnotatedString.Range<@Composable (String
  * @param onTextLayout Callback that is executed when a new text layout is calculated.
  */
 @Composable
-@OptIn(ExperimentalTextApi::class, InternalTextApi::class)
+@OptIn(InternalTextApi::class)
 @Suppress("DEPRECATION") // longPressDragGestureFilter
 internal fun CoreText(
     text: AnnotatedString,
@@ -193,10 +192,7 @@ internal fun InlineChildren(
     }
 }
 
-@OptIn(
-    InternalTextApi::class,
-    ExperimentalTextApi::class
-)
+@OptIn(InternalTextApi::class)
 private class TextController(val state: TextState) {
     var selectionRegistrar: SelectionRegistrar? = null
 
@@ -346,10 +342,7 @@ private class TextController(val state: TextState) {
     }
 }
 
-@OptIn(
-    InternalTextApi::class,
-    ExperimentalTextApi::class
-)
+@OptIn(InternalTextApi::class)
 /*@VisibleForTesting*/
 internal class TextState(
     var textDelegate: TextDelegate
@@ -448,10 +441,6 @@ private fun resolveInlineContent(
     return Pair(placeholders, inlineComposables)
 }
 
-@OptIn(
-    InternalTextApi::class,
-    ExperimentalTextApi::class
-)
 /*@VisibleForTesting*/
 @Suppress("DEPRECATION") // LongPressDragObserver
 internal fun longPressDragObserver(

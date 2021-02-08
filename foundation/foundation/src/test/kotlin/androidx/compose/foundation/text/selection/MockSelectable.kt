@@ -20,9 +20,7 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Rect
 import androidx.compose.ui.layout.LayoutCoordinates
 import androidx.compose.ui.text.AnnotatedString
-import androidx.compose.ui.text.ExperimentalTextApi
 
-@OptIn(ExperimentalTextApi::class)
 internal class MockSelectable(
     var getSelectionValue: Selection? = null,
     var getHandlePositionValue: Offset = Offset.Zero,

@@ -54,7 +54,6 @@ import kotlin.math.min
 /**
  * A bridge class between user interaction to the text field selection.
  */
-@OptIn(InternalTextApi::class)
 internal class TextFieldSelectionManager {
 
     /**
@@ -495,6 +494,7 @@ internal class TextFieldSelectionManager {
      * line, and the bottom is the bottom of the last selected line. The left is the leftmost
      * handle's horizontal coordinates, and the right is the rightmost handle's coordinates.
      */
+    @OptIn(InternalTextApi::class)
     private fun getContentRect(): Rect {
         state?.let {
             val startOffset =
@@ -600,7 +600,6 @@ internal class TextFieldSelectionManager {
 }
 
 @Composable
-@OptIn(InternalTextApi::class)
 internal fun TextFieldSelectionHandle(
     isStartHandle: Boolean,
     directions: Pair<ResolvedTextDirection, ResolvedTextDirection>,

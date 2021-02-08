@@ -20,7 +20,6 @@ import android.content.Context
 import android.view.View
 import android.view.inputmethod.EditorInfo
 import android.view.inputmethod.InputMethodManager
-import androidx.compose.ui.text.ExperimentalTextApi
 import androidx.compose.ui.text.InternalTextApi
 import androidx.compose.ui.text.TextRange
 import androidx.compose.ui.text.input.ImeOptions
@@ -39,7 +38,7 @@ import org.junit.Test
 import org.junit.runner.RunWith
 import org.junit.runners.JUnit4
 
-@OptIn(ExperimentalTextApi::class, InternalTextApi::class)
+@OptIn(InternalTextApi::class)
 @RunWith(JUnit4::class)
 class TextInputServiceAndroidOnStateUpdateTest {
 
