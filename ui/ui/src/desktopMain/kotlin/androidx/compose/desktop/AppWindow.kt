@@ -39,8 +39,12 @@ import javax.swing.WindowConstants
  * Local composition of [AppWindow]. [AppWindow] is a high level window implementation. This local
  * composition is used to get the current [AppWindow].
  */
-val LocalAppWindow = compositionLocalOf<AppWindow>()
-internal val LocalLayerContainer = compositionLocalOf<Container>()
+val LocalAppWindow = compositionLocalOf<AppWindow> {
+    error("CompositionLocal LocalAppWindow not provided")
+}
+internal val LocalLayerContainer = compositionLocalOf<Container> {
+    error("CompositionLocal LayerContainer not provided")
+}
 
 /**
  * Opens a window with the given content.
