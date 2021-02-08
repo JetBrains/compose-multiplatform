@@ -67,10 +67,6 @@ package androidx.compose.ui.test {
     ctor public ComposeTimeoutException(String? message);
   }
 
-  public final class CoroutineBuildersKt {
-    method @androidx.compose.ui.test.ExperimentalTestApi public static <R> void runBlockingWithManualClock(kotlin.jvm.functions.Function3<? super kotlinx.coroutines.CoroutineScope,? super androidx.compose.animation.core.ManualFrameClock,? super kotlin.coroutines.Continuation<? super R>,?> block);
-  }
-
   public final class ErrorMessagesKt {
   }
 
