@@ -17,7 +17,7 @@
 package androidx.compose.foundation.textfield
 
 import androidx.compose.foundation.ExperimentalFoundationApi
-import androidx.compose.foundation.layout.defaultMinSizeConstraints
+import androidx.compose.foundation.layout.defaultMinSize
 import androidx.compose.foundation.layout.preferredWidth
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.text.BasicTextField
@@ -83,7 +83,7 @@ class BaseTextFieldDefaultWidthTest {
                 fontSize = fontSize,
                 modifier = Modifier
                     .onGloballyPositioned { size = it.size.width }
-                    .defaultMinSizeConstraints(minWidth),
+                    .defaultMinSize(minWidth),
                 density = density
             )
         }
