@@ -26,9 +26,9 @@ import androidx.compose.ui.layout.Layout
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.composed
 import androidx.compose.ui.geometry.Offset
-import androidx.compose.ui.gesture.DragObserver
-import androidx.compose.ui.gesture.rawDragGestureFilter
-import androidx.compose.ui.gesture.rawPressStartGestureFilter
+import androidx.compose.foundation.legacygestures.DragObserver
+import androidx.compose.foundation.legacygestures.rawDragGestureFilter
+import androidx.compose.foundation.legacygestures.rawPressStartGestureFilter
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.platform.SelectionTrackerAmbient
 import kotlin.math.max

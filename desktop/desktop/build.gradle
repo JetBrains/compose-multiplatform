@@ -41,6 +41,7 @@ kotlin {
     sourceSets {
         commonMain.dependencies {
             implementation(KOTLIN_STDLIB_COMMON)
+            implementation project(":compose:ui:ui-util")
             api project(":compose:foundation:foundation")
             api project(":compose:material:material")
             api project(":compose:runtime:runtime")

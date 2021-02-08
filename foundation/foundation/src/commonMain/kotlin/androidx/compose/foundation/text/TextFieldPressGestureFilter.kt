@@ -21,7 +21,7 @@ import androidx.compose.foundation.InteractionState
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.composed
-import androidx.compose.ui.gesture.pressIndicatorGestureFilter
+import androidx.compose.foundation.legacygestures.pressIndicatorGestureFilter
 
 /**
  * Required for the press [InteractionState] consistency for TextField.

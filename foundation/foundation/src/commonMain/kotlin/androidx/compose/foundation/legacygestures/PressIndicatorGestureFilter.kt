@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package androidx.compose.ui.gesture
+package androidx.compose.foundation.legacygestures
 
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
@@ -71,7 +71,7 @@ import androidx.compose.ui.util.fastForEach
         "androidx.compose.foundation.gestures.detectTapGestures"
     )
 )
-fun Modifier.pressIndicatorGestureFilter(
+internal fun Modifier.pressIndicatorGestureFilter(
     onStart: ((Offset) -> Unit)? = null,
     onStop: (() -> Unit)? = null,
     onCancel: (() -> Unit)? = null,
