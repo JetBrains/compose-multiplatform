@@ -1,7 +1,8 @@
 package org.jetbrains.compose.splitpane
 
-import androidx.compose.desktop.AppWindowAmbient
+import androidx.compose.desktop.LocalAppWindow
 import androidx.compose.foundation.background
+import androidx.compose.foundation.gestures.detectDragGestures
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -28,11 +29,11 @@ fun Modifier.cursorForResize(
     var isHover by remember { mutableStateOf(false) }
 
     if (isHover) {
-        AppWindowAmbient.current!!.window.cursor = Cursor(
+        LocalAppWindow.current.window.cursor = Cursor(
             if (isHorizontal) Cursor.E_RESIZE_CURSOR else Cursor.S_RESIZE_CURSOR
         )
     } else {
-        AppWindowAmbient.current!!.window.cursor = Cursor.getDefaultCursor()
+        LocalAppWindow.current.window.cursor = Cursor.getDefaultCursor()
     }
     pointerMoveFilter(
         onEnter = { isHover = true; true },
@@ -64,8 +65,8 @@ fun DesktopSplitPaneHandle(
     consumeMoveDelta: (delta: Float) -> Unit
 ) = Box(
     Modifier
-        .pointerInput {
-            ddg { change, _ ->
+        .pointerInput(null) {
+            detectDragGestures { change, _ ->
                 change.consumeAllChanges()
                 consumeMoveDelta(if (isHorizontal) change.position.x else change.position.y)
             }
@@ -83,7 +84,7 @@ fun DesktopSplitPaneHandle(
 )
 
 @Composable
-actual fun Separator(
+actual fun Splitter(
     isHorizontal: Boolean,
     consumeMovement: (delta: Float) -> Unit
 ) = Box {
