@@ -51,6 +51,7 @@ import androidx.compose.ui.unit.constrainWidth
 import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.runBlocking
+import kotlin.math.roundToInt
 import kotlin.math.sign
 
 /**
@@ -340,14 +341,14 @@ fun ScrollbarAdapter(
 private class ScrollableScrollbarAdapter(
     private val scrollState: ScrollState
 ) : ScrollbarAdapter {
-    override val scrollOffset: Float get() = scrollState.value
+    override val scrollOffset: Float get() = scrollState.value.toFloat()
 
     override suspend fun scrollTo(containerSize: Int, scrollOffset: Float) {
-        scrollState.scrollTo(scrollOffset)
+        scrollState.scrollTo(scrollOffset.roundToInt())
     }
 
     override fun maxScrollOffset(containerSize: Int) =
-        scrollState.maxValue
+        scrollState.maxValue.toFloat()
 }
 
 // TODO(demin): if item height is different then slider will have wrong

@@ -64,7 +64,7 @@ class NestedScrollerTestCase : ComposeTestCase, ToggleableTestCase {
     }
 
     override fun toggleState() {
-        runBlocking { scrollState.scrollTo(if (scrollState.value == 0f) 10f else 0f) }
+        runBlocking { scrollState.scrollTo(if (scrollState.value == 0) 10 else 0) }
     }
 
     @Composable
