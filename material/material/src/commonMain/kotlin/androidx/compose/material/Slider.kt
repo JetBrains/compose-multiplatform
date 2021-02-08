@@ -66,6 +66,7 @@ import androidx.compose.ui.semantics.setProgress
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.util.lerp
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.collect
@@ -152,7 +153,7 @@ fun Slider(
         }
 
         val press = if (enabled) {
-            Modifier.pointerInput(Unit) {
+            Modifier.pointerInput(position, interactionSource, maxPx, isRtl) {
                 detectTapGestures(
                     onPress = { pos ->
                         position.snapTo(if (isRtl) maxPx - pos.x else pos.x)
@@ -161,12 +162,16 @@ fun Slider(
                             launch {
                                 interactionSource.emit(interaction)
                             }
-                        }
-                        val success = tryAwaitRelease()
-                        if (success) gestureEndAction(0f)
-                        coroutineScope {
-                            launch {
-                                interactionSource.emit(PressInteraction.Release(interaction))
+                            try {
+                                val success = tryAwaitRelease()
+                                if (success) gestureEndAction(0f)
+                                launch {
+                                    interactionSource.emit(PressInteraction.Release(interaction))
+                                }
+                            } catch (c: CancellationException) {
+                                launch {
+                                    interactionSource.emit(PressInteraction.Cancel(interaction))
+                                }
                             }
                         }
                     }
