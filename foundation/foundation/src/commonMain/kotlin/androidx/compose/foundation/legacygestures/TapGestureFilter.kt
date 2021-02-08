@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package androidx.compose.ui.gesture
+package androidx.compose.foundation.legacygestures
 
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
@@ -64,7 +64,7 @@ import androidx.compose.ui.util.fastForEach
         "androidx.compose.foundation.gestures.detectTapGestures"
     )
 )
-fun Modifier.tapGestureFilter(
+internal fun Modifier.tapGestureFilter(
     onTap: (Offset) -> Unit
 ): Modifier = composed(
     inspectorInfo = debugInspectorInfo {
@@ -74,25 +74,6 @@ fun Modifier.tapGestureFilter(
 ) {
     val filter = remember { TapGestureFilter() }
     filter.onTap = onTap
-    TapPointerInputModifierImpl(filter)
-}
-
-/**
- * This is a special internal implementation of TapGestureFilter that does not consume changes.  It
- * is used so that root level elements in an instance of Compose can be notified that an unblocked
- * tap has occurred, without blocking other things that are higher up.
- */
-internal fun Modifier.noConsumptionTapGestureFilter(
-    onTap: (Offset) -> Unit
-): Modifier = composed(
-    inspectorInfo = debugInspectorInfo {
-        name = "noConsumptionTapGestureFilter"
-        this.properties["onTap"] = onTap
-    }
-) {
-    val filter = remember { TapGestureFilter() }
-    filter.onTap = onTap
-    filter.consumeChanges = false
     TapPointerInputModifierImpl(filter)
 }
 

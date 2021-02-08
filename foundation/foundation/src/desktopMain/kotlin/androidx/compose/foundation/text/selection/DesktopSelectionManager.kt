@@ -19,7 +19,7 @@
 package androidx.compose.foundation.text.selection
 
 import androidx.compose.ui.geometry.Offset
-import androidx.compose.ui.gesture.DragObserver
+import androidx.compose.foundation.legacygestures.DragObserver
 import androidx.compose.ui.layout.LayoutCoordinates
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.ExperimentalTextApi
