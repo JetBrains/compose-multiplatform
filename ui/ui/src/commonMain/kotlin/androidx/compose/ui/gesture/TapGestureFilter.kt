@@ -26,7 +26,7 @@ import androidx.compose.ui.input.pointer.PointerId
 import androidx.compose.ui.input.pointer.PointerInputChange
 import androidx.compose.ui.input.pointer.PointerInputFilter
 import androidx.compose.ui.input.pointer.PointerInputModifier
-import androidx.compose.ui.input.pointer.anyPositionChangeConsumed
+import androidx.compose.ui.input.pointer.positionChangeConsumed
 import androidx.compose.ui.input.pointer.changedToDown
 import androidx.compose.ui.input.pointer.changedToUp
 import androidx.compose.ui.input.pointer.changedToUpIgnoreConsumed
@@ -168,7 +168,7 @@ internal class TapGestureFilter : PointerInputFilter() {
 
         if (pass == PointerEventPass.Final && primed) {
 
-            val anyPositionChangeConsumed = changes.fastAny { it.anyPositionChangeConsumed() }
+            val anyPositionChangeConsumed = changes.fastAny { it.positionChangeConsumed() }
 
             val noPointersInBounds =
                 upBlockedPointers.isEmpty() && !changes.anyPointersInBounds(bounds)

@@ -25,7 +25,7 @@ import androidx.compose.ui.input.pointer.PointerEventPass
 import androidx.compose.ui.input.pointer.PointerInputChange
 import androidx.compose.ui.input.pointer.PointerInputFilter
 import androidx.compose.ui.input.pointer.PointerInputModifier
-import androidx.compose.ui.input.pointer.anyPositionChangeConsumed
+import androidx.compose.ui.input.pointer.positionChangeConsumed
 import androidx.compose.ui.input.pointer.changedToDown
 import androidx.compose.ui.input.pointer.changedToUpIgnoreConsumed
 import androidx.compose.ui.input.pointer.consumeDownChange
@@ -210,7 +210,7 @@ internal class PressIndicatorGestureFilter : PointerInputFilter() {
         if (
             pass == PointerEventPass.Final &&
             state == State.Started &&
-            changes.fastAny { it.anyPositionChangeConsumed() }
+            changes.fastAny { it.positionChangeConsumed() }
         ) {
             // On the final pass, if we have started and any of the changes had consumed
             // position changes, we cancel.

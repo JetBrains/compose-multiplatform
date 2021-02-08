@@ -24,7 +24,7 @@ import androidx.compose.ui.geometry.MutableRect
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Rect
 import androidx.compose.ui.geometry.toRect
-import androidx.compose.ui.gesture.nestedscroll.NestedScrollDelegatingWrapper
+import androidx.compose.ui.input.nestedscroll.NestedScrollDelegatingWrapper
 import androidx.compose.ui.graphics.Canvas
 import androidx.compose.ui.graphics.GraphicsLayerScope
 import androidx.compose.ui.graphics.Matrix

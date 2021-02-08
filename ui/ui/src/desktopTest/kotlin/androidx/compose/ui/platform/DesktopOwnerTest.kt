@@ -40,11 +40,11 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clipToBounds
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
-import androidx.compose.ui.gesture.scrollorientationlocking.Orientation
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.input.mouse.MouseScrollEvent
 import androidx.compose.ui.input.mouse.MouseScrollUnit
+import androidx.compose.ui.input.mouse.MouseScrollOrientation
 import androidx.compose.ui.layout.Layout
 import androidx.compose.ui.test.junit4.DesktopScreenshotTestRule
 import androidx.compose.ui.unit.dp
@@ -307,7 +307,7 @@ class DesktopOwnerTest {
         owners.onMouseScroll(
             10,
             10,
-            MouseScrollEvent(MouseScrollUnit.Page(1f), Orientation.Vertical)
+            MouseScrollEvent(MouseScrollUnit.Page(1f), MouseScrollOrientation.Vertical)
         )
         awaitNextRender()
         screenshotRule.snap(surface, "frame2_onMouseScroll")
@@ -316,7 +316,7 @@ class DesktopOwnerTest {
         owners.onMouseScroll(
             10,
             10,
-            MouseScrollEvent(MouseScrollUnit.Page(10f), Orientation.Vertical)
+            MouseScrollEvent(MouseScrollUnit.Page(10f), MouseScrollOrientation.Vertical)
         )
         awaitNextRender()
         screenshotRule.snap(surface, "frame3_onMouseScroll")

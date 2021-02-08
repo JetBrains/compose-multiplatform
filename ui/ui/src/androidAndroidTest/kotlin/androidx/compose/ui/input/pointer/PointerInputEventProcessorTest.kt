@@ -16,7 +16,6 @@
 
 package androidx.compose.ui.input.pointer
 
-import androidx.compose.foundation.layout.offset
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.autofill.Autofill
@@ -437,7 +436,7 @@ class PointerInputEventProcessorTest {
             Offset(0f, 0f),
             true,
             consumed = ConsumedData(
-                positionChange = Offset(0f, 0f)
+                positionChange = false
             )
         )
         val expectedOutput = PointerInputChange(
@@ -449,7 +448,7 @@ class PointerInputEventProcessorTest {
             Offset(0f, 0f),
             true,
             consumed = ConsumedData(
-                positionChange = Offset(13f, 0f)
+                positionChange = true
             )
         )
 
@@ -460,7 +459,7 @@ class PointerInputEventProcessorTest {
                     pointerEvent
                         .changes
                         .first()
-                        .consumePositionChange(13f, 0f)
+                        .consumePositionChange()
                 }
             }
         )
@@ -2891,7 +2890,7 @@ class PointerInputEventProcessorTest {
                 pointerEventHandler = { pointerEvent, pass, _ ->
                     if (pass == PointerEventPass.Initial) {
                         pointerEvent.changes.forEach {
-                            it.consumePositionChange(1f, 0f)
+                            it.consumePositionChange()
                         }
                     }
                 }

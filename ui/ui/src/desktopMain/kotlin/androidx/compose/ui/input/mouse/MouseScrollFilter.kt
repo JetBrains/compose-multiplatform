@@ -20,7 +20,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.composed
 import androidx.compose.ui.input.pointer.PointerInputModifier
-import androidx.compose.ui.gesture.scrollorientationlocking.Orientation
 import androidx.compose.ui.input.pointer.PointerEvent
 import androidx.compose.ui.input.pointer.PointerEventPass
 import androidx.compose.ui.input.pointer.PointerInputFilter
@@ -69,7 +68,7 @@ class MouseScrollEvent(
      * Up/down wheel scrolling causes events in vertical orientation.
      * Left/right wheel scrolling causes events in horizontal orientation.
      */
-    val orientation: Orientation
+    val orientation: MouseScrollOrientation
 )
 
 /**
@@ -118,3 +117,7 @@ internal class MouseScrollEventFilter : PointerInputFilter() {
 private data class MousePointerInputModifierImpl(
     override val pointerInputFilter: PointerInputFilter
 ) : PointerInputModifier
+
+enum class MouseScrollOrientation {
+    Vertical, Horizontal
+}

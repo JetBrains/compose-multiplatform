@@ -475,15 +475,9 @@ class HitPathTrackerTest {
         val log = mutableListOf<LogEntry>()
         val pif1 = PointerInputFilterMock(
             log = log,
-            pointerEventHandler = { pointerEvent, pass, _ ->
+            pointerEventHandler = { pointerEvent, _, _ ->
                 pointerEvent.changes.map {
-                    val yConsume =
-                        when (pass) {
-                            PointerEventPass.Initial -> 1f
-                            PointerEventPass.Main -> 6f
-                            else -> 0f
-                        }
-                    it.consumePositionChange(0f, yConsume)
+                    it.consumePositionChange()
                 }
                 pointerEvent.changes
             }
@@ -491,15 +485,9 @@ class HitPathTrackerTest {
 
         val pif2 = PointerInputFilterMock(
             log = log,
-            pointerEventHandler = { pointerEvent, pass, _ ->
+            pointerEventHandler = { pointerEvent, _, _ ->
                 pointerEvent.changes.map {
-                    val yConsume =
-                        when (pass) {
-                            PointerEventPass.Initial -> 2f
-                            PointerEventPass.Main -> 5f
-                            else -> 0f
-                        }
-                    it.consumePositionChange(0f, yConsume)
+                    it.consumePositionChange()
                 }
                 pointerEvent.changes
             }
@@ -507,15 +495,9 @@ class HitPathTrackerTest {
 
         val pif3 = PointerInputFilterMock(
             log = log,
-            pointerEventHandler = { pointerEvent, pass, _ ->
+            pointerEventHandler = { pointerEvent, _, _ ->
                 pointerEvent.changes.map {
-                    val yConsume =
-                        when (pass) {
-                            PointerEventPass.Initial -> 3f
-                            PointerEventPass.Main -> 4f
-                            else -> 0f
-                        }
-                    it.consumePositionChange(0f, yConsume)
+                    it.consumePositionChange()
                 }
                 pointerEvent.changes
             }
@@ -524,6 +506,7 @@ class HitPathTrackerTest {
         hitPathTracker.addHitPath(PointerId(13), listOf(pif1, pif2, pif3))
         val actualChange = down(13).moveTo(10, 0f, 0f)
         val expectedChange = actualChange.deepCopy()
+        val consumedExpectedChange = actualChange.deepCopy().apply { consumePositionChange() }
 
         val (result, _) = hitPathTracker.dispatchChanges(internalPointerEventOf(actualChange))
 
@@ -541,7 +524,7 @@ class HitPathTrackerTest {
             .assertThat(log1[1].pointerEvent)
             .isStructurallyEqualTo(
                 pointerEventOf(
-                    expectedChange.apply { consumePositionChange(0f, 1f) }
+                    consumedExpectedChange
                 )
             )
         assertThat(log1[1].pass).isEqualTo(PointerEventPass.Initial)
@@ -551,7 +534,7 @@ class HitPathTrackerTest {
             .assertThat(log1[2].pointerEvent)
             .isStructurallyEqualTo(
                 pointerEventOf(
-                    expectedChange.apply { consumePositionChange(0f, 2f) }
+                    consumedExpectedChange
                 )
             )
         assertThat(log1[2].pass).isEqualTo(PointerEventPass.Initial)
@@ -561,7 +544,7 @@ class HitPathTrackerTest {
             .assertThat(log1[3].pointerEvent)
             .isStructurallyEqualTo(
                 pointerEventOf(
-                    expectedChange.apply { consumePositionChange(0f, 3f) }
+                    consumedExpectedChange
                 )
             )
         assertThat(log1[3].pass).isEqualTo(PointerEventPass.Main)
@@ -571,7 +554,7 @@ class HitPathTrackerTest {
             .assertThat(log1[4].pointerEvent)
             .isStructurallyEqualTo(
                 pointerEventOf(
-                    expectedChange.apply { consumePositionChange(0f, 4f) }
+                    consumedExpectedChange
                 )
             )
         assertThat(log1[4].pass).isEqualTo(PointerEventPass.Main)
@@ -581,7 +564,7 @@ class HitPathTrackerTest {
             .assertThat(log1[5].pointerEvent)
             .isStructurallyEqualTo(
                 pointerEventOf(
-                    expectedChange.apply { consumePositionChange(0f, 5f) }
+                    consumedExpectedChange
                 )
             )
         assertThat(log1[5].pass).isEqualTo(PointerEventPass.Main)
@@ -589,7 +572,7 @@ class HitPathTrackerTest {
         PointerInputChangeSubject
             .assertThat(result.changes.values.first())
             .isStructurallyEqualTo(
-                expectedChange.apply { consumePositionChange(0f, 6f) }
+                consumedExpectedChange
             )
     }
 
@@ -599,15 +582,9 @@ class HitPathTrackerTest {
         val pif1 = PointerInputFilterMock(
             log = log,
             pointerEventHandler =
-                { pointerEvent, pass, _ ->
+                { pointerEvent, _, _ ->
                     pointerEvent.changes.map {
-                        val yConsume =
-                            when (pass) {
-                                PointerEventPass.Initial -> 1f
-                                PointerEventPass.Main -> 4f
-                                else -> 0f
-                            }
-                        it.consumePositionChange(0f, yConsume)
+                        it.consumePositionChange()
                     }
                     pointerEvent.changes
                 }
@@ -615,15 +592,9 @@ class HitPathTrackerTest {
         val pif2 = PointerInputFilterMock(
             log = log,
             pointerEventHandler =
-                { pointerEvent, pass, _ ->
+                { pointerEvent, _, _ ->
                     pointerEvent.changes.map {
-                        val yConsume =
-                            when (pass) {
-                                PointerEventPass.Initial -> 2f
-                                PointerEventPass.Main -> 3f
-                                else -> 0f
-                            }
-                        it.consumePositionChange(0f, yConsume)
+                        it.consumePositionChange()
                     }
                     pointerEvent.changes
                 }
@@ -631,15 +602,9 @@ class HitPathTrackerTest {
         val pif3 = PointerInputFilterMock(
             log = log,
             pointerEventHandler =
-                { pointerEvent, pass, _ ->
+                { pointerEvent, _, _ ->
                     pointerEvent.changes.map {
-                        val yConsume =
-                            when (pass) {
-                                PointerEventPass.Initial -> -1f
-                                PointerEventPass.Main -> -4f
-                                else -> 0f
-                            }
-                        it.consumePositionChange(0f, yConsume)
+                        it.consumeAllChanges()
                     }
                     pointerEvent.changes
                 }
@@ -647,25 +612,21 @@ class HitPathTrackerTest {
         val pif4 = PointerInputFilterMock(
             log = log,
             pointerEventHandler =
-                { pointerEvent, pass, _ ->
+                { pointerEvent, _, _ ->
                     pointerEvent.changes.map {
-                        val yConsume =
-                            when (pass) {
-                                PointerEventPass.Initial -> -2f
-                                PointerEventPass.Main -> -3f
-                                else -> 0f
-                            }
-                        it.consumePositionChange(0f, yConsume)
+                        it.consumeAllChanges()
                     }
                     pointerEvent.changes
                 }
         )
         hitPathTracker.addHitPath(PointerId(3), listOf(pif1, pif2))
         hitPathTracker.addHitPath(PointerId(5), listOf(pif3, pif4))
-        val actualEvent1 = down(3).moveTo(10, 0f, 0f)
-        val actualEvent2 = down(5).moveTo(10, 0f, 0f)
+        val actualEvent1 = down(3).moveTo(10, 0f, 30f)
+        val actualEvent2 = down(5).moveTo(10, 0f, 30f)
         val expectedEvent1 = actualEvent1.deepCopy()
         val expectedEvent2 = actualEvent2.deepCopy()
+        val consumedExpectedEvent1 = expectedEvent1.deepCopy().apply { consumePositionChange() }
+        val consumedExpectedEvent2 = expectedEvent2.deepCopy().apply { consumePositionChange() }
 
         val (result, _) = hitPathTracker.dispatchChanges(
             internalPointerEventOf(actualEvent1, actualEvent2)
@@ -690,7 +651,7 @@ class HitPathTrackerTest {
             .assertThat(log1[1].pointerEvent)
             .isStructurallyEqualTo(
                 pointerEventOf(
-                    expectedEvent1.apply { consumePositionChange(0f, 1f) }
+                    consumedExpectedEvent1
                 )
             )
         assertThat(log1[1].pass).isEqualTo(PointerEventPass.Initial)
@@ -700,7 +661,7 @@ class HitPathTrackerTest {
             .assertThat(log1[2].pointerEvent)
             .isStructurallyEqualTo(
                 pointerEventOf(
-                    expectedEvent1.apply { consumePositionChange(0f, 2f) }
+                    consumedExpectedEvent1
                 )
             )
         assertThat(log1[2].pass).isEqualTo(PointerEventPass.Main)
@@ -710,7 +671,7 @@ class HitPathTrackerTest {
             .assertThat(log1[3].pointerEvent)
             .isStructurallyEqualTo(
                 pointerEventOf(
-                    expectedEvent1.apply { consumePositionChange(0f, 3f) }
+                    consumedExpectedEvent1
                 )
             )
         assertThat(log1[3].pass).isEqualTo(PointerEventPass.Main)
@@ -726,7 +687,7 @@ class HitPathTrackerTest {
             .assertThat(log2[1].pointerEvent)
             .isStructurallyEqualTo(
                 pointerEventOf(
-                    expectedEvent2.apply { consumePositionChange(0f, -1f) }
+                    consumedExpectedEvent2
                 )
             )
         assertThat(log2[1].pass).isEqualTo(PointerEventPass.Initial)
@@ -736,7 +697,7 @@ class HitPathTrackerTest {
             .assertThat(log2[2].pointerEvent)
             .isStructurallyEqualTo(
                 pointerEventOf(
-                    expectedEvent2.apply { consumePositionChange(0f, -2f) }
+                    consumedExpectedEvent2
                 )
             )
         assertThat(log2[2].pass).isEqualTo(PointerEventPass.Main)
@@ -746,7 +707,7 @@ class HitPathTrackerTest {
             .assertThat(log2[3].pointerEvent)
             .isStructurallyEqualTo(
                 pointerEventOf(
-                    expectedEvent2.apply { consumePositionChange(0f, -3f) }
+                    consumedExpectedEvent2
                 )
             )
         assertThat(log2[3].pass).isEqualTo(PointerEventPass.Main)
@@ -755,12 +716,12 @@ class HitPathTrackerTest {
         PointerInputChangeSubject
             .assertThat(result.changes[actualEvent1.id])
             .isStructurallyEqualTo(
-                expectedEvent1.apply { consumePositionChange(0f, 4f) }
+                consumedExpectedEvent1
             )
         PointerInputChangeSubject
             .assertThat(result.changes[actualEvent2.id])
             .isStructurallyEqualTo(
-                expectedEvent2.apply { consumePositionChange(0f, -4f) }
+                consumedExpectedEvent2
             )
     }
 
@@ -770,18 +731,9 @@ class HitPathTrackerTest {
         val parent = PointerInputFilterMock(
             log = log,
             pointerEventHandler =
-                { pointerEvent, pass, _ ->
+                { pointerEvent, _, _ ->
                     pointerEvent.changes.map {
-                        val yConsume =
-                            when (pass) {
-                                PointerEventPass.Initial -> 1f
-                                PointerEventPass.Main -> 10f
-                                else -> 0f
-                            }
-                        it.consumePositionChange(
-                            0f,
-                            yConsume
-                        )
+                        it.consumePositionChange()
                     }
                     pointerEvent.changes
                 }
@@ -790,18 +742,9 @@ class HitPathTrackerTest {
         val child1 = PointerInputFilterMock(
             log = log,
             pointerEventHandler =
-                { pointerEvent, pass, _ ->
+                { pointerEvent, _, _ ->
                     pointerEvent.changes.map {
-                        val yConsume =
-                            when (pass) {
-                                PointerEventPass.Initial -> 2f
-                                PointerEventPass.Main -> 20f
-                                else -> 0f
-                            }
-                        it.consumePositionChange(
-                            0f,
-                            yConsume
-                        )
+                        it.consumePositionChange()
                     }
                     pointerEvent.changes
                 }
@@ -810,18 +753,9 @@ class HitPathTrackerTest {
         val child2 = PointerInputFilterMock(
             log = log,
             pointerEventHandler =
-                { pointerEvent, pass, _ ->
+                { pointerEvent, _, _ ->
                     pointerEvent.changes.map {
-                        val yConsume =
-                            when (pass) {
-                                PointerEventPass.Initial -> 4f
-                                PointerEventPass.Main -> 40f
-                                else -> 0f
-                            }
-                        it.consumePositionChange(
-                            0f,
-                            yConsume
-                        )
+                        it.consumePositionChange()
                     }
                     pointerEvent.changes
                 }
@@ -829,10 +763,12 @@ class HitPathTrackerTest {
 
         hitPathTracker.addHitPath(PointerId(3), listOf(parent, child1))
         hitPathTracker.addHitPath(PointerId(5), listOf(parent, child2))
-        val actualEvent1 = down(3).moveTo(10, 0f, 0f)
-        val actualEvent2 = down(5).moveTo(10, 0f, 0f)
+        val actualEvent1 = down(3).moveTo(10, 0f, 30f)
+        val actualEvent2 = down(5).moveTo(10, 0f, 30f)
         val expectedEvent1 = actualEvent1.deepCopy()
         val expectedEvent2 = actualEvent2.deepCopy()
+        val consumedEvent1 = expectedEvent1.deepCopy().apply { consumePositionChange() }
+        val consumedEvent2 = expectedEvent2.deepCopy().apply { consumePositionChange() }
 
         val (result, _) = hitPathTracker.dispatchChanges(
             internalPointerEventOf(actualEvent1, actualEvent2)
@@ -851,9 +787,7 @@ class HitPathTrackerTest {
         PointerEventSubject
             .assertThat(log1[1].pointerEvent)
             .isStructurallyEqualTo(
-                pointerEventOf(
-                    expectedEvent1.apply { consumePositionChange(0f, 1f) }
-                )
+                pointerEventOf(consumedEvent1)
             )
         assertThat(log1[1].pass).isEqualTo(PointerEventPass.Initial)
 
@@ -861,9 +795,7 @@ class HitPathTrackerTest {
         PointerEventSubject
             .assertThat(log1[2].pointerEvent)
             .isStructurallyEqualTo(
-                pointerEventOf(
-                    expectedEvent1.apply { consumePositionChange(0f, 2f) }
-                )
+                pointerEventOf(consumedEvent1)
             )
         assertThat(log1[2].pass).isEqualTo(PointerEventPass.Main)
 
@@ -871,9 +803,7 @@ class HitPathTrackerTest {
         PointerEventSubject
             .assertThat(log1[3].pointerEvent)
             .isStructurallyEqualTo(
-                pointerEventOf(
-                    expectedEvent2.apply { consumePositionChange(0f, 1f) }
-                )
+                pointerEventOf(consumedEvent2)
             )
         assertThat(log1[3].pass).isEqualTo(PointerEventPass.Initial)
 
@@ -881,9 +811,7 @@ class HitPathTrackerTest {
         PointerEventSubject
             .assertThat(log1[4].pointerEvent)
             .isStructurallyEqualTo(
-                pointerEventOf(
-                    expectedEvent2.apply { consumePositionChange(0f, 4f) }
-                )
+                pointerEventOf(consumedEvent2)
             )
         assertThat(log1[4].pass).isEqualTo(PointerEventPass.Main)
 
@@ -891,24 +819,18 @@ class HitPathTrackerTest {
         PointerEventSubject
             .assertThat(log1[5].pointerEvent)
             .isStructurallyEqualTo(
-                pointerEventOf(
-                    expectedEvent1.apply { consumePositionChange(0f, 20f) },
-                    expectedEvent2.apply { consumePositionChange(0f, 40f) }
-                )
+                pointerEventOf(consumedEvent1, consumedEvent2)
             )
         assertThat(log1[5].pass).isEqualTo(PointerEventPass.Main)
 
         assertThat(result.changes).hasSize(2)
         PointerInputChangeSubject
             .assertThat(result.changes[actualEvent1.id])
-            .isStructurallyEqualTo(
-                expectedEvent1.apply { consumePositionChange(0f, 10f) }
-            )
+            .isStructurallyEqualTo(consumedEvent1)
+
         PointerInputChangeSubject
             .assertThat(result.changes[actualEvent2.id])
-            .isStructurallyEqualTo(
-                expectedEvent2.apply { consumePositionChange(0f, 10f) }
-            )
+            .isStructurallyEqualTo(consumedEvent2)
     }
 
     @Test
@@ -917,18 +839,9 @@ class HitPathTrackerTest {
         val child1 = PointerInputFilterMock(
             log = log,
             pointerEventHandler =
-                { pointerEvent, pass, _ ->
+                { pointerEvent, _, _ ->
                     pointerEvent.changes.map {
-                        val yConsume =
-                            when (pass) {
-                                PointerEventPass.Initial -> 1f
-                                PointerEventPass.Main -> 4f
-                                else -> 0f
-                            }
-                        it.consumePositionChange(
-                            0f,
-                            yConsume
-                        )
+                        it.consumePositionChange()
                     }
                     pointerEvent.changes
                 }
@@ -936,18 +849,9 @@ class HitPathTrackerTest {
         val child2 = PointerInputFilterMock(
             log = log,
             pointerEventHandler =
-                { pointerEvent, pass, _ ->
+                { pointerEvent, _, _ ->
                     pointerEvent.changes.map {
-                        val yConsume =
-                            when (pass) {
-                                PointerEventPass.Initial -> 2f
-                                PointerEventPass.Main -> 3f
-                                else -> 0f
-                            }
-                        it.consumePositionChange(
-                            0f,
-                            yConsume
-                        )
+                        it.consumePositionChange()
                     }
                     pointerEvent.changes
                 }
@@ -959,6 +863,8 @@ class HitPathTrackerTest {
         val actualEvent2 = down(5).moveTo(10, 0f, 0f)
         val expectedEvent1 = actualEvent1.deepCopy()
         val expectedEvent2 = actualEvent2.deepCopy()
+        val consumedEvent1 = expectedEvent1.deepCopy().apply { consumePositionChange() }
+        val consumedEvent2 = expectedEvent2.deepCopy().apply { consumePositionChange() }
 
         val (result, _) = hitPathTracker.dispatchChanges(
             internalPointerEventOf(actualEvent1, actualEvent2)
@@ -978,8 +884,8 @@ class HitPathTrackerTest {
             .assertThat(log1[1].pointerEvent)
             .isStructurallyEqualTo(
                 pointerEventOf(
-                    expectedEvent1.apply { consumePositionChange(0f, 1f) },
-                    expectedEvent2.apply { consumePositionChange(0f, 1f) }
+                    consumedEvent1,
+                    consumedEvent2
                 )
             )
         assertThat(log1[1].pass).isEqualTo(PointerEventPass.Initial)
@@ -989,8 +895,8 @@ class HitPathTrackerTest {
             .assertThat(log1[2].pointerEvent)
             .isStructurallyEqualTo(
                 pointerEventOf(
-                    expectedEvent1.apply { consumePositionChange(0f, 2f) },
-                    expectedEvent2.apply { consumePositionChange(0f, 2f) }
+                    consumedEvent1,
+                    consumedEvent2
                 )
             )
         assertThat(log1[2].pass).isEqualTo(PointerEventPass.Main)
@@ -1000,8 +906,8 @@ class HitPathTrackerTest {
             .assertThat(log1[3].pointerEvent)
             .isStructurallyEqualTo(
                 pointerEventOf(
-                    expectedEvent1.apply { consumePositionChange(0f, 3f) },
-                    expectedEvent2.apply { consumePositionChange(0f, 3f) }
+                    consumedEvent1,
+                    consumedEvent2
                 )
             )
         assertThat(log1[3].pass).isEqualTo(PointerEventPass.Main)
@@ -1010,12 +916,12 @@ class HitPathTrackerTest {
         PointerInputChangeSubject
             .assertThat(result.changes[actualEvent1.id])
             .isStructurallyEqualTo(
-                expectedEvent1.apply { consumePositionChange(0f, 4f) }
+                consumedEvent1
             )
         PointerInputChangeSubject
             .assertThat(result.changes[actualEvent2.id])
             .isStructurallyEqualTo(
-                expectedEvent2.apply { consumePositionChange(0f, 4f) }
+                consumedEvent2
             )
     }
 

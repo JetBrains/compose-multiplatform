@@ -20,7 +20,7 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.input.pointer.PointerEvent
 import androidx.compose.ui.input.pointer.PointerInputChange
 import androidx.compose.ui.input.pointer.PointerInputScope
-import androidx.compose.ui.input.pointer.anyPositionChangeConsumed
+import androidx.compose.ui.input.pointer.positionChangeConsumed
 import androidx.compose.ui.input.pointer.consumeAllChanges
 import androidx.compose.ui.input.pointer.positionChanged
 import androidx.compose.ui.util.fastAny
@@ -63,7 +63,7 @@ suspend fun PointerInputScope.detectTransformGestures(
             awaitFirstDown(requireUnconsumed = false)
             do {
                 val event = awaitPointerEvent()
-                val canceled = event.changes.fastAny { it.anyPositionChangeConsumed() }
+                val canceled = event.changes.fastAny { it.positionChangeConsumed() }
                 if (!canceled) {
                     val zoomChange = event.calculateZoom()
                     val rotationChange = event.calculateRotation()

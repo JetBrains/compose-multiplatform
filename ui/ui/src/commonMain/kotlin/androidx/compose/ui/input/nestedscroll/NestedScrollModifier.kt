@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package androidx.compose.ui.gesture.nestedscroll
+package androidx.compose.ui.input.nestedscroll
 
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope

@@ -17,7 +17,7 @@
 package androidx.compose.ui.test.util
 
 import androidx.compose.ui.geometry.Offset
-import androidx.compose.ui.gesture.util.VelocityTracker
+import androidx.compose.ui.input.pointer.util.VelocityTracker
 import androidx.compose.ui.input.pointer.PointerEvent
 import androidx.compose.ui.input.pointer.PointerEventPass
 import androidx.compose.ui.input.pointer.PointerId

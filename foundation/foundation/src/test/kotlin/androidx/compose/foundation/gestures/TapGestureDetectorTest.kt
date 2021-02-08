@@ -323,7 +323,7 @@ class TapGestureDetectorTest {
     fun consumedMotionTap() = util.executeInComposition {
         down(5f, 5f)
             .moveTo(6f, 2f) {
-                consumePositionChange(1f, -3f)
+                consumePositionChange()
             }
             .up(50)
 
@@ -374,7 +374,7 @@ class TapGestureDetectorTest {
         val down2 = down(9f, 5f)
 
         val up = down.moveTo(5f, 5f) {
-            consumePositionChange(4f, 4f)
+            consumePositionChange()
         }.up()
         assertFalse(up.consumed.downChange)
 
