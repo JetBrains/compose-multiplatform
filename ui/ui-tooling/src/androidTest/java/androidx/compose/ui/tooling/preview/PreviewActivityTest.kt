@@ -18,13 +18,11 @@ package androidx.compose.ui.tooling.preview
 
 import android.content.Intent
 import android.view.ViewGroup
-import androidx.test.filters.MediumTest
 import com.google.common.truth.Truth.assertThat
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 
-@MediumTest
 class PreviewActivityTest {
     @Suppress("DEPRECATION")
     @get:Rule
