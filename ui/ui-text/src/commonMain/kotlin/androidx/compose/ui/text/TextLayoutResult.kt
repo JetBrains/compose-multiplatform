@@ -165,7 +165,7 @@ class TextLayoutInput(
 /**
  * The data class which holds text layout result.
  */
-class TextLayoutResult internal constructor(
+class TextLayoutResult constructor(
     /**
      * The parameters used for computing this text layout result.
      */
@@ -175,9 +175,8 @@ class TextLayoutResult internal constructor(
      * The multi paragraph object.
      *
      * This is the result of the text layout computation.
-     * This is expected to be used only for drawing from TextDelegate class.
      */
-    internal val multiParagraph: MultiParagraph,
+    val multiParagraph: MultiParagraph,
 
     /**
      * The amount of space required to paint this text in Int.

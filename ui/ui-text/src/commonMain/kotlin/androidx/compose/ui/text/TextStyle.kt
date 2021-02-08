@@ -394,10 +394,8 @@ fun resolveDefaults(style: TextStyle, direction: LayoutDirection) = TextStyle(
 )
 
 /**
- * If [textDirection] is null returns a [TextDirection] based on
- * [layoutDirection].
+ * If [textDirection] is null returns a [TextDirection] based on [layoutDirection].
  */
-/*@VisibleForTesting*/
 internal fun resolveTextDirection(
     layoutDirection: LayoutDirection,
     textDirection: TextDirection?

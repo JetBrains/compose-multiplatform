@@ -14,13 +14,17 @@
  * limitations under the License.
  */
 
-package androidx.compose.ui.text
+package androidx.compose.foundation.text
 
+import androidx.compose.foundation.text.matchers.isZero
+import androidx.compose.foundation.text.selection.BASIC_MEASURE_FONT
+import androidx.compose.foundation.text.selection.TestFontResourceLoader
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Canvas
-import androidx.compose.ui.text.FontTestData.Companion.BASIC_MEASURE_FONT
+import androidx.compose.ui.text.AnnotatedString
+import androidx.compose.ui.text.SpanStyle
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.toFontFamily
-import androidx.compose.ui.text.matchers.isZero
 import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.LayoutDirection
@@ -33,7 +37,7 @@ import org.junit.runner.RunWith
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import kotlin.math.floor
 
-@OptIn(InternalTextApi::class)
+@OptIn(InternalFoundationTextApi::class)
 @RunWith(AndroidJUnit4::class)
 @SmallTest
 class TextLayoutResultIntegrationTest {

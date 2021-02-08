@@ -31,13 +31,13 @@ import androidx.compose.ui.geometry.Rect
 import androidx.compose.foundation.legacygestures.DragObserver
 import androidx.compose.foundation.legacygestures.LongPressDragObserver
 import androidx.compose.foundation.legacygestures.dragGestureFilter
+import androidx.compose.foundation.text.InternalFoundationTextApi
 import androidx.compose.ui.hapticfeedback.HapticFeedback
 import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.platform.ClipboardManager
 import androidx.compose.ui.platform.TextToolbar
 import androidx.compose.ui.platform.TextToolbarStatus
 import androidx.compose.ui.text.AnnotatedString
-import androidx.compose.ui.text.InternalTextApi
 import androidx.compose.ui.text.TextRange
 import androidx.compose.ui.text.input.OffsetMapping
 import androidx.compose.ui.text.input.PasswordVisualTransformation
@@ -494,7 +494,7 @@ internal class TextFieldSelectionManager {
      * line, and the bottom is the bottom of the last selected line. The left is the leftmost
      * handle's horizontal coordinates, and the right is the rightmost handle's coordinates.
      */
-    @OptIn(InternalTextApi::class)
+    @OptIn(InternalFoundationTextApi::class)
     private fun getContentRect(): Rect {
         state?.let {
             val startOffset =

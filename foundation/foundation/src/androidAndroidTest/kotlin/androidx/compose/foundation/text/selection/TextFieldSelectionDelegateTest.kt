@@ -17,11 +17,11 @@
 package androidx.compose.foundation.text.selection
 
 import androidx.activity.ComponentActivity
+import androidx.compose.foundation.text.InternalFoundationTextApi
+import androidx.compose.foundation.text.TextDelegate
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
 import androidx.compose.ui.text.AnnotatedString
-import androidx.compose.ui.text.InternalTextApi
 import androidx.compose.ui.text.SpanStyle
-import androidx.compose.ui.text.TextDelegate
 import androidx.compose.ui.text.TextLayoutResult
 import androidx.compose.ui.text.TextRange
 import androidx.compose.ui.text.TextStyle
@@ -34,12 +34,11 @@ import androidx.compose.ui.unit.sp
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.SmallTest
 import androidx.test.platform.app.InstrumentationRegistry
-import com.google.common.truth.Truth
+import com.google.common.truth.Truth.assertThat
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 
-@OptIn(InternalTextApi::class)
 @RunWith(AndroidJUnit4::class)
 @SmallTest
 class TextFieldSelectionDelegateTest {
@@ -74,8 +73,8 @@ class TextFieldSelectionDelegateTest {
         )
 
         // Assert.
-        Truth.assertThat(range.start).isEqualTo(0)
-        Truth.assertThat(range.end).isEqualTo("hello".length)
+        assertThat(range.start).isEqualTo(0)
+        assertThat(range.end).isEqualTo("hello".length)
     }
 
     @Test
@@ -101,8 +100,8 @@ class TextFieldSelectionDelegateTest {
         )
 
         // Assert.
-        Truth.assertThat(range.start).isEqualTo(text.indexOf("\u05D3"))
-        Truth.assertThat(range.end).isEqualTo(text.indexOf("\u05D5") + 1)
+        assertThat(range.start).isEqualTo(text.indexOf("\u05D3"))
+        assertThat(range.end).isEqualTo(text.indexOf("\u05D5") + 1)
     }
 
     @Test
@@ -131,8 +130,8 @@ class TextFieldSelectionDelegateTest {
         )
 
         // Assert.
-        Truth.assertThat(range.start).isEqualTo(0)
-        Truth.assertThat(range.end).isEqualTo(text.length)
+        assertThat(range.start).isEqualTo(0)
+        assertThat(range.end).isEqualTo(text.length)
     }
 
     @Test
@@ -161,8 +160,8 @@ class TextFieldSelectionDelegateTest {
         )
 
         // Assert.
-        Truth.assertThat(range.start).isEqualTo(text.length)
-        Truth.assertThat(range.end).isEqualTo(0)
+        assertThat(range.start).isEqualTo(text.length)
+        assertThat(range.end).isEqualTo(0)
     }
 
     @Test
@@ -192,8 +191,8 @@ class TextFieldSelectionDelegateTest {
         )
 
         // Assert.
-        Truth.assertThat(range.start).isEqualTo(startOffset)
-        Truth.assertThat(range.end).isEqualTo(endOffset)
+        assertThat(range.start).isEqualTo(startOffset)
+        assertThat(range.end).isEqualTo(endOffset)
     }
 
     @Test
@@ -223,8 +222,8 @@ class TextFieldSelectionDelegateTest {
         )
 
         // Assert.
-        Truth.assertThat(range.start).isEqualTo(startOffset)
-        Truth.assertThat(range.end).isEqualTo(endOffset)
+        assertThat(range.start).isEqualTo(startOffset)
+        assertThat(range.end).isEqualTo(endOffset)
     }
 
     @Test
@@ -256,8 +255,8 @@ class TextFieldSelectionDelegateTest {
         )
 
         // Assert.
-        Truth.assertThat(range.start).isEqualTo(startOffset)
-        Truth.assertThat(range.end).isEqualTo(endOffset)
+        assertThat(range.start).isEqualTo(startOffset)
+        assertThat(range.end).isEqualTo(endOffset)
     }
 
     @Test
@@ -287,8 +286,8 @@ class TextFieldSelectionDelegateTest {
         )
 
         // Assert.
-        Truth.assertThat(range.start).isEqualTo(startOffset)
-        Truth.assertThat(range.end).isEqualTo(endOffset)
+        assertThat(range.start).isEqualTo(startOffset)
+        assertThat(range.end).isEqualTo(endOffset)
     }
 
     @Test
@@ -318,8 +317,8 @@ class TextFieldSelectionDelegateTest {
         )
 
         // Assert.
-        Truth.assertThat(range.start).isEqualTo(startOffset)
-        Truth.assertThat(range.end).isEqualTo(endOffset)
+        assertThat(range.start).isEqualTo(startOffset)
+        assertThat(range.end).isEqualTo(endOffset)
     }
 
     @Test
@@ -351,10 +350,11 @@ class TextFieldSelectionDelegateTest {
         )
 
         // Assert.
-        Truth.assertThat(range.start).isEqualTo(startOffset)
-        Truth.assertThat(range.end).isEqualTo(endOffset)
+        assertThat(range.start).isEqualTo(startOffset)
+        assertThat(range.end).isEqualTo(endOffset)
     }
 
+    @OptIn(InternalFoundationTextApi::class)
     private fun simpleTextLayout(
         text: String = "",
         fontSize: TextUnit = TextUnit.Unspecified,

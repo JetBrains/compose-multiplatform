@@ -26,7 +26,6 @@ import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.InternalTextApi
 import androidx.compose.ui.text.MultiParagraphIntrinsics
 import androidx.compose.ui.text.SpanStyle
-import androidx.compose.ui.text.TextDelegate
 import androidx.compose.ui.text.TextLayoutResult
 import androidx.compose.ui.text.TextRange
 import androidx.compose.ui.text.input.EditProcessor
@@ -56,7 +55,7 @@ import org.junit.Test
 import org.junit.runner.RunWith
 import org.junit.runners.JUnit4
 
-@OptIn(InternalTextApi::class)
+@OptIn(InternalTextApi::class, InternalFoundationTextApi::class)
 @RunWith(JUnit4::class)
 class TextFieldDelegateTest {
 

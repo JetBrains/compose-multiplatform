@@ -578,6 +578,9 @@ package androidx.compose.foundation.text {
     method public static void appendInlineContent(androidx.compose.ui.text.AnnotatedString.Builder, String id, optional String alternateText);
   }
 
+  @kotlin.RequiresOptIn(message="Internal/Unstable API for use only between compose-ui modules sharing " + "the same exact version, subject to change without notice.") @kotlin.annotation.Target(allowedTargets={kotlin.annotation.AnnotationTarget, kotlin.annotation.AnnotationTarget, kotlin.annotation.AnnotationTarget, kotlin.annotation.AnnotationTarget, kotlin.annotation.AnnotationTarget}) public @interface InternalFoundationTextApi {
+  }
+
   public interface KeyboardActionScope {
     method public void defaultKeyboardAction(androidx.compose.ui.text.input.ImeAction imeAction);
   }
@@ -698,6 +701,13 @@ package androidx.compose.foundation.text.selection {
   }
 
   public final class TextSelectionDelegateKt {
+  }
+
+}
+
+package androidx.compose.ui.text {
+
+  public final class TextLayoutHelperKt {
   }
 
 }
