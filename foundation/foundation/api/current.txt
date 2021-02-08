@@ -1,6 +1,9 @@
 // Signature format: 4.0
 package androidx.compose.foundation {
 
+  public final class ActualJvmKt {
+  }
+
   public final class BackgroundKt {
     method public static androidx.compose.ui.Modifier background(androidx.compose.ui.Modifier, androidx.compose.ui.graphics.Brush brush, optional androidx.compose.ui.graphics.Shape shape, optional float alpha);
     method public static androidx.compose.ui.Modifier background-1xq40Q0(androidx.compose.ui.Modifier, long color, optional androidx.compose.ui.graphics.Shape shape);
