@@ -872,8 +872,7 @@ internal class SlotReader(
 /**
  * Information about groups and their keys.
  */
-@InternalComposeApi
-class KeyInfo internal constructor(
+internal class KeyInfo internal constructor(
     /**
      * The group key.
      */
