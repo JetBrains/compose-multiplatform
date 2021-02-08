@@ -67,9 +67,8 @@ import androidx.compose.ui.semantics.semantics
  * @param colorFilter Optional ColorFilter to apply for the [ImageBitmap] when it is rendered
  * onscreen
  */
-@Suppress("NOTHING_TO_INLINE")
 @Composable
-inline fun Image(
+fun Image(
     bitmap: ImageBitmap,
     contentDescription: String?,
     modifier: Modifier = Modifier,
@@ -112,9 +111,8 @@ inline fun Image(
  * @param colorFilter Optional ColorFilter to apply for the [ImageVector] when it is rendered
  * onscreen
  */
-@Suppress("NOTHING_TO_INLINE")
 @Composable
-inline fun Image(
+fun Image(
     imageVector: ImageVector,
     contentDescription: String?,
     modifier: Modifier = Modifier,
