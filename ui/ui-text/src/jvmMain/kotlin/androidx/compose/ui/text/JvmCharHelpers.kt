@@ -18,15 +18,13 @@ package androidx.compose.ui.text
 
 import java.text.BreakIterator
 
-@InternalTextApi
-actual fun String.findPrecedingBreak(index: Int): Int {
+internal actual fun String.findPrecedingBreak(index: Int): Int {
     val it = BreakIterator.getCharacterInstance()
     it.setText(this)
     return it.preceding(index)
 }
 
-@InternalTextApi
-actual fun String.findFollowingBreak(index: Int): Int {
+internal actual fun String.findFollowingBreak(index: Int): Int {
     val it = BreakIterator.getCharacterInstance()
     it.setText(this)
     return it.following(index)

@@ -82,8 +82,6 @@ package androidx.compose.ui.text {
   }
 
   public final class JvmCharHelpersKt {
-    method @androidx.compose.ui.text.InternalTextApi public static int findFollowingBreak(String, int index);
-    method @androidx.compose.ui.text.InternalTextApi public static int findPrecedingBreak(String, int index);
   }
 
   public final class MultiParagraph {

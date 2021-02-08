@@ -45,12 +45,8 @@ import androidx.compose.ui.window.PopupPositionProvider
 import kotlin.math.max
 import kotlin.math.roundToInt
 
-/**
- * @suppress
- */
-@InternalTextApi // Used by TextField Selection from foundation
 @Composable
-actual fun SelectionHandle(
+internal actual fun SelectionHandle(
     startHandlePosition: Offset?,
     endHandlePosition: Offset?,
     isStartHandle: Boolean,
@@ -77,10 +73,6 @@ actual fun SelectionHandle(
     }
 }
 
-/**
- * @suppress
- */
-@InternalTextApi // Used by TextField Selection from foundation
 @Composable
 /*@VisibleForTesting*/
 internal fun DefaultSelectionHandle(
