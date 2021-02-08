@@ -57,7 +57,7 @@ import androidx.constraintlayout.core.widgets.analyzer.BasicMeasure
 private const val DeprecationMessage = "ConstraintLayout was moved to the " +
     "androidx.constraintlayout library and will be " +
     "removed from androidx.compose.foundation.layout. You need to add a dependency on " +
-    "androidx.constraintlayout:constraintlayout-compose:1.0.0-alpha01"
+    "androidx.constraintlayout:constraintlayout-compose:1.0.0-alpha02"
 
 /**
  * Layout that positions its children according to the constraints between them.
