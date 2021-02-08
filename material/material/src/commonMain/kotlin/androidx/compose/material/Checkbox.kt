@@ -53,6 +53,7 @@ import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.state.ToggleableState
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.util.lerp
+import kotlin.math.floor
 
 /**
  * A component that represents two states (checked / unchecked).
@@ -276,7 +277,7 @@ private fun CheckboxImpl(
     val boxColor by colors.boxColor(enabled, value)
     val borderColor by colors.borderColor(enabled, value)
     Canvas(modifier.wrapContentSize(Alignment.Center).size(CheckboxSize)) {
-        val strokeWidthPx = StrokeWidth.toPx()
+        val strokeWidthPx = floor(StrokeWidth.toPx())
         drawBox(
             boxColor = boxColor,
             borderColor = borderColor,
