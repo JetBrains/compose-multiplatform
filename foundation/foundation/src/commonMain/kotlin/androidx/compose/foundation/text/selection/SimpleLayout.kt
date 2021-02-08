@@ -19,17 +19,14 @@ package androidx.compose.foundation.text.selection
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.Layout
-import androidx.compose.ui.text.InternalTextApi
 import kotlin.math.max
 
 /**
  * Selection is transparent in terms of measurement and layout and passes the same constraints to
  * the children.
- * @suppress
  */
-@InternalTextApi // Used by TextField Selection from foundation
 @Composable
-fun SimpleLayout(modifier: Modifier = Modifier, content: @Composable () -> Unit) {
+internal fun SimpleLayout(modifier: Modifier = Modifier, content: @Composable () -> Unit) {
     Layout(modifier = modifier, content = content) { measurables, constraints ->
         val placeables = measurables.map { measurable ->
             measurable.measure(constraints)

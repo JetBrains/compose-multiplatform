@@ -19,15 +19,10 @@ package androidx.compose.foundation.text.selection
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
-import androidx.compose.ui.text.InternalTextApi
 import androidx.compose.ui.text.style.ResolvedTextDirection
 
-/**
- * @suppress
- */
-@InternalTextApi
 @Composable
-actual fun SelectionHandle(
+internal actual fun SelectionHandle(
     startHandlePosition: Offset?,
     endHandlePosition: Offset?,
     isStartHandle: Boolean,
