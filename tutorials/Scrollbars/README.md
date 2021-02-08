@@ -6,7 +6,7 @@ In this tutorial, we will show you how to add scrollbars to scrollable lists usi
 
 ## Scrollbars applying
 
-You can apply scrollbars to scrollable components. The scrollbar and scrollable components share a common state to synchronize with each other. For example, VerticalScrollbar can be attached to ScrollableColumn, and LazyColumnFor and HorizontalScrollbar can be attached to ScrollableRow and LazyRowFor.
+You can apply scrollbars to scrollable components. The scrollbar and scrollable components share a common state to synchronize with each other. For example, VerticalScrollbar can be attached to Modifier.verticalScroll, and LazyColumnFor and HorizontalScrollbar can be attached to Modifier.horizontalScroll and LazyRowFor.
 
 ```kotlin
 import androidx.compose.desktop.Window
@@ -53,7 +53,7 @@ fun main() {
             ) {
                 Column {
                     for (item in 0..30) {
-                        TextBox("Item in ScrollableColumn #$item")
+                        TextBox("Item #$item")
                         if (item < 30) {
                             Spacer(modifier = Modifier.height(5.dp))
                         }
@@ -138,7 +138,7 @@ fun LazyScrollable() {
 
         LazyColumn(Modifier.fillMaxSize().padding(end = 12.dp), state) {
             items(itemCount) { x ->
-                TextBox("Item in ScrollableColumn #$x")
+                TextBox("Item #$x")
                 Spacer(modifier = Modifier.height(5.dp))
             }
         }
@@ -173,7 +173,7 @@ fun TextBox(text: String = "Item") {
 
 Scrollbars support themes to change their appearance. The example below shows how to use the DesktopTheme appearance for the scrollbar.
 
-``` kotlin
+```kotlin
 import androidx.compose.desktop.DesktopTheme
 import androidx.compose.desktop.Window
 import androidx.compose.foundation.background
@@ -186,9 +186,10 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.rememberScrollbarAdapter
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.ScrollableColumn
 import androidx.compose.material.Text
 import androidx.compose.foundation.VerticalScrollbar
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -208,12 +209,14 @@ fun main() {
                 ) {
                     val state = rememberScrollState(0f)
 
-                    ScrollableColumn(
-                        modifier = Modifier.fillMaxSize().padding(end = 12.dp),
-                        scrollState = state
+                    Column(
+                        modifier = Modifier
+                            .verticalScroll(state)
+                            .fillMaxSize()
+                            .padding(end = 12.dp)
                     ) {
                         for (item in 0..30) {
-                            TextBox("Item in ScrollableColumn #$item")
+                            TextBox("Item #$item")
                             if (item < 30) {
                                 Spacer(modifier = Modifier.height(5.dp))
                             }
