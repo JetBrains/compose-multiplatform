@@ -27,6 +27,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.compose.testutils.advanceClockOnMainThreadMillis
+import androidx.compose.testutils.runBlockingWithManualClock
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
@@ -45,7 +46,6 @@ import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.moveBy
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.performGesture
-import androidx.compose.ui.test.runBlockingWithManualClock
 import androidx.compose.ui.test.swipe
 import androidx.compose.ui.test.swipeWithVelocity
 import androidx.compose.ui.test.up
