@@ -24,6 +24,7 @@ plugins {
 }
 
 dependencies {
+    implementation 'androidx.recyclerview:recyclerview:1.1.0'
     kotlinPlugin project(":compose:compiler:compiler")
 
     implementation(KOTLIN_STDLIB)
