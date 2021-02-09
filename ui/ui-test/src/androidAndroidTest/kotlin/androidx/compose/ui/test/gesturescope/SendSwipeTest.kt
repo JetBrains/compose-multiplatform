@@ -54,7 +54,6 @@ import androidx.compose.ui.test.util.assertIncreasing
 import androidx.compose.ui.test.util.assertOnlyLastEventIsUp
 import androidx.compose.ui.test.util.assertSame
 import androidx.compose.ui.test.util.assertTimestampsAreIncreasing
-import androidx.compose.ui.test.util.isAlmostEqualTo
 import androidx.compose.ui.test.util.verify
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.MediumTest
@@ -62,6 +61,7 @@ import com.google.common.truth.Truth.assertThat
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
+import kotlin.math.roundToInt
 
 @MediumTest
 @RunWith(AndroidJUnit4::class)
@@ -163,7 +163,7 @@ class SendSwipeTest {
     @Test
     fun swipeScrollable() {
         val touchSlop = TestTouchSlop
-        val scrollState = ScrollState(initial = 0f)
+        val scrollState = ScrollState(initial = 0)
         rule.setContent {
             CompositionLocalProvider(LocalViewConfiguration provides FakeViewConfiguration) {
                 with(LocalDensity.current) {
@@ -182,9 +182,9 @@ class SendSwipeTest {
             }
         }
 
-        assertThat(scrollState.value).isEqualTo(0f)
+        assertThat(scrollState.value).isEqualTo(0)
         // numBoxes * boxHeight - viewportHeight = 100 * 100 - 1000
-        assertThat(scrollState.maxValue).isEqualTo(9000f)
+        assertThat(scrollState.maxValue).isEqualTo(9000)
 
         val swipeDistance = 800f - touchSlop
         rule.onNodeWithTag("scrollable").performGesture {
@@ -198,8 +198,8 @@ class SendSwipeTest {
             up()
         }
 
-        assertThat(scrollState.value).isAlmostEqualTo(swipeDistance, 1e-3f)
-        assertThat(scrollState.maxValue).isEqualTo(9000f)
+        assertThat(scrollState.value).isEqualTo(swipeDistance.roundToInt())
+        assertThat(scrollState.maxValue).isEqualTo(9000)
     }
 
     private fun SinglePointerInputRecorder.assertSwipeIsUp() {

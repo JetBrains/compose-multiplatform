@@ -18,6 +18,7 @@ package androidx.compose.material
 
 import androidx.compose.animation.core.AnimationEndReason
 import androidx.compose.foundation.ScrollState
+import androidx.compose.foundation.gestures.Orientation
 import androidx.compose.foundation.gestures.scrollBy
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -34,7 +35,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.input.nestedscroll.nestedScroll
-import androidx.compose.foundation.gestures.Orientation
 import androidx.compose.ui.platform.InspectableValue
 import androidx.compose.ui.platform.LocalViewConfiguration
 import androidx.compose.ui.platform.isDebugInspectorInfoEnabled
@@ -1603,7 +1603,7 @@ class SwipeableTest {
         advanceClock()
 
         assertThat(swipeableState.currentValue).isEqualTo("B")
-        assertThat(scrollState.value).isGreaterThan(0f)
+        assertThat(scrollState.value).isGreaterThan(0)
 
         rule.onNodeWithTag(swipeableTag)
             .performGesture {
@@ -1615,7 +1615,7 @@ class SwipeableTest {
         advanceClock()
 
         assertThat(swipeableState.currentValue).isEqualTo("A")
-        assertThat(scrollState.value).isEqualTo(0f)
+        assertThat(scrollState.value).isEqualTo(0)
     }
 
     @Test
@@ -1665,7 +1665,7 @@ class SwipeableTest {
         rule.runOnIdle {
             assertThat(swipeableState.currentValue).isEqualTo("B")
             // should eat all velocity, no internal scroll
-            assertThat(scrollState.value).isEqualTo(0f)
+            assertThat(scrollState.value).isEqualTo(0)
         }
 
         rule.onNodeWithTag(swipeableTag)
@@ -1680,7 +1680,7 @@ class SwipeableTest {
 
         rule.runOnIdle {
             assertThat(swipeableState.currentValue).isEqualTo("A")
-            assertThat(scrollState.value).isEqualTo(0f)
+            assertThat(scrollState.value).isEqualTo(0)
         }
     }
 
@@ -1692,7 +1692,7 @@ class SwipeableTest {
         rule.setContent {
             swipeableState = rememberSwipeableState("B")
             anchors = remember { mutableStateOf(mapOf(0f to "A", -1000f to "B")) }
-            scrollState = rememberScrollState(initial = 5000f)
+            scrollState = rememberScrollState(initial = 5000)
             Box(
                 Modifier
                     .size(300.dp)
@@ -1716,7 +1716,7 @@ class SwipeableTest {
 
         rule.awaitIdle()
         assertThat(swipeableState.currentValue).isEqualTo("B")
-        assertThat(scrollState.value).isEqualTo(5000f)
+        assertThat(scrollState.value).isEqualTo(5000)
 
         rule.onNodeWithTag(swipeableTag)
             .performGesture {
@@ -1732,13 +1732,13 @@ class SwipeableTest {
 
         rule.awaitIdle()
         assertThat(swipeableState.currentValue).isEqualTo("B")
-        assertThat(scrollState.value).isEqualTo(0f)
+        assertThat(scrollState.value).isEqualTo(0)
         // set value again to test overshoot
         scrollState.scrollBy(500f)
 
         rule.runOnIdle {
             assertThat(swipeableState.currentValue).isEqualTo("B")
-            assertThat(scrollState.value).isEqualTo(500f)
+            assertThat(scrollState.value).isEqualTo(500)
         }
 
         rule.onNodeWithTag(swipeableTag)
@@ -1754,7 +1754,7 @@ class SwipeableTest {
 
         rule.runOnIdle {
             assertThat(swipeableState.currentValue).isEqualTo("A")
-            assertThat(scrollState.value).isEqualTo(0f)
+            assertThat(scrollState.value).isEqualTo(0)
         }
     }
 

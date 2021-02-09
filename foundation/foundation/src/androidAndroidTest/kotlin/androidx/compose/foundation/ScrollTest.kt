@@ -21,7 +21,6 @@ import androidx.annotation.RequiresApi
 import androidx.compose.animation.core.advanceClockMillis
 import androidx.compose.foundation.gestures.scrollBy
 import androidx.compose.foundation.gestures.smoothScrollBy
-import androidx.compose.foundation.gestures.ScrollableState
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -126,12 +125,12 @@ class ScrollTest {
 
     @Test
     fun verticalScroller_SmallContent_Unscrollable() = runBlocking {
-        val scrollState = ScrollState(initial = 0f)
+        val scrollState = ScrollState(initial = 0)
 
         composeVerticalScroller(scrollState)
 
         rule.runOnIdle {
-            assertTrue(scrollState.maxValue == 0f)
+            assertTrue(scrollState.maxValue == 0)
         }
     }
 
@@ -149,7 +148,7 @@ class ScrollTest {
     @SdkSuppress(minSdkVersion = 26)
     @Test
     fun verticalScroller_LargeContent_ScrollToEnd() = runBlocking {
-        val scrollState = ScrollState(initial = 0f)
+        val scrollState = ScrollState(initial = 0)
         val height = 30
         val scrollDistance = 10
 
@@ -158,8 +157,8 @@ class ScrollTest {
         validateVerticalScroller(height = height)
 
         rule.awaitIdle()
-        assertEquals(scrollDistance.toFloat(), scrollState.maxValue)
-        scrollState.scrollTo(scrollDistance.toFloat())
+        assertEquals(scrollDistance, scrollState.maxValue)
+        scrollState.scrollTo(scrollDistance)
 
         rule.runOnIdle {} // Just so the block below is correct
         validateVerticalScroller(offset = scrollDistance, height = height)
@@ -168,7 +167,7 @@ class ScrollTest {
     @SdkSuppress(minSdkVersion = 26)
     @Test
     fun verticalScroller_Reversed() = runBlocking {
-        val scrollState = ScrollState(initial = 0f)
+        val scrollState = ScrollState(initial = 0)
         val height = 30
         val expectedOffset = defaultCellSize * colors.size - height
 
@@ -181,7 +180,7 @@ class ScrollTest {
     @SdkSuppress(minSdkVersion = 26)
     @Test
     fun verticalScroller_LargeContent_Reversed_ScrollToEnd() = runBlocking {
-        val scrollState = ScrollState(initial = 0f)
+        val scrollState = ScrollState(initial = 0)
         val height = 20
         val scrollDistance = 10
         val expectedOffset = defaultCellSize * colors.size - height - scrollDistance
@@ -189,7 +188,7 @@ class ScrollTest {
         composeVerticalScroller(scrollState, height = height, isReversed = true)
 
         rule.awaitIdle()
-        scrollState.scrollTo(scrollDistance.toFloat())
+        scrollState.scrollTo(scrollDistance)
 
         rule.awaitIdle()
         validateVerticalScroller(offset = expectedOffset, height = height)
@@ -242,15 +241,15 @@ class ScrollTest {
         val width = 30
         val scrollDistance = 10
 
-        val scrollState = ScrollState(initial = 0f)
+        val scrollState = ScrollState(initial = 0)
 
         composeHorizontalScroller(scrollState, width = width)
 
         validateHorizontalScroller(width = width)
 
         rule.awaitIdle()
-        assertEquals(scrollDistance.toFloat(), scrollState.maxValue)
-        scrollState.scrollTo(scrollDistance.toFloat())
+        assertEquals(scrollDistance, scrollState.maxValue)
+        scrollState.scrollTo(scrollDistance)
 
         rule.runOnIdle {} // Just so the block below is correct
         validateHorizontalScroller(offset = scrollDistance, width = width)
@@ -263,15 +262,15 @@ class ScrollTest {
         val width = 30
         val scrollDistance = 10
 
-        val scrollState = ScrollState(initial = 0f)
+        val scrollState = ScrollState(initial = 0)
 
         composeHorizontalScroller(scrollState, width = width, isRtl = true)
 
         validateHorizontalScroller(width = width, checkInRtl = true)
 
         rule.awaitIdle()
-        assertEquals(scrollDistance.toFloat(), scrollState.maxValue)
-        scrollState.scrollTo(scrollDistance.toFloat())
+        assertEquals(scrollDistance, scrollState.maxValue)
+        scrollState.scrollTo(scrollDistance)
 
         rule.awaitIdle()
         validateHorizontalScroller(offset = scrollDistance, width = width, checkInRtl = true)
@@ -280,7 +279,7 @@ class ScrollTest {
     @SdkSuppress(minSdkVersion = 26)
     @Test
     fun horizontalScroller_reversed() = runBlocking {
-        val scrollState = ScrollState(initial = 0f)
+        val scrollState = ScrollState(initial = 0)
         val width = 30
         val expectedOffset = defaultCellSize * colors.size - width
 
@@ -292,7 +291,7 @@ class ScrollTest {
     @SdkSuppress(minSdkVersion = 26)
     @Test
     fun horizontalScroller_rtl_reversed() = runBlocking {
-        val scrollState = ScrollState(initial = 0f)
+        val scrollState = ScrollState(initial = 0)
         val width = 30
         val expectedOffset = defaultCellSize * colors.size - width
 
@@ -308,14 +307,14 @@ class ScrollTest {
         val width = 30
         val scrollDistance = 10
 
-        val scrollState = ScrollState(initial = 0f)
+        val scrollState = ScrollState(initial = 0)
 
         val expectedOffset = defaultCellSize * colors.size - width - scrollDistance
 
         composeHorizontalScroller(scrollState, width = width, isReversed = true)
 
         rule.awaitIdle()
-        scrollState.scrollTo(scrollDistance.toFloat())
+        scrollState.scrollTo(scrollDistance)
 
         rule.runOnIdle {} // Just so the block below is correct
         validateHorizontalScroller(offset = expectedOffset, width = width)
@@ -328,7 +327,7 @@ class ScrollTest {
         val width = 30
         val scrollDistance = 10
 
-        val scrollState = ScrollState(initial = 0f)
+        val scrollState = ScrollState(initial = 0)
 
         val expectedOffset = defaultCellSize * colors.size - width - scrollDistance
 
@@ -336,7 +335,7 @@ class ScrollTest {
 
         rule.awaitIdle()
 
-        scrollState.scrollTo(scrollDistance.toFloat())
+        scrollState.scrollTo(scrollDistance)
 
         rule.runOnIdle {} // Just so the block below is correct
         validateHorizontalScroller(offset = expectedOffset, width = width, checkInRtl = true)
@@ -378,7 +377,7 @@ class ScrollTest {
     fun verticalScroller_reversed_scrollTo_scrollForward(): Unit = runBlocking {
         createScrollableContent(
             isVertical = true,
-            scrollState = ScrollState(initial = 0f),
+            scrollState = ScrollState(initial = 0),
             isReversed = true
         )
 
@@ -393,7 +392,7 @@ class ScrollTest {
     fun horizontalScroller_reversed_scrollTo_scrollForward(): Unit = runBlocking {
         createScrollableContent(
             isVertical = false,
-            scrollState = ScrollState(initial = 0f),
+            scrollState = ScrollState(initial = 0),
             isReversed = true
         )
 
@@ -461,20 +460,20 @@ class ScrollTest {
     @OptIn(ExperimentalTestApi::class)
     @Test
     fun scroller_coerce_whenScrollTo() = runBlocking {
-        val scrollState = ScrollState(initial = 0f)
+        val scrollState = ScrollState(initial = 0)
 
         createScrollableContent(isVertical = true, scrollState = scrollState)
 
         rule.awaitIdle()
 
-        assertThat(scrollState.value).isEqualTo(0f)
-        assertThat(scrollState.maxValue).isGreaterThan(0f)
+        assertThat(scrollState.value).isEqualTo(0)
+        assertThat(scrollState.maxValue).isGreaterThan(0)
 
-        scrollState.scrollTo(-100f)
-        assertThat(scrollState.value).isEqualTo(0f)
+        scrollState.scrollTo(-100)
+        assertThat(scrollState.value).isEqualTo(0)
 
-        (scrollState as ScrollableState).scrollBy(-100f)
-        assertThat(scrollState.value).isEqualTo(0f)
+        scrollState.scrollBy(-100f)
+        assertThat(scrollState.value).isEqualTo(0)
 
         scrollState.scrollTo(scrollState.maxValue)
         assertThat(scrollState.value).isEqualTo(scrollState.maxValue)
@@ -482,14 +481,14 @@ class ScrollTest {
         scrollState.scrollTo(scrollState.maxValue + 1000)
         assertThat(scrollState.value).isEqualTo(scrollState.maxValue)
 
-        (scrollState as ScrollableState).scrollBy(100f)
+        scrollState.scrollBy(100f)
         assertThat(scrollState.value).isEqualTo(scrollState.maxValue)
     }
 
     @OptIn(ExperimentalTestApi::class)
     @Test
     fun verticalScroller_LargeContent_coerceWhenMaxChanges() = runBlocking {
-        val scrollState = ScrollState(initial = 0f)
+        val scrollState = ScrollState(initial = 0)
         val itemCount = mutableStateOf(100)
         rule.setContent {
             Box {
@@ -508,8 +507,8 @@ class ScrollTest {
 
         rule.awaitIdle()
 
-        assertThat(scrollState.value).isEqualTo(0f)
-        assertThat(scrollState.maxValue).isGreaterThan(0f)
+        assertThat(scrollState.value).isEqualTo(0)
+        assertThat(scrollState.maxValue).isGreaterThan(0)
         val max = scrollState.maxValue
 
         scrollState.scrollTo(max)
@@ -524,20 +523,20 @@ class ScrollTest {
     @OptIn(ExperimentalTestApi::class)
     @Test
     fun scroller_coerce_whenScrollSmoothTo() = runBlocking {
-        val scrollState = ScrollState(initial = 0f)
+        val scrollState = ScrollState(initial = 0)
 
         createScrollableContent(isVertical = true, scrollState = scrollState)
 
         rule.awaitIdle()
-        assertThat(scrollState.value).isEqualTo(0f)
-        assertThat(scrollState.maxValue).isGreaterThan(0f)
+        assertThat(scrollState.value).isEqualTo(0)
+        assertThat(scrollState.maxValue).isGreaterThan(0)
         val max = scrollState.maxValue
 
-        scrollState.smoothScrollTo(-100f)
-        assertThat(scrollState.value).isEqualTo(0f)
+        scrollState.smoothScrollTo(-100)
+        assertThat(scrollState.value).isEqualTo(0)
 
-        (scrollState as ScrollableState).smoothScrollBy(-100f)
-        assertThat(scrollState.value).isEqualTo(0f)
+        scrollState.smoothScrollBy(-100f)
+        assertThat(scrollState.value).isEqualTo(0)
 
         scrollState.smoothScrollTo(scrollState.maxValue)
         assertThat(scrollState.value).isEqualTo(max)
@@ -545,17 +544,17 @@ class ScrollTest {
         scrollState.smoothScrollTo(scrollState.maxValue + 1000)
         assertThat(scrollState.value).isEqualTo(max)
 
-        (scrollState as ScrollableState).smoothScrollBy(100f)
+        scrollState.smoothScrollBy(100f)
         assertThat(scrollState.value).isEqualTo(max)
     }
 
     @Test
     fun scroller_whenFling_stopsByTouchDown() = runBlockingWithManualClock { clock ->
-        val scrollState = ScrollState(initial = 0f)
+        val scrollState = ScrollState(initial = 0)
 
         createScrollableContent(isVertical = true, scrollState = scrollState)
 
-        assertThat(scrollState.value).isEqualTo(0f)
+        assertThat(scrollState.value).isEqualTo(0)
         assertThat(scrollState.isScrollInProgress).isEqualTo(false)
 
         rule.onNodeWithTag(scrollerTag)
@@ -586,13 +585,13 @@ class ScrollTest {
         }
 
         rule.awaitIdle()
-        scrollState!!.scrollTo(70f)
+        scrollState!!.scrollTo(70)
         scrollState = null
 
         restorationTester.emulateSavedInstanceStateRestore()
 
         rule.runOnIdle {
-            assertThat(scrollState!!.value).isEqualTo(70f)
+            assertThat(scrollState!!.value).isEqualTo(70)
         }
     }
 
@@ -602,12 +601,12 @@ class ScrollTest {
         secondSwipe: GestureScope.() -> Unit,
         isRtl: Boolean = false
     ) = runBlockingWithManualClock { clock ->
-        val scrollState = ScrollState(initial = 0f)
+        val scrollState = ScrollState(initial = 0)
 
         createScrollableContent(isVertical, scrollState = scrollState, isRtl = isRtl)
 
         rule.runOnIdle {
-            assertThat(scrollState.value).isEqualTo(0f)
+            assertThat(scrollState.value).isEqualTo(0)
         }
 
         rule.onNodeWithTag(scrollerTag)
@@ -623,7 +622,7 @@ class ScrollTest {
         val scrolledValue = rule.runOnIdle {
             scrollState.value
         }
-        assertThat(scrolledValue).isGreaterThan(0f)
+        assertThat(scrolledValue).isGreaterThan(0)
 
         rule.onNodeWithTag(scrollerTag)
             .performGesture { secondSwipe() }
@@ -647,7 +646,7 @@ class ScrollTest {
         height: Int = defaultMainAxisSize,
         rowHeight: Int = defaultCellSize
     ) = runBlocking {
-        val resolvedState = scrollState ?: ScrollState(initial = 0f)
+        val resolvedState = scrollState ?: ScrollState(initial = 0)
         // We assume that the height of the device is more than 45 px
         with(rule.density) {
             rule.setContent {
@@ -681,7 +680,7 @@ class ScrollTest {
         height: Int = defaultCrossAxisSize,
         isRtl: Boolean = false
     ) = runBlocking {
-        val resolvedState = scrollState ?: ScrollState(initial = 0f)
+        val resolvedState = scrollState ?: ScrollState(initial = 0)
         // We assume that the height of the device is more than 45 px
         with(rule.density) {
             rule.setContent {
@@ -752,7 +751,7 @@ class ScrollTest {
         scrollState: ScrollState? = null,
         isRtl: Boolean = false
     ) = runBlocking {
-        val resolvedState = scrollState ?: ScrollState(initial = 0f)
+        val resolvedState = scrollState ?: ScrollState(initial = 0)
         rule.setContent {
             val content = @Composable {
                 repeat(itemCount) {
@@ -815,7 +814,7 @@ class ScrollTest {
 
     @Test
     fun testInspectorValue() = runBlocking {
-        val state = ScrollState(initial = 0f)
+        val state = ScrollState(initial = 0)
         rule.setContent {
             val modifier = Modifier.verticalScroll(state) as InspectableValue
             assertThat(modifier.nameFallback).isEqualTo("scroll")

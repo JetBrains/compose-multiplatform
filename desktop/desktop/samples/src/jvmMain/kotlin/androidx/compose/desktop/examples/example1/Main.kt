@@ -156,7 +156,7 @@ private fun App() {
 
 @Composable
 private fun LeftColumn(modifier: Modifier) = Box(modifier.fillMaxSize()) {
-    val state = rememberScrollState(0f)
+    val state = rememberScrollState()
     ScrollableContent(state)
 
     VerticalScrollbar(
