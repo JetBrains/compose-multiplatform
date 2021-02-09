@@ -245,7 +245,8 @@ fun getGenerateApiArgs(
         sourcePaths.filter { it.exists() }.joinToString(File.pathSeparator),
 
         "--format=v4",
-        "--output-kotlin-nulls=yes"
+        "--output-kotlin-nulls=yes",
+        "--warnings-as-errors"
     )
 
     pathToManifest?.let {
