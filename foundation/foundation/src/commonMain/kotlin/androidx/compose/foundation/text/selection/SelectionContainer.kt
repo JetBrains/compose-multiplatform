@@ -29,14 +29,12 @@ import androidx.compose.foundation.legacygestures.dragGestureFilter
 import androidx.compose.ui.platform.LocalClipboardManager
 import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.platform.LocalTextToolbar
-import androidx.compose.ui.text.InternalTextApi
 
 /**
  * Enables text selection for it's direct or indirection children.
  *
  * @sample androidx.compose.foundation.samples.SelectionSample
  */
-@OptIn(InternalTextApi::class)
 @Composable
 fun SelectionContainer(modifier: Modifier = Modifier, content: @Composable () -> Unit) {
     var selection by remember { mutableStateOf<Selection?>(null) }

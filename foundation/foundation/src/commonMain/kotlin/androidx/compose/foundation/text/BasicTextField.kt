@@ -27,7 +27,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.SolidColor
-import androidx.compose.ui.text.InternalTextApi
 import androidx.compose.ui.text.SoftwareKeyboardController
 import androidx.compose.ui.text.TextLayoutResult
 import androidx.compose.ui.text.TextStyle
@@ -242,7 +241,6 @@ fun BasicTextField(
  * innerTextField exactly once.
  */
 @Composable
-@OptIn(InternalTextApi::class)
 fun BasicTextField(
     value: TextFieldValue,
     onValueChange: (TextFieldValue) -> Unit,

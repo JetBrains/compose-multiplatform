@@ -28,8 +28,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.SolidColor
-import androidx.compose.ui.text.ExperimentalTextApi
-import androidx.compose.ui.text.InternalTextApi
 import androidx.compose.ui.text.SoftwareKeyboardController
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.input.KeyboardCapitalization
@@ -37,7 +35,6 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
 
-@OptIn(ExperimentalTextApi::class)
 private val KeyboardOptionsList = listOf(
     ImeOptionsData(
         keyboardOptions = KeyboardOptions(
@@ -77,7 +74,6 @@ private val KeyboardOptionsList = listOf(
     )
 )
 
-@OptIn(ExperimentalTextApi::class)
 @Composable
 fun CapitalizationAutoCorrectDemo() {
     LazyColumn {
@@ -89,10 +85,6 @@ fun CapitalizationAutoCorrectDemo() {
 }
 
 @Composable
-@OptIn(
-    ExperimentalTextApi::class,
-    InternalTextApi::class
-)
 private fun MyTextField(data: ImeOptionsData) {
     val controller = remember { mutableStateOf<SoftwareKeyboardController?>(null) }
     val state = rememberSaveable(stateSaver = TextFieldValue.Saver) {

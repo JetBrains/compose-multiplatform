@@ -17,7 +17,6 @@
 package androidx.compose.ui.text.input
 
 import androidx.compose.ui.text.AnnotatedString
-import androidx.compose.ui.text.InternalTextApi
 import androidx.compose.ui.text.findFollowingBreak
 import androidx.compose.ui.text.findPrecedingBreak
 
@@ -455,7 +454,6 @@ class FinishComposingTextCommand : EditCommand {
  */
 class BackspaceCommand : EditCommand {
 
-    @OptIn(InternalTextApi::class)
     override fun applyTo(buffer: EditingBuffer) {
         if (buffer.hasComposition()) {
             buffer.delete(buffer.compositionStart, buffer.compositionEnd)
@@ -502,7 +500,6 @@ class MoveCursorCommand(
     val amount: Int
 ) : EditCommand {
 
-    @OptIn(InternalTextApi::class)
     override fun applyTo(buffer: EditingBuffer) {
         if (buffer.cursor == -1) {
             buffer.cursor = buffer.selectionStart

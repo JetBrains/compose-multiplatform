@@ -42,18 +42,12 @@ import androidx.compose.ui.platform.ClipboardManager
 import androidx.compose.ui.platform.TextToolbar
 import androidx.compose.ui.platform.TextToolbarStatus
 import androidx.compose.ui.text.AnnotatedString
-import androidx.compose.ui.text.ExperimentalTextApi
-import androidx.compose.ui.text.InternalTextApi
 import kotlin.math.max
 import kotlin.math.min
 
 /**
  * A bridge class between user interaction to the text composables for text selection.
  */
-@OptIn(
-    InternalTextApi::class,
-    ExperimentalTextApi::class
-)
 internal class SelectionManager(private val selectionRegistrar: SelectionRegistrarImpl) {
     /**
      * The current selection.
@@ -549,7 +543,6 @@ internal fun merge(lhs: Selection?, rhs: Selection?): Selection? {
     return lhs?.merge(rhs) ?: rhs
 }
 
-@OptIn(ExperimentalTextApi::class)
 internal fun getCurrentSelectedText(
     selectable: Selectable,
     selection: Selection

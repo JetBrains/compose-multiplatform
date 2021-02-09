@@ -18,10 +18,8 @@ package androidx.compose.foundation.text.selection
 
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.layout.LayoutCoordinates
-import androidx.compose.ui.text.ExperimentalTextApi
 
 // based on androidx.compose.foundation.text.selection.SelectionRegistrarImpl
-@OptIn(ExperimentalTextApi::class)
 internal class DesktopSelectionRegistrar : SelectionRegistrar {
     internal var sorted: Boolean = false
 

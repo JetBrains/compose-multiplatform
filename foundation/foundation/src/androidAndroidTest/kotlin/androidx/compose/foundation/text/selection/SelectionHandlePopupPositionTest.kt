@@ -31,7 +31,6 @@ import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.platform.ViewRootForTest
 import androidx.compose.ui.test.junit4.ComposeTestRule
 import androidx.compose.ui.test.junit4.createComposeRule
-import androidx.compose.ui.text.InternalTextApi
 import androidx.compose.ui.text.style.ResolvedTextDirection
 import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.Dp
@@ -60,7 +59,6 @@ import kotlin.math.max
 
 @MediumTest
 @RunWith(AndroidJUnit4::class)
-@OptIn(InternalTextApi::class)
 class SelectionHandlePopupPositionTest {
     @get:Rule
     val rule = createComposeRule()

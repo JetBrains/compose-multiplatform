@@ -72,9 +72,6 @@ package androidx.compose.ui.text {
     method public static inline <R> R withStyle(androidx.compose.ui.text.AnnotatedString.Builder, androidx.compose.ui.text.ParagraphStyle style, kotlin.jvm.functions.Function1<? super androidx.compose.ui.text.AnnotatedString.Builder,? extends R> block);
   }
 
-  @kotlin.RequiresOptIn(level=kotlin.RequiresOptIn.Level, message="This is an experimental text API that may change without warning.") @kotlin.annotation.Target(allowedTargets={kotlin.annotation.AnnotationTarget, kotlin.annotation.AnnotationTarget, kotlin.annotation.AnnotationTarget}) public @interface ExperimentalTextApi {
-  }
-
   @kotlin.RequiresOptIn(level=kotlin.RequiresOptIn.Level, message="This is internal API that may change frequently and without warning.") @kotlin.annotation.Target(allowedTargets={kotlin.annotation.AnnotationTarget, kotlin.annotation.AnnotationTarget, kotlin.annotation.AnnotationTarget}) public @interface InternalTextApi {
   }
 

@@ -19,12 +19,10 @@ package androidx.compose.foundation.text.selection
 import androidx.compose.runtime.compositionLocalOf
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.layout.LayoutCoordinates
-import androidx.compose.ui.text.ExperimentalTextApi
 
 /**
  *  An interface allowing a composable to subscribe and unsubscribe to selection changes.
  */
-@ExperimentalTextApi
 internal interface SelectionRegistrar {
     /**
      * Subscribe to SelectionContainer selection changes.
@@ -107,5 +105,4 @@ internal interface SelectionRegistrar {
  * CompositionLocal to get a [SelectionRegistrar] in order to subscribe and unsubscribe to
  * [SelectionRegistrar].
  */
-@OptIn(ExperimentalTextApi::class)
 internal val LocalSelectionRegistrar = compositionLocalOf<SelectionRegistrar?>()

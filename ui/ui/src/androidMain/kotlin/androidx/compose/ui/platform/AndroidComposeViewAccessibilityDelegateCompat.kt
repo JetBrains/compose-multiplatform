@@ -52,12 +52,12 @@ import androidx.compose.ui.semantics.SemanticsProperties
 import androidx.compose.ui.semantics.getOrNull
 import androidx.compose.ui.semantics.outerSemantics
 import androidx.compose.ui.text.AnnotatedString
-import androidx.compose.ui.text.InternalTextApi
 import androidx.compose.ui.text.TextLayoutResult
 import androidx.compose.ui.text.platform.toAccessibilitySpannableString
 import androidx.compose.ui.util.fastForEach
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.semantics.ProgressBarRangeInfo
+import androidx.compose.ui.text.InternalTextApi
 import androidx.core.view.AccessibilityDelegateCompat
 import androidx.core.view.ViewCompat
 import androidx.core.view.accessibility.AccessibilityEventCompat
@@ -79,7 +79,6 @@ private fun LayoutNode.findClosestParentNode(selector: (LayoutNode) -> Boolean):
     return null
 }
 
-@OptIn(InternalTextApi::class)
 internal class AndroidComposeViewAccessibilityDelegateCompat(val view: AndroidComposeView) :
     AccessibilityDelegateCompat() {
     companion object {
@@ -638,6 +637,7 @@ internal class AndroidComposeViewAccessibilityDelegateCompat(val view: AndroidCo
         }
     }
 
+    @OptIn(InternalTextApi::class)
     private fun setText(
         node: SemanticsNode,
         info: AccessibilityNodeInfoCompat

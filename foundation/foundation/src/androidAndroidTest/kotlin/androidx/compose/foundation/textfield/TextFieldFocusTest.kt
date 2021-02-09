@@ -31,7 +31,6 @@ import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.performClick
-import androidx.compose.ui.text.InternalTextApi
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
 import androidx.test.ext.junit.runners.AndroidJUnit4
@@ -42,7 +41,6 @@ import org.junit.Test
 import org.junit.runner.RunWith
 
 @LargeTest
-@OptIn(InternalTextApi::class)
 @RunWith(AndroidJUnit4::class)
 class TextFieldFocusTest {
     @get:Rule

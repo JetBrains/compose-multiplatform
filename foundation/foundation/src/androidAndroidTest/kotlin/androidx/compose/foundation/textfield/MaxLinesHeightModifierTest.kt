@@ -26,7 +26,6 @@ import androidx.compose.ui.platform.InspectableValue
 import androidx.compose.ui.platform.ValueElement
 import androidx.compose.ui.platform.isDebugInspectorInfoEnabled
 import androidx.compose.ui.test.junit4.createComposeRule
-import androidx.compose.ui.text.InternalTextApi
 import androidx.compose.ui.text.TextLayoutResult
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.input.TextFieldValue
@@ -44,7 +43,6 @@ import java.util.concurrent.TimeUnit
 
 @MediumTest
 @RunWith(AndroidJUnit4::class)
-@OptIn(InternalTextApi::class)
 class MaxLinesHeightModifierTest {
 
     private val longText = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do " +

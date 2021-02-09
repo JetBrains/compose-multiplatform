@@ -56,7 +56,6 @@ import androidx.compose.ui.test.swipeDown
 import androidx.compose.ui.test.swipeLeft
 import androidx.compose.ui.test.swipeRight
 import androidx.compose.ui.test.swipeUp
-import androidx.compose.ui.text.InternalTextApi
 import androidx.compose.ui.text.TextLayoutResult
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.input.TextFieldValue
@@ -90,7 +89,7 @@ import org.junit.runner.RunWith
 
 @MediumTest
 @RunWith(AndroidJUnit4::class)
-@OptIn(ExperimentalFoundationApi::class, InternalTextApi::class)
+@OptIn(ExperimentalFoundationApi::class)
 class TextFieldScrollTest {
 
     private val TextfieldTag = "textField"
