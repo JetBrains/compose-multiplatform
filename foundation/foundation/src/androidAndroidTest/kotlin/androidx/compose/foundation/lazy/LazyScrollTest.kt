@@ -90,6 +90,15 @@ class LazyScrollTest(private val orientation: Orientation) {
         assertThat(state.firstVisibleItemScrollOffset).isEqualTo(expectedOffset)
     }
 
+    @Test
+    fun smoothScrollToItemTest() = runBlocking {
+        withContext(Dispatchers.Main) {
+            state.animateScrollToItem(5, 10)
+        }
+        assertThat(state.firstVisibleItemIndex).isEqualTo(5)
+        assertThat(state.firstVisibleItemScrollOffset).isEqualTo(10)
+    }
+
     @Composable
     private fun TestContent() {
         if (vertical) {

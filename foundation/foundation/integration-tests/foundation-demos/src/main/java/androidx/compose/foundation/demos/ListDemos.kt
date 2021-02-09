@@ -36,10 +36,10 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.requiredHeight
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.requiredHeight
 import androidx.compose.foundation.layout.requiredSize
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.lazy.GridCells
 import androidx.compose.foundation.lazy.LazyColumn
@@ -75,6 +75,8 @@ import androidx.paging.compose.demos.PagingDemos
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.launch
 import kotlin.math.abs
+import kotlin.math.max
+import kotlin.math.min
 import kotlin.random.Random
 
 val LazyListDemos = listOf(
@@ -144,6 +146,7 @@ private fun ListHoistedStateDemo() {
     val state = rememberLazyListState()
     var lastScrollDescription: String by remember { mutableStateOf("") }
     Column {
+        val numItems = 10000
         Row {
             val buttonModifier = Modifier.padding(8.dp)
             val density = LocalDensity.current
@@ -171,9 +174,44 @@ private fun ListHoistedStateDemo() {
             Button(
                 modifier = buttonModifier,
                 onClick = {
+                    coroutineScope.launch {
+                        val index = min(state.firstVisibleItemIndex + 500, numItems - 1)
+                        state.animateScrollToItem(index)
+                    }
+                }
+            ) {
+                Text("+500")
+            }
+            Button(
+                modifier = buttonModifier,
+                onClick = {
+                    coroutineScope.launch {
+                        val index = max(state.firstVisibleItemIndex - 500, 0)
+                        state.animateScrollToItem(index)
+                    }
+                }
+            ) {
+                Text("-500")
+            }
+            Button(
+                modifier = buttonModifier,
+                onClick = {
+                    coroutineScope.launch {
+                        state.animateScrollToItem(
+                            state.firstVisibleItemIndex,
+                            500
+                        )
+                    }
+                }
+            ) {
+                Text("Offset")
+            }
+            Button(
+                modifier = buttonModifier,
+                onClick = {
                     with(density) {
                         coroutineScope.launch {
-                            val requestedScroll = 3000.dp.toPx()
+                            val requestedScroll = 10000.dp.toPx()
                             lastScrollDescription = try {
                                 val actualScroll = state.animateScrollBy(requestedScroll)
                                 "$actualScroll/$requestedScroll px"
@@ -202,7 +240,7 @@ private fun ListHoistedStateDemo() {
             Modifier.fillMaxWidth(),
             state = state
         ) {
-            items(1000) {
+            items(numItems) {
                 Text("$it", style = LocalTextStyle.current.copy(fontSize = 40.sp))
             }
         }

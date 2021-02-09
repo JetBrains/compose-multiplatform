@@ -29,15 +29,15 @@ import androidx.compose.runtime.withFrameNanos
  * complete.
  *
  * @param value number of pixels to scroll by
- * @param spec [AnimationSpec] to be used for this scrolling
+ * @param animationSpec [AnimationSpec] to be used for this scrolling
  *
  * @return the amount of scroll consumed
  */
 suspend fun ScrollableState.animateScrollBy(
     value: Float,
-    spec: AnimationSpec<Float> = spring()
+    animationSpec: AnimationSpec<Float> = spring()
 ): Float {
-    val animSpec = spec.vectorize(Float.VectorConverter)
+    val animSpec = animationSpec.vectorize(Float.VectorConverter)
     val conv = Float.VectorConverter
     val zeroVector = conv.convertToVector(0f)
     val targetVector = conv.convertToVector(value)

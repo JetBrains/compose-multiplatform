@@ -149,13 +149,13 @@ class ScrollState(initial: Int) : ScrollableState {
      *
      * @param value target value in pixels to smooth scroll to, value will be coerced to
      * 0..maxPosition
-     * @param spec animation curve for scroll animation
+     * @param animationSpec animation curve for smooth scroll animation
      */
     suspend fun animateScrollTo(
         value: Int,
-        spec: AnimationSpec<Float> = SpringSpec()
+        animationSpec: AnimationSpec<Float> = SpringSpec()
     ) {
-        this.animateScrollBy((value - this.value).toFloat(), spec)
+        this.animateScrollBy((value - this.value).toFloat(), animationSpec)
     }
 
     /**
