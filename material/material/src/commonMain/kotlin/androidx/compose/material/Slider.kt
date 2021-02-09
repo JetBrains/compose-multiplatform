@@ -37,9 +37,9 @@ import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.preferredHeightIn
-import androidx.compose.foundation.layout.preferredSize
-import androidx.compose.foundation.layout.preferredWidthIn
+import androidx.compose.foundation.layout.heightIn
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.progressSemantics
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.SliderDefaults.InactiveTrackColorAlpha
@@ -283,7 +283,7 @@ private fun SliderImpl(
                         )
                     )
             ) {
-                Spacer(Modifier.preferredSize(thumbSize, thumbSize))
+                Spacer(Modifier.size(thumbSize, thumbSize))
             }
         }
     }
@@ -478,7 +478,7 @@ internal val TrackHeight = 4.dp
 private val SliderHeight = 48.dp
 private val SliderMinWidth = 144.dp // TODO: clarify min width
 private val DefaultSliderConstraints =
-    Modifier.preferredWidthIn(min = SliderMinWidth)
-        .preferredHeightIn(max = SliderHeight)
+    Modifier.widthIn(min = SliderMinWidth)
+        .heightIn(max = SliderHeight)
 
 private val SliderToTickAnimation = TweenSpec<Float>(durationMillis = 100)

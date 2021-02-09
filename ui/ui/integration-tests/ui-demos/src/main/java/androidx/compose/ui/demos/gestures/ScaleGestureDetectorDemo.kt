@@ -21,7 +21,7 @@ import androidx.compose.foundation.gestures.detectTransformGestures
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.preferredSize
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
@@ -46,7 +46,7 @@ fun ScaleGestureFilterDemo() {
         Box(
             Modifier.fillMaxSize()
                 .wrapContentSize(Alignment.Center)
-                .preferredSize(size.value)
+                .size(size.value)
                 .pointerInput(Unit) {
                     detectTransformGestures { _, _, zoom, _ -> size.value *= zoom }
                 }

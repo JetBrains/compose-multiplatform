@@ -23,7 +23,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.preferredHeight
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.BottomSheetScaffold
 import androidx.compose.material.Button
@@ -67,7 +67,7 @@ fun BottomSheetScaffoldSample() {
     BottomSheetScaffold(
         sheetContent = {
             Box(
-                Modifier.fillMaxWidth().preferredHeight(128.dp),
+                Modifier.fillMaxWidth().height(128.dp),
                 contentAlignment = Alignment.Center
             ) {
                 Text("Swipe up to expand sheet")
@@ -77,7 +77,7 @@ fun BottomSheetScaffoldSample() {
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 Text("Sheet content")
-                Spacer(Modifier.preferredHeight(20.dp))
+                Spacer(Modifier.height(20.dp))
                 Button(
                     onClick = {
                         scope.launch { scaffoldState.bottomSheetState.collapse() }
@@ -119,7 +119,7 @@ fun BottomSheetScaffoldSample() {
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 Text("Drawer content")
-                Spacer(Modifier.preferredHeight(20.dp))
+                Spacer(Modifier.height(20.dp))
                 Button(onClick = { scope.launch { scaffoldState.drawerState.close() } }) {
                     Text("Click to close drawer")
                 }
@@ -131,7 +131,7 @@ fun BottomSheetScaffoldSample() {
                 Box(
                     Modifier
                         .fillMaxWidth()
-                        .preferredHeight(50.dp)
+                        .height(50.dp)
                         .background(colors[it % colors.size])
                 )
             }

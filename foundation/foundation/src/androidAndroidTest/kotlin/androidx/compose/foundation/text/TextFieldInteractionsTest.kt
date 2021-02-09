@@ -20,7 +20,7 @@ import androidx.compose.foundation.Interaction
 import androidx.compose.foundation.InteractionState
 import androidx.compose.foundation.focusable
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.requiredSize
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
@@ -117,7 +117,7 @@ class TextFieldInteractionsTest {
                 interactionState = interactionState
             )
             Box(
-                modifier = Modifier.size(10.dp).focusRequester(focusRequester).focusable(),
+                modifier = Modifier.requiredSize(10.dp).focusRequester(focusRequester).focusable(),
             )
         }
         assertThat(interactionState.value).doesNotContain(Interaction.Focused)
@@ -191,7 +191,7 @@ class TextFieldInteractionsTest {
         val interactionState = InteractionState()
         rule.setContent {
             BasicTextField(
-                modifier = Modifier.size(50.dp).testTag(testTag),
+                modifier = Modifier.requiredSize(50.dp).testTag(testTag),
                 value = state.value,
                 maxLines = 3,
                 onValueChange = { state.value = it },
@@ -218,7 +218,7 @@ class TextFieldInteractionsTest {
         val interactionState = InteractionState()
         rule.setContent {
             BasicTextField(
-                modifier = Modifier.size(50.dp).testTag(testTag),
+                modifier = Modifier.requiredSize(50.dp).testTag(testTag),
                 value = state.value,
                 maxLines = 3,
                 onValueChange = { state.value = it },

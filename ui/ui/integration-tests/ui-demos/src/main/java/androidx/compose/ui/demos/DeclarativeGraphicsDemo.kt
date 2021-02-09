@@ -17,7 +17,7 @@ package androidx.compose.ui.demos
 
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.preferredSize
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -40,7 +40,7 @@ fun DeclarativeGraphicsDemo() {
         modifier =
             Modifier.fillMaxSize()
                 .wrapContentSize(Alignment.Center)
-                .preferredSize(120.dp, 120.dp)
+                .size(120.dp, 120.dp)
     ) {
         drawRect(color = Color.Gray)
         // Inset content by 10 pixels on the left/right sides and 12 by the

@@ -24,7 +24,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.preferredHeight
+import androidx.compose.foundation.layout.height
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -51,7 +51,7 @@ fun CrossfadeDemo() {
                         }
                     }
                         .weight(1f, true)
-                        .preferredHeight(48.dp)
+                        .height(48.dp)
                         .background(tab.color)
                 )
             }

@@ -46,7 +46,7 @@ import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.requiredHeight
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.FloatingActionButton
 import androidx.compose.material.Icon
@@ -87,7 +87,7 @@ fun HorizontalTransitionSample() {
         )
     ) {
         // Content that needs to appear/disappear goes here:
-        Box(Modifier.fillMaxWidth().height(200.dp))
+        Box(Modifier.fillMaxWidth().requiredHeight(200.dp))
     }
 }
 
@@ -114,7 +114,7 @@ fun SlideTransition() {
         ) + fadeOut()
     ) {
         // Content that needs to appear/disappear goes here:
-        Box(Modifier.fillMaxWidth().height(200.dp)) {}
+        Box(Modifier.fillMaxWidth().requiredHeight(200.dp)) {}
     }
 }
 
@@ -135,7 +135,7 @@ fun FadeTransition() {
         )
     ) {
         // Content that needs to appear/disappear goes here:
-        Text("Content to appear/disappear", Modifier.fillMaxWidth().height(200.dp))
+        Text("Content to appear/disappear", Modifier.fillMaxWidth().requiredHeight(200.dp))
     }
 }
 
@@ -156,7 +156,7 @@ fun FullyLoadedTransition() {
         exit = slideOutVertically() + shrinkVertically() + fadeOut()
     ) {
         // Content that needs to appear/disappear goes here:
-        Text("Content to appear/disappear", Modifier.fillMaxWidth().height(200.dp))
+        Text("Content to appear/disappear", Modifier.fillMaxWidth().requiredHeight(200.dp))
     }
 }
 
@@ -183,7 +183,7 @@ fun AnimatedFloatingActionButton() {
             }
         }
     }
-    Spacer(Modifier.height(20.dp))
+    Spacer(Modifier.requiredHeight(20.dp))
 }
 
 @OptIn(ExperimentalAnimationApi::class)
@@ -209,7 +209,7 @@ fun SlideInOutSample() {
         )
     ) {
         // Content that needs to appear/disappear goes here:
-        Text("Content to appear/disappear", Modifier.fillMaxWidth().height(200.dp))
+        Text("Content to appear/disappear", Modifier.fillMaxWidth().requiredHeight(200.dp))
     }
 }
 
@@ -234,7 +234,7 @@ fun ExpandShrinkVerticallySample() {
         )
     ) {
         // Content that needs to appear/disappear goes here:
-        Text("Content to appear/disappear", Modifier.fillMaxWidth().height(200.dp))
+        Text("Content to appear/disappear", Modifier.fillMaxWidth().requiredHeight(200.dp))
     }
 }
 
@@ -266,7 +266,7 @@ fun ExpandInShrinkOutSample() {
         )
     ) {
         // Content that needs to appear/disappear goes here:
-        Text("Content to appear/disappear", Modifier.fillMaxWidth().height(200.dp))
+        Text("Content to appear/disappear", Modifier.fillMaxWidth().requiredHeight(200.dp))
     }
 }
 
@@ -285,7 +285,7 @@ fun ColumnAnimatedVisibilitySample() {
             // By default ColumnScope.AnimatedVisibility expands and shrinks new content while
             // fading.
             AnimatedVisibility(i <= itemIndex) {
-                Box(Modifier.height(40.dp).fillMaxWidth().background(color))
+                Box(Modifier.requiredHeight(40.dp).fillMaxWidth().background(color))
             }
         }
     }

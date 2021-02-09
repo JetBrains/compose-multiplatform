@@ -32,7 +32,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.preferredHeight
+import androidx.compose.foundation.layout.height
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -127,7 +127,7 @@ fun SpringBackScrollingDemo() {
                 }
             }
         }
-        Canvas(gesture.fillMaxWidth().preferredHeight(400.dp)) {
+        Canvas(gesture.fillMaxWidth().height(400.dp)) {
             itemWidth.value = size.width / 2f
             if (DEBUG) {
                 println(

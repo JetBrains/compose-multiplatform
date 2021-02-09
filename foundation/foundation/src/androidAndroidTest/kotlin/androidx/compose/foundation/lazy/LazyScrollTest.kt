@@ -19,8 +19,8 @@ package androidx.compose.foundation.lazy
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.animation.smoothScrollBy
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.preferredHeight
-import androidx.compose.foundation.layout.preferredWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.width
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.foundation.gestures.Orientation
@@ -93,13 +93,13 @@ class LazyScrollTest(private val orientation: Orientation) {
     @Composable
     private fun TestContent() {
         if (vertical) {
-            LazyColumn(Modifier.preferredHeight(300.dp), state) {
+            LazyColumn(Modifier.height(300.dp), state) {
                 items(items) {
                     ItemContent()
                 }
             }
         } else {
-            LazyRow(Modifier.preferredWidth(300.dp), state) {
+            LazyRow(Modifier.width(300.dp), state) {
                 items(items) {
                     ItemContent()
                 }
@@ -110,9 +110,9 @@ class LazyScrollTest(private val orientation: Orientation) {
     @Composable
     private fun ItemContent() {
         val modifier = if (vertical) {
-            Modifier.preferredHeight(101.dp)
+            Modifier.height(101.dp)
         } else {
-            Modifier.preferredWidth(101.dp)
+            Modifier.width(101.dp)
         }
         Spacer(modifier)
     }

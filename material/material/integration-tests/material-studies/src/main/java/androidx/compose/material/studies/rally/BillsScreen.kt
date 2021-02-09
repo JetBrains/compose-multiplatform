@@ -21,7 +21,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.preferredHeight
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.Card
@@ -41,7 +41,7 @@ fun BillsBody(bills: List<Bill>) {
         val accountsProportion = bills.extractProportions { it.amount }
         val colors = bills.map { it.color }
         AnimatedCircle(
-            Modifier.align(Alignment.Center).preferredHeight(300.dp).fillMaxWidth(),
+            Modifier.align(Alignment.Center).height(300.dp).fillMaxWidth(),
             accountsProportion,
             colors
         )
@@ -58,7 +58,7 @@ fun BillsBody(bills: List<Bill>) {
             )
         }
     }
-    Spacer(Modifier.preferredHeight(10.dp))
+    Spacer(Modifier.height(10.dp))
     Card {
         Column(modifier = Modifier.padding(12.dp)) {
             bills.forEach { bill ->

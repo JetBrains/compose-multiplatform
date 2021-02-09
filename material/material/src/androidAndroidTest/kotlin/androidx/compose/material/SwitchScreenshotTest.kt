@@ -18,7 +18,7 @@ package androidx.compose.material
 
 import android.os.Build
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.requiredSize
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.mutableStateOf
@@ -131,7 +131,7 @@ class SwitchScreenshotTest {
     @Test
     fun switchTest_bigSizeSpecified() {
         rule.setMaterialContent {
-            Box(wrapperModifier.size(50.dp)) {
+            Box(wrapperModifier.requiredSize(50.dp)) {
                 Switch(checked = true, onCheckedChange = { })
             }
         }

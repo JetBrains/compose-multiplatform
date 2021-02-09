@@ -38,7 +38,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.requiredHeight
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.selection.selectable
 import androidx.compose.material.Button
@@ -127,7 +127,7 @@ fun AnimatedItems(animateContentSize: Boolean) {
 
 @Composable
 fun Item(color: Color, text: String = "") {
-    Box(Modifier.height(80.dp).fillMaxWidth().background(color)) {
+    Box(Modifier.requiredHeight(80.dp).fillMaxWidth().background(color)) {
         Text(
             text,
             modifier = Modifier.align(Alignment.CenterStart).padding(start = 10.dp)

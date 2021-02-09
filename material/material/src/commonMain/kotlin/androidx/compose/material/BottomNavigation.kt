@@ -28,7 +28,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.preferredHeight
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.selection.selectable
 import androidx.compose.material.ripple.rememberRipple
 import androidx.compose.runtime.Composable
@@ -97,7 +97,7 @@ fun BottomNavigation(
         modifier = modifier
     ) {
         Row(
-            Modifier.fillMaxWidth().preferredHeight(BottomNavigationHeight),
+            Modifier.fillMaxWidth().height(BottomNavigationHeight),
             horizontalArrangement = Arrangement.SpaceBetween,
             content = content
         )

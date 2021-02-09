@@ -25,8 +25,8 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.preferredHeight
-import androidx.compose.foundation.layout.preferredWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.selection.selectable
 import androidx.compose.material.Icon
 import androidx.compose.material.MaterialTheme
@@ -48,7 +48,7 @@ fun RallyTopAppBar(
     onTabSelected: (RallyScreenState) -> Unit,
     currentScreen: RallyScreenState
 ) {
-    Surface(Modifier.preferredHeight(TabHeight).fillMaxWidth()) {
+    Surface(Modifier.height(TabHeight).fillMaxWidth()) {
         Row {
             allScreens.forEachIndexed { index, screen ->
                 RallyTab(
@@ -73,7 +73,7 @@ private fun RallyTab(
         Row(
             modifier = Modifier
                 .padding(16.dp)
-                .preferredHeight(TabHeight)
+                .height(TabHeight)
                 .selectable(
                     selected = selected,
                     onClick = onSelected,
@@ -87,7 +87,7 @@ private fun RallyTab(
                 tint = tabTintColor
             )
             if (selected) {
-                Spacer(Modifier.preferredWidth(12.dp))
+                Spacer(Modifier.width(12.dp))
                 Text(text, color = tabTintColor)
             }
         }

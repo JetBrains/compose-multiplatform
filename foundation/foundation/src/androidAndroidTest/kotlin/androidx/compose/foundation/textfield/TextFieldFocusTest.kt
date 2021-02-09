@@ -16,7 +16,7 @@
 
 package androidx.compose.foundation.textfield
 
-import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.requiredWidth
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.CoreTextField
 import androidx.compose.runtime.Composable
@@ -55,7 +55,7 @@ class TextFieldFocusTest {
                 modifier = Modifier
                     .focusRequester(data.focusRequester)
                     .onFocusChanged { data.focused = it.isFocused }
-                    .width(10.dp),
+                    .requiredWidth(10.dp),
                 onValueChange = {
                     editor.value = it
                 }

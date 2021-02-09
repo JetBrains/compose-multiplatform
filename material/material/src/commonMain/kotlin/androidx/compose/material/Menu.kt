@@ -32,8 +32,8 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.preferredSizeIn
-import androidx.compose.foundation.layout.preferredWidth
+import androidx.compose.foundation.layout.sizeIn
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.ripple.rememberRipple
@@ -127,7 +127,7 @@ internal fun DropdownMenuContent(
         Column(
             modifier = modifier
                 .padding(vertical = DropdownMenuVerticalPadding)
-                .preferredWidth(IntrinsicSize.Max)
+                .width(IntrinsicSize.Max)
                 .verticalScroll(rememberScrollState()),
             content = content
         )
@@ -154,7 +154,7 @@ internal fun DropdownMenuItemContent(
             )
             .fillMaxWidth()
             // Preferred min and max width used during the intrinsic measurement.
-            .preferredSizeIn(
+            .sizeIn(
                 minWidth = DropdownMenuItemDefaultMinWidth,
                 maxWidth = DropdownMenuItemDefaultMaxWidth,
                 minHeight = DropdownMenuItemDefaultMinHeight

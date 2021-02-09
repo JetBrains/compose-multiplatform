@@ -19,7 +19,7 @@ package androidx.compose.ui.layout
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.requiredSize
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
@@ -71,7 +71,7 @@ class OnSizeChangedTest {
                             latch.countDown()
                         }
                     ) {
-                        Box(Modifier.size(sizePx.toDp()))
+                        Box(Modifier.requiredSize(sizePx.toDp()))
                     }
                 }
             }
@@ -108,7 +108,7 @@ class OnSizeChangedTest {
                                 latch.countDown()
                             }.padding(sizePx.toDp())
                     ) {
-                        Box(Modifier.size(10.toDp()))
+                        Box(Modifier.requiredSize(10.toDp()))
                     }
                 }
             }
@@ -143,7 +143,7 @@ class OnSizeChangedTest {
                             latch.countDown()
                         }
                     ) {
-                        Box(Modifier.size(10.toDp()))
+                        Box(Modifier.requiredSize(10.toDp()))
                     }
                 }
             }
@@ -176,7 +176,7 @@ class OnSizeChangedTest {
                             latch.countDown()
                         }
                     ) {
-                        Box(Modifier.size(sizePx.toDp()))
+                        Box(Modifier.requiredSize(sizePx.toDp()))
                     }
                 }
             }
@@ -219,7 +219,7 @@ class OnSizeChangedTest {
                             latch1.countDown()
                         }.then(mod)
                     ) {
-                        Box(Modifier.size(10.toDp()))
+                        Box(Modifier.requiredSize(10.toDp()))
                     }
                 }
             }

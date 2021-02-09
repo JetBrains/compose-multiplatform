@@ -22,7 +22,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.offset
-import androidx.compose.foundation.layout.preferredSize
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
@@ -55,7 +55,7 @@ fun LongPressDragGestureFilterDemo() {
             Modifier.offset(offsetX, offsetY)
                 .fillMaxSize()
                 .wrapContentSize(Alignment.Center)
-                .preferredSize(192.dp)
+                .size(192.dp)
                 .pointerInput(Unit) {
                     detectDragGesturesAfterLongPress(
                         onDragStart = { color.value = Blue },

@@ -18,9 +18,9 @@ package androidx.compose.ui.window
 import android.view.View
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.preferredSize
-import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.requiredHeight
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.requiredWidth
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.compositionLocalOf
 import androidx.compose.runtime.getValue
@@ -80,7 +80,7 @@ class PopupTest {
             SimpleContainer {
                 PopupTestTag(testTag) {
                     Popup(alignment = Alignment.Center) {
-                        SimpleContainer(Modifier.preferredSize(50.dp), content = {})
+                        SimpleContainer(Modifier.size(50.dp), content = {})
                     }
                 }
             }
@@ -150,7 +150,7 @@ class PopupTest {
                         // This is called after the OnChildPosition method in Popup() which
                         // updates the popup to its final position
                         Box(
-                            modifier = Modifier.width(200.dp).height(200.dp)
+                            modifier = Modifier.requiredWidth(200.dp).requiredHeight(200.dp)
                                 .onGloballyPositioned {
                                     measureLatch.countDown()
                                 }
@@ -242,7 +242,7 @@ class PopupTest {
             Box(Modifier.fillMaxSize()) {
                 if (showPopup) {
                     Popup(alignment = Alignment.Center, onDismissRequest = { showPopup = false }) {
-                        Box(Modifier.preferredSize(50.dp).testTag(testTag))
+                        Box(Modifier.size(50.dp).testTag(testTag))
                     }
                 }
             }
@@ -276,7 +276,7 @@ class PopupTest {
                         alignment = Alignment.Center,
                         onDismissRequest = { showPopup = false }
                     ) {
-                        Box(Modifier.preferredSize(50.dp).testTag(testTag))
+                        Box(Modifier.size(50.dp).testTag(testTag))
                     }
                 }
             }
@@ -302,7 +302,7 @@ class PopupTest {
                         properties = PopupProperties(dismissOnClickOutside = false),
                         onDismissRequest = { showPopup = false }
                     ) {
-                        Box(Modifier.preferredSize(50.dp).testTag(testTag))
+                        Box(Modifier.size(50.dp).testTag(testTag))
                     }
                 }
             }
@@ -337,7 +337,7 @@ class PopupTest {
                         alignment = Alignment.Center,
                         onDismissRequest = { showPopup = false }
                     ) {
-                        Box(Modifier.preferredSize(50.dp).testTag(testTag))
+                        Box(Modifier.size(50.dp).testTag(testTag))
                     }
                 }
             }

@@ -28,7 +28,7 @@ import androidx.compose.ui.graphics.StrokeJoin
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.graphics.vector.PathData
 import androidx.compose.ui.graphics.vector.ImageVector
-import androidx.compose.foundation.layout.preferredSize
+import androidx.compose.foundation.layout.size
 import androidx.compose.testutils.ComposeTestCase
 import androidx.compose.ui.graphics.vector.rememberVectorPainter
 import androidx.compose.ui.res.painterResource
@@ -47,7 +47,7 @@ sealed class ImageVectorTestCase : ComposeTestCase {
         Box {
             Box(
                 Modifier.testTag(testTag)
-                    .preferredSize(24.dp)
+                    .size(24.dp)
                     .paint(getPainter())
             )
         }

@@ -19,7 +19,7 @@ package androidx.compose.material
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.preferredHeight
+import androidx.compose.foundation.layout.height
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.semantics.SemanticsActions
@@ -67,7 +67,7 @@ class ModalBottomSheetTest {
                     Box(
                         Modifier
                             .fillMaxWidth()
-                            .preferredHeight(sheetHeight)
+                            .height(sheetHeight)
                             .testTag(sheetTag)
                     )
                 }
@@ -89,7 +89,7 @@ class ModalBottomSheetTest {
                     Box(
                         Modifier
                             .fillMaxWidth()
-                            .preferredHeight(sheetHeight)
+                            .height(sheetHeight)
                             .testTag(sheetTag)
                     )
                 }
@@ -111,7 +111,7 @@ class ModalBottomSheetTest {
                     Box(
                         Modifier
                             .fillMaxWidth()
-                            .preferredHeight(sheetHeight)
+                            .height(sheetHeight)
                             .testTag(sheetTag)
                     )
                 }
@@ -320,7 +320,7 @@ class ModalBottomSheetTest {
                     Box(
                         Modifier
                             .fillMaxWidth()
-                            .preferredHeight(sheetHeight)
+                            .height(sheetHeight)
                             .testTag(sheetTag)
                     )
                 }
@@ -397,7 +397,7 @@ class ModalBottomSheetTest {
                     Box(
                         Modifier
                             .fillMaxWidth()
-                            .preferredHeight(sheetHeight)
+                            .height(sheetHeight)
                             .testTag(sheetTag)
                     )
                 }

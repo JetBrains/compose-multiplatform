@@ -19,7 +19,7 @@ package androidx.compose.material
 import android.os.Build
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.requiredSize
 import androidx.compose.testutils.assertAgainstGolden
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.test.captureToImage
@@ -157,7 +157,9 @@ class AlertDialogScreenshotTest {
             AlertDialog(
                 onDismissRequest = {},
                 title = {
-                    Box(Modifier.size(75.dp, 25.dp).background(MaterialTheme.colors.primary))
+                    Box(
+                        Modifier.requiredSize(75.dp, 25.dp).background(MaterialTheme.colors.primary)
+                    )
                 },
                 text = { Text("Text") },
                 confirmButton = {
@@ -180,7 +182,10 @@ class AlertDialogScreenshotTest {
                 onDismissRequest = {},
                 title = { Text("Title") },
                 text = {
-                    Box(Modifier.size(300.dp, 50.dp).background(MaterialTheme.colors.primary))
+                    Box(
+                        Modifier.requiredSize(300.dp, 50.dp)
+                            .background(MaterialTheme.colors.primary)
+                    )
                 },
                 confirmButton = {
                     TextButton(onClick = {}) {
@@ -201,10 +206,16 @@ class AlertDialogScreenshotTest {
             AlertDialog(
                 onDismissRequest = {},
                 title = {
-                    Box(Modifier.size(75.dp, 25.dp).background(MaterialTheme.colors.primary))
+                    Box(
+                        Modifier.requiredSize(75.dp, 25.dp)
+                            .background(MaterialTheme.colors.primary)
+                    )
                 },
                 text = {
-                    Box(Modifier.size(300.dp, 50.dp).background(MaterialTheme.colors.primary))
+                    Box(
+                        Modifier.requiredSize(300.dp, 50.dp)
+                            .background(MaterialTheme.colors.primary)
+                    )
                 },
                 confirmButton = {
                     TextButton(onClick = {}) {

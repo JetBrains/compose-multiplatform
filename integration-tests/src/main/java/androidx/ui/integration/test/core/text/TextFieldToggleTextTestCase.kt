@@ -20,8 +20,8 @@ import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.InternalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.preferredWidth
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.requiredWidth
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
@@ -65,7 +65,7 @@ class TextFieldToggleTextTestCase(
                 value = text.value,
                 onValueChange = {},
                 textStyle = TextStyle(color = Color.Black, fontSize = fontSize),
-                modifier = Modifier.background(color = Color.Cyan).width(width)
+                modifier = Modifier.background(color = Color.Cyan).requiredWidth(width)
             )
         }
     }
@@ -81,7 +81,7 @@ class TextFieldToggleTextTestCase(
             textInputService
         }
         Column(
-            modifier = Modifier.preferredWidth(width)
+            modifier = Modifier.width(width)
         ) {
             content()
         }

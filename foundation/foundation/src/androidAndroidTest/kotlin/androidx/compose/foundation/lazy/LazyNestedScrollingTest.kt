@@ -20,7 +20,7 @@ import androidx.compose.foundation.gestures.ScrollableState
 import androidx.compose.foundation.gestures.scrollable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.requiredSize
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.foundation.gestures.Orientation
@@ -66,9 +66,9 @@ class LazyNestedScrollingTest {
                     state = scrollable
                 )
             ) {
-                LazyColumn(Modifier.size(100.dp).testTag(LazyTag)) {
+                LazyColumn(Modifier.requiredSize(100.dp).testTag(LazyTag)) {
                     items(items) {
-                        Spacer(Modifier.size(50.dp).testTag("$it"))
+                        Spacer(Modifier.requiredSize(50.dp).testTag("$it"))
                     }
                 }
             }
@@ -101,9 +101,9 @@ class LazyNestedScrollingTest {
                     state = scrollable
                 )
             ) {
-                LazyColumn(Modifier.size(100.dp).testTag(LazyTag)) {
+                LazyColumn(Modifier.requiredSize(100.dp).testTag(LazyTag)) {
                     items(items) {
-                        Spacer(Modifier.size(50.dp).testTag("$it"))
+                        Spacer(Modifier.requiredSize(50.dp).testTag("$it"))
                     }
                 }
             }
@@ -146,9 +146,9 @@ class LazyNestedScrollingTest {
                     state = scrollable
                 )
             ) {
-                LazyColumn(Modifier.size(100.dp).testTag(LazyTag)) {
+                LazyColumn(Modifier.requiredSize(100.dp).testTag(LazyTag)) {
                     items(items) {
-                        Spacer(Modifier.size(40.dp).testTag("$it"))
+                        Spacer(Modifier.requiredSize(40.dp).testTag("$it"))
                     }
                 }
             }
@@ -181,9 +181,9 @@ class LazyNestedScrollingTest {
                     state = scrollable
                 )
             ) {
-                LazyColumn(Modifier.size(100.dp).testTag(LazyTag)) {
+                LazyColumn(Modifier.requiredSize(100.dp).testTag(LazyTag)) {
                     items(items) {
-                        Spacer(Modifier.size(50.dp).testTag("$it"))
+                        Spacer(Modifier.requiredSize(50.dp).testTag("$it"))
                     }
                 }
             }
@@ -222,10 +222,10 @@ class LazyNestedScrollingTest {
                 )
             ) {
                 LazyRow(
-                    modifier = Modifier.size(100.dp).testTag(LazyTag)
+                    modifier = Modifier.requiredSize(100.dp).testTag(LazyTag)
                 ) {
                     items(items) {
-                        Spacer(Modifier.size(50.dp).testTag("$it"))
+                        Spacer(Modifier.requiredSize(50.dp).testTag("$it"))
                     }
                 }
             }
@@ -259,10 +259,10 @@ class LazyNestedScrollingTest {
                 )
             ) {
                 LazyRow(
-                    modifier = Modifier.size(100.dp).testTag(LazyTag)
+                    modifier = Modifier.requiredSize(100.dp).testTag(LazyTag)
                 ) {
                     items(items) {
-                        Spacer(Modifier.size(50.dp).testTag("$it"))
+                        Spacer(Modifier.requiredSize(50.dp).testTag("$it"))
                     }
                 }
             }
@@ -306,10 +306,10 @@ class LazyNestedScrollingTest {
                 )
             ) {
                 LazyRow(
-                    modifier = Modifier.size(100.dp).testTag(LazyTag)
+                    modifier = Modifier.requiredSize(100.dp).testTag(LazyTag)
                 ) {
                     items(items) {
-                        Spacer(Modifier.size(40.dp).testTag("$it"))
+                        Spacer(Modifier.requiredSize(40.dp).testTag("$it"))
                     }
                 }
             }
@@ -343,10 +343,10 @@ class LazyNestedScrollingTest {
                 )
             ) {
                 LazyRow(
-                    modifier = Modifier.size(100.dp).testTag(LazyTag)
+                    modifier = Modifier.requiredSize(100.dp).testTag(LazyTag)
                 ) {
                     items(items) {
-                        Spacer(Modifier.size(50.dp).testTag("$it"))
+                        Spacer(Modifier.requiredSize(50.dp).testTag("$it"))
                     }
                 }
             }

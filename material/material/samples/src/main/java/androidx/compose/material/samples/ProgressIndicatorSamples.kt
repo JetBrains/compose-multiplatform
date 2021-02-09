@@ -20,7 +20,7 @@ import androidx.annotation.Sampled
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.requiredHeight
 import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.material.LinearProgressIndicator
 import androidx.compose.material.OutlinedButton
@@ -46,7 +46,7 @@ fun LinearProgressIndicatorSample() {
 
     Column(horizontalAlignment = Alignment.CenterHorizontally) {
         LinearProgressIndicator(progress = animatedProgress)
-        Spacer(Modifier.height(30.dp))
+        Spacer(Modifier.requiredHeight(30.dp))
         OutlinedButton(
             onClick = {
                 if (progress < 1f) progress += 0.1f
@@ -68,7 +68,7 @@ fun CircularProgressIndicatorSample() {
 
     Column(horizontalAlignment = Alignment.CenterHorizontally) {
         CircularProgressIndicator(progress = animatedProgress)
-        Spacer(Modifier.height(30.dp))
+        Spacer(Modifier.requiredHeight(30.dp))
         OutlinedButton(
             onClick = {
                 if (progress < 1f) progress += 0.1f

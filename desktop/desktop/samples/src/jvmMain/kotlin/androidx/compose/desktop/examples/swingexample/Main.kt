@@ -29,7 +29,6 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.preferredSize
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -167,7 +166,7 @@ fun ComposeContent(background: Color = Color.White) {
                 }
                 Spacer(modifier = Modifier.width(20.dp))
                 SwingPanel(
-                    modifier = Modifier.preferredSize(200.dp, 39.dp),
+                    modifier = Modifier.size(200.dp, 39.dp),
                     componentBlock = {
                         actionButton(
                             text = "JComponent",
@@ -183,7 +182,7 @@ fun ComposeContent(background: Color = Color.White) {
                 Spacer(modifier = Modifier.width(20.dp))
                 SwingPanel(
                     background = background,
-                    modifier = Modifier.preferredSize(200.dp, 39.dp),
+                    modifier = Modifier.size(200.dp, 39.dp),
                     componentBlock = { ComposableColoredPanel(Color.Red) }
                 )
             }

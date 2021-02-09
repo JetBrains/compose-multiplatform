@@ -21,7 +21,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.preferredSize
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -35,13 +35,13 @@ class ComponentWithTwoLayoutNodesTestCase : SimpleComponentImplenentationTestCas
     override fun Content() {
         Box(
             modifier = Modifier
-                .preferredSize(48.dp)
+                .size(48.dp)
                 .border(BorderStroke(1.dp, Color.Cyan), CircleShape)
                 .padding(1.dp),
             contentAlignment = Alignment.Center
         ) {
             val innerSize = getInnerSize().value
-            Canvas(Modifier.preferredSize(innerSize)) {
+            Canvas(Modifier.size(innerSize)) {
                 drawOutline(
                     CircleShape.createOutline(size, layoutDirection, this),
                     Color.Cyan

@@ -23,8 +23,8 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.preferredSize
+import androidx.compose.foundation.layout.requiredHeight
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.runtime.Composable
@@ -1572,7 +1572,7 @@ class SwipeableTest {
             scrollState = rememberScrollState()
             Box(
                 Modifier
-                    .preferredSize(300.dp)
+                    .size(300.dp)
                     .nestedScroll(swipeableState.PreUpPostDownNestedScrollConnection)
                     .swipeable(
                         state = swipeableState,
@@ -1585,7 +1585,7 @@ class SwipeableTest {
                     Modifier.fillMaxWidth().testTag(swipeableTag).verticalScroll(scrollState)
                 ) {
                     repeat(100) {
-                        Text(text = it.toString(), modifier = Modifier.height(50.dp))
+                        Text(text = it.toString(), modifier = Modifier.requiredHeight(50.dp))
                     }
                 }
             }
@@ -1629,7 +1629,7 @@ class SwipeableTest {
             scrollState = rememberScrollState()
             Box(
                 Modifier
-                    .preferredSize(300.dp)
+                    .size(300.dp)
                     .nestedScroll(swipeableState.PreUpPostDownNestedScrollConnection)
                     .swipeable(
                         state = swipeableState,
@@ -1642,7 +1642,7 @@ class SwipeableTest {
                     Modifier.fillMaxWidth().testTag(swipeableTag).verticalScroll(scrollState)
                 ) {
                     repeat(100) {
-                        Text(text = it.toString(), modifier = Modifier.height(50.dp))
+                        Text(text = it.toString(), modifier = Modifier.requiredHeight(50.dp))
                     }
                 }
             }
@@ -1695,7 +1695,7 @@ class SwipeableTest {
             scrollState = rememberScrollState(initial = 5000f)
             Box(
                 Modifier
-                    .preferredSize(300.dp)
+                    .size(300.dp)
                     .nestedScroll(swipeableState.PreUpPostDownNestedScrollConnection)
                     .swipeable(
                         state = swipeableState,
@@ -1708,7 +1708,7 @@ class SwipeableTest {
                     Modifier.fillMaxWidth().testTag(swipeableTag).verticalScroll(scrollState)
                 ) {
                     repeat(100) {
-                        Text(text = it.toString(), modifier = Modifier.height(50.dp))
+                        Text(text = it.toString(), modifier = Modifier.requiredHeight(50.dp))
                     }
                 }
             }

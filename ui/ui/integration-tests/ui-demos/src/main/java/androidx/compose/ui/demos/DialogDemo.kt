@@ -20,7 +20,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.preferredSize
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Card
 import androidx.compose.material.Text
@@ -46,7 +46,7 @@ fun DialogDemo() {
     if (openDialog) {
         Dialog(onDismissRequest = { openDialog = false }) {
             Card(
-                modifier = Modifier.preferredSize(350.dp, 200.dp).padding(10.dp),
+                modifier = Modifier.size(350.dp, 200.dp).padding(10.dp),
                 elevation = elevation,
                 shape = shape
             ) {

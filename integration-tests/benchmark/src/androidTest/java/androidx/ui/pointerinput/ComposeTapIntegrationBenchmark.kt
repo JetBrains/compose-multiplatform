@@ -24,7 +24,7 @@ import androidx.benchmark.junit4.measureRepeated
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.requiredHeight
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
@@ -184,7 +184,7 @@ class ComposeTapIntegrationBenchmark {
                     }
                 }
                 .fillMaxWidth()
-                .height(itemHeightDp)
+                .requiredHeight(itemHeightDp)
         )
     }
 }

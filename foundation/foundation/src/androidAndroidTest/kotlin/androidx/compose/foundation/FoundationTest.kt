@@ -17,7 +17,7 @@
 package androidx.compose.foundation
 
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.preferredSizeIn
+import androidx.compose.foundation.layout.sizeIn
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
@@ -41,7 +41,7 @@ fun ComposeContentTestRule.setContentForSizeAssertions(
     setContent {
         Box {
             Box(
-                Modifier.preferredSizeIn(maxWidth = parentMaxWidth, maxHeight = parentMaxHeight)
+                Modifier.sizeIn(maxWidth = parentMaxWidth, maxHeight = parentMaxHeight)
                     .testTag("containerForSizeAssertion")
             ) {
                 content()

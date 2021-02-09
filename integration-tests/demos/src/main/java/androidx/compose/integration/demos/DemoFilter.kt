@@ -20,7 +20,7 @@ import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.preferredHeight
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.BasicTextField
@@ -160,7 +160,7 @@ private fun FilteredDemoListItem(
         ListItem(
             text = {
                 Text(
-                    modifier = Modifier.preferredHeight(56.dp).wrapContentSize(Alignment.Center),
+                    modifier = Modifier.height(56.dp).wrapContentSize(Alignment.Center),
                     text = annotatedString
                 )
             },

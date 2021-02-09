@@ -24,8 +24,8 @@ import androidx.compose.foundation.indication
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.preferredHeight
-import androidx.compose.foundation.layout.preferredWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.ripple.ExperimentalRippleApi
 import androidx.compose.material.ripple.LocalRippleTheme
@@ -686,7 +686,7 @@ private fun RippleBox(interactionState: InteractionState, ripple: Indication) {
             color = RippleBoxBackgroundColor, shape = RoundedCornerShape(20)
         ) {
             Box(
-                Modifier.preferredWidth(80.dp).preferredHeight(50.dp).indication(
+                Modifier.width(80.dp).height(50.dp).indication(
                     interactionState = interactionState,
                     indication = ripple
                 )

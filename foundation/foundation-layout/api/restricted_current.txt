@@ -126,8 +126,8 @@ package androidx.compose.foundation.layout {
   }
 
   public final class IntrinsicKt {
-    method @androidx.compose.foundation.layout.ExperimentalLayout @androidx.compose.runtime.Stable public static androidx.compose.ui.Modifier preferredHeight(androidx.compose.ui.Modifier, androidx.compose.foundation.layout.IntrinsicSize intrinsicSize);
-    method @androidx.compose.foundation.layout.ExperimentalLayout @androidx.compose.runtime.Stable public static androidx.compose.ui.Modifier preferredWidth(androidx.compose.ui.Modifier, androidx.compose.foundation.layout.IntrinsicSize intrinsicSize);
+    method @androidx.compose.foundation.layout.ExperimentalLayout @androidx.compose.runtime.Stable public static androidx.compose.ui.Modifier height(androidx.compose.ui.Modifier, androidx.compose.foundation.layout.IntrinsicSize intrinsicSize);
+    method @androidx.compose.foundation.layout.ExperimentalLayout @androidx.compose.runtime.Stable public static androidx.compose.ui.Modifier width(androidx.compose.ui.Modifier, androidx.compose.foundation.layout.IntrinsicSize intrinsicSize);
   }
 
   public enum IntrinsicSize {
@@ -200,13 +200,13 @@ package androidx.compose.foundation.layout {
     method @androidx.compose.runtime.Stable public static androidx.compose.ui.Modifier fillMaxWidth(androidx.compose.ui.Modifier, optional float fraction);
     method @androidx.compose.runtime.Stable public static androidx.compose.ui.Modifier height-wxomhCo(androidx.compose.ui.Modifier, float height);
     method @androidx.compose.runtime.Stable public static androidx.compose.ui.Modifier heightIn-S2lCeAQ(androidx.compose.ui.Modifier, optional float min, optional float max);
-    method @androidx.compose.runtime.Stable public static androidx.compose.ui.Modifier preferredHeight-wxomhCo(androidx.compose.ui.Modifier, float height);
-    method @androidx.compose.runtime.Stable public static androidx.compose.ui.Modifier preferredHeightIn-S2lCeAQ(androidx.compose.ui.Modifier, optional float min, optional float max);
-    method @androidx.compose.runtime.Stable public static androidx.compose.ui.Modifier preferredSize-S2lCeAQ(androidx.compose.ui.Modifier, float width, float height);
-    method @androidx.compose.runtime.Stable public static androidx.compose.ui.Modifier preferredSize-wxomhCo(androidx.compose.ui.Modifier, float size);
-    method @androidx.compose.runtime.Stable public static androidx.compose.ui.Modifier preferredSizeIn-w2-DAAU(androidx.compose.ui.Modifier, optional float minWidth, optional float minHeight, optional float maxWidth, optional float maxHeight);
-    method @androidx.compose.runtime.Stable public static androidx.compose.ui.Modifier preferredWidth-wxomhCo(androidx.compose.ui.Modifier, float width);
-    method @androidx.compose.runtime.Stable public static androidx.compose.ui.Modifier preferredWidthIn-S2lCeAQ(androidx.compose.ui.Modifier, optional float min, optional float max);
+    method @androidx.compose.runtime.Stable public static androidx.compose.ui.Modifier requiredHeight-wxomhCo(androidx.compose.ui.Modifier, float height);
+    method @androidx.compose.runtime.Stable public static androidx.compose.ui.Modifier requiredHeightIn-S2lCeAQ(androidx.compose.ui.Modifier, optional float min, optional float max);
+    method @androidx.compose.runtime.Stable public static androidx.compose.ui.Modifier requiredSize-S2lCeAQ(androidx.compose.ui.Modifier, float width, float height);
+    method @androidx.compose.runtime.Stable public static androidx.compose.ui.Modifier requiredSize-wxomhCo(androidx.compose.ui.Modifier, float size);
+    method @androidx.compose.runtime.Stable public static androidx.compose.ui.Modifier requiredSizeIn-w2-DAAU(androidx.compose.ui.Modifier, optional float minWidth, optional float minHeight, optional float maxWidth, optional float maxHeight);
+    method @androidx.compose.runtime.Stable public static androidx.compose.ui.Modifier requiredWidth-wxomhCo(androidx.compose.ui.Modifier, float width);
+    method @androidx.compose.runtime.Stable public static androidx.compose.ui.Modifier requiredWidthIn-S2lCeAQ(androidx.compose.ui.Modifier, optional float min, optional float max);
     method @androidx.compose.runtime.Stable public static androidx.compose.ui.Modifier size-S2lCeAQ(androidx.compose.ui.Modifier, float width, float height);
     method @androidx.compose.runtime.Stable public static androidx.compose.ui.Modifier size-wxomhCo(androidx.compose.ui.Modifier, float size);
     method @androidx.compose.runtime.Stable public static androidx.compose.ui.Modifier sizeIn-w2-DAAU(androidx.compose.ui.Modifier, optional float minWidth, optional float minHeight, optional float maxWidth, optional float maxHeight);

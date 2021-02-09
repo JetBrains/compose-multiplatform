@@ -23,7 +23,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.requiredWidth
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
@@ -109,7 +109,7 @@ private fun FocusableText(text: String, modifier: Modifier = Modifier) {
     Text(
         modifier = modifier
             .border(width = 1.dp, color = Black)
-            .width(50.dp)
+            .requiredWidth(50.dp)
             .focusRequester(focusRequester)
             .onFocusChanged { color = if (it.isFocused) Green else Black }
             .focusModifier()

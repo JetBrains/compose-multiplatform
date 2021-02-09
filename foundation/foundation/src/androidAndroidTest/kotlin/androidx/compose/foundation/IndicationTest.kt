@@ -17,7 +17,7 @@
 package androidx.compose.foundation
 
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.preferredSize
+import androidx.compose.foundation.layout.size
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -76,7 +76,7 @@ class IndicationTest {
             }
         }
         rule.setContent {
-            Box(Modifier.testTag(testTag).preferredSize(100.dp).indication(state, indication))
+            Box(Modifier.testTag(testTag).size(100.dp).indication(state, indication))
         }
         assertThat(countDownLatch.await(1000, TimeUnit.MILLISECONDS)).isTrue()
     }
@@ -93,7 +93,7 @@ class IndicationTest {
             Box(
                 Modifier
                     .testTag(testTag)
-                    .preferredSize(100.dp)
+                    .size(100.dp)
                     .clickable(
                         interactionState = remember { InteractionState() },
                         indication = indication,
@@ -129,7 +129,7 @@ class IndicationTest {
         rule.setContent {
             val switchableIndication =
                 if (switchState.value) Modifier.indication(state, indication) else Modifier
-            Box(Modifier.testTag(testTag).preferredSize(100.dp).then(switchableIndication))
+            Box(Modifier.testTag(testTag).size(100.dp).then(switchableIndication))
         }
         assertThat(countDownLatch.count).isEqualTo(1)
         rule.runOnIdle {
@@ -152,7 +152,7 @@ class IndicationTest {
             Box(
                 Modifier
                     .testTag(testTag)
-                    .preferredSize(100.dp)
+                    .size(100.dp)
                     .clickable(
                         interactionState = remember { InteractionState() },
                         indication = indication

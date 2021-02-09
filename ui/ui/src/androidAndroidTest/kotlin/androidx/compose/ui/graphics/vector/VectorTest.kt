@@ -21,9 +21,9 @@ import android.os.Build
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.preferredHeight
-import androidx.compose.foundation.layout.preferredSize
-import androidx.compose.foundation.layout.preferredWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -149,7 +149,7 @@ class VectorTest {
         // Make sure that if we are given the size of zero we should not crash and instead
         // act as a no-op
         rule.setContent {
-            Box(modifier = Modifier.preferredSize(0.dp).paint(createTestVectorPainter()))
+            Box(modifier = Modifier.size(0.dp).paint(createTestVectorPainter()))
         }
     }
 
@@ -157,7 +157,7 @@ class VectorTest {
     fun testVectorZeroWidthDoesNotCrash() {
         rule.setContent {
             Box(
-                modifier = Modifier.preferredWidth(0.dp).preferredHeight(100.dp).paint
+                modifier = Modifier.width(0.dp).height(100.dp).paint
                 (createTestVectorPainter())
             )
         }
@@ -167,7 +167,7 @@ class VectorTest {
     fun testVectorZeroHeightDoesNotCrash() {
         rule.setContent {
             Box(
-                modifier = Modifier.preferredWidth(50.dp).preferredHeight(0.dp).paint(
+                modifier = Modifier.width(50.dp).height(0.dp).paint(
                     createTestVectorPainter()
                 )
             )
@@ -236,7 +236,7 @@ class VectorTest {
                 contentDescription = null,
                 modifier = Modifier
                     .testTag(testTag)
-                    .preferredSize(icon1.defaultWidth, icon1.defaultHeight)
+                    .size(icon1.defaultWidth, icon1.defaultHeight)
                     .background(Color.Red)
                     .clickable { clickState.value = !clickState.value },
                 alignment = Alignment.TopStart,
@@ -296,7 +296,7 @@ class VectorTest {
                 contentDescription = null,
                 modifier = Modifier
                     .testTag(testTag)
-                    .preferredSize(defaultWidth * 7, defaultHeight * 3)
+                    .size(defaultWidth * 7, defaultHeight * 3)
                     .background(Color.Red),
                 contentScale = ContentScale.FillBounds
             )

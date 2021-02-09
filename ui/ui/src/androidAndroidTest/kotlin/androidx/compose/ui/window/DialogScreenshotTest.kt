@@ -17,7 +17,7 @@ package androidx.compose.ui.window
 
 import android.os.Build
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.preferredSize
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.testutils.assertAgainstGolden
 import androidx.compose.ui.GOLDEN_UI
@@ -56,7 +56,7 @@ class DialogScreenshotTest {
                 Box(
                     Modifier
                         .graphicsLayer(shape = RoundedCornerShape(percent = 15), clip = true)
-                        .preferredSize(200.dp)
+                        .size(200.dp)
                         .background(Color(0xFFA896B0))
                 )
             }
@@ -79,7 +79,7 @@ class DialogScreenshotTest {
                             shape = RoundedCornerShape(percent = 15),
                             clip = true
                         )
-                        .preferredSize(200.dp)
+                        .size(200.dp)
                         .background(Color(0xFFA896B0))
                 )
             }

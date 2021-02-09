@@ -27,7 +27,7 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.preferredSize
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
@@ -100,7 +100,7 @@ private object LayoutSnippet3bis {
                 .fillMaxWidth()
         ) {
             Row(verticalAlignment = Alignment.CenterVertically) { /*...*/ }
-            Spacer(Modifier.preferredSize(padding))
+            Spacer(Modifier.size(padding))
             Card(elevation = 4.dp) { /*...*/ }
         }
     }

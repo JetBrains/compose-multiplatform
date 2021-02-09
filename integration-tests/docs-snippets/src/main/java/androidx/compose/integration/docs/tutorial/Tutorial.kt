@@ -25,7 +25,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.preferredHeight
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
@@ -176,7 +176,7 @@ private object TutorialSnippet8 {
             modifier = Modifier.padding(16.dp)
         ) {
             val imageModifier = Modifier
-                .preferredHeight(180.dp)
+                .height(180.dp)
                 .fillMaxWidth()
 
             Image(
@@ -204,7 +204,7 @@ private object TutorialSnippet9 {
             modifier = Modifier.padding(16.dp)
         ) {
             val imageModifier = Modifier
-                .preferredHeight(180.dp)
+                .height(180.dp)
                 .fillMaxWidth()
                 .clip(shape = RoundedCornerShape(4.dp))
 
@@ -214,7 +214,7 @@ private object TutorialSnippet9 {
                 modifier = imageModifier,
                 contentScale = ContentScale.Crop
             )
-            Spacer(Modifier.preferredHeight(16.dp))
+            Spacer(Modifier.height(16.dp))
 
             Text("A day in Shark Fin Cove")
             Text("Davenport, California")
@@ -232,7 +232,7 @@ private object TutorialSnippet10 {
                 modifier = Modifier.padding(16.dp)
             ) {
                 val imageModifier = Modifier
-                    .preferredHeight(180.dp)
+                    .height(180.dp)
                     .fillMaxWidth()
                     .clip(shape = RoundedCornerShape(4.dp))
 
@@ -242,7 +242,7 @@ private object TutorialSnippet10 {
                     modifier = imageModifier,
                     contentScale = ContentScale.Crop
                 )
-                Spacer(Modifier.preferredHeight(16.dp))
+                Spacer(Modifier.height(16.dp))
 
                 Text("A day in Shark Fin Cove")
                 Text("Davenport, California")
@@ -262,7 +262,7 @@ private object TutorialSnippet11 {
                 modifier = Modifier.padding(16.dp)
             ) {
                 val imageModifier = Modifier
-                    .preferredHeight(180.dp)
+                    .height(180.dp)
                     .fillMaxWidth()
                     .clip(shape = RoundedCornerShape(4.dp))
 
@@ -272,7 +272,7 @@ private object TutorialSnippet11 {
                     modifier = imageModifier,
                     contentScale = ContentScale.Crop
                 )
-                Spacer(Modifier.preferredHeight(16.dp))
+                Spacer(Modifier.height(16.dp))
 
                 Text("A day in Shark Fin Cove",
                     style = typography.h6)
@@ -295,7 +295,7 @@ private object TutorialSnippet12 {
                 modifier = Modifier.padding(16.dp)
             ) {
                 val imageModifier = Modifier
-                    .preferredHeight(180.dp)
+                    .height(180.dp)
                     .fillMaxWidth()
                     .clip(shape = RoundedCornerShape(4.dp))
 
@@ -305,7 +305,7 @@ private object TutorialSnippet12 {
                     modifier = imageModifier,
                     contentScale = ContentScale.Crop
                 )
-                Spacer(Modifier.preferredHeight(16.dp))
+                Spacer(Modifier.height(16.dp))
 
                 Text(
                     "A day wandering through the sandhills " +
@@ -332,7 +332,7 @@ private object TutorialSnippet13 {
                 modifier = Modifier.padding(16.dp)
             ) {
                 val imageModifier = Modifier
-                    .preferredHeight(180.dp)
+                    .height(180.dp)
                     .fillMaxWidth()
                     .clip(shape = RoundedCornerShape(4.dp))
 
@@ -341,7 +341,7 @@ private object TutorialSnippet13 {
                     modifier = imageModifier,
                     contentScale = ContentScale.Crop
                 )
-                Spacer(Modifier.preferredHeight(16.dp))
+                Spacer(Modifier.height(16.dp))
 
                 Text(
                     "A day wandering through the sandhills " +

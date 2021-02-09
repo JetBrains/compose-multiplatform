@@ -18,7 +18,7 @@ package androidx.compose.foundation.samples
 
 import androidx.annotation.Sampled
 import androidx.compose.foundation.Canvas
-import androidx.compose.foundation.layout.preferredSize
+import androidx.compose.foundation.layout.size
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
@@ -29,7 +29,7 @@ import androidx.compose.ui.unit.dp
 @Sampled
 @Composable
 fun CanvasSample() {
-    Canvas(modifier = Modifier.preferredSize(100.dp)) {
+    Canvas(modifier = Modifier.size(100.dp)) {
         drawRect(Color.Magenta)
         inset(10.0f) {
             drawLine(

@@ -18,7 +18,7 @@ package androidx.compose.ui.samples
 
 import androidx.annotation.Sampled
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.preferredSize
+import androidx.compose.foundation.layout.size
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.scale
@@ -29,7 +29,7 @@ import androidx.compose.ui.unit.dp
 fun ScaleUniformSample() {
     Box(
         Modifier.scale(2f)
-            .preferredSize(100.dp, 100.dp)
+            .size(100.dp, 100.dp)
     )
 }
 
@@ -38,6 +38,6 @@ fun ScaleUniformSample() {
 fun ScaleNonUniformSample() {
     Box(
         Modifier.scale(scaleX = 2f, scaleY = 3f)
-            .preferredSize(100.dp, 100.dp)
+            .size(100.dp, 100.dp)
     )
 }

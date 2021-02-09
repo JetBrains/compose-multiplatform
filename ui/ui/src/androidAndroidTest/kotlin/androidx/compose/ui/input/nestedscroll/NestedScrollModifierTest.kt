@@ -18,7 +18,7 @@ package androidx.compose.ui.input.nestedscroll
 
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.requiredSize
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.Modifier
@@ -87,9 +87,9 @@ class NestedScrollModifierTest {
         }
         val childDispatcher = NestedScrollDispatcher()
         rule.setContent {
-            Box(Modifier.size(100.dp).nestedScroll(parentConnection)) {
+            Box(Modifier.requiredSize(100.dp).nestedScroll(parentConnection)) {
                 Box(
-                    Modifier.size(100.dp).nestedScroll(childConnection, childDispatcher)
+                    Modifier.requiredSize(100.dp).nestedScroll(childConnection, childDispatcher)
                 )
             }
         }
@@ -135,10 +135,10 @@ class NestedScrollModifierTest {
         }
         val childDispatcher = NestedScrollDispatcher()
         rule.setContent {
-            Box(Modifier.size(100.dp).nestedScroll(grandParentConnection)) {
-                Box(Modifier.size(100.dp).nestedScroll(parentConnection)) {
+            Box(Modifier.requiredSize(100.dp).nestedScroll(grandParentConnection)) {
+                Box(Modifier.requiredSize(100.dp).nestedScroll(parentConnection)) {
                     Box(
-                        Modifier.size(100.dp).nestedScroll(childConnection, childDispatcher)
+                        Modifier.requiredSize(100.dp).nestedScroll(childConnection, childDispatcher)
                     )
                 }
             }
@@ -183,10 +183,10 @@ class NestedScrollModifierTest {
         }
         val childDispatcher = NestedScrollDispatcher()
         rule.setContent {
-            Box(Modifier.size(100.dp).nestedScroll(grandParentConnection)) {
-                Box(Modifier.size(100.dp).nestedScroll(parentConnection)) {
+            Box(Modifier.requiredSize(100.dp).nestedScroll(grandParentConnection)) {
+                Box(Modifier.requiredSize(100.dp).nestedScroll(parentConnection)) {
                     Box(
-                        Modifier.size(100.dp).nestedScroll(childConnection, childDispatcher)
+                        Modifier.requiredSize(100.dp).nestedScroll(childConnection, childDispatcher)
                     )
                 }
             }
@@ -224,10 +224,10 @@ class NestedScrollModifierTest {
         }
         val childDispatcher = NestedScrollDispatcher()
         rule.setContent {
-            Box(Modifier.size(100.dp).nestedScroll(grandParentConnection)) {
-                Box(Modifier.size(100.dp).nestedScroll(parentConnection)) {
+            Box(Modifier.requiredSize(100.dp).nestedScroll(grandParentConnection)) {
+                Box(Modifier.requiredSize(100.dp).nestedScroll(parentConnection)) {
                     Box(
-                        Modifier.size(100.dp).nestedScroll(childConnection, childDispatcher)
+                        Modifier.requiredSize(100.dp).nestedScroll(childConnection, childDispatcher)
                     )
                 }
             }
@@ -267,10 +267,10 @@ class NestedScrollModifierTest {
         }
         val childDispatcher = NestedScrollDispatcher()
         rule.setContent {
-            Box(Modifier.size(100.dp).nestedScroll(grandParentConnection)) {
-                Box(Modifier.size(100.dp).nestedScroll(parentConnection)) {
+            Box(Modifier.requiredSize(100.dp).nestedScroll(grandParentConnection)) {
+                Box(Modifier.requiredSize(100.dp).nestedScroll(parentConnection)) {
                     Box(
-                        Modifier.size(100.dp).nestedScroll(childConnection, childDispatcher)
+                        Modifier.requiredSize(100.dp).nestedScroll(childConnection, childDispatcher)
                     )
                 }
             }
@@ -326,9 +326,9 @@ class NestedScrollModifierTest {
         }
         val childDispatcher = NestedScrollDispatcher()
         rule.setContent {
-            Box(Modifier.size(100.dp).nestedScroll(parentConnection)) {
+            Box(Modifier.requiredSize(100.dp).nestedScroll(parentConnection)) {
                 Box(
-                    Modifier.size(100.dp).nestedScroll(childConnection, childDispatcher)
+                    Modifier.requiredSize(100.dp).nestedScroll(childConnection, childDispatcher)
                 )
             }
         }
@@ -372,10 +372,10 @@ class NestedScrollModifierTest {
         }
         val childDispatcher = NestedScrollDispatcher()
         rule.setContent {
-            Box(Modifier.size(100.dp).nestedScroll(grandParentConnection)) {
-                Box(Modifier.size(100.dp).nestedScroll(parentConnection)) {
+            Box(Modifier.requiredSize(100.dp).nestedScroll(grandParentConnection)) {
+                Box(Modifier.requiredSize(100.dp).nestedScroll(parentConnection)) {
                     Box(
-                        Modifier.size(100.dp).nestedScroll(childConnection, childDispatcher)
+                        Modifier.requiredSize(100.dp).nestedScroll(childConnection, childDispatcher)
                     )
                 }
             }
@@ -420,10 +420,10 @@ class NestedScrollModifierTest {
         }
         val childDispatcher = NestedScrollDispatcher()
         rule.setContent {
-            Box(Modifier.size(100.dp).nestedScroll(grandParentConnection)) {
-                Box(Modifier.size(100.dp).nestedScroll(parentConnection)) {
+            Box(Modifier.requiredSize(100.dp).nestedScroll(grandParentConnection)) {
+                Box(Modifier.requiredSize(100.dp).nestedScroll(parentConnection)) {
                     Box(
-                        Modifier.size(100.dp).nestedScroll(childConnection, childDispatcher)
+                        Modifier.requiredSize(100.dp).nestedScroll(childConnection, childDispatcher)
                     )
                 }
             }
@@ -460,10 +460,10 @@ class NestedScrollModifierTest {
         }
         val childDispatcher = NestedScrollDispatcher()
         rule.setContent {
-            Box(Modifier.size(100.dp).nestedScroll(grandParentConnection)) {
-                Box(Modifier.size(100.dp).nestedScroll(parentConnection)) {
+            Box(Modifier.requiredSize(100.dp).nestedScroll(grandParentConnection)) {
+                Box(Modifier.requiredSize(100.dp).nestedScroll(parentConnection)) {
                     Box(
-                        Modifier.size(100.dp).nestedScroll(childConnection, childDispatcher)
+                        Modifier.requiredSize(100.dp).nestedScroll(childConnection, childDispatcher)
                     )
                 }
             }
@@ -506,10 +506,10 @@ class NestedScrollModifierTest {
         }
         val childDispatcher = NestedScrollDispatcher()
         rule.setContent {
-            Box(Modifier.size(100.dp).nestedScroll(grandParentConnection)) {
-                Box(Modifier.size(100.dp).nestedScroll(parentConnection)) {
+            Box(Modifier.requiredSize(100.dp).nestedScroll(grandParentConnection)) {
+                Box(Modifier.requiredSize(100.dp).nestedScroll(parentConnection)) {
                     Box(
-                        Modifier.size(100.dp).nestedScroll(childConnection, childDispatcher)
+                        Modifier.requiredSize(100.dp).nestedScroll(childConnection, childDispatcher)
                     )
                 }
             }
@@ -561,7 +561,7 @@ class NestedScrollModifierTest {
         rule.setContent {
             Box(
                 Modifier
-                    .size(100.dp)
+                    .requiredSize(100.dp)
                     .nestedScroll(parentConnection) // parent
                     .nestedScroll(childConnection, childDispatcher) // child
             )
@@ -633,7 +633,7 @@ class NestedScrollModifierTest {
     @Test
     fun nestedScroll_hierarchyDispatch_rootParentRemoval() {
         testRootParentAdditionRemoval { root, child ->
-            Box(Modifier.size(100.dp).then(root)) {
+            Box(Modifier.requiredSize(100.dp).then(root)) {
                 Box(child)
             }
         }
@@ -650,7 +650,13 @@ class NestedScrollModifierTest {
     fun nestedScroll_flatDispatch_longChain_rootParentRemoval() {
         testRootParentAdditionRemoval { root, child ->
             // insert a few random modifiers so it's more realistic example of wrapper re-usage
-            Box(Modifier.size(100.dp).then(root).padding(5.dp).size(50.dp).then(child))
+            Box(
+                Modifier.requiredSize(100.dp)
+                    .then(root)
+                    .padding(5.dp)
+                    .requiredSize(50.dp)
+                    .then(child)
+            )
         }
     }
 
@@ -658,9 +664,9 @@ class NestedScrollModifierTest {
     fun nestedScroll_hierarchyDispatch_middleParentRemoval() {
         testMiddleParentAdditionRemoval { rootMod, middleMod, childMod ->
             // random boxes to emulate nesting
-            Box(Modifier.size(100.dp).then(rootMod)) {
+            Box(Modifier.requiredSize(100.dp).then(rootMod)) {
                 Box {
-                    Box(Modifier.size(100.dp).then(middleMod)) {
+                    Box(Modifier.requiredSize(100.dp).then(middleMod)) {
                         Box {
                             Box(childMod)
                         }
@@ -688,9 +694,9 @@ class NestedScrollModifierTest {
             // insert a few random modifiers so it's more realistic example of wrapper re-usage
             Box(
                 Modifier
-                    .size(100.dp)
+                    .requiredSize(100.dp)
                     .then(rootMod)
-                    .size(90.dp)
+                    .requiredSize(90.dp)
                     .clipToBounds()
                     .then(middleMod)
                     .padding(5.dp)
@@ -780,7 +786,7 @@ class NestedScrollModifierTest {
             }
             Box(
                 Modifier
-                    .size(100.dp)
+                    .requiredSize(100.dp)
                     .then(nestedScrollParents)
                     .nestedScroll(childConnection, childDispatcher)
             )
@@ -890,8 +896,8 @@ class NestedScrollModifierTest {
         rule.setContent {
             val outerBoxConnection = if (isConnection1Parent.value) connection1 else connection2
             val innerBoxConnection = if (isConnection1Parent.value) connection2 else connection1
-            Box(Modifier.size(100.dp).nestedScroll(outerBoxConnection)) {
-                Box(Modifier.size(100.dp).nestedScroll(innerBoxConnection)) {
+            Box(Modifier.requiredSize(100.dp).nestedScroll(outerBoxConnection)) {
+                Box(Modifier.requiredSize(100.dp).nestedScroll(innerBoxConnection)) {
                     Box(Modifier.nestedScroll(childConnection, childDispatcher))
                 }
             }

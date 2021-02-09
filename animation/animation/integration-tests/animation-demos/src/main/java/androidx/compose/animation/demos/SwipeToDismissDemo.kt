@@ -25,10 +25,10 @@ import androidx.compose.foundation.gestures.verticalDrag
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.requiredHeight
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.requiredSize
 import androidx.compose.material.Button
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
@@ -56,9 +56,9 @@ import kotlin.math.roundToInt
 fun SwipeToDismissDemo() {
     Column {
         var index by remember { mutableStateOf(0) }
-        Box(Modifier.height(300.dp).fillMaxWidth()) {
+        Box(Modifier.requiredHeight(300.dp).fillMaxWidth()) {
             Box(
-                Modifier.swipeToDismiss(index).align(Alignment.BottomCenter).size(150.dp)
+                Modifier.swipeToDismiss(index).align(Alignment.BottomCenter).requiredSize(150.dp)
                     .background(pastelColors[index])
             )
         }

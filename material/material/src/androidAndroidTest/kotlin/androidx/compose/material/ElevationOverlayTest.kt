@@ -18,7 +18,7 @@ package androidx.compose.material
 
 import android.os.Build
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.preferredSize
+import androidx.compose.foundation.layout.size
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.testutils.assertPixels
@@ -213,7 +213,7 @@ private fun TestSurface(elevation: Dp, colors: Colors) {
                 with(LocalDensity.current) {
                     // Make the surface size small so we compare less pixels
                     Box(
-                        Modifier.preferredSize(
+                        Modifier.size(
                             SurfaceSize.width.toDp(),
                             SurfaceSize.height.toDp()
                         ).testTag(Tag)

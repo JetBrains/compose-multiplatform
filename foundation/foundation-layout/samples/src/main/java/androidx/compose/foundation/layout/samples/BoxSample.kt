@@ -21,7 +21,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.preferredSize
+import androidx.compose.foundation.layout.size
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -45,17 +45,17 @@ fun SimpleBox() {
         )
         Box(
             Modifier.align(Alignment.Center)
-                .preferredSize(300.dp, 300.dp)
+                .size(300.dp, 300.dp)
                 .background(Color.Green)
         )
         Box(
             Modifier.align(Alignment.TopStart)
-                .preferredSize(150.dp, 150.dp)
+                .size(150.dp, 150.dp)
                 .background(Color.Red)
         )
         Box(
             Modifier.align(Alignment.BottomEnd)
-                .preferredSize(150.dp, 150.dp)
+                .size(150.dp, 150.dp)
                 .background(Color.Blue)
         )
     }

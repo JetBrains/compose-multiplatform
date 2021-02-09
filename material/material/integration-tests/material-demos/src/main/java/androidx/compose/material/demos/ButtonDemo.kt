@@ -24,8 +24,8 @@ import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.preferredHeight
-import androidx.compose.foundation.layout.preferredSize
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.GenericShape
 import androidx.compose.material.Button
@@ -83,14 +83,14 @@ fun ButtonDemo() {
 @Composable
 private fun Buttons() {
     Text("Buttons")
-    Spacer(Modifier.preferredHeight(DefaultSpace))
+    Spacer(Modifier.height(DefaultSpace))
     Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceEvenly) {
         ButtonSample()
         OutlinedButtonSample()
         TextButtonSample()
     }
 
-    Spacer(Modifier.preferredHeight(DefaultSpace))
+    Spacer(Modifier.height(DefaultSpace))
 
     Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceEvenly) {
         Button(
@@ -104,7 +104,7 @@ private fun Buttons() {
         ButtonWithIconSample()
     }
 
-    Spacer(Modifier.preferredHeight(DefaultSpace))
+    Spacer(Modifier.height(DefaultSpace))
 
     Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceEvenly) {
         Button(onClick = {}, enabled = false) {
@@ -122,21 +122,21 @@ private fun Buttons() {
 @Composable
 private fun Fabs() {
     Text("Floating action buttons")
-    Spacer(Modifier.preferredHeight(DefaultSpace))
+    Spacer(Modifier.height(DefaultSpace))
 
     Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceEvenly) {
         SimpleFab()
         SimpleExtendedFabNoIcon()
         SimpleExtendedFabWithIcon()
     }
-    Spacer(Modifier.preferredHeight(DefaultSpace))
+    Spacer(Modifier.height(DefaultSpace))
     FluidExtendedFab()
 }
 
 @Composable
 private fun IconButtons() {
     Text("Icon buttons")
-    Spacer(Modifier.preferredHeight(DefaultSpace))
+    Spacer(Modifier.height(DefaultSpace))
 
     Row {
         IconButtonSample()
@@ -148,10 +148,10 @@ private fun IconButtons() {
 @Composable
 private fun CustomShapeButton() {
     Text("Custom shape button")
-    Spacer(Modifier.preferredHeight(DefaultSpace))
+    Spacer(Modifier.height(DefaultSpace))
     OutlinedButton(
         onClick = {},
-        modifier = Modifier.preferredSize(110.dp),
+        modifier = Modifier.size(110.dp),
         shape = TriangleShape,
         colors = ButtonDefaults.outlinedButtonColors(
             backgroundColor = Color.Yellow

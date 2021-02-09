@@ -29,7 +29,7 @@ import android.widget.TextView
 import androidx.activity.ComponentActivity
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.requiredSize
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.compositionLocalOf
 import androidx.compose.runtime.getValue
@@ -205,7 +205,7 @@ class AndroidViewTest {
         rule.setContent {
             AndroidView(
                 { LayoutInflater.from(it).inflate(R.layout.test_layout, null) },
-                Modifier.size(size)
+                Modifier.requiredSize(size)
             )
         }
         Espresso
@@ -227,7 +227,7 @@ class AndroidViewTest {
             frameLayout = FrameLayout(activity)
         }
         rule.setContent {
-            AndroidView({ frameLayout }, Modifier.size(size))
+            AndroidView({ frameLayout }, Modifier.requiredSize(size))
         }
 
         Espresso
@@ -267,7 +267,7 @@ class AndroidViewTest {
         rule.setContent {
             AndroidView(
                 { LayoutInflater.from(it).inflate(R.layout.test_layout, null) },
-                Modifier.size(size.value)
+                Modifier.requiredSize(size.value)
             )
         }
         Espresso
@@ -337,7 +337,7 @@ class AndroidViewTest {
             CompositionLocalProvider(LocalDensity provides density) {
                 AndroidView(
                     { FrameLayout(it) },
-                    Modifier.size(size).onGloballyPositioned {
+                    Modifier.requiredSize(size).onGloballyPositioned {
                         assertThat(it.size).isEqualTo(IntSize(sizeIpx, sizeIpx))
                     }
                 )

@@ -16,7 +16,7 @@
 package androidx.compose.material
 
 import android.os.Build
-import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.requiredSize
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Menu
 import androidx.compose.testutils.assertPixels
@@ -172,7 +172,7 @@ class IconTest {
                 image,
                 null,
                 // Force Icon to be 50dp
-                modifier = Modifier.size(50.dp).testTag(testTag),
+                modifier = Modifier.requiredSize(50.dp).testTag(testTag),
                 tint = Color.Unspecified
             )
             with(LocalDensity.current) {

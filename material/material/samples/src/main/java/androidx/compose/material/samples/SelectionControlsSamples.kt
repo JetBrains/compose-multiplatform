@@ -21,7 +21,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.preferredHeight
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.selection.selectable
 import androidx.compose.material.Checkbox
 import androidx.compose.material.CheckboxDefaults
@@ -123,7 +123,7 @@ fun RadioGroupSample() {
             Row(
                 Modifier
                     .fillMaxWidth()
-                    .preferredHeight(56.dp)
+                    .height(56.dp)
                     .selectable(
                         selected = (text == selectedOption),
                         onClick = { onOptionSelected(text) }

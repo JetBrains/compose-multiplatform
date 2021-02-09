@@ -23,7 +23,7 @@ import android.view.MotionEvent.ACTION_UP
 import android.view.View
 import android.view.ViewGroup
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.requiredSize
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.platform.LocalDensity
@@ -73,7 +73,7 @@ class PointerInteropFilterComposeHookupTest {
                                     disallowInterceptRequester,
                                     motionEventCallback
                                 )
-                                .size(100f.toDp(), 100f.toDp())
+                                .requiredSize(100f.toDp(), 100f.toDp())
                         )
                     }
                 }

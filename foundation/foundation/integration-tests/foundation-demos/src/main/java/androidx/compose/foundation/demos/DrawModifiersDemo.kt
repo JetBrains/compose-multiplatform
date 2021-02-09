@@ -20,7 +20,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.preferredHeight
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.samples.BorderSample
 import androidx.compose.foundation.samples.BorderSampleWithBrush
 import androidx.compose.foundation.samples.BorderSampleWithDataClass
@@ -35,14 +35,14 @@ fun DrawModifiersDemo() {
     Row {
         Column(Modifier.weight(1f, true).padding(10.dp)) {
             BorderSample()
-            Spacer(Modifier.preferredHeight(30.dp))
+            Spacer(Modifier.height(30.dp))
             BorderSampleWithBrush()
-            Spacer(Modifier.preferredHeight(30.dp))
+            Spacer(Modifier.height(30.dp))
             BorderSampleWithDataClass()
         }
         Column(Modifier.weight(1f).padding(10.dp)) {
             DrawBackgroundColor()
-            Spacer(Modifier.preferredHeight(30.dp))
+            Spacer(Modifier.height(30.dp))
             DrawBackgroundShapedBrush()
         }
     }
