@@ -19,7 +19,6 @@ package androidx.compose.foundation
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.size
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.graphics.drawscope.ContentDrawScope
 import androidx.compose.ui.Modifier
@@ -118,29 +117,6 @@ class IndicationTest {
     }
 
     @Test
-    fun indication_disposed_whenIndicationRemoved() {
-        val state = InteractionState()
-        val switchState = mutableStateOf(true)
-        val countDownLatch = CountDownLatch(2)
-        val indication = makeIndication(
-            onDispose = { countDownLatch.countDown() },
-            onDraw = { countDownLatch.countDown() }
-        )
-        rule.setContent {
-            val switchableIndication =
-                if (switchState.value) Modifier.indication(state, indication) else Modifier
-            Box(Modifier.testTag(testTag).size(100.dp).then(switchableIndication))
-        }
-        assertThat(countDownLatch.count).isEqualTo(1)
-        rule.runOnIdle {
-            switchState.value = !switchState.value
-        }
-        rule.runOnIdle {
-            assertThat(countDownLatch.await(1000, TimeUnit.MILLISECONDS)).isTrue()
-        }
-    }
-
-    @Test
     @Ignore("b/155466122: multitouch is not supported yet")
     fun indication_multiplyPress_firstWins() {
         var lastPosition: Offset? = null
@@ -199,23 +175,17 @@ class IndicationTest {
             }
     }
 
-    private fun makeIndication(
-        onDispose: () -> Unit = {},
-        onDraw: (InteractionState) -> Unit
-    ): Indication {
+    private fun makeIndication(onDraw: (InteractionState) -> Unit): Indication {
         return object : Indication {
             @Composable
-            override fun createInstance(): IndicationInstance {
-                return object : IndicationInstance {
-                    override fun ContentDrawScope.drawIndication(
-                        interactionState: InteractionState
-                    ) {
-                        onDraw(interactionState)
-                    }
-
-                    override fun onDispose() {
-                        super.onDispose()
-                        onDispose()
+            override fun rememberUpdatedInstance(
+                interactionState: InteractionState
+            ): IndicationInstance {
+                return remember(interactionState) {
+                    object : IndicationInstance {
+                        override fun ContentDrawScope.drawIndication() {
+                            onDraw(interactionState)
+                        }
                     }
                 }
             }
@@ -225,7 +195,7 @@ class IndicationTest {
     @Test
     fun testInspectorValue() {
         val state = InteractionState()
-        val indication = makeIndication({}, {})
+        val indication = makeIndication({})
         rule.setContent {
             val modifier = Modifier.indication(state, indication) as InspectableValue
             assertThat(modifier.nameFallback).isEqualTo("indication")
