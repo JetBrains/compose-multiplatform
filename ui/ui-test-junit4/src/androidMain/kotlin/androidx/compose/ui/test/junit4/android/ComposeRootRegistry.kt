@@ -259,7 +259,7 @@ private fun ComposeRootRegistry.ensureComposeRootRegistryIsSetUp() {
     }
 }
 
-internal fun ComposeRootRegistry.waitForComposeRoots() {
+internal fun ComposeRootRegistry.waitForComposeRoots(atLeastOneRootExpected: Boolean) {
     ensureComposeRootRegistryIsSetUp()
 
     if (!hasComposeRoots) {
@@ -274,7 +274,11 @@ internal fun ComposeRootRegistry.waitForComposeRoots() {
         try {
             addOnRegistrationChangedListener(listener)
             if (!hasComposeRoots) {
-                latch.await(2, TimeUnit.SECONDS)
+                if (atLeastOneRootExpected) {
+                    latch.await(2, TimeUnit.SECONDS)
+                } else {
+                    latch.await(500, TimeUnit.MILLISECONDS)
+                }
             }
         } finally {
             removeOnRegistrationChangedListener(listener)

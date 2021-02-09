@@ -183,7 +183,7 @@ class DesktopComposeTestRule : ComposeContentTestRule {
             return rule.runOnUiThread(action)
         }
 
-        override fun getRoots(): Set<RootForTest> {
+        override fun getRoots(atLeastOneRootExpected: Boolean): Set<RootForTest> {
             return rule.window.roots
         }
 
