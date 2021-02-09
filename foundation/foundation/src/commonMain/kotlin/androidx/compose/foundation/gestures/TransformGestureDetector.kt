@@ -33,11 +33,11 @@ import kotlin.math.atan2
 
 /**
  * A gesture detector for rotationg, panning, and zoom. Once touch slop has been reached, the
- * user can use rotation, panning and zoom gestures. [onRotate] will be called when rotation
- * occurs, passing the angle in degrees, [onZoom] will be called when zoom occurs, and [onPan]
- * will be called when a pan occurs. Each of these changes is a difference between the previous
- * call and the current gesture. This will consume all position changes after touch slop has
- * been reached.
+ * user can use rotation, panning and zoom gestures. [onGesture] will be called when any of the
+ * rotation, zoom or pan occurs, passing the rotation angle in degrees, zoom in scale factor and
+ * pan as an offset in pixels. Each of these changes is a difference between the previous call
+ * and the current gesture. This will consume all position changes after touch slop has
+ * been reached. [onGesture] will also provide centroid of all the pointers that are down.
  *
  * If [panZoomLock] is `true`, rotation is allowed only if touch slop is detected for rotation
  * before pan or zoom motions. If not, pan and zoom gestures will be detected, but rotation
