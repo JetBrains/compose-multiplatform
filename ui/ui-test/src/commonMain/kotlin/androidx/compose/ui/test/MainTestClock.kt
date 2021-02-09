@@ -49,12 +49,14 @@ interface MainTestClock {
      *
      * Important: The duration will always be rounded up to the nearest duration that is a
      * multiplier of the frame duration. This is to make sure that any changes get recomposed to
-     * avoid confusing states.
+     * avoid confusing states. This behavior can be turned off via [ignoreFrameDuration].
      *
      * @param milliseconds The minimal duration to advance the main clock by. Will be rounded up
      * to the nearest frame duration.
+     * @param ignoreFrameDuration Whether to avoid rounding up the [milliseconds] to the nearest
+     * multiplier of a frame duration.
      */
-    fun advanceTimeBy(milliseconds: Long)
+    fun advanceTimeBy(milliseconds: Long, ignoreFrameDuration: Boolean = false)
 
     /**
      * Advances the clock until the given condition is satisfied.
