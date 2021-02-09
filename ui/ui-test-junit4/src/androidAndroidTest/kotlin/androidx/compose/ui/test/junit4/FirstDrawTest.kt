@@ -24,6 +24,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.ComposeView
+import androidx.test.filters.LargeTest
 import androidx.test.filters.MediumTest
 import com.google.common.truth.Truth.assertThat
 import org.junit.Rule
@@ -39,6 +40,7 @@ class FirstDrawTest {
      * Tests that the compose tree has been drawn at least once when
      * [ComposeContentTestRule.setContent] finishes.
      */
+    @LargeTest
     @Test
     fun waitsForFirstDraw_withoutOnIdle() {
         var drawn = false
