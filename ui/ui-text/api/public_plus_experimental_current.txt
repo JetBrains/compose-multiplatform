@@ -849,9 +849,8 @@ package androidx.compose.ui.text.input {
 
   @androidx.compose.runtime.Immutable public final class TextFieldValue {
     method public androidx.compose.ui.text.input.TextFieldValue commitComposition();
-    method public androidx.compose.ui.text.input.TextFieldValue copy-5zc-tL8(optional long selection);
-    method public androidx.compose.ui.text.input.TextFieldValue copy-bLOX0OE(optional androidx.compose.ui.text.AnnotatedString annotatedString, optional long selection);
-    method public androidx.compose.ui.text.input.TextFieldValue copy-rJy5ZHU(String text, optional long selection);
+    method public androidx.compose.ui.text.input.TextFieldValue copy-Dr2r1M0(String text, optional long selection, optional androidx.compose.ui.text.TextRange? composition);
+    method public androidx.compose.ui.text.input.TextFieldValue copy-ec4yWi8(optional androidx.compose.ui.text.AnnotatedString annotatedString, optional long selection, optional androidx.compose.ui.text.TextRange? composition);
     method public androidx.compose.ui.text.AnnotatedString getAnnotatedString();
     method public androidx.compose.ui.text.TextRange? getComposition-MzsxiRA();
     method public long getSelection-d9O1mEE();
