@@ -20,7 +20,7 @@ import androidx.compose.foundation.gestures.ZoomableController
 import androidx.compose.foundation.gestures.rememberZoomableController
 import androidx.compose.foundation.gestures.zoomable
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.preferredSize
+import androidx.compose.foundation.layout.size
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.rememberCoroutineScope
@@ -344,7 +344,7 @@ class ZoomableTest {
 
     private fun setZoomableContent(getModifier: @Composable () -> Modifier) {
         rule.setContent {
-            Box(Modifier.preferredSize(600.dp).testTag(TEST_TAG).then(getModifier()))
+            Box(Modifier.size(600.dp).testTag(TEST_TAG).then(getModifier()))
         }
     }
 }

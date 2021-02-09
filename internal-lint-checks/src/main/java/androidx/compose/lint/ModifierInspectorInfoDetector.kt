@@ -84,19 +84,19 @@ private val DemosPackageRegEx = "androidx\\.compose\\..+\\.demos\\..+".toRegex()
  * Lint [Detector] to ensure that we are creating debug information for the layout inspector on
  * all modifiers. For example in:
  * ```
- *   fun Modifier.preferredWidth(width: Dp) = this.then(SizeModifier(width))
+ *   fun Modifier.width(width: Dp) = this.then(SizeModifier(width))
  * ```
  *
- * The layout inspector will not know that the name is `preferredWidth` and the `width` member
+ * The layout inspector will not know that the name is `width` and the `width` member
  * may not be a field in SizeModifier that we can see via reflection.
  *
  * To supply debug information to the layout inspector include an InspectorInfo lambda like this:
  * ```
- *   fun Modifier.preferredWidth(width: Dp) = this.then(
+ *   fun Modifier.width(width: Dp) = this.then(
  *      SizeModifier(
  *          width = width,
  *          inspectorInfo = debugInspectorInfo {
- *              name = "preferredWidth",
+ *              name = "width",
  *              value = width,
  *          )
  *      )
@@ -107,11 +107,11 @@ private val DemosPackageRegEx = "androidx\\.compose\\..+\\.demos\\..+".toRegex()
  *
  * If the modifier has multiple parameters use the `properties` specifier instead:
  * ```
- *   fun Modifier.preferredSize(width: Dp, height: Dp) = this.then(
+ *   fun Modifier.size(width: Dp, height: Dp) = this.then(
  *      SizeModifier(
  *          width = width,
  *          inspectorInfo = debugInspectorInfo {
- *              name = "preferredWidth",
+ *              name = "width",
  *              properties["width"] = width
  *              properties["height"] = height
  *          )
@@ -351,7 +351,7 @@ class ModifierInspectorInfoDetector : Detector(), SourceCodeScanner {
              * Return the name of the variable that the [expr] represents.
              *
              * This can be a simple parameter variable from the modifier.\
-             * Example: `width` from `fun Modifier.preferredWidth(width: Int)`
+             * Example: `width` from `fun Modifier.width(width: Int)`
              *
              * Or it can be a selector from a data class parameter variable from the modifier.\
              * Example: `values.start` from `fun Modifier.border(values: Borders)`

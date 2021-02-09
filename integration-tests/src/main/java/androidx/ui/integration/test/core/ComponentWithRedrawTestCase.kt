@@ -21,7 +21,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.foundation.Canvas
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.drawscope.Stroke
-import androidx.compose.foundation.layout.preferredSize
+import androidx.compose.foundation.layout.size
 import androidx.compose.ui.unit.dp
 
 class ComponentWithRedrawTestCase : SimpleComponentImplenentationTestCase() {
@@ -30,7 +30,7 @@ class ComponentWithRedrawTestCase : SimpleComponentImplenentationTestCase() {
     override fun Content() {
         val innerSize = getInnerSize()
         val stroke = Stroke()
-        Canvas(Modifier.preferredSize(48.dp)) {
+        Canvas(Modifier.size(48.dp)) {
             drawCircle(Color.Black, size.minDimension, style = stroke)
             drawCircle(Color.Black, innerSize.value.value / 2f, center)
         }

@@ -20,9 +20,9 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.requiredHeight
+import androidx.compose.foundation.layout.requiredSize
+import androidx.compose.foundation.layout.requiredWidth
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
@@ -106,7 +106,7 @@ class LazyListScrollingTestCase(
 }
 
 private val LazyColumnWithItemAndItems = LazyListScrollingTestCase("LazyColumnWithItemAndItems") {
-    LazyColumn(modifier = Modifier.height(400.dp).fillMaxWidth()) {
+    LazyColumn(modifier = Modifier.requiredHeight(400.dp).fillMaxWidth()) {
         item {
             RemeasurableItem()
         }
@@ -117,7 +117,7 @@ private val LazyColumnWithItemAndItems = LazyListScrollingTestCase("LazyColumnWi
 }
 
 private val LazyColumnWithItems = LazyListScrollingTestCase("LazyColumnWithItems") {
-    LazyColumn(modifier = Modifier.height(400.dp).fillMaxWidth()) {
+    LazyColumn(modifier = Modifier.requiredHeight(400.dp).fillMaxWidth()) {
         items(items) {
             if (it.index == 0) {
                 RemeasurableItem()
@@ -129,7 +129,7 @@ private val LazyColumnWithItems = LazyListScrollingTestCase("LazyColumnWithItems
 }
 
 private val LazyColumnWithItemsIndexed = LazyListScrollingTestCase("LazyColumnWithItemsIndexed") {
-    LazyColumn(modifier = Modifier.height(400.dp).fillMaxWidth()) {
+    LazyColumn(modifier = Modifier.requiredHeight(400.dp).fillMaxWidth()) {
         itemsIndexed(items) { index, _ ->
             if (index == 0) {
                 RemeasurableItem()
@@ -141,7 +141,7 @@ private val LazyColumnWithItemsIndexed = LazyListScrollingTestCase("LazyColumnWi
 }
 
 private val LazyRowWithItemAndItems = LazyListScrollingTestCase("LazyRowWithItemAndItems") {
-    LazyRow(modifier = Modifier.width(400.dp).fillMaxHeight()) {
+    LazyRow(modifier = Modifier.requiredWidth(400.dp).fillMaxHeight()) {
         item {
             RemeasurableItem()
         }
@@ -152,7 +152,7 @@ private val LazyRowWithItemAndItems = LazyListScrollingTestCase("LazyRowWithItem
 }
 
 private val LazyRowWithItems = LazyListScrollingTestCase("LazyRowWithItems") {
-    LazyRow(modifier = Modifier.width(400.dp).fillMaxHeight()) {
+    LazyRow(modifier = Modifier.requiredWidth(400.dp).fillMaxHeight()) {
         items(items) {
             if (it.index == 0) {
                 RemeasurableItem()
@@ -164,7 +164,7 @@ private val LazyRowWithItems = LazyListScrollingTestCase("LazyRowWithItems") {
 }
 
 private val LazyRowWithItemsIndexed = LazyListScrollingTestCase("LazyRowWithItemsIndexed") {
-    LazyRow(modifier = Modifier.width(400.dp).fillMaxHeight()) {
+    LazyRow(modifier = Modifier.requiredWidth(400.dp).fillMaxHeight()) {
         itemsIndexed(items) { index, _ ->
             if (index == 0) {
                 RemeasurableItem()
@@ -255,7 +255,7 @@ class ListRemeasureTestCase(
 
     @Composable
     fun RegularItem() {
-        Box(Modifier.size(20.dp).background(Color.Red, RoundedCornerShape(8.dp)))
+        Box(Modifier.requiredSize(20.dp).background(Color.Red, RoundedCornerShape(8.dp)))
     }
 
     fun prepareForToggle() {

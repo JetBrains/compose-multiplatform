@@ -20,9 +20,9 @@ import android.os.Build
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.preferredSize
-import androidx.compose.foundation.layout.preferredWidth
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.requiredWidth
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.LocalContentAlpha
 import androidx.compose.material.LocalContentColor
@@ -102,7 +102,7 @@ class OutlinedTextFieldTest {
                 value = "input",
                 onValueChange = {},
                 label = {},
-                modifier = Modifier.width(40.dp)
+                modifier = Modifier.requiredWidth(40.dp)
             )
         }
             .assertWidthIsEqualTo(40.dp)
@@ -498,11 +498,11 @@ class OutlinedTextFieldTest {
             OutlinedTextField(
                 value = "text",
                 onValueChange = {},
-                modifier = Modifier.preferredWidth(textFieldWidth),
+                modifier = Modifier.width(textFieldWidth),
                 label = {},
                 leadingIcon = {
                     Box(
-                        Modifier.preferredSize(size).onGloballyPositioned {
+                        Modifier.size(size).onGloballyPositioned {
                             leadingPosition.value = it.positionInRoot()
                             leadingSize.value = it.size
                         }
@@ -510,7 +510,7 @@ class OutlinedTextFieldTest {
                 },
                 trailingIcon = {
                     Box(
-                        Modifier.preferredSize(size).onGloballyPositioned {
+                        Modifier.size(size).onGloballyPositioned {
                             trailingPosition.value = it.positionInRoot()
                             trailingSize.value = it.size
                         }
@@ -556,8 +556,8 @@ class OutlinedTextFieldTest {
                             }
                         )
                     },
-                    trailingIcon = { Box(Modifier.preferredSize(iconSize)) },
-                    leadingIcon = { Box(Modifier.preferredSize(iconSize)) }
+                    trailingIcon = { Box(Modifier.size(iconSize)) },
+                    leadingIcon = { Box(Modifier.size(iconSize)) }
                 )
             }
         }

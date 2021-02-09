@@ -23,7 +23,7 @@ import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.preferredHeight
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.Card
 import androidx.compose.material.Divider
@@ -211,7 +211,7 @@ private fun BillsCard() {
 private fun SeeAllButton(onClick: () -> Unit) {
     TextButton(
         onClick = onClick,
-        modifier = Modifier.preferredHeight(44.dp).fillMaxWidth()
+        modifier = Modifier.height(44.dp).fillMaxWidth()
     ) {
         Text("SEE ALL")
     }

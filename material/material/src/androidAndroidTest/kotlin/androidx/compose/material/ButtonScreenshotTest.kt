@@ -17,7 +17,7 @@ package androidx.compose.material
 
 import android.os.Build
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.requiredSize
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.testutils.assertAgainstGolden
 import androidx.compose.ui.Modifier
@@ -80,7 +80,7 @@ class ButtonScreenshotTest {
     @Test
     fun ripple() {
         rule.setMaterialContent {
-            Box(Modifier.size(200.dp, 100.dp).wrapContentSize()) {
+            Box(Modifier.requiredSize(200.dp, 100.dp).wrapContentSize()) {
                 Button(onClick = { }) { }
             }
         }

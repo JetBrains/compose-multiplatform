@@ -19,7 +19,7 @@ package androidx.compose.ui.window
 import android.view.View
 import android.view.WindowManager
 import androidx.activity.ComponentActivity
-import androidx.compose.foundation.layout.preferredSize
+import androidx.compose.foundation.layout.size
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -115,7 +115,7 @@ class DialogSecureFlagTest(private val setSecureFlagOnActivity: Boolean) {
                 onDismissRequest = { },
                 properties = dialogProperties
             ) {
-                SimpleContainer(Modifier.preferredSize(50.dp), content = {})
+                SimpleContainer(Modifier.size(50.dp), content = {})
             }
         }
     }

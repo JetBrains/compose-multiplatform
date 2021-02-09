@@ -23,7 +23,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.preferredWidth
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.shape.CornerSize
 import androidx.compose.foundation.shape.CutCornerShape
@@ -442,7 +442,7 @@ class ParameterFactoryTest {
                     .padding(2.0.dp)
                     .fillMaxWidth()
                     .wrapContentHeight(Alignment.Bottom)
-                    .preferredWidth(30.0.dp)
+                    .width(30.0.dp)
                     .paint(TestPainter(10f, 20f))
             )!!
         ) {
@@ -464,7 +464,7 @@ class ParameterFactoryTest {
                     parameter("align", ParameterType.String, "Bottom")
                     parameter("unbounded", ParameterType.Boolean, false)
                 }
-                parameter("preferredWidth", ParameterType.DimensionDp, 30.0f)
+                parameter("width", ParameterType.DimensionDp, 30.0f)
                 parameter("paint", ParameterType.String, "") {
                     parameter("alignment", ParameterType.String, "Center")
                     parameter("alpha", ParameterType.Float, 1.0f)

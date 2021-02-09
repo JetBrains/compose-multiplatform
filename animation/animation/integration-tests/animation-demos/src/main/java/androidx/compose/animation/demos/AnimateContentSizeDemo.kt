@@ -25,9 +25,9 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.requiredHeight
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.sizeIn
+import androidx.compose.foundation.layout.requiredSizeIn
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -53,9 +53,9 @@ fun AnimateContentSizeDemo() {
             .padding(50.dp)
     ) {
         Text()
-        Spacer(Modifier.height(20.dp))
+        Spacer(Modifier.requiredHeight(20.dp))
         Button()
-        Spacer(Modifier.height(20.dp))
+        Spacer(Modifier.requiredHeight(20.dp))
         Image()
     }
 }
@@ -112,7 +112,7 @@ private fun Image() {
     var portraitMode by remember { mutableStateOf(true) }
     Box(
         Modifier.clickable { portraitMode = !portraitMode }
-            .sizeIn(maxWidth = 300.dp, maxHeight = 300.dp)
+            .requiredSizeIn(maxWidth = 300.dp, maxHeight = 300.dp)
             .background(if (portraitMode) Color(0xFFfffbd0) else Color(0xFFe3ffd9))
             .animateContentSize(tween(500))
             .aspectRatio(if (portraitMode) 3 / 4f else 16 / 9f)

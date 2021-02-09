@@ -21,7 +21,7 @@ import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.offset
-import androidx.compose.foundation.layout.preferredSize
+import androidx.compose.foundation.layout.size
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -96,7 +96,7 @@ class LayerTouchTransformTest {
                 SimpleLayout(
                     modifier = Modifier.fillMaxSize().offset(offsetX, offsetY)
                 ) {
-                    SimpleLayout(modifier = background.then(Modifier.preferredSize(containerDp))) {
+                    SimpleLayout(modifier = background.then(Modifier.size(containerDp))) {
                         SimpleLayout(
                             modifier = Modifier
                                 .graphicsLayer(
@@ -110,7 +110,7 @@ class LayerTouchTransformTest {
                                     drawRect(color)
                                 }
                                 .then(latchDrawModifier)
-                                .preferredSize(boxDp)
+                                .size(boxDp)
                                 .pointerInput(Unit) {
                                     detectTapGestures(
                                         onPress = {

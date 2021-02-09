@@ -23,7 +23,7 @@ import androidx.annotation.Sampled
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.requiredSize
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -57,7 +57,7 @@ fun AndroidViewSample() {
 fun AndroidDrawableInDrawScopeSample() {
     val drawable = LocalContext.current.getDrawable(R.drawable.sample_drawable)
     Box(
-        modifier = Modifier.size(100.dp)
+        modifier = Modifier.requiredSize(100.dp)
             .drawBehind {
                 drawIntoCanvas { canvas ->
                     drawable?.let {

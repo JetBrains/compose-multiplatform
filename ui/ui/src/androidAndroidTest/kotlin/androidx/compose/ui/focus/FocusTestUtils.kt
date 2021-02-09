@@ -17,7 +17,7 @@
 package androidx.compose.ui.focus
 
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.requiredSize
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.test.junit4.ComposeContentTestRule
@@ -29,6 +29,6 @@ import androidx.compose.ui.unit.dp
  */
 internal fun ComposeContentTestRule.setFocusableContent(content: @Composable () -> Unit) {
     setContent {
-        Box(modifier = Modifier.size(10.dp, 10.dp)) { content() }
+        Box(modifier = Modifier.requiredSize(10.dp, 10.dp)) { content() }
     }
 }

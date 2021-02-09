@@ -32,7 +32,7 @@ import androidx.activity.ComponentActivity
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.requiredSize
 import androidx.compose.foundation.selection.toggleable
 import androidx.compose.foundation.text.BasicText
 import androidx.compose.foundation.text.BasicTextField
@@ -176,13 +176,13 @@ class AndroidAccessibilityTest {
                             Modifier
                                 .zIndex(1f)
                                 .testTag(OverlappedChildOneTag)
-                                .size(50.dp)
+                                .requiredSize(50.dp)
                         )
                         BasicText(
                             "Child Two",
                             Modifier
                                 .testTag(OverlappedChildTwoTag)
-                                .size(50.dp)
+                                .requiredSize(50.dp)
                         )
                     }
                     if (isTextFieldVisible) {

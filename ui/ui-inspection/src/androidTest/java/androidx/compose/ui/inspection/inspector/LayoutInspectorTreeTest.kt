@@ -21,7 +21,7 @@ import android.view.ViewGroup
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.preferredHeight
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.text.BasicText
 import androidx.compose.material.Button
 import androidx.compose.material.Icon
@@ -333,7 +333,7 @@ class LayoutInspectorTreeTest {
             Inspectable(slotTableRecord) {
                 Column {
                     Text(text = "Hello World", color = Color.Green)
-                    Spacer(Modifier.preferredHeight(16.dp))
+                    Spacer(Modifier.height(16.dp))
                     Image(Icons.Filled.Call, null)
                 }
             }

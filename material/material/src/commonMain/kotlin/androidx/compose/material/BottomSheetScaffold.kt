@@ -27,7 +27,7 @@ import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.heightIn
+import androidx.compose.foundation.layout.requiredHeightIn
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Stable
 import androidx.compose.runtime.State
@@ -324,7 +324,7 @@ fun BottomSheetScaffold(
                     Surface(
                         swipeable
                             .fillMaxWidth()
-                            .heightIn(min = sheetPeekHeight)
+                            .requiredHeightIn(min = sheetPeekHeight)
                             .onGloballyPositioned {
                                 bottomSheetHeight = it.size.height.toFloat()
                             },

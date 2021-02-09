@@ -21,7 +21,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.preferredHeight
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.Button
 import androidx.compose.material.ExperimentalMaterialApi
@@ -69,7 +69,7 @@ fun ModalBottomSheetSample() {
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             Text("Rest of the UI")
-            Spacer(Modifier.preferredHeight(20.dp))
+            Spacer(Modifier.height(20.dp))
             Button(onClick = { scope.launch { state.show() } }) {
                 Text("Click to show sheet")
             }

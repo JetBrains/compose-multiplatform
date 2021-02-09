@@ -24,7 +24,7 @@ import androidx.activity.compose.setContent
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.requiredSize
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.State
 import androidx.compose.runtime.getValue
@@ -401,18 +401,18 @@ class OnGloballyPositionedTest {
             activity.setContent {
                 with(LocalDensity.current) {
                     DelayedMeasure(50) {
-                        Box(Modifier.size(25.toDp())) {
+                        Box(Modifier.requiredSize(25.toDp())) {
                             Box(
-                                Modifier.size(size.toDp())
+                                Modifier.requiredSize(size.toDp())
                                     .onGloballyPositioned {
                                         coordinates1 = it
                                         positionedLatch.countDown()
                                     }
                             )
                         }
-                        Box(Modifier.size(25.toDp())) {
+                        Box(Modifier.requiredSize(25.toDp())) {
                             Box(
-                                Modifier.size(size.toDp())
+                                Modifier.requiredSize(size.toDp())
                                     .onGloballyPositioned {
                                         coordinates2 = it
                                         positionedLatch.countDown()
@@ -611,13 +611,13 @@ class OnGloballyPositionedTest {
                 with(LocalDensity.current) {
                     Box {
                         Offset(left) {
-                            Box(Modifier.size(10.toDp())) {
-                                Box(Modifier.size(10.toDp())) {
+                            Box(Modifier.requiredSize(10.toDp())) {
+                                Box(Modifier.requiredSize(10.toDp())) {
                                     Box(
                                         Modifier.onGloballyPositioned {
                                             realLeft = it.positionInRoot().x
                                             positionedLatch.countDown()
-                                        }.size(10.toDp())
+                                        }.requiredSize(10.toDp())
                                     )
                                 }
                             }

@@ -41,10 +41,10 @@ import androidx.compose.ui.platform.debugInspectorInfo
  *
  * When none of its children have weights, a [Row] will be as small as possible to fit its
  * children one next to the other. In order to change the width of the [Row], use the
- * [Modifier.width] modifiers; e.g. to make it fill the available width [Modifier.fillMaxWidth]
+ * [Modifier.requiredWidth] modifiers; e.g. to make it fill the available width [Modifier.fillMaxWidth]
  * can be used. If at least one child of a [Row] has a [weight][RowScope.weight], the [Row] will
  * fill the available width, so there is no need for [Modifier.fillMaxWidth]. However, if [Row]'s
- * size should be limited, the [Modifier.width] or [Modifier.size] layout modifiers should be
+ * size should be limited, the [Modifier.requiredWidth] or [Modifier.requiredSize] layout modifiers should be
  * applied.
  *
  * When the size of the [Row] is larger than the sum of its children sizes, a

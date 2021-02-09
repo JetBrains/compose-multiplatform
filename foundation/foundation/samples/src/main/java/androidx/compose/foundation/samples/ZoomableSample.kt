@@ -24,7 +24,7 @@ import androidx.compose.foundation.gestures.rememberZoomableController
 import androidx.compose.foundation.gestures.zoomable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.preferredSize
+import androidx.compose.foundation.layout.size
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -46,7 +46,7 @@ import kotlinx.coroutines.launch
 @Composable
 fun ZoomableSample() {
     Box(
-        Modifier.preferredSize(200.dp).clipToBounds().background(Color.LightGray)
+        Modifier.size(200.dp).clipToBounds().background(Color.LightGray)
     ) {
         var scale by remember { mutableStateOf(1f) }
         val zoomableController = rememberZoomableController { scale *= it }

@@ -18,7 +18,7 @@ package androidx.compose.material
 
 import android.os.Build
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.preferredSize
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CutCornerShape
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.testutils.assertShape
@@ -63,7 +63,7 @@ class CardTest {
                                 .testTag("card"),
                             elevation = 0.dp
                         ) {
-                            Box(Modifier.preferredSize(50.dp, 50.dp))
+                            Box(Modifier.size(50.dp, 50.dp))
                         }
                     }
                 }

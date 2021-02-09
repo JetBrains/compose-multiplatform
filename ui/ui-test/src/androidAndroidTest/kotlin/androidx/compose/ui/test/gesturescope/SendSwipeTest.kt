@@ -22,7 +22,7 @@ import androidx.compose.foundation.ScrollState
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.requiredSize
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.runtime.Composable
@@ -173,7 +173,7 @@ class SendSwipeTest {
                     Column(
                         Modifier
                             .testTag("scrollable")
-                            .size(100.toDp(), 1000.toDp())
+                            .requiredSize(100.toDp(), 1000.toDp())
                             .verticalScroll(
                                 scrollState,
                                 flingSpec = FloatExponentialDecaySpec()

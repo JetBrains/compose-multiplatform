@@ -31,7 +31,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.preferredSize
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.material.LocalTextStyle
 import androidx.compose.material.Text
@@ -67,7 +67,7 @@ fun PriorityInteractionStateSample() {
         Modifier
             .fillMaxSize()
             .wrapContentSize()
-            .preferredSize(width = 240.dp, height = 80.dp)
+            .size(width = 240.dp, height = 80.dp)
     ) {
         Box(
             Modifier
@@ -131,7 +131,7 @@ fun MultipleInteractionStateSample() {
         Row {
             Box(
                 Modifier
-                    .preferredSize(width = 240.dp, height = 80.dp)
+                    .size(width = 240.dp, height = 80.dp)
                     .then(clickable)
                     .border(BorderStroke(3.dp, Color.Blue))
                     .padding(3.dp)
@@ -145,7 +145,7 @@ fun MultipleInteractionStateSample() {
             }
             Box(
                 Modifier
-                    .preferredSize(width = 240.dp, height = 80.dp)
+                    .size(width = 240.dp, height = 80.dp)
                     .then(draggable)
                     .border(BorderStroke(3.dp, Color.Red))
                     .padding(3.dp)

@@ -22,7 +22,7 @@ import androidx.activity.ComponentActivity
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.preferredSize
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.text.CoreText
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.mutableStateOf
@@ -204,7 +204,7 @@ class SelectionContainerFocusTest {
                         )
                     }
 
-                    Box(Modifier.preferredSize(boxSize, boxSize).testTag("box"))
+                    Box(Modifier.size(boxSize, boxSize).testTag("box"))
                 }
             }
         }

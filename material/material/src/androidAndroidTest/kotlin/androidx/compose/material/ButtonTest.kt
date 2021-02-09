@@ -21,13 +21,13 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.heightIn
+import androidx.compose.foundation.layout.requiredHeight
+import androidx.compose.foundation.layout.requiredHeightIn
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.preferredSize
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.layout.widthIn
+import androidx.compose.foundation.layout.requiredSize
+import androidx.compose.foundation.layout.requiredWidth
+import androidx.compose.foundation.layout.requiredWidthIn
 import androidx.compose.foundation.shape.CutCornerShape
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
@@ -291,7 +291,7 @@ class ButtonTest {
             primary = MaterialTheme.colors.primary
             CompositionLocalProvider(LocalShapes provides Shapes(small = shape)) {
                 Button(modifier = Modifier.testTag("myButton"), onClick = {}, elevation = null) {
-                    Box(Modifier.preferredSize(10.dp, 10.dp))
+                    Box(Modifier.size(10.dp, 10.dp))
                 }
             }
         }
@@ -532,7 +532,7 @@ class ButtonTest {
             Box {
                 Button({}, Modifier.onGloballyPositioned { buttonCoordinates = it }) {
                     Box(
-                        Modifier.preferredSize(2.dp)
+                        Modifier.size(2.dp)
                             .onGloballyPositioned { contentCoordinates = it }
                     )
                 }
@@ -558,9 +558,9 @@ class ButtonTest {
             Button(
                 onClick = {},
                 contentPadding = PaddingValues(),
-                modifier = Modifier.widthIn(20.dp).heightIn(15.dp).testTag("button")
+                modifier = Modifier.requiredWidthIn(20.dp).requiredHeightIn(15.dp).testTag("button")
             ) {
-                Spacer(Modifier.size(10.dp))
+                Spacer(Modifier.requiredSize(10.dp))
             }
         }
 
@@ -576,7 +576,7 @@ class ButtonTest {
         rule.setMaterialContent {
             Column {
                 Spacer(
-                    Modifier.size(10.dp).weight(1f).onGloballyPositioned {
+                    Modifier.requiredSize(10.dp).weight(1f).onGloballyPositioned {
                         item1Bounds = it.boundsInRoot()
                     }
                 )
@@ -590,7 +590,7 @@ class ButtonTest {
                     Text("Button")
                 }
 
-                Spacer(Modifier.size(10.dp).weight(1f))
+                Spacer(Modifier.requiredSize(10.dp).weight(1f))
             }
         }
 
@@ -611,12 +611,12 @@ class ButtonTest {
                 }
             ) {
                 Spacer(
-                    Modifier.size(10.dp).onGloballyPositioned {
+                    Modifier.requiredSize(10.dp).onGloballyPositioned {
                         item1Bounds = it.boundsInRoot()
                     }
                 )
                 Spacer(
-                    Modifier.width(10.dp).height(5.dp).onGloballyPositioned {
+                    Modifier.requiredWidth(10.dp).requiredHeight(5.dp).onGloballyPositioned {
                         item2Bounds = it.boundsInRoot()
                     }
                 )

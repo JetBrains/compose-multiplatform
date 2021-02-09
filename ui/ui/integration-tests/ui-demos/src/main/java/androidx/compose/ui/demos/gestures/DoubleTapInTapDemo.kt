@@ -22,7 +22,7 @@ import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.preferredSize
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
@@ -67,14 +67,14 @@ fun DoubleTapInTapDemo() {
 
                 .fillMaxSize()
                 .wrapContentSize(Alignment.Center)
-                .preferredSize(192.dp)
+                .size(192.dp)
                 .pointerInput(Unit) { detectTapGestures(onTap = onTap) }
                 .border(2.dp, BorderColor)
                 .background(color = outerColor.value)
 
                 .fillMaxSize()
                 .wrapContentSize(Alignment.Center)
-                .preferredSize(96.dp)
+                .size(96.dp)
                 .pointerInput(Unit) { detectTapGestures(onDoubleTap = onDoubleTap) }
                 .border(2.dp, BorderColor)
                 .background(color = innerColor.value, shape = RectangleShape)

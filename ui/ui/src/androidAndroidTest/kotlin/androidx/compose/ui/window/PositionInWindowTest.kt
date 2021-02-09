@@ -17,7 +17,7 @@ package androidx.compose.ui.window
 
 import androidx.activity.ComponentActivity
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.requiredSize
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
@@ -66,7 +66,7 @@ class PositionInWindowTest {
         }
         rule.setContent {
             with(LocalDensity.current) {
-                Box(Modifier.size(size.toDp()).onGloballyPositioned { coordinates = it })
+                Box(Modifier.requiredSize(size.toDp()).onGloballyPositioned { coordinates = it })
             }
         }
 

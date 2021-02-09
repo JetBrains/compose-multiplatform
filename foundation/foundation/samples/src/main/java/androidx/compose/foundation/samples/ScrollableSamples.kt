@@ -22,7 +22,7 @@ import androidx.compose.foundation.gestures.Orientation
 import androidx.compose.foundation.gestures.rememberScrollableState
 import androidx.compose.foundation.gestures.scrollable
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.preferredSize
+import androidx.compose.foundation.layout.size
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
@@ -42,7 +42,7 @@ fun ScrollableSample() {
     val offset = remember { mutableStateOf(0f) }
     Box(
         Modifier
-            .preferredSize(150.dp)
+            .size(150.dp)
             .scrollable(
                 orientation = Orientation.Vertical,
                 // state for Scrollable, describes how consume scroll amount

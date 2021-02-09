@@ -21,7 +21,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.preferredSize
+import androidx.compose.foundation.layout.size
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -33,11 +33,11 @@ fun BoxWithConstraintsSample() {
     BoxWithConstraints {
         val rectangleHeight = 100.dp
         if (maxHeight < rectangleHeight * 2) {
-            Box(Modifier.preferredSize(50.dp, rectangleHeight).background(Color.Blue))
+            Box(Modifier.size(50.dp, rectangleHeight).background(Color.Blue))
         } else {
             Column {
-                Box(Modifier.preferredSize(50.dp, rectangleHeight).background(Color.Blue))
-                Box(Modifier.preferredSize(50.dp, rectangleHeight).background(Color.Gray))
+                Box(Modifier.size(50.dp, rectangleHeight).background(Color.Blue))
+                Box(Modifier.size(50.dp, rectangleHeight).background(Color.Gray))
             }
         }
     }

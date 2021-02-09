@@ -21,7 +21,7 @@ import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.preferredHeight
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.MaterialTheme
@@ -80,7 +80,7 @@ fun ExplicitAutofillTypesDemo() {
             )
         }
 
-        Spacer(Modifier.preferredHeight(40.dp))
+        Spacer(Modifier.height(40.dp))
 
         Text("Email", style = labelStyle)
         Autofill(

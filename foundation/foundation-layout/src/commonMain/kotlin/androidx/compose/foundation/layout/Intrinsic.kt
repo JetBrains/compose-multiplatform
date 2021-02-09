@@ -33,8 +33,8 @@ import androidx.compose.ui.unit.constrain
  * the content. The incoming measurement [Constraints] may override this value, forcing the content
  * to be either smaller or larger.
  *
- * See [preferredHeight] for options of sizing to intrinsic height.
- * Also see [preferredWidth] and [preferredWidthIn] for other options to set the preferred width.
+ * See [height] for options of sizing to intrinsic height.
+ * Also see [width] and [widthIn] for other options to set the preferred width.
  *
  * Example usage for min intrinsic:
  * @sample androidx.compose.foundation.layout.samples.SameWidthBoxes
@@ -44,7 +44,7 @@ import androidx.compose.ui.unit.constrain
  */
 @ExperimentalLayout
 @Stable
-fun Modifier.preferredWidth(intrinsicSize: IntrinsicSize) = when (intrinsicSize) {
+fun Modifier.width(intrinsicSize: IntrinsicSize) = when (intrinsicSize) {
     IntrinsicSize.Min -> this.then(PreferredMinIntrinsicWidthModifier)
     IntrinsicSize.Max -> this.then(PreferredMaxIntrinsicWidthModifier)
 }
@@ -54,8 +54,8 @@ fun Modifier.preferredWidth(intrinsicSize: IntrinsicSize) = when (intrinsicSize)
  * the content. The incoming measurement [Constraints] may override this value, forcing the content
  * to be either smaller or larger.
  *
- * See [preferredWidth] for other options of sizing to intrinsic width.
- * Also see [preferredHeight] and [preferredHeightIn] for other options to set the preferred height.
+ * See [width] for other options of sizing to intrinsic width.
+ * Also see [height] and [heightIn] for other options to set the preferred height.
  *
  * Example usage for min intrinsic:
  * @sample androidx.compose.foundation.layout.samples.MatchParentDividerForText
@@ -65,13 +65,13 @@ fun Modifier.preferredWidth(intrinsicSize: IntrinsicSize) = when (intrinsicSize)
  */
 @ExperimentalLayout
 @Stable
-fun Modifier.preferredHeight(intrinsicSize: IntrinsicSize) = when (intrinsicSize) {
+fun Modifier.height(intrinsicSize: IntrinsicSize) = when (intrinsicSize) {
     IntrinsicSize.Min -> this.then(PreferredMinIntrinsicHeightModifier)
     IntrinsicSize.Max -> this.then(PreferredMaxIntrinsicHeightModifier)
 }
 
 /**
- * Intrinsic size used in [preferredWidth] or [preferredHeight] which can refer to width or height.
+ * Intrinsic size used in [width] or [height] which can refer to width or height.
  */
 enum class IntrinsicSize { Min, Max }
 

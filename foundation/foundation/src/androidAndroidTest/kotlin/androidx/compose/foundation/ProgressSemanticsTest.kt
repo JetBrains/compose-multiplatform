@@ -17,7 +17,7 @@
 package androidx.compose.foundation
 
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.preferredSize
+import androidx.compose.foundation.layout.size
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -55,7 +55,7 @@ class ProgressSemanticsTest {
                 Modifier
                     .testTag(tag)
                     .progressSemantics(progress.value)
-                    .preferredSize(50.dp)
+                    .size(50.dp)
                     .background(color = Color.Cyan)
             )
         }
@@ -90,7 +90,7 @@ class ProgressSemanticsTest {
                 Modifier
                     .testTag(tag)
                     .progressSemantics()
-                    .preferredSize(50.dp)
+                    .size(50.dp)
                     .background(color = Color.Cyan)
             )
         }

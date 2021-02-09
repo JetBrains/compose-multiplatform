@@ -18,7 +18,7 @@ package androidx.compose.material
 
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.preferredSize
+import androidx.compose.foundation.layout.size
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalLayoutDirection
@@ -106,7 +106,7 @@ class SwipeToDismissTest {
             SwipeToDismiss(
                 state = rememberDismissState(DismissValue.Default),
                 background = { Box(Modifier.fillMaxSize().testTag(backgroundTag)) },
-                dismissContent = { Box(Modifier.preferredSize(100.dp)) }
+                dismissContent = { Box(Modifier.size(100.dp)) }
             )
         }
 

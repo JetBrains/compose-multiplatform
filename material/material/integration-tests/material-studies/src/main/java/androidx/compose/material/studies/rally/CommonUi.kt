@@ -22,9 +22,9 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.preferredHeight
-import androidx.compose.foundation.layout.preferredSize
-import androidx.compose.foundation.layout.preferredWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.material.Divider
 import androidx.compose.material.Icon
 import androidx.compose.material.MaterialTheme
@@ -73,17 +73,17 @@ private fun BaseRow(
     amount: Float,
     negative: Boolean
 ) {
-    Row(Modifier.preferredHeight(68.dp)) {
+    Row(Modifier.height(68.dp)) {
         val typography = MaterialTheme.typography
         AccountIndicator(color = color, modifier = Modifier.align(Alignment.CenterVertically))
-        Spacer(Modifier.preferredWidth(8.dp))
+        Spacer(Modifier.width(8.dp))
         Column(Modifier.align(Alignment.CenterVertically)) {
             Text(text = title, style = typography.body1)
             Text(text = subtitle, style = typography.subtitle1)
         }
         Spacer(Modifier.weight(1f))
         Row(
-            modifier = Modifier.align(Alignment.CenterVertically).preferredWidth(113.dp),
+            modifier = Modifier.align(Alignment.CenterVertically).width(113.dp),
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
             Text(
@@ -97,11 +97,11 @@ private fun BaseRow(
                 modifier = Modifier.align(Alignment.CenterVertically)
             )
         }
-        Spacer(Modifier.preferredWidth(16.dp))
+        Spacer(Modifier.width(16.dp))
         Icon(
             Icons.Filled.ArrowForwardIos,
             contentDescription = null,
-            modifier = Modifier.preferredSize(12.dp).align(Alignment.CenterVertically),
+            modifier = Modifier.size(12.dp).align(Alignment.CenterVertically),
             tint = Color.White.copy(alpha = 0.6f)
         )
     }
@@ -113,7 +113,7 @@ private fun BaseRow(
  */
 @Composable
 private fun AccountIndicator(color: Color, modifier: Modifier = Modifier) {
-    Box(modifier.preferredSize(4.dp, 36.dp).background(color = color))
+    Box(modifier.size(4.dp, 36.dp).background(color = color))
 }
 
 @Composable

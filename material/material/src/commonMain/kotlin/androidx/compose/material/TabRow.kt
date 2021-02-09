@@ -26,8 +26,8 @@ import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.offset
-import androidx.compose.foundation.layout.preferredHeight
-import androidx.compose.foundation.layout.preferredWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.material.TabRowDefaults.tabIndicatorOffset
@@ -355,7 +355,7 @@ object TabRowDefaults {
         Box(
             modifier
                 .fillMaxWidth()
-                .preferredHeight(height)
+                .height(height)
                 .background(color = color)
         )
     }
@@ -385,7 +385,7 @@ object TabRowDefaults {
         fillMaxWidth()
             .wrapContentSize(Alignment.BottomStart)
             .offset(x = indicatorOffset)
-            .preferredWidth(currentTabWidth)
+            .width(currentTabWidth)
     }
 
     /**

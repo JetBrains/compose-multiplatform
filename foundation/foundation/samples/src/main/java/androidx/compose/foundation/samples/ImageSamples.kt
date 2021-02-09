@@ -18,7 +18,7 @@ package androidx.compose.foundation.samples
 
 import androidx.annotation.Sampled
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.layout.preferredSize
+import androidx.compose.foundation.layout.size
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
@@ -76,7 +76,7 @@ fun BitmapPainterSample() {
     Image(
         painter = customPainter,
         contentDescription = "Localized description",
-        modifier = Modifier.preferredSize(100.dp, 100.dp)
+        modifier = Modifier.size(100.dp, 100.dp)
     )
 }
 

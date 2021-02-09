@@ -25,10 +25,10 @@ import androidx.compose.foundation.InteractionState
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.requiredHeight
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.preferredHeight
-import androidx.compose.foundation.layout.preferredSize
-import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.requiredWidth
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.LocalContentAlpha
 import androidx.compose.material.LocalContentColor
@@ -116,7 +116,7 @@ class TextFieldTest {
                 value = "input",
                 onValueChange = {},
                 label = {},
-                modifier = Modifier.preferredHeight(20.dp)
+                modifier = Modifier.height(20.dp)
             )
         }
             .assertHeightIsEqualTo(20.dp)
@@ -129,7 +129,7 @@ class TextFieldTest {
                 value = "input",
                 onValueChange = {},
                 label = {},
-                modifier = Modifier.width(40.dp)
+                modifier = Modifier.requiredWidth(40.dp)
             )
         }
             .assertWidthIsEqualTo(40.dp)
@@ -297,7 +297,7 @@ class TextFieldTest {
                                 }
                         )
                     },
-                    modifier = Modifier.preferredHeight(56.dp)
+                    modifier = Modifier.height(56.dp)
                 )
             }
         }
@@ -338,7 +338,7 @@ class TextFieldTest {
                                 }
                         )
                     },
-                    modifier = Modifier.preferredHeight(56.dp)
+                    modifier = Modifier.height(56.dp)
                 )
             }
         }
@@ -368,7 +368,7 @@ class TextFieldTest {
                 TextField(
                     value = "",
                     onValueChange = {},
-                    modifier = Modifier.preferredHeight(height),
+                    modifier = Modifier.height(height),
                     label = {
                         Text(
                             text = "label",
@@ -489,7 +489,7 @@ class TextFieldTest {
             Box {
                 TextField(
                     modifier = Modifier
-                        .preferredHeight(60.dp)
+                        .height(60.dp)
                         .testTag(TextfieldTag),
                     value = "",
                     onValueChange = {},
@@ -534,14 +534,14 @@ class TextFieldTest {
         rule.setMaterialContent {
             Box {
                 TextField(
-                    modifier = Modifier.preferredHeight(height).testTag(TextfieldTag),
+                    modifier = Modifier.height(height).testTag(TextfieldTag),
                     value = "",
                     onValueChange = {},
                     label = {},
                     placeholder = {
                         Text(
                             text = "placeholder",
-                            modifier = Modifier.height(20.dp)
+                            modifier = Modifier.requiredHeight(20.dp)
                                 .onGloballyPositioned {
                                     placeholderPosition.value = it.positionInRoot()
                                     placeholderSize.value = it.size
@@ -646,11 +646,11 @@ class TextFieldTest {
             TextField(
                 value = "text",
                 onValueChange = {},
-                modifier = Modifier.preferredSize(textFieldWidth, textFieldHeight),
+                modifier = Modifier.size(textFieldWidth, textFieldHeight),
                 label = {},
                 leadingIcon = {
                     Box(
-                        Modifier.preferredSize(size).onGloballyPositioned {
+                        Modifier.size(size).onGloballyPositioned {
                             leadingPosition.value = it.positionInRoot()
                             leadingSize.value = it.size
                         }
@@ -658,7 +658,7 @@ class TextFieldTest {
                 },
                 trailingIcon = {
                     Box(
-                        Modifier.preferredSize(size).onGloballyPositioned {
+                        Modifier.size(size).onGloballyPositioned {
                             trailingPosition.value = it.positionInRoot()
                             trailingSize.value = it.size
                         }
@@ -699,7 +699,7 @@ class TextFieldTest {
                 TextField(
                     value = "",
                     onValueChange = {},
-                    modifier = Modifier.preferredHeight(height),
+                    modifier = Modifier.height(height),
                     label = {
                         Text(
                             text = "label",
@@ -708,8 +708,8 @@ class TextFieldTest {
                             }
                         )
                     },
-                    trailingIcon = { Box(Modifier.preferredSize(iconSize)) },
-                    leadingIcon = { Box(Modifier.preferredSize(iconSize)) }
+                    trailingIcon = { Box(Modifier.size(iconSize)) },
+                    leadingIcon = { Box(Modifier.size(iconSize)) }
                 )
             }
         }
@@ -731,7 +731,7 @@ class TextFieldTest {
                 TextField(
                     value = "",
                     onValueChange = {},
-                    modifier = Modifier.preferredHeight(height),
+                    modifier = Modifier.height(height),
                     label = {
                         Text(
                             text = "label",

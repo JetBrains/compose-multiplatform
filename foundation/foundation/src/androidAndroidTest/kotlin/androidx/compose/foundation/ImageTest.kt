@@ -18,10 +18,10 @@ package androidx.compose.foundation
 
 import android.os.Build
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.preferredHeightIn
-import androidx.compose.foundation.layout.preferredSize
-import androidx.compose.foundation.layout.preferredSizeIn
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.sizeIn
+import androidx.compose.foundation.layout.requiredSize
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.test.R
 import androidx.compose.runtime.mutableStateOf
@@ -112,7 +112,7 @@ class ImageTest {
         rule.setContent {
             val size = (containerSize / LocalDensity.current.density).dp
             Box(
-                Modifier.preferredSize(size)
+                Modifier.size(size)
                     .background(color = Color.White)
                     .wrapContentSize(Alignment.Center)
             ) {
@@ -157,7 +157,7 @@ class ImageTest {
         rule.setContent {
             val size = (containerSize / LocalDensity.current.density).dp
             Box(
-                Modifier.preferredSize(size)
+                Modifier.size(size)
                     .background(color = Color.White)
                     .wrapContentSize(Alignment.Center)
             ) {
@@ -257,7 +257,7 @@ class ImageTest {
             val density = LocalDensity.current.density
             val size = (containerSize * 2 / density).dp
             Box(
-                Modifier.preferredSize(size)
+                Modifier.size(size)
                     .background(color = Color.White)
                     .wrapContentSize(Alignment.Center)
             ) {
@@ -269,7 +269,7 @@ class ImageTest {
                     contentDescription = null,
                     modifier = Modifier
                         .testTag(contentTag)
-                        .preferredSize(
+                        .size(
                             (imageComposableWidth / density).dp,
                             (imageComposableHeight / density).dp
                         )
@@ -328,7 +328,7 @@ class ImageTest {
                 drawRect(color = Color.Blue)
             }
             Box(
-                Modifier.preferredSize(size)
+                Modifier.size(size)
                     .background(color = Color.White)
                     .wrapContentSize(Alignment.Center)
             ) {
@@ -337,7 +337,7 @@ class ImageTest {
                     contentDescription = null,
                     modifier = Modifier
                         .testTag(contentTag)
-                        .preferredSize(
+                        .size(
                             (imageComposableWidth / density.density).dp,
                             (imageComposableHeight / density.density).dp
                         ),
@@ -359,7 +359,7 @@ class ImageTest {
             val density = LocalDensity.current.density
             val size = (containerSize * 2 / density).dp
             Box(
-                Modifier.preferredSize(size)
+                Modifier.size(size)
                     .background(color = Color.White)
                     .wrapContentSize(Alignment.Center)
             ) {
@@ -370,7 +370,7 @@ class ImageTest {
                     contentDescription = null,
                     modifier = Modifier
                         .testTag(contentTag)
-                        .preferredSize(
+                        .size(
                             (imageComposableWidth / density).dp,
                             (imageComposableHeight / density).dp
                         ),
@@ -421,14 +421,14 @@ class ImageTest {
             val minWidth = (boxWidth / density).dp
             val minHeight = (boxHeight / density).dp
             Box(
-                Modifier.preferredSize(size)
+                Modifier.size(size)
                     .background(color = Color.White)
                     .wrapContentSize(Alignment.Center)
             ) {
                 Image(
                     painterResource(R.drawable.ic_vector_asset_test),
                     null,
-                    modifier = Modifier.preferredSizeIn(
+                    modifier = Modifier.sizeIn(
                         minWidth = minWidth,
                         minHeight = minHeight
                     )
@@ -516,7 +516,7 @@ class ImageTest {
                 modifier = Modifier
                     .testTag(testTag)
                     .background(Color.Green)
-                    .preferredHeightIn(max = (heightDp / 2f).dp),
+                    .heightIn(max = (heightDp / 2f).dp),
                 contentScale = ContentScale.Crop
             )
         }
@@ -584,7 +584,7 @@ class ImageTest {
         val testTag = "testTag"
         rule.setContent {
             val sizeDp = with(LocalDensity.current) { 50 / density }
-            Box(modifier = Modifier.size(sizeDp.dp)) {
+            Box(modifier = Modifier.requiredSize(sizeDp.dp)) {
                 Image(
                     painter = ColorPainter(Color.Red),
                     modifier = Modifier.testTag(testTag),
@@ -599,7 +599,7 @@ class ImageTest {
     fun testImageZeroSizeDoesNotCrash() {
         rule.setContent {
             // Intentionally force a size of zero to ensure we do not crash
-            Box(modifier = Modifier.size(0.dp)) {
+            Box(modifier = Modifier.requiredSize(0.dp)) {
                 Image(
                     painter = ColorPainter(Color.Red),
                     contentDescription = null

@@ -18,7 +18,7 @@ package androidx.compose.foundation.textfield
 
 import androidx.compose.foundation.Interaction
 import androidx.compose.foundation.InteractionState
-import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.requiredWidth
 import androidx.compose.foundation.text.InactiveTextField
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.composed
@@ -101,7 +101,7 @@ class InactiveTextFieldTest {
         rule.setContent {
             InactiveTextField(
                 value = text,
-                modifier = Modifier.testTag(tag).width(100.dp).composed {
+                modifier = Modifier.testTag(tag).requiredWidth(100.dp).composed {
                     assertThat(LocalSelectionRegistrar.current).isNull()
                     Modifier
                 },

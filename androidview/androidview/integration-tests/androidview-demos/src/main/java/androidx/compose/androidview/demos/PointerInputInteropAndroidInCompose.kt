@@ -29,8 +29,8 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.preferredHeight
-import androidx.compose.foundation.layout.preferredSize
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
@@ -82,7 +82,7 @@ private fun FourAndroidTapInCompose() {
             Modifier
                 .fillMaxSize()
                 .wrapContentSize(Alignment.Center)
-                .preferredSize(240.dp)
+                .size(240.dp)
         ) {
             AndroidView({ context ->
                 LayoutInflater.from(context)
@@ -131,7 +131,7 @@ private fun AndroidTapInComposeTap() {
             Modifier
                 .fillMaxSize()
                 .wrapContentSize(Alignment.Center)
-                .preferredSize(240.dp)
+                .size(240.dp)
                 .pointerInput(Unit) {
                     detectTapGestures(onTap = onTap)
                 }
@@ -252,7 +252,7 @@ private fun AndroidScrollInComposeScrollSameOrientation() {
                 modifier = Modifier
                     .padding(96.dp)
                     .background(color = androidx.compose.ui.graphics.Color.Red)
-                    .preferredHeight(750.dp)
+                    .height(750.dp)
             ) {
                 AndroidView({ context ->
                     LayoutInflater.from(context)

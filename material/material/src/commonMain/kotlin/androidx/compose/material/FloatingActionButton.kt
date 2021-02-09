@@ -27,8 +27,8 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.defaultMinSize
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.preferredSizeIn
-import androidx.compose.foundation.layout.preferredWidth
+import androidx.compose.foundation.layout.sizeIn
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CornerSize
 import androidx.compose.material.ripple.rememberRipple
 import androidx.compose.runtime.Composable
@@ -152,7 +152,7 @@ fun ExtendedFloatingActionButton(
     elevation: FloatingActionButtonElevation = FloatingActionButtonDefaults.elevation()
 ) {
     FloatingActionButton(
-        modifier = modifier.preferredSizeIn(
+        modifier = modifier.sizeIn(
             minWidth = ExtendedFabSize,
             minHeight = ExtendedFabSize
         ),
@@ -175,7 +175,7 @@ fun ExtendedFloatingActionButton(
             } else {
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     icon()
-                    Spacer(Modifier.preferredWidth(ExtendedFabIconPadding))
+                    Spacer(Modifier.width(ExtendedFabIconPadding))
                     text()
                 }
             }

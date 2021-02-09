@@ -18,7 +18,7 @@ package androidx.compose.ui.draw
 
 import android.os.Build
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.requiredSize
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -300,7 +300,7 @@ class GraphicsLayerTest {
         rule.setContent {
             with(LocalDensity.current) {
                 Box(
-                    Modifier.size(25.toDp())
+                    Modifier.requiredSize(25.toDp())
                         .graphicsLayer(
                             rotationZ = 30f,
                             clip = true
@@ -312,7 +312,7 @@ class GraphicsLayerTest {
                             transformOrigin = TransformOrigin(0f, 1f),
                             clip = true
                         )
-                            .size(20.toDp(), 10.toDp())
+                            .requiredSize(20.toDp(), 10.toDp())
                             .onGloballyPositioned {
                                 coords1 = it
                             }
@@ -325,7 +325,7 @@ class GraphicsLayerTest {
                                 transformOrigin = TransformOrigin(0f, 1f),
                                 clip = true
                             )
-                            .size(10.toDp())
+                            .requiredSize(10.toDp())
                             .onGloballyPositioned {
                                 coords2 = it
                             }
@@ -358,12 +358,12 @@ class GraphicsLayerTest {
             Box(modifier = Modifier.testTag(testTag).wrapContentSize()) {
                 Box(
                     modifier = Modifier
-                        .size(100.dp)
+                        .requiredSize(100.dp)
                         .background(Color.Gray)
                         .graphicsLayer(rotationY = 25f, cameraDistance = 1.0f)
                         .background(Color.Red)
                 ) {
-                    Box(modifier = Modifier.size(100.dp))
+                    Box(modifier = Modifier.requiredSize(100.dp))
                 }
             }
         }
@@ -391,7 +391,7 @@ class GraphicsLayerTest {
         }
         val tag = "testTag"
         rule.setContent {
-            Box(modifier = Modifier.testTag(tag).size(100.dp).background(Color.Blue)) {
+            Box(modifier = Modifier.testTag(tag).requiredSize(100.dp).background(Color.Blue)) {
                 Box(
                     modifier = Modifier
                         .matchParentSize()
