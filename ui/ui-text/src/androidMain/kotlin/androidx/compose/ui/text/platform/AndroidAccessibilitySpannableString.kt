@@ -44,6 +44,8 @@ import androidx.compose.ui.util.fastForEach
 
 /**
  * Convert an AnnotatedString into SpannableString for Android text to speech support.
+ *
+ * @suppress
  */
 @InternalTextApi // used in ui:ui
 fun AnnotatedString.toAccessibilitySpannableString(
