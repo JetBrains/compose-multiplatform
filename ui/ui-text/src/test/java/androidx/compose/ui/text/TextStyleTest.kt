@@ -33,6 +33,7 @@ import androidx.compose.ui.text.style.TextDirection
 import androidx.compose.ui.text.style.TextGeometricTransform
 import androidx.compose.ui.text.style.TextIndent
 import androidx.compose.ui.text.style.lerp
+import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.em
 import androidx.compose.ui.unit.isUnspecified
@@ -1050,5 +1051,107 @@ class TextStyleTest {
     @Test(expected = IllegalStateException::class)
     fun `negative lineHeight throws IllegalStateException`() {
         TextStyle(lineHeight = (-1).sp)
+    }
+
+    @Test
+    fun resolveTextDirection_null() {
+        assertThat(
+            resolveTextDirection(
+                LayoutDirection.Ltr,
+                null
+            )
+        ).isEqualTo(TextDirection.Ltr)
+
+        assertThat(
+            resolveTextDirection(
+                LayoutDirection.Rtl,
+                null
+            )
+        ).isEqualTo(TextDirection.Rtl)
+    }
+
+    @Test
+    fun resolveTextDirection_Content() {
+        assertThat(
+            resolveTextDirection(
+                LayoutDirection.Ltr,
+                TextDirection.Content
+            )
+        ).isEqualTo(TextDirection.ContentOrLtr)
+
+        assertThat(
+            resolveTextDirection(
+                LayoutDirection.Rtl,
+                TextDirection.Content
+            )
+        ).isEqualTo(TextDirection.ContentOrRtl)
+    }
+
+    @Test
+    fun resolveTextDirection_ContentOrLtr() {
+        assertThat(
+            resolveTextDirection(
+                LayoutDirection.Ltr,
+                TextDirection.ContentOrLtr
+            )
+        ).isEqualTo(TextDirection.ContentOrLtr)
+
+        assertThat(
+            resolveTextDirection(
+                LayoutDirection.Rtl,
+                TextDirection.ContentOrLtr
+            )
+        ).isEqualTo(TextDirection.ContentOrLtr)
+    }
+
+    @Test
+    fun resolveTextDirection_ContentOrRtl() {
+        assertThat(
+            resolveTextDirection(
+                LayoutDirection.Ltr,
+                TextDirection.ContentOrRtl
+            )
+        ).isEqualTo(TextDirection.ContentOrRtl)
+
+        assertThat(
+            resolveTextDirection(
+                LayoutDirection.Rtl,
+                TextDirection.ContentOrRtl
+            )
+        ).isEqualTo(TextDirection.ContentOrRtl)
+    }
+
+    @Test
+    fun resolveTextDirection_Ltr() {
+        assertThat(
+            resolveTextDirection(
+                LayoutDirection.Ltr,
+                TextDirection.Ltr
+            )
+        ).isEqualTo(TextDirection.Ltr)
+
+        assertThat(
+            resolveTextDirection(
+                LayoutDirection.Rtl,
+                TextDirection.Ltr
+            )
+        ).isEqualTo(TextDirection.Ltr)
+    }
+
+    @Test
+    fun resolveTextDirection_Rtl() {
+        assertThat(
+            resolveTextDirection(
+                LayoutDirection.Ltr,
+                TextDirection.Rtl
+            )
+        ).isEqualTo(TextDirection.Rtl)
+
+        assertThat(
+            resolveTextDirection(
+                LayoutDirection.Rtl,
+                TextDirection.Rtl
+            )
+        ).isEqualTo(TextDirection.Rtl)
     }
 }

@@ -17,7 +17,6 @@
 package androidx.ui.integration.test.core.text
 
 import androidx.compose.foundation.ExperimentalFoundationApi
-import androidx.compose.foundation.InternalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.width
@@ -70,7 +69,6 @@ class TextFieldToggleTextTestCase(
         }
     }
 
-    @OptIn(InternalFoundationApi::class)
     @Composable
     override fun ContentWrappers(content: @Composable () -> Unit) {
         // Override IME input connection since we are not interested in it, and it might cause

@@ -14,20 +14,20 @@
  * limitations under the License.
  */
 
-package androidx.compose.ui.text
+package androidx.compose.foundation.text
 
+import androidx.compose.ui.text.AnnotatedString
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.Font
-import androidx.compose.ui.text.style.TextDirection
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.Density
-import androidx.compose.ui.unit.LayoutDirection
 import com.google.common.truth.Truth.assertThat
 import com.nhaarman.mockitokotlin2.mock
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.junit.runners.JUnit4
 
-@OptIn(InternalTextApi::class)
+@OptIn(InternalFoundationTextApi::class)
 @RunWith(JUnit4::class)
 class TextDelegateTest {
     private val density = Density(density = 1f)
@@ -111,107 +111,5 @@ class TextDelegateTest {
         )
 
         textDelegate.maxIntrinsicWidth
-    }
-
-    @Test
-    fun resolveTextDirection_null() {
-        assertThat(
-            resolveTextDirection(
-                LayoutDirection.Ltr,
-                null
-            )
-        ).isEqualTo(TextDirection.Ltr)
-
-        assertThat(
-            resolveTextDirection(
-                LayoutDirection.Rtl,
-                null
-            )
-        ).isEqualTo(TextDirection.Rtl)
-    }
-
-    @Test
-    fun resolveTextDirection_Content() {
-        assertThat(
-            resolveTextDirection(
-                LayoutDirection.Ltr,
-                TextDirection.Content
-            )
-        ).isEqualTo(TextDirection.ContentOrLtr)
-
-        assertThat(
-            resolveTextDirection(
-                LayoutDirection.Rtl,
-                TextDirection.Content
-            )
-        ).isEqualTo(TextDirection.ContentOrRtl)
-    }
-
-    @Test
-    fun resolveTextDirection_ContentOrLtr() {
-        assertThat(
-            resolveTextDirection(
-                LayoutDirection.Ltr,
-                TextDirection.ContentOrLtr
-            )
-        ).isEqualTo(TextDirection.ContentOrLtr)
-
-        assertThat(
-            resolveTextDirection(
-                LayoutDirection.Rtl,
-                TextDirection.ContentOrLtr
-            )
-        ).isEqualTo(TextDirection.ContentOrLtr)
-    }
-
-    @Test
-    fun resolveTextDirection_ContentOrRtl() {
-        assertThat(
-            resolveTextDirection(
-                LayoutDirection.Ltr,
-                TextDirection.ContentOrRtl
-            )
-        ).isEqualTo(TextDirection.ContentOrRtl)
-
-        assertThat(
-            resolveTextDirection(
-                LayoutDirection.Rtl,
-                TextDirection.ContentOrRtl
-            )
-        ).isEqualTo(TextDirection.ContentOrRtl)
-    }
-
-    @Test
-    fun resolveTextDirection_Ltr() {
-        assertThat(
-            resolveTextDirection(
-                LayoutDirection.Ltr,
-                TextDirection.Ltr
-            )
-        ).isEqualTo(TextDirection.Ltr)
-
-        assertThat(
-            resolveTextDirection(
-                LayoutDirection.Rtl,
-                TextDirection.Ltr
-            )
-        ).isEqualTo(TextDirection.Ltr)
-    }
-
-    @Test
-    fun resolveTextDirection_Rtl() {
-        assertThat(
-            resolveTextDirection(
-                LayoutDirection.Ltr,
-                TextDirection.Rtl
-            )
-        ).isEqualTo(TextDirection.Rtl)
-
-        assertThat(
-            resolveTextDirection(
-                LayoutDirection.Rtl,
-                TextDirection.Rtl
-            )
-        ).isEqualTo(TextDirection.Rtl)
     }
 }
