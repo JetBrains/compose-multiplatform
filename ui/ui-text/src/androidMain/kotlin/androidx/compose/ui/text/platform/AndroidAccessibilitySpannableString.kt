@@ -24,6 +24,7 @@ import android.text.style.ScaleXSpan
 import android.text.style.StyleSpan
 import android.text.style.TypefaceSpan
 import androidx.annotation.RequiresApi
+import androidx.annotation.RestrictTo
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.InternalTextApi
 import androidx.compose.ui.text.SpanStyle
@@ -47,6 +48,7 @@ import androidx.compose.ui.util.fastForEach
  *
  * @suppress
  */
+@RestrictTo(RestrictTo.Scope.LIBRARY_GROUP)
 @InternalTextApi // used in ui:ui
 fun AnnotatedString.toAccessibilitySpannableString(
     density: Density,

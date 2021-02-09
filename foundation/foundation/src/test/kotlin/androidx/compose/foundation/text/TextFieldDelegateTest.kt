@@ -38,7 +38,6 @@ import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.input.TextInputService
 import androidx.compose.ui.text.input.TransformedText
 import androidx.compose.ui.text.input.VisualTransformation
-import androidx.compose.ui.text.input.buildTextFieldValue
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.IntSize
 import com.google.common.truth.Truth.assertThat
@@ -151,7 +150,7 @@ class TextFieldDelegateTest {
     fun on_blur() {
         val inputSessionToken = 10 // We are not using this value in this test.
 
-        val editorState = buildTextFieldValue(
+        val editorState = TextFieldValue(
             text = "Hello, World",
             selection = TextRange(1),
             composition = TextRange(3, 5)
@@ -177,7 +176,7 @@ class TextFieldDelegateTest {
     fun on_blur_with_hiding() {
         val inputSessionToken = 10 // We are not using this value in this test.
 
-        val editorState = buildTextFieldValue(
+        val editorState = TextFieldValue(
             text = "Hello, World",
             selection = TextRange(1),
             composition = TextRange(3, 5)
