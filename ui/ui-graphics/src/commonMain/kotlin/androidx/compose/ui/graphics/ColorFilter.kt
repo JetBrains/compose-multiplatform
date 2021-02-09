@@ -19,27 +19,6 @@ package androidx.compose.ui.graphics
 import androidx.compose.runtime.Immutable
 import androidx.compose.runtime.Stable
 
-/**
- * Creates a color filter that applies the blend mode given as the second
- * argument. The source color is the one given as the first argument, and the
- * destination color is the one from the layer being composited.
- *
- * The output of this filter is then composited into the background according
- * to the [Paint.blendMode], using the output of this filter as the source
- * and the background as the destination.
- */
-@Deprecated(
-    "Use ColorFilter.tint(color, blendmode) instead",
-    ReplaceWith(
-        "ColorFilter.tint(color, blendMode)",
-        "androidx.compose.ui.graphics"
-    )
-)
-fun ColorFilter(
-    color: Color,
-    blendMode: BlendMode
-) = ColorFilter.tint(color, blendMode)
-
 // TODO mark internal once https://youtrack.jetbrains.com/issue/KT-36695 is fixed
 /* internal */ expect class NativeColorFilter
 

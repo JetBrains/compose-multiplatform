@@ -443,18 +443,6 @@ fun Constraints(
     return Constraints.createConstraints(minWidth, maxWidth, minHeight, maxHeight)
 }
 
-@Deprecated(
-    "enforce was deprecated. Please use constrain instead.",
-    ReplaceWith("otherConstraints.constrain(this)")
-)
-@Stable
-fun Constraints.enforce(otherConstraints: Constraints) = Constraints(
-    minWidth = minWidth.coerceIn(otherConstraints.minWidth, otherConstraints.maxWidth),
-    maxWidth = maxWidth.coerceIn(otherConstraints.minWidth, otherConstraints.maxWidth),
-    minHeight = minHeight.coerceIn(otherConstraints.minHeight, otherConstraints.maxHeight),
-    maxHeight = maxHeight.coerceIn(otherConstraints.minHeight, otherConstraints.maxHeight)
-)
-
 /**
  * Takes [otherConstraints] and returns the result of coercing them in the current constraints.
  * Note this means that any size satisfying the resulting constraints will satisfy the current
