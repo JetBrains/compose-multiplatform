@@ -92,7 +92,6 @@ private fun JavaCompile.configureWithErrorProne() {
             "-Xep:RestrictTo:OFF",
 
             // Disable the following checks.
-            "-Xep:ObjectToString:OFF",
             "-Xep:CatchAndPrintStackTrace:OFF",
             "-Xep:MixedMutabilityReturnType:OFF",
             "-Xep:UnescapedEntity:OFF",
@@ -162,6 +161,7 @@ private fun JavaCompile.configureWithErrorProne() {
             "-Xep:RxReturnValueIgnored:ERROR",
             "-Xep:BadImport:ERROR",
             "-Xep:MissingCasesInEnumSwitch:ERROR",
+            "-Xep:ObjectToString:ERROR",
 
             // Nullaway
             "-XepIgnoreUnknownCheckNames", // https://github.com/uber/NullAway/issues/25
