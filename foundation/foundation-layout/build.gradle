@@ -43,7 +43,6 @@ dependencies {
 
         implementation project(":compose:runtime:runtime")
         implementation project(":compose:ui:ui-util")
-        implementation(CONSTRAINT_LAYOUT_CORE)
         implementation(KOTLIN_STDLIB_COMMON)
 
         testImplementation(ANDROIDX_TEST_RULES)
@@ -80,7 +79,6 @@ if(AndroidXUiPlugin.isMultiplatformEnabled(project)) {
 
             androidMain.dependencies {
                 api "androidx.annotation:annotation:1.1.0"
-                implementation(CONSTRAINT_LAYOUT_CORE)
             }
 
             desktopMain.dependencies {
