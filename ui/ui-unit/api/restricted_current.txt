@@ -38,7 +38,6 @@ package androidx.compose.ui.unit {
     method @androidx.compose.runtime.Stable public static long constrain-m9CmiCs(long, long size);
     method @androidx.compose.runtime.Stable public static int constrainHeight-4A1wEdY(long, int height);
     method @androidx.compose.runtime.Stable public static int constrainWidth-4A1wEdY(long, int width);
-    method @Deprecated @androidx.compose.runtime.Stable public static long enforce-WVSBfsc(long, long otherConstraints);
     method @androidx.compose.runtime.Stable public static boolean isSatisfiedBy-m9CmiCs(long, long size);
     method @androidx.compose.runtime.Stable public static long offset-dAqVMF8(long, optional int horizontal, optional int vertical);
   }
@@ -51,7 +50,6 @@ package androidx.compose.ui.unit {
     method @androidx.compose.runtime.Stable public default float toDp--R2X_6o(long);
     method @androidx.compose.runtime.Stable public default float toDp-D9Ej5fM(int);
     method @androidx.compose.runtime.Stable public default float toDp-D9Ej5fM(float);
-    method @Deprecated @androidx.compose.runtime.Stable public default int toIntPx-0680j_4(float);
     method @androidx.compose.runtime.Stable public default float toPx--R2X_6o(long);
     method @androidx.compose.runtime.Stable public default float toPx-0680j_4(float);
     method @androidx.compose.runtime.Stable public default androidx.compose.ui.geometry.Rect toRect(androidx.compose.ui.unit.DpRect);

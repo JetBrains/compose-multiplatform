@@ -1907,7 +1907,6 @@ package androidx.compose.ui.platform {
     method protected final void onLayout(boolean changed, int left, int top, int right, int bottom);
     method protected final void onMeasure(int widthMeasureSpec, int heightMeasureSpec);
     method public final void setParentCompositionContext(androidx.compose.runtime.CompositionContext? parent);
-    method @Deprecated public final void setParentCompositionReference(androidx.compose.runtime.CompositionContext? parent);
     method public final void setShowLayoutBounds(boolean value);
     method public final void setViewCompositionStrategy(androidx.compose.ui.platform.ViewCompositionStrategy strategy);
     property public final boolean hasComposition;
@@ -2167,11 +2166,8 @@ package androidx.compose.ui.platform {
 
   public final class WindowRecomposerKt {
     method public static androidx.compose.runtime.CompositionContext? findViewTreeCompositionContext(android.view.View);
-    method @Deprecated public static androidx.compose.runtime.CompositionContext? findViewTreeCompositionReference(android.view.View);
     method public static androidx.compose.runtime.CompositionContext? getCompositionContext(android.view.View);
-    method @Deprecated public static androidx.compose.runtime.CompositionContext? getCompositionReference(android.view.View);
     method public static void setCompositionContext(android.view.View, androidx.compose.runtime.CompositionContext? value);
-    method @Deprecated public static void setCompositionReference(android.view.View, androidx.compose.runtime.CompositionContext? value);
   }
 
   @androidx.compose.ui.InternalComposeUiApi public final class WindowRecomposerPolicy {

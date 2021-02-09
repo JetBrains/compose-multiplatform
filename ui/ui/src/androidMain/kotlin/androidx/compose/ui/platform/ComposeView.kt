@@ -83,14 +83,6 @@ abstract class AbstractComposeView @JvmOverloads constructor(
         parentContext = parent
     }
 
-    @Deprecated(
-        "renamed to setParentCompositionContext",
-        ReplaceWith("setParentCompositionContext(parent)")
-    )
-    fun setParentCompositionReference(parent: CompositionContext?) {
-        setParentCompositionContext(parent)
-    }
-
     // Leaking `this` during init is generally dangerous, but we know that the implementation of
     // this particular ViewCompositionStrategy is not going to do something harmful with it.
     @Suppress("LeakingThis")

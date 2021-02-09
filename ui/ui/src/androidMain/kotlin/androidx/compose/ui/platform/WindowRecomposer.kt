@@ -50,13 +50,6 @@ var View.compositionContext: CompositionContext?
         setTag(R.id.androidx_compose_ui_view_composition_context, value)
     }
 
-@Deprecated("renamed to compositionContext")
-var View.compositionReference: CompositionContext?
-    get() = compositionContext
-    set(value) {
-        compositionContext = value
-    }
-
 /**
  * Returns the parent [CompositionContext] for this point in the view hierarchy, or `null`
  * if none can be found.
@@ -74,16 +67,6 @@ fun View.findViewTreeCompositionContext(): CompositionContext? {
     }
     return found
 }
-
-@Deprecated(
-    "renamed to findViewTreeCompositionContext",
-    ReplaceWith(
-        "findViewTreeCompositionContext()",
-        "androidx.compose.ui.platform.findViewTreeCompositionContext"
-    )
-)
-fun View.findViewTreeCompositionReference(): CompositionContext? =
-    findViewTreeCompositionContext()
 
 /**
  * A factory for creating an Android window-scoped [Recomposer]. See [createRecomposer].
