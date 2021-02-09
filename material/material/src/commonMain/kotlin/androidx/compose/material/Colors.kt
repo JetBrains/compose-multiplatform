@@ -17,6 +17,7 @@
 package androidx.compose.material
 
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.ReadOnlyComposable
 import androidx.compose.runtime.Stable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -287,6 +288,7 @@ fun Colors.contentColorFor(backgroundColor: Color): Color {
  * @see Colors.contentColorFor
  */
 @Composable
+@ReadOnlyComposable
 fun contentColorFor(backgroundColor: Color) =
     MaterialTheme.colors.contentColorFor(backgroundColor).takeOrElse { LocalContentColor.current }
 
