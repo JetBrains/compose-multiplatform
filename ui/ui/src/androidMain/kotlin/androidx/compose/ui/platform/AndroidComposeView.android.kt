@@ -481,10 +481,15 @@ internal class AndroidComposeView(context: Context) :
         // are currently wrong if you try to get the global(activity) coordinates -
         // View is not yet laid out.
         updatePositionCacheAndDispatch()
-        if (_androidViewsHandler != null && androidViewsHandler.isLayoutRequested) {
-            // Even if we laid out during onMeasure, this can happen when the Views hierarchy
-            // receives forceLayout(). We need to relayout to clear the isLayoutRequested info
-            // on the Views, as otherwise further layout requests will be discarded.
+        if (_androidViewsHandler != null) {
+            // Even if we laid out during onMeasure, we want to set the bounds of the
+            // AndroidViewsHandler for accessibility and for Views making assumptions based on
+            // the size of their ancestors. Usually the Views in the hierarchy will not
+            // be relaid out, as they have not requested layout in the meantime.
+            // However, there is also chance for the AndroidViewsHandler to be isLayoutRequested
+            // at this point, in case the Views hierarchy receives forceLayout().
+            // In this case, calling layout here will relayout to clear the isLayoutRequested
+            // info on the Views, as otherwise further layout requests will be discarded.
             androidViewsHandler.layout(0, 0, r - l, b - t)
         }
     }
