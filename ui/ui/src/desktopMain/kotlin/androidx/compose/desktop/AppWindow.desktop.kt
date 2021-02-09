@@ -287,7 +287,7 @@ class AppWindow : AppFrame {
      * Sets the menu bar of the window. The menu bar can be displayed inside a window (Windows,
      * Linux) or at the top of the screen (Mac OS).
      *
-     * @param manuBar Window menu bar.
+     * @param menuBar Window menu bar.
      */
     override fun setMenuBar(menuBar: MenuBar) {
         this.menuBar = menuBar
