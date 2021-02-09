@@ -16,7 +16,6 @@
 
 package androidx.compose.material
 
-import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.animation.core.AnimationEndReason
 import androidx.compose.animation.core.AnimationSpec
 import androidx.compose.foundation.gestures.Orientation
@@ -249,7 +248,6 @@ fun rememberBottomSheetScaffoldState(
  */
 @Composable
 @ExperimentalMaterialApi
-@OptIn(ExperimentalAnimationApi::class)
 fun BottomSheetScaffold(
     sheetContent: @Composable ColumnScope.() -> Unit,
     modifier: Modifier = Modifier,
