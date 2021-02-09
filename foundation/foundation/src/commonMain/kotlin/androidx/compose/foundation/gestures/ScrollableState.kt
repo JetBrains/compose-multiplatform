@@ -29,13 +29,13 @@ import kotlinx.coroutines.coroutineScope
  * of scrollable containers such as [androidx.compose.foundation.lazy.LazyListState] or
  * [androidx.compose.foundation.ScrollState] in order to provide low-level scrolling control via
  * [scroll], as well as allowing for higher-level scrolling functions like
- * [smoothScrollBy] to be implemented as extension
+ * [animateScrollBy] to be implemented as extension
  * functions on [ScrollableState].
  *
  * Subclasses may also have their own methods that are specific to their interaction paradigm, such
- * as [androidx.compose.foundation.lazy.LazyListState.snapToItemIndex].
+ * as [androidx.compose.foundation.lazy.LazyListState.scrollToItem].
  *
- * @see androidx.compose.foundation.gestures.smoothScrollBy
+ * @see androidx.compose.foundation.gestures.animateScrollBy
  * @see androidx.compose.foundation.gestures.scrollable
  */
 interface ScrollableState {

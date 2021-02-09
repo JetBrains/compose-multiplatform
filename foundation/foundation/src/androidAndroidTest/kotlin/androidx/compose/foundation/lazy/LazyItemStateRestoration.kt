@@ -106,7 +106,7 @@ class LazyItemStateRestoration {
         rule.runOnIdle {
             assertThat(realState).isEqualTo(1)
             runBlocking {
-                state.snapToItemIndex(1, 5)
+                state.scrollToItem(1, 5)
             }
         }
 
@@ -114,7 +114,7 @@ class LazyItemStateRestoration {
             assertThat(itemDisposed).isEqualTo(true)
             realState = 0
             runBlocking {
-                state.snapToItemIndex(0, 0)
+                state.scrollToItem(0, 0)
             }
         }
 
@@ -149,7 +149,7 @@ class LazyItemStateRestoration {
         rule.runOnIdle {
             assertThat(realState[0]).isEqualTo(1)
             runBlocking {
-                state.snapToItemIndex(1, 5)
+                state.scrollToItem(1, 5)
             }
         }
 
@@ -163,7 +163,7 @@ class LazyItemStateRestoration {
         rule.runOnIdle {
             assertThat(realState[1]).isEqualTo(10)
             runBlocking {
-                state.snapToItemIndex(0, 0)
+                state.scrollToItem(0, 0)
             }
         }
 
@@ -207,7 +207,7 @@ class LazyItemStateRestoration {
         rule.runOnIdle {
             assertThat(realState).isEqualTo(1)
             runBlocking {
-                state.snapToItemIndex(1, 5)
+                state.scrollToItem(1, 5)
             }
         }
 
@@ -215,7 +215,7 @@ class LazyItemStateRestoration {
             assertThat(itemDisposed).isEqualTo(true)
             realState = 0
             runBlocking {
-                state.snapToItemIndex(0, 0)
+                state.scrollToItem(0, 0)
             }
         }
 

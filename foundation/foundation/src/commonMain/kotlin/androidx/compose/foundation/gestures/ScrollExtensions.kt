@@ -23,17 +23,17 @@ import androidx.compose.foundation.MutatePriority
 import androidx.compose.runtime.withFrameNanos
 
 /**
- * Smooth scroll by [value] pixels.
+ * Scroll by [value] pixels with animation.
  *
  * Cancels the currently running scroll, if any, and suspends until the cancellation is
  * complete.
  *
  * @param value number of pixels to scroll by
- * @param spec [AnimationSpec] to be used for this smooth scrolling
+ * @param spec [AnimationSpec] to be used for this scrolling
  *
  * @return the amount of scroll consumed
  */
-suspend fun ScrollableState.smoothScrollBy(
+suspend fun ScrollableState.animateScrollBy(
     value: Float,
     spec: AnimationSpec<Float> = spring()
 ): Float {
@@ -78,7 +78,7 @@ suspend fun ScrollableState.smoothScrollBy(
  * Cancels the currently running scroll, if any, and suspends until the cancellation is
  * complete.
  *
- * @see smoothScrollBy for an animated version
+ * @see animateScrollBy for an animated version
  *
  * @param value number of pixels to scroll by
  * @return the amount of scroll consumed

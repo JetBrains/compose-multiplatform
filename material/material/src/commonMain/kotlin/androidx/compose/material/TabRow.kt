@@ -436,7 +436,7 @@ private class ScrollableTabData(
                 // screen or as close to the center as possible.
                 val calculatedOffset = it.calculateTabOffset(density, edgeOffset, tabPositions)
                 coroutineScope.launch {
-                    scrollState.smoothScrollTo(
+                    scrollState.animateScrollTo(
                         calculatedOffset,
                         spec = ScrollableTabRowScrollSpec
                     )
