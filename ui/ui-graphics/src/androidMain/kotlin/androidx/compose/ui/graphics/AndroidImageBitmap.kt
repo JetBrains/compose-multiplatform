@@ -16,26 +16,12 @@
 
 package androidx.compose.ui.graphics
 
-import android.content.res.Resources
 import android.graphics.Bitmap
-import android.graphics.drawable.BitmapDrawable
 import android.os.Build
 import android.util.DisplayMetrics
 import androidx.annotation.RequiresApi
 import androidx.compose.ui.graphics.colorspace.ColorSpace
 import androidx.compose.ui.graphics.colorspace.ColorSpaces
-
-/**
- * Create an [ImageBitmap] from an image file stored in resources for the application
- *
- * @param res Resources object to query the image file from
- * @param resId Identifier for the image asset to query from [res]
- *
- * @return Loaded image file represented as an [ImageBitmap]
- */
-fun imageFromResource(res: Resources, resId: Int): ImageBitmap {
-    return (res.getDrawable(resId, null) as BitmapDrawable).bitmap.asImageBitmap()
-}
 
 /**
  * Create an [ImageBitmap] from the given [Bitmap]. Note this does

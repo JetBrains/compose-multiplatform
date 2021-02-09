@@ -14,17 +14,16 @@
  * limitations under the License.
  */
 
-@file:Suppress("DEPRECATION")
-
 package androidx.compose.ui.graphics.vector.compat
 
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.SolidColor
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.graphics.vector.PathNode
 import androidx.compose.ui.graphics.vector.VectorGroup
 import androidx.compose.ui.graphics.vector.VectorNode
 import androidx.compose.ui.graphics.vector.VectorPath
-import androidx.compose.ui.res.loadVectorResource
+import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.test.R
 import androidx.compose.ui.unit.dp
 import androidx.test.ext.junit.runners.AndroidJUnit4
@@ -42,7 +41,7 @@ class XmlVectorParserTest {
     @Test
     fun testParseXml() {
         val res = InstrumentationRegistry.getInstrumentation().targetContext.resources
-        val asset = loadVectorResource(
+        val asset = ImageVector.vectorResource(
             null,
             res,
             R.drawable.test_compose_vector
@@ -87,7 +86,7 @@ class XmlVectorParserTest {
     @Test
     fun testImplicitLineTo() {
         val res = InstrumentationRegistry.getInstrumentation().targetContext.resources
-        val asset = loadVectorResource(
+        val asset = ImageVector.vectorResource(
             null,
             res,
             R.drawable.test_compose_vector2
@@ -112,7 +111,7 @@ class XmlVectorParserTest {
     @Test
     fun testGroupParsing() {
         val res = InstrumentationRegistry.getInstrumentation().targetContext.resources
-        val asset = loadVectorResource(
+        val asset = ImageVector.vectorResource(
             null,
             res,
             R.drawable.test_compose_vector3

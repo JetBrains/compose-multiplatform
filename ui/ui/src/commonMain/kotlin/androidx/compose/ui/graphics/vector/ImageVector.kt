@@ -330,6 +330,11 @@ class ImageVector internal constructor(
         )
     }
 
+    /**
+     * Provide an empty companion object to hang platform-specific companion extensions onto.
+     */
+    companion object { } // ktlint-disable no-empty-class-body
+
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
         if (other !is ImageVector) return false
