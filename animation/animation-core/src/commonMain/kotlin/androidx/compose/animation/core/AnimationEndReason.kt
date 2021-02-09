@@ -21,10 +21,6 @@ package androidx.compose.animation.core
  */
 enum class AnimationEndReason {
     /**
-     * Animation was interrupted, e.g by another animation
-     */
-    Interrupted,
-    /**
      * Animation will be forced to end when its value reaches upper/lower bound (if they have
      * been defined, e.g via [Animatable.updateBounds])
      *

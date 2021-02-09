@@ -16,11 +16,11 @@
 
 package androidx.compose.material
 
-import androidx.compose.animation.core.AnimationEndReason
 import androidx.compose.animation.core.AnimationSpec
 import androidx.compose.animation.core.TweenSpec
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.foundation.Canvas
+import androidx.compose.foundation.gestures.Orientation
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -39,11 +39,10 @@ import androidx.compose.runtime.saveable.Saver
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.input.nestedscroll.nestedScroll
-import androidx.compose.foundation.gestures.Orientation
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.SubcomposeLayout
 import androidx.compose.ui.platform.LocalDensity
@@ -58,6 +57,7 @@ import androidx.compose.ui.unit.offset
 import androidx.compose.ui.util.fastForEach
 import androidx.compose.ui.util.fastMap
 import androidx.compose.ui.zIndex
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.launch
 import kotlin.math.max
 import kotlin.math.min
@@ -113,19 +113,21 @@ class BackdropScaffoldState(
 
     /**
      * Reveal the back layer with animation and suspend until it if fully revealed or animation
-     * has been cancelled.
+     * has been cancelled.  This method will throw [CancellationException] if the animation is
+     * interrupted
      *
      * @return the reason the reveal animation ended
      */
-    suspend fun reveal(): AnimationEndReason = animateTo(targetValue = Revealed)
+    suspend fun reveal() = animateTo(targetValue = Revealed)
 
     /**
      * Conceal the back layer with animation and suspend until it if fully concealed or animation
-     * has been cancelled.
+     * has been cancelled. This method will throw [CancellationException] if the animation is
+     * interrupted
      *
      * @return the reason the conceal animation ended
      */
-    suspend fun conceal(): AnimationEndReason = animateTo(targetValue = Concealed)
+    suspend fun conceal() = animateTo(targetValue = Concealed)
 
     internal val nestedScrollConnection = this.PreUpPostDownNestedScrollConnection
 

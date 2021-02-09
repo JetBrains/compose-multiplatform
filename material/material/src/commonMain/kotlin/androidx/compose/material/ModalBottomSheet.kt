@@ -16,11 +16,11 @@
 
 package androidx.compose.material
 
-import androidx.compose.animation.core.AnimationEndReason
 import androidx.compose.animation.core.AnimationSpec
 import androidx.compose.animation.core.TweenSpec
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.foundation.Canvas
+import androidx.compose.foundation.gestures.Orientation
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -35,10 +35,9 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.Saver
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.input.nestedscroll.nestedScroll
-import androidx.compose.foundation.gestures.Orientation
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shape
+import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.SubcomposeLayout
 import androidx.compose.ui.semantics.collapse
@@ -49,6 +48,7 @@ import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.launch
 import kotlin.math.max
 import kotlin.math.roundToInt
@@ -127,19 +127,21 @@ class ModalBottomSheetState(
 
     /**
      * Fully expand the bottom sheet with animation and suspend until it if fully expanded or
-     * animation has been cancelled.
+     * animation has been cancelled. This method will throw [CancellationException] if the
+     * animation is interrupted
      *
      * @return the reason the expand animation ended
      */
-    internal suspend fun expand(): AnimationEndReason = animateTo(ModalBottomSheetValue.Expanded)
+    internal suspend fun expand() = animateTo(ModalBottomSheetValue.Expanded)
 
     /**
      * Hide the bottom sheet with animation and suspend until it if fully hidden or animation has
-     * been cancelled.
+     * been cancelled. This method will throw [CancellationException] if the animation is
+     * interrupted
      *
      * @return the reason the hide animation ended
      */
-    suspend fun hide(): AnimationEndReason = animateTo(ModalBottomSheetValue.Hidden)
+    suspend fun hide() = animateTo(ModalBottomSheetValue.Hidden)
 
     internal val nestedScrollConnection = this.PreUpPostDownNestedScrollConnection
 
