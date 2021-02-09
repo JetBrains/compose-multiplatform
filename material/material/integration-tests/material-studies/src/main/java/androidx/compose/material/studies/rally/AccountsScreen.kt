@@ -38,7 +38,7 @@ import androidx.compose.ui.unit.dp
 @Composable
 fun AccountsBody(accounts: List<Account>) {
     Column {
-        Box(Modifier.verticalScroll(rememberScrollState(0f)).padding(16.dp)) {
+        Box(Modifier.verticalScroll(rememberScrollState(0)).padding(16.dp)) {
             val accountsProportion = accounts.extractProportions { it.balance }
             val colors = accounts.map { it.color }
             AnimatedCircle(

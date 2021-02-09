@@ -117,24 +117,24 @@ package androidx.compose.foundation {
 
   public final class ScrollKt {
     method public static androidx.compose.ui.Modifier horizontalScroll(androidx.compose.ui.Modifier, androidx.compose.foundation.ScrollState state, optional boolean enabled, optional androidx.compose.foundation.gestures.FlingBehavior? flingBehavior, optional boolean reverseScrolling);
-    method @androidx.compose.runtime.Composable public static androidx.compose.foundation.ScrollState rememberScrollState(optional float initial);
+    method @androidx.compose.runtime.Composable public static androidx.compose.foundation.ScrollState rememberScrollState(optional int initial);
     method public static androidx.compose.ui.Modifier verticalScroll(androidx.compose.ui.Modifier, androidx.compose.foundation.ScrollState state, optional boolean enabled, optional androidx.compose.foundation.gestures.FlingBehavior? flingBehavior, optional boolean reverseScrolling);
   }
 
   @androidx.compose.runtime.Stable public final class ScrollState implements androidx.compose.foundation.gestures.ScrollableState {
-    ctor public ScrollState(float initial);
+    ctor public ScrollState(int initial);
     method public float dispatchRawDelta(float delta);
     method public androidx.compose.foundation.InteractionState getInteractionState();
-    method public float getMaxValue();
-    method public float getValue();
+    method public int getMaxValue();
+    method public int getValue();
     method public boolean isScrollInProgress();
     method public suspend Object? scroll(androidx.compose.foundation.MutatePriority scrollPriority, kotlin.jvm.functions.Function2<? super androidx.compose.foundation.gestures.ScrollScope,? super kotlin.coroutines.Continuation<? super kotlin.Unit>,?> block, kotlin.coroutines.Continuation<? super kotlin.Unit> p);
-    method public suspend Object? scrollTo(float value, kotlin.coroutines.Continuation<? super java.lang.Float> p);
-    method public suspend Object? smoothScrollTo(float value, optional androidx.compose.animation.core.AnimationSpec<java.lang.Float> spec, optional kotlin.coroutines.Continuation<? super kotlin.Unit> p);
+    method public suspend Object? scrollTo(int value, kotlin.coroutines.Continuation<? super java.lang.Float> p);
+    method public suspend Object? smoothScrollTo(int value, optional androidx.compose.animation.core.AnimationSpec<java.lang.Float> spec, optional kotlin.coroutines.Continuation<? super kotlin.Unit> p);
     property public final androidx.compose.foundation.InteractionState interactionState;
     property public boolean isScrollInProgress;
-    property public final float maxValue;
-    property public final float value;
+    property public final int maxValue;
+    property public final int value;
     field public static final androidx.compose.foundation.ScrollState.Companion Companion;
   }
 

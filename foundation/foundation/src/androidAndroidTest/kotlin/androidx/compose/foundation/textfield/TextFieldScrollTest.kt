@@ -385,7 +385,7 @@ class TextFieldScrollTest {
         """.trimIndent()
 
         val textFieldScrollPosition = TextFieldScrollerPosition()
-        val scrollerPosition = ScrollState(0f)
+        val scrollerPosition = ScrollState(0)
         var touchSlop = 0f
         val height = 60.dp
 
@@ -409,7 +409,7 @@ class TextFieldScrollTest {
 
         assertThat(textFieldScrollPosition.offset).isEqualTo(0f)
         assertThat(textFieldScrollPosition.maximum).isGreaterThan(0f)
-        assertThat(scrollerPosition.value).isEqualTo(0f)
+        assertThat(scrollerPosition.value).isEqualTo(0)
 
         with(rule.density) {
             val x = 10.dp.toPx()
@@ -428,7 +428,7 @@ class TextFieldScrollTest {
         assertThat(textFieldScrollPosition.offset).isGreaterThan(0f)
         assertThat(textFieldScrollPosition.offset)
             .isWithin(0.5f).of(textFieldScrollPosition.maximum)
-        assertThat(scrollerPosition.value).isGreaterThan(0f)
+        assertThat(scrollerPosition.value).isGreaterThan(0)
     }
 
     private fun ComposeContentTestRule.setupHorizontallyScrollableContent(

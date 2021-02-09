@@ -65,7 +65,7 @@ import kotlin.math.roundToInt
  * @param initial initial scroller position to start with
  */
 @Composable
-fun rememberScrollState(initial: Float = 0f): ScrollState {
+fun rememberScrollState(initial: Int = 0): ScrollState {
     return rememberSaveable(saver = ScrollState.Saver) {
         ScrollState(initial = initial)
     }
@@ -85,18 +85,18 @@ fun rememberScrollState(initial: Float = 0f): ScrollState {
  * @param initial value of the scroll
  */
 @Stable
-class ScrollState(initial: Float) : ScrollableState {
+class ScrollState(initial: Int) : ScrollableState {
 
     /**
      * current scroll position value in pixels
      */
-    var value by mutableStateOf(initial, structuralEqualityPolicy())
+    var value: Int by mutableStateOf(initial, structuralEqualityPolicy())
         private set
 
     /**
-     * maximum bound for [value], or [Float.POSITIVE_INFINITY] if still unknown
+     * maximum bound for [value], or [Int.MAX_VALUE] if still unknown
      */
-    var maxValue: Float
+    var maxValue: Int
         get() = _maxValueState.value
         internal set(newMax) {
             _maxValueState.value = newMax
@@ -112,14 +112,22 @@ class ScrollState(initial: Float) : ScrollableState {
      */
     val interactionState: InteractionState = InteractionState()
 
-    private var _maxValueState = mutableStateOf(Float.POSITIVE_INFINITY, structuralEqualityPolicy())
+    private var _maxValueState = mutableStateOf(Int.MAX_VALUE, structuralEqualityPolicy())
+
+    /**
+     * We receive scroll events in floats but represent the scroll position in ints so we have to
+     * manually accumulate the fractional part of the scroll to not completely ignore it.
+     */
+    private var accumulator: Float = 0f
 
     private val scrollableState = ScrollableState {
-        val absolute = (value + it)
-        val newValue = absolute.coerceIn(0f, maxValue)
+        val absolute = (value + it + accumulator)
+        val newValue = absolute.coerceIn(0f, maxValue.toFloat())
         val changed = absolute != newValue
         val consumed = newValue - value
-        value += consumed
+        val consumedInt = consumed.roundToInt()
+        value += consumedInt
+        accumulator = consumed - consumedInt
 
         // Avoid floating-point rounding error
         if (changed) consumed else it
@@ -144,10 +152,10 @@ class ScrollState(initial: Float) : ScrollableState {
      * @param spec animation curve for smooth scroll animation
      */
     suspend fun smoothScrollTo(
-        value: Float,
+        value: Int,
         spec: AnimationSpec<Float> = SpringSpec()
     ) {
-        this.smoothScrollBy(value - this.value, spec)
+        this.smoothScrollBy((value - this.value).toFloat(), spec)
     }
 
     /**
@@ -161,7 +169,7 @@ class ScrollState(initial: Float) : ScrollableState {
      * @param value number of pixels to scroll by
      * @return the amount of scroll consumed
      */
-    suspend fun scrollTo(value: Float): Float = this.scrollBy(value - this.value)
+    suspend fun scrollTo(value: Int): Float = this.scrollBy((value - this.value).toFloat())
 
     companion object {
         /**
@@ -244,8 +252,8 @@ private fun Modifier.scroll(
         val semantics = Modifier.semantics {
             if (isScrollable) {
                 val accessibilityScrollState = ScrollAxisRange(
-                    value = { state.value },
-                    maxValue = { state.maxValue },
+                    value = { state.value.toFloat() },
+                    maxValue = { state.maxValue.toFloat() },
                     reverseScrolling = reverseScrolling
                 )
                 if (isVertical) {
@@ -309,15 +317,15 @@ private data class ScrollingLayoutModifier(
         val placeable = measurable.measure(childConstraints)
         val width = placeable.width.coerceAtMost(constraints.maxWidth)
         val height = placeable.height.coerceAtMost(constraints.maxHeight)
-        val scrollHeight = placeable.height.toFloat() - height.toFloat()
-        val scrollWidth = placeable.width.toFloat() - width.toFloat()
+        val scrollHeight = placeable.height - height
+        val scrollWidth = placeable.width - width
         val side = if (isVertical) scrollHeight else scrollWidth
         return layout(width, height) {
             scrollerState.maxValue = side
-            val scroll = scrollerState.value.coerceIn(0f, side)
+            val scroll = scrollerState.value.coerceIn(0, side)
             val absScroll = if (isReversed) scroll - side else -scroll
-            val xOffset = if (isVertical) 0 else absScroll.roundToInt()
-            val yOffset = if (isVertical) absScroll.roundToInt() else 0
+            val xOffset = if (isVertical) 0 else absScroll
+            val yOffset = if (isVertical) absScroll else 0
             placeable.placeRelativeWithLayer(xOffset, yOffset)
         }
     }
