@@ -19,16 +19,3 @@ package androidx.compose.animation.core
 @RequiresOptIn(message = "This API is internal to library.")
 @Target(AnnotationTarget.CLASS, AnnotationTarget.FUNCTION, AnnotationTarget.PROPERTY)
 annotation class InternalAnimationApi
-
-/**
- * Stores the enabled state for [transition] animations. Useful for tests to disable
- * animations and have reliable screenshot tests.
- * @suppress
- */
-@InternalAnimationApi
-@Deprecated(
-    level = DeprecationLevel.ERROR,
-    message = "Transitions should not be disabled. Instead, " +
-        "pause the animation clock and advance it manually"
-)
-var transitionsEnabled = true

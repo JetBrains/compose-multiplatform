@@ -34,8 +34,6 @@ import androidx.compose.ui.layout.TestModifierUpdaterLayout
 import androidx.compose.ui.layout.layoutId
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.semantics.semantics
-import androidx.compose.ui.test.InternalTestApi
-import androidx.compose.ui.test.junit4.DisableTransitionsTestRule
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.zIndex
 import androidx.test.filters.LargeTest
@@ -131,10 +129,8 @@ class LayoutNodeModifierBenchmark(
         val benchmarkRule = BenchmarkRule()
 
         override fun apply(base: Statement, description: Description?): Statement {
-            @OptIn(InternalTestApi::class)
             return RuleChain
-                .outerRule(DisableTransitionsTestRule())
-                .around(benchmarkRule)
+                .outerRule(benchmarkRule)
                 .around(activityTestRule)
                 .apply(base, description)
         }
