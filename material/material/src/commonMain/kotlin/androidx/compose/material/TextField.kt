@@ -20,7 +20,7 @@ import androidx.compose.foundation.Interaction
 import androidx.compose.foundation.InteractionState
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.defaultMinSizeConstraints
+import androidx.compose.foundation.layout.defaultMinSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.ZeroCornerSize
 import androidx.compose.foundation.text.BasicTextField
@@ -369,7 +369,7 @@ internal fun TextFieldLayout(
     BasicTextField(
         value = value,
         modifier = modifier
-            .defaultMinSizeConstraints(
+            .defaultMinSize(
                 minWidth = TextFieldMinWidth,
                 minHeight = TextFieldMinHeight
             )

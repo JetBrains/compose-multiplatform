@@ -20,7 +20,7 @@ import androidx.annotation.Sampled
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.aspectRatio
-import androidx.compose.foundation.layout.defaultMinSizeConstraints
+import androidx.compose.foundation.layout.defaultMinSize
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -226,21 +226,21 @@ fun SimpleWrapContentHorizontallyAlignedModifier() {
 
 @Sampled
 @Composable
-fun DefaultMinSizeConstraintsSample() {
+fun DefaultMinSizeSample() {
     @Composable
     fun DefaultMinBox(modifier: Modifier = Modifier) {
         Box(
-            modifier.defaultMinSizeConstraints(minWidth = 100.dp, minHeight = 100.dp)
+            modifier.defaultMinSize(minWidth = 100.dp, minHeight = 100.dp)
                 .background(Color.Blue)
         )
     }
     // This will be a 100.dp x 100.dp blue box. Because we are not providing any min constraints
-    // to the DefaultMinBox, defaultMinSizeConstraints will apply its min constraints.
+    // to the DefaultMinBox, defaultMinSize will apply its min constraints.
     DefaultMinBox()
     // This will be a 50.dp x 50.dp blue box. Because we are providing min constraints
-    // to the DefaultMinBox, defaultMinSizeConstraints will not apply its min constraints.
+    // to the DefaultMinBox, defaultMinSize will not apply its min constraints.
     DefaultMinBox(Modifier.sizeIn(minWidth = 50.dp, minHeight = 50.dp))
     // Note that if DefaultMinBox used sizeIn or preferredSizeIn rather than
-    // defaultMinSizeConstraints, the min constraints would have been applied with either
+    // defaultMinSize, the min constraints would have been applied with either
     // of the above usages.
 }

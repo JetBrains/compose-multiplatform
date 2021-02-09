@@ -582,7 +582,7 @@ class SizeTest : LayoutTest() {
     }
 
     @Test
-    fun testDefaultMinSizeConstraints() = with(density) {
+    fun testDefaultMinSize() = with(density) {
         val latch = CountDownLatch(3)
         show {
             // Constraints are applied.
@@ -590,7 +590,7 @@ class SizeTest : LayoutTest() {
                 {},
                 Modifier.wrapContentSize()
                     .sizeIn(maxWidth = 30.toDp(), maxHeight = 40.toDp())
-                    .defaultMinSizeConstraints(minWidth = 10.toDp(), minHeight = 20.toDp())
+                    .defaultMinSize(minWidth = 10.toDp(), minHeight = 20.toDp())
             ) { _, constraints ->
                 assertEquals(10, constraints.minWidth)
                 assertEquals(20, constraints.minHeight)
@@ -607,7 +607,7 @@ class SizeTest : LayoutTest() {
                     minHeight = 20.toDp(),
                     maxWidth = 100.toDp(),
                     maxHeight = 110.toDp()
-                ).defaultMinSizeConstraints(
+                ).defaultMinSize(
                     minWidth = 50.toDp(),
                     minHeight = 50.toDp()
                 )
@@ -627,7 +627,7 @@ class SizeTest : LayoutTest() {
                     minHeight = 20.toDp(),
                     maxWidth = 100.toDp(),
                     maxHeight = 110.toDp()
-                ).defaultMinSizeConstraints()
+                ).defaultMinSize()
             ) { _, constraints ->
                 assertEquals(10, constraints.minWidth)
                 assertEquals(20, constraints.minHeight)
@@ -641,14 +641,14 @@ class SizeTest : LayoutTest() {
     }
 
     @Test
-    fun testDefaultMinSizeConstraints_withCoercingMaxConstraints() = with(density) {
+    fun testDefaultMinSize_withCoercingMaxConstraints() = with(density) {
         val latch = CountDownLatch(1)
         show {
             Layout(
                 {},
                 Modifier.wrapContentSize()
                     .sizeIn(maxWidth = 30.toDp(), maxHeight = 40.toDp())
-                    .defaultMinSizeConstraints(minWidth = 70.toDp(), minHeight = 80.toDp())
+                    .defaultMinSize(minWidth = 70.toDp(), minHeight = 80.toDp())
             ) { _, constraints ->
                 assertEquals(30, constraints.minWidth)
                 assertEquals(40, constraints.minHeight)
@@ -1104,10 +1104,10 @@ class SizeTest : LayoutTest() {
     }
 
     @Test
-    fun testDefaultMinSizeConstraintsModifier_hasCorrectIntrinsicMeasurements() = with(density) {
+    fun testDefaultMinSizeModifier_hasCorrectIntrinsicMeasurements() = with(density) {
         testIntrinsics(
             @Composable {
-                Container(Modifier.defaultMinSizeConstraints(40.toDp(), 50.toDp())) {
+                Container(Modifier.defaultMinSize(40.toDp(), 50.toDp())) {
                     Container(Modifier.aspectRatio(1f)) { }
                 }
             }
@@ -1251,8 +1251,8 @@ class SizeTest : LayoutTest() {
         )
 
         checkModifier(
-            Modifier.defaultMinSizeConstraints(10.0.dp, 20.0.dp),
-            "defaultMinSizeConstraints", null,
+            Modifier.defaultMinSize(10.0.dp, 20.0.dp),
+            "defaultMinSize", null,
             listOf(ValueElement("minWidth", 10.dp), ValueElement("minHeight", 20.dp))
         )
     }

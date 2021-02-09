@@ -598,10 +598,10 @@ fun Modifier.wrapContentSize(
  * while still allowing it to be overidden with smaller min sizes across usages.
  *
  * Example usage:
- * @sample androidx.compose.foundation.layout.samples.DefaultMinSizeConstraintsSample
+ * @sample androidx.compose.foundation.layout.samples.DefaultMinSizeSample
  */
 @Stable
-fun Modifier.defaultMinSizeConstraints(
+fun Modifier.defaultMinSize(
     minWidth: Dp = Dp.Unspecified,
     minHeight: Dp = Dp.Unspecified
 ) = this.then(
@@ -609,7 +609,7 @@ fun Modifier.defaultMinSizeConstraints(
         minWidth = minWidth,
         minHeight = minHeight,
         inspectorInfo = debugInspectorInfo {
-            name = "defaultMinSizeConstraints"
+            name = "defaultMinSize"
             properties["minWidth"] = minWidth
             properties["minHeight"] = minHeight
         }
