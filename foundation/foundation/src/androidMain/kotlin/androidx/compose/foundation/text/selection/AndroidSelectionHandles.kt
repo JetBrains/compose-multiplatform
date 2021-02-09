@@ -31,7 +31,6 @@ import androidx.compose.ui.layout.LayoutModifier
 import androidx.compose.ui.layout.Measurable
 import androidx.compose.ui.layout.MeasureResult
 import androidx.compose.ui.layout.MeasureScope
-import androidx.compose.ui.text.InternalTextApi
 import androidx.compose.ui.text.style.ResolvedTextDirection
 import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.Density
@@ -166,7 +165,6 @@ private fun HandleDrawLayout(
     }
 }
 
-@OptIn(InternalTextApi::class)
 @Composable
 private fun SelectionHandlePopup(
     startHandlePosition: Offset?,

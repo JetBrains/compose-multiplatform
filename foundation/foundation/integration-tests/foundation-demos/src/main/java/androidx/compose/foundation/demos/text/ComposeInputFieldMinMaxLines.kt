@@ -24,7 +24,6 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.draw.clipToBounds
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.SolidColor
-import androidx.compose.ui.text.InternalTextApi
 import androidx.compose.ui.text.TextStyle
 
 @Composable
@@ -54,7 +53,6 @@ fun BasicTextFieldMinMaxDemo() {
 }
 
 @Composable
-@OptIn(InternalTextApi::class)
 private fun TextFieldWithMaxLines(str: String? = null, maxLines: Int) {
     val state = rememberSaveable { mutableStateOf(str ?: "abc ".repeat(20)) }
     BasicTextField(

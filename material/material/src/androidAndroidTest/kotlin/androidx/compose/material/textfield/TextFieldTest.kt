@@ -68,7 +68,6 @@ import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.performGesture
-import androidx.compose.ui.text.ExperimentalTextApi
 import androidx.compose.ui.text.SoftwareKeyboardController
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.ImeOptions
@@ -805,7 +804,6 @@ class TextFieldTest {
         }
     }
 
-    @OptIn(ExperimentalTextApi::class)
     @Test
     fun testTextField_imeActionAndKeyboardTypePropagatedDownstream() {
         val textInputService = mock<TextInputService>()

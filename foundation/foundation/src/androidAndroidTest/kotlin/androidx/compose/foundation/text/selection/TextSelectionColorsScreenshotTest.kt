@@ -40,7 +40,6 @@ import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performGesture
 import androidx.compose.ui.test.width
-import androidx.compose.ui.text.InternalTextApi
 import androidx.compose.ui.text.style.ResolvedTextDirection
 import androidx.compose.ui.unit.dp
 import androidx.test.ext.junit.runners.AndroidJUnit4
@@ -171,7 +170,6 @@ class TextSelectionColorsScreenshotTest {
     }
 }
 
-@OptIn(InternalTextApi::class)
 @Composable
 private fun TextTestContent(textSelectionColors: TextSelectionColors) {
     CompositionLocalProvider(LocalTextSelectionColors provides textSelectionColors) {

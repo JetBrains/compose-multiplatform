@@ -30,7 +30,6 @@ import androidx.compose.testutils.ToggleableTestCase
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Rect
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.text.ExperimentalTextApi
 import androidx.compose.ui.text.InternalTextApi
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.input.EditCommand
@@ -94,7 +93,6 @@ class TextFieldToggleTextTestCase(
         }
     }
 
-    @OptIn(ExperimentalTextApi::class)
     private class TestPlatformTextInputService : PlatformTextInputService {
         override fun startInput(
             value: TextFieldValue,

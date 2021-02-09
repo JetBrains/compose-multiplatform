@@ -16,7 +16,6 @@
 package androidx.compose.ui.platform
 
 import androidx.compose.ui.geometry.Rect
-import androidx.compose.ui.text.ExperimentalTextApi
 import androidx.compose.ui.text.input.BackspaceCommand
 import androidx.compose.ui.text.input.CommitTextCommand
 import androidx.compose.ui.text.input.DeleteSurroundingTextInCodePointsCommand
@@ -50,7 +49,6 @@ internal interface DesktopInputComponent {
     val density: Density
 }
 
-@OptIn(ExperimentalTextApi::class)
 internal class DesktopPlatformInput(val component: DesktopComponent) :
     PlatformTextInputService {
     data class CurrentInput(

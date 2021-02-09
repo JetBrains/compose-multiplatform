@@ -18,9 +18,7 @@ package androidx.compose.foundation.text.selection
 
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.layout.LayoutCoordinates
-import androidx.compose.ui.text.ExperimentalTextApi
 
-@OptIn(ExperimentalTextApi::class)
 internal class SelectionRegistrarImpl : SelectionRegistrar {
     /**
      * A flag to check if the [Selectable]s have already been sorted.
