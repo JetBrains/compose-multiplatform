@@ -166,8 +166,6 @@ class AndroidComposeTestRule<R : TestRule, A : ComponentActivity>(
     @VisibleForTesting(otherwise = VisibleForTesting.PRIVATE)
     internal val composeIdlingResource: IdlingResource
 
-    private val clockTestRule: MonotonicFrameClockTestRule
-
     private val recomposer: Recomposer
     @OptIn(ExperimentalCoroutinesApi::class)
     private val testCoroutineDispatcher: TestCoroutineDispatcher
@@ -201,7 +199,6 @@ class AndroidComposeTestRule<R : TestRule, A : ComponentActivity>(
         composeIdlingResource = ComposeIdlingResource(
             composeRootRegistry, mainClockImpl, recomposer
         )
-        clockTestRule = MonotonicFrameClockTestRule()
         registerIdlingResource(composeIdlingResource)
     }
 
@@ -220,7 +217,6 @@ class AndroidComposeTestRule<R : TestRule, A : ComponentActivity>(
             .outerRule { base, _ -> composeRootRegistry.getStatementFor(base) }
             .around { base, _ -> idlingResourceRegistry.getStatementFor(base) }
             .around { base, _ -> espressoLink.getStatementFor(base) }
-            .around(clockTestRule)
             .around { base, _ -> AndroidComposeStatement(base) }
             .around(activityRule)
             .apply(base, description)
