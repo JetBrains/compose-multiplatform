@@ -25,7 +25,6 @@ import androidx.compose.ui.text.android.InternalPlatformTextApi
 import androidx.compose.ui.text.android.TextLayout
 import androidx.compose.ui.text.android.style.BaselineShiftSpan
 import androidx.compose.ui.text.android.style.FontFeatureSpan
-import androidx.compose.ui.text.android.style.FontSpan
 import androidx.compose.ui.text.android.style.LetterSpacingSpanEm
 import androidx.compose.ui.text.android.style.LetterSpacingSpanPx
 import androidx.compose.ui.text.android.style.ShadowSpan
@@ -687,78 +686,6 @@ class AndroidParagraphTest {
     }
 
     @Test
-    fun testAnnotatedString_fontFamily_addsTypefaceSpanWithCorrectTypeface() {
-        val text = "abcde"
-        val spanStyle = SpanStyle(
-            fontFamily = basicFontFamily,
-            fontStyle = FontStyle.Italic,
-            fontWeight = FontWeight.Bold
-        )
-        val expectedTypeface = TypefaceAdapter().create(
-            fontFamily = basicFontFamily,
-            fontStyle = FontStyle.Italic,
-            fontWeight = FontWeight.Bold
-        )
-        val expectedStart = 0
-        val expectedEnd = "abc".length
-
-        val paragraph = simpleParagraph(
-            text = text,
-            spanStyles = listOf(
-                AnnotatedString.Range(
-                    spanStyle,
-                    expectedStart,
-                    expectedEnd
-                )
-            ),
-            width = 100.0f
-        )
-
-        assertThat(paragraph.charSequence.toString()).isEqualTo(text)
-        assertThat(paragraph.charSequence)
-            .hasSpan(FontSpan::class, expectedStart, expectedEnd) { span ->
-                span.getTypeface(FontWeight.Bold.weight, true) == expectedTypeface
-            }
-    }
-
-    @Test
-    fun testAnnotatedString_fontFamily_whenFontSynthesizeTurnedOff() {
-        val text = "abcde"
-        val spanStyle = SpanStyle(
-            fontFamily = basicFontFamily,
-            fontStyle = FontStyle.Italic,
-            fontWeight = FontWeight.Bold,
-            fontSynthesis = FontSynthesis.None
-        )
-        val expectedTypeface = TypefaceAdapter().create(
-            fontFamily = basicFontFamily,
-            fontStyle = FontStyle.Italic,
-            fontWeight = FontWeight.Bold,
-            fontSynthesis = FontSynthesis.None
-        )
-        val expectedStart = 0
-        val expectedEnd = "abc".length
-
-        val paragraph = simpleParagraph(
-            text = text,
-            spanStyles = listOf(
-                AnnotatedString.Range(
-                    spanStyle,
-                    expectedStart,
-                    expectedEnd
-                )
-            ),
-            width = 100.0f
-        )
-
-        assertThat(paragraph.charSequence.toString()).isEqualTo(text)
-        assertThat(paragraph.charSequence)
-            .hasSpan(FontSpan::class, expectedStart, expectedEnd) { span ->
-                span.getTypeface(FontWeight.Bold.weight, true) == expectedTypeface
-            }
-    }
-
-    @Test
     fun testAnnotatedString_fontFeatureSetting_setSpanOnText() {
         val text = "abc"
         val fontFeatureSettings = "\"kern\" 0"
@@ -899,24 +826,6 @@ class AndroidParagraphTest {
         val typeface = paragraph.textPaint.typeface
         assertThat(typeface.isBold).isFalse()
         assertThat(typeface.isItalic).isFalse()
-    }
-
-    @Test
-    @MediumTest
-    fun testFontFamily_appliedAsSpan() {
-        val text = "abc"
-        val typefaceAdapter = spy(TypefaceAdapter())
-        val paragraph = simpleParagraph(
-            text = text,
-            style = TextStyle(
-                fontFamily = basicFontFamily
-            ),
-            typefaceAdapter = typefaceAdapter,
-            width = Float.MAX_VALUE
-        )
-
-        val charSequence = paragraph.charSequence
-        assertThat(charSequence).hasSpan(FontSpan::class, 0, text.length)
     }
 
     @Test

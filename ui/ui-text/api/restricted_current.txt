@@ -500,9 +500,6 @@ package androidx.compose.ui.text.android {
 
 package androidx.compose.ui.text.android.style {
 
-  public final class FontWeightStyleSpanKt {
-  }
-
   public final class PlaceholderSpanKt {
   }
 
