@@ -20,10 +20,8 @@ import androidx.compose.runtime.Immutable
 import androidx.compose.runtime.saveable.Saver
 import androidx.compose.runtime.saveable.listSaver
 import androidx.compose.ui.text.AnnotatedString
-import androidx.compose.ui.text.InternalTextApi
 import androidx.compose.ui.text.TextRange
 import androidx.compose.ui.text.constrain
-import androidx.compose.ui.text.emptyAnnotatedString
 import kotlin.math.max
 import kotlin.math.min
 
@@ -37,49 +35,43 @@ import kotlin.math.min
  * This class stores a snapshot of the input state of the edit buffer and provide utility functions
  * for answering IME requests such as getTextBeforeCursor, getSelectedText.
  *
+ * IME [composition] parameter is owned by the IME and it is related to text composition. When a
+ * [TextFieldValue] with null [composition] is passed to a TextField, if there was an
+ * active [composition] on the text, the changes will be committed. Please use [copy] functions
+ * if you do not want to intentionally commit the IME composition.
+ *
  * @param annotatedString the text to be rendered.
  * @param selection the selection range. If the selection is collapsed, it represents cursor
  * location. When selection range is out of bounds, it is constrained with the text length.
  * @param composition the composition range, null means empty composition or commit if a
- * composition exists on the text.
+ * composition exists on the text. Owned by IME, and if you have an instance of [TextFieldValue]
+ * please use [copy] functions if you do not want to intentionally change the value of this
+ * field.
+ *
+ * @see commitComposition
  */
 @Immutable
-class TextFieldValue internal constructor(
-    val annotatedString: AnnotatedString = emptyAnnotatedString(),
+class TextFieldValue constructor(
+    val annotatedString: AnnotatedString,
     selection: TextRange = TextRange.Zero,
     composition: TextRange? = null
 ) {
     /**
-     * Internal utility constructor.
+     * @param text the text to be rendered.
+     * @param selection the selection range. If the selection is collapsed, it represents cursor
+     * location. When selection range is out of bounds, it is constrained with the text length.
+     * @param composition the composition range, null means empty composition or commit if a
+     * composition exists on the text. Owned by IME, and if you have an instance of [TextFieldValue]
+     * please use [copy] functions if you do not want to intentionally change the value of this
+     * field.
+     *
+     * @see commitComposition
      */
-    internal constructor(
+    constructor(
         text: String = "",
         selection: TextRange = TextRange.Zero,
         composition: TextRange? = null
     ) : this(AnnotatedString(text), selection, composition)
-
-    /**
-     * @param text the text to be rendered.
-     * @param selection the selection range. If the selection is collapsed, it represents cursor
-     * location. When selection range is out of bounds, it is constrained with the text length.
-     */
-    constructor(
-        text: String = "",
-        selection: TextRange = TextRange.Zero
-    ) : this(AnnotatedString(text), selection, null)
-
-    /**
-     * TextFieldValue accepts AnnotatedString for providing the API for future, however
-     * multi-style text editing is not implemented yet.
-     *
-     * @param annotatedString the text to be rendered.
-     * @param selection the selection range. If the selection is collapsed, it represents cursor
-     * location. When selection range is out of bounds, it is constrained with the text length.
-     */
-    constructor(
-        annotatedString: AnnotatedString,
-        selection: TextRange = TextRange.Zero
-    ) : this(annotatedString, selection, null)
 
     val text: String get() = annotatedString.text
 
@@ -87,7 +79,6 @@ class TextFieldValue internal constructor(
      * The selection range. If the selection is collapsed, it represents cursor
      * location. When selection range is out of bounds, it is constrained with the text length.
      */
-    @OptIn(InternalTextApi::class)
     val selection = selection.constrain(0, text.length)
 
     /**
@@ -98,10 +89,9 @@ class TextFieldValue internal constructor(
      *
      * Input service composition is an instance of text produced by IME. An example visual for the
      * composition is that the currently composed word is visually separated from others with
-     * underline, or text background. For description of
-     * composition please check [W3C IME Composition](https://www.w3.org/TR/ime-api/#ime-composition)
+     * underline, or text background. For description of composition please check
+     * [W3C IME Composition](https://www.w3.org/TR/ime-api/#ime-composition)
      */
-    @OptIn(InternalTextApi::class)
     val composition: TextRange? = composition?.constrain(0, text.length)
 
     /**
@@ -109,7 +99,8 @@ class TextFieldValue internal constructor(
      */
     fun copy(
         annotatedString: AnnotatedString = this.annotatedString,
-        selection: TextRange = this.selection
+        selection: TextRange = this.selection,
+        composition: TextRange? = this.composition
     ): TextFieldValue {
         return TextFieldValue(annotatedString, selection, composition)
     }
@@ -119,18 +110,10 @@ class TextFieldValue internal constructor(
      */
     fun copy(
         text: String,
-        selection: TextRange = this.selection
+        selection: TextRange = this.selection,
+        composition: TextRange? = this.composition
     ): TextFieldValue {
         return TextFieldValue(AnnotatedString(text), selection, composition)
-    }
-
-    /**
-     * Returns a copy of the TextFieldValue.
-     */
-    fun copy(
-        selection: TextRange = this.selection
-    ): TextFieldValue {
-        return copy(this.annotatedString, selection)
     }
 
     /**
@@ -204,16 +187,3 @@ fun TextFieldValue.getTextAfterSelection(maxChars: Int): AnnotatedString =
  * Returns the currently selected text.
  */
 fun TextFieldValue.getSelectedText(): AnnotatedString = annotatedString.subSequence(selection)
-
-/**
- * Temporary constructor until we figure out how to enforce composition for internal values
- * while enforcing higher level API not to accept composition modification.
- *
- * @suppress
- */
-@InternalTextApi // Used by tests in foundation since constructor is not accessible
-fun buildTextFieldValue(
-    text: String,
-    selection: TextRange,
-    composition: TextRange?
-): TextFieldValue = TextFieldValue(AnnotatedString(text), selection, composition)
