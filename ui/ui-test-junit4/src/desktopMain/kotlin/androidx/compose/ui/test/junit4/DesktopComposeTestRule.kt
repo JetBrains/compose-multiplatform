@@ -17,7 +17,6 @@
 package androidx.compose.ui.test.junit4
 
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.ExperimentalComposeApi
 import androidx.compose.runtime.snapshots.Snapshot
 import androidx.compose.ui.node.RootForTest
 import androidx.compose.ui.platform.TestComposeWindow
@@ -90,7 +89,6 @@ class DesktopComposeTestRule : ComposeContentTestRule {
         coroutineContext = Dispatchers.Swing
     )
 
-    @OptIn(ExperimentalComposeApi::class)
     private fun isIdle() =
         !Snapshot.current.hasPendingChanges() &&
             !window.hasInvalidations()

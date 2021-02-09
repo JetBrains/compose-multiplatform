@@ -21,7 +21,6 @@ package androidx.compose.ui.layout
 import androidx.compose.runtime.Applier
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.ComposeNode
-import androidx.compose.runtime.ExperimentalComposeApi
 import androidx.compose.runtime.SkippableUpdater
 import androidx.compose.runtime.currentComposer
 import androidx.compose.runtime.remember
@@ -224,7 +223,6 @@ fun measureBlocksOf(
     measureBlocks: MeasureBlocks,
     modifier: Modifier = Modifier
 ) {
-    @OptIn(ExperimentalComposeApi::class)
     val density = LocalDensity.current
     val layoutDirection = LocalLayoutDirection.current
     ComposeNode<ComposeUiNode, Applier<Any>>(
@@ -265,7 +263,6 @@ fun MultiMeasureLayout(
     val density = LocalDensity.current
     val layoutDirection = LocalLayoutDirection.current
 
-    @OptIn(ExperimentalComposeApi::class)
     ComposeNode<LayoutNode, Applier<Any>>(
         factory = LayoutNode.Constructor,
         update = {

@@ -27,7 +27,6 @@ import kotlin.test.Test
 import kotlin.test.assertEquals
 
 @Suppress("RemoveExplicitTypeArguments")
-@OptIn(ExperimentalComposeApi::class)
 class SnapshotFlowTests {
     @Test
     fun observeBasicChanges() = runBlocking<Unit> {

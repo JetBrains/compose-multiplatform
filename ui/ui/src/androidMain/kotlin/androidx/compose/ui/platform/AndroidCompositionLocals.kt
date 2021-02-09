@@ -21,7 +21,6 @@ import android.content.res.Configuration
 import android.view.View
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
-import androidx.compose.runtime.ExperimentalComposeApi
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.compositionLocalOf
 import androidx.compose.runtime.getValue
@@ -40,7 +39,6 @@ import androidx.savedstate.SavedStateRegistryOwner
  * UI.
  */
 val LocalConfiguration = compositionLocalOf<Configuration>(
-    @OptIn(ExperimentalComposeApi::class)
     neverEqualPolicy()
 )
 
@@ -75,7 +73,6 @@ internal fun ProvideAndroidCompositionLocals(
     var configuration by remember {
         mutableStateOf(
             context.resources.configuration,
-            @OptIn(ExperimentalComposeApi::class)
             neverEqualPolicy()
         )
     }

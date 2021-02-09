@@ -152,7 +152,7 @@ class SuspendingEffectsTests : BaseComposeTest() {
         }
     }
 
-    @OptIn(ExperimentalComposeApi::class, InternalComposeApi::class)
+    @OptIn(InternalComposeApi::class)
     @Test
     fun testCoroutineScopesHaveCorrectFrameClock() {
         var recomposerClock: MonotonicFrameClock? = null

@@ -17,14 +17,12 @@
 package androidx.compose.runtime.samples
 
 import androidx.annotation.Sampled
-import androidx.compose.runtime.ExperimentalComposeApi
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.SnapshotMutationPolicy
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.snapshots.Snapshot
 
 @Sampled
-@OptIn(ExperimentalComposeApi::class)
 fun counterSample() {
     /**
      * A policy that treats an `MutableState<Int>` as a counter. Changing the value to the same

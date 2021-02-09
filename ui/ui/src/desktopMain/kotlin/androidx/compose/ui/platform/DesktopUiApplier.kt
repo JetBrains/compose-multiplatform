@@ -14,11 +14,9 @@
  * limitations under the License.
  */
 
-@file:OptIn(ExperimentalComposeApi::class)
 package androidx.compose.ui.platform
 
 import androidx.compose.runtime.AbstractApplier
-import androidx.compose.runtime.ExperimentalComposeApi
 import androidx.compose.ui.node.LayoutNode
 
 internal class DesktopUiApplier(

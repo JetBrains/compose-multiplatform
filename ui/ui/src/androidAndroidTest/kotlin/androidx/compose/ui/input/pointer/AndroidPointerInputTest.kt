@@ -22,7 +22,6 @@ import android.view.ViewGroup
 import androidx.activity.ComponentActivity
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.ExperimentalComposeApi
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -205,7 +204,6 @@ class AndroidPointerInputTest {
             // we update size from 10 to 20 pixels
             size.value = 20
             // this call will synchronously mark the LayoutNode as needs remeasure
-            @OptIn(ExperimentalComposeApi::class)
             Snapshot.sendApplyNotifications()
 
             val ownerPosition = androidComposeView.calculatePosition()

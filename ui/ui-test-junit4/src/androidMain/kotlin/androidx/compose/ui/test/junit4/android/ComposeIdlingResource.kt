@@ -16,7 +16,6 @@
 
 package androidx.compose.ui.test.junit4.android
 
-import androidx.compose.runtime.ExperimentalComposeApi
 import androidx.compose.runtime.Recomposer
 import androidx.compose.runtime.snapshots.Snapshot
 import androidx.compose.ui.platform.ViewRootForTest
@@ -44,7 +43,6 @@ internal class ComposeIdlingResource(
     private var hadPendingMeasureLayout = false
 
     override val isIdleNow: Boolean
-        @OptIn(ExperimentalComposeApi::class)
         get() {
             fun shouldPumpTime(): Boolean {
                 hadAwaitersOnMainClock = clock.hasAwaiters

@@ -13,12 +13,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-@file:OptIn(ExperimentalComposeApi::class)
+
 package androidx.compose.ui.graphics.vector
 
 import androidx.compose.runtime.AbstractApplier
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.ExperimentalComposeApi
 import androidx.compose.runtime.ComposeNode
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.PathFillType

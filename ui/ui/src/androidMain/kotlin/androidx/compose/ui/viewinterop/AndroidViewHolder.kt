@@ -21,7 +21,6 @@ import android.os.Looper
 import android.view.View
 import android.view.ViewGroup
 import androidx.compose.runtime.CompositionContext
-import androidx.compose.runtime.ExperimentalComposeApi
 import androidx.compose.runtime.snapshots.SnapshotStateObserver
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.drawBehind
@@ -45,8 +44,6 @@ import kotlin.math.roundToInt
  * This API is not designed to be used directly, but rather using the [AndroidView] and
  * `AndroidViewBinding` APIs, which are built on top of [AndroidViewHolder].
  */
-// Opt in snapshot observing APIs.
-@OptIn(ExperimentalComposeApi::class)
 internal abstract class AndroidViewHolder(
     context: Context,
     parentContext: CompositionContext?
@@ -114,7 +111,6 @@ internal abstract class AndroidViewHolder(
 
     internal var onDensityChanged: ((Density) -> Unit)? = null
 
-    @OptIn(ExperimentalComposeApi::class)
     private val snapshotObserver = SnapshotStateObserver { command ->
         if (handler.looper === Looper.myLooper()) {
             command()
@@ -127,7 +123,6 @@ internal abstract class AndroidViewHolder(
         handler.post(runUpdate)
     }
 
-    @OptIn(ExperimentalComposeApi::class)
     private val runUpdate: () -> Unit = {
         if (hasUpdateBlock) {
             snapshotObserver.observeReads(this, onCommitAffectingUpdate, update)

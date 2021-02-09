@@ -113,7 +113,6 @@ class RecomposerTests : BaseComposeTest() {
     }
 
     @Test
-    @OptIn(ExperimentalComposeApi::class)
     fun testFrameTransition() {
         var snapshotId: Int? = null
         compose {

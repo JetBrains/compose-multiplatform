@@ -16,7 +16,6 @@
 
 @file:OptIn(
     InternalComposeApi::class,
-    ExperimentalComposeApi::class,
     ComposeCompilerApi::class
 )
 package androidx.compose.runtime
@@ -1154,7 +1153,7 @@ internal class ComposerImpl(
     /**
      * Discard a pending composition because an error was encountered during composition
      */
-    @OptIn(InternalComposeApi::class, ExperimentalComposeApi::class)
+    @OptIn(InternalComposeApi::class)
     private fun abortRoot() {
         cleanUpCompose()
         pendingStack.clear()
@@ -1372,7 +1371,6 @@ internal class ComposerImpl(
     /**
      * Apply the changes to the tree that were collected during the last composition.
      */
-    @OptIn(ExperimentalComposeApi::class)
     internal fun applyChanges() {
         trace("Compose:applyChanges") {
             invalidateStack.clear()
@@ -1487,7 +1485,6 @@ internal class ComposerImpl(
      * call when the composer is inserting.
      */
     @Suppress("UNUSED")
-    @OptIn(ExperimentalComposeApi::class)
     override fun <T> createNode(factory: () -> T) {
         validateNodeExpected()
         check(inserting) { "createNode() can only be called when inserting" }
@@ -1530,7 +1527,6 @@ internal class ComposerImpl(
      * Schedule a change to be applied to a node's property. This change will be applied to the
      * node that is the current node in the tree which was either created by [createNode].
      */
-    @OptIn(ExperimentalComposeApi::class)
     override fun <V, T> apply(value: V, block: T.(V) -> Unit) {
         val operation: Change = { applier, _, _ ->
             @Suppress("UNCHECKED_CAST")
@@ -3077,7 +3073,6 @@ internal class ComposerImpl(
             updateCompoundKeyWhenWeEnterGroupKeyHash(dataKey.hashCode())
     }
 
-    @OptIn(ExperimentalComposeApi::class)
     private fun updateCompoundKeyWhenWeEnterGroupKeyHash(keyHash: Int) {
         compoundKeyHash = (compoundKeyHash rol 3) xor keyHash
     }
@@ -3089,7 +3084,6 @@ internal class ComposerImpl(
             updateCompoundKeyWhenWeExitGroupKeyHash(dataKey.hashCode())
     }
 
-    @OptIn(ExperimentalComposeApi::class)
     private fun updateCompoundKeyWhenWeExitGroupKeyHash(groupKey: Int) {
         compoundKeyHash = (compoundKeyHash xor groupKey.hashCode()) ror 3
     }

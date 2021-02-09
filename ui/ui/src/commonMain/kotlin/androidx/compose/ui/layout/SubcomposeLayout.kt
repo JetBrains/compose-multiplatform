@@ -21,7 +21,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.ComposeNode
 import androidx.compose.runtime.Composition
 import androidx.compose.runtime.CompositionContext
-import androidx.compose.runtime.ExperimentalComposeApi
 import androidx.compose.runtime.RememberObserver
 import androidx.compose.runtime.currentComposer
 import androidx.compose.runtime.remember
@@ -58,7 +57,6 @@ import androidx.compose.ui.unit.LayoutDirection
  * @param measureBlock Measure block which provides ability to subcompose during the measuring.
  */
 @Composable
-@OptIn(ExperimentalComposeApi::class)
 fun SubcomposeLayout(
     modifier: Modifier = Modifier,
     measureBlock: SubcomposeMeasureScope.(Constraints) -> MeasureResult

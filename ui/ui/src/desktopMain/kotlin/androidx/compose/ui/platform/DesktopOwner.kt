@@ -18,7 +18,6 @@
 
 package androidx.compose.ui.platform
 
-import androidx.compose.runtime.ExperimentalComposeApi
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
@@ -75,7 +74,6 @@ import androidx.compose.ui.unit.LayoutDirection
 
 @OptIn(
     ExperimentalComposeUiApi::class,
-    ExperimentalComposeApi::class,
     InternalCoreApi::class
 )
 internal class DesktopOwner(

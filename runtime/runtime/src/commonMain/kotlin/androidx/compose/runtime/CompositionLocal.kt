@@ -154,7 +154,6 @@ internal class StaticProvidableCompositionLocal<T>(defaultFactory: (() -> T)?) :
  */
 fun <T> compositionLocalOf(
     policy: SnapshotMutationPolicy<T> =
-        @OptIn(ExperimentalComposeApi::class)
         structuralEqualityPolicy(),
     defaultFactory: (() -> T)? = null
 ): ProvidableCompositionLocal<T> = DynamicProvidableCompositionLocal(policy, defaultFactory)
