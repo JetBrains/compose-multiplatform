@@ -44,7 +44,6 @@ dependencies {
         implementation(ESPRESSO_CORE)
         implementation project(":compose:animation:animation")
         implementation project(":compose:foundation:foundation")
-        implementation project(":activity:activity-compose")
 
         testImplementation(TRUTH)
 
@@ -84,7 +83,6 @@ if(AndroidXUiPlugin.isMultiplatformEnabled(project)) {
                 api(JUNIT)
                 api(ANDROIDX_TEST_EXT_JUNIT)
                 api "androidx.activity:activity:1.2.0"
-                implementation project(":activity:activity-compose")
 
                 implementation(ANDROIDX_TEST_RULES)
                 implementation(ANDROIDX_TEST_RUNNER)
