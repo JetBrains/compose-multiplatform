@@ -20,7 +20,6 @@ import android.graphics.Typeface
 import android.os.Build
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.SpanStyle
-import androidx.compose.ui.text.font.FontListFontFamily
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontSynthesis
 import androidx.compose.ui.text.font.FontWeight
@@ -89,18 +88,10 @@ internal fun AndroidTextPaint.applySpanStyle(
     setShadow(style.shadow)
     setTextDecoration(style.textDecoration)
 
-    // When FontFamily is a custom font(FontListFontFamily), it needs to be applied on Paint to
-    // compute empty paragraph height. Meanwhile, we also need a FontSpan for
-    // FontStyle/FontWeight span to work correctly.
     // letterSpacing with unit Sp needs to be handled by span.
     // baselineShift and bgColor is reset in the Android Layout constructor,
     // therefore we cannot apply them on paint, have to use spans.
     return SpanStyle(
-        fontFamily = if (style.fontFamily != null && style.fontFamily is FontListFontFamily) {
-            style.fontFamily
-        } else {
-            null
-        },
         letterSpacing = if (style.letterSpacing.type == TextUnitType.Sp &&
             style.letterSpacing.value != 0f
         ) {
@@ -124,7 +115,7 @@ internal fun AndroidTextPaint.applySpanStyle(
 /**
  * Returns true if this [SpanStyle] contains any font style attributes set.
  */
-private fun SpanStyle.hasFontAttributes(): Boolean {
+internal fun SpanStyle.hasFontAttributes(): Boolean {
     return fontFamily != null || fontStyle != null || fontWeight != null
 }
 
