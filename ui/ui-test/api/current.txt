@@ -305,10 +305,10 @@ package androidx.compose.ui.test {
   }
 
   public final class TextActionsKt {
-    method public static void performImeAction(androidx.compose.ui.test.SemanticsNodeInteraction, optional boolean alreadyHasFocus);
-    method public static void performTextClearance(androidx.compose.ui.test.SemanticsNodeInteraction, optional boolean alreadyHasFocus);
-    method public static void performTextInput(androidx.compose.ui.test.SemanticsNodeInteraction, String text, optional boolean alreadyHasFocus);
-    method public static void performTextReplacement(androidx.compose.ui.test.SemanticsNodeInteraction, String text, optional boolean alreadyHasFocus);
+    method public static void performImeAction(androidx.compose.ui.test.SemanticsNodeInteraction);
+    method public static void performTextClearance(androidx.compose.ui.test.SemanticsNodeInteraction);
+    method public static void performTextInput(androidx.compose.ui.test.SemanticsNodeInteraction, String text);
+    method public static void performTextReplacement(androidx.compose.ui.test.SemanticsNodeInteraction, String text);
   }
 
   public final class UtilsKt {
