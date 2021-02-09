@@ -26,8 +26,12 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ColumnScope
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.requiredWidth
 import androidx.compose.foundation.selection.selectable
 import androidx.compose.material.ripple.rememberRipple
 import androidx.compose.runtime.Composable
@@ -73,6 +77,8 @@ import kotlin.math.max
  * @param selectedContentColor the color for the content of this tab when selected, and the color
  * of the ripple.
  * @param unselectedContentColor the color for the content of this tab when not selected
+ *
+ * @see LeadingIconTab
  */
 @Composable
 fun Tab(
@@ -102,6 +108,74 @@ fun Tab(
         unselectedContentColor
     ) {
         TabBaselineLayout(icon = icon, text = styledText)
+    }
+}
+
+/**
+ * A LeadingIconTab represents a single page of content using a text label and an icon in
+ * front of the label.
+ * It represents its selected state by tinting the text label and icon with [selectedContentColor].
+ *
+ * This should typically be used inside of a [TabRow], see the corresponding documentation for
+ * example usage.
+ *
+ * @param selected whether this tab is selected or not
+ * @param onClick the callback to be invoked when this tab is selected
+ * @param text the text label displayed in this tab
+ * @param icon the icon displayed in this tab
+ * @param modifier optional [Modifier] for this tab
+ * @param enabled controls the enabled state of this tab. When `false`, this tab will not
+ * be clickable and will appear disabled to accessibility services.
+ * @param interactionSource the [MutableInteractionSource] representing the different [Interaction]s
+ * present on this tab. You can create and pass in your own remembered [MutableInteractionSource] if
+ * you want to read the [Interaction] and customize the appearance / behavior of this tab
+ * in different [Interaction]s.
+ * @param selectedContentColor the color for the content of this tab when selected, and the color
+ * of the ripple.
+ * @param unselectedContentColor the color for the content of this tab when not selected
+ *
+ * @see Tab
+ */
+@ExperimentalMaterialApi
+@Composable
+fun LeadingIconTab(
+    selected: Boolean,
+    onClick: () -> Unit,
+    text: @Composable (() -> Unit),
+    icon: @Composable (() -> Unit),
+    modifier: Modifier = Modifier,
+    enabled: Boolean = true,
+    interactionSource: MutableInteractionSource = remember { MutableInteractionSource() },
+    selectedContentColor: Color = LocalContentColor.current,
+    unselectedContentColor: Color = selectedContentColor.copy(alpha = ContentAlpha.medium)
+) {
+    // The color of the Ripple should always the be selected color, as we want to show the color
+    // before the item is considered selected, and hence before the new contentColor is
+    // provided by TabTransition.
+    val ripple = rememberRipple(bounded = false, color = selectedContentColor)
+
+    TabTransition(selectedContentColor, unselectedContentColor, selected) {
+        Row(
+            modifier = modifier
+                .height(SmallTabHeight)
+                .selectable(
+                    selected = selected,
+                    onClick = onClick,
+                    enabled = enabled,
+                    role = Role.Tab,
+                    interactionSource = interactionSource,
+                    indication = ripple
+                )
+                .padding(horizontal = HorizontalTextPadding)
+                .fillMaxWidth(),
+            horizontalArrangement = Arrangement.Center,
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            icon()
+            Spacer(Modifier.requiredWidth(TextDistanceFromLeadingIcon))
+            val style = MaterialTheme.typography.button.copy(textAlign = TextAlign.Center)
+            ProvideTextStyle(style, content = text)
+        }
     }
 }
 
@@ -372,3 +446,5 @@ private val DoubleLineTextBaseline = 10.dp
 private val DoubleLineTextBaselineWithIcon = 6.dp
 // Distance from the first text baseline to the bottom of the icon in a combined tab
 private val IconDistanceFromBaseline = 20.sp
+// Distance from the end of the leading icon to the start of the text
+private val TextDistanceFromLeadingIcon = 8.dp
