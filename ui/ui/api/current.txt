@@ -545,6 +545,7 @@ package androidx.compose.ui.graphics.vector {
     property public final long tintColor;
     property public final float viewportHeight;
     property public final float viewportWidth;
+    field public static final androidx.compose.ui.graphics.vector.ImageVector.Companion Companion;
   }
 
   public static final class ImageVector.Builder {
@@ -552,6 +553,9 @@ package androidx.compose.ui.graphics.vector {
     method public androidx.compose.ui.graphics.vector.ImageVector.Builder addPath(java.util.List<? extends androidx.compose.ui.graphics.vector.PathNode> pathData, optional androidx.compose.ui.graphics.PathFillType pathFillType, optional String name, optional androidx.compose.ui.graphics.Brush? fill, optional float fillAlpha, optional androidx.compose.ui.graphics.Brush? stroke, optional float strokeAlpha, optional float strokeLineWidth, optional androidx.compose.ui.graphics.StrokeCap strokeLineCap, optional androidx.compose.ui.graphics.StrokeJoin strokeLineJoin, optional float strokeLineMiter, optional float trimPathStart, optional float trimPathEnd, optional float trimPathOffset);
     method public androidx.compose.ui.graphics.vector.ImageVector build();
     method public androidx.compose.ui.graphics.vector.ImageVector.Builder clearGroup();
+  }
+
+  public static final class ImageVector.Companion {
   }
 
   public final class ImageVectorKt {
@@ -2205,38 +2209,17 @@ package androidx.compose.ui.res {
     method @androidx.compose.runtime.Composable public static long colorResource(@ColorRes int id);
   }
 
-  @Deprecated @androidx.compose.runtime.Stable public final class DeferredResource<T> {
-    method @Deprecated public androidx.compose.ui.res.Resource<T> getResource();
-    property public final androidx.compose.ui.res.Resource<T> resource;
-  }
-
-  @Deprecated public final class FailedResource<T> extends androidx.compose.ui.res.Resource<T> {
-    ctor @Deprecated public FailedResource(T? resource, Throwable? throwable);
-    method @Deprecated public Throwable? getThrowable();
-    property public final Throwable? throwable;
-  }
-
   public final class FontResourcesKt {
     method @androidx.compose.runtime.Composable public static androidx.compose.ui.text.font.Typeface fontResource(androidx.compose.ui.text.font.FontFamily fontFamily);
-    method @Deprecated @androidx.compose.runtime.Composable public static androidx.compose.ui.res.DeferredResource<androidx.compose.ui.text.font.Typeface> loadFontResource(androidx.compose.ui.text.font.FontFamily fontFamily, optional androidx.compose.ui.text.font.FontFamily? pendingFontFamily, optional androidx.compose.ui.text.font.FontFamily? failedFontFamily);
-    method @Deprecated @androidx.compose.runtime.Composable public static androidx.compose.ui.res.DeferredResource<androidx.compose.ui.text.font.Typeface> loadFontResource(androidx.compose.ui.text.font.FontFamily fontFamily, optional androidx.compose.ui.text.font.Typeface? pendingTypeface, optional androidx.compose.ui.text.font.Typeface? failedTypeface);
   }
 
   public final class ImageResourcesKt {
-    method @Deprecated @androidx.compose.runtime.Composable public static androidx.compose.ui.graphics.ImageBitmap imageResource(@DrawableRes int id);
-    method @Deprecated @androidx.compose.runtime.Composable public static androidx.compose.ui.res.DeferredResource<androidx.compose.ui.graphics.ImageBitmap> loadImageResource(int id, optional androidx.compose.ui.graphics.ImageBitmap? pendingImage, optional androidx.compose.ui.graphics.ImageBitmap? failedImage);
-  }
-
-  @Deprecated public final class LoadedResource<T> extends androidx.compose.ui.res.Resource<T> {
-    ctor @Deprecated public LoadedResource(T? resource);
+    method public static androidx.compose.ui.graphics.ImageBitmap imageResource(androidx.compose.ui.graphics.ImageBitmap.Companion, android.content.res.Resources res, @DrawableRes int id);
+    method @androidx.compose.runtime.Composable public static androidx.compose.ui.graphics.ImageBitmap imageResource(androidx.compose.ui.graphics.ImageBitmap.Companion, @DrawableRes int id);
   }
 
   public final class PainterResourcesKt {
     method @androidx.compose.runtime.Composable public static androidx.compose.ui.graphics.painter.Painter painterResource(@DrawableRes int id);
-  }
-
-  @Deprecated public final class PendingResource<T> extends androidx.compose.ui.res.Resource<T> {
-    ctor @Deprecated public PendingResource(T? resource);
   }
 
   public final class PrimitiveResourcesKt {
@@ -2246,14 +2229,6 @@ package androidx.compose.ui.res {
     method @androidx.compose.runtime.Composable public static int integerResource(@IntegerRes int id);
   }
 
-  @Deprecated public abstract sealed class Resource<T> {
-    method @Deprecated public final T? getResource();
-    property public final T? resource;
-  }
-
-  public final class ResourcesKt {
-  }
-
   public final class StringResourcesKt {
     method @androidx.compose.runtime.Composable public static String![] stringArrayResource(@ArrayRes int id);
     method @androidx.compose.runtime.Composable public static String stringResource(@StringRes int id);
@@ -2261,8 +2236,8 @@ package androidx.compose.ui.res {
   }
 
   public final class VectorResourcesKt {
-    method @Deprecated @androidx.compose.runtime.Composable public static androidx.compose.ui.res.DeferredResource<androidx.compose.ui.graphics.vector.ImageVector> loadVectorResource(int id, optional androidx.compose.ui.graphics.vector.ImageVector? pendingResource, optional androidx.compose.ui.graphics.vector.ImageVector? failedResource);
-    method @Deprecated @androidx.compose.runtime.Composable public static androidx.compose.ui.graphics.vector.ImageVector vectorResource(@DrawableRes int id);
+    method @androidx.compose.runtime.Composable public static androidx.compose.ui.graphics.vector.ImageVector vectorResource(androidx.compose.ui.graphics.vector.ImageVector.Companion, @DrawableRes int id);
+    method @kotlin.jvm.Throws(exceptionClasses=XmlPullParserException::class) public static androidx.compose.ui.graphics.vector.ImageVector vectorResource(androidx.compose.ui.graphics.vector.ImageVector.Companion, optional android.content.res.Resources.Theme? theme, android.content.res.Resources res, int resId) throws org.xmlpull.v1.XmlPullParserException;
   }
 
 }
