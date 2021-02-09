@@ -265,7 +265,7 @@ internal class TextFieldDelegate {
             editProcessor: EditProcessor,
             onValueChange: (TextFieldValue) -> Unit
         ) {
-            onValueChange(editProcessor.toTextFieldValue().commitComposition())
+            onValueChange(editProcessor.toTextFieldValue().copy(composition = null))
             textInputSession.hideSoftwareKeyboard()
             textInputSession.dispose()
         }

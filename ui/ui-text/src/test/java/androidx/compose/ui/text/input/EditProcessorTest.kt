@@ -148,7 +148,7 @@ class EditProcessorTest {
         assertEquals(initialBuffer.compositionStart, EditingBuffer.NOWHERE)
         assertEquals(initialBuffer.compositionEnd, EditingBuffer.NOWHERE)
 
-        val newTextFieldValue = textFieldValue.commitComposition()
+        val newTextFieldValue = textFieldValue.copy(composition = null)
         processor.reset(
             newTextFieldValue,
             textInputSeson
