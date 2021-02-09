@@ -36,7 +36,6 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.semantics.clearAndSetSemantics
 import androidx.compose.ui.unit.dp
 
 @Sampled
@@ -49,13 +48,9 @@ fun ClickableListItems() {
         ListItem(
             text = { Text("Switch ListItem") },
             trailing = {
-                // The [clearAndSetSemantics] causes the switch's redundant
-                // toggleable semantics to be cleared in favor of the [ListItem]
-                // toggleable's, to improve usability with screen-readers.
                 Switch(
-                    modifier = Modifier.clearAndSetSemantics {},
                     checked = switched,
-                    onCheckedChange = onSwitchedChange
+                    onCheckedChange = null // null recommended for accessibility with screenreaders
                 )
             },
             modifier = Modifier.toggleable(
@@ -69,13 +64,9 @@ fun ClickableListItems() {
         ListItem(
             text = { Text("Checkbox ListItem") },
             trailing = {
-                // The [clearAndSetSemantics] causes the checkbox's redundant
-                // toggleable semantics to be cleared in favor of the [ListItem]
-                // toggleable's, to improve usability with screen-readers.
                 Checkbox(
-                    modifier = Modifier.clearAndSetSemantics {},
                     checked = checked,
-                    onCheckedChange = onCheckedChange
+                    onCheckedChange = null // null recommended for accessibility with screenreaders
                 )
             },
             modifier = Modifier.toggleable(
