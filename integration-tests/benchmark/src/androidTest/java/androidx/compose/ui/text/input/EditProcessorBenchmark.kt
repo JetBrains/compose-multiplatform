@@ -21,14 +21,12 @@ import androidx.benchmark.junit4.measureRepeated
 import androidx.test.filters.LargeTest
 import androidx.ui.integration.test.RandomTextGenerator
 import androidx.ui.integration.test.cartesian
-import androidx.compose.ui.text.InternalTextApi
 import androidx.compose.ui.text.TextRange
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.junit.runners.Parameterized
 
-@OptIn(InternalTextApi::class)
 @LargeTest
 @RunWith(Parameterized::class)
 class EditProcessorBenchmark(val initText: InitialText, val scenario: TestScenario) {
@@ -82,7 +80,7 @@ class EditProcessorBenchmark(val initText: InitialText, val scenario: TestScenar
         benchmarkRule.measureRepeated {
             val ep = runWithTimingDisabled {
                 EditProcessor().apply {
-                    onNewState(
+                    reset(
                         TextFieldValue(
                             text = initText.text,
                             selection = TextRange(5)
@@ -93,7 +91,7 @@ class EditProcessorBenchmark(val initText: InitialText, val scenario: TestScenar
                 }
             }
 
-            ep.onEditCommands(scenario.ops)
+            ep.apply(scenario.ops)
         }
     }
 }
