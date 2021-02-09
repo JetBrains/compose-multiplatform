@@ -16,7 +16,7 @@
 
 package androidx.compose.foundation.demos.text
 
-import androidx.compose.foundation.layout.defaultMinSizeConstraints
+import androidx.compose.foundation.layout.defaultMinSize
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.text.BasicTextField
@@ -91,7 +91,7 @@ private fun MyTextField(data: ImeOptionsData) {
         mutableStateOf(TextFieldValue())
     }
     BasicTextField(
-        modifier = demoTextFieldModifiers.defaultMinSizeConstraints(100.dp),
+        modifier = demoTextFieldModifiers.defaultMinSize(100.dp),
         value = state.value,
         keyboardOptions = data.keyboardOptions,
         keyboardActions = KeyboardActions { controller.value?.hideSoftwareKeyboard() },

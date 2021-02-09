@@ -194,7 +194,7 @@ package androidx.compose.foundation.layout {
   }
 
   public final class SizeKt {
-    method @androidx.compose.runtime.Stable public static androidx.compose.ui.Modifier defaultMinSizeConstraints-S2lCeAQ(androidx.compose.ui.Modifier, optional float minWidth, optional float minHeight);
+    method @androidx.compose.runtime.Stable public static androidx.compose.ui.Modifier defaultMinSize-S2lCeAQ(androidx.compose.ui.Modifier, optional float minWidth, optional float minHeight);
     method @androidx.compose.runtime.Stable public static androidx.compose.ui.Modifier fillMaxHeight(androidx.compose.ui.Modifier, optional float fraction);
     method @androidx.compose.runtime.Stable public static androidx.compose.ui.Modifier fillMaxSize(androidx.compose.ui.Modifier, optional float fraction);
     method @androidx.compose.runtime.Stable public static androidx.compose.ui.Modifier fillMaxWidth(androidx.compose.ui.Modifier, optional float fraction);

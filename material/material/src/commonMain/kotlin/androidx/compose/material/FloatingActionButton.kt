@@ -25,7 +25,7 @@ import androidx.compose.foundation.indication
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.defaultMinSizeConstraints
+import androidx.compose.foundation.layout.defaultMinSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.preferredSizeIn
 import androidx.compose.foundation.layout.preferredWidth
@@ -99,7 +99,7 @@ fun FloatingActionButton(
             ProvideTextStyle(MaterialTheme.typography.button) {
                 Box(
                     modifier = Modifier
-                        .defaultMinSizeConstraints(minWidth = FabSize, minHeight = FabSize)
+                        .defaultMinSize(minWidth = FabSize, minHeight = FabSize)
                         .indication(interactionState, rememberRipple()),
                     contentAlignment = Alignment.Center
                 ) { content() }
