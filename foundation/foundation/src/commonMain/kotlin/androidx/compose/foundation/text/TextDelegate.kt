@@ -14,13 +14,23 @@
  * limitations under the License.
  */
 
-package androidx.compose.ui.text
+package androidx.compose.foundation.text
 
 import androidx.compose.runtime.Stable
 import androidx.compose.ui.graphics.Canvas
 import androidx.compose.ui.graphics.Paint
-import androidx.compose.ui.text.TextDelegate.Companion.paint
+import androidx.compose.ui.text.AnnotatedString
+import androidx.compose.ui.text.MultiParagraph
+import androidx.compose.ui.text.MultiParagraphIntrinsics
+import androidx.compose.ui.text.Placeholder
+import androidx.compose.ui.text.TextLayoutInput
+import androidx.compose.ui.text.TextLayoutResult
+import androidx.compose.ui.text.TextPainter
+import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.SpanStyle
+import androidx.compose.ui.text.canReuse
 import androidx.compose.ui.text.font.Font
+import androidx.compose.ui.text.resolveDefaults
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.Constraints
@@ -70,7 +80,7 @@ import kotlin.math.ceil
  *
  * @suppress
  */
-@InternalTextApi // Used by CoreText in foundation
+@InternalFoundationTextApi // Used by benchmarks
 @Stable
 class TextDelegate(
     val text: AnnotatedString,

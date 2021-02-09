@@ -14,23 +14,14 @@
  * limitations under the License.
  */
 
-package androidx.compose.ui.text.matchers
+package androidx.compose.foundation.text.matchers
 
 import android.graphics.Bitmap
-import android.graphics.Typeface
 import com.google.common.truth.IntegerSubject
 import com.google.common.truth.Truth.assertAbout
 
 internal fun assertThat(bitmap: Bitmap?): BitmapSubject {
     return assertAbout(BitmapSubject.SUBJECT_FACTORY).that(bitmap)!!
-}
-
-internal fun assertThat(typeface: Typeface?): TypefaceSubject {
-    return assertAbout(TypefaceSubject.SUBJECT_FACTORY).that(typeface)!!
-}
-
-internal fun assertThat(charSequence: CharSequence?): CharSequenceSubject {
-    return assertAbout(CharSequenceSubject.SUBJECT_FACTORY).that(charSequence)!!
 }
 
 internal fun IntegerSubject.isZero() {

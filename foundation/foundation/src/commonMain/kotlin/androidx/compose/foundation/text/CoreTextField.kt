@@ -75,7 +75,6 @@ import androidx.compose.ui.semantics.textSelectionRange
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.InternalTextApi
 import androidx.compose.ui.text.SoftwareKeyboardController
-import androidx.compose.ui.text.TextDelegate
 import androidx.compose.ui.text.TextLayoutResult
 import androidx.compose.ui.text.TextRange
 import androidx.compose.ui.text.TextStyle
@@ -159,7 +158,7 @@ import kotlin.math.roundToInt
  * innerTextField exactly once.
  */
 @Composable
-@OptIn(MouseTemporaryApi::class, InternalTextApi::class)
+@OptIn(MouseTemporaryApi::class, InternalTextApi::class, InternalFoundationTextApi::class)
 internal fun CoreTextField(
     value: TextFieldValue,
     onValueChange: (TextFieldValue) -> Unit,
@@ -512,7 +511,7 @@ internal fun CoreTextField(
 
 internal expect fun Modifier.textFieldKeyboardModifier(manager: TextFieldSelectionManager): Modifier
 
-@OptIn(InternalTextApi::class)
+@OptIn(InternalTextApi::class, InternalFoundationTextApi::class)
 internal class TextFieldState(
     var textDelegate: TextDelegate
 ) {

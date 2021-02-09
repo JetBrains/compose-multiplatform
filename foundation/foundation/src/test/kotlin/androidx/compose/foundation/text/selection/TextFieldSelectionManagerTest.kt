@@ -16,6 +16,7 @@
 
 package androidx.compose.foundation.text.selection
 
+import androidx.compose.foundation.text.InternalFoundationTextApi
 import androidx.compose.foundation.text.TextFieldState
 import androidx.compose.foundation.text.TextLayoutResultProxy
 import androidx.compose.ui.focus.FocusRequester
@@ -27,7 +28,6 @@ import androidx.compose.ui.platform.ClipboardManager
 import androidx.compose.ui.platform.TextToolbar
 import androidx.compose.ui.platform.TextToolbarStatus
 import androidx.compose.ui.text.AnnotatedString
-import androidx.compose.ui.text.InternalTextApi
 import androidx.compose.ui.text.TextLayoutInput
 import androidx.compose.ui.text.TextLayoutResult
 import androidx.compose.ui.text.TextRange
@@ -56,7 +56,6 @@ import org.mockito.invocation.InvocationOnMock
 import org.mockito.stubbing.Answer
 
 @RunWith(JUnit4::class)
-@OptIn(InternalTextApi::class)
 class TextFieldSelectionManagerTest {
     private val text = "Hello World"
     private val density = Density(density = 1f)
@@ -81,6 +80,7 @@ class TextFieldSelectionManagerTest {
     private val hapticFeedback = mock<HapticFeedback>()
     private val focusRequester = mock<FocusRequester>()
 
+    @OptIn(InternalFoundationTextApi::class)
     @Before
     fun setup() {
         manager.offsetMapping = offsetMapping
