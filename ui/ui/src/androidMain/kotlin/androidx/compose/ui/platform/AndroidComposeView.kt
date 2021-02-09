@@ -33,10 +33,12 @@ import android.view.autofill.AutofillValue
 import android.view.inputmethod.EditorInfo
 import android.view.inputmethod.InputConnection
 import androidx.annotation.RequiresApi
+import androidx.annotation.RestrictTo
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.ExperimentalComposeUiApi
+import androidx.compose.ui.InternalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.autofill.AndroidAutofill
 import androidx.compose.ui.autofill.Autofill
@@ -84,10 +86,10 @@ import androidx.compose.ui.node.OwnerSnapshotObserver
 import androidx.compose.ui.node.RootForTest
 import androidx.compose.ui.semantics.SemanticsModifierCore
 import androidx.compose.ui.semantics.SemanticsOwner
-import androidx.compose.ui.text.InternalTextApi
 import androidx.compose.ui.text.font.Font
+import androidx.compose.ui.text.input.PlatformTextInputService
+import androidx.compose.ui.text.input.TextInputService
 import androidx.compose.ui.text.input.TextInputServiceAndroid
-import androidx.compose.ui.text.input.textInputServiceFactory
 import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.IntOffset
@@ -268,10 +270,8 @@ internal class AndroidComposeView(context: Context) :
 
     private val textInputServiceAndroid = TextInputServiceAndroid(this)
 
-    override val textInputService =
-        @OptIn(InternalTextApi::class)
-        @Suppress("DEPRECATION_ERROR")
-        textInputServiceFactory(textInputServiceAndroid)
+    @OptIn(InternalComposeUiApi::class)
+    override val textInputService = textInputServiceFactory(textInputServiceAndroid)
 
     override val fontLoader: Font.ResourceLoader = AndroidFontResourceLoader(context)
 
@@ -777,3 +777,9 @@ private fun layoutDirectionFromInt(layoutDirection: Int): LayoutDirection = when
     android.util.LayoutDirection.RTL -> LayoutDirection.Rtl
     else -> LayoutDirection.Ltr
 }
+
+/** @suppress */
+@RestrictTo(RestrictTo.Scope.LIBRARY_GROUP)
+@InternalComposeUiApi // used by testing infra
+var textInputServiceFactory: (PlatformTextInputService) -> TextInputService =
+    { TextInputService(it) }

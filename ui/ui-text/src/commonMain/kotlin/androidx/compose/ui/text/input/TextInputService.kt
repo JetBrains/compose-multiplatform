@@ -17,7 +17,6 @@
 package androidx.compose.ui.text.input
 
 import androidx.compose.ui.geometry.Rect
-import androidx.compose.ui.text.InternalTextApi
 
 /**
  * The input session token.
@@ -204,11 +203,3 @@ interface PlatformTextInputService {
      */
     fun notifyFocusedRect(rect: Rect)
 }
-
-/** @suppress */
-@InternalTextApi // "Used by testing infra"
-@Deprecated(level = DeprecationLevel.ERROR, message = "This is internal API")
-var textInputServiceFactory: (PlatformTextInputService) -> TextInputService =
-    { TextInputService(it) }
-    /*@VisibleForTesting
-        set*/
