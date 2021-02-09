@@ -28,5 +28,6 @@ val AndroidViewDemos = DemoCategory(
         ComplexTouchInterop,
         ActivityDemo("WebComponent", WebComponentActivity::class),
         ComposableDemo("TextField Interop") { EditTextInteropDemo() },
+        ComposableDemo("Focus Transfer") { FocusTransferDemo() },
     )
 )
