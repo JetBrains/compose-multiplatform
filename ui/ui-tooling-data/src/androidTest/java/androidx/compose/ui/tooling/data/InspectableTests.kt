@@ -374,18 +374,32 @@ class InspectableTests : ToolingTest() {
         assertFalse(tables.isNullOrEmpty())
         assertTrue(tables.size > 1)
 
-        val calls = tables.flatMap { table ->
-            if (!table.isEmpty) table.asTree().asList() else emptyList()
-        }.filter {
-            val location = it.location
-            location != null && location.sourceFile == "InspectableTests.kt"
-        }.map {
-            it.name
+        val calls = activity.uiThread {
+            tables.flatMap { table ->
+                if (!table.isEmpty) table.asTree().asList() else emptyList()
+            }.filter {
+                val location = it.location
+                location != null && location.sourceFile == "InspectableTests.kt"
+            }.map {
+                it.name
+            }
         }
+
         assertTrue(calls.contains("Column"))
         assertTrue(calls.contains("Text"))
         assertTrue(calls.contains("Button"))
     }
+}
+
+private fun <T> TestActivity.uiThread(block: () -> T): T {
+    val latch = CountDownLatch(1)
+    var result: T? = null
+    runOnUiThread {
+        result = block()
+        latch.countDown()
+    }
+    latch.await(1, TimeUnit.SECONDS)
+    return result!!
 }
 
 @Suppress("UNUSED_PARAMETER")
