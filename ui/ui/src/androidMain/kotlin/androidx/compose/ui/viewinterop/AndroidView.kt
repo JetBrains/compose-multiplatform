@@ -70,7 +70,6 @@ fun <T : View> AndroidView(
             viewBlockHolder.toLayoutNode()
         },
         update = {
-            set(viewBlock) { viewBlockHolderRef.value!!.viewBlock = it }
             set(materialized) { viewBlockHolderRef.value!!.modifier = it }
             set(density) { viewBlockHolderRef.value!!.density = it }
             set(update) { viewBlockHolderRef.value!!.updateBlock = it }
