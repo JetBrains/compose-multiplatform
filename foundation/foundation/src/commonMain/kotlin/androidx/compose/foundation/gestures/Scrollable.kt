@@ -19,10 +19,10 @@ package androidx.compose.foundation.gestures
 import androidx.compose.animation.core.AnimationState
 import androidx.compose.animation.core.DecayAnimationSpec
 import androidx.compose.animation.core.animateDecay
+import androidx.compose.animation.defaultDecayAnimationSpec
 import androidx.compose.foundation.Interaction
 import androidx.compose.foundation.InteractionState
 import androidx.compose.foundation.MutatePriority
-import androidx.compose.foundation.animation.defaultFlingSpec
 import androidx.compose.foundation.gestures.Orientation.Horizontal
 import androidx.compose.foundation.gestures.Orientation.Vertical
 import androidx.compose.runtime.Composable
@@ -68,8 +68,8 @@ import kotlin.math.abs
  * @param enabled whether or not scrolling in enabled
  * @param reverseDirection reverse the direction of the scroll, so top to bottom scroll will
  * behave like bottom to top and left to right will behave like right to left.
- * @param flingSpec fling animation configuration to use when drag ended with velocity. If
- * `null`, default fling configuration will be used.
+ * @param flingBehavior logic describing fling behavior when drag has finished with velocity. If
+ * `null`, default from [ScrollableDefaults.flingBehavior] will be used.
  * @param interactionState [InteractionState] that will be updated when this draggable is
  * being dragged, using [Interaction.Dragged].
  */
@@ -78,7 +78,7 @@ fun Modifier.scrollable(
     orientation: Orientation,
     enabled: Boolean = true,
     reverseDirection: Boolean = false,
-    flingSpec: DecayAnimationSpec<Float>? = null,
+    flingBehavior: FlingBehavior? = null,
     interactionState: InteractionState? = null
 ): Modifier = composed(
     inspectorInfo = debugInspectorInfo {
@@ -87,7 +87,7 @@ fun Modifier.scrollable(
         properties["state"] = state
         properties["enabled"] = enabled
         properties["reverseDirection"] = reverseDirection
-        properties["flingSpec"] = flingSpec
+        properties["flingBehavior"] = flingBehavior
         properties["interactionState"] = interactionState
     },
     factory = {
@@ -97,13 +97,30 @@ fun Modifier.scrollable(
             orientation,
             reverseDirection,
             state,
-            flingSpec,
+            flingBehavior,
             enabled
         ).mouseScrollable(orientation) {
             state.dispatchRawDelta(it.reverseIfNeeded())
         }
     }
 )
+
+/**
+ * Contains the default values used by [scrollable]
+ */
+object ScrollableDefaults {
+
+    /**
+     * Create and remember default [FlingBehavior] that will represent natural fling curve.
+     */
+    @Composable
+    fun flingBehavior(): FlingBehavior {
+        val flingSpec = defaultDecayAnimationSpec()
+        return remember(flingSpec) {
+            DefaultFlingBehavior(flingSpec)
+        }
+    }
+}
 
 // TODO(demin): think how we can move touchScrollable/mouseScrollable into commonMain,
 //  so Android can support mouse wheel scrolling, and desktop can support touch scrolling.
@@ -121,7 +138,7 @@ private fun Modifier.touchScrollImplementation(
     orientation: Orientation,
     reverseDirection: Boolean,
     controller: ScrollableState,
-    flingSpec: DecayAnimationSpec<Float>?,
+    flingBehavior: FlingBehavior?,
     enabled: Boolean
 ): Modifier {
     DisposableEffect(interactionState) {
@@ -137,7 +154,7 @@ private fun Modifier.touchScrollImplementation(
             reverseDirection,
             nestedScrollDispatcher,
             controller,
-            flingSpec ?: defaultFlingSpec()
+            flingBehavior ?: ScrollableDefaults.flingBehavior()
         )
     )
     val nestedScrollConnection = remember { scrollableNestedScrollConnection(scrollLogic) }
@@ -235,7 +252,7 @@ private fun Modifier.dragForEachGesture(
     suspend fun fling(velocity: Velocity) {
         val preConsumedByParent = nestedScrollDispatcher.value.dispatchPreFling(velocity)
         val available = velocity - preConsumedByParent
-        val velocityLeft = scrollLogic.value.performFling(available, false)
+        val velocityLeft = scrollLogic.value.doFlingAnimation(available)
         nestedScrollDispatcher.value.dispatchPostFling(available - velocityLeft, velocityLeft)
     }
 
@@ -271,7 +288,7 @@ private class ScrollingLogic(
     val reverseDirection: Boolean,
     val nestedScrollDispatcher: State<NestedScrollDispatcher>,
     val scrollableState: ScrollableState,
-    val flingDecay: DecayAnimationSpec<Float>,
+    val flingBehavior: FlingBehavior
 ) {
     fun Float.toOffset(): Offset =
         if (orientation == Horizontal) Offset(this, 0f) else Offset(0f, this)
@@ -309,26 +326,24 @@ private class ScrollingLogic(
         }
     }
 
-    suspend fun performFling(
-        available: Velocity,
-        isNestedScroll: Boolean
-    ): Velocity {
-        var velocityLeft = available
-        if (available.toFloat() != 0f) scrollableState.scroll {
-            var lastValue = 0f
-            AnimationState(
-                initialValue = 0f,
-                initialVelocity = available.toFloat(),
-            ).animateDecay(flingDecay, sequentialAnimation = isNestedScroll) {
-                val delta = value - lastValue
-                val left = dispatchScroll(delta, NestedScrollSource.Fling)
-                lastValue = value
-                velocityLeft = this.velocity.toVelocity()
-                // avoid rounding errors and stop if anything is unconsumed
-                if (abs(left) > 0.5f) this.cancelAnimation()
+    suspend fun doFlingAnimation(available: Velocity): Velocity {
+        var result: Velocity = available
+        // come up with the better threshold, but we need it since spline curve gives us NaNs
+        if (abs(available.toFloat()) > 1f) scrollableState.scroll {
+            val outerScopeScroll: (Float) -> Float =
+                { delta -> this.dispatchScroll(delta, NestedScrollSource.Fling) }
+            val scope = object : ScrollScope {
+                override fun scrollBy(pixels: Float): Float {
+                    return outerScopeScroll.invoke(pixels)
+                }
+            }
+            with(scope) {
+                with(flingBehavior) {
+                    result = performFling(available.toFloat()).toVelocity()
+                }
             }
         }
-        return velocityLeft
+        return result
     }
 }
 
@@ -345,7 +360,28 @@ private fun scrollableNestedScrollConnection(
         consumed: Velocity,
         available: Velocity
     ): Velocity {
-        val velocityLeft = scrollLogic.value.performFling(available, true)
+        val velocityLeft = scrollLogic.value.doFlingAnimation(available)
         return available - velocityLeft
+    }
+}
+
+private class DefaultFlingBehavior(
+    private val flingDecay: DecayAnimationSpec<Float>
+) : FlingBehavior {
+    override suspend fun ScrollScope.performFling(initialVelocity: Float): Float {
+        var velocityLeft = initialVelocity
+        var lastValue = 0f
+        AnimationState(
+            initialValue = 0f,
+            initialVelocity = initialVelocity,
+        ).animateDecay(flingDecay) {
+            val delta = value - lastValue
+            val left = scrollBy(delta)
+            lastValue = value
+            velocityLeft = this.velocity
+            // avoid rounding errors and stop if anything is unconsumed
+            if (abs(left) > 0.5f) this.cancelAnimation()
+        }
+        return velocityLeft
     }
 }

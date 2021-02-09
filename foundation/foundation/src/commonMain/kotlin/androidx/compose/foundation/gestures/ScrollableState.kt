@@ -29,13 +29,13 @@ import kotlinx.coroutines.coroutineScope
  * of scrollable containers such as [androidx.compose.foundation.lazy.LazyListState] or
  * [androidx.compose.foundation.ScrollState] in order to provide low-level scrolling control via
  * [scroll], as well as allowing for higher-level scrolling functions like
- * [androidx.compose.foundation.animation.smoothScrollBy] to be implemented as extension
+ * [smoothScrollBy] to be implemented as extension
  * functions on [ScrollableState].
  *
  * Subclasses may also have their own methods that are specific to their interaction paradigm, such
  * as [androidx.compose.foundation.lazy.LazyListState.snapToItemIndex].
  *
- * @see androidx.compose.foundation.animation.smoothScrollBy
+ * @see androidx.compose.foundation.gestures.smoothScrollBy
  * @see androidx.compose.foundation.gestures.scrollable
  */
 interface ScrollableState {
@@ -126,18 +126,6 @@ interface ScrollScope {
      * @return the amount of the requested scroll that was consumed (that is, how far it scrolled)
      */
     fun scrollBy(pixels: Float): Float
-}
-
-/**
- * Stop and suspend until any ongoing animation, smooth scrolling, fling, or any other scroll
- * occurring via [ScrollableState.scroll] is terminated.
- *
- * @param scrollPriority scrolls that run with this priority or lower will be stopped
- */
-suspend fun ScrollableState.stopScroll(scrollPriority: MutatePriority = MutatePriority.Default) {
-    scroll(scrollPriority) {
-        // do nothing, just lock the mutex so other scroll actors are cancelled
-    }
 }
 
 private class DefaultScrollableState(val onDelta: (Float) -> Float) : ScrollableState {

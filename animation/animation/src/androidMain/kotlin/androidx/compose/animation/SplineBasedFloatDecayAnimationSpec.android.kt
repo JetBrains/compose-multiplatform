@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package androidx.compose.foundation.animation
+package androidx.compose.animation
 
 import android.view.ViewConfiguration
 import androidx.compose.animation.core.DecayAnimationSpec
@@ -28,7 +28,7 @@ import kotlin.math.sign
  *
  * @param density density of the display
  */
-class FloatAndroidFlingDecaySpec(density: Density) : FloatDecayAnimationSpec {
+class SplineBasedFloatDecayAnimationSpec(density: Density) : FloatDecayAnimationSpec {
 
     private val flingCalculator = AndroidFlingCalculator(
         ViewConfiguration.getScrollFriction(),
@@ -74,5 +74,5 @@ class FloatAndroidFlingDecaySpec(density: Density) : FloatDecayAnimationSpec {
  *
  * @param density density of the display
  */
-fun <T> androidFlingDecay(density: Density): DecayAnimationSpec<T> =
-    FloatAndroidFlingDecaySpec(density).generateDecayAnimationSpec()
+fun <T> splineBasedDecay(density: Density): DecayAnimationSpec<T> =
+    SplineBasedFloatDecayAnimationSpec(density).generateDecayAnimationSpec()

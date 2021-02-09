@@ -16,8 +16,6 @@
 
 package androidx.compose.ui.test.gesturescope
 
-import androidx.compose.animation.core.FloatExponentialDecaySpec
-import androidx.compose.animation.core.generateDecayAnimationSpec
 import androidx.compose.foundation.ScrollState
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -174,11 +172,7 @@ class SendSwipeTest {
                         Modifier
                             .testTag("scrollable")
                             .requiredSize(100.toDp(), 1000.toDp())
-                            .verticalScroll(
-                                scrollState,
-                                flingSpec = FloatExponentialDecaySpec()
-                                    .generateDecayAnimationSpec()
-                            )
+                            .verticalScroll(scrollState)
                     ) {
                         repeat(100) {
                             ClickableTestBox()

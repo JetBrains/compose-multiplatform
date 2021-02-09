@@ -18,7 +18,7 @@ package androidx.compose.animation.demos
 
 import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.calculateTargetValue
-import androidx.compose.foundation.animation.androidFlingDecay
+import androidx.compose.animation.splineBasedDecay
 import androidx.compose.foundation.background
 import androidx.compose.foundation.gestures.awaitFirstDown
 import androidx.compose.foundation.gestures.verticalDrag
@@ -108,7 +108,7 @@ private fun Modifier.swipeToDismiss(index: Int): Modifier = composed {
                 val velocity = velocityTracker.calculateVelocity().y
                 launch {
                     // Either fling out of the sight, or snap back
-                    val decay = androidFlingDecay<Float>(this@pointerInput)
+                    val decay = splineBasedDecay<Float>(this@pointerInput)
                     if (decay.calculateTargetValue(
                             animatedOffset.value,
                             velocity

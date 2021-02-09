@@ -227,8 +227,8 @@ class Animatable<T, V : AnimationVector>(
      * used after a fling gesture.
      *
      * [animationSpec] defines the decay animation that will be used for this animation. Some
-     * options for this [animationSpec] include: [androidFlingDecay][androidx.compose
-     * .foundation.animation.androidFlingDecay] and [exponentialDecay]. [block] will be
+     * options for this [animationSpec] include: [splineBasedDecay][androidx.compose
+     * .animation.splineBasedDecay] and [exponentialDecay]. [block] will be
      * invoked on each animation frame.
      *
      * Returns an [AnimationResult] object, that contains the [reason][AnimationEndReason] for

@@ -14,13 +14,13 @@
  * limitations under the License.
  */
 
-package androidx.compose.foundation.animation
+package androidx.compose.animation
 
 import androidx.compose.animation.core.FloatDecayAnimationSpec
 import androidx.compose.ui.unit.Density
 import kotlin.math.sign
 
-internal class DesktopFlingDecaySpec(density: Density) : FloatDecayAnimationSpec {
+internal class DesktopDefaultDecayAnimationSpec(density: Density) : FloatDecayAnimationSpec {
     // TODO(demin): extract common SplineBasedFlingCalculator if any other OS uses similar
     //  fling implementation
     // temporarily we use android implementation of fling decay

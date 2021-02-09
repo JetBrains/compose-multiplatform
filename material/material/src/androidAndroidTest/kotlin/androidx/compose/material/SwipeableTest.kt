@@ -18,7 +18,7 @@ package androidx.compose.material
 
 import androidx.compose.animation.core.AnimationEndReason
 import androidx.compose.foundation.ScrollState
-import androidx.compose.foundation.animation.scrollBy
+import androidx.compose.foundation.gestures.scrollBy
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
