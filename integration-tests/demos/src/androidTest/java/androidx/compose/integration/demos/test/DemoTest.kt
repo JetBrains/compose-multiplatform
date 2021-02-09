@@ -39,10 +39,10 @@ import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.performScrollTo
 import androidx.test.espresso.Espresso
 import androidx.test.ext.junit.runners.AndroidJUnit4
-import androidx.test.filters.FlakyTest
 import androidx.test.filters.LargeTest
 import androidx.test.filters.MediumTest
 import com.google.common.truth.Truth.assertThat
+import org.junit.Ignore
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -95,7 +95,7 @@ class DemoTest {
     }
 
     @Test
-    @FlakyTest(bugId = 179339732)
+    @Ignore("b/179339732")
     fun navigateThroughAllDemos_2() {
         navigateThroughAllDemos(SplitDemoCategories[1])
     }
