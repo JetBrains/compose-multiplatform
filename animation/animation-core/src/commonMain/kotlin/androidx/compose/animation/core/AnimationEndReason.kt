@@ -17,39 +17,7 @@
 package androidx.compose.animation.core
 
 /**
- * TargetAnimation class defines how to animate to a given target value.
- *
- * @param target Target value for the animation to animate to
- * @param animation The animation that will be used to animate to the target destination. This
- *                  animation defaults to a Spring Animation unless specified.
- */
-class TargetAnimation(
-    val target: Float,
-    val animation: AnimationSpec<Float> = SpringSpec()
-) {
-    override fun equals(other: Any?): Boolean {
-        if (this === other) return true
-        if (other !is TargetAnimation) return false
-
-        if (target != other.target) return false
-        if (animation != other.animation) return false
-
-        return true
-    }
-
-    override fun hashCode(): Int {
-        var result = target.hashCode()
-        result = 31 * result + animation.hashCode()
-        return result
-    }
-
-    override fun toString(): String {
-        return "TargetAnimation(target=$target, animation=$animation)"
-    }
-}
-
-/**
- * Possible reasons with which DynamicTargetAnimation can finish
+ * Possible reasons for [Animatable]s to end.
  */
 enum class AnimationEndReason {
     /**
@@ -65,7 +33,6 @@ enum class AnimationEndReason {
      * and the remaining velocity can be obtained via [AnimationResult].
      */
     BoundReached,
-    // TODO: deprecate TargetReached
     /**
      * Animation has finished successfully without any interruption.
      */
