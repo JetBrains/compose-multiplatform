@@ -137,6 +137,7 @@ inline fun <T> key(
  * TODO(lmr): provide documentation
  */
 val currentComposer: Composer
+    @ReadOnlyComposable
     @Composable get() { throw NotImplementedError("Implemented as an intrinsic") }
 
 /**
@@ -184,6 +185,9 @@ val currentCompositeKeyHash: Int
  * @see Composition
  */
 @OptIn(ComposeCompilerApi::class)
+// ComposeNode is a special case of readonly composable and handles creating its own groups, so
+// it is okay to use.
+@Suppress("NONREADONLY_CALL_IN_READONLY_COMPOSABLE")
 @Composable inline fun <T : Any, reified E : Applier<*>> ComposeNode(
     noinline factory: () -> T,
     update: @DisallowComposableCalls Updater<T>.() -> Unit
@@ -219,6 +223,9 @@ val currentCompositeKeyHash: Int
  * @see Composition
  */
 @OptIn(ComposeCompilerApi::class)
+// ComposeNode is a special case of readonly composable and handles creating its own groups, so
+// it is okay to use.
+@Suppress("NONREADONLY_CALL_IN_READONLY_COMPOSABLE")
 @Composable
 inline fun <T : Any?, reified E : Applier<*>> ComposeNode(
     noinline factory: () -> T,
@@ -263,6 +270,9 @@ inline fun <T : Any?, reified E : Applier<*>> ComposeNode(
  * @see Composition
  */
 @OptIn(ComposeCompilerApi::class)
+// ComposeNode is a special case of readonly composable and handles creating its own groups, so
+// it is okay to use.
+@Suppress("NONREADONLY_CALL_IN_READONLY_COMPOSABLE")
 @Composable @ReadOnlyComposable
 inline fun <T, reified E : Applier<*>> ComposeNode(
     noinline factory: () -> T,
