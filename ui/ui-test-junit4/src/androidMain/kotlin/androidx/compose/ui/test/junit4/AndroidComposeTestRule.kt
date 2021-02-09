@@ -394,7 +394,7 @@ class AndroidComposeTestRule<R : TestRule, A : ComponentActivity>(
         override fun sendTextInputCommand(node: SemanticsNode, command: List<EditCommand>) {
             val owner = node.root as ViewRootForTest
 
-            runOnUiThread {
+            runOnIdle {
                 val textInputService = owner.getTextInputServiceOrDie()
                 val onEditCommand = textInputService.onEditCommand
                     ?: throw IllegalStateException("No input session started. Missing a focus?")
@@ -406,7 +406,7 @@ class AndroidComposeTestRule<R : TestRule, A : ComponentActivity>(
         override fun sendImeAction(node: SemanticsNode, actionSpecified: ImeAction) {
             val owner = node.root as ViewRootForTest
 
-            runOnUiThread {
+            runOnIdle {
                 val textInputService = owner.getTextInputServiceOrDie()
                 val onImeActionPerformed = textInputService.onImeActionPerformed
                     ?: throw IllegalStateException("No input session started. Missing a focus?")
