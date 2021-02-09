@@ -34,7 +34,7 @@ import kotlin.test.assertEquals
 import kotlin.test.assertNotNull
 import kotlin.test.assertTrue
 
-@OptIn(ExperimentalCoroutinesApi::class, ExperimentalComposeApi::class)
+@OptIn(ExperimentalCoroutinesApi::class)
 class RecomposerTests {
 
     @Test

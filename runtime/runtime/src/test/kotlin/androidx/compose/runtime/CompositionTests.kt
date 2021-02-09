@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-@file:OptIn(ExperimentalComposeApi::class, InternalComposeApi::class)
+@file:OptIn(InternalComposeApi::class)
 package androidx.compose.runtime
 
 import androidx.compose.runtime.mock.Contact
@@ -54,7 +54,7 @@ import kotlin.test.assertTrue
 fun Container(content: @Composable () -> Unit) = content()
 
 @Stable
-@OptIn(ExperimentalComposeApi::class, InternalComposeApi::class)
+@OptIn(InternalComposeApi::class)
 @Suppress("unused")
 class CompositionTests {
     @Test
@@ -2803,7 +2803,7 @@ class CompositionTests {
     }
 }
 
-@OptIn(InternalComposeApi::class, ExperimentalComposeApi::class)
+@OptIn(InternalComposeApi::class)
 @Composable
 internal fun TestSubcomposition(
     content: @Composable () -> Unit
@@ -2836,7 +2836,6 @@ fun testDeferredSubcomposition(block: @Composable () -> Unit): () -> Unit {
     val ref = Ref<CompositionContext>()
     NarrowInvalidateForReference(ref = ref)
     return {
-        @OptIn(ExperimentalComposeApi::class)
         Composition(
             ViewApplier(container),
             ref.value
@@ -2914,7 +2913,6 @@ private interface Named {
     val name: String
 }
 
-@OptIn(ExperimentalComposeApi::class)
 private class EmptyApplier : Applier<Unit> {
     override val current: Unit = Unit
     override fun down(node: Unit) {}

@@ -334,7 +334,6 @@ fun <K, V> mutableStateMapOf(vararg pairs: Pair<K, V>) =
 fun <K, V> Iterable<Pair<K, V>>.toMutableStateMap() =
     SnapshotStateMap<K, V>().also { it.putAll(this.toMap()) }
 
-@OptIn(ExperimentalComposeApi::class)
 private class DerivedSnapshotState<T>(private val calculation: () -> T) : StateObject, State<T> {
     private var first: ResultRecord<T> = ResultRecord()
     private class ResultRecord<T> : StateRecord() {

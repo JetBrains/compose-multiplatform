@@ -94,10 +94,7 @@ interface RecomposerInfo {
 // if 'internal' is not explicitly specified - b/171342041
 // NotCloseable suppressed because this is Kotlin-only common code; [Auto]Closeable not available.
 @Suppress("RedundantVisibilityModifier", "NotCloseable")
-@OptIn(
-    ExperimentalComposeApi::class,
-    InternalComposeApi::class
-)
+@OptIn(InternalComposeApi::class)
 class Recomposer(
     effectCoroutineContext: CoroutineContext
 ) : CompositionContext() {

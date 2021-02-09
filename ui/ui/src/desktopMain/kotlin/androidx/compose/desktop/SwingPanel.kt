@@ -17,7 +17,6 @@ package androidx.compose.desktop
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
-import androidx.compose.runtime.ExperimentalComposeApi
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.snapshots.SnapshotStateObserver
@@ -116,7 +115,6 @@ private class ComponentInfo<T : Component> {
     lateinit var updater: Updater<T>
 }
 
-@OptIn(ExperimentalComposeApi::class)
 private class Updater<T : Component>(
     private val component: T,
     update: (T) -> Unit

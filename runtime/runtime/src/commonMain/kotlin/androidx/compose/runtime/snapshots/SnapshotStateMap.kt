@@ -14,11 +14,8 @@
  * limitations under the License.
  */
 
-@file:OptIn(ExperimentalComposeApi::class)
-
 package androidx.compose.runtime.snapshots
 
-import androidx.compose.runtime.ExperimentalComposeApi
 import androidx.compose.runtime.Stable
 import kotlinx.collections.immutable.PersistentMap
 import kotlinx.collections.immutable.persistentHashMapOf
@@ -94,7 +91,6 @@ class SnapshotStateMap<K, V> : MutableMap<K, V>, StateObject {
 
     private inline fun <R> withCurrent(block: StateMapStateRecord<K, V>.() -> R): R =
         @Suppress("UNCHECKED_CAST")
-        @OptIn(ExperimentalComposeApi::class)
         (firstStateRecord as StateMapStateRecord<K, V>).withCurrent(block)
 
     private inline fun <R> writable(block: StateMapStateRecord<K, V>.() -> R): R =

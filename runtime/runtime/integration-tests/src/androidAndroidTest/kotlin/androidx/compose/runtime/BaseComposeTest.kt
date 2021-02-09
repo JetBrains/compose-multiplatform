@@ -68,7 +68,6 @@ internal fun Activity.uiThread(block: () -> Unit) {
 
 internal fun ComponentActivity.show(block: @Composable () -> Unit) {
     uiThread {
-        @OptIn(ExperimentalComposeApi::class)
         Snapshot.sendApplyNotifications()
         setContent(content = block)
     }

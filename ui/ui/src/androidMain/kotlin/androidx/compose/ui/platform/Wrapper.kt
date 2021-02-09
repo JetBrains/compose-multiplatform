@@ -24,7 +24,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Composition
 import androidx.compose.runtime.CompositionContext
 import androidx.compose.runtime.tooling.CompositionData
-import androidx.compose.runtime.ExperimentalComposeApi
 import androidx.compose.runtime.InternalComposeApi
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.CompositionLocalProvider
@@ -46,7 +45,6 @@ private val TAG = "Wrapper"
 // nextFrame() inside recompose() doesn't really start a new frame, but a new subframe
 // instead.
 @MainThread
-@OptIn(ExperimentalComposeApi::class)
 internal actual fun createSubcomposition(
     container: LayoutNode,
     parent: CompositionContext

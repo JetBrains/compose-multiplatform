@@ -30,7 +30,6 @@ import android.view.ViewGroup
 import android.widget.ImageView
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import androidx.compose.runtime.ExperimentalComposeApi
 import androidx.compose.runtime.MonotonicFrameClock
 import androidx.compose.runtime.Recomposer
 import androidx.compose.runtime.snapshots.Snapshot
@@ -132,7 +131,6 @@ internal class AndroidComposeTestCaseRunner<T : ComposeTestCase>(
 
         activity.setContent(recomposer) { testCase!!.Content() }
         view = findViewRootForTest(activity)!!.view
-        @OptIn(ExperimentalComposeApi::class)
         Snapshot.notifyObjectsInitialized()
         simulationState = SimulationState.EmitContentDone
     }
@@ -140,7 +138,6 @@ internal class AndroidComposeTestCaseRunner<T : ComposeTestCase>(
     // TODO: This method may advance the global snapshot and should be just a getter
     override fun hasPendingChanges(): Boolean {
         if (recomposer.hasPendingWork || hasPendingChangesInFrame()) {
-            @OptIn(ExperimentalComposeApi::class)
             Snapshot.sendApplyNotifications()
         }
 
@@ -154,7 +151,6 @@ internal class AndroidComposeTestCaseRunner<T : ComposeTestCase>(
      * need to recompose.
      */
     private fun hasPendingChangesInFrame(): Boolean {
-        @OptIn(ExperimentalComposeApi::class)
         return Snapshot.current.hasPendingChanges()
     }
 

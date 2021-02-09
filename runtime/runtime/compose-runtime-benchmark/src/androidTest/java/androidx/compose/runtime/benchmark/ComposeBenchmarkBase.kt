@@ -22,7 +22,6 @@ import androidx.benchmark.junit4.BenchmarkRule
 import androidx.benchmark.junit4.measureRepeated
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.ControlledComposition
-import androidx.compose.runtime.ExperimentalComposeApi
 import androidx.compose.runtime.InternalComposeApi
 import androidx.compose.runtime.Recomposer
 import androidx.compose.runtime.currentComposer
@@ -41,7 +40,7 @@ import org.junit.Rule
 import kotlin.coroutines.CoroutineContext
 import kotlin.coroutines.EmptyCoroutineContext
 
-@OptIn(ExperimentalComposeApi::class, InternalComposeApi::class)
+@OptIn(InternalComposeApi::class)
 abstract class ComposeBenchmarkBase {
     @get:Rule
     val benchmarkRule = BenchmarkRule()

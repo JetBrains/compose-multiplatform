@@ -33,7 +33,6 @@ import android.view.autofill.AutofillValue
 import android.view.inputmethod.EditorInfo
 import android.view.inputmethod.InputConnection
 import androidx.annotation.RequiresApi
-import androidx.compose.runtime.ExperimentalComposeApi
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
@@ -105,10 +104,7 @@ import java.lang.reflect.Method
 import android.view.KeyEvent as AndroidKeyEvent
 
 @SuppressLint("ViewConstructor", "VisibleForTests")
-@OptIn(
-    ExperimentalComposeApi::class,
-    ExperimentalComposeUiApi::class,
-)
+@OptIn(ExperimentalComposeUiApi::class)
 @RequiresApi(Build.VERSION_CODES.LOLLIPOP)
 internal class AndroidComposeView(context: Context) :
     ViewGroup(context), Owner, ViewRootForTest {

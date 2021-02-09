@@ -38,7 +38,6 @@ import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.ExperimentalComposeApi
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.Stable
 import androidx.compose.runtime.State
@@ -2385,7 +2384,6 @@ class AndroidLayoutDrawTest {
                     val firstPlaceable = first.measure(constraints)
                     // switch frame, as inside the measure block we changed the model value
                     // this will trigger requestRemeasure on this first layout
-                    @OptIn(ExperimentalComposeApi::class)
                     Snapshot.sendApplyNotifications()
                     val secondPlaceable = second.measure(constraints)
                     layout(30, 30) {

@@ -21,7 +21,6 @@ import androidx.compose.runtime.AbstractApplier
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Composition
 import androidx.compose.runtime.CompositionContext
-import androidx.compose.runtime.ExperimentalComposeApi
 import androidx.compose.runtime.ComposeNode
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -29,7 +28,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 
 @Suppress("unused")
-@OptIn(ExperimentalComposeApi::class)
 @Sampled
 fun CustomTreeComposition() {
     // Provided we have a tree with a node base type like the following

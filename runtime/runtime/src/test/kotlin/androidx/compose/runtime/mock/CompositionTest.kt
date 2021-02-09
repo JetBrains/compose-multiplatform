@@ -18,7 +18,6 @@ package androidx.compose.runtime.mock
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Composition
-import androidx.compose.runtime.ExperimentalComposeApi
 import androidx.compose.runtime.InternalComposeApi
 import androidx.compose.runtime.Recomposer
 import androidx.compose.runtime.snapshots.Snapshot
@@ -30,7 +29,7 @@ import kotlinx.coroutines.withContext
 import kotlin.test.assertFalse
 import kotlin.test.assertTrue
 
-@OptIn(ExperimentalComposeApi::class, InternalComposeApi::class, ExperimentalCoroutinesApi::class)
+@OptIn(InternalComposeApi::class, ExperimentalCoroutinesApi::class)
 fun compositionTest(block: suspend CompositionTestScope.() -> Unit) = runBlockingTest {
     withContext(TestMonotonicFrameClock(this)) {
         // Start the recomposer

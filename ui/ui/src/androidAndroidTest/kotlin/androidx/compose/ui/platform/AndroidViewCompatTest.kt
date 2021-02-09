@@ -33,7 +33,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Applier
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.ComposeNode
-import androidx.compose.runtime.ExperimentalComposeApi
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -495,7 +494,6 @@ class AndroidViewCompatTest {
     }
 
     @Test
-    @OptIn(ExperimentalComposeApi::class)
     fun testComposeInsideView_attachingAndDetaching() {
         var composeContent by mutableStateOf(true)
         var node: LayoutNode? = null
