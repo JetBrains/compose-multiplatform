@@ -24,18 +24,8 @@ import androidx.compose.ui.text.input.ImeAction
 
 /**
  * Clears the text in this node in similar way to IME.
- *
- * Note performing this operation requires to get a focus.
- *
- * @param alreadyHasFocus Whether the node already has a focus and thus does not need to be
- * clicked on.
  */
-fun SemanticsNodeInteraction.performTextClearance(alreadyHasFocus: Boolean = false) {
-    if (!alreadyHasFocus) {
-        performClick()
-    }
-    // TODO: There should be some assertion on focus in the future.
-
+fun SemanticsNodeInteraction.performTextClearance() {
     sendTextInputCommand(listOf(DeleteAllCommand()))
 }
 
@@ -43,15 +33,8 @@ fun SemanticsNodeInteraction.performTextClearance(alreadyHasFocus: Boolean = fal
  * Sends the given text to this node in similar way to IME.
  *
  * @param text Text to send.
- * @param alreadyHasFocus Whether the node already has a focus and thus does not need to be
- * clicked on.
  */
-fun SemanticsNodeInteraction.performTextInput(text: String, alreadyHasFocus: Boolean = false) {
-    if (!alreadyHasFocus) {
-        performClick()
-    }
-    // TODO: There should be some assertion on focus in the future.
-
+fun SemanticsNodeInteraction.performTextInput(text: String) {
     sendTextInputCommand(listOf(CommitTextCommand(text, 1)))
 }
 
@@ -61,19 +44,8 @@ fun SemanticsNodeInteraction.performTextInput(text: String, alreadyHasFocus: Boo
  * This does not reflect text selection. All the text gets cleared out and new inserted.
  *
  * @param text Text to send.
- * @param alreadyHasFocus Whether the node already has a focus and thus does not need to be
- * clicked on.
  */
-fun SemanticsNodeInteraction.performTextReplacement(
-    text: String,
-    alreadyHasFocus: Boolean = false
-) {
-    if (!alreadyHasFocus) {
-        performClick()
-    }
-
-    // TODO: There should be some assertion on focus in the future.
-
+fun SemanticsNodeInteraction.performTextReplacement(text: String) {
     sendTextInputCommand(listOf(DeleteAllCommand(), CommitTextCommand(text, 1)))
 }
 
@@ -82,18 +54,11 @@ fun SemanticsNodeInteraction.performTextReplacement(
  *
  * The node needs to define its IME action in semantics.
  *
- * @param alreadyHasFocus Whether the node already has a focus and thus does not need to be
- * clicked on.
- *
  * @throws AssertionError if the node does not support input or does not define IME action.
  * @throws IllegalStateException if tne node did not establish input connection (e.g. is not
  * focused)
  */
-fun SemanticsNodeInteraction.performImeAction(alreadyHasFocus: Boolean = false) {
-    if (!alreadyHasFocus) {
-        performClick()
-    }
-
+fun SemanticsNodeInteraction.performImeAction() {
     val errorOnFail = "Failed to perform IME action."
     val node = fetchSemanticsNode(errorOnFail)
 
@@ -110,6 +75,11 @@ fun SemanticsNodeInteraction.performImeAction(alreadyHasFocus: Boolean = false) 
         )
     }
 
+    if (!isFocused().matches(node)) {
+        // Get focus
+        performClick()
+    }
+
     @OptIn(InternalTestApi::class)
     testContext.testOwner.sendImeAction(node, actionSpecified)
 }
@@ -118,6 +88,11 @@ internal fun SemanticsNodeInteraction.sendTextInputCommand(command: List<EditCom
     val errorOnFail = "Failed to perform text input."
     val node = fetchSemanticsNode(errorOnFail)
     assert(hasSetTextAction()) { errorOnFail }
+
+    if (!isFocused().matches(node)) {
+        // Get focus
+        performClick()
+    }
 
     @OptIn(InternalTestApi::class)
     testContext.testOwner.sendTextInputCommand(node, command)

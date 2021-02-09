@@ -668,7 +668,7 @@ class TextFieldTest {
         }
 
         rule.onNodeWithTag(Tag)
-            .performTextClearance(true)
+            .performTextClearance()
 
         rule.runOnIdle {
             assertThat(lastSeenText).isEqualTo("")

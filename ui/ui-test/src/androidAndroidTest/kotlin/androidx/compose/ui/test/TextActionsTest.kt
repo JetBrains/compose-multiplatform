@@ -23,7 +23,6 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.testutils.expectError
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.test.junit4.createComposeRule
@@ -83,7 +82,7 @@ class TextActionsTest {
         }
 
         rule.onNodeWithTag(fieldTag)
-            .performTextClearance(alreadyHasFocus = true)
+            .performTextClearance()
 
         rule.runOnIdle {
             assertThat(lastSeenText).isEqualTo("")
@@ -103,7 +102,7 @@ class TextActionsTest {
             .performTextInput("Hello ")
 
         rule.onNodeWithTag(fieldTag)
-            .performTextInput("world!", alreadyHasFocus = true)
+            .performTextInput("world!")
 
         rule.runOnIdle {
             assertThat(lastSeenText).isEqualTo("Hello world!")
@@ -126,22 +125,10 @@ class TextActionsTest {
         // Thread.sleep(3000)
 
         rule.onNodeWithTag(fieldTag)
-            .performTextInput(" world!", alreadyHasFocus = true)
+            .performTextInput(" world!")
 
         rule.runOnIdle {
             assertThat(lastSeenText).isEqualTo("Hello world!")
-        }
-    }
-
-    @Test
-    fun sendText_noFocus_fail() {
-        rule.setContent {
-            TextFieldUi()
-        }
-
-        expectError<IllegalStateException> {
-            rule.onNodeWithTag(fieldTag)
-                .performTextInput("Hello!", alreadyHasFocus = true)
         }
     }
 
@@ -162,7 +149,7 @@ class TextActionsTest {
         }
 
         rule.onNodeWithTag(fieldTag)
-            .performTextReplacement("world", alreadyHasFocus = true)
+            .performTextReplacement("world")
 
         rule.runOnIdle {
             assertThat(lastSeenText).isEqualTo("world")

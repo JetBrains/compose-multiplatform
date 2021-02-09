@@ -263,7 +263,7 @@ class TextFieldCursorTest {
 
         // change text field value
         rule.onNode(hasSetTextAction())
-            .performTextReplacement("", true)
+            .performTextReplacement("")
 
         // cursor would have been invisible during next 500 ms if cursor blinks while typing.
         // To prevent blinking while typing we restart animation when new symbol is typed.
