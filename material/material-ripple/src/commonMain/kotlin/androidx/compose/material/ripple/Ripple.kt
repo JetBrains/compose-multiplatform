@@ -75,7 +75,6 @@ import kotlinx.coroutines.launch
  * used will be [RippleTheme.defaultColor] instead.
  */
 @Composable
-@OptIn(ExperimentalRippleApi::class)
 public fun rememberRipple(
     bounded: Boolean = true,
     radius: Dp = Dp.Unspecified,
@@ -105,7 +104,6 @@ public fun rememberRipple(
  * parameters from the default, such as to create an unbounded ripple with a fixed size.
  */
 @Stable
-@ExperimentalRippleApi
 private class Ripple(
     private val bounded: Boolean,
     private val radius: Dp,
@@ -149,7 +147,6 @@ private class Ripple(
     }
 }
 
-@ExperimentalRippleApi
 private class RippleIndicationInstance constructor(
     private val interactionState: InteractionState,
     private val bounded: Boolean,
@@ -212,7 +209,7 @@ private class RippleIndicationInstance constructor(
     private fun DrawScope.drawRipples(color: Color) {
         ripples.fastForEach {
             with(it) {
-                val alpha = rippleAlpha.alphaForInteraction(Interaction.Pressed)
+                val alpha = rippleAlpha.pressedAlpha
                 if (alpha != 0f) {
                     draw(color.copy(alpha = alpha))
                 }
@@ -266,7 +263,6 @@ private class RippleIndicationInstance constructor(
  * @see IncomingStateLayerAnimationSpecs
  * @see OutgoingStateLayerAnimationSpecs
  */
-@ExperimentalRippleApi
 private class StateLayer(
     private val bounded: Boolean,
     private val rippleAlpha: RippleAlpha,
@@ -296,8 +292,11 @@ private class StateLayer(
             // Move to the next interaction if this interaction is not a new interaction
             if (interaction in previousInteractions) continue
 
+            val targetAlpha = when (interaction) {
+                Interaction.Dragged -> rippleAlpha.draggedAlpha
+                else -> 0f
+            }
             // Move to the next interaction if this is not an interaction we show a state layer for
-            val targetAlpha = rippleAlpha.alphaForInteraction(interaction)
             if (targetAlpha == 0f) continue
 
             // TODO: consider defaults - these will be used for a custom Interaction that we are
