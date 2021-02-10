@@ -27,7 +27,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.ripple.ExperimentalRippleApi
 import androidx.compose.material.ripple.LocalRippleTheme
 import androidx.compose.material.ripple.RippleAlpha
 import androidx.compose.material.ripple.RippleTheme
@@ -68,7 +67,7 @@ import org.junit.runner.RunWith
 @LargeTest
 @RunWith(AndroidJUnit4::class)
 @SdkSuppress(minSdkVersion = Build.VERSION_CODES.O)
-@OptIn(ExperimentalMaterialApi::class, ExperimentalTestApi::class, ExperimentalRippleApi::class)
+@OptIn(ExperimentalMaterialApi::class, ExperimentalTestApi::class)
 class MaterialRippleThemeTest {
 
     @get:Rule
@@ -425,7 +424,7 @@ class MaterialRippleThemeTest {
 
         val rippleColor = Color.Red
         val expectedAlpha = 0.5f
-        val rippleAlpha = RippleAlpha { expectedAlpha }
+        val rippleAlpha = RippleAlpha(expectedAlpha, expectedAlpha, expectedAlpha, expectedAlpha)
 
         val rippleTheme = object : RippleTheme {
             @Composable
@@ -468,7 +467,7 @@ class MaterialRippleThemeTest {
 
         val rippleColor = Color.Red
         val expectedAlpha = 0.5f
-        val rippleAlpha = RippleAlpha { 0.5f }
+        val rippleAlpha = RippleAlpha(expectedAlpha, expectedAlpha, expectedAlpha, expectedAlpha)
 
         val rippleTheme = object : RippleTheme {
             @Composable
@@ -507,7 +506,7 @@ class MaterialRippleThemeTest {
         val interactionState = InteractionState()
 
         fun createRippleTheme(color: Color, alpha: Float) = object : RippleTheme {
-            val rippleAlpha = RippleAlpha { alpha }
+            val rippleAlpha = RippleAlpha(alpha, alpha, alpha, alpha)
             @Composable
             override fun defaultColor() = color
 
@@ -573,7 +572,7 @@ class MaterialRippleThemeTest {
         val interactionState = InteractionState()
 
         val alpha = 0.5f
-        val rippleAlpha = RippleAlpha { 0.5f }
+        val rippleAlpha = RippleAlpha(alpha, alpha, alpha, alpha)
         val expectedRippleColor = Color.Red
 
         val theme = object : RippleTheme {
