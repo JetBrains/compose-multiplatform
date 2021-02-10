@@ -51,6 +51,7 @@ import androidx.compose.ui.test.getUnclippedBoundsInRoot
 import androidx.compose.ui.test.isSelectable
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
+import androidx.compose.ui.test.onParent
 import androidx.compose.ui.test.performClick
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.height
@@ -89,7 +90,7 @@ class TabTest {
     @Test
     fun defaultSemantics() {
         rule.setMaterialContent {
-            Box {
+            TabRow(0) {
                 Tab(
                     text = { Text("Text") },
                     modifier = Modifier.testTag("tab"),
@@ -104,6 +105,10 @@ class TabTest {
             .assertIsSelected()
             .assertIsEnabled()
             .assertHasClickAction()
+
+        rule.onNodeWithTag("tab")
+            .onParent()
+            .assert(SemanticsMatcher.keyIsDefined(SemanticsProperties.SelectableGroup))
     }
 
     @Test
@@ -198,7 +203,7 @@ class TabTest {
 
         val tabRowBounds = rule.onNodeWithTag("tabRow").getUnclippedBoundsInRoot()
 
-        rule.onNodeWithTag("indicator")
+        rule.onNodeWithTag("indicator", true)
             .assertPositionInRootIsEqualTo(
                 expectedLeft = 0.dp,
                 expectedTop = tabRowBounds.height - indicatorHeight
@@ -209,7 +214,7 @@ class TabTest {
 
         // Indicator should now be placed in the bottom left of the second tab, so its x coordinate
         // should be in the middle of the TabRow
-        rule.onNodeWithTag("indicator")
+        rule.onNodeWithTag("indicator", true)
             .assertPositionInRootIsEqualTo(
                 expectedLeft = (tabRowBounds.width / 2),
                 expectedTop = tabRowBounds.height - indicatorHeight
@@ -375,7 +380,7 @@ class TabTest {
         val tabRowBounds = rule.onNodeWithTag("tabRow").getUnclippedBoundsInRoot()
 
         // Indicator should be placed in the bottom left of the first tab
-        rule.onNodeWithTag("indicator")
+        rule.onNodeWithTag("indicator", true)
             .assertPositionInRootIsEqualTo(
                 // Tabs in a scrollable tab row are offset 52.dp from each end
                 expectedLeft = TabRowDefaults.ScrollableTabRowPadding,
@@ -387,7 +392,7 @@ class TabTest {
 
         // Indicator should now be placed in the bottom left of the second tab, so its x coordinate
         // should be in the middle of the TabRow
-        rule.onNodeWithTag("indicator")
+        rule.onNodeWithTag("indicator", true)
             .assertPositionInRootIsEqualTo(
                 expectedLeft = TabRowDefaults.ScrollableTabRowPadding + minimumTabWidth,
                 expectedTop = tabRowBounds.height - indicatorHeight

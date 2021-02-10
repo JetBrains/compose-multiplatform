@@ -410,6 +410,10 @@ package androidx.compose.foundation.legacygestures {
 
 package androidx.compose.foundation.selection {
 
+  public final class SelectableGroupKt {
+    method public static androidx.compose.ui.Modifier selectableGroup(androidx.compose.ui.Modifier);
+  }
+
   public final class SelectableKt {
     method public static androidx.compose.ui.Modifier selectable(androidx.compose.ui.Modifier, boolean selected, optional boolean enabled, optional androidx.compose.ui.semantics.Role? role, kotlin.jvm.functions.Function0<kotlin.Unit> onClick);
     method public static androidx.compose.ui.Modifier selectable(androidx.compose.ui.Modifier, boolean selected, androidx.compose.foundation.InteractionState interactionState, androidx.compose.foundation.Indication? indication, optional boolean enabled, optional androidx.compose.ui.semantics.Role? role, kotlin.jvm.functions.Function0<kotlin.Unit> onClick);

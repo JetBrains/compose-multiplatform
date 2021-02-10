@@ -2493,6 +2493,7 @@ package androidx.compose.ui.semantics {
     method public androidx.compose.ui.semantics.SemanticsPropertyKey<kotlin.Unit> getPassword();
     method public androidx.compose.ui.semantics.SemanticsPropertyKey<androidx.compose.ui.semantics.ProgressBarRangeInfo> getProgressBarRangeInfo();
     method public androidx.compose.ui.semantics.SemanticsPropertyKey<androidx.compose.ui.semantics.Role> getRole();
+    method public androidx.compose.ui.semantics.SemanticsPropertyKey<kotlin.Unit> getSelectableGroup();
     method public androidx.compose.ui.semantics.SemanticsPropertyKey<java.lang.Boolean> getSelected();
     method public androidx.compose.ui.semantics.SemanticsPropertyKey<java.lang.String> getStateDescription();
     method public androidx.compose.ui.semantics.SemanticsPropertyKey<java.lang.String> getTestTag();
@@ -2514,6 +2515,7 @@ package androidx.compose.ui.semantics {
     property public final androidx.compose.ui.semantics.SemanticsPropertyKey<kotlin.Unit> Password;
     property public final androidx.compose.ui.semantics.SemanticsPropertyKey<androidx.compose.ui.semantics.ProgressBarRangeInfo> ProgressBarRangeInfo;
     property public final androidx.compose.ui.semantics.SemanticsPropertyKey<androidx.compose.ui.semantics.Role> Role;
+    property public final androidx.compose.ui.semantics.SemanticsPropertyKey<kotlin.Unit> SelectableGroup;
     property public final androidx.compose.ui.semantics.SemanticsPropertyKey<java.lang.Boolean> Selected;
     property public final androidx.compose.ui.semantics.SemanticsPropertyKey<java.lang.String> StateDescription;
     property public final androidx.compose.ui.semantics.SemanticsPropertyKey<java.lang.String> TestTag;
@@ -2557,6 +2559,7 @@ package androidx.compose.ui.semantics {
     method public static void pasteText(androidx.compose.ui.semantics.SemanticsPropertyReceiver, optional String? label, kotlin.jvm.functions.Function0<java.lang.Boolean>? action);
     method public static void popup(androidx.compose.ui.semantics.SemanticsPropertyReceiver);
     method public static void scrollBy(androidx.compose.ui.semantics.SemanticsPropertyReceiver, optional String? label, kotlin.jvm.functions.Function2<? super java.lang.Float,? super java.lang.Float,java.lang.Boolean>? action);
+    method public static void selectableGroup(androidx.compose.ui.semantics.SemanticsPropertyReceiver);
     method public static void setContentDescription(androidx.compose.ui.semantics.SemanticsPropertyReceiver, String p);
     method public static void setCustomActions(androidx.compose.ui.semantics.SemanticsPropertyReceiver, java.util.List<androidx.compose.ui.semantics.CustomAccessibilityAction> p);
     method public static void setEditableText(androidx.compose.ui.semantics.SemanticsPropertyReceiver, androidx.compose.ui.text.AnnotatedString p);
