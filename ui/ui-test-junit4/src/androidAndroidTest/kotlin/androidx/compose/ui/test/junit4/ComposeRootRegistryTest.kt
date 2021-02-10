@@ -20,7 +20,6 @@ import android.app.Activity
 import android.view.View
 import android.view.ViewGroup
 import androidx.activity.ComponentActivity
-import androidx.activity.compose.setContent
 import androidx.compose.ui.platform.ViewRootForTest
 import androidx.compose.ui.test.junit4.android.ComposeRootRegistry
 import androidx.test.ext.junit.rules.ActivityScenarioRule
