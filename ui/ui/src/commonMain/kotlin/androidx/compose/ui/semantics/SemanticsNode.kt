@@ -134,8 +134,8 @@ class SemanticsNode internal constructor(
      * Returns the position of an [alignment line][AlignmentLine], or [AlignmentLine.Unspecified]
      * if the line is not provided.
      */
-    fun getAlignmentLinePosition(line: AlignmentLine): Int {
-        return this.layoutNode.coordinates[line]
+    fun getAlignmentLinePosition(alignmentLine: AlignmentLine): Int {
+        return this.layoutNode.coordinates[alignmentLine]
     }
 
     // CHILDREN

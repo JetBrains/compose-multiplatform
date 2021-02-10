@@ -1620,7 +1620,7 @@ package androidx.compose.ui.layout {
   public interface LayoutCoordinates {
     method @Deprecated public androidx.compose.ui.geometry.Rect childBoundingBox(androidx.compose.ui.layout.LayoutCoordinates child);
     method @Deprecated public long childToLocal-YJiYy8w(androidx.compose.ui.layout.LayoutCoordinates child, long childLocal);
-    method public operator int get(androidx.compose.ui.layout.AlignmentLine line);
+    method public operator int get(androidx.compose.ui.layout.AlignmentLine alignmentLine);
     method public androidx.compose.ui.layout.LayoutCoordinates? getParentCoordinates();
     method public androidx.compose.ui.layout.LayoutCoordinates? getParentLayoutCoordinates();
     method public java.util.Set<androidx.compose.ui.layout.AlignmentLine> getProvidedAlignmentLines();
@@ -1721,16 +1721,12 @@ package androidx.compose.ui.layout {
   public final class MeasureScopeKt {
   }
 
-  public final inline class Measured {
-    ctor public Measured();
-    method public static androidx.compose.ui.layout.Placeable! constructor-impl(androidx.compose.ui.layout.Placeable placeable);
-    method public static inline boolean equals-impl(androidx.compose.ui.layout.Placeable! p, Object? p1);
-    method public static boolean equals-impl0(androidx.compose.ui.layout.Placeable p1, androidx.compose.ui.layout.Placeable p2);
-    method public static operator int get-impl(androidx.compose.ui.layout.Placeable $this, androidx.compose.ui.layout.AlignmentLine alignmentLine);
-    method public static int getHeight-impl(androidx.compose.ui.layout.Placeable! $this);
-    method public static int getWidth-impl(androidx.compose.ui.layout.Placeable! $this);
-    method public static inline int hashCode-impl(androidx.compose.ui.layout.Placeable! p);
-    method public static inline String! toString-impl(androidx.compose.ui.layout.Placeable! p);
+  public interface Measured {
+    method public operator int get(androidx.compose.ui.layout.AlignmentLine alignmentLine);
+    method public int getMeasuredHeight();
+    method public int getMeasuredWidth();
+    property public abstract int measuredHeight;
+    property public abstract int measuredWidth;
   }
 
   public final class ModifierInfo {
@@ -1763,12 +1759,13 @@ package androidx.compose.ui.layout {
     method public Object? modifyParentData(androidx.compose.ui.unit.Density, Object? parentData);
   }
 
-  public abstract class Placeable {
+  public abstract class Placeable implements androidx.compose.ui.layout.Measured {
     ctor public Placeable();
-    method public abstract operator int get(androidx.compose.ui.layout.AlignmentLine line);
     method protected final long getApparentToRealOffset-nOcc-ac();
     method public final int getHeight();
+    method public int getMeasuredHeight();
     method protected final long getMeasuredSize-YbymL2g();
+    method public int getMeasuredWidth();
     method protected final long getMeasurementConstraints-msEJaDk();
     method public final int getWidth();
     method protected abstract void placeAt-rMeLuDI(long position, float zIndex, kotlin.jvm.functions.Function1<? super androidx.compose.ui.graphics.GraphicsLayerScope,kotlin.Unit>? layerBlock);
@@ -1776,7 +1773,9 @@ package androidx.compose.ui.layout {
     method protected final void setMeasurementConstraints-BRTryo0(long p);
     property protected final long apparentToRealOffset;
     property public final int height;
+    property public int measuredHeight;
     property protected final long measuredSize;
+    property public int measuredWidth;
     property protected final long measurementConstraints;
     property public final int width;
   }
@@ -2357,7 +2356,7 @@ package androidx.compose.ui.semantics {
   }
 
   public final class SemanticsNode {
-    method public int getAlignmentLinePosition(androidx.compose.ui.layout.AlignmentLine line);
+    method public int getAlignmentLinePosition(androidx.compose.ui.layout.AlignmentLine alignmentLine);
     method public androidx.compose.ui.geometry.Rect getBoundsInRoot();
     method public java.util.List<androidx.compose.ui.semantics.SemanticsNode> getChildren();
     method public androidx.compose.ui.semantics.SemanticsConfiguration getConfig();

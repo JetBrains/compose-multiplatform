@@ -285,7 +285,7 @@ private class FixedSizeIntrinsicsPlaceable(width: Int, height: Int) : Placeable(
         measuredSize = IntSize(width, height)
     }
 
-    override fun get(line: AlignmentLine): Int = AlignmentLine.Unspecified
+    override fun get(alignmentLine: AlignmentLine): Int = AlignmentLine.Unspecified
     override fun placeAt(
         position: IntOffset,
         zIndex: Float,

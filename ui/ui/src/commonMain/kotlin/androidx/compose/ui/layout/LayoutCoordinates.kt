@@ -127,7 +127,7 @@ interface LayoutCoordinates {
      * Returns the position in pixels of an [alignment line][AlignmentLine],
      * or [AlignmentLine.Unspecified] if the line is not provided.
      */
-    operator fun get(line: AlignmentLine): Int
+    operator fun get(alignmentLine: AlignmentLine): Int
 }
 
 /**

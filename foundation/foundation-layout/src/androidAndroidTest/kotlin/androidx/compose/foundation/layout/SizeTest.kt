@@ -26,6 +26,7 @@ import androidx.compose.ui.layout.LayoutCoordinates
 import androidx.compose.ui.node.Ref
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.layout.positionInParent
+import androidx.compose.ui.layout.positionInRoot
 import androidx.compose.ui.platform.InspectableValue
 import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.platform.ValueElement
@@ -396,6 +397,41 @@ class SizeTest : LayoutTest() {
                     .requiredSize(sizeDp)
                     .saveLayoutInfo(boxSize, boxPosition, positionedLatch)
             )
+        }
+        assertTrue(positionedLatch.await(1, TimeUnit.SECONDS))
+
+        assertEquals(IntSize(sizeIpx, sizeIpx), boxSize.value)
+        assertEquals(
+            Offset(
+                (sizeIpx / 2).toFloat(),
+                (sizeIpx / 2).toFloat()
+            ),
+            boxPosition.value
+        )
+    }
+
+    @Test
+    fun testSize_smallerBoxInLargerBox() = with(density) {
+        val sizeIpx = 64
+        val sizeDp = sizeIpx.toDp()
+
+        val positionedLatch = CountDownLatch(1)
+        val boxSize = Ref<IntSize>()
+        val boxPosition = Ref<Offset>()
+        show {
+            Box(
+                Modifier.wrapContentSize(Alignment.TopStart).requiredSize(sizeDp * 2),
+                propagateMinConstraints = true
+            ) {
+                Box(
+                    Modifier.requiredSize(sizeDp)
+                        .onGloballyPositioned {
+                            boxSize.value = it.size
+                            boxPosition.value = it.positionInRoot()
+                            positionedLatch.countDown()
+                        }
+                )
+            }
         }
         assertTrue(positionedLatch.await(1, TimeUnit.SECONDS))
 
