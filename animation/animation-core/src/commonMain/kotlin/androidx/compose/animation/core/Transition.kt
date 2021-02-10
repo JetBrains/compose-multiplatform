@@ -25,11 +25,11 @@ import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.State
 import androidx.compose.runtime.collection.mutableVectorOf
-import androidx.compose.runtime.withFrameNanos
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.runtime.withFrameNanos
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Rect
 import androidx.compose.ui.geometry.Size
@@ -47,13 +47,18 @@ import kotlin.math.max
  *
  * [label] is used to differentiate different transitions in Android Studio.
  *
+ * __Note__: There is another [updateTransition] overload that accepts a [MutableTransitionState].
+ * The difference between the two is that the [MutableTransitionState] variant: 1) supports a
+ * different initial state than target state (This would allow a transition to start as soon as
+ * it enters composition.) 2) can be recreated to intentionally trigger a re-start of the
+ * transition.
+ *
  * @sample androidx.compose.animation.core.samples.GestureAnimationSample
  *
  * @return a [Transition] object, to which animations can be added.
  * @see Transition
- * @see animateFloat
- * @see animateValue
- * @see androidx.compose.animation.animateColor
+ * @see Transition.animateFloat
+ * @see Transition.animateValue
  */
 @Composable
 fun <T> updateTransition(
@@ -103,12 +108,12 @@ class MutableTransitionState<S>(initialState: S) {
  * the provided [transitionState]. Whenever the [targetState][MutableTransitionState.targetState] of
  * the [transitionState] changes, the [Transition] will animate to the new target state.
  *
+ * __Remember__: The provided [transitionState] needs to be [remember]ed.
+ *
  * Compared to the [updateTransition] variant that takes a targetState, this function supports a
  * different initial state than the first targetState. Here is an example:
  *
  * @sample androidx.compose.animation.core.samples.InitialStateSample
- *
- * __Note__: The provided [transitionState] needs to be [remember]ed.
  *
  * In most cases, it is recommended to reuse the same [transitionState] that is [remember]ed, such
  * that [Transition] preserves continuity when [targetState][MutableTransitionState.targetState] is
@@ -131,7 +136,7 @@ fun <T> updateTransition(
 
 /**
  * [Transition] manages all the child animations on a state level. Child animations
- * can be created in a declarative way using [animateFloat], [animateValue],
+ * can be created in a declarative way using [Transition.animateFloat], [Transition.animateValue],
  * [animateColor][androidx.compose.animation.animateColor] etc. When the [targetState] changes,
  * [Transition] will automatically start or adjust course for all its child animations to animate
  * to the new target values defined for each animation.
@@ -144,8 +149,8 @@ fun <T> updateTransition(
  *
  * @return a [Transition] object, to which animations can be added.
  * @see updateTransition
- * @see animateFloat
- * @see animateValue
+ * @see Transition.animateFloat
+ * @see Transition.animateValue
  * @see androidx.compose.animation.animateColor
  */
 // TODO: Support creating Transition outside of composition and support imperative use of Transition
@@ -270,11 +275,16 @@ class Transition<S> internal constructor(
     }
 
     @PublishedApi
-    internal fun addAnimation(animation: TransitionAnimationState<*, *>) =
-        _animations.add(animation)
+    internal fun addAnimation(
+        @Suppress("HiddenTypeParameter")
+        animation: TransitionAnimationState<*, *>
+    ) = _animations.add(animation)
 
     @PublishedApi
-    internal fun removeAnimation(animation: TransitionAnimationState<*, *>) {
+    internal fun removeAnimation(
+        @Suppress("HiddenTypeParameter")
+        animation: TransitionAnimationState<*, *>
+    ) {
         _animations.remove(animation)
     }
 
@@ -343,10 +353,10 @@ class Transition<S> internal constructor(
     }
 
     // TODO: Consider making this public
-    /** Suppress **/
+    /** @suppress **/
     @InternalAnimationApi
-    inner class TransitionAnimationState<T, V : AnimationVector> @PublishedApi internal
-    constructor(
+    inner class TransitionAnimationState<T, V : AnimationVector>
+    @PublishedApi @Suppress("ShowingMemberInHiddenClass") internal constructor(
         initialValue: T,
         initialVelocityVector: V,
         val typeConverter: TwoWayConverter<T, V>,
@@ -354,10 +364,12 @@ class Transition<S> internal constructor(
     ) : State<T> {
 
         // Changed during composition, may rollback
+        @Suppress("ShowingMemberInHiddenClass")
         @PublishedApi
         internal var targetValue: T by mutableStateOf(initialValue)
             internal set
 
+        @Suppress("ShowingMemberInHiddenClass")
         @PublishedApi
         internal var animationSpec: FiniteAnimationSpec<T> by mutableStateOf(spring())
         private var animation: TargetBasedAnimation<T, V> by mutableStateOf(
@@ -411,6 +423,7 @@ class Transition<S> internal constructor(
         }
 
         @PublishedApi
+        @Suppress("ShowingMemberInHiddenClass")
         // This gets called *during* composition
         internal fun updateTargetValue(targetValue: T) {
             if (this.targetValue != targetValue) {
@@ -423,7 +436,7 @@ class Transition<S> internal constructor(
         }
 
         @PublishedApi
-        @Suppress("ControlFlowWithEmptyBody")
+        @Suppress("ControlFlowWithEmptyBody", "ShowingMemberInHiddenClass")
         // This gets called *during* composition
         internal fun updateInitialAndTargetValue(initialValue: T, targetValue: T) {
             this.targetValue = targetValue
@@ -472,7 +485,7 @@ class Transition<S> internal constructor(
  *
  * @return A [State] object, the value of which is updated by animation
  * @see updateTransition
- * @see animateFloat
+ * @see Transition.animateFloat
  * @see androidx.compose.animation.animateColor
  */
 @Composable
@@ -549,7 +562,7 @@ inline fun <S, T, V : AnimationVector> Transition<S>.animateValue(
  *
  * @return A [State] object, the value of which is updated by animation
  * @see updateTransition
- * @see animateValue
+ * @see Transition.animateValue
  * @see androidx.compose.animation.animateColor
  */
 @Composable

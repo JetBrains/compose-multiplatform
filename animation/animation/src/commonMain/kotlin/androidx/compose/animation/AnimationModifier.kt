@@ -21,7 +21,6 @@ import androidx.compose.animation.core.AnimationEndReason
 import androidx.compose.animation.core.AnimationSpec
 import androidx.compose.animation.core.AnimationVector2D
 import androidx.compose.animation.core.FiniteAnimationSpec
-import androidx.compose.animation.core.SpringSpec
 import androidx.compose.animation.core.VectorConverter
 import androidx.compose.animation.core.spring
 import androidx.compose.runtime.remember
@@ -44,9 +43,8 @@ import kotlinx.coroutines.launch
  * is already at the tail of the chain) changes size. This allows the parent modifier to observe
  * a smooth size change, resulting in an overall continuous visual change.
  *
- * An [AnimationSpec] can be optionally specified for the size change animation. By default,
- * [SpringSpec] will be used. Clipping defaults to true, such that the content outside of animated
- * size will not be shown.
+ * A [FiniteAnimationSpec] can be optionally specified for the size change animation. By default,
+ * [spring] will be used.
  *
  * An optional [finishedListener] can be supplied to get notified when the size change animation is
  * finished. Since the content size change can be dynamic in many cases, both initial value and
@@ -57,8 +55,9 @@ import kotlinx.coroutines.launch
  *
  * @sample androidx.compose.animation.samples.AnimateContent
  *
- * @param animationSpec the animation that will be used to animate size change
- * @param finishedListener optional listener to be called when the content change animation is
+ * @param animationSpec a finite animation that will be used to animate size change, [spring] by
+ *                      default
+ * @param finishedListener an optional listener to be called when the content change animation is
  *                         completed.
  */
 fun Modifier.animateContentSize(
