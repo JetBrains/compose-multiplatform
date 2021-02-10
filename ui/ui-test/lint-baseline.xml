@@ -24,22 +24,22 @@
 
     <issue
         id="UnsafeNewApiCall"
-        message="This call is to a method from API 29, the call containing class androidx.compose.ui.test.android.WindowCaptureKt is not annotated with @RequiresApi(x) where x is at least 29. Either annotate the containing class with at least @RequiresApi(29) or move the call to a static method in a wrapper class annotated with at least @RequiresApi(29)."
+        message="This call is to a method from API 29, the call containing class androidx.compose.ui.test.android.WindowCapture_androidKt is not annotated with @RequiresApi(x) where x is at least 29. Either annotate the containing class with at least @RequiresApi(29) or move the call to a static method in a wrapper class annotated with at least @RequiresApi(29)."
         errorLine1="            decorView.viewTreeObserver.registerFrameCommitCallback {"
         errorLine2="                                       ~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
-            file="src/androidMain/kotlin/androidx/compose/ui/test/android/WindowCapture.kt"
+            file="src/androidMain/kotlin/androidx/compose/ui/test/android/WindowCapture.android.kt"
             line="59"
             column="40"/>
     </issue>
 
     <issue
         id="UnsafeNewApiCall"
-        message="This call is to a method from API 26, the call containing class androidx.compose.ui.test.android.WindowCaptureKt is not annotated with @RequiresApi(x) where x is at least 26. Either annotate the containing class with at least @RequiresApi(26) or move the call to a static method in a wrapper class annotated with at least @RequiresApi(26)."
+        message="This call is to a method from API 26, the call containing class androidx.compose.ui.test.android.WindowCapture_androidKt is not annotated with @RequiresApi(x) where x is at least 26. Either annotate the containing class with at least @RequiresApi(26) or move the call to a static method in a wrapper class annotated with at least @RequiresApi(26)."
         errorLine1="    PixelCopy.request(windowToCapture, captureRectInWindow, destBitmap, onCopyFinished, handler)"
         errorLine2="              ~~~~~~~">
         <location
-            file="src/androidMain/kotlin/androidx/compose/ui/test/android/WindowCapture.kt"
+            file="src/androidMain/kotlin/androidx/compose/ui/test/android/WindowCapture.android.kt"
             line="95"
             column="15"/>
     </issue>

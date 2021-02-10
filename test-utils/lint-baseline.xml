@@ -28,7 +28,7 @@
         errorLine1="        @Synchronized"
         errorLine2="        ^">
         <location
-            file="src/androidMain/kotlin/androidx/compose/testutils/fake/FakeViewStructure.kt"
+            file="src/androidMain/kotlin/androidx/compose/testutils/fake/FakeViewStructure.android.kt"
             line="72"
             column="9"/>
     </issue>
@@ -39,7 +39,7 @@
         errorLine1="@TargetApi(Build.VERSION_CODES.Q)"
         errorLine2="~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
-            file="src/androidMain/kotlin/androidx/compose/testutils/AndroidComposeTestCaseRunner.kt"
+            file="src/androidMain/kotlin/androidx/compose/testutils/AndroidComposeTestCaseRunner.android.kt"
             line="349"
             column="1"/>
     </issue>
@@ -50,7 +50,7 @@
         errorLine1="@TargetApi(Build.VERSION_CODES.Q)"
         errorLine2="~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
-            file="src/androidMain/kotlin/androidx/compose/testutils/benchmark/android/AndroidTestCaseRunner.kt"
+            file="src/androidMain/kotlin/androidx/compose/testutils/benchmark/android/AndroidTestCaseRunner.android.kt"
             line="159"
             column="1"/>
     </issue>
@@ -61,7 +61,7 @@
         errorLine1="@TargetApi(Build.VERSION_CODES.Q)"
         errorLine2="~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
-            file="src/androidMain/kotlin/androidx/compose/testutils/benchmark/BenchmarkHelpers.kt"
+            file="src/androidMain/kotlin/androidx/compose/testutils/benchmark/BenchmarkHelpers.android.kt"
             line="42"
             column="1"/>
     </issue>
@@ -72,7 +72,7 @@
         errorLine1="            bitmap = Bitmap.createBitmap(picture)"
         errorLine2="                            ~~~~~~~~~~~~">
         <location
-            file="src/androidMain/kotlin/androidx/compose/testutils/AndroidComposeTestCaseRunner.kt"
+            file="src/androidMain/kotlin/androidx/compose/testutils/AndroidComposeTestCaseRunner.android.kt"
             line="278"
             column="29"/>
     </issue>
@@ -83,7 +83,7 @@
         errorLine1="    private val renderNode = RenderNode(&quot;Test&quot;)"
         errorLine2="                             ~~~~~~~~~~~~~~~~~~">
         <location
-            file="src/androidMain/kotlin/androidx/compose/testutils/AndroidComposeTestCaseRunner.kt"
+            file="src/androidMain/kotlin/androidx/compose/testutils/AndroidComposeTestCaseRunner.android.kt"
             line="351"
             column="30"/>
     </issue>
@@ -94,7 +94,7 @@
         errorLine1="        renderNode.setPosition(0, 0, width, height)"
         errorLine2="                   ~~~~~~~~~~~">
         <location
-            file="src/androidMain/kotlin/androidx/compose/testutils/AndroidComposeTestCaseRunner.kt"
+            file="src/androidMain/kotlin/androidx/compose/testutils/AndroidComposeTestCaseRunner.android.kt"
             line="354"
             column="20"/>
     </issue>
@@ -105,7 +105,7 @@
         errorLine1="        return renderNode.beginRecording()"
         errorLine2="                          ~~~~~~~~~~~~~~">
         <location
-            file="src/androidMain/kotlin/androidx/compose/testutils/AndroidComposeTestCaseRunner.kt"
+            file="src/androidMain/kotlin/androidx/compose/testutils/AndroidComposeTestCaseRunner.android.kt"
             line="355"
             column="27"/>
     </issue>
@@ -116,7 +116,7 @@
         errorLine1="        renderNode.endRecording()"
         errorLine2="                   ~~~~~~~~~~~~">
         <location
-            file="src/androidMain/kotlin/androidx/compose/testutils/AndroidComposeTestCaseRunner.kt"
+            file="src/androidMain/kotlin/androidx/compose/testutils/AndroidComposeTestCaseRunner.android.kt"
             line="359"
             column="20"/>
     </issue>
@@ -127,7 +127,7 @@
         errorLine1="    private val renderNode = RenderNode(&quot;Test&quot;)"
         errorLine2="                             ~~~~~~~~~~~~~~~~~~">
         <location
-            file="src/androidMain/kotlin/androidx/compose/testutils/benchmark/android/AndroidTestCaseRunner.kt"
+            file="src/androidMain/kotlin/androidx/compose/testutils/benchmark/android/AndroidTestCaseRunner.android.kt"
             line="161"
             column="30"/>
     </issue>
@@ -138,7 +138,7 @@
         errorLine1="        renderNode.setPosition(0, 0, width, height)"
         errorLine2="                   ~~~~~~~~~~~">
         <location
-            file="src/androidMain/kotlin/androidx/compose/testutils/benchmark/android/AndroidTestCaseRunner.kt"
+            file="src/androidMain/kotlin/androidx/compose/testutils/benchmark/android/AndroidTestCaseRunner.android.kt"
             line="164"
             column="20"/>
     </issue>
@@ -149,7 +149,7 @@
         errorLine1="        return renderNode.beginRecording()"
         errorLine2="                          ~~~~~~~~~~~~~~">
         <location
-            file="src/androidMain/kotlin/androidx/compose/testutils/benchmark/android/AndroidTestCaseRunner.kt"
+            file="src/androidMain/kotlin/androidx/compose/testutils/benchmark/android/AndroidTestCaseRunner.android.kt"
             line="165"
             column="27"/>
     </issue>
@@ -160,7 +160,7 @@
         errorLine1="        renderNode.endRecording()"
         errorLine2="                   ~~~~~~~~~~~~">
         <location
-            file="src/androidMain/kotlin/androidx/compose/testutils/benchmark/android/AndroidTestCaseRunner.kt"
+            file="src/androidMain/kotlin/androidx/compose/testutils/benchmark/android/AndroidTestCaseRunner.android.kt"
             line="169"
             column="20"/>
     </issue>
@@ -171,7 +171,7 @@
         errorLine1="    private val renderNode = RenderNode(&quot;Test&quot;)"
         errorLine2="                             ~~~~~~~~~~~~~~~~~~">
         <location
-            file="src/androidMain/kotlin/androidx/compose/testutils/benchmark/BenchmarkHelpers.kt"
+            file="src/androidMain/kotlin/androidx/compose/testutils/benchmark/BenchmarkHelpers.android.kt"
             line="44"
             column="30"/>
     </issue>
@@ -182,7 +182,7 @@
         errorLine1="        renderNode.setPosition(0, 0, width, height)"
         errorLine2="                   ~~~~~~~~~~~">
         <location
-            file="src/androidMain/kotlin/androidx/compose/testutils/benchmark/BenchmarkHelpers.kt"
+            file="src/androidMain/kotlin/androidx/compose/testutils/benchmark/BenchmarkHelpers.android.kt"
             line="47"
             column="20"/>
     </issue>
@@ -193,7 +193,7 @@
         errorLine1="        return Canvas(renderNode.beginRecording())"
         errorLine2="                                 ~~~~~~~~~~~~~~">
         <location
-            file="src/androidMain/kotlin/androidx/compose/testutils/benchmark/BenchmarkHelpers.kt"
+            file="src/androidMain/kotlin/androidx/compose/testutils/benchmark/BenchmarkHelpers.android.kt"
             line="48"
             column="34"/>
     </issue>
@@ -204,7 +204,7 @@
         errorLine1="        renderNode.endRecording()"
         errorLine2="                   ~~~~~~~~~~~~">
         <location
-            file="src/androidMain/kotlin/androidx/compose/testutils/benchmark/BenchmarkHelpers.kt"
+            file="src/androidMain/kotlin/androidx/compose/testutils/benchmark/BenchmarkHelpers.android.kt"
             line="52"
             column="20"/>
     </issue>

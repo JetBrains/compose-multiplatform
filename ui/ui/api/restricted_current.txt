@@ -153,13 +153,13 @@ package androidx.compose.ui {
 
 package androidx.compose.ui.autofill {
 
-  public final class AndroidAutofillDebugUtilsKt {
+  public final class AndroidAutofillDebugUtils_androidKt {
   }
 
-  public final class AndroidAutofillKt {
+  public final class AndroidAutofillType_androidKt {
   }
 
-  public final class AndroidAutofillTypeKt {
+  public final class AndroidAutofill_androidKt {
   }
 
   @androidx.compose.ui.ExperimentalComposeUiApi public interface Autofill {
@@ -682,16 +682,16 @@ package androidx.compose.ui.graphics.vector {
 
 package androidx.compose.ui.graphics.vector.compat {
 
-  public final class XmlAnimatedVectorParserKt {
+  public final class XmlAnimatedVectorParser_androidKt {
   }
 
-  public final class XmlAnimatorParserKt {
+  public final class XmlAnimatorParser_androidKt {
   }
 
-  public final class XmlPullParserUtilsKt {
+  public final class XmlPullParserUtils_androidKt {
   }
 
-  public final class XmlVectorParserKt {
+  public final class XmlVectorParser_androidKt {
   }
 
 }
@@ -1311,7 +1311,13 @@ package androidx.compose.ui.input.key {
     property public final android.view.KeyEvent nativeKeyEvent;
   }
 
-  public final class KeyEventKt {
+  public enum KeyEventType {
+    enum_constant public static final androidx.compose.ui.input.key.KeyEventType KeyDown;
+    enum_constant public static final androidx.compose.ui.input.key.KeyEventType KeyUp;
+    enum_constant public static final androidx.compose.ui.input.key.KeyEventType Unknown;
+  }
+
+  public final class KeyEvent_androidKt {
     method public static long getKey-ZmokQxo(android.view.KeyEvent);
     method public static androidx.compose.ui.input.key.KeyEventType getType-ZmokQxo(android.view.KeyEvent);
     method public static int getUtf16CodePoint-ZmokQxo(android.view.KeyEvent);
@@ -1321,18 +1327,12 @@ package androidx.compose.ui.input.key {
     method public static boolean isShiftPressed-ZmokQxo(android.view.KeyEvent);
   }
 
-  public enum KeyEventType {
-    enum_constant public static final androidx.compose.ui.input.key.KeyEventType KeyDown;
-    enum_constant public static final androidx.compose.ui.input.key.KeyEventType KeyUp;
-    enum_constant public static final androidx.compose.ui.input.key.KeyEventType Unknown;
-  }
-
   public final class KeyInputModifierKt {
     method public static androidx.compose.ui.Modifier onKeyEvent(androidx.compose.ui.Modifier, kotlin.jvm.functions.Function1<? super androidx.compose.ui.input.key.KeyEvent,java.lang.Boolean> onKeyEvent);
     method public static androidx.compose.ui.Modifier onPreviewKeyEvent(androidx.compose.ui.Modifier, kotlin.jvm.functions.Function1<? super androidx.compose.ui.input.key.KeyEvent,java.lang.Boolean> onPreviewKeyEvent);
   }
 
-  public final class KeyKt {
+  public final class Key_androidKt {
     method public static long Key(int nativeKeyCode);
     method public static int getNativeKeyCode-YVgTNJs(long);
   }
@@ -1374,7 +1374,7 @@ package androidx.compose.ui.input.nestedscroll {
 
 package androidx.compose.ui.input.pointer {
 
-  public final class AndroidMouseKt {
+  public final class AndroidMouse_androidKt {
     method public static boolean isMouseInput();
   }
 
@@ -1402,7 +1402,7 @@ package androidx.compose.ui.input.pointer {
   public final class HitPathTrackerKt {
   }
 
-  public final class MotionEventAdapterKt {
+  public final class MotionEventAdapter_androidKt {
   }
 
   @kotlin.RequiresOptIn(level=kotlin.RequiresOptIn.Level, message="This is a temporary API and should be removed after proper mouse handling is " + "settled (b/171402426).") @kotlin.annotation.Target(allowedTargets={kotlin.annotation.AnnotationTarget, kotlin.annotation.AnnotationTarget, kotlin.annotation.AnnotationTarget}) public @interface MouseTemporaryApi {
@@ -1499,11 +1499,11 @@ package androidx.compose.ui.input.pointer {
   public final class PointerInputTestUtilKt {
   }
 
-  public final class PointerInteropFilterKt {
+  public final class PointerInteropFilter_androidKt {
     method public static androidx.compose.ui.Modifier pointerInteropFilter(androidx.compose.ui.Modifier, optional androidx.compose.ui.input.pointer.RequestDisallowInterceptTouchEvent? requestDisallowInterceptTouchEvent, kotlin.jvm.functions.Function1<? super android.view.MotionEvent,java.lang.Boolean> onTouchEvent);
   }
 
-  public final class PointerInteropUtilsKt {
+  public final class PointerInteropUtils_androidKt {
   }
 
   public enum PointerType {
@@ -1967,7 +1967,7 @@ package androidx.compose.ui.node {
     property public abstract androidx.compose.ui.text.input.TextInputService textInputService;
   }
 
-  public final class ViewInteropKt {
+  public final class ViewInterop_androidKt {
   }
 
 }
@@ -1994,16 +1994,16 @@ package androidx.compose.ui.platform {
     property public final boolean showLayoutBounds;
   }
 
-  public final class AndroidClipboardManagerKt {
+  public final class AndroidClipboardManager_androidKt {
   }
 
-  public final class AndroidComposeViewAccessibilityDelegateCompatKt {
+  public final class AndroidComposeViewAccessibilityDelegateCompat_androidKt {
   }
 
-  public final class AndroidComposeViewKt {
+  public final class AndroidComposeView_androidKt {
   }
 
-  public final class AndroidCompositionLocalsKt {
+  public final class AndroidCompositionLocals_androidKt {
     method public static androidx.compose.runtime.ProvidableCompositionLocal<android.content.res.Configuration> getLocalConfiguration();
     method public static androidx.compose.runtime.ProvidableCompositionLocal<android.content.Context> getLocalContext();
     method public static androidx.compose.runtime.ProvidableCompositionLocal<androidx.lifecycle.LifecycleOwner> getLocalLifecycleOwner();
@@ -2027,7 +2027,7 @@ package androidx.compose.ui.platform {
     property public final kotlin.coroutines.CoroutineContext Main;
   }
 
-  public final class AndroidUiDispatcherKt {
+  public final class AndroidUiDispatcher_androidKt {
   }
 
   public final class AndroidUiFrameClock implements androidx.compose.runtime.MonotonicFrameClock {
@@ -2086,7 +2086,7 @@ package androidx.compose.ui.platform {
   public final class DebugUtilsKt {
   }
 
-  public final class DisposableSaveableStateRegistryKt {
+  public final class DisposableSaveableStateRegistry_androidKt {
   }
 
   public interface InspectableValue {
@@ -2128,7 +2128,7 @@ package androidx.compose.ui.platform {
     property public Object? valueOverride;
   }
 
-  public final class JvmActualsKt {
+  public final class JvmActuals_jvmKt {
   }
 
   public final class TestTagKt {
@@ -2195,7 +2195,7 @@ package androidx.compose.ui.platform {
     field public static final androidx.compose.ui.platform.ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed INSTANCE;
   }
 
-  public final class ViewCompositionStrategyKt {
+  public final class ViewCompositionStrategy_androidKt {
   }
 
   public interface ViewConfiguration {
@@ -2244,12 +2244,6 @@ package androidx.compose.ui.platform {
     property public final androidx.compose.ui.platform.WindowRecomposerFactory LifecycleAware;
   }
 
-  public final class WindowRecomposerKt {
-    method public static androidx.compose.runtime.CompositionContext? findViewTreeCompositionContext(android.view.View);
-    method public static androidx.compose.runtime.CompositionContext? getCompositionContext(android.view.View);
-    method public static void setCompositionContext(android.view.View, androidx.compose.runtime.CompositionContext? value);
-  }
-
   @androidx.compose.ui.InternalComposeUiApi public final class WindowRecomposerPolicy {
     method @kotlin.PublishedApi internal boolean compareAndSetFactory(androidx.compose.ui.platform.WindowRecomposerFactory expected, androidx.compose.ui.platform.WindowRecomposerFactory factory);
     method @kotlin.PublishedApi internal androidx.compose.ui.platform.WindowRecomposerFactory getAndSetFactory(androidx.compose.ui.platform.WindowRecomposerFactory factory);
@@ -2258,58 +2252,64 @@ package androidx.compose.ui.platform {
     field public static final androidx.compose.ui.platform.WindowRecomposerPolicy INSTANCE;
   }
 
-  public final class WrapperKt {
+  public final class WindowRecomposer_androidKt {
+    method public static androidx.compose.runtime.CompositionContext? findViewTreeCompositionContext(android.view.View);
+    method public static androidx.compose.runtime.CompositionContext? getCompositionContext(android.view.View);
+    method public static void setCompositionContext(android.view.View, androidx.compose.runtime.CompositionContext? value);
+  }
+
+  public final class Wrapper_androidKt {
   }
 
 }
 
 package androidx.compose.ui.platform.actionmodecallback {
 
-  public final class TextActionModeCallbackKt {
+  public final class TextActionModeCallback_androidKt {
   }
 
 }
 
 package androidx.compose.ui.res {
 
-  public final class AnimatedVectorResourcesKt {
+  public final class AnimatedVectorResources_androidKt {
     method @androidx.compose.runtime.Composable @androidx.compose.ui.ExperimentalComposeUiApi public static androidx.compose.ui.graphics.vector.AnimatedImageVector animatedVectorResource(@DrawableRes int id);
   }
 
-  public final class AnimatorResourcesKt {
+  public final class AnimatorResources_androidKt {
   }
 
-  public final class ColorResourcesKt {
+  public final class ColorResources_androidKt {
     method @androidx.compose.runtime.Composable public static long colorResource(@ColorRes int id);
   }
 
-  public final class FontResourcesKt {
+  public final class FontResources_androidKt {
     method @androidx.compose.runtime.Composable public static androidx.compose.ui.text.font.Typeface fontResource(androidx.compose.ui.text.font.FontFamily fontFamily);
   }
 
-  public final class ImageResourcesKt {
+  public final class ImageResources_androidKt {
     method public static androidx.compose.ui.graphics.ImageBitmap imageResource(androidx.compose.ui.graphics.ImageBitmap.Companion, android.content.res.Resources res, @DrawableRes int id);
     method @androidx.compose.runtime.Composable public static androidx.compose.ui.graphics.ImageBitmap imageResource(androidx.compose.ui.graphics.ImageBitmap.Companion, @DrawableRes int id);
   }
 
-  public final class PainterResourcesKt {
+  public final class PainterResources_androidKt {
     method @androidx.compose.runtime.Composable public static androidx.compose.ui.graphics.painter.Painter painterResource(@DrawableRes int id);
   }
 
-  public final class PrimitiveResourcesKt {
+  public final class PrimitiveResources_androidKt {
     method @androidx.compose.runtime.Composable public static boolean booleanResource(@BoolRes int id);
     method @androidx.compose.runtime.Composable public static float dimensionResource(@DimenRes int id);
     method @androidx.compose.runtime.Composable public static int[] integerArrayResource(@ArrayRes int id);
     method @androidx.compose.runtime.Composable public static int integerResource(@IntegerRes int id);
   }
 
-  public final class StringResourcesKt {
+  public final class StringResources_androidKt {
     method @androidx.compose.runtime.Composable public static String![] stringArrayResource(@ArrayRes int id);
     method @androidx.compose.runtime.Composable public static String stringResource(@StringRes int id);
     method @androidx.compose.runtime.Composable public static String stringResource(@StringRes int id, java.lang.Object... formatArgs);
   }
 
-  public final class VectorResourcesKt {
+  public final class VectorResources_androidKt {
     method @androidx.compose.runtime.Composable public static androidx.compose.ui.graphics.vector.ImageVector vectorResource(androidx.compose.ui.graphics.vector.ImageVector.Companion, @DrawableRes int id);
     method @kotlin.jvm.Throws(exceptionClasses=XmlPullParserException::class) public static androidx.compose.ui.graphics.vector.ImageVector vectorResource(androidx.compose.ui.graphics.vector.ImageVector.Companion, optional android.content.res.Resources.Theme? theme, android.content.res.Resources res, int resId) throws org.xmlpull.v1.XmlPullParserException;
   }
@@ -2609,20 +2609,20 @@ package androidx.compose.ui.state {
 
 package androidx.compose.ui.text.input {
 
-  public final class InputStateKt {
+  public final class InputState_androidKt {
   }
 
-  public final class RecordingInputConnectionKt {
+  public final class RecordingInputConnection_androidKt {
   }
 
 }
 
 package androidx.compose.ui.viewinterop {
 
-  public final class AndroidViewHolderKt {
+  public final class AndroidViewHolder_androidKt {
   }
 
-  public final class AndroidViewKt {
+  public final class AndroidView_androidKt {
     method @androidx.compose.runtime.Composable public static <T extends android.view.View> void AndroidView(kotlin.jvm.functions.Function1<? super android.content.Context,? extends T> viewBlock, optional androidx.compose.ui.Modifier modifier, optional kotlin.jvm.functions.Function1<? super T,kotlin.Unit> update);
     method public static kotlin.jvm.functions.Function1<android.view.View,kotlin.Unit> getNoOpUpdate();
   }
@@ -2631,11 +2631,11 @@ package androidx.compose.ui.viewinterop {
 
 package androidx.compose.ui.window {
 
-  public final class AndroidDialogKt {
+  public final class AndroidDialog_androidKt {
     method @androidx.compose.runtime.Composable public static void Dialog(kotlin.jvm.functions.Function0<kotlin.Unit> onDismissRequest, optional androidx.compose.ui.window.DialogProperties properties, kotlin.jvm.functions.Function0<kotlin.Unit> content);
   }
 
-  public final class AndroidPopupKt {
+  public final class AndroidPopup_androidKt {
     method @androidx.compose.runtime.Composable public static void Popup(androidx.compose.ui.window.PopupPositionProvider popupPositionProvider, optional kotlin.jvm.functions.Function0<kotlin.Unit>? onDismissRequest, optional androidx.compose.ui.window.PopupProperties properties, kotlin.jvm.functions.Function0<kotlin.Unit> content);
     method @androidx.compose.runtime.Composable public static void Popup-wO4EaeM(optional androidx.compose.ui.Alignment alignment, optional long offset, optional kotlin.jvm.functions.Function0<kotlin.Unit>? onDismissRequest, optional androidx.compose.ui.window.PopupProperties properties, kotlin.jvm.functions.Function0<kotlin.Unit> content);
     method @org.jetbrains.annotations.TestOnly public static boolean isPopupLayout(android.view.View view, optional String? testTag);
@@ -2680,7 +2680,7 @@ package androidx.compose.ui.window {
     enum_constant public static final androidx.compose.ui.window.SecureFlagPolicy SecureOn;
   }
 
-  public final class SecureFlagPolicyKt {
+  public final class SecureFlagPolicy_androidKt {
   }
 
 }
