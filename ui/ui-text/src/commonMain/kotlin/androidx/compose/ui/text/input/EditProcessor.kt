@@ -16,24 +16,28 @@
 
 package androidx.compose.ui.text.input
 
-import androidx.compose.ui.text.InternalTextApi
 import androidx.compose.ui.text.TextRange
 import androidx.compose.ui.text.emptyAnnotatedString
 
 /**
- * The core editing implementation
+ * Helper class to apply [EditCommand]s on an internal buffer. Used by TextField Composable
+ * to combine TextFieldValue lifecycle with the editing operations.
  *
- * This class accepts latest text edit state from developer and also receives edit operations from
- * IME.
- *
- * @suppress
+ * * When a [TextFieldValue] is suggested by the developer, [reset] should be called.
+ * * When [TextInputService] provides [EditCommand]s, they should be applied to the internal
+ * buffer using [apply].
  */
-@InternalTextApi // Used by CoreTextTextField in foundation
 class EditProcessor {
 
-    // The last known state of the EditingBuffer
+    /**
+     * The current state of the internal editing buffer as a [TextFieldValue].
+     */
     /*@VisibleForTesting*/
-    var mBufferState: TextFieldValue = TextFieldValue(emptyAnnotatedString(), TextRange.Zero, null)
+    internal var mBufferState: TextFieldValue = TextFieldValue(
+        emptyAnnotatedString(),
+        TextRange.Zero,
+        null
+    )
         private set
 
     // The editing buffer used for applying editor commands from IME.
@@ -42,6 +46,7 @@ class EditProcessor {
         text = mBufferState.annotatedString,
         selection = mBufferState.selection
     )
+        private set
 
     /**
      * Must be called whenever new editor model arrives.
@@ -49,7 +54,7 @@ class EditProcessor {
      * This method updates the internal editing buffer with the given editor model.
      * This method may tell the IME about the selection offset changes or extracted text changes.
      */
-    fun onNewState(
+    fun reset(
         value: TextFieldValue,
         textInputService: TextInputService?,
         token: InputSessionToken
@@ -75,13 +80,17 @@ class EditProcessor {
     }
 
     /**
-     * Must be called whenever new edit operations sent from IMEs arrives.
+     * Applies a set of [editCommands] to the internal text editing buffer.
      *
-     * This method updates internal editing buffer with the given edit operations and returns the
-     * latest editor state representation of the editing buffer.
+     * After applying the changes, returns the final state of the editing buffer as a
+     * [TextFieldValue]
+     *
+     * @param editCommands [EditCommand]s to be applied to the editing buffer.
+     *
+     * @return the [TextFieldValue] representation of the final buffer state.
      */
-    fun onEditCommands(ops: List<EditCommand>): TextFieldValue {
-        ops.forEach { it.applyTo(mBuffer) }
+    fun apply(editCommands: List<EditCommand>): TextFieldValue {
+        editCommands.forEach { it.applyTo(mBuffer) }
 
         val newState = TextFieldValue(
             annotatedString = mBuffer.toAnnotatedString(),
@@ -96,4 +105,9 @@ class EditProcessor {
         mBufferState = newState
         return newState
     }
+
+    /**
+     * Returns the current state of the internal editing buffer as a [TextFieldValue].
+     */
+    fun toTextFieldValue(): TextFieldValue = mBufferState
 }

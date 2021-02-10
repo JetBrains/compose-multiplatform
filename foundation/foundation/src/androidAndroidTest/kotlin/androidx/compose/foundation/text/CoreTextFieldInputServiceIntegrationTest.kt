@@ -25,7 +25,6 @@ import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.performClick
-import androidx.compose.ui.text.InternalTextApi
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.text.input.ImeOptions
@@ -52,7 +51,6 @@ class CoreTextFieldInputServiceIntegrationTest {
     @get:Rule
     val rule = createComposeRule()
 
-    @OptIn(InternalTextApi::class)
     @Test
     fun textField_ImeOptions_isPassedTo_platformTextInputService() {
         val platformTextInputService = mock<PlatformTextInputService>()

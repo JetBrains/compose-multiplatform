@@ -96,7 +96,7 @@ class DesktopTextFieldSelectionManagerTest {
         )
         whenever(state.layoutResult!!.getOffsetForPosition(dragLastPosition)).thenReturn(dragOffset)
 
-        state.processor.onNewState(value, null, state.inputSession)
+        state.processor.reset(value, null, state.inputSession)
     }
 
     @Test

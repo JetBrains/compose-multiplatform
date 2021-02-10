@@ -82,6 +82,7 @@ class EditingBuffer(
     /**
      * Helper accessor for cursor offset
      */
+    /*VisibleForTesting*/
     internal var cursor: Int
         /**
          * Return the cursor offset.
