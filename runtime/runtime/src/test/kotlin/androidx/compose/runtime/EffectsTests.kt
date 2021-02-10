@@ -535,7 +535,7 @@ class EffectsTests {
 
     @Test
     fun testCompositionLocal1() = compositionTest {
-        val Foo = compositionLocalOf<String>()
+        val Foo = compositionLocalOf<String> { error("Not provided") }
         var current by mutableStateOf("Hello World")
 
         @Composable

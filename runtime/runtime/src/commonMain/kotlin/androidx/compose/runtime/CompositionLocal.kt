@@ -56,7 +56,7 @@ package androidx.compose.runtime
  * @sample androidx.compose.runtime.samples.consumeCompositionLocal
  */
 @Stable
-sealed class CompositionLocal<T> constructor(defaultFactory: (() -> T)? = null) {
+sealed class CompositionLocal<T> constructor(defaultFactory: () -> T) {
     @Suppress("UNCHECKED_CAST")
     internal val defaultValueHolder = LazyValueHolder(defaultFactory)
 
@@ -85,7 +85,7 @@ sealed class CompositionLocal<T> constructor(defaultFactory: (() -> T)? = null) 
  * @see CompositionLocalProvider
  */
 @Stable
-abstract class ProvidableCompositionLocal<T> internal constructor(defaultFactory: (() -> T)?) :
+abstract class ProvidableCompositionLocal<T> internal constructor(defaultFactory: () -> T) :
     CompositionLocal<T> (defaultFactory) {
 
     /**
@@ -119,7 +119,7 @@ abstract class ProvidableCompositionLocal<T> internal constructor(defaultFactory
  */
 internal class DynamicProvidableCompositionLocal<T> constructor(
     private val policy: SnapshotMutationPolicy<T>,
-    defaultFactory: (() -> T)?
+    defaultFactory: () -> T
 ) : ProvidableCompositionLocal<T>(defaultFactory) {
 
     @Composable
@@ -133,7 +133,7 @@ internal class DynamicProvidableCompositionLocal<T> constructor(
  *
  * @see staticCompositionLocalOf
  */
-internal class StaticProvidableCompositionLocal<T>(defaultFactory: (() -> T)?) :
+internal class StaticProvidableCompositionLocal<T>(defaultFactory: () -> T) :
     ProvidableCompositionLocal<T>(defaultFactory) {
 
     @Composable
@@ -147,6 +147,7 @@ internal class StaticProvidableCompositionLocal<T>(defaultFactory: (() -> T)?) :
  *
  * @param policy a policy to determine when a [CompositionLocal] is considered changed. See
  * [SnapshotMutationPolicy] for details.
+ * @param defaultFactory a value factory to supply a value when a value is not provided.
  *
  * @see CompositionLocal
  * @see staticCompositionLocalOf
@@ -155,7 +156,7 @@ internal class StaticProvidableCompositionLocal<T>(defaultFactory: (() -> T)?) :
 fun <T> compositionLocalOf(
     policy: SnapshotMutationPolicy<T> =
         structuralEqualityPolicy(),
-    defaultFactory: (() -> T)? = null
+    defaultFactory: () -> T
 ): ProvidableCompositionLocal<T> = DynamicProvidableCompositionLocal(policy, defaultFactory)
 
 /**
@@ -166,10 +167,12 @@ fun <T> compositionLocalOf(
  * A static [CompositionLocal] should be only be used when the value provided is highly unlikely to
  * change.
  *
+ * @param defaultFactory a value factory to supply a value when a value is not provided.
+ *
  * @see CompositionLocal
  * @see compositionLocalOf
  */
-fun <T> staticCompositionLocalOf(defaultFactory: (() -> T)? = null): ProvidableCompositionLocal<T> =
+fun <T> staticCompositionLocalOf(defaultFactory: () -> T): ProvidableCompositionLocal<T> =
     StaticProvidableCompositionLocal(defaultFactory)
 
 /**

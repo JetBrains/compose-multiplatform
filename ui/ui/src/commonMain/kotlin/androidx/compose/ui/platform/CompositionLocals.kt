@@ -36,7 +36,7 @@ import androidx.compose.ui.unit.LayoutDirection
  */
 @get:ExperimentalComposeUiApi
 @ExperimentalComposeUiApi
-val LocalAutofill = staticCompositionLocalOf<Autofill?>()
+val LocalAutofill = staticCompositionLocalOf<Autofill?> { null }
 
 /**
  * The CompositionLocal that can be used to add
@@ -46,12 +46,16 @@ val LocalAutofill = staticCompositionLocalOf<Autofill?>()
  */
 @get:ExperimentalComposeUiApi
 @ExperimentalComposeUiApi
-val LocalAutofillTree = staticCompositionLocalOf<AutofillTree>()
+val LocalAutofillTree = staticCompositionLocalOf<AutofillTree> {
+    noLocalProvidedFor("LocalAutofillTree")
+}
 
 /**
  * The CompositionLocal to provide communication with platform clipboard service.
  */
-val LocalClipboardManager = staticCompositionLocalOf<ClipboardManager>()
+val LocalClipboardManager = staticCompositionLocalOf<ClipboardManager> {
+    noLocalProvidedFor("LocalClipboardManager")
+}
 
 /**
  * Provides the [Density] to be used to transform between [density-independent pixel
@@ -61,12 +65,16 @@ val LocalClipboardManager = staticCompositionLocalOf<ClipboardManager>()
  * [DP][androidx.compose.ui.unit.Dp] is provided and it must be converted in the body of [Layout]
  * or [DrawModifier].
  */
-val LocalDensity = staticCompositionLocalOf<Density>()
+val LocalDensity = staticCompositionLocalOf<Density> {
+    noLocalProvidedFor("LocalDensity")
+}
 
 /**
  * The CompositionLocal that can be used to control focus within Compose.
  */
-val LocalFocusManager = staticCompositionLocalOf<FocusManager>()
+val LocalFocusManager = staticCompositionLocalOf<FocusManager> {
+    noLocalProvidedFor("LocalFocusManager")
+}
 
 /**
  * The CompositionLocal to provide platform font loading methods.
@@ -74,42 +82,56 @@ val LocalFocusManager = staticCompositionLocalOf<FocusManager>()
  * Use [androidx.compose.ui.res.fontResource] instead.
  * @suppress
  */
-val LocalFontLoader = staticCompositionLocalOf<Font.ResourceLoader>()
+val LocalFontLoader = staticCompositionLocalOf<Font.ResourceLoader> {
+    noLocalProvidedFor("LocalFontLoader")
+}
 
 /**
  * The CompositionLocal to provide haptic feedback to the user.
  */
-val LocalHapticFeedback = staticCompositionLocalOf<HapticFeedback>()
+val LocalHapticFeedback = staticCompositionLocalOf<HapticFeedback> {
+    noLocalProvidedFor("LocalHapticFeedback")
+}
 
 /**
  * The CompositionLocal to provide the layout direction.
  */
-val LocalLayoutDirection = staticCompositionLocalOf<LayoutDirection>()
+val LocalLayoutDirection = staticCompositionLocalOf<LayoutDirection> {
+    noLocalProvidedFor("LocalLayoutDirection")
+}
 
 /**
  * The CompositionLocal to provide communication with platform text input service.
  */
-val LocalTextInputService = staticCompositionLocalOf<TextInputService?>()
+val LocalTextInputService = staticCompositionLocalOf<TextInputService?> { null }
 
 /**
  * The CompositionLocal to provide text-related toolbar.
  */
-val LocalTextToolbar = staticCompositionLocalOf<TextToolbar>()
+val LocalTextToolbar = staticCompositionLocalOf<TextToolbar> {
+    noLocalProvidedFor("LocalTextToolbar")
+}
 
 /**
  * The CompositionLocal to provide functionality related to URL, e.g. open URI.
  */
-val LocalUriHandler = staticCompositionLocalOf<UriHandler>()
+val LocalUriHandler = staticCompositionLocalOf<UriHandler> {
+    noLocalProvidedFor("LocalUriHandler")
+}
 
 /**
  * The CompositionLocal that provides the ViewConfiguration.
  */
-val LocalViewConfiguration = staticCompositionLocalOf<ViewConfiguration>()
+val LocalViewConfiguration = staticCompositionLocalOf<ViewConfiguration> {
+    noLocalProvidedFor("LocalViewConfiguration")
+}
 
 /**
  * The CompositionLocal that provides information about the window that hosts the current [Owner].
  */
-val LocalWindowInfo = staticCompositionLocalOf<WindowInfo>()
+val LocalWindowInfo = staticCompositionLocalOf<WindowInfo> {
+    noLocalProvidedFor("LocalWindowInfo")
+}
 
 @ExperimentalComposeUiApi
 @Composable
@@ -134,4 +156,8 @@ internal fun ProvideCommonCompositionLocals(
         LocalWindowInfo provides owner.windowInfo,
         content = content
     )
+}
+
+private fun noLocalProvidedFor(name: String): Nothing {
+    error("CompositionLocal $name not present")
 }

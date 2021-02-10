@@ -205,4 +205,6 @@ private fun ExpensiveSecondaryColorConsumer(compositionTracker: CompositionTrack
 @Immutable
 private class CompositionTracker(var compositions: Int = 0)
 
-private val LocalTestTheme = staticCompositionLocalOf<TestTheme>()
+private val LocalTestTheme = staticCompositionLocalOf<TestTheme> {
+    error("CompositionLocal LocalTestThemem not present")
+}
