@@ -30,6 +30,7 @@ import androidx.compose.runtime.saveable.listSaver
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.layout.Remeasurement
 import androidx.compose.ui.layout.RemeasurementModifier
+import androidx.compose.ui.unit.Density
 import kotlin.math.abs
 
 /**
@@ -118,6 +119,11 @@ class LazyListState constructor(
      * The same as [firstVisibleItemScrollOffset] but the read will not trigger remeasure.
      */
     internal val firstVisibleItemScrollOffsetNonObservable: Int get() = scrollPosition.scrollOffset
+
+    /**
+     * Needed for [animateScrollToItem].  Updated on every measure.
+     */
+    internal var density: Density = Density(1f, 1f)
 
     /**
      * The ScrollableController instance. We keep it as we need to call stopAnimation on it once
@@ -241,7 +247,9 @@ class LazyListState constructor(
      *
      * @param index the index to which to scroll
      * @param scrollOffset the offset that the item should end up after the scroll (same as
-     * [snapToItemIndex]) - note that it is an offset *backwards*, not forward
+     * [scrollToItem]) - note that positive offset refers to forward scroll, so in a
+     * top-to-bottom list, positive offset will scroll the item further upward (taking it partly
+     * offscreen)
      */
     suspend fun animateScrollToItem(
         /*@IntRange(from = 0)*/
