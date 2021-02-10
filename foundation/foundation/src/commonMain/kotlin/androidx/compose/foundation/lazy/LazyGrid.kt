@@ -34,6 +34,7 @@ import androidx.compose.ui.unit.dp
  *
  * @param cells a class describing how cells form columns, see [GridCells] doc for more information
  * @param modifier the modifier to apply to this layout
+ * @param state the state object to be used to control or observe the list's state
  * @param contentPadding specify a padding around the whole content
  * @param content the [LazyListScope] which describes the content
  */
