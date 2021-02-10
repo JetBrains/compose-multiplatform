@@ -33,7 +33,6 @@ dependencies {
     kotlinPlugin project(":compose:compiler:compiler")
 
     if(!AndroidXUiPlugin.isMultiplatformEnabled(project)) {
-        api project(":compose:runtime:runtime-dispatch")
         api project(":compose:ui:ui")
         api project(":compose:ui:ui-graphics")
         api project(":compose:ui:ui-geometry")
@@ -71,7 +70,6 @@ if(AndroidXUiPlugin.isMultiplatformEnabled(project)) {
 
         sourceSets {
             commonMain.dependencies {
-                api project(":compose:runtime:runtime-dispatch")
                 api project(":compose:ui:ui")
                 api project(":compose:ui:ui-geometry")
                 api project(":compose:ui:ui-text")
