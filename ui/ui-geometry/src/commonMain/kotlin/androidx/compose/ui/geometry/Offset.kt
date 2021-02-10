@@ -27,9 +27,8 @@ import kotlin.math.sqrt
 /**
  * Constructs an Offset from the given relative x and y offsets
  */
-@Suppress("NOTHING_TO_INLINE")
 @Stable
-inline fun Offset(x: Float, y: Float) = Offset(packFloats(x, y))
+fun Offset(x: Float, y: Float) = Offset(packFloats(x, y))
 
 /**
  * An immutable 2D floating-point offset.
@@ -59,7 +58,7 @@ inline fun Offset(x: Float, y: Float) = Offset(packFloats(x, y))
  */
 @Suppress("EXPERIMENTAL_FEATURE_WARNING")
 @Immutable
-inline class Offset(val packedValue: Long) {
+inline class Offset internal constructor(val packedValue: Long) {
 
     @Stable
     val x: Float
