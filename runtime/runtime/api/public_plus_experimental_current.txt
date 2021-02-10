@@ -56,7 +56,7 @@ package androidx.compose.runtime {
   public final class ComposablesKt {
     method @androidx.compose.runtime.Composable public static inline <T extends java.lang.Object, reified E extends androidx.compose.runtime.Applier<?>> void ComposeNode(kotlin.jvm.functions.Function0<? extends T> factory, kotlin.jvm.functions.Function1<? super androidx.compose.runtime.Updater<T>,? extends kotlin.Unit> update);
     method @androidx.compose.runtime.Composable public static inline <T extends java.lang.Object, reified E extends androidx.compose.runtime.Applier<?>> void ComposeNode(kotlin.jvm.functions.Function0<? extends T> factory, kotlin.jvm.functions.Function1<? super androidx.compose.runtime.Updater<T>,? extends kotlin.Unit> update, kotlin.jvm.functions.Function0<? extends kotlin.Unit> content);
-    method @androidx.compose.runtime.Composable @androidx.compose.runtime.ReadOnlyComposable public static inline <T, reified E extends androidx.compose.runtime.Applier<?>> void ComposeNode(kotlin.jvm.functions.Function0<? extends T> factory, kotlin.jvm.functions.Function1<? super androidx.compose.runtime.Updater<T>,? extends kotlin.Unit> update, kotlin.jvm.functions.Function1<? super androidx.compose.runtime.SkippableUpdater<T>,? extends kotlin.Unit> skippableUpdate, kotlin.jvm.functions.Function0<? extends kotlin.Unit> content);
+    method @androidx.compose.runtime.Composable @androidx.compose.runtime.ExplicitGroupsComposable public static inline <T, reified E extends androidx.compose.runtime.Applier<?>> void ComposeNode(kotlin.jvm.functions.Function0<? extends T> factory, kotlin.jvm.functions.Function1<? super androidx.compose.runtime.Updater<T>,? extends kotlin.Unit> update, kotlin.jvm.functions.Function1<? super androidx.compose.runtime.SkippableUpdater<T>,? extends kotlin.Unit> skippableUpdate, kotlin.jvm.functions.Function0<? extends kotlin.Unit> content);
     method @androidx.compose.runtime.Composable @androidx.compose.runtime.ReadOnlyComposable public static androidx.compose.runtime.Composer getCurrentComposer();
     method @androidx.compose.runtime.Composable public static int getCurrentCompositeKeyHash();
     method @androidx.compose.runtime.Composable @androidx.compose.runtime.ReadOnlyComposable public static androidx.compose.runtime.RecomposeScope getCurrentRecomposeScope();
@@ -219,6 +219,9 @@ package androidx.compose.runtime {
   }
 
   @kotlin.RequiresOptIn(level=kotlin.RequiresOptIn.Level, message="This is an experimental API for Compose and is likely to change before becoming " + "stable.") @kotlin.annotation.Target(allowedTargets={kotlin.annotation.AnnotationTarget, kotlin.annotation.AnnotationTarget, kotlin.annotation.AnnotationTarget, kotlin.annotation.AnnotationTarget}) public @interface ExperimentalComposeApi {
+  }
+
+  @kotlin.annotation.Retention(kotlin.annotation.AnnotationRetention) @kotlin.annotation.Target(allowedTargets={kotlin.annotation.AnnotationTarget, kotlin.annotation.AnnotationTarget}) public @interface ExplicitGroupsComposable {
   }
 
   @androidx.compose.runtime.StableMarker @kotlin.annotation.MustBeDocumented @kotlin.annotation.Retention(kotlin.annotation.AnnotationRetention) @kotlin.annotation.Target(allowedTargets=kotlin.annotation.AnnotationTarget) public @interface Immutable {
