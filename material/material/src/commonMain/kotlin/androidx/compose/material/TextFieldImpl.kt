@@ -30,6 +30,7 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.graphics.Color
@@ -89,9 +90,12 @@ internal fun TextFieldImpl(
     val mergedTextStyle = textStyle.merge(TextStyle(color = textColor))
 
     val isFocused = interactionSource.collectIsFocusedAsState().value
+    val transformedText = remember(value.annotatedString, visualTransformation) {
+        visualTransformation.filter(value.annotatedString)
+    }.text
     val inputState = when {
         isFocused -> InputPhase.Focused
-        value.text.isEmpty() -> InputPhase.UnfocusedEmpty
+        transformedText.isEmpty() -> InputPhase.UnfocusedEmpty
         else -> InputPhase.UnfocusedNotEmpty
     }
 
@@ -116,7 +120,7 @@ internal fun TextFieldImpl(
             } else null
 
         val decoratedPlaceholder: @Composable ((Modifier) -> Unit)? =
-            if (placeholder != null && value.text.isEmpty()) {
+            if (placeholder != null && transformedText.isEmpty()) {
                 @Composable { modifier ->
                     Box(modifier.alpha(placeholderAlphaProgress)) {
                         Decoration(

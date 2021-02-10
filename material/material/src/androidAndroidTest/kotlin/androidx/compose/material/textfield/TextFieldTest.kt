@@ -49,6 +49,7 @@ import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.testutils.assertPixels
 import androidx.compose.testutils.assertShape
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
@@ -65,7 +66,9 @@ import androidx.compose.ui.node.Ref
 import androidx.compose.ui.platform.LocalTextInputService
 import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.semantics.SemanticsProperties
 import androidx.compose.ui.test.ExperimentalTestApi
+import androidx.compose.ui.test.SemanticsMatcher
 import androidx.compose.ui.test.assertHeightIsEqualTo
 import androidx.compose.ui.test.assertWidthIsEqualTo
 import androidx.compose.ui.test.captureToImage
@@ -74,12 +77,17 @@ import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.performGesture
+import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.ImeOptions
 import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.input.OffsetMapping
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.PlatformTextInputService
 import androidx.compose.ui.text.input.TextInputService
+import androidx.compose.ui.text.input.TransformedText
+import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -937,6 +945,86 @@ class TextFieldTest {
                 // avoid elevation artifacts
                 shapeOverlapPixelCount = with(rule.density) { 1.dp.toPx() }
             )
+    }
+
+    @Test
+    @LargeTest
+    fun testTransformedTextIsUsed_toDefineLabelPosition() {
+        // if non-transformed value were used to check if the text input is empty, the label
+        // wouldn't be aligned to the top, as a result it would be obscured by text
+        val prefixTransformation = VisualTransformation { text ->
+            val prefix = "prefix"
+            val transformed = buildAnnotatedString {
+                append(prefix)
+                append(text)
+            }
+            val mapping = object : OffsetMapping {
+                override fun originalToTransformed(offset: Int) = offset + prefix.length
+                override fun transformedToOriginal(offset: Int) =
+                    (offset - prefix.length).coerceAtLeast(0)
+            }
+            TransformedText(transformed, mapping)
+        }
+        rule.setMaterialContent {
+            TextField(
+                value = "",
+                onValueChange = {},
+                visualTransformation = prefixTransformation,
+                label = {
+                    Text("label", color = Color.Red, modifier = Modifier.background(Color.Red))
+                },
+                textStyle = TextStyle(color = Color.Blue),
+                colors = TextFieldDefaults.textFieldColors(backgroundColor = Color.White)
+            )
+        }
+        rule.onNode(SemanticsMatcher.keyIsDefined(SemanticsProperties.Text), true)
+            .captureToImage()
+            .assertPixels { Color.Red }
+    }
+
+    @Test
+    @LargeTest
+    fun testTransformedTextIsUsed_toDefineIfPlaceholderNeeded() {
+        // if original value were used to check if the text input is empty, the placeholder would be
+        // displayed on top of the text
+        val prefixTransformation = VisualTransformation { text ->
+            val prefix = "prefix"
+            val transformed = buildAnnotatedString {
+                append(prefix)
+                append(text)
+            }
+            val mapping = object : OffsetMapping {
+                override fun originalToTransformed(offset: Int) = offset + prefix.length
+                override fun transformedToOriginal(offset: Int) =
+                    (offset - prefix.length).coerceAtLeast(0)
+            }
+            TransformedText(transformed, mapping)
+        }
+        rule.setMaterialContent {
+            TextField(
+                modifier = Modifier.testTag(TextfieldTag),
+                value = "",
+                onValueChange = {},
+                visualTransformation = prefixTransformation,
+                placeholder = {
+                    Text(
+                        text = "placeholder",
+                        color = Color.Red,
+                        modifier = Modifier.background(Color.Red)
+                    )
+                },
+                textStyle = TextStyle(color = Color.White),
+                colors = TextFieldDefaults.textFieldColors(
+                    backgroundColor = Color.White,
+                    unfocusedIndicatorColor = Color.Transparent
+                )
+            )
+        }
+        rule.onNodeWithTag(TextfieldTag)
+            .captureToImage()
+            .assertPixels {
+                Color.White
+            }
     }
 
     private val View.isSoftwareKeyboardShown: Boolean
