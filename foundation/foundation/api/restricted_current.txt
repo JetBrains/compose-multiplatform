@@ -640,6 +640,9 @@ package androidx.compose.foundation.text {
   public final class TextLayoutResultProxyKt {
   }
 
+  public final class TouchMode_androidKt {
+  }
+
 }
 
 package androidx.compose.foundation.text.selection {
@@ -659,6 +662,9 @@ package androidx.compose.foundation.text.selection {
   }
 
   public final class SelectionManagerKt {
+  }
+
+  public final class SelectionManager_androidKt {
   }
 
   public final class SelectionRegistrarKt {
