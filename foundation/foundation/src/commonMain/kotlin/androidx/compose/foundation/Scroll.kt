@@ -23,9 +23,9 @@ import androidx.compose.foundation.gestures.Orientation
 import androidx.compose.foundation.gestures.ScrollScope
 import androidx.compose.foundation.gestures.ScrollableDefaults
 import androidx.compose.foundation.gestures.ScrollableState
+import androidx.compose.foundation.gestures.animateScrollBy
 import androidx.compose.foundation.gestures.scrollBy
 import androidx.compose.foundation.gestures.scrollable
-import androidx.compose.foundation.gestures.smoothScrollBy
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Stable
 import androidx.compose.runtime.getValue
@@ -145,17 +145,17 @@ class ScrollState(initial: Int) : ScrollableState {
         get() = scrollableState.isScrollInProgress
 
     /**
-     * Smooth scroll to position in pixels
+     * Scroll to position in pixels with animation.
      *
      * @param value target value in pixels to smooth scroll to, value will be coerced to
      * 0..maxPosition
-     * @param spec animation curve for smooth scroll animation
+     * @param spec animation curve for scroll animation
      */
-    suspend fun smoothScrollTo(
+    suspend fun animateScrollTo(
         value: Int,
         spec: AnimationSpec<Float> = SpringSpec()
     ) {
-        this.smoothScrollBy((value - this.value).toFloat(), spec)
+        this.animateScrollBy((value - this.value).toFloat(), spec)
     }
 
     /**
@@ -164,7 +164,7 @@ class ScrollState(initial: Int) : ScrollableState {
      * Cancels the currently running scroll, if any, and suspends until the cancellation is
      * complete.
      *
-     * @see smoothScrollTo for an animated version
+     * @see animateScrollTo for an animated version
      *
      * @param value number of pixels to scroll by
      * @return the amount of scroll consumed

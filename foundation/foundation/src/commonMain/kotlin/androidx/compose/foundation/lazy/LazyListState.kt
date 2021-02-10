@@ -159,7 +159,7 @@ class LazyListState constructor(
      * not be negative.
      */
     @OptIn(ExperimentalFoundationApi::class)
-    suspend fun snapToItemIndex(
+    suspend fun scrollToItem(
         /*@IntRange(from = 0)*/
         index: Int,
         /*@IntRange(from = 0)*/

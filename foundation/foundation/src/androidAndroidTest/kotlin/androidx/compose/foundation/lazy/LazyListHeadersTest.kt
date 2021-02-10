@@ -325,7 +325,7 @@ class LazyListHeadersTest {
         }
 
         rule.runOnIdle {
-            runBlocking { state.snapToItemIndex(1, itemIndexPx / 2) }
+            runBlocking { state.scrollToItem(1, itemIndexPx / 2) }
         }
 
         rule.onNodeWithTag(headerTag)

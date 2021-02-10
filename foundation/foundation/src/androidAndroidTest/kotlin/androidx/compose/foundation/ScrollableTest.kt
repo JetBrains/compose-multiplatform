@@ -17,7 +17,7 @@
 package androidx.compose.foundation
 
 import androidx.compose.animation.core.ManualFrameClock
-import androidx.compose.foundation.gestures.smoothScrollBy
+import androidx.compose.foundation.gestures.animateScrollBy
 import androidx.compose.foundation.gestures.ScrollableState
 import androidx.compose.foundation.gestures.scrollable
 import androidx.compose.foundation.layout.Box
@@ -290,10 +290,10 @@ class ScrollableTest {
         rule.awaitIdle()
         assertThat(total).isEqualTo(0f)
 
-        controller.smoothScrollBy(1000f)
+        controller.animateScrollBy(1000f)
         assertThat(total).isWithin(0.001f).of(1000f)
 
-        controller.smoothScrollBy(-200f)
+        controller.animateScrollBy(-200f)
         assertThat(total).isWithin(0.001f).of(800f)
     }
 

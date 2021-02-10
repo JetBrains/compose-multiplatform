@@ -20,7 +20,7 @@ import android.os.Looper
 import androidx.annotation.RequiresApi
 import androidx.compose.animation.core.advanceClockMillis
 import androidx.compose.foundation.gestures.scrollBy
-import androidx.compose.foundation.gestures.smoothScrollBy
+import androidx.compose.foundation.gestures.animateScrollBy
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -532,19 +532,19 @@ class ScrollTest {
         assertThat(scrollState.maxValue).isGreaterThan(0)
         val max = scrollState.maxValue
 
-        scrollState.smoothScrollTo(-100)
+        scrollState.animateScrollTo(-100)
         assertThat(scrollState.value).isEqualTo(0)
 
-        scrollState.smoothScrollBy(-100f)
+        scrollState.animateScrollBy(-100f)
         assertThat(scrollState.value).isEqualTo(0)
 
-        scrollState.smoothScrollTo(scrollState.maxValue)
+        scrollState.animateScrollTo(scrollState.maxValue)
         assertThat(scrollState.value).isEqualTo(max)
 
-        scrollState.smoothScrollTo(scrollState.maxValue + 1000)
+        scrollState.animateScrollTo(scrollState.maxValue + 1000)
         assertThat(scrollState.value).isEqualTo(max)
 
-        scrollState.smoothScrollBy(100f)
+        scrollState.animateScrollBy(100f)
         assertThat(scrollState.value).isEqualTo(max)
     }
 
