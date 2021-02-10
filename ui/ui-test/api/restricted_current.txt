@@ -180,7 +180,7 @@ package androidx.compose.ui.test {
   }
 
   public interface MainTestClock {
-    method public void advanceTimeBy(long milliseconds);
+    method public void advanceTimeBy(long milliseconds, optional boolean ignoreFrameDuration);
     method public void advanceTimeByFrame();
     method public void advanceTimeUntil(optional long timeoutMillis, kotlin.jvm.functions.Function0<java.lang.Boolean> condition);
     method public boolean getAutoAdvance();
