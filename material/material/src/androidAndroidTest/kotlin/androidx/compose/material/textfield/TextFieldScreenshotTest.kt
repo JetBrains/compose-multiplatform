@@ -150,7 +150,7 @@ class TextFieldScreenshotTest {
                 value = "Input",
                 onValueChange = {},
                 label = { Text("Label") },
-                isErrorValue = true,
+                isError = true,
                 modifier = Modifier.requiredWidth(280.dp).testTag(TextFieldTag)
             )
         }
@@ -167,7 +167,7 @@ class TextFieldScreenshotTest {
                 value = "",
                 onValueChange = {},
                 label = { Text("Label") },
-                isErrorValue = true,
+                isError = true,
                 modifier = Modifier.requiredWidth(280.dp).testTag(TextFieldTag)
             )
         }

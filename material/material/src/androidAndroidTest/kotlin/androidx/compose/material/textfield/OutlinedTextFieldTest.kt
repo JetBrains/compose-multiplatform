@@ -606,7 +606,7 @@ class OutlinedTextFieldTest {
                 value = "",
                 onValueChange = {},
                 label = {},
-                isErrorValue = false,
+                isError = false,
                 leadingIcon = {
                     assertThat(LocalContentColor.current)
                         .isEqualTo(
@@ -634,7 +634,7 @@ class OutlinedTextFieldTest {
                 value = "",
                 onValueChange = {},
                 label = {},
-                isErrorValue = true,
+                isError = true,
                 leadingIcon = {
                     assertThat(LocalContentColor.current)
                         .isEqualTo(

@@ -26,6 +26,8 @@ import androidx.compose.foundation.shape.ZeroCornerSize
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.material.TextFieldDefaults.MinHeight
+import androidx.compose.material.TextFieldDefaults.MinWidth
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -74,7 +76,7 @@ import kotlin.math.roundToInt
  *
  * @sample androidx.compose.material.samples.TextFieldWithIcons
  *
- * To handle the error input state, use [isErrorValue] parameter:
+ * To handle the error input state, use [isError] parameter:
  *
  * @sample androidx.compose.material.samples.TextFieldWithErrorState
  *
@@ -114,9 +116,9 @@ import kotlin.math.roundToInt
  * container
  * @param trailingIcon the optional trailing icon to be displayed at the end of the text field
  * container
- * @param isErrorValue indicates if the text field's current value is in error. If set to true, the
- * label, bottom indicator and trailing icon will be displayed in [errorColor] color
- * @param visualTransformation transforms the visual representation of the input [value].
+ * @param isError indicates if the text field's current value is in error. If set to true, the
+ * label, bottom indicator and trailing icon by default will be displayed in error color
+ * @param visualTransformation transforms the visual representation of the input [value]
  * For example, you can use [androidx.compose.ui.text.input.PasswordVisualTransformation] to create a password
  * text field. By default no visual transformation is applied
  * @param keyboardOptions software keyboard options that contains configuration such as
@@ -141,14 +143,10 @@ import kotlin.math.roundToInt
  * present on this TextField. You can create and pass in your own remembered
  * [InteractionState] if you want to read the [InteractionState] and customize the appearance /
  * behavior of this TextField in different [Interaction]s.
- * @param activeColor the color of the label, bottom indicator and the cursor when the text field is
- * in focus
- * @param inactiveColor the color of either the input text or placeholder when the text field is in
- * focus, and the color of the label and bottom indicator when the text field is not in focus
- * @param errorColor the alternative color of the label, bottom indicator, cursor and trailing icon
- * used when [isErrorValue] is set to true
- * @param backgroundColor the background color of the text field's container
  * @param shape the shape of the text field's container
+ * @param colors [TextFieldColors] that will be used to resolve color of the text, content
+ * (including label, placeholder, leading and trailing icons, indicator line) and background for
+ * this text field in different states. See [TextFieldDefaults.textFieldColors]
  */
 @Composable
 fun TextField(
@@ -162,7 +160,7 @@ fun TextField(
     placeholder: @Composable (() -> Unit)? = null,
     leadingIcon: @Composable (() -> Unit)? = null,
     trailingIcon: @Composable (() -> Unit)? = null,
-    isErrorValue: Boolean = false,
+    isError: Boolean = false,
     visualTransformation: VisualTransformation = VisualTransformation.None,
     keyboardOptions: KeyboardOptions = KeyboardOptions.Default,
     keyboardActions: KeyboardActions = KeyboardActions(),
@@ -170,18 +168,14 @@ fun TextField(
     maxLines: Int = Int.MAX_VALUE,
     onTextInputStarted: (SoftwareKeyboardController) -> Unit = {},
     interactionState: InteractionState = remember { InteractionState() },
-    activeColor: Color = MaterialTheme.colors.primary,
-    inactiveColor: Color = MaterialTheme.colors.onSurface,
-    errorColor: Color = MaterialTheme.colors.error,
-    backgroundColor: Color = MaterialTheme.colors.onSurface.copy(alpha = ContainerAlpha),
     shape: Shape =
-        MaterialTheme.shapes.small.copy(bottomEnd = ZeroCornerSize, bottomStart = ZeroCornerSize)
+        MaterialTheme.shapes.small.copy(bottomEnd = ZeroCornerSize, bottomStart = ZeroCornerSize),
+    colors: TextFieldColors = TextFieldDefaults.textFieldColors()
 ) {
     var textFieldValueState by remember { mutableStateOf(TextFieldValue(text = value)) }
     val textFieldValue = textFieldValueState.copy(text = value)
 
-    TextFieldImpl(
-        type = TextFieldType.Filled,
+    TextField(
         enabled = enabled,
         readOnly = readOnly,
         value = textFieldValue,
@@ -196,20 +190,17 @@ fun TextField(
         textStyle = textStyle,
         label = label,
         placeholder = placeholder,
-        leading = leadingIcon,
-        trailing = trailingIcon,
-        isErrorValue = isErrorValue,
+        leadingIcon = leadingIcon,
+        trailingIcon = trailingIcon,
+        isError = isError,
         visualTransformation = visualTransformation,
         keyboardOptions = keyboardOptions,
         keyboardActions = keyboardActions,
         maxLines = maxLines,
         onTextInputStarted = onTextInputStarted,
         interactionState = interactionState,
-        activeColor = activeColor,
-        inactiveColor = inactiveColor,
-        errorColor = errorColor,
-        backgroundColor = backgroundColor,
-        shape = shape
+        shape = shape,
+        colors = colors
     )
 }
 
@@ -247,8 +238,8 @@ fun TextField(
  * container
  * @param trailingIcon the optional trailing icon to be displayed at the end of the text field
  * container
- * @param isErrorValue indicates if the text field's current value is in error state. If set to
- * true, the label, bottom indicator and trailing icon will be displayed in [errorColor] color
+ * @param isError indicates if the text field's current value is in error state. If set to
+ * true, the label, bottom indicator and trailing icon by default will be displayed in error color
  * @param visualTransformation transforms the visual representation of the input [value].
  * For example, you can use [androidx.compose.ui.text.input.PasswordVisualTransformation] to create a password
  * text field. By default no visual transformation is applied
@@ -274,14 +265,10 @@ fun TextField(
  * present on this TextField. You can create and pass in your own remembered
  * [InteractionState] if you want to read the [InteractionState] and customize the appearance /
  * behavior of this TextField in different [Interaction]s.
- * @param activeColor the color of the label, bottom indicator and the cursor when the text field is
- * in focus
- * @param inactiveColor the color of either the input text or placeholder when the text field is in
- * focus, and the color of the label and bottom indicator when the text field is not in focus
- * @param errorColor the alternative color of the label, bottom indicator, cursor and trailing icon
- * used when [isErrorValue] is set to true
- * @param backgroundColor the background color of the text field's container
  * @param shape the shape of the text field's container
+ * @param colors [TextFieldColors] that will be used to resolve color of the text, content
+ * (including label, placeholder, leading and trailing icons, indicator line) and background for
+ * this text field in different states. See [TextFieldDefaults.textFieldColors]
  */
 @Composable
 fun TextField(
@@ -295,7 +282,7 @@ fun TextField(
     placeholder: @Composable (() -> Unit)? = null,
     leadingIcon: @Composable (() -> Unit)? = null,
     trailingIcon: @Composable (() -> Unit)? = null,
-    isErrorValue: Boolean = false,
+    isError: Boolean = false,
     visualTransformation: VisualTransformation = VisualTransformation.None,
     keyboardOptions: KeyboardOptions = KeyboardOptions.Default,
     keyboardActions: KeyboardActions = KeyboardActions(),
@@ -303,12 +290,9 @@ fun TextField(
     maxLines: Int = Int.MAX_VALUE,
     onTextInputStarted: (SoftwareKeyboardController) -> Unit = {},
     interactionState: InteractionState = remember { InteractionState() },
-    activeColor: Color = MaterialTheme.colors.primary,
-    inactiveColor: Color = MaterialTheme.colors.onSurface,
-    errorColor: Color = MaterialTheme.colors.error,
-    backgroundColor: Color = MaterialTheme.colors.onSurface.copy(alpha = ContainerAlpha),
     shape: Shape =
-        MaterialTheme.shapes.small.copy(bottomEnd = ZeroCornerSize, bottomStart = ZeroCornerSize)
+        MaterialTheme.shapes.small.copy(bottomEnd = ZeroCornerSize, bottomStart = ZeroCornerSize),
+    colors: TextFieldColors = TextFieldDefaults.textFieldColors()
 ) {
     TextFieldImpl(
         type = TextFieldType.Filled,
@@ -323,18 +307,15 @@ fun TextField(
         placeholder = placeholder,
         leading = leadingIcon,
         trailing = trailingIcon,
-        isErrorValue = isErrorValue,
+        isError = isError,
         visualTransformation = visualTransformation,
         keyboardOptions = keyboardOptions,
         keyboardActions = keyboardActions,
         maxLines = maxLines,
         onTextInputStarted = onTextInputStarted,
         interactionState = interactionState,
-        activeColor = activeColor,
-        inactiveColor = inactiveColor,
-        errorColor = errorColor,
-        backgroundColor = backgroundColor,
-        shape = shape
+        shape = shape,
+        colors = colors
     )
 }
 
@@ -366,12 +347,13 @@ internal fun TextFieldLayout(
     cursorColor: Color,
     shape: Shape
 ) {
+
     BasicTextField(
         value = value,
         modifier = modifier
             .defaultMinSize(
-                minWidth = TextFieldMinWidth,
-                minHeight = TextFieldMinHeight
+                minWidth = MinWidth,
+                minHeight = MinHeight
             )
             .background(color = backgroundColor, shape = shape)
             .drawIndicatorLine(lineWidth = indicatorWidth, color = indicatorColor),
@@ -727,4 +709,3 @@ internal fun Modifier.drawIndicatorLine(lineWidth: Dp, color: Color): Modifier {
 private val FirstBaselineOffset = 20.dp
 private val LastBaselineOffset = 10.dp
 private val TextFieldTopPadding = 4.dp
-const val ContainerAlpha = 0.12f
