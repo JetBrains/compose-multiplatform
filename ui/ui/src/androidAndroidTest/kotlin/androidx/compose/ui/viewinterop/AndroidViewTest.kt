@@ -34,6 +34,7 @@ import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.compositionLocalOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.testutils.assertPixels
 import androidx.compose.ui.Modifier
@@ -423,6 +424,41 @@ class AndroidViewTest {
         rule.runOnIdle {
             assertThat(childViewLayoutDirection).isEqualTo(android.util.LayoutDirection.RTL)
             assertThat(childCompositionLayoutDirection).isEqualTo(LayoutDirection.Ltr)
+        }
+    }
+
+    @Test
+    fun androidView_runsFactoryExactlyOnce_afterFirstComposition() {
+        var factoryRunCount = 0
+        rule.setContent {
+            val view = remember { View(rule.activity) }
+            AndroidView({ ++factoryRunCount; view })
+        }
+        rule.runOnIdle {
+            assertThat(factoryRunCount).isEqualTo(1)
+        }
+    }
+
+    @Test
+    fun androidView_runsFactoryExactlyOnce_evenWhenFactoryIsChanged() {
+        var factoryRunCount = 0
+        var first by mutableStateOf(true)
+        rule.setContent {
+            val view = remember { View(rule.activity) }
+            AndroidView(
+                if (first) {
+                    { ++factoryRunCount; view }
+                } else {
+                    { ++factoryRunCount; view }
+                }
+            )
+        }
+        rule.runOnIdle {
+            assertThat(factoryRunCount).isEqualTo(1)
+            first = false
+        }
+        rule.runOnIdle {
+            assertThat(factoryRunCount).isEqualTo(1)
         }
     }
 
