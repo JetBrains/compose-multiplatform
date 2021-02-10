@@ -16,7 +16,7 @@
 
 package androidx.compose.runtime
 
-actual typealias AtomicReference<V> = java.util.concurrent.atomic.AtomicReference<V>
+internal actual typealias AtomicReference<V> = java.util.concurrent.atomic.AtomicReference<V>
 
 internal actual open class ThreadLocal<T> actual constructor(
     private val initialValue: () -> T
