@@ -56,8 +56,7 @@ class EditProcessor {
      */
     fun reset(
         value: TextFieldValue,
-        textInputService: TextInputService?,
-        token: InputSessionToken
+        textInputSession: TextInputSession?,
     ) {
         if (mBufferState.annotatedString != value.annotatedString) {
             mBuffer = EditingBuffer(
@@ -76,7 +75,7 @@ class EditProcessor {
 
         val oldValue = mBufferState
         mBufferState = value
-        textInputService?.updateState(token, oldValue, value)
+        textInputSession?.updateState(oldValue, value)
     }
 
     /**

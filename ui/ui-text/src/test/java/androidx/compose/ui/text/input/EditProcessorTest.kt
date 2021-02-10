@@ -39,16 +39,14 @@ class EditProcessorTest {
     @Test
     fun test_new_state_and_edit_commands() {
         val proc = EditProcessor()
-        val tis: TextInputService = mock()
-        val inputSessionToken = 10 // We are not using this value in this test.
+        val tis: TextInputSession = mock()
 
         val model = TextFieldValue("ABCDE", TextRange.Zero)
-        proc.reset(model, tis, inputSessionToken)
+        proc.reset(model, tis)
 
         assertEquals(model, proc.mBufferState)
         val captor = argumentCaptor<TextFieldValue>()
         verify(tis, times(1)).updateState(
-            eq(inputSessionToken),
             eq(TextFieldValue("", TextRange.Zero)),
             captor.capture()
         )
@@ -69,28 +67,25 @@ class EditProcessorTest {
         assertEquals(1, newState.selection.min)
         assertEquals(1, newState.selection.max)
         // onEditCommands should not fire onStateUpdated since need to pass it to developer first.
-        verify(tis, never()).updateState(any(), any(), any())
+        verify(tis, never()).updateState(any(), any())
     }
 
     @Test
     fun testNewState_bufferNotUpdated_ifSameModelStructurally() {
         val processor = EditProcessor()
-        val textInputService = mock<TextInputService>()
-        val token = 10 // mock token value
+        val textInputSession = mock<TextInputSession>()
 
         val initialBuffer = processor.mBuffer
         processor.reset(
             TextFieldValue("qwerty", TextRange.Zero, TextRange.Zero),
-            textInputService,
-            token
+            textInputSession
         )
         assertNotEquals(initialBuffer, processor.mBuffer)
 
         val updatedBuffer = processor.mBuffer
         processor.reset(
             TextFieldValue("qwerty", TextRange.Zero, TextRange.Zero),
-            textInputService,
-            token
+            textInputSession
         )
         assertEquals(updatedBuffer, processor.mBuffer)
     }
@@ -98,21 +93,19 @@ class EditProcessorTest {
     @Test
     fun testNewState_new_buffer_created_if_text_is_different() {
         val processor = EditProcessor()
-        val textInputService = mock<TextInputService>()
-        val token = 10 // mock token value
+        val textInputSession = mock<TextInputSession>()
+
         val textFieldValue = TextFieldValue("qwerty", TextRange.Zero, TextRange.Zero)
         processor.reset(
             textFieldValue,
-            textInputService,
-            token
+            textInputSession
         )
         val initialBuffer = processor.mBuffer
 
         val newTextFieldValue = textFieldValue.copy("abc")
         processor.reset(
             newTextFieldValue,
-            textInputService,
-            token
+            textInputSession
         )
 
         assertNotEquals(initialBuffer, processor.mBuffer)
@@ -121,21 +114,18 @@ class EditProcessorTest {
     @Test
     fun testNewState_buffer_not_recreated_if_selection_is_different() {
         val processor = EditProcessor()
-        val textInputService = mock<TextInputService>()
-        val token = 10 // mock token value
+        val textInputSession = mock<TextInputSession>()
         val textFieldValue = TextFieldValue("qwerty", TextRange.Zero, TextRange.Zero)
         processor.reset(
             textFieldValue,
-            textInputService,
-            token
+            textInputSession
         )
         val initialBuffer = processor.mBuffer
 
         val newTextFieldValue = textFieldValue.copy(selection = TextRange(1))
         processor.reset(
             newTextFieldValue,
-            textInputService,
-            token
+            textInputSession
         )
 
         assertEquals(initialBuffer, processor.mBuffer)
@@ -146,13 +136,11 @@ class EditProcessorTest {
     @Test
     fun testNewState_buffer_not_recreated_if_composition_is_different() {
         val processor = EditProcessor()
-        val textInputService = mock<TextInputService>()
-        val token = 10 // mock token value
+        val textInputSeson = mock<TextInputSession>()
         val textFieldValue = TextFieldValue("qwerty", TextRange.Zero, TextRange(1))
         processor.reset(
             textFieldValue,
-            textInputService,
-            token
+            textInputSeson
         )
         val initialBuffer = processor.mBuffer
 
@@ -163,8 +151,7 @@ class EditProcessorTest {
         val newTextFieldValue = textFieldValue.commitComposition()
         processor.reset(
             newTextFieldValue,
-            textInputService,
-            token
+            textInputSeson
         )
 
         assertEquals(initialBuffer, processor.mBuffer)
@@ -175,16 +162,14 @@ class EditProcessorTest {
     @Test
     fun testNewState_reversedSelection_setsTheSelection() {
         val processor = EditProcessor()
-        val textInputService = mock<TextInputService>()
-        val token = 10 // mock token value
+        val textInputSession = mock<TextInputSession>()
         val initialSelection = TextRange(2, 1)
         val textFieldValue = TextFieldValue("qwerty", initialSelection, TextRange(1))
 
         // set the initial selection to be reversed
         processor.reset(
             textFieldValue,
-            textInputService,
-            token
+            textInputSession
         )
         val initialBuffer = processor.mBuffer
 
@@ -196,8 +181,7 @@ class EditProcessorTest {
         // set the new selection
         processor.reset(
             newTextFieldValue,
-            textInputService,
-            token
+            textInputSession
         )
 
         assertEquals(initialBuffer, processor.mBuffer)
