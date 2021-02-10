@@ -17,7 +17,7 @@
 package androidx.compose.foundation.text
 
 @RequiresOptIn(
-    message = "Internal/Unstable API for use only between compose-ui modules sharing " +
+    message = "Internal/Unstable API for use only between foundation modules sharing " +
         "the same exact version, subject to change without notice."
 )
 @Target(
