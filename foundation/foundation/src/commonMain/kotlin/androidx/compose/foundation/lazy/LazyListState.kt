@@ -98,7 +98,7 @@ class LazyListState constructor(
     /**
      * interactionState [InteractionState] that will be updated when component with this
      * state is being scrolled by dragging, using [Interaction.Dragged]. If you want to know whether
-     * the fling (or smooth scroll) is in progress, use [isScrollInProgress].
+     * the fling (or animated scroll) is in progress, use [isScrollInProgress].
      */
     val interactionState: InteractionState = InteractionState()
 
@@ -165,6 +165,10 @@ class LazyListState constructor(
         /*@IntRange(from = 0)*/
         scrollOffset: Int = 0
     ) = scrollableState.scroll {
+        snapToItemIndexInternal(index, scrollOffset)
+    }
+
+    internal fun snapToItemIndexInternal(index: Int, scrollOffset: Int) {
         scrollPosition.update(
             index = DataIndex(index),
             scrollOffset = scrollOffset,
@@ -230,6 +234,22 @@ class LazyListState constructor(
             scrollToBeConsumed = 0f // We're not consuming the rest, give it back
             return scrollConsumed
         }
+    }
+
+    /**
+     * Animate (smooth scroll) to the given item.
+     *
+     * @param index the index to which to scroll
+     * @param scrollOffset the offset that the item should end up after the scroll (same as
+     * [snapToItemIndex]) - note that it is an offset *backwards*, not forward
+     */
+    suspend fun animateScrollToItem(
+        /*@IntRange(from = 0)*/
+        index: Int,
+        /*@IntRange(from = 0)*/
+        scrollOffset: Int = 0
+    ) {
+        doSmoothScrollToItem(index, scrollOffset)
     }
 
     /**

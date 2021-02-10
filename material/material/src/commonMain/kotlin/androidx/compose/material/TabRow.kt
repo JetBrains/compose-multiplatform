@@ -438,7 +438,7 @@ private class ScrollableTabData(
                 coroutineScope.launch {
                     scrollState.animateScrollTo(
                         calculatedOffset,
-                        spec = ScrollableTabRowScrollSpec
+                        animationSpec = ScrollableTabRowScrollSpec
                     )
                 }
             }
