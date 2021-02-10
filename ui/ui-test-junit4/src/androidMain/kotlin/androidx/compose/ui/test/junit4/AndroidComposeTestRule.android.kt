@@ -75,15 +75,15 @@ actual fun createComposeRule(): ComposeContentTestRule =
  * activity class type [A].
  *
  * This method is useful for tests that require a custom Activity. This is usually the case for
- * app tests. Make sure that you add the provided activity into your app's manifest file (usually
- * in main/AndroidManifest.xml).
+ * tests where the compose content is set by that Activity, instead of via the test rule's
+ * [setContent][ComposeContentTestRule.setContent]. Make sure that you add the provided activity
+ * into your app's manifest file (usually in main/AndroidManifest.xml).
  *
  * This creates a test rule that is using [ActivityScenarioRule] as the activity launcher. If you
  * would like to use a different one you can create [AndroidComposeTestRule] directly and supply
  * it with your own launcher.
  *
- * If you don't care about specific activity and just want to test composables in general, see
- * [createComposeRule].
+ * If your test doesn't require a specific Activity, use [createComposeRule] instead.
  */
 inline fun <reified A : ComponentActivity> createAndroidComposeRule():
     AndroidComposeTestRule<ActivityScenarioRule<A>, A> {
@@ -99,15 +99,15 @@ inline fun <reified A : ComponentActivity> createAndroidComposeRule():
  * [activityClass].
  *
  * This method is useful for tests that require a custom Activity. This is usually the case for
- * app tests. Make sure that you add the provided activity into your app's manifest file (usually
- * in main/AndroidManifest.xml).
+ * tests where the compose content is set by that Activity, instead of via the test rule's
+ * [setContent][ComposeContentTestRule.setContent]. Make sure that you add the provided activity
+ * into your app's manifest file (usually in main/AndroidManifest.xml).
  *
  * This creates a test rule that is using [ActivityScenarioRule] as the activity launcher. If you
  * would like to use a different one you can create [AndroidComposeTestRule] directly and supply
  * it with your own launcher.
  *
- * If you don't care about specific activity and just want to test composables in general, see
- * [createComposeRule].
+ * If your test doesn't require a specific Activity, use [createComposeRule] instead.
  */
 fun <A : ComponentActivity> createAndroidComposeRule(
     activityClass: Class<A>
@@ -117,10 +117,16 @@ fun <A : ComponentActivity> createAndroidComposeRule(
 )
 
 /**
- * Factory method to provide an implementation of [ComposeTestRule] that doesn't create a host
- * for you in which you can set content. Use this if you don't want the test rule to launch an
- * activity for you, which is typically the case when you launch your activity during the test
- * instead of before the test.
+ * Factory method to provide an implementation of [ComposeTestRule] that doesn't create a compose
+ * host for you in which you can set content.
+ *
+ * This method is useful for tests that need to create their own compose host during the test.
+ * The returned test rule will not create a host, and consequently does not provide a
+ * `setContent` method. To set content in tests using this rule, use the appropriate `setContent`
+ * methods from your compose host.
+ *
+ * A typical use case on Android is when the test needs to launch an Activity (the compose host)
+ * after one or more dependencies have been injected.
  */
 fun createEmptyComposeRule(): ComposeTestRule =
     AndroidComposeTestRule<TestRule, ComponentActivity>(
@@ -134,15 +140,22 @@ fun createEmptyComposeRule(): ComposeTestRule =
     )
 
 /**
- * Android specific implementation of [ComposeContentTestRule].
+ * Android specific implementation of [ComposeContentTestRule], where compose content is hosted
+ * by an Activity.
  *
- * This rule wraps around the given [activityRule], which is responsible for launching the activity.
- * The [activityProvider] should return the launched activity instance when the [activityRule] is
- * passed to it. In this way, you can provide any test rule that can launch an activity
+ * The Activity is normally launched by the given [activityRule] before the test starts, but it
+ * is possible to pass a test rule that chooses to launch an Activity on a later time. The
+ * Activity is retrieved from the [activityRule] by means of the [activityProvider], which can be
+ * thought of as a getter for the Activity on the [activityRule]. If you use an [activityRule]
+ * that launches an Activity on a later time, you should make sure that the Activity is launched
+ * by the time or while the [activityProvider] is called.
  *
- * @param activityRule Test rule to use to launch the activity.
- * @param activityProvider To resolve the activity from the given test rule. Must be a blocking
- * function.
+ * The [AndroidComposeTestRule] wraps around the given [activityRule] to make sure the Activity
+ * is launched _after_ the [AndroidComposeTestRule] has completed all necessary steps to control
+ * and monitor the compose content.
+ *
+ * @param activityRule Test rule to use to launch the Activity.
+ * @param activityProvider Function to retrieve the Activity from the given [activityRule].
  */
 @OptIn(InternalTestApi::class)
 class AndroidComposeTestRule<R : TestRule, A : ComponentActivity>(
