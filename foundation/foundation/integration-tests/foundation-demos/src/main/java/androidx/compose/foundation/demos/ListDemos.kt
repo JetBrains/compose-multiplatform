@@ -27,7 +27,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.gestures.FlingBehavior
 import androidx.compose.foundation.gestures.ScrollScope
-import androidx.compose.foundation.gestures.smoothScrollBy
+import androidx.compose.foundation.gestures.animateScrollBy
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -152,7 +152,7 @@ private fun ListHoistedStateDemo() {
                 modifier = buttonModifier,
                 onClick = {
                     coroutineScope.launch {
-                        state.snapToItemIndex(state.firstVisibleItemIndex - 1)
+                        state.scrollToItem(state.firstVisibleItemIndex - 1)
                     }
                 }
             ) {
@@ -162,7 +162,7 @@ private fun ListHoistedStateDemo() {
                 modifier = buttonModifier,
                 onClick = {
                     coroutineScope.launch {
-                        state.snapToItemIndex(state.firstVisibleItemIndex + 1)
+                        state.scrollToItem(state.firstVisibleItemIndex + 1)
                     }
                 }
             ) {
@@ -175,7 +175,7 @@ private fun ListHoistedStateDemo() {
                         coroutineScope.launch {
                             val requestedScroll = 3000.dp.toPx()
                             lastScrollDescription = try {
-                                val actualScroll = state.smoothScrollBy(requestedScroll)
+                                val actualScroll = state.animateScrollBy(requestedScroll)
                                 "$actualScroll/$requestedScroll px"
                             } catch (_: CancellationException) {
                                 "Interrupted!"

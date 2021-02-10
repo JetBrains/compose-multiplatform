@@ -89,7 +89,7 @@ class LazyListLayoutInfoTest {
 
         rule.runOnIdle {
             runBlocking {
-                state.snapToItemIndex(1, 10)
+                state.scrollToItem(1, 10)
             }
             state.layoutInfo.assertVisibleItems(count = 4, startIndex = 1, startOffset = -10)
         }
@@ -139,7 +139,7 @@ class LazyListLayoutInfoTest {
             // empty it here and scrolling should invoke observingFun again
             currentInfo = null
             runBlocking {
-                state.snapToItemIndex(1, 0)
+                state.scrollToItem(1, 0)
             }
         }
 

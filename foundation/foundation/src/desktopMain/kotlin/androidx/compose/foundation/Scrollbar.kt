@@ -409,7 +409,7 @@ private class LazyScrollbarAdapter(
             .coerceAtLeast(0)
             .coerceAtMost(itemCount - 1)
 
-        scrollState.snapToItemIndex(
+        scrollState.scrollToItem(
             index = index,
             scrollOffset = (scrollOffsetCoerced - index * averageItemSize).toInt()
         )

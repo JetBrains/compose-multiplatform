@@ -17,7 +17,7 @@
 package androidx.compose.foundation.lazy
 
 import androidx.compose.animation.core.snap
-import androidx.compose.foundation.gestures.smoothScrollBy
+import androidx.compose.foundation.gestures.animateScrollBy
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -866,7 +866,7 @@ class LazyRowTest {
 
         rule.runOnIdle {
             runBlocking {
-                state.snapToItemIndex(3, 10)
+                state.scrollToItem(3, 10)
             }
             assertThat(state.firstVisibleItemIndex).isEqualTo(3)
             assertThat(state.firstVisibleItemScrollOffset).isEqualTo(10)
@@ -1039,7 +1039,7 @@ class LazyRowTest {
 
     private fun LazyListState.scrollBy(offset: Dp) {
         runBlocking {
-            smoothScrollBy(with(rule.density) { offset.roundToPx().toFloat() }, snap())
+            animateScrollBy(with(rule.density) { offset.roundToPx().toFloat() }, snap())
         }
     }
 }

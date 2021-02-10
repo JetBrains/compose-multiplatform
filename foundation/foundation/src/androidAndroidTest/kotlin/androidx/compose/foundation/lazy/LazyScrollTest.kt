@@ -17,7 +17,7 @@
 package androidx.compose.foundation.lazy
 
 import androidx.compose.foundation.ExperimentalFoundationApi
-import androidx.compose.foundation.gestures.smoothScrollBy
+import androidx.compose.foundation.gestures.animateScrollBy
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.width
@@ -67,7 +67,7 @@ class LazyScrollTest(private val orientation: Orientation) {
     @Test
     fun snapToItemTest() = runBlocking {
         withContext(Dispatchers.Main) {
-            state.snapToItemIndex(3)
+            state.scrollToItem(3)
         }
         assertThat(state.firstVisibleItemIndex).isEqualTo(3)
         assertThat(state.firstVisibleItemScrollOffset).isEqualTo(0)
@@ -84,7 +84,7 @@ class LazyScrollTest(private val orientation: Orientation) {
         val expectedOffset = scrollDistance % itemSize // resolves to ~17.dp.toIntPx()
 
         withContext(Dispatchers.Main) {
-            state.smoothScrollBy(scrollDistance.toFloat())
+            state.animateScrollBy(scrollDistance.toFloat())
         }
         assertThat(state.firstVisibleItemIndex).isEqualTo(expectedIndex)
         assertThat(state.firstVisibleItemScrollOffset).isEqualTo(expectedOffset)
