@@ -16,11 +16,11 @@ package androidx.compose.runtime {
     property public final T! root;
   }
 
-  public final class ActualAndroidKt {
+  public final class ActualAndroid_androidKt {
     method public static androidx.compose.runtime.MonotonicFrameClock getDefaultMonotonicFrameClock();
   }
 
-  public final class ActualJvmKt {
+  public final class ActualJvm_jvmKt {
   }
 
   public interface Applier<N> {
@@ -509,7 +509,7 @@ package androidx.compose.runtime.internal {
   @androidx.compose.runtime.ComposeCompilerApi @androidx.compose.runtime.Stable public interface ComposableLambdaN extends kotlin.jvm.functions.FunctionN<java.lang.Object> {
   }
 
-  public final class ComposableLambdaNKt {
+  public final class ComposableLambdaN_jvmKt {
     method @androidx.compose.runtime.ComposeCompilerApi public static androidx.compose.runtime.internal.ComposableLambdaN composableLambdaN(androidx.compose.runtime.Composer composer, int key, boolean tracked, String? sourceInformation, int arity, Object block);
     method @androidx.compose.runtime.ComposeCompilerApi public static androidx.compose.runtime.internal.ComposableLambdaN composableLambdaNInstance(int key, boolean tracked, String? sourceInformation, int arity, Object block);
   }

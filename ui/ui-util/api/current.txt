@@ -1,7 +1,7 @@
 // Signature format: 4.0
 package androidx.compose.ui.util {
 
-  public final class AndroidTraceKt {
+  public final class AndroidTrace_androidKt {
     method public static inline <T> T! trace(String sectionName, kotlin.jvm.functions.Function0<? extends T> block);
   }
 

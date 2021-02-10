@@ -9,17 +9,17 @@ package androidx.compose.ui.test {
     method public static void performSemanticsAction(androidx.compose.ui.test.SemanticsNodeInteraction, androidx.compose.ui.semantics.SemanticsPropertyKey<androidx.compose.ui.semantics.AccessibilityAction<kotlin.jvm.functions.Function0<java.lang.Boolean>>> key);
   }
 
-  public final class AndroidAssertionsKt {
+  public final class AndroidAssertions_androidKt {
   }
 
-  public final class AndroidImageHelpersKt {
+  public final class AndroidImageHelpers_androidKt {
     method @RequiresApi(android.os.Build.VERSION_CODES.O) public static androidx.compose.ui.graphics.ImageBitmap captureToImage(androidx.compose.ui.test.SemanticsNodeInteraction);
   }
 
-  public final class AndroidInputDispatcherKt {
+  public final class AndroidInputDispatcher_androidKt {
   }
 
-  public final class AndroidOutputKt {
+  public final class AndroidOutput_androidKt {
   }
 
   public final class AssertionsKt {
@@ -282,7 +282,7 @@ package androidx.compose.ui.test {
     property public final boolean hasAwaiters;
   }
 
-  public final class TestMonotonicFrameClockKt {
+  public final class TestMonotonicFrameClock_jvmKt {
     method @kotlinx.coroutines.ExperimentalCoroutinesApi public static androidx.compose.ui.test.TestMonotonicFrameClock TestMonotonicFrameClock(kotlinx.coroutines.CoroutineScope coroutineScope, optional long frameDelayNanos);
     method public static long getFrameDelayMillis(androidx.compose.ui.test.TestMonotonicFrameClock);
   }
@@ -314,7 +314,7 @@ package androidx.compose.ui.test {
 
 package androidx.compose.ui.test.android {
 
-  public final class WindowCaptureKt {
+  public final class WindowCapture_androidKt {
   }
 
 }

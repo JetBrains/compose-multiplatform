@@ -1,3 +1,3 @@
 // Baseline format: 1.0
-MissingNullability: androidx.compose.ui.test.junit4.AndroidComposeTestRuleKt#createAndroidComposeRule():
+MissingNullability: androidx.compose.ui.test.junit4.AndroidComposeTestRule_androidKt#createAndroidComposeRule():
     Missing nullability on method `createAndroidComposeRule` return

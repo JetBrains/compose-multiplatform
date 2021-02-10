@@ -1,7 +1,7 @@
 // Signature format: 4.0
 package androidx.compose.ui.unit {
 
-  public final class AndroidDensityKt {
+  public final class AndroidDensity_androidKt {
     method public static androidx.compose.ui.unit.Density Density(android.content.Context context);
   }
 
