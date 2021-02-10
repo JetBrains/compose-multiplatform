@@ -73,7 +73,6 @@ import androidx.compose.ui.semantics.setSelection
 import androidx.compose.ui.semantics.setText
 import androidx.compose.ui.semantics.textSelectionRange
 import androidx.compose.ui.text.AnnotatedString
-import androidx.compose.ui.text.InternalTextApi
 import androidx.compose.ui.text.SoftwareKeyboardController
 import androidx.compose.ui.text.TextLayoutResult
 import androidx.compose.ui.text.TextRange
@@ -158,7 +157,7 @@ import kotlin.math.roundToInt
  * innerTextField exactly once.
  */
 @Composable
-@OptIn(MouseTemporaryApi::class, InternalTextApi::class, InternalFoundationTextApi::class)
+@OptIn(MouseTemporaryApi::class, InternalFoundationTextApi::class)
 internal fun CoreTextField(
     value: TextFieldValue,
     onValueChange: (TextFieldValue) -> Unit,
@@ -241,7 +240,7 @@ internal fun CoreTextField(
         state.keyboardActionRunner.runAction(imeAction)
     }
 
-    state.processor.onNewState(value, textInputService, state.inputSession)
+    state.processor.reset(value, textInputService, state.inputSession)
 
     val manager = remember { TextFieldSelectionManager() }
     manager.offsetMapping = offsetMapping
@@ -511,7 +510,7 @@ internal fun CoreTextField(
 
 internal expect fun Modifier.textFieldKeyboardModifier(manager: TextFieldSelectionManager): Modifier
 
-@OptIn(InternalTextApi::class, InternalFoundationTextApi::class)
+@OptIn(InternalFoundationTextApi::class)
 internal class TextFieldState(
     var textDelegate: TextDelegate
 ) {

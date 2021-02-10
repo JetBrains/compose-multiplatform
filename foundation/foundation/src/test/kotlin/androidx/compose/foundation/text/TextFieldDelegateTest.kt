@@ -23,7 +23,6 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.AlignmentLine
 import androidx.compose.ui.layout.LayoutCoordinates
 import androidx.compose.ui.text.AnnotatedString
-import androidx.compose.ui.text.InternalTextApi
 import androidx.compose.ui.text.MultiParagraphIntrinsics
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.TextLayoutResult
@@ -54,7 +53,7 @@ import org.junit.Test
 import org.junit.runner.RunWith
 import org.junit.runners.JUnit4
 
-@OptIn(InternalTextApi::class, InternalFoundationTextApi::class)
+@OptIn(InternalFoundationTextApi::class)
 @RunWith(JUnit4::class)
 class TextFieldDelegateTest {
 
@@ -97,7 +96,7 @@ class TextFieldDelegateTest {
         val position = Offset(100f, 200f)
         val offset = 10
         val editorState = TextFieldValue(text = "Hello, World", selection = TextRange(1))
-        whenever(processor.mBufferState).thenReturn(editorState)
+        whenever(processor.toTextFieldValue()).thenReturn(editorState)
         whenever(textLayoutResultProxy.getOffsetForPosition(position)).thenReturn(offset)
 
         TextFieldDelegate.setCursorOffset(
@@ -155,7 +154,7 @@ class TextFieldDelegateTest {
             selection = TextRange(1),
             composition = TextRange(3, 5)
         )
-        whenever(processor.mBufferState).thenReturn(editorState)
+        whenever(processor.toTextFieldValue()).thenReturn(editorState)
 
         TextFieldDelegate.onBlur(
             textInputService,
@@ -181,7 +180,7 @@ class TextFieldDelegateTest {
             selection = TextRange(1),
             composition = TextRange(3, 5)
         )
-        whenever(processor.mBufferState).thenReturn(editorState)
+        whenever(processor.toTextFieldValue()).thenReturn(editorState)
 
         TextFieldDelegate.onBlur(
             textInputService,
@@ -291,7 +290,7 @@ class TextFieldDelegateTest {
         val position = Offset(100f, 200f)
         val offset = 10
         val editorState = TextFieldValue(text = "Hello, World", selection = TextRange(1))
-        whenever(processor.mBufferState).thenReturn(editorState)
+        whenever(processor.toTextFieldValue()).thenReturn(editorState)
         whenever(textLayoutResultProxy.getOffsetForPosition(position)).thenReturn(offset)
 
         TextFieldDelegate.setCursorOffset(

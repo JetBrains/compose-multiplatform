@@ -23,7 +23,6 @@ import androidx.compose.ui.graphics.Canvas
 import androidx.compose.ui.graphics.Paint
 import androidx.compose.ui.layout.LayoutCoordinates
 import androidx.compose.ui.text.AnnotatedString
-import androidx.compose.ui.text.InternalTextApi
 import androidx.compose.ui.text.Paragraph
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.TextLayoutResult
@@ -87,7 +86,7 @@ internal fun computeSizeForDefaultText(
 
 private fun Float.toIntPx(): Int = ceil(this).roundToInt()
 
-@OptIn(InternalFoundationTextApi::class, InternalTextApi::class)
+@OptIn(InternalFoundationTextApi::class)
 internal class TextFieldDelegate {
     companion object {
         /**
@@ -200,7 +199,7 @@ internal class TextFieldDelegate {
             editProcessor: EditProcessor,
             onValueChange: (TextFieldValue) -> Unit
         ) {
-            onValueChange(editProcessor.onEditCommands(ops))
+            onValueChange(editProcessor.apply(ops))
         }
 
         /**
@@ -223,7 +222,7 @@ internal class TextFieldDelegate {
             val offset = offsetMapping.transformedToOriginal(
                 textLayoutResult.getOffsetForPosition(position)
             )
-            onValueChange(editProcessor.mBufferState.copy(selection = TextRange(offset)))
+            onValueChange(editProcessor.toTextFieldValue().copy(selection = TextRange(offset)))
         }
 
         /**
@@ -273,7 +272,7 @@ internal class TextFieldDelegate {
             hasNextClient: Boolean,
             onValueChange: (TextFieldValue) -> Unit
         ) {
-            onValueChange(editProcessor.mBufferState.commitComposition())
+            onValueChange(editProcessor.toTextFieldValue().commitComposition())
             textInputService?.stopInput(token)
             if (!hasNextClient) {
                 textInputService?.hideSoftwareKeyboard(token)
