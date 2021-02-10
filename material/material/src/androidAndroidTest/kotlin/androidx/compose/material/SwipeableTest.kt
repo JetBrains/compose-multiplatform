@@ -16,7 +16,6 @@
 
 package androidx.compose.material
 
-import androidx.compose.animation.core.AnimationEndReason
 import androidx.compose.foundation.ScrollState
 import androidx.compose.foundation.gestures.Orientation
 import androidx.compose.foundation.gestures.scrollBy
@@ -58,6 +57,7 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.LargeTest
 import androidx.test.filters.MediumTest
 import com.google.common.truth.Truth.assertThat
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.async
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
@@ -1370,9 +1370,15 @@ class SwipeableTest {
             )
         }
 
-        val endValue = state.animateTo("B")
+        var result: Boolean?
+        try {
+            state.animateTo("B")
+            result = true
+        } catch (c: CancellationException) {
+            result = false
+        }
         advanceClock()
-        assertThat(endValue).isEqualTo(AnimationEndReason.Finished)
+        assertThat(result).isEqualTo(true)
     }
 
     /**
@@ -1402,8 +1408,7 @@ class SwipeableTest {
             up()
         }
         advanceClock()
-        val endReason = job.await()
-        assertThat(endReason).isEqualTo(AnimationEndReason.Interrupted)
+        job.await()
     }
 
     /**

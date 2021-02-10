@@ -16,7 +16,6 @@
 
 package androidx.compose.material
 
-import androidx.compose.animation.core.AnimationEndReason
 import androidx.compose.foundation.gestures.Orientation
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxWithConstraints
@@ -38,6 +37,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.LayoutDirection
+import kotlinx.coroutines.CancellationException
 import kotlin.math.roundToInt
 
 /**
@@ -106,20 +106,22 @@ class DismissState(
 
     /**
      * Reset the component to the default position with animation and suspend until it if fully
-     * reset or animation has been cancelled.
+     * reset or animation has been cancelled. This method will throw [CancellationException] if
+     * the animation is interrupted
      *
      * @return the reason the reset animation ended
      */
-    suspend fun reset(): AnimationEndReason = animateTo(targetValue = Default)
+    suspend fun reset() = animateTo(targetValue = Default)
 
     /**
-     * Dismiss the component in the given [direction], with an animation and suspend .
+     * Dismiss the component in the given [direction], with an animation and suspend. This method
+     * will throw [CancellationException] if the animation is interrupted
      *
      * @param direction The dismiss direction.
      */
-    suspend fun dismiss(direction: DismissDirection): AnimationEndReason {
+    suspend fun dismiss(direction: DismissDirection) {
         val targetValue = if (direction == StartToEnd) DismissedToEnd else DismissedToStart
-        return animateTo(targetValue = targetValue)
+        animateTo(targetValue = targetValue)
     }
 
     companion object {

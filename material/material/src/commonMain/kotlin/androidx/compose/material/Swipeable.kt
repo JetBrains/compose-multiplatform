@@ -17,7 +17,6 @@
 package androidx.compose.material
 
 import androidx.compose.animation.core.Animatable
-import androidx.compose.animation.core.AnimationEndReason
 import androidx.compose.animation.core.AnimationSpec
 import androidx.compose.animation.core.SpringSpec
 import androidx.compose.foundation.InteractionState
@@ -159,14 +158,15 @@ open class SwipeableState<T>(
             maxBound = Float.POSITIVE_INFINITY
             val targetOffset = newAnchors.getOffset(currentValue)
                 ?: newAnchors.keys.minByOrNull { abs(it - offset.value) }!!
-            val result = animateInternalToOffset(targetOffset, animationSpec)
+            try {
+                animateInternalToOffset(targetOffset, animationSpec)
+            } catch (c: CancellationException) {
+                // If the animation was interrupted for any reason, snap as a last resort.
+                snapInternalToOffset(targetOffset)
+            }
             currentValue = newAnchors.getValue(targetOffset)
             minBound = newAnchors.keys.minOrNull()!!
             maxBound = newAnchors.keys.maxOrNull()!!
-            // If the animation was interrupted for any reason, snap as a last resort.
-            if (result == AnimationEndReason.Interrupted) {
-                snapInternalToOffset(targetOffset)
-            }
         }
     }
 
@@ -192,28 +192,21 @@ open class SwipeableState<T>(
         }
     }
 
-    private suspend fun animateInternalToOffset(
-        target: Float,
-        spec: AnimationSpec<Float>
-    ): AnimationEndReason {
-        var result: AnimationEndReason = AnimationEndReason.Interrupted
+    private suspend fun animateInternalToOffset(target: Float, spec: AnimationSpec<Float>) {
         draggableState.drag {
             var prevValue = absoluteOffset.value
             animationTarget.value = target
             isAnimationRunning = true
             try {
-                result = Animatable(prevValue).animateTo(target, spec) {
+                Animatable(prevValue).animateTo(target, spec) {
                     dragBy(this.value - prevValue)
                     prevValue = this.value
-                }.endReason
-            } catch (c: CancellationException) {
-                result = AnimationEndReason.Interrupted
+                }
             } finally {
                 animationTarget.value = null
                 isAnimationRunning = false
             }
         }
-        return result
     }
 
     /**
@@ -310,14 +303,9 @@ open class SwipeableState<T>(
      *
      * @param targetValue The new value to animate to.
      * @param anim The animation that will be used to animate to the new value.
-     *
-     * @return animation end reason
      */
     @ExperimentalMaterialApi
-    suspend fun animateTo(
-        targetValue: T,
-        anim: AnimationSpec<Float> = animationSpec
-    ): AnimationEndReason {
+    suspend fun animateTo(targetValue: T, anim: AnimationSpec<Float> = animationSpec) {
         try {
             val targetOffset = anchors.getOffset(targetValue)
             require(anchors.isNotEmpty()) {
@@ -351,7 +339,7 @@ open class SwipeableState<T>(
      *
      * @return the reason fling ended
      */
-    suspend fun performFling(velocity: Float): AnimationEndReason {
+    suspend fun performFling(velocity: Float) {
         val lastAnchor = anchors.getOffset(currentValue)!!
         val targetValue = computeTarget(
             offset = offset.value,
@@ -362,12 +350,9 @@ open class SwipeableState<T>(
             velocityThreshold = velocityThreshold
         )
         val targetState = anchors[targetValue]
-        return if (targetState != null && confirmStateChange(targetState)) {
-            animateTo(targetState)
-        } else {
-            // If the user vetoed the state change, rollback to the previous state.
-            animateInternalToOffset(lastAnchor, animationSpec)
-        }
+        if (targetState != null && confirmStateChange(targetState)) animateTo(targetState)
+        // If the user vetoed the state change, rollback to the previous state.
+        else animateInternalToOffset(lastAnchor, animationSpec)
     }
 
     /**

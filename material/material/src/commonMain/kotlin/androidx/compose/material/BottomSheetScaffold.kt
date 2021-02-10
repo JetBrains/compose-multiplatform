@@ -16,7 +16,6 @@
 
 package androidx.compose.material
 
-import androidx.compose.animation.core.AnimationEndReason
 import androidx.compose.animation.core.AnimationSpec
 import androidx.compose.foundation.gestures.Orientation
 import androidx.compose.foundation.layout.Box
@@ -49,6 +48,7 @@ import androidx.compose.ui.semantics.expand
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.launch
 import kotlin.math.roundToInt
 
@@ -100,19 +100,21 @@ class BottomSheetState(
 
     /**
      * Expand the bottom sheet with animation and suspend until it if fully expanded or animation
-     * has been cancelled.
+     * has been cancelled. This method will throw [CancellationException] if the animation is
+     * interrupted
      *
      * @return the reason the expand animation ended
      */
-    suspend fun expand(): AnimationEndReason = animateTo(BottomSheetValue.Expanded)
+    suspend fun expand() = animateTo(BottomSheetValue.Expanded)
 
     /**
      * Collapse the bottom sheet with animation and suspend until it if fully collapsed or animation
-     * has been cancelled.
+     * has been cancelled. This method will throw [CancellationException] if the animation is
+     * interrupted
      *
      * @return the reason the collapse animation ended
      */
-    suspend fun collapse(): AnimationEndReason = animateTo(BottomSheetValue.Collapsed)
+    suspend fun collapse() = animateTo(BottomSheetValue.Collapsed)
 
     companion object {
         /**
