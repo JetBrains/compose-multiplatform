@@ -378,8 +378,6 @@ package androidx.compose.ui.text {
 
   @androidx.compose.runtime.Immutable public final inline class TextRange {
     ctor public TextRange();
-    method public static long constructor-impl(long packedValue);
-    method public static long constructor-impl(int start, int end);
     method public static operator boolean contains-5zc-tL8(long $this, long other);
     method public static operator boolean contains-impl(long $this, int offset);
     method @androidx.compose.runtime.Immutable public static inline boolean equals-impl(long p, Object? p1);
@@ -405,6 +403,7 @@ package androidx.compose.ui.text {
   }
 
   public final class TextRangeKt {
+    method public static long TextRange(int start, int end);
     method public static long TextRange(int index);
     method public static String substring-cWlJSyE(CharSequence, long range);
   }
