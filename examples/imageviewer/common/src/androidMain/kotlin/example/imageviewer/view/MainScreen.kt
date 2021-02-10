@@ -1,8 +1,9 @@
 package example.imageviewer.view
 
 import android.content.res.Configuration
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.ScrollableColumn
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -28,6 +29,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.graphics.asImageBitmap
+import androidx.compose.ui.graphics.painter.BitmapPainter
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.dp
 import example.imageviewer.common.R
@@ -145,7 +147,7 @@ fun setPreviewImageUI(content: ContentState) {
                 if (content.isMainImageEmpty()) {
                     icEmpty()
                 } else {
-                    content.getSelectedImage().asImageBitmap()
+                    BitmapPainter(content.getSelectedImage().asImageBitmap())
                 },
                 contentDescription = null,
                 modifier = Modifier
@@ -223,18 +225,16 @@ fun setMiniatureUI(
 
 @Composable
 fun setScrollableArea(content: ContentState) {
-
-    ScrollableColumn {
-        var index = 1
-        Column {
-            for (picture in content.getMiniatures()) {
-                setMiniatureUI(
-                    picture = picture,
-                    content = content
-                )
-                Spacer(modifier = Modifier.height(5.dp))
-                index++
-            }
+    var index = 1
+    val scrollState = rememberScrollState()
+    Column(Modifier.verticalScroll(scrollState)) {
+        for (picture in content.getMiniatures()) {
+            setMiniatureUI(
+                picture = picture,
+                content = content
+            )
+            Spacer(modifier = Modifier.height(5.dp))
+            index++
         }
     }
 }

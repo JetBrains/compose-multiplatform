@@ -1,7 +1,6 @@
 package example.imageviewer.view
 
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.emptyContent
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.ui.Modifier
@@ -10,7 +9,7 @@ import androidx.compose.ui.Modifier
 fun Clickable(
     modifier: Modifier = Modifier,
     onClick: (() -> Unit)? = null,
-    children: @Composable () -> Unit = emptyContent()
+    children: @Composable () -> Unit = { }
 ) {
     Box(
         modifier = modifier.clickable {
