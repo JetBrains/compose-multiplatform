@@ -38,6 +38,7 @@ abstract class CompositionContext internal constructor() {
     internal abstract val compoundHashKey: Int
     internal abstract val collectingParameterInformation: Boolean
     internal abstract val effectCoroutineContext: CoroutineContext
+    internal abstract val recomposeCoroutineContext: CoroutineContext
     internal abstract fun composeInitial(
         composition: ControlledComposition,
         content: @Composable () -> Unit

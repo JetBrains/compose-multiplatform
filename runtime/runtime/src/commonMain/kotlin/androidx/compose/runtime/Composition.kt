@@ -17,6 +17,9 @@
 @file:OptIn(InternalComposeApi::class)
 package androidx.compose.runtime
 
+import kotlin.coroutines.CoroutineContext
+import kotlin.coroutines.EmptyCoroutineContext
+
 /**
  * A composition object is usually constructed for you, and returned from an API that
  * is used to initially compose a UI. For instance, [setContent] returns a Composition.
@@ -144,6 +147,20 @@ interface ControlledComposition : Composition {
 }
 
 /**
+ * The [CoroutineContext] that should be used to perform concurrent recompositions of this
+ * [ControlledComposition] when used in an environment supporting concurrent composition.
+ *
+ * See [Recomposer.runRecomposeConcurrentlyAndApplyChanges] as an example of configuring
+ * such an environment.
+ */
+// Implementation note: as/if this method graduates it should become a real method of
+// ControlledComposition with a default implementation.
+@ExperimentalComposeApi
+val ControlledComposition.recomposeCoroutineContext: CoroutineContext
+    @ExperimentalComposeApi
+    get() = (this as? CompositionImpl)?.recomposeContext ?: EmptyCoroutineContext
+
+/**
  * This method is the way to initiate a composition. Optionally, a [parent]
  * [CompositionContext] can be provided to make the composition behave as a sub-composition of
  * the parent or a [Recomposer] can be provided.
@@ -200,6 +217,38 @@ fun ControlledComposition(
     )
 
 /**
+ * Create a [Composition] using [applier] to manage the composition, as a child of [parent].
+ *
+ * When used in a configuration that supports concurrent recomposition, hint to the environment
+ * that [recomposeCoroutineContext] should be used to perform recomposition. Recompositions will
+ * be launched into the
+ */
+@ExperimentalComposeApi
+fun Composition(
+    applier: Applier<*>,
+    parent: CompositionContext,
+    recomposeCoroutineContext: CoroutineContext
+): Composition = CompositionImpl(
+    parent,
+    applier,
+    recomposeContext = recomposeCoroutineContext
+)
+
+@TestOnly
+@ExperimentalComposeApi
+fun ControlledComposition(
+    applier: Applier<*>,
+    parent: CompositionContext,
+    recomposeCoroutineContext: CoroutineContext
+): ControlledComposition = CompositionImpl(
+    parent,
+    applier,
+    recomposeContext = recomposeCoroutineContext
+)
+
+private val PendingApplyNoModifications = Any()
+
+/**
  * @param parent An optional reference to the parent composition.
  * @param applier The applier to use to manage the tree built by the composer.
  * @param onDispose A callback to be triggered when [dispose] is called.
@@ -207,11 +256,30 @@ fun ControlledComposition(
 internal class CompositionImpl(
     private val parent: CompositionContext,
     applier: Applier<*>,
-    private val onDispose: (() -> Unit)? = null
+    private val onDispose: (() -> Unit)? = null,
+    recomposeContext: CoroutineContext? = null
 ) : ControlledComposition {
+
+    /**
+     * `null` if a composition isn't pending to apply.
+     * `Set<Any>` or `Array<Set<Any>>` if there are modifications to record
+     * [PendingApplyNoModifications] if a composition is pending to apply, no modifications.
+     * any set contents will be sent to [ComposerImpl.recordModificationsOf] after applying changes
+     * before releasing [lock]
+     */
+    private val pendingModifications = AtomicReference<Any?>(null)
+
+    // Held when making changes to self or composer
+    private val lock = Any()
+
     private val composer: ComposerImpl = ComposerImpl(applier, parent, this).also {
         parent.registerComposer(it)
     }
+
+    private val _recomposeContext: CoroutineContext? = recomposeContext
+
+    val recomposeContext: CoroutineContext
+        get() = _recomposeContext ?: parent.recomposeCoroutineContext
 
     /**
      * Return true if this is a root (non-sub-) composition.
@@ -228,7 +296,7 @@ internal class CompositionImpl(
     override val isDisposed: Boolean = disposed
 
     override val hasPendingChanges: Boolean
-        get() = composer.hasPendingChanges
+        get() = synchronized(lock) { composer.hasPendingChanges }
 
     override fun setContent(content: @Composable () -> Unit) {
         check(!disposed) { "The composition is disposed" }
@@ -236,46 +304,128 @@ internal class CompositionImpl(
         parent.composeInitial(this, composable)
     }
 
-    override fun composeContent(content: @Composable () -> Unit) {
-        composer.composeContent(content)
-    }
-
-    override fun dispose() {
-        if (!disposed) {
-            disposed = true
-            composable = {}
-            composer.dispose()
-            parent.unregisterComposition(this)
-            onDispose?.invoke()
+    @Suppress("UNCHECKED_CAST")
+    private fun drainPendingModificationsForCompositionLocked() {
+        // Recording modifications may race for lock. If there are pending modifications
+        // and we won the lock race, drain them before composing.
+        when (val toRecord = pendingModifications.getAndSet(PendingApplyNoModifications)) {
+            null -> {
+                // Do nothing, just start composing.
+            }
+            PendingApplyNoModifications -> error("pending composition has not been applied")
+            is Set<*> -> composer.recordModificationsOf(toRecord as Set<Any>)
+            is Array<*> -> for (changed in toRecord as Array<Set<Any>>) {
+                composer.recordModificationsOf(changed)
+            }
+            else -> error("corrupt pendingModifications drain: $pendingModifications")
         }
     }
 
-    override val hasInvalidations get() = composer.hasInvalidations
+    @Suppress("UNCHECKED_CAST")
+    private fun drainPendingModificationsLocked() {
+        when (val toRecord = pendingModifications.getAndSet(null)) {
+            PendingApplyNoModifications -> {
+                // No work to do
+            }
+            is Set<*> -> composer.recordModificationsOf(toRecord as Set<Any>)
+            is Array<*> -> for (changed in toRecord as Array<Set<Any>>) {
+                composer.recordModificationsOf(changed)
+            }
+            null -> error(
+                "calling recordModificationsOf and applyChanges concurrently is not supported"
+            )
+            else -> error(
+                "corrupt pendingModifications drain: $pendingModifications"
+            )
+        }
+    }
 
+    override fun composeContent(content: @Composable () -> Unit) {
+        // TODO: This should raise a signal to any currently running recompose calls
+        // to halt and return
+        synchronized(lock) {
+            drainPendingModificationsForCompositionLocked()
+            composer.composeContent(content)
+        }
+    }
+
+    override fun dispose() {
+        synchronized(lock) {
+            if (!disposed) {
+                disposed = true
+                composable = {}
+                composer.dispose()
+                parent.unregisterComposition(this)
+                onDispose?.invoke()
+            }
+        }
+    }
+
+    override val hasInvalidations get() = synchronized(lock) { composer.hasInvalidations }
+
+    /**
+     * To bootstrap multithreading handling, recording modifications is now deferred between
+     * recomposition with changes to apply and the application of those changes.
+     * [pendingModifications] will contain a queue of changes to apply once all current changes
+     * have been successfully processed. Draining this queue is the responsibility of [recompose]
+     * if it would return `false` (changes do not need to be applied) or [applyChanges].
+     */
+    @Suppress("UNCHECKED_CAST")
     override fun recordModificationsOf(values: Set<Any>) {
-        composer.recordModificationsOf(values)
+        while (true) {
+            val old = pendingModifications.get()
+            val new: Any = when (old) {
+                null, PendingApplyNoModifications -> values
+                is Set<*> -> arrayOf(old, values)
+                is Array<*> -> (old as Array<Set<Any>>) + values
+                else -> error("corrupt pendingModifications: $pendingModifications")
+            }
+            if (pendingModifications.compareAndSet(old, new)) {
+                if (old == null) {
+                    synchronized(lock) {
+                        drainPendingModificationsLocked()
+                    }
+                }
+                break
+            }
+        }
     }
 
     override fun recordReadOf(value: Any) {
+        // Not acquiring lock since this happens during composition with it already held
         composer.recordReadOf(value)
     }
 
     override fun recordWriteOf(value: Any) {
+        // Not acquiring lock since this happens during composition with it already held
         composer.recordWriteOf(value)
     }
 
-    override fun recompose(): Boolean = composer.recompose()
+    override fun recompose(): Boolean = synchronized(lock) {
+        drainPendingModificationsForCompositionLocked()
+        composer.recompose().also { shouldDrain ->
+            // Apply would normally do this for us; do it now if apply shouldn't happen.
+            if (!shouldDrain) drainPendingModificationsLocked()
+        }
+    }
 
     override fun applyChanges() {
-        composer.applyChanges()
+        synchronized(lock) {
+            composer.applyChanges()
+            drainPendingModificationsLocked()
+        }
     }
 
     override fun invalidateAll() {
-        composer.invalidateAll()
+        synchronized(lock) {
+            composer.invalidateAll()
+        }
     }
 
     override fun verifyConsistent() {
-        composer.verifyConsistent()
+        synchronized(lock) {
+            composer.verifyConsistent()
+        }
     }
 }
 

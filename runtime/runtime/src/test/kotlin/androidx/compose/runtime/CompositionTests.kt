@@ -19,25 +19,25 @@ package androidx.compose.runtime
 
 import androidx.compose.runtime.mock.Contact
 import androidx.compose.runtime.mock.ContactModel
-import androidx.compose.runtime.mock.MockViewValidator
-import androidx.compose.runtime.mock.Point
-import androidx.compose.runtime.mock.Report
-import androidx.compose.runtime.mock.TestMonotonicFrameClock
-import androidx.compose.runtime.mock.ViewApplier
-import androidx.compose.runtime.mock.contact
 import androidx.compose.runtime.mock.Edit
 import androidx.compose.runtime.mock.Linear
+import androidx.compose.runtime.mock.MockViewValidator
+import androidx.compose.runtime.mock.Point
 import androidx.compose.runtime.mock.Points
 import androidx.compose.runtime.mock.Repeated
+import androidx.compose.runtime.mock.Report
 import androidx.compose.runtime.mock.ReportsReport
 import androidx.compose.runtime.mock.ReportsTo
 import androidx.compose.runtime.mock.SelectContact
-import androidx.compose.runtime.mock.compositionTest
-import androidx.compose.runtime.mock.skip
+import androidx.compose.runtime.mock.TestMonotonicFrameClock
 import androidx.compose.runtime.mock.Text
 import androidx.compose.runtime.mock.View
+import androidx.compose.runtime.mock.ViewApplier
+import androidx.compose.runtime.mock.compositionTest
+import androidx.compose.runtime.mock.contact
 import androidx.compose.runtime.mock.expectChanges
 import androidx.compose.runtime.mock.expectNoChanges
+import androidx.compose.runtime.mock.skip
 import androidx.compose.runtime.mock.validate
 import androidx.compose.runtime.snapshots.Snapshot
 import kotlinx.coroutines.CoroutineScope
@@ -2644,19 +2644,18 @@ class CompositionTests {
     @Test
     fun testComposableLambdaSubcompositionInvalidation() = runBlockingTest {
         localRecomposerTest { recomposer ->
-            val composition = ControlledComposition(EmptyApplier(), recomposer)
+            val composition = Composition(EmptyApplier(), recomposer)
             try {
                 var rootState by mutableStateOf(false)
                 val composedResults = mutableListOf<Boolean>()
                 Snapshot.notifyObjectsInitialized()
-                recomposer.composeInitial(composition) {
+                composition.setContent {
                     // Read into local variable, local will be captured below
                     val capturedValue = rootState
                     TestSubcomposition {
                         composedResults.add(capturedValue)
                     }
                 }
-                composition.applyChanges()
                 assertEquals(listOf(false), composedResults)
                 rootState = true
                 Snapshot.sendApplyNotifications()
@@ -2811,15 +2810,22 @@ internal fun TestSubcomposition(
     val parentRef = rememberCompositionContext()
     val currentContent by rememberUpdatedState(content)
     DisposableEffect(parentRef) {
-        val subcomposition = ControlledComposition(EmptyApplier(), parentRef)
-        parentRef.composeInitial(subcomposition) {
+        val subcomposition = Composition(EmptyApplier(), parentRef)
+        // TODO: work around for b/179701728
+        callSetContent(subcomposition) {
+            // Note: This is in a lambda invocation to keep the currentContent state read
+            // in the subcomposition's content composable. Changing this to be
+            // subcomposition.setContent(currentContent) would snapshot read only on initial set.
             currentContent()
         }
-        subcomposition.applyChanges()
         onDispose {
             subcomposition.dispose()
         }
     }
+}
+
+private fun callSetContent(composition: Composition, content: @Composable () -> Unit) {
+    composition.setContent(content)
 }
 
 class Ref<T : Any> {
