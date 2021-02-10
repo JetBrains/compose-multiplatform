@@ -18,7 +18,6 @@ package androidx.compose.ui.res.vector
 
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.ColorStop
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.PathFillType
 import androidx.compose.ui.graphics.SolidColor
@@ -203,7 +202,7 @@ private fun Element.parseSweepGradient() = Brush.sweepGradient(
     )
 )
 
-private fun Element.parseColorStops(): Array<ColorStop> {
+private fun Element.parseColorStops(): Array<Pair<Float, Color>> {
     val items = childrenSequence
         .filterIsInstance<Element>()
         .filter { it.nodeName == "item" }
@@ -232,7 +231,7 @@ private fun Element.parseColorStops(): Array<ColorStop> {
     return colorStops.toTypedArray()
 }
 
-private fun Element.parseColorStop(defaultOffset: Float): ColorStop? {
+private fun Element.parseColorStop(defaultOffset: Float): Pair<Float, Color>? {
     val offset = attributeOrNull(ANDROID_NS, "offset")?.toFloat() ?: defaultOffset
     val color = attributeOrNull(ANDROID_NS, "color")?.let(::parseColorValue) ?: return null
     return offset to Color(color)

@@ -25,15 +25,6 @@ import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.toSize
 import kotlin.math.roundToInt
 
-@Deprecated(
-    "Use BitmapPainter instead",
-    ReplaceWith(
-        "BitmapPainter",
-        "androidx.compose.ui.graphics.painter.BitmapPainter"
-    )
-)
-typealias ImagePainter = BitmapPainter
-
 /**
  * [Painter] implementation used to draw an [ImageBitmap] into the provided canvas
  * This implementation can handle applying alpha and [ColorFilter] to it's drawn result
