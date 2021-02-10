@@ -23,12 +23,13 @@ import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.SolidColor
-import androidx.compose.ui.text.SoftwareKeyboardController
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.text.input.KeyboardType
@@ -84,20 +85,20 @@ fun CapitalizationAutoCorrectDemo() {
     }
 }
 
+@OptIn(ExperimentalComposeUiApi::class)
 @Composable
 private fun MyTextField(data: ImeOptionsData) {
-    val controller = remember { mutableStateOf<SoftwareKeyboardController?>(null) }
-    val state = rememberSaveable(stateSaver = TextFieldValue.Saver) {
+    var state by rememberSaveable(stateSaver = TextFieldValue.Saver) {
         mutableStateOf(TextFieldValue())
     }
+    // TODO(b/1583763): re-add software keyboard controller when replacement API is added
     BasicTextField(
         modifier = demoTextFieldModifiers.defaultMinSize(100.dp),
-        value = state.value,
+        value = state,
         keyboardOptions = data.keyboardOptions,
-        keyboardActions = KeyboardActions { controller.value?.hideSoftwareKeyboard() },
-        onValueChange = { state.value = it },
+        keyboardActions = KeyboardActions { /* hide keyboard */ },
+        onValueChange = { state = it },
         textStyle = TextStyle(fontSize = fontSize8),
-        onTextInputStarted = { controller.value = it },
         cursorBrush = SolidColor(Color.Red)
     )
 }

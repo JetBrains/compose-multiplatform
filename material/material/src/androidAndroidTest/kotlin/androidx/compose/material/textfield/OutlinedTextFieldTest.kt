@@ -58,7 +58,6 @@ import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.performGesture
-import androidx.compose.ui.text.SoftwareKeyboardController
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.ImeOptions
 import androidx.compose.ui.text.input.KeyboardType
@@ -716,30 +715,5 @@ class OutlinedTextFieldTest {
                 // avoid elevation artifacts
                 shapeOverlapPixelCount = with(rule.density) { 3.dp.toPx() }
             )
-    }
-
-    @Test
-    fun testOutlinedTextField_onTextInputStartedCallback() {
-        var controller: SoftwareKeyboardController? = null
-
-        rule.setMaterialContent {
-            OutlinedTextField(
-                modifier = Modifier.testTag(TextfieldTag),
-                value = "",
-                onValueChange = {},
-                label = {},
-                onTextInputStarted = {
-                    controller = it
-                }
-            )
-        }
-        assertThat(controller).isNull()
-
-        rule.onNodeWithTag(TextfieldTag)
-            .performClick()
-
-        rule.runOnIdle {
-            assertThat(controller).isNotNull()
-        }
     }
 }

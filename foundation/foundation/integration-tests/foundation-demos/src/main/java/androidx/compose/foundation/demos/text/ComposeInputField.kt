@@ -28,12 +28,10 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalLayoutDirection
-import androidx.compose.ui.text.SoftwareKeyboardController
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
@@ -81,7 +79,7 @@ internal fun EditLine(
     singleLine: Boolean = false,
     text: String = ""
 ) {
-    val controller = remember { mutableStateOf<SoftwareKeyboardController?>(null) }
+    // TODO(b/1583763): re-add software keyboard controller when replacement API is added
     val state = rememberSaveable { mutableStateOf(text) }
     BasicTextField(
         modifier = demoTextFieldModifiers,
@@ -91,10 +89,9 @@ internal fun EditLine(
             keyboardType = keyboardType,
             imeAction = imeAction
         ),
-        keyboardActions = KeyboardActions { controller.value?.hideSoftwareKeyboard() },
+        keyboardActions = KeyboardActions { /* hide keyboard */ },
         onValueChange = { state.value = it },
         textStyle = TextStyle(fontSize = fontSize8),
-        onTextInputStarted = { controller.value = it },
     )
 }
 
