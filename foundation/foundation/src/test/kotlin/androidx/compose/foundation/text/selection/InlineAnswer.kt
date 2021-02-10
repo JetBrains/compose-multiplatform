@@ -17,6 +17,7 @@
 package androidx.compose.foundation.text.selection
 
 import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.util.packFloats
 import org.mockito.invocation.InvocationOnMock
 import org.mockito.stubbing.Answer
 import org.mockito.stubbing.OngoingStubbing
@@ -26,5 +27,5 @@ class LongAnswer(private val value: Long) : Answer<Any> {
 }
 
 infix fun <T> OngoingStubbing<T>.doAnswer(offset: Offset): OngoingStubbing<T> {
-    return thenAnswer(LongAnswer(offset.packedValue))
+    return thenAnswer(LongAnswer(packFloats(offset.x, offset.y)))
 }

@@ -74,7 +74,6 @@ package androidx.compose.ui.geometry {
     method public static boolean equals-impl0(long p1, long p2);
     method @androidx.compose.runtime.Stable public static float getDistance-impl(long $this);
     method @androidx.compose.runtime.Stable public static float getDistanceSquared-impl(long $this);
-    method public long getPackedValue();
     method public static float getX-impl(long $this);
     method public static float getY-impl(long $this);
     method @androidx.compose.runtime.Immutable public static inline int hashCode-impl(long p);
@@ -85,7 +84,6 @@ package androidx.compose.ui.geometry {
     method @androidx.compose.runtime.Stable public static operator long times-F1C5BW0(long $this, float operand);
     method public static String toString-impl(long $this);
     method @androidx.compose.runtime.Stable public static operator long unaryMinus-F1C5BW0(long $this);
-    property public final long packedValue;
     field public static final androidx.compose.ui.geometry.Offset.Companion Companion;
   }
 
@@ -102,7 +100,7 @@ package androidx.compose.ui.geometry {
     method @androidx.compose.runtime.Stable public static long Offset(float x, float y);
     method public static boolean isFinite-k-4lQ0M(long);
     method public static boolean isSpecified-k-4lQ0M(long);
-    method public static inline boolean isUnspecified-k-4lQ0M(long);
+    method public static boolean isUnspecified-k-4lQ0M(long);
     method @androidx.compose.runtime.Stable public static long lerp-tX6QBWo(long start, long stop, float fraction);
     method public static inline long takeOrElse-Yy5JL0A(long, kotlin.jvm.functions.Function0<androidx.compose.ui.geometry.Offset> block);
   }
