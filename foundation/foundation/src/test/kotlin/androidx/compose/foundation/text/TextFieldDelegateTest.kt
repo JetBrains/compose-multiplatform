@@ -35,6 +35,7 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.OffsetMapping
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.input.TextInputService
+import androidx.compose.ui.text.input.TextInputSession
 import androidx.compose.ui.text.input.TransformedText
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.text.style.TextDecoration
@@ -42,6 +43,7 @@ import androidx.compose.ui.unit.IntSize
 import com.google.common.truth.Truth.assertThat
 import com.nhaarman.mockitokotlin2.any
 import com.nhaarman.mockitokotlin2.eq
+import com.nhaarman.mockitokotlin2.inOrder
 import com.nhaarman.mockitokotlin2.mock
 import com.nhaarman.mockitokotlin2.never
 import com.nhaarman.mockitokotlin2.times
@@ -122,7 +124,17 @@ class TextFieldDelegateTest {
             imeAction = ImeAction.Search
         )
 
-        TextFieldDelegate.onFocus(
+        val textInputSession: TextInputSession = mock()
+        whenever(
+            textInputService.startInput(
+                eq(editorState),
+                eq(imeOptions),
+                any(),
+                eq(onEditorActionPerformed)
+            )
+        ).thenReturn(textInputSession)
+
+        val actual = TextFieldDelegate.onFocus(
             textInputService = textInputService,
             value = editorState,
             editProcessor = processor,
@@ -142,39 +154,11 @@ class TextFieldDelegateTest {
             eq(onEditorActionPerformed)
         )
 
-        verify(textInputService).showSoftwareKeyboard(any())
+        verify(actual).showSoftwareKeyboard()
+        assertThat(actual).isEqualTo(textInputSession)
     }
-
-    @Test
-    fun on_blur() {
-        val inputSessionToken = 10 // We are not using this value in this test.
-
-        val editorState = TextFieldValue(
-            text = "Hello, World",
-            selection = TextRange(1),
-            composition = TextRange(3, 5)
-        )
-        whenever(processor.toTextFieldValue()).thenReturn(editorState)
-
-        TextFieldDelegate.onBlur(
-            textInputService,
-            inputSessionToken,
-            processor,
-            true,
-            onValueChange
-        )
-
-        verify(textInputService).stopInput(eq(inputSessionToken))
-        verify(textInputService, never()).hideSoftwareKeyboard(any())
-        verify(onValueChange, times(1)).invoke(
-            eq(editorState.commitComposition())
-        )
-    }
-
     @Test
     fun on_blur_with_hiding() {
-        val inputSessionToken = 10 // We are not using this value in this test.
-
         val editorState = TextFieldValue(
             text = "Hello, World",
             selection = TextRange(1),
@@ -182,16 +166,14 @@ class TextFieldDelegateTest {
         )
         whenever(processor.toTextFieldValue()).thenReturn(editorState)
 
-        TextFieldDelegate.onBlur(
-            textInputService,
-            inputSessionToken,
-            processor,
-            false, // There is no next focused client. Hide the keyboard.
-            onValueChange
-        )
+        val textInputSession = mock<TextInputSession>()
 
-        verify(textInputService).stopInput(eq(inputSessionToken))
-        verify(textInputService).hideSoftwareKeyboard(eq(inputSessionToken))
+        TextFieldDelegate.onBlur(textInputSession, processor, onValueChange)
+
+        inOrder(textInputSession) {
+            verify(textInputSession).hideSoftwareKeyboard()
+            verify(textInputSession).dispose()
+        }
         verify(onValueChange, times(1)).invoke(
             eq(editorState.commitComposition())
         )
@@ -206,35 +188,34 @@ class TextFieldDelegateTest {
             rootOffset = point
         )
         val editorState = TextFieldValue(text = "Hello, World", selection = TextRange(1))
-        val inputSessionToken = 10 // We are not using this value in this test.
+        val textInputSession: TextInputSession = mock()
+
         TextFieldDelegate.notifyFocusedRect(
             editorState,
             mDelegate,
             textLayoutResult,
             layoutCoordinates,
-            textInputService,
-            inputSessionToken,
+            textInputSession,
             true /* hasFocus */,
             OffsetMapping.Identity
         )
-        verify(textInputService).notifyFocusedRect(eq(inputSessionToken), any())
+        verify(textInputSession).notifyFocusedRect(any())
     }
 
     @Test
     fun notify_focused_rect_without_focus() {
         val editorState = TextFieldValue(text = "Hello, World", selection = TextRange(1))
-        val inputSessionToken = 10 // We are not using this value in this test.
+        val textInputSession: TextInputSession = mock()
         TextFieldDelegate.notifyFocusedRect(
             editorState,
             mDelegate,
             textLayoutResult,
             layoutCoordinates,
-            textInputService,
-            inputSessionToken,
+            textInputSession,
             false /* hasFocus */,
             OffsetMapping.Identity
         )
-        verify(textInputService, never()).notifyFocusedRect(any(), any())
+        verify(textInputSession, never()).notifyFocusedRect(any())
     }
 
     @Test
@@ -246,18 +227,17 @@ class TextFieldDelegateTest {
             rootOffset = point
         )
         val editorState = TextFieldValue(text = "Hello, World", selection = TextRange(12))
-        val inputSessionToken = 10 // We are not using this value in this test.
+        val textInputSession: TextInputSession = mock()
         TextFieldDelegate.notifyFocusedRect(
             editorState,
             mDelegate,
             textLayoutResult,
             layoutCoordinates,
-            textInputService,
-            inputSessionToken,
+            textInputSession,
             true /* hasFocus */,
             OffsetMapping.Identity
         )
-        verify(textInputService).notifyFocusedRect(eq(inputSessionToken), any())
+        verify(textInputSession).notifyFocusedRect(any())
     }
 
     @Test
@@ -265,24 +245,24 @@ class TextFieldDelegateTest {
         val rect = Rect(0f, 1f, 2f, 3f)
         val point = Offset(5f, 6f)
         val editorState = TextFieldValue(text = "Hello, World", selection = TextRange(1, 3))
-        val inputSessionToken = 10 // We are not using this value in this test.
+
         whenever(textLayoutResult.getBoundingBox(any())).thenReturn(rect)
         layoutCoordinates = MockCoordinates(
             rootOffset = point
         )
+        val textInputSession: TextInputSession = mock()
 
         TextFieldDelegate.notifyFocusedRect(
             editorState,
             mDelegate,
             textLayoutResult,
             layoutCoordinates,
-            textInputService,
-            inputSessionToken,
+            textInputSession,
             true /* hasFocus */,
             skippingOffsetMap
         )
         verify(textLayoutResult).getBoundingBox(6)
-        verify(textInputService).notifyFocusedRect(eq(inputSessionToken), any())
+        verify(textInputSession).notifyFocusedRect(any())
     }
 
     @Test

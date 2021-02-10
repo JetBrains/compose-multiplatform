@@ -28,17 +28,16 @@ import androidx.compose.ui.test.hasSetTextAction
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.performClick
 import androidx.compose.ui.text.SoftwareKeyboardController
+import androidx.compose.ui.text.input.PlatformTextInputService
 import androidx.compose.ui.text.input.TextInputService
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.MediumTest
-import com.nhaarman.mockitokotlin2.any
+import com.google.common.truth.Truth.assertThat
 import com.nhaarman.mockitokotlin2.mock
-import com.nhaarman.mockitokotlin2.times
-import com.nhaarman.mockitokotlin2.verify
-import com.nhaarman.mockitokotlin2.whenever
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
+import java.util.concurrent.CountDownLatch
 
 @MediumTest
 @RunWith(AndroidJUnit4::class)
@@ -49,13 +48,12 @@ class SoftwareKeyboardTest {
 
     @Test
     fun textField_onTextLayoutCallback() {
-        val textInputService = mock<TextInputService>()
-        val inputSessionToken = 10 // any positive number is fine.
+        val platformTextInputService = mock<PlatformTextInputService>()
+        val textInputService = TextInputService(platformTextInputService)
 
-        whenever(textInputService.startInput(any(), any(), any(), any()))
-            .thenReturn(inputSessionToken)
+        var keyboardCallback: SoftwareKeyboardController? = null
+        val latch = CountDownLatch(1)
 
-        val onTextInputStarted: (SoftwareKeyboardController) -> Unit = mock()
         rule.setContent {
             CompositionLocalProvider(
                 LocalTextInputService provides textInputService
@@ -67,7 +65,10 @@ class SoftwareKeyboardTest {
                     onValueChange = {
                         state.value = it
                     },
-                    onTextInputStarted = onTextInputStarted
+                    onTextInputStarted = {
+                        keyboardCallback = it
+                        latch.countDown()
+                    }
                 )
             }
         }
@@ -77,7 +78,8 @@ class SoftwareKeyboardTest {
             .performClick()
 
         rule.runOnIdle {
-            verify(onTextInputStarted, times(1)).invoke(any())
+            latch.await()
+            assertThat(keyboardCallback).isNotNull()
         }
     }
 }

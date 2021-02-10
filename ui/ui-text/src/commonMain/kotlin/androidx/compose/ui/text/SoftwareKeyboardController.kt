@@ -17,15 +17,13 @@
 package androidx.compose.ui.text
 
 import androidx.compose.ui.geometry.Rect
-import androidx.compose.ui.text.input.InputSessionToken
-import androidx.compose.ui.text.input.TextInputService
+import androidx.compose.ui.text.input.TextInputSession
 
 /**
  * Provide software keyboard control.
  */
 class SoftwareKeyboardController(
-    private val textInputService: TextInputService,
-    private val token: InputSessionToken
+    private val textInputSession: TextInputSession,
 ) {
     /**
      * Show software keyboard
@@ -33,14 +31,18 @@ class SoftwareKeyboardController(
      * There is no guarantee nor callback of the result of this API.
      * Do nothing if bound text field loses input session.
      */
-    fun showSoftwareKeyboard() = textInputService.showSoftwareKeyboard(token)
+    fun showSoftwareKeyboard() {
+        textInputSession.showSoftwareKeyboard()
+    }
 
     /**
      * Hide software keyboard
      *
      * Do nothing if bound text field loses input session.
      */
-    fun hideSoftwareKeyboard() = textInputService.hideSoftwareKeyboard(token)
+    fun hideSoftwareKeyboard() {
+        textInputSession.hideSoftwareKeyboard()
+    }
 
     /**
      * Notify to IME about the currently focused rectangle.
@@ -48,5 +50,7 @@ class SoftwareKeyboardController(
      * Do nothing if bound text field loses input session.
      * @param rect focused rectangle in the root view coordinate.
      */
-    fun notifyFocusedRect(rect: Rect) = textInputService.notifyFocusedRect(token, rect)
+    fun notifyFocusedRect(rect: Rect) {
+        textInputSession.notifyFocusedRect(rect)
+    }
 }

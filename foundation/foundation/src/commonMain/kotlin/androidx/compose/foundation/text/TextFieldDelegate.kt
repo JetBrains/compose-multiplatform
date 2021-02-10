@@ -32,13 +32,12 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.input.EditCommand
 import androidx.compose.ui.text.input.EditProcessor
-import androidx.compose.ui.text.input.INVALID_SESSION
 import androidx.compose.ui.text.input.ImeAction
-import androidx.compose.ui.text.input.InputSessionToken
 import androidx.compose.ui.text.input.ImeOptions
 import androidx.compose.ui.text.input.OffsetMapping
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.input.TextInputService
+import androidx.compose.ui.text.input.TextInputSession
 import androidx.compose.ui.text.input.TransformedText
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.Constraints
@@ -142,8 +141,7 @@ internal class TextFieldDelegate {
          * @param value The editor model
          * @param textDelegate The text delegate
          * @param layoutCoordinates The layout coordinates
-         * @param textInputService The text input service
-         * @param token The current input session token.
+         * @param textInputSession The current input session.
          * @param hasFocus True if focus is gained.
          * @param offsetMapping The mapper from/to editing buffer to/from visible text.
          */
@@ -153,8 +151,7 @@ internal class TextFieldDelegate {
             textDelegate: TextDelegate,
             textLayoutResult: TextLayoutResult,
             layoutCoordinates: LayoutCoordinates,
-            textInputService: TextInputService,
-            token: InputSessionToken,
+            textInputSession: TextInputSession,
             hasFocus: Boolean,
             offsetMapping: OffsetMapping
         ) {
@@ -180,8 +177,7 @@ internal class TextFieldDelegate {
             }
             val globalLT = layoutCoordinates.localToRoot(Offset(bbox.left, bbox.top))
 
-            textInputService.notifyFocusedRect(
-                token,
+            textInputSession.notifyFocusedRect(
                 Rect(Offset(globalLT.x, globalLT.y), Size(bbox.width, bbox.height))
             )
         }
@@ -237,46 +233,41 @@ internal class TextFieldDelegate {
          */
         @JvmStatic
         internal fun onFocus(
-            textInputService: TextInputService?,
+            textInputService: TextInputService,
             value: TextFieldValue,
             editProcessor: EditProcessor,
             imeOptions: ImeOptions,
             onValueChange: (TextFieldValue) -> Unit,
             onImeActionPerformed: (ImeAction) -> Unit
-        ): InputSessionToken {
-            val inputSessionToken = textInputService?.startInput(
+        ): TextInputSession {
+            val textInputSession = textInputService.startInput(
                 value = value.copy(),
                 imeOptions = imeOptions,
                 onEditCommand = { onEditCommand(it, editProcessor, onValueChange) },
                 onImeActionPerformed = onImeActionPerformed
-            ) ?: INVALID_SESSION
+            )
 
-            textInputService?.showSoftwareKeyboard(inputSessionToken)
+            textInputSession.showSoftwareKeyboard()
 
-            return inputSessionToken
+            return textInputSession
         }
 
         /**
          * Called when the composable loses input focus
          *
-         * @param textInputService The text input service
-         * @param token The current input session token.
+         * @param textInputSession The current input session.
          * @param editProcessor The edit processor
          * @param onValueChange The callback called when the new editor state arrives.
          */
         @JvmStatic
         internal fun onBlur(
-            textInputService: TextInputService?,
-            token: InputSessionToken,
+            textInputSession: TextInputSession,
             editProcessor: EditProcessor,
-            hasNextClient: Boolean,
             onValueChange: (TextFieldValue) -> Unit
         ) {
             onValueChange(editProcessor.toTextFieldValue().commitComposition())
-            textInputService?.stopInput(token)
-            if (!hasNextClient) {
-                textInputService?.hideSoftwareKeyboard(token)
-            }
+            textInputSession.hideSoftwareKeyboard()
+            textInputSession.dispose()
         }
 
         /**
