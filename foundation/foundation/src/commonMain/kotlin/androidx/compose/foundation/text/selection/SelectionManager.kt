@@ -35,6 +35,8 @@ import androidx.compose.ui.geometry.Rect
 import androidx.compose.foundation.legacygestures.DragObserver
 import androidx.compose.ui.hapticfeedback.HapticFeedback
 import androidx.compose.ui.hapticfeedback.HapticFeedbackType
+import androidx.compose.ui.input.key.KeyEvent
+import androidx.compose.ui.input.key.onKeyEvent
 import androidx.compose.ui.layout.LayoutCoordinates
 import androidx.compose.ui.layout.boundsInWindow
 import androidx.compose.ui.layout.onGloballyPositioned
@@ -59,6 +61,11 @@ internal class SelectionManager(private val selectionRegistrar: SelectionRegistr
                 updateHandleOffsets()
             }
         }
+
+    /**
+     * Is touch mode active
+     */
+    var touchMode: Boolean = true
 
     /**
      * The manager will invoke this every time it comes to the conclusion that the selection should
@@ -104,6 +111,14 @@ internal class SelectionManager(private val selectionRegistrar: SelectionRegistr
             }
         }
         .focusable(interactionState = interactionState)
+        .onKeyEvent {
+            if (isCopyKeyEvent(it)) {
+                copy()
+                true
+            } else {
+                false
+            }
+        }
 
     /**
      * Layout Coordinates of the selection container.
@@ -162,7 +177,7 @@ internal class SelectionManager(private val selectionRegistrar: SelectionRegistr
                 startPosition = convertToContainerCoordinates(layoutCoordinates, startPosition),
                 endPosition = convertToContainerCoordinates(layoutCoordinates, startPosition),
                 isStartHandle = true,
-                longPress = true
+                longPress = touchMode
             )
             hideSelectionToolbar()
             focusRequester.requestFocus()
@@ -174,7 +189,7 @@ internal class SelectionManager(private val selectionRegistrar: SelectionRegistr
                     startPosition = convertToContainerCoordinates(layoutCoordinates, startPosition),
                     endPosition = convertToContainerCoordinates(layoutCoordinates, endPosition),
                     isStartHandle = false,
-                    longPress = true
+                    longPress = touchMode
                 )
             }
 
@@ -542,6 +557,8 @@ internal class SelectionManager(private val selectionRegistrar: SelectionRegistr
 internal fun merge(lhs: Selection?, rhs: Selection?): Selection? {
     return lhs?.merge(rhs) ?: rhs
 }
+
+internal expect fun isCopyKeyEvent(keyEvent: KeyEvent): Boolean
 
 internal fun getCurrentSelectedText(
     selectable: Selectable,

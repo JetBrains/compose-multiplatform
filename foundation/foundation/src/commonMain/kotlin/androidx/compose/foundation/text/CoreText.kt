@@ -17,6 +17,7 @@
 
 package androidx.compose.foundation.text
 
+import androidx.compose.foundation.legacygestures.DragObserver
 import androidx.compose.foundation.text.selection.MultiWidgetSelectionDelegate
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
@@ -153,12 +154,22 @@ internal fun CoreText(
             .then(controller.modifiers)
             .then(
                 if (selectionRegistrar != null) {
-                    Modifier.longPressDragGestureFilter(
-                        longPressDragObserver(
-                            state = state,
-                            selectionRegistrar = selectionRegistrar
+                    if (isInTouchMode) {
+                        Modifier.longPressDragGestureFilter(
+                            longPressDragObserver(
+                                state = state,
+                                selectionRegistrar = selectionRegistrar
+                            )
                         )
-                    )
+                    } else {
+                        Modifier.mouseDragGestureFilter(
+                            mouseSelectionObserver(
+                                state = state,
+                                selectionRegistrar = selectionRegistrar
+                            ),
+                            enabled = true
+                        )
+                    }
                 } else {
                     Modifier
                 }
@@ -500,6 +511,49 @@ internal fun longPressDragObserver(
 
         override fun onCancel() {
             selectionRegistrar?.notifySelectionUpdateEnd()
+        }
+    }
+}
+
+@Suppress("DEPRECATION") // DragObserver
+internal fun mouseSelectionObserver(
+    state: TextState,
+    selectionRegistrar: SelectionRegistrar?
+): DragObserver {
+    var dragBeginPosition = Offset.Zero
+
+    var dragTotalDistance = Offset.Zero
+    return object : DragObserver {
+        override fun onStart(downPosition: Offset) {
+            state.layoutCoordinates?.let {
+                if (!it.isAttached) return
+
+                selectionRegistrar?.notifySelectionUpdateStart(
+                    layoutCoordinates = it,
+                    startPosition = downPosition
+                )
+
+                dragBeginPosition = downPosition
+            }
+
+            if (state.selectionRange == null) return
+            dragTotalDistance = Offset.Zero
+        }
+
+        override fun onDrag(dragDistance: Offset): Offset {
+            state.layoutCoordinates?.let {
+                if (!it.isAttached) return Offset.Zero
+                if (state.selectionRange == null) return Offset.Zero
+
+                dragTotalDistance += dragDistance
+
+                selectionRegistrar?.notifySelectionUpdate(
+                    layoutCoordinates = it,
+                    startPosition = dragBeginPosition,
+                    endPosition = dragBeginPosition + dragTotalDistance
+                )
+            }
+            return dragDistance
         }
     }
 }

@@ -17,6 +17,7 @@
 package androidx.compose.foundation.text.selection
 
 import androidx.compose.foundation.Interaction
+import androidx.compose.foundation.text.isInTouchMode
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.CompositionLocalProvider
@@ -24,6 +25,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.foundation.legacygestures.dragGestureFilter
 import androidx.compose.ui.platform.LocalClipboardManager
@@ -68,6 +70,7 @@ fun DisableSelection(content: @Composable () -> Unit) {
  * The selection composable wraps composables and let them to be selectable. It paints the selection
  * area with start and end handles.
  */
+@OptIn(ExperimentalComposeUiApi::class)
 @Suppress("ComposableLambdaParameterNaming", "DEPRECATION")
 @Composable
 internal fun SelectionContainer(
@@ -87,13 +90,14 @@ internal fun SelectionContainer(
     manager.textToolbar = LocalTextToolbar.current
     manager.onSelectionChange = onSelectionChange
     manager.selection = selection
+    manager.touchMode = isInTouchMode
 
     CompositionLocalProvider(LocalSelectionRegistrar provides registrarImpl) {
         // Get the layout coordinates of the selection container. This is for hit test of
         // cross-composable selection.
         SimpleLayout(modifier = modifier.then(manager.modifier)) {
             children()
-            if (manager.interactionState.contains(Interaction.Focused)) {
+            if (isInTouchMode && manager.interactionState.contains(Interaction.Focused)) {
                 manager.selection?.let {
                     for (isStartHandle in listOf(true, false)) {
                         SelectionHandle(
