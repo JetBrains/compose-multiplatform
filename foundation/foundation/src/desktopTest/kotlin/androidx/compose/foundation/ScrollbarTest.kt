@@ -35,20 +35,22 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.input.mouse.MouseScrollEvent
-import androidx.compose.ui.input.mouse.MouseScrollUnit
 import androidx.compose.ui.input.mouse.MouseScrollOrientation
+import androidx.compose.ui.input.mouse.MouseScrollUnit
 import androidx.compose.ui.platform.DesktopPlatform
 import androidx.compose.ui.platform.DesktopPlatformAmbient
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.test.ExperimentalTestApi
+import androidx.compose.ui.test.GestureScope
 import androidx.compose.ui.test.assertTopPositionInRootIsEqualTo
 import androidx.compose.ui.test.down
 import androidx.compose.ui.test.junit4.ComposeTestRule
 import androidx.compose.ui.test.junit4.DesktopComposeTestRule
 import androidx.compose.ui.test.junit4.createComposeRule
+import androidx.compose.ui.test.moveTo
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.performGesture
-import androidx.compose.ui.test.swipe
+import androidx.compose.ui.test.up
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.Dispatchers
@@ -79,7 +81,7 @@ class ScrollbarTest {
             rule.awaitIdle()
 
             rule.onNodeWithTag("scrollbar").performGesture {
-                swipe(start = Offset(0f, 25f), end = Offset(0f, 50f))
+                instantSwipe(start = Offset(0f, 25f), end = Offset(0f, 50f))
             }
             rule.awaitIdle()
             rule.onNodeWithTag("box0").assertTopPositionInRootIsEqualTo(-50.dp)
@@ -95,13 +97,13 @@ class ScrollbarTest {
             rule.awaitIdle()
 
             rule.onNodeWithTag("scrollbar").performGesture {
-                swipe(start = Offset(0f, 25f), end = Offset(0f, 500f))
+                instantSwipe(start = Offset(0f, 25f), end = Offset(0f, 500f))
             }
             rule.awaitIdle()
             rule.onNodeWithTag("box0").assertTopPositionInRootIsEqualTo(-100.dp)
 
             rule.onNodeWithTag("scrollbar").performGesture {
-                swipe(start = Offset(0f, 99f), end = Offset(0f, -500f))
+                instantSwipe(start = Offset(0f, 99f), end = Offset(0f, -500f))
             }
             rule.awaitIdle()
             rule.onNodeWithTag("box0").assertTopPositionInRootIsEqualTo(0.dp)
@@ -117,7 +119,7 @@ class ScrollbarTest {
             rule.awaitIdle()
 
             rule.onNodeWithTag("scrollbar").performGesture {
-                swipe(start = Offset(10f, 25f), end = Offset(0f, 50f))
+                instantSwipe(start = Offset(10f, 25f), end = Offset(0f, 50f))
             }
             rule.awaitIdle()
             rule.onNodeWithTag("box0").assertTopPositionInRootIsEqualTo(0.dp)
@@ -181,7 +183,7 @@ class ScrollbarTest {
             rule.onNodeWithTag("box0").assertTopPositionInRootIsEqualTo(-100.dp)
 
             rule.onNodeWithTag("scrollbar").performGesture {
-                swipe(start = Offset(0f, 99f), end = Offset(0f, -500f))
+                instantSwipe(start = Offset(0f, 99f), end = Offset(0f, -500f))
             }
             rule.awaitIdle()
             rule.onNodeWithTag("box0").assertTopPositionInRootIsEqualTo(0.dp)
@@ -248,7 +250,7 @@ class ScrollbarTest {
             rule.awaitIdle()
 
             rule.onNodeWithTag("scrollbar").performGesture {
-                swipe(start = Offset(0f, 25f), end = Offset(0f, 500f))
+                instantSwipe(start = Offset(0f, 25f), end = Offset(0f, 500f))
             }
             rule.awaitIdle()
             rule.onNodeWithTag("box0").assertTopPositionInRootIsEqualTo(-100.dp)
@@ -275,7 +277,7 @@ class ScrollbarTest {
             rule.awaitIdle()
 
             rule.onNodeWithTag("scrollbar").performGesture {
-                swipe(start = Offset(0f, 0f), end = Offset(0f, 11f), durationMillis = 1)
+                instantSwipe(start = Offset(0f, 0f), end = Offset(0f, 11f))
             }
             rule.awaitIdle()
             assertEquals(2, state.firstVisibleItemIndex)
@@ -303,7 +305,7 @@ class ScrollbarTest {
             rule.awaitIdle()
 
             rule.onNodeWithTag("scrollbar").performGesture {
-                swipe(start = Offset(0f, 0f), end = Offset(0f, 26f), durationMillis = 1)
+                instantSwipe(start = Offset(0f, 0f), end = Offset(0f, 26f))
             }
             rule.awaitIdle()
             assertEquals(5, state.firstVisibleItemIndex)
@@ -331,14 +333,14 @@ class ScrollbarTest {
             rule.awaitIdle()
 
             rule.onNodeWithTag("scrollbar").performGesture {
-                swipe(start = Offset(0f, 0f), end = Offset(0f, 10000f), durationMillis = 1)
+                instantSwipe(start = Offset(0f, 0f), end = Offset(0f, 10000f))
             }
             rule.awaitIdle()
             assertEquals(15, state.firstVisibleItemIndex)
             assertEquals(0, state.firstVisibleItemScrollOffset)
 
             rule.onNodeWithTag("scrollbar").performGesture {
-                swipe(start = Offset(0f, 99f), end = Offset(0f, -10000f), durationMillis = 1)
+                instantSwipe(start = Offset(0f, 99f), end = Offset(0f, -10000f))
             }
             rule.awaitIdle()
             assertEquals(0, state.firstVisibleItemIndex)
@@ -443,6 +445,12 @@ class ScrollbarTest {
                     .testTag("scrollbar")
             )
         }
+    }
+
+    private fun GestureScope.instantSwipe(start: Offset, end: Offset) {
+        down(start)
+        moveTo(end)
+        up()
     }
 
     @Composable
