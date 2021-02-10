@@ -69,7 +69,6 @@ package androidx.compose.ui.geometry {
     ctor public Offset();
     method @androidx.compose.runtime.Stable public static operator float component1-impl(long $this);
     method @androidx.compose.runtime.Stable public static operator float component2-impl(long $this);
-    method public static long constructor-impl(long packedValue);
     method public static long copy-F1C5BW0(long $this, optional float x, optional float y);
     method @androidx.compose.runtime.Stable public static operator long div-F1C5BW0(long $this, float operand);
     method @androidx.compose.runtime.Immutable public static inline boolean equals-impl(long p, Object? p1);
@@ -101,7 +100,7 @@ package androidx.compose.ui.geometry {
   }
 
   public final class OffsetKt {
-    method @androidx.compose.runtime.Stable public static inline long Offset(float x, float y);
+    method @androidx.compose.runtime.Stable public static long Offset(float x, float y);
     method public static boolean isFinite-k-4lQ0M(long);
     method public static boolean isSpecified-k-4lQ0M(long);
     method public static inline boolean isUnspecified-k-4lQ0M(long);
