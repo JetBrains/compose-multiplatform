@@ -16,7 +16,6 @@
 
 package androidx.compose.material
 
-import androidx.compose.animation.core.AnimationEndReason
 import androidx.compose.animation.core.TweenSpec
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.gestures.Orientation
@@ -50,6 +49,7 @@ import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.util.lerp
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.launch
 import kotlin.math.roundToInt
 
@@ -119,19 +119,21 @@ class DrawerState(
 
     /**
      * Open the drawer with animation and suspend until it if fully opened or animation has been
-     * cancelled.
+     * cancelled. This method will throw [CancellationException] if the animation is
+     * interrupted
      *
      * @return the reason the open animation ended
      */
-    suspend fun open(): AnimationEndReason = animateTo(DrawerValue.Open)
+    suspend fun open() = animateTo(DrawerValue.Open)
 
     /**
      * Close the drawer with animation and suspend until it if fully closed or animation has been
-     * cancelled.
+     * cancelled. This method will throw [CancellationException] if the animation is
+     * interrupted
      *
      * @return the reason the close animation ended
      */
-    suspend fun close(): AnimationEndReason = animateTo(DrawerValue.Closed)
+    suspend fun close() = animateTo(DrawerValue.Closed)
 
     companion object {
         /**
@@ -181,15 +183,17 @@ class BottomDrawerState(
 
     /**
      * Open the drawer with animation and suspend until it if fully opened or animation has been
-     * cancelled.
+     * cancelled. This method will throw [CancellationException] if the animation is
+     * interrupted
      *
      * @return the reason the open animation ended
      */
-    suspend fun open(): AnimationEndReason = animateTo(BottomDrawerValue.Open)
+    suspend fun open() = animateTo(BottomDrawerValue.Open)
 
     /**
      * Close the drawer with animation and suspend until it if fully closed or animation has been
-     * cancelled.
+     * cancelled. This method will throw [CancellationException] if the animation is
+     * interrupted
      *
      * @return the reason the close animation ended
      */
