@@ -35,7 +35,7 @@ fun ScaleFactor(scaleX: Float, scaleY: Float) = ScaleFactor(packFloats(scaleX, s
  */
 @Suppress("EXPERIMENTAL_FEATURE_WARNING")
 @Immutable
-inline class ScaleFactor(@PublishedApi internal val packedValue: Long) {
+inline class ScaleFactor internal constructor(@PublishedApi internal val packedValue: Long) {
 
     /**
      * Returns the scale factor to apply along the horizontal axis

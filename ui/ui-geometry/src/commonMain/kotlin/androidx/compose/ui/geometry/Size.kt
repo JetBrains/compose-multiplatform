@@ -39,7 +39,7 @@ fun Size(width: Float, height: Float) = Size(packFloats(width, height))
  */
 @Suppress("EXPERIMENTAL_FEATURE_WARNING")
 @Immutable
-inline class Size(@PublishedApi internal val packedValue: Long) {
+inline class Size internal constructor(@PublishedApi internal val packedValue: Long) {
 
     @Stable
     val width: Float
