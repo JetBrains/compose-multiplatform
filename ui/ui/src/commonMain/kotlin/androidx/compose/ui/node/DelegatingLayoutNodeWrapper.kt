@@ -79,7 +79,7 @@ internal open class DelegatingLayoutNodeWrapper<T : Modifier.Element>(
         }
     }
 
-    override fun get(line: AlignmentLine): Int = wrapped[line]
+    override fun get(alignmentLine: AlignmentLine): Int = wrapped[alignmentLine]
 
     override fun placeAt(
         position: IntOffset,

@@ -152,7 +152,7 @@ interface ColumnScope {
     @Stable
     fun Modifier.alignBy(alignmentLine: VerticalAlignmentLine) = this.then(
         SiblingsAlignedModifier.WithAlignmentLine(
-            line = alignmentLine,
+            alignmentLine = alignmentLine,
             inspectorInfo = debugInspectorInfo {
                 name = "alignBy"
                 value = alignmentLine

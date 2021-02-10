@@ -92,12 +92,12 @@ fun SimpleRelativeToSiblings() {
         // left edge of the third one.
         Box(
             Modifier.size(80.dp, 40.dp)
-                .alignBy { it.width / 2 }
+                .alignBy { it.measuredWidth / 2 }
                 .background(Color.Blue)
         )
         Box(
             Modifier.size(80.dp, 40.dp)
-                .alignBy { it.width }
+                .alignBy { it.measuredWidth }
                 .background(Color.Magenta)
         )
         Box(
@@ -139,7 +139,7 @@ fun SimpleRelativeToSiblingsInColumn() {
         // left edge of the third one.
         Box(
             Modifier.size(80.dp, 40.dp)
-                .alignBy { it.width / 2 }
+                .alignBy { it.measuredWidth / 2 }
                 .background(Color.Blue)
         )
         RectangleWithStartEnd(

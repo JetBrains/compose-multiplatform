@@ -143,9 +143,9 @@ fun SemanticsNodeInteraction.assertLeftPositionInRootIsEqualTo(
  * Returns the position of an [alignment line][AlignmentLine], or [Dp.Unspecified] if the line is
  * not provided.
  */
-fun SemanticsNodeInteraction.getAlignmentLinePosition(line: AlignmentLine): Dp {
+fun SemanticsNodeInteraction.getAlignmentLinePosition(alignmentLine: AlignmentLine): Dp {
     return withDensity {
-        val pos = it.getAlignmentLinePosition(line)
+        val pos = it.getAlignmentLinePosition(alignmentLine)
         if (pos == AlignmentLine.Unspecified) {
             Dp.Unspecified
         } else {

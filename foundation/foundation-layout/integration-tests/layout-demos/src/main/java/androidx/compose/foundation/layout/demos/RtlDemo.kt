@@ -136,13 +136,13 @@ private fun TestText() {
 private fun TestSiblings() {
     Column {
         Box(
-            boxSize.background(color = Color.Red).alignBy { p -> p.width }
+            boxSize.background(color = Color.Red).alignBy { p -> p.measuredWidth }
         ) {}
         Box(
-            boxSize.background(color = Color.Green).alignBy { p -> p.width / 2 }
+            boxSize.background(color = Color.Green).alignBy { p -> p.measuredWidth / 2 }
         ) {}
         Box(
-            boxSize.background(color = Color.Blue).alignBy { p -> p.width / 4 }
+            boxSize.background(color = Color.Blue).alignBy { p -> p.measuredWidth / 4 }
         ) {}
     }
 }

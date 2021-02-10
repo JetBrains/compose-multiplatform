@@ -389,7 +389,7 @@ internal sealed class CrossAxisAlignment {
         override val isRelative: Boolean
             get() = true
 
-        override fun calculateAlignmentLinePosition(placeable: Placeable): Int? {
+        override fun calculateAlignmentLinePosition(placeable: Placeable): Int {
             return alignmentLineProvider.calculateAlignmentLinePosition(placeable)
         }
 
@@ -401,7 +401,7 @@ internal sealed class CrossAxisAlignment {
         ): Int {
             val alignmentLinePosition =
                 alignmentLineProvider.calculateAlignmentLinePosition(placeable)
-            return if (alignmentLinePosition != null) {
+            return if (alignmentLinePosition != AlignmentLine.Unspecified) {
                 val line = beforeCrossAxisAlignmentLine - alignmentLinePosition
                 if (layoutDirection == LayoutDirection.Rtl) {
                     size - line
@@ -735,7 +735,7 @@ internal sealed class SiblingsAlignedModifier(
         val block: (Measured) -> Int,
         inspectorInfo: InspectorInfo.() -> Unit
     ) : SiblingsAlignedModifier(inspectorInfo) {
-        override fun Density.modifyParentData(parentData: Any?): Any? {
+        override fun Density.modifyParentData(parentData: Any?): Any {
             return ((parentData as? RowColumnParentData) ?: RowColumnParentData()).also {
                 it.crossAxisAlignment =
                     CrossAxisAlignment.Relative(AlignmentLineProvider.Block(block))
@@ -754,25 +754,25 @@ internal sealed class SiblingsAlignedModifier(
     }
 
     internal class WithAlignmentLine(
-        val line: AlignmentLine,
+        val alignmentLine: AlignmentLine,
         inspectorInfo: InspectorInfo.() -> Unit
     ) : SiblingsAlignedModifier(inspectorInfo) {
-        override fun Density.modifyParentData(parentData: Any?): Any? {
+        override fun Density.modifyParentData(parentData: Any?): Any {
             return ((parentData as? RowColumnParentData) ?: RowColumnParentData()).also {
                 it.crossAxisAlignment =
-                    CrossAxisAlignment.Relative(AlignmentLineProvider.Value(line))
+                    CrossAxisAlignment.Relative(AlignmentLineProvider.Value(alignmentLine))
             }
         }
 
         override fun equals(other: Any?): Boolean {
             if (this === other) return true
             val otherModifier = other as? WithAlignmentLine ?: return false
-            return line == otherModifier.line
+            return alignmentLine == otherModifier.alignmentLine
         }
 
-        override fun hashCode(): Int = line.hashCode()
+        override fun hashCode(): Int = alignmentLine.hashCode()
 
-        override fun toString(): String = "WithAlignmentLine(line=$line)"
+        override fun toString(): String = "WithAlignmentLine(line=$alignmentLine)"
     }
 }
 
@@ -832,18 +832,18 @@ internal data class RowColumnParentData(
  * Provides the alignment line.
  */
 internal sealed class AlignmentLineProvider {
-    abstract fun calculateAlignmentLinePosition(placeable: Placeable): Int?
+    abstract fun calculateAlignmentLinePosition(placeable: Placeable): Int
     data class Block(val lineProviderBlock: (Measured) -> Int) : AlignmentLineProvider() {
         override fun calculateAlignmentLinePosition(
             placeable: Placeable
-        ): Int? {
-            return lineProviderBlock(Measured(placeable))
+        ): Int {
+            return lineProviderBlock(placeable)
         }
     }
 
-    data class Value(val line: AlignmentLine) : AlignmentLineProvider() {
-        override fun calculateAlignmentLinePosition(placeable: Placeable): Int? {
-            return placeable[line]
+    data class Value(val alignmentLine: AlignmentLine) : AlignmentLineProvider() {
+        override fun calculateAlignmentLinePosition(placeable: Placeable): Int {
+            return placeable[alignmentLine]
         }
     }
 }

@@ -3367,6 +3367,33 @@ class AndroidLayoutDrawTest {
         validateSquareColors(outerColor = Color.Blue, innerColor = Color.Yellow, size = 10)
     }
 
+    @Test
+    fun placeableMeasuredSize() = with(density) {
+        val realSize = 100.dp
+        val constrainedSize = 50.dp
+        val latch = CountDownLatch(1)
+        activityTestRule.runOnUiThread {
+            activity.setContent {
+                Layout(
+                    content = {
+                        Box(Modifier.requiredSize(realSize))
+                    }
+                ) { measurables, _ ->
+                    val placeable = measurables[0].measure(
+                        Constraints.fixed(constrainedSize.roundToPx(), constrainedSize.roundToPx())
+                    )
+                    assertEquals(realSize.roundToPx(), placeable.measuredWidth)
+                    assertEquals(realSize.roundToPx(), placeable.measuredHeight)
+                    assertEquals(constrainedSize.roundToPx(), placeable.width)
+                    assertEquals(constrainedSize.roundToPx(), placeable.height)
+                    latch.countDown()
+                    layout(1, 1) { }
+                }
+            }
+        }
+        assertTrue(latch.await(1, TimeUnit.SECONDS))
+    }
+
     private fun composeSquares(model: SquareModel) {
         activityTestRule.runOnUiThreadIR {
             activity.setContent {
