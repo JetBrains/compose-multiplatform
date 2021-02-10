@@ -17,7 +17,6 @@
 package androidx.compose.material
 
 import androidx.compose.foundation.LocalIndication
-import androidx.compose.material.ripple.ExperimentalRippleApi
 import androidx.compose.material.ripple.LocalRippleTheme
 import androidx.compose.material.ripple.RippleTheme
 import androidx.compose.material.ripple.rememberRipple
@@ -53,7 +52,6 @@ import androidx.compose.foundation.text.selection.LocalTextSelectionColors
  * @param typography A set of text styles to be used as this hierarchy's typography system
  * @param shapes A set of shapes to be used by the components in this hierarchy
  */
-@OptIn(ExperimentalRippleApi::class)
 @Composable
 fun MaterialTheme(
     colors: Colors = MaterialTheme.colors,
@@ -115,7 +113,6 @@ object MaterialTheme {
         get() = LocalShapes.current
 }
 
-@OptIn(ExperimentalRippleApi::class)
 @Immutable
 private object MaterialRippleTheme : RippleTheme {
     @Composable
