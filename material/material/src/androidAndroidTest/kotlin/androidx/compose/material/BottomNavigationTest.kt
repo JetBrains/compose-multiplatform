@@ -45,6 +45,7 @@ import androidx.compose.ui.test.isSelectable
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
+import androidx.compose.ui.test.onParent
 import androidx.compose.ui.test.performClick
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.height
@@ -88,6 +89,10 @@ class BottomNavigationTest {
             .assertIsSelected()
             .assertIsEnabled()
             .assertHasClickAction()
+
+        rule.onNodeWithTag("item")
+            .onParent()
+            .assert(SemanticsMatcher.keyIsDefined(SemanticsProperties.SelectableGroup))
     }
 
     @Test

@@ -30,6 +30,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.selection.selectableGroup
 import androidx.compose.material.TabRowDefaults.tabIndicatorOffset
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Immutable
@@ -134,7 +135,11 @@ fun TabRow(
     },
     tabs: @Composable () -> Unit
 ) {
-    Surface(modifier = modifier, color = backgroundColor, contentColor = contentColor) {
+    Surface(
+        modifier = modifier.selectableGroup(),
+        color = backgroundColor,
+        contentColor = contentColor
+    ) {
         SubcomposeLayout(Modifier.fillMaxWidth()) { constraints ->
             val tabRowWidth = constraints.maxWidth
             val tabMeasurables = subcompose(TabSlots.Tabs, tabs)
@@ -215,7 +220,11 @@ fun ScrollableTabRow(
     },
     tabs: @Composable () -> Unit
 ) {
-    Surface(modifier = modifier, color = backgroundColor, contentColor = contentColor) {
+    Surface(
+        modifier = modifier.selectableGroup(),
+        color = backgroundColor,
+        contentColor = contentColor
+    ) {
         val scrollState = rememberScrollState()
         val coroutineScope = rememberCoroutineScope()
         val scrollableTabData = remember(scrollState) {

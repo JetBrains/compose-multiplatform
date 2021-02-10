@@ -23,11 +23,17 @@ import android.view.accessibility.AccessibilityEvent
 import android.view.accessibility.AccessibilityNodeInfo
 import android.widget.FrameLayout
 import androidx.activity.ComponentActivity
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.selection.selectable
+import androidx.compose.foundation.selection.selectableGroup
 import androidx.compose.ui.node.InnerPlaceable
 import androidx.compose.ui.node.LayoutNode
 import androidx.compose.ui.platform.AndroidComposeView
 import androidx.compose.ui.platform.AndroidComposeViewAccessibilityDelegateCompat
 import androidx.compose.ui.platform.LocalClipboardManager
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.semantics.ProgressBarRangeInfo
 import androidx.compose.ui.semantics.ScrollAxisRange
 import androidx.compose.ui.semantics.SemanticsModifierCore
@@ -51,6 +57,7 @@ import androidx.compose.ui.semantics.onClick
 import androidx.compose.ui.semantics.onLongClick
 import androidx.compose.ui.semantics.pasteText
 import androidx.compose.ui.semantics.role
+import androidx.compose.ui.semantics.selected
 import androidx.compose.ui.semantics.setProgress
 import androidx.compose.ui.semantics.setSelection
 import androidx.compose.ui.semantics.setText
@@ -58,8 +65,10 @@ import androidx.compose.ui.semantics.text
 import androidx.compose.ui.semantics.textSelectionRange
 import androidx.compose.ui.semantics.verticalScrollAxisRange
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
+import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.TextRange
+import androidx.compose.ui.unit.dp
 import androidx.core.view.accessibility.AccessibilityNodeInfoCompat
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.SmallTest
@@ -112,9 +121,6 @@ class AndroidComposeViewAccessibilityDelegateCompatTest {
                 androidComposeView
             )
             accessibilityDelegate.accessibilityForceEnabledForTesting = true
-        }
-        rule.setContent {
-            LocalClipboardManager.current.setText(AnnotatedString("test"))
         }
         info = AccessibilityNodeInfoCompat.obtain()
     }
@@ -198,6 +204,10 @@ class AndroidComposeViewAccessibilityDelegateCompatTest {
 
     @Test
     fun testPopulateAccessibilityNodeInfoProperties_disabled() {
+        rule.setContent {
+            LocalClipboardManager.current.setText(AnnotatedString("test"))
+        }
+
         val semanticsNode = createSemanticsNodeWithProperties(1, true) {
             disabled()
             text = AnnotatedString("text")
@@ -443,6 +453,10 @@ class AndroidComposeViewAccessibilityDelegateCompatTest {
 
     @Test
     fun test_PasteAction_ifFocused() {
+        rule.setContent {
+            LocalClipboardManager.current.setText(AnnotatedString("test"))
+        }
+
         val semanticsNode = createSemanticsNodeWithProperties(1, true) {
             focused = true
             pasteText {
@@ -465,6 +479,10 @@ class AndroidComposeViewAccessibilityDelegateCompatTest {
 
     @Test
     fun test_noPasteAction_ifUnfocused() {
+        rule.setContent {
+            LocalClipboardManager.current.setText(AnnotatedString("test"))
+        }
+
         val semanticsNode = createSemanticsNodeWithProperties(1, true) {
             pasteText {
                 true
@@ -643,6 +661,46 @@ class AndroidComposeViewAccessibilityDelegateCompatTest {
                         it.contentChangeTypes == AccessibilityEvent.CONTENT_CHANGE_TYPE_UNDEFINED
                 }
             )
+        )
+    }
+
+    @Test
+    fun testCollectionItemInfo() {
+        rule.setContent {
+            Column(Modifier.selectableGroup()) {
+                Box(Modifier.selectable(selected = true, onClick = {}).testTag("item"))
+                Box(Modifier.selectable(selected = false, onClick = {}))
+            }
+        }
+        val itemNode = rule.onNodeWithTag("item").fetchSemanticsNode()
+        accessibilityDelegate.populateAccessibilityNodeInfoProperties(1, info, itemNode)
+
+        val resultCollectionItemInfo = info.collectionItemInfo
+        assertEquals(0, resultCollectionItemInfo.rowIndex)
+        assertEquals(1, resultCollectionItemInfo.rowSpan)
+        assertEquals(0, resultCollectionItemInfo.columnIndex)
+        assertEquals(1, resultCollectionItemInfo.columnSpan)
+        assertEquals(true, resultCollectionItemInfo.isSelected)
+    }
+
+    @Test
+    fun testCollectionInfo() {
+        rule.setContent {
+            Column(Modifier.selectableGroup().testTag("collection")) {
+                Box(Modifier.size(50.dp).selectable(selected = true, onClick = {}))
+                Box(Modifier.size(50.dp).selectable(selected = false, onClick = {}))
+            }
+        }
+        val collectionNode = rule.onNodeWithTag("collection").fetchSemanticsNode()
+        accessibilityDelegate.populateAccessibilityNodeInfoProperties(1, info, collectionNode)
+
+        val resultCollectionInfo = info.collectionInfo
+        assertEquals(2, resultCollectionInfo.rowCount)
+        assertEquals(1, resultCollectionInfo.columnCount)
+        assertEquals(false, resultCollectionInfo.isHierarchical)
+        assertEquals(
+            AccessibilityNodeInfoCompat.CollectionInfoCompat.SELECTION_MODE_SINGLE,
+            resultCollectionInfo.selectionMode
         )
     }
 
