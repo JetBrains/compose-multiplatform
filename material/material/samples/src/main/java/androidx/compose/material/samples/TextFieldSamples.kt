@@ -109,7 +109,7 @@ fun TextFieldWithErrorState() {
             val label = if (isValid) "Email" else "Email*"
             Text(label)
         },
-        isErrorValue = !isValid
+        isError = !isValid
     )
 }
 
@@ -127,7 +127,7 @@ fun TextFieldWithHelperMessage() {
                 val label = if (invalidInput) "Email*" else "Email"
                 Text(label)
             },
-            isErrorValue = invalidInput
+            isError = invalidInput
         )
         val textColor = if (invalidInput) {
             MaterialTheme.colors.error

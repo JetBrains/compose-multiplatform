@@ -155,7 +155,7 @@ class OutlinedTextFieldScreenshotTest {
                     value = "Input",
                     onValueChange = {},
                     label = { Text("Label") },
-                    isErrorValue = true,
+                    isError = true,
                     modifier = Modifier.requiredWidth(280.dp)
                 )
             }
@@ -174,7 +174,7 @@ class OutlinedTextFieldScreenshotTest {
                     value = "",
                     onValueChange = {},
                     label = { Text("Label") },
-                    isErrorValue = true,
+                    isError = true,
                     modifier = Modifier.requiredWidth(280.dp)
                 )
             }

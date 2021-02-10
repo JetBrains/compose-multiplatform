@@ -30,13 +30,17 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.requiredWidth
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.material.Icon
 import androidx.compose.material.LocalContentAlpha
 import androidx.compose.material.LocalContentColor
 import androidx.compose.material.LocalTextStyle
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.material.TextField
+import androidx.compose.material.TextFieldDefaults
 import androidx.compose.material.TextFieldPadding
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.runOnIdleWithDensity
 import androidx.compose.material.setMaterialContent
 import androidx.compose.material.setMaterialContentForSizeAssertions
@@ -760,7 +764,7 @@ class TextFieldTest {
                 value = "",
                 onValueChange = {},
                 label = {},
-                isErrorValue = false,
+                isError = false,
                 leadingIcon = {
                     assertThat(LocalContentColor.current)
                         .isEqualTo(
@@ -788,7 +792,7 @@ class TextFieldTest {
                 value = "",
                 onValueChange = {},
                 label = {},
-                isErrorValue = true,
+                isError = true,
                 leadingIcon = {
                     assertThat(LocalContentColor.current)
                         .isEqualTo(
@@ -851,10 +855,9 @@ class TextFieldTest {
                 modifier = Modifier.testTag(TextfieldTag),
                 value = "qwerty",
                 onValueChange = {},
-                label = {},
                 visualTransformation = PasswordVisualTransformation('\u0020'),
-                backgroundColor = Color.White,
-                shape = RectangleShape
+                shape = RectangleShape,
+                colors = TextFieldDefaults.textFieldColors(backgroundColor = Color.White)
             )
         }
 
@@ -880,14 +883,26 @@ class TextFieldTest {
             Box(Modifier.background(color = Color.White)) {
                 TextField(
                     modifier = Modifier.testTag(TextfieldTag),
-                    value = "",
+                    value = "test",
                     onValueChange = {},
-                    label = {},
+                    label = { Text("label") },
                     shape = RectangleShape,
-                    backgroundColor = Color.Blue,
-                    activeColor = Color.Transparent,
-                    inactiveColor = Color.Transparent,
-                    interactionState = interactionState
+                    leadingIcon = {
+                        Icon(Icons.Default.Favorite, null, tint = Color.Transparent)
+                    },
+                    trailingIcon = {
+                        Icon(Icons.Default.Favorite, null, tint = Color.Transparent)
+                    },
+                    interactionState = interactionState,
+                    colors = TextFieldDefaults.textFieldColors(
+                        backgroundColor = Color.Blue,
+                        focusedIndicatorColor = Color.Transparent,
+                        unfocusedIndicatorColor = Color.Transparent,
+                        textColor = Color.Transparent,
+                        cursorColor = Color.Transparent,
+                        focusedLabelColor = Color.Transparent,
+                        unfocusedLabelColor = Color.Transparent
+                    )
                 )
             }
         }
