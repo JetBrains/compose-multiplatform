@@ -17,7 +17,9 @@
 package androidx.compose.foundation.text.selection
 
 import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.geometry.Rect
 import androidx.compose.ui.layout.LayoutCoordinates
+import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.style.ResolvedTextDirection
 import androidx.compose.ui.unit.IntSize
 import com.google.common.truth.Truth.assertThat
@@ -34,8 +36,9 @@ import org.junit.runners.JUnit4
 
 @RunWith(JUnit4::class)
 class SelectionManagerDragTest {
+
     private val selectionRegistrar = SelectionRegistrarImpl()
-    private val selectable = mock<Selectable>()
+    private val selectable = FakeSelectable()
     private val selectionManager = SelectionManager(selectionRegistrar)
 
     private val size = IntSize(500, 600)
@@ -92,17 +95,7 @@ class SelectionManagerDragTest {
     @Before
     fun setup() {
         selectionRegistrar.subscribe(selectable)
-
-        whenever(
-            selectable.getSelection(
-                startPosition = Offset(any()),
-                endPosition = Offset(any()),
-                containerLayoutCoordinates = any(),
-                longPress = any(),
-                previousSelection = any(),
-                isStartHandle = any()
-            )
-        ).thenReturn(fakeResultSelection)
+        selectable.selectionToReturn = fakeResultSelection
 
         whenever(startSelectable.getLayoutCoordinates()).thenReturn(startLayoutCoordinates)
         whenever(endSelectable.getLayoutCoordinates()).thenReturn(endLayoutCoordinates)
@@ -138,8 +131,7 @@ class SelectionManagerDragTest {
     }
 
     @Test
-    fun handleDragObserver_onDrag_startHandle_reuse_endHandle_calls_getSelection_change_selection
-    () {
+    fun handleDragObserver_onDrag_startHandle_reuse_endHandle_calls_getSelection_change() {
         val startOffset = Offset(30f, 50f)
         val dragDistance = Offset(100f, 100f)
         selectionManager.handleDragObserver(isStartHandle = true).onStart(startOffset)
@@ -151,23 +143,23 @@ class SelectionManagerDragTest {
                 sourceCoordinates = endLayoutCoordinates,
                 relativeToSource = getAdjustedCoordinates(Offset.Zero)
             )
-        verify(selectable, times(1))
-            .getSelection(
-                startPosition = childToLocalOffset + dragDistance,
-                endPosition = childToLocalOffset,
-                containerLayoutCoordinates = selectionManager.requireContainerCoordinates(),
-                longPress = false,
-                isStartHandle = true,
-                previousSelection = fakeInitialSelection
-            )
+
+        assertThat(selectable.getSelectionCalledTimes).isEqualTo(1)
+        assertThat(selectable.lastStartPosition).isEqualTo(childToLocalOffset + dragDistance)
+        assertThat(selectable.lastEndPosition).isEqualTo(childToLocalOffset)
+        assertThat(selectable.lastContainerLayoutCoordinates)
+            .isEqualTo(selectionManager.requireContainerCoordinates())
+        assertThat(selectable.lastLongPress).isEqualTo(false)
+        assertThat(selectable.lastIsStartHandle).isEqualTo(true)
+        assertThat(selectable.lastPreviousSelection).isEqualTo(fakeInitialSelection)
+
         assertThat(selection).isEqualTo(fakeResultSelection)
         verify(spyLambda, times(1)).invoke(fakeResultSelection)
         assertThat(result).isEqualTo(dragDistance)
     }
 
     @Test
-    fun handleDragObserver_onDrag_endHandle_reuse_startHandle_calls_getSelection_change_selection
-    () {
+    fun handleDragObserver_onDrag_endHandle_reuse_startHandle_calls_getSelection_change() {
         val startOffset = Offset(30f, 50f)
         val dragDistance = Offset(100f, 100f)
         selectionManager.handleDragObserver(isStartHandle = false).onStart(startOffset)
@@ -179,15 +171,16 @@ class SelectionManagerDragTest {
                 sourceCoordinates = startLayoutCoordinates,
                 relativeToSource = getAdjustedCoordinates(Offset.Zero)
             )
-        verify(selectable, times(1))
-            .getSelection(
-                startPosition = childToLocalOffset,
-                endPosition = childToLocalOffset + dragDistance,
-                containerLayoutCoordinates = selectionManager.requireContainerCoordinates(),
-                longPress = false,
-                isStartHandle = false,
-                previousSelection = fakeInitialSelection
-            )
+
+        assertThat(selectable.getSelectionCalledTimes).isEqualTo(1)
+        assertThat(selectable.lastStartPosition).isEqualTo(childToLocalOffset)
+        assertThat(selectable.lastEndPosition).isEqualTo(childToLocalOffset + dragDistance)
+        assertThat(selectable.lastContainerLayoutCoordinates)
+            .isEqualTo(selectionManager.requireContainerCoordinates())
+        assertThat(selectable.lastLongPress).isEqualTo(false)
+        assertThat(selectable.lastIsStartHandle).isEqualTo(false)
+        assertThat(selectable.lastPreviousSelection).isEqualTo(fakeInitialSelection)
+
         assertThat(selection).isEqualTo(fakeResultSelection)
         verify(spyLambda, times(1)).invoke(fakeResultSelection)
         assertThat(result).isEqualTo(dragDistance)
@@ -195,5 +188,51 @@ class SelectionManagerDragTest {
 
     private fun getAdjustedCoordinates(position: Offset): Offset {
         return Offset(position.x, position.y - 1f)
+    }
+}
+
+internal class FakeSelectable : Selectable {
+    var lastStartPosition: Offset? = null
+    var lastEndPosition: Offset? = null
+    var lastContainerLayoutCoordinates: LayoutCoordinates? = null
+    var lastLongPress: Boolean? = null
+    var lastPreviousSelection: Selection? = null
+    var lastIsStartHandle: Boolean? = null
+    var getSelectionCalledTimes = 0
+    var getTextCalledTimes = 0
+    var selectionToReturn: Selection? = null
+    var textToReturn: AnnotatedString? = null
+
+    override fun getSelection(
+        startPosition: Offset,
+        endPosition: Offset,
+        containerLayoutCoordinates: LayoutCoordinates,
+        longPress: Boolean,
+        previousSelection: Selection?,
+        isStartHandle: Boolean
+    ): Selection? {
+        getSelectionCalledTimes++
+        lastStartPosition = startPosition
+        lastEndPosition = endPosition
+        lastContainerLayoutCoordinates = containerLayoutCoordinates
+        lastLongPress = longPress
+        lastPreviousSelection = previousSelection
+        lastIsStartHandle = isStartHandle
+        return selectionToReturn
+    }
+
+    override fun getText(): AnnotatedString {
+        getTextCalledTimes++
+        return textToReturn!!
+    }
+
+    override fun getLayoutCoordinates(): LayoutCoordinates? = null
+
+    override fun getHandlePosition(selection: Selection, isStartHandle: Boolean): Offset {
+        TODO("Not yet implemented")
+    }
+
+    override fun getBoundingBox(offset: Int): Rect {
+        TODO("Not yet implemented")
     }
 }
