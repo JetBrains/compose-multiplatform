@@ -155,7 +155,7 @@ class WrapperTest {
         activityScenario.onActivity {
             val frameLayout = FrameLayout(it)
             it.setContent {
-                val compositionLocal = compositionLocalOf<Float>()
+                val compositionLocal = compositionLocalOf<Float> { error("not set") }
                 CompositionLocalProvider(compositionLocal provides 1f) {
                     val composition = rememberCompositionContext()
 

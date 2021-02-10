@@ -21,7 +21,9 @@ import androidx.compose.ui.input.key.Key
 import androidx.compose.ui.input.key.plus
 import androidx.compose.ui.text.AnnotatedString
 
-val SelectionTrackerAmbient = staticCompositionLocalOf<SelectionTracker>()
+val SelectionTrackerAmbient = staticCompositionLocalOf<SelectionTracker> {
+    error("CompositionLocal SelectionTrackerAmbient not provided")
+}
 
 class SelectionTracker {
     var getSelectedText: (() -> AnnotatedString?)? = null

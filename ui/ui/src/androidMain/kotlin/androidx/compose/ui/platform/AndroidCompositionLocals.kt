@@ -40,27 +40,37 @@ import androidx.savedstate.SavedStateRegistryOwner
  */
 val LocalConfiguration = compositionLocalOf<Configuration>(
     neverEqualPolicy()
-)
+) {
+    noLocalProvidedFor("LocalConfiguration")
+}
 
 /**
  * Provides a [Context] that can be used by Android applications.
  */
-val LocalContext = staticCompositionLocalOf<Context>()
+val LocalContext = staticCompositionLocalOf<Context> {
+    noLocalProvidedFor("LocalContext")
+}
 
 /**
  * The CompositionLocal containing the current [LifecycleOwner].
  */
-val LocalLifecycleOwner = staticCompositionLocalOf<LifecycleOwner>()
+val LocalLifecycleOwner = staticCompositionLocalOf<LifecycleOwner> {
+    noLocalProvidedFor("LocalLifecycleOwner")
+}
 
 /**
  * The CompositionLocal containing the current [SavedStateRegistryOwner].
  */
-val LocalSavedStateRegistryOwner = staticCompositionLocalOf<SavedStateRegistryOwner>()
+val LocalSavedStateRegistryOwner = staticCompositionLocalOf<SavedStateRegistryOwner> {
+    noLocalProvidedFor("LocalSavedStateRegistryOwner")
+}
 
 /**
  * The CompositionLocal containing the current Compose [View].
  */
-val LocalView = staticCompositionLocalOf<View>()
+val LocalView = staticCompositionLocalOf<View> {
+    noLocalProvidedFor("LocalView")
+}
 
 @Composable
 @OptIn(ExperimentalComposeUiApi::class)
@@ -107,4 +117,8 @@ internal fun ProvideAndroidCompositionLocals(
             content = content
         )
     }
+}
+
+private fun noLocalProvidedFor(name: String): Nothing {
+    error("CompositionLocal $name not present")
 }

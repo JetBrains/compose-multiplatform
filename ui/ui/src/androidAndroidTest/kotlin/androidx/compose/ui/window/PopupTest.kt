@@ -206,7 +206,7 @@ class PopupTest {
 
     @Test
     fun preservesCompositionLocals() {
-        val compositionLocal = compositionLocalOf<Float>()
+        val compositionLocal = compositionLocalOf<Float> { error("unset") }
         var value = 0f
         rule.setContent {
             CompositionLocalProvider(compositionLocal provides 1f) {

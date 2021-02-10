@@ -37,7 +37,9 @@ class DesktopPopupTest {
 
     @Test
     fun `pass ambients to popup`() {
-        val ambient = staticCompositionLocalOf<Int>()
+        val ambient = staticCompositionLocalOf<Int> {
+            error("not set")
+        }
 
         var actualAmbientValue = 0
 

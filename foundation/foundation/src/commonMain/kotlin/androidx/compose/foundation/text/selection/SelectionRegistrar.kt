@@ -105,4 +105,4 @@ internal interface SelectionRegistrar {
  * CompositionLocal to get a [SelectionRegistrar] in order to subscribe and unsubscribe to
  * [SelectionRegistrar].
  */
-internal val LocalSelectionRegistrar = compositionLocalOf<SelectionRegistrar?>()
+internal val LocalSelectionRegistrar = compositionLocalOf<SelectionRegistrar?> { null }
