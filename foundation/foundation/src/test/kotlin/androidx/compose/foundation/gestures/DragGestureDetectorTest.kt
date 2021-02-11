@@ -51,12 +51,14 @@ class DragGestureDetectorTest(dragType: GestureType) {
     private var dragDistance = 0f
     private var dragged = false
     private var gestureEnded = false
+    private var gestureStarted = false
     private var gestureCanceled = false
     private var consumePositiveOnly = false
     private var sloppyDetector = false
 
     private val DragTouchSlopUtil = SuspendingGestureTestUtil(width = 100, height = 100) {
         detectDragGestures(
+            onDragStart = { gestureStarted = true },
             onDragEnd = { gestureEnded = true },
             onDragCancel = { gestureCanceled = true }
         ) { change, dragAmount ->
@@ -71,6 +73,7 @@ class DragGestureDetectorTest(dragType: GestureType) {
 
     private val VerticalTouchSlopUtil = SuspendingGestureTestUtil(width = 100, height = 100) {
         detectVerticalDragGestures(
+            onDragStart = { gestureStarted = true },
             onDragEnd = { gestureEnded = true },
             onDragCancel = { gestureCanceled = true }
         ) { change, dragAmount ->
@@ -84,6 +87,7 @@ class DragGestureDetectorTest(dragType: GestureType) {
 
     private val HorizontalTouchSlopUtil = SuspendingGestureTestUtil(width = 100, height = 100) {
         detectHorizontalDragGestures(
+            onDragStart = { gestureStarted = true },
             onDragEnd = { gestureEnded = true },
             onDragCancel = { gestureCanceled = true }
         ) { change, dragAmount ->
@@ -107,6 +111,7 @@ class DragGestureDetectorTest(dragType: GestureType) {
                     }
                 }
                 if (slopChange != null || sloppyDetector) {
+                    gestureStarted = true
                     var pointer = if (sloppyDetector) down.id else slopChange!!.id
                     do {
                         val change = awaitVerticalDragOrCancellation(pointer)
@@ -139,6 +144,7 @@ class DragGestureDetectorTest(dragType: GestureType) {
                         }
                     }
                 if (slopChange != null || sloppyDetector) {
+                    gestureStarted = true
                     var pointer = if (sloppyDetector) down.id else slopChange!!.id
                     do {
                         val change = awaitHorizontalDragOrCancellation(pointer)
@@ -171,6 +177,7 @@ class DragGestureDetectorTest(dragType: GestureType) {
                     }
                 }
                 if (slopChange != null || sloppyDetector) {
+                    gestureStarted = true
                     var pointer = if (sloppyDetector) down.id else slopChange!!.id
                     do {
                         val change = awaitDragOrCancellation(pointer)
@@ -241,6 +248,7 @@ class DragGestureDetectorTest(dragType: GestureType) {
     @Test
     fun normalDrag() = util.executeInComposition {
         val move = down().moveBy(dragMotion)
+        assertTrue(gestureStarted)
         assertTrue(dragged)
         assertEquals(0f, dragDistance)
         val move2 = move.moveBy(dragMotion)
@@ -257,11 +265,13 @@ class DragGestureDetectorTest(dragType: GestureType) {
     fun crossDrag() = util.executeInComposition {
         if (!twoAxisDrag) {
             down().moveBy(crossDragMotion).up()
+            assertFalse(gestureStarted)
             assertFalse(dragged)
             assertFalse(gestureEnded)
 
             // now try a normal drag to ensure that it is still working.
             down().moveBy(dragMotion).up()
+            assertTrue(gestureStarted)
             assertTrue(dragged)
             assertEquals(0f, dragDistance)
             assertTrue(gestureEnded)
@@ -279,6 +289,7 @@ class DragGestureDetectorTest(dragType: GestureType) {
         // second finger shouldn't cause a drag. It should follow finger1
         val moveFinger2 = finger2.moveBy(dragMotion)
 
+        assertFalse(gestureStarted)
         assertFalse(dragged)
 
         // now it should move to finger 2
@@ -301,6 +312,7 @@ class DragGestureDetectorTest(dragType: GestureType) {
 
         finger1.moveBy(dragMotion).up()
 
+        assertTrue(gestureStarted)
         assertTrue(dragged)
         assertEquals(0f, dragDistance)
         assertFalse(gestureEnded)
@@ -317,6 +329,7 @@ class DragGestureDetectorTest(dragType: GestureType) {
     @Test
     fun cancelDragDuringSlop() = util.executeInComposition {
         down().moveBy(dragMotion) { consumeAllChanges() }.moveBy(dragMotion).up()
+        assertFalse(gestureStarted)
         assertFalse(dragged)
         assertFalse(gestureEnded)
         assertFalse(gestureCanceled) // only canceled if the touch slop was crossed first
@@ -328,6 +341,7 @@ class DragGestureDetectorTest(dragType: GestureType) {
     @Test
     fun cancelDragAfterSlop() = util.executeInComposition {
         down().moveBy(dragMotion).moveBy(dragMotion) { consumeAllChanges() }.up()
+        assertTrue(gestureStarted)
         assertTrue(dragged)
         assertFalse(gestureEnded)
         assertTrue(gestureCanceled)
@@ -349,6 +363,7 @@ class DragGestureDetectorTest(dragType: GestureType) {
                 }
             )
                 .up()
+            assertTrue(gestureStarted)
             assertTrue(dragged)
             assertTrue(gestureEnded)
             assertFalse(gestureCanceled)
@@ -367,9 +382,11 @@ class DragGestureDetectorTest(dragType: GestureType) {
 
             val back = down().moveBy(-dragMotion)
 
+            assertFalse(gestureStarted)
             assertFalse(dragged)
             back.moveBy(dragMotion).up()
 
+            assertTrue(gestureStarted)
             assertTrue(dragged)
         } finally {
             consumePositiveOnly = false

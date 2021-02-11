@@ -1,5 +1,5 @@
 /*
- * Copyright 2020 The Android Open Source Project
+ * Copyright 2021 The Android Open Source Project
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,10 +13,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package androidx.compose.foundation
+package androidx.compose.foundation.text
 
 import androidx.compose.foundation.gestures.detectTapGestures
-import androidx.compose.foundation.text.BasicText
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -70,7 +69,7 @@ fun ClickableText(
     onClick: (Int) -> Unit
 ) {
     val layoutResult = remember { mutableStateOf<TextLayoutResult?>(null) }
-    val pressIndicator = Modifier.pointerInput(Unit) {
+    val pressIndicator = Modifier.pointerInput(onClick) {
         detectTapGestures { pos ->
             layoutResult.value?.let { layoutResult ->
                 onClick(layoutResult.getOffsetForPosition(pos))

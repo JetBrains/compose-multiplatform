@@ -16,7 +16,7 @@
 
 package androidx.compose.foundation.demos.text
 
-import androidx.compose.foundation.ClickableText
+import androidx.compose.foundation.text.ClickableText
 import androidx.compose.foundation.layout.Column
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
