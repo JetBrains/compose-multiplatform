@@ -36,7 +36,7 @@ fun Velocity(x: Float, y: Float) = Velocity(packFloats(x, y))
  */
 @Suppress("EXPERIMENTAL_FEATURE_WARNING")
 @Immutable
-inline class Velocity internal constructor(val packedValue: Long) {
+inline class Velocity internal constructor(private val packedValue: Long) {
 
     /**
      * The horizontal component of the velocity in pixels per second.

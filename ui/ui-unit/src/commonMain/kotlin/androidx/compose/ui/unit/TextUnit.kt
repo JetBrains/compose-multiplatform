@@ -61,7 +61,7 @@ enum class TextUnitType {
  */
 @Suppress("EXPERIMENTAL_FEATURE_WARNING")
 @Immutable
-inline class TextUnit internal constructor(val packedValue: Long) {
+inline class TextUnit internal constructor(internal val packedValue: Long) {
     /**
      * This is the same as multiplying the [TextUnit] by -1.0.
      *

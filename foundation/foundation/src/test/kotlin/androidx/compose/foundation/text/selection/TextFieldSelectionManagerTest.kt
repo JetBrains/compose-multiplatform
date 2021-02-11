@@ -40,6 +40,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.LayoutDirection
+import androidx.compose.ui.util.packInts
 import com.google.common.truth.Truth.assertThat
 import com.nhaarman.mockitokotlin2.any
 import com.nhaarman.mockitokotlin2.isNull
@@ -512,5 +513,6 @@ class TextFieldSelectionManagerTest {
 // This class is a workaround for the bug that mockito can't stub a method returning inline class.
 // (https://github.com/nhaarman/mockito-kotlin/issues/309).
 internal class TextRangeAnswer(private val textRange: TextRange) : Answer<Any> {
-    override fun answer(invocation: InvocationOnMock?): Any = textRange.packedValue
+    override fun answer(invocation: InvocationOnMock?): Any =
+        packInts(textRange.start, textRange.end)
 }

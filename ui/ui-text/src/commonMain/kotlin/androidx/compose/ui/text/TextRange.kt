@@ -43,7 +43,7 @@ fun TextRange(/*@IntRange(from = 0)*/ start: Int, /*@IntRange(from = 0)*/ end: I
  */
 @Suppress("EXPERIMENTAL_FEATURE_WARNING")
 @Immutable
-inline class TextRange internal constructor(val packedValue: Long) {
+inline class TextRange internal constructor(private val packedValue: Long) {
 
     val start: Int get() = unpackInt1(packedValue)
 
