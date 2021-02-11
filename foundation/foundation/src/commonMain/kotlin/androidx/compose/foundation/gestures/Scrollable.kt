@@ -20,11 +20,11 @@ import androidx.compose.animation.core.AnimationState
 import androidx.compose.animation.core.DecayAnimationSpec
 import androidx.compose.animation.core.animateDecay
 import androidx.compose.animation.defaultDecayAnimationSpec
-import androidx.compose.foundation.interaction.DragInteraction
-import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.MutatePriority
 import androidx.compose.foundation.gestures.Orientation.Horizontal
 import androidx.compose.foundation.gestures.Orientation.Vertical
+import androidx.compose.foundation.interaction.DragInteraction
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.MutableState
@@ -41,6 +41,7 @@ import androidx.compose.ui.input.nestedscroll.NestedScrollSource
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.input.pointer.PointerInputChange
 import androidx.compose.ui.input.pointer.PointerInputScope
+import androidx.compose.ui.input.pointer.PointerType
 import androidx.compose.ui.input.pointer.consumePositionChange
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.input.pointer.positionChange
@@ -198,7 +199,7 @@ private fun Modifier.dragForEachGesture(
         var initialDelta = 0f
         return awaitPointerEventScope {
             val down = awaitFirstDown(requireUnconsumed = false)
-            if (!enabled.value) {
+            if (!enabled.value || down.type == PointerType.Mouse) {
                 null to initialDelta
             } else if (scrollableState.value.isScrollInProgress) {
                 // since we start immediately we don't wait for slop and set initial delta to 0
@@ -225,6 +226,18 @@ private fun Modifier.dragForEachGesture(
         velocityTracker: VelocityTracker,
     ): Boolean {
         var result = false
+
+        fun ScrollScope.touchDragTick(event: PointerInputChange) {
+            velocityTracker.addPosition(event.uptimeMillis, event.position)
+            val delta = event.positionChange().axisValue()
+            if (enabled.value) {
+                with(scrollLogic.value) {
+                    dispatchScroll(delta, NestedScrollSource.Drag)
+                }
+            }
+            event.consumePositionChange()
+        }
+
         try {
             scrollableState.value.scroll(MutatePriority.UserInput) {
                 awaitPointerEventScope {
@@ -235,14 +248,9 @@ private fun Modifier.dragForEachGesture(
                     }
                     velocityTracker.addPosition(drag.uptimeMillis, drag.position)
                     val dragTick = { event: PointerInputChange ->
-                        velocityTracker.addPosition(event.uptimeMillis, event.position)
-                        val delta = event.positionChange().axisValue()
-                        if (enabled.value) {
-                            with(scrollLogic.value) {
-                                dispatchScroll(delta, NestedScrollSource.Drag)
-                            }
+                        if (event.type != PointerType.Mouse) {
+                            touchDragTick(event)
                         }
-                        event.consumePositionChange()
                     }
                     result = if (isVertical()) {
                         verticalDrag(drag.id, dragTick)
