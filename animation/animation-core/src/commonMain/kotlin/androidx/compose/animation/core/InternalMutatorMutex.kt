@@ -16,7 +16,6 @@
 
 package androidx.compose.animation.core
 
-import androidx.compose.runtime.AtomicReference
 import androidx.compose.runtime.Stable
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Job

@@ -1,6 +1,9 @@
 // Signature format: 4.0
 package androidx.compose.animation.core {
 
+  public final class ActualJvmKt {
+  }
+
   public final class Animatable<T, V extends androidx.compose.animation.core.AnimationVector> {
     ctor public Animatable(T? initialValue, androidx.compose.animation.core.TwoWayConverter<T,V> typeConverter, T? visibilityThreshold);
     method public suspend Object? animateDecay(T? initialVelocity, androidx.compose.animation.core.DecayAnimationSpec<T> animationSpec, optional kotlin.jvm.functions.Function1<? super androidx.compose.animation.core.Animatable<T,V>,kotlin.Unit>? block, optional kotlin.coroutines.Continuation<? super androidx.compose.animation.core.AnimationResult<T,V>> p);
