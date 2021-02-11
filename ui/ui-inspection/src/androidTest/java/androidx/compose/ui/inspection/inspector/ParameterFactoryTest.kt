@@ -70,7 +70,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.em
 import androidx.compose.ui.unit.sp
 import androidx.test.ext.junit.runners.AndroidJUnit4
-import androidx.test.filters.LargeTest
+import androidx.test.filters.MediumTest
 import com.google.common.truth.Truth.assertThat
 import com.google.common.truth.Truth.assertWithMessage
 import kotlinx.coroutines.runBlocking
@@ -84,7 +84,7 @@ import org.junit.runner.RunWith
 private fun topLevelFunction() {
 }
 
-@LargeTest
+@MediumTest
 @RunWith(AndroidJUnit4::class)
 class ParameterFactoryTest {
     private val factory = ParameterFactory(InlineClassConverter())
@@ -554,6 +554,14 @@ class ParameterFactoryTest {
                     }
                 }
             }
+        }
+    }
+
+    @Test
+    fun testDoNotRecurseIntoAndroidAndJavaPackages() {
+        runBlocking {
+            assertThat(factory.create(node, "v1", java.net.URL("http://domain.com"))).isNull()
+            assertThat(factory.create(node, "v1", android.app.Notification())).isNull()
         }
     }
 
