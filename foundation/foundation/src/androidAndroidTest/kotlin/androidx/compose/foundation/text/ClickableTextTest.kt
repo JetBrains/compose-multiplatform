@@ -1,5 +1,5 @@
 /*
- * Copyright 2020 The Android Open Source Project
+ * Copyright 2021 The Android Open Source Project
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,8 +14,9 @@
  * limitations under the License.
  */
 
-package androidx.compose.foundation
+package androidx.compose.foundation.text
 
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.test.junit4.createComposeRule
@@ -53,6 +54,29 @@ class ClickableTextTest {
 
         rule.runOnIdle {
             verify(onClick, times(1)).invoke(any())
+        }
+    }
+
+    @Test
+    fun onclick_callback_whenCallbackIsUpdated() {
+        val onClick1: (Int) -> Unit = mock()
+        val onClick2: (Int) -> Unit = mock()
+        val use2 = mutableStateOf(false)
+        rule.setContent {
+            ClickableText(
+                modifier = Modifier.testTag("clickableText"),
+                text = AnnotatedString("android"),
+                onClick = if (use2.value) onClick2 else onClick1
+            )
+        }
+        use2.value = true
+        rule.waitForIdle()
+
+        rule.onNodeWithTag("clickableText").performClick()
+
+        rule.runOnIdle {
+            verify(onClick1, times(0)).invoke(any())
+            verify(onClick2, times(1)).invoke(any())
         }
     }
 }

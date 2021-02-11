@@ -18,7 +18,7 @@ package androidx.compose.ui.window
 
 import android.os.Build
 import android.view.View
-import androidx.compose.foundation.ClickableText
+import androidx.compose.foundation.text.ClickableText
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.size
