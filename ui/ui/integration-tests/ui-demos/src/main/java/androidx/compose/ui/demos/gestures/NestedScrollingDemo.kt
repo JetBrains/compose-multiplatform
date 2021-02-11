@@ -106,7 +106,7 @@ private fun ScrollableContainer(content: @Composable () -> Unit) {
                 }
             )
             .clipToBounds(),
-        measureBlock = { measurables, constraints ->
+        measurePolicy = { measurables, constraints ->
             val placeable =
                 measurables.first()
                     .measure(constraints.copy(minHeight = 0, maxHeight = Constraints.Infinity))

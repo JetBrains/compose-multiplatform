@@ -17,6 +17,7 @@
 package androidx.compose.ui.node
 
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.layout.MeasurePolicy
 import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.LayoutDirection
 
@@ -25,7 +26,7 @@ import androidx.compose.ui.unit.LayoutDirection
  */
 @PublishedApi
 internal interface ComposeUiNode {
-    var measureBlocks: MeasureBlocks
+    var measurePolicy: MeasurePolicy
     var layoutDirection: LayoutDirection
     var density: Density
     var modifier: Modifier
@@ -37,8 +38,8 @@ internal interface ComposeUiNode {
         val Constructor: () -> ComposeUiNode = LayoutNode.Constructor
         val SetModifier: ComposeUiNode.(Modifier) -> Unit = { this.modifier = it }
         val SetDensity: ComposeUiNode.(Density) -> Unit = { this.density = it }
-        val SetMeasureBlocks: ComposeUiNode.(MeasureBlocks) -> Unit =
-            { this.measureBlocks = it }
+        val SetMeasurePolicy: ComposeUiNode.(MeasurePolicy) -> Unit =
+            { this.measurePolicy = it }
         val SetLayoutDirection: ComposeUiNode.(LayoutDirection) -> Unit =
             { this.layoutDirection = it }
     }

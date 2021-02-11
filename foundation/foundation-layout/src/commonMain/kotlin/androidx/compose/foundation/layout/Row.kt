@@ -70,13 +70,10 @@ inline fun Row(
     verticalAlignment: Alignment.Vertical = Alignment.Top,
     content: @Composable RowScope.() -> Unit
 ) {
-    val measureBlocks = rowMeasureBlocks(
-        horizontalArrangement,
-        verticalAlignment
-    )
+    val measurePolicy = rowMeasurePolicy(horizontalArrangement, verticalAlignment)
     Layout(
         content = { RowScope.content() },
-        measureBlocks = measureBlocks,
+        measurePolicy = measurePolicy,
         modifier = modifier
     )
 }
@@ -85,7 +82,7 @@ inline fun Row(
  * MeasureBlocks to use when horizontalArrangement and verticalAlignment are not provided.
  */
 @PublishedApi
-internal val DefaultRowMeasureBlocks = rowColumnMeasureBlocks(
+internal val DefaultRowMeasurePolicy = rowColumnMeasurePolicy(
     orientation = LayoutOrientation.Horizontal,
     arrangement = { totalSize, size, layoutDirection, density, outPosition ->
         with(Arrangement.Start) { density.arrange(totalSize, size, layoutDirection, outPosition) }
@@ -97,14 +94,14 @@ internal val DefaultRowMeasureBlocks = rowColumnMeasureBlocks(
 
 @PublishedApi
 @Composable
-internal fun rowMeasureBlocks(
+internal fun rowMeasurePolicy(
     horizontalArrangement: Arrangement.Horizontal,
     verticalAlignment: Alignment.Vertical
 ) = remember(horizontalArrangement, verticalAlignment) {
     if (horizontalArrangement == Arrangement.Start && verticalAlignment == Alignment.Top) {
-        DefaultRowMeasureBlocks
+        DefaultRowMeasurePolicy
     } else {
-        rowColumnMeasureBlocks(
+        rowColumnMeasurePolicy(
             orientation = LayoutOrientation.Horizontal,
             arrangement = { totalSize, size, layoutDirection, density, outPosition ->
                 with(horizontalArrangement) {

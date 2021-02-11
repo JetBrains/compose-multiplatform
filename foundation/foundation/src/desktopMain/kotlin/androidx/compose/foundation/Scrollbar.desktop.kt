@@ -45,7 +45,7 @@ import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.input.pointer.pointerMoveFilter
 import androidx.compose.ui.layout.Layout
-import androidx.compose.ui.layout.MeasuringIntrinsicsMeasureBlocks
+import androidx.compose.ui.layout.MeasurePolicy
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.Dp
@@ -201,13 +201,13 @@ private fun Scrollbar(
     }
 
     val scrollThickness = style.thickness.roundToPx()
-    val measureBlocks = if (isVertical) {
+    val measurePolicy = if (isVertical) {
         remember(sliderAdapter, scrollThickness) {
-            verticalMeasureBlocks(sliderAdapter, { containerSize = it }, scrollThickness)
+            verticalMeasurePolicy(sliderAdapter, { containerSize = it }, scrollThickness)
         }
     } else {
         remember(sliderAdapter, scrollThickness) {
-            horizontalMeasureBlocks(sliderAdapter, { containerSize = it }, scrollThickness)
+            horizontalMeasurePolicy(sliderAdapter, { containerSize = it }, scrollThickness)
         }
     }
 
@@ -268,13 +268,13 @@ private fun Scrollbar(
                     .rawDragGestureFilter(dragObserver)
             )
         },
-        measureBlocks,
         modifier
             .pointerMoveFilter(
                 onExit = { isHover = false; true },
                 onEnter = { isHover = true; true }
             )
-            .scrollOnPressOutsideSlider(isVertical, sliderAdapter, adapter, containerSize)
+            .scrollOnPressOutsideSlider(isVertical, sliderAdapter, adapter, containerSize),
+        measurePolicy
     )
 }
 
@@ -506,11 +506,11 @@ private class SliderAdapter(
     val bounds get() = position..position + size
 }
 
-private fun verticalMeasureBlocks(
+private fun verticalMeasurePolicy(
     sliderAdapter: SliderAdapter,
     setContainerSize: (Int) -> Unit,
     scrollThickness: Int
-) = MeasuringIntrinsicsMeasureBlocks { measurables, constraints ->
+) = MeasurePolicy { measurables, constraints ->
     setContainerSize(constraints.maxHeight)
     val height = sliderAdapter.size.toInt()
     val placeable = measurables.first().measure(
@@ -524,11 +524,11 @@ private fun verticalMeasureBlocks(
     }
 }
 
-private fun horizontalMeasureBlocks(
+private fun horizontalMeasurePolicy(
     sliderAdapter: SliderAdapter,
     setContainerSize: (Int) -> Unit,
     scrollThickness: Int
-) = MeasuringIntrinsicsMeasureBlocks { measurables, constraints ->
+) = MeasurePolicy { measurables, constraints ->
     setContainerSize(constraints.maxWidth)
     val width = sliderAdapter.size.toInt()
     val placeable = measurables.first().measure(

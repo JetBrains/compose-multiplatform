@@ -42,7 +42,7 @@ import androidx.compose.ui.graphics.vector.rememberVectorPainter
 import androidx.compose.ui.layout.Layout
 import androidx.compose.ui.layout.LayoutModifier
 import androidx.compose.ui.layout.Measurable
-import androidx.compose.ui.layout.MeasureBlock
+import androidx.compose.ui.layout.MeasurePolicy
 import androidx.compose.ui.layout.MeasureResult
 import androidx.compose.ui.layout.MeasureScope
 import androidx.compose.ui.layout.onGloballyPositioned
@@ -90,14 +90,14 @@ class BoxWithConstraintsTest : LayoutTest() {
                     BoxWithConstraints(drawModifier) {
                         paddedConstraints.value = constraints
                         Layout(
-                            measureBlock = { _, childConstraints ->
+                            measurePolicy = { _, childConstraints ->
                                 firstChildConstraints.value = childConstraints
                                 layout(size, size) { }
                             },
                             content = { }
                         )
                         Layout(
-                            measureBlock = { _, chilConstraints ->
+                            measurePolicy = { _, chilConstraints ->
                                 secondChildConstraints.value = chilConstraints
                                 layout(size, size) { }
                             },
@@ -579,7 +579,7 @@ class BoxWithConstraintsTest : LayoutTest() {
         val zeroConstraints = Constraints.fixed(0, 0)
         show {
             Layout(
-                measureBlock = { measurables, _ ->
+                measurePolicy = { measurables, _ ->
                     layout(0, 0) {
                         // there was a bug when the child of WithConstraints wasn't marking
                         // needsRemeasure and it was only measured because the constraints
@@ -768,8 +768,8 @@ fun Container(
     Layout(
         content = content,
         modifier = modifier,
-        measureBlock = remember<MeasureBlock>(width, height) {
-            { measurables, _ ->
+        measurePolicy = remember(width, height) {
+            MeasurePolicy { measurables, _ ->
                 val constraint = Constraints(maxWidth = width, maxHeight = height)
                 layout(width, height) {
                     measurables.forEach {
@@ -793,8 +793,8 @@ fun ContainerChildrenAffectsParentSize(
 ) {
     Layout(
         content = content,
-        measureBlock = remember<MeasureBlock>(width, height) {
-            { measurables, _ ->
+        measurePolicy = remember(width, height) {
+            MeasurePolicy { measurables, _ ->
                 val constraint = Constraints(maxWidth = width, maxHeight = height)
                 val placeables = measurables.map { it.measure(constraint) }
                 layout(width, height) {
@@ -841,7 +841,7 @@ internal fun Padding(
 ) {
     Layout(
         modifier = modifier,
-        measureBlock = { measurables, constraints ->
+        measurePolicy = { measurables, constraints ->
             val totalDiff = size * 2
             val targetMinWidth = constraints.minWidth - totalDiff
             val targetMaxWidth = if (constraints.hasBoundedWidth) {

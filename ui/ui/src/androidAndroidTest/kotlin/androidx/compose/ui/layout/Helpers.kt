@@ -144,7 +144,7 @@ internal fun root(block: LayoutNode.() -> Unit = {}): LayoutNode {
 
 internal fun node(block: LayoutNode.() -> Unit = {}): LayoutNode {
     return LayoutNode().apply {
-        measureBlocks = MeasureInMeasureBlock()
+        measurePolicy = MeasureInMeasureBlock()
         block.invoke(this)
     }
 }
@@ -152,57 +152,57 @@ internal fun node(block: LayoutNode.() -> Unit = {}): LayoutNode {
 internal fun LayoutNode.add(child: LayoutNode) = insertAt(children.count(), child)
 
 internal fun LayoutNode.measureInLayoutBlock() {
-    measureBlocks = MeasureInLayoutBlock()
+    measurePolicy = MeasureInLayoutBlock()
 }
 
 internal fun LayoutNode.doNotMeasure() {
-    measureBlocks = NoMeasureBlock()
+    measurePolicy = NoMeasure()
 }
 
 internal fun LayoutNode.queryAlignmentLineDuringMeasure() {
-    (measureBlocks as SmartMeasureBlock).queryAlignmentLinesDuringMeasure = true
+    (measurePolicy as SmartMeasurePolicy).queryAlignmentLinesDuringMeasure = true
 }
 
 internal fun LayoutNode.runDuringMeasure(block: () -> Unit) {
-    (measureBlocks as SmartMeasureBlock).preMeasureCallback = block
+    (measurePolicy as SmartMeasurePolicy).preMeasureCallback = block
 }
 
 internal fun LayoutNode.runDuringLayout(block: () -> Unit) {
-    (measureBlocks as SmartMeasureBlock).preLayoutCallback = block
+    (measurePolicy as SmartMeasurePolicy).preLayoutCallback = block
 }
 
 internal val LayoutNode.first: LayoutNode get() = children.first()
 internal val LayoutNode.second: LayoutNode get() = children[1]
 internal val LayoutNode.measuresCount: Int
-    get() = (measureBlocks as SmartMeasureBlock).measuresCount
+    get() = (measurePolicy as SmartMeasurePolicy).measuresCount
 internal val LayoutNode.layoutsCount: Int
-    get() = (measureBlocks as SmartMeasureBlock).layoutsCount
+    get() = (measurePolicy as SmartMeasurePolicy).layoutsCount
 internal var LayoutNode.wrapChildren: Boolean
-    get() = (measureBlocks as SmartMeasureBlock).wrapChildren
+    get() = (measurePolicy as SmartMeasurePolicy).wrapChildren
     set(value) {
-        (measureBlocks as SmartMeasureBlock).wrapChildren = value
+        (measurePolicy as SmartMeasurePolicy).wrapChildren = value
     }
 internal val LayoutNode.measuredWithLayoutDirection: LayoutDirection
-    get() = (measureBlocks as SmartMeasureBlock).measuredLayoutDirection!!
+    get() = (measurePolicy as SmartMeasurePolicy).measuredLayoutDirection!!
 internal var LayoutNode.size: Int?
-    get() = (measureBlocks as SmartMeasureBlock).size
+    get() = (measurePolicy as SmartMeasurePolicy).size
     set(value) {
-        (measureBlocks as SmartMeasureBlock).size = value
+        (measurePolicy as SmartMeasurePolicy).size = value
     }
 internal var LayoutNode.childrenDirection: LayoutDirection?
-    get() = (measureBlocks as SmartMeasureBlock).childrenLayoutDirection
+    get() = (measurePolicy as SmartMeasurePolicy).childrenLayoutDirection
     set(value) {
-        (measureBlocks as SmartMeasureBlock).childrenLayoutDirection = value
+        (measurePolicy as SmartMeasurePolicy).childrenLayoutDirection = value
     }
 internal var LayoutNode.shouldPlaceChildren: Boolean
-    get() = (measureBlocks as SmartMeasureBlock).shouldPlaceChildren
+    get() = (measurePolicy as SmartMeasurePolicy).shouldPlaceChildren
     set(value) {
-        (measureBlocks as SmartMeasureBlock).shouldPlaceChildren = value
+        (measurePolicy as SmartMeasurePolicy).shouldPlaceChildren = value
     }
 
 internal val TestAlignmentLine = HorizontalAlignmentLine(::min)
 
-internal abstract class SmartMeasureBlock : LayoutNode.NoIntrinsicsMeasureBlocks("") {
+internal abstract class SmartMeasurePolicy : LayoutNode.NoIntrinsicsMeasurePolicy("") {
     var measuresCount = 0
         protected set
     var layoutsCount = 0
@@ -219,9 +219,8 @@ internal abstract class SmartMeasureBlock : LayoutNode.NoIntrinsicsMeasureBlocks
     var shouldPlaceChildren = true
 }
 
-internal class MeasureInMeasureBlock : SmartMeasureBlock() {
-    override fun measure(
-        measureScope: MeasureScope,
+internal class MeasureInMeasureBlock : SmartMeasurePolicy() {
+    override fun MeasureScope.measure(
         measurables: List<Measurable>,
         constraints: Constraints
     ): MeasureResult {
@@ -251,7 +250,7 @@ internal class MeasureInMeasureBlock : SmartMeasureBlock() {
                 maxHeight = max(placeable.height, maxHeight)
             }
         }
-        return measureScope.layout(maxWidth, maxHeight) {
+        return layout(maxWidth, maxHeight) {
             layoutsCount++
             preLayoutCallback?.invoke()
             preLayoutCallback = null
@@ -264,7 +263,7 @@ internal class MeasureInMeasureBlock : SmartMeasureBlock() {
     }
 }
 
-internal class MeasureInLayoutBlock : SmartMeasureBlock() {
+internal class MeasureInLayoutBlock : SmartMeasurePolicy() {
 
     override var wrapChildren: Boolean
         get() = false
@@ -285,8 +284,7 @@ internal class MeasureInLayoutBlock : SmartMeasureBlock() {
             }
         }
 
-    override fun measure(
-        measureScope: MeasureScope,
+    override fun MeasureScope.measure(
         measurables: List<Measurable>,
         constraints: Constraints
     ): MeasureResult {
@@ -299,7 +297,7 @@ internal class MeasureInLayoutBlock : SmartMeasureBlock() {
             val size = size!!
             constraints.copy(maxWidth = size, maxHeight = size)
         }
-        return measureScope.layout(childConstraints.maxWidth, childConstraints.maxHeight) {
+        return layout(childConstraints.maxWidth, childConstraints.maxHeight) {
             preLayoutCallback?.invoke()
             preLayoutCallback = null
             layoutsCount++
@@ -313,7 +311,7 @@ internal class MeasureInLayoutBlock : SmartMeasureBlock() {
     }
 }
 
-internal class NoMeasureBlock : SmartMeasureBlock() {
+internal class NoMeasure : SmartMeasurePolicy() {
 
     override var queryAlignmentLinesDuringMeasure: Boolean
         get() = false
@@ -326,8 +324,7 @@ internal class NoMeasureBlock : SmartMeasureBlock() {
             }
         }
 
-    override fun measure(
-        measureScope: MeasureScope,
+    override fun MeasureScope.measure(
         measurables: List<Measurable>,
         constraints: Constraints
     ): MeasureResult {
@@ -337,7 +334,7 @@ internal class NoMeasureBlock : SmartMeasureBlock() {
 
         val width = size ?: if (!wrapChildren) constraints.maxWidth else constraints.minWidth
         val height = size ?: if (!wrapChildren) constraints.maxHeight else constraints.minHeight
-        return measureScope.layout(width, height) {
+        return layout(width, height) {
             layoutsCount++
             preLayoutCallback?.invoke()
             preLayoutCallback = null

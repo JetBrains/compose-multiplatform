@@ -41,11 +41,9 @@ internal class InnerPlaceable(
     override val measureScope get() = layoutNode.measureScope
 
     override fun performMeasure(constraints: Constraints): Placeable {
-        val measureResult = layoutNode.measureBlocks.measure(
-            layoutNode.measureScope,
-            layoutNode.children,
-            constraints
-        )
+        val measureResult = with(layoutNode.measurePolicy) {
+            layoutNode.measureScope.measure(layoutNode.children, constraints)
+        }
         layoutNode.handleMeasureResult(measureResult)
         return this
     }
@@ -70,35 +68,27 @@ internal class InnerPlaceable(
     override fun findLastKeyInputWrapper(): ModifiedKeyInputNode? = findPreviousKeyInputWrapper()
 
     override fun minIntrinsicWidth(height: Int): Int {
-        return layoutNode.measureBlocks.minIntrinsicWidth(
-            measureScope,
-            layoutNode.children,
-            height
-        )
+        return with(layoutNode.measurePolicy) {
+            measureScope.minIntrinsicWidth(layoutNode.children, height)
+        }
     }
 
     override fun minIntrinsicHeight(width: Int): Int {
-        return layoutNode.measureBlocks.minIntrinsicHeight(
-            measureScope,
-            layoutNode.children,
-            width
-        )
+        return with(layoutNode.measurePolicy) {
+            measureScope.minIntrinsicHeight(layoutNode.children, width)
+        }
     }
 
     override fun maxIntrinsicWidth(height: Int): Int {
-        return layoutNode.measureBlocks.maxIntrinsicWidth(
-            measureScope,
-            layoutNode.children,
-            height
-        )
+        return with(layoutNode.measurePolicy) {
+            measureScope.maxIntrinsicWidth(layoutNode.children, height)
+        }
     }
 
     override fun maxIntrinsicHeight(width: Int): Int {
-        return layoutNode.measureBlocks.maxIntrinsicHeight(
-            measureScope,
-            layoutNode.children,
-            width
-        )
+        return with(layoutNode.measurePolicy) {
+            measureScope.maxIntrinsicHeight(layoutNode.children, width)
+        }
     }
 
     override fun placeAt(

@@ -133,7 +133,7 @@ private fun PopupLayout(
                 coordinates.size
             )
         },
-        measureBlock = { _, _ ->
+        measurePolicy = { _, _ ->
             layout(0, 0) {}
         }
     )
@@ -149,7 +149,7 @@ private fun PopupLayout(
                         onDismissRequest?.invoke()
                     }
                 },
-                measureBlock = { measurables, constraints ->
+                measurePolicy = { measurables, constraints ->
                     val width = constraints.maxWidth
                     val height = constraints.maxHeight
 

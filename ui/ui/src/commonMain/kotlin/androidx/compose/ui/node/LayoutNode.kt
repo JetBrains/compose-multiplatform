@@ -38,6 +38,7 @@ import androidx.compose.ui.layout.LayoutCoordinates
 import androidx.compose.ui.layout.LayoutInfo
 import androidx.compose.ui.layout.LayoutModifier
 import androidx.compose.ui.layout.Measurable
+import androidx.compose.ui.layout.MeasurePolicy
 import androidx.compose.ui.layout.MeasureResult
 import androidx.compose.ui.layout.MeasureScope
 import androidx.compose.ui.layout.ModifierInfo
@@ -389,7 +390,7 @@ internal class LayoutNode : Measurable, Remeasurement, OwnerScope, LayoutInfo, C
 
     override fun toString(): String {
         return "${simpleIdentityToString(this, null)} children: ${children.size} " +
-            "measureBlocks: $measureBlocks"
+            "measurePolicy: $measurePolicy"
     }
 
     /**
@@ -418,36 +419,32 @@ internal class LayoutNode : Measurable, Remeasurement, OwnerScope, LayoutInfo, C
         return treeString
     }
 
-    internal abstract class NoIntrinsicsMeasureBlocks(private val error: String) : MeasureBlocks {
-        override fun minIntrinsicWidth(
-            intrinsicMeasureScope: IntrinsicMeasureScope,
+    internal abstract class NoIntrinsicsMeasurePolicy(private val error: String) : MeasurePolicy {
+        override fun IntrinsicMeasureScope.minIntrinsicWidth(
             measurables: List<IntrinsicMeasurable>,
-            h: Int
+            height: Int
         ) = error(error)
 
-        override fun minIntrinsicHeight(
-            intrinsicMeasureScope: IntrinsicMeasureScope,
+        override fun IntrinsicMeasureScope.minIntrinsicHeight(
             measurables: List<IntrinsicMeasurable>,
-            w: Int
+            width: Int
         ) = error(error)
 
-        override fun maxIntrinsicWidth(
-            intrinsicMeasureScope: IntrinsicMeasureScope,
+        override fun IntrinsicMeasureScope.maxIntrinsicWidth(
             measurables: List<IntrinsicMeasurable>,
-            h: Int
+            height: Int
         ) = error(error)
 
-        override fun maxIntrinsicHeight(
-            intrinsicMeasureScope: IntrinsicMeasureScope,
+        override fun IntrinsicMeasureScope.maxIntrinsicHeight(
             measurables: List<IntrinsicMeasurable>,
-            w: Int
+            width: Int
         ) = error(error)
     }
 
     /**
      * Blocks that define the measurement and intrinsic measurement of the layout.
      */
-    override var measureBlocks: MeasureBlocks = ErrorMeasureBlocks
+    override var measurePolicy: MeasurePolicy = ErrorMeasurePolicy
         set(value) {
             if (field != value) {
                 field = value
@@ -461,8 +458,7 @@ internal class LayoutNode : Measurable, Remeasurement, OwnerScope, LayoutInfo, C
     override var density: Density = Density(1f)
 
     /**
-     * The scope used to run the [MeasureBlocks.measure]
-     * [MeasureBlock][androidx.compose.ui.layout.MeasureBlock].
+     * The scope used to [measure][MeasurePolicy.measure] children.
      */
     internal val measureScope: MeasureScope = object : MeasureScope, Density {
         override val density: Float get() = this@LayoutNode.density.density
@@ -1274,12 +1270,11 @@ internal class LayoutNode : Measurable, Remeasurement, OwnerScope, LayoutInfo, C
         get() = parent
 
     internal companion object {
-        private val ErrorMeasureBlocks: NoIntrinsicsMeasureBlocks =
-            object : NoIntrinsicsMeasureBlocks(
+        private val ErrorMeasurePolicy: NoIntrinsicsMeasurePolicy =
+            object : NoIntrinsicsMeasurePolicy(
                 error = "Undefined intrinsics block and it is required"
             ) {
-                override fun measure(
-                    measureScope: MeasureScope,
+                override fun MeasureScope.measure(
                     measurables: List<Measurable>,
                     constraints: Constraints
                 ) = error("Undefined measure and it is required")

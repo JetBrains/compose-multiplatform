@@ -55,7 +55,7 @@ import androidx.compose.ui.input.pointer.PointerInputFilter
 import androidx.compose.ui.input.pointer.PointerMoveEventFilter
 import androidx.compose.ui.input.pointer.PositionCalculator
 import androidx.compose.ui.input.pointer.TestPointerInputEventData
-import androidx.compose.ui.layout.RootMeasureBlocks
+import androidx.compose.ui.layout.RootMeasurePolicy
 import androidx.compose.ui.layout.boundsInWindow
 import androidx.compose.ui.node.InternalCoreApi
 import androidx.compose.ui.node.LayoutNode
@@ -119,7 +119,7 @@ internal class DesktopOwner(
     )
 
     override val root = LayoutNode().also {
-        it.measureBlocks = RootMeasureBlocks
+        it.measurePolicy = RootMeasurePolicy
         it.modifier = semanticsModifier
             .then(_focusManager.modifier)
             .then(keyInputModifier)

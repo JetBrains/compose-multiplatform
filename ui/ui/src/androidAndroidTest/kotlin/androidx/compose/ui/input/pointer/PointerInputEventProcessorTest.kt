@@ -2995,9 +2995,8 @@ private fun LayoutNode(x: Int, y: Int, x2: Int, y2: Int, modifier: Modifier = Mo
                 placeable.place(x, y)
             }
         }.then(modifier)
-        measureBlocks = object : LayoutNode.NoIntrinsicsMeasureBlocks("not supported") {
-            override fun measure(
-                measureScope: MeasureScope,
+        measurePolicy = object : LayoutNode.NoIntrinsicsMeasurePolicy("not supported") {
+            override fun MeasureScope.measure(
                 measurables: List<Measurable>,
                 constraints: Constraints
             ): MeasureResult =

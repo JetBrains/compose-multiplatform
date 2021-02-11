@@ -31,7 +31,7 @@ class PlacedChildTest {
     @Test
     fun remeasureNotPlacedChild() {
         val root = root {
-            measureBlocks = UseChildSizeButNotPlace
+            measurePolicy = UseChildSizeButNotPlace
             add(
                 node {
                     wrapChildren = true
@@ -57,14 +57,13 @@ class PlacedChildTest {
     }
 }
 
-private val UseChildSizeButNotPlace = object : LayoutNode.NoIntrinsicsMeasureBlocks("") {
-    override fun measure(
-        measureScope: MeasureScope,
+private val UseChildSizeButNotPlace = object : LayoutNode.NoIntrinsicsMeasurePolicy("") {
+    override fun MeasureScope.measure(
         measurables: List<Measurable>,
         constraints: Constraints
     ): MeasureResult {
         val placeable = measurables.first().measure(constraints)
-        return measureScope.layout(placeable.width, placeable.height) {
+        return layout(placeable.width, placeable.height) {
             // do not place
         }
     }

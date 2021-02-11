@@ -517,7 +517,7 @@ class AndroidViewCompatTest {
                                 factory = LayoutNode.Constructor,
                                 update = {
                                     init { node = this }
-                                    set(noOpMeasureBlocks, ComposeUiNode.SetMeasureBlocks)
+                                    set(noOpMeasurePolicy, ComposeUiNode.SetMeasurePolicy)
                                 }
                             )
                         }
@@ -664,9 +664,8 @@ class AndroidViewCompatTest {
         }
     }
 
-    private val noOpMeasureBlocks = object : LayoutNode.NoIntrinsicsMeasureBlocks("") {
-        override fun measure(
-            measureScope: MeasureScope,
+    private val noOpMeasurePolicy = object : LayoutNode.NoIntrinsicsMeasurePolicy("") {
+        override fun MeasureScope.measure(
             measurables: List<Measurable>,
             constraints: Constraints
         ): MeasureResult {

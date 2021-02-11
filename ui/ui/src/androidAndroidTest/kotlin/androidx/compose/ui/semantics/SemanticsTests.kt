@@ -20,8 +20,10 @@ import androidx.compose.foundation.clickable
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Stable
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.Layout
+import androidx.compose.ui.layout.MeasurePolicy
 import androidx.compose.ui.platform.InspectableValue
 import androidx.compose.ui.platform.ValueElement
 import androidx.compose.ui.platform.isDebugInspectorInfoEnabled
@@ -713,11 +715,14 @@ private class Counter(var count: Int)
 private fun CountingLayout(modifier: Modifier, counter: Counter) {
     Layout(
         modifier = modifier,
-        content = {}
-    ) { _, constraints ->
-        counter.count++
-        layout(constraints.minWidth, constraints.minHeight) {}
-    }
+        content = {},
+        measurePolicy = remember {
+            MeasurePolicy { _, constraints ->
+                counter.count++
+                layout(constraints.minWidth, constraints.minHeight) {}
+            }
+        }
+    )
 }
 
 /**
