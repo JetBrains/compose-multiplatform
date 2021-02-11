@@ -19,11 +19,13 @@ package androidx.compose.foundation.layout
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.layout.Layout
 import androidx.compose.ui.layout.LayoutCoordinates
+import androidx.compose.ui.layout.MeasurePolicy
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.layout.positionInParent
@@ -472,16 +474,19 @@ class BoxTest : LayoutTest() {
                                 }
                             )
                         }
+                    },
+                    measurePolicy = remember {
+                        MeasurePolicy { measurables, constraints ->
+                            val placeable = measurables.first().measure(constraints)
+                            ++measure
+                            layout(placeable.width, placeable.height) {
+                                placeable.place(0, 0)
+                                ++layout
+                                layoutLatch.countDown()
+                            }
+                        }
                     }
-                ) { measurables, constraints ->
-                    val placeable = measurables.first().measure(constraints)
-                    ++measure
-                    layout(placeable.width, placeable.height) {
-                        placeable.place(0, 0)
-                        ++layout
-                        layoutLatch.countDown()
-                    }
-                }
+                )
             }
         }
         assertTrue(layoutLatch.await(1, TimeUnit.SECONDS))

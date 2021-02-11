@@ -59,4 +59,5 @@ interface MeasureScope : IntrinsicMeasureScope {
 /**
  * A function for performing layout measurement.
  */
-typealias MeasureBlock = MeasureScope.(List<Measurable>, Constraints) -> MeasureResult
+@Deprecated("MeasureBlock was deprecated. See MeasurePolicy and the new Layout overloads.")
+internal typealias MeasureBlock = MeasureScope.(List<Measurable>, Constraints) -> MeasureResult

@@ -55,11 +55,11 @@ fun BoxWithConstraints(
     propagateMinConstraints: Boolean = false,
     content: @Composable BoxWithConstraintsScope.() -> Unit
 ) {
-    val measureBlocks = rememberBoxMeasureBlocks(contentAlignment, propagateMinConstraints)
+    val measurePolicy = rememberBoxMeasurePolicy(contentAlignment, propagateMinConstraints)
     SubcomposeLayout(modifier) { constraints ->
         val scope = BoxWithConstraintsScopeImpl(this, constraints)
         val measurables = subcompose(Unit) { scope.content() }
-        measureBlocks.measure(this, measurables, constraints)
+        with(measurePolicy) { measure(measurables, constraints) }
     }
 }
 

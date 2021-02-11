@@ -201,11 +201,10 @@ internal abstract class AndroidViewHolder(
             view = null
         }
 
-        layoutNode.measureBlocks = object : LayoutNode.NoIntrinsicsMeasureBlocks(
+        layoutNode.measurePolicy = object : LayoutNode.NoIntrinsicsMeasurePolicy(
             "Intrinsics not supported for Android views"
         ) {
-            override fun measure(
-                measureScope: MeasureScope,
+            override fun MeasureScope.measure(
                 measurables: List<Measurable>,
                 constraints: Constraints
             ): MeasureResult {
@@ -230,7 +229,7 @@ internal abstract class AndroidViewHolder(
                         layoutParams!!.height
                     )
                 )
-                return measureScope.layout(measuredWidth, measuredHeight) {
+                return layout(measuredWidth, measuredHeight) {
                     layoutAccordingTo(layoutNode)
                 }
             }

@@ -145,7 +145,7 @@ class OnGloballyPositionedTest {
         var latch = CountDownLatch(1)
         rule.setContent {
             Layout(
-                measureBlock = { measurables, constraints ->
+                measurePolicy = { measurables, constraints ->
                     layout(10, 10) {
                         measurables[0].measure(constraints).place(position, 0)
                     }
@@ -186,7 +186,7 @@ class OnGloballyPositionedTest {
         var wrap2OnPositionedCalled = false
         rule.setContent {
             Layout(
-                measureBlock = { measurables, constraints ->
+                measurePolicy = { measurables, constraints ->
                     layout(10, 10) {
                         measurables[1].measure(constraints).place(0, 0)
                     }

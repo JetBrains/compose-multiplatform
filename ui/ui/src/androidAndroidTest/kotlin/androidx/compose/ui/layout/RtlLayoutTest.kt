@@ -31,6 +31,7 @@ import androidx.compose.ui.node.Ref
 import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.runOnUiThreadIR
 import androidx.compose.ui.test.TestActivity
+import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.test.ext.junit.runners.AndroidJUnit4
@@ -226,20 +227,41 @@ class RtlLayoutTest {
             activity.setContent {
                 @OptIn(ExperimentalLayout::class)
                 CompositionLocalProvider(LocalLayoutDirection provides LayoutDirection.Rtl) {
+                    val measurePolicy = object : MeasurePolicy {
+                        override fun MeasureScope.measure(
+                            measurables: List<Measurable>,
+                            constraints: Constraints
+                        ) = layout(0, 0) {}
+
+                        override fun IntrinsicMeasureScope.minIntrinsicWidth(
+                            measurables: List<IntrinsicMeasurable>,
+                            height: Int
+                        ) = 0
+
+                        override fun IntrinsicMeasureScope.minIntrinsicHeight(
+                            measurables: List<IntrinsicMeasurable>,
+                            width: Int
+                        ) = 0
+
+                        override fun IntrinsicMeasureScope.maxIntrinsicWidth(
+                            measurables: List<IntrinsicMeasurable>,
+                            height: Int
+                        ): Int {
+                            resultLayoutDirection = this.layoutDirection
+                            latch.countDown()
+                            return 0
+                        }
+
+                        override fun IntrinsicMeasureScope.maxIntrinsicHeight(
+                            measurables: List<IntrinsicMeasurable>,
+                            width: Int
+                        ) = 0
+                    }
                     Layout(
                         content = {},
                         modifier = Modifier.width(IntrinsicSize.Max),
-                        minIntrinsicWidthMeasureBlock = { _, _ -> 0 },
-                        minIntrinsicHeightMeasureBlock = { _, _ -> 0 },
-                        maxIntrinsicWidthMeasureBlock = { _, _ ->
-                            resultLayoutDirection = this.layoutDirection
-                            latch.countDown()
-                            0
-                        },
-                        maxIntrinsicHeightMeasureBlock = { _, _ -> 0 }
-                    ) { _, _ ->
-                        layout(0, 0) {}
-                    }
+                        measurePolicy = measurePolicy
+                    )
                 }
             }
         }

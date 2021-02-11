@@ -23,7 +23,8 @@ import androidx.compose.ui.layout.MeasureResult
 import androidx.compose.ui.layout.MeasureScope
 import androidx.compose.ui.unit.Constraints
 
-interface MeasureBlocks {
+@Deprecated("MeasureBlocks was deprecated. Please use MeasurePolicy instead.")
+internal interface MeasureBlocks {
     /**
      * The function used to measure the child. It must call [MeasureScope.layout] before
      * completing.

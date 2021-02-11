@@ -20,9 +20,16 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.layout.Layout
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.layout.IntrinsicMeasurable
+import androidx.compose.ui.layout.IntrinsicMeasureScope
 import androidx.compose.ui.layout.LayoutCoordinates
+import androidx.compose.ui.layout.Measurable
+import androidx.compose.ui.layout.MeasurePolicy
+import androidx.compose.ui.layout.MeasureResult
+import androidx.compose.ui.layout.MeasureScope
 import androidx.compose.ui.node.Ref
 import androidx.compose.ui.layout.onGloballyPositioned
+import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.constrainHeight
@@ -481,17 +488,40 @@ private fun FixedIntrinsicsBox(
     height: Dp,
     maxIntrinsicHeight: Dp
 ) {
-    Layout(
-        {},
-        minIntrinsicWidthMeasureBlock = { _, _ -> minIntrinsicWidth.roundToPx() },
-        minIntrinsicHeightMeasureBlock = { _, _ -> minIntrinsicHeight.roundToPx() },
-        maxIntrinsicWidthMeasureBlock = { _, _ -> maxIntrinsicWidth.roundToPx() },
-        maxIntrinsicHeightMeasureBlock = { _, _ -> maxIntrinsicHeight.roundToPx() },
-        modifier = modifier
-    ) { _, constraints ->
-        layout(
-            constraints.constrainWidth(width.roundToPx()),
-            constraints.constrainHeight(height.roundToPx())
-        ) {}
+    val measurePolicy = object : MeasurePolicy {
+        override fun MeasureScope.measure(
+            measurables: List<Measurable>,
+            constraints: Constraints
+        ): MeasureResult {
+            return layout(
+                constraints.constrainWidth(width.roundToPx()),
+                constraints.constrainHeight(height.roundToPx())
+            ) {}
+        }
+
+        override fun IntrinsicMeasureScope.minIntrinsicWidth(
+            measurables: List<IntrinsicMeasurable>,
+            height: Int
+        ) = minIntrinsicWidth.roundToPx()
+
+        override fun IntrinsicMeasureScope.minIntrinsicHeight(
+            measurables: List<IntrinsicMeasurable>,
+            width: Int
+        ) = minIntrinsicHeight.roundToPx()
+
+        override fun IntrinsicMeasureScope.maxIntrinsicWidth(
+            measurables: List<IntrinsicMeasurable>,
+            height: Int
+        ) = maxIntrinsicWidth.roundToPx()
+
+        override fun IntrinsicMeasureScope.maxIntrinsicHeight(
+            measurables: List<IntrinsicMeasurable>,
+            width: Int
+        ) = maxIntrinsicHeight.roundToPx()
     }
+    Layout(
+        content = {},
+        modifier = modifier,
+        measurePolicy = measurePolicy
+    )
 }

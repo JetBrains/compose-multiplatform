@@ -23,8 +23,13 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.layout.FirstBaseline
 import androidx.compose.ui.layout.HorizontalAlignmentLine
+import androidx.compose.ui.layout.IntrinsicMeasurable
+import androidx.compose.ui.layout.IntrinsicMeasureScope
 import androidx.compose.ui.layout.Layout
 import androidx.compose.ui.layout.LayoutCoordinates
+import androidx.compose.ui.layout.Measurable
+import androidx.compose.ui.layout.MeasurePolicy
+import androidx.compose.ui.layout.MeasureScope
 import androidx.compose.ui.layout.VerticalAlignmentLine
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.layout.positionInParent
@@ -3929,13 +3934,36 @@ class RowColumnTest : LayoutTest() {
                         positionedLatch.countDown()
                     }
                 ) {}
+                val measurePolicy = object : MeasurePolicy {
+                    override fun MeasureScope.measure(
+                        measurables: List<Measurable>,
+                        constraints: Constraints
+                    ) = layout(constraints.maxWidth, constraints.maxWidth / 2) {}
+
+                    override fun IntrinsicMeasureScope.minIntrinsicWidth(
+                        measurables: List<IntrinsicMeasurable>,
+                        height: Int
+                    ) = rowWidth.roundToPx() / 10
+
+                    override fun IntrinsicMeasureScope.minIntrinsicHeight(
+                        measurables: List<IntrinsicMeasurable>,
+                        width: Int
+                    ) = width / 2
+
+                    override fun IntrinsicMeasureScope.maxIntrinsicWidth(
+                        measurables: List<IntrinsicMeasurable>,
+                        height: Int
+                    ) = rowWidth.roundToPx() * 2
+
+                    override fun IntrinsicMeasureScope.maxIntrinsicHeight(
+                        measurables: List<IntrinsicMeasurable>,
+                        width: Int
+                    ) = width / 2
+                }
                 Layout(
                     content = {},
-                    minIntrinsicWidthMeasureBlock = { _, _ -> rowWidth.roundToPx() / 10 },
-                    maxIntrinsicWidthMeasureBlock = { _, _ -> rowWidth.roundToPx() * 2 },
-                    minIntrinsicHeightMeasureBlock = { _, w -> w / 2 },
-                    maxIntrinsicHeightMeasureBlock = { _, w -> w / 2 }
-                ) { _, constraints -> layout(constraints.maxWidth, constraints.maxWidth / 2) {} }
+                    measurePolicy = measurePolicy
+                )
             }
         }
 
@@ -3960,13 +3988,36 @@ class RowColumnTest : LayoutTest() {
                         positionedLatch.countDown()
                     }
                 ) {}
+                val measurePolicy = object : MeasurePolicy {
+                    override fun MeasureScope.measure(
+                        measurables: List<Measurable>,
+                        constraints: Constraints
+                    ) = layout(constraints.maxHeight / 2, constraints.maxHeight) {}
+
+                    override fun IntrinsicMeasureScope.minIntrinsicWidth(
+                        measurables: List<IntrinsicMeasurable>,
+                        height: Int
+                    ) = height / 2
+
+                    override fun IntrinsicMeasureScope.minIntrinsicHeight(
+                        measurables: List<IntrinsicMeasurable>,
+                        width: Int
+                    ) = columnHeight.roundToPx() / 10
+
+                    override fun IntrinsicMeasureScope.maxIntrinsicWidth(
+                        measurables: List<IntrinsicMeasurable>,
+                        height: Int
+                    ) = height / 2
+
+                    override fun IntrinsicMeasureScope.maxIntrinsicHeight(
+                        measurables: List<IntrinsicMeasurable>,
+                        width: Int
+                    ) = columnHeight.roundToPx() * 2
+                }
                 Layout(
                     content = {},
-                    minIntrinsicWidthMeasureBlock = { _, h -> h / 2 },
-                    maxIntrinsicWidthMeasureBlock = { _, h -> h / 2 },
-                    minIntrinsicHeightMeasureBlock = { _, _ -> columnHeight.roundToPx() / 10 },
-                    maxIntrinsicHeightMeasureBlock = { _, _ -> columnHeight.roundToPx() * 2 }
-                ) { _, constraints -> layout(constraints.maxHeight / 2, constraints.maxHeight) {} }
+                    measurePolicy = measurePolicy
+                )
             }
         }
 
@@ -5403,10 +5454,9 @@ private fun BaselineTestLayout(
     Layout(
         content = content,
         modifier = modifier,
-        measureBlock = { _, constraints ->
+        measurePolicy = { _, constraints ->
             val widthPx = max(width.roundToPx(), constraints.minWidth)
-            val heightPx =
-                max(height.roundToPx(), constraints.minHeight)
+            val heightPx = max(height.roundToPx(), constraints.minHeight)
             layout(
                 widthPx, heightPx,
                 mapOf(

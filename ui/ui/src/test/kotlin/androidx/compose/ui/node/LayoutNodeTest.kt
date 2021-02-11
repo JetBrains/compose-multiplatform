@@ -1834,13 +1834,12 @@ private class MockOwner(
 private fun LayoutNode(x: Int, y: Int, x2: Int, y2: Int, modifier: Modifier = Modifier) =
     LayoutNode().apply {
         this.modifier = modifier
-        measureBlocks = object : LayoutNode.NoIntrinsicsMeasureBlocks("not supported") {
-            override fun measure(
-                measureScope: MeasureScope,
+        measurePolicy = object : LayoutNode.NoIntrinsicsMeasurePolicy("not supported") {
+            override fun MeasureScope.measure(
                 measurables: List<Measurable>,
                 constraints: Constraints
             ): MeasureResult =
-                measureScope.layout(x2 - x, y2 - y) {
+                layout(x2 - x, y2 - y) {
                     measurables.forEach { it.measure(constraints).place(0, 0) }
                 }
         }

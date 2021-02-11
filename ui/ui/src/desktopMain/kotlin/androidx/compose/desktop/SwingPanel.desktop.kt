@@ -75,7 +75,7 @@ public fun <T : Component> SwingPanel(
             componentInfo.layout.validate()
             componentInfo.layout.repaint()
         },
-        measureBlock = { _, _ ->
+        measurePolicy = { _, _ ->
             layout(0, 0) {}
         }
     )

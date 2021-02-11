@@ -78,7 +78,7 @@ import androidx.compose.ui.input.pointer.MotionEventAdapter
 import androidx.compose.ui.input.pointer.PointerInputEventProcessor
 import androidx.compose.ui.input.pointer.PositionCalculator
 import androidx.compose.ui.input.pointer.ProcessResult
-import androidx.compose.ui.layout.RootMeasureBlocks
+import androidx.compose.ui.layout.RootMeasurePolicy
 import androidx.compose.ui.node.InternalCoreApi
 import androidx.compose.ui.node.LayoutNode
 import androidx.compose.ui.node.LayoutNode.UsageByParent
@@ -152,7 +152,7 @@ internal class AndroidComposeView(context: Context) :
     private val canvasHolder = CanvasHolder()
 
     override val root = LayoutNode().also {
-        it.measureBlocks = RootMeasureBlocks
+        it.measurePolicy = RootMeasurePolicy
         it.modifier = Modifier
             .then(semanticsModifier)
             .then(_focusManager.modifier)
