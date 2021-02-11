@@ -92,7 +92,6 @@ private fun JavaCompile.configureWithErrorProne() {
             "-Xep:RestrictTo:OFF",
 
             // Disable the following checks.
-            "-Xep:CatchAndPrintStackTrace:OFF",
             "-Xep:UnescapedEntity:OFF",
             "-Xep:MissingSummary:OFF",
             "-Xep:StaticAssignmentInConstructor:OFF",
@@ -161,6 +160,7 @@ private fun JavaCompile.configureWithErrorProne() {
             "-Xep:BadImport:ERROR",
             "-Xep:MissingCasesInEnumSwitch:ERROR",
             "-Xep:ObjectToString:ERROR",
+            "-Xep:CatchAndPrintStackTrace:ERROR",
             "-Xep:MixedMutabilityReturnType:ERROR",
 
             // Nullaway
