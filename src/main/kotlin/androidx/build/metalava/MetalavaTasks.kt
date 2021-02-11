@@ -69,6 +69,9 @@ object MetalavaTasks {
             }
             applyInputs(javaCompileInputs, task)
             AffectedModuleDetector.configureTaskGuard(task)
+            // If we will be updating the api lint baselines, then we should do that before
+            // using it to validate the generated api
+            task.mustRunAfter("updateApiLintBaseline")
         }
 
         // Policy: If the artifact has previously been released, e.g. has a beta or later API file
@@ -117,9 +120,6 @@ object MetalavaTasks {
                 task.manifestPath.set(processManifest.manifestOutputFile)
             }
             applyInputs(javaCompileInputs, task)
-            // If we will be updating the api lint baselines, then we should do that before
-            // using it to validate the generated api
-            generateApi.get().mustRunAfter(task)
         }
 
         // Policy: All changes to API surfaces for which compatibility is enforced must be
