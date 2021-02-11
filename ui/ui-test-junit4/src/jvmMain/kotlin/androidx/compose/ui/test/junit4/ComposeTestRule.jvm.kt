@@ -165,11 +165,14 @@ interface ComposeContentTestRule : ComposeTestRule {
 /**
  * Factory method to provide an implementation of [ComposeContentTestRule].
  *
- * This method is useful for tests in compose libraries where no custom Activity is usually
- * needed. For app tests or launching custom activities, see [createAndroidComposeRule].
+ * This method is useful for tests in compose libraries where it is irrelevant where the compose
+ * content is hosted (e.g. an Activity on Android). Such tests typically set compose content
+ * themselves via [setContent][ComposeContentTestRule.setContent] and only instrument and assert
+ * that content.
  *
  * For Android this will use the default Activity (android.app.Activity). You need to add a
  * reference to this activity into the manifest file of the corresponding tests (usually in
- * androidTest/AndroidManifest.xml).
+ * androidTest/AndroidManifest.xml). If your Android test requires a specific Activity to be
+ * launched, see [createAndroidComposeRule].
  */
 expect fun createComposeRule(): ComposeContentTestRule
