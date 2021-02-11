@@ -26,13 +26,12 @@ import androidx.compose.ui.graphics.isSpecified
 import androidx.compose.ui.graphics.nativeCanvas
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.graphics.toComposeRect
-import androidx.compose.ui.text.AnnotatedString
+import androidx.compose.ui.text.AnnotatedString.Range
 import androidx.compose.ui.text.Paragraph
 import androidx.compose.ui.text.ParagraphIntrinsics
 import androidx.compose.ui.text.Placeholder
 import androidx.compose.ui.text.PlaceholderVerticalAlign
 import androidx.compose.ui.text.SpanStyle
-import androidx.compose.ui.text.SpanStyleRange
 import androidx.compose.ui.text.TextRange
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.Font
@@ -80,8 +79,8 @@ private val DefaultFontSize = 16.sp
 internal actual fun ActualParagraph(
     text: String,
     style: TextStyle,
-    spanStyles: List<AnnotatedString.Range<SpanStyle>>,
-    placeholders: List<AnnotatedString.Range<Placeholder>>,
+    spanStyles: List<Range<SpanStyle>>,
+    placeholders: List<Range<Placeholder>>,
     maxLines: Int,
     ellipsis: Boolean,
     width: Float,
@@ -502,8 +501,8 @@ internal class ParagraphBuilder(
     var textStyle: TextStyle,
     var ellipsis: String = "",
     var maxLines: Int = Int.MAX_VALUE,
-    val spanStyles: List<SpanStyleRange>,
-    val placeholders: List<AnnotatedString.Range<Placeholder>>,
+    val spanStyles: List<Range<SpanStyle>>,
+    val placeholders: List<Range<Placeholder>>,
     val density: Density
 ) {
     private lateinit var initialStyle: SpanStyle
@@ -631,8 +630,8 @@ internal class ParagraphBuilder(
     }
 
     private fun makeOps(
-        spans: List<SpanStyleRange>,
-        placeholders: List<AnnotatedString.Range<Placeholder>>
+        spans: List<Range<SpanStyle>>,
+        placeholders: List<Range<Placeholder>>
     ): List<Op> {
         val cuts = mutableListOf<Cut>()
         for (span in spans) {

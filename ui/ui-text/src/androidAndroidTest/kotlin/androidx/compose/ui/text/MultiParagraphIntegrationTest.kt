@@ -19,6 +19,7 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Rect
 import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.PathOperation
+import androidx.compose.ui.text.AnnotatedString.Range
 import androidx.compose.ui.text.FontTestData.Companion.BASIC_MEASURE_FONT
 import androidx.compose.ui.text.font.toFontFamily
 import androidx.compose.ui.text.intl.LocaleList
@@ -1215,12 +1216,12 @@ class MultiParagraphIntegrationTest {
         val text = AnnotatedString(
             text = "ab",
             paragraphStyles = listOf(
-                ParagraphStyleRange(
+                Range<ParagraphStyle>(
                     item = ParagraphStyle(textDirection = TextDirection.Content),
                     start = 0,
                     end = "a".length
                 ),
-                ParagraphStyleRange(
+                Range<ParagraphStyle>(
                     // skip setting [TextDirection] on purpose, should inherit from the
                     // main [ParagraphStyle]
                     item = ParagraphStyle(),
