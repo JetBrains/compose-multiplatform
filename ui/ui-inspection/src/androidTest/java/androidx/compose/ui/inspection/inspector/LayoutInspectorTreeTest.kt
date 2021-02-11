@@ -443,9 +443,9 @@ class LayoutInspectorTreeTest {
                 assertWithMessage(message).that(node.id).isLessThan(0L)
             }
             if (hasTransformations) {
-                assertWithMessage(message).that(node.bounds).isNotEmpty()
+                assertWithMessage(message).that(node.bounds).isNotNull()
             } else {
-                assertWithMessage(message).that(node.bounds).isEmpty()
+                assertWithMessage(message).that(node.bounds).isNull()
             }
             if (left != Dp.Unspecified) {
                 with(density) {
