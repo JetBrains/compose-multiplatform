@@ -29,24 +29,24 @@ import androidx.viewbinding.ViewBinding
 
 /**
  * Composes an Android layout resource in the presence of [ViewBinding]. The binding is obtained
- * from the [bindingBlock] block, which will be called exactly once to obtain the [ViewBinding]
+ * from the [factory] block, which will be called exactly once to obtain the [ViewBinding]
  * to be composed, and it is also guaranteed to be invoked on the UI thread.
  * Therefore, in addition to creating the [ViewBinding], the block can also be used
  * to perform one-off initializations and [View] constant properties' setting.
  * The [update] block can be run multiple times (on the UI thread as well) due to recomposition,
  * and it is the right place to set [View] properties depending on state. When state changes,
  * the block will be reexecuted to set the new properties. Note the block will also be ran once
- * right after the [bindingBlock] block completes.
+ * right after the [factory] block completes.
  *
  * @sample androidx.compose.ui.samples.AndroidViewBindingSample
  *
- * @param bindingBlock The block creating the [ViewBinding] to be composed.
+ * @param factory The block creating the [ViewBinding] to be composed.
  * @param modifier The modifier to be applied to the layout.
  * @param update The callback to be invoked after the layout is inflated.
  */
 @Composable
 fun <T : ViewBinding> AndroidViewBinding(
-    bindingBlock: (inflater: LayoutInflater, parent: ViewGroup, attachToParent: Boolean) -> T,
+    factory: (inflater: LayoutInflater, parent: ViewGroup, attachToParent: Boolean) -> T,
     modifier: Modifier = Modifier,
     update: T.() -> Unit = {}
 ) {
@@ -54,13 +54,13 @@ fun <T : ViewBinding> AndroidViewBinding(
     val viewBlock: (Context) -> View = remember {
         { context ->
             val inflater = LayoutInflater.from(context)
-            val viewBinding = bindingBlock(inflater, FrameLayout(context), false)
+            val viewBinding = factory(inflater, FrameLayout(context), false)
             viewBindingRef.value = viewBinding
             viewBinding.root
         }
     }
     AndroidView(
-        viewBlock = viewBlock,
+        factory = viewBlock,
         modifier = modifier,
         update = { viewBindingRef.value?.update() }
     )

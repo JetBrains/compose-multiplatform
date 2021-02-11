@@ -167,7 +167,7 @@ fun ComposeContent(background: Color = Color.White) {
                 Spacer(modifier = Modifier.width(20.dp))
                 SwingPanel(
                     modifier = Modifier.size(200.dp, 39.dp),
-                    componentBlock = {
+                    factory = {
                         actionButton(
                             text = "JComponent",
                             action = {
@@ -183,7 +183,7 @@ fun ComposeContent(background: Color = Color.White) {
                 SwingPanel(
                     background = background,
                     modifier = Modifier.size(200.dp, 39.dp),
-                    componentBlock = { ComposableColoredPanel(Color.Red) }
+                    factory = { ComposableColoredPanel(Color.Red) }
                 )
             }
             Spacer(modifier = Modifier.height(50.dp))

@@ -374,7 +374,7 @@ class AndroidViewTest {
         rule.setContent {
             CompositionLocalProvider(ambient provides "setByParent") {
                 AndroidView(
-                    viewBlock = {
+                    factory = {
                         ComposeView(it).apply {
                             setContent {
                                 childComposedAmbientValue = ambient.current
@@ -396,7 +396,7 @@ class AndroidViewTest {
         rule.setContent {
             CompositionLocalProvider(LocalLayoutDirection provides LayoutDirection.Rtl) {
                 AndroidView(
-                    viewBlock = {
+                    factory = {
                         FrameLayout(it).apply {
                             addOnLayoutChangeListener { _, _, _, _, _, _, _, _, _ ->
                                 childViewLayoutDirection = layoutDirection
