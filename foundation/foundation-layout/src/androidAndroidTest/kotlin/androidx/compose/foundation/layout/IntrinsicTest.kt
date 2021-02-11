@@ -47,7 +47,6 @@ import java.util.concurrent.TimeUnit
 
 @SmallTest
 @RunWith(AndroidJUnit4::class)
-@OptIn(ExperimentalLayout::class)
 class IntrinsicTest : LayoutTest() {
     @Test
     fun testMinIntrinsicWidth() = with(density) {

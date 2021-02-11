@@ -18,7 +18,6 @@ package androidx.compose.ui.layout
 
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.ExperimentalLayout
 import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.width
 import androidx.compose.runtime.Composable
@@ -225,7 +224,6 @@ class RtlLayoutTest {
 
         activityTestRule.runOnUiThread {
             activity.setContent {
-                @OptIn(ExperimentalLayout::class)
                 CompositionLocalProvider(LocalLayoutDirection provides LayoutDirection.Rtl) {
                     val measurePolicy = object : MeasurePolicy {
                         override fun MeasureScope.measure(

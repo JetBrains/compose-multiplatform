@@ -20,7 +20,6 @@ import androidx.annotation.Sampled
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.ExperimentalLayout
 import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.aspectRatio
@@ -37,7 +36,6 @@ import androidx.compose.ui.unit.dp
 
 @Sampled
 @Composable
-@OptIn(ExperimentalLayout::class)
 fun SameWidthBoxes() {
     // Builds a layout containing three Box having the same width as the widest one.
     //
@@ -69,7 +67,6 @@ fun SameWidthBoxes() {
 
 @Sampled
 @Composable
-@OptIn(ExperimentalLayout::class)
 fun MatchParentDividerForText() {
     // Builds a layout containing two pieces of text separated by a divider, where the divider
     // is sized according to the height of the longest text.
@@ -97,7 +94,6 @@ fun MatchParentDividerForText() {
 
 @Sampled
 @Composable
-@OptIn(ExperimentalLayout::class)
 fun SameWidthTextBoxes() {
     // Builds a layout containing three Text boxes having the same width as the widest one.
     //
@@ -124,7 +120,6 @@ fun SameWidthTextBoxes() {
 
 @Sampled
 @Composable
-@OptIn(ExperimentalLayout::class)
 fun MatchParentDividerForAspectRatio() {
     // Builds a layout containing two aspectRatios separated by a divider, where the divider
     // is sized according to the height of the taller aspectRatio.

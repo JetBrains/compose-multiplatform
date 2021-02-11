@@ -42,7 +42,6 @@ import androidx.compose.ui.unit.constrain
  * Example usage for max intrinsic:
  * @sample androidx.compose.foundation.layout.samples.SameWidthTextBoxes
  */
-@ExperimentalLayout
 @Stable
 fun Modifier.width(intrinsicSize: IntrinsicSize) = when (intrinsicSize) {
     IntrinsicSize.Min -> this.then(MinIntrinsicWidthModifier)
@@ -63,7 +62,6 @@ fun Modifier.width(intrinsicSize: IntrinsicSize) = when (intrinsicSize) {
  * Example usage for max intrinsic:
  * @sample androidx.compose.foundation.layout.samples.MatchParentDividerForAspectRatio
  */
-@ExperimentalLayout
 @Stable
 fun Modifier.height(intrinsicSize: IntrinsicSize) = when (intrinsicSize) {
     IntrinsicSize.Min -> this.then(MinIntrinsicHeightModifier)
