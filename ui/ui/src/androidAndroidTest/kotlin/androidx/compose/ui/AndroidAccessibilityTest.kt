@@ -405,7 +405,7 @@ class AndroidAccessibilityTest {
         val rectF = data[0] as RectF
         val expectedRect = textLayoutResult.getBoundingBox(0).translate(
             textFieldNode
-                .globalPosition
+                .positionInWindow
         )
         assertEquals(expectedRect.left, rectF.left)
         assertEquals(expectedRect.top, rectF.top)
@@ -687,12 +687,12 @@ class AndroidAccessibilityTest {
         var rootNodeBoundsTop = 0f
         rule.runOnIdle {
             val rootNode = androidComposeView.semanticsOwner.rootSemanticsNode
-            rootNodeBoundsLeft = rootNode.globalBounds.left
-            rootNodeBoundsTop = rootNode.globalBounds.top
+            rootNodeBoundsLeft = rootNode.boundsInWindow.left
+            rootNodeBoundsTop = rootNode.boundsInWindow.top
         }
         val toggleableNode = rule.onNodeWithTag(ToggleableTag)
             .fetchSemanticsNode("couldn't find node with tag $ToggleableTag")
-        val toggleableNodeBounds = toggleableNode.globalBounds
+        val toggleableNodeBounds = toggleableNode.boundsInWindow
 
         val toggleableNodeId = delegate.getVirtualViewAt(
             (toggleableNodeBounds.left + toggleableNodeBounds.right) / 2 - rootNodeBoundsLeft,
@@ -704,7 +704,7 @@ class AndroidAccessibilityTest {
             .fetchSemanticsNode("couldn't find node with tag $OverlappedChildOneTag")
         val overlappedChildTwoNode = rule.onNodeWithTag(OverlappedChildTwoTag)
             .fetchSemanticsNode("couldn't find node with tag $OverlappedChildTwoTag")
-        val overlappedChildNodeBounds = overlappedChildTwoNode.globalBounds
+        val overlappedChildNodeBounds = overlappedChildTwoNode.boundsInWindow
         val overlappedChildNodeId = delegate.getVirtualViewAt(
             (overlappedChildNodeBounds.left + overlappedChildNodeBounds.right) / 2 -
                 rootNodeBoundsLeft,

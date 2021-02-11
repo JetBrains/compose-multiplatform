@@ -16,9 +16,9 @@
 
 package androidx.compose.ui.input.pointer
 
+import androidx.compose.ui.layout.LayoutCoordinates
+import androidx.compose.ui.layout.findRoot
 import androidx.compose.ui.node.InternalCoreApi
-import androidx.compose.ui.unit.IntOffset
-import androidx.compose.ui.unit.plus
 
 /**
  * Organizes pointers and the [PointerInputFilter]s that they hit into a hierarchy such that
@@ -353,40 +353,25 @@ internal class Node(val pointerInputFilter: PointerInputFilter) : NodeParent() {
         // dispatch or could have moved in some synchronous way (an Android parent may have moved
         // for example) and we actually want to add back whatever position was previously
         // subtracted.
-        val position = pointerInputFilter.position
-        val size = pointerInputFilter.size
+        val coordinates = filter.layoutCoordinates!!
+        val root = coordinates.findRoot()
 
-        // TODO(shepshapard): Subtracting offsets and adding offsets is currently expensive because
-        //  PointerInputChanges are copied during the operation. Should be better when
-        //  PointerInputChanges are privately mutable.
-        subtractOffset(position)
-        val pointerEvent = PointerEvent(this.changes.values.toList(), this)
-        filter.onPointerEvent(pointerEvent, pass, size)
-        addOffset(position)
+        val pointerEvent = PointerEvent(changesInLocal(root, coordinates), this)
+        filter.onPointerEvent(pointerEvent, pass, coordinates.size)
     }
 
-    private fun InternalPointerEvent.addOffset(position: IntOffset) {
-        // TODO(shepshapard): Replace everything is costly, we should be able to simply change
-        //  data in place here and prevent it from being changed when dispatched to
-        //  PointerInputFilters.
-        if (position != IntOffset.Zero) {
-            changes.replaceEverything {
-                it.copy(
-                    currentPosition = it.position + position,
-                    previousPosition = it.previousPosition + position
-                )
-            }
+    private fun InternalPointerEvent.changesInLocal(
+        root: LayoutCoordinates,
+        local: LayoutCoordinates
+    ): List<PointerInputChange> {
+        val list = mutableListOf<PointerInputChange>()
+        changes.values.forEach { change ->
+            list += change.copy(
+                previousPosition = local.localPositionOf(root, change.previousPosition),
+                currentPosition = local.localPositionOf(root, change.position)
+            )
         }
-    }
-
-    private fun InternalPointerEvent.subtractOffset(position: IntOffset) {
-        addOffset(-position)
-    }
-
-    private inline fun <K, V> MutableMap<K, V>.replaceEverything(f: (V) -> V) {
-        for (entry in this) {
-            entry.setValue(f(entry.value))
-        }
+        return list
     }
 }
 

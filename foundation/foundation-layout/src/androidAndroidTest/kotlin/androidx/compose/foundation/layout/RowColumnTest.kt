@@ -16,20 +16,20 @@
 
 package androidx.compose.foundation.layout
 
-import androidx.compose.ui.layout.FirstBaseline
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.layout.FirstBaseline
 import androidx.compose.ui.layout.HorizontalAlignmentLine
 import androidx.compose.ui.layout.Layout
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.layout.VerticalAlignmentLine
-import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.layout.LayoutCoordinates
+import androidx.compose.ui.layout.VerticalAlignmentLine
+import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.layout.positionInParent
 import androidx.compose.ui.layout.positionInRoot
 import androidx.compose.ui.node.Ref
-import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.platform.InspectableValue
 import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.platform.ValueElement
@@ -39,17 +39,17 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
+import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.SmallTest
+import com.google.common.truth.Truth
+import org.junit.After
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNotNull
 import org.junit.Assert.assertTrue
+import org.junit.Before
 import org.junit.Ignore
 import org.junit.Test
 import org.junit.runner.RunWith
-import androidx.test.ext.junit.runners.AndroidJUnit4
-import com.google.common.truth.Truth
-import org.junit.After
-import org.junit.Before
 import java.util.concurrent.CountDownLatch
 import java.util.concurrent.TimeUnit
 import kotlin.math.max
@@ -2558,13 +2558,13 @@ class RowColumnTest : LayoutTest() {
                 ) {
                     Box(
                         Modifier.requiredSize(size).onGloballyPositioned {
-                            assertEquals(0f, it.positionInParent.x)
+                            assertEquals(0f, it.positionInParent().x)
                             latch.countDown()
                         }
                     )
                     Box(
                         Modifier.requiredSize(size).onGloballyPositioned {
-                            assertEquals(sizePx + spacePx, it.positionInParent.x)
+                            assertEquals(sizePx + spacePx, it.positionInParent().x)
                             latch.countDown()
                         }
                     )
@@ -2594,13 +2594,13 @@ class RowColumnTest : LayoutTest() {
                 ) {
                     Box(
                         Modifier.requiredSize(size).onGloballyPositioned {
-                            assertEquals(rowSizePx - spacePx - sizePx * 2, it.positionInParent.x)
+                            assertEquals(rowSizePx - spacePx - sizePx * 2, it.positionInParent().x)
                             latch.countDown()
                         }
                     )
                     Box(
                         Modifier.requiredSize(size).onGloballyPositioned {
-                            assertEquals(rowSizePx - sizePx, it.positionInParent.x)
+                            assertEquals(rowSizePx - sizePx, it.positionInParent().x)
                             latch.countDown()
                         }
                     )
@@ -2630,21 +2630,21 @@ class RowColumnTest : LayoutTest() {
                 ) {
                     Box(
                         Modifier.size(size).onGloballyPositioned {
-                            assertEquals(0f, it.positionInParent.x)
+                            assertEquals(0f, it.positionInParent().x)
                             assertEquals(sizePx.roundToInt(), it.size.width)
                             latch.countDown()
                         }
                     )
                     Box(
                         Modifier.size(size).onGloballyPositioned {
-                            assertEquals(sizePx + spacePx, it.positionInParent.x)
+                            assertEquals(sizePx + spacePx, it.positionInParent().x)
                             assertEquals((rowSizePx - spacePx - sizePx).roundToInt(), it.size.width)
                             latch.countDown()
                         }
                     )
                     Box(
                         Modifier.size(size).onGloballyPositioned {
-                            assertEquals(rowSizePx, it.positionInParent.x)
+                            assertEquals(rowSizePx, it.positionInParent().x)
                             assertEquals(0, it.size.width)
                             latch.countDown()
                         }
@@ -2673,14 +2673,14 @@ class RowColumnTest : LayoutTest() {
                 ) {
                     Box(
                         Modifier.size(size).onGloballyPositioned {
-                            assertEquals(rowSizePx - sizePx * 2, it.positionInParent.x)
+                            assertEquals(rowSizePx - sizePx * 2, it.positionInParent().x)
                             assertEquals(sizePx.roundToInt(), it.size.width)
                             latch.countDown()
                         }
                     )
                     Box(
                         Modifier.size(size).onGloballyPositioned {
-                            assertEquals(rowSizePx - sizePx, it.positionInParent.x)
+                            assertEquals(rowSizePx - sizePx, it.positionInParent().x)
                             assertEquals(sizePx.roundToInt(), it.size.width)
                             latch.countDown()
                         }
@@ -3031,13 +3031,13 @@ class RowColumnTest : LayoutTest() {
                 ) {
                     Box(
                         Modifier.requiredSize(size).onGloballyPositioned {
-                            assertEquals(0f, it.positionInParent.x)
+                            assertEquals(0f, it.positionInParent().x)
                             latch.countDown()
                         }
                     )
                     Box(
                         Modifier.requiredSize(size).onGloballyPositioned {
-                            assertEquals(sizePx + spacePx, it.positionInParent.y)
+                            assertEquals(sizePx + spacePx, it.positionInParent().y)
                             latch.countDown()
                         }
                     )
@@ -3067,13 +3067,15 @@ class RowColumnTest : LayoutTest() {
                 ) {
                     Box(
                         Modifier.requiredSize(size).onGloballyPositioned {
-                            assertEquals(columnSizePx - spacePx - sizePx * 2, it.positionInParent.y)
+                            assertEquals(
+                                columnSizePx - spacePx - sizePx * 2, it.positionInParent().y
+                            )
                             latch.countDown()
                         }
                     )
                     Box(
                         Modifier.requiredSize(size).onGloballyPositioned {
-                            assertEquals(columnSizePx - sizePx, it.positionInParent.y)
+                            assertEquals(columnSizePx - sizePx, it.positionInParent().y)
                             latch.countDown()
                         }
                     )
@@ -3103,14 +3105,14 @@ class RowColumnTest : LayoutTest() {
                 ) {
                     Box(
                         Modifier.size(size).onGloballyPositioned {
-                            assertEquals(0f, it.positionInParent.y)
+                            assertEquals(0f, it.positionInParent().y)
                             assertEquals(sizePx.roundToInt(), it.size.height)
                             latch.countDown()
                         }
                     )
                     Box(
                         Modifier.size(size).onGloballyPositioned {
-                            assertEquals(sizePx + spacePx, it.positionInParent.y)
+                            assertEquals(sizePx + spacePx, it.positionInParent().y)
                             assertEquals(
                                 (columnSizePx - spacePx - sizePx).roundToInt(), it.size.height
                             )
@@ -3119,7 +3121,7 @@ class RowColumnTest : LayoutTest() {
                     )
                     Box(
                         Modifier.size(size).onGloballyPositioned {
-                            assertEquals(columnSizePx, it.positionInParent.y)
+                            assertEquals(columnSizePx, it.positionInParent().y)
                             assertEquals(0, it.size.height)
                             latch.countDown()
                         }
@@ -3148,13 +3150,13 @@ class RowColumnTest : LayoutTest() {
                 ) {
                     Box(
                         Modifier.requiredSize(size).onGloballyPositioned {
-                            assertEquals(columnSizePx - sizePx * 2, it.positionInParent.y)
+                            assertEquals(columnSizePx - sizePx * 2, it.positionInParent().y)
                             latch.countDown()
                         }
                     )
                     Box(
                         Modifier.requiredSize(size).onGloballyPositioned {
-                            assertEquals(columnSizePx - sizePx, it.positionInParent.y)
+                            assertEquals(columnSizePx - sizePx, it.positionInParent().y)
                             latch.countDown()
                         }
                     )
@@ -4365,13 +4367,13 @@ class RowColumnTest : LayoutTest() {
                     ) {
                         Box(
                             Modifier.requiredSize(size).onGloballyPositioned {
-                                assertEquals(sizePx + spacePx, it.positionInParent.x)
+                                assertEquals(sizePx + spacePx, it.positionInParent().x)
                                 latch.countDown()
                             }
                         )
                         Box(
                             Modifier.requiredSize(size).onGloballyPositioned {
-                                assertEquals(0f, it.positionInParent.x)
+                                assertEquals(0f, it.positionInParent().x)
                                 latch.countDown()
                             }
                         )
@@ -5306,13 +5308,13 @@ class RowColumnTest : LayoutTest() {
                     ) {
                         Box(
                             Modifier.requiredSize(size).onGloballyPositioned {
-                                assertEquals(0f, it.positionInParent.x)
+                                assertEquals(0f, it.positionInParent().x)
                                 latch.countDown()
                             }
                         )
                         Box(
                             Modifier.requiredSize(size).onGloballyPositioned {
-                                assertEquals(sizePx + spacePx, it.positionInParent.x)
+                                assertEquals(sizePx + spacePx, it.positionInParent().x)
                                 latch.countDown()
                             }
                         )

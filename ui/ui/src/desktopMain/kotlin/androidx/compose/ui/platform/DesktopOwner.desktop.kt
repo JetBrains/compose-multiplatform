@@ -53,9 +53,10 @@ import androidx.compose.ui.input.pointer.PointerInputEvent
 import androidx.compose.ui.input.pointer.PointerInputEventProcessor
 import androidx.compose.ui.input.pointer.PointerInputFilter
 import androidx.compose.ui.input.pointer.PointerMoveEventFilter
+import androidx.compose.ui.input.pointer.PositionCalculator
 import androidx.compose.ui.input.pointer.TestPointerInputEventData
 import androidx.compose.ui.layout.RootMeasureBlocks
-import androidx.compose.ui.layout.globalBounds
+import androidx.compose.ui.layout.boundsInWindow
 import androidx.compose.ui.node.InternalCoreApi
 import androidx.compose.ui.node.LayoutNode
 import androidx.compose.ui.node.MeasureAndLayoutDelegate
@@ -68,7 +69,6 @@ import androidx.compose.ui.text.input.TextInputService
 import androidx.compose.ui.text.platform.FontLoader
 import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.Density
-import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.LayoutDirection
 
@@ -79,7 +79,7 @@ import androidx.compose.ui.unit.LayoutDirection
 internal class DesktopOwner(
     val container: DesktopOwners,
     density: Density = Density(1f, 1f)
-) : Owner, RootForTest, DesktopRootForTest {
+) : Owner, RootForTest, DesktopRootForTest, PositionCalculator {
     internal var size by mutableStateOf(IntSize(0, 0))
 
     override var density by mutableStateOf(density)
@@ -229,9 +229,13 @@ internal class DesktopOwner(
         else -> null
     }
 
-    override fun calculatePosition() = IntOffset.Zero
+    override fun calculatePositionInWindow(localPosition: Offset): Offset = localPosition
 
-    override fun calculatePositionInWindow() = IntOffset.Zero
+    override fun calculateLocalPosition(positionInWindow: Offset): Offset = positionInWindow
+
+    override fun localToScreen(localPosition: Offset): Offset = localPosition
+
+    override fun screenToLocal(positionOnScreen: Offset): Offset = positionOnScreen
 
     fun setSize(width: Int, height: Int) {
         val constraints = Constraints(0, width, 0, height)
@@ -245,7 +249,7 @@ internal class DesktopOwner(
 
     internal fun processPointerInput(event: PointerInputEvent) {
         measureAndLayout()
-        pointerInputEventProcessor.process(event)
+        pointerInputEventProcessor.process(event, this)
     }
 
     override fun processPointerInput(nanoTime: Long, pointers: List<TestPointerInputEventData>) {
@@ -302,7 +306,7 @@ internal class DesktopOwner(
                 .filterIsInstance<PointerMoveEventFilter>()
         ) {
             if (!onMoveConsumed) {
-                val relative = position - filter.layoutCoordinates!!.globalBounds.topLeft
+                val relative = position - filter.layoutCoordinates!!.boundsInWindow().topLeft
                 onMoveConsumed = filter.onMoveHandler(relative)
             }
             if (!onEnterConsumed && !oldMoveFilters.contains(filter))

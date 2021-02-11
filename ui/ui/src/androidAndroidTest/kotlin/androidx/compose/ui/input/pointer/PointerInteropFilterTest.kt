@@ -4374,10 +4374,8 @@ class PointerInteropFilterTest {
         override val isAttached: Boolean
             get() = true
 
-        override fun globalToLocal(global: Offset): Offset = Offset.Zero
         override fun windowToLocal(relativeToWindow: Offset): Offset = Offset.Zero
 
-        override fun localToGlobal(local: Offset): Offset = Offset.Zero
         override fun localToWindow(relativeToLocal: Offset): Offset = Offset.Zero
 
         override fun localToRoot(relativeToLocal: Offset): Offset = Offset.Zero
@@ -4386,10 +4384,6 @@ class PointerInteropFilterTest {
             relativeToSource: Offset
         ): Offset = Offset.Zero
 
-        override fun childToLocal(child: LayoutCoordinates, childLocal: Offset): Offset =
-            Offset.Zero
-
-        override fun childBoundingBox(child: LayoutCoordinates): Rect = Rect.Zero
         override fun localBoundingBoxOf(
             sourceCoordinates: LayoutCoordinates,
             clipBounds: Boolean

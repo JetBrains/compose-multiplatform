@@ -270,10 +270,10 @@ internal class AndroidComposeViewAccessibilityDelegateCompat(val view: AndroidCo
         try {
             info.setBoundsInScreen(
                 android.graphics.Rect(
-                    semanticsNode.globalBounds.left.toInt(),
-                    semanticsNode.globalBounds.top.toInt(),
-                    semanticsNode.globalBounds.right.toInt(),
-                    semanticsNode.globalBounds.bottom.toInt()
+                    semanticsNode.boundsInWindow.left.toInt(),
+                    semanticsNode.boundsInWindow.top.toInt(),
+                    semanticsNode.boundsInWindow.right.toInt(),
+                    semanticsNode.boundsInWindow.bottom.toInt()
                 )
             )
         } catch (e: IllegalStateException) {
@@ -943,7 +943,7 @@ internal class AndroidComposeViewAccessibilityDelegateCompat(val view: AndroidCo
                         xScrollState.value() < xScrollState.maxValue()
                     ) {
                         return scrollAction.action?.invoke(
-                            node.globalBounds.right - node.globalBounds.left,
+                            node.boundsInWindow.right - node.boundsInWindow.left,
                             0f
                         ) ?: false
                     }
@@ -961,7 +961,7 @@ internal class AndroidComposeViewAccessibilityDelegateCompat(val view: AndroidCo
                         xScrollState.value() > 0
                     ) {
                         return scrollAction.action?.invoke(
-                            -(node.globalBounds.right - node.globalBounds.left),
+                            -(node.boundsInWindow.right - node.boundsInWindow.left),
                             0f
                         ) ?: false
                     }
@@ -984,7 +984,7 @@ internal class AndroidComposeViewAccessibilityDelegateCompat(val view: AndroidCo
                     ) {
                         return scrollAction.action?.invoke(
                             0f,
-                            node.globalBounds.bottom - node.globalBounds.top
+                            node.boundsInWindow.bottom - node.boundsInWindow.top
                         ) ?: false
                     }
                     if ((
@@ -1002,7 +1002,7 @@ internal class AndroidComposeViewAccessibilityDelegateCompat(val view: AndroidCo
                     ) {
                         return scrollAction.action?.invoke(
                             0f,
-                            -(node.globalBounds.bottom - node.globalBounds.top)
+                            -(node.boundsInWindow.bottom - node.boundsInWindow.top)
                         ) ?: false
                     }
                 }
@@ -1124,8 +1124,8 @@ internal class AndroidComposeViewAccessibilityDelegateCompat(val view: AndroidCo
     }
 
     private fun toScreenCoords(textNode: SemanticsNode, bounds: Rect): Rect? {
-        val screenBounds = bounds.translate(textNode.globalPosition)
-        val globalBounds = textNode.globalBounds
+        val screenBounds = bounds.translate(textNode.positionInWindow)
+        val globalBounds = textNode.boundsInWindow
         if (screenBounds.overlaps(globalBounds)) {
             return screenBounds.intersect(globalBounds)
         }
@@ -1195,8 +1195,8 @@ internal class AndroidComposeViewAccessibilityDelegateCompat(val view: AndroidCo
     internal fun getVirtualViewAt(x: Float, y: Float): Int {
         val node = view.semanticsOwner.rootSemanticsNode
         val id = findVirtualViewAt(
-            x + node.globalBounds.left,
-            y + node.globalBounds.top, node
+            x + node.boundsInWindow.left,
+            y + node.boundsInWindow.top, node
         )
         if (id == node.id) {
             return AccessibilityNodeProviderCompat.HOST_VIEW_ID
@@ -1214,8 +1214,8 @@ internal class AndroidComposeViewAccessibilityDelegateCompat(val view: AndroidCo
             }
         }
 
-        if (node.globalBounds.left < x && node.globalBounds.right > x && node
-            .globalBounds.top < y && node.globalBounds.bottom > y
+        if (node.boundsInWindow.left < x && node.boundsInWindow.right > x && node
+            .boundsInWindow.top < y && node.boundsInWindow.bottom > y
         ) {
             return node.id
         }
@@ -2066,13 +2066,13 @@ internal fun SemanticsOwner.getAllUncoveredSemanticsNodesToMap(
 ): Map<Int, SemanticsNode> {
     val root = if (useUnmergedTree) unmergedRootSemanticsNode else rootSemanticsNode
     val nodes = mutableMapOf<Int, SemanticsNode>()
-    val unaccountedSpace = Region().also { it.set(root.globalBounds.toAndroidRect()) }
+    val unaccountedSpace = Region().also { it.set(root.boundsInWindow.toAndroidRect()) }
 
     fun findAllSemanticNodesRecursive(currentNode: SemanticsNode) {
         if (unaccountedSpace.isEmpty) {
             return
         }
-        val rect = currentNode.globalBounds.toAndroidRect()
+        val rect = currentNode.boundsInWindow.toAndroidRect()
 
         if (Region(unaccountedSpace).op(rect, Region.Op.INTERSECT)) {
             nodes[currentNode.id] = currentNode

@@ -425,8 +425,8 @@ class BoxTest : LayoutTest() {
             ) {
                 Box(
                     Modifier.requiredSize(innerSize).onGloballyPositioned {
-                        assertEquals(outerSizePx - innerSizePx, it.positionInParent.x)
-                        assertEquals(outerSizePx - innerSizePx, it.positionInParent.y)
+                        assertEquals(outerSizePx - innerSizePx, it.positionInParent().x)
+                        assertEquals(outerSizePx - innerSizePx, it.positionInParent().y)
                         positionedLatch.countDown()
                     }
                 ) {}
@@ -445,8 +445,8 @@ class BoxTest : LayoutTest() {
                 Box(
                     Modifier.align(Alignment.BottomEnd).align(Alignment.TopStart)
                         .onGloballyPositioned {
-                            assertEquals(size, it.positionInParent.x)
-                            assertEquals(size, it.positionInParent.y)
+                            assertEquals(size, it.positionInParent().x)
+                            assertEquals(size, it.positionInParent().y)
                             positionedLatch.countDown()
                         }
                 )
