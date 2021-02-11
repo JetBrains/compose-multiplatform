@@ -32,7 +32,7 @@ packaging JDK 14 or later must be used.
 
 ### Update the wizard plugin
 The compose plugin version used in the wizard above may be out of date. Update the version of the plugin to the latest available. 
-E.g. at time of writing that wsa kotlin 1.4.30 and compose plugin version 0.3.0-build152.
+E.g. at time of writing that was kotlin 1.4.30 and compose plugin version 0.3.0-build152.
 Find and update this in the build.gradle.kts file.
 ```
 plugins {
