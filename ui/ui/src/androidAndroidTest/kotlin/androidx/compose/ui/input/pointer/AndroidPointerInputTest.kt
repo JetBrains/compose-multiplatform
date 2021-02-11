@@ -205,6 +205,9 @@ class AndroidPointerInputTest {
             // this call will synchronously mark the LayoutNode as needs remeasure
             Snapshot.sendApplyNotifications()
             val androidComposeView = container.getChildAt(0) as AndroidComposeView
+            val locationInWindow = IntArray(2).also {
+                container.getLocationInWindow(it)
+            }
 
             val motionEvent = MotionEvent(
                 0,
@@ -212,7 +215,7 @@ class AndroidPointerInputTest {
                 1,
                 0,
                 arrayOf(PointerProperties(0)),
-                arrayOf(PointerCoords(15f, 15f))
+                arrayOf(PointerCoords(locationInWindow[0] + 15f, locationInWindow[1] + 15f))
             )
 
             // we expect it to first remeasure and only then process
