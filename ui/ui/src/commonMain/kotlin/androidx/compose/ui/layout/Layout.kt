@@ -247,15 +247,15 @@ internal fun materializerOf(
     }
 }
 
-@Suppress("ComposableLambdaParameterNaming", "ComposableLambdaParameterPosition")
+@Suppress("ComposableLambdaParameterPosition")
 @Composable
 @Deprecated(
-    "This composable is temporary to enable quicker prototyping in ConstraintLayout. " +
-        "It should not be used in app code directly."
+    "This API is unsafe for UI performance at scale - using it incorrectly will lead " +
+        "to exponential performance issues. This API should be avoided whenever possible."
 )
 fun MultiMeasureLayout(
     modifier: Modifier = Modifier,
-    children: @Composable () -> Unit,
+    content: @Composable () -> Unit,
     measureBlock: MeasureBlock
 ) {
     val measureBlocks = remember(measureBlock) { MeasuringIntrinsicsMeasureBlocks(measureBlock) }
@@ -273,7 +273,7 @@ fun MultiMeasureLayout(
             @Suppress("DEPRECATION")
             init { this.canMultiMeasure = true }
         },
-        content = children
+        content = content
     )
 }
 
