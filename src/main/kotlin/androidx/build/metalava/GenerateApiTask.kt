@@ -22,7 +22,7 @@ import androidx.build.java.JavaCompileInputs
 import org.gradle.api.provider.Property
 import org.gradle.api.tasks.CacheableTask
 import org.gradle.api.tasks.Input
-import org.gradle.api.tasks.InputFiles
+import org.gradle.api.tasks.InputFile
 import org.gradle.api.tasks.Internal
 import org.gradle.api.tasks.Optional
 import org.gradle.api.tasks.OutputFiles
@@ -38,36 +38,15 @@ import javax.inject.Inject
 abstract class GenerateApiTask @Inject constructor(
     workerExecutor: WorkerExecutor
 ) : MetalavaTask(workerExecutor) {
-    @get:Internal // already expressed by getReferenceApiFiles()
-    abstract val referenceApiLocation: Property<ApiLocation>
-
-    @Optional
-    @PathSensitive(PathSensitivity.NONE)
-    @InputFiles
-    fun getReferenceApiFiles(): List<File> {
-        val location = referenceApiLocation.orNull ?: return emptyList()
-        return listOfNotNull(
-            location.publicApiFile,
-            location.removedApiFile,
-            location.experimentalApiFile,
-            location.restrictedApiFile
-        )
-    }
-
-    @get:Internal // already expressed by getTaskOutputs()
-    abstract val currentApiLocation: Property<ApiLocation>
-    @get:Internal // already expressed by getBaselineFiles()
+    @get:Internal // already expressed by getApiLintBaseline()
     abstract val baselines: Property<ApiBaselinesLocation>
 
     @Optional
     @PathSensitive(PathSensitivity.NONE)
-    @InputFiles
-    fun getBaselineFiles(): List<File> {
-        return listOf(
-            baselines.get().apiLintFile,
-            baselines.get().publicApiFile,
-            baselines.get().restrictedApiFile,
-        )
+    @InputFile
+    fun getApiLintBaseline(): File? {
+        val baseline = baselines.get().apiLintFile
+        return if (baseline.exists()) baseline else null
     }
 
     @get:Input
@@ -81,8 +60,8 @@ abstract class GenerateApiTask @Inject constructor(
     abstract val apiLocation: Property<ApiLocation>
 
     @OutputFiles
-    fun getTaskOutputs(): List<File> {
-        val prop = currentApiLocation.get()
+    fun getTaskOutputs(): List<File>? {
+        val prop = apiLocation.get()
         return listOfNotNull(
             prop.publicApiFile,
             prop.removedApiFile,
@@ -101,22 +80,11 @@ abstract class GenerateApiTask @Inject constructor(
             dependencyClasspath,
             project
         )
-
-        val compatibilityCheckMode = if (referenceApiLocation.isPresent) {
-            CompatibilityCheckMode.CheckCompatibility(
-                referenceApiLocation.get(),
-                baselines.get()
-            )
-        } else {
-            CompatibilityCheckMode.Skip
-        }
-
         generateApi(
             metalavaClasspath,
             inputs,
-            currentApiLocation.get(),
+            apiLocation.get(),
             ApiLintMode.CheckBaseline(baselines.get().apiLintFile, targetsJavaConsumers),
-            compatibilityCheckMode,
             generateRestrictToLibraryGroupAPIs,
             workerExecutor,
             manifestPath.orNull?.asFile?.absolutePath
