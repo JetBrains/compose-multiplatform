@@ -50,18 +50,16 @@ private fun InspectorNode.toComposableNodeImpl(stringTable: StringTable): Compos
                 w = inspectorNode.width
                 h = inspectorNode.height
             }.build()
-            if (inspectorNode.bounds.size == 8) {
-                // Note: Inspector bounds are clockwise order (TL, TR, BR, BL) but Studio expects
-                // (TL, TR, BL, BR)
+            if (inspectorNode.bounds != null) {
                 render = Quad.newBuilder().apply {
-                    x0 = inspectorNode.bounds[0]
-                    y0 = inspectorNode.bounds[1]
-                    x1 = inspectorNode.bounds[2]
-                    y1 = inspectorNode.bounds[3]
-                    x2 = inspectorNode.bounds[6]
-                    y2 = inspectorNode.bounds[7]
-                    x3 = inspectorNode.bounds[4]
-                    y3 = inspectorNode.bounds[5]
+                    x0 = inspectorNode.bounds.x0
+                    y0 = inspectorNode.bounds.y0
+                    x1 = inspectorNode.bounds.x1
+                    y1 = inspectorNode.bounds.y1
+                    x2 = inspectorNode.bounds.x2
+                    y2 = inspectorNode.bounds.y2
+                    x3 = inspectorNode.bounds.x3
+                    y3 = inspectorNode.bounds.y3
                 }.build()
             }
         }.build()

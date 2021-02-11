@@ -40,10 +40,8 @@ message Rect {
     int32 h = 4;
 }
 
-// A Quad will be the result of a Rect after applying some affine or perspective transformations.
-// While the transformed points can be skewed in a complex manner, the untransformed Rect source of
-// the coordinates will always be consistent:
-// 0 = top left, 1 = top right, 2 = bot left, 3 = bot right
+// A Quad holds the 4 corners of a polygon in drawing order, that represent the transformed shape
+// of a Rect after applying some affine or perspective transformations.
 message Quad {
     sint32 x0 = 1;
     sint32 y0 = 2;
