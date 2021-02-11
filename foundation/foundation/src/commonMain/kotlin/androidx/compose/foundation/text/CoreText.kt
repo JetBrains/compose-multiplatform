@@ -73,7 +73,7 @@ private typealias InlineContentRange = AnnotatedString.Range<@Composable (String
 /**
  * CoreText is a low level element that displays text with multiple different styles. The text to
  * display is described using a [AnnotatedString]. Typically you will instead want to use
- * [androidx.compose.foundation.text.BasicText], which is a higher level Text element that contains
+ * [androidx.compose.material.Text], which is a higher level Text element that contains
  * semantics and consumes style information from a theme.
  *
  * @param text AnnotatedString encoding a styled text.

@@ -27,6 +27,8 @@ import androidx.compose.ui.text.style.TextOverflow
 
 /**
  * Basic element that displays text and provides semantics / accessibility information.
+ * Typically you will instead want to use [androidx.compose.material.Text], which is
+ * a higher level Text element that contains semantics and consumes style information from a theme.
  *
  * @param text The text to be displayed.
  * @param modifier [Modifier] to apply to this layout node.
@@ -63,6 +65,8 @@ fun BasicText(
 
 /**
  * Basic element that displays text and provides semantics / accessibility information.
+ * Typically you will instead want to use [androidx.compose.material.Text], which is
+ * a higher level Text element that contains semantics and consumes style information from a theme.
  *
  * @param text The text to be displayed.
  * @param modifier [Modifier] to apply to this layout node.
