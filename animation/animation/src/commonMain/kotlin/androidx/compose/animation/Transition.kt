@@ -39,14 +39,13 @@ import androidx.compose.ui.graphics.Color
  * [targetValueByState] is used as a mapping from a target state to the target value of this
  * animation. [Transition] will be using this mapping to determine what value to target this
  * animation towards. __Note__ that [targetValueByState] is a composable function. This means the
- * mapping function could access states, CompositionLocals, themes, etc. If the targetValue changes
- * outside of a [Transition] run (i.e. when the [Transition] already reached its targetState),
- * the [Transition] will start running again to ensure this animation reaches its new target
- * smoothly.
+ * mapping function could access states, CompositionLocals, themes, etc. If the target value changes
+ * when the [Transition] already reached its [targetState][Transition.targetState],
+ * the [Transition] will run an animation to ensure the new target value is reached smoothly.
  *
- * An optional [transitionSpec] can be provided to specify (potentially different) animation for
- * each pair of initialState and targetState. [FiniteAnimationSpec] includes any non-infinite
- * animation, such as [tween], [spring], [keyframes] and even [repeatable], but not
+ * An optional [transitionSpec] can be provided to specify (potentially different) animations for
+ * each pair of initialState and targetState. [FiniteAnimationSpec] can be used to describe such
+ * animations, such as [tween], [spring], [keyframes] and even [repeatable], but not
  * [infiniteRepeatable]. By default, [transitionSpec] uses a [spring] animation for all transition
  * destinations.
  *
@@ -54,8 +53,9 @@ import androidx.compose.ui.graphics.Color
  *
  * @return A [State] object, the value of which is updated by animation
  *
- * @see animateValue
- * @see androidx.compose.animation.core.animateFloat
+ * @sample androidx.compose.animation.samples.GestureAnimationSample
+ *
+ * @see Transition.animateValue
  * @see androidx.compose.animation.core.Transition
  * @see androidx.compose.animation.core.updateTransition
  */
@@ -83,11 +83,13 @@ inline fun <S> Transition<S>.animateColor(
  * . [RepeatMode.Reverse]).
  *
  * If [initialValue] or [targetValue] is changed at any point during the animation, the animation
- * will be restarted with the new [initialValue] and [targetValue]. __Note__: this means
- * continuity will *not* be preserved.
+ * will be restarted with the new initial/targetValue. __Note__: this means animation continuity
+ * will *not* be preserved when changing either [initialValue] or [targetValue].
+ *
+ * @sample androidx.compose.animation.samples.InfiniteTransitionSample
  *
  * @see InfiniteTransition.animateValue
- * @see androidx.compose.animation.core.animateFloat
+ * @see InfiniteRepeatableSpec
  */
 @Composable
 fun InfiniteTransition.animateColor(
