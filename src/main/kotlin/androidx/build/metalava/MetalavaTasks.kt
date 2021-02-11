@@ -44,7 +44,7 @@ object MetalavaTasks {
         javaCompileInputs: JavaCompileInputs,
         extension: AndroidXExtension,
         processManifest: ProcessLibraryManifest? = null,
-        baselinesApiLocation: ApiBaselinesLocation,
+        apiBaselinesLocation: ApiBaselinesLocation,
         builtApiLocation: ApiLocation,
         outputApiLocations: List<ApiLocation>
     ) {
@@ -59,10 +59,10 @@ object MetalavaTasks {
 
             task.group = "API"
             task.description = "Generates API files from source"
-            task.apiLocation.set(builtApiLocation)
+            task.currentApiLocation.set(builtApiLocation)
             task.metalavaClasspath.from(metalavaClasspath)
             task.generateRestrictToLibraryGroupAPIs = generateRestrictToLibraryGroupAPIs
-            task.baselines.set(baselinesApiLocation)
+            task.baselines.set(apiBaselinesLocation)
             task.targetsJavaConsumers = extension.targetsJavaConsumers
             processManifest?.let {
                 task.manifestPath.set(processManifest.manifestOutputFile)
@@ -71,34 +71,23 @@ object MetalavaTasks {
             AffectedModuleDetector.configureTaskGuard(task)
         }
 
-        // Policy: If the artifact has previously been released, e.g. has a beta or later API file
-        // checked in, then we must verify "release compatibility" against the work-in-progress
-        // API file.
-        var checkApiRelease: TaskProvider<CheckApiCompatibilityTask>? = null
         var ignoreApiChanges: TaskProvider<IgnoreApiChangesTask>? = null
         project.getRequiredCompatibilityApiLocation()?.let { lastReleasedApiFile ->
-            checkApiRelease = project.tasks.register(
-                "checkApiRelease",
-                CheckApiCompatibilityTask::class.java
-            ) { task ->
-                task.metalavaClasspath.from(metalavaClasspath)
-                task.referenceApi.set(lastReleasedApiFile)
-                task.baselines.set(baselinesApiLocation)
-                task.api.set(builtApiLocation)
-                task.dependencyClasspath = javaCompileInputs.dependencyClasspath
-                task.bootClasspath = javaCompileInputs.bootClasspath
-                task.cacheEvenIfNoOutputs()
-                task.dependsOn(generateApi)
-                AffectedModuleDetector.configureTaskGuard(task)
+            if (!project.hasProperty("force")) {
+                // Policy: If the artifact has previously been released, e.g. has a beta or later API file
+                // checked in, then we must verify "release compatibility" against the work-in-progress
+                // API file.
+                generateApi.configure { task ->
+                    task.referenceApiLocation.set(lastReleasedApiFile)
+                }
             }
-
             ignoreApiChanges = project.tasks.register(
                 "ignoreApiChanges",
                 IgnoreApiChangesTask::class.java
             ) { task ->
                 task.metalavaClasspath.from(metalavaClasspath)
-                task.referenceApi.set(checkApiRelease!!.flatMap { it.referenceApi })
-                task.baselines.set(checkApiRelease!!.flatMap { it.baselines })
+                task.referenceApi.set(lastReleasedApiFile)
+                task.baselines.set(apiBaselinesLocation)
                 task.api.set(builtApiLocation)
                 task.dependencyClasspath = javaCompileInputs.dependencyClasspath
                 task.bootClasspath = javaCompileInputs.bootClasspath
@@ -111,7 +100,7 @@ object MetalavaTasks {
             UpdateApiLintBaselineTask::class.java
         ) { task ->
             task.metalavaClasspath.from(metalavaClasspath)
-            task.baselines.set(baselinesApiLocation)
+            task.baselines.set(apiBaselinesLocation)
             task.targetsJavaConsumers.set(extension.targetsJavaConsumers)
             processManifest?.let {
                 task.manifestPath.set(processManifest.manifestOutputFile)
@@ -130,13 +119,10 @@ object MetalavaTasks {
                 task.group = "API"
                 task.description = "Checks that the API generated from source code matches the " +
                     "checked in API file"
-                task.builtApi.set(generateApi.flatMap { it.apiLocation })
+                task.builtApi.set(generateApi.flatMap { it.currentApiLocation })
                 task.cacheEvenIfNoOutputs()
                 task.checkedInApis.set(outputApiLocations)
                 task.dependsOn(generateApi)
-                checkApiRelease?.let {
-                    task.dependsOn(checkApiRelease)
-                }
                 AffectedModuleDetector.configureTaskGuard(task)
             }
 
@@ -154,23 +140,17 @@ object MetalavaTasks {
         // surface. Make sure it always runs *after* the regenerateOldApis task.
         ignoreApiChanges?.configure { it.mustRunAfter(regenerateOldApis) }
 
-        // checkApiRelease validates the output of this task, so make sure it always runs
+        // generateApi validates the output of this task, so make sure it always runs
         // *after* the regenerateOldApis task.
-        checkApiRelease?.configure { it.mustRunAfter(regenerateOldApis) }
+        generateApi?.configure { it.mustRunAfter(regenerateOldApis) }
 
         val updateApi = project.tasks.register("updateApi", UpdateApiTask::class.java) { task ->
             task.group = "API"
             task.description = "Updates the checked in API files to match source code API"
-            task.inputApiLocation.set(generateApi.flatMap { it.apiLocation })
+            task.inputApiLocation.set(generateApi.flatMap { it.currentApiLocation })
             task.outputApiLocations.set(checkApi.flatMap { it.checkedInApis })
             task.forceUpdate = project.hasProperty("force")
             task.dependsOn(generateApi)
-
-            // If a developer (accidentally) makes a non-backwards compatible change to an API,
-            // the developer will want to be informed of it as soon as possible. So, whenever a
-            // developer updates an API, if backwards compatibility checks are enabled in the
-            // library, then we want to check that the changes are backwards compatible.
-            checkApiRelease?.let { task.dependsOn(it) }
             AffectedModuleDetector.configureTaskGuard(task)
         }
 

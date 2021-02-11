@@ -92,8 +92,13 @@ abstract class RegenerateOldApisTask @Inject constructor(
         if (outputApiLocation.publicApiFile.exists()) {
             project.logger.lifecycle("Regenerating $mavenId")
             generateApi(
-                project.getMetalavaClasspath(), inputs, outputApiLocation, ApiLintMode.Skip,
-                generateRestrictToLibraryGroupAPIs, workerExecutor
+                project.getMetalavaClasspath(),
+                inputs,
+                outputApiLocation,
+                ApiLintMode.Skip,
+                CompatibilityCheckMode.Skip,
+                generateRestrictToLibraryGroupAPIs,
+                workerExecutor
             )
         }
     }
