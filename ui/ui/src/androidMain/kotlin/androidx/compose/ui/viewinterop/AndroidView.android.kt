@@ -35,24 +35,24 @@ import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.unit.LayoutDirection
 
 /**
- * Composes an Android [View] obtained from [viewBlock]. The [viewBlock] block will be called
+ * Composes an Android [View] obtained from [factory]. The [factory] block will be called
  * exactly once to obtain the [View] to be composed, and it is also guaranteed to be invoked on
- * the UI thread. Therefore, in addition to creating the [viewBlock], the block can also be used
+ * the UI thread. Therefore, in addition to creating the [factory], the block can also be used
  * to perform one-off initializations and [View] constant properties' setting.
  * The [update] block can be run multiple times (on the UI thread as well) due to recomposition,
  * and it is the right place to set [View] properties depending on state. When state changes,
  * the block will be reexecuted to set the new properties. Note the block will also be ran once
- * right after the [viewBlock] block completes.
+ * right after the [factory] block completes.
  *
  * @sample androidx.compose.ui.samples.AndroidViewSample
  *
- * @param viewBlock The block creating the [View] to be composed.
+ * @param factory The block creating the [View] to be composed.
  * @param modifier The modifier to be applied to the layout.
  * @param update The callback to be invoked after the layout is inflated.
  */
 @Composable
 fun <T : View> AndroidView(
-    viewBlock: (Context) -> T,
+    factory: (Context) -> T,
     modifier: Modifier = Modifier,
     update: (T) -> Unit = NoOpUpdate
 ) {
@@ -61,13 +61,13 @@ fun <T : View> AndroidView(
     val density = LocalDensity.current
     val layoutDirection = LocalLayoutDirection.current
     val parentReference = rememberCompositionContext()
-    val viewBlockHolderRef = remember { Ref<ViewBlockHolder<T>>() }
+    val viewBlockHolderRef = remember { Ref<ViewFactoryHolder<T>>() }
     ComposeNode<LayoutNode, UiApplier>(
         factory = {
-            val viewBlockHolder = ViewBlockHolder<T>(context, parentReference)
-            viewBlockHolder.viewBlock = viewBlock
-            viewBlockHolderRef.value = viewBlockHolder
-            viewBlockHolder.toLayoutNode()
+            val viewFactoryHolder = ViewFactoryHolder<T>(context, parentReference)
+            viewFactoryHolder.factory = factory
+            viewBlockHolderRef.value = viewFactoryHolder
+            viewFactoryHolder.toLayoutNode()
         },
         update = {
             set(materialized) { viewBlockHolderRef.value!!.modifier = it }
@@ -88,14 +88,14 @@ fun <T : View> AndroidView(
  */
 val NoOpUpdate: View.() -> Unit = {}
 
-internal class ViewBlockHolder<T : View>(
+internal class ViewFactoryHolder<T : View>(
     context: Context,
     parentContext: CompositionContext? = null
 ) : AndroidViewHolder(context, parentContext) {
 
     private var typedView: T? = null
 
-    var viewBlock: ((Context) -> T)? = null
+    var factory: ((Context) -> T)? = null
         set(value) {
             field = value
             if (value != null) {

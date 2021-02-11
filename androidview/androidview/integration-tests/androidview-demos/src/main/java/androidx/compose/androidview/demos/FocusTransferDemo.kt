@@ -47,7 +47,7 @@ import androidx.compose.ui.unit.sp
 @Composable
 fun FocusTransferDemo() {
     AndroidView(
-        viewBlock = {
+        factory = {
             RecyclerView(it).apply {
                 setHasFixedSize(true)
                 layoutManager = LinearLayoutManager(it, VERTICAL, false)

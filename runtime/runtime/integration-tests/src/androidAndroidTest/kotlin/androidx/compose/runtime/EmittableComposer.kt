@@ -28,7 +28,7 @@ fun TextView(
     text: String = "",
     onClickListener: View.OnClickListener? = null
 ) {
-    AndroidView(viewBlock = { TextView(it) }) { view ->
+    AndroidView(factory = { TextView(it) }) { view ->
         view.id = id
         view.text = text
         if (onClickListener != null)
@@ -43,7 +43,7 @@ fun Button(
     text: String = "",
     onClickListener: View.OnClickListener? = null
 ) {
-    AndroidView(viewBlock = { Button(it) }) { view ->
+    AndroidView(factory = { Button(it) }) { view ->
         view.id = id
         view.text = text
         if (onClickListener != null)

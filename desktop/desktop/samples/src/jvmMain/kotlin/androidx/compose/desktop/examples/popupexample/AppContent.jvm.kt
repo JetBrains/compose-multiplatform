@@ -503,7 +503,7 @@ fun SwingActionButton(text: String, action: (() -> Unit)? = null) {
     SwingPanel(
         background = Color(55, 55, 55),
         modifier = Modifier.size(200.dp, 35.dp),
-        componentBlock = {
+        factory = {
             JButton(text).apply {
                 addActionListener(object : ActionListener {
                     public override fun actionPerformed(e: ActionEvent) {
