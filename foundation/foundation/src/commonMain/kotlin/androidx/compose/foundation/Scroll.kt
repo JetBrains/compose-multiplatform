@@ -26,6 +26,8 @@ import androidx.compose.foundation.gestures.ScrollableState
 import androidx.compose.foundation.gestures.animateScrollBy
 import androidx.compose.foundation.gestures.scrollBy
 import androidx.compose.foundation.gestures.scrollable
+import androidx.compose.foundation.interaction.InteractionSource
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Stable
 import androidx.compose.runtime.getValue
@@ -106,11 +108,13 @@ class ScrollState(initial: Int) : ScrollableState {
         }
 
     /**
-     * [InteractionState] that will be updated when the element with this state is being scrolled
-     * by dragging, using [Interaction.Dragged]. If you want to know whether the fling (or smooth
-     * scroll) is in progress, use [ScrollState.isScrollInProgress].
+     * [InteractionSource] that will be used to dispatch drag events when this
+     * list is being dragged. If you want to know whether the fling (or smooth scroll) is in
+     * progress, use [isScrollInProgress].
      */
-    val interactionState: InteractionState = InteractionState()
+    val interactionSource: InteractionSource get() = internalInteractionSource
+
+    internal val internalInteractionSource: MutableInteractionSource = MutableInteractionSource()
 
     private var _maxValueState = mutableStateOf(Int.MAX_VALUE, structuralEqualityPolicy())
 
@@ -283,7 +287,7 @@ private fun Modifier.scroll(
             // if rtl and horizontal, do not reverse to make it right-to-left
             reverseDirection = if (!isVertical && isRtl) reverseScrolling else !reverseScrolling,
             enabled = isScrollable,
-            interactionState = state.interactionState,
+            interactionSource = state.internalInteractionSource,
             flingBehavior = flingBehavior,
             state = state
         )

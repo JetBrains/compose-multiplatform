@@ -21,7 +21,9 @@ import androidx.compose.animation.core.AnimationSpec
 import androidx.compose.animation.core.CubicBezierEasing
 import androidx.compose.animation.core.FastOutSlowInEasing
 import androidx.compose.animation.core.TweenSpec
-import androidx.compose.foundation.Interaction
+import androidx.compose.foundation.interaction.DragInteraction
+import androidx.compose.foundation.interaction.Interaction
+import androidx.compose.foundation.interaction.PressInteraction
 import androidx.compose.ui.unit.Dp
 
 /**
@@ -34,7 +36,7 @@ import androidx.compose.ui.unit.Dp
  * desired for the [to] state.
  * @param from the previous [Interaction] that was used to calculate elevation. `null` if there
  * was no previous [Interaction], such as when the component is in its default state.
- * @param to the [Interaction] that this component is moving to, such as [Interaction.Pressed]
+ * @param to the [Interaction] that this component is moving to, such as [PressInteraction.Press]
  * when this component is being pressed. `null` if this component is moving back to its default
  * state.
  */
@@ -75,8 +77,8 @@ private object ElevationDefaults {
      */
     fun incomingAnimationSpecForInteraction(interaction: Interaction): AnimationSpec<Dp>? {
         return when (interaction) {
-            is Interaction.Pressed -> DefaultIncomingSpec
-            is Interaction.Dragged -> DefaultIncomingSpec
+            is PressInteraction.Press -> DefaultIncomingSpec
+            is DragInteraction.Start -> DefaultIncomingSpec
             else -> null
         }
     }
@@ -89,8 +91,8 @@ private object ElevationDefaults {
      */
     fun outgoingAnimationSpecForInteraction(interaction: Interaction): AnimationSpec<Dp>? {
         return when (interaction) {
-            is Interaction.Pressed -> DefaultOutgoingSpec
-            is Interaction.Dragged -> DefaultOutgoingSpec
+            is PressInteraction.Press -> DefaultOutgoingSpec
+            is DragInteraction.Start -> DefaultOutgoingSpec
             // TODO: use [HoveredOutgoingSpec] when hovered
             else -> null
         }

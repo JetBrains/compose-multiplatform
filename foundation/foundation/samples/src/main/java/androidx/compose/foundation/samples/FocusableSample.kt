@@ -17,9 +17,9 @@
 package androidx.compose.foundation.samples
 
 import androidx.annotation.Sampled
-import androidx.compose.foundation.Interaction
-import androidx.compose.foundation.InteractionState
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.focusable
+import androidx.compose.foundation.interaction.collectIsFocusedAsState
 import androidx.compose.foundation.layout.Column
 import androidx.compose.material.Button
 import androidx.compose.material.Text
@@ -34,11 +34,11 @@ import androidx.compose.ui.focus.focusRequester
 fun FocusableSample() {
     // initialize focus reference to be able to request focus programmatically
     val focusRequester = FocusRequester()
-    // interaction state to track changes of the component's interactions (like "focused")
-    val interactionState = remember { InteractionState() }
+    // MutableInteractionSource to track changes of the component's interactions (like "focused")
+    val interactionSource = remember { MutableInteractionSource() }
 
     // text below will change when we focus it via button click
-    val isFocused = interactionState.contains(Interaction.Focused)
+    val isFocused = interactionSource.collectIsFocusedAsState().value
     val text = if (isFocused) {
         "Focused! tap anywhere to free the focus"
     } else {
@@ -51,7 +51,7 @@ fun FocusableSample() {
             modifier = Modifier
                 // add focusRequester modifier before the focusable (or even in the parent)
                 .focusRequester(focusRequester)
-                .focusable(interactionState = interactionState)
+                .focusable(interactionSource = interactionSource)
         )
         Button(onClick = { focusRequester.requestFocus() }) {
             Text("Bring focus to the text above")

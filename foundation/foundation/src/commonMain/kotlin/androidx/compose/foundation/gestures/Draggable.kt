@@ -16,13 +16,15 @@
 
 package androidx.compose.foundation.gestures
 
-import androidx.compose.foundation.Interaction
-import androidx.compose.foundation.InteractionState
+import androidx.compose.foundation.interaction.DragInteraction
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.MutatePriority
 import androidx.compose.foundation.MutatorMutex
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.State
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.ui.Modifier
@@ -37,6 +39,7 @@ import androidx.compose.ui.input.pointer.util.VelocityTracker
 import androidx.compose.ui.platform.debugInspectorInfo
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.launch
 import kotlin.coroutines.cancellation.CancellationException
 import kotlin.math.sign
 
@@ -141,8 +144,8 @@ fun rememberDraggableState(onDelta: (Float) -> Unit): DraggableState {
  * interpreted by the user land logic.
  * @param orientation orientation of the drag
  * @param enabled whether or not drag is enabled
- * @param interactionState [InteractionState] that will be updated when this draggable is
- * being dragged, using [Interaction.Dragged].
+ * @param interactionSource [MutableInteractionSource] that will be used to emit
+ * [DragInteraction.Start] when this draggable is being dragged.
  * @param startDragImmediately when set to true, draggable will start dragging immediately and
  * prevent other gesture detectors from reacting to "down" events (in order to block composed
  * press-based gestures).  This is intended to allow end users to "catch" an animating widget by
@@ -160,7 +163,7 @@ fun Modifier.draggable(
     state: DraggableState,
     orientation: Orientation,
     enabled: Boolean = true,
-    interactionState: InteractionState? = null,
+    interactionSource: MutableInteractionSource? = null,
     startDragImmediately: Boolean = false,
     onDragStarted: suspend CoroutineScope.(startedPosition: Offset) -> Unit = {},
     onDragStopped: suspend CoroutineScope.(velocity: Float) -> Unit = {},
@@ -171,23 +174,27 @@ fun Modifier.draggable(
         properties["orientation"] = orientation
         properties["enabled"] = enabled
         properties["reverseDirection"] = reverseDirection
-        properties["interactionState"] = interactionState
+        properties["interactionSource"] = interactionSource
         properties["startDragImmediately"] = startDragImmediately
         properties["onDragStarted"] = onDragStarted
         properties["onDragStopped"] = onDragStopped
         properties["state"] = state
     }
 ) {
-    DisposableEffect(interactionState) {
+    val draggedInteraction = remember { mutableStateOf<DragInteraction.Start?>(null) }
+    DisposableEffect(interactionSource) {
         onDispose {
-            interactionState?.removeInteraction(Interaction.Dragged)
+            draggedInteraction.value?.let { interaction ->
+                interactionSource?.tryEmit(DragInteraction.Cancel(interaction))
+                draggedInteraction.value = null
+            }
         }
     }
     val orientationState = rememberUpdatedState(orientation)
     val enabledState = rememberUpdatedState(enabled)
     val reverseDirectionState = rememberUpdatedState(reverseDirection)
     val startImmediatelyState = rememberUpdatedState(startDragImmediately)
-    val interactionStateState = rememberUpdatedState(interactionState)
+    val interactionSourceState = rememberUpdatedState(interactionSource)
     val onDragStartedState = rememberUpdatedState(onDragStarted)
     val updatedDraggableState = rememberUpdatedState(state)
     val onDragStoppedState = rememberUpdatedState(onDragStopped)
@@ -196,7 +203,8 @@ fun Modifier.draggable(
             dragForEachGesture(
                 orientation = orientationState,
                 enabled = enabledState,
-                interactionState = interactionStateState,
+                interactionSource = interactionSourceState,
+                dragStartInteraction = draggedInteraction,
                 reverseDirection = reverseDirectionState,
                 startDragImmediately = startImmediatelyState,
                 onDragStarted = onDragStartedState,
@@ -212,7 +220,8 @@ private suspend fun PointerInputScope.dragForEachGesture(
     orientation: State<Orientation>,
     enabled: State<Boolean>,
     reverseDirection: State<Boolean>,
-    interactionState: State<InteractionState?>,
+    interactionSource: State<MutableInteractionSource?>,
+    dragStartInteraction: MutableState<DragInteraction.Start?>,
     startDragImmediately: State<Boolean>,
     onDragStarted: State<suspend CoroutineScope.(startedPosition: Offset) -> Unit>,
     onDragStopped: State<suspend CoroutineScope.(velocity: Float) -> Unit>,
@@ -284,7 +293,16 @@ private suspend fun PointerInputScope.dragForEachGesture(
                         overSlopOffset * sign(drag.position.run { if (isVertical()) y else x })
                     if (enabledWhenInteractionAdded) {
                         onDragStarted.value.invoke(this@coroutineScope, adjustedStart)
-                        interactionState.value?.addInteraction(Interaction.Dragged)
+                        launch {
+                            dragStartInteraction.value?.let { oldInteraction ->
+                                interactionSource.value?.emit(
+                                    DragInteraction.Cancel(oldInteraction)
+                                )
+                            }
+                            val interaction = DragInteraction.Start()
+                            interactionSource.value?.emit(interaction)
+                            dragStartInteraction.value = interaction
+                        }
                     }
                     dragState.value.drag(dragPriority = MutatePriority.UserInput) {
                         isDragSuccessful = performDrag(initialDelta, drag, velocityTracker)
@@ -293,7 +311,14 @@ private suspend fun PointerInputScope.dragForEachGesture(
                     isDragSuccessful = false
                 } finally {
                     if (enabledWhenInteractionAdded) {
-                        interactionState.value?.removeInteraction(Interaction.Dragged)
+                        launch {
+                            dragStartInteraction.value?.let { interaction ->
+                                interactionSource.value?.emit(
+                                    DragInteraction.Stop(interaction)
+                                )
+                                dragStartInteraction.value = null
+                            }
+                        }
                     }
                     val velocity =
                         if (isDragSuccessful) {

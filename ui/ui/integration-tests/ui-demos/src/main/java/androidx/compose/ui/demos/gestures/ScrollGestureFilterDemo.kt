@@ -16,11 +16,11 @@
 
 package androidx.compose.ui.demos.gestures
 
-import androidx.compose.foundation.Interaction.Dragged
-import androidx.compose.foundation.InteractionState
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.background
 import androidx.compose.foundation.gestures.rememberScrollableState
 import androidx.compose.foundation.gestures.scrollable
+import androidx.compose.foundation.interaction.collectIsDraggedAsState
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
@@ -68,8 +68,8 @@ fun ScrollableBox(
     content: @Composable () -> Unit = {}
 ) {
 
-    val interactionState = remember { InteractionState() }
-    val color = if (interactionState.contains(Dragged)) activeColor else idleColor
+    val interactionSource = remember { MutableInteractionSource() }
+    val color = if (interactionSource.collectIsDraggedAsState().value) activeColor else idleColor
     val offsetPx = remember { mutableStateOf(0f) }
 
     val offsetDp = with(LocalDensity.current) {
@@ -85,7 +85,7 @@ fun ScrollableBox(
             .fillMaxSize()
             .wrapContentSize(Alignment.Center)
             .scrollable(
-                interactionState = interactionState,
+                interactionSource = interactionSource,
                 orientation = orientation,
                 state = rememberScrollableState { scrollDistance ->
                     offsetPx.value += scrollDistance

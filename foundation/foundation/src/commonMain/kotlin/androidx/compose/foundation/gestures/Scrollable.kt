@@ -20,13 +20,14 @@ import androidx.compose.animation.core.AnimationState
 import androidx.compose.animation.core.DecayAnimationSpec
 import androidx.compose.animation.core.animateDecay
 import androidx.compose.animation.defaultDecayAnimationSpec
-import androidx.compose.foundation.Interaction
-import androidx.compose.foundation.InteractionState
+import androidx.compose.foundation.interaction.DragInteraction
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.MutatePriority
 import androidx.compose.foundation.gestures.Orientation.Horizontal
 import androidx.compose.foundation.gestures.Orientation.Vertical
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -47,6 +48,7 @@ import androidx.compose.ui.input.pointer.util.VelocityTracker
 import androidx.compose.ui.platform.debugInspectorInfo
 import androidx.compose.ui.unit.Velocity
 import kotlinx.coroutines.CancellationException
+import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.launch
 import kotlin.math.abs
 
@@ -70,8 +72,8 @@ import kotlin.math.abs
  * behave like bottom to top and left to right will behave like right to left.
  * @param flingBehavior logic describing fling behavior when drag has finished with velocity. If
  * `null`, default from [ScrollableDefaults.flingBehavior] will be used.
- * @param interactionState [InteractionState] that will be updated when this draggable is
- * being dragged, using [Interaction.Dragged].
+ * @param interactionSource [MutableInteractionSource] that will be used to emit
+ * drag events when this scrollable is being dragged.
  */
 fun Modifier.scrollable(
     state: ScrollableState,
@@ -79,7 +81,7 @@ fun Modifier.scrollable(
     enabled: Boolean = true,
     reverseDirection: Boolean = false,
     flingBehavior: FlingBehavior? = null,
-    interactionState: InteractionState? = null
+    interactionSource: MutableInteractionSource? = null
 ): Modifier = composed(
     inspectorInfo = debugInspectorInfo {
         name = "scrollable"
@@ -88,12 +90,12 @@ fun Modifier.scrollable(
         properties["enabled"] = enabled
         properties["reverseDirection"] = reverseDirection
         properties["flingBehavior"] = flingBehavior
-        properties["interactionState"] = interactionState
+        properties["interactionSource"] = interactionSource
     },
     factory = {
         fun Float.reverseIfNeeded(): Float = if (reverseDirection) this * -1 else this
         touchScrollImplementation(
-            interactionState,
+            interactionSource,
             orientation,
             reverseDirection,
             state,
@@ -134,16 +136,20 @@ internal expect fun Modifier.mouseScrollable(
 @Suppress("ComposableModifierFactory")
 @Composable
 private fun Modifier.touchScrollImplementation(
-    interactionState: InteractionState?,
+    interactionSource: MutableInteractionSource?,
     orientation: Orientation,
     reverseDirection: Boolean,
     controller: ScrollableState,
     flingBehavior: FlingBehavior?,
     enabled: Boolean
 ): Modifier {
-    DisposableEffect(interactionState) {
+    val draggedInteraction = remember { mutableStateOf<DragInteraction.Start?>(null) }
+    DisposableEffect(interactionSource) {
         onDispose {
-            interactionState?.removeInteraction(Interaction.Dragged)
+            draggedInteraction.value?.let { interaction ->
+                interactionSource?.tryEmit(DragInteraction.Cancel(interaction))
+                draggedInteraction.value = null
+            }
         }
     }
 
@@ -161,13 +167,14 @@ private fun Modifier.touchScrollImplementation(
     val orientationState = rememberUpdatedState(orientation)
     val enabledState = rememberUpdatedState(enabled)
     val controllerState = rememberUpdatedState(controller)
-    val interactionStateState = rememberUpdatedState(interactionState)
+    val interactionSourceState = rememberUpdatedState(interactionSource)
     return dragForEachGesture(
         orientation = orientationState,
         enabled = enabledState,
         scrollableState = controllerState,
         nestedScrollDispatcher = nestedScrollDispatcher,
-        interactionState = interactionStateState,
+        interactionSource = interactionSourceState,
+        dragStartInteraction = draggedInteraction,
         scrollLogic = scrollLogic
     ).nestedScroll(nestedScrollConnection, nestedScrollDispatcher.value)
 }
@@ -179,7 +186,8 @@ private fun Modifier.dragForEachGesture(
     enabled: State<Boolean>,
     scrollableState: State<ScrollableState>,
     nestedScrollDispatcher: State<NestedScrollDispatcher>,
-    interactionState: State<InteractionState?>,
+    interactionSource: State<MutableInteractionSource?>,
+    dragStartInteraction: MutableState<DragInteraction.Start?>,
     scrollLogic: State<ScrollingLogic>
 ): Modifier {
     fun isVertical() = orientation.value == Vertical
@@ -265,11 +273,31 @@ private fun Modifier.dragForEachGesture(
                     // remember enabled state when we add interaction to remove later if needed
                     val enabledWhenInteractionAdded = enabled.value
                     if (enabledWhenInteractionAdded) {
-                        interactionState.value?.addInteraction(Interaction.Dragged)
+                        coroutineScope {
+                            launch {
+                                dragStartInteraction.value?.let { oldInteraction ->
+                                    interactionSource.value?.emit(
+                                        DragInteraction.Cancel(oldInteraction)
+                                    )
+                                }
+                                val interaction = DragInteraction.Start()
+                                interactionSource.value?.emit(interaction)
+                                dragStartInteraction.value = interaction
+                            }
+                        }
                     }
                     val isDragSuccessful = mainDragCycle(startEvent, initialDelta, velocityTracker)
                     if (enabledWhenInteractionAdded) {
-                        interactionState.value?.removeInteraction(Interaction.Dragged)
+                        coroutineScope {
+                            launch {
+                                dragStartInteraction.value?.let { interaction ->
+                                    interactionSource.value?.emit(
+                                        DragInteraction.Stop(interaction)
+                                    )
+                                    dragStartInteraction.value = null
+                                }
+                            }
+                        }
                     }
                     if (isDragSuccessful) {
                         nestedScrollDispatcher.value.coroutineScope.launch {

@@ -18,15 +18,20 @@ package androidx.compose.material
 
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.core.tween
-import androidx.compose.foundation.Interaction
-import androidx.compose.foundation.InteractionState
+import androidx.compose.foundation.interaction.FocusInteraction
+import androidx.compose.foundation.interaction.Interaction
+import androidx.compose.foundation.interaction.InteractionSource
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Immutable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.Stable
 import androidx.compose.runtime.State
+import androidx.compose.runtime.mutableStateListOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
+import kotlinx.coroutines.flow.collect
 
 /**
  * Represents the colors of the input text, background and content (including label, placeholder,
@@ -67,14 +72,14 @@ interface TextFieldColors {
      *
      * @param enabled whether the text field is enabled
      * @param error whether the text field's current value is in error
-     * @param interactionState the [InteractionState] of this text field. Helps to determine if
+     * @param interactionSource the [InteractionSource] of this text field. Helps to determine if
      * the text field is in focus or not
      */
     @Composable
     fun labelColor(
         enabled: Boolean,
         error: Boolean,
-        interactionState: InteractionState
+        interactionSource: InteractionSource
     ): State<Color>
 
     /**
@@ -100,14 +105,14 @@ interface TextFieldColors {
      *
      * @param enabled whether the text field is enabled
      * @param isError whether the text field's current value is in error
-     * @param interactionState the [InteractionState] of this text field. Helps to determine if
+     * @param interactionSource the [InteractionSource] of this text field. Helps to determine if
      * the text field is in focus or not
      */
     @Composable
     fun indicatorColor(
         enabled: Boolean,
         isError: Boolean,
-        interactionState: InteractionState
+        interactionSource: InteractionSource
     ): State<Color>
 
     /**
@@ -320,15 +325,27 @@ private class DefaultTextFieldColors(
     override fun indicatorColor(
         enabled: Boolean,
         isError: Boolean,
-        interactionState: InteractionState
+        interactionSource: InteractionSource
     ): State<Color> {
-        val interaction = interactionState.value.lastOrNull {
-            it is Interaction.Focused
+        val interactions = remember { mutableStateListOf<Interaction>() }
+        LaunchedEffect(interactionSource) {
+            interactionSource.interactions.collect { interaction ->
+                when (interaction) {
+                    is FocusInteraction.Focus -> {
+                        interactions.add(interaction)
+                    }
+                    is FocusInteraction.Unfocus -> {
+                        interactions.remove(interaction.focus)
+                    }
+                }
+            }
         }
+        val interaction = interactions.lastOrNull()
+
         val targetValue = when {
             !enabled -> disabledIndicatorColor
             isError -> errorIndicatorColor
-            interaction == Interaction.Focused -> focusedIndicatorColor
+            interaction is FocusInteraction.Focus -> focusedIndicatorColor
             else -> unfocusedIndicatorColor
         }
         return if (enabled) {
@@ -352,15 +369,27 @@ private class DefaultTextFieldColors(
     override fun labelColor(
         enabled: Boolean,
         error: Boolean,
-        interactionState: InteractionState
+        interactionSource: InteractionSource
     ): State<Color> {
-        val interaction = interactionState.value.lastOrNull {
-            it is Interaction.Focused
+        val interactions = remember { mutableStateListOf<Interaction>() }
+        LaunchedEffect(interactionSource) {
+            interactionSource.interactions.collect { interaction ->
+                when (interaction) {
+                    is FocusInteraction.Focus -> {
+                        interactions.add(interaction)
+                    }
+                    is FocusInteraction.Unfocus -> {
+                        interactions.remove(interaction.focus)
+                    }
+                }
+            }
         }
+        val interaction = interactions.lastOrNull()
+
         val targetValue = when {
             !enabled -> disabledLabelColor
             error -> errorLabelColor
-            interaction == Interaction.Focused -> focusedLabelColor
+            interaction is FocusInteraction.Focus -> focusedLabelColor
             else -> unfocusedLabelColor
         }
         return if (enabled) {

@@ -19,7 +19,6 @@ package androidx.compose.material.ripple
 import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.FastOutSlowInEasing
 import androidx.compose.animation.core.LinearEasing
-import androidx.compose.animation.core.VectorConverter
 import androidx.compose.animation.core.tween
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -30,18 +29,18 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.drawscope.DrawScope
 import androidx.compose.ui.graphics.drawscope.clipRect
 import androidx.compose.ui.unit.Density
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
-import kotlinx.coroutines.CoroutineScope
+import androidx.compose.ui.unit.isUnspecified
+import androidx.compose.ui.util.lerp
+import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.launch
-import kotlin.coroutines.Continuation
-import kotlin.coroutines.resume
-import kotlin.coroutines.suspendCoroutine
 import kotlin.math.max
 
 /**
  * [RippleAnimation]s are drawn as part of [Ripple] as a visual indicator for an
- * different [androidx.compose.foundation.Interaction]s.
+ * different [androidx.compose.foundation.interaction.Interaction]s.
  *
  * Use [androidx.compose.foundation.clickable] or [androidx.compose.foundation.indication] to add a
  * ripple to your component, which contains a RippleAnimation for pressed states, and
@@ -53,66 +52,54 @@ import kotlin.math.max
  * radius expanding from 60% of the final value. The ripple origin animates to the center of its
  * target layout for the bounded version and stays in the center for the unbounded one.
  *
- * @param size The size of the target layout.
- * @param startPosition The position the animation will start from.
+ * @param origin The position the animation will start from. If null the animation will start
+ * from the center of the layout bounds.
  * @param radius Effects grow up to this size.
- * @param clipped If true the effect should be clipped by the target layout bounds.
- * @param scope The coroutine scope used for suspending animations
- * @param onAnimationFinished Call when the effect animation has been finished.
+ * @param bounded If true the effect should be clipped by the target layout bounds.
  */
 internal class RippleAnimation(
-    size: Size,
-    startPosition: Offset,
-    radius: Float,
-    scope: CoroutineScope,
-    private val clipped: Boolean,
-    private val onAnimationFinished: (RippleAnimation) -> Unit
+    private var origin: Offset?,
+    private val radius: Dp,
+    private val bounded: Boolean
 ) {
-    private val startAlpha = 0f
-    private val startRadius = getRippleStartRadius(size)
+    private var startRadius: Float? = null
+    private var targetRadius: Float? = null
 
-    private val targetAlpha = 1f
-    private val targetRadius = radius
-    private val targetCenter = Offset(size.width / 2.0f, size.height / 2.0f)
+    private var targetCenter: Offset? = null
 
-    private val animatedAlpha = Animatable(startAlpha)
-    private val animatedRadius = Animatable(startRadius)
-    private val animatedCenter = Animatable(startPosition, Offset.VectorConverter)
+    private val animatedAlpha = Animatable(0f)
+    private val animatedRadiusPercent = Animatable(0f)
+    private val animatedCenterPercent = Animatable(0f)
 
-    private var finishContinuation: Continuation<Unit>? = null
+    private val finishSignalDeferred = CompletableDeferred<Unit>(null)
+
     private var finishedFadingIn by mutableStateOf(false)
     private var finishRequested by mutableStateOf(false)
 
-    init {
-        scope.launch {
-            fadeIn()
-            finishedFadingIn = true
-            // If we haven't been told to finish, wait until we have been
-            if (!finishRequested) {
-                suspendCoroutine<Unit> { finishContinuation = it }
-            }
-            fadeOut()
-            onAnimationFinished(this@RippleAnimation)
-        }
+    suspend fun animate() {
+        fadeIn()
+        finishedFadingIn = true
+        finishSignalDeferred.await()
+        fadeOut()
     }
 
     private suspend fun fadeIn() {
         coroutineScope {
             launch {
                 animatedAlpha.animateTo(
-                    targetAlpha,
+                    1f,
                     tween(durationMillis = FadeInDuration, easing = LinearEasing)
                 )
             }
             launch {
-                animatedRadius.animateTo(
-                    targetRadius,
+                animatedRadiusPercent.animateTo(
+                    1f,
                     tween(durationMillis = RadiusDuration, easing = FastOutSlowInEasing)
                 )
             }
             launch {
-                animatedCenter.animateTo(
-                    targetCenter,
+                animatedCenterPercent.animateTo(
+                    1f,
                     tween(durationMillis = RadiusDuration, easing = LinearEasing)
                 )
             }
@@ -132,10 +119,27 @@ internal class RippleAnimation(
 
     fun finish() {
         finishRequested = true
-        finishContinuation?.resume(Unit)
+        finishSignalDeferred.complete(Unit)
     }
 
     fun DrawScope.draw(color: Color) {
+        if (startRadius == null) {
+            startRadius = getRippleStartRadius(size)
+        }
+        if (targetRadius == null) {
+            targetRadius = if (radius.isUnspecified) {
+                getRippleEndRadius(bounded, size)
+            } else {
+                radius.toPx()
+            }
+        }
+        if (origin == null) {
+            origin = center
+        }
+        if (targetCenter == null) {
+            targetCenter = Offset(size.width / 2.0f, size.height / 2.0f)
+        }
+
         val alpha = if (finishRequested && !finishedFadingIn) {
             // If we are still fading-in we should immediately switch to the final alpha.
             1f
@@ -143,11 +147,14 @@ internal class RippleAnimation(
             animatedAlpha.value
         }
 
-        val radius = animatedRadius.value
-        val centerOffset = animatedCenter.value
+        val radius = lerp(startRadius!!, targetRadius!!, animatedRadiusPercent.value)
+        val centerOffset = Offset(
+            lerp(origin!!.x, targetCenter!!.x, animatedCenterPercent.value),
+            lerp(origin!!.y, targetCenter!!.y, animatedCenterPercent.value),
+        )
 
         val modulatedColor = color.copy(alpha = color.alpha * alpha)
-        if (clipped) {
+        if (bounded) {
             clipRect {
                 drawCircle(modulatedColor, radius, centerOffset)
             }

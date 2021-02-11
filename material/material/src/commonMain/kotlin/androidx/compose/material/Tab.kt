@@ -20,8 +20,8 @@ import androidx.compose.animation.animateColor
 import androidx.compose.animation.core.LinearEasing
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.core.updateTransition
-import androidx.compose.foundation.Interaction
-import androidx.compose.foundation.InteractionState
+import androidx.compose.foundation.interaction.Interaction
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -66,10 +66,10 @@ import kotlin.math.max
  * be clickable and will appear disabled to accessibility services.
  * @param text the text label displayed in this tab
  * @param icon the icon displayed in this tab
- * @param interactionState the [InteractionState] representing the different [Interaction]s
- * present on this Tab. You can create and pass in your own remembered [InteractionState] if
- * you want to read the [InteractionState] and customize the appearance / behavior of this Tab
- * in different [Interaction]s.
+ * @param interactionSource the [MutableInteractionSource] representing the stream of
+ * [Interaction]s for this Tab. You can create and pass in your own remembered
+ * [MutableInteractionSource] if you want to observe [Interaction]s and customize the
+ * appearance / behavior of this Tab in different [Interaction]s.
  * @param selectedContentColor the color for the content of this tab when selected, and the color
  * of the ripple.
  * @param unselectedContentColor the color for the content of this tab when not selected
@@ -82,7 +82,7 @@ fun Tab(
     enabled: Boolean = true,
     text: @Composable (() -> Unit)? = null,
     icon: @Composable (() -> Unit)? = null,
-    interactionState: InteractionState = remember { InteractionState() },
+    interactionSource: MutableInteractionSource = remember { MutableInteractionSource() },
     selectedContentColor: Color = LocalContentColor.current,
     unselectedContentColor: Color = selectedContentColor.copy(alpha = ContentAlpha.medium)
 ) {
@@ -97,7 +97,7 @@ fun Tab(
         onClick,
         modifier,
         enabled,
-        interactionState,
+        interactionSource,
         selectedContentColor,
         unselectedContentColor
     ) {
@@ -119,10 +119,10 @@ fun Tab(
  * @param modifier optional [Modifier] for this tab
  * @param enabled controls the enabled state of this tab. When `false`, this tab will not
  * be clickable and will appear disabled to accessibility services.
- * @param interactionState the [InteractionState] representing the different [Interaction]s
- * present on this Tab. You can create and pass in your own remembered [InteractionState] if
- * you want to read the [InteractionState] and customize the appearance / behavior of this Tab
- * in different [Interaction]s.
+ * @param interactionSource the [MutableInteractionSource] representing the stream of
+ * [Interaction]s for this Tab. You can create and pass in your own remembered
+ * [MutableInteractionSource] if you want to observe [Interaction]s and customize the
+ * appearance / behavior of this Tab in different [Interaction]s.
  * @param selectedContentColor the color for the content of this tab when selected, and the color
  * of the ripple.
  * @param unselectedContentColor the color for the content of this tab when not selected
@@ -134,7 +134,7 @@ fun Tab(
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
     enabled: Boolean = true,
-    interactionState: InteractionState = remember { InteractionState() },
+    interactionSource: MutableInteractionSource = remember { MutableInteractionSource() },
     selectedContentColor: Color = LocalContentColor.current,
     unselectedContentColor: Color = selectedContentColor.copy(alpha = ContentAlpha.medium),
     content: @Composable ColumnScope.() -> Unit
@@ -152,7 +152,7 @@ fun Tab(
                     onClick = onClick,
                     enabled = enabled,
                     role = Role.Tab,
-                    interactionState = interactionState,
+                    interactionSource = interactionSource,
                     indication = ripple
                 )
                 .fillMaxWidth(),

@@ -22,12 +22,12 @@ import androidx.compose.animation.core.animateTo
 import androidx.compose.animation.core.calculateTargetValue
 import androidx.compose.animation.defaultDecayAnimationSpec
 import androidx.compose.foundation.ExperimentalFoundationApi
-import androidx.compose.foundation.Interaction
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.gestures.FlingBehavior
 import androidx.compose.foundation.gestures.ScrollScope
 import androidx.compose.foundation.gestures.animateScrollBy
+import androidx.compose.foundation.interaction.collectIsDraggedAsState
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -231,7 +231,7 @@ private fun ListHoistedStateDemo() {
                 fontSize = 20.sp
             )
             Text(
-                "Dragging: ${state.interactionState.contains(Interaction.Dragged)}, " +
+                "Dragging: ${state.interactionSource.collectIsDraggedAsState().value}, " +
                     "Flinging: ${state.isScrollInProgress}",
                 fontSize = 20.sp
             )

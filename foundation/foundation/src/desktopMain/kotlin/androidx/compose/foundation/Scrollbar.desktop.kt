@@ -29,6 +29,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.staticCompositionLocalOf
 import androidx.compose.ui.Modifier
@@ -37,6 +38,8 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.foundation.legacygestures.DragObserver
 import androidx.compose.foundation.legacygestures.pressIndicatorGestureFilter
 import androidx.compose.foundation.legacygestures.rawDragGestureFilter
+import androidx.compose.foundation.interaction.DragInteraction
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.graphics.Shape
@@ -50,6 +53,7 @@ import androidx.compose.ui.unit.constrainHeight
 import androidx.compose.ui.unit.constrainWidth
 import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import kotlin.math.roundToInt
 import kotlin.math.sign
@@ -110,20 +114,20 @@ fun defaultScrollbarStyle() = ScrollbarStyle(
  * @param adapter [ScrollbarAdapter] that will be used to communicate with scrollable component
  * @param modifier the modifier to apply to this layout
  * @param style [ScrollbarStyle] to define visual style of scrollbar
- * @param interactionState [InteractionState] that will be updated when the element with this
- * state is being dragged, using [Interaction.Dragged]
+ * @param interactionSource [MutableInteractionSource] that will be used to dispatch
+ * [DragInteraction.Start] when this Scrollbar is being dragged.
  */
 @Composable
 fun VerticalScrollbar(
     adapter: ScrollbarAdapter,
     modifier: Modifier = Modifier,
     style: ScrollbarStyle = ScrollbarStyleAmbient.current,
-    interactionState: InteractionState = remember { InteractionState() }
+    interactionSource: MutableInteractionSource = remember { MutableInteractionSource() }
 ) = Scrollbar(
     adapter,
     modifier,
     style,
-    interactionState,
+    interactionSource,
     isVertical = true
 )
 
@@ -150,36 +154,41 @@ fun VerticalScrollbar(
  * @param adapter [ScrollbarAdapter] that will be used to communicate with scrollable component
  * @param modifier the modifier to apply to this layout
  * @param style [ScrollbarStyle] to define visual style of scrollbar
- * @param interactionState [InteractionState] that will be updated when the element with this
- * state is being dragged, using [Interaction.Dragged]
+ * @param interactionSource [MutableInteractionSource] that will be used to dispatch
+ * [DragInteraction.Start] when this Scrollbar is being dragged.
  */
 @Composable
 fun HorizontalScrollbar(
     adapter: ScrollbarAdapter,
     modifier: Modifier = Modifier,
     style: ScrollbarStyle = ScrollbarStyleAmbient.current,
-    interactionState: InteractionState = remember { InteractionState() }
+    interactionSource: MutableInteractionSource = remember { MutableInteractionSource() }
 ) = Scrollbar(
     adapter,
     modifier,
     style,
-    interactionState,
+    interactionSource,
     isVertical = false
 )
 
 // TODO(demin): do we need to stop dragging if cursor is beyond constraints?
-// TODO(demin): add Interaction.Hovered to interactionState
+// TODO(demin): add Interaction.Hovered to interactionSource
 @Composable
 private fun Scrollbar(
     adapter: ScrollbarAdapter,
     modifier: Modifier = Modifier,
     style: ScrollbarStyle,
-    interactionState: InteractionState,
+    interactionSource: MutableInteractionSource,
     isVertical: Boolean
 ) = with(LocalDensity.current) {
-    DisposableEffect(interactionState) {
+    val scope = rememberCoroutineScope()
+    val dragInteraction = remember { mutableStateOf<DragInteraction.Start?>(null) }
+    DisposableEffect(interactionSource) {
         onDispose {
-            interactionState.removeInteraction(Interaction.Dragged)
+            dragInteraction.value?.let { interaction ->
+                interactionSource.tryEmit(DragInteraction.Cancel(interaction))
+                dragInteraction.value = null
+            }
         }
     }
 
@@ -204,15 +213,38 @@ private fun Scrollbar(
 
     val dragObserver = object : DragObserver {
         override fun onStart(downPosition: Offset) {
-            interactionState.addInteraction(Interaction.Dragged)
+            scope.launch {
+                dragInteraction.value?.let { oldInteraction ->
+                    interactionSource.emit(
+                        DragInteraction.Cancel(oldInteraction)
+                    )
+                }
+                val interaction = DragInteraction.Start()
+                interactionSource.emit(interaction)
+                dragInteraction.value = interaction
+            }
         }
 
         override fun onStop(velocity: Offset) {
-            interactionState.removeInteraction(Interaction.Dragged)
+            scope.launch {
+                dragInteraction.value?.let { interaction ->
+                    interactionSource.emit(
+                        DragInteraction.Stop(interaction)
+                    )
+                    dragInteraction.value = null
+                }
+            }
         }
 
         override fun onCancel() {
-            interactionState.removeInteraction(Interaction.Dragged)
+            scope.launch {
+                dragInteraction.value?.let { interaction ->
+                    interactionSource.emit(
+                        DragInteraction.Cancel(interaction)
+                    )
+                    dragInteraction.value = null
+                }
+            }
         }
 
         override fun onDrag(dragDistance: Offset): Offset {

@@ -19,14 +19,17 @@ package androidx.compose.material
 import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.TweenSpec
 import androidx.compose.foundation.Canvas
-import androidx.compose.foundation.Interaction
-import androidx.compose.foundation.InteractionState
+import androidx.compose.foundation.interaction.Interaction
+import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.interaction.PressInteraction
 import androidx.compose.foundation.focusable
 import androidx.compose.foundation.gestures.Orientation
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.gestures.draggable
 import androidx.compose.foundation.gestures.rememberDraggableState
 import androidx.compose.foundation.indication
+import androidx.compose.foundation.interaction.collectIsDraggedAsState
+import androidx.compose.foundation.interaction.collectIsPressedAsState
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Spacer
@@ -42,6 +45,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Immutable
 import androidx.compose.runtime.Stable
 import androidx.compose.runtime.State
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.rememberUpdatedState
@@ -63,6 +67,7 @@ import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.util.lerp
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.launch
 import kotlin.math.abs
 
@@ -95,10 +100,10 @@ import kotlin.math.abs
  * @param onValueChangeFinished lambda to be invoked when value change has ended. This callback
  * shouldn't be used to update the slider value (use [onValueChange] for that), but rather to
  * know when the user has completed selecting a new value by ending a drag or a click.
- * @param interactionState the [InteractionState] representing the different [Interaction]s
- * present on this Slider. You can create and pass in your own remembered
- * [InteractionState] if you want to read the [InteractionState] and customize the appearance /
- * behavior of this Slider in different [Interaction]s.
+ * @param interactionSource the [MutableInteractionSource] representing the stream of
+ * [Interaction]s for this Slider. You can create and pass in your own remembered
+ * [MutableInteractionSource] if you want to observe [Interaction]s and customize the
+ * appearance / behavior of this Slider in different [Interaction]s.
  * @param colors [SliderColors] that will be used to determine the color of the Slider parts in
  * different state. See [SliderDefaults.colors] to customize.
  */
@@ -112,7 +117,7 @@ fun Slider(
     /*@IntRange(from = 0)*/
     steps: Int = 0,
     onValueChangeFinished: (() -> Unit)? = null,
-    interactionState: InteractionState = remember { InteractionState() },
+    interactionSource: MutableInteractionSource = remember { MutableInteractionSource() },
     colors: SliderColors = SliderDefaults.colors()
 ) {
     val scope = rememberCoroutineScope()
@@ -150,10 +155,19 @@ fun Slider(
                 detectTapGestures(
                     onPress = { pos ->
                         position.snapTo(if (isRtl) maxPx - pos.x else pos.x)
-                        interactionState.addInteraction(Interaction.Pressed, pos)
+                        val interaction = PressInteraction.Press(pos)
+                        coroutineScope {
+                            launch {
+                                interactionSource.emit(interaction)
+                            }
+                        }
                         val success = tryAwaitRelease()
                         if (success) gestureEndAction(0f)
-                        interactionState.removeInteraction(Interaction.Pressed)
+                        coroutineScope {
+                            launch {
+                                interactionSource.emit(PressInteraction.Release(interaction))
+                            }
+                        }
                     }
                 )
             }
@@ -165,7 +179,7 @@ fun Slider(
             orientation = Orientation.Horizontal,
             reverseDirection = isRtl,
             enabled = enabled,
-            interactionState = interactionState,
+            interactionSource = interactionSource,
             onDragStopped = { velocity -> gestureEndAction(velocity) },
             startDragImmediately = position.holder.isRunning,
             state = rememberDraggableState {
@@ -180,7 +194,7 @@ fun Slider(
             position.tickFractions,
             colors,
             maxPx,
-            interactionState,
+            interactionSource,
             modifier = press.then(drag)
         )
     }
@@ -325,7 +339,7 @@ private fun SliderImpl(
     tickFractions: List<Float>,
     colors: SliderColors,
     width: Float,
-    interactionState: InteractionState,
+    interactionSource: MutableInteractionSource,
     modifier: Modifier
 ) {
     val widthDp = with(LocalDensity.current) {
@@ -352,9 +366,10 @@ private fun SliderImpl(
             trackStrokeWidth
         )
         Box(center.padding(start = offset)) {
-            val elevation = if (
-                Interaction.Pressed in interactionState || Interaction.Dragged in interactionState
-            ) {
+            val isPressed by interactionSource.collectIsPressedAsState()
+            val isDragged by interactionSource.collectIsDraggedAsState()
+            val hasInteraction = isPressed || isDragged
+            val elevation = if (hasInteraction) {
                 ThumbPressedElevation
             } else {
                 ThumbDefaultElevation
@@ -364,9 +379,9 @@ private fun SliderImpl(
                 color = colors.thumbColor(enabled).value,
                 elevation = if (enabled) elevation else 0.dp,
                 modifier = Modifier
-                    .focusable(interactionState = interactionState)
+                    .focusable(interactionSource = interactionSource)
                     .indication(
-                        interactionState = interactionState,
+                        interactionSource = interactionSource,
                         indication = rememberRipple(
                             bounded = false,
                             radius = ThumbRippleRadius

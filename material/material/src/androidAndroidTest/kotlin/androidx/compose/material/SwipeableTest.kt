@@ -1558,7 +1558,7 @@ class SwipeableTest {
                 "orientation",
                 "enabled",
                 "reverseDirection",
-                "interactionState",
+                "interactionSource",
                 "thresholds",
                 "resistance",
                 "velocityThreshold"

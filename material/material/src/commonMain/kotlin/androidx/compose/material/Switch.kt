@@ -18,10 +18,13 @@ package androidx.compose.material
 
 import androidx.compose.animation.core.TweenSpec
 import androidx.compose.foundation.Canvas
-import androidx.compose.foundation.Interaction
-import androidx.compose.foundation.InteractionState
+import androidx.compose.foundation.interaction.Interaction
+import androidx.compose.foundation.interaction.InteractionSource
 import androidx.compose.foundation.gestures.Orientation
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.indication
+import androidx.compose.foundation.interaction.collectIsDraggedAsState
+import androidx.compose.foundation.interaction.collectIsPressedAsState
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxScope
 import androidx.compose.foundation.layout.fillMaxSize
@@ -64,10 +67,10 @@ import kotlin.math.roundToInt
  * therefore the change of checked state is requested.
  * @param modifier Modifier to be applied to the switch layout
  * @param enabled whether or not components is enabled and can be clicked to request state change
- * @param interactionState the [InteractionState] representing the different [Interaction]s
- * present on this Switch. You can create and pass in your own remembered
- * [InteractionState] if you want to read the [InteractionState] and customize the appearance /
- * behavior of this Switch in different [Interaction]s.
+ * @param interactionSource the [MutableInteractionSource] representing the stream of
+ * [Interaction]s for this Switch. You can create and pass in your own remembered
+ * [MutableInteractionSource] if you want to observe [Interaction]s and customize the
+ * appearance / behavior of this Switch in different [Interaction]s.
  * @param colors [SwitchColors] that will be used to determine the color of the thumb and track
  * in different states. See [SwitchDefaults.colors].
  */
@@ -78,7 +81,7 @@ fun Switch(
     onCheckedChange: (Boolean) -> Unit,
     modifier: Modifier = Modifier,
     enabled: Boolean = true,
-    interactionState: InteractionState = remember { InteractionState() },
+    interactionSource: MutableInteractionSource = remember { MutableInteractionSource() },
     colors: SwitchColors = SwitchDefaults.colors()
 ) {
     val minBound = 0f
@@ -92,7 +95,7 @@ fun Switch(
                 onValueChange = onCheckedChange,
                 enabled = enabled,
                 role = Role.Switch,
-                interactionState = interactionState,
+                interactionSource = interactionSource,
                 indication = null
             )
             .swipeable(
@@ -102,7 +105,7 @@ fun Switch(
                 orientation = Orientation.Horizontal,
                 enabled = enabled,
                 reverseDirection = isRtl,
-                interactionState = interactionState,
+                interactionSource = interactionSource,
                 resistance = null
             )
             .wrapContentSize(Alignment.Center)
@@ -114,7 +117,7 @@ fun Switch(
             enabled = enabled,
             colors = colors,
             thumbValue = swipeableState.offset,
-            interactionState = interactionState
+            interactionSource = interactionSource
         )
     }
 }
@@ -153,10 +156,11 @@ private fun BoxScope.SwitchImpl(
     enabled: Boolean,
     colors: SwitchColors,
     thumbValue: State<Float>,
-    interactionState: InteractionState
+    interactionSource: InteractionSource
 ) {
-    val hasInteraction =
-        Interaction.Pressed in interactionState || Interaction.Dragged in interactionState
+    val isPressed by interactionSource.collectIsPressedAsState()
+    val isDragged by interactionSource.collectIsDraggedAsState()
+    val hasInteraction = isPressed || isDragged
     val elevation = if (hasInteraction) {
         ThumbPressedElevation
     } else {
@@ -175,7 +179,7 @@ private fun BoxScope.SwitchImpl(
             .align(Alignment.CenterStart)
             .offset { IntOffset(thumbValue.value.roundToInt(), 0) }
             .indication(
-                interactionState = interactionState,
+                interactionSource = interactionSource,
                 indication = rememberRipple(bounded = false, radius = ThumbRippleRadius)
             )
             .requiredSize(ThumbDiameter),

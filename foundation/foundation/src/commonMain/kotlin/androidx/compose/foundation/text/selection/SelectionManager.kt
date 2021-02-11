@@ -18,7 +18,7 @@
 
 package androidx.compose.foundation.text.selection
 
-import androidx.compose.foundation.InteractionState
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.focusable
 import androidx.compose.runtime.State
 import androidx.compose.runtime.getValue
@@ -95,9 +95,9 @@ internal class SelectionManager(private val selectionRegistrar: SelectionRegistr
     var focusRequester: FocusRequester = FocusRequester()
 
     /**
-     * InteractionState corresponds to the focusRequester, it will return trun.
+     * MutableInteractionSource for the selection container, containing focus interactions.
      */
-    val interactionState: InteractionState = InteractionState()
+    val interactionSource: MutableInteractionSource = MutableInteractionSource()
 
     /**
      * Modifier for selection container.
@@ -110,7 +110,7 @@ internal class SelectionManager(private val selectionRegistrar: SelectionRegistr
                 onRelease()
             }
         }
-        .focusable(interactionState = interactionState)
+        .focusable(interactionSource = interactionSource)
         .onKeyEvent {
             if (isCopyKeyEvent(it)) {
                 copy()

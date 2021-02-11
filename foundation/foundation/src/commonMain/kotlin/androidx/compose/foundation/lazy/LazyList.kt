@@ -83,7 +83,7 @@ internal fun LazyList(
             .scrollable(
                 orientation = if (isVertical) Orientation.Vertical else Orientation.Horizontal,
                 reverseDirection = reverseScrollDirection,
-                interactionState = state.interactionState,
+                interactionSource = state.internalInteractionSource,
                 flingBehavior = flingBehavior,
                 state = state
             )

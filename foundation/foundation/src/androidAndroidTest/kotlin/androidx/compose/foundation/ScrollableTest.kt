@@ -25,6 +25,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.testutils.advanceClockOnMainThreadMillis
 import androidx.compose.testutils.runBlockingWithManualClock
@@ -36,6 +37,9 @@ import androidx.compose.ui.input.nestedscroll.NestedScrollDispatcher
 import androidx.compose.ui.input.nestedscroll.NestedScrollSource
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.foundation.gestures.Orientation
+import androidx.compose.foundation.interaction.DragInteraction
+import androidx.compose.foundation.interaction.Interaction
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.ui.platform.InspectableValue
 import androidx.compose.ui.platform.isDebugInspectorInfoEnabled
 import androidx.compose.ui.platform.testTag
@@ -55,6 +59,9 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.LargeTest
 import com.google.common.truth.Truth.assertThat
 import com.google.common.truth.Truth.assertWithMessage
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.yield
 import org.junit.After
@@ -742,8 +749,8 @@ class ScrollableTest {
 
     @Test
     @OptIn(ExperimentalTestApi::class)
-    fun scrollable_interactionState() = runBlocking {
-        val interactionState = InteractionState()
+    fun scrollable_interactionSource() = runBlocking {
+        val interactionSource = MutableInteractionSource()
         var total = 0f
         val controller = ScrollableState(
             consumeScrollDelta = {
@@ -752,16 +759,25 @@ class ScrollableTest {
             }
         )
 
+        var scope: CoroutineScope? = null
+
         setScrollableContent {
+            scope = rememberCoroutineScope()
             Modifier.scrollable(
-                interactionState = interactionState,
+                interactionSource = interactionSource,
                 orientation = Orientation.Horizontal,
                 state = controller
             )
         }
 
+        val interactions = mutableListOf<Interaction>()
+
+        scope!!.launch {
+            interactionSource.interactions.collect { interactions.add(it) }
+        }
+
         rule.runOnIdle {
-            assertThat(interactionState.value).doesNotContain(Interaction.Dragged)
+            assertThat(interactions).isEmpty()
         }
 
         rule.onNodeWithTag(scrollableBoxTag)
@@ -771,7 +787,8 @@ class ScrollableTest {
             }
 
         rule.runOnIdle {
-            assertThat(interactionState.value).contains(Interaction.Dragged)
+            assertThat(interactions).hasSize(1)
+            assertThat(interactions.first()).isInstanceOf(DragInteraction.Start::class.java)
         }
 
         rule.onNodeWithTag(scrollableBoxTag)
@@ -780,14 +797,18 @@ class ScrollableTest {
             }
 
         rule.runOnIdle {
-            assertThat(interactionState.value).doesNotContain(Interaction.Dragged)
+            assertThat(interactions).hasSize(2)
+            assertThat(interactions.first()).isInstanceOf(DragInteraction.Start::class.java)
+            assertThat(interactions[1]).isInstanceOf(DragInteraction.Stop::class.java)
+            assertThat((interactions[1] as DragInteraction.Stop).start)
+                .isEqualTo(interactions[0])
         }
     }
 
     @Test
     @OptIn(ExperimentalTestApi::class)
-    fun scrollable_interactionState_resetWhenDisposed() = runBlocking {
-        val interactionState = InteractionState()
+    fun scrollable_interactionSource_resetWhenDisposed() = runBlocking {
+        val interactionSource = MutableInteractionSource()
         var emitScrollableBox by mutableStateOf(true)
         var total = 0f
         val controller = ScrollableState(
@@ -797,7 +818,10 @@ class ScrollableTest {
             }
         )
 
+        var scope: CoroutineScope? = null
+
         rule.setContent {
+            scope = rememberCoroutineScope()
             Box {
                 if (emitScrollableBox) {
                     Box(
@@ -805,7 +829,7 @@ class ScrollableTest {
                             .testTag(scrollableBoxTag)
                             .size(100.dp)
                             .scrollable(
-                                interactionState = interactionState,
+                                interactionSource = interactionSource,
                                 orientation = Orientation.Horizontal,
                                 state = controller
                             )
@@ -814,8 +838,14 @@ class ScrollableTest {
             }
         }
 
+        val interactions = mutableListOf<Interaction>()
+
+        scope!!.launch {
+            interactionSource.interactions.collect { interactions.add(it) }
+        }
+
         rule.runOnIdle {
-            assertThat(interactionState.value).doesNotContain(Interaction.Dragged)
+            assertThat(interactions).isEmpty()
         }
 
         rule.onNodeWithTag(scrollableBoxTag)
@@ -825,7 +855,8 @@ class ScrollableTest {
             }
 
         rule.runOnIdle {
-            assertThat(interactionState.value).contains(Interaction.Dragged)
+            assertThat(interactions).hasSize(1)
+            assertThat(interactions.first()).isInstanceOf(DragInteraction.Start::class.java)
         }
 
         // Dispose scrollable
@@ -834,7 +865,11 @@ class ScrollableTest {
         }
 
         rule.runOnIdle {
-            assertThat(interactionState.value).doesNotContain(Interaction.Dragged)
+            assertThat(interactions).hasSize(2)
+            assertThat(interactions.first()).isInstanceOf(DragInteraction.Start::class.java)
+            assertThat(interactions[1]).isInstanceOf(DragInteraction.Cancel::class.java)
+            assertThat((interactions[1] as DragInteraction.Cancel).start)
+                .isEqualTo(interactions[0])
         }
     }
 
@@ -853,7 +888,7 @@ class ScrollableTest {
                 "enabled",
                 "reverseDirection",
                 "flingBehavior",
-                "interactionState",
+                "interactionSource",
             )
         }
     }

@@ -18,14 +18,19 @@ package androidx.compose.foundation.samples
 
 import androidx.annotation.Sampled
 import androidx.compose.foundation.BorderStroke
-import androidx.compose.foundation.Interaction
-import androidx.compose.foundation.InteractionState
+import androidx.compose.foundation.interaction.DragInteraction
+import androidx.compose.foundation.interaction.Interaction
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.LocalIndication
+import androidx.compose.foundation.interaction.PressInteraction
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.Orientation
 import androidx.compose.foundation.gestures.draggable
 import androidx.compose.foundation.gestures.rememberDraggableState
+import androidx.compose.foundation.indication
+import androidx.compose.foundation.interaction.collectIsDraggedAsState
+import androidx.compose.foundation.interaction.collectIsPressedAsState
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -36,29 +41,44 @@ import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.material.LocalTextStyle
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import kotlinx.coroutines.flow.collect
 
 @Sampled
 @Composable
-fun PriorityInteractionStateSample() {
-    val interactionState = remember { InteractionState() }
+fun SimpleInteractionSourceSample() {
+    // Hoist the MutableInteractionSource that we will provide to interactions
+    val interactionSource = remember { MutableInteractionSource() }
 
+    // Provide the MutableInteractionSource instances to the interactions we want to observe state
+    // changes for
     val draggable = Modifier.draggable(
+        interactionSource = interactionSource,
         orientation = Orientation.Horizontal,
-        interactionState = interactionState,
         state = rememberDraggableState { /* update some business state here */ }
     )
 
-    // Use InteractionState to determine how this component should appear during transient UI states
-    // In this example we are using a 'priority' system, such that we ignore multiple states, and
-    // don't care about the most recent state - Dragged is more important than Pressed.
+    val clickable = Modifier.clickable(
+        interactionSource = interactionSource,
+        indication = LocalIndication.current
+    ) { /* update some business state here */ }
+
+    // Observe changes to the binary state for these interactions
+    val isDragged by interactionSource.collectIsDraggedAsState()
+    val isPressed by interactionSource.collectIsPressedAsState()
+
+    // Use the state to change our UI
     val (text, color) = when {
-        Interaction.Dragged in interactionState -> "Dragged" to Color.Red
-        Interaction.Pressed in interactionState -> "Pressed" to Color.Blue
+        isDragged && isPressed -> "Dragged and pressed" to Color.Red
+        isDragged -> "Dragged" to Color.Green
+        isPressed -> "Pressed" to Color.Blue
         // Default / baseline state
         else -> "Drag me horizontally, or press me!" to Color.Black
     }
@@ -72,10 +92,7 @@ fun PriorityInteractionStateSample() {
         Box(
             Modifier
                 .fillMaxSize()
-                .clickable(
-                    interactionState = interactionState,
-                    indication = LocalIndication.current
-                ) { /* do nothing */ }
+                .then(clickable)
                 .then(draggable)
                 .border(BorderStroke(3.dp, color))
                 .padding(3.dp)
@@ -90,36 +107,50 @@ fun PriorityInteractionStateSample() {
 
 @Sampled
 @Composable
-fun MultipleInteractionStateSample() {
-    val interactionState = remember { InteractionState() }
+fun InteractionSourceFlowSample() {
+    // Hoist the MutableInteractionSource that we will provide to interactions
+    val interactionSource = remember { MutableInteractionSource() }
 
+    // Provide the MutableInteractionSource instances to the interactions we want to observe state
+    // changes for
     val draggable = Modifier.draggable(
+        interactionSource = interactionSource,
         orientation = Orientation.Horizontal,
-        interactionState = interactionState,
         state = rememberDraggableState { /* update some business state here */ }
     )
 
     val clickable = Modifier.clickable(
-        interactionState = interactionState,
-        indication = LocalIndication.current
-    ) {
-        /* update some business state here */
+        interactionSource = interactionSource,
+        // This component is a compound component where part of it is clickable and part of it is
+        // draggable. As a result we want to show indication for the _whole_ component, and not
+        // just for clickable area. We set `null` indication here and provide an explicit
+        // Modifier.indication instance later that will draw indication for the whole component.
+        indication = null
+    ) { /* update some business state here */ }
+
+    // SnapshotStateList we will use to track incoming Interactions in the order they are emitted
+    val interactions = remember { mutableStateListOf<Interaction>() }
+
+    // Collect Interactions - if they are new, add them to `interactions`. If they represent stop /
+    // cancel events for existing Interactions, remove them from `interactions` so it will only
+    // contain currently active `interactions`.
+    LaunchedEffect(interactionSource) {
+        interactionSource.interactions.collect { interaction ->
+            when (interaction) {
+                is PressInteraction.Press -> interactions.add(interaction)
+                is PressInteraction.Release -> interactions.remove(interaction.press)
+                is PressInteraction.Cancel -> interactions.remove(interaction.press)
+                is DragInteraction.Start -> interactions.add(interaction)
+                is DragInteraction.Stop -> interactions.remove(interaction.start)
+                is DragInteraction.Cancel -> interactions.remove(interaction.start)
+            }
+        }
     }
 
-    // In this example we have a complex component that can be in multiple states at the same time
-    // (both pressed and dragged, since different areas of the same component can be pressed and
-    // dragged at the same time), and we want to use only the most recent state to show the visual
-    // state of the component. This could be with a visual overlay, or similar. Note that the most
-    // recent state is the _last_ state added to interactionState, so we want to start from the end,
-    // hence we use `lastOrNull` and not `firstOrNull`.
-    val latestState = interactionState.value.lastOrNull {
-        // We only care about pressed and dragged states here, so ignore everything else
-        it is Interaction.Dragged || it is Interaction.Pressed
-    }
-
-    val text = when (latestState) {
-        Interaction.Dragged -> "Dragged"
-        Interaction.Pressed -> "Pressed"
+    // Display some text based on the most recent Interaction stored in `interactions`
+    val text = when (interactions.lastOrNull()) {
+        is DragInteraction.Start -> "Dragged"
+        is PressInteraction.Press -> "Pressed"
         else -> "No state"
     }
 
@@ -128,7 +159,14 @@ fun MultipleInteractionStateSample() {
             .fillMaxSize()
             .wrapContentSize()
     ) {
-        Row {
+        Row(
+            // Draw indication for the whole component, based on the Interactions dispatched by
+            // our hoisted MutableInteractionSource
+            Modifier.indication(
+                interactionSource = interactionSource,
+                indication = LocalIndication.current
+            )
+        ) {
             Box(
                 Modifier
                     .size(width = 240.dp, height = 80.dp)
@@ -136,7 +174,7 @@ fun MultipleInteractionStateSample() {
                     .border(BorderStroke(3.dp, Color.Blue))
                     .padding(3.dp)
             ) {
-                val pressed = Interaction.Pressed in interactionState
+                val pressed = interactions.any { it is PressInteraction.Press }
                 Text(
                     text = if (pressed) "Pressed" else "Not pressed",
                     style = LocalTextStyle.current.copy(textAlign = TextAlign.Center),
@@ -150,7 +188,7 @@ fun MultipleInteractionStateSample() {
                     .border(BorderStroke(3.dp, Color.Red))
                     .padding(3.dp)
             ) {
-                val dragged = Interaction.Dragged in interactionState
+                val dragged = interactions.any { it is DragInteraction.Start }
                 Text(
                     text = if (dragged) "Dragged" else "Not dragged",
                     style = LocalTextStyle.current.copy(textAlign = TextAlign.Center),

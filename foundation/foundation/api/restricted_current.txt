@@ -33,9 +33,9 @@ package androidx.compose.foundation {
 
   public final class ClickableKt {
     method public static androidx.compose.ui.Modifier clickable(androidx.compose.ui.Modifier, optional boolean enabled, optional String? onClickLabel, optional androidx.compose.ui.semantics.Role? role, kotlin.jvm.functions.Function0<kotlin.Unit> onClick);
-    method public static androidx.compose.ui.Modifier clickable(androidx.compose.ui.Modifier, androidx.compose.foundation.InteractionState interactionState, androidx.compose.foundation.Indication? indication, optional boolean enabled, optional String? onClickLabel, optional androidx.compose.ui.semantics.Role? role, kotlin.jvm.functions.Function0<kotlin.Unit> onClick);
+    method public static androidx.compose.ui.Modifier clickable(androidx.compose.ui.Modifier, androidx.compose.foundation.interaction.MutableInteractionSource interactionSource, androidx.compose.foundation.Indication? indication, optional boolean enabled, optional String? onClickLabel, optional androidx.compose.ui.semantics.Role? role, kotlin.jvm.functions.Function0<kotlin.Unit> onClick);
     method @androidx.compose.foundation.ExperimentalFoundationApi public static androidx.compose.ui.Modifier combinedClickable(androidx.compose.ui.Modifier, optional boolean enabled, optional String? onClickLabel, optional androidx.compose.ui.semantics.Role? role, optional String? onLongClickLabel, optional kotlin.jvm.functions.Function0<kotlin.Unit>? onLongClick, optional kotlin.jvm.functions.Function0<kotlin.Unit>? onDoubleClick, kotlin.jvm.functions.Function0<kotlin.Unit> onClick);
-    method @androidx.compose.foundation.ExperimentalFoundationApi public static androidx.compose.ui.Modifier combinedClickable(androidx.compose.ui.Modifier, androidx.compose.foundation.InteractionState interactionState, androidx.compose.foundation.Indication? indication, optional boolean enabled, optional String? onClickLabel, optional androidx.compose.ui.semantics.Role? role, optional String? onLongClickLabel, optional kotlin.jvm.functions.Function0<kotlin.Unit>? onLongClick, optional kotlin.jvm.functions.Function0<kotlin.Unit>? onDoubleClick, kotlin.jvm.functions.Function0<kotlin.Unit> onClick);
+    method @androidx.compose.foundation.ExperimentalFoundationApi public static androidx.compose.ui.Modifier combinedClickable(androidx.compose.ui.Modifier, androidx.compose.foundation.interaction.MutableInteractionSource interactionSource, androidx.compose.foundation.Indication? indication, optional boolean enabled, optional String? onClickLabel, optional androidx.compose.ui.semantics.Role? role, optional String? onLongClickLabel, optional kotlin.jvm.functions.Function0<kotlin.Unit>? onLongClick, optional kotlin.jvm.functions.Function0<kotlin.Unit>? onDoubleClick, kotlin.jvm.functions.Function0<kotlin.Unit> onClick);
   }
 
   public final class ClickableTextKt {
@@ -50,7 +50,7 @@ package androidx.compose.foundation {
   }
 
   public final class FocusableKt {
-    method public static androidx.compose.ui.Modifier focusable(androidx.compose.ui.Modifier, optional boolean enabled, optional androidx.compose.foundation.InteractionState? interactionState);
+    method public static androidx.compose.ui.Modifier focusable(androidx.compose.ui.Modifier, optional boolean enabled, optional androidx.compose.foundation.interaction.MutableInteractionSource? interactionSource);
   }
 
   public final class ImageKt {
@@ -60,7 +60,7 @@ package androidx.compose.foundation {
   }
 
   @androidx.compose.runtime.Stable public interface Indication {
-    method @androidx.compose.runtime.Composable public androidx.compose.foundation.IndicationInstance rememberUpdatedInstance(androidx.compose.foundation.InteractionState interactionState);
+    method @androidx.compose.runtime.Composable public androidx.compose.foundation.IndicationInstance rememberUpdatedInstance(androidx.compose.foundation.interaction.InteractionSource interactionSource);
   }
 
   public interface IndicationInstance {
@@ -69,32 +69,7 @@ package androidx.compose.foundation {
 
   public final class IndicationKt {
     method public static androidx.compose.runtime.ProvidableCompositionLocal<androidx.compose.foundation.Indication> getLocalIndication();
-    method public static androidx.compose.ui.Modifier indication(androidx.compose.ui.Modifier, androidx.compose.foundation.InteractionState interactionState, androidx.compose.foundation.Indication? indication);
-  }
-
-  public interface Interaction {
-  }
-
-  public static final class Interaction.Dragged implements androidx.compose.foundation.Interaction {
-    field public static final androidx.compose.foundation.Interaction.Dragged INSTANCE;
-  }
-
-  public static final class Interaction.Focused implements androidx.compose.foundation.Interaction {
-    field public static final androidx.compose.foundation.Interaction.Focused INSTANCE;
-  }
-
-  public static final class Interaction.Pressed implements androidx.compose.foundation.Interaction {
-    field public static final androidx.compose.foundation.Interaction.Pressed INSTANCE;
-  }
-
-  @androidx.compose.runtime.Stable public final class InteractionState implements androidx.compose.runtime.State<java.util.Set<? extends androidx.compose.foundation.Interaction>> {
-    ctor public InteractionState();
-    method public void addInteraction-Jgxim6Q(androidx.compose.foundation.Interaction interaction, optional androidx.compose.ui.geometry.Offset? position);
-    method public operator boolean contains(androidx.compose.foundation.Interaction interaction);
-    method public java.util.Set<androidx.compose.foundation.Interaction> getValue();
-    method public androidx.compose.ui.geometry.Offset? interactionPositionFor-_m7T9-E(androidx.compose.foundation.Interaction interaction);
-    method public void removeInteraction(androidx.compose.foundation.Interaction interaction);
-    property public java.util.Set<androidx.compose.foundation.Interaction> value;
+    method public static androidx.compose.ui.Modifier indication(androidx.compose.ui.Modifier, androidx.compose.foundation.interaction.InteractionSource interactionSource, androidx.compose.foundation.Indication? indication);
   }
 
   @kotlin.RequiresOptIn(message="This API is internal to library.") @kotlin.annotation.Target(allowedTargets={kotlin.annotation.AnnotationTarget, kotlin.annotation.AnnotationTarget, kotlin.annotation.AnnotationTarget, kotlin.annotation.AnnotationTarget, kotlin.annotation.AnnotationTarget}) public @interface InternalFoundationApi {
@@ -127,13 +102,13 @@ package androidx.compose.foundation {
     ctor public ScrollState(int initial);
     method public suspend Object? animateScrollTo(int value, optional androidx.compose.animation.core.AnimationSpec<java.lang.Float> animationSpec, optional kotlin.coroutines.Continuation<? super kotlin.Unit> p);
     method public float dispatchRawDelta(float delta);
-    method public androidx.compose.foundation.InteractionState getInteractionState();
+    method public androidx.compose.foundation.interaction.InteractionSource getInteractionSource();
     method public int getMaxValue();
     method public int getValue();
     method public boolean isScrollInProgress();
     method public suspend Object? scroll(androidx.compose.foundation.MutatePriority scrollPriority, kotlin.jvm.functions.Function2<? super androidx.compose.foundation.gestures.ScrollScope,? super kotlin.coroutines.Continuation<? super kotlin.Unit>,?> block, kotlin.coroutines.Continuation<? super kotlin.Unit> p);
     method public suspend Object? scrollTo(int value, kotlin.coroutines.Continuation<? super java.lang.Float> p);
-    property public final androidx.compose.foundation.InteractionState interactionState;
+    property public final androidx.compose.foundation.interaction.InteractionSource interactionSource;
     property public boolean isScrollInProgress;
     property public final int maxValue;
     property public final int value;
@@ -174,7 +149,7 @@ package androidx.compose.foundation.gestures {
 
   public final class DraggableKt {
     method public static androidx.compose.foundation.gestures.DraggableState DraggableState(kotlin.jvm.functions.Function1<? super java.lang.Float,kotlin.Unit> onDelta);
-    method public static androidx.compose.ui.Modifier draggable(androidx.compose.ui.Modifier, androidx.compose.foundation.gestures.DraggableState state, androidx.compose.foundation.gestures.Orientation orientation, optional boolean enabled, optional androidx.compose.foundation.InteractionState? interactionState, optional boolean startDragImmediately, optional kotlin.jvm.functions.Function3<? super kotlinx.coroutines.CoroutineScope,? super androidx.compose.ui.geometry.Offset,? super kotlin.coroutines.Continuation<? super kotlin.Unit>,?> onDragStarted, optional kotlin.jvm.functions.Function3<? super kotlinx.coroutines.CoroutineScope,? super java.lang.Float,? super kotlin.coroutines.Continuation<? super kotlin.Unit>,?> onDragStopped, optional boolean reverseDirection);
+    method public static androidx.compose.ui.Modifier draggable(androidx.compose.ui.Modifier, androidx.compose.foundation.gestures.DraggableState state, androidx.compose.foundation.gestures.Orientation orientation, optional boolean enabled, optional androidx.compose.foundation.interaction.MutableInteractionSource? interactionSource, optional boolean startDragImmediately, optional kotlin.jvm.functions.Function3<? super kotlinx.coroutines.CoroutineScope,? super androidx.compose.ui.geometry.Offset,? super kotlin.coroutines.Continuation<? super kotlin.Unit>,?> onDragStarted, optional kotlin.jvm.functions.Function3<? super kotlinx.coroutines.CoroutineScope,? super java.lang.Float,? super kotlin.coroutines.Continuation<? super kotlin.Unit>,?> onDragStopped, optional boolean reverseDirection);
     method @androidx.compose.runtime.Composable public static androidx.compose.foundation.gestures.DraggableState rememberDraggableState(kotlin.jvm.functions.Function1<? super java.lang.Float,kotlin.Unit> onDelta);
   }
 
@@ -222,7 +197,7 @@ package androidx.compose.foundation.gestures {
   }
 
   public final class ScrollableKt {
-    method public static androidx.compose.ui.Modifier scrollable(androidx.compose.ui.Modifier, androidx.compose.foundation.gestures.ScrollableState state, androidx.compose.foundation.gestures.Orientation orientation, optional boolean enabled, optional boolean reverseDirection, optional androidx.compose.foundation.gestures.FlingBehavior? flingBehavior, optional androidx.compose.foundation.InteractionState? interactionState);
+    method public static androidx.compose.ui.Modifier scrollable(androidx.compose.ui.Modifier, androidx.compose.foundation.gestures.ScrollableState state, androidx.compose.foundation.gestures.Orientation orientation, optional boolean enabled, optional boolean reverseDirection, optional androidx.compose.foundation.gestures.FlingBehavior? flingBehavior, optional androidx.compose.foundation.interaction.MutableInteractionSource? interactionSource);
   }
 
   public interface ScrollableState {
@@ -276,6 +251,91 @@ package androidx.compose.foundation.gestures {
     method public static suspend Object? rotateBy(androidx.compose.foundation.gestures.TransformableState, float degrees, kotlin.coroutines.Continuation<? super kotlin.Unit> p);
     method public static suspend Object? stopTransformation(androidx.compose.foundation.gestures.TransformableState, optional androidx.compose.foundation.MutatePriority terminationPriority, optional kotlin.coroutines.Continuation<? super kotlin.Unit> p);
     method public static suspend Object? zoomBy(androidx.compose.foundation.gestures.TransformableState, float zoomFactor, kotlin.coroutines.Continuation<? super kotlin.Unit> p);
+  }
+
+}
+
+package androidx.compose.foundation.interaction {
+
+  public interface DragInteraction extends androidx.compose.foundation.interaction.Interaction {
+  }
+
+  public static final class DragInteraction.Cancel implements androidx.compose.foundation.interaction.DragInteraction {
+    ctor public DragInteraction.Cancel(androidx.compose.foundation.interaction.DragInteraction.Start start);
+    method public androidx.compose.foundation.interaction.DragInteraction.Start getStart();
+    property public final androidx.compose.foundation.interaction.DragInteraction.Start start;
+  }
+
+  public static final class DragInteraction.Start implements androidx.compose.foundation.interaction.DragInteraction {
+    ctor public DragInteraction.Start();
+  }
+
+  public static final class DragInteraction.Stop implements androidx.compose.foundation.interaction.DragInteraction {
+    ctor public DragInteraction.Stop(androidx.compose.foundation.interaction.DragInteraction.Start start);
+    method public androidx.compose.foundation.interaction.DragInteraction.Start getStart();
+    property public final androidx.compose.foundation.interaction.DragInteraction.Start start;
+  }
+
+  public final class DragInteractionKt {
+    method @androidx.compose.runtime.Composable public static androidx.compose.runtime.State<java.lang.Boolean> collectIsDraggedAsState(androidx.compose.foundation.interaction.InteractionSource);
+  }
+
+  public interface FocusInteraction extends androidx.compose.foundation.interaction.Interaction {
+  }
+
+  public static final class FocusInteraction.Focus implements androidx.compose.foundation.interaction.FocusInteraction {
+    ctor public FocusInteraction.Focus();
+  }
+
+  public static final class FocusInteraction.Unfocus implements androidx.compose.foundation.interaction.FocusInteraction {
+    ctor public FocusInteraction.Unfocus(androidx.compose.foundation.interaction.FocusInteraction.Focus focus);
+    method public androidx.compose.foundation.interaction.FocusInteraction.Focus getFocus();
+    property public final androidx.compose.foundation.interaction.FocusInteraction.Focus focus;
+  }
+
+  public final class FocusInteractionKt {
+    method @androidx.compose.runtime.Composable public static androidx.compose.runtime.State<java.lang.Boolean> collectIsFocusedAsState(androidx.compose.foundation.interaction.InteractionSource);
+  }
+
+  public interface Interaction {
+  }
+
+  @androidx.compose.runtime.Stable public interface InteractionSource {
+    method public kotlinx.coroutines.flow.Flow<androidx.compose.foundation.interaction.Interaction> getInteractions();
+    property public abstract kotlinx.coroutines.flow.Flow<androidx.compose.foundation.interaction.Interaction> interactions;
+  }
+
+  public final class InteractionSourceKt {
+    method public static androidx.compose.foundation.interaction.MutableInteractionSource MutableInteractionSource();
+  }
+
+  @androidx.compose.runtime.Stable public interface MutableInteractionSource extends androidx.compose.foundation.interaction.InteractionSource {
+    method public suspend Object? emit(androidx.compose.foundation.interaction.Interaction interaction, kotlin.coroutines.Continuation<? super kotlin.Unit> p);
+    method public boolean tryEmit(androidx.compose.foundation.interaction.Interaction interaction);
+  }
+
+  public interface PressInteraction extends androidx.compose.foundation.interaction.Interaction {
+  }
+
+  public static final class PressInteraction.Cancel implements androidx.compose.foundation.interaction.PressInteraction {
+    ctor public PressInteraction.Cancel(androidx.compose.foundation.interaction.PressInteraction.Press press);
+    method public androidx.compose.foundation.interaction.PressInteraction.Press getPress();
+    property public final androidx.compose.foundation.interaction.PressInteraction.Press press;
+  }
+
+  public static final class PressInteraction.Press implements androidx.compose.foundation.interaction.PressInteraction {
+    method public long getPressPosition-F1C5BW0();
+    property public final long pressPosition;
+  }
+
+  public static final class PressInteraction.Release implements androidx.compose.foundation.interaction.PressInteraction {
+    ctor public PressInteraction.Release(androidx.compose.foundation.interaction.PressInteraction.Press press);
+    method public androidx.compose.foundation.interaction.PressInteraction.Press getPress();
+    property public final androidx.compose.foundation.interaction.PressInteraction.Press press;
+  }
+
+  public final class PressInteractionKt {
+    method @androidx.compose.runtime.Composable public static androidx.compose.runtime.State<java.lang.Boolean> collectIsPressedAsState(androidx.compose.foundation.interaction.InteractionSource);
   }
 
 }
@@ -371,14 +431,14 @@ package androidx.compose.foundation.lazy {
     method public float dispatchRawDelta(float delta);
     method public int getFirstVisibleItemIndex();
     method public int getFirstVisibleItemScrollOffset();
-    method public androidx.compose.foundation.InteractionState getInteractionState();
+    method public androidx.compose.foundation.interaction.InteractionSource getInteractionSource();
     method public androidx.compose.foundation.lazy.LazyListLayoutInfo getLayoutInfo();
     method public boolean isScrollInProgress();
     method public suspend Object? scroll(androidx.compose.foundation.MutatePriority scrollPriority, kotlin.jvm.functions.Function2<? super androidx.compose.foundation.gestures.ScrollScope,? super kotlin.coroutines.Continuation<? super kotlin.Unit>,?> block, kotlin.coroutines.Continuation<? super kotlin.Unit> p);
     method public suspend Object? scrollToItem(int index, optional int scrollOffset, optional kotlin.coroutines.Continuation<? super kotlin.Unit> p);
     property public final int firstVisibleItemIndex;
     property public final int firstVisibleItemScrollOffset;
-    property public final androidx.compose.foundation.InteractionState interactionState;
+    property public final androidx.compose.foundation.interaction.InteractionSource interactionSource;
     property public boolean isScrollInProgress;
     property public final androidx.compose.foundation.lazy.LazyListLayoutInfo layoutInfo;
     field public static final androidx.compose.foundation.lazy.LazyListState.Companion Companion;
@@ -419,14 +479,14 @@ package androidx.compose.foundation.selection {
 
   public final class SelectableKt {
     method public static androidx.compose.ui.Modifier selectable(androidx.compose.ui.Modifier, boolean selected, optional boolean enabled, optional androidx.compose.ui.semantics.Role? role, kotlin.jvm.functions.Function0<kotlin.Unit> onClick);
-    method public static androidx.compose.ui.Modifier selectable(androidx.compose.ui.Modifier, boolean selected, androidx.compose.foundation.InteractionState interactionState, androidx.compose.foundation.Indication? indication, optional boolean enabled, optional androidx.compose.ui.semantics.Role? role, kotlin.jvm.functions.Function0<kotlin.Unit> onClick);
+    method public static androidx.compose.ui.Modifier selectable(androidx.compose.ui.Modifier, boolean selected, androidx.compose.foundation.interaction.MutableInteractionSource interactionSource, androidx.compose.foundation.Indication? indication, optional boolean enabled, optional androidx.compose.ui.semantics.Role? role, kotlin.jvm.functions.Function0<kotlin.Unit> onClick);
   }
 
   public final class ToggleableKt {
     method public static androidx.compose.ui.Modifier toggleable(androidx.compose.ui.Modifier, boolean value, optional boolean enabled, optional androidx.compose.ui.semantics.Role? role, kotlin.jvm.functions.Function1<? super java.lang.Boolean,kotlin.Unit> onValueChange);
-    method public static androidx.compose.ui.Modifier toggleable(androidx.compose.ui.Modifier, boolean value, androidx.compose.foundation.InteractionState interactionState, androidx.compose.foundation.Indication? indication, optional boolean enabled, optional androidx.compose.ui.semantics.Role? role, kotlin.jvm.functions.Function1<? super java.lang.Boolean,kotlin.Unit> onValueChange);
+    method public static androidx.compose.ui.Modifier toggleable(androidx.compose.ui.Modifier, boolean value, androidx.compose.foundation.interaction.MutableInteractionSource interactionSource, androidx.compose.foundation.Indication? indication, optional boolean enabled, optional androidx.compose.ui.semantics.Role? role, kotlin.jvm.functions.Function1<? super java.lang.Boolean,kotlin.Unit> onValueChange);
     method public static androidx.compose.ui.Modifier triStateToggleable(androidx.compose.ui.Modifier, androidx.compose.ui.state.ToggleableState state, optional boolean enabled, optional androidx.compose.ui.semantics.Role? role, kotlin.jvm.functions.Function0<kotlin.Unit> onClick);
-    method public static androidx.compose.ui.Modifier triStateToggleable(androidx.compose.ui.Modifier, androidx.compose.ui.state.ToggleableState state, androidx.compose.foundation.InteractionState interactionState, androidx.compose.foundation.Indication? indication, optional boolean enabled, optional androidx.compose.ui.semantics.Role? role, kotlin.jvm.functions.Function0<kotlin.Unit> onClick);
+    method public static androidx.compose.ui.Modifier triStateToggleable(androidx.compose.ui.Modifier, androidx.compose.ui.state.ToggleableState state, androidx.compose.foundation.interaction.MutableInteractionSource interactionSource, androidx.compose.foundation.Indication? indication, optional boolean enabled, optional androidx.compose.ui.semantics.Role? role, kotlin.jvm.functions.Function0<kotlin.Unit> onClick);
   }
 
 }
@@ -538,8 +598,8 @@ package androidx.compose.foundation.text {
   }
 
   public final class BasicTextFieldKt {
-    method @androidx.compose.runtime.Composable public static void BasicTextField(String value, kotlin.jvm.functions.Function1<? super java.lang.String,kotlin.Unit> onValueChange, optional androidx.compose.ui.Modifier modifier, optional boolean enabled, optional boolean readOnly, optional androidx.compose.ui.text.TextStyle textStyle, optional androidx.compose.foundation.text.KeyboardOptions keyboardOptions, optional androidx.compose.foundation.text.KeyboardActions keyboardActions, optional boolean singleLine, optional int maxLines, optional androidx.compose.ui.text.input.VisualTransformation visualTransformation, optional kotlin.jvm.functions.Function1<? super androidx.compose.ui.text.TextLayoutResult,kotlin.Unit> onTextLayout, optional kotlin.jvm.functions.Function1<? super androidx.compose.ui.text.SoftwareKeyboardController,kotlin.Unit> onTextInputStarted, optional androidx.compose.foundation.InteractionState interactionState, optional androidx.compose.ui.graphics.Brush cursorBrush, optional kotlin.jvm.functions.Function1<? super kotlin.jvm.functions.Function0<kotlin.Unit>,kotlin.Unit> decorationBox);
-    method @androidx.compose.runtime.Composable public static void BasicTextField(androidx.compose.ui.text.input.TextFieldValue value, kotlin.jvm.functions.Function1<? super androidx.compose.ui.text.input.TextFieldValue,kotlin.Unit> onValueChange, optional androidx.compose.ui.Modifier modifier, optional boolean enabled, optional boolean readOnly, optional androidx.compose.ui.text.TextStyle textStyle, optional androidx.compose.foundation.text.KeyboardOptions keyboardOptions, optional androidx.compose.foundation.text.KeyboardActions keyboardActions, optional boolean singleLine, optional int maxLines, optional androidx.compose.ui.text.input.VisualTransformation visualTransformation, optional kotlin.jvm.functions.Function1<? super androidx.compose.ui.text.TextLayoutResult,kotlin.Unit> onTextLayout, optional kotlin.jvm.functions.Function1<? super androidx.compose.ui.text.SoftwareKeyboardController,kotlin.Unit> onTextInputStarted, optional androidx.compose.foundation.InteractionState interactionState, optional androidx.compose.ui.graphics.Brush cursorBrush, optional kotlin.jvm.functions.Function1<? super kotlin.jvm.functions.Function0<kotlin.Unit>,kotlin.Unit> decorationBox);
+    method @androidx.compose.runtime.Composable public static void BasicTextField(String value, kotlin.jvm.functions.Function1<? super java.lang.String,kotlin.Unit> onValueChange, optional androidx.compose.ui.Modifier modifier, optional boolean enabled, optional boolean readOnly, optional androidx.compose.ui.text.TextStyle textStyle, optional androidx.compose.foundation.text.KeyboardOptions keyboardOptions, optional androidx.compose.foundation.text.KeyboardActions keyboardActions, optional boolean singleLine, optional int maxLines, optional androidx.compose.ui.text.input.VisualTransformation visualTransformation, optional kotlin.jvm.functions.Function1<? super androidx.compose.ui.text.TextLayoutResult,kotlin.Unit> onTextLayout, optional kotlin.jvm.functions.Function1<? super androidx.compose.ui.text.SoftwareKeyboardController,kotlin.Unit> onTextInputStarted, optional androidx.compose.foundation.interaction.MutableInteractionSource interactionSource, optional androidx.compose.ui.graphics.Brush cursorBrush, optional kotlin.jvm.functions.Function1<? super kotlin.jvm.functions.Function0<kotlin.Unit>,kotlin.Unit> decorationBox);
+    method @androidx.compose.runtime.Composable public static void BasicTextField(androidx.compose.ui.text.input.TextFieldValue value, kotlin.jvm.functions.Function1<? super androidx.compose.ui.text.input.TextFieldValue,kotlin.Unit> onValueChange, optional androidx.compose.ui.Modifier modifier, optional boolean enabled, optional boolean readOnly, optional androidx.compose.ui.text.TextStyle textStyle, optional androidx.compose.foundation.text.KeyboardOptions keyboardOptions, optional androidx.compose.foundation.text.KeyboardActions keyboardActions, optional boolean singleLine, optional int maxLines, optional androidx.compose.ui.text.input.VisualTransformation visualTransformation, optional kotlin.jvm.functions.Function1<? super androidx.compose.ui.text.TextLayoutResult,kotlin.Unit> onTextLayout, optional kotlin.jvm.functions.Function1<? super androidx.compose.ui.text.SoftwareKeyboardController,kotlin.Unit> onTextInputStarted, optional androidx.compose.foundation.interaction.MutableInteractionSource interactionSource, optional androidx.compose.ui.graphics.Brush cursorBrush, optional kotlin.jvm.functions.Function1<? super kotlin.jvm.functions.Function0<kotlin.Unit>,kotlin.Unit> decorationBox);
   }
 
   public final class BasicTextKt {
