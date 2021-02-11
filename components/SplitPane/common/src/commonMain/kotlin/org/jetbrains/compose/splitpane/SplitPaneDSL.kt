@@ -1,13 +1,11 @@
 package org.jetbrains.compose.splitpane
 
 import androidx.compose.foundation.InteractionState
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
-import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import org.jetbrains.compose.movable.SplitterState
 
 interface SplitPaneScope {
 
@@ -18,11 +16,7 @@ interface SplitPaneScope {
 
     fun second(
         minSize: Dp = 0.dp,
-        content: @Composable () -> Unit = { Box(
-            Modifier
-                .fillMaxSize()
-        )
-        }
+        content: @Composable () -> Unit
     )
 }
 

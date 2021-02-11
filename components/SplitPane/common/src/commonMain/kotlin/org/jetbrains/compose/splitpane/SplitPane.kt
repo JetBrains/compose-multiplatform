@@ -4,9 +4,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
-import org.jetbrains.compose.movable.SingleDirectionMoveState
-
-typealias SplitterState = SingleDirectionMoveState
+import org.jetbrains.compose.movable.SplitterState
 
 data class MinimalSizes(
     val firstPlaceableMinimalSize: Dp,
@@ -28,7 +26,7 @@ fun VerticalSplitPane(
         bet.minimalSizes,
         bet.firstPlaceableContent,
         bet.secondPlaceableContent,
-        { Splitter(isHorizontal = false, splitterState::smoothMoveBy)}
+        { Splitter(isHorizontal = false, splitterState::onMove)}
     )
 }
 
@@ -46,7 +44,7 @@ fun HorizontalSplitPane(
         bet.minimalSizes,
         bet.firstPlaceableContent,
         bet.secondPlaceableContent,
-        { Splitter(isHorizontal = true, splitterState::smoothMoveBy)}
+        { Splitter(isHorizontal = true, splitterState::onMove)}
     )
 }
 
