@@ -3923,7 +3923,6 @@ class RowColumnTest : LayoutTest() {
 
         val positionedLatch = CountDownLatch(1)
         show {
-            @OptIn(ExperimentalLayout::class)
             Row(Modifier.requiredWidth(rowWidth).height(IntrinsicSize.Min)) {
                 Container(
                     Modifier.requiredWidth(dividerWidth).fillMaxHeight().onGloballyPositioned {
@@ -3977,7 +3976,6 @@ class RowColumnTest : LayoutTest() {
 
         val positionedLatch = CountDownLatch(1)
         show {
-            @OptIn(ExperimentalLayout::class)
             Column(Modifier.requiredHeight(columnHeight).width(IntrinsicSize.Min)) {
                 Container(
                     Modifier.requiredHeight(dividerHeight).fillMaxWidth().onGloballyPositioned {
