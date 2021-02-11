@@ -20,13 +20,13 @@ import androidx.compose.animation.core.AnimationSpec
 import androidx.compose.animation.core.AnimationState
 import androidx.compose.animation.core.animateTo
 import androidx.compose.animation.core.spring
+import androidx.compose.ui.unit.dp
 import kotlin.coroutines.cancellation.CancellationException
 
 private class ItemFoundInScroll(val item: LazyListItemInfo) : CancellationException()
 
-// TODO: these need to be Dp somehow
-private val TargetDistance = 5000
-private val BoundDistance = 3000
+private val TargetDistance = 2500.dp
+private val BoundDistance = 1500.dp
 
 internal suspend fun LazyListState.doSmoothScrollToItem(
     index: Int,
@@ -37,6 +37,8 @@ internal suspend fun LazyListState.doSmoothScrollToItem(
         it.index == index
     }
     scroll {
+        val targetDistancePx = with(density) { TargetDistance.toPx() }
+        val boundDistancePx = with(density) { BoundDistance.toPx() }
         var prevValue = 0f
         val anim = AnimationState(0f)
         var target: Float
@@ -52,23 +54,23 @@ internal suspend fun LazyListState.doSmoothScrollToItem(
                 val bound: Float
                 // Magic constants for teleportation chosen arbitrarily by experiment
                 if (forward) {
-                    if (anim.value >= TargetDistance * 2 &&
+                    if (anim.value >= targetDistancePx * 2 &&
                         index - layoutInfo.visibleItemsInfo.last().index > 100
                     ) {
                         // Teleport
                         snapToItemIndexInternal(index = index - 100, scrollOffset = 0)
                     }
-                    target = anim.value + TargetDistance
-                    bound = anim.value + BoundDistance
+                    target = anim.value + targetDistancePx
+                    bound = anim.value + boundDistancePx
                 } else {
-                    if (anim.value >= TargetDistance * -2 &&
+                    if (anim.value >= targetDistancePx * -2 &&
                         layoutInfo.visibleItemsInfo.first().index - index > 100
                     ) {
                         // Teleport
                         snapToItemIndexInternal(index = index + 100, scrollOffset = 0)
                     }
-                    target = anim.value - TargetDistance
-                    bound = anim.value - BoundDistance
+                    target = anim.value - targetDistancePx
+                    bound = anim.value - boundDistancePx
                 }
                 anim.animateTo(
                     target,
