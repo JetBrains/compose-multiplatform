@@ -29,6 +29,7 @@ import androidx.compose.ui.layout.MeasureResult
 import androidx.compose.ui.layout.MeasureScope
 import androidx.compose.ui.node.Ref
 import androidx.compose.ui.layout.onGloballyPositioned
+import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.IntSize
@@ -417,6 +418,90 @@ class IntrinsicTest : LayoutTest() {
         assertEquals(IntSize(20.dp.roundToPx(), 65.dp.roundToPx()), maxIntrinsicHeightSize.value)
         assertEquals(IntSize(20.dp.roundToPx(), 65.dp.roundToPx()), childSize.value)
         assertEquals(Offset(0f, 0f), childPosition.value)
+    }
+
+    @Test
+    fun testRequiredMinIntrinsicWidth() = with(density) {
+        val countDownLatch = CountDownLatch(1)
+        show {
+            Box {
+                ConstrainedBox(
+                    DpConstraints.fixed(100.dp, 100.dp)
+                ) {
+                    FixedIntrinsicsBox(
+                        Modifier.requiredWidth(IntrinsicSize.Min).onSizeChanged {
+                            assertEquals(IntSize(10.dp.roundToPx(), 50.dp.roundToPx()), it)
+                            countDownLatch.countDown()
+                        },
+                        10.dp, 20.dp, 30.dp, 40.dp, 50.dp, 60.dp
+                    )
+                }
+            }
+        }
+        assertTrue(countDownLatch.await(1, TimeUnit.SECONDS))
+    }
+
+    @Test
+    fun testRequiredMinIntrinsicHeight() = with(density) {
+        val countDownLatch = CountDownLatch(1)
+        show {
+            Box {
+                ConstrainedBox(
+                    DpConstraints.fixed(100.dp, 100.dp)
+                ) {
+                    FixedIntrinsicsBox(
+                        Modifier.requiredHeight(IntrinsicSize.Min).onSizeChanged {
+                            assertEquals(IntSize(20.dp.roundToPx(), 40.dp.roundToPx()), it)
+                            countDownLatch.countDown()
+                        },
+                        10.dp, 20.dp, 30.dp, 40.dp, 50.dp, 60.dp
+                    )
+                }
+            }
+        }
+        assertTrue(countDownLatch.await(1, TimeUnit.SECONDS))
+    }
+
+    @Test
+    fun testRequiredMaxIntrinsicWidth() = with(density) {
+        val countDownLatch = CountDownLatch(1)
+        show {
+            Box {
+                ConstrainedBox(
+                    DpConstraints.fixed(100.dp, 100.dp)
+                ) {
+                    FixedIntrinsicsBox(
+                        Modifier.requiredWidth(IntrinsicSize.Max).onSizeChanged {
+                            assertEquals(IntSize(30.dp.roundToPx(), 50.dp.roundToPx()), it)
+                            countDownLatch.countDown()
+                        },
+                        10.dp, 20.dp, 30.dp, 40.dp, 50.dp, 60.dp
+                    )
+                }
+            }
+        }
+        assertTrue(countDownLatch.await(1, TimeUnit.SECONDS))
+    }
+
+    @Test
+    fun testRequiredMaxIntrinsicHeight() = with(density) {
+        val countDownLatch = CountDownLatch(1)
+        show {
+            Box {
+                ConstrainedBox(
+                    DpConstraints.fixed(100.dp, 100.dp)
+                ) {
+                    FixedIntrinsicsBox(
+                        Modifier.requiredHeight(IntrinsicSize.Max).onSizeChanged {
+                            assertEquals(IntSize(20.dp.roundToPx(), 60.dp.roundToPx()), it)
+                            countDownLatch.countDown()
+                        },
+                        10.dp, 20.dp, 30.dp, 40.dp, 50.dp, 60.dp
+                    )
+                }
+            }
+        }
+        assertTrue(countDownLatch.await(1, TimeUnit.SECONDS))
     }
 
     @Test
