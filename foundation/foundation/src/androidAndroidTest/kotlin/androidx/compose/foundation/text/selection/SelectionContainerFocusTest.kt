@@ -52,6 +52,7 @@ import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import androidx.test.filters.FlakyTest
 import androidx.test.filters.LargeTest
 import com.google.common.truth.Truth.assertThat
 import com.nhaarman.mockitokotlin2.mock
@@ -83,6 +84,8 @@ class SelectionContainerFocusTest {
     private val boxSize = 40.dp
 
     private val hapticFeedback = mock<HapticFeedback>()
+
+    @FlakyTest(bugId = 179770443)
     @Test
     fun click_anywhere_to_cancel() {
         // Setup. Long press to create a selection.
@@ -119,6 +122,7 @@ class SelectionContainerFocusTest {
         }
     }
 
+    @FlakyTest(bugId = 179770443)
     @Test
     fun select_anotherContainer_cancelOld() {
         // Setup. Long press to create a selection.

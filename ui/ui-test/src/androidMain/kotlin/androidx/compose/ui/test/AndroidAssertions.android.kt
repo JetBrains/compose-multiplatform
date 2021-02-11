@@ -44,7 +44,7 @@ internal actual fun SemanticsNodeInteraction.checkIsDisplayed(): Boolean {
     }
 
     // check node doesn't clip unintentionally (e.g. row too small for content)
-    val globalRect = node.globalBounds
+    val globalRect = node.boundsInWindow
     if (!node.isInScreenBounds()) {
         return false
     }

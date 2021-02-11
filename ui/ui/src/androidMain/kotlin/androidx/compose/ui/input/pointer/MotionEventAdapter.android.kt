@@ -16,12 +16,15 @@
 
 package androidx.compose.ui.input.pointer
 
+import android.annotation.SuppressLint
+import android.os.Build
 import android.view.MotionEvent
 import android.view.MotionEvent.ACTION_CANCEL
 import android.view.MotionEvent.ACTION_DOWN
 import android.view.MotionEvent.ACTION_POINTER_DOWN
 import android.view.MotionEvent.ACTION_POINTER_UP
 import android.view.MotionEvent.ACTION_UP
+import androidx.annotation.RequiresApi
 import androidx.annotation.VisibleForTesting
 import androidx.compose.ui.geometry.Offset
 
@@ -50,7 +53,10 @@ internal class MotionEventAdapter {
      *
      * @return The PointerInputEvent or null if the event action was ACTION_CANCEL.
      */
-    internal fun convertToPointerInputEvent(motionEvent: MotionEvent): PointerInputEvent? {
+    internal fun convertToPointerInputEvent(
+        motionEvent: MotionEvent,
+        positionCalculator: PositionCalculator
+    ): PointerInputEvent? {
 
         if (motionEvent.actionMasked == ACTION_CANCEL) {
             motionEventToComposePointerIdMap.clear()
@@ -75,10 +81,16 @@ internal class MotionEventAdapter {
         // This converts the MotionEvent into a list of PointerInputEventData, and updates
         // internal record keeping.
         @Suppress("NAME_SHADOWING")
-        motionEvent.asOffsetToScreen { motionEvent ->
-            for (i in 0 until motionEvent.pointerCount) {
-                pointers.add(createPointerInputEventData(motionEvent, i, downIndex, upIndex))
-            }
+        for (i in 0 until motionEvent.pointerCount) {
+            pointers.add(
+                createPointerInputEventData(
+                    positionCalculator,
+                    motionEvent,
+                    i,
+                    downIndex,
+                    upIndex
+                )
+            )
         }
 
         return PointerInputEvent(
@@ -92,6 +104,7 @@ internal class MotionEventAdapter {
      * Creates a new PointerInputEventData.
      */
     private fun createPointerInputEventData(
+        positionCalculator: PositionCalculator,
         motionEvent: MotionEvent,
         index: Int,
         downIndex: Int?,
@@ -117,6 +130,7 @@ internal class MotionEventAdapter {
             )
 
         return createPointerInputEventData(
+            positionCalculator,
             pointerId,
             motionEvent.eventTime,
             motionEvent,
@@ -130,15 +144,22 @@ internal class MotionEventAdapter {
  * Creates a new PointerInputData.
  */
 private fun createPointerInputEventData(
+    positionCalculator: PositionCalculator,
     pointerId: PointerId,
     timestamp: Long,
     motionEvent: MotionEvent,
     index: Int,
     upIndex: Int?
 ): PointerInputEventData {
-    val pointerCoords = MotionEvent.PointerCoords()
-    motionEvent.getPointerCoords(index, pointerCoords)
-    val offset = Offset(pointerCoords.x, pointerCoords.y)
+    val position = Offset(motionEvent.getX(index), motionEvent.getY(index))
+    val rawPosition: Offset
+    if (index == 0) {
+        rawPosition = Offset(motionEvent.rawX, motionEvent.rawY)
+    } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+        rawPosition = motionEvent.toRawOffset(index)
+    } else {
+        rawPosition = positionCalculator.localToScreen(position)
+    }
     val toolType = when (motionEvent.getToolType(index)) {
         MotionEvent.TOOL_TYPE_UNKNOWN -> PointerType.Unknown
         MotionEvent.TOOL_TYPE_FINGER -> PointerType.Touch
@@ -151,21 +172,15 @@ private fun createPointerInputEventData(
     return PointerInputEventData(
         pointerId,
         timestamp,
-        offset,
+        rawPosition,
+        position,
         index != upIndex,
         toolType
     )
 }
 
-/**
- * Mutates the MotionEvent to be relative to the screen.
- *
- * This is required to create a valid PointerInputEvent.
- */
-private inline fun MotionEvent.asOffsetToScreen(block: (MotionEvent) -> Unit) {
-    val offsetX = rawX - x
-    val offsetY = rawY - y
-    offsetLocation(offsetX, offsetY)
-    block(this)
-    offsetLocation(-offsetX, -offsetY)
+@RequiresApi(Build.VERSION_CODES.Q)
+@SuppressLint("UnsafeNewApiCall") // not sure why RequiresApi is not enough
+private fun MotionEvent.toRawOffset(index: Int): Offset {
+    return Offset(getRawX(index), getRawY(index))
 }

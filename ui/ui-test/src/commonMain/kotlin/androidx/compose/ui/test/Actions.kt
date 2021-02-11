@@ -64,7 +64,7 @@ fun SemanticsNodeInteraction.performScrollTo(): SemanticsNodeInteraction {
     // Figure out the (clipped) bounds of the viewPort in its direct parent's content area, in
     // root coordinates. We only want the clipping from the direct parent on the scrollable, not
     // from any other ancestors.
-    val viewPortInParent = scrollableNode.layoutInfo.coordinates.boundsInParent
+    val viewPortInParent = scrollableNode.layoutInfo.coordinates.boundsInParent()
     val parentInRoot = scrollableNode.layoutInfo.coordinates.parentLayoutCoordinates
         ?.positionInRoot() ?: Offset.Zero
 

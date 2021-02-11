@@ -19,6 +19,7 @@ package androidx.compose.ui.platform
 import android.annotation.SuppressLint
 import android.content.Context
 import android.content.res.Configuration
+import android.graphics.Matrix
 import android.graphics.Rect
 import android.os.Build
 import android.os.Looper
@@ -57,6 +58,7 @@ import androidx.compose.ui.focus.FocusDirection.Right
 import androidx.compose.ui.focus.FocusDirection.Up
 import androidx.compose.ui.focus.FocusManager
 import androidx.compose.ui.focus.FocusManagerImpl
+import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Canvas
 import androidx.compose.ui.graphics.CanvasHolder
 import androidx.compose.ui.hapticfeedback.AndroidHapticFeedback
@@ -74,6 +76,7 @@ import androidx.compose.ui.input.key.key
 import androidx.compose.ui.input.key.type
 import androidx.compose.ui.input.pointer.MotionEventAdapter
 import androidx.compose.ui.input.pointer.PointerInputEventProcessor
+import androidx.compose.ui.input.pointer.PositionCalculator
 import androidx.compose.ui.input.pointer.ProcessResult
 import androidx.compose.ui.layout.RootMeasureBlocks
 import androidx.compose.ui.node.InternalCoreApi
@@ -109,7 +112,7 @@ import android.view.KeyEvent as AndroidKeyEvent
 @OptIn(ExperimentalComposeUiApi::class)
 @RequiresApi(Build.VERSION_CODES.LOLLIPOP)
 internal class AndroidComposeView(context: Context) :
-    ViewGroup(context), Owner, ViewRootForTest {
+    ViewGroup(context), Owner, ViewRootForTest, PositionCalculator {
 
     override val view: View = this
 
@@ -240,6 +243,8 @@ internal class AndroidComposeView(context: Context) :
     private var globalPosition: IntOffset = IntOffset.Zero
 
     private val tmpPositionArray = intArrayOf(0, 0)
+    private val tmpOffsetArray = floatArrayOf(0f, 0f)
+    private val tmpMatrix = Matrix()
 
     // Used to track whether or not there was an exception while creating an MRenderNode
     // so that we don't have to continue using try/catch after fails once.
@@ -667,19 +672,10 @@ internal class AndroidComposeView(context: Context) :
     // TODO(shepshapard): Test this method.
     override fun dispatchTouchEvent(motionEvent: MotionEvent): Boolean {
         measureAndLayout()
-        // TODO(b/166848812): Calling updatePositionCacheAndDispatch here seems necessary because
-        //  if the soft keyboard being displayed causes the AndroidComposeView to be offset from
-        //  the screen, we don't seem to have any timely callback that updates our globalPosition
-        //  cache. ViewTreeObserver.OnGlobalLayoutListener gets called, but not when the keyboard
-        //  opens. And when it gets called as the keyboard is closing, it is called before the
-        //  keyboard actually closes causing the globalPosition to be wrong.
-        // TODO(shepshapard): There is no test to garuntee that this method is called here as doing
-        //  so proved to be very difficult. A test should be added.
-        updatePositionCacheAndDispatch()
         val processResult = trace("AndroidOwner:onTouch") {
-            val pointerInputEvent = motionEventAdapter.convertToPointerInputEvent(motionEvent)
+            val pointerInputEvent = motionEventAdapter.convertToPointerInputEvent(motionEvent, this)
             if (pointerInputEvent != null) {
-                pointerInputEventProcessor.process(pointerInputEvent)
+                pointerInputEventProcessor.process(pointerInputEvent, this)
             } else {
                 pointerInputEventProcessor.processCancel()
                 ProcessResult(
@@ -696,16 +692,65 @@ internal class AndroidComposeView(context: Context) :
         return processResult.dispatchedToAPointerInputModifier
     }
 
+    override fun localToScreen(localPosition: Offset): Offset {
+        tmpMatrix.reset()
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+            TransformMatrixApi29.transformMatrixToScreen(this, tmpMatrix)
+        } else {
+            TransformMatrixApi28.transformMatrixToScreen(this, tmpMatrix, tmpPositionArray)
+        }
+        val points = tmpOffsetArray
+        points[0] = localPosition.x
+        points[1] = localPosition.y
+        tmpMatrix.mapPoints(points)
+        return Offset(points[0], points[1])
+    }
+
+    override fun screenToLocal(positionOnScreen: Offset): Offset {
+        tmpMatrix.reset()
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+            TransformMatrixApi29.transformMatrixFromScreen(this, tmpMatrix)
+        } else {
+            TransformMatrixApi28.transformMatrixFromScreen(this, tmpMatrix, tmpPositionArray)
+        }
+        val points = tmpOffsetArray
+        points[0] = positionOnScreen.x
+        points[1] = positionOnScreen.y
+        tmpMatrix.mapPoints(points)
+        return Offset(points[0], points[1])
+    }
+
     override fun onCheckIsTextEditor(): Boolean = textInputServiceAndroid.isEditorFocused()
 
     override fun onCreateInputConnection(outAttrs: EditorInfo): InputConnection? =
         textInputServiceAndroid.createInputConnection(outAttrs)
 
-    override fun calculatePosition(): IntOffset = globalPosition
+    override fun calculateLocalPosition(positionInWindow: Offset): Offset {
+        tmpMatrix.reset()
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+            TransformMatrixApi29.transformMatrixFromWindow(this, tmpMatrix, tmpPositionArray)
+        } else {
+            TransformMatrixApi28.transformMatrixFromWindow(this, tmpMatrix)
+        }
+        val points = tmpOffsetArray
+        points[0] = positionInWindow.x
+        points[1] = positionInWindow.y
+        tmpMatrix.mapPoints(points)
+        return Offset(points[0], points[1])
+    }
 
-    override fun calculatePositionInWindow(): IntOffset {
-        getLocationInWindow(tmpPositionArray)
-        return IntOffset(tmpPositionArray[0], tmpPositionArray[1])
+    override fun calculatePositionInWindow(localPosition: Offset): Offset {
+        tmpMatrix.reset()
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+            TransformMatrixApi29.transformMatrixToWindow(this, tmpMatrix, tmpPositionArray)
+        } else {
+            TransformMatrixApi28.transformMatrixToWindow(this, tmpMatrix)
+        }
+        val points = tmpOffsetArray
+        points[0] = localPosition.x
+        points[1] = localPosition.y
+        tmpMatrix.mapPoints(points)
+        return Offset(points[0], points[1])
     }
 
     override fun onConfigurationChanged(newConfig: Configuration) {
@@ -781,6 +826,94 @@ private fun layoutDirectionFromInt(layoutDirection: Int): LayoutDirection = when
     android.util.LayoutDirection.LTR -> LayoutDirection.Ltr
     android.util.LayoutDirection.RTL -> LayoutDirection.Rtl
     else -> LayoutDirection.Ltr
+}
+
+private fun View.findRootView(): View {
+    var contentView: View = this
+    var parent = contentView.parent
+    while (parent is View) {
+        contentView = parent
+        parent = contentView.parent
+    }
+    return contentView
+}
+
+private class TransformMatrixApi28 {
+    companion object {
+        fun transformMatrixToWindow(view: View, matrix: Matrix) =
+            transformFromLocal(view, matrix, null)
+
+        fun transformMatrixToScreen(view: View, matrix: Matrix, tmpPositionArray: IntArray) =
+            transformFromLocal(view, matrix, tmpPositionArray)
+
+        fun transformMatrixFromWindow(view: View, matrix: Matrix) =
+            transformToLocal(view, matrix, null)
+
+        fun transformMatrixFromScreen(view: View, matrix: Matrix, tmpPositionArray: IntArray) =
+            transformToLocal(view, matrix, tmpPositionArray)
+
+        private fun transformFromLocal(view: View, transform: Matrix, tmpPositionArray: IntArray?) {
+            val parentView = view.parent
+            if (parentView is View) {
+                transformFromLocal(parentView, transform, tmpPositionArray)
+                transform.preTranslate(-view.scrollX.toFloat(), -view.scrollY.toFloat())
+                transform.preTranslate(view.left.toFloat(), view.top.toFloat())
+            } else if (tmpPositionArray != null) {
+                view.getLocationOnScreen(tmpPositionArray)
+                transform.preTranslate(tmpPositionArray[0].toFloat(), tmpPositionArray[1].toFloat())
+            }
+
+            val matrix = view.matrix
+            if (!matrix.isIdentity) {
+                transform.preConcat(matrix)
+            }
+        }
+
+        private fun transformToLocal(view: View, transform: Matrix, tmpPositionArray: IntArray?) {
+            val parentView = view.parent
+            if (parentView is View) {
+                transformToLocal(parentView, transform, tmpPositionArray)
+                transform.postTranslate(view.scrollX.toFloat(), view.scrollY.toFloat())
+                transform.postTranslate(-view.left.toFloat(), -view.top.toFloat())
+            } else if (tmpPositionArray != null) {
+                view.getLocationOnScreen(tmpPositionArray)
+                transform.postTranslate(
+                    -tmpPositionArray[0].toFloat(),
+                    -tmpPositionArray[1].toFloat()
+                )
+            }
+
+            val matrix = view.matrix
+            if (!matrix.isIdentity) {
+                matrix.invert(matrix)
+                transform.postConcat(matrix)
+            }
+        }
+    }
+}
+
+private class TransformMatrixApi29 {
+    @RequiresApi(Build.VERSION_CODES.Q)
+    companion object {
+        fun transformMatrixToScreen(view: View, matrix: Matrix) =
+            view.transformMatrixToGlobal(matrix)
+
+        fun transformMatrixToWindow(view: View, matrix: Matrix, tmpPositionArray: IntArray) {
+            val rootView = view.findRootView()
+            rootView.getLocationOnScreen(tmpPositionArray)
+            matrix.preTranslate(-tmpPositionArray[0].toFloat(), -tmpPositionArray[1].toFloat())
+            view.transformMatrixToGlobal(matrix)
+        }
+        fun transformMatrixFromScreen(view: View, matrix: Matrix) =
+            view.transformMatrixToLocal(matrix)
+
+        fun transformMatrixFromWindow(view: View, matrix: Matrix, tmpPositionArray: IntArray) {
+            val rootView = view.findRootView()
+            rootView.getLocationOnScreen(tmpPositionArray)
+            matrix.postTranslate(tmpPositionArray[0].toFloat(), tmpPositionArray[1].toFloat())
+            view.transformMatrixToLocal(matrix)
+        }
+    }
 }
 
 /** @suppress */

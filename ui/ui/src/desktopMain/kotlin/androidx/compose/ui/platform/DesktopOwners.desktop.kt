@@ -199,13 +199,15 @@ internal class DesktopOwners(
         down: Boolean
     ): PointerInputEvent {
         val time = System.nanoTime() / 1_000_000L
+        val position = Offset(x.toFloat(), y.toFloat())
         return PointerInputEvent(
             time,
             listOf(
                 PointerInputEventData(
                     PointerId(pointerId),
                     time,
-                    Offset(x.toFloat(), y.toFloat()),
+                    position,
+                    position,
                     down,
                     PointerType.Mouse
                 )

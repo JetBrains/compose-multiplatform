@@ -456,10 +456,10 @@ internal class AccessibilityIterators {
             }
             try {
                 tempRect = Rect(
-                    node.globalBounds.left.toInt(),
-                    node.globalBounds.top.toInt(),
-                    node.globalBounds.right.toInt(),
-                    node.globalBounds.bottom.toInt()
+                    node.boundsInWindow.left.toInt(),
+                    node.boundsInWindow.top.toInt(),
+                    node.boundsInWindow.right.toInt(),
+                    node.boundsInWindow.bottom.toInt()
                 )
                 // TODO(b/153198816): check whether we still get this exception when R is in.
             } catch (e: IllegalStateException) {
@@ -495,10 +495,10 @@ internal class AccessibilityIterators {
             }
             try {
                 tempRect = Rect(
-                    node.globalBounds.left.toInt(),
-                    node.globalBounds.top.toInt(),
-                    node.globalBounds.right.toInt(),
-                    node.globalBounds.bottom.toInt()
+                    node.boundsInWindow.left.toInt(),
+                    node.boundsInWindow.top.toInt(),
+                    node.boundsInWindow.right.toInt(),
+                    node.boundsInWindow.bottom.toInt()
                 )
                 // TODO(b/153198816): check whether we still get this exception when R is in.
             } catch (e: IllegalStateException) {

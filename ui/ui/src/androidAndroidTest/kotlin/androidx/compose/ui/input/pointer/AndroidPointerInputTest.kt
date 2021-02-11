@@ -18,6 +18,7 @@ package androidx.compose.ui.input.pointer
 
 import android.content.Context
 import android.view.MotionEvent
+import android.view.View
 import android.view.ViewGroup
 import androidx.activity.ComponentActivity
 import androidx.compose.foundation.gestures.detectTapGestures
@@ -111,7 +112,7 @@ class AndroidPointerInputTest {
             )
 
             // Act
-            val actual = container.dispatchTouchEvent(motionEvent)
+            val actual = findRootView(container).dispatchTouchEvent(motionEvent)
 
             // Assert
             assertThat(actual).isFalse()
@@ -150,7 +151,7 @@ class AndroidPointerInputTest {
             )
 
             // Act
-            val actual = container.dispatchTouchEvent(motionEvent)
+            val actual = findRootView(container).dispatchTouchEvent(motionEvent)
 
             // Assert
             assertThat(actual).isTrue()
@@ -176,7 +177,7 @@ class AndroidPointerInputTest {
     @Test
     fun dispatchTouchEvent_notMeasuredLayoutsAreMeasuredFirst() {
         val size = mutableStateOf(10)
-        val latch = CountDownLatch(1)
+        var latch = CountDownLatch(1)
         var consumedDownPosition: Offset? = null
         rule.runOnUiThread {
             container.setContent {
@@ -199,21 +200,19 @@ class AndroidPointerInputTest {
         assertThat(latch.await(1, TimeUnit.SECONDS)).isTrue()
 
         rule.runOnUiThread {
-            val androidComposeView = container.getChildAt(0) as AndroidComposeView
-
             // we update size from 10 to 20 pixels
             size.value = 20
             // this call will synchronously mark the LayoutNode as needs remeasure
             Snapshot.sendApplyNotifications()
+            val androidComposeView = container.getChildAt(0) as AndroidComposeView
 
-            val ownerPosition = androidComposeView.calculatePosition()
             val motionEvent = MotionEvent(
                 0,
                 MotionEvent.ACTION_DOWN,
                 1,
                 0,
                 arrayOf(PointerProperties(0)),
-                arrayOf(PointerCoords(ownerPosition.x + 15f, ownerPosition.y + 15f))
+                arrayOf(PointerCoords(15f, 15f))
             )
 
             // we expect it to first remeasure and only then process
@@ -281,7 +280,7 @@ class AndroidPointerInputTest {
             )
 
             // Act
-            container.dispatchTouchEvent(motionEvent)
+            findRootView(container).dispatchTouchEvent(motionEvent)
 
             // Assert
             assertThat(log).hasSize(1)
@@ -333,10 +332,10 @@ class AndroidPointerInputTest {
                 arrayOf(PointerCoords(x + 1, y))
             )
 
-            container.dispatchTouchEvent(down)
+            findRootView(container).dispatchTouchEvent(down)
 
             // Act
-            container.dispatchTouchEvent(move)
+            findRootView(container).dispatchTouchEvent(move)
 
             // Assert
             if (callsRequestDisallowInterceptTouchEvent) {
@@ -397,7 +396,7 @@ class AndroidPointerInputTest {
             )
 
             // Act
-            container.dispatchTouchEvent(motionEvent)
+            findRootView(container).dispatchTouchEvent(motionEvent)
 
             // Assert
             assertThat(log).hasSize(1)
@@ -440,12 +439,12 @@ class AndroidPointerInputTest {
             container.getLocationInWindow(locationInWindow)
 
             val downEvent = createPointerEventAt(0, MotionEvent.ACTION_DOWN, locationInWindow)
-            container.dispatchTouchEvent(downEvent)
+            findRootView(container).dispatchTouchEvent(downEvent)
         }
 
         rule.runOnUiThread {
             val upEvent = createPointerEventAt(200, MotionEvent.ACTION_UP, locationInWindow)
-            container.dispatchTouchEvent(upEvent)
+            findRootView(container).dispatchTouchEvent(upEvent)
         }
 
         assertTrue(tapLatch.await(1, TimeUnit.SECONDS))
@@ -457,7 +456,7 @@ class AndroidPointerInputTest {
 
         rule.runOnUiThread {
             val downEvent = createPointerEventAt(1000, MotionEvent.ACTION_DOWN, locationInWindow)
-            container.dispatchTouchEvent(downEvent)
+            findRootView(container).dispatchTouchEvent(downEvent)
         }
         // Need to wait for long press timeout (at least)
         rule.runOnUiThread {
@@ -466,7 +465,7 @@ class AndroidPointerInputTest {
                 MotionEvent.ACTION_UP,
                 locationInWindow
             )
-            container.dispatchTouchEvent(upEvent)
+            findRootView(container).dispatchTouchEvent(upEvent)
         }
         assertTrue(tapLatch2.await(1, TimeUnit.SECONDS))
 
@@ -476,11 +475,11 @@ class AndroidPointerInputTest {
 
         rule.runOnUiThread {
             val downEvent = createPointerEventAt(2000, MotionEvent.ACTION_DOWN, locationInWindow)
-            container.dispatchTouchEvent(downEvent)
+            findRootView(container).dispatchTouchEvent(downEvent)
         }
         rule.runOnUiThread {
             val upEvent = createPointerEventAt(2200, MotionEvent.ACTION_UP, locationInWindow)
-            container.dispatchTouchEvent(upEvent)
+            findRootView(container).dispatchTouchEvent(upEvent)
         }
         assertTrue(tapLatch.await(1, TimeUnit.SECONDS))
     }
@@ -622,3 +621,11 @@ private fun MotionEvent(
     0,
     0
 )
+
+internal fun findRootView(view: View): View {
+    val parent = view.parent
+    if (parent is View) {
+        return findRootView(parent)
+    }
+    return view
+}

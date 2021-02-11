@@ -138,16 +138,16 @@ internal class InnerPlaceable(
     }
 
     override fun hitTest(
-        pointerPositionRelativeToScreen: Offset,
+        pointerPosition: Offset,
         hitPointerInputFilters: MutableList<PointerInputFilter>
     ) {
-        if (withinLayerBounds(pointerPositionRelativeToScreen)) {
+        if (withinLayerBounds(pointerPosition)) {
             // Any because as soon as true is returned, we know we have found a hit path and we must
             // not add PointerInputFilters on different paths so we should not even go looking.
             val originalSize = hitPointerInputFilters.size
             layoutNode.zSortedChildren.reversedAny { child ->
                 if (child.isPlaced) {
-                    callHitTest(child, pointerPositionRelativeToScreen, hitPointerInputFilters)
+                    callHitTest(child, pointerPosition, hitPointerInputFilters)
                     hitPointerInputFilters.size > originalSize
                 } else {
                     false
@@ -169,10 +169,10 @@ internal class InnerPlaceable(
 
         private fun callHitTest(
             node: LayoutNode,
-            globalPoint: Offset,
+            pointerPosition: Offset,
             hitPointerInputFilters: MutableList<PointerInputFilter>
         ) {
-            node.hitTest(globalPoint, hitPointerInputFilters)
+            node.hitTest(pointerPosition, hitPointerInputFilters)
         }
     }
 }

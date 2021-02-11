@@ -293,7 +293,7 @@ class BottomSheetScaffoldTest {
                         Box(
                             Modifier
                                 .onGloballyPositioned { positioned: LayoutCoordinates ->
-                                    drawerChildPosition = positioned.positionInParent
+                                    drawerChildPosition = positioned.positionInParent()
                                 }
                                 .fillMaxWidth()
                                 .height(50.dp)
