@@ -383,13 +383,11 @@ package androidx.compose.ui.text {
     method public static int getLength-impl(long $this);
     method public static int getMax-impl(long $this);
     method public static int getMin-impl(long $this);
-    method public long getPackedValue();
     method public static boolean getReversed-impl(long $this);
     method public static int getStart-impl(long $this);
     method @androidx.compose.runtime.Immutable public static inline int hashCode-impl(long p);
     method public static boolean intersects-5zc-tL8(long $this, long other);
     method public static String toString-impl(long $this);
-    property public final long packedValue;
     field public static final androidx.compose.ui.text.TextRange.Companion Companion;
   }
 

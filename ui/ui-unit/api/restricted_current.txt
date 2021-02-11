@@ -301,7 +301,6 @@ package androidx.compose.ui.unit {
     method public static inline operator long div-XSAIIZE(long $this, int other);
     method @androidx.compose.runtime.Immutable public static inline boolean equals-impl(long p, Object? p1);
     method public static boolean equals-impl0(long p1, long p2);
-    method public long getPackedValue();
     method public static androidx.compose.ui.unit.TextUnitType getType-impl(long $this);
     method public static float getValue-impl(long $this);
     method @androidx.compose.runtime.Immutable public static inline int hashCode-impl(long p);
@@ -312,7 +311,6 @@ package androidx.compose.ui.unit {
     method public static inline operator long times-XSAIIZE(long $this, int other);
     method public static String toString-impl(long $this);
     method public static inline operator long unaryMinus-XSAIIZE(long $this);
-    property public final long packedValue;
     field public static final androidx.compose.ui.unit.TextUnit.Companion Companion;
   }
 
@@ -355,7 +353,6 @@ package androidx.compose.ui.unit {
     method @androidx.compose.runtime.Stable public static operator long div-9UxMQ8M(long $this, float operand);
     method @androidx.compose.runtime.Immutable public static inline boolean equals-impl(long p, Object? p1);
     method public static boolean equals-impl0(long p1, long p2);
-    method public long getPackedValue();
     method public static float getX-impl(long $this);
     method public static float getY-impl(long $this);
     method @androidx.compose.runtime.Immutable public static inline int hashCode-impl(long p);
@@ -365,7 +362,6 @@ package androidx.compose.ui.unit {
     method @androidx.compose.runtime.Stable public static operator long times-9UxMQ8M(long $this, float operand);
     method public static String toString-impl(long $this);
     method @androidx.compose.runtime.Stable public static operator long unaryMinus-9UxMQ8M(long $this);
-    property public final long packedValue;
     field public static final androidx.compose.ui.unit.Velocity.Companion Companion;
   }
 
