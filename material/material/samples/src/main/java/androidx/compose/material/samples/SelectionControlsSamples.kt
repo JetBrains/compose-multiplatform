@@ -39,7 +39,6 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.semantics.Role
-import androidx.compose.ui.semantics.clearAndSetSemantics
 import androidx.compose.ui.state.ToggleableState
 import androidx.compose.ui.unit.dp
 
@@ -136,13 +135,9 @@ fun RadioGroupSample() {
                     .padding(horizontal = 16.dp),
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                // The [clearAndSetSemantics] causes the button's redundant
-                // selectable semantics to be cleared in favor of the [Row]
-                // selectable's, to improve usability with screen-readers.
                 RadioButton(
-                    modifier = Modifier.clearAndSetSemantics {},
                     selected = (text == selectedOption),
-                    onClick = { onOptionSelected(text) }
+                    onClick = null // null recommended for accessibility with screenreaders
                 )
                 Text(
                     text = text,
