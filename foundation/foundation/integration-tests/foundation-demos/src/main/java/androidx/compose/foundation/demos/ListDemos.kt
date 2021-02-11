@@ -31,7 +31,6 @@ import androidx.compose.foundation.interaction.collectIsDraggedAsState
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.ExperimentalLayout
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
@@ -140,7 +139,6 @@ private fun ListAddRemoveItemsDemo() {
     }
 }
 
-@OptIn(ExperimentalLayout::class)
 @Composable
 private fun ListHoistedStateDemo() {
     val state = rememberLazyListState()

@@ -25,7 +25,6 @@ import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ColumnScope
-import androidx.compose.foundation.layout.ExperimentalLayout
 import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
@@ -123,7 +122,6 @@ internal fun DropdownMenuContent(
         },
         elevation = MenuElevation
     ) {
-        @OptIn(ExperimentalLayout::class)
         Column(
             modifier = modifier
                 .padding(vertical = DropdownMenuVerticalPadding)
