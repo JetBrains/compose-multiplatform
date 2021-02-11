@@ -11,7 +11,6 @@ import androidx.compose.runtime.ExperimentalComposeApi
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.MonotonicFrameClock
 import androidx.compose.runtime.Recomposer
-import androidx.compose.runtime.emptyContent
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -46,7 +45,7 @@ class ApplicationScope(
     private val scope = CoroutineScope(context)
 
     private val recomposer = Recomposer(context)
-    private val composition = Composition(Unit, EmptyApplier(), recomposer)
+    private val composition = Composition(EmptyApplier(), recomposer)
 
     private val windows = mutableSetOf<AppWindow>()
     private var windowsVersion by mutableStateOf(Any())
@@ -89,7 +88,7 @@ class ApplicationScope(
         resizable: Boolean = true,
         events: WindowEvents = WindowEvents(),
         onDismissRequest: (() -> Unit)? = null,
-        content: @Composable () -> Unit = emptyContent()
+        content: @Composable () -> Unit = {}
     ) {
         var isOpened by remember { mutableStateOf(true) }
         if (isOpened) {
