@@ -34,7 +34,8 @@ sealed class Brush {
 
         /**
          * Creates a linear gradient with the provided colors along the given start and end
-         * coordinates. The colors are dispersed at the provided offset defined in the [ColorStop]
+         * coordinates. The colors are dispersed at the provided offset defined in the
+         * colorstop pair.
          *
          * ```
          *  Brush.linearGradient(
@@ -58,7 +59,7 @@ sealed class Brush {
          */
         @Stable
         fun linearGradient(
-            vararg colorStops: ColorStop,
+            vararg colorStops: Pair<Float, Color>,
             start: Offset = Offset.Zero,
             end: Offset = Offset.Infinite,
             tileMode: TileMode = TileMode.Clamp
@@ -139,7 +140,7 @@ sealed class Brush {
 
         /**
          * Creates a horizontal gradient with the given colors dispersed at the provided offset
-         * defined in the [ColorStop]
+         * defined in the colorstop pair.
          *
          * Ex:
          * ```
@@ -166,7 +167,7 @@ sealed class Brush {
          */
         @Stable
         fun horizontalGradient(
-            vararg colorStops: ColorStop,
+            vararg colorStops: Pair<Float, Color>,
             startX: Float = 0.0f,
             endX: Float = Float.POSITIVE_INFINITY,
             tileMode: TileMode = TileMode.Clamp
@@ -210,7 +211,7 @@ sealed class Brush {
 
         /**
          * Creates a vertical gradient with the given colors at the provided offset defined
-         * in the [ColorStop]
+         * in the [Pair<Float, Color>]
          *
          * Ex:
          * ```
@@ -237,7 +238,7 @@ sealed class Brush {
          */
         @Stable
         fun verticalGradient(
-            vararg colorStops: ColorStop,
+            vararg colorStops: Pair<Float, Color>,
             startY: Float = 0f,
             endY: Float = Float.POSITIVE_INFINITY,
             tileMode: TileMode = TileMode.Clamp
@@ -250,7 +251,7 @@ sealed class Brush {
 
         /**
          * Creates a radial gradient with the given colors at the provided offset
-         * defined in the [ColorStop]
+         * defined in the colorstop pair.
          * ```
          * Brush.radialGradient(
          *      0.0f to Color.Red,
@@ -277,7 +278,7 @@ sealed class Brush {
          */
         @Stable
         fun radialGradient(
-            vararg colorStops: ColorStop,
+            vararg colorStops: Pair<Float, Color>,
             center: Offset = Offset.Unspecified,
             radius: Float = Float.POSITIVE_INFINITY,
             tileMode: TileMode = TileMode.Clamp
@@ -329,7 +330,7 @@ sealed class Brush {
 
         /**
          * Creates a sweep gradient with the given colors dispersed around the center with
-         * offsets defined in each [ColorStop]. The sweep begins relative to 3 o'clock and continues
+         * offsets defined in each colorstop pair. The sweep begins relative to 3 o'clock and continues
          * clockwise until it reaches the starting position again.
          *
          * Ex:
@@ -352,7 +353,7 @@ sealed class Brush {
          */
         @Stable
         fun sweepGradient(
-            vararg colorStops: ColorStop,
+            vararg colorStops: Pair<Float, Color>,
             center: Offset = Offset.Unspecified
         ): Brush = SweepGradient(
             colors = List<Color>(colorStops.size) { i -> colorStops[i].second },
@@ -420,8 +421,6 @@ class SolidColor(val value: Color) : Brush() {
         return "SolidColor(value=$value)"
     }
 }
-
-typealias ColorStop = Pair<Float, Color>
 
 /**
  * Brush implementation used to apply a linear gradient on a given [Paint]

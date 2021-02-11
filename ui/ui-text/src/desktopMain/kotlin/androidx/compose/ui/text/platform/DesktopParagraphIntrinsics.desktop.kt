@@ -15,11 +15,10 @@
  */
 package androidx.compose.ui.text.platform
 
-import androidx.compose.ui.text.AnnotatedString
+import androidx.compose.ui.text.AnnotatedString.Range
 import androidx.compose.ui.text.ParagraphIntrinsics
 import androidx.compose.ui.text.Placeholder
 import androidx.compose.ui.text.SpanStyle
-import androidx.compose.ui.text.SpanStyleRange
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.unit.Density
@@ -29,8 +28,8 @@ import kotlin.math.ceil
 internal actual fun ActualParagraphIntrinsics(
     text: String,
     style: TextStyle,
-    spanStyles: List<AnnotatedString.Range<SpanStyle>>,
-    placeholders: List<AnnotatedString.Range<Placeholder>>,
+    spanStyles: List<Range<SpanStyle>>,
+    placeholders: List<Range<Placeholder>>,
     density: Density,
     resourceLoader: Font.ResourceLoader
 ): ParagraphIntrinsics =
@@ -46,8 +45,8 @@ internal actual fun ActualParagraphIntrinsics(
 internal class DesktopParagraphIntrinsics(
     val text: String,
     style: TextStyle,
-    spanStyles: List<SpanStyleRange>,
-    placeholders: List<AnnotatedString.Range<Placeholder>>,
+    spanStyles: List<Range<SpanStyle>>,
+    placeholders: List<Range<Placeholder>>,
     density: Density,
     resourceLoader: Font.ResourceLoader
 ) : ParagraphIntrinsics {
