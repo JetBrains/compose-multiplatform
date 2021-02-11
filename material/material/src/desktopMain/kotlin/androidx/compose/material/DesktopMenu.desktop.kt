@@ -86,6 +86,7 @@ fun DropdownMenu(
         }
 
         Popup(
+            isFocusable = true,
             onDismissRequest = onDismissRequest,
             popupPositionProvider = popupPositionProvider
         ) {
