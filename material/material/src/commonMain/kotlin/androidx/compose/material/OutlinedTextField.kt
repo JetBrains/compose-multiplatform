@@ -43,7 +43,6 @@ import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.layout.Layout
 import androidx.compose.ui.layout.Placeable
 import androidx.compose.ui.layout.layoutId
-import androidx.compose.ui.text.SoftwareKeyboardController
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
@@ -106,12 +105,7 @@ import kotlin.math.roundToInt
  * @param maxLines the maximum height in terms of maximum number of visible lines. Should be
  * equal or greater than 1. Note that this parameter will be ignored and instead maxLines will be
  * set to 1 if [singleLine] is set to true
- * [KeyboardOptions.imeAction] field. The callback also exposes a [SoftwareKeyboardController]
- * instance as a parameter that can be used to request to hide the software keyboard
- * @param onTextInputStarted a callback to be invoked when the connection with the platform's text
- * input service (e.g. software keyboard on Android) has been established. Called with the
- * [SoftwareKeyboardController] instance that can be used to request to show or hide the software
- * keyboard
+ * [KeyboardOptions.imeAction] field.
  * @param interactionSource the [MutableInteractionSource] representing the stream of
  * [Interaction]s for this OutlinedTextField. You can create and pass in your own remembered
  * [MutableInteractionSource] if you want to observe [Interaction]s and customize the
@@ -138,7 +132,6 @@ fun OutlinedTextField(
     keyboardActions: KeyboardActions = KeyboardActions.Default,
     singleLine: Boolean = false,
     maxLines: Int = Int.MAX_VALUE,
-    onTextInputStarted: (SoftwareKeyboardController) -> Unit = {},
     interactionSource: MutableInteractionSource = remember { MutableInteractionSource() },
     colors: TextFieldColors = TextFieldDefaults.outlinedTextFieldColors()
 ) {
@@ -167,7 +160,6 @@ fun OutlinedTextField(
         keyboardOptions = keyboardOptions,
         keyboardActions = keyboardActions,
         maxLines = maxLines,
-        onTextInputStarted = onTextInputStarted,
         interactionSource = interactionSource,
         colors = colors
     )
@@ -222,12 +214,6 @@ fun OutlinedTextField(
  * @param maxLines the maximum height in terms of maximum number of visible lines. Should be
  * equal or greater than 1. Note that this parameter will be ignored and instead maxLines will be
  * set to 1 if [singleLine] is set to true
- * [KeyboardOptions.imeAction] field. The callback also exposes a [SoftwareKeyboardController]
- * instance as a parameter that can be used to request to hide the software keyboard.
- * @param onTextInputStarted a callback to be invoked when the connection with the platform's text
- * input service (e.g. software keyboard on Android) has been established. Called with the
- * [SoftwareKeyboardController] instance that can be used to request to show or hide the software
- * keyboard
  * @param interactionSource the [MutableInteractionSource] representing the stream of
  * [Interaction]s for this OutlinedTextField. You can create and pass in your own remembered
  * [MutableInteractionSource] if you want to observe [Interaction]s and customize the
@@ -254,7 +240,6 @@ fun OutlinedTextField(
     keyboardActions: KeyboardActions = KeyboardActions(),
     singleLine: Boolean = false,
     maxLines: Int = Int.MAX_VALUE,
-    onTextInputStarted: (SoftwareKeyboardController) -> Unit = {},
     interactionSource: MutableInteractionSource = remember { MutableInteractionSource() },
     colors: TextFieldColors = TextFieldDefaults.outlinedTextFieldColors()
 ) {
@@ -276,7 +261,6 @@ fun OutlinedTextField(
         keyboardOptions = keyboardOptions,
         keyboardActions = keyboardActions,
         maxLines = maxLines,
-        onTextInputStarted = onTextInputStarted,
         interactionSource = interactionSource,
         shape = RectangleShape,
         colors = colors
@@ -296,7 +280,6 @@ internal fun OutlinedTextFieldLayout(
     singleLine: Boolean,
     maxLines: Int = Int.MAX_VALUE,
     visualTransformation: VisualTransformation,
-    onTextInputStarted: (SoftwareKeyboardController) -> Unit,
     interactionSource: MutableInteractionSource,
     decoratedPlaceholder: @Composable ((Modifier) -> Unit)?,
     decoratedLabel: @Composable (() -> Unit)?,
@@ -340,7 +323,6 @@ internal fun OutlinedTextFieldLayout(
         keyboardOptions = keyboardOptions,
         keyboardActions = keyboardActions,
         interactionSource = interactionSource,
-        onTextInputStarted = onTextInputStarted,
         singleLine = singleLine,
         maxLines = maxLines,
         decorationBox = @Composable { coreTextField ->
