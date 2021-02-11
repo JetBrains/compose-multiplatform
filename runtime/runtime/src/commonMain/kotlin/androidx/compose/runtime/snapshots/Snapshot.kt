@@ -164,9 +164,9 @@ sealed class Snapshot(
     /**
      * Notify the snapshot that all objects created in this snapshot to this point should be
      * considered initialized. If any state object is are modified passed this point it will
-     * appear as modified in the snapshot and any applicable [SnapshotWriteObserver] will be
+     * appear as modified in the snapshot and any applicable snapshot write observer will be
      * called for the object and the object will be part of the a set of mutated objects sent to
-     * any applicable [SnapshotApplyObserver].
+     * any applicable snapshot apply observer.
      *
      * Unless [notifyObjectsInitialized] is called, state objects created in a snapshot are not
      * considered modified by the snapshot even if they are modified after construction.
@@ -199,7 +199,7 @@ sealed class Snapshot(
          * [Snapshot.dispose] is called on the result.
          *
          * The [readObserver] parameter can be used to track when all state objects are read when in
-         * [Snapshot.enter]. A [SnapshotApplyObserver] can be registered using
+         * [Snapshot.enter]. A snapshot apply observer can be registered using
          * [Snapshot.registerApplyObserver] to observe modification of state objects.
          *
          * An active snapshot (after it is created but before [Snapshot.dispose] is called) requires
@@ -223,7 +223,6 @@ sealed class Snapshot(
          *
          * @see Snapshot
          * @see Snapshot.registerApplyObserver
-         * @see SnapshotApplyObserver
          */
         fun takeSnapshot(
             readObserver: ((Any) -> Unit)? = null
@@ -327,7 +326,8 @@ sealed class Snapshot(
          * Prior to returning, any changes made to snapshot state (e.g. state holders returned by
          * [androidx.compose.runtime.mutableStateOf] are not visible to other threads. When
          * [withMutableSnapshot] returns successfully those changes will be made visible to other
-         * threads  and any snapshot observers (e.g. [snapshotFlow]) will be notified of changes.
+         * threads  and any snapshot observers (e.g. [androidx.compose.runtime.snapshotFlow]) will
+         * be notified of changes.
          *
          * [block] must not suspend if [withMutableSnapshot] is called from a suspend function.
          */
@@ -431,9 +431,9 @@ sealed class Snapshot(
         /**
          * Notify the snapshot that all objects created in this snapshot to this point should be
          * considered initialized. If any state object is are modified passed this point it will
-         * appear as modified in the snapshot and any applicable [SnapshotWriteObserver] will be
+         * appear as modified in the snapshot and any applicable snapshot write observer will be
          * called for the object and the object will be part of the a set of mutated objects sent to
-         * any applicable [SnapshotApplyObserver].
+         * any applicable snapshot apply observer.
          *
          * Unless [notifyObjectsInitialized] is called, state objects created in a snapshot are not
          * considered modified by the snapshot even if they are modified after construction.
@@ -495,7 +495,7 @@ sealed class Snapshot(
  * Snapshots can be nested by calling [takeNestedSnapshot] or
  * [MutableSnapshot.takeNestedMutableSnapshot].
  *
- * @see takeMutableSnapshot
+ * @see Snapshot.takeMutableSnapshot
  * @see androidx.compose.runtime.mutableStateOf
  * @see androidx.compose.runtime.mutableStateListOf
  * @see androidx.compose.runtime.mutableStateMapOf
