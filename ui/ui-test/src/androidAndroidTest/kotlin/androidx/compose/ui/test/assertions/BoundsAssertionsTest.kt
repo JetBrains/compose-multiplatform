@@ -32,8 +32,6 @@ import androidx.compose.ui.unit.dp
 import androidx.test.filters.MediumTest
 import androidx.compose.ui.test.assertHeightIsAtLeast
 import androidx.compose.ui.test.assertHeightIsEqualTo
-import androidx.compose.ui.test.assertIsEqualTo
-import androidx.compose.ui.test.assertIsNotEqualTo
 import androidx.compose.ui.test.assertLeftPositionInRootIsEqualTo
 import androidx.compose.ui.test.assertPositionInRootIsEqualTo
 import androidx.compose.ui.test.assertTopPositionInRootIsEqualTo
@@ -72,33 +70,6 @@ class BoundsAssertionsTest {
                     )
                 }
             }
-        }
-    }
-
-    @Test
-    fun dp_assertEquals() {
-        5.dp.assertIsEqualTo(5.dp)
-        5.dp.assertIsEqualTo(4.6.dp)
-        5.dp.assertIsEqualTo(5.4.dp)
-    }
-
-    @Test
-    fun dp_assertNotEquals() {
-        5.dp.assertIsNotEqualTo(6.dp)
-    }
-
-    @Test
-    fun dp_assertEquals_fail() {
-        expectError<AssertionError> {
-            5.dp.assertIsEqualTo(6.dp)
-        }
-    }
-
-    @Test
-    fun dp_assertNotEquals_fail() {
-        expectError<AssertionError> {
-            5.dp.assertIsNotEqualTo(5.dp)
-            5.dp.assertIsNotEqualTo(5.4.dp)
         }
     }
 
