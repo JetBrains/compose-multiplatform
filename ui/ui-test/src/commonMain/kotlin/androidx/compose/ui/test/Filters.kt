@@ -16,6 +16,7 @@
 
 package androidx.compose.ui.test
 
+import androidx.compose.ui.geometry.Rect
 import androidx.compose.ui.semantics.ProgressBarRangeInfo
 import androidx.compose.ui.semantics.SemanticsActions
 import androidx.compose.ui.semantics.SemanticsNode
@@ -23,7 +24,11 @@ import androidx.compose.ui.semantics.SemanticsProperties
 import androidx.compose.ui.semantics.getOrNull
 import androidx.compose.ui.state.ToggleableState
 import androidx.compose.ui.text.input.ImeAction
+import androidx.compose.ui.unit.Density
+import androidx.compose.ui.unit.Dp
+import androidx.compose.ui.unit.toSize
 import androidx.compose.ui.util.fastAny
+import kotlin.math.abs
 
 /**
  * Returns whether the node is enabled.
@@ -302,6 +307,142 @@ fun hasSetTextAction() =
     SemanticsMatcher.keyIsDefined(SemanticsActions.SetText)
 
 /**
+ * Returns whether the node has the given [width], within a certain [tolerance]. The default
+ * tolerance is 0.5 dp.
+ *
+ * This is mostly useful in [assertions][assert].
+ *
+ * @see hasWidthAtLeast
+ * @see hasHeight
+ * @see hasHeightAtLeast
+ */
+fun hasWidth(width: Dp, tolerance: Dp = DefaultTolerance): SemanticsMatcher =
+    SemanticsMatcher("width = $width ± $tolerance") { node ->
+        node.withDensity {
+            abs(node.unclippedBoundsInRoot.width - width.toPx()) < tolerance.toPx()
+        }
+    }
+
+/**
+ * Returns whether the node has a width of at least the given [width], with a certain [tolerance].
+ * The default tolerance is 0.5 dp.
+ *
+ * This is mostly useful in [assertions][assert].
+ *
+ * @see hasWidth
+ * @see hasHeight
+ * @see hasHeightAtLeast
+ */
+fun hasWidthAtLeast(width: Dp, tolerance: Dp = DefaultTolerance): SemanticsMatcher =
+    SemanticsMatcher("width > $width - $tolerance") { node ->
+        node.withDensity {
+            node.unclippedBoundsInRoot.width - width.toPx() > -tolerance.toPx()
+        }
+    }
+
+/**
+ * Returns whether the node has the given [height], within a certain [tolerance]. The default
+ * tolerance is 0.5 dp.
+ *
+ * This is mostly useful in [assertions][assert].
+ *
+ * @see hasWidth
+ * @see hasWidthAtLeast
+ * @see hasHeightAtLeast
+ */
+fun hasHeight(height: Dp, tolerance: Dp = DefaultTolerance): SemanticsMatcher =
+    SemanticsMatcher("height = $height ± $tolerance") { node ->
+        node.withDensity {
+            abs(node.unclippedBoundsInRoot.height - height.toPx()) < tolerance.toPx()
+        }
+    }
+
+/**
+ * Returns whether the node has a height of at least the given [height], with a certain
+ * [tolerance]. The default tolerance is 0.5 dp.
+ *
+ * This is mostly useful in [assertions][assert].
+ *
+ * @see hasWidth
+ * @see hasWidthAtLeast
+ * @see hasHeight
+ */
+fun hasHeightAtLeast(height: Dp, tolerance: Dp = DefaultTolerance): SemanticsMatcher =
+    SemanticsMatcher("height > $height - $tolerance") { node ->
+        node.withDensity {
+            node.unclippedBoundsInRoot.height - height.toPx() > -tolerance.toPx()
+        }
+    }
+
+/**
+ * Returns whether the node's left edge relative to the root matches the given [left], within a
+ * certain [tolerance]. The default tolerance is 0.5 dp.
+ *
+ * This is mostly useful in [assertions][assert].
+ *
+ * @see hasTopPosition
+ * @see hasRightPosition
+ * @see hasBottomPosition
+ */
+fun hasLeftPosition(left: Dp, tolerance: Dp = DefaultTolerance): SemanticsMatcher =
+    SemanticsMatcher("left = $left ± $tolerance") { node ->
+        node.withDensity {
+            abs(node.unclippedBoundsInRoot.left - left.toPx()) < tolerance.toPx()
+        }
+    }
+
+/**
+ * Returns whether the node's top edge relative to the root matches the given [top], within a
+ * certain [tolerance]. The default tolerance is 0.5 dp.
+ *
+ * This is mostly useful in [assertions][assert].
+ *
+ * @see hasLeftPosition
+ * @see hasRightPosition
+ * @see hasBottomPosition
+ */
+fun hasTopPosition(top: Dp, tolerance: Dp = DefaultTolerance): SemanticsMatcher =
+    SemanticsMatcher("top = $top ± $tolerance") { node ->
+        node.withDensity {
+            abs(node.unclippedBoundsInRoot.top - top.toPx()) < tolerance.toPx()
+        }
+    }
+
+/**
+ * Returns whether the node's right edge relative to the root matches the given [right], within a
+ * certain [tolerance]. The default tolerance is 0.5 dp.
+ *
+ * This is mostly useful in [assertions][assert].
+ *
+ * @see hasLeftPosition
+ * @see hasTopPosition
+ * @see hasBottomPosition
+ */
+fun hasRightPosition(right: Dp, tolerance: Dp = DefaultTolerance): SemanticsMatcher =
+    SemanticsMatcher("right = $right ± $tolerance") { node ->
+        node.withDensity {
+            abs(node.unclippedBoundsInRoot.right - right.toPx()) < tolerance.toPx()
+        }
+    }
+
+/**
+ * Returns whether the node's bottom edge relative to the root matches the given [bottom], within
+ * a certain [tolerance]. The default tolerance is 0.5 dp.
+ *
+ * This is mostly useful in [assertions][assert].
+ *
+ * @see hasLeftPosition
+ * @see hasTopPosition
+ * @see hasRightPosition
+ */
+fun hasBottomPosition(bottom: Dp, tolerance: Dp = DefaultTolerance): SemanticsMatcher =
+    SemanticsMatcher("bottom = $bottom ± $tolerance") { node ->
+        node.withDensity {
+            abs(node.unclippedBoundsInRoot.bottom - bottom.toPx()) < tolerance.toPx()
+        }
+    }
+
+/**
  * Return whether the node is the root semantics node.
  *
  * There is always one root in every node tree, added implicitly by Compose.
@@ -411,3 +552,11 @@ internal val SemanticsNode.ancestors: Iterable<SemanticsNode>
             }
         }
     }
+
+private val DefaultTolerance = Dp(.5f)
+
+internal val SemanticsNode.unclippedBoundsInRoot: Rect
+    get() = Rect(positionInRoot, size.toSize())
+
+private fun <R> SemanticsNode.withDensity(block: Density.() -> R): R =
+    block.invoke(root!!.density)

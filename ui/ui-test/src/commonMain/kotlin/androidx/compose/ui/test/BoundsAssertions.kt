@@ -16,48 +16,36 @@
 
 package androidx.compose.ui.test
 
-import androidx.compose.ui.layout.AlignmentLine
 import androidx.compose.ui.geometry.Rect
+import androidx.compose.ui.layout.AlignmentLine
 import androidx.compose.ui.semantics.SemanticsNode
 import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.DpRect
-import androidx.compose.ui.unit.toSize
-import kotlin.math.absoluteValue
-
-private const val floatTolerance = 0.5f
 
 /**
  * Asserts that the layout of this node has width equal to [expectedWidth].
  *
  * @throws AssertionError if comparison fails.
  */
-fun SemanticsNodeInteraction.assertWidthIsEqualTo(expectedWidth: Dp): SemanticsNodeInteraction {
-    return withUnclippedBoundsInRoot {
-        it.width.toDp().assertIsEqualTo(expectedWidth, "width")
-    }
-}
+fun SemanticsNodeInteraction.assertWidthIsEqualTo(expectedWidth: Dp): SemanticsNodeInteraction =
+    assert(hasWidth(expectedWidth))
 
 /**
  * Asserts that the layout of this node has height equal to [expectedHeight].
  *
  * @throws AssertionError if comparison fails.
  */
-fun SemanticsNodeInteraction.assertHeightIsEqualTo(expectedHeight: Dp): SemanticsNodeInteraction {
-    return withUnclippedBoundsInRoot {
-        it.height.toDp().assertIsEqualTo(expectedHeight, "height")
-    }
-}
+fun SemanticsNodeInteraction.assertHeightIsEqualTo(expectedHeight: Dp): SemanticsNodeInteraction =
+    assert(hasHeight(expectedHeight))
+
 /**
  * Asserts that the layout of this node has width that is greater ot equal to [expectedMinWidth].
  *
  * @throws AssertionError if comparison fails.
  */
-fun SemanticsNodeInteraction.assertWidthIsAtLeast(expectedMinWidth: Dp): SemanticsNodeInteraction {
-    return withUnclippedBoundsInRoot {
-        isAtLeastOrThrow("width", it.width, expectedMinWidth)
-    }
-}
+fun SemanticsNodeInteraction.assertWidthIsAtLeast(expectedMinWidth: Dp): SemanticsNodeInteraction =
+    assert(hasWidthAtLeast(expectedMinWidth))
 
 /**
  * Asserts that the layout of this node has height that is greater ot equal to [expectedMinHeight].
@@ -66,27 +54,8 @@ fun SemanticsNodeInteraction.assertWidthIsAtLeast(expectedMinWidth: Dp): Semanti
  */
 fun SemanticsNodeInteraction.assertHeightIsAtLeast(
     expectedMinHeight: Dp
-): SemanticsNodeInteraction {
-    return withUnclippedBoundsInRoot {
-        isAtLeastOrThrow("height", it.height, expectedMinHeight)
-    }
-}
-
-/**
-* Returns the bounds of the layout of this node. The bounds are relative to the root composable.
-*/
-fun SemanticsNodeInteraction.getUnclippedBoundsInRoot(): DpRect {
-    lateinit var bounds: DpRect
-    withUnclippedBoundsInRoot {
-        bounds = DpRect(
-            left = it.left.toDp(),
-            top = it.top.toDp(),
-            right = it.right.toDp(),
-            bottom = it.bottom.toDp()
-        )
-    }
-    return bounds
-}
+): SemanticsNodeInteraction =
+    assert(hasHeightAtLeast(expectedMinHeight))
 
 /**
  * Asserts that the layout of this node has position in the root composable that is equal to the
@@ -100,12 +69,8 @@ fun SemanticsNodeInteraction.getUnclippedBoundsInRoot(): DpRect {
 fun SemanticsNodeInteraction.assertPositionInRootIsEqualTo(
     expectedLeft: Dp,
     expectedTop: Dp
-): SemanticsNodeInteraction {
-    return withUnclippedBoundsInRoot {
-        it.left.toDp().assertIsEqualTo(expectedLeft, "left")
-        it.top.toDp().assertIsEqualTo(expectedTop, "top")
-    }
-}
+): SemanticsNodeInteraction =
+    assert(hasLeftPosition(expectedLeft).and(hasTopPosition(expectedTop)))
 
 /**
  * Asserts that the layout of this node has the top position in the root composable that is equal to
@@ -117,11 +82,8 @@ fun SemanticsNodeInteraction.assertPositionInRootIsEqualTo(
  */
 fun SemanticsNodeInteraction.assertTopPositionInRootIsEqualTo(
     expectedTop: Dp
-): SemanticsNodeInteraction {
-    return withUnclippedBoundsInRoot {
-        it.top.toDp().assertIsEqualTo(expectedTop, "top")
-    }
-}
+): SemanticsNodeInteraction =
+    assert(hasTopPosition(expectedTop))
 
 /**
  * Asserts that the layout of this node has the left position in the root composable that is
@@ -133,10 +95,23 @@ fun SemanticsNodeInteraction.assertTopPositionInRootIsEqualTo(
  */
 fun SemanticsNodeInteraction.assertLeftPositionInRootIsEqualTo(
     expectedLeft: Dp
-): SemanticsNodeInteraction {
-    return withUnclippedBoundsInRoot {
-        it.left.toDp().assertIsEqualTo(expectedLeft, "left")
+): SemanticsNodeInteraction =
+    assert(hasLeftPosition(expectedLeft))
+
+/**
+ * Returns the bounds of the layout of this node. The bounds are relative to the root composable.
+ */
+fun SemanticsNodeInteraction.getUnclippedBoundsInRoot(): DpRect {
+    lateinit var bounds: DpRect
+    withUnclippedBoundsInRoot {
+        bounds = DpRect(
+            left = it.left.toDp(),
+            top = it.top.toDp(),
+            right = it.right.toDp(),
+            bottom = it.bottom.toDp()
+        )
     }
+    return bounds
 }
 
 /**
@@ -154,52 +129,20 @@ fun SemanticsNodeInteraction.getAlignmentLinePosition(alignmentLine: AlignmentLi
     }
 }
 
-/**
- * Asserts that this value is equal to the given [expected] value.
- *
- * Performs the comparison with the given [tolerance] or the default one if none is provided. It is
- * recommended to use tolerance when comparing positions and size coming from the framework as there
- * can be rounding operation performed by individual layouts so the values can be slightly off from
- * the expected ones.
- *
- * @param expected The expected value to which this one should be equal to.
- * @param subject Used in the error message to identify which item this assertion failed on.
- * @param tolerance The tolerance within which the values should be treated as equal.
- *
- * @throws AssertionError if comparison fails.
- */
-private fun Dp.assertIsEqualTo(expected: Dp, subject: String = "", tolerance: Dp = Dp(.5f)) {
-    val diff = (this - expected).value.absoluteValue
-    if (diff > tolerance.value) {
-        // Comparison failed, report the error in DPs
-        throw AssertionError(
-            "Actual $subject is $this, expected $expected (tolerance: $tolerance)"
-        )
-    }
+private fun <R> SemanticsNodeInteraction.withDensity(
+    operation: Density.(SemanticsNode) -> R
+): R {
+    val node = fetchSemanticsNode("Failed to retrieve density for the node.")
+    val density = node.root!!.density
+    return operation.invoke(density, node)
 }
 
-internal val SemanticsNode.unclippedBoundsInRoot: Rect
-    get() {
-        return Rect(positionInRoot, size.toSize())
-    }
-
-internal expect fun <R> SemanticsNodeInteraction.withDensity(
-    operation: Density.(SemanticsNode) -> R
-): R
-
-internal expect fun SemanticsNodeInteraction.withUnclippedBoundsInRoot(
+private fun SemanticsNodeInteraction.withUnclippedBoundsInRoot(
     assertion: Density.(Rect) -> Unit
-): SemanticsNodeInteraction
+): SemanticsNodeInteraction {
+    val node = fetchSemanticsNode("Failed to retrieve bounds of the node.")
+    val density = node.root!!.density
 
-private fun Density.isAtLeastOrThrow(
-    subject: String,
-    actualPx: Float,
-    expected: Dp
-) {
-    if (actualPx + floatTolerance < expected.toPx()) {
-        // Comparison failed, report the error in DPs
-        throw AssertionError(
-            "Actual $subject is ${actualPx.toDp()}, expected at least $expected"
-        )
-    }
+    assertion.invoke(density, node.unclippedBoundsInRoot)
+    return this
 }
