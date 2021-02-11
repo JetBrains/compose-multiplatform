@@ -23,14 +23,34 @@ import androidx.compose.ui.text.TextLayoutResult
 
 internal class TextLayoutResultProxy(val value: TextLayoutResult) {
     // TextLayoutResult methods
-    fun getOffsetForPosition(position: Offset): Int {
-        val shiftedOffset = shiftedOffset(position)
-        return value.getOffsetForPosition(shiftedOffset)
+    /**
+     * Translates the position of the touch on the screen to the position in text. Because touch
+     * is relative to the decoration box, we need to translate it to the inner text field's
+     * coordinates first before calculating position of the symbol in text.
+     *
+     * @param position original position of the gesture relative to the decoration box
+     * @param coerceInVisibleBounds if true and original [position] is outside visible bounds
+     * of the inner text field, the [position] will be shifted to the closest edge of the inner
+     * text field's visible bounds. This is useful when you have a decoration box
+     * bigger than the inner text field, so when user touches to the decoration box area, the cursor
+     * goes to the beginning or the end of the visible inner text field; otherwise if we put the
+     * cursor under the touch in the invisible part of the inner text field, it would scroll to
+     * make the cursor visible. This behavior is not needed, and therefore
+     * [coerceInVisibleBounds] should be set to false, when the user drags outside visible bounds
+     * to make a selection.
+     */
+    fun getOffsetForPosition(position: Offset, coerceInVisibleBounds: Boolean = true): Int {
+        val relativePosition = position
+            .let { if (coerceInVisibleBounds) it.coercedInVisibleBoundsOfInputText() else it }
+            .relativeToInputText()
+        return value.getOffsetForPosition(relativePosition)
     }
 
     fun getLineForVerticalPosition(vertical: Float): Int {
-        val shiftedVertical = shiftedOffset(Offset(0f, vertical)).y
-        return value.getLineForVerticalPosition(shiftedVertical)
+        val relativeVertical = Offset(0f, vertical)
+            .coercedInVisibleBoundsOfInputText()
+            .relativeToInputText().y
+        return value.getLineForVerticalPosition(relativeVertical)
     }
 
     fun getLineEnd(lineIndex: Int, visibleEnd: Boolean = false): Int =
@@ -40,10 +60,10 @@ internal class TextLayoutResultProxy(val value: TextLayoutResult) {
      * in the view. Returns false when the position is in the empty space of left/right of text.
      */
     fun isPositionOnText(offset: Offset): Boolean {
-        val shiftedOffset = shiftedOffset(offset)
-        val line = value.getLineForVerticalPosition(shiftedOffset.y)
-        return shiftedOffset.x >= value.getLineLeft(line) &&
-            shiftedOffset.x <= value.getLineRight(line)
+        val relativeOffset = offset.coercedInVisibleBoundsOfInputText().relativeToInputText()
+        val line = value.getLineForVerticalPosition(relativeOffset.y)
+        return relativeOffset.x >= value.getLineLeft(line) &&
+            relativeOffset.x <= value.getLineRight(line)
     }
 
     // Shift offset
@@ -54,19 +74,39 @@ internal class TextLayoutResultProxy(val value: TextLayoutResult) {
     var innerTextFieldCoordinates: LayoutCoordinates? = null
     var decorationBoxCoordinates: LayoutCoordinates? = null
 
-    private fun shiftedOffset(offset: Offset): Offset {
-        // If offset is outside visible bounds of the inner text field, use visible bounds edges
-        val visibleInnerTextFieldRect = innerTextFieldCoordinates?.let { inner ->
-            decorationBoxCoordinates?.localBoundingBoxOf(inner)
-        } ?: Rect.Zero
-        val coercedOffset = offset.coerceIn(visibleInnerTextFieldRect)
-
+    /**
+     * Translates the click happened on the decoration box to the position in the inner text
+     * field coordinates. This relative position is then used to determine symbol position in
+     * text using TextLayoutResult object.
+     */
+    private fun Offset.relativeToInputText(): Offset {
         // Translates touch to the inner text field coordinates
         return innerTextFieldCoordinates?.let { innerTextFieldCoordinates ->
             decorationBoxCoordinates?.let { decorationBoxCoordinates ->
-                innerTextFieldCoordinates.localPositionOf(decorationBoxCoordinates, coercedOffset)
+                if (innerTextFieldCoordinates.isAttached && decorationBoxCoordinates.isAttached) {
+                    innerTextFieldCoordinates.localPositionOf(decorationBoxCoordinates, this)
+                } else {
+                    this
+                }
             }
-        } ?: coercedOffset
+        } ?: this
+    }
+
+    /**
+     * If click on the decoration box happens outside visible inner text field, coerce the click
+     * position to the visible edges of the inner text field.
+     */
+    private fun Offset.coercedInVisibleBoundsOfInputText(): Offset {
+        // If offset is outside visible bounds of the inner text field, use visible bounds edges
+        val visibleInnerTextFieldRect =
+            innerTextFieldCoordinates?.let { innerTextFieldCoordinates ->
+                if (innerTextFieldCoordinates.isAttached) {
+                    decorationBoxCoordinates?.localBoundingBoxOf(innerTextFieldCoordinates)
+                } else {
+                    Rect.Zero
+                }
+            } ?: Rect.Zero
+        return this.coerceIn(visibleInnerTextFieldRect)
     }
 }
 
