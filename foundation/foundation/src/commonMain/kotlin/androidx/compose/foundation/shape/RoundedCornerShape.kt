@@ -79,8 +79,8 @@ class RoundedCornerShape(
     ) = RoundedCornerShape(
         topStart = topStart,
         topEnd = topEnd,
-        bottomEnd = bottomStart,
-        bottomStart = bottomEnd
+        bottomEnd = bottomEnd,
+        bottomStart = bottomStart
     )
 
     override fun toString(): String {

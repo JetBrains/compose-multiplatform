@@ -124,8 +124,8 @@ class AbsoluteRoundedCornerShapeTest(val layoutDirection: LayoutDirection) {
 
         assertEquals(CornerSize(3.dp), original.topStart)
         assertEquals(CornerSize(10.0f), original.topEnd)
-        assertEquals(CornerSize(10.0f), original.bottomEnd)
-        assertEquals(CornerSize(50), original.bottomStart)
+        assertEquals(CornerSize(50), original.bottomEnd)
+        assertEquals(CornerSize(10f), original.bottomStart)
         assertThat(
             AbsoluteRoundedCornerShape(10.0f).copy(
                 topStart = CornerSize(3.dp),
@@ -135,8 +135,8 @@ class AbsoluteRoundedCornerShapeTest(val layoutDirection: LayoutDirection) {
             AbsoluteRoundedCornerShape(
                 topLeft = CornerSize(3.dp),
                 topRight = CornerSize(10.0f),
-                bottomRight = CornerSize(10.0f),
-                bottomLeft = CornerSize(50)
+                bottomRight = CornerSize(50),
+                bottomLeft = CornerSize(10.0f)
             )
         )
     }
@@ -199,6 +199,38 @@ class AbsoluteRoundedCornerShapeTest(val layoutDirection: LayoutDirection) {
                 )
             )
         ).isFalse()
+    }
+
+    @Test
+    fun copyHasCorrectDefaults() {
+        assertEquals(
+            AbsoluteRoundedCornerShape(
+                topLeft = 5.dp,
+                topRight = 6.dp,
+                bottomRight = 3.dp,
+                bottomLeft = 4.dp
+            ),
+            AbsoluteRoundedCornerShape(
+                topLeft = 1.dp,
+                topRight = 2.dp,
+                bottomRight = 3.dp,
+                bottomLeft = 4.dp
+            ).copy(topStart = CornerSize(5.dp), topEnd = CornerSize(6.dp))
+        )
+        assertEquals(
+            AbsoluteRoundedCornerShape(
+                topLeft = 1.dp,
+                topRight = 2.dp,
+                bottomRight = 5.dp,
+                bottomLeft = 6.dp
+            ),
+            AbsoluteRoundedCornerShape(
+                topLeft = 1.dp,
+                topRight = 2.dp,
+                bottomRight = 3.dp,
+                bottomLeft = 4.dp
+            ).copy(bottomEnd = CornerSize(5.dp), bottomStart = CornerSize(6.dp))
+        )
     }
 
     private fun Shape.toOutline() =

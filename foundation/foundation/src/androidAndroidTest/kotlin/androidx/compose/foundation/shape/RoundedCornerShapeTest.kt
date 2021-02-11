@@ -141,8 +141,8 @@ class RoundedCornerShapeTest {
 
         assertEquals(CornerSize(3.dp), original.topStart)
         assertEquals(CornerSize(10.0f), original.topEnd)
-        assertEquals(CornerSize(10.0f), original.bottomEnd)
-        assertEquals(CornerSize(50), original.bottomStart)
+        assertEquals(CornerSize(50), original.bottomEnd)
+        assertEquals(CornerSize(10.0f), original.bottomStart)
         assertThat(
             RoundedCornerShape(10.0f).copy(
                 topStart = CornerSize(3.dp),
@@ -152,8 +152,8 @@ class RoundedCornerShapeTest {
             RoundedCornerShape(
                 topStart = CornerSize(3.dp),
                 topEnd = CornerSize(10.0f),
-                bottomEnd = CornerSize(10.0f),
-                bottomStart = CornerSize(50)
+                bottomEnd = CornerSize(50),
+                bottomStart = CornerSize(10.0f)
             )
         )
     }
@@ -216,6 +216,38 @@ class RoundedCornerShapeTest {
                 )
             )
         ).isFalse()
+    }
+
+    @Test
+    fun copyHasCorrectDefaults() {
+        assertEquals(
+            RoundedCornerShape(
+                topStart = 5.dp,
+                topEnd = 6.dp,
+                bottomEnd = 3.dp,
+                bottomStart = 4.dp
+            ),
+            RoundedCornerShape(
+                topStart = 1.dp,
+                topEnd = 2.dp,
+                bottomEnd = 3.dp,
+                bottomStart = 4.dp
+            ).copy(topStart = CornerSize(5.dp), topEnd = CornerSize(6.dp))
+        )
+        assertEquals(
+            RoundedCornerShape(
+                topStart = 1.dp,
+                topEnd = 2.dp,
+                bottomEnd = 5.dp,
+                bottomStart = 6.dp
+            ),
+            RoundedCornerShape(
+                topStart = 1.dp,
+                topEnd = 2.dp,
+                bottomEnd = 3.dp,
+                bottomStart = 4.dp
+            ).copy(bottomEnd = CornerSize(5.dp), bottomStart = CornerSize(6.dp))
+        )
     }
 
     private fun Shape.toOutline(direction: LayoutDirection = LayoutDirection.Ltr) =
