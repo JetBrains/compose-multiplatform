@@ -33,6 +33,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clipToBounds
 import androidx.compose.ui.layout.SubcomposeLayout
 import androidx.compose.ui.platform.LocalLayoutDirection
+import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.LayoutDirection
 
 internal class ItemContent(
@@ -92,6 +93,9 @@ internal fun LazyList(
             .then(state.remeasurementModifier)
     ) { constraints ->
         constraints.assertNotNestingScrollableContainers(isVertical)
+
+        // Update the state's cached Density
+        state.density = Density(density, fontScale)
 
         // this will update the scope object if the constrains have been changed
         cachingItemContentFactory.updateItemScope(this, constraints)
