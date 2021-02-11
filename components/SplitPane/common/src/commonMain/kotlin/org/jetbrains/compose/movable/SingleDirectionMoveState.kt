@@ -1,6 +1,7 @@
-package org.jetbrains.compose.animation
+package org.jetbrains.compose.movable
 
 import androidx.compose.foundation.InteractionState
+import androidx.compose.foundation.MutatePriority
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
@@ -8,7 +9,8 @@ import androidx.compose.runtime.structuralEqualityPolicy
 
 class SingleDirectionMoveState(
     initial: Float,
-    borders: ClosedFloatingPointRange<Float> = 0f..Float.POSITIVE_INFINITY,
+    minValue: Float = 0f,
+    maxValue: Float = Float.POSITIVE_INFINITY,
     interactionState: InteractionState? = null
 ) : SingleDirectionMovable {
 
@@ -24,22 +26,24 @@ class SingleDirectionMoveState(
             }
         }
 
-    private var _maxValueState = mutableStateOf(borders.endInclusive, structuralEqualityPolicy())
+    private var _maxValueState = mutableStateOf(maxValue, structuralEqualityPolicy())
 
     var minValue: Float
         get() = _minValueState.value
         internal set(newMin) {
-            _minValueState.value = when {
-                newMin < 0f -> 0f
-                newMin > maxValue -> maxValue
-                else -> newMin
-            }
+            _minValueState.value = newMin
             if (value <= newMin) {
                 value = newMin
             }
         }
 
-    private var _minValueState = mutableStateOf(borders.start, structuralEqualityPolicy())
+    private var _minValueState = mutableStateOf(minValue, structuralEqualityPolicy())
+
+    private val singleDirectionMovableState = movableState { onMove(it) }
+
+    internal fun onMove(delta: Float): Float {
+        TODO("Not yet implemented")
+    }
 
     private val singleDirectionMoveScope = object : SingleDirectionMoveScope {
         override fun moveBy(pixels: Float): Float {
@@ -47,10 +51,8 @@ class SingleDirectionMoveState(
         }
     }
 
-    override suspend fun move(
-        block: suspend SingleDirectionMoveScope.() -> Unit
-    ) {
-
+    override suspend fun move(movePriority: MutatePriority, block: suspend SingleDirectionMoveScope.() -> Unit) {
+        TODO("Not yet implemented")
     }
 
     override val isMoveInProgress: Boolean
