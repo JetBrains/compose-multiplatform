@@ -45,7 +45,7 @@ abstract class MetalavaTask @Inject constructor(
     lateinit var bootClasspath: Collection<File>
 
     /** Dependencies of [sourcePaths]. */
-    @get:[InputFiles PathSensitive(PathSensitivity.RELATIVE)]
+    @get:Classpath
     lateinit var dependencyClasspath: FileCollection
 
     /** Source files against which API signatures will be validated. */

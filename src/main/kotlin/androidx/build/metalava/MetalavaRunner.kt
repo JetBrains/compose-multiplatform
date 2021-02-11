@@ -16,7 +16,6 @@
 
 package androidx.build.metalava
 
-import androidx.build.checkapi.ApiBaselinesLocation
 import androidx.build.checkapi.ApiLocation
 import androidx.build.java.JavaCompileInputs
 import androidx.build.logging.TERMINAL_RED
@@ -170,34 +169,23 @@ sealed class ApiLintMode {
     object Skip : ApiLintMode()
 }
 
-sealed class CompatibilityCheckMode {
-    class CheckCompatibility(
-        val referenceApi: ApiLocation,
-        val compatibilityBaseline: ApiBaselinesLocation
-    ) : CompatibilityCheckMode()
-    object Skip : CompatibilityCheckMode()
-}
-
 // Generates all of the specified api files
 fun generateApi(
     metalavaClasspath: FileCollection,
     files: JavaCompileInputs,
     apiLocation: ApiLocation,
     apiLintMode: ApiLintMode,
-    compatibilityCheckMode: CompatibilityCheckMode,
     includeRestrictToLibraryGroupApis: Boolean,
     workerExecutor: WorkerExecutor,
     pathToManifest: String? = null
 ) {
     generateApi(
         metalavaClasspath, files.bootClasspath, files.dependencyClasspath, files.sourcePaths.files,
-        apiLocation, GenerateApiMode.PublicApi, apiLintMode, compatibilityCheckMode,
-        workerExecutor, pathToManifest
+        apiLocation, GenerateApiMode.PublicApi, apiLintMode, workerExecutor, pathToManifest
     )
     generateApi(
         metalavaClasspath, files.bootClasspath, files.dependencyClasspath, files.sourcePaths.files,
-        apiLocation, GenerateApiMode.ExperimentalApi, apiLintMode, CompatibilityCheckMode.Skip,
-        workerExecutor, pathToManifest
+        apiLocation, GenerateApiMode.ExperimentalApi, apiLintMode, workerExecutor, pathToManifest
     )
 
     val restrictedAPIMode = if (includeRestrictToLibraryGroupApis) {
@@ -207,7 +195,7 @@ fun generateApi(
     }
     generateApi(
         metalavaClasspath, files.bootClasspath, files.dependencyClasspath, files.sourcePaths.files,
-        apiLocation, restrictedAPIMode, ApiLintMode.Skip, compatibilityCheckMode, workerExecutor
+        apiLocation, restrictedAPIMode, ApiLintMode.Skip, workerExecutor
     )
     workerExecutor.await()
     val removedApiFile = apiLocation.removedApiFile
@@ -228,13 +216,12 @@ private fun generateApi(
     outputLocation: ApiLocation,
     generateApiMode: GenerateApiMode,
     apiLintMode: ApiLintMode,
-    compatibilityCheckMode: CompatibilityCheckMode,
     workerExecutor: WorkerExecutor,
     pathToManifest: String? = null
 ) {
     val args = getGenerateApiArgs(
         bootClasspath, dependencyClasspath, sourcePaths, outputLocation,
-        generateApiMode, apiLintMode, compatibilityCheckMode, pathToManifest
+        generateApiMode, apiLintMode, pathToManifest
     )
     runMetalavaWithArgs(metalavaClasspath, args, workerExecutor)
 }
@@ -247,7 +234,6 @@ fun getGenerateApiArgs(
     outputLocation: ApiLocation?,
     generateApiMode: GenerateApiMode,
     apiLintMode: ApiLintMode,
-    compatibilityCheckMode: CompatibilityCheckMode,
     pathToManifest: String? = null
 ): List<String> {
     // generate public API txt
@@ -359,48 +345,6 @@ fun getGenerateApiArgs(
                     "ReferencesDeprecated"
                 )
             )
-        }
-    }
-
-    if (compatibilityCheckMode is CompatibilityCheckMode.CheckCompatibility) {
-        lateinit var baseline: File
-        var oldRemovedApi: File? = null
-        lateinit var referenceApi: File
-        when (generateApiMode) {
-            is GenerateApiMode.PublicApi -> {
-                referenceApi = compatibilityCheckMode.referenceApi.publicApiFile
-                oldRemovedApi = compatibilityCheckMode.referenceApi.removedApiFile
-                baseline = compatibilityCheckMode.compatibilityBaseline.publicApiFile
-            }
-            is GenerateApiMode.RestrictToLibraryGroupPrefixApis -> {
-                referenceApi = compatibilityCheckMode.referenceApi.restrictedApiFile
-                baseline = compatibilityCheckMode.compatibilityBaseline.restrictedApiFile
-            }
-            is GenerateApiMode.AllRestrictedApis -> {
-                referenceApi = compatibilityCheckMode.referenceApi.restrictedApiFile
-                baseline = compatibilityCheckMode.compatibilityBaseline.restrictedApiFile
-            }
-            else -> { throw Exception("Unexpected compatibility check type") }
-        }
-        args.addAll(
-            listOf(
-                "--check-compatibility:api:released",
-                referenceApi.toString(),
-                "--error-message:compatibility:released",
-                """
-    ${TERMINAL_RED}Your change has API compatibility issues. Fix the code according to the messages above.$TERMINAL_RESET
-
-    If you *intentionally* want to break compatibility, you can suppress it with
-    ./gradlew ignoreApiChanges -Pforce=true && ./gradlew updateApi
-"""
-            )
-        )
-
-        if (oldRemovedApi != null && oldRemovedApi.exists()) {
-            args.addAll(listOf("--check-compatibility:removed:released", oldRemovedApi.toString()))
-        }
-        if (baseline.exists()) {
-            args.addAll(listOf("--baseline:compatibility:released", baseline.toString()))
         }
     }
 
