@@ -39,6 +39,7 @@ import androidx.compose.ui.node.OwnedLayer
 import androidx.compose.ui.node.Owner
 import androidx.compose.ui.node.OwnerSnapshotObserver
 import androidx.compose.ui.node.RootForTest
+import androidx.compose.ui.platform.AccessibilityManager
 import androidx.compose.ui.platform.ClipboardManager
 import androidx.compose.ui.platform.TextToolbar
 import androidx.compose.ui.platform.ViewConfiguration
@@ -3024,6 +3025,8 @@ private class TestOwner : Owner {
     override val hapticFeedBack: HapticFeedback
         get() = TODO("Not yet implemented")
     override val clipboardManager: ClipboardManager
+        get() = TODO("Not yet implemented")
+    override val accessibilityManager: AccessibilityManager
         get() = TODO("Not yet implemented")
     override val textToolbar: TextToolbar
         get() = TODO("Not yet implemented")
