@@ -481,8 +481,8 @@ fun shrinkVertically(
 }
 
 /**
- * This slides in the content horizontally, from a starting offset defined in
- * [initialOffsetX] to `0`. The direction of the slide can be controlled by configuring the
+ * This slides in the content horizontally, from a starting offset defined in [initialOffsetX] to
+ * `0` **pixels**. The direction of the slide can be controlled by configuring the
  * [initialOffsetX]. A positive value means sliding from right to left, whereas a negative
  * value would slide the content from left to right.
  *
@@ -493,7 +493,7 @@ fun shrinkVertically(
  *
  * @sample androidx.compose.animation.samples.SlideTransition
  *
- * @param initialOffsetX a lambda that takes the full width of the content and returns the
+ * @param initialOffsetX a lambda that takes the full width of the content in pixels and returns the
  *                             initial offset for the slide-in, by default it returns `-fullWidth/2`
  * @param animationSpec the animation used for the slide-in, [spring] by default.
  */
@@ -509,8 +509,8 @@ fun slideInHorizontally(
     )
 
 /**
- * This slides in the content vertically, from a starting offset defined in
- * [initialOffsetY] to `0`. The direction of the slide can be controlled by configuring the
+ * This slides in the content vertically, from a starting offset defined in [initialOffsetY] to `0`
+ * in **pixels**. The direction of the slide can be controlled by configuring the
  * [initialOffsetY]. A positive initial offset means sliding up, whereas a negative value would
  * slide the content down.
  *
@@ -537,8 +537,8 @@ fun slideInVertically(
     )
 
 /**
- * This slides out the content horizontally, from 0 to a target offset defined in
- * [targetOffsetX]. The direction of the slide can be controlled by configuring the
+ * This slides out the content horizontally, from 0 to a target offset defined in [targetOffsetX]
+ * in **pixels**. The direction of the slide can be controlled by configuring the
  * [targetOffsetX]. A positive value means sliding to the right, whereas a negative
  * value would slide the content towards the left.
  *
@@ -565,8 +565,8 @@ fun slideOutHorizontally(
     )
 
 /**
- * This slides out the content vertically, from 0 to a target offset defined in
- * [targetOffsetY]. The direction of the slide-out can be controlled by configuring the
+ * This slides out the content vertically, from 0 to a target offset defined in [targetOffsetY]
+ * in **pixels**. The direction of the slide-out can be controlled by configuring the
  * [targetOffsetY]. A positive target offset means sliding down, whereas a negative value would
  * slide the content up.
  *

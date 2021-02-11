@@ -34,7 +34,7 @@ import kotlinx.coroutines.CancellationException
  *
  * Unlike [AnimationState], [Animatable] ensures *mutual exclusiveness* on its animations. To
  * achieve this, when a new animation is started via [animateTo] (or [animateDecay]), any ongoing
- * animation will be canceled.
+ * animation will be canceled via a [CancellationException].
  *
  * @sample androidx.compose.animation.core.samples.AnimatableAnimateToGenericsType
  *
@@ -42,6 +42,9 @@ import kotlinx.coroutines.CancellationException
  * @param typeConverter A two-way converter that converts the given type [T] from and to
  *                      [AnimationVector]
  * @param visibilityThreshold Threshold at which the animation may round off to its target value.
+ *
+ * @see animateTo
+ * @see animateDecay
  */
 @Suppress("NotCloseable")
 class Animatable<T, V : AnimationVector>(
@@ -87,7 +90,7 @@ class Animatable<T, V : AnimationVector>(
         private set
 
     /**
-     * Lower bound of the animation. Defaults to null, which means no lower bound. Bounds can be
+     * Lower bound of the animation, null by default (meaning no lower bound). Bounds can be
      * changed using [updateBounds].
      *
      * Animation will stop as soon as *any* dimension specified in [lowerBound] is reached. For
@@ -98,7 +101,7 @@ class Animatable<T, V : AnimationVector>(
         private set
 
     /**
-     * Upper bound of the animation. Defaults to null, which means no upper bound. Bounds can be
+     * Upper bound of the animation, null by default (meaning no upper bound). Bounds can be
      * changed using [updateBounds].
      *
      * Animation will stop as soon as *any* dimension specified in [upperBound] is reached. For
@@ -173,12 +176,11 @@ class Animatable<T, V : AnimationVector>(
     }
 
     /**
-     * Sets the target value, which effectively starts an animation to change the value from [value]
-     * to the [targetValue]. If there is already an animation in-flight, this method will cancel
-     * the ongoing animation and start a new animation continuing the current [value] and
-     * [velocity]. It's recommended to set the optional [initialVelocity] only when [animateTo] is
-     * used immediately after a fling. In most of the other cases, altering velocity would result
-     * in visual discontinuity.
+     * Starts an animation to animate from [value] to the provided [targetValue]. If there is
+     * already an animation in-flight, this method will cancel the ongoing animation before
+     * starting a new animation continuing the current [value] and [velocity]. It's recommended to
+     * set the optional [initialVelocity] only when [animateTo] is used immediately after a fling.
+     * In most of the other cases, altering velocity would result in visual discontinuity.
      *
      * The animation will use the provided [animationSpec] to animate the value towards the
      * [targetValue]. When no [animationSpec] is specified, a [spring] will be used.  [block] will
@@ -192,8 +194,11 @@ class Animatable<T, V : AnimationVector>(
      *    dimension, the animation will end with [BoundReached] being the end reason.
      *
      * If the animation gets interrupted by 1) another call to start an animation
-     * (i.e. [animateTo]/[animateDecay]), 2) [Animatable.stop], or 3)[Animatable.snapTo], it will
-     * throw a [CancellationException] as the job gets canceled.
+     * (i.e. [animateTo]/[animateDecay]), 2) [Animatable.stop], or 3)[Animatable.snapTo], the
+     * canceled animation will throw a [CancellationException] as the job gets canceled. As a
+     * result, all the subsequent work in the caller's coroutine will be canceled. This is often
+     * the desired behavior. If there's any cleanup that needs to be done when an animation gets
+     * canceled, consider starting the animation in a `try-catch` block.
      *
      * __Note__: once the animation ends, its velocity will be reset to 0. The animation state at
      * the point of interruption/reaching bound is captured in the returned [AnimationResult].
@@ -201,7 +206,6 @@ class Animatable<T, V : AnimationVector>(
      * or reached the bound, it's recommended to use the velocity in the returned
      * [AnimationResult.endState] to start another animation.
      *
-     * @sample androidx.compose.animation.core.samples.AnimatableAnimateToGenericsType
      * @sample androidx.compose.animation.core.samples.AnimatableFadeIn
      */
     suspend fun animateTo(
@@ -221,10 +225,10 @@ class Animatable<T, V : AnimationVector>(
     }
 
     /**
-     * Starts an animation that slows down from the given [initialVelocity] starting at
-     * current [Animatable.value] until the velocity reaches 0. If there's already an ongoing
-     * animation, the animation in-flight will be immediately cancelled. Decay animation is often
-     * used after a fling gesture.
+     * Start a decay animation (i.e. an animation that *slows down* from the given
+     * [initialVelocity] starting at current [Animatable.value] until the velocity reaches 0.
+     * If there's already an ongoing animation, the animation in-flight will be immediately
+     * cancelled. Decay animation is often used after a fling gesture.
      *
      * [animationSpec] defines the decay animation that will be used for this animation. Some
      * options for this [animationSpec] include: [splineBasedDecay][androidx.compose
@@ -233,13 +237,16 @@ class Animatable<T, V : AnimationVector>(
      *
      * Returns an [AnimationResult] object, that contains the [reason][AnimationEndReason] for
      * ending the animation, and an end state of the animation. The reason for ending the animation
-     * will be [Finished], when the animation finishes successfully without any interruption.
+     * will be [Finished] if the animation finishes successfully without any interruption.
      * If the animation reaches the either [lowerBound] or [upperBound] in any dimension, the
      * animation will end with [BoundReached] being the end reason.
      *
      * If the animation gets interrupted by 1) another call to start an animation
-     * (i.e. [animateTo]/[animateDecay]), 2) [Animatable.stop], or 3)[Animatable.snapTo], it will
-     * throw a [CancellationException] as the job gets canceled.
+     * (i.e. [animateTo]/[animateDecay]), 2) [Animatable.stop], or 3)[Animatable.snapTo], the
+     * canceled animation will throw a [CancellationException] as the job gets canceled. As a
+     * result, all the subsequent work in the caller's coroutine will be canceled. This is often
+     * the desired behavior. If there's any cleanup that needs to be done when an animation gets
+     * canceled, consider starting the animation in a `try-catch` block.
      *
      * __Note__, once the animation ends, its velocity will be reset to 0. If there's a need to
      * continue the momentum before the animation gets interrupted or reaches the bound, it's
@@ -342,10 +349,17 @@ class Animatable<T, V : AnimationVector>(
     }
 
     /**
-     * Sets the current value to the target value immediately, without any animation. This will
-     * also cancel any on-going animation
+     * Sets the current value to the target value, without any animation. This will also cancel any
+     * on-going animation with a [CancellationException]. This function will return *after*
+     * canceling any on-going animation and updating the [value] to the provided [targetValue].
+     *
+     * See [animateTo] and [animateDecay] for more details about animation being canceled.
      *
      * @param targetValue The new target value to set [value] to.
+     *
+     * @see animateTo
+     * @see animateDecay
+     * @see stop
      */
     suspend fun snapTo(targetValue: T) {
         mutatorMutex.mutate {
@@ -356,9 +370,18 @@ class Animatable<T, V : AnimationVector>(
     }
 
     /**
-     * Stops any on-going animation. No op if no animation is running. Note that this method does
-     * not skip the animation value to its target value. Rather the animation will be stopped in its
-     * track.
+     * Stops any on-going animation with a [CancellationException].
+     *
+     * This function will not return until the ongoing animation has been canceled (if any).
+     * Note, [stop] function does **not** skip the animation value to its target value. Rather the
+     * animation will be stopped in its track. Consider [snapTo] if it's desired to not only stop
+     * the animation but also snap the [value] to a given value.
+     *
+     * See [animateTo] and [animateDecay] for more details about animation being canceled.
+     *
+     * @see animateTo
+     * @see animateDecay
+     * @see snapTo
      */
     suspend fun stop() {
         mutatorMutex.mutate {
@@ -387,7 +410,7 @@ class Animatable<T, V : AnimationVector>(
  * do so, when a new animation is started via [animateTo] (or [animateDecay]), any ongoing
  * animation job will be cancelled.
  *
- * @sample androidx.compose.animation.core.samples.AnimatableDecayAndAnimateToSample
+ * @sample androidx.compose.animation.core.samples.AnimatableFadeIn
  *
  * @param initialValue initial value of the animatable value holder
  * @param visibilityThreshold Threshold at which the animation may round off to its target value.
@@ -416,6 +439,18 @@ fun Animatable(
  * @sample androidx.compose.animation.core.samples.AnimatableAnimationResultSample
  */
 class AnimationResult<T, V : AnimationVector>(
+    /**
+     * The state of the animation in its last frame before it's canceled or reset. This captures
+     * the animation value/velocity/frame time, etc at the point of interruption, or before the
+     * velocity is reset when the animation finishes successfully.
+     */
     val endState: AnimationState<T, V>,
+    /**
+     * The reason why the animation has ended. Could be either of the following:
+     * -  [Finished], when the animation finishes successfully without any interruption
+     * -  [BoundReached] If the animation reaches the either [lowerBound][Animatable.lowerBound] or
+     *    [upperBound][Animatable.upperBound] in any dimension, the animation will end with
+     *    [BoundReached] being the end reason.
+     */
     val endReason: AnimationEndReason
 )
