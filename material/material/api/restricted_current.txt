@@ -522,14 +522,24 @@ package androidx.compose.material {
   public final class ShapesKt {
   }
 
+  @androidx.compose.runtime.Stable public interface SliderColors {
+    method @androidx.compose.runtime.Composable public androidx.compose.runtime.State<androidx.compose.ui.graphics.Color> thumbColor(boolean enabled);
+    method @androidx.compose.runtime.Composable public androidx.compose.runtime.State<androidx.compose.ui.graphics.Color> tickColor(boolean enabled, boolean active);
+    method @androidx.compose.runtime.Composable public androidx.compose.runtime.State<androidx.compose.ui.graphics.Color> trackColor(boolean enabled, boolean active);
+  }
+
   public final class SliderDefaults {
+    method @androidx.compose.runtime.Composable public androidx.compose.material.SliderColors colors-kU-unao(optional long thumbColor, optional long disabledThumbColor, optional long activeTrackColor, optional long inactiveTrackColor, optional long disabledActiveTrackColor, optional long disabledInactiveTrackColor, optional long activeTickColor, optional long inactiveTickColor, optional long disabledActiveTickColor, optional long disabledInactiveTickColor);
+    field public static final float DisabledActiveTrackAlpha = 0.32f;
+    field public static final float DisabledInactiveTrackAlpha = 0.12f;
+    field public static final float DisabledTickAlpha = 0.12f;
     field public static final androidx.compose.material.SliderDefaults INSTANCE;
-    field public static final float InactiveTrackColorAlpha = 0.24f;
-    field public static final float TickColorAlpha = 0.54f;
+    field public static final float InactiveTrackAlpha = 0.24f;
+    field public static final float TickAlpha = 0.54f;
   }
 
   public final class SliderKt {
-    method @androidx.compose.runtime.Composable public static void Slider-7LIuTVc(float value, kotlin.jvm.functions.Function1<? super java.lang.Float,kotlin.Unit> onValueChange, optional androidx.compose.ui.Modifier modifier, optional kotlin.ranges.ClosedFloatingPointRange<java.lang.Float> valueRange, optional int steps, optional kotlin.jvm.functions.Function0<kotlin.Unit>? onValueChangeFinished, optional androidx.compose.foundation.InteractionState interactionState, optional long thumbColor, optional long activeTrackColor, optional long inactiveTrackColor, optional long activeTickColor, optional long inactiveTickColor);
+    method @androidx.compose.runtime.Composable public static void Slider(float value, kotlin.jvm.functions.Function1<? super java.lang.Float,kotlin.Unit> onValueChange, optional androidx.compose.ui.Modifier modifier, optional boolean enabled, optional kotlin.ranges.ClosedFloatingPointRange<java.lang.Float> valueRange, optional int steps, optional kotlin.jvm.functions.Function0<kotlin.Unit>? onValueChangeFinished, optional androidx.compose.foundation.InteractionState interactionState, optional androidx.compose.material.SliderColors colors);
   }
 
   public interface SnackbarData {

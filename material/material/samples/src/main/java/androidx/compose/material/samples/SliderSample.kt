@@ -19,6 +19,7 @@ package androidx.compose.material.samples
 import androidx.annotation.Sampled
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Slider
+import androidx.compose.material.SliderDefaults
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -48,7 +49,9 @@ fun StepsSliderSample() {
             // viewModel.updateSelectedSliderValue(sliderPosition)
         },
         steps = 5,
-        thumbColor = MaterialTheme.colors.secondary,
-        activeTrackColor = MaterialTheme.colors.secondary
+        colors = SliderDefaults.colors(
+            thumbColor = MaterialTheme.colors.secondary,
+            activeTrackColor = MaterialTheme.colors.secondary
+        )
     )
 }
