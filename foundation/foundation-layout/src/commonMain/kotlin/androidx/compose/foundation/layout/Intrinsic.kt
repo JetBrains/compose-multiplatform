@@ -45,8 +45,8 @@ import androidx.compose.ui.unit.constrain
 @ExperimentalLayout
 @Stable
 fun Modifier.width(intrinsicSize: IntrinsicSize) = when (intrinsicSize) {
-    IntrinsicSize.Min -> this.then(PreferredMinIntrinsicWidthModifier)
-    IntrinsicSize.Max -> this.then(PreferredMaxIntrinsicWidthModifier)
+    IntrinsicSize.Min -> this.then(MinIntrinsicWidthModifier)
+    IntrinsicSize.Max -> this.then(MaxIntrinsicWidthModifier)
 }
 
 /**
@@ -66,8 +66,44 @@ fun Modifier.width(intrinsicSize: IntrinsicSize) = when (intrinsicSize) {
 @ExperimentalLayout
 @Stable
 fun Modifier.height(intrinsicSize: IntrinsicSize) = when (intrinsicSize) {
-    IntrinsicSize.Min -> this.then(PreferredMinIntrinsicHeightModifier)
-    IntrinsicSize.Max -> this.then(PreferredMaxIntrinsicHeightModifier)
+    IntrinsicSize.Min -> this.then(MinIntrinsicHeightModifier)
+    IntrinsicSize.Max -> this.then(MaxIntrinsicHeightModifier)
+}
+
+/**
+ * Declare the width of the content to be exactly the same as the min or max intrinsic width of
+ * the content. The incoming measurement [Constraints] will not override this value. If the content
+ * intrinsic width does not satisfy the incoming [Constraints], the parent layout will be
+ * reported a size coerced in the [Constraints], and the position of the content will be
+ * automatically offset to be centered on the space assigned to the child by the parent layout under
+ * the assumption that [Constraints] were respected.
+ *
+ * See [height] for options of sizing to intrinsic height.
+ * See [width] and [widthIn] for options to set the preferred width.
+ * See [requiredWidth] and [requiredWidthIn] for other options to set the required width.
+ */
+@Stable
+fun Modifier.requiredWidth(intrinsicSize: IntrinsicSize) = when (intrinsicSize) {
+    IntrinsicSize.Min -> this.then(RequiredMinIntrinsicWidthModifier)
+    IntrinsicSize.Max -> this.then(RequiredMaxIntrinsicWidthModifier)
+}
+
+/**
+ * Declare the height of the content to be exactly the same as the min or max intrinsic height of
+ * the content. The incoming measurement [Constraints] will not override this value. If the content
+ * intrinsic height does not satisfy the incoming [Constraints], the parent layout will be
+ * reported a size coerced in the [Constraints], and the position of the content will be
+ * automatically offset to be centered on the space assigned to the child by the parent layout under
+ * the assumption that [Constraints] were respected.
+ *
+ * See [width] for options of sizing to intrinsic width.
+ * See [height] and [heightIn] for options to set the preferred height.
+ * See [requiredHeight] and [requiredHeightIn] for other options to set the required height.
+ */
+@Stable
+fun Modifier.requiredHeight(intrinsicSize: IntrinsicSize) = when (intrinsicSize) {
+    IntrinsicSize.Min -> this.then(RequiredMinIntrinsicHeightModifier)
+    IntrinsicSize.Max -> this.then(RequiredMaxIntrinsicHeightModifier)
 }
 
 /**
@@ -75,7 +111,7 @@ fun Modifier.height(intrinsicSize: IntrinsicSize) = when (intrinsicSize) {
  */
 enum class IntrinsicSize { Min, Max }
 
-private object PreferredMinIntrinsicWidthModifier : PreferredIntrinsicSizeModifier {
+private object MinIntrinsicWidthModifier : IntrinsicSizeModifier {
     override fun MeasureScope.calculateContentConstraints(
         measurable: Measurable,
         constraints: Constraints
@@ -90,7 +126,7 @@ private object PreferredMinIntrinsicWidthModifier : PreferredIntrinsicSizeModifi
     ) = measurable.minIntrinsicWidth(height)
 }
 
-private object PreferredMinIntrinsicHeightModifier : PreferredIntrinsicSizeModifier {
+private object MinIntrinsicHeightModifier : IntrinsicSizeModifier {
     override fun MeasureScope.calculateContentConstraints(
         measurable: Measurable,
         constraints: Constraints
@@ -105,7 +141,7 @@ private object PreferredMinIntrinsicHeightModifier : PreferredIntrinsicSizeModif
     ) = measurable.minIntrinsicHeight(width)
 }
 
-private object PreferredMaxIntrinsicWidthModifier : PreferredIntrinsicSizeModifier {
+private object MaxIntrinsicWidthModifier : IntrinsicSizeModifier {
     override fun MeasureScope.calculateContentConstraints(
         measurable: Measurable,
         constraints: Constraints
@@ -120,7 +156,7 @@ private object PreferredMaxIntrinsicWidthModifier : PreferredIntrinsicSizeModifi
     ) = measurable.maxIntrinsicWidth(height)
 }
 
-private object PreferredMaxIntrinsicHeightModifier : PreferredIntrinsicSizeModifier {
+private object MaxIntrinsicHeightModifier : IntrinsicSizeModifier {
     override fun MeasureScope.calculateContentConstraints(
         measurable: Measurable,
         constraints: Constraints
@@ -135,7 +171,77 @@ private object PreferredMaxIntrinsicHeightModifier : PreferredIntrinsicSizeModif
     ) = measurable.maxIntrinsicHeight(width)
 }
 
-private interface PreferredIntrinsicSizeModifier : LayoutModifier {
+private object RequiredMinIntrinsicWidthModifier : IntrinsicSizeModifier {
+    override val enforceIncoming: Boolean = false
+
+    override fun MeasureScope.calculateContentConstraints(
+        measurable: Measurable,
+        constraints: Constraints
+    ): Constraints {
+        val width = measurable.minIntrinsicWidth(constraints.maxHeight)
+        return Constraints.fixedWidth(width)
+    }
+
+    override fun IntrinsicMeasureScope.maxIntrinsicWidth(
+        measurable: IntrinsicMeasurable,
+        height: Int
+    ) = measurable.minIntrinsicWidth(height)
+}
+
+private object RequiredMinIntrinsicHeightModifier : IntrinsicSizeModifier {
+    override val enforceIncoming: Boolean = false
+
+    override fun MeasureScope.calculateContentConstraints(
+        measurable: Measurable,
+        constraints: Constraints
+    ): Constraints {
+        val height = measurable.minIntrinsicHeight(constraints.maxWidth)
+        return Constraints.fixedHeight(height)
+    }
+
+    override fun IntrinsicMeasureScope.maxIntrinsicHeight(
+        measurable: IntrinsicMeasurable,
+        width: Int
+    ) = measurable.minIntrinsicHeight(width)
+}
+
+private object RequiredMaxIntrinsicWidthModifier : IntrinsicSizeModifier {
+    override val enforceIncoming: Boolean = false
+
+    override fun MeasureScope.calculateContentConstraints(
+        measurable: Measurable,
+        constraints: Constraints
+    ): Constraints {
+        val width = measurable.maxIntrinsicWidth(constraints.maxHeight)
+        return Constraints.fixedWidth(width)
+    }
+
+    override fun IntrinsicMeasureScope.minIntrinsicWidth(
+        measurable: IntrinsicMeasurable,
+        height: Int
+    ) = measurable.maxIntrinsicWidth(height)
+}
+
+private object RequiredMaxIntrinsicHeightModifier : IntrinsicSizeModifier {
+    override val enforceIncoming: Boolean = false
+
+    override fun MeasureScope.calculateContentConstraints(
+        measurable: Measurable,
+        constraints: Constraints
+    ): Constraints {
+        val height = measurable.maxIntrinsicHeight(constraints.maxWidth)
+        return Constraints.fixedHeight(height)
+    }
+
+    override fun IntrinsicMeasureScope.minIntrinsicHeight(
+        measurable: IntrinsicMeasurable,
+        width: Int
+    ) = measurable.maxIntrinsicHeight(width)
+}
+
+private interface IntrinsicSizeModifier : LayoutModifier {
+    val enforceIncoming: Boolean get() = true
+
     fun MeasureScope.calculateContentConstraints(
         measurable: Measurable,
         constraints: Constraints
@@ -145,8 +251,9 @@ private interface PreferredIntrinsicSizeModifier : LayoutModifier {
         measurable: Measurable,
         constraints: Constraints
     ): MeasureResult {
+        val contentConstraints = calculateContentConstraints(measurable, constraints)
         val placeable = measurable.measure(
-            constraints.constrain(calculateContentConstraints(measurable, constraints))
+            if (enforceIncoming) constraints.constrain(contentConstraints) else contentConstraints
         )
         return layout(placeable.width, placeable.height) {
             placeable.placeRelative(IntOffset.Zero)
