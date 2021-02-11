@@ -52,8 +52,6 @@ package androidx.compose.ui.test {
   public final class BoundsAssertionsKt {
     method public static androidx.compose.ui.test.SemanticsNodeInteraction assertHeightIsAtLeast-3AN6ZEs(androidx.compose.ui.test.SemanticsNodeInteraction, float expectedMinHeight);
     method public static androidx.compose.ui.test.SemanticsNodeInteraction assertHeightIsEqualTo-3AN6ZEs(androidx.compose.ui.test.SemanticsNodeInteraction, float expectedHeight);
-    method public static void assertIsEqualTo-nR2IGDg(float, float expected, optional String subject, optional float tolerance);
-    method public static void assertIsNotEqualTo-nR2IGDg(float, float unexpected, optional String subject, optional float tolerance);
     method public static androidx.compose.ui.test.SemanticsNodeInteraction assertLeftPositionInRootIsEqualTo-3AN6ZEs(androidx.compose.ui.test.SemanticsNodeInteraction, float expectedLeft);
     method public static androidx.compose.ui.test.SemanticsNodeInteraction assertPositionInRootIsEqualTo-aELHoiQ(androidx.compose.ui.test.SemanticsNodeInteraction, float expectedLeft, float expectedTop);
     method public static androidx.compose.ui.test.SemanticsNodeInteraction assertTopPositionInRootIsEqualTo-3AN6ZEs(androidx.compose.ui.test.SemanticsNodeInteraction, float expectedTop);
