@@ -6,7 +6,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
 
 interface SingleDirectionMoveScope {
-    fun moveBy(pixels: Float): Float
+    fun moveBy(pixels: Float)
 }
 
 interface SingleDirectionMovable {
@@ -21,10 +21,10 @@ interface SingleDirectionMovable {
 }
 
 interface SingleDirectionRawMovementDispatcher : SingleDirectionMovable {
-    fun dispatchRawMovement(delta: Float): Float
+    fun dispatchRawMovement(delta: Float)
 }
 
-typealias SingleDirectionMoveDeltaConsumer = (Float) -> Float
+typealias SingleDirectionMoveDeltaConsumer = (Float) -> Unit
 
 fun movableState(
     consumeMoveDelta: SingleDirectionMoveDeltaConsumer
@@ -50,7 +50,7 @@ private class DefaultSingleDirectionMovableState(
 ) : SingleDirectionRawMovementDispatcher {
 
     private val singleDirectionMoveScope = object : SingleDirectionMoveScope {
-        override fun moveBy(pixels: Float): Float = onMoveDelta(pixels)
+        override fun moveBy(pixels: Float) = onMoveDelta(pixels)
     }
 
     private val moveMutex = MutatorMutex()
@@ -71,7 +71,7 @@ private class DefaultSingleDirectionMovableState(
     override val isMoveInProgress: Boolean
         get() = isMovingState.value
 
-    override fun dispatchRawMovement(delta: Float): Float {
+    override fun dispatchRawMovement(delta: Float) {
         return onMoveDelta(delta)
     }
 }

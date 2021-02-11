@@ -41,12 +41,12 @@ class SingleDirectionMoveState(
 
     private val singleDirectionMovableState = movableState { onMove(it) }
 
-    internal fun onMove(delta: Float): Float {
+    internal fun onMove(delta: Float) {
         TODO("Not yet implemented")
     }
 
     private val singleDirectionMoveScope = object : SingleDirectionMoveScope {
-        override fun moveBy(pixels: Float): Float {
+        override fun moveBy(pixels: Float) {
             TODO("Not yet implemented")
         }
     }
