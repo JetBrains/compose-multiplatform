@@ -205,7 +205,7 @@ class LayoutInspectorTreeTest : ToolingTest() {
                 name = "MaterialTheme",
                 hasTransformations = true,
                 fileName = "LayoutInspectorTreeTest.kt",
-                left = 68.0.dp, top = 49.7.dp, width = 88.5.dp, height = 21.7.dp,
+                left = 65.8.dp, top = 49.7.dp, width = 86.2.dp, height = 21.7.dp,
                 children = listOf("Text")
             )
             node(
@@ -213,7 +213,7 @@ class LayoutInspectorTreeTest : ToolingTest() {
                 isRenderNode = true,
                 hasTransformations = true,
                 fileName = "LayoutInspectorTreeTest.kt",
-                left = 68.0.dp, top = 49.7.dp, width = 88.5.dp, height = 21.7.dp,
+                left = 65.8.dp, top = 49.7.dp, width = 86.2.dp, height = 21.7.dp,
             )
         }
     }
