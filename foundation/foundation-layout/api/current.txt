@@ -124,6 +124,8 @@ package androidx.compose.foundation.layout {
 
   public final class IntrinsicKt {
     method @androidx.compose.foundation.layout.ExperimentalLayout @androidx.compose.runtime.Stable public static androidx.compose.ui.Modifier height(androidx.compose.ui.Modifier, androidx.compose.foundation.layout.IntrinsicSize intrinsicSize);
+    method @androidx.compose.runtime.Stable public static androidx.compose.ui.Modifier requiredHeight(androidx.compose.ui.Modifier, androidx.compose.foundation.layout.IntrinsicSize intrinsicSize);
+    method @androidx.compose.runtime.Stable public static androidx.compose.ui.Modifier requiredWidth(androidx.compose.ui.Modifier, androidx.compose.foundation.layout.IntrinsicSize intrinsicSize);
     method @androidx.compose.foundation.layout.ExperimentalLayout @androidx.compose.runtime.Stable public static androidx.compose.ui.Modifier width(androidx.compose.ui.Modifier, androidx.compose.foundation.layout.IntrinsicSize intrinsicSize);
   }
 
