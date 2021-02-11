@@ -16,8 +16,8 @@
 
 package androidx.compose.foundation.text
 
-import androidx.compose.foundation.Interaction
-import androidx.compose.foundation.InteractionState
+import androidx.compose.foundation.interaction.Interaction
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -101,10 +101,10 @@ import androidx.compose.ui.text.input.VisualTransformation
  * communicating with platform text input service, e.g. software keyboard on Android. Called with
  * [SoftwareKeyboardController] instance which can be used for requesting input show/hide software
  * keyboard.
- * @param interactionState the [InteractionState] representing the different [Interaction]s
- * present on this TextField. You can create and pass in your own remembered [InteractionState]
- * if you want to read the [InteractionState] and customize the appearance / behavior of this
- * TextField in different [Interaction]s.
+ * @param interactionSource the [MutableInteractionSource] representing the stream of
+ * [Interaction]s for this TextField. You can create and pass in your own remembered
+ * [MutableInteractionSource] if you want to observe [Interaction]s and customize the
+ * appearance / behavior of this TextField in different [Interaction]s.
  * @param cursorBrush [Brush] to paint cursor with. If [SolidColor] with [Color.Unspecified]
  * provided, there will be no cursor drawn
  * @param decorationBox Composable lambda that allows to add decorations around text field, such
@@ -129,7 +129,7 @@ fun BasicTextField(
     visualTransformation: VisualTransformation = VisualTransformation.None,
     onTextLayout: (TextLayoutResult) -> Unit = {},
     onTextInputStarted: (SoftwareKeyboardController) -> Unit = {},
-    interactionState: InteractionState = remember { InteractionState() },
+    interactionSource: MutableInteractionSource = remember { MutableInteractionSource() },
     cursorBrush: Brush = SolidColor(Color.Black),
     decorationBox: @Composable (innerTextField: @Composable () -> Unit) -> Unit =
         @Composable { innerTextField -> innerTextField() }
@@ -156,7 +156,7 @@ fun BasicTextField(
         onTextLayout = onTextLayout,
         onTextInputStarted = onTextInputStarted,
         cursorBrush = cursorBrush,
-        interactionState = interactionState,
+        interactionSource = interactionSource,
         singleLine = singleLine,
         decorationBox = decorationBox
     )
@@ -227,10 +227,10 @@ fun BasicTextField(
  * communicating with platform text input service, e.g. software keyboard on Android. Called with
  * [SoftwareKeyboardController] instance which can be used for requesting input show/hide software
  * keyboard.
- * @param interactionState The [InteractionState] representing the different [Interaction]s
- * present on this TextField. You can create and pass in your own remembered [InteractionState]
- * if you want to read the [InteractionState] and customize the appearance / behavior of this
- * TextField in different [Interaction]s.
+ * @param interactionSource the [MutableInteractionSource] representing the stream of
+ * [Interaction]s for this TextField. You can create and pass in your own remembered
+ * [MutableInteractionSource] if you want to observe [Interaction]s and customize the
+ * appearance / behavior of this TextField in different [Interaction]s.
  * @param cursorBrush [Brush] to paint cursor with. If [SolidColor] with [Color.Unspecified]
  * provided, there will be no cursor drawn
  * @param decorationBox Composable lambda that allows to add decorations around text field, such
@@ -255,7 +255,7 @@ fun BasicTextField(
     visualTransformation: VisualTransformation = VisualTransformation.None,
     onTextLayout: (TextLayoutResult) -> Unit = {},
     onTextInputStarted: (SoftwareKeyboardController) -> Unit = {},
-    interactionState: InteractionState = remember { InteractionState() },
+    interactionSource: MutableInteractionSource = remember { MutableInteractionSource() },
     cursorBrush: Brush = SolidColor(Color.Black),
     decorationBox: @Composable (innerTextField: @Composable () -> Unit) -> Unit =
         @Composable { innerTextField -> innerTextField() }
@@ -267,7 +267,7 @@ fun BasicTextField(
         textStyle = textStyle,
         visualTransformation = visualTransformation,
         onTextLayout = onTextLayout,
-        interactionState = interactionState,
+        interactionSource = interactionSource,
         onTextInputStarted = onTextInputStarted,
         cursorBrush = cursorBrush,
         imeOptions = keyboardOptions.toImeOptions(singleLine = singleLine),

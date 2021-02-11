@@ -23,12 +23,16 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.composed
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.foundation.gestures.Orientation
+import androidx.compose.foundation.interaction.DragInteraction
+import androidx.compose.foundation.interaction.Interaction
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.ui.platform.InspectableValue
 import androidx.compose.ui.platform.isDebugInspectorInfoEnabled
 import androidx.compose.ui.platform.testTag
@@ -45,6 +49,9 @@ import androidx.compose.ui.unit.dp
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.MediumTest
 import com.google.common.truth.Truth.assertThat
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.launch
 import org.junit.After
 import org.junit.Before
 import org.junit.Rule
@@ -322,18 +329,27 @@ class DraggableTest {
     }
 
     @Test
-    fun draggable_interactionState() {
-        val interactionState = InteractionState()
+    fun draggable_interactionSource() {
+        val interactionSource = MutableInteractionSource()
+
+        var scope: CoroutineScope? = null
 
         setDraggableContent {
+            scope = rememberCoroutineScope()
             Modifier.draggable(
                 Orientation.Horizontal,
-                interactionState = interactionState
+                interactionSource = interactionSource
             ) {}
         }
 
+        val interactions = mutableListOf<Interaction>()
+
+        scope!!.launch {
+            interactionSource.interactions.collect { interactions.add(it) }
+        }
+
         rule.runOnIdle {
-            assertThat(interactionState.value).doesNotContain(Interaction.Dragged)
+            assertThat(interactions).isEmpty()
         }
 
         rule.onNodeWithTag(draggableBoxTag)
@@ -343,7 +359,8 @@ class DraggableTest {
             }
 
         rule.runOnIdle {
-            assertThat(interactionState.value).contains(Interaction.Dragged)
+            assertThat(interactions).hasSize(1)
+            assertThat(interactions.first()).isInstanceOf(DragInteraction.Start::class.java)
         }
 
         rule.onNodeWithTag(draggableBoxTag)
@@ -352,16 +369,23 @@ class DraggableTest {
             }
 
         rule.runOnIdle {
-            assertThat(interactionState.value).doesNotContain(Interaction.Dragged)
+            assertThat(interactions).hasSize(2)
+            assertThat(interactions.first()).isInstanceOf(DragInteraction.Start::class.java)
+            assertThat(interactions[1]).isInstanceOf(DragInteraction.Stop::class.java)
+            assertThat((interactions[1] as DragInteraction.Stop).start)
+                .isEqualTo(interactions[0])
         }
     }
 
     @Test
-    fun draggable_interactionState_resetWhenDisposed() {
-        val interactionState = InteractionState()
+    fun draggable_interactionSource_resetWhenDisposed() {
+        val interactionSource = MutableInteractionSource()
         var emitDraggableBox by mutableStateOf(true)
 
+        var scope: CoroutineScope? = null
+
         rule.setContent {
+            scope = rememberCoroutineScope()
             Box {
                 if (emitDraggableBox) {
                     Box(
@@ -370,15 +394,21 @@ class DraggableTest {
                             .size(100.dp)
                             .draggable(
                                 orientation = Orientation.Horizontal,
-                                interactionState = interactionState
+                                interactionSource = interactionSource
                             ) {}
                     )
                 }
             }
         }
 
+        val interactions = mutableListOf<Interaction>()
+
+        scope!!.launch {
+            interactionSource.interactions.collect { interactions.add(it) }
+        }
+
         rule.runOnIdle {
-            assertThat(interactionState.value).doesNotContain(Interaction.Dragged)
+            assertThat(interactions).isEmpty()
         }
 
         rule.onNodeWithTag(draggableBoxTag)
@@ -388,7 +418,8 @@ class DraggableTest {
             }
 
         rule.runOnIdle {
-            assertThat(interactionState.value).contains(Interaction.Dragged)
+            assertThat(interactions).hasSize(1)
+            assertThat(interactions.first()).isInstanceOf(DragInteraction.Start::class.java)
         }
 
         // Dispose draggable
@@ -397,7 +428,11 @@ class DraggableTest {
         }
 
         rule.runOnIdle {
-            assertThat(interactionState.value).doesNotContain(Interaction.Dragged)
+            assertThat(interactions).hasSize(2)
+            assertThat(interactions.first()).isInstanceOf(DragInteraction.Start::class.java)
+            assertThat(interactions[1]).isInstanceOf(DragInteraction.Cancel::class.java)
+            assertThat((interactions[1] as DragInteraction.Cancel).start)
+                .isEqualTo(interactions[0])
         }
     }
 
@@ -414,7 +449,7 @@ class DraggableTest {
                 "orientation",
                 "enabled",
                 "reverseDirection",
-                "interactionState",
+                "interactionSource",
                 "startDragImmediately",
                 "onDragStarted",
                 "onDragStopped",
@@ -441,7 +476,7 @@ class DraggableTest {
         orientation: Orientation,
         enabled: Boolean = true,
         reverseDirection: Boolean = false,
-        interactionState: InteractionState? = null,
+        interactionSource: MutableInteractionSource? = null,
         startDragImmediately: Boolean = false,
         onDragStarted: (startedPosition: Offset) -> Unit = {},
         onDragStopped: (velocity: Float) -> Unit = {},
@@ -452,7 +487,7 @@ class DraggableTest {
             orientation = orientation,
             enabled = enabled,
             reverseDirection = reverseDirection,
-            interactionState = interactionState,
+            interactionSource = interactionSource,
             startDragImmediately = startDragImmediately,
             onDragStarted = { onDragStarted(it) },
             onDragStopped = { onDragStopped(it) },

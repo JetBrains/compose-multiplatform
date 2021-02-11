@@ -20,8 +20,8 @@ import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Canvas
-import androidx.compose.foundation.Interaction
-import androidx.compose.foundation.InteractionState
+import androidx.compose.foundation.interaction.Interaction
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.padding
@@ -60,10 +60,10 @@ import androidx.compose.ui.unit.dp
  * @param modifier Modifier to be applied to the radio button
  * @param enabled Controls the enabled state of the [RadioButton]. When `false`, this button will
  * not be selectable and appears in the disabled ui state
- * @param interactionState the [InteractionState] representing the different [Interaction]s
- * present on this RadioButton. You can create and pass in your own remembered
- * [InteractionState] if you want to read the [InteractionState] and customize the appearance /
- * behavior of this RadioButton in different [Interaction]s.
+ * @param interactionSource the [MutableInteractionSource] representing the stream of
+ * [Interaction]s for this RadioButton. You can create and pass in your own remembered
+ * [MutableInteractionSource] if you want to observe [Interaction]s and customize the
+ * appearance / behavior of this RadioButton in different [Interaction]s.
  * @param colors [RadioButtonColors] that will be used to resolve the color used for this
  * RadioButton in different states. See [RadioButtonDefaults.colors].
  */
@@ -73,7 +73,7 @@ fun RadioButton(
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
     enabled: Boolean = true,
-    interactionState: InteractionState = remember { InteractionState() },
+    interactionSource: MutableInteractionSource = remember { MutableInteractionSource() },
     colors: RadioButtonColors = RadioButtonDefaults.colors()
 ) {
     val dotRadius by animateDpAsState(
@@ -88,7 +88,7 @@ fun RadioButton(
                 onClick = onClick,
                 enabled = enabled,
                 role = Role.RadioButton,
-                interactionState = interactionState,
+                interactionSource = interactionSource,
                 indication = rememberRipple(
                     bounded = false,
                     radius = RadioButtonRippleRadius

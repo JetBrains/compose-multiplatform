@@ -18,7 +18,7 @@ package androidx.compose.foundation.textfield
 
 import android.os.Build
 import androidx.compose.foundation.ExperimentalFoundationApi
-import androidx.compose.foundation.InteractionState
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.ScrollState
 import androidx.compose.foundation.background
 import androidx.compose.foundation.gestures.Orientation
@@ -360,15 +360,15 @@ class TextFieldScrollTest {
     @Test
     fun textFieldScrollable_testInspectorValue() {
         val position = TextFieldScrollerPosition(Orientation.Vertical, 10f)
-        val interactionState = InteractionState()
+        val interactionSource = MutableInteractionSource()
         rule.setContent {
             val modifier =
-                Modifier.textFieldScrollable(position, interactionState) as InspectableValue
+                Modifier.textFieldScrollable(position, interactionSource) as InspectableValue
             assertThat(modifier.nameFallback).isEqualTo("textFieldScrollable")
             assertThat(modifier.valueOverride).isNull()
             assertThat(modifier.inspectableElements.map { it.name }.asIterable()).containsExactly(
                 "scrollerPosition",
-                "interactionState",
+                "interactionSource",
                 "enabled"
             )
         }

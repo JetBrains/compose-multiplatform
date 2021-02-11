@@ -16,8 +16,8 @@
 
 package androidx.compose.material
 
-import androidx.compose.foundation.Interaction
-import androidx.compose.foundation.InteractionState
+import androidx.compose.foundation.interaction.Interaction
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.defaultMinSize
@@ -139,10 +139,10 @@ import kotlin.math.roundToInt
  * input service (e.g. software keyboard on Android) has been established. Called with the
  * [SoftwareKeyboardController] instance that can be used to request to show or hide the software
  * keyboard
- * @param interactionState the [InteractionState] representing the different [Interaction]s
- * present on this TextField. You can create and pass in your own remembered
- * [InteractionState] if you want to read the [InteractionState] and customize the appearance /
- * behavior of this TextField in different [Interaction]s.
+ * @param interactionSource the [MutableInteractionSource] representing the stream of
+ * [Interaction]s for this TextField. You can create and pass in your own remembered
+ * [MutableInteractionSource] if you want to observe [Interaction]s and customize the
+ * appearance / behavior of this TextField in different [Interaction]s.
  * @param shape the shape of the text field's container
  * @param colors [TextFieldColors] that will be used to resolve color of the text, content
  * (including label, placeholder, leading and trailing icons, indicator line) and background for
@@ -167,7 +167,7 @@ fun TextField(
     singleLine: Boolean = false,
     maxLines: Int = Int.MAX_VALUE,
     onTextInputStarted: (SoftwareKeyboardController) -> Unit = {},
-    interactionState: InteractionState = remember { InteractionState() },
+    interactionSource: MutableInteractionSource = remember { MutableInteractionSource() },
     shape: Shape =
         MaterialTheme.shapes.small.copy(bottomEnd = ZeroCornerSize, bottomStart = ZeroCornerSize),
     colors: TextFieldColors = TextFieldDefaults.textFieldColors()
@@ -198,7 +198,7 @@ fun TextField(
         keyboardActions = keyboardActions,
         maxLines = maxLines,
         onTextInputStarted = onTextInputStarted,
-        interactionState = interactionState,
+        interactionSource = interactionSource,
         shape = shape,
         colors = colors
     )
@@ -261,10 +261,10 @@ fun TextField(
  * input service (e.g. software keyboard on Android) has been established. Called with the
  * [SoftwareKeyboardController] instance that can be used to request to show or hide the software
  * keyboard
- * @param interactionState the [InteractionState] representing the different [Interaction]s
- * present on this TextField. You can create and pass in your own remembered
- * [InteractionState] if you want to read the [InteractionState] and customize the appearance /
- * behavior of this TextField in different [Interaction]s.
+ * @param interactionSource the [MutableInteractionSource] representing the stream of
+ * [Interaction]s for this TextField. You can create and pass in your own remembered
+ * [MutableInteractionSource] if you want to observe [Interaction]s and customize the
+ * appearance / behavior of this TextField in different [Interaction]s.
  * @param shape the shape of the text field's container
  * @param colors [TextFieldColors] that will be used to resolve color of the text, content
  * (including label, placeholder, leading and trailing icons, indicator line) and background for
@@ -289,7 +289,7 @@ fun TextField(
     singleLine: Boolean = false,
     maxLines: Int = Int.MAX_VALUE,
     onTextInputStarted: (SoftwareKeyboardController) -> Unit = {},
-    interactionState: InteractionState = remember { InteractionState() },
+    interactionSource: MutableInteractionSource = remember { MutableInteractionSource() },
     shape: Shape =
         MaterialTheme.shapes.small.copy(bottomEnd = ZeroCornerSize, bottomStart = ZeroCornerSize),
     colors: TextFieldColors = TextFieldDefaults.textFieldColors()
@@ -313,7 +313,7 @@ fun TextField(
         keyboardActions = keyboardActions,
         maxLines = maxLines,
         onTextInputStarted = onTextInputStarted,
-        interactionState = interactionState,
+        interactionSource = interactionSource,
         shape = shape,
         colors = colors
     )
@@ -333,7 +333,7 @@ internal fun TextFieldLayout(
     maxLines: Int = Int.MAX_VALUE,
     visualTransformation: VisualTransformation,
     onTextInputStarted: (SoftwareKeyboardController) -> Unit,
-    interactionState: InteractionState,
+    interactionSource: MutableInteractionSource,
     decoratedPlaceholder: @Composable ((Modifier) -> Unit)?,
     decoratedLabel: @Composable (() -> Unit)?,
     leading: @Composable (() -> Unit)?,
@@ -365,7 +365,7 @@ internal fun TextFieldLayout(
         visualTransformation = visualTransformation,
         keyboardOptions = keyboardOptions,
         keyboardActions = keyboardActions,
-        interactionState = interactionState,
+        interactionSource = interactionSource,
         onTextInputStarted = onTextInputStarted,
         singleLine = singleLine,
         maxLines = maxLines,

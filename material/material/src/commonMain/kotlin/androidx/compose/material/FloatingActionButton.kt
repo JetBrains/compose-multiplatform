@@ -18,8 +18,10 @@ package androidx.compose.material
 
 import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.VectorConverter
-import androidx.compose.foundation.Interaction
-import androidx.compose.foundation.InteractionState
+import androidx.compose.foundation.interaction.Interaction
+import androidx.compose.foundation.interaction.InteractionSource
+import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.interaction.PressInteraction
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.indication
 import androidx.compose.foundation.layout.Box
@@ -32,18 +34,21 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CornerSize
 import androidx.compose.material.ripple.rememberRipple
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.Stable
 import androidx.compose.runtime.State
+import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import kotlinx.coroutines.flow.collect
 
 /**
  * A floating action button (FAB) is a button that represents the primary action of a screen.
@@ -57,11 +62,10 @@ import androidx.compose.ui.unit.dp
  * @param onClick will be called when user clicked on this FAB. The FAB will be disabled
  * when it is null.
  * @param modifier [Modifier] to be applied to this FAB.
- * @param interactionState the [InteractionState] representing the different [Interaction]s
- * present on this FAB. You can create and pass in your own remembered [InteractionState] if
- * you want to read the [InteractionState] and customize the appearance / behavior of this FAB
- * in different [Interaction]s, such as customizing how the [elevation] of this FAB changes when
- * it is [Interaction.Pressed].
+ * @param interactionSource the [MutableInteractionSource] representing the stream of
+ * [Interaction]s for this FAB. You can create and pass in your own remembered
+ * [MutableInteractionSource] if you want to observe [Interaction]s and customize the
+ * appearance / behavior of this FAB in different [Interaction]s.
  * @param shape The [Shape] of this FAB
  * @param backgroundColor The background color. Use [Color.Transparent] to have no color
  * @param contentColor The preferred content color for content inside this FAB
@@ -73,7 +77,7 @@ import androidx.compose.ui.unit.dp
 fun FloatingActionButton(
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
-    interactionState: InteractionState = remember { InteractionState() },
+    interactionSource: MutableInteractionSource = remember { MutableInteractionSource() },
     shape: Shape = MaterialTheme.shapes.small.copy(CornerSize(percent = 50)),
     backgroundColor: Color = MaterialTheme.colors.secondary,
     contentColor: Color = contentColorFor(backgroundColor),
@@ -87,20 +91,20 @@ fun FloatingActionButton(
         modifier = modifier.clickable(
             onClick = onClick,
             role = Role.Button,
-            interactionState = interactionState,
+            interactionSource = interactionSource,
             indication = null
         ),
         shape = shape,
         color = backgroundColor,
         contentColor = contentColor,
-        elevation = elevation.elevation(interactionState).value
+        elevation = elevation.elevation(interactionSource).value
     ) {
         CompositionLocalProvider(LocalContentAlpha provides contentColor.alpha) {
             ProvideTextStyle(MaterialTheme.typography.button) {
                 Box(
                     modifier = Modifier
                         .defaultMinSize(minWidth = FabSize, minHeight = FabSize)
-                        .indication(interactionState, rememberRipple()),
+                        .indication(interactionSource, rememberRipple()),
                     contentAlignment = Alignment.Center
                 ) { content() }
             }
@@ -128,11 +132,10 @@ fun FloatingActionButton(
  * @param modifier [Modifier] to be applied to this FAB
  * @param icon Optional icon for this FAB, typically this will be a
  * [Icon].
- * @param interactionState the [InteractionState] representing the different [Interaction]s
- * present on this FAB. You can create and pass in your own remembered [InteractionState] if
- * you want to read the [InteractionState] and customize the appearance / behavior of this FAB
- * in different [Interaction]s, such as customizing how the [elevation] of this FAB changes when
- * it is [Interaction.Pressed].
+ * @param interactionSource the [MutableInteractionSource] representing the stream of
+ * [Interaction]s for this FAB. You can create and pass in your own remembered
+ * [MutableInteractionSource] if you want to observe [Interaction]s and customize the
+ * appearance / behavior of this FAB in different [Interaction]s.
  * @param shape The [Shape] of this FAB
  * @param backgroundColor The background color. Use [Color.Transparent] to have no color
  * @param contentColor The preferred content color. Will be used by text and iconography
@@ -145,7 +148,7 @@ fun ExtendedFloatingActionButton(
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
     icon: @Composable (() -> Unit)? = null,
-    interactionState: InteractionState = remember { InteractionState() },
+    interactionSource: MutableInteractionSource = remember { MutableInteractionSource() },
     shape: Shape = MaterialTheme.shapes.small.copy(CornerSize(percent = 50)),
     backgroundColor: Color = MaterialTheme.colors.secondary,
     contentColor: Color = contentColorFor(backgroundColor),
@@ -157,7 +160,7 @@ fun ExtendedFloatingActionButton(
             minHeight = ExtendedFabSize
         ),
         onClick = onClick,
-        interactionState = interactionState,
+        interactionSource = interactionSource,
         shape = shape,
         backgroundColor = backgroundColor,
         contentColor = contentColor,
@@ -192,12 +195,13 @@ fun ExtendedFloatingActionButton(
 @Stable
 interface FloatingActionButtonElevation {
     /**
-     * Represents the elevation used in a floating action button, depending on [interactionState].
+     * Represents the elevation used in a floating action button, depending on
+     * [interactionSource].
      *
-     * @param interactionState the [InteractionState] for this floating action button
+     * @param interactionSource the [InteractionSource] for this floating action button
      */
     @Composable
-    fun elevation(interactionState: InteractionState): State<Dp>
+    fun elevation(interactionSource: InteractionSource): State<Dp>
 }
 
 /**
@@ -212,7 +216,7 @@ object FloatingActionButtonDefaults {
      * @param defaultElevation the elevation to use when the [FloatingActionButton] has no
      * [Interaction]s
      * @param pressedElevation the elevation to use when the [FloatingActionButton] is
-     * [Interaction.Pressed].
+     * pressed.
      */
     @Composable
     fun elevation(
@@ -239,13 +243,28 @@ private class DefaultFloatingActionButtonElevation(
     private val pressedElevation: Dp,
 ) : FloatingActionButtonElevation {
     @Composable
-    override fun elevation(interactionState: InteractionState): State<Dp> {
-        val interaction = interactionState.value.lastOrNull {
-            it is Interaction.Pressed
+    override fun elevation(interactionSource: InteractionSource): State<Dp> {
+        val interactions = remember { mutableStateListOf<Interaction>() }
+        LaunchedEffect(interactionSource) {
+            interactionSource.interactions.collect { interaction ->
+                when (interaction) {
+                    is PressInteraction.Press -> {
+                        interactions.add(interaction)
+                    }
+                    is PressInteraction.Release -> {
+                        interactions.remove(interaction.press)
+                    }
+                    is PressInteraction.Cancel -> {
+                        interactions.remove(interaction.press)
+                    }
+                }
+            }
         }
 
+        val interaction = interactions.lastOrNull()
+
         val target = when (interaction) {
-            Interaction.Pressed -> pressedElevation
+            is PressInteraction.Press -> pressedElevation
             else -> defaultElevation
         }
 
@@ -253,7 +272,7 @@ private class DefaultFloatingActionButtonElevation(
 
         LaunchedEffect(target) {
             val lastInteraction = when (animatable.targetValue) {
-                pressedElevation -> Interaction.Pressed
+                pressedElevation -> PressInteraction.Press(Offset.Zero)
                 else -> null
             }
             animatable.animateElevation(

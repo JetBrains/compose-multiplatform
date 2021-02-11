@@ -17,9 +17,13 @@
 package androidx.compose.foundation
 
 import androidx.compose.foundation.gestures.detectTapGestures
+import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.interaction.PressInteraction
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.composed
@@ -33,6 +37,7 @@ import androidx.compose.ui.semantics.onClick
 import androidx.compose.ui.semantics.onLongClick
 import androidx.compose.ui.semantics.role
 import androidx.compose.ui.semantics.semantics
+import kotlinx.coroutines.launch
 
 /**
  * Configure component to receive clicks via input or accessibility "click" event.
@@ -40,8 +45,8 @@ import androidx.compose.ui.semantics.semantics
  * Add this modifier to the element to make it clickable within its bounds and show a default
  * indication when it's pressed.
  *
- * This version has no [InteractionState] or [Indication] parameters, default indication from
- * [LocalIndication] will be used. To specify [InteractionState] or [Indication], use another
+ * This version has no [MutableInteractionSource] or [Indication] parameters, default indication from
+ * [LocalIndication] will be used. To specify [MutableInteractionSource] or [Indication], use another
  * overload.
  *
  * If you need to support double click or long click alongside the single click, consider
@@ -76,7 +81,7 @@ fun Modifier.clickable(
         onClick = onClick,
         role = role,
         indication = LocalIndication.current,
-        interactionState = remember { InteractionState() }
+        interactionSource = remember { MutableInteractionSource() }
     )
 }
 
@@ -91,9 +96,9 @@ fun Modifier.clickable(
  *
  * @sample androidx.compose.foundation.samples.ClickableSample
  *
- * @param interactionState [InteractionState] that will be updated when this Clickable is
- * pressed, using [Interaction.Pressed]. Only initial (first) press will be recorded and added to
- * [InteractionState]
+ * @param interactionSource [MutableInteractionSource] that will be used to dispatch
+ * [PressInteraction.Press] when this clickable is pressed. Only the initial (first) press will be
+ * recorded and dispatched with [MutableInteractionSource].
  * @param indication indication to be shown when modified element is pressed. Be default,
  * indication from [LocalIndication] will be used. Pass `null` to show no indication, or
  * current value from [LocalIndication] to show theme default
@@ -106,7 +111,7 @@ fun Modifier.clickable(
  */
 @Suppress("DEPRECATION")
 fun Modifier.clickable(
-    interactionState: InteractionState,
+    interactionSource: MutableInteractionSource,
     indication: Indication?,
     enabled: Boolean = true,
     onClickLabel: String? = null,
@@ -114,21 +119,60 @@ fun Modifier.clickable(
     onClick: () -> Unit
 ) = composed(
     factory = {
+        val scope = rememberCoroutineScope()
+        val pressedInteraction = remember { mutableStateOf<PressInteraction.Press?>(null) }
         val interactionUpdate =
             if (enabled) {
                 Modifier.pressIndicatorGestureFilter(
-                    onStart = { interactionState.addInteraction(Interaction.Pressed, it) },
-                    onStop = { interactionState.removeInteraction(Interaction.Pressed) },
-                    onCancel = { interactionState.removeInteraction(Interaction.Pressed) }
+                    onStart = {
+                        scope.launch {
+                            // Remove any old interactions if we didn't fire stop / cancel properly
+                            pressedInteraction.value?.let { oldValue ->
+                                val interaction = PressInteraction.Cancel(oldValue)
+                                interactionSource.emit(interaction)
+                                pressedInteraction.value = null
+                            }
+                            val interaction = PressInteraction.Press(it)
+                            interactionSource.emit(interaction)
+                            pressedInteraction.value = interaction
+                        }
+                    },
+                    onStop = {
+                        scope.launch {
+                            pressedInteraction.value?.let {
+                                val interaction = PressInteraction.Release(it)
+                                interactionSource.emit(interaction)
+                                pressedInteraction.value = null
+                            }
+                        }
+                    },
+                    onCancel = {
+                        scope.launch {
+                            pressedInteraction.value?.let {
+                                val interaction = PressInteraction.Cancel(it)
+                                interactionSource.emit(interaction)
+                                pressedInteraction.value = null
+                            }
+                        }
+                    }
                 )
             } else {
                 Modifier
             }
         val tap = if (enabled) tapGestureFilter(onTap = { onClick() }) else Modifier
+        DisposableEffect(interactionSource) {
+            onDispose {
+                pressedInteraction.value?.let { oldValue ->
+                    val interaction = PressInteraction.Cancel(oldValue)
+                    interactionSource.tryEmit(interaction)
+                    pressedInteraction.value = null
+                }
+            }
+        }
         Modifier
             .genericClickableWithoutGesture(
                 gestureModifiers = Modifier.then(interactionUpdate).then(tap),
-                interactionState = interactionState,
+                interactionSource = interactionSource,
                 indication = indication,
                 enabled = enabled,
                 onClickLabel = onClickLabel,
@@ -145,7 +189,7 @@ fun Modifier.clickable(
         properties["role"] = role
         properties["onClick"] = onClick
         properties["indication"] = indication
-        properties["interactionState"] = interactionState
+        properties["interactionSource"] = interactionSource
     }
 )
 
@@ -157,9 +201,9 @@ fun Modifier.clickable(
  *
  * If you need only click handling, and no double or long clicks, consider using [clickable]
  *
- * This version has no [InteractionState] or [Indication] parameters, default indication from
- * [LocalIndication] will be used. To specify [InteractionState] or [Indication], use another
- * overload.
+ * This version has no [MutableInteractionSource] or [Indication] parameters, default indication
+ * from [LocalIndication] will be used. To specify [MutableInteractionSource] or [Indication],
+ * use another overload.
  *
  * @sample androidx.compose.foundation.samples.ClickableSample
  *
@@ -203,7 +247,7 @@ fun Modifier.combinedClickable(
         onClick = onClick,
         role = role,
         indication = LocalIndication.current,
-        interactionState = remember { InteractionState() }
+        interactionSource = remember { MutableInteractionSource() }
     )
 }
 
@@ -219,9 +263,9 @@ fun Modifier.combinedClickable(
  *
  * @sample androidx.compose.foundation.samples.ClickableSample
  *
- * @param interactionState [InteractionState] that will be updated when this Clickable is
- * pressed, using [Interaction.Pressed]. Only initial (first) press will be recorded and added to
- * [InteractionState]
+ * @param interactionSource [MutableInteractionSource] that will be used to emit
+ * [PressInteraction.Press] when this clickable is pressed. Only the initial (first) press will be
+ * recorded and emitted with [MutableInteractionSource].
  * @param indication indication to be shown when modified element is pressed. Be default,
  * indication from [LocalIndication] will be used. Pass `null` to show no indication, or
  * current value from [LocalIndication] to show theme default
@@ -237,7 +281,7 @@ fun Modifier.combinedClickable(
  */
 @ExperimentalFoundationApi
 fun Modifier.combinedClickable(
-    interactionState: InteractionState,
+    interactionSource: MutableInteractionSource,
     indication: Indication?,
     enabled: Boolean = true,
     onClickLabel: String? = null,
@@ -248,8 +292,10 @@ fun Modifier.combinedClickable(
     onClick: () -> Unit
 ) = composed(
     factory = {
+        val scope = rememberCoroutineScope()
         val onClickState = rememberUpdatedState(onClick)
-        val interactionStateState = rememberUpdatedState(interactionState)
+        val interactionSourceState = rememberUpdatedState(interactionSource)
+        val pressedInteraction = remember { mutableStateOf<PressInteraction.Press?>(null) }
         val gesture = if (enabled) {
             Modifier.pointerInput(onDoubleClick, onLongClick) {
                 detectTapGestures(
@@ -264,9 +310,25 @@ fun Modifier.combinedClickable(
                         null
                     },
                     onPress = {
-                        interactionStateState.value.addInteraction(Interaction.Pressed, it)
+                        scope.launch {
+                            // Remove any old interactions if we didn't fire stop / cancel properly
+                            pressedInteraction.value?.let { oldValue ->
+                                val interaction = PressInteraction.Cancel(oldValue)
+                                interactionSourceState.value.emit(interaction)
+                                pressedInteraction.value = null
+                            }
+                            val interaction = PressInteraction.Press(it)
+                            interactionSourceState.value.emit(interaction)
+                            pressedInteraction.value = interaction
+                        }
                         tryAwaitRelease()
-                        interactionStateState.value.removeInteraction(Interaction.Pressed)
+                        scope.launch {
+                            pressedInteraction.value?.let { oldValue ->
+                                val interaction = PressInteraction.Release(oldValue)
+                                interactionSourceState.value.emit(interaction)
+                                pressedInteraction.value = null
+                            }
+                        }
                     },
                     onTap = { onClickState.value.invoke() }
                 )
@@ -274,10 +336,21 @@ fun Modifier.combinedClickable(
         } else {
             Modifier
         }
+        DisposableEffect(interactionSource) {
+            onDispose {
+                scope.launch {
+                    pressedInteraction.value?.let { oldValue ->
+                        val interaction = PressInteraction.Cancel(oldValue)
+                        interactionSourceState.value.emit(interaction)
+                        pressedInteraction.value = null
+                    }
+                }
+            }
+        }
         Modifier
             .genericClickableWithoutGesture(
                 gestureModifiers = gesture,
-                interactionState = interactionState,
+                interactionSource = interactionSource,
                 indication = indication,
                 enabled = enabled,
                 onClickLabel = onClickLabel,
@@ -297,7 +370,7 @@ fun Modifier.combinedClickable(
         properties["onLongClick"] = onLongClick
         properties["onLongClickLabel"] = onLongClickLabel
         properties["indication"] = indication
-        properties["interactionState"] = interactionState
+        properties["interactionSource"] = interactionSource
     }
 )
 
@@ -305,7 +378,7 @@ fun Modifier.combinedClickable(
 @Suppress("ComposableModifierFactory")
 internal fun Modifier.genericClickableWithoutGesture(
     gestureModifiers: Modifier,
-    interactionState: InteractionState,
+    interactionSource: MutableInteractionSource,
     indication: Indication?,
     enabled: Boolean = true,
     onClickLabel: String? = null,
@@ -327,13 +400,8 @@ internal fun Modifier.genericClickableWithoutGesture(
             disabled()
         }
     }
-    DisposableEffect(interactionState) {
-        onDispose {
-            interactionState.removeInteraction(Interaction.Pressed)
-        }
-    }
     return this
         .then(semanticModifier)
-        .indication(interactionState, indication)
+        .indication(interactionSource, indication)
         .then(gestureModifiers)
 }

@@ -16,11 +16,15 @@
 
 package androidx.compose.foundation
 
+import androidx.compose.foundation.interaction.Interaction
+import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.interaction.PressInteraction
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.text.BasicText
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.InspectableValue
@@ -49,6 +53,9 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.LargeTest
 import androidx.test.filters.MediumTest
 import com.google.common.truth.Truth.assertThat
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.launch
 import org.junit.After
 import org.junit.Before
 import org.junit.Rule
@@ -409,48 +416,65 @@ class ClickableTest {
     }
 
     @Test
-    fun clickableTest_interactionState() {
-        val interactionState = InteractionState()
+    fun clickableTest_interactionSource() {
+        val interactionSource = MutableInteractionSource()
+
+        var scope: CoroutineScope? = null
 
         rule.setContent {
+            scope = rememberCoroutineScope()
             Box {
                 BasicText(
                     "ClickableText",
                     modifier = Modifier
                         .testTag("myClickable")
                         .combinedClickable(
-                            interactionState = interactionState,
+                            interactionSource = interactionSource,
                             indication = null
                         ) {}
                 )
             }
         }
 
+        val interactions = mutableListOf<Interaction>()
+
+        scope!!.launch {
+            interactionSource.interactions.collect { interactions.add(it) }
+        }
+
         rule.runOnIdle {
-            assertThat(interactionState.value).doesNotContain(Interaction.Pressed)
+            assertThat(interactions).isEmpty()
         }
 
         rule.onNodeWithTag("myClickable")
             .performGesture { down(center) }
 
         rule.runOnIdle {
-            assertThat(interactionState.value).contains(Interaction.Pressed)
+            assertThat(interactions).hasSize(1)
+            assertThat(interactions.first()).isInstanceOf(PressInteraction.Press::class.java)
         }
 
         rule.onNodeWithTag("myClickable")
             .performGesture { up() }
 
         rule.runOnIdle {
-            assertThat(interactionState.value).doesNotContain(Interaction.Pressed)
+            assertThat(interactions).hasSize(2)
+            assertThat(interactions.first()).isInstanceOf(PressInteraction.Press::class.java)
+            assertThat(interactions[1]).isInstanceOf(PressInteraction.Release::class.java)
+            assertThat((interactions[1] as PressInteraction.Release).press)
+                .isEqualTo(interactions[0])
         }
     }
 
     @Test
-    fun clickableTest_interactionState_resetWhenDisposed() {
-        val interactionState = InteractionState()
+    fun clickableTest_interactionSource_resetWhenDisposed() {
+        val interactionSource = MutableInteractionSource()
         var emitClickableText by mutableStateOf(true)
 
+        var scope: CoroutineScope? = null
+
         rule.setContent {
+            scope = rememberCoroutineScope()
             Box {
                 if (emitClickableText) {
                     BasicText(
@@ -458,7 +482,7 @@ class ClickableTest {
                         modifier = Modifier
                             .testTag("myClickable")
                             .combinedClickable(
-                                interactionState = interactionState,
+                                interactionSource = interactionSource,
                                 indication = null
                             ) {}
                     )
@@ -466,15 +490,22 @@ class ClickableTest {
             }
         }
 
+        val interactions = mutableListOf<Interaction>()
+
+        scope!!.launch {
+            interactionSource.interactions.collect { interactions.add(it) }
+        }
+
         rule.runOnIdle {
-            assertThat(interactionState.value).doesNotContain(Interaction.Pressed)
+            assertThat(interactions).isEmpty()
         }
 
         rule.onNodeWithTag("myClickable")
             .performGesture { down(center) }
 
         rule.runOnIdle {
-            assertThat(interactionState.value).contains(Interaction.Pressed)
+            assertThat(interactions).hasSize(1)
+            assertThat(interactions.first()).isInstanceOf(PressInteraction.Press::class.java)
         }
 
         // Dispose clickable
@@ -483,7 +514,11 @@ class ClickableTest {
         }
 
         rule.runOnIdle {
-            assertThat(interactionState.value).doesNotContain(Interaction.Pressed)
+            assertThat(interactions).hasSize(2)
+            assertThat(interactions.first()).isInstanceOf(PressInteraction.Press::class.java)
+            assertThat(interactions[1]).isInstanceOf(PressInteraction.Cancel::class.java)
+            assertThat((interactions[1] as PressInteraction.Cancel).press)
+                .isEqualTo(interactions[0])
         }
     }
 
@@ -618,7 +653,7 @@ class ClickableTest {
         rule.setContent {
             val modifier = Modifier.combinedClickable(
                 onClick = onClick,
-                interactionState = remember { InteractionState() },
+                interactionSource = remember { MutableInteractionSource() },
                 indication = null
             ) as InspectableValue
             assertThat(modifier.nameFallback).isEqualTo("combinedClickable")
@@ -632,7 +667,7 @@ class ClickableTest {
                 "onLongClick",
                 "onLongClickLabel",
                 "indication",
-                "interactionState"
+                "interactionSource"
             )
         }
     }

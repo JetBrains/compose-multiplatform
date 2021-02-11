@@ -20,7 +20,7 @@ import androidx.compose.animation.Animatable
 import androidx.compose.animation.core.AnimationSpec
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.spring
-import androidx.compose.foundation.InteractionState
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
@@ -48,7 +48,7 @@ fun SingleValueAnimationDemo() {
     Box(
         Modifier.fillMaxSize().clickable(
             indication = null,
-            interactionState = remember { InteractionState() }
+            interactionSource = remember { MutableInteractionSource() }
         ) {
             enabled
                 .value = !enabled

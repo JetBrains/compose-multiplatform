@@ -23,8 +23,8 @@ import androidx.compose.animation.core.spring
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.core.updateTransition
 import androidx.compose.foundation.Canvas
-import androidx.compose.foundation.Interaction
-import androidx.compose.foundation.InteractionState
+import androidx.compose.foundation.interaction.Interaction
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.requiredSize
 import androidx.compose.foundation.layout.wrapContentSize
@@ -69,10 +69,10 @@ import kotlin.math.floor
  * @param modifier Modifier to be applied to the layout of the checkbox
  * @param enabled enabled whether or not this [Checkbox] will handle input events and appear
  * enabled for semantics purposes
- * @param interactionState the [InteractionState] representing the different [Interaction]s
- * present on this Checkbox. You can create and pass in your own remembered
- * [InteractionState] if you want to read the [InteractionState] and customize the appearance /
- * behavior of this Checkbox in different [Interaction]s.
+ * @param interactionSource the [MutableInteractionSource] representing the stream of
+ * [Interaction]s for this Checkbox. You can create and pass in your own remembered
+ * [MutableInteractionSource] if you want to observe [Interaction]s and customize the
+ * appearance / behavior of this Checkbox in different [Interaction]s.
  * @param colors [CheckboxColors] that will be used to determine the color of the checkmark / box
  * / border in different states. See [CheckboxDefaults.colors].
  */
@@ -82,13 +82,13 @@ fun Checkbox(
     onCheckedChange: (Boolean) -> Unit,
     modifier: Modifier = Modifier,
     enabled: Boolean = true,
-    interactionState: InteractionState = remember { InteractionState() },
+    interactionSource: MutableInteractionSource = remember { MutableInteractionSource() },
     colors: CheckboxColors = CheckboxDefaults.colors()
 ) {
     TriStateCheckbox(
         state = ToggleableState(checked),
         onClick = { onCheckedChange(!checked) },
-        interactionState = interactionState,
+        interactionSource = interactionSource,
         enabled = enabled,
         colors = colors,
         modifier = modifier
@@ -112,10 +112,10 @@ fun Checkbox(
  * @param modifier Modifier to be applied to the layout of the checkbox
  * @param enabled whether or not this [TriStateCheckbox] will handle input events and
  * appear enabled for semantics purposes
- * @param interactionState the [InteractionState] representing the different [Interaction]s
- * present on this TriStateCheckbox. You can create and pass in your own remembered
- * [InteractionState] if you want to read the [InteractionState] and customize the appearance /
- * behavior of this TriStateCheckbox in different [Interaction]s.
+ * @param interactionSource the [MutableInteractionSource] representing the stream of
+ * [Interaction]s for this TriStateCheckbox. You can create and pass in your own remembered
+ * [MutableInteractionSource] if you want to observe [Interaction]s and customize the
+ * appearance / behavior of this TriStateCheckbox in different [Interaction]s.
  * @param colors [CheckboxColors] that will be used to determine the color of the checkmark / box
  * / border in different states. See [CheckboxDefaults.colors].
  */
@@ -125,7 +125,7 @@ fun TriStateCheckbox(
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
     enabled: Boolean = true,
-    interactionState: InteractionState = remember { InteractionState() },
+    interactionSource: MutableInteractionSource = remember { MutableInteractionSource() },
     colors: CheckboxColors = CheckboxDefaults.colors()
 ) {
     CheckboxImpl(
@@ -137,7 +137,7 @@ fun TriStateCheckbox(
                 onClick = onClick,
                 enabled = enabled,
                 role = Role.Checkbox,
-                interactionState = interactionState,
+                interactionSource = interactionSource,
                 indication = rememberRipple(
                     bounded = false,
                     radius = CheckboxRippleRadius

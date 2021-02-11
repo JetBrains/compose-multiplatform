@@ -16,10 +16,14 @@
 
 package androidx.compose.foundation
 
+import androidx.compose.foundation.interaction.FocusInteraction
+import androidx.compose.foundation.interaction.Interaction
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.text.BasicText
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
@@ -39,6 +43,9 @@ import androidx.compose.ui.test.onNodeWithTag
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.MediumTest
 import com.google.common.truth.Truth
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.launch
 import org.junit.After
 import org.junit.Before
 import org.junit.Rule
@@ -137,17 +144,21 @@ class FocusableTest {
 
     @ExperimentalComposeUiApi
     @Test
-    fun focusableTest_interactionState() {
-        val interactionState = InteractionState()
+    fun focusableTest_interactionSource() {
+        val interactionSource = MutableInteractionSource()
         val (focusRequester, otherFocusRequester) = FocusRequester.createRefs()
+
+        var scope: CoroutineScope? = null
+
         rule.setContent {
+            scope = rememberCoroutineScope()
             Box {
                 BasicText(
                     "focusableText",
                     modifier = Modifier
                         .testTag(focusTag)
                         .focusRequester(focusRequester)
-                        .focusable(interactionState = interactionState)
+                        .focusable(interactionSource = interactionSource)
                 )
                 BasicText(
                     "otherFocusableText",
@@ -158,8 +169,14 @@ class FocusableTest {
             }
         }
 
+        val interactions = mutableListOf<Interaction>()
+
+        scope!!.launch {
+            interactionSource.interactions.collect { interactions.add(it) }
+        }
+
         rule.runOnIdle {
-            Truth.assertThat(interactionState.value).doesNotContain(Interaction.Focused)
+            Truth.assertThat(interactions).isEmpty()
         }
 
         rule.runOnIdle {
@@ -167,7 +184,8 @@ class FocusableTest {
         }
 
         rule.runOnIdle {
-            Truth.assertThat(interactionState.value).contains(Interaction.Focused)
+            Truth.assertThat(interactions).hasSize(1)
+            Truth.assertThat(interactions.first()).isInstanceOf(FocusInteraction.Focus::class.java)
         }
 
         rule.runOnIdle {
@@ -175,17 +193,25 @@ class FocusableTest {
         }
 
         rule.runOnIdle {
-            Truth.assertThat(interactionState.value).doesNotContain(Interaction.Focused)
+            Truth.assertThat(interactions).hasSize(2)
+            Truth.assertThat(interactions.first()).isInstanceOf(FocusInteraction.Focus::class.java)
+            Truth.assertThat(interactions[1])
+                .isInstanceOf(FocusInteraction.Unfocus::class.java)
+            Truth.assertThat((interactions[1] as FocusInteraction.Unfocus).focus)
+                .isEqualTo(interactions[0])
         }
     }
 
     @Test
-    fun focusableTest_interactionState_resetWhenDisposed() {
-        val interactionState = InteractionState()
+    fun focusableTest_interactionSource_resetWhenDisposed() {
+        val interactionSource = MutableInteractionSource()
         val focusRequester = FocusRequester()
         var emitFocusableText by mutableStateOf(true)
 
+        var scope: CoroutineScope? = null
+
         rule.setContent {
+            scope = rememberCoroutineScope()
             Box {
                 if (emitFocusableText) {
                     BasicText(
@@ -193,14 +219,20 @@ class FocusableTest {
                         modifier = Modifier
                             .testTag(focusTag)
                             .focusRequester(focusRequester)
-                            .focusable(interactionState = interactionState)
+                            .focusable(interactionSource = interactionSource)
                     )
                 }
             }
         }
 
+        val interactions = mutableListOf<Interaction>()
+
+        scope!!.launch {
+            interactionSource.interactions.collect { interactions.add(it) }
+        }
+
         rule.runOnIdle {
-            Truth.assertThat(interactionState.value).doesNotContain(Interaction.Focused)
+            Truth.assertThat(interactions).isEmpty()
         }
 
         rule.runOnIdle {
@@ -208,7 +240,8 @@ class FocusableTest {
         }
 
         rule.runOnIdle {
-            Truth.assertThat(interactionState.value).contains(Interaction.Focused)
+            Truth.assertThat(interactions).hasSize(1)
+            Truth.assertThat(interactions.first()).isInstanceOf(FocusInteraction.Focus::class.java)
         }
 
         // Dispose focusable, Interaction should be gone
@@ -217,7 +250,12 @@ class FocusableTest {
         }
 
         rule.runOnIdle {
-            Truth.assertThat(interactionState.value).doesNotContain(Interaction.Focused)
+            Truth.assertThat(interactions).hasSize(2)
+            Truth.assertThat(interactions.first()).isInstanceOf(FocusInteraction.Focus::class.java)
+            Truth.assertThat(interactions[1])
+                .isInstanceOf(FocusInteraction.Unfocus::class.java)
+            Truth.assertThat((interactions[1] as FocusInteraction.Unfocus).focus)
+                .isEqualTo(interactions[0])
         }
     }
 
@@ -230,7 +268,7 @@ class FocusableTest {
             Truth.assertThat(modifier.inspectableElements.map { it.name }.asIterable())
                 .containsExactly(
                     "enabled",
-                    "interactionState"
+                    "interactionSource"
                 )
         }
     }

@@ -17,8 +17,8 @@
 package androidx.compose.foundation.lazy
 
 import androidx.compose.foundation.ExperimentalFoundationApi
-import androidx.compose.foundation.Interaction
-import androidx.compose.foundation.InteractionState
+import androidx.compose.foundation.interaction.InteractionSource
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.MutatePriority
 import androidx.compose.foundation.gestures.ScrollScope
 import androidx.compose.foundation.gestures.ScrollableState
@@ -96,11 +96,13 @@ class LazyListState constructor(
     val layoutInfo: LazyListLayoutInfo get() = layoutInfoState.value
 
     /**
-     * interactionState [InteractionState] that will be updated when component with this
-     * state is being scrolled by dragging, using [Interaction.Dragged]. If you want to know whether
-     * the fling (or animated scroll) is in progress, use [isScrollInProgress].
+     * [InteractionSource] that will be used to dispatch drag events when this
+     * list is being dragged. If you want to know whether the fling (or animated scroll) is in
+     * progress, use [isScrollInProgress].
      */
-    val interactionState: InteractionState = InteractionState()
+    val interactionSource: InteractionSource get() = internalInteractionSource
+
+    internal val internalInteractionSource: MutableInteractionSource = MutableInteractionSource()
 
     /**
      * The amount of scroll to be consumed in the next layout pass.  Scrolling forward is negative
