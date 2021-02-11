@@ -56,7 +56,8 @@ import androidx.compose.ui.unit.dp
  * @sample androidx.compose.material.samples.RadioGroupSample
  *
  * @param selected boolean state for this button: either it is selected or not
- * @param onClick callback to be invoked when the RadioButton is being clicked
+ * @param onClick callback to be invoked when the RadioButton is being clicked.  If null,
+ * then this is passive and relies entirely on a higher-level component to control the state.
  * @param modifier Modifier to be applied to the radio button
  * @param enabled Controls the enabled state of the [RadioButton]. When `false`, this button will
  * not be selectable and appears in the disabled ui state
@@ -70,7 +71,7 @@ import androidx.compose.ui.unit.dp
 @Composable
 fun RadioButton(
     selected: Boolean,
-    onClick: () -> Unit,
+    onClick: (() -> Unit)?,
     modifier: Modifier = Modifier,
     enabled: Boolean = true,
     interactionSource: MutableInteractionSource = remember { MutableInteractionSource() },
@@ -81,9 +82,9 @@ fun RadioButton(
         animationSpec = tween(durationMillis = RadioAnimationDuration)
     )
     val radioColor by colors.radioColor(enabled, selected)
-    Canvas(
-        modifier
-            .selectable(
+    val selectableModifier =
+        if (onClick != null) {
+            Modifier.selectable(
                 selected = selected,
                 onClick = onClick,
                 enabled = enabled,
@@ -94,6 +95,12 @@ fun RadioButton(
                     radius = RadioButtonRippleRadius
                 )
             )
+        } else {
+            Modifier
+        }
+    Canvas(
+        modifier
+            .then(selectableModifier)
             .wrapContentSize(Alignment.Center)
             .padding(RadioButtonPadding)
             .requiredSize(RadioButtonSize)

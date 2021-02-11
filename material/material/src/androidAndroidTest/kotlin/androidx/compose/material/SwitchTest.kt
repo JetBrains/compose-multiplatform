@@ -27,14 +27,19 @@ import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.test.assertHasClickAction
 import androidx.compose.ui.semantics.SemanticsProperties
 import androidx.compose.ui.semantics.Role
+import androidx.compose.ui.semantics.focused
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.test.SemanticsMatcher
 import androidx.compose.ui.test.assert
+import androidx.compose.ui.test.assertHasNoClickAction
 import androidx.compose.ui.test.assertHeightIsEqualTo
 import androidx.compose.ui.test.assertIsEnabled
 import androidx.compose.ui.test.assertIsOff
 import androidx.compose.ui.test.assertIsOn
 import androidx.compose.ui.test.assertValueEquals
 import androidx.compose.ui.test.assertWidthIsEqualTo
+import androidx.compose.ui.test.isFocusable
+import androidx.compose.ui.test.isNotFocusable
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.performClick
@@ -139,6 +144,48 @@ class SwitchTest {
         }
         rule.onNodeWithTag(defaultSwitchTag)
             .assertHasClickAction()
+    }
+
+    @Test
+    fun switch_untoggleable_whenEmptyLambda() {
+        val parentTag = "parent"
+
+        rule.setMaterialContent {
+            val (checked, _) = remember { mutableStateOf(false) }
+            Box(Modifier.semantics(mergeDescendants = true) {}.testTag(parentTag)) {
+                Switch(
+                    checked,
+                    {},
+                    enabled = false,
+                    modifier = Modifier.testTag(defaultSwitchTag).semantics { focused = true }
+                )
+            }
+        }
+
+        rule.onNodeWithTag(defaultSwitchTag)
+            .assertHasClickAction()
+
+        // Check not merged into parent
+        rule.onNodeWithTag(parentTag)
+            .assert(isNotFocusable())
+    }
+
+    @Test
+    fun switch_untoggleableAndMergeable_whenNullLambda() {
+        rule.setMaterialContent {
+            val (checked, _) = remember { mutableStateOf(false) }
+            Box(Modifier.semantics(mergeDescendants = true) {}.testTag(defaultSwitchTag)) {
+                Switch(
+                    checked,
+                    null,
+                    modifier = Modifier.semantics { focused = true }
+                )
+            }
+        }
+
+        rule.onNodeWithTag(defaultSwitchTag)
+            .assertHasNoClickAction()
+            .assert(isFocusable()) // Check merged into parent
     }
 
     @Test

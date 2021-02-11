@@ -62,11 +62,12 @@ import kotlin.math.roundToInt
  *
  * @sample androidx.compose.material.samples.SwitchSample
  *
- * @param checked whether or not this components is checked
+ * @param checked whether or not this component is checked
  * @param onCheckedChange callback to be invoked when Switch is being clicked,
- * therefore the change of checked state is requested.
+ * therefore the change of checked state is requested.  If null, then this is passive
+ * and relies entirely on a higher-level component to control the "checked" state.
  * @param modifier Modifier to be applied to the switch layout
- * @param enabled whether or not components is enabled and can be clicked to request state change
+ * @param enabled whether the component is enabled or grayed out
  * @param interactionSource the [MutableInteractionSource] representing the stream of
  * [Interaction]s for this Switch. You can create and pass in your own remembered
  * [MutableInteractionSource] if you want to observe [Interaction]s and customize the
@@ -78,7 +79,7 @@ import kotlin.math.roundToInt
 @OptIn(ExperimentalMaterialApi::class)
 fun Switch(
     checked: Boolean,
-    onCheckedChange: (Boolean) -> Unit,
+    onCheckedChange: ((Boolean) -> Unit)?,
     modifier: Modifier = Modifier,
     enabled: Boolean = true,
     interactionSource: MutableInteractionSource = remember { MutableInteractionSource() },
@@ -86,11 +87,11 @@ fun Switch(
 ) {
     val minBound = 0f
     val maxBound = with(LocalDensity.current) { ThumbPathLength.toPx() }
-    val swipeableState = rememberSwipeableStateFor(checked, onCheckedChange, AnimationSpec)
+    val swipeableState = rememberSwipeableStateFor(checked, onCheckedChange ?: {}, AnimationSpec)
     val isRtl = LocalLayoutDirection.current == LayoutDirection.Rtl
-    Box(
-        modifier
-            .toggleable(
+    val toggleableModifier =
+        if (onCheckedChange != null) {
+            Modifier.toggleable(
                 value = checked,
                 onValueChange = onCheckedChange,
                 enabled = enabled,
@@ -98,12 +99,19 @@ fun Switch(
                 interactionSource = interactionSource,
                 indication = null
             )
+        } else {
+            Modifier
+        }
+
+    Box(
+        modifier
+            .then(toggleableModifier)
             .swipeable(
                 state = swipeableState,
                 anchors = mapOf(minBound to false, maxBound to true),
                 thresholds = { _, _ -> FractionalThreshold(0.5f) },
                 orientation = Orientation.Horizontal,
-                enabled = enabled,
+                enabled = enabled && onCheckedChange != null,
                 reverseDirection = isRtl,
                 interactionSource = interactionSource,
                 resistance = null
