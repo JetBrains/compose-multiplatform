@@ -101,6 +101,14 @@ private const val LaunchedEffectNoParamError =
         "the LaunchedEffect and determine when its previous effect coroutine should be cancelled " +
         "and a new effect launched for the new key."
 
+/**
+ * A side effect of composition that must be reversed or cleaned up if the [DisposableEffect]
+ * leaves the composition.
+ *
+ * It is an error to call [DisposableEffect] without at least one `key` parameter.
+ */
+// This deprecated-error function shadows the varargs overload so that the varargs version
+// is not used without key parameters.
 @Composable
 @NonRestartableComposable
 @Suppress("DeprecatedCallableAddReplaceWith", "UNUSED_PARAMETER")
@@ -298,6 +306,8 @@ internal class LaunchedEffectImpl(
  *
  * It is an error to call [LaunchedEffect] without at least one `key` parameter.
  */
+// This deprecated-error function shadows the varargs overload so that the varargs version
+// is not used without key parameters.
 @Deprecated(LaunchedEffectNoParamError, level = DeprecationLevel.ERROR)
 @Suppress("DeprecatedCallableAddReplaceWith", "UNUSED_PARAMETER")
 @Composable
