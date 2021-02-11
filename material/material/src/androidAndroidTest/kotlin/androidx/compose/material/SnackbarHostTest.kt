@@ -19,6 +19,7 @@ package androidx.compose.material
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.ui.platform.AccessibilityManager
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
@@ -26,13 +27,19 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.LargeTest
 import androidx.test.filters.MediumTest
 import com.google.common.truth.Truth
+import com.nhaarman.mockitokotlin2.any
+import com.nhaarman.mockitokotlin2.doReturn
+import com.nhaarman.mockitokotlin2.eq
+import com.nhaarman.mockitokotlin2.mock
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import org.junit.Assert.assertEquals
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
+import org.mockito.AdditionalMatchers.not
 
 @MediumTest
 @RunWith(AndroidJUnit4::class)
@@ -151,5 +158,74 @@ class SnackbarHostTest {
         }
 
         rule.waitUntil { job1.isCompleted && job2.isCompleted }
+    }
+
+    @Test
+    fun snackbarDuration_toMillis_nonNullAccessibilityManager() {
+        val mockDurationControl = 10000L
+        val mockDurationNonControl = 5000L
+        val accessibilityManager: AccessibilityManager = mock {
+            on {
+                calculateRecommendedTimeoutMillis(eq(Long.MAX_VALUE), any(), any(), any())
+            } doReturn Long.MAX_VALUE
+            on {
+                calculateRecommendedTimeoutMillis(not(eq(Long.MAX_VALUE)), any(), any(), eq(true))
+            } doReturn mockDurationControl
+            on {
+                calculateRecommendedTimeoutMillis(not(eq(Long.MAX_VALUE)), any(), any(), eq(false))
+            } doReturn mockDurationNonControl
+        }
+        assertEquals(
+            Long.MAX_VALUE,
+            SnackbarDuration.Indefinite.toMillis(true, accessibilityManager)
+        )
+        assertEquals(
+            Long.MAX_VALUE,
+            SnackbarDuration.Indefinite.toMillis(false, accessibilityManager)
+        )
+        assertEquals(
+            mockDurationControl,
+            SnackbarDuration.Long.toMillis(true, accessibilityManager)
+        )
+        assertEquals(
+            mockDurationNonControl,
+            SnackbarDuration.Long.toMillis(false, accessibilityManager)
+        )
+        assertEquals(
+            mockDurationControl,
+            SnackbarDuration.Short.toMillis(true, accessibilityManager)
+        )
+        assertEquals(
+            mockDurationNonControl,
+            SnackbarDuration.Short.toMillis(false, accessibilityManager)
+        )
+    }
+
+    @Test
+    fun snackbarDuration_toMillis_nullAccessibilityManager() {
+        assertEquals(
+            Long.MAX_VALUE,
+            SnackbarDuration.Indefinite.toMillis(true, null)
+        )
+        assertEquals(
+            Long.MAX_VALUE,
+            SnackbarDuration.Indefinite.toMillis(false, null)
+        )
+        assertEquals(
+            10000L,
+            SnackbarDuration.Long.toMillis(true, null)
+        )
+        assertEquals(
+            10000L,
+            SnackbarDuration.Long.toMillis(false, null)
+        )
+        assertEquals(
+            4000L,
+            SnackbarDuration.Short.toMillis(true, null)
+        )
+        assertEquals(
+            4000L,
+            SnackbarDuration.Short.toMillis(false, null)
+        )
     }
 }

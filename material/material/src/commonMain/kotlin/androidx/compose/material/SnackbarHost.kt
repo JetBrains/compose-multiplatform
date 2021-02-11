@@ -35,6 +35,8 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.platform.AccessibilityManager
+import androidx.compose.ui.platform.LocalAccessibilityManager
 import androidx.compose.ui.util.fastForEach
 import kotlinx.coroutines.CancellableContinuation
 import kotlinx.coroutines.delay
@@ -148,9 +150,14 @@ fun SnackbarHost(
     snackbar: @Composable (SnackbarData) -> Unit = { Snackbar(it) }
 ) {
     val currentSnackbarData = hostState.currentSnackbarData
+    val accessibilityManager = LocalAccessibilityManager.current
     LaunchedEffect(currentSnackbarData) {
         if (currentSnackbarData != null) {
-            delay(currentSnackbarData.duration.toMillis())
+            val duration = currentSnackbarData.duration.toMillis(
+                currentSnackbarData.actionLabel != null,
+                accessibilityManager
+            )
+            delay(duration)
             currentSnackbarData.dismiss()
         }
     }
@@ -219,11 +226,25 @@ enum class SnackbarDuration {
     Indefinite
 }
 
-// TODO: a11y and magic numbers adjustment
-private fun SnackbarDuration.toMillis() = when (this) {
-    SnackbarDuration.Indefinite -> Long.MAX_VALUE
-    SnackbarDuration.Long -> 10000L
-    SnackbarDuration.Short -> 4000L
+// TODO: magic numbers adjustment
+internal fun SnackbarDuration.toMillis(
+    hasAction: Boolean,
+    accessibilityManager: AccessibilityManager?
+): Long {
+    val original = when (this) {
+        SnackbarDuration.Indefinite -> Long.MAX_VALUE
+        SnackbarDuration.Long -> 10000L
+        SnackbarDuration.Short -> 4000L
+    }
+    if (accessibilityManager == null) {
+        return original
+    }
+    return accessibilityManager.calculateRecommendedTimeoutMillis(
+        original,
+        containsIcons = true,
+        containsText = true,
+        containsControls = hasAction
+    )
 }
 
 // TODO: to be replaced with the public customizable implementation

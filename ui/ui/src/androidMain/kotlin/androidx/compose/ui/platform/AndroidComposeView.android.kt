@@ -198,6 +198,11 @@ internal class AndroidComposeView(context: Context) :
      */
     override val clipboardManager = AndroidClipboardManager(context)
 
+    /**
+     * Provide accessibility manager to the user. Use the Android version of accessibility manager.
+     */
+    override val accessibilityManager = AndroidAccessibilityManager(context)
+
     override val snapshotObserver = OwnerSnapshotObserver { command ->
         if (handler?.looper === Looper.myLooper()) {
             command()
