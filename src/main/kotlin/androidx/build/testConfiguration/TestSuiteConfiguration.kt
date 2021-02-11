@@ -266,6 +266,7 @@ private fun Project.configureMacrobenchmarkConfigTask(
 
 fun Project.configureTestConfigGeneration(testedExtension: TestedExtension) {
     extensions.getByType<AndroidComponentsExtension<*, *>>().apply {
+        @Suppress("deprecation")
         androidTests(selector().all()) { androidTest ->
             when {
                 path.contains("media2:media2-session:version-compat-tests:") -> {
