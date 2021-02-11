@@ -4,7 +4,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
-import org.jetbrains.compose.animation.SingleDirectionMoveState
+import org.jetbrains.compose.movable.SingleDirectionMoveState
 
 typealias SplitterState = SingleDirectionMoveState
 
@@ -19,7 +19,7 @@ fun VerticalSplitPane(
     modifier: Modifier = Modifier,
     content: SplitPaneScope.() -> Unit
 ) {
-    val bet: Betrayer = Betrayer().apply(content)
+    val bet: SplitPaneScopeImpl = SplitPaneScopeImpl().apply(content)
 
     SplitPane(
         modifier,
@@ -38,7 +38,7 @@ fun HorizontalSplitPane(
     modifier: Modifier = Modifier,
     content: SplitPaneScope.() -> Unit
 ) {
-    val bet = Betrayer().apply(content)
+    val bet = SplitPaneScopeImpl().apply(content)
     SplitPane(
         modifier,
         isHorizontal = true,

@@ -26,7 +26,7 @@ interface SplitPaneScope {
     )
 }
 
-internal class Betrayer : SplitPaneScope {
+internal class SplitPaneScopeImpl : SplitPaneScope {
 
     private var firstPlaceableMinimalSize: Dp = 0.dp
     private var secondPlaceableMinimalSize: Dp = 0.dp
