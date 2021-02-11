@@ -42,7 +42,6 @@ import androidx.compose.ui.layout.MeasureScope
 import androidx.compose.ui.layout.Placeable
 import androidx.compose.ui.platform.InspectorValueInfo
 import androidx.compose.ui.platform.debugInspectorInfo
-import androidx.compose.ui.text.SoftwareKeyboardController
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.input.VisualTransformation
@@ -79,7 +78,6 @@ internal fun TextFieldImpl(
     keyboardOptions: KeyboardOptions = KeyboardOptions.Default,
     keyboardActions: KeyboardActions,
     maxLines: Int = Int.MAX_VALUE,
-    onTextInputStarted: (SoftwareKeyboardController) -> Unit,
     interactionSource: MutableInteractionSource,
     shape: Shape,
     colors: TextFieldColors
@@ -144,7 +142,6 @@ internal fun TextFieldImpl(
                     singleLine = singleLine,
                     maxLines = maxLines,
                     visualTransformation = visualTransformation,
-                    onTextInputStarted = onTextInputStarted,
                     interactionSource = interactionSource,
                     decoratedPlaceholder = decoratedPlaceholder,
                     decoratedLabel = decoratedLabel,
@@ -174,7 +171,6 @@ internal fun TextFieldImpl(
                     singleLine = singleLine,
                     maxLines = maxLines,
                     visualTransformation = visualTransformation,
-                    onTextInputStarted = onTextInputStarted,
                     interactionSource = interactionSource,
                     decoratedPlaceholder = decoratedPlaceholder,
                     decoratedLabel = decoratedLabel,

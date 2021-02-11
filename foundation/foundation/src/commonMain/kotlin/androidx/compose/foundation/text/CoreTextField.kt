@@ -71,7 +71,6 @@ import androidx.compose.ui.semantics.setSelection
 import androidx.compose.ui.semantics.setText
 import androidx.compose.ui.semantics.textSelectionRange
 import androidx.compose.ui.text.AnnotatedString
-import androidx.compose.ui.text.SoftwareKeyboardController
 import androidx.compose.ui.text.TextLayoutResult
 import androidx.compose.ui.text.TextRange
 import androidx.compose.ui.text.TextStyle
@@ -121,10 +120,6 @@ import kotlin.math.roundToInt
  * @param visualTransformation The visual transformation filter for changing the visual
  * representation of the input. By default no visual transformation is applied.
  * @param onTextLayout Callback that is executed when a new text layout is calculated.
- * @param onTextInputStarted Callback that is executed when the initialization has done for
- * communicating with platform text input service, e.g. software keyboard on Android. Called with
- * [SoftwareKeyboardController] instance which can be used for requesting input show/hide software
- * keyboard.
  * @param interactionSource the [MutableInteractionSource] representing the stream of
  * [Interaction]s for this CoreTextField. You can create and pass in your own remembered
  * [MutableInteractionSource] if you want to observe [Interaction]s and customize the
@@ -160,7 +155,6 @@ internal fun CoreTextField(
     textStyle: TextStyle = TextStyle.Default,
     visualTransformation: VisualTransformation = VisualTransformation.None,
     onTextLayout: (TextLayoutResult) -> Unit = {},
-    onTextInputStarted: (SoftwareKeyboardController) -> Unit = {},
     interactionSource: MutableInteractionSource? = null,
     cursorBrush: Brush = SolidColor(Color.Unspecified),
     softWrap: Boolean = true,
@@ -269,7 +263,6 @@ internal fun CoreTextField(
                 imeOptions,
                 onValueChangeWrapper,
                 onImeActionPerformedWrapper,
-                onTextInputStarted,
                 offsetMapping
             )
         }
@@ -631,7 +624,6 @@ private fun notifyTextInputServiceOnFocusChange(
     imeOptions: ImeOptions,
     onValueChange: (TextFieldValue) -> Unit,
     onImeActionPerformed: (ImeAction) -> Unit,
-    onTextInputStarted: (SoftwareKeyboardController) -> Unit,
     offsetMapping: OffsetMapping
 ) {
     if (state.hasFocus) {
@@ -643,8 +635,6 @@ private fun notifyTextInputServiceOnFocusChange(
             onValueChange,
             onImeActionPerformed
         ).also { newSession ->
-            onTextInputStarted(SoftwareKeyboardController(newSession))
-
             state.layoutCoordinates?.let { coords ->
                 state.layoutResult?.let { layoutResult ->
                     TextFieldDelegate.notifyFocusedRect(

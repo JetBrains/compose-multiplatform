@@ -74,7 +74,6 @@ import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.performGesture
-import androidx.compose.ui.text.SoftwareKeyboardController
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.ImeOptions
 import androidx.compose.ui.text.input.KeyboardType
@@ -287,40 +286,7 @@ class TextFieldTest {
         rule.runOnIdle { assertThat(hostView.isSoftwareKeyboardShown).isFalse() }
     }
 
-    @ExperimentalComposeUiApi
-    @Test
-    fun testTextField_clickingOnTextAfterDismissingKeyboard_showsKeyboard() {
-        val (focusRequester, parentFocusRequester) = FocusRequester.createRefs()
-        lateinit var softwareKeyboardController: SoftwareKeyboardController
-        lateinit var hostView: View
-        rule.setMaterialContent {
-            hostView = LocalView.current
-            Box {
-                TextField(
-                    modifier = Modifier
-                        .focusRequester(parentFocusRequester)
-                        .focusModifier()
-                        .focusRequester(focusRequester)
-                        .testTag(TextfieldTag),
-                    value = "input",
-                    onValueChange = {},
-                    onTextInputStarted = { softwareKeyboardController = it },
-                    label = {}
-                )
-            }
-        }
-
-        // Shows keyboard when the text field is focused.
-        rule.runOnIdle { focusRequester.requestFocus() }
-        rule.runOnIdle { assertThat(hostView.isSoftwareKeyboardShown).isTrue() }
-
-        // Hide keyboard.
-        rule.runOnIdle { softwareKeyboardController.hideSoftwareKeyboard() }
-
-        // Clicking on the text field shows the keyboard.
-        rule.onNodeWithTag(TextfieldTag).performClick()
-        rule.runOnIdle { assertThat(hostView.isSoftwareKeyboardShown).isTrue() }
-    }
+    // TODO(b/1583763): re-add keyboard hide/show test when replacement API is added
 
     @Test
     fun testTextField_labelPosition_initial_singleLine() {
@@ -971,31 +937,6 @@ class TextFieldTest {
                 // avoid elevation artifacts
                 shapeOverlapPixelCount = with(rule.density) { 1.dp.toPx() }
             )
-    }
-
-    @Test
-    fun testTextField_onTextInputStartedCallback() {
-        var controller: SoftwareKeyboardController? = null
-
-        rule.setMaterialContent {
-            TextField(
-                modifier = Modifier.testTag(TextfieldTag),
-                value = "",
-                onValueChange = {},
-                label = {},
-                onTextInputStarted = {
-                    controller = it
-                }
-            )
-        }
-        assertThat(controller).isNull()
-
-        rule.onNodeWithTag(TextfieldTag)
-            .performClick()
-
-        rule.runOnIdle {
-            assertThat(controller).isNotNull()
-        }
     }
 
     private val View.isSoftwareKeyboardShown: Boolean

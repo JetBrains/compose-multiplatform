@@ -27,7 +27,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.SolidColor
-import androidx.compose.ui.text.SoftwareKeyboardController
 import androidx.compose.ui.text.TextLayoutResult
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.input.ImeAction
@@ -97,10 +96,6 @@ import androidx.compose.ui.text.input.VisualTransformation
  * @param visualTransformation The visual transformation filter for changing the visual
  * representation of the input. By default no visual transformation is applied.
  * @param onTextLayout Callback that is executed when a new text layout is calculated.
- * @param onTextInputStarted Callback that is executed when the initialization has done for
- * communicating with platform text input service, e.g. software keyboard on Android. Called with
- * [SoftwareKeyboardController] instance which can be used for requesting input show/hide software
- * keyboard.
  * @param interactionSource the [MutableInteractionSource] representing the stream of
  * [Interaction]s for this TextField. You can create and pass in your own remembered
  * [MutableInteractionSource] if you want to observe [Interaction]s and customize the
@@ -128,7 +123,6 @@ fun BasicTextField(
     maxLines: Int = Int.MAX_VALUE,
     visualTransformation: VisualTransformation = VisualTransformation.None,
     onTextLayout: (TextLayoutResult) -> Unit = {},
-    onTextInputStarted: (SoftwareKeyboardController) -> Unit = {},
     interactionSource: MutableInteractionSource = remember { MutableInteractionSource() },
     cursorBrush: Brush = SolidColor(Color.Black),
     decorationBox: @Composable (innerTextField: @Composable () -> Unit) -> Unit =
@@ -154,7 +148,6 @@ fun BasicTextField(
         maxLines = maxLines,
         visualTransformation = visualTransformation,
         onTextLayout = onTextLayout,
-        onTextInputStarted = onTextInputStarted,
         cursorBrush = cursorBrush,
         interactionSource = interactionSource,
         singleLine = singleLine,
@@ -223,10 +216,6 @@ fun BasicTextField(
  * @param visualTransformation The visual transformation filter for changing the visual
  * representation of the input. By default no visual transformation is applied.
  * @param onTextLayout Callback that is executed when a new text layout is calculated.
- * @param onTextInputStarted Callback that is executed when the initialization has done for
- * communicating with platform text input service, e.g. software keyboard on Android. Called with
- * [SoftwareKeyboardController] instance which can be used for requesting input show/hide software
- * keyboard.
  * @param interactionSource the [MutableInteractionSource] representing the stream of
  * [Interaction]s for this TextField. You can create and pass in your own remembered
  * [MutableInteractionSource] if you want to observe [Interaction]s and customize the
@@ -254,7 +243,6 @@ fun BasicTextField(
     maxLines: Int = Int.MAX_VALUE,
     visualTransformation: VisualTransformation = VisualTransformation.None,
     onTextLayout: (TextLayoutResult) -> Unit = {},
-    onTextInputStarted: (SoftwareKeyboardController) -> Unit = {},
     interactionSource: MutableInteractionSource = remember { MutableInteractionSource() },
     cursorBrush: Brush = SolidColor(Color.Black),
     decorationBox: @Composable (innerTextField: @Composable () -> Unit) -> Unit =
@@ -268,7 +256,6 @@ fun BasicTextField(
         visualTransformation = visualTransformation,
         onTextLayout = onTextLayout,
         interactionSource = interactionSource,
-        onTextInputStarted = onTextInputStarted,
         cursorBrush = cursorBrush,
         imeOptions = keyboardOptions.toImeOptions(singleLine = singleLine),
         keyboardActions = keyboardActions,
