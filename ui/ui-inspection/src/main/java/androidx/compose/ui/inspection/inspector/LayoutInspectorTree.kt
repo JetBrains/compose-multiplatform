@@ -308,7 +308,7 @@ class LayoutInspectorTree {
                 node.layoutNodes.forEach { claimedNodes.getOrPut(it) { resultNode } }
                 parentNode.children.add(resultNode)
             }
-            if (node.bounds.isNotEmpty() && sameBoundingRectangle(parentNode, node)) {
+            if (node.bounds != null && sameBoundingRectangle(parentNode, node)) {
                 parentNode.bounds = node.bounds
             }
             parentNode.layoutNodes.addAll(node.layoutNodes)
@@ -366,11 +366,11 @@ class LayoutInspectorTree {
         ) {
             return
         }
-        node.bounds = intArrayOf(
+        node.bounds = QuadBounds(
             topLeft.x, topLeft.y,
             topRight.x, topRight.y,
             bottomRight.x, bottomRight.y,
-            bottomLeft.x, bottomLeft.y
+            bottomLeft.x, bottomLeft.y,
         )
     }
 

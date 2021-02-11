@@ -220,7 +220,7 @@ class LayoutInspectorTreeTest {
                 name = "MaterialTheme",
                 hasTransformations = true,
                 fileName = "LayoutInspectorTreeTest.kt",
-                left = 68.0.dp, top = 49.7.dp, width = 88.5.dp, height = 21.7.dp,
+                left = 65.8.dp, top = 49.7.dp, width = 86.2.dp, height = 21.7.dp,
                 children = listOf("Text")
             )
             node(
@@ -228,7 +228,7 @@ class LayoutInspectorTreeTest {
                 isRenderNode = true,
                 hasTransformations = true,
                 fileName = "LayoutInspectorTreeTest.kt",
-                left = 68.0.dp, top = 49.7.dp, width = 88.5.dp, height = 21.7.dp,
+                left = 65.8.dp, top = 49.7.dp, width = 86.2.dp, height = 21.7.dp,
             )
         }
     }
@@ -443,9 +443,9 @@ class LayoutInspectorTreeTest {
                 assertWithMessage(message).that(node.id).isLessThan(0L)
             }
             if (hasTransformations) {
-                assertWithMessage(message).that(node.bounds).isNotEmpty()
+                assertWithMessage(message).that(node.bounds).isNotNull()
             } else {
-                assertWithMessage(message).that(node.bounds).isEmpty()
+                assertWithMessage(message).that(node.bounds).isNull()
             }
             if (left != Dp.Unspecified) {
                 with(density) {

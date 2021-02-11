@@ -18,8 +18,6 @@ package androidx.compose.ui.inspection.inspector
 
 import androidx.compose.ui.layout.LayoutInfo
 
-private val EmptyIntArray = IntArray(0)
-
 /**
  * Node representing a Composable for the Layout Inspector.
  */
@@ -88,12 +86,9 @@ class InspectorNode internal constructor(
     val height: Int,
 
     /**
-     * The 4 corners of the node after modifier transformations.
-     * If there are no coordinate transforms the array will be empty.
-     * Otherwise the content will be 8 integers representing 4 (x,y) corners
-     * in clockwise order of the original, untransformed coordinates.
+     * The 4 corners of the polygon after transformations of the original rectangle.
      */
-    val bounds: IntArray,
+    val bounds: QuadBounds? = null,
 
     /**
      * The parameters of this Composable.
@@ -104,6 +99,17 @@ class InspectorNode internal constructor(
      * The children nodes of this Composable.
      */
     val children: List<InspectorNode>
+)
+
+data class QuadBounds(
+    val x0: Int,
+    val y0: Int,
+    val x1: Int,
+    val y1: Int,
+    val x2: Int,
+    val y2: Int,
+    val x3: Int,
+    val y3: Int,
 )
 
 /**
@@ -127,7 +133,7 @@ internal class MutableInspectorNode {
     var top = 0
     var width = 0
     var height = 0
-    var bounds = EmptyIntArray
+    var bounds: QuadBounds? = null
     val parameters = mutableListOf<RawParameter>()
     val children = mutableListOf<InspectorNode>()
 
@@ -139,7 +145,7 @@ internal class MutableInspectorNode {
         width = 0
         height = 0
         layoutNodes.clear()
-        bounds = EmptyIntArray
+        bounds = null
         children.clear()
     }
 
