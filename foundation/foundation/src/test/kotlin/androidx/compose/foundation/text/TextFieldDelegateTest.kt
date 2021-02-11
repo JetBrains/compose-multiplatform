@@ -157,6 +157,7 @@ class TextFieldDelegateTest {
         verify(actual).showSoftwareKeyboard()
         assertThat(actual).isEqualTo(textInputSession)
     }
+
     @Test
     fun on_blur_with_hiding() {
         val editorState = TextFieldValue(
@@ -175,7 +176,7 @@ class TextFieldDelegateTest {
             verify(textInputSession).dispose()
         }
         verify(onValueChange, times(1)).invoke(
-            eq(editorState.commitComposition())
+            eq(editorState.copy(composition = null))
         )
     }
 

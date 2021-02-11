@@ -35,20 +35,25 @@ import kotlin.math.min
  * This class stores a snapshot of the input state of the edit buffer and provide utility functions
  * for answering IME requests such as getTextBeforeCursor, getSelectedText.
  *
- * IME [composition] parameter is owned by the IME and it is related to text composition. When a
+ * Input service composition is an instance of text produced by IME. An example visual for the
+ * composition is that the currently composed word is visually separated from others with
+ * underline, or text background. For description of composition please check
+ * [W3C IME Composition](https://www.w3.org/TR/ime-api/#ime-composition).
+ *
+ * IME composition is defined by [composition] parameter and function. When a
  * [TextFieldValue] with null [composition] is passed to a TextField, if there was an
- * active [composition] on the text, the changes will be committed. Please use [copy] functions
- * if you do not want to intentionally commit the IME composition.
+ * active [composition] on the text, the changes will be applied. Applying a composition will
+ * accept the changes that were still being composed by IME. Please use [copy]
+ * functions if you do not want to intentionally apply the ongoing IME composition.
  *
  * @param annotatedString the text to be rendered.
  * @param selection the selection range. If the selection is collapsed, it represents cursor
  * location. When selection range is out of bounds, it is constrained with the text length.
- * @param composition the composition range, null means empty composition or commit if a
+ * @param composition the composition range, null means empty composition or apply if a
  * composition exists on the text. Owned by IME, and if you have an instance of [TextFieldValue]
  * please use [copy] functions if you do not want to intentionally change the value of this
  * field.
  *
- * @see commitComposition
  */
 @Immutable
 class TextFieldValue constructor(
@@ -60,12 +65,10 @@ class TextFieldValue constructor(
      * @param text the text to be rendered.
      * @param selection the selection range. If the selection is collapsed, it represents cursor
      * location. When selection range is out of bounds, it is constrained with the text length.
-     * @param composition the composition range, null means empty composition or commit if a
+     * @param composition the composition range, null means empty composition or apply if a
      * composition exists on the text. Owned by IME, and if you have an instance of [TextFieldValue]
      * please use [copy] functions if you do not want to intentionally change the value of this
      * field.
-     *
-     * @see commitComposition
      */
     constructor(
         text: String = "",
@@ -79,18 +82,19 @@ class TextFieldValue constructor(
      * The selection range. If the selection is collapsed, it represents cursor
      * location. When selection range is out of bounds, it is constrained with the text length.
      */
-    val selection = selection.constrain(0, text.length)
+    val selection: TextRange = selection.constrain(0, text.length)
 
     /**
      * Composition range created by  IME. If null, there is no composition range.
-     *
-     * Composition can be set on the by the system, however it is possible to commit an existing
-     * composition using [commitComposition].
      *
      * Input service composition is an instance of text produced by IME. An example visual for the
      * composition is that the currently composed word is visually separated from others with
      * underline, or text background. For description of composition please check
      * [W3C IME Composition](https://www.w3.org/TR/ime-api/#ime-composition)
+     *
+     * Composition can be set on the by the system, however it is possible to apply an existing
+     * composition by setting the value to null. Applying a composition will accept the changes
+     * that were still being composed by IME.
      */
     val composition: TextRange? = composition?.constrain(0, text.length)
 
@@ -115,19 +119,6 @@ class TextFieldValue constructor(
     ): TextFieldValue {
         return TextFieldValue(AnnotatedString(text), selection, composition)
     }
-
-    /**
-     * Returns a copy of [TextFieldValue] in which [composition] is set to null. When a
-     * [TextFieldValue] with null [composition] is passed to a TextField, if there was an
-     * active [composition] on the text, the changes will be committed.
-     *
-     * @see composition
-     */
-    fun commitComposition() = TextFieldValue(
-        annotatedString = annotatedString,
-        selection = selection,
-        composition = null
-    )
 
     // auto generated equals method
     override fun equals(other: Any?): Boolean {
@@ -173,12 +164,22 @@ class TextFieldValue constructor(
 
 /**
  * Returns the text before the selection.
+ *
+ * @param maxChars maximum number of characters (inclusive) before the minimum value in
+ * [TextFieldValue.selection].
+ *
+ * @see TextRange.min
  */
 fun TextFieldValue.getTextBeforeSelection(maxChars: Int): AnnotatedString =
     annotatedString.subSequence(max(0, selection.min - maxChars), selection.min)
 
 /**
  * Returns the text after the selection.
+ *
+ * @param maxChars maximum number of characters (exclusive) after the maximum value in
+ * [TextFieldValue.selection].
+ *
+ * @see TextRange.max
  */
 fun TextFieldValue.getTextAfterSelection(maxChars: Int): AnnotatedString =
     annotatedString.subSequence(selection.max, min(selection.max + maxChars, text.length))
