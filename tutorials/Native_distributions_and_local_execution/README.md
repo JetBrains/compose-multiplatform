@@ -78,7 +78,7 @@ to run such applications will be faced with an error like this:
 
 ![](attrs-error.png)
 
-See [our tutorial](tutorials/Signing_and_notarization_on_macOS/README.md) 
+See [our tutorial](/tutorials/Signing_and_notarization_on_macOS/README.md) 
 on how to sign and notarize your application. 
 
 ## Customizing JDK version

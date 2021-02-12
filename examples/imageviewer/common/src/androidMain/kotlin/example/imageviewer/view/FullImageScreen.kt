@@ -3,8 +3,9 @@ package example.imageviewer.view
 import android.graphics.Bitmap
 import android.graphics.Rect
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.ScrollableRow
 import androidx.compose.foundation.background
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -25,6 +26,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.asImageBitmap
+import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.unit.dp
 import example.imageviewer.core.FilterType
@@ -85,7 +87,7 @@ fun setToolBar(
     text: String,
     content: ContentState
 ) {
-
+    val scrollState = rememberScrollState()
     Surface(color = MiniatureColor, modifier = Modifier.preferredHeight(44.dp)) {
         Row(modifier = Modifier.padding(end = 30.dp)) {
             Surface(
@@ -122,11 +124,9 @@ fun setToolBar(
                     .align(Alignment.CenterVertically),
                 shape = CircleShape
             ) {
-                ScrollableRow {
-                    Row {
-                        for (type in FilterType.values()) {
-                            FilterButton(content, type)
-                        }
+                Row(Modifier.horizontalScroll(scrollState)) {
+                    for (type in FilterType.values()) {
+                        FilterButton(content, type)
                     }
                 }
             }
@@ -158,7 +158,7 @@ fun FilterButton(
 }
 
 @Composable
-fun getFilterImage(type: FilterType, content: ContentState): ImageBitmap {
+fun getFilterImage(type: FilterType, content: ContentState): Painter {
 
     return when (type) {
         FilterType.GrayScale -> if (content.isFilterEnabled(type)) icFilterGrayscaleOn() else icFilterGrayscaleOff()

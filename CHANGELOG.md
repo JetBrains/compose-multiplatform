@@ -1,5 +1,6 @@
 # M3
-   * Support [vsync](https://github.com/JetBrains/skiko/pull/44)
+   * Support [vsync](https://github.com/JetBrains/skiko/pull/44),  [sync composition with rendering frames](https://android-review.googlesource.com/c/platform/frameworks/support/+/1534675)
+   * [Slightly reduce artifacts on window resize/start](https://github.com/JetBrains/skiko/pull/55)
    * Fix [Ambients are not transferred across pop ups](https://github.com/JetBrains/compose-jb/issues/135)
    * Fix [Laggy UI on Linux](https://github.com/JetBrains/compose-jb/issues/23)
    * Implement [signing and notarization for macOS](https://github.com/JetBrains/compose-jb/tree/master/tutorials/Signing_and_notarization_on_macOS)
@@ -13,7 +14,7 @@
    * Support [XML vector images](https://developer.android.com/guide/topics/graphics/vector-drawable-resources)
    * [Support for Gradle 6.6 and 6.7](https://github.com/JetBrains/compose-jb/issues/66)
    * [Support macOS 10.13 and 10.14](https://github.com/JetBrains/compose-jb/issues/76)
-   * Support Apple Silicon (am64) natively
+   * Support Apple Silicon (arm64) natively
    * [Support letter spacing in text](https://github.com/JetBrains/compose-jb/issues/82)
    * [Implemented desktop "ActualDialog" and "ActualPopup"](https://github.com/JetBrains/compose-jb/issues/19)
    * [Fix input method bar positioning](https://github.com/JetBrains/compose-jb/issues/67)
