@@ -253,6 +253,6 @@ private fun StringBuilder.appendConfigInfo(config: SemanticsConfiguration, inden
     if (config.isClearingSemantics) {
         appendLine()
         append(indent)
-        append("ReplaceSemantics = 'true'")
+        append("ClearAndSetSemantics = 'true'")
     }
 }
