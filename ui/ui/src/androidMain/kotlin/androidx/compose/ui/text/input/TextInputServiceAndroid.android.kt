@@ -51,10 +51,18 @@ internal class TextInputServiceAndroid(val view: View) : PlatformTextInputServic
     private var ic: RecordingInputConnection? = null
     private var focusedRect: android.graphics.Rect? = null
 
+    private var _imm: InputMethodManager? = null
     /**
      * The editable buffer used for BaseInputConnection.
      */
-    private lateinit var imm: InputMethodManager
+    private val imm: InputMethodManager
+        get() {
+            if (_imm == null) {
+                _imm = view.context.getSystemService(Context.INPUT_METHOD_SERVICE) as
+                    InputMethodManager
+            }
+            return _imm!!
+        }
 
     /**
      * A channel that is used to send ShowKeyboard/HideKeyboard commands. Send 'true' for
@@ -115,7 +123,6 @@ internal class TextInputServiceAndroid(val view: View) : PlatformTextInputServic
         onEditCommand: (List<EditCommand>) -> Unit,
         onImeActionPerformed: (ImeAction) -> Unit
     ) {
-        imm = view.context.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
         editorHasFocus = true
         state = value
         this.imeOptions = imeOptions
@@ -153,6 +160,7 @@ internal class TextInputServiceAndroid(val view: View) : PlatformTextInputServic
 
     @OptIn(FlowPreview::class)
     suspend fun keyboardVisibilityEventLoop() {
+        // TODO(b/180071033): Allow for more IMPLICIT flag to be passed.
         for (showKeyboard in showKeyboardChannel) {
             // Even though we are using a conflated channel, and the producers and consumers are
             // on the same thread, there is a possibility that we have a stale value in the channel

@@ -16,6 +16,7 @@
 
 package androidx.compose.ui.demos
 
+import androidx.compose.foundation.demos.text.SoftwareKeyboardControllerDemo
 import androidx.compose.ui.demos.autofill.ExplicitAutofillTypesDemo
 import androidx.compose.ui.demos.focus.FocusableDemo
 import androidx.compose.ui.demos.focus.ReuseFocusRequesterDemo
@@ -132,6 +133,7 @@ val CoreDemos = DemoCategory(
         ComposableDemo("Popup") { PopupDemo() },
         GraphicsDemos,
         GestureDemos,
-        ComposableDemo("Views interoperability") { ViewInteropDemo() }
+        ComposableDemo("Views interoperability") { ViewInteropDemo() },
+        ComposableDemo("Software Keyboard Controller") { SoftwareKeyboardControllerDemo() }
     )
 )
