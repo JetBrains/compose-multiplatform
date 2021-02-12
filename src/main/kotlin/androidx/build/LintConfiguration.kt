@@ -74,17 +74,20 @@ fun Project.configureLint(lintOptions: LintOptions, extension: AndroidXExtension
         project.rootProject.project(":lint-checks")
     )
 
+    // The purpose of this specific project is to test that lint is running, so
+    // it contains expected violations that we do not want to trigger a build failure
+    val isTestingLintItself = (project.path == ":lint-checks:integration-tests")
+
     // If -PupdateLintBaseline was set we should update the baseline if it exists
-    val updateLintBaseline = hasProperty(UPDATE_LINT_BASELINE)
+    val updateLintBaseline = hasProperty(UPDATE_LINT_BASELINE) && !isTestingLintItself
 
     // Lint is configured entirely in afterEvaluate so that individual projects cannot easily
-    // disable individual checks in the DSL for any reason. That being said, when rolling out a new
-    // check as fatal, it can be beneficial to set it to fatal above this comment. This allows you
-    // to override it in a build script rather than messing with the baseline files. This is
-    // especially relevant for checks which cause hundreds or more failures.
+    // disable individual checks in the DSL for any reason.
     afterEvaluate {
         lintOptions.apply {
-            isAbortOnError = true
+            if (!isTestingLintItself) {
+                isAbortOnError = true
+            }
             isIgnoreWarnings = true
 
             // Workaround for b/177359055 where 27.2.0-beta04 incorrectly computes severity.

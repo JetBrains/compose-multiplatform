@@ -27,6 +27,7 @@ import androidx.build.dokka.Dokka
 import androidx.build.getBuildId
 import androidx.build.getCheckoutRoot
 import androidx.build.getDistributionDirectory
+import androidx.build.getKeystore
 import androidx.build.gradle.getByType
 import com.android.build.api.attributes.BuildTypeAttr
 import com.android.build.gradle.LibraryExtension
@@ -75,6 +76,14 @@ class AndroidXDocsPlugin : Plugin<Project> {
                     val libraryExtension = project.extensions.getByType<LibraryExtension>()
                     libraryExtension.compileSdkVersion = SupportConfig.COMPILE_SDK_VERSION
                     libraryExtension.buildToolsVersion = SupportConfig.BUILD_TOOLS_VERSION
+
+                    // Use a local debug keystore to avoid build server issues.
+                    val debugSigningConfig = libraryExtension.signingConfigs.getByName("debug")
+                    debugSigningConfig.storeFile = project.getKeystore()
+                    libraryExtension.buildTypes.all { buildType ->
+                        // Sign all the builds (including release) with debug key
+                        buildType.signingConfig = debugSigningConfig
+                    }
                 }
             }
         }

@@ -88,11 +88,10 @@ private fun JavaCompile.configureWithErrorProne() {
 
             "-XepExcludedPaths:.*/(build/generated|build/errorProne|external)/.*",
 
-            // Disable the following checks.
+            // We allow inter library RestrictTo usage.
             "-Xep:RestrictTo:OFF",
-            "-Xep:ObjectToString:OFF",
-            "-Xep:CatchAndPrintStackTrace:OFF",
-            "-Xep:MixedMutabilityReturnType:OFF",
+
+            // Disable the following checks.
             "-Xep:UnescapedEntity:OFF",
             "-Xep:MissingSummary:OFF",
             "-Xep:StaticAssignmentInConstructor:OFF",
@@ -160,6 +159,9 @@ private fun JavaCompile.configureWithErrorProne() {
             "-Xep:RxReturnValueIgnored:ERROR",
             "-Xep:BadImport:ERROR",
             "-Xep:MissingCasesInEnumSwitch:ERROR",
+            "-Xep:ObjectToString:ERROR",
+            "-Xep:CatchAndPrintStackTrace:ERROR",
+            "-Xep:MixedMutabilityReturnType:ERROR",
 
             // Nullaway
             "-XepIgnoreUnknownCheckNames", // https://github.com/uber/NullAway/issues/25

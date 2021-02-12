@@ -268,7 +268,7 @@ class AndroidXPlugin : Plugin<Project> {
 
         project.extensions.getByType<LibraryAndroidComponentsExtension>().apply {
             @Suppress("deprecation")
-            beforeUnitTest(selector().withBuildType("release")) { unitTest ->
+            beforeUnitTests(selector().withBuildType("release")) { unitTest ->
                 unitTest.enabled = false
             }
         }
@@ -386,6 +386,7 @@ class AndroidXPlugin : Plugin<Project> {
         }
 
         // Force AGP to use our version of JaCoCo
+        @Suppress("deprecation")
         jacoco.version = Jacoco.VERSION
         compileSdkVersion(COMPILE_SDK_VERSION)
         buildToolsVersion = BUILD_TOOLS_VERSION
