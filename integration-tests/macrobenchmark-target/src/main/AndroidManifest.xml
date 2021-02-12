@@ -25,6 +25,10 @@
         android:icon="@mipmap/ic_launcher"
         tools:ignore="GoogleAppIndexingWarning">
 
+        <!-- Profileable to enable macrobenchmark profiling -->
+        <!--suppress AndroidElementNotAllowed -->
+        <profileable android:shell="true"/>
+
         <!--
         Activities need to be exported so the macrobenchmark can discover them
         under the new package visibility changes for Android 11.
