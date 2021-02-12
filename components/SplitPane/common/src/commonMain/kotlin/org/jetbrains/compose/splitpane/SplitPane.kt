@@ -14,7 +14,7 @@ data class MinimalSizes(
 
 @Composable
 fun VerticalSplitPane(
-    splitPaneState: SplitPaneState,
+    splitPaneState: SplitPaneState = rememberSplitPaneState(),
     modifier: Modifier = Modifier,
     content: SplitPaneScope.() -> Unit
 ) {
@@ -39,7 +39,7 @@ fun VerticalSplitPane(
 
 @Composable
 fun HorizontalSplitPane(
-    splitPaneState: SplitPaneState,
+    splitPaneState: SplitPaneState = rememberSplitPaneState(),
     modifier: Modifier = Modifier,
     content: SplitPaneScope.() -> Unit
 ) {
