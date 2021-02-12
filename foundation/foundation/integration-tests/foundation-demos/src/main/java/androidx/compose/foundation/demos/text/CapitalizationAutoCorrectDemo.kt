@@ -30,6 +30,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.SolidColor
+import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.text.input.KeyboardType
@@ -91,12 +92,12 @@ private fun MyTextField(data: ImeOptionsData) {
     var state by rememberSaveable(stateSaver = TextFieldValue.Saver) {
         mutableStateOf(TextFieldValue())
     }
-    // TODO(b/1583763): re-add software keyboard controller when replacement API is added
+    val keyboardController = LocalSoftwareKeyboardController.current
     BasicTextField(
         modifier = demoTextFieldModifiers.defaultMinSize(100.dp),
         value = state,
         keyboardOptions = data.keyboardOptions,
-        keyboardActions = KeyboardActions { /* hide keyboard */ },
+        keyboardActions = KeyboardActions { keyboardController?.hideSoftwareKeyboard() },
         onValueChange = { state = it },
         textStyle = TextStyle(fontSize = fontSize8),
         cursorBrush = SolidColor(Color.Red)
