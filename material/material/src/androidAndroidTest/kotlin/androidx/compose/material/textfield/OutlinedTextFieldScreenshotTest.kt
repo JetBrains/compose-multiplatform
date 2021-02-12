@@ -106,7 +106,6 @@ class OutlinedTextFieldScreenshotTest {
         assertAgainstGolden("outlined_textField_not_focused")
     }
 
-    @FlakyTest(bugId = 179292401)
     @Test
     fun outlinedTextField_focused() {
         rule.setMaterialContent {
@@ -125,7 +124,6 @@ class OutlinedTextFieldScreenshotTest {
         assertAgainstGolden("outlined_textField_focused")
     }
 
-    @FlakyTest(bugId = 179292401)
     @Test
     fun outlinedTextField_focused_rtl() {
         rule.setMaterialContent {
@@ -146,7 +144,6 @@ class OutlinedTextFieldScreenshotTest {
         assertAgainstGolden("outlined_textField_focused_rtl")
     }
 
-    @FlakyTest(bugId = 179292401)
     @Test
     fun outlinedTextField_error_focused() {
         rule.setMaterialContent {
