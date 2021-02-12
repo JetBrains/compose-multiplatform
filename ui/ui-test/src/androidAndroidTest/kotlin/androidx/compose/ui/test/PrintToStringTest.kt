@@ -69,7 +69,7 @@ class PrintToStringTest {
 
         assertThat(obfuscateNodesInfo(result)).matches(
             "" +
-                "Node #X at \\(X, X, X, X\\)px\n" +
+                "Node #X at \\(l=X, t=X, r=X, b=X\\)px\n" +
                 "Text = 'Hello'\n" +
                 "GetTextLayoutResult = 'AccessibilityAction\\(label=null, action=.*\\)'\n" +
                 "Has 1 sibling"
@@ -88,11 +88,11 @@ class PrintToStringTest {
 
         assertThat(obfuscateNodesInfo(result)).matches(
             "" +
-                "1\\) Node #X at \\(X, X, X, X\\)px\n" +
+                "1\\) Node #X at \\(l=X, t=X, r=X, b=X\\)px\n" +
                 "Text = 'Hello'\n" +
                 "GetTextLayoutResult = 'AccessibilityAction\\(label=null, action=.*\\)'\n" +
                 "Has 1 sibling\n" +
-                "2\\) Node #X at \\(X, X, X, X\\)px\n" +
+                "2\\) Node #X at \\(l=X, t=X, r=X, b=X\\)px\n" +
                 "Text = 'World'\n" +
                 "GetTextLayoutResult = 'AccessibilityAction\\(label=null, action=.*\\)'\n" +
                 "Has 1 sibling"
@@ -117,19 +117,19 @@ class PrintToStringTest {
 
         assertThat(obfuscateNodesInfo(result)).matches(
             "" +
-                "Node #X at \\(X, X, X, X\\)px\n" +
-                " ..*Node #X at \\(X, X, X, X\\)px, Tag: 'column'\n" +
+                "Node #X at \\(l=X, t=X, r=X, b=X\\)px\n" +
+                " ..*Node #X at \\(l=X, t=X, r=X, b=X\\)px, Tag: 'column'\n" +
                 "   Disabled = 'kotlin.Unit'\n" +
-                "    .-Node #X at \\(X, X, X, X\\)px, Tag: 'box'\n" +
+                "    .-Node #X at \\(l=X, t=X, r=X, b=X\\)px, Tag: 'box'\n" +
                 "    . Disabled = 'kotlin.Unit'\n" +
-                "    .  .-Node #X at \\(X, X, X, X\\)px\n" +
+                "    .  .-Node #X at \\(l=X, t=X, r=X, b=X\\)px\n" +
                 "    .    Role = 'Button'\n" +
                 "    .    OnClick = 'AccessibilityAction\\(label=null, action=.*\\)'\n" +
                 "    .    Text = 'Button'\n" +
                 "    .    GetTextLayoutResult = 'AccessibilityAction\\(label=null, " +
                 "action=.*\\)'\n" +
                 "    .    MergeDescendants = 'true'\n" +
-                "    .-Node #X at \\(X, X, X, X\\)px\n" +
+                "    .-Node #X at \\(l=X, t=X, r=X, b=X\\)px\n" +
                 "      Text = 'Hello'\n" +
                 "      GetTextLayoutResult = 'AccessibilityAction\\(label=null, action=.*\\).*'"
         )
@@ -156,11 +156,11 @@ class PrintToStringTest {
 
         assertThat(obfuscateNodesInfo(result)).isEqualTo(
             "" +
-                "1) Node #X at (X, X, X, X)px, Tag: 'tag1'\n" +
-                " |-Node #X at (X, X, X, X)px, Tag: 'tag11'\n" +
+                "1) Node #X at (l=X, t=X, r=X, b=X)px, Tag: 'tag1'\n" +
+                " |-Node #X at (l=X, t=X, r=X, b=X)px, Tag: 'tag11'\n" +
                 "   Has 1 child\n" +
-                "2) Node #X at (X, X, X, X)px, Tag: 'tag2'\n" +
-                " |-Node #X at (X, X, X, X)px, Tag: 'tag22'\n" +
+                "2) Node #X at (l=X, t=X, r=X, b=X)px, Tag: 'tag2'\n" +
+                " |-Node #X at (l=X, t=X, r=X, b=X)px, Tag: 'tag22'\n" +
                 "   Has 1 child"
         )
     }

@@ -118,7 +118,7 @@ class ErrorMessagesTest {
                 "Reason: Expected exactly '1' node but found '2' nodes that satisfy: " +
                 "(Text = 'Toggle' (ignoreCase: false))\n" +
                 "Nodes found:\n" +
-                "1) Node #X at (X, X, X, X)px, Tag: 'MyButton'"
+                "1) Node #X at (l=X, t=X, r=X, b=X)px, Tag: 'MyButton'"
         ) {
             rule.onNodeWithText("Toggle")
                 .performClick()
@@ -154,7 +154,7 @@ class ErrorMessagesTest {
                 "Reason: Did not expect any node but found '1' node that satisfies: " +
                 "(TestTag = 'MyButton')\n" +
                 "Node found:\n" +
-                "Node #X at (X, X, X, X)px, Tag: 'MyButton'"
+                "Node #X at (l=X, t=X, r=X, b=X)px, Tag: 'MyButton'"
         ) {
             rule.onNodeWithTag("MyButton")
                 .assertDoesNotExist()
@@ -173,7 +173,7 @@ class ErrorMessagesTest {
                 "Reason: Expected '3' nodes but found '2' nodes that satisfy: " +
                 "(Text = 'Toggle' (ignoreCase: false))\n" +
                 "Nodes found:\n" +
-                "1) Node #X at (X, X, X, X)px"
+                "1) Node #X at (l=X, t=X, r=X, b=X)px"
         ) {
             rule.onAllNodesWithText("Toggle")
                 .assertCountEquals(3)
@@ -213,7 +213,7 @@ class ErrorMessagesTest {
             "" +
                 "Failed to perform a gesture.\n" +
                 "The node is no longer in the tree, last known semantics:\n" +
-                "Node #X at \\(X, X, X, X\\)px\n" +
+                "Node #X at \\(l=X, t=X, r=X, b=X\\)px\n" +
                 "Text = 'Hello'\n" +
                 "GetTextLayoutResult = 'AccessibilityAction\\(label=null, action=.*\\)'\n" +
                 "Has 1 sibling\n" +
@@ -240,7 +240,7 @@ class ErrorMessagesTest {
             "" +
                 "Failed: assertExists.\n" +
                 "The node is no longer in the tree, last known semantics:\n" +
-                "Node #X at \\(X, X, X, X\\)px\n" +
+                "Node #X at \\(l=X, t=X, r=X, b=X\\)px\n" +
                 "Text = 'Hello'\n" +
                 "GetTextLayoutResult = 'AccessibilityAction\\(label=null, action=.*\\)'\n" +
                 "Has 1 sibling\n" +
@@ -267,7 +267,7 @@ class ErrorMessagesTest {
             "" +
                 "Failed to assert the following: \\(OnClick is defined\\)\n" +
                 "The node is no longer in the tree, last known semantics:\n" +
-                "Node #X at \\(X, X, X, X\\)px\n" +
+                "Node #X at \\(l=X, t=X, r=X, b=X\\)px\n" +
                 "Text = 'Hello'\n" +
                 "GetTextLayoutResult = 'AccessibilityAction\\(label=null, action=.*\\)'\n" +
                 "Has 1 sibling\n" +
