@@ -21,7 +21,6 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.height
@@ -202,21 +201,16 @@ fun BottomAppBar(
     } else {
         RectangleShape
     }
+    // TODO: b/150609566 clarify emphasis for children
     AppBar(
         backgroundColor,
         contentColor,
         elevation,
         contentPadding,
         shape,
-        modifier
-    ) {
-        // TODO: b/150609566 clarify emphasis for children
-        Row(
-            Modifier.fillMaxSize(),
-            verticalAlignment = Alignment.CenterVertically,
-            content = content
-        )
-    }
+        modifier,
+        content
+    )
 }
 
 /**
@@ -502,7 +496,8 @@ private fun AppBar(
             Modifier.fillMaxWidth()
                 .padding(contentPadding)
                 .height(AppBarHeight),
-            horizontalArrangement = Arrangement.SpaceBetween,
+            horizontalArrangement = Arrangement.Start,
+            verticalAlignment = Alignment.CenterVertically,
             content = content
         )
     }
