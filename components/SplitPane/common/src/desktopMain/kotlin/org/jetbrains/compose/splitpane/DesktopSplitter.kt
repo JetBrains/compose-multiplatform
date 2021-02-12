@@ -23,7 +23,7 @@ import androidx.compose.ui.input.pointer.pointerMoveFilter
 import androidx.compose.ui.unit.dp
 import java.awt.Cursor
 
-fun Modifier.cursorForResize(
+internal fun Modifier.cursorForResize(
     isHorizontal: Boolean
 ): Modifier = composed {
     var isHover by remember { mutableStateOf(false) }
@@ -42,7 +42,7 @@ fun Modifier.cursorForResize(
 }
 
 @Composable
-fun DesktopSplitPaneSeparator(
+internal fun DesktopSplitPaneSeparator(
     isHorizontal: Boolean,
     color: Color = MaterialTheme.colors.background
 ) = Box(
@@ -60,7 +60,7 @@ fun DesktopSplitPaneSeparator(
 )
 
 @Composable
-fun DesktopSplitPaneHandle(
+internal fun DesktopSplitPaneHandle(
     isHorizontal: Boolean,
     consumeMoveDelta: (delta: Float) -> Unit
 ) = Box(

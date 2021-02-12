@@ -5,14 +5,27 @@ import androidx.compose.foundation.MutatePriority
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.structuralEqualityPolicy
 
+class SplitPaneState(
+    val splitterState: SplitterState,
+    enabled: Boolean
+) {
+    private var _enabled = mutableStateOf(enabled, structuralEqualityPolicy())
+
+    var enabled: Boolean
+        get() = _enabled.value
+        set(newValue) {
+            _enabled.value = newValue
+        }
+
+}
+
 class SplitterState(
-    initial: Float,
-    minValue: Float = 0f,
-    maxValue: Float = Float.POSITIVE_INFINITY,
-    interactionState: InteractionState? = null
+    initialPosition: Float,
+    minPosition: Float = 0f,
+    maxPosition: Float = Float.POSITIVE_INFINITY,
 ) : SingleDirectionMovable {
 
-    private var _position = mutableStateOf(initial, structuralEqualityPolicy())
+    private var _position = mutableStateOf(initialPosition, structuralEqualityPolicy())
 
     var position: Float
         get() = _position.value
@@ -31,7 +44,7 @@ class SplitterState(
             _position.value = percentPosition
         }
 
-    private var _maxPosition = mutableStateOf(maxValue, structuralEqualityPolicy())
+    private var _maxPosition = mutableStateOf(maxPosition, structuralEqualityPolicy())
 
     var minPosition: Float
         get() = _minPosition.value
@@ -40,9 +53,9 @@ class SplitterState(
             _position.value = percentPosition
         }
 
-    private var _minPosition = mutableStateOf(minValue, structuralEqualityPolicy())
+    private var _minPosition = mutableStateOf(minPosition, structuralEqualityPolicy())
 
-    private val singleDirectionMovableState = movableState { onMove(it) }
+    private val singleDirectionMovableState = movableState(this::onMove)
 
     internal fun onMove(delta: Float) {
         position = (position + delta).coerceIn(minPosition, maxPosition)
@@ -52,6 +65,8 @@ class SplitterState(
         movePriority: MutatePriority,
         block: suspend SingleDirectionMoveScope.() -> Unit) = singleDirectionMovableState.move(movePriority,block)
 
+    override fun dispatchRawMovement(delta: Float) = singleDirectionMovableState.dispatchRawMovement(delta)
+
     override val isMoveInProgress: Boolean
         get() = singleDirectionMovableState.isMoveInProgress
 
@@ -59,42 +74,5 @@ class SplitterState(
 
     private val percentPosition: Float
         get() = ((maxPosition - minPosition) * percent).coerceIn(minPosition, maxPosition)
-
-}
-
-internal class SplitterPosition(
-    position: Float = 0f,
-    maxValue: Float = Float.POSITIVE_INFINITY,
-    minValue: Float = 0f
-) {
-    var maxValue = maxValue
-        set(newMaxValue) {
-            field = newMaxValue
-            if (position > newMaxValue) {
-                position = newMaxValue
-            }
-        }
-
-    var minValue = minValue
-        set(newMinValue) {
-            field = newMinValue
-            if (position < newMinValue) {
-                position = newMinValue
-            }
-        }
-
-    var position = position
-        set(newPosition) {
-            field = newPosition.coerceIn(minValue,maxValue)
-        }
-
-    var percent: Float
-        get() = (position - minValue) / (maxValue - minValue)
-        set(newPercent) {
-            if (newPercent in 0f..1f) {
-                position = ((maxValue - minValue) * newPercent).coerceIn(minValue, maxValue)
-            }
-        }
-
 
 }

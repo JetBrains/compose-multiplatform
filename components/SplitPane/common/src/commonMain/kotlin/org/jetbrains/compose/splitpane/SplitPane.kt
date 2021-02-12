@@ -19,15 +19,20 @@ fun VerticalSplitPane(
 ) {
     val bet: SplitPaneScopeImpl = SplitPaneScopeImpl().apply(content)
 
-    SplitPane(
-        modifier,
-        isHorizontal = false,
-        splitterState,
-        bet.minimalSizes,
-        bet.firstPlaceableContent,
-        bet.secondPlaceableContent,
-        { Splitter(isHorizontal = false, splitterState::onMove)}
-    )
+    if (bet.firstPlaceableContent != null && bet.secondPlaceableContent != null) {
+        SplitPane(
+            modifier,
+            isHorizontal = false,
+            splitterState,
+            bet.minimalSizes,
+            bet.firstPlaceableContent!!,
+            bet.secondPlaceableContent!!,
+            { Splitter(isHorizontal = false, splitterState::dispatchRawMovement)}
+        )
+    } else {
+        bet.firstPlaceableContent?.invoke()
+        bet.secondPlaceableContent?.invoke()
+    }
 }
 
 @Composable
@@ -37,15 +42,20 @@ fun HorizontalSplitPane(
     content: SplitPaneScope.() -> Unit
 ) {
     val bet = SplitPaneScopeImpl().apply(content)
-    SplitPane(
-        modifier,
-        isHorizontal = true,
-        splitterState,
-        bet.minimalSizes,
-        bet.firstPlaceableContent,
-        bet.secondPlaceableContent,
-        { Splitter(isHorizontal = true, splitterState::onMove)}
-    )
+    if (bet.firstPlaceableContent != null && bet.secondPlaceableContent != null) {
+        SplitPane(
+            modifier,
+            isHorizontal = true,
+            splitterState,
+            bet.minimalSizes,
+            bet.firstPlaceableContent!!,
+            bet.secondPlaceableContent!!,
+            { Splitter(isHorizontal = true, splitterState::dispatchRawMovement)}
+        )
+    } else {
+        bet.firstPlaceableContent?.invoke()
+        bet.secondPlaceableContent?.invoke()
+    }
 }
 
 @Composable

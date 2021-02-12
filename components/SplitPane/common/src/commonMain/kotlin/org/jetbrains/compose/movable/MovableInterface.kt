@@ -16,12 +16,10 @@ interface SingleDirectionMovable {
         block: suspend SingleDirectionMoveScope.() -> Unit
     )
 
+    fun dispatchRawMovement(delta: Float)
+
     val isMoveInProgress: Boolean
 
-}
-
-interface SingleDirectionRawMovementDispatcher : SingleDirectionMovable {
-    fun dispatchRawMovement(delta: Float)
 }
 
 typealias SingleDirectionMoveDeltaConsumer = (Float) -> Unit
@@ -47,7 +45,7 @@ suspend fun SingleDirectionMovable.stopMovement(
 
 private class DefaultSingleDirectionMovableState(
     val onMoveDelta: SingleDirectionMoveDeltaConsumer
-) : SingleDirectionRawMovementDispatcher {
+) : SingleDirectionMovable {
 
     private val singleDirectionMoveScope = object : SingleDirectionMoveScope {
         override fun moveBy(pixels: Float) = onMoveDelta(pixels)
