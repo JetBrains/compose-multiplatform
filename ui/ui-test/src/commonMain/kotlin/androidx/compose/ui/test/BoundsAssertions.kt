@@ -28,6 +28,7 @@ import androidx.compose.ui.unit.DpRect
  *
  * @throws AssertionError if comparison fails.
  */
+@OptIn(ExperimentalTestApi::class)
 fun SemanticsNodeInteraction.assertWidthIsEqualTo(expectedWidth: Dp): SemanticsNodeInteraction =
     assert(hasWidth(expectedWidth))
 
@@ -36,6 +37,7 @@ fun SemanticsNodeInteraction.assertWidthIsEqualTo(expectedWidth: Dp): SemanticsN
  *
  * @throws AssertionError if comparison fails.
  */
+@OptIn(ExperimentalTestApi::class)
 fun SemanticsNodeInteraction.assertHeightIsEqualTo(expectedHeight: Dp): SemanticsNodeInteraction =
     assert(hasHeight(expectedHeight))
 
@@ -44,6 +46,7 @@ fun SemanticsNodeInteraction.assertHeightIsEqualTo(expectedHeight: Dp): Semantic
  *
  * @throws AssertionError if comparison fails.
  */
+@OptIn(ExperimentalTestApi::class)
 fun SemanticsNodeInteraction.assertWidthIsAtLeast(expectedMinWidth: Dp): SemanticsNodeInteraction =
     assert(hasWidthAtLeast(expectedMinWidth))
 
@@ -52,6 +55,7 @@ fun SemanticsNodeInteraction.assertWidthIsAtLeast(expectedMinWidth: Dp): Semanti
  *
  * @throws AssertionError if comparison fails.
  */
+@OptIn(ExperimentalTestApi::class)
 fun SemanticsNodeInteraction.assertHeightIsAtLeast(
     expectedMinHeight: Dp
 ): SemanticsNodeInteraction =
@@ -66,6 +70,7 @@ fun SemanticsNodeInteraction.assertHeightIsAtLeast(
  *
  * @throws AssertionError if comparison fails.
  */
+@OptIn(ExperimentalTestApi::class)
 fun SemanticsNodeInteraction.assertPositionInRootIsEqualTo(
     expectedLeft: Dp,
     expectedTop: Dp
@@ -80,6 +85,7 @@ fun SemanticsNodeInteraction.assertPositionInRootIsEqualTo(
  *
  * @throws AssertionError if comparison fails.
  */
+@OptIn(ExperimentalTestApi::class)
 fun SemanticsNodeInteraction.assertTopPositionInRootIsEqualTo(
     expectedTop: Dp
 ): SemanticsNodeInteraction =
@@ -93,6 +99,7 @@ fun SemanticsNodeInteraction.assertTopPositionInRootIsEqualTo(
  *
  * @throws AssertionError if comparison fails.
  */
+@OptIn(ExperimentalTestApi::class)
 fun SemanticsNodeInteraction.assertLeftPositionInRootIsEqualTo(
     expectedLeft: Dp
 ): SemanticsNodeInteraction =
