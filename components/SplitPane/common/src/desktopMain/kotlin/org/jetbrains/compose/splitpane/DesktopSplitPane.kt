@@ -4,14 +4,14 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.Layout
 import androidx.compose.ui.unit.Constraints
+import org.jetbrains.compose.movable.SplitterState
 import kotlin.math.roundToInt
 
 private fun Constraints.maxByDirection(isHorizontal: Boolean): Int = if (isHorizontal) maxWidth else maxHeight
-
-internal fun SplitterState.valueInPercents(): Float = (value - minValue) / (maxValue - minValue)
+private fun Constraints.minByDirection(isHorizontal: Boolean): Int = if (isHorizontal) minWidth else minHeight
 
 private val SplitterState.roundToIntValue
-    get() = value.roundToInt()
+    get() = position.roundToInt()
 
 @Composable
 actual fun SplitPane(
@@ -31,33 +31,27 @@ actual fun SplitPane(
         },
         modifier,
     ) { measurables, constraints ->
-        require(measurables.size == 3)
         with(minimalSizesConfiguration) {
             with(state) {
-                // check if minimal sizes constraints are valid
-                var constraintedMax = constraints.maxByDirection(isHorizontal).toFloat() - secondPlaceableMinimalSize.value
-                if (constraintedMax <= 0 || constraintedMax <= firstPlaceableMinimalSize.value) {
-                    constraintedMax = constraints.maxByDirection(isHorizontal).toFloat()
+
+                val constrainedMin = constraints.minByDirection(isHorizontal) + firstPlaceableMinimalSize.value
+
+                if (constrainedMin != minPosition) {
+                    minPosition = constrainedMin
                 }
-                // apply second placeable minimal size constraint
-                if (maxValue == kotlin.Float.POSITIVE_INFINITY) {
-                    maxValue = constraintedMax
+
+                val constrainedMax = (constraints.maxByDirection(isHorizontal).toFloat() - secondPlaceableMinimalSize.value).let {
+                    if (it <= 0 || it <= constrainedMin) {
+                        constraints.maxByDirection(isHorizontal).toFloat()
+                    } else { it }
                 }
-                // check if layout size was changed
-                if (constraintedMax != maxValue) {
-                    if (constraints.maxByDirection(isHorizontal).toFloat() < (firstPlaceableMinimalSize + secondPlaceableMinimalSize).value) {
-                        value = minValue
-                        maxValue = minValue
+
+                if (constrainedMax != maxPosition) {
+                    maxPosition = if (constraints.maxByDirection(isHorizontal).toFloat() <
+                        (firstPlaceableMinimalSize + secondPlaceableMinimalSize).value) {
+                        minPosition
                     } else {
-                        if (maxValue != minValue) {
-                            val splitterPositionPercent = valueInPercents()
-                            val newMax = constraints.maxByDirection(isHorizontal) - secondPlaceableMinimalSize.value
-                            val newStateValue = (newMax - minValue) * splitterPositionPercent
-                            maxValue = newMax
-                            value = newStateValue
-                        } else {
-                            maxValue = constraints.maxByDirection(isHorizontal) - secondPlaceableMinimalSize.value
-                        }
+                        constrainedMax
                     }
                 }
 

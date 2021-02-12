@@ -4,11 +4,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
-import org.jetbrains.compose.animation.SingleDirectionMoveState
-
-private const val Horizontal = true
-
-typealias SplitterState = SingleDirectionMoveState
+import org.jetbrains.compose.movable.SplitPaneState
+import org.jetbrains.compose.movable.SplitterState
 
 data class MinimalSizes(
     val firstPlaceableMinimalSize: Dp,
@@ -17,55 +14,62 @@ data class MinimalSizes(
 
 @Composable
 fun VerticalSplitPane(
-    splitterState: SplitterState,
+    splitPaneState: SplitPaneState,
     modifier: Modifier = Modifier,
-    content: SplitPaneContext.() -> Unit
+    content: SplitPaneScope.() -> Unit
 ) {
-    val bet: Betrayer = Betrayer.apply(content)
+    with(SplitPaneScopeImpl(isHorizontal = false, splitPaneState).apply(content)) {
+        if (firstPlaceableContent != null && secondPlaceableContent != null) {
+            SplitPane(
+                modifier,
+                isHorizontal = false,
+                splitPaneState.splitterState,
+                minimalSizes,
+                firstPlaceableContent!!,
+                secondPlaceableContent!!,
+                splitter ?: { Splitter(isHorizontal = false, splitPaneState)}
+            )
+        } else {
+            firstPlaceableContent?.invoke()
+            secondPlaceableContent?.invoke()
+        }
+    }
 
-    SplitPane(
-        modifier,
-        !Horizontal,
-        splitterState.apply { minValue = bet.firstPlaceableMinimalSize.value },
-        MinimalSizes(
-            bet.firstPlaceableMinimalSize,
-            bet.secondPlaceableMinimalSize
-        ),
-        bet.firstPlaceableContent,
-        bet.secondPlaceableContent,
-        { Separator(!Horizontal, splitterState::smoothMoveBy)}
-    )
 }
 
 @Composable
 fun HorizontalSplitPane(
-    splitterState: SplitterState,
+    splitPaneState: SplitPaneState,
     modifier: Modifier = Modifier,
-    content: SplitPaneContext.() -> Unit
+    content: SplitPaneScope.() -> Unit
 ) {
-    val bet: Betrayer = Betrayer.apply(content)
-    SplitPane(
-        modifier,
-        Horizontal,
-        splitterState.apply { minValue = bet.firstPlaceableMinimalSize.value },
-        MinimalSizes(
-            bet.firstPlaceableMinimalSize,
-            bet.secondPlaceableMinimalSize
-        ),
-        bet.firstPlaceableContent,
-        bet.secondPlaceableContent,
-        { Separator(Horizontal, splitterState::smoothMoveBy)}
-    )
+    with(SplitPaneScopeImpl(isHorizontal = true, splitPaneState).apply(content)) {
+        if (firstPlaceableContent != null && secondPlaceableContent != null) {
+            SplitPane(
+                modifier,
+                isHorizontal = true,
+                splitPaneState.splitterState,
+                minimalSizes,
+                firstPlaceableContent!!,
+                secondPlaceableContent!!,
+                splitter ?: { Splitter(isHorizontal = true, splitPaneState)}
+            )
+        } else {
+            firstPlaceableContent?.invoke()
+            secondPlaceableContent?.invoke()
+        }
+    }
+
 }
 
 @Composable
-expect fun Separator(
+internal expect fun Splitter(
     isHorizontal: Boolean,
-    consumeMovement: (delta: Float) -> Unit
+    splitPaneState: SplitPaneState
 )
 
 @Composable
-expect fun SplitPane(
+internal expect fun SplitPane(
     modifier: Modifier = Modifier,
     isHorizontal: Boolean = true,
     state: SplitterState,

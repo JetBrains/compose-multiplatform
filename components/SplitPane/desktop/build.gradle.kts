@@ -17,8 +17,8 @@ kotlin {
     }
 }
 
-//compose.desktop {
-//    application {
-//        mainClass = "org.jetbrains.compose.videoplayer.demo.MainKt"
-//    }
-//}
+compose.desktop {
+    application {
+        mainClass = "org.jetbrains.compose.splitpanedemo.MainKt"
+    }
+}
