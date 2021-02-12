@@ -130,7 +130,7 @@ val ALLOW_RERUNNING_TASKS = setOf(
 // Tasks in this set we don't even try to rerun, because they're known to be unnecessary
 val DONT_TRY_RERUNNING_TASKS = setOf(
     "listTaskOutputs",
-    "properties",
+    "validateProperties",
     "tasks",
     "zipEcFiles",
 
