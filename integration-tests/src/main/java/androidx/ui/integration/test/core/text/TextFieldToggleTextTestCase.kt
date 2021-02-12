@@ -17,21 +17,20 @@
 package androidx.ui.integration.test.core.text
 
 import androidx.compose.foundation.ExperimentalFoundationApi
-import androidx.compose.foundation.InternalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.preferredWidth
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.requiredWidth
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.testutils.LayeredComposeTestCase
 import androidx.compose.testutils.ToggleableTestCase
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Rect
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.text.ExperimentalTextApi
-import androidx.compose.ui.text.InternalTextApi
+import androidx.compose.ui.platform.LocalTextInputService
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.input.EditCommand
 import androidx.compose.ui.text.input.ImeAction
@@ -39,7 +38,6 @@ import androidx.compose.ui.text.input.ImeOptions
 import androidx.compose.ui.text.input.PlatformTextInputService
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.input.TextInputService
-import androidx.compose.ui.text.input.textInputServiceFactory
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.TextUnit
 import androidx.ui.integration.test.RandomTextGenerator
@@ -66,25 +64,19 @@ class TextFieldToggleTextTestCase(
                 value = text.value,
                 onValueChange = {},
                 textStyle = TextStyle(color = Color.Black, fontSize = fontSize),
-                modifier = Modifier.background(color = Color.Cyan).width(width)
+                modifier = Modifier.background(color = Color.Cyan).requiredWidth(width)
             )
         }
     }
 
-    @OptIn(InternalFoundationApi::class)
     @Composable
     override fun ContentWrappers(content: @Composable () -> Unit) {
-        // Override IME input connection since we are not interested in it, and it might cause
-        // flakiness
-        @Suppress("DEPRECATION_ERROR")
-        @OptIn(InternalTextApi::class)
-        textInputServiceFactory = {
-            textInputService
-        }
         Column(
-            modifier = Modifier.preferredWidth(width)
+            modifier = Modifier.width(width)
         ) {
-            content()
+            CompositionLocalProvider(LocalTextInputService provides textInputService) {
+                content()
+            }
         }
     }
 
@@ -94,7 +86,6 @@ class TextFieldToggleTextTestCase(
         }
     }
 
-    @OptIn(ExperimentalTextApi::class)
     private class TestPlatformTextInputService : PlatformTextInputService {
         override fun startInput(
             value: TextFieldValue,

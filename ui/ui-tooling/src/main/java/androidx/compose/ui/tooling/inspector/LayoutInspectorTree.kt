@@ -17,7 +17,7 @@
 package androidx.compose.ui.tooling.inspector
 
 import android.view.View
-import androidx.compose.runtime.CompositionData
+import androidx.compose.runtime.tooling.CompositionData
 import androidx.compose.runtime.InternalComposeApi
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.layout.GraphicLayerInfo
@@ -70,7 +70,7 @@ private val unwantedCalls = setOf(
     "remember",
     "Inspectable",
     "Layout",
-    "Providers",
+    "CompositionLocalProvider",
     "SelectionContainer",
     "SelectionLayout"
 )
@@ -150,7 +150,7 @@ class LayoutInspectorTree {
     /**
      * Stitch separate trees together using the [LayoutInfo]s found in the [CompositionData]s.
      *
-     * Some constructs in Compose (e.g. ModalDrawerLayout) will result is multiple
+     * Some constructs in Compose (e.g. ModalDrawer) will result is multiple
      * [CompositionData]s. This code will attempt to stitch the resulting [InspectorNode] trees
      * together by looking at the parent of each [LayoutInfo].
      *

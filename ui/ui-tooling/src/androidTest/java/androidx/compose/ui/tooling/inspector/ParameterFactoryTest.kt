@@ -23,7 +23,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.preferredWidth
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.shape.CornerSize
 import androidx.compose.foundation.shape.CutCornerShape
@@ -70,7 +70,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.em
 import androidx.compose.ui.unit.sp
 import androidx.test.ext.junit.runners.AndroidJUnit4
-import androidx.test.filters.LargeTest
+import androidx.test.filters.MediumTest
 import com.google.common.truth.Truth.assertThat
 import com.google.common.truth.Truth.assertWithMessage
 import kotlinx.coroutines.runBlocking
@@ -82,7 +82,7 @@ import org.junit.runner.RunWith
 @Suppress("unused")
 private fun topLevelFunction() {}
 
-@LargeTest
+@MediumTest
 @RunWith(AndroidJUnit4::class)
 class ParameterFactoryTest {
     private val factory = ParameterFactory(InlineClassConverter())
@@ -379,7 +379,11 @@ class ParameterFactoryTest {
     @Test
     fun testPaddingValues() {
         validate(factory.create(node, "padding", PaddingValues(2.0.dp, 0.5.dp, 2.5.dp, 0.7.dp))!!) {
-            parameter("padding", ParameterType.String, PaddingValues::class.java.simpleName) {
+            parameter(
+                "padding",
+                ParameterType.String,
+                "PaddingValuesImpl"
+            ) {
                 parameter("bottom", ParameterType.DimensionDp, 0.7f)
                 parameter("end", ParameterType.DimensionDp, 2.5f)
                 parameter("start", ParameterType.DimensionDp, 2.0f)
@@ -434,7 +438,7 @@ class ParameterFactoryTest {
                     .padding(2.0.dp)
                     .fillMaxWidth()
                     .wrapContentHeight(Alignment.Bottom)
-                    .preferredWidth(30.0.dp)
+                    .width(30.0.dp)
                     .paint(TestPainter(10f, 20f))
             )!!
         ) {
@@ -456,7 +460,7 @@ class ParameterFactoryTest {
                     parameter("align", ParameterType.String, "Bottom")
                     parameter("unbounded", ParameterType.Boolean, false)
                 }
-                parameter("preferredWidth", ParameterType.DimensionDp, 30.0f)
+                parameter("width", ParameterType.DimensionDp, 30.0f)
                 parameter("paint", ParameterType.String, "") {
                     parameter("alignment", ParameterType.String, "Center")
                     parameter("alpha", ParameterType.Float, 1.0f)
@@ -546,6 +550,14 @@ class ParameterFactoryTest {
                     }
                 }
             }
+        }
+    }
+
+    @Test
+    fun testDoNotRecurseIntoAndroidAndJavaPackages() {
+        runBlocking {
+            assertThat(factory.create(node, "v1", java.net.URL("http://domain.com"))).isNull()
+            assertThat(factory.create(node, "v1", android.app.Notification())).isNull()
         }
     }
 

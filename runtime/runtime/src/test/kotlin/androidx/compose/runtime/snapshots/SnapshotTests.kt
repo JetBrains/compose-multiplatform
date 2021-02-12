@@ -14,11 +14,10 @@
  * limitations under the License.
  */
 
-@file:OptIn(InternalComposeApi::class, ExperimentalComposeApi::class)
+@file:OptIn(InternalComposeApi::class)
 
 package androidx.compose.runtime.snapshots
 
-import androidx.compose.runtime.ExperimentalComposeApi
 import androidx.compose.runtime.InternalComposeApi
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.State

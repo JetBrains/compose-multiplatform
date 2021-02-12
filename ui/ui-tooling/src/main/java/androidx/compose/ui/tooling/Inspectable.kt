@@ -17,9 +17,9 @@
 package androidx.compose.ui.tooling
 
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.CompositionData
+import androidx.compose.runtime.tooling.CompositionData
 import androidx.compose.runtime.InternalComposeApi
-import androidx.compose.runtime.Providers
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.currentComposer
 import androidx.compose.runtime.tooling.LocalInspectionTables
 import androidx.compose.ui.platform.LocalInspectionMode
@@ -61,7 +61,7 @@ internal fun Inspectable(
     currentComposer.collectParameterInformation()
     val store = (compositionDataRecord as CompositionDataRecordImpl).store
     store.add(currentComposer.compositionData)
-    Providers(
+    CompositionLocalProvider(
         LocalInspectionMode provides true,
         LocalInspectionTables provides store,
         content = content

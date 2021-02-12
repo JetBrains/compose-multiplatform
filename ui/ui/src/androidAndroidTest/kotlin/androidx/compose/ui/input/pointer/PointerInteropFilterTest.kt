@@ -731,7 +731,7 @@ class PointerInteropFilterTest {
             )
         val moveConsumed =
             down.moveTo(7, 8f, 9f)
-                .apply { consumePositionChange(1f, 0f) }
+                .apply { consumePositionChange() }
         val expected =
             MotionEvent(
                 7,
@@ -789,7 +789,7 @@ class PointerInteropFilterTest {
 
         val aMove2 = aMove1.moveTo(15, 8f, 9f)
         val bMoveConsumed =
-            bDown.moveTo(15, 18f, 19f).apply { consumePositionChange(1f, 0f) }
+            bDown.moveTo(15, 18f, 19f).apply { consumePositionChange() }
 
         val expected =
             MotionEvent(
@@ -1041,7 +1041,7 @@ class PointerInteropFilterTest {
             )
 
         val move1Consumed =
-            down.moveTo(5, 6f, 7f).apply { consumePositionChange(0f, 1f) }
+            down.moveTo(5, 6f, 7f).apply { consumePositionChange() }
         val motionEvent2 =
             MotionEvent(
                 5,
@@ -2388,7 +2388,7 @@ class PointerInteropFilterTest {
         )
 
         PointerInputChangeSubject.assertThat(move).downNotConsumed()
-        PointerInputChangeSubject.assertThat(move).positionChangeConsumed(Offset(5f, 5f))
+        PointerInputChangeSubject.assertThat(move).positionChangeConsumed()
     }
 
     @Test
@@ -2423,7 +2423,7 @@ class PointerInteropFilterTest {
         )
 
         PointerInputChangeSubject.assertThat(move).downNotConsumed()
-        PointerInputChangeSubject.assertThat(move).positionChangeConsumed(Offset(5f, 5f))
+        PointerInputChangeSubject.assertThat(move).positionChangeConsumed()
     }
 
     @Test
@@ -2497,9 +2497,9 @@ class PointerInteropFilterTest {
         // Assert
 
         PointerInputChangeSubject.assertThat(aMove2).downNotConsumed()
-        PointerInputChangeSubject.assertThat(aMove2).positionChangeConsumed(Offset(8f, 9f))
+        PointerInputChangeSubject.assertThat(aMove2).positionChangeConsumed()
         PointerInputChangeSubject.assertThat(bMove1).downNotConsumed()
-        PointerInputChangeSubject.assertThat(bMove1).positionChangeConsumed(Offset(18f, 19f))
+        PointerInputChangeSubject.assertThat(bMove1).positionChangeConsumed()
     }
 
     @Test
@@ -2572,9 +2572,9 @@ class PointerInteropFilterTest {
         // Assert
 
         PointerInputChangeSubject.assertThat(aMove2).downNotConsumed()
-        PointerInputChangeSubject.assertThat(aMove2).positionChangeConsumed(Offset(8f, 9f))
+        PointerInputChangeSubject.assertThat(aMove2).positionChangeConsumed()
         PointerInputChangeSubject.assertThat(bMove1).downNotConsumed()
-        PointerInputChangeSubject.assertThat(bMove1).positionChangeConsumed(Offset(18f, 19f))
+        PointerInputChangeSubject.assertThat(bMove1).positionChangeConsumed()
     }
 
     // Verification of no further consumption after initial consumption (because if something was
@@ -2755,7 +2755,9 @@ class PointerInteropFilterTest {
             )
 
         val aMove1 = aDown.moveTo(7, 3f, 4f)
-        val bDown = down(11, 7, 13f, 14f)
+        val xDown = 13f
+        val yDown = 14f
+        val bDown = down(11, 7, xDown, yDown)
         val motionEvent2 =
             MotionEvent(
                 7,
@@ -2773,9 +2775,11 @@ class PointerInteropFilterTest {
             )
 
         val aMove2 = aMove1.moveTo(15, 8f, 9f)
+        val xMove = 18f
+        val yMove = 19f
         val bMoveConsumed =
-            bDown.moveTo(15, 18f, 19f)
-                .apply { consumePositionChange(1f, 0f) }
+            bDown.moveTo(15, xMove, yMove)
+                .apply { consumePositionChange() }
         val motionEvent3 =
             MotionEvent(
                 7,
@@ -2807,7 +2811,7 @@ class PointerInteropFilterTest {
         // Assert
         PointerInputChangeSubject.assertThat(aMove2).nothingConsumed()
         PointerInputChangeSubject.assertThat(bMoveConsumed).downNotConsumed()
-        PointerInputChangeSubject.assertThat(bMoveConsumed).positionChangeConsumed(Offset(1f, 0f))
+        PointerInputChangeSubject.assertThat(bMoveConsumed).positionChangeConsumed()
     }
 
     @Test
@@ -3826,7 +3830,7 @@ class PointerInteropFilterTest {
             )
         val moveConsumed =
             down.moveTo(7, 8f, 9f)
-                .apply { consumePositionChange(1f, 0f) }
+                .apply { consumePositionChange() }
         val motionEvent2 =
             MotionEvent(
                 7,
@@ -3886,7 +3890,7 @@ class PointerInteropFilterTest {
 
         val aMove2 = aMove1.moveTo(15, 8f, 9f)
         val bMoveConsumed =
-            bDown.moveTo(15, 18f, 19f).apply { consumePositionChange(1f, 0f) }
+            bDown.moveTo(15, 18f, 19f).apply { consumePositionChange() }
         val motionEvent3 =
             MotionEvent(
                 7,
@@ -4133,7 +4137,7 @@ class PointerInteropFilterTest {
         )
 
         PointerInputChangeSubject.assertThat(move).downNotConsumed()
-        PointerInputChangeSubject.assertThat(move).positionChangeConsumed(Offset(5f, 5f))
+        PointerInputChangeSubject.assertThat(move).positionChangeConsumed()
     }
 
     @Test
@@ -4370,10 +4374,8 @@ class PointerInteropFilterTest {
         override val isAttached: Boolean
             get() = true
 
-        override fun globalToLocal(global: Offset): Offset = Offset.Zero
         override fun windowToLocal(relativeToWindow: Offset): Offset = Offset.Zero
 
-        override fun localToGlobal(local: Offset): Offset = Offset.Zero
         override fun localToWindow(relativeToLocal: Offset): Offset = Offset.Zero
 
         override fun localToRoot(relativeToLocal: Offset): Offset = Offset.Zero
@@ -4382,16 +4384,12 @@ class PointerInteropFilterTest {
             relativeToSource: Offset
         ): Offset = Offset.Zero
 
-        override fun childToLocal(child: LayoutCoordinates, childLocal: Offset): Offset =
-            Offset.Zero
-
-        override fun childBoundingBox(child: LayoutCoordinates): Rect = Rect.Zero
         override fun localBoundingBoxOf(
             sourceCoordinates: LayoutCoordinates,
             clipBounds: Boolean
         ): Rect = Rect.Zero
 
-        override fun get(line: AlignmentLine): Int = 0
+        override fun get(alignmentLine: AlignmentLine): Int = 0
     }
 }
 

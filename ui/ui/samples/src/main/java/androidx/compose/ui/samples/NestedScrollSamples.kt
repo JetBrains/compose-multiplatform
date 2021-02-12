@@ -14,152 +14,166 @@
  * limitations under the License.
  */
 
-@file:Suppress("DEPRECATION")
-
 package androidx.compose.ui.samples
 
 import androidx.annotation.Sampled
 import androidx.compose.foundation.background
+import androidx.compose.foundation.gestures.Orientation
+import androidx.compose.foundation.gestures.draggable
+import androidx.compose.foundation.gestures.rememberDraggableState
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.Text
+import androidx.compose.material.TopAppBar
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
-import androidx.compose.ui.gesture.ScrollCallback
-import androidx.compose.ui.gesture.nestedscroll.NestedScrollConnection
-import androidx.compose.ui.gesture.nestedscroll.NestedScrollDispatcher
-import androidx.compose.ui.gesture.nestedscroll.NestedScrollSource
-import androidx.compose.ui.gesture.nestedscroll.nestedScroll
-import androidx.compose.ui.gesture.scrollGestureFilter
-import androidx.compose.ui.gesture.scrollorientationlocking.Orientation
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.unit.Velocity
+import androidx.compose.ui.input.nestedscroll.NestedScrollConnection
+import androidx.compose.ui.input.nestedscroll.NestedScrollDispatcher
+import androidx.compose.ui.input.nestedscroll.NestedScrollSource
+import androidx.compose.ui.input.nestedscroll.nestedScroll
+import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.minus
 import kotlin.math.roundToInt
 
 @Sampled
 @Composable
-fun NestedScrollSample() {
-    // constructing the box with next that scrolls as long as text within 0 .. 300
-    // to support nested scrolling, we need to scroll ourselves, dispatch nested scroll events
-    // as we scroll, and listen to potential children when we're scrolling.
-    val maxValue = 300f
-    val minValue = 0f
-    // our state that we update as scroll
-    var value by remember { mutableStateOf(maxValue / 2) }
-    // create dispatch to dispatch scroll events up to the nested scroll parents
-    val nestedScrollDispatcher = remember { NestedScrollDispatcher() }
-    // we're going to scroll vertically, so set the orientation to vertical
-    val orientation = Orientation.Vertical
+fun NestedScrollConnectionSample() {
+    // here we use LazyColumn that has build-in nested scroll, but we want to act like a
+    // parent for this LazyColumn and participate in its nested scroll.
+    // Let's make a collapsing toolbar for LazyColumn
+    val toolbarHeight = 48.dp
+    val toolbarHeightPx = with(LocalDensity.current) { toolbarHeight.roundToPx().toFloat() }
+    // our offset to collapse toolbar
+    val toolbarOffsetHeightPx =
 
-    // callback to listen to scroll events and dispatch nested scroll events
-    val scrollCallback = remember {
-        object : ScrollCallback {
-            override fun onScroll(scrollDistance: Float): Float {
-                // dispatch prescroll with Y axis since we're going vertical scroll
-                val aboveConsumed = nestedScrollDispatcher.dispatchPreScroll(
-                    Offset(x = 0f, y = scrollDistance),
-                    NestedScrollSource.Drag
-                )
-                // adjust what we can consume according to pre-scroll
-                val available = scrollDistance - aboveConsumed.y
-                // let's calculate how much we want to consume and how much is left
-                val newTotal = value + available
-                val newValue = newTotal.coerceIn(minValue, maxValue)
-                val toConsume = newValue - value
-                val leftAfterUs = available - toConsume
-                // consume ourselves what we need and dispatch "scroll" phase of nested scroll
-                value += toConsume
-                nestedScrollDispatcher.dispatchPostScroll(
-                    Offset(x = 0f, y = toConsume),
-                    Offset(x = 0f, y = leftAfterUs),
-                    NestedScrollSource.Drag
-                )
-                // indicate to the old pointer that we handled everything by returning same value
-                return scrollDistance
-            }
-
-            override fun onStop(velocity: Float) {
-                // for simplicity we won't fling ourselves, but we need to respect nested scroll
-                // dispatch pre fling
-                val velocity2d = Velocity(x = 0f, y = velocity)
-                val consumed = nestedScrollDispatcher.dispatchPreFling(velocity2d)
-                // now, since we don't fling, we consume 0 (Offset.Zero).
-                // Adjust what's left after prefling and dispatch post fling
-                val left = velocity2d - consumed
-                nestedScrollDispatcher.dispatchPostFling(Velocity.Zero, left)
-            }
-        }
-    }
-
-    // we also want to participate in the nested scrolling, not only dispatching. create connection
-    val connection = remember {
+        remember { mutableStateOf(0f) }
+    // now, let's create connection to the nested scroll system and listen to the scroll
+    // happening inside child LazyColumn
+    val nestedScrollConnection = remember {
         object : NestedScrollConnection {
-            // let's assume we want to consume children's delta before them if we can
-            // we should do it in pre scroll
             override fun onPreScroll(available: Offset, source: NestedScrollSource): Offset {
-                // calculate how much we can take from child
-                val oldValue = value
-                val newTotal = value + available.y
-                val newValue = newTotal.coerceIn(minValue, maxValue)
-                val toConsume = newValue - oldValue
-                // consume what we want and report back co children can adjust
-                value += toConsume
-                return Offset(x = 0f, y = toConsume)
+                // try to consume before LazyColumn to collapse toolbar if needed, hence pre-scroll
+                val delta = available.y
+                val newOffset = toolbarOffsetHeightPx.value + delta
+                toolbarOffsetHeightPx.value = newOffset.coerceIn(-toolbarHeightPx, 0f)
+                // here's the catch: let's pretend we consumed 0 in any case, since we want
+                // LazyColumn to scroll anyway for good UX
+                // We're basically watching scroll without taking it
+                return Offset.Zero
             }
         }
     }
+    Box(
+        Modifier
+            .fillMaxSize()
+            // attach as a parent to the nested scroll system
+            .nestedScroll(nestedScrollConnection)
+    ) {
+        // our list with build in nested scroll support that will notify us about its scroll
+        LazyColumn(contentPadding = PaddingValues(top = toolbarHeight)) {
+            items(100) { index ->
+                Text("I'm item $index", modifier = Modifier.fillMaxWidth().padding(16.dp))
+            }
+        }
+        TopAppBar(
+            modifier = Modifier
+                .height(toolbarHeight)
+                .offset { IntOffset(x = 0, y = toolbarOffsetHeightPx.value.roundToInt()) },
+            title = { Text("toolbar offset is ${toolbarOffsetHeightPx.value}") }
+        )
+    }
+}
 
-    // scrollable parent to which we will dispatch our nested scroll events
-    // Since we properly support scrolling above, this parent will scroll even if we scroll inner
-    // box (with White background)
-    LazyColumn(Modifier.background(Color.Red)) {
-        // our box we constructed
-        item {
-            Box(
-                Modifier
-                    .size(width = 300.dp, height = 100.dp)
-                    .background(Color.White)
-                    // add scrolling listening and dispatching
-                    .scrollGestureFilter(orientation = orientation, scrollCallback = scrollCallback)
-                    // connect self connection and dispatcher to the nested scrolling system
-                    .nestedScroll(connection, dispatcher = nestedScrollDispatcher)
-            ) {
-                // hypothetical scrollable child which we will listen in connection above
-                LazyColumn {
-                    items(5) {
-                        Text(
-                            "Magenta text above will change first when you scroll me",
-                            modifier = Modifier.padding(5.dp)
-                        )
-                    }
+@Sampled
+@Composable
+fun NestedScrollDispatcherSample() {
+    // Let's take Modifier.draggable (which doesn't have nested scroll build in, unlike Modifier
+    // .scrollable) and add nested scroll support our component that contains draggable
+
+    // this will be a generic components that will work inside other nested scroll components.
+    // put it inside LazyColumn or / Modifier.verticalScroll to see how they will interact
+
+    // first, state and it's bounds
+    val basicState = remember { mutableStateOf(0f) }
+    val minBound = -100f
+    val maxBound = 100f
+    // lambda to update state and return amount consumed
+    val onNewDelta: (Float) -> Float = { delta ->
+        val oldState = basicState.value
+        val newState = (basicState.value + delta).coerceIn(minBound, maxBound)
+        basicState.value = newState
+        newState - oldState
+    }
+    // create a dispatcher to dispatch nested scroll events (participate like a nested scroll child)
+    val nestedScrollDispatcher = remember { NestedScrollDispatcher() }
+
+    // create nested scroll connection to react to nested scroll events (participate like a parent)
+    val nestedScrollConnection = remember {
+        object : NestedScrollConnection {
+            override fun onPostScroll(
+                consumed: Offset,
+                available: Offset,
+                source: NestedScrollSource
+            ): Offset {
+                // we have no fling, so we're interested in the regular post scroll cycle
+                // let's try to consume what's left if we need and return the amount consumed
+                val vertical = available.y
+                val weConsumed = onNewDelta(vertical)
+                return Offset(x = 0f, y = weConsumed)
+            }
+        }
+    }
+    Box(
+        Modifier
+            .size(100.dp)
+            .background(Color.LightGray)
+            // attach ourselves to nested scroll system
+            .nestedScroll(connection = nestedScrollConnection, dispatcher = nestedScrollDispatcher)
+            .draggable(
+                orientation = Orientation.Vertical,
+                state = rememberDraggableState { delta ->
+                    // here's regular drag. Let's be good citizens and ask parents first if they
+                    // want to pre consume (it's a nested scroll contract)
+                    val parentsConsumed = nestedScrollDispatcher.dispatchPreScroll(
+                        available = Offset(x = 0f, y = delta),
+                        source = NestedScrollSource.Drag
+                    )
+                    // adjust what's available to us since might have consumed smth
+                    val adjustedAvailable = delta - parentsConsumed.y
+                    // we consume
+                    val weConsumed = onNewDelta(adjustedAvailable)
+                    // dispatch as a post scroll what's left after pre-scroll and our consumption
+                    val totalConsumed = Offset(x = 0f, y = weConsumed) + parentsConsumed
+                    val left = adjustedAvailable - weConsumed
+                    nestedScrollDispatcher.dispatchPostScroll(
+                        consumed = totalConsumed,
+                        available = Offset(x = 0f, y = left),
+                        source = NestedScrollSource.Drag
+                    )
+                    // we won't dispatch pre/post fling events as we have no flinging here, but the
+                    // idea is very similar:
+                    // 1. dispatch pre fling, asking parents to pre consume
+                    // 2. fling (while dispatching scroll events like above for any fling tick)
+                    // 3. dispatch post fling, allowing parent to react to velocity left
                 }
-                // simply show our value. It will change when we scroll child list above, taking
-                // child's scroll delta until we reach maxValue or minValue
-                Text(
-                    text = value.roundToInt().toString(),
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .background(Color.Magenta)
-                )
-            }
-        }
-        repeat(100) {
-            item {
-                Text(
-                    "Outer scroll items are Yellow on Red parent",
-                    modifier = Modifier.background(Color.Yellow).padding(5.dp)
-                )
-            }
-        }
+            )
+    ) {
+        Text(
+            "State: ${basicState.value.roundToInt()}",
+            modifier = Modifier.align(Alignment.Center)
+        )
     }
 }

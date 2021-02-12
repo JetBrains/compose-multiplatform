@@ -18,9 +18,9 @@ package androidx.compose.material
 
 import android.os.Build
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.requiredSize
 import androidx.compose.foundation.layout.wrapContentSize
-import androidx.compose.runtime.Providers
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.testutils.assertAgainstGolden
@@ -42,7 +42,6 @@ import androidx.compose.ui.test.up
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import androidx.test.ext.junit.runners.AndroidJUnit4
-import androidx.test.filters.FlakyTest
 import androidx.test.filters.MediumTest
 import androidx.test.filters.SdkSuppress
 import androidx.test.screenshot.AndroidXScreenshotTestRule
@@ -84,7 +83,7 @@ class SwitchScreenshotTest {
     fun switchTest_checked_rtl() {
         rule.setMaterialContent {
             Box(wrapperModifier) {
-                Providers(LocalLayoutDirection provides LayoutDirection.Rtl) {
+                CompositionLocalProvider(LocalLayoutDirection provides LayoutDirection.Rtl) {
                     Switch(checked = true, onCheckedChange = { })
                 }
             }
@@ -120,7 +119,7 @@ class SwitchScreenshotTest {
     fun switchTest_unchecked_rtl() {
         rule.setMaterialContent {
             Box(wrapperModifier) {
-                Providers(LocalLayoutDirection provides LayoutDirection.Rtl) {
+                CompositionLocalProvider(LocalLayoutDirection provides LayoutDirection.Rtl) {
                     Switch(checked = false, onCheckedChange = { })
                 }
             }
@@ -131,7 +130,7 @@ class SwitchScreenshotTest {
     @Test
     fun switchTest_bigSizeSpecified() {
         rule.setMaterialContent {
-            Box(wrapperModifier.size(50.dp)) {
+            Box(wrapperModifier.requiredSize(50.dp)) {
                 Switch(checked = true, onCheckedChange = { })
             }
         }
@@ -173,7 +172,6 @@ class SwitchScreenshotTest {
     }
 
     @Test
-    @FlakyTest // b/178409086 Fails on Cuttlefish API 29 consistently
     fun switchTest_unchecked_animateToChecked() {
         rule.setMaterialContent {
             val isChecked = remember { mutableStateOf(false) }
@@ -199,7 +197,6 @@ class SwitchScreenshotTest {
     }
 
     @Test
-    @FlakyTest // b/178409086 Fails on Cuttlefish API 29 consistently
     @Suppress("DEPRECATION") // Due to clockTestRule
     fun switchTest_checked_animateToUnchecked() {
         rule.setMaterialContent {

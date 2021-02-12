@@ -34,11 +34,12 @@ internal expect class PointerInputEvent {
 /**
  * Data that describes a particular pointer
  *
- * All pointer locations are relative to the device screen.
+ * [positionOnScreen] is relative to the device screen. [position] is relative to the owner.
  */
 internal data class PointerInputEventData(
     val id: PointerId,
     val uptime: Long,
+    val positionOnScreen: Offset,
     val position: Offset,
     val down: Boolean,
     val type: PointerType

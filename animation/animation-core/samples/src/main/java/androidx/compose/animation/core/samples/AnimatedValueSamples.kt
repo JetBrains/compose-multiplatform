@@ -27,8 +27,8 @@ import androidx.compose.animation.core.animateOffsetAsState
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.preferredSize
+import androidx.compose.foundation.layout.requiredHeight
+import androidx.compose.foundation.layout.size
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
@@ -80,7 +80,7 @@ fun ArbitraryValueTypeTransitionSample() {
                 convertFromVector = { MySize(it.v1.dp, it.v2.dp) }
             )
         )
-        Box(Modifier.preferredSize(animSize.width, animSize.height).background(color = Color.Red))
+        Box(Modifier.size(animSize.width, animSize.height).background(color = Color.Red))
     }
 }
 
@@ -91,7 +91,7 @@ fun DpAnimationSample() {
     fun HeightAnimation(collapsed: Boolean) {
         // Animates a height of [Dp] type to different target values based on the [collapsed] flag.
         val height: Dp by animateDpAsState(if (collapsed) 10.dp else 20.dp)
-        Box(Modifier.fillMaxWidth().height(height).background(color = Color.Red))
+        Box(Modifier.fillMaxWidth().requiredHeight(height).background(color = Color.Red))
     }
 }
 

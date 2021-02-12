@@ -25,7 +25,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.graphics.Color
 import androidx.compose.foundation.layout.Column
 import androidx.compose.material.MaterialTheme
-import androidx.compose.foundation.layout.preferredSize
+import androidx.compose.foundation.layout.size
 import androidx.compose.testutils.ComposeTestCase
 import androidx.compose.testutils.ToggleableTestCase
 
@@ -48,9 +48,9 @@ class RectsInColumnSharedModelTestCase(
             Column {
                 repeat(amountOfRectangles) { i ->
                     if (i == 0) {
-                        Box(Modifier.preferredSize(100.dp, 50.dp).background(color = color.value))
+                        Box(Modifier.size(100.dp, 50.dp).background(color = color.value))
                     } else {
-                        Box(Modifier.preferredSize(100.dp, 50.dp).background(color = Color.Green))
+                        Box(Modifier.size(100.dp, 50.dp).background(color = Color.Green))
                     }
                 }
             }

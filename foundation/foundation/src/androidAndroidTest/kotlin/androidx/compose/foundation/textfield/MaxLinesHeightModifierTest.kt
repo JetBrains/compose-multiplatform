@@ -17,7 +17,7 @@
 package androidx.compose.foundation.textfield
 
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.requiredWidth
 import androidx.compose.foundation.text.CoreTextField
 import androidx.compose.foundation.text.maxLinesHeight
 import androidx.compose.ui.Modifier
@@ -26,7 +26,6 @@ import androidx.compose.ui.platform.InspectableValue
 import androidx.compose.ui.platform.ValueElement
 import androidx.compose.ui.platform.isDebugInspectorInfoEnabled
 import androidx.compose.ui.test.junit4.createComposeRule
-import androidx.compose.ui.text.InternalTextApi
 import androidx.compose.ui.text.TextLayoutResult
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.input.TextFieldValue
@@ -44,7 +43,6 @@ import java.util.concurrent.TimeUnit
 
 @MediumTest
 @RunWith(AndroidJUnit4::class)
-@OptIn(InternalTextApi::class)
 class MaxLinesHeightModifierTest {
 
     private val longText = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do " +
@@ -139,7 +137,7 @@ class MaxLinesHeightModifierTest {
                     onValueChange = {},
                     textStyle = TextStyle.Default,
                     modifier = Modifier
-                        .width(100.dp)
+                        .requiredWidth(100.dp)
                         .maxLinesHeight(maxLines, TextStyle.Default),
                     onTextLayout = { textLayoutResult = it }
                 )

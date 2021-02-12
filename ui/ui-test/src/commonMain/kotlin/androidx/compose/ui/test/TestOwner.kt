@@ -59,21 +59,11 @@ interface TestOwner {
      *
      * Can crash in case it hits time out. This is not supposed to be handled as it
      * surfaces only in incorrect tests.
+     *
+     * @param atLeastOneRootExpected Whether the caller expects that at least one compose root is
+     * present in the tested app. This affects synchronization efforts / timeouts of this API.
      */
-    fun getRoots(): Set<RootForTest>
-}
-
-/**
- * Collects all [SemanticsNode]s from all compose hierarchies.
- *
- * This is a blocking call. Returns only after compose is idle.
- *
- * Can crash in case it hits time out. This is not supposed to be handled as it
- * surfaces only in incorrect tests.
- */
-@OptIn(InternalTestApi::class)
-internal fun TestOwner.getAllSemanticsNodes(useUnmergedTree: Boolean): List<SemanticsNode> {
-    return getRoots().flatMap { it.semanticsOwner.getAllSemanticsNodes(useUnmergedTree) }
+    fun getRoots(atLeastOneRootExpected: Boolean): Set<RootForTest>
 }
 
 @InternalTestApi
@@ -90,6 +80,24 @@ class TestContext internal constructor(internal val testOwner: TestOwner) {
      */
     internal val states = mutableMapOf<RootForTest, InputDispatcherState>()
 
-    internal fun getAllSemanticsNodes(mergingEnabled: Boolean) =
-        testOwner.getAllSemanticsNodes(mergingEnabled)
+    /**
+     * Collects all [SemanticsNode]s from all compose hierarchies.
+     *
+     * This is a blocking call. Returns only after compose is idle.
+     *
+     * Can crash in case it hits time out. This is not supposed to be handled as it
+     * surfaces only in incorrect tests.
+     */
+    internal fun getAllSemanticsNodes(
+        atLeastOneRootRequired: Boolean,
+        useUnmergedTree: Boolean
+    ): Iterable<SemanticsNode> {
+        val roots = testOwner.getRoots(atLeastOneRootRequired).also {
+            check(!atLeastOneRootRequired || it.isNotEmpty()) {
+                "No compose views found in the app. Is your Activity resumed?"
+            }
+        }
+
+        return roots.flatMap { it.semanticsOwner.getAllSemanticsNodes(useUnmergedTree) }
+    }
 }

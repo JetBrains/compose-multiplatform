@@ -24,7 +24,6 @@ import androidx.compose.ui.layout.LayoutCoordinates
 import androidx.compose.ui.platform.ClipboardManager
 import androidx.compose.ui.platform.TextToolbar
 import androidx.compose.ui.text.AnnotatedString
-import androidx.compose.ui.text.ExperimentalTextApi
 import androidx.compose.ui.text.style.ResolvedTextDirection
 import com.google.common.truth.Truth.assertThat
 import com.nhaarman.mockitokotlin2.any
@@ -41,16 +40,14 @@ import org.junit.Test
 import org.junit.runner.RunWith
 import org.junit.runners.JUnit4
 
-@OptIn(ExperimentalTextApi::class)
 @RunWith(JUnit4::class)
 class SelectionManagerTest {
     private val selectionRegistrar = spy(SelectionRegistrarImpl())
-    private val selectable = mock<Selectable>()
+    private val selectable = FakeSelectable()
     private val selectionManager = SelectionManager(selectionRegistrar)
 
     private val containerLayoutCoordinates = mock<LayoutCoordinates> {
         on { isAttached } doReturn true
-        on { localPositionOf(any(), Offset(any())) } doAnswer Offset.Zero
     }
     private val startSelectable = mock<Selectable>()
     private val endSelectable = mock<Selectable>()
@@ -99,25 +96,24 @@ class SelectionManagerTest {
 
     @Test
     fun mergeSelections_single_selectable_calls_getSelection_once() {
+        val fakeNewSelection = mock<Selection>()
+
+        selectable.selectionToReturn = fakeNewSelection
+
         selectionManager.mergeSelections(
             startPosition = startCoordinates,
             endPosition = endCoordinates,
             previousSelection = fakeSelection
         )
 
-        val fakeNewSelection = mock<Selection>()
+        assertThat(selectable.getSelectionCalledTimes).isEqualTo(1)
+        assertThat(selectable.lastStartPosition).isEqualTo(startCoordinates)
+        assertThat(selectable.lastEndPosition).isEqualTo(endCoordinates)
+        assertThat(selectable.lastContainerLayoutCoordinates)
+            .isEqualTo(selectionManager.requireContainerCoordinates())
+        assertThat(selectable.lastLongPress).isEqualTo(false)
+        assertThat(selectable.lastPreviousSelection).isEqualTo(fakeSelection)
 
-        whenever(selectable.getSelection(Offset(any()), Offset(any()), any(), any(), any(), any()))
-            .thenReturn(fakeNewSelection)
-
-        verify(selectable, times(1))
-            .getSelection(
-                startPosition = startCoordinates,
-                endPosition = endCoordinates,
-                containerLayoutCoordinates = selectionManager.requireContainerCoordinates(),
-                longPress = false,
-                previousSelection = fakeSelection
-            )
         verify(
             hapticFeedback,
             times(1)
@@ -135,14 +131,14 @@ class SelectionManagerTest {
             previousSelection = fakeSelection
         )
 
-        verify(selectable, times(1))
-            .getSelection(
-                startPosition = startCoordinates,
-                endPosition = endCoordinates,
-                containerLayoutCoordinates = selectionManager.requireContainerCoordinates(),
-                longPress = false,
-                previousSelection = fakeSelection
-            )
+        assertThat(selectable.getSelectionCalledTimes).isEqualTo(1)
+        assertThat(selectable.lastStartPosition).isEqualTo(startCoordinates)
+        assertThat(selectable.lastEndPosition).isEqualTo(endCoordinates)
+        assertThat(selectable.lastContainerLayoutCoordinates)
+            .isEqualTo(selectionManager.requireContainerCoordinates())
+        assertThat(selectable.lastLongPress).isEqualTo(false)
+        assertThat(selectable.lastPreviousSelection).isEqualTo(fakeSelection)
+
         verify(selectable_another, times(1))
             .getSelection(
                 startPosition = startCoordinates,
@@ -159,9 +155,8 @@ class SelectionManagerTest {
 
     @Test
     fun mergeSelections_selection_does_not_change_hapticFeedBack_Not_triggered() {
-        val selection: Selection? = mock()
-        whenever(selectable.getSelection(Offset(any()), Offset(any()), any(), any(), any(), any()))
-            .thenReturn(selection)
+        val selection: Selection = mock()
+        selectable.selectionToReturn = selection
 
         selectionManager.mergeSelections(
             startPosition = startCoordinates,
@@ -180,7 +175,7 @@ class SelectionManagerTest {
         selectionManager.selection = null
 
         assertThat(selectionManager.getSelectedText()).isNull()
-        verify(selectable, times(0)).getText()
+        assertThat(selectable.getTextCalledTimes).isEqualTo(0)
     }
 
     @Test
@@ -189,7 +184,7 @@ class SelectionManagerTest {
         val annotatedString = AnnotatedString(text = text)
         val startOffset = text.indexOf('e')
         val endOffset = text.indexOf('m')
-        whenever(selectable.getText()).thenReturn(annotatedString)
+        selectable.textToReturn = annotatedString
         selectionManager.selection = Selection(
             start = Selection.AnchorInfo(
                 direction = ResolvedTextDirection.Ltr,
@@ -206,7 +201,7 @@ class SelectionManagerTest {
 
         assertThat(selectionManager.getSelectedText())
             .isEqualTo(annotatedString.subSequence(startOffset, endOffset))
-        verify(selectable, times(1)).getText()
+        assertThat(selectable.getTextCalledTimes).isEqualTo(1)
     }
 
     @Test
@@ -215,7 +210,7 @@ class SelectionManagerTest {
         val annotatedString = AnnotatedString(text = text)
         val startOffset = text.indexOf('m')
         val endOffset = text.indexOf('x')
-        whenever(selectable.getText()).thenReturn(annotatedString)
+        selectable.textToReturn = annotatedString
         selectionManager.selection = Selection(
             start = Selection.AnchorInfo(
                 direction = ResolvedTextDirection.Ltr,
@@ -232,7 +227,7 @@ class SelectionManagerTest {
 
         assertThat(selectionManager.getSelectedText())
             .isEqualTo(annotatedString.subSequence(endOffset, startOffset))
-        verify(selectable, times(1)).getText()
+        assertThat(selectable.getTextCalledTimes).isEqualTo(1)
     }
 
     @Test
@@ -267,7 +262,7 @@ class SelectionManagerTest {
         val result = annotatedString.subSequence(startOffset, annotatedString.length) +
             annotatedString + annotatedString.subSequence(0, endOffset)
         assertThat(selectionManager.getSelectedText()).isEqualTo(result)
-        verify(selectable, times(0)).getText()
+        assertThat(selectable.getTextCalledTimes).isEqualTo(0)
         verify(startSelectable, times(1)).getText()
         verify(middleSelectable, times(1)).getText()
         verify(endSelectable, times(1)).getText()
@@ -306,7 +301,7 @@ class SelectionManagerTest {
         val result = annotatedString.subSequence(endOffset, annotatedString.length) +
             annotatedString + annotatedString.subSequence(0, startOffset)
         assertThat(selectionManager.getSelectedText()).isEqualTo(result)
-        verify(selectable, times(0)).getText()
+        assertThat(selectable.getTextCalledTimes).isEqualTo(0)
         verify(startSelectable, times(1)).getText()
         verify(middleSelectable, times(1)).getText()
         verify(endSelectable, times(1)).getText()
@@ -328,7 +323,7 @@ class SelectionManagerTest {
         val annotatedString = AnnotatedString(text = text)
         val startOffset = text.indexOf('m')
         val endOffset = text.indexOf('x')
-        whenever(selectable.getText()).thenReturn(annotatedString)
+        selectable.textToReturn = annotatedString
         selectionManager.selection = Selection(
             start = Selection.AnchorInfo(
                 direction = ResolvedTextDirection.Ltr,
@@ -359,7 +354,7 @@ class SelectionManagerTest {
         val annotatedString = AnnotatedString(text = text)
         val startOffset = text.indexOf('m')
         val endOffset = text.indexOf('x')
-        whenever(selectable.getText()).thenReturn(annotatedString)
+        selectable.textToReturn = annotatedString
         selectionManager.selection = Selection(
             start = Selection.AnchorInfo(
                 direction = ResolvedTextDirection.Ltr,
@@ -408,14 +403,14 @@ class SelectionManagerTest {
 
         selectionManager.onRelease()
 
-        verify(selectable, times(1))
-            .getSelection(
-                startPosition = Offset(-1f, -1f),
-                endPosition = Offset(-1f, -1f),
-                containerLayoutCoordinates = selectionManager.requireContainerCoordinates(),
-                longPress = false,
-                previousSelection = fakeSelection
-            )
+        assertThat(selectable.getSelectionCalledTimes).isEqualTo(1)
+        assertThat(selectable.lastStartPosition).isEqualTo(Offset(-1f, -1f))
+        assertThat(selectable.lastEndPosition).isEqualTo(Offset(-1f, -1f))
+        assertThat(selectable.lastContainerLayoutCoordinates)
+            .isEqualTo(selectionManager.requireContainerCoordinates())
+        assertThat(selectable.lastLongPress).isEqualTo(false)
+        assertThat(selectable.lastPreviousSelection).isEqualTo(fakeSelection)
+
         assertThat(selection).isNull()
         verify(spyLambda, times(1)).invoke(null)
         verify(
@@ -447,14 +442,14 @@ class SelectionManagerTest {
 
         selectionRegistrar.notifySelectableChange(selectable)
 
-        verify(selectable, times(1))
-            .getSelection(
-                startPosition = Offset(-1f, -1f),
-                endPosition = Offset(-1f, -1f),
-                containerLayoutCoordinates = selectionManager.requireContainerCoordinates(),
-                longPress = false,
-                previousSelection = fakeSelection
-            )
+        assertThat(selectable.getSelectionCalledTimes).isEqualTo(1)
+        assertThat(selectable.lastStartPosition).isEqualTo(Offset(-1f, -1f))
+        assertThat(selectable.lastEndPosition).isEqualTo(Offset(-1f, -1f))
+        assertThat(selectable.lastContainerLayoutCoordinates)
+            .isEqualTo(selectionManager.requireContainerCoordinates())
+        assertThat(selectable.lastLongPress).isEqualTo(false)
+        assertThat(selectable.lastPreviousSelection).isEqualTo(fakeSelection)
+
         assertThat(selection).isNull()
         verify(spyLambda, times(1)).invoke(null)
         verify(

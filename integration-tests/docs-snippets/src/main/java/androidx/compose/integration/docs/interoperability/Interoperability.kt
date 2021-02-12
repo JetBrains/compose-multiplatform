@@ -18,7 +18,8 @@
 // Ignore lint warnings in documentation snippets
 @file:Suppress(
     "unused", "UNUSED_PARAMETER", "UNUSED_VARIABLE", "UNUSED_ANONYMOUS_PARAMETER",
-    "RedundantSuspendModifier", "CascadeIf", "ClassName", "RemoveExplicitTypeArguments"
+    "RedundantSuspendModifier", "CascadeIf", "ClassName", "RemoveExplicitTypeArguments",
+    "ControlFlowWithEmptyBody", "PropertyName"
 )
 
 package androidx.compose.integration.docs.interoperability
@@ -84,9 +85,14 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.compose.ui.viewinterop.AndroidViewBinding
+import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.navigation.compose.NavHost
+import androidx.navigation.compose.composable
+import androidx.navigation.compose.rememberNavController
 
 /**
  * This file lets DevRel track changes to snippets present in
@@ -187,7 +193,7 @@ private object InteropSnippet5 {
         // Adds view to Compose
         AndroidView(
             modifier = Modifier.fillMaxSize(), // Occupy the max size in the Compose UI tree
-            viewBlock = { context ->
+            factory = { context ->
                 // Creates custom view
                 CustomView(context).apply {
                     // Sets up listeners for View -> Compose communication
@@ -530,7 +536,6 @@ private object BetaSnippets {
         }
     }
 
-    @Suppress("ControlFlowWithEmptyBody")
     private object InteropSnippet6 {
         @Composable
         fun MyComposable() {
@@ -543,7 +548,6 @@ private object BetaSnippets {
         }
     }
 
-    @Suppress("ControlFlowWithEmptyBody")
     private object InteropSnippet7 {
         @Composable
         fun MyComposable() {
@@ -560,6 +564,60 @@ private object BetaSnippets {
     }
 
     private object InteropSnippet8 {
+        class ExampleActivity : AppCompatActivity() {
+            override fun onCreate(savedInstanceState: Bundle?) {
+                super.onCreate(savedInstanceState)
+
+                setContent {
+                    MaterialTheme {
+                        Column {
+                            Greeting("user1")
+                            Greeting("user2")
+                        }
+                    }
+                }
+            }
+        }
+
+        @Composable
+        fun Greeting(userId: String) {
+            val greetingViewModel: GreetingViewModel = viewModel(
+                factory = GreetingViewModelFactory(userId)
+            )
+            val messageUser by greetingViewModel.message.observeAsState("")
+
+            Text(messageUser)
+        }
+
+        class GreetingViewModel(private val userId: String) : ViewModel() {
+            private val _message = MutableLiveData("Hi $userId")
+            val message: LiveData<String> = _message
+        }
+    }
+
+    private object InteropSnippet9 {
+        @Composable
+        fun MyScreen() {
+            NavHost(rememberNavController(), startDestination = "profile/{userId}") {
+                /* ... */
+                composable("profile/{userId}") { backStackEntry ->
+                    Greeting(backStackEntry.arguments?.getString("userId") ?: "")
+                }
+            }
+        }
+
+        @Composable
+        fun Greeting(userId: String) {
+            val greetingViewModel: GreetingViewModel = viewModel(
+                factory = GreetingViewModelFactory(userId)
+            )
+            val messageUser by greetingViewModel.message.observeAsState("")
+
+            Text(messageUser)
+        }
+    }
+
+    private object InteropSnippet10 {
         @Composable
         fun BackHandler(
             enabled: Boolean,
@@ -599,7 +657,7 @@ private object BetaSnippets {
         }
     }
 
-    private object InteropSnippet9 {
+    private object InteropSnippet11 {
         class CustomViewGroup @JvmOverloads constructor(
             context: Context,
             attrs: AttributeSet? = null,
@@ -636,7 +694,7 @@ private object BetaSnippets {
         }
     }
 
-    private object InteropSnippet10 {
+    private object InteropSnippet12 {
         @Composable
         fun LoginButton(
             onClick: () -> Unit,
@@ -670,7 +728,7 @@ private object BetaSnippets {
         }
     }
 
-    private object InteropSnippet11 {
+    private object InteropSnippet13 {
         @Composable
         fun SystemBroadcastReceiver(
             systemAction: String,
@@ -822,10 +880,6 @@ private open class Fragment {
     fun requireContext(): Context = TODO()
 }
 
-private class AppCompatActivity {
-    val window: Any = Any()
-}
-
 private class WindowCompat {
     companion object {
         fun setDecorFitsSystemWindows(window: Any, bool: Boolean) {}
@@ -833,3 +887,13 @@ private class WindowCompat {
 }
 
 private fun Modifier.navigationBarsPadding(): Modifier = this
+
+private class GreetingViewModel : ViewModel() {
+    val _message = MutableLiveData("")
+    val message: LiveData<String> = _message
+}
+private class GreetingViewModelFactory(val userId: String) : ViewModelProvider.Factory {
+    override fun <T : ViewModel?> create(modelClass: Class<T>): T {
+        TODO("Not yet implemented")
+    }
+}

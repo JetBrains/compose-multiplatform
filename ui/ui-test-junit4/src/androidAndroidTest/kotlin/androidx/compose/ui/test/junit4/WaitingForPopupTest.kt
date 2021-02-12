@@ -17,7 +17,7 @@
 package androidx.compose.ui.test.junit4
 
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.preferredSize
+import androidx.compose.foundation.layout.size
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.Modifier
@@ -39,7 +39,7 @@ class WaitingForPopupTest {
     @Composable
     private fun ShowPopup() {
         Popup {
-            Box(Modifier.preferredSize(10.dp, 10.dp))
+            Box(Modifier.size(10.dp, 10.dp))
         }
     }
 

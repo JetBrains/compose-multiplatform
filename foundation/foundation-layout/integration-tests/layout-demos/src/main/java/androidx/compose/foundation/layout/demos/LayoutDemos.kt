@@ -22,13 +22,6 @@ import androidx.compose.integration.demos.common.DemoCategory
 val LayoutDemos = DemoCategory(
     "Layout",
     listOf(
-        DemoCategory(
-            "ConstraintLayout",
-            listOf(
-                ComposableDemo("With inline (modifier based) DSL") { DemoInlineDSL() },
-                ComposableDemo("With ConstraintSet DSL") { DemoConstraintSet() }
-            )
-        ),
         ComposableDemo("Row and column") { SimpleLayoutDemo() },
         ComposableDemo("Rtl support") { RtlDemo() }
     )

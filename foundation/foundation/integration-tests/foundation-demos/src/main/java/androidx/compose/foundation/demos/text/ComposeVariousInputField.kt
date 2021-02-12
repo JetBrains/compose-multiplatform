@@ -16,8 +16,10 @@
 
 package androidx.compose.foundation.demos.text
 
-import androidx.compose.foundation.Interaction
-import androidx.compose.foundation.InteractionState
+import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.interaction.collectIsDraggedAsState
+import androidx.compose.foundation.interaction.collectIsFocusedAsState
+import androidx.compose.foundation.interaction.collectIsPressedAsState
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -240,8 +242,8 @@ fun VariousInputFieldDemo() {
             }
         }
         item {
-            TagLine(tag = "TextField InteractionState")
-            InteractionStateTextField()
+            TagLine(tag = "TextField MutableInteractionSource")
+            InteractionSourceTextField()
         }
     }
 }
@@ -289,21 +291,30 @@ private fun HintEditText(content: @Composable () -> Unit) {
 }
 
 @Composable
-private fun InteractionStateTextField() {
+private fun InteractionSourceTextField() {
     val state = rememberSaveable(stateSaver = TextFieldValue.Saver) {
         mutableStateOf(TextFieldValue())
     }
-    val interactionState = remember { InteractionState() }
+    val interactionSource = remember { MutableInteractionSource() }
 
     Column(demoTextFieldModifiers) {
-        Text("Pressed?: ${interactionState.contains(Interaction.Pressed)}", fontSize = fontSize4)
-        Text("Focused?: ${interactionState.contains(Interaction.Focused)}", fontSize = fontSize4)
-        Text("Dragged?: ${interactionState.contains(Interaction.Dragged)}", fontSize = fontSize4)
+        Text(
+            "Pressed?: ${interactionSource.collectIsPressedAsState().value}",
+            fontSize = fontSize4
+        )
+        Text(
+            "Focused?: ${interactionSource.collectIsFocusedAsState().value}",
+            fontSize = fontSize4
+        )
+        Text(
+            "Dragged?: ${interactionSource.collectIsDraggedAsState().value}",
+            fontSize = fontSize4
+        )
         BasicTextField(
             modifier = Modifier.fillMaxWidth(),
             value = state.value,
             singleLine = true,
-            interactionState = interactionState,
+            interactionSource = interactionSource,
             onValueChange = { state.value = it },
             textStyle = TextStyle(fontSize = fontSize8)
         )

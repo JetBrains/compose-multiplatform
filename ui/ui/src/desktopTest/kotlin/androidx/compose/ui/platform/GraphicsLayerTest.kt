@@ -19,7 +19,7 @@ package androidx.compose.ui.platform
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.requiredSize
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -48,7 +48,7 @@ class GraphicsLayerTest {
                         scaleY = 0.5f,
                         transformOrigin = TransformOrigin(0f, 0f)
                     )
-                    .size(10f.dp, 10f.dp).background(Color.Red)
+                    .requiredSize(10f.dp, 10f.dp).background(Color.Red)
             )
             Box(
                 Modifier
@@ -58,7 +58,7 @@ class GraphicsLayerTest {
                         scaleX = 2f,
                         scaleY = 0.5f
                     )
-                    .size(10f.dp, 10f.dp).background(Color.Blue)
+                    .requiredSize(10f.dp, 10f.dp).background(Color.Blue)
             )
         }
         screenshotRule.snap(window.surface)
@@ -77,7 +77,7 @@ class GraphicsLayerTest {
                         scaleY = 0.5f,
                         transformOrigin = TransformOrigin(0f, 0f)
                     )
-                    .size(10f.dp, 10f.dp).background(Color.Red)
+                    .requiredSize(10f.dp, 10f.dp).background(Color.Red)
             )
             Box(
                 Modifier
@@ -86,7 +86,7 @@ class GraphicsLayerTest {
                         translationY = 20f,
                         rotationZ = 45f
                     )
-                    .size(10f.dp, 10f.dp).background(Color.Blue)
+                    .requiredSize(10f.dp, 10f.dp).background(Color.Blue)
             )
         }
         screenshotRule.snap(window.surface)
@@ -100,7 +100,7 @@ class GraphicsLayerTest {
             Box(
                 Modifier
                     .graphicsLayer(rotationX = 45f)
-                    .size(10f.dp, 10f.dp).background(Color.Blue)
+                    .requiredSize(10f.dp, 10f.dp).background(Color.Blue)
             )
             Box(
                 Modifier
@@ -109,7 +109,7 @@ class GraphicsLayerTest {
                         transformOrigin = TransformOrigin(0f, 0f),
                         rotationX = 45f
                     )
-                    .size(10f.dp, 10f.dp).background(Color.Blue)
+                    .requiredSize(10f.dp, 10f.dp).background(Color.Blue)
             )
         }
         screenshotRule.snap(window.surface)
@@ -122,7 +122,7 @@ class GraphicsLayerTest {
             Box(
                 Modifier
                     .graphicsLayer(rotationY = 45f)
-                    .size(10f.dp, 10f.dp).background(Color.Blue)
+                    .requiredSize(10f.dp, 10f.dp).background(Color.Blue)
             )
             Box(
                 Modifier
@@ -131,7 +131,7 @@ class GraphicsLayerTest {
                         transformOrigin = TransformOrigin(0f, 0f),
                         rotationY = 45f
                     )
-                    .size(10f.dp, 10f.dp).background(Color.Blue)
+                    .requiredSize(10f.dp, 10f.dp).background(Color.Blue)
             )
         }
         screenshotRule.snap(window.surface)
@@ -144,12 +144,12 @@ class GraphicsLayerTest {
             Box(
                 Modifier
                     .graphicsLayer(rotationZ = 45f, translationX = 10f)
-                    .size(20f.dp, 20f.dp).background(Color.Green)
+                    .requiredSize(20f.dp, 20f.dp).background(Color.Green)
             ) {
                 Box(
                     Modifier
                         .graphicsLayer(rotationZ = 45f)
-                        .size(20f.dp, 20f.dp).background(Color.Blue)
+                        .requiredSize(20f.dp, 20f.dp).background(Color.Blue)
                 )
             }
         }
@@ -168,7 +168,7 @@ class GraphicsLayerTest {
                         transformOrigin = TransformOrigin(0f, 0f),
                         clip = false
                     )
-                    .size(10f.dp, 10f.dp).background(Color.Red)
+                    .requiredSize(10f.dp, 10f.dp).background(Color.Red)
             ) {
                 Box(
                     Modifier
@@ -176,7 +176,7 @@ class GraphicsLayerTest {
                             transformOrigin = TransformOrigin(0f, 0f),
                             clip = false
                         )
-                        .size(20f.dp, 2f.dp)
+                        .requiredSize(20f.dp, 2f.dp)
                         .background(Color.Blue)
                 )
             }
@@ -189,7 +189,7 @@ class GraphicsLayerTest {
                         transformOrigin = TransformOrigin(0f, 0f),
                         clip = true
                     )
-                    .size(10f.dp, 10f.dp).background(Color.Red)
+                    .requiredSize(10f.dp, 10f.dp).background(Color.Red)
             ) {
                 Box(
                     Modifier
@@ -197,7 +197,7 @@ class GraphicsLayerTest {
                             transformOrigin = TransformOrigin(0f, 0f),
                             clip = false
                         )
-                        .size(20f.dp, 2f.dp)
+                        .requiredSize(20f.dp, 2f.dp)
                         .background(Color.Blue)
                 )
             }
@@ -211,7 +211,7 @@ class GraphicsLayerTest {
                         clip = true,
                         shape = RoundedCornerShape(5.dp)
                     )
-                    .size(10f.dp, 10f.dp).background(Color.Red)
+                    .requiredSize(10f.dp, 10f.dp).background(Color.Red)
             ) {
                 Box(
                     Modifier
@@ -219,7 +219,7 @@ class GraphicsLayerTest {
                             transformOrigin = TransformOrigin(0f, 0f),
                             clip = false
                         )
-                        .size(20f.dp, 2f.dp)
+                        .requiredSize(20f.dp, 2f.dp)
                         .background(Color.Blue)
                 )
             }
@@ -240,14 +240,14 @@ class GraphicsLayerTest {
                         transformOrigin = TransformOrigin(0f, 0f),
                         alpha = 0.5f
                     )
-                    .size(10f.dp, 10f.dp)
+                    .requiredSize(10f.dp, 10f.dp)
                     .background(Color.Green)
             ) {
                 // This box will be clipped (because if we use alpha, we draw into
                 // intermediate buffer)
                 Box(
                     Modifier
-                        .size(30f.dp, 30f.dp)
+                        .requiredSize(30f.dp, 30f.dp)
                         .background(Color.Blue)
                 )
             }
@@ -256,13 +256,13 @@ class GraphicsLayerTest {
                 Modifier
                     .padding(start = 15.dp)
                     .graphicsLayer(alpha = 0.5f)
-                    .size(15f.dp, 15f.dp)
+                    .requiredSize(15f.dp, 15f.dp)
                     .background(Color.Red)
             ) {
                 Box(
                     Modifier
                         .graphicsLayer(alpha = 0.5f)
-                        .size(10f.dp, 10f.dp)
+                        .requiredSize(10f.dp, 10f.dp)
                         .background(Color.Blue)
                 )
             }
@@ -272,7 +272,7 @@ class GraphicsLayerTest {
                     .graphicsLayer(
                         alpha = 0f
                     )
-                    .size(10f.dp, 10f.dp)
+                    .requiredSize(10f.dp, 10f.dp)
                     .background(Color.Blue)
             )
         }
@@ -286,27 +286,27 @@ class GraphicsLayerTest {
             Box(
                 Modifier
                     .graphicsLayer(shadowElevation = 5f)
-                    .size(20f.dp, 20f.dp)
+                    .requiredSize(20f.dp, 20f.dp)
             )
             Box(
                 Modifier
                     .graphicsLayer(translationX = 20f, shadowElevation = 5f)
-                    .size(20f.dp, 20f.dp)
+                    .requiredSize(20f.dp, 20f.dp)
             ) {
                 Box(
                     Modifier
-                        .size(20f.dp, 20f.dp)
+                        .requiredSize(20f.dp, 20f.dp)
                         .background(Color.Blue)
                 )
             }
             Box(
                 Modifier
                     .graphicsLayer(translationY = 20f, alpha = 0.8f, shadowElevation = 5f)
-                    .size(20f.dp, 20f.dp)
+                    .requiredSize(20f.dp, 20f.dp)
             ) {
                 Box(
                     Modifier
-                        .size(20f.dp, 20f.dp)
+                        .requiredSize(20f.dp, 20f.dp)
                         .background(Color.Red)
                 )
             }
@@ -318,7 +318,7 @@ class GraphicsLayerTest {
                         shadowElevation = 5f,
                         alpha = 0.8f
                     )
-                    .size(20f.dp, 20f.dp)
+                    .requiredSize(20f.dp, 20f.dp)
             )
         }
         screenshotRule.snap(window.surface)

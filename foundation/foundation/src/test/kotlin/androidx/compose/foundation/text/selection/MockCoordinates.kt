@@ -48,19 +48,9 @@ class MockCoordinates(
     override val parentCoordinates: LayoutCoordinates?
         get() = null
 
-    override fun globalToLocal(global: Offset): Offset {
-        globalToLocalParams += global
-        return localOffset
-    }
-
     override fun windowToLocal(relativeToWindow: Offset): Offset {
         windowToLocalParams += relativeToWindow
         return localOffset
-    }
-
-    override fun localToGlobal(local: Offset): Offset {
-        localToGlobalParams += local
-        return globalOffset
     }
 
     override fun localToWindow(relativeToLocal: Offset): Offset {
@@ -81,16 +71,10 @@ class MockCoordinates(
         return childToLocalOffset
     }
 
-    override fun childToLocal(child: LayoutCoordinates, childLocal: Offset): Offset {
-        childToLocalParams += child to childLocal
-        return childToLocalOffset
-    }
-
-    override fun childBoundingBox(child: LayoutCoordinates): Rect = Rect.Zero
     override fun localBoundingBoxOf(
         sourceCoordinates: LayoutCoordinates,
         clipBounds: Boolean
     ): Rect = Rect.Zero
 
-    override fun get(line: AlignmentLine): Int = 0
+    override fun get(alignmentLine: AlignmentLine): Int = 0
 }

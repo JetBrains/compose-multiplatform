@@ -16,29 +16,29 @@
 
 package androidx.compose.foundation.lazy
 
-import androidx.compose.animation.core.FloatExponentialDecaySpec
-import androidx.compose.animation.core.ManualAnimationClock
+import androidx.compose.animation.core.advanceClockMillis
 import androidx.compose.animation.core.snap
-import androidx.compose.foundation.animation.FlingConfig
-import androidx.compose.foundation.animation.smoothScrollBy
+import androidx.compose.foundation.gestures.animateScrollBy
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.requiredHeight
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.preferredHeight
-import androidx.compose.foundation.layout.preferredSize
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.sizeIn
-import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.requiredSize
+import androidx.compose.foundation.layout.requiredSizeIn
+import androidx.compose.foundation.layout.requiredWidth
 import androidx.compose.foundation.text.BasicText
-import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.Providers
+import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
+import androidx.compose.testutils.assertIsEqualTo
+import androidx.compose.testutils.runBlockingWithManualClock
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.drawBehind
@@ -46,11 +46,11 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.platform.LocalViewConfiguration
 import androidx.compose.ui.platform.ViewConfiguration
 import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.test.ExperimentalTestApi
 import androidx.compose.ui.test.SemanticsNodeInteraction
 import androidx.compose.ui.test.assertCountEquals
 import androidx.compose.ui.test.assertHeightIsEqualTo
 import androidx.compose.ui.test.assertIsDisplayed
-import androidx.compose.ui.test.assertIsEqualTo
 import androidx.compose.ui.test.assertIsNotDisplayed
 import androidx.compose.ui.test.assertPositionInRootIsEqualTo
 import androidx.compose.ui.test.assertTopPositionInRootIsEqualTo
@@ -103,18 +103,18 @@ class LazyColumnTest {
         val indexedItems = listOf(3, 4, 5)
 
         rule.setContentWithTestViewConfiguration {
-            LazyColumn(Modifier.preferredHeight(200.dp)) {
+            LazyColumn(Modifier.height(200.dp)) {
                 item {
                     Spacer(
-                        Modifier.preferredHeight(40.dp).fillParentMaxWidth().testTag(itemTestTag)
+                        Modifier.height(40.dp).fillParentMaxWidth().testTag(itemTestTag)
                     )
                 }
                 items(items) {
-                    Spacer(Modifier.preferredHeight(40.dp).fillParentMaxWidth().testTag(it))
+                    Spacer(Modifier.height(40.dp).fillParentMaxWidth().testTag(it))
                 }
                 itemsIndexed(indexedItems) { index, item ->
                     Spacer(
-                        Modifier.preferredHeight(41.dp).fillParentMaxWidth()
+                        Modifier.height(41.dp).fillParentMaxWidth()
                             .testTag("$index-$item")
                     )
                 }
@@ -148,7 +148,7 @@ class LazyColumnTest {
             LazyColumn {
                 items(emptyList<Any>()) { }
                 item {
-                    Spacer(Modifier.preferredSize(10.dp).testTag(itemTag))
+                    Spacer(Modifier.size(10.dp).testTag(itemTag))
                 }
             }
         }
@@ -163,13 +163,13 @@ class LazyColumnTest {
         val nullTestTag = "nullTestTag"
 
         rule.setContentWithTestViewConfiguration {
-            LazyColumn(Modifier.preferredHeight(200.dp)) {
+            LazyColumn(Modifier.height(200.dp)) {
                 items(items) {
                     if (it != null) {
-                        Spacer(Modifier.preferredHeight(101.dp).fillParentMaxWidth().testTag(it))
+                        Spacer(Modifier.height(101.dp).fillParentMaxWidth().testTag(it))
                     } else {
                         Spacer(
-                            Modifier.preferredHeight(101.dp).fillParentMaxWidth()
+                            Modifier.height(101.dp).fillParentMaxWidth()
                                 .testTag(nullTestTag)
                         )
                     }
@@ -196,7 +196,7 @@ class LazyColumnTest {
 
         rule.setContentWithTestViewConfiguration {
             // Fixed height to eliminate device size as a factor
-            Box(Modifier.testTag(LazyListTag).preferredHeight(300.dp)) {
+            Box(Modifier.testTag(LazyListTag).height(300.dp)) {
                 LazyColumn(Modifier.fillMaxSize()) {
                     items(50) {
                         DisposableEffect(NeverEqualObject) {
@@ -209,7 +209,7 @@ class LazyColumnTest {
                         }
 
                         // There will be 10 of these in the 300dp box
-                        Spacer(Modifier.preferredHeight(31.dp))
+                        Spacer(Modifier.height(31.dp))
                     }
                 }
             }
@@ -258,7 +258,7 @@ class LazyColumnTest {
                         }
                     }
 
-                    Spacer(Modifier.height(50.dp))
+                    Spacer(Modifier.requiredHeight(50.dp))
                 }
             }
         }
@@ -293,7 +293,7 @@ class LazyColumnTest {
             if (emitAdapterList) {
                 LazyColumn(Modifier.fillMaxSize()) {
                     items(2) {
-                        Box(Modifier.size(100.dp))
+                        Box(Modifier.requiredSize(100.dp))
                         DisposableEffect(Unit) {
                             onDispose {
                                 if (it == 1) {
@@ -404,7 +404,7 @@ class LazyColumnTest {
         rule.setContentWithTestViewConfiguration {
             LazyColumn(
                 Modifier.fillMaxWidth()
-                    .preferredHeight(100.dp)
+                    .height(100.dp)
                     .testTag(LazyListTag)
             ) {
                 items(items) {
@@ -412,10 +412,10 @@ class LazyColumnTest {
                         Spacer(
                             Modifier.testTag(thirdTag)
                                 .fillParentMaxWidth()
-                                .preferredHeight(if (thirdHasSize) 60.dp else 0.dp)
+                                .height(if (thirdHasSize) 60.dp else 0.dp)
                         )
                     } else {
-                        Spacer(Modifier.fillParentMaxWidth().preferredHeight(60.dp))
+                        Spacer(Modifier.fillParentMaxWidth().height(60.dp))
                     }
                 }
             }
@@ -452,13 +452,13 @@ class LazyColumnTest {
                 LazyColumn(Modifier.testTag(LazyListTag)) {
                     items(listOf(1, 2)) {
                         if (it == 1) {
-                            Spacer(Modifier.preferredSize(50.dp).testTag(itemInsideLazyColumn))
+                            Spacer(Modifier.size(50.dp).testTag(itemInsideLazyColumn))
                         } else {
-                            Spacer(Modifier.preferredSize(if (sameSizeItems) 50.dp else 70.dp))
+                            Spacer(Modifier.size(if (sameSizeItems) 50.dp else 70.dp))
                         }
                     }
                 }
-                Spacer(Modifier.preferredSize(50.dp).testTag(itemOutsideLazyColumn))
+                Spacer(Modifier.size(50.dp).testTag(itemOutsideLazyColumn))
             }
         }
 
@@ -503,14 +503,14 @@ class LazyColumnTest {
     private fun prepareLazyColumnsItemsAlignment(horizontalGravity: Alignment.Horizontal) {
         rule.setContentWithTestViewConfiguration {
             LazyColumn(
-                Modifier.testTag(LazyListTag).width(100.dp),
+                Modifier.testTag(LazyListTag).requiredWidth(100.dp),
                 horizontalAlignment = horizontalGravity
             ) {
                 items(listOf(1, 2)) {
                     if (it == 1) {
-                        Spacer(Modifier.preferredSize(50.dp).testTag(firstItemTag))
+                        Spacer(Modifier.size(50.dp).testTag(firstItemTag))
                     } else {
-                        Spacer(Modifier.preferredSize(70.dp).testTag(secondItemTag))
+                        Spacer(Modifier.size(70.dp).testTag(secondItemTag))
                     }
                 }
             }
@@ -568,9 +568,11 @@ class LazyColumnTest {
     @Test
     fun itemFillingParentWidth() {
         rule.setContentWithTestViewConfiguration {
-            LazyColumn(Modifier.size(width = 100.dp, height = 150.dp)) {
+            LazyColumn(Modifier.requiredSize(width = 100.dp, height = 150.dp)) {
                 items(listOf(0)) {
-                    Spacer(Modifier.fillParentMaxWidth().height(50.dp).testTag(firstItemTag))
+                    Spacer(
+                        Modifier.fillParentMaxWidth().requiredHeight(50.dp).testTag(firstItemTag)
+                    )
                 }
             }
         }
@@ -583,9 +585,11 @@ class LazyColumnTest {
     @Test
     fun itemFillingParentHeight() {
         rule.setContentWithTestViewConfiguration {
-            LazyColumn(Modifier.size(width = 100.dp, height = 150.dp)) {
+            LazyColumn(Modifier.requiredSize(width = 100.dp, height = 150.dp)) {
                 items(listOf(0)) {
-                    Spacer(Modifier.width(50.dp).fillParentMaxHeight().testTag(firstItemTag))
+                    Spacer(
+                        Modifier.requiredWidth(50.dp).fillParentMaxHeight().testTag(firstItemTag)
+                    )
                 }
             }
         }
@@ -598,7 +602,7 @@ class LazyColumnTest {
     @Test
     fun itemFillingParentSize() {
         rule.setContentWithTestViewConfiguration {
-            LazyColumn(Modifier.size(width = 100.dp, height = 150.dp)) {
+            LazyColumn(Modifier.requiredSize(width = 100.dp, height = 150.dp)) {
                 items(listOf(0)) {
                     Spacer(Modifier.fillParentMaxSize().testTag(firstItemTag))
                 }
@@ -613,9 +617,13 @@ class LazyColumnTest {
     @Test
     fun itemFillingParentWidthFraction() {
         rule.setContentWithTestViewConfiguration {
-            LazyColumn(Modifier.size(width = 100.dp, height = 150.dp)) {
+            LazyColumn(Modifier.requiredSize(width = 100.dp, height = 150.dp)) {
                 items(listOf(0)) {
-                    Spacer(Modifier.fillParentMaxWidth(0.6f).height(50.dp).testTag(firstItemTag))
+                    Spacer(
+                        Modifier.fillParentMaxWidth(0.6f)
+                            .requiredHeight(50.dp)
+                            .testTag(firstItemTag)
+                    )
                 }
             }
         }
@@ -628,9 +636,13 @@ class LazyColumnTest {
     @Test
     fun itemFillingParentHeightFraction() {
         rule.setContentWithTestViewConfiguration {
-            LazyColumn(Modifier.size(width = 100.dp, height = 150.dp)) {
+            LazyColumn(Modifier.requiredSize(width = 100.dp, height = 150.dp)) {
                 items(listOf(0)) {
-                    Spacer(Modifier.width(50.dp).fillParentMaxHeight(0.2f).testTag(firstItemTag))
+                    Spacer(
+                        Modifier.requiredWidth(50.dp)
+                            .fillParentMaxHeight(0.2f)
+                            .testTag(firstItemTag)
+                    )
                 }
             }
         }
@@ -643,7 +655,7 @@ class LazyColumnTest {
     @Test
     fun itemFillingParentSizeFraction() {
         rule.setContentWithTestViewConfiguration {
-            LazyColumn(Modifier.size(width = 100.dp, height = 150.dp)) {
+            LazyColumn(Modifier.requiredSize(width = 100.dp, height = 150.dp)) {
                 items(listOf(0)) {
                     Spacer(Modifier.fillParentMaxSize(0.1f).testTag(firstItemTag))
                 }
@@ -659,7 +671,7 @@ class LazyColumnTest {
     fun itemFillingParentSizeParentResized() {
         var parentSize by mutableStateOf(100.dp)
         rule.setContentWithTestViewConfiguration {
-            LazyColumn(Modifier.size(parentSize)) {
+            LazyColumn(Modifier.requiredSize(parentSize)) {
                 items(listOf(0)) {
                     Spacer(Modifier.fillParentMaxSize().testTag(firstItemTag))
                 }
@@ -679,9 +691,9 @@ class LazyColumnTest {
     fun whenNotAnymoreAvailableItemWasDisplayed() {
         var items by mutableStateOf((1..30).toList())
         rule.setContentWithTestViewConfiguration {
-            LazyColumn(Modifier.size(100.dp).testTag(LazyListTag)) {
+            LazyColumn(Modifier.requiredSize(100.dp).testTag(LazyListTag)) {
                 items(items) {
-                    Spacer(Modifier.size(20.dp).testTag("$it"))
+                    Spacer(Modifier.requiredSize(20.dp).testTag("$it"))
                 }
             }
         }
@@ -703,9 +715,9 @@ class LazyColumnTest {
     fun whenFewDisplayedItemsWereRemoved() {
         var items by mutableStateOf((1..10).toList())
         rule.setContentWithTestViewConfiguration {
-            LazyColumn(Modifier.size(100.dp).testTag(LazyListTag)) {
+            LazyColumn(Modifier.requiredSize(100.dp).testTag(LazyListTag)) {
                 items(items) {
-                    Spacer(Modifier.size(20.dp).testTag("$it"))
+                    Spacer(Modifier.requiredSize(20.dp).testTag("$it"))
                 }
             }
         }
@@ -727,9 +739,9 @@ class LazyColumnTest {
     fun whenItemsBecameEmpty() {
         var items by mutableStateOf((1..10).toList())
         rule.setContentWithTestViewConfiguration {
-            LazyColumn(Modifier.sizeIn(maxHeight = 100.dp).testTag(LazyListTag)) {
+            LazyColumn(Modifier.requiredSizeIn(maxHeight = 100.dp).testTag(LazyListTag)) {
                 items(items) {
-                    Spacer(Modifier.size(20.dp).testTag("$it"))
+                    Spacer(Modifier.requiredSize(20.dp).testTag("$it"))
                 }
             }
         }
@@ -758,9 +770,9 @@ class LazyColumnTest {
     fun scrollBackAndForth() {
         val items by mutableStateOf((1..20).toList())
         rule.setContentWithTestViewConfiguration {
-            LazyColumn(Modifier.size(100.dp).testTag(LazyListTag)) {
+            LazyColumn(Modifier.requiredSize(100.dp).testTag(LazyListTag)) {
                 items(items) {
-                    Spacer(Modifier.size(20.dp).testTag("$it"))
+                    Spacer(Modifier.requiredSize(20.dp).testTag("$it"))
                 }
             }
         }
@@ -781,9 +793,9 @@ class LazyColumnTest {
     fun tryToScrollBackwardWhenAlreadyOnTop() {
         val items by mutableStateOf((1..20).toList())
         rule.setContentWithTestViewConfiguration {
-            LazyColumn(Modifier.size(100.dp).testTag(LazyListTag)) {
+            LazyColumn(Modifier.requiredSize(100.dp).testTag(LazyListTag)) {
                 items(items) {
-                    Spacer(Modifier.size(20.dp).testTag("$it"))
+                    Spacer(Modifier.requiredSize(20.dp).testTag("$it"))
                 }
             }
         }
@@ -804,14 +816,14 @@ class LazyColumnTest {
         var firstItemRecomposed = 0
         var secondItemRecomposed = 0
         rule.setContentWithTestViewConfiguration {
-            LazyColumn(Modifier.size(100.dp).testTag(LazyListTag)) {
+            LazyColumn(Modifier.requiredSize(100.dp).testTag(LazyListTag)) {
                 items(items) {
                     if (it.count == 1) {
                         firstItemRecomposed++
                     } else {
                         secondItemRecomposed++
                     }
-                    Spacer(Modifier.size(75.dp))
+                    Spacer(Modifier.requiredSize(75.dp))
                 }
             }
         }
@@ -837,11 +849,11 @@ class LazyColumnTest {
         rule.setContentWithTestViewConfiguration {
             state = rememberLazyListState()
             LazyColumn(
-                Modifier.size(100.dp).testTag(LazyListTag),
+                Modifier.requiredSize(100.dp).testTag(LazyListTag),
                 state = state
             ) {
                 items(items) {
-                    Spacer(Modifier.size(20.dp).testTag("$it"))
+                    Spacer(Modifier.requiredSize(20.dp).testTag("$it"))
                 }
             }
         }
@@ -866,11 +878,11 @@ class LazyColumnTest {
         rule.setContentWithTestViewConfiguration {
             state = rememberLazyListState()
             LazyColumn(
-                Modifier.size(100.dp).testTag(LazyListTag),
+                Modifier.requiredSize(100.dp).testTag(LazyListTag),
                 state = state
             ) {
                 items(items) {
-                    Spacer(Modifier.size(20.dp).testTag("$it"))
+                    Spacer(Modifier.requiredSize(20.dp).testTag("$it"))
                 }
             }
         }
@@ -896,45 +908,39 @@ class LazyColumnTest {
         }
     }
 
+    @OptIn(ExperimentalTestApi::class)
     @Test
-    fun isAnimationRunningUpdate() {
+    fun isAnimationRunningUpdate() = runBlockingWithManualClock { clock ->
         val items by mutableStateOf((1..20).toList())
-        val clock = ManualAnimationClock(0L)
-        val state = LazyListState(
-            flingConfig = FlingConfig(FloatExponentialDecaySpec()),
-            animationClock = clock
-        )
+        val state = LazyListState()
         rule.setContentWithTestViewConfiguration {
             LazyColumn(
-                Modifier.size(100.dp).testTag(LazyListTag),
+                Modifier.requiredSize(100.dp).testTag(LazyListTag),
                 state = state
             ) {
                 items(items) {
-                    Spacer(Modifier.size(20.dp).testTag("$it"))
+                    Spacer(Modifier.requiredSize(20.dp).testTag("$it"))
                 }
             }
         }
 
         rule.runOnIdle {
             assertThat(state.firstVisibleItemIndex).isEqualTo(0)
-            assertThat(state.isAnimationRunning).isEqualTo(false)
+            assertThat(state.isScrollInProgress).isEqualTo(false)
         }
 
         rule.onNodeWithTag(LazyListTag)
             .performGesture { swipeUp() }
 
-        rule.runOnIdle {
-            clock.clockTimeMillis += 100
-            assertThat(state.firstVisibleItemIndex).isNotEqualTo(0)
-            assertThat(state.isAnimationRunning).isEqualTo(true)
-        }
+        clock.advanceClockMillis(100L)
+
+        assertThat(state.firstVisibleItemIndex).isNotEqualTo(0)
+        assertThat(state.isScrollInProgress).isEqualTo(true)
 
         rule.onNodeWithTag(LazyListTag)
             .performGesture { down(center) }
 
-        rule.runOnIdle {
-            assertThat(state.isAnimationRunning).isEqualTo(false)
-        }
+        assertThat(state.isScrollInProgress).isEqualTo(false)
     }
 
     @Test
@@ -944,11 +950,11 @@ class LazyColumnTest {
         rule.setContentWithTestViewConfiguration {
             state = rememberLazyListState()
             LazyColumn(
-                Modifier.size(100.dp).testTag(LazyListTag),
+                Modifier.requiredSize(100.dp).testTag(LazyListTag),
                 state = state
             ) {
                 items(items) {
-                    Spacer(Modifier.size(20.dp).testTag("$it"))
+                    Spacer(Modifier.requiredSize(20.dp).testTag("$it"))
                 }
             }
         }
@@ -975,11 +981,11 @@ class LazyColumnTest {
         rule.setContentWithTestViewConfiguration {
             state = rememberLazyListState(2, expectedOffset)
             LazyColumn(
-                Modifier.size(100.dp).testTag(LazyListTag),
+                Modifier.requiredSize(100.dp).testTag(LazyListTag),
                 state = state
             ) {
                 items(items) {
-                    Spacer(Modifier.size(20.dp).testTag("$it"))
+                    Spacer(Modifier.requiredSize(20.dp).testTag("$it"))
                 }
             }
         }
@@ -1000,11 +1006,11 @@ class LazyColumnTest {
         restorationTester.setContent {
             state = rememberLazyListState()
             LazyColumn(
-                Modifier.size(100.dp).testTag(LazyListTag),
+                Modifier.requiredSize(100.dp).testTag(LazyListTag),
                 state = state!!
             ) {
                 items(20) {
-                    Spacer(Modifier.size(20.dp).testTag("$it"))
+                    Spacer(Modifier.requiredSize(20.dp).testTag("$it"))
                 }
             }
         }
@@ -1030,9 +1036,9 @@ class LazyColumnTest {
     fun scroll_makeListSmaller_scroll() {
         var items by mutableStateOf((1..100).toList())
         rule.setContentWithTestViewConfiguration {
-            LazyColumn(Modifier.size(100.dp).testTag(LazyListTag)) {
+            LazyColumn(Modifier.requiredSize(100.dp).testTag(LazyListTag)) {
                 items(items) {
-                    Spacer(Modifier.size(10.dp).testTag("$it"))
+                    Spacer(Modifier.requiredSize(10.dp).testTag("$it"))
                 }
             }
         }
@@ -1058,18 +1064,18 @@ class LazyColumnTest {
         rule.setContentWithTestViewConfiguration {
             state = rememberLazyListState()
             LazyColumn(
-                Modifier.size(100.dp).testTag(LazyListTag),
+                Modifier.requiredSize(100.dp).testTag(LazyListTag),
                 state = state
             ) {
                 items(20) {
-                    Spacer(Modifier.size(20.dp).testTag("$it"))
+                    Spacer(Modifier.requiredSize(20.dp).testTag("$it"))
                 }
             }
         }
 
         rule.runOnIdle {
             runBlocking {
-                state.snapToItemIndex(3, 10)
+                state.scrollToItem(3, 10)
             }
             assertThat(state.firstVisibleItemIndex).isEqualTo(3)
             assertThat(state.firstVisibleItemScrollOffset).isEqualTo(10)
@@ -1081,10 +1087,10 @@ class LazyColumnTest {
         val items = (0..20).toList()
         val redrawCount = Array(6) { 0 }
         rule.setContentWithTestViewConfiguration {
-            LazyColumn(Modifier.size(100.dp).testTag(LazyListTag)) {
+            LazyColumn(Modifier.requiredSize(100.dp).testTag(LazyListTag)) {
                 items(items) {
                     Spacer(
-                        Modifier.size(20.dp)
+                        Modifier.requiredSize(20.dp)
                             .drawBehind { redrawCount[it]++ }
                     )
                 }
@@ -1107,10 +1113,10 @@ class LazyColumnTest {
         val redrawCount = Array(2) { 0 }
         var stateUsedInDrawScope by mutableStateOf(false)
         rule.setContentWithTestViewConfiguration {
-            LazyColumn(Modifier.size(100.dp).testTag(LazyListTag)) {
+            LazyColumn(Modifier.requiredSize(100.dp).testTag(LazyListTag)) {
                 items(2) {
                     Spacer(
-                        Modifier.size(50.dp)
+                        Modifier.requiredSize(50.dp)
                             .drawBehind {
                                 redrawCount[it]++
                                 if (it == 1) {
@@ -1141,15 +1147,15 @@ class LazyColumnTest {
         lateinit var state: LazyListState
         rule.setContentWithTestViewConfiguration {
             LazyColumn(
-                Modifier.height(itemSizeMinusOne).testTag(LazyListTag),
+                Modifier.requiredHeight(itemSizeMinusOne).testTag(LazyListTag),
                 state = rememberLazyListState().also { state = it }
             ) {
                 items(2) {
                     Spacer(
                         if (it == 0) {
-                            Modifier.width(30.dp).height(itemSizeMinusOne)
+                            Modifier.requiredWidth(30.dp).requiredHeight(itemSizeMinusOne)
                         } else {
-                            Modifier.width(20.dp).height(itemSize)
+                            Modifier.requiredWidth(20.dp).requiredHeight(itemSize)
                         }
                     )
                 }
@@ -1169,17 +1175,17 @@ class LazyColumnTest {
         lateinit var state: LazyListState
         rule.setContentWithTestViewConfiguration {
             LazyColumn(
-                Modifier.height(itemSize * 1.75f).testTag(LazyListTag),
+                Modifier.requiredHeight(itemSize * 1.75f).testTag(LazyListTag),
                 state = rememberLazyListState().also { state = it }
             ) {
                 items(items) {
                     Spacer(
                         if (it == 0) {
-                            Modifier.width(30.dp).height(itemSize / 2)
+                            Modifier.requiredWidth(30.dp).requiredHeight(itemSize / 2)
                         } else if (it == 1) {
-                            Modifier.width(20.dp).height(itemSize / 2)
+                            Modifier.requiredWidth(20.dp).requiredHeight(itemSize / 2)
                         } else {
-                            Modifier.width(20.dp).height(itemSize)
+                            Modifier.requiredWidth(20.dp).requiredHeight(itemSize)
                         }
                     )
                 }
@@ -1201,7 +1207,7 @@ class LazyColumnTest {
         rule.setContentWithTestViewConfiguration {
             LazyColumn {
                 items(items) {
-                    Spacer(Modifier.size(itemSize).testTag(it))
+                    Spacer(Modifier.requiredSize(itemSize).testTag(it))
                 }
             }
         }
@@ -1225,7 +1231,7 @@ class LazyColumnTest {
         rule.setContentWithTestViewConfiguration {
             LazyColumn {
                 itemsIndexed(items) { index, item ->
-                    Spacer(Modifier.size(itemSize).testTag("$index*$item"))
+                    Spacer(Modifier.requiredSize(itemSize).testTag("$index*$item"))
                 }
             }
         }
@@ -1246,7 +1252,7 @@ class LazyColumnTest {
 
     private fun LazyListState.scrollBy(offset: Dp) {
         runBlocking {
-            smoothScrollBy(with(rule.density) { offset.roundToPx().toFloat() }, snap())
+            animateScrollBy(with(rule.density) { offset.roundToPx().toFloat() }, snap())
         }
     }
 }
@@ -1278,7 +1284,7 @@ internal fun ComposeContentTestRule.setContentWithTestViewConfiguration(
     composable: @Composable () -> Unit
 ) {
     this.setContent {
-        Providers(LocalViewConfiguration provides FakeViewConfiguration) {
+        CompositionLocalProvider(LocalViewConfiguration provides FakeViewConfiguration) {
             composable()
         }
     }

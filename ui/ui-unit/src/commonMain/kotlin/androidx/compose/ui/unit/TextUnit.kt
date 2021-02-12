@@ -61,7 +61,7 @@ enum class TextUnitType {
  */
 @Suppress("EXPERIMENTAL_FEATURE_WARNING")
 @Immutable
-inline class TextUnit(val packedValue: Long) {
+inline class TextUnit internal constructor(internal val packedValue: Long) {
     /**
      * This is the same as multiplying the [TextUnit] by -1.0.
      *
@@ -315,7 +315,7 @@ inline operator fun Int.times(other: TextUnit): TextUnit {
 }
 
 @PublishedApi
-internal inline fun pack(unitType: Long, v: Float): TextUnit =
+internal fun pack(unitType: Long, v: Float): TextUnit =
     TextUnit(unitType or (v.toBits().toLong() and 0xFFFF_FFFFL))
 
 @PublishedApi

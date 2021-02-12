@@ -16,12 +16,10 @@
 package androidx.compose.ui.node
 
 import androidx.compose.ui.ExperimentalComposeUiApi
-import androidx.compose.ui.graphics.drawscope.ContentDrawScope
-import androidx.compose.ui.draw.DrawModifier
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.TransformOrigin
 import androidx.compose.ui.autofill.Autofill
 import androidx.compose.ui.autofill.AutofillTree
+import androidx.compose.ui.draw.DrawModifier
 import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.focus.FocusDirection
 import androidx.compose.ui.focus.FocusManager
@@ -29,6 +27,8 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Canvas
 import androidx.compose.ui.graphics.Matrix
 import androidx.compose.ui.graphics.Shape
+import androidx.compose.ui.graphics.TransformOrigin
+import androidx.compose.ui.graphics.drawscope.ContentDrawScope
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.hapticfeedback.HapticFeedback
 import androidx.compose.ui.input.key.KeyEvent
@@ -36,13 +36,14 @@ import androidx.compose.ui.input.pointer.PointerEvent
 import androidx.compose.ui.input.pointer.PointerEventPass
 import androidx.compose.ui.input.pointer.PointerInputFilter
 import androidx.compose.ui.input.pointer.PointerInputModifier
-import androidx.compose.ui.layout.LayoutModifier
 import androidx.compose.ui.layout.AlignmentLine
+import androidx.compose.ui.layout.LayoutModifier
 import androidx.compose.ui.layout.Measurable
 import androidx.compose.ui.layout.MeasureResult
 import androidx.compose.ui.layout.MeasureScope
 import androidx.compose.ui.layout.layout
 import androidx.compose.ui.layout.positionInRoot
+import androidx.compose.ui.platform.AccessibilityManager
 import androidx.compose.ui.platform.ClipboardManager
 import androidx.compose.ui.platform.TextToolbar
 import androidx.compose.ui.platform.ViewConfiguration
@@ -54,6 +55,7 @@ import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.LayoutDirection
+import androidx.compose.ui.unit.toOffset
 import androidx.compose.ui.zIndex
 import com.google.common.truth.Truth.assertThat
 import org.junit.Assert.assertEquals
@@ -1337,76 +1339,6 @@ class LayoutNodeTest {
         }
     }
 
-    /**
-     * This test creates a layout of this shape:
-     *
-     *   |---|
-     *   |tt |
-     *   |t  |
-     *   |---|t
-     *       tt
-     *
-     *   But where the additional offset suggest something more like this shape.
-     *
-     *   tt
-     *   t|---|
-     *    |  t|
-     *    | tt|
-     *    |---|
-     *
-     *   Without the additional offset, it would be expected that only the top left 3 pointers would
-     *   hit, but with the additional offset, only the bottom right 3 hit.
-     */
-    @Test
-    fun hitTest_ownerIsOffset_onlyCorrectPointersHit() {
-
-        // Arrange
-
-        val pointerInputFilter: PointerInputFilter = mockPointerInputFilter()
-
-        val layoutNode = LayoutNode(
-            0, 0, 2, 2,
-            PointerInputModifierImpl(
-                pointerInputFilter
-            )
-        ).apply {
-            attach(MockOwner(IntOffset(1, 1)))
-        }
-
-        val offsetThatHits1 = Offset(2f, 2f)
-        val offsetThatHits2 = Offset(2f, 1f)
-        val offsetThatHits3 = Offset(1f, 2f)
-        val offsetsThatMiss =
-            listOf(
-                Offset(0f, 0f),
-                Offset(0f, 1f),
-                Offset(1f, 0f)
-            )
-
-        val hit1 = mutableListOf<PointerInputFilter>()
-        val hit2 = mutableListOf<PointerInputFilter>()
-        val hit3 = mutableListOf<PointerInputFilter>()
-
-        val miss = mutableListOf<PointerInputFilter>()
-
-        // Act.
-
-        layoutNode.hitTest(offsetThatHits1, hit1)
-        layoutNode.hitTest(offsetThatHits2, hit2)
-        layoutNode.hitTest(offsetThatHits3, hit3)
-
-        offsetsThatMiss.forEach {
-            layoutNode.hitTest(it, miss)
-        }
-
-        // Assert.
-
-        assertThat(hit1).isEqualTo(listOf(pointerInputFilter))
-        assertThat(hit2).isEqualTo(listOf(pointerInputFilter))
-        assertThat(hit3).isEqualTo(listOf(pointerInputFilter))
-        assertThat(miss).isEmpty()
-    }
-
     @Test
     fun hitTest_pointerOn3NestedPointerInputModifiers_allPimsHitInCorrectOrder() {
 
@@ -1780,6 +1712,8 @@ private class MockOwner(
         get() = TODO("Not yet implemented")
     override val clipboardManager: ClipboardManager
         get() = TODO("Not yet implemented")
+    override val accessibilityManager: AccessibilityManager
+        get() = TODO("Not yet implemented")
     override val textToolbar: TextToolbar
         get() = TODO("Not yet implemented")
     @OptIn(ExperimentalComposeUiApi::class)
@@ -1820,8 +1754,11 @@ private class MockOwner(
         onDetachParams += node
     }
 
-    override fun calculatePosition(): IntOffset = position
-    override fun calculatePositionInWindow(): IntOffset = position
+    override fun calculatePositionInWindow(localPosition: Offset): Offset =
+        localPosition + position.toOffset()
+
+    override fun calculateLocalPosition(positionInWindow: Offset): Offset =
+        positionInWindow - position.toOffset()
 
     override fun requestFocus(): Boolean = false
 
@@ -1897,13 +1834,12 @@ private class MockOwner(
 private fun LayoutNode(x: Int, y: Int, x2: Int, y2: Int, modifier: Modifier = Modifier) =
     LayoutNode().apply {
         this.modifier = modifier
-        measureBlocks = object : LayoutNode.NoIntrinsicsMeasureBlocks("not supported") {
-            override fun measure(
-                measureScope: MeasureScope,
+        measurePolicy = object : LayoutNode.NoIntrinsicsMeasurePolicy("not supported") {
+            override fun MeasureScope.measure(
                 measurables: List<Measurable>,
                 constraints: Constraints
             ): MeasureResult =
-                measureScope.layout(x2 - x, y2 - y) {
+                layout(x2 - x, y2 - y) {
                     measurables.forEach { it.measure(constraints).place(0, 0) }
                 }
         }

@@ -19,14 +19,13 @@ package androidx.compose.foundation.text.selection
 import android.content.Context
 import android.graphics.Typeface
 import androidx.activity.ComponentActivity
+import androidx.compose.foundation.text.InternalFoundationTextApi
+import androidx.compose.foundation.text.TextDelegate
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.layout.LayoutCoordinates
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
 import androidx.compose.ui.text.AnnotatedString
-import androidx.compose.ui.text.ExperimentalTextApi
-import androidx.compose.ui.text.InternalTextApi
 import androidx.compose.ui.text.SpanStyle
-import androidx.compose.ui.text.TextDelegate
 import androidx.compose.ui.text.TextLayoutResult
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.Font
@@ -58,10 +57,6 @@ val BASIC_MEASURE_FONT = Font(
     style = FontStyle.Normal
 )
 
-@OptIn(
-    InternalTextApi::class,
-    ExperimentalTextApi::class
-)
 @RunWith(AndroidJUnit4::class)
 @MediumTest
 class MultiWidgetSelectionDelegateTest {
@@ -2375,6 +2370,7 @@ class MultiWidgetSelectionDelegateTest {
         }
     }
 
+    @OptIn(InternalFoundationTextApi::class)
     private fun simpleTextLayout(
         text: String = "",
         fontSize: TextUnit = TextUnit.Unspecified,

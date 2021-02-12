@@ -20,7 +20,7 @@ import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Immutable
-import androidx.compose.runtime.Providers
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.Stable
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.staticCompositionLocalOf
@@ -138,7 +138,7 @@ enum class FabPosition {
  * @param contentColor color of the content in scaffold body. Defaults to either the matching
  * content color for [backgroundColor], or, if it is not a color from the theme, this will keep
  * the same value set above this Surface.
- * @param bodyContent content of your screen. The lambda receives an [PaddingValues] that should be
+ * @param content content of your screen. The lambda receives an [PaddingValues] that should be
  * applied to the content root via Modifier.padding to properly offset top and bottom bars. If
  * you're using VerticalScroller, apply this modifier to the child of the scroller, and not on
  * the scroller itself.
@@ -162,7 +162,7 @@ fun Scaffold(
     drawerScrimColor: Color = DrawerDefaults.scrimColor,
     backgroundColor: Color = MaterialTheme.colors.background,
     contentColor: Color = contentColorFor(backgroundColor),
-    bodyContent: @Composable (PaddingValues) -> Unit
+    content: @Composable (PaddingValues) -> Unit
 ) {
     val child = @Composable { childModifier: Modifier ->
         Surface(modifier = childModifier, color = backgroundColor, contentColor = contentColor) {
@@ -170,7 +170,7 @@ fun Scaffold(
                 isFabDocked = isFloatingActionButtonDocked,
                 fabPosition = floatingActionButtonPosition,
                 topBar = topBar,
-                bodyContent = bodyContent,
+                content = content,
                 snackbar = {
                     snackbarHost(scaffoldState.snackbarHostState)
                 },
@@ -181,7 +181,7 @@ fun Scaffold(
     }
 
     if (drawerContent != null) {
-        ModalDrawerLayout(
+        ModalDrawer(
             modifier = modifier,
             drawerState = scaffoldState.drawerState,
             gesturesEnabled = drawerGesturesEnabled,
@@ -191,7 +191,7 @@ fun Scaffold(
             drawerBackgroundColor = drawerBackgroundColor,
             drawerContentColor = drawerContentColor,
             scrimColor = drawerScrimColor,
-            bodyContent = { child(Modifier) }
+            content = { child(Modifier) }
         )
     } else {
         child(modifier)
@@ -204,19 +204,19 @@ fun Scaffold(
  * @param isFabDocked whether the FAB (if present) is docked to the bottom bar or not
  * @param fabPosition [FabPosition] for the FAB (if present)
  * @param topBar the content to place at the top of the [Scaffold], typically a [TopAppBar]
- * @param bodyContent the main 'body' of the [Scaffold]
- * @param snackbar the [Snackbar] displayed on top of the [bodyContent]
- * @param fab the [FloatingActionButton] displayed on top of the [bodyContent], below the [snackbar]
+ * @param content the main 'body' of the [Scaffold]
+ * @param snackbar the [Snackbar] displayed on top of the [content]
+ * @param fab the [FloatingActionButton] displayed on top of the [content], below the [snackbar]
  * and above the [bottomBar]
  * @param bottomBar the content to place at the bottom of the [Scaffold], on top of the
- * [bodyContent], typically a [BottomAppBar].
+ * [content], typically a [BottomAppBar].
  */
 @Composable
 private fun ScaffoldLayout(
     isFabDocked: Boolean,
     fabPosition: FabPosition,
     topBar: @Composable () -> Unit,
-    bodyContent: @Composable (PaddingValues) -> Unit,
+    content: @Composable (PaddingValues) -> Unit,
     snackbar: @Composable () -> Unit,
     fab: @Composable () -> Unit,
     bottomBar: @Composable () -> Unit
@@ -274,7 +274,7 @@ private fun ScaffoldLayout(
             }
 
             val bottomBarPlaceables = subcompose(ScaffoldLayoutContent.BottomBar) {
-                Providers(
+                CompositionLocalProvider(
                     LocalFabPlacement provides fabPlacement,
                     content = bottomBar
                 )
@@ -313,7 +313,7 @@ private fun ScaffoldLayout(
 
             val bodyContentPlaceables = subcompose(ScaffoldLayoutContent.MainContent) {
                 val innerPadding = PaddingValues(bottom = bottomBarHeight.toDp())
-                bodyContent(innerPadding)
+                content(innerPadding)
             }.fastMap { it.measure(looseConstraints.copy(maxHeight = bodyContentHeight)) }
 
             // Placing to control drawing order to match default elevation of each placeable

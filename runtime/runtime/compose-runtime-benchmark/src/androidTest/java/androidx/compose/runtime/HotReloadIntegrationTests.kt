@@ -20,7 +20,7 @@ import android.app.Activity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
-import androidx.compose.material.ModalDrawerLayout
+import androidx.compose.material.ModalDrawer
 import androidx.compose.material.Text
 import androidx.compose.runtime.benchmark.ComposeActivity
 import androidx.test.ext.junit.runners.AndroidJUnit4
@@ -55,9 +55,9 @@ class HotReloadIntegrationTests {
             activity.setContent {
                 Column {
                     BoxWithConstraints {
-                        ModalDrawerLayout(
+                        ModalDrawer(
                             drawerContent = { },
-                            bodyContent = { Text(text = "Hello") }
+                            content = { Text(text = "Hello") }
                         )
                     }
                 }

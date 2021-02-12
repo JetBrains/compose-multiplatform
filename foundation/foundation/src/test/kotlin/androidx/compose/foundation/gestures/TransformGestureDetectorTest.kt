@@ -17,7 +17,7 @@
 package androidx.compose.foundation.gestures
 
 import androidx.compose.ui.geometry.Offset
-import androidx.compose.ui.input.pointer.anyPositionChangeConsumed
+import androidx.compose.ui.input.pointer.positionChangeConsumed
 import androidx.compose.ui.input.pointer.consumeAllChanges
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
@@ -82,12 +82,12 @@ class TransformGestureDetectorTest(val panZoomLock: Boolean) {
         assertFalse(panned)
 
         val move1 = down.moveBy(Offset(12.7f, 12.7f))
-        assertFalse(move1.anyPositionChangeConsumed())
+        assertFalse(move1.positionChangeConsumed())
 
         assertFalse(panned)
 
         val move2 = move1.moveBy(Offset(0.1f, 0.1f))
-        assertTrue(move2.anyPositionChangeConsumed())
+        assertTrue(move2.positionChangeConsumed())
 
         assertEquals(17.7f, centroid.x, 0.1f)
         assertEquals(17.7f, centroid.y, 0.1f)
@@ -99,7 +99,7 @@ class TransformGestureDetectorTest(val panZoomLock: Boolean) {
 
         panAmount = Offset.Zero
         val move3 = move2.moveBy(Offset(1f, 0f))
-        assertTrue(move3.anyPositionChangeConsumed())
+        assertTrue(move3.positionChangeConsumed())
 
         assertEquals(Offset(1f, 0f), panAmount)
 
@@ -123,11 +123,11 @@ class TransformGestureDetectorTest(val panZoomLock: Boolean) {
         assertFalse(panned)
 
         val moveA1 = downA.moveBy(Offset(12.8f, 12.8f))
-        assertFalse(moveA1.anyPositionChangeConsumed())
+        assertFalse(moveA1.positionChangeConsumed())
 
         val moveB1 = downB.moveBy(Offset(12.8f, 12.8f))
         // Now we've averaged enough movement
-        assertTrue(moveB1.anyPositionChangeConsumed())
+        assertTrue(moveB1.positionChangeConsumed())
 
         assertEquals((5f + 25f + 12.8f) / 2f, centroid.x, 0.1f)
         assertEquals((5f + 25f + 12.8f) / 2f, centroid.y, 0.1f)
@@ -154,10 +154,10 @@ class TransformGestureDetectorTest(val panZoomLock: Boolean) {
         assertFalse(downB.consumed.downChange)
 
         val moveB1 = downB.moveBy(Offset(35.95f, 0f))
-        assertFalse(moveB1.anyPositionChangeConsumed())
+        assertFalse(moveB1.positionChangeConsumed())
 
         val moveB2 = moveB1.moveBy(Offset(0.1f, 0f))
-        assertTrue(moveB2.anyPositionChangeConsumed())
+        assertTrue(moveB2.positionChangeConsumed())
 
         assertTrue(panned)
         assertTrue(zoomed)
@@ -171,10 +171,10 @@ class TransformGestureDetectorTest(val panZoomLock: Boolean) {
         panAmount = Offset.Zero
 
         val moveA1 = downA.moveBy(Offset(-1f, 0f))
-        assertTrue(moveA1.anyPositionChangeConsumed())
+        assertTrue(moveA1.positionChangeConsumed())
 
         val moveB3 = moveB2.moveBy(Offset(1f, 0f))
-        assertTrue(moveB3.anyPositionChangeConsumed())
+        assertTrue(moveB3.positionChangeConsumed())
 
         assertEquals(0f, panAmount.x, 0.01f)
         assertEquals(0f, panAmount.y, 0.01f)

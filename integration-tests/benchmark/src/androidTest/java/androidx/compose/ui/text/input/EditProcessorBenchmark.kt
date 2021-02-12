@@ -18,17 +18,15 @@ package androidx.compose.ui.text.input
 
 import androidx.benchmark.junit4.BenchmarkRule
 import androidx.benchmark.junit4.measureRepeated
+import androidx.compose.ui.text.TextRange
 import androidx.test.filters.LargeTest
 import androidx.ui.integration.test.RandomTextGenerator
 import androidx.ui.integration.test.cartesian
-import androidx.compose.ui.text.InternalTextApi
-import androidx.compose.ui.text.TextRange
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.junit.runners.Parameterized
 
-@OptIn(InternalTextApi::class)
 @LargeTest
 @RunWith(Parameterized::class)
 class EditProcessorBenchmark(val initText: InitialText, val scenario: TestScenario) {
@@ -82,18 +80,17 @@ class EditProcessorBenchmark(val initText: InitialText, val scenario: TestScenar
         benchmarkRule.measureRepeated {
             val ep = runWithTimingDisabled {
                 EditProcessor().apply {
-                    onNewState(
+                    reset(
                         TextFieldValue(
                             text = initText.text,
                             selection = TextRange(5)
                         ),
-                        null, // text input service, not used.
-                        0 // session token, not used
+                        null // text input service, not used.
                     )
                 }
             }
 
-            ep.onEditCommands(scenario.ops)
+            ep.apply(scenario.ops)
         }
     }
 }

@@ -24,101 +24,16 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.layout.Layout
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.IntrinsicMeasurable
+import androidx.compose.ui.layout.IntrinsicMeasureScope
+import androidx.compose.ui.layout.Measurable
+import androidx.compose.ui.layout.MeasurePolicy
+import androidx.compose.ui.layout.MeasureResult
+import androidx.compose.ui.layout.MeasureScope
 import androidx.compose.ui.layout.layout
 import androidx.compose.ui.layout.layoutId
-import androidx.compose.ui.layout.measureBlocksOf
 import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.offset
-
-@Sampled
-@Composable
-fun LayoutWithProvidedIntrinsicsUsage(content: @Composable () -> Unit) {
-    // We build a layout that will occupy twice as much space as its children,
-    // and will position them to be bottom right aligned.
-    Layout(
-        content,
-        minIntrinsicWidthMeasureBlock = { measurables, h ->
-            // The min intrinsic width of this layout will be twice the largest min intrinsic
-            // width of a child. Note that we call minIntrinsicWidth with h / 2 for children,
-            // since we should be double the size of the children.
-            (measurables.map { it.minIntrinsicWidth(h / 2) }.maxByOrNull { it } ?: 0) * 2
-        },
-        minIntrinsicHeightMeasureBlock = { measurables, w ->
-            (measurables.map { it.minIntrinsicHeight(w / 2) }.maxByOrNull { it } ?: 0) * 2
-        },
-        maxIntrinsicWidthMeasureBlock = { measurables, h ->
-            (measurables.map { it.maxIntrinsicHeight(h / 2) }.maxByOrNull { it } ?: 0) * 2
-        },
-        maxIntrinsicHeightMeasureBlock = { measurables, w ->
-            (measurables.map { it.maxIntrinsicHeight(w / 2) }.maxByOrNull { it } ?: 0) * 2
-        }
-    ) { measurables, constraints ->
-        // measurables contains one element corresponding to each of our layout children.
-        // constraints are the constraints that our parent is currently measuring us with.
-        val childConstraints = Constraints(
-            minWidth = constraints.minWidth / 2,
-            minHeight = constraints.minHeight / 2,
-            maxWidth = constraints.maxWidth / 2,
-            maxHeight = constraints.maxHeight / 2
-        )
-        // We measure the children with half our constraints, to ensure we can be double
-        // the size of the children.
-        val placeables = measurables.map { it.measure(childConstraints) }
-        val layoutWidth = (placeables.maxByOrNull { it.width }?.width ?: 0) * 2
-        val layoutHeight = (placeables.maxByOrNull { it.height }?.height ?: 0) * 2
-        // We call layout to set the size of the current layout and to provide the positioning
-        // of the children. The children are placed relative to the current layout place.
-        layout(layoutWidth, layoutHeight) {
-            placeables.forEach {
-                it.placeRelative(layoutWidth - it.width, layoutHeight - it.height)
-            }
-        }
-    }
-}
-
-@Sampled
-@Composable
-fun LayoutWithMeasureBlocksWithIntrinsicUsage(content: @Composable () -> Unit) {
-    val measureBlocks = measureBlocksOf(
-        minIntrinsicWidthMeasureBlock = { measurables, h ->
-            // The min intrinsic width of this layout will be twice the largest min intrinsic
-            // width of a child. Note that we call minIntrinsicWidth with h / 2 for children,
-            // since we should be double the size of the children.
-            (measurables.map { it.minIntrinsicWidth(h / 2) }.maxByOrNull { it } ?: 0) * 2
-        },
-        minIntrinsicHeightMeasureBlock = { measurables, w ->
-            (measurables.map { it.minIntrinsicHeight(w / 2) }.maxByOrNull { it } ?: 0) * 2
-        },
-        maxIntrinsicWidthMeasureBlock = { measurables, h ->
-            (measurables.map { it.maxIntrinsicHeight(h / 2) }.maxByOrNull { it } ?: 0) * 2
-        },
-        maxIntrinsicHeightMeasureBlock = { measurables, w ->
-            (measurables.map { it.maxIntrinsicHeight(w / 2) }.maxByOrNull { it } ?: 0) * 2
-        }
-    ) { measurables, constraints ->
-        // measurables contains one element corresponding to each of our layout children.
-        // constraints are the constraints that our parent is currently measuring us with.
-        val childConstraints = Constraints(
-            minWidth = constraints.minWidth / 2,
-            minHeight = constraints.minHeight / 2,
-            maxWidth = constraints.maxWidth / 2,
-            maxHeight = constraints.maxHeight / 2
-        )
-        // We measure the children with half our constraints, to ensure we can be double
-        // the size of the children.
-        val placeables = measurables.map { it.measure(childConstraints) }
-        val layoutWidth = (placeables.maxByOrNull { it.width }?.width ?: 0) * 2
-        val layoutHeight = (placeables.maxByOrNull { it.height }?.height ?: 0) * 2
-        // We call layout to set the size of the current layout and to provide the positioning
-        // of the children. The children are placed relative to the current layout place.
-        layout(layoutWidth, layoutHeight) {
-            placeables.forEach {
-                it.placeRelative(layoutWidth - it.width, layoutHeight - it.height)
-            }
-        }
-    }
-    Layout(content = content, measureBlocks = measureBlocks)
-}
 
 @Sampled
 @Composable
@@ -147,6 +62,65 @@ fun LayoutUsage(content: @Composable () -> Unit) {
             }
         }
     }
+}
+
+@Sampled
+@Composable
+fun LayoutWithProvidedIntrinsicsUsage(content: @Composable () -> Unit) {
+    // We build a layout that will occupy twice as much space as its children,
+    // and will position them to be bottom right aligned.
+    val measurePolicy = object : MeasurePolicy {
+        override fun MeasureScope.measure(
+            measurables: List<Measurable>,
+            constraints: Constraints
+        ): MeasureResult {
+            // measurables contains one element corresponding to each of our layout children.
+            // constraints are the constraints that our parent is currently measuring us with.
+            val childConstraints = Constraints(
+                minWidth = constraints.minWidth / 2,
+                minHeight = constraints.minHeight / 2,
+                maxWidth = constraints.maxWidth / 2,
+                maxHeight = constraints.maxHeight / 2
+            )
+            // We measure the children with half our constraints, to ensure we can be double
+            // the size of the children.
+            val placeables = measurables.map { it.measure(childConstraints) }
+            val layoutWidth = (placeables.maxByOrNull { it.width }?.width ?: 0) * 2
+            val layoutHeight = (placeables.maxByOrNull { it.height }?.height ?: 0) * 2
+            // We call layout to set the size of the current layout and to provide the positioning
+            // of the children. The children are placed relative to the current layout place.
+            return layout(layoutWidth, layoutHeight) {
+                placeables.forEach {
+                    it.placeRelative(layoutWidth - it.width, layoutHeight - it.height)
+                }
+            }
+        }
+
+        // The min intrinsic width of this layout will be twice the largest min intrinsic
+        // width of a child. Note that we call minIntrinsicWidth with h / 2 for children,
+        // since we should be double the size of the children.
+        override fun IntrinsicMeasureScope.minIntrinsicWidth(
+            measurables: List<IntrinsicMeasurable>,
+            height: Int
+        ) = (measurables.map { it.minIntrinsicWidth(height / 2) }.maxByOrNull { it } ?: 0) * 2
+
+        override fun IntrinsicMeasureScope.minIntrinsicHeight(
+            measurables: List<IntrinsicMeasurable>,
+            width: Int
+        ) = (measurables.map { it.minIntrinsicHeight(width / 2) }.maxByOrNull { it } ?: 0) * 2
+
+        override fun IntrinsicMeasureScope.maxIntrinsicWidth(
+            measurables: List<IntrinsicMeasurable>,
+            height: Int
+        ) = (measurables.map { it.maxIntrinsicHeight(height / 2) }.maxByOrNull { it } ?: 0) * 2
+
+        override fun IntrinsicMeasureScope.maxIntrinsicHeight(
+            measurables: List<IntrinsicMeasurable>,
+            width: Int
+        ) = (measurables.map { it.maxIntrinsicHeight(width / 2) }.maxByOrNull { it } ?: 0) * 2
+    }
+
+    Layout(content = content, measurePolicy = measurePolicy)
 }
 
 @Sampled

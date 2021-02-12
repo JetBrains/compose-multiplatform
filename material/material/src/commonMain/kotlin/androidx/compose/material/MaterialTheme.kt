@@ -17,13 +17,12 @@
 package androidx.compose.material
 
 import androidx.compose.foundation.LocalIndication
-import androidx.compose.material.ripple.ExperimentalRippleApi
 import androidx.compose.material.ripple.LocalRippleTheme
 import androidx.compose.material.ripple.RippleTheme
 import androidx.compose.material.ripple.rememberRipple
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Immutable
-import androidx.compose.runtime.Providers
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.ReadOnlyComposable
 import androidx.compose.runtime.remember
 import androidx.compose.foundation.text.selection.LocalTextSelectionColors
@@ -53,7 +52,6 @@ import androidx.compose.foundation.text.selection.LocalTextSelectionColors
  * @param typography A set of text styles to be used as this hierarchy's typography system
  * @param shapes A set of shapes to be used by the components in this hierarchy
  */
-@OptIn(ExperimentalRippleApi::class)
 @Composable
 fun MaterialTheme(
     colors: Colors = MaterialTheme.colors,
@@ -68,7 +66,7 @@ fun MaterialTheme(
     }.apply { updateColorsFrom(colors) }
     val rippleIndication = rememberRipple()
     val selectionColors = rememberTextSelectionColors(rememberedColors)
-    Providers(
+    CompositionLocalProvider(
         LocalColors provides rememberedColors,
         LocalContentAlpha provides ContentAlpha.high,
         LocalIndication provides rippleIndication,
@@ -115,7 +113,6 @@ object MaterialTheme {
         get() = LocalShapes.current
 }
 
-@OptIn(ExperimentalRippleApi::class)
 @Immutable
 private object MaterialRippleTheme : RippleTheme {
     @Composable

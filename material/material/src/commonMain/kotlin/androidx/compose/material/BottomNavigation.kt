@@ -20,19 +20,20 @@ import androidx.compose.animation.core.FastOutSlowInEasing
 import androidx.compose.animation.core.TweenSpec
 import androidx.compose.animation.core.VectorizedAnimationSpec
 import androidx.compose.animation.core.animateFloatAsState
-import androidx.compose.foundation.Interaction
-import androidx.compose.foundation.InteractionState
+import androidx.compose.foundation.interaction.Interaction
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.preferredHeight
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.selection.selectable
+import androidx.compose.foundation.selection.selectableGroup
 import androidx.compose.material.ripple.rememberRipple
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.Providers
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
@@ -87,7 +88,7 @@ fun BottomNavigation(
     modifier: Modifier = Modifier,
     backgroundColor: Color = MaterialTheme.colors.primarySurface,
     contentColor: Color = contentColorFor(backgroundColor),
-    elevation: Dp = BottomNavigationElevation,
+    elevation: Dp = BottomNavigationDefaults.Elevation,
     content: @Composable RowScope.() -> Unit
 ) {
     Surface(
@@ -97,7 +98,10 @@ fun BottomNavigation(
         modifier = modifier
     ) {
         Row(
-            Modifier.fillMaxWidth().preferredHeight(BottomNavigationHeight),
+            Modifier
+                .fillMaxWidth()
+                .height(BottomNavigationHeight)
+                .selectableGroup(),
             horizontalArrangement = Arrangement.SpaceBetween,
             content = content
         )
@@ -117,35 +121,35 @@ fun BottomNavigation(
  * use icons, and use text labels if space permits.
  *
  * A BottomNavigationItem always shows text labels (if it exists) when selected. Showing text
- * labels if not selected is controlled by [alwaysShowLabels].
+ * labels if not selected is controlled by [alwaysShowLabel].
  *
- * @param icon icon for this item, typically this will be an [Icon]
  * @param selected whether this item is selected
  * @param onClick the callback to be invoked when this item is selected
+ * @param icon icon for this item, typically this will be an [Icon]
  * @param modifier optional [Modifier] for this item
  * @param enabled controls the enabled state of this item. When `false`, this item will not
  * be clickable and will appear disabled to accessibility services.
  * @param label optional text label for this item
- * @param alwaysShowLabels whether to always show labels for this item. If false, labels will
+ * @param alwaysShowLabel whether to always show the label for this item. If false, the label will
  * only be shown when this item is selected.
- * @param interactionState the [InteractionState] representing the different [Interaction]s
- * present on this BottomNavigationItem. You can create and pass in your own remembered
- * [InteractionState] if you want to read the [InteractionState] and customize the appearance /
- * behavior of this BottomNavigationItem in different [Interaction]s.
+ * @param interactionSource the [MutableInteractionSource] representing the stream of
+ * [Interaction]s for this BottomNavigationItem. You can create and pass in your own remembered
+ * [MutableInteractionSource] if you want to observe [Interaction]s and customize the
+ * appearance / behavior of this BottomNavigationItem in different [Interaction]s.
  * @param selectedContentColor the color of the text label and icon when this item is selected,
  * and the color of the ripple.
  * @param unselectedContentColor the color of the text label and icon when this item is not selected
  */
 @Composable
 fun RowScope.BottomNavigationItem(
-    icon: @Composable () -> Unit,
     selected: Boolean,
     onClick: () -> Unit,
+    icon: @Composable () -> Unit,
     modifier: Modifier = Modifier,
     enabled: Boolean = true,
     label: @Composable (() -> Unit)? = null,
-    alwaysShowLabels: Boolean = true,
-    interactionState: InteractionState = remember { InteractionState() },
+    alwaysShowLabel: Boolean = true,
+    interactionSource: MutableInteractionSource = remember { MutableInteractionSource() },
     selectedContentColor: Color = LocalContentColor.current,
     unselectedContentColor: Color = selectedContentColor.copy(alpha = ContentAlpha.medium)
 ) {
@@ -160,7 +164,6 @@ fun RowScope.BottomNavigationItem(
     // provided by BottomNavigationTransition.
     val ripple = rememberRipple(bounded = false, color = selectedContentColor)
 
-    // TODO This composable has magic behavior within a Row; reconsider this behavior later
     Box(
         modifier
             .selectable(
@@ -168,7 +171,7 @@ fun RowScope.BottomNavigationItem(
                 onClick = onClick,
                 enabled = enabled,
                 role = Role.Tab,
-                interactionState = interactionState,
+                interactionSource = interactionSource,
                 indication = ripple
             )
             .weight(1f),
@@ -179,7 +182,7 @@ fun RowScope.BottomNavigationItem(
             unselectedContentColor,
             selected
         ) { progress ->
-            val animationProgress = if (alwaysShowLabels) 1f else progress
+            val animationProgress = if (alwaysShowLabel) 1f else progress
 
             BottomNavigationItemBaselineLayout(
                 icon = icon,
@@ -188,6 +191,16 @@ fun RowScope.BottomNavigationItem(
             )
         }
     }
+}
+
+/**
+ * Contains default values used for [BottomNavigation].
+ */
+object BottomNavigationDefaults {
+    /**
+     * Default elevation used for [BottomNavigation].
+     */
+    val Elevation = 8.dp
 }
 
 /**
@@ -216,7 +229,7 @@ private fun BottomNavigationTransition(
 
     val color = lerp(inactiveColor, activeColor, animationProgress)
 
-    Providers(
+    CompositionLocalProvider(
         LocalContentColor provides color.copy(alpha = 1f),
         LocalContentAlpha provides color.alpha,
     ) {
@@ -370,11 +383,6 @@ private val BottomNavigationAnimationSpec = TweenSpec<Float>(
  * Height of a [BottomNavigation] component
  */
 private val BottomNavigationHeight = 56.dp
-
-/**
- * Default elevation of a [BottomNavigation] component
- */
-private val BottomNavigationElevation = 8.dp
 
 /**
  * Padding at the start and end of a [BottomNavigationItem]

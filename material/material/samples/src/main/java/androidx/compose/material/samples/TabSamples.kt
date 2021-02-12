@@ -31,9 +31,9 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.preferredHeight
-import androidx.compose.foundation.layout.preferredSize
-import androidx.compose.foundation.layout.preferredWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Icon
@@ -288,11 +288,11 @@ fun ScrollingFancyIndicatorContainerTabs() {
 fun FancyTab(title: String, onClick: () -> Unit, selected: Boolean) {
     Tab(selected, onClick) {
         Column(
-            Modifier.padding(10.dp).preferredHeight(50.dp).fillMaxWidth(),
+            Modifier.padding(10.dp).height(50.dp).fillMaxWidth(),
             verticalArrangement = Arrangement.SpaceBetween
         ) {
             Box(
-                Modifier.preferredSize(10.dp)
+                Modifier.size(10.dp)
                     .align(Alignment.CenterHorizontally)
                     .background(color = if (selected) Color.Red else Color.White)
             )
@@ -367,6 +367,6 @@ fun FancyAnimatedIndicator(tabPositions: List<TabPosition>, selectedTabIndex: In
             // Apply an offset from the start to correctly position the indicator around the tab
             .offset(x = indicatorStart)
             // Make the width of the indicator follow the animated width as we move between tabs
-            .preferredWidth(indicatorEnd - indicatorStart)
+            .width(indicatorEnd - indicatorStart)
     )
 }

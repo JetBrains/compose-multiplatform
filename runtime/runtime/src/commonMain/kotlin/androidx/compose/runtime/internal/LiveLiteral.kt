@@ -30,6 +30,7 @@ import androidx.compose.runtime.mutableStateOf
  * @param offset The startOffset of the literal in the source file at the time of compilation.
  */
 @ComposeCompilerApi
+@Target(AnnotationTarget.FUNCTION)
 @Retention(AnnotationRetention.RUNTIME)
 annotation class LiveLiteralInfo(
     val key: String,
@@ -43,6 +44,7 @@ annotation class LiveLiteralInfo(
  * @param file The file path of the file the associate LiveLiterals class was produced for
  */
 @ComposeCompilerApi
+@Target(AnnotationTarget.CLASS)
 @Retention(AnnotationRetention.RUNTIME)
 annotation class LiveLiteralFileInfo(
     val file: String
@@ -51,15 +53,30 @@ annotation class LiveLiteralFileInfo(
 private val liveLiteralCache = HashMap<String, MutableState<Any?>>()
 
 @InternalComposeApi
+@ComposeCompilerApi
 var isLiveLiteralsEnabled: Boolean = false
     private set
 
+/**
+ * When called, all live literals will start to use their values backed by [MutableState].
+ *
+ * Caution: This API is intended to be used by tooling only. Use at your own risk.
+ */
 @InternalComposeApi
+@OptIn(ComposeCompilerApi::class)
 fun enableLiveLiterals() {
     isLiveLiteralsEnabled = true
 }
 
+/**
+ * Constructs a [State] object identified by the provided global [key] and initialized to the
+ * provided [value]. This value may then be updated from tooling with the
+ * [updateLiveLiteralValue] API. Only a single [State] object will be created for any given [key].
+ *
+ * Caution: This API is intended to be used by tooling only. Use at your own risk.
+ */
 @InternalComposeApi
+@ComposeCompilerApi
 fun <T> liveLiteral(key: String, value: T): State<T> {
     @Suppress("UNCHECKED_CAST")
     return liveLiteralCache.getOrPut(key) {
@@ -67,6 +84,9 @@ fun <T> liveLiteral(key: String, value: T): State<T> {
     } as State<T>
 }
 
+/**
+ * Updates the value of a [State] object that was created by [liveLiteral] with the same key.
+ */
 @InternalComposeApi
 fun updateLiveLiteralValue(key: String, value: Any?) {
     var needToUpdate = true

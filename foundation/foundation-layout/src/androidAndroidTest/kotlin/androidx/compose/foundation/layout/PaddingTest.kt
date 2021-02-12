@@ -17,7 +17,7 @@
 package androidx.compose.foundation.layout
 
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.Providers
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.layout.Layout
 import androidx.compose.ui.Modifier
@@ -275,11 +275,11 @@ class PaddingTest : LayoutTest() {
         // ltr: P1 S P2 | S P3 | P1 S
         // rtl:    S P1 | P3 S | P2 S P1
         show {
-            Providers(LocalLayoutDirection provides LayoutDirection.Rtl) {
+            CompositionLocalProvider(LocalLayoutDirection provides LayoutDirection.Rtl) {
                 Row(Modifier.fillMaxSize()) {
                     Box(
                         Modifier.padding(start = padding1Dp, end = padding2Dp)
-                            .preferredSize(sizeDp, sizeDp)
+                            .size(sizeDp, sizeDp)
                             .onGloballyPositioned { coordinates: LayoutCoordinates ->
                                 childSize[0] = coordinates.size
                                 childPosition[0] = coordinates.positionInRoot()
@@ -290,7 +290,7 @@ class PaddingTest : LayoutTest() {
 
                     Box(
                         Modifier.padding(end = padding3Dp)
-                            .preferredSize(sizeDp, sizeDp)
+                            .size(sizeDp, sizeDp)
                             .onGloballyPositioned { coordinates: LayoutCoordinates ->
                                 childSize[1] = coordinates.size
                                 childPosition[1] = coordinates.positionInRoot()
@@ -301,7 +301,7 @@ class PaddingTest : LayoutTest() {
 
                     Box(
                         Modifier.padding(start = padding1Dp)
-                            .preferredSize(sizeDp, sizeDp)
+                            .size(sizeDp, sizeDp)
                             .onGloballyPositioned { coordinates: LayoutCoordinates ->
                                 childSize[2] = coordinates.size
                                 childPosition[2] = coordinates.positionInRoot()
@@ -351,11 +351,11 @@ class PaddingTest : LayoutTest() {
         // ltr: P1 S P2 | S P3
         // rtl:    S P3 | P1 S P2
         show {
-            Providers(LocalLayoutDirection provides LayoutDirection.Rtl) {
+            CompositionLocalProvider(LocalLayoutDirection provides LayoutDirection.Rtl) {
                 Row(Modifier.fillMaxSize()) {
                     Box(
                         Modifier.absolutePadding(left = padding1Dp, right = padding2Dp)
-                            .preferredSize(sizeDp, sizeDp)
+                            .size(sizeDp, sizeDp)
                             .onGloballyPositioned { coordinates: LayoutCoordinates ->
                                 childPosition[0] = coordinates.positionInRoot()
                                 drawLatch.countDown()
@@ -364,7 +364,7 @@ class PaddingTest : LayoutTest() {
                     }
                     Box(
                         Modifier.absolutePadding(right = padding3Dp)
-                            .preferredSize(sizeDp, sizeDp)
+                            .size(sizeDp, sizeDp)
                             .onGloballyPositioned { coordinates: LayoutCoordinates ->
                                 childPosition[1] = coordinates.positionInRoot()
                                 drawLatch.countDown()

@@ -70,6 +70,9 @@ object SemanticsProperties {
         }
     )
 
+    /** @see SemanticsPropertyReceiver.selectableGroup */
+    val SelectableGroup = SemanticsPropertyKey<Unit>("SelectableGroup")
+
     /**
      * The node is marked as heading for accessibility.
      *
@@ -702,6 +705,15 @@ by SemanticsProperties.ToggleableState
  */
 fun SemanticsPropertyReceiver.password() {
     this[SemanticsProperties.Password] = Unit
+}
+
+/**
+ * The node is marked as a collection of horizontally or vertically stacked selectable elements.
+ *
+ * @see SemanticsPropertyReceiver.selected
+*/
+fun SemanticsPropertyReceiver.selectableGroup() {
+    this[SemanticsProperties.SelectableGroup] = Unit
 }
 
 /**

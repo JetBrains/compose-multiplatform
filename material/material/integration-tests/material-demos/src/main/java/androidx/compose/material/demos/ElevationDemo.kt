@@ -24,7 +24,7 @@ import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.preferredHeight
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -67,7 +67,7 @@ private fun ElevatedCard(elevation: Dp) {
         Box(
             Modifier
                 .fillMaxWidth()
-                .preferredHeight(150.dp)
+                .height(150.dp)
                 .clickable(onClick = {}),
             contentAlignment = Alignment.Center
         ) {

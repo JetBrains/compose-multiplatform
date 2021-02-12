@@ -40,7 +40,7 @@ import androidx.compose.material.darkColors
 import androidx.compose.material.lightColors
 import androidx.compose.material.primarySurface
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.Providers
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.TextStyle
@@ -143,10 +143,10 @@ TopAppBar(
 @Composable private fun ThemingSnippet7() {
     // By default, both Icon & Text use the combination of LocalContentColor &
     // LocalContentAlpha. De-emphasize content by setting content alpha
-    Providers(LocalContentAlpha provides ContentAlpha.medium) {
+    CompositionLocalProvider(LocalContentAlpha provides ContentAlpha.medium) {
         Text(/*...*/)
     }
-    Providers(LocalContentAlpha provides ContentAlpha.disabled) {
+    CompositionLocalProvider(LocalContentAlpha provides ContentAlpha.disabled) {
         Icon(/*...*/)
         Text(/*...*/)
     }

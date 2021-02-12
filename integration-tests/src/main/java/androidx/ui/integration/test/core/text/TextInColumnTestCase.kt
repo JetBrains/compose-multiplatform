@@ -17,7 +17,7 @@
 package androidx.ui.integration.test.core.text
 
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.preferredWidth
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
@@ -52,7 +52,7 @@ class TextInColumnTestCase(
     @Composable
     override fun ContentWrappers(content: @Composable () -> Unit) {
         Column(
-            modifier = Modifier.wrapContentSize(Alignment.Center).preferredWidth(width)
+            modifier = Modifier.wrapContentSize(Alignment.Center).width(width)
         ) {
             content()
         }

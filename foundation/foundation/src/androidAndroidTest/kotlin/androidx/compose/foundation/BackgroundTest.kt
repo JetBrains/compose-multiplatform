@@ -19,10 +19,10 @@ package androidx.compose.foundation
 
 import android.os.Build
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.preferredSize
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.Providers
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.testutils.assertShape
 import androidx.compose.ui.Alignment
@@ -90,10 +90,10 @@ class BackgroundTest {
         rule.setContent {
             SemanticParent {
                 Box(
-                    Modifier.preferredSize(40f.toDp()).background(Color.Magenta),
+                    Modifier.size(40f.toDp()).background(Color.Magenta),
                     contentAlignment = Alignment.Center
                 ) {
-                    Box(Modifier.preferredSize(20f.toDp()).background(Color.White))
+                    Box(Modifier.size(20f.toDp()).background(Color.White))
                 }
             }
         }
@@ -113,11 +113,11 @@ class BackgroundTest {
         rule.setContent {
             SemanticParent {
                 Box(
-                    Modifier.preferredSize(40f.toDp()).background(Color.Magenta),
+                    Modifier.size(40f.toDp()).background(Color.Magenta),
                     contentAlignment = Alignment.Center
                 ) {
                     Box(
-                        Modifier.preferredSize(20f.toDp())
+                        Modifier.size(20f.toDp())
                             .background(SolidColor(Color.White))
                     )
                 }
@@ -139,7 +139,7 @@ class BackgroundTest {
         rule.setContent {
             SemanticParent {
                 Box(
-                    Modifier.preferredSize(40f.toDp())
+                    Modifier.size(40f.toDp())
                         .background(Color.Magenta)
                         .background(color = Color.White, shape = CircleShape)
                 )
@@ -160,7 +160,7 @@ class BackgroundTest {
         rule.setContent {
             SemanticParent {
                 Box(
-                    Modifier.preferredSize(40f.toDp())
+                    Modifier.size(40f.toDp())
                         .background(Color.Magenta)
                         .background(
                             brush = SolidColor(Color.White),
@@ -183,9 +183,9 @@ class BackgroundTest {
     fun background_rtl_initially() {
         rule.setContent {
             SemanticParent {
-                Providers(LocalLayoutDirection provides LayoutDirection.Rtl) {
+                CompositionLocalProvider(LocalLayoutDirection provides LayoutDirection.Rtl) {
                     Box(
-                        Modifier.preferredSize(40f.toDp())
+                        Modifier.size(40f.toDp())
                             .background(Color.Magenta)
                             .background(
                                 brush = SolidColor(Color.White),
@@ -210,9 +210,9 @@ class BackgroundTest {
         val direction = mutableStateOf(LayoutDirection.Ltr)
         rule.setContent {
             SemanticParent {
-                Providers(LocalLayoutDirection provides direction.value) {
+                CompositionLocalProvider(LocalLayoutDirection provides direction.value) {
                     Box(
-                        Modifier.preferredSize(40f.toDp())
+                        Modifier.size(40f.toDp())
                             .background(Color.Magenta)
                             .background(
                                 brush = SolidColor(Color.White),

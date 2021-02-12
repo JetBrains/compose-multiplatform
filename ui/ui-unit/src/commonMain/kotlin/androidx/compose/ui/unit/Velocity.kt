@@ -28,16 +28,16 @@ import androidx.compose.ui.util.unpackFloat2
  * @param x Horizontal component of the velocity in pixels per second
  * @param y Vertical component of the velocity in pixels per second
  */
-@Suppress("NOTHING_TO_INLINE")
 @Stable
-inline fun Velocity(x: Float, y: Float) = Velocity(packFloats(x, y))
+fun Velocity(x: Float, y: Float) = Velocity(packFloats(x, y))
 
 /**
  * A two dimensional velocity in pixels per second.
  */
 @Suppress("EXPERIMENTAL_FEATURE_WARNING")
 @Immutable
-inline class Velocity(val packedValue: Long) {
+inline class Velocity internal constructor(private val packedValue: Long) {
+
     /**
      * The horizontal component of the velocity in pixels per second.
      */

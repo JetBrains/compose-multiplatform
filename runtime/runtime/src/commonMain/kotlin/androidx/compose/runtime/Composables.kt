@@ -1,0 +1,307 @@
+/*
+ * Copyright 2019 The Android Open Source Project
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+package androidx.compose.runtime
+
+/**
+ * Remember the value produced by [calculation]. [calculation] will only be evaluated during the composition.
+ * Recomposition will always return the value produced by composition.
+ */
+@OptIn(ComposeCompilerApi::class)
+@Composable
+inline fun <T> remember(calculation: @DisallowComposableCalls () -> T): T =
+    currentComposer.cache(false, calculation)
+
+/**
+ * Remember the value returned by [calculation] if [key1] is equal to the previous composition,
+ * otherwise produce and remember a new value by calling [calculation].
+ */
+@OptIn(ComposeCompilerApi::class)
+@Composable
+inline fun <T> remember(
+    key1: Any?,
+    calculation: @DisallowComposableCalls () -> T
+): T {
+    return currentComposer.cache(currentComposer.changed(key1), calculation)
+}
+
+/**
+ * Remember the value returned by [calculation] if [key1] and [key2] are equal to the previous
+ * composition, otherwise produce and remember a new value by calling [calculation].
+ */
+@OptIn(ComposeCompilerApi::class)
+@Composable
+inline fun <T> remember(
+    key1: Any?,
+    key2: Any?,
+    calculation: @DisallowComposableCalls () -> T
+): T {
+    return currentComposer.cache(
+        currentComposer.changed(key1) or currentComposer.changed(key2),
+        calculation
+    )
+}
+
+/**
+ * Remember the value returned by [calculation] if [key1], [key2] and [key3] are equal to the
+ * previous composition, otherwise produce and remember a new value by calling [calculation].
+ */
+@OptIn(ComposeCompilerApi::class)
+@Composable
+inline fun <T> remember(
+    key1: Any?,
+    key2: Any?,
+    key3: Any?,
+    calculation: @DisallowComposableCalls () -> T
+): T {
+    return currentComposer.cache(
+        currentComposer.changed(key1) or
+            currentComposer.changed(key2) or
+            currentComposer.changed(key3),
+        calculation
+    )
+}
+
+/**
+ * Remember the value returned by [calculation] if all values of [keys] are equal to the previous
+ * composition, otherwise produce and remember a new value by calling [calculation].
+ */
+@OptIn(ComposeCompilerApi::class)
+@Composable
+inline fun <T> remember(
+    vararg keys: Any?,
+    calculation: @DisallowComposableCalls () -> T
+): T {
+    var invalid = false
+    for (key in keys) invalid = invalid or currentComposer.changed(key)
+    return currentComposer.cache(invalid, calculation)
+}
+
+/**
+ * [key] is a utility composable that is used to "group" or "key" a block of execution inside of a
+ * composition. This is sometimes needed for correctness inside of control-flow that may cause a
+ * given composable invocation to execute more than once during composition.
+ *
+ * The value for a key *does not need to be globally unique*, and needs only be unique amongst the
+ * invocations of [key] *at that point* in composition.
+ *
+ * For instance, consider the following example:
+ *
+ * @sample androidx.compose.runtime.samples.LocallyUniqueKeys
+ *
+ * Even though there are users with the same id composed in both the top and the bottom loop,
+ * because they are different calls to [key], there is no need to create compound keys.
+ *
+ * The key must be unique for each element in the collection, however, or children and local state
+ * might be reused in unintended ways.
+ *
+ * For instance, consider the following example:
+ *
+ * @sample androidx.compose.runtime.samples.NotAlwaysUniqueKeys
+ *
+ * This example assumes that `parent.id` is a unique key for each item in the collection,
+ * but this is only true if it is fair to assume that a parent will only ever have a single child,
+ * which may not be the case.  Instead, it may be more correct to do the following:
+ *
+ * @sample androidx.compose.runtime.samples.MoreCorrectUniqueKeys
+ *
+ * A compound key can be created by passing in multiple arguments:
+ *
+ * @sample androidx.compose.runtime.samples.TwoInputsKeySample
+ *
+ * @param keys The set of values to be used to create a compound key. These will be compared to
+ * their previous values using [equals] and [hashCode]
+ * @param block The composable children for this group.
+ */
+@Composable
+inline fun <T> key(
+    @Suppress("UNUSED_PARAMETER")
+    vararg keys: Any?,
+    block: @Composable () -> T
+) = block()
+
+/**
+ * TODO(lmr): provide documentation
+ */
+val currentComposer: Composer
+    @ReadOnlyComposable
+    @Composable get() { throw NotImplementedError("Implemented as an intrinsic") }
+
+/**
+ * Returns an object which can be used to invalidate the current scope at this point in composition.
+ * This object can be used to manually cause recompositions.
+ */
+val currentRecomposeScope: RecomposeScope
+    @ReadOnlyComposable
+    @OptIn(InternalComposeApi::class)
+    @Composable get() {
+        val scope = currentComposer.recomposeScope ?: error("no recompose scope found")
+        currentComposer.recordUsed(scope)
+        return scope
+    }
+
+/**
+ * This a hash value used to coordinate map externally stored state to the composition. For
+ * example, this is used by saved instance state to preserve state across activity lifetime
+ * boundaries.
+ *
+ * This value is not likely to be unique but is not guaranteed unique. There are known cases,
+ * such as for loops without a [key], where the runtime does not have enough information to
+ * make the compound key hash unique.
+ */
+val currentCompositeKeyHash: Int
+    @Composable
+    @OptIn(InternalComposeApi::class)
+    get() = currentComposer.compoundKeyHash
+
+/**
+ * Emits a node into the composition of type [T].
+ *
+ * This function will throw a runtime exception if [E] is not a subtype of the applier of the
+ * [currentComposer].
+ *
+ * @sample androidx.compose.runtime.samples.CustomTreeComposition
+ *
+ * @param factory A function which will create a new instance of [T]. This function is NOT
+ * guaranteed to be called in place.
+ * @param update A function to perform updates on the node. This will run every time emit is
+ * executed. This function is called in place and will be inlined.
+ *
+ * @see Updater
+ * @see Applier
+ * @see Composition
+ */
+@OptIn(ComposeCompilerApi::class)
+// ComposeNode is a special case of readonly composable and handles creating its own groups, so
+// it is okay to use.
+@Suppress("NONREADONLY_CALL_IN_READONLY_COMPOSABLE")
+@Composable inline fun <T : Any, reified E : Applier<*>> ComposeNode(
+    noinline factory: () -> T,
+    update: @DisallowComposableCalls Updater<T>.() -> Unit
+) {
+    if (currentComposer.applier !is E) invalidApplier()
+    currentComposer.startNode()
+    if (currentComposer.inserting) {
+        currentComposer.createNode { factory() }
+    } else {
+        currentComposer.useNode()
+    }
+    Updater<T>(currentComposer).update()
+    currentComposer.endNode()
+}
+
+/**
+ * Emits a node into the composition of type [T]. Nodes emitted inside of [content] will become
+ * children of the emitted node.
+ *
+ * This function will throw a runtime exception if [E] is not a subtype of the applier of the
+ * [currentComposer].
+ *
+ * @sample androidx.compose.runtime.samples.CustomTreeComposition
+ *
+ * @param factory A function which will create a new instance of [T]. This function is NOT
+ * guaranteed to be called in place.
+ * @param update A function to perform updates on the node. This will run every time emit is
+ * executed. This function is called in place and will be inlined.
+ * @param content the composable content that will emit the "children" of this node.
+ *
+ * @see Updater
+ * @see Applier
+ * @see Composition
+ */
+@OptIn(ComposeCompilerApi::class)
+// ComposeNode is a special case of readonly composable and handles creating its own groups, so
+// it is okay to use.
+@Suppress("NONREADONLY_CALL_IN_READONLY_COMPOSABLE")
+@Composable
+inline fun <T : Any?, reified E : Applier<*>> ComposeNode(
+    noinline factory: () -> T,
+    update: @DisallowComposableCalls Updater<T>.() -> Unit,
+    content: @Composable () -> Unit
+) {
+    if (currentComposer.applier !is E) invalidApplier()
+    currentComposer.startNode()
+    if (currentComposer.inserting) {
+        currentComposer.createNode(factory)
+    } else {
+        currentComposer.useNode()
+    }
+    Updater<T>(currentComposer).update()
+    content()
+    currentComposer.endNode()
+}
+
+/**
+ * Emits a node into the composition of type [T]. Nodes emitted inside of [content] will become
+ * children of the emitted node.
+ *
+ * This function will throw a runtime exception if [E] is not a subtype of the applier of the
+ * [currentComposer].
+ *
+ * @sample androidx.compose.runtime.samples.CustomTreeComposition
+ *
+ * @param factory A function which will create a new instance of [T]. This function is NOT
+ * guaranteed to be called in place.
+ * @param update A function to perform updates on the node. This will run every time emit is
+ * executed. This function is called in place and will be inlined.
+ * @param skippableUpdate A function to perform updates on the node. Unlike [update], this
+ * function is Composable and will therefore be skipped unless it has been invalidated by some
+ * other mechanism. This can be useful to perform expensive calculations for updating the node
+ * where the calculations are likely to have the same inputs over time, so the function's
+ * execution can be skipped.
+ * @param content the composable content that will emit the "children" of this node.
+ *
+ * @see Updater
+ * @see SkippableUpdater
+ * @see Applier
+ * @see Composition
+ */
+@OptIn(ComposeCompilerApi::class)
+@Composable @ExplicitGroupsComposable
+inline fun <T, reified E : Applier<*>> ComposeNode(
+    noinline factory: () -> T,
+    update: @DisallowComposableCalls Updater<T>.() -> Unit,
+    noinline skippableUpdate: @Composable SkippableUpdater<T>.() -> Unit,
+    content: @Composable () -> Unit
+) {
+    if (currentComposer.applier !is E) invalidApplier()
+    currentComposer.startNode()
+    if (currentComposer.inserting) {
+        currentComposer.createNode(factory)
+    } else {
+        currentComposer.useNode()
+    }
+    Updater<T>(currentComposer).update()
+    SkippableUpdater<T>(currentComposer).skippableUpdate()
+    currentComposer.startReplaceableGroup(0x7ab4aae9)
+    content()
+    currentComposer.endReplaceableGroup()
+    currentComposer.endNode()
+}
+
+@PublishedApi
+internal fun invalidApplier(): Unit = error("Invalid applier")
+
+/**
+ * An Effect to construct a [CompositionContext] at the current point of composition. This can be
+ * used to run a separate composition in the context of the current one, preserving
+ * [CompositionLocal]s and propagating invalidations. When this call leaves the composition, the
+ * context is invalidated.
+ */
+@OptIn(InternalComposeApi::class)
+@Composable fun rememberCompositionContext(): CompositionContext {
+    return currentComposer.buildContext()
+}

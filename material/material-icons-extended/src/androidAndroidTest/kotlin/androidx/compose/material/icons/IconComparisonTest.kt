@@ -14,8 +14,6 @@
  * limitations under the License.
  */
 
-@file:Suppress("DEPRECATION")
-
 package androidx.compose.material.icons
 
 import android.graphics.Bitmap
@@ -25,7 +23,7 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.preferredSize
+import androidx.compose.foundation.layout.size
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -211,7 +209,7 @@ private fun ImageVector.copy(name: String): ImageVector {
 private fun String.toImageVector(): ImageVector {
     val context = LocalContext.current
     val resId = context.resources.getIdentifier(this, "drawable", context.packageName)
-    return vectorResource(resId)
+    return ImageVector.vectorResource(resId)
 }
 
 /**
@@ -284,7 +282,7 @@ private fun DrawVectors(programmaticVector: ImageVector, xmlVector: ImageVector)
         // Using ipx directly ensures that we will always have a consistent layout / drawing
         // story, so anti-aliasing should be identical.
         val layoutSize = with(LocalDensity.current) {
-            Modifier.preferredSize(72.toDp())
+            Modifier.size(72.toDp())
         }
         Row(Modifier.align(Alignment.Center)) {
             Box(

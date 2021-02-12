@@ -90,15 +90,12 @@ class DemoTest {
     }
 
     @Test
-    @Ignore(
-        "b/179181757: Test crashes on 'AndroidView > Complex Touch Interop > Compose in " +
-            "Android in Compose in Android'"
-    )
     fun navigateThroughAllDemos_1() {
         navigateThroughAllDemos(SplitDemoCategories[0])
     }
 
     @Test
+    @Ignore("b/179339732")
     fun navigateThroughAllDemos_2() {
         navigateThroughAllDemos(SplitDemoCategories[1])
     }

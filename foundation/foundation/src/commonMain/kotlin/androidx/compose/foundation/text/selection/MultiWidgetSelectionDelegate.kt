@@ -20,12 +20,10 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Rect
 import androidx.compose.ui.layout.LayoutCoordinates
 import androidx.compose.ui.text.AnnotatedString
-import androidx.compose.ui.text.ExperimentalTextApi
 import androidx.compose.ui.text.TextLayoutResult
 import androidx.compose.ui.text.TextRange
 import kotlin.math.max
 
-@OptIn(ExperimentalTextApi::class)
 internal class MultiWidgetSelectionDelegate(
     private val selectionRangeUpdate: (TextRange?) -> Unit,
     private val coordinatesCallback: () -> LayoutCoordinates?,
@@ -123,7 +121,6 @@ internal class MultiWidgetSelectionDelegate(
  *
  * @return [Selection] of the current composable, or null if the composable is not selected.
  */
-@OptIn(ExperimentalTextApi::class)
 internal fun getTextSelectionInfo(
     textLayoutResult: TextLayoutResult,
     selectionCoordinates: Pair<Offset, Offset>,
@@ -207,7 +204,6 @@ internal fun getTextSelectionInfo(
  *
  * @return [Selection] of the current composable, or null if the composable is not selected.
  */
-@OptIn(ExperimentalTextApi::class)
 private fun getRefinedSelectionInfo(
     rawStartOffset: Int,
     rawEndOffset: Int,
@@ -284,7 +280,6 @@ private fun getRefinedSelectionInfo(
  *
  * @return an assembled object of [Selection] using the offered selection info.
  */
-@OptIn(ExperimentalTextApi::class)
 private fun getAssembledSelectionInfo(
     startOffset: Int,
     endOffset: Int,

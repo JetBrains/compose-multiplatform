@@ -20,13 +20,10 @@ import android.content.Context
 import android.view.View
 import android.view.inputmethod.EditorInfo
 import android.view.inputmethod.InputMethodManager
-import androidx.compose.ui.text.ExperimentalTextApi
-import androidx.compose.ui.text.InternalTextApi
 import androidx.compose.ui.text.TextRange
 import androidx.compose.ui.text.input.ImeOptions
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.input.TextInputServiceAndroid
-import androidx.compose.ui.text.input.buildTextFieldValue
 import com.nhaarman.mockitokotlin2.any
 import com.nhaarman.mockitokotlin2.eq
 import com.nhaarman.mockitokotlin2.mock
@@ -39,7 +36,6 @@ import org.junit.Test
 import org.junit.runner.RunWith
 import org.junit.runners.JUnit4
 
-@OptIn(ExperimentalTextApi::class, InternalTextApi::class)
 @RunWith(JUnit4::class)
 class TextInputServiceAndroidOnStateUpdateTest {
 
@@ -77,8 +73,8 @@ class TextInputServiceAndroidOnStateUpdateTest {
     @Test
     fun onUpdateState_resetInputCalled_whenOnlyCompositionChanged() {
         textInputService.updateState(
-            oldValue = buildTextFieldValue("a", TextRange.Zero, TextRange.Zero),
-            newValue = buildTextFieldValue("a", TextRange.Zero, null)
+            oldValue = TextFieldValue("a", TextRange.Zero, TextRange.Zero),
+            newValue = TextFieldValue("a", TextRange.Zero, null)
         )
 
         verify(imm, times(1)).restartInput(any())
@@ -88,8 +84,8 @@ class TextInputServiceAndroidOnStateUpdateTest {
     @Test
     fun onUpdateState_updateSelectionCalled_whenOnlySelectionChanged() {
         textInputService.updateState(
-            oldValue = buildTextFieldValue("a", TextRange.Zero, null),
-            newValue = buildTextFieldValue("a", TextRange(1), null)
+            oldValue = TextFieldValue("a", TextRange.Zero, null),
+            newValue = TextFieldValue("a", TextRange(1), null)
         )
 
         verify(imm, never()).restartInput(any())
@@ -99,8 +95,8 @@ class TextInputServiceAndroidOnStateUpdateTest {
     @Test
     fun onUpdateState_resetInputNotCalled_whenSelectionAndCompositionChanged() {
         textInputService.updateState(
-            oldValue = buildTextFieldValue("a", TextRange.Zero, TextRange.Zero),
-            newValue = buildTextFieldValue("a", TextRange(1), null)
+            oldValue = TextFieldValue("a", TextRange.Zero, TextRange.Zero),
+            newValue = TextFieldValue("a", TextRange(1), null)
         )
 
         verify(imm, never()).restartInput(any())

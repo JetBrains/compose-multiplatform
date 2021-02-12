@@ -20,7 +20,6 @@ import android.view.View
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.MediumTest
 import junit.framework.TestCase
-import org.junit.After
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -28,11 +27,6 @@ import org.junit.runner.RunWith
 @MediumTest
 @RunWith(AndroidJUnit4::class)
 class DisposeTests : BaseComposeTest() {
-    @After
-    fun teardown() {
-        clearRoots()
-    }
-
     @get:Rule
     override val activityRule = makeTestActivityRule()
 
@@ -47,7 +41,6 @@ class DisposeTests : BaseComposeTest() {
         val log = mutableListOf<String>()
 
         lateinit var recomposeScope: RecomposeScope
-        @OptIn(ExperimentalComposeApi::class)
         val composable = @Composable {
             recomposeScope = currentRecomposeScope
             DisposableEffect(NeverEqualObject) {

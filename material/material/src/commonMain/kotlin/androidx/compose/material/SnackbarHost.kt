@@ -14,23 +14,19 @@
  * limitations under the License.
  */
 
-@file:Suppress("DEPRECATION")
-
 package androidx.compose.material
 
-import androidx.compose.animation.animatedFloat
-import androidx.compose.animation.core.AnimatedFloat
-import androidx.compose.animation.core.AnimationEndReason
+import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.AnimationSpec
 import androidx.compose.animation.core.FastOutSlowInEasing
 import androidx.compose.animation.core.LinearEasing
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.layout.Box
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.RecomposeScope
 import androidx.compose.runtime.Stable
+import androidx.compose.runtime.State
 import androidx.compose.runtime.currentRecomposeScope
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.key
@@ -39,6 +35,8 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.platform.AccessibilityManager
+import androidx.compose.ui.platform.LocalAccessibilityManager
 import androidx.compose.ui.util.fastForEach
 import kotlinx.coroutines.CancellableContinuation
 import kotlinx.coroutines.delay
@@ -152,9 +150,14 @@ fun SnackbarHost(
     snackbar: @Composable (SnackbarData) -> Unit = { Snackbar(it) }
 ) {
     val currentSnackbarData = hostState.currentSnackbarData
+    val accessibilityManager = LocalAccessibilityManager.current
     LaunchedEffect(currentSnackbarData) {
         if (currentSnackbarData != null) {
-            delay(currentSnackbarData.duration.toMillis())
+            val duration = currentSnackbarData.duration.toMillis(
+                currentSnackbarData.actionLabel != null,
+                accessibilityManager
+            )
+            delay(duration)
             currentSnackbarData.dismiss()
         }
     }
@@ -223,11 +226,25 @@ enum class SnackbarDuration {
     Indefinite
 }
 
-// TODO: a11y and magic numbers adjustment
-private fun SnackbarDuration.toMillis() = when (this) {
-    SnackbarDuration.Indefinite -> Long.MAX_VALUE
-    SnackbarDuration.Long -> 10000L
-    SnackbarDuration.Short -> 4000L
+// TODO: magic numbers adjustment
+internal fun SnackbarDuration.toMillis(
+    hasAction: Boolean,
+    accessibilityManager: AccessibilityManager?
+): Long {
+    val original = when (this) {
+        SnackbarDuration.Indefinite -> Long.MAX_VALUE
+        SnackbarDuration.Long -> 10000L
+        SnackbarDuration.Short -> 4000L
+    }
+    if (accessibilityManager == null) {
+        return original
+    }
+    return accessibilityManager.calculateRecommendedTimeoutMillis(
+        original,
+        containsIcons = true,
+        containsText = true,
+        containsControls = hasAction
+    )
 }
 
 // TODO: to be replaced with the public customizable implementation
@@ -319,36 +336,28 @@ private fun animatedOpacity(
     animation: AnimationSpec<Float>,
     visible: Boolean,
     onAnimationFinish: () -> Unit = {}
-): AnimatedFloat {
-    val animatedFloat = animatedFloat(if (!visible) 1f else 0f)
-    DisposableEffect(visible) {
-        animatedFloat.animateTo(
+): State<Float> {
+    val alpha = remember { Animatable(if (!visible) 1f else 0f) }
+    LaunchedEffect(visible) {
+        alpha.animateTo(
             if (visible) 1f else 0f,
-            anim = animation,
-            onEnd = { reason, _ ->
-                if (reason == AnimationEndReason.TargetReached) onAnimationFinish()
-            }
+            animationSpec = animation
         )
-        onDispose {
-            animatedFloat.stop()
-        }
+        onAnimationFinish()
     }
-    return animatedFloat
+    return alpha.asState()
 }
 
 @Composable
-private fun animatedScale(animation: AnimationSpec<Float>, visible: Boolean): AnimatedFloat {
-    val animatedFloat = animatedFloat(if (!visible) 1f else 0.8f)
-    DisposableEffect(visible) {
-        animatedFloat.animateTo(
+private fun animatedScale(animation: AnimationSpec<Float>, visible: Boolean): State<Float> {
+    val scale = remember { Animatable(if (!visible) 1f else 0.8f) }
+    LaunchedEffect(visible) {
+        scale.animateTo(
             if (visible) 1f else 0.8f,
-            anim = animation
+            animationSpec = animation
         )
-        onDispose {
-            animatedFloat.stop()
-        }
     }
-    return animatedFloat
+    return scale.asState()
 }
 
 private const val SnackbarFadeInMillis = 150

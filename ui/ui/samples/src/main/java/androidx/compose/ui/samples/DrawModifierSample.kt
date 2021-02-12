@@ -20,7 +20,7 @@ import androidx.annotation.Sampled
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.requiredSize
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.setValue
@@ -112,7 +112,7 @@ fun DrawWithCacheContentSample() {
     Image(
         painter = vectorPainter,
         contentDescription = null,
-        modifier = Modifier.size(120.dp).drawWithCache {
+        modifier = Modifier.requiredSize(120.dp).drawWithCache {
             val gradient = Brush.linearGradient(
                 colors = listOf(Color.Red, Color.Blue),
                 start = Offset.Zero,

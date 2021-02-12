@@ -17,6 +17,8 @@
 package androidx.compose.foundation.lazy
 
 import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.gestures.FlingBehavior
+import androidx.compose.foundation.gestures.ScrollableDefaults
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.runtime.Composable
@@ -27,6 +29,7 @@ import androidx.compose.ui.unit.dp
 /**
  * Receiver scope which is used by [LazyColumn] and [LazyRow].
  */
+@LazyScopeMarker
 interface LazyListScope {
     /**
      * Adds a single item.
@@ -214,6 +217,7 @@ private class LazyListScopeImpl : LazyListScope {
  * to add a spacing between items and specify the arrangement of the items when we have not enough
  * of them to fill the whole minimum size.
  * @param verticalAlignment the vertical alignment applied to the items
+ * @param flingBehavior logic describing fling behavior.
  * @param content a block which describes the content. Inside this block you can use methods like
  * [LazyListScope.item] to add a single item or [LazyListScope.items] to add a list of items.
  */
@@ -226,6 +230,7 @@ fun LazyRow(
     horizontalArrangement: Arrangement.Horizontal =
         if (!reverseLayout) Arrangement.Start else Arrangement.End,
     verticalAlignment: Alignment.Vertical = Alignment.Top,
+    flingBehavior: FlingBehavior = ScrollableDefaults.flingBehavior(),
     content: LazyListScope.() -> Unit
 ) {
     val scope = LazyListScopeImpl()
@@ -239,6 +244,7 @@ fun LazyRow(
         verticalAlignment = verticalAlignment,
         horizontalArrangement = horizontalArrangement,
         isVertical = false,
+        flingBehavior = flingBehavior,
         reverseLayout = reverseLayout,
         headerIndexes = scope.headersIndexes ?: emptyList()
     ) { index ->
@@ -267,6 +273,7 @@ fun LazyRow(
  * to add a spacing between items and specify the arrangement of the items when we have not enough
  * of them to fill the whole minimum size.
  * @param horizontalAlignment the horizontal alignment applied to the items.
+ * @param flingBehavior logic describing fling behavior.
  * @param content a block which describes the content. Inside this block you can use methods like
  * [LazyListScope.item] to add a single item or [LazyListScope.items] to add a list of items.
  */
@@ -279,6 +286,7 @@ fun LazyColumn(
     verticalArrangement: Arrangement.Vertical =
         if (!reverseLayout) Arrangement.Top else Arrangement.Bottom,
     horizontalAlignment: Alignment.Horizontal = Alignment.Start,
+    flingBehavior: FlingBehavior = ScrollableDefaults.flingBehavior(),
     content: LazyListScope.() -> Unit
 ) {
     val scope = LazyListScopeImpl()
@@ -289,6 +297,7 @@ fun LazyColumn(
         modifier = modifier,
         state = state,
         contentPadding = contentPadding,
+        flingBehavior = flingBehavior,
         horizontalAlignment = horizontalAlignment,
         verticalArrangement = verticalArrangement,
         isVertical = true,

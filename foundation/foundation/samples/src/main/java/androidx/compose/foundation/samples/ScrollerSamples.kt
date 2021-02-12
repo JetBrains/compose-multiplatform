@@ -17,19 +17,17 @@
 package androidx.compose.foundation.samples
 
 import androidx.annotation.Sampled
-import androidx.compose.foundation.animation.scrollBy
-import androidx.compose.foundation.animation.smoothScrollBy
+import androidx.compose.foundation.gestures.scrollBy
+import androidx.compose.foundation.gestures.animateScrollBy
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.gestures.Scrollable
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.requiredHeight
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.preferredSize
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
@@ -78,7 +76,7 @@ fun VerticalScrollExample() {
         Modifier
             .verticalScroll(scrollState)
             .fillMaxWidth()
-            .height(10000.dp)
+            .requiredHeight(10000.dp)
             .background(brush = gradient)
     )
 }
@@ -107,7 +105,7 @@ fun ControlledScrollableRowSample() {
             }
             Button(
                 onClick = {
-                    scope.launch { (scrollState as Scrollable).scrollBy(10000f) }
+                    scope.launch { scrollState.scrollBy(10000f) }
                 }
             ) {
                 Text("--- >")
@@ -117,14 +115,14 @@ fun ControlledScrollableRowSample() {
             Text("Smooth Scroll")
             Button(
                 onClick = {
-                    scope.launch { scrollState.smoothScrollTo(scrollState.value - 1000) }
+                    scope.launch { scrollState.animateScrollTo(scrollState.value - 1000) }
                 }
             ) {
                 Text("< -")
             }
             Button(
                 onClick = {
-                    scope.launch { (scrollState as Scrollable).smoothScrollBy(10000f) }
+                    scope.launch { scrollState.animateScrollBy(10000f) }
                 }
             ) {
                 Text("--- >")
@@ -136,7 +134,7 @@ fun ControlledScrollableRowSample() {
 @Composable
 private fun Square(index: Int) {
     Box(
-        Modifier.preferredSize(75.dp, 200.dp).background(colors[index % colors.size]),
+        Modifier.size(75.dp, 200.dp).background(colors[index % colors.size]),
         contentAlignment = Alignment.Center
     ) {
         Text(index.toString())
@@ -147,7 +145,7 @@ private fun Square(index: Int) {
 private fun Button(onClick: () -> Unit, content: @Composable () -> Unit) {
     Box(
         Modifier.padding(5.dp)
-            .preferredSize(120.dp, 60.dp)
+            .size(120.dp, 60.dp)
             .clickable(onClick = onClick)
             .background(color = Color.LightGray),
         contentAlignment = Alignment.Center

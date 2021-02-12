@@ -22,17 +22,17 @@ import androidx.activity.ComponentActivity
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.preferredSize
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.text.CoreText
-import androidx.compose.runtime.Providers
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.hapticfeedback.HapticFeedback
 import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.layout.onGloballyPositioned
-import androidx.compose.ui.platform.AmbientHapticFeedback
-import androidx.compose.ui.platform.AmbientLayoutDirection
+import androidx.compose.ui.platform.LocalHapticFeedback
+import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.test.click
 import androidx.compose.ui.test.hasTestTag
@@ -40,7 +40,6 @@ import androidx.compose.ui.test.junit4.createAndroidComposeRule
 import androidx.compose.ui.test.longClick
 import androidx.compose.ui.test.performGesture
 import androidx.compose.ui.text.AnnotatedString
-import androidx.compose.ui.text.InternalTextApi
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontStyle
@@ -53,6 +52,7 @@ import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import androidx.test.filters.FlakyTest
 import androidx.test.filters.LargeTest
 import com.google.common.truth.Truth.assertThat
 import com.nhaarman.mockitokotlin2.mock
@@ -63,8 +63,6 @@ import org.junit.Test
 import org.junit.runner.RunWith
 import java.util.concurrent.CountDownLatch
 
-@Suppress("DEPRECATION")
-@OptIn(InternalTextApi::class)
 @LargeTest
 @RunWith(AndroidJUnit4::class)
 class SelectionContainerFocusTest {
@@ -86,6 +84,8 @@ class SelectionContainerFocusTest {
     private val boxSize = 40.dp
 
     private val hapticFeedback = mock<HapticFeedback>()
+
+    @FlakyTest(bugId = 179770443)
     @Test
     fun click_anywhere_to_cancel() {
         // Setup. Long press to create a selection.
@@ -122,6 +122,7 @@ class SelectionContainerFocusTest {
         }
     }
 
+    @FlakyTest(bugId = 179770443)
     @Test
     fun select_anotherContainer_cancelOld() {
         // Setup. Long press to create a selection.
@@ -160,9 +161,9 @@ class SelectionContainerFocusTest {
 
         val layoutDirection = if (isRtl) LayoutDirection.Rtl else LayoutDirection.Ltr
         rule.setContent {
-            Providers(
-                AmbientHapticFeedback provides hapticFeedback,
-                AmbientLayoutDirection provides layoutDirection
+            CompositionLocalProvider(
+                LocalHapticFeedback provides hapticFeedback,
+                LocalLayoutDirection provides layoutDirection
             ) {
                 Column {
                     SelectionContainer(
@@ -207,7 +208,7 @@ class SelectionContainerFocusTest {
                         )
                     }
 
-                    Box(Modifier.preferredSize(boxSize, boxSize).testTag("box"))
+                    Box(Modifier.size(boxSize, boxSize).testTag("box"))
                 }
             }
         }

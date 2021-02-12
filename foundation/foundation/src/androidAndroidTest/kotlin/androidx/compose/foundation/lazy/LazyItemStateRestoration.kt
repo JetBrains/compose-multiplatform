@@ -17,7 +17,7 @@
 package androidx.compose.foundation.lazy
 
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.requiredSize
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -48,7 +48,7 @@ class LazyItemStateRestoration {
             LazyColumn {
                 item {
                     realState[0] = rememberSaveable { counter0++ }
-                    Box(Modifier.size(1.dp))
+                    Box(Modifier.requiredSize(1.dp))
                 }
                 items((1..2).toList()) {
                     if (it == 1) {
@@ -56,7 +56,7 @@ class LazyItemStateRestoration {
                     } else {
                         realState[2] = rememberSaveable { counter2++ }
                     }
-                    Box(Modifier.size(1.dp))
+                    Box(Modifier.requiredSize(1.dp))
                 }
             }
         }
@@ -86,7 +86,7 @@ class LazyItemStateRestoration {
         var realState = 0
         restorationTester.setContent {
             LazyColumn(
-                Modifier.size(20.dp),
+                Modifier.requiredSize(20.dp),
                 state = rememberLazyListState().also { state = it }
             ) {
                 items((0..1).toList()) {
@@ -98,7 +98,7 @@ class LazyItemStateRestoration {
                             }
                         }
                     }
-                    Box(Modifier.size(30.dp))
+                    Box(Modifier.requiredSize(30.dp))
                 }
             }
         }
@@ -106,7 +106,7 @@ class LazyItemStateRestoration {
         rule.runOnIdle {
             assertThat(realState).isEqualTo(1)
             runBlocking {
-                state.snapToItemIndex(1, 5)
+                state.scrollToItem(1, 5)
             }
         }
 
@@ -114,7 +114,7 @@ class LazyItemStateRestoration {
             assertThat(itemDisposed).isEqualTo(true)
             realState = 0
             runBlocking {
-                state.snapToItemIndex(0, 0)
+                state.scrollToItem(0, 0)
             }
         }
 
@@ -132,7 +132,7 @@ class LazyItemStateRestoration {
         var realState = arrayOf(0, 0)
         restorationTester.setContent {
             LazyColumn(
-                Modifier.size(20.dp),
+                Modifier.requiredSize(20.dp),
                 state = rememberLazyListState().also { state = it }
             ) {
                 items((0..1).toList()) {
@@ -141,7 +141,7 @@ class LazyItemStateRestoration {
                     } else {
                         realState[1] = rememberSaveable { counter1++ }
                     }
-                    Box(Modifier.size(30.dp))
+                    Box(Modifier.requiredSize(30.dp))
                 }
             }
         }
@@ -149,7 +149,7 @@ class LazyItemStateRestoration {
         rule.runOnIdle {
             assertThat(realState[0]).isEqualTo(1)
             runBlocking {
-                state.snapToItemIndex(1, 5)
+                state.scrollToItem(1, 5)
             }
         }
 
@@ -163,7 +163,7 @@ class LazyItemStateRestoration {
         rule.runOnIdle {
             assertThat(realState[1]).isEqualTo(10)
             runBlocking {
-                state.snapToItemIndex(0, 0)
+                state.scrollToItem(0, 0)
             }
         }
 
@@ -181,7 +181,7 @@ class LazyItemStateRestoration {
         var realState = 0
         restorationTester.setContent {
             LazyColumn(
-                Modifier.size(20.dp),
+                Modifier.requiredSize(20.dp),
                 state = rememberLazyListState().also { state = it }
             ) {
                 items((0..1).toList()) {
@@ -194,11 +194,11 @@ class LazyItemStateRestoration {
                                         itemDisposed = true
                                     }
                                 }
-                                Box(Modifier.size(30.dp))
+                                Box(Modifier.requiredSize(30.dp))
                             }
                         }
                     } else {
-                        Box(Modifier.size(30.dp))
+                        Box(Modifier.requiredSize(30.dp))
                     }
                 }
             }
@@ -207,7 +207,7 @@ class LazyItemStateRestoration {
         rule.runOnIdle {
             assertThat(realState).isEqualTo(1)
             runBlocking {
-                state.snapToItemIndex(1, 5)
+                state.scrollToItem(1, 5)
             }
         }
 
@@ -215,7 +215,7 @@ class LazyItemStateRestoration {
             assertThat(itemDisposed).isEqualTo(true)
             realState = 0
             runBlocking {
-                state.snapToItemIndex(0, 0)
+                state.scrollToItem(0, 0)
             }
         }
 
@@ -241,7 +241,7 @@ class LazyItemStateRestoration {
                     } else {
                         realState[2] = rememberSaveable { counter2++ }
                     }
-                    Box(Modifier.size(1.dp))
+                    Box(Modifier.requiredSize(1.dp))
                 }
             }
         }
@@ -280,7 +280,7 @@ class LazyItemStateRestoration {
                     } else {
                         realState[2] = rememberSaveable { counter2++ }
                     }
-                    Box(Modifier.size(1.dp))
+                    Box(Modifier.requiredSize(1.dp))
                 }
             }
         }

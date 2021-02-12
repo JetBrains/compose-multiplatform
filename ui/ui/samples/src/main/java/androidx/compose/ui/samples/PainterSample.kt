@@ -21,7 +21,7 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.requiredSize
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.paint
@@ -67,6 +67,6 @@ fun PainterResourceSample() {
     Image(
         painterResource(R.drawable.ic_vector_or_png),
         contentDescription = null,
-        modifier = Modifier.size(50.dp)
+        modifier = Modifier.requiredSize(50.dp)
     )
 }

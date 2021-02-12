@@ -19,13 +19,13 @@ package androidx.compose.ui.demos.gestures
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.gestures.detectTapGestures
-import androidx.compose.foundation.gestures.rememberScrollableController
+import androidx.compose.foundation.gestures.rememberScrollableState
 import androidx.compose.foundation.gestures.scrollable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.preferredSize
+import androidx.compose.foundation.layout.size
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
@@ -33,7 +33,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.DrawModifier
 import androidx.compose.ui.geometry.Offset
-import androidx.compose.ui.gesture.scrollorientationlocking.Orientation
+import androidx.compose.foundation.gestures.Orientation
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.drawscope.ContentDrawScope
 import androidx.compose.ui.graphics.drawscope.clipRect
@@ -87,7 +87,7 @@ private fun Scrollable(orientation: Orientation, content: @Composable () -> Unit
         content = content,
         modifier = Modifier.scrollable(
             orientation = orientation,
-            controller = rememberScrollableController { scrollDistance ->
+            state = rememberScrollableState { scrollDistance ->
                 val resultingOffset = offset.value + scrollDistance
                 val toConsume =
                     when {
@@ -106,7 +106,7 @@ private fun Scrollable(orientation: Orientation, content: @Composable () -> Unit
             }
         )
             .then(ClipModifier),
-        measureBlock = { measurables, constraints ->
+        measurePolicy = { measurables, constraints ->
             val placeable =
                 when (orientation) {
                     Orientation.Horizontal -> measurables.first().measure(
@@ -219,7 +219,7 @@ private fun Pressable(
 
     Box(
         gestureDetectors
-            .preferredSize(width, height)
+            .size(width, height)
             .border(1.dp, Color.Black)
             .background(color = color.value)
             .then(pressOverlay)

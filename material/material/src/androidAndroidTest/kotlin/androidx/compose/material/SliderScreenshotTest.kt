@@ -18,7 +18,7 @@ package androidx.compose.material
 
 import android.os.Build
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.requiredWidth
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -37,6 +37,7 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.LargeTest
 import androidx.test.filters.SdkSuppress
 import androidx.test.screenshot.AndroidXScreenshotTestRule
+import org.junit.Ignore
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -52,7 +53,7 @@ class SliderScreenshotTest {
     @get:Rule
     val screenshotRule = AndroidXScreenshotTestRule(GOLDEN_MATERIAL)
 
-    val wrap = Modifier.width(70.dp).wrapContentSize(Alignment.TopStart)
+    val wrap = Modifier.requiredWidth(70.dp).wrapContentSize(Alignment.TopStart)
 
     private val wrapperTestTag = "sliderWrapper"
 
@@ -65,6 +66,18 @@ class SliderScreenshotTest {
             }
         }
         assertSliderAgainstGolden("slider_origin")
+    }
+
+    @Test
+    @Ignore("b/179922733 cannot upload new goldens")
+    fun sliderTest_origin_disabled() {
+        rule.setMaterialContent {
+            Box(wrap.testTag(wrapperTestTag)) {
+                var position by remember { mutableStateOf(0f) }
+                Slider(position, { position = it }, enabled = false)
+            }
+        }
+        assertSliderAgainstGolden("slider_origin_disabled")
     }
 
     @Test
@@ -101,6 +114,18 @@ class SliderScreenshotTest {
     }
 
     @Test
+    @Ignore("b/179922733 cannot upload new goldens")
+    fun sliderTest_middle_steps_disabled() {
+        rule.setMaterialContent {
+            Box(wrap.testTag(wrapperTestTag)) {
+                var position by remember { mutableStateOf(0.5f) }
+                Slider(position, { position = it }, steps = 5, enabled = false)
+            }
+        }
+        assertSliderAgainstGolden("slider_middle_steps_disabled")
+    }
+
+    @Test
     fun sliderTest_customColors() {
         rule.setMaterialContent {
             Box(wrap.testTag(wrapperTestTag)) {
@@ -109,14 +134,44 @@ class SliderScreenshotTest {
                     value = position,
                     onValueChange = { position = it },
                     steps = 5,
-                    thumbColor = Color.Red,
-                    activeTrackColor = Color.Blue,
-                    activeTickColor = Color.Yellow,
-                    inactiveTickColor = Color.Magenta
+                    colors = SliderDefaults.colors(
+                        thumbColor = Color.Red,
+                        activeTrackColor = Color.Blue,
+                        activeTickColor = Color.Yellow,
+                        inactiveTickColor = Color.Magenta
+                    )
+
                 )
             }
         }
         assertSliderAgainstGolden("slider_customColors")
+    }
+
+    @Test
+    @Ignore("b/179922733 cannot upload new goldens")
+    fun sliderTest_customColors_disabled() {
+        rule.setMaterialContent {
+            Box(wrap.testTag(wrapperTestTag)) {
+                var position by remember { mutableStateOf(0.5f) }
+                Slider(
+                    value = position,
+                    onValueChange = { position = it },
+                    steps = 5,
+                    enabled = false,
+                    // this is intentionally made to appear as enabled in disabled state for a
+                    // brighter test
+                    colors = SliderDefaults.colors(
+                        disabledThumbColor = Color.Blue,
+                        disabledActiveTrackColor = Color.Red,
+                        disabledInactiveTrackColor = Color.Yellow,
+                        disabledActiveTickColor = Color.Magenta,
+                        disabledInactiveTickColor = Color.Cyan
+                    )
+
+                )
+            }
+        }
+        assertSliderAgainstGolden("slider_customColors_disabled")
     }
 
     private fun assertSliderAgainstGolden(goldenName: String) {

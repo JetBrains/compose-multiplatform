@@ -200,16 +200,6 @@ class PointerInputTest {
     }
 
     @Test
-    fun positionChange_changedPartiallyConsumed_returnsRemainder() {
-        val pointerInputChange =
-            createPointerInputChange(8f, 16f, true, 2f, 4f, true, 5f, 9f, false)
-        assertThat(
-            pointerInputChange.positionChange(),
-            `is`(equalTo(Offset(1f, 3f)))
-        )
-    }
-
-    @Test
     fun positionChange_changedFullConsumed_returnsZeroOffset() {
         val pointerInputChange =
             createPointerInputChange(8f, 16f, true, 2f, 4f, true, 6f, 12f, false)
@@ -274,13 +264,6 @@ class PointerInputTest {
     }
 
     @Test
-    fun positionChanged_changedPartiallyConsumed_returnsTrue() {
-        val pointerInputChange =
-            createPointerInputChange(8f, 16f, true, 2f, 4f, true, 5f, 9f, false)
-        assertThat(pointerInputChange.positionChanged(), `is`(true))
-    }
-
-    @Test
     fun positionChanged_changedFullConsumed_returnsFalse() {
         val pointerInputChange =
             createPointerInputChange(8f, 16f, true, 2f, 4f, true, 6f, 12f, false)
@@ -332,7 +315,7 @@ class PointerInputTest {
         val pointerInputChange =
             createPointerInputChange(8f, 16f, true, 2f, 4f, true, 0f, 0f, false)
         assertThat(
-            pointerInputChange.anyPositionChangeConsumed(),
+            pointerInputChange.positionChangeConsumed(),
             `is`(false)
         )
     }
@@ -342,7 +325,7 @@ class PointerInputTest {
         val pointerInputChange =
             createPointerInputChange(8f, 16f, true, 2f, 4f, true, 5f, 9f, false)
         assertThat(
-            pointerInputChange.anyPositionChangeConsumed(),
+            pointerInputChange.positionChangeConsumed(),
             `is`(true)
         )
     }
@@ -352,7 +335,7 @@ class PointerInputTest {
         val pointerInputChange =
             createPointerInputChange(8f, 16f, true, 2f, 4f, true, 6f, 12f, false)
         assertThat(
-            pointerInputChange.anyPositionChangeConsumed(),
+            pointerInputChange.positionChangeConsumed(),
             `is`(true)
         )
     }
@@ -414,73 +397,15 @@ class PointerInputTest {
     }
 
     @Test
-    fun consumePositionChange_consumesNone_consumesCorrectly() {
-        val pointerInputChange1 =
-            createPointerInputChange(8f, 16f, true, 2f, 4f, true, 0f, 0f, false)
-
-        val pointerInputChangeResult1 = pointerInputChange1.apply { consumePositionChange(0f, 0f) }
-
-        assertThat(pointerInputChangeResult1, `is`(equalTo(pointerInputChange1)))
-    }
-
-    @Test
-    fun consumePositionChange_consumesPart_consumes() {
-        val pointerInputChange1 =
-            createPointerInputChange(8f, 16f, true, 2f, 4f, true, 0f, 0f, false)
-
-        val pointerInputChangeResult1 =
-            pointerInputChange1.deepCopy().apply { consumePositionChange(5f, 0f) }
-        val pointerInputChangeResult2 =
-            pointerInputChange1.deepCopy().apply { consumePositionChange(0f, 3f) }
-        val pointerInputChangeResult3 =
-            pointerInputChange1.deepCopy().apply { consumePositionChange(5f, 3f) }
-
-        PointerInputChangeSubject
-            .assertThat(pointerInputChangeResult1).positionChangeConsumed(Offset(5f, 0f))
-        PointerInputChangeSubject
-            .assertThat(pointerInputChangeResult2).positionChangeConsumed(Offset(0f, 3f))
-        PointerInputChangeSubject
-            .assertThat(pointerInputChangeResult3).positionChangeConsumed(Offset(5f, 3f))
-    }
-
-    @Test
     fun consumePositionChange_consumesAll_consumes() {
         val pointerInputChange1 =
             createPointerInputChange(8f, 16f, true, 2f, 4f, true, 0f, 0f, false)
 
         val pointerInputChangeResult1 =
-            pointerInputChange1.deepCopy().apply { consumePositionChange(6f, 0f) }
-        val pointerInputChangeResult2 =
-            pointerInputChange1.deepCopy().apply { consumePositionChange(0f, 12f) }
-        val pointerInputChangeResult3 =
-            pointerInputChange1.deepCopy().apply { consumePositionChange(6f, 12f) }
+            pointerInputChange1.deepCopy().apply { consumePositionChange() }
 
         PointerInputChangeSubject
-            .assertThat(pointerInputChangeResult1).positionChangeConsumed(Offset(6f, 0f))
-        PointerInputChangeSubject
-            .assertThat(pointerInputChangeResult2).positionChangeConsumed(Offset(0f, 12f))
-        PointerInputChangeSubject
-            .assertThat(pointerInputChangeResult3).positionChangeConsumed(Offset(6f, 12f))
-    }
-
-    @Test
-    fun consumePositionChange_alreadyPartiallyConsumed_consumptionAdded() {
-        val pointerInputChange1 =
-            createPointerInputChange(8f, 16f, true, 2f, 4f, true, 1f, 5f, false)
-
-        val pointerInputChangeResult1 =
-            pointerInputChange1.deepCopy().apply { consumePositionChange(2f, 0f) }
-        val pointerInputChangeResult2 =
-            pointerInputChange1.deepCopy().apply { consumePositionChange(0f, 3f) }
-        val pointerInputChangeResult3 =
-            pointerInputChange1.deepCopy().apply { consumePositionChange(2f, 3f) }
-
-        PointerInputChangeSubject
-            .assertThat(pointerInputChangeResult1).positionChangeConsumed(Offset(3f, 5f))
-        PointerInputChangeSubject
-            .assertThat(pointerInputChangeResult2).positionChangeConsumed(Offset(1f, 8f))
-        PointerInputChangeSubject
-            .assertThat(pointerInputChangeResult3).positionChangeConsumed(Offset(3f, 8f))
+            .assertThat(pointerInputChangeResult1).positionChangeConsumed()
     }
 
     @Test
@@ -494,9 +419,9 @@ class PointerInputTest {
         val actual2 = pointerInputChange2.apply { consumeAllChanges() }
 
         PointerInputChangeSubject
-            .assertThat(actual1).nothingConsumed()
+            .assertThat(actual1).positionChangeNotConsumed()
         PointerInputChangeSubject
-            .assertThat(actual2).nothingConsumed()
+            .assertThat(actual2).positionChangeNotConsumed()
     }
 
     @Test
@@ -520,7 +445,7 @@ class PointerInputTest {
 
         val actual = pointerInputChange.apply { consumeAllChanges() }
 
-        PointerInputChangeSubject.assertThat(actual).positionChangeConsumed(Offset(-10f, -19f))
+        PointerInputChangeSubject.assertThat(actual).positionChangeConsumed()
     }
 
     @Test
@@ -530,7 +455,7 @@ class PointerInputTest {
 
         val actual = pointerInputChange.apply { consumeAllChanges() }
 
-        PointerInputChangeSubject.assertThat(actual).positionChangeConsumed(Offset(-10f, -19f))
+        PointerInputChangeSubject.assertThat(actual).positionChangeConsumed()
     }
 
     @Test
@@ -544,9 +469,9 @@ class PointerInputTest {
         val actual2 = pointerInputChange2.apply { consumeAllChanges() }
 
         PointerInputChangeSubject.assertThat(actual1).downConsumed()
-        PointerInputChangeSubject.assertThat(actual1).positionChangeConsumed(Offset(-10f, -19f))
+        PointerInputChangeSubject.assertThat(actual1).positionChangeConsumed()
         PointerInputChangeSubject.assertThat(actual2).downConsumed()
-        PointerInputChangeSubject.assertThat(actual2).positionChangeConsumed(Offset(-10f, -19f))
+        PointerInputChangeSubject.assertThat(actual2).positionChangeConsumed()
     }
 
     // Private Helper
@@ -571,10 +496,7 @@ class PointerInputTest {
             Offset(previousX, previousY),
             previousDown,
             ConsumedData(
-                Offset(
-                    consumedX,
-                    consumedY
-                ),
+                consumedX != 0f || consumedY != 0f,
                 consumedDown
             )
         )
@@ -599,8 +521,8 @@ private class PointerInputChangeSubject(
     }
 
     fun nothingConsumed() {
-        check("consumed.downChange").that(actual.consumed.downChange).isEqualTo(false)
-        check("consumed.positionChange").that(actual.consumed.positionChange).isEqualTo(Offset.Zero)
+        downNotConsumed()
+        positionChangeNotConsumed()
     }
 
     fun downConsumed() {
@@ -611,14 +533,16 @@ private class PointerInputChangeSubject(
         check("consumed.downChange").that(actual.consumed.downChange).isEqualTo(false)
     }
 
-    fun positionChangeConsumed(expected: Offset) {
+    fun positionChangeConsumed() {
         check("consumed.positionChangeConsumed")
             .that(actual.consumed.positionChange)
-            .isEqualTo(expected)
+            .isEqualTo(true)
     }
 
     fun positionChangeNotConsumed() {
-        positionChangeConsumed(Offset.Zero)
+        check("consumed.positionChange not Consumed")
+            .that(actual.consumed.positionChange)
+            .isEqualTo(false)
     }
 }
 

@@ -18,7 +18,7 @@ package androidx.compose.ui
 
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.requiredWidth
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.BasicText
 import androidx.compose.foundation.text.BasicTextField
@@ -389,7 +389,7 @@ class AccessibilityIteratorsTest {
         val lineHeight = textLayoutResult.getLineBottom(endLine) -
             textLayoutResult.getLineTop(endLine)
         val iteratorStep = endLineTop - startLineTop
-        val nodeHeight = textFieldNode.globalBounds.bottom - textFieldNode.globalBounds.top
+        val nodeHeight = textFieldNode.boundsInWindow.bottom - textFieldNode.boundsInWindow.top
         Truth.assertThat(abs(iteratorStep - nodeHeight) < lineHeight)
         currentOffset = InputText.length
         range = pageIterator.following(currentOffset)
@@ -412,7 +412,7 @@ class AccessibilityIteratorsTest {
         val lineHeight = textLayoutResult.getLineBottom(endLine) -
             textLayoutResult.getLineTop(endLine)
         val iteratorStep = endLineTop - startLineTop
-        val nodeHeight = textFieldNode.globalBounds.bottom - textFieldNode.globalBounds.top
+        val nodeHeight = textFieldNode.boundsInWindow.bottom - textFieldNode.boundsInWindow.top
         Truth.assertThat(abs(iteratorStep - nodeHeight) < lineHeight)
         currentOffset = 0
         range = pageIterator.preceding(currentOffset)
@@ -438,7 +438,7 @@ class AccessibilityIteratorsTest {
                         ).toFontFamily()
                     ),
                     text = AnnotatedString(text),
-                    modifier = Modifier.width(width.toDp()),
+                    modifier = Modifier.requiredWidth(width.toDp()),
                     onTextLayout = { textLayoutResult = it }
                 )
             }

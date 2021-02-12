@@ -16,15 +16,15 @@
 
 package androidx.compose.foundation.text
 
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.isFocused
 import androidx.compose.ui.focus.onFocusChanged
+import androidx.compose.ui.platform.LocalTextInputService
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.performClick
-import androidx.compose.ui.text.ExperimentalTextApi
-import androidx.compose.ui.text.InternalTextApi
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.text.input.ImeOptions
@@ -32,7 +32,6 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PlatformTextInputService
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.input.TextInputService
-import androidx.compose.ui.text.input.textInputServiceFactory
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.LargeTest
 import com.google.common.truth.Truth.assertThat
@@ -45,10 +44,6 @@ import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 
-@OptIn(
-    ExperimentalTextApi::class,
-    InternalTextApi::class
-)
 @LargeTest
 @RunWith(AndroidJUnit4::class)
 class CoreTextFieldInputServiceIntegrationTest {
@@ -59,8 +54,7 @@ class CoreTextFieldInputServiceIntegrationTest {
     @Test
     fun textField_ImeOptions_isPassedTo_platformTextInputService() {
         val platformTextInputService = mock<PlatformTextInputService>()
-        @Suppress("DEPRECATION_ERROR")
-        textInputServiceFactory = { TextInputService(platformTextInputService) }
+        val textInputService = TextInputService(platformTextInputService)
 
         val testTag = "KeyboardOption"
         val value = TextFieldValue("abc")
@@ -75,14 +69,16 @@ class CoreTextFieldInputServiceIntegrationTest {
         var focused = false
 
         rule.setContent {
-            CoreTextField(
-                value = value,
-                imeOptions = imeOptions,
-                modifier = Modifier
-                    .testTag(testTag)
-                    .onFocusChanged { focused = it.isFocused },
-                onValueChange = {}
-            )
+            CompositionLocalProvider(LocalTextInputService provides textInputService) {
+                CoreTextField(
+                    value = value,
+                    imeOptions = imeOptions,
+                    modifier = Modifier
+                        .testTag(testTag)
+                        .onFocusChanged { focused = it.isFocused },
+                    onValueChange = {}
+                )
+            }
         }
 
         rule.onNodeWithTag(testTag).performClick()

@@ -22,8 +22,8 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.preferredHeight
-import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.requiredSize
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.runtime.Composable
@@ -55,6 +55,7 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.MediumTest
 import androidx.test.filters.SdkSuppress
 import com.google.common.truth.Truth.assertThat
+import kotlinx.coroutines.runBlocking
 import org.junit.Ignore
 import org.junit.Rule
 import org.junit.Test
@@ -91,11 +92,11 @@ class ScaffoldTest {
             Scaffold {
                 Text(
                     "One",
-                    Modifier.onGloballyPositioned { child1 = it.positionInParent }
+                    Modifier.onGloballyPositioned { child1 = it.positionInParent() }
                 )
                 Text(
                     "Two",
-                    Modifier.onGloballyPositioned { child2 = it.positionInParent }
+                    Modifier.onGloballyPositioned { child2 = it.positionInParent() }
                 )
             }
         }
@@ -118,7 +119,7 @@ class ScaffoldTest {
                                 appbarSize = positioned.size
                             }
                             .fillMaxWidth()
-                            .preferredHeight(50.dp)
+                            .height(50.dp)
                             .background(color = Color.Red)
                     )
                 }
@@ -127,7 +128,7 @@ class ScaffoldTest {
                     Modifier
                         .onGloballyPositioned { contentPosition = it.localToWindow(Offset.Zero) }
                         .fillMaxWidth()
-                        .preferredHeight(50.dp)
+                        .height(50.dp)
                         .background(Color.Blue)
                 )
             }
@@ -148,11 +149,11 @@ class ScaffoldTest {
                     Box(
                         Modifier
                             .onGloballyPositioned { positioned: LayoutCoordinates ->
-                                appbarPosition = positioned.positionInParent
+                                appbarPosition = positioned.positionInParent()
                                 appbarSize = positioned.size
                             }
                             .fillMaxWidth()
-                            .preferredHeight(50.dp)
+                            .height(50.dp)
                             .background(color = Color.Red)
                     )
                 }
@@ -160,11 +161,11 @@ class ScaffoldTest {
                 Box(
                     Modifier
                         .onGloballyPositioned { positioned: LayoutCoordinates ->
-                            contentPosition = positioned.positionInParent
+                            contentPosition = positioned.positionInParent()
                             contentSize = positioned.size
                         }
                         .fillMaxSize()
-                        .preferredHeight(50.dp)
+                        .height(50.dp)
                         .background(color = Color.Blue)
                 )
             }
@@ -186,10 +187,10 @@ class ScaffoldTest {
                         Box(
                             Modifier
                                 .onGloballyPositioned { positioned: LayoutCoordinates ->
-                                    drawerChildPosition = positioned.positionInParent
+                                    drawerChildPosition = positioned.positionInParent()
                                 }
                                 .fillMaxWidth()
-                                .preferredHeight(50.dp)
+                                .height(50.dp)
                                 .background(color = Color.Blue)
                         )
                     },
@@ -198,7 +199,7 @@ class ScaffoldTest {
                     Box(
                         Modifier
                             .fillMaxWidth()
-                            .preferredHeight(50.dp)
+                            .height(50.dp)
                             .background(color = Color.Blue)
                     )
                 }
@@ -230,7 +231,7 @@ class ScaffoldTest {
 
     @Test
     @Ignore("unignore once animation sync is ready (b/147291885)")
-    fun scaffold_drawer_manualControl() {
+    fun scaffold_drawer_manualControl(): Unit = runBlocking {
         var drawerChildPosition: Offset = Offset.Zero
         lateinit var scaffoldState: ScaffoldState
         rule.setContent {
@@ -242,10 +243,10 @@ class ScaffoldTest {
                         Box(
                             Modifier
                                 .onGloballyPositioned { positioned: LayoutCoordinates ->
-                                    drawerChildPosition = positioned.positionInParent
+                                    drawerChildPosition = positioned.positionInParent()
                                 }
                                 .fillMaxWidth()
-                                .preferredHeight(50.dp)
+                                .height(50.dp)
                                 .background(color = Color.Blue)
                         )
                     }
@@ -253,20 +254,16 @@ class ScaffoldTest {
                     Box(
                         Modifier
                             .fillMaxWidth()
-                            .preferredHeight(50.dp)
+                            .height(50.dp)
                             .background(color = Color.Blue)
                     )
                 }
             }
         }
         assertThat(drawerChildPosition.x).isLessThan(0f)
-        rule.runOnUiThread {
-            scaffoldState.drawerState.open()
-        }
+        scaffoldState.drawerState.open()
         assertThat(drawerChildPosition.x).isLessThan(0f)
-        rule.runOnUiThread {
-            scaffoldState.drawerState.close()
-        }
+        scaffoldState.drawerState.close()
         assertThat(drawerChildPosition.x).isLessThan(0f)
     }
 
@@ -348,14 +345,14 @@ class ScaffoldTest {
         rule.setContent {
             Box(
                 Modifier
-                    .size(10.dp, 20.dp)
+                    .requiredSize(10.dp, 20.dp)
                     .semantics(mergeDescendants = true) {}
                     .testTag("Scaffold")
             ) {
                 Scaffold(
                     topBar = {
                         Box(
-                            Modifier.size(10.dp)
+                            Modifier.requiredSize(10.dp)
                                 .shadow(4.dp)
                                 .zIndex(4f)
                                 .background(color = Color.White)
@@ -363,7 +360,7 @@ class ScaffoldTest {
                     }
                 ) {
                     Box(
-                        Modifier.size(10.dp)
+                        Modifier.requiredSize(10.dp)
                             .background(color = Color.White)
                     )
                 }
@@ -437,7 +434,7 @@ class ScaffoldTest {
                                 bottomBarSize = positioned.size
                             }
                             .fillMaxWidth()
-                            .preferredHeight(100.dp)
+                            .height(100.dp)
                             .background(color = Color.Red)
                     )
                 }

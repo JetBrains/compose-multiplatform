@@ -21,13 +21,14 @@ import android.view.ViewGroup
 import androidx.activity.compose.setContent
 import androidx.benchmark.junit4.BenchmarkRule
 import androidx.benchmark.junit4.measureRepeated
+import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.requiredHeight
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.gesture.tapGestureFilter
+import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.dp
 import androidx.test.annotation.UiThreadTest
@@ -172,17 +173,18 @@ class ComposeTapIntegrationBenchmark {
     }
 
     @Composable
-    @Suppress("DEPRECATION")
     fun Email(label: String) {
         Text(
             text = label,
             modifier = Modifier
-                .tapGestureFilter {
-                    assertThat(label).isEqualTo(expectedLabel)
-                    actualClickCount++
+                .pointerInput(label) {
+                    detectTapGestures {
+                        assertThat(label).isEqualTo(expectedLabel)
+                        actualClickCount++
+                    }
                 }
                 .fillMaxWidth()
-                .height(itemHeightDp)
+                .requiredHeight(itemHeightDp)
         )
     }
 }

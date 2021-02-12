@@ -20,12 +20,10 @@ package androidx.compose.ui.text
  * Helper function that returns the preceding character boundary index. It will return -1 if it
  * can't go back.
  */
-@InternalTextApi
-expect fun String.findPrecedingBreak(index: Int): Int
+internal expect fun String.findPrecedingBreak(index: Int): Int
 
 /**
  * Helper function that returns the following character boundary index. It will return -1 if it
  * can't go forward.
  */
-@InternalTextApi
-expect fun String.findFollowingBreak(index: Int): Int
+internal expect fun String.findFollowingBreak(index: Int): Int

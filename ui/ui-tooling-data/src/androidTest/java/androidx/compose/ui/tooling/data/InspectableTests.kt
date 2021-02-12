@@ -19,9 +19,9 @@ package androidx.compose.ui.tooling.data
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.preferredSize
+import androidx.compose.foundation.layout.size
 import androidx.compose.material.Button
-import androidx.compose.material.ModalDrawerLayout
+import androidx.compose.material.ModalDrawer
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.InternalComposeApi
@@ -30,8 +30,6 @@ import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.height
-import androidx.compose.ui.unit.width
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.MediumTest
 import org.junit.Assert.assertEquals
@@ -55,7 +53,7 @@ class InspectableTests : ToolingTest() {
             Inspectable(slotTableRecord) {
                 Column {
                     Box(
-                        Modifier.preferredSize(100.dp).drawBehind {
+                        Modifier.size(100.dp).drawBehind {
                             drawRect(Color(0xFF))
                         }
                     )
@@ -298,7 +296,7 @@ class InspectableTests : ToolingTest() {
             Inspectable(CompositionDataRecord.create()) {
                 Column {
                     InInspectionModeOnly {
-                        Box(Modifier.preferredSize(100.dp).background(color = Color(0xFF)))
+                        Box(Modifier.size(100.dp).background(color = Color(0xFF)))
                         displayed = true
                     }
                 }
@@ -314,7 +312,7 @@ class InspectableTests : ToolingTest() {
         show {
             Column {
                 InInspectionModeOnly {
-                    Box(Modifier.preferredSize(100.dp).background(color = Color(0xFF)))
+                    Box(Modifier.size(100.dp).background(color = Color(0xFF)))
                     displayed = true
                 }
             }
@@ -350,12 +348,12 @@ class InspectableTests : ToolingTest() {
 
     @OptIn(InternalComposeApi::class)
     @Test // regression test for b/162092315
-    fun inspectingModalDrawerLayout() {
+    fun inspectingModalDrawer() {
         val positioned = CountDownLatch(1)
         val tables = showAndRecord {
-            ModalDrawerLayout(
+            ModalDrawer(
                 drawerContent = { Text("Something") },
-                bodyContent = {
+                content = {
                     Column(
                         Modifier.onGloballyPositioned {
                             positioned.countDown()
@@ -376,18 +374,32 @@ class InspectableTests : ToolingTest() {
         assertFalse(tables.isNullOrEmpty())
         assertTrue(tables.size > 1)
 
-        val calls = tables.flatMap { table ->
-            if (!table.isEmpty) table.asTree().asList() else emptyList()
-        }.filter {
-            val location = it.location
-            location != null && location.sourceFile == "InspectableTests.kt"
-        }.map {
-            it.name
+        val calls = activity.uiThread {
+            tables.flatMap { table ->
+                if (!table.isEmpty) table.asTree().asList() else emptyList()
+            }.filter {
+                val location = it.location
+                location != null && location.sourceFile == "InspectableTests.kt"
+            }.map {
+                it.name
+            }
         }
+
         assertTrue(calls.contains("Column"))
         assertTrue(calls.contains("Text"))
         assertTrue(calls.contains("Button"))
     }
+}
+
+private fun <T> TestActivity.uiThread(block: () -> T): T {
+    val latch = CountDownLatch(1)
+    var result: T? = null
+    runOnUiThread {
+        result = block()
+        latch.countDown()
+    }
+    latch.await(1, TimeUnit.SECONDS)
+    return result!!
 }
 
 @Suppress("UNUSED_PARAMETER")

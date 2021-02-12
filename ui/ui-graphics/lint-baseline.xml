@@ -24,11 +24,11 @@
 
     <issue
         id="UnsafeNewApiCall"
-        message="This call is to a method from API 29, the call containing class androidx.compose.ui.graphics.AndroidPaintKt is not annotated with @RequiresApi(x) where x is at least 29. Either annotate the containing class with at least @RequiresApi(29) or move the call to a static method in a wrapper class annotated with at least @RequiresApi(29)."
+        message="This call is to a method from API 29, the call containing class androidx.compose.ui.graphics.AndroidPaint_androidKt is not annotated with @RequiresApi(x) where x is at least 29. Either annotate the containing class with at least @RequiresApi(29) or move the call to a static method in a wrapper class annotated with at least @RequiresApi(29)."
         errorLine1="        this.blendMode = mode.toAndroidBlendMode()"
         errorLine2="             ~~~~~~~~~">
         <location
-            file="src/androidMain/kotlin/androidx/compose/ui/graphics/AndroidPaint.kt"
+            file="src/androidMain/kotlin/androidx/compose/ui/graphics/AndroidPaint.android.kt"
             line="134"
             column="14"/>
     </issue>
@@ -39,7 +39,7 @@
         errorLine1="                canvas.enableZ()"
         errorLine2="                       ~~~~~~~">
         <location
-            file="src/androidMain/kotlin/androidx/compose/ui/graphics/CanvasUtils.kt"
+            file="src/androidMain/kotlin/androidx/compose/ui/graphics/CanvasUtils.android.kt"
             line="39"
             column="24"/>
     </issue>
@@ -50,7 +50,7 @@
         errorLine1="                canvas.disableZ()"
         errorLine2="                       ~~~~~~~~">
         <location
-            file="src/androidMain/kotlin/androidx/compose/ui/graphics/CanvasUtils.kt"
+            file="src/androidMain/kotlin/androidx/compose/ui/graphics/CanvasUtils.android.kt"
             line="41"
             column="24"/>
     </issue>

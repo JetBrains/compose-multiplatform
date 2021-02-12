@@ -24,7 +24,9 @@ import androidx.compose.animation.core.updateTransition
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
-import androidx.compose.foundation.gestures.detectDragGestures
+import androidx.compose.foundation.gestures.awaitFirstDown
+import androidx.compose.foundation.gestures.drag
+import androidx.compose.foundation.gestures.forEachGesture
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
@@ -36,8 +38,8 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.preferredHeight
-import androidx.compose.foundation.layout.preferredSize
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.GenericShape
 import androidx.compose.material.LocalTextStyle
@@ -64,6 +66,7 @@ import androidx.compose.ui.graphics.SweepGradientShader
 import androidx.compose.ui.graphics.isSpecified
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.graphics.toPixelMap
+import androidx.compose.ui.input.pointer.consumePositionChange
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.text.style.TextAlign
@@ -98,11 +101,9 @@ private fun ColorPicker(onColorChange: (Color) -> Unit) {
         var position by remember { mutableStateOf(Offset.Zero) }
         val colorWheel = remember(diameter) { ColorWheel(diameter) }
 
-        var isDragging by remember { mutableStateOf(false) }
-        val inputModifier = Modifier.pointerInput(Unit) {
-            detectDragGestures { change, _ ->
-                isDragging = true
-                val newPosition = change.position
+        var hasInput by remember { mutableStateOf(false) }
+        val inputModifier = Modifier.pointerInput(colorWheel) {
+            fun updateColorWheel(newPosition: Offset) {
                 // Work out if the new position is inside the circle we are drawing, and has a
                 // valid color associated to it. If not, keep the current position
                 val newColor = colorWheel.colorForPosition(newPosition)
@@ -111,13 +112,26 @@ private fun ColorPicker(onColorChange: (Color) -> Unit) {
                     onColorChange(newColor)
                 }
             }
+
+            forEachGesture {
+                awaitPointerEventScope {
+                    val down = awaitFirstDown()
+                    hasInput = true
+                    updateColorWheel(down.position)
+                    drag(down.id) { change ->
+                        change.consumePositionChange()
+                        updateColorWheel(change.position)
+                    }
+                    hasInput = false
+                }
+            }
         }
 
         Box(Modifier.fillMaxSize()) {
             Image(modifier = inputModifier, contentDescription = null, bitmap = colorWheel.image)
             val color = colorWheel.colorForPosition(position)
             if (color.isSpecified) {
-                Magnifier(visible = isDragging, position = position, color = color)
+                Magnifier(visible = hasInput, position = position, color = color)
             }
         }
     }
@@ -142,18 +156,18 @@ private fun Magnifier(visible: Boolean, position: Offset, color: Color) {
     ) { labelWidth: Dp, selectionDiameter: Dp,
         alpha: Float ->
         Column(
-            offset.preferredSize(width = MagnifierWidth, height = MagnifierHeight)
+            offset.size(width = MagnifierWidth, height = MagnifierHeight)
                 .alpha(alpha)
         ) {
             Box(Modifier.fillMaxWidth(), contentAlignment = Alignment.Center) {
-                MagnifierLabel(Modifier.preferredSize(labelWidth, MagnifierLabelHeight), color)
+                MagnifierLabel(Modifier.size(labelWidth, MagnifierLabelHeight), color)
             }
             Spacer(Modifier.weight(1f))
             Box(
-                Modifier.fillMaxWidth().preferredHeight(SelectionCircleDiameter),
+                Modifier.fillMaxWidth().height(SelectionCircleDiameter),
                 contentAlignment = Alignment.Center
             ) {
-                MagnifierSelectionCircle(Modifier.preferredSize(selectionDiameter), color)
+                MagnifierSelectionCircle(Modifier.size(selectionDiameter), color)
             }
         }
     }

@@ -16,13 +16,13 @@
 
 package androidx.compose.ui.test
 
-import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.requiredSize
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.layout.Layout
-import androidx.compose.ui.layout.MeasureBlock
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.MeasurePolicy
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.semantics.scrollBy
 import androidx.compose.ui.semantics.semantics
@@ -48,8 +48,8 @@ class ScrollToTest {
 
     private val recorder = mutableListOf<Offset>()
 
-    private fun horizontalLayout(offset: Int, columnWidth: Int): MeasureBlock {
-        return { measurables, constraints ->
+    private fun horizontalLayout(offset: Int, columnWidth: Int): MeasurePolicy {
+        return MeasurePolicy { measurables, constraints ->
             val childConstraints = constraints.copy(minWidth = 0, maxWidth = Constraints.Infinity)
             val placeables = measurables.map { it.measure(childConstraints) }
             layout(columnWidth, crossAxisSize) {
@@ -62,8 +62,8 @@ class ScrollToTest {
         }
     }
 
-    private fun verticalLayout(offset: Int, columnHeight: Int): MeasureBlock {
-        return { measurables, constraints ->
+    private fun verticalLayout(offset: Int, columnHeight: Int): MeasurePolicy {
+        return MeasurePolicy { measurables, constraints ->
             val childConstraints = constraints.copy(minHeight = 0, maxHeight = Constraints.Infinity)
             val placeables = measurables.map { it.measure(childConstraints) }
             layout(crossAxisSize, columnHeight) {
@@ -86,7 +86,7 @@ class ScrollToTest {
         with(LocalDensity.current) {
             Layout(
                 content,
-                modifier.size(crossAxisSize.toDp(), columnHeight.toDp()),
+                modifier.requiredSize(crossAxisSize.toDp(), columnHeight.toDp()),
                 verticalLayout(offset, columnHeight)
             )
         }
@@ -102,7 +102,7 @@ class ScrollToTest {
         with(LocalDensity.current) {
             Layout(
                 content,
-                modifier.size(rowWidth.toDp(), crossAxisSize.toDp()),
+                modifier.requiredSize(rowWidth.toDp(), crossAxisSize.toDp()),
                 horizontalLayout(offset, rowWidth)
             )
         }

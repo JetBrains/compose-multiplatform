@@ -17,44 +17,34 @@
 package androidx.compose.material
 
 import androidx.compose.animation.animateColor
-import androidx.compose.animation.core.FastOutSlowInEasing
 import androidx.compose.animation.core.LinearEasing
-import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.core.updateTransition
-import androidx.compose.foundation.Interaction
-import androidx.compose.foundation.InteractionState
-import androidx.compose.foundation.background
+import androidx.compose.foundation.interaction.Interaction
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.preferredHeight
-import androidx.compose.foundation.layout.preferredWidth
-import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.selection.selectable
 import androidx.compose.material.ripple.rememberRipple
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.Providers
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.composed
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.FirstBaseline
 import androidx.compose.ui.layout.LastBaseline
 import androidx.compose.ui.layout.Layout
 import androidx.compose.ui.layout.Placeable
 import androidx.compose.ui.layout.layoutId
-import androidx.compose.ui.platform.debugInspectorInfo
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.Density
-import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import kotlin.math.max
@@ -76,10 +66,10 @@ import kotlin.math.max
  * be clickable and will appear disabled to accessibility services.
  * @param text the text label displayed in this tab
  * @param icon the icon displayed in this tab
- * @param interactionState the [InteractionState] representing the different [Interaction]s
- * present on this Tab. You can create and pass in your own remembered [InteractionState] if
- * you want to read the [InteractionState] and customize the appearance / behavior of this Tab
- * in different [Interaction]s.
+ * @param interactionSource the [MutableInteractionSource] representing the stream of
+ * [Interaction]s for this Tab. You can create and pass in your own remembered
+ * [MutableInteractionSource] if you want to observe [Interaction]s and customize the
+ * appearance / behavior of this Tab in different [Interaction]s.
  * @param selectedContentColor the color for the content of this tab when selected, and the color
  * of the ripple.
  * @param unselectedContentColor the color for the content of this tab when not selected
@@ -92,7 +82,7 @@ fun Tab(
     enabled: Boolean = true,
     text: @Composable (() -> Unit)? = null,
     icon: @Composable (() -> Unit)? = null,
-    interactionState: InteractionState = remember { InteractionState() },
+    interactionSource: MutableInteractionSource = remember { MutableInteractionSource() },
     selectedContentColor: Color = LocalContentColor.current,
     unselectedContentColor: Color = selectedContentColor.copy(alpha = ContentAlpha.medium)
 ) {
@@ -107,7 +97,7 @@ fun Tab(
         onClick,
         modifier,
         enabled,
-        interactionState,
+        interactionSource,
         selectedContentColor,
         unselectedContentColor
     ) {
@@ -129,10 +119,10 @@ fun Tab(
  * @param modifier optional [Modifier] for this tab
  * @param enabled controls the enabled state of this tab. When `false`, this tab will not
  * be clickable and will appear disabled to accessibility services.
- * @param interactionState the [InteractionState] representing the different [Interaction]s
- * present on this Tab. You can create and pass in your own remembered [InteractionState] if
- * you want to read the [InteractionState] and customize the appearance / behavior of this Tab
- * in different [Interaction]s.
+ * @param interactionSource the [MutableInteractionSource] representing the stream of
+ * [Interaction]s for this Tab. You can create and pass in your own remembered
+ * [MutableInteractionSource] if you want to observe [Interaction]s and customize the
+ * appearance / behavior of this Tab in different [Interaction]s.
  * @param selectedContentColor the color for the content of this tab when selected, and the color
  * of the ripple.
  * @param unselectedContentColor the color for the content of this tab when not selected
@@ -144,7 +134,7 @@ fun Tab(
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
     enabled: Boolean = true,
-    interactionState: InteractionState = remember { InteractionState() },
+    interactionSource: MutableInteractionSource = remember { MutableInteractionSource() },
     selectedContentColor: Color = LocalContentColor.current,
     unselectedContentColor: Color = selectedContentColor.copy(alpha = ContentAlpha.medium),
     content: @Composable ColumnScope.() -> Unit
@@ -162,7 +152,7 @@ fun Tab(
                     onClick = onClick,
                     enabled = enabled,
                     role = Role.Tab,
-                    interactionState = interactionState,
+                    interactionSource = interactionSource,
                     indication = ripple
                 )
                 .fillMaxWidth(),
@@ -171,105 +161,6 @@ fun Tab(
             content = content
         )
     }
-}
-
-/**
- * Contains default values used by tabs from the Material specification.
- */
-@Deprecated(
-    "TabDefaults has been replaced with TabRowDefaults",
-    ReplaceWith(
-        "TabRowDefaults",
-        "androidx.compose.material.TabRowDefaults"
-    )
-)
-object TabDefaults {
-    /**
-     * Default [Divider], which will be positioned at the bottom of the [TabRow], underneath the
-     * indicator.
-     *
-     * @param modifier modifier for the divider's layout
-     * @param thickness thickness of the divider
-     * @param color color of the divider
-     */
-    @Composable
-    fun Divider(
-        modifier: Modifier = Modifier,
-        thickness: Dp = DividerThickness,
-        color: Color = LocalContentColor.current.copy(alpha = DividerOpacity)
-    ) {
-        androidx.compose.material.Divider(modifier = modifier, thickness = thickness, color = color)
-    }
-
-    /**
-     * Default indicator, which will be positioned at the bottom of the [TabRow], on top of the
-     * divider.
-     *
-     * @param modifier modifier for the indicator's layout
-     * @param height height of the indicator
-     * @param color color of the indicator
-     */
-    @Composable
-    fun Indicator(
-        modifier: Modifier = Modifier,
-        height: Dp = IndicatorHeight,
-        color: Color = LocalContentColor.current
-    ) {
-        Box(
-            modifier
-                .fillMaxWidth()
-                .preferredHeight(height)
-                .background(color = color)
-        )
-    }
-
-    /**
-     * [Modifier] that takes up all the available width inside the [TabRow], and then animates
-     * the offset of the indicator it is applied to, depending on the [currentTabPosition].
-     *
-     * @param currentTabPosition [TabPosition] of the currently selected tab. This is used to
-     * calculate the offset of the indicator this modifier is applied to, as well as its width.
-     */
-    fun Modifier.tabIndicatorOffset(
-        currentTabPosition: TabPosition
-    ): Modifier = composed(
-        inspectorInfo = debugInspectorInfo {
-            name = "tabIndicatorOffset"
-            value = currentTabPosition
-        }
-    ) {
-        // TODO: should we animate the width of the indicator as it moves between tabs of different
-        // sizes inside a scrollable tab row?
-        val currentTabWidth = currentTabPosition.width
-        val indicatorOffset by animateDpAsState(
-            targetValue = currentTabPosition.left,
-            animationSpec = tween(durationMillis = 250, easing = FastOutSlowInEasing)
-        )
-        fillMaxWidth()
-            .wrapContentSize(Alignment.BottomStart)
-            .offset(x = indicatorOffset)
-            .preferredWidth(currentTabWidth)
-    }
-
-    /**
-     * Default opacity for the color of [Divider]
-     */
-    const val DividerOpacity = 0.12f
-
-    /**
-     * Default thickness for [Divider]
-     */
-    val DividerThickness = 1.dp
-
-    /**
-     * Default height for [Indicator]
-     */
-    val IndicatorHeight = 2.dp
-
-    /**
-     * The default padding from the starting edge before a tab in a [ScrollableTabRow].
-     */
-    val ScrollableTabRowPadding = 52.dp
 }
 
 /**
@@ -303,7 +194,7 @@ private fun TabTransition(
     ) {
         if (it) activeColor else inactiveColor
     }
-    Providers(
+    CompositionLocalProvider(
         LocalContentColor provides color.copy(alpha = 1f),
         LocalContentAlpha provides color.alpha,
         content = content

@@ -17,31 +17,28 @@
 package androidx.compose.foundation.textfield
 
 import android.os.Build
-import androidx.compose.animation.core.FloatExponentialDecaySpec
-import androidx.compose.animation.core.ManualAnimationClock
 import androidx.compose.foundation.ExperimentalFoundationApi
-import androidx.compose.foundation.InteractionState
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.ScrollState
-import androidx.compose.foundation.animation.FlingConfig
 import androidx.compose.foundation.background
+import androidx.compose.foundation.gestures.Orientation
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.preferredSize
-import androidx.compose.foundation.layout.preferredWidth
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.text.BasicText
 import androidx.compose.foundation.text.TextFieldScrollerPosition
 import androidx.compose.foundation.text.TextLayoutResultProxy
 import androidx.compose.foundation.text.maxLinesHeight
 import androidx.compose.foundation.text.textFieldScroll
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.foundation.text.textFieldScrollable
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.testutils.assertPixels
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
-import androidx.compose.ui.gesture.scrollorientationlocking.Orientation
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.node.Ref
 import androidx.compose.ui.platform.InspectableValue
@@ -59,7 +56,6 @@ import androidx.compose.ui.test.swipeDown
 import androidx.compose.ui.test.swipeLeft
 import androidx.compose.ui.test.swipeRight
 import androidx.compose.ui.test.swipeUp
-import androidx.compose.ui.text.InternalTextApi
 import androidx.compose.ui.text.TextLayoutResult
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.input.TextFieldValue
@@ -71,6 +67,7 @@ import androidx.test.filters.LargeTest
 import androidx.test.filters.MediumTest
 import androidx.test.filters.SdkSuppress
 import com.google.common.truth.Truth.assertThat
+import kotlinx.coroutines.runBlocking
 import org.junit.After
 import org.junit.Before
 import org.junit.Rule
@@ -92,7 +89,7 @@ import org.junit.runner.RunWith
 
 @MediumTest
 @RunWith(AndroidJUnit4::class)
-@OptIn(ExperimentalFoundationApi::class, InternalTextApi::class)
+@OptIn(ExperimentalFoundationApi::class)
 class TextFieldScrollTest {
 
     private val TextfieldTag = "textField"
@@ -121,7 +118,7 @@ class TextFieldScrollTest {
         val scrollerPosition = TextFieldScrollerPosition(Orientation.Horizontal)
 
         rule.setupHorizontallyScrollableContent(
-            scrollerPosition, longText, Modifier.preferredSize(width = 300.dp, height = 50.dp)
+            scrollerPosition, longText, Modifier.size(width = 300.dp, height = 50.dp)
         )
 
         rule.runOnIdle {
@@ -137,7 +134,7 @@ class TextFieldScrollTest {
         rule.setupVerticallyScrollableContent(
             scrollerPosition = scrollerPosition,
             text = longText,
-            modifier = Modifier.preferredSize(width = 300.dp, height = 50.dp)
+            modifier = Modifier.size(width = 300.dp, height = 50.dp)
         )
 
         rule.runOnIdle {
@@ -151,7 +148,7 @@ class TextFieldScrollTest {
         val scrollerPosition = TextFieldScrollerPosition()
 
         rule.setupVerticallyScrollableContent(
-            modifier = Modifier.preferredWidth(100.dp),
+            modifier = Modifier.width(100.dp),
             scrollerPosition = scrollerPosition,
             text = longText,
             maxLines = 3
@@ -170,7 +167,7 @@ class TextFieldScrollTest {
         rule.setupHorizontallyScrollableContent(
             scrollerPosition = scrollerPosition,
             text = "text",
-            modifier = Modifier.preferredSize(width = 300.dp, height = 50.dp)
+            modifier = Modifier.size(width = 300.dp, height = 50.dp)
         )
 
         rule.runOnIdle {
@@ -185,7 +182,7 @@ class TextFieldScrollTest {
         rule.setupVerticallyScrollableContent(
             scrollerPosition = scrollerPosition,
             text = "text",
-            modifier = Modifier.preferredSize(width = 300.dp, height = 100.dp)
+            modifier = Modifier.size(width = 300.dp, height = 100.dp)
         )
 
         rule.runOnIdle {
@@ -205,12 +202,12 @@ class TextFieldScrollTest {
             rule.setContent {
                 Box(
                     Modifier
-                        .preferredSize(parentSize.toDp())
+                        .size(parentSize.toDp())
                         .background(color = Color.White)
                         .testTag(tag)
                 ) {
                     ScrollableContent(
-                        modifier = Modifier.preferredSize(textFieldSize.toDp()),
+                        modifier = Modifier.size(textFieldSize.toDp()),
                         scrollerPosition = TextFieldScrollerPosition(Orientation.Horizontal),
                         text = longText,
                         isVertical = false
@@ -240,12 +237,12 @@ class TextFieldScrollTest {
             rule.setContent {
                 Box(
                     Modifier
-                        .preferredSize(parentSize.toDp())
+                        .size(parentSize.toDp())
                         .background(color = Color.White)
                         .testTag(tag)
                 ) {
                     ScrollableContent(
-                        modifier = Modifier.preferredSize(textFieldSize.toDp()),
+                        modifier = Modifier.size(textFieldSize.toDp()),
                         scrollerPosition = TextFieldScrollerPosition(),
                         text = longText,
                         isVertical = true
@@ -270,7 +267,7 @@ class TextFieldScrollTest {
         rule.setupHorizontallyScrollableContent(
             scrollerPosition = scrollerPosition,
             text = longText,
-            modifier = Modifier.preferredSize(width = 300.dp, height = 50.dp)
+            modifier = Modifier.size(width = 300.dp, height = 50.dp)
         )
 
         rule.runOnIdle {
@@ -299,7 +296,7 @@ class TextFieldScrollTest {
         rule.setupVerticallyScrollableContent(
             scrollerPosition = scrollerPosition,
             text = longText,
-            modifier = Modifier.preferredSize(width = 300.dp, height = 50.dp)
+            modifier = Modifier.size(width = 300.dp, height = 50.dp)
         )
 
         rule.runOnIdle {
@@ -333,7 +330,7 @@ class TextFieldScrollTest {
                 TextFieldScrollerPosition(Orientation.Horizontal)
             }
             ScrollableContent(
-                modifier = Modifier.preferredSize(width = 300.dp, height = 50.dp),
+                modifier = Modifier.size(width = 300.dp, height = 50.dp),
                 scrollerPosition = scrollerPosition!!,
                 text = longText,
                 isVertical = false
@@ -363,22 +360,22 @@ class TextFieldScrollTest {
     @Test
     fun textFieldScrollable_testInspectorValue() {
         val position = TextFieldScrollerPosition(Orientation.Vertical, 10f)
-        val interactionState = InteractionState()
+        val interactionSource = MutableInteractionSource()
         rule.setContent {
             val modifier =
-                Modifier.textFieldScrollable(position, interactionState) as InspectableValue
+                Modifier.textFieldScrollable(position, interactionSource) as InspectableValue
             assertThat(modifier.nameFallback).isEqualTo("textFieldScrollable")
             assertThat(modifier.valueOverride).isNull()
             assertThat(modifier.inspectableElements.map { it.name }.asIterable()).containsExactly(
                 "scrollerPosition",
-                "interactionState",
+                "interactionSource",
                 "enabled"
             )
         }
     }
 
     @Test
-    fun textFieldScroll_testNestedScrolling() {
+    fun textFieldScroll_testNestedScrolling() = runBlocking {
         val size = 300.dp
         val text = """
             First Line
@@ -388,61 +385,50 @@ class TextFieldScrollTest {
         """.trimIndent()
 
         val textFieldScrollPosition = TextFieldScrollerPosition()
-        val scrollerPosition = ScrollState(
-            0f,
-            FlingConfig(FloatExponentialDecaySpec()),
-            ManualAnimationClock(0)
-        )
+        val scrollerPosition = ScrollState(0)
         var touchSlop = 0f
+        val height = 60.dp
 
         rule.setContent {
             touchSlop = LocalViewConfiguration.current.touchSlop
             Column(
                 Modifier
-                    .preferredSize(size)
+                    .size(size)
                     .verticalScroll(scrollerPosition)
             ) {
                 ScrollableContent(
-                    modifier = Modifier.preferredSize(size, 50.dp),
+                    modifier = Modifier.size(size, height),
                     scrollerPosition = textFieldScrollPosition,
                     text = text,
                     isVertical = true
                 )
-                Box(Modifier.preferredSize(size))
-                Box(Modifier.preferredSize(size))
+                Box(Modifier.size(size))
+                Box(Modifier.size(size))
             }
         }
 
-        rule.runOnIdle {
-            assertThat(textFieldScrollPosition.offset).isEqualTo(0f)
-            assertThat(textFieldScrollPosition.maximum).isGreaterThan(0f)
-            assertThat(scrollerPosition.value).isEqualTo(0f)
-        }
+        assertThat(textFieldScrollPosition.offset).isEqualTo(0f)
+        assertThat(textFieldScrollPosition.maximum).isGreaterThan(0f)
+        assertThat(scrollerPosition.value).isEqualTo(0)
 
         with(rule.density) {
             val x = 10.dp.toPx()
-            val start = Offset(x, 40.dp.toPx())
-            // not to exceed 50dp
-            val slopStartY = minOf(40.dp.toPx() + touchSlop, 49.dp.toPx())
+            val desiredY = textFieldScrollPosition.maximum + 10.dp.roundToPx()
+            val nearEdge = (height - 1.dp)
+            // not to exceed size
+            val slopStartY = minOf(desiredY + touchSlop, nearEdge.toPx())
             val slopStart = Offset(x, slopStartY)
             val end = Offset(x, 0f)
             rule.onNodeWithTag(TextfieldTag)
                 .performGesture {
-                    // scroll first two lines
                     swipe(slopStart, end)
-                    // scroll last two lines
-                    swipe(start, end)
-                    // scroll Scrollable column
-                    swipe(start, end)
                 }
         }
 
-        rule.runOnIdle {
-            assertThat(textFieldScrollPosition.offset).isGreaterThan(0f)
-            assertThat(textFieldScrollPosition.offset)
-                .isWithin(0.5f).of(textFieldScrollPosition.maximum)
-            assertThat(scrollerPosition.value).isGreaterThan(0f)
-        }
+        assertThat(textFieldScrollPosition.offset).isGreaterThan(0f)
+        assertThat(textFieldScrollPosition.offset)
+            .isWithin(0.5f).of(textFieldScrollPosition.maximum)
+        assertThat(scrollerPosition.value).isGreaterThan(0)
     }
 
     private fun ComposeContentTestRule.setupHorizontallyScrollableContent(

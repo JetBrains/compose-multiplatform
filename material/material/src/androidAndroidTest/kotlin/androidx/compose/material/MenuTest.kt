@@ -19,8 +19,8 @@ package androidx.compose.material
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.preferredSize
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.requiredSize
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
@@ -61,7 +61,7 @@ class MenuTest {
         var expanded by mutableStateOf(false)
 
         rule.setContent {
-            Box(Modifier.size(20.dp).background(color = Color.Blue)) {
+            Box(Modifier.requiredSize(20.dp).background(color = Color.Blue)) {
                 DropdownMenu(
                     expanded = expanded,
                     onDismissRequest = {}
@@ -102,13 +102,13 @@ class MenuTest {
     fun menu_hasExpectedSize() {
         rule.setContent {
             with(LocalDensity.current) {
-                Box(Modifier.size(20.toDp()).background(color = Color.Blue)) {
+                Box(Modifier.requiredSize(20.toDp()).background(color = Color.Blue)) {
                     DropdownMenu(
                         expanded = true,
                         onDismissRequest = {}
                     ) {
-                        Box(Modifier.testTag("MenuContent1").preferredSize(70.toDp()))
-                        Box(Modifier.testTag("MenuContent2").preferredSize(130.toDp()))
+                        Box(Modifier.testTag("MenuContent1").size(70.toDp()))
+                        Box(Modifier.testTag("MenuContent2").size(130.toDp()))
                     }
                 }
             }
@@ -301,7 +301,7 @@ class MenuTest {
             onSurface = MaterialTheme.colors.onSurface
             enabledContentAlpha = ContentAlpha.high
             disabledContentAlpha = ContentAlpha.disabled
-            Box(Modifier.size(20.dp)) {
+            Box(Modifier.requiredSize(20.dp)) {
                 DropdownMenu(
                     onDismissRequest = {},
                     expanded = true
@@ -332,7 +332,7 @@ class MenuTest {
                 onClick,
                 modifier = Modifier.testTag("MenuItem").clickable(onClick = onClick)
             ) {
-                Box(Modifier.size(40.dp))
+                Box(Modifier.requiredSize(40.dp))
             }
         }
 

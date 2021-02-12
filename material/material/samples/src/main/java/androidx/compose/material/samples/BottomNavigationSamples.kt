@@ -59,7 +59,7 @@ fun BottomNavigationWithOnlySelectedLabelsSample() {
                 label = { Text(item) },
                 selected = selectedItem == index,
                 onClick = { selectedItem = index },
-                alwaysShowLabels = false
+                alwaysShowLabel = false
             )
         }
     }

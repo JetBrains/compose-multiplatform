@@ -33,12 +33,12 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.requiredHeight
 import androidx.compose.foundation.layout.offset
-import androidx.compose.foundation.layout.preferredHeight
-import androidx.compose.foundation.layout.preferredSize
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.requiredSize
+import androidx.compose.foundation.layout.requiredWidth
 import androidx.compose.integration.demos.common.ComposableDemo
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
@@ -60,7 +60,6 @@ import androidx.compose.ui.input.pointer.PointerType
 import androidx.compose.ui.input.pointer.consumeAllChanges
 import androidx.compose.ui.input.pointer.consumePositionChange
 import androidx.compose.ui.input.pointer.pointerInput
-import androidx.compose.ui.input.pointer.positionChange
 import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.IntSize
@@ -121,11 +120,11 @@ fun CoroutineTapDemo() {
 
     Column {
         Text("The boxes change color when you tap the white box.")
-        Spacer(Modifier.size(5.dp))
+        Spacer(Modifier.requiredSize(5.dp))
         Box(
             Modifier
                 .fillMaxWidth()
-                .preferredHeight(50.dp)
+                .height(50.dp)
                 .pointerInput(Unit) {
                     detectTapGestures(
                         onTap = { tapHue = anotherRandomHue(tapHue) },
@@ -146,65 +145,65 @@ fun CoroutineTapDemo() {
         ) {
             Text("Tap, double-tap, or long-press", Modifier.align(Alignment.Center))
         }
-        Spacer(Modifier.size(5.dp))
+        Spacer(Modifier.requiredSize(5.dp))
         Row {
             Box(
                 Modifier
-                    .preferredSize(50.dp)
+                    .size(50.dp)
                     .background(hueToColor(tapHue))
                     .border(BorderStroke(2.dp, Color.Black))
             )
             Text("Changes color on tap", Modifier.align(Alignment.CenterVertically))
         }
-        Spacer(Modifier.size(5.dp))
+        Spacer(Modifier.requiredSize(5.dp))
         Row {
             Box(
                 Modifier
-                    .preferredSize(50.dp)
+                    .size(50.dp)
                     .clipToBounds()
                     .background(hueToColor(doubleTapHue))
                     .border(BorderStroke(2.dp, Color.Black))
             )
             Text("Changes color on double-tap", Modifier.align(Alignment.CenterVertically))
         }
-        Spacer(Modifier.size(5.dp))
+        Spacer(Modifier.requiredSize(5.dp))
         Row {
             Box(
                 Modifier
-                    .preferredSize(50.dp)
+                    .size(50.dp)
                     .clipToBounds()
                     .background(hueToColor(longPressHue))
                     .border(BorderStroke(2.dp, Color.Black))
             )
             Text("Changes color on long press", Modifier.align(Alignment.CenterVertically))
         }
-        Spacer(Modifier.size(5.dp))
+        Spacer(Modifier.requiredSize(5.dp))
         Row {
             Box(
                 Modifier
-                    .preferredSize(50.dp)
+                    .size(50.dp)
                     .clipToBounds()
                     .background(hueToColor(pressHue))
                     .border(BorderStroke(2.dp, Color.Black))
             )
             Text("Changes color on press", Modifier.align(Alignment.CenterVertically))
         }
-        Spacer(Modifier.size(5.dp))
+        Spacer(Modifier.requiredSize(5.dp))
         Row {
             Box(
                 Modifier
-                    .preferredSize(50.dp)
+                    .size(50.dp)
                     .clipToBounds()
                     .background(hueToColor(releaseHue))
                     .border(BorderStroke(2.dp, Color.Black))
             )
             Text("Changes color on release", Modifier.align(Alignment.CenterVertically))
         }
-        Spacer(Modifier.size(5.dp))
+        Spacer(Modifier.requiredSize(5.dp))
         Row {
             Box(
                 Modifier
-                    .preferredSize(50.dp)
+                    .size(50.dp)
                     .clipToBounds()
                     .background(hueToColor(cancelHue))
                     .border(BorderStroke(2.dp, Color.Black))
@@ -226,7 +225,7 @@ fun TouchSlopDragGestures() {
             var offset by remember { mutableStateOf(0.dp) }
             Box(
                 Modifier.offset(offset, 0.dp)
-                    .size(50.dp)
+                    .requiredSize(50.dp)
                     .background(Color.Blue)
                     .pointerInput(Unit) {
                         detectHorizontalDragGestures { change, dragDistance ->
@@ -235,7 +234,7 @@ fun TouchSlopDragGestures() {
                                 (offsetPx + dragDistance).coerceIn(0f, width - 50.dp.toPx())
                             val consumed = newOffset - offsetPx
                             if (consumed != 0f) {
-                                change.consumePositionChange(change.positionChange().x, 0f)
+                                change.consumePositionChange()
                                 offset = newOffset.toDp()
                             }
                         }
@@ -254,7 +253,7 @@ fun TouchSlopDragGestures() {
                 var offset by remember { mutableStateOf(0.dp) }
                 Box(
                     Modifier.offset(0.dp, offset)
-                        .size(50.dp)
+                        .requiredSize(50.dp)
                         .background(Color.Red)
                         .pointerInput(Unit) {
                             detectVerticalDragGestures { change, dragDistance ->
@@ -263,10 +262,7 @@ fun TouchSlopDragGestures() {
                                     .coerceIn(0f, height - 50.dp.toPx())
                                 val consumed = newOffset - offsetPx
                                 if (consumed != 0f) {
-                                    change.consumePositionChange(
-                                        0f,
-                                        change.positionChange().y
-                                    )
+                                    change.consumePositionChange()
                                     offset = newOffset.toDp()
                                 }
                             }
@@ -274,7 +270,7 @@ fun TouchSlopDragGestures() {
                 )
             }
             Box(
-                Modifier.height(50.dp)
+                Modifier.requiredHeight(50.dp)
                     .fillMaxWidth()
                     .align(Alignment.TopStart)
                     .graphicsLayer(
@@ -301,7 +297,7 @@ fun OrientationLockDragGestures() {
             size = it
         }.pointerInput(Unit) {
             detectVerticalDragGestures { change, dragAmount ->
-                change.consumePositionChange(0f, change.positionChange().y)
+                change.consumePositionChange()
                 offsetY = (offsetY.toPx() + dragAmount)
                     .coerceIn(0f, size.height.toFloat() - 50.dp.toPx()).toDp()
             }
@@ -311,11 +307,11 @@ fun OrientationLockDragGestures() {
         Box(
             Modifier.offset(offsetX, 0.dp)
                 .background(Color.Blue.copy(alpha = 0.5f))
-                .width(50.dp)
+                .requiredWidth(50.dp)
                 .fillMaxHeight()
                 .pointerInput(Unit) {
                     detectHorizontalDragGestures { change, dragAmount ->
-                        change.consumePositionChange(change.positionChange().x, 0f)
+                        change.consumePositionChange()
                         offsetX = (offsetX.toPx() + dragAmount)
                             .coerceIn(0f, size.width.toFloat() - 50.dp.toPx()).toDp()
                     }
@@ -324,7 +320,7 @@ fun OrientationLockDragGestures() {
         Box(
             Modifier.offset(0.dp, offsetY)
                 .background(Color.Red.copy(alpha = 0.5f))
-                .height(50.dp)
+                .requiredHeight(50.dp)
                 .fillMaxWidth()
         )
 
@@ -348,7 +344,7 @@ fun Drag2DGestures() {
         Box(
             Modifier.offset { IntOffset(offsetX.value.roundToInt(), offsetY.value.roundToInt()) }
                 .background(Color.Blue)
-                .size(50.dp)
+                .requiredSize(50.dp)
                 .pointerInput(Unit) {
                     detectDragGestures { change, dragAmount ->
                         change.consumeAllChanges()

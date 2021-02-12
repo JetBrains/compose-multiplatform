@@ -24,7 +24,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.text.BasicText
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.Providers
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.testutils.assertAgainstGolden
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
@@ -40,10 +40,10 @@ import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performGesture
 import androidx.compose.ui.test.width
-import androidx.compose.ui.text.InternalTextApi
 import androidx.compose.ui.text.style.ResolvedTextDirection
 import androidx.compose.ui.unit.dp
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import androidx.test.filters.FlakyTest
 import androidx.test.filters.LargeTest
 import androidx.test.filters.SdkSuppress
 import androidx.test.screenshot.AndroidXScreenshotTestRule
@@ -68,6 +68,7 @@ class TextSelectionColorsScreenshotTest {
     @get:Rule
     val screenshotRule = AndroidXScreenshotTestRule(GOLDEN_UI)
 
+    @FlakyTest(bugId = 179770443)
     @Test
     fun text_defaultSelectionColors() {
         rule.setContent {
@@ -86,6 +87,7 @@ class TextSelectionColorsScreenshotTest {
             .assertAgainstGolden(screenshotRule, "text_defaultSelectionColors")
     }
 
+    @FlakyTest(bugId = 179770443)
     @Test
     fun text_customSelectionColors() {
         rule.setContent {
@@ -171,10 +173,9 @@ class TextSelectionColorsScreenshotTest {
     }
 }
 
-@OptIn(InternalTextApi::class)
 @Composable
 private fun TextTestContent(textSelectionColors: TextSelectionColors) {
-    Providers(LocalTextSelectionColors provides textSelectionColors) {
+    CompositionLocalProvider(LocalTextSelectionColors provides textSelectionColors) {
         Row(Modifier.testTag(Tag), horizontalArrangement = Arrangement.spacedBy(20.dp)) {
             // Manually draw selection handles as we cannot screenshot the ones drawn in the popup
             DefaultSelectionHandle(
@@ -200,7 +201,7 @@ private fun TextTestContent(textSelectionColors: TextSelectionColors) {
 
 @Composable
 private fun TextFieldTestContent(textSelectionColors: TextSelectionColors) {
-    Providers(LocalTextSelectionColors provides textSelectionColors) {
+    CompositionLocalProvider(LocalTextSelectionColors provides textSelectionColors) {
         Box(Modifier.testTag(Tag)) {
             BasicTextField(value = Text, onValueChange = {})
         }

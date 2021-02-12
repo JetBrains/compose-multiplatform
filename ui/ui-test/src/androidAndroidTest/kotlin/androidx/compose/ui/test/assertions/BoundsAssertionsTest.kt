@@ -21,7 +21,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.requiredSize
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -32,8 +32,6 @@ import androidx.compose.ui.unit.dp
 import androidx.test.filters.MediumTest
 import androidx.compose.ui.test.assertHeightIsAtLeast
 import androidx.compose.ui.test.assertHeightIsEqualTo
-import androidx.compose.ui.test.assertIsEqualTo
-import androidx.compose.ui.test.assertIsNotEqualTo
 import androidx.compose.ui.test.assertLeftPositionInRootIsEqualTo
 import androidx.compose.ui.test.assertPositionInRootIsEqualTo
 import androidx.compose.ui.test.assertTopPositionInRootIsEqualTo
@@ -67,38 +65,11 @@ class BoundsAssertionsTest {
                     Box(
                         modifier = Modifier
                             .testTag(tag)
-                            .size(80.dp, 100.dp)
+                            .requiredSize(80.dp, 100.dp)
                             .background(color = Color.Black)
                     )
                 }
             }
-        }
-    }
-
-    @Test
-    fun dp_assertEquals() {
-        5.dp.assertIsEqualTo(5.dp)
-        5.dp.assertIsEqualTo(4.6.dp)
-        5.dp.assertIsEqualTo(5.4.dp)
-    }
-
-    @Test
-    fun dp_assertNotEquals() {
-        5.dp.assertIsNotEqualTo(6.dp)
-    }
-
-    @Test
-    fun dp_assertEquals_fail() {
-        expectError<AssertionError> {
-            5.dp.assertIsEqualTo(6.dp)
-        }
-    }
-
-    @Test
-    fun dp_assertNotEquals_fail() {
-        expectError<AssertionError> {
-            5.dp.assertIsNotEqualTo(5.dp)
-            5.dp.assertIsNotEqualTo(5.4.dp)
         }
     }
 
@@ -191,7 +162,7 @@ class BoundsAssertionsTest {
                     modifier = Modifier
                         .testTag(tag)
                         .offset((-30).dp, (-10).dp)
-                        .size(80.dp, 100.dp)
+                        .requiredSize(80.dp, 100.dp)
                         .background(color = Color.Black)
                 )
             }

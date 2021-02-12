@@ -17,10 +17,10 @@
 package androidx.compose.foundation.lazy
 
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.requiredHeight
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.preferredHeight
-import androidx.compose.foundation.layout.preferredWidth
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.requiredWidth
 import androidx.compose.foundation.text.BasicText
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
@@ -44,10 +44,10 @@ class LazyListsIndexedTest {
         val items = (1..4).map { it.toString() }
 
         rule.setContent {
-            LazyColumn(Modifier.preferredHeight(200.dp)) {
+            LazyColumn(Modifier.height(200.dp)) {
                 itemsIndexed(items) { index, item ->
                     Spacer(
-                        Modifier.preferredHeight(101.dp).fillParentMaxWidth()
+                        Modifier.height(101.dp).fillParentMaxWidth()
                             .testTag("$index-$item")
                     )
                 }
@@ -72,9 +72,11 @@ class LazyListsIndexedTest {
         val items = (0..1).map { it.toString() }
 
         rule.setContent {
-            LazyColumn(Modifier.preferredHeight(200.dp)) {
+            LazyColumn(Modifier.height(200.dp)) {
                 itemsIndexed(items) { index, item ->
-                    BasicText("${index}x$item", Modifier.fillParentMaxWidth().height(100.dp))
+                    BasicText(
+                        "${index}x$item", Modifier.fillParentMaxWidth().requiredHeight(100.dp)
+                    )
                 }
             }
         }
@@ -91,10 +93,10 @@ class LazyListsIndexedTest {
         val items = (1..4).map { it.toString() }
 
         rule.setContent {
-            LazyRow(Modifier.preferredWidth(200.dp)) {
+            LazyRow(Modifier.width(200.dp)) {
                 itemsIndexed(items) { index, item ->
                     Spacer(
-                        Modifier.preferredWidth(101.dp).fillParentMaxHeight()
+                        Modifier.width(101.dp).fillParentMaxHeight()
                             .testTag("$index-$item")
                     )
                 }
@@ -119,9 +121,11 @@ class LazyListsIndexedTest {
         val items = (0..1).map { it.toString() }
 
         rule.setContent {
-            LazyRow(Modifier.preferredWidth(200.dp)) {
+            LazyRow(Modifier.width(200.dp)) {
                 itemsIndexed(items) { index, item ->
-                    BasicText("${index}x$item", Modifier.fillParentMaxHeight().width(100.dp))
+                    BasicText(
+                        "${index}x$item", Modifier.fillParentMaxHeight().requiredWidth(100.dp)
+                    )
                 }
             }
         }

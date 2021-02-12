@@ -16,7 +16,7 @@
 
 package androidx.compose.ui.res
 
-import androidx.compose.runtime.Providers
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.test.R
@@ -41,7 +41,7 @@ class ColorResourcesTest {
         val context = InstrumentationRegistry.getInstrumentation().targetContext
 
         rule.setContent {
-            Providers(LocalContext provides context) {
+            CompositionLocalProvider(LocalContext provides context) {
                 assertThat(colorResource(R.color.color_resource))
                     .isEqualTo(Color(0x12345678))
             }

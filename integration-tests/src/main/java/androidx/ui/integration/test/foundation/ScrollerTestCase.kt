@@ -16,18 +16,18 @@
 
 package androidx.ui.integration.test.foundation
 
-import androidx.compose.runtime.Composable
-import androidx.compose.ui.Modifier
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.ScrollState
-import androidx.compose.foundation.rememberScrollState
-import androidx.compose.ui.graphics.Color
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxHeight
-import androidx.compose.foundation.layout.preferredSize
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.runtime.Composable
 import androidx.compose.testutils.ComposeTestCase
 import androidx.compose.testutils.ToggleableTestCase
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.runBlocking
 
@@ -65,12 +65,12 @@ class ScrollerTestCase : ComposeTestCase, ToggleableTestCase {
     }
 
     override fun toggleState() {
-        runBlocking { scrollState.scrollTo(if (scrollState.value == 0f) 10f else 0f) }
+        runBlocking { scrollState.scrollTo(if (scrollState.value == 0) 10 else 0) }
     }
 
     @Composable
     fun ColorStripe(red: Int, green: Int, blue: Int) {
-        Canvas(Modifier.preferredSize(45.dp, 5.dp)) {
+        Canvas(Modifier.size(45.dp, 5.dp)) {
             drawRect(Color(red = red, green = green, blue = blue))
         }
     }

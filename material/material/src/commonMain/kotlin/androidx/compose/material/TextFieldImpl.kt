@@ -16,21 +16,19 @@
 
 package androidx.compose.material
 
-import androidx.compose.animation.animateColor
 import androidx.compose.animation.core.LinearEasing
 import androidx.compose.animation.core.animateDp
 import androidx.compose.animation.core.animateFloat
 import androidx.compose.animation.core.spring
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.core.updateTransition
-import androidx.compose.foundation.ExperimentalFoundationApi
-import androidx.compose.foundation.Interaction
-import androidx.compose.foundation.InteractionState
+import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.interaction.collectIsFocusedAsState
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.Providers
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
@@ -43,11 +41,8 @@ import androidx.compose.ui.layout.Measurable
 import androidx.compose.ui.layout.MeasureResult
 import androidx.compose.ui.layout.MeasureScope
 import androidx.compose.ui.layout.Placeable
-import androidx.compose.ui.node.Ref
 import androidx.compose.ui.platform.InspectorValueInfo
 import androidx.compose.ui.platform.debugInspectorInfo
-import androidx.compose.ui.text.InternalTextApi
-import androidx.compose.ui.text.SoftwareKeyboardController
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.input.VisualTransformation
@@ -66,7 +61,6 @@ internal enum class TextFieldType {
  * Implementation of the [TextField] and [OutlinedTextField]
  */
 @Composable
-@OptIn(ExperimentalFoundationApi::class, InternalTextApi::class)
 internal fun TextFieldImpl(
     type: TextFieldType,
     enabled: Boolean,
@@ -80,60 +74,34 @@ internal fun TextFieldImpl(
     placeholder: @Composable (() -> Unit)?,
     leading: @Composable (() -> Unit)?,
     trailing: @Composable (() -> Unit)?,
-    isErrorValue: Boolean,
+    isError: Boolean,
     visualTransformation: VisualTransformation,
     keyboardOptions: KeyboardOptions = KeyboardOptions.Default,
     keyboardActions: KeyboardActions,
     maxLines: Int = Int.MAX_VALUE,
-    onTextInputStarted: (SoftwareKeyboardController) -> Unit,
-    interactionState: InteractionState,
-    activeColor: Color,
-    inactiveColor: Color,
-    errorColor: Color,
-    backgroundColor: Color,
-    shape: Shape
+    interactionSource: MutableInteractionSource,
+    shape: Shape,
+    colors: TextFieldColors
 ) {
-    // TODO(soboleva): b/171305338 provide colors object and apply alpha there instead
     // If color is not provided via the text style, use content color as a default
     val textColor = textStyle.color.takeOrElse {
-        LocalContentColor.current
-    }.copy(alpha = if (enabled) LocalContentAlpha.current else ContentAlpha.disabled)
+        colors.textColor(enabled).value
+    }
     val mergedTextStyle = textStyle.merge(TextStyle(color = textColor))
 
-    val keyboardController: Ref<SoftwareKeyboardController> = remember { Ref() }
-
-    val isFocused = interactionState.contains(Interaction.Focused)
+    val isFocused = interactionSource.collectIsFocusedAsState().value
+    val transformedText = remember(value.annotatedString, visualTransformation) {
+        visualTransformation.filter(value.annotatedString)
+    }.text
     val inputState = when {
         isFocused -> InputPhase.Focused
-        value.text.isEmpty() -> InputPhase.UnfocusedEmpty
+        transformedText.isEmpty() -> InputPhase.UnfocusedEmpty
         else -> InputPhase.UnfocusedNotEmpty
     }
 
     TextFieldTransitionScope.Transition(
-        inputState = inputState,
-        showLabel = label != null,
-        activeColor = if (isErrorValue) {
-            errorColor
-        } else {
-            activeColor.applyAlpha(alpha = ContentAlpha.high)
-        },
-        labelInactiveColor = if (isErrorValue) {
-            errorColor
-        } else {
-            inactiveColor.applyAlpha(if (enabled) ContentAlpha.medium else ContentAlpha.disabled)
-        },
-        indicatorInactiveColor = when {
-            isErrorValue -> errorColor
-            type == TextFieldType.Filled -> inactiveColor.applyAlpha(
-                if (enabled) IndicatorInactiveAlpha else ContentAlpha.disabled
-            )
-            else -> inactiveColor.applyAlpha(alpha = ContentAlpha.disabled)
-        }
-
-    ) { labelProgress, animatedLabelColor, indicatorWidth, indicatorColor, placeholderAlpha ->
-
-        val leadingColor = inactiveColor.applyAlpha(alpha = TrailingLeadingAlpha)
-        val trailingColor = if (isErrorValue) errorColor else leadingColor
+        inputState = inputState, showLabel = label != null
+    ) { labelProgress, indicatorWidth, placeholderAlphaProgress ->
 
         val decoratedLabel: @Composable (() -> Unit)? =
             if (label != null) {
@@ -144,7 +112,7 @@ internal fun TextFieldImpl(
                         labelProgress
                     )
                     Decoration(
-                        contentColor = animatedLabelColor,
+                        contentColor = colors.labelColor(enabled, isError, interactionSource).value,
                         typography = labelAnimatedStyle,
                         content = label
                     )
@@ -152,25 +120,18 @@ internal fun TextFieldImpl(
             } else null
 
         val decoratedPlaceholder: @Composable ((Modifier) -> Unit)? =
-            if (placeholder != null && value.text.isEmpty()) {
+            if (placeholder != null && transformedText.isEmpty()) {
                 @Composable { modifier ->
-                    Box(modifier.alpha(placeholderAlpha)) {
+                    Box(modifier.alpha(placeholderAlphaProgress)) {
                         Decoration(
-                            contentColor = inactiveColor,
+                            contentColor = colors.placeholderColor(enabled).value,
                             typography = MaterialTheme.typography.subtitle1,
-                            contentAlpha =
-                                if (enabled) ContentAlpha.medium else ContentAlpha.disabled,
                             content = placeholder
                         )
                     }
                 }
             } else null
 
-        val cursorColor = if (isErrorValue) errorColor else activeColor
-        val onTextInputStartedAction: (SoftwareKeyboardController) -> Unit = {
-            keyboardController.value = it
-            onTextInputStarted(it)
-        }
         when (type) {
             TextFieldType.Filled -> {
                 TextFieldLayout(
@@ -185,19 +146,19 @@ internal fun TextFieldImpl(
                     singleLine = singleLine,
                     maxLines = maxLines,
                     visualTransformation = visualTransformation,
-                    onTextInputStarted = onTextInputStartedAction,
-                    interactionState = interactionState,
+                    interactionSource = interactionSource,
                     decoratedPlaceholder = decoratedPlaceholder,
                     decoratedLabel = decoratedLabel,
                     leading = leading,
                     trailing = trailing,
-                    leadingColor = leadingColor,
-                    trailingColor = trailingColor,
+                    leadingColor = colors.leadingIconColor(enabled, isError).value,
+                    trailingColor = colors.trailingIconColor(enabled, isError).value,
                     labelProgress = labelProgress,
                     indicatorWidth = indicatorWidth,
-                    indicatorColor = indicatorColor,
-                    backgroundColor = backgroundColor,
-                    cursorColor = cursorColor,
+                    indicatorColor =
+                        colors.indicatorColor(enabled, isError, interactionSource).value,
+                    backgroundColor = colors.backgroundColor(enabled).value,
+                    cursorColor = colors.cursorColor(isError).value,
                     shape = shape
                 )
             }
@@ -214,29 +175,22 @@ internal fun TextFieldImpl(
                     singleLine = singleLine,
                     maxLines = maxLines,
                     visualTransformation = visualTransformation,
-                    onTextInputStarted = onTextInputStartedAction,
-                    interactionState = interactionState,
+                    interactionSource = interactionSource,
                     decoratedPlaceholder = decoratedPlaceholder,
                     decoratedLabel = decoratedLabel,
                     leading = leading,
                     trailing = trailing,
-                    leadingColor = leadingColor,
-                    trailingColor = trailingColor,
+                    leadingColor = colors.leadingIconColor(enabled, isError).value,
+                    trailingColor = colors.trailingIconColor(enabled, isError).value,
                     labelProgress = labelProgress,
                     indicatorWidth = indicatorWidth,
-                    indicatorColor = indicatorColor,
-                    cursorColor = cursorColor
+                    indicatorColor =
+                        colors.indicatorColor(enabled, isError, interactionSource).value,
+                    cursorColor = colors.cursorColor(isError).value
                 )
             }
         }
     }
-}
-
-/**
- * Set alpha if the color is not translucent
- */
-internal fun Color.applyAlpha(alpha: Float): Color {
-    return if (this.alpha != 1f) this else this.copy(alpha = alpha)
 }
 
 /**
@@ -249,15 +203,15 @@ internal fun Decoration(
     contentAlpha: Float? = null,
     content: @Composable () -> Unit
 ) {
-    val colorAndEmphasis = @Composable {
-        Providers(LocalContentColor provides contentColor) {
+    val colorAndEmphasis: @Composable () -> Unit = @Composable {
+        CompositionLocalProvider(LocalContentColor provides contentColor) {
             if (contentAlpha != null) {
-                Providers(
+                CompositionLocalProvider(
                     LocalContentAlpha provides contentAlpha,
                     content = content
                 )
             } else {
-                Providers(
+                CompositionLocalProvider(
                     LocalContentAlpha provides contentColor.alpha,
                     content = content
                 )
@@ -276,6 +230,7 @@ internal fun heightOrZero(placeable: Placeable?) = placeable?.height ?: 0
  */
 internal fun Modifier.iconPadding(start: Dp = 0.dp, end: Dp = 0.dp) =
     this.then(
+        @Suppress("ModifierInspectorInfo")
         object : LayoutModifier, InspectorValueInfo(
             debugInspectorInfo {
                 name = "iconPadding"
@@ -306,14 +261,9 @@ private object TextFieldTransitionScope {
     fun Transition(
         inputState: InputPhase,
         showLabel: Boolean,
-        activeColor: Color,
-        labelInactiveColor: Color,
-        indicatorInactiveColor: Color,
         content: @Composable (
             labelProgress: Float,
-            labelColor: Color,
             indicatorWidth: Dp,
-            indicatorColor: Color,
             placeholderOpacity: Float
         ) -> Unit
     ) {
@@ -321,24 +271,6 @@ private object TextFieldTransitionScope {
         // UnfocusedEmpty <-> UnfocusedNotEmpty are needed when a single state is used to control
         // multiple text fields.
         val transition = updateTransition(inputState)
-        val labelColor by transition.animateColor(
-            transitionSpec = { tween(durationMillis = AnimationDuration) }
-        ) {
-            when (it) {
-                InputPhase.Focused -> activeColor
-                InputPhase.UnfocusedEmpty -> labelInactiveColor
-                InputPhase.UnfocusedNotEmpty -> labelInactiveColor
-            }
-        }
-        val indicatorColor by transition.animateColor(
-            transitionSpec = { tween(durationMillis = AnimationDuration) }
-        ) {
-            when (it) {
-                InputPhase.Focused -> activeColor
-                InputPhase.UnfocusedEmpty -> indicatorInactiveColor
-                InputPhase.UnfocusedNotEmpty -> indicatorInactiveColor
-            }
-        }
 
         val labelProgress by transition.animateFloat(
             transitionSpec = { tween(durationMillis = AnimationDuration) }
@@ -389,9 +321,7 @@ private object TextFieldTransitionScope {
 
         content(
             labelProgress,
-            labelColor,
             indicatorWidth,
-            indicatorColor,
             placeholderOpacity
         )
     }
@@ -415,17 +345,11 @@ internal const val TextFieldId = "TextField"
 internal const val PlaceholderId = "Hint"
 internal const val LabelId = "Label"
 
-private const val AnimationDuration = 150
+internal const val AnimationDuration = 150
 private const val PlaceholderAnimationDuration = 83
 private const val PlaceholderAnimationDelayOrDuration = 67
 
 private val IndicatorUnfocusedWidth = 1.dp
 private val IndicatorFocusedWidth = 2.dp
-private const val TrailingLeadingAlpha = 0.54f
-internal val TextFieldMinHeight = 56.dp
-internal val TextFieldMinWidth = 280.dp
 internal val TextFieldPadding = 16.dp
 internal val HorizontalIconPadding = 12.dp
-
-// Filled text field uses 42% opacity to meet the contrast requirements for accessibility reasons
-private const val IndicatorInactiveAlpha = 0.42f

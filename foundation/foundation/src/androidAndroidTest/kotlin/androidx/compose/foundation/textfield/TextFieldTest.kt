@@ -21,26 +21,28 @@ package androidx.compose.foundation.textfield
 
 import android.os.Build
 import androidx.compose.foundation.ExperimentalFoundationApi
-import androidx.compose.foundation.Interaction
-import androidx.compose.foundation.InteractionState
+import androidx.compose.foundation.interaction.FocusInteraction
+import androidx.compose.foundation.interaction.Interaction
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.preferredSize
+import androidx.compose.foundation.layout.requiredHeight
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.text.BasicText
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.MutableState
-import androidx.compose.runtime.Providers
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.testutils.assertShape
@@ -50,6 +52,7 @@ import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.RectangleShape
+import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.platform.LocalTextInputService
 import androidx.compose.ui.platform.LocalTextToolbar
@@ -86,6 +89,7 @@ import androidx.compose.ui.text.input.CommitTextCommand
 import androidx.compose.ui.text.input.EditCommand
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.PasswordVisualTransformation
+import androidx.compose.ui.text.input.PlatformTextInputService
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.input.TextFieldValue.Companion.Saver
 import androidx.compose.ui.text.input.TextInputService
@@ -99,11 +103,12 @@ import com.google.common.truth.Truth.assertThat
 import com.nhaarman.mockitokotlin2.any
 import com.nhaarman.mockitokotlin2.argumentCaptor
 import com.nhaarman.mockitokotlin2.atLeastOnce
-import com.nhaarman.mockitokotlin2.eq
 import com.nhaarman.mockitokotlin2.mock
 import com.nhaarman.mockitokotlin2.times
 import com.nhaarman.mockitokotlin2.verify
-import com.nhaarman.mockitokotlin2.whenever
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.launch
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -119,12 +124,12 @@ class TextFieldTest {
 
     @Test
     fun textField_focusInSemantics() {
-        val inputService = mock<TextInputService>()
+        val inputService = TextInputService(mock())
 
         var isFocused = false
         rule.setContent {
             val state = remember { mutableStateOf("") }
-            Providers(
+            CompositionLocalProvider(
                 LocalTextInputService provides inputService
             ) {
                 BasicTextField(
@@ -156,14 +161,11 @@ class TextFieldTest {
 
     @Test
     fun textField_commitTexts() {
-        val textInputService = mock<TextInputService>()
-        val inputSessionToken = 10 // any positive number is fine.
-
-        whenever(textInputService.startInput(any(), any(), any(), any()))
-            .thenReturn(inputSessionToken)
+        val platformTextInputService = mock<PlatformTextInputService>()
+        val textInputService = TextInputService(platformTextInputService)
 
         rule.setContent {
-            Providers(
+            CompositionLocalProvider(
                 LocalTextInputService provides textInputService
             ) {
                 TextFieldApp()
@@ -176,7 +178,7 @@ class TextFieldTest {
         rule.runOnIdle {
             // Verify startInput is called and capture the callback.
             val onEditCommandCaptor = argumentCaptor<(List<EditCommand>) -> Unit>()
-            verify(textInputService, times(1)).startInput(
+            verify(platformTextInputService, times(1)).startInput(
                 value = any(),
                 imeOptions = any(),
                 onEditCommand = onEditCommandCaptor.capture(),
@@ -203,8 +205,8 @@ class TextFieldTest {
 
         rule.runOnIdle {
             val stateCaptor = argumentCaptor<TextFieldValue>()
-            verify(textInputService, atLeastOnce())
-                .updateState(eq(inputSessionToken), any(), stateCaptor.capture())
+            verify(platformTextInputService, atLeastOnce())
+                .updateState(any(), stateCaptor.capture())
 
             // Don't care about the intermediate state update. It should eventually be "1a2b3".
             assertThat(stateCaptor.lastValue.text).isEqualTo("1a2b3")
@@ -227,14 +229,11 @@ class TextFieldTest {
 
     @Test
     fun textField_commitTexts_state_may_not_set() {
-        val textInputService = mock<TextInputService>()
-        val inputSessionToken = 10 // any positive number is fine.
-
-        whenever(textInputService.startInput(any(), any(), any(), any()))
-            .thenReturn(inputSessionToken)
+        val platformTextInputService = mock<PlatformTextInputService>()
+        val textInputService = TextInputService(platformTextInputService)
 
         rule.setContent {
-            Providers(
+            CompositionLocalProvider(
                 LocalTextInputService provides textInputService
             ) {
                 OnlyDigitsApp()
@@ -247,7 +246,7 @@ class TextFieldTest {
         rule.runOnIdle {
             // Verify startInput is called and capture the callback.
             val onEditCommandCaptor = argumentCaptor<(List<EditCommand>) -> Unit>()
-            verify(textInputService, times(1)).startInput(
+            verify(platformTextInputService, times(1)).startInput(
                 value = any(),
                 imeOptions = any(),
                 onEditCommand = onEditCommandCaptor.capture(),
@@ -274,8 +273,8 @@ class TextFieldTest {
 
         rule.runOnIdle {
             val stateCaptor = argumentCaptor<TextFieldValue>()
-            verify(textInputService, atLeastOnce())
-                .updateState(eq(inputSessionToken), any(), stateCaptor.capture())
+            verify(platformTextInputService, atLeastOnce())
+                .updateState(any(), stateCaptor.capture())
 
             // Don't care about the intermediate state update. It should eventually be "123" since
             // the rejects if the incoming model contains alphabets.
@@ -285,15 +284,12 @@ class TextFieldTest {
 
     @Test
     fun textField_onTextLayoutCallback() {
-        val textInputService = mock<TextInputService>()
-        val inputSessionToken = 10 // any positive number is fine.
-
-        whenever(textInputService.startInput(any(), any(), any(), any()))
-            .thenReturn(inputSessionToken)
+        val platformTextInputService = mock<PlatformTextInputService>()
+        val textInputService = TextInputService(platformTextInputService)
 
         val onTextLayout: (TextLayoutResult) -> Unit = mock()
         rule.setContent {
-            Providers(
+            CompositionLocalProvider(
                 LocalTextInputService provides textInputService
             ) {
                 val state = remember { mutableStateOf("") }
@@ -314,7 +310,7 @@ class TextFieldTest {
         rule.runOnIdle {
             // Verify startInput is called and capture the callback.
             val onEditCommandCaptor = argumentCaptor<(List<EditCommand>) -> Unit>()
-            verify(textInputService, times(1)).startInput(
+            verify(platformTextInputService, times(1)).startInput(
                 value = any(),
                 imeOptions = any(),
                 onEditCommand = onEditCommandCaptor.capture(),
@@ -352,7 +348,7 @@ class TextFieldTest {
         val boxSize = 50.dp
         var size: Int? = null
         rule.setContent {
-            Box(Modifier.preferredSize(parentSize)) {
+            Box(Modifier.size(parentSize)) {
                 Row {
                     BasicTextField(
                         value = "",
@@ -363,7 +359,7 @@ class TextFieldTest {
                                 size = it.size.width
                             }
                     )
-                    Box(Modifier.preferredSize(boxSize))
+                    Box(Modifier.size(boxSize))
                 }
             }
         }
@@ -406,8 +402,8 @@ class TextFieldTest {
                 value = "",
                 onValueChange = {},
                 textStyle = TextStyle(color = Color.White),
-                modifier = Modifier.preferredSize(10.dp, 20.dp).background(color = Color.White),
-                cursorColor = Color.Blue
+                modifier = Modifier.size(10.dp, 20.dp).background(color = Color.White),
+                cursorBrush = SolidColor(Color.Blue)
             )
         }
 
@@ -667,7 +663,7 @@ class TextFieldTest {
         }
 
         rule.onNodeWithTag(Tag)
-            .performTextClearance(true)
+            .performTextClearance()
 
         rule.runOnIdle {
             assertThat(lastSeenText).isEqualTo("")
@@ -676,14 +672,18 @@ class TextFieldTest {
 
     @Test
     fun decorationBox_clickable() {
-        val interactionState = InteractionState()
+        val interactionSource = MutableInteractionSource()
+
+        var scope: CoroutineScope? = null
+
         rule.setContent {
+            scope = rememberCoroutineScope()
             Column {
                 BasicTextField(
                     value = "test",
                     onValueChange = {},
                     textStyle = TextStyle(fontSize = 2.sp),
-                    modifier = Modifier.height(100.dp).fillMaxWidth(),
+                    modifier = Modifier.requiredHeight(100.dp).fillMaxWidth(),
                     decorationBox = {
                         // the core text field is at the very bottom
                         Column {
@@ -692,13 +692,19 @@ class TextFieldTest {
                             it()
                         }
                     },
-                    interactionState = interactionState
+                    interactionSource = interactionSource
                 )
             }
         }
 
+        val interactions = mutableListOf<Interaction>()
+
+        scope!!.launch {
+            interactionSource.interactions.collect { interactions.add(it) }
+        }
+
         rule.runOnIdle {
-            assertThat(interactionState.contains(Interaction.Focused)).isFalse()
+            assertThat(interactions).isEmpty()
         }
 
         // click outside core text field area
@@ -708,7 +714,8 @@ class TextFieldTest {
             }
 
         rule.runOnIdle {
-            assertThat(interactionState.contains(Interaction.Focused)).isTrue()
+            // Not asserting total size as we have other interactions here too
+            assertThat(interactions.filterIsInstance<FocusInteraction.Focus>()).hasSize(1)
         }
     }
 }

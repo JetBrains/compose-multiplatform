@@ -18,17 +18,17 @@ package androidx.compose.animation.demos
 
 import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.calculateTargetValue
-import androidx.compose.foundation.animation.androidFlingDecay
+import androidx.compose.animation.splineBasedDecay
 import androidx.compose.foundation.background
 import androidx.compose.foundation.gestures.awaitFirstDown
 import androidx.compose.foundation.gestures.verticalDrag
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.requiredHeight
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.requiredSize
 import androidx.compose.material.Button
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
@@ -40,11 +40,11 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.composed
-import androidx.compose.ui.gesture.util.VelocityTracker
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.input.pointer.positionChange
+import androidx.compose.ui.input.pointer.util.VelocityTracker
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -56,9 +56,9 @@ import kotlin.math.roundToInt
 fun SwipeToDismissDemo() {
     Column {
         var index by remember { mutableStateOf(0) }
-        Box(Modifier.height(300.dp).fillMaxWidth()) {
+        Box(Modifier.requiredHeight(300.dp).fillMaxWidth()) {
             Box(
-                Modifier.swipeToDismiss(index).align(Alignment.BottomCenter).size(150.dp)
+                Modifier.swipeToDismiss(index).align(Alignment.BottomCenter).requiredSize(150.dp)
                     .background(pastelColors[index])
             )
         }
@@ -108,7 +108,7 @@ private fun Modifier.swipeToDismiss(index: Int): Modifier = composed {
                 val velocity = velocityTracker.calculateVelocity().y
                 launch {
                     // Either fling out of the sight, or snap back
-                    val decay = androidFlingDecay<Float>(this@pointerInput)
+                    val decay = splineBasedDecay<Float>(this@pointerInput)
                     if (decay.calculateTargetValue(
                             animatedOffset.value,
                             velocity

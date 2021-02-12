@@ -16,7 +16,9 @@
 
 package androidx.compose.material.ripple
 
-import androidx.compose.foundation.Interaction
+import androidx.compose.foundation.interaction.Interaction
+import androidx.compose.material.ripple.RippleTheme.Companion.defaultRippleAlpha
+import androidx.compose.material.ripple.RippleTheme.Companion.defaultRippleColor
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Immutable
 import androidx.compose.runtime.ProvidableCompositionLocal
@@ -31,7 +33,6 @@ import androidx.compose.ui.graphics.luminance
  *
  * @see rememberRipple
  */
-@ExperimentalRippleApi
 public interface RippleTheme {
     /**
      * @return the default ripple color at the call site's position in the hierarchy.
@@ -59,7 +60,6 @@ public interface RippleTheme {
          * contains the ripple.
          * @param lightTheme whether the theme is light or not
          */
-        @ExperimentalRippleApi
         public fun defaultRippleColor(
             contentColor: Color,
             lightTheme: Boolean
@@ -83,7 +83,6 @@ public interface RippleTheme {
          * contains the ripple.
          * @param lightTheme whether the theme is light or not
          */
-        @ExperimentalRippleApi
         public fun defaultRippleAlpha(contentColor: Color, lightTheme: Boolean): RippleAlpha {
             return when {
                 lightTheme -> {
@@ -102,59 +101,54 @@ public interface RippleTheme {
 }
 
 /**
- * RippleAlpha defines the alpha of the ripple / state layer for a given [Interaction].
- */
-@ExperimentalRippleApi
-public fun interface RippleAlpha {
-    /**
-     * @return the alpha of the ripple for the given [interaction]. Return `0f` if this
-     * particular interaction should not show a corresponding ripple / state layer.
-     */
-    public fun alphaForInteraction(interaction: Interaction): Float
-}
-
-/**
- * CompositionLocal used for providing [RippleTheme] down the tree.
+ * RippleAlpha defines the alpha of the ripple / state layer for different [Interaction]s.
  *
- * See [RippleTheme.defaultRippleColor] and [RippleTheme.defaultRippleAlpha] functions for the
- * default implementations for color and alpha.
+ * @property draggedAlpha the alpha used when the ripple is dragged
+ * @property focusedAlpha not currently supported
+ * @property hoveredAlpha not currently supported
+ * @property pressedAlpha the alpha used when the ripple is pressed
  */
-@get:ExperimentalRippleApi
-@ExperimentalRippleApi
-@Deprecated(
-    "Renamed to LocalRippleTheme",
-    replaceWith = ReplaceWith(
-        "LocalRippleTheme",
-        "androidx.compose.material.ripple.LocalRippleTheme"
-    )
-)
-public val AmbientRippleTheme: ProvidableCompositionLocal<RippleTheme> get() = LocalRippleTheme
+@Immutable
+public class RippleAlpha(
+    public val draggedAlpha: Float,
+    public val focusedAlpha: Float,
+    public val hoveredAlpha: Float,
+    public val pressedAlpha: Float
+) {
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (other !is RippleAlpha) return false
 
-/**
- * CompositionLocal used for providing [RippleTheme] down the tree.
- *
- * See [RippleTheme.defaultRippleColor] and [RippleTheme.defaultRippleAlpha] functions for the
- * default implementations for color and alpha.
- */
-@get:ExperimentalRippleApi
-@ExperimentalRippleApi
-public val LocalRippleTheme: ProvidableCompositionLocal<RippleTheme> =
-    staticCompositionLocalOf { DebugRippleTheme }
+        if (draggedAlpha != other.draggedAlpha) return false
+        if (focusedAlpha != other.focusedAlpha) return false
+        if (hoveredAlpha != other.hoveredAlpha) return false
+        if (pressedAlpha != other.pressedAlpha) return false
 
-@Suppress("unused")
-@OptIn(ExperimentalRippleApi::class)
-private sealed class DefaultRippleAlpha(
-    val pressed: Float,
-    val focused: Float,
-    val dragged: Float,
-    val hovered: Float
-) : RippleAlpha {
-    override fun alphaForInteraction(interaction: Interaction): Float = when (interaction) {
-        Interaction.Pressed -> pressed
-        Interaction.Dragged -> dragged
-        else -> 0f
+        return true
+    }
+
+    override fun hashCode(): Int {
+        var result = draggedAlpha.hashCode()
+        result = 31 * result + focusedAlpha.hashCode()
+        result = 31 * result + hoveredAlpha.hashCode()
+        result = 31 * result + pressedAlpha.hashCode()
+        return result
+    }
+
+    override fun toString(): String {
+        return "RippleAlpha(draggedAlpha=$draggedAlpha, focusedAlpha=$focusedAlpha, " +
+            "hoveredAlpha=$hoveredAlpha, pressedAlpha=$pressedAlpha)"
     }
 }
+
+/**
+ * CompositionLocal used for providing [RippleTheme] down the tree.
+ *
+ * See [RippleTheme.defaultRippleColor] and [RippleTheme.defaultRippleAlpha] functions for the
+ * default implementations for color and alpha.
+ */
+public val LocalRippleTheme: ProvidableCompositionLocal<RippleTheme> =
+    staticCompositionLocalOf { DebugRippleTheme }
 
 /**
  * Alpha values for high luminance content in a light theme.
@@ -165,11 +159,11 @@ private sealed class DefaultRippleAlpha(
  * These levels are typically used for text / iconography in primary colored tabs /
  * bottom navigation / etc.
  */
-private object LightThemeHighContrastRippleAlpha : DefaultRippleAlpha(
-    pressed = 0.24f,
-    focused = 0.24f,
-    dragged = 0.16f,
-    hovered = 0.08f
+private val LightThemeHighContrastRippleAlpha = RippleAlpha(
+    pressedAlpha = 0.24f,
+    focusedAlpha = 0.24f,
+    draggedAlpha = 0.16f,
+    hoveredAlpha = 0.08f
 )
 
 /**
@@ -181,21 +175,21 @@ private object LightThemeHighContrastRippleAlpha : DefaultRippleAlpha(
  * These levels are typically used for body text on the main surface (white in light theme, grey
  * in dark theme) and text / iconography in surface colored tabs / bottom navigation / etc.
  */
-private object LightThemeLowContrastRippleAlpha : DefaultRippleAlpha(
-    pressed = 0.12f,
-    focused = 0.12f,
-    dragged = 0.08f,
-    hovered = 0.04f
+private val LightThemeLowContrastRippleAlpha = RippleAlpha(
+    pressedAlpha = 0.12f,
+    focusedAlpha = 0.12f,
+    draggedAlpha = 0.08f,
+    hoveredAlpha = 0.04f
 )
 
 /**
  * Alpha levels for all content in a dark theme.
  */
-private object DarkThemeRippleAlpha : DefaultRippleAlpha(
-    pressed = 0.10f,
-    focused = 0.12f,
-    dragged = 0.08f,
-    hovered = 0.04f
+private val DarkThemeRippleAlpha = RippleAlpha(
+    pressedAlpha = 0.10f,
+    focusedAlpha = 0.12f,
+    draggedAlpha = 0.08f,
+    hoveredAlpha = 0.04f
 )
 
 /**
@@ -203,14 +197,13 @@ private object DarkThemeRippleAlpha : DefaultRippleAlpha(
  * instead provide your own theme with meaningful values - this exists as an alternative to
  * crashing if no theme is provided.
  */
-@ExperimentalRippleApi
 @Immutable
 private object DebugRippleTheme : RippleTheme {
     @Composable
-    override fun defaultColor() = RippleTheme.defaultRippleColor(Color.Black, lightTheme = true)
+    override fun defaultColor() = defaultRippleColor(Color.Black, lightTheme = true)
 
     @Composable
-    override fun rippleAlpha(): RippleAlpha = RippleTheme.defaultRippleAlpha(
+    override fun rippleAlpha(): RippleAlpha = defaultRippleAlpha(
         Color.Black,
         lightTheme = true
     )

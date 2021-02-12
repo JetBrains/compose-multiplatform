@@ -16,13 +16,12 @@
 
 package androidx.compose.foundation.text
 
-import androidx.compose.foundation.layout.width
-import androidx.compose.runtime.Providers
+import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.foundation.layout.requiredWidth
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.test.junit4.createComposeRule
-import androidx.compose.ui.text.InternalTextApi
 import androidx.compose.ui.text.TextLayoutResult
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.Font
@@ -43,7 +42,6 @@ import org.junit.runner.RunWith
 
 @LargeTest
 @RunWith(AndroidJUnit4::class)
-@OptIn(InternalTextApi::class)
 class CoreTextFieldSoftWrapTest {
 
     private val fontFamily = Font(
@@ -67,14 +65,14 @@ class CoreTextFieldSoftWrapTest {
         var width: Int? = null
 
         rule.setContent {
-            Providers(LocalDensity provides density) {
+            CompositionLocalProvider(LocalDensity provides density) {
                 CoreTextField(
                     value = TextFieldValue(string),
                     onValueChange = {},
                     textStyle = textStyle,
                     softWrap = false,
                     onTextLayout = { textLayout = it },
-                    modifier = Modifier.width(composableWidth)
+                    modifier = Modifier.requiredWidth(composableWidth)
                         .onGloballyPositioned {
                             width = it.size.width
                         }
@@ -104,14 +102,14 @@ class CoreTextFieldSoftWrapTest {
         var width: Int? = null
 
         rule.setContent {
-            Providers(LocalDensity provides density) {
+            CompositionLocalProvider(LocalDensity provides density) {
                 CoreTextField(
                     value = TextFieldValue(string),
                     onValueChange = {},
                     textStyle = textStyle,
                     softWrap = true,
                     onTextLayout = { textLayout = it },
-                    modifier = Modifier.width(composableWidth)
+                    modifier = Modifier.requiredWidth(composableWidth)
                         .onGloballyPositioned {
                             width = it.size.width
                         }

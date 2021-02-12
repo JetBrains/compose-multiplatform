@@ -24,8 +24,8 @@ import androidx.compose.ui.focus.FocusModifier
 import androidx.compose.ui.focus.FocusOrderModifier
 import androidx.compose.ui.focus.FocusRequesterModifier
 import androidx.compose.ui.geometry.Offset
-import androidx.compose.ui.gesture.nestedscroll.NestedScrollDelegatingWrapper
-import androidx.compose.ui.gesture.nestedscroll.NestedScrollModifier
+import androidx.compose.ui.input.nestedscroll.NestedScrollDelegatingWrapper
+import androidx.compose.ui.input.nestedscroll.NestedScrollModifier
 import androidx.compose.ui.graphics.Canvas
 import androidx.compose.ui.input.key.KeyInputModifier
 import androidx.compose.ui.input.pointer.PointerInputFilter
@@ -38,6 +38,7 @@ import androidx.compose.ui.layout.LayoutCoordinates
 import androidx.compose.ui.layout.LayoutInfo
 import androidx.compose.ui.layout.LayoutModifier
 import androidx.compose.ui.layout.Measurable
+import androidx.compose.ui.layout.MeasurePolicy
 import androidx.compose.ui.layout.MeasureResult
 import androidx.compose.ui.layout.MeasureScope
 import androidx.compose.ui.layout.ModifierInfo
@@ -389,7 +390,7 @@ internal class LayoutNode : Measurable, Remeasurement, OwnerScope, LayoutInfo, C
 
     override fun toString(): String {
         return "${simpleIdentityToString(this, null)} children: ${children.size} " +
-            "measureBlocks: $measureBlocks"
+            "measurePolicy: $measurePolicy"
     }
 
     /**
@@ -418,36 +419,32 @@ internal class LayoutNode : Measurable, Remeasurement, OwnerScope, LayoutInfo, C
         return treeString
     }
 
-    internal abstract class NoIntrinsicsMeasureBlocks(private val error: String) : MeasureBlocks {
-        override fun minIntrinsicWidth(
-            intrinsicMeasureScope: IntrinsicMeasureScope,
+    internal abstract class NoIntrinsicsMeasurePolicy(private val error: String) : MeasurePolicy {
+        override fun IntrinsicMeasureScope.minIntrinsicWidth(
             measurables: List<IntrinsicMeasurable>,
-            h: Int
+            height: Int
         ) = error(error)
 
-        override fun minIntrinsicHeight(
-            intrinsicMeasureScope: IntrinsicMeasureScope,
+        override fun IntrinsicMeasureScope.minIntrinsicHeight(
             measurables: List<IntrinsicMeasurable>,
-            w: Int
+            width: Int
         ) = error(error)
 
-        override fun maxIntrinsicWidth(
-            intrinsicMeasureScope: IntrinsicMeasureScope,
+        override fun IntrinsicMeasureScope.maxIntrinsicWidth(
             measurables: List<IntrinsicMeasurable>,
-            h: Int
+            height: Int
         ) = error(error)
 
-        override fun maxIntrinsicHeight(
-            intrinsicMeasureScope: IntrinsicMeasureScope,
+        override fun IntrinsicMeasureScope.maxIntrinsicHeight(
             measurables: List<IntrinsicMeasurable>,
-            w: Int
+            width: Int
         ) = error(error)
     }
 
     /**
      * Blocks that define the measurement and intrinsic measurement of the layout.
      */
-    override var measureBlocks: MeasureBlocks = ErrorMeasureBlocks
+    override var measurePolicy: MeasurePolicy = ErrorMeasurePolicy
         set(value) {
             if (field != value) {
                 field = value
@@ -461,8 +458,7 @@ internal class LayoutNode : Measurable, Remeasurement, OwnerScope, LayoutInfo, C
     override var density: Density = Density(1f)
 
     /**
-     * The scope used to run the [MeasureBlocks.measure]
-     * [MeasureBlock][androidx.compose.ui.layout.MeasureBlock].
+     * The scope used to [measure][MeasurePolicy.measure] children.
      */
     internal val measureScope: MeasureScope = object : MeasureScope, Density {
         override val density: Float get() = this@LayoutNode.density.density
@@ -797,28 +793,29 @@ internal class LayoutNode : Measurable, Remeasurement, OwnerScope, LayoutInfo, C
      * Carries out a hit test on the [PointerInputModifier]s associated with this [LayoutNode] and
      * all [PointerInputModifier]s on all descendant [LayoutNode]s.
      *
-     * If [pointerPositionRelativeToScreen] is within the bounds of any tested
+     * If [pointerPosition] is within the bounds of any tested
      * [PointerInputModifier]s, the [PointerInputModifier] is added to [hitPointerInputFilters]
      * and true is returned.
      *
-     * @param pointerPositionRelativeToScreen The tested pointer position, which is relative to
-     * the device screen.
+     * @param pointerPosition The tested pointer position, which is relative to
+     * the LayoutNode.
      * @param hitPointerInputFilters The collection that the hit [PointerInputFilter]s will be
      * added to if hit.
      */
     internal fun hitTest(
-        pointerPositionRelativeToScreen: Offset,
+        pointerPosition: Offset,
         hitPointerInputFilters: MutableList<PointerInputFilter>
     ) {
-        outerLayoutNodeWrapper.hitTest(pointerPositionRelativeToScreen, hitPointerInputFilters)
+        val positionInWrapped = outerLayoutNodeWrapper.fromParentPosition(pointerPosition)
+        outerLayoutNodeWrapper.hitTest(positionInWrapped, hitPointerInputFilters)
     }
 
     /**
      * Returns the alignment line value for a given alignment line without affecting whether
      * the flag for whether the alignment line was read.
      */
-    internal fun getAlignmentLine(line: AlignmentLine): Int? {
-        val linePos = alignmentLines[line] ?: return null
+    internal fun getAlignmentLine(alignmentLine: AlignmentLine): Int? {
+        val linePos = alignmentLines[alignmentLine] ?: return null
         var pos = Offset(linePos.toFloat(), linePos.toFloat())
         var wrapper = innerLayoutNodeWrapper
         while (wrapper != outerLayoutNodeWrapper) {
@@ -826,7 +823,7 @@ internal class LayoutNode : Measurable, Remeasurement, OwnerScope, LayoutInfo, C
             wrapper = wrapper.wrappedBy!!
         }
         pos = wrapper.toParentPosition(pos)
-        return if (line is HorizontalAlignmentLine) {
+        return if (alignmentLine is HorizontalAlignmentLine) {
             pos.y.roundToInt()
         } else {
             pos.x.roundToInt()
@@ -1084,8 +1081,8 @@ internal class LayoutNode : Measurable, Remeasurement, OwnerScope, LayoutInfo, C
      * Execute your code within the [block] if you want some code to not be observed for the
      * model reads even if you are currently inside some observed scope like measuring.
      */
-    internal fun ignoreModelReads(block: () -> Unit) {
-        requireOwner().snapshotObserver.pauseSnapshotReadObservation(block)
+    internal fun withNoSnapshotReadObservation(block: () -> Unit) {
+        requireOwner().snapshotObserver.withNoSnapshotReadObservation(block)
     }
 
     internal fun dispatchOnPositionedCallbacks() {
@@ -1273,12 +1270,11 @@ internal class LayoutNode : Measurable, Remeasurement, OwnerScope, LayoutInfo, C
         get() = parent
 
     internal companion object {
-        private val ErrorMeasureBlocks: NoIntrinsicsMeasureBlocks =
-            object : NoIntrinsicsMeasureBlocks(
+        private val ErrorMeasurePolicy: NoIntrinsicsMeasurePolicy =
+            object : NoIntrinsicsMeasurePolicy(
                 error = "Undefined intrinsics block and it is required"
             ) {
-                override fun measure(
-                    measureScope: MeasureScope,
+                override fun MeasureScope.measure(
                     measurables: List<Measurable>,
                     constraints: Constraints
                 ) = error("Undefined measure and it is required")

@@ -19,7 +19,7 @@ package androidx.compose.ui.samples
 import androidx.annotation.Sampled
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.preferredSize
+import androidx.compose.foundation.layout.size
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
@@ -29,5 +29,5 @@ import androidx.compose.ui.unit.dp
 @Sampled
 @Composable
 fun AlphaSample() {
-    Box(Modifier.preferredSize(100.dp).alpha(alpha = 0.5f).background(Color.Red))
+    Box(Modifier.size(100.dp).alpha(alpha = 0.5f).background(Color.Red))
 }

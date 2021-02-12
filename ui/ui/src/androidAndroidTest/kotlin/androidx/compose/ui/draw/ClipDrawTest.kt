@@ -19,7 +19,7 @@ package androidx.compose.ui.draw
 import android.graphics.Bitmap
 import android.os.Build
 import androidx.activity.compose.setContent
-import androidx.compose.runtime.Providers
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.AtLeastSize
 import androidx.compose.ui.Modifier
@@ -485,7 +485,7 @@ class ClipDrawTest {
 
         rule.runOnUiThreadIR {
             activity.setContent {
-                Providers(LocalLayoutDirection provides direction.value) {
+                CompositionLocalProvider(LocalLayoutDirection provides direction.value) {
                     AtLeastSize(
                         size = 30,
                         modifier = Modifier.fillColor(Color.Green)

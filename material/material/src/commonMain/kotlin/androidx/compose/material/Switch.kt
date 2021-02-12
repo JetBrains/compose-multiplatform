@@ -18,15 +18,19 @@ package androidx.compose.material
 
 import androidx.compose.animation.core.TweenSpec
 import androidx.compose.foundation.Canvas
-import androidx.compose.foundation.Interaction
-import androidx.compose.foundation.InteractionState
+import androidx.compose.foundation.interaction.Interaction
+import androidx.compose.foundation.interaction.InteractionSource
+import androidx.compose.foundation.gestures.Orientation
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.indication
+import androidx.compose.foundation.interaction.collectIsDraggedAsState
+import androidx.compose.foundation.interaction.collectIsPressedAsState
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxScope
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.requiredSize
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.selection.toggleable
 import androidx.compose.foundation.shape.CircleShape
@@ -41,7 +45,6 @@ import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
-import androidx.compose.ui.gesture.scrollorientationlocking.Orientation
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.compositeOver
@@ -59,15 +62,16 @@ import kotlin.math.roundToInt
  *
  * @sample androidx.compose.material.samples.SwitchSample
  *
- * @param checked whether or not this components is checked
+ * @param checked whether or not this component is checked
  * @param onCheckedChange callback to be invoked when Switch is being clicked,
- * therefore the change of checked state is requested.
+ * therefore the change of checked state is requested.  If null, then this is passive
+ * and relies entirely on a higher-level component to control the "checked" state.
  * @param modifier Modifier to be applied to the switch layout
- * @param enabled whether or not components is enabled and can be clicked to request state change
- * @param interactionState the [InteractionState] representing the different [Interaction]s
- * present on this Switch. You can create and pass in your own remembered
- * [InteractionState] if you want to read the [InteractionState] and customize the appearance /
- * behavior of this Switch in different [Interaction]s.
+ * @param enabled whether the component is enabled or grayed out
+ * @param interactionSource the [MutableInteractionSource] representing the stream of
+ * [Interaction]s for this Switch. You can create and pass in your own remembered
+ * [MutableInteractionSource] if you want to observe [Interaction]s and customize the
+ * appearance / behavior of this Switch in different [Interaction]s.
  * @param colors [SwitchColors] that will be used to determine the color of the thumb and track
  * in different states. See [SwitchDefaults.colors].
  */
@@ -75,46 +79,53 @@ import kotlin.math.roundToInt
 @OptIn(ExperimentalMaterialApi::class)
 fun Switch(
     checked: Boolean,
-    onCheckedChange: (Boolean) -> Unit,
+    onCheckedChange: ((Boolean) -> Unit)?,
     modifier: Modifier = Modifier,
     enabled: Boolean = true,
-    interactionState: InteractionState = remember { InteractionState() },
+    interactionSource: MutableInteractionSource = remember { MutableInteractionSource() },
     colors: SwitchColors = SwitchDefaults.colors()
 ) {
     val minBound = 0f
     val maxBound = with(LocalDensity.current) { ThumbPathLength.toPx() }
-    val swipeableState = rememberSwipeableStateFor(checked, onCheckedChange, AnimationSpec)
+    val swipeableState = rememberSwipeableStateFor(checked, onCheckedChange ?: {}, AnimationSpec)
     val isRtl = LocalLayoutDirection.current == LayoutDirection.Rtl
-    Box(
-        modifier
-            .toggleable(
+    val toggleableModifier =
+        if (onCheckedChange != null) {
+            Modifier.toggleable(
                 value = checked,
                 onValueChange = onCheckedChange,
                 enabled = enabled,
                 role = Role.Switch,
-                interactionState = interactionState,
+                interactionSource = interactionSource,
                 indication = null
             )
+        } else {
+            Modifier
+        }
+
+    Box(
+        modifier
+            .then(toggleableModifier)
             .swipeable(
                 state = swipeableState,
                 anchors = mapOf(minBound to false, maxBound to true),
                 thresholds = { _, _ -> FractionalThreshold(0.5f) },
                 orientation = Orientation.Horizontal,
-                enabled = enabled,
+                enabled = enabled && onCheckedChange != null,
                 reverseDirection = isRtl,
-                interactionState = interactionState,
+                interactionSource = interactionSource,
                 resistance = null
             )
             .wrapContentSize(Alignment.Center)
             .padding(DefaultSwitchPadding)
-            .size(SwitchWidth, SwitchHeight)
+            .requiredSize(SwitchWidth, SwitchHeight)
     ) {
         SwitchImpl(
             checked = checked,
             enabled = enabled,
             colors = colors,
             thumbValue = swipeableState.offset,
-            interactionState = interactionState
+            interactionSource = interactionSource
         )
     }
 }
@@ -153,10 +164,11 @@ private fun BoxScope.SwitchImpl(
     enabled: Boolean,
     colors: SwitchColors,
     thumbValue: State<Float>,
-    interactionState: InteractionState
+    interactionSource: InteractionSource
 ) {
-    val hasInteraction =
-        Interaction.Pressed in interactionState || Interaction.Dragged in interactionState
+    val isPressed by interactionSource.collectIsPressedAsState()
+    val isDragged by interactionSource.collectIsDraggedAsState()
+    val hasInteraction = isPressed || isDragged
     val elevation = if (hasInteraction) {
         ThumbPressedElevation
     } else {
@@ -175,10 +187,10 @@ private fun BoxScope.SwitchImpl(
             .align(Alignment.CenterStart)
             .offset { IntOffset(thumbValue.value.roundToInt(), 0) }
             .indication(
-                interactionState = interactionState,
+                interactionSource = interactionSource,
                 indication = rememberRipple(bounded = false, radius = ThumbRippleRadius)
             )
-            .size(ThumbDiameter),
+            .requiredSize(ThumbDiameter),
         content = {}
     )
 }

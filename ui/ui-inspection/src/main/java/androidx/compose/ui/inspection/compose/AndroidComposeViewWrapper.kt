@@ -17,10 +17,10 @@
 package androidx.compose.ui.inspection.compose
 
 import android.view.View
+import androidx.compose.ui.inspection.inspector.LayoutInspectorTree
 import androidx.compose.ui.inspection.proto.StringTable
 import androidx.compose.ui.inspection.proto.toComposableNodes
 import androidx.compose.ui.inspection.util.ThreadUtils
-import androidx.compose.ui.tooling.inspector.LayoutInspectorTree
 import layoutinspector.compose.inspection.LayoutInspectorComposeProtocol.ComposableRoot
 
 /**

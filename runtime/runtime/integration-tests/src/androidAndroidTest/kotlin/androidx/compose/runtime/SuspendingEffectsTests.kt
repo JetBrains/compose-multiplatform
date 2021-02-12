@@ -23,7 +23,6 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
-import org.junit.After
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -37,11 +36,6 @@ import kotlin.test.assertTrue
 @MediumTest
 @RunWith(AndroidJUnit4::class)
 class SuspendingEffectsTests : BaseComposeTest() {
-
-    @After
-    fun teardown() {
-        clearRoots()
-    }
 
     @get:Rule
     override val activityRule = makeTestActivityRule()
@@ -158,7 +152,7 @@ class SuspendingEffectsTests : BaseComposeTest() {
         }
     }
 
-    @OptIn(ExperimentalComposeApi::class, InternalComposeApi::class)
+    @OptIn(InternalComposeApi::class)
     @Test
     fun testCoroutineScopesHaveCorrectFrameClock() {
         var recomposerClock: MonotonicFrameClock? = null

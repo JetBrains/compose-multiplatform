@@ -24,12 +24,12 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.heightIn
+import androidx.compose.foundation.layout.requiredHeight
+import androidx.compose.foundation.layout.requiredHeightIn
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.preferredHeight
-import androidx.compose.foundation.layout.preferredWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.requiredWidth
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.selection.selectable
@@ -111,7 +111,7 @@ fun VerticalAlignmentsInTextField() {
         val label = remember { mutableStateOf(false) }
         val text = remember { mutableStateOf("") }
 
-        Spacer(Modifier.height(10.dp))
+        Spacer(Modifier.requiredHeight(10.dp))
         OptionRow(
             title = "Single line",
             checked = singleLine.value,
@@ -123,12 +123,12 @@ fun VerticalAlignmentsInTextField() {
             onCheckedChange = { label.value = it }
         )
 
-        Spacer(Modifier.height(10.dp))
+        Spacer(Modifier.requiredHeight(10.dp))
         val textFieldModifier = Modifier
             .align(Alignment.CenterHorizontally)
-            .width(300.dp)
-            .heightIn(max = 200.dp)
-            .then(if (singleLine.value) Modifier else Modifier.heightIn(min = 100.dp))
+            .requiredWidth(300.dp)
+            .requiredHeightIn(max = 200.dp)
+            .then(if (singleLine.value) Modifier else Modifier.requiredHeightIn(min = 100.dp))
         TextField(
             value = text.value,
             onValueChange = { text.value = it },
@@ -136,7 +136,7 @@ fun VerticalAlignmentsInTextField() {
             singleLine = singleLine.value,
             modifier = textFieldModifier
         )
-        Spacer(Modifier.height(10.dp))
+        Spacer(Modifier.requiredHeight(10.dp))
         OutlinedTextField(
             value = text.value,
             onValueChange = { text.value = it },
@@ -180,8 +180,8 @@ fun MaterialTextFieldDemo() {
                         trailingIcon = {
                             if (trailingChecked) Icon(Icons.Filled.Info, "Info")
                         },
-                        isErrorValue = selectedOption == Option.Error,
-                        modifier = Modifier.width(300.dp)
+                        isError = selectedOption == Option.Error,
+                        modifier = Modifier.requiredWidth(300.dp)
                     )
                 TextFieldType.Outlined ->
                     OutlinedTextField(
@@ -201,13 +201,13 @@ fun MaterialTextFieldDemo() {
                         trailingIcon = {
                             if (trailingChecked) Icon(Icons.Filled.Info, "Info")
                         },
-                        isErrorValue = selectedOption == Option.Error,
-                        modifier = Modifier.width(300.dp)
+                        isError = selectedOption == Option.Error,
+                        modifier = Modifier.requiredWidth(300.dp)
                     )
             }
         }
 
-        Box(Modifier.preferredHeight(150.dp).align(Alignment.CenterHorizontally)) {
+        Box(Modifier.height(150.dp).align(Alignment.CenterHorizontally)) {
             if (selectedOption == Option.None) {
                 textField()
             } else {
@@ -264,7 +264,7 @@ fun MaterialTextFieldDemo() {
                 onCheckedChange = { /* TODO */ }
             )
 
-            Spacer(Modifier.preferredHeight(20.dp))
+            Spacer(Modifier.height(20.dp))
 
             Title("Assistive text")
             Option.values().map { it.name }.forEach { text ->
@@ -339,7 +339,7 @@ private fun ColumnScope.Title(title: String) {
         style = MaterialTheme.typography.body1,
         modifier = Modifier.align(Alignment.CenterHorizontally)
     )
-    Spacer(Modifier.preferredHeight(10.dp))
+    Spacer(Modifier.height(10.dp))
 }
 
 @Composable
@@ -351,7 +351,7 @@ private fun OptionRow(
 ) {
     Row(Modifier.padding(start = 10.dp, top = 10.dp)) {
         Checkbox(checked = checked, onCheckedChange = onCheckedChange, enabled = enabled)
-        Spacer(Modifier.preferredWidth(20.dp))
+        Spacer(Modifier.width(20.dp))
         Text(text = title, style = MaterialTheme.typography.body1)
     }
 }

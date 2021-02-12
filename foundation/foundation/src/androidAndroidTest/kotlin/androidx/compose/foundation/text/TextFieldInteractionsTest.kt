@@ -16,12 +16,16 @@
 
 package androidx.compose.foundation.text
 
-import androidx.compose.foundation.Interaction
-import androidx.compose.foundation.InteractionState
+import androidx.compose.foundation.interaction.DragInteraction
+import androidx.compose.foundation.interaction.FocusInteraction
+import androidx.compose.foundation.interaction.Interaction
+import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.interaction.PressInteraction
 import androidx.compose.foundation.focusable
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.requiredSize
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
@@ -36,19 +40,20 @@ import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.performGesture
 import androidx.compose.ui.test.up
-import androidx.compose.ui.text.InternalTextApi
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.MediumTest
 import com.google.common.truth.Truth.assertThat
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.launch
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 
 @MediumTest
 @RunWith(AndroidJUnit4::class)
-@OptIn(InternalTextApi::class)
 class TextFieldInteractionsTest {
 
     @get:Rule
@@ -59,185 +64,304 @@ class TextFieldInteractionsTest {
     @Test
     fun coreTextField_interaction_pressed() {
         val state = mutableStateOf(TextFieldValue(""))
-        val interactionState = InteractionState()
+        val interactionSource = MutableInteractionSource()
+        var scope: CoroutineScope? = null
         rule.setContent {
+            scope = rememberCoroutineScope()
             BasicTextField(
                 modifier = Modifier.testTag(testTag),
                 value = state.value,
                 onValueChange = { state.value = it },
-                interactionState = interactionState
+                interactionSource = interactionSource
             )
         }
-        assertThat(interactionState.value).doesNotContain(Interaction.Pressed)
+        val interactions = mutableListOf<Interaction>()
+
+        scope!!.launch {
+            interactionSource.interactions.collect { interactions.add(it) }
+        }
+
+        rule.runOnIdle {
+            assertThat(interactions).isEmpty()
+        }
         rule.onNodeWithTag(testTag)
             .performGesture {
                 down(center)
             }
-        assertThat(interactionState.value).contains(Interaction.Pressed)
+        rule.runOnIdle {
+            // Not asserting total size as we have other interactions here too
+            assertThat(interactions.filterIsInstance<PressInteraction.Press>()).hasSize(1)
+        }
         rule.onNodeWithTag(testTag)
             .performGesture {
                 up()
             }
-        assertThat(interactionState.value).doesNotContain(Interaction.Pressed)
+        rule.runOnIdle {
+            // Not asserting total size as we have other interactions here too
+            assertThat(interactions.filterIsInstance<PressInteraction.Press>()).hasSize(1)
+            assertThat(interactions.filterIsInstance<PressInteraction.Release>()).hasSize(1)
+        }
     }
 
     @Test
     fun coreTextField_interaction_pressed_removedWhenCancelled() {
         val state = mutableStateOf(TextFieldValue(""))
-        val interactionState = InteractionState()
+        val interactionSource = MutableInteractionSource()
+        var scope: CoroutineScope? = null
         rule.setContent {
+            scope = rememberCoroutineScope()
             BasicTextField(
                 modifier = Modifier.testTag(testTag),
                 value = state.value,
                 onValueChange = { state.value = it },
-                interactionState = interactionState
+                interactionSource = interactionSource
             )
         }
-        assertThat(interactionState.value).doesNotContain(Interaction.Pressed)
+        val interactions = mutableListOf<Interaction>()
+
+        scope!!.launch {
+            interactionSource.interactions.collect { interactions.add(it) }
+        }
+
+        rule.runOnIdle {
+            assertThat(interactions).isEmpty()
+        }
         rule.onNodeWithTag(testTag)
             .performGesture {
                 down(center)
             }
-        assertThat(interactionState.value).contains(Interaction.Pressed)
+        rule.runOnIdle {
+            // Not asserting total size as we have other interactions here too
+            assertThat(interactions.filterIsInstance<PressInteraction.Press>()).hasSize(1)
+        }
         rule.onNodeWithTag(testTag)
             .performGesture {
                 cancel()
             }
-        assertThat(interactionState.value).doesNotContain(Interaction.Pressed)
+        rule.runOnIdle {
+            // Not asserting total size as we have other interactions here too
+            assertThat(interactions.filterIsInstance<PressInteraction.Press>()).hasSize(1)
+            assertThat(interactions.filterIsInstance<PressInteraction.Cancel>()).hasSize(1)
+        }
     }
 
     @Test
     fun coreTextField_interaction_focused() {
         val state = mutableStateOf(TextFieldValue(""))
-        val interactionState = InteractionState()
+        val interactionSource = MutableInteractionSource()
         val focusRequester = FocusRequester()
+        var scope: CoroutineScope? = null
         rule.setContent {
+            scope = rememberCoroutineScope()
             BasicTextField(
                 modifier = Modifier.testTag(testTag),
                 value = state.value,
                 onValueChange = { state.value = it },
-                interactionState = interactionState
+                interactionSource = interactionSource
             )
             Box(
-                modifier = Modifier.size(10.dp).focusRequester(focusRequester).focusable(),
+                modifier = Modifier.requiredSize(10.dp).focusRequester(focusRequester).focusable(),
             )
         }
-        assertThat(interactionState.value).doesNotContain(Interaction.Focused)
+        val interactions = mutableListOf<Interaction>()
+
+        scope!!.launch {
+            interactionSource.interactions.collect { interactions.add(it) }
+        }
+
+        rule.runOnIdle {
+            assertThat(interactions).isEmpty()
+        }
         rule.onNodeWithTag(testTag)
             .performClick()
-        assertThat(interactionState.value).contains(Interaction.Focused)
+        rule.runOnIdle {
+            // Not asserting total size as we have other interactions here too
+            assertThat(interactions.filterIsInstance<FocusInteraction.Focus>()).hasSize(1)
+        }
         rule.runOnIdle {
             // request focus on the box so TextField will lose it
             focusRequester.requestFocus()
         }
-        assertThat(interactionState.value).doesNotContain(Interaction.Focused)
+        rule.runOnIdle {
+            // Not asserting total size as we have other interactions here too
+            assertThat(interactions.filterIsInstance<FocusInteraction.Focus>()).hasSize(1)
+            assertThat(interactions.filterIsInstance<FocusInteraction.Unfocus>()).hasSize(1)
+        }
     }
 
     @Test
     fun coreTextField_interaction_horizontally_dragged() {
         val state = mutableStateOf(TextFieldValue("test ".repeat(100)))
-        val interactionState = InteractionState()
+        val interactionSource = MutableInteractionSource()
+        var scope: CoroutineScope? = null
         rule.setContent {
+            scope = rememberCoroutineScope()
             BasicTextField(
                 modifier = Modifier.testTag(testTag),
                 value = state.value,
                 singleLine = true,
                 onValueChange = { state.value = it },
-                interactionState = interactionState
+                interactionSource = interactionSource
             )
         }
-        assertThat(interactionState.value).doesNotContain(Interaction.Dragged)
+        val interactions = mutableListOf<Interaction>()
+
+        scope!!.launch {
+            interactionSource.interactions.collect { interactions.add(it) }
+        }
+
+        rule.runOnIdle {
+            assertThat(interactions).isEmpty()
+        }
         rule.onNodeWithTag(testTag)
             .performGesture {
                 down(center)
                 moveBy(Offset(x = 100f, y = 0f))
             }
-        assertThat(interactionState.value).contains(Interaction.Dragged)
+        rule.runOnIdle {
+            // Not asserting total size as we have other interactions here too
+            assertThat(interactions.filterIsInstance<DragInteraction.Start>()).hasSize(1)
+        }
         rule.onNodeWithTag(testTag)
             .performGesture {
                 up()
             }
-        assertThat(interactionState.value).doesNotContain(Interaction.Dragged)
+        rule.runOnIdle {
+            // Not asserting total size as we have other interactions here too
+            assertThat(interactions.filterIsInstance<DragInteraction.Start>()).hasSize(1)
+            assertThat(interactions.filterIsInstance<DragInteraction.Stop>()).hasSize(1)
+        }
     }
 
     @Test
     fun coreTextField_interaction_dragged_horizontally_cancelled() {
         val state = mutableStateOf(TextFieldValue("test ".repeat(100)))
-        val interactionState = InteractionState()
+        val interactionSource = MutableInteractionSource()
+        var scope: CoroutineScope? = null
         rule.setContent {
+            scope = rememberCoroutineScope()
             BasicTextField(
                 modifier = Modifier.testTag(testTag),
                 value = state.value,
                 singleLine = true,
                 onValueChange = { state.value = it },
-                interactionState = interactionState
+                interactionSource = interactionSource
             )
         }
-        assertThat(interactionState.value).doesNotContain(Interaction.Dragged)
+        val interactions = mutableListOf<Interaction>()
+
+        scope!!.launch {
+            interactionSource.interactions.collect { interactions.add(it) }
+        }
+
+        rule.runOnIdle {
+            assertThat(interactions).isEmpty()
+        }
         rule.onNodeWithTag(testTag)
             .performGesture {
                 down(center)
                 moveBy(Offset(x = 100f, y = 0f))
             }
-        assertThat(interactionState.value).contains(Interaction.Dragged)
+        rule.runOnIdle {
+            // Not asserting total size as we have other interactions here too
+            assertThat(interactions.filterIsInstance<DragInteraction.Start>()).hasSize(1)
+        }
         rule.onNodeWithTag(testTag)
             .performGesture {
                 cancel()
             }
-        assertThat(interactionState.value).doesNotContain(Interaction.Dragged)
+        rule.runOnIdle {
+            // Not asserting total size as we have other interactions here too
+            assertThat(interactions.filterIsInstance<DragInteraction.Start>()).hasSize(1)
+            assertThat(interactions.filterIsInstance<DragInteraction.Stop>()).hasSize(1)
+        }
     }
 
     @Test
     fun coreTextField_interaction_vertically_dragged() {
         val state = mutableStateOf(TextFieldValue("test\n".repeat(10)))
-        val interactionState = InteractionState()
+        val interactionSource = MutableInteractionSource()
+        var scope: CoroutineScope? = null
         rule.setContent {
+            scope = rememberCoroutineScope()
             BasicTextField(
-                modifier = Modifier.size(50.dp).testTag(testTag),
+                modifier = Modifier.requiredSize(50.dp).testTag(testTag),
                 value = state.value,
                 maxLines = 3,
                 onValueChange = { state.value = it },
-                interactionState = interactionState
+                interactionSource = interactionSource
             )
         }
-        assertThat(interactionState.value).doesNotContain(Interaction.Dragged)
+        val interactions = mutableListOf<Interaction>()
+
+        scope!!.launch {
+            interactionSource.interactions.collect { interactions.add(it) }
+        }
+
+        rule.runOnIdle {
+            assertThat(interactions).isEmpty()
+        }
         rule.onNodeWithTag(testTag)
             .performGesture {
                 down(center)
                 moveBy(Offset(x = 0f, y = 150f))
             }
-        assertThat(interactionState.value).contains(Interaction.Dragged)
+        rule.runOnIdle {
+            // Not asserting total size as we have other interactions here too
+            assertThat(interactions.filterIsInstance<DragInteraction.Start>()).hasSize(1)
+        }
         rule.onNodeWithTag(testTag)
             .performGesture {
                 up()
             }
-        assertThat(interactionState.value).doesNotContain(Interaction.Dragged)
+        rule.runOnIdle {
+            // Not asserting total size as we have other interactions here too
+            assertThat(interactions.filterIsInstance<DragInteraction.Start>()).hasSize(1)
+            assertThat(interactions.filterIsInstance<DragInteraction.Stop>()).hasSize(1)
+        }
     }
 
     @Test
     fun coreTextField_interaction_dragged_vertically_cancelled() {
         val state = mutableStateOf(TextFieldValue("test\n".repeat(10)))
-        val interactionState = InteractionState()
+        val interactionSource = MutableInteractionSource()
+        var scope: CoroutineScope? = null
         rule.setContent {
+            scope = rememberCoroutineScope()
             BasicTextField(
-                modifier = Modifier.size(50.dp).testTag(testTag),
+                modifier = Modifier.requiredSize(50.dp).testTag(testTag),
                 value = state.value,
                 maxLines = 3,
                 onValueChange = { state.value = it },
-                interactionState = interactionState
+                interactionSource = interactionSource
             )
         }
-        assertThat(interactionState.value).doesNotContain(Interaction.Dragged)
+        val interactions = mutableListOf<Interaction>()
+
+        scope!!.launch {
+            interactionSource.interactions.collect { interactions.add(it) }
+        }
+
+        rule.runOnIdle {
+            assertThat(interactions).isEmpty()
+        }
         rule.onNodeWithTag(testTag)
             .performGesture {
                 down(center)
                 moveBy(Offset(x = 0f, y = 150f))
             }
-        assertThat(interactionState.value).contains(Interaction.Dragged)
+        rule.runOnIdle {
+            // Not asserting total size as we have other interactions here too
+            assertThat(interactions.filterIsInstance<DragInteraction.Start>()).hasSize(1)
+        }
         rule.onNodeWithTag(testTag)
             .performGesture {
                 cancel()
             }
-        assertThat(interactionState.value).doesNotContain(Interaction.Dragged)
+        rule.runOnIdle {
+            // Not asserting total size as we have other interactions here too
+            assertThat(interactions.filterIsInstance<DragInteraction.Start>()).hasSize(1)
+            assertThat(interactions.filterIsInstance<DragInteraction.Stop>()).hasSize(1)
+        }
     }
 }

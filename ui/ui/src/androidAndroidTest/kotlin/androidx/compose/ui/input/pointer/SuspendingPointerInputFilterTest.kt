@@ -18,7 +18,6 @@ package androidx.compose.ui.input.pointer
 
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.layout.Box
-import androidx.compose.runtime.ExperimentalComposeApi
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
@@ -34,7 +33,7 @@ import androidx.compose.ui.unit.IntSize
 import androidx.lifecycle.Lifecycle
 import androidx.test.core.app.ActivityScenario
 import androidx.test.ext.junit.runners.AndroidJUnit4
-import androidx.test.filters.MediumTest
+import androidx.test.filters.LargeTest
 import androidx.test.filters.SmallTest
 import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.CompletableDeferred
@@ -240,9 +239,8 @@ class SuspendingPointerInputFilterTest {
         )
     }
 
-    @OptIn(ExperimentalComposeApi::class)
     @Test
-    @MediumTest
+    @LargeTest
     fun testRestartPointerInput() = runBlocking {
         var toAdd by mutableStateOf("initial")
         val result = mutableListOf<String>()

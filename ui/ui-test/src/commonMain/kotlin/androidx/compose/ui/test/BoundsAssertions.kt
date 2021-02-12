@@ -143,9 +143,9 @@ fun SemanticsNodeInteraction.assertLeftPositionInRootIsEqualTo(
  * Returns the position of an [alignment line][AlignmentLine], or [Dp.Unspecified] if the line is
  * not provided.
  */
-fun SemanticsNodeInteraction.getAlignmentLinePosition(line: AlignmentLine): Dp {
+fun SemanticsNodeInteraction.getAlignmentLinePosition(alignmentLine: AlignmentLine): Dp {
     return withDensity {
-        val pos = it.getAlignmentLinePosition(line)
+        val pos = it.getAlignmentLinePosition(alignmentLine)
         if (pos == AlignmentLine.Unspecified) {
             Dp.Unspecified
         } else {
@@ -168,38 +168,12 @@ fun SemanticsNodeInteraction.getAlignmentLinePosition(line: AlignmentLine): Dp {
  *
  * @throws AssertionError if comparison fails.
  */
-fun Dp.assertIsEqualTo(expected: Dp, subject: String = "", tolerance: Dp = Dp(.5f)) {
+private fun Dp.assertIsEqualTo(expected: Dp, subject: String = "", tolerance: Dp = Dp(.5f)) {
     val diff = (this - expected).value.absoluteValue
     if (diff > tolerance.value) {
         // Comparison failed, report the error in DPs
         throw AssertionError(
             "Actual $subject is $this, expected $expected (tolerance: $tolerance)"
-        )
-    }
-}
-
-/**
- * Asserts that this value is not equal to the given [unexpected] value.
- *
- * Performs the comparison with the given [tolerance] or the default one if none is provided. It is
- * recommended to use tolerance when comparing positions and size coming from the framework as there
- * can be rounding operation performed by individual layouts so the values can be slightly off from
- * the expected ones.
- *
- * @param unexpected The value to which this one should not be equal to.
- * @param subject Used in the error message to identify which item this assertion failed on.
- * @param tolerance The tolerance that is expected to be greater than the difference between the
- * given values to treat them as non-equal.
- *
- * @throws AssertionError if comparison fails.
- */
-fun Dp.assertIsNotEqualTo(unexpected: Dp, subject: String = "", tolerance: Dp = Dp(.5f)) {
-    val diff = (this - unexpected).value.absoluteValue
-    if (diff <= tolerance.value) {
-        // Comparison failed, report the error in DPs
-        throw AssertionError(
-            "Actual $subject is $this, not expected to be equal to $unexpected within a " +
-                "tolerance of $tolerance"
         )
     }
 }

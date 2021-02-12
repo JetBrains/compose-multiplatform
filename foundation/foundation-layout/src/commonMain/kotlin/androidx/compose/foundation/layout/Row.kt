@@ -41,10 +41,10 @@ import androidx.compose.ui.platform.debugInspectorInfo
  *
  * When none of its children have weights, a [Row] will be as small as possible to fit its
  * children one next to the other. In order to change the width of the [Row], use the
- * [Modifier.width] modifiers; e.g. to make it fill the available width [Modifier.fillMaxWidth]
+ * [Modifier.requiredWidth] modifiers; e.g. to make it fill the available width [Modifier.fillMaxWidth]
  * can be used. If at least one child of a [Row] has a [weight][RowScope.weight], the [Row] will
  * fill the available width, so there is no need for [Modifier.fillMaxWidth]. However, if [Row]'s
- * size should be limited, the [Modifier.width] or [Modifier.size] layout modifiers should be
+ * size should be limited, the [Modifier.requiredWidth] or [Modifier.requiredSize] layout modifiers should be
  * applied.
  *
  * When the size of the [Row] is larger than the sum of its children sizes, a
@@ -70,13 +70,10 @@ inline fun Row(
     verticalAlignment: Alignment.Vertical = Alignment.Top,
     content: @Composable RowScope.() -> Unit
 ) {
-    val measureBlocks = rowMeasureBlocks(
-        horizontalArrangement,
-        verticalAlignment
-    )
+    val measurePolicy = rowMeasurePolicy(horizontalArrangement, verticalAlignment)
     Layout(
         content = { RowScope.content() },
-        measureBlocks = measureBlocks,
+        measurePolicy = measurePolicy,
         modifier = modifier
     )
 }
@@ -85,7 +82,7 @@ inline fun Row(
  * MeasureBlocks to use when horizontalArrangement and verticalAlignment are not provided.
  */
 @PublishedApi
-internal val DefaultRowMeasureBlocks = rowColumnMeasureBlocks(
+internal val DefaultRowMeasurePolicy = rowColumnMeasurePolicy(
     orientation = LayoutOrientation.Horizontal,
     arrangement = { totalSize, size, layoutDirection, density, outPosition ->
         with(Arrangement.Start) { density.arrange(totalSize, size, layoutDirection, outPosition) }
@@ -97,14 +94,14 @@ internal val DefaultRowMeasureBlocks = rowColumnMeasureBlocks(
 
 @PublishedApi
 @Composable
-internal fun rowMeasureBlocks(
+internal fun rowMeasurePolicy(
     horizontalArrangement: Arrangement.Horizontal,
     verticalAlignment: Alignment.Vertical
 ) = remember(horizontalArrangement, verticalAlignment) {
     if (horizontalArrangement == Arrangement.Start && verticalAlignment == Alignment.Top) {
-        DefaultRowMeasureBlocks
+        DefaultRowMeasurePolicy
     } else {
-        rowColumnMeasureBlocks(
+        rowColumnMeasurePolicy(
             orientation = LayoutOrientation.Horizontal,
             arrangement = { totalSize, size, layoutDirection, density, outPosition ->
                 with(horizontalArrangement) {
@@ -165,19 +162,13 @@ interface RowScope {
     @Stable
     fun Modifier.alignBy(alignmentLine: HorizontalAlignmentLine) = this.then(
         SiblingsAlignedModifier.WithAlignmentLine(
-            line = alignmentLine,
+            alignmentLine = alignmentLine,
             inspectorInfo = debugInspectorInfo {
                 name = "alignBy"
                 value = alignmentLine
             }
         )
     )
-
-    @Deprecated(
-        "alignWithSiblings was renamed to alignBy.",
-        ReplaceWith("alignBy(alignmentLine)")
-    )
-    fun Modifier.alignWithSiblings(alignmentLine: HorizontalAlignmentLine) = alignBy(alignmentLine)
 
     /**
      * Position the element vertically such that its first baseline aligns with sibling elements
@@ -254,13 +245,6 @@ interface RowScope {
             }
         )
     )
-
-    @Deprecated(
-        "alignWithSiblings was renamed to alignBy.",
-        ReplaceWith("alignBy(alignmentLineBlock)")
-    )
-    fun Modifier.alignWithSiblings(alignmentLineBlock: (Measured) -> Int) =
-        alignBy(alignmentLineBlock)
 
     companion object : RowScope
 }

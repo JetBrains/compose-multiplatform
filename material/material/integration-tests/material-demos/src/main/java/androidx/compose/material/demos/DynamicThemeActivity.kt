@@ -24,7 +24,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.preferredHeight
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.rememberLazyListState
@@ -40,11 +40,10 @@ import androidx.compose.material.Text
 import androidx.compose.material.TopAppBar
 import androidx.compose.material.lightColors
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.ExperimentalComposeApi
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.snapshots.snapshotFlow
+import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -98,7 +97,6 @@ private val LazyListState.scrollOffset: Float get() {
     }
 }
 
-@OptIn(ExperimentalComposeApi::class)
 @Composable
 private fun DynamicThemeApp(scrollFraction: ScrollFraction, palette: Colors) {
     MaterialTheme(palette) {
@@ -114,7 +112,7 @@ private fun DynamicThemeApp(scrollFraction: ScrollFraction, palette: Colors) {
             floatingActionButton = { Fab(scrollFraction) },
             floatingActionButtonPosition = FabPosition.Center,
             isFloatingActionButtonDocked = true,
-            bodyContent = { innerPadding ->
+            content = { innerPadding ->
                 LazyColumn(state = state, contentPadding = innerPadding) {
                     items(20) {
                         Card(it)
@@ -142,7 +140,7 @@ private fun Card(index: Int) {
     // colour from the Material theme to work out text colour, so we end up doing a
     // large amount of work here when the top level theme changes
     Box(
-        Modifier.padding(25.dp).fillMaxWidth().preferredHeight(150.dp)
+        Modifier.padding(25.dp).fillMaxWidth().height(150.dp)
             .background(shapeColor, RoundedCornerShape(10.dp)),
         contentAlignment = Alignment.Center
     ) {

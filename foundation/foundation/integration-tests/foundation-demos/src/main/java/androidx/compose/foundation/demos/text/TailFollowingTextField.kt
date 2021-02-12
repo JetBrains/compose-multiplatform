@@ -18,7 +18,7 @@ package androidx.compose.foundation.demos.text
 
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.requiredHeight
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
@@ -56,7 +56,7 @@ fun TailFollowingTextFieldDemo() {
             modifier = Modifier
                 .then(demoTextFieldModifiers)
                 .fillMaxWidth()
-                .height(120.dp)
+                .requiredHeight(120.dp)
                 .clipToBounds()
         )
     }

@@ -33,6 +33,6 @@ internal fun assertThat(charSequence: CharSequence?): CharSequenceSubject {
     return assertAbout(CharSequenceSubject.SUBJECT_FACTORY).that(charSequence)!!
 }
 
-fun IntegerSubject.isZero() {
+internal fun IntegerSubject.isZero() {
     this.isEqualTo(0)
 }

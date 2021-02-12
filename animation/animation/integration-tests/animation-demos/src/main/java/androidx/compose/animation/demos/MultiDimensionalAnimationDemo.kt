@@ -22,7 +22,7 @@ import androidx.compose.animation.core.spring
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.core.updateTransition
 import androidx.compose.foundation.Canvas
-import androidx.compose.foundation.InteractionState
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
@@ -70,7 +70,7 @@ fun MultiDimensionalAnimationDemo() {
         modifier = Modifier.fillMaxSize().clickable(
             onClick = onClick,
             indication = null,
-            interactionState = remember { InteractionState() }
+            interactionSource = remember { MutableInteractionSource() }
         )
     ) {
         width = size.width

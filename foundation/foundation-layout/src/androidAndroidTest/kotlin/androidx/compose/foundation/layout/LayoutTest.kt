@@ -32,7 +32,13 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.layout.AlignmentLine
+import androidx.compose.ui.layout.IntrinsicMeasurable
+import androidx.compose.ui.layout.IntrinsicMeasureScope
 import androidx.compose.ui.layout.Layout
+import androidx.compose.ui.layout.Measurable
+import androidx.compose.ui.layout.MeasurePolicy
+import androidx.compose.ui.layout.MeasureResult
+import androidx.compose.ui.layout.MeasureScope
 import androidx.compose.ui.layout.Placeable
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.node.Ref
@@ -158,23 +164,47 @@ open class LayoutTest {
         layouts.forEach { layout ->
             val layoutLatch = CountDownLatch(1)
             show {
-                Layout(
-                    layout,
-                    minIntrinsicWidthMeasureBlock = { _, _ -> 0 },
-                    minIntrinsicHeightMeasureBlock = { _, _ -> 0 },
-                    maxIntrinsicWidthMeasureBlock = { _, _ -> 0 },
-                    maxIntrinsicHeightMeasureBlock = { _, _ -> 0 }
-                ) { measurables, _ ->
-                    val measurable = measurables.first()
-                    test(
-                        { h -> measurable.minIntrinsicWidth(h) },
-                        { w -> measurable.minIntrinsicHeight(w) },
-                        { h -> measurable.maxIntrinsicWidth(h) },
-                        { w -> measurable.maxIntrinsicHeight(w) }
-                    )
-                    layoutLatch.countDown()
-                    layout(0, 0) {}
+                val measurePolicy = object : MeasurePolicy {
+                    override fun MeasureScope.measure(
+                        measurables: List<Measurable>,
+                        constraints: Constraints
+                    ): MeasureResult {
+                        val measurable = measurables.first()
+                        test(
+                            { h -> measurable.minIntrinsicWidth(h) },
+                            { w -> measurable.minIntrinsicHeight(w) },
+                            { h -> measurable.maxIntrinsicWidth(h) },
+                            { w -> measurable.maxIntrinsicHeight(w) }
+                        )
+                        layoutLatch.countDown()
+
+                        return layout(0, 0) {}
+                    }
+
+                    override fun IntrinsicMeasureScope.minIntrinsicWidth(
+                        measurables: List<IntrinsicMeasurable>,
+                        height: Int
+                    ) = 0
+
+                    override fun IntrinsicMeasureScope.minIntrinsicHeight(
+                        measurables: List<IntrinsicMeasurable>,
+                        width: Int
+                    ) = 0
+
+                    override fun IntrinsicMeasureScope.maxIntrinsicWidth(
+                        measurables: List<IntrinsicMeasurable>,
+                        height: Int
+                    ) = 0
+
+                    override fun IntrinsicMeasureScope.maxIntrinsicHeight(
+                        measurables: List<IntrinsicMeasurable>,
+                        width: Int
+                    ) = 0
                 }
+                Layout(
+                    content = layout,
+                    measurePolicy = measurePolicy
+                )
             }
             assertTrue(layoutLatch.await(1, TimeUnit.SECONDS))
         }
@@ -213,36 +243,60 @@ open class LayoutTest {
     ) {
         with(LocalDensity.current) {
             val pxConstraints = Constraints(constraints)
-            Layout(
-                content,
-                modifier = modifier,
-                minIntrinsicWidthMeasureBlock = { measurables, h ->
-                    val width = measurables.firstOrNull()?.minIntrinsicWidth(h) ?: 0
-                    pxConstraints.constrainWidth(width)
-                },
-                minIntrinsicHeightMeasureBlock = { measurables, w ->
-                    val height = measurables.firstOrNull()?.minIntrinsicHeight(w) ?: 0
-                    pxConstraints.constrainHeight(height)
-                },
-                maxIntrinsicWidthMeasureBlock = { measurables, h ->
-                    val width = measurables.firstOrNull()?.maxIntrinsicWidth(h) ?: 0
-                    pxConstraints.constrainWidth(width)
-                },
-                maxIntrinsicHeightMeasureBlock = { measurables, w ->
-                    val height = measurables.firstOrNull()?.maxIntrinsicHeight(w) ?: 0
-                    pxConstraints.constrainHeight(height)
-                }
-            ) { measurables, incomingConstraints ->
-                val measurable = measurables.firstOrNull()
-                val childConstraints = incomingConstraints.constrain(Constraints(constraints))
-                val placeable = measurable?.measure(childConstraints)
+            val measurePolicy = object : MeasurePolicy {
+                @Suppress("PARAMETER_NAME_CHANGED_ON_OVERRIDE")
+                override fun MeasureScope.measure(
+                    measurables: List<Measurable>,
+                    incomingConstraints: Constraints
+                ): MeasureResult {
+                    val measurable = measurables.firstOrNull()
+                    val childConstraints = incomingConstraints.constrain(Constraints(constraints))
+                    val placeable = measurable?.measure(childConstraints)
 
-                val layoutWidth = placeable?.width ?: childConstraints.minWidth
-                val layoutHeight = placeable?.height ?: childConstraints.minHeight
-                layout(layoutWidth, layoutHeight) {
-                    placeable?.placeRelative(0, 0)
+                    val layoutWidth = placeable?.width ?: childConstraints.minWidth
+                    val layoutHeight = placeable?.height ?: childConstraints.minHeight
+                    return layout(layoutWidth, layoutHeight) {
+                        placeable?.placeRelative(0, 0)
+                    }
+                }
+
+                override fun IntrinsicMeasureScope.minIntrinsicWidth(
+                    measurables: List<IntrinsicMeasurable>,
+                    height: Int
+                ): Int {
+                    val width = measurables.firstOrNull()?.minIntrinsicWidth(height) ?: 0
+                    return pxConstraints.constrainWidth(width)
+                }
+
+                override fun IntrinsicMeasureScope.minIntrinsicHeight(
+                    measurables: List<IntrinsicMeasurable>,
+                    width: Int
+                ): Int {
+                    val height = measurables.firstOrNull()?.minIntrinsicHeight(width) ?: 0
+                    return pxConstraints.constrainHeight(height)
+                }
+
+                override fun IntrinsicMeasureScope.maxIntrinsicWidth(
+                    measurables: List<IntrinsicMeasurable>,
+                    height: Int
+                ): Int {
+                    val width = measurables.firstOrNull()?.maxIntrinsicWidth(height) ?: 0
+                    return pxConstraints.constrainWidth(width)
+                }
+
+                override fun IntrinsicMeasureScope.maxIntrinsicHeight(
+                    measurables: List<IntrinsicMeasurable>,
+                    width: Int
+                ): Int {
+                    val height = measurables.firstOrNull()?.maxIntrinsicHeight(width) ?: 0
+                    return pxConstraints.constrainHeight(height)
                 }
             }
+            Layout(
+                content = content,
+                modifier = modifier,
+                measurePolicy = measurePolicy
+            )
         }
     }
 

@@ -22,7 +22,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.paddingFromBaseline
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.Providers
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -70,8 +70,8 @@ import kotlin.math.max
  * the theme, this will keep the same value set above this Surface.
  * @param elevation The z-coordinate at which to place the SnackBar. This controls the size
  * of the shadow below the SnackBar
- * @param text text component to show information about a process that an app has performed or
- * will perform
+ * @param content content to show information about a process that an app has performed or will
+ * perform
  */
 @Composable
 fun Snackbar(
@@ -82,7 +82,7 @@ fun Snackbar(
     backgroundColor: Color = SnackbarDefaults.backgroundColor,
     contentColor: Color = MaterialTheme.colors.surface,
     elevation: Dp = 6.dp,
-    text: @Composable () -> Unit
+    content: @Composable () -> Unit
 ) {
     Surface(
         modifier = modifier,
@@ -91,13 +91,13 @@ fun Snackbar(
         color = backgroundColor,
         contentColor = contentColor
     ) {
-        Providers(LocalContentAlpha provides ContentAlpha.high) {
+        CompositionLocalProvider(LocalContentAlpha provides ContentAlpha.high) {
             val textStyle = MaterialTheme.typography.body2
             ProvideTextStyle(value = textStyle) {
                 when {
-                    action == null -> TextOnlySnackbar(text)
-                    actionOnNewLine -> NewLineButtonSnackbar(text, action)
-                    else -> OneRowSnackbar(text, action)
+                    action == null -> TextOnlySnackbar(content)
+                    actionOnNewLine -> NewLineButtonSnackbar(content, action)
+                    else -> OneRowSnackbar(content, action)
                 }
             }
         }
@@ -165,7 +165,7 @@ fun Snackbar(
     }
     Snackbar(
         modifier = modifier.padding(12.dp),
-        text = { Text(snackbarData.message) },
+        content = { Text(snackbarData.message) },
         action = actionComposable,
         actionOnNewLine = actionOnNewLine,
         shape = shape,

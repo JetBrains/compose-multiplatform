@@ -21,10 +21,10 @@ import androidx.compose.animation.core.AnimationSpec
 import androidx.compose.animation.core.CubicBezierEasing
 import androidx.compose.animation.core.FastOutSlowInEasing
 import androidx.compose.animation.core.TweenSpec
-import androidx.compose.foundation.Interaction
-import androidx.compose.runtime.compositionLocalOf
+import androidx.compose.foundation.interaction.DragInteraction
+import androidx.compose.foundation.interaction.Interaction
+import androidx.compose.foundation.interaction.PressInteraction
 import androidx.compose.ui.unit.Dp
-import androidx.compose.ui.unit.dp
 
 /**
  * Animates the [Dp] value of [this] between [from] and [to] [Interaction]s, to [target]. The
@@ -32,18 +32,18 @@ import androidx.compose.ui.unit.dp
  * [ElevationDefaults.incomingAnimationSpecForInteraction] and
  * [ElevationDefaults.outgoingAnimationSpecForInteraction] for more details.
  *
- * @param from the previous [Interaction] that was used to calculate elevation. `null` if there
- * was no previous [Interaction], such as when the component is in its default state.
- * @param to the [Interaction] that this component is moving to, such as [Interaction.Pressed]
- * when this component is being pressed. `null` if this component is moving back to its default
- * state.
  * @param target the [Dp] target elevation for this component, corresponding to the elevation
  * desired for the [to] state.
+ * @param from the previous [Interaction] that was used to calculate elevation. `null` if there
+ * was no previous [Interaction], such as when the component is in its default state.
+ * @param to the [Interaction] that this component is moving to, such as [PressInteraction.Press]
+ * when this component is being pressed. `null` if this component is moving back to its default
+ * state.
  */
-suspend fun Animatable<Dp, *>.animateElevation(
+internal suspend fun Animatable<Dp, *>.animateElevation(
+    target: Dp,
     from: Interaction? = null,
-    to: Interaction? = null,
-    target: Dp
+    to: Interaction? = null
 ) {
     val spec = when {
         // Moving to a new state
@@ -67,7 +67,7 @@ suspend fun Animatable<Dp, *>.animateElevation(
  *
  * @see animateElevation
  */
-object ElevationDefaults {
+private object ElevationDefaults {
     /**
      * Returns the [AnimationSpec]s used when animating elevation to [interaction], either from a
      * previous [Interaction], or from the default state. If [interaction] is unknown, then
@@ -77,8 +77,8 @@ object ElevationDefaults {
      */
     fun incomingAnimationSpecForInteraction(interaction: Interaction): AnimationSpec<Dp>? {
         return when (interaction) {
-            is Interaction.Pressed -> DefaultIncomingSpec
-            is Interaction.Dragged -> DefaultIncomingSpec
+            is PressInteraction.Press -> DefaultIncomingSpec
+            is DragInteraction.Start -> DefaultIncomingSpec
             else -> null
         }
     }
@@ -91,8 +91,8 @@ object ElevationDefaults {
      */
     fun outgoingAnimationSpecForInteraction(interaction: Interaction): AnimationSpec<Dp>? {
         return when (interaction) {
-            is Interaction.Pressed -> DefaultOutgoingSpec
-            is Interaction.Dragged -> DefaultOutgoingSpec
+            is PressInteraction.Press -> DefaultOutgoingSpec
+            is DragInteraction.Start -> DefaultOutgoingSpec
             // TODO: use [HoveredOutgoingSpec] when hovered
             else -> null
         }
@@ -114,30 +114,3 @@ private val HoveredOutgoingSpec = TweenSpec<Dp>(
     durationMillis = 120,
     easing = CubicBezierEasing(0.40f, 0.00f, 0.60f, 1.00f)
 )
-
-/**
- * CompositionLocal containing the current absolute elevation provided by [Surface] components. This
- * absolute elevation is a sum of all the previous elevations. Absolute elevation is only
- * used for calculating elevation overlays in dark theme, and is *not* used for drawing the
- * shadow in a [Surface]. See [ElevationOverlay] for more information on elevation overlays.
- *
- * @sample androidx.compose.material.samples.AbsoluteElevationSample
- */
-@Deprecated(
-    "Renamed to LocalAbsoluteElevation",
-    replaceWith = ReplaceWith(
-        "LocalAbsoluteElevation",
-        "androidx.compose.material.LocalAbsoluteElevation"
-    )
-)
-val AmbientAbsoluteElevation get() = LocalAbsoluteElevation
-
-/**
- * CompositionLocal containing the current absolute elevation provided by [Surface] components. This
- * absolute elevation is a sum of all the previous elevations. Absolute elevation is only
- * used for calculating elevation overlays in dark theme, and is *not* used for drawing the
- * shadow in a [Surface]. See [ElevationOverlay] for more information on elevation overlays.
- *
- * @sample androidx.compose.material.samples.AbsoluteElevationSample
- */
-val LocalAbsoluteElevation = compositionLocalOf { 0.dp }

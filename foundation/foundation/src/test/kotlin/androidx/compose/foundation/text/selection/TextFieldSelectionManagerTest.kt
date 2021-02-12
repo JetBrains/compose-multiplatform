@@ -16,6 +16,7 @@
 
 package androidx.compose.foundation.text.selection
 
+import androidx.compose.foundation.text.InternalFoundationTextApi
 import androidx.compose.foundation.text.TextFieldState
 import androidx.compose.foundation.text.TextLayoutResultProxy
 import androidx.compose.ui.focus.FocusRequester
@@ -27,7 +28,6 @@ import androidx.compose.ui.platform.ClipboardManager
 import androidx.compose.ui.platform.TextToolbar
 import androidx.compose.ui.platform.TextToolbarStatus
 import androidx.compose.ui.text.AnnotatedString
-import androidx.compose.ui.text.InternalTextApi
 import androidx.compose.ui.text.TextLayoutInput
 import androidx.compose.ui.text.TextLayoutResult
 import androidx.compose.ui.text.TextRange
@@ -40,6 +40,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.LayoutDirection
+import androidx.compose.ui.util.packInts
 import com.google.common.truth.Truth.assertThat
 import com.nhaarman.mockitokotlin2.any
 import com.nhaarman.mockitokotlin2.isNull
@@ -56,7 +57,6 @@ import org.mockito.invocation.InvocationOnMock
 import org.mockito.stubbing.Answer
 
 @RunWith(JUnit4::class)
-@OptIn(InternalTextApi::class)
 class TextFieldSelectionManagerTest {
     private val text = "Hello World"
     private val density = Density(density = 1f)
@@ -81,6 +81,7 @@ class TextFieldSelectionManagerTest {
     private val hapticFeedback = mock<HapticFeedback>()
     private val focusRequester = mock<FocusRequester>()
 
+    @OptIn(InternalFoundationTextApi::class)
     @Before
     fun setup() {
         manager.offsetMapping = offsetMapping
@@ -512,5 +513,6 @@ class TextFieldSelectionManagerTest {
 // This class is a workaround for the bug that mockito can't stub a method returning inline class.
 // (https://github.com/nhaarman/mockito-kotlin/issues/309).
 internal class TextRangeAnswer(private val textRange: TextRange) : Answer<Any> {
-    override fun answer(invocation: InvocationOnMock?): Any = textRange.packedValue
+    override fun answer(invocation: InvocationOnMock?): Any =
+        packInts(textRange.start, textRange.end)
 }

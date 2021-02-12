@@ -5,7 +5,6 @@ package androidx.compose.ui.geometry {
     ctor public CornerRadius();
     method @androidx.compose.runtime.Stable public static inline operator float component1-impl(long $this);
     method @androidx.compose.runtime.Stable public static inline operator float component2-impl(long $this);
-    method public static long constructor-impl(long packedValue);
     method public static long copy-kKHJgLs(long $this, optional float x, optional float y);
     method @androidx.compose.runtime.Stable public static operator long div-kKHJgLs(long $this, float operand);
     method @androidx.compose.runtime.Immutable public static inline boolean equals-impl(long p, Object? p1);
@@ -27,7 +26,7 @@ package androidx.compose.ui.geometry {
   }
 
   public final class CornerRadiusKt {
-    method @androidx.compose.runtime.Stable public static inline long CornerRadius(float x, optional float y);
+    method @androidx.compose.runtime.Stable public static long CornerRadius(float x, optional float y);
     method @androidx.compose.runtime.Stable public static long lerp-LCIZJP8(long start, long stop, float fraction);
   }
 
@@ -69,14 +68,12 @@ package androidx.compose.ui.geometry {
     ctor public Offset();
     method @androidx.compose.runtime.Stable public static operator float component1-impl(long $this);
     method @androidx.compose.runtime.Stable public static operator float component2-impl(long $this);
-    method public static long constructor-impl(long packedValue);
     method public static long copy-F1C5BW0(long $this, optional float x, optional float y);
     method @androidx.compose.runtime.Stable public static operator long div-F1C5BW0(long $this, float operand);
     method @androidx.compose.runtime.Immutable public static inline boolean equals-impl(long p, Object? p1);
     method public static boolean equals-impl0(long p1, long p2);
     method @androidx.compose.runtime.Stable public static float getDistance-impl(long $this);
     method @androidx.compose.runtime.Stable public static float getDistanceSquared-impl(long $this);
-    method public long getPackedValue();
     method public static float getX-impl(long $this);
     method public static float getY-impl(long $this);
     method @androidx.compose.runtime.Immutable public static inline int hashCode-impl(long p);
@@ -87,7 +84,6 @@ package androidx.compose.ui.geometry {
     method @androidx.compose.runtime.Stable public static operator long times-F1C5BW0(long $this, float operand);
     method public static String toString-impl(long $this);
     method @androidx.compose.runtime.Stable public static operator long unaryMinus-F1C5BW0(long $this);
-    property public final long packedValue;
     field public static final androidx.compose.ui.geometry.Offset.Companion Companion;
   }
 
@@ -101,10 +97,10 @@ package androidx.compose.ui.geometry {
   }
 
   public final class OffsetKt {
-    method @androidx.compose.runtime.Stable public static inline long Offset(float x, float y);
+    method @androidx.compose.runtime.Stable public static long Offset(float x, float y);
     method public static boolean isFinite-k-4lQ0M(long);
     method public static boolean isSpecified-k-4lQ0M(long);
-    method public static inline boolean isUnspecified-k-4lQ0M(long);
+    method public static boolean isUnspecified-k-4lQ0M(long);
     method @androidx.compose.runtime.Stable public static long lerp-tX6QBWo(long start, long stop, float fraction);
     method public static inline long takeOrElse-Yy5JL0A(long, kotlin.jvm.functions.Function0<androidx.compose.ui.geometry.Offset> block);
   }
@@ -245,7 +241,6 @@ package androidx.compose.ui.geometry {
     ctor public Size();
     method @androidx.compose.runtime.Stable public static inline operator float component1-impl(long $this);
     method @androidx.compose.runtime.Stable public static inline operator float component2-impl(long $this);
-    method public static long constructor-impl(long packedValue);
     method public static long copy-NH-jbRc(long $this, optional float width, optional float height);
     method @androidx.compose.runtime.Stable public static operator long div-NH-jbRc(long $this, float operand);
     method @androidx.compose.runtime.Immutable public static inline boolean equals-impl(long p, Object? p1);

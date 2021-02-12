@@ -16,27 +16,27 @@
 
 package androidx.compose.foundation.text.selection
 
-import androidx.compose.foundation.Interaction
+import androidx.compose.foundation.text.isInTouchMode
+import androidx.compose.foundation.interaction.collectIsFocusedAsState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.DisposableEffect
-import androidx.compose.runtime.Providers
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.gesture.dragGestureFilter
+import androidx.compose.foundation.legacygestures.dragGestureFilter
 import androidx.compose.ui.platform.LocalClipboardManager
 import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.platform.LocalTextToolbar
-import androidx.compose.ui.text.InternalTextApi
 
 /**
  * Enables text selection for it's direct or indirection children.
  *
  * @sample androidx.compose.foundation.samples.SelectionSample
  */
-@OptIn(InternalTextApi::class)
 @Composable
 fun SelectionContainer(modifier: Modifier = Modifier, content: @Composable () -> Unit) {
     var selection by remember { mutableStateOf<Selection?>(null) }
@@ -58,7 +58,7 @@ fun SelectionContainer(modifier: Modifier = Modifier, content: @Composable () ->
  */
 @Composable
 fun DisableSelection(content: @Composable () -> Unit) {
-    Providers(
+    CompositionLocalProvider(
         LocalSelectionRegistrar provides null,
         content = content
     )
@@ -69,11 +69,9 @@ fun DisableSelection(content: @Composable () -> Unit) {
  *
  * The selection composable wraps composables and let them to be selectable. It paints the selection
  * area with start and end handles.
- *
- * @suppress
  */
+@OptIn(ExperimentalComposeUiApi::class)
 @Suppress("ComposableLambdaParameterNaming", "DEPRECATION")
-@InternalTextApi // Used by foundation
 @Composable
 internal fun SelectionContainer(
     /** A [Modifier] for SelectionContainer. */
@@ -92,13 +90,15 @@ internal fun SelectionContainer(
     manager.textToolbar = LocalTextToolbar.current
     manager.onSelectionChange = onSelectionChange
     manager.selection = selection
+    manager.touchMode = isInTouchMode
 
-    Providers(LocalSelectionRegistrar provides registrarImpl) {
+    CompositionLocalProvider(LocalSelectionRegistrar provides registrarImpl) {
         // Get the layout coordinates of the selection container. This is for hit test of
         // cross-composable selection.
         SimpleLayout(modifier = modifier.then(manager.modifier)) {
             children()
-            if (manager.interactionState.contains(Interaction.Focused)) {
+            val isFocused = manager.interactionSource.collectIsFocusedAsState()
+            if (isInTouchMode && isFocused.value) {
                 manager.selection?.let {
                     for (isStartHandle in listOf(true, false)) {
                         SelectionHandle(

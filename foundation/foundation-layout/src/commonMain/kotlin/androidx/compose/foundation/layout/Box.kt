@@ -24,10 +24,9 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.layout.Layout
 import androidx.compose.ui.layout.Measurable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.layout.MeasuringIntrinsicsMeasureBlocks
+import androidx.compose.ui.layout.MeasurePolicy
 import androidx.compose.ui.layout.ParentDataModifier
 import androidx.compose.ui.layout.Placeable
-import androidx.compose.ui.node.MeasureBlocks
 import androidx.compose.ui.platform.InspectorInfo
 import androidx.compose.ui.platform.InspectorValueInfo
 import androidx.compose.ui.platform.NoInspectorInfo
@@ -65,33 +64,33 @@ inline fun Box(
     propagateMinConstraints: Boolean = false,
     content: @Composable BoxScope.() -> Unit
 ) {
-    val measureBlocks = rememberBoxMeasureBlocks(contentAlignment, propagateMinConstraints)
+    val measurePolicy = rememberBoxMeasurePolicy(contentAlignment, propagateMinConstraints)
     Layout(
         content = { BoxScope.content() },
-        measureBlocks = measureBlocks,
+        measurePolicy = measurePolicy,
         modifier = modifier
     )
 }
 
 @PublishedApi
 @Composable
-internal fun rememberBoxMeasureBlocks(
+internal fun rememberBoxMeasurePolicy(
     alignment: Alignment,
     propagateMinConstraints: Boolean
 ) = remember(alignment) {
     if (alignment == Alignment.TopStart && !propagateMinConstraints) {
-        DefaultBoxMeasureBlocks
+        DefaultBoxMeasurePolicy
     } else {
-        boxMeasureBlocks(alignment, propagateMinConstraints)
+        boxMeasurePolicy(alignment, propagateMinConstraints)
     }
 }
 
-internal val DefaultBoxMeasureBlocks: MeasureBlocks = boxMeasureBlocks(Alignment.TopStart, false)
+internal val DefaultBoxMeasurePolicy: MeasurePolicy = boxMeasurePolicy(Alignment.TopStart, false)
 
-internal fun boxMeasureBlocks(alignment: Alignment, propagateMinConstraints: Boolean) =
-    MeasuringIntrinsicsMeasureBlocks { measurables, constraints ->
+internal fun boxMeasurePolicy(alignment: Alignment, propagateMinConstraints: Boolean) =
+    MeasurePolicy { measurables, constraints ->
         if (measurables.isEmpty()) {
-            return@MeasuringIntrinsicsMeasureBlocks layout(
+            return@MeasurePolicy layout(
                 constraints.minWidth,
                 constraints.minHeight
             ) {}
@@ -119,7 +118,7 @@ internal fun boxMeasureBlocks(alignment: Alignment, propagateMinConstraints: Boo
                     Constraints.fixed(constraints.minWidth, constraints.minHeight)
                 )
             }
-            return@MeasuringIntrinsicsMeasureBlocks layout(boxWidth, boxHeight) {
+            return@MeasurePolicy layout(boxWidth, boxHeight) {
                 placeInBox(placeable, measurable, layoutDirection, boxWidth, boxHeight, alignment)
             }
         }
@@ -195,10 +194,10 @@ private fun Placeable.PlacementScope.placeInBox(
  */
 @Composable
 fun Box(modifier: Modifier) {
-    Layout({}, measureBlocks = EmptyBoxMeasureBlocks, modifier = modifier)
+    Layout({}, measurePolicy = EmptyBoxMeasurePolicy, modifier = modifier)
 }
 
-internal val EmptyBoxMeasureBlocks = MeasuringIntrinsicsMeasureBlocks { _, constraints ->
+internal val EmptyBoxMeasurePolicy = MeasurePolicy { _, constraints ->
     layout(constraints.minWidth, constraints.minHeight) {}
 }
 

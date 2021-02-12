@@ -17,6 +17,8 @@
 package androidx.compose.ui.graphics.vector
 
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.Composition
+import androidx.compose.runtime.CompositionContext
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.getValue
@@ -26,6 +28,7 @@ import androidx.compose.runtime.rememberCompositionContext
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.BlendMode
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.graphics.drawscope.DrawScope
@@ -135,6 +138,28 @@ class VectorPainter internal constructor() : Painter() {
         }
     }
 
+    private var composition: Composition? = null
+
+    private fun composeVector(
+        parent: CompositionContext,
+        composable: @Composable (viewportWidth: Float, viewportHeight: Float) -> Unit
+    ): Composition {
+        val existing = composition
+        val next = if (existing == null || existing.isDisposed) {
+            Composition(
+                VectorApplier(vector.root),
+                parent
+            )
+        } else {
+            existing
+        }
+        composition = next
+        next.setContent {
+            composable(vector.viewportWidth, vector.viewportHeight)
+        }
+        return next
+    }
+
     private var isDirty by mutableStateOf(true)
 
     @Composable
@@ -150,7 +175,6 @@ class VectorPainter internal constructor() : Painter() {
             this.viewportHeight = viewportHeight
         }
         val composition = composeVector(
-            vector,
             rememberCompositionContext(),
             content
         )
@@ -191,42 +215,137 @@ class VectorPainter internal constructor() : Painter() {
 }
 
 /**
+ * Returns all the properties of PathComponent or GroupComponent that can be overridden for
+ * animation. This can be passed to [RenderVectorGroup] to override some property values when the
+ * [VectorGroup] is rendered.
+ */
+internal interface VectorOverride {
+
+    /**
+     * Overrides the 'rotation' attribute for a vector group.
+     */
+    fun obtainRotation(rotation: Float): Float = rotation
+
+    /**
+     * Overrides the 'pivotX' attribute for a vector group.
+     */
+    fun obtainPivotX(pivotX: Float): Float = pivotX
+
+    /**
+     * Overrides the 'pivotY' attribute for a vector group.
+     */
+    fun obtainPivotY(pivotY: Float): Float = pivotY
+
+    /**
+     * Overrides the 'scaleX' attribute for a vector group.
+     */
+    fun obtainScaleX(scaleX: Float): Float = scaleX
+
+    /**
+     * Overrides the 'scaleY' attribute for a vector group.
+     */
+    fun obtainScaleY(scaleY: Float): Float = scaleY
+
+    /**
+     * Overrides the 'translateX' attribute for a vector group.
+     */
+    fun obtainTranslateX(translateX: Float): Float = translateX
+
+    /**
+     * Overrides the 'translateY' attribute for a vector group.
+     */
+    fun obtainTranslateY(translateY: Float): Float = translateY
+
+    /**
+     * Overrides the 'pathData' attribute for a vector path or a clip path.
+     */
+    fun obtainPathData(pathData: List<PathNode>): List<PathNode> = pathData
+
+    /**
+     * Overrides the 'fill' attribute for a vector path.
+     */
+    fun obtainFill(fill: Brush?): Brush? = fill
+
+    /**
+     * Overrides the 'fillAlpha' attribute for a vector path.
+     */
+    fun obtainFillAlpha(fillAlpha: Float): Float = fillAlpha
+
+    /**
+     * Overrides the 'stroke' attribute for a vector path.
+     */
+    fun obtainStroke(stroke: Brush?): Brush? = stroke
+
+    /**
+     * Overrides the 'strokeWidth' attribute for a vector path.
+     */
+    fun obtainStrokeWidth(strokeWidth: Float): Float = strokeWidth
+
+    /**
+     * Overrides the 'strokeAlpha' attribute for a vector path.
+     */
+    fun obtainStrokeAlpha(strokeAlpha: Float): Float = strokeAlpha
+
+    /**
+     * Overrides the 'trimPathStart' attribute for a vector path.
+     */
+    fun obtainTrimPathStart(trimPathStart: Float): Float = trimPathStart
+
+    /**
+     * Overrides the 'trimPathEnd' attribute for a vector path.
+     */
+    fun obtainTrimPathEnd(trimPathEnd: Float): Float = trimPathEnd
+
+    /**
+     * Overrides the 'trimPathOffset' attribute for a vector path.
+     */
+    fun obtainTrimPathOffset(trimPathOffset: Float): Float = trimPathOffset
+}
+
+private object DefaultVectorOverride : VectorOverride
+
+/**
  * Recursive method for creating the vector graphic composition by traversing
  * the tree structure
  */
 @Composable
-private fun RenderVectorGroup(group: VectorGroup) {
+internal fun RenderVectorGroup(
+    group: VectorGroup,
+    overrides: Map<String, VectorOverride> = emptyMap()
+) {
     for (vectorNode in group) {
         if (vectorNode is VectorPath) {
+            val override = overrides[vectorNode.name] ?: DefaultVectorOverride
             Path(
-                pathData = vectorNode.pathData,
+                pathData = override.obtainPathData(vectorNode.pathData),
                 pathFillType = vectorNode.pathFillType,
                 name = vectorNode.name,
-                fill = vectorNode.fill,
-                fillAlpha = vectorNode.fillAlpha,
-                stroke = vectorNode.stroke,
-                strokeAlpha = vectorNode.strokeAlpha,
-                strokeLineWidth = vectorNode.strokeLineWidth,
+                fill = override.obtainFill(vectorNode.fill),
+                fillAlpha = override.obtainFillAlpha(vectorNode.fillAlpha),
+                stroke = override.obtainStroke(vectorNode.stroke),
+                strokeAlpha = override.obtainStrokeAlpha(vectorNode.strokeAlpha),
+                strokeLineWidth = override.obtainStrokeWidth(vectorNode.strokeLineWidth),
                 strokeLineCap = vectorNode.strokeLineCap,
                 strokeLineJoin = vectorNode.strokeLineJoin,
                 strokeLineMiter = vectorNode.strokeLineMiter,
-                trimPathStart = vectorNode.trimPathStart,
-                trimPathEnd = vectorNode.trimPathEnd,
-                trimPathOffset = vectorNode.trimPathOffset
+                trimPathStart = override.obtainTrimPathStart(vectorNode.trimPathStart),
+                trimPathEnd = override.obtainTrimPathEnd(vectorNode.trimPathEnd),
+                trimPathOffset = override.obtainTrimPathOffset(vectorNode.trimPathOffset)
             )
         } else if (vectorNode is VectorGroup) {
+            val override = overrides[vectorNode.name] ?: DefaultVectorOverride
             Group(
                 name = vectorNode.name,
-                rotation = vectorNode.rotation,
-                scaleX = vectorNode.scaleX,
-                scaleY = vectorNode.scaleY,
-                translationX = vectorNode.translationX,
-                translationY = vectorNode.translationY,
-                pivotX = vectorNode.pivotX,
-                pivotY = vectorNode.pivotY,
-                clipPathData = vectorNode.clipPathData
+                rotation = override.obtainRotation(vectorNode.rotation),
+                scaleX = override.obtainScaleX(vectorNode.scaleX),
+                scaleY = override.obtainScaleY(vectorNode.scaleY),
+                translationX = override.obtainTranslateX(vectorNode.translationX),
+                translationY = override.obtainTranslateY(vectorNode.translationY),
+                pivotX = override.obtainPivotX(vectorNode.pivotX),
+                pivotY = override.obtainPivotY(vectorNode.pivotY),
+                clipPathData = override.obtainPathData(vectorNode.clipPathData)
             ) {
-                RenderVectorGroup(group = vectorNode)
+                RenderVectorGroup(group = vectorNode, overrides = overrides)
             }
         }
     }

@@ -44,13 +44,13 @@ class TestModifierUpdater internal constructor(private val node: LayoutNode) {
 @Composable
 @Suppress("DEPRECATION_ERROR")
 fun TestModifierUpdaterLayout(onAttached: (TestModifierUpdater) -> Unit) {
-    val measureBlocks = MeasuringIntrinsicsMeasureBlocks { _, constraints ->
+    val measurePolicy = MeasurePolicy { _, constraints ->
         layout(constraints.maxWidth, constraints.maxHeight) {}
     }
     ComposeNode<LayoutNode, Applier<Any>>(
         factory = LayoutNode.Constructor,
         update = {
-            set(measureBlocks, ComposeUiNode.SetMeasureBlocks)
+            set(measurePolicy, ComposeUiNode.SetMeasurePolicy)
             init { onAttached(TestModifierUpdater(this)) }
         }
     )

@@ -15,6 +15,10 @@ class ComposableCheckerTests : AbstractComposeDiagnosticsTest() {
             "user.dir",
             homeDir
         )
+        System.setProperty(
+            "idea.ignore.disabled.plugins",
+            "true"
+        )
     }
 
     fun doTest(text: String, expectPass: Boolean) {
@@ -157,7 +161,6 @@ class ComposableCheckerTests : AbstractComposeDiagnosticsTest() {
         import androidx.compose.runtime.*
         @Composable fun C(): Int { return 123 }
         val ncProp: Int = <!COMPOSABLE_INVOCATION!>C<!>()
-        @Composable val <!COMPOSABLE_PROPERTY_BACKING_FIELD,DEPRECATED_COMPOSABLE_PROPERTY!>cProp<!>: Int = <!COMPOSABLE_INVOCATION!>C<!>()
     """
     )
 
@@ -346,7 +349,7 @@ class ComposableCheckerTests : AbstractComposeDiagnosticsTest() {
             }
 
             @Composable
-            fun main() {
+            fun test() {
                 Foo { Leaf() }
             }
         """
@@ -363,7 +366,7 @@ class ComposableCheckerTests : AbstractComposeDiagnosticsTest() {
             }
 
             @Composable
-            fun main() {
+            fun test() {
                 Foo { <!COMPOSABLE_INVOCATION!>Leaf<!>() }
             }
         """
@@ -1089,6 +1092,86 @@ class ComposableCheckerTests : AbstractComposeDiagnosticsTest() {
         @Composable inline fun c(block2: @DisallowComposableCalls () -> Foo): Foo {
           return a { block2() }
         }
+    """
+    )
+
+    fun testReadOnlyComposablePropagation() = check(
+        """
+        import androidx.compose.runtime.*
+
+        @Composable @ReadOnlyComposable
+        fun readOnly(): Int = 10
+        val readonlyVal: Int
+            @Composable @ReadOnlyComposable get() = 10
+
+        @Composable
+        fun normal(): Int = 10
+        val normalVal: Int
+            @Composable get() = 10
+
+        @Composable
+        fun test1() {
+            print(readOnly())
+            print(readonlyVal)
+        }
+
+        @Composable @ReadOnlyComposable
+        fun test2() {
+            print(readOnly())
+            print(readonlyVal)
+        }
+
+        @Composable
+        fun test3() {
+            print(readOnly())
+            print(normal())
+            print(readonlyVal)
+            print(normalVal)
+        }
+
+        @Composable @ReadOnlyComposable
+        fun test4() {
+            print(readOnly())
+            print(<!NONREADONLY_CALL_IN_READONLY_COMPOSABLE!>normal<!>())
+            print(readonlyVal)
+            print(<!NONREADONLY_CALL_IN_READONLY_COMPOSABLE!>normalVal<!>)
+        }
+
+        val test5: Int
+            @Composable
+            get() {
+                print(readOnly())
+                print(readonlyVal)
+                return 10
+            }
+
+        val test6: Int
+            @Composable @ReadOnlyComposable
+            get() {
+                print(readOnly())
+                print(readonlyVal)
+                return 10
+            }
+
+        val test7: Int
+            @Composable
+            get() {
+                print(readOnly())
+                print(normal())
+                print(readonlyVal)
+                print(normalVal)
+                return 10
+            }
+
+        val test8: Int
+            @Composable @ReadOnlyComposable
+            get() {
+                print(readOnly())
+                print(<!NONREADONLY_CALL_IN_READONLY_COMPOSABLE!>normal<!>())
+                print(readonlyVal)
+                print(<!NONREADONLY_CALL_IN_READONLY_COMPOSABLE!>normalVal<!>)
+                return 10
+            }
     """
     )
 }

@@ -52,9 +52,6 @@ dependencies {
         api project(":compose:ui:ui-unit")
         api "androidx.annotation:annotation:1.1.0"
 
-        // TODO: Remove this when removing the deprecated ComponentActivity.setContent extension
-        api project(":activity:activity-ktx")
-
         // This has stub APIs for access to legacy Android APIs, so we don't want
         // any dependency on this module.
         compileOnly project(":compose:ui:ui-android-stubs")
@@ -69,8 +66,8 @@ dependencies {
         // used if the user adds these dependencies as otherwise AppCompatActivity and Fragment
         // will not propagate ViewTree*Owners we are relying on and we will crash.
         // TODO: remove these dependencies at some point: b/161814404
-        implementation "androidx.fragment:fragment:1.3.0-alpha07"
-        implementation "androidx.appcompat:appcompat:1.3.0-alpha01"
+        implementation "androidx.fragment:fragment:1.3.0"
+        implementation "androidx.appcompat:appcompat:1.3.0-beta01"
 
         testImplementation(ANDROIDX_TEST_RULES)
         testImplementation(ANDROIDX_TEST_RUNNER)
@@ -85,7 +82,7 @@ dependencies {
         testImplementation project(":compose:ui:ui-test-junit4")
         testImplementation project(":compose:test-utils")
 
-        androidTestImplementation "androidx.fragment:fragment:1.2.4"
+        androidTestImplementation "androidx.fragment:fragment:1.3.0"
         androidTestImplementation "androidx.appcompat:appcompat:1.1.0"
         androidTestImplementation(ANDROIDX_TEST_UIAUTOMATOR)
         androidTestImplementation(ANDROIDX_TEST_RULES)
@@ -151,7 +148,6 @@ if(AndroidXUiPlugin.isMultiplatformEnabled(project)) {
                 // any dependency on this module.
                 compileOnly project(":compose:ui:ui-android-stubs")
                 api "androidx.annotation:annotation:1.1.0"
-                api project(":activity:activity-ktx")
                 implementation "androidx.autofill:autofill:1.0.0"
                 implementation(KOTLIN_COROUTINES_ANDROID)
 
@@ -159,7 +155,7 @@ if(AndroidXUiPlugin.isMultiplatformEnabled(project)) {
                 // used if the user adds these dependencies as otherwise AppCompatActivity and Fragment
                 // will not propagate ViewTree*Owners we are relying on and we will crash.
                 // TODO: remove these dependencies at some point: b/161814404
-                implementation "androidx.fragment:fragment:1.3.0-alpha07"
+                implementation "androidx.fragment:fragment:1.3.0"
                 implementation "androidx.appcompat:appcompat:1.3.0-alpha01"
             }
 
@@ -168,7 +164,12 @@ if(AndroidXUiPlugin.isMultiplatformEnabled(project)) {
             }
 
             androidMain.dependsOn jvmMain
-            desktopMain.dependsOn jvmMain
+            desktopMain {
+                dependencies {
+                    api(KOTLIN_COROUTINES_SWING)
+                }
+                dependsOn jvmMain
+            }
 
             test.dependencies {
                 implementation(ANDROIDX_TEST_RULES)
@@ -186,7 +187,7 @@ if(AndroidXUiPlugin.isMultiplatformEnabled(project)) {
             }
 
             androidAndroidTest.dependencies {
-                implementation "androidx.fragment:fragment:1.2.4"
+                implementation "androidx.fragment:fragment:1.3.0"
                 implementation "androidx.appcompat:appcompat:1.1.0"
                 implementation(ANDROIDX_TEST_UIAUTOMATOR)
                 implementation(ANDROIDX_TEST_RULES)

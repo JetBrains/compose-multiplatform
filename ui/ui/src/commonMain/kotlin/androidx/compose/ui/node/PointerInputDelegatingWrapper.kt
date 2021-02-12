@@ -37,17 +37,17 @@ internal class PointerInputDelegatingWrapper(
         }
 
     override fun hitTest(
-        pointerPositionRelativeToScreen: Offset,
+        pointerPosition: Offset,
         hitPointerInputFilters: MutableList<PointerInputFilter>
     ) {
-        if (isGlobalPointerInBounds(pointerPositionRelativeToScreen)) {
+        if (isPointerInBounds(pointerPosition)) {
             // If the pointer is in bounds, we hit the pointer input filter, so add it!
             hitPointerInputFilters.add(modifier.pointerInputFilter)
         }
 
         // Also, keep looking to see if we also might hit any children.
         super.hitTest(
-            pointerPositionRelativeToScreen,
+            pointerPosition,
             hitPointerInputFilters
         )
     }

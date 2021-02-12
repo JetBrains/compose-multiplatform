@@ -19,9 +19,9 @@ package androidx.compose.foundation.lazy
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.preferredHeight
-import androidx.compose.foundation.layout.preferredWidth
-import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.requiredSize
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.test.assertIsDisplayed
@@ -54,21 +54,21 @@ class LazyListHeadersTest {
         val secondHeaderTag = "secondHeaderTag"
 
         rule.setContent {
-            LazyColumn(Modifier.preferredHeight(300.dp)) {
+            LazyColumn(Modifier.height(300.dp)) {
                 stickyHeader {
                     Spacer(
-                        Modifier.preferredHeight(101.dp).fillParentMaxWidth()
+                        Modifier.height(101.dp).fillParentMaxWidth()
                             .testTag(firstHeaderTag)
                     )
                 }
 
                 items(items) {
-                    Spacer(Modifier.preferredHeight(101.dp).fillParentMaxWidth().testTag(it))
+                    Spacer(Modifier.height(101.dp).fillParentMaxWidth().testTag(it))
                 }
 
                 stickyHeader {
                     Spacer(
-                        Modifier.preferredHeight(101.dp).fillParentMaxWidth()
+                        Modifier.height(101.dp).fillParentMaxWidth()
                             .testTag(secondHeaderTag)
                     )
                 }
@@ -95,21 +95,21 @@ class LazyListHeadersTest {
         val secondHeaderTag = "secondHeaderTag"
 
         rule.setContentWithTestViewConfiguration {
-            LazyColumn(Modifier.preferredHeight(300.dp).testTag(LazyListTag)) {
+            LazyColumn(Modifier.height(300.dp).testTag(LazyListTag)) {
                 stickyHeader {
                     Spacer(
-                        Modifier.preferredHeight(101.dp).fillParentMaxWidth()
+                        Modifier.height(101.dp).fillParentMaxWidth()
                             .testTag(firstHeaderTag)
                     )
                 }
 
                 items(items) {
-                    Spacer(Modifier.preferredHeight(101.dp).fillParentMaxWidth().testTag(it))
+                    Spacer(Modifier.height(101.dp).fillParentMaxWidth().testTag(it))
                 }
 
                 stickyHeader {
                     Spacer(
-                        Modifier.preferredHeight(101.dp).fillParentMaxWidth()
+                        Modifier.height(101.dp).fillParentMaxWidth()
                             .testTag(secondHeaderTag)
                     )
                 }
@@ -137,23 +137,23 @@ class LazyListHeadersTest {
         val secondHeaderTag = "secondHeaderTag"
 
         rule.setContentWithTestViewConfiguration {
-            LazyColumn(Modifier.preferredHeight(300.dp).testTag(LazyListTag)) {
+            LazyColumn(Modifier.height(300.dp).testTag(LazyListTag)) {
                 stickyHeader {
                     Spacer(
-                        Modifier.preferredHeight(101.dp).fillParentMaxWidth()
+                        Modifier.height(101.dp).fillParentMaxWidth()
                             .testTag(firstHeaderTag)
                     )
                 }
 
                 stickyHeader {
                     Spacer(
-                        Modifier.preferredHeight(101.dp).fillParentMaxWidth()
+                        Modifier.height(101.dp).fillParentMaxWidth()
                             .testTag(secondHeaderTag)
                     )
                 }
 
                 items(items) {
-                    Spacer(Modifier.preferredHeight(101.dp).fillParentMaxWidth().testTag(it))
+                    Spacer(Modifier.height(101.dp).fillParentMaxWidth().testTag(it))
                 }
             }
         }
@@ -181,21 +181,21 @@ class LazyListHeadersTest {
         val secondHeaderTag = "secondHeaderTag"
 
         rule.setContent {
-            LazyRow(Modifier.preferredWidth(300.dp)) {
+            LazyRow(Modifier.width(300.dp)) {
                 stickyHeader {
                     Spacer(
-                        Modifier.preferredWidth(101.dp).fillParentMaxHeight()
+                        Modifier.width(101.dp).fillParentMaxHeight()
                             .testTag(firstHeaderTag)
                     )
                 }
 
                 items(items) {
-                    Spacer(Modifier.preferredWidth(101.dp).fillParentMaxHeight().testTag(it))
+                    Spacer(Modifier.width(101.dp).fillParentMaxHeight().testTag(it))
                 }
 
                 stickyHeader {
                     Spacer(
-                        Modifier.preferredWidth(101.dp).fillParentMaxHeight()
+                        Modifier.width(101.dp).fillParentMaxHeight()
                             .testTag(secondHeaderTag)
                     )
                 }
@@ -222,21 +222,21 @@ class LazyListHeadersTest {
         val secondHeaderTag = "secondHeaderTag"
 
         rule.setContentWithTestViewConfiguration {
-            LazyRow(Modifier.preferredWidth(300.dp).testTag(LazyListTag)) {
+            LazyRow(Modifier.width(300.dp).testTag(LazyListTag)) {
                 stickyHeader {
                     Spacer(
-                        Modifier.preferredWidth(101.dp).fillParentMaxHeight()
+                        Modifier.width(101.dp).fillParentMaxHeight()
                             .testTag(firstHeaderTag)
                     )
                 }
 
                 items(items) {
-                    Spacer(Modifier.preferredWidth(101.dp).fillParentMaxHeight().testTag(it))
+                    Spacer(Modifier.width(101.dp).fillParentMaxHeight().testTag(it))
                 }
 
                 stickyHeader {
                     Spacer(
-                        Modifier.preferredWidth(101.dp).fillParentMaxHeight()
+                        Modifier.width(101.dp).fillParentMaxHeight()
                             .testTag(secondHeaderTag)
                     )
                 }
@@ -264,23 +264,23 @@ class LazyListHeadersTest {
         val secondHeaderTag = "secondHeaderTag"
 
         rule.setContentWithTestViewConfiguration {
-            LazyRow(Modifier.preferredWidth(300.dp).testTag(LazyListTag)) {
+            LazyRow(Modifier.width(300.dp).testTag(LazyListTag)) {
                 stickyHeader {
                     Spacer(
-                        Modifier.preferredWidth(101.dp).fillParentMaxHeight()
+                        Modifier.width(101.dp).fillParentMaxHeight()
                             .testTag(firstHeaderTag)
                     )
                 }
 
                 stickyHeader {
                     Spacer(
-                        Modifier.preferredWidth(101.dp).fillParentMaxHeight()
+                        Modifier.width(101.dp).fillParentMaxHeight()
                             .testTag(secondHeaderTag)
                     )
                 }
 
                 items(items) {
-                    Spacer(Modifier.preferredWidth(101.dp).fillParentMaxHeight().testTag(it))
+                    Spacer(Modifier.width(101.dp).fillParentMaxHeight().testTag(it))
                 }
             }
         }
@@ -310,22 +310,22 @@ class LazyListHeadersTest {
 
         rule.setContent {
             LazyColumn(
-                Modifier.size(itemIndexDp * 4),
+                Modifier.requiredSize(itemIndexDp * 4),
                 state = rememberLazyListState().also { state = it },
                 contentPadding = PaddingValues(top = itemIndexDp * 2)
             ) {
                 stickyHeader {
-                    Spacer(Modifier.size(itemIndexDp).testTag(headerTag))
+                    Spacer(Modifier.requiredSize(itemIndexDp).testTag(headerTag))
                 }
 
                 items((0..4).toList()) {
-                    Spacer(Modifier.size(itemIndexDp).testTag("$it"))
+                    Spacer(Modifier.requiredSize(itemIndexDp).testTag("$it"))
                 }
             }
         }
 
         rule.runOnIdle {
-            runBlocking { state.snapToItemIndex(1, itemIndexPx / 2) }
+            runBlocking { state.scrollToItem(1, itemIndexPx / 2) }
         }
 
         rule.onNodeWithTag(headerTag)

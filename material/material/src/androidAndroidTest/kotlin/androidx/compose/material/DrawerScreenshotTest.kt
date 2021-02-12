@@ -20,7 +20,7 @@ import android.os.Build
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.requiredSize
 import androidx.compose.testutils.assertAgainstGolden
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -53,11 +53,11 @@ class DrawerScreenshotTest {
 
     private fun ComposeContentTestRule.setBottomDrawer(drawerValue: BottomDrawerValue) {
         setMaterialContent {
-            Box(Modifier.size(10.dp, 100.dp).testTag("container")) {
-                BottomDrawerLayout(
+            Box(Modifier.requiredSize(10.dp, 100.dp).testTag("container")) {
+                BottomDrawer(
                     drawerState = rememberBottomDrawerState(drawerValue),
                     drawerContent = { Box(Modifier.fillMaxSize().background(Color.Red)) },
-                    bodyContent = { Box(Modifier.fillMaxSize().background(Color.Yellow)) }
+                    content = { Box(Modifier.fillMaxSize().background(Color.Yellow)) }
                 )
             }
         }
@@ -65,11 +65,11 @@ class DrawerScreenshotTest {
 
     private fun ComposeContentTestRule.setModalDrawer(drawerValue: DrawerValue) {
         setMaterialContent {
-            Box(Modifier.size(100.dp, 10.dp).testTag("container")) {
-                ModalDrawerLayout(
+            Box(Modifier.requiredSize(100.dp, 10.dp).testTag("container")) {
+                ModalDrawer(
                     drawerState = rememberDrawerState(drawerValue),
                     drawerContent = { Box(Modifier.fillMaxSize().background(Color.Red)) },
-                    bodyContent = { Box(Modifier.fillMaxSize().background(Color.Yellow)) }
+                    content = { Box(Modifier.fillMaxSize().background(Color.Yellow)) }
                 )
             }
         }

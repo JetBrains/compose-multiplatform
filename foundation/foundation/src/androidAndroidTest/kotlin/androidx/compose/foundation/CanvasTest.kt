@@ -18,7 +18,7 @@ package androidx.compose.foundation
 
 import android.os.Build
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.preferredSize
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.testutils.assertShape
@@ -67,11 +67,11 @@ class CanvasTest {
             val minWidth = (boxWidth / density).dp
             val minHeight = (boxHeight / density).dp
             Box(
-                modifier = Modifier.preferredSize(containerSize)
+                modifier = Modifier.size(containerSize)
                     .background(color = Color.White)
                     .wrapContentSize(Alignment.Center)
             ) {
-                Canvas(modifier = Modifier.preferredSize(minWidth, minHeight)) {
+                Canvas(modifier = Modifier.size(minWidth, minHeight)) {
                     drawLine(
                         start = Offset.Zero,
                         end = Offset(size.width, size.height),
@@ -175,7 +175,7 @@ class CanvasTest {
     @LargeTest
     fun canvas_exactSizes() {
         rule.setContentForSizeAssertions {
-            Canvas(Modifier.preferredSize(100.dp)) {
+            Canvas(Modifier.size(100.dp)) {
                 drawRect(Color.Red)
             }
         }
@@ -194,7 +194,7 @@ class CanvasTest {
     @LargeTest
     fun canvas_exactSizes_drawCircle() {
         rule.setContentForSizeAssertions {
-            Canvas(Modifier.preferredSize(100.dp)) {
+            Canvas(Modifier.size(100.dp)) {
                 drawRect(Color.Red)
                 drawCircle(
                     Color.Blue,

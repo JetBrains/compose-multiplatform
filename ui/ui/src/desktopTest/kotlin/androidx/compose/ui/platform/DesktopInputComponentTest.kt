@@ -42,14 +42,14 @@ class DesktopInputComponentTest {
         val input = DesktopPlatformInput(DummyDesktopComponent)
         val inputService = TextInputService(input)
 
-        val token = inputService.startInput(
+        val session = inputService.startInput(
             TextFieldValue(),
             ImeOptions.Default,
-            processor::onEditCommands,
+            processor::apply,
             {}
         )
 
-        processor.onNewState(TextFieldValue("h"), inputService, token)
+        processor.reset(TextFieldValue("h"), session)
 
         val familyEmoji = "\uD83D\uDC68\u200D\uD83D\uDC69\u200D\uD83D\uDC66\u200D\uD83D\uDC66"
 
@@ -64,7 +64,7 @@ class DesktopInputComponentTest {
             )
         )
 
-        val buffer = processor.mBufferState
+        val buffer = processor.toTextFieldValue()
 
         Assert.assertEquals("${familyEmoji}h", buffer.text)
         Assert.assertEquals(TextRange(11), buffer.selection)

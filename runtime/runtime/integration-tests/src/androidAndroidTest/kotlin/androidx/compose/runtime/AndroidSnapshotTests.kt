@@ -29,7 +29,6 @@ class AndroidSnapshotTests : BaseComposeTest() {
     @get:Rule
     override val activityRule = makeTestActivityRule()
 
-    @OptIn(ExperimentalComposeApi::class)
     @Test // regression test for b/163903673
     fun testCommittingInABackgroundThread() {
         val states = Array(10000) { mutableStateOf(0) }

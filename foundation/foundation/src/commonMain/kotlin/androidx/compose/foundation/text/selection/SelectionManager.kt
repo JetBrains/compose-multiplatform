@@ -18,7 +18,7 @@
 
 package androidx.compose.foundation.text.selection
 
-import androidx.compose.foundation.InteractionState
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.focusable
 import androidx.compose.runtime.State
 import androidx.compose.runtime.getValue
@@ -32,9 +32,11 @@ import androidx.compose.ui.focus.isFocused
 import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Rect
-import androidx.compose.ui.gesture.DragObserver
+import androidx.compose.foundation.legacygestures.DragObserver
 import androidx.compose.ui.hapticfeedback.HapticFeedback
 import androidx.compose.ui.hapticfeedback.HapticFeedbackType
+import androidx.compose.ui.input.key.KeyEvent
+import androidx.compose.ui.input.key.onKeyEvent
 import androidx.compose.ui.layout.LayoutCoordinates
 import androidx.compose.ui.layout.boundsInWindow
 import androidx.compose.ui.layout.onGloballyPositioned
@@ -42,18 +44,12 @@ import androidx.compose.ui.platform.ClipboardManager
 import androidx.compose.ui.platform.TextToolbar
 import androidx.compose.ui.platform.TextToolbarStatus
 import androidx.compose.ui.text.AnnotatedString
-import androidx.compose.ui.text.ExperimentalTextApi
-import androidx.compose.ui.text.InternalTextApi
 import kotlin.math.max
 import kotlin.math.min
 
 /**
  * A bridge class between user interaction to the text composables for text selection.
  */
-@OptIn(
-    InternalTextApi::class,
-    ExperimentalTextApi::class
-)
 internal class SelectionManager(private val selectionRegistrar: SelectionRegistrarImpl) {
     /**
      * The current selection.
@@ -65,6 +61,11 @@ internal class SelectionManager(private val selectionRegistrar: SelectionRegistr
                 updateHandleOffsets()
             }
         }
+
+    /**
+     * Is touch mode active
+     */
+    var touchMode: Boolean = true
 
     /**
      * The manager will invoke this every time it comes to the conclusion that the selection should
@@ -94,9 +95,9 @@ internal class SelectionManager(private val selectionRegistrar: SelectionRegistr
     var focusRequester: FocusRequester = FocusRequester()
 
     /**
-     * InteractionState corresponds to the focusRequester, it will return trun.
+     * MutableInteractionSource for the selection container, containing focus interactions.
      */
-    val interactionState: InteractionState = InteractionState()
+    val interactionSource: MutableInteractionSource = MutableInteractionSource()
 
     /**
      * Modifier for selection container.
@@ -109,7 +110,15 @@ internal class SelectionManager(private val selectionRegistrar: SelectionRegistr
                 onRelease()
             }
         }
-        .focusable(interactionState = interactionState)
+        .focusable(interactionSource = interactionSource)
+        .onKeyEvent {
+            if (isCopyKeyEvent(it)) {
+                copy()
+                true
+            } else {
+                false
+            }
+        }
 
     /**
      * Layout Coordinates of the selection container.
@@ -168,7 +177,7 @@ internal class SelectionManager(private val selectionRegistrar: SelectionRegistr
                 startPosition = convertToContainerCoordinates(layoutCoordinates, startPosition),
                 endPosition = convertToContainerCoordinates(layoutCoordinates, startPosition),
                 isStartHandle = true,
-                longPress = true
+                longPress = touchMode
             )
             hideSelectionToolbar()
             focusRequester.requestFocus()
@@ -180,7 +189,7 @@ internal class SelectionManager(private val selectionRegistrar: SelectionRegistr
                     startPosition = convertToContainerCoordinates(layoutCoordinates, startPosition),
                     endPosition = convertToContainerCoordinates(layoutCoordinates, endPosition),
                     isStartHandle = false,
-                    longPress = true
+                    longPress = touchMode
                 )
             }
 
@@ -549,7 +558,8 @@ internal fun merge(lhs: Selection?, rhs: Selection?): Selection? {
     return lhs?.merge(rhs) ?: rhs
 }
 
-@OptIn(ExperimentalTextApi::class)
+internal expect fun isCopyKeyEvent(keyEvent: KeyEvent): Boolean
+
 internal fun getCurrentSelectedText(
     selectable: Selectable,
     selection: Selection

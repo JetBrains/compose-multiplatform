@@ -19,7 +19,7 @@ package androidx.compose.animation
 import androidx.compose.animation.core.LinearOutSlowInEasing
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.requiredSize
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
@@ -98,7 +98,7 @@ class AnimationModifierTest {
                         animationStartSize = startSize
                         animationEndSize = endSize
                     }
-                    .size(width.dp, height.dp)
+                    .requiredSize(width.dp, height.dp)
             )
             density = LocalDensity.current.density
         }

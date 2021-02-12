@@ -17,10 +17,12 @@
 package androidx.compose.material
 
 import android.os.Build
-import androidx.compose.foundation.Interaction
-import androidx.compose.foundation.InteractionState
+import androidx.compose.foundation.interaction.Interaction
+import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.interaction.PressInteraction
 import androidx.compose.foundation.layout.Box
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.testutils.assertAgainstGolden
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
@@ -35,6 +37,8 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.LargeTest
 import androidx.test.filters.SdkSuppress
 import androidx.test.screenshot.AndroidXScreenshotTestRule
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.launch
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -53,18 +57,20 @@ class TabScreenshotTest {
 
     @Test
     fun lightTheme_defaultColors() {
-        val interactionState = InteractionState().apply {
-            addInteraction(Interaction.Pressed)
-        }
+        val interactionSource = MutableInteractionSource()
+
+        var scope: CoroutineScope? = null
 
         composeTestRule.setContent {
+            scope = rememberCoroutineScope()
             MaterialTheme(lightColors()) {
-                DefaultTabs(interactionState)
+                DefaultTabs(interactionSource)
             }
         }
 
         assertTabsMatch(
-            interactionState = interactionState,
+            scope = scope!!,
+            interactionSource = interactionSource,
             interaction = null,
             goldenIdentifier = "tabs_lightTheme_defaultColors"
         )
@@ -72,31 +78,36 @@ class TabScreenshotTest {
 
     @Test
     fun lightTheme_defaultColors_pressed() {
-        val interactionState = InteractionState()
+        val interactionSource = MutableInteractionSource()
+
+        var scope: CoroutineScope? = null
 
         composeTestRule.setContent {
+            scope = rememberCoroutineScope()
             MaterialTheme(lightColors()) {
-                DefaultTabs(interactionState)
+                DefaultTabs(interactionSource)
             }
         }
 
         assertTabsMatch(
-            interactionState = interactionState,
-            interaction = Interaction.Pressed,
+            scope = scope!!,
+            interactionSource = interactionSource,
+            interaction = PressInteraction.Press(Offset(10f, 10f)),
             goldenIdentifier = "tabs_lightTheme_defaultColors_pressed"
         )
     }
 
     @Test
     fun lightTheme_surfaceColors() {
-        val interactionState = InteractionState().apply {
-            addInteraction(Interaction.Pressed)
-        }
+        val interactionSource = MutableInteractionSource()
+
+        var scope: CoroutineScope? = null
 
         composeTestRule.setContent {
             MaterialTheme(lightColors()) {
+                scope = rememberCoroutineScope()
                 CustomTabs(
-                    interactionState,
+                    interactionSource,
                     backgroundColor = MaterialTheme.colors.surface,
                     selectedContentColor = MaterialTheme.colors.primary,
                     unselectedContentColor = MaterialTheme.colors.onSurface
@@ -105,7 +116,8 @@ class TabScreenshotTest {
         }
 
         assertTabsMatch(
-            interactionState = interactionState,
+            scope = scope!!,
+            interactionSource = interactionSource,
             interaction = null,
             goldenIdentifier = "tabs_lightTheme_surfaceColors"
         )
@@ -113,12 +125,15 @@ class TabScreenshotTest {
 
     @Test
     fun lightTheme_surfaceColors_pressed() {
-        val interactionState = InteractionState()
+        val interactionSource = MutableInteractionSource()
+
+        var scope: CoroutineScope? = null
 
         composeTestRule.setContent {
             MaterialTheme(lightColors()) {
+                scope = rememberCoroutineScope()
                 CustomTabs(
-                    interactionState,
+                    interactionSource,
                     backgroundColor = MaterialTheme.colors.surface,
                     selectedContentColor = MaterialTheme.colors.primary,
                     unselectedContentColor = MaterialTheme.colors.onSurface
@@ -127,26 +142,29 @@ class TabScreenshotTest {
         }
 
         assertTabsMatch(
-            interactionState = interactionState,
-            interaction = Interaction.Pressed,
+            scope = scope!!,
+            interactionSource = interactionSource,
+            interaction = PressInteraction.Press(Offset(10f, 10f)),
             goldenIdentifier = "tabs_lightTheme_surfaceColors_pressed"
         )
     }
 
     @Test
     fun darkTheme_defaultColors() {
-        val interactionState = InteractionState().apply {
-            addInteraction(Interaction.Pressed)
-        }
+        val interactionSource = MutableInteractionSource()
+
+        var scope: CoroutineScope? = null
 
         composeTestRule.setContent {
+            scope = rememberCoroutineScope()
             MaterialTheme(darkColors()) {
-                DefaultTabs(interactionState)
+                DefaultTabs(interactionSource)
             }
         }
 
         assertTabsMatch(
-            interactionState = interactionState,
+            scope = scope!!,
+            interactionSource = interactionSource,
             interaction = null,
             goldenIdentifier = "tabs_darkTheme_defaultColors"
         )
@@ -154,17 +172,21 @@ class TabScreenshotTest {
 
     @Test
     fun darkTheme_defaultColors_pressed() {
-        val interactionState = InteractionState()
+        val interactionSource = MutableInteractionSource()
+
+        var scope: CoroutineScope? = null
 
         composeTestRule.setContent {
+            scope = rememberCoroutineScope()
             MaterialTheme(darkColors()) {
-                DefaultTabs(interactionState)
+                DefaultTabs(interactionSource)
             }
         }
 
         assertTabsMatch(
-            interactionState = interactionState,
-            interaction = Interaction.Pressed,
+            scope = scope!!,
+            interactionSource = interactionSource,
+            interaction = PressInteraction.Press(Offset(10f, 10f)),
             goldenIdentifier = "tabs_darkTheme_defaultColors_pressed"
         )
     }
@@ -174,14 +196,15 @@ class TabScreenshotTest {
     // matches that use case.
     @Test
     fun darkTheme_surfaceColors() {
-        val interactionState = InteractionState().apply {
-            addInteraction(Interaction.Pressed)
-        }
+        val interactionSource = MutableInteractionSource()
+
+        var scope: CoroutineScope? = null
 
         composeTestRule.setContent {
             MaterialTheme(darkColors()) {
+                scope = rememberCoroutineScope()
                 CustomTabs(
-                    interactionState,
+                    interactionSource,
                     backgroundColor = MaterialTheme.colors.surface,
                     selectedContentColor = MaterialTheme.colors.primary,
                     unselectedContentColor = MaterialTheme.colors.onSurface
@@ -190,7 +213,8 @@ class TabScreenshotTest {
         }
 
         assertTabsMatch(
-            interactionState = interactionState,
+            scope = scope!!,
+            interactionSource = interactionSource,
             interaction = null,
             goldenIdentifier = "tabs_darkTheme_surfaceColors"
         )
@@ -198,12 +222,15 @@ class TabScreenshotTest {
 
     @Test
     fun darkTheme_surfaceColors_pressed() {
-        val interactionState = InteractionState()
+        val interactionSource = MutableInteractionSource()
+
+        var scope: CoroutineScope? = null
 
         composeTestRule.setContent {
             MaterialTheme(darkColors()) {
+                scope = rememberCoroutineScope()
                 CustomTabs(
-                    interactionState,
+                    interactionSource,
                     backgroundColor = MaterialTheme.colors.surface,
                     selectedContentColor = MaterialTheme.colors.primary,
                     unselectedContentColor = MaterialTheme.colors.onSurface
@@ -212,22 +239,24 @@ class TabScreenshotTest {
         }
 
         assertTabsMatch(
-            interactionState = interactionState,
-            interaction = Interaction.Pressed,
+            scope = scope!!,
+            interactionSource = interactionSource,
+            interaction = PressInteraction.Press(Offset(10f, 10f)),
             goldenIdentifier = "tabs_darkTheme_surfaceColors_pressed"
         )
     }
 
     @Test
     fun darkTheme_primaryColors() {
-        val interactionState = InteractionState().apply {
-            addInteraction(Interaction.Pressed)
-        }
+        val interactionSource = MutableInteractionSource()
+
+        var scope: CoroutineScope? = null
 
         composeTestRule.setContent {
             MaterialTheme(darkColors()) {
+                scope = rememberCoroutineScope()
                 CustomTabs(
-                    interactionState,
+                    interactionSource,
                     backgroundColor = MaterialTheme.colors.primary,
                     selectedContentColor = MaterialTheme.colors.onPrimary,
                     unselectedContentColor = MaterialTheme.colors.onPrimary
@@ -236,7 +265,8 @@ class TabScreenshotTest {
         }
 
         assertTabsMatch(
-            interactionState = interactionState,
+            scope = scope!!,
+            interactionSource = interactionSource,
             interaction = null,
             goldenIdentifier = "tabs_darkTheme_primaryColors"
         )
@@ -244,12 +274,15 @@ class TabScreenshotTest {
 
     @Test
     fun darkTheme_primaryColors_pressed() {
-        val interactionState = InteractionState()
+        val interactionSource = MutableInteractionSource()
+
+        var scope: CoroutineScope? = null
 
         composeTestRule.setContent {
             MaterialTheme(darkColors()) {
+                scope = rememberCoroutineScope()
                 CustomTabs(
-                    interactionState,
+                    interactionSource,
                     backgroundColor = MaterialTheme.colors.primary,
                     selectedContentColor = MaterialTheme.colors.onPrimary,
                     unselectedContentColor = MaterialTheme.colors.onPrimary
@@ -258,8 +291,9 @@ class TabScreenshotTest {
         }
 
         assertTabsMatch(
-            interactionState = interactionState,
-            interaction = Interaction.Pressed,
+            scope = scope!!,
+            interactionSource = interactionSource,
+            interaction = PressInteraction.Press(Offset(10f, 10f)),
             goldenIdentifier = "tabs_darkTheme_primaryColors_pressed"
         )
     }
@@ -267,12 +301,13 @@ class TabScreenshotTest {
     /**
      * Asserts that the tabs match the screenshot with identifier [goldenIdentifier].
      *
-     * @param interactionState the [InteractionState] used for the first Tab
+     * @param interactionSource the [MutableInteractionSource] used for the first Tab
      * @param interaction the [Interaction] to assert for, or `null` if no [Interaction].
      * @param goldenIdentifier the identifier for the corresponding screenshot
      */
     private fun assertTabsMatch(
-        interactionState: InteractionState,
+        scope: CoroutineScope,
+        interactionSource: MutableInteractionSource,
         interaction: Interaction? = null,
         goldenIdentifier: String
     ) {
@@ -280,12 +315,8 @@ class TabScreenshotTest {
 
         if (interaction != null) {
             // Start ripple
-            composeTestRule.runOnUiThread {
-                if (interaction is Interaction.Pressed) {
-                    interactionState.addInteraction(interaction, Offset(10f, 10f))
-                } else {
-                    interactionState.addInteraction(interaction)
-                }
+            scope.launch {
+                interactionSource.emit(interaction)
             }
 
             // Advance to somewhere in the middle of the animation for the ripple
@@ -303,18 +334,19 @@ class TabScreenshotTest {
 /**
  * Default colored [TabRow] with three [Tab]s. The first [Tab] is selected, and the rest are not.
  *
- * @param interactionState the [InteractionState] for the first [Tab], to control its visual state.
+ * @param interactionSource the [MutableInteractionSource] for the first [Tab], to control its
+ * visual state.
  */
 @Composable
 private fun DefaultTabs(
-    interactionState: InteractionState
+    interactionSource: MutableInteractionSource
 ) {
     Box(Modifier.semantics(mergeDescendants = true) {}.testTag(Tag)) {
         TabRow(selectedTabIndex = 0) {
             Tab(
                 text = { Text("TAB") },
                 selected = true,
-                interactionState = interactionState,
+                interactionSource = interactionSource,
                 onClick = {}
             )
             Tab(
@@ -334,14 +366,15 @@ private fun DefaultTabs(
 /**
  * Custom colored [TabRow] with three [Tab]s. The first [Tab] is selected, and the rest are not.
  *
- * @param interactionState the [InteractionState] for the first [Tab], to control its visual state.
+ * @param interactionSource the [MutableInteractionSource] for the first [Tab], to control its
+ * visual state.
  * @param backgroundColor the backgroundColor of the [TabRow]
  * @param selectedContentColor the content color for a selected [Tab] (first tab)
  * @param unselectedContentColor the content color for an unselected [Tab] (second and third tabs)
  */
 @Composable
 private fun CustomTabs(
-    interactionState: InteractionState,
+    interactionSource: MutableInteractionSource,
     backgroundColor: Color,
     selectedContentColor: Color,
     unselectedContentColor: Color
@@ -354,7 +387,7 @@ private fun CustomTabs(
             Tab(
                 text = { Text("TAB") },
                 selected = true,
-                interactionState = interactionState,
+                interactionSource = interactionSource,
                 selectedContentColor = selectedContentColor,
                 unselectedContentColor = unselectedContentColor,
                 onClick = {}

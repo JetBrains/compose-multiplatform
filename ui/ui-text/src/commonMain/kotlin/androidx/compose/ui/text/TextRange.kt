@@ -27,27 +27,23 @@ fun CharSequence.substring(range: TextRange): String = this.substring(range.min,
  * An immutable text range class, represents a text range from [start] (inclusive) to [end]
  * (exclusive). [end] can be smaller than [start] and in those cases [min] and [max] can be
  * used in order to fetch the values.
+ *
+ * @param start the inclusive start offset of the range. Must be non-negative, otherwise an
+ * exception will be thrown.
+ * @param end the exclusive end offset of the range. Must be non-negative, otherwise an
+ * exception will be thrown.
+ */
+fun TextRange(/*@IntRange(from = 0)*/ start: Int, /*@IntRange(from = 0)*/ end: Int) =
+    TextRange(packWithCheck(start, end))
+
+/**
+ * An immutable text range class, represents a text range from [start] (inclusive) to [end]
+ * (exclusive). [end] can be smaller than [start] and in those cases [min] and [max] can be
+ * used in order to fetch the values.
  */
 @Suppress("EXPERIMENTAL_FEATURE_WARNING")
 @Immutable
-inline class TextRange(val packedValue: Long) {
-
-    /**
-     * An immutable text range class, represents a text range from [start] (inclusive) to [end]
-     * (exclusive). [end] can be smaller than [start] and in those cases [min] and [max] can be
-     * used in order to fetch the values.
-     *
-     * @param start the inclusive start offset of the range. Must be non-negative, otherwise an
-     * exception will be thrown.
-     * @param end the exclusive end offset of the range. Must be non-negative, otherwise an
-     * exception will be thrown.
-     */
-    constructor(
-        /*@IntRange(from = 0)*/
-        start: Int,
-        /*@IntRange(from = 0)*/
-        end: Int
-    ) : this(packWithCheck(start, end))
+inline class TextRange internal constructor(private val packedValue: Long) {
 
     val start: Int get() = unpackInt1(packedValue)
 

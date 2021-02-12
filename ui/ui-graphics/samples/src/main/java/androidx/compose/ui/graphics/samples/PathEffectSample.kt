@@ -21,7 +21,7 @@ import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
-import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.requiredSize
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -44,7 +44,7 @@ fun StampedPathEffectSample() {
         close()
     }
     Column(modifier = Modifier.fillMaxHeight().wrapContentSize(Alignment.Center)) {
-        val canvasModifier = Modifier.size(80.dp).align(Alignment.CenterHorizontally)
+        val canvasModifier = Modifier.requiredSize(80.dp).align(Alignment.CenterHorizontally)
 
         // StampedPathEffectStyle.Morph will modify the lines of the square to be curved to fit
         // the curvature of the circle itself. Each stamped square will be rendered as an arc
@@ -64,7 +64,7 @@ fun StampedPathEffectSample() {
             )
         }
 
-        Spacer(modifier = Modifier.size(10.dp))
+        Spacer(modifier = Modifier.requiredSize(10.dp))
 
         // StampedPathEffectStyle.Rotate will draw the square repeatedly around the circle
         // such that each stamped square is centered on the circumference of the circle and is
@@ -84,7 +84,7 @@ fun StampedPathEffectSample() {
             )
         }
 
-        Spacer(modifier = Modifier.size(10.dp))
+        Spacer(modifier = Modifier.requiredSize(10.dp))
 
         // StampedPathEffectStyle.Translate will draw the square repeatedly around the circle
         // with the top left of each stamped square on the circumference of the circle

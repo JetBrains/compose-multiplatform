@@ -28,16 +28,16 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Rect
-import androidx.compose.ui.gesture.DragObserver
-import androidx.compose.ui.gesture.LongPressDragObserver
-import androidx.compose.ui.gesture.dragGestureFilter
+import androidx.compose.foundation.legacygestures.DragObserver
+import androidx.compose.foundation.legacygestures.LongPressDragObserver
+import androidx.compose.foundation.legacygestures.dragGestureFilter
+import androidx.compose.foundation.text.InternalFoundationTextApi
 import androidx.compose.ui.hapticfeedback.HapticFeedback
 import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.platform.ClipboardManager
 import androidx.compose.ui.platform.TextToolbar
 import androidx.compose.ui.platform.TextToolbarStatus
 import androidx.compose.ui.text.AnnotatedString
-import androidx.compose.ui.text.InternalTextApi
 import androidx.compose.ui.text.TextRange
 import androidx.compose.ui.text.input.OffsetMapping
 import androidx.compose.ui.text.input.PasswordVisualTransformation
@@ -54,7 +54,6 @@ import kotlin.math.min
 /**
  * A bridge class between user interaction to the text field selection.
  */
-@OptIn(InternalTextApi::class)
 internal class TextFieldSelectionManager {
 
     /**
@@ -495,6 +494,7 @@ internal class TextFieldSelectionManager {
      * line, and the bottom is the bottom of the last selected line. The left is the leftmost
      * handle's horizontal coordinates, and the right is the rightmost handle's coordinates.
      */
+    @OptIn(InternalFoundationTextApi::class)
     private fun getContentRect(): Rect {
         state?.let {
             val startOffset =
@@ -600,7 +600,6 @@ internal class TextFieldSelectionManager {
 }
 
 @Composable
-@OptIn(InternalTextApi::class)
 internal fun TextFieldSelectionHandle(
     isStartHandle: Boolean,
     directions: Pair<ResolvedTextDirection, ResolvedTextDirection>,

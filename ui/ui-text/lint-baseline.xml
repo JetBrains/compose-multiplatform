@@ -7,7 +7,7 @@
         errorLine1="            Typeface.create(Typeface.DEFAULT, fontWeight.weight, fontStyle == FontStyle.Italic)"
         errorLine2="                     ~~~~~~">
         <location
-            file="src/androidMain/kotlin/androidx/compose/ui/text/platform/AndroidDefaultTypeface.kt"
+            file="src/androidMain/kotlin/androidx/compose/ui/text/platform/AndroidDefaultTypeface.android.kt"
             line="44"
             column="22"/>
     </issue>
@@ -18,7 +18,7 @@
         errorLine1="            Typeface.create(nativeTypeface, fontWeight.weight, fontStyle == FontStyle.Italic)"
         errorLine2="                     ~~~~~~">
         <location
-            file="src/androidMain/kotlin/androidx/compose/ui/text/platform/AndroidGenericFontFamilyTypeface.kt"
+            file="src/androidMain/kotlin/androidx/compose/ui/text/platform/AndroidGenericFontFamilyTypeface.android.kt"
             line="75"
             column="22"/>
     </issue>
@@ -80,22 +80,22 @@
 
     <issue
         id="UnsafeNewApiCall"
-        message="This call is to a method from API 24, the call containing class androidx.compose.ui.text.platform.extensions.LocaleExtensionsKt is not annotated with @RequiresApi(x) where x is at least 24. Either annotate the containing class with at least @RequiresApi(24) or move the call to a static method in a wrapper class annotated with at least @RequiresApi(24)."
+        message="This call is to a method from API 24, the call containing class androidx.compose.ui.text.platform.extensions.LocaleExtensions_androidKt is not annotated with @RequiresApi(x) where x is at least 24. Either annotate the containing class with at least @RequiresApi(24) or move the call to a static method in a wrapper class annotated with at least @RequiresApi(24)."
         errorLine1="    android.os.LocaleList(*map { it.toJavaLocale() }.toTypedArray())"
         errorLine2="               ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
-            file="src/androidMain/kotlin/androidx/compose/ui/text/platform/extensions/LocaleExtensions.kt"
+            file="src/androidMain/kotlin/androidx/compose/ui/text/platform/extensions/LocaleExtensions.android.kt"
             line="28"
             column="16"/>
     </issue>
 
     <issue
         id="UnsafeNewApiCall"
-        message="This call is to a method from API 24, the call containing class androidx.compose.ui.text.platform.extensions.SpannableExtensionsKt is not annotated with @RequiresApi(x) where x is at least 24. Either annotate the containing class with at least @RequiresApi(24) or move the call to a static method in a wrapper class annotated with at least @RequiresApi(24)."
+        message="This call is to a method from API 24, the call containing class androidx.compose.ui.text.platform.extensions.SpannableExtensions_androidKt is not annotated with @RequiresApi(x) where x is at least 24. Either annotate the containing class with at least @RequiresApi(24) or move the call to a static method in a wrapper class annotated with at least @RequiresApi(24)."
         errorLine1="                LocaleSpan(it.toAndroidLocaleList())"
         errorLine2="                ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
-            file="src/androidMain/kotlin/androidx/compose/ui/text/platform/extensions/SpannableExtensions.kt"
+            file="src/androidMain/kotlin/androidx/compose/ui/text/platform/extensions/SpannableExtensions.android.kt"
             line="280"
             column="17"/>
     </issue>
@@ -256,11 +256,11 @@
 
     <issue
         id="UnsafeNewApiCall"
-        message="This call is to a method from API 24, the call containing class androidx.compose.ui.text.platform.extensions.TextPaintExtensionsKt is not annotated with @RequiresApi(x) where x is at least 24. Either annotate the containing class with at least @RequiresApi(24) or move the call to a static method in a wrapper class annotated with at least @RequiresApi(24)."
+        message="This call is to a method from API 24, the call containing class androidx.compose.ui.text.platform.extensions.TextPaintExtensions_androidKt is not annotated with @RequiresApi(x) where x is at least 24. Either annotate the containing class with at least @RequiresApi(24) or move the call to a static method in a wrapper class annotated with at least @RequiresApi(24)."
         errorLine1="            textLocales = style.localeList.toAndroidLocaleList()"
         errorLine2="            ~~~~~~~~~~~">
         <location
-            file="src/androidMain/kotlin/androidx/compose/ui/text/platform/extensions/TextPaintExtensions.kt"
+            file="src/androidMain/kotlin/androidx/compose/ui/text/platform/extensions/TextPaintExtensions.android.kt"
             line="59"
             column="13"/>
     </issue>
@@ -271,7 +271,7 @@
         errorLine1="                Typeface.create(typeface, finalFontWeight, finalFontStyle)"
         errorLine2="                         ~~~~~~">
         <location
-            file="src/androidMain/kotlin/androidx/compose/ui/text/platform/TypefaceAdapter.kt"
+            file="src/androidMain/kotlin/androidx/compose/ui/text/platform/TypefaceAdapter.android.kt"
             line="99"
             column="26"/>
     </issue>
@@ -282,7 +282,7 @@
         errorLine1="            Typeface.create("
         errorLine2="                     ~~~~~~">
         <location
-            file="src/androidMain/kotlin/androidx/compose/ui/text/platform/TypefaceAdapter.kt"
+            file="src/androidMain/kotlin/androidx/compose/ui/text/platform/TypefaceAdapter.android.kt"
             line="213"
             column="22"/>
     </issue>

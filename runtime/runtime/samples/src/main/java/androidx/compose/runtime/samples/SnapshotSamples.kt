@@ -17,18 +17,16 @@
 package androidx.compose.runtime.samples
 
 import androidx.annotation.Sampled
-import androidx.compose.runtime.ExperimentalComposeApi
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.snapshots.Snapshot
-import androidx.compose.runtime.snapshots.snapshotFlow
+import androidx.compose.runtime.snapshotFlow
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 
 @Suppress("UNREACHABLE_CODE", "CanBeVal", "UNUSED_VARIABLE")
-@OptIn(ExperimentalComposeApi::class)
 @Sampled
 fun snapshotFlowSample() {
     // Define Snapshot state objects

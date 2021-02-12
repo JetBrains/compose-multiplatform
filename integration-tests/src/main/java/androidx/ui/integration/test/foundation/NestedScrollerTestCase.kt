@@ -25,7 +25,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.preferredSize
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.material.MaterialTheme
@@ -64,7 +64,7 @@ class NestedScrollerTestCase : ComposeTestCase, ToggleableTestCase {
     }
 
     override fun toggleState() {
-        runBlocking { scrollState.scrollTo(if (scrollState.value == 0f) 10f else 0f) }
+        runBlocking { scrollState.scrollTo(if (scrollState.value == 0) 10 else 0) }
     }
 
     @Composable
@@ -80,7 +80,7 @@ class NestedScrollerTestCase : ComposeTestCase, ToggleableTestCase {
                             val blue = Random.nextInt(256)
                             Color(red = red, green = green, blue = blue)
                         }
-                        Box(Modifier.preferredSize(350f.toDp()).background(color = color))
+                        Box(Modifier.size(350f.toDp()).background(color = color))
                         Text(
                             text = "Some title",
                             color = Color.Black,
@@ -95,7 +95,7 @@ class NestedScrollerTestCase : ComposeTestCase, ToggleableTestCase {
                             Box(
                                 Modifier
                                     .align(Alignment.CenterVertically)
-                                    .preferredSize(40f.toDp())
+                                    .size(40f.toDp())
                                     .background(color = playStoreColor)
                             )
                         }

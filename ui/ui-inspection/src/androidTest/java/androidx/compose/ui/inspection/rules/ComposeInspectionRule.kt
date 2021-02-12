@@ -16,10 +16,16 @@
 
 package androidx.compose.ui.inspection.rules
 
-import android.app.Activity
 import android.view.inspector.WindowInspector
-import androidx.compose.runtime.CompositionData
+import androidx.compose.runtime.tooling.CompositionData
+import androidx.activity.ComponentActivity
+import androidx.activity.compose.setContent
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.runtime.Composable
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.R
+import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.platform.ViewRootForTest
 import androidx.inspection.testing.InspectorTester
 import androidx.test.core.app.ActivityScenario
@@ -30,13 +36,26 @@ import layoutinspector.compose.inspection.LayoutInspectorComposeProtocol.Respons
 import org.junit.rules.ExternalResource
 import java.util.Collections
 import java.util.WeakHashMap
+import java.util.concurrent.CountDownLatch
+import java.util.concurrent.TimeUnit
 import kotlin.reflect.KClass
 
-class ComposeInspectionRule(val clazz: KClass<out Activity>) : ExternalResource() {
+class ComposeInspectionRule(
+    val clazz: KClass<out ComponentActivity>,
+    private val useInspector: Boolean = true
+) : ExternalResource() {
     var rootId: Long = 0
         private set
     lateinit var inspectorTester: InspectorTester
         private set
+
+    private val compositionDataSet =
+        Collections.newSetFromMap(WeakHashMap<CompositionData, Boolean>())
+
+    val compositionData: CompositionData
+        get() = compositionDataSet.first()
+
+    private lateinit var activityScenario: ActivityScenario<out ComponentActivity>
 
     override fun before() {
         JvmtiRule.ensureInitialised()
@@ -44,24 +63,47 @@ class ComposeInspectionRule(val clazz: KClass<out Activity>) : ExternalResource(
         ViewRootForTest.onViewCreatedCallback = {
             it.view.setTag(
                 R.id.inspection_slot_table_set,
-                Collections.newSetFromMap(WeakHashMap<CompositionData, Boolean>())
+                compositionDataSet
             )
             ViewRootForTest.onViewCreatedCallback = null
         }
 
-        ActivityScenario.launch(clazz.java).onActivity {
+        activityScenario = ActivityScenario.launch(clazz.java)
+        activityScenario.onActivity {
             val roots = WindowInspector.getGlobalWindowViews().map { it.uniqueDrawingId }
             Truth.assertThat(roots).hasSize(1)
             rootId = roots[0]
         }
+        if (!useInspector) return
         runBlocking {
             inspectorTester = InspectorTester("layoutinspector.compose.inspection")
         }
     }
 
+    fun show(composable: @Composable () -> Unit) = activityScenario.show(composable)
+
     override fun after() {
-        inspectorTester.dispose()
+        if (useInspector) inspectorTester.dispose()
     }
+}
+
+fun ActivityScenario<out ComponentActivity>.show(composable: @Composable () -> Unit) {
+    val positionedLatch = CountDownLatch(1)
+    onActivity {
+        it.setContent {
+            Box(
+                Modifier.onGloballyPositioned { positionedLatch.countDown() }
+                    .fillMaxSize()
+            ) {
+                composable()
+            }
+        }
+    }
+    // Wait for the layout to be performed
+    positionedLatch.await(1, TimeUnit.SECONDS)
+
+    // Wait for the UI thread to complete its current work so we know that layout is done.
+    onActivity { }
 }
 
 suspend fun InspectorTester.sendCommand(command: Command): Response {

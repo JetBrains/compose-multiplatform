@@ -27,10 +27,9 @@ import android.widget.FrameLayout
 import androidx.annotation.VisibleForTesting
 import androidx.compose.animation.core.InternalAnimationApi
 import androidx.compose.animation.core.Transition
-import androidx.compose.runtime.AtomicReference
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Composition
-import androidx.compose.runtime.Providers
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.currentComposer
 import androidx.compose.runtime.mutableStateOf
@@ -144,7 +143,12 @@ internal class ComposeViewAdapter : FrameLayout {
      * composition, we save it and throw it during onLayout, this allows Studio to catch it and
      * display it to the user.
      */
-    private val delayedException = AtomicReference<Throwable?>(null)
+    private var delayedException: Throwable? = null
+
+    /**
+     * A lock to take to access delayedException.
+     */
+    private val delayExceptionLock = Any()
 
     /**
      * The [Composable] to be rendered in the preview. It is initialized when this adapter
@@ -250,10 +254,12 @@ internal class ComposeViewAdapter : FrameLayout {
     override fun onLayout(changed: Boolean, left: Int, top: Int, right: Int, bottom: Int) {
         super.onLayout(changed, left, top, right, bottom)
 
-        delayedException.getAndSet(null)?.let { exception ->
-            // There was a pending exception. Throw it here since Studio will catch it and show
-            // it to the user.
-            throw exception
+        synchronized(delayExceptionLock) {
+            delayedException?.let { exception ->
+                // There was a pending exception. Throw it here since Studio will catch it and show
+                // it to the user.
+                throw exception
+            }
         }
 
         processViewInfos()
@@ -387,7 +393,7 @@ internal class ComposeViewAdapter : FrameLayout {
         // We need to replace the FontResourceLoader to avoid using ResourcesCompat.
         // ResourcesCompat can not load fonts within Layoutlib and, since Layoutlib always runs
         // the latest version, we do not need it.
-        Providers(LocalFontLoader provides LayoutlibFontResourceLoader(context)) {
+        CompositionLocalProvider(LocalFontLoader provides LayoutlibFontResourceLoader(context)) {
             Inspectable(slotTableRecord, content)
         }
     }
@@ -455,7 +461,9 @@ internal class ComposeViewAdapter : FrameLayout {
                         while (exception is ReflectiveOperationException) {
                             exception = exception.cause ?: break
                         }
-                        delayedException.set(exception)
+                        synchronized(delayExceptionLock) {
+                            delayedException = exception
+                        }
                         throw t
                     }
                 }

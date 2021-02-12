@@ -249,12 +249,19 @@ fun lerp(start: Dp, stop: Dp, fraction: Float): Dp {
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 
 /**
+ * Constructs a [DpOffset] from [x] and [y] position [Dp] values.
+ */
+@Stable
+fun DpOffset(x: Dp, y: Dp): DpOffset = DpOffset(packFloats(x.value, y.value))
+
+/**
  * A two-dimensional offset using [Dp] for units
  */
 @OptIn(ExperimentalUnsignedTypes::class)
 @Suppress("EXPERIMENTAL_FEATURE_WARNING")
 @Immutable
-inline class DpOffset(@PublishedApi internal val packedValue: Long) {
+inline class DpOffset internal constructor(@PublishedApi internal val packedValue: Long) {
+
     /**
      * The horizontal aspect of the offset in [Dp]
      */
@@ -299,13 +306,6 @@ inline class DpOffset(@PublishedApi internal val packedValue: Long) {
         val Zero = DpOffset(0.dp, 0.dp)
     }
 }
-
-/**
- * Constructs a [DpOffset] from [x] and [y] position [Dp] values.
- */
-@OptIn(ExperimentalUnsignedTypes::class)
-@Stable
-inline fun DpOffset(x: Dp, y: Dp): DpOffset = DpOffset(packFloats(x.value, y.value))
 
 /**
  * Linearly interpolate between two [DpOffset]s.

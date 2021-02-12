@@ -16,12 +16,11 @@
 
 package androidx.compose.material
 
-import androidx.compose.animation.core.ManualAnimationClock
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.preferredHeight
+import androidx.compose.foundation.layout.height
 import androidx.compose.material.BackdropValue.Concealed
 import androidx.compose.material.BackdropValue.Revealed
 import androidx.compose.ui.Modifier
@@ -43,7 +42,7 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.LargeTest
 import androidx.test.filters.MediumTest
 import com.google.common.truth.Truth.assertThat
-import org.junit.Before
+import kotlinx.coroutines.runBlocking
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -62,15 +61,8 @@ class BackdropScaffoldTest {
 
     private val frontLayer = "frontLayerTag"
 
-    private lateinit var clock: ManualAnimationClock
-
     private fun advanceClock() {
-        clock.clockTimeMillis += 100000L
-    }
-
-    @Before
-    fun init() {
-        clock = ManualAnimationClock(initTimeMillis = 0L)
+        rule.mainClock.advanceTimeBy(100_000L)
     }
 
     @Test
@@ -80,8 +72,8 @@ class BackdropScaffoldTest {
                 scaffoldState = rememberBackdropScaffoldState(Concealed),
                 peekHeight = peekHeight,
                 headerHeight = headerHeight,
-                appBar = { Box(Modifier.preferredHeight(peekHeight)) },
-                backLayerContent = { Box(Modifier.preferredHeight(contentHeight)) },
+                appBar = { Box(Modifier.height(peekHeight)) },
+                backLayerContent = { Box(Modifier.height(contentHeight)) },
                 frontLayerContent = { Box(Modifier.fillMaxSize().testTag(frontLayer)) }
             )
         }
@@ -93,14 +85,13 @@ class BackdropScaffoldTest {
     @Test
     @LargeTest
     fun backdropScaffold_testCollapseAction_whenConcealed() {
-        val scaffoldState = BackdropScaffoldState(Concealed, clock = clock)
         rule.setContent {
             BackdropScaffold(
-                scaffoldState = scaffoldState,
+                scaffoldState = rememberBackdropScaffoldState(Concealed),
                 peekHeight = peekHeight,
                 headerHeight = headerHeight,
-                appBar = { Box(Modifier.preferredHeight(peekHeight)) },
-                backLayerContent = { Box(Modifier.preferredHeight(contentHeight)) },
+                appBar = { Box(Modifier.height(peekHeight)) },
+                backLayerContent = { Box(Modifier.height(contentHeight)) },
                 frontLayerContent = { Box(Modifier.fillMaxSize().testTag(frontLayer)) }
             )
         }
@@ -123,8 +114,8 @@ class BackdropScaffoldTest {
                 scaffoldState = rememberBackdropScaffoldState(Revealed),
                 peekHeight = peekHeight,
                 headerHeight = headerHeight,
-                appBar = { Box(Modifier.preferredHeight(peekHeight)) },
-                backLayerContent = { Box(Modifier.preferredHeight(contentHeight)) },
+                appBar = { Box(Modifier.height(peekHeight)) },
+                backLayerContent = { Box(Modifier.height(contentHeight)) },
                 frontLayerContent = { Box(Modifier.fillMaxSize().testTag(frontLayer)) }
             )
         }
@@ -136,14 +127,13 @@ class BackdropScaffoldTest {
     @Test
     @LargeTest
     fun backdropScaffold_testExpandAction_whenRevealed() {
-        val scaffoldState = BackdropScaffoldState(Revealed, clock = clock)
         rule.setContent {
             BackdropScaffold(
-                scaffoldState = scaffoldState,
+                scaffoldState = rememberBackdropScaffoldState(Revealed),
                 peekHeight = peekHeight,
                 headerHeight = headerHeight,
-                appBar = { Box(Modifier.preferredHeight(peekHeight)) },
-                backLayerContent = { Box(Modifier.preferredHeight(contentHeight)) },
+                appBar = { Box(Modifier.height(peekHeight)) },
+                backLayerContent = { Box(Modifier.height(contentHeight)) },
                 frontLayerContent = { Box(Modifier.fillMaxSize().testTag(frontLayer)) }
             )
         }
@@ -166,7 +156,7 @@ class BackdropScaffoldTest {
                 scaffoldState = rememberBackdropScaffoldState(Revealed),
                 peekHeight = peekHeight,
                 headerHeight = headerHeight,
-                appBar = { Box(Modifier.preferredHeight(peekHeight)) },
+                appBar = { Box(Modifier.height(peekHeight)) },
                 backLayerContent = { Box(Modifier.fillMaxHeight()) },
                 frontLayerContent = { Box(Modifier.fillMaxSize().testTag(frontLayer)) }
             )
@@ -184,8 +174,8 @@ class BackdropScaffoldTest {
                 peekHeight = peekHeight,
                 headerHeight = headerHeight,
                 persistentAppBar = false,
-                appBar = { Box(Modifier.preferredHeight(peekHeight)) },
-                backLayerContent = { Box(Modifier.preferredHeight(contentHeight)) },
+                appBar = { Box(Modifier.height(peekHeight)) },
+                backLayerContent = { Box(Modifier.height(contentHeight)) },
                 frontLayerContent = { Box(Modifier.fillMaxSize().testTag(frontLayer)) }
             )
         }
@@ -202,8 +192,8 @@ class BackdropScaffoldTest {
                 peekHeight = peekHeight,
                 headerHeight = headerHeight,
                 stickyFrontLayer = false,
-                appBar = { Box(Modifier.preferredHeight(peekHeight)) },
-                backLayerContent = { Box(Modifier.preferredHeight(contentHeight)) },
+                appBar = { Box(Modifier.height(peekHeight)) },
+                backLayerContent = { Box(Modifier.height(contentHeight)) },
                 frontLayerContent = { Box(Modifier.fillMaxSize().testTag(frontLayer)) }
             )
         }
@@ -214,15 +204,16 @@ class BackdropScaffoldTest {
 
     @Test
     @LargeTest
-    fun backdropScaffold_revealAndConceal_manually() {
-        val scaffoldState = BackdropScaffoldState(Concealed, clock = clock)
+    fun backdropScaffold_revealAndConceal_manually(): Unit = runBlocking {
+        lateinit var scaffoldState: BackdropScaffoldState
         rule.setContent {
+            scaffoldState = rememberBackdropScaffoldState(Concealed)
             BackdropScaffold(
                 scaffoldState = scaffoldState,
                 peekHeight = peekHeight,
                 headerHeight = headerHeight,
-                appBar = { Box(Modifier.preferredHeight(peekHeight)) },
-                backLayerContent = { Box(Modifier.preferredHeight(contentHeight)) },
+                appBar = { Box(Modifier.height(peekHeight)) },
+                backLayerContent = { Box(Modifier.height(contentHeight)) },
                 frontLayerContent = { Box(Modifier.fillMaxSize().testTag(frontLayer)) }
             )
         }
@@ -230,18 +221,14 @@ class BackdropScaffoldTest {
         rule.onNodeWithTag(frontLayer)
             .assertTopPositionInRootIsEqualTo(peekHeight)
 
-        rule.runOnIdle {
-            scaffoldState.reveal()
-        }
+        scaffoldState.reveal()
 
         advanceClock()
 
         rule.onNodeWithTag(frontLayer)
             .assertTopPositionInRootIsEqualTo(peekHeight + contentHeight)
 
-        rule.runOnIdle {
-            scaffoldState.conceal()
-        }
+        scaffoldState.conceal()
 
         advanceClock()
 
@@ -251,20 +238,21 @@ class BackdropScaffoldTest {
 
     @Test
     fun backdropScaffold_revealBySwiping() {
-        val scaffoldState = BackdropScaffoldState(Concealed, clock)
+        lateinit var scaffoldState: BackdropScaffoldState
         rule.setContent {
+            scaffoldState = rememberBackdropScaffoldState(Concealed)
             BackdropScaffold(
                 scaffoldState = scaffoldState,
                 peekHeight = peekHeight,
                 headerHeight = headerHeight,
-                appBar = { Box(Modifier.preferredHeight(peekHeight)) },
-                backLayerContent = { Box(Modifier.preferredHeight(contentHeight)) },
+                appBar = { Box(Modifier.height(peekHeight)) },
+                backLayerContent = { Box(Modifier.height(contentHeight)) },
                 frontLayerContent = { Box(Modifier.fillMaxSize().testTag(frontLayer)) }
             )
         }
 
         rule.runOnIdle {
-            assertThat(scaffoldState.value).isEqualTo(Concealed)
+            assertThat(scaffoldState.currentValue).isEqualTo(Concealed)
         }
 
         rule.onNodeWithTag(frontLayer)
@@ -273,27 +261,28 @@ class BackdropScaffoldTest {
         advanceClock()
 
         rule.runOnIdle {
-            assertThat(scaffoldState.value).isEqualTo(Revealed)
+            assertThat(scaffoldState.currentValue).isEqualTo(Revealed)
         }
     }
 
     @Test
     fun backdropScaffold_concealByTapingOnFrontLayer() {
-        val scaffoldState = BackdropScaffoldState(Revealed, clock)
+        lateinit var scaffoldState: BackdropScaffoldState
         rule.setContent {
+            scaffoldState = rememberBackdropScaffoldState(Revealed)
             BackdropScaffold(
                 scaffoldState = scaffoldState,
                 peekHeight = peekHeight,
                 headerHeight = headerHeight,
                 frontLayerScrimColor = Color.Red,
-                appBar = { Box(Modifier.preferredHeight(peekHeight)) },
-                backLayerContent = { Box(Modifier.preferredHeight(contentHeight)) },
+                appBar = { Box(Modifier.height(peekHeight)) },
+                backLayerContent = { Box(Modifier.height(contentHeight)) },
                 frontLayerContent = { Box(Modifier.fillMaxSize().testTag(frontLayer)) }
             )
         }
 
         rule.runOnIdle {
-            assertThat(scaffoldState.value).isEqualTo(Revealed)
+            assertThat(scaffoldState.currentValue).isEqualTo(Revealed)
         }
 
         rule.onNodeWithTag(frontLayer)
@@ -302,22 +291,23 @@ class BackdropScaffoldTest {
         advanceClock()
 
         rule.runOnIdle {
-            assertThat(scaffoldState.value).isEqualTo(Concealed)
+            assertThat(scaffoldState.currentValue).isEqualTo(Concealed)
         }
     }
 
     @Test
     fun backdropScaffold_scrimIsDisabledWhenTransparent() {
         var frontLayerClicks = 0
-        val scaffoldState = BackdropScaffoldState(Revealed, clock)
+        lateinit var scaffoldState: BackdropScaffoldState
         rule.setContent {
+            scaffoldState = rememberBackdropScaffoldState(Revealed)
             BackdropScaffold(
                 scaffoldState = scaffoldState,
                 peekHeight = peekHeight,
                 headerHeight = headerHeight,
                 frontLayerScrimColor = Color.Transparent,
-                appBar = { Box(Modifier.preferredHeight(peekHeight)) },
-                backLayerContent = { Box(Modifier.preferredHeight(contentHeight)) },
+                appBar = { Box(Modifier.height(peekHeight)) },
+                backLayerContent = { Box(Modifier.height(contentHeight)) },
                 frontLayerContent = {
                     Box(
                         Modifier.fillMaxSize().testTag(frontLayer).clickable {
@@ -330,7 +320,7 @@ class BackdropScaffoldTest {
 
         rule.runOnIdle {
             assertThat(frontLayerClicks).isEqualTo(0)
-            assertThat(scaffoldState.value).isEqualTo(Revealed)
+            assertThat(scaffoldState.currentValue).isEqualTo(Revealed)
         }
 
         rule.onNodeWithTag(frontLayer)
@@ -340,7 +330,7 @@ class BackdropScaffoldTest {
 
         rule.runOnIdle {
             assertThat(frontLayerClicks).isEqualTo(1)
-            assertThat(scaffoldState.value).isEqualTo(Revealed)
+            assertThat(scaffoldState.currentValue).isEqualTo(Revealed)
         }
     }
 }

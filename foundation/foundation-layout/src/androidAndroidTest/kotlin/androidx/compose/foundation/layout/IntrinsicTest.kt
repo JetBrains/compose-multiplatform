@@ -20,9 +20,17 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.layout.Layout
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.layout.IntrinsicMeasurable
+import androidx.compose.ui.layout.IntrinsicMeasureScope
 import androidx.compose.ui.layout.LayoutCoordinates
+import androidx.compose.ui.layout.Measurable
+import androidx.compose.ui.layout.MeasurePolicy
+import androidx.compose.ui.layout.MeasureResult
+import androidx.compose.ui.layout.MeasureScope
 import androidx.compose.ui.node.Ref
 import androidx.compose.ui.layout.onGloballyPositioned
+import androidx.compose.ui.layout.onSizeChanged
+import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.constrainHeight
@@ -39,7 +47,6 @@ import java.util.concurrent.TimeUnit
 
 @SmallTest
 @RunWith(AndroidJUnit4::class)
-@OptIn(ExperimentalLayout::class)
 class IntrinsicTest : LayoutTest() {
     @Test
     fun testMinIntrinsicWidth() = with(density) {
@@ -54,7 +61,7 @@ class IntrinsicTest : LayoutTest() {
                         minIntrinsicWidthSize.value = coordinates.size
                         positionedLatch.countDown()
                     }
-                        .preferredWidth(IntrinsicSize.Min).saveLayoutInfo(
+                        .width(IntrinsicSize.Min).saveLayoutInfo(
                             size = childSize,
                             position = childPosition,
                             positionedLatch = positionedLatch
@@ -82,7 +89,7 @@ class IntrinsicTest : LayoutTest() {
                     Modifier.onGloballyPositioned { coordinates: LayoutCoordinates ->
                         minIntrinsicHeightSize.value = coordinates.size
                         positionedLatch.countDown()
-                    }.preferredHeight(IntrinsicSize.Min).saveLayoutInfo(
+                    }.height(IntrinsicSize.Min).saveLayoutInfo(
                         size = childSize,
                         position = childPosition,
                         positionedLatch = positionedLatch
@@ -110,7 +117,7 @@ class IntrinsicTest : LayoutTest() {
                     Modifier.onGloballyPositioned { coordinates: LayoutCoordinates ->
                         maxIntrinsicWidthSize.value = coordinates.size
                         positionedLatch.countDown()
-                    }.preferredWidth(IntrinsicSize.Max).saveLayoutInfo(
+                    }.width(IntrinsicSize.Max).saveLayoutInfo(
                         size = childSize,
                         position = childPosition,
                         positionedLatch = positionedLatch
@@ -138,7 +145,7 @@ class IntrinsicTest : LayoutTest() {
                     Modifier.onGloballyPositioned { coordinates: LayoutCoordinates ->
                         maxIntrinsicHeightSize.value = coordinates.size
                         positionedLatch.countDown()
-                    }.preferredHeight(IntrinsicSize.Max).saveLayoutInfo(
+                    }.height(IntrinsicSize.Max).saveLayoutInfo(
                         size = childSize,
                         position = childPosition,
                         positionedLatch = positionedLatch
@@ -167,7 +174,7 @@ class IntrinsicTest : LayoutTest() {
                         Modifier.onGloballyPositioned { coordinates: LayoutCoordinates ->
                             minIntrinsicWidthSize.value = coordinates.size
                             positionedLatch.countDown()
-                        }.preferredWidth(IntrinsicSize.Min).saveLayoutInfo(
+                        }.width(IntrinsicSize.Min).saveLayoutInfo(
                             size = childSize,
                             position = childPosition,
                             positionedLatch = positionedLatch
@@ -197,7 +204,7 @@ class IntrinsicTest : LayoutTest() {
                         Modifier.onGloballyPositioned { coordinates: LayoutCoordinates ->
                             minIntrinsicWidthSize.value = coordinates.size
                             positionedLatch.countDown()
-                        }.preferredWidth(IntrinsicSize.Min).saveLayoutInfo(
+                        }.width(IntrinsicSize.Min).saveLayoutInfo(
                             size = childSize,
                             position = childPosition,
                             positionedLatch = positionedLatch
@@ -230,7 +237,7 @@ class IntrinsicTest : LayoutTest() {
                     }
                 ) {
                     FixedIntrinsicsBox(
-                        Modifier.preferredHeight(IntrinsicSize.Min).saveLayoutInfo(
+                        Modifier.height(IntrinsicSize.Min).saveLayoutInfo(
                             size = childSize,
                             position = childPosition,
                             positionedLatch = positionedLatch
@@ -263,7 +270,7 @@ class IntrinsicTest : LayoutTest() {
                     }
                 ) {
                     FixedIntrinsicsBox(
-                        Modifier.preferredHeight(IntrinsicSize.Min).saveLayoutInfo(
+                        Modifier.height(IntrinsicSize.Min).saveLayoutInfo(
                             size = childSize,
                             position = childPosition,
                             positionedLatch = positionedLatch
@@ -296,7 +303,7 @@ class IntrinsicTest : LayoutTest() {
                     }
                 ) {
                     FixedIntrinsicsBox(
-                        Modifier.preferredWidth(IntrinsicSize.Max).saveLayoutInfo(
+                        Modifier.width(IntrinsicSize.Max).saveLayoutInfo(
                             size = childSize,
                             position = childPosition,
                             positionedLatch = positionedLatch
@@ -329,7 +336,7 @@ class IntrinsicTest : LayoutTest() {
                     }
                 ) {
                     FixedIntrinsicsBox(
-                        Modifier.preferredWidth(IntrinsicSize.Max).saveLayoutInfo(
+                        Modifier.width(IntrinsicSize.Max).saveLayoutInfo(
                             size = childSize,
                             position = childPosition,
                             positionedLatch = positionedLatch
@@ -362,7 +369,7 @@ class IntrinsicTest : LayoutTest() {
                     }
                 ) {
                     FixedIntrinsicsBox(
-                        Modifier.preferredHeight(IntrinsicSize.Max).saveLayoutInfo(
+                        Modifier.height(IntrinsicSize.Max).saveLayoutInfo(
                             size = childSize,
                             position = childPosition,
                             positionedLatch = positionedLatch
@@ -395,7 +402,7 @@ class IntrinsicTest : LayoutTest() {
                     }
                 ) {
                     FixedIntrinsicsBox(
-                        Modifier.preferredHeight(IntrinsicSize.Max).saveLayoutInfo(
+                        Modifier.height(IntrinsicSize.Max).saveLayoutInfo(
                             size = childSize,
                             position = childPosition,
                             positionedLatch = positionedLatch
@@ -413,10 +420,94 @@ class IntrinsicTest : LayoutTest() {
     }
 
     @Test
+    fun testRequiredMinIntrinsicWidth() = with(density) {
+        val countDownLatch = CountDownLatch(1)
+        show {
+            Box {
+                ConstrainedBox(
+                    DpConstraints.fixed(100.dp, 100.dp)
+                ) {
+                    FixedIntrinsicsBox(
+                        Modifier.requiredWidth(IntrinsicSize.Min).onSizeChanged {
+                            assertEquals(IntSize(10.dp.roundToPx(), 50.dp.roundToPx()), it)
+                            countDownLatch.countDown()
+                        },
+                        10.dp, 20.dp, 30.dp, 40.dp, 50.dp, 60.dp
+                    )
+                }
+            }
+        }
+        assertTrue(countDownLatch.await(1, TimeUnit.SECONDS))
+    }
+
+    @Test
+    fun testRequiredMinIntrinsicHeight() = with(density) {
+        val countDownLatch = CountDownLatch(1)
+        show {
+            Box {
+                ConstrainedBox(
+                    DpConstraints.fixed(100.dp, 100.dp)
+                ) {
+                    FixedIntrinsicsBox(
+                        Modifier.requiredHeight(IntrinsicSize.Min).onSizeChanged {
+                            assertEquals(IntSize(20.dp.roundToPx(), 40.dp.roundToPx()), it)
+                            countDownLatch.countDown()
+                        },
+                        10.dp, 20.dp, 30.dp, 40.dp, 50.dp, 60.dp
+                    )
+                }
+            }
+        }
+        assertTrue(countDownLatch.await(1, TimeUnit.SECONDS))
+    }
+
+    @Test
+    fun testRequiredMaxIntrinsicWidth() = with(density) {
+        val countDownLatch = CountDownLatch(1)
+        show {
+            Box {
+                ConstrainedBox(
+                    DpConstraints.fixed(100.dp, 100.dp)
+                ) {
+                    FixedIntrinsicsBox(
+                        Modifier.requiredWidth(IntrinsicSize.Max).onSizeChanged {
+                            assertEquals(IntSize(30.dp.roundToPx(), 50.dp.roundToPx()), it)
+                            countDownLatch.countDown()
+                        },
+                        10.dp, 20.dp, 30.dp, 40.dp, 50.dp, 60.dp
+                    )
+                }
+            }
+        }
+        assertTrue(countDownLatch.await(1, TimeUnit.SECONDS))
+    }
+
+    @Test
+    fun testRequiredMaxIntrinsicHeight() = with(density) {
+        val countDownLatch = CountDownLatch(1)
+        show {
+            Box {
+                ConstrainedBox(
+                    DpConstraints.fixed(100.dp, 100.dp)
+                ) {
+                    FixedIntrinsicsBox(
+                        Modifier.requiredHeight(IntrinsicSize.Max).onSizeChanged {
+                            assertEquals(IntSize(20.dp.roundToPx(), 60.dp.roundToPx()), it)
+                            countDownLatch.countDown()
+                        },
+                        10.dp, 20.dp, 30.dp, 40.dp, 50.dp, 60.dp
+                    )
+                }
+            }
+        }
+        assertTrue(countDownLatch.await(1, TimeUnit.SECONDS))
+    }
+
+    @Test
     fun testMinIntrinsicWidth_intrinsicMeasurements() = with(density) {
         testIntrinsics({
             FixedIntrinsicsBox(
-                Modifier.preferredWidth(IntrinsicSize.Min), 10.dp, 20.dp, 30.dp, 40.dp, 50.dp, 60.dp
+                Modifier.width(IntrinsicSize.Min), 10.dp, 20.dp, 30.dp, 40.dp, 50.dp, 60.dp
             )
         }) { minIntrinsicWidth, minIntrinsicHeight, maxIntrinsicWidth, maxIntrinsicHeight ->
             assertEquals(10.dp.roundToPx(), minIntrinsicWidth(0))
@@ -430,7 +521,7 @@ class IntrinsicTest : LayoutTest() {
     fun testMinIntrinsicHeight_intrinsicMeasurements() = with(density) {
         testIntrinsics({
             FixedIntrinsicsBox(
-                Modifier.preferredHeight(IntrinsicSize.Min),
+                Modifier.height(IntrinsicSize.Min),
                 10.dp, 20.dp, 30.dp, 40.dp, 50.dp, 60.dp
             )
         }) { minIntrinsicWidth, minIntrinsicHeight, maxIntrinsicWidth, maxIntrinsicHeight ->
@@ -445,7 +536,7 @@ class IntrinsicTest : LayoutTest() {
     fun testMaxIntrinsicWidth_intrinsicMeasurements() = with(density) {
         testIntrinsics({
             FixedIntrinsicsBox(
-                Modifier.preferredWidth(IntrinsicSize.Max), 10.dp, 20.dp, 30.dp, 40.dp, 50.dp, 60.dp
+                Modifier.width(IntrinsicSize.Max), 10.dp, 20.dp, 30.dp, 40.dp, 50.dp, 60.dp
             )
         }) { minIntrinsicWidth, minIntrinsicHeight, maxIntrinsicWidth, maxIntrinsicHeight ->
             assertEquals(30.dp.roundToPx(), minIntrinsicWidth(0))
@@ -459,7 +550,7 @@ class IntrinsicTest : LayoutTest() {
     fun testMaxIntrinsicHeight_intrinsicMeasurements() = with(density) {
         testIntrinsics({
             FixedIntrinsicsBox(
-                Modifier.preferredHeight(IntrinsicSize.Max),
+                Modifier.height(IntrinsicSize.Max),
                 10.dp, 20.dp, 30.dp, 40.dp, 50.dp, 60.dp
             )
         }) { minIntrinsicWidth, minIntrinsicHeight, maxIntrinsicWidth, maxIntrinsicHeight ->
@@ -481,17 +572,40 @@ private fun FixedIntrinsicsBox(
     height: Dp,
     maxIntrinsicHeight: Dp
 ) {
-    Layout(
-        {},
-        minIntrinsicWidthMeasureBlock = { _, _ -> minIntrinsicWidth.roundToPx() },
-        minIntrinsicHeightMeasureBlock = { _, _ -> minIntrinsicHeight.roundToPx() },
-        maxIntrinsicWidthMeasureBlock = { _, _ -> maxIntrinsicWidth.roundToPx() },
-        maxIntrinsicHeightMeasureBlock = { _, _ -> maxIntrinsicHeight.roundToPx() },
-        modifier = modifier
-    ) { _, constraints ->
-        layout(
-            constraints.constrainWidth(width.roundToPx()),
-            constraints.constrainHeight(height.roundToPx())
-        ) {}
+    val measurePolicy = object : MeasurePolicy {
+        override fun MeasureScope.measure(
+            measurables: List<Measurable>,
+            constraints: Constraints
+        ): MeasureResult {
+            return layout(
+                constraints.constrainWidth(width.roundToPx()),
+                constraints.constrainHeight(height.roundToPx())
+            ) {}
+        }
+
+        override fun IntrinsicMeasureScope.minIntrinsicWidth(
+            measurables: List<IntrinsicMeasurable>,
+            height: Int
+        ) = minIntrinsicWidth.roundToPx()
+
+        override fun IntrinsicMeasureScope.minIntrinsicHeight(
+            measurables: List<IntrinsicMeasurable>,
+            width: Int
+        ) = minIntrinsicHeight.roundToPx()
+
+        override fun IntrinsicMeasureScope.maxIntrinsicWidth(
+            measurables: List<IntrinsicMeasurable>,
+            height: Int
+        ) = maxIntrinsicWidth.roundToPx()
+
+        override fun IntrinsicMeasureScope.maxIntrinsicHeight(
+            measurables: List<IntrinsicMeasurable>,
+            width: Int
+        ) = maxIntrinsicHeight.roundToPx()
     }
+    Layout(
+        content = {},
+        modifier = modifier,
+        measurePolicy = measurePolicy
+    )
 }

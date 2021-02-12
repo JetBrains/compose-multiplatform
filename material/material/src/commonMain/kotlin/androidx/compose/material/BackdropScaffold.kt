@@ -16,13 +16,11 @@
 
 package androidx.compose.material
 
-import androidx.compose.animation.asDisposableClock
-import androidx.compose.animation.core.AnimationClockObservable
-import androidx.compose.animation.core.AnimationEndReason.Interrupted
 import androidx.compose.animation.core.AnimationSpec
 import androidx.compose.animation.core.TweenSpec
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.foundation.Canvas
+import androidx.compose.foundation.gestures.Orientation
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -36,18 +34,17 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Stable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.Saver
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.gesture.nestedscroll.nestedScroll
-import androidx.compose.ui.gesture.scrollorientationlocking.Orientation
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.SubcomposeLayout
-import androidx.compose.ui.platform.LocalAnimationClock
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.semantics.collapse
 import androidx.compose.ui.semantics.expand
@@ -60,6 +57,8 @@ import androidx.compose.ui.unit.offset
 import androidx.compose.ui.util.fastForEach
 import androidx.compose.ui.util.fastMap
 import androidx.compose.ui.zIndex
+import kotlinx.coroutines.CancellationException
+import kotlinx.coroutines.launch
 import kotlin.math.max
 import kotlin.math.min
 import kotlin.math.roundToInt
@@ -67,6 +66,7 @@ import kotlin.math.roundToInt
 /**
  * Possible values of [BackdropScaffoldState].
  */
+@ExperimentalMaterialApi
 enum class BackdropValue {
     /**
      * Indicates the back layer is concealed and the front layer is active.
@@ -83,7 +83,6 @@ enum class BackdropValue {
  * State of the [BackdropScaffold] composable.
  *
  * @param initialValue The initial value of the state.
- * @param clock The animation clock that will be used to drive the animations.
  * @param animationSpec The default animation that will be used to animate to a new state.
  * @param confirmStateChange Optional callback invoked to confirm or veto a pending state change.
  * @param snackbarHostState The [SnackbarHostState] used to show snackbars inside the scaffold.
@@ -92,13 +91,11 @@ enum class BackdropValue {
 @Stable
 class BackdropScaffoldState(
     initialValue: BackdropValue,
-    clock: AnimationClockObservable,
     animationSpec: AnimationSpec<Float> = SwipeableDefaults.AnimationSpec,
     confirmStateChange: (BackdropValue) -> Boolean = { true },
     val snackbarHostState: SnackbarHostState = SnackbarHostState()
 ) : SwipeableState<BackdropValue>(
     initialValue = initialValue,
-    clock = clock,
     animationSpec = animationSpec,
     confirmStateChange = confirmStateChange
 ) {
@@ -106,45 +103,31 @@ class BackdropScaffoldState(
      * Whether the back layer is revealed.
      */
     val isRevealed: Boolean
-        get() = value == Revealed
+        get() = currentValue == Revealed
 
     /**
      * Whether the back layer is concealed.
      */
     val isConcealed: Boolean
-        get() = value == Concealed
+        get() = currentValue == Concealed
 
     /**
-     * Reveal the back layer, with an animation.
+     * Reveal the back layer with animation and suspend until it if fully revealed or animation
+     * has been cancelled.  This method will throw [CancellationException] if the animation is
+     * interrupted
      *
-     * @param onRevealed Optional callback invoked when the back layer has been revealed.
+     * @return the reason the reveal animation ended
      */
-    fun reveal(onRevealed: (() -> Unit)? = null) {
-        animateTo(
-            targetValue = Revealed,
-            onEnd = { endReason, endValue ->
-                if (endReason != Interrupted && endValue == Revealed) {
-                    onRevealed?.invoke()
-                }
-            }
-        )
-    }
+    suspend fun reveal() = animateTo(targetValue = Revealed)
 
     /**
-     * Conceal the back layer, with an animation.
+     * Conceal the back layer with animation and suspend until it if fully concealed or animation
+     * has been cancelled. This method will throw [CancellationException] if the animation is
+     * interrupted
      *
-     * @param onConcealed Optional callback invoked when the back layer has been concealed.
+     * @return the reason the conceal animation ended
      */
-    fun conceal(onConcealed: (() -> Unit)? = null) {
-        animateTo(
-            targetValue = Concealed,
-            onEnd = { endReason, endValue ->
-                if (endReason != Interrupted && endValue == Concealed) {
-                    onConcealed?.invoke()
-                }
-            }
-        )
-    }
+    suspend fun conceal() = animateTo(targetValue = Concealed)
 
     internal val nestedScrollConnection = this.PreUpPostDownNestedScrollConnection
 
@@ -153,16 +136,14 @@ class BackdropScaffoldState(
          * The default [Saver] implementation for [BackdropScaffoldState].
          */
         fun Saver(
-            clock: AnimationClockObservable,
             animationSpec: AnimationSpec<Float>,
             confirmStateChange: (BackdropValue) -> Boolean,
             snackbarHostState: SnackbarHostState
         ): Saver<BackdropScaffoldState, *> = Saver(
-            save = { it.value },
+            save = { it.currentValue },
             restore = {
                 BackdropScaffoldState(
                     initialValue = it,
-                    clock = clock,
                     animationSpec = animationSpec,
                     confirmStateChange = confirmStateChange,
                     snackbarHostState = snackbarHostState
@@ -173,10 +154,9 @@ class BackdropScaffoldState(
 }
 
 /**
- * Create and [remember] a [BackdropScaffoldState] with the default animation clock.
+ * Create and [remember] a [BackdropScaffoldState].
  *
  * @param initialValue The initial value of the state.
- * @param clock The animation clock that will be used to drive the animations.
  * @param animationSpec The default animation that will be used to animate to a new state.
  * @param confirmStateChange Optional callback invoked to confirm or veto a pending state change.
  * @param snackbarHostState The [SnackbarHostState] used to show snackbars inside the scaffold.
@@ -185,19 +165,15 @@ class BackdropScaffoldState(
 @ExperimentalMaterialApi
 fun rememberBackdropScaffoldState(
     initialValue: BackdropValue,
-    clock: AnimationClockObservable = LocalAnimationClock.current,
     animationSpec: AnimationSpec<Float> = SwipeableDefaults.AnimationSpec,
     confirmStateChange: (BackdropValue) -> Boolean = { true },
     snackbarHostState: SnackbarHostState = remember { SnackbarHostState() }
 ): BackdropScaffoldState {
-    val disposableClock = clock.asDisposableClock()
     return rememberSaveable(
-        disposableClock,
         animationSpec,
         confirmStateChange,
         snackbarHostState,
         saver = BackdropScaffoldState.Saver(
-            clock = disposableClock,
             animationSpec = animationSpec,
             confirmStateChange = confirmStateChange,
             snackbarHostState = snackbarHostState
@@ -205,7 +181,6 @@ fun rememberBackdropScaffoldState(
     ) {
         BackdropScaffoldState(
             initialValue = initialValue,
-            clock = disposableClock,
             animationSpec = animationSpec,
             confirmStateChange = confirmStateChange,
             snackbarHostState = snackbarHostState
@@ -242,6 +217,11 @@ fun rememberBackdropScaffoldState(
  *
  * @sample androidx.compose.material.samples.BackdropScaffoldSample
  *
+ * @param appBar App bar for the back layer. Make sure that the [peekHeight] is equal to the
+ * height of the app bar, so that the app bar is fully visible. Consider using [TopAppBar] but
+ * set the elevation to 0dp and background color to transparent as a surface is already provided.
+ * @param backLayerContent The content of the back layer.
+ * @param frontLayerContent The content of the front layer.
  * @param modifier Optional [Modifier] for the root of the scaffold.
  * @param scaffoldState The state of the scaffold.
  * @param gesturesEnabled Whether or not the backdrop can be interacted with by gestures.
@@ -265,15 +245,13 @@ fun rememberBackdropScaffoldState(
  * layer is revealed. If you set this to `Color.Transparent`, then a scrim will not be applied
  * and interaction with the front layer will not be blocked when the back layer is revealed.
  * @param snackbarHost The component hosting the snackbars shown inside the scaffold.
- * @param appBar App bar for the back layer. Make sure that the [peekHeight] is equal to the
- * height of the app bar, so that the app bar is fully visible. Consider using [TopAppBar] but
- * set the elevation to 0dp and background color to transparent as a surface is already provided.
- * @param backLayerContent The content of the back layer.
- * @param frontLayerContent The content of the front layer.
  */
 @Composable
 @ExperimentalMaterialApi
 fun BackdropScaffold(
+    appBar: @Composable () -> Unit,
+    backLayerContent: @Composable () -> Unit,
+    frontLayerContent: @Composable () -> Unit,
     modifier: Modifier = Modifier,
     scaffoldState: BackdropScaffoldState = rememberBackdropScaffoldState(Concealed),
     gesturesEnabled: Boolean = true,
@@ -288,10 +266,7 @@ fun BackdropScaffold(
     frontLayerBackgroundColor: Color = MaterialTheme.colors.surface,
     frontLayerContentColor: Color = contentColorFor(frontLayerBackgroundColor),
     frontLayerScrimColor: Color = BackdropScaffoldDefaults.frontLayerScrimColor,
-    snackbarHost: @Composable (SnackbarHostState) -> Unit = { SnackbarHost(it) },
-    appBar: @Composable () -> Unit,
-    backLayerContent: @Composable () -> Unit,
-    frontLayerContent: @Composable () -> Unit
+    snackbarHost: @Composable (SnackbarHostState) -> Unit = { SnackbarHost(it) }
 ) {
     val peekHeightPx = with(LocalDensity.current) { peekHeight.toPx() }
     val headerHeightPx = with(LocalDensity.current) { headerHeight.toPx() }
@@ -315,6 +290,7 @@ fun BackdropScaffold(
         color = backLayerBackgroundColor,
         contentColor = backLayerContentColor
     ) {
+        val scope = rememberCoroutineScope()
         BackdropStack(
             modifier.fillMaxSize(),
             backLayer,
@@ -339,9 +315,9 @@ fun BackdropScaffold(
                 )
                 .semantics {
                     if (scaffoldState.isConcealed) {
-                        collapse { scaffoldState.reveal(); true }
+                        collapse { scope.launch { scaffoldState.reveal() }; true }
                     } else {
-                        expand { scaffoldState.conceal(); true }
+                        expand { scope.launch { scaffoldState.conceal() }; true }
                     }
                 }
 
@@ -360,7 +336,9 @@ fun BackdropScaffold(
 
                     Scrim(
                         color = frontLayerScrimColor,
-                        onDismiss = { scaffoldState.conceal() },
+                        onDismiss = {
+                            scope.launch { scaffoldState.conceal() }
+                        },
                         visible = scaffoldState.targetValue == Revealed
                     )
                 }
@@ -413,6 +391,7 @@ private fun Scrim(
  * vertically, while they crossfade. It is very important that both are composed and measured,
  * even if invisible, and that this component is as large as both of them.
  */
+@OptIn(ExperimentalMaterialApi::class)
 @Composable
 private fun BackLayerTransition(
     target: BackdropValue,

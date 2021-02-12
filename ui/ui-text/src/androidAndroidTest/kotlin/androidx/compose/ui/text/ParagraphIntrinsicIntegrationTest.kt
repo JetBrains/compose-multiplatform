@@ -16,6 +16,7 @@
 
 package androidx.compose.ui.text
 
+import androidx.compose.ui.text.AnnotatedString.Range
 import androidx.compose.ui.text.font.toFontFamily
 import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.TextUnit
@@ -98,7 +99,7 @@ class ParagraphIntrinsicIntegrationTest {
                 text = text,
                 fontSize = fontSize,
                 spanStyles = listOf(
-                    SpanStyleRange(
+                    Range<SpanStyle>(
                         item = SpanStyle(fontSize = styledFontSize),
                         start = "a ".length,
                         end = "a bb ".length
@@ -182,7 +183,7 @@ class ParagraphIntrinsicIntegrationTest {
                 text = text,
                 fontSize = fontSize,
                 spanStyles = listOf(
-                    SpanStyleRange(
+                    Range<SpanStyle>(
                         item = SpanStyle(fontSize = styledFontSize),
                         start = "a".length,
                         end = "a bb ".length
@@ -199,7 +200,7 @@ class ParagraphIntrinsicIntegrationTest {
         text: String = "",
         style: TextStyle? = null,
         fontSize: TextUnit = 14.sp,
-        spanStyles: List<AnnotatedString.Range<SpanStyle>> = listOf()
+        spanStyles: List<Range<SpanStyle>> = listOf()
     ): ParagraphIntrinsics {
         return ParagraphIntrinsics(
             text = text,

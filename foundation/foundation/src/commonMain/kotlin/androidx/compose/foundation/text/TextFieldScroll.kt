@@ -16,17 +16,14 @@
 
 package androidx.compose.foundation.text
 
-import androidx.compose.animation.asDisposableClock
-import androidx.compose.foundation.InteractionState
-import androidx.compose.foundation.animation.defaultFlingConfig
-import androidx.compose.foundation.gestures.ScrollableController
+import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.gestures.Orientation
+import androidx.compose.foundation.gestures.rememberScrollableState
 import androidx.compose.foundation.gestures.scrollable
 import androidx.compose.foundation.layout.offset
-import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Stable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.listSaver
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.structuralEqualityPolicy
@@ -34,12 +31,10 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.composed
 import androidx.compose.ui.draw.clipToBounds
 import androidx.compose.ui.geometry.Rect
-import androidx.compose.ui.gesture.scrollorientationlocking.Orientation
 import androidx.compose.ui.layout.LayoutModifier
 import androidx.compose.ui.layout.Measurable
 import androidx.compose.ui.layout.MeasureResult
 import androidx.compose.ui.layout.MeasureScope
-import androidx.compose.ui.platform.LocalAnimationClock
 import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.platform.debugInspectorInfo
 import androidx.compose.ui.text.TextLayoutResult
@@ -56,23 +51,20 @@ import kotlin.math.roundToInt
 // Scrollable
 internal fun Modifier.textFieldScrollable(
     scrollerPosition: TextFieldScrollerPosition,
-    interactionState: InteractionState? = null,
+    interactionSource: MutableInteractionSource? = null,
     enabled: Boolean = true
 ) = composed(
     inspectorInfo = debugInspectorInfo {
         name = "textFieldScrollable"
         properties["scrollerPosition"] = scrollerPosition
-        properties["interactionState"] = interactionState
+        properties["interactionSource"] = interactionSource
         properties["enabled"] = enabled
     }
 ) {
     // do not reverse direction only in case of RTL in horizontal orientation
     val rtl = LocalLayoutDirection.current == LayoutDirection.Rtl
     val reverseDirection = scrollerPosition.orientation == Orientation.Vertical || !rtl
-    val controller = rememberScrollableController(
-        scrollerPosition,
-        interactionState = interactionState
-    ) { delta ->
+    val controller = rememberScrollableState { delta ->
         val newOffset = scrollerPosition.offset + delta
         val consumedDelta = when {
             newOffset > scrollerPosition.maximum ->
@@ -86,7 +78,8 @@ internal fun Modifier.textFieldScrollable(
     val scroll = Modifier.scrollable(
         orientation = scrollerPosition.orientation,
         reverseDirection = reverseDirection,
-        controller = controller,
+        state = controller,
+        interactionSource = interactionSource,
         enabled = enabled && scrollerPosition.maximum != 0f
     )
     scroll
@@ -122,19 +115,6 @@ internal fun Modifier.textFieldScroll(
             )
     }
     return this.clipToBounds().then(layout)
-}
-
-@Composable
-private fun rememberScrollableController(
-    vararg inputs: Any?,
-    interactionState: InteractionState? = null,
-    consumeScrollDelta: (Float) -> Float
-): ScrollableController {
-    val clocks = LocalAnimationClock.current.asDisposableClock()
-    val flingConfig = defaultFlingConfig()
-    return remember(inputs, clocks, flingConfig, interactionState) {
-        ScrollableController(consumeScrollDelta, flingConfig, clocks, interactionState)
-    }
 }
 
 private data class VerticalScrollLayoutModifier(

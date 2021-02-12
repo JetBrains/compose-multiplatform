@@ -19,7 +19,7 @@ package androidx.compose.ui.demos.focus
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.requiredHeight
 import androidx.compose.material.Button
 import androidx.compose.material.Text
 import androidx.compose.material.TextField
@@ -47,12 +47,12 @@ fun FocusInPopupDemo() {
 
     Column(Modifier.background(if (windowInfo.isWindowFocused) White else LightGray)) {
         Text("Click the button to show the popup. Click outside the popup to dismiss it.")
-        Spacer(Modifier.height(10.dp))
+        Spacer(Modifier.requiredHeight(10.dp))
         Button(onClick = { showPopup = true }) {
             Text("Show Popup")
         }
 
-        Spacer(Modifier.height(50.dp))
+        Spacer(Modifier.requiredHeight(50.dp))
 
         Text("Click this text field to bring the main app in focus.")
         TextField(value = mainText, onValueChange = { mainText = it })

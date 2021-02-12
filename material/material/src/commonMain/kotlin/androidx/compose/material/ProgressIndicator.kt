@@ -29,7 +29,7 @@ import androidx.compose.animation.core.rememberInfiniteTransition
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.focusable
-import androidx.compose.foundation.layout.preferredSize
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.progressSemantics
 import androidx.compose.material.ProgressIndicatorDefaults.IndicatorBackgroundOpacity
 import androidx.compose.runtime.Composable
@@ -75,7 +75,7 @@ fun LinearProgressIndicator(
     Canvas(
         modifier
             .progressSemantics(progress)
-            .preferredSize(LinearIndicatorWidth, LinearIndicatorHeight)
+            .size(LinearIndicatorWidth, LinearIndicatorHeight)
             .focusable()
     ) {
         val strokeWidth = ProgressIndicatorDefaults.StrokeWidth.toPx()
@@ -149,7 +149,7 @@ fun LinearProgressIndicator(
     Canvas(
         modifier
             .progressSemantics()
-            .preferredSize(LinearIndicatorWidth, LinearIndicatorHeight)
+            .size(LinearIndicatorWidth, LinearIndicatorHeight)
             .focusable()
     ) {
         val strokeWidth = ProgressIndicatorDefaults.StrokeWidth.toPx()
@@ -226,7 +226,7 @@ fun CircularProgressIndicator(
     Canvas(
         modifier
             .progressSemantics(progress)
-            .preferredSize(CircularIndicatorDiameter)
+            .size(CircularIndicatorDiameter)
             .focusable()
     ) {
         // Start at 12 O'clock
@@ -304,7 +304,7 @@ fun CircularProgressIndicator(
     Canvas(
         modifier
             .progressSemantics()
-            .preferredSize(CircularIndicatorDiameter)
+            .size(CircularIndicatorDiameter)
             .focusable()
     ) {
 

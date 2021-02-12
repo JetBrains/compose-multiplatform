@@ -33,7 +33,11 @@ dependencies {
     testImplementation(JUNIT)
     testImplementation(ROBOLECTRIC)
 
-    testImplementation("org.jetbrains.kotlin:kotlin-compiler:$KOTLIN_VERSION")
+    testImplementation(
+        project(
+           ":compose:compiler:compiler-hosted:integration-tests:kotlin-compiler-repackaged"
+        )
+    )
 
     testImplementation(KOTLIN_STDLIB)
     testImplementation(project(":compose:androidview:androidview"))
@@ -42,6 +46,7 @@ dependencies {
     testImplementation(projectOrArtifact(":compose:runtime:runtime"))
     testImplementation(projectOrArtifact(":compose:ui:ui"))
     testImplementation("androidx.core:core-ktx:1.1.0")
+    testImplementation("androidx.activity:activity:1.2.0")
 }
 
 afterEvaluate {

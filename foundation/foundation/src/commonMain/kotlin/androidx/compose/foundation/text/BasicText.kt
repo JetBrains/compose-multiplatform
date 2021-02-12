@@ -21,13 +21,14 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.semantics.text
 import androidx.compose.ui.text.AnnotatedString
-import androidx.compose.ui.text.InternalTextApi
 import androidx.compose.ui.text.TextLayoutResult
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.style.TextOverflow
 
 /**
  * Basic element that displays text and provides semantics / accessibility information.
+ * Typically you will instead want to use [androidx.compose.material.Text], which is
+ * a higher level Text element that contains semantics and consumes style information from a theme.
  *
  * @param text The text to be displayed.
  * @param modifier [Modifier] to apply to this layout node.
@@ -64,6 +65,8 @@ fun BasicText(
 
 /**
  * Basic element that displays text and provides semantics / accessibility information.
+ * Typically you will instead want to use [androidx.compose.material.Text], which is
+ * a higher level Text element that contains semantics and consumes style information from a theme.
  *
  * @param text The text to be displayed.
  * @param modifier [Modifier] to apply to this layout node.
@@ -79,7 +82,6 @@ fun BasicText(
  * @param inlineContent A map store composables that replaces certain ranges of the text. It's
  * used to insert composables into text layout. Check [InlineTextContent] for more information.
  */
-@OptIn(InternalTextApi::class)
 @Composable
 fun BasicText(
     text: AnnotatedString,

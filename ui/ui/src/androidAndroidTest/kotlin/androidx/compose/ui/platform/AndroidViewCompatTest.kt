@@ -26,14 +26,15 @@ import android.view.View.MeasureSpec
 import android.view.ViewGroup
 import android.view.ViewGroup.LayoutParams.MATCH_PARENT
 import android.view.ViewGroup.LayoutParams.WRAP_CONTENT
+import android.widget.FrameLayout
 import android.widget.LinearLayout
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.runtime.Applier
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.ComposeNode
-import androidx.compose.runtime.ExperimentalComposeApi
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -66,6 +67,7 @@ import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.IntSize
+import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.test.espresso.Espresso
 import androidx.test.espresso.assertion.ViewAssertions.matches
@@ -495,7 +497,6 @@ class AndroidViewCompatTest {
     }
 
     @Test
-    @OptIn(ExperimentalComposeApi::class)
     fun testComposeInsideView_attachingAndDetaching() {
         var composeContent by mutableStateOf(true)
         var node: LayoutNode? = null
@@ -516,7 +517,7 @@ class AndroidViewCompatTest {
                                 factory = LayoutNode.Constructor,
                                 update = {
                                     init { node = this }
-                                    set(noOpMeasureBlocks, ComposeUiNode.SetMeasureBlocks)
+                                    set(noOpMeasurePolicy, ComposeUiNode.SetMeasurePolicy)
                                 }
                             )
                         }
@@ -559,6 +560,28 @@ class AndroidViewCompatTest {
             assertFalse(innerAndroidComposeView!!.isAttachedToWindow)
             // the node stays attached after the compose view is detached
             assertTrue(node!!.isAttached)
+        }
+    }
+
+    @Test
+    fun testAndroidViewHolder_size() {
+        val size = 100
+
+        rule.runOnUiThread {
+            val root = FrameLayout(rule.activity)
+            val composeView = ComposeView(rule.activity)
+            composeView.layoutParams = FrameLayout.LayoutParams(size, size)
+            root.addView(composeView)
+            rule.activity.setContentView(root)
+            composeView.setContent {
+                AndroidView(::View, Modifier.size(10.dp))
+            }
+        }
+
+        Espresso.onView(withClassName(endsWith("AndroidViewsHandler"))).check { view, exception ->
+            view as AndroidViewsHandler
+            // The views handler should match the size of the ComposeView.
+            if (view.width != size || view.height != size) throw exception
         }
     }
 
@@ -641,9 +664,8 @@ class AndroidViewCompatTest {
         }
     }
 
-    private val noOpMeasureBlocks = object : LayoutNode.NoIntrinsicsMeasureBlocks("") {
-        override fun measure(
-            measureScope: MeasureScope,
+    private val noOpMeasurePolicy = object : LayoutNode.NoIntrinsicsMeasurePolicy("") {
+        override fun MeasureScope.measure(
             measurables: List<Measurable>,
             constraints: Constraints
         ): MeasureResult {

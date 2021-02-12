@@ -230,7 +230,7 @@ class AlignmentLineTest : LayoutTest() {
             Box(Modifier.saveLayoutInfo(parentSize, Ref(), layoutLatch)) {
                 AlignmentLineLayout(
                     childDp, 0.dp, testLine, lineDp,
-                    Modifier.preferredSizeIn(maxWidth = maxWidth)
+                    Modifier.sizeIn(maxWidth = maxWidth)
                         .saveLayoutInfo(childSize, childPosition, layoutLatch)
                         .paddingFrom(testLine, beforeDp, afterDp)
                 )
@@ -264,7 +264,7 @@ class AlignmentLineTest : LayoutTest() {
             Box(Modifier.saveLayoutInfo(parentSize, Ref(), layoutLatch)) {
                 AlignmentLineLayout(
                     0.dp, childDp, testLine, lineDp,
-                    Modifier.preferredSizeIn(maxHeight = maxHeight)
+                    Modifier.sizeIn(maxHeight = maxHeight)
                         .saveLayoutInfo(childSize, childPosition, layoutLatch)
                         .paddingFrom(testLine, beforeDp, afterDp)
                 )
@@ -290,7 +290,7 @@ class AlignmentLineTest : LayoutTest() {
             Box {
                 BoxWithConstraints(
                     Modifier
-                        .preferredSizeIn(minHeight = minHeight)
+                        .sizeIn(minHeight = minHeight)
                         .paddingFrom(testLine, 0.dp)
                 ) {
                     Assert.assertEquals(minHeight.roundToPx(), constraints.minHeight)
@@ -310,7 +310,7 @@ class AlignmentLineTest : LayoutTest() {
             Box {
                 BoxWithConstraints(
                     Modifier
-                        .preferredSizeIn(minWidth = minWidth)
+                        .sizeIn(minWidth = minWidth)
                         .paddingFrom(testLine, 0.dp)
                 ) {
                     Assert.assertEquals(minWidth.roundToPx(), constraints.minWidth)
@@ -340,21 +340,21 @@ class AlignmentLineTest : LayoutTest() {
             Box {
                 AlignmentLineLayout(
                     childSize, childSize, testLine, linePosition,
-                    Modifier.preferredWidth(incomingSize)
+                    Modifier.width(incomingSize)
                         .paddingFrom(testLine, before = before)
                         .onGloballyPositioned {
-                            Assert.assertEquals(beforePx - linePositionPx, it.positionInParent.x)
+                            Assert.assertEquals(beforePx - linePositionPx, it.positionInParent().x)
                             latch.countDown()
                         }
                 )
                 AlignmentLineLayout(
                     childSize, childSize, testLine, linePosition,
-                    Modifier.preferredWidth(incomingSize)
+                    Modifier.width(incomingSize)
                         .paddingFrom(testLine, after = after)
                         .onGloballyPositioned {
                             Assert.assertEquals(
                                 incomingSizePx - childSizePx - afterPx + linePositionPx,
-                                it.positionInParent.x
+                                it.positionInParent().x
                             )
                             latch.countDown()
                         }
@@ -383,21 +383,21 @@ class AlignmentLineTest : LayoutTest() {
             Box {
                 AlignmentLineLayout(
                     childSize, childSize, testLine, linePosition,
-                    Modifier.preferredHeight(incomingSize)
+                    Modifier.height(incomingSize)
                         .paddingFrom(testLine, before = before)
                         .onGloballyPositioned {
-                            Assert.assertEquals(beforePx - linePositionPx, it.positionInParent.y)
+                            Assert.assertEquals(beforePx - linePositionPx, it.positionInParent().y)
                             latch.countDown()
                         }
                 )
                 AlignmentLineLayout(
                     childSize, childSize, testLine, linePosition,
-                    Modifier.preferredHeight(incomingSize)
+                    Modifier.height(incomingSize)
                         .paddingFrom(testLine, after = after)
                         .onGloballyPositioned {
                             Assert.assertEquals(
                                 incomingSizePx - childSizePx - afterPx + linePositionPx,
-                                it.positionInParent.y
+                                it.positionInParent().y
                             )
                             latch.countDown()
                         }
@@ -489,10 +489,10 @@ class AlignmentLineTest : LayoutTest() {
         show {
             Box {
                 Box(
-                    Modifier.preferredHeight(incomingSize)
+                    Modifier.height(incomingSize)
                         .paddingFromBaseline(top = before, bottom = after)
                         .onGloballyPositioned {
-                            Assert.assertEquals(beforePx - linePositionPx, it.positionInParent.y)
+                            Assert.assertEquals(beforePx - linePositionPx, it.positionInParent().y)
                             latch.countDown()
                         }
                 ) {

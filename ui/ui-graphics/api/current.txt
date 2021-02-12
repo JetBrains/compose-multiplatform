@@ -1,27 +1,26 @@
 // Signature format: 4.0
 package androidx.compose.ui.graphics {
 
-  public final class AndroidBlendModeKt {
+  public final class AndroidBlendMode_androidKt {
     method public static boolean isSupported(androidx.compose.ui.graphics.BlendMode);
   }
 
-  public final class AndroidCanvasKt {
+  public final class AndroidCanvas_androidKt {
     method public static androidx.compose.ui.graphics.Canvas Canvas(android.graphics.Canvas c);
     method public static android.graphics.Canvas getNativeCanvas(androidx.compose.ui.graphics.Canvas);
   }
 
-  public final class AndroidColorFilterKt {
+  public final class AndroidColorFilter_androidKt {
     method public static android.graphics.ColorFilter asAndroidColorFilter(androidx.compose.ui.graphics.ColorFilter);
     method public static androidx.compose.ui.graphics.ColorFilter asComposeColorFilter(android.graphics.ColorFilter);
   }
 
-  public final class AndroidImageBitmapKt {
+  public final class AndroidImageBitmap_androidKt {
     method public static android.graphics.Bitmap asAndroidBitmap(androidx.compose.ui.graphics.ImageBitmap);
     method public static androidx.compose.ui.graphics.ImageBitmap asImageBitmap(android.graphics.Bitmap);
-    method public static androidx.compose.ui.graphics.ImageBitmap imageFromResource(android.content.res.Resources res, int resId);
   }
 
-  public final class AndroidMatrixConversionsKt {
+  public final class AndroidMatrixConversions_androidKt {
     method public static void setFrom-7lL006A(float[], android.graphics.Matrix matrix);
     method public static void setFrom-8AuSnpc(android.graphics.Matrix, float[] matrix);
   }
@@ -70,7 +69,7 @@ package androidx.compose.ui.graphics {
     property public androidx.compose.ui.graphics.PaintingStyle style;
   }
 
-  public final class AndroidPaintKt {
+  public final class AndroidPaint_androidKt {
     method public static androidx.compose.ui.graphics.Paint Paint();
   }
 
@@ -108,15 +107,9 @@ package androidx.compose.ui.graphics {
     property public boolean isEmpty;
   }
 
-  public final class AndroidPathEffectKt {
+  public final class AndroidPathEffect_androidKt {
     method public static android.graphics.PathEffect asAndroidPathEffect(androidx.compose.ui.graphics.PathEffect);
     method public static androidx.compose.ui.graphics.PathEffect toComposePathEffect(android.graphics.PathEffect);
-  }
-
-  public final class AndroidPathKt {
-    method public static androidx.compose.ui.graphics.Path Path();
-    method public static inline android.graphics.Path asAndroidPath(androidx.compose.ui.graphics.Path);
-    method public static androidx.compose.ui.graphics.Path asComposePath(android.graphics.Path);
   }
 
   public final class AndroidPathMeasure implements androidx.compose.ui.graphics.PathMeasure {
@@ -126,18 +119,24 @@ package androidx.compose.ui.graphics {
     property public float length;
   }
 
-  public final class AndroidPathMeasureKt {
+  public final class AndroidPathMeasure_androidKt {
     method public static androidx.compose.ui.graphics.PathMeasure PathMeasure();
   }
 
-  public final class AndroidShaderKt {
+  public final class AndroidPath_androidKt {
+    method public static androidx.compose.ui.graphics.Path Path();
+    method public static inline android.graphics.Path asAndroidPath(androidx.compose.ui.graphics.Path);
+    method public static androidx.compose.ui.graphics.Path asComposePath(android.graphics.Path);
   }
 
-  public final class AndroidTileModeKt {
+  public final class AndroidShader_androidKt {
+  }
+
+  public final class AndroidTileMode_androidKt {
     method public static android.graphics.Shader.TileMode toNativeTileMode(androidx.compose.ui.graphics.TileMode);
   }
 
-  public final class AndroidVertexModeKt {
+  public final class AndroidVertexMode_androidKt {
     method public static android.graphics.Canvas.VertexMode toNativeVertexMode(androidx.compose.ui.graphics.VertexMode);
   }
 
@@ -310,10 +309,6 @@ package androidx.compose.ui.graphics {
     method @androidx.compose.runtime.Stable public androidx.compose.ui.graphics.ColorFilter tint-aamYUWA(long color, optional androidx.compose.ui.graphics.BlendMode blendMode);
   }
 
-  public final class ColorFilterKt {
-    method @Deprecated public static androidx.compose.ui.graphics.ColorFilter ColorFilter-aamYUWA(long color, androidx.compose.ui.graphics.BlendMode blendMode);
-  }
-
   public final class ColorKt {
     method @androidx.compose.runtime.Stable public static long Color(float red, float green, float blue, optional float alpha, optional androidx.compose.ui.graphics.colorspace.ColorSpace colorSpace);
     method @androidx.compose.runtime.Stable public static long Color(int color);
@@ -377,6 +372,10 @@ package androidx.compose.ui.graphics {
     property public abstract boolean hasAlpha;
     property public abstract int height;
     property public abstract int width;
+    field public static final androidx.compose.ui.graphics.ImageBitmap.Companion Companion;
+  }
+
+  public static final class ImageBitmap.Companion {
   }
 
   public enum ImageBitmapConfig {
@@ -620,7 +619,7 @@ package androidx.compose.ui.graphics {
     method public android.graphics.Shader createShader-uvyYCjk(long size);
   }
 
-  public final class RectHelperKt {
+  public final class RectHelper_androidKt {
     method public static android.graphics.Rect toAndroidRect(androidx.compose.ui.geometry.Rect);
     method public static android.graphics.RectF toAndroidRectF(androidx.compose.ui.geometry.Rect);
     method public static androidx.compose.ui.geometry.Rect toComposeRect(android.graphics.Rect);
@@ -1082,9 +1081,6 @@ package androidx.compose.ui.graphics.painter {
     method public long getIntrinsicSize-NH-jbRc();
     method protected void onDraw(androidx.compose.ui.graphics.drawscope.DrawScope);
     property public long intrinsicSize;
-  }
-
-  public final class BitmapPainterKt {
   }
 
   public final class ColorPainter extends androidx.compose.ui.graphics.painter.Painter {

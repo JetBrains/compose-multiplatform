@@ -16,16 +16,18 @@
 
 package androidx.compose.material
 
-import androidx.compose.foundation.Interaction
-import androidx.compose.foundation.InteractionState
+import androidx.compose.foundation.interaction.Interaction
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.defaultMinSizeConstraints
+import androidx.compose.foundation.layout.defaultMinSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.ZeroCornerSize
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.material.TextFieldDefaults.MinHeight
+import androidx.compose.material.TextFieldDefaults.MinWidth
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -37,12 +39,12 @@ import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shape
+import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.layout.AlignmentLine
 import androidx.compose.ui.layout.LastBaseline
 import androidx.compose.ui.layout.Layout
 import androidx.compose.ui.layout.Placeable
 import androidx.compose.ui.layout.layoutId
-import androidx.compose.ui.text.SoftwareKeyboardController
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
@@ -73,7 +75,7 @@ import kotlin.math.roundToInt
  *
  * @sample androidx.compose.material.samples.TextFieldWithIcons
  *
- * To handle the error input state, use [isErrorValue] parameter:
+ * To handle the error input state, use [isError] parameter:
  *
  * @sample androidx.compose.material.samples.TextFieldWithErrorState
  *
@@ -113,9 +115,9 @@ import kotlin.math.roundToInt
  * container
  * @param trailingIcon the optional trailing icon to be displayed at the end of the text field
  * container
- * @param isErrorValue indicates if the text field's current value is in error. If set to true, the
- * label, bottom indicator and trailing icon will be displayed in [errorColor] color
- * @param visualTransformation transforms the visual representation of the input [value].
+ * @param isError indicates if the text field's current value is in error. If set to true, the
+ * label, bottom indicator and trailing icon by default will be displayed in error color
+ * @param visualTransformation transforms the visual representation of the input [value]
  * For example, you can use [androidx.compose.ui.text.input.PasswordVisualTransformation] to create a password
  * text field. By default no visual transformation is applied
  * @param keyboardOptions software keyboard options that contains configuration such as
@@ -130,24 +132,14 @@ import kotlin.math.roundToInt
  * @param maxLines the maximum height in terms of maximum number of visible lines. Should be
  * equal or greater than 1. Note that this parameter will be ignored and instead maxLines will be
  * set to 1 if [singleLine] is set to true.
- * [KeyboardOptions.imeAction] field. The callback also exposes a [SoftwareKeyboardController]
- * instance as a parameter that can be used to request to hide the software keyboard
- * @param onTextInputStarted a callback to be invoked when the connection with the platform's text
- * input service (e.g. software keyboard on Android) has been established. Called with the
- * [SoftwareKeyboardController] instance that can be used to request to show or hide the software
- * keyboard
- * @param interactionState the [InteractionState] representing the different [Interaction]s
- * present on this TextField. You can create and pass in your own remembered
- * [InteractionState] if you want to read the [InteractionState] and customize the appearance /
- * behavior of this TextField in different [Interaction]s.
- * @param activeColor the color of the label, bottom indicator and the cursor when the text field is
- * in focus
- * @param inactiveColor the color of either the input text or placeholder when the text field is in
- * focus, and the color of the label and bottom indicator when the text field is not in focus
- * @param errorColor the alternative color of the label, bottom indicator, cursor and trailing icon
- * used when [isErrorValue] is set to true
- * @param backgroundColor the background color of the text field's container
+ * @param interactionSource the [MutableInteractionSource] representing the stream of
+ * [Interaction]s for this TextField. You can create and pass in your own remembered
+ * [MutableInteractionSource] if you want to observe [Interaction]s and customize the
+ * appearance / behavior of this TextField in different [Interaction]s.
  * @param shape the shape of the text field's container
+ * @param colors [TextFieldColors] that will be used to resolve color of the text, content
+ * (including label, placeholder, leading and trailing icons, indicator line) and background for
+ * this text field in different states. See [TextFieldDefaults.textFieldColors]
  */
 @Composable
 fun TextField(
@@ -161,26 +153,21 @@ fun TextField(
     placeholder: @Composable (() -> Unit)? = null,
     leadingIcon: @Composable (() -> Unit)? = null,
     trailingIcon: @Composable (() -> Unit)? = null,
-    isErrorValue: Boolean = false,
+    isError: Boolean = false,
     visualTransformation: VisualTransformation = VisualTransformation.None,
     keyboardOptions: KeyboardOptions = KeyboardOptions.Default,
     keyboardActions: KeyboardActions = KeyboardActions(),
     singleLine: Boolean = false,
     maxLines: Int = Int.MAX_VALUE,
-    onTextInputStarted: (SoftwareKeyboardController) -> Unit = {},
-    interactionState: InteractionState = remember { InteractionState() },
-    activeColor: Color = MaterialTheme.colors.primary,
-    inactiveColor: Color = MaterialTheme.colors.onSurface,
-    errorColor: Color = MaterialTheme.colors.error,
-    backgroundColor: Color = MaterialTheme.colors.onSurface.copy(alpha = ContainerAlpha),
+    interactionSource: MutableInteractionSource = remember { MutableInteractionSource() },
     shape: Shape =
-        MaterialTheme.shapes.small.copy(bottomEnd = ZeroCornerSize, bottomStart = ZeroCornerSize)
+        MaterialTheme.shapes.small.copy(bottomEnd = ZeroCornerSize, bottomStart = ZeroCornerSize),
+    colors: TextFieldColors = TextFieldDefaults.textFieldColors()
 ) {
     var textFieldValueState by remember { mutableStateOf(TextFieldValue(text = value)) }
     val textFieldValue = textFieldValueState.copy(text = value)
 
-    TextFieldImpl(
-        type = TextFieldType.Filled,
+    TextField(
         enabled = enabled,
         readOnly = readOnly,
         value = textFieldValue,
@@ -195,184 +182,18 @@ fun TextField(
         textStyle = textStyle,
         label = label,
         placeholder = placeholder,
-        leading = leadingIcon,
-        trailing = trailingIcon,
-        isErrorValue = isErrorValue,
+        leadingIcon = leadingIcon,
+        trailingIcon = trailingIcon,
+        isError = isError,
         visualTransformation = visualTransformation,
         keyboardOptions = keyboardOptions,
         keyboardActions = keyboardActions,
         maxLines = maxLines,
-        onTextInputStarted = onTextInputStarted,
-        interactionState = interactionState,
-        activeColor = activeColor,
-        inactiveColor = inactiveColor,
-        errorColor = errorColor,
-        backgroundColor = backgroundColor,
-        shape = shape
+        interactionSource = interactionSource,
+        shape = shape,
+        colors = colors
     )
 }
-
-// TODO(b/178633932): Remove after Alpha 12.
-/**
- * Material Design implementation of a
- * [Filled TextField](https://material.io/components/text-fields/#filled-text-field)
- *
- * If you are looking for an outlined version, see [OutlinedTextField].
- *
- * A simple single line text field looks like:
- *
- * @sample androidx.compose.material.samples.SimpleTextFieldSample
- *
- * You may provide a placeholder:
- *
- * @sample androidx.compose.material.samples.TextFieldWithPlaceholder
- *
- * You can also provide leading and trailing icons:
- *
- * @sample androidx.compose.material.samples.TextFieldWithIcons
- *
- * To handle the error input state, use [isErrorValue] parameter:
- *
- * @sample androidx.compose.material.samples.TextFieldWithErrorState
- *
- * Additionally, you may provide additional message at the bottom:
- *
- * @sample androidx.compose.material.samples.TextFieldWithHelperMessage
- *
- * Password text field example:
- *
- * @sample androidx.compose.material.samples.PasswordTextField
- *
- * Hiding a software keyboard on IME action performed:
- *
- * @sample androidx.compose.material.samples.TextFieldWithHideKeyboardOnImeAction
- *
- * If apart from input text change you also want to observe the cursor location, selection range,
- * or IME composition use the TextField overload with the [TextFieldValue] parameter instead.
- *
- * @param value the input text to be shown in the text field
- * @param onValueChange the callback that is triggered when the input service updates the text. An
- * updated text comes as a parameter of the callback
- * @param modifier a [Modifier] for this text field
- * @param enabled controls the enabled state of the [TextField]. When `false`, the text field will
- * be neither editable nor focusable, the input of the text field will not be selectable,
- * visually text field will appear in the disabled UI state
- * @param readOnly controls the editable state of the [TextField]. When `true`, the text
- * field can not be modified, however, a user can focus it and copy text from it. Read-only text
- * fields are usually used to display pre-filled forms that user can not edit
- * @param textStyle the style to be applied to the input text. The default [textStyle] uses the
- * [AmbientTextStyle] defined by the theme
- * @param label the optional label to be displayed inside the text field container. The default
- * text style for internal [Text] is [Typography.caption] when the text field is in focus and
- * [Typography.subtitle1] when the text field is not in focus
- * @param placeholder the optional placeholder to be displayed when the text field is in focus and
- * the input text is empty. The default text style for internal [Text] is [Typography.subtitle1]
- * @param leadingIcon the optional leading icon to be displayed at the beginning of the text field
- * container
- * @param trailingIcon the optional trailing icon to be displayed at the end of the text field
- * container
- * @param isErrorValue indicates if the text field's current value is in error. If set to true, the
- * label, bottom indicator and trailing icon will be displayed in [errorColor] color
- * @param visualTransformation transforms the visual representation of the input [value].
- * For example, you can use [androidx.compose.ui.text.input.PasswordVisualTransformation] to create a password
- * text field. By default no visual transformation is applied
- * @param keyboardOptions software keyboard options that contains configuration such as
- * [KeyboardType] and [ImeAction].
- * @param singleLine when set to true, this text field becomes a single horizontally scrolling
- * text field instead of wrapping onto multiple lines. The keyboard will be informed to not show
- * the return key as the [ImeAction]. Note that [maxLines] parameter will be ignored as the
- * maxLines attribute will be automatically set to 1.
- * @param maxLines the maximum height in terms of maximum number of visible lines. Should be
- * equal or greater than 1. Note that this parameter will be ignored and instead maxLines will be
- * set to 1 if [singleLine] is set to true.
- * @param onImeActionPerformed is triggered when the input service performs an [ImeAction].
- * Note that the emitted IME action may be different from what you specified through the
- * [KeyboardOptions.imeAction] field. The callback also exposes a [SoftwareKeyboardController]
- * instance as a parameter that can be used to request to hide the software keyboard
- * @param onTextInputStarted a callback to be invoked when the connection with the platform's text
- * input service (e.g. software keyboard on Android) has been established. Called with the
- * [SoftwareKeyboardController] instance that can be used to request to show or hide the software
- * keyboard
- * @param interactionState the [InteractionState] representing the different [Interaction]s
- * present on this TextField. You can create and pass in your own remembered
- * [InteractionState] if you want to read the [InteractionState] and customize the appearance /
- * behavior of this TextField in different [Interaction]s.
- * @param activeColor the color of the label, bottom indicator and the cursor when the text field is
- * in focus
- * @param inactiveColor the color of either the input text or placeholder when the text field is in
- * focus, and the color of the label and bottom indicator when the text field is not in focus
- * @param errorColor the alternative color of the label, bottom indicator, cursor and trailing icon
- * used when [isErrorValue] is set to true
- * @param backgroundColor the background color of the text field's container
- * @param shape the shape of the text field's container
- */
-@Suppress("UNUSED_PARAMETER")
-@Deprecated(
-    message = "Instead of onImeActionPerformed, use the keyboardActions parameter to specify " +
-        "IMEAction callbacks.",
-    replaceWith = ReplaceWith(
-        expression = """TextField(
-            value,
-            onValueChange,
-            modifier,
-            enabled,
-            readOnly,
-            textStyle,
-            label,
-            placeholder,
-            leadingIcon,
-            trailingIcon,
-            isErrorValue,
-            visualTransformation,
-            keyboardOptions,
-            KeyboardActions(
-                onDone= { },
-                onGo = { },
-                onNext= { },
-                onPrevious= { },
-                onSearch = { },
-                onSend = { }
-            ),
-            singleLine,
-            maxLines,
-            onTextInputStarted,
-            interactionState,
-            activeColor,
-            inactiveColor,
-            errorColor,
-            backgroundColor,
-            shape)""",
-        imports = ["androidx.compose.foundation.text.KeyboardActions"]
-    ),
-    level = DeprecationLevel.ERROR
-)
-@Composable
-fun TextField(
-    value: String,
-    onValueChange: (String) -> Unit,
-    modifier: Modifier = Modifier,
-    enabled: Boolean = true,
-    readOnly: Boolean = false,
-    textStyle: TextStyle = LocalTextStyle.current,
-    label: @Composable (() -> Unit)? = null,
-    placeholder: @Composable (() -> Unit)? = null,
-    leadingIcon: @Composable (() -> Unit)? = null,
-    trailingIcon: @Composable (() -> Unit)? = null,
-    isErrorValue: Boolean = false,
-    visualTransformation: VisualTransformation = VisualTransformation.None,
-    keyboardOptions: KeyboardOptions = KeyboardOptions.Default,
-    singleLine: Boolean = false,
-    maxLines: Int = Int.MAX_VALUE,
-    onImeActionPerformed: (ImeAction, SoftwareKeyboardController?) -> Unit,
-    onTextInputStarted: (SoftwareKeyboardController) -> Unit = {},
-    interactionState: InteractionState = remember { InteractionState() },
-    activeColor: Color = MaterialTheme.colors.primary,
-    inactiveColor: Color = MaterialTheme.colors.onSurface,
-    errorColor: Color = MaterialTheme.colors.error,
-    backgroundColor: Color = MaterialTheme.colors.onSurface.copy(alpha = ContainerAlpha),
-    shape: Shape =
-        MaterialTheme.shapes.small.copy(bottomEnd = ZeroCornerSize, bottomStart = ZeroCornerSize)
-) = Unit
 
 /**
  * Material Design implementation of a
@@ -408,8 +229,8 @@ fun TextField(
  * container
  * @param trailingIcon the optional trailing icon to be displayed at the end of the text field
  * container
- * @param isErrorValue indicates if the text field's current value is in error state. If set to
- * true, the label, bottom indicator and trailing icon will be displayed in [errorColor] color
+ * @param isError indicates if the text field's current value is in error state. If set to
+ * true, the label, bottom indicator and trailing icon by default will be displayed in error color
  * @param visualTransformation transforms the visual representation of the input [value].
  * For example, you can use [androidx.compose.ui.text.input.PasswordVisualTransformation] to create a password
  * text field. By default no visual transformation is applied
@@ -425,24 +246,14 @@ fun TextField(
  * @param maxLines the maximum height in terms of maximum number of visible lines. Should be
  * equal or greater than 1. Note that this parameter will be ignored and instead maxLines will be
  * set to 1 if [singleLine] is set to true.
- * [KeyboardOptions.imeAction] field. The callback also exposes a [SoftwareKeyboardController]
- * instance as a parameter that can be used to request to hide the software keyboard
- * @param onTextInputStarted a callback to be invoked when the connection with the platform's text
- * input service (e.g. software keyboard on Android) has been established. Called with the
- * [SoftwareKeyboardController] instance that can be used to request to show or hide the software
- * keyboard
- * @param interactionState the [InteractionState] representing the different [Interaction]s
- * present on this TextField. You can create and pass in your own remembered
- * [InteractionState] if you want to read the [InteractionState] and customize the appearance /
- * behavior of this TextField in different [Interaction]s.
- * @param activeColor the color of the label, bottom indicator and the cursor when the text field is
- * in focus
- * @param inactiveColor the color of either the input text or placeholder when the text field is in
- * focus, and the color of the label and bottom indicator when the text field is not in focus
- * @param errorColor the alternative color of the label, bottom indicator, cursor and trailing icon
- * used when [isErrorValue] is set to true
- * @param backgroundColor the background color of the text field's container
+ * @param interactionSource the [MutableInteractionSource] representing the stream of
+ * [Interaction]s for this TextField. You can create and pass in your own remembered
+ * [MutableInteractionSource] if you want to observe [Interaction]s and customize the
+ * appearance / behavior of this TextField in different [Interaction]s.
  * @param shape the shape of the text field's container
+ * @param colors [TextFieldColors] that will be used to resolve color of the text, content
+ * (including label, placeholder, leading and trailing icons, indicator line) and background for
+ * this text field in different states. See [TextFieldDefaults.textFieldColors]
  */
 @Composable
 fun TextField(
@@ -456,20 +267,16 @@ fun TextField(
     placeholder: @Composable (() -> Unit)? = null,
     leadingIcon: @Composable (() -> Unit)? = null,
     trailingIcon: @Composable (() -> Unit)? = null,
-    isErrorValue: Boolean = false,
+    isError: Boolean = false,
     visualTransformation: VisualTransformation = VisualTransformation.None,
     keyboardOptions: KeyboardOptions = KeyboardOptions.Default,
     keyboardActions: KeyboardActions = KeyboardActions(),
     singleLine: Boolean = false,
     maxLines: Int = Int.MAX_VALUE,
-    onTextInputStarted: (SoftwareKeyboardController) -> Unit = {},
-    interactionState: InteractionState = remember { InteractionState() },
-    activeColor: Color = MaterialTheme.colors.primary,
-    inactiveColor: Color = MaterialTheme.colors.onSurface,
-    errorColor: Color = MaterialTheme.colors.error,
-    backgroundColor: Color = MaterialTheme.colors.onSurface.copy(alpha = ContainerAlpha),
+    interactionSource: MutableInteractionSource = remember { MutableInteractionSource() },
     shape: Shape =
-        MaterialTheme.shapes.small.copy(bottomEnd = ZeroCornerSize, bottomStart = ZeroCornerSize)
+        MaterialTheme.shapes.small.copy(bottomEnd = ZeroCornerSize, bottomStart = ZeroCornerSize),
+    colors: TextFieldColors = TextFieldDefaults.textFieldColors()
 ) {
     TextFieldImpl(
         type = TextFieldType.Filled,
@@ -484,158 +291,16 @@ fun TextField(
         placeholder = placeholder,
         leading = leadingIcon,
         trailing = trailingIcon,
-        isErrorValue = isErrorValue,
+        isError = isError,
         visualTransformation = visualTransformation,
         keyboardOptions = keyboardOptions,
         keyboardActions = keyboardActions,
         maxLines = maxLines,
-        onTextInputStarted = onTextInputStarted,
-        interactionState = interactionState,
-        activeColor = activeColor,
-        inactiveColor = inactiveColor,
-        errorColor = errorColor,
-        backgroundColor = backgroundColor,
-        shape = shape
+        interactionSource = interactionSource,
+        shape = shape,
+        colors = colors
     )
 }
-
-// TODO(b/178633932): Remove after Alpha 12.
-/**
- * Material Design implementation of a
- * [Filled TextField](https://material.io/components/text-fields/#filled-text-field)
- *
- * If you are looking for an outlined version, see [OutlinedTextField].
- *
- * See example usage:
- * @sample androidx.compose.material.samples.TextFieldSample
- *
- * This overload provides access to the input text, cursor position, selection range and
- * IME composition. If you only want to observe an input text change, use the TextField
- * overload with the [String] parameter instead.
- *
- * @param value the input [TextFieldValue] to be shown in the text field
- * @param onValueChange the callback that is triggered when the input service updates values in
- * [TextFieldValue]. An updated [TextFieldValue] comes as a parameter of the callback
- * @param modifier a [Modifier] for this text field
- * @param enabled controls the enabled state of the [TextField]. When `false`, the text field will
- * be neither editable nor focusable, the input of the text field will not be selectable,
- * visually text field will appear in the disabled UI state
- * @param readOnly controls the editable state of the [TextField]. When `true`, the text
- * field can not be modified, however, a user can focus it and copy text from it. Read-only text
- * fields are usually used to display pre-filled forms that user can not edit
- * @param textStyle the style to be applied to the input text. The default [textStyle] uses the
- * [AmbientTextStyle] defined by the theme
- * @param label the optional label to be displayed inside the text field container. The default
- * text style for internal [Text] is [Typography.caption] when the text field is in focus and
- * [Typography.subtitle1] when the text field is not in focus
- * @param placeholder the optional placeholder to be displayed when the text field is in focus and
- * the input text is empty. The default text style for internal [Text] is [Typography.subtitle1]
- * @param leadingIcon the optional leading icon to be displayed at the beginning of the text field
- * container
- * @param trailingIcon the optional trailing icon to be displayed at the end of the text field
- * container
- * @param isErrorValue indicates if the text field's current value is in error state. If set to
- * true, the label, bottom indicator and trailing icon will be displayed in [errorColor] color
- * @param visualTransformation transforms the visual representation of the input [value].
- * For example, you can use [androidx.compose.ui.text.input.PasswordVisualTransformation] to create a password
- * text field. By default no visual transformation is applied
- * @param keyboardOptions software keyboard options that contains configuration such as
- * [KeyboardType] and [ImeAction].
- * @param singleLine when set to true, this text field becomes a single horizontally scrolling
- * text field instead of wrapping onto multiple lines. The keyboard will be informed to not show
- * the return key as the [ImeAction]. Note that [maxLines] parameter will be ignored as the
- * maxLines attribute will be automatically set to 1.
- * @param maxLines the maximum height in terms of maximum number of visible lines. Should be
- * equal or greater than 1. Note that this parameter will be ignored and instead maxLines will be
- * set to 1 if [singleLine] is set to true.
- * @param onImeActionPerformed is triggered when the input service performs an [ImeAction].
- * Note that the emitted IME action may be different from what you specified through the
- * [KeyboardOptions.imeAction] field. The callback also exposes a [SoftwareKeyboardController]
- * instance as a parameter that can be used to request to hide the software keyboard
- * @param onTextInputStarted a callback to be invoked when the connection with the platform's text
- * input service (e.g. software keyboard on Android) has been established. Called with the
- * [SoftwareKeyboardController] instance that can be used to request to show or hide the software
- * keyboard
- * @param interactionState the [InteractionState] representing the different [Interaction]s
- * present on this TextField. You can create and pass in your own remembered
- * [InteractionState] if you want to read the [InteractionState] and customize the appearance /
- * behavior of this TextField in different [Interaction]s.
- * @param activeColor the color of the label, bottom indicator and the cursor when the text field is
- * in focus
- * @param inactiveColor the color of either the input text or placeholder when the text field is in
- * focus, and the color of the label and bottom indicator when the text field is not in focus
- * @param errorColor the alternative color of the label, bottom indicator, cursor and trailing icon
- * used when [isErrorValue] is set to true
- * @param backgroundColor the background color of the text field's container
- * @param shape the shape of the text field's container
- */
-@Suppress("UNUSED_PARAMETER")
-@Deprecated(
-    message = "Instead of onImeActionPerformed, use the keyboardActions parameter to specify " +
-        "IMEAction callbacks.",
-    replaceWith = ReplaceWith(
-        expression = """TextField(
-            value,
-            onValueChange,
-            modifier,
-            enabled,
-            readOnly,
-            textStyle,
-            label,
-            placeholder,
-            leadingIcon,
-            trailingIcon,
-            isErrorValue,
-            visualTransformation,
-            keyboardOptions,
-            KeyboardActions(
-                onDone= { },
-                onGo = { },
-                onNext= { },
-                onPrevious= { },
-                onSearch = { },
-                onSend = { }
-            ),
-            singleLine,
-            maxLines,
-            onTextInputStarted,
-            interactionState,
-            activeColor,
-            inactiveColor,
-            errorColor,
-            backgroundColor,
-            shape)""",
-        imports = ["androidx.compose.foundation.text.KeyboardActions"]
-    ),
-    level = DeprecationLevel.ERROR
-)
-@Composable
-fun TextField(
-    value: TextFieldValue,
-    onValueChange: (TextFieldValue) -> Unit,
-    modifier: Modifier = Modifier,
-    enabled: Boolean = true,
-    readOnly: Boolean = false,
-    textStyle: TextStyle = LocalTextStyle.current,
-    label: @Composable (() -> Unit)? = null,
-    placeholder: @Composable (() -> Unit)? = null,
-    leadingIcon: @Composable (() -> Unit)? = null,
-    trailingIcon: @Composable (() -> Unit)? = null,
-    isErrorValue: Boolean = false,
-    visualTransformation: VisualTransformation = VisualTransformation.None,
-    keyboardOptions: KeyboardOptions = KeyboardOptions.Default,
-    singleLine: Boolean = false,
-    maxLines: Int = Int.MAX_VALUE,
-    onImeActionPerformed: (ImeAction, SoftwareKeyboardController?) -> Unit,
-    onTextInputStarted: (SoftwareKeyboardController) -> Unit = {},
-    interactionState: InteractionState = remember { InteractionState() },
-    activeColor: Color = MaterialTheme.colors.primary,
-    inactiveColor: Color = MaterialTheme.colors.onSurface,
-    errorColor: Color = MaterialTheme.colors.error,
-    backgroundColor: Color = MaterialTheme.colors.onSurface.copy(alpha = ContainerAlpha),
-    shape: Shape =
-        MaterialTheme.shapes.small.copy(bottomEnd = ZeroCornerSize, bottomStart = ZeroCornerSize)
-) = Unit
 
 @Composable
 internal fun TextFieldLayout(
@@ -650,8 +315,7 @@ internal fun TextFieldLayout(
     singleLine: Boolean,
     maxLines: Int = Int.MAX_VALUE,
     visualTransformation: VisualTransformation,
-    onTextInputStarted: (SoftwareKeyboardController) -> Unit,
-    interactionState: InteractionState,
+    interactionSource: MutableInteractionSource,
     decoratedPlaceholder: @Composable ((Modifier) -> Unit)?,
     decoratedLabel: @Composable (() -> Unit)?,
     leading: @Composable (() -> Unit)?,
@@ -665,12 +329,13 @@ internal fun TextFieldLayout(
     cursorColor: Color,
     shape: Shape
 ) {
+
     BasicTextField(
         value = value,
         modifier = modifier
-            .defaultMinSizeConstraints(
-                minWidth = TextFieldMinWidth,
-                minHeight = TextFieldMinHeight
+            .defaultMinSize(
+                minWidth = MinWidth,
+                minHeight = MinHeight
             )
             .background(color = backgroundColor, shape = shape)
             .drawIndicatorLine(lineWidth = indicatorWidth, color = indicatorColor),
@@ -678,12 +343,11 @@ internal fun TextFieldLayout(
         enabled = enabled,
         readOnly = readOnly,
         textStyle = textStyle,
-        cursorColor = cursorColor,
+        cursorBrush = SolidColor(cursorColor),
         visualTransformation = visualTransformation,
         keyboardOptions = keyboardOptions,
         keyboardActions = keyboardActions,
-        interactionState = interactionState,
-        onTextInputStarted = onTextInputStarted,
+        interactionSource = interactionSource,
         singleLine = singleLine,
         maxLines = maxLines,
         decorationBox = @Composable { coreTextField ->
@@ -1026,4 +690,3 @@ internal fun Modifier.drawIndicatorLine(lineWidth: Dp, color: Color): Modifier {
 private val FirstBaselineOffset = 20.dp
 private val LastBaselineOffset = 10.dp
 private val TextFieldTopPadding = 4.dp
-const val ContainerAlpha = 0.12f

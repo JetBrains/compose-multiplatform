@@ -18,7 +18,7 @@ package androidx.compose.ui.graphics.samples
 
 import androidx.annotation.Sampled
 import androidx.compose.foundation.Canvas
-import androidx.compose.foundation.layout.preferredSize
+import androidx.compose.foundation.layout.size
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -36,7 +36,7 @@ import androidx.compose.ui.unit.dp
 fun DrawScopeSample() {
     // Sample showing how to use the DrawScope receiver scope to issue
     // drawing commands
-    Canvas(Modifier.preferredSize(120.dp)) {
+    Canvas(Modifier.size(120.dp)) {
         drawRect(color = Color.Gray) // Draw grey background
         // Inset content by 10 pixels on the left/right sides and 12 by the
         // top/bottom
@@ -59,7 +59,7 @@ fun DrawScopeSample() {
 @Sampled
 @Composable
 fun DrawScopeBatchedTransformSample() {
-    Canvas(Modifier.preferredSize(120.dp)) { // CanvasScope
+    Canvas(Modifier.size(120.dp)) { // CanvasScope
         inset(20.0f) {
             // Use withTransform to batch multiple transformations for 1 or more drawing calls
             // that are to be drawn.

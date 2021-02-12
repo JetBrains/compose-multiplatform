@@ -28,6 +28,7 @@ import androidx.compose.runtime.ComposeCompilerApi
  * indicates that the stability of the annotated class should be calculated as a combination of
  * the stability of the class itself and the stability of that type parameter.
  */
-@Retention(AnnotationRetention.BINARY)
 @ComposeCompilerApi
+@Target(AnnotationTarget.CLASS)
+@Retention(AnnotationRetention.BINARY)
 annotation class StabilityInferred(val parameters: Int)

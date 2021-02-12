@@ -97,6 +97,37 @@ class ComposerParamSignatureTests : AbstractCodegenSignatureTest() {
     }
 
     @Test
+    fun testInterfaceMethodWithComposableParameter(): Unit = validateBytecode(
+        """
+            @Composable
+            fun test1(cc: ControlledComposition) {
+                cc.setContent {}
+            }
+            fun test2(cc: ControlledComposition) {
+                cc.setContent {}
+            }
+        """
+    ) {
+        assert(!it.contains("INVOKEINTERFACE androidx/compose/runtime/ControlledComposition.setContent (Lkotlin/jvm/functions/Function0;)V"))
+    }
+
+    @Test
+    fun testFakeOverrideFromSameModuleButLaterTraversal(): Unit = validateBytecode(
+        """
+            class B : A() {
+                fun test() {
+                    show {}
+                }
+            }
+            open class A {
+                fun show(content: @Composable () -> Unit) {}
+            }
+        """
+    ) {
+        assert(!it.contains("INVOKEINTERFACE androidx/compose/runtime/ControlledComposition.setContent (Lkotlin/jvm/functions/Function0;)V"))
+    }
+
+    @Test
     fun testPrimitiveChangedCalls(): Unit = validateBytecode(
         """
         @Composable fun Foo(
@@ -186,7 +217,7 @@ class ComposerParamSignatureTests : AbstractCodegenSignatureTest() {
         """
         inline class Bar(val value: Int)
         fun nonNull(bar: Bar) {}
-        @ComposableContract(restartable = false) @Composable fun Foo(bar: Bar = Bar(123)) {
+        @NonRestartableComposable @Composable fun Foo(bar: Bar = Bar(123)) {
             nonNull(bar)
         }
         """
@@ -833,8 +864,9 @@ class ComposerParamSignatureTests : AbstractCodegenSignatureTest() {
     fun testSealedClassEtc(): Unit = checkApi(
         """
             sealed class CompositionLocal2<T> {
-                @Composable
-                inline val current: T get() = error("")
+                inline val current: T
+                    @Composable
+                    get() = error("")
                 @Composable fun foo() {}
             }
 
@@ -846,7 +878,6 @@ class ComposerParamSignatureTests : AbstractCodegenSignatureTest() {
             public abstract class CompositionLocal2 {
               private <init>()V
               public final getCurrent(Landroidx/compose/runtime/Composer;I)Ljava/lang/Object;
-              public static synthetic getCurrent%annotations()V
               public final foo(Landroidx/compose/runtime/Composer;I)V
               public synthetic <init>(Lkotlin/jvm/internal/DefaultConstructorMarker;)V
               static <clinit>()V

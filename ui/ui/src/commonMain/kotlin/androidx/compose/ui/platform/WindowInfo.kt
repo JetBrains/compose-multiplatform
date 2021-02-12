@@ -17,12 +17,11 @@
 package androidx.compose.ui.platform
 
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.ExperimentalComposeApi
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.Stable
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.rememberUpdatedState
-import androidx.compose.runtime.snapshots.snapshotFlow
+import androidx.compose.runtime.snapshotFlow
 import kotlinx.coroutines.flow.collect
 
 /**
@@ -40,7 +39,6 @@ interface WindowInfo {
     val isWindowFocused: Boolean
 }
 
-@OptIn(ExperimentalComposeApi::class)
 @Composable
 internal fun WindowFocusObserver(onWindowFocusChanged: (isWindowFocused: Boolean) -> Unit) {
     val windowInfo = LocalWindowInfo.current

@@ -71,13 +71,6 @@ interface Density {
         return if (px.isInfinite()) Constraints.Infinity else px.roundToInt()
     }
 
-    @Stable
-    @Deprecated(
-        "toIntPx was renamed to roundToPx.",
-        ReplaceWith("roundToPx()", "androidx.compose.ui.unit.roundToPx")
-    )
-    fun Dp.toIntPx() = roundToPx()
-
     /**
      * Convert [Dp] to Sp. Sp is used for font size, etc.
      */

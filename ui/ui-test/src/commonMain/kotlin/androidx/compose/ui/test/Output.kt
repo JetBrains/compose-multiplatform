@@ -210,7 +210,7 @@ private fun SemanticsNode.printToStringInner(
 
 private val SemanticsNode.unclippedGlobalBounds: Rect
     get() {
-        return Rect(globalPosition, size.toSize())
+        return Rect(positionInWindow, size.toSize())
     }
 
 private fun rectToShortString(rect: Rect): String {

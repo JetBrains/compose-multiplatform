@@ -18,9 +18,7 @@ package androidx.compose.ui.test
 
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.lerp
-import androidx.compose.ui.gesture.DoubleTapTimeoutMillis
-import androidx.compose.ui.gesture.LongPressTimeoutMillis
-import androidx.compose.ui.layout.globalBounds
+import androidx.compose.ui.layout.boundsInWindow
 import androidx.compose.ui.semantics.SemanticsNode
 import androidx.compose.ui.test.InputDispatcher.Companion.eventPeriodMillis
 import androidx.compose.ui.unit.IntSize
@@ -44,6 +42,17 @@ private const val edgeFuzzFactor = 0.083f
  * a double click gesture. 145 milliseconds: both median and average of empirical data (33 samples)
  */
 private const val doubleClickDelayMillis = 145L
+
+/** The time before a long press gesture attempts to win. */
+// remove after b/179281066
+private const val LongPressTimeoutMillis: Long = 500L
+
+/**
+ * The maximum time from the start of the first tap to the start of the second
+ * tap in a double-tap gesture.
+ */
+// remove after b/179281066
+private const val DoubleTapTimeoutMillis: Long = 300L
 
 /**
  * The receiver scope for injecting gestures on the [semanticsNode] identified by the
@@ -274,14 +283,13 @@ fun GestureScope.percentOffset(
 }
 
 /**
- * Transforms the [position] to global coordinates, as defined by
- * [LayoutCoordinates.localToGlobal][androidx.compose.ui.layout.LayoutCoordinates.localToGlobal]
+ * Transforms the [position] to window coordinates.
  *
  * @param position A position in local coordinates
+ * @return [position] transformed to coordinates relative to the containing window.
  */
-private fun GestureScope.localToGlobal(position: Offset): Offset {
-    @Suppress("DEPRECATION")
-    return position + semanticsNode.layoutInfo.coordinates.globalBounds.topLeft
+private fun GestureScope.localToWindow(position: Offset): Offset {
+    return position + semanticsNode.layoutInfo.coordinates.boundsInWindow().topLeft
 }
 
 /**
@@ -294,7 +302,7 @@ private fun GestureScope.localToGlobal(position: Offset): Offset {
  * omitted, the center position will be used.
  */
 fun GestureScope.click(position: Offset = center) {
-    inputDispatcher.enqueueClick(localToGlobal(position))
+    inputDispatcher.enqueueClick(localToWindow(position))
 }
 
 /**
@@ -335,7 +343,7 @@ fun GestureScope.doubleClick(
     require(delayMillis <= DoubleTapTimeoutMillis - 10) {
         "Time between clicks in double click can be at most ${DoubleTapTimeoutMillis - 10}ms"
     }
-    val globalPosition = localToGlobal(position)
+    val globalPosition = localToWindow(position)
     inputDispatcher.enqueueClick(globalPosition)
     inputDispatcher.enqueueDelay(delayMillis)
     inputDispatcher.enqueueClick(globalPosition)
@@ -356,8 +364,8 @@ fun GestureScope.swipe(
     end: Offset,
     durationMillis: Long = 200
 ) {
-    val globalStart = localToGlobal(start)
-    val globalEnd = localToGlobal(end)
+    val globalStart = localToWindow(start)
+    val globalEnd = localToWindow(end)
     inputDispatcher.enqueueSwipe(globalStart, globalEnd, durationMillis)
 }
 
@@ -381,10 +389,10 @@ fun GestureScope.pinch(
     end1: Offset,
     durationMillis: Long = 400
 ) {
-    val globalStart0 = localToGlobal(start0)
-    val globalEnd0 = localToGlobal(end0)
-    val globalStart1 = localToGlobal(start1)
-    val globalEnd1 = localToGlobal(end1)
+    val globalStart0 = localToWindow(start0)
+    val globalEnd0 = localToWindow(end0)
+    val globalStart1 = localToWindow(start1)
+    val globalEnd1 = localToWindow(end1)
     val durationFloat = durationMillis.toFloat()
 
     inputDispatcher.enqueueSwipes(
@@ -430,8 +438,8 @@ fun GestureScope.swipeWithVelocity(
         "Duration must be at least ${minimumDuration}ms because " +
             "velocity requires at least 3 input events"
     }
-    val globalStart = localToGlobal(start)
-    val globalEnd = localToGlobal(end)
+    val globalStart = localToWindow(start)
+    val globalEnd = localToWindow(end)
 
     // Decompose v into it's x and y components
     val delta = end - start
@@ -606,7 +614,7 @@ private fun createFunctionForVelocity(
  * @param position The position of the down event, in the node's local coordinate system
  */
 fun GestureScope.down(pointerId: Int, position: Offset) {
-    val globalPosition = localToGlobal(position)
+    val globalPosition = localToWindow(position)
     inputDispatcher.enqueueDown(pointerId, globalPosition)
 }
 
@@ -665,7 +673,7 @@ fun GestureScope.moveTo(position: Offset) {
  * @param position The new position of the pointer, in the node's local coordinate system
  */
 fun GestureScope.movePointerTo(pointerId: Int, position: Offset) {
-    val globalPosition = localToGlobal(position)
+    val globalPosition = localToWindow(position)
     inputDispatcher.movePointer(pointerId, globalPosition)
 }
 

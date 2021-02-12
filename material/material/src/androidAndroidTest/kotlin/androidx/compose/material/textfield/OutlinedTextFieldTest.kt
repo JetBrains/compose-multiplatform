@@ -20,9 +20,9 @@ import android.os.Build
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.preferredSize
-import androidx.compose.foundation.layout.preferredWidth
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.requiredWidth
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.LocalContentAlpha
 import androidx.compose.material.LocalContentColor
@@ -35,7 +35,7 @@ import androidx.compose.material.TextFieldPadding
 import androidx.compose.material.runOnIdleWithDensity
 import androidx.compose.material.setMaterialContent
 import androidx.compose.material.setMaterialContentForSizeAssertions
-import androidx.compose.runtime.Providers
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.testutils.assertShape
@@ -58,12 +58,11 @@ import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.performGesture
-import androidx.compose.ui.text.ExperimentalTextApi
-import androidx.compose.ui.text.SoftwareKeyboardController
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.ImeOptions
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
+import androidx.compose.ui.text.input.PlatformTextInputService
 import androidx.compose.ui.text.input.TextInputService
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
@@ -103,7 +102,7 @@ class OutlinedTextFieldTest {
                 value = "input",
                 onValueChange = {},
                 label = {},
-                modifier = Modifier.width(40.dp)
+                modifier = Modifier.requiredWidth(40.dp)
             )
         }
             .assertWidthIsEqualTo(40.dp)
@@ -499,11 +498,11 @@ class OutlinedTextFieldTest {
             OutlinedTextField(
                 value = "text",
                 onValueChange = {},
-                modifier = Modifier.preferredWidth(textFieldWidth),
+                modifier = Modifier.width(textFieldWidth),
                 label = {},
                 leadingIcon = {
                     Box(
-                        Modifier.preferredSize(size).onGloballyPositioned {
+                        Modifier.size(size).onGloballyPositioned {
                             leadingPosition.value = it.positionInRoot()
                             leadingSize.value = it.size
                         }
@@ -511,7 +510,7 @@ class OutlinedTextFieldTest {
                 },
                 trailingIcon = {
                     Box(
-                        Modifier.preferredSize(size).onGloballyPositioned {
+                        Modifier.size(size).onGloballyPositioned {
                             trailingPosition.value = it.positionInRoot()
                             trailingSize.value = it.size
                         }
@@ -557,8 +556,8 @@ class OutlinedTextFieldTest {
                             }
                         )
                     },
-                    trailingIcon = { Box(Modifier.preferredSize(iconSize)) },
-                    leadingIcon = { Box(Modifier.preferredSize(iconSize)) }
+                    trailingIcon = { Box(Modifier.size(iconSize)) },
+                    leadingIcon = { Box(Modifier.size(iconSize)) }
                 )
             }
         }
@@ -607,7 +606,7 @@ class OutlinedTextFieldTest {
                 value = "",
                 onValueChange = {},
                 label = {},
-                isErrorValue = false,
+                isError = false,
                 leadingIcon = {
                     assertThat(LocalContentColor.current)
                         .isEqualTo(
@@ -635,7 +634,7 @@ class OutlinedTextFieldTest {
                 value = "",
                 onValueChange = {},
                 label = {},
-                isErrorValue = true,
+                isError = true,
                 leadingIcon = {
                     assertThat(LocalContentColor.current)
                         .isEqualTo(
@@ -651,12 +650,12 @@ class OutlinedTextFieldTest {
         }
     }
 
-    @OptIn(ExperimentalTextApi::class)
     @Test
     fun testOutlinedTextField_imeActionAndKeyboardTypePropagatedDownstream() {
-        val textInputService = mock<TextInputService>()
+        val platformTextInputService = mock<PlatformTextInputService>()
+        val textInputService = TextInputService(platformTextInputService)
         rule.setContent {
-            Providers(
+            CompositionLocalProvider(
                 LocalTextInputService provides textInputService
             ) {
                 var text = remember { mutableStateOf("") }
@@ -676,7 +675,7 @@ class OutlinedTextFieldTest {
         rule.onNodeWithTag(TextfieldTag).performClick()
 
         rule.runOnIdle {
-            verify(textInputService, atLeastOnce()).startInput(
+            verify(platformTextInputService, atLeastOnce()).startInput(
                 value = any(),
                 imeOptions = eq(
                     ImeOptions(
@@ -716,30 +715,5 @@ class OutlinedTextFieldTest {
                 // avoid elevation artifacts
                 shapeOverlapPixelCount = with(rule.density) { 3.dp.toPx() }
             )
-    }
-
-    @Test
-    fun testOutlinedTextField_onTextInputStartedCallback() {
-        var controller: SoftwareKeyboardController? = null
-
-        rule.setMaterialContent {
-            OutlinedTextField(
-                modifier = Modifier.testTag(TextfieldTag),
-                value = "",
-                onValueChange = {},
-                label = {},
-                onTextInputStarted = {
-                    controller = it
-                }
-            )
-        }
-        assertThat(controller).isNull()
-
-        rule.onNodeWithTag(TextfieldTag)
-            .performClick()
-
-        rule.runOnIdle {
-            assertThat(controller).isNotNull()
-        }
     }
 }

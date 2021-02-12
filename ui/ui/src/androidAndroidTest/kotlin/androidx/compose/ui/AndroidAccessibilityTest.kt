@@ -32,11 +32,10 @@ import androidx.activity.ComponentActivity
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.requiredSize
 import androidx.compose.foundation.selection.toggleable
 import androidx.compose.foundation.text.BasicText
 import androidx.compose.foundation.text.BasicTextField
-import androidx.compose.runtime.ExperimentalComposeApi
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -94,10 +93,7 @@ import org.mockito.internal.matchers.apachecommons.ReflectionEquals
 
 @LargeTest
 @RunWith(AndroidJUnit4::class)
-@OptIn(
-    ExperimentalFoundationApi::class,
-    ExperimentalComposeApi::class
-)
+@OptIn(ExperimentalFoundationApi::class)
 class AndroidAccessibilityTest {
     @get:Rule
     val rule = createAndroidComposeRule<ComponentActivity>()
@@ -180,13 +176,13 @@ class AndroidAccessibilityTest {
                             Modifier
                                 .zIndex(1f)
                                 .testTag(OverlappedChildOneTag)
-                                .size(50.dp)
+                                .requiredSize(50.dp)
                         )
                         BasicText(
                             "Child Two",
                             Modifier
                                 .testTag(OverlappedChildTwoTag)
-                                .size(50.dp)
+                                .requiredSize(50.dp)
                         )
                     }
                     if (isTextFieldVisible) {
@@ -409,7 +405,7 @@ class AndroidAccessibilityTest {
         val rectF = data[0] as RectF
         val expectedRect = textLayoutResult.getBoundingBox(0).translate(
             textFieldNode
-                .globalPosition
+                .positionInWindow
         )
         assertEquals(expectedRect.left, rectF.left)
         assertEquals(expectedRect.top, rectF.top)
@@ -691,12 +687,12 @@ class AndroidAccessibilityTest {
         var rootNodeBoundsTop = 0f
         rule.runOnIdle {
             val rootNode = androidComposeView.semanticsOwner.rootSemanticsNode
-            rootNodeBoundsLeft = rootNode.globalBounds.left
-            rootNodeBoundsTop = rootNode.globalBounds.top
+            rootNodeBoundsLeft = rootNode.boundsInWindow.left
+            rootNodeBoundsTop = rootNode.boundsInWindow.top
         }
         val toggleableNode = rule.onNodeWithTag(ToggleableTag)
             .fetchSemanticsNode("couldn't find node with tag $ToggleableTag")
-        val toggleableNodeBounds = toggleableNode.globalBounds
+        val toggleableNodeBounds = toggleableNode.boundsInWindow
 
         val toggleableNodeId = delegate.getVirtualViewAt(
             (toggleableNodeBounds.left + toggleableNodeBounds.right) / 2 - rootNodeBoundsLeft,
@@ -708,7 +704,7 @@ class AndroidAccessibilityTest {
             .fetchSemanticsNode("couldn't find node with tag $OverlappedChildOneTag")
         val overlappedChildTwoNode = rule.onNodeWithTag(OverlappedChildTwoTag)
             .fetchSemanticsNode("couldn't find node with tag $OverlappedChildTwoTag")
-        val overlappedChildNodeBounds = overlappedChildTwoNode.globalBounds
+        val overlappedChildNodeBounds = overlappedChildTwoNode.boundsInWindow
         val overlappedChildNodeId = delegate.getVirtualViewAt(
             (overlappedChildNodeBounds.left + overlappedChildNodeBounds.right) / 2 -
                 rootNodeBoundsLeft,

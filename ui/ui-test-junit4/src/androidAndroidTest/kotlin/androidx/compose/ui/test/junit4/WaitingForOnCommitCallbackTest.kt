@@ -21,6 +21,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import androidx.test.filters.LargeTest
 import androidx.test.filters.MediumTest
 import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.Dispatchers
@@ -63,6 +64,7 @@ class WaitingForOnCommitCallbackTest {
         assertThat(atomicBoolean.get()).isFalse()
     }
 
+    @LargeTest
     @Test
     fun cascadingOnCommits() {
         // Collect unique values (markers) at each step during the process and

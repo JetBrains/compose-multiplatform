@@ -17,12 +17,12 @@
 package androidx.compose.foundation.textfield
 
 import androidx.compose.foundation.ExperimentalFoundationApi
-import androidx.compose.foundation.layout.defaultMinSizeConstraints
-import androidx.compose.foundation.layout.preferredWidth
+import androidx.compose.foundation.layout.defaultMinSize
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.requiredWidth
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.Providers
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.platform.LocalDensity
@@ -83,7 +83,7 @@ class BaseTextFieldDefaultWidthTest {
                 fontSize = fontSize,
                 modifier = Modifier
                     .onGloballyPositioned { size = it.size.width }
-                    .defaultMinSizeConstraints(minWidth),
+                    .defaultMinSize(minWidth),
                 density = density
             )
         }
@@ -105,7 +105,7 @@ class BaseTextFieldDefaultWidthTest {
                 fontSize = fontSize,
                 modifier = Modifier
                     .onGloballyPositioned { size = it.size.width }
-                    .width(width),
+                    .requiredWidth(width),
                 density = density
             )
         }
@@ -161,7 +161,7 @@ class BaseTextFieldDefaultWidthTest {
                 text = "abc",
                 fontSize = fontSize,
                 modifier = Modifier
-                    .preferredWidth(textFieldWidth)
+                    .width(textFieldWidth)
                     .onGloballyPositioned { size = it.size.width },
                 density = density
             )
@@ -194,7 +194,7 @@ private fun DefaultWidthTextField(
         style = FontStyle.Normal
     )
 
-    Providers(LocalDensity provides density) {
+    CompositionLocalProvider(LocalDensity provides density) {
         androidx.compose.foundation.layout.Box {
             BasicTextField(
                 value = text,

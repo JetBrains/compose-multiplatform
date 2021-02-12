@@ -21,8 +21,8 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxHeight
-import androidx.compose.foundation.layout.preferredHeight
-import androidx.compose.foundation.layout.preferredSize
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.size
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -36,13 +36,13 @@ import androidx.compose.ui.unit.sp
 fun SimpleRow() {
     Row {
         // The child with no weight will have the specified size.
-        Box(Modifier.preferredSize(40.dp, 80.dp).background(Color.Magenta))
+        Box(Modifier.size(40.dp, 80.dp).background(Color.Magenta))
         // Has weight, the child will occupy half of the remaining width.
-        Box(Modifier.preferredHeight(40.dp).weight(1f).background(Color.Yellow))
+        Box(Modifier.height(40.dp).weight(1f).background(Color.Yellow))
         // Has weight and does not fill, the child will occupy at most half of the remaining width.
         // Therefore it will occupy 80.dp (its preferred width) if the assigned width is larger.
         Box(
-            Modifier.preferredSize(80.dp, 40.dp)
+            Modifier.size(80.dp, 40.dp)
                 .weight(1f, fill = false)
                 .background(Color.Green)
         )
@@ -55,25 +55,25 @@ fun SimpleAlignInRow() {
     Row(Modifier.fillMaxHeight()) {
         // The child with no align modifier is positioned by default so that its top edge is
         // aligned to the top of the vertical axis.
-        Box(Modifier.preferredSize(80.dp, 40.dp).background(Color.Magenta))
+        Box(Modifier.size(80.dp, 40.dp).background(Color.Magenta))
         // Gravity.Top, the child will be positioned so that its top edge is aligned to the top
         // of the vertical axis.
         Box(
-            Modifier.preferredSize(80.dp, 40.dp)
+            Modifier.size(80.dp, 40.dp)
                 .align(Alignment.Top)
                 .background(Color.Red)
         )
         // Gravity.Center, the child will be positioned so that its center is in the middle of
         // the vertical axis.
         Box(
-            Modifier.preferredSize(80.dp, 40.dp)
+            Modifier.size(80.dp, 40.dp)
                 .align(Alignment.CenterVertically)
                 .background(Color.Yellow)
         )
         // Gravity.Bottom, the child will be positioned so that its bottom edge is aligned to the
         // bottom of the vertical axis.
         Box(
-            Modifier.preferredSize(80.dp, 40.dp)
+            Modifier.size(80.dp, 40.dp)
                 .align(Alignment.Bottom)
                 .background(Color.Green)
         )
@@ -92,8 +92,8 @@ fun SimpleAlignByInRow() {
         // If no other sibling had alignBy() or alignByBaseline(), the modifier would have no
         // effect.
         Box(
-            modifier = Modifier.preferredSize(80.dp, 40.dp)
-                .alignBy { it.height / 2 }
+            modifier = Modifier.size(80.dp, 40.dp)
+                .alignBy { it.measuredHeight / 2 }
                 .background(Color.Magenta)
         )
         Text(

@@ -19,7 +19,7 @@ package androidx.compose.ui.demos.gestures
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.gestures.detectTapGestures
-import androidx.compose.foundation.gestures.rememberScrollableController
+import androidx.compose.foundation.gestures.rememberScrollableState
 import androidx.compose.foundation.gestures.scrollable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -29,8 +29,8 @@ import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.offset
-import androidx.compose.foundation.layout.preferredHeight
-import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.requiredWidth
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
@@ -40,7 +40,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.DrawModifier
 import androidx.compose.ui.geometry.Offset
-import androidx.compose.ui.gesture.scrollorientationlocking.Orientation
+import androidx.compose.foundation.gestures.Orientation
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.drawscope.ContentDrawScope
 import androidx.compose.ui.graphics.drawscope.clipRect
@@ -90,7 +90,7 @@ private fun DrawerLayout(drawerWidth: Dp, content: @Composable ColumnScope.() ->
     Box(
         Modifier.scrollable(
             orientation = Orientation.Horizontal,
-            controller = rememberScrollableController { scrollDistance ->
+            state = rememberScrollableState { scrollDistance ->
                 val originalOffset = currentOffset.value
                 currentOffset.value =
                     (currentOffset.value + scrollDistance).coerceIn(minOffset, maxOffset)
@@ -104,7 +104,7 @@ private fun DrawerLayout(drawerWidth: Dp, content: @Composable ColumnScope.() ->
         Box(
             Modifier
                 .fillMaxHeight()
-                .width(drawerWidth)
+                .requiredWidth(drawerWidth)
                 .offset { IntOffset(currentOffset.value.roundToInt(), 0) }
                 .background(color = DefaultBackgroundColor)
         ) {
@@ -131,7 +131,7 @@ private fun Scrollable(orientation: Orientation, content: @Composable () -> Unit
         content = content,
         modifier = Modifier.scrollable(
             orientation = orientation,
-            controller = rememberScrollableController { scrollDistance ->
+            state = rememberScrollableState { scrollDistance ->
                 val resultingOffset = offset.value + scrollDistance
                 val toConsume =
                     when {
@@ -149,7 +149,7 @@ private fun Scrollable(orientation: Orientation, content: @Composable () -> Unit
                 toConsume
             }
         ).then(ClipModifier),
-        measureBlock = { measurables, constraints ->
+        measurePolicy = { measurables, constraints ->
             val placeable =
                 when (orientation) {
                     Orientation.Horizontal -> measurables.first().measure(
@@ -262,7 +262,7 @@ private fun Pressable(
     Box(
         Modifier
             .fillMaxWidth()
-            .preferredHeight(height)
+            .height(height)
             .border(1.dp, Color.Black)
             .background(color = color.value)
             .then(pressOverlay).then(gestureDetectors)

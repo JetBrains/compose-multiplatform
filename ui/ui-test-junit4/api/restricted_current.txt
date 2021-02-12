@@ -29,14 +29,14 @@ package androidx.compose.ui.test.junit4 {
     method public void evaluate();
   }
 
-  public final class AndroidComposeTestRuleKt {
+  public final class AndroidComposeTestRule_androidKt {
     method public static <A extends androidx.activity.ComponentActivity> androidx.compose.ui.test.junit4.AndroidComposeTestRule<androidx.test.ext.junit.rules.ActivityScenarioRule<A>,A> createAndroidComposeRule(Class<A> activityClass);
     method public static inline <reified A extends androidx.activity.ComponentActivity> androidx.compose.ui.test.junit4.AndroidComposeTestRule<androidx.test.ext.junit.rules.ActivityScenarioRule<A>,A>! createAndroidComposeRule();
     method public static androidx.compose.ui.test.junit4.ComposeContentTestRule createComposeRule();
     method public static androidx.compose.ui.test.junit4.ComposeTestRule createEmptyComposeRule();
   }
 
-  public final class AndroidSynchronizationKt {
+  public final class AndroidSynchronization_androidKt {
   }
 
   public interface ComposeContentTestRule extends androidx.compose.ui.test.junit4.ComposeTestRule {
@@ -57,12 +57,6 @@ package androidx.compose.ui.test.junit4 {
     property public abstract androidx.compose.ui.test.MainTestClock mainClock;
   }
 
-  @androidx.compose.ui.test.InternalTestApi public final class DisableTransitionsTestRule implements org.junit.rules.TestRule {
-    ctor public DisableTransitionsTestRule(boolean disableTransitions);
-    ctor public DisableTransitionsTestRule();
-    method public org.junit.runners.model.Statement apply(org.junit.runners.model.Statement base, org.junit.runner.Description? description);
-  }
-
   public final class StateRestorationTester {
     ctor public StateRestorationTester(androidx.compose.ui.test.junit4.ComposeContentTestRule composeTestRule);
     method public void emulateSavedInstanceStateRestore();
@@ -73,17 +67,17 @@ package androidx.compose.ui.test.junit4 {
 
 package androidx.compose.ui.test.junit4.android {
 
-  public final class ComposeIdlingResourceKt {
+  public final class ComposeIdlingResource_androidKt {
   }
 
   public final class ComposeNotIdleException extends java.lang.Throwable {
     ctor public ComposeNotIdleException(String? message, Throwable? cause);
   }
 
-  public final class ComposeRootRegistryKt {
+  public final class ComposeRootRegistry_androidKt {
   }
 
-  public final class EspressoLinkKt {
+  public final class EspressoLink_androidKt {
   }
 
 }

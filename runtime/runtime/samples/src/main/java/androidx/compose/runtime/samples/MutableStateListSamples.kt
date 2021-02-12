@@ -36,7 +36,7 @@ fun stateListSample() {
     @Composable
     fun Names() {
         var name by remember { mutableStateOf("user") }
-        val names = mutableStateListOf<String>()
+        val names = remember { mutableStateListOf<String>() }
 
         Column {
             Row {

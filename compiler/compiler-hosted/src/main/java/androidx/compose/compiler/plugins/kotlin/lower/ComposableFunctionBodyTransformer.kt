@@ -21,9 +21,9 @@ import androidx.compose.compiler.plugins.kotlin.KtxNameConventions
 import androidx.compose.compiler.plugins.kotlin.analysis.Stability
 import androidx.compose.compiler.plugins.kotlin.analysis.knownStable
 import androidx.compose.compiler.plugins.kotlin.analysis.knownUnstable
-import androidx.compose.compiler.plugins.kotlin.composableReadonlyContract
-import androidx.compose.compiler.plugins.kotlin.composableRestartableContract
-import androidx.compose.compiler.plugins.kotlin.composableTrackedContract
+import androidx.compose.compiler.plugins.kotlin.hasExplicitGroupsAnnotation
+import androidx.compose.compiler.plugins.kotlin.hasReadonlyComposableAnnotation
+import androidx.compose.compiler.plugins.kotlin.hasNonRestartableComposableAnnotation
 import org.jetbrains.kotlin.backend.common.FileLoweringPass
 import org.jetbrains.kotlin.backend.common.extensions.IrPluginContext
 import org.jetbrains.kotlin.backend.common.lower.DeclarationIrBuilder
@@ -62,7 +62,6 @@ import org.jetbrains.kotlin.ir.declarations.IrLocalDelegatedProperty
 import org.jetbrains.kotlin.ir.declarations.IrModuleFragment
 import org.jetbrains.kotlin.ir.declarations.IrPackageFragment
 import org.jetbrains.kotlin.ir.declarations.IrProperty
-import org.jetbrains.kotlin.ir.declarations.IrSimpleFunction
 import org.jetbrains.kotlin.ir.declarations.IrTypeAlias
 import org.jetbrains.kotlin.ir.declarations.IrTypeParameter
 import org.jetbrains.kotlin.ir.declarations.IrValueDeclaration
@@ -681,9 +680,7 @@ class ComposableFunctionBodyTransformer(
         val restartable = declaration.shouldBeRestartable()
         val isLambda = declaration.isLambda()
 
-        // we use != false because a null value is treated as "tracked"
-        val isTracked = declaration.descriptor.composableTrackedContract() != false &&
-            declaration.returnType.isUnit()
+        val isTracked = declaration.returnType.isUnit()
 
         if (declaration.body == null) return declaration
 
@@ -730,7 +727,7 @@ class ComposableFunctionBodyTransformer(
         if (descriptor.isInline)
             return false
 
-        if (descriptor.composableRestartableContract() == false)
+        if (descriptor.hasNonRestartableComposableAnnotation())
             return false
 
         // Do not insert an observe scope in an inline composable lambda
@@ -770,14 +767,13 @@ class ComposableFunctionBodyTransformer(
 
     @OptIn(ObsoleteDescriptorBasedAPI::class)
     private fun IrFunction.shouldElideGroups(): Boolean {
-        var readOnly = descriptor.composableReadonlyContract()
-        if (readOnly == null && this is IrSimpleFunction) {
-            readOnly = correspondingPropertySymbol
-                ?.owner
-                ?.descriptor
-                ?.composableReadonlyContract()
-        }
-        return readOnly == true
+        return descriptor.hasReadonlyComposableAnnotation() ||
+            descriptor.hasExplicitGroupsAnnotation()
+    }
+
+    @OptIn(ObsoleteDescriptorBasedAPI::class)
+    private fun IrFunction.isReadonly(): Boolean {
+        return descriptor.hasReadonlyComposableAnnotation()
     }
 
     // At a high level, a non-restartable composable function
@@ -1289,92 +1285,50 @@ class ComposableFunctionBodyTransformer(
                 defaultExprIsStatic[index] = transformedDefault.isStatic()
                 defaultExpr[index] = transformedDefault
 
-                // create a new temporary variable with the same name as the parameter itself
-                // initialized to the parameter value.
-                val varSymbol = if (!canSkipExecution) {
-                    // If we can't skip execution, or if the expression is static, there's no need
-                    // to separate the assignment of the temporary and the declaration.
-                    irTemporary(
-                        irIfThenElse(
-                            param.type,
+                // Generate code to reassign parameter local for default arguments.
+                if (
+                    canSkipExecution &&
+                    !defaultExprIsStatic[index] &&
+                    dirty is IrChangedBitMaskVariable
+                ) {
+                    // If we are setting the parameter to the default expression and
+                    // running the default expression again, and the expression isn't
+                    // provably static, we can't be certain that the dirty value of
+                    // SAME is going to be valid. We must mark it as UNCERTAIN. In order
+                    // to avoid slot-table misalignment issues, we must mark it as
+                    // UNCERTAIN even when we skip the defaults, so that any child
+                    // function receives UNCERTAIN vs SAME/DIFFERENT deterministically.
+                    setDefaults.statements.add(
+                        irIf(
                             condition = irGetBit(defaultParam, index),
-                            // we need to ensure that this transform runs on the default expression. It
-                            // could contain conditional logic as well as composable calls
-                            thenPart = transformedDefault,
-                            elsePart = irGet(param)
-                        ),
-                        param.name.identifier,
-                        param.type,
-                        isVar = false,
-                        exactName = true
+                            body = irBlock(
+                                statements = listOf(
+                                    irSet(param, transformedDefault),
+                                    dirty.irSetSlotUncertain(index)
+                                )
+                            )
+                        )
+                    )
+                    skipDefaults.statements.add(
+                        irIf(
+                            condition = irGetBit(defaultParam, index),
+                            body = dirty.irSetSlotUncertain(index)
+                        )
                     )
                 } else {
-                    // If we can skip execution, we want to only execute the default expression
-                    // in certain cases. as a result, we first create the temp variable, and then
-                    // add the logic to set it in the "setDefaults" container.
-                    irTemporary(
-                        irGet(param),
-                        param.name.identifier,
-                        param.type,
-                        // NOTE(lmr): technically, we end up mutating this variable in the body of
-                        // the function. It turns out that the isVar doesn't validate this, but
-                        // it does cause the variable to be wrapped in a `Ref` object if it is
-                        // captured by a closure. We do NOT want that, and we know that the code
-                        // will be correct without it, so we set `isVar = false` here.
-                        isVar = false,
-                        exactName = true
-                    ).also {
-                        if (
-                            !defaultExprIsStatic[index] &&
-                            dirty is IrChangedBitMaskVariable
-                        ) {
-                            // if we are setting the parameter to the default expression and
-                            // running the default expression again, and the expression isn't
-                            // provably static, we can't be certain that the dirty value of
-                            // SAME is going to be valid. We must mark it as UNCERTAIN. In order
-                            // to avoid slot-table misalignment issues, we must mark it as
-                            // UNCERTAIN even when we skip the defaults, so that any child
-                            // function receives UNCERTAIN vs SAME/DIFFERENT deterministically.
-                            setDefaults.statements.add(
-                                irIf(
-                                    condition = irGetBit(defaultParam, index),
-                                    body = irBlock(
-                                        statements = listOf(
-                                            irSet(it, transformedDefault),
-                                            dirty.irSetSlotUncertain(index)
-                                        )
-                                    )
-                                )
-                            )
-                            skipDefaults.statements.add(
-                                irIf(
-                                    condition = irGetBit(defaultParam, index),
-                                    body = dirty.irSetSlotUncertain(index)
-                                )
-                            )
-                        } else {
-                            setDefaults.statements.add(
-                                irIf(
-                                    condition = irGetBit(defaultParam, index),
-                                    body = irSet(it, transformedDefault)
-                                )
-                            )
-                        }
-                    }
+                    setDefaults.statements.add(
+                        irIf(
+                            condition = irGetBit(defaultParam, index),
+                            body = irSet(param, transformedDefault)
+                        )
+                    )
                 }
-
-                // semantically, any reference to the parameter symbol now needs to be remapped
-                // to the temporary variable.
-                scope.remappedParams[param] = varSymbol
-
-                // in order to propagate the change detection we might perform on this parameter,
-                // we need to know which "slot" it is in
-                scope.paramsToSlots[varSymbol] = index
-                skipPreamble.statements.add(varSymbol)
-            } else {
-                scope.remappedParams[param] = param
-                scope.paramsToSlots[param] = index
             }
+
+            // In order to propagate the change detection we might perform on this parameter,
+            // we need to know which "slot" it is in
+            scope.remappedParams[param] = param
+            scope.paramsToSlots[param] = index
         }
         // we start the skipPreamble with all of the changed calls. These need to go at the top
         // of the function's group. Note that these end up getting called *before* default
@@ -1917,17 +1871,20 @@ class ComposableFunctionBodyTransformer(
     ): IrExpression {
         val startDescriptor = if (scope.hasSourceInformation)
             startRestartGroupSourceFunction else startRestartGroupFunction
-        return irMethodCall(
-            irCurrentComposer(),
-            startDescriptor,
-            element.startOffset,
-            element.endOffset
-        ).also {
-            it.putValueArgument(0, key)
-            if (scope.hasSourceInformation) {
-                recordSourceParameter(it, 1, scope)
+        return irSet(
+            nearestComposer(),
+            irMethodCall(
+                irCurrentComposer(),
+                startDescriptor,
+                element.startOffset,
+                element.endOffset
+            ).also {
+                it.putValueArgument(0, key)
+                if (scope.hasSourceInformation) {
+                    recordSourceParameter(it, 1, scope)
+                }
             }
-        }
+        )
     }
 
     private fun irEndRestartGroup(): IrExpression {
@@ -2566,7 +2523,7 @@ class ComposableFunctionBodyTransformer(
 
     private fun visitNormalComposableCall(expression: IrCall): IrExpression {
         encounteredComposableCall(
-            withGroups = !expression.symbol.owner.shouldElideGroups()
+            withGroups = !expression.symbol.owner.isReadonly()
         )
         // it's important that we transform all of the parameters here since this will cause the
         // IrGetValue's of remapped default parameters to point to the right variable.

@@ -40,7 +40,7 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 @RunWith(AndroidJUnit4::class)
 class SimpleComponentImplementationBenchmark {
     @get:Rule
-    val benchmarkRule = ComposeBenchmarkRule(enableTransitions = true)
+    val benchmarkRule = ComposeBenchmarkRule()
 
     private val twoLayoutNodesCaseFactory = { ComponentWithTwoLayoutNodesTestCase() }
     private val redrawOnlyCasefactory = { ComponentWithRedrawTestCase() }

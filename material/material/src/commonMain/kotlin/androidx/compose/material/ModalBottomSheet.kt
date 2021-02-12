@@ -16,13 +16,11 @@
 
 package androidx.compose.material
 
-import androidx.compose.animation.asDisposableClock
-import androidx.compose.animation.core.AnimationClockObservable
-import androidx.compose.animation.core.AnimationEndReason
 import androidx.compose.animation.core.AnimationSpec
 import androidx.compose.animation.core.TweenSpec
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.foundation.Canvas
+import androidx.compose.foundation.gestures.Orientation
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -33,16 +31,15 @@ import androidx.compose.foundation.layout.offset
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.Saver
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.gesture.nestedscroll.nestedScroll
-import androidx.compose.ui.gesture.scrollorientationlocking.Orientation
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shape
+import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.SubcomposeLayout
-import androidx.compose.ui.platform.LocalAnimationClock
 import androidx.compose.ui.semantics.collapse
 import androidx.compose.ui.semantics.dismiss
 import androidx.compose.ui.semantics.expand
@@ -51,6 +48,8 @@ import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
+import kotlinx.coroutines.CancellationException
+import kotlinx.coroutines.launch
 import kotlin.math.max
 import kotlin.math.roundToInt
 
@@ -80,19 +79,16 @@ enum class ModalBottomSheetValue {
  * State of the [ModalBottomSheetLayout] composable.
  *
  * @param initialValue The initial value of the state.
- * @param clock The animation clock that will be used to drive the animations.
  * @param animationSpec The default animation that will be used to animate to a new state.
  * @param confirmStateChange Optional callback invoked to confirm or veto a pending state change.
  */
 @ExperimentalMaterialApi
 class ModalBottomSheetState(
     initialValue: ModalBottomSheetValue,
-    clock: AnimationClockObservable,
     animationSpec: AnimationSpec<Float> = SwipeableDefaults.AnimationSpec,
     confirmStateChange: (ModalBottomSheetValue) -> Boolean = { true }
 ) : SwipeableState<ModalBottomSheetValue>(
     initialValue = initialValue,
-    clock = clock,
     animationSpec = animationSpec,
     confirmStateChange = confirmStateChange
 ) {
@@ -100,85 +96,52 @@ class ModalBottomSheetState(
      * Whether the bottom sheet is visible.
      */
     val isVisible: Boolean
-        get() = value != ModalBottomSheetValue.Hidden
+        get() = currentValue != ModalBottomSheetValue.Hidden
 
     internal val isHalfExpandedEnabled: Boolean
         get() = anchors.values.contains(ModalBottomSheetValue.HalfExpanded)
 
     /**
-     * Show the bottom sheet, with an animation. If half expand is enabled, the bottom sheet will
-     * be half expanded. Otherwise it will be fully expanded.
-     *
-     * @param onShown Optional callback invoked when the bottom sheet has been shown.
+     * Show the bottom sheet with animation and suspend until it's shown. If half expand is
+     * enabled, the bottom sheet will be half expanded. Otherwise it will be fully expanded.
      */
-    fun show(onShown: (() -> Unit)? = null) {
+    suspend fun show() {
         val targetValue =
             if (isHalfExpandedEnabled) ModalBottomSheetValue.HalfExpanded
             else ModalBottomSheetValue.Expanded
-        animateTo(
-            targetValue = targetValue,
-            onEnd = { endReason, _ ->
-                @Suppress("Deprecation")
-                if (endReason == AnimationEndReason.TargetReached) {
-                    onShown?.invoke()
-                }
-            }
-        )
+        animateTo(targetValue = targetValue)
     }
 
     /**
-     * Half expand the bottom sheet if half expand is enabled, with an animation.
+     * Half expand the bottom sheet if half expand is enabled with animation and suspend until it
+     * animation is complete or cancelled
      *
-     * @param onHalfExpand Optional callback invoked when the bottom sheet has been half-expanded.
+     * @return the reason the half expand animation ended
      */
-    internal fun halfExpand(onHalfExpand: (() -> Unit)? = null) {
+    internal suspend fun halfExpand() {
         if (!isHalfExpandedEnabled) {
             return
         }
-        animateTo(
-            targetValue = ModalBottomSheetValue.HalfExpanded,
-            onEnd = { endReason, _ ->
-                @Suppress("Deprecation")
-                if (endReason == AnimationEndReason.TargetReached) {
-                    onHalfExpand?.invoke()
-                }
-            }
-        )
+        animateTo(ModalBottomSheetValue.HalfExpanded)
     }
 
     /**
-     * Fully expand the bottom sheet, with an animation.
+     * Fully expand the bottom sheet with animation and suspend until it if fully expanded or
+     * animation has been cancelled. This method will throw [CancellationException] if the
+     * animation is interrupted
      *
-     * @param onExpand Optional callback invoked when the bottom sheet has been expanded.
+     * @return the reason the expand animation ended
      */
-    internal fun expand(onExpand: (() -> Unit)? = null) {
-        animateTo(
-            targetValue = ModalBottomSheetValue.Expanded,
-            onEnd = { endReason, _ ->
-                @Suppress("Deprecation")
-                if (endReason == AnimationEndReason.TargetReached) {
-                    onExpand?.invoke()
-                }
-            }
-        )
-    }
+    internal suspend fun expand() = animateTo(ModalBottomSheetValue.Expanded)
 
     /**
-     * Hide the bottom sheet, with an animation.
+     * Hide the bottom sheet with animation and suspend until it if fully hidden or animation has
+     * been cancelled. This method will throw [CancellationException] if the animation is
+     * interrupted
      *
-     * @param onHidden Optional callback invoked when the bottom sheet has been hidden.
+     * @return the reason the hide animation ended
      */
-    fun hide(onHidden: (() -> Unit)? = null) {
-        animateTo(
-            targetValue = ModalBottomSheetValue.Hidden,
-            onEnd = { endReason, _ ->
-                @Suppress("Deprecation")
-                if (endReason == AnimationEndReason.TargetReached) {
-                    onHidden?.invoke()
-                }
-            }
-        )
-    }
+    suspend fun hide() = animateTo(ModalBottomSheetValue.Hidden)
 
     internal val nestedScrollConnection = this.PreUpPostDownNestedScrollConnection
 
@@ -187,15 +150,13 @@ class ModalBottomSheetState(
          * The default [Saver] implementation for [ModalBottomSheetState].
          */
         fun Saver(
-            clock: AnimationClockObservable,
             animationSpec: AnimationSpec<Float>,
             confirmStateChange: (ModalBottomSheetValue) -> Boolean
         ): Saver<ModalBottomSheetState, *> = Saver(
-            save = { it.value },
+            save = { it.currentValue },
             restore = {
                 ModalBottomSheetState(
                     initialValue = it,
-                    clock = clock,
                     animationSpec = animationSpec,
                     confirmStateChange = confirmStateChange
                 )
@@ -205,11 +166,9 @@ class ModalBottomSheetState(
 }
 
 /**
- * Create a [ModalBottomSheetState] and [remember] it against the [clock]. If a clock is not
- * specified, the default animation clock will be used, as provided by [LocalAnimationClock].
+ * Create a [ModalBottomSheetState] and [remember] it.
  *
  * @param initialValue The initial value of the state.
- * @param clock The animation clock that will be used to drive the animations.
  * @param animationSpec The default animation that will be used to animate to a new state.
  * @param confirmStateChange Optional callback invoked to confirm or veto a pending state change.
  */
@@ -217,22 +176,17 @@ class ModalBottomSheetState(
 @ExperimentalMaterialApi
 fun rememberModalBottomSheetState(
     initialValue: ModalBottomSheetValue,
-    clock: AnimationClockObservable = LocalAnimationClock.current,
     animationSpec: AnimationSpec<Float> = SwipeableDefaults.AnimationSpec,
     confirmStateChange: (ModalBottomSheetValue) -> Boolean = { true }
 ): ModalBottomSheetState {
-    val disposableClock = clock.asDisposableClock()
     return rememberSaveable(
-        disposableClock,
         saver = ModalBottomSheetState.Saver(
-            clock = disposableClock,
             animationSpec = animationSpec,
             confirmStateChange = confirmStateChange
         )
     ) {
         ModalBottomSheetState(
             initialValue = initialValue,
-            clock = disposableClock,
             animationSpec = animationSpec,
             confirmStateChange = confirmStateChange
         )
@@ -275,65 +229,76 @@ fun ModalBottomSheetLayout(
     sheetContentColor: Color = contentColorFor(sheetBackgroundColor),
     scrimColor: Color = ModalBottomSheetDefaults.scrimColor,
     content: @Composable () -> Unit
-) = BottomSheetStack(
-    modifier = modifier,
-    sheetContent = {
-        Surface(
-            Modifier
-                .fillMaxWidth()
-                .nestedScroll(sheetState.nestedScrollConnection)
-                .offset { IntOffset(0, sheetState.offset.value.roundToInt()) }
-                .semantics {
-                    if (sheetState.isVisible) {
-                        dismiss { sheetState.hide(); true }
-                        if (sheetState.value == ModalBottomSheetValue.HalfExpanded) {
-                            expand { sheetState.expand(); true }
-                        } else if (sheetState.isHalfExpandedEnabled) {
-                            collapse { sheetState.halfExpand(); true }
+) {
+    val scope = rememberCoroutineScope()
+    BottomSheetStack(
+        modifier = modifier,
+        sheetContent = {
+            Surface(
+                Modifier
+                    .fillMaxWidth()
+                    .nestedScroll(sheetState.nestedScrollConnection)
+                    .offset { IntOffset(0, sheetState.offset.value.roundToInt()) }
+                    .semantics {
+                        if (sheetState.isVisible) {
+                            dismiss {
+                                scope.launch { sheetState.hide() }
+                                true
+                            }
+                            if (sheetState.currentValue == ModalBottomSheetValue.HalfExpanded) {
+                                expand {
+                                    scope.launch { sheetState.expand() }
+                                    true
+                                }
+                            } else if (sheetState.isHalfExpandedEnabled) {
+                                collapse {
+                                    scope.launch { sheetState.halfExpand() }
+                                    true
+                                }
+                            }
                         }
-                    }
-                },
-            shape = sheetShape,
-            elevation = sheetElevation,
-            color = sheetBackgroundColor,
-            contentColor = sheetContentColor
-        ) {
-            Column(content = sheetContent)
-        }
-    },
-    content = { constraints, sheetHeight ->
-        val fullHeight = constraints.maxHeight.toFloat()
-        val anchors = if (sheetHeight < fullHeight / 2) {
-            mapOf(
-                fullHeight to ModalBottomSheetValue.Hidden,
-                fullHeight - sheetHeight to ModalBottomSheetValue.Expanded
+                    },
+                shape = sheetShape,
+                elevation = sheetElevation,
+                color = sheetBackgroundColor,
+                contentColor = sheetContentColor
+            ) {
+                Column(content = sheetContent)
+            }
+        },
+        content = { constraints, sheetHeight ->
+            val fullHeight = constraints.maxHeight.toFloat()
+            val anchors = if (sheetHeight < fullHeight / 2) {
+                mapOf(
+                    fullHeight to ModalBottomSheetValue.Hidden,
+                    fullHeight - sheetHeight to ModalBottomSheetValue.Expanded
+                )
+            } else {
+                mapOf(
+                    fullHeight to ModalBottomSheetValue.Hidden,
+                    fullHeight / 2 to ModalBottomSheetValue.HalfExpanded,
+                    max(0f, fullHeight - sheetHeight) to ModalBottomSheetValue.Expanded
+                )
+            }
+            val swipeable = Modifier.swipeable(
+                state = sheetState,
+                anchors = anchors,
+                orientation = Orientation.Vertical,
+                enabled = sheetState.currentValue != ModalBottomSheetValue.Hidden,
+                resistance = null
             )
-        } else {
-            mapOf(
-                fullHeight to ModalBottomSheetValue.Hidden,
-                fullHeight / 2 to ModalBottomSheetValue.HalfExpanded,
-                max(0f, fullHeight - sheetHeight) to ModalBottomSheetValue.Expanded
-            )
-        }
-        val swipeable = Modifier.swipeable(
-            state = sheetState,
-            anchors = anchors,
-            orientation = Orientation.Vertical,
-            enabled = sheetState.value != ModalBottomSheetValue.Hidden,
-            resistance = null
-        )
 
-        Box(Modifier.fillMaxSize().then(swipeable)) {
-            content()
-
-            Scrim(
-                color = scrimColor,
-                onDismiss = { sheetState.hide() },
-                visible = sheetState.targetValue != ModalBottomSheetValue.Hidden
-            )
+            Box(Modifier.fillMaxSize().then(swipeable)) {
+                content()
+                Scrim(
+                    color = scrimColor,
+                    onDismiss = { scope.launch { sheetState.hide() } },
+                    visible = sheetState.targetValue != ModalBottomSheetValue.Hidden
+                )
+            }
         }
-    }
-)
+    )
+}
 
 @Composable
 private fun Scrim(

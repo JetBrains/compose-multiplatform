@@ -42,13 +42,13 @@ import androidx.compose.ui.unit.dp
 fun NestedLongPressDemo() {
     Column {
         Text(
-            "Demonstrates interaction between nested longPressGestureFitlers  in an " +
+            "Demonstrates interaction between nested pointerInput modifiers in an " +
                 "edge case that is nevertheless supported (normally regions will be separated" +
                 " by a pressIndicatorGestureFilter, but here they are not)."
         )
         Text(
             "This just demonstrates the interaction between directly nested " +
-                "longPressGestureFilters."
+                "pointerInputs with detectTapGestures."
         )
         LongPressableContainer(Modifier.fillMaxSize()) {
             LongPressableContainer(Modifier.padding(48.dp).fillMaxSize()) {

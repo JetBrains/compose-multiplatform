@@ -62,10 +62,6 @@ import java.lang.reflect.Modifier as JavaModifier
 private const val MAX_RECURSIONS = 10
 private const val MAX_ITERABLE = 25
 
-@OptIn(ComposeCompilerApi::class)
-private typealias CLambda =
-    ComposableLambda<*, *, *, *, *, *, *, *, *, *, *, *, *, *, *, *, *, *, *>
-
 /**
  * Factory of [NodeParameter]s.
  *
@@ -96,9 +92,9 @@ internal class ParameterFactory(private val inlineClassConverter: InlineClassCon
     }
 
     /**
-     * Do not decompose instances from these package prefixes.
+     * Do not decompose instances or lookup constants from these package prefixes
      */
-    private val ignoredPackagePrefixes = listOf("android.graphics.")
+    private val ignoredPackagePrefixes = listOf("android.", "java.", "javax.")
 
     var density = Density(1.0f)
 
@@ -133,7 +129,9 @@ internal class ParameterFactory(private val inlineClassConverter: InlineClassCon
     }
 
     private fun loadConstantsFrom(javaClass: Class<*>) {
-        if (valuesLoaded.contains(javaClass)) {
+        if (valuesLoaded.contains(javaClass) ||
+            ignoredPackagePrefixes.any { javaClass.name.startsWith(it) }
+        ) {
             return
         }
         val related = generateSequence(javaClass) { it.superclass }.plus(javaClass.interfaces)
@@ -269,11 +267,12 @@ internal class ParameterFactory(private val inlineClassConverter: InlineClassCon
             try {
                 recursions++
                 createFromConstant(name, value)?.let { return it }
+                @OptIn(ComposeCompilerApi::class)
                 return when (value) {
                     is AnnotatedString -> NodeParameter(name, ParameterType.String, value.text)
                     is BaselineShift -> createFromBaselineShift(name, value)
                     is Boolean -> NodeParameter(name, ParameterType.Boolean, value)
-                    is CLambda -> createFromCLambda(name, value)
+                    is ComposableLambda -> createFromCLambda(name, value)
                     is Color -> NodeParameter(name, ParameterType.Color, value.toArgb())
                     is CornerSize -> createFromCornerSize(name, value)
                     is Double -> NodeParameter(name, ParameterType.Double, value)
@@ -318,7 +317,8 @@ internal class ParameterFactory(private val inlineClassConverter: InlineClassCon
             return NodeParameter(name, ParameterType.String, converted)
         }
 
-        private fun createFromCLambda(name: String, value: CLambda): NodeParameter? = try {
+        @OptIn(ComposeCompilerApi::class)
+        private fun createFromCLambda(name: String, value: ComposableLambda): NodeParameter? = try {
             val lambda = value.javaClass.getDeclaredField("_block")
                 .apply { isAccessible = true }
                 .get(value)

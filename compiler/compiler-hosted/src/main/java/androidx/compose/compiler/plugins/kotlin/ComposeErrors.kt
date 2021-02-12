@@ -72,6 +72,12 @@ object ComposeErrors {
         )
 
     @JvmField
+    val COMPOSABLE_FUN_MAIN =
+        DiagnosticFactory0.create<PsiElement>(
+            Severity.ERROR
+        )
+
+    @JvmField
     val CAPTURED_COMPOSABLE_INVOCATION =
         DiagnosticFactory2.create<PsiElement, DeclarationDescriptor, DeclarationDescriptor>(
             Severity.ERROR
@@ -88,6 +94,11 @@ object ComposeErrors {
             Severity.ERROR
         )
 
+    @JvmField
+    val NONREADONLY_CALL_IN_READONLY_COMPOSABLE = DiagnosticFactory0.create<PsiElement>(
+        Severity.ERROR
+    )
+
     // This error matches Kotlin's CONFLICTING_OVERLOADS error, except that it renders the
     // annotations with the descriptor. This is important to use for errors where the
     // only difference is whether or not it is annotated with @Composable or not.
@@ -97,10 +108,6 @@ object ComposeErrors {
             Severity.ERROR,
             DECLARATION_SIGNATURE_OR_DEFAULT
         )
-
-    @JvmField
-    var DEPRECATED_COMPOSABLE_PROPERTY: DiagnosticFactory0<PsiElement> =
-        DiagnosticFactory0.create(Severity.WARNING)
 
     @JvmField
     val ILLEGAL_ASSIGN_TO_UNIONTYPE =

@@ -20,7 +20,7 @@ package androidx.compose.runtime.samples
 
 import androidx.annotation.Sampled
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.Providers
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.compositionLocalOf
 
 @Sampled
@@ -32,7 +32,7 @@ fun createCompositionLocal() {
 fun compositionLocalProvider() {
     @Composable
     fun App(user: User) {
-        Providers(ActiveUser provides user) {
+        CompositionLocalProvider(ActiveUser provides user) {
             SomeScreen()
         }
     }

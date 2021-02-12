@@ -25,7 +25,7 @@ import androidx.compose.animation.core.calculateTargetValue
 import androidx.compose.animation.core.exponentialDecay
 import androidx.compose.animation.core.spring
 import androidx.compose.animation.core.tween
-import androidx.compose.foundation.animation.androidFlingDecay
+import androidx.compose.animation.splineBasedDecay
 import androidx.compose.foundation.background
 import androidx.compose.foundation.gestures.awaitFirstDown
 import androidx.compose.foundation.gestures.verticalDrag
@@ -43,7 +43,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.composed
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
-import androidx.compose.ui.gesture.util.VelocityTracker
+import androidx.compose.ui.input.pointer.util.VelocityTracker
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.input.pointer.pointerInput
@@ -85,6 +85,7 @@ fun AnimatableAnimateToGenericsType() {
         Box(
             Modifier
                 .offset {
+                    // Use the animated offset as the offset of the Box.
                     IntOffset(
                         animatedOffset.value.x.roundToInt(),
                         animatedOffset.value.y.roundToInt()
@@ -98,9 +99,13 @@ fun AnimatableAnimateToGenericsType() {
 
 @Sampled
 fun AnimatableDecayAndAnimateToSample() {
+    /**
+     * In this example, we create a swipe-to-dismiss modifier that dismisses the child via a
+     * vertical swipe-up.
+     */
     fun Modifier.swipeToDismiss(): Modifier = composed {
         // Creates a Float type `Animatable` and `remember`s it
-        val animatedOffset = remember { Animatable(0f) }
+        val animatedOffsetY = remember { Animatable(0f) }
         this.pointerInput(Unit) {
             coroutineScope {
                 while (true) {
@@ -112,7 +117,9 @@ fun AnimatableDecayAndAnimateToSample() {
                         verticalDrag(pointerId) {
                             // Snaps the value by the amount of finger movement
                             launch {
-                                animatedOffset.snapTo(animatedOffset.value + it.positionChange().y)
+                                animatedOffsetY.snapTo(
+                                    animatedOffsetY.value + it.positionChange().y
+                                )
                             }
                             velocityTracker.addPosition(
                                 it.uptimeMillis,
@@ -120,33 +127,38 @@ fun AnimatableDecayAndAnimateToSample() {
                             )
                         }
                     }
+                    // At this point, drag has finished. Now we obtain the velocity at the end of
+                    // the drag, and animate the offset with it as the starting velocity.
                     val velocity = velocityTracker.calculateVelocity().y
+
+                    // The goal for the animation below is to animate the dismissal if the fling
+                    // velocity is high enough. Otherwise, spring back.
                     launch {
-                        // Either fling vertically up, or spring back
-                        val decay = androidFlingDecay<Float>(this@pointerInput)
                         // Checks where the animation will end using decay
+                        val decay = splineBasedDecay<Float>(this@pointerInput)
+
+                        // If the animation can naturally end outside of visual bounds, we will
+                        // animate with decay.
                         if (decay.calculateTargetValue(
-                                animatedOffset.value,
+                                animatedOffsetY.value,
                                 velocity
                             ) < -size.height
-                        ) { // If the animation can naturally end outside of visual bounds, we will
-                            // animate with decay.
-
+                        ) {
                             // (Optionally) updates lower bounds. This stops the animation as soon
                             // as bounds are reached.
-                            animatedOffset.updateBounds(
+                            animatedOffsetY.updateBounds(
                                 lowerBound = -size.height.toFloat()
                             )
                             // Animate with the decay animation spec using the fling velocity
-                            animatedOffset.animateDecay(velocity, decay)
+                            animatedOffsetY.animateDecay(velocity, decay)
                         } else {
                             // Not enough velocity to be dismissed, spring back to 0f
-                            animatedOffset.animateTo(0f, initialVelocity = velocity)
+                            animatedOffsetY.animateTo(0f, initialVelocity = velocity)
                         }
                     }
                 }
             }
-        }.offset { IntOffset(0, animatedOffset.value.roundToInt()) }
+        }.offset { IntOffset(0, animatedOffsetY.value.roundToInt()) }
     }
 }
 
@@ -191,18 +203,19 @@ fun AnimatableAnimationResultSample() {
 fun AnimatableFadeIn() {
     fun Modifier.fadeIn(): Modifier = composed {
         // Creates an `Animatable` and remembers it.
-        val alpha = remember { Animatable(0f) }
+        val alphaAnimation = remember { Animatable(0f) }
         // Launches a coroutine for the animation when entering the composition.
-        // Uses `Unit` as the subject so the job in `LaunchedEffect` will run once, until it
-        // leaves composition.
-        LaunchedEffect(Unit) {
+        // Uses `alphaAnimation` as the subject so the job in `LaunchedEffect` will run only when
+        // `alphaAnimation` is created, which happens one time when the modifier enters
+        // composition.
+        LaunchedEffect(alphaAnimation) {
             // Animates to 1f from 0f for the fade-in, and uses a 500ms tween animation.
-            alpha.animateTo(
+            alphaAnimation.animateTo(
                 targetValue = 1f,
                 // Default animationSpec uses [spring] animation, here we overwrite the default.
                 animationSpec = tween(500)
             )
         }
-        this.graphicsLayer(alpha = alpha.value)
+        this.graphicsLayer(alpha = alphaAnimation.value)
     }
 }

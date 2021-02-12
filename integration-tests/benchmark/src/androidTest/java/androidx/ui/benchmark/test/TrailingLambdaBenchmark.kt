@@ -18,7 +18,7 @@ package androidx.ui.benchmark.test
 
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.preferredWidth
+import androidx.compose.foundation.layout.width
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableStateOf
@@ -73,7 +73,7 @@ private sealed class TrailingLambdaTestCase : ComposeTestCase, ToggleableTestCas
         numberState = number
 
         val content = @Composable {
-            Box(Modifier.preferredWidth(10.dp))
+            Box(Modifier.width(10.dp))
         }
 
         Column {

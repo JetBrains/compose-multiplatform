@@ -25,13 +25,8 @@ internal data class StaticValueHolder<T>(override val value: T) : State<T>
  * A lazy value holder is static value holder for which the value is produced by the valueProducer
  * parameter which is called once and the result is remembered for the life of LazyValueHolder.
  */
-internal class LazyValueHolder<T>(valueProducer: (() -> T)?) : State<T> {
-    @Suppress("UNCHECKED_CAST")
-    private val current by lazy {
-        val fn = valueProducer
-        if (fn == null) null as T
-        else fn()
-    }
+internal class LazyValueHolder<T>(valueProducer: () -> T) : State<T> {
+    private val current by lazy(valueProducer)
 
     override val value: T get() = current
 }

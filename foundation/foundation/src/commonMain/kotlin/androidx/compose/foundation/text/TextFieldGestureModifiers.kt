@@ -18,7 +18,7 @@
 
 package androidx.compose.foundation.text
 
-import androidx.compose.foundation.InteractionState
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.focusable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
@@ -26,11 +26,11 @@ import androidx.compose.ui.focus.FocusState
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.geometry.Offset
-import androidx.compose.ui.gesture.DragObserver
-import androidx.compose.ui.gesture.LongPressDragObserver
-import androidx.compose.ui.gesture.dragGestureFilter
-import androidx.compose.ui.gesture.longPressDragGestureFilter
-import androidx.compose.ui.gesture.tapGestureFilter
+import androidx.compose.foundation.legacygestures.DragObserver
+import androidx.compose.foundation.legacygestures.LongPressDragObserver
+import androidx.compose.foundation.legacygestures.dragGestureFilter
+import androidx.compose.foundation.legacygestures.longPressDragGestureFilter
+import androidx.compose.foundation.legacygestures.tapGestureFilter
 
 // Touch selection
 internal fun Modifier.longPressDragGestureFilter(
@@ -45,12 +45,12 @@ internal fun Modifier.focusRequestTapModifier(onTap: (Offset) -> Unit, enabled: 
 internal fun Modifier.textFieldFocusModifier(
     enabled: Boolean,
     focusRequester: FocusRequester,
-    interactionState: InteractionState?,
+    interactionSource: MutableInteractionSource?,
     onFocusChanged: (FocusState) -> Unit
 ) = this
     .focusRequester(focusRequester)
     .onFocusChanged(onFocusChanged)
-    .focusable(interactionState = interactionState, enabled = enabled)
+    .focusable(interactionSource = interactionSource, enabled = enabled)
 
 // Mouse
 internal fun Modifier.mouseDragGestureFilter(

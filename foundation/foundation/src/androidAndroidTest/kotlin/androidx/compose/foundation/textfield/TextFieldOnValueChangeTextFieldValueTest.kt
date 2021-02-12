@@ -18,7 +18,7 @@ package androidx.compose.foundation.textfield
 
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.text.BasicTextField
-import androidx.compose.runtime.Providers
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.geometry.Offset
@@ -32,6 +32,7 @@ import androidx.compose.ui.text.input.CommitTextCommand
 import androidx.compose.ui.text.input.DeleteSurroundingTextCommand
 import androidx.compose.ui.text.input.EditCommand
 import androidx.compose.ui.text.input.FinishComposingTextCommand
+import androidx.compose.ui.text.input.PlatformTextInputService
 import androidx.compose.ui.text.input.SetComposingRegionCommand
 import androidx.compose.ui.text.input.SetComposingTextCommand
 import androidx.compose.ui.text.input.SetSelectionCommand
@@ -47,7 +48,6 @@ import com.nhaarman.mockitokotlin2.eq
 import com.nhaarman.mockitokotlin2.mock
 import com.nhaarman.mockitokotlin2.times
 import com.nhaarman.mockitokotlin2.verify
-import com.nhaarman.mockitokotlin2.whenever
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -66,14 +66,11 @@ class TextFieldOnValueChangeTextFieldValueTest {
 
     @Before
     fun setUp() {
-        val textInputService = mock<TextInputService>()
-        val inputSessionToken = 10 // any positive number is fine.
-
-        whenever(textInputService.startInput(any(), any(), any(), any()))
-            .thenReturn(inputSessionToken)
+        val platformTextInputService = mock<PlatformTextInputService>()
+        val textInputService = TextInputService(platformTextInputService)
 
         rule.setContent {
-            Providers(
+            CompositionLocalProvider(
                 LocalTextInputService provides textInputService
             ) {
                 val state = remember {
@@ -101,7 +98,7 @@ class TextFieldOnValueChangeTextFieldValueTest {
         rule.runOnIdle {
             // Verify startInput is called and capture the callback.
             val onEditCommandCaptor = argumentCaptor<(List<EditCommand>) -> Unit>()
-            verify(textInputService, times(1)).startInput(
+            verify(platformTextInputService, times(1)).startInput(
                 value = any(),
                 imeOptions = any(),
                 onEditCommand = onEditCommandCaptor.capture(),

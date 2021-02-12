@@ -16,7 +16,7 @@
 
 package androidx.compose.foundation.textfield
 
-import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.requiredWidth
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.CoreTextField
 import androidx.compose.runtime.Composable
@@ -31,7 +31,6 @@ import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.performClick
-import androidx.compose.ui.text.InternalTextApi
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
 import androidx.test.ext.junit.runners.AndroidJUnit4
@@ -42,7 +41,6 @@ import org.junit.Test
 import org.junit.runner.RunWith
 
 @LargeTest
-@OptIn(InternalTextApi::class)
 @RunWith(AndroidJUnit4::class)
 class TextFieldFocusTest {
     @get:Rule
@@ -57,7 +55,7 @@ class TextFieldFocusTest {
                 modifier = Modifier
                     .focusRequester(data.focusRequester)
                     .onFocusChanged { data.focused = it.isFocused }
-                    .width(10.dp),
+                    .requiredWidth(10.dp),
                 onValueChange = {
                     editor.value = it
                 }

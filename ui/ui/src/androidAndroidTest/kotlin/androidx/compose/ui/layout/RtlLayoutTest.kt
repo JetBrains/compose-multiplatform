@@ -18,11 +18,10 @@ package androidx.compose.ui.layout
 
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.ExperimentalLayout
 import androidx.compose.foundation.layout.IntrinsicSize
-import androidx.compose.foundation.layout.preferredWidth
+import androidx.compose.foundation.layout.width
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.Providers
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.FixedSize
 import androidx.compose.ui.Modifier
@@ -31,6 +30,7 @@ import androidx.compose.ui.node.Ref
 import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.runOnUiThreadIR
 import androidx.compose.ui.test.TestActivity
+import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.test.ext.junit.runners.AndroidJUnit4
@@ -178,7 +178,7 @@ class RtlLayoutTest {
                         layout(100, 100) {}
                     }
                 }
-                Providers(LocalLayoutDirection provides direction.value) {
+                CompositionLocalProvider(LocalLayoutDirection provides direction.value) {
                     Layout(children) { measurables, constraints ->
                         layout(100, 100) {
                             measurables.first().measure(constraints).placeRelative(0, 0)
@@ -203,7 +203,7 @@ class RtlLayoutTest {
 
         activityTestRule.runOnUiThread {
             activity.setContent {
-                Providers(LocalLayoutDirection provides LayoutDirection.Rtl) {
+                CompositionLocalProvider(LocalLayoutDirection provides LayoutDirection.Rtl) {
                     Layout(content = {}) { _, _ ->
                         resultLayoutDirection.value = layoutDirection
                         latch.countDown()
@@ -224,22 +224,42 @@ class RtlLayoutTest {
 
         activityTestRule.runOnUiThread {
             activity.setContent {
-                @OptIn(ExperimentalLayout::class)
-                Providers(LocalLayoutDirection provides LayoutDirection.Rtl) {
-                    Layout(
-                        content = {},
-                        modifier = Modifier.preferredWidth(IntrinsicSize.Max),
-                        minIntrinsicWidthMeasureBlock = { _, _ -> 0 },
-                        minIntrinsicHeightMeasureBlock = { _, _ -> 0 },
-                        maxIntrinsicWidthMeasureBlock = { _, _ ->
+                CompositionLocalProvider(LocalLayoutDirection provides LayoutDirection.Rtl) {
+                    val measurePolicy = object : MeasurePolicy {
+                        override fun MeasureScope.measure(
+                            measurables: List<Measurable>,
+                            constraints: Constraints
+                        ) = layout(0, 0) {}
+
+                        override fun IntrinsicMeasureScope.minIntrinsicWidth(
+                            measurables: List<IntrinsicMeasurable>,
+                            height: Int
+                        ) = 0
+
+                        override fun IntrinsicMeasureScope.minIntrinsicHeight(
+                            measurables: List<IntrinsicMeasurable>,
+                            width: Int
+                        ) = 0
+
+                        override fun IntrinsicMeasureScope.maxIntrinsicWidth(
+                            measurables: List<IntrinsicMeasurable>,
+                            height: Int
+                        ): Int {
                             resultLayoutDirection = this.layoutDirection
                             latch.countDown()
-                            0
-                        },
-                        maxIntrinsicHeightMeasureBlock = { _, _ -> 0 }
-                    ) { _, _ ->
-                        layout(0, 0) {}
+                            return 0
+                        }
+
+                        override fun IntrinsicMeasureScope.maxIntrinsicHeight(
+                            measurables: List<IntrinsicMeasurable>,
+                            width: Int
+                        ) = 0
                     }
+                    Layout(
+                        content = {},
+                        modifier = Modifier.width(IntrinsicSize.Max),
+                        measurePolicy = measurePolicy
+                    )
                 }
             }
         }
@@ -257,9 +277,11 @@ class RtlLayoutTest {
         activityTestRule.runOnUiThread {
             activity.setContent {
                 val initialLayoutDirection = LocalLayoutDirection.current
-                Providers(LocalLayoutDirection provides LayoutDirection.Rtl) {
+                CompositionLocalProvider(LocalLayoutDirection provides LayoutDirection.Rtl) {
                     Box {
-                        Providers(LocalLayoutDirection provides initialLayoutDirection) {
+                        CompositionLocalProvider(
+                            LocalLayoutDirection provides initialLayoutDirection
+                        ) {
                             Layout({}) { _, _ ->
                                 resultLayoutDirection.value = layoutDirection
                                 latch.countDown()
@@ -280,7 +302,7 @@ class RtlLayoutTest {
         absolutePositioning: Boolean,
         testLayoutDirection: LayoutDirection
     ) {
-        Providers(LocalLayoutDirection provides testLayoutDirection) {
+        CompositionLocalProvider(LocalLayoutDirection provides testLayoutDirection) {
             Layout(
                 content = {
                     FixedSize(size, modifier = Modifier.saveLayoutInfo(position[0], countDownLatch))

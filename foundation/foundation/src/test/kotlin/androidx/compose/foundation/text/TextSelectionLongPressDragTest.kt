@@ -19,14 +19,11 @@
 package androidx.compose.foundation.text
 
 import androidx.compose.ui.geometry.Offset
-import androidx.compose.ui.gesture.LongPressDragObserver
+import androidx.compose.foundation.legacygestures.LongPressDragObserver
 import androidx.compose.ui.layout.LayoutCoordinates
 import androidx.compose.foundation.text.selection.Selectable
 import androidx.compose.foundation.text.selection.Selection
 import androidx.compose.foundation.text.selection.SelectionRegistrar
-import androidx.compose.ui.text.ExperimentalTextApi
-import androidx.compose.ui.text.InternalTextApi
-import androidx.compose.ui.text.TextDelegate
 import androidx.compose.ui.text.style.ResolvedTextDirection
 import com.google.common.truth.Truth.assertThat
 import com.nhaarman.mockitokotlin2.doReturn
@@ -39,10 +36,7 @@ import org.junit.runner.RunWith
 import org.junit.runners.JUnit4
 
 @RunWith(JUnit4::class)
-@OptIn(
-    InternalTextApi::class,
-    ExperimentalTextApi::class
-)
+@OptIn(InternalFoundationTextApi::class)
 class TextSelectionLongPressDragTest {
     private val selectionRegistrar = mock<SelectionRegistrar>()
     private val selectable = mock<Selectable>()

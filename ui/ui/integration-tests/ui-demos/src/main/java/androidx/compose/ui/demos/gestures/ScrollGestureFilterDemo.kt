@@ -16,14 +16,16 @@
 
 package androidx.compose.ui.demos.gestures
 
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.background
-import androidx.compose.foundation.gestures.rememberScrollableController
+import androidx.compose.foundation.gestures.rememberScrollableState
 import androidx.compose.foundation.gestures.scrollable
+import androidx.compose.foundation.interaction.collectIsDraggedAsState
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.offset
-import androidx.compose.foundation.layout.preferredSize
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
@@ -31,7 +33,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.gesture.scrollorientationlocking.Orientation
+import androidx.compose.foundation.gestures.Orientation
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.Dp
@@ -66,7 +68,8 @@ fun ScrollableBox(
     content: @Composable () -> Unit = {}
 ) {
 
-    val color = remember { mutableStateOf(idleColor) }
+    val interactionSource = remember { MutableInteractionSource() }
+    val color = if (interactionSource.collectIsDraggedAsState().value) activeColor else idleColor
     val offsetPx = remember { mutableStateOf(0f) }
 
     val offsetDp = with(LocalDensity.current) {
@@ -82,20 +85,15 @@ fun ScrollableBox(
             .fillMaxSize()
             .wrapContentSize(Alignment.Center)
             .scrollable(
+                interactionSource = interactionSource,
                 orientation = orientation,
-                onScrollStarted = {
-                    color.value = activeColor
-                },
-                onScrollStopped = {
-                    color.value = idleColor
-                },
-                controller = rememberScrollableController { scrollDistance ->
+                state = rememberScrollableState { scrollDistance ->
                     offsetPx.value += scrollDistance
                     scrollDistance
                 }
             )
-            .preferredSize(size)
-            .background(color.value)
+            .size(size)
+            .background(color)
     ) {
         content()
     }

@@ -22,7 +22,7 @@ import androidx.activity.ComponentActivity
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.text.CoreText
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.Providers
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
@@ -53,7 +53,6 @@ import androidx.compose.ui.test.longClick
 import androidx.compose.ui.test.onRoot
 import androidx.compose.ui.test.performGesture
 import androidx.compose.ui.text.AnnotatedString
-import androidx.compose.ui.text.InternalTextApi
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontStyle
@@ -86,7 +85,6 @@ import kotlin.math.max
 import kotlin.math.roundToInt
 
 @Suppress("DEPRECATION")
-@OptIn(InternalTextApi::class)
 @LargeTest
 @RunWith(AndroidJUnit4::class)
 class SelectionContainerTest {
@@ -272,7 +270,7 @@ class SelectionContainerTest {
 
         val layoutDirection = if (isRtl) LayoutDirection.Rtl else LayoutDirection.Ltr
         rule.setContent {
-            Providers(
+            CompositionLocalProvider(
                 LocalHapticFeedback provides hapticFeedback,
                 LocalLayoutDirection provides layoutDirection
             ) {

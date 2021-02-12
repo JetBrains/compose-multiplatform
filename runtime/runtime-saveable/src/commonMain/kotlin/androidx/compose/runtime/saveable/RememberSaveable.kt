@@ -72,7 +72,7 @@ fun <T : Any> rememberSaveable(
     val finalKey = if (!key.isNullOrEmpty()) {
         key
     } else {
-        currentCompositeKeyHash().toString()
+        currentCompositeKeyHash.toString()
     }
     @Suppress("UNCHECKED_CAST")
     (saver as Saver<T, Any>)

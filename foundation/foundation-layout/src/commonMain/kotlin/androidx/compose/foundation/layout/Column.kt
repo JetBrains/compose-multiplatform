@@ -40,10 +40,10 @@ import androidx.compose.ui.platform.debugInspectorInfo
  *
  * When none of its children have weights, a [Column] will be as small as possible to fit its
  * children one on top of the other. In order to change the height of the [Column], use the
- * [Modifier.height] modifiers; e.g. to make it fill the available height [Modifier.fillMaxHeight]
+ * [Modifier.requiredHeight] modifiers; e.g. to make it fill the available height [Modifier.fillMaxHeight]
  * can be used. If at least one child of a [Column] has a [weight][ColumnScope.weight],
  * the [Column] will fill the available height, so there is no need for [Modifier.fillMaxHeight].
- * However, if [Column]'s size should be limited, the [Modifier.height] or [Modifier.size] layout
+ * However, if [Column]'s size should be limited, the [Modifier.requiredHeight] or [Modifier.requiredSize] layout
  * modifiers should be applied.
  *
  * When the size of the [Column] is larger than the sum of its children sizes, a
@@ -69,16 +69,16 @@ inline fun Column(
     horizontalAlignment: Alignment.Horizontal = Alignment.Start,
     content: @Composable ColumnScope.() -> Unit
 ) {
-    val measureBlocks = columnMeasureBlocks(verticalArrangement, horizontalAlignment)
+    val measurePolicy = columnMeasurePolicy(verticalArrangement, horizontalAlignment)
     Layout(
         content = { ColumnScope.content() },
-        measureBlocks = measureBlocks,
+        measurePolicy = measurePolicy,
         modifier = modifier
     )
 }
 
 @PublishedApi
-internal val DefaultColumnMeasureBlocks = rowColumnMeasureBlocks(
+internal val DefaultColumnMeasurePolicy = rowColumnMeasurePolicy(
     orientation = LayoutOrientation.Vertical,
     arrangement = { totalSize, size, _, density, outPosition ->
         with(Arrangement.Top) { density.arrange(totalSize, size, outPosition) }
@@ -90,14 +90,14 @@ internal val DefaultColumnMeasureBlocks = rowColumnMeasureBlocks(
 
 @PublishedApi
 @Composable
-internal fun columnMeasureBlocks(
+internal fun columnMeasurePolicy(
     verticalArrangement: Arrangement.Vertical,
     horizontalAlignment: Alignment.Horizontal
 ) = remember(verticalArrangement, horizontalAlignment) {
     if (verticalArrangement == Arrangement.Top && horizontalAlignment == Alignment.Start) {
-        DefaultColumnMeasureBlocks
+        DefaultColumnMeasurePolicy
     } else {
-        rowColumnMeasureBlocks(
+        rowColumnMeasurePolicy(
             orientation = LayoutOrientation.Vertical,
             arrangement = { totalSize, size, _, density, outPosition ->
                 with(verticalArrangement) { density.arrange(totalSize, size, outPosition) }
@@ -152,19 +152,13 @@ interface ColumnScope {
     @Stable
     fun Modifier.alignBy(alignmentLine: VerticalAlignmentLine) = this.then(
         SiblingsAlignedModifier.WithAlignmentLine(
-            line = alignmentLine,
+            alignmentLine = alignmentLine,
             inspectorInfo = debugInspectorInfo {
                 name = "alignBy"
                 value = alignmentLine
             }
         )
     )
-
-    @Deprecated(
-        "alignWithSiblings was renamed to alignBy.",
-        ReplaceWith("alignBy(alignmentLine)")
-    )
-    fun Modifier.alignWithSiblings(alignmentLine: VerticalAlignmentLine) = alignBy(alignmentLine)
 
     /**
      * Size the element's height proportional to its [weight] relative to other weighted sibling
@@ -228,13 +222,6 @@ interface ColumnScope {
             }
         )
     )
-
-    @Deprecated(
-        "alignWithSiblings was renamed to alignBy.",
-        ReplaceWith("alignBy(alignmentLineBlock)")
-    )
-    fun Modifier.alignWithSiblings(alignmentLineBlock: (Measured) -> Int) =
-        alignBy(alignmentLineBlock)
 
     companion object : ColumnScope
 }

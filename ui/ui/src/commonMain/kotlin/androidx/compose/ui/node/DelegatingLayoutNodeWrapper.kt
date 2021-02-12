@@ -71,15 +71,16 @@ internal open class DelegatingLayoutNodeWrapper<T : Modifier.Element>(
     }
 
     override fun hitTest(
-        pointerPositionRelativeToScreen: Offset,
+        pointerPosition: Offset,
         hitPointerInputFilters: MutableList<PointerInputFilter>
     ) {
-        if (withinLayerBounds(pointerPositionRelativeToScreen)) {
-            wrapped.hitTest(pointerPositionRelativeToScreen, hitPointerInputFilters)
+        if (withinLayerBounds(pointerPosition)) {
+            val positionInWrapped = wrapped.fromParentPosition(pointerPosition)
+            wrapped.hitTest(positionInWrapped, hitPointerInputFilters)
         }
     }
 
-    override fun get(line: AlignmentLine): Int = wrapped[line]
+    override fun get(alignmentLine: AlignmentLine): Int = wrapped[alignmentLine]
 
     override fun placeAt(
         position: IntOffset,

@@ -16,27 +16,6 @@
 
 package androidx.compose.runtime
 
-@Deprecated(
-    message = "Ambient has been renamed to CompositionLocal. Instances of CompositionLocal should" +
-        " use the prefix `Local` in their naming to convey that values retrieved through a " +
-        "CompositionLocal are local to the composition.",
-    replaceWith = ReplaceWith(
-        "CompositionLocal<T>", "androidx.compose.runtime.CompositionLocal"
-    )
-)
-typealias Ambient<T> = CompositionLocal<T>
-
-@Deprecated(
-    message = "Ambient has been renamed to CompositionLocal. Instances of CompositionLocal should" +
-        " use the prefix `Local` in their naming to convey that values retrieved through a " +
-        "CompositionLocal are local to the composition.",
-    replaceWith = ReplaceWith(
-        "ProvidableCompositionLocal<T>",
-        "androidx.compose.runtime.ProvidableCompositionLocal"
-    )
-)
-typealias ProvidableAmbient<T> = ProvidableCompositionLocal<T>
-
 /**
  * Compose passes data through the composition tree explicitly through means of parameters to
  * composable functions. This is often times the simplest and best way to have data flow through
@@ -59,7 +38,7 @@ typealias ProvidableAmbient<T> = ProvidableCompositionLocal<T>
  *
  * @sample androidx.compose.runtime.samples.createCompositionLocal
  *
- * Somewhere up the tree, a [Providers] component can be used, which provides a value for the
+ * Somewhere up the tree, a [CompositionLocalProvider] component can be used, which provides a value for the
  * [CompositionLocal]. This would often be at the "root" of a tree, but could be anywhere, and can
  * also be used in multiple places to override the provided value for a sub-tree.
  *
@@ -77,7 +56,7 @@ typealias ProvidableAmbient<T> = ProvidableCompositionLocal<T>
  * @sample androidx.compose.runtime.samples.consumeCompositionLocal
  */
 @Stable
-sealed class CompositionLocal<T> constructor(defaultFactory: (() -> T)? = null) {
+sealed class CompositionLocal<T> constructor(defaultFactory: () -> T) {
     @Suppress("UNCHECKED_CAST")
     internal val defaultValueHolder = LazyValueHolder(defaultFactory)
 
@@ -85,7 +64,7 @@ sealed class CompositionLocal<T> constructor(defaultFactory: (() -> T)? = null) 
     internal abstract fun provided(value: T): State<T>
 
     /**
-     * Return the value provided by the nearest [Providers] component that invokes, directly or
+     * Return the value provided by the nearest [CompositionLocalProvider] component that invokes, directly or
      * indirectly, the composable function that uses this property.
      *
      * @sample androidx.compose.runtime.samples.consumeCompositionLocal
@@ -98,19 +77,19 @@ sealed class CompositionLocal<T> constructor(defaultFactory: (() -> T)? = null) 
 }
 
 /**
- * A [ProvidableCompositionLocal] can be used in [Providers] to provide values.
+ * A [ProvidableCompositionLocal] can be used in [CompositionLocalProvider] to provide values.
  *
  * @see compositionLocalOf
  * @see staticCompositionLocalOf
  * @see CompositionLocal
- * @see Providers
+ * @see CompositionLocalProvider
  */
 @Stable
-abstract class ProvidableCompositionLocal<T> internal constructor(defaultFactory: (() -> T)?) :
+abstract class ProvidableCompositionLocal<T> internal constructor(defaultFactory: () -> T) :
     CompositionLocal<T> (defaultFactory) {
 
     /**
-     * Associates a [CompositionLocal] key to a value in a call to [Providers].
+     * Associates a [CompositionLocal] key to a value in a call to [CompositionLocalProvider].
      *
      * @see CompositionLocal
      * @see ProvidableCompositionLocal
@@ -119,7 +98,7 @@ abstract class ProvidableCompositionLocal<T> internal constructor(defaultFactory
     infix fun provides(value: T) = ProvidedValue(this, value, true)
 
     /**
-     * Associates a [CompositionLocal] key to a value in a call to [Providers] if the key does not
+     * Associates a [CompositionLocal] key to a value in a call to [CompositionLocalProvider] if the key does not
      * already have an associated value.
      *
      * @see CompositionLocal
@@ -140,7 +119,7 @@ abstract class ProvidableCompositionLocal<T> internal constructor(defaultFactory
  */
 internal class DynamicProvidableCompositionLocal<T> constructor(
     private val policy: SnapshotMutationPolicy<T>,
-    defaultFactory: (() -> T)?
+    defaultFactory: () -> T
 ) : ProvidableCompositionLocal<T>(defaultFactory) {
 
     @Composable
@@ -154,7 +133,7 @@ internal class DynamicProvidableCompositionLocal<T> constructor(
  *
  * @see staticCompositionLocalOf
  */
-internal class StaticProvidableCompositionLocal<T>(defaultFactory: (() -> T)?) :
+internal class StaticProvidableCompositionLocal<T>(defaultFactory: () -> T) :
     ProvidableCompositionLocal<T>(defaultFactory) {
 
     @Composable
@@ -162,12 +141,13 @@ internal class StaticProvidableCompositionLocal<T>(defaultFactory: (() -> T)?) :
 }
 
 /**
- * Create a [CompositionLocal] key that can be provided using [Providers]. Changing the value
- * provided during recomposition will invalidate the children of [Providers] that read the value
+ * Create a [CompositionLocal] key that can be provided using [CompositionLocalProvider]. Changing the value
+ * provided during recomposition will invalidate the children of [CompositionLocalProvider] that read the value
  * using [CompositionLocal.current].
  *
  * @param policy a policy to determine when a [CompositionLocal] is considered changed. See
  * [SnapshotMutationPolicy] for details.
+ * @param defaultFactory a value factory to supply a value when a value is not provided.
  *
  * @see CompositionLocal
  * @see staticCompositionLocalOf
@@ -175,78 +155,29 @@ internal class StaticProvidableCompositionLocal<T>(defaultFactory: (() -> T)?) :
  */
 fun <T> compositionLocalOf(
     policy: SnapshotMutationPolicy<T> =
-        @OptIn(ExperimentalComposeApi::class)
         structuralEqualityPolicy(),
-    defaultFactory: (() -> T)? = null
+    defaultFactory: () -> T
 ): ProvidableCompositionLocal<T> = DynamicProvidableCompositionLocal(policy, defaultFactory)
 
 /**
- * Create a [CompositionLocal] key that can be provided using [Providers]. Changing the value
- * provided will cause the entire tree below [Providers] to be recomposed, disabling skipping of
+ * Create a [CompositionLocal] key that can be provided using [CompositionLocalProvider]. Changing the value
+ * provided will cause the entire tree below [CompositionLocalProvider] to be recomposed, disabling skipping of
  * composable calls.
  *
  * A static [CompositionLocal] should be only be used when the value provided is highly unlikely to
  * change.
  *
+ * @param defaultFactory a value factory to supply a value when a value is not provided.
+ *
  * @see CompositionLocal
  * @see compositionLocalOf
  */
-fun <T> staticCompositionLocalOf(defaultFactory: (() -> T)? = null): ProvidableCompositionLocal<T> =
+fun <T> staticCompositionLocalOf(defaultFactory: () -> T): ProvidableCompositionLocal<T> =
     StaticProvidableCompositionLocal(defaultFactory)
 
 /**
- * Create an ambient key that can be provided using [Providers]. Changing the value provided
- * during recomposition will invalidate the children of [Providers] that read the value using
- * [CompositionLocal.current].
- *
- * @param policy a policy to determine when an ambient is considered changed. See
- * [SnapshotMutationPolicy] for details.
- *
- * @see CompositionLocal
- * @see staticAmbientOf
- * @see mutableStateOf
- */
-@Deprecated(
-    message = "Ambient has been renamed to CompositionLocal. Instances of CompositionLocal should" +
-        " use the prefix `Local` in their naming to convey that values retrieved through a " +
-        "CompositionLocal are local to the composition.",
-    replaceWith = ReplaceWith(
-        "compositionLocalOf(policy, defaultFactory)",
-        "androidx.compose.runtime.compositionLocalOf"
-    )
-)
-fun <T> ambientOf(
-    policy: SnapshotMutationPolicy<T> =
-        @OptIn(ExperimentalComposeApi::class)
-        structuralEqualityPolicy(),
-    defaultFactory: (() -> T)? = null
-): ProvidableCompositionLocal<T> = DynamicProvidableCompositionLocal(policy, defaultFactory)
-
-/**
- * Create an ambient key that can be provided using [Providers]. Changing the value provided
- * will cause the entire tree below [Providers] to be recomposed, disabling skipping of composable
- * calls.
- *
- * A static ambient should be only be used when the value provided is highly unlikely to change.
- *
- * @see CompositionLocal
- * @see ambientOf
- */
-@Deprecated(
-    message = "Ambient has been renamed to CompositionLocal. Instances of CompositionLocal should" +
-        " use the prefix `Local` in their naming to convey that values retrieved through a " +
-        "CompositionLocal are local to the composition.",
-    replaceWith = ReplaceWith(
-        "staticCompositionLocalOf(defaultFactory)",
-        "androidx.compose.runtime.staticCompositionLocalOf"
-    )
-)
-fun <T> staticAmbientOf(defaultFactory: (() -> T)? = null): ProvidableCompositionLocal<T> =
-    StaticProvidableCompositionLocal(defaultFactory)
-
-/**
- * [Providers] binds values to [ProvidableCompositionLocal] keys. Reading the [CompositionLocal]
- * using [CompositionLocal.current] will return the value provided in [Providers]'s [values]
+ * [CompositionLocalProvider] binds values to [ProvidableCompositionLocal] keys. Reading the [CompositionLocal]
+ * using [CompositionLocal.current] will return the value provided in [CompositionLocalProvider]'s [values]
  * parameter for all composable functions called directly or indirectly in the [content] lambda.
  *
  * @sample androidx.compose.runtime.samples.compositionLocalProvider
@@ -257,7 +188,7 @@ fun <T> staticAmbientOf(defaultFactory: (() -> T)? = null): ProvidableCompositio
  */
 @Composable
 @OptIn(InternalComposeApi::class)
-fun Providers(vararg values: ProvidedValue<*>, content: @Composable () -> Unit) {
+fun CompositionLocalProvider(vararg values: ProvidedValue<*>, content: @Composable () -> Unit) {
     currentComposer.startProviders(values)
     content()
     currentComposer.endProviders()

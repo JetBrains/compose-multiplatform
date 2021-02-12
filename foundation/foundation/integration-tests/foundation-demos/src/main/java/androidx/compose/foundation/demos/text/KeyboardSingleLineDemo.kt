@@ -16,35 +16,29 @@
 
 package androidx.compose.foundation.demos.text
 
-import androidx.compose.foundation.layout.defaultMinSizeConstraints
+import androidx.compose.foundation.layout.defaultMinSize
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.text.BasicTextField
-import androidx.compose.foundation.text.KeyboardActionScope
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.text.ExperimentalTextApi
-import androidx.compose.ui.text.InternalTextApi
-import androidx.compose.ui.text.SoftwareKeyboardController
+import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
 
-@OptIn(ExperimentalTextApi::class)
 internal class ImeOptionsData(
     val keyboardOptions: KeyboardOptions,
     val singleLine: Boolean = false,
     val name: String,
 )
 
-@OptIn(ExperimentalTextApi::class)
 private val ImeOptionsList = listOf(
     ImeOptionsData(
         singleLine = true,
@@ -108,7 +102,6 @@ private val ImeOptionsList = listOf(
     )
 )
 
-@OptIn(ExperimentalTextApi::class)
 @Composable
 fun ImeSingleLineDemo() {
     LazyColumn {
@@ -120,33 +113,19 @@ fun ImeSingleLineDemo() {
 }
 
 @Composable
-@OptIn(
-    ExperimentalTextApi::class,
-    InternalTextApi::class
-)
 private fun MyTextField(data: ImeOptionsData) {
-    val controller = remember { mutableStateOf<SoftwareKeyboardController?>(null) }
+    // TODO(b/1583763): re-add software keyboard controller when replacement API is added
     val state = rememberSaveable(stateSaver = TextFieldValue.Saver) {
         mutableStateOf(TextFieldValue())
     }
-    val anyAction: KeyboardActionScope.() -> Unit = { controller.value?.hideSoftwareKeyboard() }
     BasicTextField(
-        modifier = demoTextFieldModifiers.defaultMinSizeConstraints(100.dp),
+        modifier = demoTextFieldModifiers.defaultMinSize(100.dp),
         value = state.value,
         keyboardOptions = data.keyboardOptions,
-        // TODO(b/179226323): Add API to set the same KeyboardAction lambda for all ImeActions.
-        keyboardActions = KeyboardActions(
-            onDone = anyAction,
-            onGo = anyAction,
-            onNext = anyAction,
-            onPrevious = anyAction,
-            onSearch = anyAction,
-            onSend = anyAction,
-        ),
+        keyboardActions = KeyboardActions { /* hide keyboard */ },
         singleLine = data.singleLine,
         onValueChange = { state.value = it },
         textStyle = TextStyle(fontSize = fontSize8),
-        onTextInputStarted = { controller.value = it },
-        cursorColor = Color.Red
+        cursorBrush = SolidColor(Color.Red)
     )
 }

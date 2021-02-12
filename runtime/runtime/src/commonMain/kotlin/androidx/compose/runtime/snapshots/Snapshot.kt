@@ -14,131 +14,14 @@
  * limitations under the License.
  */
 
-@file:OptIn(InternalComposeApi::class, ExperimentalComposeApi::class)
+@file:OptIn(InternalComposeApi::class)
 
 package androidx.compose.runtime.snapshots
 
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.ExperimentalComposeApi
 import androidx.compose.runtime.InternalComposeApi
 import androidx.compose.runtime.ThreadLocal
 import androidx.compose.runtime.synchronized
-
-/**
- * Take a snapshot of the current value of all state objects. The values are preserved until
- * [Snapshot.dispose] is called on the result.
- *
- * The [readObserver] parameter can be used to track when all state objects are read when in
- * [Snapshot.enter]. A [SnapshotApplyObserver] can be registered using
- * [Snapshot.registerApplyObserver] to observe modification of state objects.
- *
- * An active snapshot (after it is created but before [Snapshot.dispose] is called) requires
- * resources to track the values in the snapshot. Once a snapshot is no longer needed it should
- * disposed by calling [Snapshot.dispose].
- *
- * Leaving a snapshot active could cause hard to diagnose memory leaks values as are maintained
- * by state objects for these unneeded snapshots. Take care to always call [Snapshot.dispose] on all
- * snapshots when they are no longer needed.
- *
- * Composition uses both of these to implicitly subscribe to changes to state object and
- * automatically update the composition when state objects read during composition change.
- *
- * A nested snapshot can be taken of a snapshot which is an independent read-only copy of the
- * snapshot and can be disposed independently. This is used by [takeSnapshot] when in a read-only
- * snapshot for API consistency allowing the result of [takeSnapshot] to be disposed leaving the
- * parent snapshot active.
- *
- * @param readObserver called when any state object is read in the lambda passed to
- * [Snapshot.enter] or in the [Snapshot.enter] of any nested snapshot.
- *
- * @see Snapshot
- * @see Snapshot.registerApplyObserver
- * @see SnapshotApplyObserver
- */
-@Deprecated(
-    "Use Snapshot.takeSnapshot() instead.",
-    ReplaceWith("Snapshot.takeSnapshot(readObserver)")
-)
-fun takeSnapshot(
-    readObserver: ((Any) -> Unit)? = null
-): Snapshot = currentSnapshot().takeNestedSnapshot(readObserver)
-
-/**
- * Take a snapshot of the current value of all state objects that also allows the state to be
- * changed and later atomically applied when [MutableSnapshot.apply] is called. The values are
- * preserved until [Snapshot.dispose] is called on the result. The global state will either see
- * all the changes made as one atomic change, when [MutableSnapshot.apply] is called, or none of
- * the changes if the mutable state object is disposed before being applied.
- *
- * The values in a snapshot can be modified by calling [Snapshot.enter] and then, in its lambda,
- * modify any state object. The new values of the state objects will only become visible to the
- * global state when [MutableSnapshot.apply] is called.
- *
- * An active snapshot (after it is created but before [Snapshot.dispose] is called) requires
- * resources to track the values in the snapshot. Once a snapshot is no longer needed it should
- * disposed by calling [Snapshot.dispose].
- *
- * Leaving a snapshot active could cause hard to diagnose memory leaks as values are maintained
- * by state objects for these unneeded snapshots. Take care to always call [Snapshot.dispose] on all
- * snapshots when they are no longer needed.
- *
- * A nested snapshot can be taken by calling [Snapshot.takeNestedSnapshot], for a read-only
- * snapshot, or [MutableSnapshot.takeNestedMutableSnapshot] for a snapshot that can be changed.
- * Nested mutable snapshots are applied to the this, the parent snapshot, when their
- * [MutableSnapshot.apply] is called. Their applied changes will be visible to in this snapshot
- * but will not be visible other snapshots (including other nested snapshots) or the global state
- * until this snapshot is applied by calling [MutableSnapshot.apply].
- *
- * Once [MutableSnapshot.apply] is called on this, the parent snapshot, all calls to
- * [MutableSnapshot.apply] on an active nested snapshot will fail.
- *
- * Changes to a mutable snapshot are isolated, using snapshot isolation, from all other snapshots.
- * Their changes are only visible as global state or to new snapshots once [MutableSnapshot.apply]
- * is called.
- *
- * Applying a snapshot can fail if currently visible changes to the state object conflicts with a
- * change made in the snapshot.
- *
- * When in a mutable snapshot, [takeMutableSnapshot] creates a nested snapshot of the current mutable
- * snapshot. If the current snapshot is read-only, an exception is thrown. The current snapshot
- * is the result of calling [currentSnapshot] which is updated by calling [Snapshot.enter] which
- * makes the [Snapshot] the current snapshot while in its lambda.
- *
- * Composition uses mutable snapshots to allow changes made in a [Composable] functions to be
- * temporarily isolated from the global state and is later applied to the global state when the
- * composition is applied. If [MutableSnapshot.apply] fails applying this snapshot, the snapshot
- * and the changes calculated during composition are disposed and a new composition is scheduled
- * to be calculated again.
- *
- * @param readObserver called when any state object is read in the lambda passed to
- * [Snapshot.enter] or in the [Snapshot.enter] of any nested snapshots.
- *
- * Composition, layout and draw use [readObserver] to implicitly subscribe to changes to state
- * objects to know when to update.
- *
- * @param writeObserver called when a state object is created or just before it is written to the
- * first time in the snapshot or a nested mutable snapshot. This might be called several times
- * for the same object if nested mutable snapshots are created.
- *
- * Composition uses [writeObserver] to track when a state object is modified during composition
- * in order to invalidate the reads that have not yet occurred. This allows a single pass of
- * composition for state objects that are written to before they are read (such as modifying the
- * value of a dynamic CompositionLocal provider).
- *
- * @see takeSnapshot
- * @see Snapshot
- * @see MutableSnapshot
- */
-@Deprecated(
-    "Use Snapshot.takeMutableSnapshot() instead.",
-    ReplaceWith("Snapshot.takeMutableSnapshot(readObserver, writeObserver)")
-)
-fun takeMutableSnapshot(
-    readObserver: ((Any) -> Unit)? = null,
-    writeObserver: ((Any) -> Unit)? = null
-): MutableSnapshot =
-    (currentSnapshot() as? MutableSnapshot)?.takeNestedMutableSnapshot(readObserver, writeObserver)
-        ?: error("Cannot create a mutable snapshot of an read-only snapshot")
 
 /**
  * A snapshot of the values return by mutable states and other state objects. All state object
@@ -183,12 +66,6 @@ sealed class Snapshot(
      * True if any change to a state object in this snapshot will throw.
      */
     abstract val readOnly: Boolean
-
-    /**
-     * True if any change to a state object in this snapshot will throw.
-     */
-    @Deprecated("Use readOnly instead", ReplaceWith("readOnly"))
-    val readonly: Boolean get() = readOnly
 
     /**
      * Dispose the snapshot. Neglecting to dispose a snapshot will result in difficult to
@@ -287,9 +164,9 @@ sealed class Snapshot(
     /**
      * Notify the snapshot that all objects created in this snapshot to this point should be
      * considered initialized. If any state object is are modified passed this point it will
-     * appear as modified in the snapshot and any applicable [SnapshotWriteObserver] will be
+     * appear as modified in the snapshot and any applicable snapshot write observer will be
      * called for the object and the object will be part of the a set of mutated objects sent to
-     * any applicable [SnapshotApplyObserver].
+     * any applicable snapshot apply observer.
      *
      * Unless [notifyObjectsInitialized] is called, state objects created in a snapshot are not
      * considered modified by the snapshot even if they are modified after construction.
@@ -322,7 +199,7 @@ sealed class Snapshot(
          * [Snapshot.dispose] is called on the result.
          *
          * The [readObserver] parameter can be used to track when all state objects are read when in
-         * [Snapshot.enter]. A [SnapshotApplyObserver] can be registered using
+         * [Snapshot.enter]. A snapshot apply observer can be registered using
          * [Snapshot.registerApplyObserver] to observe modification of state objects.
          *
          * An active snapshot (after it is created but before [Snapshot.dispose] is called) requires
@@ -346,7 +223,6 @@ sealed class Snapshot(
          *
          * @see Snapshot
          * @see Snapshot.registerApplyObserver
-         * @see SnapshotApplyObserver
          */
         fun takeSnapshot(
             readObserver: ((Any) -> Unit)? = null
@@ -450,7 +326,8 @@ sealed class Snapshot(
          * Prior to returning, any changes made to snapshot state (e.g. state holders returned by
          * [androidx.compose.runtime.mutableStateOf] are not visible to other threads. When
          * [withMutableSnapshot] returns successfully those changes will be made visible to other
-         * threads  and any snapshot observers (e.g. [snapshotFlow]) will be notified of changes.
+         * threads  and any snapshot observers (e.g. [androidx.compose.runtime.snapshotFlow]) will
+         * be notified of changes.
          *
          * [block] must not suspend if [withMutableSnapshot] is called from a suspend function.
          */
@@ -554,9 +431,9 @@ sealed class Snapshot(
         /**
          * Notify the snapshot that all objects created in this snapshot to this point should be
          * considered initialized. If any state object is are modified passed this point it will
-         * appear as modified in the snapshot and any applicable [SnapshotWriteObserver] will be
+         * appear as modified in the snapshot and any applicable snapshot write observer will be
          * called for the object and the object will be part of the a set of mutated objects sent to
-         * any applicable [SnapshotApplyObserver].
+         * any applicable snapshot apply observer.
          *
          * Unless [notifyObjectsInitialized] is called, state objects created in a snapshot are not
          * considered modified by the snapshot even if they are modified after construction.
@@ -618,7 +495,7 @@ sealed class Snapshot(
  * Snapshots can be nested by calling [takeNestedSnapshot] or
  * [MutableSnapshot.takeNestedMutableSnapshot].
  *
- * @see takeMutableSnapshot
+ * @see Snapshot.takeMutableSnapshot
  * @see androidx.compose.runtime.mutableStateOf
  * @see androidx.compose.runtime.mutableStateListOf
  * @see androidx.compose.runtime.mutableStateMapOf
@@ -1023,50 +900,6 @@ sealed class SnapshotApplyResult {
 }
 
 /**
- * Callback type for observing reads of state objects in a snapshot.
- *
- * @see takeSnapshot
- * @see takeMutableSnapshot
- */
-@Deprecated(
-    "Use normal lambda syntax instead.",
-    ReplaceWith("((Any) -> Unit)")
-)
-typealias SnapshotReadObserver = (state: Any) -> Unit
-
-/**
- * Callback type for observing writes to state objects in a snapshot.
- *
- * @see Snapshot.registerGlobalWriteObserver
- */
-@Deprecated(
-    "Use normal lambda syntax instead.",
-    ReplaceWith("((Any) -> Unit)")
-)
-typealias SnapshotWriteObserver = (state: Any) -> Unit
-
-/**
- * Callback type for observing when a non-nested mutable snapshot is applied by calling
- * [MutableSnapshot.apply], modifying the visible global state of state objects. Changes to a
- * state object outside of a snapshot are also sent to the snapshot apply observer whenever
- * [Snapshot.sendApplyNotifications] is called.
- *
- * The committed parameter is a collection of state objects modified in the snapshot.
- * The snapshot parameter is the snapshot that was applied.
- *
- * @see takeMutableSnapshot
- * @see MutableSnapshot.apply
- * @see Snapshot
- * @see Snapshot.registerApplyObserver
- * @see Snapshot.sendApplyNotifications
- */
-@Deprecated(
-    "Use normal lambda syntax instead.",
-    ReplaceWith("((Set<Any>, Snapshot) -> Unit)")
-)
-typealias SnapshotApplyObserver = (changed: Set<Any>, snapshot: Snapshot) -> Unit
-
-/**
  * The type returned by observer registration methods that unregisters the observer when it is
  * disposed.
  */
@@ -1237,7 +1070,6 @@ internal class NestedReadonlySnapshot(
     init { parent.nestedActivated(this) }
     override val readOnly get() = true
     override val root: Snapshot get() = parent.root
-    @OptIn(ExperimentalComposeApi::class)
     override fun takeNestedSnapshot(readObserver: ((Any) -> Unit)?) =
         parent.takeNestedSnapshot(readObserver)
     override fun notifyObjectsInitialized() {
@@ -1267,7 +1099,6 @@ internal class NestedReadonlySnapshot(
 
     override val modified: HashSet<StateObject>? get() = null
     override val writeObserver: ((Any) -> Unit)? get() = null
-    @OptIn(ExperimentalComposeApi::class)
     override fun recordModified(state: StateObject) = parent.recordModified(state)
 
     override fun nestedDeactivated(snapshot: Snapshot) = unsupported()
@@ -1446,7 +1277,6 @@ internal class TransparentObserverMutableSnapshot(
         @Suppress("UNUSED_PARAMETER")
         set(value) { unsupported() }
 
-    @OptIn(ExperimentalComposeApi::class)
     override var invalid get() = currentSnapshot.invalid
         @Suppress("UNUSED_PARAMETER")
         set(value) = unsupported()
@@ -1464,7 +1294,6 @@ internal class TransparentObserverMutableSnapshot(
     override fun apply(): SnapshotApplyResult =
         currentSnapshot.apply()
 
-    @OptIn(ExperimentalComposeApi::class)
     override fun recordModified(state: StateObject) =
         currentSnapshot.recordModified(state)
 
@@ -1479,7 +1308,6 @@ internal class TransparentObserverMutableSnapshot(
         mergedWriteObserver(writeObserver, this.writeObserver)
     )
 
-    @OptIn(ExperimentalComposeApi::class)
     override fun notifyObjectsInitialized() = currentSnapshot.notifyObjectsInitialized()
 
     // The following should never be called.
@@ -1735,7 +1563,6 @@ internal fun <T : StateRecord> T.writableRecord(state: StateObject, snapshot: Sn
 
     // Otherwise, make a copy of the readable data and mark it as born in this snapshot, making it
     // writable.
-    @OptIn(ExperimentalComposeApi::class)
     val newData = newWritableRecord(state, snapshot)
 
     snapshot.recordModified(state)

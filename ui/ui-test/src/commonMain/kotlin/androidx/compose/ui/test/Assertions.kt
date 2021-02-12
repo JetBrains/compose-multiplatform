@@ -258,7 +258,10 @@ fun SemanticsNodeInteractionCollection.assertCountEquals(
     expectedSize: Int
 ): SemanticsNodeInteractionCollection {
     val errorOnFail = "Failed to assert count of nodes."
-    val matchedNodes = fetchSemanticsNodes(errorOnFail)
+    val matchedNodes = fetchSemanticsNodes(
+        atLeastOneRootRequired = expectedSize > 0,
+        errorOnFail
+    )
     if (matchedNodes.size != expectedSize) {
         throw AssertionError(
             buildErrorMessageForCountMismatch(
@@ -283,7 +286,7 @@ fun SemanticsNodeInteractionCollection.assertAny(
     matcher: SemanticsMatcher
 ): SemanticsNodeInteractionCollection {
     val errorOnFail = "Failed to assertAny(${matcher.description})"
-    val nodes = fetchSemanticsNodes(errorOnFail)
+    val nodes = fetchSemanticsNodes(errorMessageOnFail = errorOnFail)
     if (nodes.isEmpty()) {
         throw AssertionError(buildErrorMessageForAtLeastOneNodeExpected(errorOnFail, selector))
     }
@@ -307,7 +310,7 @@ fun SemanticsNodeInteractionCollection.assertAll(
     matcher: SemanticsMatcher
 ): SemanticsNodeInteractionCollection {
     val errorOnFail = "Failed to assertAll(${matcher.description})"
-    val nodes = fetchSemanticsNodes(errorOnFail)
+    val nodes = fetchSemanticsNodes(errorMessageOnFail = errorOnFail)
 
     val violations = mutableListOf<SemanticsNode>()
     nodes.forEach {

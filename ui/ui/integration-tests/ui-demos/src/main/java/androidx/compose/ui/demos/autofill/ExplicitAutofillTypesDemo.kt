@@ -16,12 +16,11 @@
 
 package androidx.compose.ui.demos.autofill
 
-import android.graphics.Rect
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.preferredHeight
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.MaterialTheme
@@ -35,9 +34,7 @@ import androidx.compose.ui.autofill.AutofillNode
 import androidx.compose.ui.autofill.AutofillType
 import androidx.compose.ui.focus.isFocused
 import androidx.compose.ui.focus.onFocusChanged
-import androidx.compose.ui.geometry.Offset
-import androidx.compose.ui.graphics.toComposeRect
-import androidx.compose.ui.layout.LayoutCoordinates
+import androidx.compose.ui.layout.boundsInWindow
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.platform.LocalAutofill
 import androidx.compose.ui.platform.LocalAutofillTree
@@ -80,7 +77,7 @@ fun ExplicitAutofillTypesDemo() {
             )
         }
 
-        Spacer(Modifier.preferredHeight(40.dp))
+        Spacer(Modifier.height(40.dp))
 
         Text("Email", style = labelStyle)
         Autofill(
@@ -123,19 +120,9 @@ private fun Autofill(
 
     Box(
         Modifier.onGloballyPositioned {
-            autofillNode.boundingBox = it.boundingBox().toComposeRect()
+            autofillNode.boundingBox = it.boundsInWindow()
         }
     ) {
         content(autofillNode)
     }
-}
-
-@Suppress("DEPRECATION")
-private fun LayoutCoordinates.boundingBox() = localToGlobal(Offset.Zero).run {
-    Rect(
-        x.toInt(),
-        y.toInt(),
-        x.toInt() + size.width,
-        y.toInt() + size.height
-    )
 }

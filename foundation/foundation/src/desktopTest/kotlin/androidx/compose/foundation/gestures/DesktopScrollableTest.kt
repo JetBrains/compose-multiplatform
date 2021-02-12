@@ -16,16 +16,13 @@
 
 package androidx.compose.foundation.gestures
 
-import androidx.compose.animation.core.AnimationClockObservable
-import androidx.compose.animation.core.AnimationClockObserver
-import androidx.compose.foundation.animation.defaultFlingConfig
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.size
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.gesture.scrollorientationlocking.Orientation
 import androidx.compose.ui.input.mouse.MouseScrollEvent
 import androidx.compose.ui.input.mouse.MouseScrollUnit
+import androidx.compose.ui.input.mouse.MouseScrollOrientation
 import androidx.compose.ui.platform.DesktopPlatform
 import androidx.compose.ui.platform.TestComposeWindow
 import androidx.compose.ui.unit.Density
@@ -65,7 +62,7 @@ class DesktopScrollableTest {
                 Modifier
                     .scrollable(
                         orientation = Orientation.Vertical,
-                        controller = context.controller()
+                        state = context.controller()
                     )
                     .size(10.dp, 20.dp)
             )
@@ -74,7 +71,7 @@ class DesktopScrollableTest {
         window.onMouseScroll(
             x = 0,
             y = 0,
-            event = MouseScrollEvent(MouseScrollUnit.Line(3f), Orientation.Vertical)
+            event = MouseScrollEvent(MouseScrollUnit.Line(3f), MouseScrollOrientation.Vertical)
         )
 
         assertThat(context.offset).isWithin(0.1f).of(-3 * scrollLineLinux(20.dp))
@@ -82,7 +79,7 @@ class DesktopScrollableTest {
         window.onMouseScroll(
             x = 0,
             y = 0,
-            event = MouseScrollEvent(MouseScrollUnit.Line(3f), Orientation.Vertical)
+            event = MouseScrollEvent(MouseScrollUnit.Line(3f), MouseScrollOrientation.Vertical)
         )
 
         assertThat(context.offset).isWithin(0.1f).of(-6 * scrollLineLinux(20.dp))
@@ -98,7 +95,7 @@ class DesktopScrollableTest {
                 Modifier
                     .scrollable(
                         orientation = Orientation.Vertical,
-                        controller = context.controller()
+                        state = context.controller()
                     )
                     .size(10.dp, 20.dp)
             )
@@ -107,7 +104,7 @@ class DesktopScrollableTest {
         window.onMouseScroll(
             x = 0,
             y = 0,
-            event = MouseScrollEvent(MouseScrollUnit.Line(-2f), Orientation.Vertical)
+            event = MouseScrollEvent(MouseScrollUnit.Line(-2f), MouseScrollOrientation.Vertical)
         )
 
         assertThat(context.offset).isWithin(0.1f).of(2 * scrollLineWindows(20.dp))
@@ -115,7 +112,7 @@ class DesktopScrollableTest {
         window.onMouseScroll(
             x = 0,
             y = 0,
-            event = MouseScrollEvent(MouseScrollUnit.Line(4f), Orientation.Vertical)
+            event = MouseScrollEvent(MouseScrollUnit.Line(4f), MouseScrollOrientation.Vertical)
         )
 
         assertThat(context.offset).isWithin(0.1f).of(-2 * scrollLineWindows(20.dp))
@@ -131,7 +128,7 @@ class DesktopScrollableTest {
                 Modifier
                     .scrollable(
                         orientation = Orientation.Vertical,
-                        controller = context.controller()
+                        state = context.controller()
                     )
                     .size(10.dp, 20.dp)
             )
@@ -140,7 +137,7 @@ class DesktopScrollableTest {
         window.onMouseScroll(
             x = 0,
             y = 0,
-            event = MouseScrollEvent(MouseScrollUnit.Page(1f), Orientation.Vertical)
+            event = MouseScrollEvent(MouseScrollUnit.Page(1f), MouseScrollOrientation.Vertical)
         )
 
         assertThat(context.offset).isWithin(0.1f).of(-scrollPage(20.dp))
@@ -156,7 +153,7 @@ class DesktopScrollableTest {
                 Modifier
                     .scrollable(
                         orientation = Orientation.Vertical,
-                        controller = context.controller()
+                        state = context.controller()
                     )
                     .size(10.dp, 20.dp)
             )
@@ -165,7 +162,7 @@ class DesktopScrollableTest {
         window.onMouseScroll(
             x = 0,
             y = 0,
-            event = MouseScrollEvent(MouseScrollUnit.Line(-5.5f), Orientation.Vertical)
+            event = MouseScrollEvent(MouseScrollUnit.Line(-5.5f), MouseScrollOrientation.Vertical)
         )
 
         assertThat(context.offset).isWithin(0.1f).of(5.5f * scrollLineMacOs())
@@ -181,7 +178,7 @@ class DesktopScrollableTest {
                 Modifier
                     .scrollable(
                         orientation = Orientation.Vertical,
-                        controller = column.controller()
+                        state = column.controller()
                     )
                     .size(10.dp, 20.dp)
             )
@@ -190,7 +187,7 @@ class DesktopScrollableTest {
         window.onMouseScroll(
             x = 0,
             y = 0,
-            event = MouseScrollEvent(MouseScrollUnit.Line(3f), Orientation.Horizontal)
+            event = MouseScrollEvent(MouseScrollUnit.Line(3f), MouseScrollOrientation.Horizontal)
         )
 
         assertThat(column.offset).isEqualTo(0f)
@@ -201,20 +198,11 @@ class DesktopScrollableTest {
             private set
 
         @Composable
-        fun controller() = ScrollableController(
-            ::consumeScrollDelta,
-            defaultFlingConfig(),
-            TestAnimationClock()
-        )
+        fun controller() = ScrollableState(::consumeScrollDelta)
 
         private fun consumeScrollDelta(delta: Float): Float {
             offset += delta
             return delta
         }
-    }
-
-    private class TestAnimationClock : AnimationClockObservable {
-        override fun subscribe(observer: AnimationClockObserver) = Unit
-        override fun unsubscribe(observer: AnimationClockObserver) = Unit
     }
 }

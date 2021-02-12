@@ -20,6 +20,8 @@ import android.content.Context
 import android.util.TypedValue
 import androidx.benchmark.junit4.BenchmarkRule
 import androidx.benchmark.junit4.measureRepeated
+import androidx.compose.foundation.text.InternalFoundationTextApi
+import androidx.compose.foundation.text.TextDelegate
 import androidx.compose.testutils.benchmark.measureRepeatedRecordingCanvas
 import androidx.test.filters.LargeTest
 import androidx.test.platform.app.InstrumentationRegistry
@@ -43,7 +45,7 @@ import org.junit.runners.Parameterized
 import kotlin.math.ceil
 import kotlin.math.roundToInt
 
-@OptIn(InternalTextApi::class)
+@OptIn(InternalFoundationTextApi::class)
 @LargeTest
 @RunWith(Parameterized::class)
 class TextDelegateBenchmark(

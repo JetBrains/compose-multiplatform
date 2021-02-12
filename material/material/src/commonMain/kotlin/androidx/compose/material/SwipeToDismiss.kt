@@ -16,13 +16,11 @@
 
 package androidx.compose.material
 
-import androidx.compose.animation.asDisposableClock
-import androidx.compose.animation.core.AnimationClockObservable
-import androidx.compose.animation.core.AnimationEndReason.Interrupted
+import androidx.compose.foundation.gestures.Orientation
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.RowScope
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.offset
 import androidx.compose.material.DismissDirection.EndToStart
 import androidx.compose.material.DismissDirection.StartToEnd
@@ -36,11 +34,10 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.Saver
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.gesture.scrollorientationlocking.Orientation
-import androidx.compose.ui.platform.LocalAnimationClock
 import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.LayoutDirection
+import kotlinx.coroutines.CancellationException
 import kotlin.math.roundToInt
 
 /**
@@ -82,15 +79,13 @@ enum class DismissValue {
  * State of the [SwipeToDismiss] composable.
  *
  * @param initialValue The initial value of the state.
- * @param clock The animation clock that will be used to drive the animations.
  * @param confirmStateChange Optional callback invoked to confirm or veto a pending state change.
  */
 @ExperimentalMaterialApi
 class DismissState(
     initialValue: DismissValue,
-    clock: AnimationClockObservable,
     confirmStateChange: (DismissValue) -> Boolean = { true }
-) : SwipeableState<DismissValue>(initialValue, clock, confirmStateChange = confirmStateChange) {
+) : SwipeableState<DismissValue>(initialValue, confirmStateChange = confirmStateChange) {
     /**
      * The direction (if any) in which the composable has been or is being dismissed.
      *
@@ -106,41 +101,27 @@ class DismissState(
      * @param direction The dismiss direction.
      */
     fun isDismissed(direction: DismissDirection): Boolean {
-        return value == if (direction == StartToEnd) DismissedToEnd else DismissedToStart
+        return currentValue == if (direction == StartToEnd) DismissedToEnd else DismissedToStart
     }
 
     /**
-     * Reset the component to the default position, with an animation.
+     * Reset the component to the default position with animation and suspend until it if fully
+     * reset or animation has been cancelled. This method will throw [CancellationException] if
+     * the animation is interrupted
      *
-     * @param onReset Optional callback invoked when the component has been reset.
+     * @return the reason the reset animation ended
      */
-    fun reset(onReset: (() -> Unit)? = null) {
-        animateTo(
-            targetValue = Default,
-            onEnd = { endReason, endValue ->
-                if (endReason != Interrupted && endValue == Default) {
-                    onReset?.invoke()
-                }
-            }
-        )
-    }
+    suspend fun reset() = animateTo(targetValue = Default)
 
     /**
-     * Dismiss the component in the given [direction], with an animation.
+     * Dismiss the component in the given [direction], with an animation and suspend. This method
+     * will throw [CancellationException] if the animation is interrupted
      *
      * @param direction The dismiss direction.
-     * @param onDismissed Optional callback invoked when the component has been dismissed.
      */
-    fun dismiss(direction: DismissDirection, onDismissed: (() -> Unit)? = null) {
+    suspend fun dismiss(direction: DismissDirection) {
         val targetValue = if (direction == StartToEnd) DismissedToEnd else DismissedToStart
-        animateTo(
-            targetValue = targetValue,
-            onEnd = { endReason, endValue ->
-                if (endReason != Interrupted && endValue == targetValue) {
-                    onDismissed?.invoke()
-                }
-            }
-        )
+        animateTo(targetValue = targetValue)
     }
 
     companion object {
@@ -148,17 +129,16 @@ class DismissState(
          * The default [Saver] implementation for [DismissState].
          */
         fun Saver(
-            clock: AnimationClockObservable,
             confirmStateChange: (DismissValue) -> Boolean
         ) = Saver<DismissState, DismissValue>(
-            save = { it.value },
-            restore = { DismissState(it, clock, confirmStateChange) }
+            save = { it.currentValue },
+            restore = { DismissState(it, confirmStateChange) }
         )
     }
 }
 
 /**
- * Create and [remember] a [DismissState] with the default animation clock.
+ * Create and [remember] a [DismissState].
  *
  * @param initialValue The initial value of the state.
  * @param confirmStateChange Optional callback invoked to confirm or veto a pending state change.
@@ -169,12 +149,8 @@ fun rememberDismissState(
     initialValue: DismissValue = Default,
     confirmStateChange: (DismissValue) -> Boolean = { true }
 ): DismissState {
-    val clock = LocalAnimationClock.current.asDisposableClock()
-    return rememberSaveable(
-        clock,
-        saver = DismissState.Saver(clock, confirmStateChange)
-    ) {
-        DismissState(initialValue, clock, confirmStateChange)
+    return rememberSaveable(saver = DismissState.Saver(confirmStateChange)) {
+        DismissState(initialValue, confirmStateChange)
     }
 }
 
@@ -211,27 +187,22 @@ fun SwipeToDismiss(
     val thresholds = { from: DismissValue, to: DismissValue ->
         dismissThresholds(getDismissDirection(from, to)!!)
     }
-
+    val minFactor =
+        if (EndToStart in directions) StandardResistanceFactor else StiffResistanceFactor
+    val maxFactor =
+        if (StartToEnd in directions) StandardResistanceFactor else StiffResistanceFactor
     Box(
         Modifier.swipeable(
             state = state,
             anchors = anchors,
             thresholds = thresholds,
             orientation = Orientation.Horizontal,
-            enabled = state.value == Default,
+            enabled = state.currentValue == Default,
             reverseDirection = isRtl,
             resistance = ResistanceConfig(
                 basis = width,
-                factorAtMin =
-                    if (EndToStart in directions)
-                        StandardResistanceFactor
-                    else
-                        StiffResistanceFactor,
-                factorAtMax =
-                    if (StartToEnd in directions)
-                        StandardResistanceFactor
-                    else
-                        StiffResistanceFactor
+                factorAtMin = minFactor,
+                factorAtMax = maxFactor
             )
         )
     ) {

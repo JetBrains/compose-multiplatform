@@ -25,7 +25,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.preferredHeight
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.CircleShape
@@ -79,6 +79,7 @@ private val colors = listOf(
 @Composable
 fun SimpleScaffoldWithTopBar() {
     val scaffoldState = rememberScaffoldState()
+    val scope = rememberCoroutineScope()
     Scaffold(
         scaffoldState = scaffoldState,
         drawerContent = { Text("Drawer content") },
@@ -88,7 +89,7 @@ fun SimpleScaffoldWithTopBar() {
                 navigationIcon = {
                     IconButton(
                         onClick = {
-                            scaffoldState.drawerState.open()
+                            scope.launch { scaffoldState.drawerState.open() }
                         }
                     ) {
                         Icon(Icons.Filled.Menu, contentDescription = "Localized description")
@@ -103,13 +104,13 @@ fun SimpleScaffoldWithTopBar() {
                 onClick = { /* fab click handler */ }
             )
         },
-        bodyContent = { innerPadding ->
+        content = { innerPadding ->
             LazyColumn(contentPadding = innerPadding) {
                 items(100) {
                     Box(
                         Modifier
                             .fillMaxWidth()
-                            .preferredHeight(50.dp)
+                            .height(50.dp)
                             .background(colors[it % colors.size])
                     )
                 }
@@ -162,7 +163,7 @@ fun ScaffoldWithBottomBarAndCutout() {
             BottomAppBar(cutoutShape = fabShape) {
                 IconButton(
                     onClick = {
-                        scaffoldState.drawerState.open()
+                        coroutineScope.launch { scaffoldState.drawerState.open() }
                     }
                 ) {
                     Icon(Icons.Filled.Menu, contentDescription = "Localized description")
@@ -178,13 +179,13 @@ fun ScaffoldWithBottomBarAndCutout() {
         },
         floatingActionButtonPosition = FabPosition.Center,
         isFloatingActionButtonDocked = true,
-        bodyContent = { innerPadding ->
+        content = { innerPadding ->
             LazyColumn(contentPadding = innerPadding) {
                 items(100) {
                     Box(
                         Modifier
                             .fillMaxWidth()
-                            .preferredHeight(50.dp)
+                            .height(50.dp)
                             .background(colors[it % colors.size])
                     )
                 }
@@ -212,7 +213,7 @@ fun ScaffoldWithSimpleSnackbar() {
                 }
             )
         },
-        bodyContent = { innerPadding ->
+        content = { innerPadding ->
             Text(
                 text = "Body content",
                 modifier = Modifier.padding(innerPadding).fillMaxSize().wrapContentSize()
@@ -249,7 +250,7 @@ fun ScaffoldWithCustomSnackbar() {
                 }
             )
         },
-        bodyContent = { innerPadding ->
+        content = { innerPadding ->
             Text(
                 text = "Custom Snackbar Demo",
                 modifier = Modifier.padding(innerPadding).fillMaxSize().wrapContentSize()
@@ -296,7 +297,7 @@ fun ScaffoldWithCoroutinesSnackbar() {
                 }
             )
         },
-        bodyContent = { innerPadding ->
+        content = { innerPadding ->
             Text(
                 "Snackbar demo",
                 modifier = Modifier.padding(innerPadding).fillMaxSize().wrapContentSize()

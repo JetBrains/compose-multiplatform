@@ -36,7 +36,6 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.text.SoftwareKeyboardController
 import androidx.compose.ui.text.TextRange
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
@@ -109,7 +108,7 @@ fun TextFieldWithErrorState() {
             val label = if (isValid) "Email" else "Email*"
             Text(label)
         },
-        isErrorValue = !isValid
+        isError = !isValid
     )
 }
 
@@ -127,7 +126,7 @@ fun TextFieldWithHelperMessage() {
                 val label = if (invalidInput) "Email*" else "Email"
                 Text(label)
             },
-            isErrorValue = invalidInput
+            isError = invalidInput
         )
         val textColor = if (invalidInput) {
             MaterialTheme.colors.error
@@ -186,17 +185,15 @@ fun OutlinedTextFieldSample() {
 @Sampled
 @Composable
 fun TextFieldWithHideKeyboardOnImeAction() {
+    // TODO(b/1583763): re-add software keyboard controller when replacement API is added
     var text by rememberSaveable { mutableStateOf("") }
-    lateinit var softwareKeyboardController: SoftwareKeyboardController
     TextField(
         value = text,
         onValueChange = { text = it },
         label = { Text("Label") },
-        onTextInputStarted = { softwareKeyboardController = it },
         keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done),
         keyboardActions = KeyboardActions(
             onDone = {
-                softwareKeyboardController.hideSoftwareKeyboard()
                 // do something here
             }
         )

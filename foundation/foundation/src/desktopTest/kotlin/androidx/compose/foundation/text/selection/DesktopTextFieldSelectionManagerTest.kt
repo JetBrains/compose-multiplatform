@@ -16,6 +16,7 @@
 
 package androidx.compose.foundation.text.selection
 
+import androidx.compose.foundation.text.InternalFoundationTextApi
 import androidx.compose.foundation.text.TextFieldState
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.platform.ClipboardManager
@@ -42,7 +43,6 @@ import org.junit.runner.RunWith
 import org.junit.runners.JUnit4
 
 @RunWith(JUnit4::class)
-@OptIn(InternalTextApi::class)
 class DesktopTextFieldSelectionManagerTest {
     private val text = "Hello World"
     private val density = Density(density = 1f)
@@ -63,6 +63,7 @@ class DesktopTextFieldSelectionManagerTest {
     private val clipboardManager = mock<ClipboardManager>()
     private val textToolbar = mock<TextToolbar>()
 
+    @OptIn(InternalFoundationTextApi::class, InternalTextApi::class)
     @Before
     fun setup() {
         manager.offsetMapping = offsetMapping
@@ -95,7 +96,7 @@ class DesktopTextFieldSelectionManagerTest {
         )
         whenever(state.layoutResult!!.getOffsetForPosition(dragLastPosition)).thenReturn(dragOffset)
 
-        state.processor.onNewState(value, null, state.inputSession)
+        state.processor.reset(value, state.inputSession)
     }
 
     @Test

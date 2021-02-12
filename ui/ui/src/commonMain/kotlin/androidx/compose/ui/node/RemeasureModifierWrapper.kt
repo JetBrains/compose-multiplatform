@@ -32,7 +32,7 @@ internal class RemeasureModifierWrapper(
         val invokeRemeasureCallbacks = {
             modifier.onRemeasured(measuredSize)
         }
-        layoutNode.owner?.snapshotObserver?.pauseSnapshotReadObservation(invokeRemeasureCallbacks)
+        layoutNode.owner?.snapshotObserver?.withNoSnapshotReadObservation(invokeRemeasureCallbacks)
             ?: invokeRemeasureCallbacks.invoke()
         return placeable
     }

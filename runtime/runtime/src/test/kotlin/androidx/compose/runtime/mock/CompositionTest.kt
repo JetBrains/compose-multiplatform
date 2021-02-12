@@ -18,7 +18,6 @@ package androidx.compose.runtime.mock
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Composition
-import androidx.compose.runtime.ExperimentalComposeApi
 import androidx.compose.runtime.InternalComposeApi
 import androidx.compose.runtime.Recomposer
 import androidx.compose.runtime.snapshots.Snapshot
@@ -30,7 +29,7 @@ import kotlinx.coroutines.withContext
 import kotlin.test.assertFalse
 import kotlin.test.assertTrue
 
-@OptIn(ExperimentalComposeApi::class, InternalComposeApi::class, ExperimentalCoroutinesApi::class)
+@OptIn(InternalComposeApi::class, ExperimentalCoroutinesApi::class)
 fun compositionTest(block: suspend CompositionTestScope.() -> Unit) = runBlockingTest {
     withContext(TestMonotonicFrameClock(this)) {
         // Start the recomposer
@@ -48,17 +47,17 @@ fun compositionTest(block: suspend CompositionTestScope.() -> Unit) = runBlockin
                 check(!composed) { "Compose should only be called once" }
                 composed = true
                 root = View().apply { name = "root" }
-                val composition = Composition(root, ViewApplier(root), recomposer)
+                val composition = Composition(ViewApplier(root), recomposer)
                 this.composition = composition
                 composition.setContent(block)
             }
 
-            override fun advance(): Boolean {
+            override fun advance(ignorePendingWork: Boolean): Boolean {
                 val changeCount = recomposer.changeCount
                 Snapshot.sendApplyNotifications()
                 if (recomposer.hasPendingWork) {
                     advanceTimeBy(5_000)
-                    check(!recomposer.hasPendingWork) {
+                    check(ignorePendingWork || !recomposer.hasPendingWork) {
                         "Potentially infinite recomposition, still recomposing after advancing"
                     }
                 }
@@ -86,7 +85,7 @@ interface CompositionTestScope : TestCoroutineScope {
      * Advance the state which executes any pending compositions, if any. Returns true if
      * advancing resulted in changes being applied.
      */
-    fun advance(): Boolean
+    fun advance(ignorePendingWork: Boolean = false): Boolean
 
     /**
      * The root mock view of the mock views being composed.

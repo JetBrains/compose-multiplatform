@@ -24,7 +24,6 @@ import androidx.compose.ui.unit.IntSize
 /**
  * A holder of the measured bounds for the layout (MeasureBox).
  */
-// TODO(Andrey): Add Matrix transformation here when we would have this logic.
 interface LayoutCoordinates {
     /**
      * The size of this layout in the local coordinates space.
@@ -53,25 +52,10 @@ interface LayoutCoordinates {
     val isAttached: Boolean
 
     /**
-     * Converts a global position into a local position within this layout.
-     */
-    @Deprecated(
-        "Use windowToLocal instead",
-        replaceWith = ReplaceWith("windowToLocal(global)")
-    )
-    fun globalToLocal(global: Offset): Offset
-
-    /**
      * Converts [relativeToWindow] relative to the window's origin into an [Offset] relative to
      * this layout.
      */
     fun windowToLocal(relativeToWindow: Offset): Offset
-
-    /**
-     * Converts a local position within this layout into a global one.
-     */
-    @Deprecated("Use localToWindow instead", ReplaceWith("localToWindow(local)"))
-    fun localToGlobal(local: Offset): Offset
 
     /**
      * Converts [relativeToLocal] position within this layout into an [Offset] relative to the
@@ -92,23 +76,6 @@ interface LayoutCoordinates {
     fun localPositionOf(sourceCoordinates: LayoutCoordinates, relativeToSource: Offset): Offset
 
     /**
-     * Converts a child layout position into a local position within this layout.
-     */
-    @Deprecated("Use localPositionOf instead", ReplaceWith("localPositionOf(child, childLocal)"))
-    fun childToLocal(child: LayoutCoordinates, childLocal: Offset): Offset
-
-    /**
-     * Returns the child bounding box, in local coordinates. A child that is rotated or scaled
-     * will have the bounding box of rotated or scaled content in local coordinates. If a child
-     * is clipped, the clipped rectangle will be returned.
-     */
-    @Deprecated(
-        message = "Use localBoundingBoxOf instead",
-        replaceWith = ReplaceWith("localBoundingBoxOf(child)")
-    )
-    fun childBoundingBox(child: LayoutCoordinates): Rect
-
-    /**
      * Returns the bounding box of [sourceCoordinates] in the local coordinates.
      * If [clipBounds] is `true`, any clipping that occurs between [sourceCoordinates] and
      * this layout will affect the returned bounds, and can even result in an empty rectangle
@@ -127,23 +94,13 @@ interface LayoutCoordinates {
      * Returns the position in pixels of an [alignment line][AlignmentLine],
      * or [AlignmentLine.Unspecified] if the line is not provided.
      */
-    operator fun get(line: AlignmentLine): Int
+    operator fun get(alignmentLine: AlignmentLine): Int
 }
-
-/**
- * The global position of this layout.
- */
-@Suppress("DEPRECATION")
-@Deprecated("Use positionInWindow() instead", ReplaceWith("positionInWindow()"))
-inline val LayoutCoordinates.globalPosition: Offset get() = localToGlobal(Offset.Zero)
 
 /**
  * The position of this layout inside the root composable.
  */
 fun LayoutCoordinates.positionInRoot(): Offset = localToRoot(Offset.Zero)
-
-@Deprecated("Use positionInRoot() instead", ReplaceWith("positionInRoot()"))
-inline val LayoutCoordinates.positionInRoot: Offset get() = localToRoot(Offset.Zero)
 
 /**
  * The position of this layout relative to the window.
@@ -156,57 +113,38 @@ fun LayoutCoordinates.positionInWindow(): Offset = localToWindow(Offset.Zero)
 fun LayoutCoordinates.boundsInRoot(): Rect =
     findRoot().localBoundingBoxOf(this)
 
-@Deprecated("Use boundsInRoot()", ReplaceWith("boundsInRoot()"))
-val LayoutCoordinates.boundsInRoot: Rect get() = boundsInRoot()
-
 /**
  * The boundaries of this layout relative to the window's origin.
  */
 fun LayoutCoordinates.boundsInWindow(): Rect {
     val root = findRoot()
     val bounds = boundsInRoot()
-    val windowPosition = root.positionInWindow()
-    return Rect(
-        left = bounds.left + windowPosition.x,
-        top = bounds.top + windowPosition.y,
-        right = bounds.right + windowPosition.x,
-        bottom = bounds.bottom + windowPosition.y
-    )
+    val topLeft = root.localToWindow(Offset(bounds.left, bounds.top))
+    val topRight = root.localToWindow(Offset(bounds.right, bounds.top))
+    val bottomRight = root.localToWindow(Offset(bounds.right, bounds.bottom))
+    val bottomLeft = root.localToWindow(Offset(bounds.left, bounds.bottom))
+    val left = minOf(topLeft.x, topRight.x, bottomLeft.x, bottomRight.x)
+    val top = minOf(topLeft.y, topRight.y, bottomLeft.y, bottomRight.y)
+    val right = maxOf(topLeft.x, topRight.x, bottomLeft.x, bottomRight.x)
+    val bottom = maxOf(topLeft.y, topRight.y, bottomLeft.y, bottomRight.y)
+    return Rect(left, top, right, bottom)
 }
 
 /**
  * Returns the position of the top-left in the parent's content area or (0, 0)
  * for the root.
  */
-val LayoutCoordinates.positionInParent: Offset
-    get() = parentLayoutCoordinates?.localPositionOf(this, Offset.Zero) ?: Offset.Zero
+fun LayoutCoordinates.positionInParent(): Offset =
+    parentLayoutCoordinates?.localPositionOf(this, Offset.Zero) ?: Offset.Zero
 
 /**
  * Returns the bounding box of the child in the parent's content area, including any clipping
  * done with respect to the parent. For the root, the bounds is positioned at (0, 0) and sized
  * to the size of the root.
  */
-val LayoutCoordinates.boundsInParent: Rect
-    get() = parentLayoutCoordinates?.localBoundingBoxOf(this)
+fun LayoutCoordinates.boundsInParent(): Rect =
+    parentLayoutCoordinates?.localBoundingBoxOf(this)
         ?: Rect(0f, 0f, size.width.toFloat(), size.height.toFloat())
-
-/**
- * The global boundaries of this layout inside.
- */
-@Deprecated("Use boundsInWindow instead", ReplaceWith("boundsInWindow"))
-val LayoutCoordinates.globalBounds: Rect
-    get() {
-        val root = findRoot()
-        @Suppress("DEPRECATION")
-        val rootPosition = root.localToGlobal(Offset.Zero)
-        val bounds = root.localBoundingBoxOf(this)
-        return Rect(
-            left = bounds.left + rootPosition.x,
-            top = bounds.top + rootPosition.y,
-            right = bounds.right + rootPosition.x,
-            bottom = bounds.bottom + rootPosition.y
-        )
-    }
 
 /**
  * Returns the [LayoutCoordinates] of the root layout element in the hierarchy. This will have
