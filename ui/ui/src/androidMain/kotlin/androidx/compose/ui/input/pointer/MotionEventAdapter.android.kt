@@ -151,12 +151,14 @@ private fun createPointerInputEventData(
     index: Int,
     upIndex: Int?
 ): PointerInputEventData {
-    val position = Offset(motionEvent.getX(index), motionEvent.getY(index))
+    var position = Offset(motionEvent.getX(index), motionEvent.getY(index))
     val rawPosition: Offset
     if (index == 0) {
         rawPosition = Offset(motionEvent.rawX, motionEvent.rawY)
+        position = positionCalculator.screenToLocal(rawPosition)
     } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
         rawPosition = motionEvent.toRawOffset(index)
+        position = positionCalculator.screenToLocal(rawPosition)
     } else {
         rawPosition = positionCalculator.localToScreen(position)
     }
