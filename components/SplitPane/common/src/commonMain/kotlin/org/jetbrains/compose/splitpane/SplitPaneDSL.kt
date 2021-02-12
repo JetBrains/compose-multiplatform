@@ -3,18 +3,14 @@ package org.jetbrains.compose.splitpane
 import androidx.compose.foundation.InteractionState
 import androidx.compose.foundation.gestures.detectDragGestures
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.pointer.consumeAllChanges
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
-import kotlinx.coroutines.coroutineScope
-import kotlinx.coroutines.withContext
-import org.jetbrains.compose.movable.SingleDirectionMovable
+import org.jetbrains.compose.movable.SplitPaneState
 import org.jetbrains.compose.movable.SplitterState
-import kotlin.coroutines.coroutineContext
 
 interface SplitPaneScope {
 
@@ -27,41 +23,49 @@ interface SplitPaneScope {
         minSize: Dp = 0.dp,
         content: @Composable () -> Unit
     )
+
+    fun splitter(
+        block: SplitterScope.() -> Unit
+    )
 }
 
-interface SeparatorScope {
+interface SplitterScope {
     val isHorizontal: Boolean
-    fun Modifier.markAsHandle()
-    fun separator(content: @Composable () -> Unit)
+    fun Modifier.markAsHandle(): Modifier
+    fun content(content: @Composable () -> Unit)
 }
 
-internal class SeparatorScopeImpl(
+internal class SplitterScopeImpl(
     override val isHorizontal: Boolean,
-    private val splitterState: SingleDirectionMovable
-) : SeparatorScope {
+    private val splitPaneState: SplitPaneState
+) : SplitterScope {
 
-    override fun Modifier.markAsHandle() {
-        this.pointerInput(splitterState) {
+    internal var splitter: ComposableSlot? = null
+        private set
+
+    override fun Modifier.markAsHandle(): Modifier =
+        this.pointerInput(splitPaneState.splitterState) {
             detectDragGestures { change, _ ->
                 change.consumeAllChanges()
-                LaunchedEffect(splitterState) {
-                    splitterState.move {
-                        moveBy(if (isHorizontal) change.position.x else change.position.y)
-                    }
-                }
-//                splitterState.dispatchRawMovement(if (isHorizontal) change.position.x else change.position.y)
+                splitPaneState.splitterState.dispatchRawMovement(
+                    if (isHorizontal) change.position.x else change.position.y
+                )
             }
         }
-    }
 
-    override fun separator(content: () -> Unit) {
-        TODO("Not yet implemented")
+    override fun content(
+        content: @Composable () -> Unit
+    ) {
+        splitter = content
     }
 }
 
 private typealias ComposableSlot = @Composable () -> Unit
 
-internal class SplitPaneScopeImpl : SplitPaneScope {
+internal class SplitPaneScopeImpl(
+    private val isHorizontal: Boolean,
+    private val splitPaneState: SplitPaneState
+) : SplitPaneScope {
 
     private var firstPlaceableMinimalSize: Dp = 0.dp
     private var secondPlaceableMinimalSize: Dp = 0.dp
@@ -70,7 +74,11 @@ internal class SplitPaneScopeImpl : SplitPaneScope {
         get() = MinimalSizes(firstPlaceableMinimalSize, secondPlaceableMinimalSize)
 
     internal var firstPlaceableContent: ComposableSlot? = null
+        private set
     internal var secondPlaceableContent: ComposableSlot? = null
+        private set
+    internal var splitter: ComposableSlot? = null
+        private set
 
         override fun first(
             minSize: Dp,
@@ -88,17 +96,33 @@ internal class SplitPaneScopeImpl : SplitPaneScope {
             secondPlaceableContent = content
         }
 
+    override fun splitter(
+        block: SplitterScope.() -> Unit
+    ) {
+        SplitterScopeImpl(
+            isHorizontal,
+            splitPaneState
+        ).apply {
+            block()
+            this@SplitPaneScopeImpl.splitter = splitter
+        }
+
+    }
 }
 
 @Composable
-fun rememberSplitterState(
+fun rememberSplitPaneState(
     initial: Dp = 0.dp,
-    interactionState: InteractionState? = null
-): SplitterState {
+    moveEnabled: Boolean = true,
+    interactionState: InteractionState = InteractionState()
+): SplitPaneState {
     return remember {
-        SplitterState(
-            initialPosition = initial.value,
-//            interactionState = interactionState
+        SplitPaneState(
+            SplitterState(
+                initialPosition = initial.value,
+                interactionState = interactionState
+            ),
+            enabled = moveEnabled
         )
     }
 }

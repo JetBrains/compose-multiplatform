@@ -69,7 +69,6 @@ private class DefaultSingleDirectionMovableState(
     override val isMoveInProgress: Boolean
         get() = isMovingState.value
 
-    override fun dispatchRawMovement(delta: Float) {
-        return onMoveDelta(delta)
-    }
+    override fun dispatchRawMovement(delta: Float) = onMoveDelta(delta)
+
 }

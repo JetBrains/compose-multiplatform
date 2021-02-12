@@ -1,5 +1,6 @@
 package org.jetbrains.compose.movable
 
+import androidx.compose.foundation.Interaction
 import androidx.compose.foundation.InteractionState
 import androidx.compose.foundation.MutatePriority
 import androidx.compose.runtime.mutableStateOf
@@ -9,12 +10,12 @@ class SplitPaneState(
     val splitterState: SplitterState,
     enabled: Boolean
 ) {
-    private var _enabled = mutableStateOf(enabled, structuralEqualityPolicy())
+    private var _moveEnabled = mutableStateOf(enabled, structuralEqualityPolicy())
 
-    var enabled: Boolean
-        get() = _enabled.value
+    var moveEnabled: Boolean
+        get() = _moveEnabled.value
         set(newValue) {
-            _enabled.value = newValue
+            _moveEnabled.value = newValue
         }
 
 }
@@ -23,6 +24,7 @@ class SplitterState(
     initialPosition: Float,
     minPosition: Float = 0f,
     maxPosition: Float = Float.POSITIVE_INFINITY,
+    private val interactionState: InteractionState
 ) : SingleDirectionMovable {
 
     private var _position = mutableStateOf(initialPosition, structuralEqualityPolicy())
@@ -57,8 +59,10 @@ class SplitterState(
 
     private val singleDirectionMovableState = movableState(this::onMove)
 
-    internal fun onMove(delta: Float) {
+    private fun onMove(delta: Float) {
+        interactionState.addInteraction(Interaction.Dragged)
         position = (position + delta).coerceIn(minPosition, maxPosition)
+        interactionState.removeInteraction(Interaction.Dragged)
     }
 
     override suspend fun move(
