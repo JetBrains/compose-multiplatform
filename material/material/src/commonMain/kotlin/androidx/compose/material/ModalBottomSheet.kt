@@ -104,6 +104,8 @@ class ModalBottomSheetState(
     /**
      * Show the bottom sheet with animation and suspend until it's shown. If half expand is
      * enabled, the bottom sheet will be half expanded. Otherwise it will be fully expanded.
+     *
+     * @throws [CancellationException] if the animation is interrupted
      */
     suspend fun show() {
         val targetValue =
@@ -116,7 +118,7 @@ class ModalBottomSheetState(
      * Half expand the bottom sheet if half expand is enabled with animation and suspend until it
      * animation is complete or cancelled
      *
-     * @return the reason the half expand animation ended
+     * @throws [CancellationException] if the animation is interrupted
      */
     internal suspend fun halfExpand() {
         if (!isHalfExpandedEnabled) {
@@ -127,19 +129,17 @@ class ModalBottomSheetState(
 
     /**
      * Fully expand the bottom sheet with animation and suspend until it if fully expanded or
-     * animation has been cancelled. This method will throw [CancellationException] if the
-     * animation is interrupted
-     *
-     * @return the reason the expand animation ended
+     * animation has been cancelled.
+     * *
+     * @throws [CancellationException] if the animation is interrupted
      */
     internal suspend fun expand() = animateTo(ModalBottomSheetValue.Expanded)
 
     /**
      * Hide the bottom sheet with animation and suspend until it if fully hidden or animation has
-     * been cancelled. This method will throw [CancellationException] if the animation is
-     * interrupted
+     * been cancelled.
      *
-     * @return the reason the hide animation ended
+     * @throws [CancellationException] if the animation is interrupted
      */
     suspend fun hide() = animateTo(ModalBottomSheetValue.Hidden)
 
