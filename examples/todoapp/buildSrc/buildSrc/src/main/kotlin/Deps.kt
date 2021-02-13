@@ -3,7 +3,7 @@ object Deps {
     object JetBrains {
         object Kotlin {
             // __KOTLIN_COMPOSE_VERSION__
-            private const val VERSION = "1.4.21-2"
+            private const val VERSION = "1.4.30"
             const val gradlePlugin = "org.jetbrains.kotlin:kotlin-gradle-plugin:$VERSION"
             const val testCommon = "org.jetbrains.kotlin:kotlin-test-common:$VERSION"
             const val testJunit = "org.jetbrains.kotlin:kotlin-test-junit:$VERSION"
@@ -12,7 +12,7 @@ object Deps {
 
         object Compose {
             // __LATEST_COMPOSE_RELEASE_VERSION__
-            private const val VERSION = "0.3.0-build146"
+            private const val VERSION = "0.3.0-build152"
             const val gradlePlugin = "org.jetbrains.compose:compose-gradle-plugin:$VERSION"
         }
     }
@@ -29,11 +29,15 @@ object Deps {
         object AppCompat {
             const val appCompat = "androidx.appcompat:appcompat:1.1.0"
         }
+
+        object Activity {
+            const val activityCompose = "androidx.activity:activity-compose:1.3.0-alpha02"
+        }
     }
 
     object ArkIvanov {
         object MVIKotlin {
-            private const val VERSION = "2.0.0"
+            private const val VERSION = "2.0.1"
             const val rx = "com.arkivanov.mvikotlin:rx:$VERSION"
             const val mvikotlin = "com.arkivanov.mvikotlin:mvikotlin:$VERSION"
             const val mvikotlinMain = "com.arkivanov.mvikotlin:mvikotlin-main:$VERSION"
@@ -45,7 +49,7 @@ object Deps {
         }
 
         object Decompose {
-            private const val VERSION = "0.1.7"
+            private const val VERSION = "0.1.8"
             const val decompose = "com.arkivanov.decompose:decompose:$VERSION"
             const val decomposeIosX64 = "com.arkivanov.decompose:decompose-iosx64:$VERSION"
             const val decomposeIosArm64 = "com.arkivanov.decompose:decompose-iosarm64:$VERSION"
@@ -55,7 +59,7 @@ object Deps {
 
     object Badoo {
         object Reaktive {
-            private const val VERSION = "1.1.19"
+            private const val VERSION = "1.1.20"
             const val reaktive = "com.badoo.reaktive:reaktive:$VERSION"
             const val reaktiveTesting = "com.badoo.reaktive:reaktive-testing:$VERSION"
             const val utils = "com.badoo.reaktive:utils:$VERSION"

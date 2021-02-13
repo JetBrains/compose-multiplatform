@@ -39,4 +39,13 @@ dependencies {
     implementation(Deps.ArkIvanov.Decompose.decompose)
     implementation(Deps.ArkIvanov.Decompose.extensionsCompose)
     implementation(Deps.AndroidX.AppCompat.appCompat)
+
+    implementation(Deps.AndroidX.Activity.activityCompose) {
+        // Workaround as per https://github.com/JetBrains/compose-jb/issues/354#issuecomment-777122304
+        exclude(group = "androidx.compose.animation")
+        exclude(group = "androidx.compose.foundation")
+        exclude(group = "androidx.compose.material")
+        exclude(group = "androidx.compose.runtime")
+        exclude(group = "androidx.compose.ui")
+    }
 }
