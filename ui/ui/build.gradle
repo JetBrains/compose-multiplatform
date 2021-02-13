@@ -156,7 +156,7 @@ if(AndroidXUiPlugin.isMultiplatformEnabled(project)) {
                 // will not propagate ViewTree*Owners we are relying on and we will crash.
                 // TODO: remove these dependencies at some point: b/161814404
                 implementation "androidx.fragment:fragment:1.3.0"
-                implementation "androidx.appcompat:appcompat:1.3.0-alpha01"
+                implementation "androidx.appcompat:appcompat:1.3.0-beta01"
             }
 
             jvmMain.dependencies {
