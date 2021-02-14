@@ -30,13 +30,14 @@ fun WidgetTheme(
     content: @Composable() () -> Unit,
 ) {
     val colors = if (darkTheme) DarkGreenColorPalette else LightGreenColorPalette
+    val swingColor = SwingColor()
 
     MaterialTheme(
         colors = colors.copy(
-            background = SwingColor.background,
-            onBackground = SwingColor.onBackground,
-            surface = SwingColor.background,
-            onSurface = SwingColor.onBackground,
+            background = swingColor.background,
+            onBackground = swingColor.onBackground,
+            surface = swingColor.background,
+            onSurface = swingColor.onBackground,
         ),
         typography = typography,
         shapes = shapes,
