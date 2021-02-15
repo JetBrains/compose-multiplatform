@@ -14,11 +14,91 @@ This tutorial describes both patterns, how to choose between them, and how the D
 
 ## Prerequisites
 
-There are few things we need to do first.
+This tutorial uses a very simple example of a List-Details application with just two screens: `ItemList` and `ItemDetails`. There are few things we need to do first.
 
 ### Setup
 
 First let's add the Decompose library to the project. Please refer to the [Getting started](https://arkivanov.github.io/Decompose/getting-started/) section of the documentation.
+
+### Item model and Database
+
+Here is the `Item` data class that we will need:
+
+```kotlin
+data class Item(
+    val id: Long,
+    val text: String
+)
+```
+
+And a simple `Database` interface that will be used by child screens (there is no concurrency just for simplicity):
+
+``` kotlin
+interface Database {
+    fun getAll(): List<Item>
+    fun getById(id: Long): Item
+}
+```
+
+### Basic UI for child screens
+
+We will need some basic UI for both `List` and `Details` screens.
+
+The `ItemListScreen` `@Composable` component displays the list of `Items` and calls `onItemClick` callback when an item is clicked:
+
+``` kotlin
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
+import androidx.compose.material.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.ui.Modifier
+
+@Composable
+fun ItemListScreen(items: List<Item>, onItemClick: (id: Long) -> Unit) {
+    LazyColumn {
+        items(items = items) { item ->
+            Text(
+                text = item.text,
+                modifier = Modifier.clickable { onItemClick(item.id) }
+            )
+        }
+    }
+}
+```
+
+The `ItemDetailsScreen` `@Composable` component displays the previously selected `Item` and calls `onBackClick` callback when the back button in the `TopAppBar` is clicked:
+
+``` kotlin
+import androidx.compose.foundation.layout.Column
+import androidx.compose.material.Icon
+import androidx.compose.material.IconButton
+import androidx.compose.material.Text
+import androidx.compose.material.TopAppBar
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.runtime.Composable
+
+@Composable
+fun ItemDetailsScreen(item: Item, onBackClick: () -> Unit) {
+    Column {
+        TopAppBar(
+            title = { Text("Item details") },
+            navigationIcon = {
+                IconButton(onClick = onBackClick) {
+                    Icon(
+                        imageVector = Icons.Default.ArrowBack,
+                        contentDescription = null
+                    )
+                }
+            }
+        )
+
+        Text(text = item.text)
+    }
+}
+```
+
 
 ### Children configuration
 
@@ -99,33 +179,54 @@ The following resources can help with this pattern:
 
 ### A very basic example:
 
-List child:
+`ItemList` child with UI:
 
-```kotlin
+``` kotlin
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.State
+import androidx.compose.runtime.mutableStateOf
 
-class List(onItemSelected: (itemId: Long) -> Unit) {
-    // Implementation
+class ItemList(
+    database: Database, // Accept the Database as dependency
+    val onItemSelected: (itemId: Long) -> Unit // Called on item click
+) {
+    // No concurrency involved just for simplicity. The state can be updated if needed.
+    private val _state = mutableStateOf(database.getAll())
+    val state: State<List<Item>> = _state
 }
 
 @Composable
-fun ListUi(list: List) {
-    // Implementation
+fun ItemListUi(list: ItemList) {
+    ItemListScreen(
+        items = list.state.value,
+        onItemClick = list.onItemSelected
+    )
 }
 ```
 
-Details child:
+`ItemDetails` child with UI:
 
-```kotlin
+``` kotlin
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.State
+import androidx.compose.runtime.mutableStateOf
 
-class Details(itemId: Long, onFinished: () -> Unit) {
-    // Implementation
+class ItemDetails(
+    itemId: Long, // An item id to be loaded and displayed
+    database: Database, // Accept the Database as dependency
+    val onFinished: () -> Unit // Called on TopAppBar back button click
+) {
+    // No concurrency involved just for simplicity. The state can be updated if needed.
+    private val _state = mutableStateOf(database.getById(id = itemId))
+    val state: State<Item> = _state
 }
 
 @Composable
-fun DetailsUi(details: Details) {
-    // Implementation
+fun ItemDetailsUi(details: ItemDetails) {
+    ItemDetailsScreen(
+        item = details.state.value,
+        onBackClick = details.onFinished
+    )
 }
 ```
 
@@ -144,13 +245,14 @@ typealias Content = @Composable () -> Unit
 fun <T : Any> T.asContent(content: @Composable (T) -> Unit): Content = { content(this) }
 
 class Root(
-    componentContext: ComponentContext // In Decompose each component has its own ComponentContext
+    componentContext: ComponentContext, // In Decompose each component has its own ComponentContext
+    private val database: Database // Accept the Database as dependency
 ) : ComponentContext by componentContext {
 
     private val router =
         router<Configuration, Content>(
             initialConfiguration = Configuration.List, // Starting with List
-            componentFactory = ::createChild
+            componentFactory = ::createChild // The Router calls this function, providing the child Configuration and ComponentContext 
         )
 
     val routerState = router.state
@@ -162,15 +264,17 @@ class Root(
         } // Configurations are handled exhaustively
 
     private fun list(): Content =
-        List(
+        ItemList(
+            database = database, // Supply dependencies
             onItemSelected = { router.push(Configuration.Details(itemId = it)) } // Push Details on item click
-        ).asContent { ListUi(it) }
+        ).asContent { ItemListUi(it) }
 
     private fun details(configuration: Configuration.Details): Content =
-        Details(
+        ItemDetails(
             itemId = configuration.itemId, // Safely pass arguments
+            database = database, // Supply dependencies
             onFinished = router::pop // Go back to List
-        ).asContent { DetailsUi(it) }
+        ).asContent { ItemDetailsUi(it) }
 }
 
 @Composable
