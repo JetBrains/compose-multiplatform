@@ -1,13 +1,11 @@
 package org.jetbrains.compose.desktop.application.tasks
 
-import org.gradle.api.file.ConfigurableFileCollection
-import org.gradle.api.file.Directory
-import org.gradle.api.file.DirectoryProperty
-import org.gradle.api.file.RegularFileProperty
+import org.gradle.api.file.*
 import org.gradle.api.provider.ListProperty
 import org.gradle.api.provider.Property
 import org.gradle.api.provider.Provider
 import org.gradle.api.tasks.*
+import org.gradle.api.tasks.Optional
 import org.gradle.process.ExecResult
 import org.gradle.process.ExecSpec
 import org.gradle.work.ChangeType
@@ -15,10 +13,19 @@ import org.gradle.work.InputChanges
 import org.jetbrains.compose.desktop.application.dsl.MacOSSigningSettings
 import org.jetbrains.compose.desktop.application.dsl.TargetFormat
 import org.jetbrains.compose.desktop.application.internal.*
+import org.jetbrains.compose.desktop.application.internal.files.MacJarSignFileCopyingProcessor
+import org.jetbrains.compose.desktop.application.internal.files.SimpleFileCopyingProcessor
+import org.jetbrains.compose.desktop.application.internal.files.fileHash
 import org.jetbrains.compose.desktop.application.internal.validation.ValidatedMacOSSigningSettings
 import org.jetbrains.compose.desktop.application.internal.validation.validate
 import java.io.File
+import java.io.Serializable
+import java.util.*
 import javax.inject.Inject
+import kotlin.collections.HashMap
+import kotlin.collections.HashSet
+import java.io.ObjectInputStream
+import java.io.ObjectOutputStream
 
 abstract class AbstractJPackageTask @Inject constructor(
     @get:Input
@@ -166,12 +173,28 @@ abstract class AbstractJPackageTask @Inject constructor(
     @get:LocalState
     protected val signDir: Provider<Directory> = project.layout.buildDirectory.dir("compose/tmp/sign")
 
+    @get:Internal
+    private val libsDir: Provider<Directory> = workingDir.map {
+        it.dir("libs")
+    }
+
+    @get:Internal
+    private val libsMappingFile: Provider<RegularFile> = workingDir.map {
+        it.file("libs-mapping.txt")
+    }
+
+    @get:Internal
+    private val libsMapping = FilesMapping()
+
     override fun makeArgs(tmpDir: File): MutableList<String> = super.makeArgs(tmpDir).apply {
         if (targetFormat == TargetFormat.AppImage || appImage.orNull == null) {
             // Args, that can only be used, when creating an app image or an installer w/o --app-image parameter
             cliArg("--input", tmpDir)
             cliArg("--runtime-image", runtimeImage)
-            cliArg("--main-jar", launcherMainJar.ioFile.name)
+
+            val mappedJar = libsMapping[launcherMainJar.ioFile]
+                ?: error("Main jar was not processed correctly: ${launcherMainJar.ioFile}")
+            cliArg("--main-jar", mappedJar)
             cliArg("--main-class", launcherMainClass)
 
             when (currentOS) {
@@ -241,10 +264,45 @@ abstract class AbstractJPackageTask @Inject constructor(
         }
     }
 
-    override fun prepareWorkingDir(inputChanges: InputChanges) {
-        val workingDir = workingDir.ioFile
+    private fun invalidateMappedLibs(
+        inputChanges: InputChanges
+    ): Set<File> {
+        val outdatedLibs = HashSet<File>()
+        val libsDirFile = libsDir.ioFile
 
-        // todo: parallel processing
+        fun invalidateAllLibs() {
+            outdatedLibs.addAll(files.files)
+            outdatedLibs.add(launcherMainJar.ioFile)
+
+            logger.debug("Clearing all files in working dir: $libsDirFile")
+            fileOperations.delete(libsDirFile)
+            libsDirFile.mkdirs()
+        }
+
+        if (inputChanges.isIncremental) {
+            val allChanges = inputChanges.getFileChanges(files).asSequence() +
+                    inputChanges.getFileChanges(launcherMainJar)
+
+            try {
+                for (change in allChanges) {
+                    libsMapping.remove(change.file)?.let { fileOperations.delete(it) }
+                    if (change.changeType != ChangeType.REMOVED) {
+                        outdatedLibs.add(change.file)
+                    }
+                }
+            } catch (e: Exception) {
+                logger.debug("Could remove outdated libs incrementally: ${e.stacktraceToString()}")
+                invalidateAllLibs()
+            }
+        } else {
+            invalidateAllLibs()
+        }
+
+        return outdatedLibs
+    }
+
+    override fun prepareWorkingDir(inputChanges: InputChanges) {
+        val libsDirFile = libsDir.ioFile
         val fileProcessor =
             withValidatedMacOSSigning { signing ->
                 val tmpDirForSign = signDir.ioFile
@@ -258,35 +316,17 @@ abstract class AbstractJPackageTask @Inject constructor(
                 )
             } ?: SimpleFileCopyingProcessor
 
-        if (inputChanges.isIncremental) {
-            logger.debug("Updating working dir incrementally: $workingDir")
-            val allChanges = inputChanges.getFileChanges(files).asSequence() +
-                    inputChanges.getFileChanges(launcherMainJar)
-            allChanges.forEach { fileChange ->
-                val sourceFile = fileChange.file
-                val targetFile = workingDir.resolve(sourceFile.name)
+        val outdatedLibs = invalidateMappedLibs(inputChanges)
+        for (sourceFile in outdatedLibs) {
+            assert(sourceFile.exists()) { "Lib file does not exist: $sourceFile" }
 
-                if (fileChange.changeType == ChangeType.REMOVED) {
-                    fileOperations.delete(targetFile)
-                    logger.debug("Deleted: $targetFile")
-                } else {
-                    fileProcessor.copy(sourceFile, targetFile)
-                    logger.debug("Updated: $targetFile")
-                }
-            }
-        } else {
-            logger.debug("Updating working dir non-incrementally: $workingDir")
-            fileOperations.delete(workingDir)
-            fileOperations.mkdir(workingDir)
-
-            files.forEach { sourceFile ->
-                val targetFile = workingDir.resolve(sourceFile.name)
-                if (targetFile.exists()) {
-                    // todo: handle possible clashes
-                    logger.warn("w: File already exists: $targetFile")
-                }
-                fileProcessor.copy(sourceFile, targetFile)
-            }
+            val targetFileName =
+                if (sourceFile.isJarFile)
+                    "${sourceFile.nameWithoutExtension}-${fileHash(sourceFile)}.jar"
+                else sourceFile.name
+            val targetFile = libsDirFile.resolve(targetFileName)
+            fileProcessor.copy(sourceFile, targetFile)
+            libsMapping[sourceFile] = targetFile
         }
     }
 
@@ -308,5 +348,70 @@ abstract class AbstractJPackageTask @Inject constructor(
         super.checkResult(result)
         val outputFile = findOutputFileOrDir(destinationDir.ioFile, targetFormat)
         logger.lifecycle("The distribution is written to ${outputFile.canonicalPath}")
+    }
+
+    override fun initState() {
+        val mappingFile = libsMappingFile.ioFile
+        if (mappingFile.exists()) {
+            try {
+                libsMapping.loadFrom(mappingFile)
+            } catch (e: Exception) {
+                fileOperations.delete(mappingFile)
+                throw e
+            }
+            logger.debug("Loaded libs mapping from $mappingFile")
+        }
+    }
+
+    override fun saveStateAfterFinish() {
+        val mappingFile = libsMappingFile.ioFile
+        libsMapping.saveTo(mappingFile)
+        logger.debug("Saved libs mapping to $mappingFile")
+    }
+}
+
+// Serializable is only needed to avoid breaking configuration cache:
+// https://docs.gradle.org/current/userguide/configuration_cache.html#config_cache:requirements
+private class FilesMapping : Serializable {
+    private var mapping = HashMap<File, File>()
+
+    operator fun get(key: File): File? =
+        mapping[key]
+
+    operator fun set(key: File, value: File) {
+        mapping[key] = value
+    }
+
+    fun remove(key: File): File? =
+        mapping.remove(key)
+
+    fun loadFrom(mappingFile: File) {
+        mappingFile.readLines().forEach { line ->
+            if (line.isNotBlank()) {
+                val (k, v) = line.split(File.pathSeparatorChar)
+                mapping[File(k)] = File(v)
+            }
+        }
+    }
+
+    fun saveTo(mappingFile: File) {
+        mappingFile.parentFile.mkdirs()
+        mappingFile.bufferedWriter().use { writer ->
+            mapping.entries
+                .sortedBy { (k, _) -> k.absolutePath }
+                .forEach { (k, v) ->
+                    writer.append(k.absolutePath)
+                    writer.append(File.pathSeparatorChar)
+                    writer.appendln(v.absolutePath)
+                }
+        }
+    }
+
+    private fun writeObject(stream: ObjectOutputStream) {
+        stream.writeObject(mapping)
+    }
+
+    private fun readObject(stream: ObjectInputStream) {
+        mapping = stream.readObject() as HashMap<File, File>
     }
 }

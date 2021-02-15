@@ -1,6 +1,8 @@
-package org.jetbrains.compose.desktop.application.internal
+package org.jetbrains.compose.desktop.application.internal.files
 
 import org.gradle.process.ExecOperations
+import org.jetbrains.compose.desktop.application.internal.MacUtils
+import org.jetbrains.compose.desktop.application.internal.isJarFile
 import org.jetbrains.compose.desktop.application.internal.validation.ValidatedMacOSSigningSettings
 import java.io.*
 import java.util.regex.Pattern

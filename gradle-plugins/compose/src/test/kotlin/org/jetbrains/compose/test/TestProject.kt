@@ -36,6 +36,7 @@ data class TestProject(
             withGradleVersion(TestProperties.gradleVersionForTests)
             withProjectDir(workingDir)
             withArguments(args.toList() + additionalArgs)
+            forwardOutput()
         }
 
     @Suppress("DeprecatedCallableAddReplaceWith")

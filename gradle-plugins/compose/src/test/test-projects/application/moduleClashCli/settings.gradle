@@ -1,0 +1,11 @@
+pluginManagement {
+    plugins {
+        id 'org.jetbrains.kotlin.jvm' version 'KOTLIN_VERSION_PLACEHOLDER'
+        id 'org.jetbrains.compose' version 'COMPOSE_VERSION_PLACEHOLDER'
+    }
+    repositories {
+        mavenLocal()
+        gradlePluginPortal()
+    }
+}
+include ':lib1:utils', ':lib2:utils', ':app'
