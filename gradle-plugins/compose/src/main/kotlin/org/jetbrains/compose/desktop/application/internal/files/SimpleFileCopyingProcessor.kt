@@ -1,4 +1,4 @@
-package org.jetbrains.compose.desktop.application.internal
+package org.jetbrains.compose.desktop.application.internal.files
 
 import java.io.File
 

@@ -16,8 +16,6 @@ import org.gradle.process.ExecSpec
 import org.gradle.work.InputChanges
 import org.jetbrains.compose.desktop.application.internal.*
 import org.jetbrains.compose.desktop.application.internal.ComposeProperties
-import org.jetbrains.compose.desktop.application.internal.OS
-import org.jetbrains.compose.desktop.application.internal.currentOS
 import org.jetbrains.compose.desktop.application.internal.notNullProperty
 import java.io.File
 import javax.inject.Inject
@@ -68,6 +66,7 @@ abstract class AbstractJvmToolOperationTask(private val toolName: String) : Defa
 
     @TaskAction
     fun run(inputChanges: InputChanges) {
+        initState()
         val javaHomePath = javaHome.get()
 
         val jtool = File(javaHomePath).resolve("bin/${executableName(toolName)}")
@@ -96,5 +95,9 @@ abstract class AbstractJvmToolOperationTask(private val toolName: String) : Defa
                 fileOperations.delete(workingDir)
             }
         }
+        saveStateAfterFinish()
     }
+
+    protected open fun initState() {}
+    protected open fun saveStateAfterFinish() {}
 }

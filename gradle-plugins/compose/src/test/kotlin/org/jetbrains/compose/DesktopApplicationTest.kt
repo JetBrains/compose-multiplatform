@@ -5,7 +5,6 @@ import org.jetbrains.compose.desktop.application.internal.OS
 import org.jetbrains.compose.desktop.application.internal.currentOS
 import org.jetbrains.compose.desktop.application.internal.currentTarget
 import org.jetbrains.compose.test.*
-import org.junit.jupiter.api.Assertions.assertArrayEquals
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
 import java.util.jar.JarFile
@@ -91,6 +90,16 @@ class DesktopApplicationTest : GradlePluginTestBase() {
                     checkContains("MainKt.class", "org/jetbrains/skiko/SkiaWindow.class")
                 }
             }
+        }
+    }
+
+    @Test
+    fun testModuleClash() = with(testProject(TestProjects.moduleClashCli)) {
+        gradle(":app:runDistributable").build().checks { check ->
+            check.taskOutcome(":app:createDistributable", TaskOutcome.SUCCESS)
+            check.taskOutcome(":app:runDistributable", TaskOutcome.SUCCESS)
+            check.logContains("Called lib1#util()")
+            check.logContains("Called lib2#util()")
         }
     }
 }
