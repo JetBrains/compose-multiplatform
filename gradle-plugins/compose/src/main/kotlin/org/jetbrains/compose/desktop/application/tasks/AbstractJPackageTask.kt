@@ -7,7 +7,6 @@ import org.gradle.api.provider.Provider
 import org.gradle.api.tasks.*
 import org.gradle.api.tasks.Optional
 import org.gradle.process.ExecResult
-import org.gradle.process.ExecSpec
 import org.gradle.work.ChangeType
 import org.gradle.work.InputChanges
 import org.jetbrains.compose.desktop.application.dsl.MacOSSigningSettings
@@ -330,19 +329,16 @@ abstract class AbstractJPackageTask @Inject constructor(
         }
     }
 
-    override fun configureExec(exec: ExecSpec) {
-        super.configureExec(exec)
-        configureWixPathIfNeeded(exec)
-    }
-
-    private fun configureWixPathIfNeeded(exec: ExecSpec) {
-        if (currentOS == OS.Windows) {
-            val wixDir = wixToolsetDir.ioFileOrNull ?: return
-            val wixPath = wixDir.absolutePath
-            val path = System.getenv("PATH") ?: ""
-            exec.environment("PATH", "$wixPath;$path")
+    override fun jvmToolEnvironment(): MutableMap<String, String> =
+        super.jvmToolEnvironment().apply {
+            if (currentOS == OS.Windows) {
+                val wixDir = wixToolsetDir.ioFile
+                val wixPath = wixDir.absolutePath
+                val path = System.getenv("PATH") ?: ""
+                put("PATH", "$wixPath;$path")
+            }
         }
-    }
+
 
     override fun checkResult(result: ExecResult) {
         super.checkResult(result)

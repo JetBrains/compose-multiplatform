@@ -36,15 +36,15 @@ abstract class AbstractCheckNotarizationStatusTask : AbstractNotarizationTask() 
         for (request in requests.sortedBy { it.uploadTime }) {
             try {
                 logger.quiet("Checking status of notarization request '${request.uuid}'")
-                execOperations.exec { exec ->
-                    exec.executable = MacUtils.xcrun.absolutePath
-                    exec.args(
+                runExternalTool(
+                    tool = MacUtils.xcrun,
+                    args = listOf(
                         "altool",
                         "--notarization-info", request.uuid,
                         "--username", notarization.appleID,
                         "--password", notarization.password
                     )
-                }
+                )
             } catch (e: Exception) {
                 logger.error("Could not check notarization request '${request.uuid}'", e)
             }

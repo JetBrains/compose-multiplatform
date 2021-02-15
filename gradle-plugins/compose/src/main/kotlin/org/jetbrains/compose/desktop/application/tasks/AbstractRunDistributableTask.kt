@@ -1,13 +1,11 @@
 package org.jetbrains.compose.desktop.application.tasks
 
-import org.gradle.api.DefaultTask
 import org.gradle.api.file.Directory
 import org.gradle.api.provider.Provider
 import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.InputDirectory
 import org.gradle.api.tasks.TaskAction
 import org.gradle.api.tasks.TaskProvider
-import org.gradle.process.ExecOperations
 import org.jetbrains.compose.desktop.application.internal.OS
 import org.jetbrains.compose.desktop.application.internal.currentOS
 import org.jetbrains.compose.desktop.application.internal.executableName
@@ -18,9 +16,8 @@ import javax.inject.Inject
 // lazy configuration yet. Lazy configuration is needed to
 // calculate appImageDir after the evaluation of createApplicationImage
 abstract class AbstractRunDistributableTask @Inject constructor(
-    createApplicationImage: TaskProvider<AbstractJPackageTask>,
-    private val execOperations: ExecOperations
-) : DefaultTask() {
+    createApplicationImage: TaskProvider<AbstractJPackageTask>
+) : AbstractComposeDesktopTask() {
     @get:InputDirectory
     internal val appImageRootDir: Provider<Directory> = createApplicationImage.flatMap { it.destinationDir }
 

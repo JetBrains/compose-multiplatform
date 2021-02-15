@@ -4,8 +4,7 @@ import org.gradle.api.file.DirectoryProperty
 import org.gradle.api.tasks.*
 import org.jetbrains.compose.desktop.application.dsl.TargetFormat
 import org.jetbrains.compose.desktop.application.internal.*
-import java.io.ByteArrayOutputStream
-import java.io.PrintStream
+import java.io.File
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 import javax.inject.Inject
@@ -27,32 +26,26 @@ abstract class AbstractUploadAppForNotarizationTask @Inject constructor(
     @TaskAction
     fun run() {
         val notarization = validateNotarization()
-        val inputFile = findOutputFileOrDir(inputDir.ioFile, targetFormat)
-        val file = inputFile.checkExistingFile()
+        val packageFile = findOutputFileOrDir(inputDir.ioFile, targetFormat).checkExistingFile()
 
-        logger.quiet("Uploading '${file.name}' for notarization (package id: '${notarization.bundleID}')")
-        val (res, output) = ByteArrayOutputStream().use { baos ->
-            PrintStream(baos).use { ps ->
-                val res = execOperations.exec { exec ->
-                    exec.executable = MacUtils.xcrun.absolutePath
-                    exec.args(
-                        "altool",
-                        "--notarize-app",
-                        "--primary-bundle-id", notarization.bundleID,
-                        "--username", notarization.appleID,
-                        "--password", notarization.password,
-                        "--file", file
-                    )
-                    exec.standardOutput = ps
-                }
-
-                res to baos.toString()
+        logger.quiet("Uploading '${packageFile.name}' for notarization (package id: '${notarization.bundleID}')")
+        runExternalTool(
+            tool = MacUtils.xcrun,
+            args = listOf(
+                "altool",
+                "--notarize-app",
+                "--primary-bundle-id", notarization.bundleID,
+                "--username", notarization.appleID,
+                "--password", notarization.password,
+                "--file", packageFile.absolutePath
+            ),
+            processStdout = { output ->
+               processUploadToolOutput(packageFile, output)
             }
-        }
-        if (res.exitValue != 0) {
-            logger.error("Uploading failed. Stdout: $output")
-            res.assertNormalExitValue()
-        }
+        )
+    }
+
+    private fun processUploadToolOutput(packageFile: File, output: String) {
         val m = "RequestUUID = ([A-Za-z0-9\\-]+)".toRegex().find(output)
             ?: error("Could not determine RequestUUID from output: $output")
 
@@ -61,8 +54,8 @@ abstract class AbstractUploadAppForNotarizationTask @Inject constructor(
         val uploadTime = LocalDateTime.now()
             .format(DateTimeFormatter.ofPattern("yyyy-MM-dd-HH-mm-ss"))
         val requestDir = requestsDir.ioFile.resolve("$uploadTime-${targetFormat.id}")
-        val packageCopy = requestDir.resolve(inputFile.name)
-        inputFile.copyTo(packageCopy)
+        val packageCopy = requestDir.resolve(packageFile.name)
+        packageFile.copyTo(packageCopy)
         val requestInfo = NotarizationRequestInfo(uuid = requestId, uploadTime = uploadTime)
         val requestInfoFile = requestDir.resolve(NOTARIZATION_REQUEST_INFO_FILE_NAME)
         requestInfo.saveTo(requestInfoFile)
