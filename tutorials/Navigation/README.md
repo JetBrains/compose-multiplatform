@@ -101,7 +101,7 @@ The following resources can help with this pattern:
 
 List child:
 
-``` kotlin
+```kotlin
 import androidx.compose.runtime.Composable
 
 class List(onItemSelected: (itemId: Long) -> Unit) {
@@ -116,7 +116,7 @@ fun ListUi(list: List) {
 
 Details child:
 
-``` kotlin
+```kotlin
 import androidx.compose.runtime.Composable
 
 class Details(itemId: Long, onFinished: () -> Unit) {
