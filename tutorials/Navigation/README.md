@@ -352,7 +352,8 @@ fun <C : Parcelable> Navigator(
 }
 
 @Composable
-private fun <C : Parcelable> router(): Router<C, C> = TODO()
+private fun <C : Parcelable> router(): Router<C, C> = 
+    TODO("See the article mentioned above for an implementation")
 ```
 
 First of all we need the `Router` from the Decompose library. Once we have it, all we need to do is to use the `Children` function. The `Children` function listens for the `Router` state changes, and renders the currently active child using the provided callback. The article mentioned above explains the implementation details.
