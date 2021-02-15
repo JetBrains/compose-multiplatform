@@ -1,11 +1,11 @@
 package org.jetbrains.compose
 
+import org.gradle.internal.impldep.org.testng.Assert
 import org.gradle.testkit.runner.TaskOutcome
 import org.jetbrains.compose.desktop.application.internal.OS
 import org.jetbrains.compose.desktop.application.internal.currentOS
 import org.jetbrains.compose.desktop.application.internal.currentTarget
 import org.jetbrains.compose.test.*
-import org.junit.jupiter.api.Assertions.assertArrayEquals
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
 import java.util.jar.JarFile
@@ -57,11 +57,21 @@ class DesktopApplicationTest : GradlePluginTestBase() {
             OS.Windows -> "msi"
             OS.MacOS -> "dmg"
         }
-        val fileName =
-            if (currentOS == OS.Linux && ext == "deb") "testpackage_1.0-1_amd64"
-            else "TestPackage-1.0"
-        file("build/compose/binaries/main/$ext/$fileName.$ext")
-            .checkExists()
+        val packageDir = file("build/compose/binaries/main/$ext")
+        val packageDirFiles = packageDir.listFiles() ?: arrayOf()
+        check(packageDirFiles.size == 1) {
+            "Expected single package in $packageDir, got [${packageDirFiles.joinToString(", ") { it.name }}]"
+        }
+        val packageFile = packageDirFiles.single()
+
+        if (currentOS == OS.Linux) {
+            val expectedName = "testpackage_1.0-1_amd64.$ext"
+            check(packageFile.name.equals(expectedName, ignoreCase = true)) {
+                "Expected '$expectedName' package in $packageDir, got '${packageFile.name}'"
+            }
+        } else {
+            Assert.assertEquals(packageFile.name, "TestPackage-1.0.$ext", "Unexpected package name")
+        }
         assertEquals(TaskOutcome.SUCCESS, result.task(":package${ext.capitalize()}")?.outcome)
         assertEquals(TaskOutcome.SUCCESS, result.task(":package")?.outcome)
     }
