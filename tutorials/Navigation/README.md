@@ -123,9 +123,9 @@ fun DetailsUi(details: Details) {
 Root with navigation (assuming only Compose UI is used):
 
 ``` kotlin
-typealias Content = @Composable() () -> Unit
+typealias Content = @Composable () -> Unit
 
-fun <T : Any> T.asContent(content: @Composable() (T) -> Unit): Content = { content(this) }
+fun <T : Any> T.asContent(content: @Composable (T) -> Unit): Content = { content(this) }
 
 class Root(
     componentContext: ComponentContext // In Decompose each component has its own ComponentContext
@@ -181,7 +181,7 @@ Please refer to the following article for an implementation of the `Navigator`: 
 @Composable
 fun <C : Parcelable> Navigator(
     initialConfiguration: C,
-    content: @Composable() Navigator<C>.(C) -> Unit
+    content: @Composable Navigator<C>.(C) -> Unit
 ) {
     val router = router<C>()
 
