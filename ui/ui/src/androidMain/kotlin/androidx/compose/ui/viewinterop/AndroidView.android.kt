@@ -67,7 +67,7 @@ fun <T : View> AndroidView(
             val viewFactoryHolder = ViewFactoryHolder<T>(context, parentReference)
             viewFactoryHolder.factory = factory
             viewBlockHolderRef.value = viewFactoryHolder
-            viewFactoryHolder.toLayoutNode()
+            viewFactoryHolder.layoutNode
         },
         update = {
             set(materialized) { viewBlockHolderRef.value!!.modifier = it }

@@ -585,6 +585,31 @@ class AndroidViewCompatTest {
         }
     }
 
+    @Test
+    fun testRedraw_withoutSizeChangeOrStateRead() {
+        val squareRef = Ref<ColoredSquareView>()
+        var expectedColor = Color.Blue
+        rule.setContent {
+            AndroidView(::ColoredSquareView) {
+                it.color = expectedColor
+                it.ref = squareRef
+            }
+        }
+        val squareView = squareRef.value
+        assertNotNull(squareView)
+
+        rule.runOnUiThread {
+            assertTrue(squareView!!.drawnAfterLastColorChange)
+            // Change view attribute using recomposition.
+            squareView.color = Color.Green
+            expectedColor = Color.Green
+        }
+
+        rule.runOnUiThread {
+            assertTrue(squareView!!.drawnAfterLastColorChange)
+        }
+    }
+
     class ColoredSquareView(context: Context) : View(context) {
         var size: Int = 100
             set(value) {
@@ -598,9 +623,12 @@ class AndroidViewCompatTest {
             set(value) {
                 if (value != field) {
                     field = value
+                    drawnAfterLastColorChange = false
                     invalidate()
                 }
             }
+
+        var drawnAfterLastColorChange = false
 
         var ref: Ref<ColoredSquareView>? = null
             set(value) {
@@ -615,6 +643,7 @@ class AndroidViewCompatTest {
 
         override fun draw(canvas: Canvas?) {
             super.draw(canvas)
+            drawnAfterLastColorChange = true
             canvas!!.drawRect(
                 Rect(0, 0, size, size),
                 Paint().apply { color = this@ColoredSquareView.color.toArgb() }
