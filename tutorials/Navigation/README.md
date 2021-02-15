@@ -27,6 +27,8 @@ One of the main goals of the Decompose library is compile time safety. Each chil
 For example, for a simple List-Details navigation we need just two entries:
 
 ``` kotlin
+import com.arkivanov.decompose.statekeeper.Parcelable
+
 sealed class Configuration : Parcelable {
     object List : Configuration()
     data class Details(val itemId: Long) : Configuration()
@@ -50,6 +52,9 @@ To make this possible, all child Configurations must be [Parcelable](https://dev
 If you need Android support, please make sure you have `kotlin-parcelize` plugin enabled. All Configurations should look like this:
 
 ``` kotlin
+import com.arkivanov.decompose.statekeeper.Parcelable
+import com.arkivanov.decompose.statekeeper.Parcelize
+
 sealed class Configuration : Parcelable {
     @Parcelize
     object List : Configuration()
@@ -97,6 +102,8 @@ The following resources can help with this pattern:
 List child:
 
 ``` kotlin
+import androidx.compose.runtime.Composable
+
 class List(onItemSelected: (itemId: Long) -> Unit) {
     // Implementation
 }
@@ -110,6 +117,8 @@ fun ListUi(list: List) {
 Details child:
 
 ``` kotlin
+import androidx.compose.runtime.Composable
+
 class Details(itemId: Long, onFinished: () -> Unit) {
     // Implementation
 }
@@ -123,6 +132,13 @@ fun DetailsUi(details: Details) {
 Root with navigation (assuming only Compose UI is used):
 
 ``` kotlin
+import androidx.compose.runtime.Composable
+import com.arkivanov.decompose.ComponentContext
+import com.arkivanov.decompose.extensions.compose.jetbrains.Children
+import com.arkivanov.decompose.pop
+import com.arkivanov.decompose.push
+import com.arkivanov.decompose.router
+
 typealias Content = @Composable () -> Unit
 
 fun <T : Any> T.asContent(content: @Composable (T) -> Unit): Content = { content(this) }
@@ -178,6 +194,12 @@ Please refer to the following article for an implementation of the `Navigator`: 
 ### A very basic example:
 
 ``` kotlin
+import androidx.compose.runtime.Composable
+import com.arkivanov.decompose.Navigator
+import com.arkivanov.decompose.Router
+import com.arkivanov.decompose.extensions.compose.jetbrains.Children
+import com.arkivanov.decompose.statekeeper.Parcelable
+
 @Composable
 fun <C : Parcelable> Navigator(
     initialConfiguration: C,
@@ -199,6 +221,10 @@ First of all we need the `Router` from the Decompose library. Once we have it, a
 Using the `Navigator`:
 
 ``` kotlin
+import androidx.compose.runtime.Composable
+import com.arkivanov.decompose.pop
+import com.arkivanov.decompose.push
+
 @Composable
 fun Root() {
     Navigator<Configuration>(
