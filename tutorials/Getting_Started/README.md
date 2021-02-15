@@ -31,9 +31,7 @@ packaging JDK 14 or later must be used.
 ![Create new project 3](screen5.png)
 
 ### Update the wizard plugin
-The compose plugin version used in the wizard above may be out of date. Update the version of the plugin to the latest available. 
-E.g. at time of writing that was kotlin 1.4.30 and compose plugin version 0.3.0-build152.
-Find and update this in the build.gradle.kts file.
+The compose plugin version used in the wizard above may be out of date. Update the version of the plugin to the latest available by editing the build.gradle.kts file, finding and updating the version information as shown below. (In this example the latest versions were kotlin 1.4.30 and compose plugin version 0.3.0-build152. For the latest versions, see the JetBrains [Kotlin](https://github.com/JetBrains/kotlin/releases/tag/v1.4.30) and [compose-jb](https://github.com/JetBrains/compose-jb/tags) github sites.)
 ```
 plugins {
     kotlin("jvm") version "1.4.30"
