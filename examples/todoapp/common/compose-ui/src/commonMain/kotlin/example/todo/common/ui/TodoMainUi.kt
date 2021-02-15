@@ -8,7 +8,8 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.lazy.LazyColumnFor
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.Checkbox
 import androidx.compose.material.Divider
@@ -67,15 +68,17 @@ private fun TodoList(
     Box {
         val listState = rememberLazyListState()
 
-        LazyColumnFor(items = items, state = listState) {
-            Item(
-                item = it,
-                onItemClicked = onItemClicked,
-                onDoneChanged = onDoneChanged,
-                onDeleteItemClicked = onDeleteItemClicked
-            )
+        LazyColumn(state = listState) {
+            items(items) {
+                Item(
+                    item = it,
+                    onItemClicked = onItemClicked,
+                    onDoneChanged = onDoneChanged,
+                    onDeleteItemClicked = onDeleteItemClicked
+                )
 
-            Divider()
+                Divider()
+            }
         }
 
         VerticalScrollbar(
