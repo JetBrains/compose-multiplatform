@@ -73,5 +73,5 @@ fun InteractionSource.collectIsFocusedAsState(): State<Boolean> {
             }
         }
     }
-    return derivedStateOf { focusInteractions.isNotEmpty() }
+    return remember { derivedStateOf { focusInteractions.isNotEmpty() } }
 }
