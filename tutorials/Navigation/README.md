@@ -285,6 +285,41 @@ fun RootUi(root: Root) {
 }
 ```
 
+Application and Root initialisation:
+
+``` kotlin
+import androidx.compose.desktop.DesktopTheme
+import androidx.compose.desktop.Window
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.material.MaterialTheme
+import androidx.compose.material.Surface
+import androidx.compose.runtime.Composable
+import androidx.compose.ui.Modifier
+import com.arkivanov.decompose.extensions.compose.jetbrains.rootComponent
+
+fun main() {
+    Window("Navigation tutorial") {
+        Surface(modifier = Modifier.fillMaxSize()) {
+            MaterialTheme {
+                DesktopTheme {
+                    RootUi(root()) // Render the Root and its children
+                }
+            }
+        }
+    }
+}
+
+@Composable
+private fun root(): Root =
+    // The rootComponent function provides the root ComponentContext and remembers the instance or Root
+    rootComponent { componentContext ->
+        Root(
+            componentContext = componentContext,
+            database = DatabaseImpl() // Supply dependencies
+        )
+    }
+```
+
 ## Managing navigation inside @Composable world
 
 By using this pattern, the navigation logic is kept and managed inside `@Composable` functions. For example, this pattern is used by the Jetpack Compose `navigation-compose` library. In practice there is normally a function like `@Composable fun Navigator(...)` or `@Composable fun NavHost(...)` that manages the back stack and renders the currently active child. The way how the function renders children depends on its API.
