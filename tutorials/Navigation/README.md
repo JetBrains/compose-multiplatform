@@ -168,7 +168,7 @@ You can find some integration tests in the TodoApp example:
 
 This pattern is encouraged by the Decompose library. If this is your choice, then you can just use its recommended approach. 
 
-The main idea is to split (decompose) your project by multiple components. Components can be organized in a tree structure, and each level can (but not must) have multiple `Routers`. Each component is just a normal interface/class, an entry point to the underlying logic.
+The main idea is to split (decompose) your project by multiple components. Components can be organized in a tree structure, and each level can (but not must) have multiple [Routers](https://arkivanov.github.io/Decompose/router/overview/). Each component is just a normal interface/class, an entry point to the underlying logic.
 
 The only responsibility of the user interface is to listen for components' state changes and trigger their events.
 
