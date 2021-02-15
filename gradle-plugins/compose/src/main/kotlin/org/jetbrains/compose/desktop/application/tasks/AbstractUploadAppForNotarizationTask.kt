@@ -1,23 +1,24 @@
 package org.jetbrains.compose.desktop.application.tasks
 
 import org.gradle.api.file.DirectoryProperty
-import org.gradle.api.file.RegularFileProperty
 import org.gradle.api.tasks.*
 import org.jetbrains.compose.desktop.application.dsl.TargetFormat
 import org.jetbrains.compose.desktop.application.internal.*
 import java.io.ByteArrayOutputStream
 import java.io.PrintStream
+import java.time.LocalDateTime
+import java.time.format.DateTimeFormatter
 import javax.inject.Inject
 
 abstract class AbstractUploadAppForNotarizationTask @Inject constructor(
     @get:Input
-    val targetFormat: TargetFormat,
+    val targetFormat: TargetFormat
 ) : AbstractNotarizationTask() {
     @get:InputDirectory
     val inputDir: DirectoryProperty = objects.directoryProperty()
 
-    @get:OutputFile
-    val requestIDFile: RegularFileProperty = objects.fileProperty()
+    @get:Internal
+    val requestsDir: DirectoryProperty = objects.directoryProperty()
 
     init {
         check(targetFormat != TargetFormat.AppImage) { "${TargetFormat.AppImage} cannot be notarized!" }
@@ -26,7 +27,6 @@ abstract class AbstractUploadAppForNotarizationTask @Inject constructor(
     @TaskAction
     fun run() {
         val notarization = validateNotarization()
-
         val inputFile = findOutputFileOrDir(inputDir.ioFile, targetFormat)
         val file = inputFile.checkExistingFile()
 
@@ -57,12 +57,18 @@ abstract class AbstractUploadAppForNotarizationTask @Inject constructor(
             ?: error("Could not determine RequestUUID from output: $output")
 
         val requestId = m.groupValues[1]
-        requestIDFile.ioFile.apply {
-            parentFile.mkdirs()
-            writeText(requestId)
-        }
+
+        val uploadTime = LocalDateTime.now()
+            .format(DateTimeFormatter.ofPattern("yyyy-MM-dd-HH-mm-ss"))
+        val requestDir = requestsDir.ioFile.resolve("$uploadTime-${targetFormat.id}")
+        val packageCopy = requestDir.resolve(inputFile.name)
+        inputFile.copyTo(packageCopy)
+        val requestInfo = NotarizationRequestInfo(uuid = requestId, uploadTime = uploadTime)
+        val requestInfoFile = requestDir.resolve(NOTARIZATION_REQUEST_INFO_FILE_NAME)
+        requestInfo.saveTo(requestInfoFile)
 
         logger.quiet("Request UUID: $requestId")
-        logger.quiet("Request UUID is saved to ${requestIDFile.ioFile.absolutePath}")
+        logger.quiet("Request UUID is saved to ${requestInfoFile.absolutePath}")
+        logger.quiet("Uploaded file is saved to ${packageCopy.absolutePath}")
     }
 }

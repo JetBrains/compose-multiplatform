@@ -215,12 +215,13 @@ macOS {
 The following tasks are available:
 * Use `createDistributable` or `packageDmg` to get a signed application
   (no separate step is required).
-* Use `notarizeDmg` to upload an application for notarization.
+* Use `notarize<PACKAGING_FORMAT>` (e.g. `notarizeDmg`) to upload an application for notarization.
   Once the upload finishes, a `RequestUUID` will be printed. 
   The notarization process takes some time.
   Once the notarization process finishes, an email will be sent to you.
-* Use `checkNotarizationStatus<PACKAGING_FORMAT>` to check a status of 
-  the last notarization request. You can also use a command-line command directly:
+  Uploaded file is saved to `<BUILD_DIR>/compose/notarization/main/<UPLOAD_DATE>-<PACKAGING_FORMAT>`
+* Use `checkNotarizationStatus` to check a status of 
+  last notarization requests. You can also use a command-line command to check any notarization request:
 ```
 xcrun altool --notarization-info <RequestUUID> 
              --username <Apple_ID>
