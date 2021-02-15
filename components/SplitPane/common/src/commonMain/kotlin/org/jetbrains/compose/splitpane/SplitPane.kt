@@ -4,8 +4,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
-import org.jetbrains.compose.movable.SplitPaneState
-import org.jetbrains.compose.movable.SplitterState
 
 data class MinimalSizes(
     val firstPlaceableMinimalSize: Dp,

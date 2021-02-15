@@ -1,24 +1,13 @@
-package org.jetbrains.compose.movable
+package org.jetbrains.compose.splitpane
 
 import androidx.compose.foundation.Interaction
 import androidx.compose.foundation.InteractionState
 import androidx.compose.foundation.MutatePriority
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.structuralEqualityPolicy
-
-class SplitPaneState(
-    val splitterState: SplitterState,
-    enabled: Boolean
-) {
-    private var _moveEnabled = mutableStateOf(enabled, structuralEqualityPolicy())
-
-    var moveEnabled: Boolean
-        get() = _moveEnabled.value
-        set(newValue) {
-            _moveEnabled.value = newValue
-        }
-
-}
+import org.jetbrains.compose.movable.SingleDirectionMovable
+import org.jetbrains.compose.movable.SingleDirectionMoveScope
+import org.jetbrains.compose.movable.movableState
 
 class SplitterState(
     initialPosition: Float,
@@ -27,7 +16,7 @@ class SplitterState(
     private val interactionState: InteractionState
 ) : SingleDirectionMovable {
 
-    private var _position = mutableStateOf(initialPosition, structuralEqualityPolicy())
+    private val _position = mutableStateOf(initialPosition, structuralEqualityPolicy())
 
     var position: Float
         get() = _position.value
@@ -46,7 +35,7 @@ class SplitterState(
             _position.value = percentPosition
         }
 
-    private var _maxPosition = mutableStateOf(maxPosition, structuralEqualityPolicy())
+    private val _maxPosition = mutableStateOf(maxPosition, structuralEqualityPolicy())
 
     var minPosition: Float
         get() = _minPosition.value
@@ -55,7 +44,7 @@ class SplitterState(
             _position.value = percentPosition
         }
 
-    private var _minPosition = mutableStateOf(minPosition, structuralEqualityPolicy())
+    private val _minPosition = mutableStateOf(minPosition, structuralEqualityPolicy())
 
     private val singleDirectionMovableState = movableState(this::onMove)
 

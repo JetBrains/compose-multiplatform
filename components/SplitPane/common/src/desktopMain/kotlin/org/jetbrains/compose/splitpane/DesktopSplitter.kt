@@ -18,7 +18,6 @@ import androidx.compose.ui.composed
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.pointer.pointerMoveFilter
 import androidx.compose.ui.unit.dp
-import org.jetbrains.compose.movable.SplitPaneState
 import java.awt.Cursor
 
 internal fun Modifier.cursorForResize(
