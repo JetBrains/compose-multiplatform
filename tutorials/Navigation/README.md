@@ -226,6 +226,16 @@ import com.arkivanov.decompose.pop
 import com.arkivanov.decompose.push
 
 @Composable
+fun List(onItemClick: () -> Unit) {
+    // Implementation
+}
+
+@Composable
+fun Details(itemId: Long, onBack: () -> Unit) {
+    // Implementation
+}
+
+@Composable
 fun Root() {
     Navigator<Configuration>(
         initialConfiguration = Configuration.List // Starting with List
