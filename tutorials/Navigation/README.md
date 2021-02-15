@@ -361,36 +361,59 @@ Using the `Navigator`:
 
 ``` kotlin
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import com.arkivanov.decompose.pop
 import com.arkivanov.decompose.push
 
 @Composable
-fun List(onItemClick: () -> Unit) {
-    // Implementation
+fun ItemList(
+    database: Database,
+    onItemClick: (itemId: Long) -> Unit
+) {
+    // No concurrency involved just for simplicity. The state can be updated if needed.
+    val items = remember { mutableStateOf(database.getAll()) }
+
+    ItemListScreen(
+        items = items.value,
+        onItemClick = onItemClick
+    )
 }
 
 @Composable
-fun Details(itemId: Long, onBack: () -> Unit) {
-    // Implementation
+fun ItemDetails(
+    itemId: Long,
+    database: Database,
+    onBackClick: () -> Unit
+) {
+    // No concurrency involved just for simplicity. The state can be updated if needed.
+    val item = remember { mutableStateOf(database.getById(id = itemId)) }
+
+    ItemDetailsScreen(
+        item = item.value,
+        onBackClick = onBackClick
+    )
 }
 
 @Composable
-fun Root() {
+fun Root(database: Database) {
     Navigator<Configuration>(
         initialConfiguration = Configuration.List // Starting with List
     ) { configuration ->
         when (configuration) {
             is Configuration.List ->
-                List(
+                ItemList(
+                    database = database, // Supply dependencies
                     onItemClick = { push(Configuration.Details(itemId = it)) } // Push Details on item click
                 )
 
             is Configuration.Details ->
-                Details(
+                ItemDetails(
                     itemId = configuration.itemId, // Safely pass arguments
-                    onBack = ::pop // Go back to List
+                    database = database, // Supply dependencies
+                    onBackClick = ::pop // Go back to List
                 )
-        }.let {} // Ensure exhaustiveness 
+        }.let {} // Ensure exhaustiveness
     }
 }
 ```
