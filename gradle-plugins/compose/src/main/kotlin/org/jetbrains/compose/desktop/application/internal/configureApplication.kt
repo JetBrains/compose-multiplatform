@@ -1,6 +1,7 @@
 package org.jetbrains.compose.desktop.application.internal
 
 import org.gradle.api.*
+import org.gradle.api.file.Directory
 import org.gradle.api.file.DuplicatesStrategy
 import org.gradle.api.file.FileCollection
 import org.gradle.api.plugins.JavaPluginConvention
@@ -72,17 +73,18 @@ internal fun Project.configurePackagingTasks(apps: Collection<Application>) {
                     "Unexpected target format for MacOS: $targetFormat"
                 }
 
+                val notarizationRequestsDir = project.layout.buildDirectory.dir("compose/notarization/${app.name}")
                 val upload = tasks.composeTask<AbstractUploadAppForNotarizationTask>(
                     taskName("notarize", app, targetFormat.name),
                     args = listOf(targetFormat)
                 ) {
-                    configureUploadForNotarizationTask(app, packageFormat, targetFormat)
+                    configureUploadForNotarizationTask(app, packageFormat, notarizationRequestsDir)
                 }
 
                 tasks.composeTask<AbstractCheckNotarizationStatusTask>(
-                    taskName("checkNotarizationStatus", app, targetFormat.name)
+                    taskName("checkNotarizationStatus", app)
                 ) {
-                    configureCheckNotarizationStatusTask(app, upload)
+                    configureCheckNotarizationStatusTask(app, notarizationRequestsDir)
                 }
             }
 
@@ -163,19 +165,19 @@ internal fun AbstractJPackageTask.configurePackagingTask(
 internal fun AbstractUploadAppForNotarizationTask.configureUploadForNotarizationTask(
     app: Application,
     packageFormat: TaskProvider<AbstractJPackageTask>,
-    targetFormat: TargetFormat
+    requestsDir: Provider<Directory>
 ) {
     dependsOn(packageFormat)
     inputDir.set(packageFormat.flatMap { it.destinationDir })
-    requestIDFile.set(project.layout.buildDirectory.file("compose/notarization/${app.name}-${targetFormat.id}-request-id.txt"))
+    this.requestsDir.set(requestsDir)
     configureCommonNotarizationSettings(app)
 }
 
 internal fun AbstractCheckNotarizationStatusTask.configureCheckNotarizationStatusTask(
     app: Application,
-    uploadTask: Provider<AbstractUploadAppForNotarizationTask>
+    requestsDir: Provider<Directory>
 ) {
-    requestIDFile.set(uploadTask.flatMap { it.requestIDFile })
+    requestDir.set(requestsDir)
     configureCommonNotarizationSettings(app)
 }
 
