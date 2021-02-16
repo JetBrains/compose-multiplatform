@@ -2,9 +2,14 @@ package org.jetbrains.codeviewer.ui.editor
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.text.selection.DisableSelection
-import androidx.compose.material.*
+import androidx.compose.foundation.text.selection.SelectionContainer
+import androidx.compose.material.CircularProgressIndicator
+import androidx.compose.material.LocalContentColor
+import androidx.compose.material.Surface
+import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.key
@@ -12,19 +17,16 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
-import androidx.compose.ui.platform.AmbientDensity
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
-import org.jetbrains.codeviewer.platform.SelectionContainer
 import org.jetbrains.codeviewer.platform.VerticalScrollbar
 import org.jetbrains.codeviewer.ui.common.AppTheme
 import org.jetbrains.codeviewer.ui.common.Fonts
 import org.jetbrains.codeviewer.ui.common.Settings
-import org.jetbrains.codeviewer.util.LazyColumnFor
 import org.jetbrains.codeviewer.util.loadableScoped
 import org.jetbrains.codeviewer.util.withoutWidthConstraints
 import kotlin.text.Regex.Companion.fromLiteral
@@ -65,7 +67,7 @@ fun EditorView(model: Editor, settings: Settings) = key(model) {
 }
 
 @Composable
-private fun Lines(lines: Editor.Lines, settings: Settings) = with(AmbientDensity.current) {
+private fun Lines(lines: Editor.Lines, settings: Settings) = with(LocalDensity.current) {
     val maxNum = remember(lines.lineNumberDigitCount) {
         (1..lines.lineNumberDigitCount).joinToString(separator = "") { "9" }
     }
@@ -74,16 +76,16 @@ private fun Lines(lines: Editor.Lines, settings: Settings) = with(AmbientDensity
         val scrollState = rememberLazyListState()
         val lineHeight = settings.fontSize.toDp() * 1.6f
 
-        LazyColumnFor(
-            lines.size,
+        LazyColumn(
             modifier = Modifier.fillMaxSize(),
-            state = scrollState,
-            itemContent = { index ->
+            state = scrollState
+        ) {
+            items(lines.size) { index ->
                 Box(Modifier.height(lineHeight)) {
                     Line(Modifier.align(Alignment.CenterStart), maxNum, lines[index], settings)
                 }
             }
-        )
+        }
 
         VerticalScrollbar(
             Modifier.align(Alignment.CenterEnd),

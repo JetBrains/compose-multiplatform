@@ -1,8 +1,8 @@
 package org.jetbrains.codeviewer
 
 import android.os.Bundle
+import androidx.activity.compose.setContent
 import androidx.appcompat.app.AppCompatActivity
-import androidx.compose.ui.platform.setContent
 import org.jetbrains.codeviewer.platform._HomeFolder
 import org.jetbrains.codeviewer.ui.MainView
 import java.io.File

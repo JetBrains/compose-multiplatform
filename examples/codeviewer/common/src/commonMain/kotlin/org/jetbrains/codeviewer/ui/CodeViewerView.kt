@@ -1,12 +1,13 @@
 package org.jetbrains.codeviewer.ui
 
-import androidx.compose.animation.animate
 import androidx.compose.animation.core.Spring.StiffnessLow
 import androidx.compose.animation.core.SpringSpec
+import androidx.compose.animation.core.animateDpAsState
+import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
-import androidx.compose.material.AmbientContentColor
 import androidx.compose.material.Icon
+import androidx.compose.material.LocalContentColor
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.ArrowForward
@@ -31,10 +32,10 @@ fun CodeViewerView(model: CodeViewer) {
     val animatedSize = if (panelState.splitter.isResizing) {
         if (panelState.isExpanded) panelState.expandedSize else panelState.collapsedSize
     } else {
-        animate(
+        animateDpAsState(
             if (panelState.isExpanded) panelState.expandedSize else panelState.collapsedSize,
             SpringSpec(stiffness = StiffnessLow)
-        )
+        ).value
     }
 
     VerticalSplittable(
@@ -82,7 +83,7 @@ private fun ResizablePanel(
     state: PanelState,
     content: @Composable () -> Unit,
 ) {
-    val alpha = animate(if (state.isExpanded) 1f else 0f, SpringSpec(stiffness = StiffnessLow))
+    val alpha by animateFloatAsState(if (state.isExpanded) 1f else 0f, SpringSpec(stiffness = StiffnessLow))
 
     Box(modifier) {
         Box(Modifier.fillMaxSize().graphicsLayer(alpha = alpha)) {
@@ -92,7 +93,7 @@ private fun ResizablePanel(
         Icon(
             if (state.isExpanded) Icons.Default.ArrowBack else Icons.Default.ArrowForward,
             contentDescription = if (state.isExpanded) "Collapse" else "Expand",
-            tint = AmbientContentColor.current,
+            tint = LocalContentColor.current,
             modifier = Modifier
                 .padding(top = 4.dp)
                 .width(24.dp)

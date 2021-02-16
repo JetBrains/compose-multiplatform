@@ -1,7 +1,9 @@
 package org.jetbrains.codeviewer.util
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.gestures.Orientation
 import androidx.compose.foundation.gestures.draggable
+import androidx.compose.foundation.gestures.rememberDraggableState
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.width
@@ -10,9 +12,9 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.gesture.scrollorientationlocking.Orientation
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.Layout
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
@@ -28,7 +30,7 @@ fun VerticalSplittable(
 ) = Layout({
     children()
     VerticalSplitter(splitterState, onResize)
-}, modifier, measureBlock = { measurables, constraints ->
+}, modifier, measurePolicy = { measurables, constraints ->
     require(measurables.size == 3)
 
     val firstPlaceable = measurables[0].measure(constraints.copy(minWidth = 0))
@@ -60,6 +62,7 @@ fun VerticalSplitter(
     onResize: (delta: Dp) -> Unit,
     color: Color = AppTheme.colors.backgroundDark
 ) = Box {
+    val density = LocalDensity.current
     Box(
         Modifier
             .width(8.dp)
@@ -67,14 +70,16 @@ fun VerticalSplitter(
             .run {
                 if (splitterState.isResizeEnabled) {
                     this.draggable(
-                        Orientation.Horizontal,
+                        state = rememberDraggableState {
+                            with(density) {
+                                onResize(it.toDp())
+                            }
+                        },
+                        orientation = Orientation.Horizontal,
                         startDragImmediately = true,
                         onDragStarted = { splitterState.isResizing = true },
                         onDragStopped = { splitterState.isResizing = false }
-                    ) {
-                        onResize(it.toDp())
-                    }
-                        .cursorForHorizontalResize()
+                    ).cursorForHorizontalResize()
                 } else {
                     this
                 }

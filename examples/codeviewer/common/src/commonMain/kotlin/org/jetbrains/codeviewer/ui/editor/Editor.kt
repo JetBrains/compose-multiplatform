@@ -45,6 +45,7 @@ fun Editor(file: File) = Editor(
 
     fun content(index: Int): Editor.Content {
         val text = textLines.get(index)
+            .trim('\r', '\n') // fix for native crash in skia
         val state = mutableStateOf(text)
         return Editor.Content(state, isCode)
     }

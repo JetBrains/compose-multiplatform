@@ -2,10 +2,10 @@ package org.jetbrains.codeviewer.ui.filetree
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.lazy.LazyColumnFor
+import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.rememberLazyListState
-import androidx.compose.material.AmbientContentColor
 import androidx.compose.material.Icon
+import androidx.compose.material.LocalContentColor
 import androidx.compose.material.Surface
 import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
@@ -17,7 +17,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clipToBounds
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.AmbientDensity
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.TextUnit
@@ -35,7 +35,7 @@ fun FileTreeViewTabView() = Surface {
     ) {
         Text(
             "Files",
-            color = AmbientContentColor.current.copy(alpha = 0.60f),
+            color = LocalContentColor.current.copy(alpha = 0.60f),
             fontSize = 12.sp,
             modifier = Modifier.padding(horizontal = 4.dp)
         )
@@ -46,18 +46,20 @@ fun FileTreeViewTabView() = Surface {
 fun FileTreeView(model: FileTree) = Surface(
     modifier = Modifier.fillMaxSize()
 ) {
-    with(AmbientDensity.current) {
+    with(LocalDensity.current) {
         Box {
             val scrollState = rememberLazyListState()
             val fontSize = 14.sp
             val lineHeight = fontSize.toDp() * 1.5f
 
-            LazyColumnFor(
-                model.items,
+            LazyColumn(
                 modifier = Modifier.fillMaxSize().withoutWidthConstraints(),
-                state = scrollState,
-                itemContent = { FileTreeItemView(fontSize, lineHeight, it) }
-            )
+                state = scrollState
+            ) {
+                items(model.items.size) {
+                    FileTreeItemView(fontSize, lineHeight, model.items[it])
+                }
+            }
 
             VerticalScrollbar(
                 Modifier.align(Alignment.CenterEnd),
@@ -83,7 +85,7 @@ private fun FileTreeItemView(fontSize: TextUnit, height: Dp, model: FileTree.Ite
     FileItemIcon(Modifier.align(Alignment.CenterVertically), model)
     Text(
         text = model.name,
-        color = if (active.value) AmbientContentColor.current.copy(alpha = 0.60f) else AmbientContentColor.current,
+        color = if (active.value) LocalContentColor.current.copy(alpha = 0.60f) else LocalContentColor.current,
         modifier = Modifier
             .align(Alignment.CenterVertically)
             .clipToBounds()
@@ -110,10 +112,10 @@ private fun FileItemIcon(modifier: Modifier, model: FileTree.Item) = Box(modifie
         is FileTree.ItemType.Folder -> when {
             !type.canExpand -> Unit
             type.isExpanded -> Icon(
-                Icons.Default.KeyboardArrowDown, contentDescription = null, tint = AmbientContentColor.current
+                Icons.Default.KeyboardArrowDown, contentDescription = null, tint = LocalContentColor.current
             )
             else -> Icon(
-                Icons.Default.KeyboardArrowRight, contentDescription = null, tint = AmbientContentColor.current
+                Icons.Default.KeyboardArrowRight, contentDescription = null, tint = LocalContentColor.current
             )
         }
         is FileTree.ItemType.File -> when (type.ext) {

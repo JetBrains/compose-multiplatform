@@ -1,14 +1,14 @@
 package org.jetbrains.codeviewer.ui.statusbar
 
 import androidx.compose.foundation.layout.*
-import androidx.compose.material.AmbientContentColor
+import androidx.compose.material.LocalContentColor
 import androidx.compose.material.Slider
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.Providers
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.AmbientDensity
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.*
 import org.jetbrains.codeviewer.ui.common.Settings
 
@@ -26,13 +26,13 @@ fun StatusBar(settings: Settings) = Box(
         Text(
             text = "Text size",
             modifier = Modifier.align(Alignment.CenterVertically),
-            color = AmbientContentColor.current.copy(alpha = 0.60f),
+            color = LocalContentColor.current.copy(alpha = 0.60f),
             fontSize = 12.sp
         )
 
         Spacer(Modifier.width(8.dp))
 
-        Providers(AmbientDensity provides AmbientDensity.current.scale(0.5f)) {
+        CompositionLocalProvider(LocalDensity provides LocalDensity.current.scale(0.5f)) {
             Slider(
                 (settings.fontSize - MinFontSize) / (MaxFontSize - MinFontSize),
                 onValueChange = { settings.fontSize = lerp(MinFontSize, MaxFontSize, it) },
