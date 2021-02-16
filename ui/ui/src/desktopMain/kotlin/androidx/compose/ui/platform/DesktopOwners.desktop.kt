@@ -17,8 +17,8 @@ package androidx.compose.ui.platform
 
 import androidx.compose.runtime.BroadcastFrameClock
 import androidx.compose.runtime.Recomposer
-import androidx.compose.runtime.staticCompositionLocalOf
 import androidx.compose.runtime.snapshots.Snapshot
+import androidx.compose.runtime.staticCompositionLocalOf
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.input.mouse.MouseScrollEvent
 import androidx.compose.ui.input.pointer.PointerId
@@ -43,20 +43,25 @@ internal val DesktopOwnersAmbient = staticCompositionLocalOf<DesktopOwners> {
 internal class DesktopOwners(
     coroutineScope: CoroutineScope,
     component: DesktopComponent = DummyDesktopComponent,
-    invalidate: () -> Unit = {},
+    private val invalidate: () -> Unit = {},
 ) {
-    private val _invalidate = invalidate
+    private var isInvalidationDisabled = false
+
     @Volatile
-    private var hasPendingDraws = false
+    private var hasPendingDraws = true
+    private inline fun disableInvalidation(block: () -> Unit) {
+        isInvalidationDisabled = true
+        try {
+            block()
+        } finally {
+            isInvalidationDisabled = false
+        }
+    }
 
-    private var invalidateScheduled = false
-    private var willRenderInThisFrame = false
-
-    fun invalidate() {
-        if (!willRenderInThisFrame) {
-            invalidateScheduled = true
-            hasPendingDraws = true
-            _invalidate()
+    private fun invalidateIfNeeded() {
+        hasPendingDraws = frameClock.hasAwaiters || list.any(DesktopOwner::needsRender)
+        if (hasPendingDraws && !isInvalidationDisabled) {
+            invalidate()
         }
     }
 
@@ -67,7 +72,7 @@ internal class DesktopOwners(
     private var isMousePressed = false
 
     private val dispatcher = FlushCoroutineDispatcher(coroutineScope)
-    private val frameClock = BroadcastFrameClock(::invalidate)
+    private val frameClock = BroadcastFrameClock(onNewAwaiters = ::invalidateIfNeeded)
     private val coroutineContext = dispatcher + frameClock
 
     internal val recomposer = Recomposer(coroutineContext)
@@ -91,43 +96,29 @@ internal class DesktopOwners(
 
     fun register(desktopOwner: DesktopOwner) {
         list.add(desktopOwner)
-        invalidate()
+        desktopOwner.onNeedsRender = ::invalidateIfNeeded
+        invalidateIfNeeded()
     }
 
     fun unregister(desktopOwner: DesktopOwner) {
         list.remove(desktopOwner)
-        invalidate()
+        desktopOwner.onNeedsRender = null
+        invalidateIfNeeded()
     }
 
     fun onFrame(canvas: Canvas, width: Int, height: Int, nanoTime: Long) {
-        invalidateScheduled = false
-        willRenderInThisFrame = true
-
-        try {
+        disableInvalidation {
             // We must see the actual state before we will render the frame
             Snapshot.sendApplyNotifications()
             dispatcher.flush()
             frameClock.sendFrame(nanoTime)
 
             for (owner in list) {
-                owner.setSize(width, height)
-                owner.measureAndLayout()
+                owner.render(canvas, width, height)
             }
-        } finally {
-            willRenderInThisFrame = false
         }
 
-        for (owner in list) {
-            owner.draw(canvas)
-        }
-
-        if (frameClock.hasAwaiters) {
-            _invalidate()
-        }
-
-        if (!invalidateScheduled) {
-            hasPendingDraws = false
-        }
+        invalidateIfNeeded()
     }
 
     val lastOwner: DesktopOwner?
