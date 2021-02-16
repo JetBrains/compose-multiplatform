@@ -125,7 +125,6 @@ class MaterialTextSelectionColorsScreenshotTest {
             .assertAgainstGolden(screenshotRule, "text_darkThemeSelectionColors")
     }
 
-    @FlakyTest(bugId = 179292401)
     @Test
     fun filledTextField_lightThemeSelectionColors() {
         rule.setContent {
@@ -154,7 +153,6 @@ class MaterialTextSelectionColorsScreenshotTest {
             .assertAgainstGolden(screenshotRule, "filledTextField_lightThemeSelectionColors")
     }
 
-    @FlakyTest(bugId = 179292401)
     @Test
     fun filledTextField_darkThemeSelectionColors() {
         rule.setContent {
@@ -183,7 +181,6 @@ class MaterialTextSelectionColorsScreenshotTest {
             .assertAgainstGolden(screenshotRule, "filledTextField_darkThemeSelectionColors")
     }
 
-    @FlakyTest(bugId = 179292401)
     @Test
     fun outlinedTextField_lightThemeSelectionColors() {
         rule.setContent {
@@ -212,7 +209,6 @@ class MaterialTextSelectionColorsScreenshotTest {
             .assertAgainstGolden(screenshotRule, "outlinedTextField_lightThemeSelectionColors")
     }
 
-    @FlakyTest(bugId = 179292401)
     @Test
     fun outlinedTextField_darkThemeSelectionColors() {
         rule.setContent {
