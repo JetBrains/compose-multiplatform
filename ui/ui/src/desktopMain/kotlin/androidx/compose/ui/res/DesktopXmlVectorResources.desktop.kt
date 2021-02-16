@@ -37,20 +37,14 @@ import javax.xml.parsers.DocumentBuilderFactory
  * SVG files can be converted to XML with Android Studio or with third party tools
  * (search "svg to xml" in Google)
  *
- * Note: This API is transient and will be likely removed for encouraging async resource loading.
- *
  * @param resourcePath path to the file in the resources folder
  * @return the decoded vector image associated with the resource
  */
 @Composable
 fun vectorXmlResource(resourcePath: String): ImageVector {
     val inputSource = remember(resourcePath) {
-        val classLoader = Thread.currentThread().contextClassLoader
         object : InputSource() {
-            override fun getByteStream() =
-                requireNotNull(classLoader.getResourceAsStream(resourcePath)) {
-                    "resource $resourcePath not found"
-                }
+            override fun getByteStream() = openResourceStream(resourcePath)
         }
     }
 
@@ -68,8 +62,6 @@ fun vectorXmlResource(resourcePath: String): ImageVector {
  *
  * SVG files can be converted to XML with Android Studio or with third party tools
  * (search "svg to xml" in Google)
- *
- * Note: This API is transient and will be likely removed for encouraging async resource loading.
  *
  * Example of usage:
  *
