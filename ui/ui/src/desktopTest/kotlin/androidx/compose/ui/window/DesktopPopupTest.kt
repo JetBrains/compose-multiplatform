@@ -16,16 +16,24 @@
 
 package androidx.compose.ui.window
 
+import androidx.compose.foundation.Canvas
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.size
 import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.setValue
+import androidx.compose.runtime.snapshots.Snapshot
 import androidx.compose.runtime.staticCompositionLocalOf
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.layout.Layout
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.test.ExperimentalTestApi
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.unit.Density
+import androidx.compose.ui.unit.dp
 import com.google.common.truth.Truth
 import org.junit.Rule
 import org.junit.Test
@@ -95,5 +103,97 @@ class DesktopPopupTest {
         density = Density(3f, 1f)
         rule.waitForIdle()
         Truth.assertThat(densityInsidePopup).isEqualTo(3f)
+    }
+
+    @Test(timeout = 5000) // TODO(demin): why, when an error has occurred, this test never ends?
+    fun `(Bug) after open popup use derivedStateOf inside main window draw`() {
+        var showPopup by mutableStateOf(false)
+
+        rule.setContent {
+            val isPressed = derivedStateOf { false }
+
+            Canvas(Modifier.size(100.dp)) {
+                isPressed.value
+            }
+
+            if (showPopup) {
+                Popup {
+                    Box(Modifier)
+                }
+            }
+        }
+
+        rule.waitForIdle()
+
+        showPopup = true
+
+        rule.waitForIdle()
+    }
+
+    @Test(timeout = 5000)
+    fun `(Bug) after open popup use sendApplyNotifications inside main window draw`() {
+        var showPopup by mutableStateOf(false)
+
+        rule.setContent {
+            Canvas(Modifier.size(100.dp)) {
+                if (showPopup) {
+                    Snapshot.sendApplyNotifications()
+                }
+            }
+
+            if (showPopup) {
+                Popup {
+                    Box(Modifier)
+                }
+            }
+        }
+
+        rule.waitForIdle()
+
+        showPopup = true
+
+        rule.waitForIdle()
+    }
+
+    @Test(timeout = 5000)
+    fun `(Bug) after open popup use sendApplyNotifications inside popup layout`() {
+        var showPopup by mutableStateOf(false)
+        var state by mutableStateOf(0)
+        var applyState by mutableStateOf(false)
+        var lastCompositionState = 0
+
+        rule.setContent {
+            Canvas(Modifier.size(100.dp)) {
+                lastCompositionState = state
+            }
+
+            if (showPopup) {
+                Popup {
+                    Layout(
+                        content = {},
+                        measurePolicy = { _, _ ->
+                            layout(10, 10) {
+                                if (applyState && state == 0) {
+                                    state++
+                                    Snapshot.sendApplyNotifications()
+                                }
+                            }
+                        }
+                    )
+                }
+            }
+        }
+
+        rule.waitForIdle()
+
+        showPopup = true
+
+        rule.waitForIdle()
+
+        applyState = true
+
+        rule.waitForIdle()
+
+        Truth.assertThat(lastCompositionState).isEqualTo(1)
     }
 }
