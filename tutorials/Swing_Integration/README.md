@@ -37,6 +37,7 @@ import java.awt.event.ActionEvent
 import java.awt.event.ActionListener
 import javax.swing.JFrame
 import javax.swing.JButton
+import javax.swing.SwingUtilities
 import javax.swing.WindowConstants
 
 val northClicks = mutableStateOf(0)
@@ -53,7 +54,7 @@ fun main() {
     SwingComposeWindow()
 }
 
-fun SwingComposeWindow() {
+fun SwingComposeWindow() = SwingUtilities.invokeLater {
     val window = JFrame()
 
     // creating ComposePanel
@@ -205,7 +206,14 @@ fun main() {
                 SwingPanel(
                     background = Color.White,
                     modifier = Modifier.size(270.dp, 90.dp),
-                    componentBlock = { swingBox(dec) }
+                    factory = {
+                        JPanel().apply {
+                            setLayout(BoxLayout(this, BoxLayout.Y_AXIS))
+                            add(actionButton("1. Swing Button: decrement", dec))
+                            add(actionButton("2. Swing Button: decrement", dec))
+                            add(actionButton("3. Swing Button: decrement", dec))
+                        }
+                    }
                 )
 
                 Spacer(modifier = Modifier.height(20.dp))
@@ -223,17 +231,6 @@ fun Button(text: String = "", action: (() -> Unit)? = null) {
     ) {
         Text(text)
     }
-}
-
-fun swingBox(action: (() -> Unit)? = null): Component {
-    val box = JPanel()
-    box.setLayout(BoxLayout(box, BoxLayout.Y_AXIS))
-
-    box.add(actionButton("1. Swing Button: decrement", action))
-    box.add(actionButton("2. Swing Button: decrement", action))
-    box.add(actionButton("3. Swing Button: decrement", action))
-
-    return box
 }
 
 fun actionButton(
