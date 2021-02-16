@@ -29,6 +29,7 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.SmallTest
 import com.google.common.truth.Truth.assertThat
 import org.junit.Assert
+import org.junit.Assert.assertEquals
 import org.junit.Test
 import org.junit.runner.RunWith
 
@@ -206,6 +207,38 @@ class CutCornerShapeTest {
                 )
             )
         ).isFalse()
+    }
+
+    @Test
+    fun copyHasCorrectDefaults() {
+        assertEquals(
+            CutCornerShape(
+                topStart = 5.dp,
+                topEnd = 6.dp,
+                bottomEnd = 3.dp,
+                bottomStart = 4.dp
+            ),
+            CutCornerShape(
+                topStart = 1.dp,
+                topEnd = 2.dp,
+                bottomEnd = 3.dp,
+                bottomStart = 4.dp
+            ).copy(topStart = CornerSize(5.dp), topEnd = CornerSize(6.dp))
+        )
+        assertEquals(
+            CutCornerShape(
+                topStart = 1.dp,
+                topEnd = 2.dp,
+                bottomEnd = 5.dp,
+                bottomStart = 6.dp
+            ),
+            CutCornerShape(
+                topStart = 1.dp,
+                topEnd = 2.dp,
+                bottomEnd = 3.dp,
+                bottomStart = 4.dp
+            ).copy(bottomEnd = CornerSize(5.dp), bottomStart = CornerSize(6.dp))
+        )
     }
 
     private fun Shape.toOutline(direction: LayoutDirection = LayoutDirection.Ltr) =
