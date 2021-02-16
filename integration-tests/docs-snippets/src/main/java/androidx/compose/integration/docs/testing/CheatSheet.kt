@@ -28,6 +28,7 @@ import androidx.compose.ui.input.key.KeyEvent
 import androidx.compose.ui.layout.FirstBaseline
 import androidx.compose.ui.semantics.ProgressBarRangeInfo
 import androidx.compose.ui.semantics.SemanticsActions
+import androidx.compose.ui.test.ExperimentalTestApi
 import androidx.compose.ui.test.assert
 import androidx.compose.ui.test.assertAll
 import androidx.compose.ui.test.assertAny
@@ -225,6 +226,7 @@ private fun TestingCheatSheetFinders() {
     )
 
     // MATCHERS
+    @OptIn(ExperimentalTestApi::class)
     composeTestRule.onNode(
         hasClickAction() and
             hasNoClickAction() and

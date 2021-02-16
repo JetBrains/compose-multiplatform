@@ -316,6 +316,7 @@ fun hasSetTextAction() =
  * @see hasHeight
  * @see hasHeightAtLeast
  */
+@ExperimentalTestApi
 fun hasWidth(width: Dp, tolerance: Dp = DefaultTolerance): SemanticsMatcher =
     SemanticsMatcher("width = $width ± $tolerance") { node ->
         node.withDensity {
@@ -333,6 +334,7 @@ fun hasWidth(width: Dp, tolerance: Dp = DefaultTolerance): SemanticsMatcher =
  * @see hasHeight
  * @see hasHeightAtLeast
  */
+@ExperimentalTestApi
 fun hasWidthAtLeast(width: Dp, tolerance: Dp = DefaultTolerance): SemanticsMatcher =
     SemanticsMatcher("width > $width - $tolerance") { node ->
         node.withDensity {
@@ -350,6 +352,7 @@ fun hasWidthAtLeast(width: Dp, tolerance: Dp = DefaultTolerance): SemanticsMatch
  * @see hasWidthAtLeast
  * @see hasHeightAtLeast
  */
+@ExperimentalTestApi
 fun hasHeight(height: Dp, tolerance: Dp = DefaultTolerance): SemanticsMatcher =
     SemanticsMatcher("height = $height ± $tolerance") { node ->
         node.withDensity {
@@ -367,6 +370,7 @@ fun hasHeight(height: Dp, tolerance: Dp = DefaultTolerance): SemanticsMatcher =
  * @see hasWidthAtLeast
  * @see hasHeight
  */
+@ExperimentalTestApi
 fun hasHeightAtLeast(height: Dp, tolerance: Dp = DefaultTolerance): SemanticsMatcher =
     SemanticsMatcher("height > $height - $tolerance") { node ->
         node.withDensity {
@@ -384,6 +388,7 @@ fun hasHeightAtLeast(height: Dp, tolerance: Dp = DefaultTolerance): SemanticsMat
  * @see hasRightPosition
  * @see hasBottomPosition
  */
+@ExperimentalTestApi
 fun hasLeftPosition(left: Dp, tolerance: Dp = DefaultTolerance): SemanticsMatcher =
     SemanticsMatcher("left = $left ± $tolerance") { node ->
         node.withDensity {
@@ -401,6 +406,7 @@ fun hasLeftPosition(left: Dp, tolerance: Dp = DefaultTolerance): SemanticsMatche
  * @see hasRightPosition
  * @see hasBottomPosition
  */
+@ExperimentalTestApi
 fun hasTopPosition(top: Dp, tolerance: Dp = DefaultTolerance): SemanticsMatcher =
     SemanticsMatcher("top = $top ± $tolerance") { node ->
         node.withDensity {
@@ -418,6 +424,7 @@ fun hasTopPosition(top: Dp, tolerance: Dp = DefaultTolerance): SemanticsMatcher 
  * @see hasTopPosition
  * @see hasBottomPosition
  */
+@ExperimentalTestApi
 fun hasRightPosition(right: Dp, tolerance: Dp = DefaultTolerance): SemanticsMatcher =
     SemanticsMatcher("right = $right ± $tolerance") { node ->
         node.withDensity {
@@ -435,6 +442,7 @@ fun hasRightPosition(right: Dp, tolerance: Dp = DefaultTolerance): SemanticsMatc
  * @see hasTopPosition
  * @see hasRightPosition
  */
+@ExperimentalTestApi
 fun hasBottomPosition(bottom: Dp, tolerance: Dp = DefaultTolerance): SemanticsMatcher =
     SemanticsMatcher("bottom = $bottom ± $tolerance") { node ->
         node.withDensity {
