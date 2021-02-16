@@ -24,6 +24,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.selection.toggleable
 import androidx.compose.material.ripple.rememberRipple
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -74,7 +75,10 @@ fun IconButton(
             )
             .then(IconButtonSizeModifier),
         contentAlignment = Alignment.Center
-    ) { content() }
+    ) {
+        val contentAlpha = if (enabled) LocalContentAlpha.current else ContentAlpha.disabled
+        CompositionLocalProvider(LocalContentAlpha provides contentAlpha, content = content)
+    }
 }
 
 /**
@@ -114,7 +118,10 @@ fun IconToggleButton(
             indication = rememberRipple(bounded = false, radius = RippleRadius)
         ).then(IconButtonSizeModifier),
         contentAlignment = Alignment.Center
-    ) { content() }
+    ) {
+        val contentAlpha = if (enabled) LocalContentAlpha.current else ContentAlpha.disabled
+        CompositionLocalProvider(LocalContentAlpha provides contentAlpha, content = content)
+    }
 }
 
 // Default radius of an unbounded ripple in an IconButton
