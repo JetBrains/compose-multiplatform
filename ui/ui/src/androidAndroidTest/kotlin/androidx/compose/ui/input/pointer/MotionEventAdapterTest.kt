@@ -56,7 +56,7 @@ class MotionEventAdapterTest {
             MotionEvent.TOOL_TYPE_STYLUS to PointerType.Stylus,
             MotionEvent.TOOL_TYPE_MOUSE to PointerType.Mouse,
         )
-        types.forEach { toolType, pointerType ->
+        types.entries.forEach { (toolType, pointerType) ->
             motionEventAdapter = MotionEventAdapter()
             val motionEvent = MotionEvent(
                 2894,
