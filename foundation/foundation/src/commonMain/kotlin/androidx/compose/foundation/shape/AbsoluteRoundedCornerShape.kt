@@ -77,8 +77,8 @@ class AbsoluteRoundedCornerShape(
     ) = AbsoluteRoundedCornerShape(
         topLeft = topStart,
         topRight = topEnd,
-        bottomRight = bottomStart,
-        bottomLeft = bottomEnd
+        bottomRight = bottomEnd,
+        bottomLeft = bottomStart
     )
 
     override fun toString(): String {
