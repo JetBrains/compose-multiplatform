@@ -607,9 +607,9 @@ var SemanticsPropertyReceiver.focused by SemanticsProperties.Focused
  * but the system cannot automatically determine that.  To make the screen reader linear
  * navigation skip over this type of invisible node, this property can be set.
  *
- * If looking for a way to hide semantics of small items from screenreaders because they're
- * redundant with semantics of their parent, consider
- * [SemanticsPropertyReceiver.replaceSemantics] instead.
+ * If looking for a way to hide semantics of small items from screen readers because they're
+ * redundant with semantics of their parent, consider [SemanticsModifier.clearAndSetSemantics]
+ * instead.
  */
 @ExperimentalComposeUiApi
 fun SemanticsPropertyReceiver.invisibleToUser() {
