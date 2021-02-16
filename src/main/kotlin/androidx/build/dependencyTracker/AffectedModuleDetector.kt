@@ -182,7 +182,7 @@ abstract class AffectedModuleDetector(
          */
         @Throws(GradleException::class)
         @JvmStatic
-        internal fun configureTaskGuard(task: Task) {
+        fun configureTaskGuard(task: Task) {
             task.onlyIf {
                 getOrThrow(task.project).shouldInclude(task)
             }
