@@ -386,7 +386,7 @@ internal class AndroidComposeView(context: Context) :
      * to the hierarchy.
      */
     fun addAndroidView(view: AndroidViewHolder, layoutNode: LayoutNode) {
-        androidViewsHandler.layoutNode[view] = layoutNode
+        androidViewsHandler.holderToLayoutNode[view] = layoutNode
         androidViewsHandler.addView(view)
     }
 
@@ -396,7 +396,7 @@ internal class AndroidComposeView(context: Context) :
      */
     fun removeAndroidView(view: AndroidViewHolder) {
         androidViewsHandler.removeView(view)
-        androidViewsHandler.layoutNode.remove(view)
+        androidViewsHandler.holderToLayoutNode.remove(view)
     }
 
     /**
