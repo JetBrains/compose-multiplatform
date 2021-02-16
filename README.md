@@ -32,6 +32,7 @@ at https://android.googlesource.com/platform/frameworks/support.
        * [Signing and notarization](tutorials/Signing_and_notarization_on_macOS)
        * [Window control API](tutorials/Window_API)
        * [Swing interoperability](tutorials/Swing_Integration)
+       * [Navigation](tutorials/Navigation)
    * [components](components) - custom components of Compose for Desktop
        * [Video Player](components/VideoPlayer)
        
