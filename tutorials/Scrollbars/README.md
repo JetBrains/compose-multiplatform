@@ -41,8 +41,8 @@ fun main() {
                 .background(color = Color(180, 180, 180))
                 .padding(10.dp)
         ) {
-            val stateVertical = rememberScrollState(0f)
-            val stateHorizontal = rememberScrollState(0f)
+            val stateVertical = rememberScrollState(0)
+            val stateHorizontal = rememberScrollState(0)
 
             Box(
                 modifier = Modifier
@@ -207,7 +207,7 @@ fun main() {
                         .background(color = Color(180, 180, 180))
                         .padding(10.dp)
                 ) {
-                    val state = rememberScrollState(0f)
+                    val state = rememberScrollState(0)
 
                     Column(
                         modifier = Modifier
