@@ -224,6 +224,20 @@ private fun TestingSyncSnippets4() {
     composeTestRule.unregisterIdlingResource(idlingResource)
 }
 
+private fun TestingSyncSnippets5() {
+    composeTestRule.mainClock.autoAdvance = true // default
+    composeTestRule.waitForIdle() // Advances the clock until Compose is idle
+
+    composeTestRule.mainClock.autoAdvance = false
+    composeTestRule.waitForIdle() // Only waits for Idling Resources to become idle
+}
+
+private fun TestingSyncSnippets6and7() {
+    composeTestRule.mainClock.advanceTimeUntil(timeoutMs) { condition }
+
+    composeTestRule.waitUntil(timeoutMs) { condition }
+}
+
 private object TestingSemanticsSnippets1 {
     // Creates a Semantics property of type boolean
     val PickedDateKey = SemanticsPropertyKey<Long>("PickedDate")
@@ -295,7 +309,9 @@ private class MyActivity : ComponentActivity()
 private lateinit var key: SemanticsPropertyKey<AccessibilityAction<() -> Boolean>>
 private var keyEvent = KeyEvent(AndroidKeyEvent(ActionDown, KeyCodeA))
 private const val milliseconds = 10L
-val idlingResource = object : IdlingResource {
+private const val timeoutMs = 10L
+private val idlingResource = object : IdlingResource {
     override val isIdleNow: Boolean
         get() = TODO("Stub!")
 }
+private val condition = true

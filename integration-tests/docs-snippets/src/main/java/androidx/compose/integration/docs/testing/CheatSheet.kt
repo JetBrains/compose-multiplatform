@@ -28,6 +28,7 @@ import androidx.compose.ui.input.key.KeyEvent
 import androidx.compose.ui.layout.FirstBaseline
 import androidx.compose.ui.semantics.ProgressBarRangeInfo
 import androidx.compose.ui.semantics.SemanticsActions
+import androidx.compose.ui.test.IdlingResource
 import androidx.compose.ui.test.assert
 import androidx.compose.ui.test.assertAll
 import androidx.compose.ui.test.assertAny
@@ -163,6 +164,8 @@ import androidx.compose.ui.test.up
 import androidx.compose.ui.test.width
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.unit.dp
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
 import android.view.KeyEvent as AndroidKeyEvent
 import android.view.KeyEvent.ACTION_DOWN as ActionDown
 import android.view.KeyEvent.KEYCODE_A as KeyCodeA
@@ -378,6 +381,7 @@ private fun TestingCheatSheetOther() {
         runOnIdle { }
         runOnUiThread { }
         waitForIdle()
+        waitUntil { true }
         mainClock.apply {
             autoAdvance
             currentTime
@@ -385,6 +389,11 @@ private fun TestingCheatSheetOther() {
             advanceTimeByFrame()
             advanceTimeUntil { true }
         }
+        registerIdlingResource(idlingResource)
+        unregisterIdlingResource(idlingResource)
+    }
+    GlobalScope.launch {
+        nonAndroidComposeTestRule.awaitIdle()
     }
 
     // ANDROID COMPOSE TEST RULE
@@ -411,3 +420,7 @@ private val nonAndroidComposeTestRule = createComposeRule()
 private val keyEvent2 = KeyEvent(AndroidKeyEvent(ActionDown, KeyCodeA))
 private val offset = Offset(0f, 0f)
 private val rangeInfo = ProgressBarRangeInfo(0f, 0f..1f)
+private val idlingResource = object : IdlingResource {
+    override val isIdleNow: Boolean
+        get() = TODO("Stub!")
+}
