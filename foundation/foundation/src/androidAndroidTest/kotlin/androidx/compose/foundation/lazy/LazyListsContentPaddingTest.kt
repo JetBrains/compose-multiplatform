@@ -39,6 +39,7 @@ import androidx.test.filters.LargeTest
 import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.runBlocking
 import org.junit.Before
+import org.junit.Ignore
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -63,6 +64,7 @@ class LazyListsContentPaddingTest {
     }
 
     @Test
+    @Ignore("b/180386633")
     fun column_contentPaddingIsApplied() {
         lateinit var state: LazyListState
         val containerSize = itemSize * 2
@@ -336,6 +338,7 @@ class LazyListsContentPaddingTest {
     }
 
     @Test
+    @Ignore("b/180386633")
     fun row_contentPaddingIsApplied() {
         lateinit var state: LazyListState
         val containerSize = itemSize * 2
