@@ -18,10 +18,10 @@ package androidx.compose.ui.platform
 import android.annotation.SuppressLint
 import android.content.Context
 import android.graphics.Canvas
+import android.graphics.Rect
 import android.view.MotionEvent
 import android.view.View
 import android.view.ViewGroup
-import android.view.ViewParent
 import androidx.compose.ui.node.LayoutNode
 import androidx.compose.ui.node.LayoutNode.LayoutState.NeedsRemeasure
 import androidx.compose.ui.viewinterop.AndroidViewHolder
@@ -37,21 +37,7 @@ internal class AndroidViewsHandler(context: Context) : ViewGroup(context) {
         clipChildren = false
     }
 
-    val layoutNode = hashMapOf<View, LayoutNode>()
-
-    // No call to super to avoid invalidating the AndroidComposeView and rely on
-    // component nodes logic.
-    @SuppressLint("MissingSuperCall")
-    override fun onDescendantInvalidated(child: View, target: View) {
-        layoutNode[child]?.invalidateLayer()
-    }
-
-    // No call to super to avoid invalidating the AndroidComposeView and rely on
-    // component nodes logic.
-    override fun invalidateChildInParent(
-        location: IntArray?,
-        dirty: android.graphics.Rect?
-    ): ViewParent? = null
+    val holderToLayoutNode = hashMapOf<AndroidViewHolder, LayoutNode>()
 
     override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
         // Layout will be handled by component nodes.
@@ -66,8 +52,15 @@ internal class AndroidViewsHandler(context: Context) : ViewGroup(context) {
         // Layout was already handled by component nodes, but replace here because
         // the View system has forced relayout on children. This method will only be called
         // when forceLayout is called on the Views hierarchy.
-        layoutNode.keys.forEach { it.layout(it.left, it.top, it.right, it.bottom) }
+        holderToLayoutNode.keys.forEach { it.layout(it.left, it.top, it.right, it.bottom) }
     }
+
+    // No call to super to avoid invalidating the AndroidComposeView and the handler, and rely on
+    // component nodes logic. The layer invalidation will have been already done by the holder.
+    @SuppressLint("MissingSuperCall")
+    override fun onDescendantInvalidated(child: View, target: View) { }
+
+    override fun invalidateChildInParent(location: IntArray?, dirty: Rect?) = null
 
     fun drawView(view: AndroidViewHolder, canvas: Canvas) {
         // The canvas is already translated by the Compose logic. But the position of the
@@ -93,11 +86,11 @@ internal class AndroidViewsHandler(context: Context) : ViewGroup(context) {
         // their corresponding layout node.
         for (i in 0 until childCount) {
             val child = getChildAt(i)
-            val node = layoutNode[child]
+            val node = holderToLayoutNode[child]
             if (child.isLayoutRequested && node != null &&
                 node.layoutState != NeedsRemeasure
             ) {
-                layoutNode[child]!!.requestRemeasure()
+                holderToLayoutNode[child]!!.requestRemeasure()
             }
         }
     }
