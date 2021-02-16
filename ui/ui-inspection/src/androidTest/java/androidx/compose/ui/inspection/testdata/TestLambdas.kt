@@ -23,4 +23,18 @@ object TestLambdas {
         val count = a - b
         sum / count
     }
+    val inlined = { a: Int, b: Int ->
+        val sum = a + fct(b) { it * it }
+        sum - a
+    }
+
+    /**
+     * This inline function will appear at a line numbers
+     * past the end of this file for JVMTI.
+     */
+    private inline fun fct(n: Int, op: (Int) -> Int): Int {
+        val a = op(n)
+        val b = n * a + 3
+        return b - a
+    }
 }
