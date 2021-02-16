@@ -89,5 +89,5 @@ fun InteractionSource.collectIsDraggedAsState(): State<Boolean> {
             }
         }
     }
-    return derivedStateOf { dragInteractions.isNotEmpty() }
+    return remember { derivedStateOf { dragInteractions.isNotEmpty() } }
 }

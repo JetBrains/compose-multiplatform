@@ -139,9 +139,9 @@ fun DerivedStateSample() {
     }
 
     @Composable fun Example() {
-        var a by mutableStateOf(0)
-        var b by mutableStateOf(0)
-        val sum = derivedStateOf { a + b }
+        var a by remember { mutableStateOf(0) }
+        var b by remember { mutableStateOf(0) }
+        val sum = remember { derivedStateOf { a + b } }
         // Changing either a or b will cause CountDisplay to recompose but not trigger Example
         // to recompose.
         CountDisplay(sum)
