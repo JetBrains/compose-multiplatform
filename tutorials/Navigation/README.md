@@ -2,7 +2,7 @@
 
 ## General attitude
 
-The Jetpack Compose navigation library ([navigation-compose](https://developer.android.com/jetpack/compose/navigation)) is an Android-only library, and so can not be used together with Compose for Desktop. Our general attitude is not to “force” people to use a particular first-party library. However there are third-party libraries available. [Decompose](https://github.com/arkivanov/Decompose) - is one that is worth the attention.
+The Jetpack Compose navigation library ([navigation-compose](https://developer.android.com/jetpack/compose/navigation)) is an Android-only library, and so can not be used together with Compose for Desktop. Our general attitude is not to “force” people to use a particular first-party library. However there are third-party libraries available. One could consider [Decompose](https://github.com/arkivanov/Decompose) as possible solution.
 
 ## Patterns
 
