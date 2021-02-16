@@ -320,7 +320,7 @@ fun hasSetTextAction() =
 fun hasWidth(width: Dp, tolerance: Dp = DefaultTolerance): SemanticsMatcher =
     SemanticsMatcher("width = $width ± $tolerance") { node ->
         node.withDensity {
-            abs(node.unclippedBoundsInRoot.width - width.toPx()) < tolerance.toPx()
+            abs(node.unclippedBoundsInRoot.width - width.toPx()) <= tolerance.toPx()
         }
     }
 
@@ -338,7 +338,7 @@ fun hasWidth(width: Dp, tolerance: Dp = DefaultTolerance): SemanticsMatcher =
 fun hasWidthAtLeast(width: Dp, tolerance: Dp = DefaultTolerance): SemanticsMatcher =
     SemanticsMatcher("width > $width - $tolerance") { node ->
         node.withDensity {
-            node.unclippedBoundsInRoot.width - width.toPx() > -tolerance.toPx()
+            node.unclippedBoundsInRoot.width - width.toPx() >= -tolerance.toPx()
         }
     }
 
@@ -356,7 +356,7 @@ fun hasWidthAtLeast(width: Dp, tolerance: Dp = DefaultTolerance): SemanticsMatch
 fun hasHeight(height: Dp, tolerance: Dp = DefaultTolerance): SemanticsMatcher =
     SemanticsMatcher("height = $height ± $tolerance") { node ->
         node.withDensity {
-            abs(node.unclippedBoundsInRoot.height - height.toPx()) < tolerance.toPx()
+            abs(node.unclippedBoundsInRoot.height - height.toPx()) <= tolerance.toPx()
         }
     }
 
@@ -374,7 +374,7 @@ fun hasHeight(height: Dp, tolerance: Dp = DefaultTolerance): SemanticsMatcher =
 fun hasHeightAtLeast(height: Dp, tolerance: Dp = DefaultTolerance): SemanticsMatcher =
     SemanticsMatcher("height > $height - $tolerance") { node ->
         node.withDensity {
-            node.unclippedBoundsInRoot.height - height.toPx() > -tolerance.toPx()
+            node.unclippedBoundsInRoot.height - height.toPx() >= -tolerance.toPx()
         }
     }
 
@@ -392,7 +392,7 @@ fun hasHeightAtLeast(height: Dp, tolerance: Dp = DefaultTolerance): SemanticsMat
 fun hasLeftPosition(left: Dp, tolerance: Dp = DefaultTolerance): SemanticsMatcher =
     SemanticsMatcher("left = $left ± $tolerance") { node ->
         node.withDensity {
-            abs(node.unclippedBoundsInRoot.left - left.toPx()) < tolerance.toPx()
+            abs(node.unclippedBoundsInRoot.left - left.toPx()) <= tolerance.toPx()
         }
     }
 
@@ -410,7 +410,7 @@ fun hasLeftPosition(left: Dp, tolerance: Dp = DefaultTolerance): SemanticsMatche
 fun hasTopPosition(top: Dp, tolerance: Dp = DefaultTolerance): SemanticsMatcher =
     SemanticsMatcher("top = $top ± $tolerance") { node ->
         node.withDensity {
-            abs(node.unclippedBoundsInRoot.top - top.toPx()) < tolerance.toPx()
+            abs(node.unclippedBoundsInRoot.top - top.toPx()) <= tolerance.toPx()
         }
     }
 
@@ -428,7 +428,7 @@ fun hasTopPosition(top: Dp, tolerance: Dp = DefaultTolerance): SemanticsMatcher 
 fun hasRightPosition(right: Dp, tolerance: Dp = DefaultTolerance): SemanticsMatcher =
     SemanticsMatcher("right = $right ± $tolerance") { node ->
         node.withDensity {
-            abs(node.unclippedBoundsInRoot.right - right.toPx()) < tolerance.toPx()
+            abs(node.unclippedBoundsInRoot.right - right.toPx()) <= tolerance.toPx()
         }
     }
 
@@ -446,7 +446,7 @@ fun hasRightPosition(right: Dp, tolerance: Dp = DefaultTolerance): SemanticsMatc
 fun hasBottomPosition(bottom: Dp, tolerance: Dp = DefaultTolerance): SemanticsMatcher =
     SemanticsMatcher("bottom = $bottom ± $tolerance") { node ->
         node.withDensity {
-            abs(node.unclippedBoundsInRoot.bottom - bottom.toPx()) < tolerance.toPx()
+            abs(node.unclippedBoundsInRoot.bottom - bottom.toPx()) <= tolerance.toPx()
         }
     }
 
