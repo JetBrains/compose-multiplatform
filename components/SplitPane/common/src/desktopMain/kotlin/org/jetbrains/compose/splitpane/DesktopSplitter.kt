@@ -57,7 +57,7 @@ private fun DesktopSplitPaneSeparator(
 )
 
 @Composable
-actual fun Splitter(
+internal actual fun Splitter(
     isHorizontal: Boolean,
     splitPaneState: SplitPaneState
 ) {
