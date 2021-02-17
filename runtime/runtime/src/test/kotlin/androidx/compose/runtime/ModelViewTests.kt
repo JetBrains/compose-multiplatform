@@ -24,12 +24,12 @@ import androidx.compose.runtime.mock.expectNoChanges
 import androidx.compose.runtime.mock.validate
 import kotlin.test.Test
 
-const val PRESIDENT_NAME_1 = "George Washington"
-const val PRESIDENT_AGE_1 = 57
-const val PRESIDENT_NAME_16 = "Abraham Lincoln"
-const val PRESIDENT_AGE_16 = 52
+internal const val PRESIDENT_NAME_1 = "George Washington"
+internal const val PRESIDENT_AGE_1 = 57
+internal const val PRESIDENT_NAME_16 = "Abraham Lincoln"
+internal const val PRESIDENT_AGE_16 = 52
 
-class Person(name: String, age: Int) {
+internal class Person(name: String, age: Int) {
     var name by mutableStateOf(name)
     var age by mutableStateOf(age)
 }
