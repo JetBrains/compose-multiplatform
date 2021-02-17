@@ -1,14 +1,12 @@
 package org.jetbrains.compose.demo.widgets
 
 import androidx.compose.desktop.Window
-import androidx.compose.foundation.layout.ExperimentalLayout
 import androidx.compose.ui.unit.IntSize
 import org.jetbrains.compose.demo.widgets.ui.MainView
 import java.awt.Dimension
 import java.awt.Toolkit
 import javax.swing.SwingUtilities.invokeLater
 
-@OptIn(ExperimentalLayout::class)
 fun main() {
     invokeLater {
         Window(

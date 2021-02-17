@@ -15,6 +15,7 @@ import org.jetbrains.compose.demo.widgets.platform.Res
 import org.jetbrains.compose.demo.widgets.platform.imageResource
 import org.jetbrains.compose.demo.widgets.theme.typography
 
+@OptIn(ExperimentalMaterialApi::class)
 @Composable
 fun UICards() {
     val item = remember { DemoDataProvider.item }
@@ -54,7 +55,7 @@ fun UICards() {
             Image(
                 imageResource(Res.drawable.p3),
                 contentDescription = null,
-                modifier = Modifier.preferredSize(60.dp)
+                modifier = Modifier.requiredSize(60.dp)
             )
             Text(text = item.title, modifier = Modifier.padding(16.dp))
         }

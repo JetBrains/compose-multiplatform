@@ -81,7 +81,7 @@ private fun TopAppBarsDemo() {
                 imageResource(Res.drawable.p6),
                 contentDescription = "",
                 modifier = Modifier.padding(vertical = 4.dp, horizontal = 8.dp)
-                    .preferredSize(32.dp).clip(CircleShape)
+                    .requiredSize(32.dp).clip(CircleShape)
             )
         },
         actions = {

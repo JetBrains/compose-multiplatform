@@ -1,6 +1,6 @@
 package org.jetbrains.compose.demo.widgets.platform
 
-import androidx.compose.desktop.AppWindowAmbient
+import androidx.compose.desktop.LocalAppWindow
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -21,9 +21,9 @@ actual fun Modifier.cursorForHorizontalResize(): Modifier = composed {
     var isHover by remember { mutableStateOf(false) }
 
     if (isHover) {
-        AppWindowAmbient.current!!.window.cursor = Cursor(Cursor.E_RESIZE_CURSOR)
+        LocalAppWindow.current.window.cursor = Cursor(Cursor.E_RESIZE_CURSOR)
     } else {
-        AppWindowAmbient.current!!.window.cursor = Cursor.getDefaultCursor()
+        LocalAppWindow.current.window.cursor = Cursor.getDefaultCursor()
     }
 
     pointerMoveFilter(

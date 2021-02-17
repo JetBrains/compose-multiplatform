@@ -87,7 +87,7 @@ private fun CustomImageChip(
             Image(
                 imageResource(imageId),
                 contentDescription = null,
-                modifier = Modifier.padding(8.dp).preferredSize(20.dp).clip(CircleShape)
+                modifier = Modifier.padding(8.dp).requiredSize(20.dp).clip(CircleShape)
             )
             Text(
                 text = text,
