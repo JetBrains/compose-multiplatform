@@ -9,10 +9,10 @@ buildscript {
 
     dependencies {
         // __LATEST_COMPOSE_RELEASE_VERSION__
-        classpath("org.jetbrains.compose:compose-gradle-plugin:0.3.0-build146")
+        classpath("org.jetbrains.compose:compose-gradle-plugin:0.3.0-build154")
         classpath("com.android.tools.build:gradle:4.0.1")
         // __KOTLIN_COMPOSE_VERSION__
-        classpath(kotlin("gradle-plugin", version = "1.4.21-2"))
+        classpath(kotlin("gradle-plugin", version = "1.4.30"))
     }
 }
 

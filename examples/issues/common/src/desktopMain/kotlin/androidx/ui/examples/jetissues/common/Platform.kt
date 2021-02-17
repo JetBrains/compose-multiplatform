@@ -1,17 +1,15 @@
 package androidx.ui.examples.jetissues.view.common
 
+import androidx.compose.foundation.ScrollState
+import androidx.compose.foundation.rememberScrollbarAdapter
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.ui.platform.DesktopSelectionContainer
-import androidx.compose.ui.selection.Selection
+import androidx.compose.ui.Modifier
 
 @Composable
-actual fun SelectionContainer(children: @Composable () -> Unit) {
-    val selection = remember { mutableStateOf<Selection?>(null) }
-    DesktopSelectionContainer(
-        selection = selection.value,
-        onSelectionChange = { selection.value = it },
-        content = children
-    )
-}
+actual fun VerticalScrollbar(
+    modifier: Modifier,
+    scrollState: ScrollState
+) = androidx.compose.foundation.VerticalScrollbar(
+    rememberScrollbarAdapter(scrollState),
+    modifier
+)

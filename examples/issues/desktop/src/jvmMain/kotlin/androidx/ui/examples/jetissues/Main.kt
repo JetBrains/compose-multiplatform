@@ -1,7 +1,7 @@
 package androidx.ui.examples.jetissues
 
 import androidx.compose.desktop.Window
-import androidx.compose.runtime.Providers
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.unit.IntSize
 import androidx.ui.examples.jetissues.view.JetIssuesView
 import androidx.ui.examples.jetissues.view.Repository
@@ -13,7 +13,7 @@ fun main() = Window(
     title = "JetIssues",
     size = IntSize(1440, 768)
 ) {
-    Providers(Repository provides repo) {
+    CompositionLocalProvider(Repository provides repo) {
         JetIssuesView()
     }
 }
