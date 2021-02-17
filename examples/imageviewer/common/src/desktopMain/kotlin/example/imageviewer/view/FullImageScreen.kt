@@ -9,8 +9,8 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.preferredHeight
-import androidx.compose.foundation.layout.preferredSize
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.ScrollState
@@ -77,11 +77,11 @@ fun setImageFullScreen(
 private fun setLoadingScreen() {
 
     Box {
-        Surface(color = MiniatureColor, modifier = Modifier.preferredHeight(44.dp)) {}
+        Surface(color = MiniatureColor, modifier = Modifier.height(44.dp)) {}
         Box(modifier = Modifier.align(Alignment.Center)) {
             Surface(color = DarkGray, elevation = 4.dp, shape = CircleShape) {
                 CircularProgressIndicator(
-                    modifier = Modifier.preferredSize(50.dp).padding(3.dp, 3.dp, 4.dp, 4.dp),
+                    modifier = Modifier.size(50.dp).padding(3.dp, 3.dp, 4.dp, 4.dp),
                     color = DarkGreen
                 )
             }
@@ -97,7 +97,7 @@ fun setToolBar(
     val backButtonHover = remember { mutableStateOf(false) }
     Surface(
         color = MiniatureColor,
-        modifier = Modifier.preferredHeight(44.dp)
+        modifier = Modifier.height(44.dp)
     ) {
         Row(modifier = Modifier.padding(end = 30.dp)) {
             Surface(
@@ -125,7 +125,7 @@ fun setToolBar(
                     Image(
                         icBack(),
                         contentDescription = null,
-                        modifier = Modifier.preferredSize(38.dp)
+                        modifier = Modifier.size(38.dp)
                     )
                 }
             }
@@ -140,11 +140,11 @@ fun setToolBar(
 
             Surface(
                 color = Color(255, 255, 255, 40),
-                modifier = Modifier.preferredSize(154.dp, 38.dp)
+                modifier = Modifier.size(154.dp, 38.dp)
                     .align(Alignment.CenterVertically),
                 shape = CircleShape
             ) {
-                val state = rememberScrollState(0f)
+                val state = rememberScrollState(0)
                 Row(modifier = Modifier.horizontalScroll(state)) {
                     Row {
                         for (type in FilterType.values()) {
@@ -161,7 +161,7 @@ fun setToolBar(
 fun FilterButton(
     content: ContentState,
     type: FilterType,
-    modifier: Modifier = Modifier.preferredSize(38.dp)
+    modifier: Modifier = Modifier.size(38.dp)
 ) {
     val filterButtonHover = remember { mutableStateOf(false) }
     Box(
@@ -203,14 +203,14 @@ fun getFilterImage(type: FilterType, content: ContentState): ImageBitmap {
 
 @Composable
 fun setImage(content: ContentState) {
-    val drag = DragHandler()
-    val scale = ScaleHandler()
+    val drag = remember { DragHandler() }
+    val scale = remember { ScaleHandler() }
 
     Surface(
         color = DarkGray,
         modifier = Modifier.fillMaxSize()
     ) {
-        Draggable(onDrag = drag, modifier = Modifier.fillMaxSize()) {
+        Draggable(dragHandler = drag, modifier = Modifier.fillMaxSize()) {
             Zoomable(
                 onScale = scale,
                 modifier = Modifier.fillMaxSize()

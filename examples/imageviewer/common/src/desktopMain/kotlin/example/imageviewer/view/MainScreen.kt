@@ -14,9 +14,9 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.preferredHeight
-import androidx.compose.foundation.layout.preferredSize
-import androidx.compose.foundation.layout.preferredWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.rememberScrollbarAdapter
 import androidx.compose.foundation.rememberScrollState
@@ -79,7 +79,7 @@ private fun setLoadingScreen(content: ContentState) {
         Box(modifier = Modifier.align(Alignment.Center)) {
             Surface(color = DarkGray, elevation = 4.dp, shape = CircleShape) {
                 CircularProgressIndicator(
-                    modifier = Modifier.preferredSize(50.dp).padding(3.dp, 3.dp, 4.dp, 4.dp),
+                    modifier = Modifier.size(50.dp).padding(3.dp, 3.dp, 4.dp, 4.dp),
                     color = DarkGreen
                 )
             }
@@ -108,7 +108,7 @@ fun setTitleBar(text: String, content: ContentState) {
     TopAppBar(
         backgroundColor = DarkGreen,
         title = {
-        Row(Modifier.preferredHeight(50.dp)) {
+        Row(Modifier.height(50.dp)) {
             Text(
                 text,
                 color = Foreground,
@@ -140,7 +140,7 @@ fun setTitleBar(text: String, content: ContentState) {
                     Image(
                         icRefresh(),
                         contentDescription = null,
-                        modifier = Modifier.preferredSize(35.dp)
+                        modifier = Modifier.size(35.dp)
                     )
                 }
             }
@@ -158,7 +158,7 @@ fun setPreviewImageUI(content: ContentState) {
     ) {
         Card(
             backgroundColor = Transparent,
-            modifier = Modifier.preferredHeight(250.dp),
+            modifier = Modifier.height(250.dp),
             shape = RectangleShape,
             elevation = 1.dp
         ) {
@@ -186,7 +186,7 @@ fun setMiniatureUI(
     val infoButtonHover = remember { mutableStateOf(false) }
     Card(
         backgroundColor = if (cardHover.value) MiniatureHoverColor else MiniatureColor,
-        modifier = Modifier.padding(start = 10.dp, end = 18.dp).preferredHeight(70.dp)
+        modifier = Modifier.padding(start = 10.dp, end = 18.dp).height(70.dp)
             .fillMaxWidth()
             .hover(onEnter = {
                 cardHover.value = true
@@ -212,8 +212,8 @@ fun setMiniatureUI(
                         toByteArray(picture.image)
                     ).asImageBitmap(),
                     contentDescription = null,
-                    modifier = Modifier.preferredHeight(70.dp)
-                        .preferredWidth(90.dp)
+                    modifier = Modifier.height(70.dp)
+                        .width(90.dp)
                         .padding(start = 1.dp, top = 1.dp, end = 1.dp, bottom = 1.dp),
                     contentScale = ContentScale.Crop
                 )
@@ -229,8 +229,8 @@ fun setMiniatureUI(
             )
 
             Clickable(
-                modifier = Modifier.preferredHeight(70.dp)
-                    .preferredWidth(30.dp)
+                modifier = Modifier.height(70.dp)
+                    .width(30.dp)
                     .hover(
                         onEnter = {
                             infoButtonHover.value = true
@@ -254,8 +254,8 @@ fun setMiniatureUI(
                 Image(
                     icDots(),
                     contentDescription = null,
-                    modifier = Modifier.preferredHeight(70.dp)
-                        .preferredWidth(30.dp)
+                    modifier = Modifier.height(70.dp)
+                        .width(30.dp)
                         .padding(start = 1.dp, top = 25.dp, end = 1.dp, bottom = 25.dp),
                     contentScale = ContentScale.FillHeight
                 )
@@ -270,7 +270,7 @@ fun setScrollableArea(content: ContentState) {
         modifier = Modifier.fillMaxSize()
         .padding(end = 8.dp)
     ) {
-        val stateVertical = rememberScrollState(0f)
+        val stateVertical = rememberScrollState(0)
         Column(modifier = Modifier.verticalScroll(stateVertical)) {
             var index = 1
             Column {

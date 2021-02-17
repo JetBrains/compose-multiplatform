@@ -18,7 +18,7 @@ fun Scalable(
 ) {
     Surface(
         color = Transparent,
-        modifier = modifier.pointerInput {
+        modifier = modifier.pointerInput(Unit) {
             detectTapGestures(onDoubleTap = { onScale.resetFactor() })
             detectTransformGestures { _, _, zoom, _ ->
                 onScale.onScale(zoom)
@@ -33,6 +33,7 @@ class ScaleHandler(private val maxFactor: Float = 5f, private val minFactor: Flo
     val factor = mutableStateOf(1f)
 
     fun resetFactor() {
+        println("scale reset")
         if (factor.value > minFactor)
             factor.value = minFactor
     }

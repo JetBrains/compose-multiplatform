@@ -1,33 +1,40 @@
 package example.imageviewer.view
 
+import androidx.compose.foundation.gestures.detectDragGestures
 import androidx.compose.material.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.ui.input.pointer.consumePositionChange
+import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
-import androidx.compose.ui.gesture.DragObserver
-import androidx.compose.ui.gesture.rawDragGestureFilter
 import example.imageviewer.core.EventLocker
 import example.imageviewer.style.Transparent
 
 @Composable
 fun Draggable(
-    onDrag: DragHandler,
+    dragHandler: DragHandler,
     modifier: Modifier = Modifier,
     children: @Composable() () -> Unit
 ) {
     Surface(
         color = Transparent,
-        modifier = modifier.rawDragGestureFilter(
-            dragObserver = onDrag,
-            canStartDragging = { true }
-        )
+        modifier = modifier.pointerInput(Unit) {
+            detectDragGestures(
+                onDragStart = { dragHandler.reset() },
+                onDragEnd = { dragHandler.reset() },
+                onDragCancel = { dragHandler.cancel() },
+            ) { change, dragAmount ->
+                dragHandler.drag(dragAmount)
+                change.consumePositionChange()
+            }
+        }
     ) {
         children()
     }
 }
 
-class DragHandler : DragObserver {
+class DragHandler {
 
     private val amount = mutableStateOf(Point(0f, 0f))
     private val distance = mutableStateOf(Point(0f, 0f))
@@ -41,33 +48,24 @@ class DragHandler : DragObserver {
         return distance.value
     }
 
-    override fun onStart(downPosition: Offset) {
+    fun reset() {
         distance.value = Point(Offset.Zero)
         locker.unlock()
     }
 
-    override fun onStop(velocity: Offset) {
-        distance.value = Point(Offset.Zero)
-        locker.unlock()
-    }
-
-    override fun onCancel() {
+    fun cancel() {
         distance.value = Point(Offset.Zero)
         locker.lock()
     }
 
-    override fun onDrag(dragDistance: Offset): Offset {
+    fun drag(dragDistance: Offset) {
         if (locker.isLocked()) {
             val dx = dragDistance.x
             val dy = dragDistance.y
             
             distance.value = Point(distance.value.x + dx, distance.value.y + dy)
             amount.value = Point(amount.value.x + dx, amount.value.y + dy)
-
-            return dragDistance
         }
-
-        return Offset.Zero
     }
 }
 
