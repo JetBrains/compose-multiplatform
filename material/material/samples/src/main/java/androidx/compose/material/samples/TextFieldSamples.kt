@@ -35,7 +35,9 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.text.TextRange
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
@@ -182,10 +184,11 @@ fun OutlinedTextFieldSample() {
     )
 }
 
+@OptIn(ExperimentalComposeUiApi::class)
 @Sampled
 @Composable
 fun TextFieldWithHideKeyboardOnImeAction() {
-    // TODO(b/1583763): re-add software keyboard controller when replacement API is added
+    val keyboardController = LocalSoftwareKeyboardController.current
     var text by rememberSaveable { mutableStateOf("") }
     TextField(
         value = text,
@@ -194,6 +197,7 @@ fun TextFieldWithHideKeyboardOnImeAction() {
         keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done),
         keyboardActions = KeyboardActions(
             onDone = {
+                keyboardController?.hideSoftwareKeyboard()
                 // do something here
             }
         )
