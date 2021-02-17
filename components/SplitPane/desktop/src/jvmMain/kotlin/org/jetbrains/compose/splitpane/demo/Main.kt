@@ -48,13 +48,13 @@ fun main() = Window(
                 val splitterState = rememberSplitPaneState(50.dp)
                 val hSplitterState = rememberSplitPaneState(50.dp)
                 HorizontalSplitPane(
-                    splitterState
+                    splitPaneState = splitterState
                 ) {
                     first(20.dp) {
                         Box(Modifier.background(Color.Red).fillMaxSize())
                     }
                     second(50.dp) {
-                        VerticalSplitPane(hSplitterState) {
+                        VerticalSplitPane(splitPaneState = hSplitterState) {
                             first(50.dp) {
                                 Box(Modifier.background(Color.Blue).fillMaxSize())
                             }
