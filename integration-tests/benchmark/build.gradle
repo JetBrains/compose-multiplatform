@@ -52,12 +52,3 @@ dependencies {
     androidTestImplementation(ANDROIDX_TEST_RULES)
     androidTestImplementation(TRUTH)
 }
-
-androidx {
-    name = "Compose Benchmarks"
-    publish = Publish.NONE
-    inceptionYear = "2019"
-    description = "Compose Benchmarks"
-}
-
-android.defaultConfig.minSdkVersion 21

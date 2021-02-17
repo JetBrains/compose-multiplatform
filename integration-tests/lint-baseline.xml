@@ -22,15 +22,4 @@
             file="build.gradle"/>
     </issue>
 
-    <issue
-        id="BanUncheckedReflection"
-        message="Calling Method.invoke without an SDK check"
-        errorLine1="            freeCaches.invoke(null)"
-        errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/main/java/androidx/ui/integration/test/TextBenchmarkTestRule.kt"
-            line="82"
-            column="13"/>
-    </issue>
-
 </issues>
