@@ -1,13 +1,17 @@
 package org.jetbrains.compose.test
 
 import org.gradle.testkit.runner.GradleRunner
+import org.jetbrains.compose.desktop.application.internal.ComposeProperties
 import java.io.File
 
 data class TestProject(
     private val name: String,
     private val workingDir: File
 ) {
-    private val additionalArgs = listOf("--stacktrace")
+    private val additionalArgs = listOf(
+        "--stacktrace",
+        "-P${ComposeProperties.VERBOSE}=true"
+    )
 
     init {
         val originalTestRoot = File("src/test/test-projects").resolve(name).also {
