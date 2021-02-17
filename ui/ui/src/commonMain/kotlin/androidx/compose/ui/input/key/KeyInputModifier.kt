@@ -18,6 +18,7 @@ package androidx.compose.ui.input.key
 
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.composed
+import androidx.compose.ui.focus.findActiveFocusNode
 import androidx.compose.ui.node.ModifiedKeyInputNode
 import androidx.compose.ui.platform.debugInspectorInfo
 
