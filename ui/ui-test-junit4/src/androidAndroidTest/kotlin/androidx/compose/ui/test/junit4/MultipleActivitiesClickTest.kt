@@ -27,7 +27,6 @@ import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.test.click
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.performGesture
-import androidx.test.filters.FlakyTest
 import androidx.test.runner.lifecycle.ActivityLifecycleMonitorRegistry
 import androidx.test.runner.lifecycle.Stage
 import com.google.common.truth.Truth.assertThat
@@ -40,9 +39,8 @@ class MultipleActivitiesClickTest {
     @get:Rule
     val rule = createAndroidComposeRule<Activity1>()
 
-    @Ignore("b/178044284")
     @Test
-    @FlakyTest(bugId = 178003554)
+    @Ignore("b/155774664")
     fun test() {
         lateinit var activity1: Activity1
         rule.activityRule.scenario.onActivity { activity1 = it }
