@@ -58,6 +58,7 @@ import androidx.compose.ui.text.platform.toAccessibilitySpannableString
 import androidx.compose.ui.util.fastForEach
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.semantics.AccessibilityAction
 import androidx.compose.ui.semantics.ProgressBarRangeInfo
 import androidx.compose.ui.text.InternalTextApi
 import androidx.compose.ui.util.fastForEachIndexed
@@ -1596,10 +1597,34 @@ internal class AndroidComposeViewAccessibilityDelegateCompat(val view: AndroidCo
                             AccessibilityEvent.CONTENT_CHANGE_TYPE_UNDEFINED
                         )
                     }
+                    CustomActions -> {
+                        val actions = newNode.config[CustomActions]
+                        val oldActions = oldNode.config.getOrNull(CustomActions)
+                        if (oldActions != null) {
+                            // Suppose actions with the same label should be deduped.
+                            val labels = mutableSetOf<String>()
+                            for (action in actions) {
+                                labels.add(action.label)
+                            }
+                            val oldLabels = mutableSetOf<String>()
+                            for (action in oldActions) {
+                                oldLabels.add(action.label)
+                            }
+                            propertyChanged =
+                                !(labels.containsAll(oldLabels) && oldLabels.containsAll(labels))
+                        } else if (actions.isNotEmpty()) {
+                            propertyChanged = true
+                        }
+                    }
                     // TODO(b/151840490) send the correct events for certain properties, like view
                     //  selected.
                     else -> {
-                        propertyChanged = true
+                        if (entry.value is AccessibilityAction<*>) {
+                            propertyChanged = !(entry.value as AccessibilityAction<*>)
+                                .accessibilityEquals(oldNode.config.getOrNull(entry.key))
+                        } else {
+                            propertyChanged = true
+                        }
                     }
                 }
             }
@@ -2062,6 +2087,17 @@ private fun SemanticsNode.propertiesDeleted(
 private fun SemanticsNode.hasPaneTitle() = config.contains(SemanticsProperties.PaneTitle)
 private val SemanticsNode.isPassword: Boolean get() = config.contains(SemanticsProperties.Password)
 private val SemanticsNode.isTextField get() = this.config.contains(SemanticsActions.SetText)
+
+private fun AccessibilityAction<*>.accessibilityEquals(other: Any?): Boolean {
+    if (this === other) return true
+    if (other !is AccessibilityAction<*>) return false
+
+    if (label != other.label) return false
+    if (action == null && other.action != null) return false
+    if (action != null && other.action == null) return false
+
+    return true
+}
 
 /**
  * Finds pruned [SemanticsNode]s in the tree owned by this [SemanticsOwner]. A semantics node

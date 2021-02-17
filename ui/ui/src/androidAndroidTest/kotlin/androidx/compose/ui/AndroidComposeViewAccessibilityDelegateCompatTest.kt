@@ -34,6 +34,7 @@ import androidx.compose.ui.platform.AndroidComposeView
 import androidx.compose.ui.platform.AndroidComposeViewAccessibilityDelegateCompat
 import androidx.compose.ui.platform.LocalClipboardManager
 import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.semantics.CustomAccessibilityAction
 import androidx.compose.ui.semantics.ProgressBarRangeInfo
 import androidx.compose.ui.semantics.ScrollAxisRange
 import androidx.compose.ui.semantics.SemanticsModifierCore
@@ -44,6 +45,7 @@ import androidx.compose.ui.semantics.SemanticsWrapper
 import androidx.compose.ui.semantics.collapse
 import androidx.compose.ui.semantics.heading
 import androidx.compose.ui.semantics.copyText
+import androidx.compose.ui.semantics.customActions
 import androidx.compose.ui.semantics.cutText
 import androidx.compose.ui.semantics.disabled
 import androidx.compose.ui.semantics.stateDescription
@@ -648,6 +650,124 @@ class AndroidComposeViewAccessibilityDelegateCompatTest {
             )
         val newSemanticsNode = createSemanticsNodeWithProperties(1, false) {
             onClick { true }
+        }
+        val newNodes = mutableMapOf<Int, SemanticsNode>()
+        newNodes[1] = newSemanticsNode
+        accessibilityDelegate.sendSemanticsPropertyChangeEvents(newNodes)
+
+        verify(container, times(1)).requestSendAccessibilityEvent(
+            eq(androidComposeView),
+            argThat(
+                ArgumentMatcher {
+                    it.eventType == AccessibilityEvent.TYPE_WINDOW_CONTENT_CHANGED &&
+                        it.contentChangeTypes == AccessibilityEvent.CONTENT_CHANGE_TYPE_UNDEFINED
+                }
+            )
+        )
+    }
+
+    @Test
+    fun sendWindowContentChangeUndefinedEventByDefault_standardActionWithTheSameLabel() {
+        val label = "label"
+        val oldSemanticsNode = createSemanticsNodeWithProperties(1, false) {
+            onClick(label = label) { true }
+        }
+        accessibilityDelegate.previousSemanticsNodes[1] =
+            AndroidComposeViewAccessibilityDelegateCompat.SemanticsNodeCopy(
+                oldSemanticsNode,
+                mapOf()
+            )
+        val newSemanticsNode = createSemanticsNodeWithProperties(1, false) {
+            onClick(label = label) { true }
+        }
+        val newNodes = mutableMapOf<Int, SemanticsNode>()
+        newNodes[1] = newSemanticsNode
+        accessibilityDelegate.sendSemanticsPropertyChangeEvents(newNodes)
+
+        verify(container, never()).requestSendAccessibilityEvent(
+            eq(androidComposeView),
+            argThat(
+                ArgumentMatcher {
+                    it.eventType == AccessibilityEvent.TYPE_WINDOW_CONTENT_CHANGED &&
+                        it.contentChangeTypes == AccessibilityEvent.CONTENT_CHANGE_TYPE_UNDEFINED
+                }
+            )
+        )
+    }
+
+    @Test
+    fun sendWindowContentChangeUndefinedEventByDefault_standardActionWithDifferentLabels() {
+        val labelOld = "labelOld"
+        val labelNew = "labelNew"
+        val oldSemanticsNode = createSemanticsNodeWithProperties(1, false) {
+            onClick(label = labelOld) { true }
+        }
+        accessibilityDelegate.previousSemanticsNodes[1] =
+            AndroidComposeViewAccessibilityDelegateCompat.SemanticsNodeCopy(
+                oldSemanticsNode,
+                mapOf()
+            )
+        val newSemanticsNode = createSemanticsNodeWithProperties(1, false) {
+            onClick(label = labelNew) { true }
+        }
+        val newNodes = mutableMapOf<Int, SemanticsNode>()
+        newNodes[1] = newSemanticsNode
+        accessibilityDelegate.sendSemanticsPropertyChangeEvents(newNodes)
+
+        verify(container, times(1)).requestSendAccessibilityEvent(
+            eq(androidComposeView),
+            argThat(
+                ArgumentMatcher {
+                    it.eventType == AccessibilityEvent.TYPE_WINDOW_CONTENT_CHANGED &&
+                        it.contentChangeTypes == AccessibilityEvent.CONTENT_CHANGE_TYPE_UNDEFINED
+                }
+            )
+        )
+    }
+
+    @Test
+    fun sendWindowContentChangeUndefinedEventByDefault_customActionWithTheSameLabel() {
+        val label = "label"
+        val oldSemanticsNode = createSemanticsNodeWithProperties(1, false) {
+            customActions = listOf(CustomAccessibilityAction(label) { true })
+        }
+        accessibilityDelegate.previousSemanticsNodes[1] =
+            AndroidComposeViewAccessibilityDelegateCompat.SemanticsNodeCopy(
+                oldSemanticsNode,
+                mapOf()
+            )
+        val newSemanticsNode = createSemanticsNodeWithProperties(1, false) {
+            customActions = listOf(CustomAccessibilityAction(label) { true })
+        }
+        val newNodes = mutableMapOf<Int, SemanticsNode>()
+        newNodes[1] = newSemanticsNode
+        accessibilityDelegate.sendSemanticsPropertyChangeEvents(newNodes)
+
+        verify(container, never()).requestSendAccessibilityEvent(
+            eq(androidComposeView),
+            argThat(
+                ArgumentMatcher {
+                    it.eventType == AccessibilityEvent.TYPE_WINDOW_CONTENT_CHANGED &&
+                        it.contentChangeTypes == AccessibilityEvent.CONTENT_CHANGE_TYPE_UNDEFINED
+                }
+            )
+        )
+    }
+
+    @Test
+    fun sendWindowContentChangeUndefinedEventByDefault_customActionWithDifferentLabels() {
+        val labelOld = "labelOld"
+        val labelNew = "labelNew"
+        val oldSemanticsNode = createSemanticsNodeWithProperties(1, false) {
+            customActions = listOf(CustomAccessibilityAction(labelOld) { true })
+        }
+        accessibilityDelegate.previousSemanticsNodes[1] =
+            AndroidComposeViewAccessibilityDelegateCompat.SemanticsNodeCopy(
+                oldSemanticsNode,
+                mapOf()
+            )
+        val newSemanticsNode = createSemanticsNodeWithProperties(1, false) {
+            customActions = listOf(CustomAccessibilityAction(labelNew) { true })
         }
         val newNodes = mutableMapOf<Int, SemanticsNode>()
         newNodes[1] = newSemanticsNode
