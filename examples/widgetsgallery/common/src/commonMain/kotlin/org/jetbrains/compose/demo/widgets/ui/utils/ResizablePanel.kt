@@ -1,13 +1,11 @@
 package org.jetbrains.compose.demo.widgets.ui.utils
 
-import androidx.compose.animation.animate
-import androidx.compose.animation.core.Spring
-import androidx.compose.animation.core.SpringSpec
+import androidx.compose.animation.core.*
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
-import androidx.compose.material.AmbientContentColor
 import androidx.compose.material.Icon
+import androidx.compose.material.LocalContentColor
 import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
@@ -38,7 +36,10 @@ fun ResizablePanel(
     title: String,
     content: @Composable () -> Unit,
 ) {
-    val alpha = animate(if (state.isExpanded) 1f else 0f, SpringSpec(stiffness = Spring.StiffnessLow),)
+    val alpha = animateFloatAsState(
+        if (state.isExpanded) 1f else 0f,
+        SpringSpec(stiffness = Spring.StiffnessLow),
+    ).value
 
     Box(modifier) {
         Column {
@@ -56,7 +57,7 @@ fun ResizablePanel(
                 Icon(
                     if (state.isExpanded) Icons.Default.ArrowBack else Icons.Default.ArrowForward,
                     contentDescription = if (state.isExpanded) "Collapse" else "Expand",
-                    tint = AmbientContentColor.current,
+                    tint = LocalContentColor.current,
                     modifier = Modifier
                         .size(24.dp)
                         .padding(end = 8.dp)
