@@ -360,9 +360,68 @@ private const val InfiniteIterations: Int = Int.MAX_VALUE
 class VectorizedInfiniteRepeatableSpec<V : AnimationVector>(
     private val animation: VectorizedDurationBasedAnimationSpec<V>,
     private val repeatMode: RepeatMode = RepeatMode.Restart
-) : VectorizedAnimationSpec<V> by
-    VectorizedRepeatableSpec<V>(InfiniteIterations, animation, repeatMode) {
+) : VectorizedAnimationSpec<V> {
     override val isInfinite: Boolean get() = true
+
+    /**
+     * Single iteration duration
+     */
+    internal val durationNanos: Long =
+        (animation.delayMillis + animation.durationMillis) * MillisToNanos
+
+    private fun repetitionPlayTimeNanos(playTimeNanos: Long): Long {
+        val repeatsCount = playTimeNanos / durationNanos
+        if (repeatMode == RepeatMode.Restart || repeatsCount % 2 == 0L) {
+            return playTimeNanos - repeatsCount * durationNanos
+        } else {
+            return (repeatsCount + 1) * durationNanos - playTimeNanos
+        }
+    }
+
+    private fun repetitionStartVelocity(
+        playTimeNanos: Long,
+        start: V,
+        startVelocity: V,
+        end: V
+    ): V = if (playTimeNanos > durationNanos) {
+        // Start velocity of the 2nd and subsequent iteration will be the velocity at the end
+        // of the first iteration, instead of the initial velocity.
+        getVelocityFromNanos(durationNanos, start, startVelocity, end)
+    } else {
+        startVelocity
+    }
+
+    override fun getValueFromNanos(
+        playTimeNanos: Long,
+        initialValue: V,
+        targetValue: V,
+        initialVelocity: V
+    ): V {
+        return animation.getValueFromNanos(
+            repetitionPlayTimeNanos(playTimeNanos),
+            initialValue,
+            targetValue,
+            repetitionStartVelocity(playTimeNanos, initialValue, initialVelocity, targetValue)
+        )
+    }
+
+    override fun getVelocityFromNanos(
+        playTimeNanos: Long,
+        initialValue: V,
+        targetValue: V,
+        initialVelocity: V
+    ): V {
+        return animation.getVelocityFromNanos(
+            repetitionPlayTimeNanos(playTimeNanos),
+            initialValue,
+            targetValue,
+            repetitionStartVelocity(playTimeNanos, initialValue, initialVelocity, targetValue)
+        )
+    }
+
+    @Suppress("MethodNameUnits")
+    override fun getDurationNanos(initialValue: V, targetValue: V, initialVelocity: V): Long =
+        Long.MAX_VALUE
 }
 
 /**

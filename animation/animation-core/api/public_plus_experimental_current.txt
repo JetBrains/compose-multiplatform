@@ -603,6 +603,9 @@ package androidx.compose.animation.core {
 
   public final class VectorizedInfiniteRepeatableSpec<V extends androidx.compose.animation.core.AnimationVector> implements androidx.compose.animation.core.VectorizedAnimationSpec<V> {
     ctor public VectorizedInfiniteRepeatableSpec(androidx.compose.animation.core.VectorizedDurationBasedAnimationSpec<V> animation, androidx.compose.animation.core.RepeatMode repeatMode);
+    method public long getDurationNanos(V initialValue, V targetValue, V initialVelocity);
+    method public V getValueFromNanos(long playTimeNanos, V initialValue, V targetValue, V initialVelocity);
+    method public V getVelocityFromNanos(long playTimeNanos, V initialValue, V targetValue, V initialVelocity);
     method public boolean isInfinite();
     property public boolean isInfinite;
   }
