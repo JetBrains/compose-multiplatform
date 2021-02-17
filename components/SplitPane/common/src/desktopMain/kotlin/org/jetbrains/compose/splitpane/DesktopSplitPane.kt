@@ -20,13 +20,13 @@ actual fun SplitPane(
     minimalSizesConfiguration: MinimalSizes,
     first: @Composable ()->Unit,
     second: @Composable ()->Unit,
-    separator: @Composable ()->Unit
+    splitter: @Composable ()->Unit
 ) {
     Layout(
         {
             first()
             second()
-            separator()
+            splitter()
         },
         modifier,
     ) { measurables, constraints ->
