@@ -43,7 +43,7 @@ compose.desktop {
 
             linux {
                 shortcut = true
-                packageName = "compose"
+                packageName = "test-package"
                 debMaintainer = "example@example.com"
                 menuGroup = "menu-group"
             }
