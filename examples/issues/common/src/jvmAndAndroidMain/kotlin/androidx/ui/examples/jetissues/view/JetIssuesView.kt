@@ -17,6 +17,7 @@ package androidx.ui.examples.jetissues.view
 import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.selection.SelectionContainer
 import androidx.compose.material.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -24,7 +25,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.luminance
-import androidx.compose.ui.selection.DisableSelection
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.TextStyle
@@ -35,22 +35,20 @@ import androidx.ui.examples.jetissues.data.*
 import androidx.ui.examples.jetissues.query.IssueQuery
 import androidx.ui.examples.jetissues.query.IssuesQuery
 import androidx.ui.examples.jetissues.query.type.OrderDirection
-import androidx.ui.examples.jetissues.view.common.SelectionContainer
+import androidx.ui.examples.jetissues.view.common.VerticalScrollbar
 import kotlinx.coroutines.runBlocking
 import org.ocpsoft.prettytime.PrettyTime
 import java.lang.Integer.parseInt
 import java.util.*
 
-val Repository = ambientOf<IssuesRepository>()
+val Repository = compositionLocalOf<IssuesRepository> { error("Undefined repository") }
 
 @Composable
 fun JetIssuesView() {
     MaterialTheme(
         colors = lightThemeColors
     ) {
-        DisableSelection {
-            Main()
-        }
+        Main()
     }
 
 }
@@ -93,7 +91,7 @@ fun SingleColumnLayout(currentIssue: MutableState<IssuesQuery.Node?>) {
                         }
                     )
                 },
-                bodyContent = {
+                content = {
                     CurrentIssue(currentIssue.value)
                 }
             )
@@ -140,35 +138,44 @@ fun CurrentIssueStatus(content: @Composable () -> Unit) {
 
 @Composable
 fun CurrentIssueActive(issue: IssuesQuery.Node, body: IssueQuery.Issue) {
-    ScrollableColumn(modifier = Modifier.padding(15.dp).fillMaxSize()) {
-        SelectionContainer {
-            Text(
-                text = issue.title,
-                style = MaterialTheme.typography.h5
-            )
+    Box(Modifier.fillMaxSize()) {
+        val state = rememberScrollState()
+
+        Column(modifier = Modifier.padding(15.dp).fillMaxSize().verticalScroll(state)) {
+            SelectionContainer {
+                Text(
+                    text = issue.title,
+                    style = MaterialTheme.typography.h5
+                )
+            }
+
+            Row(horizontalArrangement = Arrangement.Center) {
+                CreatedBy(issue)
+            }
+
+            Labels(issue.labels)
+
+            Spacer(Modifier.height(8.dp))
+
+            SelectionContainer {
+                Text(
+                    text = body.body,
+                    modifier = Modifier.padding(4.dp),
+                    style = MaterialTheme.typography.body1
+                )
+            }
         }
 
-        Row(horizontalArrangement = Arrangement.Center) {
-            CreatedBy(issue)
-        }
-
-        Labels(issue.labels)
-
-        Spacer(Modifier.height(8.dp))
-
-        SelectionContainer {
-            Text(
-                text = body.body,
-                modifier = Modifier.padding(4.dp),
-                style = MaterialTheme.typography.body1
-            )
-        }
+        VerticalScrollbar(
+            Modifier.align(Alignment.CenterEnd).fillMaxHeight(),
+            state
+        )
     }
 }
 
 @Composable
 fun IssuesList(currentIssue: MutableState<IssuesQuery.Node?>) {
-    val scroll = rememberScrollState(0f)
+    val scroll = rememberScrollState()
     val issuesState = remember { mutableStateOf(IssuesState.OPEN) }
     val issuesOrder = remember { mutableStateOf(OrderDirection.DESC) }
     Column {
@@ -181,7 +188,7 @@ fun IssuesList(currentIssue: MutableState<IssuesQuery.Node?>) {
                     }
                 )
             },
-            bodyContent = {
+            content = {
                 Column {
                     FilterTabs(issuesState, scroll)
                     ListBody(
@@ -203,7 +210,7 @@ fun OrderButton(order: MutableState<OrderDirection>, scroll: ScrollState) {
             Button(onClick = {
                 order.value = OrderDirection.ASC
                 runBlocking {
-                    scroll.scrollTo(0F)
+                    scroll.scrollTo(0)
                 }
             }) {
                 Text("ASC")
@@ -212,7 +219,7 @@ fun OrderButton(order: MutableState<OrderDirection>, scroll: ScrollState) {
             Button(onClick = {
                 order.value = OrderDirection.DESC
                 runBlocking {
-                    scroll.scrollTo(0F)
+                    scroll.scrollTo(0)
                 }
             }) {
                 Text("DESC")
@@ -232,7 +239,7 @@ fun FilterTabs(issuesState: MutableState<IssuesState>, scroll: ScrollState) {
                 onClick = {
                     issuesState.value = it
                     runBlocking {
-                        scroll.scrollTo(0F)
+                        scroll.scrollTo(0)
                     }
                 }
             )
@@ -252,25 +259,32 @@ fun ListBody(
         repo.getIssues(issuesState, issuesOrder, callback = clb)
     }
 
-    ScrollableColumn(scrollState = scroll) {
-        issues.value.let {
-            when (it) {
-                is UiState.Success -> {
-                    for (iss in it.data.nodes) {
-                        Box(modifier = Modifier.clickable {
-                            currentIssue.value = iss
-                        }, contentAlignment = Alignment.CenterStart) {
-                            ListItem(iss)
+    Box(Modifier.fillMaxSize()) {
+        Column(Modifier.verticalScroll(scroll)) {
+            issues.value.let {
+                when (it) {
+                    is UiState.Success -> {
+                        for (iss in it.data.nodes) {
+                            Box(modifier = Modifier.clickable {
+                                currentIssue.value = iss
+                            }, contentAlignment = Alignment.CenterStart) {
+                                ListItem(iss)
+                            }
                         }
+                        MoreButton(issues)
                     }
-                    MoreButton(issues)
-                }
 
-                is UiState.Loading -> Loader()
-                is UiState.Error -> Error("Issues loading error")
+                    is UiState.Loading -> Loader()
+                    is UiState.Error -> Error("Issues loading error")
+                }
             }
         }
+        VerticalScrollbar(
+            Modifier.align(Alignment.CenterEnd).fillMaxHeight(),
+            scroll
+        )
     }
+
 }
 
 @Composable
