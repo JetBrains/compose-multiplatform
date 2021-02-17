@@ -140,7 +140,6 @@ fun PopupDemo() {
 
 @Composable
 private fun ColumnScope.PopupElevation() {
-    var isFocusable by remember { mutableStateOf(false) }
     var shape by remember { mutableStateOf(RectangleShape) }
     var background by remember { mutableStateOf(Color.Transparent) }
     var contentSize by remember { mutableStateOf(100.dp) }
@@ -152,7 +151,6 @@ private fun ColumnScope.PopupElevation() {
         Box(Modifier.size(110.dp).background(background)) {
             Popup(
                 alignment = Alignment.Center,
-                properties = PopupProperties(focusable = true),
                 onDismissRequest = { dismissCounter++ }
             ) {
                 Card(
@@ -166,7 +164,7 @@ private fun ColumnScope.PopupElevation() {
         }
 
         Spacer(Modifier.requiredHeight(20.dp))
-        Text("Dismiss clicked: $dismissCounter (focusable: $isFocusable)")
+        Text("Dismiss clicked: $dismissCounter")
         Spacer(Modifier.requiredHeight(20.dp))
         Row {
             Button(onClick = { elevation -= 1.dp }) {
@@ -182,9 +180,6 @@ private fun ColumnScope.PopupElevation() {
             Text("Toggle shape")
         }
         Spacer(Modifier.requiredHeight(10.dp))
-        Button(onClick = { isFocusable = !isFocusable }) {
-            Text("Toggle focusable")
-        }
         Spacer(Modifier.requiredHeight(10.dp))
         Button(
             onClick = {
