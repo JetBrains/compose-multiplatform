@@ -18,14 +18,13 @@ package androidx.compose.animation.core
 
 import com.google.common.truth.Truth.assertThat
 import junit.framework.TestCase.assertEquals
+import junit.framework.TestCase.assertFalse
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.junit.runners.JUnit4
 
 @RunWith(JUnit4::class)
 class RepeatableAnimationTest {
-
-    private val Animation = TweenSpec<AnimationVector1D>(durationMillis = Duration)
 
     private val DelayedAnimation = VectorizedTweenSpec<AnimationVector1D>(
         delayMillis = DelayDuration,
@@ -63,13 +62,13 @@ class RepeatableAnimationTest {
             animation = DelayedAnimation
         )
 
-        val duration = repeat.getDurationMillis(
+        val duration = repeat.getDurationNanos(
             AnimationVector1D(0f),
             AnimationVector1D(0f),
             AnimationVector1D(0f)
         )
 
-        assertEquals((DelayDuration + Duration) * iters.toLong(), duration)
+        assertEquals((DelayDuration + Duration) * iters * MillisToNanos, duration)
     }
 
     @Test
@@ -106,20 +105,71 @@ class RepeatableAnimationTest {
 
     @Test
     fun testInfiniteRepeat() {
-        val repeat = infiniteRepeatable(
+        val repeatShortAnimation = infiniteRepeatable(
             animation = TweenSpec<Float>(
                 durationMillis = 100, easing = LinearEasing
             ),
             repeatMode = RepeatMode.Reverse
         )
 
+        val extraLongDurationNanos = 1000000000
+        val repeatLongAnimation = infiniteRepeatable(
+            animation = TweenSpec<Float>(
+                durationMillis = extraLongDurationNanos, easing = LinearEasing
+            ),
+            repeatMode = RepeatMode.Restart
+        )
+        val vectorizedInfiniteRepeatingShort = repeatShortAnimation.vectorize(Float.VectorConverter)
+        val vectorizedInfiniteRepeatingLong = repeatLongAnimation.vectorize(Float.VectorConverter)
+
         assertEquals(
-            Int.MAX_VALUE.toLong() * 100,
-            repeat.vectorize(Float.VectorConverter).getDurationMillis(
-                AnimationVector(0f),
-                AnimationVector(100f),
-                AnimationVector(0f)
-            )
+            Long.MAX_VALUE,
+            vectorizedInfiniteRepeatingShort
+                .getDurationNanos(
+                    AnimationVector(0f),
+                    AnimationVector(100f),
+                    AnimationVector(0f)
+                )
+        )
+
+        assertEquals(
+            Long.MAX_VALUE,
+            vectorizedInfiniteRepeatingLong
+                .getDurationNanos(
+                    AnimationVector(0f),
+                    AnimationVector(100f),
+                    AnimationVector(0f)
+                )
+        )
+
+        val repeatShort = TargetBasedAnimation(
+            repeatShortAnimation,
+            Float.VectorConverter,
+            0f,
+            100f
+        )
+        val repeatLong = TargetBasedAnimation(
+            repeatLongAnimation,
+            Float.VectorConverter,
+            0f,
+            extraLongDurationNanos.toFloat()
+        )
+
+        assertEquals(repeatShort.durationNanos, Long.MAX_VALUE)
+        assertEquals(repeatLong.durationNanos, Long.MAX_VALUE)
+        assertFalse(repeatShort.isFinishedFromNanos(100000000000000000L))
+        assertFalse(repeatShort.isFinishedFromNanos(100000000000000000L))
+
+        // Also check on repeating value. Repeat mode: reverse
+        assertEquals(31f, repeatShort.getValueFromNanos(31 * MillisToNanos))
+        assertEquals(67f, repeatShort.getValueFromNanos(133 * MillisToNanos))
+
+        // Also check on repeating value. Repeat mode: restart
+        assertEquals(31f, repeatLong.getValueFromNanos(31 * MillisToNanos), 0.1f)
+        assertEquals(
+            31f,
+            repeatLong.getValueFromNanos((extraLongDurationNanos + 31) * MillisToNanos),
+            0.1f
         )
     }
 
