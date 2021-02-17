@@ -74,12 +74,19 @@ abstract class GenerateTestConfigurationTask : DefaultTask() {
     @get:OutputFile
     abstract val outputXml: RegularFileProperty
 
+    @get:OutputFile
+    abstract val constrainedOutputXml: RegularFileProperty
+
     @TaskAction
     fun generateAndroidTestZip() {
-        writeConfigFileContent()
+        writeConfigFileContent(constrainedOutputXml, true)
+        writeConfigFileContent(outputXml)
     }
 
-    private fun writeConfigFileContent() {
+    private fun writeConfigFileContent(
+        outputFile: RegularFileProperty,
+        isConstrained: Boolean = true
+    ) {
         /*
         Testing an Android Application project involves 2 APKS: an application to be instrumented,
         and a test APK. Testing an Android Library project involves only 1 APK, since the library
@@ -93,7 +100,7 @@ abstract class GenerateTestConfigurationTask : DefaultTask() {
             // We don't need to check hasBenchmarkPlugin because benchmarks shouldn't have test apps
             val appName = appApk.elements.single().outputFile.substringAfterLast("/")
                 .renameApkForTesting(appProjectPath.get(), hasBenchmarkPlugin = false)
-            // TODO(b/178776319)
+            // TODO(b/178776319): Clean up this hardcoded hack
             if (appProjectPath.get().contains("macrobenchmark-target")) {
                 configBuilder.appApkName(appName.replace("debug-androidTest", "release"))
             } else {
@@ -103,15 +110,20 @@ abstract class GenerateTestConfigurationTask : DefaultTask() {
         when (affectedModuleDetectorSubset.get()) {
             ProjectSubset.CHANGED_PROJECTS -> {
                 configBuilder.isPostsubmit(false)
-                configBuilder.runFullTests(true)
+                configBuilder.runAllTests(true)
             }
             ProjectSubset.ALL_AFFECTED_PROJECTS -> {
                 configBuilder.isPostsubmit(true)
-                configBuilder.runFullTests(true)
+                configBuilder.runAllTests(true)
             }
             ProjectSubset.DEPENDENT_PROJECTS -> {
                 configBuilder.isPostsubmit(false)
-                configBuilder.runFullTests(false)
+                // Don't ever run full tests of RV if it is dependent, since they take > 45 minutes
+                if (isConstrained || testProjectPath.get().contains("recyclerview")) {
+                    configBuilder.runAllTests(false)
+                } else {
+                    configBuilder.runAllTests(true)
+                }
             }
             else -> {
                 throw IllegalStateException(
@@ -145,11 +157,11 @@ abstract class GenerateTestConfigurationTask : DefaultTask() {
             .minSdk(minSdk.get().toString())
             .testRunner(testRunner.get())
 
-        val resolvedOutputFile: File = outputXml.asFile.get()
+        val resolvedOutputFile: File = outputFile.asFile.get()
         if (!resolvedOutputFile.exists()) {
             if (!resolvedOutputFile.createNewFile()) {
                 throw RuntimeException(
-                    "Failed to create test configuration file: $outputXml"
+                    "Failed to create test configuration file: $resolvedOutputFile"
                 )
             }
         }
