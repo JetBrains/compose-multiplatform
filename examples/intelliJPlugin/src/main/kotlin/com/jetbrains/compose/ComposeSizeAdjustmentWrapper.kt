@@ -37,7 +37,7 @@ fun ComposeSizeAdjustmentWrapper(
                     packed = true
                 }
             },
-            measureBlock = { _, _ ->
+            measurePolicy = { _, _ ->
                 layout(0, 0) {}
             }
         )

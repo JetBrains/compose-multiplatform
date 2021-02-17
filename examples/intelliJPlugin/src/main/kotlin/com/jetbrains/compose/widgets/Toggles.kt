@@ -82,7 +82,6 @@ fun Toggles() {
         Slider(value = sliderState2, modifier = Modifier.fillMaxWidth().padding(8.dp),
             valueRange = 0f..100f,
             steps = 5,
-            thumbColor = MaterialTheme.colors.secondary,
             onValueChange = { newValue ->
                 sliderState2 = newValue
             }
