@@ -19,18 +19,25 @@
 package androidx.build.testConfiguration
 
 import androidx.build.AndroidXPlugin
+import androidx.build.AndroidXPlugin.Companion.ZIP_CONSTRAINED_TEST_CONFIGS_WITH_APKS_TASK
+import androidx.build.AndroidXPlugin.Companion.ZIP_TEST_CONFIGS_WITH_APKS_TASK
 import androidx.build.asFilenamePrefix
 import androidx.build.dependencyTracker.AffectedModuleDetector
+import androidx.build.getConstrainedTestConfigDirectory
 import androidx.build.getTestConfigDirectory
 import androidx.build.gradle.getByType
 import androidx.build.hasAndroidTestSourceCode
 import androidx.build.hasBenchmarkPlugin
+import androidx.build.renameApkForTesting
 import com.android.build.api.artifact.ArtifactType
 import com.android.build.api.artifact.Artifacts
 import com.android.build.api.extension.AndroidComponentsExtension
 import com.android.build.api.extension.ApplicationAndroidComponentsExtension
 import com.android.build.gradle.TestedExtension
+import com.android.build.gradle.tasks.PackageAndroidArtifact
 import org.gradle.api.Project
+import org.gradle.api.file.DuplicatesStrategy
+import org.gradle.api.tasks.bundling.Zip
 import org.gradle.api.tasks.TaskProvider
 import java.io.File
 
@@ -61,6 +68,12 @@ fun Project.createTestConfigurationGenerationTask(
                 "${this.path.asFilenamePrefix()}$variantName.xml"
             )
         )
+        task.constrainedOutputXml.fileValue(
+            File(
+                this.getConstrainedTestConfigDirectory(),
+                "${this.path.asFilenamePrefix()}$variantName.xml"
+            )
+        )
         // Disable work tests on < API 18: b/178127496
         if (this.path.startsWith(":work:")) {
             task.minSdk.set(maxOf(18, minSdk))
@@ -85,6 +98,8 @@ fun Project.createTestConfigurationGenerationTask(
     }
     this.rootProject.tasks.findByName(AndroidXPlugin.ZIP_TEST_CONFIGS_WITH_APKS_TASK)!!
         .dependsOn(generateTestConfigurationTask)
+    this.rootProject.tasks.findByName(AndroidXPlugin.ZIP_CONSTRAINED_TEST_CONFIGS_WITH_APKS_TASK)!!
+        .dependsOn(generateTestConfigurationTask)
 }
 
 /**
@@ -105,6 +120,34 @@ fun Project.addAppApkToTestConfigGeneration(overrideProject: Project = this) {
                     it.appProjectPath.set(overrideProject.path)
                 }
         }
+    }
+}
+
+/**
+ * Configures the test zip task to include the project's apk
+ */
+fun addToTestZips(project: Project, packageTask: PackageAndroidArtifact) {
+    project.rootProject.tasks.named(ZIP_TEST_CONFIGS_WITH_APKS_TASK) { task ->
+        task as Zip
+        task.from(packageTask.outputDirectory) {
+            it.include("*.apk")
+            it.duplicatesStrategy = DuplicatesStrategy.FAIL
+            it.rename { fileName ->
+                fileName.renameApkForTesting(project.path, project.hasBenchmarkPlugin())
+            }
+        }
+        task.dependsOn(packageTask)
+    }
+    project.rootProject.tasks.named(ZIP_CONSTRAINED_TEST_CONFIGS_WITH_APKS_TASK) { task ->
+        task as Zip
+        task.from(packageTask.outputDirectory) {
+            it.include("*.apk")
+            it.duplicatesStrategy = DuplicatesStrategy.FAIL
+            it.rename { fileName ->
+                fileName.renameApkForTesting(project.path, project.hasBenchmarkPlugin())
+            }
+        }
+        task.dependsOn(packageTask)
     }
 }
 
@@ -132,6 +175,9 @@ private fun getOrCreateMediaTestConfigTask(project: Project, isMedia2: Boolean):
             }
             project.rootProject.tasks.findByName(AndroidXPlugin.ZIP_TEST_CONFIGS_WITH_APKS_TASK)!!
                 .dependsOn(task)
+            project.rootProject.tasks.findByName(
+                AndroidXPlugin.ZIP_CONSTRAINED_TEST_CONFIGS_WITH_APKS_TASK
+            )!!.dependsOn(task)
             return task
         } else {
             return parentProject.tasks.withType(GenerateMediaTestConfigurationTask::class.java)
@@ -197,6 +243,24 @@ fun Project.createOrUpdateMediaTestConfigurationGenerationTask(
                 "${mediaPrefix}ClientToTServiceToT$variantName.xml"
             )
         )
+        it.constrainedClientPreviousServiceToT.fileValue(
+            File(
+                this.getConstrainedTestConfigDirectory(),
+                "${mediaPrefix}ClientPreviousServiceToT$variantName.xml"
+            )
+        )
+        it.constrainedClientToTServicePrevious.fileValue(
+            File(
+                this.getConstrainedTestConfigDirectory(),
+                "${mediaPrefix}ClientToTServicePrevious$variantName.xml"
+            )
+        )
+        it.constrainedClientToTServiceToT.fileValue(
+            File(
+                this.getConstrainedTestConfigDirectory(),
+                "${mediaPrefix}ClientToTServiceToT$variantName.xml"
+            )
+        )
         it.minSdk.set(minSdk)
         it.testRunner.set(testRunner)
         AffectedModuleDetector.configureTaskGuard(it)
@@ -236,6 +300,12 @@ private fun Project.configureMacrobenchmarkConfigTask(
                     "${this.path.asFilenamePrefix()}$variantName.xml"
                 )
             )
+            task.constrainedOutputXml.fileValue(
+                File(
+                    this.getTestConfigDirectory(),
+                    "${this.path.asFilenamePrefix()}$variantName.xml"
+                )
+            )
             task.minSdk.set(minSdk)
             task.hasBenchmarkPlugin.set(this.hasBenchmarkPlugin())
             task.testRunner.set(testRunner)
@@ -255,6 +325,9 @@ private fun Project.configureMacrobenchmarkConfigTask(
         }
         this.rootProject.tasks.findByName(AndroidXPlugin.ZIP_TEST_CONFIGS_WITH_APKS_TASK)!!
             .dependsOn(configTask)
+        this.rootProject.tasks.findByName(
+            AndroidXPlugin.ZIP_CONSTRAINED_TEST_CONFIGS_WITH_APKS_TASK
+        )!!.dependsOn(configTask)
     } else if (path.endsWith("macrobenchmark-target")) {
         configTask.configure { task ->
             task.appFolder.set(artifacts.get(ArtifactType.APK))
