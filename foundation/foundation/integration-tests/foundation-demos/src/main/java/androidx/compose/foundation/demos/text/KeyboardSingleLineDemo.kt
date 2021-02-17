@@ -25,10 +25,8 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
-import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.SolidColor
-import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
@@ -114,10 +112,9 @@ fun ImeSingleLineDemo() {
     }
 }
 
-@OptIn(ExperimentalComposeUiApi::class)
 @Composable
 private fun MyTextField(data: ImeOptionsData) {
-    val keyboardController = LocalSoftwareKeyboardController.current
+    // TODO(b/1583763): re-add software keyboard controller when replacement API is added
     val state = rememberSaveable(stateSaver = TextFieldValue.Saver) {
         mutableStateOf(TextFieldValue())
     }
@@ -125,7 +122,7 @@ private fun MyTextField(data: ImeOptionsData) {
         modifier = demoTextFieldModifiers.defaultMinSize(100.dp),
         value = state.value,
         keyboardOptions = data.keyboardOptions,
-        keyboardActions = KeyboardActions { keyboardController?.hideSoftwareKeyboard() },
+        keyboardActions = KeyboardActions { /* hide keyboard */ },
         singleLine = data.singleLine,
         onValueChange = { state.value = it },
         textStyle = TextStyle(fontSize = fontSize8),

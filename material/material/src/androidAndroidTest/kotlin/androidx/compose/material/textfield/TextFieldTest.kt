@@ -63,10 +63,8 @@ import androidx.compose.ui.layout.FirstBaseline
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.layout.positionInRoot
 import androidx.compose.ui.node.Ref
-import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.platform.LocalTextInputService
 import androidx.compose.ui.platform.LocalView
-import androidx.compose.ui.platform.SoftwareKeyboardController
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.semantics.SemanticsProperties
 import androidx.compose.ui.test.ExperimentalTestApi
@@ -296,40 +294,7 @@ class TextFieldTest {
         rule.runOnIdle { assertThat(hostView.isSoftwareKeyboardShown).isFalse() }
     }
 
-    @ExperimentalComposeUiApi
-    @Test
-    fun testTextField_clickingOnTextAfterDismissingKeyboard_showsKeyboard() {
-        val (focusRequester, parentFocusRequester) = FocusRequester.createRefs()
-        var softwareKeyboardController: SoftwareKeyboardController? = null
-        lateinit var hostView: View
-        rule.setMaterialContent {
-            hostView = LocalView.current
-            softwareKeyboardController = LocalSoftwareKeyboardController.current
-            Box {
-                TextField(
-                    modifier = Modifier
-                        .focusRequester(parentFocusRequester)
-                        .focusModifier()
-                        .focusRequester(focusRequester)
-                        .testTag(TextfieldTag),
-                    value = "input",
-                    onValueChange = {},
-                    label = {}
-                )
-            }
-        }
-
-        // Shows keyboard when the text field is focused.
-        rule.runOnIdle { focusRequester.requestFocus() }
-        rule.runOnIdle { assertThat(hostView.isSoftwareKeyboardShown).isTrue() }
-
-        // Hide keyboard.
-        rule.runOnIdle { softwareKeyboardController?.hideSoftwareKeyboard() }
-
-        // Clicking on the text field shows the keyboard.
-        rule.onNodeWithTag(TextfieldTag).performClick()
-        rule.runOnIdle { assertThat(hostView.isSoftwareKeyboardShown).isTrue() }
-    }
+    // TODO(b/1583763): re-add keyboard hide/show test when replacement API is added
 
     @Test
     fun testTextField_labelPosition_initial_singleLine() {
