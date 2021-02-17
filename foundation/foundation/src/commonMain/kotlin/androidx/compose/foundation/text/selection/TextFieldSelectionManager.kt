@@ -114,6 +114,15 @@ internal class TextFieldSelectionManager {
     private var dragBeginPosition = Offset.Zero
 
     /**
+     * The beginning offset of the drag gesture translated into position in text. Every time a
+     * new drag gesture starts, it wil be recalculated.
+     * Unlike [dragBeginPosition] that is relative to the decoration box,
+     * [dragBeginOffsetInText] represents index in text. Essentially, it is equal to
+     * `layoutResult.getOffsetForPosition(dragBeginPosition)`.
+     */
+    private var dragBeginOffsetInText: Int? = null
+
+    /**
      * The total distance being dragged of the drag gesture. Every time a new drag gesture starts,
      * it will be zeroed out.
      */
@@ -166,6 +175,7 @@ internal class TextFieldSelectionManager {
                     isStartHandle = false,
                     wordBasedSelection = true
                 )
+                dragBeginOffsetInText = offset
             }
             dragBeginPosition = pxPosition
             dragTotalDistance = Offset.Zero
@@ -177,9 +187,13 @@ internal class TextFieldSelectionManager {
 
             dragTotalDistance += dragDistance
             state?.layoutResult?.let { layoutResult ->
-                val startOffset = layoutResult.getOffsetForPosition(dragBeginPosition)
+                val startOffset = dragBeginOffsetInText ?: layoutResult.getOffsetForPosition(
+                    position = dragBeginPosition,
+                    coerceInVisibleBounds = false
+                )
                 val endOffset = layoutResult.getOffsetForPosition(
-                    dragBeginPosition + dragTotalDistance
+                    position = dragBeginPosition + dragTotalDistance,
+                    coerceInVisibleBounds = false
                 )
                 updateSelection(
                     value = value,
@@ -197,6 +211,7 @@ internal class TextFieldSelectionManager {
             super.onStop(velocity)
             state?.showFloatingToolbar = true
             if (textToolbar?.status == TextToolbarStatus.Hidden) showSelectionToolbar()
+            dragBeginOffsetInText = null
         }
     }
 
@@ -212,6 +227,7 @@ internal class TextFieldSelectionManager {
                     offsetMapping,
                     onValueChange
                 )
+                dragBeginOffsetInText = layoutResult.getOffsetForPosition(downPosition)
             }
 
             dragBeginPosition = downPosition
@@ -224,9 +240,12 @@ internal class TextFieldSelectionManager {
 
             dragTotalDistance += dragDistance
             state?.layoutResult?.let { layoutResult ->
-                val startOffset = layoutResult.getOffsetForPosition(dragBeginPosition)
-                val endOffset =
-                    layoutResult.getOffsetForPosition(dragBeginPosition + dragTotalDistance)
+                val startOffset = dragBeginOffsetInText ?: layoutResult
+                    .getOffsetForPosition(dragBeginPosition, false)
+                val endOffset = layoutResult.getOffsetForPosition(
+                    position = dragBeginPosition + dragTotalDistance,
+                    coerceInVisibleBounds = false
+                )
                 updateSelection(
                     value = value,
                     transformedStartOffset = startOffset,
