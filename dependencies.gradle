@@ -17,18 +17,18 @@
 def libs = [:]
 
 libs.exclude_bytebuddy = {
-    exclude group: 'net.bytebuddy'
+    exclude group: "net.bytebuddy"
 }
 
 libs.exclude_for_espresso = {
-    exclude group: 'androidx.annotation'
-    exclude group: 'androidx.appcompat'
-    exclude group: 'androidx.recyclerview'
-    exclude group: 'androidx.legacy'
-    exclude group: 'androidx.cardview'
-    exclude group: 'androidx.fragment'
-    exclude group: 'com.google.android.material'
-    exclude group: 'androidx.core'
+    exclude group: "androidx.annotation"
+    exclude group: "androidx.appcompat"
+    exclude group: "androidx.recyclerview"
+    exclude group: "androidx.legacy"
+    exclude group: "androidx.cardview"
+    exclude group: "androidx.fragment"
+    exclude group: "com.google.android.material"
+    exclude group: "androidx.core"
 }
 
-rootProject.ext['libs'] = libs
+rootProject.ext["libs"] = libs

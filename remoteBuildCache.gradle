@@ -1,7 +1,7 @@
-def useRemoteBuildCache = System.getenv('USE_ANDROIDX_REMOTE_BUILD_CACHE') == 'true'
+def useRemoteBuildCache = System.getenv("USE_ANDROIDX_REMOTE_BUILD_CACHE") == "true"
 
 if (useRemoteBuildCache) {
-    logger.warn('Using AndroidX remote build cache')
+    logger.warn("Using AndroidX remote build cache")
     gradle.settingsEvaluated { settings ->
         settings.buildCache {
             remote(HttpBuildCache) {
@@ -10,10 +10,10 @@ if (useRemoteBuildCache) {
                     case { it.contains("mac os x") }:
                     case { it.contains("darwin") }:
                     case { it.contains("osx") }:
-                        url = 'http://gradle-remote-cache.uplink2.goog:999/cache/'
+                        url = "http://gradle-remote-cache.uplink2.goog:999/cache/"
                         break
                     default:
-                        url = 'http://gradle-remote-cache.uplink.goog:999/cache/'
+                        url = "http://gradle-remote-cache.uplink.goog:999/cache/"
                         break
                 }
                 allowInsecureProtocol = true
