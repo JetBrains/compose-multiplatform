@@ -24,13 +24,13 @@ import androidx.compose.ui.util.fastForEach
 
 internal val FOCUS_TAG = "Compose Focus"
 
-internal fun LayoutNode.focusableChildren2(): List<ModifiedFocusNode> {
-    val focusableChildren = mutableListOf<ModifiedFocusNode>()
+// TODO(b/152051577): Measure the performance of findFocusableChildren().
+//  Consider caching the children.
+internal fun LayoutNode.findFocusableChildren(focusableChildren: MutableList<ModifiedFocusNode>) {
     // TODO(b/152529395): Write a test for LayoutNode.focusableChildren(). We were calling the wrong
     //  function on [LayoutNodeWrapper] but no test caught this.
     outerLayoutNodeWrapper.findNextFocusWrapper()?.let { focusableChildren.add(it) }
-        ?: children.fastForEach { layout -> focusableChildren.addAll(layout.focusableChildren2()) }
-    return focusableChildren
+        ?: children.fastForEach { it.findFocusableChildren(focusableChildren) }
 }
 
 // TODO(b/144126759): For now we always return the first focusable child. We might want to

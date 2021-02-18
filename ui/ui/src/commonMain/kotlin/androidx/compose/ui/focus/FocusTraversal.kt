@@ -16,8 +16,6 @@
 
 package androidx.compose.ui.focus
 
-import androidx.compose.ui.unit.LayoutDirection.Ltr
-import androidx.compose.ui.unit.LayoutDirection.Rtl
 import androidx.compose.ui.focus.FocusDirection.Down
 import androidx.compose.ui.focus.FocusDirection.Left
 import androidx.compose.ui.focus.FocusDirection.Next
@@ -25,7 +23,14 @@ import androidx.compose.ui.focus.FocusDirection.Previous
 import androidx.compose.ui.focus.FocusDirection.Right
 import androidx.compose.ui.focus.FocusDirection.Up
 import androidx.compose.ui.focus.FocusRequester.Companion.Default
+import androidx.compose.ui.focus.FocusState.Active
+import androidx.compose.ui.focus.FocusState.ActiveParent
+import androidx.compose.ui.focus.FocusState.Captured
+import androidx.compose.ui.focus.FocusState.Disabled
+import androidx.compose.ui.focus.FocusState.Inactive
 import androidx.compose.ui.node.ModifiedFocusNode
+import androidx.compose.ui.unit.LayoutDirection.Ltr
+import androidx.compose.ui.unit.LayoutDirection.Rtl
 
 /**
  * This enum specifies the direction of the requested focus change.
@@ -69,6 +74,14 @@ internal fun ModifiedFocusNode.moveFocus(focusDirection: FocusDirection): Boolea
             // TODO(b/170155926): Perform two dimensional focus search.
             false
         }
+    }
+}
+
+internal fun ModifiedFocusNode.findActiveFocusNode(): ModifiedFocusNode? {
+    return when (focusState) {
+        Active, Captured -> this
+        ActiveParent -> focusedChild?.findActiveFocusNode()
+        Inactive, Disabled -> null
     }
 }
 
