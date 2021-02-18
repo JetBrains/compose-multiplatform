@@ -6,16 +6,17 @@ import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.runBlocking
+import org.gradle.api.Project
 
 private const val libsRepo = "https://maven.pkg.jetbrains.space/public/p/compose/dev/org/jetbrains/compose/"
-private const val version = "0.3.0-build154"
 private val exceptions = listOf(
     "desktop:desktop",
     "compose-full",
     "compose-gradle-plugin"
 )
 
-fun printAllAndroidxReplacements() = runBlocking {
+fun Project.printAllAndroidxReplacements() = runBlocking {
+    val version = BuildProperties.composeVersion(project)
     HttpClient().use { client ->
         client
             .allRecursiveFolders(libsRepo)
