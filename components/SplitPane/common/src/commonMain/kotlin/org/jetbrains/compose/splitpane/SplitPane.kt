@@ -5,7 +5,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 
-data class MinimalSizes(
+internal data class MinimalSizes(
     val firstPlaceableMinimalSize: Dp,
     val secondPlaceableMinimalSize: Dp
 )
