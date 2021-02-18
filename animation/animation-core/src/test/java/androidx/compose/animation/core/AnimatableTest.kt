@@ -264,4 +264,34 @@ class AnimatableTest {
             }
         }
     }
+
+    @Test
+    fun testUpdateBounds() {
+        val animatable = Animatable(5f)
+        // Update bounds when *not* running
+        animatable.updateBounds(0f, 4f)
+        assertEquals(4f, animatable.value)
+        runBlocking {
+            val clock = SuspendAnimationTest.TestFrameClock()
+            // Put two frames in clock
+            clock.frame(0L)
+            clock.frame(200 * 1_000_000L)
+
+            withContext(clock) {
+                animatable.animateTo(4f, tween(100)) {
+                    if (animatable.upperBound == 4f) {
+                        // Update bounds while running
+                        animatable.updateBounds(-4f, 0f)
+                    }
+                }
+            }
+        }
+        assertEquals(0f, animatable.value)
+
+        // Snap to value out of bounds
+        runBlocking {
+            animatable.snapTo(animatable.lowerBound!! - 100f)
+        }
+        assertEquals(animatable.lowerBound!!, animatable.value)
+    }
 }
