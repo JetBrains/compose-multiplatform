@@ -38,9 +38,9 @@ if (!AndroidXUiPlugin.isMultiplatformEnabled(project)) {
          * When updating dependencies, make sure to make the an an analogous update in the
          * corresponding block below
          */
-        kotlinPlugin project(":compose:compiler:compiler")
+        kotlinPlugin(project(":compose:compiler:compiler"))
 
-        api project(":compose:ui:ui")
+        api(project(":compose:ui:ui"))
         implementation(KOTLIN_STDLIB)
     }
 }
@@ -57,7 +57,7 @@ if (AndroidXUiPlugin.isMultiplatformEnabled(project)) {
         sourceSets {
             commonMain.dependencies {
                 implementation(KOTLIN_STDLIB_COMMON)
-                api project(":compose:ui:ui")
+                api(project(":compose:ui:ui"))
             }
 
             androidMain.dependencies {

@@ -27,13 +27,13 @@ plugins {
 }
 
 dependencies {
-    kotlinPlugin project(":compose:compiler:compiler")
+    kotlinPlugin(project(":compose:compiler:compiler"))
 
     implementation(KOTLIN_STDLIB)
-    compileOnly project(":annotation:annotation-sampled")
-    implementation project(":compose:runtime:runtime")
-    implementation project(":compose:ui:ui")
-    implementation project(":compose:ui:ui-viewbinding")
+    compileOnly(project(":annotation:annotation-sampled"))
+    implementation(project(":compose:runtime:runtime"))
+    implementation(project(":compose:ui:ui"))
+    implementation(project(":compose:ui:ui-viewbinding"))
 }
 
 androidx {

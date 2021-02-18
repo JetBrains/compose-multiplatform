@@ -27,16 +27,16 @@ plugins {
 }
 
 dependencies {
-    kotlinPlugin project(":compose:compiler:compiler")
+    kotlinPlugin(project(":compose:compiler:compiler"))
 
     implementation(KOTLIN_STDLIB)
-    compileOnly project(":annotation:annotation-sampled")
-    implementation project(":compose:animation:animation-core")
-    implementation project(":compose:runtime:runtime")
-    implementation project(":compose:ui:ui")
-    implementation project(":compose:ui:ui-unit")
-    implementation project(':compose:foundation:foundation')
-    implementation project(':compose:material:material')
+    compileOnly(project(":annotation:annotation-sampled"))
+    implementation(project(":compose:animation:animation-core"))
+    implementation(project(":compose:runtime:runtime"))
+    implementation(project(":compose:ui:ui"))
+    implementation(project(":compose:ui:ui-unit"))
+    implementation(project(":compose:foundation:foundation"))
+    implementation(project(":compose:material:material"))
 }
 
 androidx {

@@ -12,21 +12,21 @@ android {
         release {
             minifyEnabled true
             shrinkResources true
-            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt')
+            proguardFiles getDefaultProguardFile("proguard-android-optimize.txt")
         }
     }
 }
 
 dependencies {
-    kotlinPlugin project(":compose:compiler:compiler")
+    kotlinPlugin(project(":compose:compiler:compiler"))
 
     implementation(KOTLIN_STDLIB)
-    implementation project(":compose:foundation:foundation-layout")
-    implementation project(":compose:material:material")
-    implementation project(":compose:runtime:runtime")
-    implementation project(":compose:ui:ui")
-    implementation project(":compose:ui:ui-tooling")
-    implementation project(":activity:activity-compose")
+    implementation(project(":compose:foundation:foundation-layout"))
+    implementation(project(":compose:material:material"))
+    implementation(project(":compose:runtime:runtime"))
+    implementation(project(":compose:ui:ui"))
+    implementation(project(":compose:ui:ui-tooling"))
+    implementation(project(":activity:activity-compose"))
 }
 
 android.defaultConfig.minSdkVersion 21

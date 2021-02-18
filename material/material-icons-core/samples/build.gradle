@@ -27,15 +27,15 @@ plugins {
 }
 
 dependencies {
-    kotlinPlugin project(":compose:compiler:compiler")
+    kotlinPlugin(project(":compose:compiler:compiler"))
 
     implementation(KOTLIN_STDLIB)
 
-    compileOnly project(":annotation:annotation-sampled")
+    compileOnly(project(":annotation:annotation-sampled"))
 
-    implementation project(":compose:material:material")
-    implementation project(":compose:material:material-icons-core")
-    implementation project(":compose:runtime:runtime")
+    implementation(project(":compose:material:material"))
+    implementation(project(":compose:material:material-icons-core"))
+    implementation(project(":compose:runtime:runtime"))
 }
 
 androidx {

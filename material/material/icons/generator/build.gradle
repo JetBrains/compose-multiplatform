@@ -28,7 +28,7 @@ plugins {
 }
 
 dependencies {
-    implementation gradleApi()
+    implementation(gradleApi())
 
     implementation(AGP_STABLE)
     implementation(GUAVA)

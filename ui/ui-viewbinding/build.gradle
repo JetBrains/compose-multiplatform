@@ -27,13 +27,13 @@ plugins {
 }
 
 dependencies {
-    kotlinPlugin project(":compose:compiler:compiler")
+    kotlinPlugin(project(":compose:compiler:compiler"))
 
     implementation(KOTLIN_STDLIB)
-    implementation project(":compose:ui:ui")
+    implementation(project(":compose:ui:ui"))
 
-    androidTestImplementation project(':compose:foundation:foundation')
-    androidTestImplementation project(":compose:test-utils")
+    androidTestImplementation(project(":compose:foundation:foundation"))
+    androidTestImplementation(project(":compose:test-utils"))
     androidTestImplementation(ANDROIDX_TEST_RUNNER)
     androidTestImplementation(JUNIT)
     androidTestImplementation(TRUTH)
