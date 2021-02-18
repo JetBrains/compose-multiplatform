@@ -29,7 +29,7 @@ plugins {
 AndroidXUiPlugin.applyAndConfigureKotlinPlugin(project)
 
 dependencies {
-    kotlinPlugin project(":compose:compiler:compiler")
+    kotlinPlugin(project(":compose:compiler:compiler"))
 
     if(!AndroidXUiPlugin.isMultiplatformEnabled(project)) {
         /*
@@ -37,24 +37,24 @@ dependencies {
          * corresponding block below
          */
 
-        api "androidx.activity:activity:1.2.0"
-        api project(":compose:ui:ui-test-junit4")
-        api project(":test-screenshot")
+        api("androidx.activity:activity:1.2.0")
+        api(project(":compose:ui:ui-test-junit4"))
+        api(project(":test-screenshot"))
 
         implementation(KOTLIN_STDLIB_COMMON)
-        implementation project(":benchmark:benchmark-junit4")
-        implementation project(":compose:runtime:runtime")
-        implementation project(":compose:ui:ui")
+        implementation(project(":benchmark:benchmark-junit4"))
+        implementation(project(":compose:runtime:runtime"))
+        implementation(project(":compose:ui:ui"))
         implementation(ANDROIDX_TEST_RULES)
 
         // This has stub APIs for access to legacy Android APIs, so we don't want
         // any dependency on this module.
-        compileOnly project(":compose:ui:ui-android-stubs")
+        compileOnly(project(":compose:ui:ui-android-stubs"))
 
         testImplementation(TRUTH)
 
         androidTestImplementation(TRUTH)
-        androidTestImplementation project(':compose:material:material')
+        androidTestImplementation(project(":compose:material:material"))
     }
 }
 
@@ -68,19 +68,19 @@ if (AndroidXUiPlugin.isMultiplatformEnabled(project)) {
         sourceSets {
             commonMain.dependencies {
                 implementation(KOTLIN_STDLIB_COMMON)
-                implementation project(":benchmark:benchmark-junit4")
-                implementation project(":compose:runtime:runtime")
-                implementation project(":compose:ui:ui")
-                implementation project(":compose:ui:ui-test-junit4")
+                implementation(project(":benchmark:benchmark-junit4"))
+                implementation(project(":compose:runtime:runtime"))
+                implementation(project(":compose:ui:ui"))
+                implementation(project(":compose:ui:ui-test-junit4"))
             }
 
             androidMain.dependencies {
-                api "androidx.activity:activity:1.2.0"
-                api project(":compose:ui:ui-test-junit4")
-                api project(":test-screenshot")
+                api("androidx.activity:activity:1.2.0")
+                api(project(":compose:ui:ui-test-junit4"))
+                api(project(":test-screenshot"))
                 // This has stub APIs for access to legacy Android APIs, so we don't want
                 // any dependency on this module.
-                compileOnly project(":compose:ui:ui-android-stubs")
+                compileOnly(project(":compose:ui:ui-android-stubs"))
                 implementation(ANDROIDX_TEST_RULES)
             }
 
@@ -90,7 +90,7 @@ if (AndroidXUiPlugin.isMultiplatformEnabled(project)) {
 
             androidAndroidTest.dependencies {
                 implementation(TRUTH)
-                implementation project(':compose:material:material')
+                implementation(project(":compose:material:material"))
             }
         }
     }

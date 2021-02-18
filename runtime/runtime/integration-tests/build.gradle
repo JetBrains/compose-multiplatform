@@ -29,11 +29,11 @@ plugins {
 AndroidXUiPlugin.applyAndConfigureKotlinPlugin(project)
 
 dependencies {
-    kotlinPlugin project(":compose:compiler:compiler")
+    kotlinPlugin(project(":compose:compiler:compiler"))
 
     if(!AndroidXUiPlugin.isMultiplatformEnabled(project)) {
         androidTestImplementation(project(":compose:ui:ui"))
-        androidTestImplementation project(":compose:ui:ui-test-junit4")
+        androidTestImplementation(project(":compose:ui:ui-test-junit4"))
         androidTestImplementation(project(":compose:runtime:runtime"))
         androidTestImplementation(project(":activity:activity-compose"))
 
@@ -71,26 +71,26 @@ if(AndroidXUiPlugin.isMultiplatformEnabled(project)) {
             androidMain {
                 dependencies {
                     api(KOTLIN_COROUTINES_ANDROID)
-                    api "androidx.annotation:annotation:1.1.0"
+                    api("androidx.annotation:annotation:1.1.0")
 
                     implementation("androidx.core:core-ktx:1.1.0")
                 }
-                dependsOn jvmMain
+                dependsOn(jvmMain)
             }
             desktopMain {
                 dependencies {
                     api(KOTLIN_COROUTINES_SWING)
                 }
-                dependsOn jvmMain
+                dependsOn(jvmMain)
             }
 
             commonTest.dependencies {
-                implementation kotlin("test-junit")
+                implementation(kotlin("test-junit"))
             }
             androidAndroidTest.dependencies {
                 implementation(project(":compose:ui:ui"))
-                implementation project(":compose:ui:ui-test-junit4")
-                implementation project(":activity:activity-compose")
+                implementation(project(":compose:ui:ui-test-junit4"))
+                implementation(project(":activity:activity-compose"))
                 implementation(ANDROIDX_TEST_EXT_JUNIT)
                 implementation(ANDROIDX_TEST_RULES)
                 implementation(ANDROIDX_TEST_RUNNER)

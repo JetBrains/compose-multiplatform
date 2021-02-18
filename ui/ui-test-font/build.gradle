@@ -35,7 +35,7 @@ if(AndroidXUiPlugin.isMultiplatformEnabled(project)) {
         jvm("desktop")
 
         sourceSets {
-            desktopMain.dependsOn jvmMain
+            desktopMain.dependsOn(jvmMain)
         }
     }
 }

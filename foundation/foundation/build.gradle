@@ -31,22 +31,22 @@ plugins {
 AndroidXUiPlugin.applyAndConfigureKotlinPlugin(project)
 
 dependencies {
-    kotlinPlugin project(":compose:compiler:compiler")
+    kotlinPlugin(project(":compose:compiler:compiler"))
 
     if(!AndroidXUiPlugin.isMultiplatformEnabled(project)) {
         /*
          * When updating dependencies, make sure to make the an an analogous update in the
          * corresponding block above
          */
-        api "androidx.annotation:annotation:1.1.0"
-        api project(':compose:animation:animation')
-        api project(':compose:runtime:runtime')
-        api project(':compose:ui:ui')
+        api("androidx.annotation:annotation:1.1.0")
+        api(project(':compose:animation:animation'))
+        api(project(':compose:runtime:runtime'))
+        api(project(':compose:ui:ui'))
 
         implementation(KOTLIN_STDLIB_COMMON)
-        implementation project(':compose:foundation:foundation-layout')
-        implementation project(":compose:ui:ui-text")
-        implementation project(':compose:ui:ui-util')
+        implementation(project(":compose:foundation:foundation-layout"))
+        implementation(project(":compose:ui:ui-text"))
+        implementation(project(":compose:ui:ui-util"))
 
 
         testImplementation(ANDROIDX_TEST_RULES)
@@ -56,13 +56,13 @@ dependencies {
         testImplementation(KOTLIN_COROUTINES_TEST)
         testImplementation(MOCKITO_CORE)
         testImplementation(KOTLIN_REFLECT)
-        testImplementation MOCKITO_KOTLIN, {
-            exclude group: 'org.mockito' // to keep control on the mockito version
-        }
+        testImplementation(MOCKITO_KOTLIN, {
+            exclude group: "org.mockito" // to keep control on the mockito version
+        })
 
-        androidTestImplementation project(":compose:test-utils")
-        androidTestImplementation project(":compose:ui:ui-test-font")
-        androidTestImplementation project(":test-screenshot")
+        androidTestImplementation(project(":compose:test-utils"))
+        androidTestImplementation(project(":compose:ui:ui-test-font"))
+        androidTestImplementation(project(":test-screenshot"))
         androidTestImplementation(ANDROIDX_TEST_UIAUTOMATOR)
         androidTestImplementation(ANDROIDX_TEST_RULES)
         androidTestImplementation(ANDROIDX_TEST_RUNNER)
@@ -73,9 +73,9 @@ dependencies {
         androidTestImplementation(DEXMAKER_MOCKITO, libs.exclude_bytebuddy) // DexMaker has it"s own
         // MockMaker
         androidTestImplementation(MOCKITO_CORE, libs.exclude_bytebuddy) // DexMaker has it"s own MockMaker
-        androidTestImplementation MOCKITO_KOTLIN, {
-            exclude group: 'org.mockito' // to keep control on the mockito version
-        }
+        androidTestImplementation(MOCKITO_KOTLIN, {
+            exclude group: "org.mockito" // to keep control on the mockito version
+        })
     }
 }
 
@@ -91,15 +91,15 @@ if(AndroidXUiPlugin.isMultiplatformEnabled(project)) {
         sourceSets {
             commonMain.dependencies {
                 implementation(KOTLIN_STDLIB_COMMON)
-                api project(':compose:animation:animation')
-                api project(':compose:runtime:runtime')
-                api project(':compose:ui:ui')
-                implementation project(":compose:ui:ui-text")
-                implementation project(":compose:ui:ui-util")
-                implementation project(':compose:foundation:foundation-layout')
+                api(project(':compose:animation:animation'))
+                api(project(':compose:runtime:runtime'))
+                api(project(':compose:ui:ui'))
+                implementation(project(":compose:ui:ui-text"))
+                implementation(project(":compose:ui:ui-util"))
+                implementation(project(':compose:foundation:foundation-layout'))
             }
             androidMain.dependencies {
-                api "androidx.annotation:annotation:1.1.0"
+                api("androidx.annotation:annotation:1.1.0")
             }
 
             desktopMain.dependencies {
@@ -113,9 +113,9 @@ if(AndroidXUiPlugin.isMultiplatformEnabled(project)) {
                 implementation(MOCKITO_CORE)
                 implementation(TRUTH)
                 implementation(KOTLIN_REFLECT)
-                implementation MOCKITO_KOTLIN, {
-                    exclude group: 'org.mockito' // to keep control on the mockito version
-                }
+                implementation(MOCKITO_KOTLIN, {
+                    exclude group: "org.mockito" // to keep control on the mockito version
+                })
             }
 
             commonTest.dependencies {
@@ -123,10 +123,10 @@ if(AndroidXUiPlugin.isMultiplatformEnabled(project)) {
             }
 
             androidAndroidTest.dependencies {
-                implementation project(":compose:test-utils")
-                implementation project(":compose:ui:ui-test-font")
-                implementation project(":test-screenshot")
-                implementation project(":activity:activity-compose")
+                implementation(project(":compose:test-utils"))
+                implementation(project(":compose:ui:ui-test-font"))
+                implementation(project(":test-screenshot"))
+                implementation(project(":activity:activity-compose"))
 
                 implementation(ANDROIDX_TEST_UIAUTOMATOR)
                 implementation(ANDROIDX_TEST_RULES)
@@ -138,20 +138,20 @@ if(AndroidXUiPlugin.isMultiplatformEnabled(project)) {
                 // MockMaker
                 implementation(MOCKITO_CORE, libs.exclude_bytebuddy)
                 // DexMaker has it"s own MockMaker
-                implementation MOCKITO_KOTLIN, {
-                    exclude group: 'org.mockito' // to keep control on the mockito version
-                }
+                implementation(MOCKITO_KOTLIN, {
+                    exclude group: "org.mockito" // to keep control on the mockito version
+                })
             }
 
             desktopTest.dependencies {
-                implementation project(":compose:ui:ui-test-junit4")
+                implementation(project(":compose:ui:ui-test-junit4"))
                 implementation(TRUTH)
                 implementation(JUNIT)
                 implementation(SKIKO_CURRENT_OS)
                 implementation(MOCKITO_CORE)
-                implementation MOCKITO_KOTLIN, {
-                    exclude group: 'org.mockito' // to keep control on the mockito version
-                }
+                implementation(MOCKITO_KOTLIN, {
+                    exclude group: "org.mockito" // to keep control on the mockito version
+                })
             }
         }
     }
