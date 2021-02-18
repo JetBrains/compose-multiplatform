@@ -1,6 +1,7 @@
 package org.jetbrains.compose.splitpane
 
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.MutableState
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
@@ -23,7 +24,7 @@ internal data class MinimalSizes(
 @Composable
 fun VerticalSplitPane(
     modifier: Modifier = Modifier,
-    splitPaneState: SplitPaneState = rememberSplitPaneState(),
+    splitPaneState: SplitPaneStateImpl = rememberSplitPaneState(),
     content: SplitPaneScope.() -> Unit
 ) {
     with(SplitPaneScopeImpl(isHorizontal = false, splitPaneState).apply(content)) {
@@ -58,7 +59,7 @@ fun VerticalSplitPane(
 @Composable
 fun HorizontalSplitPane(
     modifier: Modifier = Modifier,
-    splitPaneState: SplitPaneState = rememberSplitPaneState(),
+    splitPaneState: SplitPaneStateImpl = rememberSplitPaneState(),
     content: SplitPaneScope.() -> Unit
 ) {
     with(SplitPaneScopeImpl(isHorizontal = true, splitPaneState).apply(content)) {
@@ -84,7 +85,7 @@ fun HorizontalSplitPane(
  * Default splitter if custom splitter not customized
  *
  * @param isHorizontal set if we use [Splitter] in [HorizontalSplitPane] or [VerticalSplitPane]
- * @param splitPaneState provides [SplitPaneState] to be used to control splitter state
+ * @param splitPaneState provides [SplitPaneStateImpl] to be used to control splitter state
  * */
 @Composable
 internal expect fun Splitter(
@@ -97,7 +98,7 @@ internal expect fun Splitter(
  *
  * @param modifier the modifier to apply to this layout
  * @param isHorizontal describes is it horizontal of vertical split pane
- * @param state the state object to be used to control or observe the split pane state
+ * @param splitterPositionState the state object to be used to control or observe the split pane state
  * @param minimalSizesConfiguration data class ([MinimalSizes]) that provides minimal size for split pane parts
  * @param first first part of split pane, left or top according to [isHorizontal]
  * @param second second part of split pane, right or bottom according to [isHorizontal]
@@ -107,7 +108,8 @@ internal expect fun Splitter(
 internal expect fun SplitPane(
     modifier: Modifier = Modifier,
     isHorizontal: Boolean = true,
-    state: SplitterState,
+    splitterPositionState: SplitterPositionState,
+    positionBorders: PositionBorders,
     minimalSizesConfiguration: MinimalSizes  = MinimalSizes(0.dp, 0.dp),
     first: @Composable ()->Unit,
     second: @Composable ()->Unit,

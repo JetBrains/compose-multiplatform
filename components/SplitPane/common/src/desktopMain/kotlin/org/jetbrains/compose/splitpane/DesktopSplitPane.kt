@@ -9,14 +9,12 @@ import kotlin.math.roundToInt
 private fun Constraints.maxByDirection(isHorizontal: Boolean): Int = if (isHorizontal) maxWidth else maxHeight
 private fun Constraints.minByDirection(isHorizontal: Boolean): Int = if (isHorizontal) minWidth else minHeight
 
-private val SplitterState.roundToIntValue
-    get() = position.roundToInt()
-
 @Composable
-actual fun SplitPane(
+internal actual fun SplitPane(
     modifier: Modifier,
     isHorizontal: Boolean,
-    state: SplitterState,
+    splitterPositionState: SplitterPositionState,
+    positionBorders: PositionBorders,
     minimalSizesConfiguration: MinimalSizes,
     first: @Composable ()->Unit,
     second: @Composable ()->Unit,
@@ -31,13 +29,9 @@ actual fun SplitPane(
         modifier,
     ) { measurables, constraints ->
         with(minimalSizesConfiguration) {
-            with(state) {
+            with(splitterPositionState) {
 
                 val constrainedMin = constraints.minByDirection(isHorizontal) + firstPlaceableMinimalSize.value
-
-                if (constrainedMin != minPosition) {
-                    minPosition = constrainedMin
-                }
 
                 val constrainedMax = (constraints.maxByDirection(isHorizontal).toFloat() - secondPlaceableMinimalSize.value).let {
                     if (it <= 0 || it <= constrainedMin) {
@@ -45,30 +39,42 @@ actual fun SplitPane(
                     } else { it }
                 }
 
-                if (constrainedMax != maxPosition) {
-                    maxPosition = if (constraints.maxByDirection(isHorizontal).toFloat() <
-                        (firstPlaceableMinimalSize + secondPlaceableMinimalSize).value) {
-                        minPosition
+                if (positionBorders.minPosition != constrainedMin) {
+                    positionBorders.maxPosition = constrainedMin
+                }
+
+                if (positionBorders.maxPosition != constrainedMax) {
+                    if ((firstPlaceableMinimalSize + secondPlaceableMinimalSize).value < constraints.maxByDirection(isHorizontal)) {
+                        positionBorders.maxPosition = constrainedMax
                     } else {
-                        constrainedMax
+                        positionBorders.maxPosition = positionBorders.minPosition
                     }
                 }
+
+                val constrainedPosition = (constraints.maxByDirection(isHorizontal) - (firstPlaceableMinimalSize + secondPlaceableMinimalSize).value).let {
+                    if (it > 0f) {
+                        (it*positionPercentage).coerceIn(constrainedMin,constrainedMax).roundToInt()
+                    } else {
+                        constrainedMin.roundToInt()
+                    }
+                }
+
 
                 val firstPlaceable = measurables[0].measure(
                     if(isHorizontal) {
                         constraints.copy(
                             minWidth = 0,
-                            maxWidth = roundToIntValue
+                            maxWidth = constrainedPosition
                         )
                     } else {
                         constraints.copy(
                             minHeight = 0,
-                            maxHeight = roundToIntValue
+                            maxHeight = constrainedPosition
                         )
                     }
                 )
 
-                val secondPlaceableSize = (constraints.maxByDirection(isHorizontal) - roundToIntValue).coerceIn(0, constraints.maxByDirection(isHorizontal))
+                val secondPlaceableSize = (constraints.maxByDirection(isHorizontal) - constrainedPosition).coerceIn(0, constraints.maxByDirection(isHorizontal))
 
                 val secondPlaceable = measurables[1].measure(
                     if (isHorizontal) {
@@ -89,11 +95,11 @@ actual fun SplitPane(
                 layout(constraints.maxWidth, constraints.maxHeight) {
                     firstPlaceable.place(0, 0)
                     if (isHorizontal) {
-                        secondPlaceable.place(roundToIntValue, 0)
-                        splitterPlaceable.place(roundToIntValue, 0)
+                        secondPlaceable.place(constrainedPosition, 0)
+                        splitterPlaceable.place(constrainedPosition, 0)
                     } else {
-                        secondPlaceable.place(0,roundToIntValue)
-                        splitterPlaceable.place(0,roundToIntValue)
+                        secondPlaceable.place(0,constrainedPosition)
+                        splitterPlaceable.place(0,constrainedPosition)
                     }
                 }
             }

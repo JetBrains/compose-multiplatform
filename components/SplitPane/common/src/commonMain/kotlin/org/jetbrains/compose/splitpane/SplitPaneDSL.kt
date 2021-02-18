@@ -9,6 +9,7 @@ import androidx.compose.ui.input.pointer.consumeAllChanges
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import org.jetbrains.compose.movable.SingleDirectionMovable
 
 /** Receiver scope which is used by [HorizontalSplitPane] and [VerticalSplitPane] */
 interface SplitPaneScope {
@@ -75,17 +76,17 @@ interface SplitterScope {
 
 internal class SplitterScopeImpl(
     override val isHorizontal: Boolean,
-    private val splitPaneState: SplitPaneState
+    private val movable: SplitPaneState
 ) : SplitterScope {
 
     internal var splitter: ComposableSlot? = null
         private set
 
     override fun Modifier.markAsHandle(): Modifier =
-        this.pointerInput(splitPaneState.splitterState) {
+        this.pointerInput(movable) {
             detectDragGestures { change, _ ->
                 change.consumeAllChanges()
-                splitPaneState.splitterState.dispatchRawMovement(
+                movable.dispatchRawMovement(
                     if (isHorizontal) change.position.x else change.position.y
                 )
             }
@@ -102,7 +103,7 @@ private typealias ComposableSlot = @Composable () -> Unit
 
 internal class SplitPaneScopeImpl(
     private val isHorizontal: Boolean,
-    private val splitPaneState: SplitPaneState
+    private val splitPaneState: SplitPaneStateImpl
 ) : SplitPaneScope {
 
     private var firstPlaceableMinimalSize: Dp = 0.dp
@@ -149,28 +150,26 @@ internal class SplitPaneScopeImpl(
 }
 
 /**
- * creates a [SplitPaneState] and remembers it across composition
+ * creates a [SplitPaneStateImpl] and remembers it across composition
  *
  * Changes to the provided initial values will **not** result in the state being recreated or
  * changed in any way if it has already been created.
  *
- * @param initial the initial value for [SplitterState.position]
- * @param moveEnabled the initial value for [SplitPaneState.moveEnabled]
- * @param interactionState the initial value for [SplitterState.interactionState]
+ * @param initial the initial value for [SplitPaneStateImpl.positionPercentage]
+ * @param moveEnabled the initial value for [SplitPaneStateImpl.moveEnabled]
+ * @param interactionState the initial value for [SplitPaneStateImpl.interactionState]
  * */
 @Composable
 fun rememberSplitPaneState(
     initial: Dp = 0.dp,
     moveEnabled: Boolean = true,
-    interactionState: InteractionState = InteractionState()
+    interactionState: InteractionState = remember { InteractionState() }
 ): SplitPaneState {
     return remember {
-        SplitPaneState(
-            SplitterState(
-                initialPosition = initial.value,
-                interactionState = interactionState
-            ),
-            enabled = moveEnabled
+        SplitPaneStateImpl(
+            moveEnabled = moveEnabled,
+            initialPosition = initial.value,
+            interactionState = interactionState
         )
     }
 }
