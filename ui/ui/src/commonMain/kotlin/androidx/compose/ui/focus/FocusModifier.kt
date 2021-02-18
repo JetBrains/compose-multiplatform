@@ -19,12 +19,12 @@ package androidx.compose.ui.focus
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.composed
+import androidx.compose.ui.focus.FocusState.Inactive
 import androidx.compose.ui.node.ModifiedFocusNode
 import androidx.compose.ui.platform.InspectorInfo
 import androidx.compose.ui.platform.InspectorValueInfo
 import androidx.compose.ui.platform.NoInspectorInfo
 import androidx.compose.ui.platform.debugInspectorInfo
-import androidx.compose.ui.focus.FocusState.Inactive
 
 /**
  * A [Modifier.Element] that wraps makes the modifiers on the right into a Focusable. Use a
@@ -39,10 +39,6 @@ internal class FocusModifier(
 ) : Modifier.Element, InspectorValueInfo(inspectorInfo) {
 
     var focusState: FocusState = initialFocus
-        set(value) {
-            field = value
-            focusNode.wrappedBy?.propagateFocusEvent(value)
-        }
 
     var focusedChild: ModifiedFocusNode? = null
 

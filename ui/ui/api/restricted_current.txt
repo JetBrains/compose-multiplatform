@@ -429,6 +429,9 @@ package androidx.compose.ui.focus {
     method public static boolean isFocused(androidx.compose.ui.focus.FocusState);
   }
 
+  public final class FocusTransactionsKt {
+  }
+
   public final class FocusTraversalKt {
   }
 
