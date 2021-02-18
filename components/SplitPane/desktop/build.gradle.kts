@@ -19,6 +19,6 @@ kotlin {
 
 compose.desktop {
     application {
-        mainClass = "org.jetbrains.compose.splitpanedemo.MainKt"
+        mainClass = "org.jetbrains.compose.splitpane.demo.MainKt"
     }
 }
