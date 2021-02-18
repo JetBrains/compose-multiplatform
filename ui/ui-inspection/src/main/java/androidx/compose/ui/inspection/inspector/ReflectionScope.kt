@@ -76,23 +76,29 @@ import kotlin.reflect.jvm.internal.ReflectionFactoryImpl
  */
 @SuppressLint("BanUncheckedReflection")
 class ReflectionScope {
+
+    companion object {
+        init {
+            allowHiddenApi()
+        }
+    }
+
     private val scopedReflectionFactory = installScopedReflectionFactory()
 
     /**
      * Runs `block` with access to kotlin-reflect.
      */
     fun <T> withReflectiveAccess(block: () -> T): T {
-        return scopedReflectionFactory.withFullFactory(block) ?: block()
+        return scopedReflectionFactory.withMainFactory(block)
     }
 
     private fun installScopedReflectionFactory(): ScopedReflectionFactory {
-        allowHiddenApi()
         val factoryField = Reflection::class.java.getDeclaredField("factory")
         factoryField.isAccessible = true
         val original: ReflectionFactory = factoryField.get(null) as ReflectionFactory
         val modifiersField: Field = Field::class.java.getDeclaredField("accessFlags")
         modifiersField.isAccessible = true
-        // make field non-final 😅
+        // make field non-final 😅 b/179685774 https://youtrack.jetbrains.com/issue/KT-44795
         modifiersField.setInt(factoryField, factoryField.modifiers and Modifier.FINAL.inv())
         val scopedReflectionFactory = ScopedReflectionFactory(original)
         factoryField.set(null, scopedReflectionFactory)
@@ -115,11 +121,11 @@ private fun allowHiddenApi() {
 private class ScopedReflectionFactory(
     private val original: ReflectionFactory,
 ) : ReflectionFactory() {
-    private val fullFactory = ReflectionFactoryImpl()
+    private val mainFactory = ReflectionFactoryImpl()
     private val threadLocalFactory = ThreadLocal<ReflectionFactory>()
 
-    fun <T> withFullFactory(block: () -> T): T {
-        threadLocalFactory.set(fullFactory)
+    fun <T> withMainFactory(block: () -> T): T {
+        threadLocalFactory.set(mainFactory)
         try {
             return block()
         } finally {
@@ -127,67 +133,66 @@ private class ScopedReflectionFactory(
         }
     }
 
-    private fun factory(): ReflectionFactory {
-        return threadLocalFactory.get() ?: original
-    }
+    val factory: ReflectionFactory
+        get() = threadLocalFactory.get() ?: original
 
     override fun createKotlinClass(javaClass: Class<*>?): KClass<*> {
-        return factory().createKotlinClass(javaClass)
+        return factory.createKotlinClass(javaClass)
     }
 
     override fun createKotlinClass(javaClass: Class<*>?, internalName: String?): KClass<*> {
-        return factory().createKotlinClass(javaClass, internalName)
+        return factory.createKotlinClass(javaClass, internalName)
     }
 
     override fun getOrCreateKotlinPackage(
         javaClass: Class<*>?,
         moduleName: String?
     ): KDeclarationContainer {
-        return factory().getOrCreateKotlinPackage(javaClass, moduleName)
+        return factory.getOrCreateKotlinPackage(javaClass, moduleName)
     }
 
     override fun getOrCreateKotlinClass(javaClass: Class<*>?): KClass<*> {
-        return factory().getOrCreateKotlinClass(javaClass)
+        return factory.getOrCreateKotlinClass(javaClass)
     }
 
     override fun getOrCreateKotlinClass(javaClass: Class<*>?, internalName: String?): KClass<*> {
-        return factory().getOrCreateKotlinClass(javaClass, internalName)
+        return factory.getOrCreateKotlinClass(javaClass, internalName)
     }
 
     override fun renderLambdaToString(lambda: Lambda<*>?): String {
-        return factory().renderLambdaToString(lambda)
+        return factory.renderLambdaToString(lambda)
     }
 
     override fun renderLambdaToString(lambda: FunctionBase<*>?): String {
-        return factory().renderLambdaToString(lambda)
+        return factory.renderLambdaToString(lambda)
     }
 
     override fun function(f: FunctionReference?): KFunction<*> {
-        return factory().function(f)
+        return factory.function(f)
     }
 
     override fun property0(p: PropertyReference0?): KProperty0<*> {
-        return factory().property0(p)
+        return factory.property0(p)
     }
 
     override fun mutableProperty0(p: MutablePropertyReference0?): KMutableProperty0<*> {
-        return factory().mutableProperty0(p)
+        return factory.mutableProperty0(p)
     }
 
     override fun property1(p: PropertyReference1?): KProperty1<*, *> {
-        return factory().property1(p)
+        return factory.property1(p)
     }
 
     override fun mutableProperty1(p: MutablePropertyReference1?): KMutableProperty1<*, *> {
-        return factory().mutableProperty1(p)
+        return factory.mutableProperty1(p)
     }
 
     override fun property2(p: PropertyReference2?): KProperty2<*, *, *> {
-        return factory().property2(p)
+        return factory.property2(p)
     }
 
     override fun mutableProperty2(p: MutablePropertyReference2?): KMutableProperty2<*, *, *> {
-        return factory().mutableProperty2(p)
+        return factory.mutableProperty2(p)
     }
 
     override fun typeOf(
@@ -195,7 +200,7 @@ private class ScopedReflectionFactory(
         arguments: MutableList<KTypeProjection>?,
         isMarkedNullable: Boolean
     ): KType {
-        return factory().typeOf(klass, arguments, isMarkedNullable)
+        return factory.typeOf(klass, arguments, isMarkedNullable)
     }
 
     override fun typeParameter(
@@ -204,10 +209,10 @@ private class ScopedReflectionFactory(
         variance: KVariance?,
         isReified: Boolean
     ): KTypeParameter {
-        return factory().typeParameter(container, name, variance, isReified)
+        return factory.typeParameter(container, name, variance, isReified)
     }
 
     override fun setUpperBounds(typeParameter: KTypeParameter?, bounds: MutableList<KType>?) {
-        factory().setUpperBounds(typeParameter, bounds)
+        factory.setUpperBounds(typeParameter, bounds)
     }
 }
