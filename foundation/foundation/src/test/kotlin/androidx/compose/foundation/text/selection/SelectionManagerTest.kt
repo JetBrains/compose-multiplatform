@@ -31,6 +31,7 @@ import com.nhaarman.mockitokotlin2.doReturn
 import com.nhaarman.mockitokotlin2.eq
 import com.nhaarman.mockitokotlin2.isNull
 import com.nhaarman.mockitokotlin2.mock
+import com.nhaarman.mockitokotlin2.never
 import com.nhaarman.mockitokotlin2.spy
 import com.nhaarman.mockitokotlin2.times
 import com.nhaarman.mockitokotlin2.verify
@@ -368,10 +369,44 @@ class SelectionManagerTest {
             ),
             handlesCrossed = true
         )
+        selectionManager.hasFocus = true
 
         selectionManager.showSelectionToolbar()
 
         verify(textToolbar, times(1)).showMenu(
+            eq(Rect.Zero),
+            any(),
+            isNull(),
+            isNull(),
+            isNull()
+        )
+    }
+
+    @Test
+    fun showSelectionToolbar_withoutFocus_notTrigger_textToolbar_showMenu() {
+        val text = "Text Demo"
+        val annotatedString = AnnotatedString(text = text)
+        val startOffset = text.indexOf('m')
+        val endOffset = text.indexOf('x')
+        selectable.textToReturn = annotatedString
+        selectionManager.selection = Selection(
+            start = Selection.AnchorInfo(
+                direction = ResolvedTextDirection.Ltr,
+                offset = startOffset,
+                selectable = selectable
+            ),
+            end = Selection.AnchorInfo(
+                direction = ResolvedTextDirection.Ltr,
+                offset = endOffset,
+                selectable = selectable
+            ),
+            handlesCrossed = true
+        )
+        selectionManager.hasFocus = false
+
+        selectionManager.showSelectionToolbar()
+
+        verify(textToolbar, never()).showMenu(
             eq(Rect.Zero),
             any(),
             isNull(),
