@@ -24,7 +24,7 @@ import androidx.compose.ui.unit.dp
 import org.jetbrains.compose.movable.SingleDirectionMovable
 import java.awt.Cursor
 
-fun Modifier.cursorForResize(
+private fun Modifier.cursorForHorizontalResize(
     isHorizontal: Boolean
 ): Modifier = composed {
     var isHover by remember { mutableStateOf(false) }
@@ -74,7 +74,7 @@ private fun DesctopHandle(
                 )
             }
         }
-        .cursorForResize(isHorizontal)
+        .cursorForHorizontalResize(isHorizontal)
         .run {
             if (isHorizontal) {
                 this.width(8.dp)
