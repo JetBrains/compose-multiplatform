@@ -90,7 +90,11 @@ internal actual fun SplitPane(
                 val secondPlaceableSize =
                     (constraints.maxByDirection(isHorizontal) - secondPlaceablePosition).coerceIn(
                         0,
-                        constraints.maxByDirection(isHorizontal) - secondPlaceablePosition
+                        if (secondPlaceablePosition < constraints.maxByDirection(isHorizontal)) {
+                            constraints.maxByDirection(isHorizontal) - secondPlaceablePosition
+                        } else {
+                            constraints.maxByDirection(isHorizontal)
+                        }
                     )
 
                 val secondPlaceable = measurables[2].measure(
