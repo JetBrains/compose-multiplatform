@@ -16,6 +16,7 @@
 
 package androidx.build.resources
 
+import androidx.build.getSupportRootFolder
 import com.android.build.gradle.LibraryExtension
 import org.gradle.api.Project
 import org.gradle.api.tasks.Copy
@@ -28,7 +29,7 @@ fun Project.configurePublicResourcesStub(extension: LibraryExtension) {
         "generatePublicResourcesStub",
         Copy::class.java
     ) { task ->
-        task.from(File(project.rootDir, "buildSrc/res"))
+        task.from(File(project.getSupportRootFolder(), "buildSrc/res"))
         task.into(targetResFolder)
     }
 
