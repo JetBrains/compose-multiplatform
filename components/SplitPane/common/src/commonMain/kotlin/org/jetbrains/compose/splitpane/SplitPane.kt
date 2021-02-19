@@ -4,7 +4,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
-import org.jetbrains.compose.movable.SingleDirectionMovable
 
 internal data class MinimalSizes(
     val firstPlaceableMinimalSize: Dp,
@@ -88,7 +87,7 @@ fun HorizontalSplitPane(
  */
 internal expect fun defaultSplitter(
     isHorizontal: Boolean,
-    splitPaneState: SingleDirectionMovable
+    splitPaneState: SplitPaneState
 ): Splitter
 
 /**

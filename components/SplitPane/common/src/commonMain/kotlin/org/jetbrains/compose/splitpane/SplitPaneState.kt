@@ -2,19 +2,15 @@ package org.jetbrains.compose.splitpane
 
 import androidx.compose.foundation.Interaction
 import androidx.compose.foundation.InteractionState
-import androidx.compose.foundation.MutatePriority
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.structuralEqualityPolicy
-import org.jetbrains.compose.movable.SingleDirectionMovable
-import org.jetbrains.compose.movable.SingleDirectionMoveScope
-import org.jetbrains.compose.movable.movableState
 
 
 class SplitPaneState(
     initialPositionPercentage: Float,
     moveEnabled: Boolean,
     private val interactionState: InteractionState
-) : SingleDirectionMovable {
+) {
 
     private var _moveEnabled = mutableStateOf(moveEnabled, structuralEqualityPolicy())
 
@@ -36,10 +32,7 @@ class SplitPaneState(
 
     internal var maxPosition: Float = Float.POSITIVE_INFINITY
 
-    private val singleDirectionMovableState = movableState(this::onMove)
-
-    private fun onMove(delta: Float) {
-
+    fun dispatchRawMovement(delta: Float) {
         interactionState.addInteraction(Interaction.Dragged)
         val movableArea = maxPosition - minPosition
         if (movableArea > 0) {
@@ -49,13 +42,4 @@ class SplitPaneState(
         interactionState.removeInteraction(Interaction.Dragged)
     }
 
-    override suspend fun move(
-        movePriority: MutatePriority,
-        block: suspend SingleDirectionMoveScope.() -> Unit
-    ) = singleDirectionMovableState.move(movePriority, block)
-
-    override fun dispatchRawMovement(delta: Float) = singleDirectionMovableState.dispatchRawMovement(delta)
-
-    override val isMoveInProgress: Boolean
-        get() = singleDirectionMovableState.isMoveInProgress
 }

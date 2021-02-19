@@ -9,7 +9,6 @@ import androidx.compose.ui.input.pointer.consumeAllChanges
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
-import org.jetbrains.compose.movable.SingleDirectionMovable
 
 /** Receiver scope which is used by [HorizontalSplitPane] and [VerticalSplitPane] */
 interface SplitPaneScope {
@@ -113,7 +112,7 @@ private typealias ComposableSlot = @Composable () -> Unit
 
 internal class SplitPaneScopeImpl(
     internal val isHorizontal: Boolean,
-    internal val splitPaneState: SingleDirectionMovable
+    internal val splitPaneState: SplitPaneState
 ) : SplitPaneScope {
 
     private var firstPlaceableMinimalSize: Dp = 0.dp

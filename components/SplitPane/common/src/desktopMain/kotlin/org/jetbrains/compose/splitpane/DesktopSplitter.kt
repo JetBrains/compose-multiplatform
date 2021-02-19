@@ -21,7 +21,6 @@ import androidx.compose.ui.input.pointer.consumeAllChanges
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.input.pointer.pointerMoveFilter
 import androidx.compose.ui.unit.dp
-import org.jetbrains.compose.movable.SingleDirectionMovable
 import java.awt.Cursor
 
 private fun Modifier.cursorForHorizontalResize(
@@ -63,7 +62,7 @@ private fun DesktopSplitPaneSeparator(
 @Composable
 private fun DesctopHandle(
     isHorizontal: Boolean,
-    splitPaneState: SingleDirectionMovable
+    splitPaneState: SplitPaneState
 ) = Box(
     Modifier
         .pointerInput(splitPaneState) {
@@ -88,7 +87,7 @@ private fun DesctopHandle(
 
 internal actual fun defaultSplitter(
     isHorizontal: Boolean,
-    splitPaneState: SingleDirectionMovable
+    splitPaneState: SplitPaneState
 ): Splitter = Splitter(
     measuredPart = {
         DesktopSplitPaneSeparator(isHorizontal)
