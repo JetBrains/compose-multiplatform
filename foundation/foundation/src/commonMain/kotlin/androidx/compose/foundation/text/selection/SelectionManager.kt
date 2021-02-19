@@ -18,7 +18,6 @@
 
 package androidx.compose.foundation.text.selection
 
-import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.focusable
 import androidx.compose.runtime.State
 import androidx.compose.runtime.getValue
@@ -95,9 +94,9 @@ internal class SelectionManager(private val selectionRegistrar: SelectionRegistr
     var focusRequester: FocusRequester = FocusRequester()
 
     /**
-     * MutableInteractionSource for the selection container, containing focus interactions.
+     * Return true if the corresponding SelectionContainer is focused.
      */
-    val interactionSource: MutableInteractionSource = MutableInteractionSource()
+    var hasFocus: Boolean by mutableStateOf(false)
 
     /**
      * Modifier for selection container.
@@ -106,11 +105,12 @@ internal class SelectionManager(private val selectionRegistrar: SelectionRegistr
         .onGloballyPositioned { containerLayoutCoordinates = it }
         .focusRequester(focusRequester)
         .onFocusChanged { focusState ->
-            if (!focusState.isFocused) {
+            if (!focusState.isFocused && hasFocus) {
                 onRelease()
             }
+            hasFocus = focusState.isFocused
         }
-        .focusable(interactionSource = interactionSource)
+        .focusable()
         .onKeyEvent {
             if (isCopyKeyEvent(it)) {
                 copy()
@@ -126,8 +126,10 @@ internal class SelectionManager(private val selectionRegistrar: SelectionRegistr
     var containerLayoutCoordinates: LayoutCoordinates? = null
         set(value) {
             field = value
-            updateHandleOffsets()
-            updateSelectionToolbarPosition()
+            if (hasFocus) {
+                updateHandleOffsets()
+                updateSelectionToolbarPosition()
+            }
         }
 
     /**
@@ -179,8 +181,8 @@ internal class SelectionManager(private val selectionRegistrar: SelectionRegistr
                 isStartHandle = true,
                 longPress = touchMode
             )
-            hideSelectionToolbar()
             focusRequester.requestFocus()
+            hideSelectionToolbar()
         }
 
         selectionRegistrar.onSelectionUpdateCallback =
@@ -334,25 +336,27 @@ internal class SelectionManager(private val selectionRegistrar: SelectionRegistr
      * the copy method as a callback when "copy" is clicked.
      */
     internal fun showSelectionToolbar() {
-        selection?.let {
-            textToolbar?.showMenu(
-                getContentRect(),
-                onCopyRequested = {
-                    copy()
-                    onRelease()
-                }
-            )
+        if (hasFocus) {
+            selection?.let {
+                textToolbar?.showMenu(
+                    getContentRect(),
+                    onCopyRequested = {
+                        copy()
+                        onRelease()
+                    }
+                )
+            }
         }
     }
 
     internal fun hideSelectionToolbar() {
-        if (textToolbar?.status == TextToolbarStatus.Shown) {
+        if (hasFocus && textToolbar?.status == TextToolbarStatus.Shown) {
             textToolbar?.hide()
         }
     }
 
     private fun updateSelectionToolbarPosition() {
-        if (textToolbar?.status == TextToolbarStatus.Shown) {
+        if (hasFocus && textToolbar?.status == TextToolbarStatus.Shown) {
             showSelectionToolbar()
         }
     }
