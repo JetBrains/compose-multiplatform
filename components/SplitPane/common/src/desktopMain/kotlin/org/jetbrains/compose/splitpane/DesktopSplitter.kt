@@ -21,9 +21,10 @@ import androidx.compose.ui.input.pointer.consumeAllChanges
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.input.pointer.pointerMoveFilter
 import androidx.compose.ui.unit.dp
+import org.jetbrains.compose.movable.SingleDirectionMovable
 import java.awt.Cursor
 
-internal fun Modifier.cursorForResize(
+fun Modifier.cursorForResize(
     isHorizontal: Boolean
 ): Modifier = composed {
     var isHover by remember { mutableStateOf(false) }
@@ -60,32 +61,40 @@ private fun DesktopSplitPaneSeparator(
 )
 
 @Composable
-internal actual fun Splitter(
+private fun DesctopHandle(
     isHorizontal: Boolean,
-    splitPaneState: SplitPaneState
-) {
-    if (splitPaneState.moveEnabled) {
-        Box(
-            Modifier
-                .pointerInput(splitPaneState) {
-                    detectDragGestures { change, _ ->
-                        change.consumeAllChanges()
-                        splitPaneState.dispatchRawMovement(
-                            if (isHorizontal) change.position.x else change.position.y
-                        )
-                    }
-                }
-                .cursorForResize(isHorizontal)
-                .run {
-                    if (isHorizontal) {
-                        this.width(8.dp)
-                            .fillMaxHeight()
-                    } else {
-                        this.height(8.dp)
-                            .fillMaxWidth()
-                    }
-                }
-        )
+    splitPaneState: SingleDirectionMovable
+) = Box(
+    Modifier
+        .pointerInput(splitPaneState) {
+            detectDragGestures { change, _ ->
+                change.consumeAllChanges()
+                splitPaneState.dispatchRawMovement(
+                    if (isHorizontal) change.position.x else change.position.y
+                )
+            }
+        }
+        .cursorForResize(isHorizontal)
+        .run {
+            if (isHorizontal) {
+                this.width(8.dp)
+                    .fillMaxHeight()
+            } else {
+                this.height(8.dp)
+                    .fillMaxWidth()
+            }
+        }
+)
+
+internal actual fun defaultSplitter(
+    isHorizontal: Boolean,
+    splitPaneState: SingleDirectionMovable
+): Splitter = Splitter(
+    measuredPart = {
+        DesktopSplitPaneSeparator(isHorizontal)
+    },
+    handlePart = {
+        DesctopHandle(isHorizontal, splitPaneState)
     }
-    DesktopSplitPaneSeparator(isHorizontal)
-}
+)
+

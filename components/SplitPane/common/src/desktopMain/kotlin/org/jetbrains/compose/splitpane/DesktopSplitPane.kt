@@ -3,11 +3,13 @@ package org.jetbrains.compose.splitpane
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.Layout
+import androidx.compose.ui.layout.Placeable
 import androidx.compose.ui.unit.Constraints
 import kotlin.math.roundToInt
 
 private fun Constraints.maxByDirection(isHorizontal: Boolean): Int = if (isHorizontal) maxWidth else maxHeight
 private fun Constraints.minByDirection(isHorizontal: Boolean): Int = if (isHorizontal) minWidth else minHeight
+private fun Placeable.valueByDirection(isHorizontal: Boolean): Int = if (isHorizontal) width else height
 
 @Composable
 internal actual fun SplitPane(
@@ -17,13 +19,14 @@ internal actual fun SplitPane(
     minimalSizesConfiguration: MinimalSizes,
     first: @Composable () -> Unit,
     second: @Composable () -> Unit,
-    splitter: @Composable () -> Unit
+    splitter: Splitter
 ) {
     Layout(
         {
             first()
+            splitter.measuredPart()
             second()
-            splitter()
+            splitter.handlePart()
         },
         modifier,
     ) { measurables, constraints ->
@@ -81,12 +84,16 @@ internal actual fun SplitPane(
                     }
                 )
 
-                val secondPlaceableSize = (constraints.maxByDirection(isHorizontal) - constrainedPosition).coerceIn(
-                    0,
-                    constraints.maxByDirection(isHorizontal)
-                )
+                val splitterPlaceable = measurables[1].measure(constraints)
+                val secondPlaceablePosition = constrainedPosition + splitterPlaceable.valueByDirection(isHorizontal)
 
-                val secondPlaceable = measurables[1].measure(
+                val secondPlaceableSize =
+                    (constraints.maxByDirection(isHorizontal) - secondPlaceablePosition).coerceIn(
+                        0,
+                        constraints.maxByDirection(isHorizontal) - secondPlaceablePosition
+                    )
+
+                val secondPlaceable = measurables[2].measure(
                     if (isHorizontal) {
                         constraints.copy(
                             minWidth = 0,
@@ -100,16 +107,27 @@ internal actual fun SplitPane(
                     }
                 )
 
-                val splitterPlaceable = measurables[2].measure(constraints)
+                val handlePlaceable = measurables[3].measure(constraints)
+                val handlePosition = when (splitter.align) {
+                    SplitterHandleAlign.BEFORE -> constrainedPosition - handlePlaceable.valueByDirection(isHorizontal)
+                    SplitterHandleAlign.ABOVE -> constrainedPosition - (handlePlaceable.valueByDirection(isHorizontal) / 2)
+                    SplitterHandleAlign.AFTER -> constrainedPosition + handlePlaceable.valueByDirection(isHorizontal)
+                }
 
                 layout(constraints.maxWidth, constraints.maxHeight) {
                     firstPlaceable.place(0, 0)
                     if (isHorizontal) {
-                        secondPlaceable.place(constrainedPosition, 0)
+                        secondPlaceable.place(secondPlaceablePosition, 0)
                         splitterPlaceable.place(constrainedPosition, 0)
+                        if (moveEnabled) {
+                            handlePlaceable.place(handlePosition, 0)
+                        }
                     } else {
-                        secondPlaceable.place(0, constrainedPosition)
+                        secondPlaceable.place(0, secondPlaceablePosition)
                         splitterPlaceable.place(0, constrainedPosition)
+                        if (moveEnabled) {
+                            handlePlaceable.place(0, handlePosition)
+                        }
                     }
                 }
             }

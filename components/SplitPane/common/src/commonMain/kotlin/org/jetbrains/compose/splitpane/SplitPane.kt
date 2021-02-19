@@ -4,6 +4,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import org.jetbrains.compose.movable.SingleDirectionMovable
 
 internal data class MinimalSizes(
     val firstPlaceableMinimalSize: Dp,
@@ -26,16 +27,16 @@ fun VerticalSplitPane(
     splitPaneState: SplitPaneState = rememberSplitPaneState(),
     content: SplitPaneScope.() -> Unit
 ) {
-    with(SplitPaneScopeImpl().apply(content)) {
+    with(SplitPaneScopeImpl(isHorizontal = false, splitPaneState).apply(content)) {
         if (firstPlaceableContent != null && secondPlaceableContent != null) {
             SplitPane(
-                modifier,
+                modifier = modifier,
                 isHorizontal = false,
-                splitPaneState,
-                minimalSizes,
-                firstPlaceableContent!!,
-                secondPlaceableContent!!,
-                splitter ?: { Splitter(isHorizontal = false, splitPaneState) }
+                splitPaneState = splitPaneState,
+                minimalSizesConfiguration = minimalSizes,
+                first = firstPlaceableContent!!,
+                second = secondPlaceableContent!!,
+                splitter = splitter
             )
         } else {
             firstPlaceableContent?.invoke()
@@ -60,16 +61,16 @@ fun HorizontalSplitPane(
     splitPaneState: SplitPaneState = rememberSplitPaneState(),
     content: SplitPaneScope.() -> Unit
 ) {
-    with(SplitPaneScopeImpl().apply(content)) {
+    with(SplitPaneScopeImpl(isHorizontal = true, splitPaneState).apply(content)) {
         if (firstPlaceableContent != null && secondPlaceableContent != null) {
             SplitPane(
                 modifier = modifier,
                 isHorizontal = true,
-                splitPaneState,
-                minimalSizes,
-                firstPlaceableContent!!,
-                secondPlaceableContent!!,
-                splitter ?: { Splitter(isHorizontal = true, splitPaneState) }
+                splitPaneState = splitPaneState,
+                minimalSizesConfiguration = minimalSizes,
+                first = firstPlaceableContent!!,
+                second = secondPlaceableContent!!,
+                splitter = splitter
             )
         } else {
             firstPlaceableContent?.invoke()
@@ -80,16 +81,15 @@ fun HorizontalSplitPane(
 }
 
 /**
- * Default splitter if custom splitter not customized
+ * Internal implementation of default splitter
  *
- * @param isHorizontal set if we use [Splitter] in [HorizontalSplitPane] or [VerticalSplitPane]
- * @param splitPaneState provides [SplitPaneState] to be used to control splitter state
- * */
-@Composable
-internal expect fun Splitter(
+ * @param isHorizontal describes is it horizontal or vertical split pane
+ * @param splitPaneState the state object to be used to control or observe the split pane state
+ */
+internal expect fun defaultSplitter(
     isHorizontal: Boolean,
-    splitPaneState: SplitPaneState
-)
+    splitPaneState: SingleDirectionMovable
+): Splitter
 
 /**
  * Internal implementation of split pane that used in all public composable functions
@@ -110,5 +110,5 @@ internal expect fun SplitPane(
     minimalSizesConfiguration: MinimalSizes = MinimalSizes(0.dp, 0.dp),
     first: @Composable () -> Unit,
     second: @Composable () -> Unit,
-    splitter: @Composable () -> Unit
+    splitter: Splitter
 )
