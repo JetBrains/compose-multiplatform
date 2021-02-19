@@ -17,12 +17,10 @@ package androidx.compose.desktop
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionContext
+import org.jetbrains.skiko.ClipComponent
 import java.awt.Component
-import java.awt.event.ComponentAdapter
-import java.awt.event.ComponentEvent
 import javax.swing.JFrame
 import javax.swing.JLayeredPane
-import org.jetbrains.skiko.ClipComponent
 
 /**
  * ComposeWindow is a window for building UI using Compose for Desktop.
@@ -31,17 +29,18 @@ import org.jetbrains.skiko.ClipComponent
  */
 class ComposeWindow(val parent: AppFrame) : JFrame() {
     internal val layer = ComposeLayer()
-    private val pane = JLayeredPane()
+    private val pane = object : JLayeredPane() {
+        override fun setBounds(x: Int, y: Int, width: Int, height: Int) {
+            layer.wrapped.setSize(width, height)
+            super.setBounds(x, y, width, height)
+        }
+    }
+
     private val clipMap = mutableMapOf<Component, ClipComponent>()
 
     init {
         pane.setLayout(null)
         pane.add(layer.component, Integer.valueOf(1))
-        addComponentListener(object : ComponentAdapter() {
-            override fun componentResized(e: ComponentEvent) {
-                layer.wrapped.setSize(pane.width, pane.height)
-            }
-        })
         contentPane.add(pane)
     }
 
