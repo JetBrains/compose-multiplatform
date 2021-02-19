@@ -237,7 +237,10 @@ internal fun CoreTextField(
     // notify the EditProcessor of value every recomposition
     state.processor.reset(value, state.inputSession)
 
-    val manager = remember { TextFieldSelectionManager() }
+    val undoManager = remember { UndoManager() }
+    undoManager.snapshotIfNeeded(value)
+
+    val manager = remember { TextFieldSelectionManager(undoManager) }
     manager.offsetMapping = offsetMapping
     manager.visualTransformation = visualTransformation
     manager.onValueChange = onValueChangeWrapper
@@ -450,7 +453,8 @@ internal fun CoreTextField(
             value = value,
             editable = !readOnly,
             singleLine = maxLines == 1,
-            offsetMapping = offsetMapping
+            offsetMapping = offsetMapping,
+            undoManager = undoManager
         )
 
     // Modifiers that should be applied to the outer text field container. Usually those include

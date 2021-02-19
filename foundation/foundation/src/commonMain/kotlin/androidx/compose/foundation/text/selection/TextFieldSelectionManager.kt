@@ -19,6 +19,7 @@ package androidx.compose.foundation.text.selection
 import androidx.compose.foundation.text.InternalFoundationTextApi
 import androidx.compose.foundation.text.TextDragObserver
 import androidx.compose.foundation.text.TextFieldState
+import androidx.compose.foundation.text.UndoManager
 import androidx.compose.foundation.text.detectDragGesturesWithObserver
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -53,7 +54,9 @@ import kotlin.math.min
 /**
  * A bridge class between user interaction to the text field selection.
  */
-internal class TextFieldSelectionManager {
+internal class TextFieldSelectionManager(
+    val undoManager: UndoManager? = null
+) {
 
     /**
      * The current [OffsetMapping] for text field.
@@ -443,6 +446,7 @@ internal class TextFieldSelectionManager {
         )
         onValueChange(newValue)
         setSelectionStatus(false)
+        undoManager?.forceNextSnapshot()
     }
 
     /**
@@ -470,6 +474,7 @@ internal class TextFieldSelectionManager {
         )
         onValueChange(newValue)
         setSelectionStatus(false)
+        undoManager?.forceNextSnapshot()
     }
 
     /*@VisibleForTesting*/
