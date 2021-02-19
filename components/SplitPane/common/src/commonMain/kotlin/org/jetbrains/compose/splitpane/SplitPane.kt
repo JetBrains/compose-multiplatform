@@ -13,13 +13,12 @@ internal data class MinimalSizes(
 /**
  * Pane that place it parts **vertically** from top to bottom and allows to change items **heights**.
  * The [content] block defines DSL which allow you to configure top ([SplitPaneScope.first]),
- * bottom ([SplitPaneScope.second]) and splitter ([SplitPaneScope.splitter]) parts of split pane.
+ * bottom ([SplitPaneScope.second]).
  *
  * @param modifier the modifier to apply to this layout
  * @param splitPaneState the state object to be used to control or observe the split pane state
  * @param content a block which describes the content. Inside this block you can use methods like
- * [SplitPaneScope.first], [SplitPaneScope.second], to describe parts of split pane and [SplitPaneScope.splitter]
- * to describe custom splitter.
+ * [SplitPaneScope.first], [SplitPaneScope.second], to describe parts of split pane.
  */
 @Composable
 fun VerticalSplitPane(
@@ -27,7 +26,7 @@ fun VerticalSplitPane(
     splitPaneState: SplitPaneState = rememberSplitPaneState(),
     content: SplitPaneScope.() -> Unit
 ) {
-    with(SplitPaneScopeImpl(isHorizontal = false, splitPaneState).apply(content)) {
+    with(SplitPaneScopeImpl().apply(content)) {
         if (firstPlaceableContent != null && secondPlaceableContent != null) {
             SplitPane(
                 modifier,
@@ -48,13 +47,12 @@ fun VerticalSplitPane(
 /**
  * Pane that place it parts **horizontally** from left to right and allows to change items **width**.
  * The [content] block defines DSL which allow you to configure left ([SplitPaneScope.first]),
- * right ([SplitPaneScope.second]) and splitter ([SplitPaneScope.splitter]) parts of split pane.
+ * right ([SplitPaneScope.second]) parts of split pane.
  *
  * @param modifier the modifier to apply to this layout
  * @param splitPaneState the state object to be used to control or observe the split pane state
  * @param content a block which describes the content. Inside this block you can use methods like
- * [SplitPaneScope.first], [SplitPaneScope.second], to describe parts of split pane and [SplitPaneScope.splitter]
- * to describe custom splitter.
+ * [SplitPaneScope.first], [SplitPaneScope.second], to describe parts of split pane.
  */
 @Composable
 fun HorizontalSplitPane(
@@ -62,7 +60,7 @@ fun HorizontalSplitPane(
     splitPaneState: SplitPaneState = rememberSplitPaneState(),
     content: SplitPaneScope.() -> Unit
 ) {
-    with(SplitPaneScopeImpl(isHorizontal = true, splitPaneState).apply(content)) {
+    with(SplitPaneScopeImpl().apply(content)) {
         if (firstPlaceableContent != null && secondPlaceableContent != null) {
             SplitPane(
                 modifier = modifier,
@@ -85,7 +83,7 @@ fun HorizontalSplitPane(
  * Default splitter if custom splitter not customized
  *
  * @param isHorizontal set if we use [Splitter] in [HorizontalSplitPane] or [VerticalSplitPane]
- * @param splitPaneState provides [SplitPaneStateImpl] to be used to control splitter state
+ * @param splitPaneState provides [SplitPaneState] to be used to control splitter state
  * */
 @Composable
 internal expect fun Splitter(
