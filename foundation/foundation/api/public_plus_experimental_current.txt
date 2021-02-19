@@ -741,6 +741,9 @@ package androidx.compose.foundation.text.selection {
   public final class TextFieldSelectionManagerKt {
   }
 
+  public final class TextFieldSelectionManager_androidKt {
+  }
+
   @androidx.compose.runtime.Immutable public final class TextSelectionColors {
     method public long getBackgroundColor-0d7_KjU();
     method public long getHandleColor-0d7_KjU();
