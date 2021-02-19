@@ -17,13 +17,11 @@ package androidx.compose.desktop
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
+import org.jetbrains.skiko.ClipComponent
 import java.awt.Color
 import java.awt.Component
-import java.awt.event.ComponentAdapter
-import java.awt.event.ComponentEvent
 import javax.swing.JLayeredPane
 import javax.swing.SwingUtilities.isEventDispatchThread
-import org.jetbrains.skiko.ClipComponent
 
 /**
  * ComposePanel is a panel for building UI using Compose for Desktop.
@@ -37,17 +35,16 @@ class ComposePanel : JLayeredPane() {
         }
         setBackground(Color.white)
         setLayout(null)
-
-        addComponentListener(object : ComponentAdapter() {
-            override fun componentResized(e: ComponentEvent) {
-                layer?.wrapped?.setSize(width, height)
-            }
-        })
     }
 
     internal var layer: ComposeLayer? = null
     private val clipMap = mutableMapOf<Component, ClipComponent>()
     private var content: (@Composable () -> Unit)? = null
+
+    override fun setBounds(x: Int, y: Int, width: Int, height: Int) {
+        layer?.wrapped?.setSize(width, height)
+        super.setBounds(x, y, width, height)
+    }
 
     /**
      * Sets Compose content of the ComposePanel.
@@ -97,6 +94,7 @@ class ComposePanel : JLayeredPane() {
         // content.
         layer = ComposeLayer()
         super.add(layer!!.component, Integer.valueOf(1))
+        layer?.wrapped?.setSize(width, height)
         initContent()
     }
 
