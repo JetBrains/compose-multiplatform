@@ -113,4 +113,12 @@ class DesktopApplicationTest : GradlePluginTestBase() {
             check.logContains("Called lib2#util()")
         }
     }
+
+    @Test
+    fun testJavaLogger() = with(testProject(TestProjects.javaLogger)) {
+        gradle(":runDistributable").build().checks { check ->
+            check.taskOutcome(":runDistributable", TaskOutcome.SUCCESS)
+            check.logContains("Compose Gradle plugin test log warning!")
+        }
+    }
 }
