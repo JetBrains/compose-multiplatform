@@ -43,6 +43,7 @@ interface SplitPaneScope {
     fun splitter(block: SplitterScope.() -> Unit)
 
 }
+
 /** Receiver scope which is used by [SplitterScope] */
 interface HandleScope {
     /** allow mark composable as movable handle */
@@ -130,12 +131,12 @@ internal class SplitPaneScopeImpl(
     internal lateinit var handle: ComposableSlot
     internal var alignment: SplitterHandleAlign = SplitterHandleAlign.ABOVE
     internal val splitter
-    get() =
-    if (this::visiblePart.isInitialized && this::handle.isInitialized) {
-        Splitter(visiblePart, handle, alignment)
-    } else {
-        defaultSplitter(isHorizontal, splitPaneState)
-    }
+        get() =
+            if (this::visiblePart.isInitialized && this::handle.isInitialized) {
+                Splitter(visiblePart, handle, alignment)
+            } else {
+                defaultSplitter(isHorizontal, splitPaneState)
+            }
 
     override fun first(
         minSize: Dp,

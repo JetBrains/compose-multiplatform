@@ -80,12 +80,12 @@ fun main() = Window(
                             )
                         }
                         handle {
-                             {
+                            {
                                 Box(
                                     Modifier
                                         .markAsHandle()
                                         .cursorForResize(true)
-                                        .background(SolidColor(Color.Gray),alpha = 0.50f)
+                                        .background(SolidColor(Color.Gray), alpha = 0.50f)
                                         .width(8.dp)
                                         .fillMaxHeight()
                                 )
