@@ -20,14 +20,17 @@ import org.jetbrains.compose.splitpane.rememberSplitPaneState
 @Composable
 private fun WithoutTouchSlop(content: @Composable () -> Unit) {
     fun ViewConfiguration.withoutTouchSlop() = object : ViewConfiguration {
-        override val longPressTimeoutMillis get() =
-            this@withoutTouchSlop.longPressTimeoutMillis
+        override val longPressTimeoutMillis
+            get() =
+                this@withoutTouchSlop.longPressTimeoutMillis
 
-        override val doubleTapTimeoutMillis get() =
-            this@withoutTouchSlop.doubleTapTimeoutMillis
+        override val doubleTapTimeoutMillis
+            get() =
+                this@withoutTouchSlop.doubleTapTimeoutMillis
 
-        override val doubleTapMinTimeMillis get() =
-            this@withoutTouchSlop.doubleTapMinTimeMillis
+        override val doubleTapMinTimeMillis
+            get() =
+                this@withoutTouchSlop.doubleTapMinTimeMillis
 
         override val touchSlop: Float get() = 0f
     }
@@ -45,8 +48,8 @@ fun main() = Window(
     MaterialTheme {
         DesktopTheme {
             WithoutTouchSlop {
-                val splitterState = rememberSplitPaneState(50.dp)
-                val hSplitterState = rememberSplitPaneState(50.dp)
+                val splitterState = rememberSplitPaneState()
+                val hSplitterState = rememberSplitPaneState()
                 HorizontalSplitPane(
                     splitPaneState = splitterState
                 ) {

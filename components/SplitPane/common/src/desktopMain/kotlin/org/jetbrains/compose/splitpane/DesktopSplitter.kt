@@ -45,10 +45,10 @@ private fun DesktopSplitPaneSeparator(
 ) = Box(
     Modifier
         .run {
-            if (isHorizontal){
+            if (isHorizontal) {
                 this.width(1.dp)
                     .fillMaxHeight()
-            } else{
+            } else {
                 this.height(1.dp)
                     .fillMaxWidth()
             }

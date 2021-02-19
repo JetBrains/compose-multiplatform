@@ -1,7 +1,6 @@
 package org.jetbrains.compose.splitpane
 
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.MutableState
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
@@ -10,6 +9,7 @@ internal data class MinimalSizes(
     val firstPlaceableMinimalSize: Dp,
     val secondPlaceableMinimalSize: Dp
 )
+
 /**
  * Pane that place it parts **vertically** from top to bottom and allows to change items **heights**.
  * The [content] block defines DSL which allow you to configure top ([SplitPaneScope.first]),
@@ -24,7 +24,7 @@ internal data class MinimalSizes(
 @Composable
 fun VerticalSplitPane(
     modifier: Modifier = Modifier,
-    splitPaneState: SplitPaneStateImpl = rememberSplitPaneState(),
+    splitPaneState: SplitPaneState = rememberSplitPaneState(),
     content: SplitPaneScope.() -> Unit
 ) {
     with(SplitPaneScopeImpl(isHorizontal = false, splitPaneState).apply(content)) {
@@ -32,11 +32,11 @@ fun VerticalSplitPane(
             SplitPane(
                 modifier,
                 isHorizontal = false,
-                splitPaneState.splitterState,
+                splitPaneState,
                 minimalSizes,
                 firstPlaceableContent!!,
                 secondPlaceableContent!!,
-                splitter ?: { Splitter(isHorizontal = false, splitPaneState)}
+                splitter ?: { Splitter(isHorizontal = false, splitPaneState) }
             )
         } else {
             firstPlaceableContent?.invoke()
@@ -59,19 +59,19 @@ fun VerticalSplitPane(
 @Composable
 fun HorizontalSplitPane(
     modifier: Modifier = Modifier,
-    splitPaneState: SplitPaneStateImpl = rememberSplitPaneState(),
+    splitPaneState: SplitPaneState = rememberSplitPaneState(),
     content: SplitPaneScope.() -> Unit
 ) {
     with(SplitPaneScopeImpl(isHorizontal = true, splitPaneState).apply(content)) {
         if (firstPlaceableContent != null && secondPlaceableContent != null) {
             SplitPane(
-                modifier,
+                modifier = modifier,
                 isHorizontal = true,
-                splitPaneState.splitterState,
+                splitPaneState,
                 minimalSizes,
                 firstPlaceableContent!!,
                 secondPlaceableContent!!,
-                splitter ?: { Splitter(isHorizontal = true, splitPaneState)}
+                splitter ?: { Splitter(isHorizontal = true, splitPaneState) }
             )
         } else {
             firstPlaceableContent?.invoke()
@@ -98,7 +98,7 @@ internal expect fun Splitter(
  *
  * @param modifier the modifier to apply to this layout
  * @param isHorizontal describes is it horizontal of vertical split pane
- * @param splitterPositionState the state object to be used to control or observe the split pane state
+ * @param splitPaneState the state object to be used to control or observe the split pane state
  * @param minimalSizesConfiguration data class ([MinimalSizes]) that provides minimal size for split pane parts
  * @param first first part of split pane, left or top according to [isHorizontal]
  * @param second second part of split pane, right or bottom according to [isHorizontal]
@@ -108,10 +108,9 @@ internal expect fun Splitter(
 internal expect fun SplitPane(
     modifier: Modifier = Modifier,
     isHorizontal: Boolean = true,
-    splitterPositionState: SplitterPositionState,
-    positionBorders: PositionBorders,
-    minimalSizesConfiguration: MinimalSizes  = MinimalSizes(0.dp, 0.dp),
-    first: @Composable ()->Unit,
-    second: @Composable ()->Unit,
-    splitter: @Composable ()->Unit
+    splitPaneState: SplitPaneState,
+    minimalSizesConfiguration: MinimalSizes = MinimalSizes(0.dp, 0.dp),
+    first: @Composable () -> Unit,
+    second: @Composable () -> Unit,
+    splitter: @Composable () -> Unit
 )

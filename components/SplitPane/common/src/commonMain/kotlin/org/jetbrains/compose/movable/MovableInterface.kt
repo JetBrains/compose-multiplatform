@@ -40,7 +40,7 @@ fun rememberMovableState(
 suspend fun SingleDirectionMovable.stopMovement(
     movePriority: MutatePriority = MutatePriority.Default
 ) {
-    move(movePriority){}
+    move(movePriority) {}
 }
 
 private class DefaultSingleDirectionMovableState(
