@@ -25,6 +25,8 @@ import androidx.compose.ui.inspection.util.toMap
 import androidx.test.filters.LargeTest
 import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.runBlocking
+import layoutinspector.compose.inspection.LayoutInspectorComposeProtocol.ComposableNode
+import layoutinspector.compose.inspection.LayoutInspectorComposeProtocol.GetComposablesResponse
 import layoutinspector.compose.inspection.LayoutInspectorComposeProtocol.GetParametersResponse
 import layoutinspector.compose.inspection.LayoutInspectorComposeProtocol.Parameter
 import org.junit.Rule
@@ -39,8 +41,9 @@ class ParametersTest {
     fun lambda(): Unit = runBlocking {
         val composables = rule.inspectorTester.sendCommand(GetComposablesCommand(rule.rootId))
             .getComposablesResponse
-        // first button's id
-        val buttonId = composables.rootsList[0]!!.nodesList[0]!!.childrenList[0]!!.id
+
+        val buttons = composables.filter("Button")
+        val buttonId = buttons.first().id
         val params = rule.inspectorTester.sendCommand(GetParametersCommand(rule.rootId, buttonId))
             .getParametersResponse
 
@@ -57,8 +60,8 @@ class ParametersTest {
         val composables = rule.inspectorTester.sendCommand(GetComposablesCommand(rule.rootId))
             .getComposablesResponse
 
-        // second's button id
-        val buttonId = composables.rootsList[0]!!.nodesList[0]!!.childrenList[1]!!.id
+        val buttons = composables.filter("Button")
+        val buttonId = buttons.last().id
         val params = rule.inspectorTester.sendCommand(GetParametersCommand(rule.rootId, buttonId))
             .getParametersResponse
 
@@ -82,3 +85,13 @@ private fun GetParametersResponse.find(name: String): Parameter? {
         strings[it.name] == name
     }
 }
+
+private fun GetComposablesResponse.filter(name: String): List<ComposableNode> {
+    val strings = stringsList.toMap()
+    return rootsList.flatMap { it.nodesList }.flatMap { it.flatten() }.filter {
+        strings[it.name] == name
+    }
+}
+
+private fun ComposableNode.flatten(): List<ComposableNode> =
+    listOf(this).plus(this.childrenList.flatMap { it.flatten() })

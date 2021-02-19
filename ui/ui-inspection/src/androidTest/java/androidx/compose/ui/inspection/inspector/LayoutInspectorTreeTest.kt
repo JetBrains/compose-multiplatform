@@ -16,7 +16,6 @@
 
 package androidx.compose.ui.inspection.inspector
 
-import android.view.View
 import android.view.ViewGroup
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Column
@@ -33,10 +32,10 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Call
 import androidx.compose.material.icons.filled.FavoriteBorder
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.tooling.CompositionData
-import androidx.compose.runtime.InternalComposeApi
 import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.InternalComposeApi
 import androidx.compose.runtime.currentComposer
+import androidx.compose.runtime.tooling.CompositionData
 import androidx.compose.runtime.tooling.LocalInspectionTables
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.R
@@ -79,7 +78,7 @@ private const val DEBUG = false
 @OptIn(UiToolingDataApi::class)
 class LayoutInspectorTreeTest {
     private lateinit var density: Density
-    private lateinit var view: View
+    private lateinit var view: ViewGroup
 
     @get:Rule
     val activityScenario = ActivityScenarioRule(TestActivity::class.java)
@@ -88,7 +87,7 @@ class LayoutInspectorTreeTest {
     fun before() {
         activityScenario.scenario.onActivity {
             density = Density(it)
-            view = it.findViewById<ViewGroup>(android.R.id.content)
+            view = it.findViewById(android.R.id.content)
         }
         isDebugInspectorInfoEnabled = true
     }
@@ -116,26 +115,11 @@ class LayoutInspectorTreeTest {
 
         // TODO: Find out if we can set "settings put global debug_view_attributes 1" in tests
         view.setTag(R.id.inspection_slot_table_set, slotTableRecord.store)
-        val viewWidth = with(density) { view.width.toDp() }
-        val viewHeight = with(density) { view.height.toDp() }
         val builder = LayoutInspectorTree()
         val nodes = builder.convert(view)
         dumpNodes(nodes, builder)
 
         validate(nodes, builder, checkParameters = false) {
-            node(
-                name = "Content",
-                fileName = "",
-                left = 0.0.dp, top = 0.0.dp, width = viewWidth, height = viewHeight,
-                children = listOf("Box")
-            )
-            node(
-                name = "Box",
-                isRenderNode = true,
-                fileName = "",
-                left = 0.0.dp, top = 0.0.dp, width = viewWidth, height = viewHeight,
-                children = listOf("Column")
-            )
             node(
                 name = "Column",
                 fileName = "LayoutInspectorTreeTest.kt",
@@ -196,31 +180,16 @@ class LayoutInspectorTreeTest {
 
         // TODO: Find out if we can set "settings put global debug_view_attributes 1" in tests
         view.setTag(R.id.inspection_slot_table_set, slotTableRecord.store)
-        val viewWidth = with(density) { view.width.toDp() }
-        val viewHeight = with(density) { view.height.toDp() }
         val builder = LayoutInspectorTree()
         val nodes = builder.convert(view)
         dumpNodes(nodes, builder)
 
         validate(nodes, builder, checkParameters = false) {
             node(
-                name = "Content",
-                fileName = "",
-                left = 0.0.dp, top = 0.0.dp, width = viewWidth, height = viewHeight,
-                children = listOf("Box")
-            )
-            node(
-                name = "Box",
-                isRenderNode = true,
-                fileName = "",
-                left = 0.0.dp, top = 0.0.dp, width = viewWidth, height = viewHeight,
-                children = listOf("MaterialTheme")
-            )
-            node(
                 name = "MaterialTheme",
                 hasTransformations = true,
                 fileName = "LayoutInspectorTreeTest.kt",
-                left = 65.8.dp, top = 49.7.dp, width = 86.2.dp, height = 21.7.dp,
+                left = 68.0.dp, top = 49.7.dp, width = 88.6.dp, height = 21.7.dp,
                 children = listOf("Text")
             )
             node(
@@ -228,7 +197,7 @@ class LayoutInspectorTreeTest {
                 isRenderNode = true,
                 hasTransformations = true,
                 fileName = "LayoutInspectorTreeTest.kt",
-                left = 65.8.dp, top = 49.7.dp, width = 86.2.dp, height = 21.7.dp,
+                left = 68.0.dp, top = 49.7.dp, width = 88.6.dp, height = 21.7.dp,
             )
         }
     }
@@ -402,7 +371,11 @@ class LayoutInspectorTreeTest {
         checkParameters: Boolean,
         block: TreeValidationReceiver.() -> Unit = {}
     ) {
-        val nodes = result.flatMap { flatten(it) }.iterator()
+        val nodes = result.flatMap { flatten(it) }.listIterator()
+        // Ignore a starting CompositionLocalProvider...
+        if (nodes.next().name != "CompositionLocalProvider") {
+            nodes.previous()
+        }
         val tree = TreeValidationReceiver(nodes, density, checkParameters, builder)
         tree.block()
     }
