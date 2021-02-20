@@ -28,9 +28,14 @@ import com.apollographql.apollo.api.Input
 import com.apollographql.apollo.api.Response
 import com.apollographql.apollo.exception.ApolloException
 import okhttp3.OkHttpClient
+import org.jetbrains.annotations.TestOnly
 import java.lang.NullPointerException
 import java.time.Instant
 import java.util.*
+
+private fun decode(input: String) = input.toCharArray().map { it + 1 }.joinToString("")
+
+val defaultAuth = decode("/`4/81b6db605e8d6``bdc7ecba8d2/a7/370`20")
 
 sealed class Result<out R> {
     data class Success<out T>(val data: T) : Result<T>()

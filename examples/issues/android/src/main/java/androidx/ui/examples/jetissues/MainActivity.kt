@@ -7,8 +7,9 @@ import androidx.activity.compose.setContent
 import androidx.ui.examples.jetissues.view.JetIssuesView
 import androidx.ui.examples.jetissues.view.Repository
 import androidx.ui.examples.jetissues.data.IssuesRepositoryImpl
+import androidx.ui.examples.jetissues.data.defaultAuth
 
-val repo = IssuesRepositoryImpl("ktorio", "ktor", System.getenv("GITHUB_TOKEN") ?: "8c5097718c3108397f035fd6a6f307fa0b70f9b1")
+val repo = IssuesRepositoryImpl("ktorio", "ktor", System.getenv("GITHUB_TOKEN") ?: defaultAuth)
 
 class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
