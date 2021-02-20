@@ -10,6 +10,7 @@
    * Skiko native binaries are now signed on macOS (x64 and arm)
    * Fix [Ambients are not transferred across pop ups](https://github.com/JetBrains/compose-jb/issues/135)
    * Fix [Laggy UI on Linux](https://github.com/JetBrains/compose-jb/issues/23)
+   * Fix [Using AndroidX Compose specific dependencies for Android target](https://github.com/JetBrains/compose-jb/issues/272)
 
 # M2 (Dec 2020)
    * Swing interoperability support (Compose in Swing frame)
