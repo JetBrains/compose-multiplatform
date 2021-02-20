@@ -45,8 +45,10 @@ fun Editor(file: File) = Editor(
 
     fun content(index: Int): Editor.Content {
         val text = textLines.get(index)
-            .trim('\r', '\n') // fix for native crash in skia
-        val state = mutableStateOf(text)
+            .trim('\n') // fix for native crash in Skia.
+        // Workaround for another Skia problem with empty line layout.
+        // TODO: maybe use another symbols, i.e. \u2800 or \u00a0.
+        val state = mutableStateOf(if (text.isEmpty()) " " else text)
         return Editor.Content(state, isCode)
     }
 
