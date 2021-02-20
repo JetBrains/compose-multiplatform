@@ -35,6 +35,7 @@ at https://android.googlesource.com/platform/frameworks/support.
        * [Navigation](tutorials/Navigation)
    * [components](components) - custom components of Compose for Desktop
        * [Video Player](components/VideoPlayer)
+       * [Split Pane](components/SplitPane)
        
 ## Getting latest version of Compose for Desktop ##
 
