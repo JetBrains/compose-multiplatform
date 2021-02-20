@@ -1,0 +1,47 @@
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="64" height="64" viewBox="0 0 64 64">
+  <defs>
+    <linearGradient id="idea-b" x1="73.247%" x2="15.807%" y1="89.542%" y2="56.088%">
+      <stop offset="0%" stop-color="#2773E7"/>
+      <stop offset="100%" stop-color="#FC801D"/>
+    </linearGradient>
+    <polygon id="idea-a" points=".701 37.7 16.201 49.9 30.501 32 8.401 23.399"/>
+    <linearGradient id="idea-c" x1="71.49%" x2="29.235%" y1="91.504%" y2="28.396%">
+      <stop offset="0%" stop-color="#2773E7"/>
+      <stop offset="100%" stop-color="#9039D0"/>
+    </linearGradient>
+    <linearGradient id="idea-d" x1="50%" x2="50%" y1="0%" y2="75.199%">
+      <stop offset="0%" stop-color="#2773E7"/>
+      <stop offset="100%" stop-color="#9039D0"/>
+    </linearGradient>
+    <linearGradient id="idea-e" x1="55.647%" x2="29.173%" y1="30.518%" y2="106.868%">
+      <stop offset="0%" stop-color="#FE2857"/>
+      <stop offset="100%" stop-color="#9039D0"/>
+    </linearGradient>
+    <linearGradient id="idea-g" x1="50%" x2="50%" y1="-11.618%" y2="60.589%">
+      <stop offset="0%" stop-color="#A6A5A5"/>
+      <stop offset="0%" stop-color="#989898" stop-opacity=".568"/>
+      <stop offset="100%"/>
+    </linearGradient>
+    <polygon id="idea-f" points="12 52 52 52 52 12 12 12"/>
+    <path d="M1,23 L30,23 L30,49 L1,49 Z" id="xxx" />
+    <rect x="1" y="23" width="30" height="26" id="yyy" />
+  </defs>
+  <g fill="none" fill-rule="evenodd">
+    <!-- <rect x="1" y="23" width="30" height="26" fill="url(#idea-b)" /> -->
+    <!-- <path d="M1,23 L30,23 L30,49 L1,49 Z" fill="url(#idea-b)" /> -->
+    <!-- <polygon fill="url(#idea-b)" points=".701 37.7 16.201 49.9 30.501 32 8.401 23.399"/> -->
+    <!-- <use fill="url(#idea-b)" xlink:href="#yyy"/> -->
+
+    <use fill="#F97A12" xlink:href="#idea-a"/>
+    <use fill="url(#idea-b)" xlink:href="#idea-a"/>
+
+    <polygon fill="url(#idea-c)" points="35.601 11.2 45.001 32.001 23.401 54.4 38.201 63.999 62.801 54.099 64.001 17.101 44.101 1"/>
+    <polygon fill="url(#idea-d)" points="34 13 44.5 40.099 64.001 17.101 44.101 1"/>
+    <polygon fill="url(#idea-e)" points="9.301 0 0 25.3 14.6 30.2 9.301 48 5.201 62.4 31 54 49.101 25 29.301 2.399"/>
+    <use fill="#000" xlink:href="#idea-f"/>
+    <use fill="url(#idea-g)" xlink:href="#idea-f"/>
+    <polygon fill="#FFF" points="16 47 31 47 31 44.5 16 44.5"/>
+    <path fill="#FFF" d="M26.0898,31.7417 L28.5048,29.0537 C29.4998,30.1487 30.4708,30.7957 31.6908,30.7957 C33.1338,30.7957 34.2958,29.9247 34.2958,27.9087 L34.2958,16.9997 L37.9998,16.9997 L37.9998,28.0837 C37.9998,30.1487 37.3848,31.6917 36.3388,32.7377 C35.2688,33.8067 33.6918,34.3547 31.7998,34.3547 C29.0858,34.3547 27.2838,33.1597 26.0898,31.7417"/>
+    <polygon fill="#FFF" points="24 20.072 24 17 16 17 16 20.072 18.244 20.072 18.244 30.825 16 30.825 16 34 24 34 24 30.825 21.756 30.825 21.756 20.072"/>
+  </g>
+</svg>

@@ -337,6 +337,30 @@ fun asImageAsset(image: BufferedImage): ImageBitmap {
 
 ![Tray icon](tray_icon.png)
 
+## Loading SVG images
+Suppose we have an SVG image placed in the `resources/images` directory in our project.
+
+[SVG](../../artwork/idea-logo.svg)
+
+```kotlin
+import androidx.compose.desktop.Window
+import androidx.compose.foundation.Image
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.svgResource
+
+fun main() {
+    Window {
+        Image(
+            painter = svgResource("images/idea-logo.svg"),
+            contentDescription = "Idea logo",
+            modifier = Modifier.fillMaxSize()
+        )
+    }
+}
+```
+![Loading XML vector images](loading_svg_images.png)
+
 ## Loading XML vector images
 Compose for Desktop supports XML vector images.
 XML vector images come from the world of [Android](https://developer.android.com/guide/topics/graphics/vector-drawable-resources).
