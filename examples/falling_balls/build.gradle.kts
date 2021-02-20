@@ -32,6 +32,7 @@ compose.desktop {
         nativeDistributions {
             targetFormats(TargetFormat.Dmg, TargetFormat.Msi, TargetFormat.Deb)
             packageName = "falling_balls"
+            packageVersion = "1.0.0"
         }
     }
 }
