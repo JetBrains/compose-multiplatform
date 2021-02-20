@@ -1,6 +1,7 @@
 # M3
    * Support [vsync](https://github.com/JetBrains/skiko/pull/44),  [sync composition with rendering frames](https://android-review.googlesource.com/c/platform/frameworks/support/+/1534675)
    * [Slightly reduce artifacts on window resize/start](https://github.com/JetBrains/skiko/pull/55)
+   * Improve [TextField](https://github.com/JetBrains/compose-jb/issues/277)
    * Support [SVG](https://github.com/JetBrains/compose-jb/issues/182)
    * Support [DirectX on Windows by default](https://github.com/JetBrains/skiko/pull/63)
    * Implement [signing and notarization for macOS](https://github.com/JetBrains/compose-jb/tree/master/tutorials/Signing_and_notarization_on_macOS)
