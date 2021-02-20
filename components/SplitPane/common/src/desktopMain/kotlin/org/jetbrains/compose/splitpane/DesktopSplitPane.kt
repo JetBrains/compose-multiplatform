@@ -50,10 +50,7 @@ internal actual fun SplitPane(
 
                 if (maxPosition != constrainedMax) {
                     maxPosition =
-                        if ((firstPlaceableMinimalSize + secondPlaceableMinimalSize).value < constraints.maxByDirection(
-                                isHorizontal
-                            )
-                        ) {
+                        if ((firstPlaceableMinimalSize + secondPlaceableMinimalSize).value < constraints.maxByDirection(isHorizontal)) {
                             constrainedMax
                         } else {
                             minPosition

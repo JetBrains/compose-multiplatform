@@ -74,7 +74,7 @@ interface SplitterScope {
      */
     fun handle(
         alignment: SplitterHandleAlign = SplitterHandleAlign.ABOVE,
-        content: @Composable HandleScope.()-> Unit
+        content: @Composable HandleScope.() -> Unit
     )
 }
 
