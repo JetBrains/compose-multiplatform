@@ -28,31 +28,6 @@ import org.jetbrains.compose.splitpane.VerticalSplitPane
 import org.jetbrains.compose.splitpane.rememberSplitPaneState
 import java.awt.Cursor
 
-@Composable
-private fun WithoutTouchSlop(content: @Composable () -> Unit) {
-    fun ViewConfiguration.withoutTouchSlop() = object : ViewConfiguration {
-        override val longPressTimeoutMillis
-            get() =
-                this@withoutTouchSlop.longPressTimeoutMillis
-
-        override val doubleTapTimeoutMillis
-            get() =
-                this@withoutTouchSlop.doubleTapTimeoutMillis
-
-        override val doubleTapMinTimeMillis
-            get() =
-                this@withoutTouchSlop.doubleTapMinTimeMillis
-
-        override val touchSlop: Float get() = 0f
-    }
-
-    CompositionLocalProvider(
-        LocalViewConfiguration provides LocalViewConfiguration.current.withoutTouchSlop()
-    ) {
-        content()
-    }
-}
-
 private fun Modifier.cursorForHorizontalResize(
 ): Modifier = composed {
     var isHover by remember { mutableStateOf(false) }
@@ -74,45 +49,43 @@ fun main() = Window(
 ) {
     MaterialTheme {
         DesktopTheme {
-            WithoutTouchSlop {
-                val splitterState = rememberSplitPaneState()
-                val hSplitterState = rememberSplitPaneState()
-                HorizontalSplitPane(
-                    splitPaneState = splitterState
-                ) {
-                    first(20.dp) {
-                        Box(Modifier.background(Color.Red).fillMaxSize())
-                    }
-                    second(50.dp) {
-                        VerticalSplitPane(splitPaneState = hSplitterState) {
-                            first(50.dp) {
-                                Box(Modifier.background(Color.Blue).fillMaxSize())
-                            }
-                            second(20.dp) {
-                                Box(Modifier.background(Color.Green).fillMaxSize())
-                            }
+            val splitterState = rememberSplitPaneState()
+            val hSplitterState = rememberSplitPaneState()
+            HorizontalSplitPane(
+                splitPaneState = splitterState
+            ) {
+                first(20.dp) {
+                    Box(Modifier.background(Color.Red).fillMaxSize())
+                }
+                second(50.dp) {
+                    VerticalSplitPane(splitPaneState = hSplitterState) {
+                        first(50.dp) {
+                            Box(Modifier.background(Color.Blue).fillMaxSize())
+                        }
+                        second(20.dp) {
+                            Box(Modifier.background(Color.Green).fillMaxSize())
                         }
                     }
-                    splitter {
-                        visiblePart {
+                }
+                splitter {
+                    visiblePart {
+                        Box(
+                            Modifier
+                                .width(1.dp)
+                                .fillMaxHeight()
+                                .background(MaterialTheme.colors.background)
+                        )
+                    }
+                    handle {
+                        {
                             Box(
                                 Modifier
-                                    .width(1.dp)
+                                    .markAsHandle()
+                                    .cursorForHorizontalResize()
+                                    .background(SolidColor(Color.Gray), alpha = 0.50f)
+                                    .width(8.dp)
                                     .fillMaxHeight()
-                                    .background(MaterialTheme.colors.background)
                             )
-                        }
-                        handle {
-                            {
-                                Box(
-                                    Modifier
-                                        .markAsHandle()
-                                        .cursorForHorizontalResize()
-                                        .background(SolidColor(Color.Gray), alpha = 0.50f)
-                                        .width(8.dp)
-                                        .fillMaxHeight()
-                                )
-                            }
                         }
                     }
                 }
