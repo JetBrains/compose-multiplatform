@@ -21,7 +21,7 @@ open class NativeDistributions @Inject constructor(
         set(layout.buildDirectory.dir("compose/binaries"))
     }
 
-    var modules = arrayListOf("java.desktop")
+    var modules = arrayListOf("java.desktop", "java.logging")
     fun modules(vararg modules: String) {
         this.modules.addAll(modules.toList())
     }

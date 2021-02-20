@@ -5,4 +5,5 @@ object TestProjects {
     const val mpp = "application/mpp"
     const val jvmKotlinDsl = "application/jvmKotlinDsl"
     const val moduleClashCli = "application/moduleClashCli"
+    const val javaLogger = "application/javaLogger"
 }
