@@ -12,12 +12,12 @@ import org.gradle.api.tasks.LocalState
 import org.gradle.process.ExecOperations
 import org.gradle.process.ExecResult
 import org.jetbrains.compose.desktop.application.internal.ComposeProperties
+import org.jetbrains.compose.desktop.application.internal.alsoOutputTo
 import org.jetbrains.compose.desktop.application.internal.ioFile
 import org.jetbrains.compose.desktop.application.internal.notNullProperty
 import java.io.File
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
-import java.util.function.Consumer
 import javax.inject.Inject
 
 abstract class AbstractComposeDesktopTask : DefaultTask() {
@@ -55,11 +55,12 @@ abstract class AbstractComposeDesktopTask : DefaultTask() {
         logsDir.mkdirs()
 
         val toolName = tool.nameWithoutExtension
+        val logToConsole = verbose.get()
         val outFile = logsDir.resolve("${toolName}-${currentTimeStamp()}-out.txt")
-        val errFile = logsDir.resolve("${toolName}-${currentTimeStamp()}-out.txt")
+        val errFile = logsDir.resolve("${toolName}-${currentTimeStamp()}-err.txt")
 
-        val result = outFile.outputStream().buffered().use { outStream ->
-            errFile.outputStream().buffered().use { errStream ->
+        val result = outFile.outputStream().buffered().use { outFileStream ->
+            errFile.outputStream().buffered().use { errFileStream ->
                 execOperations.exec { spec ->
                     spec.executable = tool.absolutePath
                     spec.args(*args.toTypedArray())
@@ -68,9 +69,12 @@ abstract class AbstractComposeDesktopTask : DefaultTask() {
                     // check exit value later
                     spec.isIgnoreExitValue = true
 
-                    if (!verbose.get()) {
-                        spec.standardOutput = outStream
-                        spec.errorOutput = errStream
+                    if (logToConsole) {
+                        spec.standardOutput = spec.standardOutput.alsoOutputTo(outFileStream)
+                        spec.errorOutput = spec.errorOutput.alsoOutputTo(errFileStream)
+                    } else {
+                        spec.standardOutput = outFileStream
+                        spec.errorOutput = errFileStream
                     }
                 }
             }
