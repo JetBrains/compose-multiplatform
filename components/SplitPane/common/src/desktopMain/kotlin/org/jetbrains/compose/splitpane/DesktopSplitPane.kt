@@ -11,6 +11,7 @@ private fun Constraints.maxByDirection(isHorizontal: Boolean): Int = if (isHoriz
 private fun Constraints.minByDirection(isHorizontal: Boolean): Int = if (isHorizontal) minWidth else minHeight
 private fun Placeable.valueByDirection(isHorizontal: Boolean): Int = if (isHorizontal) width else height
 
+@OptIn(ExperimentalSplitPaneApi::class)
 @Composable
 internal actual fun SplitPane(
     modifier: Modifier,
@@ -50,10 +51,7 @@ internal actual fun SplitPane(
 
                 if (maxPosition != constrainedMax) {
                     maxPosition =
-                        if ((firstPlaceableMinimalSize + secondPlaceableMinimalSize).value < constraints.maxByDirection(
-                                isHorizontal
-                            )
-                        ) {
+                        if ((firstPlaceableMinimalSize + secondPlaceableMinimalSize).value < constraints.maxByDirection(isHorizontal)) {
                             constrainedMax
                         } else {
                             minPosition
@@ -85,7 +83,8 @@ internal actual fun SplitPane(
                 )
 
                 val splitterPlaceable = measurables[1].measure(constraints)
-                val secondPlaceablePosition = constrainedPosition + splitterPlaceable.valueByDirection(isHorizontal)
+                val splitterSize = splitterPlaceable.valueByDirection(isHorizontal)
+                val secondPlaceablePosition = constrainedPosition + splitterSize
 
                 val secondPlaceableSize =
                     (constraints.maxByDirection(isHorizontal) - secondPlaceablePosition).coerceIn(
@@ -112,10 +111,12 @@ internal actual fun SplitPane(
                 )
 
                 val handlePlaceable = measurables[3].measure(constraints)
+                val handleSize = handlePlaceable.valueByDirection(isHorizontal)
+                // TODO support RTL
                 val handlePosition = when (splitter.align) {
-                    SplitterHandleAlign.BEFORE -> constrainedPosition - handlePlaceable.valueByDirection(isHorizontal)
-                    SplitterHandleAlign.ABOVE -> constrainedPosition - (handlePlaceable.valueByDirection(isHorizontal) / 2)
-                    SplitterHandleAlign.AFTER -> constrainedPosition + handlePlaceable.valueByDirection(isHorizontal)
+                    SplitterHandleAlign.BEFORE -> constrainedPosition - handleSize
+                    SplitterHandleAlign.ABOVE -> constrainedPosition + (splitterSize - handleSize) / 2
+                    SplitterHandleAlign.AFTER -> constrainedPosition + splitterSize + handleSize
                 }
 
                 layout(constraints.maxWidth, constraints.maxHeight) {

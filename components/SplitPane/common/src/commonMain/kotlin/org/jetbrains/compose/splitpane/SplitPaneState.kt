@@ -2,31 +2,22 @@ package org.jetbrains.compose.splitpane
 
 import androidx.compose.foundation.Interaction
 import androidx.compose.foundation.InteractionState
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.structuralEqualityPolicy
+import androidx.compose.runtime.setValue
 
-
+@ExperimentalSplitPaneApi
 class SplitPaneState(
     initialPositionPercentage: Float,
     moveEnabled: Boolean,
     private val interactionState: InteractionState
 ) {
 
-    private var _moveEnabled = mutableStateOf(moveEnabled, structuralEqualityPolicy())
+    var moveEnabled by mutableStateOf(moveEnabled)
+        internal set
 
-    var moveEnabled: Boolean
-        get() = _moveEnabled.value
-        set(newValue) {
-            _moveEnabled.value = newValue
-        }
-
-    private val _positionPercentage = mutableStateOf(initialPositionPercentage, structuralEqualityPolicy())
-
-    var positionPercentage: Float
-        get() = _positionPercentage.value
-        internal set(newPosition) {
-            _positionPercentage.value = newPosition
-        }
+    var positionPercentage by mutableStateOf(initialPositionPercentage)
+        internal set
 
     internal var minPosition: Float = 0f
 

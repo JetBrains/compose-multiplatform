@@ -11,6 +11,7 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 
 /** Receiver scope which is used by [HorizontalSplitPane] and [VerticalSplitPane] */
+@ExperimentalSplitPaneApi
 interface SplitPaneScope {
 
     /**
@@ -44,12 +45,14 @@ interface SplitPaneScope {
 }
 
 /** Receiver scope which is used by [SplitterScope] */
+@ExperimentalSplitPaneApi
 interface HandleScope {
     /** allow mark composable as movable handle */
     fun Modifier.markAsHandle(): Modifier
 }
 
 /** Receiver scope which is used by [SplitPaneScope] */
+@ExperimentalSplitPaneApi
 interface SplitterScope {
     /**
      * Set up visible part of splitter. This part will be measured and placed between split pane
@@ -65,7 +68,7 @@ interface SplitterScope {
      *
      * @param alignment alignment of handle according to [visiblePart] could be:
      * * [SplitterHandleAlign.BEFORE] if you place handle before [visiblePart],
-     * * [SplitterHandleAlign.ABOVE] if you place handle above [visiblePart] (will be centred)
+     * * [SplitterHandleAlign.ABOVE] if you place handle above [visiblePart] (will be centered)
      * * and [SplitterHandleAlign.AFTER] if you place handle after [visiblePart].
      *
      * @param content composable item content provider. Uses [HandleScope] to allow mark any provided composable part
@@ -74,10 +77,11 @@ interface SplitterScope {
      */
     fun handle(
         alignment: SplitterHandleAlign = SplitterHandleAlign.ABOVE,
-        content: HandleScope.() -> @Composable () -> Unit
+        content: @Composable HandleScope.() -> Unit
     )
 }
 
+@OptIn(ExperimentalSplitPaneApi::class)
 internal class HandleScopeImpl(
     private val containerScope: SplitPaneScopeImpl
 ) : HandleScope {
@@ -91,6 +95,7 @@ internal class HandleScopeImpl(
     }
 }
 
+@OptIn(ExperimentalSplitPaneApi::class)
 internal class SplitterScopeImpl(
     private val containerScope: SplitPaneScopeImpl
 ) : SplitterScope {
@@ -101,15 +106,16 @@ internal class SplitterScopeImpl(
 
     override fun handle(
         alignment: SplitterHandleAlign,
-        content: HandleScope.() -> @Composable () -> Unit
+        content: @Composable HandleScope.() -> Unit
     ) {
-        containerScope.handle = HandleScopeImpl(containerScope).content()
+        containerScope.handle = { HandleScopeImpl(containerScope).content() }
         containerScope.alignment = alignment
     }
 }
 
 private typealias ComposableSlot = @Composable () -> Unit
 
+@OptIn(ExperimentalSplitPaneApi::class)
 internal class SplitPaneScopeImpl(
     internal val isHorizontal: Boolean,
     internal val splitPaneState: SplitPaneState
@@ -168,6 +174,7 @@ internal class SplitPaneScopeImpl(
  * @param moveEnabled the initial value for [SplitPaneState.moveEnabled]
  * @param interactionState the initial value for [SplitPaneState.interactionState]
  * */
+@ExperimentalSplitPaneApi
 @Composable
 fun rememberSplitPaneState(
     initialPositionPercentage: Float = 0f,

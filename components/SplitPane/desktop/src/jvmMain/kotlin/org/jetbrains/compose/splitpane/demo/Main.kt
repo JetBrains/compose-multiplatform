@@ -9,8 +9,6 @@ import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.width
 import androidx.compose.material.MaterialTheme
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -20,9 +18,8 @@ import androidx.compose.ui.composed
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.input.pointer.pointerMoveFilter
-import androidx.compose.ui.platform.LocalViewConfiguration
-import androidx.compose.ui.platform.ViewConfiguration
 import androidx.compose.ui.unit.dp
+import org.jetbrains.compose.splitpane.ExperimentalSplitPaneApi
 import org.jetbrains.compose.splitpane.HorizontalSplitPane
 import org.jetbrains.compose.splitpane.VerticalSplitPane
 import org.jetbrains.compose.splitpane.rememberSplitPaneState
@@ -44,6 +41,7 @@ private fun Modifier.cursorForHorizontalResize(
     )
 }
 
+@OptIn(ExperimentalSplitPaneApi::class)
 fun main() = Window(
     "SplitPane demo"
 ) {
@@ -77,16 +75,14 @@ fun main() = Window(
                         )
                     }
                     handle {
-                        {
-                            Box(
-                                Modifier
-                                    .markAsHandle()
-                                    .cursorForHorizontalResize()
-                                    .background(SolidColor(Color.Gray), alpha = 0.50f)
-                                    .width(8.dp)
-                                    .fillMaxHeight()
-                            )
-                        }
+                        Box(
+                            Modifier
+                                .markAsHandle()
+                                .cursorForHorizontalResize()
+                                .background(SolidColor(Color.Gray), alpha = 0.50f)
+                                .width(9.dp)
+                                .fillMaxHeight()
+                        )
                     }
                 }
             }

@@ -1,4 +1,5 @@
 import org.jetbrains.compose.compose
+import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
     kotlin("multiplatform")
@@ -18,4 +19,9 @@ kotlin {
         }
         named("desktopMain") {}
     }
+}
+
+// TODO it seems that argument isn't applied to the common sourceSet. Figure out why
+tasks.withType<KotlinCompile>().configureEach {
+    kotlinOptions.freeCompilerArgs += "-Xopt-in=kotlin.RequiresOptIn"
 }
