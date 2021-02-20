@@ -20,6 +20,7 @@ internal data class MinimalSizes(
  * @param content a block which describes the content. Inside this block you can use methods like
  * [SplitPaneScope.first], [SplitPaneScope.second], to describe parts of split pane.
  */
+@ExperimentalSplitPaneApi
 @Composable
 fun VerticalSplitPane(
     modifier: Modifier = Modifier,
@@ -54,6 +55,7 @@ fun VerticalSplitPane(
  * @param content a block which describes the content. Inside this block you can use methods like
  * [SplitPaneScope.first], [SplitPaneScope.second], to describe parts of split pane.
  */
+@ExperimentalSplitPaneApi
 @Composable
 fun HorizontalSplitPane(
     modifier: Modifier = Modifier,
@@ -85,6 +87,7 @@ fun HorizontalSplitPane(
  * @param isHorizontal describes is it horizontal or vertical split pane
  * @param splitPaneState the state object to be used to control or observe the split pane state
  */
+@OptIn(ExperimentalSplitPaneApi::class)
 internal expect fun defaultSplitter(
     isHorizontal: Boolean,
     splitPaneState: SplitPaneState

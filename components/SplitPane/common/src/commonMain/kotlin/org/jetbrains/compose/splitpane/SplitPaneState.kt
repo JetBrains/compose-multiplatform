@@ -5,6 +5,7 @@ import androidx.compose.foundation.InteractionState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.structuralEqualityPolicy
 
+@ExperimentalSplitPaneApi
 class SplitPaneState(
     initialPositionPercentage: Float,
     moveEnabled: Boolean,

@@ -19,6 +19,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.input.pointer.pointerMoveFilter
 import androidx.compose.ui.unit.dp
+import org.jetbrains.compose.splitpane.ExperimentalSplitPaneApi
 import org.jetbrains.compose.splitpane.HorizontalSplitPane
 import org.jetbrains.compose.splitpane.VerticalSplitPane
 import org.jetbrains.compose.splitpane.rememberSplitPaneState
@@ -40,6 +41,7 @@ private fun Modifier.cursorForHorizontalResize(
     )
 }
 
+@OptIn(ExperimentalSplitPaneApi::class)
 fun main() = Window(
     "SplitPane demo"
 ) {

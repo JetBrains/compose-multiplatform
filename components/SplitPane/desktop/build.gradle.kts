@@ -1,4 +1,5 @@
 import org.jetbrains.compose.compose
+import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
     kotlin("multiplatform")
@@ -21,4 +22,8 @@ compose.desktop {
     application {
         mainClass = "org.jetbrains.compose.splitpane.demo.MainKt"
     }
+}
+
+tasks.withType<KotlinCompile>().configureEach {
+    kotlinOptions.freeCompilerArgs += "-Xopt-in=kotlin.RequiresOptIn"
 }

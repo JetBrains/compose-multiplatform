@@ -59,8 +59,9 @@ private fun DesktopSplitPaneSeparator(
         .background(color)
 )
 
+@OptIn(ExperimentalSplitPaneApi::class)
 @Composable
-private fun DesctopHandle(
+private fun DesktopHandle(
     isHorizontal: Boolean,
     splitPaneState: SplitPaneState
 ) = Box(
@@ -85,6 +86,7 @@ private fun DesctopHandle(
         }
 )
 
+@OptIn(ExperimentalSplitPaneApi::class)
 internal actual fun defaultSplitter(
     isHorizontal: Boolean,
     splitPaneState: SplitPaneState
@@ -93,7 +95,7 @@ internal actual fun defaultSplitter(
         DesktopSplitPaneSeparator(isHorizontal)
     },
     handlePart = {
-        DesctopHandle(isHorizontal, splitPaneState)
+        DesktopHandle(isHorizontal, splitPaneState)
     }
 )
 

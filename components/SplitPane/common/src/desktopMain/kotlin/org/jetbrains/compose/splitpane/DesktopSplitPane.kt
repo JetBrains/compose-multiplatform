@@ -11,6 +11,7 @@ private fun Constraints.maxByDirection(isHorizontal: Boolean): Int = if (isHoriz
 private fun Constraints.minByDirection(isHorizontal: Boolean): Int = if (isHorizontal) minWidth else minHeight
 private fun Placeable.valueByDirection(isHorizontal: Boolean): Int = if (isHorizontal) width else height
 
+@OptIn(ExperimentalSplitPaneApi::class)
 @Composable
 internal actual fun SplitPane(
     modifier: Modifier,
