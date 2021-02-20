@@ -101,3 +101,7 @@ fun Test.configureTest(gradleVersion: String) {
 tasks.named("check") {
     dependsOn(testMinGradleVersion)
 }
+
+task("printAllAndroidxReplacements") {
+    doLast { printAllAndroidxReplacements() }
+}
