@@ -65,12 +65,12 @@ class DesktopApplicationTest : GradlePluginTestBase() {
         val packageFile = packageDirFiles.single()
 
         if (currentOS == OS.Linux) {
-            val expectedName = "test-package_1.0-1_amd64.$ext"
+            val expectedName = "test-package_1.0.0-1_amd64.$ext"
             check(packageFile.name.equals(expectedName, ignoreCase = true)) {
                 "Expected '$expectedName' package in $packageDir, got '${packageFile.name}'"
             }
         } else {
-            Assert.assertEquals(packageFile.name, "TestPackage-1.0.$ext", "Unexpected package name")
+            Assert.assertEquals(packageFile.name, "TestPackage-1.0.0.$ext", "Unexpected package name")
         }
         assertEquals(TaskOutcome.SUCCESS, result.task(":package${ext.capitalize()}")?.outcome)
         assertEquals(TaskOutcome.SUCCESS, result.task(":package")?.outcome)
@@ -90,7 +90,7 @@ class DesktopApplicationTest : GradlePluginTestBase() {
         gradle(":packageUberJarForCurrentOS").build().let { result ->
             assertEquals(TaskOutcome.SUCCESS, result.task(":packageUberJarForCurrentOS")?.outcome)
 
-            val resultJarFile = file("build/compose/jars/TestPackage-${currentTarget.id}-1.0.jar")
+            val resultJarFile = file("build/compose/jars/TestPackage-${currentTarget.id}-1.0.0.jar")
             resultJarFile.checkExists()
 
             JarFile(resultJarFile).use { jar ->

@@ -10,6 +10,7 @@ import org.gradle.api.tasks.*
 import org.gradle.jvm.tasks.Jar
 import org.jetbrains.compose.desktop.application.dsl.Application
 import org.jetbrains.compose.desktop.application.dsl.TargetFormat
+import org.jetbrains.compose.desktop.application.internal.validation.validatePackageVersions
 import org.jetbrains.compose.desktop.application.tasks.*
 import org.jetbrains.kotlin.gradle.dsl.KotlinMultiplatformExtension
 import org.jetbrains.kotlin.gradle.plugin.KotlinPlatformType
@@ -28,6 +29,7 @@ fun configureApplicationImpl(project: Project, app: Application) {
             app.from(mainSourceSet)
         }
     }
+    project.validatePackageVersions(app)
     project.configurePackagingTasks(listOf(app))
     project.configureWix()
 }
@@ -141,7 +143,7 @@ internal fun AbstractJPackageTask.configurePackagingTask(
         packageDescription.set(provider { executables.description })
         packageCopyright.set(provider { executables.copyright })
         packageVendor.set(provider { executables.vendor })
-        packageVersion.set(app._packageVersionInternal(project))
+        packageVersion.set(packageVersionFor(project, app, targetFormat))
     }
 
     destinationDir.set(app.nativeDistributions.outputBaseDir.map { it.dir("${app.name}/${targetFormat.outputDirName}") })
@@ -265,7 +267,7 @@ private fun Jar.configurePackageUberJarForCurrentOS(app: Application) {
         duplicatesStrategy = DuplicatesStrategy.EXCLUDE
         archiveAppendix.set(currentTarget.id)
         archiveBaseName.set(app._packageNameProvider(project))
-        archiveVersion.set(app._packageVersionInternal(project))
+        archiveVersion.set(packageVersionFor(project, app, TargetFormat.AppImage))
         destinationDirectory.set(project.layout.buildDirectory.dir("compose/jars"))
 
         doLast {
@@ -293,12 +295,6 @@ private inline fun <reified T : Task> TaskContainer.composeTask(
 
 internal fun Application._packageNameProvider(project: Project): Provider<String> =
     project.provider { nativeDistributions.packageName ?: project.name }
-
-internal fun Application._packageVersionInternal(project: Project): Provider<String?> =
-    project.provider {
-        nativeDistributions.version
-            ?: project.version.toString().takeIf { it != "unspecified" }
-    }
 
 @OptIn(ExperimentalStdlibApi::class)
 private fun taskName(action: String, app: Application, suffix: String? = null): String =

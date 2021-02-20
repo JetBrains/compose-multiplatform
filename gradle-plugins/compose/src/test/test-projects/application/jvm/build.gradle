@@ -25,7 +25,7 @@ compose.desktop {
         nativeDistributions {
             targetFormats(TargetFormat.Dmg, TargetFormat.Msi, TargetFormat.Deb)
 
-            version = "1.0"
+            packageVersion = "1.0.0"
             packageName = "TestPackage"
             description = "Test description"
             copyright = "Test Copyright Holder"

@@ -81,6 +81,75 @@ to run such applications will be faced with an error like this:
 See [our tutorial](/tutorials/Signing_and_notarization_on_macOS/README.md) 
 on how to sign and notarize your application. 
 
+## Specifying package version
+
+You must specify a package version for native distribution packages.
+
+You can use the following DSL properties (in order of descending priority):
+* `nativeDistributions.<os>.<packageFormat>PackageVersion` specifies a version for a single package format;
+* `nativeDistributions.<os>.packageVersion` specifies a version for a single target OS;
+* `nativeDistributions.packageVersion` specifies a version for all packages;
+
+``` kotlin
+compose.desktop {
+    application {
+        nativeDistributions {
+            // a version for all distributables
+            packageVersion = "..." 
+            
+            linux {
+              // a version for all Linux distributables
+              packageVersion = "..." 
+              // a version only for the deb package
+              debVersion = "..." 
+              // a version only for the rpm package
+              rpmVersion = "..." 
+            }
+            macOS {
+              // a version for all macOS distributables
+              packageVersion = "..."
+              // a version only for the dmg package
+              dmgVersion = "..." 
+              // a version only for the pkg package
+              pkgVersion = "..." 
+            }
+            windows {
+              // a version for all Windows distributables
+              packageVersion = "..."  
+              // a version only for the msi package
+              msiVersion = "..."
+              // a version only for the exe package
+              exeVersion = "..." 
+            }
+        }
+    }
+}
+```
+
+Versions must follow the rules:
+  * For `dmg` and `pkg`: 
+    * The format is `MAJOR[.MINOR][.PATCH]`, where:
+      * `MAJOR` is an integer > 0;
+      * `MINOR` is an optional non-negative integer;
+      * `PATCH` is an optional non-negative integer;
+  * For `msi` and `exe`: 
+    * The format is `MAJOR.MINOR.BUILD`, where:
+      * `MAJOR` is a non-negative integer with a maximum value of 255;
+      * `MINOR` is a non-negative integer with a maximum value of 255;
+      * `BUILD` is a non-negative integer with a maximum value of 65535;
+  * For `deb`:
+    * The format is `[EPOCH:]UPSTREAM_VERSION[-DEBIAN_REVISION]`, where:
+      * `EPOCH` is an optional non-negative integer;
+      * `UPSTREAM_VERSION` 
+         * may contain only alphanumerics and the characters `.`, `+`, `-`, `~`;
+         * must start with a digit;
+      * `DEBIAN_REVISION` 
+        * is optional;
+        * may contain only alphanumerics and the characters `.`, `+`, `~`;
+    * See [Debian documentation](https://www.debian.org/doc/debian-policy/ch-controlfields.html#version) for more details;
+  * For `rpm`:
+    * A version must not contain the `-` (dash) character.
+
 ## Customizing JDK version
 
 The plugin uses `jpackage`, which is available since [JDK 14](https://openjdk.java.net/projects/jdk/14/).
