@@ -5,9 +5,9 @@ import org.jetbrains.compose.desktop.application.internal.currentOS
 
 enum class TargetFormat(
     internal val id: String,
-    private vararg val compatibleOSs: OS
+    internal val targetOS: OS
 ) {
-    AppImage("app-image", *OS.values()),
+    AppImage("app-image", currentOS),
     Deb("deb", OS.Linux),
     Rpm("rpm", OS.Linux),
     Dmg("dmg", OS.MacOS),
@@ -17,7 +17,7 @@ enum class TargetFormat(
 
     val isCompatibleWithCurrentOS: Boolean by lazy { isCompatibleWith(currentOS) }
 
-    internal fun isCompatibleWith(targetOS: OS): Boolean = targetOS in compatibleOSs
+    internal fun isCompatibleWith(os: OS): Boolean = os == targetOS
 
     val outputDirName: String
         get() = if (this == AppImage) "app" else id

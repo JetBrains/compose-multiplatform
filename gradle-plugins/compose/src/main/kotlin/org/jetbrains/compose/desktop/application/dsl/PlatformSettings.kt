@@ -7,10 +7,13 @@ import javax.inject.Inject
 
 abstract class PlatformSettings (objects: ObjectFactory) {
     val iconFile: RegularFileProperty = objects.fileProperty()
+    var packageVersion: String? = null
 }
 
 open class MacOSPlatformSettings @Inject constructor(objects: ObjectFactory): PlatformSettings(objects) {
     var packageName: String? = null
+    var dmgPackageVersion: String? = null
+    var pkgPackageVersion: String? = null
 
     /**
      * An application's unique identifier across Apple's ecosystem.
@@ -40,6 +43,8 @@ open class LinuxPlatformSettings @Inject constructor(objects: ObjectFactory): Pl
     var debMaintainer: String? = null
     var menuGroup: String? = null
     var rpmLicenseType: String? = null
+    var debPackageVersion: String? = null
+    var rpmPackageVersion: String? = null
 }
 
 open class WindowsPlatformSettings @Inject constructor(objects: ObjectFactory): PlatformSettings(objects) {
@@ -51,4 +56,6 @@ open class WindowsPlatformSettings @Inject constructor(objects: ObjectFactory): 
         get() = field || menuGroup != null
     var menuGroup: String? = null
     var upgradeUuid: String? = null
+    var msiPackageVersion: String? = null
+    var exePackageVersion: String? = null
 }
