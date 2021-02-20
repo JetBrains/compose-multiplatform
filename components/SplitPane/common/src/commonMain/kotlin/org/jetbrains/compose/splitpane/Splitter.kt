@@ -3,7 +3,7 @@ package org.jetbrains.compose.splitpane
 import androidx.compose.runtime.Composable
 
 @ExperimentalSplitPaneApi
-enum class SplitterHandleAlign {
+enum class SplitterHandleAlignment {
     BEFORE,
     ABOVE,
     AFTER
@@ -13,5 +13,5 @@ enum class SplitterHandleAlign {
 internal data class Splitter(
     val measuredPart: @Composable () -> Unit,
     val handlePart: @Composable () -> Unit = measuredPart,
-    val align: SplitterHandleAlign = SplitterHandleAlign.ABOVE
+    val alignment: SplitterHandleAlignment = SplitterHandleAlignment.ABOVE
 )

@@ -67,16 +67,16 @@ interface SplitterScope {
      * Size of handle will have no effect on split pane parts (first and second) sizes.
      *
      * @param alignment alignment of handle according to [visiblePart] could be:
-     * * [SplitterHandleAlign.BEFORE] if you place handle before [visiblePart],
-     * * [SplitterHandleAlign.ABOVE] if you place handle above [visiblePart] (will be centered)
-     * * and [SplitterHandleAlign.AFTER] if you place handle after [visiblePart].
+     * * [SplitterHandleAlignment.BEFORE] if you place handle before [visiblePart],
+     * * [SplitterHandleAlignment.ABOVE] if you place handle above [visiblePart] (will be centered)
+     * * and [SplitterHandleAlignment.AFTER] if you place handle after [visiblePart].
      *
      * @param content composable item content provider. Uses [HandleScope] to allow mark any provided composable part
      * as handle.
      * [content] will be placed only if [SplitPaneState.moveEnabled] is true
      */
     fun handle(
-        alignment: SplitterHandleAlign = SplitterHandleAlign.ABOVE,
+        alignment: SplitterHandleAlignment = SplitterHandleAlignment.ABOVE,
         content: @Composable HandleScope.() -> Unit
     )
 }
@@ -105,7 +105,7 @@ internal class SplitterScopeImpl(
     }
 
     override fun handle(
-        alignment: SplitterHandleAlign,
+        alignment: SplitterHandleAlignment,
         content: @Composable HandleScope.() -> Unit
     ) {
         containerScope.handle = { HandleScopeImpl(containerScope).content() }
@@ -134,7 +134,7 @@ internal class SplitPaneScopeImpl(
 
     internal lateinit var visiblePart: ComposableSlot
     internal lateinit var handle: ComposableSlot
-    internal var alignment: SplitterHandleAlign = SplitterHandleAlign.ABOVE
+    internal var alignment: SplitterHandleAlignment = SplitterHandleAlignment.ABOVE
     internal val splitter
         get() =
             if (this::visiblePart.isInitialized && this::handle.isInitialized) {

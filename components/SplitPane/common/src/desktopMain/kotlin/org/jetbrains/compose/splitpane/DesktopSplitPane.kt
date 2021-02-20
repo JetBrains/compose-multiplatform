@@ -113,10 +113,10 @@ internal actual fun SplitPane(
                 val handlePlaceable = measurables[3].measure(constraints)
                 val handleSize = handlePlaceable.valueByDirection(isHorizontal)
                 // TODO support RTL
-                val handlePosition = when (splitter.align) {
-                    SplitterHandleAlign.BEFORE -> constrainedPosition - handleSize
-                    SplitterHandleAlign.ABOVE -> constrainedPosition + (splitterSize - handleSize) / 2
-                    SplitterHandleAlign.AFTER -> constrainedPosition + splitterSize + handleSize
+                val handlePosition = when (splitter.alignment) {
+                    SplitterHandleAlignment.BEFORE -> constrainedPosition + splitterSize - handleSize
+                    SplitterHandleAlignment.ABOVE -> constrainedPosition + (splitterSize - handleSize) / 2
+                    SplitterHandleAlignment.AFTER -> constrainedPosition
                 }
 
                 layout(constraints.maxWidth, constraints.maxHeight) {
