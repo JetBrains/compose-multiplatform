@@ -1,5 +1,6 @@
 package example.todo.desktop
 
+import androidx.compose.desktop.AppWindow
 import androidx.compose.desktop.DesktopTheme
 import androidx.compose.desktop.Window
 import androidx.compose.foundation.layout.fillMaxSize
@@ -18,6 +19,7 @@ import example.todo.common.root.TodoRoot
 import example.todo.common.ui.TodoRootContent
 import example.todo.database.TodoDatabase
 import kotlinx.coroutines.Dispatchers
+import javax.swing.SwingUtilities
 
 fun main() {
     overrideSchedulers(main = Dispatchers.Main::asScheduler)
