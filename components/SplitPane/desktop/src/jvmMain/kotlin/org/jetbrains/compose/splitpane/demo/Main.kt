@@ -82,7 +82,7 @@ fun main() = Window(
                                 .markAsHandle()
                                 .cursorForHorizontalResize()
                                 .background(SolidColor(Color.Gray), alpha = 0.50f)
-                                .width(8.dp)
+                                .width(9.dp)
                                 .fillMaxHeight()
                         )
                     }
