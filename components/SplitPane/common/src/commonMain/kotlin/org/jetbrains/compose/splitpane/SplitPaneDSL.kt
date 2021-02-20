@@ -65,7 +65,7 @@ interface SplitterScope {
      *
      * @param alignment alignment of handle according to [visiblePart] could be:
      * * [SplitterHandleAlign.BEFORE] if you place handle before [visiblePart],
-     * * [SplitterHandleAlign.ABOVE] if you place handle above [visiblePart] (will be centred)
+     * * [SplitterHandleAlign.ABOVE] if you place handle above [visiblePart] (will be centered)
      * * and [SplitterHandleAlign.AFTER] if you place handle after [visiblePart].
      *
      * @param content composable item content provider. Uses [HandleScope] to allow mark any provided composable part
@@ -74,7 +74,7 @@ interface SplitterScope {
      */
     fun handle(
         alignment: SplitterHandleAlign = SplitterHandleAlign.ABOVE,
-        content: HandleScope.() -> @Composable () -> Unit
+        content: @Composable HandleScope.()-> Unit
     )
 }
 
@@ -101,9 +101,9 @@ internal class SplitterScopeImpl(
 
     override fun handle(
         alignment: SplitterHandleAlign,
-        content: HandleScope.() -> @Composable () -> Unit
+        content: @Composable HandleScope.() -> Unit
     ) {
-        containerScope.handle = HandleScopeImpl(containerScope).content()
+        containerScope.handle = { HandleScopeImpl(containerScope).content() }
         containerScope.alignment = alignment
     }
 }

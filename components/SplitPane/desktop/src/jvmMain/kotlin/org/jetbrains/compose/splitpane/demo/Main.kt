@@ -77,16 +77,14 @@ fun main() = Window(
                         )
                     }
                     handle {
-                        {
-                            Box(
-                                Modifier
-                                    .markAsHandle()
-                                    .cursorForHorizontalResize()
-                                    .background(SolidColor(Color.Gray), alpha = 0.50f)
-                                    .width(8.dp)
-                                    .fillMaxHeight()
-                            )
-                        }
+                        Box(
+                            Modifier
+                                .markAsHandle()
+                                .cursorForHorizontalResize()
+                                .background(SolidColor(Color.Gray), alpha = 0.50f)
+                                .width(8.dp)
+                                .fillMaxHeight()
+                        )
                     }
                 }
             }
