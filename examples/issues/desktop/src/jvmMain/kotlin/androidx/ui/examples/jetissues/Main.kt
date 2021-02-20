@@ -7,7 +7,7 @@ import androidx.ui.examples.jetissues.view.JetIssuesView
 import androidx.ui.examples.jetissues.view.Repository
 import androidx.ui.examples.jetissues.data.IssuesRepositoryImpl
 
-val repo = IssuesRepositoryImpl("ktorio", "ktor", System.getenv("GITHUB_TOKEN") ?: "fa7774306d1b9ab4af76652599841ee69a88fb6f")
+val repo = IssuesRepositoryImpl("ktorio", "ktor", System.getenv("GITHUB_TOKEN") ?: " 8c5097718c3108397f035fd6a6f307fa0b70f9b1")
 
 fun main() = Window(
     title = "JetIssues",
