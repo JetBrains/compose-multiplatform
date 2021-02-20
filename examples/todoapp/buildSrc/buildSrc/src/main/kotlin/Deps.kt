@@ -13,7 +13,7 @@ object Deps {
         object Compose {
             // __LATEST_COMPOSE_RELEASE_VERSION__
             // TODO remove exclude(group = "org.jetbrains.compose.desktop")
-            private const val VERSION = "0.0.0-unmerged-build38"
+            private const val VERSION = "0.0.0-unmerged-build39"
             const val gradlePlugin = "org.jetbrains.compose:compose-gradle-plugin:$VERSION"
         }
     }

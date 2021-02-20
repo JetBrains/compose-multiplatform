@@ -5,7 +5,7 @@ plugins {
     java
     kotlin("jvm") version "1.4.30"
     // __LATEST_COMPOSE_RELEASE_VERSION__
-    id("org.jetbrains.compose") version "0.0.0-unmerged-build38"
+    id("org.jetbrains.compose") version "0.0.0-unmerged-build39"
 }
 
 group = "org.example"
