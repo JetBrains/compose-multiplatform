@@ -19,14 +19,18 @@ package androidx.compose.ui.window
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.snapshots.Snapshot
 import androidx.compose.runtime.staticCompositionLocalOf
+import androidx.compose.runtime.withFrameNanos
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.Layout
 import androidx.compose.ui.platform.LocalDensity
@@ -195,5 +199,27 @@ class DesktopPopupTest {
         rule.waitForIdle()
 
         Truth.assertThat(lastCompositionState).isEqualTo(1)
+    }
+
+    @Test(timeout = 5000)
+    fun `(Bug) use Popup inside LazyColumn`() {
+        rule.setContent {
+            var count by remember { mutableStateOf(0) }
+            LazyColumn {
+                items(count) {
+                    Popup { }
+                }
+            }
+            LaunchedEffect(Unit) {
+                withFrameNanos {
+                    count++
+                }
+                withFrameNanos {
+                    count++
+                }
+            }
+        }
+
+        rule.waitForIdle()
     }
 }

@@ -66,6 +66,8 @@ internal class DesktopOwners(
     }
 
     val list = LinkedHashSet<DesktopOwner>()
+    private val listCopy = mutableListOf<DesktopOwner>()
+
     var keyboard: Keyboard? = null
 
     private var pointerId = 0L
@@ -113,7 +115,9 @@ internal class DesktopOwners(
             dispatcher.flush()
             frameClock.sendFrame(nanoTime)
 
-            for (owner in list) {
+            listCopy.clear()
+            listCopy.addAll(list)
+            for (owner in listCopy) {
                 owner.render(canvas, width, height)
             }
         }
@@ -121,7 +125,7 @@ internal class DesktopOwners(
         invalidateIfNeeded()
     }
 
-    val lastOwner: DesktopOwner?
+    private val lastOwner: DesktopOwner?
         get() = list.lastOrNull()
 
     fun onMousePressed(x: Int, y: Int, nativeEvent: MouseEvent? = null) {
