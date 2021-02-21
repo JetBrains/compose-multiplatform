@@ -4,7 +4,8 @@ plugins {
     id("org.jetbrains.intellij") version "0.6.5"
     java
     kotlin("jvm") version "1.4.30"
-    id("org.jetbrains.compose") version "0.3.0-build154"
+    // __LATEST_COMPOSE_RELEASE_VERSION__
+    id("org.jetbrains.compose") version "0.3.0-rc1"
 }
 
 group = "org.example"

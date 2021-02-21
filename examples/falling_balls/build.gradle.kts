@@ -6,7 +6,7 @@ plugins {
     // __KOTLIN_COMPOSE_VERSION__
     kotlin("jvm") version "1.4.30"
     // __LATEST_COMPOSE_RELEASE_VERSION__
-    id("org.jetbrains.compose") version "0.3.0-build154"
+    id("org.jetbrains.compose") version "0.3.0-rc1"
 }
 
 group = "me.user"
@@ -32,6 +32,7 @@ compose.desktop {
         nativeDistributions {
             targetFormats(TargetFormat.Dmg, TargetFormat.Msi, TargetFormat.Deb)
             packageName = "falling_balls"
+            packageVersion = "1.0.0"
         }
     }
 }

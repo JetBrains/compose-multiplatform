@@ -37,15 +37,16 @@ dependencies {
     implementation(Deps.ArkIvanov.MVIKotlin.mvikotlinLogging)
     implementation(Deps.ArkIvanov.MVIKotlin.mvikotlinTimeTravel)
     implementation(Deps.ArkIvanov.Decompose.decompose)
-    implementation(Deps.ArkIvanov.Decompose.extensionsCompose)
+    implementation(Deps.ArkIvanov.Decompose.extensionsCompose) {
+        // TODO remove when we will not be using 0.0.0-unmerged version
+        exclude(group = "org.jetbrains.compose.desktop")
+        exclude(group = "org.jetbrains.compose.animation")
+        exclude(group = "org.jetbrains.compose.foundation")
+        exclude(group = "org.jetbrains.compose.material")
+        exclude(group = "org.jetbrains.compose.runtime")
+        exclude(group = "org.jetbrains.compose.ui")
+    }
     implementation(Deps.AndroidX.AppCompat.appCompat)
 
-    implementation(Deps.AndroidX.Activity.activityCompose) {
-        // Workaround as per https://github.com/JetBrains/compose-jb/issues/354#issuecomment-777122304
-        exclude(group = "androidx.compose.animation")
-        exclude(group = "androidx.compose.foundation")
-        exclude(group = "androidx.compose.material")
-        exclude(group = "androidx.compose.runtime")
-        exclude(group = "androidx.compose.ui")
-    }
+    implementation(Deps.AndroidX.Activity.activityCompose)
 }
