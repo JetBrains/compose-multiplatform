@@ -43,7 +43,12 @@ abstract class AbstractCheckNotarizationStatusTask : AbstractNotarizationTask() 
                         "--notarization-info", request.uuid,
                         "--username", notarization.appleID,
                         "--password", notarization.password
-                    )
+                    ),
+                    processStdout = { output ->
+                        if (!verbose.get()) {
+                            logger.quiet(output)
+                        }
+                    }
                 )
             } catch (e: Exception) {
                 logger.error("Could not check notarization request '${request.uuid}'", e)
