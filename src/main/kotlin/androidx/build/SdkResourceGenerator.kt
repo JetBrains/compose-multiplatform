@@ -20,6 +20,7 @@ import androidx.build.dependencies.AGP_LATEST
 import androidx.build.dependencies.KOTLIN_STDLIB
 import org.gradle.api.DefaultTask
 import org.gradle.api.Project
+import org.gradle.api.artifacts.repositories.MavenArtifactRepository
 import org.gradle.api.file.RegularFileProperty
 import org.gradle.api.plugins.JavaPluginConvention
 import org.gradle.api.tasks.Input
@@ -59,6 +60,9 @@ abstract class SdkResourceGenerator : DefaultTask() {
     val kotlinStdlib: String = KOTLIN_STDLIB
 
     @get:Input
+    lateinit var repositoryUrls: List<String>
+
+    @get:Input
     val rootProjectPath: String = project.rootProject.rootDir.absolutePath
 
     @get:Input
@@ -81,6 +85,8 @@ abstract class SdkResourceGenerator : DefaultTask() {
         writer.write("kotlinStdlib=$kotlinStdlib\n")
         writer.write("gradleVersion=$gradleVersion\n")
         writer.write("rootProjectPath=$rootProjectPath\n")
+        val encodedRepositoryUrls = repositoryUrls.joinToString(",")
+        writer.write("repositoryUrls=$encodedRepositoryUrls\n")
         writer.close()
     }
 
@@ -97,6 +103,12 @@ abstract class SdkResourceGenerator : DefaultTask() {
                 it.localSupportRepo = project.getRepositoryDirectory().canonicalPath
                 it.gradleVersion = project.gradle.gradleVersion
                 it.outputFile.set(File(generatedDirectory, "sdk.prop"))
+                // Copy repositories used for the library project so that it can replicate the same
+                // maven structure in test.
+                it.repositoryUrls = project.repositories.filterIsInstance<MavenArtifactRepository>()
+                    .map {
+                        it.url.toString()
+                    }
             }
             project.tasks.named("compileTestJava").configure { it.dependsOn(provider) }
 
