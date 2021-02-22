@@ -73,7 +73,7 @@ private object LifecycleSnippet2 {
         if (showError) {
             LoginError()
         }
-        LoginInput() // This call site is used to generate the key
+        LoginInput() // This call site affects where LoginInput is placed in Composition
     }
 
     @Composable
@@ -85,8 +85,8 @@ private object LifecycleSnippet3 {
     fun MoviesScreen(movies: List<Movie>) {
         Column {
             for (movie in movies) {
-                // All MovieOverview composables in Composition will have the same key!
-                // Thus, all calls will always recompose and restart all side effects.
+                // MovieOverview composables are placed in Composition given its
+                // index position in the for loop
                 MovieOverview(movie)
             }
         }
@@ -363,8 +363,8 @@ private fun LoginError() { }
 @Composable
 private fun MovieOverview(movie: Movie) { }
 @Composable
-private fun MovieHeader(image: Image) { }
-private data class Movie(val id: Long, val url: String)
+private fun MovieHeader(movie: String) { }
+private data class Movie(val id: Long, val url: String = "")
 
 private data class UiState<T>(
     val loading: Boolean = false,
@@ -392,4 +392,4 @@ private class Greeting(val name: String)
 private fun prepareGreeting(user: User, weather: Weather) = Greeting("haha")
 
 private fun String.containsWord(input: List<String>): Boolean = false
-private fun loadNetworkImage(url: String): Image { TODO() }
+private fun loadNetworkImage(url: String): String = ""
