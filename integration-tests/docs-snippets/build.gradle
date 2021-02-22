@@ -41,6 +41,7 @@ dependencies {
     implementation(project(":navigation:navigation-compose"))
     implementation(project(":activity:activity-compose"))
     implementation(project(":lifecycle:lifecycle-viewmodel-compose"))
+    implementation(project(":paging:paging-compose"))
 
     implementation(KOTLIN_STDLIB)
     implementation(KOTLIN_REFLECT)
