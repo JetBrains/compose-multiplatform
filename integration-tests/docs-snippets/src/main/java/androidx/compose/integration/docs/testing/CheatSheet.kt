@@ -28,7 +28,6 @@ import androidx.compose.ui.input.key.KeyEvent
 import androidx.compose.ui.layout.FirstBaseline
 import androidx.compose.ui.semantics.ProgressBarRangeInfo
 import androidx.compose.ui.semantics.SemanticsActions
-import androidx.compose.ui.test.ExperimentalTestApi
 import androidx.compose.ui.test.assert
 import androidx.compose.ui.test.assertAll
 import androidx.compose.ui.test.assertAny
@@ -82,26 +81,18 @@ import androidx.compose.ui.test.hasAnyAncestor
 import androidx.compose.ui.test.hasAnyChild
 import androidx.compose.ui.test.hasAnyDescendant
 import androidx.compose.ui.test.hasAnySibling
-import androidx.compose.ui.test.hasBottomPosition
 import androidx.compose.ui.test.hasClickAction
 import androidx.compose.ui.test.hasContentDescription
-import androidx.compose.ui.test.hasHeight
-import androidx.compose.ui.test.hasHeightAtLeast
 import androidx.compose.ui.test.hasImeAction
-import androidx.compose.ui.test.hasLeftPosition
 import androidx.compose.ui.test.hasNoClickAction
 import androidx.compose.ui.test.hasNoScrollAction
 import androidx.compose.ui.test.hasParent
 import androidx.compose.ui.test.hasProgressBarRangeInfo
-import androidx.compose.ui.test.hasRightPosition
 import androidx.compose.ui.test.hasScrollAction
 import androidx.compose.ui.test.hasSetTextAction
 import androidx.compose.ui.test.hasStateDescription
 import androidx.compose.ui.test.hasTestTag
 import androidx.compose.ui.test.hasText
-import androidx.compose.ui.test.hasTopPosition
-import androidx.compose.ui.test.hasWidth
-import androidx.compose.ui.test.hasWidthAtLeast
 import androidx.compose.ui.test.height
 import androidx.compose.ui.test.isDialog
 import androidx.compose.ui.test.isEnabled
@@ -226,7 +217,6 @@ private fun TestingCheatSheetFinders() {
     )
 
     // MATCHERS
-    @OptIn(ExperimentalTestApi::class)
     composeTestRule.onNode(
         hasClickAction() and
             hasNoClickAction() and
@@ -239,14 +229,6 @@ private fun TestingCheatSheetFinders() {
             hasStateDescription("label") and
             hasTestTag("tag") and
             hasText("text") and
-            hasLeftPosition(0.dp) and
-            hasTopPosition(0.dp) and
-            hasRightPosition(0.dp) and
-            hasBottomPosition(0.dp) and
-            hasWidth(0.dp) and
-            hasWidthAtLeast(0.dp) and
-            hasHeight(0.dp) and
-            hasHeightAtLeast(0.dp) and
             isDialog() and
             isEnabled() and
             isFocusable() and
