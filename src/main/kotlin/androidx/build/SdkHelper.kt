@@ -119,9 +119,11 @@ fun Project.setSupportRootFolder(rootDir: File) {
 
 /**
  * Returns the path to the canonical root project directory, e.g. {@code frameworks/support}.
+ *
+ * Note: This method of accessing the frameworks/support path is preferred over Project.rootDir
+ * because it is generalized to also work for the "ui" project and playground projects.
  */
 fun Project.getSupportRootFolder(): File {
-    // When the `ui` project is merged, this can be simplified to `project.rootDir`.
     val extension = project.rootProject.property("ext") as ExtraPropertiesExtension
     return extension.get("supportRootFolder") as File
 }
