@@ -137,7 +137,7 @@ fun <T> rememberSaveable(
     key: String? = null,
     init: () -> MutableState<T>
 ): MutableState<T> = rememberSaveable(
-    inputs,
+    *inputs,
     saver = mutableStateSaver(stateSaver),
     key = key,
     init = init
