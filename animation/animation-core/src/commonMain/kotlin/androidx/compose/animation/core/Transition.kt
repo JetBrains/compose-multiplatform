@@ -147,7 +147,6 @@ fun <T> updateTransition(
  *
  * @sample androidx.compose.animation.core.samples.GestureAnimationSample
  *
- * @return a [Transition] object, to which animations can be added.
  * @see updateTransition
  * @see Transition.animateFloat
  * @see Transition.animateValue
