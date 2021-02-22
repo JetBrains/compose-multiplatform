@@ -44,6 +44,12 @@ import androidx.compose.ui.unit.LayoutDirection
  * the block will be reexecuted to set the new properties. Note the block will also be ran once
  * right after the [factory] block completes.
  *
+ * [AndroidView] is commonly needed for using Views that are infeasible to be reimplemented in
+ * Compose and there is no corresponding Compose API. Common examples for the moment are
+ * WebView, SurfaceView, AdView, etc. If using WebView, applying a
+ * [clip modifier][Modifier.clipToBounds] is recommended to prevent the WebView background
+ * being drawn on top of other Compose content.
+ *
  * @sample androidx.compose.ui.samples.AndroidViewSample
  *
  * @param factory The block creating the [View] to be composed.
