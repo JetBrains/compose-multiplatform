@@ -19,8 +19,8 @@ package androidx.compose.ui.samples
 import android.graphics.Color
 import androidx.annotation.Sampled
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.viewbinding.samples.databinding.SampleLayoutBinding
 import androidx.compose.ui.viewinterop.AndroidViewBinding
-import androidx.compose.ui.viewinterop.samples.databinding.SampleLayoutBinding
 
 @Sampled
 @Composable
