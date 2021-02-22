@@ -93,8 +93,14 @@ internal class ParameterFactory(private val inlineClassConverter: InlineClassCon
 
     /**
      * Do not decompose instances or lookup constants from these package prefixes
+     *
+     * The following instances are known to contain self recursion:
+     * - kotlinx.coroutines.flow.StateFlowImpl
+     * - androidx.compose.ui.node.LayoutNode
      */
-    private val ignoredPackagePrefixes = listOf("android.", "java.", "javax.")
+    private val ignoredPackagePrefixes = listOf(
+        "android.", "java.", "javax.", "kotlinx.", "androidx.compose.ui.node."
+    )
 
     var density = Density(1.0f)
 
