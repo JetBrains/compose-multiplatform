@@ -49,7 +49,14 @@ import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 
-internal object ListsSnippetsColumn {
+/**
+ * This file lets DevRel track changes to snippets present in
+ * https://developer.android.com/jetpack/compose/lists
+ *
+ * No action required if it's modified.
+ */
+
+private object ListsSnippetsColumn {
     @Composable
     fun MessageList(messages: List<Message>) {
         Column {
@@ -60,27 +67,27 @@ internal object ListsSnippetsColumn {
     }
 }
 
-internal object ListsSnippetsLazyListScope {
-    @Composable
-    fun Snippet() {
-        LazyColumn {
-            // Add a single item
-            item {
-                Text(text = "First item")
-            }
+@Composable
+private fun ListsSnippetsLazyListScope1() {
+    LazyColumn {
+        // Add a single item
+        item {
+            Text(text = "First item")
+        }
 
-            // Add 5 items
-            items(5) { index ->
-                Text(text = "Item: $index")
-            }
+        // Add 5 items
+        items(5) { index ->
+            Text(text = "Item: $index")
+        }
 
-            // Add another single item
-            item {
-                Text(text = "Last item")
-            }
+        // Add another single item
+        item {
+            Text(text = "Last item")
         }
     }
+}
 
+private object ListsSnippetsLazyListScope2 {
     @Composable
     fun MessageList(messages: List<Message>) {
         LazyColumn {
@@ -91,38 +98,34 @@ internal object ListsSnippetsLazyListScope {
     }
 }
 
-internal object ListsSnippetsContentPadding {
-    @Composable
-    fun Snippet() {
-        LazyColumn(
-            contentPadding = PaddingValues(horizontal = 16.dp, vertical = 8.dp),
-        ) {
-            // ...
-        }
+@Composable
+private fun ListsSnippetsContentPadding() {
+    LazyColumn(
+        contentPadding = PaddingValues(horizontal = 16.dp, vertical = 8.dp),
+    ) {
+        // ...
     }
 }
 
-internal object ListsSnippetsContentSpacing {
-    @Composable
-    fun Column() {
-        LazyColumn(
-            verticalArrangement = Arrangement.spacedBy(4.dp),
-        ) {
-            // ...
-        }
-    }
-
-    @Composable
-    fun Row() {
-        LazyRow(
-            horizontalArrangement = Arrangement.spacedBy(4.dp),
-        ) {
-            // ...
-        }
+@Composable
+private fun ListsSnippetsContentSpacing1() {
+    LazyColumn(
+        verticalArrangement = Arrangement.spacedBy(4.dp),
+    ) {
+        // ...
     }
 }
 
-internal object ListsSnippetsStickyHeaders {
+@Composable
+private fun ListsSnippetsContentSpacing2() {
+    LazyRow(
+        horizontalArrangement = Arrangement.spacedBy(4.dp),
+    ) {
+        // ...
+    }
+}
+
+private object ListsSnippetsStickyHeaders1 {
     @OptIn(ExperimentalFoundationApi::class)
     @Composable
     fun ListWithHeader(items: List<Item>) {
@@ -136,7 +139,9 @@ internal object ListsSnippetsStickyHeaders {
             }
         }
     }
+}
 
+private object ListsSnippetsStickyHeaders2 {
     // TODO: This ideally would be done in the ViewModel
     val grouped = contacts.groupBy { it.firstName[0] }
 
@@ -157,7 +162,7 @@ internal object ListsSnippetsStickyHeaders {
     }
 }
 
-internal object ListsSnippetsGrids {
+private object ListsSnippetsGrids {
     @OptIn(ExperimentalFoundationApi::class)
     @Composable
     fun PhotoGrid(photos: List<Photo>) {
@@ -171,7 +176,7 @@ internal object ListsSnippetsGrids {
     }
 }
 
-internal object ListsSnippetsReactingScrollPosition1 {
+private object ListsSnippetsReactingScrollPosition1 {
     @Composable
     fun MessageList(messages: List<Message>) {
         // Remember our own LazyListState
@@ -184,7 +189,7 @@ internal object ListsSnippetsReactingScrollPosition1 {
     }
 }
 
-internal object ListsSnippetsReactingScrollPosition2 {
+private object ListsSnippetsReactingScrollPosition2 {
     @OptIn(ExperimentalAnimationApi::class)
     @Composable
     fun MessageList(messages: List<Message>) {
@@ -211,29 +216,26 @@ internal object ListsSnippetsReactingScrollPosition2 {
     }
 }
 
-@Suppress("SimplifyBooleanWithConstants")
-internal object ListsSnippetsReactingScrollPosition3 {
-    @Composable
-    fun Snippet(messages: List<Message>) {
-        val listState = rememberLazyListState()
+@Composable
+private fun ListsSnippetsReactingScrollPosition3(messages: List<Message>) {
+    val listState = rememberLazyListState()
 
-        LazyColumn(state = listState) {
-            // ...
-        }
+    LazyColumn(state = listState) {
+        // ...
+    }
 
-        LaunchedEffect(listState) {
-            snapshotFlow { listState.firstVisibleItemIndex }
-                .map { index -> index > 0 }
-                .distinctUntilChanged()
-                .filter { it == true }
-                .collect {
-                    MyAnalyticsService.sendScrolledPastFirstItemEvent()
-                }
-        }
+    LaunchedEffect(listState) {
+        snapshotFlow { listState.firstVisibleItemIndex }
+            .map { index -> index > 0 }
+            .distinctUntilChanged()
+            .filter { it == true }
+            .collect {
+                MyAnalyticsService.sendScrolledPastFirstItemEvent()
+            }
     }
 }
 
-internal object ListsSnippetsControllingScrollPosition {
+private object ListsSnippetsControllingScrollPosition {
     @Composable
     fun MessageList(messages: List<Message>) {
         val listState = rememberLazyListState()
@@ -250,12 +252,12 @@ internal object ListsSnippetsControllingScrollPosition {
                     // Animate scroll to the first item
                     listState.animateScrollToItem(index = 0)
                 }
-            },
+            }
         )
     }
 }
 
-internal object ListsSnippetsPaging {
+private object ListsSnippetsPaging {
     @Composable
     fun MessageList(pager: Pager<Int, Message>) {
         val lazyPagingItems = pager.flow.collectAsLazyPagingItems()
@@ -272,7 +274,7 @@ internal object ListsSnippetsPaging {
     }
 }
 
-internal object ListsSnippetsItemKeys {
+private object ListsSnippetsItemKeys {
     @Composable
     fun MessageList(messages: List<Message>) {
         LazyColumn {
@@ -293,14 +295,14 @@ internal object ListsSnippetsItemKeys {
 // Fakes below
 // ========================
 
-class Message(val id: Long)
-class Item
+private class Message(val id: Long)
+private class Item
 
-data class Contact(val firstName: String)
-val contacts = listOf<Contact>()
+private data class Contact(val firstName: String)
+private val contacts = listOf<Contact>()
 
-class Photo
-val photos = listOf<Photo>()
+private class Photo
+private val photos = listOf<Photo>()
 
 @Composable
 private fun MessageRow(message: Message) = Unit
@@ -326,6 +328,6 @@ private fun PhotoItem(photo: Photo) = Unit
 @Composable
 private fun ScrollToTopButton(onClick: () -> Unit = {}) = Unit
 
-object MyAnalyticsService {
+private object MyAnalyticsService {
     fun sendScrolledPastFirstItemEvent() = Unit
 }
