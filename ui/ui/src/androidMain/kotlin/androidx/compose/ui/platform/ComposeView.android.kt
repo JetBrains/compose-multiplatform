@@ -29,6 +29,7 @@ import androidx.compose.ui.node.InternalCoreApi
 import androidx.compose.ui.node.Owner
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.ViewTreeLifecycleOwner
+import androidx.savedstate.ViewTreeSavedStateRegistryOwner
 
 /**
  * Base class for custom [android.view.View]s implemented using Jetpack Compose UI.
@@ -202,6 +203,20 @@ abstract class AbstractComposeView @JvmOverloads constructor(
 
     override fun onAttachedToWindow() {
         super.onAttachedToWindow()
+
+        val message = "If you are adding this ComposeView to an AppCompatActivity, make sure you " +
+            "are using AppCompat version 1.3+. If you are adding this ComposeView to a " +
+            "Fragment, make sure you are using Fragment version 1.3+. For other cases, manually " +
+            "set owners on this view by using `ViewTreeLifecycleOwner.set()` and " +
+            "`ViewTreeSavedStateRegistryOwner.set()`."
+        checkNotNull(ViewTreeLifecycleOwner.get(this)) {
+            "ViewTreeLifecycleOwner not set for this ComposeView. $message"
+        }
+        checkNotNull(ViewTreeSavedStateRegistryOwner.get(this)) {
+            "ViewTreeSavedStateRegistryOwner not set for this ComposeView. $message"
+        }
+        // Not checking for ViewTreeViewModelStoreOwner as we don't need it inside Compose, but we
+        // provide it in ComponentActivity.setContent for convenience.
 
         if (shouldCreateCompositionOnAttachedToWindow) {
             ensureCompositionCreated()
