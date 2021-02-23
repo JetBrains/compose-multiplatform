@@ -1,3 +1,0 @@
-// Baseline format: 1.0
-CallbackName: androidx.compose.animation.core.AnimationClockObserver:
-    Class should be named AnimationClockCallback

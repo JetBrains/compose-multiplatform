@@ -168,7 +168,7 @@ package androidx.compose.ui.autofill {
   }
 
   @androidx.compose.ui.ExperimentalComposeUiApi public final class AutofillNode {
-    ctor public AutofillNode(java.util.List<? extends androidx.compose.ui.autofill.AutofillType> autofillTypes, androidx.compose.ui.geometry.Rect? boundingBox, kotlin.jvm.functions.Function1<? super java.lang.String,kotlin.Unit>? onFill);
+    ctor public AutofillNode(optional java.util.List<? extends androidx.compose.ui.autofill.AutofillType> autofillTypes, optional androidx.compose.ui.geometry.Rect? boundingBox, kotlin.jvm.functions.Function1<? super java.lang.String,kotlin.Unit>? onFill);
     method public java.util.List<androidx.compose.ui.autofill.AutofillType> getAutofillTypes();
     method public androidx.compose.ui.geometry.Rect? getBoundingBox();
     method public int getId();
@@ -1387,8 +1387,7 @@ package androidx.compose.ui.input.pointer {
   }
 
   public final class ConsumedData {
-    ctor public ConsumedData(boolean positionChange, boolean downChange);
-    ctor public ConsumedData();
+    ctor public ConsumedData(optional boolean positionChange, optional boolean downChange);
     method public boolean getDownChange();
     method public boolean getPositionChange();
     method public void setDownChange(boolean p);
@@ -1721,7 +1720,7 @@ package androidx.compose.ui.layout {
   }
 
   public final class ModifierInfo {
-    ctor public ModifierInfo(androidx.compose.ui.Modifier modifier, androidx.compose.ui.layout.LayoutCoordinates coordinates, Object? extra);
+    ctor public ModifierInfo(androidx.compose.ui.Modifier modifier, androidx.compose.ui.layout.LayoutCoordinates coordinates, optional Object? extra);
     method public androidx.compose.ui.layout.LayoutCoordinates getCoordinates();
     method public Object? getExtra();
     method public androidx.compose.ui.Modifier getModifier();
@@ -1880,8 +1879,8 @@ package androidx.compose.ui.node {
 package androidx.compose.ui.platform {
 
   public abstract class AbstractComposeView extends android.view.ViewGroup {
-    ctor public AbstractComposeView(android.content.Context context, android.util.AttributeSet? attrs, int defStyleAttr);
-    ctor public AbstractComposeView(android.content.Context context, android.util.AttributeSet? attrs);
+    ctor public AbstractComposeView(android.content.Context context, optional android.util.AttributeSet? attrs, optional int defStyleAttr);
+    ctor public AbstractComposeView(android.content.Context context, optional android.util.AttributeSet? attrs);
     ctor public AbstractComposeView(android.content.Context context);
     method @androidx.compose.runtime.Composable public abstract void Content();
     method public final void createComposition();
@@ -1969,8 +1968,8 @@ package androidx.compose.ui.platform {
   }
 
   public final class ComposeView extends androidx.compose.ui.platform.AbstractComposeView {
-    ctor public ComposeView(android.content.Context context, android.util.AttributeSet? attrs, int defStyleAttr);
-    ctor public ComposeView(android.content.Context context, android.util.AttributeSet? attrs);
+    ctor public ComposeView(android.content.Context context, optional android.util.AttributeSet? attrs, optional int defStyleAttr);
+    ctor public ComposeView(android.content.Context context, optional android.util.AttributeSet? attrs);
     ctor public ComposeView(android.content.Context context);
     method @androidx.compose.runtime.Composable public void Content();
     method public void setContent(kotlin.jvm.functions.Function0<kotlin.Unit> content);
@@ -2254,7 +2253,7 @@ package androidx.compose.ui.semantics {
   }
 
   public final class ProgressBarRangeInfo {
-    ctor public ProgressBarRangeInfo(float current, kotlin.ranges.ClosedFloatingPointRange<java.lang.Float> range, int steps);
+    ctor public ProgressBarRangeInfo(float current, kotlin.ranges.ClosedFloatingPointRange<java.lang.Float> range, optional int steps);
     method public float getCurrent();
     method public kotlin.ranges.ClosedFloatingPointRange<java.lang.Float> getRange();
     method public int getSteps();
@@ -2279,7 +2278,7 @@ package androidx.compose.ui.semantics {
   }
 
   public final class ScrollAxisRange {
-    ctor public ScrollAxisRange(kotlin.jvm.functions.Function0<java.lang.Float> value, kotlin.jvm.functions.Function0<java.lang.Float> maxValue, boolean reverseScrolling);
+    ctor public ScrollAxisRange(kotlin.jvm.functions.Function0<java.lang.Float> value, kotlin.jvm.functions.Function0<java.lang.Float> maxValue, optional boolean reverseScrolling);
     method public kotlin.jvm.functions.Function0<java.lang.Float> getMaxValue();
     method public boolean getReverseScrolling();
     method public kotlin.jvm.functions.Function0<java.lang.Float> getValue();
@@ -2501,7 +2500,7 @@ package androidx.compose.ui.semantics {
   }
 
   public final class SemanticsPropertyKey<T> {
-    ctor public SemanticsPropertyKey(String name, kotlin.jvm.functions.Function2<? super T,? super T,? extends T> mergePolicy);
+    ctor public SemanticsPropertyKey(String name, optional kotlin.jvm.functions.Function2<? super T,? super T,? extends T> mergePolicy);
     method public String getName();
     method public operator T! getValue(androidx.compose.ui.semantics.SemanticsPropertyReceiver thisRef, kotlin.reflect.KProperty<?> property);
     method public T? merge(T? parentValue, T? childValue);
@@ -2564,8 +2563,7 @@ package androidx.compose.ui.window {
   }
 
   @androidx.compose.runtime.Immutable public final class DialogProperties {
-    ctor public DialogProperties(boolean dismissOnBackPress, boolean dismissOnClickOutside, androidx.compose.ui.window.SecureFlagPolicy securePolicy);
-    ctor public DialogProperties();
+    ctor public DialogProperties(optional boolean dismissOnBackPress, optional boolean dismissOnClickOutside, optional androidx.compose.ui.window.SecureFlagPolicy securePolicy);
     method public boolean getDismissOnBackPress();
     method public boolean getDismissOnClickOutside();
     method public androidx.compose.ui.window.SecureFlagPolicy getSecurePolicy();
@@ -2584,8 +2582,7 @@ package androidx.compose.ui.window {
   }
 
   @androidx.compose.runtime.Immutable public final class PopupProperties {
-    ctor public PopupProperties(boolean focusable, boolean dismissOnBackPress, boolean dismissOnClickOutside, androidx.compose.ui.window.SecureFlagPolicy securePolicy);
-    ctor public PopupProperties();
+    ctor public PopupProperties(optional boolean focusable, optional boolean dismissOnBackPress, optional boolean dismissOnClickOutside, optional androidx.compose.ui.window.SecureFlagPolicy securePolicy);
     method public boolean getDismissOnBackPress();
     method public boolean getDismissOnClickOutside();
     method public boolean getFocusable();
