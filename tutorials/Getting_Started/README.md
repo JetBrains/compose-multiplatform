@@ -36,7 +36,7 @@ The Сompose plugin version used in the wizard above may be not the last. Update
 ```
 plugins {
     kotlin("jvm") version "1.4.30"
-    id("org.jetbrains.compose") version "0.3.0-build152"
+    id("org.jetbrains.compose") version "0.3.0"
 }
 ```
 
@@ -71,8 +71,8 @@ Then create `build.gradle.kts` with the following content:
 import org.jetbrains.compose.compose
 
 plugins {
-    kotlin("jvm") version "1.4.21-2"
-    id("org.jetbrains.compose") version "0.3.0-build146"
+    kotlin("jvm") version "1.4.30"
+    id("org.jetbrains.compose") version "0.3.0"
 }
 
 repositories {
