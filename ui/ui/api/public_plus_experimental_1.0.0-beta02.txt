@@ -2041,6 +2041,17 @@ package androidx.compose.ui.platform {
   public final class JvmActuals_jvmKt {
   }
 
+  @androidx.compose.ui.ExperimentalComposeUiApi public final class LocalSoftwareKeyboardController {
+    method @androidx.compose.runtime.Composable public androidx.compose.ui.platform.SoftwareKeyboardController? getCurrent();
+    property @androidx.compose.runtime.Composable public final androidx.compose.ui.platform.SoftwareKeyboardController? current;
+    field public static final androidx.compose.ui.platform.LocalSoftwareKeyboardController INSTANCE;
+  }
+
+  @androidx.compose.ui.ExperimentalComposeUiApi public interface SoftwareKeyboardController {
+    method public void hideSoftwareKeyboard();
+    method public void showSoftwareKeyboard();
+  }
+
   public final class TestTagKt {
     method @androidx.compose.runtime.Stable public static androidx.compose.ui.Modifier testTag(androidx.compose.ui.Modifier, String tag);
   }
