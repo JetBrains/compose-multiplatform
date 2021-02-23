@@ -23,17 +23,3 @@ MissingNullability: androidx.compose.ui.input.key.KeyEvent#toString-impl(android
     Missing nullability on parameter `p` in method `toString-impl`
 MissingNullability: androidx.compose.ui.input.pointer.PointerId#toString-impl(long):
     Missing nullability on method `toString-impl` return
-MissingNullability: androidx.compose.ui.layout.Measured#constructor-impl(androidx.compose.ui.layout.Placeable):
-    Missing nullability on method `constructor-impl` return
-MissingNullability: androidx.compose.ui.layout.Measured#equals-impl(androidx.compose.ui.layout.Placeable, Object) parameter #0:
-    Missing nullability on parameter `p` in method `equals-impl`
-MissingNullability: androidx.compose.ui.layout.Measured#getHeight-impl(androidx.compose.ui.layout.Placeable) parameter #0:
-    Missing nullability on parameter `$this` in method `getHeight-impl`
-MissingNullability: androidx.compose.ui.layout.Measured#getWidth-impl(androidx.compose.ui.layout.Placeable) parameter #0:
-    Missing nullability on parameter `$this` in method `getWidth-impl`
-MissingNullability: androidx.compose.ui.layout.Measured#hashCode-impl(androidx.compose.ui.layout.Placeable) parameter #0:
-    Missing nullability on parameter `p` in method `hashCode-impl`
-MissingNullability: androidx.compose.ui.layout.Measured#toString-impl(androidx.compose.ui.layout.Placeable):
-    Missing nullability on method `toString-impl` return
-MissingNullability: androidx.compose.ui.layout.Measured#toString-impl(androidx.compose.ui.layout.Placeable) parameter #0:
-    Missing nullability on parameter `p` in method `toString-impl`

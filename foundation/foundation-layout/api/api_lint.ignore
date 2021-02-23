@@ -1,3 +1,0 @@
-// Baseline format: 1.0
-MutableBareField: androidx.compose.foundation.layout.State#layoutDirection:
-    Bare field layoutDirection must be marked final, or moved behind accessors if mutable

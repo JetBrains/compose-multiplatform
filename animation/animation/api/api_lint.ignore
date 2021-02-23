@@ -1,7 +1,0 @@
-// Baseline format: 1.0
-AutoBoxing: androidx.compose.animation.AnimatedFloatModel#getValue():
-    Must avoid boxed primitives (`java.lang.Float`)
-
-
-MissingNullability: androidx.compose.animation.AnimatedFloatModel#getValue():
-    Missing nullability on method `getValue` return
