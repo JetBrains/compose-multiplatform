@@ -17,11 +17,11 @@
 package androidx.compose.runtime.saveable
 
 import android.os.Bundle
+import android.os.Parcel
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import android.widget.FrameLayout
 import android.widget.LinearLayout
-import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableStateOf
@@ -152,11 +152,74 @@ class ActivityRecreationTest {
         }
     }
 
+    @Test
+    fun valueStoredInMutableStateInsideSaveableStateHolderIsRestored() {
+        val activityScenario: ActivityScenario<RecreationTest6Activity> =
+            ActivityScenario.launch(RecreationTest6Activity::class.java)
+
+        activityScenario.moveToState(Lifecycle.State.RESUMED)
+
+        activityScenario.onActivity {
+            assertThat(it.state.value).isEqualTo(0)
+            // change the value, so we can assert this change will be restored
+            it.state.value = 1
+        }
+
+        activityScenario.recreate()
+
+        activityScenario.onActivity {
+            assertThat(it.state.value).isEqualTo(1)
+        }
+    }
+
+    @Test
+    fun valueStoredInMutableStateWithCustomSaverInsideSaveableStateHolderIsRestored() {
+        val activityScenario: ActivityScenario<RecreationTest7Activity> =
+            ActivityScenario.launch(RecreationTest7Activity::class.java)
+
+        activityScenario.moveToState(Lifecycle.State.RESUMED)
+
+        activityScenario.onActivity {
+            assertThat(it.state.value).isEqualTo(Count(0))
+            // change the value, so we can assert this change will be restored
+            it.state.value = Count(1)
+        }
+
+        activityScenario.recreate()
+
+        activityScenario.onActivity {
+            assertThat(it.state.value).isEqualTo(Count(1))
+        }
+    }
+
+    @Test
+    fun stateStoredViaListSaverOrMapSaverIsRestored() {
+        val activityScenario: ActivityScenario<RecreationTest8Activity> =
+            ActivityScenario.launch(RecreationTest8Activity::class.java)
+
+        activityScenario.moveToState(Lifecycle.State.RESUMED)
+
+        activityScenario.onActivity {
+            assertThat(it.stateAsList.value).isEqualTo(0)
+            assertThat(it.stateAsMap.value).isEqualTo(0)
+            // change the value, so we can assert this change will be restored
+            it.stateAsList.value = 1
+            it.stateAsMap.value = 2
+        }
+
+        activityScenario.recreate()
+
+        activityScenario.onActivity {
+            assertThat(it.stateAsList.value).isEqualTo(1)
+            assertThat(it.stateAsMap.value).isEqualTo(2)
+        }
+    }
+
     private fun FragmentActivity.findFragment(id: Int) =
         supportFragmentManager.findFragmentById(id) as TestFragment
 }
 
-class RecreationTest1Activity : ComponentActivity() {
+class RecreationTest1Activity : BaseRestorableActivity() {
 
     lateinit var array: IntArray
 
@@ -168,8 +231,7 @@ class RecreationTest1Activity : ComponentActivity() {
     }
 }
 
-class RecreationTest2Activity : ComponentActivity() {
-
+class RecreationTest2Activity : BaseRestorableActivity() {
     lateinit var array: IntArray
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -181,7 +243,7 @@ class RecreationTest2Activity : ComponentActivity() {
     }
 }
 
-class RecreationTest3Activity : ComponentActivity() {
+class RecreationTest3Activity : BaseRestorableActivity() {
 
     lateinit var array1: IntArray
     lateinit var array2: IntArray
@@ -216,7 +278,7 @@ class RecreationTest3Activity : ComponentActivity() {
     }
 }
 
-class RecreationTest4Activity : FragmentActivity() {
+class RecreationTest4Activity : BaseRestorableActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -246,7 +308,7 @@ class RecreationTest4Activity : FragmentActivity() {
     }
 }
 
-class RecreationTest5Activity : ComponentActivity() {
+class RecreationTest5Activity : BaseRestorableActivity() {
 
     lateinit var state: MutableState<Int>
 
@@ -254,6 +316,83 @@ class RecreationTest5Activity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         setContent {
             state = rememberSaveable { mutableStateOf(0) }
+        }
+    }
+}
+
+class RecreationTest6Activity : BaseRestorableActivity() {
+
+    lateinit var state: MutableState<Int>
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        setContent {
+            val holder = rememberSaveableStateHolder()
+            holder.SaveableStateProvider(0) {
+                state = rememberSaveable { mutableStateOf(0) }
+            }
+        }
+    }
+}
+
+class RecreationTest7Activity : BaseRestorableActivity() {
+
+    lateinit var state: MutableState<Count>
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        setContent {
+            val holder = rememberSaveableStateHolder()
+            holder.SaveableStateProvider(0) {
+                state = rememberSaveable(stateSaver = CountSaver) { mutableStateOf(Count(0)) }
+            }
+        }
+    }
+}
+
+class RecreationTest8Activity : BaseRestorableActivity() {
+
+    lateinit var stateAsList: MutableState<Int>
+    lateinit var stateAsMap: MutableState<Int>
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        setContent {
+            val holder = rememberSaveableStateHolder()
+            holder.SaveableStateProvider(0) {
+                stateAsList = rememberSaveable(saver = StateAsListSaver) { mutableStateOf(0) }
+                stateAsMap = rememberSaveable(saver = StateAsMapSaver) { mutableStateOf(0) }
+            }
+        }
+    }
+}
+
+val StateAsListSaver = listSaver<MutableState<Int>, MutableState<Int>>(
+    save = { listOf(it) },
+    restore = { it[0] }
+)
+
+val StateAsMapSaver = mapSaver(
+    save = { mapOf("state" to it) },
+    restore = {
+        @Suppress("UNCHECKED_CAST")
+        it["state"] as MutableState<Int>
+    }
+)
+
+abstract class BaseRestorableActivity : FragmentActivity() {
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        if (savedInstanceState == null) {
+            super.onCreate(null)
+        } else {
+            // we make sure all the values we stored in bundle are really parcelable as
+            // activityScenario.recreate() will not verify that and just reuse the Bundle object
+            val parcel = Parcel.obtain()
+            parcel.writeBundle(savedInstanceState)
+            parcel.setDataPosition(0)
+            val restored = parcel.readBundle(classLoader)
+            super.onCreate(restored)
         }
     }
 }
@@ -273,3 +412,10 @@ class TestFragment : Fragment() {
         }
     }
 }
+
+data class Count(val count: Int)
+
+val CountSaver = Saver<Count, Int>(
+    save = { it.count },
+    restore = { Count(it) }
+)
