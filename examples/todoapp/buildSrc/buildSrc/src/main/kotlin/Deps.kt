@@ -12,8 +12,7 @@ object Deps {
 
         object Compose {
             // __LATEST_COMPOSE_RELEASE_VERSION__
-            // TODO remove exclude(group = "org.jetbrains.compose.desktop")
-            private const val VERSION = "0.3.0"
+            private const val VERSION = "0.4.0-build168"
             const val gradlePlugin = "org.jetbrains.compose:compose-gradle-plugin:$VERSION"
         }
     }
@@ -50,7 +49,7 @@ object Deps {
         }
 
         object Decompose {
-            private const val VERSION = "0.1.8"
+            private const val VERSION = "0.1.9"
             const val decompose = "com.arkivanov.decompose:decompose:$VERSION"
             const val decomposeIosX64 = "com.arkivanov.decompose:decompose-iosx64:$VERSION"
             const val decomposeIosArm64 = "com.arkivanov.decompose:decompose-iosarm64:$VERSION"
