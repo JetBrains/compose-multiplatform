@@ -84,6 +84,7 @@ fun ParameterType.convert(): Parameter.Type {
         ParameterType.DimensionEm -> Parameter.Type.DIMENSION_EM
         ParameterType.Lambda -> Parameter.Type.LAMBDA
         ParameterType.FunctionReference -> Parameter.Type.FUNCTION_REFERENCE
+        ParameterType.Iterable -> Parameter.Type.ITERABLE
     }
 }
 

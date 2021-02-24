@@ -110,8 +110,10 @@ class LayoutInspectorTree {
     /**
      * Converts the [RawParameter]s of the [node] into displayable parameters.
      */
-    fun convertParameters(node: InspectorNode): List<NodeParameter> {
-        return node.parameters.mapNotNull { parameterFactory.create(node, it.name, it.value) }
+    fun convertParameters(rootId: Long, node: InspectorNode): List<NodeParameter> {
+        return node.parameters.mapIndexed { index, parameter ->
+            parameterFactory.create(rootId, node, parameter.name, parameter.value, index)
+        }
     }
 
     /**

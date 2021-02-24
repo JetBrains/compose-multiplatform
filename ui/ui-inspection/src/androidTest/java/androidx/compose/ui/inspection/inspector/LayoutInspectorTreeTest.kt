@@ -71,6 +71,7 @@ import java.util.WeakHashMap
 import kotlin.math.roundToInt
 
 private const val DEBUG = false
+private const val ROOT_ID = 3L
 
 @LargeTest
 @RunWith(AndroidJUnit4::class)
@@ -456,14 +457,10 @@ class LayoutInspectorTreeTest {
             }
 
             if (checkParameters) {
-                val params = builder.convertParameters(node)
+                val params = builder.convertParameters(ROOT_ID, node)
                 val receiver = ParameterValidationReceiver(params.listIterator())
                 receiver.block()
-                if (receiver.parameterIterator.hasNext()) {
-                    val elementNames = mutableListOf<String>()
-                    receiver.parameterIterator.forEachRemaining { elementNames.add(it.name) }
-                    error("$name: has more parameters like: ${elementNames.joinToString()}")
-                }
+                receiver.checkFinished(name)
             }
         }
     }
@@ -526,7 +523,7 @@ class LayoutInspectorTreeTest {
         println()
         print(")")
         if (generateParameters && node.parameters.isNotEmpty()) {
-            generateParameters(builder.convertParameters(node), 0)
+            generateParameters(builder.convertParameters(ROOT_ID, node), 0)
         }
         println()
         node.children.forEach { generateValidate(it, builder) }

@@ -121,6 +121,7 @@ message Parameter {
       DIMENSION_EM = 11;
       LAMBDA = 12;
       FUNCTION_REFERENCE = 13;
+      ITERABLE = 14;
     }
 
     Type type = 1;

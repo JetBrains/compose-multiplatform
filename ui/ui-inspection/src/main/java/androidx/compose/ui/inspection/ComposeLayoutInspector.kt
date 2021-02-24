@@ -137,11 +137,13 @@ class ComposeLayoutInspector(
                 getParametersCommand.skipSystemComposables
             )[getParametersCommand.composableId]
 
+        val rootId = getParametersCommand.rootViewId
+
         callback.reply {
             getParametersResponse = if (foundComposable != null) {
                 val stringTable = StringTable()
-                val parameters =
-                    foundComposable.convertParameters(layoutInspectorTree).convertAll(stringTable)
+                val parameters = foundComposable.convertParameters(layoutInspectorTree, rootId)
+                    .convertAll(stringTable)
                 GetParametersResponse.newBuilder().apply {
                     parameterGroup = ParameterGroup.newBuilder().apply {
                         composableId = getParametersCommand.composableId
@@ -165,11 +167,13 @@ class ComposeLayoutInspector(
                 getAllParametersCommand.skipSystemComposables
             ).values
 
+        val rootId = getAllParametersCommand.rootViewId
+
         callback.reply {
             val stringTable = StringTable()
             val parameterGroups = allComposables.map { composable ->
-                val parameters =
-                    composable.convertParameters(layoutInspectorTree).convertAll(stringTable)
+                val parameters = composable.convertParameters(layoutInspectorTree, rootId)
+                    .convertAll(stringTable)
                 ParameterGroup.newBuilder().apply {
                     composableId = composable.id
                     addAllParameter(parameters)
@@ -177,7 +181,7 @@ class ComposeLayoutInspector(
             }
 
             getAllParametersResponse = GetAllParametersResponse.newBuilder().apply {
-                rootViewId = getAllParametersCommand.rootViewId
+                rootViewId = rootId
                 addAllParameterGroups(parameterGroups)
                 addAllStrings(stringTable.toStringEntries())
             }.build()
