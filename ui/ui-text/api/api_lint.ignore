@@ -37,6 +37,12 @@ MissingNullability: androidx.compose.ui.text.style.BaselineShift#toString-impl(f
     Missing nullability on method `toString-impl` return
 
 
+NullableCollection: androidx.compose.ui.text.SpanStyle#getLocaleList():
+    Return type of method androidx.compose.ui.text.SpanStyle.getLocaleList() is a nullable collection (`androidx.compose.ui.text.intl.LocaleList`); must be non-null
+NullableCollection: androidx.compose.ui.text.TextStyle#getLocaleList():
+    Return type of method androidx.compose.ui.text.TextStyle.getLocaleList() is a nullable collection (`androidx.compose.ui.text.intl.LocaleList`); must be non-null
+
+
 SetterReturnsThis: androidx.compose.ui.text.AnnotatedString.Builder#addStringAnnotation(String, String, int, int):
     Methods must return the builder object (return type androidx.compose.ui.text.AnnotatedString.Builder instead of void): method androidx.compose.ui.text.AnnotatedString.Builder.addStringAnnotation(String,String,int,int)
 SetterReturnsThis: androidx.compose.ui.text.AnnotatedString.Builder#addStyle(androidx.compose.ui.text.ParagraphStyle, int, int):
