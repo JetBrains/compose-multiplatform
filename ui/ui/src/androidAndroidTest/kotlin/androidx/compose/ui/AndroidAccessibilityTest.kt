@@ -305,6 +305,7 @@ class AndroidAccessibilityTest {
     }
 
     @Test
+    @SdkSuppress(minSdkVersion = Build.VERSION_CODES.O)
     fun reportedTexts_inTextFieldWithLabel_whenEditableTextNotEmpty() {
         textFieldValue.value = TextFieldValue(InitialText)
         val textFieldNode = rule.onNodeWithTag(TextFieldTag)
