@@ -27,17 +27,15 @@ import androidx.compose.ui.inspection.util.ThreadUtils
  * This method can take a long time, especially the first time, and should be called off the main
  * thread.
  */
-fun InspectorNode.convertParameters(): List<NodeParameter> {
+fun InspectorNode.convertParameters(layoutInspectorTree: LayoutInspectorTree): List<NodeParameter> {
     ThreadUtils.assertOffMainThread()
-    return LayoutInspectorTree().convertParameters(this)
+    return layoutInspectorTree.convertParameters(this)
 }
 
 /**
  * Flatten an inspector node into a list containing itself and all its children.
  */
 fun InspectorNode.flatten(): Sequence<InspectorNode> {
-    ThreadUtils.assertOnMainThread()
-
     val remaining = mutableListOf(this)
     return generateSequence {
         val next = remaining.removeLastOrNull()
