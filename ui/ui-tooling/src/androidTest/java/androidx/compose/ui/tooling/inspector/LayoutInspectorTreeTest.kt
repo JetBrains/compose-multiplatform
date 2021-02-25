@@ -52,6 +52,7 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.LargeTest
+import androidx.test.filters.MediumTest
 import androidx.test.filters.SdkSuppress
 import com.google.common.truth.Truth.assertThat
 import com.google.common.truth.Truth.assertWithMessage
@@ -63,7 +64,7 @@ import kotlin.math.roundToInt
 
 private const val DEBUG = false
 
-@LargeTest
+@MediumTest
 @RunWith(AndroidJUnit4::class)
 @SdkSuppress(minSdkVersion = 29) // Render id is not returned for api < 29
 @OptIn(UiToolingDataApi::class)
@@ -225,6 +226,7 @@ class LayoutInspectorTreeTest : ToolingTest() {
         assertThat(nodes.size).isEqualTo(1)
     }
 
+    @LargeTest
     @Test
     fun testStitchTreeFromModelDrawerLayoutWithSystemNodes() {
         val slotTableRecord = CompositionDataRecord.create()
