@@ -1076,7 +1076,7 @@ internal class NestedReadonlySnapshot(
     override val readOnly get() = true
     override val root: Snapshot get() = parent.root
     override fun takeNestedSnapshot(readObserver: ((Any) -> Unit)?) =
-        parent.takeNestedSnapshot(readObserver)
+        NestedReadonlySnapshot(id, invalid, readObserver, parent)
     override fun notifyObjectsInitialized() {
         // Nothing to do for read-only snapshots
     }

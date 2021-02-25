@@ -641,6 +641,22 @@ class SnapshotTests {
         snapshot.dispose()
     }
 
+    @Test // Regression test for b/181159260
+    fun readOnlySnapshotValidAfterParentDisposed() {
+        var state by mutableStateOf(0)
+        val parent = Snapshot.takeMutableSnapshot()
+        parent.enter { state = 1 }
+        val child = parent.takeNestedSnapshot()
+        parent.apply().check()
+        parent.dispose()
+        child.enter { assertEquals(1, state) }
+        val reads = mutableListOf<Any>()
+        val nestedChild = child.takeNestedSnapshot { reads.add(it) }
+        nestedChild.enter { assertEquals(1, state) }
+        child.dispose()
+        nestedChild.dispose()
+    }
+
     private var count = 0
 
     @BeforeTest
@@ -651,7 +667,7 @@ class SnapshotTests {
     // Validate that the tests do not change the number of open snapshots
     @AfterTest
     fun validateOpenSnapshots() {
-        assertEquals(count, openSnapshotCount())
+        assertEquals(count, openSnapshotCount(), "A snapshot was not disposed correctly")
     }
 }
 
