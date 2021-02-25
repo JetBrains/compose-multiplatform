@@ -26,7 +26,6 @@ import android.view.MotionEvent.ACTION_POINTER_INDEX_SHIFT
 import android.view.MotionEvent.ACTION_POINTER_UP
 import android.view.MotionEvent.ACTION_UP
 import androidx.compose.ui.geometry.Offset
-import androidx.compose.ui.layout.boundsInWindow
 import androidx.compose.ui.node.RootForTest
 import androidx.compose.ui.platform.AndroidUiDispatcher
 import androidx.compose.ui.platform.ViewRootForTest
@@ -131,9 +130,10 @@ internal class AndroidInputDispatcher(
                 firstEventTime = eventTime
             }
             batchedEvents.add { lateness ->
-                val positionInWindow = if (root != null) {
-                    root.semanticsOwner.rootSemanticsNode.layoutInfo.coordinates.boundsInWindow()
-                        .topLeft
+                val positionInScreen = if (root != null) {
+                    val array = intArrayOf(0, 0)
+                    root.view.getLocationOnScreen(array)
+                    Offset(array[0].toFloat(), array[1].toFloat())
                 } else {
                     Offset.Zero
                 }
@@ -147,8 +147,8 @@ internal class AndroidInputDispatcher(
                     },
                     /* pointerCoords = */ Array(coordinates.size) {
                         MotionEvent.PointerCoords().apply {
-                            x = coordinates[it].x
-                            y = coordinates[it].y
+                            x = positionInScreen.x + coordinates[it].x
+                            y = positionInScreen.y + coordinates[it].y
                         }
                     },
                     /* metaState = */ 0,
@@ -160,7 +160,7 @@ internal class AndroidInputDispatcher(
                     /* source = */ 0,
                     /* flags = */ 0
                 ).apply {
-                    offsetLocation(-positionInWindow.x, -positionInWindow.y)
+                    offsetLocation(-positionInScreen.x, -positionInScreen.y)
                 }
             }
         }
