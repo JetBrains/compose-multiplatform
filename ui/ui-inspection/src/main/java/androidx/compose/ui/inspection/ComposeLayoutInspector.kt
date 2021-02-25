@@ -22,6 +22,7 @@ import androidx.compose.ui.inspection.compose.AndroidComposeViewWrapper
 import androidx.compose.ui.inspection.compose.convertParameters
 import androidx.compose.ui.inspection.compose.flatten
 import androidx.compose.ui.inspection.framework.flatten
+import androidx.compose.ui.inspection.inspector.LayoutInspectorTree
 import androidx.compose.ui.inspection.proto.StringTable
 import androidx.compose.ui.inspection.proto.convertAll
 import androidx.compose.ui.inspection.util.ThreadUtils
@@ -56,6 +57,8 @@ class ComposeLayoutInspector(
     connection: Connection,
     private val environment: InspectorEnvironment
 ) : Inspector(connection) {
+
+    private val layoutInspectorTree = LayoutInspectorTree()
 
     override fun onReceiveCommand(data: ByteArray, callback: CommandCallback) {
         val command = Command.parseFrom(data)
@@ -165,28 +168,29 @@ class ComposeLayoutInspector(
             }
         }
     }
-}
 
-private fun getComposableRoots(
-    rootViewId: Long,
-    skipSystemComposables: Boolean
-): Sequence<AndroidComposeViewWrapper> {
-    ThreadUtils.assertOnMainThread()
+    private fun getComposableRoots(
+        rootViewId: Long,
+        skipSystemComposables: Boolean
+    ): Sequence<AndroidComposeViewWrapper> {
+        ThreadUtils.assertOnMainThread()
 
-    return WindowInspector.getGlobalWindowViews()
-        .asSequence()
-        .filter { view -> view.visibility == View.VISIBLE && view.isAttachedToWindow }
-        // Note: When querying root views, there should only be 0 or 1 match here, but it's
-        // easier to handle this as a general filter, to avoid ? operators all the rest of
-        // the way down
-        .filter { it.uniqueDrawingId == rootViewId }
-        .flatMap { it.flatten() }
-        .mapNotNull {
-            AndroidComposeViewWrapper.tryCreateFor(
-                it,
-                skipSystemComposables
-            )
-        }
+        return WindowInspector.getGlobalWindowViews()
+            .asSequence()
+            .filter { view -> view.visibility == View.VISIBLE && view.isAttachedToWindow }
+            // Note: When querying root views, there should only be 0 or 1 match here, but it's
+            // easier to handle this as a general filter, to avoid ? operators all the rest of
+            // the way down
+            .filter { it.uniqueDrawingId == rootViewId }
+            .flatMap { it.flatten() }
+            .mapNotNull {
+                AndroidComposeViewWrapper.tryCreateFor(
+                    layoutInspectorTree,
+                    it,
+                    skipSystemComposables
+                )
+            }
+    }
 }
 
 private fun Inspector.CommandCallback.reply(initResponse: Response.Builder.() -> Unit) {
