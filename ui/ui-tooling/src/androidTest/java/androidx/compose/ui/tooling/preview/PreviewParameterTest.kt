@@ -22,10 +22,12 @@ import androidx.compose.material.lightColors
 import androidx.compose.ui.tooling.preview.datasource.CollectionPreviewParameterProvider
 import androidx.compose.ui.tooling.preview.datasource.LoremIpsum
 import androidx.compose.ui.tooling.test.R
+import androidx.test.filters.MediumTest
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 
+@MediumTest
 class PreviewParameterTest {
     @Suppress("DEPRECATION")
     @get:Rule
