@@ -70,11 +70,19 @@ private fun View.isSystemView(): Boolean {
  * As this class extracts information about the view it's targeting, it must be instantiated on the
  * UI thread.
  */
-class AndroidComposeViewWrapper(composeView: View, skipSystemComposables: Boolean) {
+class AndroidComposeViewWrapper(
+    layoutInspectorTree: LayoutInspectorTree,
+    composeView: View,
+    skipSystemComposables: Boolean
+) {
     companion object {
-        fun tryCreateFor(view: View, skipSystemComposables: Boolean): AndroidComposeViewWrapper? {
+        fun tryCreateFor(
+            layoutInspectorTree: LayoutInspectorTree,
+            view: View,
+            skipSystemComposables: Boolean
+        ): AndroidComposeViewWrapper? {
             return if (view.isAndroidComposeView()) {
-                AndroidComposeViewWrapper(view, skipSystemComposables)
+                AndroidComposeViewWrapper(layoutInspectorTree, view, skipSystemComposables)
             } else {
                 null
             }
@@ -90,8 +98,7 @@ class AndroidComposeViewWrapper(composeView: View, skipSystemComposables: Boolea
         if (!skipSystemComposables) composeView
         else composeView.ancestors().first { !it.isSystemView() || it.isRoot() }
 
-    // TODO: Reuse LayoutInspectorTree to avoid redoing the constant searching in ParameterFactory
-    val inspectorNodes = LayoutInspectorTree().apply {
+    val inspectorNodes = layoutInspectorTree.apply {
         this.hideSystemNodes = skipSystemComposables
     }.convert(composeView)
 
