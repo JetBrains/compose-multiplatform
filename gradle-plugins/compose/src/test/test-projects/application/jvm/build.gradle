@@ -46,6 +46,9 @@ compose.desktop {
                 menuGroup = "compose"
                 upgradeUuid = "2d6ff464-75be-40ad-a256-56420b9cc374"
             }
+            macOS {
+                dockName = "CustomDockName"
+            }
         }
     }
 }

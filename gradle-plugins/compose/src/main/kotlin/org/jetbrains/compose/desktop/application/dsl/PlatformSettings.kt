@@ -12,6 +12,8 @@ abstract class PlatformSettings (objects: ObjectFactory) {
 
 open class MacOSPlatformSettings @Inject constructor(objects: ObjectFactory): PlatformSettings(objects) {
     var packageName: String? = null
+    var dockName: String? = null
+    var setDockNameSameAsPackageName: Boolean = true
     var dmgPackageVersion: String? = null
     var pkgPackageVersion: String? = null
 
