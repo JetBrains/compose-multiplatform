@@ -16,6 +16,7 @@
 
 package androidx.compose.ui
 
+import android.graphics.Rect
 import android.graphics.RectF
 import android.os.Build
 import android.os.Bundle
@@ -137,7 +138,6 @@ class AndroidAccessibilityTest {
             }
 
             activity.setContentView(container)
-
             androidComposeView = container.getChildAt(0) as AndroidComposeView
             delegate = ViewCompat.getAccessibilityDelegate(androidComposeView) as
                 AndroidComposeViewAccessibilityDelegateCompat
@@ -939,7 +939,7 @@ class AndroidAccessibilityTest {
     }
 
     @Test
-    fun testAccessibilityNodeInfoTreePruned() {
+    fun testAccessibilityNodeInfoTreePruned_completelyCovered() {
         val parentTag = "ParentForOverlappedChildren"
         val childOneTag = "OverlappedChildOne"
         val childTwoTag = "OverlappedChildTwo"
@@ -967,13 +967,50 @@ class AndroidAccessibilityTest {
             .fetchSemanticsNode("couldn't find node with tag $childOneTag")
         val overlappedChildTwoNode = rule.onNodeWithTag(childTwoTag)
             .fetchSemanticsNode("couldn't find node with tag $childTwoTag")
-
         assertEquals(1, provider.createAccessibilityNodeInfo(parentNode.id).childCount)
         assertEquals(
             "Child One",
             provider.createAccessibilityNodeInfo(overlappedChildOneNode.id).text.toString()
         )
         assertNull(provider.createAccessibilityNodeInfo(overlappedChildTwoNode.id))
+    }
+
+    @Test
+    fun testAccessibilityNodeInfoTreePruned_partiallyCovered() {
+        val parentTag = "parent"
+        val density = Density(2f)
+        container.setContent {
+            CompositionLocalProvider(LocalDensity provides density) {
+                Box(Modifier.testTag(parentTag)) {
+                    BasicText(
+                        "Child One",
+                        Modifier
+                            .zIndex(1f)
+                            .requiredSize(100.dp)
+                    )
+                    BasicText(
+                        "Child Two",
+                        Modifier.requiredSize(200.dp, 100.dp)
+                    )
+                }
+            }
+        }
+
+        val parentNode = rule.onNodeWithTag(parentTag)
+            .fetchSemanticsNode("couldn't find node with tag $parentTag")
+        assertEquals(2, provider.createAccessibilityNodeInfo(parentNode.id).childCount)
+
+        val childTwoNode = rule.onNodeWithText("Child Two")
+            .fetchSemanticsNode("couldn't find node with text Child Two")
+        val childTwoBounds = Rect()
+        provider.createAccessibilityNodeInfo(childTwoNode.id)
+            .getBoundsInScreen(childTwoBounds)
+        val expectedSize: Int
+        with(density) {
+            expectedSize = 100.dp.roundToPx()
+        }
+        assertEquals(expectedSize, childTwoBounds.height())
+        assertEquals(expectedSize, childTwoBounds.width())
     }
 
     @Test
@@ -1144,29 +1181,29 @@ class AndroidAccessibilityTest {
                 dialogComposeView = LocalView.current as AndroidComposeView
                 delegate = ViewCompat.getAccessibilityDelegate(dialogComposeView!!) as
                     AndroidComposeViewAccessibilityDelegateCompat
+                provider = delegate.getAccessibilityNodeProvider(dialogComposeView).provider
+                    as AccessibilityNodeProvider
 
                 Box(Modifier.size(300.dp)) {
                     BasicText(
                         text = "text",
-                        modifier = Modifier.offset(10.dp, 10.dp).fillMaxSize()
+                        modifier = Modifier.offset(100.dp, 100.dp).fillMaxSize()
                     )
                 }
             }
         }
 
         val textNode = rule.onNodeWithText("text").fetchSemanticsNode()
-        val info = AccessibilityNodeInfoCompat.obtain()
-        delegate.populateAccessibilityNodeInfoProperties(
-            textNode.id,
-            info,
-            textNode
-        )
+        var info: AccessibilityNodeInfo = AccessibilityNodeInfo.obtain()
+        rule.runOnUiThread {
+            info = provider.createAccessibilityNodeInfo(textNode.id)
+        }
 
         val viewPosition = intArrayOf(0, 0)
         dialogComposeView!!.getLocationOnScreen(viewPosition)
         with(rule.density) {
-            val offset = 10.dp.roundToPx()
-            val size = 300.dp.roundToPx()
+            val offset = 100.dp.roundToPx()
+            val size = 200.dp.roundToPx()
             val textPositionOnScreenX = viewPosition[0] + offset
             val textPositionOnScreenY = viewPosition[1] + offset
 
