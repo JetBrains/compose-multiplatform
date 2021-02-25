@@ -23,6 +23,8 @@ import androidx.compose.ui.tooling.compositionCount
 import androidx.compose.ui.tooling.data.UiToolingDataApi
 import androidx.compose.ui.tooling.preview.animation.PreviewAnimationClock
 import androidx.compose.ui.tooling.test.R
+import androidx.test.filters.LargeTest
+import androidx.test.filters.MediumTest
 import org.junit.Assert.assertArrayEquals
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
@@ -35,6 +37,7 @@ import java.util.concurrent.CountDownLatch
 import java.util.concurrent.TimeUnit
 import java.util.concurrent.atomic.AtomicBoolean
 
+@MediumTest
 @OptIn(UiToolingDataApi::class)
 class ComposeViewAdapterTest {
     @Suppress("DEPRECATION")
@@ -265,6 +268,7 @@ class ComposeViewAdapterTest {
     /**
      * Check that no re-composition happens without forcing it.
      */
+    @LargeTest
     @Test
     fun testNoInvalidation() {
         compositionCount.set(0)
