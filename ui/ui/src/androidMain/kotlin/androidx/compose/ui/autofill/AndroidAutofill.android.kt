@@ -21,8 +21,10 @@ import android.util.Log
 import android.util.SparseArray
 import android.view.View
 import android.view.ViewStructure
+import android.view.autofill.AutofillId
 import android.view.autofill.AutofillManager
 import android.view.autofill.AutofillValue
+import androidx.annotation.DoNotInline
 import androidx.annotation.RequiresApi
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.graphics.toAndroidRect
@@ -70,14 +72,21 @@ internal class AndroidAutofill(val view: View, val autofillTree: AutofillTree) :
 internal fun AndroidAutofill.populateViewStructure(root: ViewStructure) {
 
     // Add child nodes. The function returns the index to the first item.
-    var index = root.addChildCount(autofillTree.children.count())
+    var index = AutofillApi23Helper.addChildCount(root, autofillTree.children.count())
 
     for ((id, autofillNode) in autofillTree.children) {
-        root.newChild(index)?.apply {
-            setAutofillId(root.autofillId!!, id)
-            setId(id, view.context.packageName, null, null)
-            setAutofillType(View.AUTOFILL_TYPE_TEXT)
-            setAutofillHints(autofillNode.autofillTypes.map { it.androidType }.toTypedArray())
+        AutofillApi23Helper.newChild(root, index)?.also { child ->
+            AutofillApi26Helper.setAutofillId(
+                child,
+                AutofillApi26Helper.getAutofillId(root)!!,
+                id
+            )
+            AutofillApi23Helper.setId(child, id, view.context.packageName, null, null)
+            AutofillApi26Helper.setAutofillType(child, View.AUTOFILL_TYPE_TEXT)
+            AutofillApi26Helper.setAutofillHints(
+                child,
+                autofillNode.autofillTypes.map { it.androidType }.toTypedArray()
+            )
 
             if (autofillNode.boundingBox == null) {
                 // Do we need an exception here? warning? silently ignore? If the boundingbox is
@@ -89,7 +98,7 @@ internal fun AndroidAutofill.populateViewStructure(root: ViewStructure) {
                 )
             }
             autofillNode.boundingBox?.toAndroidRect()?.run {
-                setDimens(left, top, 0, 0, width(), height())
+                AutofillApi23Helper.setDimens(child, left, top, 0, 0, width(), height())
             }
         }
         index++
@@ -106,10 +115,102 @@ internal fun AndroidAutofill.performAutofill(values: SparseArray<AutofillValue>)
         val itemId = values.keyAt(index)
         val value = values[itemId]
         when {
-            value.isText -> autofillTree.performAutofill(itemId, value.textValue.toString())
-            value.isDate -> TODO("b/138604541: Add onFill() callback for date")
-            value.isList -> TODO("b/138604541: Add onFill() callback for list")
-            value.isToggle -> TODO("b/138604541:  Add onFill() callback for toggle")
+            AutofillApi26Helper.isText(value) -> autofillTree.performAutofill(
+                itemId,
+                AutofillApi26Helper.textValue(value).toString()
+            )
+            AutofillApi26Helper.isDate(value) ->
+                TODO("b/138604541: Add onFill() callback for date")
+            AutofillApi26Helper.isList(value) ->
+                TODO("b/138604541: Add onFill() callback for list")
+            AutofillApi26Helper.isToggle(value) ->
+                TODO("b/138604541:  Add onFill() callback for toggle")
         }
     }
+}
+
+/**
+ * This class is here to ensure that the classes that use this API will get verified and can be
+ * AOT compiled. It is expected that this class will soft-fail verification, but the classes
+ * which use this method will pass.
+ */
+@RequiresApi(26)
+internal object AutofillApi26Helper {
+    @RequiresApi(26)
+    @DoNotInline
+    fun setAutofillId(structure: ViewStructure, parent: AutofillId, virtualId: Int) =
+        structure.setAutofillId(parent, virtualId)
+
+    @RequiresApi(26)
+    @DoNotInline
+    fun getAutofillId(structure: ViewStructure) = structure.autofillId
+
+    @RequiresApi(26)
+    @DoNotInline
+    fun setAutofillType(structure: ViewStructure, type: Int) = structure.setAutofillType(type)
+
+    @RequiresApi(26)
+    @DoNotInline
+    fun setAutofillHints(structure: ViewStructure, hints: Array<String>) =
+        structure.setAutofillHints(hints)
+
+    @RequiresApi(26)
+    @DoNotInline
+    fun isText(value: AutofillValue) = value.isText
+
+    @RequiresApi(26)
+    @DoNotInline
+    fun isDate(value: AutofillValue) = value.isDate
+
+    @RequiresApi(26)
+    @DoNotInline
+    fun isList(value: AutofillValue) = value.isList
+
+    @RequiresApi(26)
+    @DoNotInline
+    fun isToggle(value: AutofillValue) = value.isToggle
+
+    @RequiresApi(26)
+    @DoNotInline
+    fun textValue(value: AutofillValue): CharSequence = value.textValue
+}
+
+/**
+ * This class is here to ensure that the classes that use this API will get verified and can be
+ * AOT compiled. It is expected that this class will soft-fail verification, but the classes
+ * which use this method will pass.
+ */
+@RequiresApi(23)
+internal object AutofillApi23Helper {
+    @RequiresApi(23)
+    @DoNotInline
+    fun newChild(structure: ViewStructure, index: Int): ViewStructure? =
+        structure.newChild(index)
+
+    @RequiresApi(23)
+    @DoNotInline
+    fun addChildCount(structure: ViewStructure, num: Int) =
+        structure.addChildCount(num)
+
+    @RequiresApi(23)
+    @DoNotInline
+    fun setId(
+        structure: ViewStructure,
+        id: Int,
+        packageName: String?,
+        typeName: String?,
+        entryName: String?
+    ) = structure.setId(id, packageName, typeName, entryName)
+
+    @RequiresApi(23)
+    @DoNotInline
+    fun setDimens(
+        structure: ViewStructure,
+        left: Int,
+        top: Int,
+        scrollX: Int,
+        scrollY: Int,
+        width: Int,
+        height: Int
+    ) = structure.setDimens(left, top, scrollX, scrollY, width, height)
 }

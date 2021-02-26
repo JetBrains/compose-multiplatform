@@ -20,6 +20,7 @@ import android.os.Build
 import android.util.Log
 import android.view.View
 import android.view.autofill.AutofillManager
+import androidx.annotation.DoNotInline
 import androidx.annotation.RequiresApi
 import androidx.compose.ui.ExperimentalComposeUiApi
 
@@ -61,6 +62,7 @@ private object AutofillCallback : AutofillManager.AutofillCallback() {
  */
 @ExperimentalComposeUiApi
 @RequiresApi(Build.VERSION_CODES.O)
+@DoNotInline
 internal fun AndroidAutofill.registerCallback() {
     autofillManager.registerCallback(AutofillCallback)
 }
@@ -70,6 +72,7 @@ internal fun AndroidAutofill.registerCallback() {
  */
 @ExperimentalComposeUiApi
 @RequiresApi(Build.VERSION_CODES.O)
+@DoNotInline
 internal fun AndroidAutofill.unregisterCallback() {
     autofillManager.unregisterCallback(AutofillCallback)
 }

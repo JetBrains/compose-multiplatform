@@ -33,6 +33,7 @@ import android.view.ViewTreeObserver
 import android.view.autofill.AutofillValue
 import android.view.inputmethod.EditorInfo
 import android.view.inputmethod.InputConnection
+import androidx.annotation.DoNotInline
 import androidx.annotation.RequiresApi
 import androidx.annotation.RestrictTo
 import androidx.compose.runtime.getValue
@@ -307,9 +308,11 @@ internal class AndroidComposeView(context: Context) :
         setWillNotDraw(false)
         isFocusable = true
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            focusable = View.FOCUSABLE
-            // not to add the default focus highlight to the whole compose view
-            defaultFocusHighlightEnabled = false
+            AndroidComposeViewVerificationHelperMethods.focusable(
+                this,
+                focusable = View.FOCUSABLE,
+                defaultFocusHighlightEnabled = false
+            )
         }
         isFocusableInTouchMode = true
         clipChildren = false
@@ -926,3 +929,19 @@ private class TransformMatrixApi29 {
 @InternalComposeUiApi // used by testing infra
 var textInputServiceFactory: (PlatformTextInputService) -> TextInputService =
     { TextInputService(it) }
+
+/**
+ * This class is here to ensure that the classes that use this API will get verified and can be
+ * AOT compiled. It is expected that this class will soft-fail verification, but the classes
+ * which use this method will pass.
+ */
+@RequiresApi(Build.VERSION_CODES.O)
+internal object AndroidComposeViewVerificationHelperMethods {
+    @RequiresApi(Build.VERSION_CODES.O)
+    @DoNotInline
+    fun focusable(view: View, focusable: Int, defaultFocusHighlightEnabled: Boolean) {
+        view.focusable = focusable
+        // not to add the default focus highlight to the whole compose view
+        view.defaultFocusHighlightEnabled = defaultFocusHighlightEnabled
+    }
+}
