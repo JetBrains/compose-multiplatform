@@ -272,12 +272,12 @@ private val SETUP_INCLUDE = """
 
 private val TARGET_PREPARER_OPEN = """
     <target_preparer class="com.android.tradefed.targetprep.suite.SuiteApkInstaller">
+    <option name="cleanup-apks" value="false" />
 
 """.trimIndent()
 
 private val MEDIA_TARGET_PREPARER_OPEN = """
     <target_preparer class="com.android.tradefed.targetprep.suite.SuiteApkInstaller">
-    <option name="cleanup-apks" value="true" />
 
 """.trimIndent()
 
