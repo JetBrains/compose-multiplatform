@@ -202,6 +202,7 @@ internal fun AbstractJPackageTask.configurePlatformSettings(app: Application) {
                 linuxPackageName.set(provider { linux.packageName })
                 linuxRpmLicenseType.set(provider { linux.rpmLicenseType })
                 iconFile.set(linux.iconFile)
+                installationPath.set(linux.installationPath)
             }
         }
         OS.Windows -> {
@@ -214,6 +215,7 @@ internal fun AbstractJPackageTask.configurePlatformSettings(app: Application) {
                 winMenuGroup.set(provider { win.menuGroup })
                 winUpgradeUuid.set(provider { win.upgradeUuid })
                 iconFile.set(win.iconFile)
+                installationPath.set(win.installationPath)
             }
         }
         OS.MacOS -> {
@@ -222,6 +224,7 @@ internal fun AbstractJPackageTask.configurePlatformSettings(app: Application) {
                 nonValidatedMacBundleID.set(provider { mac.bundleID })
                 nonValidatedMacSigningSettings = app.nativeDistributions.macOS.signing
                 iconFile.set(mac.iconFile)
+                installationPath.set(mac.installationPath)
             }
         }
     }
