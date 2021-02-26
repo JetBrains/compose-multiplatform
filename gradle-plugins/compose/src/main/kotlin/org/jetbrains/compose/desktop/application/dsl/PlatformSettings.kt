@@ -8,6 +8,7 @@ import javax.inject.Inject
 abstract class PlatformSettings (objects: ObjectFactory) {
     val iconFile: RegularFileProperty = objects.fileProperty()
     var packageVersion: String? = null
+    var installationPath: String? = null
 }
 
 open class MacOSPlatformSettings @Inject constructor(objects: ObjectFactory): PlatformSettings(objects) {
