@@ -48,6 +48,7 @@ object LibraryGroups {
     val DRAWERLAYOUT = LibraryGroup("androidx.drawerlayout", LibraryVersions.DRAWERLAYOUT)
     val DYNAMICANIMATION = LibraryGroup("androidx.dynamicanimation", null)
     val EMOJI = LibraryGroup("androidx.emoji", null)
+    val EMOJI2 = LibraryGroup("androidx.emoji2", LibraryVersions.EMOJI2)
     val ENTERPRISE = LibraryGroup("androidx.enterprise", LibraryVersions.ENTERPRISE)
     val EXIFINTERFACE = LibraryGroup("androidx.exifinterface", LibraryVersions.EXIFINTERFACE)
     val FRAGMENT = LibraryGroup("androidx.fragment", LibraryVersions.FRAGMENT)
