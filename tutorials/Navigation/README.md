@@ -295,7 +295,7 @@ import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import com.arkivanov.decompose.extensions.compose.jetbrains.rootComponent
+import com.arkivanov.decompose.extensions.compose.jetbrains.rememberRootComponent
 
 fun main() {
     Window("Navigation tutorial") {
@@ -311,8 +311,8 @@ fun main() {
 
 @Composable
 private fun root(): Root =
-    // The rootComponent function provides the root ComponentContext and remembers the instance or Root
-    rootComponent { componentContext ->
+    // The rememberRootComponent function provides the root ComponentContext and remembers the instance or Root
+    rememberRootComponent { componentContext ->
         Root(
             componentContext = componentContext,
             database = DatabaseImpl() // Supply dependencies

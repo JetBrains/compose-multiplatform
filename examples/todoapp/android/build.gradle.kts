@@ -39,6 +39,5 @@ dependencies {
     implementation(Deps.ArkIvanov.Decompose.decompose)
     implementation(Deps.ArkIvanov.Decompose.extensionsCompose)
     implementation(Deps.AndroidX.AppCompat.appCompat)
-
     implementation(Deps.AndroidX.Activity.activityCompose)
 }
