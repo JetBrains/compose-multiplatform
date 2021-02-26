@@ -165,7 +165,7 @@ internal class RenderNodeLayer(
     private fun triggerRepaint() {
         // onDescendantInvalidated is only supported on O+
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            ownerView.parent?.onDescendantInvalidated(ownerView, ownerView)
+            WrapperRenderNodeLayerHelperMethods.onDescendantInvalidated(ownerView)
         } else {
             ownerView.invalidate()
         }
@@ -211,5 +211,18 @@ internal class RenderNodeLayer(
         }
         renderNode.getMatrix(androidMatrix)
         matrix.setFrom(androidMatrix)
+    }
+}
+
+/**
+ * This class is here to ensure that the classes that use this API will get verified and can be
+ * AOT compiled. It is expected that this class will soft-fail verification, but the classes
+ * which use this method will pass.
+ */
+@RequiresApi(Build.VERSION_CODES.O)
+internal object WrapperRenderNodeLayerHelperMethods {
+    @androidx.annotation.DoNotInline
+    fun onDescendantInvalidated(ownerView: AndroidComposeView) {
+        ownerView.parent?.onDescendantInvalidated(ownerView, ownerView)
     }
 }
