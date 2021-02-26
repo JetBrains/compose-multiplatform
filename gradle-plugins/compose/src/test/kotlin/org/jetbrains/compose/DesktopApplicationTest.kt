@@ -7,6 +7,7 @@ import org.jetbrains.compose.desktop.application.internal.currentOS
 import org.jetbrains.compose.desktop.application.internal.currentTarget
 import org.jetbrains.compose.test.*
 import org.junit.jupiter.api.Assertions.assertEquals
+import org.junit.jupiter.api.Assumptions
 import org.junit.jupiter.api.Test
 import java.util.jar.JarFile
 
@@ -133,6 +134,18 @@ class DesktopApplicationTest : GradlePluginTestBase() {
         gradle(":runDistributable").build().checks { check ->
             check.taskOutcome(":runDistributable", TaskOutcome.SUCCESS)
             check.logContains("Compose Gradle plugin test log warning!")
+        }
+    }
+
+    @Test
+    fun testMacOptions() {
+        Assumptions.assumeTrue(currentOS == OS.MacOS)
+
+        with(testProject(TestProjects.macOptions)) {
+            gradle(":runDistributable").build().checks { check ->
+                check.taskOutcome(":runDistributable", TaskOutcome.SUCCESS)
+                check.logContains("Hello, from Mac OS!")
+            }
         }
     }
 }

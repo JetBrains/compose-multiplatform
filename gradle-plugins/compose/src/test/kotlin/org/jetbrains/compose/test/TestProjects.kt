@@ -6,4 +6,5 @@ object TestProjects {
     const val jvmKotlinDsl = "application/jvmKotlinDsl"
     const val moduleClashCli = "application/moduleClashCli"
     const val javaLogger = "application/javaLogger"
+    const val macOptions = "application/macOptions"
 }

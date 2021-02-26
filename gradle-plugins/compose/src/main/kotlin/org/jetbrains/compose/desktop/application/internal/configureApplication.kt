@@ -221,6 +221,12 @@ internal fun AbstractJPackageTask.configurePlatformSettings(app: Application) {
         OS.MacOS -> {
             app.nativeDistributions.macOS.also { mac ->
                 macPackageName.set(provider { mac.packageName })
+                macDockName.set(
+                    if (mac.setDockNameSameAsPackageName)
+                        provider { mac.dockName }.orElse(macPackageName).orElse(packageName)
+                    else
+                        provider { mac.dockName }
+                )
                 nonValidatedMacBundleID.set(provider { mac.bundleID })
                 nonValidatedMacSigningSettings = app.nativeDistributions.macOS.signing
                 iconFile.set(mac.iconFile)

@@ -120,6 +120,10 @@ abstract class AbstractJPackageTask @Inject constructor(
 
     @get:Input
     @get:Optional
+    val macDockName: Property<String?> = objects.nullableProperty()
+
+    @get:Input
+    @get:Optional
     val winConsole: Property<Boolean?> = objects.nullableProperty()
 
     @get:Input
@@ -252,6 +256,9 @@ abstract class AbstractJPackageTask @Inject constructor(
             OS.MacOS -> {
                 cliArg("--mac-package-name", macPackageName)
                 cliArg("--mac-package-identifier", nonValidatedMacBundleID)
+                macDockName.orNull?.let { dockName ->
+                    cliArg("--java-options", "-Xdock:name=\"$dockName\"")
+                }
 
                 withValidatedMacOSSigning { signing ->
                     cliArg("--mac-sign", true)
