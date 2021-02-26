@@ -36,6 +36,20 @@ class DesktopApplicationTest : GradlePluginTestBase() {
     }
 
     @Test
+    fun testRunMpp() = with(testProject(TestProjects.mpp)) {
+        val logLine = "Kotlin MPP app is running!"
+        gradle("run").build().checks { check ->
+            check.taskOutcome(":run", TaskOutcome.SUCCESS)
+            check.logContains(logLine)
+        }
+        gradle("runDistributable").build().checks { check ->
+            check.taskOutcome(":createDistributable", TaskOutcome.SUCCESS)
+            check.taskOutcome(":runDistributable", TaskOutcome.SUCCESS)
+            check.logContains(logLine)
+        }
+    }
+
+    @Test
     fun kotlinDsl(): Unit = with(testProject(TestProjects.jvmKotlinDsl)) {
         gradle(":package", "--dry-run").build()
     }
