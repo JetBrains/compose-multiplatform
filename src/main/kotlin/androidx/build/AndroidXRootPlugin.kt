@@ -178,7 +178,10 @@ class AndroidXRootPlugin : Plugin<Project> {
         if (project.usingMaxDepVersions()) {
             // This requires evaluating all sub-projects to create the module:project map
             // and project dependencies.
-            evaluationDependsOnChildren()
+            allprojects { project2 ->
+                // evaluationDependsOnChildren isn't transitive so we must call it on each project
+                project2.evaluationDependsOnChildren()
+            }
             val projectModules = getProjectsMap()
             subprojects { subproject ->
                 // TODO(153485458) remove most of these exceptions
