@@ -24,7 +24,9 @@ import androidx.compose.ui.inspection.compose.flatten
 import androidx.compose.ui.inspection.framework.flatten
 import androidx.compose.ui.inspection.inspector.InspectorNode
 import androidx.compose.ui.inspection.inspector.LayoutInspectorTree
+import androidx.compose.ui.inspection.inspector.NodeParameterReference
 import androidx.compose.ui.inspection.proto.StringTable
+import androidx.compose.ui.inspection.proto.convert
 import androidx.compose.ui.inspection.proto.convertAll
 import androidx.compose.ui.inspection.util.ThreadUtils
 import androidx.inspection.Connection
@@ -36,6 +38,8 @@ import layoutinspector.compose.inspection.LayoutInspectorComposeProtocol.GetAllP
 import layoutinspector.compose.inspection.LayoutInspectorComposeProtocol.GetAllParametersResponse
 import layoutinspector.compose.inspection.LayoutInspectorComposeProtocol.GetComposablesCommand
 import layoutinspector.compose.inspection.LayoutInspectorComposeProtocol.GetComposablesResponse
+import layoutinspector.compose.inspection.LayoutInspectorComposeProtocol.GetParameterDetailsCommand
+import layoutinspector.compose.inspection.LayoutInspectorComposeProtocol.GetParameterDetailsResponse
 import layoutinspector.compose.inspection.LayoutInspectorComposeProtocol.GetParametersCommand
 import layoutinspector.compose.inspection.LayoutInspectorComposeProtocol.GetParametersResponse
 import layoutinspector.compose.inspection.LayoutInspectorComposeProtocol.ParameterGroup
@@ -89,6 +93,9 @@ class ComposeLayoutInspector(
             }
             Command.SpecializedCase.GET_ALL_PARAMETERS_COMMAND -> {
                 handleGetAllParametersCommand(command.getAllParametersCommand, callback)
+            }
+            Command.SpecializedCase.GET_PARAMETER_DETAILS_COMMAND -> {
+                handleGetParameterDetailsCommand(command.getParameterDetailsCommand, callback)
             }
             else -> error("Unexpected compose inspector command case: ${command.specializedCase}")
         }
@@ -185,6 +192,43 @@ class ComposeLayoutInspector(
                 addAllParameterGroups(parameterGroups)
                 addAllStrings(stringTable.toStringEntries())
             }.build()
+        }
+    }
+
+    private fun handleGetParameterDetailsCommand(
+        getParameterDetailsCommand: GetParameterDetailsCommand,
+        callback: CommandCallback
+    ) {
+        val composables = getComposableNodes(
+            getParameterDetailsCommand.rootViewId,
+            getParameterDetailsCommand.skipSystemComposables
+        )
+        val reference = NodeParameterReference(
+            getParameterDetailsCommand.reference.composableId,
+            getParameterDetailsCommand.reference.parameterIndex,
+            getParameterDetailsCommand.reference.compositeIndexList
+        )
+        val expanded = composables[reference.nodeId]?.let { composable ->
+            layoutInspectorTree.expandParameter(
+                getParameterDetailsCommand.rootViewId,
+                composable,
+                reference,
+                getParameterDetailsCommand.startIndex,
+                getParameterDetailsCommand.maxElements
+            )
+        }
+
+        callback.reply {
+            getParameterDetailsResponse = if (expanded != null) {
+                val stringTable = StringTable()
+                GetParameterDetailsResponse.newBuilder().apply {
+                    rootViewId = getParameterDetailsCommand.rootViewId
+                    parameter = expanded.convert(stringTable)
+                    addAllStrings(stringTable.toStringEntries())
+                }.build()
+            } else {
+                GetParameterDetailsResponse.getDefaultInstance()
+            }
         }
     }
 

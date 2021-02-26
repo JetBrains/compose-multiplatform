@@ -117,6 +117,33 @@ class LayoutInspectorTree {
     }
 
     /**
+     * Converts a part of the [RawParameter] identified by [reference] into a
+     * displayable parameter. If the parameter is some sort of a collection
+     * then [startIndex] and [maxElements] describes the scope of the data returned.
+     */
+    fun expandParameter(
+        rootId: Long,
+        node: InspectorNode,
+        reference: NodeParameterReference,
+        startIndex: Int,
+        maxElements: Int
+    ): NodeParameter? {
+        if (reference.parameterIndex !in node.parameters.indices) {
+            return null
+        }
+        val parameter = node.parameters[reference.parameterIndex]
+        return parameterFactory.expand(
+            rootId,
+            node,
+            parameter.name,
+            parameter.value,
+            reference,
+            startIndex,
+            maxElements
+        )
+    }
+
+    /**
      * Reset the generated id. Nodes are assigned an id if there isn't a layout node id present.
      */
     @Suppress("unused")
