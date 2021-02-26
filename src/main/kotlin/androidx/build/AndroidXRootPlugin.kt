@@ -29,6 +29,7 @@ import com.android.build.gradle.api.AndroidBasePlugin
 import com.android.build.gradle.internal.tasks.factory.dependsOn
 import org.gradle.api.Plugin
 import org.gradle.api.Project
+import org.gradle.api.artifacts.component.ModuleComponentSelector
 import org.gradle.api.plugins.ExtraPropertiesExtension
 import org.gradle.api.plugins.JavaPlugin
 import org.gradle.api.tasks.bundling.Zip
@@ -197,8 +198,14 @@ class AndroidXRootPlugin : Plugin<Project> {
                 ) {
                     subproject.configurations.all { configuration ->
                         configuration.resolutionStrategy.dependencySubstitution.apply {
-                            for (e in projectModules) {
-                                substitute(module(e.key)).with(project(e.value))
+                            all { dep ->
+                                val requested = dep.getRequested()
+                                if (requested is ModuleComponentSelector) {
+                                    val module = requested.group + ":" + requested.module
+                                    if (projectModules.containsKey(module)) {
+                                        dep.useTarget(project(projectModules[module]!!))
+                                    }
+                                }
                             }
                         }
                     }
