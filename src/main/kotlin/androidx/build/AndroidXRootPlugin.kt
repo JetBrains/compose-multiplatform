@@ -81,8 +81,7 @@ class AndroidXRootPlugin : Plugin<Project> {
         if (partiallyDejetifyArchiveTask != null)
             buildOnServerTask.dependsOn(partiallyDejetifyArchiveTask)
 
-        val projectModules = ConcurrentHashMap<String, String>()
-        extra.set("projects", projectModules)
+        extra.set("projects", ConcurrentHashMap<String, String>())
         buildOnServerTask.dependsOn(tasks.named(CheckExternalDependencyLicensesTask.TASK_NAME))
         // Anchor task that invokes running all subprojects :validateProperties tasks which ensure that
         // Android Studio sync is able to succeed.
@@ -180,6 +179,7 @@ class AndroidXRootPlugin : Plugin<Project> {
             // This requires evaluating all sub-projects to create the module:project map
             // and project dependencies.
             evaluationDependsOnChildren()
+            val projectModules = getProjectsMap()
             subprojects { subproject ->
                 // TODO(153485458) remove most of these exceptions
                 if (!subproject.name.contains("hilt") &&
