@@ -274,6 +274,74 @@ compose.desktop {
 }
 ```
 
+
+## Platform-specific options
+
+Platform-specific options should be set using the corresponding DSL blocks:
+``` kotlin
+compose.desktop {
+    application {
+        nativeDistributions {
+            macOS {
+                // macOS specific options
+            }
+            windows {
+                // Windows specific options
+            }
+            linux {
+                // Linux specific options
+            }
+        }
+    }
+}
+```
+
+The following platform-specific options are available 
+(the usage of non-documented properties **is not recommended**):
+* All platforms:
+    * `iconFile.set(File("PATH_TO_ICON"))` — a path to a platform-specific icon for the application.
+       (see the section `App icon` for details);
+    * `packageVersion = "1.0.0"` — a platform-specific package version
+      (see the section `Specifying package version` for details);
+    * `installationPath = "PATH_TO_INSTALL_DIR"` — an absolute or relative path to the default installation directory;
+         * On Windows `dirChooser = true` may be used to enable customizing the path during installation.
+* Linux:
+    * `packageName = "custom-package-name"` overrides the default application name;
+    * `debMaintainer = "maintainer@example.com"` — an email of the deb package's maintainer;
+    * `menuGroup = "my-example-menu-group"` — a menu group for the application;
+    * `appRelease = "1"` — a release value for the rpm package, or a revision value for the deb package;
+    * `appCategory = "CATEGORY"` — a group value for the rpm package, or a section value for the deb package;
+    * `rpmLicenseType = "TYPE_OF_LICENSE"` — a type of license for the rpm package;
+    * `debPackageVersion = "DEB_VERSION"` — a deb-specific package version 
+      (see the section `Specifying package version` for details);
+    * `rpmPackageVersion = "RPM_VERSION"` — a rpm-specific package version
+      (see the section `Specifying package version` for details);
+* macOS:
+    * `bundleID` — a unique application identifier;
+        * May only contain alphanumeric characters (`A-Z`,`a-z`,`0-9`), hyphen (`-`) and period (`.`) characters;
+        * Use of a reverse DNS notation (e.g. `com.mycompany.myapp`) is recommended;
+    * `packageName` — a name of the application in the menu bar;    
+    * `signing` and `notarization` — see
+      [the corresponding tutorial](/tutorials/Signing_and_notarization_on_macOS/README.md) 
+      for details;
+    * `dmgPackageVersion = "DMG_VERSION"` — a dmg-specific package version
+      (see the section `Specifying package version` for details);
+    * `pkgPackageVersion = "PKG_VERSION"` — a pkg-specific package version
+      (see the section `Specifying package version` for details);
+* Windows:
+    * `console = true` adds a console launcher for the application;
+    * `dirChooser = true` enables customizing the installation path during installation;
+    * `perUserInstall = true` enables installing the application on a per-user basis 
+    * `menuGroup = "start-menu-group"` adds the application to the specified Start menu group;
+    * `upgradeUuid = "UUID"` — a unique ID, which enables users to update an app via installer, 
+      when an updated version is newer, than an installed version. The value must remain constant for a single application.
+      See [the link](https://wixtoolset.org/documentation/manual/v3/howtos/general/generate_guids.html) 
+      for details on generating a UUID.
+    * `msiPackageVersion = "MSI_VERSION"` — a msi-specific package version
+          (see the section `Specifying package version` for details);
+    * `exePackageVersion = "EXE_VERSION"` — a pkg-specific package version
+    (see the section `Specifying package version` for details);
+    
 ## App icon
 
 The app icon needs to be provided in OS-specific formats:
