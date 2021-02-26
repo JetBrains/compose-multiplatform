@@ -42,6 +42,7 @@ import androidx.compose.ui.platform.SemanticsNodeWithAdjustedBounds
 import androidx.compose.ui.platform.getAllUncoveredSemanticsNodesToMap
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.semantics.CustomAccessibilityAction
+import androidx.compose.ui.semantics.LiveRegionMode
 import androidx.compose.ui.semantics.ProgressBarRangeInfo
 import androidx.compose.ui.semantics.ScrollAxisRange
 import androidx.compose.ui.semantics.SemanticsModifierCore
@@ -63,6 +64,7 @@ import androidx.compose.ui.semantics.expand
 import androidx.compose.ui.semantics.focused
 import androidx.compose.ui.semantics.getTextLayoutResult
 import androidx.compose.ui.semantics.horizontalScrollAxisRange
+import androidx.compose.ui.semantics.liveRegion
 import androidx.compose.ui.semantics.onClick
 import androidx.compose.ui.semantics.onLongClick
 import androidx.compose.ui.semantics.pasteText
@@ -78,6 +80,7 @@ import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.TextRange
 import androidx.compose.ui.unit.dp
+import androidx.core.view.ViewCompat
 import androidx.core.view.accessibility.AccessibilityNodeInfoCompat
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.MediumTest
@@ -380,6 +383,23 @@ class AndroidComposeViewAccessibilityDelegateCompatTest {
         }
         accessibilityDelegate.populateAccessibilityNodeInfoProperties(1, info, semanticsNode)
         assertEquals("android.widget.ImageView", info.className)
+    }
+
+    @Test
+    fun testPopulateAccessibilityNodeInfoProperties_liveRegion() {
+        var semanticsNode = createSemanticsNodeWithProperties(1, true) {
+            liveRegion = LiveRegionMode.Polite
+        }
+        accessibilityDelegate.populateAccessibilityNodeInfoProperties(1, info, semanticsNode)
+        assertEquals(ViewCompat.ACCESSIBILITY_LIVE_REGION_POLITE, info.liveRegion)
+        info.recycle()
+
+        info = AccessibilityNodeInfoCompat.obtain()
+        semanticsNode = createSemanticsNodeWithProperties(1, true) {
+            liveRegion = LiveRegionMode.Assertive
+        }
+        accessibilityDelegate.populateAccessibilityNodeInfoProperties(1, info, semanticsNode)
+        assertEquals(ViewCompat.ACCESSIBILITY_LIVE_REGION_ASSERTIVE, info.liveRegion)
     }
 
     @Test

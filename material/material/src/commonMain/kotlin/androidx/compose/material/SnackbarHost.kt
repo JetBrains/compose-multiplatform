@@ -37,6 +37,10 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.platform.AccessibilityManager
 import androidx.compose.ui.platform.LocalAccessibilityManager
+import androidx.compose.ui.semantics.LiveRegionMode
+import androidx.compose.ui.semantics.dismiss
+import androidx.compose.ui.semantics.liveRegion
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.util.fastForEach
 import kotlinx.coroutines.CancellableContinuation
 import kotlinx.coroutines.delay
@@ -299,6 +303,10 @@ private fun FadeInFadeOutWithScale(
                             scaleY = scale.value,
                             alpha = opacity.value
                         )
+                        .semantics {
+                            liveRegion = LiveRegionMode.Polite
+                            dismiss { key.dismiss(); true }
+                        }
                 ) {
                     children()
                 }
