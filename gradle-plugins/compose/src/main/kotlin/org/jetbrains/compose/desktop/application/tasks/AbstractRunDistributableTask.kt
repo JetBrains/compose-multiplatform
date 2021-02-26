@@ -43,7 +43,7 @@ abstract class AbstractRunDistributableTask @Inject constructor(
 
         execOperations.exec { spec ->
             spec.workingDir(workingDir)
-            spec.executable(executable)
+            spec.executable(workingDir.resolve(executable).absolutePath)
         }.assertNormalExitValue()
     }
 }
