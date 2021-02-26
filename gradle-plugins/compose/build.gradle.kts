@@ -60,7 +60,7 @@ val jar = tasks.named<Jar>("jar") {
 
 // __SUPPORTED_GRADLE_VERSIONS__
 val minGradleVersionForTests = "6.4"
-val maxGradleVersionForTests = "6.7"
+val maxGradleVersionForTests = "6.8.3"
 val javaHomeForTests: String? = when {
     JavaVersion.current() >= JavaVersion.VERSION_14 -> System.getProperty("java.home")
     else -> System.getenv("JDK_14")
