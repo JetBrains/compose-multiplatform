@@ -47,6 +47,7 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.test.runBlockingTest
 import kotlin.test.Test
 import kotlin.test.assertEquals
+import kotlin.test.assertFalse
 import kotlin.test.assertNotEquals
 import kotlin.test.assertTrue
 
@@ -2798,6 +2799,17 @@ class CompositionTests {
             } finally {
                 composition.dispose()
             }
+        }
+    }
+
+    @Test // Regression test for b/180124293
+    @OptIn(ExperimentalCoroutinesApi::class)
+    fun disposedCompositionShouldReportAsDisposed() = runBlockingTest {
+        localRecomposerTest { recomposer ->
+            val composition = Composition(EmptyApplier(), recomposer)
+            assertFalse(composition.isDisposed)
+            composition.dispose()
+            assertTrue(composition.isDisposed)
         }
     }
 }

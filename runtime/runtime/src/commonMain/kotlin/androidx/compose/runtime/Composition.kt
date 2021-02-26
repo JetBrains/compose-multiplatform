@@ -293,7 +293,7 @@ internal class CompositionImpl(
     override val isComposing: Boolean
         get() = composer.isComposing
 
-    override val isDisposed: Boolean = disposed
+    override val isDisposed: Boolean get() = disposed
 
     override val hasPendingChanges: Boolean
         get() = synchronized(lock) { composer.hasPendingChanges }
