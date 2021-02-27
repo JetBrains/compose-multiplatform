@@ -304,7 +304,7 @@ fun <T> mutableStateListOf(vararg elements: T) =
 fun <T> Collection<T>.toMutableStateList() = SnapshotStateList<T>().also { it.addAll(this) }
 
 /**
- * Create a instance of MutableSet<K, V> that is observable and can be snapshot.
+ * Create a instance of MutableMap<K, V> that is observable and can be snapshot.
  *
  * @sample androidx.compose.runtime.samples.stateMapSample
  *
