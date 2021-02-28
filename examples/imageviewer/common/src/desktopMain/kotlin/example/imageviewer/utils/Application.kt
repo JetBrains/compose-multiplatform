@@ -11,7 +11,9 @@ import kotlinx.coroutines.*
 import kotlinx.coroutines.swing.Swing
 import java.awt.image.BufferedImage
 
-fun Application(content: @Composable ApplicationScope.() -> Unit) {
+fun Application(
+    content: @Composable ApplicationScope.() -> Unit
+) {
     GlobalScope.launch(Dispatchers.Swing + ImmediateFrameClock()) {
         AppManager.setEvents(onWindowsEmpty = null)
 
