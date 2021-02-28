@@ -294,15 +294,17 @@ fun BottomSheetScaffold(
                 resistance = null
             )
             .semantics {
-                if (scaffoldState.bottomSheetState.isCollapsed) {
-                    expand {
-                        scope.launch { scaffoldState.bottomSheetState.expand() }
-                        true
-                    }
-                } else {
-                    collapse {
-                        scope.launch { scaffoldState.bottomSheetState.collapse() }
-                        true
+                if (peekHeightPx != bottomSheetHeight) {
+                    if (scaffoldState.bottomSheetState.isCollapsed) {
+                        expand {
+                            scope.launch { scaffoldState.bottomSheetState.expand() }
+                            true
+                        }
+                    } else {
+                        collapse {
+                            scope.launch { scaffoldState.bottomSheetState.collapse() }
+                            true
+                        }
                     }
                 }
             }
