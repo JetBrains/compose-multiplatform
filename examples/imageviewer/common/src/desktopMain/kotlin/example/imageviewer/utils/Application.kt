@@ -3,79 +3,37 @@ package example.imageviewer.utils
 import androidx.compose.desktop.AppManager
 import androidx.compose.desktop.AppWindow
 import androidx.compose.desktop.WindowEvents
-import androidx.compose.runtime.Applier
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.Composition
-import androidx.compose.runtime.DisposableEffect
-import androidx.compose.runtime.ExperimentalComposeApi
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.MonotonicFrameClock
-import androidx.compose.runtime.Recomposer
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
+import androidx.compose.runtime.*
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.window.MenuBar
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.CoroutineStart
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.cancel
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.*
+import kotlinx.coroutines.swing.Swing
 import java.awt.image.BufferedImage
-import javax.swing.SwingUtilities
-import kotlin.system.exitProcess
 
-fun Application(
-    content: @Composable ApplicationScope.() -> Unit
-) = SwingUtilities.invokeLater {
-    AppManager.setEvents(onWindowsEmpty = null)
-    val scope = ApplicationScope(content)
-    scope.start()
-}
+fun Application(content: @Composable ApplicationScope.() -> Unit) {
+    GlobalScope.launch(Dispatchers.Swing + ImmediateFrameClock()) {
+        AppManager.setEvents(onWindowsEmpty = null)
 
-@OptIn(ExperimentalComposeApi::class, ExperimentalCoroutinesApi::class)
-class ApplicationScope(
-    private val content: @Composable ApplicationScope.() -> Unit
-) {
-    private val frameClock = ImmediateFrameClock()
-    private val context = Dispatchers.Main + frameClock
-    private val scope = CoroutineScope(context)
+        withRunningRecomposer { recomposer ->
+            val latch = CompletableDeferred<Unit>()
+            val applier = ApplicationApplier { latch.complete(Unit) }
 
-    private val recomposer = Recomposer(context)
-    private val composition = Composition(EmptyApplier(), recomposer)
+            val composition = Composition(applier, recomposer)
+            try {
+                val scope = ApplicationScope(recomposer)
 
-    private val windows = mutableSetOf<AppWindow>()
-    private var windowsVersion by mutableStateOf(Any())
+                composition.setContent { scope.content() }
 
-    fun start() {
-        scope.launch(start = CoroutineStart.UNDISPATCHED) {
-            recomposer.runRecomposeAndApplyChanges()
-        }
-        composition.setContent {
-            content()
-            WindowsMonitor()
-        }
-    }
-
-    @Composable
-    private fun WindowsMonitor() {
-        LaunchedEffect(windowsVersion) {
-            if (windows.isEmpty()) {
-                dispose()
-                exitProcess(0)
+                latch.join()
+            } finally {
+                composition.dispose()
             }
         }
     }
+}
 
-    private fun dispose() {
-        composition.dispose()
-        scope.cancel()
-    }
-
-    // TODO make parameters observable (now if any parameter is changed we don't change the window)
+class ApplicationScope internal constructor(private val recomposer: Recomposer) {
     @Composable
     fun ComposableWindow(
         title: String = "JetpackDesktopWindow",
@@ -91,20 +49,10 @@ class ApplicationScope(
         content: @Composable () -> Unit = {}
     ) {
         var isOpened by remember { mutableStateOf(true) }
-        if (isOpened) {
-            DisposableEffect(Unit) {
-                lateinit var window: AppWindow
-
-                fun onClose() {
-                    if (isOpened) {
-                        windows.remove(window)
-                        onDismissRequest?.invoke()
-                        windowsVersion = Any()
-                        isOpened = false
-                    }
-                }
-
-                window = AppWindow(
+        if (!isOpened) return
+        ComposeNode<AppWindow, ApplicationApplier>(
+            factory = {
+                val window = AppWindow(
                     title = title,
                     size = size,
                     location = location,
@@ -115,21 +63,24 @@ class ApplicationScope(
                     resizable = resizable,
                     events = events,
                     onDismissRequest = {
-                        onClose()
+                        onDismissRequest?.invoke()
+                        isOpened = false
                     }
                 )
-
-                windows.add(window)
                 window.show(recomposer, content)
-
-                onDispose {
-                    if (!window.isClosed) {
-                        window.close()
-                    }
-                    onClose()
-                }
+                window
+            },
+            update = {
+                set(title) { setTitle(it) }
+                set(size) { setSize(it.width, it.height) }
+                set(location) { setLocation(it.x, it.y) }
+                set(icon) { setIcon(it) }
+                set(menuBar) { if (it != null) setMenuBar(it) else removeMenuBar() }
+                // set(resizable) { setResizable(it) }
+                // set(events) { setEvents(it) }
+                // set(onDismissRequest) { setDismiss(it) }
             }
-        }
+        )
     }
 }
 
@@ -139,14 +90,67 @@ private class ImmediateFrameClock : MonotonicFrameClock {
     ) = onFrame(System.nanoTime())
 }
 
-@OptIn(ExperimentalComposeApi::class)
-private class EmptyApplier : Applier<Unit> {
-    override val current: Unit = Unit
-    override fun down(node: Unit) = Unit
-    override fun up() = Unit
-    override fun insertTopDown(index: Int, instance: Unit) = Unit
-    override fun insertBottomUp(index: Int, instance: Unit) = Unit
-    override fun remove(index: Int, count: Int) = Unit
-    override fun move(from: Int, to: Int, count: Int) = Unit
-    override fun clear() = Unit
+private class ApplicationApplier(
+    private val onWindowsEmpty: () -> Unit
+) : Applier<AppWindow?> {
+    private val windows = mutableListOf<AppWindow>()
+
+    override var current: AppWindow? = null
+
+    override fun insertBottomUp(index: Int, instance: AppWindow?) {
+        requireNotNull(instance)
+        check(current == null) { "Windows cannot be nested!" }
+        windows.add(index, instance)
+    }
+
+    override fun remove(index: Int, count: Int) {
+        repeat(count) {
+            val window = windows.removeAt(index)
+            if (!window.isClosed) {
+                window.close()
+            }
+        }
+    }
+
+    override fun move(from: Int, to: Int, count: Int) {
+        if (from > to) {
+            var current = to
+            repeat(count) {
+                val node = windows.removeAt(from)
+                windows.add(current, node)
+                current++
+            }
+        } else {
+            repeat(count) {
+                val node = windows.removeAt(from)
+                windows.add(to - 1, node)
+            }
+        }
+    }
+
+    override fun clear() {
+        windows.forEach { if (!it.isClosed) it.close() }
+        windows.clear()
+    }
+
+    override fun onEndChanges() {
+        if (windows.isEmpty()) {
+            onWindowsEmpty()
+        }
+    }
+
+    override fun down(node: AppWindow?) {
+        requireNotNull(node)
+        check(current == null) { "Windows cannot be nested!" }
+        current = node
+    }
+
+    override fun up() {
+        check(current != null) { "Windows cannot be nested!" }
+        current = null
+    }
+
+    override fun insertTopDown(index: Int, instance: AppWindow?) {
+        // ignored. Building tree bottom-up
+    }
 }
