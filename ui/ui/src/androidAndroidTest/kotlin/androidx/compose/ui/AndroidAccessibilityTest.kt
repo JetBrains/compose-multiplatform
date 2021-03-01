@@ -32,7 +32,10 @@ import androidx.activity.ComponentActivity
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.requiredSize
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.selection.toggleable
 import androidx.compose.foundation.text.BasicText
 import androidx.compose.foundation.text.BasicTextField
@@ -42,6 +45,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.platform.AndroidComposeView
 import androidx.compose.ui.platform.AndroidComposeViewAccessibilityDelegateCompat
+import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.semantics.SemanticsActions
 import androidx.compose.ui.semantics.SemanticsProperties
@@ -64,6 +68,7 @@ import androidx.compose.ui.text.TextRange
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.window.Dialog
 import androidx.core.view.ViewCompat
 import androidx.core.view.accessibility.AccessibilityNodeInfoCompat
 import androidx.test.ext.junit.runners.AndroidJUnit4
@@ -1077,6 +1082,54 @@ class AndroidAccessibilityTest {
         )
 
         assertTrue(event.isPassword)
+    }
+
+    @Test
+    fun testDialog_setCorrectBounds() {
+        var dialogComposeView: AndroidComposeView? = null
+        container.setContent {
+            Dialog(onDismissRequest = {}) {
+                dialogComposeView = LocalView.current as AndroidComposeView
+                delegate = ViewCompat.getAccessibilityDelegate(dialogComposeView!!) as
+                    AndroidComposeViewAccessibilityDelegateCompat
+
+                Box(Modifier.size(300.dp)) {
+                    BasicText(
+                        text = "text",
+                        modifier = Modifier.offset(10.dp, 10.dp).fillMaxSize()
+                    )
+                }
+            }
+        }
+
+        val textNode = rule.onNodeWithText("text").fetchSemanticsNode()
+        val info = AccessibilityNodeInfoCompat.obtain()
+        delegate.populateAccessibilityNodeInfoProperties(
+            textNode.id,
+            info,
+            textNode
+        )
+
+        val viewPosition = intArrayOf(0, 0)
+        dialogComposeView!!.getLocationOnScreen(viewPosition)
+        with(rule.density) {
+            val offset = 10.dp.roundToPx()
+            val size = 300.dp.roundToPx()
+            val textPositionOnScreenX = viewPosition[0] + offset
+            val textPositionOnScreenY = viewPosition[1] + offset
+
+            val textRect = android.graphics.Rect()
+            info.getBoundsInScreen(textRect)
+            assertEquals(
+                android.graphics.Rect(
+                    textPositionOnScreenX,
+                    textPositionOnScreenY,
+                    textPositionOnScreenX + size,
+                    textPositionOnScreenY + size
+                ),
+                textRect
+            )
+        }
     }
 
     private fun eventIndex(list: List<AccessibilityEvent>, event: AccessibilityEvent): Int {
