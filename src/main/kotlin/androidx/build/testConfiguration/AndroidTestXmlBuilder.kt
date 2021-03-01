@@ -270,6 +270,10 @@ private val SETUP_INCLUDE = """
 
 """.trimIndent()
 
+/**
+ * We can't remove the apk on API < 27 due to a platform crash that occurs
+ * when handling a PACKAGE_CHANGED broadcast after the package has been removed. b/37264334
+ */
 private val TARGET_PREPARER_OPEN = """
     <target_preparer class="com.android.tradefed.targetprep.suite.SuiteApkInstaller">
     <option name="cleanup-apks" value="false" />
@@ -278,6 +282,7 @@ private val TARGET_PREPARER_OPEN = """
 
 private val MEDIA_TARGET_PREPARER_OPEN = """
     <target_preparer class="com.android.tradefed.targetprep.suite.SuiteApkInstaller">
+    <option name="cleanup-apks" value="true" />
 
 """.trimIndent()
 
