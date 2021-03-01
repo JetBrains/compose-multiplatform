@@ -269,12 +269,15 @@ internal class AndroidComposeViewAccessibilityDelegateCompat(val view: AndroidCo
         }
         info.packageName = view.context.packageName
         try {
+            val boundsInRoot = semanticsNode.boundsInRoot
+            val topLeftInScreen = view.localToScreen(boundsInRoot.topLeft)
+            val bottomRightInScreen = view.localToScreen(boundsInRoot.bottomRight)
             info.setBoundsInScreen(
                 android.graphics.Rect(
-                    semanticsNode.boundsInWindow.left.toInt(),
-                    semanticsNode.boundsInWindow.top.toInt(),
-                    semanticsNode.boundsInWindow.right.toInt(),
-                    semanticsNode.boundsInWindow.bottom.toInt()
+                    topLeftInScreen.x.toInt(),
+                    topLeftInScreen.y.toInt(),
+                    bottomRightInScreen.x.toInt(),
+                    bottomRightInScreen.y.toInt()
                 )
             )
         } catch (e: IllegalStateException) {
