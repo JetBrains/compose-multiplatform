@@ -19,7 +19,9 @@ import android.os.Build
 import android.util.Log
 import android.view.View
 import android.view.ViewGroup
+import androidx.annotation.DoNotInline
 import androidx.annotation.MainThread
+import androidx.annotation.RequiresApi
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Composition
 import androidx.compose.runtime.CompositionContext
@@ -205,4 +207,17 @@ private val DefaultLayoutParams = ViewGroup.LayoutParams(
  */
 private fun inspectionWanted(owner: AndroidComposeView): Boolean =
     Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q &&
-        owner.attributeSourceResourceMap.isNotEmpty()
+        WrapperVerificationHelperMethods.attributeSourceResourceMap(owner).isNotEmpty()
+
+/**
+ * This class is here to ensure that the classes that use this API will get verified and can be
+ * AOT compiled. It is expected that this class will soft-fail verification, but the classes
+ * which use this method will pass.
+ */
+@RequiresApi(Build.VERSION_CODES.Q)
+internal object WrapperVerificationHelperMethods {
+    @RequiresApi(Build.VERSION_CODES.Q)
+    @DoNotInline
+    fun attributeSourceResourceMap(view: View): Map<Int, Int> =
+        view.attributeSourceResourceMap
+}
