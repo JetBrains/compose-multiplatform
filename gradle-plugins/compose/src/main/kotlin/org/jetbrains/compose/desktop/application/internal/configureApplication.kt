@@ -54,9 +54,19 @@ internal fun Project.configureFromMppPlugin(mainApplication: Application) {
 
 internal fun Project.configurePackagingTasks(apps: Collection<Application>) {
     for (app in apps) {
+        val checkRuntime = tasks.composeTask<AbstractCheckNativeDistributionRuntime>(
+            taskName("checkRuntime", app)
+        ) {
+            javaHome.set(provider { app.javaHomeOrDefault() })
+            javaRuntimePropertiesFile.set(
+                project.layout.buildDirectory.file("compose/tmp/${app.name}/runtime-properties/properties.bin")
+            )
+        }
+
         val createRuntimeImage = tasks.composeTask<AbstractJLinkTask>(
             taskName("createRuntimeImage", app)
         ) {
+            dependsOn(checkRuntime)
             javaHome.set(provider { app.javaHomeOrDefault() })
             modules.set(provider { app.nativeDistributions.modules })
             destinationDir.set(project.layout.buildDirectory.dir("compose/tmp/${app.name}/runtime"))

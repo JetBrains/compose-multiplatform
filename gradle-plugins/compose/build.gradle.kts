@@ -62,9 +62,9 @@ val jar = tasks.named<Jar>("jar") {
 val minGradleVersionForTests = "6.4"
 val maxGradleVersionForTests = "6.8.3"
 val javaHomeForTests: String? = when {
-    JavaVersion.current() >= JavaVersion.VERSION_14 -> System.getProperty("java.home")
-    else -> System.getenv("JDK_14")
-         ?: System.getenv("JDK_15")
+    // __COMPOSE_NATIVE_DISTRIBUTIONS_MIN_JAVA_VERSION__
+    JavaVersion.current() >= JavaVersion.VERSION_15 -> System.getProperty("java.home")
+    else -> System.getenv("JDK_15")
          ?: System.getenv("JDK_FOR_GRADLE_TESTS")
 }
 val isWindows = getCurrentOperatingSystem().isWindows
@@ -94,7 +94,7 @@ fun Test.configureTest(gradleVersion: String) {
         val executableFileName = if (isWindows) "java.exe" else "java"
         executable = File(javaHomeForTests).resolve("bin/$executableFileName").absolutePath
     } else {
-        doFirst { error("Use JDK 14+ to run tests or set up JDK_14/JDK_15/JDK_FOR_GRADLE_TESTS env. var") }
+        doFirst { error("Use JDK 15+ to run tests or set up JDK_15/JDK_FOR_GRADLE_TESTS env. var") }
     }
 }
 

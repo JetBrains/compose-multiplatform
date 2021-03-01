@@ -49,13 +49,14 @@ abstract class AbstractComposeDesktopTask : DefaultTask() {
         environment: Map<String, Any> = emptyMap(),
         workingDir: File? = null,
         checkExitCodeIsNormal: Boolean = true,
-        processStdout: Function1<String, Unit>? = null
+        processStdout: Function1<String, Unit>? = null,
+        forceLogToFile: Boolean = false
     ): ExecResult {
         val logsDir = logsDir.ioFile
         logsDir.mkdirs()
 
         val toolName = tool.nameWithoutExtension
-        val logToConsole = verbose.get()
+        val logToConsole = verbose.get() && !forceLogToFile
         val outFile = logsDir.resolve("${toolName}-${currentTimeStamp()}-out.txt")
         val errFile = logsDir.resolve("${toolName}-${currentTimeStamp()}-err.txt")
 
