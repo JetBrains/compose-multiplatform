@@ -34,6 +34,7 @@ open class NativeDistributions @Inject constructor(
     fun modules(vararg modules: String) {
         this.modules.addAll(modules.toList())
     }
+    var includeAllModules: Boolean = false
 
     var targetFormats: Set<TargetFormat> = EnumSet.noneOf(TargetFormat::class.java)
     fun targetFormats(vararg formats: TargetFormat) {
