@@ -18,6 +18,8 @@ package androidx.compose.ui.inspection.util
 
 import android.os.Handler
 import android.os.Looper
+import java.util.concurrent.CompletableFuture
+import java.util.concurrent.Future
 
 object ThreadUtils {
     fun assertOnMainThread() {
@@ -32,7 +34,21 @@ object ThreadUtils {
         }
     }
 
-    fun runOnMainThread(block: () -> Unit) {
-        Handler.createAsync(Looper.getMainLooper()).post(block)
+    /**
+     * Run some logic on the main thread, returning a future that will contain any data computed
+     * by and returned from the block.
+     *
+     * If this method is called from the main thread, it will run immediately.
+     */
+    fun <T> runOnMainThread(block: () -> T): Future<T> {
+        return if (!Looper.getMainLooper().isCurrentThread) {
+            val future = CompletableFuture<T>()
+            Handler.createAsync(Looper.getMainLooper()).post {
+                future.complete(block())
+            }
+            future
+        } else {
+            CompletableFuture.completedFuture(block())
+        }
     }
 }
