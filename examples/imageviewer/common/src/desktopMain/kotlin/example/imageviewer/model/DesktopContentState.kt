@@ -1,6 +1,7 @@
 package example.imageviewer.model
 
 import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.RememberObserver
 import androidx.compose.runtime.mutableStateOf
 import example.imageviewer.ResString
 import example.imageviewer.core.FilterType
@@ -16,7 +17,7 @@ import java.util.concurrent.Executors
 import javax.swing.SwingUtilities.invokeLater
 
 
-object ContentState {
+object ContentState : RememberObserver {
 
     private lateinit var repository: ImageRepository
     private lateinit var uriRepository: String
@@ -279,6 +280,12 @@ object ContentState {
                 }
             }
         }
+    }
+
+    override fun onRemembered() { }
+    override fun onAbandoned() { }
+    override fun onForgotten() {
+        executor.shutdown()
     }
 }
 
