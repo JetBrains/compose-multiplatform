@@ -7,16 +7,6 @@ internal class MultiOutputStream(
     mainStream: OutputStream,
     private val secondaryStream: OutputStream
 ) : FilterOutputStream(mainStream) {
-    override fun write(b: ByteArray, off: Int, len: Int) {
-        super.write(b, off, len)
-        secondaryStream.write(b, off, len)
-    }
-
-    override fun write(b: ByteArray) {
-        super.write(b)
-        secondaryStream.write(b)
-    }
-
     override fun write(b: Int) {
         super.write(b)
         secondaryStream.write(b)
