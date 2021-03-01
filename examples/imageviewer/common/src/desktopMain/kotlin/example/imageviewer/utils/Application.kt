@@ -75,9 +75,9 @@ class ApplicationScope internal constructor(private val recomposer: Recomposer) 
             update = {
                 set(title) { setTitle(it) }
                 set(size) { setSize(it.width, it.height) }
-                set(location) { setLocation(it.x, it.y) }
+                // set(location) { setLocation(it.x, it.y) }
                 set(icon) { setIcon(it) }
-                set(menuBar) { if (it != null) setMenuBar(it) else removeMenuBar() }
+                // set(menuBar) { if (it != null) setMenuBar(it) else removeMenuBar() }
                 // set(resizable) { setResizable(it) }
                 // set(events) { setEvents(it) }
                 // set(onDismissRequest) { setDismiss(it) }
