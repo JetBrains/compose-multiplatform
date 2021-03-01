@@ -12,9 +12,6 @@ package androidx.compose.animation {
   }
 
   public final class AnimatedVisibilityKt {
-    method @androidx.compose.animation.ExperimentalAnimationApi @androidx.compose.runtime.Composable public static void AnimatedVisibility(boolean visible, optional androidx.compose.ui.Modifier modifier, optional androidx.compose.animation.EnterTransition enter, optional androidx.compose.animation.ExitTransition exit, optional boolean initiallyVisible, kotlin.jvm.functions.Function0<kotlin.Unit> content);
-    method @androidx.compose.animation.ExperimentalAnimationApi @androidx.compose.runtime.Composable public static void AnimatedVisibility(androidx.compose.foundation.layout.RowScope, boolean visible, optional androidx.compose.ui.Modifier modifier, optional androidx.compose.animation.EnterTransition enter, optional androidx.compose.animation.ExitTransition exit, optional boolean initiallyVisible, kotlin.jvm.functions.Function0<kotlin.Unit> content);
-    method @androidx.compose.animation.ExperimentalAnimationApi @androidx.compose.runtime.Composable public static void AnimatedVisibility(androidx.compose.foundation.layout.ColumnScope, boolean visible, optional androidx.compose.ui.Modifier modifier, optional androidx.compose.animation.EnterTransition enter, optional androidx.compose.animation.ExitTransition exit, optional boolean initiallyVisible, kotlin.jvm.functions.Function0<kotlin.Unit> content);
   }
 
   public final class AnimationModifierKt {
@@ -30,31 +27,6 @@ package androidx.compose.animation {
   }
 
   public final class EnterExitTransitionKt {
-    method @androidx.compose.animation.ExperimentalAnimationApi @androidx.compose.runtime.Stable public static androidx.compose.animation.EnterTransition expandHorizontally(optional androidx.compose.ui.Alignment.Horizontal expandFrom, optional kotlin.jvm.functions.Function1<? super java.lang.Integer,java.lang.Integer> initialWidth, optional androidx.compose.animation.core.FiniteAnimationSpec<androidx.compose.ui.unit.IntSize> animationSpec, optional boolean clip);
-    method @androidx.compose.animation.ExperimentalAnimationApi @androidx.compose.runtime.Stable public static androidx.compose.animation.EnterTransition expandIn(optional androidx.compose.ui.Alignment expandFrom, optional kotlin.jvm.functions.Function1<? super androidx.compose.ui.unit.IntSize,androidx.compose.ui.unit.IntSize> initialSize, optional androidx.compose.animation.core.FiniteAnimationSpec<androidx.compose.ui.unit.IntSize> animationSpec, optional boolean clip);
-    method @androidx.compose.animation.ExperimentalAnimationApi @androidx.compose.runtime.Stable public static androidx.compose.animation.EnterTransition expandVertically(optional androidx.compose.ui.Alignment.Vertical expandFrom, optional kotlin.jvm.functions.Function1<? super java.lang.Integer,java.lang.Integer> initialHeight, optional androidx.compose.animation.core.FiniteAnimationSpec<androidx.compose.ui.unit.IntSize> animationSpec, optional boolean clip);
-    method @androidx.compose.animation.ExperimentalAnimationApi @androidx.compose.runtime.Stable public static androidx.compose.animation.EnterTransition fadeIn(optional float initialAlpha, optional androidx.compose.animation.core.FiniteAnimationSpec<java.lang.Float> animationSpec);
-    method @androidx.compose.animation.ExperimentalAnimationApi @androidx.compose.runtime.Stable public static androidx.compose.animation.ExitTransition fadeOut(optional float targetAlpha, optional androidx.compose.animation.core.FiniteAnimationSpec<java.lang.Float> animationSpec);
-    method @androidx.compose.animation.ExperimentalAnimationApi @androidx.compose.runtime.Stable public static androidx.compose.animation.ExitTransition shrinkHorizontally(optional androidx.compose.ui.Alignment.Horizontal shrinkTowards, optional kotlin.jvm.functions.Function1<? super java.lang.Integer,java.lang.Integer> targetWidth, optional androidx.compose.animation.core.FiniteAnimationSpec<androidx.compose.ui.unit.IntSize> animationSpec, optional boolean clip);
-    method @androidx.compose.animation.ExperimentalAnimationApi @androidx.compose.runtime.Stable public static androidx.compose.animation.ExitTransition shrinkOut(optional androidx.compose.ui.Alignment shrinkTowards, optional kotlin.jvm.functions.Function1<? super androidx.compose.ui.unit.IntSize,androidx.compose.ui.unit.IntSize> targetSize, optional androidx.compose.animation.core.FiniteAnimationSpec<androidx.compose.ui.unit.IntSize> animationSpec, optional boolean clip);
-    method @androidx.compose.animation.ExperimentalAnimationApi @androidx.compose.runtime.Stable public static androidx.compose.animation.ExitTransition shrinkVertically(optional androidx.compose.ui.Alignment.Vertical shrinkTowards, optional kotlin.jvm.functions.Function1<? super java.lang.Integer,java.lang.Integer> targetHeight, optional androidx.compose.animation.core.FiniteAnimationSpec<androidx.compose.ui.unit.IntSize> animationSpec, optional boolean clip);
-    method @androidx.compose.animation.ExperimentalAnimationApi @androidx.compose.runtime.Stable public static androidx.compose.animation.EnterTransition slideIn(kotlin.jvm.functions.Function1<? super androidx.compose.ui.unit.IntSize,androidx.compose.ui.unit.IntOffset> initialOffset, optional androidx.compose.animation.core.FiniteAnimationSpec<androidx.compose.ui.unit.IntOffset> animationSpec);
-    method @androidx.compose.animation.ExperimentalAnimationApi @androidx.compose.runtime.Stable public static androidx.compose.animation.EnterTransition slideInHorizontally(optional kotlin.jvm.functions.Function1<? super java.lang.Integer,java.lang.Integer> initialOffsetX, optional androidx.compose.animation.core.FiniteAnimationSpec<androidx.compose.ui.unit.IntOffset> animationSpec);
-    method @androidx.compose.animation.ExperimentalAnimationApi @androidx.compose.runtime.Stable public static androidx.compose.animation.EnterTransition slideInVertically(optional kotlin.jvm.functions.Function1<? super java.lang.Integer,java.lang.Integer> initialOffsetY, optional androidx.compose.animation.core.FiniteAnimationSpec<androidx.compose.ui.unit.IntOffset> animationSpec);
-    method @androidx.compose.animation.ExperimentalAnimationApi @androidx.compose.runtime.Stable public static androidx.compose.animation.ExitTransition slideOut(kotlin.jvm.functions.Function1<? super androidx.compose.ui.unit.IntSize,androidx.compose.ui.unit.IntOffset> targetOffset, optional androidx.compose.animation.core.FiniteAnimationSpec<androidx.compose.ui.unit.IntOffset> animationSpec);
-    method @androidx.compose.animation.ExperimentalAnimationApi @androidx.compose.runtime.Stable public static androidx.compose.animation.ExitTransition slideOutHorizontally(optional kotlin.jvm.functions.Function1<? super java.lang.Integer,java.lang.Integer> targetOffsetX, optional androidx.compose.animation.core.FiniteAnimationSpec<androidx.compose.ui.unit.IntOffset> animationSpec);
-    method @androidx.compose.animation.ExperimentalAnimationApi @androidx.compose.runtime.Stable public static androidx.compose.animation.ExitTransition slideOutVertically(optional kotlin.jvm.functions.Function1<? super java.lang.Integer,java.lang.Integer> targetOffsetY, optional androidx.compose.animation.core.FiniteAnimationSpec<androidx.compose.ui.unit.IntOffset> animationSpec);
-  }
-
-  @androidx.compose.animation.ExperimentalAnimationApi @androidx.compose.runtime.Immutable public abstract sealed class EnterTransition {
-    method @androidx.compose.runtime.Stable public final operator androidx.compose.animation.EnterTransition plus(androidx.compose.animation.EnterTransition enter);
-  }
-
-  @androidx.compose.animation.ExperimentalAnimationApi @androidx.compose.runtime.Immutable public abstract sealed class ExitTransition {
-    method @androidx.compose.runtime.Stable public final operator androidx.compose.animation.ExitTransition plus(androidx.compose.animation.ExitTransition exit);
-  }
-
-  @kotlin.RequiresOptIn(message="This is an experimental animation API.") @kotlin.annotation.Target(allowedTargets={kotlin.annotation.AnnotationTarget, kotlin.annotation.AnnotationTarget, kotlin.annotation.AnnotationTarget}) public @interface ExperimentalAnimationApi {
   }
 
   public final class SingleValueAnimationKt {
