@@ -1,6 +1,5 @@
 package org.jetbrains.compose.splitpane
 
-import androidx.compose.foundation.InteractionState
 import androidx.compose.foundation.gestures.detectDragGestures
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
@@ -178,14 +177,12 @@ internal class SplitPaneScopeImpl(
 @Composable
 fun rememberSplitPaneState(
     initialPositionPercentage: Float = 0f,
-    moveEnabled: Boolean = true,
-    interactionState: InteractionState = remember { InteractionState() }
+    moveEnabled: Boolean = true
 ): SplitPaneState {
     return remember {
         SplitPaneState(
             moveEnabled = moveEnabled,
-            initialPositionPercentage = initialPositionPercentage,
-            interactionState = interactionState
+            initialPositionPercentage = initialPositionPercentage
         )
     }
 }

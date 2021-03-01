@@ -20,7 +20,7 @@ kotlin {
         }
         named("androidMain") {
             dependencies {
-                api("androidx.appcompat:appcompat:1.1.0")
+                api("androidx.appcompat:appcompat:1.3.0-beta01")
                 api("androidx.core:core-ktx:1.3.1")
                 implementation("io.ktor:ktor-client-cio:1.4.1")
             }

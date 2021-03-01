@@ -1,6 +1,6 @@
 buildscript {
     // __LATEST_COMPOSE_RELEASE_VERSION__
-    val composeVersion = System.getenv("COMPOSE_RELEASE_VERSION") ?: "0.3.0-build150"
+    val composeVersion = System.getenv("COMPOSE_RELEASE_VERSION") ?: "0.3.1"
 
     repositories {
         google()
