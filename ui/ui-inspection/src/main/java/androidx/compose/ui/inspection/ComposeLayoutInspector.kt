@@ -22,6 +22,7 @@ import androidx.compose.ui.inspection.compose.AndroidComposeViewWrapper
 import androidx.compose.ui.inspection.compose.convertParameters
 import androidx.compose.ui.inspection.compose.flatten
 import androidx.compose.ui.inspection.framework.flatten
+import androidx.compose.ui.inspection.inspector.InspectorNode
 import androidx.compose.ui.inspection.inspector.LayoutInspectorTree
 import androidx.compose.ui.inspection.proto.StringTable
 import androidx.compose.ui.inspection.proto.convertAll
@@ -58,7 +59,24 @@ class ComposeLayoutInspector(
     private val environment: InspectorEnvironment
 ) : Inspector(connection) {
 
+    /** Cache data which allows us to reuse previously queried inspector nodes */
+    private class CacheData(
+        /** If the cached data includes system nodes or not */
+        val systemComposablesSkipped: Boolean,
+        /** The cached nodes themselves as a map from node id to InspectorNode */
+        val nodes: Map<Long, InspectorNode>,
+    )
+
     private val layoutInspectorTree = LayoutInspectorTree()
+
+    // Sidestep threading concerns by only ever accessing cachedNodes on the inspector thread
+    private val inspectorThread = Thread.currentThread()
+    private val _cachedNodes = mutableMapOf<Long, CacheData>()
+    private val cachedNodes: MutableMap<Long, CacheData>
+        get() {
+            check(Thread.currentThread() == inspectorThread)
+            return _cachedNodes
+        }
 
     override fun onReceiveCommand(data: ByteArray, callback: CommandCallback) {
         val command = Command.parseFrom(data)
@@ -82,15 +100,19 @@ class ComposeLayoutInspector(
     ) {
         ThreadUtils.runOnMainThread {
             val stringTable = StringTable()
-            val composeRoots =
-                getComposableRoots(
-                    getComposablesCommand.rootViewId,
-                    getComposablesCommand.skipSystemComposables
-                )
-                    .map { it.createComposableRoot(stringTable) }
-                    .toList()
+            val composeViews = getAndroidComposeViews(
+                getComposablesCommand.rootViewId,
+                getComposablesCommand.skipSystemComposables
+            )
+
+            val composeRoots = composeViews.map { it.createComposableRoot(stringTable) }
 
             environment.executors().primary().execute {
+                cachedNodes[getComposablesCommand.rootViewId] = CacheData(
+                    getComposablesCommand.skipSystemComposables,
+                    composeViews.toInspectorNodes().associateBy { it.id }
+                )
+
                 callback.reply {
                     getComposablesResponse = GetComposablesResponse.newBuilder().apply {
                         addAllStrings(stringTable.toStringEntries())
@@ -105,31 +127,26 @@ class ComposeLayoutInspector(
         getParametersCommand: GetParametersCommand,
         callback: CommandCallback
     ) {
-        ThreadUtils.runOnMainThread {
-            val foundComposable = getComposableRoots(
+        val foundComposable =
+            getComposableNodes(
                 getParametersCommand.rootViewId,
                 getParametersCommand.skipSystemComposables
-            )
-                .flatMap { it.inspectorNodes }
-                .flatMap { it.flatten() }
-                .firstOrNull { it.id == getParametersCommand.composableId }
+            )[getParametersCommand.composableId]
 
-            environment.executors().primary().execute {
-                callback.reply {
-                    getParametersResponse = if (foundComposable != null) {
-                        val stringTable = StringTable()
-                        val parameters = foundComposable.convertParameters().convertAll(stringTable)
-                        GetParametersResponse.newBuilder().apply {
-                            parameterGroup = ParameterGroup.newBuilder().apply {
-                                composableId = getParametersCommand.composableId
-                                addAllParameter(parameters)
-                            }.build()
-                            addAllStrings(stringTable.toStringEntries())
-                        }.build()
-                    } else {
-                        GetParametersResponse.getDefaultInstance()
-                    }
-                }
+        callback.reply {
+            getParametersResponse = if (foundComposable != null) {
+                val stringTable = StringTable()
+                val parameters =
+                    foundComposable.convertParameters(layoutInspectorTree).convertAll(stringTable)
+                GetParametersResponse.newBuilder().apply {
+                    parameterGroup = ParameterGroup.newBuilder().apply {
+                        composableId = getParametersCommand.composableId
+                        addAllParameter(parameters)
+                    }.build()
+                    addAllStrings(stringTable.toStringEntries())
+                }.build()
+            } else {
+                GetParametersResponse.getDefaultInstance()
             }
         }
     }
@@ -138,58 +155,80 @@ class ComposeLayoutInspector(
         getAllParametersCommand: GetAllParametersCommand,
         callback: CommandCallback
     ) {
-        ThreadUtils.runOnMainThread {
-
-            val allComposables = getComposableRoots(
+        val allComposables =
+            getComposableNodes(
                 getAllParametersCommand.rootViewId,
                 getAllParametersCommand.skipSystemComposables
-            )
-                .flatMap { it.inspectorNodes }
-                .flatMap { it.flatten() }
-                .toList()
+            ).values
 
-            environment.executors().primary().execute {
-                callback.reply {
-                    val stringTable = StringTable()
-                    val parameterGroups = allComposables.map { composable ->
-                        val parameters = composable.convertParameters().convertAll(stringTable)
-                        ParameterGroup.newBuilder().apply {
-                            composableId = composable.id
-                            addAllParameter(parameters)
-                        }.build()
-                    }
-
-                    getAllParametersResponse = GetAllParametersResponse.newBuilder().apply {
-                        rootViewId = getAllParametersCommand.rootViewId
-                        addAllParameterGroups(parameterGroups)
-                        addAllStrings(stringTable.toStringEntries())
-                    }.build()
-                }
+        callback.reply {
+            val stringTable = StringTable()
+            val parameterGroups = allComposables.map { composable ->
+                val parameters =
+                    composable.convertParameters(layoutInspectorTree).convertAll(stringTable)
+                ParameterGroup.newBuilder().apply {
+                    composableId = composable.id
+                    addAllParameter(parameters)
+                }.build()
             }
+
+            getAllParametersResponse = GetAllParametersResponse.newBuilder().apply {
+                rootViewId = getAllParametersCommand.rootViewId
+                addAllParameterGroups(parameterGroups)
+                addAllStrings(stringTable.toStringEntries())
+            }.build()
         }
     }
 
-    private fun getComposableRoots(
+    /**
+     * Get all [InspectorNode]s found under the layout tree rooted by [rootViewId]. They will be
+     * mapped with their ID as the key.
+     *
+     * This will return cached data if possible, but may request new data otherwise, blocking the
+     * current thread potentially.
+     */
+    private fun getComposableNodes(
         rootViewId: Long,
         skipSystemComposables: Boolean
-    ): Sequence<AndroidComposeViewWrapper> {
+    ): Map<Long, InspectorNode> {
+        cachedNodes[rootViewId]?.let { cacheData ->
+            if (cacheData.systemComposablesSkipped == skipSystemComposables) {
+                return cacheData.nodes
+            }
+        }
+
+        return ThreadUtils.runOnMainThread {
+            getAndroidComposeViews(rootViewId, skipSystemComposables)
+                .toInspectorNodes()
+                .associateBy { it.id }
+        }.get()
+    }
+
+    /**
+     * Get all AndroidComposeView instances found within the layout tree rooted by [rootViewId].
+     */
+    private fun getAndroidComposeViews(
+        rootViewId: Long,
+        skipSystemComposables: Boolean
+    ): List<AndroidComposeViewWrapper> {
         ThreadUtils.assertOnMainThread()
 
+        layoutInspectorTree.resetGeneratedId()
         return WindowInspector.getGlobalWindowViews()
             .asSequence()
-            .filter { view -> view.visibility == View.VISIBLE && view.isAttachedToWindow }
-            // Note: When querying root views, there should only be 0 or 1 match here, but it's
-            // easier to handle this as a general filter, to avoid ? operators all the rest of
-            // the way down
-            .filter { it.uniqueDrawingId == rootViewId }
+            .filter { root ->
+                root.visibility == View.VISIBLE && root.isAttachedToWindow &&
+                    root.uniqueDrawingId == rootViewId
+            }
             .flatMap { it.flatten() }
-            .mapNotNull {
+            .mapNotNull { view ->
                 AndroidComposeViewWrapper.tryCreateFor(
                     layoutInspectorTree,
-                    it,
+                    view,
                     skipSystemComposables
                 )
             }
+            .toList()
     }
 }
 
@@ -197,4 +236,15 @@ private fun Inspector.CommandCallback.reply(initResponse: Response.Builder.() ->
     val response = Response.newBuilder()
     response.initResponse()
     reply(response.build().toByteArray())
+}
+
+/**
+ * Convert an [AndroidComposeViewWrapper] to a flat list of all inspector nodes (including children)
+ * that live underneath it.
+ */
+private fun List<AndroidComposeViewWrapper>.toInspectorNodes(): List<InspectorNode> {
+    return this
+        .flatMap { it.inspectorNodes }
+        .flatMap { it.flatten() }
+        .toList()
 }
