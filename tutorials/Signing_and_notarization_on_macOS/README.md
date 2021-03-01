@@ -13,7 +13,7 @@ for distribution on macOS.
 ## Prerequisites
 
 * [Xcode](https://developer.apple.com/xcode/). The tutorial was checked with Xcode 12.3.
-* JDK 15+ (JDK 14 is not guaranteed to work). The tutorial was checked with OpenJDK 15.0.1.
+* JDK 15+. The tutorial was checked with OpenJDK 15.0.1.
 
 ## Preparing a Developer ID certificate
 
