@@ -95,6 +95,12 @@ enum class LibraryType(
         checkApi = RunApiTasks.No("Annotation Processor"),
         compilationTarget = CompilationTarget.HOST
     ),
+    ANNOTATION_PROCESSOR_UTILS(
+        publish = Publish.SNAPSHOT_AND_RELEASE,
+        sourceJars = true,
+        checkApi = RunApiTasks.No("Annotation Processor Helper Library"),
+        compilationTarget = CompilationTarget.HOST
+    ),
     OTHER_CODE_PROCESSOR(
         publish = Publish.SNAPSHOT_AND_RELEASE,
         sourceJars = false,
