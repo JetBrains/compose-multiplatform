@@ -58,13 +58,18 @@ import kotlin.math.floor
 @SdkSuppress(minSdkVersion = Build.VERSION_CODES.O)
 @RunWith(Parameterized::class)
 class BorderTest(val shape: Shape) {
-
     companion object {
         @JvmStatic
         @Parameterized.Parameters(name = "{0}")
         fun initShapes(): Array<Any> = arrayOf(
-            RectangleShape, CircleShape, RoundedCornerShape(5.0f)
+            namedShape("Rectangle", RectangleShape),
+            namedShape("Circle", CircleShape),
+            namedShape("Rounded", RoundedCornerShape(5.0f))
         )
+
+        private fun namedShape(name: String, shape: Shape): Shape = object : Shape by shape {
+            override fun toString(): String = name
+        }
     }
 
     @get:Rule

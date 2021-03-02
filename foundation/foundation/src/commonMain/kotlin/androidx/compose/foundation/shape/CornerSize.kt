@@ -48,6 +48,8 @@ fun CornerSize(size: Dp): CornerSize = DpCornerSize(size)
 private data class DpCornerSize(private val size: Dp) : CornerSize {
     override fun toPx(shapeSize: Size, density: Density) =
         with(density) { size.toPx() }
+
+    override fun toString(): String = "CornerSize(size = ${size.value}.dp)"
 }
 
 /**
@@ -59,6 +61,8 @@ fun CornerSize(size: Float): CornerSize = PxCornerSize(size)
 
 private data class PxCornerSize(private val size: Float) : CornerSize {
     override fun toPx(shapeSize: Size, density: Density) = size
+
+    override fun toString(): String = "CornerSize(size = $size.px)"
 }
 
 /**
@@ -87,6 +91,8 @@ private data class PercentCornerSize(
 
     override fun toPx(shapeSize: Size, density: Density) =
         shapeSize.minDimension * (percent / 100f)
+
+    override fun toString(): String = "CornerSize(size = $percent%)"
 }
 
 /**
@@ -95,4 +101,6 @@ private data class PercentCornerSize(
 @Stable
 val ZeroCornerSize: CornerSize = object : CornerSize {
     override fun toPx(shapeSize: Size, density: Density) = 0.0f
+
+    override fun toString(): String = "ZeroCornerSize"
 }
