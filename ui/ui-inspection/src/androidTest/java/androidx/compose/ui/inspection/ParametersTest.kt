@@ -29,7 +29,6 @@ import layoutinspector.compose.inspection.LayoutInspectorComposeProtocol.Composa
 import layoutinspector.compose.inspection.LayoutInspectorComposeProtocol.GetComposablesResponse
 import layoutinspector.compose.inspection.LayoutInspectorComposeProtocol.GetParametersResponse
 import layoutinspector.compose.inspection.LayoutInspectorComposeProtocol.Parameter
-import org.junit.Ignore
 import org.junit.Rule
 import org.junit.Test
 
@@ -54,7 +53,6 @@ class ParametersTest {
         assertThat(resourceValue.name.resolve(params)).isEqualTo("samplefont")
     }
 
-    @Ignore // Will re-enable after platform bug is fixed upstream
     @Test
     fun lambda(): Unit = runBlocking {
         val composables = rule.inspectorTester.sendCommand(GetComposablesCommand(rule.rootId))
@@ -73,7 +71,6 @@ class ParametersTest {
             .isEqualTo("androidx.compose.ui.inspection.testdata")
     }
 
-    @Ignore // Will re-enable after platform bug is fixed upstream
     @Test
     fun functionType(): Unit = runBlocking {
         val composables = rule.inspectorTester.sendCommand(GetComposablesCommand(rule.rootId))
