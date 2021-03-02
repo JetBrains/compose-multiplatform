@@ -27,6 +27,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.requiredSize
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Favorite
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.geometry.Offset
@@ -35,6 +36,7 @@ import androidx.compose.ui.graphics.asAndroidBitmap
 import androidx.compose.ui.layout.LayoutCoordinates
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.layout.positionInParent
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.semantics.SemanticsActions
 import androidx.compose.ui.semantics.semantics
@@ -49,6 +51,7 @@ import androidx.compose.ui.test.performGesture
 import androidx.compose.ui.test.performSemanticsAction
 import androidx.compose.ui.test.swipeDown
 import androidx.compose.ui.test.swipeUp
+import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.zIndex
@@ -167,6 +170,31 @@ class BottomSheetScaffoldTest {
 
         rule.onNodeWithTag(sheetContent)
             .assertTopPositionInRootIsEqualTo(rule.rootHeight() - peekHeight)
+    }
+
+    @Test
+    fun bottomSheetScaffold_testNoCollapseExpandAction_whenPeekHeightIsSheetHeight() {
+        rule.setContent {
+            CompositionLocalProvider(LocalDensity provides Density(1f, 1f)) {
+                BottomSheetScaffold(
+                    scaffoldState = rememberBottomSheetScaffoldState(
+                        bottomSheetState = rememberBottomSheetState(BottomSheetValue.Collapsed)
+                    ),
+                    sheetContent = {
+                        Box(
+                            Modifier.fillMaxWidth().requiredHeight(peekHeight).testTag(sheetContent)
+                        )
+                    },
+                    sheetPeekHeight = peekHeight
+                ) {
+                    Text("Content")
+                }
+            }
+        }
+
+        rule.onNodeWithTag(sheetContent).onParent()
+            .assert(SemanticsMatcher.keyNotDefined(SemanticsActions.Expand))
+            .assert(SemanticsMatcher.keyNotDefined(SemanticsActions.Collapse))
     }
 
     @Test
