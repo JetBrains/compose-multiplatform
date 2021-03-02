@@ -474,6 +474,7 @@ internal class LayoutNode : Measurable, Remeasurement, OwnerScope, LayoutInfo, C
             if (field != value) {
                 field = value
                 requestRemeasure()
+                invalidateLayer()
             }
         }
 
