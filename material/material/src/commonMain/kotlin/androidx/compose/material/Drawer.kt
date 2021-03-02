@@ -16,6 +16,7 @@
 
 package androidx.compose.material
 
+import androidx.compose.animation.core.AnimationSpec
 import androidx.compose.animation.core.TweenSpec
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.foundation.Canvas
@@ -33,6 +34,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Stable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.State
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.Saver
@@ -78,6 +80,7 @@ enum class DrawerValue {
 /**
  * Possible values of [BottomDrawerState].
  */
+@ExperimentalMaterialApi
 enum class BottomDrawerValue {
     /**
      * The state of the bottom drawer when it is closed.
@@ -101,17 +104,20 @@ enum class BottomDrawerValue {
  * @param initialValue The initial value of the state.
  * @param confirmStateChange Optional callback invoked to confirm or veto a pending state change.
  */
-@Suppress("NotCloseable", "HiddenSuperclass")
+@Suppress("NotCloseable")
 @OptIn(ExperimentalMaterialApi::class)
 @Stable
 class DrawerState(
     initialValue: DrawerValue,
     confirmStateChange: (DrawerValue) -> Boolean = { true }
-) : SwipeableState<DrawerValue>(
-    initialValue = initialValue,
-    animationSpec = AnimationSpec,
-    confirmStateChange = confirmStateChange
 ) {
+
+    internal val swipeableState = SwipeableState(
+        initialValue = initialValue,
+        animationSpec = AnimationSpec,
+        confirmStateChange = confirmStateChange
+    )
+
     /**
      * Whether the drawer is open.
      */
@@ -125,13 +131,33 @@ class DrawerState(
         get() = currentValue == DrawerValue.Closed
 
     /**
+     * The current value of the state.
+     *
+     * If no swipe or animation is in progress, this corresponds to the start the drawer
+     * currently in. If a swipe or an animation is in progress, this corresponds the state drawer
+     * was in before the swipe or animation started.
+     */
+    val currentValue: DrawerValue
+        get() {
+            return swipeableState.currentValue
+        }
+
+    /**
+     * Whether the state is currently animating.
+     */
+    val isAnimationRunning: Boolean
+        get() {
+            return swipeableState.isAnimationRunning
+        }
+
+    /**
      * Open the drawer with animation and suspend until it if fully opened or animation has been
      * cancelled. This method will throw [CancellationException] if the animation is
      * interrupted
      *
      * @return the reason the open animation ended
      */
-    suspend fun open() = animateTo(DrawerValue.Open)
+    suspend fun open() = animateTo(DrawerValue.Open, AnimationSpec)
 
     /**
      * Close the drawer with animation and suspend until it if fully closed or animation has been
@@ -140,7 +166,48 @@ class DrawerState(
      *
      * @return the reason the close animation ended
      */
-    suspend fun close() = animateTo(DrawerValue.Closed)
+    suspend fun close() = animateTo(DrawerValue.Closed, AnimationSpec)
+
+    /**
+     * Set the state of the drawer with specific animation
+     *
+     * @param targetValue The new value to animate to.
+     * @param anim The animation that will be used to animate to the new value.
+     */
+    @ExperimentalMaterialApi
+    suspend fun animateTo(targetValue: DrawerValue, anim: AnimationSpec<Float>) {
+        swipeableState.animateTo(targetValue, anim)
+    }
+
+    /**
+     * Set the state without any animation and suspend until it's set
+     *
+     * @param targetValue The new target value
+     */
+    @ExperimentalMaterialApi
+    suspend fun snapTo(targetValue: DrawerValue) {
+        swipeableState.snapTo(targetValue)
+    }
+
+    /**
+     * The target value of the drawer state.
+     *
+     * If a swipe is in progress, this is the value that the Drawer would animate to if the
+     * swipe finishes. If an animation is running, this is the target value of that animation.
+     * Finally, if no swipe or animation is in progress, this is the same as the [currentValue].
+     */
+    @ExperimentalMaterialApi
+    @get:ExperimentalMaterialApi
+    val targetValue: DrawerValue
+        get() = swipeableState.targetValue
+
+    /**
+     * The current position (in pixels) of the drawer sheet.
+     */
+    @ExperimentalMaterialApi
+    @get:ExperimentalMaterialApi
+    val offset: State<Float>
+        get() = swipeableState.offset
 
     companion object {
         /**
@@ -160,8 +227,8 @@ class DrawerState(
  * @param initialValue The initial value of the state.
  * @param confirmStateChange Optional callback invoked to confirm or veto a pending state change.
  */
-@Suppress("NotCloseable", "HiddenSuperclass")
-@OptIn(ExperimentalMaterialApi::class)
+@Suppress("NotCloseable")
+@ExperimentalMaterialApi
 class BottomDrawerState(
     initialValue: BottomDrawerValue,
     confirmStateChange: (BottomDrawerValue) -> Boolean = { true }
@@ -260,6 +327,7 @@ fun rememberDrawerState(
  * @param confirmStateChange Optional callback invoked to confirm or veto a pending state change.
  */
 @Composable
+@ExperimentalMaterialApi
 fun rememberBottomDrawerState(
     initialValue: BottomDrawerValue,
     confirmStateChange: (BottomDrawerValue) -> Boolean = { true }
@@ -330,7 +398,7 @@ fun ModalDrawer(
         }
         Box(
             Modifier.swipeable(
-                state = drawerState,
+                state = drawerState.swipeableState,
                 anchors = anchors,
                 thresholds = { _, _ -> FractionalThreshold(0.5f) },
                 orientation = Orientation.Horizontal,
@@ -346,7 +414,9 @@ fun ModalDrawer(
             Scrim(
                 open = drawerState.isOpen,
                 onClose = { scope.launch { drawerState.close() } },
-                fraction = { calculateFraction(minValue, maxValue, drawerState.offset.value) },
+                fraction = {
+                    calculateFraction(minValue, maxValue, drawerState.offset.value)
+                },
                 color = scrimColor
             )
             Surface(
