@@ -16,6 +16,7 @@
 
 package androidx.compose.ui.inspection.proto
 
+import android.view.inspector.WindowInspector
 import androidx.compose.ui.inspection.LambdaLocation
 import androidx.compose.ui.inspection.inspector.InspectorNode
 import androidx.compose.ui.inspection.inspector.NodeParameter
@@ -110,13 +111,20 @@ private fun Parameter.Builder.setValue(stringTable: StringTable, value: Any?) {
         Parameter.Type.INT64 -> {
             int64Value = value as Long
         }
-        Parameter.Type.RESOURCE -> {
-            // TODO: handle resource type
-        }
+        Parameter.Type.RESOURCE -> setResourceType(value, stringTable)
         Parameter.Type.LAMBDA -> setFunctionType(value, stringTable)
         Parameter.Type.FUNCTION_REFERENCE -> setFunctionType(value, stringTable)
         else -> error("Unknown Composable parameter type: $type")
     }
+}
+
+private fun Parameter.Builder.setResourceType(value: Any?, stringTable: StringTable) {
+    // A Resource is passed by resource id for Compose
+    val resourceId = (value as? Int) ?: return
+    resourceValue = WindowInspector.getGlobalWindowViews()
+        .firstOrNull()
+        ?.createResource(stringTable, resourceId)
+        ?: return
 }
 
 private fun Parameter.Builder.setFunctionType(value: Any?, stringTable: StringTable) {

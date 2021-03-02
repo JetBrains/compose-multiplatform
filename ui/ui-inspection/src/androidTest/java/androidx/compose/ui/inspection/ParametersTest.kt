@@ -29,6 +29,7 @@ import layoutinspector.compose.inspection.LayoutInspectorComposeProtocol.Composa
 import layoutinspector.compose.inspection.LayoutInspectorComposeProtocol.GetComposablesResponse
 import layoutinspector.compose.inspection.LayoutInspectorComposeProtocol.GetParametersResponse
 import layoutinspector.compose.inspection.LayoutInspectorComposeProtocol.Parameter
+import org.junit.Ignore
 import org.junit.Rule
 import org.junit.Test
 
@@ -37,6 +38,23 @@ class ParametersTest {
     @get:Rule
     val rule = ComposeInspectionRule(ParametersTestActivity::class)
 
+    @Test
+    fun resource(): Unit = runBlocking {
+        val composables = rule.inspectorTester.sendCommand(GetComposablesCommand(rule.rootId))
+            .getComposablesResponse
+
+        val text = composables.filter("Text").first()
+        val params = rule.inspectorTester.sendCommand(GetParametersCommand(rule.rootId, text.id))
+            .getParametersResponse
+
+        val resourceValue = params.find("fontFamily")!!.resourceValue
+        assertThat(resourceValue.type.resolve(params)).isEqualTo("font")
+        assertThat(resourceValue.namespace.resolve(params))
+            .isEqualTo("androidx.compose.ui.inspection.test")
+        assertThat(resourceValue.name.resolve(params)).isEqualTo("samplefont")
+    }
+
+    @Ignore // Will re-enable after platform bug is fixed upstream
     @Test
     fun lambda(): Unit = runBlocking {
         val composables = rule.inspectorTester.sendCommand(GetComposablesCommand(rule.rootId))
@@ -49,12 +67,13 @@ class ParametersTest {
 
         val lambdaValue = params.find("onClick")!!.lambdaValue
         assertThat(lambdaValue.fileName.resolve(params)).isEqualTo("ParametersTestActivity.kt")
-        assertThat(lambdaValue.startLineNumber).isEqualTo(29)
-        assertThat(lambdaValue.endLineNumber).isEqualTo(29)
+        assertThat(lambdaValue.startLineNumber).isEqualTo(47)
+        assertThat(lambdaValue.endLineNumber).isEqualTo(47)
         assertThat(lambdaValue.packageName.resolve(params))
             .isEqualTo("androidx.compose.ui.inspection.testdata")
     }
 
+    @Ignore // Will re-enable after platform bug is fixed upstream
     @Test
     fun functionType(): Unit = runBlocking {
         val composables = rule.inspectorTester.sendCommand(GetComposablesCommand(rule.rootId))
@@ -67,8 +86,8 @@ class ParametersTest {
 
         val lambdaValue = params.find("onClick")!!.lambdaValue
         assertThat(lambdaValue.fileName.resolve(params)).isEqualTo("ParametersTestActivity.kt")
-        assertThat(lambdaValue.startLineNumber).isEqualTo(32)
-        assertThat(lambdaValue.endLineNumber).isEqualTo(32)
+        assertThat(lambdaValue.startLineNumber).isEqualTo(50)
+        assertThat(lambdaValue.endLineNumber).isEqualTo(50)
         assertThat(lambdaValue.functionName.resolve(params)).isEqualTo("testClickHandler")
         assertThat(lambdaValue.packageName.resolve(params))
             .isEqualTo("androidx.compose.ui.inspection.testdata")
