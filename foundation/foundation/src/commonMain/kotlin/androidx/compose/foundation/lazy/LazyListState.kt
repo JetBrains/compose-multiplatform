@@ -338,10 +338,14 @@ private class ItemRelativeScrollPosition(
     fun update(index: DataIndex, scrollOffset: Int, canScrollForward: Boolean) {
         require(index.value >= 0f) { "Index should be non-negative (${index.value})" }
         require(scrollOffset >= 0f) { "scrollOffset should be non-negative ($scrollOffset)" }
-        this.index = index
-        indexState.value = index.value
-        this.scrollOffset = scrollOffset
-        scrollOffsetState.value = scrollOffset
+        if (index != this.index) {
+            this.index = index
+            indexState.value = index.value
+        }
+        if (scrollOffset != this.scrollOffset) {
+            this.scrollOffset = scrollOffset
+            scrollOffsetState.value = scrollOffset
+        }
         this.canScrollForward = canScrollForward
     }
 }

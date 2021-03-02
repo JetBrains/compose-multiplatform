@@ -337,9 +337,6 @@ package androidx.compose.foundation.interaction {
 
 package androidx.compose.foundation.lazy {
 
-  public final class CachingItemContentFactoryKt {
-  }
-
   @androidx.compose.foundation.ExperimentalFoundationApi public abstract sealed class GridCells {
   }
 
@@ -380,6 +377,9 @@ package androidx.compose.foundation.lazy {
     method public androidx.compose.ui.Modifier fillParentMaxHeight(androidx.compose.ui.Modifier, optional float fraction);
     method public androidx.compose.ui.Modifier fillParentMaxSize(androidx.compose.ui.Modifier, optional float fraction);
     method public androidx.compose.ui.Modifier fillParentMaxWidth(androidx.compose.ui.Modifier, optional float fraction);
+  }
+
+  public final class LazyListItemContentFactoryKt {
   }
 
   public interface LazyListItemInfo {
@@ -448,6 +448,9 @@ package androidx.compose.foundation.lazy {
   }
 
   @kotlin.DslMarker public @interface LazyScopeMarker {
+  }
+
+  public final class Lazy_androidKt {
   }
 
 }
