@@ -104,7 +104,7 @@ abstract class InspectorValueInfo(private val info: InspectorInfo.() -> Unit) : 
 
     private val values: InspectorInfo
         get() {
-            val valueInfo = _values ?: InspectorInfo().apply { info() }
+            val valueInfo = _values ?: InspectorInfo().apply(info)
             _values = valueInfo
             return valueInfo
         }
