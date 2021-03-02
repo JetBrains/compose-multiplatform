@@ -100,6 +100,7 @@ class ComposeLayoutInspector(
     ) {
         ThreadUtils.runOnMainThread {
             val stringTable = StringTable()
+            val rootIds = WindowInspector.getGlobalWindowViews().map { it.uniqueDrawingId }
             val composeViews = getAndroidComposeViews(
                 getComposablesCommand.rootViewId,
                 getComposablesCommand.skipSystemComposables
@@ -108,6 +109,9 @@ class ComposeLayoutInspector(
             val composeRoots = composeViews.map { it.createComposableRoot(stringTable) }
 
             environment.executors().primary().execute {
+                // As long as we're modifying cachedNodes anyway, remove any nodes associated with
+                // layout roots that have since been removed.
+                cachedNodes.keys.removeAll { rootId -> !rootIds.contains(rootId) }
                 cachedNodes[getComposablesCommand.rootViewId] = CacheData(
                     getComposablesCommand.skipSystemComposables,
                     composeViews.toInspectorNodes().associateBy { it.id }
