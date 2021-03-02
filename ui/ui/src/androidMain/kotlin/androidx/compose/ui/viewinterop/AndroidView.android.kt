@@ -46,9 +46,11 @@ import androidx.compose.ui.unit.LayoutDirection
  *
  * [AndroidView] is commonly needed for using Views that are infeasible to be reimplemented in
  * Compose and there is no corresponding Compose API. Common examples for the moment are
- * WebView, SurfaceView, AdView, etc. If using WebView, applying a
- * [clip modifier][Modifier.clipToBounds] is recommended to prevent the WebView background
- * being drawn on top of other Compose content.
+ * WebView, SurfaceView, AdView, etc.
+ *
+ * [AndroidView] will clip its content to the layout bounds, as being clipped is a common
+ * assumption made by [View]s - keeping clipping disabled might lead to unexpected drawing behavior.
+ * Note this deviates from Compose's practice of keeping clipping opt-in, disabled by default.
  *
  * @sample androidx.compose.ui.samples.AndroidViewSample
  *
