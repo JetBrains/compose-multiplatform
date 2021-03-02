@@ -116,12 +116,6 @@ package androidx.compose.ui {
     method public static androidx.compose.ui.Modifier materialize(androidx.compose.runtime.Composer, androidx.compose.ui.Modifier modifier);
   }
 
-  @kotlin.RequiresOptIn(message="This API is experimental and is likely to change in the future.") public @interface ExperimentalComposeUiApi {
-  }
-
-  @kotlin.RequiresOptIn(message="Unstable API for use only between compose-ui modules sharing the same exact version, " + "subject to change without notice in major, minor, or patch releases.") public @interface InternalComposeUiApi {
-  }
-
   @androidx.compose.runtime.Stable public interface Modifier {
     method public boolean all(kotlin.jvm.functions.Function1<? super androidx.compose.ui.Modifier.Element,java.lang.Boolean> predicate);
     method public boolean any(kotlin.jvm.functions.Function1<? super androidx.compose.ui.Modifier.Element,java.lang.Boolean> predicate);
@@ -160,71 +154,6 @@ package androidx.compose.ui.autofill {
   }
 
   public final class AndroidAutofill_androidKt {
-  }
-
-  @androidx.compose.ui.ExperimentalComposeUiApi public interface Autofill {
-    method public void cancelAutofillForNode(androidx.compose.ui.autofill.AutofillNode autofillNode);
-    method public void requestAutofillForNode(androidx.compose.ui.autofill.AutofillNode autofillNode);
-  }
-
-  @androidx.compose.ui.ExperimentalComposeUiApi public final class AutofillNode {
-    ctor public AutofillNode(java.util.List<? extends androidx.compose.ui.autofill.AutofillType> autofillTypes, androidx.compose.ui.geometry.Rect? boundingBox, kotlin.jvm.functions.Function1<? super java.lang.String,kotlin.Unit>? onFill);
-    method public java.util.List<androidx.compose.ui.autofill.AutofillType> getAutofillTypes();
-    method public androidx.compose.ui.geometry.Rect? getBoundingBox();
-    method public int getId();
-    method public kotlin.jvm.functions.Function1<java.lang.String,kotlin.Unit>? getOnFill();
-    method public void setBoundingBox(androidx.compose.ui.geometry.Rect? p);
-    property public final java.util.List<androidx.compose.ui.autofill.AutofillType> autofillTypes;
-    property public final androidx.compose.ui.geometry.Rect? boundingBox;
-    property public final int id;
-    property public final kotlin.jvm.functions.Function1<java.lang.String,kotlin.Unit>? onFill;
-  }
-
-  @androidx.compose.ui.ExperimentalComposeUiApi public final class AutofillTree {
-    ctor public AutofillTree();
-    method public java.util.Map<java.lang.Integer,androidx.compose.ui.autofill.AutofillNode> getChildren();
-    method public kotlin.Unit? performAutofill(int id, String value);
-    method public operator void plusAssign(androidx.compose.ui.autofill.AutofillNode autofillNode);
-    property public final java.util.Map<java.lang.Integer,androidx.compose.ui.autofill.AutofillNode> children;
-  }
-
-  @androidx.compose.ui.ExperimentalComposeUiApi public enum AutofillType {
-    enum_constant public static final androidx.compose.ui.autofill.AutofillType AddressAuxiliaryDetails;
-    enum_constant public static final androidx.compose.ui.autofill.AutofillType AddressCountry;
-    enum_constant public static final androidx.compose.ui.autofill.AutofillType AddressLocality;
-    enum_constant public static final androidx.compose.ui.autofill.AutofillType AddressRegion;
-    enum_constant public static final androidx.compose.ui.autofill.AutofillType AddressStreet;
-    enum_constant public static final androidx.compose.ui.autofill.AutofillType BirthDateDay;
-    enum_constant public static final androidx.compose.ui.autofill.AutofillType BirthDateFull;
-    enum_constant public static final androidx.compose.ui.autofill.AutofillType BirthDateMonth;
-    enum_constant public static final androidx.compose.ui.autofill.AutofillType BirthDateYear;
-    enum_constant public static final androidx.compose.ui.autofill.AutofillType CreditCardExpirationDate;
-    enum_constant public static final androidx.compose.ui.autofill.AutofillType CreditCardExpirationDay;
-    enum_constant public static final androidx.compose.ui.autofill.AutofillType CreditCardExpirationMonth;
-    enum_constant public static final androidx.compose.ui.autofill.AutofillType CreditCardExpirationYear;
-    enum_constant public static final androidx.compose.ui.autofill.AutofillType CreditCardNumber;
-    enum_constant public static final androidx.compose.ui.autofill.AutofillType CreditCardSecurityCode;
-    enum_constant public static final androidx.compose.ui.autofill.AutofillType EmailAddress;
-    enum_constant public static final androidx.compose.ui.autofill.AutofillType Gender;
-    enum_constant public static final androidx.compose.ui.autofill.AutofillType NewPassword;
-    enum_constant public static final androidx.compose.ui.autofill.AutofillType NewUsername;
-    enum_constant public static final androidx.compose.ui.autofill.AutofillType Password;
-    enum_constant public static final androidx.compose.ui.autofill.AutofillType PersonFirstName;
-    enum_constant public static final androidx.compose.ui.autofill.AutofillType PersonFullName;
-    enum_constant public static final androidx.compose.ui.autofill.AutofillType PersonLastName;
-    enum_constant public static final androidx.compose.ui.autofill.AutofillType PersonMiddleInitial;
-    enum_constant public static final androidx.compose.ui.autofill.AutofillType PersonMiddleName;
-    enum_constant public static final androidx.compose.ui.autofill.AutofillType PersonNamePrefix;
-    enum_constant public static final androidx.compose.ui.autofill.AutofillType PersonNameSuffix;
-    enum_constant public static final androidx.compose.ui.autofill.AutofillType PhoneCountryCode;
-    enum_constant public static final androidx.compose.ui.autofill.AutofillType PhoneNumber;
-    enum_constant public static final androidx.compose.ui.autofill.AutofillType PhoneNumberDevice;
-    enum_constant public static final androidx.compose.ui.autofill.AutofillType PhoneNumberNational;
-    enum_constant public static final androidx.compose.ui.autofill.AutofillType PostalAddress;
-    enum_constant public static final androidx.compose.ui.autofill.AutofillType PostalCode;
-    enum_constant public static final androidx.compose.ui.autofill.AutofillType PostalCodeExtended;
-    enum_constant public static final androidx.compose.ui.autofill.AutofillType SmsOtpCode;
-    enum_constant public static final androidx.compose.ui.autofill.AutofillType Username;
   }
 
 }
@@ -380,29 +309,8 @@ package androidx.compose.ui.focus {
   }
 
   public static final class FocusRequester.Companion {
-    method @androidx.compose.ui.ExperimentalComposeUiApi public androidx.compose.ui.focus.FocusRequester.Companion.FocusRequesterFactory createRefs();
     method public androidx.compose.ui.focus.FocusRequester getDefault();
     property public final androidx.compose.ui.focus.FocusRequester Default;
-  }
-
-  @androidx.compose.ui.ExperimentalComposeUiApi public static final class FocusRequester.Companion.FocusRequesterFactory {
-    method public operator androidx.compose.ui.focus.FocusRequester component1();
-    method public operator androidx.compose.ui.focus.FocusRequester component10();
-    method public operator androidx.compose.ui.focus.FocusRequester component11();
-    method public operator androidx.compose.ui.focus.FocusRequester component12();
-    method public operator androidx.compose.ui.focus.FocusRequester component13();
-    method public operator androidx.compose.ui.focus.FocusRequester component14();
-    method public operator androidx.compose.ui.focus.FocusRequester component15();
-    method public operator androidx.compose.ui.focus.FocusRequester component16();
-    method public operator androidx.compose.ui.focus.FocusRequester component2();
-    method public operator androidx.compose.ui.focus.FocusRequester component3();
-    method public operator androidx.compose.ui.focus.FocusRequester component4();
-    method public operator androidx.compose.ui.focus.FocusRequester component5();
-    method public operator androidx.compose.ui.focus.FocusRequester component6();
-    method public operator androidx.compose.ui.focus.FocusRequester component7();
-    method public operator androidx.compose.ui.focus.FocusRequester component8();
-    method public operator androidx.compose.ui.focus.FocusRequester component9();
-    field public static final androidx.compose.ui.focus.FocusRequester.Companion.FocusRequesterFactory INSTANCE;
   }
 
   public final class FocusRequesterKt {
@@ -518,14 +426,6 @@ package androidx.compose.ui.graphics {
 }
 
 package androidx.compose.ui.graphics.vector {
-
-  @androidx.compose.runtime.Immutable @androidx.compose.ui.ExperimentalComposeUiApi public final class AnimatedImageVector {
-    method public androidx.compose.ui.graphics.vector.ImageVector getImageVector();
-    method public int getTotalDuration();
-    method @androidx.compose.runtime.Composable public androidx.compose.ui.graphics.painter.Painter painterFor(boolean atEnd);
-    property public final androidx.compose.ui.graphics.vector.ImageVector imageVector;
-    property public final int totalDuration;
-  }
 
   public final class AnimatorKt {
   }
@@ -1387,8 +1287,7 @@ package androidx.compose.ui.input.pointer {
   }
 
   public final class ConsumedData {
-    ctor public ConsumedData(boolean positionChange, boolean downChange);
-    ctor public ConsumedData();
+    ctor public ConsumedData(optional boolean positionChange, optional boolean downChange);
     method public boolean getDownChange();
     method public boolean getPositionChange();
     method public void setDownChange(boolean p);
@@ -1722,7 +1621,7 @@ package androidx.compose.ui.layout {
   }
 
   public final class ModifierInfo {
-    ctor public ModifierInfo(androidx.compose.ui.Modifier modifier, androidx.compose.ui.layout.LayoutCoordinates coordinates, Object? extra);
+    ctor public ModifierInfo(androidx.compose.ui.Modifier modifier, androidx.compose.ui.layout.LayoutCoordinates coordinates, optional Object? extra);
     method public androidx.compose.ui.layout.LayoutCoordinates getCoordinates();
     method public Object? getExtra();
     method public androidx.compose.ui.Modifier getModifier();
@@ -1879,9 +1778,6 @@ package androidx.compose.ui.node {
     property public final kotlin.jvm.functions.Function2<androidx.compose.ui.node.ComposeUiNode,androidx.compose.ui.Modifier,kotlin.Unit> SetModifier;
   }
 
-  @kotlin.RequiresOptIn(message="This API is internal to library.") @kotlin.annotation.Target(allowedTargets={kotlin.annotation.AnnotationTarget, kotlin.annotation.AnnotationTarget, kotlin.annotation.AnnotationTarget, kotlin.annotation.AnnotationTarget, kotlin.annotation.AnnotationTarget}) public @interface InternalCoreApi {
-  }
-
   public final class LayoutNodeKt {
   }
 
@@ -1910,8 +1806,8 @@ package androidx.compose.ui.node {
 package androidx.compose.ui.platform {
 
   public abstract class AbstractComposeView extends android.view.ViewGroup {
-    ctor public AbstractComposeView(android.content.Context context, android.util.AttributeSet? attrs, int defStyleAttr);
-    ctor public AbstractComposeView(android.content.Context context, android.util.AttributeSet? attrs);
+    ctor public AbstractComposeView(android.content.Context context, optional android.util.AttributeSet? attrs, optional int defStyleAttr);
+    ctor public AbstractComposeView(android.content.Context context, optional android.util.AttributeSet? attrs);
     ctor public AbstractComposeView(android.content.Context context);
     method @androidx.compose.runtime.Composable public abstract void Content();
     method public final void createComposition();
@@ -1999,8 +1895,8 @@ package androidx.compose.ui.platform {
   }
 
   public final class ComposeView extends androidx.compose.ui.platform.AbstractComposeView {
-    ctor public ComposeView(android.content.Context context, android.util.AttributeSet? attrs, int defStyleAttr);
-    ctor public ComposeView(android.content.Context context, android.util.AttributeSet? attrs);
+    ctor public ComposeView(android.content.Context context, optional android.util.AttributeSet? attrs, optional int defStyleAttr);
+    ctor public ComposeView(android.content.Context context, optional android.util.AttributeSet? attrs);
     ctor public ComposeView(android.content.Context context);
     method @androidx.compose.runtime.Composable public void Content();
     method public void setContent(kotlin.jvm.functions.Function0<kotlin.Unit> content);
@@ -2009,8 +1905,6 @@ package androidx.compose.ui.platform {
 
   public final class CompositionLocalsKt {
     method public static androidx.compose.runtime.ProvidableCompositionLocal<androidx.compose.ui.platform.AccessibilityManager> getLocalAccessibilityManager();
-    method @androidx.compose.ui.ExperimentalComposeUiApi public static androidx.compose.runtime.ProvidableCompositionLocal<androidx.compose.ui.autofill.Autofill> getLocalAutofill();
-    method @androidx.compose.ui.ExperimentalComposeUiApi public static androidx.compose.runtime.ProvidableCompositionLocal<androidx.compose.ui.autofill.AutofillTree> getLocalAutofillTree();
     method public static androidx.compose.runtime.ProvidableCompositionLocal<androidx.compose.ui.platform.ClipboardManager> getLocalClipboardManager();
     method public static androidx.compose.runtime.ProvidableCompositionLocal<androidx.compose.ui.unit.Density> getLocalDensity();
     method public static androidx.compose.runtime.ProvidableCompositionLocal<androidx.compose.ui.focus.FocusManager> getLocalFocusManager();
@@ -2069,17 +1963,6 @@ package androidx.compose.ui.platform {
   }
 
   public final class JvmActuals_jvmKt {
-  }
-
-  @androidx.compose.ui.ExperimentalComposeUiApi public final class LocalSoftwareKeyboardController {
-    method @androidx.compose.runtime.Composable public androidx.compose.ui.platform.SoftwareKeyboardController? getCurrent();
-    property @androidx.compose.runtime.Composable public final androidx.compose.ui.platform.SoftwareKeyboardController? current;
-    field public static final androidx.compose.ui.platform.LocalSoftwareKeyboardController INSTANCE;
-  }
-
-  @androidx.compose.ui.ExperimentalComposeUiApi public interface SoftwareKeyboardController {
-    method public void hideSoftwareKeyboard();
-    method public void showSoftwareKeyboard();
   }
 
   public final class TestTagKt {
@@ -2185,24 +2068,6 @@ package androidx.compose.ui.platform {
   public final class WindowInfoKt {
   }
 
-  @androidx.compose.ui.InternalComposeUiApi public fun interface WindowRecomposerFactory {
-    method public androidx.compose.runtime.Recomposer createRecomposer(android.view.View windowRootView);
-    field public static final androidx.compose.ui.platform.WindowRecomposerFactory.Companion Companion;
-  }
-
-  public static final class WindowRecomposerFactory.Companion {
-    method public androidx.compose.ui.platform.WindowRecomposerFactory getLifecycleAware();
-    property public final androidx.compose.ui.platform.WindowRecomposerFactory LifecycleAware;
-  }
-
-  @androidx.compose.ui.InternalComposeUiApi public final class WindowRecomposerPolicy {
-    method @kotlin.PublishedApi internal boolean compareAndSetFactory(androidx.compose.ui.platform.WindowRecomposerFactory expected, androidx.compose.ui.platform.WindowRecomposerFactory factory);
-    method @kotlin.PublishedApi internal androidx.compose.ui.platform.WindowRecomposerFactory getAndSetFactory(androidx.compose.ui.platform.WindowRecomposerFactory factory);
-    method public void setFactory(androidx.compose.ui.platform.WindowRecomposerFactory factory);
-    method public inline <R> R! withFactory(androidx.compose.ui.platform.WindowRecomposerFactory factory, kotlin.jvm.functions.Function0<? extends R> block);
-    field public static final androidx.compose.ui.platform.WindowRecomposerPolicy INSTANCE;
-  }
-
   public final class WindowRecomposer_androidKt {
     method public static androidx.compose.runtime.CompositionContext? findViewTreeCompositionContext(android.view.View);
     method public static androidx.compose.runtime.CompositionContext? getCompositionContext(android.view.View);
@@ -2224,7 +2089,6 @@ package androidx.compose.ui.platform.actionmodecallback {
 package androidx.compose.ui.res {
 
   public final class AnimatedVectorResources_androidKt {
-    method @androidx.compose.runtime.Composable @androidx.compose.ui.ExperimentalComposeUiApi public static androidx.compose.ui.graphics.vector.AnimatedImageVector animatedVectorResource(@DrawableRes int id);
   }
 
   public final class AnimatorResources_androidKt {
@@ -2286,7 +2150,7 @@ package androidx.compose.ui.semantics {
   }
 
   public final class ProgressBarRangeInfo {
-    ctor public ProgressBarRangeInfo(float current, kotlin.ranges.ClosedFloatingPointRange<java.lang.Float> range, int steps);
+    ctor public ProgressBarRangeInfo(float current, kotlin.ranges.ClosedFloatingPointRange<java.lang.Float> range, optional int steps);
     method public float getCurrent();
     method public kotlin.ranges.ClosedFloatingPointRange<java.lang.Float> getRange();
     method public int getSteps();
@@ -2311,7 +2175,7 @@ package androidx.compose.ui.semantics {
   }
 
   public final class ScrollAxisRange {
-    ctor public ScrollAxisRange(kotlin.jvm.functions.Function0<java.lang.Float> value, kotlin.jvm.functions.Function0<java.lang.Float> maxValue, boolean reverseScrolling);
+    ctor public ScrollAxisRange(kotlin.jvm.functions.Function0<java.lang.Float> value, kotlin.jvm.functions.Function0<java.lang.Float> maxValue, optional boolean reverseScrolling);
     method public kotlin.jvm.functions.Function0<java.lang.Float> getMaxValue();
     method public boolean getReverseScrolling();
     method public kotlin.jvm.functions.Function0<java.lang.Float> getValue();
@@ -2503,7 +2367,6 @@ package androidx.compose.ui.semantics {
     method public static androidx.compose.ui.state.ToggleableState getToggleableState(androidx.compose.ui.semantics.SemanticsPropertyReceiver);
     method public static androidx.compose.ui.semantics.ScrollAxisRange getVerticalScrollAxisRange(androidx.compose.ui.semantics.SemanticsPropertyReceiver);
     method public static void heading(androidx.compose.ui.semantics.SemanticsPropertyReceiver);
-    method @androidx.compose.ui.ExperimentalComposeUiApi public static void invisibleToUser(androidx.compose.ui.semantics.SemanticsPropertyReceiver);
     method public static void onClick(androidx.compose.ui.semantics.SemanticsPropertyReceiver, optional String? label, kotlin.jvm.functions.Function0<java.lang.Boolean>? action);
     method public static void onLongClick(androidx.compose.ui.semantics.SemanticsPropertyReceiver, optional String? label, kotlin.jvm.functions.Function0<java.lang.Boolean>? action);
     method public static void password(androidx.compose.ui.semantics.SemanticsPropertyReceiver);
@@ -2533,7 +2396,7 @@ package androidx.compose.ui.semantics {
   }
 
   public final class SemanticsPropertyKey<T> {
-    ctor public SemanticsPropertyKey(String name, kotlin.jvm.functions.Function2<? super T,? super T,? extends T> mergePolicy);
+    ctor public SemanticsPropertyKey(String name, optional kotlin.jvm.functions.Function2<? super T,? super T,? extends T> mergePolicy);
     method public String getName();
     method public operator T! getValue(androidx.compose.ui.semantics.SemanticsPropertyReceiver thisRef, kotlin.reflect.KProperty<?> property);
     method public T? merge(T? parentValue, T? childValue);
@@ -2596,8 +2459,7 @@ package androidx.compose.ui.window {
   }
 
   @androidx.compose.runtime.Immutable public final class DialogProperties {
-    ctor public DialogProperties(boolean dismissOnBackPress, boolean dismissOnClickOutside, androidx.compose.ui.window.SecureFlagPolicy securePolicy);
-    ctor public DialogProperties();
+    ctor public DialogProperties(optional boolean dismissOnBackPress, optional boolean dismissOnClickOutside, optional androidx.compose.ui.window.SecureFlagPolicy securePolicy);
     method public boolean getDismissOnBackPress();
     method public boolean getDismissOnClickOutside();
     method public androidx.compose.ui.window.SecureFlagPolicy getSecurePolicy();
@@ -2616,8 +2478,7 @@ package androidx.compose.ui.window {
   }
 
   @androidx.compose.runtime.Immutable public final class PopupProperties {
-    ctor public PopupProperties(boolean focusable, boolean dismissOnBackPress, boolean dismissOnClickOutside, androidx.compose.ui.window.SecureFlagPolicy securePolicy);
-    ctor public PopupProperties();
+    ctor public PopupProperties(optional boolean focusable, optional boolean dismissOnBackPress, optional boolean dismissOnClickOutside, optional androidx.compose.ui.window.SecureFlagPolicy securePolicy);
     method public boolean getDismissOnBackPress();
     method public boolean getDismissOnClickOutside();
     method public boolean getFocusable();
