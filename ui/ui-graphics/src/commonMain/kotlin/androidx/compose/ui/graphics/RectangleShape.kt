@@ -29,4 +29,6 @@ import androidx.compose.ui.unit.LayoutDirection
 val RectangleShape: Shape = object : Shape {
     override fun createOutline(size: Size, layoutDirection: LayoutDirection, density: Density) =
         Outline.Rectangle(size.toRect())
+
+    override fun toString(): String = "RectangleShape"
 }
