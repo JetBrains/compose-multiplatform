@@ -23,7 +23,6 @@ import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.Nested
 import org.gradle.api.tasks.TaskProvider
 import org.gradle.api.tasks.bundling.Zip
-import org.gradle.plugin.devel.GradlePluginDevelopmentExtension
 import java.io.File
 import java.util.TreeSet
 
@@ -182,7 +181,7 @@ object Release {
         }
         val version = project.version
 
-        val zipTasks = listOf(
+        var zipTasks = listOf(
             getProjectZipTask(project),
             getGroupReleaseZipTask(project, mavenGroup),
             getGlobalFullZipTask(project)
@@ -194,25 +193,9 @@ object Release {
         )
         val publishTask = project.tasks.named("publish")
         zipTasks.forEach {
-            it.configure { zipTask ->
-                zipTask.candidates.add(artifact)
-
-                // Add additional artifacts needed for Gradle Plugins
-                if (extension.type == LibraryType.GRADLE_PLUGIN) {
-                    project.extensions.getByType(
-                        GradlePluginDevelopmentExtension::class.java
-                    ).plugins.forEach { plugin ->
-                        zipTask.candidates.add(
-                            Artifact(
-                                mavenGroup = plugin.id,
-                                projectName = "${plugin.id}.gradle.plugin",
-                                version = version.toString()
-                            )
-                        )
-                    }
-                }
-
-                zipTask.dependsOn(publishTask)
+            it.configure {
+                it.candidates.add(artifact)
+                it.dependsOn(publishTask)
             }
         }
     }
@@ -297,20 +280,26 @@ object Release {
     private fun getProjectZipTask(
         project: Project
     ): TaskProvider<GMavenZipTask> {
-        val taskProvider = project.tasks.register(
-            PROJECT_ARCHIVE_ZIP_TASK_NAME,
-            GMavenZipTask::class.java
-        ) {
-            GMavenZipTask.ConfigAction(
-                getParams(
-                    project = project,
-                    distDir = File(project.getDistributionDirectory(), PROJECT_ZIPS_FOLDER),
-                    fileNamePrefix = project.projectZipPrefix()
-                ).copy(
-                    includeMetadata = true
-                )
-            ).execute(it)
-        }
+        val taskName = "$PROJECT_ARCHIVE_ZIP_TASK_NAME"
+        val taskProvider: TaskProvider<GMavenZipTask> = project.maybeRegister(
+            name = taskName,
+            onConfigure = {
+                GMavenZipTask.ConfigAction(
+                    getParams(
+                        project = project,
+                        distDir = File(
+                            project.getDistributionDirectory(),
+                            PROJECT_ZIPS_FOLDER
+                        ),
+                        fileNamePrefix = project.projectZipPrefix()
+                    ).copy(
+                        includeMetadata = true
+                    )
+                ).execute(it)
+            },
+            onRegister = {
+            }
+        )
         project.addToBuildOnServer(taskProvider)
         return taskProvider
     }
