@@ -320,7 +320,9 @@ The following platform-specific options are available
     * `bundleID` — a unique application identifier;
         * May only contain alphanumeric characters (`A-Z`,`a-z`,`0-9`), hyphen (`-`) and period (`.`) characters;
         * Use of a reverse DNS notation (e.g. `com.mycompany.myapp`) is recommended;
-    * `packageName` — a name of the application in the menu bar;    
+    * `packageName` — a name of the application;
+    * `dockName` — a name of the application displayed in the menu bar, the "About <App>" menu item, in the dock, etc. 
+      Equals to `packageName` by default.
     * `signing` and `notarization` — see
       [the corresponding tutorial](/tutorials/Signing_and_notarization_on_macOS/README.md) 
       for details;
