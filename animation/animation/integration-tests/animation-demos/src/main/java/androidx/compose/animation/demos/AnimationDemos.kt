@@ -47,6 +47,7 @@ val AnimationDemos = DemoCategory(
         DemoCategory(
             "Suspend Animation Demos",
             listOf(
+                ComposableDemo("Animated clock") { AnimatedClockDemo() },
                 ComposableDemo("Animated scrolling") { FancyScrollingDemo() },
                 ComposableDemo("animateAsState()") { SingleValueAnimationDemo() },
                 ComposableDemo("Follow the tap") { SuspendAnimationDemo() },
