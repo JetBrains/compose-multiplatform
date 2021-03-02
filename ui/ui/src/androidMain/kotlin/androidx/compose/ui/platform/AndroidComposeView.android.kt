@@ -115,7 +115,17 @@ import android.view.KeyEvent as AndroidKeyEvent
 internal class AndroidComposeView(context: Context) :
     ViewGroup(context), Owner, ViewRootForTest, PositionCalculator {
 
-    override val view: View = this
+    /**
+     * Signal that AndroidComposeView's superclass constructors have finished running.
+     * If this is false, it's because the runtime's default uninitialized value is currently
+     * visible and AndroidComposeView's constructor hasn't started running yet. In this state
+     * other expected invariants do not hold, e.g. property delegates may not be initialized.
+     * View/ViewGroup have a history of calling non-final methods in their constructors that
+     * can lead to this case, e.g. [onRtlPropertiesChanged].
+     */
+    private var superclassInitComplete = true
+
+    override val view: View get() = this
 
     override var density = Density(context)
         private set
@@ -768,7 +778,13 @@ internal class AndroidComposeView(context: Context) :
     }
 
     override fun onRtlPropertiesChanged(layoutDirection: Int) {
-        this.layoutDirection = layoutDirectionFromInt(layoutDirection)
+        // This method can be called while View's constructor is running
+        // by way of resolving padding in response to initScrollbars.
+        // If we get such a call, don't try to write to a property delegate
+        // that hasn't been initialized yet.
+        if (superclassInitComplete) {
+            this.layoutDirection = layoutDirectionFromInt(layoutDirection)
+        }
     }
 
     private fun autofillSupported() = Build.VERSION.SDK_INT >= Build.VERSION_CODES.O
