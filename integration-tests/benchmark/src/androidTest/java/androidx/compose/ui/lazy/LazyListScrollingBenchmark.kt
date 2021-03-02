@@ -16,6 +16,7 @@
 
 package androidx.compose.ui.lazy
 
+import android.os.Build
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxHeight
@@ -40,6 +41,7 @@ import androidx.compose.ui.layout.RemeasurementModifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.test.filters.LargeTest
+import androidx.test.filters.SdkSuppress
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -67,6 +69,9 @@ class LazyListScrollingBenchmark(
         }
     }
 
+    // this test makes sense only when run on the Android version which supports RenderNodes
+    // as this tests how efficiently we move RenderNodes.
+    @SdkSuppress(minSdkVersion = Build.VERSION_CODES.Q)
     @Test
     fun draw_notAddingNewItemsAsResult() {
         benchmarkRule.toggleStateBenchmarkDraw {
@@ -74,6 +79,9 @@ class LazyListScrollingBenchmark(
         }
     }
 
+    // this test makes sense only when run on the Android version which supports RenderNodes
+    // as this tests how efficiently we move RenderNodes.
+    @SdkSuppress(minSdkVersion = Build.VERSION_CODES.Q)
     @Test
     fun draw_addingNewItemAsResult() {
         benchmarkRule.toggleStateBenchmarkDraw {
