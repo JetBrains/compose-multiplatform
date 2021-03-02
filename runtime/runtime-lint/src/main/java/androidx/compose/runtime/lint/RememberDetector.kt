@@ -18,7 +18,6 @@
 
 package androidx.compose.runtime.lint
 
-import com.android.tools.lint.client.api.UElementHandler
 import com.android.tools.lint.detector.api.Category
 import com.android.tools.lint.detector.api.Detector
 import com.android.tools.lint.detector.api.Implementation
@@ -28,6 +27,7 @@ import com.android.tools.lint.detector.api.Scope
 import com.android.tools.lint.detector.api.Severity
 import com.android.tools.lint.detector.api.SourceCodeScanner
 import com.intellij.psi.PsiJavaFile
+import com.intellij.psi.PsiMethod
 import com.intellij.psi.PsiType
 import org.jetbrains.uast.UCallExpression
 import java.util.EnumSet
@@ -36,22 +36,17 @@ import java.util.EnumSet
  * [Detector] that checks `remember` calls to make sure they are not returning [Unit].
  */
 class RememberDetector : Detector(), SourceCodeScanner {
-    override fun getApplicableUastTypes() = listOf(UCallExpression::class.java)
+    override fun getApplicableMethodNames(): List<String> = listOf(RememberShortName)
 
-    override fun createUastHandler(context: JavaContext) = object : UElementHandler() {
-        override fun visitCallExpression(node: UCallExpression) {
-            val call = node.resolve() ?: return
-            if (call.name == RememberShortName &&
-                (call.containingFile as? PsiJavaFile)?.packageName == RuntimePackageName
-            ) {
-                if (node.getExpressionType() == PsiType.VOID) {
-                    context.report(
-                        RememberReturnType,
-                        node,
-                        context.getNameLocation(node),
-                        "`remember` calls must not return `Unit`"
-                    )
-                }
+    override fun visitMethodCall(context: JavaContext, node: UCallExpression, method: PsiMethod) {
+        if ((method.containingFile as? PsiJavaFile)?.packageName == RuntimePackageName) {
+            if (node.getExpressionType() == PsiType.VOID) {
+                context.report(
+                    RememberReturnType,
+                    node,
+                    context.getNameLocation(node),
+                    "`remember` calls must not return `Unit`"
+                )
             }
         }
     }

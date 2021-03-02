@@ -32,9 +32,11 @@ import com.intellij.psi.PsiType
 import org.jetbrains.kotlin.psi.KtFunctionType
 import org.jetbrains.kotlin.psi.KtNullableType
 import org.jetbrains.kotlin.psi.KtParameter
+import org.jetbrains.uast.UAnnotation
 import org.jetbrains.uast.UElement
 import org.jetbrains.uast.UMethod
 import org.jetbrains.uast.UParameter
+import org.jetbrains.uast.toUElement
 import java.util.EnumSet
 
 /**
@@ -72,10 +74,11 @@ class ComposableLambdaParameterDetector : Detector(), SourceCodeScanner {
 
                 val typeReference = ktParameter.typeReference!!
 
-                val hasComposableAnnotationOnType = typeReference.modifierList?.annotationEntries
-                    ?.any {
-                        it.shortName?.identifier == ComposableShortName
-                    }
+                // Ideally this annotation should be available on the PsiType itself
+                // https://youtrack.jetbrains.com/issue/KT-45244
+                val hasComposableAnnotationOnType = typeReference.annotationEntries.any {
+                    (it.toUElement() as UAnnotation).qualifiedName == ComposableFqn
+                }
 
                 val functionType = when (val typeElement = typeReference.typeElement) {
                     is KtFunctionType -> typeElement
@@ -83,7 +86,7 @@ class ComposableLambdaParameterDetector : Detector(), SourceCodeScanner {
                     else -> null
                 }
 
-                if (functionType != null && hasComposableAnnotationOnType == true) {
+                if (functionType != null && hasComposableAnnotationOnType) {
                     ComposableLambdaParameterInfo(parameter, functionType)
                 } else {
                     null
