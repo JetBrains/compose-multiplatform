@@ -213,7 +213,7 @@ internal fun AbstractJPackageTask.configurePlatformSettings(app: Application) {
                 linuxMenuGroup.set(provider { linux.menuGroup })
                 linuxPackageName.set(provider { linux.packageName })
                 linuxRpmLicenseType.set(provider { linux.rpmLicenseType })
-                iconFile.set(linux.iconFile)
+                iconFile.set(linux.iconFile.orElse(DefaultIcons.forLinux(project)))
                 installationPath.set(linux.installationPath)
             }
         }
@@ -226,7 +226,7 @@ internal fun AbstractJPackageTask.configurePlatformSettings(app: Application) {
                 winMenu.set(provider { win.menu })
                 winMenuGroup.set(provider { win.menuGroup })
                 winUpgradeUuid.set(provider { win.upgradeUuid })
-                iconFile.set(win.iconFile)
+                iconFile.set(win.iconFile.orElse(DefaultIcons.forWindows(project)))
                 installationPath.set(win.installationPath)
             }
         }
@@ -241,7 +241,7 @@ internal fun AbstractJPackageTask.configurePlatformSettings(app: Application) {
                 )
                 nonValidatedMacBundleID.set(provider { mac.bundleID })
                 nonValidatedMacSigningSettings = app.nativeDistributions.macOS.signing
-                iconFile.set(mac.iconFile)
+                iconFile.set(mac.iconFile.orElse(DefaultIcons.forMac(project)))
                 installationPath.set(mac.installationPath)
             }
         }
