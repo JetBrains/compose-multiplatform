@@ -20,6 +20,7 @@ import android.os.Build
 import android.util.DisplayMetrics
 import android.util.TypedValue
 import android.view.LayoutInflater
+import android.view.SurfaceView
 import android.view.View
 import android.view.ViewGroup
 import android.view.ViewGroup.LayoutParams.WRAP_CONTENT
@@ -29,7 +30,9 @@ import android.widget.TextView
 import androidx.activity.ComponentActivity
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.requiredSize
+import androidx.compose.foundation.layout.size
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.compositionLocalOf
 import androidx.compose.runtime.getValue
@@ -459,6 +462,22 @@ class AndroidViewTest {
         }
         rule.runOnIdle {
             assertThat(factoryRunCount).isEqualTo(1)
+        }
+    }
+
+    @Test
+    fun androidView_clipsToBounds() {
+        val size = 20
+        val sizeDp = with(rule.density) { size.toDp() }
+        rule.setContent {
+            Column {
+                Box(Modifier.size(sizeDp).background(Color.Blue).testTag("box"))
+                AndroidView(factory = { SurfaceView(it) })
+            }
+        }
+
+        rule.onNodeWithTag("box").captureToImage().assertPixels(IntSize(size, size)) {
+            Color.Blue
         }
     }
 

@@ -51,8 +51,6 @@ internal abstract class AndroidViewHolder(
     parentContext: CompositionContext?
 ) : ViewGroup(context) {
     init {
-        clipChildren = false
-
         // Any [Abstract]ComposeViews that are descendants of this view will host
         // subcompositions of the host composition.
         // UiApplier doesn't supply this, only AndroidView.
