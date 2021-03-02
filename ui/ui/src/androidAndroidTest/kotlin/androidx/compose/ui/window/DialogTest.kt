@@ -102,6 +102,7 @@ class DialogTest {
         rule.onNodeWithText(textAfterClick).assertIsDisplayed()
     }
 
+    @FlakyTest(bugId = 179359518)
     @Test
     fun dialogTest_isDismissed_whenSpecified() {
         rule.setContent {
