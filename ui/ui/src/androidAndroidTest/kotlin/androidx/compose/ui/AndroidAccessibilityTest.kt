@@ -403,7 +403,7 @@ class AndroidAccessibilityTest {
             textFieldSelectionOne = false
             assertTrue(provider.performAction(textFieldNode.id, ACTION_SET_SELECTION, argument))
         }
-        rule.waitUntil { textFieldSelectionOne }
+        rule.waitUntil(5_000) { textFieldSelectionOne }
 
         rule.onNodeWithTag(tag)
             .assert(
