@@ -104,6 +104,8 @@ internal class ComposeRootRegistry {
                 } catch (_: ConcurrentModificationException) {
                     // A weakly referenced key may have been cleared while copying the set
                     // Keep trying until we succeed
+                } catch (_: NoSuchElementException) {
+                    // Same as above
                 }
             }
         }
