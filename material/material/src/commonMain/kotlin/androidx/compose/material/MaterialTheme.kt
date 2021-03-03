@@ -59,11 +59,7 @@ fun MaterialTheme(
     shapes: Shapes = MaterialTheme.shapes,
     content: @Composable () -> Unit
 ) {
-    val rememberedColors = remember {
-        // TODO: b/162450508 remove the unnecessary .copy() here when it isn't needed to ensure that
-        // we don't skip the updateColorsFrom call
-        colors.copy()
-    }.apply { updateColorsFrom(colors) }
+    val rememberedColors = remember { colors }.apply { updateColorsFrom(colors) }
     val rippleIndication = rememberRipple()
     val selectionColors = rememberTextSelectionColors(rememberedColors)
     CompositionLocalProvider(
