@@ -21,16 +21,34 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.material.Button
 import androidx.compose.material.Text
+import androidx.compose.ui.text.font.Font
+import androidx.compose.ui.text.font.FontFamily
+import androidx.compose.ui.text.font.FontStyle
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.inspection.test.R
 
 class ParametersTestActivity : ComponentActivity() {
+    private val fontFamily = FontFamily(
+        Font(
+            resId = R.font.samplefont,
+            weight = FontWeight.W400,
+            style = FontStyle.Normal
+        ),
+        Font(
+            resId = R.font.samplefont,
+            weight = FontWeight.W400,
+            style = FontStyle.Italic
+        )
+    )
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
             Button(onClick = { println("smth") }) {
-                Text("one")
+                Text("one", fontFamily = fontFamily)
             }
             Button(onClick = ::testClickHandler) {
-                Text("two")
+                Text("two", fontFamily = fontFamily)
             }
         }
     }
