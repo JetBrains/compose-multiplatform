@@ -37,7 +37,7 @@ if(!AndroidXUiPlugin.isMultiplatformEnabled(project)) {
          * corresponding block below
          */
 
-        api("androidx.annotation:annotation:1.1.0")
+        api("androidx.annotation:annotation:1.2.0-beta01")
         api(project(":compose:ui:ui-unit"))
 
         implementation(project(":compose:runtime:runtime"))
@@ -80,7 +80,7 @@ if(AndroidXUiPlugin.isMultiplatformEnabled(project)) {
             }
 
             androidMain.dependencies {
-                api("androidx.annotation:annotation:1.1.0")
+                api("androidx.annotation:annotation:1.2.0-beta01")
             }
 
             desktopMain.dependencies {
