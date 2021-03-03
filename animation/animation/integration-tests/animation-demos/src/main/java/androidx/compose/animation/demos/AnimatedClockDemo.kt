@@ -20,6 +20,7 @@ import androidx.compose.animation.core.animate
 import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.animation.core.spring
 import androidx.compose.animation.core.tween
+import androidx.compose.animation.core.withInfiniteAnimationFrameMillis
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -40,7 +41,6 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
-import androidx.compose.runtime.withFrameMillis
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.CornerRadius
 import androidx.compose.ui.geometry.Offset
@@ -60,13 +60,13 @@ private class Time(hours: State<Int>, minutes: State<Int>, seconds: State<Int>) 
 
 @Composable
 fun AnimatedClockDemo() {
-    val seconds = remember { mutableStateOf(0) }
-    val minutes = remember { mutableStateOf(0) }
-    val hours = remember { mutableStateOf(0) }
+    val calendar = remember { Calendar.getInstance() }
+    val seconds = remember { mutableStateOf(calendar[Calendar.SECOND]) }
+    val minutes = remember { mutableStateOf(calendar[Calendar.MINUTE]) }
+    val hours = remember { mutableStateOf(calendar[Calendar.HOUR_OF_DAY]) }
     LaunchedEffect(key1 = Unit) {
-        val calendar = Calendar.getInstance()
         while (isActive) {
-            withFrameMillis {
+            withInfiniteAnimationFrameMillis {
                 calendar.timeInMillis = System.currentTimeMillis()
                 seconds.value = calendar[Calendar.SECOND]
                 minutes.value = calendar[Calendar.MINUTE]
