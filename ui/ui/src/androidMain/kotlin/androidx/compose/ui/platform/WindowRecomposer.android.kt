@@ -108,13 +108,13 @@ object WindowRecomposerPolicy {
     )
 
     // Don't expose the actual AtomicReference as @PublishedApi; we might convert to atomicfu later
-    @PublishedApi
-    internal fun getAndSetFactory(
+    /** @suppress This should be internal @PublishedApi */
+    fun getAndSetFactory(
         factory: WindowRecomposerFactory
     ): WindowRecomposerFactory = this.factory.getAndSet(factory)
 
-    @PublishedApi
-    internal fun compareAndSetFactory(
+    /** @suppress This should be internal @PublishedApi */
+    fun compareAndSetFactory(
         expected: WindowRecomposerFactory,
         factory: WindowRecomposerFactory
     ): Boolean = this.factory.compareAndSet(expected, factory)

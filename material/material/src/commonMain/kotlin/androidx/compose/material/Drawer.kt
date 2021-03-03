@@ -94,7 +94,7 @@ enum class BottomDrawerValue {
  * @param initialValue The initial value of the state.
  * @param confirmStateChange Optional callback invoked to confirm or veto a pending state change.
  */
-@Suppress("NotCloseable")
+@Suppress("NotCloseable", "HiddenSuperclass")
 @OptIn(ExperimentalMaterialApi::class)
 @Stable
 class DrawerState(
@@ -153,7 +153,7 @@ class DrawerState(
  * @param initialValue The initial value of the state.
  * @param confirmStateChange Optional callback invoked to confirm or veto a pending state change.
  */
-@Suppress("NotCloseable")
+@Suppress("NotCloseable", "HiddenSuperclass")
 @OptIn(ExperimentalMaterialApi::class)
 class BottomDrawerState(
     initialValue: BottomDrawerValue,
