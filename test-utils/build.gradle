@@ -42,9 +42,9 @@ dependencies {
         api(project(":test-screenshot"))
 
         implementation(KOTLIN_STDLIB_COMMON)
-        implementation(project(":benchmark:benchmark-junit4"))
         implementation(project(":compose:runtime:runtime"))
-        implementation(project(":compose:ui:ui"))
+        implementation(project(":compose:ui:ui-unit"))
+        implementation(project(":compose:ui:ui-graphics"))
         implementation(ANDROIDX_TEST_RULES)
 
         // This has stub APIs for access to legacy Android APIs, so we don't want
@@ -68,9 +68,9 @@ if (AndroidXUiPlugin.isMultiplatformEnabled(project)) {
         sourceSets {
             commonMain.dependencies {
                 implementation(KOTLIN_STDLIB_COMMON)
-                implementation(project(":benchmark:benchmark-junit4"))
                 implementation(project(":compose:runtime:runtime"))
-                implementation(project(":compose:ui:ui"))
+                implementation(project(":compose:ui:ui-unit"))
+                implementation(project(":compose:ui:ui-graphics"))
                 implementation(project(":compose:ui:ui-test-junit4"))
             }
 

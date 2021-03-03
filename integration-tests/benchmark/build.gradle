@@ -44,7 +44,7 @@ dependencies {
     androidTestImplementation(project(":compose:foundation:foundation"))
     androidTestImplementation(project(":compose:material:material"))
     androidTestImplementation(project(":compose:runtime:runtime"))
-    androidTestImplementation(project(":compose:test-utils"))
+    androidTestImplementation(project(":compose:benchmark-utils"))
     androidTestImplementation(project(":compose:ui:ui"))
     androidTestImplementation(project(":activity:activity-compose"))
     androidTestImplementation(ANDROIDX_TEST_EXT_JUNIT)

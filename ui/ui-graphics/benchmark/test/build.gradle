@@ -22,24 +22,18 @@ plugins {
     id("com.android.library")
     id("AndroidXUiPlugin")
     id("org.jetbrains.kotlin.android")
-    id("androidx.benchmark")
 }
 
 dependencies {
     kotlinPlugin project(":compose:compiler:compiler")
 
-    androidTestImplementation project(":benchmark:benchmark-junit4")
-    androidTestImplementation project(":benchmark:benchmark-macro-junit4")
-    androidTestImplementation project(":compose:runtime:runtime")
-    androidTestImplementation project(":compose:ui:ui-text:ui-text-benchmark")
     androidTestImplementation project(":compose:foundation:foundation")
-    androidTestImplementation project(":compose:material:material")
     androidTestImplementation project(":compose:runtime:runtime")
-    androidTestImplementation project(":compose:benchmark-utils")
-    androidTestImplementation(ANDROIDX_TEST_RULES)
-    androidTestImplementation(JUNIT)
+    androidTestImplementation project(":compose:test-utils")
+    androidTestImplementation project(":compose:ui:ui")
+    androidTestImplementation project(":compose:ui:ui-graphics")
+    androidTestImplementation project(":compose:ui:ui-graphics:ui-graphics-benchmark")
     androidTestImplementation(KOTLIN_STDLIB)
-    androidTestImplementation(KOTLIN_REFLECT)
-    androidTestImplementation(KOTLIN_TEST_COMMON)
+    androidTestImplementation(ANDROIDX_TEST_RULES)
     androidTestImplementation(TRUTH)
 }
