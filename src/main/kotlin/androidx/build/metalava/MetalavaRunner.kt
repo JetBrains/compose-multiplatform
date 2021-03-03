@@ -87,8 +87,12 @@ fun Project.getMetalavaClasspath(): FileCollection {
 val HIDE_EXPERIMENTAL_ARGS: List<String> = listOf(
     "--hide-annotation", "androidx.annotation.experimental.Experimental",
     "--hide-annotation", "kotlin.Experimental",
+    "--hide-annotation", "androidx.annotation.RequiresOptIn",
+    "--hide-annotation", "kotlin.RequiresOptIn",
     "--hide-meta-annotation", "androidx.annotation.experimental.Experimental",
-    "--hide-meta-annotation", "kotlin.Experimental"
+    "--hide-meta-annotation", "kotlin.Experimental",
+    "--hide-meta-annotation", "androidx.annotation.RequiresOptIn",
+    "--hide-meta-annotation", "kotlin.RequiresOptIn",
 )
 
 fun getApiLintArgs(targetsJavaConsumers: Boolean): List<String> {
