@@ -144,21 +144,23 @@ private class IntervalContent(
     val content: LazyItemScope.(index: Int) -> @Composable() () -> Unit
 )
 
-private class LazyListScopeImpl : LazyListScope {
+private class LazyListScopeImpl : LazyListScope, LazyKeyAndScopedContentFactory {
     private val intervals = IntervalList<IntervalContent>()
     val totalSize get() = intervals.totalSize
     var headersIndexes: MutableList<Int>? = null
         private set
 
-    fun contentFor(index: Int, scope: LazyItemScope): ItemContent {
+    override fun getKey(index: Int): Any {
         val interval = intervals.intervalForIndex(index)
         val localIntervalIndex = index - interval.startIndex
         val key = interval.content.key?.invoke(localIntervalIndex)
+        return key ?: getDefaultLazyKeyFor(index)
+    }
 
-        return ItemContent(
-            key = key ?: "[DefaultKeyForIndex=$index]",
-            content = interval.content.content.invoke(scope, localIntervalIndex)
-        )
+    override fun getContent(index: Int, scope: LazyItemScope): @Composable () -> Unit {
+        val interval = intervals.intervalForIndex(index)
+        val localIntervalIndex = index - interval.startIndex
+        return interval.content.content.invoke(scope, localIntervalIndex)
     }
 
     override fun items(
@@ -195,6 +197,14 @@ private class LazyListScopeImpl : LazyListScope {
         item(key, content)
     }
 }
+
+/**
+ * This should create an object meeting following requirements:
+ * 1) objects created for the same index are equals and never equals for different indexes
+ * 2) this class is saveable via a default SaveableStateRegistry on the platform
+ * 3) this objects can't be equals to any object which could be provided by a user as a custom key
+ */
+internal expect fun getDefaultLazyKeyFor(index: Int): Any
 
 /**
  * The horizontally scrolling list that only composes and lays out the currently visible items.
@@ -246,10 +256,9 @@ fun LazyRow(
         isVertical = false,
         flingBehavior = flingBehavior,
         reverseLayout = reverseLayout,
-        headerIndexes = scope.headersIndexes ?: emptyList()
-    ) { index ->
-        scope.contentFor(index, this)
-    }
+        headerIndexes = scope.headersIndexes ?: emptyList(),
+        scopedFactory = scope
+    )
 }
 
 /**
@@ -302,8 +311,7 @@ fun LazyColumn(
         verticalArrangement = verticalArrangement,
         isVertical = true,
         reverseLayout = reverseLayout,
-        headerIndexes = scope.headersIndexes ?: emptyList()
-    ) { index ->
-        scope.contentFor(index, this)
-    }
+        headerIndexes = scope.headersIndexes ?: emptyList(),
+        scopedFactory = scope
+    )
 }
