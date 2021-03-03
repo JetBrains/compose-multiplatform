@@ -100,3 +100,15 @@ val Rect.Companion.VisibilityThreshold: Rect
     get() = rectVisibilityThreshold
 
 // TODO: Add Dp.DefaultAnimation = spring<Dp>(visibilityThreshold = Dp.VisibilityThreshold)
+
+internal val visibilityThresholdMap: Map<TwoWayConverter<*, *>, Float> = mapOf(
+    Int.VectorConverter to 1f,
+    IntSize.VectorConverter to 1f,
+    IntOffset.VectorConverter to 1f,
+    Float.VectorConverter to 0.01f,
+    Rect.VectorConverter to PxVisibilityThreshold,
+    Size.VectorConverter to PxVisibilityThreshold,
+    Offset.VectorConverter to PxVisibilityThreshold,
+    Dp.VectorConverter to DpVisibilityThreshold,
+    DpOffset.VectorConverter to DpVisibilityThreshold
+)

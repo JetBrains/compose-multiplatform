@@ -272,6 +272,9 @@ package androidx.compose.animation.core {
     method public static androidx.compose.animation.core.Easing getLinearOutSlowInEasing();
   }
 
+  @kotlin.RequiresOptIn(message="This is an experimental animation API for Transition. It may change in the future.") public @interface ExperimentalTransitionApi {
+  }
+
   public interface FiniteAnimationSpec<T> extends androidx.compose.animation.core.AnimationSpec<T> {
     method public <V extends androidx.compose.animation.core.AnimationVector> androidx.compose.animation.core.VectorizedFiniteAnimationSpec<V> vectorize(androidx.compose.animation.core.TwoWayConverter<T,V> converter);
   }
@@ -404,8 +407,10 @@ package androidx.compose.animation.core {
     ctor public MutableTransitionState(S? initialState);
     method public S! getCurrentState();
     method public S! getTargetState();
+    method @androidx.compose.animation.core.ExperimentalTransitionApi public boolean isIdle();
     method public void setTargetState(S! p);
     property public final S! currentState;
+    property @androidx.compose.animation.core.ExperimentalTransitionApi public final boolean isIdle;
     property public final S! targetState;
   }
 
@@ -518,6 +523,7 @@ package androidx.compose.animation.core {
     method @androidx.compose.runtime.Composable public static inline <S> androidx.compose.runtime.State<androidx.compose.ui.geometry.Rect> animateRect(androidx.compose.animation.core.Transition<S>, optional kotlin.jvm.functions.Function1<? super androidx.compose.animation.core.Transition.Segment<S>,? extends androidx.compose.animation.core.FiniteAnimationSpec<androidx.compose.ui.geometry.Rect>> transitionSpec, optional String label, kotlin.jvm.functions.Function1<? super S,androidx.compose.ui.geometry.Rect> targetValueByState);
     method @androidx.compose.runtime.Composable public static inline <S> androidx.compose.runtime.State<androidx.compose.ui.geometry.Size> animateSize(androidx.compose.animation.core.Transition<S>, optional kotlin.jvm.functions.Function1<? super androidx.compose.animation.core.Transition.Segment<S>,? extends androidx.compose.animation.core.FiniteAnimationSpec<androidx.compose.ui.geometry.Size>> transitionSpec, optional String label, kotlin.jvm.functions.Function1<? super S,androidx.compose.ui.geometry.Size> targetValueByState);
     method @androidx.compose.runtime.Composable public static inline <S, T, V extends androidx.compose.animation.core.AnimationVector> androidx.compose.runtime.State<T> animateValue(androidx.compose.animation.core.Transition<S>, androidx.compose.animation.core.TwoWayConverter<T,V> typeConverter, optional kotlin.jvm.functions.Function1<? super androidx.compose.animation.core.Transition.Segment<S>,? extends androidx.compose.animation.core.FiniteAnimationSpec<T>> transitionSpec, optional String label, kotlin.jvm.functions.Function1<? super S,? extends T> targetValueByState);
+    method @androidx.compose.animation.core.ExperimentalTransitionApi @androidx.compose.runtime.Composable public static inline <S, T> androidx.compose.animation.core.Transition<T> createChildTransition(androidx.compose.animation.core.Transition<S>, optional String label, kotlin.jvm.functions.Function1<? super S,? extends T> transformToChildState);
     method @androidx.compose.runtime.Composable public static <T> androidx.compose.animation.core.Transition<T> updateTransition(T? targetState, optional String? label);
     method @androidx.compose.runtime.Composable public static <T> androidx.compose.animation.core.Transition<T> updateTransition(androidx.compose.animation.core.MutableTransitionState<T> transitionState, optional String? label);
   }

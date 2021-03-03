@@ -18,68 +18,118 @@ package androidx.compose.animation.demos
 
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.ExperimentalAnimationApi
+import androidx.compose.animation.core.ExperimentalTransitionApi
+import androidx.compose.animation.core.MutableTransitionState
 import androidx.compose.animation.expandVertically
 import androidx.compose.animation.shrinkVertically
 import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.requiredHeight
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.requiredHeight
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.itemsIndexed
+import androidx.compose.foundation.lazy.items
 import androidx.compose.material.Button
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
+import androidx.compose.runtime.snapshotFlow
+import androidx.compose.ui.Alignment.Companion.CenterEnd
 import androidx.compose.ui.Alignment.Companion.End
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
+import kotlinx.coroutines.flow.collect
 
-@OptIn(ExperimentalAnimationApi::class)
+@OptIn(ExperimentalAnimationApi::class, ExperimentalTransitionApi::class)
 @Composable
 fun AnimatedVisibilityLazyColumnDemo() {
-    var itemNum by remember { mutableStateOf(0) }
     Column {
+        val model = remember { MyModel() }
         Row(Modifier.fillMaxWidth()) {
             Button(
-                { itemNum = itemNum + 1 },
-                enabled = itemNum <= turquoiseColors.size - 1,
+                { model.addNewItem() },
                 modifier = Modifier.padding(15.dp).weight(1f)
             ) {
                 Text("Add")
             }
+        }
 
-            Button(
-                { itemNum = itemNum - 1 },
-                enabled = itemNum >= 1,
-                modifier = Modifier.padding(15.dp).weight(1f)
-            ) {
-                Text("Remove")
+        LaunchedEffect(model) {
+            snapshotFlow {
+                model.items.firstOrNull { it.visible.isIdle && !it.visible.targetState }
+            }.collect {
+                if (it != null) {
+                    model.pruneItems()
+                }
             }
         }
         LazyColumn {
-            itemsIndexed(turquoiseColors) { i, color ->
+            items(model.items, key = { it.itemId }) { item ->
                 AnimatedVisibility(
-                    (turquoiseColors.size - itemNum) <= i,
+                    item.visible,
                     enter = expandVertically(),
                     exit = shrinkVertically()
                 ) {
-                    Spacer(Modifier.fillMaxWidth().requiredHeight(90.dp).background(color))
+                    Box(Modifier.fillMaxWidth().requiredHeight(90.dp).background(item.color)) {
+                        Button(
+                            { model.removeItem(item) },
+                            modifier = Modifier.align(CenterEnd).padding(15.dp)
+                        ) {
+                            Text("Remove")
+                        }
+                    }
                 }
             }
         }
 
         Button(
-            { itemNum = 0 },
+            { model.removeAll() },
             modifier = Modifier.align(End).padding(15.dp)
         ) {
             Text("Clear All")
+        }
+    }
+}
+
+private class MyModel {
+    private val _items: MutableList<ColoredItem> = mutableStateListOf()
+    private var lastItemId = 0
+    val items: List<ColoredItem> = _items
+
+    class ColoredItem(val visible: MutableTransitionState<Boolean>, val itemId: Int) {
+        val color: Color
+            get() = turquoiseColors.let {
+                it[itemId % it.size]
+            }
+    }
+
+    fun addNewItem() {
+        lastItemId++
+        _items.add(
+            ColoredItem(
+                MutableTransitionState(false).apply { targetState = true },
+                lastItemId
+            )
+        )
+    }
+
+    fun removeItem(item: ColoredItem) {
+        item.visible.targetState = false
+    }
+
+    @OptIn(ExperimentalTransitionApi::class)
+    fun pruneItems() {
+        _items.removeAll(items.filter { it.visible.isIdle && !it.visible.targetState })
+    }
+
+    fun removeAll() {
+        _items.forEach {
+            it.visible.targetState = false
         }
     }
 }
