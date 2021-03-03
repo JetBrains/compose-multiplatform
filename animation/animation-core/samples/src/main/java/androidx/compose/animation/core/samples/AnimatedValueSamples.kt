@@ -33,9 +33,9 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
@@ -50,7 +50,13 @@ fun AlphaAnimationSample() {
         // being updated by animation. (This method is overloaded for different parameter types.)
         // Here we use the returned [State] object as a property delegate.
         val alpha: Float by animateFloatAsState(if (visible) 1f else 0f)
-        Box(modifier = Modifier.background(Color.Red).alpha(alpha))
+
+        // Updates the alpha of a graphics layer with the float animation value. It is more
+        // performant to modify alpha in a graphics layer than using `Modifier.alpha`. The former
+        // limits the invalidation scope of alpha change to graphicsLayer's draw stage (i.e. no
+        // recomposition would be needed). The latter triggers recomposition on each animation
+        // frame.
+        Box(modifier = Modifier.graphicsLayer { this.alpha = alpha }.background(Color.Red))
     }
 }
 
