@@ -18,6 +18,8 @@ package androidx.compose.ui.text.platform
 
 import android.graphics.Typeface
 import android.os.Build
+import androidx.annotation.DoNotInline
+import androidx.annotation.RequiresApi
 import androidx.collection.LruCache
 import androidx.compose.ui.text.font.DefaultFontFamily
 import androidx.compose.ui.text.font.Font
@@ -94,8 +96,7 @@ internal open class TypefaceAdapter(
                     // if we do not want to synthesize style, we keep the loaded font style
                     font.style == FontStyle.Italic
                 }
-
-                Typeface.create(typeface, finalFontWeight, finalFontStyle)
+                TypefaceAdapterHelperMethods.create(typeface, finalFontWeight, finalFontStyle)
             }
         }
 
@@ -209,7 +210,7 @@ internal open class TypefaceAdapter(
                 Typeface.create(genericFontFamily, Typeface.NORMAL)
             }
 
-            Typeface.create(
+            TypefaceAdapterHelperMethods.create(
                 familyTypeface,
                 fontWeight.weight,
                 fontStyle == FontStyle.Italic
@@ -251,4 +252,17 @@ internal open class TypefaceAdapter(
 
         return synthesize(typeface, font, fontWeight, fontStyle, fontSynthesis)
     }
+}
+
+/**
+ * This class is here to ensure that the classes that use this API will get verified and can be
+ * AOT compiled. It is expected that this class will soft-fail verification, but the classes
+ * which use this method will pass.
+ */
+@RequiresApi(28)
+internal object TypefaceAdapterHelperMethods {
+    @RequiresApi(28)
+    @DoNotInline
+    fun create(typeface: Typeface, finalFontWeight: Int, finalFontStyle: Boolean) = Typeface
+        .create(typeface, finalFontWeight, finalFontStyle)
 }
