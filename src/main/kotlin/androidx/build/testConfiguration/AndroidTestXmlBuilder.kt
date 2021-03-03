@@ -244,7 +244,7 @@ private val CONFIGURATION_CLOSE = """
 """.trimIndent()
 
 private val MIN_API_LEVEL_CONTROLLER_OBJECT = """
-    <object type="module_controller" class="com.android.tradefed.testtype.suite.module.MinApiLevelModuleController">
+    <object type="module_controller" class="com.android.tradefed.testtype.suite.module.ShippingApiLevelModuleController">
     <option name="min-api-level" value="MIN_SDK" />
     </object>
 
