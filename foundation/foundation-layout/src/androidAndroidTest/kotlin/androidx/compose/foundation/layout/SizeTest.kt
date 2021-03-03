@@ -18,6 +18,9 @@ package androidx.compose.foundation.layout
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.layout.Layout
 import androidx.compose.ui.Modifier
@@ -47,6 +50,7 @@ import org.junit.Test
 import org.junit.runner.RunWith
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.MediumTest
+import org.junit.Assert.assertNotEquals
 import java.util.concurrent.CountDownLatch
 import java.util.concurrent.TimeUnit
 import kotlin.math.roundToInt
@@ -1793,6 +1797,68 @@ class SizeTest : LayoutTest() {
                 (alignSize.value!!.height - childSizeIpx).toFloat()
             ),
             childPosition.value
+        )
+    }
+
+    @Test
+    fun testModifiers_doNotCauseUnnecessaryRemeasure() {
+        var first by mutableStateOf(true)
+        var totalMeasures = 0
+        @Composable fun CountMeasures(modifier: Modifier) {
+            Layout(
+                content = {},
+                modifier = modifier,
+                measurePolicy = { _, _ ->
+                    ++totalMeasures
+                    layout(0, 0) {}
+                }
+            )
+        }
+        show {
+            Box {
+                if (first) Box {} else Row {}
+                CountMeasures(Modifier.size(10.dp))
+                CountMeasures(Modifier.requiredSize(10.dp))
+                CountMeasures(Modifier.wrapContentSize(Alignment.BottomEnd))
+                CountMeasures(Modifier.fillMaxSize(0.8f))
+                CountMeasures(Modifier.defaultMinSize(10.dp, 20.dp))
+            }
+        }
+
+        val root = findComposeView()
+        waitForDraw(root)
+
+        activityTestRule.runOnUiThread {
+            assertEquals(5, totalMeasures)
+            first = false
+        }
+
+        activityTestRule.runOnUiThread {
+            assertEquals(5, totalMeasures)
+        }
+    }
+
+    @Test
+    fun testModifiers_equals() {
+        assertEquals(Modifier.size(10.dp, 20.dp), Modifier.size(10.dp, 20.dp))
+        assertEquals(Modifier.requiredSize(10.dp, 20.dp), Modifier.requiredSize(10.dp, 20.dp))
+        assertEquals(
+            Modifier.wrapContentSize(Alignment.BottomEnd),
+            Modifier.wrapContentSize(Alignment.BottomEnd)
+        )
+        assertEquals(Modifier.fillMaxSize(0.8f), Modifier.fillMaxSize(0.8f))
+        assertEquals(Modifier.defaultMinSize(10.dp, 20.dp), Modifier.defaultMinSize(10.dp, 20.dp))
+
+        assertNotEquals(Modifier.size(10.dp, 20.dp), Modifier.size(20.dp, 10.dp))
+        assertNotEquals(Modifier.requiredSize(10.dp, 20.dp), Modifier.requiredSize(20.dp, 10.dp))
+        assertNotEquals(
+            Modifier.wrapContentSize(Alignment.BottomEnd),
+            Modifier.wrapContentSize(Alignment.BottomCenter)
+        )
+        assertNotEquals(Modifier.fillMaxSize(0.8f), Modifier.fillMaxSize())
+        assertNotEquals(
+            Modifier.defaultMinSize(10.dp, 20.dp),
+            Modifier.defaultMinSize(20.dp, 10.dp)
         )
     }
 }
