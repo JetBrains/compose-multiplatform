@@ -115,14 +115,14 @@ class Animatable<T, V : AnimationVector>(
     internal val defaultSpringSpec: SpringSpec<T> =
         SpringSpec(visibilityThreshold = visibilityThreshold)
 
-    private val negativeInfinityBounds = createVector(Float.NEGATIVE_INFINITY)
-    private val positiveInfinityBounds = createVector(Float.POSITIVE_INFINITY)
+    private val negativeInfinityBounds = initialValue.createVector(Float.NEGATIVE_INFINITY)
+    private val positiveInfinityBounds = initialValue.createVector(Float.POSITIVE_INFINITY)
 
     private var lowerBoundVector: V = negativeInfinityBounds
     private var upperBoundVector: V = positiveInfinityBounds
 
-    private fun createVector(value: Float): V {
-        val newVector = typeConverter.convertToVector(this.value)
+    private fun T.createVector(value: Float): V {
+        val newVector = this@Animatable.typeConverter.convertToVector(this)
         for (i in 0 until newVector.size) {
             newVector[i] = value
         }
