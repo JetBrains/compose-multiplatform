@@ -438,6 +438,9 @@ package androidx.compose.ui.focus {
   public final class FocusTraversalKt {
   }
 
+  public final class TwoDimensionalFocusSearchKt {
+  }
+
 }
 
 package androidx.compose.ui.graphics {
