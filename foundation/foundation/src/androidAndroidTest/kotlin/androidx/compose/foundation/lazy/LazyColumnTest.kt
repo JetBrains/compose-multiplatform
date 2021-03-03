@@ -24,17 +24,18 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.requiredHeight
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.requiredHeight
 import androidx.compose.foundation.layout.requiredSize
 import androidx.compose.foundation.layout.requiredSizeIn
 import androidx.compose.foundation.layout.requiredWidth
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.text.BasicText
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.compose.testutils.assertIsEqualTo
@@ -1244,6 +1245,62 @@ class LazyColumnTest {
 
         rule.onNodeWithTag("2*3")
             .assertTopPositionInRootIsEqualTo(itemSize * 2)
+    }
+
+    @Test
+    fun removalWithMutableStateListOf() {
+        val items = mutableStateListOf("1", "2", "3")
+
+        val itemSize = with(rule.density) { 15.toDp() }
+
+        rule.setContentWithTestViewConfiguration {
+            LazyColumn {
+                items(items) { item ->
+                    Spacer(Modifier.size(itemSize).testTag(item))
+                }
+            }
+        }
+
+        rule.runOnIdle {
+            items.removeLast()
+        }
+
+        rule.onNodeWithTag("1")
+            .assertIsDisplayed()
+
+        rule.onNodeWithTag("2")
+            .assertIsDisplayed()
+
+        rule.onNodeWithTag("3")
+            .assertDoesNotExist()
+    }
+
+    @Test
+    fun recompositionOrder() {
+        val outerState = mutableStateOf(0)
+        val innerState = mutableStateOf(0)
+        val recompositions = mutableListOf<Pair<Int, Int>>()
+
+        rule.setContent {
+            val localOuterState = outerState.value
+            LazyColumn {
+                items(count = 1) {
+                    recompositions.add(localOuterState to innerState.value)
+                    Box(Modifier.fillMaxSize())
+                }
+            }
+        }
+
+        rule.runOnIdle {
+            innerState.value++
+            outerState.value++
+        }
+
+        rule.runOnIdle {
+            assertThat(recompositions).isEqualTo(
+                listOf(0 to 0, 1 to 1)
+            )
+        }
     }
 
     private fun SemanticsNodeInteraction.assertTopPositionIsAlmost(expected: Dp) {
