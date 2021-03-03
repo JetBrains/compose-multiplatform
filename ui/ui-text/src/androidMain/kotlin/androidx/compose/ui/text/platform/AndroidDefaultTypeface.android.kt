@@ -41,7 +41,11 @@ internal class AndroidDefaultTypeface : AndroidTypeface {
                 TypefaceAdapter.getTypefaceStyle(fontWeight, fontStyle)
             )
         } else {
-            Typeface.create(Typeface.DEFAULT, fontWeight.weight, fontStyle == FontStyle.Italic)
+            TypefaceAdapterHelperMethods.create(
+                Typeface.DEFAULT,
+                fontWeight.weight,
+                fontStyle == FontStyle.Italic
+            )
         }
     }
 }

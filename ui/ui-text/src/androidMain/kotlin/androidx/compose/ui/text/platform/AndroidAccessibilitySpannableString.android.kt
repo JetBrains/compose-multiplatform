@@ -23,6 +23,7 @@ import android.text.Spanned
 import android.text.style.ScaleXSpan
 import android.text.style.StyleSpan
 import android.text.style.TypefaceSpan
+import androidx.annotation.DoNotInline
 import androidx.annotation.RequiresApi
 import androidx.annotation.RestrictTo
 import androidx.compose.ui.text.AnnotatedString
@@ -146,5 +147,6 @@ private fun SpannableString.setSpanStyle(
 
 @RequiresApi(28)
 private object Api28Impl {
+    @DoNotInline
     fun createTypefaceSpan(typeface: Typeface): TypefaceSpan = TypefaceSpan(typeface)
 }

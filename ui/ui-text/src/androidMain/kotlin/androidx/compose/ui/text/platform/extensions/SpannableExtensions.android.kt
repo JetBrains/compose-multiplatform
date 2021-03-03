@@ -326,7 +326,7 @@ internal fun Spannable.setLocaleList(localeList: LocaleList?, start: Int, end: I
     localeList?.let {
         setSpan(
             if (Build.VERSION.SDK_INT >= 24) {
-                LocaleSpan(it.toAndroidLocaleList())
+                LocaleListHelperMethods.localeSpan(it)
             } else {
                 val locale = if (it.isEmpty()) Locale.current else it[0]
                 LocaleSpan(locale.toJavaLocale())
