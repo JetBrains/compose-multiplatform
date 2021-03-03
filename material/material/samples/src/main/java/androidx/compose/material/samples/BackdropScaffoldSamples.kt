@@ -33,6 +33,7 @@ import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material.rememberBackdropScaffoldState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -50,6 +51,9 @@ fun BackdropScaffoldSample() {
     val scope = rememberCoroutineScope()
     val selection = remember { mutableStateOf(1) }
     val scaffoldState = rememberBackdropScaffoldState(BackdropValue.Concealed)
+    LaunchedEffect(scaffoldState) {
+        scaffoldState.reveal()
+    }
     BackdropScaffold(
         scaffoldState = scaffoldState,
         appBar = {
@@ -86,7 +90,7 @@ fun BackdropScaffoldSample() {
         },
         backLayerContent = {
             LazyColumn {
-                items(5) {
+                items(if (selection.value >= 3) 3 else 5) {
                     ListItem(
                         Modifier.clickable {
                             selection.value = it
