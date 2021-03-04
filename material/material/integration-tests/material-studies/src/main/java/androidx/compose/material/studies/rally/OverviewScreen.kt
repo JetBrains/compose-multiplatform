@@ -16,7 +16,6 @@
 
 package androidx.compose.material.studies.rally
 
-import android.annotation.SuppressLint
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -136,7 +135,6 @@ private fun AlertItem(message: String) {
 /**
  * Base structure for cards in the Overview screen.
  */
-@SuppressLint("UnnecessaryLambdaCreation")
 @Composable
 private fun <T> OverviewScreenCard(
     title: String,

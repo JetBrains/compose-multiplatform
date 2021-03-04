@@ -14,6 +14,8 @@
  * limitations under the License.
  */
 
+@file:Suppress("UnstableApiUsage")
+
 package androidx.compose.lint
 
 import com.android.tools.lint.checks.infrastructure.TestFiles.kt
@@ -29,11 +31,27 @@ import org.intellij.lang.annotations.Language
 @RunWith(JUnit4::class)
 class UnnecessaryLambdaCreationDetectorTest {
 
+    private val composableStub = kt(
+        """
+        package androidx.compose.runtime
+
+        @MustBeDocumented
+        @Retention(AnnotationRetention.BINARY)
+        @Target(
+            AnnotationTarget.FUNCTION,
+            AnnotationTarget.TYPE,
+            AnnotationTarget.TYPE_PARAMETER,
+            AnnotationTarget.PROPERTY
+        )
+        annotation class Composable
+    """
+    )
+
     private val stub = kt(
         """
         package test
 
-        annotation class Composable
+        import androidx.compose.runtime.Composable
 
         val lambda = @Composable { }
         val anonymousFunction = @Composable fun() {}
@@ -43,14 +61,14 @@ class UnnecessaryLambdaCreationDetectorTest {
 
         @Composable
         fun ComposableFunction(content: @Composable () -> Unit) {
-            children()
+            content()
         }
     """
-    ).indented().within("src")
+    ).to("test/stub.kt")
 
     private fun check(@Language("kotlin") code: String): TestLintResult {
         return TestLintTask.lint()
-            .files(kt(code.trimIndent()), stub)
+            .files(kt(code.trimIndent()), stub, composableStub)
             .allowMissingSdk(true)
             .issues(ISSUE)
             .run()
@@ -61,6 +79,8 @@ class UnnecessaryLambdaCreationDetectorTest {
         check(
             """
             package test
+
+            import androidx.compose.runtime.Composable
 
             @Composable
             fun Test() {
@@ -87,10 +107,10 @@ class UnnecessaryLambdaCreationDetectorTest {
         """
         ).expect(
             """
-src/test/test.kt:6: Error: Creating an unnecessary lambda to emit a captured lambda [UnnecessaryLambdaCreation]
+src/test/test.kt:8: Error: Creating an unnecessary lambda to emit a captured lambda [UnnecessaryLambdaCreation]
         lambda()
         ~~~~~~
-src/test/test.kt:10: Error: Creating an unnecessary lambda to emit a captured lambda [UnnecessaryLambdaCreation]
+src/test/test.kt:12: Error: Creating an unnecessary lambda to emit a captured lambda [UnnecessaryLambdaCreation]
         anonymousFunction()
         ~~~~~~~~~~~~~~~~~
 2 errors, 0 warnings
@@ -104,9 +124,11 @@ src/test/test.kt:10: Error: Creating an unnecessary lambda to emit a captured la
             """
             package test
 
+            import androidx.compose.runtime.Composable
+
             @Composable
             fun MultipleChildComposableFunction(
-                firstChild: @Composable () -> Unit, 
+                firstChild: @Composable () -> Unit,
                 secondChild: @Composable () -> Unit
             ) {}
 
@@ -119,10 +141,10 @@ src/test/test.kt:10: Error: Creating an unnecessary lambda to emit a captured la
         """
         ).expect(
             """
-src/test/test.kt:11: Error: Creating an unnecessary lambda to emit a captured lambda [UnnecessaryLambdaCreation]
+src/test/test.kt:13: Error: Creating an unnecessary lambda to emit a captured lambda [UnnecessaryLambdaCreation]
     MultipleChildComposableFunction( { lambda() }) {
                                        ~~~~~~
-src/test/test.kt:12: Error: Creating an unnecessary lambda to emit a captured lambda [UnnecessaryLambdaCreation]
+src/test/test.kt:14: Error: Creating an unnecessary lambda to emit a captured lambda [UnnecessaryLambdaCreation]
         lambda()
         ~~~~~~
 2 errors, 0 warnings
@@ -135,6 +157,8 @@ src/test/test.kt:12: Error: Creating an unnecessary lambda to emit a captured la
         check(
             """
             package test
+
+            import androidx.compose.runtime.Composable
 
             @Composable
             fun Test() {
@@ -153,26 +177,10 @@ src/test/test.kt:12: Error: Creating an unnecessary lambda to emit a captured la
             """
             package test
 
+            import androidx.compose.runtime.Composable
+
             val property: @Composable () -> Unit = {
                 lambda()
-            }
-        """
-        ).expectClean()
-    }
-
-    @Test
-    fun ignoresLayoutNodes() {
-        check(
-            """
-            package test
-
-            class FooNode(val foo: String)
-
-            @Composable
-            fun Test() {
-                FooNode(foo) { 
-                    lambda()
-                }
             }
         """
         ).expectClean()
@@ -182,7 +190,9 @@ src/test/test.kt:12: Error: Creating an unnecessary lambda to emit a captured la
     fun ignoresDifferentFunctionalTypes_parameters() {
         check(
             """
-            package test 
+            package test
+
+            import androidx.compose.runtime.Composable
 
             @Composable
             fun ComposableFunctionWithParams(
@@ -200,22 +210,22 @@ src/test/test.kt:12: Error: Creating an unnecessary lambda to emit a captured la
             val differentlyParameterizedLambda: (Int) -> Unit = { }
 
             @Composable
-            fun Test() {
-                ComposableFunctionWithParams { child -> 
+            fun Test1() {
+                ComposableFunctionWithParams { child ->
                     parameterizedLambda(child)
                 }
-            } 
+            }
 
             @Composable
-            fun Test() {
-                ComposableFunctionWithParams { child -> 
+            fun Test2() {
+                ComposableFunctionWithParams { child ->
                     differentlyParameterizedLambda(5)
                 }
             }
         """
         ).expect(
             """
-src/test/test.kt:21: Error: Creating an unnecessary lambda to emit a captured lambda [UnnecessaryLambdaCreation]
+src/test/test.kt:23: Error: Creating an unnecessary lambda to emit a captured lambda [UnnecessaryLambdaCreation]
         parameterizedLambda(child)
         ~~~~~~~~~~~~~~~~~~~
 1 errors, 0 warnings
@@ -229,12 +239,14 @@ src/test/test.kt:21: Error: Creating an unnecessary lambda to emit a captured la
             """
             package test
 
+            import androidx.compose.runtime.Composable
+
             class SomeScope
             class OtherScope
 
             @Composable
             fun ScopedComposableFunction(content: @Composable SomeScope.() -> Unit) {
-                children()
+                SomeScope().content()
             }
 
             @Composable
@@ -252,13 +264,13 @@ src/test/test.kt:21: Error: Creating an unnecessary lambda to emit a captured la
                 }
 
                 ScopedComposableFunction {
-                    differentlyScopedLambda()
+                    OtherScope().differentlyScopedLambda()
                 }
             }
         """
         ).expect(
             """
-src/test/SomeScope.kt:22: Error: Creating an unnecessary lambda to emit a captured lambda [UnnecessaryLambdaCreation]
+src/test/SomeScope.kt:24: Error: Creating an unnecessary lambda to emit a captured lambda [UnnecessaryLambdaCreation]
         scopedLambda()
         ~~~~~~~~~~~~
 1 errors, 0 warnings
@@ -271,6 +283,8 @@ src/test/SomeScope.kt:22: Error: Creating an unnecessary lambda to emit a captur
         check(
             """
             package test
+
+            import androidx.compose.runtime.Composable
 
             fun uncomposableLambdaFunction(child: () -> Unit) {}
 

@@ -183,7 +183,7 @@ fun <T : Function<Boolean>> SemanticsNodeInteraction.performSemanticsAction(
 
     @OptIn(InternalTestApi::class)
     testContext.testOwner.runOnUiThread {
-        node.config[key].action?.let { invocation(it) }
+        node.config[key].action?.let(invocation)
     }
 }
 

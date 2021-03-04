@@ -14,6 +14,8 @@
  * limitations under the License.
  */
 
+@file:Suppress("UnstableApiUsage")
+
 package androidx.compose.lint
 
 import com.android.tools.lint.client.api.UElementHandler
@@ -25,12 +27,14 @@ import com.android.tools.lint.detector.api.JavaContext
 import com.android.tools.lint.detector.api.Scope
 import com.android.tools.lint.detector.api.Severity
 import com.android.tools.lint.detector.api.SourceCodeScanner
-import com.intellij.psi.PsiElement
 import com.intellij.psi.impl.source.PsiClassReferenceType
 import org.jetbrains.kotlin.psi.KtCallExpression
 import org.jetbrains.kotlin.psi.KtCallableDeclaration
+import org.jetbrains.kotlin.psi.KtTypeReference
 import org.jetbrains.kotlin.psi.psiUtil.referenceExpression
+import org.jetbrains.uast.UAnnotation
 import org.jetbrains.uast.ULambdaExpression
+import org.jetbrains.uast.UMethod
 import org.jetbrains.uast.kotlin.KotlinUBlockExpression
 import org.jetbrains.uast.kotlin.KotlinUFunctionCallExpression
 import org.jetbrains.uast.kotlin.KotlinUImplicitReturnExpression
@@ -135,14 +139,31 @@ class UnnecessaryLambdaCreationDetector : Detector(), SourceCodeScanner {
             // matches this lambda expression's invocation
             val parameterIndex = parentExpression.valueArguments.indexOf(node)
 
-            // If we cannot resolve the parent expression as a KtCallableDeclaration, it might be a
-            // Java method / exist in bytecode or some other format, so just ignore it as we won't
-            // be able to see @Composable there anyway.
-            val parentDeclaration = parentExpression.resolveToUElement()
-                ?.sourcePsi as? KtCallableDeclaration ?: return
+            // Parent expression source declaration
+            val parentDeclaration = parentExpression.resolveToUElement() as? UMethod ?: return
 
-            val expectedComposable =
-                parentDeclaration.valueParameters[parameterIndex]!!.isComposable
+            val expectedComposable = when (val source = parentDeclaration.sourcePsi) {
+                // The source is in Kotlin source, so check the parameter for @Composable
+                is KtCallableDeclaration -> {
+                    // Currently type annotations don't appear on the psiType, so we have to look
+                    // through the type reference (https://youtrack.jetbrains.com/issue/KT-45244)
+                    val typeReference = source.valueParameters[parameterIndex]!!
+                        .typeReference as KtTypeReference
+                    typeReference.annotationEntries.any {
+                        (it.toUElement() as UAnnotation).qualifiedName == ComposableFqn
+                    }
+                }
+                // If we cannot resolve the parent expression as a KtCallableDeclaration, then
+                // the source is Java source, or in a class file. We ignore Java source, and
+                // currently there is no way to see the @Composable annotation in the class file
+                // (https://youtrack.jetbrains.com/issue/KT-45244). Instead we can look for the
+                // presence of a `Composer` parameter, as this is added by the Compose compiler
+                // to every Composable function / lambda.
+                else -> {
+                    parentDeclaration.uastParameters[parameterIndex].type.canonicalText
+                        .contains(ComposerFqn)
+                }
+            }
 
             // Hack to get the psi of the lambda declaration / source. The !!s here probably
             // aren't safe, but nothing fails with them currently - so it could be a useful
@@ -150,7 +171,14 @@ class UnnecessaryLambdaCreationDetector : Detector(), SourceCodeScanner {
             val resolvedLambda = expression.sourcePsi.calleeExpression!!.toUElement()!!.tryResolve()
                 .toUElement()!!.sourcePsi!!
 
-            val isComposable = resolvedLambda.isComposable
+            // Unfortunately as Composability isn't carried through UAST, and there are many types
+            // of declarations (types such as foo: @Composable () -> Unit, properties such as val
+            // foo = @Composable {}) the best way to cover this is just check if we contain this
+            // annotation in text. Definitely not ideal, but it should cover most cases so it is
+            // the simplest way for now. Note in particular this will return true for (rare) cases
+            // like (@Composable () -> Unit) -> Unit, so this might need to be updated in the
+            // future if this becomes a common problem.
+            val isComposable = resolvedLambda.text.contains("@Composable")
 
             if (isComposable != expectedComposable) return
 
@@ -189,13 +217,5 @@ class UnnecessaryLambdaCreationDetector : Detector(), SourceCodeScanner {
     }
 }
 
-/**
- * @return whether this [PsiElement] contains @Composable in its source
- */
-private val PsiElement.isComposable: Boolean
-    // Unfortunately as Composability isn't carried through UAST, and there are many types of
-    // declarations (types such as foo: @Composable () -> Unit, properties such as val
-    // foo = @Composable {}) the best way to cover this is just check if we contain this annotation
-    // in text. Definitely not ideal, but it should cover most cases and ignores false positives, so
-    // it's the best solution for now.
-    get() = text.contains("@Composable")
+private const val ComposableFqn = "androidx.compose.runtime.Composable"
+private const val ComposerFqn = "androidx.compose.runtime.Composer"
