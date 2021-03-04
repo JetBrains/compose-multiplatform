@@ -532,9 +532,7 @@ internal class ComposeViewAdapter : FrameLayout {
         this.onDraw = onDraw
 
         previewComposition = @Composable {
-            SideEffect {
-                onCommit()
-            }
+            SideEffect(onCommit)
 
             WrapPreview {
                 val composer = currentComposer
