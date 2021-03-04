@@ -18,21 +18,21 @@ package androidx.compose.animation
 
 import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.AnimationEndReason
-import androidx.compose.animation.core.FiniteAnimationSpec
 import androidx.compose.animation.core.AnimationVector2D
+import androidx.compose.animation.core.FiniteAnimationSpec
 import androidx.compose.animation.core.VectorConverter
 import androidx.compose.animation.core.spring
 import androidx.compose.runtime.Immutable
 import androidx.compose.runtime.Stable
 import androidx.compose.ui.Alignment
-import androidx.compose.ui.layout.LayoutModifier
-import androidx.compose.ui.layout.Measurable
-import androidx.compose.ui.layout.MeasureScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.composed
 import androidx.compose.ui.draw.clipToBounds
 import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.layout.LayoutModifier
+import androidx.compose.ui.layout.Measurable
 import androidx.compose.ui.layout.MeasureResult
+import androidx.compose.ui.layout.MeasureScope
 import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.IntSize
@@ -673,6 +673,11 @@ internal interface SizeAnimation {
         scope: CoroutineScope,
     ): SizeAnimation
 
+    /**
+     * Returns what the offset will be once the target size is applied.
+     */
+    fun snapTo(target: IntSize, scope: CoroutineScope): IntOffset
+
     val alignment: Alignment
 }
 
@@ -716,6 +721,13 @@ private class AlignmentBasedSizeAnimation(
             val offset = this.offset(fullSize)
             return RectBasedSizeAnimation(anim, offset, clip, scope, listener)
         }
+    }
+
+    override fun snapTo(target: IntSize, scope: CoroutineScope): IntOffset {
+        scope.launch {
+            anim.snapTo(target)
+        }
+        return alignment.align(target, target, LayoutDirection.Ltr)
     }
 
     override val isAnimating: Boolean
@@ -775,6 +787,15 @@ private class RectBasedSizeAnimation(
             }
         }
         return this
+    }
+
+    override fun snapTo(target: IntSize, scope: CoroutineScope): IntOffset {
+        val targetOffSet = alignment.align(target, target, LayoutDirection.Ltr)
+        scope.launch {
+            offsetAnim.snapTo(targetOffSet)
+            anim.snapTo(target)
+        }
+        return targetOffSet
     }
 
     override val isAnimating: Boolean
@@ -991,6 +1012,11 @@ private class ChangeSizeTransition(
         sizeAnim?.apply {
             if (state == currentState) {
                 // If no state change, return the current size animation value.
+                if (state == AnimStates.Entering) {
+                    animateTo(fullSize, alignment, fullSize, spring(), scope)
+                } else if (state == AnimStates.Visible) {
+                    return snapTo(fullSize, scope) to fullSize
+                }
                 return offset(fullSize) to size
             }
         }
