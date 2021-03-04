@@ -25,7 +25,13 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.layout.Layout
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.layout.IntrinsicMeasurable
+import androidx.compose.ui.layout.IntrinsicMeasureScope
 import androidx.compose.ui.layout.LayoutCoordinates
+import androidx.compose.ui.layout.Measurable
+import androidx.compose.ui.layout.MeasurePolicy
+import androidx.compose.ui.layout.MeasureResult
+import androidx.compose.ui.layout.MeasureScope
 import androidx.compose.ui.node.Ref
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.layout.positionInParent
@@ -1860,5 +1866,89 @@ class SizeTest : LayoutTest() {
             Modifier.defaultMinSize(10.dp, 20.dp),
             Modifier.defaultMinSize(20.dp, 10.dp)
         )
+    }
+
+    @Test
+    fun testIntrinsicMeasurements_notQueriedWhenConstraintsAreFixed() {
+        @Composable fun ErrorIntrinsicsLayout(modifier: Modifier) {
+            Layout(
+                {},
+                modifier,
+                object : MeasurePolicy {
+                    override fun MeasureScope.measure(
+                        measurables: List<Measurable>,
+                        constraints: Constraints
+                    ): MeasureResult {
+                        return layout(0, 0) {}
+                    }
+
+                    override fun IntrinsicMeasureScope.minIntrinsicWidth(
+                        measurables: List<IntrinsicMeasurable>,
+                        height: Int
+                    ) = error("Error intrinsic")
+
+                    override fun IntrinsicMeasureScope.minIntrinsicHeight(
+                        measurables: List<IntrinsicMeasurable>,
+                        width: Int
+                    ) = error("Error intrinsic")
+
+                    override fun IntrinsicMeasureScope.maxIntrinsicWidth(
+                        measurables: List<IntrinsicMeasurable>,
+                        height: Int
+                    ) = error("Error intrinsic")
+
+                    override fun IntrinsicMeasureScope.maxIntrinsicHeight(
+                        measurables: List<IntrinsicMeasurable>,
+                        width: Int
+                    ) = error("Error intrinsic")
+                }
+            )
+        }
+
+        show {
+            Box(Modifier.width(IntrinsicSize.Min)) { ErrorIntrinsicsLayout(Modifier.width(1.dp)) }
+            Box(Modifier.width(IntrinsicSize.Min)) {
+                ErrorIntrinsicsLayout(Modifier.width(1.dp))
+            }
+            Box(Modifier.width(IntrinsicSize.Max)) { ErrorIntrinsicsLayout(Modifier.width(1.dp)) }
+            Box(Modifier.width(IntrinsicSize.Max)) {
+                ErrorIntrinsicsLayout(Modifier.width(1.dp))
+            }
+            Box(Modifier.requiredWidth(IntrinsicSize.Min)) {
+                ErrorIntrinsicsLayout(Modifier.width(1.dp))
+            }
+            Box(Modifier.requiredWidth(IntrinsicSize.Min)) {
+                ErrorIntrinsicsLayout(Modifier.width(1.dp))
+            }
+            Box(Modifier.requiredWidth(IntrinsicSize.Max)) {
+                ErrorIntrinsicsLayout(Modifier.width(1.dp))
+            }
+            Box(Modifier.requiredWidth(IntrinsicSize.Max)) {
+                ErrorIntrinsicsLayout(Modifier.width(1.dp))
+            }
+            Box(Modifier.height(IntrinsicSize.Min)) { ErrorIntrinsicsLayout(Modifier.height(1.dp)) }
+            Box(Modifier.height(IntrinsicSize.Min)) {
+                ErrorIntrinsicsLayout(Modifier.height(1.dp))
+            }
+            Box(Modifier.height(IntrinsicSize.Max)) { ErrorIntrinsicsLayout(Modifier.height(1.dp)) }
+            Box(Modifier.height(IntrinsicSize.Max)) {
+                ErrorIntrinsicsLayout(Modifier.height(1.dp))
+            }
+            Box(Modifier.requiredHeight(IntrinsicSize.Min)) {
+                ErrorIntrinsicsLayout(Modifier.height(1.dp))
+            }
+            Box(Modifier.requiredHeight(IntrinsicSize.Min)) {
+                ErrorIntrinsicsLayout(Modifier.height(1.dp))
+            }
+            Box(Modifier.requiredHeight(IntrinsicSize.Max)) {
+                ErrorIntrinsicsLayout(Modifier.height(1.dp))
+            }
+            Box(Modifier.requiredHeight(IntrinsicSize.Max)) {
+                ErrorIntrinsicsLayout(Modifier.height(1.dp))
+            }
+        }
+        // The test tests that the measure pass should not crash.
+        val root = findComposeView()
+        waitForDraw(root)
     }
 }
