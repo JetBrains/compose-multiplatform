@@ -104,6 +104,69 @@ class DrawScopeTest {
     }
 
     @Test
+    fun testDrawOvalBrush() {
+        val width = 200
+        val height = 200
+
+        // Test that colors are rendered with the correct stroke parameters
+        testDrawScopeAndCanvasAreEquivalent(
+            width,
+            height,
+            {
+                drawOval(
+                    brush = Brush.linearGradient(listOf(Color.Red, Color.Blue)),
+                    topLeft = Offset(10f, 10f),
+                    size = Size(width - 20f, height - 20f)
+                )
+            },
+            { canvas ->
+                canvas.drawOval(
+                    10f,
+                    10f,
+                    width - 10f,
+                    height - 10f,
+                    Paint().apply {
+                        shader =
+                            LinearGradientShader(
+                                Offset.Zero,
+                                Offset(width.toFloat(), height.toFloat()),
+                                listOf(Color.Red, Color.Blue)
+                            )
+                    }
+                )
+            }
+        )
+    }
+
+    @Test
+    fun testDrawOvalColor() {
+        val width = 200
+        val height = 200
+
+        // Test that colors are rendered with the correct stroke parameters
+        testDrawScopeAndCanvasAreEquivalent(
+            width,
+            height,
+            {
+                drawOval(
+                    color = Color.Cyan,
+                    topLeft = Offset(10f, 10f),
+                    size = Size(width - 20f, height - 20f)
+                )
+            },
+            { canvas ->
+                canvas.drawOval(
+                    10f,
+                    10f,
+                    width - 10f,
+                    height - 10f,
+                    Paint().apply { color = Color.Cyan }
+                )
+            }
+        )
+    }
+
+    @Test
     fun testDrawRectColorAlpha() {
         val img = createTestDstImage()
         CanvasDrawScope().draw(Canvas(img), dstSize) {
