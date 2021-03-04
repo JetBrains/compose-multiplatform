@@ -71,7 +71,7 @@ inline fun Column(
 ) {
     val measurePolicy = columnMeasurePolicy(verticalArrangement, horizontalAlignment)
     Layout(
-        content = { ColumnScope.content() },
+        content = { ColumnScopeInstance.content() },
         measurePolicy = measurePolicy,
         modifier = modifier
     )
@@ -116,51 +116,6 @@ internal fun columnMeasurePolicy(
 @Immutable
 interface ColumnScope {
     /**
-     * Align the element horizontally within the [Column]. This alignment will have priority over
-     * the [Column]'s `horizontalAlignment` parameter.
-     *
-     * Example usage:
-     * @sample androidx.compose.foundation.layout.samples.SimpleAlignInColumn
-     */
-    @Stable
-    fun Modifier.align(alignment: Alignment.Horizontal) = this.then(
-        HorizontalAlignModifier(
-            horizontal = alignment,
-            inspectorInfo = debugInspectorInfo {
-                name = "align"
-                value = alignment
-            }
-        )
-    )
-
-    /**
-     * Position the element horizontally such that its [alignmentLine] aligns with sibling elements
-     * also configured to [alignBy]. [alignBy] is a form of [align],
-     * so both modifiers will not work together if specified for the same layout.
-     * Within a [Column], all components with [alignBy] will align horizontally using
-     * the specified [VerticalAlignmentLine]s or values provided using the other
-     * [alignBy] overload, forming a sibling group.
-     * At least one element of the sibling group will be placed as it had [Alignment.Start] align
-     * in [Column], and the alignment of the other siblings will be then determined such that
-     * the alignment lines coincide. Note that if only one element in a [Column] has the
-     * [alignBy] modifier specified the element will be positioned
-     * as if it had [Alignment.Start] align.
-     *
-     * Example usage:
-     * @sample androidx.compose.foundation.layout.samples.SimpleRelativeToSiblingsInColumn
-     */
-    @Stable
-    fun Modifier.alignBy(alignmentLine: VerticalAlignmentLine) = this.then(
-        SiblingsAlignedModifier.WithAlignmentLine(
-            alignmentLine = alignmentLine,
-            inspectorInfo = debugInspectorInfo {
-                name = "alignBy"
-                value = alignmentLine
-            }
-        )
-    )
-
-    /**
      * Size the element's height proportional to its [weight] relative to other weighted sibling
      * elements in the [Column]. The parent will divide the vertical space remaining after measuring
      * unweighted child elements and distribute it according to this weight.
@@ -179,21 +134,36 @@ interface ColumnScope {
         /*@FloatRange(from = 0.0, fromInclusive = false)*/
         weight: Float,
         fill: Boolean = true
-    ): Modifier {
-        require(weight > 0.0) { "invalid weight $weight; must be greater than zero" }
-        return this.then(
-            LayoutWeightImpl(
-                weight = weight,
-                fill = fill,
-                inspectorInfo = debugInspectorInfo {
-                    name = "weight"
-                    value = weight
-                    properties["weight"] = weight
-                    properties["fill"] = fill
-                }
-            )
-        )
-    }
+    ): Modifier
+
+    /**
+     * Align the element horizontally within the [Column]. This alignment will have priority over
+     * the [Column]'s `horizontalAlignment` parameter.
+     *
+     * Example usage:
+     * @sample androidx.compose.foundation.layout.samples.SimpleAlignInColumn
+     */
+    @Stable
+    fun Modifier.align(alignment: Alignment.Horizontal): Modifier
+
+    /**
+     * Position the element horizontally such that its [alignmentLine] aligns with sibling elements
+     * also configured to [alignBy]. [alignBy] is a form of [align],
+     * so both modifiers will not work together if specified for the same layout.
+     * Within a [Column], all components with [alignBy] will align horizontally using
+     * the specified [VerticalAlignmentLine]s or values provided using the other
+     * [alignBy] overload, forming a sibling group.
+     * At least one element of the sibling group will be placed as it had [Alignment.Start] align
+     * in [Column], and the alignment of the other siblings will be then determined such that
+     * the alignment lines coincide. Note that if only one element in a [Column] has the
+     * [alignBy] modifier specified the element will be positioned
+     * as if it had [Alignment.Start] align.
+     *
+     * Example usage:
+     * @sample androidx.compose.foundation.layout.samples.SimpleRelativeToSiblingsInColumn
+     */
+    @Stable
+    fun Modifier.alignBy(alignmentLine: VerticalAlignmentLine): Modifier
 
     /**
      * Position the element horizontally such that the alignment line for the content as
@@ -213,7 +183,51 @@ interface ColumnScope {
      * @sample androidx.compose.foundation.layout.samples.SimpleRelativeToSiblings
      */
     @Stable
-    fun Modifier.alignBy(alignmentLineBlock: (Measured) -> Int) = this.then(
+    fun Modifier.alignBy(alignmentLineBlock: (Measured) -> Int): Modifier
+}
+
+internal object ColumnScopeInstance : ColumnScope {
+    @Stable
+    override fun Modifier.weight(weight: Float, fill: Boolean): Modifier {
+        require(weight > 0.0) { "invalid weight $weight; must be greater than zero" }
+        return this.then(
+            LayoutWeightImpl(
+                weight = weight,
+                fill = fill,
+                inspectorInfo = debugInspectorInfo {
+                    name = "weight"
+                    value = weight
+                    properties["weight"] = weight
+                    properties["fill"] = fill
+                }
+            )
+        )
+    }
+
+    @Stable
+    override fun Modifier.align(alignment: Alignment.Horizontal) = this.then(
+        HorizontalAlignModifier(
+            horizontal = alignment,
+            inspectorInfo = debugInspectorInfo {
+                name = "align"
+                value = alignment
+            }
+        )
+    )
+
+    @Stable
+    override fun Modifier.alignBy(alignmentLine: VerticalAlignmentLine) = this.then(
+        SiblingsAlignedModifier.WithAlignmentLine(
+            alignmentLine = alignmentLine,
+            inspectorInfo = debugInspectorInfo {
+                name = "alignBy"
+                value = alignmentLine
+            }
+        )
+    )
+
+    @Stable
+    override fun Modifier.alignBy(alignmentLineBlock: (Measured) -> Int) = this.then(
         SiblingsAlignedModifier.WithAlignmentLineBlock(
             block = alignmentLineBlock,
             inspectorInfo = debugInspectorInfo {
@@ -222,6 +236,4 @@ interface ColumnScope {
             }
         )
     )
-
-    companion object : ColumnScope
 }

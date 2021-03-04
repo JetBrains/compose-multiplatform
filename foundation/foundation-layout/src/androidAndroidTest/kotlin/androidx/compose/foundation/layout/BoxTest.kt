@@ -595,7 +595,7 @@ class BoxTest : LayoutTest() {
 
     @Test
     fun testAlignInspectableValue() {
-        val modifier = with(object : BoxScope {}) { Modifier.align(Alignment.BottomCenter) }
+        val modifier = with(BoxScopeInstance) { Modifier.align(Alignment.BottomCenter) }
             as InspectableValue
         assertThat(modifier.nameFallback).isEqualTo("align")
         assertThat(modifier.valueOverride).isEqualTo(Alignment.BottomCenter)
@@ -604,7 +604,7 @@ class BoxTest : LayoutTest() {
 
     @Test
     fun testMatchParentSizeInspectableValue() {
-        val modifier = with(object : BoxScope {}) { Modifier.matchParentSize() }
+        val modifier = with(BoxScopeInstance) { Modifier.matchParentSize() }
             as InspectableValue
         assertThat(modifier.nameFallback).isEqualTo("matchParentSize")
         assertThat(modifier.valueOverride).isNull()

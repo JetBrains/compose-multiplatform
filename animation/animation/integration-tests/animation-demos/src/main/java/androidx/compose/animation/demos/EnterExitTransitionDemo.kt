@@ -38,7 +38,6 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -130,7 +129,13 @@ fun EnterExitTransitionDemo() {
                         Text("Bottom\nStart")
                     }
                 }
-                CenterMenu(selectedOptions, oppositeAlignment.value, alignment, visible)
+                CenterMenu(
+                    Modifier.weight(1f),
+                    selectedOptions,
+                    oppositeAlignment.value,
+                    alignment,
+                    visible
+                )
                 Box(Modifier.fillMaxHeight().wrapContentWidth()) {
                     Button(
                         modifier = Modifier.align(TopStart),
@@ -191,12 +196,13 @@ fun AlignmentOption(state: MutableState<Boolean>) {
 @OptIn(ExperimentalAnimationApi::class)
 @Composable
 fun CenterMenu(
+    modifier: Modifier = Modifier,
     selectedOptions: List<Boolean>,
     oppositeDirection: Boolean,
     alignment: Alignment,
     visible: Boolean
 ) {
-    Box(with(RowScope) { Modifier.fillMaxHeight().weight(1f) }) {
+    Box(modifier.fillMaxHeight()) {
 
         val animationAlignment = if (oppositeDirection) opposite(alignment) else alignment
         val expand = when (animationAlignment) {
