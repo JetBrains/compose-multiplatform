@@ -728,33 +728,49 @@ private class SizeModifier(
     override fun IntrinsicMeasureScope.minIntrinsicWidth(
         measurable: IntrinsicMeasurable,
         height: Int
-    ) = measurable.minIntrinsicWidth(height).let {
+    ): Int {
         val constraints = targetConstraints
-        constraints.constrainWidth(it)
-    }
-
-    override fun IntrinsicMeasureScope.maxIntrinsicWidth(
-        measurable: IntrinsicMeasurable,
-        height: Int
-    ) = measurable.maxIntrinsicWidth(height).let {
-        val constraints = targetConstraints
-        constraints.constrainWidth(it)
+        return if (constraints.hasFixedWidth) {
+            constraints.maxWidth
+        } else {
+            constraints.constrainWidth(measurable.minIntrinsicWidth(height))
+        }
     }
 
     override fun IntrinsicMeasureScope.minIntrinsicHeight(
         measurable: IntrinsicMeasurable,
         width: Int
-    ) = measurable.minIntrinsicHeight(width).let {
+    ): Int {
         val constraints = targetConstraints
-        constraints.constrainHeight(it)
+        return if (constraints.hasFixedHeight) {
+            constraints.maxHeight
+        } else {
+            constraints.constrainHeight(measurable.minIntrinsicHeight(width))
+        }
+    }
+
+    override fun IntrinsicMeasureScope.maxIntrinsicWidth(
+        measurable: IntrinsicMeasurable,
+        height: Int
+    ): Int {
+        val constraints = targetConstraints
+        return if (constraints.hasFixedWidth) {
+            constraints.maxWidth
+        } else {
+            constraints.constrainWidth(measurable.maxIntrinsicWidth(height))
+        }
     }
 
     override fun IntrinsicMeasureScope.maxIntrinsicHeight(
         measurable: IntrinsicMeasurable,
         width: Int
-    ) = measurable.maxIntrinsicHeight(width).let {
+    ): Int {
         val constraints = targetConstraints
-        constraints.constrainHeight(it)
+        return if (constraints.hasFixedHeight) {
+            constraints.maxHeight
+        } else {
+            constraints.constrainHeight(measurable.maxIntrinsicHeight(width))
+        }
     }
 
     override fun equals(other: Any?): Boolean {
