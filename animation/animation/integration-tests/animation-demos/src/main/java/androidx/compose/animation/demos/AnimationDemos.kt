@@ -40,6 +40,9 @@ val AnimationDemos = DemoCategory(
                 ComposableDemo("Animate Visibility Lazy Column Demo") {
                     AnimatedVisibilityLazyColumnDemo()
                 },
+                ComposableDemo("Animate Visibility Content Size Change Demo") {
+                    AnimatedVisibilityContentSizeChangeDemo()
+                },
                 ComposableDemo("Cross Fade") { CrossfadeDemo() },
                 ComposableDemo("Enter/Exit Transition Demo") { EnterExitTransitionDemo() },
             )

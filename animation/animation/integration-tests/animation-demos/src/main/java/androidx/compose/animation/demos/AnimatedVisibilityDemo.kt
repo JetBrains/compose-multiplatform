@@ -72,14 +72,6 @@ fun AnimatedItems(animateContentSize: Boolean) {
     Box(
         Modifier.padding(bottom = 20.dp)
     ) {
-        Button(
-            modifier = Modifier.align(Alignment.TopEnd).padding(10.dp),
-            onClick = {
-                counter = (counter + 1) % 12
-            }
-        ) {
-            Text("Click Me")
-        }
 
         val modifier = if (animateContentSize) Modifier.animateContentSize() else Modifier
         Column(
@@ -121,6 +113,15 @@ fun AnimatedItems(animateContentSize: Boolean) {
                         "Shrink Vertically + Fade Out + Slide Out Vertically"
                 )
             }
+        }
+
+        Button(
+            modifier = Modifier.align(Alignment.TopEnd).padding(10.dp),
+            onClick = {
+                counter = (counter + 1) % 12
+            }
+        ) {
+            Text("Click Me")
         }
     }
 }
