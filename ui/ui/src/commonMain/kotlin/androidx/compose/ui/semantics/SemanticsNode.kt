@@ -163,12 +163,10 @@ class SemanticsNode internal constructor(
             unmergedChildren().fastForEach { child ->
                 // Don't merge children that themselves merge all their descendants (because that
                 // indicates they're independently screen-reader-focusable).
-                if (child.isMergingSemanticsOfDescendants) {
-                    return
+                if (!child.isMergingSemanticsOfDescendants) {
+                    mergedConfig.mergeChild(child.unmergedConfig)
+                    child.mergeConfig(mergedConfig)
                 }
-
-                mergedConfig.mergeChild(child.unmergedConfig)
-                child.mergeConfig(mergedConfig)
             }
         }
     }
