@@ -583,6 +583,8 @@ interface DrawScope : Density {
      * @param style Whether or not the oval is stroked or filled in
      * @param colorFilter ColorFilter to apply to the [brush] when drawn into the destination
      * @param blendMode Blending algorithm to be applied to the brush
+     *
+     * @sample androidx.compose.ui.graphics.samples.DrawScopeOvalBrushSample
      */
     fun drawOval(
         brush: Brush,
@@ -608,6 +610,8 @@ interface DrawScope : Density {
      * @param style Whether or not the oval is stroked or filled in
      * @param colorFilter ColorFilter to apply to the [color] when drawn into the destination
      * @param blendMode Blending algorithm to be applied to the brush
+     *
+     * @sample androidx.compose.ui.graphics.samples.DrawScopeOvalColorSample
      */
     fun drawOval(
         color: Color,
