@@ -21,3 +21,7 @@ internal inline fun <T> List<T>.fastForEach(block: (element: T) -> Unit) {
         block(this[index])
     }
 }
+
+internal fun <T> List<T>.fastToSet(): Set<T> = HashSet<T>(size).also { set ->
+    fastForEach { item -> set.add(item) }
+}
