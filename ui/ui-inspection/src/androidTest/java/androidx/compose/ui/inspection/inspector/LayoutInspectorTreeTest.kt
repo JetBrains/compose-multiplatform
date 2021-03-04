@@ -121,6 +121,13 @@ class LayoutInspectorTreeTest {
 
         validate(nodes, builder, checkParameters = false) {
             node(
+                name = "Box",
+                isRenderNode = true,
+                children = listOf("Inspectable")
+            )
+            node("Inspectable", children = listOf("CompositionLocalProvider"))
+            node("CompositionLocalProvider", children = listOf("Column"))
+            node(
                 name = "Column",
                 fileName = "LayoutInspectorTreeTest.kt",
                 left = 0.0.dp, top = 0.0.dp, width = 72.0.dp, height = 78.9.dp,
@@ -185,6 +192,21 @@ class LayoutInspectorTreeTest {
         dumpNodes(nodes, builder)
 
         validate(nodes, builder, checkParameters = false) {
+            node(
+                name = "Box",
+                isRenderNode = true,
+                children = listOf("Inspectable")
+            )
+            node(
+                name = "Inspectable",
+                hasTransformations = true,
+                children = listOf("CompositionLocalProvider")
+            )
+            node(
+                name = "CompositionLocalProvider",
+                hasTransformations = true,
+                children = listOf("MaterialTheme")
+            )
             node(
                 name = "MaterialTheme",
                 hasTransformations = true,
