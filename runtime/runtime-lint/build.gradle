@@ -24,6 +24,28 @@ plugins {
     id("kotlin")
 }
 
+// New configuration that allows us to specify a dependency we will include into the resulting
+// jar, since dependencies aren't currently allowed in lint projects included via lintPublish
+// (b/182319899)
+configurations {
+    bundleWithJar
+    testImplementation.extendsFrom bundleWithJar
+    compileOnly.extendsFrom bundleWithJar
+}
+
+jar {
+    dependsOn configurations.bundleWithJar
+    from {
+        configurations.bundleWithJar
+                // The stdlib is already bundled with lint, so no need to include it manually in
+                // the lint.jar
+                .filter( { !(it.name =~ /kotlin-stdlib.*\.jar/ )})
+                .collect {
+                    it.isDirectory() ? it : zipTree(it)
+                }
+    }
+}
+
 dependencies {
     // compileOnly because we use lintChecks and it doesn't allow other types of deps
     // this ugly hack exists because of b/63873667
@@ -33,6 +55,7 @@ dependencies {
         compileOnly(LINT_API_MIN)
     }
     compileOnly(KOTLIN_STDLIB)
+    bundleWithJar(KOTLIN_METADATA_JVM)
 
     testImplementation(KOTLIN_STDLIB)
     testImplementation(LINT_CORE)

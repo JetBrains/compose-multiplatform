@@ -145,8 +145,9 @@ class UnnecessaryLambdaCreationDetector : Detector(), SourceCodeScanner {
             val expectedComposable = when (val source = parentDeclaration.sourcePsi) {
                 // The source is in Kotlin source, so check the parameter for @Composable
                 is KtCallableDeclaration -> {
-                    // Currently type annotations don't appear on the psiType, so we have to look
-                    // through the type reference (https://youtrack.jetbrains.com/issue/KT-45244)
+                    // Currently type annotations don't appear on the psiType in the version of
+                    // UAST / PSI we are using, so we have to look through the type reference.
+                    // Should be fixed when Lint upgrades the version to 1.4.30+.
                     val typeReference = source.valueParameters[parameterIndex]!!
                         .typeReference as KtTypeReference
                     typeReference.annotationEntries.any {
@@ -156,7 +157,7 @@ class UnnecessaryLambdaCreationDetector : Detector(), SourceCodeScanner {
                 // If we cannot resolve the parent expression as a KtCallableDeclaration, then
                 // the source is Java source, or in a class file. We ignore Java source, and
                 // currently there is no way to see the @Composable annotation in the class file
-                // (https://youtrack.jetbrains.com/issue/KT-45244). Instead we can look for the
+                // (https://youtrack.jetbrains.com/issue/KT-45307). Instead we can look for the
                 // presence of a `Composer` parameter, as this is added by the Compose compiler
                 // to every Composable function / lambda.
                 else -> {

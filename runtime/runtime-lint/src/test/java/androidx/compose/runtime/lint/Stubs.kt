@@ -73,3 +73,19 @@ val rememberStub: LintDetectorTest.TestFile = LintDetectorTest.kotlin(
         ): V = calculation()
     """
 )
+
+val coroutineBuildersStub: LintDetectorTest.TestFile = LintDetectorTest.kotlin(
+    """
+        package kotlinx.coroutines
+
+        object CoroutineScope
+
+        fun CoroutineScope.async(
+            block: suspend CoroutineScope.() -> Unit
+        ) {}
+
+        fun CoroutineScope.launch(
+            block: suspend CoroutineScope.() -> Unit
+        ) {}
+    """
+)

@@ -74,8 +74,9 @@ class ComposableLambdaParameterDetector : Detector(), SourceCodeScanner {
 
                 val typeReference = ktParameter.typeReference!!
 
-                // Ideally this annotation should be available on the PsiType itself
-                // https://youtrack.jetbrains.com/issue/KT-45244
+                // Currently type annotations don't appear on the psiType in the version of
+                // UAST / PSI we are using, so we have to look through the type reference.
+                // Should be fixed when Lint upgrades the version to 1.4.30+.
                 val hasComposableAnnotationOnType = typeReference.annotationEntries.any {
                     (it.toUElement() as UAnnotation).qualifiedName == ComposableFqn
                 }
