@@ -1427,7 +1427,7 @@ private fun <T> advanceGlobalSnapshot(block: (invalid: SnapshotIdSet) -> T): T {
     val modified = previousGlobalSnapshot.modified
     if (modified != null) {
         val observers = sync { applyObservers.toList() }
-        for (observer in observers) {
+        observers.fastForEach { observer ->
             observer(modified, previousGlobalSnapshot)
         }
     }

@@ -21,6 +21,8 @@
 package androidx.compose.runtime
 
 import androidx.compose.runtime.collection.IdentityScopeMap
+import androidx.compose.runtime.snapshots.fastForEach
+import androidx.compose.runtime.snapshots.fastToSet
 import androidx.compose.runtime.tooling.LocalInspectionTables
 import androidx.compose.runtime.tooling.CompositionData
 import kotlinx.collections.immutable.PersistentMap
@@ -1331,7 +1333,8 @@ internal class ComposerImpl(
         fun dispatchRememberObservers() {
             // Send forgets
             if (forgetting.isNotEmpty()) {
-                for (instance in forgetting.reversed()) {
+                for (index in forgetting.indices.reversed()) {
+                    val instance = forgetting[index]
                     if (instance !in abandoning)
                         instance.onForgotten()
                 }
@@ -1339,7 +1342,7 @@ internal class ComposerImpl(
 
             // Send remembers
             if (remembering.isNotEmpty()) {
-                for (instance in remembering) {
+                remembering.fastForEach { instance ->
                     abandoning.remove(instance)
                     instance.onRemembered()
                 }
@@ -1383,7 +1386,7 @@ internal class ComposerImpl(
                 // Apply all changes
                 slotTable.write { slots ->
                     val applier = applier
-                    changes.forEach { change ->
+                    changes.fastForEach { change ->
                         change(applier, slots, manager)
                     }
                     changes.clear()
@@ -2075,7 +2078,7 @@ internal class ComposerImpl(
 
             // usedKeys contains the keys that were used in the new composition, therefore if a key
             // doesn't exist in this set, it needs to be removed.
-            val usedKeys = current.toSet()
+            val usedKeys = current.fastToSet()
 
             val placedKeys = mutableSetOf<KeyInfo>()
             var currentIndex = 0
@@ -2803,7 +2806,7 @@ internal class ComposerImpl(
             val insertTable = insertTable
             recordSlotEditingOperation { applier, slots, rememberManager ->
                 insertTable.write { writer ->
-                    for (fixup in fixups) {
+                    fixups.fastForEach { fixup ->
                         fixup(applier, writer, rememberManager)
                     }
                 }
