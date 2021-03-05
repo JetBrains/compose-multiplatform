@@ -104,7 +104,7 @@ internal open class DelegatingLayoutNodeWrapper<T : Modifier.Element>(
         }
     }
 
-    override fun performMeasure(constraints: Constraints): Placeable {
+    override fun measure(constraints: Constraints): Placeable = performingMeasure(constraints) {
         val placeable = wrapped.measure(constraints)
         measureResult = object : MeasureResult {
             override val width: Int = wrapped.measureResult.width

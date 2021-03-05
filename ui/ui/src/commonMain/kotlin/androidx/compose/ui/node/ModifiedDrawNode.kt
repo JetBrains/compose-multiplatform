@@ -21,7 +21,6 @@ import androidx.compose.ui.draw.DrawCacheModifier
 import androidx.compose.ui.draw.DrawModifier
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Canvas
-import androidx.compose.ui.layout.MeasureResult
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.toSize
 
@@ -80,16 +79,10 @@ internal class ModifiedDrawNode(
             invalidateCache = true
         }
 
-    override var measureResult: MeasureResult
-        get() = super.measureResult
-        set(value) {
-            if (super.measuredSize.width != value.width ||
-                super.measuredSize.height != value.height
-            ) {
-                invalidateCache = true
-            }
-            super.measureResult = value
-        }
+    override fun onMeasureResultChanged(width: Int, height: Int) {
+        super.onMeasureResultChanged(width, height)
+        invalidateCache = true
+    }
 
     // This is not thread safe
     override fun performDraw(canvas: Canvas) {

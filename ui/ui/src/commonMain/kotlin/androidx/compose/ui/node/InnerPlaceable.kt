@@ -40,7 +40,7 @@ internal class InnerPlaceable(
 
     override val measureScope get() = layoutNode.measureScope
 
-    override fun performMeasure(constraints: Constraints): Placeable {
+    override fun measure(constraints: Constraints): Placeable = performingMeasure(constraints) {
         val measureResult = with(layoutNode.measurePolicy) {
             layoutNode.measureScope.measure(layoutNode.children, constraints)
         }

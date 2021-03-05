@@ -32,9 +32,11 @@ internal class ModifiedLayoutNode(
     modifier: LayoutModifier
 ) : DelegatingLayoutNodeWrapper<LayoutModifier>(wrapped, modifier) {
 
-    override fun performMeasure(constraints: Constraints): Placeable = with(modifier) {
-        measureResult = measureScope.measure(wrapped, constraints)
-        this@ModifiedLayoutNode
+    override fun measure(constraints: Constraints): Placeable = performingMeasure(constraints) {
+        with(modifier) {
+            measureResult = measureScope.measure(wrapped, constraints)
+            this@ModifiedLayoutNode
+        }
     }
 
     override fun minIntrinsicWidth(height: Int): Int =
