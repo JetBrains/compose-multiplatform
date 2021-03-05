@@ -22,6 +22,8 @@ import androidx.activity.ComponentActivity
 import androidx.compose.foundation.layout.Box
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.test.SemanticsNodeInteractionCollection
+import androidx.compose.ui.test.onAllNodesWithTag
 import androidx.compose.ui.test.onNodeWithTag
 import org.junit.Rule
 import org.junit.Test
@@ -34,8 +36,16 @@ class MultipleActivitiesFindTest {
     @Test
     fun test() {
         rule.activityRule.scenario.onActivity { it.startNewActivity() }
+        rule.waitUntil {
+            rule.onAllNodesWithTag("activity2").isNotEmpty()
+        }
+
         rule.onNodeWithTag("activity1").assertDoesNotExist()
         rule.onNodeWithTag("activity2").assertExists()
+    }
+
+    private fun SemanticsNodeInteractionCollection.isNotEmpty(): Boolean {
+        return fetchSemanticsNodes(atLeastOneRootRequired = false).isNotEmpty()
     }
 
     class Activity1 : TaggedActivity("activity1")
