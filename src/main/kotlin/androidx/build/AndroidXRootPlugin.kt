@@ -16,6 +16,7 @@
 
 package androidx.build
 
+import androidx.build.AndroidXPlugin.Companion.ZIP_CONSTRAINED_TEST_CONFIGS_WITH_APKS_TASK
 import androidx.build.AndroidXPlugin.Companion.ZIP_TEST_CONFIGS_WITH_APKS_TASK
 import androidx.build.dependencyTracker.AffectedModuleDetector
 import androidx.build.gradle.isRoot
@@ -142,16 +143,24 @@ class AndroidXRootPlugin : Plugin<Project> {
 
         val zipTestConfigsWithApks = project.tasks.register(
             ZIP_TEST_CONFIGS_WITH_APKS_TASK, Zip::class.java
-        )
-        // can't chain this, or a kotlin.Unit gets added as dependency below instead of the task
-        zipTestConfigsWithApks.configure {
+        ) {
             it.destinationDirectory.set(project.getDistributionDirectory())
             it.archiveFileName.set("androidTest.zip")
             it.from(project.getTestConfigDirectory())
             // We're mostly zipping a bunch of .apk files that are already compressed
             it.entryCompression = ZipEntryCompression.STORED
         }
+        val zipConstrainedTestConfigsWithApks = project.tasks.register(
+            ZIP_CONSTRAINED_TEST_CONFIGS_WITH_APKS_TASK, Zip::class.java
+        ) {
+            it.destinationDirectory.set(project.getDistributionDirectory())
+            it.archiveFileName.set("constrainedAndroidTest.zip")
+            it.from(project.getConstrainedTestConfigDirectory())
+            // We're mostly zipping a bunch of .apk files that are already compressed
+            it.entryCompression = ZipEntryCompression.STORED
+        }
         buildOnServerTask.dependsOn(zipTestConfigsWithApks)
+        buildOnServerTask.dependsOn(zipConstrainedTestConfigsWithApks)
 
         AffectedModuleDetector.configure(gradle, this)
 

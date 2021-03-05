@@ -14,4 +14,4 @@
  * limitations under the License.
  */
 
-include ':jetpad-integration'
+include ":jetpad-integration"

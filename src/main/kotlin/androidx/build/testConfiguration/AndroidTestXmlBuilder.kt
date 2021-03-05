@@ -22,7 +22,7 @@ class ConfigBuilder {
     var isBenchmark: Boolean = false
     var isPostsubmit: Boolean = true
     lateinit var minSdk: String
-    var runFullTests: Boolean = true
+    var runAllTests: Boolean = true
     val tags: MutableList<String> = mutableListOf()
     lateinit var testApkName: String
     lateinit var testRunner: String
@@ -32,7 +32,7 @@ class ConfigBuilder {
     fun isBenchmark(isBenchmark: Boolean) = apply { this.isBenchmark = isBenchmark }
     fun isPostsubmit(isPostsubmit: Boolean) = apply { this.isPostsubmit = isPostsubmit }
     fun minSdk(minSdk: String) = apply { this.minSdk = minSdk }
-    fun runFullTests(runFullTests: Boolean) = apply { this.runFullTests = runFullTests }
+    fun runAllTests(runAllTests: Boolean) = apply { this.runAllTests = runAllTests }
     fun tag(tag: String) = apply { this.tags.add(tag) }
     fun testApkName(testApkName: String) = apply { this.testApkName = testApkName }
     fun testRunner(testRunner: String) = apply { this.testRunner = testRunner }
@@ -63,7 +63,7 @@ class ConfigBuilder {
             .append(TEST_BLOCK_OPEN)
             .append(RUNNER_OPTION.replace("TEST_RUNNER", testRunner))
             .append(PACKAGE_OPTION.replace("APPLICATION_ID", applicationId))
-        if (runFullTests) {
+        if (runAllTests) {
             if (!isPostsubmit) {
                 sb.append(FLAKY_TEST_OPTION)
             }
@@ -95,7 +95,7 @@ class MediaConfigBuilder {
     var isPostsubmit: Boolean = true
     var isServicePrevious: Boolean = true
     lateinit var minSdk: String
-    var runFullTests: Boolean = true
+    var runAllTests: Boolean = true
     lateinit var serviceApkName: String
     lateinit var serviceApplicationId: String
     var tags: MutableList<String> = mutableListOf()
@@ -112,7 +112,7 @@ class MediaConfigBuilder {
         this.isServicePrevious = isServicePrevious
     }
     fun minSdk(minSdk: String) = apply { this.minSdk = minSdk }
-    fun runFullTests(runFullTests: Boolean) = apply { this.runFullTests = runFullTests }
+    fun runAllTests(runAllTests: Boolean) = apply { this.runAllTests = runAllTests }
     fun serviceApkName(serviceApkName: String) = apply { this.serviceApkName = serviceApkName }
     fun serviceApplicationId(serviceApplicationId: String) =
         apply { this.serviceApplicationId = serviceApplicationId }
@@ -150,7 +150,7 @@ class MediaConfigBuilder {
         )
             .append(WIFI_DISABLE_OPTION)
             .append(SETUP_INCLUDE)
-            .append(TARGET_PREPARER_OPEN)
+            .append(MEDIA_TARGET_PREPARER_OPEN)
             .append(APK_INSTALL_OPTION.replace("APK_NAME", clientApkName))
             .append(APK_INSTALL_OPTION.replace("APK_NAME", serviceApkName))
         sb.append(TARGET_PREPARER_CLOSE)
@@ -158,7 +158,7 @@ class MediaConfigBuilder {
             .append(RUNNER_OPTION.replace("TEST_RUNNER", testRunner))
             .append(PACKAGE_OPTION.replace("APPLICATION_ID", clientApplicationId))
             .append(mediaInstrumentationArgs())
-        if (runFullTests) {
+        if (runAllTests) {
             if (!isPostsubmit) {
                 sb.append(FLAKY_TEST_OPTION)
             }
@@ -244,7 +244,7 @@ private val CONFIGURATION_CLOSE = """
 """.trimIndent()
 
 private val MIN_API_LEVEL_CONTROLLER_OBJECT = """
-    <object type="module_controller" class="com.android.tradefed.testtype.suite.module.MinApiLevelModuleController">
+    <object type="module_controller" class="com.android.tradefed.testtype.suite.module.ShippingApiLevelModuleController">
     <option name="min-api-level" value="MIN_SDK" />
     </object>
 
@@ -272,7 +272,12 @@ private val SETUP_INCLUDE = """
 
 private val TARGET_PREPARER_OPEN = """
     <target_preparer class="com.android.tradefed.targetprep.suite.SuiteApkInstaller">
-    <option name="cleanup-apks" value="true" />
+    <option name="cleanup-apks" value="false" />
+
+""".trimIndent()
+
+private val MEDIA_TARGET_PREPARER_OPEN = """
+    <target_preparer class="com.android.tradefed.targetprep.suite.SuiteApkInstaller">
 
 """.trimIndent()
 

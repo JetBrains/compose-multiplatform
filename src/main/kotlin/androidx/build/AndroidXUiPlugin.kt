@@ -64,19 +64,19 @@ class AndroidXUiPlugin : Plugin<Project> {
                                 ArtifactTypeDefinition.JAR_TYPE
                             )
                         }
-                    }.files
+                    }
 
                     project.tasks.withType(KotlinCompile::class.java).configureEach { compile ->
                         compile.kotlinOptions.useIR = true
                         // TODO(b/157230235): remove when this is enabled by default
                         compile.kotlinOptions.freeCompilerArgs += "-Xopt-in=kotlin.RequiresOptIn"
-                        compile.inputs.files(kotlinPlugin)
+                        compile.inputs.files({ kotlinPlugin.files })
                             .withPropertyName("composeCompilerExtension")
                             .withNormalizer(ClasspathNormalizer::class.java)
                         compile.doFirst {
                             if (!conf.isEmpty) {
                                 compile.kotlinOptions.freeCompilerArgs +=
-                                    "-Xplugin=${kotlinPlugin.first()}"
+                                    "-Xplugin=${kotlinPlugin.files.first()}"
                             }
                         }
                     }
@@ -85,11 +85,15 @@ class AndroidXUiPlugin : Plugin<Project> {
                         val androidXExtension =
                             project.extensions.findByType(AndroidXExtension::class.java)
                         if (androidXExtension != null) {
-                            if (!conf.isEmpty && androidXExtension.publish.shouldPublish()) {
+                            if (androidXExtension.publish.shouldPublish()) {
                                 project.tasks.withType(KotlinCompile::class.java)
                                     .configureEach { compile ->
-                                        compile.kotlinOptions.freeCompilerArgs +=
-                                            listOf("-P", composeSourceOption)
+                                        compile.doFirst {
+                                            if (!conf.isEmpty) {
+                                                compile.kotlinOptions.freeCompilerArgs +=
+                                                    listOf("-P", composeSourceOption)
+                                            }
+                                        }
                                     }
                             }
                         }
