@@ -24,10 +24,10 @@ import androidx.compose.ui.focus.FocusModifier
 import androidx.compose.ui.focus.FocusOrderModifier
 import androidx.compose.ui.focus.FocusRequesterModifier
 import androidx.compose.ui.geometry.Offset
-import androidx.compose.ui.input.nestedscroll.NestedScrollDelegatingWrapper
-import androidx.compose.ui.input.nestedscroll.NestedScrollModifier
 import androidx.compose.ui.graphics.Canvas
 import androidx.compose.ui.input.key.KeyInputModifier
+import androidx.compose.ui.input.nestedscroll.NestedScrollDelegatingWrapper
+import androidx.compose.ui.input.nestedscroll.NestedScrollModifier
 import androidx.compose.ui.input.pointer.PointerInputFilter
 import androidx.compose.ui.input.pointer.PointerInputModifier
 import androidx.compose.ui.layout.AlignmentLine
@@ -474,6 +474,7 @@ internal class LayoutNode : Measurable, Remeasurement, OwnerScope, LayoutInfo, C
             if (field != value) {
                 field = value
                 requestRemeasure()
+                invalidateLayer()
             }
         }
 
@@ -1197,7 +1198,7 @@ internal class LayoutNode : Measurable, Remeasurement, OwnerScope, LayoutInfo, C
      * Return true if the measured size has been changed
      */
     internal fun remeasure(
-        constraints: Constraints = outerMeasurablePlaceable.lastConstraints!!
+        constraints: Constraints = outerMeasurablePlaceable.lastConstraints
     ) = outerMeasurablePlaceable.remeasure(constraints)
 
     override val parentData: Any? get() = outerMeasurablePlaceable.parentData

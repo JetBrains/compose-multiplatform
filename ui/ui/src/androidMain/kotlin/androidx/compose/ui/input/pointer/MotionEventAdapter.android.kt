@@ -24,6 +24,7 @@ import android.view.MotionEvent.ACTION_DOWN
 import android.view.MotionEvent.ACTION_POINTER_DOWN
 import android.view.MotionEvent.ACTION_POINTER_UP
 import android.view.MotionEvent.ACTION_UP
+import androidx.annotation.DoNotInline
 import androidx.annotation.RequiresApi
 import androidx.annotation.VisibleForTesting
 import androidx.compose.ui.geometry.Offset
@@ -181,7 +182,13 @@ private fun createPointerInputEventData(
     )
 }
 
+/**
+ * This class is here to ensure that the classes that use this API will get verified and can be
+ * AOT compiled. It is expected that this class will soft-fail verification, but the classes
+ * which use this method will pass.
+ */
 @RequiresApi(Build.VERSION_CODES.Q)
+@DoNotInline
 @SuppressLint("UnsafeNewApiCall") // not sure why RequiresApi is not enough
 private fun MotionEvent.toRawOffset(index: Int): Offset {
     return Offset(getRawX(index), getRawY(index))

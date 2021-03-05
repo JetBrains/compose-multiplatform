@@ -34,15 +34,10 @@ package androidx.compose.foundation {
   public final class ClickableKt {
     method public static androidx.compose.ui.Modifier clickable(androidx.compose.ui.Modifier, optional boolean enabled, optional String? onClickLabel, optional androidx.compose.ui.semantics.Role? role, kotlin.jvm.functions.Function0<kotlin.Unit> onClick);
     method public static androidx.compose.ui.Modifier clickable(androidx.compose.ui.Modifier, androidx.compose.foundation.interaction.MutableInteractionSource interactionSource, androidx.compose.foundation.Indication? indication, optional boolean enabled, optional String? onClickLabel, optional androidx.compose.ui.semantics.Role? role, kotlin.jvm.functions.Function0<kotlin.Unit> onClick);
-    method @androidx.compose.foundation.ExperimentalFoundationApi public static androidx.compose.ui.Modifier combinedClickable(androidx.compose.ui.Modifier, optional boolean enabled, optional String? onClickLabel, optional androidx.compose.ui.semantics.Role? role, optional String? onLongClickLabel, optional kotlin.jvm.functions.Function0<kotlin.Unit>? onLongClick, optional kotlin.jvm.functions.Function0<kotlin.Unit>? onDoubleClick, kotlin.jvm.functions.Function0<kotlin.Unit> onClick);
-    method @androidx.compose.foundation.ExperimentalFoundationApi public static androidx.compose.ui.Modifier combinedClickable(androidx.compose.ui.Modifier, androidx.compose.foundation.interaction.MutableInteractionSource interactionSource, androidx.compose.foundation.Indication? indication, optional boolean enabled, optional String? onClickLabel, optional androidx.compose.ui.semantics.Role? role, optional String? onLongClickLabel, optional kotlin.jvm.functions.Function0<kotlin.Unit>? onLongClick, optional kotlin.jvm.functions.Function0<kotlin.Unit>? onDoubleClick, kotlin.jvm.functions.Function0<kotlin.Unit> onClick);
   }
 
   public final class DarkTheme_androidKt {
     method @androidx.compose.runtime.Composable @androidx.compose.runtime.ReadOnlyComposable public static boolean isSystemInDarkTheme();
-  }
-
-  @kotlin.RequiresOptIn(message="This foundation API is experimental and is likely to change or be removed in the " + "future.") public @interface ExperimentalFoundationApi {
   }
 
   public final class FocusableKt {
@@ -66,9 +61,6 @@ package androidx.compose.foundation {
   public final class IndicationKt {
     method public static androidx.compose.runtime.ProvidableCompositionLocal<androidx.compose.foundation.Indication> getLocalIndication();
     method public static androidx.compose.ui.Modifier indication(androidx.compose.ui.Modifier, androidx.compose.foundation.interaction.InteractionSource interactionSource, androidx.compose.foundation.Indication? indication);
-  }
-
-  @kotlin.RequiresOptIn(message="This API is internal to library.") @kotlin.annotation.Target(allowedTargets={kotlin.annotation.AnnotationTarget, kotlin.annotation.AnnotationTarget, kotlin.annotation.AnnotationTarget, kotlin.annotation.AnnotationTarget, kotlin.annotation.AnnotationTarget}) public @interface InternalFoundationApi {
   }
 
   public enum MutatePriority {
@@ -163,8 +155,7 @@ package androidx.compose.foundation.gestures {
   }
 
   public final class GestureCancellationException extends java.util.concurrent.CancellationException {
-    ctor public GestureCancellationException(String? message);
-    ctor public GestureCancellationException();
+    ctor public GestureCancellationException(optional String? message);
   }
 
   public enum Orientation {
@@ -338,23 +329,6 @@ package androidx.compose.foundation.interaction {
 
 package androidx.compose.foundation.lazy {
 
-  public final class CachingItemContentFactoryKt {
-  }
-
-  @androidx.compose.foundation.ExperimentalFoundationApi public abstract sealed class GridCells {
-  }
-
-  @androidx.compose.foundation.ExperimentalFoundationApi public static final class GridCells.Adaptive extends androidx.compose.foundation.lazy.GridCells {
-    method public float getMinSize-D9Ej5fM();
-    property public final float minSize;
-  }
-
-  @androidx.compose.foundation.ExperimentalFoundationApi public static final class GridCells.Fixed extends androidx.compose.foundation.lazy.GridCells {
-    ctor public GridCells.Fixed(int count);
-    method public int getCount();
-    property public final int count;
-  }
-
   public final class LazyDslKt {
     method @androidx.compose.runtime.Composable public static void LazyColumn(optional androidx.compose.ui.Modifier modifier, optional androidx.compose.foundation.lazy.LazyListState state, optional androidx.compose.foundation.layout.PaddingValues contentPadding, optional boolean reverseLayout, optional androidx.compose.foundation.layout.Arrangement.Vertical verticalArrangement, optional androidx.compose.ui.Alignment.Horizontal horizontalAlignment, optional androidx.compose.foundation.gestures.FlingBehavior flingBehavior, kotlin.jvm.functions.Function1<? super androidx.compose.foundation.lazy.LazyListScope,kotlin.Unit> content);
     method @androidx.compose.runtime.Composable public static void LazyRow(optional androidx.compose.ui.Modifier modifier, optional androidx.compose.foundation.lazy.LazyListState state, optional androidx.compose.foundation.layout.PaddingValues contentPadding, optional boolean reverseLayout, optional androidx.compose.foundation.layout.Arrangement.Horizontal horizontalArrangement, optional androidx.compose.ui.Alignment.Vertical verticalAlignment, optional androidx.compose.foundation.gestures.FlingBehavior flingBehavior, kotlin.jvm.functions.Function1<? super androidx.compose.foundation.lazy.LazyListScope,kotlin.Unit> content);
@@ -365,22 +339,15 @@ package androidx.compose.foundation.lazy {
   }
 
   public final class LazyGridKt {
-    method @androidx.compose.foundation.ExperimentalFoundationApi @androidx.compose.runtime.Composable public static void LazyVerticalGrid(androidx.compose.foundation.lazy.GridCells cells, optional androidx.compose.ui.Modifier modifier, optional androidx.compose.foundation.lazy.LazyListState state, optional androidx.compose.foundation.layout.PaddingValues contentPadding, kotlin.jvm.functions.Function1<? super androidx.compose.foundation.lazy.LazyGridScope,kotlin.Unit> content);
-    method @androidx.compose.foundation.ExperimentalFoundationApi public static inline <T> void items(androidx.compose.foundation.lazy.LazyGridScope, java.util.List<? extends T> items, kotlin.jvm.functions.Function2<? super androidx.compose.foundation.lazy.LazyItemScope,? super T,kotlin.Unit> itemContent);
-    method @androidx.compose.foundation.ExperimentalFoundationApi public static inline <T> void items(androidx.compose.foundation.lazy.LazyGridScope, T![] items, kotlin.jvm.functions.Function2<? super androidx.compose.foundation.lazy.LazyItemScope,? super T,kotlin.Unit> itemContent);
-    method @androidx.compose.foundation.ExperimentalFoundationApi public static inline <T> void itemsIndexed(androidx.compose.foundation.lazy.LazyGridScope, java.util.List<? extends T> items, kotlin.jvm.functions.Function3<? super androidx.compose.foundation.lazy.LazyItemScope,? super java.lang.Integer,? super T,kotlin.Unit> itemContent);
-    method @androidx.compose.foundation.ExperimentalFoundationApi public static inline <T> void itemsIndexed(androidx.compose.foundation.lazy.LazyGridScope, T![] items, kotlin.jvm.functions.Function3<? super androidx.compose.foundation.lazy.LazyItemScope,? super java.lang.Integer,? super T,kotlin.Unit> itemContent);
-  }
-
-  @androidx.compose.foundation.ExperimentalFoundationApi public interface LazyGridScope {
-    method public void item(kotlin.jvm.functions.Function1<? super androidx.compose.foundation.lazy.LazyItemScope,kotlin.Unit> content);
-    method public void items(int count, kotlin.jvm.functions.Function2<? super androidx.compose.foundation.lazy.LazyItemScope,? super java.lang.Integer,kotlin.Unit> itemContent);
   }
 
   @androidx.compose.foundation.lazy.LazyScopeMarker @androidx.compose.runtime.Stable public interface LazyItemScope {
     method public androidx.compose.ui.Modifier fillParentMaxHeight(androidx.compose.ui.Modifier, optional float fraction);
     method public androidx.compose.ui.Modifier fillParentMaxSize(androidx.compose.ui.Modifier, optional float fraction);
     method public androidx.compose.ui.Modifier fillParentMaxWidth(androidx.compose.ui.Modifier, optional float fraction);
+  }
+
+  public final class LazyListItemContentFactoryKt {
   }
 
   public interface LazyListItemInfo {
@@ -414,15 +381,13 @@ package androidx.compose.foundation.lazy {
   @androidx.compose.foundation.lazy.LazyScopeMarker public interface LazyListScope {
     method public void item(optional Object? key, kotlin.jvm.functions.Function1<? super androidx.compose.foundation.lazy.LazyItemScope,kotlin.Unit> content);
     method public void items(int count, optional kotlin.jvm.functions.Function1<? super java.lang.Integer,?>? key, kotlin.jvm.functions.Function2<? super androidx.compose.foundation.lazy.LazyItemScope,? super java.lang.Integer,kotlin.Unit> itemContent);
-    method @androidx.compose.foundation.ExperimentalFoundationApi public void stickyHeader(optional Object? key, kotlin.jvm.functions.Function1<? super androidx.compose.foundation.lazy.LazyItemScope,kotlin.Unit> content);
   }
 
   public final class LazyListScrollingKt {
   }
 
   @androidx.compose.runtime.Stable public final class LazyListState implements androidx.compose.foundation.gestures.ScrollableState {
-    ctor public LazyListState(int firstVisibleItemIndex, int firstVisibleItemScrollOffset);
-    ctor public LazyListState();
+    ctor public LazyListState(optional int firstVisibleItemIndex, optional int firstVisibleItemScrollOffset);
     method public suspend Object? animateScrollToItem(int index, optional int scrollOffset, optional kotlin.coroutines.Continuation<? super kotlin.Unit> p);
     method public float dispatchRawDelta(float delta);
     method public int getFirstVisibleItemIndex();
@@ -450,6 +415,9 @@ package androidx.compose.foundation.lazy {
   }
 
   @kotlin.DslMarker public @interface LazyScopeMarker {
+  }
+
+  public final class Lazy_androidKt {
   }
 
 }
@@ -625,16 +593,12 @@ package androidx.compose.foundation.text {
     method public static void appendInlineContent(androidx.compose.ui.text.AnnotatedString.Builder, String id, optional String alternateText);
   }
 
-  @kotlin.RequiresOptIn(message="Internal/Unstable API for use only between foundation modules sharing " + "the same exact version, subject to change without notice.") @kotlin.annotation.Target(allowedTargets={kotlin.annotation.AnnotationTarget, kotlin.annotation.AnnotationTarget, kotlin.annotation.AnnotationTarget, kotlin.annotation.AnnotationTarget, kotlin.annotation.AnnotationTarget}) public @interface InternalFoundationTextApi {
-  }
-
   public interface KeyboardActionScope {
     method public void defaultKeyboardAction(androidx.compose.ui.text.input.ImeAction imeAction);
   }
 
   public final class KeyboardActions {
-    ctor public KeyboardActions(kotlin.jvm.functions.Function1<? super androidx.compose.foundation.text.KeyboardActionScope,kotlin.Unit>? onDone, kotlin.jvm.functions.Function1<? super androidx.compose.foundation.text.KeyboardActionScope,kotlin.Unit>? onGo, kotlin.jvm.functions.Function1<? super androidx.compose.foundation.text.KeyboardActionScope,kotlin.Unit>? onNext, kotlin.jvm.functions.Function1<? super androidx.compose.foundation.text.KeyboardActionScope,kotlin.Unit>? onPrevious, kotlin.jvm.functions.Function1<? super androidx.compose.foundation.text.KeyboardActionScope,kotlin.Unit>? onSearch, kotlin.jvm.functions.Function1<? super androidx.compose.foundation.text.KeyboardActionScope,kotlin.Unit>? onSend);
-    ctor public KeyboardActions();
+    ctor public KeyboardActions(optional kotlin.jvm.functions.Function1<? super androidx.compose.foundation.text.KeyboardActionScope,kotlin.Unit>? onDone, optional kotlin.jvm.functions.Function1<? super androidx.compose.foundation.text.KeyboardActionScope,kotlin.Unit>? onGo, optional kotlin.jvm.functions.Function1<? super androidx.compose.foundation.text.KeyboardActionScope,kotlin.Unit>? onNext, optional kotlin.jvm.functions.Function1<? super androidx.compose.foundation.text.KeyboardActionScope,kotlin.Unit>? onPrevious, optional kotlin.jvm.functions.Function1<? super androidx.compose.foundation.text.KeyboardActionScope,kotlin.Unit>? onSearch, optional kotlin.jvm.functions.Function1<? super androidx.compose.foundation.text.KeyboardActionScope,kotlin.Unit>? onSend);
     method public kotlin.jvm.functions.Function1<androidx.compose.foundation.text.KeyboardActionScope,kotlin.Unit>? getOnDone();
     method public kotlin.jvm.functions.Function1<androidx.compose.foundation.text.KeyboardActionScope,kotlin.Unit>? getOnGo();
     method public kotlin.jvm.functions.Function1<androidx.compose.foundation.text.KeyboardActionScope,kotlin.Unit>? getOnNext();
@@ -660,8 +624,7 @@ package androidx.compose.foundation.text {
   }
 
   @androidx.compose.runtime.Immutable public final class KeyboardOptions {
-    ctor public KeyboardOptions(androidx.compose.ui.text.input.KeyboardCapitalization capitalization, boolean autoCorrect, androidx.compose.ui.text.input.KeyboardType keyboardType, androidx.compose.ui.text.input.ImeAction imeAction);
-    ctor public KeyboardOptions();
+    ctor public KeyboardOptions(optional androidx.compose.ui.text.input.KeyboardCapitalization capitalization, optional boolean autoCorrect, optional androidx.compose.ui.text.input.KeyboardType keyboardType, optional androidx.compose.ui.text.input.ImeAction imeAction);
     method public androidx.compose.foundation.text.KeyboardOptions copy(optional androidx.compose.ui.text.input.KeyboardCapitalization capitalization, optional boolean autoCorrect, optional androidx.compose.ui.text.input.KeyboardType keyboardType, optional androidx.compose.ui.text.input.ImeAction imeAction);
     method public boolean getAutoCorrect();
     method public androidx.compose.ui.text.input.KeyboardCapitalization getCapitalization();

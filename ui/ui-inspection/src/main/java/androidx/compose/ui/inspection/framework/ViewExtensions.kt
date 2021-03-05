@@ -25,6 +25,12 @@ fun ViewGroup.getChildren(): List<View> {
     return (0 until childCount).map { i -> getChildAt(i) }
 }
 
+fun View.ancestors(): Sequence<View> =
+    generateSequence(this) { it.parent as? View }
+
+fun View.isRoot(): Boolean =
+    parent as? View == null
+
 /**
  * Return a list of this view and all its children in depth-first order
  */

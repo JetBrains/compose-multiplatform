@@ -26,26 +26,27 @@ plugins {
 }
 
 dependencies {
-    implementation 'androidx.appcompat:appcompat:1.2.0'
-    implementation 'androidx.activity:activity-ktx:1.1.0'
+    implementation("androidx.appcompat:appcompat:1.2.0")
+    implementation("androidx.activity:activity-ktx:1.1.0")
 
-    kotlinPlugin project(":compose:compiler:compiler")
-    implementation project(":compose:foundation:foundation-layout")
-    implementation project(":compose:material:material")
-    implementation project(":compose:material:material-icons-extended")
-    implementation project(":compose:runtime:runtime")
-    implementation project(":compose:runtime:runtime-livedata")
-    implementation project(":compose:ui:ui-test-junit4")
-    implementation project(":compose:ui:ui-tooling")
-    implementation project(":compose:ui:ui-viewbinding")
-    implementation project(":navigation:navigation-compose")
-    implementation project(":activity:activity-compose")
-    implementation project(":lifecycle:lifecycle-viewmodel-compose")
-
+    kotlinPlugin(project(":compose:compiler:compiler"))
+    implementation(project(":compose:foundation:foundation-layout"))
+    implementation(project(":compose:material:material"))
+    implementation(project(":compose:material:material-icons-extended"))
+    implementation(project(":compose:runtime:runtime"))
+    implementation(project(":compose:runtime:runtime-livedata"))
+    implementation(project(":compose:ui:ui-test-junit4"))
+    implementation(project(":compose:ui:ui-tooling"))
+    implementation(project(":compose:ui:ui-viewbinding"))
+    implementation(project(":navigation:navigation-compose"))
+    implementation(project(":activity:activity-compose"))
+    implementation(project(":lifecycle:lifecycle-viewmodel-compose"))
+    implementation(project(":paging:paging-compose"))
 
     implementation(KOTLIN_STDLIB)
     implementation(KOTLIN_REFLECT)
     implementation(ANDROIDX_TEST_RULES)
+    implementation(ESPRESSO_CORE)
     implementation(JUNIT)
     implementation(TRUTH)
 }

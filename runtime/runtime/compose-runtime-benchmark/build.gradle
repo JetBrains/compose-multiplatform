@@ -42,7 +42,7 @@ android {
 }
 
 dependencies {
-    kotlinPlugin project(":compose:compiler:compiler")
+    kotlinPlugin(project(":compose:compiler:compiler"))
 
     androidTestImplementation(project(":compose:ui:ui"))
     androidTestImplementation(project(":compose:ui:ui-test-junit4"))
@@ -51,6 +51,7 @@ dependencies {
     androidTestImplementation(project(":compose:material:material"))
     androidTestImplementation(project(":compose:runtime:runtime"))
     androidTestImplementation(project(":compose:ui:ui-text"))
+    androidTestImplementation(project(":compose:ui:ui-util"))
 
     androidTestImplementation(JUNIT)
     androidTestImplementation(ANDROIDX_TEST_EXT_JUNIT)
@@ -60,6 +61,6 @@ dependencies {
     androidTestImplementation(KOTLIN_STDLIB)
     androidTestImplementation(KOTLIN_REFLECT)
     androidTestImplementation(project(":benchmark:benchmark-junit4"))
-    androidTestImplementation "androidx.activity:activity:1.2.0"
-    androidTestImplementation project(":activity:activity-compose")
+    androidTestImplementation("androidx.activity:activity:1.2.0")
+    androidTestImplementation(project(":activity:activity-compose"))
 }

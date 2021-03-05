@@ -115,14 +115,14 @@ class Animatable<T, V : AnimationVector>(
     internal val defaultSpringSpec: SpringSpec<T> =
         SpringSpec(visibilityThreshold = visibilityThreshold)
 
-    private val negativeInfinityBounds = createVector(Float.NEGATIVE_INFINITY)
-    private val positiveInfinityBounds = createVector(Float.POSITIVE_INFINITY)
+    private val negativeInfinityBounds = initialValue.createVector(Float.NEGATIVE_INFINITY)
+    private val positiveInfinityBounds = initialValue.createVector(Float.POSITIVE_INFINITY)
 
     private var lowerBoundVector: V = negativeInfinityBounds
     private var upperBoundVector: V = positiveInfinityBounds
 
-    private fun createVector(value: Float): V {
-        val newVector = typeConverter.convertToVector(this.value)
+    private fun T.createVector(value: Float): V {
+        val newVector = this@Animatable.typeConverter.convertToVector(this)
         for (i in 0 until newVector.size) {
             newVector[i] = value
         }
@@ -170,7 +170,7 @@ class Animatable<T, V : AnimationVector>(
         if (!isRunning) {
             val clampedValue = clampToBounds(value)
             if (clampedValue != value) {
-                this.internalState.value = value
+                this.internalState.value = clampedValue
             }
         }
     }
@@ -318,7 +318,7 @@ class Animatable<T, V : AnimationVector>(
     private fun clampToBounds(value: T): T {
         if (
             lowerBoundVector == negativeInfinityBounds &&
-            upperBoundVector == negativeInfinityBounds
+            upperBoundVector == positiveInfinityBounds
         ) {
             // Expect this to be the most common use case
             return value
@@ -351,7 +351,11 @@ class Animatable<T, V : AnimationVector>(
     /**
      * Sets the current value to the target value, without any animation. This will also cancel any
      * on-going animation with a [CancellationException]. This function will return *after*
-     * canceling any on-going animation and updating the [value] to the provided [targetValue].
+     * canceling any on-going animation and updating the [Animatable.value] and
+     * [Animatable.targetValue] to the provided [targetValue].
+     *
+     * __Note__: If the [lowerBound] or [upperBound] is specified, the provided [targetValue]
+     * will be clamped to the bounds to ensure [Animatable.value] is always within bounds.
      *
      * See [animateTo] and [animateDecay] for more details about animation being canceled.
      *
@@ -364,8 +368,9 @@ class Animatable<T, V : AnimationVector>(
     suspend fun snapTo(targetValue: T) {
         mutatorMutex.mutate {
             endAnimation()
-            internalState.value = targetValue
-            this.targetValue = targetValue
+            val clampedValue = clampToBounds(targetValue)
+            internalState.value = clampedValue
+            this.targetValue = clampedValue
         }
     }
 

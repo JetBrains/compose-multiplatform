@@ -20,6 +20,7 @@
 
 package androidx.compose.integration.docs.kotlin
 
+import androidx.compose.foundation.ScrollState
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -30,6 +31,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -38,6 +40,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
+import kotlinx.coroutines.launch
 
 /**
  * This file lets DevRel track changes to snippets present in
@@ -143,6 +146,21 @@ import androidx.compose.ui.unit.dp
     }
 }*/
 
+@Composable private fun KotlinSnippet11() {
+    // Create a CoroutineScope that follows this composable's lifecycle
+    val composableScope = rememberCoroutineScope()
+    Button( // ...
+        onClick = {
+            // Create a new coroutine that scrolls to the top of the list
+            // and call the ViewModel to load data
+            composableScope.launch {
+                scrollState.animateScrollTo(0) // This is a suspend function
+                viewModel.loadData()
+            }
+        }
+    ) { /* ... */ }
+}
+
 /*
 Fakes needed for snippets to build:
  */
@@ -156,3 +174,7 @@ private object R {
 }
 
 private fun drawRect() {}
+
+private val scrollState = ScrollState(0)
+private class MyViewModel { fun loadData() {} }
+private val viewModel = MyViewModel()

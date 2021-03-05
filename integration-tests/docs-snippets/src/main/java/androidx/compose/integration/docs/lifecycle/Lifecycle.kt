@@ -53,7 +53,7 @@ import kotlin.random.Random
 
 /**
  * This file lets DevRel track changes to snippets present in
- * https://developer.android.com/jetpack/compose/xxxxxxxxxxxxxxx
+ * https://developer.android.com/jetpack/compose/lifecycle
  *
  * No action required if it's modified.
  */
@@ -83,8 +83,8 @@ private object LifecycleSnippet2 {
 private object LifecycleSnippet3 {
     @Composable
     fun MoviesScreen(movies: List<Movie>) {
-        LazyColumn {
-            items(movies) { movie ->
+        Column {
+            for (movie in movies) {
                 // All MovieOverview composables in Composition will have the same key!
                 // Thus, all calls will always recompose and restart all side effects.
                 MovieOverview(movie)
@@ -96,8 +96,8 @@ private object LifecycleSnippet3 {
 private object LifecycleSnippet4 {
     @Composable
     fun MoviesScreen(movies: List<Movie>) {
-        LazyColumn {
-            items(movies) { movie ->
+        Column {
+            for (movie in movies) {
                 key(movie.id) { // Unique ID for this movie
                     MovieOverview(movie)
                 }
@@ -107,6 +107,17 @@ private object LifecycleSnippet4 {
 }
 
 private object LifecycleSnippet5 {
+    @Composable
+    fun MoviesScreen(movies: List<Movie>) {
+        LazyColumn {
+            items(movies, key = { movie -> movie.id }) { movie ->
+                MovieOverview(movie)
+            }
+        }
+    }
+}
+
+private object LifecycleSnippet6 {
     // Marking the type as stable to favor skipping and smart recompositions.
     @Stable
     interface UiState<T : Result<T>> {
@@ -119,7 +130,7 @@ private object LifecycleSnippet5 {
 }
 
 @ExperimentalMaterialApi
-private object LifecycleSnippet6 {
+private object LifecycleSnippet7 {
     @Composable
     fun MyScreen(
         state: UiState<List<Movie>>,
@@ -149,7 +160,7 @@ private object LifecycleSnippet6 {
 }
 
 @ExperimentalMaterialApi
-private object LifecycleSnippet7 {
+private object LifecycleSnippet8 {
     @Composable
     fun MoviesScreen(scaffoldState: ScaffoldState = rememberScaffoldState()) {
 
@@ -174,7 +185,7 @@ private object LifecycleSnippet7 {
     }
 }
 
-private object LifecycleSnippet8 {
+private object LifecycleSnippet9 {
     @Composable
     fun LandingScreen(onTimeout: () -> Unit) {
 
@@ -193,7 +204,7 @@ private object LifecycleSnippet8 {
     }
 }
 
-private object LifecycleSnippet9 {
+private object LifecycleSnippet10 {
     @Composable
     fun BackHandler(backDispatcher: OnBackPressedDispatcher, onBack: () -> Unit) {
 
@@ -223,7 +234,7 @@ private object LifecycleSnippet9 {
     }
 }
 
-private object LifecycleSnippet10 {
+private object LifecycleSnippet11 {
     @Composable
     fun BackHandler(
         backDispatcher: OnBackPressedDispatcher,
@@ -253,7 +264,7 @@ private object LifecycleSnippet10 {
     }
 }
 
-private object LifecycleSnippet11 {
+private object LifecycleSnippet12 {
     @Composable
     fun loadNetworkImage(
         url: String,
@@ -279,7 +290,7 @@ private object LifecycleSnippet11 {
     }
 }
 
-private object LifecycleSnippet12 {
+private object LifecycleSnippet13 {
     @Composable
     fun TodoList(highPriorityKeywords: List<String> = listOf("Review", "Unblock", "Compose")) {
 
@@ -301,7 +312,7 @@ private object LifecycleSnippet12 {
     }
 }
 
-private object LifecycleSnippet13 {
+private object LifecycleSnippet14 {
     @Composable
     fun BackHandler(backDispatcher: OnBackPressedDispatcher, onBack: () -> Unit) {
         // START - DO NOT COPY IN CODE SNIPPET

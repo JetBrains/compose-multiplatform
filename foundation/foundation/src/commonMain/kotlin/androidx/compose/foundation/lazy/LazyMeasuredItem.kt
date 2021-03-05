@@ -19,7 +19,6 @@ package androidx.compose.foundation.lazy
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.layout.Placeable
 import androidx.compose.ui.unit.LayoutDirection
-import androidx.compose.ui.util.fastForEach
 
 /**
  * Represents one measured item of the lazy list. It can in fact consist of multiple placeables
@@ -27,7 +26,7 @@ import androidx.compose.ui.util.fastForEach
  */
 internal class LazyMeasuredItem(
     override val index: Int,
-    private val placeables: List<Placeable>,
+    private val placeables: Array<Placeable>,
     private val isVertical: Boolean,
     private val horizontalAlignment: Alignment.Horizontal?,
     private val verticalAlignment: Alignment.Vertical?,
@@ -62,7 +61,7 @@ internal class LazyMeasuredItem(
     init {
         var mainAxisSize = 0
         var maxCrossAxis = 0
-        placeables.fastForEach {
+        placeables.forEach {
             mainAxisSize += if (isVertical) it.height else it.width
             maxCrossAxis = maxOf(maxCrossAxis, if (!isVertical) it.height else it.width)
         }
@@ -87,9 +86,10 @@ internal class LazyMeasuredItem(
     ) = with(scope) {
         this@LazyMeasuredItem.offset = offset
         var mainAxisOffset = offset
-        val indices = if (reverseOrder) placeables.lastIndex downTo 0 else placeables.indices
-        for (index in indices) {
+        var index = if (reverseOrder) placeables.lastIndex else 0
+        while (if (reverseOrder) index >= 0 else index < placeables.size) {
             val it = placeables[index]
+            if (reverseOrder) index-- else index++
             if (isVertical) {
                 val x = requireNotNull(horizontalAlignment)
                     .align(it.width, layoutWidth, layoutDirection)

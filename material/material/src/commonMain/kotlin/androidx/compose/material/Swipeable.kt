@@ -20,9 +20,9 @@ import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.AnimationSpec
 import androidx.compose.animation.core.SpringSpec
 import androidx.compose.foundation.gestures.DraggableState
-import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.gestures.Orientation
 import androidx.compose.foundation.gestures.draggable
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.material.SwipeableDefaults.AnimationSpec
 import androidx.compose.material.SwipeableDefaults.StandardResistanceFactor
 import androidx.compose.material.SwipeableDefaults.VelocityThreshold
@@ -31,7 +31,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.Immutable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.Stable
 import androidx.compose.runtime.State
 import androidx.compose.runtime.getValue
@@ -40,6 +39,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.Saver
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
+import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.composed
 import androidx.compose.ui.geometry.Offset
@@ -54,6 +54,10 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.util.lerp
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.flow.filter
+import kotlinx.coroutines.flow.take
 import kotlinx.coroutines.launch
 import kotlin.math.PI
 import kotlin.math.abs
@@ -119,6 +123,11 @@ open class SwipeableState<T>(
     private val animationTarget = mutableStateOf<Float?>(null)
 
     internal var anchors by mutableStateOf(emptyMap<Float, T>())
+
+    private val latestNonEmptyAnchorsFlow: Flow<Map<Float, T>> =
+        snapshotFlow { anchors }
+            .filter { it.isNotEmpty() }
+            .take(1)
 
     internal var minBound = Float.NEGATIVE_INFINITY
     internal var maxBound = Float.POSITIVE_INFINITY
@@ -286,16 +295,14 @@ open class SwipeableState<T>(
      */
     @ExperimentalMaterialApi
     suspend fun snapTo(targetValue: T) {
-        val targetOffset = anchors.getOffset(targetValue)
-        require(anchors.isNotEmpty()) {
-            "State $this is not attached to a component. Have you passed state object to " +
-                "a component?"
+        latestNonEmptyAnchorsFlow.collect { anchors ->
+            val targetOffset = anchors.getOffset(targetValue)
+            requireNotNull(targetOffset) {
+                "The target value must have an associated anchor."
+            }
+            snapInternalToOffset(targetOffset)
+            currentValue = targetValue
         }
-        requireNotNull(targetOffset) {
-            "The target value must have an associated anchor."
-        }
-        snapInternalToOffset(targetOffset)
-        currentValue = targetValue
     }
 
     /**
@@ -306,23 +313,21 @@ open class SwipeableState<T>(
      */
     @ExperimentalMaterialApi
     suspend fun animateTo(targetValue: T, anim: AnimationSpec<Float> = animationSpec) {
-        try {
-            val targetOffset = anchors.getOffset(targetValue)
-            require(anchors.isNotEmpty()) {
-                "State $this is not attached to a component. Have you passed state object to " +
-                    "a component?"
+        latestNonEmptyAnchorsFlow.collect { anchors ->
+            try {
+                val targetOffset = anchors.getOffset(targetValue)
+                requireNotNull(targetOffset) {
+                    "The target value must have an associated anchor."
+                }
+                animateInternalToOffset(targetOffset, anim)
+            } finally {
+                val endOffset = absoluteOffset.value
+                val endValue = anchors
+                    // fighting rounding error once again, anchor should be as close as 0.5 pixels
+                    .filterKeys { anchorOffset -> abs(anchorOffset - endOffset) < 0.5f }
+                    .values.firstOrNull() ?: currentValue
+                currentValue = endValue
             }
-            requireNotNull(targetOffset) {
-                "The target value must have an associated anchor."
-            }
-            return animateInternalToOffset(targetOffset, anim)
-        } finally {
-            val endOffset = absoluteOffset.value
-            val endValue = anchors
-                // fighting rounding error once again, anchor should be as close as 0.5 pixels
-                .filterKeys { anchorOffset -> abs(anchorOffset - endOffset) < 0.5f }
-                .values.firstOrNull() ?: currentValue
-            currentValue = endValue
         }
     }
 
@@ -340,19 +345,21 @@ open class SwipeableState<T>(
      * @return the reason fling ended
      */
     suspend fun performFling(velocity: Float) {
-        val lastAnchor = anchors.getOffset(currentValue)!!
-        val targetValue = computeTarget(
-            offset = offset.value,
-            lastValue = lastAnchor,
-            anchors = anchors.keys,
-            thresholds = thresholds,
-            velocity = velocity,
-            velocityThreshold = velocityThreshold
-        )
-        val targetState = anchors[targetValue]
-        if (targetState != null && confirmStateChange(targetState)) animateTo(targetState)
-        // If the user vetoed the state change, rollback to the previous state.
-        else animateInternalToOffset(lastAnchor, animationSpec)
+        latestNonEmptyAnchorsFlow.collect { anchors ->
+            val lastAnchor = anchors.getOffset(currentValue)!!
+            val targetValue = computeTarget(
+                offset = offset.value,
+                lastValue = lastAnchor,
+                anchors = anchors.keys,
+                thresholds = thresholds,
+                velocity = velocity,
+                velocityThreshold = velocityThreshold
+            )
+            val targetState = anchors[targetValue]
+            if (targetState != null && confirmStateChange(targetState)) animateTo(targetState)
+            // If the user vetoed the state change, rollback to the previous state.
+            else animateInternalToOffset(lastAnchor, animationSpec)
+        }
     }
 
     /**
@@ -570,10 +577,10 @@ fun <T> Modifier.swipeable(
     }
     val density = LocalDensity.current
     state.ensureInit(anchors)
-    val oldAnchors = state.anchors
-    state.anchors = anchors
     LaunchedEffect(anchors) {
-        state.processNewAnchors(oldAnchors, anchors)
+        val oldAnchors = state.anchors
+        state.anchors = anchors
+        state.resistance = resistance
         state.thresholds = { a, b ->
             val from = anchors.getValue(a)
             val to = anchors.getValue(b)
@@ -582,9 +589,7 @@ fun <T> Modifier.swipeable(
         with(density) {
             state.velocityThreshold = velocityThreshold.toPx()
         }
-    }
-    SideEffect {
-        state.resistance = resistance
+        state.processNewAnchors(oldAnchors, anchors)
     }
 
     Modifier.draggable(

@@ -16,9 +16,7 @@
 
 package androidx.compose.ui.test
 
-import androidx.compose.ui.geometry.Rect
 import androidx.compose.ui.semantics.SemanticsNode
-import androidx.compose.ui.unit.Density
 
 /**
  * Represents a semantics node and the path to fetch it from the semantics tree. One can interact
@@ -258,22 +256,4 @@ class SemanticsNodeInteractionCollection constructor(
             selector.addIndexSelector(index)
         )
     }
-}
-
-internal actual fun <R> SemanticsNodeInteraction.withDensity(
-    operation: Density.(SemanticsNode) -> R
-): R {
-    val node = fetchSemanticsNode("Failed to retrieve density for the node.")
-    val density = node.root!!.density
-    return operation.invoke(density, node)
-}
-
-internal actual fun SemanticsNodeInteraction.withUnclippedBoundsInRoot(
-    assertion: Density.(Rect) -> Unit
-): SemanticsNodeInteraction {
-    val node = fetchSemanticsNode("Failed to retrieve bounds of the node.")
-    val density = node.root!!.density
-
-    assertion.invoke(density, node.unclippedBoundsInRoot)
-    return this
 }

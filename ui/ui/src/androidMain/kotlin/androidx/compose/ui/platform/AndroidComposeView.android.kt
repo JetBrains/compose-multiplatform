@@ -33,6 +33,7 @@ import android.view.ViewTreeObserver
 import android.view.autofill.AutofillValue
 import android.view.inputmethod.EditorInfo
 import android.view.inputmethod.InputConnection
+import androidx.annotation.DoNotInline
 import androidx.annotation.RequiresApi
 import androidx.annotation.RestrictTo
 import androidx.compose.runtime.getValue
@@ -114,7 +115,17 @@ import android.view.KeyEvent as AndroidKeyEvent
 internal class AndroidComposeView(context: Context) :
     ViewGroup(context), Owner, ViewRootForTest, PositionCalculator {
 
-    override val view: View = this
+    /**
+     * Signal that AndroidComposeView's superclass constructors have finished running.
+     * If this is false, it's because the runtime's default uninitialized value is currently
+     * visible and AndroidComposeView's constructor hasn't started running yet. In this state
+     * other expected invariants do not hold, e.g. property delegates may not be initialized.
+     * View/ViewGroup have a history of calling non-final methods in their constructors that
+     * can lead to this case, e.g. [onRtlPropertiesChanged].
+     */
+    private var superclassInitComplete = true
+
+    override val view: View get() = this
 
     override var density = Density(context)
         private set
@@ -307,9 +318,11 @@ internal class AndroidComposeView(context: Context) :
         setWillNotDraw(false)
         isFocusable = true
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            focusable = View.FOCUSABLE
-            // not to add the default focus highlight to the whole compose view
-            defaultFocusHighlightEnabled = false
+            AndroidComposeViewVerificationHelperMethods.focusable(
+                this,
+                focusable = View.FOCUSABLE,
+                defaultFocusHighlightEnabled = false
+            )
         }
         isFocusableInTouchMode = true
         clipChildren = false
@@ -386,7 +399,7 @@ internal class AndroidComposeView(context: Context) :
      * to the hierarchy.
      */
     fun addAndroidView(view: AndroidViewHolder, layoutNode: LayoutNode) {
-        androidViewsHandler.layoutNode[view] = layoutNode
+        androidViewsHandler.holderToLayoutNode[view] = layoutNode
         androidViewsHandler.addView(view)
     }
 
@@ -396,7 +409,7 @@ internal class AndroidComposeView(context: Context) :
      */
     fun removeAndroidView(view: AndroidViewHolder) {
         androidViewsHandler.removeView(view)
-        androidViewsHandler.layoutNode.remove(view)
+        androidViewsHandler.holderToLayoutNode.remove(view)
     }
 
     /**
@@ -765,7 +778,13 @@ internal class AndroidComposeView(context: Context) :
     }
 
     override fun onRtlPropertiesChanged(layoutDirection: Int) {
-        this.layoutDirection = layoutDirectionFromInt(layoutDirection)
+        // This method can be called while View's constructor is running
+        // by way of resolving padding in response to initScrollbars.
+        // If we get such a call, don't try to write to a property delegate
+        // that hasn't been initialized yet.
+        if (superclassInitComplete) {
+            this.layoutDirection = layoutDirectionFromInt(layoutDirection)
+        }
     }
 
     private fun autofillSupported() = Build.VERSION.SDK_INT >= Build.VERSION_CODES.O
@@ -926,3 +945,19 @@ private class TransformMatrixApi29 {
 @InternalComposeUiApi // used by testing infra
 var textInputServiceFactory: (PlatformTextInputService) -> TextInputService =
     { TextInputService(it) }
+
+/**
+ * This class is here to ensure that the classes that use this API will get verified and can be
+ * AOT compiled. It is expected that this class will soft-fail verification, but the classes
+ * which use this method will pass.
+ */
+@RequiresApi(Build.VERSION_CODES.O)
+internal object AndroidComposeViewVerificationHelperMethods {
+    @RequiresApi(Build.VERSION_CODES.O)
+    @DoNotInline
+    fun focusable(view: View, focusable: Int, defaultFocusHighlightEnabled: Boolean) {
+        view.focusable = focusable
+        // not to add the default focus highlight to the whole compose view
+        view.defaultFocusHighlightEnabled = defaultFocusHighlightEnabled
+    }
+}

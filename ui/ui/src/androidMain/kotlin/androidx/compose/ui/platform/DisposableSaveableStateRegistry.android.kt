@@ -14,6 +14,8 @@
  * limitations under the License.
  */
 
+@file:Suppress("UNCHECKED_CAST")
+
 package androidx.compose.ui.platform
 
 import android.annotation.SuppressLint
@@ -31,7 +33,6 @@ import androidx.compose.runtime.referentialEqualityPolicy
 import androidx.compose.runtime.saveable.SaveableStateRegistry
 import androidx.compose.runtime.snapshots.SnapshotMutableState
 import androidx.compose.runtime.structuralEqualityPolicy
-import androidx.compose.ui.util.fastForEachIndexed
 import androidx.savedstate.SavedStateRegistry
 import androidx.savedstate.SavedStateRegistryOwner
 import java.io.Serializable
@@ -162,13 +163,8 @@ private val AcceptableClasses = arrayOf(
 private fun Bundle.toMap(): Map<String, List<Any?>>? {
     val map = mutableMapOf<String, List<Any?>>()
     this.keySet().forEach { key ->
-        @Suppress("UNCHECKED_CAST")
         val list = getParcelableArrayList<Parcelable?>(key) as ArrayList<Any?>
-        list.fastForEachIndexed { index, value ->
-            if (value is ParcelableMutableStateHolder) {
-                list[index] = value.state
-            }
-        }
+        unwrapMutableStatesIn(list)
         map[key] = list
     }
     return map
@@ -178,18 +174,89 @@ private fun Map<String, List<Any?>>.toBundle(): Bundle {
     val bundle = Bundle()
     forEach { (key, list) ->
         val arrayList = if (list is ArrayList<Any?>) list else ArrayList(list)
-        arrayList.fastForEachIndexed { index, value ->
-            if (value is SnapshotMutableState<*>) {
-                arrayList[index] = ParcelableMutableStateHolder(value)
-            }
-        }
-        @Suppress("UNCHECKED_CAST")
+        wrapMutableStatesIn(arrayList)
         bundle.putParcelableArrayList(
             key,
             arrayList as ArrayList<Parcelable?>
         )
     }
     return bundle
+}
+
+private fun wrapMutableStatesIn(list: MutableList<Any?>) {
+    list.forEachIndexed { index, value ->
+        if (value is SnapshotMutableState<*>) {
+            list[index] = ParcelableMutableStateHolder(value)
+        } else {
+            wrapMutableStatesInListOrMap(value)
+        }
+    }
+}
+
+private fun wrapMutableStatesIn(map: MutableMap<Any?, Any?>) {
+    map.forEach { (key, value) ->
+        if (value is SnapshotMutableState<*>) {
+            map[key] = ParcelableMutableStateHolder(value)
+        } else {
+            wrapMutableStatesInListOrMap(value)
+        }
+    }
+}
+
+private fun wrapMutableStatesInListOrMap(value: Any?) {
+    when (value) {
+        is MutableList<*> -> {
+            wrapMutableStatesIn(value as MutableList<Any?>)
+        }
+        is List<*> -> {
+            value.forEach {
+                check(it !is SnapshotMutableState<*>) {
+                    "Unexpected immutable list containing MutableState!"
+                }
+            }
+        }
+        is MutableMap<*, *> -> {
+            wrapMutableStatesIn(value as MutableMap<Any?, Any?>)
+        }
+        is Map<*, *> -> {
+            value.forEach {
+                check(it.value !is SnapshotMutableState<*>) {
+                    "Unexpected immutable map containing MutableState!"
+                }
+            }
+        }
+    }
+}
+
+private fun unwrapMutableStatesIn(list: MutableList<Any?>) {
+    list.forEachIndexed { index, value ->
+        if (value is ParcelableMutableStateHolder) {
+            list[index] = value.state
+        } else {
+            unwrapMutableStatesInListOrMap(value)
+        }
+    }
+}
+
+private fun unwrapMutableStatesIn(map: MutableMap<Any?, Any?>) {
+    map.forEach { (key, value) ->
+        if (value is ParcelableMutableStateHolder) {
+            map[key] = value.state
+        } else {
+            unwrapMutableStatesInListOrMap(value)
+        }
+    }
+}
+
+private fun unwrapMutableStatesInListOrMap(value: Any?) {
+    when (value) {
+        is MutableList<*> -> {
+            unwrapMutableStatesIn(value as MutableList<Any?>)
+        }
+        is MutableMap<*, *> -> {
+            unwrapMutableStatesIn(value as MutableMap<Any?, Any?>)
+        }
+    }
 }
 
 @SuppressLint("BanParcelableUsage")

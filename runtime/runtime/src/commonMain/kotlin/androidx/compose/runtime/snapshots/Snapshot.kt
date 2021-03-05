@@ -646,13 +646,18 @@ open class MutableSnapshot internal constructor(
     override fun takeNestedSnapshot(readObserver: ((Any) -> Unit)?): Snapshot {
         validateNotDisposed()
         validateNotApplied()
+        val previousId = id
         return advance {
             sync {
                 val readonlyId = nextSnapshotId++
                 openSnapshots = openSnapshots.set(readonlyId)
+                var currentInvalid = invalid
+                for (invalidId in previousId + 1 until readonlyId) {
+                    currentInvalid = currentInvalid.set(invalidId)
+                }
                 NestedReadonlySnapshot(
                     readonlyId,
-                    invalid,
+                    currentInvalid,
                     readObserver,
                     this
                 )
@@ -1071,7 +1076,7 @@ internal class NestedReadonlySnapshot(
     override val readOnly get() = true
     override val root: Snapshot get() = parent.root
     override fun takeNestedSnapshot(readObserver: ((Any) -> Unit)?) =
-        parent.takeNestedSnapshot(readObserver)
+        NestedReadonlySnapshot(id, invalid, readObserver, parent)
     override fun notifyObjectsInitialized() {
         // Nothing to do for read-only snapshots
     }

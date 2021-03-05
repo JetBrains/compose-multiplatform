@@ -72,6 +72,10 @@ internal class AndroidGenericFontFamilyTypeface(
                 TypefaceAdapter.getTypefaceStyle(fontWeight, fontStyle)
             )
         } else {
-            Typeface.create(nativeTypeface, fontWeight.weight, fontStyle == FontStyle.Italic)
+            TypefaceAdapterHelperMethods.create(
+                nativeTypeface,
+                fontWeight.weight,
+                fontStyle == FontStyle.Italic
+            )
         }
 }

@@ -90,5 +90,5 @@ fun InteractionSource.collectIsPressedAsState(): State<Boolean> {
             }
         }
     }
-    return derivedStateOf { pressInteractions.isNotEmpty() }
+    return remember { derivedStateOf { pressInteractions.isNotEmpty() } }
 }

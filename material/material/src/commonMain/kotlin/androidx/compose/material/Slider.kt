@@ -28,8 +28,7 @@ import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.gestures.draggable
 import androidx.compose.foundation.gestures.rememberDraggableState
 import androidx.compose.foundation.indication
-import androidx.compose.foundation.interaction.collectIsDraggedAsState
-import androidx.compose.foundation.interaction.collectIsPressedAsState
+import androidx.compose.foundation.interaction.DragInteraction
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Spacer
@@ -43,9 +42,10 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.ripple.rememberRipple
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Immutable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.Stable
 import androidx.compose.runtime.State
-import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.rememberUpdatedState
@@ -66,8 +66,10 @@ import androidx.compose.ui.semantics.setProgress
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.util.lerp
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 import kotlin.math.abs
 
@@ -151,7 +153,7 @@ fun Slider(
         }
 
         val press = if (enabled) {
-            Modifier.pointerInput(Unit) {
+            Modifier.pointerInput(position, interactionSource, maxPx, isRtl) {
                 detectTapGestures(
                     onPress = { pos ->
                         position.snapTo(if (isRtl) maxPx - pos.x else pos.x)
@@ -160,12 +162,16 @@ fun Slider(
                             launch {
                                 interactionSource.emit(interaction)
                             }
-                        }
-                        val success = tryAwaitRelease()
-                        if (success) gestureEndAction(0f)
-                        coroutineScope {
-                            launch {
-                                interactionSource.emit(PressInteraction.Release(interaction))
+                            try {
+                                val success = tryAwaitRelease()
+                                if (success) gestureEndAction(0f)
+                                launch {
+                                    interactionSource.emit(PressInteraction.Release(interaction))
+                                }
+                            } catch (c: CancellationException) {
+                                launch {
+                                    interactionSource.emit(PressInteraction.Cancel(interaction))
+                                }
                             }
                         }
                     }
@@ -366,9 +372,22 @@ private fun SliderImpl(
             trackStrokeWidth
         )
         Box(center.padding(start = offset)) {
-            val isPressed by interactionSource.collectIsPressedAsState()
-            val isDragged by interactionSource.collectIsDraggedAsState()
-            val hasInteraction = isPressed || isDragged
+            val interactions = remember { mutableStateListOf<Interaction>() }
+
+            LaunchedEffect(interactionSource) {
+                interactionSource.interactions.collect { interaction ->
+                    when (interaction) {
+                        is PressInteraction.Press -> interactions.add(interaction)
+                        is PressInteraction.Release -> interactions.remove(interaction.press)
+                        is PressInteraction.Cancel -> interactions.remove(interaction.press)
+                        is DragInteraction.Start -> interactions.add(interaction)
+                        is DragInteraction.Stop -> interactions.remove(interaction.start)
+                        is DragInteraction.Cancel -> interactions.remove(interaction.start)
+                    }
+                }
+            }
+
+            val hasInteraction = interactions.isNotEmpty()
             val elevation = if (hasInteraction) {
                 ThumbPressedElevation
             } else {

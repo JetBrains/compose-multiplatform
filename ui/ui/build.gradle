@@ -32,7 +32,7 @@ plugins {
 AndroidXUiPlugin.applyAndConfigureKotlinPlugin(project)
 
 dependencies {
-    kotlinPlugin project(":compose:compiler:compiler")
+    kotlinPlugin(project(":compose:compiler:compiler"))
 
     if(!AndroidXUiPlugin.isMultiplatformEnabled(project)) {
         /*
@@ -44,30 +44,27 @@ dependencies {
 
         // TODO: b/160602714 create a lower level module to avoid this dependency on the
         // animation group
-        api project(":compose:animation:animation-core")
-        api project(":compose:runtime:runtime-saveable")
-        api project(":compose:ui:ui-geometry")
-        api project(":compose:ui:ui-graphics")
-        api project(":compose:ui:ui-text")
-        api project(":compose:ui:ui-unit")
-        api "androidx.annotation:annotation:1.1.0"
+        api(project(":compose:animation:animation-core"))
+        api(project(":compose:runtime:runtime-saveable"))
+        api(project(":compose:ui:ui-geometry"))
+        api(project(":compose:ui:ui-graphics"))
+        api(project(":compose:ui:ui-text"))
+        api(project(":compose:ui:ui-unit"))
+        api("androidx.annotation:annotation:1.1.0")
 
         // This has stub APIs for access to legacy Android APIs, so we don't want
         // any dependency on this module.
-        compileOnly project(":compose:ui:ui-android-stubs")
+        compileOnly(project(":compose:ui:ui-android-stubs"))
 
-        implementation project(":compose:runtime:runtime")
-        implementation project(":compose:ui:ui-util")
+        implementation(project(":compose:runtime:runtime"))
+        implementation(project(":compose:ui:ui-util"))
         implementation(KOTLIN_STDLIB)
-        implementation "androidx.autofill:autofill:1.0.0"
+        implementation("androidx.autofill:autofill:1.0.0")
         implementation(KOTLIN_COROUTINES_ANDROID)
 
-        // we don't use these dependencies but we need to ensure at least these versions are
-        // used if the user adds these dependencies as otherwise AppCompatActivity and Fragment
-        // will not propagate ViewTree*Owners we are relying on and we will crash.
-        // TODO: remove these dependencies at some point: b/161814404
-        implementation "androidx.fragment:fragment:1.3.0"
-        implementation "androidx.appcompat:appcompat:1.3.0-beta01"
+        implementation("androidx.savedstate:savedstate:1.1.0")
+        implementation("androidx.lifecycle:lifecycle-runtime:2.3.0")
+        implementation("androidx.lifecycle:lifecycle-viewmodel:2.3.0")
 
         testImplementation(ANDROIDX_TEST_RULES)
         testImplementation(ANDROIDX_TEST_RUNNER)
@@ -75,15 +72,13 @@ dependencies {
         testImplementation(JUNIT)
         testImplementation(TRUTH)
         testImplementation(MOCKITO_CORE)
-        testImplementation MOCKITO_KOTLIN, {
-            exclude group: 'org.mockito' // to keep control on the mockito version
-        }
+        testImplementation(MOCKITO_KOTLIN, {
+            exclude group: "org.mockito" // to keep control on the mockito version
+        })
         testImplementation(ROBOLECTRIC)
-        testImplementation project(":compose:ui:ui-test-junit4")
-        testImplementation project(":compose:test-utils")
+        testImplementation(project(":compose:ui:ui-test-junit4"))
+        testImplementation(project(":compose:test-utils"))
 
-        androidTestImplementation "androidx.fragment:fragment:1.3.0"
-        androidTestImplementation "androidx.appcompat:appcompat:1.1.0"
         androidTestImplementation(ANDROIDX_TEST_UIAUTOMATOR)
         androidTestImplementation(ANDROIDX_TEST_RULES)
         androidTestImplementation(ANDROIDX_TEST_RUNNER)
@@ -96,21 +91,23 @@ dependencies {
         androidTestImplementation(MOCKITO_CORE, libs.exclude_bytebuddy)
         // DexMaker has it"s own MockMaker
         androidTestImplementation(TRUTH)
-        androidTestImplementation MOCKITO_KOTLIN, {
-            exclude group: 'org.mockito' // to keep control on the mockito version
-        }
-        androidTestImplementation project(":compose:foundation:foundation")
-        androidTestImplementation project(":compose:foundation:foundation-layout")
-        androidTestImplementation project(":compose:test-utils")
-        androidTestImplementation project(":compose:ui:ui-test-font")
-        androidTestImplementation project(":compose:ui:ui-test-junit4")
-        androidTestImplementation project(":test-screenshot")
-        androidTestImplementation "androidx.recyclerview:recyclerview:1.1.0"
+        androidTestImplementation(MOCKITO_KOTLIN, {
+            exclude group: "org.mockito" // to keep control on the mockito version
+        })
+        androidTestImplementation(project(":compose:foundation:foundation"))
+        androidTestImplementation(project(":compose:foundation:foundation-layout"))
+        androidTestImplementation(project(":compose:test-utils"))
+        androidTestImplementation(project(":compose:ui:ui-test-font"))
+        androidTestImplementation(project(":compose:ui:ui-test-junit4"))
+        androidTestImplementation(project(":test-screenshot"))
+        androidTestImplementation("androidx.recyclerview:recyclerview:1.1.0")
         androidTestImplementation("androidx.core:core-ktx:1.1.0")
-        androidTestImplementation project(":activity:activity-compose")
+        androidTestImplementation(project(":activity:activity-compose"))
+        androidTestImplementation("androidx.appcompat:appcompat:1.3.0-beta01")
+        androidTestImplementation("androidx.fragment:fragment:1.3.0")
 
-        lintChecks project(":compose:ui:ui-lint")
-        lintPublish project(":compose:ui:ui-lint")
+        lintChecks(project(":compose:ui:ui-lint"))
+        lintPublish(project(":compose:ui:ui-lint"))
     }
 }
 
@@ -138,37 +135,34 @@ if(AndroidXUiPlugin.isMultiplatformEnabled(project)) {
                 api project(":compose:ui:ui-graphics")
                 api project(":compose:ui:ui-text")
                 api project(":compose:ui:ui-unit")
-                implementation project(":compose:runtime:runtime")
-                implementation project(":compose:ui:ui-util")
+                implementation(project(":compose:runtime:runtime"))
+                implementation(project(":compose:ui:ui-util"))
             }
 
             androidMain.dependencies {
                 implementation(KOTLIN_STDLIB)
                 // This has stub APIs for access to legacy Android APIs, so we don't want
                 // any dependency on this module.
-                compileOnly project(":compose:ui:ui-android-stubs")
-                api "androidx.annotation:annotation:1.1.0"
-                implementation "androidx.autofill:autofill:1.0.0"
+                compileOnly(project(":compose:ui:ui-android-stubs"))
+                api("androidx.annotation:annotation:1.1.0")
+                implementation("androidx.autofill:autofill:1.0.0")
                 implementation(KOTLIN_COROUTINES_ANDROID)
 
-                // we don't use these dependencies but we need to ensure at least these versions are
-                // used if the user adds these dependencies as otherwise AppCompatActivity and Fragment
-                // will not propagate ViewTree*Owners we are relying on and we will crash.
-                // TODO: remove these dependencies at some point: b/161814404
-                implementation "androidx.fragment:fragment:1.3.0"
-                implementation "androidx.appcompat:appcompat:1.3.0-beta01"
+                implementation("androidx.savedstate:savedstate:1.1.0")
+                implementation("androidx.lifecycle:lifecycle-runtime:2.3.0")
+                implementation("androidx.lifecycle:lifecycle-viewmodel:2.3.0")
             }
 
             jvmMain.dependencies {
                 implementation(KOTLIN_STDLIB)
             }
 
-            androidMain.dependsOn jvmMain
+            androidMain.dependsOn(jvmMain)
             desktopMain {
                 dependencies {
                     api(KOTLIN_COROUTINES_SWING)
                 }
-                dependsOn jvmMain
+                dependsOn(jvmMain)
             }
 
             test.dependencies {
@@ -178,17 +172,17 @@ if(AndroidXUiPlugin.isMultiplatformEnabled(project)) {
                 implementation(JUNIT)
                 implementation(TRUTH)
                 implementation(MOCKITO_CORE)
-                implementation MOCKITO_KOTLIN, {
-                    exclude group: 'org.mockito' // to keep control on the mockito version
-                }
+                implementation(MOCKITO_KOTLIN, {
+                    exclude group: "org.mockito" // to keep control on the mockito version
+                })
                 implementation(ROBOLECTRIC)
-                implementation project(":compose:ui:ui-test-junit4")
-                implementation project(":compose:test-utils")
+                implementation(project(":compose:ui:ui-test-junit4"))
+                implementation(project(":compose:test-utils"))
             }
 
             androidAndroidTest.dependencies {
-                implementation "androidx.fragment:fragment:1.3.0"
-                implementation "androidx.appcompat:appcompat:1.1.0"
+                implementation("androidx.fragment:fragment:1.3.0")
+                implementation("androidx.appcompat:appcompat:1.3.0-beta01")
                 implementation(ANDROIDX_TEST_UIAUTOMATOR)
                 implementation(ANDROIDX_TEST_RULES)
                 implementation(ANDROIDX_TEST_RUNNER)
@@ -201,30 +195,30 @@ if(AndroidXUiPlugin.isMultiplatformEnabled(project)) {
                 implementation(MOCKITO_CORE, libs.exclude_bytebuddy)
                 // DexMaker has it"s own MockMaker
                 implementation(TRUTH)
-                implementation MOCKITO_KOTLIN, {
-                    exclude group: 'org.mockito' // to keep control on the mockito version
-                }
-                implementation project(":compose:foundation:foundation")
-                implementation project(":compose:foundation:foundation-layout")
-                implementation project(":compose:test-utils")
-                implementation project(":compose:ui:ui-test-font")
-                implementation project(":compose:ui:ui-test-junit4")
-                implementation project(":test-screenshot")
-                implementation "androidx.recyclerview:recyclerview:1.1.0"
+                implementation(MOCKITO_KOTLIN, {
+                    exclude group: "org.mockito" // to keep control on the mockito version
+                })
+                implementation(project(":compose:foundation:foundation"))
+                implementation(project(":compose:foundation:foundation-layout"))
+                implementation(project(":compose:test-utils"))
+                implementation(project(":compose:ui:ui-test-font"))
+                implementation(project(":compose:ui:ui-test-junit4"))
+                implementation(project(":test-screenshot"))
+                implementation("androidx.recyclerview:recyclerview:1.1.0")
                 implementation("androidx.core:core-ktx:1.1.0")
-                implementation project(":activity:activity-compose")
+                implementation(project(":activity:activity-compose"))
             }
 
             desktopTest.dependencies {
                 implementation(TRUTH)
                 implementation(JUNIT)
                 implementation(MOCKITO_CORE)
-                implementation MOCKITO_KOTLIN, {
-                    exclude group: 'org.mockito' // to keep control on the mockito version
-                }
+                implementation(MOCKITO_KOTLIN, {
+                    exclude group: "org.mockito" // to keep control on the mockito version
+                })
                 implementation(SKIKO_CURRENT_OS)
-                implementation project(":compose:foundation:foundation")
-                implementation project(":compose:ui:ui-test-junit4")
+                implementation(project(":compose:foundation:foundation"))
+                implementation(project(":compose:ui:ui-test-junit4"))
             }
         }
     }
@@ -241,7 +235,7 @@ androidx {
 
 if(AndroidXUiPlugin.isMultiplatformEnabled(project)) {
     tasks.findByName("desktopTest").configure {
-        systemProperties['GOLDEN_PATH'] = project.rootDir.absolutePath + "/../../golden"
+        systemProperties["GOLDEN_PATH"] = project.rootDir.absolutePath + "/../../golden"
     }
 }
 

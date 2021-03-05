@@ -55,7 +55,7 @@ internal fun AndroidTextPaint.applySpanStyle(
 
     if (style.localeList != null && style.localeList != LocaleList.current) {
         if (Build.VERSION.SDK_INT >= 24) {
-            textLocales = style.localeList.toAndroidLocaleList()
+            LocaleListHelperMethods.setTextLocales(this, style.localeList)
         } else {
             val locale = if (style.localeList.isEmpty()) {
                 Locale.current

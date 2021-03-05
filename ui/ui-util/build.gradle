@@ -37,10 +37,10 @@ if(!AndroidXUiPlugin.isMultiplatformEnabled(project)) {
          * corresponding block below
          */
 
-        api "androidx.annotation:annotation:1.1.0"
+        api("androidx.annotation:annotation:1.1.0")
 
         implementation(KOTLIN_STDLIB)
-        implementation project(":compose:runtime:runtime")
+        implementation(project(":compose:runtime:runtime"))
 
         testImplementation(JUNIT)
         testImplementation(TRUTH)
@@ -61,7 +61,7 @@ if(AndroidXUiPlugin.isMultiplatformEnabled(project)) {
             commonMain.dependencies {
                 implementation(KOTLIN_STDLIB_COMMON)
 
-                implementation project(":compose:runtime:runtime")
+                implementation(project(":compose:runtime:runtime"))
             }
 
             jvmMain.dependencies {
@@ -69,13 +69,13 @@ if(AndroidXUiPlugin.isMultiplatformEnabled(project)) {
             }
 
             androidMain.dependencies {
-                api "androidx.annotation:annotation:1.1.0"
+                api("androidx.annotation:annotation:1.1.0")
             }
 
-            desktopMain.dependsOn jvmMain
+            desktopMain.dependsOn(jvmMain)
 
             commonTest.dependencies {
-                implementation kotlin("test-junit")
+                implementation(kotlin("test-junit"))
             }
 
             androidTest.dependencies {

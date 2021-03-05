@@ -16,6 +16,7 @@
 
 package androidx.compose.ui.lazy
 
+import android.os.Build
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxHeight
@@ -25,21 +26,24 @@ import androidx.compose.foundation.layout.requiredSize
 import androidx.compose.foundation.layout.requiredWidth
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
+import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.itemsIndexed
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.runtime.Composable
 import androidx.compose.testutils.assertNoPendingChanges
 import androidx.compose.testutils.benchmark.ComposeBenchmarkRule
 import androidx.compose.testutils.doFramesUntilNoChangesPending
 import androidx.compose.testutils.ComposeTestCase
-import androidx.compose.ui.layout.Layout
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.layout.Remeasurement
-import androidx.compose.ui.layout.RemeasurementModifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.dp
 import androidx.test.filters.LargeTest
+import androidx.test.filters.SdkSuppress
+import kotlinx.coroutines.runBlocking
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -67,6 +71,9 @@ class LazyListScrollingBenchmark(
         }
     }
 
+    // this test makes sense only when run on the Android version which supports RenderNodes
+    // as this tests how efficiently we move RenderNodes.
+    @SdkSuppress(minSdkVersion = Build.VERSION_CODES.Q)
     @Test
     fun draw_notAddingNewItemsAsResult() {
         benchmarkRule.toggleStateBenchmarkDraw {
@@ -74,6 +81,9 @@ class LazyListScrollingBenchmark(
         }
     }
 
+    // this test makes sense only when run on the Android version which supports RenderNodes
+    // as this tests how efficiently we move RenderNodes.
+    @SdkSuppress(minSdkVersion = Build.VERSION_CODES.Q)
     @Test
     fun draw_addingNewItemAsResult() {
         benchmarkRule.toggleStateBenchmarkDraw {
@@ -98,17 +108,19 @@ class LazyListScrollingBenchmark(
 
 class LazyListScrollingTestCase(
     private val name: String,
-    val content: @Composable ListRemeasureTestCase.() -> Unit
+    val content: @Composable ListRemeasureTestCase.(LazyListState) -> Unit
 ) {
     override fun toString(): String {
         return name
     }
 }
 
-private val LazyColumnWithItemAndItems = LazyListScrollingTestCase("LazyColumnWithItemAndItems") {
-    LazyColumn(modifier = Modifier.requiredHeight(400.dp).fillMaxWidth()) {
+private val LazyColumnWithItemAndItems = LazyListScrollingTestCase(
+    "LazyColumnWithItemAndItems"
+) { state ->
+    LazyColumn(state = state, modifier = Modifier.requiredHeight(400.dp).fillMaxWidth()) {
         item {
-            RemeasurableItem()
+            FirstLargeItem()
         }
         items(items) {
             RegularItem()
@@ -116,11 +128,13 @@ private val LazyColumnWithItemAndItems = LazyListScrollingTestCase("LazyColumnWi
     }
 }
 
-private val LazyColumnWithItems = LazyListScrollingTestCase("LazyColumnWithItems") {
-    LazyColumn(modifier = Modifier.requiredHeight(400.dp).fillMaxWidth()) {
+private val LazyColumnWithItems = LazyListScrollingTestCase(
+    "LazyColumnWithItems"
+) { state ->
+    LazyColumn(state = state, modifier = Modifier.requiredHeight(400.dp).fillMaxWidth()) {
         items(items) {
             if (it.index == 0) {
-                RemeasurableItem()
+                FirstLargeItem()
             } else {
                 RegularItem()
             }
@@ -128,11 +142,13 @@ private val LazyColumnWithItems = LazyListScrollingTestCase("LazyColumnWithItems
     }
 }
 
-private val LazyColumnWithItemsIndexed = LazyListScrollingTestCase("LazyColumnWithItemsIndexed") {
-    LazyColumn(modifier = Modifier.requiredHeight(400.dp).fillMaxWidth()) {
+private val LazyColumnWithItemsIndexed = LazyListScrollingTestCase(
+    "LazyColumnWithItemsIndexed"
+) { state ->
+    LazyColumn(state = state, modifier = Modifier.requiredHeight(400.dp).fillMaxWidth()) {
         itemsIndexed(items) { index, _ ->
             if (index == 0) {
-                RemeasurableItem()
+                FirstLargeItem()
             } else {
                 RegularItem()
             }
@@ -140,10 +156,12 @@ private val LazyColumnWithItemsIndexed = LazyListScrollingTestCase("LazyColumnWi
     }
 }
 
-private val LazyRowWithItemAndItems = LazyListScrollingTestCase("LazyRowWithItemAndItems") {
-    LazyRow(modifier = Modifier.requiredWidth(400.dp).fillMaxHeight()) {
+private val LazyRowWithItemAndItems = LazyListScrollingTestCase(
+    "LazyRowWithItemAndItems"
+) { state ->
+    LazyRow(state = state, modifier = Modifier.requiredWidth(400.dp).fillMaxHeight()) {
         item {
-            RemeasurableItem()
+            FirstLargeItem()
         }
         items(items) {
             RegularItem()
@@ -151,11 +169,13 @@ private val LazyRowWithItemAndItems = LazyListScrollingTestCase("LazyRowWithItem
     }
 }
 
-private val LazyRowWithItems = LazyListScrollingTestCase("LazyRowWithItems") {
-    LazyRow(modifier = Modifier.requiredWidth(400.dp).fillMaxHeight()) {
+private val LazyRowWithItems = LazyListScrollingTestCase(
+    "LazyRowWithItems"
+) { state ->
+    LazyRow(state = state, modifier = Modifier.requiredWidth(400.dp).fillMaxHeight()) {
         items(items) {
             if (it.index == 0) {
-                RemeasurableItem()
+                FirstLargeItem()
             } else {
                 RegularItem()
             }
@@ -163,11 +183,13 @@ private val LazyRowWithItems = LazyListScrollingTestCase("LazyRowWithItems") {
     }
 }
 
-private val LazyRowWithItemsIndexed = LazyListScrollingTestCase("LazyRowWithItemsIndexed") {
-    LazyRow(modifier = Modifier.requiredWidth(400.dp).fillMaxHeight()) {
+private val LazyRowWithItemsIndexed = LazyListScrollingTestCase(
+    "LazyRowWithItemsIndexed"
+) { state ->
+    LazyRow(state = state, modifier = Modifier.requiredWidth(400.dp).fillMaxHeight()) {
         itemsIndexed(items) { index, _ ->
             if (index == 0) {
-                RemeasurableItem()
+                FirstLargeItem()
             } else {
                 RegularItem()
             }
@@ -188,7 +210,9 @@ private fun ComposeBenchmarkRule.toggleStateBenchmarkMeasure(
                 assertNoPendingChanges()
             }
             getTestCase().toggle()
-            assertNoPendingChanges()
+            runWithTimingDisabled {
+                assertNoPendingChanges()
+            }
         }
     }
 }
@@ -225,32 +249,24 @@ private fun ComposeBenchmarkRule.toggleStateBenchmarkDraw(
 
 class ListRemeasureTestCase(
     val addNewItemOnToggle: Boolean,
-    val content: @Composable ListRemeasureTestCase.() -> Unit
+    val content: @Composable ListRemeasureTestCase.(LazyListState) -> Unit
 ) : ComposeTestCase {
 
-    private var size = 25.dp
     val items = List(100) { ListItem(it) }
 
-    private var remeasurement: Remeasurement? = null
+    private lateinit var listState: LazyListState
+    private lateinit var density: Density
 
     @Composable
-    fun RemeasurableItem() {
-        Layout(
-            {},
-            modifier = object : RemeasurementModifier {
-                override fun onRemeasurementAvailable(remeasurement: Remeasurement) {
-                    this@ListRemeasureTestCase.remeasurement = remeasurement
-                }
-            }
-        ) { _, _ ->
-            val size = size.roundToPx()
-            layout(size, size) {}
-        }
+    fun FirstLargeItem() {
+        Box(Modifier.requiredSize(30.dp))
     }
 
     @Composable
     override fun Content() {
-        content()
+        density = LocalDensity.current
+        listState = rememberLazyListState()
+        content(listState)
     }
 
     @Composable
@@ -259,23 +275,26 @@ class ListRemeasureTestCase(
     }
 
     fun prepareForToggle() {
-        if (addNewItemOnToggle && size != 25.dp) {
-            size = 25.dp
-            remeasurement!!.forceRemeasure()
+        if (addNewItemOnToggle && listState.firstVisibleItemScrollOffset != 0) {
+            runBlocking {
+                listState.scrollToItem(0, 0)
+            }
         }
     }
 
     fun toggle() {
-        if (addNewItemOnToggle) {
-            size = 15.dp
+        val scrollTo = if (addNewItemOnToggle) {
+            with(density) { 15.dp.roundToPx() }
         } else {
-            if (size == 25.dp) {
-                size = 24.dp
+            if (listState.firstVisibleItemScrollOffset == 5) {
+                0
             } else {
-                size = 25.dp
+                5
             }
         }
-        remeasurement!!.forceRemeasure()
+        runBlocking {
+            listState.scrollToItem(0, scrollTo)
+        }
     }
 }
 

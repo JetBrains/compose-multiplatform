@@ -21,6 +21,9 @@ import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.layout.size
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.geometry.Size
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.drawscope.inset
 import androidx.compose.ui.graphics.drawscope.rotate
@@ -76,5 +79,29 @@ fun DrawScopeBatchedTransformSample() {
             }
             drawRect(Color.Red, alpha = 0.25f)
         }
+    }
+}
+
+@Sampled
+@Composable
+fun DrawScopeOvalBrushSample() {
+    Canvas(Modifier.size(120.dp)) {
+        drawOval(
+            brush = Brush.linearGradient(listOf(Color.Red, Color.Blue)),
+            topLeft = Offset(10f, 10f),
+            size = Size(size.width - 20f, size.height - 20f)
+        )
+    }
+}
+
+@Sampled
+@Composable
+fun DrawScopeOvalColorSample() {
+    Canvas(Modifier.size(120.dp)) {
+        drawOval(
+            color = Color.Cyan,
+            topLeft = Offset(10f, 10f),
+            size = Size(size.width - 20f, size.height - 20f)
+        )
     }
 }

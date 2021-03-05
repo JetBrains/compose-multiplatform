@@ -17,7 +17,6 @@
 package androidx.compose.foundation.text.selection
 
 import androidx.compose.foundation.text.isInTouchMode
-import androidx.compose.foundation.interaction.collectIsFocusedAsState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.DisposableEffect
@@ -97,8 +96,7 @@ internal fun SelectionContainer(
         // cross-composable selection.
         SimpleLayout(modifier = modifier.then(manager.modifier)) {
             children()
-            val isFocused = manager.interactionSource.collectIsFocusedAsState()
-            if (isInTouchMode && isFocused.value) {
+            if (isInTouchMode && manager.hasFocus) {
                 manager.selection?.let {
                     for (isStartHandle in listOf(true, false)) {
                         SelectionHandle(

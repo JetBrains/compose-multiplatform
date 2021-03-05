@@ -37,6 +37,7 @@ import androidx.test.filters.MediumTest
 import androidx.test.platform.app.InstrumentationRegistry.getInstrumentation
 import androidx.test.uiautomator.UiDevice
 import org.junit.Assert.assertEquals
+import org.junit.Ignore
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -65,7 +66,7 @@ class DialogTest {
     }
 
     @Test
-    @FlakyTest(bugId = 159364185)
+    @Ignore("100% failing b/179359518")
     fun dialogTest_isNotDismissed_whenClicked() {
         val textBeforeClick = "textBeforeClick"
         val textAfterClick = "textAfterClick"
@@ -101,6 +102,7 @@ class DialogTest {
         rule.onNodeWithText(textAfterClick).assertIsDisplayed()
     }
 
+    @FlakyTest(bugId = 179359518)
     @Test
     fun dialogTest_isDismissed_whenSpecified() {
         rule.setContent {

@@ -26,6 +26,7 @@ import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import androidx.test.filters.SmallTest
 import com.google.common.truth.Truth.assertThat
+import org.junit.Assert.assertEquals
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.junit.runners.Parameterized
@@ -182,6 +183,38 @@ class AbsoluteCutCornerShapeTest(val layoutDirection: LayoutDirection) {
                 )
             )
         ).isFalse()
+    }
+
+    @Test
+    fun copyHasCorrectDefaults() {
+        assertEquals(
+            AbsoluteCutCornerShape(
+                topLeft = 5.dp,
+                topRight = 6.dp,
+                bottomRight = 3.dp,
+                bottomLeft = 4.dp
+            ),
+            AbsoluteCutCornerShape(
+                topLeft = 1.dp,
+                topRight = 2.dp,
+                bottomRight = 3.dp,
+                bottomLeft = 4.dp
+            ).copy(topStart = CornerSize(5.dp), topEnd = CornerSize(6.dp))
+        )
+        assertEquals(
+            AbsoluteCutCornerShape(
+                topLeft = 1.dp,
+                topRight = 2.dp,
+                bottomRight = 5.dp,
+                bottomLeft = 6.dp
+            ),
+            AbsoluteCutCornerShape(
+                topLeft = 1.dp,
+                topRight = 2.dp,
+                bottomRight = 3.dp,
+                bottomLeft = 4.dp
+            ).copy(bottomEnd = CornerSize(5.dp), bottomStart = CornerSize(6.dp))
+        )
     }
 
     private fun Shape.toOutline() =

@@ -25,8 +25,11 @@ import androidx.compose.ui.inspection.util.toMap
 import androidx.test.filters.LargeTest
 import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.runBlocking
+import layoutinspector.compose.inspection.LayoutInspectorComposeProtocol.ComposableNode
+import layoutinspector.compose.inspection.LayoutInspectorComposeProtocol.GetComposablesResponse
 import layoutinspector.compose.inspection.LayoutInspectorComposeProtocol.GetParametersResponse
 import layoutinspector.compose.inspection.LayoutInspectorComposeProtocol.Parameter
+import org.junit.Ignore
 import org.junit.Rule
 import org.junit.Test
 
@@ -36,36 +39,55 @@ class ParametersTest {
     val rule = ComposeInspectionRule(ParametersTestActivity::class)
 
     @Test
+    fun resource(): Unit = runBlocking {
+        val composables = rule.inspectorTester.sendCommand(GetComposablesCommand(rule.rootId))
+            .getComposablesResponse
+
+        val text = composables.filter("Text").first()
+        val params = rule.inspectorTester.sendCommand(GetParametersCommand(rule.rootId, text.id))
+            .getParametersResponse
+
+        val resourceValue = params.find("fontFamily")!!.resourceValue
+        assertThat(resourceValue.type.resolve(params)).isEqualTo("font")
+        assertThat(resourceValue.namespace.resolve(params))
+            .isEqualTo("androidx.compose.ui.inspection.test")
+        assertThat(resourceValue.name.resolve(params)).isEqualTo("samplefont")
+    }
+
+    @Ignore // Will re-enable after platform bug is fixed upstream
+    @Test
     fun lambda(): Unit = runBlocking {
         val composables = rule.inspectorTester.sendCommand(GetComposablesCommand(rule.rootId))
             .getComposablesResponse
-        // first button's id
-        val buttonId = composables.rootsList[0]!!.nodesList[0]!!.childrenList[0]!!.id
+
+        val buttons = composables.filter("Button")
+        val buttonId = buttons.first().id
         val params = rule.inspectorTester.sendCommand(GetParametersCommand(rule.rootId, buttonId))
             .getParametersResponse
 
         val lambdaValue = params.find("onClick")!!.lambdaValue
         assertThat(lambdaValue.fileName.resolve(params)).isEqualTo("ParametersTestActivity.kt")
-        assertThat(lambdaValue.startLineNumber).isEqualTo(29)
-        assertThat(lambdaValue.endLineNumber).isEqualTo(29)
+        assertThat(lambdaValue.startLineNumber).isEqualTo(47)
+        assertThat(lambdaValue.endLineNumber).isEqualTo(47)
         assertThat(lambdaValue.packageName.resolve(params))
             .isEqualTo("androidx.compose.ui.inspection.testdata")
     }
 
+    @Ignore // Will re-enable after platform bug is fixed upstream
     @Test
     fun functionType(): Unit = runBlocking {
         val composables = rule.inspectorTester.sendCommand(GetComposablesCommand(rule.rootId))
             .getComposablesResponse
 
-        // second's button id
-        val buttonId = composables.rootsList[0]!!.nodesList[0]!!.childrenList[1]!!.id
+        val buttons = composables.filter("Button")
+        val buttonId = buttons.last().id
         val params = rule.inspectorTester.sendCommand(GetParametersCommand(rule.rootId, buttonId))
             .getParametersResponse
 
         val lambdaValue = params.find("onClick")!!.lambdaValue
         assertThat(lambdaValue.fileName.resolve(params)).isEqualTo("ParametersTestActivity.kt")
-        assertThat(lambdaValue.startLineNumber).isEqualTo(32)
-        assertThat(lambdaValue.endLineNumber).isEqualTo(32)
+        assertThat(lambdaValue.startLineNumber).isEqualTo(50)
+        assertThat(lambdaValue.endLineNumber).isEqualTo(50)
         assertThat(lambdaValue.functionName.resolve(params)).isEqualTo("testClickHandler")
         assertThat(lambdaValue.packageName.resolve(params))
             .isEqualTo("androidx.compose.ui.inspection.testdata")
@@ -82,3 +104,13 @@ private fun GetParametersResponse.find(name: String): Parameter? {
         strings[it.name] == name
     }
 }
+
+private fun GetComposablesResponse.filter(name: String): List<ComposableNode> {
+    val strings = stringsList.toMap()
+    return rootsList.flatMap { it.nodesList }.flatMap { it.flatten() }.filter {
+        strings[it.name] == name
+    }
+}
+
+private fun ComposableNode.flatten(): List<ComposableNode> =
+    listOf(this).plus(this.childrenList.flatMap { it.flatten() })

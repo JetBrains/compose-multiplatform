@@ -21,6 +21,8 @@ import androidx.compose.animation.core.LinearOutSlowInEasing
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.requiredSize
+import androidx.compose.foundation.layout.size
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -32,6 +34,7 @@ import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.test.ExperimentalTestApi
 import androidx.compose.ui.test.junit4.createComposeRule
+import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
@@ -273,6 +276,45 @@ class AnimatedVisibilityTest {
             assertEquals(animY, offset.y, 2f)
             rule.mainClock.advanceTimeBy(frameDuration.toLong())
             rule.waitForIdle()
+        }
+    }
+
+    @OptIn(ExperimentalAnimationApi::class)
+    @Test
+    fun animateVisibilityContentSizeChangeTest() {
+        val size = mutableStateOf(40.dp)
+        val testModifier by mutableStateOf(TestModifier())
+        var visible by mutableStateOf(true)
+        rule.setContent {
+            CompositionLocalProvider(LocalDensity provides Density(1f)) {
+                AnimatedVisibility(visible, testModifier) {
+                    Box(modifier = Modifier.size(size = size.value))
+                }
+            }
+        }
+        rule.runOnIdle {
+            assertEquals(40, testModifier.height)
+            assertEquals(40, testModifier.width)
+            size.value = 60.dp
+        }
+        rule.runOnIdle {
+            assertEquals(60, testModifier.height)
+            assertEquals(60, testModifier.width)
+        }
+        rule.runOnIdle {
+            visible = false
+        }
+        rule.runOnIdle {
+            visible = true
+        }
+        rule.runOnIdle {
+            assertEquals(60, testModifier.height)
+            assertEquals(60, testModifier.width)
+            size.value = 30.dp
+        }
+        rule.runOnIdle {
+            assertEquals(30, testModifier.height)
+            assertEquals(30, testModifier.width)
         }
     }
 }

@@ -24,8 +24,6 @@ import androidx.compose.ui.graphics.imageFromResource
 /**
  * Synchronously load an image file stored in resources for the application.
  *
- * Note: This API is transient and will be likely removed for encouraging async resource loading.
- *
  * @param path path to the image file
  * @return the decoded image data associated with the resource
  */

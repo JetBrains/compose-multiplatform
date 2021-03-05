@@ -26,18 +26,17 @@ plugins {
 }
 
 dependencies {
-    kotlinPlugin projectOrArtifact(":compose:compiler:compiler")
+    kotlinPlugin(projectOrArtifact(":compose:compiler:compiler"))
 
     // TODO: remove / refactor out reflection dependencies, this is a large dependency to bundle
     // with a library.
     implementation(KOTLIN_REFLECT)
     implementation(KOTLIN_STDLIB)
 
-    api "androidx.annotation:annotation:1.1.0"
+    api("androidx.annotation:annotation:1.1.0")
 
-    implementation projectOrArtifact(":compose:runtime:runtime")
-    implementation projectOrArtifact(":compose:ui:ui")
-    implementation projectOrArtifact(":compose:ui:ui-test-junit4")
+    implementation(projectOrArtifact(":compose:runtime:runtime"))
+    implementation(projectOrArtifact(":compose:ui:ui"))
 
     testImplementation(ANDROIDX_TEST_RULES)
     testImplementation(ANDROIDX_TEST_RUNNER)

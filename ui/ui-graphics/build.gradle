@@ -37,11 +37,11 @@ if(!AndroidXUiPlugin.isMultiplatformEnabled(project)) {
          * corresponding block below
          */
 
-        api "androidx.annotation:annotation:1.1.0"
-        api project(":compose:ui:ui-unit")
+        api("androidx.annotation:annotation:1.2.0-beta01")
+        api(project(":compose:ui:ui-unit"))
 
-        implementation project(":compose:runtime:runtime")
-        implementation project(":compose:ui:ui-util")
+        implementation(project(":compose:runtime:runtime"))
+        implementation(project(":compose:ui:ui-util"))
         implementation(KOTLIN_STDLIB_COMMON)
 
         testImplementation(ANDROIDX_TEST_RULES)
@@ -49,9 +49,9 @@ if(!AndroidXUiPlugin.isMultiplatformEnabled(project)) {
         testImplementation(JUNIT)
         testImplementation(TRUTH)
 
-        androidTestImplementation project(":compose:ui:ui-graphics:ui-graphics-samples")
-        androidTestImplementation project(":compose:ui:ui-test-junit4")
-        androidTestImplementation project(":compose:test-utils")
+        androidTestImplementation(project(":compose:ui:ui-graphics:ui-graphics-samples"))
+        androidTestImplementation(project(":compose:ui:ui-test-junit4"))
+        androidTestImplementation(project(":compose:test-utils"))
         androidTestImplementation(ANDROIDX_TEST_RULES)
         androidTestImplementation(ANDROIDX_TEST_RUNNER)
         androidTestImplementation(ESPRESSO_CORE)
@@ -74,13 +74,13 @@ if(AndroidXUiPlugin.isMultiplatformEnabled(project)) {
             commonMain.dependencies {
                 implementation(KOTLIN_STDLIB_COMMON)
 
-                api project(":compose:ui:ui-unit")
-                implementation project(":compose:runtime:runtime")
-                implementation project(":compose:ui:ui-util")
+                api(project(":compose:ui:ui-unit"))
+                implementation(project(":compose:runtime:runtime"))
+                implementation(project(":compose:ui:ui-util"))
             }
 
             androidMain.dependencies {
-                api "androidx.annotation:annotation:1.1.0"
+                api("androidx.annotation:annotation:1.2.0-beta01")
             }
 
             desktopMain.dependencies {
@@ -96,9 +96,9 @@ if(AndroidXUiPlugin.isMultiplatformEnabled(project)) {
             }
 
             androidAndroidTest.dependencies {
-                implementation project(":compose:ui:ui-graphics:ui-graphics-samples")
-                implementation project(":compose:ui:ui-test-junit4")
-                implementation project(":compose:test-utils")
+                implementation(project(":compose:ui:ui-graphics:ui-graphics-samples"))
+                implementation(project(":compose:ui:ui-test-junit4"))
+                implementation(project(":compose:test-utils"))
                 implementation(ANDROIDX_TEST_RULES)
                 implementation(ANDROIDX_TEST_RUNNER)
                 implementation(ESPRESSO_CORE)
@@ -108,7 +108,7 @@ if(AndroidXUiPlugin.isMultiplatformEnabled(project)) {
             desktopTest {
                 resources.srcDirs += "src/desktopTest/res"
                 dependencies {
-                    implementation project(":compose:ui:ui-test-junit4")
+                    implementation(project(":compose:ui:ui-test-junit4"))
                     implementation(JUNIT)
                     implementation(TRUTH)
                     implementation(SKIKO_CURRENT_OS)
@@ -129,7 +129,7 @@ androidx {
 
 if(AndroidXUiPlugin.isMultiplatformEnabled(project)) {
     tasks.findByName("desktopTest").configure {
-        systemProperties['GOLDEN_PATH'] = project.rootDir.absolutePath + "/../../golden"
+        systemProperties["GOLDEN_PATH"] = project.rootDir.absolutePath + "/../../golden"
     }
 }
 

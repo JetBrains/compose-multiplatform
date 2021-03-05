@@ -31,9 +31,12 @@ internal class OuterMeasurablePlaceable(
 ) : Measurable, Placeable() {
 
     private var measuredOnce = false
-    val lastConstraints: Constraints? get() = if (measuredOnce) measurementConstraints else null
-    var lastPosition: IntOffset? = null
-        private set
+    private var placedOnce = false
+    val lastConstraints: Constraints get() {
+        check(measuredOnce)
+        return measurementConstraints
+    }
+    private var lastPosition: IntOffset = IntOffset.Zero
     private var lastLayerBlock: (GraphicsLayerScope.() -> Unit)? = null
     private val lastProvidedAlignmentLines = mutableMapOf<AlignmentLine, Int>()
     private var lastZIndex: Float = 0f
@@ -121,6 +124,7 @@ internal class OuterMeasurablePlaceable(
         zIndex: Float,
         layerBlock: (GraphicsLayerScope.() -> Unit)?
     ) {
+        placedOnce = true
         lastPosition = position
         lastZIndex = zIndex
         lastLayerBlock = layerBlock
@@ -137,7 +141,8 @@ internal class OuterMeasurablePlaceable(
      * Calls [placeAt] with the same position used during the last [placeAt] call
      */
     fun replace() {
-        placeAt(checkNotNull(lastPosition), lastZIndex, lastLayerBlock)
+        check(placedOnce)
+        placeAt(lastPosition, lastZIndex, lastLayerBlock)
     }
 
     override fun minIntrinsicWidth(height: Int): Int = outerWrapper.minIntrinsicWidth(height)

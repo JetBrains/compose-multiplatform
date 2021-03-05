@@ -16,8 +16,8 @@
 
 package androidx.compose.ui.test
 
-import androidx.compose.ui.layout.AlignmentLine
 import androidx.compose.ui.geometry.Rect
+import androidx.compose.ui.layout.AlignmentLine
 import androidx.compose.ui.semantics.SemanticsNode
 import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.Dp
@@ -73,22 +73,6 @@ fun SemanticsNodeInteraction.assertHeightIsAtLeast(
 }
 
 /**
-* Returns the bounds of the layout of this node. The bounds are relative to the root composable.
-*/
-fun SemanticsNodeInteraction.getUnclippedBoundsInRoot(): DpRect {
-    lateinit var bounds: DpRect
-    withUnclippedBoundsInRoot {
-        bounds = DpRect(
-            left = it.left.toDp(),
-            top = it.top.toDp(),
-            right = it.right.toDp(),
-            bottom = it.bottom.toDp()
-        )
-    }
-    return bounds
-}
-
-/**
  * Asserts that the layout of this node has position in the root composable that is equal to the
  * given position.
  *
@@ -140,6 +124,22 @@ fun SemanticsNodeInteraction.assertLeftPositionInRootIsEqualTo(
 }
 
 /**
+ * Returns the bounds of the layout of this node. The bounds are relative to the root composable.
+ */
+fun SemanticsNodeInteraction.getUnclippedBoundsInRoot(): DpRect {
+    lateinit var bounds: DpRect
+    withUnclippedBoundsInRoot {
+        bounds = DpRect(
+            left = it.left.toDp(),
+            top = it.top.toDp(),
+            right = it.right.toDp(),
+            bottom = it.bottom.toDp()
+        )
+    }
+    return bounds
+}
+
+/**
  * Returns the position of an [alignment line][AlignmentLine], or [Dp.Unspecified] if the line is
  * not provided.
  */
@@ -178,18 +178,28 @@ private fun Dp.assertIsEqualTo(expected: Dp, subject: String = "", tolerance: Dp
     }
 }
 
-internal val SemanticsNode.unclippedBoundsInRoot: Rect
+private fun <R> SemanticsNodeInteraction.withDensity(
+    operation: Density.(SemanticsNode) -> R
+): R {
+    val node = fetchSemanticsNode("Failed to retrieve density for the node.")
+    val density = node.root!!.density
+    return operation.invoke(density, node)
+}
+
+private fun SemanticsNodeInteraction.withUnclippedBoundsInRoot(
+    assertion: Density.(Rect) -> Unit
+): SemanticsNodeInteraction {
+    val node = fetchSemanticsNode("Failed to retrieve bounds of the node.")
+    val density = node.root!!.density
+
+    assertion.invoke(density, node.unclippedBoundsInRoot)
+    return this
+}
+
+private val SemanticsNode.unclippedBoundsInRoot: Rect
     get() {
         return Rect(positionInRoot, size.toSize())
     }
-
-internal expect fun <R> SemanticsNodeInteraction.withDensity(
-    operation: Density.(SemanticsNode) -> R
-): R
-
-internal expect fun SemanticsNodeInteraction.withUnclippedBoundsInRoot(
-    assertion: Density.(Rect) -> Unit
-): SemanticsNodeInteraction
 
 private fun Density.isAtLeastOrThrow(
     subject: String,

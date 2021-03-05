@@ -30,7 +30,7 @@ plugins {
 AndroidXUiPlugin.applyAndConfigureKotlinPlugin(project)
 
 dependencies {
-    kotlinPlugin project(":compose:compiler:compiler")
+    kotlinPlugin(project(":compose:compiler:compiler"))
 
     if(!AndroidXUiPlugin.isMultiplatformEnabled(project)) {
         /*
@@ -38,22 +38,22 @@ dependencies {
          * corresponding block below
          */
 
-        api "androidx.annotation:annotation:1.1.0"
-        api project(":compose:animation:animation-core")
-        api project(":compose:foundation:foundation-layout")
-        api project(":compose:runtime:runtime")
-        api project(":compose:ui:ui")
-        api project(":compose:ui:ui-geometry")
+        api("androidx.annotation:annotation:1.1.0")
+        api(project(":compose:animation:animation-core"))
+        api(project(":compose:foundation:foundation-layout"))
+        api(project(":compose:runtime:runtime"))
+        api(project(":compose:ui:ui"))
+        api(project(":compose:ui:ui-geometry"))
 
-        implementation project(":compose:ui:ui-util")
+        implementation(project(":compose:ui:ui-util"))
         implementation(KOTLIN_STDLIB_COMMON)
 
         testImplementation(ANDROIDX_TEST_RULES)
         testImplementation(ANDROIDX_TEST_RUNNER)
         testImplementation(JUNIT)
 
-        androidTestImplementation project(":compose:foundation:foundation")
-        androidTestImplementation project(":compose:ui:ui-test-junit4")
+        androidTestImplementation(project(":compose:foundation:foundation"))
+        androidTestImplementation(project(":compose:ui:ui-test-junit4"))
         androidTestImplementation(ANDROIDX_TEST_RULES)
         androidTestImplementation(ANDROIDX_TEST_RUNNER)
         androidTestImplementation(JUNIT)
@@ -73,17 +73,17 @@ if(AndroidXUiPlugin.isMultiplatformEnabled(project)) {
             commonMain.dependencies {
                 implementation(KOTLIN_STDLIB_COMMON)
 
-                api project(":compose:animation:animation-core")
-                api project(":compose:foundation:foundation-layout")
-                api project(":compose:runtime:runtime")
-                api project(":compose:ui:ui")
-                api project(":compose:ui:ui-geometry")
+                api(project(":compose:animation:animation-core"))
+                api(project(":compose:foundation:foundation-layout"))
+                api(project(":compose:runtime:runtime"))
+                api(project(":compose:ui:ui"))
+                api(project(":compose:ui:ui-geometry"))
 
-                implementation project(":compose:ui:ui-util")
+                implementation(project(":compose:ui:ui-util"))
             }
 
             androidMain.dependencies {
-                api "androidx.annotation:annotation:1.1.0"
+                api("androidx.annotation:annotation:1.1.0")
             }
 
             desktopMain.dependencies {
@@ -100,8 +100,8 @@ if(AndroidXUiPlugin.isMultiplatformEnabled(project)) {
                 implementation(ANDROIDX_TEST_RULES)
                 implementation(ANDROIDX_TEST_RUNNER)
                 implementation(JUNIT)
-                implementation project(":compose:foundation:foundation")
-                implementation project(":compose:ui:ui-test-junit4")
+                implementation(project(":compose:foundation:foundation"))
+                implementation(project(":compose:ui:ui-test-junit4"))
             }
         }
     }

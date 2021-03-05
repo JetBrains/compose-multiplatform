@@ -40,6 +40,18 @@ import java.util.concurrent.CountDownLatch
 import java.util.concurrent.TimeUnit
 import kotlin.reflect.KClass
 
+/**
+ * Test rule with common setup for compose inspector's tests:
+ * - it enables JVMTI;
+ * - starts a [clazz] activity;
+ * - enables inspection mode in compose in this activity;
+ * - starts a compose inspector itself if [useInspector] is `true`
+ *
+ * @param clazz an activity to start for a test
+ * @param useInspector parameter to enable / disable creation of inspector itself. By default,
+ * it is true. However a test may not need an inspector because it works with underlying infra,
+ * in such cases `false` can be passed to speed up test a bit.
+ */
 class ComposeInspectionRule(
     val clazz: KClass<out ComponentActivity>,
     private val useInspector: Boolean = true

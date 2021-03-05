@@ -27,15 +27,15 @@ plugins {
 }
 
 dependencies {
-    kotlinPlugin project(":compose:compiler:compiler")
+    kotlinPlugin(project(":compose:compiler:compiler"))
 
     implementation(KOTLIN_STDLIB)
 
-    api project(":compose:runtime:runtime")
-    api "androidx.lifecycle:lifecycle-livedata:2.2.0"
-    implementation project(":compose:ui:ui")
+    api(project(":compose:runtime:runtime"))
+    api("androidx.lifecycle:lifecycle-livedata:2.2.0")
+    implementation(project(":compose:ui:ui"))
 
-    androidTestImplementation project(":compose:ui:ui-test-junit4")
+    androidTestImplementation(project(":compose:ui:ui-test-junit4"))
     androidTestImplementation(ANDROIDX_TEST_RUNNER)
     androidTestImplementation(JUNIT)
     androidTestImplementation(TRUTH)

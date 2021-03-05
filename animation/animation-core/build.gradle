@@ -31,7 +31,7 @@ plugins {
 AndroidXUiPlugin.applyAndConfigureKotlinPlugin(project)
 
 dependencies {
-    kotlinPlugin project(":compose:compiler:compiler")
+    kotlinPlugin(project(":compose:compiler:compiler"))
 
     if (!AndroidXUiPlugin.isMultiplatformEnabled(project)) {
         /*
@@ -39,11 +39,11 @@ dependencies {
          * corresponding block below
          */
 
-        api "androidx.annotation:annotation:1.1.0"
+        api("androidx.annotation:annotation:1.1.0")
 
-        implementation project(":compose:runtime:runtime")
-        implementation project(":compose:ui:ui-unit")
-        implementation project(":compose:ui:ui-util")
+        implementation(project(":compose:runtime:runtime"))
+        implementation(project(":compose:ui:ui-unit"))
+        implementation(project(":compose:ui:ui-util"))
         implementation(KOTLIN_STDLIB)
         api(KOTLIN_COROUTINES_CORE)
 
@@ -73,14 +73,14 @@ if (AndroidXUiPlugin.isMultiplatformEnabled(project)) {
          */
         sourceSets {
             commonMain.dependencies {
-                implementation project(":compose:runtime:runtime")
-                implementation project(":compose:ui:ui-unit")
-                implementation project(":compose:ui:ui-util")
+                implementation(project(":compose:runtime:runtime"))
+                implementation(project(":compose:ui:ui-unit"))
+                implementation(project(":compose:ui:ui-util"))
                 implementation(KOTLIN_STDLIB_COMMON)
                 api(KOTLIN_COROUTINES_CORE)
             }
             androidMain.dependencies {
-                api "androidx.annotation:annotation:1.1.0"
+                api("androidx.annotation:annotation:1.1.0")
                 implementation(KOTLIN_STDLIB)
             }
             desktopMain.dependencies {
@@ -100,8 +100,8 @@ if (AndroidXUiPlugin.isMultiplatformEnabled(project)) {
                 implementation(ANDROIDX_TEST_RUNNER)
                 implementation(ANDROIDX_TEST_CORE)
                 implementation(JUNIT)
-                implementation project(":compose:animation:animation")
-                implementation project(":compose:ui:ui-test-junit4")
+                implementation(project(":compose:animation:animation"))
+                implementation(project(":compose:ui:ui-test-junit4"))
             }
         }
     }

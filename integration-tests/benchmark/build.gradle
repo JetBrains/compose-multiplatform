@@ -26,38 +26,29 @@ plugins {
 }
 
 dependencies {
-    kotlinPlugin project(":compose:compiler:compiler")
+    kotlinPlugin(project(":compose:compiler:compiler"))
 
-    implementation project(":benchmark:benchmark-junit4")
-    implementation project(":benchmark:benchmark-macro-junit4")
-    implementation project(":compose:foundation:foundation-layout")
-    implementation project(":compose:integration-tests")
-    implementation project(":compose:runtime:runtime")
-    implementation project(":compose:ui:ui-test-junit4")
+    implementation(project(":benchmark:benchmark-junit4"))
+    implementation(project(":benchmark:benchmark-macro-junit4"))
+    implementation(project(":compose:foundation:foundation-layout"))
+    implementation(project(":compose:integration-tests"))
+    implementation(project(":compose:runtime:runtime"))
+    implementation(project(":compose:ui:ui-test-junit4"))
     implementation(KOTLIN_STDLIB)
     implementation(KOTLIN_REFLECT)
     implementation(ANDROIDX_TEST_RULES)
     implementation(JUNIT)
     implementation(TRUTH)
 
-    androidTestImplementation project(":compose:foundation:foundation-layout")
-    androidTestImplementation project(":compose:foundation:foundation")
-    androidTestImplementation project(":compose:material:material")
-    androidTestImplementation project(":compose:runtime:runtime")
-    androidTestImplementation project(":compose:test-utils")
-    androidTestImplementation project(":compose:ui:ui")
-    androidTestImplementation project(":activity:activity-compose")
+    androidTestImplementation(project(":compose:foundation:foundation-layout"))
+    androidTestImplementation(project(":compose:foundation:foundation"))
+    androidTestImplementation(project(":compose:material:material"))
+    androidTestImplementation(project(":compose:runtime:runtime"))
+    androidTestImplementation(project(":compose:test-utils"))
+    androidTestImplementation(project(":compose:ui:ui"))
+    androidTestImplementation(project(":activity:activity-compose"))
     androidTestImplementation(ANDROIDX_TEST_EXT_JUNIT)
     androidTestImplementation(KOTLIN_TEST_COMMON)
     androidTestImplementation(ANDROIDX_TEST_RULES)
     androidTestImplementation(TRUTH)
 }
-
-androidx {
-    name = "Compose Benchmarks"
-    publish = Publish.NONE
-    inceptionYear = "2019"
-    description = "Compose Benchmarks"
-}
-
-android.defaultConfig.minSdkVersion 21

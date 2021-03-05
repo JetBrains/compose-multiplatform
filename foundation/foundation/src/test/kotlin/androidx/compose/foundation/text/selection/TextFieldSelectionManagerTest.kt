@@ -74,7 +74,7 @@ class TextFieldSelectionManagerTest {
     private val dragTextRange = TextRange("Hello".length + 1, text.length)
     private val layoutResult: TextLayoutResult = mock()
     private val layoutResultProxy: TextLayoutResultProxy = mock()
-    private val manager = TextFieldSelectionManager()
+    private lateinit var manager: TextFieldSelectionManager
 
     private val clipboardManager = mock<ClipboardManager>()
     private val textToolbar = mock<TextToolbar>()
@@ -84,6 +84,7 @@ class TextFieldSelectionManagerTest {
     @OptIn(InternalFoundationTextApi::class)
     @Before
     fun setup() {
+        manager = TextFieldSelectionManager()
         manager.offsetMapping = offsetMapping
         manager.onValueChange = lambda
         manager.value = value
@@ -116,10 +117,15 @@ class TextFieldSelectionManagerTest {
         whenever(layoutResult.getBoundingBox(any())).thenReturn(Rect.Zero)
         // left or right handle drag
         whenever(layoutResult.getOffsetForPosition(dragBeginPosition)).thenReturn(beginOffset)
-        whenever(layoutResult.getOffsetForPosition(dragDistance)).thenReturn(dragOffset)
+        whenever(layoutResult.getOffsetForPosition(dragBeginPosition + dragDistance))
+            .thenReturn(dragOffset)
         // touch drag
-        whenever(layoutResultProxy.getOffsetForPosition(dragBeginPosition)).thenReturn(beginOffset)
-        whenever(layoutResultProxy.getOffsetForPosition(dragDistance)).thenReturn(dragOffset)
+        whenever(
+            layoutResultProxy.getOffsetForPosition(dragBeginPosition, false)
+        ).thenReturn(beginOffset)
+        whenever(
+            layoutResultProxy.getOffsetForPosition(dragBeginPosition + dragDistance, false)
+        ).thenReturn(dragOffset)
 
         whenever(layoutResultProxy.value).thenReturn(layoutResult)
 

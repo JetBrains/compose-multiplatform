@@ -19,20 +19,21 @@
 
 package androidx.compose.integration.docs.testing
 
-import android.view.KeyEvent as AndroidKeyEvent
-import android.view.KeyEvent.KEYCODE_A as KeyCodeA
-import android.view.KeyEvent.ACTION_DOWN as ActionDown
 import androidx.activity.ComponentActivity
 import androidx.compose.foundation.layout.RowScope
+import androidx.compose.integration.docs.testing.TestingSemanticsSnippets1.PickedDateKey
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.key.KeyEvent
 import androidx.compose.ui.semantics.AccessibilityAction
 import androidx.compose.ui.semantics.SemanticsPropertyKey
+import androidx.compose.ui.semantics.SemanticsPropertyReceiver
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.test.IdlingResource
 import androidx.compose.ui.test.SemanticsMatcher
 import androidx.compose.ui.test.SemanticsNodeInteraction
 import androidx.compose.ui.test.assert
@@ -61,11 +62,19 @@ import androidx.compose.ui.test.performKeyPress
 import androidx.compose.ui.test.performSemanticsAction
 import androidx.compose.ui.test.printToLog
 import androidx.compose.ui.test.swipeLeft
+import androidx.test.espresso.Espresso
+import androidx.test.espresso.assertion.ViewAssertions.matches
+import androidx.test.espresso.matcher.ViewMatchers.isDisplayed
+import androidx.test.espresso.matcher.ViewMatchers.withText
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
+import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
+import android.view.KeyEvent as AndroidKeyEvent
+import android.view.KeyEvent.ACTION_DOWN as ActionDown
+import android.view.KeyEvent.KEYCODE_A as KeyCodeA
 
 /**
  * This file lets DevRel track changes to snippets present in
@@ -184,6 +193,75 @@ private object TestingSnippet3 {
         .assert(hasText("John"))
 }
 
+private object TestingSyncSnippets1 {
+    @Test
+    fun counterTest() {
+        val myCounter = mutableStateOf(0) // State that can cause recompositions
+        var lastSeenValue = 0 // Used to track recompositions
+        composeTestRule.setContent {
+            Text(myCounter.value.toString())
+            lastSeenValue = myCounter.value
+        }
+        myCounter.value = 1 // The state changes, but there is no recomposition
+
+        // Fails because nothing triggered a recomposition
+        assertTrue(lastSeenValue == 1)
+
+        // Passes because the assertion triggers recomposition
+        composeTestRule.onNodeWithText("1").assertExists()
+    }
+}
+
+private fun TestingSyncSnippets2And3() {
+    composeTestRule.mainClock.autoAdvance = false
+
+    composeTestRule.mainClock.advanceTimeByFrame()
+    composeTestRule.mainClock.advanceTimeBy(milliseconds)
+}
+
+private fun TestingSyncSnippets4() {
+    composeTestRule.registerIdlingResource(idlingResource)
+    composeTestRule.unregisterIdlingResource(idlingResource)
+}
+
+private fun TestingSyncSnippets5() {
+    composeTestRule.mainClock.autoAdvance = true // default
+    composeTestRule.waitForIdle() // Advances the clock until Compose is idle
+
+    composeTestRule.mainClock.autoAdvance = false
+    composeTestRule.waitForIdle() // Only waits for Idling Resources to become idle
+}
+
+private fun TestingSyncSnippets6and7() {
+    composeTestRule.mainClock.advanceTimeUntil(timeoutMs) { condition }
+
+    composeTestRule.waitUntil(timeoutMs) { condition }
+}
+
+private object TestingSemanticsSnippets1 {
+    // Creates a Semantics property of type boolean
+    val PickedDateKey = SemanticsPropertyKey<Long>("PickedDate")
+    var SemanticsPropertyReceiver.pickedDate by PickedDateKey
+}
+
+private fun TestingSemanticsSnippets2() {
+    composeTestRule
+        .onNode(SemanticsMatcher.expectValue(PickedDateKey, 1445378400)) // 2015-10-21
+        .assertExists()
+}
+
+private object TestingSemanticsSnippet3 {
+    @Test
+    fun androidViewInteropTest() {
+        // Check the initial state of a TextView that depends on a Compose state:
+        Espresso.onView(withText("Hello Views")).check(matches(isDisplayed()))
+        // Click on the Compose button that changes the state
+        composeTestRule.onNodeWithText("Click here").performClick()
+        // Check the new value
+        Espresso.onView(withText("Hello Compose")).check(matches(isDisplayed()))
+    }
+}
+
 @OptIn(ExperimentalCoroutinesApi::class)
 private object TestingSnippets13 {
     class MyTest() {
@@ -230,3 +308,10 @@ private class MyActivity : ComponentActivity()
 @Composable private fun MyButton(content: @Composable RowScope.() -> Unit) { }
 private lateinit var key: SemanticsPropertyKey<AccessibilityAction<() -> Boolean>>
 private var keyEvent = KeyEvent(AndroidKeyEvent(ActionDown, KeyCodeA))
+private const val milliseconds = 10L
+private const val timeoutMs = 10L
+private val idlingResource = object : IdlingResource {
+    override val isIdleNow: Boolean
+        get() = TODO("Stub!")
+}
+private val condition = true

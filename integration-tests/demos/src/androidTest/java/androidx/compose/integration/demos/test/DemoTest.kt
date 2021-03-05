@@ -16,11 +16,9 @@
 
 package androidx.compose.integration.demos.test
 
-import androidx.compose.androidview.demos.ComposeInAndroidDialogDismissDialogDuringDispatch
 import androidx.compose.integration.demos.AllDemosCategory
 import androidx.compose.integration.demos.DemoActivity
 import androidx.compose.integration.demos.Tags
-import androidx.compose.integration.demos.common.ActivityDemo
 import androidx.compose.integration.demos.common.ComposableDemo
 import androidx.compose.integration.demos.common.Demo
 import androidx.compose.integration.demos.common.DemoCategory
@@ -42,7 +40,6 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.LargeTest
 import androidx.test.filters.MediumTest
 import com.google.common.truth.Truth.assertThat
-import org.junit.Ignore
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -95,7 +92,6 @@ class DemoTest {
     }
 
     @Test
-    @Ignore("b/179339732")
     fun navigateThroughAllDemos_2() {
         navigateThroughAllDemos(SplitDemoCategories[1])
     }
@@ -177,17 +173,9 @@ class DemoTest {
             fastForwardClock()
         }
 
-        // TODO: b/165693257 demos without a compose view crash as onAllNodes will fail to
-        // find the semantic nodes.
-        val hasComposeView: Boolean = (this as? ActivityDemo<*>)
-            ?.activityClass != ComposeInAndroidDialogDismissDialogDuringDispatch::class
-
-        if (hasComposeView) {
+        while (rule.onAllNodes(isDialog()).isNotEmpty()) {
             rule.waitForIdle()
-            while (rule.onAllNodes(isDialog()).isNotEmpty()) {
-                rule.waitForIdle()
-                Espresso.pressBack()
-            }
+            Espresso.pressBack()
         }
 
         rule.waitForIdle()
@@ -218,7 +206,7 @@ class DemoTest {
         rule.onNodeWithTag(Tags.AppBarTitle).assertTextEquals(title)
 
     private fun SemanticsNodeInteractionCollection.isNotEmpty(): Boolean {
-        return fetchSemanticsNodes().isNotEmpty()
+        return fetchSemanticsNodes(atLeastOneRootRequired = false).isNotEmpty()
     }
 }
 

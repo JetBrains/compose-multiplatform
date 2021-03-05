@@ -27,11 +27,11 @@ plugins {
 }
 
 dependencies {
-    kotlinPlugin project(":compose:compiler:compiler")
+    kotlinPlugin(project(":compose:compiler:compiler"))
 
     implementation(KOTLIN_STDLIB)
 
-    api "androidx.annotation:annotation:1.1.0"
+    api("androidx.annotation:annotation:1.1.0")
 
     api(project(":compose:runtime:runtime"))
     api(project(":compose:ui:ui"))
@@ -43,13 +43,13 @@ dependencies {
     compileOnly(project(":ui:ui-animation-tooling-internal"))
     compileOnly(KOTLIN_REFLECT)
 
-    androidTestImplementation project(":compose:ui:ui-test-junit4")
+    androidTestImplementation(project(":compose:ui:ui-test-junit4"))
 
     androidTestImplementation(JUNIT)
     androidTestImplementation(ANDROIDX_TEST_RUNNER)
     androidTestImplementation(ANDROIDX_TEST_RULES)
-    androidTestImplementation project(":compose:foundation:foundation-layout")
-    androidTestImplementation project(":compose:foundation:foundation")
+    androidTestImplementation(project(":compose:foundation:foundation-layout"))
+    androidTestImplementation(project(":compose:foundation:foundation"))
     androidTestImplementation(TRUTH)
     androidTestImplementation(KOTLIN_REFLECT)
     androidTestImplementation(project(":ui:ui-animation-tooling-internal"))

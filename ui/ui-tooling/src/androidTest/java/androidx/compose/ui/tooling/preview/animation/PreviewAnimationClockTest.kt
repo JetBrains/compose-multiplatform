@@ -28,6 +28,7 @@ import androidx.compose.animation.tooling.ComposeAnimationType
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.test.junit4.createComposeRule
+import androidx.test.filters.MediumTest
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
@@ -36,6 +37,7 @@ import org.junit.Ignore
 import org.junit.Rule
 import org.junit.Test
 
+@MediumTest
 @OptIn(InternalAnimationApi::class)
 class PreviewAnimationClockTest {
 

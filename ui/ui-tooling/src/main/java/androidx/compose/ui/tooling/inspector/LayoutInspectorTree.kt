@@ -38,6 +38,7 @@ import kotlin.math.absoluteValue
 import kotlin.math.roundToInt
 
 private val systemPackages = setOf(
+    -1,
     packageNameHash("androidx.compose.animation"),
     packageNameHash("androidx.compose.animation.core"),
     packageNameHash("androidx.compose.desktop"),
@@ -53,26 +54,18 @@ private val systemPackages = setOf(
     packageNameHash("androidx.compose.ui.tooling"),
     packageNameHash("androidx.compose.ui.selection"),
     packageNameHash("androidx.compose.ui.semantics"),
-    packageNameHash("androidx.compose.ui.viewinterop")
-)
-
-private val unwantedPackages = setOf(
-    -1,
-    packageNameHash("androidx.compose.ui"),
-    packageNameHash("androidx.compose.runtime"),
-    packageNameHash("androidx.compose.ui.tooling"),
-    packageNameHash("androidx.compose.ui.selection"),
-    packageNameHash("androidx.compose.ui.semantics")
+    packageNameHash("androidx.compose.ui.viewinterop"),
+    packageNameHash("androidx.compose.ui.window"),
 )
 
 private val unwantedCalls = setOf(
     "emit",
     "remember",
-    "Inspectable",
-    "Layout",
     "CompositionLocalProvider",
-    "SelectionContainer",
-    "SelectionLayout"
+    "Content",
+    "Inspectable",
+    "ProvideAndroidCompositionLocals",
+    "ProvideCommonCompositionLocals",
 )
 
 private fun packageNameHash(packageName: String) =
@@ -416,8 +409,7 @@ class LayoutInspectorTree {
     }
 
     private fun unwantedGroup(node: MutableInspectorNode): Boolean =
-        (node.packageHash in unwantedPackages && node.name in unwantedCalls) ||
-            (hideSystemNodes && node.packageHash in systemPackages)
+        node.packageHash in systemPackages && (hideSystemNodes || node.name in unwantedCalls)
 
     private fun newNode(): MutableInspectorNode =
         if (cache.isNotEmpty()) cache.pop() else MutableInspectorNode()

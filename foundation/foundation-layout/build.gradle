@@ -14,7 +14,6 @@
  * limitations under the License.
  */
 
-
 import androidx.build.AndroidXUiPlugin
 import androidx.build.LibraryGroups
 import androidx.build.Publish
@@ -30,7 +29,7 @@ plugins {
 AndroidXUiPlugin.applyAndConfigureKotlinPlugin(project)
 
 dependencies {
-    kotlinPlugin project(":compose:compiler:compiler")
+    kotlinPlugin(project(":compose:compiler:compiler"))
 
     if(!AndroidXUiPlugin.isMultiplatformEnabled(project)) {
         /*
@@ -38,20 +37,20 @@ dependencies {
          * corresponding block below
          */
 
-        api "androidx.annotation:annotation:1.1.0"
-        api project(":compose:ui:ui")
+        api("androidx.annotation:annotation:1.1.0")
+        api(project(":compose:ui:ui"))
 
-        implementation project(":compose:runtime:runtime")
-        implementation project(":compose:ui:ui-util")
+        implementation(project(":compose:runtime:runtime"))
+        implementation(project(":compose:ui:ui-util"))
         implementation(KOTLIN_STDLIB_COMMON)
 
         testImplementation(ANDROIDX_TEST_RULES)
         testImplementation(ANDROIDX_TEST_RUNNER)
         testImplementation(JUNIT)
 
-        androidTestImplementation project(":compose:foundation:foundation")
-        androidTestImplementation project(":compose:ui:ui-test-junit4")
-        androidTestImplementation project(":activity:activity-compose")
+        androidTestImplementation(project(":compose:foundation:foundation"))
+        androidTestImplementation(project(":compose:ui:ui-test-junit4"))
+        androidTestImplementation(project(":activity:activity-compose"))
         androidTestImplementation(ANDROIDX_TEST_RULES)
         androidTestImplementation(ANDROIDX_TEST_RUNNER)
         androidTestImplementation(JUNIT)
@@ -72,13 +71,13 @@ if(AndroidXUiPlugin.isMultiplatformEnabled(project)) {
             commonMain.dependencies {
                 implementation(KOTLIN_STDLIB_COMMON)
 
-                api project(":compose:ui:ui")
-                implementation project(":compose:runtime:runtime")
-                implementation project(":compose:ui:ui-util")
+                api(project(":compose:ui:ui"))
+                implementation(project(":compose:runtime:runtime"))
+                implementation(project(":compose:ui:ui-util"))
             }
 
             androidMain.dependencies {
-                api "androidx.annotation:annotation:1.1.0"
+                api("androidx.annotation:annotation:1.1.0")
             }
 
             desktopMain.dependencies {
@@ -92,9 +91,9 @@ if(AndroidXUiPlugin.isMultiplatformEnabled(project)) {
             }
 
             androidAndroidTest.dependencies {
-                implementation project(":compose:foundation:foundation")
-                implementation project(":compose:ui:ui-test-junit4")
-                implementation project(":activity:activity-compose")
+                implementation(project(":compose:foundation:foundation"))
+                implementation(project(":compose:ui:ui-test-junit4"))
+                implementation(project(":activity:activity-compose"))
 
                 implementation(ANDROIDX_TEST_RULES)
                 implementation(ANDROIDX_TEST_RUNNER)

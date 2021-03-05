@@ -33,6 +33,7 @@ import android.view.accessibility.AccessibilityNodeInfo.EXTRA_DATA_TEXT_CHARACTE
 import android.view.accessibility.AccessibilityNodeInfo.EXTRA_DATA_TEXT_CHARACTER_LOCATION_ARG_START_INDEX
 import android.view.accessibility.AccessibilityNodeInfo.EXTRA_DATA_TEXT_CHARACTER_LOCATION_KEY
 import android.view.accessibility.AccessibilityNodeProvider
+import androidx.annotation.DoNotInline
 import androidx.annotation.IntRange
 import androidx.annotation.RequiresApi
 import androidx.annotation.VisibleForTesting
@@ -268,12 +269,15 @@ internal class AndroidComposeViewAccessibilityDelegateCompat(val view: AndroidCo
         }
         info.packageName = view.context.packageName
         try {
+            val boundsInRoot = semanticsNode.boundsInRoot
+            val topLeftInScreen = view.localToScreen(boundsInRoot.topLeft)
+            val bottomRightInScreen = view.localToScreen(boundsInRoot.bottomRight)
             info.setBoundsInScreen(
                 android.graphics.Rect(
-                    semanticsNode.boundsInWindow.left.toInt(),
-                    semanticsNode.boundsInWindow.top.toInt(),
-                    semanticsNode.boundsInWindow.right.toInt(),
-                    semanticsNode.boundsInWindow.bottom.toInt()
+                    topLeftInScreen.x.toInt(),
+                    topLeftInScreen.y.toInt(),
+                    bottomRightInScreen.x.toInt(),
+                    bottomRightInScreen.y.toInt()
                 )
             )
         } catch (e: IllegalStateException) {
@@ -427,7 +431,10 @@ internal class AndroidComposeViewAccessibilityDelegateCompat(val view: AndroidCo
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O && !info.text.isNullOrEmpty() &&
             semanticsNode.config.contains(SemanticsActions.GetTextLayoutResult)
         ) {
-            info.unwrap().availableExtraData = listOf(EXTRA_DATA_TEXT_CHARACTER_LOCATION_KEY)
+            AccessibilityNodeInfoVerificationHelperMethods.setAvailableExtraData(
+                info.unwrap(),
+                listOf(EXTRA_DATA_TEXT_CHARACTER_LOCATION_KEY)
+            )
         }
 
         val rangeInfo =
@@ -2090,4 +2097,18 @@ internal fun SemanticsOwner.getAllUncoveredSemanticsNodesToMap(
 
     findAllSemanticNodesRecursive(root)
     return nodes
+}
+
+/**
+ * This class is here to ensure that the classes that use this API will get verified and can be
+ * AOT compiled. It is expected that this class will soft-fail verification, but the classes
+ * which use this method will pass.
+ */
+@RequiresApi(Build.VERSION_CODES.O)
+internal object AccessibilityNodeInfoVerificationHelperMethods {
+    @RequiresApi(Build.VERSION_CODES.O)
+    @DoNotInline
+    fun setAvailableExtraData(node: AccessibilityNodeInfo, data: List<String>) {
+        node.availableExtraData = data
+    }
 }

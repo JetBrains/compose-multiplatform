@@ -58,7 +58,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.TileMode
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.input.pointer.consumeAllChanges
 import androidx.compose.ui.input.pointer.pointerInput
@@ -177,12 +176,12 @@ private object GesturesSnippet5 {
     fun ScrollableSample() {
         // actual composable state
         var offset by remember { mutableStateOf(0f) }
-        // state for Scrollable, describes how to consume scrolling delta and update offset
         Box(
             Modifier
                 .size(150.dp)
                 .scrollable(
                     orientation = Orientation.Vertical,
+                    // Scrollable state: describes how to consume scrolling delta and update offset
                     state = rememberScrollableState { delta ->
                         offset += delta
                         delta
@@ -216,9 +215,7 @@ private fun Preview5() {
 private object GesturesSnippet6 {
     @Composable
     fun NestedSample() {
-        val gradient = Brush.verticalGradient(
-            listOf(Color.Gray, Color.White), 0.0f, 1000.0f, TileMode.Repeated
-        )
+        val gradient = Brush.verticalGradient(0f to Color.Gray, 1000f to Color.White)
         Box(
             modifier = Modifier
                 .background(Color.LightGray)
@@ -280,19 +277,19 @@ private fun Preview6() {
 }
 @Composable private fun GesturesSnippet8() {
     Box(modifier = Modifier.fillMaxSize()) {
-        val offsetX = remember { mutableStateOf(0f) }
-        val offsetY = remember { mutableStateOf(0f) }
+        var offsetX by remember { mutableStateOf(0f) }
+        var offsetY by remember { mutableStateOf(0f) }
 
         Box(
             Modifier
-                .offset { IntOffset(offsetX.value.roundToInt(), offsetY.value.roundToInt()) }
+                .offset { IntOffset(offsetX.roundToInt(), offsetY.roundToInt()) }
                 .background(Color.Blue)
                 .size(50.dp)
                 .pointerInput(Unit) {
                     detectDragGestures { change, dragAmount ->
                         change.consumeAllChanges()
-                        offsetX.value = (offsetX.value + dragAmount.x)
-                        offsetY.value = (offsetY.value + dragAmount.y)
+                        offsetX += dragAmount.x
+                        offsetY += dragAmount.y
                     }
                 }
         )
@@ -314,7 +311,7 @@ private object GesturesSnippet9 {
 
         val swipeableState = rememberSwipeableState(0)
         val sizePx = with(LocalDensity.current) { squareSize.toPx() }
-        val anchors = mapOf(0f to 0, sizePx to 1)
+        val anchors = mapOf(0f to 0, sizePx to 1) // Maps anchor points (in px) to states
 
         Box(
             modifier = Modifier

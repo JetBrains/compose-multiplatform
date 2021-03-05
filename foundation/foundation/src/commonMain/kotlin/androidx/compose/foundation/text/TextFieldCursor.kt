@@ -42,9 +42,7 @@ internal fun Modifier.cursor(
     cursorBrush: Brush,
     enabled: Boolean
 ) = if (enabled) composed {
-    // this should be a disposable clock, but it's not available in this module
-    // however, we only launch one animation and guarantee that we stop it (via snap) in dispose
-    val cursorAlpha = remember { Animatable(0f) }
+    val cursorAlpha = remember { Animatable(1f) }
     val isBrushSpecified = !(cursorBrush is SolidColor && cursorBrush.value.isUnspecified)
     if (state.hasFocus && value.selection.collapsed && isBrushSpecified) {
         LaunchedEffect(cursorBrush, value.annotatedString) {

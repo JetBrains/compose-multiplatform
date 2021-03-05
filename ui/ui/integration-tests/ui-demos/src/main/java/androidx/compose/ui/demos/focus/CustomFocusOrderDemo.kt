@@ -65,6 +65,7 @@ fun CustomFocusOrderDemo() {
                         next = item2
                         right = item2
                         down = item3
+                        previous = item4
                     }
                 )
                 FocusableText(
@@ -73,6 +74,7 @@ fun CustomFocusOrderDemo() {
                         next = item3
                         left = item1
                         down = item4
+                        previous = item1
                     }
                 )
             }
@@ -83,6 +85,7 @@ fun CustomFocusOrderDemo() {
                         next = item4
                         right = item4
                         up = item1
+                        previous = item2
                     }
                 )
                 FocusableText(
@@ -91,6 +94,7 @@ fun CustomFocusOrderDemo() {
                         next = item1
                         left = item3
                         up = item2
+                        previous = item3
                     }
                 )
             }

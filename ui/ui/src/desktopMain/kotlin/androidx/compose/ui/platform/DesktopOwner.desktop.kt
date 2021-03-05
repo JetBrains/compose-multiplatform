@@ -187,22 +187,47 @@ internal class DesktopOwner(
 
     override val measureIteration: Long get() = measureAndLayoutDelegate.measureIteration
 
+    private var needsLayout = true
+    private var needsDraw = true
+
+    val needsRender get() = needsLayout || needsDraw
+    var onNeedsRender: (() -> Unit)? = null
+
+    fun render(canvas: org.jetbrains.skija.Canvas, width: Int, height: Int) {
+        needsLayout = false
+        setSize(width, height)
+        measureAndLayout()
+        needsDraw = false
+        draw(canvas)
+    }
+
+    private fun requestLayout() {
+        needsLayout = true
+        needsDraw = true
+        onNeedsRender?.invoke()
+    }
+
+    private fun requestDraw() {
+        needsDraw = true
+        onNeedsRender?.invoke()
+    }
+
     override fun measureAndLayout() {
         if (measureAndLayoutDelegate.measureAndLayout()) {
-            container.invalidate()
+            requestDraw()
         }
         measureAndLayoutDelegate.dispatchOnPositionedCallbacks()
     }
 
     override fun onRequestMeasure(layoutNode: LayoutNode) {
         if (measureAndLayoutDelegate.requestRemeasure(layoutNode)) {
-            container.invalidate()
+            requestLayout()
         }
     }
 
     override fun onRequestRelayout(layoutNode: LayoutNode) {
         if (measureAndLayoutDelegate.requestRelayout(layoutNode)) {
-            container.invalidate()
+            requestLayout()
         }
     }
 
@@ -213,7 +238,7 @@ internal class DesktopOwner(
         this::density,
         invalidateParentLayer = {
             invalidateParentLayer()
-            container.invalidate()
+            requestDraw()
         },
         drawBlock = drawBlock
     )

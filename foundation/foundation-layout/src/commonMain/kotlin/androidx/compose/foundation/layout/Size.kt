@@ -518,6 +518,7 @@ fun Modifier.wrapContentWidth(
         alignmentCallback = { size, layoutDirection ->
             IntOffset(align.align(0, size.width, layoutDirection), 0)
         },
+        align,
         inspectorInfo = debugInspectorInfo {
             name = "wrapContentWidth"
             properties["align"] = align
@@ -549,6 +550,7 @@ fun Modifier.wrapContentHeight(
         alignmentCallback = { size, _ ->
             IntOffset(0, align.align(0, size.height))
         },
+        align,
         inspectorInfo = debugInspectorInfo {
             name = "wrapContentHeight"
             properties["align"] = align
@@ -579,6 +581,7 @@ fun Modifier.wrapContentSize(
         alignmentCallback = { size, layoutDirection ->
             align.align(IntSize.Zero, size, layoutDirection)
         },
+        align,
         inspectorInfo = debugInspectorInfo {
             name = "wrapContentSize"
             properties["align"] = align
@@ -652,6 +655,11 @@ private class FillModifier(
             placeable.placeRelative(0, 0)
         }
     }
+
+    override fun equals(other: Any?) =
+        other is FillModifier && direction == other.direction && scale == other.scale
+
+    override fun hashCode() = direction.hashCode() * 31 + scale.hashCode()
 }
 
 private class SizeModifier(
@@ -720,40 +728,74 @@ private class SizeModifier(
     override fun IntrinsicMeasureScope.minIntrinsicWidth(
         measurable: IntrinsicMeasurable,
         height: Int
-    ) = measurable.minIntrinsicWidth(height).let {
+    ): Int {
         val constraints = targetConstraints
-        constraints.constrainWidth(it)
-    }
-
-    override fun IntrinsicMeasureScope.maxIntrinsicWidth(
-        measurable: IntrinsicMeasurable,
-        height: Int
-    ) = measurable.maxIntrinsicWidth(height).let {
-        val constraints = targetConstraints
-        constraints.constrainWidth(it)
+        return if (constraints.hasFixedWidth) {
+            constraints.maxWidth
+        } else {
+            constraints.constrainWidth(measurable.minIntrinsicWidth(height))
+        }
     }
 
     override fun IntrinsicMeasureScope.minIntrinsicHeight(
         measurable: IntrinsicMeasurable,
         width: Int
-    ) = measurable.minIntrinsicHeight(width).let {
+    ): Int {
         val constraints = targetConstraints
-        constraints.constrainHeight(it)
+        return if (constraints.hasFixedHeight) {
+            constraints.maxHeight
+        } else {
+            constraints.constrainHeight(measurable.minIntrinsicHeight(width))
+        }
+    }
+
+    override fun IntrinsicMeasureScope.maxIntrinsicWidth(
+        measurable: IntrinsicMeasurable,
+        height: Int
+    ): Int {
+        val constraints = targetConstraints
+        return if (constraints.hasFixedWidth) {
+            constraints.maxWidth
+        } else {
+            constraints.constrainWidth(measurable.maxIntrinsicWidth(height))
+        }
     }
 
     override fun IntrinsicMeasureScope.maxIntrinsicHeight(
         measurable: IntrinsicMeasurable,
         width: Int
-    ) = measurable.maxIntrinsicHeight(width).let {
+    ): Int {
         val constraints = targetConstraints
-        constraints.constrainHeight(it)
+        return if (constraints.hasFixedHeight) {
+            constraints.maxHeight
+        } else {
+            constraints.constrainHeight(measurable.maxIntrinsicHeight(width))
+        }
     }
+
+    override fun equals(other: Any?): Boolean {
+        if (other !is SizeModifier) return false
+        return minWidth == other.minWidth &&
+            minHeight == other.minHeight &&
+            maxWidth == other.maxWidth &&
+            maxHeight == other.maxHeight &&
+            enforceIncoming == other.enforceIncoming
+    }
+
+    override fun hashCode() =
+        (
+            (
+                (((minWidth.hashCode() * 31 + minHeight.hashCode()) * 31) + maxWidth.hashCode()) *
+                    31
+                ) + maxHeight.hashCode()
+            ) * 31
 }
 
 private class WrapContentModifier(
     private val direction: Direction,
     private val unbounded: Boolean,
     private val alignmentCallback: (IntSize, LayoutDirection) -> IntOffset,
+    private val align: Any, // only used for equals and hashcode
     inspectorInfo: InspectorInfo.() -> Unit
 ) : LayoutModifier, InspectorValueInfo(inspectorInfo) {
     override fun MeasureScope.measure(
@@ -788,6 +830,14 @@ private class WrapContentModifier(
             placeable.place(position)
         }
     }
+
+    override fun equals(other: Any?): Boolean {
+        if (other !is WrapContentModifier) return false
+        return direction == other.direction && unbounded == other.unbounded && align == other.align
+    }
+
+    override fun hashCode() =
+        (direction.hashCode() * 31 + unbounded.hashCode()) * 31 + align.hashCode()
 }
 
 private class UnspecifiedConstraintsModifier(
@@ -846,6 +896,13 @@ private class UnspecifiedConstraintsModifier(
     ) = measurable.maxIntrinsicHeight(width).coerceAtLeast(
         if (minHeight != Dp.Unspecified) minHeight.roundToPx() else 0
     )
+
+    override fun equals(other: Any?): Boolean {
+        if (other !is UnspecifiedConstraintsModifier) return false
+        return minWidth == other.minWidth && minHeight == other.minHeight
+    }
+
+    override fun hashCode() = minWidth.hashCode() * 31 + minHeight.hashCode()
 }
 
 internal enum class Direction {

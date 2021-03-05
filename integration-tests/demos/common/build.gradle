@@ -24,9 +24,9 @@ plugins {
 }
 
 dependencies {
-    kotlinPlugin projectOrArtifact(":compose:compiler:compiler")
+    kotlinPlugin(projectOrArtifact(":compose:compiler:compiler"))
     implementation(KOTLIN_STDLIB)
 
-    api "androidx.activity:activity:1.2.0"
-    implementation projectOrArtifact(":compose:runtime:runtime")
+    api("androidx.activity:activity:1.2.0")
+    implementation(projectOrArtifact(":compose:runtime:runtime"))
 }

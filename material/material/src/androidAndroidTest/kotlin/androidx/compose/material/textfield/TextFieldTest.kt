@@ -984,6 +984,7 @@ class TextFieldTest {
 
     @Test
     @LargeTest
+    @SdkSuppress(minSdkVersion = Build.VERSION_CODES.O)
     fun testTransformedTextIsUsed_toDefineLabelPosition() {
         // if non-transformed value were used to check if the text input is empty, the label
         // wouldn't be aligned to the top, as a result it would be obscured by text
@@ -1019,6 +1020,7 @@ class TextFieldTest {
 
     @Test
     @LargeTest
+    @SdkSuppress(minSdkVersion = Build.VERSION_CODES.O)
     fun testTransformedTextIsUsed_toDefineIfPlaceholderNeeded() {
         // if original value were used to check if the text input is empty, the placeholder would be
         // displayed on top of the text

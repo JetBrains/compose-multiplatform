@@ -17,9 +17,11 @@
 package androidx.compose.ui.viewinterop
 
 import android.content.Context
+import android.graphics.Rect
 import android.os.Looper
 import android.view.View
 import android.view.ViewGroup
+import android.view.ViewParent
 import androidx.compose.runtime.CompositionContext
 import androidx.compose.runtime.snapshots.SnapshotStateObserver
 import androidx.compose.ui.Modifier
@@ -49,8 +51,6 @@ internal abstract class AndroidViewHolder(
     parentContext: CompositionContext?
 ) : ViewGroup(context) {
     init {
-        clipChildren = false
-
         // Any [Abstract]ComposeViews that are descendants of this view will host
         // subcompositions of the host composition.
         // UiApplier doesn't supply this, only AndroidView.
@@ -162,11 +162,27 @@ internal abstract class AndroidViewHolder(
         snapshotObserver.clear()
     }
 
+    // When there is no hardware acceleration invalidates are intercepted using this method,
+    // otherwise using onDescendantInvalidated. Return null to avoid invalidating the
+    // AndroidComposeView or the handler.
+    @Suppress("Deprecation")
+    override fun invalidateChildInParent(location: IntArray?, dirty: Rect?): ViewParent? {
+        super.invalidateChildInParent(location, dirty)
+        layoutNode.invalidateLayer()
+        return null
+    }
+
+    override fun onDescendantInvalidated(child: View, target: View) {
+        // We need to call super here in order to correctly update the dirty flags of the holder.
+        super.onDescendantInvalidated(child, target)
+        layoutNode.invalidateLayer()
+    }
+
     /**
-     * Builds a [LayoutNode] tree representation for this Android [View] holder.
+     * A [LayoutNode] tree representation for this Android [View] holder.
      * The [LayoutNode] will proxy the Compose core calls to the [View].
      */
-    fun toLayoutNode(): LayoutNode {
+    val layoutNode: LayoutNode = run {
         // TODO(soboleva): add layout direction here?
         // TODO(popam): forward pointer input, accessibility, focus
         // Prepare layout node that proxies measure and layout passes to the View.
@@ -234,7 +250,7 @@ internal abstract class AndroidViewHolder(
                 }
             }
         }
-        return layoutNode
+        layoutNode
     }
 
     /**
