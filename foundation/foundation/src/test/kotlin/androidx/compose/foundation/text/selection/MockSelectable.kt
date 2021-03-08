@@ -28,6 +28,7 @@ internal class MockSelectable(
     var getTextValue: AnnotatedString = AnnotatedString(""),
     var getBoundingBoxValue: Rect = Rect.Zero
 ) : Selectable {
+    override var selectableId = 0L
     val getSelectionValues = mutableListOf<GetSelectionParameters>()
     override fun getSelection(
         startPosition: Offset,

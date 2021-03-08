@@ -37,7 +37,6 @@ import androidx.test.filters.MediumTest
 import androidx.test.filters.SdkSuppress
 import androidx.test.filters.SmallTest
 import com.google.common.truth.Truth.assertThat
-import com.nhaarman.mockitokotlin2.mock
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
 import org.junit.Before
@@ -64,12 +63,12 @@ class SelectionHandlesTest {
         start = Selection.AnchorInfo(
             direction = ResolvedTextDirection.Ltr,
             offset = 0,
-            selectable = mock()
+            selectableId = 0
         ),
         end = Selection.AnchorInfo(
             direction = ResolvedTextDirection.Ltr,
             offset = 0,
-            selectable = mock()
+            selectableId = 0
         ),
         handlesCrossed = false
     )
@@ -77,12 +76,12 @@ class SelectionHandlesTest {
         start = Selection.AnchorInfo(
             direction = ResolvedTextDirection.Ltr,
             offset = 0,
-            selectable = mock()
+            selectableId = 0
         ),
         end = Selection.AnchorInfo(
             direction = ResolvedTextDirection.Ltr,
             offset = 0,
-            selectable = mock()
+            selectableId = 0
         ),
         handlesCrossed = true
     )

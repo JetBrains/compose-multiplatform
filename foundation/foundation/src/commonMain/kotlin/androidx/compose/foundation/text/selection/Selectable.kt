@@ -28,6 +28,15 @@ import androidx.compose.ui.text.AnnotatedString
 
 internal interface Selectable {
     /**
+     * An ID used by [SelectionRegistrar] to identify this [Selectable]. This value should not be
+     * [SelectionRegistrar.InvalidSelectableId].
+     * When a [Selectable] is created, it can request an ID from [SelectionRegistrar] by
+     * calling [SelectionRegistrar.nextSelectableId].
+     * @see SelectionRegistrar.nextSelectableId
+     */
+    val selectableId: Long
+
+    /**
      * Returns [Selection] information for a selectable composable. If no selection can be provided
      * null should be returned.
      *
