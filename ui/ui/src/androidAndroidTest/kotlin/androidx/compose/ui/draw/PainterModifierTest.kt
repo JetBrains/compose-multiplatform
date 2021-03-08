@@ -18,12 +18,16 @@ package androidx.compose.ui.draw
 
 import android.graphics.Bitmap
 import android.os.Build
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.requiredHeight
 import androidx.compose.foundation.layout.requiredHeightIn
 import androidx.compose.foundation.layout.requiredWidth
 import androidx.compose.foundation.layout.requiredWidthIn
 import androidx.compose.foundation.layout.wrapContentHeight
+import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.testutils.assertPixels
@@ -49,6 +53,7 @@ import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.graphics.compositeOver
 import androidx.compose.ui.graphics.drawscope.DrawScope
 import androidx.compose.ui.graphics.painter.BitmapPainter
+import androidx.compose.ui.graphics.painter.ColorPainter
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.graphics.vector.Path
@@ -341,6 +346,23 @@ class PainterModifierTest {
                     containerHeight.roundToInt() / 2 + 1
                 )
             )
+        }
+    }
+
+    @Test
+    fun testUnboundedPainterDoesNotCrash() {
+        rule.setContent {
+            LazyColumn(Modifier.fillMaxSize().padding(16.dp)) {
+                item {
+                    // Lazy column has unbounded height so ensure that the constraints
+                    // provided to Painters without an intrinsic size are with a finite
+                    // range (i.e. don't crash)
+                    Image(
+                        painter = ColorPainter(Color.Black),
+                        contentDescription = ""
+                    )
+                }
+            }
         }
     }
 
