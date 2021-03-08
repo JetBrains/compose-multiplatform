@@ -20,6 +20,8 @@ import layoutinspector.compose.inspection.LayoutInspectorComposeProtocol
 import layoutinspector.compose.inspection.LayoutInspectorComposeProtocol.Command
 import layoutinspector.compose.inspection.LayoutInspectorComposeProtocol.GetComposablesCommand
 import layoutinspector.compose.inspection.LayoutInspectorComposeProtocol.GetParametersCommand
+import layoutinspector.compose.inspection.LayoutInspectorComposeProtocol.GetParameterDetailsCommand
+import layoutinspector.compose.inspection.LayoutInspectorComposeProtocol.ParameterReference
 
 fun List<LayoutInspectorComposeProtocol.StringEntry>.toMap() = associate { it.id to it.str }
 
@@ -32,6 +34,26 @@ fun GetParametersCommand(
         this.rootViewId = rootViewId
         this.composableId = composableId
         this.skipSystemComposables = skipSystemComposables
+    }.build()
+}.build()
+
+fun GetParameterDetailsCommand(
+    rootViewId: Long,
+    reference: ParameterReference,
+    startIndex: Int,
+    maxElements: Int,
+    skipSystemComposables: Boolean = true
+) = Command.newBuilder().apply {
+    getParameterDetailsCommand = GetParameterDetailsCommand.newBuilder().apply {
+        this.rootViewId = rootViewId
+        this.skipSystemComposables = skipSystemComposables
+        this.reference = reference
+        if (startIndex >= 0) {
+            this.startIndex = startIndex
+        }
+        if (maxElements >= 0) {
+            this.maxElements = maxElements
+        }
     }.build()
 }.build()
 

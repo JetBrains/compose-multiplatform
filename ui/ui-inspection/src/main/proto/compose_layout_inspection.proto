@@ -121,11 +121,24 @@ message Parameter {
       DIMENSION_EM = 11;
       LAMBDA = 12;
       FUNCTION_REFERENCE = 13;
+      ITERABLE = 14;
     }
 
     Type type = 1;
     int32 name = 2;
     repeated Parameter elements = 3;
+    ParameterReference reference = 4;
+
+    // If this Parameter appears in the elements of another parameter:
+    // This index is the "natural" index of the value in the agent. If the index
+    // is identical to the elements index we do not need this value and it will
+    // be set to -1.
+    //
+    // However if some of the "sibling" values in the agent are null or cannot be
+    // decomposed, those siblings are omitted from the Parameter.elements.
+    // For all subsequent parameter elements we need to have the original index in
+    // order to find the value again using the GetParameterDetailsCommand.
+    sint32 index = 5;
 
     oneof value {
         int32 int32_value = 11;
@@ -135,6 +148,22 @@ message Parameter {
         Resource resource_value = 15;
         LambdaValue lambda_value = 16;
     }
+}
+
+// A reference to a "part" of a parameter value
+message ParameterReference {
+  sint64 composable_id = 1;
+
+  // Identifies an index into a ParameterGroup
+  int32 parameter_index = 2;
+
+  // If the parameter value is a composite value such as:
+  //    List<MyClass>
+  // then:
+  //    composite_index[0] is the index into the List
+  //    composite_index[1] is the index into the fields in MyClass
+  //    composite_index[2] is the index into the field found by [1] etc...
+  repeated int32 composite_index = 3;
 }
 
 // A collection of all parameters associated with a single composable
@@ -183,11 +212,27 @@ message GetAllParametersResponse {
   repeated ParameterGroup parameter_groups = 3;
 }
 
+// Request parameter details for the parameter specified
+message GetParameterDetailsCommand {
+  int64 root_view_id = 1;
+  ParameterReference reference = 2;
+  int32 start_index = 3;
+  int32 max_elements = 4;
+  bool skip_system_composables = 5;
+}
+
+message GetParameterDetailsResponse {
+  int64 root_view_id = 1; // Echoed from GetParameterDetailsCommand
+  repeated StringEntry strings = 2;
+  Parameter parameter = 3;
+}
+
 message Command {
   oneof specialized {
     GetComposablesCommand get_composables_command = 1;
     GetParametersCommand get_parameters_command = 2;
     GetAllParametersCommand get_all_parameters_command = 3;
+    GetParameterDetailsCommand get_parameter_details_command = 4;
   }
 }
 
@@ -196,5 +241,6 @@ message Response {
     GetComposablesResponse get_composables_response = 1;
     GetParametersResponse get_parameters_response = 2;
     GetAllParametersResponse get_all_parameters_response = 3;
+    GetParameterDetailsResponse get_parameter_details_response = 4;
   }
 }
