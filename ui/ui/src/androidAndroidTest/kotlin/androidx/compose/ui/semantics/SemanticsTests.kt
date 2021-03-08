@@ -143,6 +143,27 @@ class SemanticsTests {
     }
 
     @Test
+    fun nestedMergedSubtree_includeAllMergeableChildren() {
+        val tag1 = "tag1"
+        val tag2 = "tag2"
+        val label1 = "foo"
+        val label2 = "bar"
+        val label3 = "hi"
+        rule.setContent {
+            SimpleTestLayout(Modifier.semantics(mergeDescendants = true) {}.testTag(tag1)) {
+                SimpleTestLayout(Modifier.semantics { contentDescription = label1 }) { }
+                SimpleTestLayout(Modifier.semantics(mergeDescendants = true) {}.testTag(tag2)) {
+                    SimpleTestLayout(Modifier.semantics { contentDescription = label2 }) { }
+                }
+                SimpleTestLayout(Modifier.semantics { contentDescription = label3 }) { }
+            }
+        }
+
+        rule.onNodeWithTag(tag1).assertContentDescriptionEquals("$label1, $label3")
+        rule.onNodeWithTag(tag2).assertContentDescriptionEquals(label2)
+    }
+
+    @Test
     fun clearAndSetSemantics() {
         val tag1 = "tag1"
         val tag2 = "tag2"
