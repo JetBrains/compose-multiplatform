@@ -46,6 +46,8 @@ import layoutinspector.compose.inspection.LayoutInspectorComposeProtocol.Paramet
 import layoutinspector.compose.inspection.LayoutInspectorComposeProtocol.Response
 
 private const val LAYOUT_INSPECTION_ID = "layoutinspector.compose.inspection"
+private const val MAX_RECURSIONS = 2
+private const val MAX_ITERABLE_SIZE = 5
 
 // created by java.util.ServiceLoader
 class ComposeLayoutInspectorFactory :
@@ -144,13 +146,15 @@ class ComposeLayoutInspector(
                 getParametersCommand.skipSystemComposables
             )[getParametersCommand.composableId]
 
-        val rootId = getParametersCommand.rootViewId
-
         callback.reply {
             getParametersResponse = if (foundComposable != null) {
                 val stringTable = StringTable()
-                val parameters = foundComposable.convertParameters(layoutInspectorTree, rootId)
-                    .convertAll(stringTable)
+                val parameters = foundComposable.convertParameters(
+                    layoutInspectorTree,
+                    getParametersCommand.rootViewId,
+                    getParametersCommand.maxRecursions.orElse(MAX_RECURSIONS),
+                    getParametersCommand.maxInitialIterableSize.orElse(MAX_ITERABLE_SIZE),
+                ).convertAll(stringTable)
                 GetParametersResponse.newBuilder().apply {
                     parameterGroup = ParameterGroup.newBuilder().apply {
                         composableId = getParametersCommand.composableId
@@ -174,13 +178,15 @@ class ComposeLayoutInspector(
                 getAllParametersCommand.skipSystemComposables
             ).values
 
-        val rootId = getAllParametersCommand.rootViewId
-
         callback.reply {
             val stringTable = StringTable()
             val parameterGroups = allComposables.map { composable ->
-                val parameters = composable.convertParameters(layoutInspectorTree, rootId)
-                    .convertAll(stringTable)
+                val parameters = composable.convertParameters(
+                    layoutInspectorTree,
+                    getAllParametersCommand.rootViewId,
+                    getAllParametersCommand.maxRecursions.orElse(MAX_RECURSIONS),
+                    getAllParametersCommand.maxInitialIterableSize.orElse(MAX_ITERABLE_SIZE),
+                ).convertAll(stringTable)
                 ParameterGroup.newBuilder().apply {
                     composableId = composable.id
                     addAllParameter(parameters)
@@ -188,7 +194,7 @@ class ComposeLayoutInspector(
             }
 
             getAllParametersResponse = GetAllParametersResponse.newBuilder().apply {
-                rootViewId = rootId
+                rootViewId = getAllParametersCommand.rootViewId
                 addAllParameterGroups(parameterGroups)
                 addAllStrings(stringTable.toStringEntries())
             }.build()
@@ -214,7 +220,9 @@ class ComposeLayoutInspector(
                 composable,
                 reference,
                 getParameterDetailsCommand.startIndex,
-                getParameterDetailsCommand.maxElements
+                getParameterDetailsCommand.maxElements,
+                getParameterDetailsCommand.maxRecursions.orElse(MAX_RECURSIONS),
+                getParameterDetailsCommand.maxInitialIterableSize.orElse(MAX_ITERABLE_SIZE),
             )
         }
 
@@ -300,3 +308,7 @@ private fun List<AndroidComposeViewWrapper>.toInspectorNodes(): List<InspectorNo
         .flatMap { it.flatten() }
         .toList()
 }
+
+// Provide default for older version:
+private fun Int.orElse(defaultValue: Int): Int =
+    if (this == 0) defaultValue else this

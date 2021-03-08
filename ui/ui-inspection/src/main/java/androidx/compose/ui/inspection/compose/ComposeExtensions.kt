@@ -29,10 +29,17 @@ import androidx.compose.ui.inspection.util.ThreadUtils
  */
 fun InspectorNode.convertParameters(
     layoutInspectorTree: LayoutInspectorTree,
-    rootId: Long
+    rootId: Long,
+    maxRecursions: Int,
+    maxInitialIterableSize: Int
 ): List<NodeParameter> {
     ThreadUtils.assertOffMainThread()
-    return layoutInspectorTree.convertParameters(rootId, this)
+    return layoutInspectorTree.convertParameters(
+        rootId,
+        this,
+        maxRecursions,
+        maxInitialIterableSize
+    )
 }
 
 /**
