@@ -20,11 +20,13 @@ import android.view.inspector.WindowInspector
 import androidx.compose.ui.inspection.LambdaLocation
 import androidx.compose.ui.inspection.inspector.InspectorNode
 import androidx.compose.ui.inspection.inspector.NodeParameter
+import androidx.compose.ui.inspection.inspector.NodeParameterReference
 import androidx.compose.ui.inspection.inspector.ParameterType
 import layoutinspector.compose.inspection.LayoutInspectorComposeProtocol.Bounds
 import layoutinspector.compose.inspection.LayoutInspectorComposeProtocol.ComposableNode
 import layoutinspector.compose.inspection.LayoutInspectorComposeProtocol.LambdaValue
 import layoutinspector.compose.inspection.LayoutInspectorComposeProtocol.Parameter
+import layoutinspector.compose.inspection.LayoutInspectorComposeProtocol.ParameterReference
 import layoutinspector.compose.inspection.LayoutInspectorComposeProtocol.Quad
 import layoutinspector.compose.inspection.LayoutInspectorComposeProtocol.Rect
 
@@ -84,6 +86,7 @@ fun ParameterType.convert(): Parameter.Type {
         ParameterType.DimensionEm -> Parameter.Type.DIMENSION_EM
         ParameterType.Lambda -> Parameter.Type.LAMBDA
         ParameterType.FunctionReference -> Parameter.Type.FUNCTION_REFERENCE
+        ParameterType.Iterable -> Parameter.Type.ITERABLE
     }
 }
 
@@ -114,6 +117,9 @@ private fun Parameter.Builder.setValue(stringTable: StringTable, value: Any?) {
         Parameter.Type.RESOURCE -> setResourceType(value, stringTable)
         Parameter.Type.LAMBDA -> setFunctionType(value, stringTable)
         Parameter.Type.FUNCTION_REFERENCE -> setFunctionType(value, stringTable)
+        Parameter.Type.ITERABLE -> {
+            // TODO: b/181899238 Support size for List and Array types
+        }
         else -> error("Unknown Composable parameter type: $type")
     }
 }
@@ -152,7 +158,20 @@ fun NodeParameter.convert(stringTable: StringTable): Parameter {
         name = stringTable.put(nodeParam.name)
         type = nodeParam.type.convert()
         setValue(stringTable, nodeParam.value)
-        addAllElements(nodeParam.elements.map { it.convert(stringTable) })
+        index = nodeParam.index
+        nodeParam.reference?.let { reference = it.convert() }
+        if (nodeParam.elements.isNotEmpty()) {
+            addAllElements(nodeParam.elements.map { it.convert(stringTable) })
+        }
+    }.build()
+}
+
+fun NodeParameterReference.convert(): ParameterReference {
+    val reference = this
+    return ParameterReference.newBuilder().apply {
+        composableId = reference.nodeId
+        parameterIndex = reference.parameterIndex
+        addAllCompositeIndex(reference.indices.asIterable())
     }.build()
 }
 
