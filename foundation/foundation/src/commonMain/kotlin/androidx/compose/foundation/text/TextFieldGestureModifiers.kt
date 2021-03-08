@@ -31,6 +31,8 @@ import androidx.compose.foundation.legacygestures.LongPressDragObserver
 import androidx.compose.foundation.legacygestures.dragGestureFilter
 import androidx.compose.foundation.legacygestures.longPressDragGestureFilter
 import androidx.compose.foundation.legacygestures.tapGestureFilter
+import androidx.compose.ui.input.pointer.PointerInputScope
+import androidx.compose.ui.input.pointer.pointerInput
 
 // Touch selection
 internal fun Modifier.longPressDragGestureFilter(
@@ -57,3 +59,8 @@ internal fun Modifier.mouseDragGestureFilter(
     dragObserver: DragObserver,
     enabled: Boolean
 ) = if (enabled) this.dragGestureFilter(dragObserver, startDragImmediately = true) else this
+
+internal fun Modifier.mouseDragGestureDetector(
+    detector: suspend PointerInputScope.() -> Unit,
+    enabled: Boolean
+) = if (enabled) Modifier.pointerInput(Unit, detector) else this

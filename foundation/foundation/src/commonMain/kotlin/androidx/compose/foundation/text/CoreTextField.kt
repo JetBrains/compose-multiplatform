@@ -299,10 +299,7 @@ internal fun CoreTextField(
             .then(selectionModifier)
             .then(focusRequestTapModifier)
     } else {
-        Modifier.mouseDragGestureFilter(
-            manager.mouseSelectionObserver(onStart = { focusRequester.requestFocus() }),
-            enabled = enabled
-        )
+        Modifier.mouseDragGestureDetector(manager::mouseSelectionDetector, enabled = enabled)
     }
 
     val drawModifier = Modifier.drawBehind {

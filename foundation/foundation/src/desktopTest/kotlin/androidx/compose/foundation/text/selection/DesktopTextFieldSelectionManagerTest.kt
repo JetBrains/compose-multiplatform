@@ -18,14 +18,19 @@ package androidx.compose.foundation.text.selection
 
 import androidx.compose.foundation.text.InternalFoundationTextApi
 import androidx.compose.foundation.text.TextFieldState
+import androidx.compose.foundation.text.TextLayoutResultProxy
+import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.geometry.Rect
+import androidx.compose.ui.hapticfeedback.HapticFeedback
 import androidx.compose.ui.platform.ClipboardManager
 import androidx.compose.ui.platform.TextToolbar
 import androidx.compose.ui.text.AnnotatedString
-import androidx.compose.ui.text.InternalTextApi
 import androidx.compose.ui.text.TextLayoutInput
+import androidx.compose.ui.text.TextLayoutResult
 import androidx.compose.ui.text.TextRange
 import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.input.EditProcessor
 import androidx.compose.ui.text.input.OffsetMapping
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.style.TextOverflow
@@ -33,6 +38,7 @@ import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.LayoutDirection
 import com.google.common.truth.Truth.assertThat
+import com.nhaarman.mockitokotlin2.any
 import com.nhaarman.mockitokotlin2.mock
 import com.nhaarman.mockitokotlin2.times
 import com.nhaarman.mockitokotlin2.verify
@@ -49,35 +55,35 @@ class DesktopTextFieldSelectionManagerTest {
     private val offsetMapping = OffsetMapping.Identity
     private var value = TextFieldValue(text)
     private val lambda: (TextFieldValue) -> Unit = { value = it }
-    private val state = TextFieldState(mock())
+    private lateinit var state: TextFieldState
 
     private val dragBeginPosition = Offset.Zero
-    private val dragLastPosition = Offset(300f, 15f)
+    private val dragDistance = Offset(300f, 15f)
     private val beginOffset = 0
     private val dragOffset = text.indexOf('r')
-    private val fakeTextRange = TextRange(0, "Hello".length)
-    private val dragTextRange = TextRange("Hello".length + 1, text.length)
-
-    private val manager = TextFieldSelectionManager()
+    private val layoutResult: TextLayoutResult = mock()
+    private val layoutResultProxy: TextLayoutResultProxy = mock()
+    private lateinit var manager: TextFieldSelectionManager
 
     private val clipboardManager = mock<ClipboardManager>()
     private val textToolbar = mock<TextToolbar>()
+    private val hapticFeedback = mock<HapticFeedback>()
+    private val focusRequester = mock<FocusRequester>()
+    private val processor = mock<EditProcessor>()
 
-    @OptIn(InternalFoundationTextApi::class, InternalTextApi::class)
+    @OptIn(InternalFoundationTextApi::class)
     @Before
     fun setup() {
+        manager = TextFieldSelectionManager()
         manager.offsetMapping = offsetMapping
         manager.onValueChange = lambda
-        manager.state = state
         manager.value = value
         manager.clipboardManager = clipboardManager
         manager.textToolbar = textToolbar
+        manager.hapticFeedBack = hapticFeedback
+        manager.focusRequester = focusRequester
 
-        state.layoutResult = mock()
-        state.textDelegate = mock()
-        whenever(state.layoutResult!!.value).thenReturn(mock())
-        whenever(state.textDelegate.density).thenReturn(density)
-        whenever(state.layoutResult!!.value.layoutInput).thenReturn(
+        whenever(layoutResult.layoutInput).thenReturn(
             TextLayoutInput(
                 text = AnnotatedString(text),
                 style = TextStyle.Default,
@@ -91,38 +97,64 @@ class DesktopTextFieldSelectionManagerTest {
                 constraints = Constraints()
             )
         )
-        whenever(state.layoutResult!!.getOffsetForPosition(dragBeginPosition)).thenReturn(
-            beginOffset
-        )
-        whenever(state.layoutResult!!.getOffsetForPosition(dragLastPosition)).thenReturn(dragOffset)
 
-        state.processor.reset(value, state.inputSession)
+        whenever(layoutResult.getBoundingBox(any())).thenReturn(Rect.Zero)
+        whenever(layoutResult.getOffsetForPosition(dragBeginPosition)).thenReturn(beginOffset)
+        whenever(layoutResult.getOffsetForPosition(dragBeginPosition + dragDistance))
+            .thenReturn(dragOffset)
+        whenever(
+            layoutResultProxy.getOffsetForPosition(dragBeginPosition, false)
+        ).thenReturn(beginOffset)
+        whenever(
+            layoutResultProxy.getOffsetForPosition(dragBeginPosition + dragDistance, false)
+        ).thenReturn(dragOffset)
+        whenever(
+            layoutResultProxy.getOffsetForPosition(dragBeginPosition + dragDistance)
+        ).thenReturn(dragOffset)
+
+        whenever(layoutResultProxy.value).thenReturn(layoutResult)
+
+        state = TextFieldState(mock())
+        state.layoutResult = layoutResultProxy
+        state.processor.reset(value, null)
+        manager.state = state
+        whenever(state.textDelegate.density).thenReturn(density)
     }
 
     @Test
     fun TextFieldSelectionManager_mouseSelectionObserver_onStart() {
-        manager.mouseSelectionObserver { }.onStart(dragBeginPosition)
+        manager.mouseSelectionObserver.onDown(dragBeginPosition, false)
 
         assertThat(value.selection).isEqualTo(TextRange(0, 0))
 
-        manager.mouseSelectionObserver { }.onStart(dragLastPosition)
+        manager.mouseSelectionObserver.onDown(dragBeginPosition + dragDistance, false)
         assertThat(value.selection).isEqualTo(TextRange(8, 8))
     }
 
     @Test
+    fun TextFieldSelectionManager_mouseSelectionObserver_onStart_withShift() {
+        manager.mouseSelectionObserver.onDown(dragBeginPosition, false)
+
+        assertThat(value.selection).isEqualTo(TextRange(0, 0))
+
+        manager.mouseSelectionObserver.onDown(dragBeginPosition + dragDistance, true)
+        assertThat(value.selection).isEqualTo(TextRange(0, 8))
+    }
+
+    @Test
     fun TextFieldSelectionManager_mouseSelectionObserver_onDrag() {
-        val observer = manager.mouseSelectionObserver { }
-        observer.onStart(dragBeginPosition)
-        observer.onDrag(dragLastPosition)
+        val observer = manager.mouseSelectionObserver
+        observer.onDown(dragBeginPosition, false)
+        observer.onDrag(dragDistance)
 
         assertThat(value.selection).isEqualTo(TextRange(0, 8))
     }
 
     @Test
     fun TextFieldSelectionManager_mouseSelectionObserver_copy() {
-        val observer = manager.mouseSelectionObserver { }
-        observer.onStart(dragBeginPosition)
-        observer.onDrag(dragLastPosition)
+        val observer = manager.mouseSelectionObserver
+        observer.onDown(dragBeginPosition, false)
+        observer.onDrag(dragDistance)
 
         manager.value = value
         manager.copy(cancelSelection = false)
