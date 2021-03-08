@@ -148,7 +148,7 @@ object SemanticsProperties {
      *
      * @see SemanticsPropertyReceiver.role
      */
-    val Role = SemanticsPropertyKey<Role>("Role")
+    val Role = SemanticsPropertyKey<Role>("Role") { parentValue, _ -> parentValue }
 
     /**
      * @see SemanticsPropertyReceiver.testTag
