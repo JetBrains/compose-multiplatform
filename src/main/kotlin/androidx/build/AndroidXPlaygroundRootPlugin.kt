@@ -16,6 +16,8 @@
 
 package androidx.build
 
+import androidx.build.AndroidXRootPlugin.Companion.PREBUILT_OR_SNAPSHOT_EXT_NAME
+import androidx.build.AndroidXRootPlugin.Companion.PROJECT_OR_ARTIFACT_EXT_NAME
 import androidx.build.gradle.isRoot
 import groovy.util.XmlParser
 import groovy.xml.QName
@@ -52,6 +54,12 @@ class AndroidXPlaygroundRootPlugin : Plugin<Project> {
         }
     )
 
+    private val prebuiltOrSnapshotClosure = KotlinClosure1<String, String>(
+        function = {
+            prebuiltOrSnapshot(this)
+        }
+    )
+
     override fun apply(target: Project) {
         if (!target.isRoot) {
             throw GradleException("This plugin should only be applied to root project")
@@ -72,7 +80,8 @@ class AndroidXPlaygroundRootPlugin : Plugin<Project> {
 
     private fun configureSubProject(project: Project) {
         project.repositories.addPlaygroundRepositories()
-        project.extra.set(AndroidXRootPlugin.PROJECT_OR_ARTIFACT_EXT_NAME, projectOrArtifactClosure)
+        project.extra.set(PROJECT_OR_ARTIFACT_EXT_NAME, projectOrArtifactClosure)
+        project.extra.set(PREBUILT_OR_SNAPSHOT_EXT_NAME, prebuiltOrSnapshotClosure)
         project.configurations.all { configuration ->
             configuration.resolutionStrategy.dependencySubstitution.all { substitution ->
                 substitution.allowAndroidxSnapshotReplacement()
@@ -116,6 +125,21 @@ class AndroidXPlaygroundRootPlugin : Plugin<Project> {
 
             throw GradleException("projectOrArtifact cannot find/replace project $path")
         }
+    }
+
+    private fun prebuiltOrSnapshot(path: String): String {
+        val sections = path.split(":")
+
+        if (sections.size != 3) {
+            throw GradleException(
+                "Expected prebuiltOrSnapshot path to be of the form " +
+                    "<group>:<artifact>:<version>, but was $path"
+            )
+        }
+
+        val group = sections[0]
+        val artifact = sections[1]
+        return "$group:$artifact:$SNAPSHOT_MARKER"
     }
 
     private fun DependencySubstitution.allowAndroidxSnapshotReplacement() {
