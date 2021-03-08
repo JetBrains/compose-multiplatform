@@ -18,6 +18,7 @@ package androidx.compose.ui.text.font
 
 import androidx.compose.runtime.Immutable
 import androidx.compose.runtime.Stable
+import androidx.compose.ui.text.fastDistinctBy
 
 /**
  * The base class of the font families.
@@ -96,7 +97,7 @@ class FontListFontFamily internal constructor(
 ) : FileBasedFontFamily(), List<Font> by fonts {
     init {
         check(fonts.isNotEmpty()) { "At least one font should be passed to FontFamily" }
-        check(fonts.distinctBy { Pair(it.weight, it.style) }.size == fonts.size) {
+        check(fonts.fastDistinctBy { Pair(it.weight, it.style) }.size == fonts.size) {
             "There cannot be two fonts with the same FontWeight and FontStyle in the same " +
                 "FontFamily"
         }

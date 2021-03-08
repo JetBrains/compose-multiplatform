@@ -145,6 +145,9 @@ package androidx.compose.ui {
     method public default <R> R! foldOut(R? initial, kotlin.jvm.functions.Function2<? super androidx.compose.ui.Modifier.Element,? super R,? extends R> operation);
   }
 
+  public final class TempListUtilsKt {
+  }
+
   public final class ZIndexModifierKt {
     method @androidx.compose.runtime.Stable public static androidx.compose.ui.Modifier zIndex(androidx.compose.ui.Modifier, float zIndex);
   }

@@ -27,6 +27,7 @@ import androidx.compose.ui.text.style.ResolvedTextDirection
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.Density
 import androidx.compose.ui.util.fastForEach
+import androidx.compose.ui.util.fastMap
 import kotlin.math.max
 
 /**
@@ -215,9 +216,9 @@ class MultiParagraph(
         this.didExceedMaxLines = didExceedMaxLines
         this.paragraphInfoList = paragraphInfoList
         this.width = width
-        this.placeholderRects = paragraphInfoList.flatMap { paragraphInfo ->
+        this.placeholderRects = paragraphInfoList.fastFlatMap { paragraphInfo ->
             with(paragraphInfo) {
-                paragraph.placeholderRects.map { it?.toGlobal() }
+                paragraph.placeholderRects.fastMap { it?.toGlobal() }
             }
         }.let {
             // When paragraphs get ellipsized, the size of this list will be smaller than
@@ -258,9 +259,9 @@ class MultiParagraph(
         val paragraphIndex = findParagraphByIndex(paragraphInfoList, start)
         val path = Path()
 
-        paragraphInfoList.drop(paragraphIndex)
-            .takeWhile { it.startIndex < end }
-            .filterNot { it.startIndex == it.endIndex }
+        paragraphInfoList.fastDrop(paragraphIndex)
+            .fastTakeWhile { it.startIndex < end }
+            .fastFilterNot { it.startIndex == it.endIndex }
             .fastForEach {
                 with(it) {
                     path.addPath(

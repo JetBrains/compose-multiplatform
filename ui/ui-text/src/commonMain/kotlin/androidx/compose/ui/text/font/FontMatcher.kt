@@ -16,6 +16,9 @@
 
 package androidx.compose.ui.text.font
 
+import androidx.compose.ui.text.fastMinByOrNull
+import androidx.compose.ui.util.fastMaxBy
+
 /**
  * Given a [FontFamily], [FontWeight] and [FontStyle], matches the best font in the [FontFamily]
  * that satisfies the requirements of [FontWeight] and [FontStyle].
@@ -58,14 +61,14 @@ internal open class FontMatcher {
             // If the desired weight is less than 400
             // - weights less than or equal to the desired weight are checked in descending order
             // - followed by weights above the desired weight in ascending order
-            fonts.filter { it.weight <= fontWeight }.maxByOrNull { it.weight }
-                ?: fonts.filter { it.weight > fontWeight }.minByOrNull { it.weight }
+            fonts.filter { it.weight <= fontWeight }.fastMaxBy { it.weight }
+                ?: fonts.filter { it.weight > fontWeight }.fastMinByOrNull { it.weight }
         } else if (fontWeight > FontWeight.W500) {
             // If the desired weight is greater than 500
             // - weights greater than or equal to the desired weight are checked in ascending order
             // - followed by weights below the desired weight in descending order
-            fonts.filter { it.weight >= fontWeight }.minByOrNull { it.weight }
-                ?: fonts.filter { it.weight < fontWeight }.maxByOrNull { it.weight }
+            fonts.filter { it.weight >= fontWeight }.fastMinByOrNull { it.weight }
+                ?: fonts.filter { it.weight < fontWeight }.fastMaxBy { it.weight }
         } else {
             // If the desired weight is inclusively between 400 and 500
             // - weights greater than or equal to the target weight are checked in ascending order
@@ -73,9 +76,9 @@ internal open class FontMatcher {
             // - followed by weights less than the target weight in descending order,
             // - followed by weights greater than 500
             fonts.filter { it.weight >= fontWeight && it.weight <= FontWeight.W500 }
-                .minByOrNull { it.weight }
-                ?: fonts.filter { it.weight < fontWeight }.maxByOrNull { it.weight }
-                ?: fonts.filter { it.weight > FontWeight.W500 }.minByOrNull { it.weight }
+                .fastMinByOrNull { it.weight }
+                ?: fonts.filter { it.weight < fontWeight }.fastMaxBy { it.weight }
+                ?: fonts.filter { it.weight > FontWeight.W500 }.fastMinByOrNull { it.weight }
         }
 
         return result ?: throw IllegalStateException("Cannot match any font")

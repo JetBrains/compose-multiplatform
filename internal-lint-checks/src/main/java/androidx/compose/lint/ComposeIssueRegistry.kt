@@ -14,6 +14,8 @@
  * limitations under the License.
  */
 
+@file:Suppress("UnstableApiUsage")
+
 package androidx.compose.lint
 
 import androidx.build.lint.AndroidXIssueRegistry
@@ -26,6 +28,7 @@ class ComposeIssueRegistry : IssueRegistry() {
     override val api = 8
     override val issues get(): List<Issue> {
         return listOf(
+            ListIteratorDetector.ISSUE,
             ModifierInspectorInfoDetector.ISSUE,
             UnnecessaryLambdaCreationDetector.ISSUE,
         ) + AndroidXIssueRegistry.Issues

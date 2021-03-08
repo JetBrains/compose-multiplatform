@@ -588,7 +588,7 @@ open class MutableSnapshot internal constructor(
                 takeNewGlobalSnapshot(previousGlobalSnapshot, emptyLambda)
                 val globalModified = previousGlobalSnapshot.modified
                 if (globalModified != null && globalModified.isNotEmpty())
-                    applyObservers.toList() to globalModified
+                    applyObservers.toMutableList() to globalModified
                 else
                     emptyList<(Set<Any>, Snapshot) -> Unit>() to null
             } else {
@@ -609,7 +609,7 @@ open class MutableSnapshot internal constructor(
                 this.modified = null
                 previousGlobalSnapshot.modified = null
 
-                applyObservers.toList() to globalModified
+                applyObservers.toMutableList() to globalModified
             }
         }
 
@@ -1129,7 +1129,7 @@ internal class GlobalSnapshot(id: Int, invalid: SnapshotIdSet) :
                 } else null
                 )?.let {
                 it.firstOrNull() ?: { state: Any ->
-                    it.forEach { it(state) }
+                    it.fastForEach { it(state) }
                 }
             }
         }
@@ -1429,7 +1429,7 @@ private fun <T> advanceGlobalSnapshot(block: (invalid: SnapshotIdSet) -> T): T {
     // observers.
     val modified = previousGlobalSnapshot.modified
     if (modified != null) {
-        val observers = sync { applyObservers.toList() }
+        val observers: List<(Set<Any>, Snapshot) -> Unit> = sync { applyObservers.toMutableList() }
         observers.fastForEach { observer ->
             observer(modified, previousGlobalSnapshot)
         }

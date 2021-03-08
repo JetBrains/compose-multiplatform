@@ -17,6 +17,7 @@
 package androidx.compose.ui.graphics
 
 import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.util.fastAny
 
 /**  A set of vertex data used by [Canvas.drawVertices]. */
 class Vertices(
@@ -38,7 +39,7 @@ class Vertices(
             throw IllegalArgumentException("positions and textureCoordinates lengths must match.")
         if (colors.size != positions.size)
             throw IllegalArgumentException("positions and colors lengths must match.")
-        if (indices.any(outOfBounds))
+        if (indices.fastAny(outOfBounds))
             throw IllegalArgumentException(
                 "indices values must be valid indices " +
                     "in the positions list."

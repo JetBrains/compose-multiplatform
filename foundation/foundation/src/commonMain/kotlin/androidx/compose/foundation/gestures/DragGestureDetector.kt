@@ -75,11 +75,11 @@ suspend fun AwaitPointerEventScope.awaitTouchSlopOrCancellation(
 
     while (true) {
         val event = awaitPointerEvent()
-        val dragEvent = event.changes.firstOrNull { it.id == pointer }!!
+        val dragEvent = event.changes.fastFirstOrNull { it.id == pointer }!!
         if (dragEvent.positionChangeConsumed()) {
             return null
         } else if (dragEvent.changedToUpIgnoreConsumed()) {
-            val otherDown = event.changes.firstOrNull { it.pressed }
+            val otherDown = event.changes.fastFirstOrNull { it.pressed }
             if (otherDown == null) {
                 // This is the last "up"
                 return null
@@ -567,9 +567,9 @@ private suspend inline fun AwaitPointerEventScope.awaitDragOrUp(
     var pointer = pointerId
     while (true) {
         val event = awaitPointerEvent()
-        val dragEvent = event.changes.firstOrNull { it.id == pointer }!!
+        val dragEvent = event.changes.fastFirstOrNull { it.id == pointer }!!
         if (dragEvent.changedToUpIgnoreConsumed()) {
-            val otherDown = event.changes.firstOrNull { it.pressed }
+            val otherDown = event.changes.fastFirstOrNull { it.pressed }
             if (otherDown == null) {
                 // This is the last "up"
                 return dragEvent
@@ -616,11 +616,11 @@ private suspend inline fun AwaitPointerEventScope.awaitTouchSlopOrCancellation(
 
     while (true) {
         val event = awaitPointerEvent()
-        val dragEvent = event.changes.firstOrNull { it.id == pointer }!!
+        val dragEvent = event.changes.fastFirstOrNull { it.id == pointer }!!
         if (dragEvent.positionChangeConsumed()) {
             return null
         } else if (dragEvent.changedToUpIgnoreConsumed()) {
-            val otherDown = event.changes.firstOrNull { it.pressed }
+            val otherDown = event.changes.fastFirstOrNull { it.pressed }
             if (otherDown == null) {
                 // This is the last "up"
                 return null
@@ -688,7 +688,7 @@ private suspend fun PointerInputScope.awaitLongPressOrCancellation(
                         finished = true
                     }
                     if (!event.isPointerUp(currentDown.id)) {
-                        longPress = event.changes.firstOrNull { it.id == currentDown.id }
+                        longPress = event.changes.fastFirstOrNull { it.id == currentDown.id }
                     } else {
                         val newPressed = event.changes.fastFirstOrNull { it.pressed }
                         if (newPressed != null) {
@@ -709,4 +709,4 @@ private suspend fun PointerInputScope.awaitLongPressOrCancellation(
 }
 
 private fun PointerEvent.isPointerUp(pointerId: PointerId): Boolean =
-    changes.firstOrNull { it.id == pointerId }?.pressed != true
+    changes.fastFirstOrNull { it.id == pointerId }?.pressed != true

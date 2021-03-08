@@ -103,6 +103,7 @@ inline fun <T, R> List<T>.fastMap(transform: (T) -> R): List<R> {
     return target
 }
 
+// TODO: should be fastMaxByOrNull to match stdlib
 /**
  * Returns the first element yielding the largest value of the given function or `null` if there
  * are no elements.

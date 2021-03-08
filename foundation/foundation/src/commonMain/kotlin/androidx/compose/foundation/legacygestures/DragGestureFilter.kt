@@ -18,6 +18,8 @@
 
 package androidx.compose.foundation.legacygestures
 
+import androidx.compose.foundation.fastFilter
+import androidx.compose.foundation.fastFold
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
@@ -42,6 +44,7 @@ import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.debugInspectorInfo
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.util.fastAll
 import androidx.compose.ui.util.fastAny
 import androidx.compose.ui.util.fastForEach
 import kotlinx.coroutines.CoroutineScope
@@ -305,7 +308,7 @@ internal class RawDragGestureFilter : PointerInputFilter() {
                     }
                 }
 
-                if (changes.all { it.changedToUpIgnoreConsumed() }) {
+                if (changes.fastAll { it.changedToUpIgnoreConsumed() }) {
                     // All of the pointers are up, so reset and call onStop.  If we have a
                     // velocityTracker at this point, that means at least one of the up events
                     // was not consumed so we should send velocity for flinging.
@@ -348,7 +351,7 @@ internal class RawDragGestureFilter : PointerInputFilter() {
 
             // Handle moved changes.
 
-            val movedChanges = changes.filter {
+            val movedChanges = changes.fastFilter {
                 it.pressed && !it.changedToDownIgnoreConsumed()
             }
 
@@ -540,12 +543,12 @@ internal class RawPressStartGestureFilter : PointerInputFilter() {
         val changes = pointerEvent.changes
 
         if (pass == executionPass) {
-            if (enabled && changes.all { it.changedToDown() }) {
+            if (enabled && changes.fastAll { it.changedToDown() }) {
                 // If we have not yet started and all of the changes changed to down, we are
                 // starting.
                 active = true
                 onPressStart(changes.first().position)
-            } else if (changes.all { it.changedToUp() }) {
+            } else if (changes.fastAll { it.changedToUp() }) {
                 // If we have started and all of the changes changed to up, we are stopping.
                 active = false
             }
@@ -675,7 +678,7 @@ internal class DragSlopExceededGestureFilter(
             }
 
             if (pass == PointerEventPass.Final &&
-                changes.all { it.changedToUpIgnoreConsumed() }
+                changes.fastAll { it.changedToUpIgnoreConsumed() }
             ) {
                 // On the final pass, check to see if all pointers have changed to up, and if they
                 // have, reset.
@@ -705,7 +708,7 @@ private fun getAveragePositionChange(changes: List<PointerInputChange>): Offset 
         return Offset.Zero
     }
 
-    val sum = changes.fold(Offset.Zero) { sum, change ->
+    val sum = changes.fastFold(Offset.Zero) { sum, change ->
         sum + change.positionChange()
     }
     val sizeAsFloat = changes.size.toFloat()
@@ -887,7 +890,7 @@ private class LongPressDragGestureDetectorGlue : PointerInputFilter() {
         if (pass == PointerEventPass.Main &&
             dragEnabled &&
             !dragStarted &&
-            pointerEvent.changes.all { it.changedToUpIgnoreConsumed() }
+            pointerEvent.changes.fastAll { it.changedToUpIgnoreConsumed() }
         ) {
             dragEnabled = false
             longPressDragObserver.onStop(Offset.Zero)
@@ -961,11 +964,11 @@ internal class LongPressGestureFilter(
         }
 
         if (pass == PointerEventPass.Main) {
-            if (state == State.Idle && changes.all { it.changedToDown() }) {
+            if (state == State.Idle && changes.fastAll { it.changedToDown() }) {
                 // If we are idle and all of the changes changed to down, we are prime to fire
                 // the event.
                 primeToFire()
-            } else if (state != State.Idle && changes.all { it.changedToUpIgnoreConsumed() }) {
+            } else if (state != State.Idle && changes.fastAll { it.changedToUpIgnoreConsumed() }) {
                 // If we have started and all of the changes changed to up, reset to idle.
                 resetToIdle()
             } else if (!changes.anyPointersInBounds(bounds)) {
@@ -976,7 +979,7 @@ internal class LongPressGestureFilter(
             if (state == State.Primed) {
                 // If we are primed, keep track of all down pointer positions so we can pass
                 // pointer position information to the event we will fire.
-                changes.forEach {
+                changes.fastForEach {
                     if (it.pressed) {
                         pointerPositions[it.id] = it.position
                     } else {

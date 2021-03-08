@@ -18,6 +18,7 @@
 
 package androidx.compose.foundation.text.selection
 
+import androidx.compose.foundation.fastFold
 import androidx.compose.foundation.focusable
 import androidx.compose.runtime.State
 import androidx.compose.runtime.getValue
@@ -280,7 +281,7 @@ internal class SelectionManager(private val selectionRegistrar: SelectionRegistr
     ): Selection? {
 
         val newSelection = selectionRegistrar.sort(requireContainerCoordinates())
-            .fold(null) { mergedSelection: Selection?, handler: Selectable ->
+            .fastFold(null) { mergedSelection: Selection?, handler: Selectable ->
                 merge(
                     mergedSelection,
                     handler.getSelection(
@@ -304,7 +305,8 @@ internal class SelectionManager(private val selectionRegistrar: SelectionRegistr
         var selectedText: AnnotatedString? = null
 
         selection?.let {
-            for (handler in selectables) {
+            for (i in selectables.indices) {
+                val handler = selectables[i]
                 // Continue if the current selectable is before the selection starts.
                 if (handler != it.start.selectable && handler != it.end.selectable &&
                     selectedText == null
