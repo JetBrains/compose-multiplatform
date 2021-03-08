@@ -102,6 +102,8 @@ if(AndroidXUiPlugin.isMultiplatformEnabled(project)) {
                 api("androidx.annotation:annotation:1.1.0")
             }
 
+            desktopMain.dependsOn(jvmMain)
+
             desktopMain.dependencies {
                 implementation(KOTLIN_STDLIB)
             }

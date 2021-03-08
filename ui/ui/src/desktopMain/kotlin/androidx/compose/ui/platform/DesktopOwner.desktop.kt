@@ -19,6 +19,7 @@
 package androidx.compose.ui.platform
 
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.key
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.ExperimentalComposeUiApi
@@ -170,6 +171,13 @@ internal class DesktopOwner(
         get() = container.keyboard
 
     override fun sendKeyEvent(keyEvent: KeyEvent): Boolean {
+        when {
+            keyEvent.nativeKeyEvent.id == java.awt.event.KeyEvent.KEY_TYPED ->
+                container.platformInputService.charKeyPressed = true
+            keyEvent.type == KeyEventType.KeyDown ->
+                container.platformInputService.charKeyPressed = false
+        }
+
         return keyInputModifier.processKeyInput(keyEvent) ||
             keyboard?.processKeyInput(keyEvent) ?: false
     }

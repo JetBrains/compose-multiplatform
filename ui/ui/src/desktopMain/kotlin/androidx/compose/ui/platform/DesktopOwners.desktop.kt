@@ -153,24 +153,15 @@ internal class DesktopOwners(
         lastOwner?.onPointerMove(position)
     }
 
-    private fun consumeKeyEventOr(event: KeyEvent, or: () -> Unit) {
-        val consumed = list.lastOrNull()?.sendKeyEvent(ComposeKeyEvent(event)) ?: false
-        if (!consumed) {
-            or()
-        }
+    private fun consumeKeyEvent(event: KeyEvent) {
+        list.lastOrNull()?.sendKeyEvent(ComposeKeyEvent(event))
     }
 
-    fun onKeyPressed(event: KeyEvent) = consumeKeyEventOr(event) {
-        platformInputService.onKeyPressed(event.keyCode, event.keyChar)
-    }
+    fun onKeyPressed(event: KeyEvent) = consumeKeyEvent(event)
 
-    fun onKeyReleased(event: KeyEvent) = consumeKeyEventOr(event) {
-        platformInputService.onKeyReleased(event.keyCode, event.keyChar)
-    }
+    fun onKeyReleased(event: KeyEvent) = consumeKeyEvent(event)
 
-    fun onKeyTyped(event: KeyEvent) = consumeKeyEventOr(event) {
-        platformInputService.onKeyTyped(event.keyChar)
-    }
+    fun onKeyTyped(event: KeyEvent) = consumeKeyEvent(event)
 
     fun onInputMethodEvent(event: InputMethodEvent) {
         if (!event.isConsumed()) {
