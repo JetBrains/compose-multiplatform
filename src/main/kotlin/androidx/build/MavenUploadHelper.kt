@@ -32,7 +32,6 @@ import org.gradle.api.publish.tasks.GenerateModuleMetadata
 import org.gradle.kotlin.dsl.configure
 import org.gradle.kotlin.dsl.create
 import org.gradle.kotlin.dsl.findByType
-import org.gradle.kotlin.dsl.named
 import org.jetbrains.kotlin.gradle.dsl.KotlinMultiplatformExtension
 import org.jetbrains.kotlin.gradle.plugin.mpp.KotlinAndroidTarget
 import java.io.File
@@ -63,24 +62,23 @@ private fun Project.configureComponent(
             publications {
                 if (appliesJavaGradlePluginPlugin()) {
                     // The 'java-gradle-plugin' will also add to the 'pluginMaven' publication
-                    it.create<MavenPublication>("pluginMaven").pom { pom ->
-                        addInformativeMetadata(pom, extension)
-                        tweakDependenciesMetadata(extension, pom)
-                    }
+                    it.create<MavenPublication>("pluginMaven")
                     tasks.getByName("publishPluginMavenPublicationToMavenRepository").doFirst {
                         removePreviouslyUploadedArchives(androidxGroup)
                     }
                 } else {
                     it.create<MavenPublication>("maven") {
                         from(component)
-                        pom { pom ->
-                            addInformativeMetadata(pom, extension)
-                            tweakDependenciesMetadata(extension, pom)
-                        }
                     }
                     tasks.getByName("publishMavenPublicationToMavenRepository").doFirst {
                         removePreviouslyUploadedArchives(androidxGroup)
                     }
+                }
+            }
+            publications.withType(MavenPublication::class.java).all {
+                it.pom { pom ->
+                    addInformativeMetadata(extension, pom)
+                    tweakDependenciesMetadata(extension, pom)
                 }
             }
         }
@@ -103,41 +101,21 @@ private fun Project.configureComponent(
         }
 
         if (isMultiplatformEnabled()) {
-            configureMultiplatformPublication(extension)
+            configureMultiplatformPublication()
         }
     }
 }
 
-private fun Project.configureMultiplatformPublication(
-    extension: AndroidXExtension
-) {
+private fun Project.configureMultiplatformPublication() {
     val multiplatformExtension = extensions.findByType<KotlinMultiplatformExtension>() ?: return
 
     // publishMavenPublicationToMavenRepository will produce conflicting artifacts with the same
     // name as the artifacts producing by publishKotlinMultiplatformPublicationToMavenRepository
     project.tasks.findByName("publishMavenPublicationToMavenRepository")?.enabled = false
 
-    configure<PublishingExtension> {
-        publications {
-            it.named<MavenPublication>("kotlinMultiplatform") {
-                pom { pom ->
-                    addInformativeMetadata(pom, extension)
-                    tweakDependenciesMetadata(extension, pom)
-                }
-            }
-        }
-    }
-
     multiplatformExtension.targets.all { target ->
         if (target is KotlinAndroidTarget) {
             target.publishAllLibraryVariants()
-        }
-
-        target.mavenPublication { publication ->
-            publication.pom { pom ->
-                addInformativeMetadata(pom, extension)
-                tweakDependenciesMetadata(extension, pom)
-            }
         }
     }
 }
@@ -169,7 +147,7 @@ private fun Project.removePreviouslyUploadedArchives(group: String) {
     projectArchiveDir.deleteRecursively()
 }
 
-private fun Project.addInformativeMetadata(pom: MavenPom, extension: AndroidXExtension) {
+private fun Project.addInformativeMetadata(extension: AndroidXExtension, pom: MavenPom) {
     pom.name.set(provider { extension.name })
     pom.description.set(provider { extension.description })
     pom.url.set(
