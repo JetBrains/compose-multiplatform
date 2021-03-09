@@ -46,8 +46,16 @@ fun LayoutUsage(content: @Composable () -> Unit) {
         val childConstraints = Constraints(
             minWidth = constraints.minWidth / 2,
             minHeight = constraints.minHeight / 2,
-            maxWidth = constraints.maxWidth / 2,
-            maxHeight = constraints.maxHeight / 2
+            maxWidth = if (constraints.hasBoundedWidth) {
+                constraints.maxWidth / 2
+            } else {
+                Constraints.Infinity
+            },
+            maxHeight = if (constraints.hasBoundedHeight) {
+                constraints.maxHeight / 2
+            } else {
+                Constraints.Infinity
+            }
         )
         // We measure the children with half our constraints, to ensure we can be double
         // the size of the children.
@@ -79,8 +87,16 @@ fun LayoutWithProvidedIntrinsicsUsage(content: @Composable () -> Unit) {
             val childConstraints = Constraints(
                 minWidth = constraints.minWidth / 2,
                 minHeight = constraints.minHeight / 2,
-                maxWidth = constraints.maxWidth / 2,
-                maxHeight = constraints.maxHeight / 2
+                maxWidth = if (constraints.hasBoundedWidth) {
+                    constraints.maxWidth / 2
+                } else {
+                    Constraints.Infinity
+                },
+                maxHeight = if (constraints.hasBoundedHeight) {
+                    constraints.maxHeight / 2
+                } else {
+                    Constraints.Infinity
+                }
             )
             // We measure the children with half our constraints, to ensure we can be double
             // the size of the children.
