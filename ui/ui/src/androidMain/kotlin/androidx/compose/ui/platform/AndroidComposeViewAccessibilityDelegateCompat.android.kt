@@ -1093,7 +1093,7 @@ internal class AndroidComposeViewAccessibilityDelegateCompat(val view: AndroidCo
                 return
             }
             val textLayoutResults = mutableListOf<TextLayoutResult>()
-            // Note now it only works for single Text/TextField until we fix the merging issue.
+            // Note now it only works for single Text/TextField until we fix b/157474582.
             val getLayoutResult = node.config[SemanticsActions.GetTextLayoutResult]
                 .action?.invoke(textLayoutResults)
             val textLayoutResult: TextLayoutResult
@@ -1105,6 +1105,11 @@ internal class AndroidComposeViewAccessibilityDelegateCompat(val view: AndroidCo
             val boundingRects = mutableListOf<RectF?>()
             val textNode: SemanticsNode? = node.findNonEmptyTextChild()
             for (i in 0 until positionInfoLength) {
+                // This is a workaround until we fix the merging issue in b/157474582.
+                if (positionInfoStartIndex + i >= textLayoutResult.layoutInput.text.length) {
+                    boundingRects.add(null)
+                    continue
+                }
                 val bounds = textLayoutResult.getBoundingBox(positionInfoStartIndex + i)
                 val screenBounds: Rect?
                 // Only the visible/partial visible locations are used.
