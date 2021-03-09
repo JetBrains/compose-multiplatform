@@ -416,7 +416,7 @@ class AndroidAccessibilityTest {
 
     @Test
     @SdkSuppress(minSdkVersion = Build.VERSION_CODES.O)
-    fun testAddExtraDataToAccessibilityNodeInfo() {
+    fun testAddExtraDataToAccessibilityNodeInfo_notMerged() {
         val tag = "TextField"
         lateinit var textLayoutResult: TextLayoutResult
 
@@ -447,6 +447,48 @@ class AndroidAccessibilityTest {
         val rectF = data[0] as RectF
         val expectedRect = textLayoutResult.getBoundingBox(0).translate(
             textFieldNode.positionInWindow
+        )
+        assertEquals(expectedRect.left, rectF.left)
+        assertEquals(expectedRect.top, rectF.top)
+        assertEquals(expectedRect.right, rectF.right)
+        assertEquals(expectedRect.bottom, rectF.bottom)
+    }
+
+    // This test needs to be improved after text merging(b/157474582) is fixed.
+    @Test
+    @SdkSuppress(minSdkVersion = Build.VERSION_CODES.O)
+    fun testAddExtraDataToAccessibilityNodeInfo_merged() {
+        val tag = "MergedText"
+        val textOne = "hello"
+        val textTwo = "world"
+        lateinit var textLayoutResult: TextLayoutResult
+
+        container.setContent {
+            Column(modifier = Modifier.testTag(tag).semantics(true) {}) {
+                BasicText(text = textOne, onTextLayout = { textLayoutResult = it })
+                BasicText(text = textTwo)
+            }
+        }
+
+        val textNode = rule.onNodeWithTag(tag)
+            .fetchSemanticsNode("couldn't find node with tag $tag")
+        val info = AccessibilityNodeInfo.obtain()
+        val argument = Bundle()
+        val length = textOne.length + textTwo.length
+        argument.putInt(AccessibilityNodeInfo.EXTRA_DATA_TEXT_CHARACTER_LOCATION_ARG_START_INDEX, 0)
+        argument.putInt(AccessibilityNodeInfo.EXTRA_DATA_TEXT_CHARACTER_LOCATION_ARG_LENGTH, length)
+        provider.addExtraDataToAccessibilityNodeInfo(
+            textNode.id,
+            info,
+            AccessibilityNodeInfo.EXTRA_DATA_TEXT_CHARACTER_LOCATION_KEY,
+            argument
+        )
+        val data = info.extras
+            .getParcelableArray(AccessibilityNodeInfo.EXTRA_DATA_TEXT_CHARACTER_LOCATION_KEY)
+        assertEquals(length, data!!.size)
+        val rectF = data[0] as RectF
+        val expectedRect = textLayoutResult.getBoundingBox(0).translate(
+            textNode.positionInWindow
         )
         assertEquals(expectedRect.left, rectF.left)
         assertEquals(expectedRect.top, rectF.top)
