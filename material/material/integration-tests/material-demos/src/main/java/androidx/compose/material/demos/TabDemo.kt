@@ -32,6 +32,7 @@ import androidx.compose.material.samples.IconTabs
 import androidx.compose.material.samples.ScrollingFancyIndicatorContainerTabs
 import androidx.compose.material.samples.ScrollingTextTabs
 import androidx.compose.material.samples.TextAndIconTabs
+import androidx.compose.material.samples.LeadingIconTabs
 import androidx.compose.material.samples.TextTabs
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
@@ -54,6 +55,8 @@ fun TabDemo() {
             IconTabs()
             Spacer(Modifier.requiredHeight(24.dp))
             TextAndIconTabs()
+            Spacer(Modifier.requiredHeight(24.dp))
+            LeadingIconTabs()
             Spacer(Modifier.requiredHeight(24.dp))
             ScrollingTextTabs()
         } else {
