@@ -46,13 +46,13 @@ fun SimpleNavigationWithSaveableStateSample() {
         modifier: Modifier = Modifier,
         content: @Composable (T) -> Unit
     ) {
-        // create RestorableStateHolder.
-        val restorableStateHolder = rememberSaveableStateHolder()
-        // wrap the content representing the `screen` key inside `SaveableStateProvider`.
-        // you can add screen switch animations where during the animation multiple screens
-        // will displayed at the same time.
+        // create SaveableStateHolder.
+        val saveableStateHolder = rememberSaveableStateHolder()
         Box(modifier) {
-            restorableStateHolder.SaveableStateProvider(currentScreen) {
+            // Wrap the content representing the `currentScreen` inside `SaveableStateProvider`.
+            // Here you can also add a screen switch animation like Crossfade where during the
+            // animation multiple screens will be displayed at the same time.
+            saveableStateHolder.SaveableStateProvider(currentScreen) {
                 content(currentScreen)
             }
         }
