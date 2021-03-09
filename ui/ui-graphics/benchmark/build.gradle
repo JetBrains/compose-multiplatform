@@ -28,18 +28,13 @@ plugins {
 dependencies {
     kotlinPlugin project(":compose:compiler:compiler")
 
+    implementation project(":compose:foundation:foundation")
+    implementation project(":compose:runtime:runtime")
+    implementation project(":compose:benchmark-utils")
+    implementation project(":compose:ui:ui")
+    implementation(KOTLIN_STDLIB)
+
     androidTestImplementation project(":benchmark:benchmark-junit4")
     androidTestImplementation project(":benchmark:benchmark-macro-junit4")
-    androidTestImplementation project(":compose:runtime:runtime")
-    androidTestImplementation project(":compose:ui:ui-text:ui-text-benchmark")
-    androidTestImplementation project(":compose:foundation:foundation")
-    androidTestImplementation project(":compose:material:material")
-    androidTestImplementation project(":compose:runtime:runtime")
-    androidTestImplementation project(":compose:benchmark-utils")
     androidTestImplementation(ANDROIDX_TEST_RULES)
-    androidTestImplementation(JUNIT)
-    androidTestImplementation(KOTLIN_STDLIB)
-    androidTestImplementation(KOTLIN_REFLECT)
-    androidTestImplementation(KOTLIN_TEST_COMMON)
-    androidTestImplementation(TRUTH)
 }

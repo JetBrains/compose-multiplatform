@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--
-  ~ Copyright 2018 The Android Open Source Project
+  ~ Copyright 2021 The Android Open Source Project
   ~
   ~ Licensed under the Apache License, Version 2.0 (the "License");
   ~ you may not use this file except in compliance with the License.
@@ -15,17 +15,6 @@
   ~ limitations under the License.
   -->
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
-    package="androidx.ui.benchmark.test">
-
-    <!--
-      ~ Important: disable debuggable for accurate performance results
-      -->
-    <application
-            android:debuggable="false"
-            tools:replace="android:debuggable">
-        <!-- enable profileableByShell for non-intrusive profiling tools -->
-        <!--suppress AndroidElementNotAllowed -->
-        <profileable android:shell="true"/>
-    </application>
+    package="androidx.compose.animation.core.benchmark">
+    <application/>
 </manifest>
