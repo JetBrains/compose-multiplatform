@@ -21,6 +21,8 @@ import androidx.compose.foundation.interaction.Interaction
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.interaction.PressInteraction
 import androidx.compose.foundation.layout.Box
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.testutils.assertAgainstGolden
@@ -298,6 +300,48 @@ class TabScreenshotTest {
         )
     }
 
+    @Test
+    fun leadingIconTabs_lightTheme_defaultColors() {
+        val interactionSource = MutableInteractionSource()
+
+        var scope: CoroutineScope? = null
+
+        composeTestRule.setContent {
+            scope = rememberCoroutineScope()
+            MaterialTheme(lightColors()) {
+                DefaultLeadingIconTabs(interactionSource)
+            }
+        }
+
+        assertTabsMatch(
+            scope = scope!!,
+            interactionSource = interactionSource,
+            interaction = null,
+            goldenIdentifier = "leadingIconTabs_lightTheme_defaultColors"
+        )
+    }
+
+    @Test
+    fun leadingIconTabs_darkTheme_defaultColors() {
+        val interactionSource = MutableInteractionSource()
+
+        var scope: CoroutineScope? = null
+
+        composeTestRule.setContent {
+            scope = rememberCoroutineScope()
+            MaterialTheme(darkColors()) {
+                DefaultLeadingIconTabs(interactionSource)
+            }
+        }
+
+        assertTabsMatch(
+            scope = scope!!,
+            interactionSource = interactionSource,
+            interaction = null,
+            goldenIdentifier = "leadingIconTabs_darkTheme_defaultColors"
+        )
+    }
+
     /**
      * Asserts that the tabs match the screenshot with identifier [goldenIdentifier].
      *
@@ -404,6 +448,43 @@ private fun CustomTabs(
                 selected = false,
                 selectedContentColor = selectedContentColor,
                 unselectedContentColor = unselectedContentColor,
+                onClick = {}
+            )
+        }
+    }
+}
+
+/**
+ * Default colored [TabRow] with three [LeadingIconTab]s. The first [LeadingIconTab] is selected,
+ * and the rest are not.
+ *
+ * @param interactionSource the [MutableInteractionSource] for the first [LeadingIconTab], to control its
+ * visual state.
+ */
+@OptIn(ExperimentalMaterialApi::class)
+@Composable
+private fun DefaultLeadingIconTabs(
+    interactionSource: MutableInteractionSource
+) {
+    Box(Modifier.semantics(mergeDescendants = true) {}.testTag(Tag)) {
+        TabRow(selectedTabIndex = 0) {
+            LeadingIconTab(
+                text = { Text("TAB") },
+                icon = { Icon(Icons.Filled.Favorite, contentDescription = "Favorite") },
+                selected = true,
+                interactionSource = interactionSource,
+                onClick = {}
+            )
+            LeadingIconTab(
+                text = { Text("TAB") },
+                icon = { Icon(Icons.Filled.Favorite, contentDescription = "Favorite") },
+                selected = false,
+                onClick = {}
+            )
+            LeadingIconTab(
+                text = { Text("TAB") },
+                icon = { Icon(Icons.Filled.Favorite, contentDescription = "Favorite") },
+                selected = false,
                 onClick = {}
             )
         }

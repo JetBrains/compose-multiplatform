@@ -22,6 +22,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.material.TabRowDefaults.tabIndicatorOffset
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Favorite
+import androidx.compose.material.samples.LeadingIconTabs
 import androidx.compose.material.samples.ScrollingTextTabs
 import androidx.compose.material.samples.TextTabs
 import androidx.compose.runtime.Composable
@@ -35,8 +36,8 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.InspectableValue
 import androidx.compose.ui.platform.isDebugInspectorInfoEnabled
 import androidx.compose.ui.platform.testTag
-import androidx.compose.ui.semantics.SemanticsProperties
 import androidx.compose.ui.semantics.Role
+import androidx.compose.ui.semantics.SemanticsProperties
 import androidx.compose.ui.test.SemanticsMatcher
 import androidx.compose.ui.test.assert
 import androidx.compose.ui.test.assertCountEquals
@@ -132,6 +133,55 @@ class TabTest {
             .assertHasClickAction()
     }
 
+    @OptIn(ExperimentalMaterialApi::class)
+    @Test
+    fun leadingIconTab_defaultSemantics() {
+        rule.setMaterialContent {
+            TabRow(0) {
+                LeadingIconTab(
+                    text = { Text("Text") },
+                    icon = { Icon(icon, null) },
+                    modifier = Modifier.testTag("leadingIconTab"),
+                    selected = true,
+                    onClick = {}
+                )
+            }
+        }
+
+        rule.onNodeWithTag("leadingIconTab")
+            .assert(SemanticsMatcher.expectValue(SemanticsProperties.Role, Role.Tab))
+            .assertIsSelected()
+            .assertIsEnabled()
+            .assertHasClickAction()
+
+        rule.onNodeWithTag("leadingIconTab")
+            .onParent()
+            .assert(SemanticsMatcher.keyIsDefined(SemanticsProperties.SelectableGroup))
+    }
+
+    @OptIn(ExperimentalMaterialApi::class)
+    @Test
+    fun leadingIconTab_disabledSemantics() {
+        rule.setMaterialContent {
+            Box {
+                LeadingIconTab(
+                    enabled = false,
+                    text = { Text("Text") },
+                    icon = { Icon(icon, null) },
+                    modifier = Modifier.testTag("leadingIconTab"),
+                    selected = true,
+                    onClick = {}
+                )
+            }
+        }
+
+        rule.onNodeWithTag("leadingIconTab")
+            .assert(SemanticsMatcher.expectValue(SemanticsProperties.Role, Role.Tab))
+            .assertIsSelected()
+            .assertIsNotEnabled()
+            .assertHasClickAction()
+    }
+
     @Test
     fun textTab_height() {
         rule
@@ -164,6 +214,23 @@ class TabTest {
                 }
             }
             .assertHeightIsEqualTo(ExpectedLargeTabHeight)
+    }
+
+    @OptIn(ExperimentalMaterialApi::class)
+    @Test
+    fun leadingIconTab_height() {
+        rule
+            .setMaterialContentForSizeAssertions {
+                Surface {
+                    LeadingIconTab(
+                        text = { Text("Text") },
+                        icon = { Icon(icon, null) },
+                        selected = true,
+                        onClick = {}
+                    )
+                }
+            }
+            .assertHeightIsEqualTo(ExpectedSmallTabHeight)
     }
 
     @Test
@@ -340,6 +407,47 @@ class TabTest {
         baselinePositionY.assertIsEqualTo(expectedPositionY, "baseline y-position")
     }
 
+    @OptIn(ExperimentalMaterialApi::class)
+    @Test
+    fun LeadingIconTab_textAndIconPosition() {
+        rule.setMaterialContent {
+            Box {
+                TabRow(
+                    modifier = Modifier.testTag("tabRow"),
+                    selectedTabIndex = 0
+                ) {
+                    LeadingIconTab(
+                        text = {
+                            Text("TAB", Modifier.testTag("text"))
+                        },
+                        icon = { Icon(Icons.Filled.Favorite, null, Modifier.testTag("icon")) },
+                        selected = true,
+                        onClick = {}
+                    )
+                }
+            }
+        }
+
+        val tabRowBounds =
+            rule.onNodeWithTag("tabRow", useUnmergedTree = true).getUnclippedBoundsInRoot()
+
+        val textBounds =
+            rule.onNodeWithTag("text", useUnmergedTree = true).getUnclippedBoundsInRoot()
+
+        val textDistanceFromIcon = 8.dp
+
+        val iconBounds =
+            rule.onNodeWithTag("icon", useUnmergedTree = true).getUnclippedBoundsInRoot()
+        textBounds.left.assertIsEqualTo(
+            iconBounds.right + textDistanceFromIcon,
+            "textBounds left-position"
+        )
+
+        val iconOffset =
+            (tabRowBounds.width - iconBounds.width - textBounds.width - textDistanceFromIcon) / 2
+        iconBounds.left.assertIsEqualTo(iconOffset, "iconBounds left-position")
+    }
+
     @Test
     fun scrollableTabRow_indicatorPosition() {
         val indicatorHeight = 1.dp
@@ -446,6 +554,52 @@ class TabTest {
     }
 
     @Test
+    fun fixedLeadingIconTabRow_initialTabSelected() {
+        rule
+            .setMaterialContent {
+                LeadingIconTabs()
+            }
+
+        // Only the first tab should be selected
+        rule.onAllNodes(isSelectable())
+            .assertCountEquals(3)
+            .apply {
+                get(0).assertIsSelected()
+                get(1).assertIsNotSelected()
+                get(2).assertIsNotSelected()
+            }
+    }
+
+    @Test
+    fun LeadingIconTabRow_selectNewTab() {
+        rule
+            .setMaterialContent {
+                LeadingIconTabs()
+            }
+
+        // Only the first tab should be selected
+        rule.onAllNodes(isSelectable())
+            .assertCountEquals(3)
+            .apply {
+                get(0).assertIsSelected()
+                get(1).assertIsNotSelected()
+                get(2).assertIsNotSelected()
+            }
+
+        // Click the last tab
+        rule.onAllNodes(isSelectable())[2].performClick()
+
+        // Now only the last tab should be selected
+        rule.onAllNodes(isSelectable())
+            .assertCountEquals(3)
+            .apply {
+                get(0).assertIsNotSelected()
+                get(1).assertIsNotSelected()
+                get(2).assertIsSelected()
+            }
+    }
+
+    @Test
     fun scrollableTabRow_initialTabSelected() {
         rule
             .setMaterialContent {
@@ -514,6 +668,31 @@ class TabTest {
                 Tab(
                     enabled = false,
                     text = { Text("Text") },
+                    modifier = Modifier.testTag("tab"),
+                    selected = true,
+                    onClick = { clicks++ }
+                )
+            }
+        }
+
+        rule.onNodeWithTag("tab")
+            .performClick()
+
+        rule.runOnIdle {
+            assertThat(clicks).isEqualTo(0)
+        }
+    }
+
+    @OptIn(ExperimentalMaterialApi::class)
+    @Test
+    fun leadingIconTab_disabled_noClicks() {
+        var clicks = 0
+        rule.setMaterialContent {
+            Box {
+                LeadingIconTab(
+                    enabled = false,
+                    text = { Text("Text") },
+                    icon = { Icon(icon, null) },
                     modifier = Modifier.testTag("tab"),
                     selected = true,
                     onClick = { clicks++ }
