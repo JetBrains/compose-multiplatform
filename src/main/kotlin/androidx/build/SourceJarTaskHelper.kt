@@ -24,6 +24,7 @@ import org.gradle.api.attributes.Category
 import org.gradle.api.attributes.DocsType
 import org.gradle.api.attributes.Usage
 import org.gradle.api.component.AdhocComponentWithVariants
+import org.gradle.api.file.DuplicatesStrategy
 import org.gradle.api.plugins.JavaPluginConvention
 import org.gradle.api.tasks.TaskProvider
 import org.gradle.api.tasks.bundling.Jar
@@ -40,6 +41,8 @@ fun Project.configureSourceJarForAndroid(extension: LibraryExtension) {
         val sourceJar = tasks.register("sourceJar${variant.name.capitalize()}", Jar::class.java) {
             it.archiveClassifier.set("sources")
             it.from(extension.sourceSets.getByName("main").java.srcDirs)
+            // Do not allow source files with duplicate names, information would be lost otherwise.
+            it.duplicatesStrategy = DuplicatesStrategy.FAIL
         }
         registerSourcesVariant(sourceJar)
     }
@@ -69,6 +72,8 @@ fun Project.configureSourceJarForJava() {
         it.archiveClassifier.set("sources")
         val convention = convention.getPlugin<JavaPluginConvention>()
         it.from(convention.sourceSets.getByName("main").allSource.srcDirs)
+        // Do not allow source files with duplicate names, information would be lost otherwise.
+        it.duplicatesStrategy = DuplicatesStrategy.FAIL
     }
     registerSourcesVariant(sourceJar)
 }
@@ -81,15 +86,15 @@ private fun Project.registerSourcesVariant(sourceJar: TaskProvider<Jar>) {
             Usage.USAGE_ATTRIBUTE,
             objects.named(Usage.JAVA_RUNTIME)
         )
-        gradleVariant.getAttributes().attribute(
+        gradleVariant.attributes.attribute(
             Category.CATEGORY_ATTRIBUTE,
             objects.named(Category.DOCUMENTATION)
         )
-        gradleVariant.getAttributes().attribute(
+        gradleVariant.attributes.attribute(
             Bundling.BUNDLING_ATTRIBUTE,
             objects.named(Bundling.EXTERNAL)
         )
-        gradleVariant.getAttributes().attribute(
+        gradleVariant.attributes.attribute(
             DocsType.DOCS_TYPE_ATTRIBUTE,
             objects.named(DocsType.SOURCES)
         )
