@@ -152,7 +152,7 @@ class ModifierParameterDetector : Detector(), SourceCodeScanner {
                 "- Have a type of `$ModifierShortName`" +
                 "- Either have no default value, or have a default value of `$ModifierShortName`" +
                 "- If optional, be the first optional parameter in the parameter list",
-            Category.CORRECTNESS, 3, Severity.ERROR,
+            Category.CORRECTNESS, 3, Severity.WARNING,
             Implementation(
                 ModifierParameterDetector::class.java,
                 EnumSet.of(Scope.JAVA_FILE, Scope.TEST_SOURCES)

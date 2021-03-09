@@ -62,10 +62,10 @@ class ModifierDeclarationDetectorTest : LintDetectorTest() {
             .run()
             .expect(
                 """
-src/androidx/compose/ui/foo/TestModifier.kt:8: Error: Modifier factory functions must have a return type of Modifier [ModifierFactoryReturnType]
+src/androidx/compose/ui/foo/TestModifier.kt:8: Warning: Modifier factory functions should have a return type of Modifier [ModifierFactoryReturnType]
                 fun Modifier.fooModifier(): Modifier.Element {
                              ~~~~~~~~~~~
-1 errors, 0 warnings
+0 errors, 1 warnings
             """
             )
             .expectFixDiffs(
@@ -105,16 +105,16 @@ Fix for src/androidx/compose/ui/foo/TestModifier.kt line 8: Change return type t
             .run()
             .expect(
                 """
-src/androidx/compose/ui/foo/TestModifier.kt:8: Error: Modifier factory functions must have a return type of Modifier [ModifierFactoryReturnType]
+src/androidx/compose/ui/foo/TestModifier.kt:8: Warning: Modifier factory functions should have a return type of Modifier [ModifierFactoryReturnType]
                 val Modifier.fooModifier get(): Modifier.Element {
                                          ~~~
-src/androidx/compose/ui/foo/TestModifier.kt:12: Error: Modifier factory functions must have a return type of Modifier [ModifierFactoryReturnType]
+src/androidx/compose/ui/foo/TestModifier.kt:12: Warning: Modifier factory functions should have a return type of Modifier [ModifierFactoryReturnType]
                 val Modifier.fooModifier2: Modifier.Element get() {
                                                             ~~~
-src/androidx/compose/ui/foo/TestModifier.kt:16: Error: Modifier factory functions must have a return type of Modifier [ModifierFactoryReturnType]
+src/androidx/compose/ui/foo/TestModifier.kt:16: Warning: Modifier factory functions should have a return type of Modifier [ModifierFactoryReturnType]
                 val Modifier.fooModifier3: Modifier.Element get() = TestModifier
                                                             ~~~
-3 errors, 0 warnings
+0 errors, 3 warnings
             """
             )
             .expectFixDiffs(
@@ -154,10 +154,10 @@ Fix for src/androidx/compose/ui/foo/TestModifier.kt line 16: Change return type 
             .run()
             .expect(
                 """
-src/androidx/compose/ui/foo/TestModifier.kt:8: Error: Modifier factory functions must have a return type of Modifier [ModifierFactoryReturnType]
+src/androidx/compose/ui/foo/TestModifier.kt:8: Warning: Modifier factory functions should have a return type of Modifier [ModifierFactoryReturnType]
                 fun Modifier.fooModifier() = TestModifier
                              ~~~~~~~~~~~
-1 errors, 0 warnings
+0 errors, 1 warnings
             """
             )
             .expectFixDiffs(
@@ -189,10 +189,10 @@ Fix for src/androidx/compose/ui/foo/TestModifier.kt line 8: Add explicit Modifie
             .run()
             .expect(
                 """
-src/androidx/compose/ui/foo/TestModifier.kt:8: Error: Modifier factory functions must have a return type of Modifier [ModifierFactoryReturnType]
+src/androidx/compose/ui/foo/TestModifier.kt:8: Warning: Modifier factory functions should have a return type of Modifier [ModifierFactoryReturnType]
                 val Modifier.fooModifier get() = TestModifier
                                          ~~~
-1 errors, 0 warnings
+0 errors, 1 warnings
             """
             )
             .expectFixDiffs(
@@ -226,10 +226,10 @@ Fix for src/androidx/compose/ui/foo/TestModifier.kt line 8: Add explicit Modifie
             .run()
             .expect(
                 """
-src/androidx/compose/ui/foo/TestModifier.kt:8: Error: Modifier factory functions must have a return type of Modifier [ModifierFactoryReturnType]
+src/androidx/compose/ui/foo/TestModifier.kt:8: Warning: Modifier factory functions should have a return type of Modifier [ModifierFactoryReturnType]
                 fun Modifier.fooModifier(): TestModifier {
                              ~~~~~~~~~~~
-1 errors, 0 warnings
+0 errors, 1 warnings
             """
             )
             .expectFixDiffs(
@@ -348,19 +348,19 @@ Fix for src/androidx/compose/ui/foo/TestModifier.kt line 8: Change return type t
             .run()
             .expect(
                 """
-src/androidx/compose/ui/foo/TestModifier.kt:8: Error: Modifier factory functions must be extensions on Modifier [ModifierFactoryExtensionFunction]
+src/androidx/compose/ui/foo/TestModifier.kt:8: Warning: Modifier factory functions should be extensions on Modifier [ModifierFactoryExtensionFunction]
                 fun fooModifier(): Modifier {
                     ~~~~~~~~~~~
-src/androidx/compose/ui/foo/TestModifier.kt:12: Error: Modifier factory functions must be extensions on Modifier [ModifierFactoryExtensionFunction]
+src/androidx/compose/ui/foo/TestModifier.kt:12: Warning: Modifier factory functions should be extensions on Modifier [ModifierFactoryExtensionFunction]
                 val fooModifier get(): Modifier {
                                 ~~~
-src/androidx/compose/ui/foo/TestModifier.kt:16: Error: Modifier factory functions must be extensions on Modifier [ModifierFactoryExtensionFunction]
+src/androidx/compose/ui/foo/TestModifier.kt:16: Warning: Modifier factory functions should be extensions on Modifier [ModifierFactoryExtensionFunction]
                 val fooModifier2: Modifier get() {
                                            ~~~
-src/androidx/compose/ui/foo/TestModifier.kt:20: Error: Modifier factory functions must be extensions on Modifier [ModifierFactoryExtensionFunction]
+src/androidx/compose/ui/foo/TestModifier.kt:20: Warning: Modifier factory functions should be extensions on Modifier [ModifierFactoryExtensionFunction]
                 val fooModifier3: Modifier get() = TestModifier
                                            ~~~
-4 errors, 0 warnings
+0 errors, 4 warnings
             """
             )
             .expectFixDiffs(
@@ -416,19 +416,19 @@ Fix for src/androidx/compose/ui/foo/TestModifier.kt line 20: Add Modifier receiv
             .run()
             .expect(
                 """
-src/androidx/compose/ui/foo/TestModifier.kt:8: Error: Modifier factory functions must be extensions on Modifier [ModifierFactoryExtensionFunction]
+src/androidx/compose/ui/foo/TestModifier.kt:8: Warning: Modifier factory functions should be extensions on Modifier [ModifierFactoryExtensionFunction]
                 fun TestModifier.fooModifier(): Modifier {
                                  ~~~~~~~~~~~
-src/androidx/compose/ui/foo/TestModifier.kt:12: Error: Modifier factory functions must be extensions on Modifier [ModifierFactoryExtensionFunction]
+src/androidx/compose/ui/foo/TestModifier.kt:12: Warning: Modifier factory functions should be extensions on Modifier [ModifierFactoryExtensionFunction]
                 val TestModifier.fooModifier get(): Modifier {
                                              ~~~
-src/androidx/compose/ui/foo/TestModifier.kt:16: Error: Modifier factory functions must be extensions on Modifier [ModifierFactoryExtensionFunction]
+src/androidx/compose/ui/foo/TestModifier.kt:16: Warning: Modifier factory functions should be extensions on Modifier [ModifierFactoryExtensionFunction]
                 val TestModifier.fooModifier2: Modifier get() {
                                                         ~~~
-src/androidx/compose/ui/foo/TestModifier.kt:20: Error: Modifier factory functions must be extensions on Modifier [ModifierFactoryExtensionFunction]
+src/androidx/compose/ui/foo/TestModifier.kt:20: Warning: Modifier factory functions should be extensions on Modifier [ModifierFactoryExtensionFunction]
                 val TestModifier.fooModifier3: Modifier get() = TestModifier
                                                         ~~~
-4 errors, 0 warnings
+0 errors, 4 warnings
             """
             )
             .expectFixDiffs(
@@ -493,19 +493,19 @@ Fix for src/androidx/compose/ui/foo/TestModifier.kt line 20: Change receiver to 
             .run()
             .expect(
                 """
-src/androidx/compose/ui/foo/TestModifier.kt:13: Error: Modifier factory functions should not be marked as @Composable, and should use composed instead [ComposableModifierFactory]
+src/androidx/compose/ui/foo/TestModifier.kt:13: Warning: Modifier factory functions should not be marked as @Composable, and should use composed instead [ComposableModifierFactory]
                 fun Modifier.fooModifier1(): Modifier {
                              ~~~~~~~~~~~~
-src/androidx/compose/ui/foo/TestModifier.kt:19: Error: Modifier factory functions should not be marked as @Composable, and should use composed instead [ComposableModifierFactory]
+src/androidx/compose/ui/foo/TestModifier.kt:19: Warning: Modifier factory functions should not be marked as @Composable, and should use composed instead [ComposableModifierFactory]
                 fun Modifier.fooModifier2(): Modifier = TestModifier(someComposableCall(3))
                              ~~~~~~~~~~~~
-src/androidx/compose/ui/foo/TestModifier.kt:22: Error: Modifier factory functions should not be marked as @Composable, and should use composed instead [ComposableModifierFactory]
+src/androidx/compose/ui/foo/TestModifier.kt:22: Warning: Modifier factory functions should not be marked as @Composable, and should use composed instead [ComposableModifierFactory]
                 val Modifier.fooModifier3: Modifier get() {
                                                     ~~~
-src/androidx/compose/ui/foo/TestModifier.kt:28: Error: Modifier factory functions should not be marked as @Composable, and should use composed instead [ComposableModifierFactory]
+src/androidx/compose/ui/foo/TestModifier.kt:28: Warning: Modifier factory functions should not be marked as @Composable, and should use composed instead [ComposableModifierFactory]
                 val Modifier.fooModifier4: Modifier get() = TestModifier(someComposableCall(3))
                                                     ~~~
-4 errors, 0 warnings
+0 errors, 4 warnings
             """
             )
             .expectFixDiffs(
