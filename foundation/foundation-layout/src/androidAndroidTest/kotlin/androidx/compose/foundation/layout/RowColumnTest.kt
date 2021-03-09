@@ -3588,6 +3588,24 @@ class RowColumnTest : LayoutTest() {
     }
 
     @Test
+    fun testRow_withArrangementSpacing() = with(density) {
+        val spacing = 5
+        val childSize = 10
+        testIntrinsics(
+            @Composable {
+                Row(horizontalArrangement = Arrangement.spacedBy(spacing.toDp())) {
+                    Box(Modifier.size(childSize.toDp()))
+                    Box(Modifier.size(childSize.toDp()))
+                    Box(Modifier.size(childSize.toDp()))
+                }
+            }
+        ) { minIntrinsicWidth, _, maxIntrinsicWidth, _ ->
+            assertEquals(childSize * 3 + 2 * spacing, minIntrinsicWidth(Constraints.Infinity))
+            assertEquals(childSize * 3 + 2 * spacing, maxIntrinsicWidth(Constraints.Infinity))
+        }
+    }
+
+    @Test
     fun testColumn_withNoWeightChildren_hasCorrectIntrinsicMeasurements() = with(density) {
         testIntrinsics(
             @Composable {
@@ -3913,6 +3931,24 @@ class RowColumnTest : LayoutTest() {
                 30.toDp().roundToPx() / 2 * 7 + 20.toDp().roundToPx(),
                 maxIntrinsicHeight(Constraints.Infinity)
             )
+        }
+    }
+
+    @Test
+    fun testColumn_withArrangementSpacing() = with(density) {
+        val spacing = 5
+        val childSize = 10
+        testIntrinsics(
+            @Composable {
+                Column(verticalArrangement = Arrangement.spacedBy(spacing.toDp())) {
+                    Box(Modifier.size(childSize.toDp()))
+                    Box(Modifier.size(childSize.toDp()))
+                    Box(Modifier.size(childSize.toDp()))
+                }
+            }
+        ) { _, minIntrinsicHeight, _, maxIntrinsicHeight ->
+            assertEquals(childSize * 3 + 2 * spacing, minIntrinsicHeight(Constraints.Infinity))
+            assertEquals(childSize * 3 + 2 * spacing, maxIntrinsicHeight(Constraints.Infinity))
         }
     }
 
