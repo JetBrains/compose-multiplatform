@@ -104,11 +104,11 @@ class ParametersTest {
         val intArray = params.find("intArray")!!
         var strings = params.stringsList
         assertThat(intArray.elementsCount).isEqualTo(5)
-        checkParam(strings, intArray.elementsList[0], "[0]", 10)
-        checkParam(strings, intArray.elementsList[1], "[1]", 11)
-        checkParam(strings, intArray.elementsList[2], "[2]", 12)
-        checkParam(strings, intArray.elementsList[3], "[3]", 13)
-        checkParam(strings, intArray.elementsList[4], "[4]", 14)
+        checkParam(strings, intArray.elementsList[0], "[0]", 10, 0)
+        checkParam(strings, intArray.elementsList[1], "[1]", 11, 1)
+        checkParam(strings, intArray.elementsList[2], "[2]", 12, 2)
+        checkParam(strings, intArray.elementsList[3], "[3]", 13, 3)
+        checkParam(strings, intArray.elementsList[4], "[4]", 14, 4)
 
         val expanded =
             tester.sendCommand(
@@ -122,9 +122,9 @@ class ParametersTest {
         val intArray2 = expanded.parameter
         strings = expanded.stringsList
         assertThat(intArray2.elementsCount).isEqualTo(3)
-        checkParam(strings, intArray2.elementsList[0], "[5]", 15)
-        checkParam(strings, intArray2.elementsList[1], "[6]", 16)
-        checkParam(strings, intArray2.elementsList[2], "[7]", 17)
+        checkParam(strings, intArray2.elementsList[0], "[5]", 15, 5)
+        checkParam(strings, intArray2.elementsList[1], "[6]", 16, 6)
+        checkParam(strings, intArray2.elementsList[2], "[7]", 17, 7)
     }
 }
 
@@ -154,7 +154,7 @@ private fun checkParam(
     param: Parameter,
     name: String,
     value: Int,
-    index: Int = -1
+    index: Int = 0
 ) {
     assertThat(stringList.toMap()[param.name]).isEqualTo(name)
     assertThat(param.int32Value).isEqualTo(value)

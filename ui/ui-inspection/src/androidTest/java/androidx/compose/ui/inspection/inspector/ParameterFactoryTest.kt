@@ -460,7 +460,7 @@ class ParameterFactoryTest {
 
         // If we need to retrieve more array elements we call "expand" with the reference:
         validate(expand("array", value, refToSelf, 5, 5)!!) {
-            parameter("array", ParameterType.Iterable, "", refToSelf) {
+            parameter("array", ParameterType.Iterable, "", refToSelf, childStartIndex = 5) {
                 parameter("[5]", ParameterType.Int32, 15)
                 parameter("[6]", ParameterType.Int32, 16)
                 parameter("[7]", ParameterType.Int32, 17)
@@ -472,7 +472,7 @@ class ParameterFactoryTest {
         // Call "expand" again to retrieve more:
         validate(expand("array", value, refToSelf, 10, 5)!!) {
             // This time we reached the end of the array, and we do not get a reference to get more
-            parameter("array", ParameterType.Iterable, "") {
+            parameter("array", ParameterType.Iterable, "", childStartIndex = 10) {
                 parameter("[10]", ParameterType.Int32, 20)
                 parameter("[11]", ParameterType.Int32, 21)
                 parameter("[12]", ParameterType.Int32, 22)
@@ -483,15 +483,49 @@ class ParameterFactoryTest {
 
     @Test
     fun testListWithNullElement() {
-        val value = listOf("Hello", null, "World")
-        val parameter = create("array", value, maxInitialIterableSize = 3)
+        val value = listOf(
+            "a",
+            null,
+            "b",
+            "c",
+            null,
+            null,
+            null,
+            null,
+            "d",
+            null,
+            "e",
+            null,
+            null,
+            null,
+            null,
+            null,
+            "f",
+            null,
+            "g",
+            null
+        )
+        val parameter = create("array", value)
+        val refToSelf = ref()
         validate(parameter) {
             // Here we get all the available elements from the list.
             // There is no need to go back for more data, and the iterable does not have a
             // reference for doing so.
+            parameter("array", ParameterType.Iterable, "", refToSelf) {
+                parameter("[0]", ParameterType.String, "a")
+                parameter("[2]", ParameterType.String, "b", index = 2)
+                parameter("[3]", ParameterType.String, "c", index = 3)
+                parameter("[8]", ParameterType.String, "d", index = 8)
+                parameter("[10]", ParameterType.String, "e", index = 10)
+            }
+        }
+
+        // Call "expand" to retrieve more elements:
+        validate(expand("array", value, refToSelf, 11, 5)!!) {
+            // This time we reached the end of the array, and we do not get a reference to get more
             parameter("array", ParameterType.Iterable, "") {
-                parameter("[0]", ParameterType.String, "Hello")
-                parameter("[2]", ParameterType.String, "World", index = 2)
+                parameter("[16]", ParameterType.String, "f", index = 16)
+                parameter("[18]", ParameterType.String, "g", index = 18)
             }
         }
     }
@@ -923,8 +957,9 @@ private class TestPainter(
 }
 
 class ParameterValidationReceiver(
-    private val parameterIterator: Iterator<NodeParameter>,
-    private val trace: String = ""
+    private val parameterIterator: ListIterator<NodeParameter>,
+    private val trace: String = "",
+    private val startIndex: Int = 0
 ) {
     fun parameter(
         name: String,
@@ -932,20 +967,23 @@ class ParameterValidationReceiver(
         value: Any?,
         ref: NodeParameterReference? = null,
         index: Int = -1,
+        childStartIndex: Int = 0,
         block: ParameterValidationReceiver.() -> Unit = {}
     ) {
+        val listIndex = startIndex + parameterIterator.nextIndex()
+        val expectedIndex = if (index < 0) listIndex else index
         assertWithMessage("No such element found: $name").that(parameterIterator.hasNext()).isTrue()
         val parameter = parameterIterator.next()
         assertThat(parameter.name).isEqualTo(name)
         val msg = "$trace${parameter.name}"
         assertWithMessage(msg).that(parameter.type).isEqualTo(type)
-        assertWithMessage(msg).that(parameter.index).isEqualTo(index)
+        assertWithMessage(msg).that(parameter.index).isEqualTo(expectedIndex)
         assertWithMessage(msg).that(checkEquals(parameter.reference, ref)).isTrue()
         if (type != ParameterType.Lambda || value != null) {
             assertWithMessage(msg).that(parameter.value).isEqualTo(value)
         }
         val iterator = parameter.elements.listIterator()
-        ParameterValidationReceiver(iterator, "$msg.").apply {
+        ParameterValidationReceiver(iterator, "$msg.", childStartIndex).apply {
             block()
             checkFinished(msg)
         }
