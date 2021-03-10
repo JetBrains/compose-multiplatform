@@ -168,9 +168,32 @@ fun Modifier.draggable(
     onDragStarted: suspend CoroutineScope.(startedPosition: Offset) -> Unit = {},
     onDragStopped: suspend CoroutineScope.(velocity: Float) -> Unit = {},
     reverseDirection: Boolean = false
+): Modifier = draggable(
+    state = state,
+    orientation = orientation,
+    enabled = enabled,
+    interactionSource = interactionSource,
+    startDragImmediately = startDragImmediately,
+    onDragStarted = onDragStarted,
+    onDragStopped = onDragStopped,
+    reverseDirection = reverseDirection,
+    canDrag = { true }
+)
+
+internal fun Modifier.draggable(
+    state: DraggableState,
+    canDrag: (PointerInputChange) -> Boolean,
+    orientation: Orientation,
+    enabled: Boolean = true,
+    interactionSource: MutableInteractionSource? = null,
+    startDragImmediately: Boolean = false,
+    onDragStarted: suspend CoroutineScope.(startedPosition: Offset) -> Unit = {},
+    onDragStopped: suspend CoroutineScope.(velocity: Float) -> Unit = {},
+    reverseDirection: Boolean = false
 ): Modifier = composed(
     inspectorInfo = debugInspectorInfo {
         name = "draggable"
+        properties["canDrag"] = canDrag
         properties["orientation"] = orientation
         properties["enabled"] = enabled
         properties["reverseDirection"] = reverseDirection
@@ -198,11 +221,13 @@ fun Modifier.draggable(
     val onDragStartedState = rememberUpdatedState(onDragStarted)
     val updatedDraggableState = rememberUpdatedState(state)
     val onDragStoppedState = rememberUpdatedState(onDragStopped)
+    val canDragState = rememberUpdatedState(canDrag)
     val dragBlock: suspend PointerInputScope.() -> Unit = remember {
         {
             dragForEachGesture(
                 orientation = orientationState,
                 enabled = enabledState,
+                canDrag = canDragState,
                 interactionSource = interactionSourceState,
                 dragStartInteraction = draggedInteraction,
                 reverseDirection = reverseDirectionState,
@@ -219,6 +244,7 @@ fun Modifier.draggable(
 private suspend fun PointerInputScope.dragForEachGesture(
     orientation: State<Orientation>,
     enabled: State<Boolean>,
+    canDrag: State<(PointerInputChange) -> Boolean>,
     reverseDirection: State<Boolean>,
     interactionSource: State<MutableInteractionSource?>,
     dragStartInteraction: MutableState<DragInteraction.Start?>,
@@ -260,7 +286,7 @@ private suspend fun PointerInputScope.dragForEachGesture(
             var initialDelta = 0f
             val startEvent = awaitPointerEventScope {
                 val down = awaitFirstDown(requireUnconsumed = false)
-                if (!enabled.value) {
+                if (!enabled.value || !canDrag.value.invoke(down)) {
                     null
                 } else if (startDragImmediately.value) {
                     // since we start immediately we don't wait for slop and set initial delta to 0
