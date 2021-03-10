@@ -104,8 +104,7 @@ package androidx.compose.ui.graphics {
   }
 
   public final class AndroidPath implements androidx.compose.ui.graphics.Path {
-    ctor public AndroidPath(android.graphics.Path internalPath);
-    ctor public AndroidPath();
+    ctor public AndroidPath(optional android.graphics.Path internalPath);
     method public void addArc(androidx.compose.ui.geometry.Rect oval, float startAngleDegrees, float sweepAngleDegrees);
     method public void addArcRad(androidx.compose.ui.geometry.Rect oval, float startAngleRadians, float sweepAngleRadians);
     method public void addOval(androidx.compose.ui.geometry.Rect oval);
@@ -356,7 +355,7 @@ package androidx.compose.ui.graphics {
 
   public final inline class ColorMatrix {
     ctor public ColorMatrix();
-    method public static float[]! constructor-impl(float[] values);
+    method public static float[]! constructor-impl(optional float[] values);
     method public static void convertRgbToYuv-impl(float[]! $this);
     method public static void convertYuvToRgb-impl(float[]! $this);
     method public static inline boolean equals-impl(float[]! p, Object? p1);
@@ -429,7 +428,7 @@ package androidx.compose.ui.graphics {
 
   public final inline class Matrix {
     ctor public Matrix();
-    method public static float[]! constructor-impl(float[] values);
+    method public static float[]! constructor-impl(optional float[] values);
     method public static inline boolean equals-impl(float[]! p, Object? p1);
     method public static boolean equals-impl0(float[] p1, float[] p2);
     method public static inline operator float get-impl(float[] $this, int row, int column);
@@ -909,7 +908,7 @@ package androidx.compose.ui.graphics.colorspace {
   }
 
   public final class TransferParameters {
-    ctor public TransferParameters(double gamma, double a, double b, double c, double d, double e, double f);
+    ctor public TransferParameters(double gamma, double a, double b, double c, double d, optional double e, optional double f);
     method public double component1();
     method public double component2();
     method public double component3();
@@ -1105,8 +1104,7 @@ package androidx.compose.ui.graphics.drawscope {
   }
 
   public final class Stroke extends androidx.compose.ui.graphics.drawscope.DrawStyle {
-    ctor public Stroke(float width, float miter, androidx.compose.ui.graphics.StrokeCap cap, androidx.compose.ui.graphics.StrokeJoin join, androidx.compose.ui.graphics.PathEffect? pathEffect);
-    ctor public Stroke();
+    ctor public Stroke(optional float width, optional float miter, optional androidx.compose.ui.graphics.StrokeCap cap, optional androidx.compose.ui.graphics.StrokeJoin join, optional androidx.compose.ui.graphics.PathEffect? pathEffect);
     method public androidx.compose.ui.graphics.StrokeCap getCap();
     method public androidx.compose.ui.graphics.StrokeJoin getJoin();
     method public float getMiter();
