@@ -220,9 +220,6 @@ class ParameterFactoryTest {
                     parameter("[0]", ParameterType.Color, Color.Red.toArgb())
                     parameter("[1]", ParameterType.Color, Color.Blue.toArgb())
                 }
-                // Parameters are traversed in alphabetical order through reflection queries.
-                // Validate createdSize exists before validating end parameter
-                parameter("createdSize", ParameterType.String, "Unspecified", index = 5)
                 parameter("end", ParameterType.String, Offset::class.java.simpleName) {
                     parameter("x", ParameterType.DimensionDp, 2.5f)
                     parameter("y", ParameterType.DimensionDp, 5.0f)
@@ -232,6 +229,7 @@ class ParameterFactoryTest {
                     parameter("y", ParameterType.DimensionDp, 0.25f)
                 }
                 parameter("tileMode", ParameterType.String, "Clamp", index = 4)
+                parameter("createdSize", ParameterType.String, "Unspecified", index = 5)
             }
         }
         // TODO: add tests for RadialGradient & ShaderBrush
@@ -520,9 +518,9 @@ class ParameterFactoryTest {
                     parameter("shape", ParameterType.String, "RectangleShape")
                 }
                 parameter("border", ParameterType.Color, Color.Red.toArgb()) {
+                    parameter("width", ParameterType.DimensionDp, 5.0f)
                     parameter("color", ParameterType.Color, Color.Red.toArgb())
                     parameter("shape", ParameterType.String, "RectangleShape")
-                    parameter("width", ParameterType.DimensionDp, 5.0f)
                 }
                 parameter("padding", ParameterType.DimensionDp, 2.0f)
                 parameter("fillMaxWidth", ParameterType.String, "") {
@@ -534,13 +532,8 @@ class ParameterFactoryTest {
                 }
                 parameter("width", ParameterType.DimensionDp, 30.0f)
                 parameter("paint", ParameterType.String, "") {
-                    parameter("alignment", ParameterType.String, "Center")
-                    parameter("alpha", ParameterType.Float, 1.0f)
-                    parameter("contentScale", ParameterType.String, "Inside")
                     parameter("painter", ParameterType.String, "TestPainter") {
-                        parameter("alpha", ParameterType.Float, 1.0f)
                         parameter("color", ParameterType.Color, Color.Red.toArgb())
-                        parameter("drawLambda", ParameterType.Lambda, null, index = 6)
                         parameter("height", ParameterType.Float, 20.0f)
                         parameter("intrinsicSize", ParameterType.String, "Size") {
                             parameter("height", ParameterType.Float, 20.0f)
@@ -549,11 +542,16 @@ class ParameterFactoryTest {
                             parameter("packedValue", ParameterType.Int64, 4692750812821061632L)
                             parameter("width", ParameterType.Float, 10.0f)
                         }
+                        parameter("width", ParameterType.Float, 10.0f)
+                        parameter("alpha", ParameterType.Float, 1.0f)
+                        parameter("drawLambda", ParameterType.Lambda, null, index = 6)
                         parameter("layoutDirection", ParameterType.String, "Ltr", index = 8)
                         parameter("useLayer", ParameterType.Boolean, false, index = 9)
-                        parameter("width", ParameterType.Float, 10.0f)
                     }
                     parameter("sizeToIntrinsics", ParameterType.Boolean, true)
+                    parameter("alignment", ParameterType.String, "Center")
+                    parameter("contentScale", ParameterType.String, "Inside")
+                    parameter("alpha", ParameterType.Float, 1.0f)
                 }
             }
         }
@@ -573,10 +571,10 @@ class ParameterFactoryTest {
         validate(create("modifier", Modifier.padding(1.dp, 2.dp, 3.dp, 4.dp))) {
             parameter("modifier", ParameterType.String, "") {
                 parameter("padding", ParameterType.String, "") {
-                    parameter("bottom", ParameterType.DimensionDp, 4.0f)
-                    parameter("end", ParameterType.DimensionDp, 3.0f)
                     parameter("start", ParameterType.DimensionDp, 1.0f)
                     parameter("top", ParameterType.DimensionDp, 2.0f)
+                    parameter("end", ParameterType.DimensionDp, 3.0f)
+                    parameter("bottom", ParameterType.DimensionDp, 4.0f)
                 }
             }
         }
@@ -946,14 +944,11 @@ class ParameterValidationReceiver(
         if (type != ParameterType.Lambda || value != null) {
             assertWithMessage(msg).that(parameter.value).isEqualTo(value)
         }
-        var elements: List<NodeParameter> = parameter.elements
-        if (name != "modifier" && type != ParameterType.Iterable) {
-            // Do not sort modifiers or iterables: the order is important
-            elements = elements.sortedBy { it.name }
+        val iterator = parameter.elements.listIterator()
+        ParameterValidationReceiver(iterator, "$msg.").apply {
+            block()
+            checkFinished(msg)
         }
-        val children = ParameterValidationReceiver(elements.listIterator(), "$msg.")
-        children.block()
-        children.checkFinished(msg)
     }
 
     fun checkFinished(trace: String = "") {
