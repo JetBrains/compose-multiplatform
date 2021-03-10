@@ -32,6 +32,7 @@ import androidx.activity.ComponentActivity
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.requiredSize
@@ -47,9 +48,12 @@ import androidx.compose.ui.platform.AndroidComposeView
 import androidx.compose.ui.platform.AndroidComposeViewAccessibilityDelegateCompat
 import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.semantics.SemanticsActions
 import androidx.compose.ui.semantics.SemanticsProperties
+import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.paneTitle
+import androidx.compose.ui.semantics.role
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.semantics.textSelectionRange
 import androidx.compose.ui.test.SemanticsMatcher
@@ -1172,6 +1176,121 @@ class AndroidAccessibilityTest {
                 textRect
             )
         }
+    }
+
+    @Test
+    fun testContentDescription_notMergingDescendants_withOwnContentDescription() {
+        val tag = "Column"
+        container.setContent {
+            Column(Modifier.semantics { contentDescription = "Column" }.testTag(tag)) {
+                BasicText("Text")
+                Box(Modifier.size(100.dp).semantics { contentDescription = "Box" })
+            }
+        }
+
+        val node = rule.onNodeWithTag(tag).fetchSemanticsNode()
+        val info = provider.createAccessibilityNodeInfo(node.id)
+
+        assertEquals("Column", info.contentDescription)
+    }
+
+    @Test
+    fun testContentDescription_mergingDescendants_withOwnContentDescription() {
+        val tag = "Column"
+        container.setContent {
+            Column(Modifier.semantics(true) { contentDescription = "Column" }.testTag(tag)) {
+                BasicText("Text")
+                Box(Modifier.size(100.dp).semantics { contentDescription = "Box" })
+            }
+        }
+
+        val node = rule.onNodeWithTag(tag).fetchSemanticsNode()
+        val info = provider.createAccessibilityNodeInfo(node.id)
+
+        assertEquals("Column", info.contentDescription)
+    }
+
+    @Test
+    fun testContentDescription_notMergingDescendants_withoutOwnContentDescription() {
+        val tag = "Column"
+        container.setContent {
+            Column(Modifier.semantics {}.testTag(tag)) {
+                BasicText("Text")
+                Box(Modifier.size(100.dp).semantics { contentDescription = "Box" })
+            }
+        }
+
+        val node = rule.onNodeWithTag(tag).fetchSemanticsNode()
+        val info = provider.createAccessibilityNodeInfo(node.id)
+
+        assertEquals(null, info.contentDescription)
+    }
+
+    @Test
+    fun testContentDescription_mergingDescendants_withoutOwnContentDescription() {
+        val tag = "Column"
+        container.setContent {
+            Column(Modifier.semantics(true) {}.testTag(tag)) {
+                BasicText("Text")
+                Box(Modifier.size(100.dp).semantics { contentDescription = "Box" })
+            }
+        }
+
+        val node = rule.onNodeWithTag(tag).fetchSemanticsNode()
+        val info = provider.createAccessibilityNodeInfo(node.id)
+
+        assertEquals("Text, Box", info.contentDescription)
+    }
+
+    @Test
+    fun testContentDescription_mergingDescendants() {
+        // This is a bit more complex example
+        val tag = "Column"
+        container.setContent {
+            Column(Modifier.semantics(true) {}.testTag(tag)) {
+                Column(Modifier.semantics(true) { contentDescription = "Column1" }) {
+                    BasicText("Text1")
+                    Row(Modifier.semantics {}) {
+                        Box(Modifier.size(100.dp).semantics { contentDescription = "Box1" })
+                        Box(Modifier.size(100.dp).semantics { contentDescription = "Box2" })
+                    }
+                }
+                Column(Modifier.semantics {}) {
+                    BasicText("Text2")
+                    Row(Modifier.semantics(true) {}) {
+                        Box(Modifier.size(100.dp).semantics { contentDescription = "Box3" })
+                        Box(Modifier.size(100.dp).semantics { contentDescription = "Box4" })
+                    }
+                }
+                Column(Modifier.semantics { }) {
+                    BasicText("Text3")
+                    Row(Modifier.semantics {}) {
+                        Box(Modifier.size(100.dp).semantics { contentDescription = "Box5" })
+                        Box(Modifier.size(100.dp).semantics { contentDescription = "Box6" })
+                    }
+                }
+            }
+        }
+
+        val node = rule.onNodeWithTag(tag).fetchSemanticsNode()
+        val info = provider.createAccessibilityNodeInfo(node.id)
+
+        assertEquals("Text2, Text3, Box5, Box6", info.contentDescription)
+    }
+
+    @Test
+    fun testRole_doesNotMerge() {
+        container.setContent {
+            Row(Modifier.semantics(true) {}.testTag("Row")) {
+                Box(Modifier.size(100.dp).semantics { role = Role.Button })
+                Box(Modifier.size(100.dp).semantics { role = Role.Image })
+            }
+        }
+
+        val node = rule.onNodeWithTag("Row").fetchSemanticsNode()
+        val info = provider.createAccessibilityNodeInfo(node.id)
+
+        assertEquals(AndroidComposeViewAccessibilityDelegateCompat.ClassName, info.className)
     }
 
     private fun eventIndex(list: List<AccessibilityEvent>, event: AccessibilityEvent): Int {
