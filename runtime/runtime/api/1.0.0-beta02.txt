@@ -456,6 +456,9 @@ package androidx.compose.runtime.internal {
     method public static boolean isLiveLiteralsEnabled();
   }
 
+  public final class ThreadMapKt {
+  }
+
 }
 
 package androidx.compose.runtime.snapshots {
