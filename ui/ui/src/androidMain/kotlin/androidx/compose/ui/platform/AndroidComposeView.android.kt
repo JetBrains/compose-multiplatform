@@ -70,7 +70,7 @@ import androidx.compose.ui.input.key.Key.Companion.DirectionRight
 import androidx.compose.ui.input.key.Key.Companion.DirectionUp
 import androidx.compose.ui.input.key.Key.Companion.Tab
 import androidx.compose.ui.input.key.KeyEvent
-import androidx.compose.ui.input.key.KeyEventType
+import androidx.compose.ui.input.key.KeyEventType.KeyDown
 import androidx.compose.ui.input.key.KeyInputModifier
 import androidx.compose.ui.input.key.isShiftPressed
 import androidx.compose.ui.input.key.key
@@ -149,13 +149,11 @@ internal class AndroidComposeView(context: Context) :
     //  that this common logic can be used by all owners.
     private val keyInputModifier: KeyInputModifier = KeyInputModifier(
         onKeyEvent = {
-            if (it.type == KeyEventType.KeyDown) {
-                getFocusDirection(it)?.let { direction ->
-                    focusManager.moveFocus(direction)
-                    return@KeyInputModifier true
-                }
-            }
-            false
+            val focusDirection = getFocusDirection(it)
+            if (focusDirection == null || it.type != KeyDown) return@KeyInputModifier false
+
+            // Consume the key event if we moved focus.
+            focusManager.moveFocus(focusDirection)
         },
         onPreviewKeyEvent = null
     )
