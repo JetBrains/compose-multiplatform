@@ -101,7 +101,6 @@ import androidx.compose.ui.test.onRoot
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
-import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.launch
 import org.junit.Rule
@@ -304,7 +303,7 @@ fun RememberInfiniteTransitionSimple() {
 }
 
 @Composable
-fun TargetBasedAnimationSimple(someCustomCondition: () -> Boolean, scope: CoroutineScope) {
+fun TargetBasedAnimationSimple(someCustomCondition: () -> Boolean) {
     val anim = remember {
         TargetBasedAnimation(
             animationSpec = tween(200),
@@ -315,7 +314,7 @@ fun TargetBasedAnimationSimple(someCustomCondition: () -> Boolean, scope: Corout
     }
     var playTime by remember { mutableStateOf(0L) }
 
-    scope.launch {
+    LaunchedEffect(anim) {
         val startTime = withFrameNanos { it }
 
         do {

@@ -371,7 +371,6 @@ private fun TestingCheatSheetAssertions() {
 }
 
 @RequiresApi(Build.VERSION_CODES.O)
-@Composable
 private fun TestingCheatSheetOther() {
 
     // COMPOSE TEST RULE
