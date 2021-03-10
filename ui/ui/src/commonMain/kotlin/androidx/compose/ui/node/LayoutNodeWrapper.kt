@@ -50,7 +50,7 @@ import androidx.compose.ui.unit.plus
 internal abstract class LayoutNodeWrapper(
     internal val layoutNode: LayoutNode
 ) : Placeable(), Measurable, LayoutCoordinates, OwnerScope, (Canvas) -> Unit {
-    internal open val wrapped: LayoutNodeWrapper? = null
+    internal open val wrapped: LayoutNodeWrapper? get() = null
     internal var wrappedBy: LayoutNodeWrapper? = null
 
     /**
@@ -69,7 +69,7 @@ internal abstract class LayoutNodeWrapper(
         private set
 
     private var _isAttached = false
-    override val isAttached: Boolean
+    final override val isAttached: Boolean
         get() {
             if (_isAttached) {
                 require(layoutNode.isAttached)
@@ -78,21 +78,32 @@ internal abstract class LayoutNodeWrapper(
         }
 
     private var _measureResult: MeasureResult? = null
-    open var measureResult: MeasureResult
+    var measureResult: MeasureResult
         get() = _measureResult ?: error(UnmeasuredError)
         internal set(value) {
-            if (value.width != _measureResult?.width || value.height != _measureResult?.height) {
-                val layer = layer
-                if (layer != null) {
-                    layer.resize(IntSize(value.width, value.height))
-                } else {
-                    wrappedBy?.invalidateLayer()
+            val old = _measureResult
+            if (value !== old) {
+                _measureResult = value
+                if (old == null || value.width != old.width || value.height != old.height) {
+                    onMeasureResultChanged(value.width, value.height)
                 }
-                layoutNode.owner?.onLayoutChange(layoutNode)
             }
-            _measureResult = value
-            measuredSize = IntSize(measureResult.width, measureResult.height)
         }
+
+    /**
+     * Called when the width or height of [measureResult] change. The object instance pointed to
+     * by [measureResult] may or may not have changed.
+     */
+    protected open fun onMeasureResultChanged(width: Int, height: Int) {
+        val layer = layer
+        if (layer != null) {
+            layer.resize(IntSize(width, height))
+        } else {
+            wrappedBy?.invalidateLayer()
+        }
+        layoutNode.owner?.onLayoutChange(layoutNode)
+        measuredSize = IntSize(width, height)
+    }
 
     var position: IntOffset = IntOffset.Zero
         private set
@@ -100,13 +111,13 @@ internal abstract class LayoutNodeWrapper(
     var zIndex: Float = 0f
         protected set
 
-    override val parentLayoutCoordinates: LayoutCoordinates?
+    final override val parentLayoutCoordinates: LayoutCoordinates?
         get() {
             check(isAttached) { ExpectAttachedLayoutCoordinates }
             return layoutNode.outerLayoutNodeWrapper.wrappedBy
         }
 
-    override val parentCoordinates: LayoutCoordinates?
+    final override val parentCoordinates: LayoutCoordinates?
         get() {
             check(isAttached) { ExpectAttachedLayoutCoordinates }
             return wrappedBy?.getWrappedByCoordinates()
@@ -143,17 +154,12 @@ internal abstract class LayoutNodeWrapper(
         return x >= 0f && y >= 0f && x < measuredWidth && y < measuredHeight
     }
 
-    /**
-     * Measures the modified child.
-     */
-    abstract fun performMeasure(constraints: Constraints): Placeable
-
-    /**
-     * Measures the modified child.
-     */
-    final override fun measure(constraints: Constraints): Placeable {
+    protected inline fun performingMeasure(
+        constraints: Constraints,
+        block: () -> Placeable
+    ): Placeable {
         measurementConstraints = constraints
-        val result = performMeasure(constraints)
+        val result = block()
         layer?.resize(measuredSize)
         return result
     }

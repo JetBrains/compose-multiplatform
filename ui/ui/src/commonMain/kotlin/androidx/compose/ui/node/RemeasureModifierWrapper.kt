@@ -27,8 +27,8 @@ internal class RemeasureModifierWrapper(
     wrapped: LayoutNodeWrapper,
     modifier: OnRemeasuredModifier
 ) : DelegatingLayoutNodeWrapper<OnRemeasuredModifier>(wrapped, modifier) {
-    override fun performMeasure(constraints: Constraints): Placeable {
-        val placeable = super.performMeasure(constraints)
+    override fun measure(constraints: Constraints): Placeable {
+        val placeable = super.measure(constraints)
         val invokeRemeasureCallbacks = {
             modifier.onRemeasured(measuredSize)
         }

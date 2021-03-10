@@ -165,7 +165,7 @@ abstract class Placeable : Measured {
          * have the same [zIndex] the order in which the items were placed is used.
          */
         fun Placeable.placeRelative(x: Int, y: Int, zIndex: Float = 0f) =
-            placeRelative(IntOffset(x, y), zIndex)
+            placeAutoMirrored(IntOffset(x, y), zIndex, null)
 
         /**
          * Place a [Placeable] at [x], [y] in its parent's coordinate system.
@@ -176,7 +176,8 @@ abstract class Placeable : Measured {
          * [zIndex] will be drawn on top of all the children with smaller [zIndex]. When children
          * have the same [zIndex] the order in which the items were placed is used.
          */
-        fun Placeable.place(x: Int, y: Int, zIndex: Float = 0f) = place(IntOffset(x, y), zIndex)
+        fun Placeable.place(x: Int, y: Int, zIndex: Float = 0f) =
+            placeApparentToRealOffset(IntOffset(x, y), zIndex, null)
 
         /**
          * Place a [Placeable] at [position] in its parent's coordinate system.
@@ -235,7 +236,7 @@ abstract class Placeable : Measured {
             y: Int,
             zIndex: Float = 0f,
             layerBlock: GraphicsLayerScope.() -> Unit = DefaultLayerBlock
-        ) = placeRelativeWithLayer(IntOffset(x, y), zIndex, layerBlock)
+        ) = placeAutoMirrored(IntOffset(x, y), zIndex, layerBlock)
 
         /**
          * Place a [Placeable] at [x], [y] in its parent's coordinate system with an introduced
@@ -255,7 +256,7 @@ abstract class Placeable : Measured {
             y: Int,
             zIndex: Float = 0f,
             layerBlock: GraphicsLayerScope.() -> Unit = DefaultLayerBlock
-        ) = placeWithLayer(IntOffset(x, y), zIndex, layerBlock)
+        ) = placeApparentToRealOffset(IntOffset(x, y), zIndex, layerBlock)
 
         /**
          * Place a [Placeable] at [position] in its parent's coordinate system with an introduced
@@ -276,10 +277,11 @@ abstract class Placeable : Measured {
             layerBlock: GraphicsLayerScope.() -> Unit = DefaultLayerBlock
         ) = placeApparentToRealOffset(position, zIndex, layerBlock)
 
-        private fun Placeable.placeAutoMirrored(
+        @Suppress("NOTHING_TO_INLINE")
+        internal inline fun Placeable.placeAutoMirrored(
             position: IntOffset,
             zIndex: Float,
-            layerBlock: (GraphicsLayerScope.() -> Unit)?
+            noinline layerBlock: (GraphicsLayerScope.() -> Unit)?
         ) {
             if (parentLayoutDirection == LayoutDirection.Ltr || parentWidth == 0) {
                 placeApparentToRealOffset(position, zIndex, layerBlock)
@@ -292,10 +294,11 @@ abstract class Placeable : Measured {
             }
         }
 
-        private fun Placeable.placeApparentToRealOffset(
+        @Suppress("NOTHING_TO_INLINE")
+        internal inline fun Placeable.placeApparentToRealOffset(
             position: IntOffset,
             zIndex: Float,
-            layerBlock: (GraphicsLayerScope.() -> Unit)?
+            noinline layerBlock: (GraphicsLayerScope.() -> Unit)?
         ) {
             placeAt(position + apparentToRealOffset, zIndex, layerBlock)
         }
