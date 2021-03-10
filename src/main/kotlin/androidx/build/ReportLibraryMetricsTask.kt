@@ -31,12 +31,12 @@ import org.gradle.api.tasks.TaskProvider
 import org.json.simple.JSONObject
 import java.io.File
 
-private const val AAR_FILE_EXTENSION = ".aar"
 private const val BYTECODE_SIZE = "bytecode_size"
 private const val METHOD_COUNT = "method_count"
 private const val METRICS_DIRECTORY = "librarymetrics"
 private const val JSON_FILE_EXTENSION = ".json"
 private const val JAR_FILE_EXTENSION = ".jar"
+private const val LINT_JAR = "lint$JAR_FILE_EXTENSION"
 
 @CacheableTask
 abstract class ReportLibraryMetricsTask : DefaultTask() {
@@ -77,7 +77,10 @@ abstract class ReportLibraryMetricsTask : DefaultTask() {
 
     private fun getJarFiles(): List<File> {
         return jarFiles.files.filter { file ->
-            file.name.endsWith(JAR_FILE_EXTENSION)
+            file.name.endsWith(JAR_FILE_EXTENSION) &&
+                // AARs bundle a `lint.jar` that contains lint checks published by the library -
+                // this isn't runtime code and is not part of the actual library, so ignore it.
+                file.name != LINT_JAR
         }
     }
 
