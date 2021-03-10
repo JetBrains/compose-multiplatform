@@ -30,7 +30,6 @@ import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.semantics.SemanticsActions
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.util.expectErrorMessage
-import androidx.compose.ui.test.util.expectErrorMessageMatches
 import androidx.compose.ui.test.util.expectErrorMessageStartsWith
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.MediumTest
@@ -62,10 +61,10 @@ class ErrorMessagesTest {
         }
 
         expectErrorMessage(
-            "" +
-                "Failed: assertExists.\n" +
-                "Reason: Expected exactly '1' node but could not find any node that satisfies: " +
-                "(TestTag = 'MyButton3')"
+            """
+                Failed: assertExists.
+                Reason: Expected exactly '1' node but could not find any node that satisfies: (TestTag = 'MyButton3')
+            """.trimIndent()
         ) {
             rule.onNodeWithTag("MyButton3")
                 .assertExists()
@@ -79,10 +78,11 @@ class ErrorMessagesTest {
         }
 
         expectErrorMessage(
-            "" +
-                "Failed to perform a gesture.\n" +
-                "Reason: Expected exactly '1' node but could not find any node that satisfies: " +
-                "(TestTag = 'MyButton3')"
+            """
+                Failed to perform a gesture.
+                Reason: Expected exactly '1' node but could not find any node that satisfies: (TestTag = 'MyButton3')
+            """.trimIndent()
+
         ) {
             rule.onNodeWithTag("MyButton3")
                 .performClick()
@@ -96,10 +96,10 @@ class ErrorMessagesTest {
         }
 
         expectErrorMessage(
-            "" +
-                "Failed to perform a gesture.\n" +
-                "Reason: Expected exactly '1' node but could not find any node that satisfies: " +
-                "((TestTag = 'MyButton3') && (OnClick is defined))"
+            """
+                Failed to perform a gesture.
+                Reason: Expected exactly '1' node but could not find any node that satisfies: ((TestTag = 'MyButton3') && (OnClick is defined))
+            """.trimIndent()
         ) {
             rule.onNode(hasTestTag("MyButton3") and hasClickAction())
                 .performClick()
@@ -113,12 +113,12 @@ class ErrorMessagesTest {
         }
 
         expectErrorMessageStartsWith(
-            "" +
-                "Failed to perform a gesture.\n" +
-                "Reason: Expected exactly '1' node but found '2' nodes that satisfy: " +
-                "(Text = 'Toggle' (ignoreCase: false))\n" +
-                "Nodes found:\n" +
-                "1) Node #X at (l=X, t=X, r=X, b=X)px, Tag: 'MyButton'"
+            """
+                Failed to perform a gesture.
+                Reason: Expected exactly '1' node but found '2' nodes that satisfy: (Text = 'Toggle' (ignoreCase: false))
+                Nodes found:
+                1) Node #X at (l=X, t=X, r=X, b=X)px, Tag: 'MyButton'
+            """.trimIndent()
         ) {
             rule.onNodeWithText("Toggle")
                 .performClick()
@@ -132,10 +132,10 @@ class ErrorMessagesTest {
         }
 
         expectErrorMessageStartsWith(
-            "" +
-                "Failed to perform OnClick action.\n" +
-                "Reason: Expected exactly '1' node but could not find any node that satisfies: " +
-                "(TestTag = 'MyButton3')"
+            """
+                Failed to perform OnClick action.
+                Reason: Expected exactly '1' node but could not find any node that satisfies: (TestTag = 'MyButton3')
+            """.trimIndent()
         ) {
             rule.onNodeWithTag("MyButton3")
                 .performSemanticsAction(SemanticsActions.OnClick)
@@ -149,12 +149,12 @@ class ErrorMessagesTest {
         }
 
         expectErrorMessageStartsWith(
-            "" +
-                "Failed: assertDoesNotExist.\n" +
-                "Reason: Did not expect any node but found '1' node that satisfies: " +
-                "(TestTag = 'MyButton')\n" +
-                "Node found:\n" +
-                "Node #X at (l=X, t=X, r=X, b=X)px, Tag: 'MyButton'"
+            """
+                Failed: assertDoesNotExist.
+                Reason: Did not expect any node but found '1' node that satisfies: (TestTag = 'MyButton')
+                Node found:
+                Node #X at (l=X, t=X, r=X, b=X)px, Tag: 'MyButton'
+            """.trimIndent()
         ) {
             rule.onNodeWithTag("MyButton")
                 .assertDoesNotExist()
@@ -168,12 +168,12 @@ class ErrorMessagesTest {
         }
 
         expectErrorMessageStartsWith(
-            "" +
-                "Failed to assert count of nodes.\n" +
-                "Reason: Expected '3' nodes but found '2' nodes that satisfy: " +
-                "(Text = 'Toggle' (ignoreCase: false))\n" +
-                "Nodes found:\n" +
-                "1) Node #X at (l=X, t=X, r=X, b=X)px"
+            """
+                Failed to assert count of nodes.
+                Reason: Expected '3' nodes but found '2' nodes that satisfy: (Text = 'Toggle' (ignoreCase: false))
+                Nodes found:
+                1) Node #X at (l=X, t=X, r=X, b=X)px
+            """.trimIndent()
         ) {
             rule.onAllNodesWithText("Toggle")
                 .assertCountEquals(3)
@@ -187,10 +187,10 @@ class ErrorMessagesTest {
         }
 
         expectErrorMessage(
-            "" +
-                "Failed to assert count of nodes.\n" +
-                "Reason: Expected '3' nodes but could not find any node that satisfies: " +
-                "(Text = 'Toggle2' (ignoreCase: false))"
+            """
+                Failed to assert count of nodes.
+                Reason: Expected '3' nodes but could not find any node that satisfies: (Text = 'Toggle2' (ignoreCase: false))
+            """.trimIndent()
         ) {
             rule.onAllNodesWithText("Toggle2")
                 .assertCountEquals(3)
@@ -209,15 +209,16 @@ class ErrorMessagesTest {
         rule.onNodeWithTag("MyButton")
             .performClick()
 
-        expectErrorMessageMatches(
-            "" +
-                "Failed to perform a gesture.\n" +
-                "The node is no longer in the tree, last known semantics:\n" +
-                "Node #X at \\(l=X, t=X, r=X, b=X\\)px\n" +
-                "Text = 'Hello'\n" +
-                "GetTextLayoutResult = 'AccessibilityAction\\(label=null, action=.*\\)'\n" +
-                "Has 1 sibling\n" +
-                "Original selector: Text = 'Hello' \\(ignoreCase: false\\)"
+        expectErrorMessage(
+            """
+                Failed to perform a gesture.
+                The node is no longer in the tree, last known semantics:
+                Node #X at (l=X, t=X, r=X, b=X)px
+                Text = 'Hello'
+                Actions = [GetTextLayoutResult]
+                Has 1 sibling
+                Original selector: Text = 'Hello' (ignoreCase: false)
+            """.trimIndent()
         ) {
             node.performClick()
         }
@@ -236,15 +237,16 @@ class ErrorMessagesTest {
         rule.onNodeWithTag("MyButton")
             .performClick()
 
-        expectErrorMessageMatches(
-            "" +
-                "Failed: assertExists.\n" +
-                "The node is no longer in the tree, last known semantics:\n" +
-                "Node #X at \\(l=X, t=X, r=X, b=X\\)px\n" +
-                "Text = 'Hello'\n" +
-                "GetTextLayoutResult = 'AccessibilityAction\\(label=null, action=.*\\)'\n" +
-                "Has 1 sibling\n" +
-                "Original selector: Text = 'Hello' \\(ignoreCase: false\\)"
+        expectErrorMessage(
+            """
+                Failed: assertExists.
+                The node is no longer in the tree, last known semantics:
+                Node #X at (l=X, t=X, r=X, b=X)px
+                Text = 'Hello'
+                Actions = [GetTextLayoutResult]
+                Has 1 sibling
+                Original selector: Text = 'Hello' (ignoreCase: false)
+            """.trimIndent()
         ) {
             node.assertExists()
         }
@@ -263,15 +265,16 @@ class ErrorMessagesTest {
         rule.onNodeWithTag("MyButton")
             .performClick()
 
-        expectErrorMessageMatches(
-            "" +
-                "Failed to assert the following: \\(OnClick is defined\\)\n" +
-                "The node is no longer in the tree, last known semantics:\n" +
-                "Node #X at \\(l=X, t=X, r=X, b=X\\)px\n" +
-                "Text = 'Hello'\n" +
-                "GetTextLayoutResult = 'AccessibilityAction\\(label=null, action=.*\\)'\n" +
-                "Has 1 sibling\n" +
-                "Original selector: Text = 'Hello' \\(ignoreCase: false\\)"
+        expectErrorMessage(
+            """
+                Failed to assert the following: (OnClick is defined)
+                The node is no longer in the tree, last known semantics:
+                Node #X at (l=X, t=X, r=X, b=X)px
+                Text = 'Hello'
+                Actions = [GetTextLayoutResult]
+                Has 1 sibling
+                Original selector: Text = 'Hello' (ignoreCase: false)
+            """.trimIndent()
         ) {
             node.assertHasClickAction()
         }
