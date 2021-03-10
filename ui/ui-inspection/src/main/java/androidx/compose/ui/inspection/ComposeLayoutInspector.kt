@@ -33,6 +33,8 @@ import androidx.inspection.Connection
 import androidx.inspection.Inspector
 import androidx.inspection.InspectorEnvironment
 import androidx.inspection.InspectorFactory
+import com.google.protobuf.ByteString
+import com.google.protobuf.InvalidProtocolBufferException
 import layoutinspector.compose.inspection.LayoutInspectorComposeProtocol.Command
 import layoutinspector.compose.inspection.LayoutInspectorComposeProtocol.GetAllParametersCommand
 import layoutinspector.compose.inspection.LayoutInspectorComposeProtocol.GetAllParametersResponse
@@ -44,6 +46,7 @@ import layoutinspector.compose.inspection.LayoutInspectorComposeProtocol.GetPara
 import layoutinspector.compose.inspection.LayoutInspectorComposeProtocol.GetParametersResponse
 import layoutinspector.compose.inspection.LayoutInspectorComposeProtocol.ParameterGroup
 import layoutinspector.compose.inspection.LayoutInspectorComposeProtocol.Response
+import layoutinspector.compose.inspection.LayoutInspectorComposeProtocol.UnknownCommandResponse
 
 private const val LAYOUT_INSPECTION_ID = "layoutinspector.compose.inspection"
 
@@ -83,7 +86,13 @@ class ComposeLayoutInspector(
         }
 
     override fun onReceiveCommand(data: ByteArray, callback: CommandCallback) {
-        val command = Command.parseFrom(data)
+        val command = try {
+            Command.parseFrom(data)
+        } catch (ignored: InvalidProtocolBufferException) {
+            handleUnknownCommand(data, callback)
+            return
+        }
+
         when (command.specializedCase) {
             Command.SpecializedCase.GET_COMPOSABLES_COMMAND -> {
                 handleGetComposablesCommand(command.getComposablesCommand, callback)
@@ -97,7 +106,15 @@ class ComposeLayoutInspector(
             Command.SpecializedCase.GET_PARAMETER_DETAILS_COMMAND -> {
                 handleGetParameterDetailsCommand(command.getParameterDetailsCommand, callback)
             }
-            else -> error("Unexpected compose inspector command case: ${command.specializedCase}")
+            else -> handleUnknownCommand(data, callback)
+        }
+    }
+
+    private fun handleUnknownCommand(commandBytes: ByteArray, callback: CommandCallback) {
+        callback.reply {
+            unknownCommandResponse = UnknownCommandResponse.newBuilder().apply {
+                this.commandBytes = ByteString.copyFrom(commandBytes)
+            }.build()
         }
     }
 
