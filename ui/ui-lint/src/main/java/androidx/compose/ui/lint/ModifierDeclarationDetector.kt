@@ -49,9 +49,11 @@ import java.util.EnumSet
 /**
  * [Detector] that checks functions returning Modifiers for consistency with guidelines.
  *
- * - Modifier factory functions must return Modifier as their type, and not a subclass of Modifier
- * - Modifier factory functions must be defined as an extension on Modifier to allow fluent chaining
- * - Modifier factory functions must not be marked as @Composable, and should use `composed` instead
+ * - Modifier factory functions should return Modifier as their type, and not a subclass of Modifier
+ * - Modifier factory functions should be defined as an extension on Modifier to allow fluent
+ * chaining
+ * - Modifier factory functions should not be marked as @Composable, and should use `composed`
+ * instead
  */
 class ModifierDeclarationDetector : Detector(), SourceCodeScanner {
     override fun getApplicableUastTypes() = listOf(UMethod::class.java)
@@ -99,7 +101,7 @@ class ModifierDeclarationDetector : Detector(), SourceCodeScanner {
                 "androidx.compose.ui.composed {} in their implementation instead of being marked " +
                 "as @Composable. This allows Modifiers to be referenced in top level variables " +
                 "and constructed outside of the composition.",
-            Category.CORRECTNESS, 3, Severity.ERROR,
+            Category.CORRECTNESS, 3, Severity.WARNING,
             Implementation(
                 ModifierDeclarationDetector::class.java,
                 EnumSet.of(Scope.JAVA_FILE, Scope.TEST_SOURCES)
@@ -108,10 +110,10 @@ class ModifierDeclarationDetector : Detector(), SourceCodeScanner {
 
         val ModifierFactoryReturnType = Issue.create(
             "ModifierFactoryReturnType",
-            "Modifier factory functions must return Modifier",
-            "Modifier factory functions must return Modifier as their type, and not a " +
+            "Modifier factory functions should return Modifier",
+            "Modifier factory functions should return Modifier as their type, and not a " +
                 "subtype of Modifier (such as Modifier.Element).",
-            Category.CORRECTNESS, 3, Severity.ERROR,
+            Category.CORRECTNESS, 3, Severity.WARNING,
             Implementation(
                 ModifierDeclarationDetector::class.java,
                 EnumSet.of(Scope.JAVA_FILE, Scope.TEST_SOURCES)
@@ -120,10 +122,10 @@ class ModifierDeclarationDetector : Detector(), SourceCodeScanner {
 
         val ModifierFactoryExtensionFunction = Issue.create(
             "ModifierFactoryExtensionFunction",
-            "Modifier factory functions must be extensions on Modifier",
-            "Modifier factory functions must be defined as extension functions on" +
+            "Modifier factory functions should be extensions on Modifier",
+            "Modifier factory functions should be defined as extension functions on" +
                 " Modifier to allow modifiers to be fluently chained.",
-            Category.CORRECTNESS, 3, Severity.ERROR,
+            Category.CORRECTNESS, 3, Severity.WARNING,
             Implementation(
                 ModifierDeclarationDetector::class.java,
                 EnumSet.of(Scope.JAVA_FILE, Scope.TEST_SOURCES)
@@ -183,7 +185,7 @@ private fun UMethod.checkReceiver(context: JavaContext) {
             ModifierDeclarationDetector.ModifierFactoryExtensionFunction,
             this,
             context.getNameLocation(this),
-            "Modifier factory functions must be extensions on Modifier",
+            "Modifier factory functions should be extensions on Modifier",
             lintFix
         )
     }
@@ -247,7 +249,7 @@ private fun UMethod.checkReturnType(context: JavaContext, returnType: PsiType) {
             ModifierFactoryReturnType,
             this,
             context.getNameLocation(this),
-            "Modifier factory functions must have a return type of Modifier",
+            "Modifier factory functions should have a return type of Modifier",
             lintFix
         )
     }
