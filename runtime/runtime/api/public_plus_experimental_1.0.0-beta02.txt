@@ -545,6 +545,9 @@ package androidx.compose.runtime.internal {
     property public abstract int parameters;
   }
 
+  public final class ThreadMapKt {
+  }
+
 }
 
 package androidx.compose.runtime.snapshots {
