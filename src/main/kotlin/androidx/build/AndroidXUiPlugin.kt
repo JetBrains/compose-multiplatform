@@ -140,17 +140,20 @@ class AndroidXUiPlugin : Plugin<Project> {
                 // Too many Kotlin features require synthetic accessors - we want to rely on R8 to
                 // remove these accessors
                 disable("SyntheticAccessor")
-                // Composable naming is normally a warning, but we ignore (in AndroidX)
+                // These lint checks are normally a warning (or lower), but we ignore (in AndroidX)
                 // warnings in Lint, so we make it an error here so it will fail the build.
                 // Note that this causes 'UnknownIssueId' lint warnings in the build log when
-                // Lint tries to apply this rule to modules that do not have this lint check.
-                // Unfortunately suppressing this doesn't seem to work, and disabling it causes
-                // it just to log `Lint: Unknown issue id "ComposableNaming"`, which will still
-                // cause the build log simplifier to fail.
+                // Lint tries to apply this rule to modules that do not have this lint check, so
+                // we disable that check too
+                disable("UnknownIssueId")
                 error("ComposableNaming")
                 error("ComposableLambdaParameterNaming")
                 error("ComposableLambdaParameterPosition")
                 error("CompositionLocalNaming")
+                error("ComposableModifierFactory")
+                error("ModifierFactoryReturnType")
+                error("ModifierFactoryExtensionFunction")
+                error("ModifierParameter")
             }
 
             // TODO(148540713): remove this exclusion when Lint can support using multiple lint jars
