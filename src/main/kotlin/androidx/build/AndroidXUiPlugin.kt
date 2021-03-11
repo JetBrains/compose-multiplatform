@@ -136,52 +136,56 @@ class AndroidXUiPlugin : Plugin<Project> {
         private fun Project.configureAndroidCommonOptions(testedExtension: TestedExtension) {
             testedExtension.defaultConfig.minSdkVersion(21)
 
-            testedExtension.lintOptions.apply {
-                // Too many Kotlin features require synthetic accessors - we want to rely on R8 to
-                // remove these accessors
-                disable("SyntheticAccessor")
-                // These lint checks are normally a warning (or lower), but we ignore (in AndroidX)
-                // warnings in Lint, so we make it an error here so it will fail the build.
-                // Note that this causes 'UnknownIssueId' lint warnings in the build log when
-                // Lint tries to apply this rule to modules that do not have this lint check, so
-                // we disable that check too
-                disable("UnknownIssueId")
-                error("ComposableNaming")
-                error("ComposableLambdaParameterNaming")
-                error("ComposableLambdaParameterPosition")
-                error("CompositionLocalNaming")
-                error("ComposableModifierFactory")
-                error("ModifierFactoryReturnType")
-                error("ModifierFactoryExtensionFunction")
-                error("ModifierParameter")
+            afterEvaluate { project ->
+                val isPublished = project.extensions.findByType(AndroidXExtension::class.java)
+                    ?.type == LibraryType.PUBLISHED_LIBRARY
 
-                // Paths we want to enable ListIterator checks for - for higher level levels it
-                // won't have a noticeable performance impact, and we don't want developers
-                // reading high level library code to worry about this.
-                val listIteratorPaths = listOf(
-                    "compose:foundation",
-                    "compose:runtime",
-                    "compose:ui",
-                    "text"
-                )
+                testedExtension.lintOptions.apply {
+                    // Too many Kotlin features require synthetic accessors - we want to rely on R8 to
+                    // remove these accessors
+                    disable("SyntheticAccessor")
+                    // These lint checks are normally a warning (or lower), but we ignore (in AndroidX)
+                    // warnings in Lint, so we make it an error here so it will fail the build.
+                    // Note that this causes 'UnknownIssueId' lint warnings in the build log when
+                    // Lint tries to apply this rule to modules that do not have this lint check, so
+                    // we disable that check too
+                    disable("UnknownIssueId")
+                    error("ComposableNaming")
+                    error("ComposableLambdaParameterNaming")
+                    error("ComposableLambdaParameterPosition")
+                    error("CompositionLocalNaming")
+                    error("ComposableModifierFactory")
+                    error("ModifierFactoryReturnType")
+                    error("ModifierFactoryExtensionFunction")
+                    error("ModifierParameter")
 
-                // Paths we want to disable ListIteratorChecks for - these are not runtime
-                // libraries and so Iterator allocation is not relevant.
-                val ignoreListIteratorFilter = listOf(
-                    "benchmark",
-                    "inspection",
-                    "samples",
-                    "test",
-                    "tooling"
-                )
+                    // Paths we want to enable ListIterator checks for - for higher level levels it
+                    // won't have a noticeable performance impact, and we don't want developers
+                    // reading high level library code to worry about this.
+                    val listIteratorPaths = listOf(
+                        "compose:foundation",
+                        "compose:runtime",
+                        "compose:ui",
+                        "text"
+                    )
 
-                // Disable ListIterator if we are not in a matching path, or we are in a
-                // non-runtime project
-                if (
-                    listIteratorPaths.none { path.contains(it) } ||
-                    ignoreListIteratorFilter.any { path.contains(it) }
-                ) {
-                    disable("ListIterator")
+                    // Paths we want to disable ListIteratorChecks for - these are not runtime
+                    // libraries and so Iterator allocation is not relevant.
+                    val ignoreListIteratorFilter = listOf(
+                        "compose:ui:ui-test",
+                        "compose:ui:ui-tooling",
+                        "compose:ui:ui-inspection",
+                    )
+
+                    // Disable ListIterator if we are not in a matching path, or we are in an
+                    // unpublished project
+                    if (
+                        listIteratorPaths.none { path.contains(it) } ||
+                        ignoreListIteratorFilter.any { path.contains(it) } ||
+                        !isPublished
+                    ) {
+                        disable("ListIterator")
+                    }
                 }
             }
 
