@@ -30,6 +30,7 @@ import androidx.compose.foundation.legacygestures.dragGestureFilter
 import androidx.compose.ui.platform.LocalClipboardManager
 import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.platform.LocalTextToolbar
+import androidx.compose.ui.util.fastForEach
 
 /**
  * Enables text selection for it's direct or indirection children.
@@ -98,7 +99,7 @@ internal fun SelectionContainer(
             children()
             if (isInTouchMode && manager.hasFocus) {
                 manager.selection?.let {
-                    for (isStartHandle in listOf(true, false)) {
+                    listOf(true, false).fastForEach { isStartHandle ->
                         SelectionHandle(
                             startHandlePosition = manager.startHandlePosition,
                             endHandlePosition = manager.endHandlePosition,

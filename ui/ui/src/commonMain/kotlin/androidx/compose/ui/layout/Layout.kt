@@ -37,6 +37,7 @@ import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.LayoutDirection
+import androidx.compose.ui.util.fastMap
 
 /**
  * [Layout] is the main core component for layout. It can be used to measure and position
@@ -366,7 +367,7 @@ private fun Density.MeasuringMinIntrinsicWidth(
     h: Int,
     layoutDirection: LayoutDirection
 ): Int {
-    val mapped = measurables.map {
+    val mapped = measurables.fastMap {
         DefaultIntrinsicMeasurable(it, IntrinsicMinMax.Min, IntrinsicWidthHeight.Width)
     }
     val constraints = Constraints(maxHeight = h)
@@ -385,7 +386,7 @@ private fun Density.MeasuringMinIntrinsicHeight(
     w: Int,
     layoutDirection: LayoutDirection
 ): Int {
-    val mapped = measurables.map {
+    val mapped = measurables.fastMap {
         DefaultIntrinsicMeasurable(it, IntrinsicMinMax.Min, IntrinsicWidthHeight.Height)
     }
     val constraints = Constraints(maxWidth = w)
@@ -404,7 +405,7 @@ private fun Density.MeasuringMaxIntrinsicWidth(
     h: Int,
     layoutDirection: LayoutDirection
 ): Int {
-    val mapped = measurables.map {
+    val mapped = measurables.fastMap {
         DefaultIntrinsicMeasurable(it, IntrinsicMinMax.Max, IntrinsicWidthHeight.Width)
     }
     val constraints = Constraints(maxHeight = h)
@@ -423,7 +424,7 @@ private fun Density.MeasuringMaxIntrinsicHeight(
     w: Int,
     layoutDirection: LayoutDirection
 ): Int {
-    val mapped = measurables.map {
+    val mapped = measurables.fastMap {
         DefaultIntrinsicMeasurable(it, IntrinsicMinMax.Max, IntrinsicWidthHeight.Height)
     }
     val constraints = Constraints(maxWidth = w)

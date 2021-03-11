@@ -18,6 +18,7 @@ package androidx.compose.ui.layout
 
 import androidx.compose.runtime.Stable
 import androidx.compose.ui.unit.Constraints
+import androidx.compose.ui.util.fastMap
 
 /**
  * Defines the measure and layout behavior of a [Layout]. [Layout] and [MeasurePolicy] are the way
@@ -74,7 +75,7 @@ fun interface MeasurePolicy {
         measurables: List<IntrinsicMeasurable>,
         height: Int
     ): Int {
-        val mapped = measurables.map {
+        val mapped = measurables.fastMap {
             DefaultIntrinsicMeasurable(it, IntrinsicMinMax.Min, IntrinsicWidthHeight.Width)
         }
         val constraints = Constraints(maxHeight = height)
@@ -92,7 +93,7 @@ fun interface MeasurePolicy {
         measurables: List<IntrinsicMeasurable>,
         width: Int
     ): Int {
-        val mapped = measurables.map {
+        val mapped = measurables.fastMap {
             DefaultIntrinsicMeasurable(it, IntrinsicMinMax.Min, IntrinsicWidthHeight.Height)
         }
         val constraints = Constraints(maxWidth = width)
@@ -109,7 +110,7 @@ fun interface MeasurePolicy {
         measurables: List<IntrinsicMeasurable>,
         height: Int
     ): Int {
-        val mapped = measurables.map {
+        val mapped = measurables.fastMap {
             DefaultIntrinsicMeasurable(it, IntrinsicMinMax.Max, IntrinsicWidthHeight.Width)
         }
         val constraints = Constraints(maxHeight = height)
@@ -126,7 +127,7 @@ fun interface MeasurePolicy {
         measurables: List<IntrinsicMeasurable>,
         width: Int
     ): Int {
-        val mapped = measurables.map {
+        val mapped = measurables.fastMap {
             DefaultIntrinsicMeasurable(it, IntrinsicMinMax.Max, IntrinsicWidthHeight.Height)
         }
         val constraints = Constraints(maxWidth = width)

@@ -28,6 +28,7 @@ import androidx.annotation.DoNotInline
 import androidx.annotation.RequiresApi
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.graphics.toAndroidRect
+import androidx.compose.ui.util.fastMap
 
 /**
  * Autofill implementation for Android.
@@ -85,7 +86,7 @@ internal fun AndroidAutofill.populateViewStructure(root: ViewStructure) {
             AutofillApi26Helper.setAutofillType(child, View.AUTOFILL_TYPE_TEXT)
             AutofillApi26Helper.setAutofillHints(
                 child,
-                autofillNode.autofillTypes.map { it.androidType }.toTypedArray()
+                autofillNode.autofillTypes.fastMap { it.androidType }.toTypedArray()
             )
 
             if (autofillNode.boundingBox == null) {

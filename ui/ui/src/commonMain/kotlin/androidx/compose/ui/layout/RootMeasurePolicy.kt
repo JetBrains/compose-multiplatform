@@ -21,6 +21,7 @@ import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.constrainHeight
 import androidx.compose.ui.unit.constrainWidth
 import androidx.compose.ui.util.fastForEach
+import androidx.compose.ui.util.fastMap
 
 internal object RootMeasurePolicy : LayoutNode.NoIntrinsicsMeasurePolicy(
     "Undefined intrinsics block and it is required"
@@ -43,7 +44,7 @@ internal object RootMeasurePolicy : LayoutNode.NoIntrinsicsMeasurePolicy(
                 }
             }
             else -> {
-                val placeables = measurables.map {
+                val placeables = measurables.fastMap {
                     it.measure(constraints)
                 }
                 var maxWidth = 0

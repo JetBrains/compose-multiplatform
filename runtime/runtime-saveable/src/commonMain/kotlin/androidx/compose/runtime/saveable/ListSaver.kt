@@ -33,7 +33,10 @@ fun <Original : Any, Saveable : Any> listSaver(
 ): Saver<Original, Any> = @Suppress("UNCHECKED_CAST") Saver(
     save = {
         val list = save(it)
-        list.forEach { item -> require(canBeSaved(item)) }
+        for (index in list.indices) {
+            val item = list[index]
+            require(canBeSaved(item))
+        }
         if (list.isNotEmpty()) ArrayList(list) else null
     },
     restore = restore as (Any) -> Original?

@@ -144,8 +144,8 @@ private class SaveableStateRegistryImpl(
                 // the first provider returned null(nothing to save) and the second one returned
                 // "1". when we will be restoring the first provider would restore null (it is the
                 // same as to have nothing to restore) and the second one restore "1".
-                map[key] = list.map {
-                    val value = it.invoke()
+                map[key] = List(list.size) { index ->
+                    val value = list[index].invoke()
                     if (value != null) {
                         check(canBeSaved(value))
                     }

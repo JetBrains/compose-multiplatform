@@ -160,7 +160,7 @@ private class SnapshotMapEntrySet<K, V>(
         return removed
     }
     override fun retainAll(elements: Collection<MutableMap.MutableEntry<K, V>>): Boolean {
-        val entries = elements.map { it.key to it.value }.toMap()
+        val entries = elements.associate { it.key to it.value }
         return map.removeIf { !entries.containsKey(it.key) || entries[it.key] != it.value }
     }
     override fun contains(element: MutableMap.MutableEntry<K, V>): Boolean {

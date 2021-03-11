@@ -21,6 +21,8 @@ import androidx.compose.runtime.snapshots.MutableSnapshot
 import androidx.compose.runtime.snapshots.Snapshot
 import androidx.compose.runtime.snapshots.SnapshotApplyResult
 import androidx.compose.runtime.snapshots.fastForEach
+import androidx.compose.runtime.snapshots.fastMap
+import androidx.compose.runtime.snapshots.fastMapNotNull
 import androidx.compose.runtime.tooling.CompositionData
 import kotlinx.collections.immutable.persistentSetOf
 import kotlinx.coroutines.CancellableContinuation
@@ -298,10 +300,12 @@ class Recomposer(
         override val changeCount: Long
             get() = this@Recomposer.changeCount
         fun saveStateAndDisposeForHotReload(): List<HotReloadable> {
-            val compositions = synchronized(stateLock) { knownCompositions.toList() }
+            val compositions: List<ControlledComposition> = synchronized(stateLock) {
+                knownCompositions.toMutableList()
+            }
             return compositions
-                .mapNotNull { it as? CompositionImpl }
-                .map { HotReloadable(it).apply { clearContent() } }
+                .fastMapNotNull { it as? CompositionImpl }
+                .fastMap { HotReloadable(it).apply { clearContent() } }
         }
     }
 
@@ -868,8 +872,8 @@ class Recomposer(
             // to ensure that we pause recompositions before this call.
             @Suppress("UNCHECKED_CAST")
             val holders = token as List<HotReloadable>
-            holders.forEach { it.resetContent() }
-            holders.forEach { it.recompose() }
+            holders.fastForEach { it.resetContent() }
+            holders.fastForEach { it.recompose() }
         }
     }
 }

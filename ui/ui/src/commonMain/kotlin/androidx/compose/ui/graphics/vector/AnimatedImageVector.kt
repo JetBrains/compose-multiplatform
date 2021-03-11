@@ -20,6 +20,7 @@ import androidx.compose.animation.core.updateTransition
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Immutable
 import androidx.compose.ui.ExperimentalComposeUiApi
+import androidx.compose.ui.fastAssociate
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.util.fastMaxBy
 
@@ -81,7 +82,7 @@ class AnimatedImageVector internal constructor(
             val transition = updateTransition(atEnd)
             render(
                 imageVector.root,
-                targets.associate { target ->
+                targets.fastAssociate { target ->
                     target.name to target.animator.createVectorOverride(transition, totalDuration)
                 }
             )

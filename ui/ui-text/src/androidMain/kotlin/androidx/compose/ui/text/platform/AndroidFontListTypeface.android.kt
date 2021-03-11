@@ -29,6 +29,7 @@ import androidx.compose.ui.text.font.FontSynthesis
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.font.ResourceFont
 import androidx.compose.ui.util.fastForEach
+import androidx.compose.ui.util.fastMap
 import androidx.core.content.res.ResourcesCompat
 
 /**
@@ -48,9 +49,9 @@ internal class AndroidFontListTypeface(
     private val loadedTypefaces: Map<Font, Typeface>
 
     init {
-        val targetFonts = necessaryStyles?.map { (weight, style) ->
+        val targetFonts = necessaryStyles?.fastMap { (weight, style) ->
             fontMatcher.matchFont(fontFamily, weight, style)
-        }?.distinct() ?: fontFamily.fonts
+        }?.let { LinkedHashSet(it).toList() } ?: fontFamily.fonts
         val typefaces = mutableMapOf<Font, Typeface>()
 
         targetFonts.fastForEach {

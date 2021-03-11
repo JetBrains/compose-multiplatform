@@ -18,6 +18,7 @@ package androidx.compose.ui.input.pointer
 
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.unit.IntSize
+import androidx.compose.ui.util.fastForEach
 
 // TODO(shepshapard): Document.
 
@@ -128,7 +129,7 @@ internal fun PointerInputHandler.invokeOverPasses(
 ) {
     require(pointerEvent.changes.isNotEmpty())
     require(pointerEventPasses.isNotEmpty())
-    pointerEventPasses.forEach {
+    pointerEventPasses.fastForEach {
         this.invoke(pointerEvent, it, size)
     }
 }

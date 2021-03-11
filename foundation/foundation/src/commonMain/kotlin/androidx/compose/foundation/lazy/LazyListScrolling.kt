@@ -21,6 +21,7 @@ import androidx.compose.animation.core.AnimationState
 import androidx.compose.animation.core.animateTo
 import androidx.compose.animation.core.spring
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.util.fastFirstOrNull
 import kotlin.coroutines.cancellation.CancellationException
 
 private class ItemFoundInScroll(val item: LazyListItemInfo) : CancellationException()
@@ -33,7 +34,7 @@ internal suspend fun LazyListState.doSmoothScrollToItem(
     scrollOffset: Int
 ) {
     val animationSpec: AnimationSpec<Float> = spring()
-    fun getTargetItem() = layoutInfo.visibleItemsInfo.firstOrNull {
+    fun getTargetItem() = layoutInfo.visibleItemsInfo.fastFirstOrNull {
         it.index == index
     }
     scroll {

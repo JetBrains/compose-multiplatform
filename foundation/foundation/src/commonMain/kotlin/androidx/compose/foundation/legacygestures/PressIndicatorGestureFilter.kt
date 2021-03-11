@@ -31,6 +31,7 @@ import androidx.compose.ui.input.pointer.changedToUpIgnoreConsumed
 import androidx.compose.ui.input.pointer.consumeDownChange
 import androidx.compose.ui.platform.debugInspectorInfo
 import androidx.compose.ui.unit.IntSize
+import androidx.compose.ui.util.fastAll
 import androidx.compose.ui.util.fastAny
 import androidx.compose.ui.util.fastForEach
 
@@ -181,13 +182,13 @@ internal class PressIndicatorGestureFilter : PointerInputFilter() {
 
         if (pass == PointerEventPass.Main) {
 
-            if (state == State.Idle && changes.all { it.changedToDown() }) {
+            if (state == State.Idle && changes.fastAll { it.changedToDown() }) {
                 // If we have not yet started and all of the changes changed to down, we are
                 // starting.
                 state = State.Started
                 onStart?.invoke(changes.first().position)
             } else if (state == State.Started) {
-                if (changes.all { it.changedToUpIgnoreConsumed() }) {
+                if (changes.fastAll { it.changedToUpIgnoreConsumed() }) {
                     // If we have started and all of the changes changed to up, we are stopping.
                     state = State.Idle
                     onStop?.invoke()

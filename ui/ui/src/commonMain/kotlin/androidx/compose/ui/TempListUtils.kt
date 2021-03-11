@@ -1,5 +1,5 @@
 /*
- * Copyright 2020 The Android Open Source Project
+ * Copyright 2021 The Android Open Source Project
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,44 +14,91 @@
  * limitations under the License.
  */
 
-package androidx.compose.runtime.snapshots
+package androidx.compose.ui
 
+import androidx.compose.ui.util.fastForEach
 import kotlin.contracts.ExperimentalContracts
 import kotlin.contracts.contract
 
-/**
- * Iterates through a [List] using the index and calls [action] for each item.
- * This does not allocate an iterator like [Iterable.forEach].
- */
-@OptIn(ExperimentalContracts::class)
-internal inline fun <T> List<T>.fastForEach(action: (T) -> Unit) {
-    contract { callsInPlace(action) }
-    for (index in indices) {
-        val item = get(index)
-        action(item)
-    }
-}
+// TODO: remove these when we can add new APIs to ui-util outside of beta cycle
 
 /**
- * Returns a [Set] of all elements.
+ * Returns a list containing the results of applying the given [transform] function
+ * to each pair of two adjacent elements in this collection.
  *
- * The returned set preserves the element iteration order of the original collection.
+ * The returned list is empty if this collection contains less than two elements.
  */
-internal fun <T> List<T>.fastToSet(): Set<T> = HashSet<T>(size).also { set ->
-    fastForEach { item -> set.add(item) }
+@OptIn(ExperimentalContracts::class)
+internal inline fun <T, R> List<T>.fastZipWithNext(transform: (T, T) -> R): List<R> {
+    contract { callsInPlace(transform) }
+    if (size == 0 || size == 1) return emptyList()
+    val result = mutableListOf<R>()
+    var current = get(0)
+    // `until` as we don't want to invoke this for the last element, since that won't have a `next`
+    for (i in 0 until lastIndex) {
+        val next = get(i + 1)
+        result.add(transform(current, next))
+        current = next
+    }
+    return result
 }
 
 /**
- * Iterates through a [List] using the index and calls [action] for each item.
- * This does not allocate an iterator like [Iterable.forEachIndexed].
+ * Accumulates value starting with the first element and applying [operation] from left to right
+ * to current accumulator value and each element.
+ *
+ * Throws an exception if this collection is empty. If the collection can be empty in an expected
+ * way, please use [reduceOrNull] instead. It returns `null` when its receiver is empty.
+ *
+ * @param [operation] function that takes current accumulator value and an element,
+ * and calculates the next accumulator value.
  */
 @OptIn(ExperimentalContracts::class)
-internal inline fun <T> List<T>.fastForEachIndexed(action: (Int, T) -> Unit) {
-    contract { callsInPlace(action) }
-    for (index in indices) {
-        val item = get(index)
-        action(index, item)
+internal inline fun <S, T : S> List<T>.fastReduce(operation: (acc: S, T) -> S): S {
+    contract { callsInPlace(operation) }
+    if (isEmpty()) throw UnsupportedOperationException("Empty collection can't be reduced.")
+    var accumulator: S = first()
+    for (i in 1..lastIndex) {
+        accumulator = operation(accumulator, get(i))
     }
+    return accumulator
+}
+
+/**
+ * Returns a [Map] containing key-value pairs provided by [transform] function
+ * applied to elements of the given collection.
+ *
+ * If any of two pairs would have the same key the last one gets added to the map.
+ *
+ * The returned map preserves the entry iteration order of the original collection.
+ */
+@OptIn(ExperimentalContracts::class)
+internal inline fun <T, K, V> List<T>.fastAssociate(transform: (T) -> Pair<K, V>): Map<K, V> {
+    contract { callsInPlace(transform) }
+    val target = LinkedHashMap<K, V>(size)
+    fastForEach { e ->
+        target += transform(e)
+    }
+    return target
+}
+
+/**
+ * Returns a list of values built from the elements of `this` collection and the [other] collection with the same index
+ * using the provided [transform] function applied to each pair of elements.
+ * The returned list has length of the shortest collection.
+ */
+@OptIn(ExperimentalContracts::class)
+internal inline fun <T, R, V> List<T>.fastZip(
+    other: List<R>,
+    transform: (a: T, b: R) -> V
+): List<V> {
+    contract { callsInPlace(transform) }
+    val minSize = minOf(size, other.size)
+    val target = ArrayList<V>(minSize)
+    for (i in 0 until minSize) {
+        target += (transform(get(i), other[i]))
+    }
+    return target
 }
 
 /**
@@ -59,11 +106,11 @@ internal inline fun <T> List<T>.fastForEachIndexed(action: (Int, T) -> Unit) {
  * to each element in the original collection.
  */
 @OptIn(ExperimentalContracts::class)
-internal inline fun <T, R> List<T>.fastMap(transform: (T) -> R): List<R> {
+internal inline fun <T, R> List<T>.fastMapNotNull(transform: (T) -> R?): List<R> {
     contract { callsInPlace(transform) }
     val target = ArrayList<R>(size)
-    fastForEach {
-        target += transform(it)
+    fastForEach { e ->
+        transform(e)?.let { target += it }
     }
     return target
 }
@@ -129,33 +176,4 @@ private fun <T> Appendable.appendElement(element: T, transform: ((T) -> CharSequ
         element is Char -> append(element)
         else -> append(element.toString())
     }
-}
-
-/**
- * Returns a list containing the results of applying the given [transform] function
- * to each element in the original collection.
- */
-@OptIn(ExperimentalContracts::class)
-internal inline fun <T, R> List<T>.fastMapNotNull(transform: (T) -> R?): List<R> {
-    contract { callsInPlace(transform) }
-    val target = ArrayList<R>(size)
-    fastForEach { e ->
-        transform(e)?.let { target += it }
-    }
-    return target
-}
-
-/**
- * Returns a list containing only elements matching the given [predicate].
- * @param [predicate] function that takes the index of an element and the element itself
- * and returns the result of predicate evaluation on the element.
- */
-@OptIn(ExperimentalContracts::class)
-internal inline fun <T> List<T>.fastFilterIndexed(predicate: (index: Int, T) -> Boolean): List<T> {
-    contract { callsInPlace(predicate) }
-    val target = ArrayList<T>(size)
-    fastForEachIndexed { index, e ->
-        if (predicate(index, e)) target += e
-    }
-    return target
 }
