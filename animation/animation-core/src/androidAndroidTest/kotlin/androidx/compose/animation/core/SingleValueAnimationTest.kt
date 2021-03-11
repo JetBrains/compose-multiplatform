@@ -19,10 +19,12 @@ package androidx.compose.animation.core
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.foundation.layout.Box
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.withFrameNanos
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.runtime.withFrameMillis
+import androidx.compose.runtime.withFrameNanos
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Rect
 import androidx.compose.ui.geometry.Size
@@ -258,6 +260,54 @@ class SingleValueAnimationTest {
 
         rule.runOnIdle { enabled = true }
         rule.waitForIdle()
+    }
+
+    @Test
+    fun frameByFrameInterruptionTest() {
+        var enabled by mutableStateOf(false)
+        var currentValue by mutableStateOf(Offset(-300f, -300f))
+        rule.setContent {
+            Box {
+                var destination: Offset by remember { mutableStateOf(Offset(600f, 600f)) }
+                val offsetValue = animateOffsetAsState(
+                    if (enabled)
+                        destination
+                    else
+                        Offset(0f, 0f)
+                )
+                if (enabled) {
+                    LaunchedEffect(enabled) {
+                        var startTime = -1L
+                        while (true) {
+                            val current = withFrameMillis {
+                                if (startTime < 0) startTime = it
+                                // Fuzzy test by fine adjusting the target on every frame, and
+                                // verify there's a reasonable amount of test. This is to make sure
+                                // the animation does not stay "frozen" when there's continuous
+                                // target changes.
+                                if (destination.x >= 600) {
+                                    destination = Offset(599f, 599f)
+                                } else {
+                                    destination = Offset(601f, 601f)
+                                }
+                                it
+                            }
+                            currentValue = offsetValue.value
+                            if (current - startTime > 1000) {
+                                break
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        rule.runOnIdle {
+            enabled = true
+            assertEquals(Offset(-300f, -300f), currentValue)
+        }
+        rule.waitUntil(1300) {
+            currentValue.x > 300f && currentValue.y > 300f
+        }
     }
 
     @Test
