@@ -24,7 +24,7 @@ object LibraryVersions {
     val ADS_IDENTIFIER = Version("1.0.0-alpha04")
     val ANNOTATION = Version("1.3.0-alpha01")
     val ANNOTATION_EXPERIMENTAL = Version("1.1.0-rc01")
-    val APPCOMPAT = Version("1.3.0-beta02")
+    val APPCOMPAT = Version("1.3.0-rc01")
     val APPSEARCH = Version("1.0.0-alpha01")
     val ARCH_CORE = Version("2.2.0-alpha01")
     val ARCH_CORE_TESTING = ARCH_CORE
@@ -48,7 +48,7 @@ object LibraryVersions {
     val CONTENTPAGER = Version("1.1.0-alpha01")
     val COMPOSE = Version(System.getenv("COMPOSE_CUSTOM_VERSION") ?: "1.0.0-beta02")
     val COORDINATORLAYOUT = Version("1.2.0-alpha01")
-    val CORE = Version("1.5.0-beta03")
+    val CORE = Version("1.5.0-rc01")
     val CORE_ANIMATION = Version("1.0.0-alpha03")
     val CORE_ANIMATION_TESTING = Version("1.0.0-alpha03")
     val CORE_APPDIGEST = Version("1.0.0-alpha01")
