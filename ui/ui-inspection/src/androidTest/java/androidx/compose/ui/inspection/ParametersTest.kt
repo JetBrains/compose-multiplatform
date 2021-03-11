@@ -103,12 +103,14 @@ class ParametersTest {
 
         val intArray = params.find("intArray")!!
         var strings = params.stringsList
+
+        checkStringParam(strings, intArray, "intArray", "IntArray[8]", 0)
         assertThat(intArray.elementsCount).isEqualTo(5)
-        checkParam(strings, intArray.elementsList[0], "[0]", 10, 0)
-        checkParam(strings, intArray.elementsList[1], "[1]", 11, 1)
-        checkParam(strings, intArray.elementsList[2], "[2]", 12, 2)
-        checkParam(strings, intArray.elementsList[3], "[3]", 13, 3)
-        checkParam(strings, intArray.elementsList[4], "[4]", 14, 4)
+        checkIntParam(strings, intArray.elementsList[0], "[0]", 10, 0)
+        checkIntParam(strings, intArray.elementsList[1], "[1]", 11, 1)
+        checkIntParam(strings, intArray.elementsList[2], "[2]", 12, 2)
+        checkIntParam(strings, intArray.elementsList[3], "[3]", 13, 3)
+        checkIntParam(strings, intArray.elementsList[4], "[4]", 14, 4)
 
         val expanded =
             tester.sendCommand(
@@ -121,10 +123,11 @@ class ParametersTest {
             ).getParameterDetailsResponse
         val intArray2 = expanded.parameter
         strings = expanded.stringsList
+        checkStringParam(strings, intArray, "intArray", "IntArray[8]", 0)
         assertThat(intArray2.elementsCount).isEqualTo(3)
-        checkParam(strings, intArray2.elementsList[0], "[5]", 15, 5)
-        checkParam(strings, intArray2.elementsList[1], "[6]", 16, 6)
-        checkParam(strings, intArray2.elementsList[2], "[7]", 17, 7)
+        checkIntParam(strings, intArray2.elementsList[0], "[5]", 15, 5)
+        checkIntParam(strings, intArray2.elementsList[1], "[6]", 16, 6)
+        checkIntParam(strings, intArray2.elementsList[2], "[7]", 17, 7)
     }
 }
 
@@ -149,7 +152,20 @@ private fun GetComposablesResponse.filter(name: String): List<ComposableNode> {
 private fun ComposableNode.flatten(): List<ComposableNode> =
     listOf(this).plus(this.childrenList.flatMap { it.flatten() })
 
-private fun checkParam(
+@Suppress("SameParameterValue")
+private fun checkStringParam(
+    stringList: List<StringEntry>,
+    param: Parameter,
+    name: String,
+    value: String,
+    index: Int = 0
+) {
+    assertThat(stringList.toMap()[param.name]).isEqualTo(name)
+    assertThat(stringList.toMap()[param.int32Value]).isEqualTo(value)
+    assertThat(param.index).isEqualTo(index)
+}
+
+private fun checkIntParam(
     stringList: List<StringEntry>,
     param: Parameter,
     name: String,

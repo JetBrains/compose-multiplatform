@@ -216,7 +216,7 @@ class ParameterFactoryTest {
             )
         ) {
             parameter("brush", ParameterType.String, "LinearGradient") {
-                parameter("colors", ParameterType.Iterable, "") {
+                parameter("colors", ParameterType.Iterable, "List[2]") {
                     parameter("[0]", ParameterType.Color, Color.Red.toArgb())
                     parameter("[1]", ParameterType.Color, Color.Blue.toArgb())
                 }
@@ -418,7 +418,7 @@ class ParameterFactoryTest {
     @Test
     fun testLocaleList() {
         validate(create("locales", LocaleList(Locale("fr-ca"), Locale("fr-be")))) {
-            parameter("locales", ParameterType.Iterable, "") {
+            parameter("locales", ParameterType.Iterable, "Collection[2]") {
                 parameter("[0]", ParameterType.String, "fr-CA")
                 parameter("[1]", ParameterType.String, "fr-BE")
             }
@@ -435,7 +435,7 @@ class ParameterFactoryTest {
         val value = intArrayOf(10, 11, 12)
         val parameter = create("array", value)
         validate(parameter) {
-            parameter("array", ParameterType.Iterable, "") {
+            parameter("array", ParameterType.Iterable, "IntArray[3]") {
                 parameter("[0]", ParameterType.Int32, 10)
                 parameter("[1]", ParameterType.Int32, 11)
                 parameter("[2]", ParameterType.Int32, 12)
@@ -447,9 +447,10 @@ class ParameterFactoryTest {
     fun testLongIntArray() {
         val value = intArrayOf(10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23)
         val refToSelf = ref()
+        val display = "IntArray[14]"
         val parameter = create("array", value)
         validate(parameter) {
-            parameter("array", ParameterType.Iterable, "", refToSelf) {
+            parameter("array", ParameterType.Iterable, display, refToSelf) {
                 parameter("[0]", ParameterType.Int32, 10)
                 parameter("[1]", ParameterType.Int32, 11)
                 parameter("[2]", ParameterType.Int32, 12)
@@ -460,7 +461,7 @@ class ParameterFactoryTest {
 
         // If we need to retrieve more array elements we call "expand" with the reference:
         validate(expand("array", value, refToSelf, 5, 5)!!) {
-            parameter("array", ParameterType.Iterable, "", refToSelf, childStartIndex = 5) {
+            parameter("array", ParameterType.Iterable, display, refToSelf, childStartIndex = 5) {
                 parameter("[5]", ParameterType.Int32, 15)
                 parameter("[6]", ParameterType.Int32, 16)
                 parameter("[7]", ParameterType.Int32, 17)
@@ -472,7 +473,7 @@ class ParameterFactoryTest {
         // Call "expand" again to retrieve more:
         validate(expand("array", value, refToSelf, 10, 5)!!) {
             // This time we reached the end of the array, and we do not get a reference to get more
-            parameter("array", ParameterType.Iterable, "", childStartIndex = 10) {
+            parameter("array", ParameterType.Iterable, display, childStartIndex = 10) {
                 parameter("[10]", ParameterType.Int32, 20)
                 parameter("[11]", ParameterType.Int32, 21)
                 parameter("[12]", ParameterType.Int32, 22)
@@ -507,11 +508,12 @@ class ParameterFactoryTest {
         )
         val parameter = create("array", value)
         val refToSelf = ref()
+        val display = "List[20]"
         validate(parameter) {
             // Here we get all the available elements from the list.
             // There is no need to go back for more data, and the iterable does not have a
             // reference for doing so.
-            parameter("array", ParameterType.Iterable, "", refToSelf) {
+            parameter("array", ParameterType.Iterable, display, refToSelf) {
                 parameter("[0]", ParameterType.String, "a")
                 parameter("[2]", ParameterType.String, "b", index = 2)
                 parameter("[3]", ParameterType.String, "c", index = 3)
@@ -523,7 +525,7 @@ class ParameterFactoryTest {
         // Call "expand" to retrieve more elements:
         validate(expand("array", value, refToSelf, 11, 5)!!) {
             // This time we reached the end of the array, and we do not get a reference to get more
-            parameter("array", ParameterType.Iterable, "") {
+            parameter("array", ParameterType.Iterable, display) {
                 parameter("[16]", ParameterType.String, "f", index = 16)
                 parameter("[18]", ParameterType.String, "g", index = 18)
             }

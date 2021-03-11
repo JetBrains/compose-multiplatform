@@ -450,8 +450,7 @@ internal class ParameterFactory(private val inlineClassConverter: InlineClassCon
             value == null -> null
             value is Modifier -> createFromModifier(name, value)
             value is InspectableValue -> createFromInspectableValue(name, value)
-            value is Sequence<*> ->
-                createFromSequence(name, value, value, startIndex, maxElements)
+            value is Sequence<*> -> createFromSequence(name, value, value, startIndex, maxElements)
             value is Iterable<*> ->
                 createFromSequence(name, value, value.asSequence(), startIndex, maxElements)
             value.javaClass.isArray -> createFromArray(name, value, startIndex, maxElements)
@@ -732,7 +731,7 @@ internal class ParameterFactory(private val inlineClassConverter: InlineClassCon
             startIndex: Int,
             maxElements: Int
         ): NodeParameter {
-            val parameter = NodeParameter(name, ParameterType.Iterable, "")
+            val parameter = NodeParameter(name, ParameterType.Iterable, sequenceName(value))
             return when {
                 !sequence.any() -> parameter
                 !shouldRecurseDeeper() -> parameter.withChildReference(value)
@@ -758,6 +757,22 @@ internal class ParameterFactory(private val inlineClassConverter: InlineClassCon
         private fun findFromSequence(value: Sequence<*>, index: Int): Pair<String, Any?>? {
             val element = value.elementAtOrNull(index) ?: return null
             return Pair("[$index]", element)
+        }
+
+        private fun sequenceName(value: Any): String = when (value) {
+            is Array<*> -> "Array[${value.size}]"
+            is ByteArray -> "ByteArray[${value.size}]"
+            is IntArray -> "IntArray[${value.size}]"
+            is LongArray -> "LongArray[${value.size}]"
+            is FloatArray -> "FloatArray[${value.size}]"
+            is DoubleArray -> "DoubleArray[${value.size}]"
+            is BooleanArray -> "BooleanArray[${value.size}]"
+            is CharArray -> "CharArray[${value.size}]"
+            is List<*> -> "List[${value.size}]"
+            is Set<*> -> "Set[${value.size}]"
+            is Collection<*> -> "Collection[${value.size}]"
+            is Iterable<*> -> "Iterable"
+            else -> "Sequence"
         }
 
         private fun createFromLambda(name: String, value: Lambda<*>): NodeParameter =
