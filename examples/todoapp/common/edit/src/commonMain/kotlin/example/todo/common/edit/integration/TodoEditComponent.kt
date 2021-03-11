@@ -3,20 +3,25 @@ package example.todo.common.edit.integration
 import com.arkivanov.decompose.ComponentContext
 import com.arkivanov.decompose.value.Value
 import com.arkivanov.decompose.value.operator.map
+import com.arkivanov.mvikotlin.core.store.StoreFactory
+import com.badoo.reaktive.base.Consumer
 import com.badoo.reaktive.base.invoke
 import example.todo.common.edit.TodoEdit
-import example.todo.common.edit.TodoEdit.Dependencies
 import example.todo.common.edit.TodoEdit.Model
 import example.todo.common.edit.TodoEdit.Output
 import example.todo.common.edit.store.TodoEditStore.Intent
 import example.todo.common.edit.store.TodoEditStoreProvider
 import example.todo.common.utils.asValue
 import example.todo.common.utils.getStore
+import example.todo.database.TodoDatabase
 
-internal class TodoEditImpl(
+class TodoEditComponent(
     componentContext: ComponentContext,
-    dependencies: Dependencies
-) : TodoEdit, ComponentContext by componentContext, Dependencies by dependencies {
+    storeFactory: StoreFactory,
+    database: TodoDatabase,
+    itemId: Long,
+    private val output: Consumer<Output>
+) : TodoEdit, ComponentContext by componentContext {
 
     private val store =
         instanceKeeper.getStore {
@@ -38,6 +43,6 @@ internal class TodoEditImpl(
     }
 
     override fun onCloseClicked() {
-        editOutput(Output.Finished)
+        output(Output.Finished)
     }
 }

@@ -45,7 +45,7 @@ class TodoRootTest {
     }
 
     private fun root(): TodoRoot =
-        TodoRootImpl(
+        TodoRootComponent(
             componentContext = DefaultComponentContext(lifecycle = lifecycle),
             todoMain = { _, output -> TodoMainFake(output) },
             todoEdit = { _, itemId, output -> TodoEditFake(itemId, output) }

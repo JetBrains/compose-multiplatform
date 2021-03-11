@@ -3,20 +3,24 @@ package example.todo.common.main.integration
 import com.arkivanov.decompose.ComponentContext
 import com.arkivanov.decompose.value.Value
 import com.arkivanov.decompose.value.operator.map
+import com.arkivanov.mvikotlin.core.store.StoreFactory
+import com.badoo.reaktive.base.Consumer
 import com.badoo.reaktive.base.invoke
 import example.todo.common.main.TodoMain
-import example.todo.common.main.TodoMain.Dependencies
 import example.todo.common.main.TodoMain.Model
 import example.todo.common.main.TodoMain.Output
 import example.todo.common.main.store.TodoMainStore.Intent
 import example.todo.common.main.store.TodoMainStoreProvider
 import example.todo.common.utils.asValue
 import example.todo.common.utils.getStore
+import example.todo.database.TodoDatabase
 
-internal class TodoMainImpl(
+class TodoMainComponent(
     componentContext: ComponentContext,
-    dependencies: Dependencies
-) : TodoMain, ComponentContext by componentContext, Dependencies by dependencies {
+    storeFactory: StoreFactory,
+    database: TodoDatabase,
+    private val output: Consumer<Output>
+) : TodoMain, ComponentContext by componentContext {
 
     private val store =
         instanceKeeper.getStore {
@@ -29,7 +33,7 @@ internal class TodoMainImpl(
     override val models: Value<Model> = store.asValue().map(stateToModel)
 
     override fun onItemClicked(id: Long) {
-        mainOutput(Output.Selected(id = id))
+        output(Output.Selected(id = id))
     }
 
     override fun onItemDoneChanged(id: Long, isDone: Boolean) {
