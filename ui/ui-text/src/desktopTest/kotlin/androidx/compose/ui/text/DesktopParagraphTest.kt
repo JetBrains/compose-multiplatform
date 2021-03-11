@@ -23,6 +23,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.platform.FontLoader
 import androidx.compose.ui.text.platform.Font
+import androidx.compose.ui.text.style.TextDirection
 import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.sp
 import com.google.common.truth.Truth
@@ -129,6 +130,66 @@ class DesktopParagraphTest {
                 .isEqualTo(2)
             Truth.assertThat(paragraph.getLineEnd(1, true))
                 .isEqualTo(3)
+        }
+    }
+
+    @Test
+    fun getHorizontalPositionForOffset_primary_Bidi_singleLine_textDirectionDefault() {
+        with(defaultDensity) {
+            val ltrText = "abc"
+            val rtlText = "\u05D0\u05D1\u05D2"
+            val text = ltrText + rtlText
+            val fontSize = 50.sp
+            val fontSizeInPx = fontSize.toPx()
+            val width = text.length * fontSizeInPx
+            val paragraph = simpleParagraph(
+                text = text,
+                style = TextStyle(fontSize = fontSize),
+                width = width
+            )
+
+            for (i in 0..ltrText.length) {
+                Truth.assertThat(paragraph.getHorizontalPosition(i, true))
+                    .isEqualTo(fontSizeInPx * i)
+            }
+
+            for (i in 1 until rtlText.length) {
+                Truth.assertThat(paragraph.getHorizontalPosition(i + ltrText.length, true))
+                    .isEqualTo(width - fontSizeInPx * i)
+            }
+        }
+    }
+
+    @Test
+    fun getHorizontalPositionForOffset_notPrimary_Bidi_singleLine_textDirectionLtr() {
+        with(defaultDensity) {
+            val ltrText = "abc"
+            val rtlText = "\u05D0\u05D1\u05D2"
+            val text = ltrText + rtlText
+            val fontSize = 50.sp
+            val fontSizeInPx = fontSize.toPx()
+            val width = text.length * fontSizeInPx
+            val paragraph = simpleParagraph(
+                text = text,
+                style = TextStyle(
+                    fontSize = fontSize,
+                    textDirection = TextDirection.Ltr
+                ),
+                width = width
+            )
+
+            for (i in ltrText.indices) {
+                Truth.assertThat(paragraph.getHorizontalPosition(i, false))
+                    .isEqualTo(fontSizeInPx * i)
+            }
+
+            for (i in rtlText.indices) {
+                Truth.assertThat(paragraph.getHorizontalPosition(i + ltrText.length, false))
+                    .isEqualTo(width - fontSizeInPx * i)
+            }
+
+            Truth.assertThat(paragraph.getHorizontalPosition(text.length, false))
+                .isEqualTo(width - rtlText.length * fontSizeInPx)
         }
     }
 
