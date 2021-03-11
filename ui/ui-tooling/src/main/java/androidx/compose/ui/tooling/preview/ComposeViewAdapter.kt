@@ -16,6 +16,7 @@
 
 package androidx.compose.ui.tooling.preview
 
+import android.annotation.SuppressLint
 import android.content.Context
 import android.graphics.Canvas
 import android.graphics.DashPathEffect
@@ -663,8 +664,9 @@ internal class ComposeViewAdapter : FrameLayout {
         )
     }
 
+    @SuppressLint("VisibleForTests")
     private val FakeSavedStateRegistryOwner = object : SavedStateRegistryOwner {
-        private val lifecycle = LifecycleRegistry(this)
+        private val lifecycle = LifecycleRegistry.createUnsafe(this)
         private val controller = SavedStateRegistryController.create(this).apply {
             performRestore(Bundle())
         }
