@@ -2,9 +2,7 @@ package example.todo.common.main.integration
 
 import com.arkivanov.decompose.DefaultComponentContext
 import com.arkivanov.decompose.lifecycle.LifecycleRegistry
-import com.arkivanov.mvikotlin.core.store.StoreFactory
 import com.arkivanov.mvikotlin.main.store.DefaultStoreFactory
-import com.badoo.reaktive.base.Consumer
 import com.badoo.reaktive.scheduler.overrideSchedulers
 import com.badoo.reaktive.subject.publish.PublishSubject
 import com.badoo.reaktive.test.observable.assertValue
@@ -13,7 +11,6 @@ import com.badoo.reaktive.test.scheduler.TestScheduler
 import example.todo.common.database.TestDatabaseDriver
 import example.todo.common.database.TodoItemEntity
 import example.todo.common.main.TodoItem
-import example.todo.common.main.TodoMain.Dependencies
 import example.todo.common.main.TodoMain.Model
 import example.todo.common.main.TodoMain.Output
 import example.todo.database.TodoDatabase
@@ -35,13 +32,11 @@ class TodoMainTest {
     private val queries = database.todoDatabaseQueries
 
     private val impl by lazy {
-        TodoMainImpl(
+        TodoMainComponent(
             componentContext = DefaultComponentContext(lifecycle = lifecycle),
-            dependencies = object : Dependencies {
-                override val storeFactory: StoreFactory = DefaultStoreFactory
-                override val database: TodoDatabase = this@TodoMainTest.database
-                override val mainOutput: Consumer<Output> = outputSubject
-            }
+            storeFactory = DefaultStoreFactory,
+            database = database,
+            output = outputSubject
         )
     }
 

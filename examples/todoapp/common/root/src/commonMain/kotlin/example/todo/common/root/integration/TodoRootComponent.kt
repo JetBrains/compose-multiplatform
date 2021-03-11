@@ -8,18 +8,47 @@ import com.arkivanov.decompose.router
 import com.arkivanov.decompose.statekeeper.Parcelable
 import com.arkivanov.decompose.statekeeper.Parcelize
 import com.arkivanov.decompose.value.Value
+import com.arkivanov.mvikotlin.core.store.StoreFactory
 import com.badoo.reaktive.base.Consumer
 import example.todo.common.edit.TodoEdit
+import example.todo.common.edit.integration.TodoEditComponent
 import example.todo.common.main.TodoMain
+import example.todo.common.main.integration.TodoMainComponent
 import example.todo.common.root.TodoRoot
 import example.todo.common.root.TodoRoot.Child
 import example.todo.common.utils.Consumer
+import example.todo.database.TodoDatabase
 
-internal class TodoRootImpl(
+class TodoRootComponent internal constructor(
     componentContext: ComponentContext,
     private val todoMain: (ComponentContext, Consumer<TodoMain.Output>) -> TodoMain,
     private val todoEdit: (ComponentContext, itemId: Long, Consumer<TodoEdit.Output>) -> TodoEdit
 ) : TodoRoot, ComponentContext by componentContext {
+
+    constructor(
+        componentContext: ComponentContext,
+        storeFactory: StoreFactory,
+        database: TodoDatabase
+    ) : this(
+        componentContext = componentContext,
+        todoMain = { childContext, output ->
+            TodoMainComponent(
+                componentContext = childContext,
+                storeFactory = storeFactory,
+                database = database,
+                output = output
+            )
+        },
+        todoEdit = { childContext, itemId, output ->
+            TodoEditComponent(
+                componentContext = childContext,
+                storeFactory = storeFactory,
+                database = database,
+                itemId = itemId,
+                output = output
+            )
+        }
+    )
 
     private val router =
         router<Configuration, Child>(

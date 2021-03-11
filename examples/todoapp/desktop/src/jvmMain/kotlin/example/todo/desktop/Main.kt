@@ -13,6 +13,7 @@ import com.badoo.reaktive.coroutinesinterop.asScheduler
 import com.badoo.reaktive.scheduler.overrideSchedulers
 import example.todo.common.database.TodoDatabaseDriver
 import example.todo.common.root.TodoRoot
+import example.todo.common.root.integration.TodoRootComponent
 import example.todo.common.ui.TodoRootContent
 import example.todo.database.TodoDatabase
 import kotlinx.coroutines.Dispatchers
@@ -32,10 +33,8 @@ fun main() {
 }
 
 private fun todoRoot(componentContext: ComponentContext): TodoRoot =
-    TodoRoot(
+    TodoRootComponent(
         componentContext = componentContext,
-        dependencies = object : TodoRoot.Dependencies {
-            override val storeFactory = DefaultStoreFactory
-            override val database = TodoDatabase(TodoDatabaseDriver())
-        }
+        storeFactory = DefaultStoreFactory,
+        database = TodoDatabase(TodoDatabaseDriver())
     )

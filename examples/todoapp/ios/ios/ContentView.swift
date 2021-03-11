@@ -5,9 +5,10 @@ struct ContentView: View {
     @State
     private var componentHolder =
         ComponentHolder {
-            TodoRootKt.TodoRoot(
+            TodoRootComponent(
                 componentContext: $0,
-                dependencies: RootDependencies()
+                storeFactory: DefaultStoreFactory(),
+                database: TodoDatabaseCompanion().invoke(driver: TodoDatabaseDriverFactoryKt.TodoDatabaseDriver())
             )
         }
     
@@ -16,12 +17,6 @@ struct ContentView: View {
             .onAppear { LifecycleRegistryExtKt.resume(self.componentHolder.lifecycle) }
             .onDisappear { LifecycleRegistryExtKt.stop(self.componentHolder.lifecycle) }
     }
-}
-
-private class RootDependencies: TodoRootDependencies {
-    let database: TodoDatabase = TodoDatabaseCompanion().invoke(driver: TodoDatabaseDriverFactoryKt.TodoDatabaseDriver())
-    
-    let storeFactory: MvikotlinStoreFactory = DefaultStoreFactory()
 }
 
 struct ContentView_Previews: PreviewProvider {
