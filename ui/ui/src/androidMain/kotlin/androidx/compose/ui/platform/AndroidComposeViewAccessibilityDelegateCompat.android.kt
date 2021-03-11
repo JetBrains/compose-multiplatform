@@ -1623,11 +1623,11 @@ internal class AndroidComposeViewAccessibilityDelegateCompat(val view: AndroidCo
                         if (oldActions != null) {
                             // Suppose actions with the same label should be deduped.
                             val labels = mutableSetOf<String>()
-                            for (action in actions) {
+                            actions.fastForEach { action ->
                                 labels.add(action.label)
                             }
                             val oldLabels = mutableSetOf<String>()
-                            for (action in oldActions) {
+                            oldActions.fastForEach { action ->
                                 oldLabels.add(action.label)
                             }
                             propertyChanged =
