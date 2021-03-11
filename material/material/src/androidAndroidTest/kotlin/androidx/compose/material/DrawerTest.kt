@@ -24,20 +24,18 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.semantics.SemanticsActions
 import androidx.compose.ui.semantics.SemanticsProperties
-import androidx.compose.ui.test.GestureScope
+import androidx.compose.ui.test.ExperimentalTestApi
 import androidx.compose.ui.test.SemanticsMatcher
 import androidx.compose.ui.test.assert
 import androidx.compose.ui.test.assertLeftPositionInRootIsEqualTo
 import androidx.compose.ui.test.assertTopPositionInRootIsEqualTo
 import androidx.compose.ui.test.assertWidthIsEqualTo
 import androidx.compose.ui.test.bottomCenter
-import androidx.compose.ui.test.center
 import androidx.compose.ui.test.centerLeft
 import androidx.compose.ui.test.click
 import androidx.compose.ui.test.junit4.createComposeRule
@@ -46,9 +44,10 @@ import androidx.compose.ui.test.onParent
 import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.performGesture
 import androidx.compose.ui.test.performSemanticsAction
-import androidx.compose.ui.test.swipe
+import androidx.compose.ui.test.swipeDown
 import androidx.compose.ui.test.swipeLeft
 import androidx.compose.ui.test.swipeRight
+import androidx.compose.ui.test.swipeUp
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import androidx.test.ext.junit.runners.AndroidJUnit4
@@ -61,7 +60,6 @@ import org.junit.Ignore
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
-import kotlin.math.roundToInt
 
 @MediumTest
 @RunWith(AndroidJUnit4::class)
@@ -614,6 +612,7 @@ class DrawerTest {
             assertThat(drawerState.currentValue).isEqualTo(BottomDrawerValue.Closed)
         }
 
+        @OptIn(ExperimentalTestApi::class)
         rule.onNodeWithTag(contentTag)
             .performGesture { swipeUp(endY = peekHeight) }
 
@@ -634,6 +633,7 @@ class DrawerTest {
             assertThat(drawerState.currentValue).isEqualTo(BottomDrawerValue.Expanded)
         }
 
+        @OptIn(ExperimentalTestApi::class)
         rule.onNodeWithTag(bottomDrawerTag)
             .performGesture { swipeDown(endY = peekHeight) }
 
@@ -825,55 +825,4 @@ class DrawerTest {
         // Then the drawer should be closed
         rule.onNodeWithTag(bottomDrawerTag).assertTopPositionInRootIsEqualTo(topWhenClosed)
     }
-
-    /**
-     * Performs a swipe up gesture on the associated node. The gesture starts at [startY] and
-     * ends at [endY].
-     *
-     * @param startY The start position of the gesture. By default, this is slightly above the
-     * bottom of the associated node.
-     * @param endY The end position of the gesture. By default, this is the top of the associated
-     * node.
-     */
-    private fun GestureScope.swipeUp(
-        startY: Float = (visibleSize.height * (1 - edgeFuzzFactor)).roundToInt().toFloat(),
-        endY: Float = 0.0f
-    ) {
-        require(startY >= endY) {
-            "Start position $startY needs to be equal or bigger than end position $endY"
-        }
-        val x = center.x
-        val start = Offset(x, startY)
-        val end = Offset(x, endY)
-        swipe(start, end, 200)
-    }
-
-    /**
-     * Performs a swipe down gesture on the associated node. The gesture starts at [startY] and
-     * ends at [endY].
-     *
-     * @param startY The start position of the gesture. By default, this is slightly below the
-     * top of the associated node.
-     * @param endY The end position of the gesture. By default, this is the bottom of the associated
-     * node.
-     */
-    private fun GestureScope.swipeDown(
-        startY: Float = (visibleSize.height * edgeFuzzFactor).roundToInt().toFloat(),
-        endY: Float = visibleSize.height.toFloat()
-    ) {
-        require(endY >= startY) {
-            "End position $endY needs to be equal or bigger than start position $startY"
-        }
-        val x = center.x
-        val start = Offset(x, startY)
-        val end = Offset(x, endY)
-        swipe(start, end, 200)
-    }
-
-    /**
-     * The distance of a swipe's start position from the node's edge, in terms of the node's length.
-     * We do not start the swipe exactly on the node's edge, but somewhat more inward, since swiping
-     * from the exact edge may behave in an unexpected way (e.g. may open a navigation drawer).
-     */
-    private val edgeFuzzFactor = 0.083f
 }
