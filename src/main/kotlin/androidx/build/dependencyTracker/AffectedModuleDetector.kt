@@ -236,6 +236,7 @@ class AffectedModuleDetectorImpl constructor(
     private val ignoreUnknownProjects: Boolean = false,
     private val projectSubset: ProjectSubset = ProjectSubset.ALL_AFFECTED_PROJECTS,
     private val cobuiltTestPaths: Set<Set<String>> = COBUILT_TEST_PATHS,
+    private val alwaysBuildIfExistsPaths: Set<String> = ALWAYS_BUILD_IF_EXISTS,
     private val injectedGitClient: GitClient? = null,
     private val baseCommitOverride: String? = null
 ) : AffectedModuleDetector(logger) {
@@ -274,7 +275,10 @@ class AffectedModuleDetectorImpl constructor(
     }
 
     private val alwaysBuild by lazy {
-        ALWAYS_BUILD.map { path -> rootProject.project(path) }
+        // For each path in alwaysBuildIfExistsPaths, if that path doesn't exist, then the developer
+        // must have disabled a project that they weren't interested in using during this run.
+        // Otherwise, we must always build the corresponding project during full builds.
+        alwaysBuildIfExistsPaths.map { path -> rootProject.findProject(path) }.filterNotNull()
     }
 
     /**
@@ -473,9 +477,13 @@ class AffectedModuleDetectorImpl constructor(
     }
 
     companion object {
-        // dummy test to ensure no failure due to "no instrumentation. We can eventually remove
-        // if we resolve b/127819369
-        private val ALWAYS_BUILD = setOf(":placeholder-tests")
+        // Project paths that we always build if they exist
+        private val ALWAYS_BUILD_IF_EXISTS = setOf(
+            // placeholder test project to ensure no failure due to no instrumentation.
+            // We can eventually remove if we resolve b/127819369
+            ":placeholder-tests",
+            ":buildSrc-tests:project-subsets"
+        )
 
         // Some tests are codependent even if their modules are not. Enable manual bundling of tests
         private val COBUILT_TEST_PATHS = setOf(
