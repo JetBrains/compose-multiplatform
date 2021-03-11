@@ -465,56 +465,148 @@ fun GestureScope.swipeWithVelocity(
 }
 
 /**
- * Performs a swipe up gesture on the associated node. The gesture starts slightly above the
- * bottom of the node and ends at the top.
+ * Performs a swipe up gesture along the [centerX] of the associated node. The gesture starts
+ * slightly above the [bottom] of the node and ends at the [top].
  */
 fun GestureScope.swipeUp() {
-    val x = center.x
-    val y0 = (visibleSize.height * (1 - edgeFuzzFactor)).roundToInt().toFloat()
-    val y1 = 0.0f
-    val start = Offset(x, y0)
-    val end = Offset(x, y1)
+    val start = Offset(centerX, bottomFuzzed)
+    val end = Offset(centerX, top)
     swipe(start, end, 200)
 }
 
 /**
- * Performs a swipe down gesture on the associated node. The gesture starts slightly below the
- * top of the node and ends at the bottom.
+ * Performs a swipe up gesture along the [centerX] of the associated node, from [startY] till
+ * [endY], taking [durationMillis] milliseconds.
+ *
+ * @param startY The y-coordinate of the start of the swipe. Must be greater than or equal to the
+ * [endY]. By default slightly above the [bottom] of the node.
+ * @param endY The y-coordinate of the end of the swipe. Must be less than or equal to the
+ * [startY]. By default the [top] of the node.
+ * @param durationMillis The duration of the swipe. By default 200 milliseconds.
+ */
+@ExperimentalTestApi
+fun GestureScope.swipeUp(
+    startY: Float = bottomFuzzed,
+    endY: Float = top,
+    durationMillis: Long = 200
+) {
+    require(startY >= endY) {
+        "startY=$startY needs to be greater than or equal to endY=$endY"
+    }
+    val start = Offset(centerX, startY)
+    val end = Offset(centerX, endY)
+    swipe(start, end, durationMillis)
+}
+
+/**
+ * Performs a swipe down gesture along the [centerX] of the associated node. The gesture starts
+ * slightly below the [top] of the node and ends at the [bottom].
  */
 fun GestureScope.swipeDown() {
-    val x = center.x
-    val y0 = (visibleSize.height * edgeFuzzFactor).roundToInt().toFloat()
-    val y1 = visibleSize.height.toFloat()
-    val start = Offset(x, y0)
-    val end = Offset(x, y1)
+    val start = Offset(centerX, topFuzzed)
+    val end = Offset(centerX, bottom)
     swipe(start, end, 200)
 }
 
 /**
- * Performs a swipe left gesture on the associated node. The gesture starts slightly left of
- * the right side of the node and ends at the left side.
+ * Performs a swipe down gesture along the [centerX] of the associated node, from [startY] till
+ * [endY], taking [durationMillis] milliseconds.
+ *
+ * @param startY The y-coordinate of the start of the swipe. Must be less than or equal to the
+ * [endY]. By default slightly below the [top] of the node.
+ * @param endY The y-coordinate of the end of the swipe. Must be greater than or equal to the
+ * [startY]. By default the [bottom] of the node.
+ * @param durationMillis The duration of the swipe. By default 200 milliseconds.
+ */
+@ExperimentalTestApi
+fun GestureScope.swipeDown(
+    startY: Float = topFuzzed,
+    endY: Float = bottom,
+    durationMillis: Long = 200
+) {
+    require(startY <= endY) {
+        "startY=$startY needs to be less than or equal to endY=$endY"
+    }
+    val start = Offset(centerX, startY)
+    val end = Offset(centerX, endY)
+    swipe(start, end, durationMillis)
+}
+
+/**
+ * Performs a swipe left gesture along the [centerY] of the associated node. The gesture starts
+ * slightly left of the [right] side of the node and ends at the [left] side.
  */
 fun GestureScope.swipeLeft() {
-    val x0 = (visibleSize.width * (1 - edgeFuzzFactor)).roundToInt().toFloat()
-    val x1 = 0.0f
-    val y = center.y
-    val start = Offset(x0, y)
-    val end = Offset(x1, y)
+    val start = Offset(rightFuzzed, centerY)
+    val end = Offset(left, centerY)
     swipe(start, end, 200)
 }
 
 /**
- * Performs a swipe right gesture on the associated node. The gesture starts slightly right of
- * the left side of the node and ends at the right side.
+ * Performs a swipe left gesture along the [centerY] of the associated node, from [startX] till
+ * [endX], taking [durationMillis] milliseconds.
+ *
+ * @param startX The x-coordinate of the start of the swipe. Must be greater than or equal to the
+ * [endX]. By default slightly left of the [right] of the node.
+ * @param endX The x-coordinate of the end of the swipe. Must be less than or equal to the
+ * [startX]. By default the [left] of the node.
+ * @param durationMillis The duration of the swipe. By default 200 milliseconds.
+ */
+@ExperimentalTestApi
+fun GestureScope.swipeLeft(
+    startX: Float = rightFuzzed,
+    endX: Float = left,
+    durationMillis: Long = 200
+) {
+    require(startX >= endX) {
+        "startX=$startX needs to be greater than or equal to endX=$endX"
+    }
+    val start = Offset(startX, centerY)
+    val end = Offset(endX, centerY)
+    swipe(start, end, durationMillis)
+}
+
+/**
+ * Performs a swipe right gesture along the [centerY] of the associated node. The gesture starts
+ * slightly right of the [left] side of the node and ends at the [right] side.
  */
 fun GestureScope.swipeRight() {
-    val x0 = (visibleSize.width * edgeFuzzFactor).roundToInt().toFloat()
-    val x1 = visibleSize.width.toFloat()
-    val y = center.y
-    val start = Offset(x0, y)
-    val end = Offset(x1, y)
+    val start = Offset(leftFuzzed, centerY)
+    val end = Offset(right, centerY)
     swipe(start, end, 200)
 }
+
+/**
+ * Performs a swipe right gesture along the [centerY] of the associated node, from [startX] till
+ * [endX], taking [durationMillis] milliseconds.
+ *
+ * @param startX The x-coordinate of the start of the swipe. Must be less than or equal to the
+ * [endX]. By default slightly right of the [left] of the node.
+ * @param endX The x-coordinate of the end of the swipe. Must be greater than or equal to the
+ * [startX]. By default the [right] of the node.
+ * @param durationMillis The duration of the swipe. By default 200 milliseconds.
+ */
+@ExperimentalTestApi
+fun GestureScope.swipeRight(
+    startX: Float = leftFuzzed,
+    endX: Float = right,
+    durationMillis: Long = 200
+) {
+    require(startX <= endX) {
+        "startX=$startX needs to be less than or equal to endX=$endX"
+    }
+    val start = Offset(startX, centerY)
+    val end = Offset(endX, centerY)
+    swipe(start, end, durationMillis)
+}
+
+private val Int.startFuzzed: Float get() = (this * edgeFuzzFactor).roundToInt().toFloat()
+private val Int.endFuzzed: Float get() = (this * (1 - edgeFuzzFactor)).roundToInt().toFloat()
+
+private val GestureScope.leftFuzzed: Float get() = width.startFuzzed
+private val GestureScope.topFuzzed: Float get() = height.startFuzzed
+private val GestureScope.rightFuzzed: Float get() = width.endFuzzed
+private val GestureScope.bottomFuzzed: Float get() = height.endFuzzed
 
 /**
  * Generate a function of the form `f(t) = a*(t-T)^2 + b*(t-T) + c` that satisfies

@@ -157,9 +157,13 @@ package androidx.compose.ui.test {
     method public static void pinch-1c52nSY(androidx.compose.ui.test.GestureScope, long start0, long end0, long start1, long end1, optional long durationMillis);
     method public static void swipe-DPh1Mgw(androidx.compose.ui.test.GestureScope, long start, long end, optional long durationMillis);
     method public static void swipeDown(androidx.compose.ui.test.GestureScope);
+    method @androidx.compose.ui.test.ExperimentalTestApi public static void swipeDown(androidx.compose.ui.test.GestureScope, optional float startY, optional float endY, optional long durationMillis);
     method public static void swipeLeft(androidx.compose.ui.test.GestureScope);
+    method @androidx.compose.ui.test.ExperimentalTestApi public static void swipeLeft(androidx.compose.ui.test.GestureScope, optional float startX, optional float endX, optional long durationMillis);
     method public static void swipeRight(androidx.compose.ui.test.GestureScope);
+    method @androidx.compose.ui.test.ExperimentalTestApi public static void swipeRight(androidx.compose.ui.test.GestureScope, optional float startX, optional float endX, optional long durationMillis);
     method public static void swipeUp(androidx.compose.ui.test.GestureScope);
+    method @androidx.compose.ui.test.ExperimentalTestApi public static void swipeUp(androidx.compose.ui.test.GestureScope, optional float startY, optional float endY, optional long durationMillis);
     method public static void swipeWithVelocity-YsXUJPI(androidx.compose.ui.test.GestureScope, long start, long end, float endVelocity, optional long durationMillis);
     method public static void up(androidx.compose.ui.test.GestureScope, optional int pointerId);
   }
