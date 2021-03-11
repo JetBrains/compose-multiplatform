@@ -17,6 +17,7 @@
 package androidx.compose.foundation
 
 import androidx.compose.animation.core.ManualFrameClock
+import androidx.compose.foundation.gestures.FlingBehavior
 import androidx.compose.foundation.gestures.animateScrollBy
 import androidx.compose.foundation.gestures.ScrollableState
 import androidx.compose.foundation.gestures.scrollable
@@ -37,6 +38,7 @@ import androidx.compose.ui.input.nestedscroll.NestedScrollDispatcher
 import androidx.compose.ui.input.nestedscroll.NestedScrollSource
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.foundation.gestures.Orientation
+import androidx.compose.foundation.gestures.ScrollScope
 import androidx.compose.foundation.interaction.DragInteraction
 import androidx.compose.foundation.interaction.Interaction
 import androidx.compose.foundation.interaction.MutableInteractionSource
@@ -871,6 +873,40 @@ class ScrollableTest {
             assertThat((interactions[1] as DragInteraction.Cancel).start)
                 .isEqualTo(interactions[0])
         }
+    }
+
+    @Test
+    fun scrollable_flingBehaviourCalled_whenVelocity0() {
+        var total = 0f
+        val controller = ScrollableState(
+            consumeScrollDelta = {
+                total += it
+                it
+            }
+        )
+        var flingCalled = 0
+        var flingVelocity: Float = Float.MAX_VALUE
+        val flingBehaviour = object : FlingBehavior {
+            override suspend fun ScrollScope.performFling(initialVelocity: Float): Float {
+                flingCalled++
+                flingVelocity = initialVelocity
+                return 0f
+            }
+        }
+        setScrollableContent {
+            Modifier.scrollable(
+                state = controller,
+                flingBehavior = flingBehaviour,
+                orientation = Orientation.Horizontal
+            )
+        }
+        rule.onNodeWithTag(scrollableBoxTag).performGesture {
+            down(this.center)
+            moveBy(Offset(115f, 0f))
+            up()
+        }
+        assertThat(flingCalled).isEqualTo(1)
+        assertThat(flingVelocity).isEqualTo(0f)
     }
 
     @Test

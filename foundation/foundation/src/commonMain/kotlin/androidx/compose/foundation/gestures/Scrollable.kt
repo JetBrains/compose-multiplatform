@@ -210,7 +210,7 @@ private class ScrollingLogic(
     suspend fun doFlingAnimation(available: Velocity): Velocity {
         var result: Velocity = available
         // come up with the better threshold, but we need it since spline curve gives us NaNs
-        if (abs(available.toFloat()) > 1f) scrollableState.scroll {
+        scrollableState.scroll {
             val outerScopeScroll: (Float) -> Float =
                 { delta -> this.dispatchScroll(delta, NestedScrollSource.Fling) }
             val scope = object : ScrollScope {
@@ -282,19 +282,23 @@ private class DefaultFlingBehavior(
     private val flingDecay: DecayAnimationSpec<Float>
 ) : FlingBehavior {
     override suspend fun ScrollScope.performFling(initialVelocity: Float): Float {
-        var velocityLeft = initialVelocity
-        var lastValue = 0f
-        AnimationState(
-            initialValue = 0f,
-            initialVelocity = initialVelocity,
-        ).animateDecay(flingDecay) {
-            val delta = value - lastValue
-            val left = scrollBy(delta)
-            lastValue = value
-            velocityLeft = this.velocity
-            // avoid rounding errors and stop if anything is unconsumed
-            if (abs(left) > 0.5f) this.cancelAnimation()
+        return if (abs(initialVelocity) > 1f) {
+            var velocityLeft = initialVelocity
+            var lastValue = 0f
+            AnimationState(
+                initialValue = 0f,
+                initialVelocity = initialVelocity,
+            ).animateDecay(flingDecay) {
+                val delta = value - lastValue
+                val left = scrollBy(delta)
+                lastValue = value
+                velocityLeft = this.velocity
+                // avoid rounding errors and stop if anything is unconsumed
+                if (abs(left) > 0.5f) this.cancelAnimation()
+            }
+            velocityLeft
+        } else {
+            initialVelocity
         }
-        return velocityLeft
     }
 }
