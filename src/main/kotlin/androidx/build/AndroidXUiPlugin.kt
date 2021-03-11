@@ -154,6 +154,35 @@ class AndroidXUiPlugin : Plugin<Project> {
                 error("ModifierFactoryReturnType")
                 error("ModifierFactoryExtensionFunction")
                 error("ModifierParameter")
+
+                // Paths we want to enable ListIterator checks for - for higher level levels it
+                // won't have a noticeable performance impact, and we don't want developers
+                // reading high level library code to worry about this.
+                val listIteratorPaths = listOf(
+                    "compose:foundation",
+                    "compose:runtime",
+                    "compose:ui",
+                    "text"
+                )
+
+                // Paths we want to disable ListIteratorChecks for - these are not runtime
+                // libraries and so Iterator allocation is not relevant.
+                val ignoreListIteratorFilter = listOf(
+                    "benchmark",
+                    "inspection",
+                    "samples",
+                    "test",
+                    "tooling"
+                )
+
+                // Disable ListIterator if we are not in a matching path, or we are in a
+                // non-runtime project
+                if (
+                    listIteratorPaths.none { path.contains(it) } ||
+                    ignoreListIteratorFilter.any { path.contains(it) }
+                ) {
+                    disable("ListIterator")
+                }
             }
 
             // TODO(148540713): remove this exclusion when Lint can support using multiple lint jars
