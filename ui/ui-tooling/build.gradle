@@ -15,7 +15,7 @@
  */
 
 import androidx.build.LibraryGroups
-import androidx.build.Publish
+import androidx.build.LibraryType
 
 import static androidx.build.dependencies.DependenciesKt.*
 
@@ -57,7 +57,7 @@ dependencies {
 
 androidx {
     name = "Compose Tooling"
-    publish = Publish.SNAPSHOT_AND_RELEASE
+    type = LibraryType.PUBLISHED_LIBRARY
     mavenGroup = LibraryGroups.Compose.UI
     inceptionYear = "2019"
     description = "Compose tooling library. This library exposes information to our tools for better IDE support."

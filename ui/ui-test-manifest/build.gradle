@@ -14,10 +14,8 @@
  * limitations under the License.
  */
 
-
-import androidx.build.AndroidXUiPlugin
 import androidx.build.LibraryGroups
-import androidx.build.Publish
+import androidx.build.LibraryType
 
 plugins {
     id("AndroidXPlugin")
@@ -31,7 +29,7 @@ dependencies {
 
 androidx {
     name = "Compose Testing manifest dependency"
-    publish = Publish.SNAPSHOT_AND_RELEASE
+    type = LibraryType.PUBLISHED_LIBRARY
     mavenGroup = LibraryGroups.Compose.UI
     inceptionYear = "2021"
     description = "Compose testing library that should be added as a debugImplementation dependency to add properties to the debug manifest necessary for testing an application"

@@ -15,8 +15,8 @@
  */
 
 import androidx.build.LibraryGroups
+import androidx.build.LibraryType
 import androidx.build.LibraryVersions
-import androidx.build.Publish
 import androidx.build.RunApiTasks
 import androidx.build.SupportConfigKt
 
@@ -74,7 +74,7 @@ tasks.findByName("jvmTest").configure {
 
 androidx {
     name = "Jetpack Compose desktop implementation"
-    publish = Publish.SNAPSHOT_AND_RELEASE
+    type = LibraryType.PUBLISHED_LIBRARY
     mavenGroup = LibraryGroups.Compose.DESKTOP
     inceptionYear = "2020"
     legacyDisableKotlinStrictApiMode = true

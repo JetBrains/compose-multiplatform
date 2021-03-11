@@ -16,7 +16,7 @@
 
 import androidx.build.AndroidXUiPlugin
 import androidx.build.LibraryGroups
-import androidx.build.Publish
+import androidx.build.LibraryType
 import androidx.build.RunApiTasks
 import androidx.compose.material.icons.generator.tasks.IconGenerationTask
 
@@ -115,7 +115,7 @@ IconGenerationTask.registerExtendedIconProject(
 
 androidx {
     name = "Compose Material Icons Extended"
-    publish = Publish.SNAPSHOT_AND_RELEASE
+    type = LibraryType.PUBLISHED_LIBRARY
     mavenGroup = LibraryGroups.Compose.MATERIAL
     // This module has a large number (5000+) of generated source files and so doc generation /
     // API tracking will simply take too long

@@ -17,7 +17,7 @@
 
 import androidx.build.AndroidXUiPlugin
 import androidx.build.LibraryGroups
-import androidx.build.Publish
+import androidx.build.LibraryType
 
 import static androidx.build.dependencies.DependenciesKt.*
 
@@ -129,7 +129,7 @@ if(AndroidXUiPlugin.isMultiplatformEnabled(project)) {
 
 androidx {
     name = "Compose Testing for JUnit4"
-    publish = Publish.SNAPSHOT_AND_RELEASE
+    type = LibraryType.PUBLISHED_LIBRARY
     mavenGroup = LibraryGroups.Compose.UI
     inceptionYear = "2020"
     description = "Compose testing integration with JUnit4"
