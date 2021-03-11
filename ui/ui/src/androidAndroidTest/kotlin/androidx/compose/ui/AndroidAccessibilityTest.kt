@@ -30,27 +30,32 @@ import android.view.accessibility.AccessibilityNodeProvider
 import android.view.accessibility.AccessibilityRecord
 import androidx.activity.ComponentActivity
 import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.offset
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.requiredSize
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.selection.toggleable
 import androidx.compose.foundation.text.BasicText
 import androidx.compose.foundation.text.BasicTextField
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.platform.AndroidComposeView
 import androidx.compose.ui.platform.AndroidComposeViewAccessibilityDelegateCompat
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.semantics.SemanticsActions
 import androidx.compose.ui.semantics.SemanticsProperties
+import androidx.compose.ui.semantics.clearAndSetSemantics
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.paneTitle
 import androidx.compose.ui.semantics.role
@@ -71,6 +76,7 @@ import androidx.compose.ui.text.TextLayoutResult
 import androidx.compose.ui.text.TextRange
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.TextFieldValue
+import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import androidx.core.view.ViewCompat
@@ -1291,6 +1297,192 @@ class AndroidAccessibilityTest {
         val info = provider.createAccessibilityNodeInfo(node.id)
 
         assertEquals(AndroidComposeViewAccessibilityDelegateCompat.ClassName, info.className)
+    }
+
+    @Test
+    fun testReportedBounds_clickableNode_includesPadding() {
+        val size = 100.dp
+        container.setContent {
+            Column {
+                Box(
+                    Modifier
+                        .testTag("tag")
+                        .clickable {}
+                        .size(size)
+                        .padding(10.dp)
+                        .semantics {
+                            contentDescription = "Button"
+                        }
+                )
+            }
+        }
+
+        val node = rule.onNodeWithTag("tag").fetchSemanticsNode()
+        val accessibilityNodeInfo = provider.createAccessibilityNodeInfo(node.id)
+
+        val rect = android.graphics.Rect()
+        accessibilityNodeInfo.getBoundsInScreen(rect)
+        val resultWidth = rect.right - rect.left
+        val resultHeight = rect.bottom - rect.top
+
+        with(rule.density) {
+            assertEquals(size.roundToPx(), resultWidth)
+            assertEquals(size.roundToPx(), resultHeight)
+        }
+    }
+
+    @Test
+    fun testReportedBounds_clickableNode_excludesPadding() {
+        val size = 100.dp
+        val density = Density(2f)
+        container.setContent {
+            CompositionLocalProvider(LocalDensity provides density) {
+                Column {
+                    Box(
+                        Modifier
+                            .testTag("tag")
+                            .semantics { contentDescription = "Test" }
+                            .size(size)
+                            .padding(10.dp)
+                            .clickable {}
+                    )
+                }
+            }
+        }
+
+        val node = rule.onNodeWithTag("tag").fetchSemanticsNode()
+        val accessibilityNodeInfo = provider.createAccessibilityNodeInfo(node.id)
+
+        val rect = android.graphics.Rect()
+        accessibilityNodeInfo.getBoundsInScreen(rect)
+        val resultWidth = rect.right - rect.left
+        val resultHeight = rect.bottom - rect.top
+
+        with(density) {
+            assertEquals((size - 20.dp).roundToPx(), resultWidth)
+            assertEquals((size - 20.dp).roundToPx(), resultHeight)
+        }
+    }
+
+    @Test
+    fun testReportedBounds_withClearAndSetSemantics() {
+        val size = 100.dp
+        container.setContent {
+            Column {
+                Box(
+                    Modifier
+                        .testTag("tag")
+                        .size(size)
+                        .padding(10.dp)
+                        .clearAndSetSemantics {}
+                        .clickable {}
+                )
+            }
+        }
+
+        val node = rule.onNodeWithTag("tag").fetchSemanticsNode()
+        val accessibilityNodeInfo = provider.createAccessibilityNodeInfo(node.id)
+
+        val rect = android.graphics.Rect()
+        accessibilityNodeInfo.getBoundsInScreen(rect)
+        val resultWidth = rect.right - rect.left
+        val resultHeight = rect.bottom - rect.top
+
+        with(rule.density) {
+            assertEquals(size.roundToPx(), resultWidth)
+            assertEquals(size.roundToPx(), resultHeight)
+        }
+    }
+
+    @Test
+    fun testReportedBounds_withTwoClickable_outermostWins() {
+        val size = 100.dp
+        container.setContent {
+            Column {
+                Box(
+                    Modifier
+                        .testTag("tag")
+                        .clickable {}
+                        .size(size)
+                        .padding(10.dp)
+                        .clickable {}
+                )
+            }
+        }
+
+        val node = rule.onNodeWithTag("tag").fetchSemanticsNode()
+        val accessibilityNodeInfo = provider.createAccessibilityNodeInfo(node.id)
+
+        val rect = android.graphics.Rect()
+        accessibilityNodeInfo.getBoundsInScreen(rect)
+        val resultWidth = rect.right - rect.left
+        val resultHeight = rect.bottom - rect.top
+
+        with(rule.density) {
+            assertEquals(size.roundToPx(), resultWidth)
+            assertEquals(size.roundToPx(), resultHeight)
+        }
+    }
+
+    @Test
+    fun testReportedBounds_outerMostSemanticsUsed() {
+        val size = 100.dp
+        container.setContent {
+            Column {
+                Box(
+                    Modifier
+                        .testTag("tag")
+                        .semantics { contentDescription = "Test1" }
+                        .size(size)
+                        .padding(10.dp)
+                        .semantics { contentDescription = "Test2" }
+                )
+            }
+        }
+
+        val node = rule.onNodeWithTag("tag").fetchSemanticsNode()
+        val accessibilityNodeInfo = provider.createAccessibilityNodeInfo(node.id)
+
+        val rect = android.graphics.Rect()
+        accessibilityNodeInfo.getBoundsInScreen(rect)
+        val resultWidth = rect.right - rect.left
+        val resultHeight = rect.bottom - rect.top
+
+        with(rule.density) {
+            assertEquals(size.roundToPx(), resultWidth)
+            assertEquals(size.roundToPx(), resultHeight)
+        }
+    }
+
+    @Test
+    fun testReportedBounds_withOffset() {
+        val size = 100.dp
+        container.setContent {
+            Column {
+                Box(
+                    Modifier
+                        .size(size)
+                        .offset(10.dp, 10.dp)
+                        .testTag("tag")
+                        .semantics { contentDescription = "Test" }
+                )
+            }
+        }
+
+        val node = rule.onNodeWithTag("tag").fetchSemanticsNode()
+        val accessibilityNodeInfo = provider.createAccessibilityNodeInfo(node.id)
+
+        val rect = android.graphics.Rect()
+        accessibilityNodeInfo.getBoundsInScreen(rect)
+        val resultWidth = rect.right - rect.left
+        val resultHeight = rect.bottom - rect.top
+
+        with(rule.density) {
+            assertEquals(size.roundToPx(), resultWidth)
+            assertEquals(size.roundToPx(), resultHeight)
+            assertEquals(10.dp.roundToPx(), rect.left)
+            assertEquals(10.dp.roundToPx(), rect.top)
+        }
     }
 
     private fun eventIndex(list: List<AccessibilityEvent>, event: AccessibilityEvent): Int {

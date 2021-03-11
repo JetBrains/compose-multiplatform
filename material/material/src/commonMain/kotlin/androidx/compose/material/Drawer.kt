@@ -357,14 +357,14 @@ fun ModalDrawer(
                             maxHeight = modalDrawerConstraints.maxHeight.toDp()
                         )
                 }
+                    .offset { IntOffset(drawerState.offset.value.roundToInt(), 0) }
+                    .padding(end = EndDrawerPadding)
                     .semantics {
                         paneTitle = Strings.NavigationMenu
                         if (drawerState.isOpen) {
                             dismiss(action = { scope.launch { drawerState.close() }; true })
                         }
-                    }
-                    .offset { IntOffset(drawerState.offset.value.roundToInt(), 0) }
-                    .padding(end = EndDrawerPadding),
+                    },
                 shape = drawerShape,
                 color = drawerBackgroundColor,
                 contentColor = drawerContentColor,
@@ -477,14 +477,14 @@ fun BottomDrawer(
                     .onGloballyPositioned { position ->
                         drawerHeight = position.size.height.toFloat()
                     }
+                    .offset { IntOffset(x = 0, y = drawerState.offset.value.roundToInt()) }
                     .semantics {
                         paneTitle = Strings.NavigationMenu
                         if (drawerState.isOpen) {
                             // TODO(b/180101663) The action currently doesn't return the correct results
                             dismiss(action = { scope.launch { drawerState.close() }; true })
                         }
-                    }
-                    .offset { IntOffset(x = 0, y = drawerState.offset.value.roundToInt()) },
+                    },
                 shape = drawerShape,
                 color = drawerBackgroundColor,
                 contentColor = drawerContentColor,

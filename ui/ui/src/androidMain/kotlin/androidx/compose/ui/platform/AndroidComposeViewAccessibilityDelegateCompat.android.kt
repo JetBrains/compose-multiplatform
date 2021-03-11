@@ -70,6 +70,8 @@ import androidx.core.view.accessibility.AccessibilityNodeProviderCompat
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.delay
 import kotlin.math.abs
+import kotlin.math.ceil
+import kotlin.math.floor
 
 private fun LayoutNode.findClosestParentNode(selector: (LayoutNode) -> Boolean): LayoutNode? {
     var currentParent = this.parent
@@ -275,10 +277,10 @@ internal class AndroidComposeViewAccessibilityDelegateCompat(val view: AndroidCo
             val bottomRightInScreen = view.localToScreen(boundsInRoot.bottomRight)
             info.setBoundsInScreen(
                 android.graphics.Rect(
-                    topLeftInScreen.x.toInt(),
-                    topLeftInScreen.y.toInt(),
-                    bottomRightInScreen.x.toInt(),
-                    bottomRightInScreen.y.toInt()
+                    floor(topLeftInScreen.x).toInt(),
+                    floor(topLeftInScreen.y).toInt(),
+                    ceil(bottomRightInScreen.x).toInt(),
+                    ceil(bottomRightInScreen.y).toInt()
                 )
             )
         } catch (e: IllegalStateException) {
@@ -956,8 +958,10 @@ internal class AndroidComposeViewAccessibilityDelegateCompat(val view: AndroidCo
                         ) &&
                         xScrollState.value() < xScrollState.maxValue()
                     ) {
+                        // here and below innerLayoutNodeWrapper is used to calculate the width
+                        // and height to exclude the paddings
                         return scrollAction.action?.invoke(
-                            node.boundsInWindow.right - node.boundsInWindow.left,
+                            node.layoutNode.coordinates.size.width.toFloat(),
                             0f
                         ) ?: false
                     }
@@ -975,7 +979,7 @@ internal class AndroidComposeViewAccessibilityDelegateCompat(val view: AndroidCo
                         xScrollState.value() > 0
                     ) {
                         return scrollAction.action?.invoke(
-                            -(node.boundsInWindow.right - node.boundsInWindow.left),
+                            -node.layoutNode.coordinates.size.width.toFloat(),
                             0f
                         ) ?: false
                     }
@@ -998,7 +1002,7 @@ internal class AndroidComposeViewAccessibilityDelegateCompat(val view: AndroidCo
                     ) {
                         return scrollAction.action?.invoke(
                             0f,
-                            node.boundsInWindow.bottom - node.boundsInWindow.top
+                            node.layoutNode.coordinates.size.height.toFloat()
                         ) ?: false
                     }
                     if ((
@@ -1016,7 +1020,7 @@ internal class AndroidComposeViewAccessibilityDelegateCompat(val view: AndroidCo
                     ) {
                         return scrollAction.action?.invoke(
                             0f,
-                            -(node.boundsInWindow.bottom - node.boundsInWindow.top)
+                            -node.layoutNode.coordinates.size.height.toFloat()
                         ) ?: false
                     }
                 }
@@ -1118,37 +1122,39 @@ internal class AndroidComposeViewAccessibilityDelegateCompat(val view: AndroidCo
                     continue
                 }
                 val bounds = textLayoutResult.getBoundingBox(positionInfoStartIndex + i)
-                val screenBounds: Rect?
-                // Only the visible/partial visible locations are used.
-                if (textNode != null) {
-                    screenBounds = toScreenCoords(textNode, bounds)
-                } else {
-                    screenBounds = bounds
-                }
-                if (screenBounds == null) {
-                    boundingRects.add(null)
-                } else {
-                    boundingRects.add(
-                        RectF(
-                            screenBounds.left,
-                            screenBounds.top,
-                            screenBounds.right,
-                            screenBounds.bottom
-                        )
-                    )
-                }
+                val boundsOnScreen = toScreenCoords(textNode, bounds)
+                boundingRects.add(boundsOnScreen)
             }
             info.extras.putParcelableArray(extraDataKey, boundingRects.toTypedArray())
         }
     }
 
-    private fun toScreenCoords(textNode: SemanticsNode, bounds: Rect): Rect? {
-        val screenBounds = bounds.translate(textNode.positionInWindow)
-        val globalBounds = textNode.boundsInWindow
-        if (screenBounds.overlaps(globalBounds)) {
-            return screenBounds.intersect(globalBounds)
+    private fun toScreenCoords(textNode: SemanticsNode?, bounds: Rect): RectF? {
+        if (textNode == null) return null
+        val boundsInRoot = bounds.translate(textNode.positionInRoot)
+        val textNodeBoundsInRoot = textNode.boundsInRoot
+
+        // Only visible or partially visible locations are used.
+        val visibleBounds = if (boundsInRoot.overlaps(textNodeBoundsInRoot)) {
+            boundsInRoot.intersect(textNodeBoundsInRoot)
+        } else {
+            null
         }
-        return null
+
+        return if (visibleBounds != null) {
+            val topLeftInScreen =
+                view.localToScreen(Offset(visibleBounds.left, visibleBounds.top))
+            val bottomRightInScreen =
+                view.localToScreen(Offset(visibleBounds.right, visibleBounds.bottom))
+            RectF(
+                topLeftInScreen.x,
+                topLeftInScreen.y,
+                bottomRightInScreen.x,
+                bottomRightInScreen.y
+            )
+        } else {
+            null
+        }
     }
 
     // TODO: this only works for single text/text field.
