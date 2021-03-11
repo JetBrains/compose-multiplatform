@@ -28,6 +28,8 @@ import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.IntSize
+import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.launch
 
 private val defaultAnimation = spring<Float>()
 
@@ -67,21 +69,13 @@ fun animateFloatAsState(
         } else {
             animationSpec
         }
-    val animationState: AnimationState<Float, AnimationVector1D> = remember {
-        AnimationState(targetValue)
-    }
-
-    val currentEndListener by rememberUpdatedState(finishedListener)
-    LaunchedEffect(targetValue, animationSpec) {
-        animationState.animateTo(
-            targetValue,
-            resolvedAnimSpec,
-            // If the previous animation was interrupted (i.e. not finished), make it sequential.
-            !animationState.isFinished
-        )
-        currentEndListener?.invoke(animationState.value)
-    }
-    return animationState
+    return animateValueAsState(
+        targetValue,
+        Float.VectorConverter,
+        resolvedAnimSpec,
+        visibilityThreshold,
+        finishedListener
+    )
 }
 
 /**
@@ -361,19 +355,26 @@ fun <T, V : AnimationVector> animateValueAsState(
     visibilityThreshold: T? = null,
     finishedListener: ((T) -> Unit)? = null
 ): State<T> {
-    val animationState: AnimationState<T, V> = remember(typeConverter) {
-        AnimationState(typeConverter, targetValue)
-    }
 
+    val animatable = remember { Animatable(targetValue, typeConverter) }
     val listener by rememberUpdatedState(finishedListener)
-    LaunchedEffect(targetValue, animationSpec) {
-        animationState.animateTo(
-            targetValue,
-            animationSpec,
-            // If the previous animation was interrupted (i.e. not finished), make it sequential.
-            !animationState.isFinished
-        )
-        listener?.invoke(animationState.value)
+    val channel = remember { Channel<T>(Channel.CONFLATED) }
+    channel.offer(targetValue)
+    LaunchedEffect(channel) {
+        for (target in channel) {
+            // This additional poll is needed because when the channel suspends on receive and
+            // two values are produced before consumers' dispatcher resumes, only the first value
+            // will be received.
+            // It may not be an issue elsewhere, but in animation we want to avoid being one
+            // frame late.
+            val newTarget = channel.poll() ?: target
+            launch {
+                if (newTarget != animatable.targetValue) {
+                    animatable.animateTo(newTarget, animationSpec)
+                    listener?.invoke(animatable.value)
+                }
+            }
+        }
     }
-    return animationState
+    return animatable.asState()
 }
