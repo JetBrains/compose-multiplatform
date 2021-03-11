@@ -24,12 +24,12 @@ import androidx.compose.ui.geometry.MutableRect
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Rect
 import androidx.compose.ui.geometry.toRect
-import androidx.compose.ui.input.nestedscroll.NestedScrollDelegatingWrapper
 import androidx.compose.ui.graphics.Canvas
 import androidx.compose.ui.graphics.GraphicsLayerScope
 import androidx.compose.ui.graphics.Matrix
 import androidx.compose.ui.graphics.Paint
 import androidx.compose.ui.graphics.ReusableGraphicsLayerScope
+import androidx.compose.ui.input.nestedscroll.NestedScrollDelegatingWrapper
 import androidx.compose.ui.input.pointer.PointerInputFilter
 import androidx.compose.ui.layout.LayoutCoordinates
 import androidx.compose.ui.layout.Measurable
@@ -440,16 +440,16 @@ internal abstract class LayoutNodeWrapper(
      * local coordinate system.
      */
     open fun fromParentPosition(position: Offset): Offset {
+        val relativeToWrapperPosition = position - this.position
         val layer = layer
-        val targetPosition = if (layer == null) {
-            position
+        return if (layer == null) {
+            relativeToWrapperPosition
         } else {
             val inverse = matrixCache
             layer.getMatrix(inverse)
             inverse.invert()
-            inverse.map(position)
+            inverse.map(relativeToWrapperPosition)
         }
-        return targetPosition - this.position
     }
 
     protected fun drawBorder(canvas: Canvas, paint: Paint) {
