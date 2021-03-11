@@ -200,6 +200,14 @@ message GetParametersCommand {
   // As an optimization, we can skip over searching system composables if we know we don't care
   // about them.
   bool skip_system_composables = 3;
+  // Max number of recursions into nested composite parameter values.
+  // It is possible to dig in further by using: GetParameterDetailsCommand.
+  // If not specified the default is 2.
+  int32 max_recursions = 4;
+  // Max number of initial elements in an iterable such as a List/Array.
+  // It is possible to request more elements by using: GetParameterDetailsCommand.
+  // If not specified the default is 5.
+  int32 max_initial_iterable_size = 5;
 }
 
 message GetParametersResponse {
@@ -212,6 +220,8 @@ message GetParametersResponse {
 message GetAllParametersCommand {
   int64 root_view_id = 1;
   bool skip_system_composables = 2;
+  int32 max_recursions = 3;
+  int32 max_initial_iterable_size = 4;
 }
 
 message GetAllParametersResponse {
@@ -227,6 +237,8 @@ message GetParameterDetailsCommand {
   int32 start_index = 3;
   int32 max_elements = 4;
   bool skip_system_composables = 5;
+  int32 max_recursions = 6;
+  int32 max_initial_iterable_size = 7;
 }
 
 message GetParameterDetailsResponse {
