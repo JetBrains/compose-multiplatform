@@ -27,20 +27,9 @@ import com.android.tools.lint.detector.api.JavaContext
 import com.android.tools.lint.detector.api.Scope
 import com.android.tools.lint.detector.api.Severity
 import com.android.tools.lint.detector.api.SourceCodeScanner
-import com.intellij.lang.jvm.annotation.JvmAnnotationArrayValue
-import com.intellij.lang.jvm.annotation.JvmAnnotationAttributeValue
-import com.intellij.lang.jvm.annotation.JvmAnnotationConstantValue
-import com.intellij.psi.PsiAnnotation
-import com.intellij.psi.PsiMethod
 import com.intellij.psi.impl.compiled.ClsMethodImpl
-import com.intellij.psi.util.ClassUtil
 import com.intellij.psi.util.InheritanceUtil
 import kotlinx.metadata.KmClassifier
-import kotlinx.metadata.KmDeclarationContainer
-import kotlinx.metadata.KmFunction
-import kotlinx.metadata.jvm.KotlinClassHeader
-import kotlinx.metadata.jvm.KotlinClassMetadata
-import kotlinx.metadata.jvm.signature
 import org.jetbrains.kotlin.psi.KtForExpression
 import org.jetbrains.kotlin.psi.KtNamedFunction
 import org.jetbrains.uast.UCallExpression
@@ -65,7 +54,7 @@ class ListIteratorDetector : Detector(), SourceCodeScanner {
             // Type of the variable we are iterating on, i.e the type of `b` in `for (a in b)`
             val iteratedValueType = node.iteratedValue.getExpressionType()
             // We are iterating on a List
-            if (InheritanceUtil.isInheritor(iteratedValueType, JavaListFqn)) {
+            if (InheritanceUtil.isInheritor(iteratedValueType, JavaList.javaFqn)) {
                 // Find the `in` keyword to use as location
                 val inKeyword = (node.sourcePsi as? KtForExpression)?.inKeyword
                 val location = if (inKeyword == null) {
@@ -87,7 +76,7 @@ class ListIteratorDetector : Detector(), SourceCodeScanner {
 
             // We are calling a method on a `List` type
             if (receiverType != null &&
-                InheritanceUtil.isInheritor(node.receiverType, JavaListFqn)
+                InheritanceUtil.isInheritor(node.receiverType, JavaList.javaFqn)
             ) {
                 when (val method = node.resolveToUElement()?.sourcePsi) {
                     // Parsing a class file
@@ -103,27 +92,10 @@ class ListIteratorDetector : Detector(), SourceCodeScanner {
         }
 
         private fun ClsMethodImpl.checkForIterableReceiver(node: UCallExpression) {
-            val classKotlinMetadataAnnotation = containingClass?.annotations?.find {
-                it.hasQualifiedName(KotlinMetadataFqn)
-            } ?: return
-
-            val metadata = KotlinClassMetadata.read(classKotlinMetadataAnnotation.toHeader())
-                ?: return
-
-            // Since we are visiting a function, the null branches shouldn't be called
-            val kmPackage: KmDeclarationContainer = when (metadata) {
-                is KotlinClassMetadata.Class -> metadata.toKmClass()
-                is KotlinClassMetadata.FileFacade -> metadata.toKmPackage()
-                is KotlinClassMetadata.SyntheticClass -> null
-                is KotlinClassMetadata.MultiFileClassFacade -> null
-                is KotlinClassMetadata.MultiFileClassPart -> metadata.toKmPackage()
-                is KotlinClassMetadata.Unknown -> null
-            }!!
-
-            val kmFunction = kmPackage.findKmFunctionForPsiMethod(this)
+            val kmFunction = this.toKmFunction()
 
             kmFunction?.let {
-                if (it.hasIterableReceiver) {
+                if (it.receiverParameterType?.classifier == KotlinIterableClassifier) {
                     context.report(
                         ISSUE,
                         node,
@@ -138,7 +110,7 @@ class ListIteratorDetector : Detector(), SourceCodeScanner {
             val receiver = receiverTypeReference
             // If there is no receiver, or the receiver isn't an Iterable, ignore
             if ((receiver.toUElement() as? UTypeReferenceExpression)
-                ?.getQualifiedName() != JavaIterableFQN
+                ?.getQualifiedName() != JavaIterable.javaFqn
             ) return
 
             context.report(
@@ -169,73 +141,12 @@ class ListIteratorDetector : Detector(), SourceCodeScanner {
     }
 }
 
-/**
- * Returns a [KotlinClassHeader] by parsing the attributes of this @kotlin.Metadata annotation.
- *
- * See: https://github.com/udalov/kotlinx-metadata-examples/blob/master/src/main/java
- * /examples/FindKotlinGeneratedMethods.java
- */
-private fun PsiAnnotation.toHeader(): KotlinClassHeader {
-    val attributes = attributes.associate { it.attributeName to it.attributeValue }
-
-    fun JvmAnnotationAttributeValue.parseString(): String =
-        (this as JvmAnnotationConstantValue).constantValue as String
-
-    fun JvmAnnotationAttributeValue.parseInt(): Int =
-        (this as JvmAnnotationConstantValue).constantValue as Int
-
-    fun JvmAnnotationAttributeValue.parseStringArray(): Array<String> =
-        (this as JvmAnnotationArrayValue).values.map {
-            it.parseString()
-        }.toTypedArray()
-
-    fun JvmAnnotationAttributeValue.parseIntArray(): IntArray =
-        (this as JvmAnnotationArrayValue).values.map {
-            it.parseInt()
-        }.toTypedArray().toIntArray()
-
-    val kind = attributes["k"]?.parseInt()
-    val metadataVersion = attributes["mv"]?.parseIntArray()
-    val bytecodeVersion = attributes["bv"]?.parseIntArray()
-    val data1 = attributes["d1"]?.parseStringArray()
-    val data2 = attributes["d2"]?.parseStringArray()
-    val extraString = attributes["xs"]?.parseString()
-    val packageName = attributes["pn"]?.parseString()
-    val extraInt = attributes["xi"]?.parseInt()
-
-    return KotlinClassHeader(
-        kind,
-        metadataVersion,
-        bytecodeVersion,
-        data1,
-        data2,
-        extraString,
-        packageName,
-        extraInt
-    )
-}
-
-/**
- * @return the corresponding [KmFunction] in [this] for the given [method], matching by name and
- * signature.
- */
-private fun KmDeclarationContainer.findKmFunctionForPsiMethod(method: PsiMethod): KmFunction? {
-    val expectedName = method.name
-    val expectedSignature = ClassUtil.getAsmMethodSignature(method)
-
-    return functions.find {
-        it.name == expectedName && it.signature?.desc == expectedSignature
-    }
-}
-
-/**
- * @return true if this function is an extension function on Iterable
- */
-private val KmFunction.hasIterableReceiver: Boolean
-    get() = receiverParameterType?.classifier == IterableClassifier
-
-private const val KotlinMetadataFqn = "kotlin.Metadata"
 // Kotlin collections on JVM are just the underlying Java collections
-private const val JavaListFqn = "java.util.List"
-private const val JavaIterableFQN = "java.lang.Iterable"
-private val IterableClassifier = KmClassifier.Class("kotlin/collections/Iterable")
+private val JavaLangPackageName = Package("java.lang")
+private val JavaUtilPackageName = Package("java.util")
+private val JavaList = Name(JavaUtilPackageName, "List")
+private val JavaIterable = Name(JavaLangPackageName, "Iterable")
+
+private val KotlinCollectionsPackageName = Package("kotlin.collections")
+private val KotlinIterable = Name(KotlinCollectionsPackageName, "Iterable")
+private val KotlinIterableClassifier = KmClassifier.Class(KotlinIterable.kmClassName)

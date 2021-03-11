@@ -18,6 +18,7 @@
 
 package androidx.compose.runtime.lint
 
+import androidx.compose.lint.Stubs
 import com.android.tools.lint.checks.infrastructure.LintDetectorTest
 import com.android.tools.lint.detector.api.Detector
 import com.android.tools.lint.detector.api.Issue
@@ -39,6 +40,22 @@ class ComposableCoroutineCreationDetectorTest : LintDetectorTest() {
 
     override fun getIssues(): MutableList<Issue> =
         mutableListOf(ComposableCoroutineCreationDetector.CoroutineCreationDuringComposition)
+
+    private val coroutineBuildersStub: TestFile = kotlin(
+        """
+        package kotlinx.coroutines
+
+        object CoroutineScope
+
+        fun CoroutineScope.async(
+            block: suspend CoroutineScope.() -> Unit
+        ) {}
+
+        fun CoroutineScope.launch(
+            block: suspend CoroutineScope.() -> Unit
+        ) {}
+    """
+    )
 
     @Test
     fun errors() {
@@ -94,7 +111,7 @@ class ComposableCoroutineCreationDetectorTest : LintDetectorTest() {
                 }
             """
             ),
-            composableStub,
+            kotlin(Stubs.Composable),
             coroutineBuildersStub
         )
             .run()
@@ -215,7 +232,7 @@ src/androidx/compose/runtime/foo/test.kt:46: Error: Calls to launch should happe
                 }
             """
             ),
-            composableStub,
+            kotlin(Stubs.Composable),
             coroutineBuildersStub
         )
             .run()
@@ -319,7 +336,7 @@ src/androidx/compose/runtime/foo/test.kt:59: Error: Calls to launch should happe
                 }
             """
             ),
-            composableStub,
+            kotlin(Stubs.Composable),
             coroutineBuildersStub
         )
             .run()

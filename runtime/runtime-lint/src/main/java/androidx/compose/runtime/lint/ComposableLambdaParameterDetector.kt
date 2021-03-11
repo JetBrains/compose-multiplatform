@@ -18,6 +18,8 @@
 
 package androidx.compose.runtime.lint
 
+import androidx.compose.lint.isComposable
+import androidx.compose.lint.returnsUnit
 import com.android.tools.lint.client.api.UElementHandler
 import com.android.tools.lint.detector.api.Category
 import com.android.tools.lint.detector.api.Detector
@@ -28,15 +30,12 @@ import com.android.tools.lint.detector.api.LintFix
 import com.android.tools.lint.detector.api.Scope
 import com.android.tools.lint.detector.api.Severity
 import com.android.tools.lint.detector.api.SourceCodeScanner
-import com.intellij.psi.PsiType
 import org.jetbrains.kotlin.psi.KtFunctionType
 import org.jetbrains.kotlin.psi.KtNullableType
 import org.jetbrains.kotlin.psi.KtParameter
-import org.jetbrains.uast.UAnnotation
 import org.jetbrains.uast.UElement
 import org.jetbrains.uast.UMethod
 import org.jetbrains.uast.UParameter
-import org.jetbrains.uast.toUElement
 import java.util.EnumSet
 
 /**
@@ -56,7 +55,7 @@ class ComposableLambdaParameterDetector : Detector(), SourceCodeScanner {
             if (!node.isComposable) return
 
             // Ignore non-unit composable functions
-            if (node.returnType != PsiType.VOID) return
+            if (!node.returnsUnit) return
 
             /**
              * Small class to hold information from lambda properties needed for lint checks.
@@ -72,22 +71,15 @@ class ComposableLambdaParameterDetector : Detector(), SourceCodeScanner {
                 // an extension function - just ignore it.
                 val ktParameter = parameter.sourcePsi as? KtParameter ?: return@mapNotNull null
 
-                val typeReference = ktParameter.typeReference!!
+                val isComposable = parameter.isComposable
 
-                // Currently type annotations don't appear on the psiType in the version of
-                // UAST / PSI we are using, so we have to look through the type reference.
-                // Should be fixed when Lint upgrades the version to 1.4.30+.
-                val hasComposableAnnotationOnType = typeReference.annotationEntries.any {
-                    (it.toUElement() as UAnnotation).qualifiedName == ComposableFqn
-                }
-
-                val functionType = when (val typeElement = typeReference.typeElement) {
-                    is KtFunctionType -> typeElement
-                    is KtNullableType -> typeElement.innerType as? KtFunctionType
+                val functionType = when (val type = ktParameter.typeReference!!.typeElement) {
+                    is KtFunctionType -> type
+                    is KtNullableType -> type.innerType as? KtFunctionType
                     else -> null
                 }
 
-                if (functionType != null && hasComposableAnnotationOnType) {
+                if (functionType != null && isComposable) {
                     ComposableLambdaParameterInfo(parameter, functionType)
                 } else {
                     null

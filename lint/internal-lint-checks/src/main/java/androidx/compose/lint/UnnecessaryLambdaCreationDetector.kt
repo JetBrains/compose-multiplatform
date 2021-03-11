@@ -27,20 +27,14 @@ import com.android.tools.lint.detector.api.JavaContext
 import com.android.tools.lint.detector.api.Scope
 import com.android.tools.lint.detector.api.Severity
 import com.android.tools.lint.detector.api.SourceCodeScanner
+import com.android.tools.lint.detector.api.UastLintUtils.Companion.tryResolveUDeclaration
 import com.intellij.psi.impl.source.PsiClassReferenceType
-import org.jetbrains.kotlin.psi.KtCallExpression
-import org.jetbrains.kotlin.psi.KtCallableDeclaration
-import org.jetbrains.kotlin.psi.KtTypeReference
-import org.jetbrains.kotlin.psi.psiUtil.referenceExpression
-import org.jetbrains.uast.UAnnotation
 import org.jetbrains.uast.ULambdaExpression
-import org.jetbrains.uast.UMethod
+import org.jetbrains.uast.UVariable
 import org.jetbrains.uast.kotlin.KotlinUBlockExpression
 import org.jetbrains.uast.kotlin.KotlinUFunctionCallExpression
 import org.jetbrains.uast.kotlin.KotlinUImplicitReturnExpression
-import org.jetbrains.uast.resolveToUElement
 import org.jetbrains.uast.toUElement
-import org.jetbrains.uast.tryResolve
 
 /**
  * Lint [Detector] to ensure that we are not creating extra lambdas just to emit already captured
@@ -129,57 +123,18 @@ class UnnecessaryLambdaCreationDetector : Detector(), SourceCodeScanner {
             // shouldn't matter that much in practice.
             if (functionType.reference.canonicalText.contains(NonExistentClass)) return
 
-            // Component nodes are classes that are invoked as if they are a function call, but
-            // they aren't actually a function call and so they cannot be inlined. Unfortunately
-            // since this is done in a compiler plugin, when running lint we don't have a way to
-            // understand this better, so we just check to see if the name looks like it is a node.
-            if (parentExpression.isLayoutNodeInvocation) return
-
-            // Find the index of the corresponding parameter in the source declaration, that
-            // matches this lambda expression's invocation
-            val parameterIndex = parentExpression.valueArguments.indexOf(node)
-
-            // Parent expression source declaration
-            val parentDeclaration = parentExpression.resolveToUElement() as? UMethod ?: return
-
-            val expectedComposable = when (val source = parentDeclaration.sourcePsi) {
-                // The source is in Kotlin source, so check the parameter for @Composable
-                is KtCallableDeclaration -> {
-                    // Currently type annotations don't appear on the psiType in the version of
-                    // UAST / PSI we are using, so we have to look through the type reference.
-                    // Should be fixed when Lint upgrades the version to 1.4.30+.
-                    val typeReference = source.valueParameters[parameterIndex]!!
-                        .typeReference as KtTypeReference
-                    typeReference.annotationEntries.any {
-                        (it.toUElement() as UAnnotation).qualifiedName == ComposableFqn
-                    }
-                }
-                // If we cannot resolve the parent expression as a KtCallableDeclaration, then
-                // the source is Java source, or in a class file. We ignore Java source, and
-                // currently there is no way to see the @Composable annotation in the class file
-                // (https://youtrack.jetbrains.com/issue/KT-45307). Instead we can look for the
-                // presence of a `Composer` parameter, as this is added by the Compose compiler
-                // to every Composable function / lambda.
-                else -> {
-                    parentDeclaration.uastParameters[parameterIndex].type.canonicalText
-                        .contains(ComposerFqn)
-                }
-            }
+            val expectedComposable = node.isComposable
 
             // Hack to get the psi of the lambda declaration / source. The !!s here probably
             // aren't safe, but nothing fails with them currently - so it could be a useful
             // indicator if something breaks in the future to let us know to update this lint check.
-            val resolvedLambda = expression.sourcePsi.calleeExpression!!.toUElement()!!.tryResolve()
-                .toUElement()!!.sourcePsi!!
+            val resolvedLambdaSource = expression.sourcePsi.calleeExpression!!.toUElement()!!
+                .tryResolveUDeclaration()!!.sourcePsi!!.toUElement()
 
-            // Unfortunately as Composability isn't carried through UAST, and there are many types
-            // of declarations (types such as foo: @Composable () -> Unit, properties such as val
-            // foo = @Composable {}) the best way to cover this is just check if we contain this
-            // annotation in text. Definitely not ideal, but it should cover most cases so it is
-            // the simplest way for now. Note in particular this will return true for (rare) cases
-            // like (@Composable () -> Unit) -> Unit, so this might need to be updated in the
-            // future if this becomes a common problem.
-            val isComposable = resolvedLambda.text.contains("@Composable")
+            val isComposable = when (resolvedLambdaSource) {
+                is UVariable -> resolvedLambdaSource.isComposable
+                else -> throw IllegalStateException(resolvedLambdaSource.toString())
+            }
 
             if (isComposable != expectedComposable) return
 
@@ -193,10 +148,6 @@ class UnnecessaryLambdaCreationDetector : Detector(), SourceCodeScanner {
     }
 
     companion object {
-        private val KotlinUFunctionCallExpression.isLayoutNodeInvocation
-            get() = (sourcePsi as? KtCallExpression)?.referenceExpression()?.text
-                ?.endsWith("Node") == true
-
         private const val NonExistentClass = "error.NonExistentClass"
 
         private const val explanation =
@@ -217,6 +168,3 @@ class UnnecessaryLambdaCreationDetector : Detector(), SourceCodeScanner {
         )
     }
 }
-
-private const val ComposableFqn = "androidx.compose.runtime.Composable"
-private const val ComposerFqn = "androidx.compose.runtime.Composer"
