@@ -30,6 +30,16 @@ import androidx.compose.ui.text.style.ResolvedTextDirection
 import kotlin.math.max
 import kotlin.math.min
 
+internal class TextPreparedSelectionState {
+    // it's set at the start of vertical navigation and used as the preferred value to set a new
+    // cursor position.
+    var cachedX: Float? = null
+
+    fun resetCachedX() {
+        cachedX = null
+    }
+}
+
 /**
  * This utility class implements many selection-related operations on text (including basic
  * cursor movements and deletions) and combines them, taking into account how the text was
@@ -47,25 +57,29 @@ internal abstract class BaseTextPreparedSelection<T : BaseTextPreparedSelection<
     val originalText: AnnotatedString,
     val originalSelection: TextRange,
     val layoutResult: TextLayoutResult?,
-    val offsetMapping: OffsetMapping
+    val offsetMapping: OffsetMapping,
+    val state: TextPreparedSelectionState
 ) {
     var selection = originalSelection
 
     var annotatedString = originalText
-    protected val text
+    internal val text
         get() = annotatedString.text
 
     @Suppress("UNCHECKED_CAST")
-    inline fun <U> U.apply(block: U.() -> Unit): T {
+    protected inline fun <U> U.apply(resetCachedX: Boolean = true, block: U.() -> Unit): T {
+        if (resetCachedX) {
+            state.resetCachedX()
+        }
         block()
         return this as T
     }
 
-    fun setCursor(offset: Int) = apply {
+    protected fun setCursor(offset: Int) {
         setSelection(offset, offset)
     }
 
-    fun setSelection(start: Int, end: Int) = apply {
+    protected fun setSelection(start: Int, end: Int) {
         selection = TextRange(start, end)
     }
 
@@ -175,11 +189,11 @@ internal abstract class BaseTextPreparedSelection<T : BaseTextPreparedSelection<
         setCursor(getParagraphEnd())
     }
 
-    fun moveCursorUpByLine() = apply {
+    fun moveCursorUpByLine() = apply(false) {
         layoutResult?.jumpByLinesOffset(-1)?.let { setCursor(it) }
     }
 
-    fun moveCursorDownByLine() = apply {
+    fun moveCursorDownByLine() = apply(false) {
         layoutResult?.jumpByLinesOffset(1)?.let { setCursor(it) }
     }
 
@@ -208,11 +222,16 @@ internal abstract class BaseTextPreparedSelection<T : BaseTextPreparedSelection<
     }
 
     // it selects a text from the original selection start to a current selection end
-    fun selectMovement() = apply {
+    fun selectMovement() = apply(false) {
         selection = TextRange(originalSelection.start, selection.end)
     }
 
-    // delete currently selected text and update [selection] and [annotatedString]
+    /**
+     * delete currently selected text and update [selection] and [annotatedString]
+     *
+     * it supposed to be the last operation, it doesn't relayout text by itself, so any
+     * subsequent calls could give wrong results
+     */
     fun deleteSelected() = apply {
         val maxChars = text.length
         val beforeSelection =
@@ -273,22 +292,26 @@ internal abstract class BaseTextPreparedSelection<T : BaseTextPreparedSelection<
     private fun TextLayoutResult.jumpByLinesOffset(linesAmount: Int): Int {
         val currentOffset = transformedEndOffset()
 
-        val newLine = getLineForOffset(currentOffset) + linesAmount
+        if (state.cachedX == null) {
+            state.cachedX = getCursorRect(currentOffset).left
+        }
+
+        val targetLine = getLineForOffset(currentOffset) + linesAmount
         when {
-            newLine < 0 -> {
+            targetLine < 0 -> {
                 return 0
             }
-            newLine >= lineCount -> {
+            targetLine >= lineCount -> {
                 return text.length
             }
         }
 
-        val y = getLineBottom(newLine) - 1
-        val x = getCursorRect(currentOffset).left.also {
-            if ((isLtr() && it >= getLineRight(newLine)) ||
-                (!isLtr() && it <= getLineLeft(newLine))
+        val y = getLineBottom(targetLine) - 1
+        val x = state.cachedX!!.also {
+            if ((isLtr() && it >= getLineRight(targetLine)) ||
+                (!isLtr() && it <= getLineLeft(targetLine))
             ) {
-                return getLineEnd(newLine, true)
+                return getLineEnd(targetLine, true)
             }
         }
 
@@ -300,19 +323,19 @@ internal abstract class BaseTextPreparedSelection<T : BaseTextPreparedSelection<
     }
 
     private fun transformedEndOffset(): Int {
-        return offsetMapping.originalToTransformed(originalSelection.end)
+        return offsetMapping.originalToTransformed(selection.end)
     }
 
     private fun transformedMinOffset(): Int {
-        return offsetMapping.originalToTransformed(originalSelection.min)
+        return offsetMapping.originalToTransformed(selection.min)
     }
 
     private fun transformedMaxOffset(): Int {
-        return offsetMapping.originalToTransformed(originalSelection.max)
+        return offsetMapping.originalToTransformed(selection.max)
     }
 
     private fun charOffset(offset: Int) =
-        offset.coerceAtMost(originalText.length - 1)
+        offset.coerceAtMost(text.length - 1)
 
     private fun getParagraphStart(): Int {
         var index = selection.min
@@ -343,15 +366,31 @@ internal abstract class BaseTextPreparedSelection<T : BaseTextPreparedSelection<
     }
 }
 
+internal class TextPreparedSelection(
+    originalText: AnnotatedString,
+    originalSelection: TextRange,
+    layoutResult: TextLayoutResult? = null,
+    offsetMapping: OffsetMapping = OffsetMapping.Identity,
+    state: TextPreparedSelectionState = TextPreparedSelectionState()
+) : BaseTextPreparedSelection<TextPreparedSelection>(
+    originalText = originalText,
+    originalSelection = originalSelection,
+    layoutResult = layoutResult,
+    offsetMapping = offsetMapping,
+    state = state
+)
+
 internal class TextFieldPreparedSelection(
     val currentValue: TextFieldValue,
     offsetMapping: OffsetMapping = OffsetMapping.Identity,
-    val layoutResultProxy: TextLayoutResultProxy?
+    val layoutResultProxy: TextLayoutResultProxy?,
+    state: TextPreparedSelectionState = TextPreparedSelectionState()
 ) : BaseTextPreparedSelection<TextFieldPreparedSelection>(
     originalText = currentValue.annotatedString,
     originalSelection = currentValue.selection,
     offsetMapping = offsetMapping,
-    layoutResult = layoutResultProxy?.value
+    layoutResult = layoutResultProxy?.value,
+    state = state
 ) {
     val value
         get() = currentValue.copy(
@@ -367,11 +406,11 @@ internal class TextFieldPreparedSelection(
         }
     }
 
-    fun moveCursorUpByPage() = apply {
+    fun moveCursorUpByPage() = apply(false) {
         layoutResultProxy?.jumpByPagesOffset(-1)?.let { setCursor(it) }
     }
 
-    fun moveCursorDownByPage() = apply {
+    fun moveCursorDownByPage() = apply(false) {
         layoutResultProxy?.jumpByPagesOffset(1)?.let { setCursor(it) }
     }
 
