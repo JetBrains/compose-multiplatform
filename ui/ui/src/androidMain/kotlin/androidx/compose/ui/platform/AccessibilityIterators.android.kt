@@ -23,6 +23,7 @@ import androidx.compose.ui.text.TextLayoutResult
 import androidx.compose.ui.text.style.ResolvedTextDirection
 import java.text.BreakIterator
 import java.util.Locale
+import kotlin.math.roundToInt
 
 /**
  * This class contains the implementation of text segment iterators
@@ -454,13 +455,9 @@ internal class AccessibilityIterators {
             if (current >= text.length) {
                 return null
             }
+            val pageHeight: Int
             try {
-                tempRect = Rect(
-                    node.boundsInWindow.left.toInt(),
-                    node.boundsInWindow.top.toInt(),
-                    node.boundsInWindow.right.toInt(),
-                    node.boundsInWindow.bottom.toInt()
-                )
+                pageHeight = node.boundsInRoot.height.roundToInt()
                 // TODO(b/153198816): check whether we still get this exception when R is in.
             } catch (e: IllegalStateException) {
                 return null
@@ -473,7 +470,6 @@ internal class AccessibilityIterators {
             // TODO: Please help me translate the below where mView is the TextView
             //  final int pageHeight = mTempRect.height() - mView.getTotalPaddingTop()
             //                    - mView.getTotalPaddingBottom();
-            val pageHeight = tempRect.height()
             val nextPageStartY = currentLineTop + pageHeight
             val lastLineTop = layoutResult.getLineTop(layoutResult.lineCount - 1)
             val currentPageEndLine = if (nextPageStartY < lastLineTop)
@@ -493,13 +489,9 @@ internal class AccessibilityIterators {
             if (current <= 0) {
                 return null
             }
+            val pageHeight: Int
             try {
-                tempRect = Rect(
-                    node.boundsInWindow.left.toInt(),
-                    node.boundsInWindow.top.toInt(),
-                    node.boundsInWindow.right.toInt(),
-                    node.boundsInWindow.bottom.toInt()
-                )
+                pageHeight = node.boundsInRoot.height.roundToInt()
                 // TODO(b/153198816): check whether we still get this exception when R is in.
             } catch (e: IllegalStateException) {
                 return null
@@ -513,7 +505,6 @@ internal class AccessibilityIterators {
             //  Please help me translate the below where mView is the TextView
             //  final int pageHeight = mTempRect.height() - mView.getTotalPaddingTop()
             //                    - mView.getTotalPaddingBottom();
-            val pageHeight = tempRect.height()
             val previousPageEndY = currentLineTop - pageHeight
             var currentPageStartLine = if (previousPageEndY > 0)
                 layoutResult.getLineForVerticalPosition(previousPageEndY) else 0

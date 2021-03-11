@@ -58,7 +58,7 @@ fun BottomNavigationDemo() {
         ) {
             RadioButton(
                 selected = !alwaysShowLabels,
-                onClick = { alwaysShowLabels = false }
+                onClick = null
             )
             Spacer(Modifier.requiredWidth(16.dp))
             Text("Only show labels when selected")
@@ -75,7 +75,7 @@ fun BottomNavigationDemo() {
         ) {
             RadioButton(
                 selected = alwaysShowLabels,
-                onClick = { alwaysShowLabels = true }
+                onClick = null
             )
             Spacer(Modifier.requiredWidth(16.dp))
             Text("Always show labels")
