@@ -110,9 +110,22 @@ class LayoutInspectorTree {
     /**
      * Converts the [RawParameter]s of the [node] into displayable parameters.
      */
-    fun convertParameters(rootId: Long, node: InspectorNode): List<NodeParameter> {
+    fun convertParameters(
+        rootId: Long,
+        node: InspectorNode,
+        maxRecursions: Int,
+        maxInitialIterableSize: Int
+    ): List<NodeParameter> {
         return node.parameters.mapIndexed { index, parameter ->
-            parameterFactory.create(rootId, node, parameter.name, parameter.value, index)
+            parameterFactory.create(
+                rootId,
+                node,
+                parameter.name,
+                parameter.value,
+                index,
+                maxRecursions,
+                maxInitialIterableSize
+            )
         }
     }
 
@@ -126,7 +139,9 @@ class LayoutInspectorTree {
         node: InspectorNode,
         reference: NodeParameterReference,
         startIndex: Int,
-        maxElements: Int
+        maxElements: Int,
+        maxRecursions: Int,
+        maxInitialIterableSize: Int
     ): NodeParameter? {
         if (reference.parameterIndex !in node.parameters.indices) {
             return null
@@ -139,7 +154,9 @@ class LayoutInspectorTree {
             parameter.value,
             reference,
             startIndex,
-            maxElements
+            maxElements,
+            maxRecursions,
+            maxInitialIterableSize
         )
     }
 

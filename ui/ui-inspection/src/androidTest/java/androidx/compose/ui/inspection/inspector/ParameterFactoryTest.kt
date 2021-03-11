@@ -83,6 +83,8 @@ import org.junit.runner.RunWith
 private const val ROOT_ID = 3L
 private const val NODE_ID = -7L
 private const val PARAM_INDEX = 4
+private const val MAX_RECURSIONS = 2
+private const val MAX_ITERABLE_SIZE = 5
 
 @Suppress("unused")
 private fun topLevelFunction() {
@@ -92,8 +94,6 @@ private fun topLevelFunction() {
 @RunWith(AndroidJUnit4::class)
 class ParameterFactoryTest {
     private val factory = ParameterFactory(InlineClassConverter())
-    private val originalMaxRecursions = factory.maxRecursions
-    private val originalMaxIterable = factory.maxIterable
     private val node = MutableInspectorNode().apply {
         width = 1000
         height = 500
@@ -108,8 +108,6 @@ class ParameterFactoryTest {
 
     @After
     fun after() {
-        factory.maxRecursions = originalMaxRecursions
-        factory.maxIterable = originalMaxIterable
         isDebugInspectorInfoEnabled = false
     }
 
@@ -437,7 +435,6 @@ class ParameterFactoryTest {
 
     @Test
     fun testShortIntArray() {
-        factory.maxIterable = 10
         val value = intArrayOf(10, 11, 12)
         val parameter = create("array", value)
         validate(parameter) {
@@ -451,7 +448,6 @@ class ParameterFactoryTest {
 
     @Test
     fun testLongIntArray() {
-        factory.maxIterable = 5
         val value = intArrayOf(10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23)
         val refToSelf = ref()
         val parameter = create("array", value)
@@ -465,8 +461,8 @@ class ParameterFactoryTest {
             }
         }
 
-        // If we need to retrieve more array elements we call "factory.expand" with the reference:
-        validate(factory.expand(ROOT_ID, node, "array", value, refToSelf, 5, 5)!!) {
+        // If we need to retrieve more array elements we call "expand" with the reference:
+        validate(expand("array", value, refToSelf, 5, 5)!!) {
             parameter("array", ParameterType.Iterable, "", refToSelf) {
                 parameter("[5]", ParameterType.Int32, 15)
                 parameter("[6]", ParameterType.Int32, 16)
@@ -476,8 +472,8 @@ class ParameterFactoryTest {
             }
         }
 
-        // Call "factory.expand" again to retrieve more:
-        validate(factory.expand(ROOT_ID, node, "array", value, refToSelf, 10, 5)!!) {
+        // Call "expand" again to retrieve more:
+        validate(expand("array", value, refToSelf, 10, 5)!!) {
             // This time we reached the end of the array, and we do not get a reference to get more
             parameter("array", ParameterType.Iterable, "") {
                 parameter("[10]", ParameterType.Int32, 20)
@@ -490,9 +486,8 @@ class ParameterFactoryTest {
 
     @Test
     fun testListWithNullElement() {
-        factory.maxIterable = 3
         val value = listOf("Hello", null, "World")
-        val parameter = create("array", value)
+        val parameter = create("array", value, maxInitialIterableSize = 3)
         validate(parameter) {
             // Here we get all the available elements from the list.
             // There is no need to go back for more data, and the iterable does not have a
@@ -506,7 +501,6 @@ class ParameterFactoryTest {
 
     @Test
     fun testModifier() {
-        factory.maxRecursions = 4
         validate(
             create(
                 "modifier",
@@ -517,7 +511,8 @@ class ParameterFactoryTest {
                     .fillMaxWidth()
                     .wrapContentHeight(Alignment.Bottom)
                     .width(30.0.dp)
-                    .paint(TestPainter(10f, 20f))
+                    .paint(TestPainter(10f, 20f)),
+                maxRecursions = 4
             )
         ) {
             parameter("modifier", ParameterType.String, "") {
@@ -643,9 +638,7 @@ class ParameterFactoryTest {
         val name = MyClass::class.java.simpleName
 
         // Limit the recursions for this test to validate parameter nodes with missing children.
-        factory.maxRecursions = 2
-
-        val parameter = create("v1", v1)
+        val parameter = create("v1", v1, maxRecursions = 2)
         val v2ref = ref(3, 1)
         validate(parameter) {
             parameter("v1", ParameterType.String, name) {
@@ -663,9 +656,9 @@ class ParameterFactoryTest {
         }
 
         // If we need to retrieve the missing child nodes for v2 from above, we must
-        // call "factory.expand" with the reference:
+        // call "expand" with the reference:
         val v4ref = ref(3, 1, 1, 1)
-        validate(factory.expand(ROOT_ID, node, "v1", v1, v2ref)!!) {
+        validate(expand("v1", v1, v2ref)!!) {
             parameter("other", ParameterType.String, name) {
                 parameter("name", ParameterType.String, "v3")
                 parameter("other", ParameterType.String, name) {
@@ -679,8 +672,8 @@ class ParameterFactoryTest {
         }
 
         // If we need to retrieve the missing child nodes for v4 from above, we must
-        // call "factory.expand" with the reference:
-        validate(factory.expand(ROOT_ID, node, "v1", v1, v4ref)!!) {
+        // call "expand" with the reference:
+        validate(expand("v1", v1, v4ref)!!) {
             parameter("other", ParameterType.String, name) {
                 parameter("name", ParameterType.String, "v5")
             }
@@ -802,15 +795,56 @@ class ParameterFactoryTest {
         assertThat(lookup(Icons.Rounded.Add)).isEqualTo(ParameterType.String to "Rounded.Add")
     }
 
-    private fun create(name: String, value: Any): NodeParameter {
-        val parameter = factory.create(ROOT_ID, node, name, value, PARAM_INDEX)
+    private fun create(
+        name: String,
+        value: Any,
+        maxRecursions: Int = MAX_RECURSIONS,
+        maxInitialIterableSize: Int = MAX_ITERABLE_SIZE
+    ): NodeParameter {
+        val parameter = factory.create(
+            ROOT_ID,
+            node,
+            name,
+            value,
+            PARAM_INDEX,
+            maxRecursions,
+            maxInitialIterableSize
+        )
 
         // Check that factory.expand will return the exact same information as factory.create
         // for each parameter and parameter child. Punt if there are references.
-        checkExpand(parameter, parameter.name, value, mutableListOf())
+        checkExpand(
+            parameter,
+            parameter.name,
+            value,
+            mutableListOf(),
+            maxRecursions,
+            maxInitialIterableSize
+        )
 
         return parameter
     }
+
+    private fun expand(
+        name: String,
+        value: Any?,
+        reference: NodeParameterReference,
+        startIndex: Int = 0,
+        maxElements: Int = MAX_ITERABLE_SIZE,
+        maxRecursions: Int = MAX_RECURSIONS,
+        maxInitialIterableSize: Int = MAX_ITERABLE_SIZE
+    ): NodeParameter? =
+        factory.expand(
+            ROOT_ID,
+            node,
+            name,
+            value,
+            reference,
+            startIndex,
+            maxElements,
+            maxRecursions,
+            maxInitialIterableSize
+        )
 
     private fun lookup(value: Any): Pair<ParameterType, Any?> {
         val parameter = create("parameter", value)
@@ -834,11 +868,19 @@ class ParameterFactoryTest {
         parameter: NodeParameter,
         name: String,
         value: Any,
-        indices: MutableList<Int>
+        indices: MutableList<Int>,
+        maxRecursions: Int,
+        maxInitialIterableSize: Int
     ) {
         factory.clearCacheFor(ROOT_ID)
         val reference = NodeParameterReference(NODE_ID, PARAM_INDEX, indices)
-        val expanded = factory.expand(ROOT_ID, node, name, value, reference)
+        val expanded = expand(
+            name,
+            value,
+            reference,
+            maxRecursions = maxRecursions,
+            maxInitialIterableSize = maxInitialIterableSize
+        )
         if (parameter.value == null && indices.isNotEmpty()) {
             assertThat(expanded).isNull()
         } else {
@@ -847,7 +889,14 @@ class ParameterFactoryTest {
                 parameter.elements.forEach { element ->
                     if (element.index >= 0) {
                         indices.add(element.index)
-                        checkExpand(element, name, value, indices)
+                        checkExpand(
+                            element,
+                            name,
+                            value,
+                            indices,
+                            maxRecursions,
+                            maxInitialIterableSize
+                        )
                         indices.removeLast()
                     }
                 }

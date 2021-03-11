@@ -72,6 +72,8 @@ import kotlin.math.roundToInt
 
 private const val DEBUG = false
 private const val ROOT_ID = 3L
+private const val MAX_RECURSIONS = 2
+private const val MAX_ITERABLE_SIZE = 5
 
 @LargeTest
 @RunWith(AndroidJUnit4::class)
@@ -457,7 +459,8 @@ class LayoutInspectorTreeTest {
             }
 
             if (checkParameters) {
-                val params = builder.convertParameters(ROOT_ID, node)
+                val params =
+                    builder.convertParameters(ROOT_ID, node, MAX_RECURSIONS, MAX_ITERABLE_SIZE)
                 val receiver = ParameterValidationReceiver(params.listIterator())
                 receiver.block()
                 receiver.checkFinished(name)
@@ -523,7 +526,10 @@ class LayoutInspectorTreeTest {
         println()
         print(")")
         if (generateParameters && node.parameters.isNotEmpty()) {
-            generateParameters(builder.convertParameters(ROOT_ID, node), 0)
+            generateParameters(
+                builder.convertParameters(ROOT_ID, node, MAX_RECURSIONS, MAX_ITERABLE_SIZE),
+                0
+            )
         }
         println()
         node.children.forEach { generateValidate(it, builder) }

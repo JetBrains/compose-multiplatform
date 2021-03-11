@@ -43,7 +43,6 @@ import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.TextUnitType
-import org.jetbrains.annotations.TestOnly
 import java.lang.reflect.Field
 import java.util.IdentityHashMap
 import kotlin.jvm.internal.FunctionReference
@@ -58,9 +57,6 @@ import kotlin.reflect.jvm.isAccessible
 import kotlin.reflect.jvm.javaField
 import kotlin.reflect.jvm.javaGetter
 import java.lang.reflect.Modifier as JavaModifier
-
-private const val MAX_RECURSIONS = 2
-private const val MAX_ITERABLE_SIZE = 5
 
 private val reflectionScope: ReflectionScope = ReflectionScope()
 
@@ -100,12 +96,6 @@ internal class ParameterFactory(private val inlineClassConverter: InlineClassCon
 
     var density = Density(1.0f)
 
-    @set:TestOnly
-    var maxRecursions = MAX_RECURSIONS
-
-    @set:TestOnly
-    var maxIterable = MAX_ITERABLE_SIZE
-
     init {
         val textDecorationCombination = TextDecoration.combine(
             listOf(TextDecoration.LineThrough, TextDecoration.Underline)
@@ -134,12 +124,22 @@ internal class ParameterFactory(private val inlineClassConverter: InlineClassCon
         node: InspectorNode,
         name: String,
         value: Any?,
-        parameterIndex: Int
+        parameterIndex: Int,
+        maxRecursions: Int,
+        maxInitialIterableSize: Int
     ): NodeParameter {
         val creator = creatorCache ?: ParameterCreator()
         try {
             return reflectionScope.withReflectiveAccess {
-                creator.create(rootId, node, name, value, parameterIndex)
+                creator.create(
+                    rootId,
+                    node,
+                    name,
+                    value,
+                    parameterIndex,
+                    maxRecursions,
+                    maxInitialIterableSize
+                )
             }
         } finally {
             creatorCache = creator
@@ -154,6 +154,8 @@ internal class ParameterFactory(private val inlineClassConverter: InlineClassCon
      * @param value is the value of the [reference].parameterIndex'th parameter of [node].
      * @param startIndex is the index of the 1st wanted element of a List/Array.
      * @param maxElements is the max number of elements wanted from a List/Array.
+     * @param maxRecursions is the max recursion into composite types starting from reference.
+     * @param maxInitialIterableSize is the max number of elements wanted in new List/Array values.
      */
     fun expand(
         rootId: Long,
@@ -161,13 +163,25 @@ internal class ParameterFactory(private val inlineClassConverter: InlineClassCon
         name: String,
         value: Any?,
         reference: NodeParameterReference,
-        startIndex: Int = 0,
-        maxElements: Int = maxIterable
+        startIndex: Int,
+        maxElements: Int,
+        maxRecursions: Int,
+        maxInitialIterableSize: Int
     ): NodeParameter? {
         val creator = creatorCache ?: ParameterCreator()
         try {
             return reflectionScope.withReflectiveAccess {
-                creator.expand(rootId, node, name, value, reference, startIndex, maxElements)
+                creator.expand(
+                    rootId,
+                    node,
+                    name,
+                    value,
+                    reference,
+                    startIndex,
+                    maxElements,
+                    maxRecursions,
+                    maxInitialIterableSize
+                )
             }
         } finally {
             creatorCache = creator
@@ -303,6 +317,8 @@ internal class ParameterFactory(private val inlineClassConverter: InlineClassCon
         private var rootId = 0L
         private var node: InspectorNode? = null
         private var parameterIndex = 0
+        private var maxRecursions = 0
+        private var maxInitialIterableSize = 0
         private var recursions = 0
         private val valueIndex = mutableListOf<Int>()
         private val valueLazyReferenceMap = IdentityHashMap<Any, MutableList<NodeParameter>>()
@@ -315,10 +331,12 @@ internal class ParameterFactory(private val inlineClassConverter: InlineClassCon
             node: InspectorNode,
             name: String,
             value: Any?,
-            parameterIndex: Int
+            parameterIndex: Int,
+            maxRecursions: Int,
+            maxInitialIterableSize: Int
         ): NodeParameter =
             try {
-                setup(rootId, node, parameterIndex)
+                setup(rootId, node, parameterIndex, maxRecursions, maxInitialIterableSize)
                 create(name, value) ?: createEmptyParameter(name)
             } finally {
                 setup()
@@ -331,9 +349,11 @@ internal class ParameterFactory(private val inlineClassConverter: InlineClassCon
             value: Any?,
             reference: NodeParameterReference,
             startIndex: Int,
-            maxElements: Int
+            maxElements: Int,
+            maxRecursions: Int,
+            maxInitialIterableSize: Int
         ): NodeParameter? {
-            setup(rootId, node, reference.parameterIndex)
+            setup(rootId, node, reference.parameterIndex, maxRecursions, maxInitialIterableSize)
             var new = Pair(name, value)
             for (i in reference.indices) {
                 new = find(new.first, new.second, i) ?: return null
@@ -358,11 +378,15 @@ internal class ParameterFactory(private val inlineClassConverter: InlineClassCon
         private fun setup(
             newRootId: Long = 0,
             newNode: InspectorNode? = null,
-            newParameterIndex: Int = 0
+            newParameterIndex: Int = 0,
+            maxRecursions: Int = 0,
+            maxInitialIterableSize: Int = 0
         ) {
             rootId = newRootId
             node = newNode
             parameterIndex = newParameterIndex
+            this.maxRecursions = maxRecursions
+            this.maxInitialIterableSize = maxInitialIterableSize
             recursions = 0
             valueIndex.clear()
             valueLazyReferenceMap.clear()
@@ -422,7 +446,7 @@ internal class ParameterFactory(private val inlineClassConverter: InlineClassCon
             name: String,
             value: Any?,
             startIndex: Int = 0,
-            maxElements: Int = maxIterable
+            maxElements: Int = maxInitialIterableSize
         ): NodeParameter? = when {
             value == null -> null
             value is Modifier -> createFromModifier(name, value)
