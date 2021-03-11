@@ -53,6 +53,7 @@ import org.jetbrains.skija.Paint
 import org.jetbrains.skija.Typeface
 import org.jetbrains.skija.paragraph.Alignment as SkAlignment
 import org.jetbrains.skija.paragraph.BaselineMode
+import org.jetbrains.skija.paragraph.Direction as SkDirection
 import org.jetbrains.skija.paragraph.LineMetrics
 import org.jetbrains.skija.paragraph.ParagraphBuilder
 import org.jetbrains.skija.paragraph.ParagraphStyle
@@ -321,10 +322,14 @@ internal class DesktopParagraph(
         getBoxBackwardByOffset(to)?.rect?.right
 
     override fun getParagraphDirection(offset: Int): ResolvedTextDirection =
-        ResolvedTextDirection.Ltr
+        paragraphIntrinsics.textDirection
 
     override fun getBidiRunDirection(offset: Int): ResolvedTextDirection =
-        ResolvedTextDirection.Ltr
+        when (getBoxForwardByOffset(offset)?.direction) {
+            org.jetbrains.skija.paragraph.Direction.RTL -> ResolvedTextDirection.Rtl
+            org.jetbrains.skija.paragraph.Direction.LTR -> ResolvedTextDirection.Ltr
+            null -> ResolvedTextDirection.Ltr
+        }
 
     override fun getOffsetForPosition(position: Offset): Int {
         return para.getGlyphPositionAtCoordinate(position.x, position.y).position
@@ -534,7 +539,8 @@ internal class ParagraphBuilder(
     var maxLines: Int = Int.MAX_VALUE,
     val spanStyles: List<Range<SpanStyle>>,
     val placeholders: List<Range<Placeholder>>,
-    val density: Density
+    val density: Density,
+    val textDirection: ResolvedTextDirection
 ) {
     private lateinit var initialStyle: SpanStyle
     private lateinit var defaultStyle: ComputedStyle
@@ -744,6 +750,7 @@ internal class ParagraphBuilder(
         style.textAlign?.let {
             pStyle.alignment = it.toSkAlignment()
         }
+        pStyle.direction = textDirection.toSkDirection()
         return pStyle
     }
 
@@ -836,5 +843,12 @@ fun TextAlign.toSkAlignment(): SkAlignment {
         TextAlign.Justify -> SkAlignment.JUSTIFY
         TextAlign.Start -> SkAlignment.START
         TextAlign.End -> SkAlignment.END
+    }
+}
+
+fun ResolvedTextDirection.toSkDirection(): SkDirection {
+    return when (this) {
+        ResolvedTextDirection.Ltr -> SkDirection.LTR
+        ResolvedTextDirection.Rtl -> SkDirection.RTL
     }
 }
