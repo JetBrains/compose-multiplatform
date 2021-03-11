@@ -17,6 +17,7 @@
 package androidx.compose.foundation.lazy
 
 import androidx.compose.ui.layout.Placeable
+import androidx.compose.ui.util.fastFirstOrNull
 
 /**
  * @param itemProvider the provider so we can compose a header if it wasn't composed already
@@ -99,7 +100,7 @@ internal class LazyListHeaders(
         }
 
         val headerItem = currentHeaderItem
-            ?: notUsedButComposedItems?.find { it.index == currentHeaderListPosition }
+            ?: notUsedButComposedItems?.fastFirstOrNull { it.index == currentHeaderListPosition }
             ?: itemProvider.getAndMeasure(DataIndex(currentHeaderListPosition))
 
         var headerOffset = if (!reverseOrder) {

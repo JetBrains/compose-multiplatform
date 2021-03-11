@@ -33,6 +33,7 @@ import androidx.compose.runtime.referentialEqualityPolicy
 import androidx.compose.runtime.saveable.SaveableStateRegistry
 import androidx.compose.runtime.snapshots.SnapshotMutableState
 import androidx.compose.runtime.structuralEqualityPolicy
+import androidx.compose.ui.util.fastForEachIndexed
 import androidx.savedstate.SavedStateRegistry
 import androidx.savedstate.SavedStateRegistryOwner
 import java.io.Serializable
@@ -184,7 +185,7 @@ private fun Map<String, List<Any?>>.toBundle(): Bundle {
 }
 
 private fun wrapMutableStatesIn(list: MutableList<Any?>) {
-    list.forEachIndexed { index, value ->
+    list.fastForEachIndexed { index, value ->
         if (value is SnapshotMutableState<*>) {
             list[index] = ParcelableMutableStateHolder(value)
         } else {
@@ -229,7 +230,7 @@ private fun wrapMutableStatesInListOrMap(value: Any?) {
 }
 
 private fun unwrapMutableStatesIn(list: MutableList<Any?>) {
-    list.forEachIndexed { index, value ->
+    list.fastForEachIndexed { index, value ->
         if (value is ParcelableMutableStateHolder) {
             list[index] = value.state
         } else {

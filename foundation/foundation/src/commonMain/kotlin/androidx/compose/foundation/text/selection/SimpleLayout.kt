@@ -16,9 +16,12 @@
 
 package androidx.compose.foundation.text.selection
 
+import androidx.compose.foundation.fastFold
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.Layout
+import androidx.compose.ui.util.fastForEach
+import androidx.compose.ui.util.fastMap
 import kotlin.math.max
 
 /**
@@ -28,20 +31,20 @@ import kotlin.math.max
 @Composable
 internal fun SimpleLayout(modifier: Modifier = Modifier, content: @Composable () -> Unit) {
     Layout(modifier = modifier, content = content) { measurables, constraints ->
-        val placeables = measurables.map { measurable ->
+        val placeables = measurables.fastMap { measurable ->
             measurable.measure(constraints)
         }
 
-        val width = placeables.fold(0) { maxWidth, placeable ->
+        val width = placeables.fastFold(0) { maxWidth, placeable ->
             max(maxWidth, (placeable.width))
         }
 
-        val height = placeables.fold(0) { minWidth, placeable ->
+        val height = placeables.fastFold(0) { minWidth, placeable ->
             max(minWidth, (placeable.height))
         }
 
         layout(width, height) {
-            placeables.forEach { placeable ->
+            placeables.fastForEach { placeable ->
                 placeable.place(0, 0)
             }
         }

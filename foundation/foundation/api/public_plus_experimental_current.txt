@@ -116,6 +116,9 @@ package androidx.compose.foundation {
     property public final androidx.compose.runtime.saveable.Saver<androidx.compose.foundation.ScrollState,?> Saver;
   }
 
+  public final class TempListUtilsKt {
+  }
+
 }
 
 package androidx.compose.foundation.gestures {

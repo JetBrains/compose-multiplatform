@@ -16,6 +16,7 @@
 
 package androidx.compose.runtime
 
+import androidx.compose.runtime.snapshots.fastForEach
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlin.coroutines.Continuation
@@ -103,7 +104,7 @@ class BroadcastFrameClock(
         synchronized(lock) {
             if (failureCause != null) return
             failureCause = cause
-            for (awaiter in awaiters) {
+            awaiters.fastForEach { awaiter ->
                 awaiter.continuation.resumeWithException(cause)
             }
             awaiters.clear()

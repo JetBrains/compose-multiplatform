@@ -293,7 +293,7 @@ internal class SnapshotIdSet private constructor(
 
     override fun toString(): String = "${super.toString()} [${this.map {
         it.toString()
-    }.joinToString()}]"
+    }.fastJoinToString()}]"
 
     companion object {
         /**

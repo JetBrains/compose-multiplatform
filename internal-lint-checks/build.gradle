@@ -36,6 +36,8 @@ dependencies {
     compileOnly(KOTLIN_STDLIB)
     api(project(":lint-checks"))
 
+    implementation(KOTLIN_METADATA_JVM)
+
     testImplementation(KOTLIN_STDLIB)
     testImplementation(LINT_CORE)
     testImplementation(LINT_TESTS)

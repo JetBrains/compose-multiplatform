@@ -17,6 +17,7 @@
 
 package androidx.compose.foundation.text
 
+import androidx.compose.foundation.fastMapIndexedNotNull
 import androidx.compose.foundation.legacygestures.DragObserver
 import androidx.compose.foundation.text.selection.MultiWidgetSelectionDelegate
 import androidx.compose.runtime.Composable
@@ -68,6 +69,7 @@ import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.util.fastForEach
+import androidx.compose.ui.util.fastMap
 import kotlin.math.floor
 import kotlin.math.roundToInt
 
@@ -193,7 +195,7 @@ internal fun InlineChildren(
         Layout(
             content = { content(text.subSequence(start, end).text) }
         ) { children, constrains ->
-            val placeables = children.map { it.measure(constrains) }
+            val placeables = children.fastMap { it.measure(constrains) }
             layout(width = constrains.maxWidth, height = constrains.maxHeight) {
                 placeables.fastForEach { it.placeRelative(0, 0) }
             }
@@ -273,7 +275,7 @@ private class TextController(val state: TextState) {
             state.layoutResult = layoutResult
 
             check(measurables.size >= layoutResult.placeholderRects.size)
-            val placeables = layoutResult.placeholderRects.mapIndexedNotNull { index, rect ->
+            val placeables = layoutResult.placeholderRects.fastMapIndexedNotNull { index, rect ->
                 // PlaceholderRect will be null if it's ellipsized. In that case, the corresponding
                 // inline children won't be measured or placed.
                 rect?.let {

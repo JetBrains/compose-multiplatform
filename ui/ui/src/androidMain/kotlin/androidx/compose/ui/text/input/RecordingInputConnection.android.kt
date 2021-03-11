@@ -135,7 +135,7 @@ internal class RecordingInputConnection(
         if (DEBUG) { Log.d(TAG, "endBatchEdit()") }
         batchDepth--
         if (batchDepth == 0 && editCommands.isNotEmpty()) {
-            eventCallback.onEditCommands(editCommands.toList())
+            eventCallback.onEditCommands(editCommands.toMutableList())
             editCommands.clear()
         }
         return batchDepth > 0

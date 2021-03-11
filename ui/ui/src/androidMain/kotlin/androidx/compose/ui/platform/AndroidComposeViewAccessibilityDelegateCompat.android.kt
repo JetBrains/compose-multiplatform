@@ -57,6 +57,9 @@ import androidx.compose.ui.text.TextLayoutResult
 import androidx.compose.ui.text.platform.toAccessibilitySpannableString
 import androidx.compose.ui.util.fastForEach
 import androidx.compose.ui.ExperimentalComposeUiApi
+import androidx.compose.ui.fastJoinToString
+import androidx.compose.ui.fastReduce
+import androidx.compose.ui.fastZipWithNext
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.semantics.AccessibilityAction
 import androidx.compose.ui.semantics.ProgressBarRangeInfo
@@ -289,7 +292,7 @@ internal class AndroidComposeViewAccessibilityDelegateCompat(val view: AndroidCo
             info.setBoundsInScreen(android.graphics.Rect())
         }
 
-        for (child in semanticsNode.children) {
+        semanticsNode.children.fastForEach { child ->
             if (currentSemanticsNodes.contains(child.id)) {
                 info.addChild(view, child.id)
             }
@@ -618,7 +621,7 @@ internal class AndroidComposeViewAccessibilityDelegateCompat(val view: AndroidCo
                     val oldLabelToActionId = labelToActionId[virtualViewId]
                     val availableIds = AccessibilityActionsResourceIds.toMutableList()
                     val unassignedActions = mutableListOf<CustomAccessibilityAction>()
-                    for (action in customActions) {
+                    customActions.fastForEach { action ->
                         if (oldLabelToActionId!!.contains(action.label)) {
                             val actionId = oldLabelToActionId[action.label]
                             currentActionIdToLabel.put(actionId!!, action.label)
@@ -633,7 +636,7 @@ internal class AndroidComposeViewAccessibilityDelegateCompat(val view: AndroidCo
                             unassignedActions.add(action)
                         }
                     }
-                    for ((index, action) in unassignedActions.withIndex()) {
+                    unassignedActions.fastForEachIndexed { index, action ->
                         val actionId = availableIds[index]
                         currentActionIdToLabel.put(actionId, action.label)
                         currentLabelToActionId[action.label] = actionId
@@ -644,7 +647,7 @@ internal class AndroidComposeViewAccessibilityDelegateCompat(val view: AndroidCo
                         )
                     }
                 } else {
-                    for ((index, action) in customActions.withIndex()) {
+                    customActions.fastForEachIndexed { index, action ->
                         val actionId = AccessibilityActionsResourceIds[index]
                         currentActionIdToLabel.put(actionId, action.label)
                         currentLabelToActionId[action.label] = actionId
@@ -1063,7 +1066,7 @@ internal class AndroidComposeViewAccessibilityDelegateCompat(val view: AndroidCo
             else -> {
                 val label = actionIdToLabel[virtualViewId]?.get(action) ?: return false
                 val customActions = node.config.getOrNull(CustomActions) ?: return false
-                for (customAction in customActions) {
+                customActions.fastForEach { customAction ->
                     if (customAction.label == label) {
                         return customAction.action()
                     }
@@ -2015,7 +2018,7 @@ internal class AndroidComposeViewAccessibilityDelegateCompat(val view: AndroidCo
 
         // if node merges its children, concatenate their content descriptions and texts
         if (node.unmergedConfig.isMergingSemanticsOfDescendants) {
-            return concatenateChildrenContentDescriptionAndText(node).joinToString()
+            return concatenateChildrenContentDescriptionAndText(node).fastJoinToString()
         }
         return null
     }
@@ -2091,7 +2094,7 @@ internal class AndroidComposeViewAccessibilityDelegateCompat(val view: AndroidCo
     private fun calculateIfHorizontallyStacked(items: List<SemanticsNode>): Boolean {
         if (items.count() < 2) return true
 
-        val deltas = items.zipWithNext { el1, el2 ->
+        val deltas = items.fastZipWithNext { el1, el2 ->
             Offset(
                 abs(el1.boundsInRoot.center.x - el2.boundsInRoot.center.x),
                 abs(el1.boundsInRoot.center.y - el2.boundsInRoot.center.y)
@@ -2099,7 +2102,7 @@ internal class AndroidComposeViewAccessibilityDelegateCompat(val view: AndroidCo
         }
         val (deltaX, deltaY) = when (deltas.count()) {
             1 -> deltas.first()
-            else -> deltas.reduce { result, element -> result + element }
+            else -> deltas.fastReduce { result, element -> result + element }
         }
         return deltaY < deltaX
     }

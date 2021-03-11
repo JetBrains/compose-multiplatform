@@ -17,6 +17,8 @@ package androidx.compose.ui.text.style
 
 import androidx.compose.runtime.Immutable
 import androidx.compose.runtime.Stable
+import androidx.compose.ui.text.fastFold
+import androidx.compose.ui.text.fastJoinToString
 
 /**
  * Defines a horizontal line to be drawn on the text.
@@ -52,7 +54,7 @@ class TextDecoration internal constructor(val mask: Int) {
          * @param decorations The decorations to be added
          */
         fun combine(decorations: List<TextDecoration>): TextDecoration {
-            val mask = decorations.fold(0) { acc, decoration ->
+            val mask = decorations.fastFold(0) { acc, decoration ->
                 acc or decoration.mask
             }
             return TextDecoration(mask)
@@ -92,7 +94,7 @@ class TextDecoration internal constructor(val mask: Int) {
         if ((values.size == 1)) {
             return "TextDecoration.${values[0]}"
         }
-        return "TextDecoration[${values.joinToString(separator = ", ")}]"
+        return "TextDecoration[${values.fastJoinToString(separator = ", ")}]"
     }
 
     override operator fun equals(other: Any?): Boolean {

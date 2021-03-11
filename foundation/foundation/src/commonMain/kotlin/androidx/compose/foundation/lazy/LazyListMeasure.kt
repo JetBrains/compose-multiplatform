@@ -259,7 +259,11 @@ internal fun MeasureScope.layoutLazyList(
     return layout(layoutWidth, layoutHeight) {
         var currentMainAxis = measureResult.itemsScrollOffset
         if (hasSpareSpace) {
-            val items = if (reverseLayout) measureResult.items.reversed() else measureResult.items
+            val items = if (reverseLayout) {
+                measureResult.items.toMutableList().apply { reverse() }
+            } else {
+                measureResult.items
+            }
             val sizes = IntArray(items.size) { index ->
                 items[index].size
             }
