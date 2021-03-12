@@ -18,6 +18,8 @@
 
 package androidx.compose.runtime.lint
 
+import androidx.compose.lint.isComposable
+import androidx.compose.lint.returnsUnit
 import com.android.tools.lint.client.api.UElementHandler
 import com.android.tools.lint.detector.api.Category
 import com.android.tools.lint.detector.api.Detector
@@ -28,7 +30,6 @@ import com.android.tools.lint.detector.api.LintFix
 import com.android.tools.lint.detector.api.Scope
 import com.android.tools.lint.detector.api.Severity
 import com.android.tools.lint.detector.api.SourceCodeScanner
-import com.intellij.psi.PsiType
 import org.jetbrains.uast.UMethod
 import java.util.EnumSet
 import java.util.Locale
@@ -107,5 +108,3 @@ class ComposableNamingDetector : Detector(), SourceCodeScanner {
         )
     }
 }
-
-private val UMethod.returnsUnit get() = returnType == PsiType.VOID

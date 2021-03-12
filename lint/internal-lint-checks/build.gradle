@@ -35,8 +35,7 @@ dependencies {
     compileOnly(LINT_API_LATEST)
     compileOnly(KOTLIN_STDLIB)
     api(project(":lint-checks"))
-
-    implementation(KOTLIN_METADATA_JVM)
+    implementation(project(":compose:lint:common"))
 
     testImplementation(KOTLIN_STDLIB)
     testImplementation(LINT_CORE)
@@ -44,7 +43,7 @@ dependencies {
 }
 
 androidx {
-    name = "Compose internal lint checks"
+    name = "Compose Internal Lint Checks"
     type = LibraryType.LINT
     inceptionYear = "2019"
     description = "Internal lint checks for Compose"

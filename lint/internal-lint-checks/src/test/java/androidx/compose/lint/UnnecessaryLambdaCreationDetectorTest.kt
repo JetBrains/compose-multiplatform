@@ -25,27 +25,12 @@ import org.junit.Test
 import org.junit.runner.RunWith
 import org.junit.runners.JUnit4
 import androidx.compose.lint.UnnecessaryLambdaCreationDetector.Companion.ISSUE
+import com.android.tools.lint.checks.infrastructure.TestFiles.kotlin
 import org.intellij.lang.annotations.Language
 
 /* ktlint-disable max-line-length */
 @RunWith(JUnit4::class)
 class UnnecessaryLambdaCreationDetectorTest {
-
-    private val composableStub = kt(
-        """
-        package androidx.compose.runtime
-
-        @MustBeDocumented
-        @Retention(AnnotationRetention.BINARY)
-        @Target(
-            AnnotationTarget.FUNCTION,
-            AnnotationTarget.TYPE,
-            AnnotationTarget.TYPE_PARAMETER,
-            AnnotationTarget.PROPERTY
-        )
-        annotation class Composable
-    """
-    )
 
     private val stub = kt(
         """
@@ -68,7 +53,7 @@ class UnnecessaryLambdaCreationDetectorTest {
 
     private fun check(@Language("kotlin") code: String): TestLintResult {
         return TestLintTask.lint()
-            .files(kt(code.trimIndent()), stub, composableStub)
+            .files(kt(code.trimIndent()), stub, kotlin(Stubs.Composable))
             .allowMissingSdk(true)
             .issues(ISSUE)
             .run()
@@ -223,14 +208,7 @@ src/test/test.kt:14: Error: Creating an unnecessary lambda to emit a captured la
                 }
             }
         """
-        ).expect(
-            """
-src/test/test.kt:23: Error: Creating an unnecessary lambda to emit a captured lambda [UnnecessaryLambdaCreation]
-        parameterizedLambda(child)
-        ~~~~~~~~~~~~~~~~~~~
-1 errors, 0 warnings
-        """
-        )
+        ).expectClean()
     }
 
     @Test
