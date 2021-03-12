@@ -259,45 +259,42 @@ internal fun MeasureScope.layoutLazyList(
     return layout(layoutWidth, layoutHeight) {
         var currentMainAxis = measureResult.itemsScrollOffset
         if (hasSpareSpace) {
-            val items = if (reverseLayout) {
-                measureResult.items.toMutableList().apply { reverse() }
-            } else {
-                measureResult.items
+            val itemsCount = measureResult.items.size
+            val sizes = IntArray(itemsCount) { index ->
+                val reverseLayoutAwareIndex = if (!reverseLayout) index else itemsCount - index - 1
+                measureResult.items[reverseLayoutAwareIndex].size
             }
-            val sizes = IntArray(items.size) { index ->
-                items[index].size
-            }
-            val positions = IntArray(items.size) { 0 }
+            val offsets = IntArray(itemsCount) { 0 }
             if (isVertical) {
                 with(requireNotNull(verticalArrangement)) {
-                    density.arrange(mainAxisLayoutSize, sizes, positions)
+                    density.arrange(mainAxisLayoutSize, sizes, offsets)
                 }
             } else {
                 with(requireNotNull(horizontalArrangement)) {
-                    density.arrange(mainAxisLayoutSize, sizes, layoutDirection, positions)
+                    density.arrange(mainAxisLayoutSize, sizes, layoutDirection, offsets)
                 }
             }
-            positions.forEachIndexed { index, position ->
-                items[index].place(this, layoutWidth, layoutHeight, position, reverseLayout)
+            offsets.forEachIndexed { index, absoluteOffset ->
+                val reverseLayoutAwareIndex = if (!reverseLayout) index else itemsCount - index - 1
+                val item = measureResult.items[reverseLayoutAwareIndex]
+                val relativeOffset = if (reverseLayout) {
+                    mainAxisLayoutSize - absoluteOffset - item.size
+                } else {
+                    absoluteOffset
+                }
+                item.place(this, layoutWidth, layoutHeight, relativeOffset)
             }
         } else {
             headers?.onBeforeItemsPlacing()
             measureResult.items.fastForEach {
-                val offset = if (reverseLayout) {
-                    mainAxisLayoutSize - currentMainAxis - (it.size)
-                } else {
-                    currentMainAxis
-                }
                 if (headers != null) {
-                    headers.place(it, this, layoutWidth, layoutHeight, offset, reverseLayout)
+                    headers.place(it, this, layoutWidth, layoutHeight, currentMainAxis)
                 } else {
-                    it.place(this, layoutWidth, layoutHeight, offset, reverseLayout)
+                    it.place(this, layoutWidth, layoutHeight, currentMainAxis)
                 }
                 currentMainAxis += it.sizeWithSpacings
             }
-            headers?.onAfterItemsPlacing(
-                this, mainAxisLayoutSize, layoutWidth, layoutHeight, reverseLayout
-            )
+            headers?.onAfterItemsPlacing(this, layoutWidth, layoutHeight)
         }
     }
 }

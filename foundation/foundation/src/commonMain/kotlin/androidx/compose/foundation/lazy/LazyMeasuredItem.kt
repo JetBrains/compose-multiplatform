@@ -31,6 +31,7 @@ internal class LazyMeasuredItem(
     private val horizontalAlignment: Alignment.Horizontal?,
     private val verticalAlignment: Alignment.Vertical?,
     private val layoutDirection: LayoutDirection,
+    private val reverseLayout: Boolean,
     private val startContentPadding: Int,
     private val endContentPadding: Int,
     /**
@@ -81,15 +82,19 @@ internal class LazyMeasuredItem(
         scope: Placeable.PlacementScope,
         layoutWidth: Int,
         layoutHeight: Int,
-        offset: Int,
-        reverseOrder: Boolean
+        offset: Int
     ) = with(scope) {
         this@LazyMeasuredItem.offset = offset
-        var mainAxisOffset = offset
-        var index = if (reverseOrder) placeables.lastIndex else 0
-        while (if (reverseOrder) index >= 0 else index < placeables.size) {
+        val mainAxisLayoutSize = if (isVertical) layoutHeight else layoutWidth
+        var mainAxisOffset = if (reverseLayout) {
+            mainAxisLayoutSize - offset - size
+        } else {
+            offset
+        }
+        var index = if (reverseLayout) placeables.lastIndex else 0
+        while (if (reverseLayout) index >= 0 else index < placeables.size) {
             val it = placeables[index]
-            if (reverseOrder) index-- else index++
+            if (reverseLayout) index-- else index++
             if (isVertical) {
                 val x = requireNotNull(horizontalAlignment)
                     .align(it.width, layoutWidth, layoutDirection)

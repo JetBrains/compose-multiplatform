@@ -19,6 +19,7 @@ package androidx.compose.foundation.samples
 import androidx.annotation.Sampled
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
@@ -79,7 +80,7 @@ fun LazyRowSample() {
 fun StickyHeaderSample() {
     val sections = listOf("A", "B", "C", "D", "E", "F", "G")
 
-    LazyColumn {
+    LazyColumn(reverseLayout = true, contentPadding = PaddingValues(6.dp)) {
         sections.forEach { section ->
             stickyHeader {
                 Text(
