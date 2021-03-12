@@ -426,6 +426,66 @@ class ParameterFactoryTest {
     }
 
     @Test
+    fun testMap() {
+        val map = mapOf(1 to "one", 2 to "two")
+        validate(create("map", map)) {
+            parameter("map", ParameterType.Iterable, "Map[2]") {
+                parameter("[1]", ParameterType.String, "one") {
+                    parameter("key", ParameterType.Int32, 1)
+                    parameter("value", ParameterType.String, "one")
+                }
+                parameter("[2]", ParameterType.String, "two") {
+                    parameter("key", ParameterType.Int32, 2)
+                    parameter("value", ParameterType.String, "two")
+                }
+            }
+        }
+    }
+
+    @Test
+    fun testMapEntry() {
+        val entry = object : Map.Entry<String, String> {
+            override val key = "Hello"
+            override val value = "World"
+        }
+        validate(create("myEntry", entry)) {
+            parameter("myEntry", ParameterType.String, "World") {
+                parameter("key", ParameterType.String, "Hello")
+                parameter("value", ParameterType.String, "World")
+            }
+        }
+    }
+
+    @Test
+    fun testMapWithComplexTypes() {
+        val k1 = MyClass("k1")
+        val k2 = MyClass("k2")
+        val v1 = MyClass("v1")
+        val v2 = MyClass("v2")
+        val map = mapOf(k1 to v1, k2 to v2)
+        validate(create("map", map, maxRecursions = 3)) {
+            parameter("map", ParameterType.Iterable, "Map[2]") {
+                parameter("[MyClass]", ParameterType.String, "MyClass") {
+                    parameter("key", ParameterType.String, "MyClass") {
+                        parameter("name", ParameterType.String, "k1")
+                    }
+                    parameter("value", ParameterType.String, "MyClass") {
+                        parameter("name", ParameterType.String, "v1")
+                    }
+                }
+                parameter("[MyClass]", ParameterType.String, "MyClass") {
+                    parameter("key", ParameterType.String, "MyClass") {
+                        parameter("name", ParameterType.String, "k2")
+                    }
+                    parameter("value", ParameterType.String, "MyClass") {
+                        parameter("name", ParameterType.String, "v2")
+                    }
+                }
+            }
+        }
+    }
+
+    @Test
     fun testShortIntArray() {
         val value = intArrayOf(10, 11, 12)
         val parameter = create("array", value)
@@ -975,7 +1035,7 @@ class ParameterValidationReceiver(
         val msg = "$trace${parameter.name}"
         assertWithMessage(msg).that(parameter.type).isEqualTo(type)
         assertWithMessage(msg).that(parameter.index).isEqualTo(expectedIndex)
-        assertWithMessage(msg).that(checkEquals(parameter.reference, ref)).isTrue()
+        assertWithMessage(msg).that(parameter.reference.toString()).isEqualTo(ref.toString())
         if (type != ParameterType.Lambda || value != null) {
             assertWithMessage(msg).that(parameter.value).isEqualTo(value)
         }
@@ -1002,13 +1062,16 @@ class MyClass(private val name: String) {
     var other: MyClass? = null
     var self: MyClass? = null
     var third: MyClass? = null
+
+    override fun hashCode(): Int = name.hashCode()
+    override fun equals(other: Any?): Boolean = name == (other as? MyClass)?.name
 }
 
 private fun NodeParameter.checkEquals(other: NodeParameter): Boolean {
     assertThat(other.name).isEqualTo(name)
     assertThat(other.type).isEqualTo(type)
     assertThat(other.value).isEqualTo(value)
-    assertThat(checkEquals(reference, other.reference)).isTrue()
+    assertThat(other.reference.toString()).isEqualTo(reference.toString())
     assertThat(other.elements.size).isEqualTo(elements.size)
     var hasReferences = reference != null
     elements.forEachIndexed { i, element ->
@@ -1016,9 +1079,3 @@ private fun NodeParameter.checkEquals(other: NodeParameter): Boolean {
     }
     return hasReferences
 }
-
-private fun checkEquals(ref1: NodeParameterReference?, ref2: NodeParameterReference?): Boolean =
-    ref1 === ref2 ||
-        ref1?.nodeId == ref2?.nodeId &&
-        ref1?.parameterIndex == ref2?.parameterIndex &&
-        ref1?.indices.contentEquals(ref2?.indices)

@@ -35,4 +35,10 @@ class NodeParameterReference(
         parameterIndex: Int,
         indices: List<Int>
     ) : this(nodeId, parameterIndex, indices.asIntArray())
+
+    // For testing:
+    override fun toString(): String {
+        val suffix = if (indices.isNotEmpty()) ", ${indices.joinToString()}" else ""
+        return "[$nodeId, $parameterIndex$suffix]"
+    }
 }
