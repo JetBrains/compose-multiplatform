@@ -117,6 +117,54 @@ object BundleInsideHelper {
         }
     }
 
+    /**
+     * Creates a configuration for users to use that will be used bundle these dependency
+     * jars inside of this lint check's jar. This is required because lintPublish does
+     * not currently support dependencies, so instead we need to bundle any dependencies with the
+     * lint jar manually. (b/182319899)
+     *
+     * ```
+     * dependencies {
+     *     if (rootProject.hasProperty("android.injected.invoked.from.ide")) {
+     *         compileOnly(LINT_API_LATEST)
+     *     } else {
+     *         compileOnly(LINT_API_MIN)
+     *     }
+     *     compileOnly(KOTLIN_STDLIB)
+     *     // Include this library inside the resulting lint jar
+     *     bundleInside(project(":foo-lint-utils"))
+     * }
+     * ```
+     * @receiver the project that should bundle jars specified by these configurations
+     */
+    @JvmStatic
+    fun Project.forInsideLintJar() {
+        val bundle = configurations.create("bundleInside")
+        val compileOnly = configurations.getByName("compileOnly")
+        val testImplementation = configurations.getByName("testImplementation")
+        // bundleInside dependencies should be included as compileOnly as well
+        compileOnly.setExtendsFrom(listOf(bundle))
+        testImplementation.setExtendsFrom(listOf(bundle))
+
+        tasks.named("jar").configure { jarTask ->
+            jarTask as Jar
+            jarTask.dependsOn(bundle)
+            jarTask.from({
+                bundle
+                    // The stdlib is already bundled with lint, so no need to include it manually
+                    // in the lint.jar if any dependencies here depend on it
+                    .filter { !it.name.contains("kotlin-stdlib") }
+                    .map { file ->
+                        if (file.isDirectory) {
+                            file
+                        } else {
+                            zipTree(file)
+                        }
+                    }
+            })
+        }
+    }
+
     private fun Project.configureRepackageTaskForType(
         type: String,
         from: String,

@@ -126,7 +126,7 @@ open class AndroidXExtension(val project: Project) {
                 // add per-project overrides here
                 // for example
                 // the following project is intended to be accessed from Java
-                // ":compose:internal-lint-checks" -> return true
+                // ":compose:lint:internal-lint-checks" -> return true
                 // the following project is not intended to be accessed from Java
                 // ":annotation:annotation" -> return false
             }
