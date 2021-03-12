@@ -17,6 +17,7 @@
 package androidx.compose.foundation.shape
 
 import androidx.compose.ui.geometry.Size
+import androidx.compose.ui.platform.InspectableValue
 import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.dp
 import androidx.test.ext.junit.runners.AndroidJUnit4
@@ -36,24 +37,28 @@ class CornerSizeTest {
     fun pxCorners() {
         val corner = CornerSize(24.0f)
         assertThat(corner.toPx(size, density)).isEqualTo(24.0f)
+        assertThat(corner.inspectorValue()).isEqualTo("24.0px")
     }
 
     @Test
     fun dpCorners() {
         val corner = CornerSize(5.dp)
         assertThat(corner.toPx(size, density)).isEqualTo(12.5f)
+        assertThat(corner.inspectorValue()).isEqualTo(5.dp)
     }
 
     @Test
     fun intPercentCorners() {
         val corner = CornerSize(15)
         assertThat(corner.toPx(size, density)).isEqualTo(22.5f)
+        assertThat(corner.inspectorValue()).isEqualTo("15.0%")
     }
 
     @Test
     fun zeroCorners() {
         val corner = ZeroCornerSize
         assertThat(corner.toPx(size, density)).isEqualTo(0.0f)
+        assertThat(corner.inspectorValue()).isEqualTo("ZeroCornerSize")
     }
 
     @Test
@@ -69,4 +74,6 @@ class CornerSizeTest {
             CornerSize(8.dp)
         )
     }
+
+    private fun CornerSize.inspectorValue() = (this as InspectableValue).valueOverride
 }

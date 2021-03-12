@@ -19,6 +19,7 @@ package androidx.compose.foundation.shape
 import androidx.compose.runtime.Immutable
 import androidx.compose.runtime.Stable
 import androidx.compose.ui.geometry.Size
+import androidx.compose.ui.platform.InspectableValue
 import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.Dp
 
@@ -45,11 +46,14 @@ interface CornerSize {
 @Stable
 fun CornerSize(size: Dp): CornerSize = DpCornerSize(size)
 
-private data class DpCornerSize(private val size: Dp) : CornerSize {
+private data class DpCornerSize(private val size: Dp) : CornerSize, InspectableValue {
     override fun toPx(shapeSize: Size, density: Density) =
         with(density) { size.toPx() }
 
     override fun toString(): String = "CornerSize(size = ${size.value}.dp)"
+
+    override val valueOverride: Dp
+        get() = size
 }
 
 /**
@@ -59,10 +63,13 @@ private data class DpCornerSize(private val size: Dp) : CornerSize {
 @Stable
 fun CornerSize(size: Float): CornerSize = PxCornerSize(size)
 
-private data class PxCornerSize(private val size: Float) : CornerSize {
+private data class PxCornerSize(private val size: Float) : CornerSize, InspectableValue {
     override fun toPx(shapeSize: Size, density: Density) = size
 
     override fun toString(): String = "CornerSize(size = $size.px)"
+
+    override val valueOverride: String
+        get() = "${size}px"
 }
 
 /**
@@ -82,7 +89,7 @@ fun CornerSize(/*@IntRange(from = 0, to = 100)*/ percent: Int): CornerSize =
 private data class PercentCornerSize(
     /*@FloatRange(from = 0.0, to = 100.0)*/
     private val percent: Float
-) : CornerSize {
+) : CornerSize, InspectableValue {
     init {
         if (percent < 0 || percent > 100) {
             throw IllegalArgumentException("The percent should be in the range of [0, 100]")
@@ -93,14 +100,20 @@ private data class PercentCornerSize(
         shapeSize.minDimension * (percent / 100f)
 
     override fun toString(): String = "CornerSize(size = $percent%)"
+
+    override val valueOverride: String
+        get() = "$percent%"
 }
 
 /**
  * [CornerSize] always equals to zero.
  */
 @Stable
-val ZeroCornerSize: CornerSize = object : CornerSize {
+val ZeroCornerSize: CornerSize = object : CornerSize, InspectableValue {
     override fun toPx(shapeSize: Size, density: Density) = 0.0f
 
     override fun toString(): String = "ZeroCornerSize"
+
+    override val valueOverride: String
+        get() = "ZeroCornerSize"
 }
