@@ -289,13 +289,12 @@ class ParameterFactoryTest {
         }
     }
 
-    @Ignore
     @Test
     fun testCornerSize() {
         assertThat(lookup(ZeroCornerSize)).isEqualTo(ParameterType.String to "ZeroCornerSize")
         assertThat(lookup(CornerSize(2.4.dp))).isEqualTo(ParameterType.DimensionDp to 2.4f)
-        assertThat(lookup(CornerSize(2.4f))).isEqualTo(ParameterType.DimensionDp to 1.2f)
-        assertThat(lookup(CornerSize(3))).isEqualTo(ParameterType.DimensionDp to 7.5f)
+        assertThat(lookup(CornerSize(2.4f))).isEqualTo(ParameterType.String to "2.4px")
+        assertThat(lookup(CornerSize(3))).isEqualTo(ParameterType.String to "3.0%")
     }
 
     @Test
