@@ -45,15 +45,16 @@ object Stubs {
         import androidx.compose.ui.platform.InspectorInfo
         import androidx.compose.ui.platform.InspectorValueInfo
 
+        @Suppress("ModifierFactoryExtensionFunction")
         interface Modifier {
-          infix fun then(other: Modifier): Modifier =
-              if (other === Modifier) this else CombinedModifier(this, other)
+            infix fun then(other: Modifier): Modifier =
+                if (other === Modifier) this else CombinedModifier(this, other)
 
-          interface Element : Modifier
+            interface Element : Modifier
 
-          companion object : Modifier {
-            override infix fun then(other: Modifier): Modifier = other
-          }
+            companion object : Modifier {
+                override infix fun then(other: Modifier): Modifier = other
+            }
         }
 
         class CombinedModifier(

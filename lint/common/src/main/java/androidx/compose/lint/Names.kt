@@ -23,11 +23,15 @@ import kotlinx.metadata.ClassName
  */
 object Names {
     object Runtime {
-        val packageName = Package("androidx.compose.runtime")
+        val PackageName = Package("androidx.compose.runtime")
 
-        val Composable = Name(packageName, "Composable")
-        val CompositionLocal = Name(packageName, "CompositionLocal")
-        val Remember = Name(packageName, "remember")
+        val Composable = Name(PackageName, "Composable")
+        val CompositionLocal = Name(PackageName, "CompositionLocal")
+        val Remember = Name(PackageName, "remember")
+    }
+    object Ui {
+        val PackageName = Package("androidx.compose.ui")
+        val Modifier = Name(PackageName, "Modifier")
     }
 }
 
