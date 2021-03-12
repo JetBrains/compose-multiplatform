@@ -37,12 +37,12 @@ class ConverterTest {
     @Test
     fun testColorConverter() {
         val converter = (Color.VectorConverter)(ColorSpaces.Srgb)
-        assertEquals(converter.convertFromVector(AnimationVector4D(1f, 1f, 0f, 0f)), Color.Red)
-        assertEquals(converter.convertToVector(Color.Green), AnimationVector4D(1f, 0f, 1f, 0f))
-        assertEquals(
-            converter.convertFromVector(AnimationVector4D(0f, 0f, 0f, 1f)),
-            Color(alpha = 0f, red = 0f, green = 0f, blue = 1f)
-        )
+        val vectorFromRed = converter.convertToVector(Color.Red)
+        assertEquals(Color.Red, converter.convertFromVector(vectorFromRed))
+        val vectorFromGreen = converter.convertToVector(Color.Green)
+        assertEquals(Color.Green, converter.convertFromVector(vectorFromGreen))
+        val vectorFromBlue = converter.convertToVector(Color.Blue)
+        assertEquals(Color.Blue, converter.convertFromVector(vectorFromBlue))
     }
 
     @Test
@@ -51,49 +51,59 @@ class ConverterTest {
 
         // Alpha channel above 1.0f clamps to 1.0f and result is red
         assertEquals(
-            converter.convertFromVector(AnimationVector4D(1.1f, 1f, 0f, 0f)),
-            Color.Red
+            1f,
+            converter.convertFromVector(AnimationVector4D(1.1f, 1f, 0f, 0f)).alpha,
+            0f
         )
         // Alpha channel below 0.0f clamps to 0.0f and the result is transparent red
         assertEquals(
-            converter.convertFromVector(AnimationVector4D(-0.1f, 1f, 0f, 0f)),
-            Color.Red.copy(alpha = 0.0f)
+            0f,
+            converter.convertFromVector(AnimationVector4D(-0.1f, 1f, 0f, 0f))
+                .alpha,
+            0f
         )
 
-        // Red channel above 1.0f clamps to 1.0f and the result is red
+        // all channels should clamp:
         assertEquals(
-            converter.convertFromVector(AnimationVector4D(1.0f, 1.1f, 0f, 0f)),
-            Color.Red
+            1f,
+            converter.convertFromVector(AnimationVector4D(1.0f, 3f, 3f, 3f)).red,
+            0f
+        )
+        assertEquals(
+            1f,
+            converter.convertFromVector(AnimationVector4D(1.0f, 3f, 3f, 3f)).green,
+            0f
+        )
+        assertEquals(
+            1f,
+            converter.convertFromVector(AnimationVector4D(1.0f, 3f, 3f, 3f)).blue,
+            0f
         )
 
-        // Red channel below 0.0f clamps to 0.0f and the result is black
+        // All channel below 0.0f clamps to 0.0f and the result is black
         assertEquals(
-            converter.convertFromVector(AnimationVector4D(1.0f, -0.1f, 0f, 0f)),
-            Color.Black
+            0f,
+            converter.convertFromVector(AnimationVector4D(1.0f, -3f, -3f, -3f))
+                .red,
+            0f
+        )
+        assertEquals(
+            0f,
+            converter.convertFromVector(AnimationVector4D(1.0f, -3f, -3f, -3f))
+                .green,
+            0f
+        )
+        assertEquals(
+            0f,
+            converter.convertFromVector(AnimationVector4D(1.0f, -3f, -3f, -3f))
+                .blue,
+            0f
         )
 
         // Green channel above 1.0f clamps to 1.0f and the result is green
         assertEquals(
             converter.convertFromVector(AnimationVector4D(1.0f, 0.0f, 1.1f, 0f)),
             Color.Green
-        )
-
-        // Green channel below 0.0f clamps to 0.0f and result is black
-        assertEquals(
-            converter.convertFromVector(AnimationVector4D(1.0f, 0f, -0.1f, 0f)),
-            Color.Black
-        )
-
-        // Blue channel above 1.0f clamps to 1.0f and result is blue
-        assertEquals(
-            converter.convertFromVector(AnimationVector4D(1.0f, 0f, 0f, 1.1f)),
-            Color.Blue
-        )
-
-        // Blue channel below 0.0f clamps to 0.0f and the result is black
-        assertEquals(
-            converter.convertFromVector(AnimationVector4D(1.0f, 0f, 0f, -0.1f)),
-            Color.Black
         )
     }
 

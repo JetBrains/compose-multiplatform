@@ -106,27 +106,27 @@ class ColorTest {
         val red = Color.Red
         val green = Color.Green
 
-        val redLinear = red.convert(ColorSpaces.LinearExtendedSrgb)
-        val greenLinear = green.convert(ColorSpaces.LinearExtendedSrgb)
+        val redOklab = red.convert(ColorSpaces.Oklab)
+        val greenOklab = green.convert(ColorSpaces.Oklab)
 
         for (i in 0..255) {
             val t = i / 255f
             val color = lerp(red, green, t)
-            val expectedLinear = Color(
-                red = lerp(redLinear.red, greenLinear.red, t),
+            val expectedOklab = Color(
+                red = lerp(redOklab.red, greenOklab.red, t),
                 green = lerp(
-                    redLinear.green,
-                    greenLinear.green,
+                    redOklab.green,
+                    greenOklab.green,
                     t
                 ),
                 blue = lerp(
-                    redLinear.blue,
-                    greenLinear.blue,
+                    redOklab.blue,
+                    greenOklab.blue,
                     t
                 ),
-                colorSpace = ColorSpaces.LinearExtendedSrgb
+                colorSpace = ColorSpaces.Oklab
             )
-            val expected = expectedLinear.convert(ColorSpaces.Srgb)
+            val expected = expectedOklab.convert(ColorSpaces.Srgb)
             val colorARGB = Color(color.toArgb())
             val expectedARGB = Color(expected.toArgb())
             assertEquals(
