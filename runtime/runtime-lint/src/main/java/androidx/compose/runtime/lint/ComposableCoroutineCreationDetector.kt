@@ -18,6 +18,10 @@
 
 package androidx.compose.runtime.lint
 
+import androidx.compose.lint.Name
+import androidx.compose.lint.Package
+import androidx.compose.lint.isInPackageName
+import androidx.compose.lint.isInvokedWithinComposable
 import com.android.tools.lint.detector.api.Category
 import com.android.tools.lint.detector.api.Detector
 import com.android.tools.lint.detector.api.Implementation
@@ -26,13 +30,8 @@ import com.android.tools.lint.detector.api.JavaContext
 import com.android.tools.lint.detector.api.Scope
 import com.android.tools.lint.detector.api.Severity
 import com.android.tools.lint.detector.api.SourceCodeScanner
-import com.intellij.psi.PsiJavaFile
 import com.intellij.psi.PsiMethod
 import org.jetbrains.uast.UCallExpression
-import org.jetbrains.uast.UElement
-import org.jetbrains.uast.kotlin.KotlinUFunctionCallExpression
-import org.jetbrains.uast.kotlin.KotlinULambdaExpression
-import org.jetbrains.uast.kotlin.declarations.KotlinUMethod
 import java.util.EnumSet
 
 /**
@@ -40,68 +39,19 @@ import java.util.EnumSet
  * body of a composable function / lambda.
  */
 class ComposableCoroutineCreationDetector : Detector(), SourceCodeScanner {
-    override fun getApplicableMethodNames() = listOf(AsyncShortName, LaunchShortName)
+    override fun getApplicableMethodNames() = listOf(Async.shortName, Launch.shortName)
 
     override fun visitMethodCall(context: JavaContext, node: UCallExpression, method: PsiMethod) {
-        val packageName = (method.containingFile as? PsiJavaFile)?.packageName
-        if (packageName != CoroutinePackageName) return
-        val name = method.name
+        if (!method.isInPackageName(CoroutinePackageName)) return
 
-        var expression: UElement? = node
-
-        // Limit the search depth in case of an error - in most cases the depth should be
-        // fairly shallow unless there are many if / else / while statements.
-        var depth = 0
-
-        // Find the parent function / lambda this call expression is inside
-        while (depth < 10) {
-            expression = expression?.uastParent
-
-            // TODO: this won't handle inline functions, but we also don't know if they are
-            // inline when they are defined in bytecode because this information doesn't
-            // exist in PSI. If this information isn't added to PSI / UAST, we would need to
-            // manually parse the @Metadata annotation.
-            when (expression) {
-                // In the body of a lambda
-                is KotlinULambdaExpression -> {
-                    if (expression.isComposable) {
-                        context.report(
-                            CoroutineCreationDuringComposition,
-                            node,
-                            context.getNameLocation(node),
-                            "Calls to $name should happen inside a LaunchedEffect and " +
-                                "not composition"
-                        )
-                        return
-                    }
-                    val parent = expression.uastParent
-                    if (parent is KotlinUFunctionCallExpression && parent.isDeclarationInline) {
-                        // We are now in a non-composable lambda parameter inside an inline function
-                        // For example, a scoping function such as run {} or apply {} - since the
-                        // body will be inlined and this is a common case, try to see if there is
-                        // a parent composable function above us, since it is still most likely
-                        // an error to call these methods inside an inline function, inside a
-                        // Composable function.
-                        continue
-                    } else {
-                        return
-                    }
-                }
-                // In the body of a function
-                is KotlinUMethod -> {
-                    if (expression.hasAnnotation("androidx.compose.runtime.Composable")) {
-                        context.report(
-                            CoroutineCreationDuringComposition,
-                            node,
-                            context.getNameLocation(node),
-                            "Calls to $name should happen inside a LaunchedEffect and " +
-                                "not composition"
-                        )
-                    }
-                    return
-                }
-            }
-            depth++
+        if (node.isInvokedWithinComposable()) {
+            context.report(
+                CoroutineCreationDuringComposition,
+                node,
+                context.getNameLocation(node),
+                "Calls to ${method.name} should happen inside a LaunchedEffect and " +
+                    "not composition"
+            )
         }
     }
 
@@ -125,3 +75,7 @@ class ComposableCoroutineCreationDetector : Detector(), SourceCodeScanner {
         )
     }
 }
+
+private val CoroutinePackageName = Package("kotlinx.coroutines")
+private val Async = Name(CoroutinePackageName, "async")
+private val Launch = Name(CoroutinePackageName, "launch")

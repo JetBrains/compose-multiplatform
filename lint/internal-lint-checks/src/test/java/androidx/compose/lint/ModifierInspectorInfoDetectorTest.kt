@@ -32,7 +32,7 @@ class ModifierInspectorInfoDetectorTest : LintDetectorTest() {
 
     override fun getIssues(): List<Issue> = listOf(ModifierInspectorInfoDetector.ISSUE)
 
-    private val inspectableInfoFile = kotlin(
+    private val inspectableInfoStub = kotlin(
         """
         package androidx.compose.ui.platform
 
@@ -98,29 +98,12 @@ class ModifierInspectorInfoDetectorTest : LintDetectorTest() {
         """
     ).indented()
 
-    private val modifierFile = kotlin(
+    private val composedStub = kotlin(
         """
         package androidx.compose.ui
 
         import androidx.compose.ui.platform.InspectorInfo
         import androidx.compose.ui.platform.InspectorValueInfo
-
-        interface Modifier {
-          infix fun then(other: Modifier): Modifier =
-              if (other === Modifier) this else CombinedModifier(this, other)
-
-          interface Element : Modifier {
-          }
-
-          companion object : Modifier {
-            override infix fun then(other: Modifier): Modifier = other
-          }
-        }
-
-        class CombinedModifier(
-            private val outer: Modifier,
-            private val inner: Modifier
-        ) : Modifier {}
 
         fun Modifier.composed(
             inspectorInfo: InspectorInfo.() -> Unit = NoInspectorInfo,
@@ -131,26 +114,15 @@ class ModifierInspectorInfoDetectorTest : LintDetectorTest() {
             inspectorInfo: InspectorInfo.() -> Unit,
             val factory: Modifier.() -> Modifier
         ) : Modifier.Element, InspectorValueInfo(inspectorInfo)
-
-        """
-    ).indented()
-
-    private val rememberFile = kotlin(
-        """
-        package androidx.compose.runtime
-
-        fun <T> remember(calculation: () -> T): T = calculation()
-
-        class Remember
-
         """
     ).indented()
 
     @Test
     fun existingInspectorInfo() {
         lint().files(
-            modifierFile,
-            inspectableInfoFile,
+            kotlin(Stubs.Modifier),
+            composedStub,
+            inspectableInfoStub,
             kotlin(
                 """
                 package androidx.compose.ui
@@ -183,8 +155,9 @@ class ModifierInspectorInfoDetectorTest : LintDetectorTest() {
     @Test
     fun existingInspectorInfoWithStatementsBeforeDefinition() {
         lint().files(
-            modifierFile,
-            inspectableInfoFile,
+            kotlin(Stubs.Modifier),
+            composedStub,
+            inspectableInfoStub,
             kotlin(
                 """
                 package androidx.compose.ui
@@ -232,8 +205,9 @@ class ModifierInspectorInfoDetectorTest : LintDetectorTest() {
     @Test
     fun existingInspectorInfoWithValue() {
         lint().files(
-            modifierFile,
-            inspectableInfoFile,
+            kotlin(Stubs.Modifier),
+            composedStub,
+            inspectableInfoStub,
             kotlin(
                 """
                 package androidx.compose.ui
@@ -265,8 +239,9 @@ class ModifierInspectorInfoDetectorTest : LintDetectorTest() {
     @Test
     fun existingInspectorInfoViaSynonym() {
         lint().files(
-            modifierFile,
-            inspectableInfoFile,
+            kotlin(Stubs.Modifier),
+            composedStub,
+            inspectableInfoStub,
             kotlin(
                 """
                 package androidx.compose.ui
@@ -308,8 +283,9 @@ class ModifierInspectorInfoDetectorTest : LintDetectorTest() {
     @Test
     fun existingInspectorInfoWithAnonymousClass() {
         lint().files(
-            modifierFile,
-            inspectableInfoFile,
+            kotlin(Stubs.Modifier),
+            composedStub,
+            inspectableInfoStub,
             kotlin(
                 """
                 package androidx.compose.ui
@@ -331,8 +307,9 @@ class ModifierInspectorInfoDetectorTest : LintDetectorTest() {
     @Test
     fun existingInspectorInfoWithDataClassMemberValues() {
         lint().files(
-            modifierFile,
-            inspectableInfoFile,
+            kotlin(Stubs.Modifier),
+            composedStub,
+            inspectableInfoStub,
             kotlin(
                 """
                 package androidx.compose.ui
@@ -398,8 +375,9 @@ class ModifierInspectorInfoDetectorTest : LintDetectorTest() {
     @Test
     fun existingInspectorInfoWithConditional() {
         lint().files(
-            modifierFile,
-            inspectableInfoFile,
+            kotlin(Stubs.Modifier),
+            composedStub,
+            inspectableInfoStub,
             kotlin(
                 """
                 package androidx.compose.ui
@@ -447,8 +425,9 @@ class ModifierInspectorInfoDetectorTest : LintDetectorTest() {
     @Test
     fun existingInspectorInfoWithWhen() {
         lint().files(
-            modifierFile,
-            inspectableInfoFile,
+            kotlin(Stubs.Modifier),
+            composedStub,
+            inspectableInfoStub,
             kotlin(
                 """
                 package androidx.compose.ui
@@ -487,8 +466,9 @@ class ModifierInspectorInfoDetectorTest : LintDetectorTest() {
     @Test
     fun existingInspectorInfoWithConditionals() {
         lint().files(
-            modifierFile,
-            inspectableInfoFile,
+            kotlin(Stubs.Modifier),
+            composedStub,
+            inspectableInfoStub,
             kotlin(
                 """
                 package androidx.compose.ui
@@ -545,8 +525,9 @@ class ModifierInspectorInfoDetectorTest : LintDetectorTest() {
     @Test
     fun composedModifierWithInspectorInfo() {
         lint().files(
-            modifierFile,
-            inspectableInfoFile,
+            kotlin(Stubs.Modifier),
+            composedStub,
+            inspectableInfoStub,
             kotlin(
                 """
                 package androidx.compose.ui
@@ -585,9 +566,10 @@ class ModifierInspectorInfoDetectorTest : LintDetectorTest() {
     @Test
     fun rememberModifierInfo() {
         lint().files(
-            modifierFile,
-            rememberFile,
-            inspectableInfoFile,
+            kotlin(Stubs.Modifier),
+            composedStub,
+            kotlin(Stubs.Remember),
+            inspectableInfoStub,
             kotlin(
                 """
                 package androidx.compose.ui
@@ -622,7 +604,8 @@ class ModifierInspectorInfoDetectorTest : LintDetectorTest() {
     @Test
     fun emptyModifier() {
         lint().files(
-            modifierFile,
+            kotlin(Stubs.Modifier),
+            composedStub,
             kotlin(
                 """
                 package androidx.compose.ui
@@ -641,8 +624,9 @@ class ModifierInspectorInfoDetectorTest : LintDetectorTest() {
     @Test
     fun acceptMissingInspectorInfoInSamples() {
         lint().files(
-            modifierFile,
-            inspectableInfoFile,
+            kotlin(Stubs.Modifier),
+            composedStub,
+            inspectableInfoStub,
             kotlin(
                 """
                 package androidx.compose.ui.demos.whatever
@@ -668,8 +652,9 @@ class ModifierInspectorInfoDetectorTest : LintDetectorTest() {
     @Test
     fun missingInspectorInfo() {
         lint().files(
-            modifierFile,
-            inspectableInfoFile,
+            kotlin(Stubs.Modifier),
+            composedStub,
+            inspectableInfoStub,
             kotlin(
                 """
                 package androidx.compose.ui
@@ -702,8 +687,9 @@ class ModifierInspectorInfoDetectorTest : LintDetectorTest() {
     @Test
     fun composedModifierWithMissingInspectorInfo() {
         lint().files(
-            modifierFile,
-            inspectableInfoFile,
+            kotlin(Stubs.Modifier),
+            composedStub,
+            inspectableInfoStub,
             kotlin(
                 """
                 package androidx.compose.ui
@@ -736,8 +722,9 @@ class ModifierInspectorInfoDetectorTest : LintDetectorTest() {
     @Test
     fun missingInspectorInfoFromInnerClassImplementation() {
         lint().files(
-            modifierFile,
-            inspectableInfoFile,
+            kotlin(Stubs.Modifier),
+            composedStub,
+            inspectableInfoStub,
             kotlin(
                 """
                 package androidx.compose.ui
@@ -775,8 +762,9 @@ class ModifierInspectorInfoDetectorTest : LintDetectorTest() {
     @Test
     fun inspectorInfoWithWrongName() {
         lint().files(
-            modifierFile,
-            inspectableInfoFile,
+            kotlin(Stubs.Modifier),
+            composedStub,
+            inspectableInfoStub,
             kotlin(
                 """
                 package androidx.compose.ui
@@ -815,8 +803,9 @@ class ModifierInspectorInfoDetectorTest : LintDetectorTest() {
     @Test
     fun inspectorInfoWithWrongValue() {
         lint().files(
-            modifierFile,
-            inspectableInfoFile,
+            kotlin(Stubs.Modifier),
+            composedStub,
+            inspectableInfoStub,
             kotlin(
                 """
                 package androidx.compose.ui
@@ -855,8 +844,9 @@ class ModifierInspectorInfoDetectorTest : LintDetectorTest() {
     @Test
     fun inspectorInfoWithWrongValueWhenMultipleAreAvailable() {
         lint().files(
-            modifierFile,
-            inspectableInfoFile,
+            kotlin(Stubs.Modifier),
+            composedStub,
+            inspectableInfoStub,
             kotlin(
                 """
                 package androidx.compose.ui
@@ -895,8 +885,9 @@ class ModifierInspectorInfoDetectorTest : LintDetectorTest() {
     @Test
     fun inspectorInfoWithWrongParameterNameInProperties() {
         lint().files(
-            modifierFile,
-            inspectableInfoFile,
+            kotlin(Stubs.Modifier),
+            composedStub,
+            inspectableInfoStub,
             kotlin(
                 """
                 package androidx.compose.ui
@@ -936,8 +927,9 @@ class ModifierInspectorInfoDetectorTest : LintDetectorTest() {
     @Test
     fun inspectorInfoWithMismatchInProperties() {
         lint().files(
-            modifierFile,
-            inspectableInfoFile,
+            kotlin(Stubs.Modifier),
+            composedStub,
+            inspectableInfoStub,
             kotlin(
                 """
                 package androidx.compose.ui
@@ -976,8 +968,9 @@ class ModifierInspectorInfoDetectorTest : LintDetectorTest() {
     @Test
     fun inspectorInfoWithMissingDebugSelector() {
         lint().files(
-            modifierFile,
-            inspectableInfoFile,
+            kotlin(Stubs.Modifier),
+            composedStub,
+            inspectableInfoStub,
             kotlin(
                 """
                 package androidx.compose.ui
@@ -1017,8 +1010,9 @@ class ModifierInspectorInfoDetectorTest : LintDetectorTest() {
     @Test
     fun inspectorInfoWithMissingName() {
         lint().files(
-            modifierFile,
-            inspectableInfoFile,
+            kotlin(Stubs.Modifier),
+            composedStub,
+            inspectableInfoStub,
             kotlin(
                 """
                 package androidx.compose.ui
@@ -1056,8 +1050,9 @@ class ModifierInspectorInfoDetectorTest : LintDetectorTest() {
     @Test
     fun inspectorInfoWithMissingVariables() {
         lint().files(
-            modifierFile,
-            inspectableInfoFile,
+            kotlin(Stubs.Modifier),
+            composedStub,
+            inspectableInfoStub,
             kotlin(
                 """
                 package androidx.compose.ui
@@ -1102,8 +1097,9 @@ class ModifierInspectorInfoDetectorTest : LintDetectorTest() {
     @Test
     fun inspectorInfoWithMissingDataClassMemberValues() {
         lint().files(
-            modifierFile,
-            inspectableInfoFile,
+            kotlin(Stubs.Modifier),
+            composedStub,
+            inspectableInfoStub,
             kotlin(
                 """
                 package androidx.compose.ui
@@ -1147,8 +1143,9 @@ class ModifierInspectorInfoDetectorTest : LintDetectorTest() {
     @Test
     fun missingInfoInConditionals() {
         lint().files(
-            modifierFile,
-            inspectableInfoFile,
+            kotlin(Stubs.Modifier),
+            composedStub,
+            inspectableInfoStub,
             kotlin(
                 """
                 package androidx.compose.ui

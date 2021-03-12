@@ -18,6 +18,7 @@
 
 package androidx.compose.runtime.lint
 
+import androidx.compose.lint.Names
 import com.android.tools.lint.client.api.UElementHandler
 import com.android.tools.lint.detector.api.Category
 import com.android.tools.lint.detector.api.Detector
@@ -53,10 +54,10 @@ class CompositionLocalNamingDetector : Detector(), SourceCodeScanner {
             if ((node.sourcePsi as? KtProperty)?.isLocal == true) return
 
             val type = node.type
-            if (!InheritanceUtil.isInheritor(type, CompositionLocalFqn)) return
+            if (!InheritanceUtil.isInheritor(type, Names.Runtime.CompositionLocal.javaFqn)) return
 
             val name = node.name
-            if (name!!.startsWith(CompositionLocalPrefix, ignoreCase = true)) return
+            if (name!!.startsWith("Local", ignoreCase = true)) return
 
             // Kotlinc can't disambiguate overloads for report / getNameLocation otherwise
             val uElementNode: UElement = node
@@ -86,6 +87,3 @@ class CompositionLocalNamingDetector : Detector(), SourceCodeScanner {
         )
     }
 }
-
-private const val CompositionLocalFqn = "androidx.compose.runtime.CompositionLocal"
-private const val CompositionLocalPrefix = "Local"

@@ -187,7 +187,7 @@ val currentCompositeKeyHash: Int
 @OptIn(ComposeCompilerApi::class)
 // ComposeNode is a special case of readonly composable and handles creating its own groups, so
 // it is okay to use.
-@Suppress("NONREADONLY_CALL_IN_READONLY_COMPOSABLE")
+@Suppress("NONREADONLY_CALL_IN_READONLY_COMPOSABLE", "UnnecessaryLambdaCreation")
 @Composable inline fun <T : Any, reified E : Applier<*>> ComposeNode(
     noinline factory: () -> T,
     update: @DisallowComposableCalls Updater<T>.() -> Unit

@@ -1,5 +1,5 @@
 /*
- * Copyright 2020 The Android Open Source Project
+ * Copyright 2021 The Android Open Source Project
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,14 +14,16 @@
  * limitations under the License.
  */
 
-@file:Suppress("UnstableApiUsage")
+package androidx.compose.lint
 
-package androidx.compose.runtime.lint
+import org.intellij.lang.annotations.Language
 
-import com.android.tools.lint.checks.infrastructure.LintDetectorTest
-
-val composableStub: LintDetectorTest.TestFile = LintDetectorTest.kotlin(
-    """
+/**
+ * Common Compose-related lint stubs used for testing
+ */
+object Stubs {
+    val Composable = stub(
+        """
         package androidx.compose.runtime
 
         @MustBeDocumented
@@ -33,11 +35,36 @@ val composableStub: LintDetectorTest.TestFile = LintDetectorTest.kotlin(
             AnnotationTarget.PROPERTY
         )
         annotation class Composable
-    """
-)
+        """
+    )
 
-val rememberStub: LintDetectorTest.TestFile = LintDetectorTest.kotlin(
-"""
+    val Modifier = stub(
+        """
+        package androidx.compose.ui
+
+        import androidx.compose.ui.platform.InspectorInfo
+        import androidx.compose.ui.platform.InspectorValueInfo
+
+        interface Modifier {
+          infix fun then(other: Modifier): Modifier =
+              if (other === Modifier) this else CombinedModifier(this, other)
+
+          interface Element : Modifier
+
+          companion object : Modifier {
+            override infix fun then(other: Modifier): Modifier = other
+          }
+        }
+
+        class CombinedModifier(
+            private val outer: Modifier,
+            private val inner: Modifier
+        ) : Modifier
+        """
+    )
+
+    val Remember = stub(
+        """
         package androidx.compose.runtime
 
         import androidx.compose.runtime.Composable
@@ -71,21 +98,9 @@ val rememberStub: LintDetectorTest.TestFile = LintDetectorTest.kotlin(
             vararg inputs: Any?,
             calculation: () -> V
         ): V = calculation()
-    """
-)
+        """
+    )
+}
 
-val coroutineBuildersStub: LintDetectorTest.TestFile = LintDetectorTest.kotlin(
-    """
-        package kotlinx.coroutines
-
-        object CoroutineScope
-
-        fun CoroutineScope.async(
-            block: suspend CoroutineScope.() -> Unit
-        ) {}
-
-        fun CoroutineScope.launch(
-            block: suspend CoroutineScope.() -> Unit
-        ) {}
-    """
-)
+// @Language isn't available as a type annotation, so we need a parameter
+private fun stub(@Language("kotlin") code: String) = code

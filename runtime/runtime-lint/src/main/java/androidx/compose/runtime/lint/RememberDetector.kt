@@ -18,6 +18,8 @@
 
 package androidx.compose.runtime.lint
 
+import androidx.compose.lint.Names
+import androidx.compose.lint.isInPackageName
 import com.android.tools.lint.detector.api.Category
 import com.android.tools.lint.detector.api.Detector
 import com.android.tools.lint.detector.api.Implementation
@@ -26,7 +28,6 @@ import com.android.tools.lint.detector.api.JavaContext
 import com.android.tools.lint.detector.api.Scope
 import com.android.tools.lint.detector.api.Severity
 import com.android.tools.lint.detector.api.SourceCodeScanner
-import com.intellij.psi.PsiJavaFile
 import com.intellij.psi.PsiMethod
 import com.intellij.psi.PsiType
 import org.jetbrains.uast.UCallExpression
@@ -36,10 +37,10 @@ import java.util.EnumSet
  * [Detector] that checks `remember` calls to make sure they are not returning [Unit].
  */
 class RememberDetector : Detector(), SourceCodeScanner {
-    override fun getApplicableMethodNames(): List<String> = listOf(RememberShortName)
+    override fun getApplicableMethodNames(): List<String> = listOf(Names.Runtime.Remember.shortName)
 
     override fun visitMethodCall(context: JavaContext, node: UCallExpression, method: PsiMethod) {
-        if ((method.containingFile as? PsiJavaFile)?.packageName == RuntimePackageName) {
+        if (method.isInPackageName(Names.Runtime.packageName)) {
             if (node.getExpressionType() == PsiType.VOID) {
                 context.report(
                     RememberReturnType,
