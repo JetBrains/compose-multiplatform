@@ -50,6 +50,7 @@ import androidx.compose.ui.test.performClick
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import androidx.test.filters.FlakyTest
 import androidx.test.filters.LargeTest
 import androidx.test.filters.SdkSuppress
 import com.google.common.truth.Truth.assertThat
@@ -275,6 +276,7 @@ class DrawModifierTest {
         }
     }
 
+    @FlakyTest(bugId = 182512695)
     @Test
     fun testCacheInvalidatedAfterLayoutDirectionChange() {
         var cacheBuildCount = 0
