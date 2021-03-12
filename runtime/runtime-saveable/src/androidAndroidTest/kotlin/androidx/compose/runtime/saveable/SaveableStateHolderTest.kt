@@ -16,12 +16,15 @@
 
 package androidx.compose.runtime.saveable
 
+import android.os.Bundle
+import androidx.activity.ComponentActivity
+import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.test.junit4.StateRestorationTester
-import androidx.compose.ui.test.junit4.createComposeRule
+import androidx.compose.ui.test.junit4.createAndroidComposeRule
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.MediumTest
 import com.google.common.truth.Truth.assertThat
@@ -34,7 +37,7 @@ import org.junit.runner.RunWith
 class SaveableStateHolderTest {
 
     @get:Rule
-    val rule = createComposeRule()
+    val rule = createAndroidComposeRule<Activity>()
 
     private val restorationTester = StateRestorationTester(rule)
 
@@ -254,6 +257,44 @@ class SaveableStateHolderTest {
 
         rule.runOnIdle {
             assertThat(restorableNumberOnScreen1).isEqualTo(1)
+        }
+    }
+
+    @Test
+    fun restoringStateOfThePreviousPageAfterCreatingBundle() {
+        var showFirstPage by mutableStateOf(true)
+        var firstPageState: MutableState<Int>? = null
+
+        rule.setContent {
+            val holder = rememberSaveableStateHolder()
+            holder.SaveableStateProvider(showFirstPage) {
+                if (showFirstPage) {
+                    firstPageState = rememberSaveable { mutableStateOf(0) }
+                }
+            }
+        }
+
+        rule.runOnIdle {
+            assertThat(firstPageState!!.value).isEqualTo(0)
+            // change the value, so we can assert this change will be restored
+            firstPageState!!.value = 1
+            firstPageState = null
+            showFirstPage = false
+        }
+
+        rule.runOnIdle {
+            rule.activity.doFakeSave()
+            showFirstPage = true
+        }
+
+        rule.runOnIdle {
+            assertThat(firstPageState!!.value).isEqualTo(1)
+        }
+    }
+
+    class Activity : ComponentActivity() {
+        fun doFakeSave() {
+            onSaveInstanceState(Bundle())
         }
     }
 }

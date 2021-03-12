@@ -30,5 +30,6 @@
         <activity android:name="androidx.compose.runtime.saveable.RecreationTest6Activity" />
         <activity android:name="androidx.compose.runtime.saveable.RecreationTest7Activity" />
         <activity android:name="androidx.compose.runtime.saveable.RecreationTest8Activity" />
+        <activity android:name="androidx.compose.runtime.saveable.SaveableStateHolderTest$Activity" />
     </application>
 </manifest>

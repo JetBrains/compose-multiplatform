@@ -18,6 +18,7 @@ package androidx.compose.runtime
 
 import android.os.Looper
 import android.view.Choreographer
+import androidx.compose.runtime.snapshots.SnapshotMutableState
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.runBlocking
@@ -80,3 +81,8 @@ actual val DefaultMonotonicFrameClock: MonotonicFrameClock by lazy {
     if (Looper.getMainLooper() != null) DefaultChoreographerFrameClock
     else SdkStubsFallbackFrameClock
 }
+
+internal actual fun <T> createSnapshotMutableState(
+    value: T,
+    policy: SnapshotMutationPolicy<T>
+): SnapshotMutableState<T> = ParcelableSnapshotMutableState(value, policy)
