@@ -44,6 +44,7 @@ import com.android.build.gradle.LibraryExtension
 import com.android.build.gradle.LibraryPlugin
 import com.android.build.gradle.TestedExtension
 import com.android.build.gradle.api.ApkVariant
+import org.gradle.api.GradleException
 import org.gradle.api.JavaVersion.VERSION_1_8
 import org.gradle.api.Plugin
 import org.gradle.api.Project
@@ -675,6 +676,9 @@ class AndroidXPlugin : Plugin<Project> {
     }
 }
 
+private const val PROJECTS_MAP_KEY = "projects"
+private const val ACCESSED_PROJECTS_MAP_KEY = "accessedProjectsMap"
+
 /**
  * Hides a project's Javadoc tasks from the output of `./gradlew tasks` by setting their group to
  * `null`.
@@ -698,8 +702,15 @@ private fun Project.addToProjectMap(extension: AndroidXExtension) {
             if (group != null) {
                 val module = "$group:$name"
 
+                if (project.rootProject.extra.has(ACCESSED_PROJECTS_MAP_KEY)) {
+                    throw GradleException(
+                        "Attempted to add $project to project map after " +
+                            "the contents of the map were accessed"
+                    )
+                }
                 @Suppress("UNCHECKED_CAST")
-                val projectModules = getProjectsMap()
+                val projectModules = project.rootProject.extra.get(PROJECTS_MAP_KEY)
+                    as ConcurrentHashMap<String, String>
                 projectModules[module] = path
             }
         }
@@ -723,7 +734,8 @@ private fun Project.createCheckReleaseReadyTask(taskProviderList: List<TaskProvi
 
 @Suppress("UNCHECKED_CAST")
 fun Project.getProjectsMap(): ConcurrentHashMap<String, String> {
-    return rootProject.extra.get("projects") as ConcurrentHashMap<String, String>
+    project.rootProject.extra.set(ACCESSED_PROJECTS_MAP_KEY, true)
+    return rootProject.extra.get(PROJECTS_MAP_KEY) as ConcurrentHashMap<String, String>
 }
 
 /**
