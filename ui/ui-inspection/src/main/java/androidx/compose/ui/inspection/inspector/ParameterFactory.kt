@@ -121,7 +121,7 @@ internal class ParameterFactory(private val inlineClassConverter: InlineClassCon
      */
     fun create(
         rootId: Long,
-        node: InspectorNode,
+        nodeId: Long,
         name: String,
         value: Any?,
         parameterIndex: Int,
@@ -133,7 +133,7 @@ internal class ParameterFactory(private val inlineClassConverter: InlineClassCon
             return reflectionScope.withReflectiveAccess {
                 creator.create(
                     rootId,
-                    node,
+                    nodeId,
                     name,
                     value,
                     parameterIndex,
@@ -149,9 +149,10 @@ internal class ParameterFactory(private val inlineClassConverter: InlineClassCon
     /**
      * Create/expand the [NodeParameter] specified by [reference].
      *
-     * @param node is the [InspectorNode] with the id of [reference].nodeId.
-     * @param name is the name of the [reference].parameterIndex'th parameter of [node].
-     * @param value is the value of the [reference].parameterIndex'th parameter of [node].
+     * @param rootId is the root id of the specified [nodeId].
+     * @param nodeId is the [InspectorNode.id] of the node the parameter belongs to.
+     * @param name is the name of the [reference].parameterIndex'th parameter of the node.
+     * @param value is the value of the [reference].parameterIndex'th parameter of the node.
      * @param startIndex is the index of the 1st wanted element of a List/Array.
      * @param maxElements is the max number of elements wanted from a List/Array.
      * @param maxRecursions is the max recursion into composite types starting from reference.
@@ -159,7 +160,7 @@ internal class ParameterFactory(private val inlineClassConverter: InlineClassCon
      */
     fun expand(
         rootId: Long,
-        node: InspectorNode,
+        nodeId: Long,
         name: String,
         value: Any?,
         reference: NodeParameterReference,
@@ -173,7 +174,7 @@ internal class ParameterFactory(private val inlineClassConverter: InlineClassCon
             return reflectionScope.withReflectiveAccess {
                 creator.expand(
                     rootId,
-                    node,
+                    nodeId,
                     name,
                     value,
                     reference,
@@ -315,7 +316,7 @@ internal class ParameterFactory(private val inlineClassConverter: InlineClassCon
      */
     private inner class ParameterCreator {
         private var rootId = 0L
-        private var node: InspectorNode? = null
+        private var nodeId = 0L
         private var parameterIndex = 0
         private var maxRecursions = 0
         private var maxInitialIterableSize = 0
@@ -328,7 +329,7 @@ internal class ParameterFactory(private val inlineClassConverter: InlineClassCon
 
         fun create(
             rootId: Long,
-            node: InspectorNode,
+            nodeId: Long,
             name: String,
             value: Any?,
             parameterIndex: Int,
@@ -336,7 +337,7 @@ internal class ParameterFactory(private val inlineClassConverter: InlineClassCon
             maxInitialIterableSize: Int
         ): NodeParameter =
             try {
-                setup(rootId, node, parameterIndex, maxRecursions, maxInitialIterableSize)
+                setup(rootId, nodeId, parameterIndex, maxRecursions, maxInitialIterableSize)
                 create(name, value) ?: createEmptyParameter(name)
             } finally {
                 setup()
@@ -344,7 +345,7 @@ internal class ParameterFactory(private val inlineClassConverter: InlineClassCon
 
         fun expand(
             rootId: Long,
-            node: InspectorNode,
+            nodeId: Long,
             name: String,
             value: Any?,
             reference: NodeParameterReference,
@@ -353,7 +354,7 @@ internal class ParameterFactory(private val inlineClassConverter: InlineClassCon
             maxRecursions: Int,
             maxInitialIterableSize: Int
         ): NodeParameter? {
-            setup(rootId, node, reference.parameterIndex, maxRecursions, maxInitialIterableSize)
+            setup(rootId, nodeId, reference.parameterIndex, maxRecursions, maxInitialIterableSize)
             var new = Pair(name, value)
             for (i in reference.indices) {
                 new = find(new.first, new.second, i) ?: return null
@@ -377,13 +378,13 @@ internal class ParameterFactory(private val inlineClassConverter: InlineClassCon
 
         private fun setup(
             newRootId: Long = 0,
-            newNode: InspectorNode? = null,
+            newNodeId: Long = 0,
             newParameterIndex: Int = 0,
             maxRecursions: Int = 0,
             maxInitialIterableSize: Int = 0
         ) {
             rootId = newRootId
-            node = newNode
+            nodeId = newNodeId
             parameterIndex = newParameterIndex
             this.maxRecursions = maxRecursions
             this.maxInitialIterableSize = maxInitialIterableSize
@@ -558,7 +559,7 @@ internal class ParameterFactory(private val inlineClassConverter: InlineClassCon
         }
 
         private fun valueIndexToReference(): NodeParameterReference =
-            NodeParameterReference(node!!.id, parameterIndex, valueIndex)
+            NodeParameterReference(nodeId, parameterIndex, valueIndex)
 
         private fun createEmptyParameter(name: String): NodeParameter =
             NodeParameter(name, ParameterType.String, "")

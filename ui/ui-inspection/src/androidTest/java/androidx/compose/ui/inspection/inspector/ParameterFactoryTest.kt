@@ -94,11 +94,6 @@ private fun topLevelFunction() {
 @RunWith(AndroidJUnit4::class)
 class ParameterFactoryTest {
     private val factory = ParameterFactory(InlineClassConverter())
-    private val node = MutableInspectorNode().apply {
-        width = 1000
-        height = 500
-        id = NODE_ID
-    }.build()
 
     @Before
     fun before() {
@@ -836,7 +831,7 @@ class ParameterFactoryTest {
     ): NodeParameter {
         val parameter = factory.create(
             ROOT_ID,
-            node,
+            NODE_ID,
             name,
             value,
             PARAM_INDEX,
@@ -869,7 +864,7 @@ class ParameterFactoryTest {
     ): NodeParameter? =
         factory.expand(
             ROOT_ID,
-            node,
+            NODE_ID,
             name,
             value,
             reference,
