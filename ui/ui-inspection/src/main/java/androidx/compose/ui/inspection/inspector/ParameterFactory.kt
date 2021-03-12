@@ -426,7 +426,6 @@ internal class ParameterFactory(private val inlineClassConverter: InlineClassCon
                 is Boolean -> NodeParameter(name, ParameterType.Boolean, value)
                 is ComposableLambda -> createFromCLambda(name, value)
                 is Color -> NodeParameter(name, ParameterType.Color, value.toArgb())
-//              is CornerSize -> createFromCornerSize(name, value)
                 is Double -> NodeParameter(name, ParameterType.Double, value)
                 is Dp -> NodeParameter(name, DimensionDp, value.value)
                 is Enum<*> -> NodeParameter(name, ParameterType.String, value.toString())
@@ -556,7 +555,20 @@ internal class ParameterFactory(private val inlineClassConverter: InlineClassCon
             if (value != null) {
                 val index = valueIndexToReference()
                 valueIndexMap[value] = index
-                valueLazyReferenceMap.remove(value)?.forEach { it.reference = index }
+            }
+            return this
+        }
+
+        /**
+         * Remove the [value] of this [NodeParameter] if there are no child elements.
+         */
+        private fun NodeParameter.removeIfEmpty(value: Any?): NodeParameter {
+            if (value != null) {
+                if (elements.isEmpty()) {
+                    valueIndexMap.remove(value)
+                }
+                val reference = valueIndexMap[value]
+                valueLazyReferenceMap.remove(value)?.forEach { it.reference = reference }
             }
             return this
         }
@@ -632,12 +644,6 @@ internal class ParameterFactory(private val inlineClassConverter: InlineClassCon
             return valueLookup[value]?.let { NodeParameter(name, ParameterType.String, it) }
         }
 
-//        private fun createFromCornerSize(name: String, value: CornerSize): NodeParameter {
-//            val size = Size(node!!.width.toFloat(), node!!.height.toFloat())
-//            val pixels = value.toPx(size, density)
-//            return NodeParameter(name, DimensionDp, with(density) { pixels.toDp().value })
-//        }
-
         // For now: select ResourceFontFont closest to W400 and Normal, and return the resId
         private fun createFromFontListFamily(
             name: String,
@@ -665,7 +671,7 @@ internal class ParameterFactory(private val inlineClassConverter: InlineClassCon
                     properties.values.mapIndexedNotNullTo(elements) { index, part ->
                         createRecursively(part.name, valueOf(part, value), value, index)
                     }
-                    parameter
+                    parameter.removeIfEmpty(value)
                 }
             }
         }
@@ -726,7 +732,7 @@ internal class ParameterFactory(private val inlineClassConverter: InlineClassCon
             value.inspectableElements.mapIndexedNotNullTo(elements) { index, element ->
                 createRecursively(element.name, element.value, value, index)
             }
-            return parameter
+            return parameter.removeIfEmpty(value)
         }
 
         private fun findFromInspectableValue(
@@ -791,7 +797,7 @@ internal class ParameterFactory(private val inlineClassConverter: InlineClassCon
                             break
                         }
                     }
-                    parameter
+                    parameter.removeIfEmpty(value)
                 }
             }
         }
@@ -834,7 +840,7 @@ internal class ParameterFactory(private val inlineClassConverter: InlineClassCon
                         modifiers.mapIndexedNotNullTo(elements) { index, element ->
                             createRecursively("", element, value, index)
                         }
-                        parameter.store(value)
+                        parameter.store(value).removeIfEmpty(value)
                     }
                 }
             }

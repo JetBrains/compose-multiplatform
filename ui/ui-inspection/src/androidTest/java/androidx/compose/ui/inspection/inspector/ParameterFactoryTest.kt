@@ -76,7 +76,6 @@ import com.google.common.truth.Truth.assertWithMessage
 import kotlinx.coroutines.runBlocking
 import org.junit.After
 import org.junit.Before
-import org.junit.Ignore
 import org.junit.Test
 import org.junit.runner.RunWith
 
@@ -253,7 +252,6 @@ class ParameterFactoryTest {
         )
     }
 
-    @Ignore
     @Test
     fun testCornerBasedShape() {
         validate(create("corner", RoundedCornerShape(2.0.dp, 0.5.dp, 2.5.dp, 0.7.dp))) {
@@ -266,18 +264,18 @@ class ParameterFactoryTest {
         }
         validate(create("corner", CutCornerShape(2))) {
             parameter("corner", ParameterType.String, CutCornerShape::class.java.simpleName) {
-                parameter("bottomEnd", ParameterType.DimensionDp, 5.0f)
-                parameter("bottomStart", ParameterType.DimensionDp, 5.0f)
-                parameter("topEnd", ParameterType.DimensionDp, 5.0f)
-                parameter("topStart", ParameterType.DimensionDp, 5.0f)
+                parameter("bottomEnd", ParameterType.String, "2.0%")
+                parameter("bottomStart", ParameterType.String, "2.0%")
+                parameter("topEnd", ParameterType.String, "2.0%")
+                parameter("topStart", ParameterType.String, "2.0%")
             }
         }
         validate(create("corner", RoundedCornerShape(1.0f, 10.0f, 2.0f, 3.5f))) {
             parameter("corner", ParameterType.String, RoundedCornerShape::class.java.simpleName) {
-                parameter("bottomEnd", ParameterType.DimensionDp, 1.0f)
-                parameter("bottomStart", ParameterType.DimensionDp, 1.75f)
-                parameter("topEnd", ParameterType.DimensionDp, 5.0f)
-                parameter("topStart", ParameterType.DimensionDp, 0.5f)
+                parameter("bottomEnd", ParameterType.String, "2.0px")
+                parameter("bottomStart", ParameterType.String, "3.5px")
+                parameter("topEnd", ParameterType.String, "10.0px")
+                parameter("topStart", ParameterType.String, "1.0px")
             }
         }
     }
