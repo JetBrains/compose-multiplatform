@@ -62,6 +62,7 @@ val AnimationDemos = DemoCategory(
             "Fun Demos",
             listOf(
                 ComposableDemo("Animated clock") { AnimatedClockDemo() },
+                ComposableDemo("Animated dots") { AnimatedDotsDemo() },
                 ComposableDemo("Game of fling") { FlingGame() },
                 ComposableDemo("Spring chain") { SpringChainDemo() },
             )
