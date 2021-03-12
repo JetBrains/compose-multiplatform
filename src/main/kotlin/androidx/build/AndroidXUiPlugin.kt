@@ -194,7 +194,7 @@ class AndroidXUiPlugin : Plugin<Project> {
                 "lintChecks",
                 project.dependencies.project(
                     mapOf(
-                        "path" to ":compose:internal-lint-checks",
+                        "path" to ":compose:lint:internal-lint-checks",
                         "configuration" to "shadow"
                     )
                 )

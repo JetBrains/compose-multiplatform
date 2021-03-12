@@ -130,6 +130,12 @@ fun shouldVerifyConfiguration(configuration: Configuration): Boolean {
     if (name.startsWith("lint")) return false
     if (name == "metalava") return false
 
+    // Don't check any configurations that directly bundle the dependencies with the output
+    if (name == "bundleInside") return false
+
+    // Don't check any compile-only configurations
+    if (name.startsWith("compile")) return false
+
     return true
 }
 
