@@ -29,7 +29,7 @@ import androidx.compose.runtime.key
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.alpha
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.util.fastForEach
 
 /**
@@ -70,7 +70,7 @@ fun <T> Crossfade(
                 val alpha by transition.animateFloat(
                     transitionSpec = { animationSpec }
                 ) { if (it == key) 1f else 0f }
-                Box(Modifier.alpha(alpha = alpha)) {
+                Box(Modifier.graphicsLayer { this.alpha = alpha }) {
                     content(key)
                 }
             }
