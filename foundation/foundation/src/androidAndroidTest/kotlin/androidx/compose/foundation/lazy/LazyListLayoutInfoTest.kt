@@ -21,6 +21,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.requiredSize
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.Stable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
@@ -126,14 +127,14 @@ class LazyListLayoutInfoTest(
         }
     }
 
+    @Composable
+    fun ObservingFun(state: LazyListState, currentInfo: StableRef<LazyListLayoutInfo?>) {
+        currentInfo.value = state.layoutInfo
+    }
     @Test
     fun visibleItemsAreObservableWhenWeScroll() {
         lateinit var state: LazyListState
-        var currentInfo: LazyListLayoutInfo? = null
-        @Composable
-        fun observingFun() {
-            currentInfo = state.layoutInfo
-        }
+        val currentInfo = StableRef<LazyListLayoutInfo?>(null)
         rule.setContent {
             LazyColumn(
                 state = rememberLazyListState().also { state = it },
@@ -144,20 +145,20 @@ class LazyListLayoutInfoTest(
                     Box(Modifier.requiredSize(itemSizeDp))
                 }
             }
-            observingFun()
+            ObservingFun(state, currentInfo)
         }
 
         rule.runOnIdle {
             // empty it here and scrolling should invoke observingFun again
-            currentInfo = null
+            currentInfo.value = null
             runBlocking {
                 state.scrollToItem(1, 0)
             }
         }
 
         rule.runOnIdle {
-            assertThat(currentInfo).isNotNull()
-            currentInfo!!.assertVisibleItems(count = 4, startIndex = 1)
+            assertThat(currentInfo.value).isNotNull()
+            currentInfo.value!!.assertVisibleItems(count = 4, startIndex = 1)
         }
     }
 
@@ -291,3 +292,6 @@ class LazyListLayoutInfoTest(
         }
     }
 }
+
+@Stable
+class StableRef<T>(var value: T)

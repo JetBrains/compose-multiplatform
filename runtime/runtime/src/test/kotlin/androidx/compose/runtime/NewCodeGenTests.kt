@@ -117,51 +117,50 @@ class NewCodeGenTests {
         validate()
     }
 
+    @Composable
+    fun PhoneView(phone: Phone, phoneCalled: StableCounter) {
+        phoneCalled.count++
+        Text(
+            "${if (phone.area.isBlank()) "" else "(${phone.area}) "}${
+            phone.prefix}-${phone.number}"
+        )
+    }
+
     @Test
     fun testComposableFunctionInvocationOneParameter() = compositionTest {
-        data class Phone(val area: String, val prefix: String, val number: String)
-
         var phone by mutableStateOf(Phone("123", "456", "7890"))
-        var phoneCalled = 0
+        val phoneCalled = StableCounter()
         var scope: RecomposeScope? = null
         compose {
-            @Composable
-            fun PhoneView(phone: Phone) {
-                phoneCalled++
-                Text(
-                    "${if (phone.area.isBlank()) "" else "(${phone.area}) "}${
-                    phone.prefix}-${phone.number}"
-                )
-            }
             scope = currentRecomposeScope
-            PhoneView(phone)
+            PhoneView(phone, phoneCalled)
         }
 
-        assertEquals(1, phoneCalled)
+        assertEquals(1, phoneCalled.count)
         scope?.invalidate()
         advance()
-        assertEquals(1, phoneCalled)
+        assertEquals(1, phoneCalled.count)
 
         phone = Phone("124", "456", "7890")
         advance()
-        assertEquals(2, phoneCalled)
+        assertEquals(2, phoneCalled.count)
+    }
+
+    @Composable
+    fun AddView(left: Int, right: Int, addCalled: StableCounter) {
+        addCalled.count++
+        Text("$left + $right = ${left + right}")
     }
 
     @Test
     fun testComposableFunctionInvocationTwoParameters() = compositionTest {
         var left by mutableStateOf(0)
         var right by mutableStateOf(1)
-        var addCalled = 0
+        val addCalled = StableCounter()
         var scope: RecomposeScope? = null
         compose {
-            @Composable
-            fun AddView(left: Int, right: Int) {
-                addCalled++
-                Text("$left + $right = ${left + right}")
-            }
-
             scope = currentRecomposeScope
-            AddView(left, right)
+            AddView(left, right, addCalled)
         }
 
         fun validate() {
@@ -170,27 +169,27 @@ class NewCodeGenTests {
             }
         }
         validate()
-        assertEquals(1, addCalled)
+        assertEquals(1, addCalled.count)
 
         scope?.invalidate()
         advance()
         validate()
-        assertEquals(1, addCalled)
+        assertEquals(1, addCalled.count)
 
         left = 1
         advance()
         validate()
-        assertEquals(2, addCalled)
+        assertEquals(2, addCalled.count)
 
         scope?.invalidate()
         advance()
         validate()
-        assertEquals(2, addCalled)
+        assertEquals(2, addCalled.count)
 
         right = 41
         advance()
         validate()
-        assertEquals(3, addCalled)
+        assertEquals(3, addCalled.count)
     }
 
     @Test
@@ -221,3 +220,8 @@ class NewCodeGenTests {
         validate()
     }
 }
+
+@Stable
+class StableCounter(var count: Int = 0)
+
+data class Phone(val area: String, val prefix: String, val number: String)
