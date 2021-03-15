@@ -18,6 +18,8 @@
 
 package androidx.compose.ui.lint
 
+import androidx.compose.lint.Names
+import androidx.compose.lint.isComposable
 import androidx.compose.ui.lint.ModifierDeclarationDetector.Companion.ComposableModifierFactory
 import androidx.compose.ui.lint.ModifierDeclarationDetector.Companion.ModifierFactoryReturnType
 import com.android.tools.lint.client.api.UElementHandler
@@ -64,7 +66,7 @@ class ModifierDeclarationDetector : Detector(), SourceCodeScanner {
             val returnType = node.returnType ?: return
 
             // Ignore functions that do not return Modifier or something implementing Modifier
-            if (!InheritanceUtil.isInheritor(returnType, ModifierFqn)) return
+            if (!InheritanceUtil.isInheritor(returnType, Names.Ui.Modifier.javaFqn)) return
 
             val source = node.sourcePsi
 
@@ -207,7 +209,7 @@ private fun UMethod.checkReceiver(context: JavaContext) {
                 .name("Add Modifier receiver")
                 .range(context.getLocation(source))
                 .text(name)
-                .with("$ModifierShortName.$name")
+                .with("${Names.Ui.Modifier.shortName}.$name")
                 .autoFix()
                 .build()
         )
@@ -220,10 +222,10 @@ private fun UMethod.checkReceiver(context: JavaContext) {
             )?.qualifiedName
         val hasModifierReceiver = if (receiverFqn != null) {
             // If we could resolve the class, match fqn
-            receiverFqn == ModifierFqn
+            receiverFqn == Names.Ui.Modifier.javaFqn
         } else {
             // Otherwise just try and match the short names
-            receiverShortName == ModifierShortName
+            receiverShortName == Names.Ui.Modifier.shortName
         }
         if (!hasModifierReceiver) {
             report(
@@ -232,7 +234,7 @@ private fun UMethod.checkReceiver(context: JavaContext) {
                     .name("Change receiver to Modifier")
                     .range(context.getLocation(source))
                     .text(receiverShortName)
-                    .with(ModifierShortName)
+                    .with(Names.Ui.Modifier.shortName)
                     .autoFix()
                     .build()
             )
@@ -254,7 +256,7 @@ private fun UMethod.checkReturnType(context: JavaContext, returnType: PsiType) {
         )
     }
 
-    if (returnType.canonicalText == ModifierFqn) return
+    if (returnType.canonicalText == Names.Ui.Modifier.javaFqn) return
 
     val source = sourcePsi
     if (source is KtCallableDeclaration && source.returnTypeString != null) {
@@ -266,7 +268,7 @@ private fun UMethod.checkReturnType(context: JavaContext, returnType: PsiType) {
                 .name("Change return type to Modifier")
                 .range(context.getLocation(this))
                 .text(source.returnTypeString)
-                .with(ModifierShortName)
+                .with(Names.Ui.Modifier.shortName)
                 .autoFix()
                 .build()
         )
@@ -284,7 +286,7 @@ private fun UMethod.checkReturnType(context: JavaContext, returnType: PsiType) {
                     .name("Change return type to Modifier")
                     .range(context.getLocation(this))
                     .text(getterReturnType)
-                    .with(ModifierShortName)
+                    .with(Names.Ui.Modifier.shortName)
                     .autoFix()
                     .build()
             )
@@ -301,7 +303,7 @@ private fun UMethod.checkReturnType(context: JavaContext, returnType: PsiType) {
                     .name("Change return type to Modifier")
                     .range(context.getLocation(source.property))
                     .text(propertyType)
-                    .with(ModifierShortName)
+                    .with(Names.Ui.Modifier.shortName)
                     .autoFix()
                     .build()
             )
@@ -318,7 +320,7 @@ private fun UMethod.checkReturnType(context: JavaContext, returnType: PsiType) {
                 .name("Add explicit Modifier return type")
                 .range(context.getLocation(this))
                 .pattern("[ \\t\\n]+=")
-                .with(": $ModifierShortName =")
+                .with(": ${Names.Ui.Modifier.shortName} =")
                 .autoFix()
                 .build()
         )

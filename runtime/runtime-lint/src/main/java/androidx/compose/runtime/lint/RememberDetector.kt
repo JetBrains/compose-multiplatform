@@ -40,7 +40,7 @@ class RememberDetector : Detector(), SourceCodeScanner {
     override fun getApplicableMethodNames(): List<String> = listOf(Names.Runtime.Remember.shortName)
 
     override fun visitMethodCall(context: JavaContext, node: UCallExpression, method: PsiMethod) {
-        if (method.isInPackageName(Names.Runtime.packageName)) {
+        if (method.isInPackageName(Names.Runtime.PackageName)) {
             if (node.getExpressionType() == PsiType.VOID) {
                 context.report(
                     RememberReturnType,

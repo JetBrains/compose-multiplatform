@@ -18,6 +18,7 @@
 
 package androidx.compose.ui.lint
 
+import androidx.compose.lint.Stubs
 import com.android.tools.lint.checks.infrastructure.LintDetectorTest
 import com.android.tools.lint.detector.api.Detector
 import com.android.tools.lint.detector.api.Issue
@@ -57,7 +58,7 @@ class ModifierDeclarationDetectorTest : LintDetectorTest() {
                 }
             """
             ),
-            modifierStub
+            kotlin(Stubs.Modifier)
         )
             .run()
             .expect(
@@ -100,7 +101,7 @@ Fix for src/androidx/compose/ui/foo/TestModifier.kt line 8: Change return type t
                 val Modifier.fooModifier3: Modifier.Element get() = TestModifier
             """
             ),
-            modifierStub
+            kotlin(Stubs.Modifier)
         )
             .run()
             .expect(
@@ -149,7 +150,7 @@ Fix for src/androidx/compose/ui/foo/TestModifier.kt line 16: Change return type 
                 fun Modifier.fooModifier() = TestModifier
             """
             ),
-            modifierStub
+            kotlin(Stubs.Modifier)
         )
             .run()
             .expect(
@@ -184,7 +185,7 @@ Fix for src/androidx/compose/ui/foo/TestModifier.kt line 8: Add explicit Modifie
                 val Modifier.fooModifier get() = TestModifier
             """
             ),
-            modifierStub
+            kotlin(Stubs.Modifier)
         )
             .run()
             .expect(
@@ -221,7 +222,7 @@ Fix for src/androidx/compose/ui/foo/TestModifier.kt line 8: Add explicit Modifie
                 }
             """
             ),
-            modifierStub
+            kotlin(Stubs.Modifier)
         )
             .run()
             .expect(
@@ -276,7 +277,7 @@ Fix for src/androidx/compose/ui/foo/TestModifier.kt line 8: Change return type t
                 }
             """
             ),
-            modifierStub
+            kotlin(Stubs.Modifier)
         )
             .run()
             .expectClean()
@@ -311,7 +312,7 @@ Fix for src/androidx/compose/ui/foo/TestModifier.kt line 8: Change return type t
                 }
             """
             ),
-            modifierStub
+            kotlin(Stubs.Modifier)
         )
             .run()
             .expectClean()
@@ -343,7 +344,7 @@ Fix for src/androidx/compose/ui/foo/TestModifier.kt line 8: Change return type t
                 val fooModifier3: Modifier get() = TestModifier
             """
             ),
-            modifierStub
+            kotlin(Stubs.Modifier)
         )
             .run()
             .expect(
@@ -411,7 +412,7 @@ Fix for src/androidx/compose/ui/foo/TestModifier.kt line 20: Add Modifier receiv
                 val TestModifier.fooModifier3: Modifier get() = TestModifier
             """
             ),
-            modifierStub
+            kotlin(Stubs.Modifier)
         )
             .run()
             .expect(
@@ -487,8 +488,8 @@ Fix for src/androidx/compose/ui/foo/TestModifier.kt line 20: Change receiver to 
                 val Modifier.fooModifier4: Modifier get() = TestModifier(someComposableCall(3))
             """
             ),
-            modifierStub,
-            composableStub
+            kotlin(Stubs.Modifier),
+            kotlin(Stubs.Composable)
         )
             .run()
             .expect(
@@ -556,7 +557,7 @@ Fix for src/androidx/compose/ui/foo/TestModifier.kt line 28: Replace @Composable
                 }
             """
             ),
-            modifierStub
+            kotlin(Stubs.Modifier)
         )
             .run()
             .expectClean()
