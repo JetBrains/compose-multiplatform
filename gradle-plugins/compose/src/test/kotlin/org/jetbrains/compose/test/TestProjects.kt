@@ -7,4 +7,5 @@ object TestProjects {
     const val moduleClashCli = "application/moduleClashCli"
     const val javaLogger = "application/javaLogger"
     const val macOptions = "application/macOptions"
+    const val optionsWithSpaces = "application/optionsWithSpaces"
 }

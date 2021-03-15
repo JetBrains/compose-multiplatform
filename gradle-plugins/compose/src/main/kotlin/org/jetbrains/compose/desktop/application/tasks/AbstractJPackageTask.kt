@@ -207,10 +207,15 @@ abstract class AbstractJPackageTask @Inject constructor(
             }
             cliArg("--icon", iconFile)
             launcherArgs.orNull?.forEach {
-                cliArg("--arguments", it)
+                cliArg("--arguments", "'$it'")
             }
             launcherJvmArgs.orNull?.forEach {
-                cliArg("--java-options", it)
+                cliArg("--java-options", "'$it'")
+            }
+            if (currentOS == OS.MacOS) {
+                macDockName.orNull?.let { dockName ->
+                    cliArg("--java-options", "'-Xdock:name=$dockName'")
+                }
             }
         }
 
@@ -256,9 +261,6 @@ abstract class AbstractJPackageTask @Inject constructor(
             OS.MacOS -> {
                 cliArg("--mac-package-name", macPackageName)
                 cliArg("--mac-package-identifier", nonValidatedMacBundleID)
-                macDockName.orNull?.let { dockName ->
-                    cliArg("--java-options", "-Xdock:name=\"$dockName\"")
-                }
 
                 withValidatedMacOSSigning { signing ->
                     cliArg("--mac-sign", true)
