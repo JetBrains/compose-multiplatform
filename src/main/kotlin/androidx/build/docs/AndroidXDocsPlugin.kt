@@ -142,6 +142,7 @@ class AndroidXDocsPlugin : Plugin<Project> {
                             it.exclude("**/META-INF/**")
                             it.exclude("**/OWNERS")
                             it.exclude("**/package.html")
+                            it.exclude("**/*.md")
                         }
                     }
                 }
