@@ -135,6 +135,7 @@ internal fun LazyList(
                 horizontalAlignment = horizontalAlignment,
                 verticalAlignment = verticalAlignment,
                 layoutDirection = layoutDirection,
+                reverseLayout = reverseLayout,
                 startContentPadding = startContentPadding,
                 endContentPadding = endContentPadding,
                 spacing = spacing,

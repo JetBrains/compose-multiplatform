@@ -28,18 +28,26 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
-import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.MediumTest
 import com.google.common.truth.Truth.assertThat
+import com.google.common.truth.Truth.assertWithMessage
 import kotlinx.coroutines.runBlocking
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
+import org.junit.runners.Parameterized
 
 @MediumTest
-@RunWith(AndroidJUnit4::class)
-class LazyListLayoutInfoTest {
+@RunWith(Parameterized::class)
+class LazyListLayoutInfoTest(
+    private val reverseLayout: Boolean
+) {
+    companion object {
+        @JvmStatic
+        @Parameterized.Parameters(name = "reverseLayout={0}")
+        fun initParameters(): Array<Any> = arrayOf(false, true)
+    }
 
     @get:Rule
     val rule = createComposeRule()
@@ -60,6 +68,7 @@ class LazyListLayoutInfoTest {
         rule.setContent {
             LazyColumn(
                 state = rememberLazyListState().also { state = it },
+                reverseLayout = reverseLayout,
                 modifier = Modifier.requiredSize(itemSizeDp * 3.5f)
             ) {
                 items((0..5).toList()) {
@@ -79,6 +88,7 @@ class LazyListLayoutInfoTest {
         rule.setContent {
             LazyColumn(
                 state = rememberLazyListState().also { state = it },
+                reverseLayout = reverseLayout,
                 modifier = Modifier.requiredSize(itemSizeDp * 3.5f)
             ) {
                 items((0..5).toList()) {
@@ -101,6 +111,7 @@ class LazyListLayoutInfoTest {
         rule.setContent {
             LazyColumn(
                 state = rememberLazyListState().also { state = it },
+                reverseLayout = reverseLayout,
                 verticalArrangement = Arrangement.spacedBy(itemSizeDp),
                 modifier = Modifier.requiredSize(itemSizeDp * 3.5f)
             ) {
@@ -126,6 +137,7 @@ class LazyListLayoutInfoTest {
         rule.setContent {
             LazyColumn(
                 state = rememberLazyListState().also { state = it },
+                reverseLayout = reverseLayout,
                 modifier = Modifier.requiredSize(itemSizeDp * 3.5f)
             ) {
                 items((0..5).toList()) {
@@ -160,6 +172,7 @@ class LazyListLayoutInfoTest {
         }
         rule.setContent {
             LazyColumn(
+                reverseLayout = reverseLayout,
                 state = rememberLazyListState().also { state = it }
             ) {
                 item {
@@ -188,6 +201,7 @@ class LazyListLayoutInfoTest {
         lateinit var state: LazyListState
         rule.setContent {
             LazyColumn(
+                reverseLayout = reverseLayout,
                 state = rememberLazyListState().also { state = it }
             ) {
                 items((0 until count).toList()) {
@@ -214,6 +228,7 @@ class LazyListLayoutInfoTest {
         rule.setContent {
             LazyColumn(
                 Modifier.requiredSize(sizeDp),
+                reverseLayout = reverseLayout,
                 state = rememberLazyListState().also { state = it }
             ) {
                 items((0..3).toList()) {
@@ -241,6 +256,7 @@ class LazyListLayoutInfoTest {
             LazyColumn(
                 Modifier.requiredSize(sizeDp),
                 contentPadding = PaddingValues(top = topPaddingDp, bottom = bottomPaddingDp),
+                reverseLayout = reverseLayout,
                 state = rememberLazyListState().also { state = it }
             ) {
                 items((0..3).toList()) {
@@ -267,7 +283,8 @@ class LazyListLayoutInfoTest {
         var currentOffset = startOffset
         visibleItemsInfo.forEach {
             assertThat(it.index).isEqualTo(currentIndex)
-            assertThat(it.offset).isEqualTo(currentOffset)
+            assertWithMessage("Offset of item $currentIndex").that(it.offset)
+                .isEqualTo(currentOffset)
             assertThat(it.size).isEqualTo(expectedSize)
             currentIndex++
             currentOffset += it.size + spacing
