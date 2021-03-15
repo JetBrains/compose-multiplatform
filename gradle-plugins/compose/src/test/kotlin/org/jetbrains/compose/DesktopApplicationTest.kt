@@ -148,4 +148,26 @@ class DesktopApplicationTest : GradlePluginTestBase() {
             }
         }
     }
+
+    @Test
+    fun testOptionsWithSpaces() {
+        with(testProject(TestProjects.optionsWithSpaces)) {
+            fun testRunTask(runTask: String) {
+                gradle(runTask).build().checks { check ->
+                    check.taskOutcome(runTask, TaskOutcome.SUCCESS)
+                    check.logContains("Running test options with spaces!")
+                    check.logContains("Arg #1=Value 1!")
+                    check.logContains("Arg #2=Value 2!")
+                    check.logContains("JVM system property arg=Value 3!")
+                }
+            }
+
+            testRunTask(":runDistributable")
+            testRunTask(":run")
+
+            gradle(":package").build().checks { check ->
+                check.taskOutcome(":package", TaskOutcome.SUCCESS)
+            }
+        }
+    }
 }
