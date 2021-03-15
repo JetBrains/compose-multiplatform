@@ -16,6 +16,7 @@
 
 package androidx.build.metalava
 
+import androidx.build.Version
 import androidx.build.checkapi.ApiLocation
 import com.google.common.io.Files
 import org.gradle.api.DefaultTask
@@ -46,8 +47,11 @@ abstract class UpdateApiTask : DefaultTask() {
     @get:Input
     var forceUpdate: Boolean = false
 
+    @get:Input
+    var mavenVersion: String? = null
+
     @InputFiles
-    fun getTaskInputs(): List<File>? {
+    fun getTaskInputs(): List<File> {
         val inputApi = inputApiLocation.get()
         return listOf(
             inputApi.publicApiFile,
@@ -71,16 +75,12 @@ abstract class UpdateApiTask : DefaultTask() {
 
     @TaskAction
     fun exec() {
-        var permitOverwriting = true
-        for (outputApi in outputApiLocations.get()) {
-            val version = outputApi.version()
-            if (version != null && version.isFinalApi() &&
-                outputApi.publicApiFile.exists() &&
-                !forceUpdate
-            ) {
-                permitOverwriting = false
-            }
-        }
+        // If the library has finalized its API surface (e.g. beta or later) then only allow
+        // changing the API surface (e.g. overwrite versioned API files) if we're forcing the
+        // update.
+        val version = mavenVersion?.let { Version(it) }
+        val permitOverwriting = version == null || !version.isFinalApi() || forceUpdate
+
         for (outputApi in outputApiLocations.get()) {
             val inputApi = inputApiLocation.get()
             copy(
