@@ -522,7 +522,7 @@ class ScrollTest {
 
     @OptIn(ExperimentalTestApi::class)
     @Test
-    fun scroller_coerce_whenScrollSmoothTo() = runBlocking {
+    fun scroller_coerce_whenScrollSmoothTo() = runBlocking(AutoTestFrameClock()) {
         val scrollState = ScrollState(initial = 0)
 
         createScrollableContent(isVertical = true, scrollState = scrollState)
@@ -571,7 +571,7 @@ class ScrollTest {
 
     @OptIn(ExperimentalTestApi::class)
     @Test
-    fun scroller_restoresScrollerPosition() = runBlocking {
+    fun scroller_restoresScrollerPosition() = runBlocking(AutoTestFrameClock()) {
         val restorationTester = StateRestorationTester(rule)
         var scrollState: ScrollState? = null
 

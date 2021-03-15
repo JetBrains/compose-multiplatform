@@ -243,7 +243,7 @@ class DrawerTest {
 
     @Test
     @LargeTest
-    fun modalDrawer_openAndClose(): Unit = runBlocking {
+    fun modalDrawer_openAndClose(): Unit = runBlocking(AutoTestFrameClock()) {
         lateinit var drawerState: DrawerState
         rule.setMaterialContent {
             drawerState = rememberDrawerState(DrawerValue.Closed)
@@ -274,7 +274,7 @@ class DrawerTest {
 
     @Test
     @LargeTest
-    fun modalDrawer_bodyContent_clickable(): Unit = runBlocking {
+    fun modalDrawer_bodyContent_clickable(): Unit = runBlocking(AutoTestFrameClock()) {
         var drawerClicks = 0
         var bodyClicks = 0
         lateinit var drawerState: DrawerState
@@ -314,7 +314,9 @@ class DrawerTest {
 
     @Test
     @LargeTest
-    fun modalDrawer_drawerContent_doesntPropagateClicksWhenOpen(): Unit = runBlocking {
+    fun modalDrawer_drawerContent_doesntPropagateClicksWhenOpen(): Unit = runBlocking(
+        AutoTestFrameClock()
+    ) {
         var bodyClicks = 0
         lateinit var drawerState: DrawerState
         rule.setMaterialContent {
@@ -421,7 +423,9 @@ class DrawerTest {
 
     @Test
     @LargeTest
-    fun modalDrawer_noDismissActionWhenClosed_hasDissmissActionWhenOpen(): Unit = runBlocking {
+    fun modalDrawer_noDismissActionWhenClosed_hasDissmissActionWhenOpen(): Unit = runBlocking(
+        AutoTestFrameClock()
+    ) {
         lateinit var drawerState: DrawerState
         rule.setMaterialContent {
             drawerState = rememberDrawerState(DrawerValue.Closed)
@@ -457,7 +461,7 @@ class DrawerTest {
     }
 
     @Test
-    fun bottomDrawer_bodyContent_clickable(): Unit = runBlocking {
+    fun bottomDrawer_bodyContent_clickable(): Unit = runBlocking(AutoTestFrameClock()) {
         var drawerClicks = 0
         var bodyClicks = 0
         lateinit var drawerState: BottomDrawerState
@@ -502,7 +506,9 @@ class DrawerTest {
 
     @Test
     @LargeTest
-    fun bottomDrawer_drawerContent_doesntPropagateClicksWhenOpen(): Unit = runBlocking {
+    fun bottomDrawer_drawerContent_doesntPropagateClicksWhenOpen(): Unit = runBlocking(
+        AutoTestFrameClock()
+    ) {
         var bodyClicks = 0
         lateinit var drawerState: BottomDrawerState
         rule.setMaterialContent {
@@ -548,7 +554,7 @@ class DrawerTest {
 
     @Test
     @LargeTest
-    fun bottomDrawer_openBySwipe_shortDrawer(): Unit = runBlocking {
+    fun bottomDrawer_openBySwipe_shortDrawer(): Unit = runBlocking(AutoTestFrameClock()) {
         val contentTag = "contentTestTag"
         lateinit var drawerState: BottomDrawerState
         rule.setMaterialContent {
@@ -589,7 +595,7 @@ class DrawerTest {
 
     @Test
     @LargeTest
-    fun bottomDrawer_expandBySwipe_tallDrawer(): Unit = runBlocking {
+    fun bottomDrawer_expandBySwipe_tallDrawer(): Unit = runBlocking(AutoTestFrameClock()) {
         val contentTag = "contentTestTag"
         lateinit var drawerState: BottomDrawerState
         rule.setMaterialContent {
@@ -656,7 +662,7 @@ class DrawerTest {
     }
 
     @Test
-    fun bottomDrawer_openBySwipe_onBodyContent(): Unit = runBlocking {
+    fun bottomDrawer_openBySwipe_onBodyContent(): Unit = runBlocking(AutoTestFrameClock()) {
         val contentTag = "contentTestTag"
         lateinit var drawerState: BottomDrawerState
         rule.setMaterialContent {
@@ -683,7 +689,7 @@ class DrawerTest {
     }
 
     @Test
-    fun bottomDrawer_hasDismissAction_whenExpanded(): Unit = runBlocking {
+    fun bottomDrawer_hasDismissAction_whenExpanded(): Unit = runBlocking(AutoTestFrameClock()) {
         lateinit var drawerState: BottomDrawerState
         rule.setMaterialContent {
             drawerState = rememberBottomDrawerState(BottomDrawerValue.Expanded)
@@ -709,7 +715,9 @@ class DrawerTest {
 
     @Test
     @LargeTest
-    fun bottomDrawer_noDismissActionWhenClosed_hasDissmissActionWhenOpen(): Unit = runBlocking {
+    fun bottomDrawer_noDismissActionWhenClosed_hasDissmissActionWhenOpen(): Unit = runBlocking(
+        AutoTestFrameClock()
+    ) {
         lateinit var drawerState: BottomDrawerState
         rule.setMaterialContent {
             drawerState = rememberBottomDrawerState(BottomDrawerValue.Closed)
@@ -749,7 +757,7 @@ class DrawerTest {
 
     @Test
     @LargeTest
-    fun bottomDrawer_openAndClose_shortDrawer(): Unit = runBlocking {
+    fun bottomDrawer_openAndClose_shortDrawer(): Unit = runBlocking(AutoTestFrameClock()) {
         lateinit var drawerState: BottomDrawerState
         rule.setMaterialContent {
             drawerState = rememberBottomDrawerState(BottomDrawerValue.Closed)
@@ -788,7 +796,7 @@ class DrawerTest {
 
     @Test
     @LargeTest
-    fun bottomDrawer_openAndClose_tallDrawer(): Unit = runBlocking {
+    fun bottomDrawer_openAndClose_tallDrawer(): Unit = runBlocking(AutoTestFrameClock()) {
         lateinit var drawerState: BottomDrawerState
         rule.setMaterialContent {
             drawerState = rememberBottomDrawerState(BottomDrawerValue.Closed)

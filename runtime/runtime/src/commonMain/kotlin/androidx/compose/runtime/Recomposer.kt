@@ -608,10 +608,11 @@ class Recomposer(
         }
     }
 
+    @OptIn(ExperimentalComposeApi::class)
     private suspend fun recompositionRunner(
         block: suspend CoroutineScope.(parentFrameClock: MonotonicFrameClock) -> Unit
     ) {
-        val parentFrameClock = coroutineContext[MonotonicFrameClock] ?: DefaultMonotonicFrameClock
+        val parentFrameClock = coroutineContext.monotonicFrameClock
         withContext(broadcastFrameClock) {
             // Enforce mutual exclusion of callers; register self as current runner
             val callingJob = coroutineContext.job

@@ -76,9 +76,11 @@ expect annotation class CheckResult(
 /**
  * The [MonotonicFrameClock] used by [withFrameNanos] and [withFrameMillis] if one is not present
  * in the calling [kotlin.coroutines.CoroutineContext].
+ *
+ * This value is no longer used by compose runtime.
  */
-// Implementor's note:
-// This frame clock implementation should try to synchronize with the vsync rate of the device's
-// default display. Without this synchronization, any usage of this default clock will result
-// in inconsistent animation frame timing and associated visual artifacts.
+@Deprecated(
+    "MonotonicFrameClocks are not globally applicable across platforms. " +
+        "Use an appropriate local clock."
+)
 expect val DefaultMonotonicFrameClock: MonotonicFrameClock

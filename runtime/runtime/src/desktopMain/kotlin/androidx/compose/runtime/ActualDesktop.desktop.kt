@@ -60,6 +60,10 @@ actual annotation class CheckResult(actual val suggest: String)
  * obtained using [LaunchedEffect] or [rememberCoroutineScope] they also use
  * [MonotonicFrameClock] which is bound to the current window.
  */
+@Deprecated(
+    "MonotonicFrameClocks are not globally applicable across platforms. " +
+        "Use an appropriate local clock."
+)
 actual val DefaultMonotonicFrameClock: MonotonicFrameClock get() = SixtyFpsMonotonicFrameClock
 
 private object SixtyFpsMonotonicFrameClock : MonotonicFrameClock {

@@ -17,13 +17,14 @@
 package androidx.compose.foundation.lazy
 
 import androidx.compose.animation.core.snap
+import androidx.compose.foundation.AutoTestFrameClock
 import androidx.compose.foundation.gestures.animateScrollBy
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.requiredSize
+import androidx.compose.foundation.layout.width
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.test.assertHeightIsEqualTo
@@ -37,6 +38,7 @@ import androidx.compose.ui.unit.dp
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.LargeTest
 import com.google.common.truth.Truth.assertThat
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.runBlocking
 import org.junit.Before
 import org.junit.Rule
@@ -611,7 +613,7 @@ class LazyListsContentPaddingTest {
     }
 
     private fun LazyListState.scrollBy(offset: Dp) {
-        runBlocking {
+        runBlocking(Dispatchers.Main + AutoTestFrameClock()) {
             animateScrollBy(with(rule.density) { offset.roundToPx().toFloat() }, snap())
         }
     }
