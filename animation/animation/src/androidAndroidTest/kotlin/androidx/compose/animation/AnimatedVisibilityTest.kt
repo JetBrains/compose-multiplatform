@@ -19,6 +19,7 @@ package androidx.compose.animation
 import androidx.compose.animation.core.FastOutSlowInEasing
 import androidx.compose.animation.core.LinearOutSlowInEasing
 import androidx.compose.animation.core.tween
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.requiredSize
 import androidx.compose.foundation.layout.size
@@ -30,10 +31,14 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.test.ExperimentalTestApi
+import androidx.compose.ui.test.captureToImage
 import androidx.compose.ui.test.junit4.createComposeRule
+import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.IntSize
@@ -43,6 +48,7 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.LargeTest
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
+import org.junit.Assert.assertTrue
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -62,37 +68,37 @@ class AnimatedVisibilityTest {
     fun animateVisibilityExpandShrinkTest() {
         val testModifier by mutableStateOf(TestModifier())
         var visible by mutableStateOf(false)
-        var density = 0f
         var offset by mutableStateOf(Offset(0f, 0f))
         var disposed by mutableStateOf(false)
         rule.mainClock.autoAdvance = false
         rule.setContent {
-            AnimatedVisibility(
-                visible, testModifier,
-                enter = expandIn(
-                    Alignment.BottomEnd,
-                    { fullSize -> IntSize(fullSize.width / 4, fullSize.height / 2) },
-                    tween(160, easing = LinearOutSlowInEasing)
-                ),
-                exit = shrinkOut(
-                    Alignment.CenterStart,
-                    { fullSize -> IntSize(fullSize.width / 10, fullSize.height / 5) },
-                    tween(160, easing = FastOutSlowInEasing)
-                )
-            ) {
-                Box(
-                    Modifier.onGloballyPositioned {
-                        offset = it.localToRoot(Offset.Zero)
-                    }.requiredSize(100.dp, 100.dp)
+            CompositionLocalProvider(LocalDensity provides Density(1f)) {
+                AnimatedVisibility(
+                    visible, testModifier,
+                    enter = expandIn(
+                        Alignment.BottomEnd,
+                        { fullSize -> IntSize(fullSize.width / 4, fullSize.height / 2) },
+                        tween(160, easing = LinearOutSlowInEasing)
+                    ),
+                    exit = shrinkOut(
+                        Alignment.CenterStart,
+                        { fullSize -> IntSize(fullSize.width / 10, fullSize.height / 5) },
+                        tween(160, easing = FastOutSlowInEasing)
+                    )
                 ) {
-                    DisposableEffect(Unit) {
-                        onDispose {
-                            disposed = true
+                    Box(
+                        Modifier.onGloballyPositioned {
+                            offset = it.localToRoot(Offset.Zero)
+                        }.requiredSize(100.dp, 100.dp)
+                    ) {
+                        DisposableEffect(Unit) {
+                            onDispose {
+                                disposed = true
+                            }
                         }
                     }
                 }
             }
-            density = LocalDensity.current.density
         }
 
         rule.runOnIdle {
@@ -101,9 +107,9 @@ class AnimatedVisibilityTest {
         rule.mainClock.advanceTimeByFrame()
         rule.mainClock.advanceTimeByFrame()
 
-        val startWidth = density * 100 / 4f
-        val startHeight = density * 100 / 2f
-        val fullSize = density * 100
+        val startWidth = 100 / 4f
+        val startHeight = 100 / 2f
+        val fullSize = 100f
         assertFalse(disposed)
 
         for (i in 0..160 step frameDuration) {
@@ -126,8 +132,8 @@ class AnimatedVisibilityTest {
         rule.mainClock.advanceTimeByFrame()
         rule.mainClock.advanceTimeByFrame()
 
-        val endWidth = density * 100 / 10f
-        val endHeight = density * 100 / 5f
+        val endWidth = 100 / 10f
+        val endHeight = 100 / 5f
         for (i in 0..160 step frameDuration) {
             val fraction = FastOutSlowInEasing.transform(i / 160f)
             val animWidth = lerp(fullSize, endWidth, fraction)
@@ -315,6 +321,62 @@ class AnimatedVisibilityTest {
         rule.runOnIdle {
             assertEquals(30, testModifier.height)
             assertEquals(30, testModifier.width)
+        }
+    }
+
+    @OptIn(ExperimentalAnimationApi::class)
+    @Test
+    fun animateVisibilityFadeTest() {
+        var visible by mutableStateOf(false)
+        val colors = mutableListOf<Int>()
+        rule.setContent {
+            Box(Modifier.size(size = 20.dp).background(Color.Black)) {
+                AnimatedVisibility(
+                    visible,
+                    enter = fadeIn(animationSpec = tween(500)),
+                    exit = fadeOut(animationSpec = tween(500)),
+                    modifier = Modifier.testTag("AnimV")
+                ) {
+                    Box(modifier = Modifier.size(size = 20.dp).background(Color.White))
+                }
+            }
+        }
+        rule.runOnIdle {
+            visible = true
+        }
+        rule.mainClock.autoAdvance = false
+        while (colors.isEmpty() || colors.last() != 0xffffffff.toInt()) {
+            rule.mainClock.advanceTimeByFrame()
+            rule.onNodeWithTag("AnimV").apply {
+                val data = IntArray(1)
+                data[0] = 0
+                captureToImage().readPixels(data, 10, 10, 1, 1)
+                colors.add(data[0])
+            }
+        }
+        for (i in 1 until colors.size) {
+            // Check every color against the previous one to ensure the alpha is non-decreasing
+            // during fade in.
+            assertTrue(colors[i] >= colors[i - 1])
+        }
+        assertTrue(colors[0] < 0xfffffffff)
+        colors.clear()
+        rule.runOnIdle {
+            visible = false
+        }
+        while (colors.isEmpty() || colors.last() != 0xff000000.toInt()) {
+            rule.mainClock.advanceTimeByFrame()
+            rule.onNodeWithTag("AnimV").apply {
+                val data = IntArray(1)
+                data[0] = 0
+                captureToImage().readPixels(data, 10, 10, 1, 1)
+                colors.add(data[0])
+            }
+        }
+        for (i in 1 until colors.size) {
+            // Check every color against the previous one to ensure the alpha is non-increasing
+            // during fade out.
+            assertTrue(colors[i] <= colors[i - 1])
         }
     }
 }
