@@ -92,6 +92,7 @@ fun ParameterType.convert(): Parameter.Type {
 
 private fun Parameter.Builder.setValue(stringTable: StringTable, value: Any?) {
     when (type) {
+        Parameter.Type.ITERABLE,
         Parameter.Type.STRING -> {
             int32Value = stringTable.put(value as String)
         }
@@ -117,9 +118,6 @@ private fun Parameter.Builder.setValue(stringTable: StringTable, value: Any?) {
         Parameter.Type.RESOURCE -> setResourceType(value, stringTable)
         Parameter.Type.LAMBDA -> setFunctionType(value, stringTable)
         Parameter.Type.FUNCTION_REFERENCE -> setFunctionType(value, stringTable)
-        Parameter.Type.ITERABLE -> {
-            // TODO: b/181899238 Support size for List and Array types
-        }
         else -> error("Unknown Composable parameter type: $type")
     }
 }

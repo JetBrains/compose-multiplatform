@@ -47,10 +47,8 @@ class NodeParameter internal constructor(
 
     /**
      * The index into the composite parent parameter value.
-     *
-     * If the index is identical to index of the parent element list then this value will be -1.
      */
-    var index = -1
+    var index = 0
 }
 
 /**
