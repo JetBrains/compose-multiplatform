@@ -85,7 +85,6 @@ class AndroidXPlaygroundRootPlugin : Plugin<Project> {
         project.extra.set(PREBUILT_OR_SNAPSHOT_EXT_NAME, prebuiltOrSnapshotClosure)
         project.configurations.all { configuration ->
             configuration.resolutionStrategy.dependencySubstitution.all { substitution ->
-                substitution.allowAndroidxSnapshotReplacement()
                 substitution.replaceIfSnapshot()
             }
         }
@@ -141,15 +140,6 @@ class AndroidXPlaygroundRootPlugin : Plugin<Project> {
         val group = sections[0]
         val artifact = sections[1]
         return "$group:$artifact:$SNAPSHOT_MARKER"
-    }
-
-    private fun DependencySubstitution.allowAndroidxSnapshotReplacement() {
-        val requested = this.requested
-        if (requested is ModuleComponentSelector && requested.group.startsWith("androidx") &&
-            requested.version.matches(Regex("^[0-9]+\\.[0-9]+\\.[0-9]+$"))
-        ) {
-            useTarget("${requested.group}:${requested.module}:${requested.version}+")
-        }
     }
 
     private fun DependencySubstitution.replaceIfSnapshot() {
