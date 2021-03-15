@@ -16,18 +16,13 @@
 
 package androidx.compose.material
 
-import androidx.compose.animation.core.Animatable
-import androidx.compose.animation.core.AnimationVector1D
-import androidx.compose.animation.core.TweenSpec
 import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Immutable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.Stable
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.staticCompositionLocalOf
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -39,7 +34,6 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.util.fastForEach
 import androidx.compose.ui.util.fastMap
 import androidx.compose.ui.util.fastMaxBy
-import kotlinx.coroutines.launch
 
 /**
  * State for [Scaffold] composable component.
@@ -227,9 +221,6 @@ private fun ScaffoldLayout(
     fab: @Composable () -> Unit,
     bottomBar: @Composable () -> Unit
 ) {
-    val fabAnimatableState =
-        remember { mutableStateOf<Animatable<Float, AnimationVector1D>?>(null) }
-    val scope = rememberCoroutineScope()
     SubcomposeLayout { constraints ->
         val layoutWidth = constraints.maxWidth
         val layoutHeight = constraints.maxHeight
@@ -271,24 +262,10 @@ private fun ScaffoldLayout(
                 0
             }
 
-            val floatOffset = fabLeftOffset.toFloat()
-
-            val fabAnimatable = fabAnimatableState.value ?: Animatable(floatOffset).also {
-                fabAnimatableState.value = it
-            }
-            if (fabAnimatable.targetValue != floatOffset) {
-                scope.launch {
-                    fabAnimatable.animateTo(
-                        targetValue = floatOffset,
-                        animationSpec = FabPositionAnimationSpec
-                    )
-                }
-            }
-
             val fabPlacement = if (fabWidth != 0 && fabHeight != 0) {
                 FabPlacement(
                     isDocked = isFabDocked,
-                    left = fabAnimatable.value.toInt(),
+                    left = fabLeftOffset,
                     width = fabWidth,
                     height = fabHeight
                 )
@@ -356,7 +333,7 @@ private fun ScaffoldLayout(
             }
             // Explicitly not using placeRelative here as `leftOffset` already accounts for RTL
             fabPlaceables.fastForEach {
-                it.place(fabAnimatable.value.toInt(), layoutHeight - fabOffsetFromBottom)
+                it.place(fabLeftOffset, layoutHeight - fabOffsetFromBottom)
             }
         }
     }
@@ -389,5 +366,3 @@ internal val LocalFabPlacement = staticCompositionLocalOf<FabPlacement?> { null 
 private val FabSpacing = 16.dp
 
 private enum class ScaffoldLayoutContent { TopBar, MainContent, Snackbar, Fab, BottomBar }
-
-private val FabPositionAnimationSpec = TweenSpec<Float>(durationMillis = 200)
