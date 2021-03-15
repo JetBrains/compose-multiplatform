@@ -129,15 +129,14 @@ message Parameter {
     repeated Parameter elements = 3;
     ParameterReference reference = 4;
 
-    // If this Parameter appears in the elements of another parameter:
-    // This index is the "natural" index of the value in the agent. If the index
-    // is identical to the elements index we do not need this value and it will
-    // be set to -1.
+    // For elements inside another Parameter instance, this index refer to the
+    // "natural" index of the parent composite value in the agent.
     //
-    // However if some of the "sibling" values in the agent are null or cannot be
-    // decomposed, those siblings are omitted from the Parameter.elements.
-    // For all subsequent parameter elements we need to have the original index in
-    // order to find the value again using the GetParameterDetailsCommand.
+    // We record this to be able to identify a reference to another parameter in
+    // the client and agent. Note that e.g:
+    //   - null elements in a List are omitted
+    // A reference will indicate the index among all values, such that we don't
+    // have to count nulls during a GetParameterDetailsCommand.
     sint32 index = 5;
 
     oneof value {
