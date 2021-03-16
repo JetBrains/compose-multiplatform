@@ -59,6 +59,8 @@ dependencies {
         androidTestImplementation(JUNIT)
         androidTestImplementation(project(":compose:animation:animation"))
         androidTestImplementation(project(":compose:ui:ui-test-junit4"))
+
+        lintPublish project(":compose:animation:animation-core-lint")
     }
 }
 

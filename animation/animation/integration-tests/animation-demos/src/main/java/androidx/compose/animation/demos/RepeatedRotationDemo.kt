@@ -64,6 +64,7 @@ fun RepeatedRotationDemo() {
         }
         Spacer(Modifier.requiredHeight(10.dp))
         val transition = updateTransition(state.value)
+        @Suppress("UnusedTransitionTargetStateParameter")
         val rotation by transition.animateFloat(
             transitionSpec = {
                 if (initialState == RotationStates.Original) {
