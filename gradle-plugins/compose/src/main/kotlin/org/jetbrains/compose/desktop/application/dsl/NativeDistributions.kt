@@ -7,6 +7,10 @@ import org.gradle.api.model.ObjectFactory
 import java.util.*
 import javax.inject.Inject
 
+internal val DEFAULT_RUNTIME_MODULES = arrayOf(
+    "java.base", "java.desktop", "java.logging"
+)
+
 open class NativeDistributions @Inject constructor(
         objects: ObjectFactory,
         layout: ProjectLayout
@@ -30,7 +34,7 @@ open class NativeDistributions @Inject constructor(
         set(layout.buildDirectory.dir("compose/binaries"))
     }
 
-    var modules = arrayListOf("java.desktop", "java.logging")
+    var modules = arrayListOf(*DEFAULT_RUNTIME_MODULES)
     fun modules(vararg modules: String) {
         this.modules.addAll(modules.toList())
     }

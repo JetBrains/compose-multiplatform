@@ -1,7 +1,9 @@
 package org.jetbrains.compose.desktop.application.internal
 
+import org.gradle.api.provider.Provider
 import org.gradle.api.tasks.Internal
 import org.jetbrains.compose.desktop.application.dsl.TargetFormat
+import org.jetbrains.compose.desktop.application.tasks.MIN_JAVA_RUNTIME_VERSION
 import java.io.File
 
 internal enum class OS(val id: String) {
@@ -61,6 +63,15 @@ internal object MacUtils {
     val xcrun: File by lazy {
         File("/usr/bin/xcrun").checkExistingFile()
     }
+}
+
+internal fun jvmToolFile(toolName: String, javaHome: Provider<String>): File {
+    val jtool = File(javaHome.get()).resolve("bin/${executableName(toolName)}")
+    check(jtool.isFile) {
+        "Invalid JDK: $jtool is not a file! \n" +
+                "Ensure JAVA_HOME or buildSettings.javaHome is set to JDK $MIN_JAVA_RUNTIME_VERSION or newer"
+    }
+    return jtool
 }
 
 @Internal

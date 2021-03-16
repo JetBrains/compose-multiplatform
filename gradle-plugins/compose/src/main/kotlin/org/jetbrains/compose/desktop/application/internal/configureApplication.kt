@@ -63,6 +63,18 @@ internal fun Project.configurePackagingTasks(apps: Collection<Application>) {
             )
         }
 
+        tasks.composeTask<AbstractSuggestModulesTask>(taskName("suggestRuntimeModules", app)) {
+            dependsOn(checkRuntime)
+            javaHome.set(provider { app.javaHomeOrDefault() })
+            modules.set(provider { app.nativeDistributions.modules })
+
+            app._configurationSource?.let { configSource ->
+                dependsOn(configSource.jarTaskName)
+                files.from(configSource.runtimeClasspath(project))
+                launcherMainJar.set(app.mainJar.orElse(configSource.jarTask(project).flatMap { it.archiveFile }))
+            }
+        }
+
         val createRuntimeImage = tasks.composeTask<AbstractJLinkTask>(
             taskName("createRuntimeImage", app)
         ) {
