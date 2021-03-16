@@ -35,5 +35,5 @@ private fun <T : Any?> defaultToString(): (T) -> String =
         "\"$asString\""
     }
 
-private fun File.normalizedPath() =
+internal fun File.normalizedPath() =
     if (currentOS == OS.Windows) absolutePath.replace("\\", "\\\\") else absolutePath

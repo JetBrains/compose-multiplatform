@@ -7,10 +7,9 @@ import org.gradle.api.provider.Property
 import org.gradle.api.provider.Provider
 import org.gradle.api.tasks.*
 import org.gradle.process.ExecResult
-import org.gradle.process.ExecSpec
 import org.gradle.work.InputChanges
 import org.jetbrains.compose.desktop.application.internal.ComposeProperties
-import org.jetbrains.compose.desktop.application.internal.executableName
+import org.jetbrains.compose.desktop.application.internal.jvmToolFile
 import org.jetbrains.compose.desktop.application.internal.ioFile
 import org.jetbrains.compose.desktop.application.internal.notNullProperty
 import java.io.File
@@ -49,13 +48,8 @@ abstract class AbstractJvmToolOperationTask(private val toolName: String) : Abst
     @TaskAction
     fun run(inputChanges: InputChanges) {
         initState()
-        val javaHomePath = javaHome.get()
 
-        val jtool = File(javaHomePath).resolve("bin/${executableName(toolName)}")
-        check(jtool.isFile) {
-            "Invalid JDK: $jtool is not a file! \n" +
-                    "Ensure JAVA_HOME or buildSettings.javaHome is set to JDK 14 or newer"
-        }
+        val jtool = jvmToolFile(toolName, javaHome = javaHome)
 
         fileOperations.delete(destinationDir)
         prepareWorkingDir(inputChanges)
