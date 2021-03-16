@@ -16,7 +16,6 @@ private const val MIN_JAVA_RUNTIME_VERSION = 15
 
 @CacheableTask
 abstract class AbstractCheckNativeDistributionRuntime : AbstractComposeDesktopTask() {
-    @get:PathSensitive(PathSensitivity.ABSOLUTE)
     @get:Input
     val javaHome: Property<String> = objects.notNullProperty()
 
@@ -26,11 +25,9 @@ abstract class AbstractCheckNativeDistributionRuntime : AbstractComposeDesktopTa
     @get:LocalState
     val workingDir: Provider<Directory> = project.layout.buildDirectory.dir("compose/tmp/$name")
 
-    @get:Internal
     private val javaExec: File
         get() = getTool("java")
 
-    @get:Internal
     private val javacExec: File
         get() = getTool("javac")
 
@@ -108,7 +105,7 @@ abstract class AbstractCheckNativeDistributionRuntime : AbstractComposeDesktopTa
                             printVersionAndHalt(System.getProperty("java.version"));
                         }
                     }
-                
+
                     private static void printVersionAndHalt(String version) {
                         System.out.println("$javaVersionPrefix" + version + "$javaVersionSuffix");
                         Runtime.getRuntime().exit(0);
