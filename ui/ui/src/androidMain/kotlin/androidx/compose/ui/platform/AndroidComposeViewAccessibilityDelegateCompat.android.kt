@@ -320,6 +320,9 @@ internal class AndroidComposeViewAccessibilityDelegateCompat(val view: AndroidCo
         // If the node has a content description (in unmerged config), it will be used. Otherwise
         // for merging node we concatenate content descriptions and texts from its children.
         info.contentDescription = calculateContentDescription(semanticsNode)
+        if (semanticsNode.config.isMergingSemanticsOfDescendants) {
+            info.isScreenReaderFocusable = true
+        }
 
         semanticsNode.config.getOrNull(SemanticsProperties.Heading)?.let {
             info.isHeading = true
