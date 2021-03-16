@@ -19,8 +19,7 @@ package androidx.compose.foundation.interaction
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.State
-import androidx.compose.runtime.derivedStateOf
-import androidx.compose.runtime.mutableStateListOf
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import kotlinx.coroutines.flow.collect
 
@@ -64,14 +63,16 @@ interface FocusInteraction : Interaction {
  */
 @Composable
 fun InteractionSource.collectIsFocusedAsState(): State<Boolean> {
-    val focusInteractions = remember { mutableStateListOf<FocusInteraction.Focus>() }
+    val isFocused = remember { mutableStateOf(false) }
     LaunchedEffect(this) {
+        val focusInteractions = mutableListOf<FocusInteraction.Focus>()
         interactions.collect { interaction ->
             when (interaction) {
                 is FocusInteraction.Focus -> focusInteractions.add(interaction)
                 is FocusInteraction.Unfocus -> focusInteractions.remove(interaction.focus)
             }
+            isFocused.value = focusInteractions.isNotEmpty()
         }
     }
-    return remember { derivedStateOf { focusInteractions.isNotEmpty() } }
+    return isFocused
 }
