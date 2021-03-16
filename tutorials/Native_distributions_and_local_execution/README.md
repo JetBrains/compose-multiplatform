@@ -8,7 +8,14 @@ We will also demonstrate how to run an application locally with the same setting
 ## Gradle plugin
 
 `org.jetbrains.compose` Gradle plugin simplifies the packaging of applications into native distributions and running an application locally.
-Currently, the plugin uses [jpackage](https://openjdk.java.net/jeps/343) for packaging self-contained applications.
+
+Currently, the plugin uses [jpackage](https://openjdk.java.net/jeps/343) for packaging distributable applications. 
+Distributable applications are self-contained, installable binaries which include all the Java runtime components they need, 
+without requiring an installed JDK on the target system.
+
+[Jlink](https://openjdk.java.net/jeps/282) will take care of bundling only the necessary Java Modules in 
+the distributable package to minimize package size, 
+but you must still configure the Gradle plugin to tell it which modules you need.
 
 ## Basic usage
 
@@ -36,6 +43,7 @@ compose.desktop {
         mainClass = "example.MainKt"
 
         nativeDistributions {
+            modules("java.sql")
             targetFormats(TargetFormat.Dmg, TargetFormat.Msi, TargetFormat.Deb)
         }
     }
@@ -57,12 +65,17 @@ containing the `main` function.
 Note, that `run` starts a non-packaged JVM application with full runtime.
 This is faster and easier to debug, than creating a compact binary image with minified runtime.
 To run a final binary image, use `runDistributable` instead.
-* `createDistributable` is used to create a prepackaged application image a final application image without creating an installer. 
+* `createDistributable` is used to create a prepackaged application image a final application image without creating an installer.
 * `runDistributable` is used to run a prepackaged application image. 
   
 Note, that the tasks are created only if the `application` block/property is used in a script.
 
 After a build, output binaries can be found in `${project.buildDir}/compose/binaries`.
+
+At this time, the Gradle plugin does not automatically determine the JDK Modules necessary to run, and you must manually 
+determine the specific modules you need and include them in `modules()`. Failure to provide the necessary modules 
+will not cause compilation issues, but will lead to `ClassNotFoundException` at runtime. See issue #463 for more context 
+and how to determine the modules you need to include.
 
 ## Available formats
 
