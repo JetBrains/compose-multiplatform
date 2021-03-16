@@ -43,6 +43,7 @@ import androidx.compose.ui.test.assert
 import androidx.compose.ui.test.assertCountEquals
 import androidx.compose.ui.test.assertHasClickAction
 import androidx.compose.ui.test.assertHeightIsEqualTo
+import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.assertIsEnabled
 import androidx.compose.ui.test.assertIsNotEnabled
 import androidx.compose.ui.test.assertIsNotSelected
@@ -614,6 +615,33 @@ class TabTest {
                 (1..9).forEach {
                     get(it).assertIsNotSelected()
                 }
+            }
+    }
+
+    @Test
+    fun scrollableTabRow_offScreenTabInitiallySelected() {
+        rule
+            .setMaterialContent {
+                var state by remember { mutableStateOf(9) }
+                val titles = List(10) { "Tab ${it + 1}" }
+                ScrollableTabRow(selectedTabIndex = state) {
+                    titles.forEachIndexed { index, title ->
+                        Tab(
+                            text = { Text(title) },
+                            selected = state == index,
+                            onClick = { state = index }
+                        )
+                    }
+                }
+            }
+
+        rule.onAllNodes(isSelectable())
+            .assertCountEquals(10)
+            .apply {
+                // The last tab should be selected and displayed (scrolled to)
+                get(9)
+                    .assertIsSelected()
+                    .assertIsDisplayed()
             }
     }
 

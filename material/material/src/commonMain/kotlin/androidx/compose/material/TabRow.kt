@@ -227,10 +227,9 @@ fun ScrollableTabRow(
     ) {
         val scrollState = rememberScrollState()
         val coroutineScope = rememberCoroutineScope()
-        val scrollableTabData = remember(scrollState) {
+        val scrollableTabData = remember(scrollState, coroutineScope) {
             ScrollableTabData(
                 scrollState = scrollState,
-                selectedTab = selectedTabIndex,
                 coroutineScope = coroutineScope
             )
         }
@@ -429,15 +428,18 @@ private enum class TabSlots {
  */
 private class ScrollableTabData(
     private val scrollState: ScrollState,
-    private var selectedTab: Int,
     private val coroutineScope: CoroutineScope
 ) {
+    private var selectedTab: Int? = null
+
     fun onLaidOut(
         density: Density,
         edgeOffset: Int,
         tabPositions: List<TabPosition>,
         selectedTab: Int
     ) {
+        // Animate if the new tab is different from the old tab, or this is called for the first
+        // time (i.e selectedTab is `null`).
         if (this.selectedTab != selectedTab) {
             this.selectedTab = selectedTab
             tabPositions.getOrNull(selectedTab)?.let {
@@ -465,7 +467,7 @@ private class ScrollableTabData(
         tabPositions: List<TabPosition>
     ): Int = with(density) {
         val totalTabRowWidth = tabPositions.last().right.roundToPx() + edgeOffset
-        val visibleWidth = totalTabRowWidth - scrollState.maxValue.toInt()
+        val visibleWidth = totalTabRowWidth - scrollState.maxValue
         val tabOffset = left.roundToPx()
         val scrollerCenter = visibleWidth / 2
         val tabWidth = width.roundToPx()
