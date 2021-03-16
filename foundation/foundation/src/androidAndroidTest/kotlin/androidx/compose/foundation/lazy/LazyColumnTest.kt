@@ -1305,6 +1305,34 @@ class LazyColumnTest {
         }
     }
 
+    @Test
+    fun changeItemsCountAndScrollImmediately() {
+        lateinit var state: LazyListState
+        var count by mutableStateOf(100)
+        val composedIndexes = mutableListOf<Int>()
+        rule.setContent {
+            state = rememberLazyListState()
+            LazyColumn(Modifier.fillMaxWidth().height(10.dp), state) {
+                items(count) { index ->
+                    composedIndexes.add(index)
+                    Box(Modifier.size(20.dp))
+                }
+            }
+        }
+
+        rule.runOnIdle {
+            composedIndexes.clear()
+            count = 10
+            runBlocking(AutoTestFrameClock()) {
+                state.scrollToItem(50)
+            }
+            composedIndexes.forEach {
+                assertThat(it).isLessThan(count)
+            }
+            assertThat(state.firstVisibleItemIndex).isEqualTo(9)
+        }
+    }
+
     private fun SemanticsNodeInteraction.assertTopPositionIsAlmost(expected: Dp) {
         getUnclippedBoundsInRoot().top.assertIsEqualTo(expected, tolerance = 1.dp)
     }
