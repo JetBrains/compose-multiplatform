@@ -31,6 +31,13 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.ViewTreeLifecycleOwner
 import androidx.savedstate.ViewTreeSavedStateRegistryOwner
 
+private const val MissingViewTreeDependenciesMessage =
+    "If you are adding this ComposeView to an AppCompatActivity, make sure you " +
+        "are using AppCompat version 1.3+. If you are adding this ComposeView to a " +
+        "Fragment, make sure you are using Fragment version 1.3+. For other cases, manually " +
+        "set owners on this view by using `ViewTreeLifecycleOwner.set()` and " +
+        "`ViewTreeSavedStateRegistryOwner.set()`."
+
 /**
  * Base class for custom [android.view.View]s implemented using Jetpack Compose UI.
  * Subclasses should implement the [Content] function with the appropriate content.
@@ -168,9 +175,25 @@ abstract class AbstractComposeView @JvmOverloads constructor(
         }
     }
 
+    private fun checkViewTreeOwners() {
+        checkNotNull(ViewTreeLifecycleOwner.get(this)) {
+            "ViewTreeLifecycleOwner not set for this ComposeView. " +
+                MissingViewTreeDependenciesMessage
+        }
+        checkNotNull(ViewTreeSavedStateRegistryOwner.get(this)) {
+            "ViewTreeSavedStateRegistryOwner not set for this ComposeView. " +
+                MissingViewTreeDependenciesMessage
+        }
+        // Not checking for ViewTreeViewModelStoreOwner as we don't need it inside Compose,
+        // but we provide it in ComponentActivity.setContent for convenience.
+    }
+
     @Suppress("DEPRECATION") // Still using ViewGroup.setContent for now
     private fun ensureCompositionCreated() {
         if (composition == null) {
+            if (isAttachedToWindow) {
+                checkViewTreeOwners()
+            }
             try {
                 creatingComposition = true
                 composition = setContent(
@@ -204,19 +227,9 @@ abstract class AbstractComposeView @JvmOverloads constructor(
     override fun onAttachedToWindow() {
         super.onAttachedToWindow()
 
-        val message = "If you are adding this ComposeView to an AppCompatActivity, make sure you " +
-            "are using AppCompat version 1.3+. If you are adding this ComposeView to a " +
-            "Fragment, make sure you are using Fragment version 1.3+. For other cases, manually " +
-            "set owners on this view by using `ViewTreeLifecycleOwner.set()` and " +
-            "`ViewTreeSavedStateRegistryOwner.set()`."
-        checkNotNull(ViewTreeLifecycleOwner.get(this)) {
-            "ViewTreeLifecycleOwner not set for this ComposeView. $message"
+        if (composition != null) {
+            checkViewTreeOwners()
         }
-        checkNotNull(ViewTreeSavedStateRegistryOwner.get(this)) {
-            "ViewTreeSavedStateRegistryOwner not set for this ComposeView. $message"
-        }
-        // Not checking for ViewTreeViewModelStoreOwner as we don't need it inside Compose, but we
-        // provide it in ComponentActivity.setContent for convenience.
 
         if (shouldCreateCompositionOnAttachedToWindow) {
             ensureCompositionCreated()
