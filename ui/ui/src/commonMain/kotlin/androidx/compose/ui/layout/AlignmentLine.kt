@@ -66,6 +66,9 @@ sealed class AlignmentLine(
 
 /**
  * Merges two values of the current [alignment line][AlignmentLine].
+ * This is used when a layout inherits multiple values for the same [AlignmentLine]
+ * from different children, so the position of the line within the layout will be computed
+ * by merging the children values using the provided [AlignmentLine.merger].
  */
 internal fun AlignmentLine.merge(position1: Int, position2: Int) = merger(position1, position2)
 
