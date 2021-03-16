@@ -19,8 +19,7 @@ package androidx.compose.foundation.interaction
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.State
-import androidx.compose.runtime.derivedStateOf
-import androidx.compose.runtime.mutableStateListOf
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import kotlinx.coroutines.flow.collect
 
@@ -79,15 +78,17 @@ interface DragInteraction : Interaction {
  */
 @Composable
 fun InteractionSource.collectIsDraggedAsState(): State<Boolean> {
-    val dragInteractions = remember { mutableStateListOf<DragInteraction.Start>() }
+    val isDragged = remember { mutableStateOf(false) }
     LaunchedEffect(this) {
+        val dragInteractions = mutableListOf<DragInteraction.Start>()
         interactions.collect { interaction ->
             when (interaction) {
                 is DragInteraction.Start -> dragInteractions.add(interaction)
                 is DragInteraction.Stop -> dragInteractions.remove(interaction.start)
                 is DragInteraction.Cancel -> dragInteractions.remove(interaction.start)
             }
+            isDragged.value = dragInteractions.isNotEmpty()
         }
     }
-    return remember { derivedStateOf { dragInteractions.isNotEmpty() } }
+    return isDragged
 }
