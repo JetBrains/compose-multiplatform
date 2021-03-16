@@ -28,6 +28,11 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.selection.selectable
 import androidx.compose.foundation.selection.selectableGroup
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.geometry.Rect
 import androidx.compose.ui.node.InnerPlaceable
 import androidx.compose.ui.node.LayoutNode
 import androidx.compose.ui.platform.AndroidComposeView
@@ -59,7 +64,6 @@ import androidx.compose.ui.semantics.onClick
 import androidx.compose.ui.semantics.onLongClick
 import androidx.compose.ui.semantics.pasteText
 import androidx.compose.ui.semantics.role
-import androidx.compose.ui.semantics.selected
 import androidx.compose.ui.semantics.setProgress
 import androidx.compose.ui.semantics.setSelection
 import androidx.compose.ui.semantics.setText
@@ -822,6 +826,28 @@ class AndroidComposeViewAccessibilityDelegateCompatTest {
             AccessibilityNodeInfoCompat.CollectionInfoCompat.SELECTION_MODE_SINGLE,
             resultCollectionInfo.selectionMode
         )
+    }
+
+    @Test
+    fun testSemanticsNodePositionAndBounds_doesNotThrow_whenLayoutNodeNotAttached() {
+        var emitNode by mutableStateOf(true)
+        rule.setContent {
+            if (emitNode) {
+                Box(Modifier.size(100.dp).testTag("tag"))
+            }
+        }
+
+        val semanticNode = rule.onNodeWithTag("tag").fetchSemanticsNode()
+        rule.runOnIdle {
+            emitNode = false
+        }
+
+        rule.runOnIdle {
+            assertEquals(Offset.Zero, semanticNode.positionInRoot)
+            assertEquals(Offset.Zero, semanticNode.positionInWindow)
+            assertEquals(Rect.Zero, semanticNode.boundsInRoot)
+            assertEquals(Rect.Zero, semanticNode.boundsInWindow)
+        }
     }
 
     private fun createSemanticsNodeWithProperties(
