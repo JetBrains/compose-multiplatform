@@ -66,6 +66,8 @@ dependencies {
         androidTestImplementation(MOCKITO_KOTLIN, {
             exclude group: "org.mockito" // to keep control on the mockito version
         })
+
+        lintPublish project(":compose:material:material-lint")
     }
 }
 

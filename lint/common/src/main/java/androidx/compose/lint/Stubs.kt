@@ -22,6 +22,33 @@ import org.intellij.lang.annotations.Language
  * Common Compose-related lint stubs used for testing
  */
 object Stubs {
+    val Color = stub(
+        """
+            package androidx.compose.ui.graphics
+
+            inline class Color(val value: ULong) {
+                companion object {
+                    val Black = Color(0xFF000000)
+                    val DarkGray = Color(0xFF444444)
+                    val Gray = Color(0xFF888888)
+                    val LightGray = Color(0xFFCCCCCC)
+                    val White = Color(0xFFFFFFFF)
+                    val Red = Color(0xFFFF0000)
+                    val Green = Color(0xFF00FF00)
+                    val Blue = Color(0xFF0000FF)
+                    val Yellow = Color(0xFFFFFF00)
+                    val Cyan = Color(0xFF00FFFF)
+                    val Magenta = Color(0xFFFF00FF)
+                    val Transparent = Color(0x00000000)
+                }
+            }
+
+            fun Color(color: Long): Color {
+                return Color(value = (color.toULong() and 0xffffffffUL) shl 32)
+            }
+        """
+    )
+
     val Composable = stub(
         """
         package androidx.compose.runtime
