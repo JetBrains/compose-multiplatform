@@ -212,7 +212,7 @@ private class ScrollingLogic(
         // come up with the better threshold, but we need it since spline curve gives us NaNs
         scrollableState.scroll {
             val outerScopeScroll: (Float) -> Float =
-                { delta -> this.dispatchScroll(delta, NestedScrollSource.Fling) }
+                { delta -> this.dispatchScroll(delta.reverseIfNeeded(), NestedScrollSource.Fling) }
             val scope = object : ScrollScope {
                 override fun scrollBy(pixels: Float): Float {
                     return outerScopeScroll.invoke(pixels)
@@ -220,7 +220,7 @@ private class ScrollingLogic(
             }
             with(scope) {
                 with(flingBehavior) {
-                    result = performFling(available.toFloat()).toVelocity()
+                    result = performFling(available.toFloat().reverseIfNeeded()).toVelocity()
                 }
             }
         }
