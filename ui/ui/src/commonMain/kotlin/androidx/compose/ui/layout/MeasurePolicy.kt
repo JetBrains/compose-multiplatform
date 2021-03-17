@@ -55,11 +55,31 @@ fun interface MeasurePolicy {
     /**
      * The function that defines the measurement and layout. Each [Measurable] in the [measurables]
      * list corresponds to a layout child of the layout, and children can be measured using the
-     * [Measurable.measure] method. Measuring a child returns a [Placeable], which can then
-     * be positioned in the [MeasureResult.placeChildren] of the returned [MeasureResult].
-     * Usually [MeasureResult] objects are created using the [MeasureScope.layout] factory, which
-     * takes the calculated size of this layout, its alignment lines, and a block defining
-     * the positioning of the children layouts.
+     * [Measurable.measure] method. This method takes the [Constraints] which the child should
+     * respect; different children can be measured with different constraints.
+     * Measuring a child returns a [Placeable], which reveals the size chosen by the child as a
+     * result of its own measurement. According to the children sizes, the parent is defining the
+     * positioning of the children, by [placing][Placeable.PlacementScope.place] the [Placeable]s in
+     * the [MeasureResult.placeChildren] of the returned [MeasureResult]. Therefore the parent needs
+     * to measure its children with appropriate [Constraints], such that whatever valid sizes
+     * children choose, they can be laid out correctly according to the parent's layout algorithm.
+     * This is because there is no measurement negotiation between the parent and children:
+     * once a child chooses its size, the parent needs to handle it correctly.
+     *
+     * Note that a child is allowed to choose a size that does not satisfy its constraints. However,
+     * when this happens, the placeable's [width][Placeable.width] and [height][Placeable.height]
+     * will not represent the real size of the child, but rather the size coerced in the
+     * child's constraints. Therefore, it is common for parents to assume in their layout
+     * algorithm that its children will always respect the constraints. When this
+     * does not happen in reality, the position assigned to the child will be
+     * automatically offset to be centered on the space assigned by the parent under
+     * the assumption that constraints were respected. Rarely, when a parent really needs to know
+     * the true size of the child, they can read this from the placeable's
+     * [Placeable.measuredWidth] and [Placeable.measuredHeight].
+     *
+     * [MeasureResult] objects are usually created using the [MeasureScope.layout]
+     * factory, which takes the calculated size of this layout, its alignment lines, and a block
+     * defining the positioning of the children layouts.
      */
     fun MeasureScope.measure(
         measurables: List<Measurable>,
