@@ -25,6 +25,7 @@ import androidx.compose.runtime.snapshots.SnapshotStateMap
 import androidx.compose.runtime.snapshots.StateObject
 import androidx.compose.runtime.snapshots.StateRecord
 import androidx.compose.runtime.snapshots.newWritableRecord
+import androidx.compose.runtime.snapshots.overwritable
 import androidx.compose.runtime.snapshots.readable
 import androidx.compose.runtime.snapshots.sync
 import androidx.compose.runtime.snapshots.withCurrent
@@ -140,7 +141,7 @@ internal open class SnapshotMutableStateImpl<T>(
         get() = next.readable(this).value
         set(value) = next.withCurrent {
             if (!policy.equivalent(it.value, value)) {
-                next.writable(this) { this.value = value }
+                next.overwritable(this, it) { this.value = value }
             }
         }
 
