@@ -16,10 +16,10 @@
 
 package androidx.compose.foundation.text
 
-import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.gestures.Orientation
 import androidx.compose.foundation.gestures.rememberScrollableState
 import androidx.compose.foundation.gestures.scrollable
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.offset
 import androidx.compose.runtime.Stable
 import androidx.compose.runtime.getValue
@@ -229,13 +229,13 @@ internal class TextFieldScrollerPosition(
      * Taken with the opposite sign defines the x or y position of the text field in the
      * horizontal or vertical scroller container correspondingly.
      */
-    var offset by mutableStateOf(initial, structuralEqualityPolicy())
+    var offset by mutableStateOf(initial)
 
     /**
      * Maximum length by which the text field can be scrolled. Defined as a difference in
      * size between the scroller container and the text field.
      */
-    var maximum by mutableStateOf(Float.POSITIVE_INFINITY, structuralEqualityPolicy())
+    var maximum by mutableStateOf(0f)
         private set
 
     /**
