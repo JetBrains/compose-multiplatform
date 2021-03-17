@@ -63,13 +63,7 @@ internal class AndroidViewsHandler(context: Context) : ViewGroup(context) {
     override fun invalidateChildInParent(location: IntArray?, dirty: Rect?) = null
 
     fun drawView(view: AndroidViewHolder, canvas: Canvas) {
-        // The canvas is already translated by the Compose logic. But the position of the
-        // AndroidViewHolder is also set on it inside the AndroidViewsHandler, for correct
-        // `getLocationInWindow` results for the Composed View. Therefore, we need to
-        // compensate here to avoid double translating.
-        canvas.translate(-view.x, -view.y)
-        drawChild(canvas, view, drawingTime)
-        canvas.translate(view.x, view.y)
+        view.draw(canvas)
     }
 
     // Touch events forwarding will be handled by component nodes.
