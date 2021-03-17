@@ -392,7 +392,7 @@ class ScrollableTest {
 
     @Test
     @OptIn(ExperimentalTestApi::class)
-    fun scrollable_snappingScrolling() = runBlocking {
+    fun scrollable_snappingScrolling() = runBlocking(AutoTestFrameClock()) {
         var total = 0f
         val controller = ScrollableState(
             consumeScrollDelta = {
@@ -735,7 +735,7 @@ class ScrollableTest {
 
     @Test
     @OptIn(ExperimentalTestApi::class)
-    fun scrollable_nestedScrollBelow_listensDispatches() = runBlocking {
+    fun scrollable_nestedScrollBelow_listensDispatches() = runBlocking(AutoTestFrameClock()) {
         var value = 0f
         var expectedConsumed = 0f
         val controller = ScrollableState(

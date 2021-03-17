@@ -309,7 +309,7 @@ class ModalBottomSheetTest {
     }
 
     @Test
-    fun modalBottomSheet_showAndHide_manually(): Unit = runBlocking {
+    fun modalBottomSheet_showAndHide_manually(): Unit = runBlocking(AutoTestFrameClock()) {
         lateinit var sheetState: ModalBottomSheetState
         rule.setMaterialContent {
             sheetState = rememberModalBottomSheetState(ModalBottomSheetValue.Hidden)
@@ -348,7 +348,9 @@ class ModalBottomSheetTest {
     }
 
     @Test
-    fun modalBottomSheet_showAndHide_manually_tallBottomSheet(): Unit = runBlocking {
+    fun modalBottomSheet_showAndHide_manually_tallBottomSheet(): Unit = runBlocking(
+        AutoTestFrameClock()
+    ) {
         lateinit var sheetState: ModalBottomSheetState
         rule.setMaterialContent {
             sheetState = rememberModalBottomSheetState(ModalBottomSheetValue.Hidden)

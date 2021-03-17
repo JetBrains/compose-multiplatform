@@ -17,6 +17,7 @@
 package androidx.compose.foundation.lazy
 
 import androidx.compose.animation.core.snap
+import androidx.compose.foundation.AutoTestFrameClock
 import androidx.compose.foundation.gestures.animateScrollBy
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -54,6 +55,7 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.MediumTest
 import com.google.common.truth.Truth
 import com.google.common.truth.Truth.assertThat
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.runBlocking
 import org.junit.Rule
 import org.junit.Test
@@ -1038,7 +1040,7 @@ class LazyRowTest {
     }
 
     private fun LazyListState.scrollBy(offset: Dp) {
-        runBlocking {
+        runBlocking(Dispatchers.Main + AutoTestFrameClock()) {
             animateScrollBy(with(rule.density) { offset.roundToPx().toFloat() }, snap())
         }
     }

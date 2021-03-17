@@ -364,7 +364,7 @@ class TransformableTest {
     }
 
     @Test
-    fun transformable_animateTo_zoom() = runBlocking {
+    fun transformable_animateTo_zoom() = runBlocking(AutoTestFrameClock()) {
         rule.mainClock.autoAdvance = false
         var cumulativeScale = 1.0f
         var callbackCount = 0
@@ -400,7 +400,7 @@ class TransformableTest {
     }
 
     @Test
-    fun transformable_animateTo_rotate() = runBlocking {
+    fun transformable_animateTo_rotate() = runBlocking(AutoTestFrameClock()) {
         rule.mainClock.autoAdvance = false
         var totalRotation = 0f
         var callbackCount = 0
@@ -436,7 +436,7 @@ class TransformableTest {
     }
 
     @Test
-    fun transformable_animateTo_pan() = runBlocking {
+    fun transformable_animateTo_pan() = runBlocking(AutoTestFrameClock()) {
         rule.mainClock.autoAdvance = false
         var totalPan = Offset.Zero
         var callbackCount = 0
@@ -531,7 +531,7 @@ class TransformableTest {
     }
 
     @Test
-    fun transformable_stopTransformations() = runBlocking {
+    fun transformable_stopTransformations() = runBlocking(AutoTestFrameClock()) {
         rule.mainClock.autoAdvance = false
         var totalRotation = 0f
         var callbackCount = 0

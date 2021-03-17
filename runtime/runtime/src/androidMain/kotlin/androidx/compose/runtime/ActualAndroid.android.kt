@@ -72,6 +72,10 @@ private object DefaultChoreographerFrameClock : MonotonicFrameClock {
 // For local testing
 private const val DisallowDefaultMonotonicFrameClock = false
 
+@Deprecated(
+    "MonotonicFrameClocks are not globally applicable across platforms. " +
+        "Use an appropriate local clock."
+)
 actual val DefaultMonotonicFrameClock: MonotonicFrameClock by lazy {
     if (DisallowDefaultMonotonicFrameClock) error("Disallowed use of DefaultMonotonicFrameClock")
 
