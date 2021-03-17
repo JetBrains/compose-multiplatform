@@ -215,7 +215,7 @@ class BackdropScaffoldTest {
 
     @Test
     @LargeTest
-    fun backdropScaffold_revealAndConceal_manually(): Unit = runBlocking {
+    fun backdropScaffold_revealAndConceal_manually(): Unit = runBlocking(AutoTestFrameClock()) {
         lateinit var scaffoldState: BackdropScaffoldState
         rule.setContent {
             scaffoldState = rememberBackdropScaffoldState(Concealed)

@@ -17,7 +17,7 @@ package androidx.compose.runtime {
   }
 
   public final class ActualAndroid_androidKt {
-    method public static androidx.compose.runtime.MonotonicFrameClock getDefaultMonotonicFrameClock();
+    method @Deprecated public static androidx.compose.runtime.MonotonicFrameClock getDefaultMonotonicFrameClock();
   }
 
   public final class ActualJvm_jvmKt {
@@ -243,6 +243,7 @@ package androidx.compose.runtime {
   }
 
   public final class MonotonicFrameClockKt {
+    method public static androidx.compose.runtime.MonotonicFrameClock getMonotonicFrameClock(kotlin.coroutines.CoroutineContext);
     method public static suspend inline <R> Object? withFrameMillis(androidx.compose.runtime.MonotonicFrameClock, kotlin.jvm.functions.Function1<? super java.lang.Long,? extends R> onFrame, kotlin.coroutines.Continuation<? super R> p);
     method public static suspend <R> Object? withFrameMillis(kotlin.jvm.functions.Function1<? super java.lang.Long,? extends R> onFrame, kotlin.coroutines.Continuation<? super R> p);
     method public static suspend <R> Object? withFrameNanos(kotlin.jvm.functions.Function1<? super java.lang.Long,? extends R> onFrame, kotlin.coroutines.Continuation<? super R> p);

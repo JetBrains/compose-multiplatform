@@ -403,7 +403,7 @@ class SwipeableTest {
      */
     @Test
     @LargeTest
-    fun swipeable_thresholds_fixed_small() = runBlocking {
+    fun swipeable_thresholds_fixed_small() = runBlocking(AutoTestFrameClock()) {
         rule.mainClock.autoAdvance = false
         lateinit var state: SwipeableState<String>
         val offsetDp = with(rule.density) { 35.toDp() }
@@ -459,7 +459,7 @@ class SwipeableTest {
      */
     @Test
     @LargeTest
-    fun swipeable_thresholds_fixed_large() = runBlocking {
+    fun swipeable_thresholds_fixed_large() = runBlocking(AutoTestFrameClock()) {
         lateinit var state: SwipeableState<String>
         val offsetDp = with(rule.density) { 65.toDp() }
         setSwipeableContent {
@@ -514,7 +514,7 @@ class SwipeableTest {
      */
     @Test
     @LargeTest
-    fun swipeable_thresholds_fractional_half() = runBlocking {
+    fun swipeable_thresholds_fractional_half() = runBlocking(AutoTestFrameClock()) {
         lateinit var state: SwipeableState<String>
         setSwipeableContent {
             state = rememberSwipeableState("A")
@@ -568,7 +568,7 @@ class SwipeableTest {
      */
     @Test
     @LargeTest
-    fun swipeable_thresholds_fractional_quarter() = runBlocking {
+    fun swipeable_thresholds_fractional_quarter() = runBlocking(AutoTestFrameClock()) {
         lateinit var state: SwipeableState<String>
         setSwipeableContent {
             state = rememberSwipeableState("A")
@@ -622,7 +622,7 @@ class SwipeableTest {
      */
     @Test
     @LargeTest
-    fun swipeable_thresholds_fractional_threeQuarters() = runBlocking {
+    fun swipeable_thresholds_fractional_threeQuarters() = runBlocking(AutoTestFrameClock()) {
         lateinit var state: SwipeableState<String>
         setSwipeableContent {
             state = rememberSwipeableState("A")
@@ -676,7 +676,7 @@ class SwipeableTest {
      */
     @Test
     @LargeTest
-    fun swipeable_thresholds_mixed() = runBlocking {
+    fun swipeable_thresholds_mixed() = runBlocking(AutoTestFrameClock()) {
         lateinit var state: SwipeableState<String>
         val offsetDp = with(rule.density) { 35.toDp() }
         setSwipeableContent {
@@ -737,7 +737,7 @@ class SwipeableTest {
      */
     @Test
     @LargeTest
-    fun swipeable_thresholds_custom() = runBlocking {
+    fun swipeable_thresholds_custom() = runBlocking(AutoTestFrameClock()) {
         lateinit var state: SwipeableState<String>
         setSwipeableContent {
             state = rememberSwipeableState("A")
@@ -997,7 +997,7 @@ class SwipeableTest {
      */
     @Test
     @LargeTest
-    fun swipeable_targetValue() = runBlocking {
+    fun swipeable_targetValue() = runBlocking(AutoTestFrameClock()) {
         lateinit var state: SwipeableState<String>
         setSwipeableContent {
             state = rememberSwipeableState("A")
@@ -1297,7 +1297,7 @@ class SwipeableTest {
      * Tests that 'snapTo' updates the state and offset immediately.
      */
     @Test
-    fun swipeable_snapTo() = runBlocking {
+    fun swipeable_snapTo() = runBlocking(AutoTestFrameClock()) {
         lateinit var state: SwipeableState<String>
         setSwipeableContent {
             state = rememberSwipeableState("A")
@@ -1326,7 +1326,7 @@ class SwipeableTest {
      * Tests that 'animateTo' starts an animation which updates the state and offset.
      */
     @Test
-    fun swipeable_animateTo() = runBlocking {
+    fun swipeable_animateTo() = runBlocking(AutoTestFrameClock()) {
         lateinit var state: SwipeableState<String>
         setSwipeableContent {
             state = rememberSwipeableState("A")
@@ -1358,7 +1358,7 @@ class SwipeableTest {
      * Tests that the 'onEnd' callback of 'animateTo' is invoked and with the correct end value.
      */
     @Test
-    fun swipeable_animateTo_onEnd() = runBlocking {
+    fun swipeable_animateTo_onEnd() = runBlocking(AutoTestFrameClock()) {
         lateinit var state: SwipeableState<String>
         setSwipeableContent {
             state = rememberSwipeableState("A")
@@ -1415,7 +1415,7 @@ class SwipeableTest {
      * Tests that the [SwipeableState] is restored, when created with [rememberSwipeableState].
      */
     @Test
-    fun swipeable_restoreSwipeableState() = runBlocking {
+    fun swipeable_restoreSwipeableState() = runBlocking(AutoTestFrameClock()) {
         val restorationTester = StateRestorationTester(rule)
         var state: SwipeableState<String>? = null
 
@@ -1690,7 +1690,7 @@ class SwipeableTest {
     }
 
     @Test
-    fun swipeable_nestedScroll_postFlings() = runBlocking {
+    fun swipeable_nestedScroll_postFlings() = runBlocking(AutoTestFrameClock()) {
         lateinit var swipeableState: SwipeableState<String>
         lateinit var anchors: MutableState<Map<Float, String>>
         lateinit var scrollState: ScrollState
