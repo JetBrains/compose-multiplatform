@@ -15,10 +15,14 @@
  */
 package androidx.compose.ui.test
 
+import android.view.KeyEvent
 import androidx.activity.ComponentActivity
 import java.util.concurrent.CountDownLatch
 
 class TestActivity : ComponentActivity() {
+
+    var receivedKeyEvent: KeyEvent? = null
+
     var hasFocusLatch = CountDownLatch(1)
 
     override fun onWindowFocusChanged(hasFocus: Boolean) {
@@ -26,5 +30,10 @@ class TestActivity : ComponentActivity() {
         if (hasFocus) {
             hasFocusLatch.countDown()
         }
+    }
+
+    override fun onKeyDown(keyCode: Int, event: KeyEvent?): Boolean {
+        receivedKeyEvent = event
+        return super.onKeyDown(keyCode, event)
     }
 }
