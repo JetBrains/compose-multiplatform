@@ -208,9 +208,6 @@ internal abstract class LayoutNodeWrapper(
     // implementation of draw block passed to the OwnedLayer
     override fun invoke(canvas: Canvas) {
         if (layoutNode.isPlaced) {
-            require(layoutNode.layoutState == LayoutNode.LayoutState.Ready) {
-                "Layer is redrawn for LayoutNode in state ${layoutNode.layoutState} [$layoutNode]"
-            }
             snapshotObserver.observeReads(this, onCommitAffectingLayer) {
                 performDraw(canvas)
             }
