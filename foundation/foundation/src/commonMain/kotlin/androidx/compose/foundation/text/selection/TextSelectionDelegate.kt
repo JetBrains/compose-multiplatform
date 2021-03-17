@@ -52,12 +52,12 @@ internal fun processAsSingleComposable(
     var endOffset = rawEndOffset
     if (startOffset == endOffset) {
 
+        if (previousSelection == null) return Triple(rawStartOffset, rawStartOffset, false)
         // If the start and end offset are at the same character, and it's not the initial
         // selection, then bound to at least one character.
         val textRange = ensureAtLeastOneChar(
             offset = rawStartOffset,
             lastOffset = lastOffset,
-            previousSelection = previousSelection,
             isStartHandle = isStartHandle,
             handlesCrossed = handlesCrossed
         )
@@ -168,7 +168,6 @@ internal fun updateWordBasedSelection(
  * @param offset unprocessed start and end offset calculated directly from input position, in
  * this case start and offset equals to each other.
  * @param lastOffset last offset of the text. It's actually the length of the text.
- * @param previousSelection previous selected text range.
  * @param isStartHandle true if the start handle is being dragged
  * @param handlesCrossed true if the selection handles are crossed
  *
@@ -177,13 +176,12 @@ internal fun updateWordBasedSelection(
 private fun ensureAtLeastOneChar(
     offset: Int,
     lastOffset: Int,
-    previousSelection: TextRange?,
     isStartHandle: Boolean,
     handlesCrossed: Boolean
 ): TextRange {
     // When lastOffset is 0, it can only return an empty TextRange.
     // When previousSelection is null, it won't start a selection and return an empty TextRange.
-    if (lastOffset == 0 || previousSelection == null) return TextRange(offset, offset)
+    if (lastOffset == 0) return TextRange(offset, offset)
 
     // When offset is at the boundary, the handle that is not dragged should be at [offset]. Here
     // the other handle's position is computed accordingly.
