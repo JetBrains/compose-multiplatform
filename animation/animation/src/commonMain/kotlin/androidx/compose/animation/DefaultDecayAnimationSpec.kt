@@ -23,4 +23,6 @@ import androidx.compose.runtime.Composable
  * Create default [DecayAnimationSpec] representing a default fling curve for a platform.
  */
 @Composable
+@Deprecated("Replace with rememberSplineBasedDecay<Float>")
 expect fun defaultDecayAnimationSpec(): DecayAnimationSpec<Float>
+expect fun <T> rememberSplineBasedDecay(): DecayAnimationSpec<T>
