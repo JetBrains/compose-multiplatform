@@ -208,7 +208,8 @@ class AndroidXPlaygroundRootPlugin : Plugin<Project> {
         val metalava = "https://androidx.dev/metalava/builds/${props.metalavaBuildId}/artifacts" +
             "/repo/m2repository"
         val doclava = "https://androidx.dev/dokka/builds/${props.dokkaBuildId}/artifacts/repository"
-        val all = listOf(snapshots, metalava, doclava)
+        val prebuilts = "https://androidx.dev/storage/prebuilts/androidx/internal/repository"
+        val all = listOf(snapshots, metalava, doclava, prebuilts)
     }
 
     private data class PlaygroundProperties(
