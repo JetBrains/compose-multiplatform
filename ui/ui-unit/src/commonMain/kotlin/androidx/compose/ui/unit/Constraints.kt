@@ -21,27 +21,18 @@ import androidx.compose.runtime.Immutable
 import androidx.compose.runtime.Stable
 
 /**
- * Immutable constraints used for measuring layouts, usually as part of parent
- * [layouts][androidx.compose.ui.layout.Layout] or
- * [layout modifiers][androidx.compose.ui.layout.LayoutModifier].
- * Children layouts can be measured using the `measure` method on the corresponding
- * [Measurables][androidx.compose.ui.layout.Measurable]. This method takes the [Constraints],
- * in pixels, which the child should respect. A measured child is responsible to choose
- * and return a size which satisfies the set of [Constraints] received from its parent:
- * - minWidth <= chosenWidth <= maxWidth
- * - minHeight <= chosenHeight <= maxHeight
- * The parent can then access the size chosen by the child on the resulting
- * [Placeable][androidx.compose.ui.layout.Placeable]. Based on the children sizes, the parent
- * is responsible for defining a valid positioning of the children. This means that children need
- * to be measured with appropriate [Constraints], such that whatever valid sizes children choose,
- * they can be laid out correctly according to the parent's layout algorithm. Note that
- * different children can be measured with different [Constraints].
- * A child is allowed to choose a size that does not satisfy its constraints. However, when this
- * happens, the parent will not read from the placeable the real size of the child, but rather
- * one that was coerced in the child's constraints; therefore, a parent can assume that its
- * children will always respect the constraints in their layout algorithm. When this does not
- * happen in reality, the position assigned to the child will be automatically offset to be centered
- * on the space assigned by the parent under the assumption that constraints were respected.
+ * Immutable constraints for measuring layouts, used by [layouts][androidx.compose.ui.layout.Layout]
+ * or [layout modifiers][androidx.compose.ui.layout.LayoutModifier] to measure their layout
+ * children. The parent chooses the [Constraints] defining a range, in pixels, within which
+ * the measured layout should choose a size:
+ *
+ * - `minWidth` <= `chosenWidth` <= `maxWidth`
+ * - `minHeight` <= `chosenHeight` <= `maxHeight`
+ *
+ * For more details about how layout measurement works, see
+ * [androidx.compose.ui.layout.MeasurePolicy] or
+ * [androidx.compose.ui.layout.LayoutModifier.measure].
+ *
  * A set of [Constraints] can have infinite maxWidth and/or maxHeight. This is a trick often
  * used by parents to ask their children for their preferred size: unbounded constraints force
  * children whose default behavior is to fill the available space (always size to
@@ -129,7 +120,7 @@ inline class Constraints(
         }
 
     /**
-     * `false` when [maxHeight] is [Infinity] and `true` if [maxWidth] is a non-[Infinity] value.
+     * `false` when [maxHeight] is [Infinity] and `true` if [maxHeight] is a non-[Infinity] value.
      * @see hasBoundedWidth
      */
     val hasBoundedHeight: Boolean
@@ -196,7 +187,7 @@ inline class Constraints(
         /**
          * A value that [maxWidth] or [maxHeight] will be set to when the constraint should
          * be considered infinite. [hasBoundedHeight] or [hasBoundedWidth] will be
-         * `true` when [maxHeight] or [maxWidth] is [Infinity], respectively.
+         * `false` when [maxWidth] or [maxHeight] is [Infinity], respectively.
          */
         const val Infinity = Int.MAX_VALUE
 
