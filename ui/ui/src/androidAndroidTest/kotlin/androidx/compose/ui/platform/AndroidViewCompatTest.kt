@@ -30,6 +30,7 @@ import android.widget.FrameLayout
 import android.widget.LinearLayout
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.runtime.Applier
@@ -608,6 +609,34 @@ class AndroidViewCompatTest {
         rule.runOnUiThread {
             assertTrue(squareView!!.drawnAfterLastColorChange)
         }
+    }
+
+    @Test
+    @SdkSuppress(minSdkVersion = Build.VERSION_CODES.O)
+    fun testMove_withoutRedraw() {
+        var offset by mutableStateOf(0)
+        rule.setContent {
+            Box(Modifier.testTag("box").fillMaxSize()) {
+                val offsetDp = with(rule.density) { offset.toDp() }
+                Box(Modifier.offset(offsetDp, offsetDp)) {
+                    AndroidView(::ColoredSquareView, Modifier.graphicsLayer())
+                }
+            }
+        }
+        val offsetColorProvider: (IntOffset) -> Color? = {
+            if (it.x >= offset && it.x < offset + 100 && it.y >= offset && it.y < offset + 100) {
+                Color.Blue
+            } else {
+                null
+            }
+        }
+        rule.onNodeWithTag("box").captureToImage()
+            .assertPixels(expectedColorProvider = offsetColorProvider)
+        rule.runOnUiThread {
+            offset = 100
+        }
+        rule.onNodeWithTag("box").captureToImage()
+            .assertPixels(expectedColorProvider = offsetColorProvider)
     }
 
     class ColoredSquareView(context: Context) : View(context) {
