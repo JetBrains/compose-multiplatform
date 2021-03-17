@@ -62,9 +62,9 @@ internal data class Selection(
         val offset: Int,
 
         /**
-         * The [Selectable] which contains this [Selection] Anchor.
+         * The id of the [Selectable] which contains this [Selection] Anchor.
          */
-        val selectable: Selectable
+        val selectableId: Long
     )
 
     fun merge(other: Selection?): Selection {

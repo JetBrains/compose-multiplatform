@@ -200,11 +200,23 @@ internal class SelectionManager(private val selectionRegistrar: SelectionRegistr
             showSelectionToolbar()
         }
 
-        selectionRegistrar.onSelectableChangeCallback = { selectable ->
-            if (selectable in selectionRegistrar.selectables) {
+        selectionRegistrar.onSelectableChangeCallback = { selectableKey ->
+            if (selectableKey in selectionRegistrar.subselections) {
                 // clear the selection range of each Selectable.
                 onRelease()
                 selection = null
+            }
+        }
+
+        selectionRegistrar.afterSelectableUnsubscribe = { selectableKey ->
+            if (
+                selectableKey == selection?.start?.selectableId ||
+                selectableKey == selection?.end?.selectableId
+            ) {
+                // The selectable that contains a selection handle just unsubscribed.
+                // Hide selection handles for now
+                startHandlePosition = null
+                endHandlePosition = null
             }
         }
     }
@@ -212,9 +224,14 @@ internal class SelectionManager(private val selectionRegistrar: SelectionRegistr
     private fun updateHandleOffsets() {
         val selection = selection
         val containerCoordinates = containerLayoutCoordinates
-        val startLayoutCoordinates = selection?.start?.selectable?.getLayoutCoordinates()
-        val endLayoutCoordinates = selection?.end?.selectable?.getLayoutCoordinates()
-
+        val startSelectable = selection?.start?.selectableId?.let {
+            selectionRegistrar.selectableMap[it]
+        }
+        val endSelectable = selection?.end?.selectableId?.let {
+            selectionRegistrar.selectableMap[it]
+        }
+        val startLayoutCoordinates = startSelectable?.getLayoutCoordinates()
+        val endLayoutCoordinates = endSelectable?.getLayoutCoordinates()
         if (
             selection == null ||
             containerCoordinates == null ||
@@ -229,14 +246,14 @@ internal class SelectionManager(private val selectionRegistrar: SelectionRegistr
 
         val startHandlePosition = containerCoordinates.localPositionOf(
             startLayoutCoordinates,
-            selection.start.selectable.getHandlePosition(
+            startSelectable.getHandlePosition(
                 selection = selection,
                 isStartHandle = true
             )
         )
         val endHandlePosition = containerCoordinates.localPositionOf(
             endLayoutCoordinates,
-            selection.end.selectable.getHandlePosition(
+            endSelectable.getHandlePosition(
                 selection = selection,
                 isStartHandle = false
             )
@@ -268,8 +285,9 @@ internal class SelectionManager(private val selectionRegistrar: SelectionRegistr
      * @param longPress the selection is a result of long press
      * @param previousSelection previous selection
      *
-     * @return [Selection] object which is constructed by combining all Composables that are
-     * selected.
+     * @return a [Pair] of a [Selection] object which is constructed by combining all
+     * composables that are selected and a [Map] from selectable key to [Selection]s on the
+     * [Selectable] corresponding to the that key.
      */
     // This function is internal for testing purposes.
     internal fun mergeSelections(
@@ -278,26 +296,25 @@ internal class SelectionManager(private val selectionRegistrar: SelectionRegistr
         longPress: Boolean = false,
         previousSelection: Selection? = null,
         isStartHandle: Boolean = true
-    ): Selection? {
-
+    ): Pair<Selection?, Map<Long, Selection>> {
+        val subselections = mutableMapOf<Long, Selection>()
         val newSelection = selectionRegistrar.sort(requireContainerCoordinates())
-            .fastFold(null) { mergedSelection: Selection?, handler: Selectable ->
-                merge(
-                    mergedSelection,
-                    handler.getSelection(
-                        startPosition = startPosition,
-                        endPosition = endPosition,
-                        containerLayoutCoordinates = requireContainerCoordinates(),
-                        longPress = longPress,
-                        previousSelection = previousSelection,
-                        isStartHandle = isStartHandle
-                    )
+            .fastFold(null) { mergedSelection: Selection?, selectable: Selectable ->
+                val selection = selectable.getSelection(
+                    startPosition = startPosition,
+                    endPosition = endPosition,
+                    containerLayoutCoordinates = requireContainerCoordinates(),
+                    longPress = longPress,
+                    previousSelection = previousSelection,
+                    isStartHandle = isStartHandle
                 )
+                selection?.let { subselections[selectable.selectableId] = it }
+                merge(mergedSelection, selection)
             }
         if (previousSelection != newSelection) hapticFeedBack?.performHapticFeedback(
             HapticFeedbackType.TextHandleMove
         )
-        return newSelection
+        return Pair(newSelection, subselections)
     }
 
     internal fun getSelectedText(): AnnotatedString? {
@@ -306,21 +323,22 @@ internal class SelectionManager(private val selectionRegistrar: SelectionRegistr
 
         selection?.let {
             for (i in selectables.indices) {
-                val handler = selectables[i]
+                val selectable = selectables[i]
                 // Continue if the current selectable is before the selection starts.
-                if (handler != it.start.selectable && handler != it.end.selectable &&
+                if (selectable.selectableId != it.start.selectableId &&
+                    selectable.selectableId != it.end.selectableId &&
                     selectedText == null
                 ) continue
 
                 val currentSelectedText = getCurrentSelectedText(
-                    selectable = handler,
+                    selectable = selectable,
                     selection = it
                 )
                 selectedText = selectedText?.plus(currentSelectedText) ?: currentSelectedText
 
                 // Break if the current selectable is the last selected selectable.
-                if (handler == it.end.selectable && !it.handlesCrossed ||
-                    handler == it.start.selectable && it.handlesCrossed
+                if (selectable.selectableId == it.end.selectableId && !it.handlesCrossed ||
+                    selectable.selectableId == it.start.selectableId && it.handlesCrossed
                 ) break
             }
         }
@@ -370,23 +388,23 @@ internal class SelectionManager(private val selectionRegistrar: SelectionRegistr
      */
     private fun getContentRect(): Rect {
         val selection = selection ?: return Rect.Zero
-        val startLayoutCoordinates =
-            selection.start.selectable.getLayoutCoordinates() ?: return Rect.Zero
-        val endLayoutCoordinates =
-            selection.end.selectable.getLayoutCoordinates() ?: return Rect.Zero
+        val startSelectable = selectionRegistrar.selectableMap[selection.start.selectableId]
+        val endSelectable = selectionRegistrar.selectableMap[selection.start.selectableId]
+        val startLayoutCoordinates = startSelectable?.getLayoutCoordinates() ?: return Rect.Zero
+        val endLayoutCoordinates = endSelectable?.getLayoutCoordinates() ?: return Rect.Zero
 
         val localLayoutCoordinates = containerLayoutCoordinates
         if (localLayoutCoordinates != null && localLayoutCoordinates.isAttached) {
             var startOffset = localLayoutCoordinates.localPositionOf(
                 startLayoutCoordinates,
-                selection.start.selectable.getHandlePosition(
+                startSelectable.getHandlePosition(
                     selection = selection,
                     isStartHandle = true
                 )
             )
             var endOffset = localLayoutCoordinates.localPositionOf(
                 endLayoutCoordinates,
-                selection.end.selectable.getHandlePosition(
+                endSelectable.getHandlePosition(
                     selection = selection,
                     isStartHandle = false
                 )
@@ -402,7 +420,7 @@ internal class SelectionManager(private val selectionRegistrar: SelectionRegistr
                 startLayoutCoordinates,
                 Offset(
                     0f,
-                    selection.start.selectable.getBoundingBox(selection.start.offset).top
+                    startSelectable.getBoundingBox(selection.start.offset).top
                 )
             )
 
@@ -410,7 +428,7 @@ internal class SelectionManager(private val selectionRegistrar: SelectionRegistr
                 endLayoutCoordinates,
                 Offset(
                     0.0f,
-                    selection.end.selectable.getBoundingBox(selection.end.offset).top
+                    endSelectable.getBoundingBox(selection.end.offset).top
                 )
             )
 
@@ -432,17 +450,12 @@ internal class SelectionManager(private val selectionRegistrar: SelectionRegistr
 
     // This is for PressGestureDetector to cancel the selection.
     fun onRelease() {
-        if (containerLayoutCoordinates?.isAttached == true) {
-            // Call mergeSelections with an out of boundary input to inform all text widgets to
-            // cancel their individual selection.
-            mergeSelections(
-                startPosition = Offset(-1f, -1f),
-                endPosition = Offset(-1f, -1f),
-                previousSelection = selection
-            )
-        }
+        selectionRegistrar.subselections = emptyMap()
         hideSelectionToolbar()
-        if (selection != null) onSelectionChange(null)
+        if (selection != null) {
+            onSelectionChange(null)
+            hapticFeedBack?.performHapticFeedback(HapticFeedbackType.TextHandleMove)
+        }
     }
 
     fun handleDragObserver(isStartHandle: Boolean): DragObserver {
@@ -450,24 +463,28 @@ internal class SelectionManager(private val selectionRegistrar: SelectionRegistr
             override fun onStart(downPosition: Offset) {
                 hideSelectionToolbar()
                 val selection = selection!!
+                val startSelectable =
+                    selectionRegistrar.selectableMap[selection.start.selectableId]
+                val endSelectable =
+                    selectionRegistrar.selectableMap[selection.end.selectableId]
                 // The LayoutCoordinates of the composable where the drag gesture should begin. This
                 // is used to convert the position of the beginning of the drag gesture from the
                 // composable coordinates to selection container coordinates.
                 val beginLayoutCoordinates = if (isStartHandle) {
-                    selection.start.selectable.getLayoutCoordinates()!!
+                    startSelectable?.getLayoutCoordinates()!!
                 } else {
-                    selection.end.selectable.getLayoutCoordinates()!!
+                    endSelectable?.getLayoutCoordinates()!!
                 }
 
                 // The position of the character where the drag gesture should begin. This is in
                 // the composable coordinates.
                 val beginCoordinates = getAdjustedCoordinates(
                     if (isStartHandle) {
-                        selection.start.selectable.getHandlePosition(
+                        startSelectable!!.getHandlePosition(
                             selection = selection, isStartHandle = true
                         )
                     } else {
-                        selection.end.selectable.getHandlePosition(
+                        endSelectable!!.getHandlePosition(
                             selection = selection, isStartHandle = false
                         )
                     }
@@ -487,14 +504,17 @@ internal class SelectionManager(private val selectionRegistrar: SelectionRegistr
             override fun onDrag(dragDistance: Offset): Offset {
                 val selection = selection!!
                 dragTotalDistance += dragDistance
-
+                val startSelectable =
+                    selectionRegistrar.selectableMap[selection.start.selectableId]
+                val endSelectable =
+                    selectionRegistrar.selectableMap[selection.end.selectableId]
                 val currentStart = if (isStartHandle) {
                     dragBeginPosition + dragTotalDistance
                 } else {
                     requireContainerCoordinates().localPositionOf(
-                        selection.start.selectable.getLayoutCoordinates()!!,
+                        startSelectable?.getLayoutCoordinates()!!,
                         getAdjustedCoordinates(
-                            selection.start.selectable.getHandlePosition(
+                            startSelectable.getHandlePosition(
                                 selection = selection,
                                 isStartHandle = true
                             )
@@ -504,9 +524,9 @@ internal class SelectionManager(private val selectionRegistrar: SelectionRegistr
 
                 val currentEnd = if (isStartHandle) {
                     requireContainerCoordinates().localPositionOf(
-                        selection.end.selectable.getLayoutCoordinates()!!,
+                        endSelectable?.getLayoutCoordinates()!!,
                         getAdjustedCoordinates(
-                            selection.end.selectable.getHandlePosition(
+                            endSelectable.getHandlePosition(
                                 selection = selection,
                                 isStartHandle = false
                             )
@@ -549,14 +569,17 @@ internal class SelectionManager(private val selectionRegistrar: SelectionRegistr
         isStartHandle: Boolean = true
     ) {
         if (startPosition == null || endPosition == null) return
-        val newSelection = mergeSelections(
+        val (newSelection, newSubselection) = mergeSelections(
             startPosition = startPosition,
             endPosition = endPosition,
             longPress = longPress,
             isStartHandle = isStartHandle,
             previousSelection = selection
         )
-        if (newSelection != selection) onSelectionChange(newSelection)
+        if (newSelection != selection) {
+            selectionRegistrar.subselections = newSubselection
+            onSelectionChange(newSelection)
+        }
     }
 }
 
@@ -573,15 +596,15 @@ internal fun getCurrentSelectedText(
     val currentText = selectable.getText()
 
     return if (
-        selectable != selection.start.selectable &&
-        selectable != selection.end.selectable
+        selectable.selectableId != selection.start.selectableId &&
+        selectable.selectableId != selection.end.selectableId
     ) {
         // Select the full text content if the current selectable is between the
         // start and the end selectables.
         currentText
     } else if (
-        selectable == selection.start.selectable &&
-        selectable == selection.end.selectable
+        selectable.selectableId == selection.start.selectableId &&
+        selectable.selectableId == selection.end.selectableId
     ) {
         // Select partial text content if the current selectable is the start and
         // the end selectable.
@@ -590,7 +613,7 @@ internal fun getCurrentSelectedText(
         } else {
             currentText.subSequence(selection.start.offset, selection.end.offset)
         }
-    } else if (selectable == selection.start.selectable) {
+    } else if (selectable.selectableId == selection.start.selectableId) {
         // Select partial text content if the current selectable is the start
         // selectable.
         if (selection.handlesCrossed) {

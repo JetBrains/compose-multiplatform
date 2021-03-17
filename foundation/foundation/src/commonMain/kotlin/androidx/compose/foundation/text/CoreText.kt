@@ -24,11 +24,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.DisposableEffectResult
 import androidx.compose.runtime.DisposableEffectScope
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
-import androidx.compose.runtime.structuralEqualityPolicy
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.geometry.Offset
@@ -55,12 +51,14 @@ import androidx.compose.foundation.text.selection.LocalSelectionRegistrar
 import androidx.compose.foundation.text.selection.LocalTextSelectionColors
 import androidx.compose.foundation.text.selection.Selectable
 import androidx.compose.foundation.text.selection.SelectionRegistrar
+import androidx.compose.foundation.text.selection.hasSelection
+import androidx.compose.runtime.Stable
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.semantics.getTextLayoutResult
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.Placeholder
 import androidx.compose.ui.text.TextLayoutResult
-import androidx.compose.ui.text.TextRange
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.style.TextAlign
@@ -119,6 +117,16 @@ internal fun CoreText(
 
     val (placeholders, inlineComposables) = resolveInlineContent(text, inlineContent)
 
+    // The ID used to identify this CoreText. If this CoreText is removed from the composition
+    // tree and then added back, this ID should stay the same.
+    // Notice that we need to update selectable ID when the input text or selectionRegistrar has
+    // been updated.
+    // When text is updated, the selection on this CoreText becomes invalid. It can be treated
+    // as a brand new CoreText.
+    // When SelectionRegistrar is updated, CoreText have to request a new ID to avoid ID collision.
+    val selectableId = rememberSaveable(text, selectionRegistrar) {
+        selectionRegistrar?.nextSelectableId() ?: SelectionRegistrar.InvalidSelectableId
+    }
     val state = remember {
         TextState(
             TextDelegate(
@@ -130,7 +138,8 @@ internal fun CoreText(
                 overflow = overflow,
                 maxLines = maxLines,
                 placeholders = placeholders
-            )
+            ),
+            selectableId
         )
     }
     state.textDelegate = updateTextDelegate(
@@ -211,33 +220,16 @@ private class TextController(val state: TextState) {
         this.selectionRegistrar = selectionRegistrar
     }
 
-    val modifiers = Modifier.graphicsLayer().drawBehind {
-        state.layoutResult?.let { layoutResult ->
-            drawIntoCanvas { canvas ->
-                state.selectionRange?.let {
-                    TextDelegate.paintBackground(
-                        it.min,
-                        it.max,
-                        state.selectionPaint,
-                        canvas,
-                        layoutResult
-                    )
-                }
-                TextDelegate.paint(canvas, layoutResult)
-            }
-        }
-    }.onGloballyPositioned {
+    val modifiers = Modifier.drawTextAndSelectionBehind().onGloballyPositioned {
         // Get the layout coordinates of the text composable. This is for hit test of
         // cross-composable selection.
         state.layoutCoordinates = it
-        selectionRegistrar?.let { selectionRegistrar ->
-            if (state.selectionRange != null) {
-                val newGlobalPosition = it.positionInWindow()
-                if (newGlobalPosition != state.previousGlobalPosition) {
-                    selectionRegistrar.notifyPositionChange()
-                }
-                state.previousGlobalPosition = newGlobalPosition
+        if (selectionRegistrar.hasSelection(state.selectableId)) {
+            val newGlobalPosition = it.positionInWindow()
+            if (newGlobalPosition != state.previousGlobalPosition) {
+                selectionRegistrar?.notifyPositionChange()
             }
+            state.previousGlobalPosition = newGlobalPosition
         }
     }.semantics {
         getTextLayoutResult {
@@ -266,9 +258,7 @@ private class TextController(val state: TextState) {
                 state.layoutResult?.let { prevLayoutResult ->
                     // If the input text of this CoreText has changed, notify the SelectionContainer.
                     if (prevLayoutResult.layoutInput.text != layoutResult.layoutInput.text) {
-                        state.selectable?.let { selectable ->
-                            selectionRegistrar?.notifySelectableChange(selectable)
-                        }
+                        selectionRegistrar?.notifySelectableChange(state.selectableId)
                     }
                 }
             }
@@ -352,38 +342,68 @@ private class TextController(val state: TextState) {
 
     val commit: DisposableEffectScope.() -> DisposableEffectResult = {
         // if no SelectionContainer is added as parent selectionRegistrar will be null
-        state.selectable = selectionRegistrar?.let { selectionRegistrar ->
-            selectionRegistrar.subscribe(
-                MultiWidgetSelectionDelegate(
-                    selectionRangeUpdate = { state.selectionRange = it },
-                    coordinatesCallback = { state.layoutCoordinates },
-                    layoutResultCallback = { state.layoutResult }
-                )
+        selectionRegistrar?.let { selectionRegistrar ->
+            val selectable = MultiWidgetSelectionDelegate(
+                state.selectableId,
+                coordinatesCallback = { state.layoutCoordinates },
+                layoutResultCallback = { state.layoutResult }
             )
+            selectionRegistrar.subscribe(selectable)
         }
-
         onDispose {
-            // unregister only if any id was provided by SelectionRegistrar
             state.selectable?.let { selectionRegistrar?.unsubscribe(it) }
         }
     }
+
+    /**
+     * Draw the given selection on the canvas.
+     */
+    @Stable
+    @OptIn(InternalFoundationTextApi::class)
+    private fun Modifier.drawTextAndSelectionBehind(): Modifier =
+        this.graphicsLayer().drawBehind {
+            drawIntoCanvas { canvas ->
+                val textLayoutResult = state.layoutResult
+                val selectionPaint = state.selectionPaint
+                val selection = selectionRegistrar?.subselections?.get(state.selectableId)
+
+                if (textLayoutResult == null) return@drawIntoCanvas
+                if (selection != null) {
+                    val start = if (!selection.handlesCrossed) {
+                        selection.start.offset
+                    } else {
+                        selection.end.offset
+                    }
+                    val end = if (!selection.handlesCrossed) {
+                        selection.end.offset
+                    } else {
+                        selection.start.offset
+                    }
+                    TextDelegate.paintBackground(
+                        start,
+                        end,
+                        selectionPaint,
+                        canvas,
+                        textLayoutResult
+                    )
+                }
+                TextDelegate.paint(canvas, textLayoutResult)
+            }
+        }
 }
 
 @OptIn(InternalFoundationTextApi::class)
 /*@VisibleForTesting*/
 internal class TextState(
-    var textDelegate: TextDelegate
+    var textDelegate: TextDelegate,
+    /** The selectable Id assigned to the [selectable] */
+    val selectableId: Long
 ) {
     var onTextLayout: (TextLayoutResult) -> Unit = {}
 
     /** The [Selectable] associated with this [CoreText]. */
     var selectable: Selectable? = null
-    /**
-     * The current selection range, used by selection.
-     * This should be a state as every time we update the value during the selection we
-     * need to redraw it. state observation during onDraw callback will make it work.
-     */
-    var selectionRange by mutableStateOf<TextRange?>(null, structuralEqualityPolicy())
+
     /** The last layout coordinates for the Text's layout, used by selection */
     var layoutCoordinates: LayoutCoordinates? = null
     /** The latest TextLayoutResult calculated in the measure block */
@@ -501,7 +521,7 @@ internal fun longPressDragObserver(
 
         override fun onDragStart() {
             // selection never started
-            if (state.selectionRange == null) return
+            if (!selectionRegistrar.hasSelection(state.selectableId)) return
             // Zero out the total distance that being dragged.
             dragTotalDistance = Offset.Zero
         }
@@ -510,7 +530,7 @@ internal fun longPressDragObserver(
             state.layoutCoordinates?.let {
                 if (!it.isAttached) return Offset.Zero
                 // selection never started, did not consume any drag
-                if (state.selectionRange == null) return Offset.Zero
+                if (!selectionRegistrar.hasSelection(state.selectableId)) return Offset.Zero
 
                 dragTotalDistance += dragDistance
 
@@ -524,11 +544,15 @@ internal fun longPressDragObserver(
         }
 
         override fun onStop(velocity: Offset) {
-            selectionRegistrar?.notifySelectionUpdateEnd()
+            if (selectionRegistrar.hasSelection(state.selectableId)) {
+                selectionRegistrar?.notifySelectionUpdateEnd()
+            }
         }
 
         override fun onCancel() {
-            selectionRegistrar?.notifySelectionUpdateEnd()
+            if (selectionRegistrar.hasSelection(state.selectableId)) {
+                selectionRegistrar?.notifySelectionUpdateEnd()
+            }
         }
     }
 }
@@ -554,14 +578,14 @@ internal fun mouseSelectionObserver(
                 dragBeginPosition = downPosition
             }
 
-            if (state.selectionRange == null) return
+            if (!selectionRegistrar.hasSelection(state.selectableId)) return
             dragTotalDistance = Offset.Zero
         }
 
         override fun onDrag(dragDistance: Offset): Offset {
             state.layoutCoordinates?.let {
                 if (!it.isAttached) return Offset.Zero
-                if (state.selectionRange == null) return Offset.Zero
+                if (!selectionRegistrar.hasSelection(state.selectableId)) return Offset.Zero
 
                 dragTotalDistance += dragDistance
 

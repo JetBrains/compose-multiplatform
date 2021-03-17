@@ -38,7 +38,8 @@ import org.junit.runners.JUnit4
 class SelectionManagerDragTest {
 
     private val selectionRegistrar = SelectionRegistrarImpl()
-    private val selectable = FakeSelectable()
+    private val selectableKey = 1L
+    private val selectable = FakeSelectable().also { it.selectableId = this.selectableKey }
     private val selectionManager = SelectionManager(selectionRegistrar)
 
     private val size = IntSize(500, 600)
@@ -62,30 +63,32 @@ class SelectionManagerDragTest {
     private val endSelectable = mock<Selectable> {
         on { getHandlePosition(any(), any()) } doAnswer Offset.Zero
     }
+    private val startSelectableKey = 2L
+    private val endSelectableKey = 3L
     private val startLayoutCoordinates = mock<LayoutCoordinates>()
     private val endLayoutCoordinates = mock<LayoutCoordinates>()
     private val fakeInitialSelection: Selection = Selection(
         start = Selection.AnchorInfo(
             direction = ResolvedTextDirection.Ltr,
             offset = 0,
-            selectable = startSelectable
+            selectableId = startSelectableKey
         ),
         end = Selection.AnchorInfo(
             direction = ResolvedTextDirection.Ltr,
             offset = 5,
-            selectable = endSelectable
+            selectableId = endSelectableKey
         )
     )
     private val fakeResultSelection: Selection = Selection(
         start = Selection.AnchorInfo(
             direction = ResolvedTextDirection.Ltr,
             offset = 5,
-            selectable = endSelectable
+            selectableId = endSelectableKey
         ),
         end = Selection.AnchorInfo(
             direction = ResolvedTextDirection.Ltr,
             offset = 0,
-            selectable = startSelectable
+            selectableId = startSelectableKey
         )
     )
     private var selection: Selection? = fakeInitialSelection
@@ -94,11 +97,16 @@ class SelectionManagerDragTest {
 
     @Before
     fun setup() {
-        selectionRegistrar.subscribe(selectable)
-        selectable.selectionToReturn = fakeResultSelection
-
         whenever(startSelectable.getLayoutCoordinates()).thenReturn(startLayoutCoordinates)
+        whenever(startSelectable.selectableId).thenReturn(startSelectableKey)
         whenever(endSelectable.getLayoutCoordinates()).thenReturn(endLayoutCoordinates)
+        whenever(endSelectable.selectableId).thenReturn(endSelectableKey)
+
+        selectionRegistrar.subscribe(selectable)
+        selectionRegistrar.subscribe(startSelectable)
+        selectionRegistrar.subscribe(endSelectable)
+
+        selectable.selectionToReturn = fakeResultSelection
 
         selectionManager.containerLayoutCoordinates = containerLayoutCoordinates
         selectionManager.onSelectionChange = spyLambda
@@ -192,6 +200,7 @@ class SelectionManagerDragTest {
 }
 
 internal class FakeSelectable : Selectable {
+    override var selectableId = 0L
     var lastStartPosition: Offset? = null
     var lastEndPosition: Offset? = null
     var lastContainerLayoutCoordinates: LayoutCoordinates? = null
