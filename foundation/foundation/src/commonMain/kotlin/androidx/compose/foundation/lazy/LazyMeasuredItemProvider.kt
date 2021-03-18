@@ -27,6 +27,7 @@ internal class LazyMeasuredItemProvider(
     constraints: Constraints,
     isVertical: Boolean,
     private val scope: SubcomposeMeasureScope,
+    private val itemsProvider: LazyListItemsProvider,
     private val itemContentFactory: LazyListItemContentFactory,
     private val measuredItemFactory: MeasuredItemFactory
 ) {
@@ -42,7 +43,7 @@ internal class LazyMeasuredItemProvider(
      * This method can be called only once with each [index] per the measure pass.
      */
     fun getAndMeasure(index: DataIndex): LazyMeasuredItem {
-        val key = itemContentFactory.getKey(index.value)
+        val key = itemsProvider.getKey(index.value)
         val content = itemContentFactory.getContent(index.value, key)
         val measurables = scope.subcompose(key, content)
         val placeables = Array(measurables.size) {

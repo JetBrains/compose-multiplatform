@@ -22,6 +22,10 @@ import androidx.compose.foundation.gestures.ScrollableDefaults
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.State
+import androidx.compose.runtime.derivedStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
@@ -144,11 +148,11 @@ private class IntervalContent(
     val content: LazyItemScope.(index: Int) -> @Composable() () -> Unit
 )
 
-private class LazyListScopeImpl : LazyListScope, LazyKeyAndScopedContentFactory {
+private class LazyListScopeImpl : LazyListScope, LazyListItemsProvider {
     private val intervals = IntervalList<IntervalContent>()
-    val totalSize get() = intervals.totalSize
-    var headersIndexes: MutableList<Int>? = null
-        private set
+    override val itemsCount get() = intervals.totalSize
+    private var _headerIndexes: MutableList<Int>? = null
+    override val headerIndexes: List<Int> get() = _headerIndexes ?: emptyList()
 
     override fun getKey(index: Int): Any {
         val interval = intervals.intervalForIndex(index)
@@ -189,10 +193,10 @@ private class LazyListScopeImpl : LazyListScope, LazyKeyAndScopedContentFactory 
 
     @ExperimentalFoundationApi
     override fun stickyHeader(key: Any?, content: @Composable LazyItemScope.() -> Unit) {
-        val headersIndexes = headersIndexes ?: mutableListOf<Int>().also {
-            headersIndexes = it
+        val headersIndexes = _headerIndexes ?: mutableListOf<Int>().also {
+            _headerIndexes = it
         }
-        headersIndexes.add(totalSize)
+        headersIndexes.add(itemsCount)
 
         item(key, content)
     }
@@ -243,11 +247,8 @@ fun LazyRow(
     flingBehavior: FlingBehavior = ScrollableDefaults.flingBehavior(),
     content: LazyListScope.() -> Unit
 ) {
-    val scope = LazyListScopeImpl()
-    scope.apply(content)
-
     LazyList(
-        itemsCount = scope.totalSize,
+        stateOfItemsProvider = rememberStateOfItemsProvider(content),
         modifier = modifier,
         state = state,
         contentPadding = contentPadding,
@@ -255,9 +256,7 @@ fun LazyRow(
         horizontalArrangement = horizontalArrangement,
         isVertical = false,
         flingBehavior = flingBehavior,
-        reverseLayout = reverseLayout,
-        headerIndexes = scope.headersIndexes ?: emptyList(),
-        scopedFactory = scope
+        reverseLayout = reverseLayout
     )
 }
 
@@ -298,11 +297,8 @@ fun LazyColumn(
     flingBehavior: FlingBehavior = ScrollableDefaults.flingBehavior(),
     content: LazyListScope.() -> Unit
 ) {
-    val scope = LazyListScopeImpl()
-    scope.apply(content)
-
     LazyList(
-        itemsCount = scope.totalSize,
+        stateOfItemsProvider = rememberStateOfItemsProvider(content),
         modifier = modifier,
         state = state,
         contentPadding = contentPadding,
@@ -310,8 +306,16 @@ fun LazyColumn(
         horizontalAlignment = horizontalAlignment,
         verticalArrangement = verticalArrangement,
         isVertical = true,
-        reverseLayout = reverseLayout,
-        headerIndexes = scope.headersIndexes ?: emptyList(),
-        scopedFactory = scope
+        reverseLayout = reverseLayout
     )
+}
+
+@Composable
+private fun rememberStateOfItemsProvider(
+    content: LazyListScope.() -> Unit
+): State<LazyListItemsProvider> {
+    val latestContent = rememberUpdatedState(content)
+    return remember {
+        derivedStateOf { LazyListScopeImpl().apply(latestContent.value) }
+    }
 }

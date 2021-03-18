@@ -20,10 +20,12 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.State
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.neverEqualPolicy
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.SaveableStateHolder
+import androidx.compose.runtime.saveable.rememberSaveableStateHolder
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.Constraints
@@ -31,60 +33,54 @@ import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 
+@Composable
+internal fun rememberItemContentFactory(
+    stateOfItemsProvider: State<LazyListItemsProvider>,
+    state: LazyListState
+): LazyListItemContentFactory {
+    val saveableStateHolder = rememberSaveableStateHolder()
+    val factory = remember(stateOfItemsProvider) {
+        LazyListItemContentFactory(saveableStateHolder, stateOfItemsProvider)
+    }
+    factory.updateKeyIndexMappingForVisibleItems(state)
+    return factory
+}
+
 /**
  * This class:
- * 1) Caches the lambdas being produced by [scopedFactory]. This allows us to perform less
+ * 1) Caches the lambdas being produced by [itemsProvider]. This allows us to perform less
  * recompositions as the compose runtime can skip the whole composition if we subcompose with the
  * same instance of the content lambda.
  * 2) Updates the mapping between keys and indexes when we have a new factory
- * 3) Creates an [itemScope] to be used with [scopedFactory]
- * 4) Adds state restoration on top of the composable returned by [scopedFactory] with help of
+ * 3) Creates an [itemScope] to be used with [itemsProvider]
+ * 4) Adds state restoration on top of the composable returned by [itemsProvider] with help of
  * [saveableStateHolder].
  */
 internal class LazyListItemContentFactory(
     private val saveableStateHolder: SaveableStateHolder,
-    private var scopedFactory: LazyKeyAndScopedContentFactory,
-    itemsCount: Int
+    private var itemsProvider: State<LazyListItemsProvider>,
 ) {
-
     /**
-     * Contains the cached lambdas produced by the [scopedFactory].
+     * Contains the cached lambdas produced by the [itemsProvider].
      */
     private val lambdasCache = mutableMapOf<Any, CachedItemContent>()
 
     /**
-     * Current factory for creating an item content lambdas.
+     * We iterate through the currently composed keys and update the associated indexes so we can
+     * smartly handle reorderings. If we will not do it and just wait for the next remeasure the
+     * item could be recomposed before it and switch to start displaying the wrong item.
      */
-    private var observableScopedFactory by mutableStateOf(scopedFactory, neverEqualPolicy())
-
-    /**
-     * Current items count.
-     */
-    private var itemsCount: Int by mutableStateOf(itemsCount)
-
-    fun update(
-        scopedFactory: LazyKeyAndScopedContentFactory,
-        itemsCount: Int,
-        state: LazyListState
-    ) {
-        if (this.scopedFactory != scopedFactory) {
-            this.scopedFactory = scopedFactory
-            observableScopedFactory = scopedFactory
-        }
-        this.itemsCount = itemsCount
+    fun updateKeyIndexMappingForVisibleItems(state: LazyListState) {
+        val itemsProvider = itemsProvider.value
+        val itemsCount = itemsProvider.itemsCount
         if (itemsCount > 0) {
             val firstVisible = state.firstVisibleItemIndexNonObservable.value
             val lastVisible = state.lastVisibleItemIndexNonObservable.value
             for (i in firstVisible..minOf(itemsCount - 1, lastVisible)) {
-                lambdasCache[scopedFactory.getKey(i)]?.index = i
+                lambdasCache[itemsProvider.getKey(i)]?.index = i
             }
         }
     }
-
-    /**
-     * Return a key associated with the given [index].
-     */
-    fun getKey(index: Int) = scopedFactory.getKey(index)
 
     /**
      * Return cached item content lambda or creates a new lambda and puts it in the cache.
@@ -102,8 +98,9 @@ internal class LazyListItemContentFactory(
         var index by mutableStateOf(initialIndex)
 
         val content: @Composable () -> Unit = @Composable {
-            if (index < itemsCount) {
-                val content = observableScopedFactory.getContent(index, itemScope)
+            val itemsProvider = itemsProvider.value
+            if (index < itemsProvider.itemsCount) {
+                val content = itemsProvider.getContent(index, itemScope)
                 saveableStateHolder.SaveableStateProvider(key, content)
             }
         }
