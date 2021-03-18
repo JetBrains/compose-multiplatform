@@ -146,7 +146,7 @@ private fun Modifier.touchScrollImplementation(
         enabled = enabled,
         interactionSource = interactionSource,
         reverseDirection = false,
-        startDragImmediately = controller.isScrollInProgress,
+        startDragImmediately = { controller.isScrollInProgress },
         onDragStopped = { velocity ->
             nestedScrollDispatcher.value.coroutineScope.launch {
                 scrollLogic.value.onDragStopped(velocity)
