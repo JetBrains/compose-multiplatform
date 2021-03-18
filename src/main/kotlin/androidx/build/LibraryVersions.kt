@@ -41,7 +41,7 @@ object LibraryVersions {
     val CAMERA_VIDEO = Version("1.0.0-alpha01")
     val CAMERA_VIEW = Version("1.0.0-alpha23")
     val CARDVIEW = Version("1.1.0-alpha01")
-    val CAR_APP = Version("1.0.0-rc01")
+    val CAR_APP = Version("1.1.0-alpha01")
     // Pre-release before confirming to the same version as the rest of the CAR_APP library group.
     val CAR_APP_PRE_RELEASE = Version("1.0.0-alpha01")
     val COLLECTION = Version("1.2.0-alpha02")
