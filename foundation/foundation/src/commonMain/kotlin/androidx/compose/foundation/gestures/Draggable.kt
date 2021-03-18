@@ -182,7 +182,7 @@ fun Modifier.draggable(
     orientation = orientation,
     enabled = enabled,
     interactionSource = interactionSource,
-    startDragImmediately = startDragImmediately,
+    startDragImmediately = { startDragImmediately },
     onDragStarted = onDragStarted,
     onDragStopped = onDragStopped,
     reverseDirection = reverseDirection,
@@ -195,7 +195,7 @@ internal fun Modifier.draggable(
     orientation: Orientation,
     enabled: Boolean = true,
     interactionSource: MutableInteractionSource? = null,
-    startDragImmediately: Boolean = false,
+    startDragImmediately: () -> Boolean,
     onDragStarted: suspend CoroutineScope.(startedPosition: Offset) -> Unit = {},
     onDragStopped: suspend CoroutineScope.(velocity: Float) -> Unit = {},
     reverseDirection: Boolean = false
@@ -290,13 +290,13 @@ internal fun Modifier.draggable(
 
 private suspend fun AwaitPointerEventScope.awaitDownAndSlop(
     canDrag: State<(PointerInputChange) -> Boolean>,
-    startDragImmediately: State<Boolean>,
+    startDragImmediately: State<() -> Boolean>,
     orientation: Orientation
 ): Pair<PointerInputChange, Float>? {
     val down = awaitFirstDown(requireUnconsumed = false)
     return if (!canDrag.value.invoke(down)) {
         null
-    } else if (startDragImmediately.value) {
+    } else if (startDragImmediately.value.invoke()) {
         // since we start immediately we don't wait for slop and the initial delta is 0
         down to 0f
     } else {
