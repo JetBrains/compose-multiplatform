@@ -4,9 +4,15 @@ import org.gradle.testkit.runner.GradleRunner
 import org.jetbrains.compose.desktop.application.internal.ComposeProperties
 import java.io.File
 
-data class TestProject(
+data class TestEnvironment(
+    val workingDir: File,
+    val kotlinVersion: TestKotlinVersion = TestKotlinVersion.Default,
+    val composeVersion: String = TestProperties.composeVersion
+)
+
+class TestProject(
     private val name: String,
-    private val workingDir: File
+    private val testEnvironment: TestEnvironment
 ) {
     private val additionalArgs = listOf(
         "--stacktrace",
@@ -20,14 +26,14 @@ data class TestProject(
         for (orig in originalTestRoot.walk()) {
             if (!orig.isFile) continue
 
-            val target = workingDir.resolve(orig.relativeTo(originalTestRoot))
+            val target = testEnvironment.workingDir.resolve(orig.relativeTo(originalTestRoot))
             target.parentFile.mkdirs()
 
             if (orig.name.endsWith(".gradle") || orig.name.endsWith(".gradle.kts")) {
                 val origContent = orig.readText()
                 val newContent = origContent
-                    .replace("COMPOSE_VERSION_PLACEHOLDER", TestProperties.composeVersion)
-                    .replace("KOTLIN_VERSION_PLACEHOLDER", TestProperties.kotlinVersion)
+                    .replace("COMPOSE_VERSION_PLACEHOLDER", testEnvironment.composeVersion)
+                    .replace("KOTLIN_VERSION_PLACEHOLDER", testEnvironment.kotlinVersion.versionString)
                 target.writeText(newContent)
             } else {
                 orig.copyTo(target)
@@ -38,7 +44,7 @@ data class TestProject(
     fun gradle(vararg args: String): GradleRunner =
         GradleRunner.create().apply {
             withGradleVersion(TestProperties.gradleVersionForTests)
-            withProjectDir(workingDir)
+            withProjectDir(testEnvironment.workingDir)
             withArguments(args.toList() + additionalArgs)
             forwardOutput()
         }
@@ -49,6 +55,6 @@ data class TestProject(
         gradle(*args).withDebug(true)
 
     fun file(path: String): File =
-        workingDir.resolve(path)
+        testEnvironment.workingDir.resolve(path)
 }
 
