@@ -94,24 +94,36 @@ class SemanticsNode internal constructor(
      * clipping applied. To get the bounds with no clipping applied, use
      * Rect([positionInRoot], [size].toSize())
      */
-    val boundsInRoot: Rect get() = this.findWrapperToGetBounds().boundsInRoot()
+    val boundsInRoot: Rect get() {
+        if (!layoutNode.isAttached) return Rect.Zero
+        return this.findWrapperToGetBounds().boundsInRoot()
+    }
 
     /**
      * The position of this node relative to the root of this Compose hierarchy, with no clipping
      * applied
      */
-    val positionInRoot: Offset get() = findWrapperToGetBounds().positionInRoot()
+    val positionInRoot: Offset get() {
+        if (!layoutNode.isAttached) return Offset.Zero
+        return findWrapperToGetBounds().positionInRoot()
+    }
 
     /**
      * The bounding box for this node relative to the screen, with clipping applied. To get the
      * bounds with no clipping applied, use PxBounds([positionInWindow], [size].toSize())
      */
-    val boundsInWindow: Rect get() = findWrapperToGetBounds().boundsInWindow()
+    val boundsInWindow: Rect get() {
+        if (!layoutNode.isAttached) return Rect.Zero
+        return findWrapperToGetBounds().boundsInWindow()
+    }
 
     /**
      * The position of this node relative to the screen, with no clipping applied
      */
-    val positionInWindow: Offset get() = findWrapperToGetBounds().positionInWindow()
+    val positionInWindow: Offset get() {
+        if (!layoutNode.isAttached) return Offset.Zero
+        return findWrapperToGetBounds().positionInWindow()
+    }
 
     /**
      * Returns the position of an [alignment line][AlignmentLine], or [AlignmentLine.Unspecified]
