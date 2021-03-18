@@ -130,7 +130,7 @@ class SelectionManagerTest {
         assertThat(selectable.lastEndPosition).isEqualTo(endCoordinates)
         assertThat(selectable.lastContainerLayoutCoordinates)
             .isEqualTo(selectionManager.requireContainerCoordinates())
-        assertThat(selectable.lastLongPress).isEqualTo(false)
+        assertThat(selectable.lastAdjustment).isEqualTo(SelectionAdjustment.NONE)
         assertThat(selectable.lastPreviousSelection).isEqualTo(fakeSelection)
 
         verify(
@@ -158,7 +158,7 @@ class SelectionManagerTest {
         assertThat(selectable.lastEndPosition).isEqualTo(endCoordinates)
         assertThat(selectable.lastContainerLayoutCoordinates)
             .isEqualTo(selectionManager.requireContainerCoordinates())
-        assertThat(selectable.lastLongPress).isEqualTo(false)
+        assertThat(selectable.lastAdjustment).isEqualTo(SelectionAdjustment.NONE)
         assertThat(selectable.lastPreviousSelection).isEqualTo(fakeSelection)
 
         verify(selectableAnother, times(1))
@@ -166,8 +166,9 @@ class SelectionManagerTest {
                 startPosition = startCoordinates,
                 endPosition = endCoordinates,
                 containerLayoutCoordinates = selectionManager.requireContainerCoordinates(),
-                longPress = false,
-                previousSelection = fakeSelection
+                adjustment = SelectionAdjustment.NONE,
+                previousSelection = fakeSelection,
+                ensureAtLeastOneChar = true
             )
         verify(
             hapticFeedback,

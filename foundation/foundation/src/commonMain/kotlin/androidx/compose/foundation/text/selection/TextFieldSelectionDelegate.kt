@@ -28,10 +28,8 @@ import androidx.compose.ui.text.TextRange
  * @param previousSelection previous selection result
  * @param previousHandlesCrossed true if the previous selection's handles are crossed
  * @param isStartHandle true if the start handle is being dragged
- * @param wordBasedSelection This flag is ignored if the selection handles are being dragged. If
- * the selection is modified by long press and drag gesture, the result selection will be
- * adjusted to word based selection. Otherwise, the selection will be adjusted to character based
- * selection.
+ * @param adjustment selection is adjusted according to this param
+ * @param ensureAtLeastOneChar should selection contain at least one character
  *
  * @return selected text range.
  */
@@ -42,32 +40,32 @@ internal fun getTextFieldSelection(
     previousSelection: TextRange?,
     previousHandlesCrossed: Boolean,
     isStartHandle: Boolean,
-    wordBasedSelection: Boolean
+    adjustment: SelectionAdjustment,
+    ensureAtLeastOneChar: Boolean
 ): TextRange {
     textLayoutResult?.let {
         val lastOffset = it.layoutInput.text.text.length
 
-        var (startOffset, endOffset, handlesCrossed) =
+        val (startOffset, endOffset, handlesCrossed) =
             processAsSingleComposable(
                 rawStartOffset = rawStartOffset,
                 rawEndOffset = rawEndOffset,
                 previousSelection = previousSelection,
                 isStartHandle = isStartHandle,
                 lastOffset = lastOffset,
-                handlesCrossed = previousHandlesCrossed
+                handlesCrossed = previousHandlesCrossed,
+                ensureAtLeastOneChar = ensureAtLeastOneChar
             )
-        if (wordBasedSelection) {
-            val (start, end) = updateWordBasedSelection(
-                textLayoutResult = it,
-                startOffset = startOffset,
-                endOffset = endOffset,
-                handlesCrossed = handlesCrossed
-            )
-            startOffset = start
-            endOffset = end
-        }
 
-        return TextRange(startOffset, endOffset)
+        val (start, end) = adjustSelection(
+            textLayoutResult = textLayoutResult,
+            startOffset = startOffset,
+            endOffset = endOffset,
+            handlesCrossed = handlesCrossed,
+            adjustment = adjustment
+        )
+
+        return TextRange(start, end)
     }
     return TextRange(0, 0)
 }

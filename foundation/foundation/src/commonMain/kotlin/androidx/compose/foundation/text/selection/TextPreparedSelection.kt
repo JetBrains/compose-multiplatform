@@ -18,7 +18,9 @@ package androidx.compose.foundation.text.selection
 
 import androidx.compose.foundation.text.TextLayoutResultProxy
 import androidx.compose.foundation.text.findFollowingBreak
+import androidx.compose.foundation.text.findParagraphEnd
 import androidx.compose.foundation.text.findPrecedingBreak
+import androidx.compose.foundation.text.findParagraphStart
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Rect
 import androidx.compose.ui.text.AnnotatedString
@@ -337,33 +339,9 @@ internal abstract class BaseTextPreparedSelection<T : BaseTextPreparedSelection<
     private fun charOffset(offset: Int) =
         offset.coerceAtMost(text.length - 1)
 
-    private fun getParagraphStart(): Int {
-        var index = selection.min
-        if (index > 0 && text[index - 1] == '\n') {
-            index--
-        }
-        while (index > 0) {
-            if (text[index - 1] == '\n') {
-                return index
-            }
-            index--
-        }
-        return 0
-    }
+    private fun getParagraphStart() = text.findParagraphStart(selection.min)
 
-    private fun getParagraphEnd(): Int {
-        var index = selection.max
-        if (text[index] == '\n') {
-            index++
-        }
-        while (index < text.length - 1) {
-            if (text[index] == '\n') {
-                return index
-            }
-            index++
-        }
-        return text.length
-    }
+    private fun getParagraphEnd() = text.findParagraphEnd(selection.max)
 }
 
 internal class TextPreparedSelection(

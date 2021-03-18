@@ -677,6 +677,9 @@ package androidx.compose.foundation.text {
   public final class MaxLinesHeightModifierKt {
   }
 
+  public final class StringHelpersKt {
+  }
+
   public final class StringHelpers_jvmKt {
   }
 
@@ -761,6 +764,9 @@ package androidx.compose.foundation.text.selection {
   }
 
   public final class TextSelectionDelegateKt {
+  }
+
+  public final class TextSelectionMouseDetectorKt {
   }
 
 }

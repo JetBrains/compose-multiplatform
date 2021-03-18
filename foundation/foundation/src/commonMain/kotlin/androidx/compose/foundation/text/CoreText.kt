@@ -20,10 +20,13 @@ package androidx.compose.foundation.text
 import androidx.compose.foundation.fastMapIndexedNotNull
 import androidx.compose.foundation.text.selection.LocalSelectionRegistrar
 import androidx.compose.foundation.text.selection.LocalTextSelectionColors
+import androidx.compose.foundation.text.selection.MouseSelectionObserver
 import androidx.compose.foundation.text.selection.MultiWidgetSelectionDelegate
 import androidx.compose.foundation.text.selection.Selectable
+import androidx.compose.foundation.text.selection.SelectionAdjustment
 import androidx.compose.foundation.text.selection.SelectionRegistrar
 import androidx.compose.foundation.text.selection.hasSelection
+import androidx.compose.foundation.text.selection.mouseSelectionDetector
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.DisposableEffectResult
@@ -173,7 +176,12 @@ internal fun CoreText(
                             )
                         }
                     } else {
-                        Modifier.mouseDragGestureFilter(controller.longPressDragObserver, true)
+                        Modifier.pointerInput(Unit) {
+                            mouseSelectionDetector(
+                                controller.mouseSelectionObserver,
+                                finalPass = true
+                            )
+                        }
                     }
                 } else {
                     Modifier
@@ -366,7 +374,8 @@ internal class TextController(val state: TextState) {
 
                 selectionRegistrar?.notifySelectionUpdateStart(
                     layoutCoordinates = it,
-                    startPosition = startPoint
+                    startPosition = startPoint,
+                    adjustment = SelectionAdjustment.WORD
                 )
 
                 dragBeginPosition = startPoint
@@ -388,7 +397,8 @@ internal class TextController(val state: TextState) {
                 selectionRegistrar?.notifySelectionUpdate(
                     layoutCoordinates = it,
                     startPosition = dragBeginPosition,
-                    endPosition = dragBeginPosition + dragTotalDistance
+                    endPosition = dragBeginPosition + dragTotalDistance,
+                    adjustment = SelectionAdjustment.NONE
                 )
             }
         }
@@ -403,6 +413,74 @@ internal class TextController(val state: TextState) {
             if (selectionRegistrar.hasSelection(state.selectableId)) {
                 selectionRegistrar?.notifySelectionUpdateEnd()
             }
+        }
+    }
+
+    val mouseSelectionObserver = object : MouseSelectionObserver {
+        var dragBeginPosition = Offset.Zero
+
+        override fun onExtend(downPosition: Offset): Boolean {
+            state.layoutCoordinates?.let {
+                if (!it.isAttached) return false
+
+                selectionRegistrar?.notifySelectionUpdate(
+                    layoutCoordinates = it,
+                    endPosition = downPosition,
+                    adjustment = SelectionAdjustment.NONE
+                )
+                return selectionRegistrar.hasSelection(state.selectableId)
+            }
+            return false
+        }
+
+        override fun onExtendDrag(dragPosition: Offset): Boolean {
+            state.layoutCoordinates?.let {
+                if (!it.isAttached) return false
+                if (!selectionRegistrar.hasSelection(state.selectableId)) return false
+
+                selectionRegistrar?.notifySelectionUpdate(
+                    layoutCoordinates = it,
+                    endPosition = dragPosition,
+                    adjustment = SelectionAdjustment.NONE
+                )
+            }
+            return true
+        }
+
+        override fun onStart(
+            downPosition: Offset,
+            adjustment: SelectionAdjustment
+        ): Boolean {
+            state.layoutCoordinates?.let {
+                if (!it.isAttached) return false
+
+                selectionRegistrar?.notifySelectionUpdate(
+                    layoutCoordinates = it,
+                    startPosition = downPosition,
+                    endPosition = downPosition,
+                    adjustment = adjustment
+                )
+
+                dragBeginPosition = downPosition
+                return selectionRegistrar.hasSelection(state.selectableId)
+            }
+
+            return false
+        }
+
+        override fun onDrag(dragPosition: Offset, adjustment: SelectionAdjustment): Boolean {
+            state.layoutCoordinates?.let {
+                if (!it.isAttached) return false
+                if (!selectionRegistrar.hasSelection(state.selectableId)) return false
+
+                selectionRegistrar?.notifySelectionUpdate(
+                    layoutCoordinates = it,
+                    startPosition = dragBeginPosition,
+                    endPosition = dragPosition,
+                    adjustment = adjustment
+                )
+            }
+            return true
         }
     }
 

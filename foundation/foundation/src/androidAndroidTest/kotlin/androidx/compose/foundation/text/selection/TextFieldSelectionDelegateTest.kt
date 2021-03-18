@@ -69,7 +69,8 @@ class TextFieldSelectionDelegateTest {
             previousSelection = null,
             previousHandlesCrossed = false,
             isStartHandle = true,
-            wordBasedSelection = true
+            adjustment = SelectionAdjustment.WORD,
+            ensureAtLeastOneChar = true
         )
 
         // Assert.
@@ -96,7 +97,8 @@ class TextFieldSelectionDelegateTest {
             previousSelection = null,
             previousHandlesCrossed = false,
             isStartHandle = true,
-            wordBasedSelection = true
+            adjustment = SelectionAdjustment.WORD,
+            ensureAtLeastOneChar = true
         )
 
         // Assert.
@@ -126,7 +128,8 @@ class TextFieldSelectionDelegateTest {
             previousSelection = null,
             previousHandlesCrossed = false,
             isStartHandle = true,
-            wordBasedSelection = true
+            adjustment = SelectionAdjustment.WORD,
+            ensureAtLeastOneChar = true
         )
 
         // Assert.
@@ -156,7 +159,8 @@ class TextFieldSelectionDelegateTest {
             previousSelection = null,
             previousHandlesCrossed = false,
             isStartHandle = true,
-            wordBasedSelection = true
+            adjustment = SelectionAdjustment.WORD,
+            ensureAtLeastOneChar = true
         )
 
         // Assert.
@@ -187,7 +191,8 @@ class TextFieldSelectionDelegateTest {
             previousSelection = TextRange(0, 0),
             previousHandlesCrossed = false,
             isStartHandle = true,
-            wordBasedSelection = false
+            adjustment = SelectionAdjustment.NONE,
+            ensureAtLeastOneChar = true
         )
 
         // Assert.
@@ -218,7 +223,8 @@ class TextFieldSelectionDelegateTest {
             previousSelection = TextRange(0, 0),
             previousHandlesCrossed = false,
             isStartHandle = true,
-            wordBasedSelection = false
+            adjustment = SelectionAdjustment.NONE,
+            ensureAtLeastOneChar = true
         )
 
         // Assert.
@@ -251,7 +257,8 @@ class TextFieldSelectionDelegateTest {
             previousSelection = TextRange(0, 0),
             previousHandlesCrossed = false,
             isStartHandle = true,
-            wordBasedSelection = false
+            adjustment = SelectionAdjustment.NONE,
+            ensureAtLeastOneChar = true
         )
 
         // Assert.
@@ -282,7 +289,8 @@ class TextFieldSelectionDelegateTest {
             previousSelection = TextRange(0, 0),
             previousHandlesCrossed = false,
             isStartHandle = true,
-            wordBasedSelection = false
+            adjustment = SelectionAdjustment.NONE,
+            ensureAtLeastOneChar = true
         )
 
         // Assert.
@@ -313,7 +321,8 @@ class TextFieldSelectionDelegateTest {
             previousSelection = TextRange(0, 0),
             previousHandlesCrossed = false,
             isStartHandle = true,
-            wordBasedSelection = false
+            adjustment = SelectionAdjustment.NONE,
+            ensureAtLeastOneChar = true
         )
 
         // Assert.
@@ -346,7 +355,8 @@ class TextFieldSelectionDelegateTest {
             previousSelection = TextRange(0, 0),
             previousHandlesCrossed = false,
             isStartHandle = true,
-            wordBasedSelection = false
+            adjustment = SelectionAdjustment.NONE,
+            ensureAtLeastOneChar = true
         )
 
         // Assert.

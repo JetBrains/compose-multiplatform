@@ -186,24 +186,38 @@ internal class SelectionManager(private val selectionRegistrar: SelectionRegistr
             }
         }
 
-        selectionRegistrar.onSelectionUpdateStartCallback = { layoutCoordinates, startPosition ->
-            updateSelection(
-                startPosition = convertToContainerCoordinates(layoutCoordinates, startPosition),
-                endPosition = convertToContainerCoordinates(layoutCoordinates, startPosition),
-                isStartHandle = true,
-                longPress = touchMode
-            )
-            focusRequester.requestFocus()
-            hideSelectionToolbar()
-        }
+        selectionRegistrar.onSelectionUpdateStartCallback =
+            { layoutCoordinates, startPosition, selectionMode ->
+                val startPositionInContainer = convertToContainerCoordinates(
+                    layoutCoordinates,
+                    startPosition
+                )
+
+                updateSelection(
+                    startPosition = startPositionInContainer,
+                    endPosition = startPositionInContainer,
+                    isStartHandle = true,
+                    adjustment = selectionMode
+                )
+
+                focusRequester.requestFocus()
+                hideSelectionToolbar()
+            }
 
         selectionRegistrar.onSelectionUpdateCallback =
-            { layoutCoordinates, startPosition, endPosition ->
+            { layoutCoordinates, startPosition, endPosition, selectionMode ->
+                val startPositionOrCurrent = if (startPosition == null) {
+                    currentSelectionStartPosition()
+                } else {
+                    convertToContainerCoordinates(layoutCoordinates, startPosition)
+                }
+
                 updateSelection(
-                    startPosition = convertToContainerCoordinates(layoutCoordinates, startPosition),
+                    startPosition = startPositionOrCurrent,
                     endPosition = convertToContainerCoordinates(layoutCoordinates, endPosition),
                     isStartHandle = false,
-                    longPress = touchMode
+                    adjustment = selectionMode,
+                    ensureAtLeastOneChar = touchMode
                 )
             }
 
@@ -229,6 +243,23 @@ internal class SelectionManager(private val selectionRegistrar: SelectionRegistr
                 startHandlePosition = null
                 endHandlePosition = null
             }
+        }
+    }
+
+    private fun currentSelectionStartPosition(): Offset? {
+        return selection?.let { selection ->
+            val startSelectable =
+                selectionRegistrar.selectableMap[selection.start.selectableId]
+
+            requireContainerCoordinates().localPositionOf(
+                startSelectable?.getLayoutCoordinates()!!,
+                getAdjustedCoordinates(
+                    startSelectable.getHandlePosition(
+                        selection = selection,
+                        isStartHandle = true
+                    )
+                )
+            )
         }
     }
 
@@ -293,7 +324,8 @@ internal class SelectionManager(private val selectionRegistrar: SelectionRegistr
      *
      * @param startPosition [Offset] for the start of the selection
      * @param endPosition [Offset] for the end of the selection
-     * @param longPress the selection is a result of long press
+     * @param adjustment [Selection] range is adjusted according to this param
+     * @param ensureAtLeastOneChar should selection contain at least one character
      * @param previousSelection previous selection
      *
      * @return a [Pair] of a [Selection] object which is constructed by combining all
@@ -304,7 +336,8 @@ internal class SelectionManager(private val selectionRegistrar: SelectionRegistr
     internal fun mergeSelections(
         startPosition: Offset,
         endPosition: Offset,
-        longPress: Boolean = false,
+        adjustment: SelectionAdjustment = SelectionAdjustment.NONE,
+        ensureAtLeastOneChar: Boolean = true,
         previousSelection: Selection? = null,
         isStartHandle: Boolean = true
     ): Pair<Selection?, Map<Long, Selection>> {
@@ -315,9 +348,10 @@ internal class SelectionManager(private val selectionRegistrar: SelectionRegistr
                     startPosition = startPosition,
                     endPosition = endPosition,
                     containerLayoutCoordinates = requireContainerCoordinates(),
-                    longPress = longPress,
                     previousSelection = previousSelection,
-                    isStartHandle = isStartHandle
+                    isStartHandle = isStartHandle,
+                    adjustment = adjustment,
+                    ensureAtLeastOneChar = ensureAtLeastOneChar
                 )
                 selection?.let { subselections[selectable.selectableId] = it }
                 merge(mergedSelection, selection)
@@ -576,16 +610,18 @@ internal class SelectionManager(private val selectionRegistrar: SelectionRegistr
     private fun updateSelection(
         startPosition: Offset?,
         endPosition: Offset?,
-        longPress: Boolean = false,
+        adjustment: SelectionAdjustment = SelectionAdjustment.NONE,
+        ensureAtLeastOneChar: Boolean = true,
         isStartHandle: Boolean = true
     ) {
         if (startPosition == null || endPosition == null) return
         val (newSelection, newSubselection) = mergeSelections(
             startPosition = startPosition,
             endPosition = endPosition,
-            longPress = longPress,
+            adjustment = adjustment,
             isStartHandle = isStartHandle,
-            previousSelection = selection
+            previousSelection = selection,
+            ensureAtLeastOneChar = ensureAtLeastOneChar
         )
         if (newSelection != selection) {
             selectionRegistrar.subselections = newSubselection

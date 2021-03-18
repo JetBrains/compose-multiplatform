@@ -33,7 +33,8 @@ internal class MultiWidgetSelectionDelegate(
         startPosition: Offset,
         endPosition: Offset,
         containerLayoutCoordinates: LayoutCoordinates,
-        longPress: Boolean,
+        adjustment: SelectionAdjustment,
+        ensureAtLeastOneChar: Boolean,
         previousSelection: Selection?,
         isStartHandle: Boolean
     ): Selection? {
@@ -50,9 +51,10 @@ internal class MultiWidgetSelectionDelegate(
             textLayoutResult = textLayoutResult,
             selectionCoordinates = Pair(startPx, endPx),
             selectable = this,
-            wordBasedSelection = longPress,
+            adjustment = adjustment,
             previousSelection = previousSelection,
-            isStartHandle = isStartHandle
+            isStartHandle = isStartHandle,
+            ensureAtLeastOneChar = ensureAtLeastOneChar
         )
     }
 
@@ -104,10 +106,8 @@ internal class MultiWidgetSelectionDelegate(
  * @param selectionCoordinates The positions of the start and end of the selection in Text
  * composable coordinate system.
  * @param selectable current [Selectable] for which the [Selection] is being calculated
- * @param wordBasedSelection This flag is ignored if the selection handles are being dragged. If
- * the selection is modified by long press and drag gesture, the result selection will be
- * adjusted to word based selection. Otherwise, the selection will be adjusted to character based
- * selection.
+ * @param adjustment [Selection] range is adjusted according to this param
+ * @param ensureAtLeastOneChar should selection contain at least one character
  * @param previousSelection previous selection result
  * @param isStartHandle true if the start handle is being dragged
  *
@@ -117,7 +117,8 @@ internal fun getTextSelectionInfo(
     textLayoutResult: TextLayoutResult,
     selectionCoordinates: Pair<Offset, Offset>,
     selectable: Selectable,
-    wordBasedSelection: Boolean,
+    adjustment: SelectionAdjustment,
+    ensureAtLeastOneChar: Boolean = true,
     previousSelection: Selection? = null,
     isStartHandle: Boolean = true
 ): Selection? {
@@ -165,9 +166,10 @@ internal fun getTextSelectionInfo(
         textLayoutResult = textLayoutResult,
         lastOffset = lastOffset,
         selectable = selectable,
-        wordBasedSelection = wordBasedSelection,
+        adjustment = adjustment,
         previousSelection = previousSelection,
-        isStartHandle = isStartHandle
+        isStartHandle = isStartHandle,
+        ensureAtLeastOneChar = ensureAtLeastOneChar
     )
 }
 
@@ -187,10 +189,8 @@ internal fun getTextSelectionInfo(
  * @param textLayoutResult a result of the text layout.
  * @param lastOffset last offset of the text. It's actually the length of the text.
  * @param selectable current [Selectable] for which the [Selection] is being calculated
- * @param wordBasedSelection This flag is ignored if the selection handles are being dragged. If
- * the selection is modified by long press and drag gesture, the result selection will be
- * adjusted to word based selection. Otherwise, the selection will be adjusted to character based
- * selection.
+ * @param adjustment [Selection] range is adjusted according to this param
+ * @param ensureAtLeastOneChar should selection contain at least one character
  * @param previousSelection previous selection result
  * @param isStartHandle true if the start handle is being dragged
  *
@@ -207,14 +207,15 @@ private fun getRefinedSelectionInfo(
     textLayoutResult: TextLayoutResult,
     lastOffset: Int,
     selectable: Selectable,
-    wordBasedSelection: Boolean,
+    adjustment: SelectionAdjustment,
+    ensureAtLeastOneChar: Boolean,
     previousSelection: Selection? = null,
     isStartHandle: Boolean = true
 ): Selection? {
     val shouldProcessAsSinglecomposable =
         containsWholeSelectionStart && containsWholeSelectionEnd
 
-    var (startOffset, endOffset, handlesCrossed) =
+    val (startOffset, endOffset, handlesCrossed) =
         if (shouldProcessAsSinglecomposable) {
             processAsSingleComposable(
                 rawStartOffset = rawStartOffset,
@@ -222,7 +223,8 @@ private fun getRefinedSelectionInfo(
                 previousSelection = previousSelection?.toTextRange(),
                 isStartHandle = isStartHandle,
                 lastOffset = lastOffset,
-                handlesCrossed = previousSelection?.handlesCrossed ?: false
+                handlesCrossed = previousSelection?.handlesCrossed ?: false,
+                ensureAtLeastOneChar = ensureAtLeastOneChar
             )
         } else {
             processCrossComposable(
@@ -239,21 +241,17 @@ private fun getRefinedSelectionInfo(
     // nothing is selected
     if (startOffset == -1 && endOffset == -1) return null
 
-    // If under long press, update the selection to word-based.
-    if (wordBasedSelection) {
-        val (start, end) = updateWordBasedSelection(
-            textLayoutResult = textLayoutResult,
-            startOffset = startOffset,
-            endOffset = endOffset,
-            handlesCrossed = handlesCrossed
-        )
-        startOffset = start
-        endOffset = end
-    }
-
-    return getAssembledSelectionInfo(
+    val (start, end) = adjustSelection(
+        textLayoutResult = textLayoutResult,
         startOffset = startOffset,
         endOffset = endOffset,
+        handlesCrossed = handlesCrossed,
+        adjustment = adjustment
+    )
+
+    return getAssembledSelectionInfo(
+        startOffset = start,
+        endOffset = end,
         handlesCrossed = handlesCrossed,
         selectableId = selectable.selectableId,
         textLayoutResult = textLayoutResult

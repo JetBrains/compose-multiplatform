@@ -16,6 +16,7 @@
 
 package androidx.compose.foundation.text.selection
 
+import androidx.compose.foundation.text.getParagraphBoundary
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Rect
 import androidx.compose.ui.text.TextLayoutResult
@@ -36,6 +37,7 @@ import kotlin.math.max
  * @param isStartHandle true if the start handle is being dragged
  * @param lastOffset last offset of the text. It's actually the length of the text.
  * @param handlesCrossed true if the selection handles are crossed
+ * @param ensureAtLeastOneChar should selection contain at least one character
  *
  * @return the final startOffset, endOffset of the selection, and if the start and end are
  * crossed each other.
@@ -46,11 +48,12 @@ internal fun processAsSingleComposable(
     previousSelection: TextRange?,
     isStartHandle: Boolean,
     lastOffset: Int,
-    handlesCrossed: Boolean
+    handlesCrossed: Boolean,
+    ensureAtLeastOneChar: Boolean
 ): Triple<Int, Int, Boolean> {
     var startOffset = rawStartOffset
     var endOffset = rawEndOffset
-    if (startOffset == endOffset) {
+    if (startOffset == endOffset && ensureAtLeastOneChar) {
 
         if (previousSelection == null) return Triple(rawStartOffset, rawStartOffset, false)
         // If the start and end offset are at the same character, and it's not the initial
@@ -131,31 +134,40 @@ internal fun processCrossComposable(
 }
 
 /**
- * This method returns the adjusted word-based start and end offset of the selection.
+ * This method returns the adjusted start and end offset of the selection according to [adjustment].
  *
  * @param textLayoutResult a result of the text layout.
  * @param startOffset start offset to be snapped to a word.
  * @param endOffset end offset to be snapped to a word.
  * @param handlesCrossed true if the selection handles are crossed
+ * @param adjustment how to adjust selection
  *
  * @return the adjusted word-based start and end offset of the selection.
  */
-internal fun updateWordBasedSelection(
+internal fun adjustSelection(
     textLayoutResult: TextLayoutResult,
     startOffset: Int,
     endOffset: Int,
-    handlesCrossed: Boolean
+    handlesCrossed: Boolean,
+    adjustment: SelectionAdjustment
 ): Pair<Int, Int> {
+    val boundaryFun = when (adjustment) {
+        SelectionAdjustment.NONE -> return Pair(startOffset, endOffset)
+        SelectionAdjustment.WORD -> textLayoutResult::getWordBoundary
+        SelectionAdjustment.PARAGRAPH ->
+            textLayoutResult.layoutInput.text.text::getParagraphBoundary
+    }
+
     val maxOffset = textLayoutResult.layoutInput.text.text.length - 1
-    val startWordBoundary = textLayoutResult.getWordBoundary(startOffset.coerceIn(0, maxOffset))
-    val endWordBoundary = textLayoutResult.getWordBoundary(endOffset.coerceIn(0, maxOffset))
+    val startBoundary = boundaryFun(startOffset.coerceIn(0, maxOffset))
+    val endBoundary = boundaryFun(endOffset.coerceIn(0, maxOffset))
 
     // If handles are not crossed, start should be snapped to the start of the word containing the
     // start offset, and end should be snapped to the end of the word containing the end offset.
     // If handles are crossed, start should be snapped to the end of the word containing the start
     // offset, and end should be snapped to the start of the word containing the end offset.
-    val start = if (handlesCrossed) startWordBoundary.end else startWordBoundary.start
-    val end = if (handlesCrossed) endWordBoundary.start else endWordBoundary.end
+    val start = if (handlesCrossed) startBoundary.end else startBoundary.start
+    val end = if (handlesCrossed) endBoundary.start else endBoundary.end
 
     return Pair(start, end)
 }

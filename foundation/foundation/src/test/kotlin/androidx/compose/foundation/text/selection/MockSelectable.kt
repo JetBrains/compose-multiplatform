@@ -34,7 +34,8 @@ internal class MockSelectable(
         startPosition: Offset,
         endPosition: Offset,
         containerLayoutCoordinates: LayoutCoordinates,
-        longPress: Boolean,
+        adjustment: SelectionAdjustment,
+        ensureAtLeastOneChar: Boolean,
         previousSelection: Selection?,
         isStartHandle: Boolean
     ): Selection? {
@@ -42,7 +43,7 @@ internal class MockSelectable(
             startPosition,
             endPosition,
             containerLayoutCoordinates,
-            longPress,
+            adjustment,
             previousSelection,
             isStartHandle
         )
@@ -62,7 +63,7 @@ internal class MockSelectable(
         val startPosition: Offset,
         val endPosition: Offset,
         val containerLayoutCoordinates: LayoutCoordinates,
-        val longPress: Boolean,
+        val adjustment: SelectionAdjustment,
         val previousSelection: Selection?,
         val isStartHandle: Boolean
     )

@@ -123,29 +123,32 @@ class DesktopTextFieldSelectionManagerTest {
 
     @Test
     fun TextFieldSelectionManager_mouseSelectionObserver_onStart() {
-        manager.mouseSelectionObserver.onDown(dragBeginPosition, false)
+        manager.mouseSelectionObserver.onStart(dragBeginPosition, SelectionAdjustment.NONE)
 
         assertThat(value.selection).isEqualTo(TextRange(0, 0))
 
-        manager.mouseSelectionObserver.onDown(dragBeginPosition + dragDistance, false)
+        manager.mouseSelectionObserver.onStart(
+            dragBeginPosition + dragDistance,
+            SelectionAdjustment.NONE
+        )
         assertThat(value.selection).isEqualTo(TextRange(8, 8))
     }
 
     @Test
     fun TextFieldSelectionManager_mouseSelectionObserver_onStart_withShift() {
-        manager.mouseSelectionObserver.onDown(dragBeginPosition, false)
+        manager.mouseSelectionObserver.onExtend(dragBeginPosition)
 
         assertThat(value.selection).isEqualTo(TextRange(0, 0))
 
-        manager.mouseSelectionObserver.onDown(dragBeginPosition + dragDistance, true)
+        manager.mouseSelectionObserver.onExtend(dragBeginPosition + dragDistance)
         assertThat(value.selection).isEqualTo(TextRange(0, 8))
     }
 
     @Test
     fun TextFieldSelectionManager_mouseSelectionObserver_onDrag() {
         val observer = manager.mouseSelectionObserver
-        observer.onDown(dragBeginPosition, false)
-        observer.onDrag(dragDistance)
+        observer.onStart(dragBeginPosition, SelectionAdjustment.NONE)
+        observer.onDrag(dragDistance, SelectionAdjustment.NONE)
 
         assertThat(value.selection).isEqualTo(TextRange(0, 8))
     }
@@ -153,8 +156,8 @@ class DesktopTextFieldSelectionManagerTest {
     @Test
     fun TextFieldSelectionManager_mouseSelectionObserver_copy() {
         val observer = manager.mouseSelectionObserver
-        observer.onDown(dragBeginPosition, false)
-        observer.onDrag(dragDistance)
+        observer.onStart(dragBeginPosition, SelectionAdjustment.NONE)
+        observer.onDrag(dragDistance, SelectionAdjustment.NONE)
 
         manager.value = value
         manager.copy(cancelSelection = false)
