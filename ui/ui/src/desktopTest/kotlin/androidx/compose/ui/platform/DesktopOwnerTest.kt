@@ -42,14 +42,13 @@ import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.input.mouse.MouseScrollEvent
-import androidx.compose.ui.input.mouse.MouseScrollUnit
 import androidx.compose.ui.input.mouse.MouseScrollOrientation
+import androidx.compose.ui.input.mouse.MouseScrollUnit
 import androidx.compose.ui.layout.Layout
 import androidx.compose.ui.test.junit4.DesktopScreenshotTestRule
 import androidx.compose.ui.unit.dp
 import com.google.common.truth.Truth
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.yield
 import org.junit.Assert.assertFalse
 import org.junit.Rule
 import org.junit.Test
@@ -210,7 +209,9 @@ class DesktopOwnerTest {
 
     @Test(timeout = 5000)
     fun `rendering of transition`() = renderingTest(width = 40, height = 40) {
-        var targetValue by mutableStateOf(10f)
+        val startValue = 10f
+        var targetValue by mutableStateOf(startValue)
+        var lastComposedValue = Float.MIN_VALUE
 
         setContent {
             val value by animateFloatAsState(
@@ -218,18 +219,9 @@ class DesktopOwnerTest {
                 animationSpec = TweenSpec(durationMillis = 30, easing = LinearEasing)
             )
             Box(Modifier.size(value.dp).background(Color.Blue))
+            lastComposedValue = value
         }
 
-        // TODO(demin) can we get rid of 'yield' here and write something more meaningful?
-        // animateFloatAsState will remember the initial animation value
-        // only after two asynchronous points:
-        //
-        // 1. LaunchedEffect in animateFloatAsState (wait with 'yield')
-        // 2. startTimeSpecified/withFrameNanos in SuspendAnimation.kt (wait with 'awaitNextRender')
-        //
-        // We need to wait for this moment because later we will change the target value
-        // to animate to it from the initial remembered value.
-        yield()
         awaitNextRender()
         screenshotRule.snap(surface, "frame1_initial")
 
@@ -237,17 +229,23 @@ class DesktopOwnerTest {
         awaitNextRender()
         screenshotRule.snap(surface, "frame2_target40_0ms")
 
-        currentTimeMillis = 10
-        awaitNextRender()
+        // animation can start not immediately, but on the second/third frame
+        // so wait when the animation will change the animating value
+        while (lastComposedValue == startValue) {
+            currentTimeMillis += 10
+            awaitNextRender()
+        }
+
         screenshotRule.snap(surface, "frame3_target40_10ms")
 
-        currentTimeMillis = 20
+        currentTimeMillis += 10
         awaitNextRender()
         screenshotRule.snap(surface, "frame4_target40_20ms")
 
-        currentTimeMillis = 30
+        currentTimeMillis += 10
         awaitNextRender()
         screenshotRule.snap(surface, "frame5_target40_30ms")
+
         assertFalse(hasRenders())
     }
 
