@@ -2219,7 +2219,7 @@ internal fun SemanticsOwner.getAllUncoveredSemanticsNodesToMap(
     val unaccountedSpace = Region().also { it.set(root.boundsInWindow.toAndroidRect()) }
 
     fun findAllSemanticNodesRecursive(currentNode: SemanticsNode) {
-        if (unaccountedSpace.isEmpty) {
+        if (unaccountedSpace.isEmpty || !currentNode.layoutNode.isAttached) {
             return
         }
         val rect = currentNode.boundsInWindow.toAndroidRect()
