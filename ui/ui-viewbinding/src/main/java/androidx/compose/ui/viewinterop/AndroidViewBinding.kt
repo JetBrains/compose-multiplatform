@@ -25,6 +25,9 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.node.Ref
+import androidx.compose.ui.platform.LocalView
+import androidx.fragment.app.Fragment
+import androidx.fragment.app.findFragment
 import androidx.viewbinding.ViewBinding
 
 /**
@@ -51,9 +54,23 @@ fun <T : ViewBinding> AndroidViewBinding(
     update: T.() -> Unit = {}
 ) {
     val viewBindingRef = remember { Ref<T>() }
-    val viewBlock: (Context) -> View = remember {
+    val localView = LocalView.current
+    // Find the parent fragment, if one exists. This will let us ensure that
+    // fragments inflated via a FragmentContainerView are properly nested
+    // (which, in turn, allows the fragments to properly save/restore their state)
+    val parentFragment = remember(localView) {
+        try {
+            localView.findFragment<Fragment>()
+        } catch (e: IllegalStateException) {
+            // findFragment throws if no parent fragment is found
+            null
+        }
+    }
+    val viewBlock: (Context) -> View = remember(localView) {
         { context ->
-            val inflater = LayoutInflater.from(context)
+            // Inflated fragments are automatically nested properly when
+            // using the parent fragment's LayoutInflater
+            val inflater = parentFragment?.layoutInflater ?: LayoutInflater.from(context)
             val viewBinding = factory(inflater, FrameLayout(context), false)
             viewBindingRef.value = viewBinding
             viewBinding.root
