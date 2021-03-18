@@ -209,6 +209,24 @@ class AndroidComposeViewAccessibilityDelegateCompatTest {
     }
 
     @Test
+    fun testPopulateAccessibilityNodeInfoProperties_screenReaderFocusable_mergingDescendants() {
+        val node = createSemanticsNodeWithProperties(1, true) {}
+
+        accessibilityDelegate.populateAccessibilityNodeInfoProperties(1, info, node)
+
+        assertTrue(info.isScreenReaderFocusable)
+    }
+
+    @Test
+    fun testPopulateAccessibilityNodeInfoProperties_screenReaderFocusable_notMergingDescendants() {
+        val node = createSemanticsNodeWithProperties(1, false) {}
+
+        accessibilityDelegate.populateAccessibilityNodeInfoProperties(1, info, node)
+
+        assertFalse(info.isScreenReaderFocusable)
+    }
+
+    @Test
     fun testPopulateAccessibilityNodeInfoProperties_disabled() {
         rule.setContent {
             LocalClipboardManager.current.setText(AnnotatedString("test"))
