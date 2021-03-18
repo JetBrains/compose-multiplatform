@@ -18,6 +18,7 @@ package androidx.build.docs
 
 import androidx.build.SupportConfig
 import androidx.build.addToBuildOnServer
+import androidx.build.dackka.DackkaTask
 import androidx.build.doclava.DacOptions
 import androidx.build.doclava.DoclavaTask
 import androidx.build.doclava.GENERATE_DOCS_CONFIG
@@ -103,6 +104,18 @@ class AndroidXDocsPlugin : Plugin<Project> {
             docsSourcesConfiguration
         )
 
+        val unzippedSourcesForDackka = File(project.buildDir, "unzippedSourcesForDackka")
+        val unzipSourcesForDackkaTask = configureDackkaUnzipTask(
+            unzippedSourcesForDackka,
+            docsSourcesConfiguration
+        )
+
+        configureDackka(
+            unzippedSourcesForDackka,
+            unzipSourcesForDackkaTask,
+            unzippedSamplesSources,
+            unzipSamplesTask
+        )
         configureDokka(
             unzippedDocsSources,
             unzipDocsTask,
@@ -154,6 +167,35 @@ class AndroidXDocsPlugin : Plugin<Project> {
             task.filter { line ->
                 regex.replace(line, "{@link $1attr#$3}")
             }
+        }
+    }
+
+    /**
+     * Creates and configures a task that will build a list of select sources, defined by
+     * [dackkaDirsToProcess], and places them in [destinationDirectory].
+     *
+     * This is a modified version of [configureUnzipTask], customized for Dackka usage.
+     */
+    private fun configureDackkaUnzipTask(
+        destinationDirectory: File,
+        docsConfiguration: Configuration
+    ): TaskProvider<Sync> {
+        return project.tasks.register("unzipSourcesForDackka", Sync::class.java) { task ->
+            val sources = docsConfiguration.incoming.artifactView { }.files
+
+            @Suppress("UnstableApiUsage")
+            task.from(
+                sources.elements.map { jars ->
+                    jars.map {
+                        project.zipTree(it).matching {
+                            dackkaDirsToProcess.forEach { dir ->
+                                it.include(dir)
+                            }
+                        }
+                    }
+                }
+            )
+            task.into(destinationDirectory)
         }
     }
 
@@ -242,6 +284,36 @@ class AndroidXDocsPlugin : Plugin<Project> {
                 "android-classes"
             )
         }.files
+    }
+
+    private fun configureDackka(
+        unzippedDocsSources: File,
+        unzipDocsTask: TaskProvider<Sync>,
+        unzippedSamplesSources: File,
+        unzipSamplesTask: TaskProvider<Sync>
+    ) {
+        val generatedDocsDir = project.file("${project.buildDir}/dackkaDocs")
+
+        val dackkaConfiguration = project.configurations.create("dackka").apply {
+            dependencies.add(project.dependencies.create(DACKKA_DEPENDENCY))
+        }
+
+        project.tasks.register("dackkaDocs", DackkaTask::class.java) { task ->
+            task.apply {
+                dependsOn(dackkaConfiguration)
+                dependsOn(unzipDocsTask)
+                dependsOn(unzipSamplesTask)
+
+                description = "Generates reference documentation using a Google devsite Dokka" +
+                    " plugin. Places docs in $generatedDocsDir"
+                group = JavaBasePlugin.DOCUMENTATION_GROUP
+
+                dackkaClasspath.from(project.files(dackkaConfiguration))
+                destinationDir = generatedDocsDir
+                samplesDir = unzippedSamplesSources
+                sourcesDir = unzippedDocsSources
+            }
+        }
     }
 
     private fun configureDokka(
@@ -463,7 +535,15 @@ abstract class SourcesVariantRule : ComponentMetadataRule {
     }
 }
 
+private const val DACKKA_DEPENDENCY = "com.google.devsite:dackka:0.0.1-alpha01"
 private const val DOCLAVA_DEPENDENCY = "com.android:doclava:1.0.6"
+
+// Allowlist for directories that should be processed by Dackka
+private val dackkaDirsToProcess = listOf(
+    "androidx/benchmark/**",
+    "androidx/collection/**",
+    "androidx/paging/**"
+)
 
 private val hiddenPackages = listOf(
     "androidx.camera.camera2.impl",
