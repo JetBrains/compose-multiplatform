@@ -7,6 +7,12 @@ abstract class GradlePluginTestBase {
     @TempDir
     lateinit var testWorkDir: File
 
-    fun testProject(name: String): TestProject =
-        TestProject(name, workingDir = testWorkDir)
+    val defaultTestEnvironment: TestEnvironment
+        get() = TestEnvironment(workingDir = testWorkDir)
+
+    fun testProject(
+        name: String,
+        testEnvironment: TestEnvironment = defaultTestEnvironment
+    ): TestProject =
+        TestProject(name, testEnvironment = testEnvironment)
 }

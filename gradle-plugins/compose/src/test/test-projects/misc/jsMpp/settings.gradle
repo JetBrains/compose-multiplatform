@@ -1,0 +1,12 @@
+pluginManagement {
+    plugins {
+        id 'org.jetbrains.kotlin.multiplatform' version 'KOTLIN_VERSION_PLACEHOLDER'
+        id 'org.jetbrains.compose' version 'COMPOSE_VERSION_PLACEHOLDER'
+    }
+    repositories {
+        mavenLocal()
+        gradlePluginPortal()
+        maven { url "https://maven.pkg.jetbrains.space/kotlin/p/kotlin/dev" }
+    }
+}
+rootProject.name = "jsMpp"

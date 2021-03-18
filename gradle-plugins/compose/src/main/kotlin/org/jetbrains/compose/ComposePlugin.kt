@@ -13,7 +13,7 @@ import org.jetbrains.compose.desktop.application.internal.currentTarget
 import org.jetbrains.kotlin.gradle.plugin.KotlinDependencyHandler
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
-private val composeVersion get() = ComposeBuildConfig.composeVersion
+internal val composeVersion get() = ComposeBuildConfig.composeVersion
 
 class ComposePlugin : Plugin<Project> {
     override fun apply(project: Project) {
@@ -30,17 +30,14 @@ class ComposePlugin : Plugin<Project> {
             }
         }
 
+        project.pluginManager.apply(ComposeCompilerKotlinSupportPlugin::class.java)
+
         project.afterEvaluate {
             if (desktopExtension._isApplicationInitialized) {
                 // If application object was not accessed in a script,
                 // we want to avoid creating tasks like package, run, etc. to avoid conflicts with other plugins
                 configureApplicationImpl(project, desktopExtension.application)
             }
-
-            project.dependencies.add(
-                "kotlinCompilerPluginClasspath",
-                "org.jetbrains.compose.compiler:compiler:$composeVersion"
-            )
         }
 
         fun ComponentModuleMetadataHandler.replaceAndroidx(original: String, replacement: String) {

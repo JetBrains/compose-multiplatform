@@ -8,4 +8,5 @@ object TestProjects {
     const val javaLogger = "application/javaLogger"
     const val macOptions = "application/macOptions"
     const val optionsWithSpaces = "application/optionsWithSpaces"
+    const val jsMpp = "misc/jsMpp"
 }
