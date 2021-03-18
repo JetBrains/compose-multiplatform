@@ -430,12 +430,6 @@ package androidx.compose.foundation.legacygestures {
   public final class DragGestureFilterKt {
   }
 
-  public final class PressIndicatorGestureFilterKt {
-  }
-
-  public final class TapGestureFilterKt {
-  }
-
 }
 
 package androidx.compose.foundation.selection {

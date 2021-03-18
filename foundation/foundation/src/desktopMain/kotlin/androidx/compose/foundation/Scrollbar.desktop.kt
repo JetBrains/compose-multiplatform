@@ -34,12 +34,13 @@ import androidx.compose.runtime.setValue
 import androidx.compose.runtime.staticCompositionLocalOf
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.composed
+import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.foundation.legacygestures.DragObserver
-import androidx.compose.foundation.legacygestures.pressIndicatorGestureFilter
 import androidx.compose.foundation.legacygestures.rawDragGestureFilter
 import androidx.compose.foundation.interaction.DragInteraction
 import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.gestures.detectTapAndPress
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.graphics.Shape
@@ -278,7 +279,6 @@ private fun Scrollbar(
     )
 }
 
-@Suppress("DEPRECATION") // press gesture filter
 private fun Modifier.scrollOnPressOutsideSlider(
     isVertical: Boolean,
     sliderAdapter: SliderAdapter,
@@ -309,12 +309,16 @@ private fun Modifier.scrollOnPressOutsideSlider(
             }
         }
     }
-
-    pressIndicatorGestureFilter(
-        onStart = { targetOffset = it },
-        onStop = { targetOffset = null },
-        onCancel = { targetOffset = null }
-    )
+    Modifier.pointerInput(Unit) {
+        detectTapAndPress(
+            onPress = { offset ->
+                targetOffset = offset
+                tryAwaitRelease()
+                targetOffset = null
+            },
+            onTap = {}
+        )
+    }
 }
 
 /**

@@ -13,12 +13,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-@file:Suppress("DEPRECATION_ERROR")
 
 package androidx.compose.foundation.text
 
-import androidx.compose.foundation.interaction.Interaction
 import androidx.compose.foundation.gestures.Orientation
+import androidx.compose.foundation.interaction.Interaction
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.text.selection.LocalTextSelectionColors
@@ -269,9 +268,11 @@ internal fun CoreTextField(
         if (!it.isFocused) manager.deselect()
     }
 
-    val focusRequestTapModifier = Modifier.focusRequestTapModifier(
-        enabled = enabled,
-        onTap = { offset ->
+    val selectionModifier =
+        Modifier.longPressDragGestureFilter(manager.touchSelectionObserver, enabled)
+
+    val pointerModifier = if (isInTouchMode) {
+        Modifier.tapPressTextFieldModifier(interactionSource, enabled) { offset ->
             tapToFocus(state, focusRequester, !readOnly)
             if (state.hasFocus) {
                 if (!state.selectionIsOn) {
@@ -288,16 +289,7 @@ internal fun CoreTextField(
                     manager.deselect(offset)
                 }
             }
-        }
-    )
-
-    val selectionModifier =
-        Modifier.longPressDragGestureFilter(manager.touchSelectionObserver, enabled)
-
-    val pointerModifier = if (isInTouchMode) {
-        Modifier.pressGestureFilter(interactionSource = interactionSource, enabled = enabled)
-            .then(selectionModifier)
-            .then(focusRequestTapModifier)
+        }.then(selectionModifier)
     } else {
         Modifier.mouseDragGestureDetector(manager::mouseSelectionDetector, enabled = enabled)
     }
