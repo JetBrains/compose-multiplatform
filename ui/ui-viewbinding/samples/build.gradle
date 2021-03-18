@@ -34,9 +34,13 @@ dependencies {
     implementation(project(":compose:runtime:runtime"))
     implementation(project(":compose:ui:ui"))
     implementation(project(":compose:ui:ui-viewbinding"))
+    // Used when creating layouts that contain a FragmentContainerView
+    implementation("androidx.fragment:fragment-ktx:1.3.2")
 
     androidTestImplementation(project(":compose:foundation:foundation"))
     androidTestImplementation(project(":compose:test-utils"))
+    androidTestImplementation(project(":activity:activity-compose"))
+    androidTestImplementation(project(":internal-testutils-runtime"))
     androidTestImplementation(ANDROIDX_TEST_RUNNER)
     androidTestImplementation(JUNIT)
     androidTestImplementation(TRUTH)
