@@ -1,0 +1,19 @@
+<idea-plugin>
+    <id>org.jetbrains.compose.desktop.idea.preview</id>
+    <name>Compose Desktop Preview</name>
+    <vendor>JetBrains</vendor>
+
+    <!-- Product and plugin compatibility requirements -->
+    <!-- https://plugins.jetbrains.com/docs/intellij/plugin-compatibility.html -->
+    <depends>com.intellij.modules.platform</depends>
+    <depends>com.intellij.gradle</depends>
+    <depends>org.jetbrains.kotlin</depends>
+
+    <extensions defaultExtensionNs="com.intellij">
+        <runLineMarkerContributor
+                language="kotlin"
+                implementationClass="org.jetbrains.compose.desktop.idea.preview.PreviewRunLineMarkerContributor"/>
+        <runConfigurationProducer
+                implementation="org.jetbrains.compose.desktop.idea.preview.PreviewRunConfigurationProducer"/>
+    </extensions>
+</idea-plugin>
