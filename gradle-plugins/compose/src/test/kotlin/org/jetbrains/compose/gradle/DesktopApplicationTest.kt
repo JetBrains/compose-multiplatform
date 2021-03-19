@@ -1,4 +1,4 @@
-package org.jetbrains.compose
+package org.jetbrains.compose.gradle
 
 import org.gradle.internal.impldep.org.testng.Assert
 import org.gradle.testkit.runner.TaskOutcome
