@@ -1110,6 +1110,7 @@ package androidx.compose.ui.text.style {
   public enum TextOverflow {
     enum_constant public static final androidx.compose.ui.text.style.TextOverflow Clip;
     enum_constant public static final androidx.compose.ui.text.style.TextOverflow Ellipsis;
+    enum_constant public static final androidx.compose.ui.text.style.TextOverflow Visible;
   }
 
 }
