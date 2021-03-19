@@ -43,7 +43,8 @@ import androidx.compose.ui.unit.dp
  * 1) Clipping: Surface clips its children to the shape specified by [shape]
  *
  * 2) Elevation: Surface draws a shadow to represent depth, where [elevation] represents the
- * depth of this surface.
+ * depth of this surface. If the passed [shape] is convex the shadow will not be drawn on Android
+ * versions less than 10.
  *
  * 3) Borders: If [shape] has a border, then it will also be drawn.
  *

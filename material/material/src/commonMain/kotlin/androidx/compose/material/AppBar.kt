@@ -22,8 +22,8 @@ import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.runtime.Composable
@@ -167,6 +167,9 @@ fun TopAppBar(
  *
  * See [BottomAppBar anatomy](https://material.io/components/app-bars-bottom/#anatomy) for the
  * recommended content depending on the [FloatingActionButton] position.
+ *
+ * Note that when you pass a non-null [cutoutShape] this makes the AppBar shape convex. The shadows
+ * for such shapes will not be drawn on Android versions less than 10.
  *
  * @sample androidx.compose.material.samples.SimpleBottomAppBar
  *
