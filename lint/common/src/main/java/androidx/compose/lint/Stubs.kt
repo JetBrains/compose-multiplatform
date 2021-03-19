@@ -128,6 +128,22 @@ object Stubs {
         ): V = calculation()
         """
     )
+
+    val MutableState = stub(
+        """
+        package androidx.compose.runtime
+
+        fun <T> mutableStateOf(value: T) = MutableState<T>()
+
+        class MutableState<T>
+
+        fun <T> mutableStateListOf() = SnapshotStateList<T>()
+        class SnapshotStateList<T>
+
+        fun <K, V> mutableStateMapOf() = SnapshotStateMap<K, V>()
+        class SnapshotStateMap<K, V>
+        """
+    )
 }
 
 // @Language isn't available as a type annotation, so we need a parameter
