@@ -46,7 +46,9 @@ import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalLayoutDirection
+import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.dismiss
+import androidx.compose.ui.semantics.onClick
 import androidx.compose.ui.semantics.paneTitle
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.Dp
@@ -531,9 +533,14 @@ private fun BottomDrawerScrim(
             animationSpec = TweenSpec()
         )
         val dismissModifier = if (visible) {
-            Modifier.pointerInput(onDismiss) {
-                detectTapGestures { onDismiss() }
-            }
+            Modifier
+                .pointerInput(onDismiss) {
+                    detectTapGestures { onDismiss() }
+                }
+                .semantics(mergeDescendants = true) {
+                    contentDescription = Strings.CloseDrawer
+                    onClick { onDismiss(); true }
+                }
         } else {
             Modifier
         }
@@ -556,7 +563,12 @@ private fun Scrim(
     color: Color
 ) {
     val dismissDrawer = if (open) {
-        Modifier.pointerInput(onClose) { detectTapGestures { onClose() } }
+        Modifier
+            .pointerInput(onClose) { detectTapGestures { onClose() } }
+            .semantics(mergeDescendants = true) {
+                contentDescription = Strings.CloseDrawer
+                onClick { onClose(); true }
+            }
     } else {
         Modifier
     }
