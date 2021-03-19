@@ -59,8 +59,9 @@ val jar = tasks.named<Jar>("jar") {
 }
 
 // __SUPPORTED_GRADLE_VERSIONS__
-val minGradleVersionForTests = "6.4"
-val maxGradleVersionForTests = "6.8.3"
+testGradleVersion("6.4")
+testGradleVersion("6.8.3")
+
 val javaHomeForTests: String? = when {
     // __COMPOSE_NATIVE_DISTRIBUTIONS_MIN_JAVA_VERSION__
     JavaVersion.current() >= JavaVersion.VERSION_15 -> System.getProperty("java.home")
@@ -69,18 +70,29 @@ val javaHomeForTests: String? = when {
 }
 val isWindows = getCurrentOperatingSystem().isWindows
 
+val gradleTestsPattern = "org.jetbrains.compose.gradle.*"
 tasks.test {
-    configureTest(maxGradleVersionForTests)
-}
-
-val testMinGradleVersion by tasks.registering(Test::class) {
-    tasks.test.get().let { defaultTest ->
-        classpath = defaultTest.classpath
+    filter {
+        excludeTestsMatching(gradleTestsPattern)
     }
-    configureTest(minGradleVersionForTests)
+}
+fun testGradleVersion(gradleVersion: String) {
+    val taskProvider = tasks.register("testGradle-$gradleVersion", Test::class) {
+        tasks.test.get().let { defaultTest ->
+            classpath = defaultTest.classpath
+        }
+        systemProperty("gradle.version.for.tests", gradleVersion)
+        filter {
+            includeTestsMatching(gradleTestsPattern)
+        }
+        dependsOn("validateTaskProperties")
+    }
+    tasks.named("check") {
+        dependsOn(taskProvider)
+    }
 }
 
-fun Test.configureTest(gradleVersion: String) {
+tasks.withType<Test>().configureEach {
     useJUnitPlatform()
     testLogging {
         events("passed", "skipped", "failed")
@@ -88,7 +100,6 @@ fun Test.configureTest(gradleVersion: String) {
 
     dependsOn("publishToMavenLocal")
     systemProperty("compose.plugin.version", BuildProperties.deployVersion(project))
-    systemProperty("gradle.version.for.tests", gradleVersion)
 
     if (javaHomeForTests != null) {
         val executableFileName = if (isWindows) "java.exe" else "java"
@@ -96,10 +107,7 @@ fun Test.configureTest(gradleVersion: String) {
     } else {
         doFirst { error("Use JDK 15+ to run tests or set up JDK_15/JDK_FOR_GRADLE_TESTS env. var") }
     }
-}
 
-tasks.named("check") {
-    dependsOn(testMinGradleVersion)
 }
 
 task("printAllAndroidxReplacements") {
