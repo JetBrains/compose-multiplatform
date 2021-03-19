@@ -38,7 +38,7 @@ internal class OuterMeasurablePlaceable(
     }
     private var lastPosition: IntOffset = IntOffset.Zero
     private var lastLayerBlock: (GraphicsLayerScope.() -> Unit)? = null
-    private val lastProvidedAlignmentLines = mutableMapOf<AlignmentLine, Int>()
+    private var lastProvidedAlignmentLines: MutableMap<AlignmentLine, Int>? = null
     private var lastZIndex: Float = 0f
 
     /**
@@ -90,16 +90,12 @@ internal class OuterMeasurablePlaceable(
             measuredOnce = true
             layoutNode.layoutState = LayoutState.Measuring
             measurementConstraints = constraints
-            lastProvidedAlignmentLines.clear()
-            lastProvidedAlignmentLines.putAll(layoutNode.providedAlignmentLines)
             val outerWrapperPreviousMeasuredSize = outerWrapper.size
             owner.snapshotObserver.observeMeasureSnapshotReads(layoutNode) {
                 outerWrapper.measure(constraints)
             }
             layoutNode.layoutState = LayoutState.NeedsRelayout
-            if (layoutNode.providedAlignmentLines != lastProvidedAlignmentLines) {
-                layoutNode.onAlignmentsChanged()
-            }
+            notifyAlignmentChanges()
             val sizeChanged = outerWrapper.size != outerWrapperPreviousMeasuredSize ||
                 outerWrapper.width != width ||
                 outerWrapper.height != height
@@ -108,6 +104,26 @@ internal class OuterMeasurablePlaceable(
             return sizeChanged
         }
         return false
+    }
+
+    private fun notifyAlignmentChanges() {
+        // optimized to only create a lastProvidedAlignmentLines when we do have non empty map
+        if (layoutNode.providedAlignmentLines.isNotEmpty()) {
+            val previous = lastProvidedAlignmentLines ?: mutableMapOf<AlignmentLine, Int>().also {
+                lastProvidedAlignmentLines = it
+            }
+            if (layoutNode.providedAlignmentLines != previous) {
+                previous.clear()
+                previous.putAll(layoutNode.providedAlignmentLines)
+                layoutNode.onAlignmentsChanged()
+            }
+        } else {
+            val previous = lastProvidedAlignmentLines
+            if (previous != null && previous.isNotEmpty()) {
+                previous.clear()
+                layoutNode.onAlignmentsChanged()
+            }
+        }
     }
 
     // We are setting our measuredSize to match the coerced outerWrapper size, to prevent
