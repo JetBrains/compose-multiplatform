@@ -343,12 +343,13 @@ private class TextController(val state: TextState) {
     val commit: DisposableEffectScope.() -> DisposableEffectResult = {
         // if no SelectionContainer is added as parent selectionRegistrar will be null
         selectionRegistrar?.let { selectionRegistrar ->
-            val selectable = MultiWidgetSelectionDelegate(
-                state.selectableId,
-                coordinatesCallback = { state.layoutCoordinates },
-                layoutResultCallback = { state.layoutResult }
+            state.selectable = selectionRegistrar.subscribe(
+                MultiWidgetSelectionDelegate(
+                    selectableId = state.selectableId,
+                    coordinatesCallback = { state.layoutCoordinates },
+                    layoutResultCallback = { state.layoutResult }
+                )
             )
-            selectionRegistrar.subscribe(selectable)
         }
         onDispose {
             state.selectable?.let { selectionRegistrar?.unsubscribe(it) }
