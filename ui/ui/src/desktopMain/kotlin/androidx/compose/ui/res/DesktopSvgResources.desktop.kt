@@ -31,7 +31,7 @@ import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.IntSize
 import org.jetbrains.skija.Data
 import org.jetbrains.skija.Point
-import org.jetbrains.skija.svg.DOM
+import org.jetbrains.skija.svg.SVGDOM
 import java.io.InputStream
 import kotlin.math.ceil
 
@@ -62,15 +62,15 @@ fun svgResource(resourcePath: String): Painter {
  */
 fun loadSvgResource(inputStream: InputStream, density: Density): Painter {
     val data = Data.makeFromBytes(inputStream.readAllBytes())
-    return SVGPainter(DOM(data), density)
+    return SVGPainter(SVGDOM(data), density)
 }
 
 private class SVGPainter(
-    private val dom: DOM,
+    private val SVGDOM: SVGDOM,
     private val density: Density
 ) : Painter() {
     private val defaultSizePx: Size = run {
-        val containerSize = dom.containerSize
+        val containerSize = SVGDOM.containerSize
         if (containerSize.x == 0f && containerSize.y == 0f) {
             Size.Unspecified
         } else {
@@ -119,8 +119,8 @@ private class SVGPainter(
 
     private fun DrawScope.drawSvg(size: Size) {
         drawIntoCanvas {
-            dom.containerSize = Point(size.width, size.height)
-            dom.render(it.nativeCanvas)
+            SVGDOM.containerSize = Point(size.width, size.height)
+            SVGDOM.render(it.nativeCanvas)
         }
     }
 }
