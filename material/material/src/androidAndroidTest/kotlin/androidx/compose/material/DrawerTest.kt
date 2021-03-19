@@ -32,6 +32,7 @@ import androidx.compose.ui.semantics.SemanticsProperties
 import androidx.compose.ui.test.ExperimentalTestApi
 import androidx.compose.ui.test.SemanticsMatcher
 import androidx.compose.ui.test.assert
+import androidx.compose.ui.test.assertHasClickAction
 import androidx.compose.ui.test.assertLeftPositionInRootIsEqualTo
 import androidx.compose.ui.test.assertTopPositionInRootIsEqualTo
 import androidx.compose.ui.test.assertWidthIsEqualTo
@@ -39,6 +40,7 @@ import androidx.compose.ui.test.bottomCenter
 import androidx.compose.ui.test.centerLeft
 import androidx.compose.ui.test.click
 import androidx.compose.ui.test.junit4.createComposeRule
+import androidx.compose.ui.test.onChildAt
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onParent
 import androidx.compose.ui.test.performClick
@@ -57,6 +59,7 @@ import androidx.test.filters.SmallTest
 import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.runBlocking
 import org.junit.Ignore
+import org.junit.Assert.assertEquals
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -832,5 +835,74 @@ class DrawerTest {
         drawerState.close()
         // Then the drawer should be closed
         rule.onNodeWithTag(bottomDrawerTag).assertTopPositionInRootIsEqualTo(topWhenClosed)
+    }
+
+    @Test
+    fun modalDrawer_scrimNode_reportToSemanticsWhenOpen_notReportToSemanticsWhenClosed() {
+        val topTag = "ModalDrawer"
+        rule.setMaterialContent {
+            ModalDrawer(
+                modifier = Modifier.testTag(topTag),
+                drawerState = rememberDrawerState(DrawerValue.Open),
+                drawerContent = {
+                    Box(Modifier.fillMaxSize().testTag("drawer"))
+                },
+                content = {
+                    Box(Modifier.fillMaxSize().testTag("body"))
+                }
+            )
+        }
+
+        // The drawer should be opened
+        rule.onNodeWithTag("drawer").assertLeftPositionInRootIsEqualTo(0.dp)
+
+        var topNode = rule.onNodeWithTag(topTag).fetchSemanticsNode()
+        assertEquals(3, topNode.children.size)
+        rule.onNodeWithTag(topTag)
+            .onChildAt(1)
+            .assertHasClickAction()
+            .performSemanticsAction(SemanticsActions.OnClick)
+
+        // Then the drawer should be closed
+        rule.onNodeWithTag("drawer").assertLeftPositionInRootIsEqualTo(-rule.rootWidth())
+
+        topNode = rule.onNodeWithTag(topTag).fetchSemanticsNode()
+        assertEquals(2, topNode.children.size)
+    }
+
+    @Test
+    fun bottomDrawer_scrimNode_reportToSemanticsWhenOpen_notReportToSemanticsWhenClosed() {
+        val topTag = "BottomDrawer"
+        rule.setMaterialContent {
+            BottomDrawer(
+                modifier = Modifier.testTag(topTag),
+                drawerState = rememberBottomDrawerState(BottomDrawerValue.Open),
+                drawerContent = {
+                    Box(Modifier.height(shortBottomDrawerHeight).testTag(bottomDrawerTag))
+                },
+                content = {
+                    Box(Modifier.fillMaxSize().testTag("body"))
+                }
+            )
+        }
+
+        val height = rule.rootHeight()
+        val topWhenOpened = height - shortBottomDrawerHeight
+
+        // The drawer should be opened
+        rule.onNodeWithTag(bottomDrawerTag).assertTopPositionInRootIsEqualTo(topWhenOpened)
+
+        var topNode = rule.onNodeWithTag(topTag).fetchSemanticsNode()
+        assertEquals(3, topNode.children.size)
+        rule.onNodeWithTag(topTag)
+            .onChildAt(1)
+            .assertHasClickAction()
+            .performSemanticsAction(SemanticsActions.OnClick)
+
+        // Then the drawer should be closed
+        rule.onNodeWithTag(bottomDrawerTag).assertTopPositionInRootIsEqualTo(height)
+
+        topNode = rule.onNodeWithTag(topTag).fetchSemanticsNode()
+        assertEquals(2, topNode.children.size)
     }
 }

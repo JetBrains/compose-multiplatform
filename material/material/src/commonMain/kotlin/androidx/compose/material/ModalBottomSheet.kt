@@ -41,8 +41,10 @@ import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.SubcomposeLayout
 import androidx.compose.ui.semantics.collapse
+import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.dismiss
 import androidx.compose.ui.semantics.expand
+import androidx.compose.ui.semantics.onClick
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.Dp
@@ -312,7 +314,12 @@ private fun Scrim(
             animationSpec = TweenSpec()
         )
         val dismissModifier = if (visible) {
-            Modifier.pointerInput(onDismiss) { detectTapGestures { onDismiss() } }
+            Modifier
+                .pointerInput(onDismiss) { detectTapGestures { onDismiss() } }
+                .semantics(mergeDescendants = true) {
+                    contentDescription = Strings.CloseSheet
+                    onClick { onDismiss(); true }
+                }
         } else {
             Modifier
         }
