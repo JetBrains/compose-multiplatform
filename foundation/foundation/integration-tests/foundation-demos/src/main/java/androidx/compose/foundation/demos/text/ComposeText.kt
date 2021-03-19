@@ -44,6 +44,10 @@ import androidx.compose.ui.text.samples.ParagraphStyleSample
 import androidx.compose.ui.text.samples.TextDecorationCombinedSample
 import androidx.compose.ui.text.samples.TextDecorationLineThroughSample
 import androidx.compose.ui.text.samples.TextDecorationUnderlineSample
+import androidx.compose.ui.text.samples.TextOverflowClipSample
+import androidx.compose.ui.text.samples.TextOverflowEllipsisSample
+import androidx.compose.ui.text.samples.TextOverflowVisibleFixedSizeSample
+import androidx.compose.ui.text.samples.TextOverflowVisibleMinHeightSample
 import androidx.compose.ui.text.samples.TextStyleSample
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.withStyle
@@ -128,6 +132,11 @@ fun TextDemo() {
         item {
             TagLine(tag = "complex paragraph styling")
             TextDemoParagraphStyling()
+        }
+
+        item {
+            TagLine(tag = "textOverflow: Clip, Ellipsis, Visible")
+            TextDemoTextOverflow()
         }
     }
 }
@@ -518,4 +527,16 @@ fun TextDemoFontSizeScale() {
 fun TextDemoParagraphStyling() {
     ParagraphStyleSample()
     ParagraphStyleAnnotatedStringsSample()
+}
+
+@Composable
+fun TextDemoTextOverflow() {
+    SecondTagLine(tag = "overflow = TextOverflow.Clip")
+    TextOverflowClipSample()
+    SecondTagLine(tag = "overflow = TextOverflow.Ellipsis")
+    TextOverflowEllipsisSample()
+    SecondTagLine(tag = "overflow = TextOverflow.Visible with fixed size")
+    TextOverflowVisibleFixedSizeSample()
+    SecondTagLine(tag = "overflow = TextOverflow.Visible with fixed width and min height")
+    TextOverflowVisibleMinHeightSample()
 }
