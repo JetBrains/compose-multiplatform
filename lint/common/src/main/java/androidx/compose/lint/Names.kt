@@ -27,6 +27,9 @@ object Names {
 
         val Composable = Name(PackageName, "Composable")
         val CompositionLocal = Name(PackageName, "CompositionLocal")
+        val MutableStateOf = Name(PackageName, "mutableStateOf")
+        val MutableStateListOf = Name(PackageName, "mutableStateListOf")
+        val MutableStateMapOf = Name(PackageName, "mutableStateMapOf")
         val Remember = Name(PackageName, "remember")
     }
     object Ui {
