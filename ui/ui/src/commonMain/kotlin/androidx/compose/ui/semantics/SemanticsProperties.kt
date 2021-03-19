@@ -38,13 +38,7 @@ object SemanticsProperties {
      */
     val ContentDescription = SemanticsPropertyKey<String>(
         name = "ContentDescription",
-        mergePolicy = { parentValue, childValue ->
-            if (parentValue == null) {
-                childValue
-            } else {
-                "$parentValue, $childValue"
-            }
-        }
+        mergePolicy = { parentValue, _ -> parentValue }
     )
 
     /**
