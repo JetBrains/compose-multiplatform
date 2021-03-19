@@ -15,7 +15,8 @@ without requiring an installed JDK on the target system.
 
 [Jlink](https://openjdk.java.net/jeps/282) will take care of bundling only the necessary Java Modules in 
 the distributable package to minimize package size, 
-but you must still configure the Gradle plugin to tell it which modules you need.
+but you must still configure the Gradle plugin to tell it which modules you need 
+(see the `Configuring included JDK modules` section).
 
 ## Basic usage
 
@@ -43,7 +44,6 @@ compose.desktop {
         mainClass = "example.MainKt"
 
         nativeDistributions {
-            modules("java.sql")
             targetFormats(TargetFormat.Dmg, TargetFormat.Msi, TargetFormat.Deb)
         }
     }
@@ -72,10 +72,37 @@ Note, that the tasks are created only if the `application` block/property is use
 
 After a build, output binaries can be found in `${project.buildDir}/compose/binaries`.
 
-At this time, the Gradle plugin does not automatically determine the JDK Modules necessary to run, and you must manually 
-determine the specific modules you need and include them in `modules()`. Failure to provide the necessary modules 
-will not cause compilation issues, but will lead to `ClassNotFoundException` at runtime. See issue #463 for more context 
-and how to determine the modules you need to include.
+## Configuring included JDK modules
+
+The Gradle plugin uses [jlink](https://openjdk.java.net/jeps/282) to minimize a distributable size by
+including only necessary JDK modules.
+
+At this time, the Gradle plugin does not automatically determine necessary JDK Modules. 
+Failure to provide the necessary modules will not cause compilation issues, 
+but will lead to `ClassNotFoundException` at runtime. 
+
+If you encounter `ClassNotFoundException` when running a packaged application or
+`runDistributable` task, you can include additional JDK modules using 
+`modules` DSL method (see example below).
+
+You can determine, which modules are necessary either by hand or by running
+`suggestModules` task. `suggestModules` uses the [jdeps](https://docs.oracle.com/javase/9/tools/jdeps.htm) 
+static analysis tool to determine possible missing modules. Note, that the output of the tool 
+might be incomplete or list unnecessary modules.
+
+If a distributable size is not critical, you may simply include all runtime modules as an alternative
+by using `includeAllModules` DSL property.
+
+``` kotlin
+compose.desktop {
+    application {
+        nativeDistributions {
+            modules("java.sql")
+            // alternatively: includeAllModules = true
+        }
+    }
+}
+```
 
 ## Available formats
 
