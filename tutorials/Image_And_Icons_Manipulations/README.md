@@ -20,7 +20,7 @@ import androidx.compose.ui.res.imageResource
 fun main() {
     Window {
         Image(
-            bitmap = imageResource("sample.png"), // ImageBitmap
+            bitmap = imageResource("images/sample.png"), // ImageBitmap
             contentDescription = "Sample",
             modifier = Modifier.fillMaxSize()
         )
