@@ -32,7 +32,6 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.swing.Swing
 import org.jetbrains.skija.Canvas
-import org.jetbrains.skiko.HardwareLayer
 import org.jetbrains.skiko.SkiaLayer
 import org.jetbrains.skiko.SkiaRenderer
 import java.awt.Point
@@ -113,7 +112,7 @@ internal class ComposeLayer {
             get() = this@ComposeLayer.density
     }
 
-    val component: HardwareLayer
+    val component: SkiaLayer
         get() = wrapped
 
     init {

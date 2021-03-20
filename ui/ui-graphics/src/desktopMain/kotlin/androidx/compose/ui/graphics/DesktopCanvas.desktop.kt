@@ -149,8 +149,8 @@ class DesktopCanvas(val skija: org.jetbrains.skija.Canvas) : Canvas {
         skija.drawArc(
             left,
             top,
-            right - left,
-            bottom - top,
+            right,
+            bottom,
             startAngle,
             sweepAngle,
             useCenter,
