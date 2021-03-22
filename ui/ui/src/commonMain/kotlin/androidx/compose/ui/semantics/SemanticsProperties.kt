@@ -16,13 +16,13 @@
 
 package androidx.compose.ui.semantics
 
+import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.state.ToggleableState
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.TextLayoutResult
 import androidx.compose.ui.text.TextRange
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.input.ImeAction
-import androidx.compose.ui.ExperimentalComposeUiApi
 import kotlin.reflect.KProperty
 
 /**
@@ -211,6 +211,11 @@ object SemanticsProperties {
      * @see SemanticsPropertyReceiver.error
      */
     val Error = SemanticsPropertyKey<String>("Error")
+
+    /**
+     * @see SemanticsPropertyReceiver.indexForKey
+     */
+    val IndexForKey = SemanticsPropertyKey<(Any) -> Int>("IndexForKey")
 }
 
 /**
@@ -242,6 +247,11 @@ object SemanticsActions {
      * @see SemanticsPropertyReceiver.scrollBy
      */
     val ScrollBy = ActionPropertyKey<(x: Float, y: Float) -> Boolean>("ScrollBy")
+
+    /**
+     * @see SemanticsPropertyReceiver.scrollToIndex
+     */
+    val ScrollToIndex = ActionPropertyKey<(Int) -> Boolean>("ScrollToIndex")
 
     /**
      * @see SemanticsPropertyReceiver.setProgress
@@ -751,6 +761,14 @@ fun SemanticsPropertyReceiver.error(description: String) {
 }
 
 /**
+ * The index of an item identified by a given key. The key is usually defined during the creation
+ * of the container. If the key did not match any of the items' keys, the [mapping] must return -1.
+ */
+fun SemanticsPropertyReceiver.indexForKey(mapping: (Any) -> Int) {
+    this[SemanticsProperties.IndexForKey] = mapping
+}
+
+/**
  * The node is marked as a collection of horizontally or vertically stacked selectable elements.
  *
  * @see SemanticsPropertyReceiver.selected
@@ -811,6 +829,18 @@ fun SemanticsPropertyReceiver.scrollBy(
     action: ((x: Float, y: Float) -> Boolean)?
 ) {
     this[SemanticsActions.ScrollBy] = AccessibilityAction(label, action)
+}
+
+/**
+ * Action to scroll a container to the index of one of its items.
+ *
+ * The [action] should throw an [IllegalArgumentException] if the index is out of bounds.
+ */
+fun SemanticsPropertyReceiver.scrollToIndex(
+    label: String? = null,
+    action: (Int) -> Boolean
+) {
+    this[SemanticsActions.ScrollToIndex] = AccessibilityAction(label, action)
 }
 
 /**

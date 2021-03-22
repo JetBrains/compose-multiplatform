@@ -27,6 +27,7 @@ import androidx.compose.foundation.layout.calculateStartPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.State
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clipToBounds
@@ -69,6 +70,11 @@ internal fun LazyList(
 
     SubcomposeLayout(
         modifier
+            .lazyListSemantics(
+                stateOfItemsProvider = stateOfItemsProvider,
+                state = state,
+                coroutineScope = rememberCoroutineScope()
+            )
             .scrollable(
                 orientation = if (isVertical) Orientation.Vertical else Orientation.Horizontal,
                 reverseDirection = reverseScrollDirection,
