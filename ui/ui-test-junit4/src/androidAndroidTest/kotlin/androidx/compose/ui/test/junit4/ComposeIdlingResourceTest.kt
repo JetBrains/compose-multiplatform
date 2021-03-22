@@ -44,7 +44,6 @@ import androidx.test.filters.LargeTest
 import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.CoroutineStart
-import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.async
 import kotlinx.coroutines.runBlocking
 import org.junit.Ignore
@@ -153,7 +152,6 @@ class ComposeIdlingResourceTest {
             wasIdleAfterApplySnapshot = composeIdlingResource.isIdleNow
 
             // Record idleness after the first recomposition
-            @OptIn(ExperimentalCoroutinesApi::class)
             scope.async(start = CoroutineStart.UNDISPATCHED) {
                 // Await a single recomposition
                 withFrameNanos {}
