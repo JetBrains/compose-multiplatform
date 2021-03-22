@@ -16,6 +16,15 @@
 
 package androidx.compose.material.catalog
 
-import androidx.compose.integration.demos.common.ActivityDemo
+import androidx.compose.material.catalog.insets.ProvideWindowInsets
+import androidx.compose.material.catalog.ui.theme.CatalogTheme
+import androidx.compose.runtime.Composable
 
-val MaterialCatalog = ActivityDemo("Material Catalog", CatalogActivity::class)
+@Composable
+fun CatalogApp() {
+    ProvideWindowInsets {
+        CatalogTheme {
+            NavGraph()
+        }
+    }
+}

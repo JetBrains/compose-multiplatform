@@ -16,17 +16,6 @@
 
 package androidx.compose.material.catalog
 
-import android.os.Bundle
-import androidx.activity.ComponentActivity
-import androidx.activity.compose.setContent
-import androidx.core.view.WindowCompat
+import androidx.compose.integration.demos.common.ActivityDemo
 
-class CatalogActivity : ComponentActivity() {
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        WindowCompat.setDecorFitsSystemWindows(window, false)
-        setContent {
-            CatalogApp()
-        }
-    }
-}
+val MaterialCatalog = ActivityDemo("Material catalog", CatalogActivity::class)

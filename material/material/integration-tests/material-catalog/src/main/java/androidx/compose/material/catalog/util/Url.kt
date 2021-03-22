@@ -14,19 +14,19 @@
  * limitations under the License.
  */
 
-package androidx.compose.material.catalog
+package androidx.compose.material.catalog.util
 
-import android.os.Bundle
-import androidx.activity.ComponentActivity
-import androidx.activity.compose.setContent
-import androidx.core.view.WindowCompat
+import android.content.Context
+import android.content.Intent
+import android.net.Uri
 
-class CatalogActivity : ComponentActivity() {
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        WindowCompat.setDecorFitsSystemWindows(window, false)
-        setContent {
-            CatalogApp()
-        }
-    }
+fun Context.openUrl(url: String) {
+    val intent = Intent(Intent.ACTION_VIEW, Uri.parse(url))
+    startActivity(intent)
 }
+
+const val GUIDELINES_URL = "https://material.io/components"
+const val DOCS_URL = "https://developer.android.com/jetpack/androidx/releases/compose-material"
+const val SOURCE_URL = "https://cs.android.com/androidx/platform/frameworks/support/+/" +
+    "androidx-main:compose/material/"
+const val ISSUE_URL = "https://issuetracker.google.com/issues/new?component=742043"

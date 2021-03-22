@@ -14,19 +14,22 @@
  * limitations under the License.
  */
 
-package androidx.compose.material.catalog
+package androidx.compose.material.catalog.ui.theme
 
-import android.os.Bundle
-import androidx.activity.ComponentActivity
-import androidx.activity.compose.setContent
-import androidx.core.view.WindowCompat
+import androidx.compose.foundation.isSystemInDarkTheme
+import androidx.compose.material.MaterialTheme
+import androidx.compose.material.darkColors
+import androidx.compose.material.lightColors
+import androidx.compose.runtime.Composable
 
-class CatalogActivity : ComponentActivity() {
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        WindowCompat.setDecorFitsSystemWindows(window, false)
-        setContent {
-            CatalogApp()
-        }
-    }
+@Composable
+fun CatalogTheme(content: @Composable () -> Unit) {
+    MaterialTheme(
+        colors = if (isSystemInDarkTheme()) {
+            darkColors()
+        } else {
+            lightColors()
+        },
+        content = content
+    )
 }
