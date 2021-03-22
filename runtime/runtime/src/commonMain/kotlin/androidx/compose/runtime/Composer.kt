@@ -1331,6 +1331,11 @@ internal class ComposerImpl(
             sideEffects += effect
         }
 
+        val hasEffects: Boolean
+            get() = sideEffects.isNotEmpty() ||
+                forgetting.isNotEmpty() ||
+                remembering.isNotEmpty()
+
         fun dispatchRememberObservers() {
             // Send forgets
             if (forgetting.isNotEmpty()) {
@@ -1361,11 +1366,13 @@ internal class ComposerImpl(
 
         fun dispatchAbandons() {
             if (abandoning.isNotEmpty()) {
-                val iterator = abandoning.iterator()
-                while (iterator.hasNext()) {
-                    val instance = iterator.next()
-                    iterator.remove()
-                    instance.onAbandoned()
+                trace("Compose:dispatchAbandons") {
+                    val iterator = abandoning.iterator()
+                    while (iterator.hasNext()) {
+                        val instance = iterator.next()
+                        iterator.remove()
+                        instance.onAbandoned()
+                    }
                 }
             }
         }
@@ -1410,8 +1417,12 @@ internal class ComposerImpl(
                 // Side effects run after lifecycle observers so that any remembered objects
                 // that implement RememberObserver receive onRemembered before a side effect
                 // that captured it and operates on it can run.
-                manager.dispatchRememberObservers()
-                manager.dispatchSideEffects()
+                if (manager.hasEffects) {
+                    trace("Compose:dispatchEffects") {
+                        manager.dispatchRememberObservers()
+                        manager.dispatchSideEffects()
+                    }
+                }
 
                 if (pendingInvalidScopes) {
                     pendingInvalidScopes = false
