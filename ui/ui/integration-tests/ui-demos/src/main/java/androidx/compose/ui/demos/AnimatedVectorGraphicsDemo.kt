@@ -117,6 +117,7 @@ fun createSampleVectorPainter(toggle: Boolean): Painter {
         ) { state ->
             if (state) 360f else 0f
         }
+        @Suppress("UnusedTransitionTargetStateParameter")
         val translationX by transition.animateFloat(
             transitionSpec = {
                 if (targetState) {
@@ -135,6 +136,7 @@ fun createSampleVectorPainter(toggle: Boolean): Painter {
                 }
             }
         ) { 0f }
+        @Suppress("UnusedTransitionTargetStateParameter")
         val translationY by transition.animateFloat(
             transitionSpec = {
                 if (targetState) {
