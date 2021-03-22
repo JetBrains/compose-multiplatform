@@ -66,7 +66,7 @@ inline fun Box(
 ) {
     val measurePolicy = rememberBoxMeasurePolicy(contentAlignment, propagateMinConstraints)
     Layout(
-        content = { BoxScope.content() },
+        content = { BoxScopeInstance.content() },
         measurePolicy = measurePolicy,
         modifier = modifier
     )
@@ -212,16 +212,7 @@ interface BoxScope {
      * have priority over the [Box]'s `alignment` parameter.
      */
     @Stable
-    fun Modifier.align(alignment: Alignment) = this.then(
-        BoxChildData(
-            alignment = alignment,
-            matchParentSize = false,
-            inspectorInfo = debugInspectorInfo {
-                name = "align"
-                value = alignment
-            }
-        )
-    )
+    fun Modifier.align(alignment: Alignment): Modifier
 
     /**
      * Size the element to match the size of the [Box] after all other content elements have
@@ -236,15 +227,30 @@ interface BoxScope {
      * available space.
      */
     @Stable
-    fun Modifier.matchParentSize() = this.then(
+    fun Modifier.matchParentSize(): Modifier
+}
+
+internal object BoxScopeInstance : BoxScope {
+    @Stable
+    override fun Modifier.align(alignment: Alignment) = this.then(
+        BoxChildData(
+            alignment = alignment,
+            matchParentSize = false,
+            inspectorInfo = debugInspectorInfo {
+                name = "align"
+                value = alignment
+            }
+        )
+    )
+
+    @Stable
+    override fun Modifier.matchParentSize() = this.then(
         BoxChildData(
             alignment = Alignment.Center,
             matchParentSize = true,
             inspectorInfo = debugInspectorInfo { name = "matchParentSize" }
         )
     )
-
-    companion object : BoxScope
 }
 
 @get:Suppress("ModifierFactoryReturnType", "ModifierFactoryExtensionFunction")
