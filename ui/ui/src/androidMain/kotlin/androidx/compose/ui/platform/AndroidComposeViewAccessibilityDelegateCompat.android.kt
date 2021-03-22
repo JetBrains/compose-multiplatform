@@ -62,11 +62,14 @@ import androidx.compose.ui.fastReduce
 import androidx.compose.ui.fastZipWithNext
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.semantics.AccessibilityAction
+import androidx.compose.ui.semantics.LiveRegionMode
 import androidx.compose.ui.semantics.ProgressBarRangeInfo
 import androidx.compose.ui.text.InternalTextApi
 import androidx.compose.ui.util.fastForEachIndexed
 import androidx.core.view.AccessibilityDelegateCompat
 import androidx.core.view.ViewCompat
+import androidx.core.view.ViewCompat.ACCESSIBILITY_LIVE_REGION_ASSERTIVE
+import androidx.core.view.ViewCompat.ACCESSIBILITY_LIVE_REGION_POLITE
 import androidx.core.view.accessibility.AccessibilityEventCompat
 import androidx.core.view.accessibility.AccessibilityNodeInfoCompat
 import androidx.core.view.accessibility.AccessibilityNodeProviderCompat
@@ -336,6 +339,12 @@ internal class AndroidComposeViewAccessibilityDelegateCompat(val view: AndroidCo
         }
         info.isVisibleToUser =
             (semanticsNode.config.getOrNull(SemanticsProperties.InvisibleToUser) == null)
+        semanticsNode.config.getOrNull(SemanticsProperties.LiveRegion)?.let {
+            info.liveRegion = when (it) {
+                LiveRegionMode.Polite -> ACCESSIBILITY_LIVE_REGION_POLITE
+                LiveRegionMode.Assertive -> ACCESSIBILITY_LIVE_REGION_ASSERTIVE
+            }
+        }
         info.isClickable = false
         semanticsNode.config.getOrNull(SemanticsActions.OnClick)?.let {
             // Selectable items that are already selected should not announce it again
