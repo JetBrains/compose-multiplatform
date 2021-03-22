@@ -133,7 +133,7 @@ src/foo/test.kt:18: Error: Target state parameter _ is not used [UnusedTransitio
                 fun Test() {
                     transition.animateFloat {
                         foo.let {
-                            // These `it`s refer to the `let`, not the `animateFloat`, so we 
+                            // These `it`s refer to the `let`, not the `animateFloat`, so we
                             // should still report an error
                             it.let {
                                 if (it) 1f else 0f
@@ -142,7 +142,7 @@ src/foo/test.kt:18: Error: Target state parameter _ is not used [UnusedTransitio
                     }
                     transition.animateFloat { param ->
                         foo.let { param ->
-                            // This `param` refers to the `let`, not the `animateFloat`, so we 
+                            // This `param` refers to the `let`, not the `animateFloat`, so we
                             // should still report an error
                             if (param) 1f else 0f
                         }
@@ -210,7 +210,7 @@ src/foo/test.kt:22: Error: Target state parameter param is not used [UnusedTrans
                     }
                 }
 
-                fun multipleParameterLambda(lambda: (Boolean, Boolean) -> Float): Float 
+                fun multipleParameterLambda(lambda: (Boolean, Boolean) -> Float): Float
                     = lambda(true, true)
 
                 transition.animateFloat {

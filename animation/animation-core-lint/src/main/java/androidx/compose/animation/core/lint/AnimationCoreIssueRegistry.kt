@@ -27,6 +27,7 @@ class AnimationCoreIssueRegistry : IssueRegistry() {
     override val api = 8
     override val minApi = CURRENT_API
     override val issues get() = listOf(
-        TransitionDetector.UnusedTransitionTargetStateParameter
+        TransitionDetector.UnusedTransitionTargetStateParameter,
+        UnrememberedAnimatableDetector.UnrememberedAnimatable
     )
 }
