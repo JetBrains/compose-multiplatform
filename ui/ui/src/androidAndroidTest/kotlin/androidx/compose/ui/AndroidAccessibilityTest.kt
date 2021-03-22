@@ -20,6 +20,11 @@ import android.graphics.Rect
 import android.graphics.RectF
 import android.os.Build
 import android.os.Bundle
+import android.view.InputDevice
+import android.view.MotionEvent
+import android.view.MotionEvent.ACTION_HOVER_ENTER
+import android.view.MotionEvent.ACTION_HOVER_MOVE
+import android.view.View
 import android.view.ViewGroup
 import android.view.accessibility.AccessibilityEvent
 import android.view.accessibility.AccessibilityNodeInfo
@@ -29,6 +34,9 @@ import android.view.accessibility.AccessibilityNodeInfo.ACTION_PREVIOUS_AT_MOVEM
 import android.view.accessibility.AccessibilityNodeInfo.ACTION_SET_SELECTION
 import android.view.accessibility.AccessibilityNodeProvider
 import android.view.accessibility.AccessibilityRecord
+import android.widget.Button
+import android.widget.LinearLayout
+import android.widget.TextView
 import androidx.activity.ComponentActivity
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.clickable
@@ -79,6 +87,7 @@ import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.viewinterop.AndroidView
 import androidx.compose.ui.window.Dialog
 import androidx.core.view.ViewCompat
 import androidx.core.view.accessibility.AccessibilityNodeInfoCompat
@@ -96,6 +105,7 @@ import com.nhaarman.mockitokotlin2.verify
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertNotEquals
+import org.junit.Assert.assertNotNull
 import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
 import org.junit.Before
@@ -107,6 +117,7 @@ import org.mockito.ArgumentCaptor
 import org.mockito.ArgumentMatcher
 import org.mockito.ArgumentMatchers.any
 import org.mockito.internal.matchers.apachecommons.ReflectionEquals
+import java.lang.reflect.Method
 
 @LargeTest
 @RunWith(AndroidJUnit4::class)
@@ -872,24 +883,17 @@ class AndroidAccessibilityTest {
             }
         }
 
-        var rootNodeBoundsLeft = 0f
-        var rootNodeBoundsTop = 0f
-        rule.runOnIdle {
-            val rootNode = androidComposeView.semanticsOwner.rootSemanticsNode
-            rootNodeBoundsLeft = rootNode.boundsInWindow.left
-            rootNodeBoundsTop = rootNode.boundsInWindow.top
-        }
-
         val toggleableNode = rule.onNodeWithTag(tag)
             .fetchSemanticsNode("couldn't find node with tag $tag")
-        val toggleableNodeBounds = toggleableNode.boundsInWindow
+        val toggleableNodeBounds = toggleableNode.boundsInRoot
 
-        val toggleableNodeId = delegate.getVirtualViewAt(
-            (toggleableNodeBounds.left + toggleableNodeBounds.right) / 2 - rootNodeBoundsLeft,
-            (toggleableNodeBounds.top + toggleableNodeBounds.bottom) / 2 - rootNodeBoundsTop
+        val toggleableNodeFound = delegate.findSemanticsNodeAt(
+            (toggleableNodeBounds.left + toggleableNodeBounds.right) / 2,
+            (toggleableNodeBounds.top + toggleableNodeBounds.bottom) / 2,
+            androidComposeView.semanticsOwner.rootSemanticsNode
         )
-
-        assertEquals(toggleableNode.id, toggleableNodeId)
+        assertNotNull(toggleableNodeFound)
+        assertEquals(toggleableNode.id, toggleableNodeFound!!.id)
     }
 
     @Test
@@ -914,28 +918,187 @@ class AndroidAccessibilityTest {
             }
         }
 
-        var rootNodeBoundsLeft = 0f
-        var rootNodeBoundsTop = 0f
-        rule.runOnIdle {
-            val rootNode = androidComposeView.semanticsOwner.rootSemanticsNode
-            rootNodeBoundsLeft = rootNode.boundsInWindow.left
-            rootNodeBoundsTop = rootNode.boundsInWindow.top
-        }
-
         val overlappedChildOneNode = rule.onNodeWithTag(childOneTag)
             .fetchSemanticsNode("couldn't find node with tag $childOneTag")
         val overlappedChildTwoNode = rule.onNodeWithTag(childTwoTag)
             .fetchSemanticsNode("couldn't find node with tag $childTwoTag")
-        val overlappedChildNodeBounds = overlappedChildTwoNode.boundsInWindow
-        val overlappedChildNodeId = delegate.getVirtualViewAt(
-            (overlappedChildNodeBounds.left + overlappedChildNodeBounds.right) / 2 -
-                rootNodeBoundsLeft,
-            (overlappedChildNodeBounds.top + overlappedChildNodeBounds.bottom) / 2 -
-                rootNodeBoundsTop
+        val overlappedChildNodeBounds = overlappedChildTwoNode.boundsInRoot
+        val overlappedChildNode = delegate.findSemanticsNodeAt(
+            (overlappedChildNodeBounds.left + overlappedChildNodeBounds.right) / 2,
+            (overlappedChildNodeBounds.top + overlappedChildNodeBounds.bottom) / 2,
+            androidComposeView.semanticsOwner.rootSemanticsNode
+        )
+        assertNotNull(overlappedChildNode)
+        assertEquals(overlappedChildOneNode.id, overlappedChildNode!!.id)
+        assertNotEquals(overlappedChildTwoNode.id, overlappedChildNode.id)
+    }
+
+    @Test
+    @SdkSuppress(maxSdkVersion = Build.VERSION_CODES.P)
+    fun testViewInterop_findViewByAccessibilityId() {
+        val androidViewTag = "androidView"
+        container.setContent {
+            Column {
+                AndroidView(
+                    { context ->
+                        LinearLayout(context).apply {
+                            addView(TextView(context).apply { text = "Text1" })
+                            addView(TextView(context).apply { text = "Text2" })
+                        }
+                    },
+                    Modifier.testTag(androidViewTag)
+                )
+                BasicText("text")
+            }
+        }
+
+        val getViewRootImplMethod = View::class.java.getDeclaredMethod("getViewRootImpl")
+        getViewRootImplMethod.isAccessible = true
+        val rootView = getViewRootImplMethod.invoke(container)
+
+        val forName = Class::class.java.getMethod("forName", String::class.java)
+        val getDeclaredMethod = Class::class.java.getMethod(
+            "getDeclaredMethod",
+            String::class.java,
+            arrayOf<Class<*>>()::class.java
         )
 
-        assertEquals(overlappedChildOneNode.id, overlappedChildNodeId)
-        assertNotEquals(overlappedChildTwoNode.id, overlappedChildNodeId)
+        val viewRootImplClass = forName.invoke(null, "android.view.ViewRootImpl") as Class<*>
+        val getAccessibilityInteractionControllerMethod = getDeclaredMethod.invoke(
+            viewRootImplClass,
+            "getAccessibilityInteractionController",
+            arrayOf<Class<*>>()
+        ) as Method
+        getAccessibilityInteractionControllerMethod.isAccessible = true
+        val accessibilityInteractionController =
+            getAccessibilityInteractionControllerMethod.invoke(rootView)
+
+        val accessibilityInteractionControllerClass =
+            forName.invoke(null, "android.view.AccessibilityInteractionController") as Class<*>
+        val findViewByAccessibilityIdMethod =
+            getDeclaredMethod.invoke(
+                accessibilityInteractionControllerClass,
+                "findViewByAccessibilityId",
+                arrayOf<Class<*>>(Int::class.java)
+            ) as Method
+        findViewByAccessibilityIdMethod.isAccessible = true
+
+        val androidView = rule.onNodeWithTag(androidViewTag)
+            .fetchSemanticsNode("can't find node with tag $androidViewTag")
+        val viewGroup = androidComposeView.androidViewsHandler
+            .layoutNodeToHolder[androidView.layoutNode]!!.view as ViewGroup
+        val getAccessibilityViewIdMethod = View::class.java
+            .getDeclaredMethod("getAccessibilityViewId")
+        getAccessibilityViewIdMethod.isAccessible = true
+
+        val textTwo = viewGroup.getChildAt(1)
+        val textViewTwoId = getAccessibilityViewIdMethod.invoke(textTwo)
+        val foundView = findViewByAccessibilityIdMethod.invoke(
+            accessibilityInteractionController,
+            textViewTwoId
+        )
+        assertNotNull(foundView)
+        assertEquals(textTwo, foundView)
+    }
+
+    @Test
+    fun testViewInterop_viewChildExists() {
+        val colTag = "ColTag"
+        val buttonText = "button text"
+        container.setContent {
+            Column(Modifier.testTag(colTag)) {
+                AndroidView(::Button) {
+                    it.text = buttonText
+                    it.setOnClickListener {}
+                }
+                BasicText("text")
+            }
+        }
+
+        val colSemanticsNode = rule.onNodeWithTag(colTag)
+            .fetchSemanticsNode("can't find node with tag $colTag")
+        val colAccessibilityNode = provider.createAccessibilityNodeInfo(colSemanticsNode.id)
+        assertEquals(2, colAccessibilityNode.childCount)
+        assertEquals(2, colSemanticsNode.children.size)
+        val buttonHolder = androidComposeView.androidViewsHandler
+            .layoutNodeToHolder[colSemanticsNode.children[0].layoutNode]
+        assertNotNull(buttonHolder)
+        assertEquals(
+            ViewCompat.IMPORTANT_FOR_ACCESSIBILITY_YES,
+            buttonHolder!!.importantForAccessibility
+        )
+        assertEquals(buttonText, (buttonHolder.getChildAt(0) as Button).text)
+    }
+
+    @Test
+    fun testViewInterop_hoverEnterExit() {
+        val colTag = "ColTag"
+        val textTag = "TextTag"
+        val buttonText = "button text"
+        container.setContent {
+            Column(Modifier.testTag(colTag)) {
+                AndroidView(::Button) {
+                    it.text = buttonText
+                    it.setOnClickListener {}
+                }
+                BasicText(text = "text", modifier = Modifier.testTag(textTag))
+            }
+        }
+
+        val colSemanticsNode = rule.onNodeWithTag(colTag)
+            .fetchSemanticsNode("can't find node with tag $colTag")
+        rule.runOnUiThread {
+            val bounds = colSemanticsNode.children[0].boundsInRoot
+            val hoverEnter = MotionEvent.obtain(
+                0 /* downTime */, 0 /* eventTime */,
+                ACTION_HOVER_ENTER, (bounds.left + bounds.right) / 2 /* x */,
+                (bounds.top + bounds.bottom) / 2/* y */, 0 /* metaState*/
+            )
+            hoverEnter.source = InputDevice.SOURCE_CLASS_POINTER
+            assertTrue(androidComposeView.dispatchHoverEvent(hoverEnter))
+            assertEquals(
+                AndroidComposeViewAccessibilityDelegateCompat.InvalidId,
+                delegate.hoveredVirtualViewId
+            )
+        }
+        rule.runOnIdle {
+            verify(container, times(1)).requestSendAccessibilityEvent(
+                eq(androidComposeView),
+                argThat(
+                    ArgumentMatcher {
+                        it.eventType == AccessibilityEvent.TYPE_VIEW_HOVER_ENTER
+                    }
+                )
+            )
+        }
+
+        val textNode = rule.onNodeWithTag(textTag)
+            .fetchSemanticsNode("can't find node with tag $textTag")
+        rule.runOnUiThread {
+            val bounds = textNode.boundsInRoot
+            val hoverEnter = MotionEvent.obtain(
+                0 /* downTime */, 0 /* eventTime */,
+                ACTION_HOVER_MOVE, (bounds.left + bounds.right) / 2 /* x */,
+                (bounds.top + bounds.bottom) / 2/* y */, 0 /* metaState*/
+            )
+            hoverEnter.source = InputDevice.SOURCE_CLASS_POINTER
+            assertTrue(androidComposeView.dispatchHoverEvent(hoverEnter))
+            assertEquals(
+                textNode.id,
+                delegate.hoveredVirtualViewId
+            )
+        }
+        // verify hover exit accessibility event is sent from the previously hovered view
+        rule.runOnIdle {
+            verify(container, times(1)).requestSendAccessibilityEvent(
+                eq(androidComposeView),
+                argThat(
+                    ArgumentMatcher {
+                        it.eventType == AccessibilityEvent.TYPE_VIEW_HOVER_EXIT
+                    }
+                )
+            )
+        }
     }
 
     @Test
