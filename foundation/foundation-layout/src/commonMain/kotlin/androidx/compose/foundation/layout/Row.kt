@@ -72,7 +72,7 @@ inline fun Row(
 ) {
     val measurePolicy = rowMeasurePolicy(horizontalArrangement, verticalAlignment)
     Layout(
-        content = { RowScope.content() },
+        content = { RowScopeInstance.content() },
         measurePolicy = measurePolicy,
         modifier = modifier
     )
@@ -122,6 +122,25 @@ internal fun rowMeasurePolicy(
 @Immutable
 interface RowScope {
     /**
+     * Size the element's width proportional to its [weight] relative to other weighted sibling
+     * elements in the [Row]. The parent will divide the horizontal space remaining after measuring
+     * unweighted child elements and distribute it according to this weight.
+     * When [fill] is true, the element will be forced to occupy the whole width allocated to it.
+     * Otherwise, the element is allowed to be smaller - this will result in [Row] being smaller,
+     * as the unused allocated width will not be redistributed to other siblings.
+     *
+     * @param weight The proportional width to give to this element, as related to the total of
+     * all weighted siblings. Must be positive.
+     * @param fill When `true`, the element will occupy the whole width allocated.
+     */
+    @Stable
+    fun Modifier.weight(
+        /*@FloatRange(from = 0.0, fromInclusive = false)*/
+        weight: Float,
+        fill: Boolean = true
+    ): Modifier
+
+    /**
      * Align the element vertically within the [Row]. This alignment will have priority over the
      * [Row]'s `verticalAlignment` parameter.
      *
@@ -129,15 +148,7 @@ interface RowScope {
      * @sample androidx.compose.foundation.layout.samples.SimpleAlignInRow
      */
     @Stable
-    fun Modifier.align(alignment: Alignment.Vertical) = this.then(
-        VerticalAlignModifier(
-            vertical = alignment,
-            inspectorInfo = debugInspectorInfo {
-                name = "align"
-                value = alignment
-            }
-        )
-    )
+    fun Modifier.align(alignment: Alignment.Vertical): Modifier
 
     /**
      * Position the element vertically such that its [alignmentLine] aligns with sibling elements
@@ -160,15 +171,7 @@ interface RowScope {
      * @sample androidx.compose.foundation.layout.samples.SimpleAlignByInRow
      */
     @Stable
-    fun Modifier.alignBy(alignmentLine: HorizontalAlignmentLine) = this.then(
-        SiblingsAlignedModifier.WithAlignmentLine(
-            alignmentLine = alignmentLine,
-            inspectorInfo = debugInspectorInfo {
-                name = "alignBy"
-                value = alignmentLine
-            }
-        )
-    )
+    fun Modifier.alignBy(alignmentLine: HorizontalAlignmentLine): Modifier
 
     /**
      * Position the element vertically such that its first baseline aligns with sibling elements
@@ -183,40 +186,7 @@ interface RowScope {
      * @sample androidx.compose.foundation.layout.samples.SimpleAlignByInRow
      */
     @Stable
-    fun Modifier.alignByBaseline() = alignBy(FirstBaseline)
-
-    /**
-     * Size the element's width proportional to its [weight] relative to other weighted sibling
-     * elements in the [Row]. The parent will divide the horizontal space remaining after measuring
-     * unweighted child elements and distribute it according to this weight.
-     * When [fill] is true, the element will be forced to occupy the whole width allocated to it.
-     * Otherwise, the element is allowed to be smaller - this will result in [Row] being smaller,
-     * as the unused allocated width will not be redistributed to other siblings.
-     *
-     * @param weight The proportional width to give to this element, as related to the total of
-     * all weighted siblings. Must be positive.
-     * @param fill When `true`, the element will occupy the whole width allocated.
-     */
-    @Stable
-    fun Modifier.weight(
-        /*@FloatRange(from = 0.0, fromInclusive = false)*/
-        weight: Float,
-        fill: Boolean = true
-    ): Modifier {
-        require(weight > 0.0) { "invalid weight $weight; must be greater than zero" }
-        return this.then(
-            LayoutWeightImpl(
-                weight = weight,
-                fill = fill,
-                inspectorInfo = debugInspectorInfo {
-                    name = "weight"
-                    value = weight
-                    properties["weight"] = weight
-                    properties["fill"] = fill
-                }
-            )
-        )
-    }
+    fun Modifier.alignByBaseline(): Modifier
 
     /**
      * Position the element vertically such that the alignment line for the content as
@@ -236,7 +206,53 @@ interface RowScope {
      * @sample androidx.compose.foundation.layout.samples.SimpleAlignByInRow
      */
     @Stable
-    fun Modifier.alignBy(alignmentLineBlock: (Measured) -> Int) = this.then(
+    fun Modifier.alignBy(alignmentLineBlock: (Measured) -> Int): Modifier
+}
+
+internal object RowScopeInstance : RowScope {
+    @Stable
+    override fun Modifier.weight(weight: Float, fill: Boolean): Modifier {
+        require(weight > 0.0) { "invalid weight $weight; must be greater than zero" }
+        return this.then(
+            LayoutWeightImpl(
+                weight = weight,
+                fill = fill,
+                inspectorInfo = debugInspectorInfo {
+                    name = "weight"
+                    value = weight
+                    properties["weight"] = weight
+                    properties["fill"] = fill
+                }
+            )
+        )
+    }
+
+    @Stable
+    override fun Modifier.align(alignment: Alignment.Vertical) = this.then(
+        VerticalAlignModifier(
+            vertical = alignment,
+            inspectorInfo = debugInspectorInfo {
+                name = "align"
+                value = alignment
+            }
+        )
+    )
+
+    @Stable
+    override fun Modifier.alignBy(alignmentLine: HorizontalAlignmentLine) = this.then(
+        SiblingsAlignedModifier.WithAlignmentLine(
+            alignmentLine = alignmentLine,
+            inspectorInfo = debugInspectorInfo {
+                name = "alignBy"
+                value = alignmentLine
+            }
+        )
+    )
+
+    @Stable
+    override fun Modifier.alignByBaseline() = alignBy(FirstBaseline)
+
+    override fun Modifier.alignBy(alignmentLineBlock: (Measured) -> Int) = this.then(
         SiblingsAlignedModifier.WithAlignmentLineBlock(
             block = alignmentLineBlock,
             inspectorInfo = debugInspectorInfo {
@@ -245,6 +261,4 @@ interface RowScope {
             }
         )
     )
-
-    companion object : RowScope
 }

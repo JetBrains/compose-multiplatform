@@ -5414,7 +5414,7 @@ class RowColumnTest : LayoutTest() {
     // region InspectableValue tests for Row and Column
     @Test
     fun testRow_AlignInspectableValue() {
-        val modifier = with(object : RowScope {}) { Modifier.align(Alignment.Bottom) }
+        val modifier = with(RowScopeInstance) { Modifier.align(Alignment.Bottom) }
             as InspectableValue
         Truth.assertThat(modifier.nameFallback).isEqualTo("align")
         Truth.assertThat(modifier.valueOverride).isEqualTo(Alignment.Bottom)
@@ -5423,7 +5423,7 @@ class RowColumnTest : LayoutTest() {
 
     @Test
     fun testRow_AlignByInspectableValue() {
-        val modifier = with(object : RowScope {}) { Modifier.alignBy(FirstBaseline) }
+        val modifier = with(RowScopeInstance) { Modifier.alignBy(FirstBaseline) }
             as InspectableValue
         Truth.assertThat(modifier.nameFallback).isEqualTo("alignBy")
         Truth.assertThat(modifier.valueOverride).isEqualTo(FirstBaseline)
@@ -5432,7 +5432,7 @@ class RowColumnTest : LayoutTest() {
 
     @Test
     fun testRow_WeightInspectableValue() {
-        val modifier = with(object : RowScope {}) { Modifier.weight(2.0f, false) }
+        val modifier = with(RowScopeInstance) { Modifier.weight(2.0f, false) }
             as InspectableValue
         Truth.assertThat(modifier.nameFallback).isEqualTo("weight")
         Truth.assertThat(modifier.valueOverride).isEqualTo(2.0f)
@@ -5443,7 +5443,7 @@ class RowColumnTest : LayoutTest() {
     }
     @Test
     fun testColumn_AlignInspectableValue() {
-        val modifier = with(object : ColumnScope {}) { Modifier.align(Alignment.Start) }
+        val modifier = with(ColumnScopeInstance) { Modifier.align(Alignment.Start) }
             as InspectableValue
         Truth.assertThat(modifier.nameFallback).isEqualTo("align")
         Truth.assertThat(modifier.valueOverride).isEqualTo(Alignment.Start)
@@ -5452,7 +5452,7 @@ class RowColumnTest : LayoutTest() {
 
     @Test
     fun testColumn_AlignByInspectableValue() {
-        val modifier = with(object : ColumnScope {}) { Modifier.alignBy(TestVerticalLine) }
+        val modifier = with(ColumnScopeInstance) { Modifier.alignBy(TestVerticalLine) }
             as InspectableValue
         Truth.assertThat(modifier.nameFallback).isEqualTo("alignBy")
         Truth.assertThat(modifier.valueOverride).isEqualTo(TestVerticalLine)
@@ -5461,7 +5461,7 @@ class RowColumnTest : LayoutTest() {
 
     @Test
     fun testColumn_WeightInspectableValue() {
-        val modifier = with(object : ColumnScope {}) { Modifier.weight(2.0f, false) }
+        val modifier = with(ColumnScopeInstance) { Modifier.weight(2.0f, false) }
             as InspectableValue
         Truth.assertThat(modifier.nameFallback).isEqualTo("weight")
         Truth.assertThat(modifier.valueOverride).isEqualTo(2.0f)

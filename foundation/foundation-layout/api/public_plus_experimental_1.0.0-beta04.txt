@@ -79,12 +79,8 @@ package androidx.compose.foundation.layout {
   }
 
   @androidx.compose.foundation.layout.LayoutScopeMarker @androidx.compose.runtime.Immutable public interface BoxScope {
-    method @androidx.compose.runtime.Stable public default androidx.compose.ui.Modifier align(androidx.compose.ui.Modifier, androidx.compose.ui.Alignment alignment);
-    method @androidx.compose.runtime.Stable public default androidx.compose.ui.Modifier matchParentSize(androidx.compose.ui.Modifier);
-    field public static final androidx.compose.foundation.layout.BoxScope.Companion Companion;
-  }
-
-  public static final class BoxScope.Companion implements androidx.compose.foundation.layout.BoxScope {
+    method @androidx.compose.runtime.Stable public androidx.compose.ui.Modifier align(androidx.compose.ui.Modifier, androidx.compose.ui.Alignment alignment);
+    method @androidx.compose.runtime.Stable public androidx.compose.ui.Modifier matchParentSize(androidx.compose.ui.Modifier);
   }
 
   public final class BoxWithConstraintsKt {
@@ -109,14 +105,10 @@ package androidx.compose.foundation.layout {
   }
 
   @androidx.compose.foundation.layout.LayoutScopeMarker @androidx.compose.runtime.Immutable public interface ColumnScope {
-    method @androidx.compose.runtime.Stable public default androidx.compose.ui.Modifier align(androidx.compose.ui.Modifier, androidx.compose.ui.Alignment.Horizontal alignment);
-    method @androidx.compose.runtime.Stable public default androidx.compose.ui.Modifier alignBy(androidx.compose.ui.Modifier, androidx.compose.ui.layout.VerticalAlignmentLine alignmentLine);
-    method @androidx.compose.runtime.Stable public default androidx.compose.ui.Modifier alignBy(androidx.compose.ui.Modifier, kotlin.jvm.functions.Function1<? super androidx.compose.ui.layout.Measured,java.lang.Integer> alignmentLineBlock);
-    method @androidx.compose.runtime.Stable public default androidx.compose.ui.Modifier weight(androidx.compose.ui.Modifier, float weight, optional boolean fill);
-    field public static final androidx.compose.foundation.layout.ColumnScope.Companion Companion;
-  }
-
-  public static final class ColumnScope.Companion implements androidx.compose.foundation.layout.ColumnScope {
+    method @androidx.compose.runtime.Stable public androidx.compose.ui.Modifier align(androidx.compose.ui.Modifier, androidx.compose.ui.Alignment.Horizontal alignment);
+    method @androidx.compose.runtime.Stable public androidx.compose.ui.Modifier alignBy(androidx.compose.ui.Modifier, androidx.compose.ui.layout.VerticalAlignmentLine alignmentLine);
+    method @androidx.compose.runtime.Stable public androidx.compose.ui.Modifier alignBy(androidx.compose.ui.Modifier, kotlin.jvm.functions.Function1<? super androidx.compose.ui.layout.Measured,java.lang.Integer> alignmentLineBlock);
+    method @androidx.compose.runtime.Stable public androidx.compose.ui.Modifier weight(androidx.compose.ui.Modifier, float weight, optional boolean fill);
   }
 
   @kotlin.RequiresOptIn(message="The API of this layout is experimental and is likely to change in the future.") public @interface ExperimentalLayoutApi {
@@ -179,15 +171,11 @@ package androidx.compose.foundation.layout {
   }
 
   @androidx.compose.foundation.layout.LayoutScopeMarker @androidx.compose.runtime.Immutable public interface RowScope {
-    method @androidx.compose.runtime.Stable public default androidx.compose.ui.Modifier align(androidx.compose.ui.Modifier, androidx.compose.ui.Alignment.Vertical alignment);
-    method @androidx.compose.runtime.Stable public default androidx.compose.ui.Modifier alignBy(androidx.compose.ui.Modifier, androidx.compose.ui.layout.HorizontalAlignmentLine alignmentLine);
-    method @androidx.compose.runtime.Stable public default androidx.compose.ui.Modifier alignBy(androidx.compose.ui.Modifier, kotlin.jvm.functions.Function1<? super androidx.compose.ui.layout.Measured,java.lang.Integer> alignmentLineBlock);
-    method @androidx.compose.runtime.Stable public default androidx.compose.ui.Modifier alignByBaseline(androidx.compose.ui.Modifier);
-    method @androidx.compose.runtime.Stable public default androidx.compose.ui.Modifier weight(androidx.compose.ui.Modifier, float weight, optional boolean fill);
-    field public static final androidx.compose.foundation.layout.RowScope.Companion Companion;
-  }
-
-  public static final class RowScope.Companion implements androidx.compose.foundation.layout.RowScope {
+    method @androidx.compose.runtime.Stable public androidx.compose.ui.Modifier align(androidx.compose.ui.Modifier, androidx.compose.ui.Alignment.Vertical alignment);
+    method @androidx.compose.runtime.Stable public androidx.compose.ui.Modifier alignBy(androidx.compose.ui.Modifier, androidx.compose.ui.layout.HorizontalAlignmentLine alignmentLine);
+    method @androidx.compose.runtime.Stable public androidx.compose.ui.Modifier alignBy(androidx.compose.ui.Modifier, kotlin.jvm.functions.Function1<? super androidx.compose.ui.layout.Measured,java.lang.Integer> alignmentLineBlock);
+    method @androidx.compose.runtime.Stable public androidx.compose.ui.Modifier alignByBaseline(androidx.compose.ui.Modifier);
+    method @androidx.compose.runtime.Stable public androidx.compose.ui.Modifier weight(androidx.compose.ui.Modifier, float weight, optional boolean fill);
   }
 
   public final class SizeKt {
