@@ -1,5 +1,5 @@
 /*
- * Copyright 2020 The Android Open Source Project
+ * Copyright 2021 The Android Open Source Project
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,19 +14,21 @@
  * limitations under the License.
  */
 
-package androidx.compose.material.lint
+@file:Suppress("UnstableApiUsage")
+
+package androidx.compose.animation.lint
 
 import com.android.tools.lint.client.api.IssueRegistry
 import com.android.tools.lint.detector.api.CURRENT_API
 
 /**
- * [IssueRegistry] containing Material specific lint issues.
+ * [IssueRegistry] containing animation specific lint issues.
  */
-class MaterialIssueRegistry : IssueRegistry() {
+class AnimationIssueRegistry : IssueRegistry() {
     // Tests are run with this version. We ensure that with ApiLintVersionsTest
     override val api = 8
     override val minApi = CURRENT_API
     override val issues get() = listOf(
-        ColorsDetector.ConflictingOnColor
+        CrossfadeDetector.UnusedCrossfadeTargetStateParameter
     )
 }
