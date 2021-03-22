@@ -20,9 +20,16 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.platform.AccessibilityManager
+import androidx.compose.ui.semantics.LiveRegionMode
+import androidx.compose.ui.semantics.SemanticsActions
+import androidx.compose.ui.semantics.SemanticsProperties
+import androidx.compose.ui.test.SemanticsMatcher
+import androidx.compose.ui.test.assert
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithText
+import androidx.compose.ui.test.onParent
 import androidx.compose.ui.test.performClick
+import androidx.compose.ui.test.performSemanticsAction
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.LargeTest
 import androidx.test.filters.MediumTest
@@ -158,6 +165,30 @@ class SnackbarHostTest {
         }
 
         rule.waitUntil { job1.isCompleted && job2.isCompleted }
+    }
+
+    @Test
+    fun snackbarHost_semantics() {
+        val hostState = SnackbarHostState()
+        lateinit var scope: CoroutineScope
+        rule.setContent {
+            scope = rememberCoroutineScope()
+            SnackbarHost(hostState) { data ->
+                Snackbar(data)
+            }
+        }
+        val job1 = scope.launch {
+            val result = hostState.showSnackbar("1", actionLabel = "press")
+            Truth.assertThat(result).isEqualTo(SnackbarResult.Dismissed)
+        }
+        rule.onNodeWithText("1").onParent()
+            .assert(
+                SemanticsMatcher.expectValue(SemanticsProperties.LiveRegion, LiveRegionMode.Polite)
+            )
+            .assert(SemanticsMatcher.keyIsDefined(SemanticsActions.Dismiss))
+            .performSemanticsAction(SemanticsActions.Dismiss)
+
+        rule.waitUntil { job1.isCompleted }
     }
 
     @Test
