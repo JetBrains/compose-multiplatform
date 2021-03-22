@@ -212,7 +212,7 @@ class SelectionRegistrarImplTest {
         assertThat(selectionRegistrar.sorted).isTrue()
 
         // Act.
-        selectionRegistrar.notifyPositionChange()
+        selectionRegistrar.notifyPositionChange(handlerId0)
 
         // Assert.
         assertThat(selectionRegistrar.sorted).isFalse()
