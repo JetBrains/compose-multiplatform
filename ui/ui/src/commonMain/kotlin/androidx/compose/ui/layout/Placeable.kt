@@ -97,7 +97,7 @@ abstract class Placeable : Measured {
     /**
      * The constraints used for the measurement made to obtain this [Placeable].
      */
-    protected var measurementConstraints: Constraints = Constraints()
+    protected var measurementConstraints: Constraints = DefaultConstraints
 
     /**
      * The offset to be added to an apparent position assigned to this [Placeable] to make it real.
@@ -330,3 +330,5 @@ abstract class Placeable : Measured {
  * Block on [GraphicsLayerScope] which applies the default layer parameters.
  */
 private val DefaultLayerBlock: GraphicsLayerScope.() -> Unit = {}
+
+private val DefaultConstraints = Constraints()
