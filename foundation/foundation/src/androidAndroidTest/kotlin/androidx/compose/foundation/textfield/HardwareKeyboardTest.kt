@@ -21,6 +21,7 @@ import android.view.KeyEvent.META_CTRL_ON
 import android.view.KeyEvent.META_SHIFT_ON
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.requiredSize
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.MutableState
@@ -36,8 +37,16 @@ import androidx.compose.ui.test.hasSetTextAction
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.performKeyPress
 import androidx.compose.ui.text.TextRange
+import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.font.Font
+import androidx.compose.ui.text.font.FontStyle
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.font.test.R
+import androidx.compose.ui.text.font.toFontFamily
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.input.TextInputService
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.MediumTest
 import com.google.common.truth.Truth
@@ -85,6 +94,17 @@ class HardwareKeyboardTest {
             Key.DirectionUp.downAndUp()
             Key.Zero.downAndUp()
             expectedText("0h0ello\n0world")
+        }
+    }
+
+    @Test
+    fun textField_linesNavigation_cache() {
+        keysSequenceTest(initText = "hello\n\nworld") {
+            Key.DirectionRight.downAndUp()
+            Key.DirectionDown.downAndUp()
+            Key.DirectionDown.downAndUp()
+            Key.Zero.downAndUp()
+            expectedText("hello\n\nw0orld")
         }
     }
 
@@ -228,6 +248,17 @@ class HardwareKeyboardTest {
         }
     }
 
+    @Test
+    fun textField_pageNavigation() {
+        keysSequenceTest(
+            initText = "1\n2\n3\n4\n5",
+            modifier = Modifier.requiredSize(30.dp)
+        ) {
+            Key.PageDown.downAndUp()
+            expectedSelection(TextRange(4))
+        }
+    }
+
     private inner class SequenceScope(
         val state: MutableState<TextFieldValue>,
         val nodeGetter: () -> SemanticsNodeInteraction
@@ -260,6 +291,7 @@ class HardwareKeyboardTest {
 
     private fun keysSequenceTest(
         initText: String = "",
+        modifier: Modifier = Modifier.fillMaxSize(),
         sequence: SequenceScope.() -> Unit
     ) {
         val inputService = TextInputService(mock())
@@ -272,7 +304,15 @@ class HardwareKeyboardTest {
             ) {
                 BasicTextField(
                     value = state.value,
-                    modifier = Modifier.fillMaxSize().focusRequester(focusFequester),
+                    textStyle = TextStyle(
+                        fontFamily = Font(
+                            R.font.sample_font,
+                            FontWeight.Normal,
+                            FontStyle.Normal
+                        ).toFontFamily(),
+                        fontSize = 10.sp
+                    ),
+                    modifier = modifier.focusRequester(focusFequester),
                     onValueChange = {
                         state.value = it
                     }

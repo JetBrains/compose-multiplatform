@@ -18,7 +18,10 @@ package androidx.compose.foundation.text
 
 import androidx.compose.foundation.text.selection.TextFieldPreparedSelection
 import androidx.compose.foundation.text.selection.TextFieldSelectionManager
+import androidx.compose.foundation.text.selection.TextPreparedSelectionState
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.composed
 import androidx.compose.ui.input.key.KeyEvent
 import androidx.compose.ui.input.key.KeyEventType
 import androidx.compose.ui.input.key.onKeyEvent
@@ -47,6 +50,7 @@ internal class TextFieldKeyInput(
     val value: TextFieldValue = TextFieldValue(),
     val editable: Boolean = true,
     val singleLine: Boolean = false,
+    val preparedSelectionState: TextPreparedSelectionState,
     val offsetMapping: OffsetMapping = OffsetMapping.Identity,
     private val keyMapping: KeyMapping = platformDefaultKeyMapping,
 ) {
@@ -67,6 +71,7 @@ internal class TextFieldKeyInput(
         typedCommand(event)?.let {
             return if (editable) {
                 it.apply()
+                preparedSelectionState.resetCachedX()
                 true
             } else {
                 false
@@ -165,7 +170,8 @@ internal class TextFieldKeyInput(
         val preparedSelection = TextFieldPreparedSelection(
             currentValue = value,
             offsetMapping = offsetMapping,
-            layoutResultProxy = state.layoutResult
+            layoutResultProxy = state.layoutResult,
+            state = preparedSelectionState
         )
         block(preparedSelection)
         if (preparedSelection.selection != value.selection ||
@@ -176,6 +182,7 @@ internal class TextFieldKeyInput(
     }
 }
 
+@Suppress("ModifierInspectorInfo")
 internal fun Modifier.textFieldKeyInput(
     state: TextFieldState,
     manager: TextFieldSelectionManager,
@@ -183,14 +190,16 @@ internal fun Modifier.textFieldKeyInput(
     editable: Boolean,
     singleLine: Boolean,
     offsetMapping: OffsetMapping
-): Modifier {
+) = composed {
+    val preparedSelectionState = remember { TextPreparedSelectionState() }
     val processor = TextFieldKeyInput(
         state = state,
         selectionManager = manager,
         value = value,
         editable = editable,
         singleLine = singleLine,
-        offsetMapping = offsetMapping
+        offsetMapping = offsetMapping,
+        preparedSelectionState = preparedSelectionState
     )
-    return Modifier.onKeyEvent(processor::process)
+    Modifier.onKeyEvent(processor::process)
 }
