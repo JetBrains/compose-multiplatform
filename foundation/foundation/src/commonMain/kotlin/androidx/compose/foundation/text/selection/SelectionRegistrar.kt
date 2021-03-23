@@ -55,7 +55,7 @@ internal interface SelectionRegistrar {
      * When the Global Position of a subscribed [Selectable] changes, this method
      * is called.
      */
-    fun notifyPositionChange()
+    fun notifyPositionChange(selectableId: Long)
 
     /**
      * Call this method to notify the [SelectionContainer] that the selection has been initiated.

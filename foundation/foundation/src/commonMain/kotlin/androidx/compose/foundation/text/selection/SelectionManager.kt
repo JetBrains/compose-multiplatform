@@ -40,6 +40,7 @@ import androidx.compose.ui.input.key.onKeyEvent
 import androidx.compose.ui.layout.LayoutCoordinates
 import androidx.compose.ui.layout.boundsInWindow
 import androidx.compose.ui.layout.onGloballyPositioned
+import androidx.compose.ui.layout.positionInWindow
 import androidx.compose.ui.platform.ClipboardManager
 import androidx.compose.ui.platform.TextToolbar
 import androidx.compose.ui.platform.TextToolbarStatus
@@ -121,13 +122,16 @@ internal class SelectionManager(private val selectionRegistrar: SelectionRegistr
             }
         }
 
+    private var previousPosition: Offset? = null
     /**
      * Layout Coordinates of the selection container.
      */
     var containerLayoutCoordinates: LayoutCoordinates? = null
         set(value) {
             field = value
-            if (hasFocus) {
+            val positionInWindow = value?.positionInWindow()
+            if (hasFocus && previousPosition != positionInWindow) {
+                previousPosition = positionInWindow
                 updateHandleOffsets()
                 updateSelectionToolbarPosition()
             }
@@ -170,9 +174,14 @@ internal class SelectionManager(private val selectionRegistrar: SelectionRegistr
         private set
 
     init {
-        selectionRegistrar.onPositionChangeCallback = {
-            updateHandleOffsets()
-            updateSelectionToolbarPosition()
+        selectionRegistrar.onPositionChangeCallback = { selectableId ->
+            if (
+                selectableId == selection?.start?.selectableId ||
+                selectableId == selection?.end?.selectableId
+            ) {
+                updateHandleOffsets()
+                updateSelectionToolbarPosition()
+            }
         }
 
         selectionRegistrar.onSelectionUpdateStartCallback = { layoutCoordinates, startPosition ->
