@@ -227,7 +227,7 @@ private class TextController(val state: TextState) {
         if (selectionRegistrar.hasSelection(state.selectableId)) {
             val newGlobalPosition = it.positionInWindow()
             if (newGlobalPosition != state.previousGlobalPosition) {
-                selectionRegistrar?.notifyPositionChange()
+                selectionRegistrar?.notifyPositionChange(state.selectableId)
             }
             state.previousGlobalPosition = newGlobalPosition
         }

@@ -59,7 +59,7 @@ internal class SelectionRegistrarImpl : SelectionRegistrar {
     /**
      * The callback to be invoked when the position change was triggered.
      */
-    internal var onPositionChangeCallback: (() -> Unit)? = null
+    internal var onPositionChangeCallback: ((Long) -> Unit)? = null
 
     /**
      * The callback to be invoked when the selection is initiated.
@@ -150,11 +150,11 @@ internal class SelectionRegistrarImpl : SelectionRegistrar {
         return selectables
     }
 
-    override fun notifyPositionChange() {
+    override fun notifyPositionChange(selectableId: Long) {
         // Set the variable sorted to be false, when the global position of a registered
         // selectable changes.
         sorted = false
-        onPositionChangeCallback?.invoke()
+        onPositionChangeCallback?.invoke(selectableId)
     }
 
     override fun notifySelectionUpdateStart(
