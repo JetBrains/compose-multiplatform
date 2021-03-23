@@ -206,6 +206,11 @@ object SemanticsProperties {
      * @see SemanticsPropertyReceiver.password
      */
     val Password = SemanticsPropertyKey<Unit>("Password")
+
+    /**
+     * @see SemanticsPropertyReceiver.error
+     */
+    val Error = SemanticsPropertyKey<String>("Error")
 }
 
 /**
@@ -734,6 +739,15 @@ by SemanticsProperties.ToggleableState
  */
 fun SemanticsPropertyReceiver.password() {
     this[SemanticsProperties.Password] = Unit
+}
+
+/**
+ * Mark semantics node that contains invalid input or error.
+ *
+ * @param [description] a localized description explaining an error to the accessibility user
+ */
+fun SemanticsPropertyReceiver.error(description: String) {
+    this[SemanticsProperties.Error] = description
 }
 
 /**

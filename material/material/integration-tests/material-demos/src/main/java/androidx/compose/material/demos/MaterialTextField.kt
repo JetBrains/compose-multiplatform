@@ -90,7 +90,7 @@ fun TextFieldsDemo() {
             TextFieldWithErrorState()
         }
         item {
-            Text("Text field with helper/error message")
+            Text("Text field with helper message")
             TextFieldWithHelperMessage()
         }
         item {
