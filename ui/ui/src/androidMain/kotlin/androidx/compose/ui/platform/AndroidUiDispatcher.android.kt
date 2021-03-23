@@ -19,8 +19,6 @@ package androidx.compose.ui.platform
 import android.os.Looper
 import android.view.Choreographer
 import androidx.compose.runtime.MonotonicFrameClock
-import androidx.compose.ui.platform.AndroidUiDispatcher.Companion.CurrentThread
-import androidx.compose.ui.platform.AndroidUiDispatcher.Companion.Main
 import androidx.core.os.HandlerCompat
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
@@ -40,7 +38,6 @@ import kotlin.coroutines.CoroutineContext
 // not marked as async will adversely affect dispatch behavior but not to the point of
 // incorrectness; more operations would be deferred to the choreographer frame as racing handler
 // messages would wait behind a frame barrier.
-@OptIn(ExperimentalStdlibApi::class)
 class AndroidUiDispatcher private constructor(
     val choreographer: Choreographer,
     private val handler: android.os.Handler
