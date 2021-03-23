@@ -16,10 +16,15 @@
 
 package androidx.compose.ui.platform
 
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.text.BasicText
 import androidx.compose.foundation.text.BasicTextField
+import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.SideEffect
 import androidx.compose.ui.ExperimentalComposeUiApi
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
@@ -29,6 +34,7 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.LargeTest
 import com.nhaarman.mockitokotlin2.inOrder
 import com.nhaarman.mockitokotlin2.mock
+import com.nhaarman.mockitokotlin2.never
 import com.nhaarman.mockitokotlin2.times
 import com.nhaarman.mockitokotlin2.verify
 import org.junit.Rule
@@ -43,7 +49,37 @@ class LocalSoftwareKeyboardControllerTest {
     @get:Rule
     val rule = createComposeRule()
 
-    @ExperimentalComposeUiApi
+    @Test
+    fun whenButtonClicked_performsHide_realisticAppTestCase() {
+        // code under test
+        @Composable
+        fun TestComposable() {
+            val softwareKeyboardController = LocalSoftwareKeyboardController.current
+            // Box instead of Button in this file for module dependency reasons
+            Box(Modifier.clickable { softwareKeyboardController?.hide() }) {
+                BasicText("Click Me")
+            }
+        }
+
+        // arrange
+        val mockSoftwareKeyboardController: SoftwareKeyboardController = mock()
+        rule.setContent {
+            CompositionLocalProvider(
+                LocalSoftwareKeyboardController provides mockSoftwareKeyboardController
+            ) {
+                TestComposable()
+            }
+        }
+
+        // act
+        rule.onNodeWithText("Click Me").performClick()
+
+        // assert
+        rule.runOnIdle {
+            verify(mockSoftwareKeyboardController).hide()
+        }
+    }
+
     @Test
     fun localSoftwareKeybardController_delegatesTo_textInputService() {
         val platformTextInputService = mock<PlatformTextInputService>()
@@ -55,7 +91,7 @@ class LocalSoftwareKeyboardControllerTest {
             ) {
                 val controller = LocalSoftwareKeyboardController.current
                 SideEffect {
-                    controller?.hideSoftwareKeyboard()
+                    controller?.hide()
                 }
             }
         }
@@ -84,8 +120,8 @@ class LocalSoftwareKeyboardControllerTest {
         rule.onNodeWithText("string").performClick()
 
         rule.runOnIdle {
-            controller?.hideSoftwareKeyboard()
-            controller?.showSoftwareKeyboard()
+            controller?.hide()
+            controller?.show()
             inOrder(platformTextInputService) {
                 verify(platformTextInputService).showSoftwareKeyboard() // focus
                 verify(platformTextInputService).hideSoftwareKeyboard() // explicit call
@@ -100,7 +136,29 @@ class LocalSoftwareKeyboardControllerTest {
         rule.setContent {
             keyboardController = LocalSoftwareKeyboardController.current
         }
-        keyboardController!!.showSoftwareKeyboard()
-        keyboardController!!.hideSoftwareKeyboard()
+        keyboardController!!.show()
+        keyboardController!!.hide()
+    }
+
+    @Test
+    fun showAndHide_noOp_whenProvidedMock() {
+        val mockSoftwareKeyboardController: SoftwareKeyboardController = mock()
+        val platformTextInputService = mock<PlatformTextInputService>()
+        val textInputService = TextInputService(platformTextInputService)
+        var controller: SoftwareKeyboardController? = null
+        rule.setContent {
+            CompositionLocalProvider(
+                LocalSoftwareKeyboardController provides mockSoftwareKeyboardController,
+                LocalTextInputService provides textInputService
+            ) {
+                controller = LocalSoftwareKeyboardController.current
+            }
+        }
+        rule.runOnIdle {
+            controller?.show()
+            controller?.hide()
+        }
+        verify(platformTextInputService, never()).hideSoftwareKeyboard()
+        verify(platformTextInputService, never()).showSoftwareKeyboard()
     }
 }
