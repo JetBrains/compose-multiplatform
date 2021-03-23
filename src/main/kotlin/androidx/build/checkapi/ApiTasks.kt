@@ -23,6 +23,7 @@ import androidx.build.Version
 import androidx.build.isWriteVersionedApiFilesEnabled
 import androidx.build.java.JavaCompileInputs
 import androidx.build.metalava.MetalavaTasks
+import androidx.build.multiplatformExtension
 import androidx.build.resources.ResourceTasks
 import androidx.build.version
 import com.android.build.gradle.LibraryExtension
@@ -35,6 +36,7 @@ import org.gradle.kotlin.dsl.getPlugin
 sealed class ApiTaskConfig
 data class LibraryApiTaskConfig(val library: LibraryExtension) : ApiTaskConfig()
 object JavaApiTaskConfig : ApiTaskConfig()
+object KmpApiTaskConfig : ApiTaskConfig()
 
 fun AndroidXExtension.shouldConfigureApiTasks(): Boolean {
     if (!project.state.executed) {
@@ -166,6 +168,10 @@ fun Project.configureProjectForApiTasks(
                 processManifest = config.library.buildOutputs.getByName(variant.name)
                     .processManifestProvider.get() as ProcessLibraryManifest
             }
+            is KmpApiTaskConfig -> {
+                javaInputs = project.jvmCompileInputsFromKmpProject()
+                processManifest = null
+            }
             is JavaApiTaskConfig -> {
                 val javaPluginConvention = convention.getPlugin<JavaPluginConvention>()
                 val mainSourceSet = javaPluginConvention.sourceSets.getByName("main")
@@ -188,4 +194,35 @@ fun Project.configureProjectForApiTasks(
             )
         }
     }
+}
+
+/**
+ * Despite the return type, this returns a [JavaCompileInputs] wrapping Kotlin + Java JVM source
+ * sets and compile classpath dependencies.
+ */
+fun Project.jvmCompileInputsFromKmpProject(): JavaCompileInputs {
+    if (multiplatformExtension == null) {
+        throw GradleException("Expected KMP project but got ${project.name}")
+    }
+
+    val javaPluginConvention = convention.getPlugin<JavaPluginConvention>()
+    val mainSourceSet = javaPluginConvention.sourceSets.getByName("main")
+    val dependencyClasspath = mainSourceSet.compileClasspath
+    val mainSourcePaths = project.files(
+        provider { mainSourceSet.allSource.srcDirs }
+    )
+
+    val kotlinSourceSets = multiplatformExtension!!.sourceSets
+        .filter { it.name.contains("main", ignoreCase = true) }
+    val kotlinSourcePaths = files(
+        provider {
+            kotlinSourceSets.flatMap { it.kotlin.sourceDirectories }
+        }
+    )
+
+    return JavaCompileInputs.fromSourcesAndDeps(
+        sourcePaths = mainSourcePaths + kotlinSourcePaths,
+        dependencyClasspath = dependencyClasspath,
+        project = this
+    )
 }

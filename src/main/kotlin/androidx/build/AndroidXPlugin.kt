@@ -25,6 +25,7 @@ import androidx.build.SupportConfig.DEFAULT_MIN_SDK_VERSION
 import androidx.build.SupportConfig.INSTRUMENTATION_RUNNER
 import androidx.build.SupportConfig.TARGET_SDK_VERSION
 import androidx.build.checkapi.JavaApiTaskConfig
+import androidx.build.checkapi.KmpApiTaskConfig
 import androidx.build.checkapi.LibraryApiTaskConfig
 import androidx.build.checkapi.configureProjectForApiTasks
 import androidx.build.dependencyTracker.AffectedModuleDetector
@@ -358,10 +359,12 @@ class AndroidXPlugin : Plugin<Project> {
 
         // Standard lint, docs, and Metalava configuration for AndroidX projects.
         project.configureNonAndroidProjectForLint(extension)
-        project.configureProjectForApiTasks(
-            JavaApiTaskConfig,
-            extension
-        )
+        val apiTaskConfig = if (project.multiplatformExtension != null) {
+            KmpApiTaskConfig
+        } else {
+            JavaApiTaskConfig
+        }
+        project.configureProjectForApiTasks(apiTaskConfig, extension)
 
         project.afterEvaluate {
             if (extension.type.publish.shouldRelease()) {
