@@ -149,7 +149,7 @@ private fun AboutSection(
     openWebsiteLink: (String) -> Unit
 ) {
     Text(
-        text = stringResource(R.string.io_about_title).toUpperCase(
+        text = stringResource(R.string.io_about_title).uppercase(
             LocaleListCompat.getDefault().get(0)
         ),
         style = MaterialTheme.typography.body2,

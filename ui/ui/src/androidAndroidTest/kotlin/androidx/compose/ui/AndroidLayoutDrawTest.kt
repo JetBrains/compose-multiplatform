@@ -3800,8 +3800,8 @@ fun Wrap(
 ) {
     Layout(modifier = modifier, content = content) { measurables, constraints ->
         val placeables = measurables.map { it.measure(constraints) }
-        val width = max(placeables.maxBy { it.width }?.width ?: 0, minWidth)
-        val height = max(placeables.maxBy { it.height }?.height ?: 0, minHeight)
+        val width = max(placeables.maxByOrNull { it.width }?.width ?: 0, minWidth)
+        val height = max(placeables.maxByOrNull { it.height }?.height ?: 0, minHeight)
         layout(width, height) {
             placeables.forEach { it.placeRelative(0, 0) }
         }
@@ -3857,8 +3857,8 @@ fun WrapForceRelayout(
 ) {
     Layout(modifier = modifier, content = content) { measurables, constraints ->
         val placeables = measurables.map { it.measure(constraints) }
-        val width = placeables.maxBy { it.width }?.width ?: 0
-        val height = placeables.maxBy { it.height }?.height ?: 0
+        val width = placeables.maxByOrNull { it.width }?.width ?: 0
+        val height = placeables.maxByOrNull { it.height }?.height ?: 0
         layout(width, height) {
             model.value
             placeables.forEach { it.placeRelative(0, 0) }

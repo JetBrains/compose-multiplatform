@@ -44,6 +44,7 @@ private const val invalidFocusDirection = "Invalid FocusDirection"
  *
  * @sample androidx.compose.ui.samples.MoveFocusSample
  */
+@Suppress("INLINE_CLASS_DEPRECATED", "EXPERIMENTAL_FEATURE_WARNING")
 inline class FocusDirection(val value: Int) {
 
     override fun toString(): String {

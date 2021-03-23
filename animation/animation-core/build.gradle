@@ -75,6 +75,14 @@ if (AndroidXUiPlugin.isMultiplatformEnabled(project)) {
          * corresponding block above
          */
         sourceSets {
+
+            jvmMain {
+                dependencies {
+                    implementation(KOTLIN_STDLIB)
+                    api(KOTLIN_COROUTINES_CORE)
+                }
+            }
+
             commonMain.dependencies {
                 implementation(project(":compose:runtime:runtime"))
                 implementation(project(":compose:ui:ui-unit"))
@@ -82,12 +90,19 @@ if (AndroidXUiPlugin.isMultiplatformEnabled(project)) {
                 implementation(KOTLIN_STDLIB_COMMON)
                 api(KOTLIN_COROUTINES_CORE)
             }
-            androidMain.dependencies {
-                api("androidx.annotation:annotation:1.1.0")
-                implementation(KOTLIN_STDLIB)
+
+            androidMain {
+                dependencies {
+                    api("androidx.annotation:annotation:1.1.0")
+                    implementation(KOTLIN_STDLIB)
+                }
+                dependsOn(jvmMain)
             }
-            desktopMain.dependencies {
-                implementation(KOTLIN_STDLIB)
+            desktopMain {
+                dependencies {
+                    implementation(KOTLIN_STDLIB)
+                }
+                dependsOn(jvmMain)
             }
 
             androidTest.dependencies {

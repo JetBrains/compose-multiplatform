@@ -244,4 +244,4 @@ private fun AttributedCharacterIterator.toStringFrom(index: Int): String {
 }
 
 private val isMac =
-    System.getProperty("os.name").toLowerCase(Locale.ENGLISH).startsWith("mac")
+    System.getProperty("os.name").lowercase(Locale.ENGLISH).startsWith("mac")

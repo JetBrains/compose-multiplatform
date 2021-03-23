@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-@file:Suppress("EXPERIMENTAL_FEATURE_WARNING")
+@file:Suppress("INLINE_CLASS_DEPRECATED", "EXPERIMENTAL_FEATURE_WARNING")
 
 package androidx.compose.ui.input.pointer
 

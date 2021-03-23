@@ -86,7 +86,7 @@ class DemoTest {
     @MediumTest
     fun testAllDemosAreBeingTested() {
         assertThat(
-            SplitDemoCategories.sumBy { it.allLaunchableDemos().size }
+            SplitDemoCategories.sumOf { it.allLaunchableDemos().size }
         ).isEqualTo(AllButIgnoredDemos.allLaunchableDemos().size)
     }
 

@@ -24,7 +24,7 @@ import javax.crypto.spec.PBEKeySpec
 val random = Random(5)
 
 fun createWord(): String {
-    return (5..10).map { ('a'.toInt() + random.nextInt(26)).toChar() }.joinToString(" ")
+    return (5..10).map { ('a'.code + random.nextInt(26)).toChar() }.joinToString(" ")
 }
 
 fun createSomeText(sentences: Int = 10): String {

@@ -181,6 +181,7 @@ private class PointerInputChangeEventProducer {
  * The result of a call to [PointerInputEventProcessor.process].
  */
 // TODO(shepshpard): Not sure if storing these values in a int is most efficient overall.
+@Suppress("INLINE_CLASS_DEPRECATED", "EXPERIMENTAL_FEATURE_WARNING")
 internal inline class ProcessResult(private val value: Int) {
     val dispatchedToAPointerInputModifier
         get() = (value and 1) != 0
