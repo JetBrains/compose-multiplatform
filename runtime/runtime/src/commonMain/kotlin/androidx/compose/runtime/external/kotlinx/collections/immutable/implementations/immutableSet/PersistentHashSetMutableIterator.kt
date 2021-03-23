@@ -3,9 +3,9 @@
  * Use of this source code is governed by the Apache 2.0 License that can be found in the LICENSE.txt file.
  */
 
-package kotlinx.collections.immutable.implementations.immutableSet
+package androidx.compose.runtime.external.kotlinx.collections.immutable.implementations.immutableSet
 
-import kotlinx.collections.immutable.internal.assert
+import androidx.compose.runtime.external.kotlinx.collections.immutable.internal.assert
 
 internal class PersistentHashSetMutableIterator<E>(private val builder: PersistentHashSetBuilder<E>)
     : PersistentHashSetIterator<E>(builder.node), MutableIterator<E> {

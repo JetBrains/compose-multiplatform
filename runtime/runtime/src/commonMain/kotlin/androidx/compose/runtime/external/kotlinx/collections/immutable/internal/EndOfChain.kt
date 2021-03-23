@@ -3,6 +3,6 @@
  * Use of this source code is governed by the Apache 2.0 License that can be found in the LICENSE.txt file.
  */
 
-package kotlinx.collections.immutable.internal
+package androidx.compose.runtime.external.kotlinx.collections.immutable.internal
 
 internal object EndOfChain

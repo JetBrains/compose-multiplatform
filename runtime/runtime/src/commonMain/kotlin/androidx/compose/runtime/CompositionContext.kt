@@ -17,7 +17,7 @@
 package androidx.compose.runtime
 
 import androidx.compose.runtime.tooling.CompositionData
-import kotlinx.collections.immutable.persistentHashMapOf
+import androidx.compose.runtime.external.kotlinx.collections.immutable.persistentHashMapOf
 import kotlin.coroutines.CoroutineContext
 
 private val EmptyCompositionLocalMap: CompositionLocalMap = persistentHashMapOf()

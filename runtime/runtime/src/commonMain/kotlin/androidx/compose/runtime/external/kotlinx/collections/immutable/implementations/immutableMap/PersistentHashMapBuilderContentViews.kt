@@ -3,12 +3,13 @@
  * Use of this source code is governed by the Apache 2.0 License that can be found in the LICENSE.txt file.
  */
 
-package kotlinx.collections.immutable.implementations.immutableMap
+package androidx.compose.runtime.external.kotlinx.collections.immutable.implementations.immutableMap
 
 // intermediate abstract class to workaround KT-43321
 internal abstract class AbstractMapBuilderEntries<E : Map.Entry<K, V>, K, V> : AbstractMutableSet<E>() {
     final override fun contains(element: E): Boolean {
         // TODO: Eliminate this check after KT-30016 gets fixed.
+        @Suppress("USELESS_CAST")
         if ((element as? Any?) !is Map.Entry<*, *>) return false
         return containsEntry(element)
     }
@@ -16,6 +17,7 @@ internal abstract class AbstractMapBuilderEntries<E : Map.Entry<K, V>, K, V> : A
 
     final override fun remove(element: E): Boolean {
         // TODO: Eliminate this check after KT-30016 gets fixed.
+        @Suppress("USELESS_CAST")
         if ((element as? Any?) !is Map.Entry<*, *>) return false
         return removeEntry(element)
     }

@@ -3,11 +3,11 @@
  * Use of this source code is governed by the Apache 2.0 License that can be found in the LICENSE.txt file.
  */
 
-package kotlinx.collections.immutable.implementations.immutableMap
+package androidx.compose.runtime.external.kotlinx.collections.immutable.implementations.immutableMap
 
-import kotlinx.collections.immutable.PersistentMap
-import kotlinx.collections.immutable.internal.DeltaCounter
-import kotlinx.collections.immutable.internal.MutabilityOwnership
+import androidx.compose.runtime.external.kotlinx.collections.immutable.PersistentMap
+import androidx.compose.runtime.external.kotlinx.collections.immutable.internal.DeltaCounter
+import androidx.compose.runtime.external.kotlinx.collections.immutable.internal.MutabilityOwnership
 
 internal class PersistentHashMapBuilder<K, V>(private var map: PersistentHashMap<K, V>) : PersistentMap.Builder<K, V>, AbstractMutableMap<K, V>() {
     internal var ownership = MutabilityOwnership()

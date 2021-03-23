@@ -3,15 +3,13 @@
  * Use of this source code is governed by the Apache 2.0 License that can be found in the LICENSE.txt file.
  */
 
-package kotlinx.collections.immutable.implementations.immutableSet
+package androidx.compose.runtime.external.kotlinx.collections.immutable.implementations.immutableSet
 
-import kotlinx.collections.immutable.internal.assert
-import kotlin.js.JsName
+import androidx.compose.runtime.external.kotlinx.collections.immutable.internal.assert
 
 internal open class PersistentHashSetIterator<E>(node: TrieNode<E>) : Iterator<E> {
     protected val path = mutableListOf(TrieNodeIterator<E>())
     protected var pathLastIndex = 0
-    @JsName("_hasNext")
     private var hasNext = true
 
     init {

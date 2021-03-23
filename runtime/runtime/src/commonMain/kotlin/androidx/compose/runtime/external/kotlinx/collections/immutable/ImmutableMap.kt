@@ -3,7 +3,7 @@
  * Use of this source code is governed by the Apache 2.0 License that can be found in the LICENSE.txt file.
  */
 
-package kotlinx.collections.immutable
+package androidx.compose.runtime.external.kotlinx.collections.immutable
 
 /**
  * A generic immutable collection that holds pairs of objects (keys and values) and supports efficiently retrieving
@@ -19,7 +19,7 @@ package kotlinx.collections.immutable
  *          can accept key as a parameter (of [containsKey] for example) and return it in [keys] set.
  * @param V the type of map values. The map is covariant on its value type.
  */
-public interface ImmutableMap<K, out V>: Map<K, V> {
+internal interface ImmutableMap<K, out V>: Map<K, V> {
 
     override val keys: ImmutableSet<K>
 
@@ -38,7 +38,7 @@ public interface ImmutableMap<K, out V>: Map<K, V> {
  * @param K the type of map keys. The map is invariant on its key type.
  * @param V the type of map values. The persistent map is covariant on its value type.
  */
-public interface PersistentMap<K, out V> : ImmutableMap<K, V> {
+internal interface PersistentMap<K, out V> : ImmutableMap<K, V> {
     /**
      * Returns the result of associating the specified [value] with the specified [key] in this map.
      *

@@ -3,11 +3,11 @@
  * Use of this source code is governed by the Apache 2.0 License that can be found in the LICENSE.txt file.
  */
 
-package kotlinx.collections.immutable.implementations.immutableSet
+package androidx.compose.runtime.external.kotlinx.collections.immutable.implementations.immutableSet
 
-import kotlinx.collections.immutable.PersistentSet
-import kotlinx.collections.immutable.internal.DeltaCounter
-import kotlinx.collections.immutable.internal.MutabilityOwnership
+import androidx.compose.runtime.external.kotlinx.collections.immutable.PersistentSet
+import androidx.compose.runtime.external.kotlinx.collections.immutable.internal.DeltaCounter
+import androidx.compose.runtime.external.kotlinx.collections.immutable.internal.MutabilityOwnership
 
 internal class PersistentHashSetBuilder<E>(private var set: PersistentHashSet<E>) : AbstractMutableSet<E>(), PersistentSet.Builder<E> {
     internal var ownership = MutabilityOwnership()

@@ -5,17 +5,17 @@
 
 @file:Suppress("NOTHING_TO_INLINE")
 
-package kotlinx.collections.immutable
+package androidx.compose.runtime.external.kotlinx.collections.immutable
 
-import kotlinx.collections.immutable.implementations.immutableList.persistentVectorOf
-import kotlinx.collections.immutable.implementations.immutableMap.PersistentHashMap
-import kotlinx.collections.immutable.implementations.immutableMap.PersistentHashMapBuilder
-import kotlinx.collections.immutable.implementations.immutableSet.PersistentHashSet
-import kotlinx.collections.immutable.implementations.immutableSet.PersistentHashSetBuilder
-import kotlinx.collections.immutable.implementations.persistentOrderedMap.PersistentOrderedMap
-import kotlinx.collections.immutable.implementations.persistentOrderedMap.PersistentOrderedMapBuilder
-import kotlinx.collections.immutable.implementations.persistentOrderedSet.PersistentOrderedSet
-import kotlinx.collections.immutable.implementations.persistentOrderedSet.PersistentOrderedSetBuilder
+import androidx.compose.runtime.external.kotlinx.collections.immutable.implementations.immutableList.persistentVectorOf
+import androidx.compose.runtime.external.kotlinx.collections.immutable.implementations.immutableMap.PersistentHashMap
+import androidx.compose.runtime.external.kotlinx.collections.immutable.implementations.immutableMap.PersistentHashMapBuilder
+import androidx.compose.runtime.external.kotlinx.collections.immutable.implementations.immutableSet.PersistentHashSet
+import androidx.compose.runtime.external.kotlinx.collections.immutable.implementations.immutableSet.PersistentHashSetBuilder
+import androidx.compose.runtime.external.kotlinx.collections.immutable.implementations.persistentOrderedMap.PersistentOrderedMap
+import androidx.compose.runtime.external.kotlinx.collections.immutable.implementations.persistentOrderedMap.PersistentOrderedMapBuilder
+import androidx.compose.runtime.external.kotlinx.collections.immutable.implementations.persistentOrderedSet.PersistentOrderedSet
+import androidx.compose.runtime.external.kotlinx.collections.immutable.implementations.persistentOrderedSet.PersistentOrderedSetBuilder
 
 //@Suppress("INVISIBLE_MEMBER", "INVISIBLE_REFERENCE")
 //inline fun <T> @kotlin.internal.Exact ImmutableCollection<T>.mutate(mutator: (MutableCollection<T>) -> Unit): ImmutableCollection<T> = builder().apply(mutator).build()
@@ -28,7 +28,7 @@ import kotlinx.collections.immutable.implementations.persistentOrderedSet.Persis
  * @return a new persistent set with the provided modifications applied;
  * or this instance if no modifications were made in the result of this operation.
  */
-inline fun <T> PersistentSet<T>.mutate(mutator: (MutableSet<T>) -> Unit): PersistentSet<T> = builder().apply(mutator).build()
+internal inline fun <T> PersistentSet<T>.mutate(mutator: (MutableSet<T>) -> Unit): PersistentSet<T> = builder().apply(mutator).build()
 
 /**
  * Returns the result of applying the provided modifications on this list.
@@ -38,7 +38,7 @@ inline fun <T> PersistentSet<T>.mutate(mutator: (MutableSet<T>) -> Unit): Persis
  * @return a new persistent list with the provided modifications applied;
  * or this instance if no modifications were made in the result of this operation.
  */
-inline fun <T> PersistentList<T>.mutate(mutator: (MutableList<T>) -> Unit): PersistentList<T> = builder().apply(mutator).build()
+internal inline fun <T> PersistentList<T>.mutate(mutator: (MutableList<T>) -> Unit): PersistentList<T> = builder().apply(mutator).build()
 
 /**
  * Returns the result of applying the provided modifications on this map.
@@ -48,7 +48,8 @@ inline fun <T> PersistentList<T>.mutate(mutator: (MutableList<T>) -> Unit): Pers
  * @return a new persistent map with the provided modifications applied;
  * or this instance if no modifications were made in the result of this operation.
  */
-inline fun <K, V> PersistentMap<out K, V>.mutate(mutator: (MutableMap<K, V>) -> Unit): PersistentMap<K, V> =
+@Suppress("UNCHECKED_CAST")
+internal inline fun <K, V> PersistentMap<out K, V>.mutate(mutator: (MutableMap<K, V>) -> Unit): PersistentMap<K, V> =
         (this as PersistentMap<K, V>).builder().apply(mutator).build()
 
 
@@ -58,7 +59,7 @@ inline fun <K, V> PersistentMap<out K, V>.mutate(mutator: (MutableMap<K, V>) -> 
  * @returns a new persistent collection with the specified [element] added;
  * or this instance if this collection does not support duplicates and it already contains the element.
  */
-inline operator fun <E> PersistentCollection<E>.plus(element: E): PersistentCollection<E> = add(element)
+internal inline operator fun <E> PersistentCollection<E>.plus(element: E): PersistentCollection<E> = add(element)
 
 /**
  * Returns the result of removing a single appearance of the specified [element] from this collection.
@@ -66,7 +67,7 @@ inline operator fun <E> PersistentCollection<E>.plus(element: E): PersistentColl
  * @return a new persistent collection with a single appearance of the specified [element] removed;
  * or this instance if there is no such element in this collection.
  */
-inline operator fun <E> PersistentCollection<E>.minus(element: E): PersistentCollection<E> = remove(element)
+internal inline operator fun <E> PersistentCollection<E>.minus(element: E): PersistentCollection<E> = remove(element)
 
 
 /**
@@ -75,7 +76,7 @@ inline operator fun <E> PersistentCollection<E>.minus(element: E): PersistentCol
  * @return a new persistent collection with elements of the specified [elements] collection added;
  * or this instance if no modifications were made in the result of this operation.
  */
-operator fun <E> PersistentCollection<E>.plus(elements: Iterable<E>): PersistentCollection<E>
+internal operator fun <E> PersistentCollection<E>.plus(elements: Iterable<E>): PersistentCollection<E>
         = if (elements is Collection) addAll(elements) else builder().also { it.addAll(elements) }.build()
 
 /**
@@ -84,7 +85,7 @@ operator fun <E> PersistentCollection<E>.plus(elements: Iterable<E>): Persistent
  * @return a new persistent collection with elements of the specified [elements] array added;
  * or this instance if no modifications were made in the result of this operation.
  */
-operator fun <E> PersistentCollection<E>.plus(elements: Array<out E>): PersistentCollection<E>
+internal operator fun <E> PersistentCollection<E>.plus(elements: Array<out E>): PersistentCollection<E>
         = builder().also { it.addAll(elements) }.build()
 
 /**
@@ -93,7 +94,7 @@ operator fun <E> PersistentCollection<E>.plus(elements: Array<out E>): Persisten
  * @return a new persistent collection with elements of the specified [elements] sequence added;
  * or this instance if no modifications were made in the result of this operation.
  */
-operator fun <E> PersistentCollection<E>.plus(elements: Sequence<E>): PersistentCollection<E>
+internal operator fun <E> PersistentCollection<E>.plus(elements: Sequence<E>): PersistentCollection<E>
         = builder().also { it.addAll(elements) }.build()
 
 
@@ -105,7 +106,7 @@ operator fun <E> PersistentCollection<E>.plus(elements: Sequence<E>): Persistent
  * contained in the specified [elements] collection removed;
  * or this instance if no modifications were made in the result of this operation.
  */
-operator fun <E> PersistentCollection<E>.minus(elements: Iterable<E>): PersistentCollection<E>
+internal operator fun <E> PersistentCollection<E>.minus(elements: Iterable<E>): PersistentCollection<E>
         = if (elements is Collection) removeAll(elements) else builder().also { it.removeAll(elements) }.build()
 
 /**
@@ -116,7 +117,7 @@ operator fun <E> PersistentCollection<E>.minus(elements: Iterable<E>): Persisten
  * contained in the specified [elements] array removed;
  * or this instance if no modifications were made in the result of this operation.
  */
-operator fun <E> PersistentCollection<E>.minus(elements: Array<out E>): PersistentCollection<E>
+internal operator fun <E> PersistentCollection<E>.minus(elements: Array<out E>): PersistentCollection<E>
         = builder().also { it.removeAll(elements) }.build()
 
 /**
@@ -127,14 +128,14 @@ operator fun <E> PersistentCollection<E>.minus(elements: Array<out E>): Persiste
  * contained in the specified [elements] sequence removed;
  * or this instance if no modifications were made in the result of this operation.
  */
-operator fun <E> PersistentCollection<E>.minus(elements: Sequence<E>): PersistentCollection<E>
+internal operator fun <E> PersistentCollection<E>.minus(elements: Sequence<E>): PersistentCollection<E>
         =  builder().also { it.removeAll(elements) }.build()
 
 
 /**
  * Returns a new persistent list with the specified [element] appended.
  */
-inline operator fun <E> PersistentList<E>.plus(element: E): PersistentList<E> = add(element)
+internal inline operator fun <E> PersistentList<E>.plus(element: E): PersistentList<E> = add(element)
 
 /**
  * Returns the result of removing the first appearance of the specified [element] from this list.
@@ -142,7 +143,7 @@ inline operator fun <E> PersistentList<E>.plus(element: E): PersistentList<E> = 
  * @return a new persistent list with the first appearance of the specified [element] removed;
  * or this instance if there is no such element in this list.
  */
-inline operator fun <E> PersistentList<E>.minus(element: E): PersistentList<E> = remove(element)
+internal inline operator fun <E> PersistentList<E>.minus(element: E): PersistentList<E> = remove(element)
 
 
 /**
@@ -153,7 +154,7 @@ inline operator fun <E> PersistentList<E>.minus(element: E): PersistentList<E> =
  * @return a new persistent list with elements of the specified [elements] collection appended;
  * or this instance if the specified collection is empty.
  */
-operator fun <E> PersistentList<E>.plus(elements: Iterable<E>): PersistentList<E>
+internal operator fun <E> PersistentList<E>.plus(elements: Iterable<E>): PersistentList<E>
         = if (elements is Collection) addAll(elements) else mutate { it.addAll(elements) }
 
 /**
@@ -164,7 +165,7 @@ operator fun <E> PersistentList<E>.plus(elements: Iterable<E>): PersistentList<E
  * @return a new persistent list with elements of the specified [elements] array appended;
  * or this instance if the specified array is empty.
  */
-operator fun <E> PersistentList<E>.plus(elements: Array<out E>): PersistentList<E>
+internal operator fun <E> PersistentList<E>.plus(elements: Array<out E>): PersistentList<E>
         = mutate { it.addAll(elements) }
 
 /**
@@ -175,7 +176,7 @@ operator fun <E> PersistentList<E>.plus(elements: Array<out E>): PersistentList<
  * @return a new persistent list with elements of the specified [elements] sequence appended;
  * or this instance if the specified sequence is empty.
  */
-operator fun <E> PersistentList<E>.plus(elements: Sequence<E>): PersistentList<E>
+internal operator fun <E> PersistentList<E>.plus(elements: Sequence<E>): PersistentList<E>
         = mutate { it.addAll(elements) }
 
 
@@ -187,7 +188,7 @@ operator fun <E> PersistentList<E>.plus(elements: Sequence<E>): PersistentList<E
  * contained in the specified [elements] collection removed;
  * or this instance if no modifications were made in the result of this operation.
  */
-operator fun <E> PersistentList<E>.minus(elements: Iterable<E>): PersistentList<E>
+internal operator fun <E> PersistentList<E>.minus(elements: Iterable<E>): PersistentList<E>
         = if (elements is Collection) removeAll(elements) else mutate { it.removeAll(elements) }
 
 /**
@@ -198,7 +199,7 @@ operator fun <E> PersistentList<E>.minus(elements: Iterable<E>): PersistentList<
  * contained in the specified [elements] array removed;
  * or this instance if no modifications were made in the result of this operation.
  */
-operator fun <E> PersistentList<E>.minus(elements: Array<out E>): PersistentList<E>
+internal operator fun <E> PersistentList<E>.minus(elements: Array<out E>): PersistentList<E>
         = mutate { it.removeAll(elements) }
 
 /**
@@ -209,7 +210,7 @@ operator fun <E> PersistentList<E>.minus(elements: Array<out E>): PersistentList
  * contained in the specified [elements] sequence removed;
  * or this instance if no modifications were made in the result of this operation.
  */
-operator fun <E> PersistentList<E>.minus(elements: Sequence<E>): PersistentList<E>
+internal operator fun <E> PersistentList<E>.minus(elements: Sequence<E>): PersistentList<E>
         = mutate { it.removeAll(elements) }
 
 
@@ -219,7 +220,7 @@ operator fun <E> PersistentList<E>.minus(elements: Sequence<E>): PersistentList<
  * @return a new persistent set with the specified [element] added;
  * or this instance if it already contains the element.
  */
-inline operator fun <E> PersistentSet<E>.plus(element: E): PersistentSet<E> = add(element)
+internal inline operator fun <E> PersistentSet<E>.plus(element: E): PersistentSet<E> = add(element)
 
 /**
  * Returns the result of removing the specified [element] from this set.
@@ -227,7 +228,7 @@ inline operator fun <E> PersistentSet<E>.plus(element: E): PersistentSet<E> = ad
  * @return a new persistent set with the specified [element] removed;
  * or this instance if there is no such element in this set.
  */
-inline operator fun <E> PersistentSet<E>.minus(element: E): PersistentSet<E> = remove(element)
+internal inline operator fun <E> PersistentSet<E>.minus(element: E): PersistentSet<E> = remove(element)
 
 
 /**
@@ -236,7 +237,7 @@ inline operator fun <E> PersistentSet<E>.minus(element: E): PersistentSet<E> = r
  * @return a new persistent set with elements of the specified [elements] collection added;
  * or this instance if it already contains every element of the specified collection.
  */
-operator fun <E> PersistentSet<E>.plus(elements: Iterable<E>): PersistentSet<E>
+internal operator fun <E> PersistentSet<E>.plus(elements: Iterable<E>): PersistentSet<E>
         = if (elements is Collection) addAll(elements) else mutate { it.addAll(elements) }
 
 /**
@@ -245,7 +246,7 @@ operator fun <E> PersistentSet<E>.plus(elements: Iterable<E>): PersistentSet<E>
  * @return a new persistent set with elements of the specified [elements] array added;
  * or this instance if it already contains every element of the specified array.
  */
-operator fun <E> PersistentSet<E>.plus(elements: Array<out E>): PersistentSet<E>
+internal operator fun <E> PersistentSet<E>.plus(elements: Array<out E>): PersistentSet<E>
         = mutate { it.addAll(elements) }
 
 /**
@@ -254,7 +255,7 @@ operator fun <E> PersistentSet<E>.plus(elements: Array<out E>): PersistentSet<E>
  * @return a new persistent set with elements of the specified [elements] sequence added;
  * or this instance if it already contains every element of the specified sequence.
  */
-operator fun <E> PersistentSet<E>.plus(elements: Sequence<E>): PersistentSet<E>
+internal operator fun <E> PersistentSet<E>.plus(elements: Sequence<E>): PersistentSet<E>
         = mutate { it.addAll(elements) }
 
 
@@ -266,7 +267,7 @@ operator fun <E> PersistentSet<E>.plus(elements: Sequence<E>): PersistentSet<E>
  * contained in the specified [elements] collection removed;
  * or this instance if no modifications were made in the result of this operation.
  */
-operator fun <E> PersistentSet<E>.minus(elements: Iterable<E>): PersistentSet<E>
+internal operator fun <E> PersistentSet<E>.minus(elements: Iterable<E>): PersistentSet<E>
         = if (elements is Collection) removeAll(elements) else mutate { it.removeAll(elements) }
 
 /**
@@ -277,7 +278,7 @@ operator fun <E> PersistentSet<E>.minus(elements: Iterable<E>): PersistentSet<E>
  * contained in the specified [elements] array removed;
  * or this instance if no modifications were made in the result of this operation.
  */
-operator fun <E> PersistentSet<E>.minus(elements: Array<out E>): PersistentSet<E>
+internal operator fun <E> PersistentSet<E>.minus(elements: Array<out E>): PersistentSet<E>
         = mutate { it.removeAll(elements) }
 
 /**
@@ -288,7 +289,7 @@ operator fun <E> PersistentSet<E>.minus(elements: Array<out E>): PersistentSet<E
  * contained in the specified [elements] sequence removed;
  * or this instance if no modifications were made in the result of this operation.
  */
-operator fun <E> PersistentSet<E>.minus(elements: Sequence<E>): PersistentSet<E>
+internal operator fun <E> PersistentSet<E>.minus(elements: Sequence<E>): PersistentSet<E>
         = mutate { it.removeAll(elements) }
 
 /**
@@ -299,7 +300,7 @@ operator fun <E> PersistentSet<E>.minus(elements: Sequence<E>): PersistentSet<E>
  * contained in the specified [elements] collection;
  * or this instance if no modifications were made in the result of this operation.
  */
-infix fun <E> PersistentSet<E>.intersect(elements: Iterable<E>): PersistentSet<E>
+internal infix fun <E> PersistentSet<E>.intersect(elements: Iterable<E>): PersistentSet<E>
         = if (elements is Collection) retainAll(elements) else mutate { it.retainAll(elements) }
 
 /**
@@ -309,7 +310,7 @@ infix fun <E> PersistentSet<E>.intersect(elements: Iterable<E>): PersistentSet<E
  * @return a new persistent set with elements in this collection that are also
  * contained in the specified [elements] collection
  */
-infix fun <E> PersistentCollection<E>.intersect(elements: Iterable<E>): PersistentSet<E>
+internal infix fun <E> PersistentCollection<E>.intersect(elements: Iterable<E>): PersistentSet<E>
         = this.toPersistentSet().intersect(elements)
 
 /**
@@ -321,7 +322,8 @@ infix fun <E> PersistentCollection<E>.intersect(elements: Iterable<E>): Persiste
  * @return a new persistent map with an entry from the specified key-value [pair] added;
  * or this instance if no modifications were made in the result of this operation.
  */
-inline operator fun <K, V> PersistentMap<out K, V>.plus(pair: Pair<K, V>): PersistentMap<K, V>
+@Suppress("UNCHECKED_CAST")
+internal inline operator fun <K, V> PersistentMap<out K, V>.plus(pair: Pair<K, V>): PersistentMap<K, V>
         = (this as PersistentMap<K, V>).put(pair.first, pair.second)
 
 /**
@@ -330,7 +332,7 @@ inline operator fun <K, V> PersistentMap<out K, V>.plus(pair: Pair<K, V>): Persi
  * @return a new persistent map with entries from the specified key-value pairs added;
  * or this instance if no modifications were made in the result of this operation.
  */
-inline operator fun <K, V> PersistentMap<out K, V>.plus(pairs: Iterable<Pair<K, V>>): PersistentMap<K, V> = putAll(pairs)
+internal inline operator fun <K, V> PersistentMap<out K, V>.plus(pairs: Iterable<Pair<K, V>>): PersistentMap<K, V> = putAll(pairs)
 
 /**
  * Returns the result of replacing or adding entries to this map from the specified key-value pairs.
@@ -338,7 +340,7 @@ inline operator fun <K, V> PersistentMap<out K, V>.plus(pairs: Iterable<Pair<K, 
  * @return a new persistent map with entries from the specified key-value pairs added;
  * or this instance if no modifications were made in the result of this operation.
  */
-inline operator fun <K, V> PersistentMap<out K, V>.plus(pairs: Array<out Pair<K, V>>): PersistentMap<K, V> = putAll(pairs)
+internal inline operator fun <K, V> PersistentMap<out K, V>.plus(pairs: Array<out Pair<K, V>>): PersistentMap<K, V> = putAll(pairs)
 
 /**
  * Returns the result of replacing or adding entries to this map from the specified key-value pairs.
@@ -346,7 +348,7 @@ inline operator fun <K, V> PersistentMap<out K, V>.plus(pairs: Array<out Pair<K,
  * @return a new persistent map with entries from the specified key-value pairs added;
  * or this instance if no modifications were made in the result of this operation.
  */
-inline operator fun <K, V> PersistentMap<out K, V>.plus(pairs: Sequence<Pair<K, V>>): PersistentMap<K, V> = putAll(pairs)
+internal inline operator fun <K, V> PersistentMap<out K, V>.plus(pairs: Sequence<Pair<K, V>>): PersistentMap<K, V> = putAll(pairs)
 
 /**
  * Returns the result of merging the specified [map] with this map.
@@ -357,7 +359,7 @@ inline operator fun <K, V> PersistentMap<out K, V>.plus(pairs: Sequence<Pair<K, 
  * @return a new persistent map with keys and values from the specified [map] associated;
  * or this instance if no modifications were made in the result of this operation.
  */
-inline operator fun <K, V> PersistentMap<out K, V>.plus(map: Map<out K, V>): PersistentMap<K, V> = putAll(map)
+internal inline operator fun <K, V> PersistentMap<out K, V>.plus(map: Map<out K, V>): PersistentMap<K, V> = putAll(map)
 
 
 /**
@@ -369,7 +371,8 @@ inline operator fun <K, V> PersistentMap<out K, V>.plus(map: Map<out K, V>): Per
  * @return a new persistent map with keys and values from the specified [map] associated;
  * or this instance if no modifications were made in the result of this operation.
  */
-public fun <K, V> PersistentMap<out K, V>.putAll(map: Map<out K, V>): PersistentMap<K, V> =
+@Suppress("UNCHECKED_CAST")
+internal fun <K, V> PersistentMap<out K, V>.putAll(map: Map<out K, V>): PersistentMap<K, V> =
         (this as PersistentMap<K, V>).putAll(map)
 
 /**
@@ -378,7 +381,7 @@ public fun <K, V> PersistentMap<out K, V>.putAll(map: Map<out K, V>): Persistent
  * @return a new persistent map with entries from the specified key-value pairs added;
  * or this instance if no modifications were made in the result of this operation.
  */
-public fun <K, V> PersistentMap<out K, V>.putAll(pairs: Iterable<Pair<K, V>>): PersistentMap<K, V>
+internal fun <K, V> PersistentMap<out K, V>.putAll(pairs: Iterable<Pair<K, V>>): PersistentMap<K, V>
         = mutate { it.putAll(pairs) }
 
 /**
@@ -387,7 +390,7 @@ public fun <K, V> PersistentMap<out K, V>.putAll(pairs: Iterable<Pair<K, V>>): P
  * @return a new persistent map with entries from the specified key-value pairs added;
  * or this instance if no modifications were made in the result of this operation.
  */
-public fun <K, V> PersistentMap<out K, V>.putAll(pairs: Array<out Pair<K, V>>): PersistentMap<K, V>
+internal fun <K, V> PersistentMap<out K, V>.putAll(pairs: Array<out Pair<K, V>>): PersistentMap<K, V>
         = mutate { it.putAll(pairs) }
 
 /**
@@ -396,7 +399,7 @@ public fun <K, V> PersistentMap<out K, V>.putAll(pairs: Array<out Pair<K, V>>): 
  * @return a new persistent map with entries from the specified key-value pairs added;
  * or this instance if no modifications were made in the result of this operation.
  */
-public fun <K, V> PersistentMap<out K, V>.putAll(pairs: Sequence<Pair<K, V>>): PersistentMap<K, V>
+internal fun <K, V> PersistentMap<out K, V>.putAll(pairs: Sequence<Pair<K, V>>): PersistentMap<K, V>
         = mutate { it.putAll(pairs) }
 
 
@@ -406,7 +409,8 @@ public fun <K, V> PersistentMap<out K, V>.putAll(pairs: Sequence<Pair<K, V>>): P
  * @return a new persistent map with the specified [key] and its corresponding value removed;
  * or this instance if it contains no mapping for the key.
  */
-public operator fun <K, V> PersistentMap<out K, V>.minus(key: K): PersistentMap<K, V>
+@Suppress("UNCHECKED_CAST")
+internal operator fun <K, V> PersistentMap<out K, V>.minus(key: K): PersistentMap<K, V>
         = (this as PersistentMap<K, V>).remove(key)
 
 /**
@@ -415,7 +419,7 @@ public operator fun <K, V> PersistentMap<out K, V>.minus(key: K): PersistentMap<
  * @return a new persistent map with the specified [keys] and their corresponding values removed;
  * or this instance if no modifications were made in the result of this operation.
  */
-public operator fun <K, V> PersistentMap<out K, V>.minus(keys: Iterable<K>): PersistentMap<K, V>
+internal operator fun <K, V> PersistentMap<out K, V>.minus(keys: Iterable<K>): PersistentMap<K, V>
         = mutate { it.minusAssign(keys) }
 
 /**
@@ -424,7 +428,7 @@ public operator fun <K, V> PersistentMap<out K, V>.minus(keys: Iterable<K>): Per
  * @return a new persistent map with the specified [keys] and their corresponding values removed;
  * or this instance if no modifications were made in the result of this operation.
  */
-public operator fun <K, V> PersistentMap<out K, V>.minus(keys: Array<out K>): PersistentMap<K, V>
+internal operator fun <K, V> PersistentMap<out K, V>.minus(keys: Array<out K>): PersistentMap<K, V>
         = mutate { it.minusAssign(keys) }
 
 /**
@@ -433,19 +437,19 @@ public operator fun <K, V> PersistentMap<out K, V>.minus(keys: Array<out K>): Pe
  * @return a new persistent map with the specified [keys] and their corresponding values removed;
  * or this instance if no modifications were made in the result of this operation.
  */
-public operator fun <K, V> PersistentMap<out K, V>.minus(keys: Sequence<K>): PersistentMap<K, V>
+internal operator fun <K, V> PersistentMap<out K, V>.minus(keys: Sequence<K>): PersistentMap<K, V>
         = mutate { it.minusAssign(keys) }
 
 
 /**
  * Returns a new persistent list of the specified elements.
  */
-fun <E> persistentListOf(vararg elements: E): PersistentList<E> = persistentVectorOf<E>().addAll(elements.asList())
+internal fun <E> persistentListOf(vararg elements: E): PersistentList<E> = persistentVectorOf<E>().addAll(elements.asList())
 
 /**
  * Returns an empty persistent list.
  */
-fun <E> persistentListOf(): PersistentList<E> = persistentVectorOf()
+internal fun <E> persistentListOf(): PersistentList<E> = persistentVectorOf()
 
 
 /**
@@ -453,12 +457,12 @@ fun <E> persistentListOf(): PersistentList<E> = persistentVectorOf()
  *
  * Elements of the returned set are iterated in the order they were specified.
  */
-fun <E> persistentSetOf(vararg elements: E): PersistentSet<E> = PersistentOrderedSet.emptyOf<E>().addAll(elements.asList())
+internal fun <E> persistentSetOf(vararg elements: E): PersistentSet<E> = PersistentOrderedSet.emptyOf<E>().addAll(elements.asList())
 
 /**
  * Returns an empty persistent set.
  */
-fun <E> persistentSetOf(): PersistentSet<E> = PersistentOrderedSet.emptyOf<E>()
+internal fun <E> persistentSetOf(): PersistentSet<E> = PersistentOrderedSet.emptyOf<E>()
 
 
 /**
@@ -466,12 +470,12 @@ fun <E> persistentSetOf(): PersistentSet<E> = PersistentOrderedSet.emptyOf<E>()
  *
  * Order of the elements in the returned set is unspecified.
  */
-fun <E> persistentHashSetOf(vararg elements: E): PersistentSet<E> = PersistentHashSet.emptyOf<E>().addAll(elements.asList())
+internal fun <E> persistentHashSetOf(vararg elements: E): PersistentSet<E> = PersistentHashSet.emptyOf<E>().addAll(elements.asList())
 
 /**
  * Returns an empty persistent set.
  */
-fun <E> persistentHashSetOf(): PersistentSet<E> = PersistentHashSet.emptyOf()
+internal fun <E> persistentHashSetOf(): PersistentSet<E> = PersistentHashSet.emptyOf()
 
 
 /**
@@ -482,12 +486,12 @@ fun <E> persistentHashSetOf(): PersistentSet<E> = PersistentHashSet.emptyOf()
  *
  * Entries of the map are iterated in the order they were specified.
  */
-fun <K, V> persistentMapOf(vararg pairs: Pair<K, V>): PersistentMap<K, V> = PersistentOrderedMap.emptyOf<K,V>().mutate { it += pairs }
+internal fun <K, V> persistentMapOf(vararg pairs: Pair<K, V>): PersistentMap<K, V> = PersistentOrderedMap.emptyOf<K,V>().mutate { it += pairs }
 
 /**
  * Returns an empty persistent map.
  */
-fun <K, V> persistentMapOf(): PersistentMap<K, V> = PersistentOrderedMap.emptyOf()
+internal fun <K, V> persistentMapOf(): PersistentMap<K, V> = PersistentOrderedMap.emptyOf()
 
 
 /**
@@ -498,25 +502,25 @@ fun <K, V> persistentMapOf(): PersistentMap<K, V> = PersistentOrderedMap.emptyOf
  *
  * Order of the entries in the returned map is unspecified.
  */
-fun <K, V> persistentHashMapOf(vararg pairs: Pair<K, V>): PersistentMap<K, V> = PersistentHashMap.emptyOf<K,V>().mutate { it += pairs }
+internal fun <K, V> persistentHashMapOf(vararg pairs: Pair<K, V>): PersistentMap<K, V> = PersistentHashMap.emptyOf<K,V>().mutate { it += pairs }
 
 /**
  * Returns an empty persistent map.
  */
-fun <K, V> persistentHashMapOf(): PersistentMap<K, V> = PersistentHashMap.emptyOf()
+internal fun <K, V> persistentHashMapOf(): PersistentMap<K, V> = PersistentHashMap.emptyOf()
 
 
 /**
  * Returns a new persistent list of the specified elements.
  */
 @Deprecated("Use persistentListOf instead.", ReplaceWith("persistentListOf(*elements)"))
-fun <E> immutableListOf(vararg elements: E): PersistentList<E> = persistentListOf(*elements)
+internal fun <E> immutableListOf(vararg elements: E): PersistentList<E> = persistentListOf(*elements)
 
 /**
  * Returns an empty persistent list.
  */
 @Deprecated("Use persistentListOf instead.", ReplaceWith("persistentListOf()"))
-fun <E> immutableListOf(): PersistentList<E> = persistentListOf()
+internal fun <E> immutableListOf(): PersistentList<E> = persistentListOf()
 
 
 /**
@@ -525,13 +529,13 @@ fun <E> immutableListOf(): PersistentList<E> = persistentListOf()
  * Elements of the returned set are iterated in the order they were specified.
  */
 @Deprecated("Use persistentSetOf instead.", ReplaceWith("persistentSetOf(*elements)"))
-fun <E> immutableSetOf(vararg elements: E): PersistentSet<E> = persistentSetOf(*elements)
+internal fun <E> immutableSetOf(vararg elements: E): PersistentSet<E> = persistentSetOf(*elements)
 
 /**
  * Returns an empty persistent set.
  */
 @Deprecated("Use persistentSetOf instead.", ReplaceWith("persistentSetOf()"))
-fun <E> immutableSetOf(): PersistentSet<E> = persistentSetOf()
+internal fun <E> immutableSetOf(): PersistentSet<E> = persistentSetOf()
 
 
 /**
@@ -540,7 +544,7 @@ fun <E> immutableSetOf(): PersistentSet<E> = persistentSetOf()
  * Order of the elements in the returned set is unspecified.
  */
 @Deprecated("Use persistentHashSetOf instead.", ReplaceWith("persistentHashSetOf(*elements)"))
-fun <E> immutableHashSetOf(vararg elements: E): PersistentSet<E> = persistentHashSetOf(*elements)
+internal fun <E> immutableHashSetOf(vararg elements: E): PersistentSet<E> = persistentHashSetOf(*elements)
 
 
 /**
@@ -552,7 +556,7 @@ fun <E> immutableHashSetOf(vararg elements: E): PersistentSet<E> = persistentHas
  * Entries of the map are iterated in the order they were specified.
  */
 @Deprecated("Use persistentMapOf instead.", ReplaceWith("persistentMapOf(*pairs)"))
-fun <K, V> immutableMapOf(vararg pairs: Pair<K, V>): PersistentMap<K, V> = persistentMapOf(*pairs)
+internal fun <K, V> immutableMapOf(vararg pairs: Pair<K, V>): PersistentMap<K, V> = persistentMapOf(*pairs)
 
 /**
  * Returns a new persistent map with the specified contents, given as a list of pairs
@@ -563,7 +567,7 @@ fun <K, V> immutableMapOf(vararg pairs: Pair<K, V>): PersistentMap<K, V> = persi
  * Order of the entries in the returned map is unspecified.
  */
 @Deprecated("Use persistentHashMapOf instead.", ReplaceWith("persistentHashMapOf(*pairs)"))
-fun <K, V> immutableHashMapOf(vararg pairs: Pair<K, V>): PersistentMap<K, V> = persistentHashMapOf(*pairs)
+internal fun <K, V> immutableHashMapOf(vararg pairs: Pair<K, V>): PersistentMap<K, V> = persistentHashMapOf(*pairs)
 
 
 /**
@@ -571,19 +575,19 @@ fun <K, V> immutableHashMapOf(vararg pairs: Pair<K, V>): PersistentMap<K, V> = p
  *
  * If the receiver is already an immutable list, returns it as is.
  */
-fun <T> Iterable<T>.toImmutableList(): ImmutableList<T> =
+internal fun <T> Iterable<T>.toImmutableList(): ImmutableList<T> =
         this as? ImmutableList
         ?: this.toPersistentList()
 
 /**
  * Returns an immutable list containing all elements of this sequence.
  */
-fun <T> Sequence<T>.toImmutableList(): ImmutableList<T> = toPersistentList()
+internal fun <T> Sequence<T>.toImmutableList(): ImmutableList<T> = toPersistentList()
 
 /**
  * Returns an immutable list containing all characters.
  */
-fun CharSequence.toImmutableList(): ImmutableList<Char> = toPersistentList()
+internal fun CharSequence.toImmutableList(): ImmutableList<Char> = toPersistentList()
 
 
 // fun <T> Array<T>.toImmutableList(): ImmutableList<T> = immutableListOf<T>() + this.asList()
@@ -595,7 +599,7 @@ fun CharSequence.toImmutableList(): ImmutableList<Char> = toPersistentList()
  * If the receiver is already a persistent list, returns it as is.
  * If the receiver is a persistent list builder, calls `build` on it and returns the result.
  */
-fun <T> Iterable<T>.toPersistentList(): PersistentList<T> =
+internal fun <T> Iterable<T>.toPersistentList(): PersistentList<T> =
         this as? PersistentList
         ?: (this as? PersistentList.Builder)?.build()
         ?: persistentListOf<T>() + this
@@ -603,12 +607,12 @@ fun <T> Iterable<T>.toPersistentList(): PersistentList<T> =
 /**
  * Returns a persistent list containing all elements of this sequence.
  */
-fun <T> Sequence<T>.toPersistentList(): PersistentList<T> = persistentListOf<T>() + this
+internal fun <T> Sequence<T>.toPersistentList(): PersistentList<T> = persistentListOf<T>() + this
 
 /**
  * Returns a persistent list containing all characters.
  */
-fun CharSequence.toPersistentList(): PersistentList<Char> =
+internal fun CharSequence.toPersistentList(): PersistentList<Char> =
     persistentListOf<Char>().mutate { this.toCollection(it) }
 
 
@@ -619,7 +623,7 @@ fun CharSequence.toPersistentList(): PersistentList<Char> =
  *
  * Elements of the returned set are iterated in the same order as in this collection.
  */
-fun <T> Iterable<T>.toImmutableSet(): ImmutableSet<T> =
+internal fun <T> Iterable<T>.toImmutableSet(): ImmutableSet<T> =
         this as? ImmutableSet<T>
         ?: (this as? PersistentSet.Builder)?.build()
         ?: persistentSetOf<T>() + this
@@ -629,14 +633,14 @@ fun <T> Iterable<T>.toImmutableSet(): ImmutableSet<T> =
  *
  * Elements of the returned set are iterated in the same order as in this sequence.
  */
-fun <T> Sequence<T>.toImmutableSet(): ImmutableSet<T> = toPersistentSet()
+internal fun <T> Sequence<T>.toImmutableSet(): ImmutableSet<T> = toPersistentSet()
 
 /**
  * Returns an immutable set of all characters.
  *
  * Elements of the returned set are iterated in the same order as in this char sequence.
  */
-fun CharSequence.toImmutableSet(): PersistentSet<Char> = toPersistentSet()
+internal fun CharSequence.toImmutableSet(): PersistentSet<Char> = toPersistentSet()
 
 
 /**
@@ -647,7 +651,7 @@ fun CharSequence.toImmutableSet(): PersistentSet<Char> = toPersistentSet()
  *
  * Elements of the returned set are iterated in the same order as in this collection.
  */
-fun <T> Iterable<T>.toPersistentSet(): PersistentSet<T> =
+internal fun <T> Iterable<T>.toPersistentSet(): PersistentSet<T> =
         this as? PersistentOrderedSet<T>
         ?: (this as? PersistentOrderedSetBuilder)?.build()
         ?: PersistentOrderedSet.emptyOf<T>() + this
@@ -657,14 +661,14 @@ fun <T> Iterable<T>.toPersistentSet(): PersistentSet<T> =
  *
  * Elements of the returned set are iterated in the same order as in this sequence.
  */
-fun <T> Sequence<T>.toPersistentSet(): PersistentSet<T> = persistentSetOf<T>() + this
+internal fun <T> Sequence<T>.toPersistentSet(): PersistentSet<T> = persistentSetOf<T>() + this
 
 /**
  * Returns a persistent set of all characters.
  *
  * Elements of the returned set are iterated in the same order as in this char sequence.
  */
-fun CharSequence.toPersistentSet(): PersistentSet<Char> =
+internal fun CharSequence.toPersistentSet(): PersistentSet<Char> =
         persistentSetOf<Char>().mutate { this.toCollection(it) }
 
 
@@ -676,7 +680,7 @@ fun CharSequence.toPersistentSet(): PersistentSet<Char> =
  *
  * Order of the elements in the returned set is unspecified.
  */
-fun <T> Iterable<T>.toPersistentHashSet(): PersistentSet<T>
+internal fun <T> Iterable<T>.toPersistentHashSet(): PersistentSet<T>
     = this as? PersistentHashSet
         ?: (this as? PersistentHashSetBuilder<T>)?.build()
         ?: PersistentHashSet.emptyOf<T>() + this
@@ -686,14 +690,14 @@ fun <T> Iterable<T>.toPersistentHashSet(): PersistentSet<T>
  *
  * Order of the elements in the returned set is unspecified.
  */
-fun <T> Sequence<T>.toPersistentHashSet(): PersistentSet<T> = persistentHashSetOf<T>() + this
+internal fun <T> Sequence<T>.toPersistentHashSet(): PersistentSet<T> = persistentHashSetOf<T>() + this
 
 /**
  * Returns a persistent set of all characters.
  *
  * Order of the elements in the returned set is unspecified.
  */
-fun CharSequence.toPersistentHashSet(): PersistentSet<Char> =
+internal fun CharSequence.toPersistentHashSet(): PersistentSet<Char> =
         persistentHashSetOf<Char>().mutate { this.toCollection(it) }
 
 
@@ -704,7 +708,7 @@ fun CharSequence.toPersistentHashSet(): PersistentSet<Char> =
  *
  * Entries of the returned map are iterated in the same order as in this map.
  */
-fun <K, V> Map<K, V>.toImmutableMap(): ImmutableMap<K, V>
+internal fun <K, V> Map<K, V>.toImmutableMap(): ImmutableMap<K, V>
     = this as? ImmutableMap
         ?: (this as? PersistentMap.Builder)?.build()
         ?: persistentMapOf<K, V>().putAll(this)
@@ -717,7 +721,7 @@ fun <K, V> Map<K, V>.toImmutableMap(): ImmutableMap<K, V>
  *
  * Entries of the returned map are iterated in the same order as in this map.
  */
-fun <K, V> Map<K, V>.toPersistentMap(): PersistentMap<K, V>
+internal fun <K, V> Map<K, V>.toPersistentMap(): PersistentMap<K, V>
     = this as? PersistentOrderedMap<K, V>
         ?: (this as? PersistentOrderedMapBuilder<K, V>)?.build()
         ?: PersistentOrderedMap.emptyOf<K, V>().putAll(this)
@@ -730,7 +734,7 @@ fun <K, V> Map<K, V>.toPersistentMap(): PersistentMap<K, V>
  *
  * Order of the entries in the returned map is unspecified.
  */
-fun <K, V> Map<K, V>.toPersistentHashMap(): PersistentMap<K, V>
+internal fun <K, V> Map<K, V>.toPersistentHashMap(): PersistentMap<K, V>
         = this as? PersistentHashMap
         ?: (this as? PersistentHashMapBuilder<K, V>)?.build()
         ?: PersistentHashMap.emptyOf<K, V>().putAll(this)

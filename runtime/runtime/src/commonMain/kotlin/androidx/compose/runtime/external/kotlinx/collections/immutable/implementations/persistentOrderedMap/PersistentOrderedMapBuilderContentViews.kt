@@ -3,9 +3,9 @@
  * Use of this source code is governed by the Apache 2.0 License that can be found in the LICENSE.txt file.
  */
 
-package kotlinx.collections.immutable.implementations.persistentOrderedMap
+package androidx.compose.runtime.external.kotlinx.collections.immutable.implementations.persistentOrderedMap
 
-import kotlinx.collections.immutable.implementations.immutableMap.AbstractMapBuilderEntries
+import androidx.compose.runtime.external.kotlinx.collections.immutable.implementations.immutableMap.AbstractMapBuilderEntries
 
 internal class PersistentOrderedMapBuilderEntries<K, V>(private val builder: PersistentOrderedMapBuilder<K, V>)
     : AbstractMapBuilderEntries<MutableMap.MutableEntry<K, V>, K, V>() {

@@ -3,9 +3,9 @@
  * Use of this source code is governed by the Apache 2.0 License that can be found in the LICENSE.txt file.
  */
 
-package kotlinx.collections.immutable.implementations.immutableList
+package androidx.compose.runtime.external.kotlinx.collections.immutable.implementations.immutableList
 
-import kotlinx.collections.immutable.PersistentList
+import androidx.compose.runtime.external.kotlinx.collections.immutable.PersistentList
 
 internal const val MAX_BUFFER_SIZE = 32
 internal const val LOG_MAX_BUFFER_SIZE = 5

@@ -3,7 +3,7 @@
  * Use of this source code is governed by the Apache 2.0 License that can be found in the LICENSE.txt file.
  */
 
-package kotlinx.collections.immutable
+package androidx.compose.runtime.external.kotlinx.collections.immutable
 
 /**
  * A generic immutable unordered collection of elements that does not support duplicate elements.
@@ -16,7 +16,7 @@ package kotlinx.collections.immutable
  *
  * @param E the type of elements contained in the set. The set is covariant on its element type.
  */
-public interface ImmutableSet<out E>: Set<E>, ImmutableCollection<E>
+internal interface ImmutableSet<out E>: Set<E>, ImmutableCollection<E>
 
 /**
  * A generic persistent unordered collection of elements that does not support duplicate elements, and supports
@@ -26,7 +26,7 @@ public interface ImmutableSet<out E>: Set<E>, ImmutableCollection<E>
  *
  * @param E the type of elements contained in the set. The persistent set is covariant on its element type.
  */
-public interface PersistentSet<out E> : ImmutableSet<E>, PersistentCollection<E> {
+internal interface PersistentSet<out E> : ImmutableSet<E>, PersistentCollection<E> {
     /**
      * Returns the result of adding the specified [element] to this set.
      *

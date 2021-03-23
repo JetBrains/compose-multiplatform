@@ -3,16 +3,17 @@
  * Use of this source code is governed by the Apache 2.0 License that can be found in the LICENSE.txt file.
  */
 
-package kotlinx.collections.immutable.implementations.immutableMap
+package androidx.compose.runtime.external.kotlinx.collections.immutable.implementations.immutableMap
 
-import kotlinx.collections.immutable.ImmutableCollection
-import kotlinx.collections.immutable.ImmutableSet
+import androidx.compose.runtime.external.kotlinx.collections.immutable.ImmutableCollection
+import androidx.compose.runtime.external.kotlinx.collections.immutable.ImmutableSet
 
 internal class PersistentHashMapEntries<K, V>(private val map: PersistentHashMap<K, V>) : ImmutableSet<Map.Entry<K, V>>, AbstractSet<Map.Entry<K, V>>() {
     override val size: Int get() = map.size
 
     override fun contains(element: Map.Entry<K, V>): Boolean {
         // TODO: Eliminate this check after KT-30016 gets fixed.
+        @Suppress("USELESS_CAST")
         if ((element as Any?) !is Map.Entry<*, *>) return false
         return map[element.key]?.let { candidate -> candidate == element.value }
                 ?: (element.value == null && map.containsKey(element.key))

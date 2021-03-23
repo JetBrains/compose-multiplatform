@@ -3,12 +3,12 @@
  * Use of this source code is governed by the Apache 2.0 License that can be found in the LICENSE.txt file.
  */
 
-package kotlinx.collections.immutable.implementations.immutableMap
+package androidx.compose.runtime.external.kotlinx.collections.immutable.implementations.immutableMap
 
-import kotlinx.collections.immutable.internal.DeltaCounter
-import kotlinx.collections.immutable.internal.MutabilityOwnership
-import kotlinx.collections.immutable.internal.assert
-import kotlinx.collections.immutable.internal.forEachOneBit
+import androidx.compose.runtime.external.kotlinx.collections.immutable.internal.DeltaCounter
+import androidx.compose.runtime.external.kotlinx.collections.immutable.internal.MutabilityOwnership
+import androidx.compose.runtime.external.kotlinx.collections.immutable.internal.assert
+import androidx.compose.runtime.external.kotlinx.collections.immutable.internal.forEachOneBit
 
 
 internal const val MAX_BRANCHING_FACTOR = 32

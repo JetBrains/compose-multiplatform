@@ -3,10 +3,10 @@
  * Use of this source code is governed by the Apache 2.0 License that can be found in the LICENSE.txt file.
  */
 
-package kotlinx.collections.immutable.implementations.immutableSet
+package androidx.compose.runtime.external.kotlinx.collections.immutable.implementations.immutableSet
 
-import kotlinx.collections.immutable.PersistentSet
-import kotlinx.collections.immutable.mutate
+import androidx.compose.runtime.external.kotlinx.collections.immutable.PersistentSet
+import androidx.compose.runtime.external.kotlinx.collections.immutable.mutate
 
 internal class PersistentHashSet<E>(internal val node: TrieNode<E>,
                                     override val size: Int): AbstractSet<E>(), PersistentSet<E> {

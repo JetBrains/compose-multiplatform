@@ -3,14 +3,14 @@
  * Use of this source code is governed by the Apache 2.0 License that can be found in the LICENSE.txt file.
  */
 
-package kotlinx.collections.immutable.implementations.immutableList
+package androidx.compose.runtime.external.kotlinx.collections.immutable.implementations.immutableList
 
-import kotlinx.collections.immutable.ImmutableList
-import kotlinx.collections.immutable.PersistentList
-import kotlinx.collections.immutable.internal.ListImplementation.checkElementIndex
-import kotlinx.collections.immutable.internal.ListImplementation.checkPositionIndex
-import kotlinx.collections.immutable.internal.assert
-import kotlinx.collections.immutable.mutate
+import androidx.compose.runtime.external.kotlinx.collections.immutable.ImmutableList
+import androidx.compose.runtime.external.kotlinx.collections.immutable.PersistentList
+import androidx.compose.runtime.external.kotlinx.collections.immutable.internal.ListImplementation.checkElementIndex
+import androidx.compose.runtime.external.kotlinx.collections.immutable.internal.ListImplementation.checkPositionIndex
+import androidx.compose.runtime.external.kotlinx.collections.immutable.internal.assert
+import androidx.compose.runtime.external.kotlinx.collections.immutable.mutate
 
 internal class SmallPersistentVector<E>(private val buffer: Array<Any?>) : ImmutableList<E>, AbstractPersistentList<E>() {
 

@@ -3,7 +3,7 @@
  * Use of this source code is governed by the Apache 2.0 License that can be found in the LICENSE.txt file.
  */
 
-package kotlinx.collections.immutable.implementations.persistentOrderedSet
+package androidx.compose.runtime.external.kotlinx.collections.immutable.implementations.persistentOrderedSet
 
 internal open class PersistentOrderedSetIterator<E>(private var nextElement: Any?,
                                                     internal val map: Map<E, Links>) : Iterator<E> {

@@ -3,11 +3,11 @@
  * Use of this source code is governed by the Apache 2.0 License that can be found in the LICENSE.txt file.
  */
 
-package kotlinx.collections.immutable.implementations.persistentOrderedMap
+package androidx.compose.runtime.external.kotlinx.collections.immutable.implementations.persistentOrderedMap
 
-import kotlinx.collections.immutable.PersistentMap
-import kotlinx.collections.immutable.internal.EndOfChain
-import kotlinx.collections.immutable.internal.assert
+import androidx.compose.runtime.external.kotlinx.collections.immutable.PersistentMap
+import androidx.compose.runtime.external.kotlinx.collections.immutable.internal.EndOfChain
+import androidx.compose.runtime.external.kotlinx.collections.immutable.internal.assert
 
 internal class PersistentOrderedMapBuilder<K, V>(private var map: PersistentOrderedMap<K, V>) : AbstractMutableMap<K, V>(), PersistentMap.Builder<K, V> {
     internal var firstKey = map.firstKey

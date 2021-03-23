@@ -3,7 +3,7 @@
  * Use of this source code is governed by the Apache 2.0 License that can be found in the LICENSE.txt file.
  */
 
-package kotlinx.collections.immutable
+package androidx.compose.runtime.external.kotlinx.collections.immutable
 
 /**
  * A generic immutable collection of elements. Methods in this interface support only read-only access to the collection.
@@ -15,7 +15,7 @@ package kotlinx.collections.immutable
  *
  * @param E the type of elements contained in the collection. The immutable collection is covariant on its element type.
  */
-public interface ImmutableCollection<out E>: Collection<E>
+internal interface ImmutableCollection<out E>: Collection<E>
 
 /**
  * A generic persistent collection of elements that supports adding and removing elements.
@@ -24,7 +24,7 @@ public interface ImmutableCollection<out E>: Collection<E>
  *
  * @param E the type of elements contained in the collection. The persistent collection is covariant on its element type.
  */
-public interface PersistentCollection<out E> : ImmutableCollection<E> {
+internal interface PersistentCollection<out E> : ImmutableCollection<E> {
     /**
      * Returns the result of adding the specified [element] to this collection.
      *

@@ -3,12 +3,12 @@
  * Use of this source code is governed by the Apache 2.0 License that can be found in the LICENSE.txt file.
  */
 
-package kotlinx.collections.immutable.implementations.immutableMap
+package androidx.compose.runtime.external.kotlinx.collections.immutable.implementations.immutableMap
 
-import kotlinx.collections.immutable.ImmutableCollection
-import kotlinx.collections.immutable.ImmutableSet
-import kotlinx.collections.immutable.PersistentMap
-import kotlinx.collections.immutable.mutate
+import androidx.compose.runtime.external.kotlinx.collections.immutable.ImmutableCollection
+import androidx.compose.runtime.external.kotlinx.collections.immutable.ImmutableSet
+import androidx.compose.runtime.external.kotlinx.collections.immutable.PersistentMap
+import androidx.compose.runtime.external.kotlinx.collections.immutable.mutate
 
 internal class PersistentHashMap<K, V>(internal val node: TrieNode<K, V>,
                                        override val size: Int): AbstractMap<K, V>(), PersistentMap<K, V> {

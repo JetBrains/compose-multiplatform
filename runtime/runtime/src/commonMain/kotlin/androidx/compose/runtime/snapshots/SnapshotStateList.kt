@@ -17,8 +17,8 @@
 package androidx.compose.runtime.snapshots
 
 import androidx.compose.runtime.Stable
-import kotlinx.collections.immutable.PersistentList
-import kotlinx.collections.immutable.persistentListOf
+import androidx.compose.runtime.external.kotlinx.collections.immutable.PersistentList
+import androidx.compose.runtime.external.kotlinx.collections.immutable.persistentListOf
 
 /**
  * An implementation of [MutableList] that can be observed and snapshot. This is the result type

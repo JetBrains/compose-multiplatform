@@ -3,9 +3,9 @@
  * Use of this source code is governed by the Apache 2.0 License that can be found in the LICENSE.txt file.
  */
 
-package kotlinx.collections.immutable
+package androidx.compose.runtime.external.kotlinx.collections.immutable
 
-import kotlinx.collections.immutable.internal.ListImplementation
+import androidx.compose.runtime.external.kotlinx.collections.immutable.internal.ListImplementation
 
 /**
  * A generic immutable ordered collection of elements. Methods in this interface support only read-only access to the immutable list.
@@ -17,7 +17,7 @@ import kotlinx.collections.immutable.internal.ListImplementation
  *
  * @param E the type of elements contained in the list. The immutable list is covariant on its element type.
  */
-public interface ImmutableList<out E> : List<E>, ImmutableCollection<E> {
+internal interface ImmutableList<out E> : List<E>, ImmutableCollection<E> {
 
     /**
      * Returns a view of the portion of this list between the specified [fromIndex] (inclusive) and [toIndex] (exclusive).
@@ -59,7 +59,7 @@ public interface ImmutableList<out E> : List<E>, ImmutableCollection<E> {
  *
  * @param E the type of elements contained in the list. The persistent list is covariant on its element type.
  */
-public interface PersistentList<out E> : ImmutableList<E>, PersistentCollection<E> {
+internal interface PersistentList<out E> : ImmutableList<E>, PersistentCollection<E> {
     /**
      * Returns a new persistent list with the specified [element] appended.
      */

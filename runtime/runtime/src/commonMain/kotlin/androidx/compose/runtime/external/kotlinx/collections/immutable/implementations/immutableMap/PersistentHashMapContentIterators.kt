@@ -3,10 +3,9 @@
  * Use of this source code is governed by the Apache 2.0 License that can be found in the LICENSE.txt file.
  */
 
-package kotlinx.collections.immutable.implementations.immutableMap
+package androidx.compose.runtime.external.kotlinx.collections.immutable.implementations.immutableMap
 
-import kotlinx.collections.immutable.internal.assert
-import kotlin.js.JsName
+import androidx.compose.runtime.external.kotlinx.collections.immutable.internal.assert
 
 internal const val TRIE_MAX_HEIGHT = 7
 
@@ -104,7 +103,6 @@ internal abstract class PersistentHashMapBaseIterator<K, V, T>(
 ) : Iterator<T> {
 
     protected var pathLastIndex = 0
-    @JsName("_hasNext")
     private var hasNext = true
 
     init {

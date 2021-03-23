@@ -3,9 +3,9 @@
  * Use of this source code is governed by the Apache 2.0 License that can be found in the LICENSE.txt file.
  */
 
-package kotlinx.collections.immutable.implementations.persistentOrderedMap
+package androidx.compose.runtime.external.kotlinx.collections.immutable.implementations.persistentOrderedMap
 
-import kotlinx.collections.immutable.implementations.immutableMap.MapEntry
+import androidx.compose.runtime.external.kotlinx.collections.immutable.implementations.immutableMap.MapEntry
 
 internal open class PersistentOrderedMapLinksIterator<K, V>(
         internal var nextKey: Any?,

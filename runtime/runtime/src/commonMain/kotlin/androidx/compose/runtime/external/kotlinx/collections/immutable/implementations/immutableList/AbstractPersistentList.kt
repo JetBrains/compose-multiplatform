@@ -3,13 +3,13 @@
  * Use of this source code is governed by the Apache 2.0 License that can be found in the LICENSE.txt file.
  */
 
-package kotlinx.collections.immutable.implementations.immutableList
+package androidx.compose.runtime.external.kotlinx.collections.immutable.implementations.immutableList
 
-import kotlinx.collections.immutable.ImmutableList
-import kotlinx.collections.immutable.PersistentList
-import kotlinx.collections.immutable.mutate
+import androidx.compose.runtime.external.kotlinx.collections.immutable.ImmutableList
+import androidx.compose.runtime.external.kotlinx.collections.immutable.PersistentList
+import androidx.compose.runtime.external.kotlinx.collections.immutable.mutate
 
-abstract class AbstractPersistentList<E> : PersistentList<E>, AbstractList<E>() {
+internal abstract class AbstractPersistentList<E> : PersistentList<E>, AbstractList<E>() {
     override fun subList(fromIndex: Int, toIndex: Int): ImmutableList<E> {
         return super<PersistentList>.subList(fromIndex, toIndex)
     }

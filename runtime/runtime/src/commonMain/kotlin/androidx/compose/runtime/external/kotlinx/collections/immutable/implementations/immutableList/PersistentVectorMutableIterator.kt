@@ -3,7 +3,7 @@
  * Use of this source code is governed by the Apache 2.0 License that can be found in the LICENSE.txt file.
  */
 
-package kotlinx.collections.immutable.implementations.immutableList
+package androidx.compose.runtime.external.kotlinx.collections.immutable.implementations.immutableList
 
 /**
  * The class responsible for iterating over elements of the [PersistentVectorBuilder].

@@ -3,14 +3,14 @@
  * Use of this source code is governed by the Apache 2.0 License that can be found in the LICENSE.txt file.
  */
 
-package kotlinx.collections.immutable.implementations.persistentOrderedMap
+package androidx.compose.runtime.external.kotlinx.collections.immutable.implementations.persistentOrderedMap
 
-import kotlinx.collections.immutable.ImmutableCollection
-import kotlinx.collections.immutable.ImmutableSet
-import kotlinx.collections.immutable.PersistentMap
-import kotlinx.collections.immutable.implementations.immutableMap.PersistentHashMap
-import kotlinx.collections.immutable.internal.EndOfChain
-import kotlinx.collections.immutable.mutate
+import androidx.compose.runtime.external.kotlinx.collections.immutable.ImmutableCollection
+import androidx.compose.runtime.external.kotlinx.collections.immutable.ImmutableSet
+import androidx.compose.runtime.external.kotlinx.collections.immutable.PersistentMap
+import androidx.compose.runtime.external.kotlinx.collections.immutable.implementations.immutableMap.PersistentHashMap
+import androidx.compose.runtime.external.kotlinx.collections.immutable.internal.EndOfChain
+import androidx.compose.runtime.external.kotlinx.collections.immutable.mutate
 
 internal class LinkedValue<V>(val value: V, val previous: Any?, val next: Any?) {
     /** Constructs LinkedValue for a new single entry */

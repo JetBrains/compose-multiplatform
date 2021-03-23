@@ -515,6 +515,47 @@ package androidx.compose.runtime.collection {
 
 }
 
+package androidx.compose.runtime.external.kotlinx.collections.immutable {
+
+  public final class ExtensionsKt {
+  }
+
+}
+
+package androidx.compose.runtime.external.kotlinx.collections.immutable.implementations.immutableList {
+
+  public final class UtilsKt {
+  }
+
+}
+
+package androidx.compose.runtime.external.kotlinx.collections.immutable.implementations.immutableMap {
+
+  public final class PersistentHashMapContentIteratorsKt {
+  }
+
+  public final class TrieNodeKt {
+  }
+
+}
+
+package androidx.compose.runtime.external.kotlinx.collections.immutable.implementations.immutableSet {
+
+  public final class TrieNodeKt {
+  }
+
+}
+
+package androidx.compose.runtime.external.kotlinx.collections.immutable.internal {
+
+  public final class CommonFunctionsKt {
+  }
+
+  public final class ForEachOneBitKt {
+  }
+
+}
+
 package androidx.compose.runtime.internal {
 
   @androidx.compose.runtime.ComposeCompilerApi @androidx.compose.runtime.Stable public interface ComposableLambda extends kotlin.jvm.functions.Function2<androidx.compose.runtime.Composer,java.lang.Integer,java.lang.Object> kotlin.jvm.functions.Function10<java.lang.Object,java.lang.Object,java.lang.Object,java.lang.Object,java.lang.Object,java.lang.Object,java.lang.Object,java.lang.Object,androidx.compose.runtime.Composer,java.lang.Integer,java.lang.Object> kotlin.jvm.functions.Function11<java.lang.Object,java.lang.Object,java.lang.Object,java.lang.Object,java.lang.Object,java.lang.Object,java.lang.Object,java.lang.Object,java.lang.Object,androidx.compose.runtime.Composer,java.lang.Integer,java.lang.Object> kotlin.jvm.functions.Function13<java.lang.Object,java.lang.Object,java.lang.Object,java.lang.Object,java.lang.Object,java.lang.Object,java.lang.Object,java.lang.Object,java.lang.Object,java.lang.Object,androidx.compose.runtime.Composer,java.lang.Integer,java.lang.Integer,java.lang.Object> kotlin.jvm.functions.Function14<java.lang.Object,java.lang.Object,java.lang.Object,java.lang.Object,java.lang.Object,java.lang.Object,java.lang.Object,java.lang.Object,java.lang.Object,java.lang.Object,java.lang.Object,androidx.compose.runtime.Composer,java.lang.Integer,java.lang.Integer,java.lang.Object> kotlin.jvm.functions.Function15<java.lang.Object,java.lang.Object,java.lang.Object,java.lang.Object,java.lang.Object,java.lang.Object,java.lang.Object,java.lang.Object,java.lang.Object,java.lang.Object,java.lang.Object,java.lang.Object,androidx.compose.runtime.Composer,java.lang.Integer,java.lang.Integer,java.lang.Object> kotlin.jvm.functions.Function16<java.lang.Object,java.lang.Object,java.lang.Object,java.lang.Object,java.lang.Object,java.lang.Object,java.lang.Object,java.lang.Object,java.lang.Object,java.lang.Object,java.lang.Object,java.lang.Object,java.lang.Object,androidx.compose.runtime.Composer,java.lang.Integer,java.lang.Integer,java.lang.Object> kotlin.jvm.functions.Function17<java.lang.Object,java.lang.Object,java.lang.Object,java.lang.Object,java.lang.Object,java.lang.Object,java.lang.Object,java.lang.Object,java.lang.Object,java.lang.Object,java.lang.Object,java.lang.Object,java.lang.Object,java.lang.Object,androidx.compose.runtime.Composer,java.lang.Integer,java.lang.Integer,java.lang.Object> kotlin.jvm.functions.Function18<java.lang.Object,java.lang.Object,java.lang.Object,java.lang.Object,java.lang.Object,java.lang.Object,java.lang.Object,java.lang.Object,java.lang.Object,java.lang.Object,java.lang.Object,java.lang.Object,java.lang.Object,java.lang.Object,java.lang.Object,androidx.compose.runtime.Composer,java.lang.Integer,java.lang.Integer,java.lang.Object> kotlin.jvm.functions.Function19<java.lang.Object,java.lang.Object,java.lang.Object,java.lang.Object,java.lang.Object,java.lang.Object,java.lang.Object,java.lang.Object,java.lang.Object,java.lang.Object,java.lang.Object,java.lang.Object,java.lang.Object,java.lang.Object,java.lang.Object,java.lang.Object,androidx.compose.runtime.Composer,java.lang.Integer,java.lang.Integer,java.lang.Object> kotlin.jvm.functions.Function20<java.lang.Object,java.lang.Object,java.lang.Object,java.lang.Object,java.lang.Object,java.lang.Object,java.lang.Object,java.lang.Object,java.lang.Object,java.lang.Object,java.lang.Object,java.lang.Object,java.lang.Object,java.lang.Object,java.lang.Object,java.lang.Object,java.lang.Object,androidx.compose.runtime.Composer,java.lang.Integer,java.lang.Integer,java.lang.Object> kotlin.jvm.functions.Function21<java.lang.Object,java.lang.Object,java.lang.Object,java.lang.Object,java.lang.Object,java.lang.Object,java.lang.Object,java.lang.Object,java.lang.Object,java.lang.Object,java.lang.Object,java.lang.Object,java.lang.Object,java.lang.Object,java.lang.Object,java.lang.Object,java.lang.Object,java.lang.Object,androidx.compose.runtime.Composer,java.lang.Integer,java.lang.Integer,java.lang.Object> kotlin.jvm.functions.Function3<java.lang.Object,androidx.compose.runtime.Composer,java.lang.Integer,java.lang.Object> kotlin.jvm.functions.Function4<java.lang.Object,java.lang.Object,androidx.compose.runtime.Composer,java.lang.Integer,java.lang.Object> kotlin.jvm.functions.Function5<java.lang.Object,java.lang.Object,java.lang.Object,androidx.compose.runtime.Composer,java.lang.Integer,java.lang.Object> kotlin.jvm.functions.Function6<java.lang.Object,java.lang.Object,java.lang.Object,java.lang.Object,androidx.compose.runtime.Composer,java.lang.Integer,java.lang.Object> kotlin.jvm.functions.Function7<java.lang.Object,java.lang.Object,java.lang.Object,java.lang.Object,java.lang.Object,androidx.compose.runtime.Composer,java.lang.Integer,java.lang.Object> kotlin.jvm.functions.Function8<java.lang.Object,java.lang.Object,java.lang.Object,java.lang.Object,java.lang.Object,java.lang.Object,androidx.compose.runtime.Composer,java.lang.Integer,java.lang.Object> kotlin.jvm.functions.Function9<java.lang.Object,java.lang.Object,java.lang.Object,java.lang.Object,java.lang.Object,java.lang.Object,java.lang.Object,androidx.compose.runtime.Composer,java.lang.Integer,java.lang.Object> {
