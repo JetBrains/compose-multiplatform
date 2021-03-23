@@ -63,7 +63,7 @@ fun SoftwareKeyboardControllerDemo() {
         Button(
             onClick = {
                 isHidden = true
-                keyboardController?.hideSoftwareKeyboard()
+                keyboardController?.hide()
             },
             enabled = !isHidden,
             modifier = Modifier.padding(vertical = 8.dp)
@@ -74,7 +74,7 @@ fun SoftwareKeyboardControllerDemo() {
             onClick = {
                 isHidden = false
                 focusRequester.requestFocus()
-                keyboardController?.showSoftwareKeyboard()
+                keyboardController?.show()
             },
             enabled = isHidden
         ) {

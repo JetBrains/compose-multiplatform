@@ -2048,13 +2048,16 @@ package androidx.compose.ui.platform {
 
   @androidx.compose.ui.ExperimentalComposeUiApi public final class LocalSoftwareKeyboardController {
     method @androidx.compose.runtime.Composable public androidx.compose.ui.platform.SoftwareKeyboardController? getCurrent();
+    method public infix androidx.compose.runtime.ProvidedValue<androidx.compose.ui.platform.SoftwareKeyboardController> provides(androidx.compose.ui.platform.SoftwareKeyboardController softwareKeyboardController);
     property @androidx.compose.runtime.Composable public final androidx.compose.ui.platform.SoftwareKeyboardController? current;
     field public static final androidx.compose.ui.platform.LocalSoftwareKeyboardController INSTANCE;
   }
 
-  @androidx.compose.ui.ExperimentalComposeUiApi public interface SoftwareKeyboardController {
-    method public void hideSoftwareKeyboard();
-    method public void showSoftwareKeyboard();
+  @androidx.compose.runtime.Stable @androidx.compose.ui.ExperimentalComposeUiApi public interface SoftwareKeyboardController {
+    method public void hide();
+    method @Deprecated public default void hideSoftwareKeyboard();
+    method public void show();
+    method @Deprecated public default void showSoftwareKeyboard();
   }
 
   public final class TestTagKt {

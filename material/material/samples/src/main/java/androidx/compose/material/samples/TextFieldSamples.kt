@@ -197,7 +197,7 @@ fun TextFieldWithHideKeyboardOnImeAction() {
         keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done),
         keyboardActions = KeyboardActions(
             onDone = {
-                keyboardController?.hideSoftwareKeyboard()
+                keyboardController?.hide()
                 // do something here
             }
         )

@@ -16,12 +16,14 @@
 
 package androidx.compose.ui.platform
 
+import androidx.compose.runtime.Stable
 import androidx.compose.ui.ExperimentalComposeUiApi
 
 /**
  * Provide software keyboard control.
  */
 @ExperimentalComposeUiApi
+@Stable
 interface SoftwareKeyboardController {
     /**
      * Request that the system show a software keyboard.
@@ -37,13 +39,22 @@ interface SoftwareKeyboardController {
      *
      * @sample androidx.compose.ui.samples.SoftwareKeyboardControllerSample
      *
-     * You do not need to call this function unless you also call [hideSoftwareKeyboard], as the
+     * You do not need to call this function unless you also call [hide], as the
      * keyboard is automatically shown and hidden by focus events in the BasicTextField.
      *
      * Calling this function is considered a side-effect and should not be called directly from
      * recomposition.
      */
-    fun showSoftwareKeyboard()
+    fun show()
+
+    /**
+     * @see show
+     */
+    @Deprecated(
+        "Use show instead.",
+        ReplaceWith("show()")
+    )
+    fun showSoftwareKeyboard() = show()
 
     /**
      * Hide the software keyboard.
@@ -56,5 +67,14 @@ interface SoftwareKeyboardController {
      * Calling this function is considered a side-effect and should not be called directly from
      * recomposition.
      */
-    fun hideSoftwareKeyboard()
+    fun hide()
+
+    /**
+     * @see hide
+     */
+    @Deprecated(
+        "Use hide instead.",
+        ReplaceWith("hide()")
+    )
+    fun hideSoftwareKeyboard() = hide()
 }

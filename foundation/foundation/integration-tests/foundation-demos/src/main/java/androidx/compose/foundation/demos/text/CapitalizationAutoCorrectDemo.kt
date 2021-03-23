@@ -97,7 +97,7 @@ private fun MyTextField(data: ImeOptionsData) {
         modifier = demoTextFieldModifiers.defaultMinSize(100.dp),
         value = state,
         keyboardOptions = data.keyboardOptions,
-        keyboardActions = KeyboardActions { keyboardController?.hideSoftwareKeyboard() },
+        keyboardActions = KeyboardActions { keyboardController?.hide() },
         onValueChange = { state = it },
         textStyle = TextStyle(fontSize = fontSize8),
         cursorBrush = SolidColor(Color.Red)
