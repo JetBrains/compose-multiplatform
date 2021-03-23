@@ -39,6 +39,10 @@ object Names {
         val PackageName = Package("androidx.compose.ui")
         val Modifier = Name(PackageName, "Modifier")
     }
+    object UiGraphics {
+        val PackageName = Package("androidx.compose.ui.graphics")
+        val Color = Name(PackageName, "Color")
+    }
 }
 
 /**
