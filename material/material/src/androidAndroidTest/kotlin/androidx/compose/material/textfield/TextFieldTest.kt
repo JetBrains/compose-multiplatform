@@ -324,7 +324,7 @@ class TextFieldTest {
         rule.runOnIdle { assertThat(hostView.isSoftwareKeyboardShown).isTrue() }
 
         // Hide keyboard.
-        rule.runOnIdle { softwareKeyboardController?.hideSoftwareKeyboard() }
+        rule.runOnIdle { softwareKeyboardController?.hide() }
 
         // Clicking on the text field shows the keyboard.
         rule.onNodeWithTag(TextfieldTag).performClick()

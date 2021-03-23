@@ -92,7 +92,7 @@ internal fun EditLine(
             keyboardType = keyboardType,
             imeAction = imeAction
         ),
-        keyboardActions = KeyboardActions { keyboardController?.hideSoftwareKeyboard() },
+        keyboardActions = KeyboardActions { keyboardController?.hide() },
         onValueChange = { state.value = it },
         textStyle = TextStyle(fontSize = fontSize8),
     )
