@@ -101,15 +101,6 @@ class AndroidXRootPlugin : Plugin<Project> {
                     }
                 )
             )
-            project.extra.set(
-                PREBUILT_OR_SNAPSHOT_EXT_NAME,
-                KotlinClosure1<String, String>(
-                    function = {
-                        // this refers to the first parameter of the closure.
-                        this
-                    }
-                )
-            )
             project.plugins.withType(AndroidBasePlugin::class.java) {
                 buildOnServerTask.dependsOn("${project.path}:assembleDebug")
                 buildOnServerTask.dependsOn("${project.path}:assembleAndroidTest")
@@ -245,6 +236,5 @@ class AndroidXRootPlugin : Plugin<Project> {
 
     companion object {
         const val PROJECT_OR_ARTIFACT_EXT_NAME = "projectOrArtifact"
-        const val PREBUILT_OR_SNAPSHOT_EXT_NAME = "prebuiltOrSnapshot"
     }
 }
