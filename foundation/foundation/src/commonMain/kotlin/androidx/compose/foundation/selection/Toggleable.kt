@@ -17,19 +17,20 @@
 package androidx.compose.foundation.selection
 
 import androidx.compose.foundation.Indication
-import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.PressedInteractionSourceDisposableEffect
 import androidx.compose.foundation.LocalIndication
-import androidx.compose.foundation.interaction.PressInteraction
 import androidx.compose.foundation.Strings
+import androidx.compose.foundation.gestures.detectTapAndPress
+import androidx.compose.foundation.handlePressInteraction
 import androidx.compose.foundation.indication
-import androidx.compose.runtime.DisposableEffect
+import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.interaction.PressInteraction
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.composed
-import androidx.compose.foundation.legacygestures.pressIndicatorGestureFilter
-import androidx.compose.foundation.legacygestures.tapGestureFilter
+import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.debugInspectorInfo
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.semantics.disabled
@@ -42,7 +43,6 @@ import androidx.compose.ui.state.ToggleableState
 import androidx.compose.ui.state.ToggleableState.Indeterminate
 import androidx.compose.ui.state.ToggleableState.Off
 import androidx.compose.ui.state.ToggleableState.On
-import kotlinx.coroutines.launch
 
 /**
  * Configure component to make it toggleable via input and accessibility events
@@ -233,7 +233,7 @@ fun Modifier.triStateToggleable(
     }
 )
 
-@Suppress("ModifierInspectorInfo", "DEPRECATION")
+@Suppress("ModifierInspectorInfo")
 private fun Modifier.toggleableImpl(
     state: ToggleableState,
     enabled: Boolean,
@@ -242,7 +242,6 @@ private fun Modifier.toggleableImpl(
     indication: Indication?,
     onClick: () -> Unit
 ): Modifier = composed {
-    val scope = rememberCoroutineScope()
     val pressedInteraction = remember { mutableStateOf<PressInteraction.Press?>(null) }
     // TODO(pavlis): Handle multiple states for Semantics
     val semantics = Modifier.semantics(mergeDescendants = true) {
@@ -261,58 +260,22 @@ private fun Modifier.toggleableImpl(
             disabled()
         }
     }
-    val interactionUpdate =
-        if (enabled) {
-            Modifier.pressIndicatorGestureFilter(
-                onStart = {
-                    scope.launch {
-                        // Remove any old interactions if we didn't fire stop / cancel properly
-                        pressedInteraction.value?.let { oldValue ->
-                            val interaction = PressInteraction.Cancel(oldValue)
-                            interactionSource.emit(interaction)
-                            pressedInteraction.value = null
-                        }
-                        val interaction = PressInteraction.Press(it)
-                        interactionSource.emit(interaction)
-                        pressedInteraction.value = interaction
-                    }
+    val onClickState = rememberUpdatedState(onClick)
+    val gestures = if (enabled) {
+        PressedInteractionSourceDisposableEffect(interactionSource, pressedInteraction)
+        Modifier.pointerInput(interactionSource) {
+            detectTapAndPress(
+                onPress = { offset ->
+                    handlePressInteraction(offset, interactionSource, pressedInteraction)
                 },
-                onStop = {
-                    scope.launch {
-                        pressedInteraction.value?.let {
-                            val interaction = PressInteraction.Release(it)
-                            interactionSource.emit(interaction)
-                            pressedInteraction.value = null
-                        }
-                    }
-                },
-                onCancel = {
-                    scope.launch {
-                        pressedInteraction.value?.let {
-                            val interaction = PressInteraction.Cancel(it)
-                            interactionSource.emit(interaction)
-                            pressedInteraction.value = null
-                        }
-                    }
-                }
+                onTap = { onClickState.value.invoke() }
             )
-        } else {
-            Modifier
         }
-    val click = if (enabled) Modifier.tapGestureFilter { onClick() } else Modifier
-
-    DisposableEffect(interactionSource) {
-        onDispose {
-            pressedInteraction.value?.let { oldValue ->
-                val interaction = PressInteraction.Cancel(oldValue)
-                interactionSource.tryEmit(interaction)
-                pressedInteraction.value = null
-            }
-        }
+    } else {
+        Modifier
     }
     this
         .then(semantics)
         .indication(interactionSource, indication)
-        .then(interactionUpdate)
-        .then(click)
+        .then(gestures)
 }

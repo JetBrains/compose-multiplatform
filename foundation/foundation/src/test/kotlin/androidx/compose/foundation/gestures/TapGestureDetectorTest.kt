@@ -62,6 +62,22 @@ class TapGestureDetectorTest {
         )
     }
 
+    private val utilWithShortcut = SuspendingGestureTestUtil {
+        detectTapAndPress(
+            onPress = {
+                pressed = true
+                if (tryAwaitRelease()) {
+                    released = true
+                } else {
+                    canceled = true
+                }
+            },
+            onTap = {
+                tapped = true
+            }
+        )
+    }
+
     private val allGestures = SuspendingGestureTestUtil {
         detectTapGestures(
             onPress = {
@@ -94,6 +110,26 @@ class TapGestureDetectorTest {
      */
     @Test
     fun normalTap() = util.executeInComposition {
+        val down = down(5f, 5f)
+        assertTrue(down.consumed.downChange)
+
+        assertTrue(pressed)
+        assertFalse(tapped)
+        assertFalse(released)
+
+        val up = down.up(50)
+        assertTrue(up.consumed.downChange)
+
+        assertTrue(tapped)
+        assertTrue(released)
+        assertFalse(canceled)
+    }
+
+    /**
+     * Clicking in the region should result in the callback being invoked.
+     */
+    @Test
+    fun normalTap_withShortcut() = utilWithShortcut.executeInComposition {
         val down = down(5f, 5f)
         assertTrue(down.consumed.downChange)
 
@@ -206,6 +242,23 @@ class TapGestureDetectorTest {
      * the callback not being invoked
      */
     @Test
+    fun tapMiss_withShortcut() = utilWithShortcut.executeInComposition {
+        val up = down(5f, 5f)
+            .moveTo(15f, 15f)
+            .up()
+
+        assertTrue(pressed)
+        assertTrue(canceled)
+        assertFalse(released)
+        assertFalse(tapped)
+        assertFalse(up.consumed.downChange)
+    }
+
+    /**
+     * Pressing in the region, sliding out and then lifting should result in
+     * the callback not being invoked
+     */
+    @Test
     fun longPressMiss() = allGestures.executeInComposition {
         val pointer = down(5f, 5f)
             .moveTo(15f, 15f)
@@ -271,10 +324,53 @@ class TapGestureDetectorTest {
     }
 
     /**
+     * Pressing in the region, sliding out, then back in, then lifting
+     * should result the gesture being canceled.
+     */
+    @Test
+    fun tapOutAndIn_withShortcut() = utilWithShortcut.executeInComposition {
+        val up = down(5f, 5f)
+            .moveTo(15f, 15f)
+            .moveTo(6f, 6f)
+            .up()
+
+        assertFalse(tapped)
+        assertFalse(up.consumed.downChange)
+        assertTrue(pressed)
+        assertFalse(released)
+        assertTrue(canceled)
+    }
+
+    /**
      * After a first tap, a second tap should also be detected.
      */
     @Test
     fun secondTap() = util.executeInComposition {
+        down(5f, 5f)
+            .up()
+
+        assertTrue(pressed)
+        assertTrue(released)
+        assertFalse(canceled)
+
+        tapped = false
+        pressed = false
+        released = false
+
+        val up2 = down(4f, 4f)
+            .up()
+        assertTrue(tapped)
+        assertTrue(up2.consumed.downChange)
+        assertTrue(pressed)
+        assertTrue(released)
+        assertFalse(canceled)
+    }
+
+    /**
+     * After a first tap, a second tap should also be detected.
+     */
+    @Test
+    fun secondTap_withShortcut() = utilWithShortcut.executeInComposition {
         down(5f, 5f)
             .up()
 
@@ -316,11 +412,49 @@ class TapGestureDetectorTest {
     }
 
     /**
+     * Clicking in the region with the up already consumed should result in the callback not
+     * being invoked.
+     */
+    @Test
+    fun consumedUpTap_withShortcut() = utilWithShortcut.executeInComposition {
+        val down = down(5f, 5f)
+
+        assertFalse(tapped)
+        assertTrue(pressed)
+
+        down.up {
+            consumeDownChange()
+        }
+
+        assertFalse(tapped)
+        assertFalse(released)
+        assertTrue(canceled)
+    }
+
+    /**
      * Clicking in the region with the motion consumed should result in the callback not
      * being invoked.
      */
     @Test
     fun consumedMotionTap() = util.executeInComposition {
+        down(5f, 5f)
+            .moveTo(6f, 2f) {
+                consumePositionChange()
+            }
+            .up(50)
+
+        assertFalse(tapped)
+        assertTrue(pressed)
+        assertFalse(released)
+        assertTrue(canceled)
+    }
+
+    /**
+     * Clicking in the region with the motion consumed should result in the callback not
+     * being invoked.
+     */
+    @Test
+    fun consumedMotionTap_withShortcut() = utilWithShortcut.executeInComposition {
         down(5f, 5f)
             .moveTo(6f, 2f) {
                 consumePositionChange()
@@ -363,10 +497,65 @@ class TapGestureDetectorTest {
     }
 
     /**
+     * Ensure that two-finger taps work.
+     */
+    @Test
+    fun twoFingerTap_withShortcut() = utilWithShortcut.executeInComposition {
+        val down = down(1f, 1f)
+        assertTrue(down.consumed.downChange)
+
+        assertTrue(pressed)
+        pressed = false
+
+        val down2 = down(9f, 5f)
+        assertFalse(down2.consumed.downChange)
+
+        assertFalse(pressed)
+
+        val up = down.up()
+        assertFalse(up.consumed.downChange)
+        assertFalse(tapped)
+        assertFalse(released)
+
+        val up2 = down2.up()
+        assertTrue(up2.consumed.downChange)
+
+        assertTrue(tapped)
+        assertTrue(released)
+        assertFalse(canceled)
+    }
+
+    /**
      * A position change consumption on any finger should cause tap to cancel.
      */
     @Test
     fun twoFingerTapCancel() = util.executeInComposition {
+        val down = down(1f, 1f)
+
+        assertTrue(pressed)
+
+        val down2 = down(9f, 5f)
+
+        val up = down.moveTo(5f, 5f) {
+            consumePositionChange()
+        }.up()
+        assertFalse(up.consumed.downChange)
+
+        assertFalse(tapped)
+        assertTrue(canceled)
+
+        val up2 = down2.up(50)
+        assertFalse(up2.consumed.downChange)
+
+        assertFalse(tapped)
+        assertFalse(released)
+    }
+
+    /**
+     * A position change consumption on any finger should cause tap to cancel.
+     */
+    @Test
+    fun twoFingerTapCancel_withShortcut() = utilWithShortcut.executeInComposition {
         val down = down(1f, 1f)
 
         assertTrue(pressed)

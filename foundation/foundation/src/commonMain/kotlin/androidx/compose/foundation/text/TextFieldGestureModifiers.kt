@@ -18,19 +18,17 @@
 
 package androidx.compose.foundation.text
 
-import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.focusable
+import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.legacygestures.DragObserver
+import androidx.compose.foundation.legacygestures.LongPressDragObserver
+import androidx.compose.foundation.legacygestures.dragGestureFilter
+import androidx.compose.foundation.legacygestures.longPressDragGestureFilter
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.FocusState
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.focus.onFocusChanged
-import androidx.compose.ui.geometry.Offset
-import androidx.compose.foundation.legacygestures.DragObserver
-import androidx.compose.foundation.legacygestures.LongPressDragObserver
-import androidx.compose.foundation.legacygestures.dragGestureFilter
-import androidx.compose.foundation.legacygestures.longPressDragGestureFilter
-import androidx.compose.foundation.legacygestures.tapGestureFilter
 import androidx.compose.ui.input.pointer.PointerInputScope
 import androidx.compose.ui.input.pointer.pointerInput
 
@@ -39,9 +37,6 @@ internal fun Modifier.longPressDragGestureFilter(
     observer: LongPressDragObserver,
     enabled: Boolean
 ) = if (enabled) this.then(longPressDragGestureFilter(observer)) else this
-
-internal fun Modifier.focusRequestTapModifier(onTap: (Offset) -> Unit, enabled: Boolean) =
-    if (enabled) this.tapGestureFilter(onTap) else this
 
 // Focus modifiers
 internal fun Modifier.textFieldFocusModifier(
