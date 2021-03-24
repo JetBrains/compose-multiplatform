@@ -34,6 +34,12 @@ dependencies {
     implementation(project(":compose:runtime:runtime"))
     implementation(project(":compose:ui:ui"))
     implementation(project(":compose:ui:ui-viewbinding"))
+
+    androidTestImplementation(project(":compose:foundation:foundation"))
+    androidTestImplementation(project(":compose:test-utils"))
+    androidTestImplementation(ANDROIDX_TEST_RUNNER)
+    androidTestImplementation(JUNIT)
+    androidTestImplementation(TRUTH)
 }
 
 androidx {
