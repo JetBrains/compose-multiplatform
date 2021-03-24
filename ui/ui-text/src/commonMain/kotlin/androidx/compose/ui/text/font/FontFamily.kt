@@ -39,7 +39,7 @@ sealed class FontFamily(val canLoadSynchronously: Boolean) {
          *
          * @sample androidx.compose.ui.text.samples.FontFamilySansSerifSample
          *
-         * @see [CSS sans-serif](https://www.w3.org/TR/css-fonts-3/#sans-serif)
+         * See [CSS sans-serif](https://www.w3.org/TR/css-fonts-3/#sans-serif)
          */
         val SansSerif = GenericFontFamily("sans-serif")
 
@@ -48,7 +48,7 @@ sealed class FontFamily(val canLoadSynchronously: Boolean) {
          *
          * @sample androidx.compose.ui.text.samples.FontFamilySerifSample
          *
-         * @see [CSS serif](https://www.w3.org/TR/css-fonts-3/#serif)
+         * See [CSS serif](https://www.w3.org/TR/css-fonts-3/#serif)
          */
         val Serif = GenericFontFamily("serif")
 
@@ -57,7 +57,7 @@ sealed class FontFamily(val canLoadSynchronously: Boolean) {
          *
          * @sample androidx.compose.ui.text.samples.FontFamilyMonospaceSample
          *
-         * @see [CSS monospace](https://www.w3.org/TR/css-fonts-3/#monospace)
+         * See [CSS monospace](https://www.w3.org/TR/css-fonts-3/#monospace)
          */
         val Monospace = GenericFontFamily("monospace")
 
@@ -69,7 +69,7 @@ sealed class FontFamily(val canLoadSynchronously: Boolean) {
          *
          * @sample androidx.compose.ui.text.samples.FontFamilyCursiveSample
          *
-         * @see [CSS cursive](https://www.w3.org/TR/css-fonts-3/#cursive)
+         * See [CSS cursive](https://www.w3.org/TR/css-fonts-3/#cursive)
          */
         val Cursive = GenericFontFamily("cursive")
     }
