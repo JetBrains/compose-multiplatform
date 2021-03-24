@@ -127,6 +127,7 @@ val SKIKO_CURRENT_OS by lazy {
     }
 }
 const val TRUTH = "com.google.truth:truth:1.0.1"
+const val VIEW_BINDING = "androidx.databinding:viewbinding:4.1.2"
 const val XERIAL = "org.xerial:sqlite-jdbc:3.25.2"
 const val XPP3 = "xpp3:xpp3:1.1.4c"
 const val XMLPULL = "xmlpull:xmlpull:1.1.3.1"
