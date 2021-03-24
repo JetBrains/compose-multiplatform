@@ -678,6 +678,9 @@ package androidx.compose.foundation.text {
     property public final androidx.compose.foundation.text.KeyboardOptions Default;
   }
 
+  public final class LongPressTextDragObserverKt {
+  }
+
   public final class MaxLinesHeightModifierKt {
   }
 

@@ -14,26 +14,24 @@
  * limitations under the License.
  */
 
-@file:Suppress("DEPRECATION") // gestures
-
 package androidx.compose.foundation.text.selection
 
 import androidx.compose.foundation.gestures.drag
 import androidx.compose.foundation.gestures.forEachGesture
+import androidx.compose.foundation.text.InternalFoundationTextApi
+import androidx.compose.foundation.text.TextDragObserver
 import androidx.compose.foundation.text.TextFieldDelegate
 import androidx.compose.foundation.text.TextFieldState
+import androidx.compose.foundation.text.detectDragGesturesWithObserver
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Rect
-import androidx.compose.foundation.legacygestures.DragObserver
-import androidx.compose.foundation.legacygestures.LongPressDragObserver
-import androidx.compose.foundation.legacygestures.dragGestureFilter
-import androidx.compose.foundation.text.InternalFoundationTextApi
 import androidx.compose.ui.hapticfeedback.HapticFeedback
 import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.input.pointer.AwaitPointerEventScope
@@ -43,6 +41,7 @@ import androidx.compose.ui.input.pointer.PointerType
 import androidx.compose.ui.input.pointer.changedToDown
 import androidx.compose.ui.input.pointer.consumeAllChanges
 import androidx.compose.ui.input.pointer.consumeDownChange
+import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.input.pointer.positionChange
 import androidx.compose.ui.platform.ClipboardManager
 import androidx.compose.ui.platform.TextToolbar
@@ -146,20 +145,20 @@ internal class TextFieldSelectionManager {
     private var oldValue: TextFieldValue = TextFieldValue()
 
     /**
-     * [LongPressDragObserver] for long press and drag to select in TextField.
+     * [TextDragObserver] for long press and drag to select in TextField.
      */
-    internal val touchSelectionObserver = object : LongPressDragObserver {
-        override fun onLongPress(pxPosition: Offset) {
+    internal val touchSelectionObserver = object : TextDragObserver {
+        override fun onStart(startPoint: Offset) {
             state?.let {
                 if (it.draggingHandle) return
             }
 
             // Long Press at the blank area, the cursor should show up at the end of the line.
-            if (state?.layoutResult?.isPositionOnText(pxPosition) != true) {
+            if (state?.layoutResult?.isPositionOnText(startPoint) != true) {
                 state?.layoutResult?.let { layoutResult ->
                     val offset = offsetMapping.transformedToOriginal(
                         layoutResult.getLineEnd(
-                            layoutResult.getLineForVerticalPosition(pxPosition.y)
+                            layoutResult.getLineForVerticalPosition(startPoint.y)
                         )
                     )
                     hapticFeedBack?.performHapticFeedback(HapticFeedbackType.TextHandleMove)
@@ -178,7 +177,7 @@ internal class TextFieldSelectionManager {
             if (value.text.isEmpty()) return
             enterSelectionMode()
             state?.layoutResult?.let { layoutResult ->
-                val offset = layoutResult.getOffsetForPosition(pxPosition)
+                val offset = layoutResult.getOffsetForPosition(startPoint)
                 updateSelection(
                     value = value,
                     transformedStartOffset = offset,
@@ -188,15 +187,15 @@ internal class TextFieldSelectionManager {
                 )
                 dragBeginOffsetInText = offset
             }
-            dragBeginPosition = pxPosition
+            dragBeginPosition = startPoint
             dragTotalDistance = Offset.Zero
         }
 
-        override fun onDrag(dragDistance: Offset): Offset {
+        override fun onDrag(delta: Offset) {
             // selection never started, did not consume any drag
-            if (value.text.isEmpty()) return Offset.Zero
+            if (value.text.isEmpty()) return
 
-            dragTotalDistance += dragDistance
+            dragTotalDistance += delta
             state?.layoutResult?.let { layoutResult ->
                 val startOffset = dragBeginOffsetInText ?: layoutResult.getOffsetForPosition(
                     position = dragBeginPosition,
@@ -215,15 +214,15 @@ internal class TextFieldSelectionManager {
                 )
             }
             state?.showFloatingToolbar = false
-            return dragDistance
         }
 
-        override fun onStop(velocity: Offset) {
-            super.onStop(velocity)
+        override fun onStop() {
             state?.showFloatingToolbar = true
             if (textToolbar?.status == TextToolbarStatus.Hidden) showSelectionToolbar()
             dragBeginOffsetInText = null
         }
+
+        override fun onCancel() {}
     }
 
     internal interface MouseSelectionObserver {
@@ -267,6 +266,7 @@ internal class TextFieldSelectionManager {
                 }
             }
         }
+
         override fun onDrag(dragDistance: Offset) {
             if (value.text.isEmpty()) return
 
@@ -305,11 +305,11 @@ internal class TextFieldSelectionManager {
     }
 
     /**
-     * [DragObserver] for dragging the selection handles to change the selection in TextField.
+     * [TextDragObserver] for dragging the selection handles to change the selection in TextField.
      */
-    internal fun handleDragObserver(isStartHandle: Boolean): DragObserver {
-        return object : DragObserver {
-            override fun onStart(downPosition: Offset) {
+    internal fun handleDragObserver(isStartHandle: Boolean): TextDragObserver {
+        return object : TextDragObserver {
+            override fun onStart(startPoint: Offset) {
                 // The position of the character where the drag gesture should begin. This is in
                 // the composable coordinates.
                 dragBeginPosition = getAdjustedCoordinates(getHandlePosition(isStartHandle))
@@ -319,8 +319,8 @@ internal class TextFieldSelectionManager {
                 state?.showFloatingToolbar = false
             }
 
-            override fun onDrag(dragDistance: Offset): Offset {
-                dragTotalDistance += dragDistance
+            override fun onDrag(delta: Offset) {
+                dragTotalDistance += delta
 
                 state?.layoutResult?.value?.let { layoutResult ->
                     val startOffset = if (isStartHandle)
@@ -342,15 +342,15 @@ internal class TextFieldSelectionManager {
                     )
                 }
                 state?.showFloatingToolbar = false
-                return dragDistance
             }
 
-            override fun onStop(velocity: Offset) {
-                super.onStop(velocity)
+            override fun onStop() {
                 state?.draggingHandle = false
                 state?.showFloatingToolbar = true
                 if (textToolbar?.status == TextToolbarStatus.Hidden) showSelectionToolbar()
             }
+
+            override fun onCancel() {}
         }
     }
 
@@ -670,13 +670,18 @@ internal fun TextFieldSelectionHandle(
     directions: Pair<ResolvedTextDirection, ResolvedTextDirection>,
     manager: TextFieldSelectionManager
 ) {
+    val observer = remember(isStartHandle, manager) {
+        manager.handleDragObserver(isStartHandle)
+    }
     SelectionHandle(
         startHandlePosition = manager.getHandlePosition(true),
         endHandlePosition = manager.getHandlePosition(false),
         isStartHandle = isStartHandle,
         directions = directions,
         handlesCrossed = manager.value.selection.reversed,
-        modifier = Modifier.dragGestureFilter(manager.handleDragObserver(isStartHandle)),
+        modifier = Modifier.pointerInput(observer) {
+            detectDragGesturesWithObserver(observer)
+        },
         handle = null
     )
 }
