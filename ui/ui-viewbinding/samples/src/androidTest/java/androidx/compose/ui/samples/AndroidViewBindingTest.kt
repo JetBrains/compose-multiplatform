@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package androidx.compose.ui.viewinterop
+package androidx.compose.ui.samples
 
 import android.os.Build
 import androidx.compose.foundation.layout.requiredSize
@@ -33,7 +33,8 @@ import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.viewinterop.databinding.TestLayoutBinding
+import androidx.compose.ui.viewinterop.AndroidViewBinding
+import androidx.compose.ui.viewbinding.samples.databinding.SampleLayoutBinding
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.LargeTest
 import androidx.test.filters.MediumTest
@@ -54,7 +55,7 @@ class AndroidViewBindingTest {
     @Test
     fun drawing() {
         rule.setContent {
-            AndroidViewBinding(TestLayoutBinding::inflate, Modifier.testTag("layout"))
+            AndroidViewBinding(SampleLayoutBinding::inflate, Modifier.testTag("layout"))
         }
 
         val size = 50.dp
@@ -69,7 +70,7 @@ class AndroidViewBindingTest {
     fun update() {
         val color = mutableStateOf(Color.Gray)
         rule.setContent {
-            AndroidViewBinding(TestLayoutBinding::inflate, Modifier.testTag("layout")) {
+            AndroidViewBinding(SampleLayoutBinding::inflate, Modifier.testTag("layout")) {
                 second.setBackgroundColor(color.value.toArgb())
             }
         }
@@ -96,7 +97,7 @@ class AndroidViewBindingTest {
             val sizeIpx = with(density) { size.roundToPx() }
             CompositionLocalProvider(LocalDensity provides density) {
                 AndroidViewBinding(
-                    TestLayoutBinding::inflate,
+                    SampleLayoutBinding::inflate,
                     Modifier.requiredSize(size).onGloballyPositioned {
                         Truth.assertThat(it.size).isEqualTo(IntSize(sizeIpx, sizeIpx))
                     }

@@ -31,6 +31,7 @@ dependencies {
 
     implementation(KOTLIN_STDLIB)
     implementation(project(":compose:ui:ui"))
+    implementation(VIEW_BINDING)
 
     androidTestImplementation(project(":compose:foundation:foundation"))
     androidTestImplementation(project(":compose:test-utils"))
@@ -46,10 +47,4 @@ androidx {
     inceptionYear = "2020"
     description = "Compose integration with ViewBinding"
     legacyDisableKotlinStrictApiMode = true
-}
-
-android {
-    buildFeatures {
-        viewBinding true
-    }
 }
