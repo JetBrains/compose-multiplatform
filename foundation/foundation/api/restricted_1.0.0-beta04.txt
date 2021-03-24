@@ -425,13 +425,6 @@ package androidx.compose.foundation.lazy {
 
 }
 
-package androidx.compose.foundation.legacygestures {
-
-  public final class DragGestureFilterKt {
-  }
-
-}
-
 package androidx.compose.foundation.selection {
 
   public final class SelectableGroupKt {
