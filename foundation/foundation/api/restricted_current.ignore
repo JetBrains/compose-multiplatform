@@ -1,0 +1,5 @@
+// Baseline format: 1.0
+RemovedClass: androidx.compose.foundation.legacygestures.PressIndicatorGestureFilterKt:
+    Removed class androidx.compose.foundation.legacygestures.PressIndicatorGestureFilterKt
+RemovedClass: androidx.compose.foundation.legacygestures.TapGestureFilterKt:
+    Removed class androidx.compose.foundation.legacygestures.TapGestureFilterKt

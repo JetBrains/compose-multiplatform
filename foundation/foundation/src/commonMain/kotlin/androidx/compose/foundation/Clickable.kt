@@ -16,19 +16,20 @@
 
 package androidx.compose.foundation
 
+import androidx.compose.foundation.gestures.PressGestureScope
+import androidx.compose.foundation.gestures.detectTapAndPress
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.interaction.PressInteraction
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.composed
-import androidx.compose.foundation.legacygestures.pressIndicatorGestureFilter
-import androidx.compose.foundation.legacygestures.tapGestureFilter
+import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.debugInspectorInfo
 import androidx.compose.ui.semantics.Role
@@ -37,7 +38,6 @@ import androidx.compose.ui.semantics.onClick
 import androidx.compose.ui.semantics.onLongClick
 import androidx.compose.ui.semantics.role
 import androidx.compose.ui.semantics.semantics
-import kotlinx.coroutines.launch
 
 /**
  * Configure component to receive clicks via input or accessibility "click" event.
@@ -109,7 +109,6 @@ fun Modifier.clickable(
  * to describe the element or do customizations
  * @param onClick will be called when user clicks on the element
  */
-@Suppress("DEPRECATION")
 fun Modifier.clickable(
     interactionSource: MutableInteractionSource,
     indication: Indication?,
@@ -119,59 +118,24 @@ fun Modifier.clickable(
     onClick: () -> Unit
 ) = composed(
     factory = {
-        val scope = rememberCoroutineScope()
+        val onClickState = rememberUpdatedState(onClick)
         val pressedInteraction = remember { mutableStateOf<PressInteraction.Press?>(null) }
-        val interactionUpdate =
-            if (enabled) {
-                Modifier.pressIndicatorGestureFilter(
-                    onStart = {
-                        scope.launch {
-                            // Remove any old interactions if we didn't fire stop / cancel properly
-                            pressedInteraction.value?.let { oldValue ->
-                                val interaction = PressInteraction.Cancel(oldValue)
-                                interactionSource.emit(interaction)
-                                pressedInteraction.value = null
-                            }
-                            val interaction = PressInteraction.Press(it)
-                            interactionSource.emit(interaction)
-                            pressedInteraction.value = interaction
-                        }
+        val gesture = if (enabled) {
+            PressedInteractionSourceDisposableEffect(interactionSource, pressedInteraction)
+            Modifier.pointerInput(interactionSource) {
+                detectTapAndPress(
+                    onPress = { offset ->
+                        handlePressInteraction(offset, interactionSource, pressedInteraction)
                     },
-                    onStop = {
-                        scope.launch {
-                            pressedInteraction.value?.let {
-                                val interaction = PressInteraction.Release(it)
-                                interactionSource.emit(interaction)
-                                pressedInteraction.value = null
-                            }
-                        }
-                    },
-                    onCancel = {
-                        scope.launch {
-                            pressedInteraction.value?.let {
-                                val interaction = PressInteraction.Cancel(it)
-                                interactionSource.emit(interaction)
-                                pressedInteraction.value = null
-                            }
-                        }
-                    }
+                    onTap = { onClickState.value.invoke() }
                 )
-            } else {
-                Modifier
             }
-        val tap = if (enabled) tapGestureFilter(onTap = { onClick() }) else Modifier
-        DisposableEffect(interactionSource) {
-            onDispose {
-                pressedInteraction.value?.let { oldValue ->
-                    val interaction = PressInteraction.Cancel(oldValue)
-                    interactionSource.tryEmit(interaction)
-                    pressedInteraction.value = null
-                }
-            }
+        } else {
+            Modifier
         }
         Modifier
             .genericClickableWithoutGesture(
-                gestureModifiers = Modifier.then(interactionUpdate).then(tap),
+                gestureModifiers = gesture,
                 interactionSource = interactionSource,
                 indication = indication,
                 enabled = enabled,
@@ -292,12 +256,11 @@ fun Modifier.combinedClickable(
     onClick: () -> Unit
 ) = composed(
     factory = {
-        val scope = rememberCoroutineScope()
         val onClickState = rememberUpdatedState(onClick)
-        val interactionSourceState = rememberUpdatedState(interactionSource)
         val pressedInteraction = remember { mutableStateOf<PressInteraction.Press?>(null) }
         val gesture = if (enabled) {
-            Modifier.pointerInput(onDoubleClick, onLongClick) {
+            PressedInteractionSourceDisposableEffect(interactionSource, pressedInteraction)
+            Modifier.pointerInput(onDoubleClick, onLongClick, interactionSource) {
                 detectTapGestures(
                     onDoubleTap = if (onDoubleClick != null) {
                         { onDoubleClick() }
@@ -309,43 +272,14 @@ fun Modifier.combinedClickable(
                     } else {
                         null
                     },
-                    onPress = {
-                        scope.launch {
-                            // Remove any old interactions if we didn't fire stop / cancel properly
-                            pressedInteraction.value?.let { oldValue ->
-                                val interaction = PressInteraction.Cancel(oldValue)
-                                interactionSourceState.value.emit(interaction)
-                                pressedInteraction.value = null
-                            }
-                            val interaction = PressInteraction.Press(it)
-                            interactionSourceState.value.emit(interaction)
-                            pressedInteraction.value = interaction
-                        }
-                        tryAwaitRelease()
-                        scope.launch {
-                            pressedInteraction.value?.let { oldValue ->
-                                val interaction = PressInteraction.Release(oldValue)
-                                interactionSourceState.value.emit(interaction)
-                                pressedInteraction.value = null
-                            }
-                        }
+                    onPress = { offset ->
+                        handlePressInteraction(offset, interactionSource, pressedInteraction)
                     },
                     onTap = { onClickState.value.invoke() }
                 )
             }
         } else {
             Modifier
-        }
-        DisposableEffect(interactionSource) {
-            onDispose {
-                scope.launch {
-                    pressedInteraction.value?.let { oldValue ->
-                        val interaction = PressInteraction.Cancel(oldValue)
-                        interactionSourceState.value.emit(interaction)
-                        pressedInteraction.value = null
-                    }
-                }
-            }
         }
         Modifier
             .genericClickableWithoutGesture(
@@ -373,6 +307,41 @@ fun Modifier.combinedClickable(
         properties["interactionSource"] = interactionSource
     }
 )
+
+@Composable
+internal fun PressedInteractionSourceDisposableEffect(
+    interactionSource: MutableInteractionSource,
+    pressedInteraction: MutableState<PressInteraction.Press?>
+) {
+    DisposableEffect(interactionSource) {
+        onDispose {
+            pressedInteraction.value?.let { oldValue ->
+                val interaction = PressInteraction.Cancel(oldValue)
+                interactionSource.tryEmit(interaction)
+                pressedInteraction.value = null
+            }
+        }
+    }
+}
+
+internal suspend fun PressGestureScope.handlePressInteraction(
+    pressPoint: Offset,
+    interactionSource: MutableInteractionSource,
+    pressedInteraction: MutableState<PressInteraction.Press?>
+) {
+    val pressInteraction = PressInteraction.Press(pressPoint)
+    interactionSource.emit(pressInteraction)
+    pressedInteraction.value = pressInteraction
+    val success = tryAwaitRelease()
+    val endInteraction =
+        if (success) {
+            PressInteraction.Release(pressInteraction)
+        } else {
+            PressInteraction.Cancel(pressInteraction)
+        }
+    interactionSource.emit(endInteraction)
+    pressedInteraction.value = null
+}
 
 @Composable
 @Suppress("ComposableModifierFactory")
