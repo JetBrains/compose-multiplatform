@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package androidx.compose.material.benchmark
+package androidx.compose.foundation.benchmark.text
 
 import androidx.compose.testutils.benchmark.ComposeBenchmarkRule
 import androidx.compose.testutils.benchmark.toggleStateBenchmarkDraw

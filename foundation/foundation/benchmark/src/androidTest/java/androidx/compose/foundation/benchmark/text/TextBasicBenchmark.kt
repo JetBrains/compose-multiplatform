@@ -14,17 +14,21 @@
  * limitations under the License.
  */
 
-package androidx.compose.material.benchmark
+package androidx.compose.foundation.benchmark.text
 
 import androidx.compose.testutils.benchmark.ComposeBenchmarkRule
 import androidx.compose.testutils.benchmark.benchmarkDrawPerf
-import androidx.compose.testutils.benchmark.benchmarkFirstCompose
-import androidx.compose.testutils.benchmark.benchmarkFirstDraw
-import androidx.compose.testutils.benchmark.benchmarkFirstLayout
-import androidx.compose.testutils.benchmark.benchmarkFirstMeasure
+import androidx.compose.testutils.benchmark.benchmarkFirstComposeFast
+import androidx.compose.testutils.benchmark.benchmarkFirstDrawFast
+import androidx.compose.testutils.benchmark.benchmarkFirstLayoutFast
+import androidx.compose.testutils.benchmark.benchmarkFirstMeasureFast
 import androidx.compose.testutils.benchmark.benchmarkLayoutPerf
+import androidx.compose.testutils.benchmark.toggleStateBenchmarkDraw
+import androidx.compose.testutils.benchmark.toggleStateBenchmarkLayout
+import androidx.compose.testutils.benchmark.toggleStateBenchmarkMeasure
+import androidx.compose.testutils.benchmark.toggleStateBenchmarkRecompose
+import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.benchmark.TextBenchmarkTestRule
-import androidx.compose.ui.text.benchmark.cartesian
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.test.filters.LargeTest
@@ -34,22 +38,17 @@ import org.junit.runner.RunWith
 import org.junit.runners.Parameterized
 
 /**
- * The benchmark for [Text] composable with the input being a styled text in the form of
- * AnnotatedString.
+ * The benchmark for [Text] composable with the input being a plain string.
  */
 @LargeTest
 @RunWith(Parameterized::class)
-class TextMultiStyleBenchmark(
-    private val textLength: Int,
-    private val styleCount: Int
+class TextBasicBenchmark(
+    private val textLength: Int
 ) {
     companion object {
         @JvmStatic
-        @Parameterized.Parameters(name = "length={0} styleCount={1}")
-        fun initParameters() = cartesian(
-            arrayOf(32, 512),
-            arrayOf(0, 32)
-        )
+        @Parameterized.Parameters(name = "length={0}")
+        fun initParameters(): Array<Any> = arrayOf(32, 512)
     }
 
     @get:Rule
@@ -70,11 +69,7 @@ class TextMultiStyleBenchmark(
              * is created.
              */
             val texts = List(textBenchmarkRule.repeatTimes) {
-                textGenerator.nextAnnotatedString(
-                    length = textLength,
-                    styleCount = styleCount,
-                    hasMetricAffectingStyle = true
-                )
+                AnnotatedString(textGenerator.nextParagraph(textLength))
             }
             TextInColumnTestCase(
                 texts = texts,
@@ -85,44 +80,42 @@ class TextMultiStyleBenchmark(
     }
 
     /**
-     * Measure the time taken to compose a [Text] composable from scratch with styled text as input.
+     * Measure the time taken to compose a [Text] composable from scratch with the given input.
      * This is the time taken to call the [Text] composable function.
      */
     @Test
     fun first_compose() {
-        benchmarkRule.benchmarkFirstCompose(caseFactory)
+        benchmarkRule.benchmarkFirstComposeFast(caseFactory)
     }
 
     /**
-     * Measure the time taken by first time measure the Text composable with styled text as input.
+     * Measure the time taken by the first time measure the [Text] composable with the given input.
      * This is mainly the time used to measure all the [Measurable]s in the [Text] composable.
      */
     @Test
     fun first_measure() {
-        benchmarkRule.benchmarkFirstMeasure(caseFactory)
+        benchmarkRule.benchmarkFirstMeasureFast(caseFactory)
     }
 
     /**
-     * Measure the time taken by first time layout the Text composable with styled text as input.
+     * Measure the time taken by the first time layout the [Text] composable with the given input.
      * This is mainly the time used to place [Placeable]s in [Text] composable.
      */
     @Test
     fun first_layout() {
-        benchmarkRule.benchmarkFirstLayout(caseFactory)
+        benchmarkRule.benchmarkFirstLayoutFast(caseFactory)
     }
 
     /**
-     * Measure the time taken by first time draw the Text composable with styled text
-     * as input.
+     * Measure the time taken by first time draw the [Text] composable with the given input.
      */
     @Test
     fun first_draw() {
-        benchmarkRule.benchmarkFirstDraw(caseFactory)
+        benchmarkRule.benchmarkFirstDrawFast(caseFactory)
     }
 
     /**
-     * Measure the time taken by layout a Text composable with styled text input, when
-     * layout constrains changed.
+     * Measure the time taken by layout the [Text] composable after the layout constrains changed.
      * This is mainly the time used to re-measure and re-layout the composable.
      */
     @Test
@@ -131,10 +124,42 @@ class TextMultiStyleBenchmark(
     }
 
     /**
-     * Measure the time taken by re-draw a Text composable with styled text input.
+     * Measure the time taken by redrawing the [Text] composable.
      */
     @Test
     fun draw() {
         benchmarkRule.benchmarkDrawPerf(caseFactory)
+    }
+
+    /**
+     * Measure the time taken to recompose the [Text] composable when color gets toggled.
+     */
+    @Test
+    fun toggleColor_recompose() {
+        benchmarkRule.toggleStateBenchmarkRecompose(caseFactory)
+    }
+
+    /**
+     * Measure the time taken to measure the [Text] composable when color gets toggled.
+     */
+    @Test
+    fun toggleColor_measure() {
+        benchmarkRule.toggleStateBenchmarkMeasure(caseFactory)
+    }
+
+    /**
+     * Measure the time taken to layout the [Text] composable when color gets toggled.
+     */
+    @Test
+    fun toggleColor_layout() {
+        benchmarkRule.toggleStateBenchmarkLayout(caseFactory)
+    }
+
+    /**
+     * Measure the time taken to draw the [Text] composable when color gets toggled.
+     */
+    @Test
+    fun toggleColor_draw() {
+        benchmarkRule.toggleStateBenchmarkDraw(caseFactory)
     }
 }
