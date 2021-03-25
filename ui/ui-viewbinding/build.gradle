@@ -31,6 +31,7 @@ dependencies {
 
     implementation(KOTLIN_STDLIB)
     implementation(project(":compose:ui:ui"))
+    implementation(project(":compose:ui:ui-util"))
     implementation(VIEW_BINDING)
     // Required to ensure that Fragments inflated by AndroidViewBinding
     // actually appear after configuration changes
