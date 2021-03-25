@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package androidx.compose.material.benchmark
+package androidx.compose.foundation.benchmark.text
 
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.width
