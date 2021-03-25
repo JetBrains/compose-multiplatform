@@ -358,4 +358,34 @@ internal class DesktopOwner(
         oldMoveFilters = newMoveFilters.filterIsInstance<PointerMoveEventFilter>()
         newMoveFilters = mutableListOf()
     }
+
+    internal fun onPointerEnter(position: Offset) {
+        var onEnterConsumed = false
+        // TODO: do we actually need that?
+        measureAndLayout()
+        root.hitTest(position, newMoveFilters)
+        for (
+            filter in newMoveFilters
+                .asReversed()
+                .asSequence()
+                .filterIsInstance<PointerMoveEventFilter>()
+        ) {
+            if (!onEnterConsumed) {
+                onEnterConsumed = filter.onEnterHandler()
+            }
+        }
+        oldMoveFilters = newMoveFilters.filterIsInstance<PointerMoveEventFilter>()
+        newMoveFilters = mutableListOf()
+    }
+
+    internal fun onPointerExit() {
+        var onExitConsumed = false
+        for (filter in oldMoveFilters.asReversed()) {
+            if (!onExitConsumed) {
+                onExitConsumed = filter.onExitHandler()
+            }
+        }
+        oldMoveFilters = listOf()
+        newMoveFilters = mutableListOf()
+    }
 }
