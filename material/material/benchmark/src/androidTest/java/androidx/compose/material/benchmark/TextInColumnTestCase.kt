@@ -19,6 +19,8 @@ package androidx.compose.material.benchmark
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentSize
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
@@ -53,6 +55,7 @@ class TextInColumnTestCase(
     override fun ContentWrappers(content: @Composable () -> Unit) {
         Column(
             modifier = Modifier.wrapContentSize(Alignment.Center).width(width)
+                .verticalScroll(rememberScrollState())
         ) {
             content()
         }
