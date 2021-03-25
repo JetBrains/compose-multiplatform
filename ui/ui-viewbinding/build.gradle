@@ -32,6 +32,9 @@ dependencies {
     implementation(KOTLIN_STDLIB)
     implementation(project(":compose:ui:ui"))
     implementation(VIEW_BINDING)
+    // Required to ensure that Fragments inflated by AndroidViewBinding
+    // actually appear after configuration changes
+    implementation("androidx.fragment:fragment-ktx:1.3.2")
 
     androidTestImplementation(project(":compose:foundation:foundation"))
     androidTestImplementation(project(":compose:test-utils"))
