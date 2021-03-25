@@ -21,6 +21,9 @@ import androidx.compose.ui.text.Placeholder
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.Font
+import androidx.compose.ui.text.resolveTextDirection
+import androidx.compose.ui.text.style.ResolvedTextDirection
+import androidx.compose.ui.text.style.TextDirection
 import androidx.compose.ui.unit.Density
 import org.jetbrains.skija.paragraph.Paragraph
 import kotlin.math.ceil
@@ -52,6 +55,7 @@ internal class DesktopParagraphIntrinsics(
 ) : ParagraphIntrinsics {
 
     val fontLoader = resourceLoader as FontLoader
+    val textDirection = resolveTextDirection(style.textDirection)
     val builder: ParagraphBuilder
     var para: Paragraph
     init {
@@ -61,7 +65,8 @@ internal class DesktopParagraphIntrinsics(
             textStyle = style,
             spanStyles = spanStyles,
             placeholders = placeholders,
-            density = density
+            density = density,
+            textDirection = textDirection
         )
         para = builder.build()
 
@@ -70,4 +75,26 @@ internal class DesktopParagraphIntrinsics(
 
     override val minIntrinsicWidth = ceil(para.getMinIntrinsicWidth())
     override val maxIntrinsicWidth = ceil(para.getMaxIntrinsicWidth())
+
+    private fun resolveTextDirection(direction: TextDirection?): ResolvedTextDirection {
+        return when (direction) {
+            TextDirection.Ltr -> ResolvedTextDirection.Ltr
+            TextDirection.Rtl -> ResolvedTextDirection.Rtl
+            TextDirection.Content -> contentBasedTextDirection() ?: ResolvedTextDirection.Ltr
+            TextDirection.ContentOrLtr -> contentBasedTextDirection() ?: ResolvedTextDirection.Ltr
+            TextDirection.ContentOrRtl -> contentBasedTextDirection() ?: ResolvedTextDirection.Rtl
+            null -> ResolvedTextDirection.Ltr
+        }
+    }
+
+    private fun contentBasedTextDirection(): ResolvedTextDirection? {
+        for (char in text) {
+            when (char.directionality) {
+                CharDirectionality.LEFT_TO_RIGHT -> return ResolvedTextDirection.Ltr
+                CharDirectionality.RIGHT_TO_LEFT -> return ResolvedTextDirection.Rtl
+                else -> continue
+            }
+        }
+        return null
+    }
 }
