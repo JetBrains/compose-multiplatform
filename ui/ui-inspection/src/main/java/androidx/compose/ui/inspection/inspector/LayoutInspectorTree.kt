@@ -119,7 +119,7 @@ class LayoutInspectorTree {
         return node.parameters.mapIndexed { index, parameter ->
             parameterFactory.create(
                 rootId,
-                node,
+                node.id,
                 parameter.name,
                 parameter.value,
                 index,
@@ -149,7 +149,7 @@ class LayoutInspectorTree {
         val parameter = node.parameters[reference.parameterIndex]
         return parameterFactory.expand(
             rootId,
-            node,
+            node.id,
             parameter.name,
             parameter.value,
             reference,
