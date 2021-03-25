@@ -15,6 +15,7 @@ import org.jetbrains.compose.desktop.application.internal.OS
 import org.jetbrains.compose.desktop.application.internal.currentOS
 import org.jetbrains.compose.desktop.application.internal.executableName
 import org.jetbrains.compose.desktop.application.internal.ioFile
+import org.jetbrains.compose.desktop.tasks.AbstractComposeDesktopTask
 import javax.inject.Inject
 
 // Custom task is used instead of Exec, because Exec does not support
