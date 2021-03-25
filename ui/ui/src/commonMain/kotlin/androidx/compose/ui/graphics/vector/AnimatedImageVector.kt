@@ -31,14 +31,14 @@ import androidx.compose.ui.util.fastMaxBy
  *
  * @param imageVector The [ImageVector] to be animated. This is represented with the
  * `android:drawable` parameter of an `<animated-vector>` element.
- * @param targets The list of [AnimatedVectorTarget]s that specify animations for each of the
- * elements in the drawable. This is represented with `<target>` elements in `<animated-vector>`.
- * This list is expected to be *immutable*.
  */
 @ExperimentalComposeUiApi
 @Immutable
 class AnimatedImageVector internal constructor(
     val imageVector: ImageVector,
+    // The list of [AnimatedVectorTarget]s that specify animations for each of the elements in the
+    // drawable. This is represented with `<target>` elements in `<animated-vector>`. This list is
+    // expected to be *immutable*.
     internal val targets: List<AnimatedVectorTarget>
 ) {
 
