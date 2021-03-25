@@ -1681,6 +1681,33 @@ class LayoutNodeTest {
         assertEquals(2, owner.layoutChangeCount)
     }
 
+    @Test
+    fun reuseModifiersThatImplementMultipleModifierInterfaces() {
+        val drawAndLayoutModifier: Modifier = object : DrawModifier, LayoutModifier {
+            override fun MeasureScope.measure(
+                measurable: Measurable,
+                constraints: Constraints
+            ): MeasureResult {
+                val placeable = measurable.measure(constraints)
+                return layout(placeable.width, placeable.height) {
+                    placeable.placeRelative(IntOffset.Zero)
+                }
+            }
+            override fun ContentDrawScope.draw() {
+                drawContent()
+            }
+        }
+        val a = Modifier.then(EmptyLayoutModifier()).then(drawAndLayoutModifier)
+        val b = Modifier.then(EmptyLayoutModifier()).then(drawAndLayoutModifier)
+        val node = LayoutNode(20, 20, 100, 100)
+        val owner = MockOwner()
+        node.attach(owner)
+        node.modifier = a
+        assertEquals(3, node.getModifierInfo().size)
+        node.modifier = b
+        assertEquals(3, node.getModifierInfo().size)
+    }
+
     private fun createSimpleLayout(): Triple<LayoutNode, LayoutNode, LayoutNode> {
         val layoutNode = ZeroSizedLayoutNode()
         val child1 = ZeroSizedLayoutNode()
@@ -1694,6 +1721,18 @@ class LayoutNodeTest {
 
     private class PointerInputModifierImpl(override val pointerInputFilter: PointerInputFilter) :
         PointerInputModifier
+}
+
+private class EmptyLayoutModifier : LayoutModifier {
+    override fun MeasureScope.measure(
+        measurable: Measurable,
+        constraints: Constraints
+    ): MeasureResult {
+        val placeable = measurable.measure(constraints)
+        return layout(placeable.width, placeable.height) {
+            placeable.placeRelative(IntOffset.Zero)
+        }
+    }
 }
 
 @OptIn(InternalCoreApi::class)
