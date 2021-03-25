@@ -14,6 +14,7 @@ import org.jetbrains.compose.desktop.application.internal.JavaRuntimeProperties
 import org.jetbrains.compose.desktop.application.internal.executableName
 import org.jetbrains.compose.desktop.application.internal.ioFile
 import org.jetbrains.compose.desktop.application.internal.notNullProperty
+import org.jetbrains.compose.desktop.tasks.AbstractComposeDesktopTask
 import java.io.File
 
 // __COMPOSE_NATIVE_DISTRIBUTIONS_MIN_JAVA_VERSION__

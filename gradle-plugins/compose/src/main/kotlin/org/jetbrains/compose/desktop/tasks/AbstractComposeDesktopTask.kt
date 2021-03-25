@@ -3,7 +3,7 @@
  * Use of this source code is governed by the Apache 2.0 license that can be found in the LICENSE.txt file.
  */
 
-package org.jetbrains.compose.desktop.application.tasks
+package org.jetbrains.compose.desktop.tasks
 
 import org.gradle.api.DefaultTask
 import org.gradle.api.file.Directory

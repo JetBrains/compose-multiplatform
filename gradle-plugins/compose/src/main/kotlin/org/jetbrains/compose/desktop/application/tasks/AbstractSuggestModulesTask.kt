@@ -16,6 +16,7 @@ import org.jetbrains.compose.desktop.application.dsl.DEFAULT_RUNTIME_MODULES
 import org.jetbrains.compose.desktop.application.internal.*
 import org.jetbrains.compose.desktop.application.internal.ComposeProperties
 import org.jetbrains.compose.desktop.application.internal.normalizedPath
+import org.jetbrains.compose.desktop.tasks.AbstractComposeDesktopTask
 import org.jetbrains.kotlin.konan.file.File
 
 abstract class AbstractSuggestModulesTask : AbstractComposeDesktopTask() {

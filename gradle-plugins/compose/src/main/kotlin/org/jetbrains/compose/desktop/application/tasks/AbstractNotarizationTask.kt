@@ -12,6 +12,7 @@ import org.gradle.api.tasks.Optional
 import org.jetbrains.compose.desktop.application.dsl.MacOSNotarizationSettings
 import org.jetbrains.compose.desktop.application.internal.nullableProperty
 import org.jetbrains.compose.desktop.application.internal.validation.validate
+import org.jetbrains.compose.desktop.tasks.AbstractComposeDesktopTask
 
 abstract class AbstractNotarizationTask : AbstractComposeDesktopTask() {
     @get:Input
