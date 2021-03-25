@@ -18,5 +18,6 @@
     package="androidx.compose.ui.viewbinding.samples">
     <application>
         <activity android:name="androidx.compose.ui.samples.InflatedFragmentActivity"/>
+        <activity android:name="androidx.compose.ui.samples.ChildInflatedFragmentActivity"/>
     </application>
 </manifest>
