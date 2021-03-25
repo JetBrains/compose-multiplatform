@@ -19,8 +19,8 @@ package androidx.compose.ui.viewinterop
 import android.view.KeyEvent
 import android.view.View
 import android.widget.EditText
-import androidx.activity.ComponentActivity
 import androidx.compose.ui.platform.LocalView
+import androidx.compose.ui.test.TestActivity
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.MediumTest
@@ -33,7 +33,7 @@ import org.junit.runner.RunWith
 @RunWith(AndroidJUnit4::class)
 class EditTextInteropTest {
     @get:Rule
-    val rule = createAndroidComposeRule<ComponentActivity>()
+    val rule = createAndroidComposeRule<TestActivity>()
 
     @Test
     fun hardwareKeyInEmbeddedView() {

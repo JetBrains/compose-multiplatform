@@ -19,12 +19,12 @@ package androidx.compose.ui
 import android.content.Context
 import android.os.Bundle
 import android.view.ViewGroup
-import androidx.activity.ComponentActivity
 import androidx.compose.foundation.layout.Box
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.layout.layout
 import androidx.compose.ui.platform.ComposeView
+import androidx.compose.ui.test.TestActivity
 import androidx.compose.ui.unit.Constraints
 import androidx.lifecycle.Lifecycle
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -108,7 +108,7 @@ class RecyclerViewIntegrationTest {
     }
 }
 
-class RecyclerViewActivity : ComponentActivity() {
+class RecyclerViewActivity : TestActivity() {
 
     private lateinit var recyclerView: RecyclerView
 

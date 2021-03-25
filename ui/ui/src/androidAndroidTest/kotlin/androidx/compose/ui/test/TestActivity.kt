@@ -15,15 +15,21 @@
  */
 package androidx.compose.ui.test
 
+import android.os.Build
 import android.view.KeyEvent
 import androidx.activity.ComponentActivity
+import androidx.compose.ui.platform.ViewLayer
 import java.util.concurrent.CountDownLatch
 
-class TestActivity : ComponentActivity() {
+open class TestActivity : ComponentActivity() {
 
     var receivedKeyEvent: KeyEvent? = null
 
     var hasFocusLatch = CountDownLatch(1)
+
+    init {
+        setViewLayerTypeForApi28()
+    }
 
     override fun onWindowFocusChanged(hasFocus: Boolean) {
         super.onWindowFocusChanged(hasFocus)
@@ -35,5 +41,17 @@ class TestActivity : ComponentActivity() {
     override fun onKeyDown(keyCode: Int, event: KeyEvent?): Boolean {
         receivedKeyEvent = event
         return super.onKeyDown(keyCode, event)
+    }
+}
+
+/**
+ * We have a ViewLayer that doesn't use reflection that won't be activated on
+ * any Google devices, so we must trigger it directly. Here, we use it on all P
+ * devices. The normal ViewLayer is used on L devices. RenderNodeLayer is used
+ * on all other devices.
+ */
+internal fun setViewLayerTypeForApi28() {
+    if (Build.VERSION.SDK_INT == Build.VERSION_CODES.P) {
+        ViewLayer.shouldUseDispatchDraw = true
     }
 }
