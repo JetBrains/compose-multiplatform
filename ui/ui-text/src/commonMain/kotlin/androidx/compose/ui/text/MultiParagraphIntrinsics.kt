@@ -47,13 +47,13 @@ class MultiParagraphIntrinsics(
     resourceLoader: Font.ResourceLoader
 ) : ParagraphIntrinsics {
 
-    override val minIntrinsicWidth: Float by lazy {
+    override val minIntrinsicWidth: Float by lazy(LazyThreadSafetyMode.NONE) {
         infoList.fastMaxBy {
             it.intrinsics.minIntrinsicWidth
         }?.intrinsics?.minIntrinsicWidth ?: 0f
     }
 
-    override val maxIntrinsicWidth: Float by lazy {
+    override val maxIntrinsicWidth: Float by lazy(LazyThreadSafetyMode.NONE) {
         infoList.fastMaxBy {
             it.intrinsics.maxIntrinsicWidth
         }?.intrinsics?.maxIntrinsicWidth ?: 0f
