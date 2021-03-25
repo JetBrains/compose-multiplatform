@@ -78,7 +78,7 @@ fun LinearProgressIndicator(
             .size(LinearIndicatorWidth, LinearIndicatorHeight)
             .focusable()
     ) {
-        val strokeWidth = ProgressIndicatorDefaults.StrokeWidth.toPx()
+        val strokeWidth = size.height
         drawLinearIndicatorBackground(backgroundColor, strokeWidth)
         drawLinearIndicator(0f, progress, color, strokeWidth)
     }
@@ -152,7 +152,7 @@ fun LinearProgressIndicator(
             .size(LinearIndicatorWidth, LinearIndicatorHeight)
             .focusable()
     ) {
-        val strokeWidth = ProgressIndicatorDefaults.StrokeWidth.toPx()
+        val strokeWidth = size.height
         drawLinearIndicatorBackground(backgroundColor, strokeWidth)
         if (firstLineHead - firstLineTail > 0) {
             drawLinearIndicator(
