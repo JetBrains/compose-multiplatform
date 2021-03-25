@@ -1,3 +1,4 @@
+<?xml version="1.0" encoding="utf-8"?>
 <!--
   ~ Copyright (C) 2021 The Android Open Source Project
   ~
@@ -20,9 +21,8 @@
 
     <application>
         <activity android:name=".CatalogActivity"
-            android:theme="@android:style/Theme.NoTitleBar"
-            android:configChanges="orientation|screenSize"
-            android:label="Catalog">
+            android:theme="@style/Theme.Catalog"
+            android:label="@string/app_name">
         </activity>
     </application>
 </manifest>

@@ -28,20 +28,17 @@ dependencies {
     kotlinPlugin project(":compose:compiler:compiler")
     implementation(KOTLIN_STDLIB)
 
-    implementation project(":compose:foundation:foundation")
-    implementation project(":compose:foundation:foundation-layout")
     implementation project(":compose:integration-tests:demos:common")
+    implementation project(":compose:ui:ui")
     implementation project(":compose:material:material")
     implementation project(":compose:material:material:material-samples")
-    implementation project(":compose:runtime:runtime")
-    implementation project(":compose:ui:ui")
-    implementation project(":compose:ui:ui-text")
     implementation project(":activity:activity-compose")
+    implementation project(":navigation:navigation-compose")
 }
 
 androidx {
-    name = "Compose Material Catalog"
+    name = "Compose Material catalog"
     publish = Publish.NONE
     inceptionYear = "2021"
-    description = "This is a project for a Material catalog."
+    description = "This is a project for a Compose Material catalog."
 }
