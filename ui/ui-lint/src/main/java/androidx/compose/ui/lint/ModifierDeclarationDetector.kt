@@ -19,6 +19,7 @@
 package androidx.compose.ui.lint
 
 import androidx.compose.lint.Names
+import androidx.compose.lint.inheritsFrom
 import androidx.compose.lint.isComposable
 import androidx.compose.ui.lint.ModifierDeclarationDetector.Companion.ComposableModifierFactory
 import androidx.compose.ui.lint.ModifierDeclarationDetector.Companion.ModifierFactoryReturnType
@@ -34,7 +35,6 @@ import com.android.tools.lint.detector.api.Severity
 import com.android.tools.lint.detector.api.SourceCodeScanner
 import com.intellij.psi.PsiClass
 import com.intellij.psi.PsiType
-import com.intellij.psi.util.InheritanceUtil
 import org.jetbrains.kotlin.psi.KtCallableDeclaration
 import org.jetbrains.kotlin.psi.KtDeclarationWithBody
 import org.jetbrains.kotlin.psi.KtFunction
@@ -66,7 +66,7 @@ class ModifierDeclarationDetector : Detector(), SourceCodeScanner {
             val returnType = node.returnType ?: return
 
             // Ignore functions that do not return Modifier or something implementing Modifier
-            if (!InheritanceUtil.isInheritor(returnType, Names.Ui.Modifier.javaFqn)) return
+            if (!returnType.inheritsFrom(Names.Ui.Modifier)) return
 
             val source = node.sourcePsi
 

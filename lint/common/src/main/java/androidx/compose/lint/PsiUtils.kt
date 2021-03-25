@@ -19,6 +19,7 @@ package androidx.compose.lint
 import com.intellij.psi.PsiJavaFile
 import com.intellij.psi.PsiMethod
 import com.intellij.psi.PsiType
+import com.intellij.psi.util.InheritanceUtil
 
 /**
  * Returns whether [this] has [packageName] as its package name.
@@ -33,3 +34,9 @@ fun PsiMethod.isInPackageName(packageName: PackageName): Boolean {
  */
 val PsiMethod.returnsUnit
     get() = returnType == PsiType.VOID
+
+/**
+ * @return whether [this] inherits from [name]. Returns `true` if [this] _is_ directly [name].
+ */
+fun PsiType.inheritsFrom(name: Name) =
+    InheritanceUtil.isInheritor(this, name.javaFqn)
