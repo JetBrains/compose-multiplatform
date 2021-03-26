@@ -29,7 +29,6 @@ import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.ViewTreeLifecycleOwner
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.CoroutineStart
-import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.android.asCoroutineDispatcher
 import kotlinx.coroutines.launch
@@ -204,7 +203,6 @@ internal val View.windowRecomposer: Recomposer
         }
     }
 
-@OptIn(ExperimentalCoroutinesApi::class)
 private fun View.createLifecycleAwareViewTreeRecomposer(): Recomposer {
     val currentThreadContext = AndroidUiDispatcher.CurrentThread
     val pausableClock = currentThreadContext[MonotonicFrameClock]?.let {

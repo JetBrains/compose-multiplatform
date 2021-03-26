@@ -17,15 +17,12 @@
 package androidx.compose.runtime
 
 import kotlinx.coroutines.CoroutineStart
-import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withTimeout
 import kotlin.test.Test
 import kotlin.test.assertTrue
 
-// OptIn for CoroutineStart.UNDISPATCHED
-@OptIn(ExperimentalCoroutinesApi::class)
 class LatchTest {
     @Test
     fun openDoesntSuspend() = runBlocking {

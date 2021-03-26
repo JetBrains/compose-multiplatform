@@ -53,7 +53,6 @@ import androidx.compose.ui.unit.Velocity
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.util.lerp
 import kotlinx.coroutines.CancellationException
-import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.filter
@@ -544,7 +543,6 @@ internal fun <T : Any> rememberSwipeableStateFor(
  * in order to animate to the next state, even if the positional [thresholds] have not been reached.
  */
 @ExperimentalMaterialApi
-@OptIn(ExperimentalCoroutinesApi::class)
 fun <T> Modifier.swipeable(
     state: SwipeableState<T>,
     anchors: Map<Float, T>,

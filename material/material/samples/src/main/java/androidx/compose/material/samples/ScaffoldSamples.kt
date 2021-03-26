@@ -24,8 +24,8 @@ import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.CircleShape
@@ -57,12 +57,9 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
-import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.FlowPreview
-import kotlinx.coroutines.channels.BroadcastChannel
 import kotlinx.coroutines.channels.Channel
-import kotlinx.coroutines.flow.asFlow
 import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
 import kotlin.math.abs
 import kotlin.math.roundToInt
@@ -260,16 +257,15 @@ fun ScaffoldWithCustomSnackbar() {
 }
 
 @Sampled
-@OptIn(ExperimentalCoroutinesApi::class, FlowPreview::class)
 @Composable
 fun ScaffoldWithCoroutinesSnackbar() {
     // decouple snackbar host state from scaffold state for demo purposes
     // this state, channel and flow is for demo purposes to demonstrate business logic layer
     val snackbarHostState = remember { SnackbarHostState() }
     // we allow only one snackbar to be in the queue here, hence conflated
-    val channel = remember { BroadcastChannel<Int>(Channel.Factory.CONFLATED) }
+    val channel = remember { Channel<Int>(Channel.Factory.CONFLATED) }
     LaunchedEffect(channel) {
-        channel.asFlow().collect { index ->
+        channel.receiveAsFlow().collect { index ->
             val result = snackbarHostState.showSnackbar(
                 message = "Snackbar # $index",
                 actionLabel = "Action on $index"

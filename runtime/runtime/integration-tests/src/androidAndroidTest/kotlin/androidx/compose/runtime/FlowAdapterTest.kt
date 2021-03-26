@@ -16,16 +16,13 @@
 
 package androidx.compose.runtime
 
+import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.LargeTest
-import androidx.compose.ui.test.junit4.createComposeRule
 import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.FlowPreview
-import kotlinx.coroutines.channels.BroadcastChannel
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.asFlow
 import org.junit.Ignore
 import org.junit.Rule
 import org.junit.Test
@@ -34,29 +31,22 @@ import kotlin.coroutines.CoroutineContext
 
 @LargeTest
 @RunWith(AndroidJUnit4::class)
-@ExperimentalCoroutinesApi
-@FlowPreview
 class FlowAdapterTest {
-
-    private class FlowChannel<T> {
-        val channel = BroadcastChannel<T>(1)
-        val flow = channel.asFlow()
-    }
 
     @get:Rule
     val rule = createComposeRule()
 
     @Test
     fun weReceiveSubmittedValue() {
-        val stream = FlowChannel<String>()
+        val stream = MutableSharedFlow<String>(extraBufferCapacity = 1)
 
         var realValue: String? = null
         rule.setContent {
-            realValue = stream.flow.collectAsState(initial = null).value
+            realValue = stream.collectAsState(initial = null).value
         }
 
         rule.runOnIdle {
-            stream.channel.offer("value")
+            stream.tryEmit("value")
         }
 
         rule.runOnIdle {
@@ -66,20 +56,20 @@ class FlowAdapterTest {
 
     @Test
     fun weReceiveSecondValue() {
-        val stream = FlowChannel<String>()
+        val stream = MutableSharedFlow<String>(extraBufferCapacity = 1)
 
         var realValue: String? = null
         rule.setContent {
-            realValue = stream.flow.collectAsState(initial = null).value
+            realValue = stream.collectAsState(initial = null).value
         }
 
         rule.runOnIdle {
-            stream.channel.offer("value")
+            stream.tryEmit("value")
         }
 
         rule.runOnIdle {
             assertThat(realValue).isEqualTo("value")
-            stream.channel.offer("value2")
+            stream.tryEmit("value2")
         }
 
         rule.runOnIdle {
@@ -89,19 +79,19 @@ class FlowAdapterTest {
 
     @Test
     fun noUpdatesAfterDispose() {
-        val stream = FlowChannel<String>()
+        val stream = MutableSharedFlow<String>(extraBufferCapacity = 1)
         var emit by mutableStateOf(true)
         var realValue: String? = "to-be-updated"
         rule.setContent {
             if (emit) {
-                realValue = stream.flow.collectAsState(initial = null).value
+                realValue = stream.collectAsState(initial = null).value
             }
         }
 
         rule.runOnIdle { emit = false }
 
         rule.runOnIdle {
-            stream.channel.offer("value")
+            stream.tryEmit("value")
         }
 
         rule.runOnIdle {
@@ -111,10 +101,10 @@ class FlowAdapterTest {
 
     @Test
     fun testCollectionWithInitialValue() {
-        val stream = FlowChannel<String>()
+        val stream = MutableSharedFlow<String>(extraBufferCapacity = 1)
         var realValue = "to-be-updated"
         rule.setContent {
-            realValue = stream.flow.collectAsState("value").value
+            realValue = stream.collectAsState("value").value
         }
 
         assertThat(realValue).isEqualTo("value")
@@ -122,14 +112,14 @@ class FlowAdapterTest {
 
     @Test
     fun testOverridingInitialValue() {
-        val stream = FlowChannel<String>()
+        val stream = MutableSharedFlow<String>(extraBufferCapacity = 1)
         var realValue = "to-be-updated"
         rule.setContent {
-            realValue = stream.flow.collectAsState("value").value
+            realValue = stream.collectAsState("value").value
         }
 
         rule.runOnIdle {
-            stream.channel.offer("value2")
+            stream.tryEmit("value2")
         }
 
         rule.runOnIdle {
@@ -139,12 +129,12 @@ class FlowAdapterTest {
 
     @Test
     fun theCurrentValueIsNotLostWhenWeUpdatedInitial() {
-        val stream = FlowChannel<String>()
+        val stream = MutableSharedFlow<String>(extraBufferCapacity = 1)
         var initial by mutableStateOf("initial1")
 
         var realValue: String? = null
         rule.setContent {
-            realValue = stream.flow.collectAsState(initial).value
+            realValue = stream.collectAsState(initial).value
         }
 
         rule.runOnIdle {
@@ -158,13 +148,13 @@ class FlowAdapterTest {
 
     @Test
     fun replacingStreams() {
-        val stream1 = FlowChannel<String>()
-        val stream2 = FlowChannel<String>()
+        val stream1 = MutableSharedFlow<String>(extraBufferCapacity = 1)
+        val stream2 = MutableSharedFlow<String>(extraBufferCapacity = 1)
         var stream by mutableStateOf(stream1)
 
         var realValue: String? = null
         rule.setContent {
-            realValue = stream.flow.collectAsState(initial = null).value
+            realValue = stream.collectAsState(initial = null).value
         }
 
         rule.runOnIdle {
@@ -172,11 +162,11 @@ class FlowAdapterTest {
         }
 
         rule.runOnIdle {
-            stream2.channel.offer("stream2")
+            stream2.tryEmit("stream2")
         }
 
         rule.runOnIdle {
-            stream1.channel.offer("stream1")
+            stream1.tryEmit("stream1")
         }
 
         rule.runOnIdle {
@@ -186,17 +176,17 @@ class FlowAdapterTest {
 
     @Test
     fun theCurrentValueIsNotLostWhenWeReplacedStreams() {
-        val stream1 = FlowChannel<String>()
-        val stream2 = FlowChannel<String>()
+        val stream1 = MutableSharedFlow<String>(extraBufferCapacity = 1)
+        val stream2 = MutableSharedFlow<String>(extraBufferCapacity = 1)
         var stream by mutableStateOf(stream1)
 
         var realValue: String? = null
         rule.setContent {
-            realValue = stream.flow.collectAsState(initial = null).value
+            realValue = stream.collectAsState(initial = null).value
         }
 
         rule.runOnIdle {
-            stream1.channel.offer("value")
+            stream1.tryEmit("value")
         }
 
         rule.runOnIdle {
@@ -211,15 +201,15 @@ class FlowAdapterTest {
     @Ignore("b/177256608")
     @Test
     fun observingOnCustomContext() {
-        val stream = FlowChannel<String>()
+        val stream = MutableSharedFlow<String>(extraBufferCapacity = 1)
 
         var realValue: String? = null
         rule.setContent {
-            realValue = stream.flow.collectAsState(null, Dispatchers.Default).value
+            realValue = stream.collectAsState(null, Dispatchers.Default).value
         }
 
         rule.runOnUiThread {
-            stream.channel.offer("value")
+            stream.tryEmit("value")
         }
 
         rule.waitUntil { realValue != null }
@@ -228,16 +218,16 @@ class FlowAdapterTest {
 
     @Test
     fun theCurrentValueIsNotLostWhenWeReplacedContext() {
-        val stream = FlowChannel<String>()
+        val stream = MutableSharedFlow<String>(extraBufferCapacity = 1)
         var context by mutableStateOf<CoroutineContext>(Dispatchers.Main)
 
         var realValue: String? = null
         rule.setContent {
-            realValue = stream.flow.collectAsState(null, context).value
+            realValue = stream.collectAsState(null, context).value
         }
 
         rule.runOnIdle {
-            stream.channel.offer("value")
+            stream.tryEmit("value")
         }
 
         rule.runOnIdle {

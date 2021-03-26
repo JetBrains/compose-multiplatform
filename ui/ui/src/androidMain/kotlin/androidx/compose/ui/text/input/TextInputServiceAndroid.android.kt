@@ -28,7 +28,6 @@ import android.view.inputmethod.InputConnection
 import android.view.inputmethod.InputMethodManager
 import androidx.compose.ui.geometry.Rect
 import androidx.compose.ui.text.TextRange
-import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.channels.Channel
 import kotlin.math.roundToInt
 
@@ -158,7 +157,6 @@ internal class TextInputServiceAndroid(val view: View) : PlatformTextInputServic
         showKeyboardChannel.offer(false)
     }
 
-    @OptIn(FlowPreview::class)
     suspend fun keyboardVisibilityEventLoop() {
         // TODO(b/180071033): Allow for more IMPLICIT flag to be passed.
         for (showKeyboard in showKeyboardChannel) {
