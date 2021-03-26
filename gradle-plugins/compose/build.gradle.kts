@@ -12,10 +12,13 @@ plugins {
 
 gradlePluginConfig {
     pluginId = "org.jetbrains.compose"
-    artifactId = "compose-gradle-plugin"
-    displayName = "JetBrains Compose Plugin"
-    description = "JetBrains Compose Gradle plugin for easy configuration"
     implementationClass = "org.jetbrains.compose.ComposePlugin"
+}
+
+mavenPublicationConfig {
+    displayName = "JetBrains Compose Gradle Plugin"
+    description = "JetBrains Compose Gradle plugin for easy configuration"
+    artifactId = "compose-gradle-plugin"
 }
 
 buildConfig {
