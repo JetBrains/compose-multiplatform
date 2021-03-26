@@ -89,7 +89,9 @@ import androidx.compose.ui.node.Owner
 import androidx.compose.ui.node.OwnerSnapshotObserver
 import androidx.compose.ui.node.RootForTest
 import androidx.compose.ui.semantics.SemanticsModifierCore
+import androidx.compose.ui.semantics.SemanticsNode
 import androidx.compose.ui.semantics.SemanticsOwner
+import androidx.compose.ui.semantics.outerSemantics
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.input.PlatformTextInputService
 import androidx.compose.ui.text.input.TextInputService
@@ -100,7 +102,10 @@ import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.util.trace
 import androidx.compose.ui.viewinterop.AndroidViewHolder
+import androidx.core.view.AccessibilityDelegateCompat
 import androidx.core.view.ViewCompat
+import androidx.core.view.accessibility.AccessibilityNodeInfoCompat
+import androidx.core.view.accessibility.AccessibilityNodeProviderCompat
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.ViewTreeLifecycleOwner
@@ -224,7 +229,7 @@ internal class AndroidComposeView(context: Context) :
     override var showLayoutBounds = false
 
     private var _androidViewsHandler: AndroidViewsHandler? = null
-    private val androidViewsHandler: AndroidViewsHandler
+    internal val androidViewsHandler: AndroidViewsHandler
         get() {
             if (_androidViewsHandler == null) {
                 _androidViewsHandler = AndroidViewsHandler(context)
@@ -399,6 +404,30 @@ internal class AndroidComposeView(context: Context) :
     fun addAndroidView(view: AndroidViewHolder, layoutNode: LayoutNode) {
         androidViewsHandler.holderToLayoutNode[view] = layoutNode
         androidViewsHandler.addView(view)
+        androidViewsHandler.layoutNodeToHolder[layoutNode] = view
+        // Fetching AccessibilityNodeInfo from a View which is not set to
+        // IMPORTANT_FOR_ACCESSIBILITY_YES will return null.
+        ViewCompat.setImportantForAccessibility(
+            view,
+            ViewCompat.IMPORTANT_FOR_ACCESSIBILITY_YES
+        )
+        val thisView = this
+        ViewCompat.setAccessibilityDelegate(
+            view,
+            object : AccessibilityDelegateCompat() {
+                override fun onInitializeAccessibilityNodeInfo(
+                    host: View?,
+                    info: AccessibilityNodeInfoCompat?
+                ) {
+                    super.onInitializeAccessibilityNodeInfo(host, info)
+                    var parentId = SemanticsNode(layoutNode.outerSemantics!!, true).parent!!.id
+                    if (parentId == semanticsOwner.rootSemanticsNode.id) {
+                        parentId = AccessibilityNodeProviderCompat.HOST_VIEW_ID
+                    }
+                    info!!.setParent(thisView, parentId)
+                }
+            }
+        )
     }
 
     /**
@@ -408,6 +437,13 @@ internal class AndroidComposeView(context: Context) :
     fun removeAndroidView(view: AndroidViewHolder) {
         androidViewsHandler.removeView(view)
         androidViewsHandler.holderToLayoutNode.remove(view)
+        androidViewsHandler.layoutNodeToHolder.remove(
+            androidViewsHandler.holderToLayoutNode[view]
+        )
+        ViewCompat.setImportantForAccessibility(
+            view,
+            ViewCompat.IMPORTANT_FOR_ACCESSIBILITY_AUTO
+        )
     }
 
     /**
@@ -789,6 +825,63 @@ internal class AndroidComposeView(context: Context) :
 
     public override fun dispatchHoverEvent(event: MotionEvent): Boolean {
         return accessibilityDelegate.dispatchHoverEvent(event)
+    }
+
+    private fun findViewByAccessibilityIdRootedAtCurrentView(
+        accessibilityId: Int,
+        currentView: View
+    ): View? {
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.Q) {
+            val getAccessibilityViewIdMethod = View::class.java
+                .getDeclaredMethod("getAccessibilityViewId")
+            getAccessibilityViewIdMethod.isAccessible = true
+            if (getAccessibilityViewIdMethod.invoke(currentView) == accessibilityId) {
+                return currentView
+            }
+            if (currentView is ViewGroup) {
+                for (i in 0 until currentView.childCount) {
+                    val foundView = findViewByAccessibilityIdRootedAtCurrentView(
+                        accessibilityId,
+                        currentView.getChildAt(i)
+                    )
+                    if (foundView != null) {
+                        return foundView
+                    }
+                }
+            }
+        }
+        return null
+    }
+
+    /**
+     * This overrides an @hide method in ViewGroup. Because of the @hide, the override keyword
+     * cannot be used, but the override works anyway because the ViewGroup method is not final.
+     * In Android P and earlier, the call path is
+     * AccessibilityInteractionController#findViewByAccessibilityId ->
+     * View#findViewByAccessibilityId -> ViewGroup#findViewByAccessibilityIdTraversal. In Android
+     * Q and later, AccessibilityInteractionController#findViewByAccessibilityId uses
+     * AccessibilityNodeIdManager and findViewByAccessibilityIdTraversal is only used by autofill.
+     */
+    public fun findViewByAccessibilityIdTraversal(accessibilityId: Int): View? {
+        try {
+            // AccessibilityInteractionController#findViewByAccessibilityId doesn't call this
+            // method in Android Q and later. Ideally, we should only define this method in
+            // Android P and earlier, but since we don't have a way to do so, we can simply
+            // invoke the hidden parent method after Android P. If in new android, the hidden method
+            // ViewGroup#findViewByAccessibilityIdTraversal signature is changed or removed, we can
+            // simply return null here because there will be no call to this method.
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+                val findViewByAccessibilityIdTraversalMethod = View::class.java
+                    .getDeclaredMethod("findViewByAccessibilityIdTraversal", Int::class.java)
+                findViewByAccessibilityIdTraversalMethod.isAccessible = true
+                return findViewByAccessibilityIdTraversalMethod.invoke(this, accessibilityId) as?
+                    View
+            } else {
+                return findViewByAccessibilityIdRootedAtCurrentView(accessibilityId, this)
+            }
+        } catch (e: NoSuchMethodException) {
+            return null
+        }
     }
 
     override val isLifecycleInResumedState: Boolean

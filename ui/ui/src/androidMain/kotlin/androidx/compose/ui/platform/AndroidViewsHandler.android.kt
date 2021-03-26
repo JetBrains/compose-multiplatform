@@ -38,6 +38,7 @@ internal class AndroidViewsHandler(context: Context) : ViewGroup(context) {
     }
 
     val holderToLayoutNode = hashMapOf<AndroidViewHolder, LayoutNode>()
+    val layoutNodeToHolder = hashMapOf<LayoutNode, AndroidViewHolder>()
 
     override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
         // Layout will be handled by component nodes.
