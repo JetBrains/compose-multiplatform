@@ -153,6 +153,15 @@ internal class DesktopOwners(
         lastOwner?.onPointerMove(position)
     }
 
+    fun onMouseEntered(x: Int, y: Int) {
+        val position = Offset(x.toFloat(), y.toFloat())
+        lastOwner?.onPointerEnter(position)
+    }
+
+    fun onMouseExited() {
+        lastOwner?.onPointerExit()
+    }
+
     private fun consumeKeyEvent(event: KeyEvent) {
         list.lastOrNull()?.sendKeyEvent(ComposeKeyEvent(event))
     }
