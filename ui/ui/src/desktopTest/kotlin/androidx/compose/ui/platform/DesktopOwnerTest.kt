@@ -48,14 +48,10 @@ import androidx.compose.ui.layout.Layout
 import androidx.compose.ui.test.junit4.DesktopScreenshotTestRule
 import androidx.compose.ui.unit.dp
 import com.google.common.truth.Truth
-import kotlinx.coroutines.ExperimentalCoroutinesApi
 import org.junit.Assert.assertFalse
 import org.junit.Rule
 import org.junit.Test
 
-@OptIn(
-    ExperimentalCoroutinesApi::class
-)
 class DesktopOwnerTest {
     @get:Rule
     val screenshotRule = DesktopScreenshotTestRule("ui/ui-desktop/ui")
