@@ -18,8 +18,6 @@ package androidx.compose.foundation.text.selection
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
-import androidx.compose.ui.AbsoluteAlignment
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.geometry.Offset
@@ -27,12 +25,7 @@ import androidx.compose.ui.geometry.Rect
 import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.drawscope.DrawScope
 import androidx.compose.ui.layout.Layout
-import androidx.compose.ui.layout.LayoutModifier
-import androidx.compose.ui.layout.Measurable
-import androidx.compose.ui.layout.MeasureResult
-import androidx.compose.ui.layout.MeasureScope
 import androidx.compose.ui.text.style.ResolvedTextDirection
-import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.IntOffset
@@ -41,7 +34,6 @@ import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.window.Popup
 import androidx.compose.ui.window.PopupPositionProvider
-import kotlin.math.max
 import kotlin.math.roundToInt
 
 @Composable
@@ -175,59 +167,33 @@ private fun SelectionHandlePopup(
     content: @Composable () -> Unit
 ) {
     val offset = (if (isStartHandle) startHandlePosition else endHandlePosition) ?: return
+    val left = isLeft(
+        isStartHandle = isStartHandle,
+        directions = directions,
+        handlesCrossed = handlesCrossed
+    )
 
-    SimpleLayout(AllowZeroSize) {
-        val left = isLeft(
-            isStartHandle = isStartHandle,
-            directions = directions,
-            handlesCrossed = handlesCrossed
-        )
-        val alignment = if (left) AbsoluteAlignment.TopRight else AbsoluteAlignment.TopLeft
+    val intOffset = IntOffset(offset.x.roundToInt(), offset.y.roundToInt())
 
-        val intOffset = IntOffset(offset.x.roundToInt(), offset.y.roundToInt())
-
-        val popupPositioner = remember(alignment, intOffset) {
-            SelectionHandlePositionProvider(alignment, intOffset)
-        }
-
-        Popup(
-            popupPositionProvider = popupPositioner,
-            content = content
-        )
+    val popupPositioner = remember(left, intOffset) {
+        SelectionHandlePositionProvider(left, intOffset)
     }
+
+    Popup(
+        popupPositionProvider = popupPositioner,
+        content = content
+    )
 }
 
 /**
- * This modifier allows the content to measure at its desired size without regard for the incoming
- * measurement [minimum width][Constraints.minWidth] or [minimum height][Constraints.minHeight]
- * constraints.
- *
- * The same as "wrapContentSize" in foundation-layout, which we cannot use in this module.
- */
-private object AllowZeroSize : LayoutModifier {
-    override fun MeasureScope.measure(
-        measurable: Measurable,
-        constraints: Constraints
-    ): MeasureResult {
-        val placeable = measurable.measure(constraints.copy(minWidth = 0, minHeight = 0))
-        return layout(
-            max(constraints.minWidth, placeable.width),
-            max(constraints.minHeight, placeable.height)
-        ) {
-            placeable.place(0, 0)
-        }
-    }
-}
-
-/**
- * This is a copy of "AlignmentOffsetPositionProvider" class in Popup, with some
- * change at "resolvedOffset" value.
- *
- * This is for [SelectionHandlePopup] only.
+ * This [PopupPositionProvider] for [SelectionHandlePopup]. It will position the selection handle
+ * to the [offset] in its anchor layout. For left selection handle, the right top corner will be
+ * positioned to [offset]. For right selection handle, the left top corner will be positioned to
+ * [offset].
  */
 /*@VisibleForTesting*/
 internal class SelectionHandlePositionProvider(
-    val alignment: Alignment,
+    val isLeft: Boolean,
     val offset: IntOffset
 ) : PopupPositionProvider {
     override fun calculatePosition(
@@ -236,36 +202,17 @@ internal class SelectionHandlePositionProvider(
         layoutDirection: LayoutDirection,
         popupContentSize: IntSize
     ): IntOffset {
-        // TODO: Decide which is the best way to round to result without reimplementing Alignment.align
-        var popupPosition = IntOffset(0, 0)
-
-        // Get the aligned point inside the parent
-        val parentAlignmentPoint = alignment.align(
-            IntSize.Zero,
-            IntSize(anchorBounds.width, anchorBounds.height),
-            layoutDirection
-        )
-        // Get the aligned point inside the child
-        val relativePopupPos = alignment.align(
-            IntSize.Zero,
-            IntSize(popupContentSize.width, popupContentSize.height),
-            layoutDirection
-        )
-
-        // Add the position of the parent
-        popupPosition += IntOffset(anchorBounds.left, anchorBounds.top)
-
-        // Add the distance between the parent's top left corner and the alignment point
-        popupPosition += parentAlignmentPoint
-
-        // Subtract the distance between the children's top left corner and the alignment point
-        popupPosition -= IntOffset(relativePopupPos.x, relativePopupPos.y)
-
-        // Add the user offset
-        val resolvedOffset = IntOffset(offset.x, offset.y)
-        popupPosition += resolvedOffset
-
-        return popupPosition
+        return if (isLeft) {
+            IntOffset(
+                x = anchorBounds.left + offset.x - popupContentSize.width,
+                y = anchorBounds.top + offset.y
+            )
+        } else {
+            IntOffset(
+                x = anchorBounds.left + offset.x,
+                y = anchorBounds.top + offset.y
+            )
+        }
     }
 }
 
