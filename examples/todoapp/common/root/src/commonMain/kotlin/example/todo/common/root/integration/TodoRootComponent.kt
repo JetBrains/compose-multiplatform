@@ -54,7 +54,7 @@ class TodoRootComponent internal constructor(
         router<Configuration, Child>(
             initialConfiguration = Configuration.Main,
             handleBackButton = true,
-            componentFactory = ::createChild
+            childFactory = ::createChild
         )
 
     override val routerState: Value<RouterState<*, Child>> = router.state
