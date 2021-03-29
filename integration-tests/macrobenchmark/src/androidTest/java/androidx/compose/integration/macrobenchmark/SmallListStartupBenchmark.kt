@@ -16,6 +16,9 @@
 
 package androidx.compose.integration.macrobenchmark
 
+import androidx.benchmark.integration.macrobenchmark.createStartupCompilationParams
+import androidx.benchmark.integration.macrobenchmark.measureStartup
+import androidx.benchmark.macro.CompilationMode
 import androidx.benchmark.macro.StartupMode
 import androidx.benchmark.macro.junit4.MacrobenchmarkRule
 import androidx.test.filters.LargeTest
@@ -26,13 +29,16 @@ import org.junit.runners.Parameterized
 
 @LargeTest
 @RunWith(Parameterized::class)
-class SmallListStartupBenchmark(private val startupMode: StartupMode) {
+class SmallListStartupBenchmark(
+    private val startupMode: StartupMode,
+    private val compilationMode: CompilationMode
+) {
     @get:Rule
     val benchmarkRule = MacrobenchmarkRule()
 
     @Test
     fun startup() = benchmarkRule.measureStartup(
-        profileCompiled = true,
+        compilationMode = compilationMode,
         startupMode = startupMode
     ) {
         action = "androidx.compose.integration.macrobenchmark.target.LAZY_COLUMN_ACTIVITY"
@@ -40,11 +46,8 @@ class SmallListStartupBenchmark(private val startupMode: StartupMode) {
     }
 
     companion object {
-        @Parameterized.Parameters(name = "mode={0}")
+        @Parameterized.Parameters(name = "startup={0},compilation={1}")
         @JvmStatic
-        fun parameters(): List<Array<Any>> {
-            return listOf(StartupMode.COLD, StartupMode.WARM)
-                .map { arrayOf(it) }
-        }
+        fun parameters() = createStartupCompilationParams()
     }
 }
