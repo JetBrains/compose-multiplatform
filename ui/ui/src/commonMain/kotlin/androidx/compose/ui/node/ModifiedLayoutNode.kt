@@ -59,7 +59,7 @@ internal class ModifiedLayoutNode(
             measureScope.maxIntrinsicHeight(wrapped, width)
         }
 
-    override operator fun get(alignmentLine: AlignmentLine): Int {
+    override fun calculateAlignmentLine(alignmentLine: AlignmentLine): Int {
         if (measureResult.alignmentLines.containsKey(alignmentLine)) {
             return measureResult.alignmentLines[alignmentLine] ?: AlignmentLine.Unspecified
         }
