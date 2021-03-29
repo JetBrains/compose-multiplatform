@@ -36,7 +36,7 @@ interface EditCommand {
 /**
  * Commit final [text] to the text box and set the new cursor position.
  *
- * @see <https://developer.android.com/reference/android/view/inputmethod/InputConnection.html#commitText(java.lang.CharSequence,%20int)>
+ * See <https://developer.android.com/reference/android/view/inputmethod/InputConnection.html#commitText(java.lang.CharSequence,%20int)>
  */
 class CommitTextCommand(
     /**
@@ -111,7 +111,7 @@ class CommitTextCommand(
 /**
  * Mark a certain region of text as composing text.
  *
- * @see <https://developer.android.com/reference/android/view/inputmethod/InputConnection.html#setComposingRegion(int,%2520int)>
+ * See <https://developer.android.com/reference/android/view/inputmethod/InputConnection.html#setComposingRegion(int,%2520int)>
  */
 class SetComposingRegionCommand(
     /**
@@ -169,7 +169,7 @@ class SetComposingRegionCommand(
  * Replace the currently composing text with the given text, and set the new cursor position. Any
  * composing text set previously will be removed automatically.
  *
- * @see <https://developer.android.com/reference/android/view/inputmethod/InputConnection.html#setComposingText(java.lang.CharSequence,%2520int)>
+ * See <https://developer.android.com/reference/android/view/inputmethod/InputConnection.html#setComposingText(java.lang.CharSequence,%2520int)>
  */
 class SetComposingTextCommand(
     /**
@@ -255,7 +255,7 @@ class SetComposingTextCommand(
  * Before and after refer to the order of the characters in the string, not to their visual
  * representation.
  *
- * @see <https://developer.android.com/reference/android/view/inputmethod/InputConnection.html#deleteSurroundingText(int,%2520int)>
+ * See <https://developer.android.com/reference/android/view/inputmethod/InputConnection.html#deleteSurroundingText(int,%2520int)>
  */
 class DeleteSurroundingTextCommand(
     /**
@@ -307,7 +307,7 @@ class DeleteSurroundingTextCommand(
  * * This command does nothing if there are one or more invalid surrogate pairs
  * in the requested range.
  *
- * @see <https://developer.android.com/reference/android/view/inputmethod/InputConnection.html#deleteSurroundingTextInCodePoints(int,%2520int)>
+ * See <https://developer.android.com/reference/android/view/inputmethod/InputConnection.html#deleteSurroundingTextInCodePoints(int,%2520int)>
  */
 class DeleteSurroundingTextInCodePointsCommand(
     /**
@@ -380,7 +380,7 @@ class DeleteSurroundingTextInCodePointsCommand(
  * Sets the selection on the text. When [start] and [end] have the same value, it sets the cursor
  * position.
  *
- * @see <https://developer.android.com/reference/android/view/inputmethod/InputConnection.html#setSelection(int,%2520int)>
+ * See <https://developer.android.com/reference/android/view/inputmethod/InputConnection.html#setSelection(int,%2520int)>
  */
 class SetSelectionCommand(
     /**
@@ -429,7 +429,7 @@ class SetSelectionCommand(
  * removing any special composing styling or other state that was around it. The cursor position
  * remains unchanged.
  *
- * @see <https://developer.android.com/reference/android/view/inputmethod/InputConnection.html#finishComposingText()>
+ * See <https://developer.android.com/reference/android/view/inputmethod/InputConnection.html#finishComposingText()>
  */
 class FinishComposingTextCommand : EditCommand {
 
