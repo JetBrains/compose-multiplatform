@@ -19,6 +19,7 @@ package androidx.compose.ui.res
 import android.os.Build
 import androidx.annotation.ColorRes
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.ReadOnlyComposable
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 
@@ -29,6 +30,7 @@ import androidx.compose.ui.platform.LocalContext
  * @return the color associated with the resource
  */
 @Composable
+@ReadOnlyComposable
 fun colorResource(@ColorRes id: Int): Color {
     val context = LocalContext.current
     return if (Build.VERSION.SDK_INT >= 23) {
