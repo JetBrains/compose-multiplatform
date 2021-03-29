@@ -403,7 +403,6 @@ class ScrollTest {
     }
 
     @Test
-    @Ignore("When b/157687898 is fixed, performScrollTo must be adjusted to use semantic bounds")
     fun verticalScroller_scrollTo_scrollBack() {
         createScrollableContent(isVertical = true)
 
@@ -419,7 +418,6 @@ class ScrollTest {
     }
 
     @Test
-    @Ignore("When b/157687898 is fixed, performScrollTo must be adjusted to use semantic bounds")
     fun horizontalScroller_scrollTo_scrollBack() {
         createScrollableContent(isVertical = false)
 
