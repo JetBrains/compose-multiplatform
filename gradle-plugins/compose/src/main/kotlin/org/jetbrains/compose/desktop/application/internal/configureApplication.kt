@@ -17,6 +17,8 @@ import org.jetbrains.compose.desktop.application.dsl.Application
 import org.jetbrains.compose.desktop.application.dsl.TargetFormat
 import org.jetbrains.compose.desktop.application.internal.validation.validatePackageVersions
 import org.jetbrains.compose.desktop.application.tasks.*
+import org.jetbrains.compose.desktop.preview.internal.configureRunPreviewTask
+import org.jetbrains.compose.desktop.preview.tasks.AbstractRunComposePreviewTask
 import org.jetbrains.kotlin.gradle.dsl.KotlinMultiplatformExtension
 import org.jetbrains.kotlin.gradle.plugin.KotlinPlatformType
 import java.io.File
@@ -154,6 +156,10 @@ internal fun Project.configurePackagingTasks(apps: Collection<Application>) {
 
         val run = project.tasks.composeTask<JavaExec>(taskName("run", app)) {
             configureRunTask(app)
+        }
+
+        val runPreview = project.tasks.composeTask<AbstractRunComposePreviewTask>("runComposeDesktopPreview") {
+            configureRunPreviewTask(app)
         }
     }
 }
@@ -327,7 +333,7 @@ private fun File.isZipOrJar() =
     name.endsWith(".jar", ignoreCase = true)
         || name.endsWith(".zip", ignoreCase = true)
 
-private fun Application.javaHomeOrDefault(): String =
+internal fun Application.javaHomeOrDefault(): String =
     javaHome ?: System.getProperty("java.home")
 
 private inline fun <reified T : Task> TaskContainer.composeTask(
