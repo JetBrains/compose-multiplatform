@@ -48,28 +48,36 @@ subprojects {
     }
 
     afterEvaluate {
-        mavenPublicationConfig?.let { mavenPublicationConfig ->
-            configurePublication(mavenPublicationConfig)
+        val publicationConfig = mavenPublicationConfig
+        val gradlePluginConfig = gradlePluginConfig
 
-            gradlePluginConfig?.let { gradlePluginConfig ->
-                configureGradlePlugin(mavenPublicationConfig, gradlePluginConfig)
+        if (publicationConfig != null) {
+            if (gradlePluginConfig != null) {
+                // pluginMaven is a default publication created by java-gradle-plugin
+                // https://github.com/gradle/gradle/issues/10384
+                configureMavenPublication("pluginMaven", publicationConfig)
+                configureGradlePlugin(publicationConfig, gradlePluginConfig)
+            } else {
+                configureMavenPublication("maven", publicationConfig) {
+                    from(components["java"])
+                }
             }
         }
     }
 }
 
-fun Project.configurePublication(
-    publicationConfig: MavenPublicationConfigExtension
+fun Project.configureMavenPublication(
+    publicationName: String,
+    config: MavenPublicationConfigExtension,
+    customize: MavenPublication.() -> Unit = {}
 ) {
     // maven publication for plugin
     configureIfExists<PublishingExtension> {
-        // pluginMaven is a default publication created by java-gradle-plugin
-        // https://github.com/gradle/gradle/issues/10384
-        publications.create<MavenPublication>("pluginMaven") {
-            artifactId = publicationConfig.artifactId
+        publications.create<MavenPublication>(publicationName) {
+            artifactId = config.artifactId
             pom {
-                name.set(publicationConfig.displayName)
-                description.set(publicationConfig.description)
+                name.set(config.displayName)
+                description.set(config.description)
                 url.set(BuildProperties.website)
                 licenses {
                     license {
@@ -78,6 +86,8 @@ fun Project.configurePublication(
                     }
                 }
             }
+
+            customize()
         }
     }
 }
