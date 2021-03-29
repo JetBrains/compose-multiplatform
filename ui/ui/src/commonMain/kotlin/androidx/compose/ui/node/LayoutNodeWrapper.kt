@@ -31,11 +31,13 @@ import androidx.compose.ui.graphics.Paint
 import androidx.compose.ui.graphics.ReusableGraphicsLayerScope
 import androidx.compose.ui.input.nestedscroll.NestedScrollDelegatingWrapper
 import androidx.compose.ui.input.pointer.PointerInputFilter
+import androidx.compose.ui.layout.AlignmentLine
 import androidx.compose.ui.layout.LayoutCoordinates
 import androidx.compose.ui.layout.Measurable
 import androidx.compose.ui.layout.MeasureResult
 import androidx.compose.ui.layout.MeasureScope
 import androidx.compose.ui.layout.Placeable
+import androidx.compose.ui.layout.VerticalAlignmentLine
 import androidx.compose.ui.layout.findRoot
 import androidx.compose.ui.layout.positionInRoot
 import androidx.compose.ui.unit.Constraints
@@ -162,6 +164,18 @@ internal abstract class LayoutNodeWrapper(
         val result = block()
         layer?.resize(measuredSize)
         return result
+    }
+
+    abstract fun calculateAlignmentLine(alignmentLine: AlignmentLine): Int
+
+    final override fun get(alignmentLine: AlignmentLine): Int {
+        val measuredPosition = calculateAlignmentLine(alignmentLine)
+        if (measuredPosition == AlignmentLine.Unspecified) return AlignmentLine.Unspecified
+        return measuredPosition + if (alignmentLine is VerticalAlignmentLine) {
+            apparentToRealOffset.x
+        } else {
+            apparentToRealOffset.y
+        }
     }
 
     /**
