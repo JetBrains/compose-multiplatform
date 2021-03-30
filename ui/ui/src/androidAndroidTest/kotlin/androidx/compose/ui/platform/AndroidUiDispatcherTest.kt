@@ -24,6 +24,7 @@ import android.view.ViewGroup.LayoutParams
 import androidx.appcompat.app.AppCompatActivity
 import androidx.compose.runtime.MonotonicFrameClock
 import androidx.compose.runtime.withFrameNanos
+import androidx.compose.ui.test.setViewLayerTypeForApi28
 import androidx.core.view.doOnLayout
 import androidx.test.ext.junit.rules.activityScenarioRule
 import androidx.test.ext.junit.runners.AndroidJUnit4
@@ -40,6 +41,7 @@ import org.junit.Assert.assertNotEquals
 import org.junit.Assert.assertNotNull
 import org.junit.Assert.assertSame
 import org.junit.Assert.assertTrue
+import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -49,6 +51,11 @@ import org.junit.runner.RunWith
 class AndroidUiDispatcherTest {
     @get:Rule
     val rule = activityScenarioRule<AppCompatActivity>()
+
+    @Before
+    fun setup() {
+        setViewLayerTypeForApi28()
+    }
 
     @Test
     fun currentThreadIsMainOnMainThread() = runBlocking(Dispatchers.Main) {

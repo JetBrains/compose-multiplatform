@@ -40,7 +40,7 @@ import java.lang.reflect.Method
  */
 internal class ViewLayer(
     val ownerView: AndroidComposeView,
-    val container: ViewLayerContainer,
+    val container: DrawChildContainer,
     val drawBlock: (Canvas) -> Unit,
     val invalidateParentLayer: () -> Unit
 ) : View(ownerView.context), OwnedLayer {
@@ -50,7 +50,8 @@ internal class ViewLayer(
     private var clipBoundsCache: android.graphics.Rect? = null
     private val manualClipPath: Path? get() =
         if (!clipToOutline) null else outlineResolver.clipPath
-    private var isInvalidated = false
+    var isInvalidated = false
+        private set
     private var drawnWithZ = false
     private val canvasHolder = CanvasHolder()
 
@@ -221,13 +222,15 @@ internal class ViewLayer(
     }
 
     override fun destroy() {
-        container.removeView(this)
+        container.postOnAnimation {
+            container.removeView(this)
+        }
         ownerView.dirtyLayers -= this
         ownerView.requestClearInvalidObservations()
     }
 
     override fun updateDisplayList() {
-        if (isInvalidated) {
+        if (isInvalidated && !shouldUseDispatchDraw) {
             updateDisplayList(this)
             isInvalidated = false
         }
@@ -252,40 +255,48 @@ internal class ViewLayer(
         }
         private var updateDisplayListIfDirtyMethod: Method? = null
         private var recreateDisplayList: Field? = null
-        private var hasRetrievedMethod = false
+        var hasRetrievedMethod = false
+            private set
+
+        var shouldUseDispatchDraw = false
+            internal set // internal so that tests can use it.
 
         fun updateDisplayList(view: View) {
-            if (!hasRetrievedMethod) {
-                hasRetrievedMethod = true
-                if (Build.VERSION.SDK_INT < Build.VERSION_CODES.P) {
-                    updateDisplayListIfDirtyMethod =
-                        View::class.java.getDeclaredMethod("updateDisplayListIfDirty")
-                    recreateDisplayList =
-                        View::class.java.getDeclaredField("mRecreateDisplayList")
-                } else {
-                    val getDeclaredMethod = Class::class.java.getDeclaredMethod(
-                        "getDeclaredMethod",
-                        String::class.java,
-                        arrayOf<Class<*>>()::class.java
-                    )
-                    updateDisplayListIfDirtyMethod = getDeclaredMethod.invoke(
-                        View::class.java,
-                        "updateDisplayListIfDirty", emptyArray<Class<*>>()
-                    ) as Method?
-                    val getDeclaredField = Class::class.java.getDeclaredMethod(
-                        "getDeclaredField",
-                        String::class.java
-                    )
-                    recreateDisplayList = getDeclaredField.invoke(
-                        View::class.java,
-                        "mRecreateDisplayList"
-                    ) as Field?
+            try {
+                if (!hasRetrievedMethod) {
+                    hasRetrievedMethod = true
+                    if (Build.VERSION.SDK_INT < Build.VERSION_CODES.P) {
+                        updateDisplayListIfDirtyMethod =
+                            View::class.java.getDeclaredMethod("updateDisplayListIfDirty")
+                        recreateDisplayList =
+                            View::class.java.getDeclaredField("mRecreateDisplayList")
+                    } else {
+                        val getDeclaredMethod = Class::class.java.getDeclaredMethod(
+                            "getDeclaredMethod",
+                            String::class.java,
+                            arrayOf<Class<*>>()::class.java
+                        )
+                        updateDisplayListIfDirtyMethod = getDeclaredMethod.invoke(
+                            View::class.java,
+                            "updateDisplayListIfDirty", emptyArray<Class<*>>()
+                        ) as Method?
+                        val getDeclaredField = Class::class.java.getDeclaredMethod(
+                            "getDeclaredField",
+                            String::class.java
+                        )
+                        recreateDisplayList = getDeclaredField.invoke(
+                            View::class.java,
+                            "mRecreateDisplayList"
+                        ) as Field?
+                    }
+                    updateDisplayListIfDirtyMethod?.isAccessible = true
+                    recreateDisplayList?.isAccessible = true
                 }
-                updateDisplayListIfDirtyMethod?.isAccessible = true
-                recreateDisplayList?.isAccessible = true
+                recreateDisplayList?.setBoolean(view, true)
+                updateDisplayListIfDirtyMethod?.invoke(view)
+            } catch (_: Throwable) {
+                shouldUseDispatchDraw = true
             }
-            recreateDisplayList?.setBoolean(view, true)
-            updateDisplayListIfDirtyMethod?.invoke(view)
         }
     }
 }

@@ -22,7 +22,6 @@ import android.view.ViewGroup
 import android.view.accessibility.AccessibilityEvent
 import android.view.accessibility.AccessibilityNodeInfo
 import android.widget.FrameLayout
-import androidx.activity.ComponentActivity
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.size
@@ -44,37 +43,38 @@ import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.semantics.CustomAccessibilityAction
 import androidx.compose.ui.semantics.LiveRegionMode
 import androidx.compose.ui.semantics.ProgressBarRangeInfo
+import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.semantics.ScrollAxisRange
 import androidx.compose.ui.semantics.SemanticsModifierCore
 import androidx.compose.ui.semantics.SemanticsNode
-import androidx.compose.ui.semantics.SemanticsPropertyReceiver
-import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.semantics.SemanticsOwner
+import androidx.compose.ui.semantics.SemanticsPropertyReceiver
 import androidx.compose.ui.semantics.SemanticsWrapper
 import androidx.compose.ui.semantics.collapse
-import androidx.compose.ui.semantics.heading
 import androidx.compose.ui.semantics.copyText
 import androidx.compose.ui.semantics.customActions
 import androidx.compose.ui.semantics.cutText
 import androidx.compose.ui.semantics.disabled
-import androidx.compose.ui.semantics.stateDescription
-import androidx.compose.ui.semantics.progressBarRangeInfo
 import androidx.compose.ui.semantics.dismiss
 import androidx.compose.ui.semantics.expand
 import androidx.compose.ui.semantics.focused
 import androidx.compose.ui.semantics.getTextLayoutResult
+import androidx.compose.ui.semantics.heading
 import androidx.compose.ui.semantics.horizontalScrollAxisRange
 import androidx.compose.ui.semantics.liveRegion
 import androidx.compose.ui.semantics.onClick
 import androidx.compose.ui.semantics.onLongClick
 import androidx.compose.ui.semantics.pasteText
+import androidx.compose.ui.semantics.progressBarRangeInfo
 import androidx.compose.ui.semantics.role
 import androidx.compose.ui.semantics.setProgress
 import androidx.compose.ui.semantics.setSelection
 import androidx.compose.ui.semantics.setText
+import androidx.compose.ui.semantics.stateDescription
 import androidx.compose.ui.semantics.text
 import androidx.compose.ui.semantics.textSelectionRange
 import androidx.compose.ui.semantics.verticalScrollAxisRange
+import androidx.compose.ui.test.TestActivity
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.text.AnnotatedString
@@ -107,7 +107,7 @@ import org.mockito.ArgumentMatchers
 @RunWith(AndroidJUnit4::class)
 class AndroidComposeViewAccessibilityDelegateCompatTest {
     @get:Rule
-    val rule = createAndroidComposeRule<ComponentActivity>()
+    val rule = createAndroidComposeRule<TestActivity>()
 
     private lateinit var accessibilityDelegate: AndroidComposeViewAccessibilityDelegateCompat
     private lateinit var container: ViewGroup
