@@ -181,6 +181,11 @@ internal class TextInputServiceAndroid(val view: View) : PlatformTextInputServic
     }
 
     override fun updateState(oldValue: TextFieldValue?, newValue: TextFieldValue) {
+        if (DEBUG) { Log.d(TAG, "InputService.updateState: $oldValue -> $newValue") }
+
+        // update the latest TextFieldValue in InputConnection
+        ic?.mTextFieldValue = newValue
+
         if (oldValue == newValue) return
 
         this.state = newValue
@@ -190,6 +195,8 @@ internal class TextInputServiceAndroid(val view: View) : PlatformTextInputServic
                 // when selection is the same but composition has changed, need to reset the input.
                 (it.selection == newValue.selection && it.composition != newValue.composition)
         } ?: false
+
+        if (DEBUG) { Log.d(TAG, "InputService.updateState: $state / $restartInput(restartInput) ") }
 
         if (restartInput) {
             restartInput()

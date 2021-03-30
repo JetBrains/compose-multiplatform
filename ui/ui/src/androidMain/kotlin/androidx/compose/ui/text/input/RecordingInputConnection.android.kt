@@ -81,12 +81,8 @@ internal class RecordingInputConnection(
      * contents has changed if needed.
      */
     fun updateInputState(state: TextFieldValue, imm: InputMethodManager, view: View) {
-        val prev = mTextFieldValue
+        if (DEBUG) { Log.d(TAG, "updateInputState: $state") }
         mTextFieldValue = state
-
-        if (prev == state) {
-            return
-        }
 
         if (extractedTextMonitorMode) {
             imm.updateExtractedText(view, currentExtractedTextRequestToken, state.toExtractedText())
@@ -225,12 +221,30 @@ internal class RecordingInputConnection(
     }
 
     override fun getExtractedText(request: ExtractedTextRequest?, flags: Int): ExtractedText {
-        if (DEBUG) { Log.d(TAG, "getExtractedText($request, $flags)") }
+        if (DEBUG) {
+            Log.d(TAG, "getExtractedText($request, $flags)")
+        }
         extractedTextMonitorMode = (flags and InputConnection.GET_EXTRACTED_TEXT_MONITOR) != 0
         if (extractedTextMonitorMode) {
             currentExtractedTextRequestToken = request?.token ?: 0
         }
-        return mTextFieldValue.toExtractedText()
+        val extractedText = mTextFieldValue.toExtractedText()
+
+        if (DEBUG) {
+            with(extractedText) {
+                Log.d(
+                    TAG,
+                    "getExtractedText() return: text: $text" +
+                        ",partialStartOffset $partialStartOffset" +
+                        ",partialEndOffset $partialEndOffset" +
+                        ",selectionStart $selectionStart" +
+                        ",selectionEnd $selectionEnd" +
+                        ",flags $flags"
+                )
+            }
+        }
+
+        return extractedText
     }
 
     // /////////////////////////////////////////////////////////////////////////////////////////////

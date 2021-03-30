@@ -22,8 +22,10 @@ import android.view.inputmethod.EditorInfo
 import android.view.inputmethod.InputMethodManager
 import androidx.compose.ui.text.TextRange
 import androidx.compose.ui.text.input.ImeOptions
+import androidx.compose.ui.text.input.RecordingInputConnection
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.input.TextInputServiceAndroid
+import com.google.common.truth.Truth.assertThat
 import com.nhaarman.mockitokotlin2.any
 import com.nhaarman.mockitokotlin2.eq
 import com.nhaarman.mockitokotlin2.mock
@@ -41,6 +43,7 @@ class TextInputServiceAndroidOnStateUpdateTest {
 
     private lateinit var textInputService: TextInputServiceAndroid
     private lateinit var imm: InputMethodManager
+    private lateinit var inputConnection: RecordingInputConnection
 
     @Before
     fun setup() {
@@ -56,61 +59,77 @@ class TextInputServiceAndroidOnStateUpdateTest {
             onEditCommand = {},
             onImeActionPerformed = {}
         )
-        textInputService.createInputConnection(EditorInfo())
+        inputConnection = textInputService.createInputConnection(EditorInfo())
+            as RecordingInputConnection
     }
 
     @Test
     fun onUpdateState_resetInputCalled_whenOnlyTextChanged() {
+        val newValue = TextFieldValue("b")
         textInputService.updateState(
             oldValue = TextFieldValue("a"),
-            newValue = TextFieldValue("b")
+            newValue = newValue
         )
 
         verify(imm, times(1)).restartInput(any())
         verify(imm, never()).updateSelection(any(), any(), any(), any(), any())
+
+        assertThat(inputConnection.mTextFieldValue).isEqualTo(newValue)
     }
 
     @Test
     fun onUpdateState_resetInputCalled_whenOnlyCompositionChanged() {
+        val newValue = TextFieldValue("a", TextRange.Zero, null)
         textInputService.updateState(
             oldValue = TextFieldValue("a", TextRange.Zero, TextRange.Zero),
-            newValue = TextFieldValue("a", TextRange.Zero, null)
+            newValue = newValue
         )
 
         verify(imm, times(1)).restartInput(any())
         verify(imm, never()).updateSelection(any(), any(), any(), any(), any())
+
+        assertThat(inputConnection.mTextFieldValue).isEqualTo(newValue)
     }
 
     @Test
     fun onUpdateState_updateSelectionCalled_whenOnlySelectionChanged() {
+        val newValue = TextFieldValue("a", TextRange(1), null)
         textInputService.updateState(
             oldValue = TextFieldValue("a", TextRange.Zero, null),
-            newValue = TextFieldValue("a", TextRange(1), null)
+            newValue = newValue
         )
 
         verify(imm, never()).restartInput(any())
         verify(imm, times(1)).updateSelection(any(), any(), any(), any(), any())
+
+        assertThat(inputConnection.mTextFieldValue).isEqualTo(newValue)
     }
 
     @Test
     fun onUpdateState_resetInputNotCalled_whenSelectionAndCompositionChanged() {
+        val newValue = TextFieldValue("a", TextRange(1), null)
         textInputService.updateState(
             oldValue = TextFieldValue("a", TextRange.Zero, TextRange.Zero),
-            newValue = TextFieldValue("a", TextRange(1), null)
+            newValue = newValue
         )
 
         verify(imm, never()).restartInput(any())
         verify(imm, times(1)).updateSelection(any(), any(), any(), any(), any())
+
+        assertThat(inputConnection.mTextFieldValue).isEqualTo(newValue)
     }
 
     @Test
     fun onUpdateState_resetInputNotCalled_whenValuesAreSame() {
+        val value = TextFieldValue("a")
         textInputService.updateState(
-            oldValue = TextFieldValue("a"),
-            newValue = TextFieldValue("a")
+            oldValue = value,
+            newValue = value
         )
 
         verify(imm, never()).restartInput(any())
         verify(imm, never()).updateSelection(any(), any(), any(), any(), any())
+
+        assertThat(inputConnection.mTextFieldValue).isEqualTo(value)
     }
 }
