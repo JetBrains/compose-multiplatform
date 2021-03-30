@@ -19,14 +19,12 @@ package androidx.compose.ui.input
 import android.view.KeyEvent
 import android.view.inputmethod.CorrectionInfo
 import androidx.compose.ui.text.TextRange
-import androidx.compose.ui.text.input.BackspaceCommand
 import androidx.compose.ui.text.input.CommitTextCommand
 import androidx.compose.ui.text.input.DeleteSurroundingTextCommand
 import androidx.compose.ui.text.input.DeleteSurroundingTextInCodePointsCommand
 import androidx.compose.ui.text.input.EditCommand
 import androidx.compose.ui.text.input.FinishComposingTextCommand
-import androidx.compose.ui.text.input.InputEventCallback
-import androidx.compose.ui.text.input.MoveCursorCommand
+import androidx.compose.ui.text.input.InputEventCallback2
 import androidx.compose.ui.text.input.RecordingInputConnection
 import androidx.compose.ui.text.input.SetComposingRegionCommand
 import androidx.compose.ui.text.input.SetComposingTextCommand
@@ -52,7 +50,7 @@ import org.junit.runner.RunWith
 class RecordingInputConnectionTest {
 
     private lateinit var ic: RecordingInputConnection
-    private lateinit var mCallback: InputEventCallback
+    private lateinit var mCallback: InputEventCallback2
 
     @Before
     fun setup() {
@@ -475,64 +473,21 @@ class RecordingInputConnectionTest {
 
     @Test
     fun key_event_del_down() {
-        val captor = argumentCaptor<List<EditCommand>>()
-        ic.sendKeyEvent(KeyEvent(KeyEvent.ACTION_DOWN, KeyEvent.KEYCODE_DEL))
-        verify(mCallback, times(1)).onEditCommands(captor.capture())
+        val keyEvent = KeyEvent(KeyEvent.ACTION_DOWN, KeyEvent.KEYCODE_DEL)
+        val captor = argumentCaptor<KeyEvent>()
 
-        val editCommands = captor.lastValue
-        assertEquals(1, editCommands.size)
-        assertEquals(BackspaceCommand(), editCommands[0])
-    }
-
-    @Test
-    fun key_event_del_up() {
-        ic.sendKeyEvent(KeyEvent(KeyEvent.ACTION_UP, KeyEvent.KEYCODE_DEL))
+        ic.sendKeyEvent(keyEvent)
+        verify(mCallback, times(1)).onKeyEvent(captor.capture())
         verify(mCallback, never()).onEditCommands(any())
-    }
 
-    @Test
-    fun key_event_left_down() {
-        val captor = argumentCaptor<List<EditCommand>>()
-        ic.sendKeyEvent(KeyEvent(KeyEvent.ACTION_DOWN, KeyEvent.KEYCODE_DPAD_LEFT))
-        verify(mCallback, times(1)).onEditCommands(captor.capture())
-
-        val editCommands = captor.lastValue
-        assertEquals(1, editCommands.size)
-        assertEquals(MoveCursorCommand(-1), editCommands[0])
+        val capturedKeyEvent = captor.lastValue
+        assertEquals(keyEvent, capturedKeyEvent)
     }
 
     @Test
     fun key_event_left_up() {
         ic.sendKeyEvent(KeyEvent(KeyEvent.ACTION_UP, KeyEvent.KEYCODE_DPAD_LEFT))
         verify(mCallback, never()).onEditCommands(any())
-    }
-
-    @Test
-    fun key_event_right_down() {
-        val captor = argumentCaptor<List<EditCommand>>()
-        ic.sendKeyEvent(KeyEvent(KeyEvent.ACTION_DOWN, KeyEvent.KEYCODE_DPAD_RIGHT))
-        verify(mCallback, times(1)).onEditCommands(captor.capture())
-
-        val editCommands = captor.lastValue
-        assertEquals(1, editCommands.size)
-        assertEquals(MoveCursorCommand(1), editCommands[0])
-    }
-
-    @Test
-    fun key_event_right_up() {
-        ic.sendKeyEvent(KeyEvent(KeyEvent.ACTION_UP, KeyEvent.KEYCODE_DPAD_RIGHT))
-        verify(mCallback, never()).onEditCommands(any())
-    }
-
-    @Test
-    fun key_event_printablekey_down() {
-        val captor = argumentCaptor<List<EditCommand>>()
-        ic.sendKeyEvent(KeyEvent(KeyEvent.ACTION_DOWN, KeyEvent.KEYCODE_1))
-        verify(mCallback, times(1)).onEditCommands(captor.capture())
-
-        val editCommands = captor.lastValue
-        assertEquals(1, editCommands.size)
-        assertEquals(CommitTextCommand("1", 1), editCommands[0])
     }
 
     @Test
