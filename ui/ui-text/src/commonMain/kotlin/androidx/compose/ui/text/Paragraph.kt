@@ -221,7 +221,7 @@ interface Paragraph {
     /**
      * Returns the TextRange of the word at the given character offset. Characters not
      * part of a word, such as spaces, symbols, and punctuation, have word breaks
-     * on both sides. In such cases, this method will return TextRange(offset, offset+1).
+     * on both sides. In such cases, this method will return TextRange(offset, offset).
      * Word boundaries are defined more precisely in Unicode Standard Annex #29
      * http://www.unicode.org/reports/tr29/#Word_Boundaries
      */

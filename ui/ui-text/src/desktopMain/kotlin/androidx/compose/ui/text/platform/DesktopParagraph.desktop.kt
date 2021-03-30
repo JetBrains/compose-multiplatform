@@ -351,11 +351,15 @@ internal class DesktopParagraph(
     }
 
     override fun getWordBoundary(offset: Int): TextRange {
-        if (text[offset].isWhitespace()) {
-            return TextRange(offset, offset)
-        }
-        para.getWordBoundary(offset).let {
-            return TextRange(it.start, it.end)
+        return when {
+            (text[offset].isLetterOrDigit()) -> para.getWordBoundary(offset).let {
+                TextRange(it.start, it.end)
+            }
+            (text.getOrNull(offset - 1)?.isLetterOrDigit() ?: false) ->
+                para.getWordBoundary(offset - 1).let {
+                    TextRange(it.start, it.end)
+                }
+            else -> TextRange(offset, offset)
         }
     }
 

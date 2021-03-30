@@ -3834,6 +3834,34 @@ class ParagraphIntegrationTest {
     }
 
     @Test
+    fun testGetWordBoundary_spaces() {
+        val text = "ab cd  e"
+        val paragraph = simpleParagraph(
+            text = text,
+            style = TextStyle(
+                fontFamily = fontFamilyMeasureFont,
+                fontSize = 20.sp
+            )
+        )
+
+        // end of word (length+1) will select word
+        val singleSpaceStartResult = paragraph.getWordBoundary(text.indexOf('b') + 1)
+        assertThat(singleSpaceStartResult.start).isEqualTo(text.indexOf('a'))
+        assertThat(singleSpaceStartResult.end).isEqualTo(text.indexOf('b') + 1)
+
+        // beginning of word will select word
+        val singleSpaceEndResult = paragraph.getWordBoundary(text.indexOf('c'))
+        assertThat(singleSpaceEndResult.start).isEqualTo(text.indexOf('c'))
+        assertThat(singleSpaceEndResult.end).isEqualTo(text.indexOf('d') + 1)
+
+        // between spaces ("_ | _") where | is the requested offset and _ is the space, will
+        // return the exact collapsed range at offset/offset
+        val doubleSpaceResult = paragraph.getWordBoundary(text.indexOf('d') + 2)
+        assertThat(doubleSpaceResult.start).isEqualTo(text.indexOf('d') + 2)
+        assertThat(doubleSpaceResult.end).isEqualTo(text.indexOf('d') + 2)
+    }
+
+    @Test
     fun testGetWordBoundary_Bidi() {
         val text = "abc \u05d0\u05d1\u05d2 def"
         val paragraph = simpleParagraph(

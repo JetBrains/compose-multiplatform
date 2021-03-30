@@ -193,6 +193,31 @@ class DesktopParagraphTest {
         }
     }
 
+    @Test
+    fun getWordBoundary_spaces() {
+        val text = "ab cd  e"
+        val paragraph = simpleParagraph(
+            text = text,
+            style = TextStyle(
+                fontFamily = fontFamilyMeasureFont,
+                fontSize = 20.sp
+            )
+        )
+
+        val singleSpaceStartResult = paragraph.getWordBoundary(text.indexOf('b') + 1)
+        Truth.assertThat(singleSpaceStartResult.start).isEqualTo(text.indexOf('a'))
+        Truth.assertThat(singleSpaceStartResult.end).isEqualTo(text.indexOf('b') + 1)
+
+        val singleSpaceEndResult = paragraph.getWordBoundary(text.indexOf('c'))
+
+        Truth.assertThat(singleSpaceEndResult.start).isEqualTo(text.indexOf('c'))
+        Truth.assertThat(singleSpaceEndResult.end).isEqualTo(text.indexOf('d') + 1)
+
+        val doubleSpaceResult = paragraph.getWordBoundary(text.indexOf('d') + 2)
+        Truth.assertThat(doubleSpaceResult.start).isEqualTo(text.indexOf('d') + 2)
+        Truth.assertThat(doubleSpaceResult.end).isEqualTo(text.indexOf('d') + 2)
+    }
+
     private fun simpleParagraph(
         text: String = "",
         style: TextStyle? = null,
