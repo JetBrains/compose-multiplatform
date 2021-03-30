@@ -30,6 +30,7 @@ object Names {
 
         val Composable = Name(PackageName, "Composable")
         val CompositionLocal = Name(PackageName, "CompositionLocal")
+        val MutableState = Name(PackageName, "MutableState")
         val MutableStateOf = Name(PackageName, "mutableStateOf")
         val MutableStateListOf = Name(PackageName, "mutableStateListOf")
         val MutableStateMapOf = Name(PackageName, "mutableStateMapOf")

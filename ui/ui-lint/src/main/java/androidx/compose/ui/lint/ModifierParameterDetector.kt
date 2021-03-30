@@ -19,6 +19,7 @@
 package androidx.compose.ui.lint
 
 import androidx.compose.lint.Names
+import androidx.compose.lint.inheritsFrom
 import androidx.compose.lint.isComposable
 import androidx.compose.lint.returnsUnit
 import com.android.tools.lint.client.api.UElementHandler
@@ -31,7 +32,6 @@ import com.android.tools.lint.detector.api.LintFix
 import com.android.tools.lint.detector.api.Scope
 import com.android.tools.lint.detector.api.Severity
 import com.android.tools.lint.detector.api.SourceCodeScanner
-import com.intellij.psi.util.InheritanceUtil
 import org.jetbrains.kotlin.psi.KtNameReferenceExpression
 import org.jetbrains.kotlin.psi.KtParameter
 import org.jetbrains.uast.UElement
@@ -61,8 +61,7 @@ class ModifierParameterDetector : Detector(), SourceCodeScanner {
             if (!node.returnsUnit) return
 
             val modifierParameter = node.uastParameters.firstOrNull { parameter ->
-                parameter.sourcePsi is KtParameter &&
-                    InheritanceUtil.isInheritor(parameter.type, Names.Ui.Modifier.javaFqn)
+                parameter.sourcePsi is KtParameter && parameter.type.inheritsFrom(Names.Ui.Modifier)
             } ?: return
 
             // Need to strongly type this or else Kotlinc cannot resolve overloads for
