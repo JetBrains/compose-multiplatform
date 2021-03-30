@@ -3,9 +3,9 @@ import Todo
 func simpleRouterState<T : AnyObject>(_ child: T) -> Value<RouterState<AnyObject, T>> {
     return valueOf(
         RouterState(
-            activeChild: RouterStateEntryCreated(
+            activeChild: ChildCreated(
                 configuration: "config" as AnyObject,
-                component: child
+                instance: child
             ),
             backStack: []
         )
