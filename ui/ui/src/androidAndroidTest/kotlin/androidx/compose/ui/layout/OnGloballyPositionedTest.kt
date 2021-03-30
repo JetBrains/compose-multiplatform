@@ -20,7 +20,6 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.LinearLayout
 import android.widget.ScrollView
-import androidx.activity.ComponentActivity
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
@@ -45,6 +44,7 @@ import androidx.compose.ui.platform.AndroidComposeView
 import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalView
+import androidx.compose.ui.test.TestActivity
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
 import androidx.compose.ui.test.onRoot
 import androidx.compose.ui.unit.Constraints
@@ -69,7 +69,7 @@ import kotlin.math.sqrt
 class OnGloballyPositionedTest {
 
     @get:Rule
-    val rule = createAndroidComposeRule<ComponentActivity>()
+    val rule = createAndroidComposeRule<TestActivity>()
 
     @Test
     fun handlesChildrenNodeMoveCorrectly() {

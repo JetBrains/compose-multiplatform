@@ -27,6 +27,7 @@ import androidx.compose.ui.layout.LayoutCoordinates
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.layout.positionInWindow
 import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.test.TestActivity
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.MediumTest
@@ -41,7 +42,7 @@ import org.junit.runner.RunWith
 class PositionInWindowTest {
 
     @get:Rule
-    val rule = createAndroidComposeRule<ComponentActivity>()
+    val rule = createAndroidComposeRule<TestActivity>()
 
     lateinit var activity: ComponentActivity
 

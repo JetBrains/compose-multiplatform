@@ -237,9 +237,7 @@ internal class AndroidComposeView(context: Context) :
             }
             return _androidViewsHandler!!
         }
-    private val viewLayersContainer by lazy(LazyThreadSafetyMode.NONE) {
-        ViewLayerContainer(context).also { addView(it) }
-    }
+    private var viewLayersContainer: DrawChildContainer? = null
 
     // The constraints being used by the last onMeasure. It is set to null in onLayout. It allows
     // us to detect the case when the View was measured twice with different constraints within
@@ -583,12 +581,20 @@ internal class AndroidComposeView(context: Context) :
                 isRenderNodeCompatible = false
             }
         }
-        return ViewLayer(
-            this,
-            viewLayersContainer,
-            drawBlock,
-            invalidateParentLayer
-        )
+        if (viewLayersContainer == null) {
+            if (!ViewLayer.hasRetrievedMethod) {
+                // Test to see if updateDisplayList() can be called. If this fails then
+                // ViewLayer.shouldUseDispatchDraw will be true.
+                ViewLayer.updateDisplayList(View(context))
+            }
+            if (ViewLayer.shouldUseDispatchDraw) {
+                viewLayersContainer = DrawChildContainer(context)
+            } else {
+                viewLayersContainer = ViewLayerContainer(context)
+            }
+            addView(viewLayersContainer)
+        }
+        return ViewLayer(this, viewLayersContainer!!, drawBlock, invalidateParentLayer)
     }
 
     override fun onSemanticsChange() {
@@ -613,6 +619,7 @@ internal class AndroidComposeView(context: Context) :
             invalidateLayers(root)
         }
         measureAndLayout()
+
         // we don't have to observe here because the root has a layer modifier
         // that will observe all children. The AndroidComposeView has only the
         // root, so it doesn't have to invalidate itself based on model changes.
@@ -624,6 +631,17 @@ internal class AndroidComposeView(context: Context) :
                 layer.updateDisplayList()
             }
             dirtyLayers.clear()
+        }
+
+        if (ViewLayer.shouldUseDispatchDraw) {
+            // We must update the display list of all children using dispatchDraw()
+            // instead of updateDisplayList(). But since we don't want to actually draw
+            // the contents, we will clip out everything from the canvas.
+            val saveCount = canvas.save()
+            canvas.clipRect(0f, 0f, 0f, 0f)
+
+            super.dispatchDraw(canvas)
+            canvas.restoreToCount(saveCount)
         }
     }
 
