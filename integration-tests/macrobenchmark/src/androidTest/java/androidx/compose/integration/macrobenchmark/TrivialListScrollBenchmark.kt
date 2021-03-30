@@ -18,6 +18,7 @@ package androidx.compose.integration.macrobenchmark
 
 import android.content.Intent
 import android.graphics.Point
+import androidx.benchmark.integration.macrobenchmark.createCompilationParams
 import androidx.benchmark.macro.CompilationMode
 import androidx.benchmark.macro.FrameTimingMetric
 import androidx.benchmark.macro.junit4.MacrobenchmarkRule
@@ -34,7 +35,9 @@ import org.junit.runners.Parameterized
 
 @LargeTest
 @RunWith(Parameterized::class)
-class FrameTimingMetricValidation(private val compilationMode: CompilationMode) {
+class TrivialListScrollBenchmark(
+    private val compilationMode: CompilationMode
+) {
     @get:Rule
     val benchmarkRule = MacrobenchmarkRule()
 
@@ -78,13 +81,8 @@ class FrameTimingMetricValidation(private val compilationMode: CompilationMode) 
 
         private const val COMPOSE_IDLE = "COMPOSE-IDLE"
 
-        @Parameterized.Parameters(name = "compilation_mode={0}")
+        @Parameterized.Parameters(name = "compilation={0}")
         @JvmStatic
-        fun jankParameters(): List<Array<Any>> {
-            return listOf(
-                CompilationMode.None,
-                CompilationMode.SpeedProfile(warmupIterations = 3)
-            ).map { arrayOf(it) }
-        }
+        fun parameters() = createCompilationParams()
     }
 }
