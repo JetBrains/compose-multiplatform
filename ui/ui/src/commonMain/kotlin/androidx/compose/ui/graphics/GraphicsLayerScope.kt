@@ -63,7 +63,7 @@ interface GraphicsLayerScope : Density {
      * [shape] set, a shadow is produced. Default value is `0` and the value must not be
      * negative.
      *
-     * Note that if you provide a non-zero [shadowElevation] and if the passed [shape] is convex the
+     * Note that if you provide a non-zero [shadowElevation] and if the passed [shape] is concave the
      * shadow will not be drawn on Android versions less than 10.
      */
     /*@setparam:FloatRange(from = 0.0)*/

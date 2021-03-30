@@ -97,7 +97,8 @@ sealed class Outline {
     /**
      * An area defined as a path.
      *
-     * Note that only convex paths can be used for drawing the shadow. See [Path.isConvex].
+     * Note that if you use this path for drawing the shadow on Android versions less than 10 the
+     * shadow will not be drawn for the concave paths. See [Path.isConvex].
      */
     class Generic(val path: Path) : Outline() {
         override val bounds: Rect

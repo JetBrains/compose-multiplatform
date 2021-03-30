@@ -168,7 +168,7 @@ fun TopAppBar(
  * See [BottomAppBar anatomy](https://material.io/components/app-bars-bottom/#anatomy) for the
  * recommended content depending on the [FloatingActionButton] position.
  *
- * Note that when you pass a non-null [cutoutShape] this makes the AppBar shape convex. The shadows
+ * Note that when you pass a non-null [cutoutShape] this makes the AppBar shape concave. The shadows
  * for such shapes will not be drawn on Android versions less than 10.
  *
  * @sample androidx.compose.material.samples.SimpleBottomAppBar
