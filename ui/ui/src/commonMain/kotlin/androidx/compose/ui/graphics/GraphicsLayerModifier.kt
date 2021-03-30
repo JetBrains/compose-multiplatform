@@ -37,6 +37,9 @@ import androidx.compose.ui.unit.Constraints
  * rotation ([rotationX], [rotationY], [rotationZ]), opacity ([alpha]), shadow
  * ([shadowElevation], [shape]), and clipping ([clip], [shape]).
  *
+ * Note that if you provide a non-zero [shadowElevation] and if the passed [shape] is convex the
+ * shadow will not be drawn on Android versions less than 10.
+ *
  * If the layer parameters are backed by a [androidx.compose.runtime.State] or an animated value
  * prefer an overload with a lambda block on [GraphicsLayerScope] as reading a state inside the block
  * will only cause the layer properties update without triggering recomposition and relayout.
