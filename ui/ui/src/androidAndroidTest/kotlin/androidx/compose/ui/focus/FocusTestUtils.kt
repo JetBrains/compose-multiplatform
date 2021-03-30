@@ -17,10 +17,16 @@
 package androidx.compose.ui.focus
 
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.requiredSize
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.layout.Layout
+import androidx.compose.ui.layout.MeasurePolicy
 import androidx.compose.ui.test.junit4.ComposeContentTestRule
+import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 
 /**
@@ -31,4 +37,38 @@ internal fun ComposeContentTestRule.setFocusableContent(content: @Composable () 
     setContent {
         Box(modifier = Modifier.requiredSize(10.dp, 10.dp)) { content() }
     }
+}
+
+/**
+ * This is a composable that makes it easier to create focusable boxes with a specific offset and
+ * dimensions.
+ */
+@Composable
+internal fun FocusableBox(
+    isFocused: MutableState<Boolean>,
+    x: Int,
+    y: Int,
+    width: Int,
+    height: Int,
+    focusRequester: FocusRequester? = null,
+    content: @Composable () -> Unit = {}
+) {
+    Layout(
+        content = content,
+        modifier = Modifier
+            .offset { IntOffset(x, y) }
+            .focusRequester(focusRequester ?: FocusRequester())
+            .onFocusChanged { isFocused.value = it.isFocused }
+            .focusModifier(),
+        measurePolicy = remember(width, height) {
+            MeasurePolicy { measurables, constraint ->
+                layout(width, height) {
+                    measurables.forEach {
+                        val placeable = it.measure(constraint)
+                        placeable.placeRelative(0, 0)
+                    }
+                }
+            }
+        }
+    )
 }
