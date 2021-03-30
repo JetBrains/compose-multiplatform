@@ -31,7 +31,9 @@ import androidx.compose.ui.platform.actionmodecallback.TextActionModeCallback
  */
 internal class AndroidTextToolbar(private val view: View) : TextToolbar {
     private var actionMode: ActionMode? = null
-    private var textToolbarStatus = TextToolbarStatus.Hidden
+    private val textActionModeCallback: TextActionModeCallback = TextActionModeCallback()
+    override var status: TextToolbarStatus = TextToolbarStatus.Hidden
+        private set
 
     override fun showMenu(
         rect: Rect,
@@ -40,45 +42,34 @@ internal class AndroidTextToolbar(private val view: View) : TextToolbar {
         onCutRequested: ActionCallback?,
         onSelectAllRequested: ActionCallback?
     ) {
-        textToolbarStatus = TextToolbarStatus.Shown
-        if (Build.VERSION.SDK_INT >= 23) {
-            val actionModeCallback =
-                FloatingTextActionModeCallback(
-                    TextActionModeCallback(
-                        onCopyRequested = onCopyRequested,
-                        onCutRequested = onCutRequested,
-                        onPasteRequested = onPasteRequested,
-                        onSelectAllRequested = onSelectAllRequested
-                    )
+        textActionModeCallback.rect = rect
+        textActionModeCallback.onCopyRequested = onCopyRequested
+        textActionModeCallback.onCutRequested = onCutRequested
+        textActionModeCallback.onPasteRequested = onPasteRequested
+        textActionModeCallback.onSelectAllRequested = onSelectAllRequested
+        if (actionMode == null) {
+            status = TextToolbarStatus.Shown
+            actionMode = if (Build.VERSION.SDK_INT >= 23) {
+                TextToolbarHelperMethods.startActionMode(
+                    view,
+                    FloatingTextActionModeCallback(textActionModeCallback),
+                    ActionMode.TYPE_FLOATING
                 )
-            actionModeCallback.setRect(rect)
-            actionMode = TextToolbarHelperMethods.startActionMode(
-                view,
-                actionModeCallback,
-                ActionMode.TYPE_FLOATING
-            )
+            } else {
+                view.startActionMode(
+                    PrimaryTextActionModeCallback(textActionModeCallback)
+                )
+            }
         } else {
-            val actionModeCallback =
-                PrimaryTextActionModeCallback(
-                    TextActionModeCallback(
-                        onCopyRequested = onCopyRequested,
-                        onPasteRequested = onPasteRequested,
-                        onCutRequested = onCutRequested,
-                        onSelectAllRequested = onSelectAllRequested
-                    )
-                )
-            actionMode = view.startActionMode(actionModeCallback)
+            actionMode?.invalidate()
         }
     }
 
     override fun hide() {
-        textToolbarStatus = TextToolbarStatus.Hidden
+        status = TextToolbarStatus.Hidden
         actionMode?.finish()
         actionMode = null
     }
-
-    override val status: TextToolbarStatus
-        get() = textToolbarStatus
 }
 
 /**
@@ -99,5 +90,10 @@ internal object TextToolbarHelperMethods {
             actionModeCallback,
             type
         )
+    }
+
+    @RequiresApi(23)
+    fun invalidateContentRect(actionMode: ActionMode) {
+        actionMode.invalidateContentRect()
     }
 }
