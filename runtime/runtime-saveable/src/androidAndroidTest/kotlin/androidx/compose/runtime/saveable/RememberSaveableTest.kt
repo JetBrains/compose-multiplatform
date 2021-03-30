@@ -382,6 +382,34 @@ class RememberSaveableTest {
 
         assertThat(actualKey).isNotEmpty()
     }
+
+    @Test
+    fun restoreCorrectValueAfterInputChanges() {
+        var counter = 0
+        var composedValue: Int? = null
+        var input by mutableStateOf(0)
+        restorationTester.setContent {
+            composedValue = rememberSaveable(input) {
+                counter++
+            }
+        }
+
+        rule.runOnIdle {
+            assertThat(composedValue).isEqualTo(0)
+            input = 1 // this will reset the state
+        }
+
+        rule.runOnIdle {
+            assertThat(composedValue).isEqualTo(1)
+            composedValue = null // clear to make sure the restoration worked
+        }
+
+        restorationTester.emulateSavedInstanceStateRestore()
+
+        rule.runOnIdle {
+            assertThat(composedValue).isEqualTo(1)
+        }
+    }
 }
 
 @Composable
