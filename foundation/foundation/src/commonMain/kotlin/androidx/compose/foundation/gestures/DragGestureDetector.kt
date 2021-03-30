@@ -23,8 +23,10 @@ import androidx.compose.ui.input.pointer.PointerEventPass
 import androidx.compose.ui.input.pointer.PointerId
 import androidx.compose.ui.input.pointer.PointerInputChange
 import androidx.compose.ui.input.pointer.PointerInputScope
+import androidx.compose.ui.input.pointer.changedToUp
 import androidx.compose.ui.input.pointer.positionChangeConsumed
 import androidx.compose.ui.input.pointer.changedToUpIgnoreConsumed
+import androidx.compose.ui.input.pointer.consumeDownChange
 import androidx.compose.ui.input.pointer.isOutOfBounds
 import androidx.compose.ui.input.pointer.positionChange
 import androidx.compose.ui.input.pointer.positionChangeIgnoreConsumed
@@ -33,6 +35,7 @@ import androidx.compose.ui.platform.ViewConfiguration
 import androidx.compose.ui.util.fastAll
 import androidx.compose.ui.util.fastAny
 import androidx.compose.ui.util.fastFirstOrNull
+import androidx.compose.ui.util.fastForEach
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.TimeoutCancellationException
 import kotlinx.coroutines.withTimeout
@@ -247,10 +250,16 @@ suspend fun PointerInputScope.detectDragGesturesAfterLongPress(
                 onDragStart.invoke(drag.position)
 
                 awaitPointerEventScope {
-                    if (!drag(drag.id) { onDrag(it, it.positionChange()) }) {
-                        onDragCancel()
-                    } else {
+                    if (drag(drag.id) { onDrag(it, it.positionChange()) }) {
+                        // consume up if we quit drag gracefully with the up
+                        currentEvent.changes.fastForEach {
+                            if (it.changedToUp()) {
+                                it.consumeDownChange()
+                            }
+                        }
                         onDragEnd()
+                    } else {
+                        onDragCancel()
                     }
                 }
             }

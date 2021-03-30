@@ -3,3 +3,7 @@ RemovedClass: androidx.compose.foundation.legacygestures.PressIndicatorGestureFi
     Removed class androidx.compose.foundation.legacygestures.PressIndicatorGestureFilterKt
 RemovedClass: androidx.compose.foundation.legacygestures.TapGestureFilterKt:
     Removed class androidx.compose.foundation.legacygestures.TapGestureFilterKt
+RemovedClass: androidx.compose.foundation.legacygestures.DragGestureFilterKt:
+    Removed class androidx.compose.foundation.legacygestures.DragGestureFilterKt
+RemovedPackage: androidx.compose.foundation.legacygestures:
+    Removed package androidx.compose.foundation.legacygestures
