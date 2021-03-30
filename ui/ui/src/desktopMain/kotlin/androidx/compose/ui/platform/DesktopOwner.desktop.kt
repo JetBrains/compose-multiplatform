@@ -26,17 +26,22 @@ import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.autofill.Autofill
 import androidx.compose.ui.autofill.AutofillTree
 import androidx.compose.ui.focus.FocusDirection
-import androidx.compose.ui.focus.FocusDirection.Down
-import androidx.compose.ui.focus.FocusDirection.Left
-import androidx.compose.ui.focus.FocusDirection.Next
-import androidx.compose.ui.focus.FocusDirection.Previous
-import androidx.compose.ui.focus.FocusDirection.Right
-import androidx.compose.ui.focus.FocusDirection.Up
+import androidx.compose.ui.focus.FocusDirectionInternal
+import androidx.compose.ui.focus.FocusDirectionInternal.Down
+import androidx.compose.ui.focus.FocusDirectionInternal.In
+import androidx.compose.ui.focus.FocusDirectionInternal.Left
+import androidx.compose.ui.focus.FocusDirectionInternal.Next
+import androidx.compose.ui.focus.FocusDirectionInternal.Out
+import androidx.compose.ui.focus.FocusDirectionInternal.Previous
+import androidx.compose.ui.focus.FocusDirectionInternal.Right
+import androidx.compose.ui.focus.FocusDirectionInternal.Up
 import androidx.compose.ui.focus.FocusManager
 import androidx.compose.ui.focus.FocusManagerImpl
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Canvas
 import androidx.compose.ui.graphics.DesktopCanvas
+import androidx.compose.ui.input.key.Key.Companion.Back
+import androidx.compose.ui.input.key.Key.Companion.DirectionCenter
 import androidx.compose.ui.input.key.Key.Companion.DirectionDown
 import androidx.compose.ui.input.key.Key.Companion.DirectionLeft
 import androidx.compose.ui.input.key.Key.Companion.DirectionRight
@@ -44,6 +49,7 @@ import androidx.compose.ui.input.key.Key.Companion.DirectionUp
 import androidx.compose.ui.input.key.Key.Companion.Tab
 import androidx.compose.ui.input.key.KeyEvent
 import androidx.compose.ui.input.key.KeyEventType
+import androidx.compose.ui.input.key.KeyEventType.KeyDown
 import androidx.compose.ui.input.key.KeyInputModifier
 import androidx.compose.ui.input.key.isShiftPressed
 import androidx.compose.ui.input.key.key
@@ -108,13 +114,24 @@ internal class DesktopOwner(
     //  that this common logic can be used by all owners.
     private val keyInputModifier: KeyInputModifier = KeyInputModifier(
         onKeyEvent = {
-            if (it.type == KeyEventType.KeyDown) {
-                getFocusDirection(it)?.let { direction ->
-                    focusManager.moveFocus(direction)
-                    return@KeyInputModifier true
+            val focusDirection = getFocusDirection(it)
+            if (focusDirection == null || it.type != KeyDown) return@KeyInputModifier false
+
+            val focusMoveSuccess = with(focusManager) {
+                when (focusDirection) {
+                    Up -> moveFocus(FocusDirection.Up)
+                    Down -> moveFocus(FocusDirection.Down)
+                    Left -> moveFocus(FocusDirection.Left)
+                    Right -> moveFocus(FocusDirection.Right)
+                    In -> moveFocusIn()
+                    Out -> moveFocusOut()
+                    Next -> moveFocus(FocusDirection.Next)
+                    Previous -> moveFocus(FocusDirection.Previous)
                 }
             }
-            false
+
+            // Consume the key event if we moved focus.
+            focusMoveSuccess
         },
         onPreviewKeyEvent = null
     )
@@ -255,13 +272,17 @@ internal class DesktopOwner(
 
     override fun onLayoutChange(layoutNode: LayoutNode) = Unit
 
-    override fun getFocusDirection(keyEvent: KeyEvent): FocusDirection? = when (keyEvent.key) {
-        Tab -> if (keyEvent.isShiftPressed) Previous else Next
-        DirectionRight -> Right
-        DirectionLeft -> Left
-        DirectionUp -> Up
-        DirectionDown -> Down
-        else -> null
+    override fun getFocusDirection(keyEvent: KeyEvent): FocusDirectionInternal? {
+        return when (keyEvent.key) {
+            Tab -> if (keyEvent.isShiftPressed) Previous else Next
+            DirectionRight -> Right
+            DirectionLeft -> Left
+            DirectionUp -> Up
+            DirectionDown -> Down
+            DirectionCenter -> In
+            Back -> Out
+            else -> null
+        }
     }
 
     override fun calculatePositionInWindow(localPosition: Offset): Offset = localPosition
