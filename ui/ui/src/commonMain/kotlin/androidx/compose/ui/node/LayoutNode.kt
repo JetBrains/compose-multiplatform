@@ -906,6 +906,9 @@ internal class LayoutNode : Measurable, Remeasurement, OwnerScope, LayoutInfo, C
                     // all the placed children.
                     if (child.placeOrder == NotPlacedPlaceOrder) {
                         child.markSubtreeAsNotPlaced()
+                        // we have to invalidate here in order to stop displaying the child
+                        // which is not placed anymore.
+                        invalidateLayer()
                     }
                     child.alignmentLinesRead = child.alignmentLinesQueriedSinceLastLayout
                 }
