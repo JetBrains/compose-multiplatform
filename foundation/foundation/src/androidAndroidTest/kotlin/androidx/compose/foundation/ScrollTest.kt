@@ -19,8 +19,8 @@ import android.os.Handler
 import android.os.Looper
 import androidx.annotation.RequiresApi
 import androidx.compose.animation.core.advanceClockMillis
-import androidx.compose.foundation.gestures.scrollBy
 import androidx.compose.foundation.gestures.animateScrollBy
+import androidx.compose.foundation.gestures.scrollBy
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -71,7 +71,6 @@ import org.junit.After
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
 import org.junit.Before
-import org.junit.Ignore
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -361,7 +360,6 @@ class ScrollTest {
             .assertIsDisplayed()
     }
 
-    @Ignore("Unignore when b/156389287 is fixed for proper reverse and rtl delegation")
     @Test
     fun horizontalScroller_rtl_scrollTo_scrollForward() {
         createScrollableContent(isVertical = false, isRtl = true)
@@ -372,7 +370,6 @@ class ScrollTest {
             .assertIsDisplayed()
     }
 
-    @Ignore("Unignore when b/156389287 is fixed for proper reverse delegation")
     @Test
     fun verticalScroller_reversed_scrollTo_scrollForward(): Unit = runBlocking {
         createScrollableContent(
@@ -387,7 +384,6 @@ class ScrollTest {
             .assertIsDisplayed()
     }
 
-    @Ignore("Unignore when b/156389287 is fixed for proper reverse and rtl delegation")
     @Test
     fun horizontalScroller_reversed_scrollTo_scrollForward(): Unit = runBlocking {
         createScrollableContent(
