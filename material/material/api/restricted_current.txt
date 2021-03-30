@@ -47,38 +47,6 @@ package androidx.compose.material {
   public final class BackdropScaffoldKt {
   }
 
-  public final class BottomDrawerState {
-    ctor public BottomDrawerState(androidx.compose.material.BottomDrawerValue initialValue, optional kotlin.jvm.functions.Function1<? super androidx.compose.material.BottomDrawerValue,java.lang.Boolean> confirmStateChange);
-    method public suspend Object? close(kotlin.coroutines.Continuation<? super kotlin.Unit> p);
-    method public suspend Object? expand(kotlin.coroutines.Continuation<? super kotlin.Unit> p);
-    method public final T! getCurrentValue();
-    method public final float getDirection();
-    method public final androidx.compose.runtime.State<java.lang.Float> getOffset();
-    method public final androidx.compose.runtime.State<java.lang.Float> getOverflow();
-    method public final T! getTargetValue();
-    method public final boolean isAnimationRunning();
-    method public boolean isClosed();
-    method public boolean isExpanded();
-    method public boolean isOpen();
-    method public suspend Object? open(kotlin.coroutines.Continuation<? super kotlin.Unit> p);
-    method public final float performDrag(float delta);
-    method public final suspend Object? performFling(float velocity, kotlin.coroutines.Continuation<? super kotlin.Unit> p);
-    property public final boolean isClosed;
-    property public final boolean isExpanded;
-    property public final boolean isOpen;
-    field public static final androidx.compose.material.BottomDrawerState.Companion Companion;
-  }
-
-  public static final class BottomDrawerState.Companion {
-    method public androidx.compose.runtime.saveable.Saver<androidx.compose.material.BottomDrawerState,androidx.compose.material.BottomDrawerValue> Saver(kotlin.jvm.functions.Function1<? super androidx.compose.material.BottomDrawerValue,java.lang.Boolean> confirmStateChange);
-  }
-
-  public enum BottomDrawerValue {
-    enum_constant public static final androidx.compose.material.BottomDrawerValue Closed;
-    enum_constant public static final androidx.compose.material.BottomDrawerValue Expanded;
-    enum_constant public static final androidx.compose.material.BottomDrawerValue Open;
-  }
-
   public final class BottomNavigationDefaults {
     method public float getElevation-D9Ej5fM();
     property public final float Elevation;
@@ -243,24 +211,19 @@ package androidx.compose.material {
 
   public final class DrawerKt {
     method @androidx.compose.runtime.Composable public static void ModalDrawer-TlzqArY(kotlin.jvm.functions.Function1<? super androidx.compose.foundation.layout.ColumnScope,kotlin.Unit> drawerContent, optional androidx.compose.ui.Modifier modifier, optional androidx.compose.material.DrawerState drawerState, optional boolean gesturesEnabled, optional androidx.compose.ui.graphics.Shape drawerShape, optional float drawerElevation, optional long drawerBackgroundColor, optional long drawerContentColor, optional long scrimColor, kotlin.jvm.functions.Function0<kotlin.Unit> content);
-    method @androidx.compose.runtime.Composable public static androidx.compose.material.BottomDrawerState rememberBottomDrawerState(androidx.compose.material.BottomDrawerValue initialValue, optional kotlin.jvm.functions.Function1<? super androidx.compose.material.BottomDrawerValue,java.lang.Boolean> confirmStateChange);
     method @androidx.compose.runtime.Composable public static androidx.compose.material.DrawerState rememberDrawerState(androidx.compose.material.DrawerValue initialValue, optional kotlin.jvm.functions.Function1<? super androidx.compose.material.DrawerValue,java.lang.Boolean> confirmStateChange);
   }
 
   @androidx.compose.runtime.Stable public final class DrawerState {
     ctor public DrawerState(androidx.compose.material.DrawerValue initialValue, optional kotlin.jvm.functions.Function1<? super androidx.compose.material.DrawerValue,java.lang.Boolean> confirmStateChange);
     method public suspend Object? close(kotlin.coroutines.Continuation<? super kotlin.Unit> p);
-    method public final T! getCurrentValue();
-    method public final float getDirection();
-    method public final androidx.compose.runtime.State<java.lang.Float> getOffset();
-    method public final androidx.compose.runtime.State<java.lang.Float> getOverflow();
-    method public final T! getTargetValue();
-    method public final boolean isAnimationRunning();
+    method public androidx.compose.material.DrawerValue getCurrentValue();
+    method public boolean isAnimationRunning();
     method public boolean isClosed();
     method public boolean isOpen();
     method public suspend Object? open(kotlin.coroutines.Continuation<? super kotlin.Unit> p);
-    method public final float performDrag(float delta);
-    method public final suspend Object? performFling(float velocity, kotlin.coroutines.Continuation<? super kotlin.Unit> p);
+    property public final androidx.compose.material.DrawerValue currentValue;
+    property public final boolean isAnimationRunning;
     property public final boolean isClosed;
     property public final boolean isOpen;
     field public static final androidx.compose.material.DrawerState.Companion Companion;
