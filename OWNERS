@@ -9,5 +9,6 @@ nickanthony@google.com
 per-file *Dependencies.kt=file://OWNERS
 per-file *LibraryVersions.kt=file://OWNERS
 per-file *PublishDocsRules.kt=file://OWNERS
+per-file *build_dependencies.gradle=file://OWNERS
 
 per-file *AndroidXPlaygroundRootPlugin.kt = dustinlam@google.com, rahulrav@google.com, yboyar@google.com
