@@ -425,13 +425,6 @@ package androidx.compose.foundation.lazy {
 
 }
 
-package androidx.compose.foundation.legacygestures {
-
-  public final class DragGestureFilterKt {
-  }
-
-}
-
 package androidx.compose.foundation.selection {
 
   public final class SelectableGroupKt {
@@ -640,6 +633,9 @@ package androidx.compose.foundation.text {
   public static final class KeyboardOptions.Companion {
     method public androidx.compose.foundation.text.KeyboardOptions getDefault();
     property public final androidx.compose.foundation.text.KeyboardOptions Default;
+  }
+
+  public final class LongPressTextDragObserverKt {
   }
 
   public final class MaxLinesHeightModifierKt {

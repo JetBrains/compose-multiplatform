@@ -32,7 +32,7 @@ import androidx.compose.ui.focus.isFocused
 import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Rect
-import androidx.compose.foundation.legacygestures.DragObserver
+import androidx.compose.foundation.text.TextDragObserver
 import androidx.compose.ui.hapticfeedback.HapticFeedback
 import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.input.key.KeyEvent
@@ -467,9 +467,9 @@ internal class SelectionManager(private val selectionRegistrar: SelectionRegistr
         }
     }
 
-    fun handleDragObserver(isStartHandle: Boolean): DragObserver {
-        return object : DragObserver {
-            override fun onStart(downPosition: Offset) {
+    fun handleDragObserver(isStartHandle: Boolean): TextDragObserver {
+        return object : TextDragObserver {
+            override fun onStart(startPoint: Offset) {
                 hideSelectionToolbar()
                 val selection = selection!!
                 val startSelectable =
@@ -510,9 +510,9 @@ internal class SelectionManager(private val selectionRegistrar: SelectionRegistr
                 dragTotalDistance = Offset.Zero
             }
 
-            override fun onDrag(dragDistance: Offset): Offset {
+            override fun onDrag(delta: Offset) {
                 val selection = selection!!
-                dragTotalDistance += dragDistance
+                dragTotalDistance += delta
                 val startSelectable =
                     selectionRegistrar.selectableMap[selection.start.selectableId]
                 val endSelectable =
@@ -549,10 +549,10 @@ internal class SelectionManager(private val selectionRegistrar: SelectionRegistr
                     endPosition = currentEnd,
                     isStartHandle = isStartHandle
                 )
-                return dragDistance
+                return
             }
 
-            override fun onStop(velocity: Offset) {
+            override fun onStop() {
                 showSelectionToolbar()
             }
 

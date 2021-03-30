@@ -144,7 +144,7 @@ class SelectionManagerDragTest {
         val dragDistance = Offset(100f, 100f)
         selectionManager.handleDragObserver(isStartHandle = true).onStart(startOffset)
 
-        val result = selectionManager.handleDragObserver(isStartHandle = true).onDrag(dragDistance)
+        selectionManager.handleDragObserver(isStartHandle = true).onDrag(dragDistance)
 
         verify(containerLayoutCoordinates, times(1))
             .localPositionOf(
@@ -163,7 +163,6 @@ class SelectionManagerDragTest {
 
         assertThat(selection).isEqualTo(fakeResultSelection)
         verify(spyLambda, times(1)).invoke(fakeResultSelection)
-        assertThat(result).isEqualTo(dragDistance)
     }
 
     @Test
@@ -172,7 +171,7 @@ class SelectionManagerDragTest {
         val dragDistance = Offset(100f, 100f)
         selectionManager.handleDragObserver(isStartHandle = false).onStart(startOffset)
 
-        val result = selectionManager.handleDragObserver(isStartHandle = false).onDrag(dragDistance)
+        selectionManager.handleDragObserver(isStartHandle = false).onDrag(dragDistance)
 
         verify(containerLayoutCoordinates, times(1))
             .localPositionOf(
@@ -191,7 +190,6 @@ class SelectionManagerDragTest {
 
         assertThat(selection).isEqualTo(fakeResultSelection)
         verify(spyLambda, times(1)).invoke(fakeResultSelection)
-        assertThat(result).isEqualTo(dragDistance)
     }
 
     private fun getAdjustedCoordinates(position: Offset): Offset {
