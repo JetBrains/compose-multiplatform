@@ -60,6 +60,8 @@ dependencies {
         // DexMaker has it"s own MockMaker
         androidTestImplementation(MOCKITO_CORE, libs.exclude_bytebuddy)
         // DexMaker has it"s own MockMaker
+
+        lintPublish(project(":compose:runtime:runtime-saveable-lint"))
     }
 }
 
