@@ -17,6 +17,7 @@
 package androidx.compose.material
 
 import android.os.SystemClock.sleep
+import androidx.compose.animation.core.TweenSpec
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
@@ -273,6 +274,97 @@ class DrawerTest {
         drawerState.close()
         // Then the drawer should be closed
         rule.onNodeWithTag("drawer").assertLeftPositionInRootIsEqualTo(-width)
+    }
+
+    @Test
+    @LargeTest
+    fun modalDrawer_animateTo(): Unit = runBlocking(AutoTestFrameClock()) {
+        lateinit var drawerState: DrawerState
+        rule.setMaterialContent {
+            drawerState = rememberDrawerState(DrawerValue.Closed)
+            ModalDrawer(
+                drawerState = drawerState,
+                drawerContent = {
+                    Box(Modifier.fillMaxSize().testTag("drawer"))
+                },
+                content = {}
+            )
+        }
+
+        val width = rule.rootWidth()
+
+        // Drawer should start in closed state
+        rule.onNodeWithTag("drawer").assertLeftPositionInRootIsEqualTo(-width)
+
+        // When the drawer state is set to Opened
+        drawerState.animateTo(DrawerValue.Open, TweenSpec())
+        // Then the drawer should be opened
+        rule.onNodeWithTag("drawer").assertLeftPositionInRootIsEqualTo(0.dp)
+
+        // When the drawer state is set to Closed
+        drawerState.animateTo(DrawerValue.Closed, TweenSpec())
+        // Then the drawer should be closed
+        rule.onNodeWithTag("drawer").assertLeftPositionInRootIsEqualTo(-width)
+    }
+
+    @Test
+    @LargeTest
+    fun modalDrawer_snapTo(): Unit = runBlocking(AutoTestFrameClock()) {
+        lateinit var drawerState: DrawerState
+        rule.setMaterialContent {
+            drawerState = rememberDrawerState(DrawerValue.Closed)
+            ModalDrawer(
+                drawerState = drawerState,
+                drawerContent = {
+                    Box(Modifier.fillMaxSize().testTag("drawer"))
+                },
+                content = {}
+            )
+        }
+
+        val width = rule.rootWidth()
+
+        // Drawer should start in closed state
+        rule.onNodeWithTag("drawer").assertLeftPositionInRootIsEqualTo(-width)
+
+        // When the drawer state is set to Opened
+        drawerState.snapTo(DrawerValue.Open)
+        // Then the drawer should be opened
+        rule.onNodeWithTag("drawer").assertLeftPositionInRootIsEqualTo(0.dp)
+
+        // When the drawer state is set to Closed
+        drawerState.snapTo(DrawerValue.Closed)
+        // Then the drawer should be closed
+        rule.onNodeWithTag("drawer").assertLeftPositionInRootIsEqualTo(-width)
+    }
+
+    @Test
+    @LargeTest
+    fun modalDrawer_currentValue(): Unit = runBlocking(AutoTestFrameClock()) {
+        lateinit var drawerState: DrawerState
+        rule.setMaterialContent {
+            drawerState = rememberDrawerState(DrawerValue.Closed)
+            ModalDrawer(
+                drawerState = drawerState,
+                drawerContent = {
+                    Box(Modifier.fillMaxSize().testTag("drawer"))
+                },
+                content = {}
+            )
+        }
+
+        // Drawer should start in closed state
+        assertThat(drawerState.currentValue).isEqualTo(DrawerValue.Closed)
+
+        // When the drawer state is set to Opened
+        drawerState.snapTo(DrawerValue.Open)
+        // Then the drawer should be opened
+        assertThat(drawerState.currentValue).isEqualTo(DrawerValue.Open)
+
+        // When the drawer state is set to Closed
+        drawerState.snapTo(DrawerValue.Closed)
+        // Then the drawer should be closed
+        assertThat(drawerState.currentValue).isEqualTo(DrawerValue.Closed)
     }
 
     @Test
