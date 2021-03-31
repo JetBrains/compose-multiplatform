@@ -32,7 +32,7 @@ import android.view.inputmethod.InputContentInfo
 import android.view.inputmethod.InputMethodManager
 import androidx.annotation.VisibleForTesting
 
-internal val DEBUG = true
+internal val DEBUG = false
 internal val TAG = "RecordingIC"
 
 /**
