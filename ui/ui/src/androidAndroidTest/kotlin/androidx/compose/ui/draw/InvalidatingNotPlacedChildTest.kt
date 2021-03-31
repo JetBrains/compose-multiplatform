@@ -151,6 +151,34 @@ class InvalidatingNotPlacedChildTest {
             .captureToImage()
             .assertCenterPixelColor(Color.Red)
     }
+
+    @Test
+    @SdkSuppress(minSdkVersion = Build.VERSION_CODES.O)
+    fun childIsNotDisplayedWhenIsNotPlacedAnymore() {
+        val shouldPlace = mutableStateOf(true)
+        composeTestRule.setContent {
+            ConditionallyPlacedChild(
+                shouldPlace,
+                Modifier.background(Color.Blue)
+                    .graphicsLayer()
+                    .testTag("node")
+            ) {
+                Spacer(
+                    Modifier.fillMaxSize()
+                        .graphicsLayer()
+                        .background(Color.Red)
+                )
+            }
+        }
+
+        composeTestRule.runOnIdle {
+            shouldPlace.value = false
+        }
+
+        composeTestRule.onNodeWithTag("node")
+            .captureToImage()
+            .assertCenterPixelColor(Color.Blue)
+    }
 }
 
 @Composable
