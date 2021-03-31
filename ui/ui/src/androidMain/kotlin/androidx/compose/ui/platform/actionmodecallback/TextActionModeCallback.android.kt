@@ -19,6 +19,7 @@ package androidx.compose.ui.platform.actionmodecallback
 import android.view.ActionMode
 import android.view.Menu
 import android.view.MenuItem
+import androidx.compose.ui.geometry.Rect
 import androidx.compose.ui.platform.ActionCallback
 
 internal const val MENU_ITEM_COPY = 0
@@ -27,12 +28,13 @@ internal const val MENU_ITEM_CUT = 2
 internal const val MENU_ITEM_SELECT_ALL = 3
 
 internal class TextActionModeCallback(
-    private val onCopyRequested: ActionCallback? = null,
-    private val onPasteRequested: ActionCallback? = null,
-    private val onCutRequested: ActionCallback? = null,
-    private val onSelectAllRequested: ActionCallback? = null
-) : ActionMode.Callback {
-    override fun onCreateActionMode(mode: ActionMode?, menu: Menu?): Boolean {
+    var rect: Rect = Rect.Zero,
+    var onCopyRequested: ActionCallback? = null,
+    var onPasteRequested: ActionCallback? = null,
+    var onCutRequested: ActionCallback? = null,
+    var onSelectAllRequested: ActionCallback? = null
+) {
+    fun onCreateActionMode(mode: ActionMode?, menu: Menu?): Boolean {
         requireNotNull(menu)
         requireNotNull(mode)
 
@@ -58,11 +60,11 @@ internal class TextActionModeCallback(
         return true
     }
 
-    override fun onPrepareActionMode(mode: ActionMode?, menu: Menu?): Boolean {
+    fun onPrepareActionMode(): Boolean {
         return false
     }
 
-    override fun onActionItemClicked(mode: ActionMode?, item: MenuItem?): Boolean {
+    fun onActionItemClicked(mode: ActionMode?, item: MenuItem?): Boolean {
         when (item!!.itemId) {
             MENU_ITEM_COPY -> onCopyRequested?.invoke()
             MENU_ITEM_PASTE -> onPasteRequested?.invoke()
@@ -74,5 +76,5 @@ internal class TextActionModeCallback(
         return true
     }
 
-    override fun onDestroyActionMode(mode: ActionMode?) {}
+    fun onDestroyActionMode() {}
 }

@@ -21,7 +21,7 @@ import android.view.Menu
 import android.view.MenuItem
 
 internal class PrimaryTextActionModeCallback(
-    private val callback: ActionMode.Callback
+    private val callback: TextActionModeCallback
 ) : ActionMode.Callback {
     override fun onActionItemClicked(mode: ActionMode?, item: MenuItem?): Boolean {
         return callback.onActionItemClicked(mode, item)
@@ -32,10 +32,10 @@ internal class PrimaryTextActionModeCallback(
     }
 
     override fun onPrepareActionMode(mode: ActionMode?, menu: Menu?): Boolean {
-        return callback.onPrepareActionMode(mode, menu)
+        return callback.onPrepareActionMode()
     }
 
     override fun onDestroyActionMode(mode: ActionMode?) {
-        callback.onDestroyActionMode(mode)
+        callback.onDestroyActionMode()
     }
 }
