@@ -415,7 +415,12 @@ private fun IconsWithTextFieldLayout(
                         )
                 ) { label() }
             }
-            Box(Modifier.layoutId(TextFieldId).then(padding)) { textField() }
+            Box(
+                modifier = Modifier.layoutId(TextFieldId).then(padding),
+                propagateMinConstraints = true,
+            ) {
+                textField()
+            }
         }
     ) { measurables, incomingConstraints ->
         val topBottomPadding = TextFieldPadding.roundToPx()
