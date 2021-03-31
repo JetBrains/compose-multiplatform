@@ -54,7 +54,7 @@ class InspectableTests : ToolingTest() {
                 Column {
                     Box(
                         Modifier.size(100.dp).drawBehind {
-                            drawRect(Color(0xFF))
+                            drawRect(Color.Black)
                         }
                     )
                 }
@@ -299,7 +299,7 @@ class InspectableTests : ToolingTest() {
             Inspectable(CompositionDataRecord.create()) {
                 Column {
                     InInspectionModeOnly {
-                        Box(Modifier.size(100.dp).background(color = Color(0xFF)))
+                        Box(Modifier.size(100.dp).background(color = Color.Black))
                         displayed = true
                     }
                 }
@@ -315,7 +315,7 @@ class InspectableTests : ToolingTest() {
         show {
             Column {
                 InInspectionModeOnly {
-                    Box(Modifier.size(100.dp).background(color = Color(0xFF)))
+                    Box(Modifier.size(100.dp).background(color = Color.Black))
                     displayed = true
                 }
             }

@@ -56,6 +56,8 @@ if(!AndroidXUiPlugin.isMultiplatformEnabled(project)) {
         androidTestImplementation(ESPRESSO_CORE)
         androidTestImplementation(JUNIT)
         androidTestImplementation(TRUTH)
+
+        lintPublish(project(":compose:ui:ui-graphics-lint"))
     }
 }
 
