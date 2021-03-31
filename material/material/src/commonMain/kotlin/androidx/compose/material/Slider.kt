@@ -19,16 +19,19 @@ package androidx.compose.material
 import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.TweenSpec
 import androidx.compose.foundation.Canvas
-import androidx.compose.foundation.interaction.Interaction
-import androidx.compose.foundation.interaction.MutableInteractionSource
-import androidx.compose.foundation.interaction.PressInteraction
+import androidx.compose.foundation.MutatePriority
+import androidx.compose.foundation.MutatorMutex
 import androidx.compose.foundation.focusable
+import androidx.compose.foundation.gestures.DragScope
+import androidx.compose.foundation.gestures.DraggableState
 import androidx.compose.foundation.gestures.Orientation
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.gestures.draggable
-import androidx.compose.foundation.gestures.rememberDraggableState
 import androidx.compose.foundation.indication
 import androidx.compose.foundation.interaction.DragInteraction
+import androidx.compose.foundation.interaction.Interaction
+import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.interaction.PressInteraction
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Spacer
@@ -43,12 +46,16 @@ import androidx.compose.material.ripple.rememberRipple
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Immutable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.Stable
 import androidx.compose.runtime.State
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateListOf
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.rememberUpdatedState
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
@@ -67,7 +74,6 @@ import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.util.lerp
 import kotlinx.coroutines.CancellationException
-import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
@@ -122,29 +128,49 @@ fun Slider(
     interactionSource: MutableInteractionSource = remember { MutableInteractionSource() },
     colors: SliderColors = SliderDefaults.colors()
 ) {
-    val scope = rememberCoroutineScope()
-    val position = remember(valueRange, steps, scope) {
-        SliderPosition(value, valueRange, steps, scope, onValueChange)
+    require(steps >= 0) { "steps should be >= 0" }
+    val onValueChangeState = rememberUpdatedState(onValueChange)
+    val tickFractions = remember(steps) {
+        if (steps == 0) emptyList() else List(steps + 2) { it.toFloat() / (steps + 1) }
     }
-    position.onValueChange = onValueChange
-    position.scaledValue = value
     BoxWithConstraints(
-        modifier.sliderSemantics(value, position, enabled, onValueChange, valueRange, steps)
+        modifier.sliderSemantics(value, tickFractions, enabled, onValueChange, valueRange, steps)
     ) {
         val isRtl = LocalLayoutDirection.current == LayoutDirection.Rtl
         val maxPx = constraints.maxWidth.toFloat()
         val minPx = 0f
-        position.setBounds(minPx, maxPx)
 
-        val gestureEndAction: (Float) -> Unit = { velocity: Float ->
-            if (position.anchorsPx.isNotEmpty()) {
-                val now = position.holder.value
-                val point = position.anchorsPx.minByOrNull { abs(it - now) }
-                val target = point ?: now
+        fun scaleToUserValue(offset: Float) =
+            scale(minPx, maxPx, offset, valueRange.start, valueRange.endInclusive)
+
+        fun scaleToOffset(userValue: Float) =
+            scale(valueRange.start, valueRange.endInclusive, userValue, minPx, maxPx)
+
+        val scope = rememberCoroutineScope()
+        val rawOffset = remember { mutableStateOf(scaleToOffset(value)) }
+        val draggableState = remember(minPx, maxPx, valueRange) {
+            SliderDraggableState {
+                rawOffset.value = (rawOffset.value + it).coerceIn(minPx, maxPx)
+                onValueChangeState.value.invoke(scaleToUserValue(rawOffset.value))
+            }
+        }
+        SideEffect {
+            val newOffset = scaleToOffset(value)
+            // floating point error due to rescaling
+            val error = (valueRange.endInclusive - valueRange.start) / 1000
+            if (abs(newOffset - rawOffset.value) > error) rawOffset.value = newOffset
+        }
+
+        val gestureEndAction = rememberUpdatedState<(Float) -> Unit> { velocity: Float ->
+            val current = rawOffset.value
+            // target is a closest anchor to the `current`, if exists
+            val target = tickFractions
+                .minByOrNull { abs(lerp(minPx, maxPx, it) - current) }
+                ?.run { lerp(minPx, maxPx, this) }
+                ?: current
+            if (current != target) {
                 scope.launch {
-                    position.holder.animateTo(target, SliderToTickAnimation, velocity) {
-                        position.onHolderValueUpdated(this.value)
-                    }
+                    animateToTarget(draggableState, current, target, velocity)
                     onValueChangeFinished?.invoke()
                 }
             } else {
@@ -152,52 +178,25 @@ fun Slider(
             }
         }
 
-        val press = if (enabled) {
-            Modifier.pointerInput(position, interactionSource, maxPx, isRtl) {
-                detectTapGestures(
-                    onPress = { pos ->
-                        position.snapTo(if (isRtl) maxPx - pos.x else pos.x)
-                        val interaction = PressInteraction.Press(pos)
-                        coroutineScope {
-                            launch {
-                                interactionSource.emit(interaction)
-                            }
-                            try {
-                                val success = tryAwaitRelease()
-                                if (success) gestureEndAction(0f)
-                                launch {
-                                    interactionSource.emit(PressInteraction.Release(interaction))
-                                }
-                            } catch (c: CancellationException) {
-                                launch {
-                                    interactionSource.emit(PressInteraction.Cancel(interaction))
-                                }
-                            }
-                        }
-                    }
-                )
-            }
-        } else {
-            Modifier
-        }
+        val press = Modifier.sliderPressModifier(
+            draggableState, interactionSource, maxPx, isRtl, rawOffset, gestureEndAction, enabled
+        )
 
         val drag = Modifier.draggable(
             orientation = Orientation.Horizontal,
             reverseDirection = isRtl,
             enabled = enabled,
             interactionSource = interactionSource,
-            onDragStopped = { velocity -> gestureEndAction(velocity) },
-            startDragImmediately = position.holder.isRunning,
-            state = rememberDraggableState {
-                position.snapTo(position.holder.value + it)
-            }
+            onDragStopped = { velocity -> gestureEndAction.value.invoke(velocity) },
+            startDragImmediately = draggableState.isDragging,
+            state = draggableState
         )
-        val coerced = value.coerceIn(position.startValue, position.endValue)
-        val fraction = calcFraction(position.startValue, position.endValue, coerced)
+        val coerced = value.coerceIn(valueRange.start, valueRange.endInclusive)
+        val fraction = calcFraction(valueRange.start, valueRange.endInclusive, coerced)
         SliderImpl(
             enabled,
             fraction,
-            position.tickFractions,
+            tickFractions,
             colors,
             maxPx,
             interactionSource,
@@ -476,21 +475,21 @@ private fun calcFraction(a: Float, b: Float, pos: Float) =
 
 private fun Modifier.sliderSemantics(
     value: Float,
-    position: SliderPosition,
+    tickFractions: List<Float>,
     enabled: Boolean,
     onValueChange: (Float) -> Unit,
     valueRange: ClosedFloatingPointRange<Float> = 0f..1f,
     steps: Int = 0
 ): Modifier {
-    val coerced = value.coerceIn(position.startValue, position.endValue)
+    val coerced = value.coerceIn(valueRange.start, valueRange.endInclusive)
     return semantics(mergeDescendants = true) {
         if (!enabled) disabled()
         setProgress(
             action = { targetValue ->
-                val newValue = targetValue.coerceIn(position.startValue, position.endValue)
+                val newValue = targetValue.coerceIn(valueRange.start, valueRange.endInclusive)
                 val resolvedValue = if (steps > 0) {
-                    position.tickFractions
-                        .map { lerp(position.startValue, position.endValue, it) }
+                    tickFractions
+                        .map { lerp(valueRange.start, valueRange.endInclusive, it) }
                         .minByOrNull { abs(it - newValue) } ?: newValue
                 } else {
                     newValue
@@ -508,78 +507,57 @@ private fun Modifier.sliderSemantics(
     }.progressSemantics(value, valueRange, steps)
 }
 
-/**
- * Internal state for [Slider] that represents the Slider value, its bounds and optional amount of
- * steps evenly distributed across the Slider range.
- *
- * @param initial initial value for the Slider when created. If outside of range provided,
- * initial position will be coerced to this range
- * @param valueRange range of values that Slider value can take
- * @param steps if greater than 0, specifies the amounts of discrete values, evenly distributed
- * between across the whole value range. If 0, slider will behave as a continuous slider and allow
- * to choose any value from the range specified. Must not be negative.
- */
-private class SliderPosition(
-    initial: Float = 0f,
-    val valueRange: ClosedFloatingPointRange<Float> = 0f..1f,
-    /*@IntRange(from = 0)*/
-    steps: Int = 0,
-    val scope: CoroutineScope,
-    var onValueChange: (Float) -> Unit
+private fun Modifier.sliderPressModifier(
+    draggableState: DraggableState,
+    interactionSource: MutableInteractionSource,
+    maxPx: Float,
+    isRtl: Boolean,
+    rawOffset: State<Float>,
+    gestureEndAction: State<(Float) -> Unit>,
+    enabled: Boolean
+): Modifier =
+    if (enabled) {
+        pointerInput(draggableState, interactionSource, maxPx, isRtl) {
+            detectTapGestures(
+                onPress = { pos ->
+                    draggableState.drag(MutatePriority.UserInput) {
+                        val to = if (isRtl) maxPx - pos.x else pos.x
+                        dragBy(to - rawOffset.value)
+                    }
+                    val interaction = PressInteraction.Press(pos)
+                    interactionSource.emit(interaction)
+                    val finishInteraction =
+                        try {
+                            val success = tryAwaitRelease()
+                            gestureEndAction.value.invoke(0f)
+                            if (success) {
+                                PressInteraction.Release(interaction)
+                            } else {
+                                PressInteraction.Cancel(interaction)
+                            }
+                        } catch (c: CancellationException) {
+                            PressInteraction.Cancel(interaction)
+                        }
+                    interactionSource.emit(finishInteraction)
+                }
+            )
+        }
+    } else {
+        this
+    }
+
+private suspend fun animateToTarget(
+    draggableState: DraggableState,
+    current: Float,
+    target: Float,
+    velocity: Float
 ) {
-
-    internal val startValue: Float = valueRange.start
-    internal val endValue: Float = valueRange.endInclusive
-
-    init {
-        require(steps >= 0) {
-            "steps should be >= 0"
+    draggableState.drag {
+        var latestValue = current
+        Animatable(initialValue = current).animateTo(target, SliderToTickAnimation, velocity) {
+            dragBy(this.value - latestValue)
+            latestValue = this.value
         }
-    }
-
-    internal var scaledValue: Float = initial
-        set(value) {
-            val scaled = scale(startValue, endValue, value, startPx, endPx)
-            // floating point error due to rescaling
-            if ((scaled - holder.value) > floatPointMistakeCorrection) {
-                snapTo(scaled)
-            }
-        }
-
-    private val floatPointMistakeCorrection = (valueRange.endInclusive - valueRange.start) / 100
-
-    private var endPx = Float.MAX_VALUE
-    private var startPx = Float.MIN_VALUE
-
-    internal fun setBounds(min: Float, max: Float) {
-        if (startPx == min && endPx == max) return
-        val newValue = scale(startPx, endPx, holder.value, min, max)
-        startPx = min
-        endPx = max
-        holder.updateBounds(min, max)
-        anchorsPx = tickFractions.map {
-            lerp(startPx, endPx, it)
-        }
-        snapTo(newValue)
-    }
-
-    internal val tickFractions: List<Float> =
-        if (steps == 0) emptyList() else List(steps + 2) { it.toFloat() / (steps + 1) }
-
-    internal var anchorsPx: List<Float> = emptyList()
-        private set
-
-    internal val holder = Animatable(scale(startValue, endValue, initial, startPx, endPx))
-
-    internal fun snapTo(newValue: Float) {
-        scope.launch {
-            holder.snapTo(newValue)
-            onHolderValueUpdated(holder.value)
-        }
-    }
-
-    internal val onHolderValueUpdated: (value: Float) -> Unit = {
-        onValueChange(scale(startPx, endPx, it, startValue, endValue))
     }
 }
 
@@ -674,3 +652,30 @@ private val DefaultSliderConstraints =
         .heightIn(max = SliderHeight)
 
 private val SliderToTickAnimation = TweenSpec<Float>(durationMillis = 100)
+
+private class SliderDraggableState(
+    val onDelta: (Float) -> Unit
+) : DraggableState {
+
+    var isDragging by mutableStateOf(false)
+        private set
+
+    private val dragScope: DragScope = object : DragScope {
+        override fun dragBy(pixels: Float): Unit = onDelta(pixels)
+    }
+
+    private val scrollMutex = MutatorMutex()
+
+    override suspend fun drag(
+        dragPriority: MutatePriority,
+        block: suspend DragScope.() -> Unit
+    ): Unit = coroutineScope {
+        isDragging = true
+        scrollMutex.mutateWith(dragScope, dragPriority, block)
+        isDragging = false
+    }
+
+    override fun dispatchRawDelta(delta: Float) {
+        return onDelta(delta)
+    }
+}
