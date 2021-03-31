@@ -68,7 +68,6 @@ import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.yield
 import org.junit.After
 import org.junit.Before
-import org.junit.Ignore
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -356,9 +355,8 @@ class ScrollableTest {
     }
 
     @Test
-    @OptIn(ExperimentalTestApi::class)
-    @Ignore // TODO: functionality works, just need to adjust the test correctly
-    fun scrollable_startWithoutSlop_ifFlinging() = runBlockingWithManualClock {
+    fun scrollable_startWithoutSlop_ifFlinging() = runBlocking(AutoTestFrameClock()) {
+        rule.mainClock.autoAdvance = false
         var total = 0f
         val controller = ScrollableState(
             consumeScrollDelta = {
@@ -373,20 +371,28 @@ class ScrollableTest {
             )
         }
         rule.onNodeWithTag(scrollableBoxTag).performGesture {
-            swipe(
+            swipeWithVelocity(
                 start = this.center,
-                end = Offset(this.center.x + 100f, this.center.y),
-                durationMillis = 100
+                end = Offset(this.center.x + 200f, this.center.y),
+                durationMillis = 100,
+                endVelocity = 4000f
             )
         }
         assertThat(total).isGreaterThan(0f)
-        val prevTotal = total
+        val prev = total
+        // pump frames twice to start fling animation
+        rule.mainClock.advanceTimeByFrame()
+        rule.mainClock.advanceTimeByFrame()
+        val prevAfterSomeFling = total
+        assertThat(prevAfterSomeFling).isGreaterThan(prev)
+        // don't advance main clock anymore since we're in the middle of the fling. Now interrupt
         rule.onNodeWithTag(scrollableBoxTag).performGesture {
             down(this.center)
             moveBy(Offset(115f, 0f))
             up()
         }
-        val expected = prevTotal + 115
+        val expected = prevAfterSomeFling + 115
+        rule.mainClock.advanceTimeBy(1000)
         assertThat(total).isEqualTo(expected)
     }
 
@@ -417,14 +423,14 @@ class ScrollableTest {
     }
 
     @Test
-    @OptIn(ExperimentalTestApi::class)
-    @Ignore // TODO: fix this test and / or functionality
-    fun scrollable_explicitDisposal() = runBlockingWithManualClock { clock ->
+    fun scrollable_explicitDisposal() = runBlocking(AutoTestFrameClock()) {
+        rule.mainClock.autoAdvance = false
         val emit = mutableStateOf(true)
+        val expectEmission = mutableStateOf(true)
         var total = 0f
         val controller = ScrollableState(
             consumeScrollDelta = {
-                assertWithMessage("Animating after dispose!").that(emit.value).isTrue()
+                assertWithMessage("Animating after dispose!").that(expectEmission.value).isTrue()
                 total += it
                 it
             }
@@ -440,33 +446,35 @@ class ScrollableTest {
             }
         }
         rule.onNodeWithTag(scrollableBoxTag).performGesture {
-            this.swipe(
+            this.swipeWithVelocity(
                 start = this.center,
                 end = Offset(this.center.x + 200f, this.center.y),
-                durationMillis = 300
+                durationMillis = 100,
+                endVelocity = 4000f
             )
         }
         assertThat(total).isGreaterThan(0f)
-        val prevTotal = total
 
-        rule.onNodeWithTag(scrollableBoxTag).performGesture {
-            this.swipe(
-                start = this.center,
-                end = Offset(this.center.x + 200f, this.center.y),
-                durationMillis = 300
-            )
-        }
-        // don't advance clocks yet, toggle disposed value
+        // start the fling for a few frames
+        rule.mainClock.advanceTimeByFrame()
+        rule.mainClock.advanceTimeByFrame()
+        // flip the emission
         rule.runOnUiThread {
             emit.value = false
         }
+        // propagate the emit flip and record the value
+        rule.mainClock.advanceTimeByFrame()
+        val prevTotal = total
+        // make sure we don't receive any deltas
+        rule.runOnUiThread {
+            expectEmission.value = false
+        }
+
+        // pump the clock until idle
+        rule.mainClock.autoAdvance = true
         rule.waitForIdle()
 
-        // Modifier should now have been disposed and cancelled the scroll, advance clocks to
-        // confirm that it does not animate (checked in consumeScrollDelta)
-        advanceClockWhileAwaitersExist(clock)
-
-        // still 300 and didn't fail in onScrollConsumptionRequested.. lambda
+        // still same and didn't fail in onScrollConsumptionRequested.. lambda
         assertThat(total).isEqualTo(prevTotal)
     }
 

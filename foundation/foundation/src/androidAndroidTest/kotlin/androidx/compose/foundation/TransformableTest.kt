@@ -54,7 +54,6 @@ import com.google.common.truth.Truth.assertWithMessage
 import kotlinx.coroutines.runBlocking
 import org.junit.After
 import org.junit.Before
-import org.junit.Ignore
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -306,13 +305,13 @@ class TransformableTest {
     }
 
     @Test
-    @Ignore("can't came up with good enough test, b/179399198")
     fun transformable_disabledWontCallLambda() {
         val enabled = mutableStateOf(true)
         var cumulativeScale = 1.0f
 
         setTransformableContent {
             Modifier.transformable(
+                enabled = enabled.value,
                 state = rememberTransformableState { zoom, _, _ ->
                     cumulativeScale *= zoom
                 }
