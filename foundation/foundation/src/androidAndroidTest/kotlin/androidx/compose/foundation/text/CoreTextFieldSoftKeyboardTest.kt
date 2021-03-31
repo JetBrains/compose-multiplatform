@@ -22,6 +22,7 @@ import android.view.WindowInsets
 import android.view.WindowInsetsAnimation
 import androidx.annotation.RequiresApi
 import androidx.compose.foundation.layout.Column
+import androidx.compose.runtime.Composable
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusManager
@@ -30,6 +31,7 @@ import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.test.junit4.ComposeContentTestRule
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.performClick
@@ -40,33 +42,36 @@ import androidx.test.filters.SdkSuppress
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
+import java.util.concurrent.CountDownLatch
+import java.util.concurrent.TimeUnit
 
 @LargeTest
 @RunWith(AndroidJUnit4::class)
 class CoreTextFieldSoftKeyboardTest {
-
     @get:Rule
     val rule = createComposeRule()
+
+    private lateinit var view: View
+    private lateinit var focusManager: FocusManager
+    private val timeout = 15_000L
 
     @SdkSuppress(minSdkVersion = Build.VERSION_CODES.R)
     @Test
     fun keyboardShownOnInitialClick() {
         // Arrange.
-        lateinit var view: View
-        rule.setContent {
-            view = LocalView.current
+        rule.setContentForTest {
             CoreTextField(
                 value = TextFieldValue("Hello"),
                 onValueChange = {},
                 modifier = Modifier.testTag("TextField1")
             )
         }
-        view.ensureKeyboardIsHidden()
 
         // Act.
-        view.runAndWaitUntil({ view.isSoftwareKeyboardShown() }) {
-            rule.onNodeWithTag("TextField1").performClick()
-        }
+        rule.onNodeWithTag("TextField1").performClick()
+
+        // Assert.
+        view.waitUntil(timeout) { view.isSoftwareKeyboardShown() }
     }
 
     @SdkSuppress(minSdkVersion = Build.VERSION_CODES.R)
@@ -74,57 +79,49 @@ class CoreTextFieldSoftKeyboardTest {
     fun keyboardShownOnInitialFocus() {
         // Arrange.
         val focusRequester = FocusRequester()
-        lateinit var view: View
-        rule.setContent {
-            view = LocalView.current
+        rule.setContentForTest {
             CoreTextField(
                 value = TextFieldValue("Hello"),
                 onValueChange = {},
                 modifier = Modifier.focusRequester(focusRequester)
             )
         }
-        view.ensureKeyboardIsHidden()
 
         // Act.
-        view.runAndWaitUntil({ view.isSoftwareKeyboardShown() }) {
-            rule.runOnIdle { focusRequester.requestFocus() }
-        }
+        rule.runOnIdle { focusRequester.requestFocus() }
+
+        // Assert.
+        view.waitUntil(timeout) { view.isSoftwareKeyboardShown() }
     }
 
     @SdkSuppress(minSdkVersion = Build.VERSION_CODES.R)
     @Test
     fun keyboardHiddenWhenFocusIsLost() {
         // Arrange.
-        lateinit var focusManager: FocusManager
-        lateinit var view: View
         val focusRequester = FocusRequester()
-        rule.setContent {
-            view = LocalView.current
-            focusManager = LocalFocusManager.current
+        rule.setContentForTest {
             CoreTextField(
                 value = TextFieldValue("Hello"),
                 onValueChange = {},
                 modifier = Modifier.focusRequester(focusRequester)
             )
         }
-        view.ensureKeyboardIsHidden()
         // Request focus and wait for keyboard.
-        view.runAndWaitUntil({ view.isSoftwareKeyboardShown() }) {
-            rule.runOnIdle { focusRequester.requestFocus() }
-        }
+        rule.runOnIdle { focusRequester.requestFocus() }
+        view.waitUntil(timeout) { view.isSoftwareKeyboardShown() }
 
         // Act.
-        view.runAndWaitUntil({ !view.isSoftwareKeyboardShown() }) {
-            rule.runOnIdle { focusManager.clearFocus() }
-        }
+        rule.runOnIdle { focusManager.clearFocus() }
+
+        // Assert.
+        view.waitUntil(timeout) { !view.isSoftwareKeyboardShown() }
     }
 
     @SdkSuppress(minSdkVersion = Build.VERSION_CODES.R)
     @Test
     fun keyboardShownAfterDismissingKeyboardAndClickingAgain() {
         // Arrange.
-        lateinit var view: View
-        rule.setContent {
+        rule.setContentForTest {
             view = LocalView.current
             CoreTextField(
                 value = TextFieldValue("Hello"),
@@ -132,18 +129,16 @@ class CoreTextFieldSoftKeyboardTest {
                 modifier = Modifier.testTag("TextField1")
             )
         }
-        view.ensureKeyboardIsHidden()
-        view.runAndWaitUntil({ view.isSoftwareKeyboardShown() }) {
-            rule.onNodeWithTag("TextField1").performClick()
-        }
-        view.runAndWaitUntil({ !view.isSoftwareKeyboardShown() }) {
-            rule.runOnIdle { view.hideKeyboard() }
-        }
+        rule.onNodeWithTag("TextField1").performClick()
+        view.waitUntil(timeout) { view.isSoftwareKeyboardShown() }
 
         // Act.
-        view.runAndWaitUntil({ view.isSoftwareKeyboardShown() }) {
-            rule.onNodeWithTag("TextField1").performClick()
-        }
+        rule.runOnIdle { view.hideKeyboard() }
+        view.waitUntil(timeout) { !view.isSoftwareKeyboardShown() }
+        rule.onNodeWithTag("TextField1").performClick()
+
+        // Assert.
+        view.waitUntil(timeout) { view.isSoftwareKeyboardShown() }
     }
 
     @OptIn(ExperimentalComposeUiApi::class)
@@ -152,9 +147,7 @@ class CoreTextFieldSoftKeyboardTest {
     fun keyboardStaysVisibleWhenMovingFromOneTextFieldToAnother() {
         // Arrange.
         val (focusRequester1, focusRequester2) = FocusRequester.createRefs()
-        lateinit var view: View
-        rule.setContent {
-            view = LocalView.current
+        rule.setContentForTest {
             Column {
                 CoreTextField(
                     value = TextFieldValue("Hello"),
@@ -168,58 +161,55 @@ class CoreTextFieldSoftKeyboardTest {
                 )
             }
         }
-        view.ensureKeyboardIsHidden()
-        view.runAndWaitUntil({ view.isSoftwareKeyboardShown() }) {
-            rule.runOnIdle { focusRequester1.requestFocus() }
-        }
+        rule.runOnIdle { focusRequester1.requestFocus() }
+        view.waitUntil(timeout) { view.isSoftwareKeyboardShown() }
 
         // Act.
-        view.runAndWaitUntil({ !view.isSoftwareKeyboardShown() }) {
-            rule.runOnIdle { focusRequester2.requestFocus() }
-        }
+        rule.runOnIdle { focusRequester2.requestFocus() }
+
+        // Assert.
+        view.waitUntil(timeout) { !view.isSoftwareKeyboardShown() }
     }
 
-    @RequiresApi(Build.VERSION_CODES.R)
-    private fun View.runAndWaitUntil(condition: () -> Boolean, block: () -> Unit) {
-        var conditionPassed = false
-        rule.runOnIdle {
-            rootView.setWindowInsetsAnimationCallback(
-                InsetAnimationCallback {
-                    if (condition()) { conditionPassed = true }
-                }
-            )
+    private fun ComposeContentTestRule.setContentForTest(composable: @Composable () -> Unit) {
+        setContent {
+            view = LocalView.current
+            focusManager = LocalFocusManager.current
+            composable()
         }
-        rule.waitForIdle()
-        block()
-        rule.waitUntil(15_000) { conditionPassed }
-    }
-
-    // We experienced some flakiness in tests if the keyboard was visible at the start of the test.
-    // This function makes sure the keyboard is hidden at the start of every test.
-    @RequiresApi(Build.VERSION_CODES.R)
-    private fun View.ensureKeyboardIsHidden() {
-        rule.waitForIdle()
-        if (isSoftwareKeyboardShown()) {
-            runAndWaitUntil({ !isSoftwareKeyboardShown() }) {
-                rule.runOnIdle { hideKeyboard() }
+        // We experienced some flakiness in tests if the keyboard was visible at the start of the
+        // test. So we make sure that the keyboard is hidden at the start of every test.
+        runOnIdle {
+            if (view.isSoftwareKeyboardShown()) {
+                view.hideKeyboard()
+                view.waitUntil(timeout) { !view.isSoftwareKeyboardShown() }
             }
         }
-        rule.waitForIdle()
     }
+}
 
-    @RequiresApi(Build.VERSION_CODES.R)
-    private class InsetAnimationCallback(val block: () -> Unit) :
-        WindowInsetsAnimation.Callback(DISPATCH_MODE_CONTINUE_ON_SUBTREE) {
-
-        override fun onProgress(
-            insets: WindowInsets,
-            runningAnimations: MutableList<WindowInsetsAnimation>
-        ) = insets
-
-        override fun onEnd(animation: WindowInsetsAnimation) {
-            block()
-            super.onEnd(animation)
+private fun View.waitUntil(timeoutMillis: Long, condition: () -> Boolean) {
+    val latch = CountDownLatch(1)
+    rootView.setWindowInsetsAnimationCallback(
+        InsetAnimationCallback {
+            if (condition()) { latch.countDown() }
         }
+    )
+    latch.await(timeoutMillis, TimeUnit.MILLISECONDS)
+}
+
+@RequiresApi(Build.VERSION_CODES.R)
+private class InsetAnimationCallback(val block: () -> Unit) :
+    WindowInsetsAnimation.Callback(DISPATCH_MODE_CONTINUE_ON_SUBTREE) {
+
+    override fun onProgress(
+        insets: WindowInsets,
+        runningAnimations: MutableList<WindowInsetsAnimation>
+    ) = insets
+
+    override fun onEnd(animation: WindowInsetsAnimation) {
+        block()
+        super.onEnd(animation)
     }
 }
 
