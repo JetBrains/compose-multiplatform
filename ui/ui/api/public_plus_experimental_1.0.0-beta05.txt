@@ -2533,6 +2533,9 @@ package androidx.compose.ui.semantics {
     method public operator <T> void set(androidx.compose.ui.semantics.SemanticsPropertyKey<T> key, T? value);
   }
 
+  public final class SemanticsSortKt {
+  }
+
 }
 
 package androidx.compose.ui.state {
