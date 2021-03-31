@@ -22,7 +22,7 @@ new File(buildscript.sourceFile.parentFile, "studio_versions.properties").withIn
 build_versions.agp = build_versions.studio["agp"]
 build_versions.lint = build_versions.studio["lint"]
 
-build_versions.kotlin = "1.4.31"
+build_versions.kotlin = "1.4.32"
 build_versions.kotlin_coroutines = "1.4.3"
 build_versions.ksp = "1.4.31-1.0.0-alpha06"
 
