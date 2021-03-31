@@ -58,6 +58,7 @@ class SingleValueAnimationTest {
             )
 
         var enabled by mutableStateOf(false)
+        var expected by mutableStateOf(250f)
         rule.setContent {
             Box {
                 val animationValue by animateDpAsState(
@@ -67,29 +68,33 @@ class SingleValueAnimationTest {
                 // ready
                 if (enabled) {
                     LaunchedEffect(Unit) {
-                        assertEquals(250.dp, animationValue)
                         val startTime = withFrameNanos { it }
                         var frameTime = startTime
                         do {
                             val playTime = (frameTime - startTime) / 1_000_000L
                             val fraction = FastOutSlowInEasing.transform(playTime / 100f)
-                            val expected = lerp(250f, 50f, fraction)
-                            assertEquals(expected.dp, animationValue)
+                            expected = lerp(250f, 50f, fraction)
                             frameTime = withFrameNanos { it }
                         } while (frameTime - startTime <= 100_000_000L)
                         // Animation is finished at this point
-                        assertEquals(50.dp, animationValue)
+                        expected = 50f
                     }
+                    assertEquals(expected.dp, animationValue)
+                } else {
+                    assertEquals(250.dp, animationValue)
                 }
             }
         }
+        assertEquals(250f, expected)
         rule.runOnIdle { enabled = true }
         rule.waitForIdle()
+        assertEquals(50f, expected)
     }
 
     @Test
     fun animate1DOnCoroutineTest() {
         var enabled by mutableStateOf(false)
+        var expected by mutableStateOf(250f)
         rule.setContent {
             Box {
                 // Animate from 250f to 50f when enable flips to true
@@ -106,18 +111,19 @@ class SingleValueAnimationTest {
                         do {
                             val playTime = (frameTime - startTime) / 1_000_000L
                             val fraction = FastOutLinearInEasing.transform(playTime / 200f)
-                            val expected = lerp(250f, 50f, fraction)
-                            assertEquals(expected, animationValue)
+                            expected = lerp(250f, 50f, fraction)
                             frameTime = withFrameNanos { it }
                         } while (frameTime - startTime <= 200_000_000L)
-                        // Animation is finished at this point
-                        assertEquals(50f, animationValue)
+                        expected = 50f
                     }
                 }
+                assertEquals(expected, animationValue)
             }
         }
         rule.runOnIdle { enabled = true }
         rule.waitForIdle()
+        // Animation is finished at this point
+        assertEquals(50f, expected)
     }
 
     @Test
@@ -125,6 +131,7 @@ class SingleValueAnimationTest {
 
         val startVal = AnimationVector(120f, 56f)
         val endVal = AnimationVector(0f, 77f)
+        var expected by mutableStateOf(startVal)
 
         fun <V> tween(): TweenSpec<V> =
             TweenSpec(
@@ -157,25 +164,28 @@ class SingleValueAnimationTest {
                         var frameTime = startTime
                         do {
                             val playTime = (frameTime - startTime) / 1_000_000L
-                            val expect = AnimationVector(
+                            expected = AnimationVector(
                                 lerp(startVal.v1, endVal.v1, playTime / 100f),
                                 lerp(startVal.v2, endVal.v2, playTime / 100f)
                             )
 
-                            assertEquals(Size.VectorConverter.convertFromVector(expect), sizeValue)
-                            assertEquals(
-                                Offset.VectorConverter.convertFromVector(expect),
-                                pxPositionValue
-                            )
                             frameTime = withFrameNanos { it }
                         } while (frameTime - startTime <= 100_000_000L)
+                        expected = endVal
                     }
                 }
+
+                assertEquals(Size.VectorConverter.convertFromVector(expected), sizeValue)
+                assertEquals(
+                    Offset.VectorConverter.convertFromVector(expected),
+                    pxPositionValue
+                )
             }
         }
 
         rule.runOnIdle { enabled = true }
         rule.waitForIdle()
+        assertEquals(endVal, expected)
     }
 
     @Test
@@ -190,6 +200,7 @@ class SingleValueAnimationTest {
             )
 
         var enabled by mutableStateOf(false)
+        var expected by mutableStateOf(startVal)
         rule.setContent {
             Box {
                 val pxBoundsValue by animateRectAsState(
@@ -208,31 +219,36 @@ class SingleValueAnimationTest {
                             val playTime = (frameTime - startTime) / 1_000_000L
 
                             val fraction = LinearOutSlowInEasing.transform(playTime / 100f)
-                            val expect = AnimationVector(
+                            expected = AnimationVector(
                                 lerp(startVal.v1, endVal.v1, fraction),
                                 lerp(startVal.v2, endVal.v2, fraction),
                                 lerp(startVal.v3, endVal.v3, fraction),
                                 lerp(startVal.v4, endVal.v4, fraction)
                             )
 
-                            assertEquals(
-                                Rect.VectorConverter.convertFromVector(expect),
-                                pxBoundsValue
-                            )
                             frameTime = withFrameNanos { it }
                         } while (frameTime - startTime <= 100_000_000L)
+                        expected = endVal
                     }
                 }
+
+                // Check this every frame
+                assertEquals(
+                    Rect.VectorConverter.convertFromVector(expected),
+                    pxBoundsValue
+                )
             }
         }
 
         rule.runOnIdle { enabled = true }
         rule.waitForIdle()
+        assertEquals(endVal, expected)
     }
 
     @Test
     fun animateColorTest() {
         var enabled by mutableStateOf(false)
+        var expected by mutableStateOf(Color.Black)
         rule.setContent {
             Box {
                 val value by animateColorAsState(
@@ -249,20 +265,23 @@ class SingleValueAnimationTest {
                         do {
                             val playTime = (frameTime - startTime) / 1_000_000L
                             val fraction = FastOutLinearInEasing.transform(playTime / 100f)
-                            val expected = lerp(Color.Black, Color.Cyan, fraction)
-                            assertEquals(expected.red, value.red, 1 / 255f)
-                            assertEquals(expected.green, value.green, 1 / 255f)
-                            assertEquals(expected.blue, value.blue, 1 / 255f)
-                            assertEquals(expected.alpha, value.alpha, 1 / 255f)
+                            expected = lerp(Color.Black, Color.Cyan, fraction)
                             frameTime = withFrameNanos { it }
                         } while (frameTime - startTime <= 100_000_000L)
+                        expected = Color.Cyan
                     }
                 }
+                // Check every frame
+                assertEquals(expected.red, value.red, 1 / 255f)
+                assertEquals(expected.green, value.green, 1 / 255f)
+                assertEquals(expected.blue, value.blue, 1 / 255f)
+                assertEquals(expected.alpha, value.alpha, 1 / 255f)
             }
         }
 
         rule.runOnIdle { enabled = true }
         rule.waitForIdle()
+        assertEquals(Color.Cyan, expected)
     }
 
     @Test
@@ -319,6 +338,8 @@ class SingleValueAnimationTest {
         val specForFloat = FloatSpringSpec(visibilityThreshold = 0.01f)
         val specForOffset = FloatSpringSpec(visibilityThreshold = 0.5f)
 
+        var expectedFloat by mutableStateOf(0f)
+        var expectedOffset by mutableStateOf(Offset(0f, 0f))
         var enabled by mutableStateOf(false)
         rule.setContent {
             Box {
@@ -340,26 +361,91 @@ class SingleValueAnimationTest {
                         var frameTime = startTime
                         do {
                             val playTime = frameTime - startTime
-                            val expectFloat =
+                            expectedFloat =
                                 specForFloat.getValueFromNanos(playTime, 0f, 100f, 0f)
-                            assertEquals("play time: $playTime", expectFloat, floatValue)
 
                             if (playTime < durationForOffset) {
-                                val expectOffset =
+                                val offset =
                                     specForOffset.getValueFromNanos(playTime, 0f, 100f, 0f)
-                                assertEquals(Offset(expectOffset, expectOffset), offsetValue)
+                                expectedOffset = Offset(offset, offset)
                             } else {
-                                assertEquals(Offset(100f, 100f), offsetValue)
+                                expectedOffset = Offset(100f, 100f)
                             }
 
                             frameTime = withFrameNanos { it }
                         } while (frameTime - startTime <= durationForFloat)
+                        expectedFloat = 100f
                     }
                 }
+
+                assertEquals(expectedOffset, offsetValue)
+                assertEquals(expectedFloat, floatValue)
             }
         }
 
         rule.runOnIdle { enabled = true }
         rule.waitForIdle()
+    }
+
+    @Test
+    fun updateAnimationSpecTest() {
+        var duration by mutableStateOf(100)
+        var firstRun by mutableStateOf(true)
+        fun <T> myTween(): TweenSpec<T> =
+            TweenSpec(
+                easing = FastOutSlowInEasing,
+                durationMillis = duration
+            )
+
+        var enabled by mutableStateOf(false)
+        var expected by mutableStateOf(250f)
+        rule.setContent {
+            Box {
+                val animationValue by animateDpAsState(
+                    if (enabled) 50.dp else 250.dp, myTween()
+                )
+                assertEquals(expected.dp, animationValue)
+                if (!firstRun) {
+                    LaunchedEffect(enabled) {
+                        if (enabled) {
+                            assertEquals(100, duration)
+                        } else {
+                            assertEquals(200, duration)
+                        }
+                        val startTime = withFrameNanos { it }
+                        var frameTime = startTime
+                        do {
+                            val playTime = (frameTime - startTime) / 1_000_000L
+                            val fraction = FastOutSlowInEasing.transform(
+                                playTime / duration.toFloat()
+                            )
+                            expected =
+                                if (enabled) {
+                                    lerp(250f, 50f, fraction)
+                                } else {
+                                    lerp(50f, 250f, fraction)
+                                }
+                            frameTime = withFrameNanos { it }
+                        } while (frameTime - startTime <= duration * 1_000_000L)
+                        expected = if (enabled) 50f else 250f
+                    }
+                }
+            }
+        }
+        rule.runOnIdle {
+            enabled = true
+            firstRun = false
+        }
+        rule.waitForIdle()
+        // Animation is finished at this point
+        assertEquals(50f, expected)
+
+        rule.runOnIdle {
+            enabled = false
+            duration = 200
+        }
+        rule.waitForIdle()
+        // Animation is finished at this point
+        assertEquals(250f, expected)
     }
 }
