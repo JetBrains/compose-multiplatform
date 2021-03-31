@@ -16,8 +16,15 @@
 
 package androidx.compose.material
 
+import androidx.compose.foundation.interaction.Interaction
+import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.interaction.PressInteraction
+import androidx.compose.foundation.layout.Box
 import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.platform.LocalLayoutDirection
@@ -48,6 +55,9 @@ import androidx.compose.ui.unit.dp
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.MediumTest
 import com.google.common.truth.Truth
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.launch
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -356,5 +366,78 @@ class SliderTest {
             ) { Slider(value = state.value, onValueChange = { state.value = it }) }
             .assertHeightIsEqualTo(48.dp)
             .assertWidthIsEqualTo(100.dp)
+    }
+
+    @Test
+    fun slider_noUnwantedCallbackCalls() {
+        val state = mutableStateOf(0f)
+        val callCount = mutableStateOf(0f)
+
+        rule.setMaterialContent {
+            Slider(
+                modifier = Modifier.testTag(tag),
+                value = state.value,
+                onValueChange = {
+                    callCount.value += 1
+                }
+            )
+        }
+
+        rule.runOnIdle {
+            Truth.assertThat(callCount.value).isEqualTo(0f)
+        }
+    }
+
+    @Test
+    fun slider_interactionSource_resetWhenDisposed() {
+        val interactionSource = MutableInteractionSource()
+        var emitSlider by mutableStateOf(true)
+
+        var scope: CoroutineScope? = null
+
+        rule.setContent {
+            scope = rememberCoroutineScope()
+            Box {
+                if (emitSlider) {
+                    Slider(
+                        modifier = Modifier.testTag(tag),
+                        value = 0.5f,
+                        onValueChange = {},
+                        interactionSource = interactionSource
+                    )
+                }
+            }
+        }
+
+        val interactions = mutableListOf<Interaction>()
+
+        scope!!.launch {
+            interactionSource.interactions.collect { interactions.add(it) }
+        }
+
+        rule.runOnIdle {
+            Truth.assertThat(interactions).isEmpty()
+        }
+
+        rule.onNodeWithTag(tag)
+            .performGesture { down(center) }
+
+        rule.runOnIdle {
+            Truth.assertThat(interactions).hasSize(1)
+            Truth.assertThat(interactions.first()).isInstanceOf(PressInteraction.Press::class.java)
+        }
+
+        // Dispose
+        rule.runOnIdle {
+            emitSlider = false
+        }
+
+        rule.runOnIdle {
+            Truth.assertThat(interactions).hasSize(2)
+            Truth.assertThat(interactions.first()).isInstanceOf(PressInteraction.Press::class.java)
+            Truth.assertThat(interactions[1]).isInstanceOf(PressInteraction.Cancel::class.java)
+            Truth.assertThat((interactions[1] as PressInteraction.Cancel).press)
+                .isEqualTo(interactions[0])
+        }
     }
 }
