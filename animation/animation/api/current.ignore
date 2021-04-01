@@ -1,9 +1,0 @@
-// Baseline format: 1.0
-RemovedClass: androidx.compose.animation.AndroidFlingCalculator_androidKt:
-    Removed class androidx.compose.animation.AndroidFlingCalculator_androidKt
-RemovedClass: androidx.compose.animation.AndroidFlingSpline_androidKt:
-    Removed class androidx.compose.animation.AndroidFlingSpline_androidKt
-
-
-RemovedMethod: androidx.compose.animation.SplineBasedFloatDecayAnimationSpec_androidKt#splineBasedDecay(androidx.compose.ui.unit.Density):
-    Removed method androidx.compose.animation.SplineBasedFloatDecayAnimationSpec_androidKt.splineBasedDecay(androidx.compose.ui.unit.Density)

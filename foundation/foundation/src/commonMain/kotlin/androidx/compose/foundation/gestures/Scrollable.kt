@@ -19,7 +19,7 @@ package androidx.compose.foundation.gestures
 import androidx.compose.animation.core.AnimationState
 import androidx.compose.animation.core.DecayAnimationSpec
 import androidx.compose.animation.core.animateDecay
-import androidx.compose.animation.rememberSplineBasedDecay
+import androidx.compose.animation.defaultDecayAnimationSpec
 import androidx.compose.foundation.MutatePriority
 import androidx.compose.foundation.gestures.Orientation.Horizontal
 import androidx.compose.foundation.interaction.MutableInteractionSource
@@ -106,7 +106,7 @@ object ScrollableDefaults {
      */
     @Composable
     fun flingBehavior(): FlingBehavior {
-        val flingSpec = rememberSplineBasedDecay<Float>()
+        val flingSpec = defaultDecayAnimationSpec()
         return remember(flingSpec) {
             DefaultFlingBehavior(flingSpec)
         }
