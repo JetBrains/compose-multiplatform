@@ -838,13 +838,6 @@ class Recomposer(
         }?.resume(Unit)
     }
 
-    internal override fun invalidateScope(scope: RecomposeScopeImpl) {
-        synchronized(stateLock) {
-            snapshotInvalidations += setOf(scope)
-            deriveStateLocked()
-        }?.resume(Unit)
-    }
-
     companion object {
 
         private val _runningRecomposers = MutableStateFlow(persistentSetOf<RecomposerInfoImpl>())
