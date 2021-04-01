@@ -16,26 +16,13 @@
 
 package androidx.compose.animation
 
-import android.view.ViewConfiguration
 import androidx.compose.animation.core.DecayAnimationSpec
 import androidx.compose.animation.core.generateDecayAnimationSpec
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.platform.LocalDensity
-import androidx.compose.ui.unit.Density
 
-/**
- * Creates a [DecayAnimationSpec] using the native Android fling decay. This can then be used to
- * animate any type [T].
- *
- * @param density density of the display
- */
-@Deprecated("Moved to common code", level = DeprecationLevel.HIDDEN)
-@JvmName("splineBasedDecay")
-fun <T> splineBasedDecayDeprecated(density: Density): DecayAnimationSpec<T> =
-    splineBasedDecay(density)
-
-internal actual val platformFlingScrollFriction = ViewConfiguration.getScrollFriction()
+internal actual val platformFlingScrollFriction = 0.015f
 
 @Composable
 actual fun <T> rememberSplineBasedDecay(): DecayAnimationSpec<T> {
