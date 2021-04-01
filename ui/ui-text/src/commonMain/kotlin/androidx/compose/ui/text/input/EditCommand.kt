@@ -547,7 +547,7 @@ class MoveCursorCommand(
  */
 class DeleteAllCommand : EditCommand {
     override fun applyTo(buffer: EditingBuffer) {
-        buffer.delete(0, buffer.length)
+        buffer.replace(0, buffer.length, "")
     }
 
     override fun equals(other: Any?): Boolean = other is DeleteAllCommand
