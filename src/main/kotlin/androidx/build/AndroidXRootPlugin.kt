@@ -181,6 +181,9 @@ class AndroidXRootPlugin : Plugin<Project> {
 
         AffectedModuleDetector.configure(gradle, this)
 
+        // Needs to be called before evaluationDependsOnChildren in usingMaxDepVersions block
+        publishInspectionArtifacts()
+
         // If useMaxDepVersions is set, iterate through all the project and substitute any androidx
         // artifact dependency with the local tip of tree version of the library.
         if (project.usingMaxDepVersions()) {
@@ -232,7 +235,6 @@ class AndroidXRootPlugin : Plugin<Project> {
             task.setOutput(File(project.getDistributionDirectory(), "task_outputs.txt"))
             task.removePrefix(project.getCheckoutRoot().path)
         }
-        publishInspectionArtifacts()
     }
 
     private fun Project.setDependencyVersions() {

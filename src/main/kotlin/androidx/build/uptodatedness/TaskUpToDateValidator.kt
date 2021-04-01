@@ -127,6 +127,16 @@ val ALLOW_RERUNNING_TASKS = setOf(
     ":camera:integration-tests:camera-testapp-view:GenerateTestConfigurationdebugAndroidTest",
     ":camera:integration-tests:camera-testapp-view:mergeLibDexDebug",
     ":camera:integration-tests:camera-testapp-view:packageDebug",
+    ":benchmark:benchmark-macro:generateReleaseProtos",
+    ":benchmark:benchmark-macro:generateDebugProtos",
+    ":benchmark:benchmark-macro:compileReleaseKotlin",
+    ":benchmark:benchmark-macro:compileDebugKotlin",
+    ":benchmark:benchmark-macro:compileReleaseJavaWithJavac",
+    ":benchmark:benchmark-macro:compileDebugJavaWithJavac",
+    ":benchmark:benchmark-macro:extractReleaseAnnotations",
+    ":benchmark:benchmark-macro:extractDebugAnnotations",
+    ":benchmark:benchmark-macro:generateApi",
+    ":benchmark:benchmark-macro:runErrorProne"
 )
 
 // Additional tasks that are expected to be temporarily out-of-date after running once

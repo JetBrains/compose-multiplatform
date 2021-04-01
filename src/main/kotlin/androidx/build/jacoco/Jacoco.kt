@@ -64,6 +64,8 @@ object Jacoco {
                 copySpec.exclude("META-INF/*.SF")
                 copySpec.exclude("META-INF/*.DSA")
                 copySpec.exclude("META-INF/*.RSA")
+                copySpec.exclude("about.html")
+                copySpec.exclude("module-info.class")
             }
             it.destinationDirectory.set(project.getDistributionDirectory())
             it.archiveFileName.set("jacocoant.jar")
