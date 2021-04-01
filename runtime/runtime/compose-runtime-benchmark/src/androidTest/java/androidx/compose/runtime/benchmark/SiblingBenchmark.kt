@@ -24,6 +24,7 @@ import androidx.compose.runtime.benchmark.siblings.update
 import androidx.compose.runtime.mutableStateOf
 import androidx.test.annotation.UiThreadTest
 import androidx.test.filters.LargeTest
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.junit.runners.Parameterized
@@ -51,6 +52,7 @@ import kotlin.random.Random
  */
 @LargeTest
 @RunWith(Parameterized::class)
+@OptIn(ExperimentalCoroutinesApi::class)
 class SiblingBenchmark(
     val count: Int,
     val reorder: ReorderType,
@@ -86,15 +88,18 @@ class SiblingBenchmark(
             val random = Random(0)
             val listB = listA.update(reorder, random) { Item(it + 1) }
             val items = mutableStateOf(listA)
-            measureRecompose {
-                compose {
-                    SiblingManagement(identity = identity, items = items.value)
-                }
-                update {
-                    items.value = listB
-                }
-                reset {
-                    items.value = listA
+
+            runBlockingTestWithFrameClock {
+                measureRecomposeSuspending {
+                    compose {
+                        SiblingManagement(identity = identity, items = items.value)
+                    }
+                    update {
+                        items.value = listB
+                    }
+                    reset {
+                        items.value = listA
+                    }
                 }
             }
         }

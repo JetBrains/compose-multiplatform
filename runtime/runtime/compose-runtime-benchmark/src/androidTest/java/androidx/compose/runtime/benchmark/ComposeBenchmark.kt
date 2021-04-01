@@ -73,9 +73,9 @@ class ComposeBenchmark : ComposeBenchmarkBase() {
 
     @UiThreadTest
     @Test
-    fun benchmark_04_Recompose_OneRect() {
+    fun benchmark_04_Recompose_OneRect() = runBlockingTestWithFrameClock {
         val model = ColorModel()
-        measureRecompose {
+        measureRecomposeSuspending {
             compose {
                 OneRect(model)
             }
@@ -101,9 +101,9 @@ class ComposeBenchmark : ComposeBenchmarkBase() {
 
     @UiThreadTest
     @Test
-    fun benchmark_05_Recompose_TenRect_Wide() {
+    fun benchmark_05_Recompose_TenRect_Wide() = runBlockingTestWithFrameClock {
         val model = ColorModel()
-        measureRecompose {
+        measureRecomposeSuspending {
             compose {
                 TenRects(model, narrow = false)
             }
@@ -115,9 +115,9 @@ class ComposeBenchmark : ComposeBenchmarkBase() {
 
     @UiThreadTest
     @Test
-    fun benchmark_06_Recompose_TenRect_Narrow() {
+    fun benchmark_06_Recompose_TenRect_Narrow() = runBlockingTestWithFrameClock {
         val model = ColorModel()
-        measureRecompose {
+        measureRecomposeSuspending {
             compose {
                 TenRects(model, narrow = true)
             }
@@ -129,9 +129,9 @@ class ComposeBenchmark : ComposeBenchmarkBase() {
 
     @UiThreadTest
     @Test
-    fun benchmark_07_Recompose_100Rect_Wide() {
+    fun benchmark_07_Recompose_100Rect_Wide() = runBlockingTestWithFrameClock {
         val model = ColorModel()
-        measureRecompose {
+        measureRecomposeSuspending {
             compose {
                 HundredRects(model, narrow = false)
             }
@@ -143,9 +143,9 @@ class ComposeBenchmark : ComposeBenchmarkBase() {
 
     @UiThreadTest
     @Test
-    fun benchmark_08_Recompose_100Rect_Narrow() {
+    fun benchmark_08_Recompose_100Rect_Narrow() = runBlockingTestWithFrameClock {
         val model = ColorModel()
-        measureRecompose {
+        measureRecomposeSuspending {
             compose {
                 HundredRects(model, narrow = true)
             }
@@ -157,12 +157,12 @@ class ComposeBenchmark : ComposeBenchmarkBase() {
 
     @UiThreadTest
     @Test
-    fun benchmark_10_NestedRowColumnsWithModifier() {
+    fun benchmark_10_NestedRowColumnsWithModifier() = runBlockingTestWithFrameClock {
         var pad by mutableStateOf(0)
         val modifier = Modifier.composed {
             Modifier.padding(pad.dp)
         }
-        measureRecompose {
+        measureRecomposeSuspending {
             compose {
                 Column(modifier = modifier) {
                     repeat(100) {
