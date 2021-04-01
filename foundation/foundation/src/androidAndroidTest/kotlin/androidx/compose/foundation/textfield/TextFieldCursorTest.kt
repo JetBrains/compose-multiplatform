@@ -41,7 +41,9 @@ import androidx.compose.ui.test.hasSetTextAction
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.performTextReplacement
+import androidx.compose.ui.text.TextRange
 import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.IntSize
@@ -267,6 +269,57 @@ class TextFieldCursorTest {
 
         // cursor would have been invisible during next 500 ms if cursor blinks while typing.
         // To prevent blinking while typing we restart animation when new symbol is typed.
+        rule.mainClock.advanceTimeBy(400)
+        with(rule.density) {
+            rule.onNode(hasSetTextAction())
+                .captureToImage()
+                .assertCursor(2.dp, this)
+        }
+    }
+
+    @Test
+    @SdkSuppress(minSdkVersion = Build.VERSION_CODES.O)
+    fun selectionChanges_cursorNotBlinking() = with(rule.density) {
+        rule.mainClock.autoAdvance = false
+        val width = 100.dp
+        val height = 20.dp
+        var isFocused = false
+        val textValue = mutableStateOf(TextFieldValue("test", selection = TextRange(2)))
+        rule.setContent {
+            // The padding helps if the test is run accidentally in landscape. Landscape makes
+            // the cursor to be next to the navigation bar which affects the red color to be a bit
+            // different - possibly anti-aliasing.
+            Box(Modifier.padding(10.dp)) {
+                BasicTextField(
+                    value = textValue.value,
+                    onValueChange = { textValue.value = it },
+                    textStyle = TextStyle(color = Color.White, background = Color.White),
+                    modifier = Modifier
+                        .size(width, height)
+                        .background(Color.White)
+                        .onFocusChanged { if (it.isFocused) isFocused = true },
+                    cursorBrush = SolidColor(Color.Red)
+                )
+            }
+        }
+
+        rule.onNode(hasSetTextAction()).performClick()
+        rule.mainClock.advanceTimeUntil { isFocused }
+
+        // cursor visible first 500 ms
+        rule.mainClock.advanceTimeBy(500)
+
+        // TODO(b/170298051) check here that cursor is visible when we have a way to control
+        //  cursor position when sending a text
+
+        // change text field value
+        rule.runOnIdle {
+            textValue.value = textValue.value.copy(selection = TextRange(0))
+        }
+
+        // cursor would have been invisible during next 500 ms if cursor blinks when selection
+        // changes.
+        // To prevent blinking when selection changes we restart animation when new symbol is typed.
         rule.mainClock.advanceTimeBy(400)
         with(rule.density) {
             rule.onNode(hasSetTextAction())
