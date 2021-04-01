@@ -24,6 +24,7 @@ import androidx.compose.ui.Modifier
 import androidx.test.annotation.UiThreadTest
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.LargeTest
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import org.junit.FixMethodOrder
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -37,6 +38,7 @@ import kotlin.random.Random
  * See: http://mathieuancelin.github.io/js-repaint-perfs/
  */
 @LargeTest
+@OptIn(ExperimentalCoroutinesApi::class)
 @RunWith(AndroidJUnit4::class)
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
 class DbMonsterBenchmark : ComposeBenchmarkBase() {
@@ -53,13 +55,13 @@ class DbMonsterBenchmark : ComposeBenchmarkBase() {
      * @param count - the number of databases (2x this will be number of rows)
      * @param mutate - the number of databases to mutate/update on each frame (2x count will be 100%)
      */
-    private fun dbMonsterBenchmark(count: Int, mutate: Int) {
+    private fun dbMonsterBenchmark(count: Int, mutate: Int) = runBlockingTestWithFrameClock {
         val random = Random(0)
         println(count)
         println(mutate)
         println(random)
         val list = DatabaseList(count, random)
-        measureRecompose {
+        measureRecomposeSuspending {
             compose {
                 Column(Modifier.fillMaxHeight()) {
                     for (db in list.databases) {
