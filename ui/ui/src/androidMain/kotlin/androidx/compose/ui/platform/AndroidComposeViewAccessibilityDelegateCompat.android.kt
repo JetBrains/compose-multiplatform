@@ -42,6 +42,7 @@ import androidx.collection.SparseArrayCompat
 import androidx.compose.ui.R
 import androidx.compose.ui.geometry.Rect
 import androidx.compose.ui.graphics.toAndroidRect
+import androidx.compose.ui.layout.boundsInParent
 import androidx.compose.ui.node.LayoutNode
 import androidx.compose.ui.semantics.CustomAccessibilityAction
 import androidx.compose.ui.semantics.Role
@@ -955,6 +956,7 @@ internal class AndroidComposeViewAccessibilityDelegateCompat(val view: AndroidCo
                     }
                 }
 
+                val viewport = node.layoutInfo.coordinates.boundsInParent().size
                 val scrollAction = node.config.getOrNull(SemanticsActions.ScrollBy) ?: return false
                 val xScrollState =
                     node.config.getOrNull(SemanticsProperties.HorizontalScrollAxisRange)
@@ -974,10 +976,7 @@ internal class AndroidComposeViewAccessibilityDelegateCompat(val view: AndroidCo
                     ) {
                         // here and below innerLayoutNodeWrapper is used to calculate the width
                         // and height to exclude the paddings
-                        return scrollAction.action?.invoke(
-                            node.layoutNode.coordinates.size.width.toFloat(),
-                            0f
-                        ) ?: false
+                        return scrollAction.action?.invoke(viewport.width, 0f) ?: false
                     }
                     if ((
                         (
@@ -992,10 +991,7 @@ internal class AndroidComposeViewAccessibilityDelegateCompat(val view: AndroidCo
                         ) &&
                         xScrollState.value() > 0
                     ) {
-                        return scrollAction.action?.invoke(
-                            -node.layoutNode.coordinates.size.width.toFloat(),
-                            0f
-                        ) ?: false
+                        return scrollAction.action?.invoke(-viewport.width, 0f) ?: false
                     }
                 }
                 val yScrollState =
@@ -1014,10 +1010,7 @@ internal class AndroidComposeViewAccessibilityDelegateCompat(val view: AndroidCo
                         ) &&
                         yScrollState.value() < yScrollState.maxValue()
                     ) {
-                        return scrollAction.action?.invoke(
-                            0f,
-                            node.layoutNode.coordinates.size.height.toFloat()
-                        ) ?: false
+                        return scrollAction.action?.invoke(0f, viewport.height) ?: false
                     }
                     if ((
                         (
@@ -1032,10 +1025,7 @@ internal class AndroidComposeViewAccessibilityDelegateCompat(val view: AndroidCo
                         ) &&
                         yScrollState.value() > 0
                     ) {
-                        return scrollAction.action?.invoke(
-                            0f,
-                            -node.layoutNode.coordinates.size.height.toFloat()
-                        ) ?: false
+                        return scrollAction.action?.invoke(0f, -viewport.height) ?: false
                     }
                 }
                 return false
