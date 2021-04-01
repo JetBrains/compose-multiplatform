@@ -47,7 +47,8 @@ import org.jetbrains.skija.ShadowUtils
 internal class SkijaLayer(
     private val getDensity: () -> Density,
     private val invalidateParentLayer: () -> Unit,
-    private val drawBlock: (Canvas) -> Unit
+    private val drawBlock: (Canvas) -> Unit,
+    private val onDestroy: () -> Unit = {}
 ) : OwnedLayer {
     private var size = IntSize.Zero
     private var position = IntOffset.Zero
@@ -76,6 +77,7 @@ internal class SkijaLayer(
         picture?.close()
         pictureRecorder.close()
         isDestroyed = true
+        onDestroy()
     }
 
     override fun resize(size: IntSize) {
