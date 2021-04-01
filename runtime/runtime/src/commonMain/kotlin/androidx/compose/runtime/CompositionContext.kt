@@ -44,7 +44,6 @@ abstract class CompositionContext internal constructor() {
         content: @Composable () -> Unit
     )
     internal abstract fun invalidate(composition: ControlledComposition)
-    internal abstract fun invalidateScope(scope: RecomposeScopeImpl)
 
     internal open fun recordInspectionTable(table: MutableSet<CompositionData>) {}
     internal open fun registerComposer(composer: Composer) { }

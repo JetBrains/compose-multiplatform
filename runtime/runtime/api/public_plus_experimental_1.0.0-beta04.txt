@@ -102,8 +102,10 @@ package androidx.compose.runtime {
     method public androidx.compose.runtime.RecomposeScope? getRecomposeScope();
     method public boolean getSkipping();
     method @androidx.compose.runtime.ComposeCompilerApi public Object joinKey(Object? left, Object? right);
+    method @androidx.compose.runtime.InternalComposeApi public void recordReadOf(Object value);
     method @androidx.compose.runtime.InternalComposeApi public void recordSideEffect(kotlin.jvm.functions.Function0<kotlin.Unit> effect);
     method @androidx.compose.runtime.InternalComposeApi public void recordUsed(androidx.compose.runtime.RecomposeScope scope);
+    method @androidx.compose.runtime.InternalComposeApi public void recordWriteOf(Object value);
     method @androidx.compose.runtime.ComposeCompilerApi public Object? rememberedValue();
     method @androidx.compose.runtime.ComposeCompilerApi public void skipCurrentGroup();
     method @androidx.compose.runtime.ComposeCompilerApi public void skipToGroupEnd();
