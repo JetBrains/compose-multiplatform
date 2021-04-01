@@ -19,7 +19,6 @@
 package androidx.compose.ui.platform
 
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.key
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.ExperimentalComposeUiApi
@@ -191,6 +190,7 @@ internal class DesktopOwner(
     override fun onDetach(node: LayoutNode) {
         measureAndLayoutDelegate.onNodeDetached(node)
         snapshotObserver.clear(node)
+        needClearObservations = true
     }
 
     override val measureIteration: Long get() = measureAndLayoutDelegate.measureIteration
@@ -207,6 +207,16 @@ internal class DesktopOwner(
         measureAndLayout()
         needsDraw = false
         draw(canvas)
+        clearInvalidObservations()
+    }
+
+    private var needClearObservations = false
+
+    private fun clearInvalidObservations() {
+        if (needClearObservations) {
+            snapshotObserver.clearInvalidObservations()
+            needClearObservations = false
+        }
     }
 
     private fun requestLayout() {
@@ -248,7 +258,8 @@ internal class DesktopOwner(
             invalidateParentLayer()
             requestDraw()
         },
-        drawBlock = drawBlock
+        drawBlock = drawBlock,
+        onDestroy = { needClearObservations = true }
     )
 
     override fun onSemanticsChange() = Unit
