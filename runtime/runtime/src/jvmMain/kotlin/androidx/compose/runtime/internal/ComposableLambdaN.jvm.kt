@@ -20,7 +20,6 @@ package androidx.compose.runtime.internal
 import androidx.compose.runtime.ComposeCompilerApi
 import androidx.compose.runtime.Composer
 import androidx.compose.runtime.InternalComposeApi
-import androidx.compose.runtime.RecomposeScope
 import androidx.compose.runtime.Stable
 import kotlin.jvm.functions.FunctionN
 
@@ -35,64 +34,13 @@ internal class ComposableLambdaNImpl(
     override val arity: Int
 ) : ComposableLambdaN {
     private var _block: Any? = null
-    private var scope: RecomposeScope? = null
-    private var scopes: MutableList<RecomposeScope>? = null
 
-    private fun trackWrite() {
-        if (tracked) {
-            val scope = this.scope
-            if (scope != null) {
-                scope.invalidate()
-                this.scope = null
+    fun update(block: Any, composer: Composer?) {
+        if (block != this._block) {
+            if (tracked) {
+                composer?.recordWriteOf(this)
             }
-            val scopes = this.scopes
-            if (scopes != null) {
-                for (index in 0 until scopes.size) {
-                    val item = scopes[index]
-                    item.invalidate()
-                }
-                scopes.clear()
-            }
-        }
-    }
-
-    private fun trackRead(composer: Composer) {
-        if (tracked) {
-            val scope = composer.recomposeScope
-            if (scope != null) {
-                // Find the first invalid scope and replace it or record it if no scopes are invalid
-                composer.recordUsed(scope)
-                val lastScope = this.scope
-                if (lastScope.replacableWith(scope)) {
-                    this.scope = scope
-                } else {
-                    val lastScopes = scopes
-                    if (lastScopes == null) {
-                        val newScopes = mutableListOf<RecomposeScope>()
-                        scopes = newScopes
-                        newScopes.add(scope)
-                    } else {
-                        for (index in 0 until lastScopes.size) {
-                            val scopeAtIndex = lastScopes[index]
-                            if (scopeAtIndex.replacableWith(scope)) {
-                                lastScopes[index] = scope
-                                return
-                            }
-                        }
-                        lastScopes.add(scope)
-                    }
-                }
-            }
-        }
-    }
-
-    fun update(block: Any) {
-        if (block != _block) {
-            val oldBlockNull = _block == null
-            _block = block as FunctionN<*>
-            if (!oldBlockNull) {
-                trackWrite()
-            }
+            this._block = block as FunctionN<*>
         }
     }
 
@@ -114,11 +62,13 @@ internal class ComposableLambdaNImpl(
         val allArgsButLast = args.slice(0 until args.size - 1).toTypedArray()
         val lastChanged = args[args.size - 1] as Int
         c = c.startRestartGroup(key, sourceInformation)
-        trackRead(c)
         val dirty = lastChanged or if (c.changed(this))
             differentBits(realParams)
         else
             sameBits(realParams)
+        if (tracked) {
+            c.recordReadOf(this)
+        }
         @Suppress("UNCHECKED_CAST")
         val result = (_block as FunctionN<*>)(*allArgsButLast, dirty)
         c.endRestartGroup()?.updateScope { nc, _ ->
@@ -161,7 +111,7 @@ fun composableLambdaN(
         @Suppress("UNCHECKED_CAST")
         slot as ComposableLambdaNImpl
     }
-    result.update(block)
+    result.update(block, composer)
     composer.endReplaceableGroup()
     return result
 }
@@ -179,4 +129,4 @@ fun composableLambdaNInstance(
     tracked,
     sourceInformation,
     arity
-).apply { update(block) }
+).apply { update(block, null) }
