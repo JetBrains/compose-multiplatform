@@ -26,10 +26,12 @@ import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.performClick
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.LargeTest
-import org.junit.Ignore
+import com.google.common.truth.Truth.assertThat
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
+import java.util.concurrent.CountDownLatch
+import java.util.concurrent.TimeUnit.SECONDS
 
 @LargeTest
 @RunWith(AndroidJUnit4::class)
@@ -40,11 +42,11 @@ class SetRootFocusTest {
     private val focusable = "Focusable"
     private val nonFocusable = "NotFocusable"
 
-    @Ignore("Flaky test. b/178470869")
     @Test
     fun clearFocus_byClickingOutsideFocusableComponent() {
         // Arrange.
         var isFocused = false
+        var focusChanged = CountDownLatch(1)
         rule.setContent {
             Column {
                 // TODO(b/163725615): Remove this after clickable is made focusable.
@@ -55,7 +57,10 @@ class SetRootFocusTest {
                         .testTag(focusable)
                         .clickable { focusRequester.requestFocus() }
                         .focusRequester(focusRequester)
-                        .onFocusChanged { isFocused = it.isFocused }
+                        .onFocusChanged {
+                            isFocused = it.isFocused
+                            focusChanged.countDown()
+                        }
                         .focusModifier()
                 )
                 BasicText(
@@ -65,12 +70,21 @@ class SetRootFocusTest {
             }
         }
         rule.onNodeWithTag(focusable).performClick()
-        rule.waitUntil(5_000) { isFocused == true }
+        rule.waitForIdle()
+        focusChanged.await(10, SECONDS)
+        rule.runOnIdle {
+            assertThat(isFocused).isTrue()
+            focusChanged = CountDownLatch(1)
+        }
 
         // Act.
         rule.onNodeWithTag(nonFocusable).performClick()
 
         // Assert.
-        rule.waitUntil(5_000) { isFocused == false }
+        rule.waitForIdle()
+        focusChanged.await(10, SECONDS)
+        rule.runOnIdle {
+            assertThat(isFocused).isFalse()
+        }
     }
 }
