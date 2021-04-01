@@ -2,13 +2,7 @@
 package androidx.compose.animation {
 
   public final class AndroidActualDefaultDecayAnimationSpec_androidKt {
-    method @androidx.compose.runtime.Composable public static androidx.compose.animation.core.DecayAnimationSpec<java.lang.Float> defaultDecayAnimationSpec();
-  }
-
-  public final class AndroidFlingCalculator_androidKt {
-  }
-
-  public final class AndroidFlingSpline_androidKt {
+    method @Deprecated @androidx.compose.runtime.Composable public static androidx.compose.animation.core.DecayAnimationSpec<java.lang.Float> defaultDecayAnimationSpec();
   }
 
   public final class AnimatedVisibilityKt {
@@ -29,9 +23,16 @@ package androidx.compose.animation {
   public final class EnterExitTransitionKt {
   }
 
+  public final class FlingCalculatorKt {
+  }
+
   public final class SingleValueAnimationKt {
     method public static androidx.compose.animation.core.Animatable<androidx.compose.ui.graphics.Color,androidx.compose.animation.core.AnimationVector4D> Animatable-8_81llA(long initialValue);
     method @androidx.compose.runtime.Composable public static androidx.compose.runtime.State<androidx.compose.ui.graphics.Color> animateColorAsState-m3E411Q(long targetValue, optional androidx.compose.animation.core.AnimationSpec<androidx.compose.ui.graphics.Color> animationSpec, optional kotlin.jvm.functions.Function1<? super androidx.compose.ui.graphics.Color,kotlin.Unit>? finishedListener);
+  }
+
+  public final class SplineBasedDecayKt {
+    method public static <T> androidx.compose.animation.core.DecayAnimationSpec<T> splineBasedDecay(androidx.compose.ui.unit.Density density);
   }
 
   public final class SplineBasedFloatDecayAnimationSpec implements androidx.compose.animation.core.FloatDecayAnimationSpec {
@@ -45,7 +46,7 @@ package androidx.compose.animation {
   }
 
   public final class SplineBasedFloatDecayAnimationSpec_androidKt {
-    method public static <T> androidx.compose.animation.core.DecayAnimationSpec<T> splineBasedDecay(androidx.compose.ui.unit.Density density);
+    method @androidx.compose.runtime.Composable public static <T> androidx.compose.animation.core.DecayAnimationSpec<T> rememberSplineBasedDecay();
   }
 
   public final class TransitionKt {
