@@ -1,0 +1,3 @@
+<component name="DependencyValidationManager">
+  <scope name="Apply copyright" pattern="(file[*]:*.kt||file[*]:*.java)&amp;&amp;!file[*]:*.gradle.kts&amp;&amp;!file[*]:*.gradle&amp;&amp;!file[gradle-plugins.compose.test]:test-projects/*" />
+</component>
