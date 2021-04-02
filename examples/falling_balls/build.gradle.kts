@@ -6,14 +6,13 @@ plugins {
     // __KOTLIN_COMPOSE_VERSION__
     kotlin("jvm") version "1.4.32"
     // __LATEST_COMPOSE_RELEASE_VERSION__
-    id("org.jetbrains.compose") version "0.4.0-build180"
+    id("org.jetbrains.compose") version "0.4.0-build182"
 }
 
 group = "me.user"
 version = "1.0"
 
 repositories {
-    jcenter()
     mavenCentral()
     maven { url = uri("https://maven.pkg.jetbrains.space/public/p/compose/dev") }
 }

@@ -14,7 +14,6 @@ version = properties("deploy.version")
 
 repositories {
     mavenCentral()
-    jcenter()
 }
 
 intellij {

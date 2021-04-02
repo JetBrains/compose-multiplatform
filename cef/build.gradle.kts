@@ -43,7 +43,7 @@ val cefUnZip = run {
 
 repositories {
     google()
-    jcenter()
+    mavenCentral()
     maven("https://maven.pkg.jetbrains.space/public/p/compose/dev")
     // temp
     maven("https://packages.jetbrains.team/maven/p/ui/dev")

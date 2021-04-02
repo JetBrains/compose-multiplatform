@@ -10,7 +10,6 @@ val properties = ComposeUberJarProperties()
 
 repositories {
     mavenCentral()
-    jcenter()
     maven(properties.composeRepoUrl)
 }
 

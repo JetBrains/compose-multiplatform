@@ -1,12 +1,12 @@
 buildscript {
     // __LATEST_COMPOSE_RELEASE_VERSION__
-    val composeVersion = System.getenv("COMPOSE_TEMPLATE_COMPOSE_VERSION") ?: "0.4.0-build180"
+    val composeVersion = System.getenv("COMPOSE_TEMPLATE_COMPOSE_VERSION") ?: "0.4.0-build182"
 
     repositories {
         // TODO: remove after new build is published
         mavenLocal()
         google()
-        jcenter()
+        mavenCentral()
         maven("https://maven.pkg.jetbrains.space/public/p/compose/dev")
     }
 
@@ -21,7 +21,7 @@ buildscript {
 allprojects {
     repositories {
         google()
-        jcenter()
+        mavenCentral()
         maven("https://maven.pkg.jetbrains.space/public/p/compose/dev")
     }
 }
