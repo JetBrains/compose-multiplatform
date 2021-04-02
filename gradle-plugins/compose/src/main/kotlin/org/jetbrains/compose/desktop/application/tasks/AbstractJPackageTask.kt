@@ -356,8 +356,47 @@ abstract class AbstractJPackageTask @Inject constructor(
 
     override fun checkResult(result: ExecResult) {
         super.checkResult(result)
+        patchInfoPlistIfNeeded()
         val outputFile = findOutputFileOrDir(destinationDir.ioFile, targetFormat)
         logger.lifecycle("The distribution is written to ${outputFile.canonicalPath}")
+    }
+
+    /**
+     * https://github.com/JetBrains/compose-jb/issues/545
+     *
+     * Patching Info.plist is necessary to avoid duplicating and supporting
+     * properties set by jpackage.
+     *
+     * Info.plist is patched only on macOS for app image.
+     * Packaged installers receive patched Info.plist through
+     * prebuilt [appImage].
+     */
+    private fun patchInfoPlistIfNeeded() {
+        if (currentOS != OS.MacOS || targetFormat != TargetFormat.AppImage) return
+
+        val infoPlist = destinationDir.ioFile.resolve("${packageName.get()}.app/Contents/Info.plist")
+        if (!infoPlist.exists()) return
+
+        val content = infoPlist.readText()
+        val nsSupportsAutomaticGraphicsSwitching = "<key>NSSupportsAutomaticGraphicsSwitching</key>"
+        val stringToAppend = "$nsSupportsAutomaticGraphicsSwitching<true/>"
+        if (content.indexOf(nsSupportsAutomaticGraphicsSwitching) >= 0) return
+
+        /**
+         * Dirty hack: to avoid parsing plist file, let's find known expected key substring,
+         * and insert the necessary keys before it.
+         */
+        val knownExpectedKey = "<key>NSHighResolutionCapable</key>"
+        val i = content.indexOf(knownExpectedKey)
+        if (i >= 0) {
+            val newContent = buildString {
+                append(content.substring(0, i))
+                appendln(stringToAppend)
+                append("  ")
+                appendln(content.substring(i, content.length))
+            }
+            infoPlist.writeText(newContent)
+        }
     }
 
     override fun initState() {
