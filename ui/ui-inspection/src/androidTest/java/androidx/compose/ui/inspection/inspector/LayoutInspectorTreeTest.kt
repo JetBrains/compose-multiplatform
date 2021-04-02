@@ -515,8 +515,9 @@ class LayoutInspectorTreeTest {
             }
 
             if (checkParameters) {
-                val params =
-                    builder.convertParameters(ROOT_ID, node, MAX_RECURSIONS, MAX_ITERABLE_SIZE)
+                val params = builder.convertParameters(
+                    ROOT_ID, node, ParameterKind.Normal, MAX_RECURSIONS, MAX_ITERABLE_SIZE
+                )
                 val receiver = ParameterValidationReceiver(params.listIterator())
                 receiver.block()
                 receiver.checkFinished(name)
@@ -583,7 +584,9 @@ class LayoutInspectorTreeTest {
         print(")")
         if (generateParameters && node.parameters.isNotEmpty()) {
             generateParameters(
-                builder.convertParameters(ROOT_ID, node, MAX_RECURSIONS, MAX_ITERABLE_SIZE),
+                builder.convertParameters(
+                    ROOT_ID, node, ParameterKind.Normal, MAX_RECURSIONS, MAX_ITERABLE_SIZE
+                ),
                 0
             )
         }

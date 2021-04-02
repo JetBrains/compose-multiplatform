@@ -19,7 +19,7 @@ package androidx.compose.ui.inspection
 import android.view.View
 import android.view.inspector.WindowInspector
 import androidx.compose.ui.inspection.compose.AndroidComposeViewWrapper
-import androidx.compose.ui.inspection.compose.convertParameters
+import androidx.compose.ui.inspection.compose.convertToParameterGroup
 import androidx.compose.ui.inspection.compose.flatten
 import androidx.compose.ui.inspection.framework.flatten
 import androidx.compose.ui.inspection.inspector.InspectorNode
@@ -27,7 +27,6 @@ import androidx.compose.ui.inspection.inspector.LayoutInspectorTree
 import androidx.compose.ui.inspection.inspector.NodeParameterReference
 import androidx.compose.ui.inspection.proto.StringTable
 import androidx.compose.ui.inspection.proto.convert
-import androidx.compose.ui.inspection.proto.convertAll
 import androidx.compose.ui.inspection.util.ThreadUtils
 import androidx.inspection.Connection
 import androidx.inspection.Inspector
@@ -44,7 +43,6 @@ import layoutinspector.compose.inspection.LayoutInspectorComposeProtocol.GetPara
 import layoutinspector.compose.inspection.LayoutInspectorComposeProtocol.GetParameterDetailsResponse
 import layoutinspector.compose.inspection.LayoutInspectorComposeProtocol.GetParametersCommand
 import layoutinspector.compose.inspection.LayoutInspectorComposeProtocol.GetParametersResponse
-import layoutinspector.compose.inspection.LayoutInspectorComposeProtocol.ParameterGroup
 import layoutinspector.compose.inspection.LayoutInspectorComposeProtocol.Response
 import layoutinspector.compose.inspection.LayoutInspectorComposeProtocol.UnknownCommandResponse
 
@@ -166,17 +164,14 @@ class ComposeLayoutInspector(
         callback.reply {
             getParametersResponse = if (foundComposable != null) {
                 val stringTable = StringTable()
-                val parameters = foundComposable.convertParameters(
-                    layoutInspectorTree,
-                    getParametersCommand.rootViewId,
-                    getParametersCommand.maxRecursions.orElse(MAX_RECURSIONS),
-                    getParametersCommand.maxInitialIterableSize.orElse(MAX_ITERABLE_SIZE),
-                ).convertAll(stringTable)
                 GetParametersResponse.newBuilder().apply {
-                    parameterGroup = ParameterGroup.newBuilder().apply {
-                        composableId = getParametersCommand.composableId
-                        addAllParameter(parameters)
-                    }.build()
+                    parameterGroup = foundComposable.convertToParameterGroup(
+                        layoutInspectorTree,
+                        getParametersCommand.rootViewId,
+                        getParametersCommand.maxRecursions.orElse(MAX_RECURSIONS),
+                        getParametersCommand.maxInitialIterableSize.orElse(MAX_ITERABLE_SIZE),
+                        stringTable
+                    )
                     addAllStrings(stringTable.toStringEntries())
                 }.build()
             } else {
@@ -198,16 +193,13 @@ class ComposeLayoutInspector(
         callback.reply {
             val stringTable = StringTable()
             val parameterGroups = allComposables.map { composable ->
-                val parameters = composable.convertParameters(
+                composable.convertToParameterGroup(
                     layoutInspectorTree,
                     getAllParametersCommand.rootViewId,
                     getAllParametersCommand.maxRecursions.orElse(MAX_RECURSIONS),
                     getAllParametersCommand.maxInitialIterableSize.orElse(MAX_ITERABLE_SIZE),
-                ).convertAll(stringTable)
-                ParameterGroup.newBuilder().apply {
-                    composableId = composable.id
-                    addAllParameter(parameters)
-                }.build()
+                    stringTable
+                )
             }
 
             getAllParametersResponse = GetAllParametersResponse.newBuilder().apply {
@@ -228,6 +220,7 @@ class ComposeLayoutInspector(
         )
         val reference = NodeParameterReference(
             getParameterDetailsCommand.reference.composableId,
+            getParameterDetailsCommand.reference.kind.convert(),
             getParameterDetailsCommand.reference.parameterIndex,
             getParameterDetailsCommand.reference.compositeIndexList
         )

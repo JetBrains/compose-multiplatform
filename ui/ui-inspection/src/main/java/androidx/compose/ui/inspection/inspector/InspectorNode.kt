@@ -109,7 +109,13 @@ class InspectorNode internal constructor(
      * The children nodes of this Composable.
      */
     val children: List<InspectorNode>
-)
+) {
+    fun parametersByKind(kind: ParameterKind): List<RawParameter> = when (kind) {
+        ParameterKind.Normal -> parameters
+        ParameterKind.MergedSemantics -> mergedSemantics
+        ParameterKind.UnmergedSemantics -> unmergedSemantics
+    }
+}
 
 data class QuadBounds(
     val x0: Int,

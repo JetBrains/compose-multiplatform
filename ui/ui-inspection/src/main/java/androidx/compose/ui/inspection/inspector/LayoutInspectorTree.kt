@@ -40,7 +40,7 @@ import java.util.IdentityHashMap
 import kotlin.math.absoluteValue
 import kotlin.math.roundToInt
 
-private val systemPackages = setOf(
+val systemPackages = setOf(
     -1,
     packageNameHash("androidx.compose.animation"),
     packageNameHash("androidx.compose.animation.core"),
@@ -131,15 +131,18 @@ class LayoutInspectorTree {
     fun convertParameters(
         rootId: Long,
         node: InspectorNode,
+        kind: ParameterKind,
         maxRecursions: Int,
         maxInitialIterableSize: Int
     ): List<NodeParameter> {
-        return node.parameters.mapIndexed { index, parameter ->
+        val parameters = node.parametersByKind(kind)
+        return parameters.mapIndexed { index, parameter ->
             parameterFactory.create(
                 rootId,
                 node.id,
                 parameter.name,
                 parameter.value,
+                kind,
                 index,
                 maxRecursions,
                 maxInitialIterableSize
@@ -161,10 +164,11 @@ class LayoutInspectorTree {
         maxRecursions: Int,
         maxInitialIterableSize: Int
     ): NodeParameter? {
-        if (reference.parameterIndex !in node.parameters.indices) {
+        val parameters = node.parametersByKind(reference.kind)
+        if (reference.parameterIndex !in parameters.indices) {
             return null
         }
-        val parameter = node.parameters[reference.parameterIndex]
+        val parameter = parameters[reference.parameterIndex]
         return parameterFactory.expand(
             rootId,
             node.id,

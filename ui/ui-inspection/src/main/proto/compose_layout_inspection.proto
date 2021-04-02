@@ -80,6 +80,14 @@ message ComposableNode {
     int32 name = 7;
 
     Bounds bounds = 8;
+
+    enum Flags {
+      NONE = 0;
+      SYSTEM_CREATED = 0x1;
+      HAS_MERGED_SEMANTICS = 0x2;
+      HAS_UNMERGED_SEMANTICS = 0x4;
+    }
+    int32 flags = 9;
 }
 
 // In Android, a resource id is a simple integer. This class holds the namespace, type, and name
@@ -151,6 +159,13 @@ message Parameter {
 
 // A reference to a "part" of a parameter value
 message ParameterReference {
+  enum Kind {
+    UNSPECIFIED = 0;
+    NORMAL = 1;
+    MERGED_SEMANTICS = 2;
+    UNMERGED_SEMANTICS = 3;
+  }
+
   sint64 composable_id = 1;
 
   // Identifies an index into a ParameterGroup
@@ -163,12 +178,17 @@ message ParameterReference {
   //    composite_index[1] is the index into the fields in MyClass
   //    composite_index[2] is the index into the field found by [1] etc...
   repeated int32 composite_index = 3;
+
+  // The kind of parameter this is a reference to
+  Kind kind = 4;
 }
 
 // A collection of all parameters associated with a single composable
 message ParameterGroup {
   sint64 composable_id = 1;
   repeated Parameter parameter = 3;
+  repeated Parameter merged_semantics = 4;
+  repeated Parameter unmerged_semantics = 5;
 }
 
 // ======= COMMANDS, RESPONSES, AND EVENTS =======
