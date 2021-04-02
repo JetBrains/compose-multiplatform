@@ -18,26 +18,20 @@ package androidx.compose.ui.focus
 
 import android.view.View
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.text.BasicText
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusDirection.Down
 import androidx.compose.ui.focus.FocusDirection.Left
 import androidx.compose.ui.focus.FocusDirection.Right
 import androidx.compose.ui.focus.FocusDirection.Up
-import androidx.compose.ui.layout.Layout
-import androidx.compose.ui.layout.MeasurePolicy
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.test.junit4.createComposeRule
-import androidx.compose.ui.unit.Constraints
-import androidx.compose.ui.unit.IntOffset
 import androidx.test.filters.MediumTest
 import com.google.common.truth.Truth.assertThat
 import org.junit.Rule
@@ -49,7 +43,7 @@ private const val invalid = "Not applicable to a 2D focus search."
 
 @MediumTest
 @RunWith(Parameterized::class)
-class TwoDimensionalFocusTraversalInitialFocus(private val focusDirection: FocusDirection) {
+class TwoDimensionalFocusTraversalInitialFocusTest(private val focusDirection: FocusDirection) {
     @get:Rule
     val rule = createComposeRule()
 
@@ -177,8 +171,8 @@ class TwoDimensionalFocusTraversalInitialFocus(private val focusDirection: Focus
         val isFocused = MutableList(2) { mutableStateOf(false) }
         val (item1, item2) = FocusRequester.createRefs()
         val siblings = @Composable {
-            FocusableBox(isFocused = isFocused[0], focusRequester = item1)
-            FocusableBox(isFocused = isFocused[1], focusRequester = item2)
+            FocusableBox(isFocused[0], item1)
+            FocusableBox(isFocused[1], item2)
         }
         val initialFocusedItem = when (focusDirection) {
             Up, Left -> item2
@@ -223,33 +217,11 @@ class TwoDimensionalFocusTraversalInitialFocus(private val focusDirection: Focus
 
 @Composable
 private fun FocusableBox(
-    isFocused: MutableState<Boolean>? = null,
-    x: Int = 0,
-    y: Int = 0,
-    width: Int = 10,
-    height: Int = 10,
+    isFocused: MutableState<Boolean> = mutableStateOf(false),
     focusRequester: FocusRequester? = null,
     content: @Composable () -> Unit = {}
 ) {
-    Layout(
-        content = content,
-        modifier = Modifier
-            .offset { IntOffset(x, y) }
-            .focusRequester(focusRequester ?: FocusRequester())
-            .onFocusChanged { if (isFocused != null) isFocused.value = it.isFocused }
-            .focusModifier(),
-        measurePolicy = remember(width, height) {
-            MeasurePolicy { measurables, _ ->
-                val constraint = Constraints(width, width, height, height)
-                layout(width, height) {
-                    measurables.forEach {
-                        val placeable = it.measure(constraint)
-                        placeable.place(0, 0)
-                    }
-                }
-            }
-        }
-    )
+    FocusableBox(isFocused, 0, 0, 10, 10, focusRequester, content)
 }
 
 private val MutableList<MutableState<Boolean>>.values get() = this.map { it.value }

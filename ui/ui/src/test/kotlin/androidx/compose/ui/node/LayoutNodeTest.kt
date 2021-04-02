@@ -21,7 +21,7 @@ import androidx.compose.ui.autofill.Autofill
 import androidx.compose.ui.autofill.AutofillTree
 import androidx.compose.ui.draw.DrawModifier
 import androidx.compose.ui.draw.drawBehind
-import androidx.compose.ui.focus.FocusDirection
+import androidx.compose.ui.focus.FocusDirectionInternal
 import androidx.compose.ui.focus.FocusManager
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Canvas
@@ -1861,7 +1861,7 @@ private class MockOwner(
         layoutChangeCount++
     }
 
-    override fun getFocusDirection(keyEvent: KeyEvent): FocusDirection? {
+    override fun getFocusDirection(keyEvent: KeyEvent): FocusDirectionInternal? {
         TODO("Not yet implemented")
     }
 
