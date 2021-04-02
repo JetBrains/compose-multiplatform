@@ -421,6 +421,20 @@ internal fun CoreTextField(
         onDispose { manager.hideSelectionToolbar() }
     }
 
+    DisposableEffect(imeOptions) {
+        if (textInputService != null && state.hasFocus) {
+            state.inputSession = TextFieldDelegate.restartInput(
+                textInputService = textInputService,
+                value = value,
+                editProcessor = state.processor,
+                imeOptions = imeOptions,
+                onValueChange = onValueChangeWrapper,
+                onImeActionPerformed = onImeActionPerformedWrapper
+            )
+        }
+        onDispose { /* do nothing */ }
+    }
+
     val textKeyInputModifier =
         Modifier.textFieldKeyInput(
             state = state,

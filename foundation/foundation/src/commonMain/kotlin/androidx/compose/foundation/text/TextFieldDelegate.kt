@@ -222,6 +222,33 @@ internal class TextFieldDelegate {
         }
 
         /**
+         * Starts a new input connection.
+         *
+         * @param textInputService The text input service
+         * @param value The editor state
+         * @param editProcessor The edit processor
+         * @param onValueChange The callback called when the new editor state arrives.
+         * @param onImeActionPerformed The callback called when the editor action arrives.
+         * @param imeOptions Keyboard configuration such as single line, auto correct etc.
+         */
+        @JvmStatic
+        internal fun restartInput(
+            textInputService: TextInputService,
+            value: TextFieldValue,
+            editProcessor: EditProcessor,
+            imeOptions: ImeOptions,
+            onValueChange: (TextFieldValue) -> Unit,
+            onImeActionPerformed: (ImeAction) -> Unit
+        ): TextInputSession {
+            return textInputService.startInput(
+                value = value.copy(),
+                imeOptions = imeOptions,
+                onEditCommand = { onEditCommand(it, editProcessor, onValueChange) },
+                onImeActionPerformed = onImeActionPerformed
+            )
+        }
+
+        /**
          * Called when the composable gained input focus
          *
          * @param textInputService The text input service
@@ -240,10 +267,12 @@ internal class TextFieldDelegate {
             onValueChange: (TextFieldValue) -> Unit,
             onImeActionPerformed: (ImeAction) -> Unit
         ): TextInputSession {
-            val textInputSession = textInputService.startInput(
-                value = value.copy(),
+            val textInputSession = restartInput(
+                textInputService = textInputService,
+                value = value,
+                editProcessor = editProcessor,
                 imeOptions = imeOptions,
-                onEditCommand = { onEditCommand(it, editProcessor, onValueChange) },
+                onValueChange = onValueChange,
                 onImeActionPerformed = onImeActionPerformed
             )
 
