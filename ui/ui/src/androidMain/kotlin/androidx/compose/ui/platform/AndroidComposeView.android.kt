@@ -279,7 +279,16 @@ internal class AndroidComposeView(context: Context) :
 
     private val tmpPositionArray = intArrayOf(0, 0)
     private val tmpOffsetArray = floatArrayOf(0f, 0f)
-    private val tmpMatrix = Matrix()
+    private val viewToWindowMatrix = Matrix()
+    private val windowToViewMatrix = Matrix()
+    private var lastMatrixRecalculationDrawingTime = -1L
+
+    /**
+     * On some devices, the `getLocationOnScreen()` returns `(0, 0)` even when the Window
+     * is offset in special circumstances. This contains the screen coordinates of the containing
+     * Window the last time the [viewToWindowMatrix] and [windowToViewMatrix] were recalculated.
+     */
+    private var windowPosition = Offset.Infinite
 
     // Used to track whether or not there was an exception while creating an MRenderNode
     // so that we don't have to continue using try/catch after fails once.
@@ -763,6 +772,7 @@ internal class AndroidComposeView(context: Context) :
 
     // TODO(shepshapard): Test this method.
     override fun dispatchTouchEvent(motionEvent: MotionEvent): Boolean {
+        recalculateWindowPosition(motionEvent)
         measureAndLayout()
         val processResult = trace("AndroidOwner:onTouch") {
             val pointerInputEvent = motionEventAdapter.convertToPointerInputEvent(motionEvent, this)
@@ -785,31 +795,65 @@ internal class AndroidComposeView(context: Context) :
     }
 
     override fun localToScreen(localPosition: Offset): Offset {
-        tmpMatrix.reset()
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-            TransformMatrixApi29.transformMatrixToScreen(this, tmpMatrix)
-        } else {
-            TransformMatrixApi28.transformMatrixToScreen(this, tmpMatrix, tmpPositionArray)
-        }
+        recalculateWindowPosition()
         val points = tmpOffsetArray
         points[0] = localPosition.x
         points[1] = localPosition.y
-        tmpMatrix.mapPoints(points)
-        return Offset(points[0], points[1])
+        viewToWindowMatrix.mapPoints(points)
+        return Offset(
+            points[0] + windowPosition.x,
+            points[1] + windowPosition.y
+        )
     }
 
     override fun screenToLocal(positionOnScreen: Offset): Offset {
-        tmpMatrix.reset()
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-            TransformMatrixApi29.transformMatrixFromScreen(this, tmpMatrix)
-        } else {
-            TransformMatrixApi28.transformMatrixFromScreen(this, tmpMatrix, tmpPositionArray)
-        }
+        recalculateWindowPosition()
         val points = tmpOffsetArray
-        points[0] = positionOnScreen.x
-        points[1] = positionOnScreen.y
-        tmpMatrix.mapPoints(points)
+        points[0] = positionOnScreen.x - windowPosition.x
+        points[1] = positionOnScreen.y - windowPosition.y
+        windowToViewMatrix.mapPoints(points)
         return Offset(points[0], points[1])
+    }
+
+    private fun recalculateWindowPosition(motionEvent: MotionEvent) {
+        lastMatrixRecalculationDrawingTime = drawingTime
+        recalculateWindowViewTransforms()
+        val points = tmpOffsetArray
+        points[0] = motionEvent.x
+        points[1] = motionEvent.y
+        viewToWindowMatrix.mapPoints(points)
+
+        windowPosition = Offset(
+            motionEvent.rawX - points[0],
+            motionEvent.rawY - points[1]
+        )
+    }
+
+    private fun recalculateWindowPosition() {
+        val drawingTime = drawingTime
+        if (drawingTime != lastMatrixRecalculationDrawingTime) {
+            lastMatrixRecalculationDrawingTime = drawingTime
+            recalculateWindowViewTransforms()
+            var viewParent = parent
+            var view: View = this
+            while (viewParent is ViewGroup) {
+                view = viewParent
+                viewParent = view.parent
+            }
+            view.getLocationOnScreen(tmpPositionArray)
+            val screenX = tmpPositionArray[0].toFloat()
+            val screenY = tmpPositionArray[1].toFloat()
+            view.getLocationInWindow(tmpPositionArray)
+            val windowX = tmpPositionArray[0].toFloat()
+            val windowY = tmpPositionArray[1].toFloat()
+            windowPosition = Offset(screenX - windowX, screenY - windowY)
+        }
+    }
+
+    private fun recalculateWindowViewTransforms() {
+        viewToWindowMatrix.reset()
+        transformMatrixToWindow(this, viewToWindowMatrix)
+        viewToWindowMatrix.invert(windowToViewMatrix)
     }
 
     override fun onCheckIsTextEditor(): Boolean = textInputServiceAndroid.isEditorFocused()
@@ -818,30 +862,20 @@ internal class AndroidComposeView(context: Context) :
         textInputServiceAndroid.createInputConnection(outAttrs)
 
     override fun calculateLocalPosition(positionInWindow: Offset): Offset {
-        tmpMatrix.reset()
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-            TransformMatrixApi29.transformMatrixFromWindow(this, tmpMatrix, tmpPositionArray)
-        } else {
-            TransformMatrixApi28.transformMatrixFromWindow(this, tmpMatrix)
-        }
+        recalculateWindowPosition()
         val points = tmpOffsetArray
         points[0] = positionInWindow.x
         points[1] = positionInWindow.y
-        tmpMatrix.mapPoints(points)
+        windowToViewMatrix.mapPoints(points)
         return Offset(points[0], points[1])
     }
 
     override fun calculatePositionInWindow(localPosition: Offset): Offset {
-        tmpMatrix.reset()
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-            TransformMatrixApi29.transformMatrixToWindow(this, tmpMatrix, tmpPositionArray)
-        } else {
-            TransformMatrixApi28.transformMatrixToWindow(this, tmpMatrix)
-        }
+        recalculateWindowPosition()
         val points = tmpOffsetArray
         points[0] = localPosition.x
         points[1] = localPosition.y
-        tmpMatrix.mapPoints(points)
+        viewToWindowMatrix.mapPoints(points)
         return Offset(points[0], points[1])
     }
 
@@ -946,6 +980,20 @@ internal class AndroidComposeView(context: Context) :
         } catch (e: Exception) {
             false
         }
+
+        fun transformMatrixToWindow(view: View, matrix: Matrix) {
+            val parentView = view.parent
+            if (parentView is View) {
+                transformMatrixToWindow(parentView, matrix)
+                matrix.preTranslate(-view.scrollX.toFloat(), -view.scrollY.toFloat())
+                matrix.preTranslate(view.left.toFloat(), view.top.toFloat())
+            }
+
+            val viewMatrix = view.matrix
+            if (!viewMatrix.isIdentity) {
+                matrix.preConcat(viewMatrix)
+            }
+        }
     }
 
     /**
@@ -980,94 +1028,6 @@ private fun layoutDirectionFromInt(layoutDirection: Int): LayoutDirection = when
     android.util.LayoutDirection.LTR -> LayoutDirection.Ltr
     android.util.LayoutDirection.RTL -> LayoutDirection.Rtl
     else -> LayoutDirection.Ltr
-}
-
-private fun View.findRootView(): View {
-    var contentView: View = this
-    var parent = contentView.parent
-    while (parent is View) {
-        contentView = parent
-        parent = contentView.parent
-    }
-    return contentView
-}
-
-private class TransformMatrixApi28 {
-    companion object {
-        fun transformMatrixToWindow(view: View, matrix: Matrix) =
-            transformFromLocal(view, matrix, null)
-
-        fun transformMatrixToScreen(view: View, matrix: Matrix, tmpPositionArray: IntArray) =
-            transformFromLocal(view, matrix, tmpPositionArray)
-
-        fun transformMatrixFromWindow(view: View, matrix: Matrix) =
-            transformToLocal(view, matrix, null)
-
-        fun transformMatrixFromScreen(view: View, matrix: Matrix, tmpPositionArray: IntArray) =
-            transformToLocal(view, matrix, tmpPositionArray)
-
-        private fun transformFromLocal(view: View, transform: Matrix, tmpPositionArray: IntArray?) {
-            val parentView = view.parent
-            if (parentView is View) {
-                transformFromLocal(parentView, transform, tmpPositionArray)
-                transform.preTranslate(-view.scrollX.toFloat(), -view.scrollY.toFloat())
-                transform.preTranslate(view.left.toFloat(), view.top.toFloat())
-            } else if (tmpPositionArray != null) {
-                view.getLocationOnScreen(tmpPositionArray)
-                transform.preTranslate(tmpPositionArray[0].toFloat(), tmpPositionArray[1].toFloat())
-            }
-
-            val matrix = view.matrix
-            if (!matrix.isIdentity) {
-                transform.preConcat(matrix)
-            }
-        }
-
-        private fun transformToLocal(view: View, transform: Matrix, tmpPositionArray: IntArray?) {
-            val parentView = view.parent
-            if (parentView is View) {
-                transformToLocal(parentView, transform, tmpPositionArray)
-                transform.postTranslate(view.scrollX.toFloat(), view.scrollY.toFloat())
-                transform.postTranslate(-view.left.toFloat(), -view.top.toFloat())
-            } else if (tmpPositionArray != null) {
-                view.getLocationOnScreen(tmpPositionArray)
-                transform.postTranslate(
-                    -tmpPositionArray[0].toFloat(),
-                    -tmpPositionArray[1].toFloat()
-                )
-            }
-
-            val matrix = view.matrix
-            if (!matrix.isIdentity) {
-                matrix.invert(matrix)
-                transform.postConcat(matrix)
-            }
-        }
-    }
-}
-
-private class TransformMatrixApi29 {
-    @RequiresApi(Build.VERSION_CODES.Q)
-    companion object {
-        fun transformMatrixToScreen(view: View, matrix: Matrix) =
-            view.transformMatrixToGlobal(matrix)
-
-        fun transformMatrixToWindow(view: View, matrix: Matrix, tmpPositionArray: IntArray) {
-            val rootView = view.findRootView()
-            rootView.getLocationOnScreen(tmpPositionArray)
-            matrix.preTranslate(-tmpPositionArray[0].toFloat(), -tmpPositionArray[1].toFloat())
-            view.transformMatrixToGlobal(matrix)
-        }
-        fun transformMatrixFromScreen(view: View, matrix: Matrix) =
-            view.transformMatrixToLocal(matrix)
-
-        fun transformMatrixFromWindow(view: View, matrix: Matrix, tmpPositionArray: IntArray) {
-            val rootView = view.findRootView()
-            rootView.getLocationOnScreen(tmpPositionArray)
-            matrix.postTranslate(tmpPositionArray[0].toFloat(), tmpPositionArray[1].toFloat())
-            view.transformMatrixToLocal(matrix)
-        }
-    }
 }
 
 /** @suppress */
