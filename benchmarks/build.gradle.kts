@@ -9,18 +9,17 @@ plugins {
     id("org.jetbrains.compose") version "0.2.0-build132"
     // __KOTLIN_COMPOSE_VERSION__
     kotlin("plugin.allopen") version "1.4.20"
-    id("kotlinx.benchmark") version "0.2.0-dev-20"
+    id("kotlinx.benchmark") version "0.3.0"
 }
 
 repositories {
-    jcenter()
+    mavenCentral()
     maven("https://maven.pkg.jetbrains.space/public/p/compose/dev")
-    maven("https://dl.bintray.com/kotlin/kotlinx")
 }
 
 dependencies {
     implementation(compose.desktop.currentOs)
-    implementation("org.jetbrains.kotlinx:kotlinx.benchmark.runtime:0.2.0-dev-20")
+    implementation("org.jetbrains.kotlinx:kotlinx.benchmark.runtime:0.3.0")
 }
 
 configure<AllOpenExtension> {

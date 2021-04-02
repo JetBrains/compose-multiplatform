@@ -12,8 +12,7 @@ subprojects {
     version = BuildProperties.deployVersion(project)
 
     repositories {
-        maven("https://dl.bintray.com/kotlin/kotlin-dev")
-        jcenter()
+        mavenCentral()
         mavenLocal()
     }
 

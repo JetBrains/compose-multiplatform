@@ -7,11 +7,12 @@ plugins {
 }
 
 repositories {
-    jcenter()
+    mavenCentral()
     maven("https://maven.pkg.jetbrains.space/public/p/compose/dev")
 }
 
 dependencies {
+    implementation("org.jetbrains.kotlinx:kotlinx-collections-immutable:0.3.4")
     implementation(compose.desktop.currentOs)
     implementation("org.jetbrains.kotlin:kotlin-reflect")
 }
