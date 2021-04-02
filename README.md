@@ -1,6 +1,7 @@
 [![official project](http://jb.gg/badges/official.svg)](https://confluence.jetbrains.com/display/ALL/JetBrains+on+GitHub)
 [![Latest release](http://img.shields.io/github/v/release/JetBrains/compose-jb](https://github.com/JetBrains/compose-jb/releases/latest)
 [![Latest build](http://img.shields.io/github/v/release/JetBrains/compose-jb?include_prereleases&label=build](https://github.com/JetBrains/compose-jb/releases)
+![GitHub release (latest by date including pre-releases)](https://img.shields.io/github/v/release/JetBrains/compose-jb?include_prereleases)
 
 # Compose for Desktop, by JetBrains
 ![](artwork/readme/apps.png)
