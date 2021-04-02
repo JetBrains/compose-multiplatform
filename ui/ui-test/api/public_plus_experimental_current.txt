@@ -303,6 +303,7 @@ package androidx.compose.ui.test {
     method public static void performImeAction(androidx.compose.ui.test.SemanticsNodeInteraction);
     method public static void performTextClearance(androidx.compose.ui.test.SemanticsNodeInteraction);
     method public static void performTextInput(androidx.compose.ui.test.SemanticsNodeInteraction, String text);
+    method @androidx.compose.ui.test.ExperimentalTestApi public static void performTextInputSelection-pAoLNKA(androidx.compose.ui.test.SemanticsNodeInteraction, long selection);
     method public static void performTextReplacement(androidx.compose.ui.test.SemanticsNodeInteraction, String text);
   }
 
