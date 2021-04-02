@@ -19,12 +19,10 @@ package androidx.compose.runtime.benchmark
 import android.view.View
 import androidx.activity.compose.setContent
 import androidx.benchmark.junit4.BenchmarkRule
-import androidx.benchmark.junit4.measureRepeated
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.ControlledComposition
 import androidx.compose.runtime.InternalComposeApi
 import androidx.compose.runtime.Recomposer
-import androidx.compose.runtime.currentComposer
 import androidx.compose.runtime.snapshots.Snapshot
 import androidx.compose.ui.test.TestMonotonicFrameClock
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -71,46 +69,6 @@ abstract class ComposeBenchmarkBase {
             activity.setContentView(emptyView)
             advanceUntilIdle()
             recomposer.cancel()
-        }
-    }
-
-    fun measureRecompose(block: RecomposeReceiver.() -> Unit) {
-        val receiver = RecomposeReceiver()
-        receiver.block()
-        var activeComposition: ControlledComposition? = null
-
-        val activity = activityRule.activity
-        val emptyView = View(activity)
-
-        activity.setContent {
-            activeComposition = currentComposer.composition
-            receiver.composeCb()
-        }
-
-        val composition = activeComposition
-        require(composition != null) { "Composition was null" }
-        val readObserver = { value: Any -> composition.recordReadOf(value) }
-        val writeObserver = { value: Any -> composition.recordWriteOf(value) }
-        val unregisterApplyObserver = Snapshot.registerApplyObserver { changed, _ ->
-            composition.recordModificationsOf(changed)
-        }
-        try {
-            benchmarkRule.measureRepeated {
-                runWithTimingDisabled {
-                    receiver.updateModelCb()
-                    Snapshot.sendApplyNotifications()
-                }
-                val didSomething = composition.performRecompose(readObserver, writeObserver)
-                assertTrue(didSomething)
-                runWithTimingDisabled {
-                    receiver.resetCb()
-                    Snapshot.sendApplyNotifications()
-                    composition.performRecompose(readObserver, writeObserver)
-                }
-            }
-        } finally {
-            unregisterApplyObserver.dispose()
-            activity.setContentView(emptyView)
         }
     }
 
