@@ -39,12 +39,8 @@ internal class BuildResultChecks(private val result: BuildResult) {
     }
 }
 
-internal fun BuildResult.checkOutputLogContains(substring: String) {
-    if (output.contains(substring)) return
-
-    println("Test output:")
-    output.lineSequence().forEach {
-        println("  > $it")
+internal fun String.checkContains(substring: String) {
+    if (!contains(substring)) {
+        throw AssertionError("String '$substring' is not found in text:\n$this")
     }
-    throw AssertionError("Test output does not contain the expected string: '$substring'")
 }

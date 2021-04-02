@@ -14,6 +14,7 @@ import org.jetbrains.compose.test.*
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assumptions
 import org.junit.jupiter.api.Test
+import java.nio.charset.Charset
 import java.util.jar.JarFile
 
 class DesktopApplicationTest : GradlePluginTestBase() {
@@ -150,6 +151,9 @@ class DesktopApplicationTest : GradlePluginTestBase() {
             gradle(":runDistributable").build().checks { check ->
                 check.taskOutcome(":runDistributable", TaskOutcome.SUCCESS)
                 check.logContains("Hello, from Mac OS!")
+                val appDir = testWorkDir.resolve("build/compose/binaries/main/app/TestPackage.app/Contents/")
+                val infoPlist = appDir.resolve("Info.plist").checkExists().checkExists()
+                infoPlist.readText().checkContains("<key>NSSupportsAutomaticGraphicsSwitching</key><true/>")
             }
         }
     }
