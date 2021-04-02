@@ -188,92 +188,24 @@ class EditingBuffer(
      */
     internal fun delete(start: Int, end: Int) {
         val deleteRange = TextRange(start, end)
-        if (deleteRange.intersects(TextRange(selectionStart, selectionEnd))) {
-            // Currently only target for deleteSurroundingText/deleteSurroundingTextInCodePoints.
-            TODO("support deletion within selection range.")
-        }
 
         gapBuffer.replace(start, end, "")
-        if (end <= selectionStart) {
-            selectionStart -= deleteRange.length
-            selectionEnd -= deleteRange.length
-        }
 
-        if (!hasComposition()) {
-            return
-        }
+        val newSelection = updateRangeAfterDelete(
+            TextRange(selectionStart, selectionEnd),
+            deleteRange
+        )
+        selectionStart = newSelection.min
+        selectionEnd = newSelection.max
 
-        val compositionRange = TextRange(compositionStart, compositionEnd)
-
-        // Following figure shows the deletion range and composition range.
-        // |---| represents a range to be deleted.
-        // |===| represents a composition range.
-        if (deleteRange.intersects(compositionRange)) {
-            if (deleteRange.contains(compositionRange)) {
-                // Input:
-                //   Buffer     : ABCDEFGHIJKLMNOPQRSTUVWXYZ
-                //   Delete     :      |-------------|
-                //   Composition:          |======|
-                //
-                // Result:
-                //   Buffer     : ABCDETUVWXYZ
-                //   Composition:
-                compositionStart = NOWHERE
-                compositionEnd = NOWHERE
-            } else if (compositionRange.contains(deleteRange)) {
-                // Input:
-                //   Buffer     : ABCDEFGHIJKLMNOPQRSTUVWXYZ
-                //   Delete     :          |------|
-                //   Composition:        |==========|
-                //
-                // Result:
-                //   Buffer     : ABCDEFGHIQRSTUVWXYZ
-                //   Composition:        |===|
-                compositionEnd -= deleteRange.length
-            } else if (deleteRange.contains(compositionStart)) {
-                // Input:
-                //   Buffer     : ABCDEFGHIJKLMNOPQRSTUVWXYZ
-                //   Delete     :      |---------|
-                //   Composition:            |========|
-                //
-                // Result:
-                //   Buffer     : ABCDEFPQRSTUVWXYZ
-                //   Composition:       |=====|
-                compositionStart = deleteRange.min
-                compositionEnd -= deleteRange.length
-            } else { // deleteRange contains compositionEnd
-                // Input:
-                //   Buffer     : ABCDEFGHIJKLMNOPQRSTUVWXYZ
-                //   Delete     :         |---------|
-                //   Composition:    |=======|
-                //
-                // Result:
-                //   Buffer     : ABCDEFGHSTUVWXYZ
-                //   Composition:    |====|
-                compositionEnd = deleteRange.min
-            }
-        } else {
-            if (compositionStart <= deleteRange.min) {
-                // Input:
-                //   Buffer     : ABCDEFGHIJKLMNOPQRSTUVWXYZ
-                //   Delete     :            |-------|
-                //   Composition:  |=======|
-                //
-                // Result:
-                //   Buffer     : ABCDEFGHIJKLTUVWXYZ
-                //   Composition:  |=======|
-                // do nothing
+        if (hasComposition()) {
+            val compositionRange = TextRange(compositionStart, compositionEnd)
+            val newComposition = updateRangeAfterDelete(compositionRange, deleteRange)
+            if (newComposition.collapsed) {
+                commitComposition()
             } else {
-                // Input:
-                //   Buffer     : ABCDEFGHIJKLMNOPQRSTUVWXYZ
-                //   Delete     :  |-------|
-                //   Composition:            |=======|
-                //
-                // Result:
-                //   Buffer     : AJKLMNOPQRSTUVWXYZ
-                //   Composition:    |=======|
-                compositionStart -= deleteRange.length
-                compositionEnd -= deleteRange.length
+                compositionStart = newComposition.min
+                compositionEnd = newComposition.max
             }
         }
     }
@@ -360,4 +292,89 @@ class EditingBuffer(
     override fun toString(): String = gapBuffer.toString()
 
     internal fun toAnnotatedString(): AnnotatedString = AnnotatedString(toString())
+}
+
+/**
+ * Returns the updated TextRange for [target] after the [deleted] TextRange is deleted as a Pair.
+ *
+ * If the [deleted] Range covers the whole target, Pair(-1,-1) is returned.
+ */
+/*@VisibleForTesting*/
+internal fun updateRangeAfterDelete(target: TextRange, deleted: TextRange): TextRange {
+    var targetMin = target.min
+    var targetMax = target.max
+
+    // Following figure shows the deletion range and composition range.
+    // |---| represents deleted range.
+    // |===| represents target range.
+    if (deleted.intersects(target)) {
+        if (deleted.contains(target)) {
+            // Input:
+            //   Buffer     : ABCDEFGHIJKLMNOPQRSTUVWXYZ
+            //   Deleted    :      |-------------|
+            //   Target     :          |======|
+            //
+            // Result:
+            //   Buffer     : ABCDETUVWXYZ
+            //   Target     :
+            targetMin = deleted.min
+            targetMax = targetMin
+        } else if (target.contains(deleted)) {
+            // Input:
+            //   Buffer     : ABCDEFGHIJKLMNOPQRSTUVWXYZ
+            //   Deleted    :          |------|
+            //   Target     :        |==========|
+            //
+            // Result:
+            //   Buffer     : ABCDEFGHIQRSTUVWXYZ
+            //   Target     :        |===|
+            targetMax -= deleted.length
+        } else if (deleted.contains(targetMin)) {
+            // Input:
+            //   Buffer     : ABCDEFGHIJKLMNOPQRSTUVWXYZ
+            //   Deleted    :      |---------|
+            //   Target     :            |========|
+            //
+            // Result:
+            //   Buffer     : ABCDEFPQRSTUVWXYZ
+            //   Target     :       |=====|
+            targetMin = deleted.min
+            targetMax -= deleted.length
+        } else { // deleteRange contains myMax
+            // Input:
+            //   Buffer     : ABCDEFGHIJKLMNOPQRSTUVWXYZ
+            //   Deleted    :         |---------|
+            //   Target     :    |=======|
+            //
+            // Result:
+            //   Buffer     : ABCDEFGHSTUVWXYZ
+            //   Target     :    |====|
+            targetMax = deleted.min
+        }
+    } else {
+        if (targetMax <= deleted.min) {
+            // Input:
+            //   Buffer     : ABCDEFGHIJKLMNOPQRSTUVWXYZ
+            //   Deleted    :            |-------|
+            //   Target     :  |=======|
+            //
+            // Result:
+            //   Buffer     : ABCDEFGHIJKLTUVWXYZ
+            //   Target     :  |=======|
+            // do nothing
+        } else {
+            // Input:
+            //   Buffer     : ABCDEFGHIJKLMNOPQRSTUVWXYZ
+            //   Deleted    :  |-------|
+            //   Target     :            |=======|
+            //
+            // Result:
+            //   Buffer     : AJKLMNOPQRSTUVWXYZ
+            //   Target     :    |=======|
+            targetMin -= deleted.length
+            targetMax -= deleted.length
+        }
+    }
+
+    return TextRange(targetMin, targetMax)
 }

@@ -726,6 +726,9 @@ package androidx.compose.ui.text.input {
   public final class EditingBuffer {
   }
 
+  public final class EditingBufferKt {
+  }
+
   public final class FinishComposingTextCommand implements androidx.compose.ui.text.input.EditCommand {
     ctor public FinishComposingTextCommand();
     method public void applyTo(androidx.compose.ui.text.input.EditingBuffer buffer);

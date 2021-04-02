@@ -302,6 +302,54 @@ class EditingBufferTest {
     }
 
     @Test
+    fun test_delete_covered_cursor() {
+        // AB[]CDE
+        val eb = EditingBuffer("ABCDE", TextRange(2, 2))
+
+        eb.delete(1, 3)
+        // A[]DE
+        assertStrWithChars("ADE", eb)
+        assertEquals(1, eb.selectionStart)
+        assertEquals(1, eb.selectionEnd)
+    }
+
+    @Test
+    fun test_delete_covered_selection() {
+        // A[BC]DE
+        val eb = EditingBuffer("ABCDE", TextRange(1, 3))
+
+        eb.delete(0, 4)
+        // []E
+        assertStrWithChars("E", eb)
+        assertEquals(0, eb.selectionStart)
+        assertEquals(0, eb.selectionEnd)
+    }
+
+    @Test
+    fun test_delete_intersects_first_half_of_selection() {
+        // AB[CD]E
+        val eb = EditingBuffer("ABCDE", TextRange(2, 4))
+
+        eb.delete(1, 3)
+        // A[D]E
+        assertStrWithChars("ADE", eb)
+        assertEquals(1, eb.selectionStart)
+        assertEquals(2, eb.selectionEnd)
+    }
+
+    @Test
+    fun test_delete_intersects_second_half_of_selection() {
+        // A[BCD]EFG
+        val eb = EditingBuffer("ABCDEFG", TextRange(1, 4))
+
+        eb.delete(3, 5)
+        // A[BC]FG
+        assertStrWithChars("ABCFG", eb)
+        assertEquals(1, eb.selectionStart)
+        assertEquals(3, eb.selectionEnd)
+    }
+
+    @Test
     fun test_delete_preceding_composition_no_intersection() {
         val eb = EditingBuffer("ABCDE", TextRange.Zero)
 
