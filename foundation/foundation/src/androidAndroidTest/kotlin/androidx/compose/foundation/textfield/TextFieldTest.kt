@@ -422,7 +422,7 @@ class TextFieldTest {
     fun defaultSemantics() {
         rule.setContent {
             BasicTextField(
-                modifier = Modifier.testTag("textField"),
+                modifier = Modifier.testTag(Tag),
                 value = "",
                 onValueChange = {},
                 decorationBox = {
@@ -434,7 +434,7 @@ class TextFieldTest {
             )
         }
 
-        rule.onNodeWithTag("textField")
+        rule.onNodeWithTag(Tag)
             .assertEditableTextEquals("")
             .assertTextEquals("label")
             .assertHasClickAction()
@@ -452,7 +452,7 @@ class TextFieldTest {
             .assert(SemanticsMatcher.keyIsDefined(SemanticsActions.GetTextLayoutResult))
 
         val textLayoutResults = mutableListOf<TextLayoutResult>()
-        rule.onNodeWithTag("textField")
+        rule.onNodeWithTag(Tag)
             .performSemanticsAction(SemanticsActions.GetTextLayoutResult) { it(textLayoutResults) }
         assert(textLayoutResults.size == 1) { "TextLayoutResult is null" }
     }
@@ -462,16 +462,16 @@ class TextFieldTest {
         rule.setContent {
             var value by remember { mutableStateOf("") }
             BasicTextField(
-                modifier = Modifier.testTag("textField"),
+                modifier = Modifier.testTag(Tag),
                 value = value,
                 onValueChange = { value = it }
             )
         }
 
-        rule.onNodeWithTag("textField")
+        rule.onNodeWithTag(Tag)
             .assert(isNotFocused())
             .performSemanticsAction(SemanticsActions.OnClick)
-        rule.onNodeWithTag("textField")
+        rule.onNodeWithTag(Tag)
             .assert(isFocused())
     }
 
@@ -487,10 +487,10 @@ class TextFieldTest {
         }
 
         val hello = AnnotatedString("Hello")
-        rule.onNodeWithTag("textField")
+        rule.onNodeWithTag(Tag)
             .assertEditableTextEquals("")
             .performSemanticsAction(SemanticsActions.SetText) { it(hello) }
-        rule.onNodeWithTag("textField")
+        rule.onNodeWithTag(Tag)
             .assertEditableTextEquals(hello.text)
             .assert(
                 SemanticsMatcher.expectValue(
@@ -499,9 +499,9 @@ class TextFieldTest {
                 )
             )
 
-        rule.onNodeWithTag("textField")
+        rule.onNodeWithTag(Tag)
             .performSemanticsAction(SemanticsActions.SetSelection) { it(1, 3, true) }
-        rule.onNodeWithTag("textField")
+        rule.onNodeWithTag(Tag)
             .assert(
                 SemanticsMatcher.expectValue(
                     SemanticsProperties.TextSelectionRange,

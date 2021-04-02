@@ -131,7 +131,7 @@ fun BasicTextField(
     var textFieldValueState by remember { mutableStateOf(TextFieldValue(text = value)) }
     val textFieldValue = textFieldValueState.copy(text = value)
 
-    BasicTextField(
+    CoreTextField(
         value = textFieldValue,
         onValueChange = {
             textFieldValueState = it
@@ -140,18 +140,18 @@ fun BasicTextField(
             }
         },
         modifier = modifier,
-        enabled = enabled,
-        readOnly = readOnly,
         textStyle = textStyle,
-        keyboardOptions = keyboardOptions,
-        keyboardActions = keyboardActions,
-        maxLines = maxLines,
         visualTransformation = visualTransformation,
         onTextLayout = onTextLayout,
-        cursorBrush = cursorBrush,
         interactionSource = interactionSource,
-        singleLine = singleLine,
-        decorationBox = decorationBox
+        cursorBrush = cursorBrush,
+        imeOptions = keyboardOptions.toImeOptions(singleLine = singleLine),
+        keyboardActions = keyboardActions,
+        softWrap = !singleLine,
+        maxLines = if (singleLine) 1 else maxLines,
+        decorationBox = decorationBox,
+        enabled = enabled,
+        readOnly = readOnly
     )
 }
 
@@ -250,7 +250,11 @@ fun BasicTextField(
 ) {
     CoreTextField(
         value = value,
-        onValueChange = onValueChange,
+        onValueChange = {
+            if (value != it) {
+                onValueChange(it)
+            }
+        },
         modifier = modifier,
         textStyle = textStyle,
         visualTransformation = visualTransformation,
