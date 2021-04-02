@@ -132,6 +132,7 @@ abstract class GenerateTestConfigurationTask : DefaultTask() {
                 )
             }
         }
+        // This section adds metadata tags that will help filter runners to specific modules.
         if (hasBenchmarkPlugin.get()) {
             configBuilder.isBenchmark(true)
             if (configBuilder.isPostsubmit) {
@@ -143,8 +144,10 @@ abstract class GenerateTestConfigurationTask : DefaultTask() {
             configBuilder.tag("macrobenchmarks")
         } else {
             configBuilder.tag("androidx_unit_tests")
-            if (project.path.contains(":compose:")) {
+            if (project.path.startsWith(":compose:")) {
                 configBuilder.tag("compose")
+            } else if (project.path.startsWith(":wear:")) {
+                configBuilder.tag("wear")
             }
         }
         val testApk = testLoader.get().load(testFolder.get())
