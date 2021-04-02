@@ -33,6 +33,11 @@ internal class IdentityArraySet<T : Any> {
     internal var values: Array<Any?> = arrayOfNulls(16)
 
     /**
+     * Returns true if the set contains [value]
+     */
+    fun contains(value: T) = find(value) >= 0
+
+    /**
      * Return the item at the given [index].
      */
     operator fun get(index: Int): T {
@@ -103,6 +108,16 @@ internal class IdentityArraySet<T : Any> {
             block(this[i])
         }
     }
+
+    /**
+     * Return true if the set is empty.
+     */
+    fun isEmpty() = size == 0
+
+    /**
+     * Returns true if the set is not empty.
+     */
+    fun isNotEmpty() = size > 0
 
     /**
      * Remove [value] from the set.

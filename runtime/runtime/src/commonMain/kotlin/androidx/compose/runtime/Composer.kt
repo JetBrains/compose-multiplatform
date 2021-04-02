@@ -20,12 +20,13 @@
 )
 package androidx.compose.runtime
 
+import androidx.compose.runtime.collection.IdentityArraySet
 import androidx.compose.runtime.collection.IdentityScopeMap
 import androidx.compose.runtime.snapshots.fastForEach
 import androidx.compose.runtime.snapshots.fastMap
 import androidx.compose.runtime.snapshots.fastToSet
-import androidx.compose.runtime.tooling.LocalInspectionTables
 import androidx.compose.runtime.tooling.CompositionData
+import androidx.compose.runtime.tooling.LocalInspectionTables
 import kotlinx.collections.immutable.PersistentMap
 import kotlinx.collections.immutable.persistentHashMapOf
 import kotlin.coroutines.CoroutineContext
@@ -828,25 +829,6 @@ interface Composer {
     /**
      * A Compose internal function. DO NOT call directly.
      *
-     * Record that [value] has been read. This is used primarily by the [Recomposer] to inform the
-     * composer when the a [MutableState] instance has been read implying it should be observed
-     * for changes.
-     */
-    @InternalComposeApi
-    fun recordReadOf(value: Any)
-
-    /**
-     * A Compose internal function. DO NOT call directly.
-     *
-     * Record that [value] has been modified. This is used primarily by the [Recomposer] to inform
-     * the composer when the a [MutableState] instance been change by a composable function.
-     */
-    @InternalComposeApi
-    fun recordWriteOf(value: Any)
-
-    /**
-     * A Compose internal function. DO NOT call directly.
-     *
      * The data stored for the composition. This is used by Compose tools, such as the preview and
      * the inspector, to display or interpret the result of composition.
      */
@@ -940,13 +922,19 @@ internal class ComposerImpl(
     private val parentContext: CompositionContext,
 
     /**
+     * The slot table to use to store composition data
+     */
+    private val slotTable: SlotTable,
+
+    private val abandonSet: MutableSet<RememberObserver>,
+
+    private val changes: MutableList<Change>,
+
+    /**
      * The composition that owns this composer
      */
     override val composition: ControlledComposition
 ) : Composer {
-    private val slotTable: SlotTable = SlotTable()
-    private val changes = mutableListOf<Change>()
-    private val abandonSet = HashSet<RememberObserver>()
     private val pendingStack = Stack<Pending?>()
     private var pending: Pending? = null
     private var nodeIndex: Int = 0
@@ -958,7 +946,6 @@ internal class ComposerImpl(
     private var collectParameterInformation = false
     private var nodeExpected = false
     private val observations = IdentityScopeMap<RecomposeScopeImpl>()
-    private val observationsProcessed = IdentityScopeMap<RecomposeScopeImpl>()
     private val invalidations: MutableList<Invalidation> = mutableListOf()
     internal var pendingInvalidScopes = false
     private val entersStack = IntStack()
@@ -974,6 +961,8 @@ internal class ComposerImpl(
         private set
     internal var isDisposed = false
         private set
+    internal val areChildrenComposing get() = childrenComposing > 0
+
     internal val hasPendingChanges: Boolean get() = changes.isNotEmpty()
 
     private var reader: SlotReader = slotTable.openReader().also { it.close() }
@@ -1205,91 +1194,6 @@ internal class ComposerImpl(
     @InternalComposeApi
     override fun collectParameterInformation() {
         collectParameterInformation = true
-    }
-
-    /**
-     * Record that [value] was read from. If [recordWriteOf] or [recordModificationsOf] is called
-     * with [value] then the corresponding [currentRecomposeScope] is invalidated.
-     *
-     * This should only be called when this composition is actively composing.
-     */
-    @InternalComposeApi
-    override fun recordReadOf(value: Any) {
-        if (childrenComposing == 0) {
-            currentRecomposeScope?.let {
-                it.used = true
-                observations.add(value, it)
-            }
-        }
-    }
-
-    /**
-     * Record that [value] was written to during composition. This invalidates all scopes that were
-     * current when [recordReadOf] was called with [value] yet to be composed. If a scope has
-     * already been composed a request is made to the recomposer to recompose the composition.
-     *
-     * This should only be called when this composition is actively composing.
-     */
-    @InternalComposeApi
-    override fun recordWriteOf(value: Any) {
-        observations.forEachScopeOf(value) { scope ->
-            if (scope.invalidateForResult() == InvalidationResult.IMMINENT) {
-                // If we process this during recordWriteOf, ignore it when recording modifications
-                observationsProcessed.add(value, scope)
-            }
-        }
-    }
-
-    /**
-     * Throw a diagnostic exception if the internal tracking tables are inconsistent.
-     */
-    internal fun verifyConsistent() {
-        if (!isComposing) {
-            slotTable.verifyWellFormed()
-            insertTable.verifyWellFormed()
-            validateRecomposeScopeAnchors(slotTable)
-        }
-    }
-
-    private fun validateRecomposeScopeAnchors(slotTable: SlotTable) {
-        val scopes = slotTable.slots.mapNotNull { it as? RecomposeScopeImpl }
-        scopes.fastForEach { scope ->
-            scope.anchor?.let { anchor ->
-                check(scope in slotTable.slotsOf(anchor.toIndexFor(slotTable))) {
-                    val dataIndex = slotTable.slots.indexOf(scope)
-                    "Misaligned anchor $anchor in scope $scope encountered, scope found at " +
-                        "$dataIndex"
-                }
-            }
-        }
-    }
-
-    /**
-     * Record that the objects in [values] have been modified. This invalidates any recomposes
-     * scopes that were current when [recordReadOf] was called with an instance in [values].
-     *
-     * This should only be called when this composition is not actively composing.
-     */
-    internal fun recordModificationsOf(values: Set<Any>) {
-        var invalidated: HashSet<RecomposeScopeImpl>? = null
-        for (value in values) {
-            observations.forEachScopeOf(value) { scope ->
-                if (!observationsProcessed.remove(value, scope) &&
-                    scope.invalidateForResult() != InvalidationResult.IGNORED
-                ) {
-                    (
-                        invalidated ?: (
-                            HashSet<RecomposeScopeImpl>().also {
-                                invalidated = it
-                            }
-                            )
-                        ).add(scope)
-                }
-            }
-        }
-        invalidated?.let {
-            observations.removeValueIf { scope -> scope in it }
-        }
     }
 
     /**
@@ -1718,9 +1622,10 @@ internal class ComposerImpl(
                     is RememberObserver ->
                         rememberManager.forgetting(previous)
                     is RecomposeScopeImpl -> {
-                        if (previous.composer != null) {
-                            previous.composer = null
-                            pendingInvalidScopes = true
+                        val composition = previous.composition
+                        if (composition != null) {
+                            previous.composition = null
+                            composition.pendingInvalidScopes = true
                         }
                     }
                 }
@@ -2468,16 +2373,7 @@ internal class ComposerImpl(
             )
     }
 
-    /**
-     * Invalidate all known RecomposeScopes. Used by [Recomposer] to bring known composers
-     * back into a known good state after a period of time when snapshot changes were not
-     * being observed.
-     */
-    internal fun invalidateAll() {
-        slotTable.slots.forEach { (it as? RecomposeScopeImpl)?.invalidate() }
-    }
-
-    internal fun invalidate(scope: RecomposeScopeImpl): InvalidationResult {
+    internal fun invalidateForResult(scope: RecomposeScopeImpl): InvalidationResult {
         if (scope.defaultsInScope) {
             scope.defaultsInvalid = true
         }
@@ -2495,6 +2391,26 @@ internal class ComposerImpl(
         }
         parentContext.invalidate(composition)
         return if (isComposing) InvalidationResult.DEFERRED else InvalidationResult.SCHEDULED
+    }
+
+    /**
+     * Unlike [invalidateForResult] above, this method can be called on any thread and synchronizes
+     * with the parent reference to ensure [invalidateForResult] is called on the correct thread.
+     */
+    internal fun invalidate(scope: RecomposeScopeImpl) {
+        parentContext.invalidateScope(scope)
+    }
+
+    internal fun tryImminentInvalidation(scope: RecomposeScopeImpl): Boolean {
+        val anchor = scope.anchor ?: return false
+        val location = anchor.toIndexFor(slotTable)
+        if (isComposing && location >= reader.currentGroup) {
+            // if we are invalidating a scope that is going to be traversed during this
+            // composition.
+            invalidations.insertIfMissing(location, scope)
+            return true
+        }
+        return false
     }
 
     /**
@@ -2558,7 +2474,7 @@ internal class ComposerImpl(
 
     private fun addRecomposeScope() {
         if (inserting) {
-            val scope = RecomposeScopeImpl(this)
+            val scope = RecomposeScopeImpl(composition as CompositionImpl)
             invalidateStack.push(scope)
             updateValue(scope)
         } else {
@@ -2603,51 +2519,58 @@ internal class ComposerImpl(
      * Synchronously compose the initial composition of [content]. This collects all the changes
      * which must be applied by [applyChanges] to build the tree implied by [content].
      */
-    internal fun composeContent(content: @Composable () -> Unit) {
+    internal fun composeContent(
+        invalidationsRequested: IdentityArraySet<RecomposeScopeImpl>,
+        content: @Composable () -> Unit
+    ) {
         check(changes.isEmpty()) { "Expected applyChanges() to have been called" }
-        trace("Compose:recompose") {
-            var complete = false
-            val wasComposing = isComposing
-            isComposing = true
-            try {
-                startRoot()
-                startGroup(invocationKey, invocation)
-                invokeComposable(this, content)
-                endGroup()
-                endRoot()
-                complete = true
-            } finally {
-                isComposing = wasComposing
-                if (!complete) abortRoot()
-            }
-        }
+        doCompose(invalidationsRequested, content)
     }
 
     /**
      * Synchronously recompose all invalidated groups. This collects the changes which must be
      * applied by [applyChanges] to have an effect.
      */
-    internal fun recompose(): Boolean {
+    internal fun recompose(invalidationsRequested: IdentityArraySet<RecomposeScopeImpl>): Boolean {
         check(changes.isEmpty()) { "Expected applyChanges() to have been called" }
-        if (invalidations.isNotEmpty()) {
-            trace("Compose:recompose") {
-                nodeIndex = 0
-                var complete = false
-                val wasComposing = isComposing
-                isComposing = true
-                try {
-                    startRoot()
-                    skipCurrentGroup()
-                    endRoot()
-                    complete = true
-                } finally {
-                    isComposing = wasComposing
-                    if (!complete) abortRoot()
-                }
-            }
+        if (invalidationsRequested.isNotEmpty()) {
+            doCompose(invalidationsRequested, null)
             return changes.isNotEmpty()
         }
         return false
+    }
+
+    private fun doCompose(
+        invalidationsRequested: IdentityArraySet<RecomposeScopeImpl>,
+        content: (@Composable () -> Unit)?
+    ) {
+        check(!isComposing) { "Reentrant composition is not supported" }
+        trace("Compose:recompose") {
+            invalidations.clear()
+            invalidationsRequested.forEach { scope ->
+                val location = scope.anchor?.location ?: return
+                invalidations.add(Invalidation(scope, location))
+            }
+            invalidations.sortBy { it.location }
+            nodeIndex = 0
+            var complete = false
+            isComposing = true
+            try {
+                startRoot()
+                if (content != null) {
+                    startGroup(invocationKey, invocation)
+                    invokeComposable(this, content)
+                    endGroup()
+                } else {
+                    skipCurrentGroup()
+                }
+                endRoot()
+                complete = true
+            } finally {
+                isComposing = false
+                if (!complete) abortRoot()
+            }
+        }
     }
 
     val hasInvalidations get() = invalidations.isNotEmpty()
@@ -3053,6 +2976,10 @@ internal class ComposerImpl(
             parentContext.invalidate(composition)
         }
 
+        override fun invalidateScope(scope: RecomposeScopeImpl) {
+            parentContext.invalidateScope(scope)
+        }
+
         // This is snapshot state not because we need it to be observable, but because
         // we need changes made to it in composition to be visible for the rest of the current
         // composition and not become visible outside of the composition process until composition
@@ -3131,6 +3058,7 @@ inline class Updater<T> constructor(
      * @see update
      */
     @Suppress("NOTHING_TO_INLINE") // Inlining the compare has noticeable impact
+    @OptIn(ComposeCompilerApi::class)
     inline fun set(
         value: Int,
         noinline block: T.(value: Int) -> Unit
@@ -3259,10 +3187,10 @@ private fun SlotWriter.removeCurrentGroup(rememberManager: RememberManager) {
                 rememberManager.forgetting(slot)
             }
             is RecomposeScopeImpl -> {
-                val composer = slot.composer as? ComposerImpl
-                if (composer != null) {
-                    composer.pendingInvalidScopes = true
-                    slot.composer = null
+                val composition = slot.composition
+                if (composition != null) {
+                    composition.pendingInvalidScopes = true
+                    slot.composition = null
                 }
             }
         }
@@ -3295,84 +3223,6 @@ private fun getKey(value: Any?, left: Any?, right: Any?): Any? = (value as? Join
         left,
         right
     )
-}
-
-// Observation helpers
-
-// These helpers enable storing observation pairs of value to scope instances in a list sorted by
-// the value hash as a primary key and the scope hash as the secondary key. This results in a
-// multi-set that allows finding an observation/scope pairs in O(log N) and a worst case of
-// insert into and remove from the array of O(log N) + O(N) where N is the number of total pairs.
-// This also enables finding all scopes in O(log N) + O(M) for value V where M is the number of
-// scopes recorded for value V.
-
-// The layout of the array is a sequence of sorted pairs where the even slots are values and the
-// odd slots are recompose scopes. Storing the pairs in this fashion saves an instance per pair.
-
-// Since inserts and removes are common this algorithm tends to be O(N^2) where N is the number of
-// inserts and removes. Using a balanced binary tree might be better here, at the cost of
-// significant added complexity and more memory, as it would have close to O(N log N) for N
-// inserts and removes. The mechanics of pointer chasing on lower-end and/or low-power processors,
-// however, might outweigh the benefits for moderate sizes of N.
-
-private fun MutableList<Any>.insertIfMissing(value: Any, scope: RecomposeScopeImpl) {
-    val index = find(value, scope)
-    if (index < 0) {
-        val offset = -(index + 1)
-        if (size - index > 16) {
-            // Use an allocation to save the cost one of the two moves implied by add()/add()
-            // for large moves.
-            addAll(offset, listOf(value, scope))
-        } else {
-            add(offset, value)
-            add(offset + 1, scope)
-        }
-    }
-}
-
-private fun MutableList<Any>.removeValueScope(value: Any, scope: RecomposeScopeImpl): Boolean {
-    val index = find(value, scope)
-    if (index >= 0) {
-        subList(index, index + 2).clear()
-        return true
-    }
-    return false
-}
-
-private fun MutableList<Any>.find(value: Any, scope: RecomposeScopeImpl): Int {
-    val valueHash = identityHashCode(value)
-    val scopeHash = identityHashCode(scope)
-    var index = find(identityHashCode(value), identityHashCode(scope))
-    if (index < 0) return index
-    while (true) {
-        if (get(index) === value && get(index + 1) === scope) return index
-        index++
-        if (index >= size ||
-            identityHashCode(get(index)) != valueHash ||
-            identityHashCode(get(index + 1)) != scopeHash
-        ) {
-            index--
-            break
-        }
-    }
-    return -(index + 1)
-}
-
-private fun MutableList<Any>.find(valueHash: Int, scopeHash: Int): Int {
-    var low = 0
-    var high = (size / 2) - 1
-    while (low <= high) {
-        val mid = (low + high).ushr(1) // safe from overflows
-        val cmp = identityHashCode(get(mid * 2)).compareTo(valueHash).let {
-            if (it != 0) it else identityHashCode(get(mid * 2 + 1)).compareTo(scopeHash)
-        }
-        when {
-            cmp < 0 -> low = mid + 1
-            cmp > 0 -> high = mid - 1
-            else -> return mid * 2 // found
-        }
-    }
-    return -(low * 2 + 1) // not found
 }
 
 // Invalidation helpers
