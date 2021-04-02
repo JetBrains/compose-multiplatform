@@ -124,9 +124,12 @@ class TextFieldValue constructor(
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
         if (other !is TextFieldValue) return false
-        return annotatedString == other.annotatedString &&
-            selection == other.selection &&
-            composition == other.composition
+
+        // compare selection and composition first for early return
+        //  before comparing string.
+        return selection == other.selection &&
+            composition == other.composition &&
+            annotatedString == other.annotatedString
     }
 
     // auto generated hashCode method
