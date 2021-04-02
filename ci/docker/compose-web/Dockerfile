@@ -2,6 +2,8 @@ FROM ubuntu:20.10
 
 ENV LANG='en_US.UTF-8' LANGUAGE='en_US:en' LC_ALL='en_US.UTF-8'
 
+SHELL ["/bin/bash", "-c"]
+
 RUN dpkg --add-architecture i386 && apt-get update -yqq && apt-get install -y \
     curl \
     git \
