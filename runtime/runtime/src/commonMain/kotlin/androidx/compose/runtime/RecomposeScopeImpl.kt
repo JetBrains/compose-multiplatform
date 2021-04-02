@@ -23,6 +23,8 @@ package androidx.compose.runtime
 interface RecomposeScope {
     /**
      * Invalidate the corresponding scope, requesting the composer recompose this scope.
+     *
+     * This method is thread safe.
      */
     fun invalidate()
 }
@@ -34,7 +36,9 @@ interface RecomposeScope {
  * [Composer.startRestartGroup] and is used to track how to restart the group.
  */
 @OptIn(ComposeCompilerApi::class)
-internal class RecomposeScopeImpl(var composer: Composer?) : ScopeUpdateScope, RecomposeScope {
+internal class RecomposeScopeImpl(
+    var composition: CompositionImpl?
+) : ScopeUpdateScope, RecomposeScope {
     /**
      * An anchor to the location in the slot table that start the group associated with this
      * recompose scope.
@@ -46,7 +50,7 @@ internal class RecomposeScopeImpl(var composer: Composer?) : ScopeUpdateScope, R
      * removed from the slot table. For example, if the scope is in the then clause of an if
      * statement that later becomes false.
      */
-    val valid: Boolean get() = composer != null && anchor?.valid ?: false
+    val valid: Boolean get() = composition != null && anchor?.valid ?: false
 
     /**
      * Used is set when the [RecomposeScopeImpl] is used by, for example, [currentRecomposeScope].
@@ -92,17 +96,20 @@ internal class RecomposeScopeImpl(var composer: Composer?) : ScopeUpdateScope, R
     }
 
     /**
-     * Invalidate the group which will cause [composer] to request this scope be recomposed,
+     * Invalidate the group which will cause [composition] to request this scope be recomposed,
      * and an [InvalidationResult] will be returned.
      */
     fun invalidateForResult(): InvalidationResult =
-        (composer as? ComposerImpl)?.invalidate(this) ?: InvalidationResult.IGNORED
+        composition?.invalidate(this) ?: InvalidationResult.IGNORED
 
     /**
-     * Invalidate the group which will cause [composer] to request this scope be recomposed.
+     * Invalidate the group which will cause [composition] to request this scope be recomposed.
+     *
+     * Unlike [invalidateForResult], this method is thread safe and calls the thread safe
+     * invalidate on the composer.
      */
     override fun invalidate() {
-        invalidateForResult()
+        composition?.invalidate(this)
     }
 
     /**
