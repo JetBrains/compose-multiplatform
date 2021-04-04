@@ -4,6 +4,9 @@ ENV LANG='en_US.UTF-8' LANGUAGE='en_US:en' LC_ALL='en_US.UTF-8'
 
 SHELL ["/bin/bash", "-c"]
 
+RUN echo "dash dash/sh boolean false" | debconf-set-selections
+RUN dpkg-reconfigure -f noninteractive dash
+
 RUN dpkg --add-architecture i386 && apt-get update -yqq && apt-get install -y \
     curl \
     git \
