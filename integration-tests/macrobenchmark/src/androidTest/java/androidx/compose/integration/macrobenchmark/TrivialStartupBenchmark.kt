@@ -16,8 +16,6 @@
 
 package androidx.compose.integration.macrobenchmark
 
-import androidx.benchmark.integration.macrobenchmark.createStartupCompilationParams
-import androidx.benchmark.integration.macrobenchmark.measureStartup
 import androidx.benchmark.macro.CompilationMode
 import androidx.benchmark.macro.StartupMode
 import androidx.benchmark.macro.junit4.MacrobenchmarkRule
