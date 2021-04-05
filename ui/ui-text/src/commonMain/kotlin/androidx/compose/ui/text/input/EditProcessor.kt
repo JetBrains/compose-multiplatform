@@ -18,6 +18,7 @@ package androidx.compose.ui.text.input
 
 import androidx.compose.ui.text.TextRange
 import androidx.compose.ui.text.emptyAnnotatedString
+import androidx.compose.ui.util.fastForEach
 
 /**
  * Helper class to apply [EditCommand]s on an internal buffer. Used by TextField Composable
@@ -89,7 +90,7 @@ class EditProcessor {
      * @return the [TextFieldValue] representation of the final buffer state.
      */
     fun apply(editCommands: List<EditCommand>): TextFieldValue {
-        editCommands.forEach { it.applyTo(mBuffer) }
+        editCommands.fastForEach { it.applyTo(mBuffer) }
 
         val newState = TextFieldValue(
             annotatedString = mBuffer.toAnnotatedString(),

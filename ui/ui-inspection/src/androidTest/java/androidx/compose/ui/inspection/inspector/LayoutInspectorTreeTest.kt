@@ -71,6 +71,9 @@ import java.util.WeakHashMap
 import kotlin.math.roundToInt
 
 private const val DEBUG = false
+private const val ROOT_ID = 3L
+private const val MAX_RECURSIONS = 2
+private const val MAX_ITERABLE_SIZE = 5
 
 @LargeTest
 @RunWith(AndroidJUnit4::class)
@@ -120,6 +123,13 @@ class LayoutInspectorTreeTest {
         dumpNodes(nodes, builder)
 
         validate(nodes, builder, checkParameters = false) {
+            node(
+                name = "Box",
+                isRenderNode = true,
+                children = listOf("Inspectable")
+            )
+            node("Inspectable", children = listOf("CompositionLocalProvider"))
+            node("CompositionLocalProvider", children = listOf("Column"))
             node(
                 name = "Column",
                 fileName = "LayoutInspectorTreeTest.kt",
@@ -185,6 +195,21 @@ class LayoutInspectorTreeTest {
         dumpNodes(nodes, builder)
 
         validate(nodes, builder, checkParameters = false) {
+            node(
+                name = "Box",
+                isRenderNode = true,
+                children = listOf("Inspectable")
+            )
+            node(
+                name = "Inspectable",
+                hasTransformations = true,
+                children = listOf("CompositionLocalProvider")
+            )
+            node(
+                name = "CompositionLocalProvider",
+                hasTransformations = true,
+                children = listOf("MaterialTheme")
+            )
             node(
                 name = "MaterialTheme",
                 hasTransformations = true,
@@ -434,14 +459,11 @@ class LayoutInspectorTreeTest {
             }
 
             if (checkParameters) {
-                val params = builder.convertParameters(node)
+                val params =
+                    builder.convertParameters(ROOT_ID, node, MAX_RECURSIONS, MAX_ITERABLE_SIZE)
                 val receiver = ParameterValidationReceiver(params.listIterator())
                 receiver.block()
-                if (receiver.parameterIterator.hasNext()) {
-                    val elementNames = mutableListOf<String>()
-                    receiver.parameterIterator.forEachRemaining { elementNames.add(it.name) }
-                    error("$name: has more parameters like: ${elementNames.joinToString()}")
-                }
+                receiver.checkFinished(name)
             }
         }
     }
@@ -504,7 +526,10 @@ class LayoutInspectorTreeTest {
         println()
         print(")")
         if (generateParameters && node.parameters.isNotEmpty()) {
-            generateParameters(builder.convertParameters(node), 0)
+            generateParameters(
+                builder.convertParameters(ROOT_ID, node, MAX_RECURSIONS, MAX_ITERABLE_SIZE),
+                0
+            )
         }
         println()
         node.children.forEach { generateValidate(it, builder) }

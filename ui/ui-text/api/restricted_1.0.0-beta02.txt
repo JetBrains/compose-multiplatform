@@ -292,6 +292,9 @@ package androidx.compose.ui.text {
     method public static String toUpperCase(String, androidx.compose.ui.text.intl.LocaleList localeList);
   }
 
+  public final class TempListUtilsKt {
+  }
+
   public final class TextLayoutInput {
     method public androidx.compose.ui.text.TextLayoutInput copy-ih31NyA(optional androidx.compose.ui.text.AnnotatedString text, optional androidx.compose.ui.text.TextStyle style, optional java.util.List<androidx.compose.ui.text.AnnotatedString.Range<androidx.compose.ui.text.Placeholder>> placeholders, optional int maxLines, optional boolean softWrap, optional androidx.compose.ui.text.style.TextOverflow overflow, optional androidx.compose.ui.unit.Density density, optional androidx.compose.ui.unit.LayoutDirection layoutDirection, optional androidx.compose.ui.text.font.Font.ResourceLoader resourceLoader, optional long constraints);
     method public operator boolean equals(Object? other);
@@ -477,6 +480,9 @@ package androidx.compose.ui.text.android {
   }
 
   public final class LayoutIntrinsicsKt {
+  }
+
+  public final class TempListUtilsKt {
   }
 
   public final class TextLayoutKt {
@@ -1098,6 +1104,7 @@ package androidx.compose.ui.text.style {
   public enum TextOverflow {
     enum_constant public static final androidx.compose.ui.text.style.TextOverflow Clip;
     enum_constant public static final androidx.compose.ui.text.style.TextOverflow Ellipsis;
+    enum_constant public static final androidx.compose.ui.text.style.TextOverflow Visible;
   }
 
 }

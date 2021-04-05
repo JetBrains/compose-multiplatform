@@ -98,9 +98,7 @@ private fun DrawerLayout(drawerWidth: Dp, content: @Composable ColumnScope.() ->
             }
         )
     ) {
-        Column {
-            content()
-        }
+        Column(content = content)
         Box(
             Modifier
                 .fillMaxHeight()

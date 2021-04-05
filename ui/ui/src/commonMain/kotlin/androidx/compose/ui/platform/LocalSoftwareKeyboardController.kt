@@ -17,6 +17,8 @@
 package androidx.compose.ui.platform
 
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.ProvidedValue
+import androidx.compose.runtime.compositionLocalOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.text.input.TextInputService
@@ -24,31 +26,51 @@ import androidx.compose.ui.text.input.TextInputService
 @ExperimentalComposeUiApi
 public object LocalSoftwareKeyboardController {
 
+    private val LocalSoftwareKeyboardController =
+        compositionLocalOf<SoftwareKeyboardController?> { null }
+
     /**
-     * Return a [SoftwareKeyboardController] that delegates to the current [LocalTextInputService].
+     * Return a [SoftwareKeyboardController] that can control the current software keyboard.
      *
-     * Returns null if there is no [LocalTextInputService] and the software keyboard cannot be
-     * controlled.
+     * If it is not provided, the default implementation will delegate to [LocalTextInputService].
+     *
+     * Returns null if the software keyboard cannot be controlled.
      */
     @ExperimentalComposeUiApi
     public val current: SoftwareKeyboardController?
         @Composable get() {
-            val textInputService = LocalTextInputService.current ?: return null
-            return remember(textInputService) {
-                DelegatingSotwareKeyboardController(textInputService)
-            }
+            return LocalSoftwareKeyboardController.current ?: delegatingController()
         }
+
+    @Composable
+    private fun delegatingController(): SoftwareKeyboardController? {
+        val textInputService = LocalTextInputService.current ?: return null
+        return remember(textInputService) {
+            DelegatingSoftwareKeyboardController(textInputService)
+        }
+    }
+
+    /**
+     * Set the key [LocalSoftwareKeyboardController] in [CompositionLocalProvider].
+     */
+    public infix fun provides(
+        softwareKeyboardController: SoftwareKeyboardController
+    ): ProvidedValue<SoftwareKeyboardController?> {
+        return LocalSoftwareKeyboardController.provides(softwareKeyboardController)
+    }
 }
 
 @ExperimentalComposeUiApi
-private class DelegatingSotwareKeyboardController(
-    val textInputService: TextInputService?
+private class DelegatingSoftwareKeyboardController(
+    val textInputService: TextInputService
 ) : SoftwareKeyboardController {
-    override fun showSoftwareKeyboard() {
-        textInputService?.showSoftwareKeyboard()
+    override fun show() {
+        @Suppress("DEPRECATION")
+        textInputService.showSoftwareKeyboard()
     }
 
-    override fun hideSoftwareKeyboard() {
-        textInputService?.hideSoftwareKeyboard()
+    override fun hide() {
+        @Suppress("DEPRECATION")
+        textInputService.hideSoftwareKeyboard()
     }
 }

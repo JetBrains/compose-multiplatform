@@ -17,12 +17,12 @@
 package androidx.compose.ui.node
 
 import androidx.compose.ui.geometry.Offset
-import androidx.compose.ui.input.nestedscroll.NestedScrollDelegatingWrapper
 import androidx.compose.ui.graphics.Canvas
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.GraphicsLayerScope
 import androidx.compose.ui.graphics.Paint
 import androidx.compose.ui.graphics.PaintingStyle
+import androidx.compose.ui.input.nestedscroll.NestedScrollDelegatingWrapper
 import androidx.compose.ui.input.pointer.PointerInputFilter
 import androidx.compose.ui.layout.AlignmentLine
 import androidx.compose.ui.layout.LayoutCoordinates
@@ -40,7 +40,7 @@ internal class InnerPlaceable(
 
     override val measureScope get() = layoutNode.measureScope
 
-    override fun performMeasure(constraints: Constraints): Placeable {
+    override fun measure(constraints: Constraints): Placeable = performingMeasure(constraints) {
         val measureResult = with(layoutNode.measurePolicy) {
             layoutNode.measureScope.measure(layoutNode.children, constraints)
         }
@@ -108,7 +108,7 @@ internal class InnerPlaceable(
         layoutNode.onNodePlaced()
     }
 
-    override operator fun get(alignmentLine: AlignmentLine): Int {
+    override fun calculateAlignmentLine(alignmentLine: AlignmentLine): Int {
         return layoutNode.calculateAlignmentLines()[alignmentLine] ?: AlignmentLine.Unspecified
     }
 
@@ -116,9 +116,6 @@ internal class InnerPlaceable(
         val owner = layoutNode.requireOwner()
         layoutNode.zSortedChildren.forEach { child ->
             if (child.isPlaced) {
-                require(child.layoutState == LayoutNode.LayoutState.Ready) {
-                    "$child is not ready. layoutState is ${child.layoutState}"
-                }
                 child.draw(canvas)
             }
         }

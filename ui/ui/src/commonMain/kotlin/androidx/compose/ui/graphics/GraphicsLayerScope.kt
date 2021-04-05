@@ -62,6 +62,9 @@ interface GraphicsLayerScope : Density {
      * Sets the elevation for the shadow in pixels. With the [shadowElevation] > 0f and
      * [shape] set, a shadow is produced. Default value is `0` and the value must not be
      * negative.
+     *
+     * Note that if you provide a non-zero [shadowElevation] and if the passed [shape] is concave the
+     * shadow will not be drawn on Android versions less than 10.
      */
     /*@setparam:FloatRange(from = 0.0)*/
     var shadowElevation: Float

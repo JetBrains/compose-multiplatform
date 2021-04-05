@@ -26,6 +26,7 @@ import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.inspection.test.R
+import androidx.compose.runtime.Composable
 
 class ParametersTestActivity : ComponentActivity() {
     private val fontFamily = FontFamily(
@@ -50,8 +51,15 @@ class ParametersTestActivity : ComponentActivity() {
             Button(onClick = ::testClickHandler) {
                 Text("two", fontFamily = fontFamily)
             }
+            FunctionWithIntArray(intArrayOf(10, 11, 12, 13, 14, 15, 16, 17))
         }
     }
+}
+
+@Suppress("UNUSED_PARAMETER")
+@Composable
+fun FunctionWithIntArray(intArray: IntArray) {
+    Text("three")
 }
 
 internal fun testClickHandler() {}

@@ -27,7 +27,6 @@ import androidx.compose.ui.input.pointer.PointerInputEventData
 import androidx.compose.ui.input.pointer.PointerType
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.CoroutineStart
-import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.launch
 import org.jetbrains.skija.Canvas
 import java.awt.event.InputMethodEvent
@@ -39,7 +38,6 @@ internal val DesktopOwnersAmbient = staticCompositionLocalOf<DesktopOwners> {
     error("CompositionLocal DesktopOwnersAmbient not provided")
 }
 
-@OptIn(ExperimentalCoroutinesApi::class)
 internal class DesktopOwners(
     coroutineScope: CoroutineScope,
     component: DesktopComponent = DummyDesktopComponent,
@@ -81,8 +79,6 @@ internal class DesktopOwners(
     internal val platformInputService: DesktopPlatformInput = DesktopPlatformInput(component)
 
     init {
-        // TODO(demin): Experimental API (CoroutineStart.UNDISPATCHED).
-        //  Decide what to do before release (copy paste or use different approach).
         coroutineScope.launch(coroutineContext, start = CoroutineStart.UNDISPATCHED) {
             recomposer.runRecomposeAndApplyChanges()
         }
@@ -153,24 +149,24 @@ internal class DesktopOwners(
         lastOwner?.onPointerMove(position)
     }
 
-    private fun consumeKeyEventOr(event: KeyEvent, or: () -> Unit) {
-        val consumed = list.lastOrNull()?.sendKeyEvent(ComposeKeyEvent(event)) ?: false
-        if (!consumed) {
-            or()
-        }
+    fun onMouseEntered(x: Int, y: Int) {
+        val position = Offset(x.toFloat(), y.toFloat())
+        lastOwner?.onPointerEnter(position)
     }
 
-    fun onKeyPressed(event: KeyEvent) = consumeKeyEventOr(event) {
-        platformInputService.onKeyPressed(event.keyCode, event.keyChar)
+    fun onMouseExited() {
+        lastOwner?.onPointerExit()
     }
 
-    fun onKeyReleased(event: KeyEvent) = consumeKeyEventOr(event) {
-        platformInputService.onKeyReleased(event.keyCode, event.keyChar)
+    private fun consumeKeyEvent(event: KeyEvent) {
+        list.lastOrNull()?.sendKeyEvent(ComposeKeyEvent(event))
     }
 
-    fun onKeyTyped(event: KeyEvent) = consumeKeyEventOr(event) {
-        platformInputService.onKeyTyped(event.keyChar)
-    }
+    fun onKeyPressed(event: KeyEvent) = consumeKeyEvent(event)
+
+    fun onKeyReleased(event: KeyEvent) = consumeKeyEvent(event)
+
+    fun onKeyTyped(event: KeyEvent) = consumeKeyEvent(event)
 
     fun onInputMethodEvent(event: InputMethodEvent) {
         if (!event.isConsumed()) {

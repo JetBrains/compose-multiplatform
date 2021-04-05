@@ -17,7 +17,9 @@
 package androidx.compose.ui.draw
 
 import android.os.Build
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.requiredSize
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.runtime.getValue
@@ -33,12 +35,14 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Rect
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.GraphicsLayerScope
 import androidx.compose.ui.graphics.Outline
 import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.graphics.TransformOrigin
 import androidx.compose.ui.graphics.asAndroidBitmap
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.graphics.toArgb
+import androidx.compose.ui.layout.Layout
 import androidx.compose.ui.layout.LayoutCoordinates
 import androidx.compose.ui.layout.boundsInRoot
 import androidx.compose.ui.layout.boundsInWindow
@@ -50,9 +54,12 @@ import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.test.TestActivity
 import androidx.compose.ui.test.captureToImage
+import androidx.compose.ui.test.click
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onRoot
+import androidx.compose.ui.test.performGesture
+import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
@@ -60,6 +67,8 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.MediumTest
 import androidx.test.filters.SdkSuppress
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertFalse
+import org.junit.Assert.assertTrue
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -476,6 +485,51 @@ class GraphicsLayerTest {
                 assertEquals(2.dp.toPx(), testDpConversion)
                 assertEquals(3.dp.toSp().toPx(), testFontScaleConversion)
             }
+        }
+    }
+
+    @Test
+    fun testClickOnScaledElement() {
+        var firstClicked = false
+        var secondClicked = false
+        rule.setContent {
+            Layout(
+                content = {
+                    Box(
+                        Modifier.fillMaxSize().clickable {
+                            firstClicked = true
+                        }
+                    )
+                    Box(
+                        Modifier.fillMaxSize().clickable {
+                            secondClicked = true
+                        }
+                    )
+                },
+                modifier = Modifier.testTag("layout")
+            ) { measurables, _ ->
+                val itemConstraints = Constraints.fixed(100, 100)
+                val first = measurables[0].measure(itemConstraints)
+                val second = measurables[1].measure(itemConstraints)
+                layout(100, 200) {
+                    val layer: GraphicsLayerScope.() -> Unit = {
+                        scaleX = 0.5f
+                        scaleY = 0.5f
+                    }
+                    first.placeWithLayer(0, 0, layerBlock = layer)
+                    second.placeWithLayer(0, 100, layerBlock = layer)
+                }
+            }
+        }
+
+        rule.onNodeWithTag("layout")
+            .performGesture {
+                click(position = Offset(50f, 170f))
+            }
+
+        rule.runOnIdle {
+            assertFalse("First element is clicked", firstClicked)
+            assertTrue("Second element is not clicked", secondClicked)
         }
     }
 }

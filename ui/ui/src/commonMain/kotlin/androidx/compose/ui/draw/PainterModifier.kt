@@ -199,7 +199,9 @@ private class PainterModifier(
     }
 
     private fun modifyConstraints(constraints: Constraints): Constraints {
-        if (!useIntrinsicSize || (constraints.hasFixedWidth && constraints.hasFixedHeight)) {
+        val hasBoundedDimens = constraints.hasBoundedWidth && constraints.hasBoundedHeight
+        val hasFixedDimens = constraints.hasFixedWidth && constraints.hasFixedHeight
+        if ((!useIntrinsicSize && hasBoundedDimens) || hasFixedDimens) {
             // If we have fixed constraints or we are not attempting to size the
             // composable based on the size of the Painter, do not attempt to
             // modify them. Otherwise rely on Alignment and ContentScale

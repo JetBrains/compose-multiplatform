@@ -21,6 +21,7 @@ import androidx.compose.runtime.collection.mutableVectorOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.composed
+import androidx.compose.ui.fastMapNotNull
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalViewConfiguration
 import androidx.compose.ui.platform.ViewConfiguration
@@ -341,7 +342,7 @@ internal class SuspendingPointerInputFilter(
         // down-ness is consumed, and we omit any pointers that previously went up entirely.
         val lastEvent = lastPointerEvent ?: return
 
-        val newChanges = lastEvent.changes.mapNotNull { old ->
+        val newChanges = lastEvent.changes.fastMapNotNull { old ->
             if (old.pressed) {
                 old.copy(
                     currentPressed = false,

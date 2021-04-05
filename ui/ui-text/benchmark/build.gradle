@@ -38,7 +38,7 @@ dependencies {
     implementation(JUNIT)
 
     androidTestImplementation project(":compose:runtime:runtime")
-    androidTestImplementation project(":compose:test-utils")
+    androidTestImplementation project(":compose:benchmark-utils")
     androidTestImplementation project(":compose:ui:ui")
     androidTestImplementation(KOTLIN_TEST_COMMON)
     androidTestImplementation(TRUTH)

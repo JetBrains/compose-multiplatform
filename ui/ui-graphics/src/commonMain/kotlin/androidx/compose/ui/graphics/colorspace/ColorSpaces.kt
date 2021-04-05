@@ -266,6 +266,23 @@ object ColorSpaces {
     )
 
     /**
+     * [Lab][ColorModel.Lab] color space Oklab. This color space uses Oklab D65
+     * as a profile conversion space.
+     *
+     * ```
+     * | Property                | Value                                                   |
+     * |-------------------------|---------------------------------------------------------|
+     * | Name                    | Oklab                                                   |
+     * | CIE standard illuminant | [D65][Illuminant.D65]                                   |
+     * | Range                   | (L: `[0.0, 1.0]`, a: `[-2, 2]`, b: `[-2, 2]`)           |
+     * ```
+     */
+    internal val Oklab: ColorSpace = Oklab(
+        "Oklab",
+        id = 17
+    )
+
+    /**
      * Returns a [ColorSpaces] instance of [ColorSpace] that matches
      * the specified RGB to CIE XYZ transform and transfer functions. If no
      * instance can be found, this method returns null.
@@ -322,6 +339,7 @@ object ColorSpaces {
         Acescg,
         CieXyz,
         CieLab,
-        Unspecified
+        Unspecified,
+        Oklab
     )
 }

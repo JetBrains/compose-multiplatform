@@ -25,11 +25,11 @@ val AnimationDemos = DemoCategory(
         DemoCategory(
             "State Transition Demos",
             listOf(
-                ComposableDemo("Multi-dimensional prop") { MultiDimensionalAnimationDemo() },
                 ComposableDemo("Double tap to like") { DoubleTapToLikeDemo() },
-                ComposableDemo("Repeating rotation") { RepeatedRotationDemo() },
                 ComposableDemo("Gesture based animation") { GestureBasedAnimationDemo() },
                 ComposableDemo("Infinite transition") { InfiniteTransitionDemo() },
+                ComposableDemo("Multi-dimensional prop") { MultiDimensionalAnimationDemo() },
+                ComposableDemo("Repeating rotation") { RepeatedRotationDemo() },
             )
         ),
         DemoCategory(
@@ -50,15 +50,22 @@ val AnimationDemos = DemoCategory(
         DemoCategory(
             "Suspend Animation Demos",
             listOf(
-                ComposableDemo("Animated clock") { AnimatedClockDemo() },
                 ComposableDemo("Animated scrolling") { FancyScrollingDemo() },
-                ComposableDemo("animateAsState()") { SingleValueAnimationDemo() },
+                ComposableDemo("animateColorAsState") { SingleValueAnimationDemo() },
                 ComposableDemo("Follow the tap") { SuspendAnimationDemo() },
-                ComposableDemo("Game of fling") { FlingGame() },
                 ComposableDemo("Infinitely Animating") { InfiniteAnimationDemo() },
                 ComposableDemo("Spring back scrolling") { SpringBackScrollingDemo() },
                 ComposableDemo("Swipe to dismiss") { SwipeToDismissDemo() },
             )
         ),
+        DemoCategory(
+            "Fun Demos",
+            listOf(
+                ComposableDemo("Animated clock") { AnimatedClockDemo() },
+                ComposableDemo("Animated dots") { AnimatedDotsDemo() },
+                ComposableDemo("Game of fling") { FlingGame() },
+                ComposableDemo("Spring chain") { SpringChainDemo() },
+            )
+        )
     )
 )

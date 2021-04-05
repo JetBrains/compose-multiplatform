@@ -62,7 +62,8 @@ internal class HitPathTracker {
     fun addHitPath(pointerId: PointerId, pointerInputFilters: List<PointerInputFilter>) {
         var parent: NodeParent = root
         var merging = true
-        eachPin@ for (pointerInputFilter in pointerInputFilters) {
+        eachPin@ for (i in pointerInputFilters.indices) {
+            val pointerInputFilter = pointerInputFilters[i]
             if (merging) {
                 val node = parent.children.find { it.pointerInputFilter == pointerInputFilter }
                 if (node != null) {

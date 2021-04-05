@@ -19,6 +19,7 @@ package androidx.compose.ui.text.intl
 import androidx.compose.runtime.Immutable
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.util.fastMap
 
 /**
  * Defines a list of [Locale] objects.
@@ -33,7 +34,7 @@ class LocaleList constructor(val localeList: List<Locale>) : Collection<Locale> 
          * Returns Locale object which represents current locale
          */
         val current: LocaleList
-            get() = LocaleList(platformLocaleDelegate.current.map { Locale(it) })
+            get() = LocaleList(platformLocaleDelegate.current.fastMap { Locale(it) })
     }
 
     /**
@@ -43,7 +44,7 @@ class LocaleList constructor(val localeList: List<Locale>) : Collection<Locale> 
      * compliant language tag.
      */
     constructor(languageTags: String) :
-        this(languageTags.split(",").map { it.trim() }.map { Locale(it) })
+        this(languageTags.split(",").fastMap { it.trim() }.fastMap { Locale(it) })
 
     /**
      * Creates a [LocaleList] object from a list of [Locale]s.

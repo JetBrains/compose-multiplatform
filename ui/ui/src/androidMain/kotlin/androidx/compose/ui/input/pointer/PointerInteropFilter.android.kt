@@ -27,6 +27,7 @@ import androidx.compose.ui.composed
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.platform.debugInspectorInfo
 import androidx.compose.ui.unit.IntSize
+import androidx.compose.ui.util.fastAll
 import androidx.compose.ui.util.fastAny
 import androidx.compose.ui.util.fastForEach
 import androidx.compose.ui.viewinterop.AndroidViewHolder
@@ -204,7 +205,7 @@ internal class PointerInteropFilter : PointerInputModifier {
                 if (pass == PointerEventPass.Final) {
                     // If all of the changes were up changes, then the "event stream" has ended
                     // and we reset.
-                    if (changes.all { it.changedToUpIgnoreConsumed() }) {
+                    if (changes.fastAll { it.changedToUpIgnoreConsumed() }) {
                         reset()
                     }
                 }

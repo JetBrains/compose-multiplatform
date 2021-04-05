@@ -14,6 +14,8 @@
  * limitations under the License.
  */
 
+@file:Suppress("UnstableApiUsage")
+
 package androidx.compose.runtime.lint
 
 import com.android.tools.lint.client.api.IssueRegistry
@@ -27,10 +29,12 @@ class RuntimeIssueRegistry : IssueRegistry() {
     override val api = 8
     override val minApi = CURRENT_API
     override val issues get() = listOf(
-        CompositionLocalNamingDetector.CompositionLocalNaming,
+        ComposableCoroutineCreationDetector.CoroutineCreationDuringComposition,
         ComposableLambdaParameterDetector.ComposableLambdaParameterNaming,
         ComposableLambdaParameterDetector.ComposableLambdaParameterPosition,
         ComposableNamingDetector.ComposableNaming,
-        RememberDetector.RememberReturnType
+        CompositionLocalNamingDetector.CompositionLocalNaming,
+        RememberDetector.RememberReturnType,
+        UnrememberedMutableStateDetector.UnrememberedMutableState
     )
 }

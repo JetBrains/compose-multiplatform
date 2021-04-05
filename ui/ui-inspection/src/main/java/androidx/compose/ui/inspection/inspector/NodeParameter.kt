@@ -39,6 +39,16 @@ class NodeParameter internal constructor(
      * Sub elements of the parameter.
      */
     val elements = mutableListOf<NodeParameter>()
+
+    /**
+     * Reference to value parameter.
+     */
+    var reference: NodeParameterReference? = null
+
+    /**
+     * The index into the composite parent parameter value.
+     */
+    var index = 0
 }
 
 /**
@@ -58,4 +68,5 @@ enum class ParameterType {
     DimensionEm,
     Lambda,
     FunctionReference,
+    Iterable,
 }

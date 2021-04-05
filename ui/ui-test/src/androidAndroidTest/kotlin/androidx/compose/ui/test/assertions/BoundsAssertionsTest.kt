@@ -160,8 +160,8 @@ class BoundsAssertionsTest {
                 // so it is clipped to a size of 50 x 90
                 Box(
                     modifier = Modifier
-                        .testTag(tag)
                         .offset((-30).dp, (-10).dp)
+                        .testTag(tag)
                         .requiredSize(80.dp, 100.dp)
                         .background(color = Color.Black)
                 )

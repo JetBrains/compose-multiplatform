@@ -17,6 +17,7 @@
 package androidx.compose.foundation
 
 import androidx.compose.animation.core.ManualFrameClock
+import androidx.compose.foundation.gestures.FlingBehavior
 import androidx.compose.foundation.gestures.animateScrollBy
 import androidx.compose.foundation.gestures.ScrollableState
 import androidx.compose.foundation.gestures.scrollable
@@ -37,6 +38,7 @@ import androidx.compose.ui.input.nestedscroll.NestedScrollDispatcher
 import androidx.compose.ui.input.nestedscroll.NestedScrollSource
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.foundation.gestures.Orientation
+import androidx.compose.foundation.gestures.ScrollScope
 import androidx.compose.foundation.interaction.DragInteraction
 import androidx.compose.foundation.interaction.Interaction
 import androidx.compose.foundation.interaction.MutableInteractionSource
@@ -66,7 +68,6 @@ import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.yield
 import org.junit.After
 import org.junit.Before
-import org.junit.Ignore
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -118,6 +119,61 @@ class ScrollableTest {
 
         val lastTotal = rule.runOnIdle {
             assertThat(total).isGreaterThan(0)
+            total
+        }
+        rule.onNodeWithTag(scrollableBoxTag).performGesture {
+            this.swipe(
+                start = this.center,
+                end = Offset(this.center.x, this.center.y + 100f),
+                durationMillis = 100
+            )
+        }
+        advanceClockWhileAwaitersExist(clock)
+
+        rule.runOnIdle {
+            assertThat(total).isEqualTo(lastTotal)
+        }
+        rule.onNodeWithTag(scrollableBoxTag).performGesture {
+            this.swipe(
+                start = this.center,
+                end = Offset(this.center.x - 100f, this.center.y),
+                durationMillis = 100
+            )
+        }
+        advanceClockWhileAwaitersExist(clock)
+        rule.runOnIdle {
+            assertThat(total).isLessThan(0.01f)
+        }
+    }
+
+    @Test
+    @OptIn(ExperimentalTestApi::class)
+    fun scrollable_horizontalScroll_reverse() = runBlockingWithManualClock { clock ->
+        var total = 0f
+        val controller = ScrollableState(
+            consumeScrollDelta = {
+                total += it
+                it
+            }
+        )
+        setScrollableContent {
+            Modifier.scrollable(
+                reverseDirection = true,
+                state = controller,
+                orientation = Orientation.Horizontal
+            )
+        }
+        rule.onNodeWithTag(scrollableBoxTag).performGesture {
+            this.swipe(
+                start = this.center,
+                end = Offset(this.center.x + 100f, this.center.y),
+                durationMillis = 100
+            )
+        }
+        advanceClockWhileAwaitersExist(clock)
+
+        val lastTotal = rule.runOnIdle {
+            assertThat(total).isLessThan(0)
             total
         }
         rule.onNodeWithTag(scrollableBoxTag).performGesture {
@@ -201,6 +257,61 @@ class ScrollableTest {
 
     @Test
     @OptIn(ExperimentalTestApi::class)
+    fun scrollable_verticalScroll_reversed() = runBlockingWithManualClock { clock ->
+        var total = 0f
+        val controller = ScrollableState(
+            consumeScrollDelta = {
+                total += it
+                it
+            }
+        )
+        setScrollableContent {
+            Modifier.scrollable(
+                reverseDirection = true,
+                state = controller,
+                orientation = Orientation.Vertical
+            )
+        }
+        rule.onNodeWithTag(scrollableBoxTag).performGesture {
+            this.swipe(
+                start = this.center,
+                end = Offset(this.center.x, this.center.y + 100f),
+                durationMillis = 100
+            )
+        }
+        advanceClockWhileAwaitersExist(clock)
+
+        val lastTotal = rule.runOnIdle {
+            assertThat(total).isLessThan(0)
+            total
+        }
+        rule.onNodeWithTag(scrollableBoxTag).performGesture {
+            this.swipe(
+                start = this.center,
+                end = Offset(this.center.x + 100f, this.center.y),
+                durationMillis = 100
+            )
+        }
+        advanceClockWhileAwaitersExist(clock)
+
+        rule.runOnIdle {
+            assertThat(total).isEqualTo(lastTotal)
+        }
+        rule.onNodeWithTag(scrollableBoxTag).performGesture {
+            this.swipe(
+                start = this.center,
+                end = Offset(this.center.x, this.center.y - 100f),
+                durationMillis = 100
+            )
+        }
+        advanceClockWhileAwaitersExist(clock)
+        rule.runOnIdle {
+            assertThat(total).isLessThan(0.01f)
+        }
+    }
+
+    @Test
+    @OptIn(ExperimentalTestApi::class)
     fun scrollable_disabledWontCallLambda() = runBlockingWithManualClock { clock ->
         val enabled = mutableStateOf(true)
         var total = 0f
@@ -244,9 +355,8 @@ class ScrollableTest {
     }
 
     @Test
-    @OptIn(ExperimentalTestApi::class)
-    @Ignore // TODO: functionality works, just need to adjust the test correctly
-    fun scrollable_startWithoutSlop_ifFlinging() = runBlockingWithManualClock {
+    fun scrollable_startWithoutSlop_ifFlinging() = runBlocking(AutoTestFrameClock()) {
+        rule.mainClock.autoAdvance = false
         var total = 0f
         val controller = ScrollableState(
             consumeScrollDelta = {
@@ -261,26 +371,34 @@ class ScrollableTest {
             )
         }
         rule.onNodeWithTag(scrollableBoxTag).performGesture {
-            swipe(
+            swipeWithVelocity(
                 start = this.center,
-                end = Offset(this.center.x + 100f, this.center.y),
-                durationMillis = 100
+                end = Offset(this.center.x + 200f, this.center.y),
+                durationMillis = 100,
+                endVelocity = 4000f
             )
         }
         assertThat(total).isGreaterThan(0f)
-        val prevTotal = total
+        val prev = total
+        // pump frames twice to start fling animation
+        rule.mainClock.advanceTimeByFrame()
+        rule.mainClock.advanceTimeByFrame()
+        val prevAfterSomeFling = total
+        assertThat(prevAfterSomeFling).isGreaterThan(prev)
+        // don't advance main clock anymore since we're in the middle of the fling. Now interrupt
         rule.onNodeWithTag(scrollableBoxTag).performGesture {
             down(this.center)
             moveBy(Offset(115f, 0f))
             up()
         }
-        val expected = prevTotal + 115
+        val expected = prevAfterSomeFling + 115
+        rule.mainClock.advanceTimeBy(1000)
         assertThat(total).isEqualTo(expected)
     }
 
     @Test
     @OptIn(ExperimentalTestApi::class)
-    fun scrollable_snappingScrolling() = runBlocking {
+    fun scrollable_snappingScrolling() = runBlocking(AutoTestFrameClock()) {
         var total = 0f
         val controller = ScrollableState(
             consumeScrollDelta = {
@@ -305,14 +423,14 @@ class ScrollableTest {
     }
 
     @Test
-    @OptIn(ExperimentalTestApi::class)
-    @Ignore // TODO: fix this test and / or functionality
-    fun scrollable_explicitDisposal() = runBlockingWithManualClock { clock ->
+    fun scrollable_explicitDisposal() = runBlocking(AutoTestFrameClock()) {
+        rule.mainClock.autoAdvance = false
         val emit = mutableStateOf(true)
+        val expectEmission = mutableStateOf(true)
         var total = 0f
         val controller = ScrollableState(
             consumeScrollDelta = {
-                assertWithMessage("Animating after dispose!").that(emit.value).isTrue()
+                assertWithMessage("Animating after dispose!").that(expectEmission.value).isTrue()
                 total += it
                 it
             }
@@ -328,33 +446,35 @@ class ScrollableTest {
             }
         }
         rule.onNodeWithTag(scrollableBoxTag).performGesture {
-            this.swipe(
+            this.swipeWithVelocity(
                 start = this.center,
                 end = Offset(this.center.x + 200f, this.center.y),
-                durationMillis = 300
+                durationMillis = 100,
+                endVelocity = 4000f
             )
         }
         assertThat(total).isGreaterThan(0f)
-        val prevTotal = total
 
-        rule.onNodeWithTag(scrollableBoxTag).performGesture {
-            this.swipe(
-                start = this.center,
-                end = Offset(this.center.x + 200f, this.center.y),
-                durationMillis = 300
-            )
-        }
-        // don't advance clocks yet, toggle disposed value
+        // start the fling for a few frames
+        rule.mainClock.advanceTimeByFrame()
+        rule.mainClock.advanceTimeByFrame()
+        // flip the emission
         rule.runOnUiThread {
             emit.value = false
         }
+        // propagate the emit flip and record the value
+        rule.mainClock.advanceTimeByFrame()
+        val prevTotal = total
+        // make sure we don't receive any deltas
+        rule.runOnUiThread {
+            expectEmission.value = false
+        }
+
+        // pump the clock until idle
+        rule.mainClock.autoAdvance = true
         rule.waitForIdle()
 
-        // Modifier should now have been disposed and cancelled the scroll, advance clocks to
-        // confirm that it does not animate (checked in consumeScrollDelta)
-        advanceClockWhileAwaitersExist(clock)
-
-        // still 300 and didn't fail in onScrollConsumptionRequested.. lambda
+        // still same and didn't fail in onScrollConsumptionRequested.. lambda
         assertThat(total).isEqualTo(prevTotal)
     }
 
@@ -623,7 +743,7 @@ class ScrollableTest {
 
     @Test
     @OptIn(ExperimentalTestApi::class)
-    fun scrollable_nestedScrollBelow_listensDispatches() = runBlocking {
+    fun scrollable_nestedScrollBelow_listensDispatches() = runBlocking(AutoTestFrameClock()) {
         var value = 0f
         var expectedConsumed = 0f
         val controller = ScrollableState(
@@ -870,6 +990,196 @@ class ScrollableTest {
             assertThat(interactions[1]).isInstanceOf(DragInteraction.Cancel::class.java)
             assertThat((interactions[1] as DragInteraction.Cancel).start)
                 .isEqualTo(interactions[0])
+        }
+    }
+
+    @Test
+    fun scrollable_flingBehaviourCalled_whenVelocity0() {
+        var total = 0f
+        val controller = ScrollableState(
+            consumeScrollDelta = {
+                total += it
+                it
+            }
+        )
+        var flingCalled = 0
+        var flingVelocity: Float = Float.MAX_VALUE
+        val flingBehaviour = object : FlingBehavior {
+            override suspend fun ScrollScope.performFling(initialVelocity: Float): Float {
+                flingCalled++
+                flingVelocity = initialVelocity
+                return 0f
+            }
+        }
+        setScrollableContent {
+            Modifier.scrollable(
+                state = controller,
+                flingBehavior = flingBehaviour,
+                orientation = Orientation.Horizontal
+            )
+        }
+        rule.onNodeWithTag(scrollableBoxTag).performGesture {
+            down(this.center)
+            moveBy(Offset(115f, 0f))
+            up()
+        }
+        assertThat(flingCalled).isEqualTo(1)
+        assertThat(flingVelocity).isEqualTo(0f)
+    }
+
+    @Test
+    fun scrollable_flingBehaviourCalled() {
+        var total = 0f
+        val controller = ScrollableState(
+            consumeScrollDelta = {
+                total += it
+                it
+            }
+        )
+        var flingCalled = 0
+        var flingVelocity: Float = Float.MAX_VALUE
+        val flingBehaviour = object : FlingBehavior {
+            override suspend fun ScrollScope.performFling(initialVelocity: Float): Float {
+                flingCalled++
+                flingVelocity = initialVelocity
+                return 0f
+            }
+        }
+        setScrollableContent {
+            Modifier.scrollable(
+                state = controller,
+                flingBehavior = flingBehaviour,
+                orientation = Orientation.Horizontal
+            )
+        }
+        rule.onNodeWithTag(scrollableBoxTag).performGesture {
+            swipeWithVelocity(
+                this.center,
+                this.center + Offset(115f, 0f),
+                endVelocity = 1000f
+            )
+        }
+        assertThat(flingCalled).isEqualTo(1)
+        assertThat(flingVelocity).isWithin(5f).of(1000f)
+    }
+
+    @Test
+    fun scrollable_flingBehaviourCalled_reversed() {
+        var total = 0f
+        val controller = ScrollableState(
+            consumeScrollDelta = {
+                total += it
+                it
+            }
+        )
+        var flingCalled = 0
+        var flingVelocity: Float = Float.MAX_VALUE
+        val flingBehaviour = object : FlingBehavior {
+            override suspend fun ScrollScope.performFling(initialVelocity: Float): Float {
+                flingCalled++
+                flingVelocity = initialVelocity
+                return 0f
+            }
+        }
+        setScrollableContent {
+            Modifier.scrollable(
+                state = controller,
+                reverseDirection = true,
+                flingBehavior = flingBehaviour,
+                orientation = Orientation.Horizontal
+            )
+        }
+        rule.onNodeWithTag(scrollableBoxTag).performGesture {
+            swipeWithVelocity(
+                this.center,
+                this.center + Offset(115f, 0f),
+                endVelocity = 1000f
+            )
+        }
+        assertThat(flingCalled).isEqualTo(1)
+        assertThat(flingVelocity).isWithin(5f).of(-1000f)
+    }
+
+    @Test
+    fun scrollable_flingBehaviourCalled_correctScope() {
+        var total = 0f
+        val controller = ScrollableState(
+            consumeScrollDelta = {
+                total += it
+                it
+            }
+        )
+        val flingBehaviour = object : FlingBehavior {
+            override suspend fun ScrollScope.performFling(initialVelocity: Float): Float {
+                scrollBy(123f)
+                return 0f
+            }
+        }
+        setScrollableContent {
+            Modifier.scrollable(
+                state = controller,
+                flingBehavior = flingBehaviour,
+                orientation = Orientation.Horizontal
+            )
+        }
+        rule.onNodeWithTag(scrollableBoxTag).performGesture {
+            down(center)
+            moveBy(Offset(x = 100f, y = 0f))
+        }
+
+        val prevTotal = rule.runOnIdle {
+            assertThat(total).isGreaterThan(0f)
+            total
+        }
+
+        rule.onNodeWithTag(scrollableBoxTag).performGesture {
+            up()
+        }
+
+        rule.runOnIdle {
+            assertThat(total).isEqualTo(prevTotal + 123)
+        }
+    }
+
+    @Test
+    fun scrollable_flingBehaviourCalled_reversed_correctScope() {
+        var total = 0f
+        val controller = ScrollableState(
+            consumeScrollDelta = {
+                total += it
+                it
+            }
+        )
+        val flingBehaviour = object : FlingBehavior {
+            override suspend fun ScrollScope.performFling(initialVelocity: Float): Float {
+                scrollBy(123f)
+                return 0f
+            }
+        }
+        setScrollableContent {
+            Modifier.scrollable(
+                state = controller,
+                reverseDirection = true,
+                flingBehavior = flingBehaviour,
+                orientation = Orientation.Horizontal
+            )
+        }
+        rule.onNodeWithTag(scrollableBoxTag).performGesture {
+            down(center)
+            moveBy(Offset(x = 100f, y = 0f))
+        }
+
+        val prevTotal = rule.runOnIdle {
+            assertThat(total).isLessThan(0f)
+            total
+        }
+
+        rule.onNodeWithTag(scrollableBoxTag).performGesture {
+            up()
+        }
+
+        rule.runOnIdle {
+            assertThat(total).isEqualTo(prevTotal + 123)
         }
     }
 

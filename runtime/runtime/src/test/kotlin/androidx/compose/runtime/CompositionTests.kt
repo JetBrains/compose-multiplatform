@@ -2438,6 +2438,11 @@ class CompositionTests {
         validate()
     }
 
+    /**
+     * This tests behavior when changing the state object instances being observed - so not
+     * `remember`ing the mutableStateOf calls is intentional, hence the Lint suppression.
+     */
+    @Suppress("UnrememberedMutableState")
     @Test
     fun testObservationScopes() = compositionTest {
         val states = mutableListOf<MutableState<Int>>()

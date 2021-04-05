@@ -103,7 +103,7 @@ interface BoxWithConstraintsScope : BoxScope {
 private data class BoxWithConstraintsScopeImpl(
     private val density: Density,
     override val constraints: Constraints
-) : BoxWithConstraintsScope {
+) : BoxWithConstraintsScope, BoxScope by BoxScopeInstance {
     override val minWidth: Dp
         get() = with(density) { constraints.minWidth.toDp() }
     override val maxWidth: Dp

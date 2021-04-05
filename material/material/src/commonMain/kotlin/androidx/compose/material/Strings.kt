@@ -20,4 +20,6 @@ package androidx.compose.material
 //  then delete this class
 internal object Strings {
     const val NavigationMenu = "Navigation menu"
+    const val CloseDrawer = "Close navigation menu"
+    const val CloseSheet = "Close sheet"
 }

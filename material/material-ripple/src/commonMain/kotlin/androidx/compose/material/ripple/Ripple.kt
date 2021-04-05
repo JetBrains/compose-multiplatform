@@ -41,6 +41,7 @@ import androidx.compose.ui.graphics.drawscope.clipRect
 import androidx.compose.ui.graphics.isSpecified
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.isUnspecified
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 
@@ -126,9 +127,7 @@ private class Ripple(
             interactionSource.interactions.collect { interaction ->
                 when (interaction) {
                     is PressInteraction.Press -> {
-                        launch {
-                            instance.addRipple(interaction)
-                        }
+                        instance.addRipple(interaction, this)
                     }
                     is PressInteraction.Release -> {
                         instance.removeRipple(interaction.press)
@@ -136,7 +135,7 @@ private class Ripple(
                     is PressInteraction.Cancel -> {
                         instance.removeRipple(interaction.press)
                     }
-                    else -> instance.updateStateLayer(interaction)
+                    else -> instance.updateStateLayer(interaction, this)
                 }
             }
         }
@@ -184,7 +183,7 @@ private class RippleIndicationInstance constructor(
         drawRipples(color)
     }
 
-    suspend fun addRipple(interaction: PressInteraction.Press) {
+    fun addRipple(interaction: PressInteraction.Press, scope: CoroutineScope) {
         // Finish existing ripples
         ripples.forEach { (_, ripple) -> ripple.finish() }
         val origin = if (bounded) interaction.pressPosition else null
@@ -194,12 +193,17 @@ private class RippleIndicationInstance constructor(
             bounded = bounded
         )
         ripples[interaction] = rippleAnimation
-        rippleAnimation.animate()
-        ripples.remove(interaction)
+        scope.launch {
+            try {
+                rippleAnimation.animate()
+            } finally {
+                ripples.remove(interaction)
+            }
+        }
     }
 
-    suspend fun updateStateLayer(interaction: Interaction) {
-        stateLayer.handleInteraction(interaction)
+    fun updateStateLayer(interaction: Interaction, scope: CoroutineScope) {
+        stateLayer.handleInteraction(interaction, scope)
     }
 
     fun removeRipple(interaction: PressInteraction.Press) {
@@ -262,7 +266,7 @@ private class StateLayer(
     private val interactions: MutableList<Interaction> = mutableListOf()
     private var currentInteraction: Interaction? = null
 
-    suspend fun handleInteraction(interaction: Interaction) {
+    fun handleInteraction(interaction: Interaction, scope: CoroutineScope) {
         // TODO: handle hover / focus states
         when (interaction) {
             is DragInteraction.Start -> {
@@ -288,11 +292,15 @@ private class StateLayer(
                 }
                 val incomingAnimationSpec = incomingStateLayerAnimationSpecFor(newInteraction)
 
-                animatedAlpha.animateTo(targetAlpha, incomingAnimationSpec)
+                scope.launch {
+                    animatedAlpha.animateTo(targetAlpha, incomingAnimationSpec)
+                }
             } else {
                 val outgoingAnimationSpec = outgoingStateLayerAnimationSpecFor(currentInteraction)
 
-                animatedAlpha.animateTo(0f, outgoingAnimationSpec)
+                scope.launch {
+                    animatedAlpha.animateTo(0f, outgoingAnimationSpec)
+                }
             }
             currentInteraction = newInteraction
         }

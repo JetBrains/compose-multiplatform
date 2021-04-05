@@ -54,7 +54,6 @@ import com.google.common.truth.Truth.assertWithMessage
 import kotlinx.coroutines.runBlocking
 import org.junit.After
 import org.junit.Before
-import org.junit.Ignore
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -306,13 +305,13 @@ class TransformableTest {
     }
 
     @Test
-    @Ignore("can't came up with good enough test, b/179399198")
     fun transformable_disabledWontCallLambda() {
         val enabled = mutableStateOf(true)
         var cumulativeScale = 1.0f
 
         setTransformableContent {
             Modifier.transformable(
+                enabled = enabled.value,
                 state = rememberTransformableState { zoom, _, _ ->
                     cumulativeScale *= zoom
                 }
@@ -364,7 +363,7 @@ class TransformableTest {
     }
 
     @Test
-    fun transformable_animateTo_zoom() = runBlocking {
+    fun transformable_animateTo_zoom() = runBlocking(AutoTestFrameClock()) {
         rule.mainClock.autoAdvance = false
         var cumulativeScale = 1.0f
         var callbackCount = 0
@@ -400,7 +399,7 @@ class TransformableTest {
     }
 
     @Test
-    fun transformable_animateTo_rotate() = runBlocking {
+    fun transformable_animateTo_rotate() = runBlocking(AutoTestFrameClock()) {
         rule.mainClock.autoAdvance = false
         var totalRotation = 0f
         var callbackCount = 0
@@ -436,7 +435,7 @@ class TransformableTest {
     }
 
     @Test
-    fun transformable_animateTo_pan() = runBlocking {
+    fun transformable_animateTo_pan() = runBlocking(AutoTestFrameClock()) {
         rule.mainClock.autoAdvance = false
         var totalPan = Offset.Zero
         var callbackCount = 0
@@ -531,7 +530,7 @@ class TransformableTest {
     }
 
     @Test
-    fun transformable_stopTransformations() = runBlocking {
+    fun transformable_stopTransformations() = runBlocking(AutoTestFrameClock()) {
         rule.mainClock.autoAdvance = false
         var totalRotation = 0f
         var callbackCount = 0

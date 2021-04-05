@@ -14,6 +14,7 @@
  * limitations under the License.
  */
 
+import androidx.build.BundleInsideHelper
 import androidx.build.LibraryGroups
 import androidx.build.LibraryType
 
@@ -24,6 +25,8 @@ plugins {
     id("kotlin")
 }
 
+BundleInsideHelper.forInsideLintJar(project)
+
 dependencies {
     // compileOnly because we use lintChecks and it doesn't allow other types of deps
     // this ugly hack exists because of b/63873667
@@ -33,6 +36,7 @@ dependencies {
         compileOnly(LINT_API_MIN)
     }
     compileOnly(KOTLIN_STDLIB)
+    bundleInside(project(":compose:lint:common"))
 
     testImplementation(KOTLIN_STDLIB)
     testImplementation(LINT_CORE)

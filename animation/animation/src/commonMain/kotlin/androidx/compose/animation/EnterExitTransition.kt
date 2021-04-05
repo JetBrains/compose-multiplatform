@@ -93,6 +93,12 @@ sealed class EnterTransition {
         )
     }
     // TODO: Support EnterTransition.None
+
+    override fun equals(other: Any?): Boolean {
+        return other is EnterTransition && other.data == data
+    }
+
+    override fun hashCode(): Int = data.hashCode()
 }
 
 /**
@@ -143,7 +149,13 @@ sealed class ExitTransition {
             )
         )
     }
+
     // TODO: Support ExitTransition.None
+    override fun equals(other: Any?): Boolean {
+        return other is ExitTransition && other.data == data
+    }
+
+    override fun hashCode(): Int = data.hashCode()
 }
 
 /**
@@ -825,12 +837,8 @@ private class FadeTransition(
     override val isRunning: Boolean
         get() = alphaAnim.isRunning
     override val modifier: Modifier
-        get() = if (alphaAnim.isRunning || (state == AnimStates.Exiting && exit != null)) {
-            // Only add graphics layer if the animation is running, or if it's waiting for other
-            // exit animations to finish.
-            Modifier.graphicsLayer(alpha = alphaAnim.value)
-        } else {
-            Modifier
+        get() = Modifier.graphicsLayer {
+            alpha = alphaAnim.value
         }
 
     override var state: AnimStates = AnimStates.Gone
@@ -851,8 +859,8 @@ private class FadeTransition(
                     enter?.apply {
                         // If fade in is defined start from pre-defined `alphaFrom`. If no fade in is defined,
                         // snap the alpha to 1f
+                        alphaAnim = Animatable(alpha, 0.02f)
                         scope.launch {
-                            alphaAnim.snapTo(alpha)
                             alphaAnim.animateTo(1f, animationSpec)
                             listener(AnimationEndReason.Finished, alphaAnim.value)
                         }
@@ -877,6 +885,7 @@ private class FadeTransition(
             }
             field = value
         }
+
     private fun animateTo(
         target: Float,
         animationSpec: FiniteAnimationSpec<Float> = spring(visibilityThreshold = 0.02f),
@@ -888,7 +897,7 @@ private class FadeTransition(
         }
     }
 
-    val alphaAnim = Animatable(1f, visibilityThreshold = 0.02f)
+    var alphaAnim = Animatable(1f, visibilityThreshold = 0.02f)
 }
 
 private class SlideTransition(
@@ -940,12 +949,15 @@ private class SlideTransition(
             // Animation is interrupted from slide out, now slide in
             enter?.apply {
                 // If slide in animation specified, use that. Otherwise use default.
-                val anim = slideAnim
-                    ?: Animatable(
+                val anim = if (slideAnim?.isRunning != true) {
+                    Animatable(
                         slideOffset(fullSize), IntOffset.VectorConverter, IntOffset(1, 1)
                     )
+                } else {
+                    slideAnim
+                }
                 scope.launch {
-                    anim.animateTo(IntOffset.Zero, animationSpec)
+                    anim!!.animateTo(IntOffset.Zero, animationSpec)
                     listener(AnimationEndReason.Finished, anim.value)
                 }
                 slideAnim = anim
@@ -1028,10 +1040,11 @@ private class ChangeSizeTransition(
                 val anim = sizeAnim?.run {
                     // If the animation is not running and the alignment isn't the same, prefer
                     // AlignmentBasedSizeAnimation over rect based animation.
-                    if (!isRunning && alignment != enter.alignment) {
+                    if (!isAnimating) {
                         null
-                    } else
+                    } else {
                         this
+                    }
                 } ?: AlignmentBasedSizeAnimation(
                     Animatable(
                         enter.startSize.invoke(fullSize),
@@ -1128,11 +1141,6 @@ internal class TransitionAnimations constructor(
     init {
         animations = mutableListOf()
         // Only set up animations when either enter or exit transition is defined.
-        if (enter.data.fade != null || exit.data.fade != null) {
-            animations.add(
-                FadeTransition(enter.data.fade, exit.data.fade, scope, listener)
-            )
-        }
         if (enter.data.slide != null || exit.data.slide != null) {
             animations.add(
                 SlideTransition(enter.data.slide, exit.data.slide, scope, listener)
@@ -1141,6 +1149,11 @@ internal class TransitionAnimations constructor(
         if (enter.data.changeSize != null || exit.data.changeSize != null) {
             animations.add(
                 ChangeSizeTransition(enter.data.changeSize, exit.data.changeSize, scope, listener)
+            )
+        }
+        if (enter.data.fade != null || exit.data.fade != null) {
+            animations.add(
+                FadeTransition(enter.data.fade, exit.data.fade, scope, listener)
             )
         }
     }

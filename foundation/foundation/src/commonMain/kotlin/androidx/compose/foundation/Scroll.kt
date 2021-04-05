@@ -253,12 +253,16 @@ private fun Modifier.scroll(
 ) = composed(
     factory = {
         val coroutineScope = rememberCoroutineScope()
+        val isRtl = LocalLayoutDirection.current == LayoutDirection.Rtl
+        // Add RTL to the mix: if horizontal and RTL, reverse reverseScrolling
+        val resolvedReverseScrolling =
+            if (!isVertical && isRtl) !reverseScrolling else reverseScrolling
         val semantics = Modifier.semantics {
             if (isScrollable) {
                 val accessibilityScrollState = ScrollAxisRange(
                     value = { state.value.toFloat() },
                     maxValue = { state.maxValue.toFloat() },
-                    reverseScrolling = reverseScrolling
+                    reverseScrolling = resolvedReverseScrolling
                 )
                 if (isVertical) {
                     this.verticalScrollAxisRange = accessibilityScrollState
@@ -280,12 +284,10 @@ private fun Modifier.scroll(
                 )
             }
         }
-        val isRtl = LocalLayoutDirection.current == LayoutDirection.Rtl
         val scrolling = Modifier.scrollable(
             orientation = if (isVertical) Orientation.Vertical else Orientation.Horizontal,
-            // reverse scroll by default, to have "natural" gesture that goes reversed to layout
-            // if rtl and horizontal, do not reverse to make it right-to-left
-            reverseDirection = if (!isVertical && isRtl) reverseScrolling else !reverseScrolling,
+            // reverse scroll to have a "natural" gesture that goes reversed to layout
+            reverseDirection = !resolvedReverseScrolling,
             enabled = isScrollable,
             interactionSource = state.internalInteractionSource,
             flingBehavior = flingBehavior,

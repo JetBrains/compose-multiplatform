@@ -1,26 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<issues format="5" by="lint 4.2.0-beta02" client="gradle" variant="debug" version="4.2.0-beta02">
-
-    <issue
-        id="UnknownIssueId"
-        message="Unknown issue id &quot;ComposableLambdaParameterNaming&quot;">
-        <location
-            file="build.gradle"/>
-    </issue>
-
-    <issue
-        id="UnknownIssueId"
-        message="Unknown issue id &quot;ComposableLambdaParameterPosition&quot;">
-        <location
-            file="build.gradle"/>
-    </issue>
-
-    <issue
-        id="UnknownIssueId"
-        message="Unknown issue id &quot;ComposableNaming&quot;">
-        <location
-            file="build.gradle"/>
-    </issue>
+<issues format="5" by="lint 4.2.0-beta04" client="gradle" variant="debug" version="4.2.0-beta04">
 
     <issue
         id="BanTargetApiAnnotation"
@@ -40,7 +19,7 @@
         errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/androidMain/kotlin/androidx/compose/ui/platform/AndroidComposeView.android.kt"
-            line="719"
+            line="815"
             column="13"/>
     </issue>
 
@@ -51,151 +30,8 @@
         errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/androidMain/kotlin/androidx/compose/ui/platform/ViewLayer.android.kt"
-            line="285"
+            line="288"
             column="13"/>
-    </issue>
-
-    <issue
-        id="UnsafeNewApiCall"
-        message="This call is to a method from API 23, the call containing class androidx.compose.ui.autofill.AndroidAutofill_androidKt is not annotated with @RequiresApi(x) where x is at least 23. Either annotate the containing class with at least @RequiresApi(23) or move the call to a static method in a wrapper class annotated with at least @RequiresApi(23)."
-        errorLine1="    var index = root.addChildCount(autofillTree.children.count())"
-        errorLine2="                     ~~~~~~~~~~~~~">
-        <location
-            file="src/androidMain/kotlin/androidx/compose/ui/autofill/AndroidAutofill.android.kt"
-            line="73"
-            column="22"/>
-    </issue>
-
-    <issue
-        id="UnsafeNewApiCall"
-        message="This call is to a method from API 23, the call containing class androidx.compose.ui.autofill.AndroidAutofill_androidKt is not annotated with @RequiresApi(x) where x is at least 23. Either annotate the containing class with at least @RequiresApi(23) or move the call to a static method in a wrapper class annotated with at least @RequiresApi(23)."
-        errorLine1="        root.newChild(index)?.apply {"
-        errorLine2="             ~~~~~~~~">
-        <location
-            file="src/androidMain/kotlin/androidx/compose/ui/autofill/AndroidAutofill.android.kt"
-            line="76"
-            column="14"/>
-    </issue>
-
-    <issue
-        id="UnsafeNewApiCall"
-        message="This call is to a method from API 26, the call containing class androidx.compose.ui.autofill.AndroidAutofill_androidKt is not annotated with @RequiresApi(x) where x is at least 26. Either annotate the containing class with at least @RequiresApi(26) or move the call to a static method in a wrapper class annotated with at least @RequiresApi(26)."
-        errorLine1="            setAutofillId(root.autofillId!!, id)"
-        errorLine2="            ~~~~~~~~~~~~~">
-        <location
-            file="src/androidMain/kotlin/androidx/compose/ui/autofill/AndroidAutofill.android.kt"
-            line="77"
-            column="13"/>
-    </issue>
-
-    <issue
-        id="UnsafeNewApiCall"
-        message="This call is to a method from API 26, the call containing class androidx.compose.ui.autofill.AndroidAutofill_androidKt is not annotated with @RequiresApi(x) where x is at least 26. Either annotate the containing class with at least @RequiresApi(26) or move the call to a static method in a wrapper class annotated with at least @RequiresApi(26)."
-        errorLine1="            setAutofillId(root.autofillId!!, id)"
-        errorLine2="                               ~~~~~~~~~~">
-        <location
-            file="src/androidMain/kotlin/androidx/compose/ui/autofill/AndroidAutofill.android.kt"
-            line="77"
-            column="32"/>
-    </issue>
-
-    <issue
-        id="UnsafeNewApiCall"
-        message="This call is to a method from API 23, the call containing class androidx.compose.ui.autofill.AndroidAutofill_androidKt is not annotated with @RequiresApi(x) where x is at least 23. Either annotate the containing class with at least @RequiresApi(23) or move the call to a static method in a wrapper class annotated with at least @RequiresApi(23)."
-        errorLine1="            setId(id, view.context.packageName, null, null)"
-        errorLine2="            ~~~~~">
-        <location
-            file="src/androidMain/kotlin/androidx/compose/ui/autofill/AndroidAutofill.android.kt"
-            line="78"
-            column="13"/>
-    </issue>
-
-    <issue
-        id="UnsafeNewApiCall"
-        message="This call is to a method from API 26, the call containing class androidx.compose.ui.autofill.AndroidAutofill_androidKt is not annotated with @RequiresApi(x) where x is at least 26. Either annotate the containing class with at least @RequiresApi(26) or move the call to a static method in a wrapper class annotated with at least @RequiresApi(26)."
-        errorLine1="            setAutofillType(View.AUTOFILL_TYPE_TEXT)"
-        errorLine2="            ~~~~~~~~~~~~~~~">
-        <location
-            file="src/androidMain/kotlin/androidx/compose/ui/autofill/AndroidAutofill.android.kt"
-            line="79"
-            column="13"/>
-    </issue>
-
-    <issue
-        id="UnsafeNewApiCall"
-        message="This call is to a method from API 26, the call containing class androidx.compose.ui.autofill.AndroidAutofill_androidKt is not annotated with @RequiresApi(x) where x is at least 26. Either annotate the containing class with at least @RequiresApi(26) or move the call to a static method in a wrapper class annotated with at least @RequiresApi(26)."
-        errorLine1="            setAutofillHints(autofillNode.autofillTypes.map { it.androidType }.toTypedArray())"
-        errorLine2="            ~~~~~~~~~~~~~~~~">
-        <location
-            file="src/androidMain/kotlin/androidx/compose/ui/autofill/AndroidAutofill.android.kt"
-            line="80"
-            column="13"/>
-    </issue>
-
-    <issue
-        id="UnsafeNewApiCall"
-        message="This call is to a method from API 23, the call containing class androidx.compose.ui.autofill.AndroidAutofill_androidKt is not annotated with @RequiresApi(x) where x is at least 23. Either annotate the containing class with at least @RequiresApi(23) or move the call to a static method in a wrapper class annotated with at least @RequiresApi(23)."
-        errorLine1="                setDimens(left, top, 0, 0, width(), height())"
-        errorLine2="                ~~~~~~~~~">
-        <location
-            file="src/androidMain/kotlin/androidx/compose/ui/autofill/AndroidAutofill.android.kt"
-            line="92"
-            column="17"/>
-    </issue>
-
-    <issue
-        id="UnsafeNewApiCall"
-        message="This call is to a method from API 26, the call containing class androidx.compose.ui.autofill.AndroidAutofill_androidKt is not annotated with @RequiresApi(x) where x is at least 26. Either annotate the containing class with at least @RequiresApi(26) or move the call to a static method in a wrapper class annotated with at least @RequiresApi(26)."
-        errorLine1="            value.isText -> autofillTree.performAutofill(itemId, value.textValue.toString())"
-        errorLine2="                  ~~~~~~">
-        <location
-            file="src/androidMain/kotlin/androidx/compose/ui/autofill/AndroidAutofill.android.kt"
-            line="109"
-            column="19"/>
-    </issue>
-
-    <issue
-        id="UnsafeNewApiCall"
-        message="This call is to a method from API 26, the call containing class androidx.compose.ui.autofill.AndroidAutofill_androidKt is not annotated with @RequiresApi(x) where x is at least 26. Either annotate the containing class with at least @RequiresApi(26) or move the call to a static method in a wrapper class annotated with at least @RequiresApi(26)."
-        errorLine1="            value.isText -> autofillTree.performAutofill(itemId, value.textValue.toString())"
-        errorLine2="                                                                       ~~~~~~~~~">
-        <location
-            file="src/androidMain/kotlin/androidx/compose/ui/autofill/AndroidAutofill.android.kt"
-            line="109"
-            column="72"/>
-    </issue>
-
-    <issue
-        id="UnsafeNewApiCall"
-        message="This call is to a method from API 26, the call containing class androidx.compose.ui.autofill.AndroidAutofill_androidKt is not annotated with @RequiresApi(x) where x is at least 26. Either annotate the containing class with at least @RequiresApi(26) or move the call to a static method in a wrapper class annotated with at least @RequiresApi(26)."
-        errorLine1="            value.isDate -> TODO(&quot;b/138604541: Add onFill() callback for date&quot;)"
-        errorLine2="                  ~~~~~~">
-        <location
-            file="src/androidMain/kotlin/androidx/compose/ui/autofill/AndroidAutofill.android.kt"
-            line="110"
-            column="19"/>
-    </issue>
-
-    <issue
-        id="UnsafeNewApiCall"
-        message="This call is to a method from API 26, the call containing class androidx.compose.ui.autofill.AndroidAutofill_androidKt is not annotated with @RequiresApi(x) where x is at least 26. Either annotate the containing class with at least @RequiresApi(26) or move the call to a static method in a wrapper class annotated with at least @RequiresApi(26)."
-        errorLine1="            value.isList -> TODO(&quot;b/138604541: Add onFill() callback for list&quot;)"
-        errorLine2="                  ~~~~~~">
-        <location
-            file="src/androidMain/kotlin/androidx/compose/ui/autofill/AndroidAutofill.android.kt"
-            line="111"
-            column="19"/>
-    </issue>
-
-    <issue
-        id="UnsafeNewApiCall"
-        message="This call is to a method from API 26, the call containing class androidx.compose.ui.autofill.AndroidAutofill_androidKt is not annotated with @RequiresApi(x) where x is at least 26. Either annotate the containing class with at least @RequiresApi(26) or move the call to a static method in a wrapper class annotated with at least @RequiresApi(26)."
-        errorLine1="            value.isToggle -> TODO(&quot;b/138604541:  Add onFill() callback for toggle&quot;)"
-        errorLine2="                  ~~~~~~~~">
-        <location
-            file="src/androidMain/kotlin/androidx/compose/ui/autofill/AndroidAutofill.android.kt"
-            line="112"
-            column="19"/>
     </issue>
 
     <issue
@@ -205,7 +41,7 @@
         errorLine2="                    ~~~~~~~~~~~~~~~~">
         <location
             file="src/androidMain/kotlin/androidx/compose/ui/autofill/AndroidAutofillDebugUtils.android.kt"
-            line="65"
+            line="67"
             column="21"/>
     </issue>
 
@@ -216,52 +52,8 @@
         errorLine2="                    ~~~~~~~~~~~~~~~~~~">
         <location
             file="src/androidMain/kotlin/androidx/compose/ui/autofill/AndroidAutofillDebugUtils.android.kt"
-            line="74"
+            line="77"
             column="21"/>
-    </issue>
-
-    <issue
-        id="UnsafeNewApiCall"
-        message="This call is to a method from API 26, the call containing class androidx.compose.ui.platform.AndroidComposeView is not annotated with @RequiresApi(x) where x is at least 26. Either annotate the containing class with at least @RequiresApi(26) or move the call to a static method in a wrapper class annotated with at least @RequiresApi(26)."
-        errorLine1="            focusable = View.FOCUSABLE"
-        errorLine2="            ~~~~~~~~~">
-        <location
-            file="src/androidMain/kotlin/androidx/compose/ui/platform/AndroidComposeView.android.kt"
-            line="280"
-            column="13"/>
-    </issue>
-
-    <issue
-        id="UnsafeNewApiCall"
-        message="This call is to a method from API 26, the call containing class androidx.compose.ui.platform.AndroidComposeView is not annotated with @RequiresApi(x) where x is at least 26. Either annotate the containing class with at least @RequiresApi(26) or move the call to a static method in a wrapper class annotated with at least @RequiresApi(26)."
-        errorLine1="            defaultFocusHighlightEnabled = false"
-        errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/androidMain/kotlin/androidx/compose/ui/platform/AndroidComposeView.android.kt"
-            line="282"
-            column="13"/>
-    </issue>
-
-    <issue
-        id="UnsafeNewApiCall"
-        message="This call is to a method from API 26, the call containing class androidx.compose.ui.platform.AndroidComposeViewAccessibilityDelegateCompat is not annotated with @RequiresApi(x) where x is at least 26. Either annotate the containing class with at least @RequiresApi(26) or move the call to a static method in a wrapper class annotated with at least @RequiresApi(26)."
-        errorLine1="            info.unwrap().availableExtraData = listOf(EXTRA_DATA_TEXT_CHARACTER_LOCATION_KEY)"
-        errorLine2="                          ~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/androidMain/kotlin/androidx/compose/ui/platform/AndroidComposeViewAccessibilityDelegateCompat.android.kt"
-            line="407"
-            column="27"/>
-    </issue>
-
-    <issue
-        id="UnsafeNewApiCall"
-        message="This call is to a method from API 23, the call containing class androidx.compose.ui.platform.AndroidTextToolbar is not annotated with @RequiresApi(x) where x is at least 23. Either annotate the containing class with at least @RequiresApi(23) or move the call to a static method in a wrapper class annotated with at least @RequiresApi(23)."
-        errorLine1="            actionMode = view.startActionMode("
-        errorLine2="                              ~~~~~~~~~~~~~~~">
-        <location
-            file="src/androidMain/kotlin/androidx/compose/ui/platform/AndroidTextToolbar.android.kt"
-            line="53"
-            column="31"/>
     </issue>
 
     <issue
@@ -284,28 +76,6 @@
             file="src/androidMain/kotlin/androidx/compose/ui/platform/actionmodecallback/FloatingTextActionModeCallback.android.kt"
             line="30"
             column="5"/>
-    </issue>
-
-    <issue
-        id="UnsafeNewApiCall"
-        message="This call is to a method from API 26, the call containing class androidx.compose.ui.platform.RenderNodeLayer is not annotated with @RequiresApi(x) where x is at least 26. Either annotate the containing class with at least @RequiresApi(26) or move the call to a static method in a wrapper class annotated with at least @RequiresApi(26)."
-        errorLine1="            ownerView.parent?.onDescendantInvalidated(ownerView, ownerView)"
-        errorLine2="                              ~~~~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/androidMain/kotlin/androidx/compose/ui/platform/RenderNodeLayer.android.kt"
-            line="165"
-            column="31"/>
-    </issue>
-
-    <issue
-        id="UnsafeNewApiCall"
-        message="This call is to a method from API 29, the call containing class androidx.compose.ui.platform.Wrapper_androidKt is not annotated with @RequiresApi(x) where x is at least 29. Either annotate the containing class with at least @RequiresApi(29) or move the call to a static method in a wrapper class annotated with at least @RequiresApi(29)."
-        errorLine1="        owner.attributeSourceResourceMap.isNotEmpty()"
-        errorLine2="              ~~~~~~~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/androidMain/kotlin/androidx/compose/ui/platform/Wrapper.android.kt"
-            line="308"
-            column="15"/>
     </issue>
 
 </issues>

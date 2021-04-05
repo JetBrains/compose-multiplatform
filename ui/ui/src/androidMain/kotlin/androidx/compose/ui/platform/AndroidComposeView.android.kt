@@ -70,7 +70,7 @@ import androidx.compose.ui.input.key.Key.Companion.DirectionRight
 import androidx.compose.ui.input.key.Key.Companion.DirectionUp
 import androidx.compose.ui.input.key.Key.Companion.Tab
 import androidx.compose.ui.input.key.KeyEvent
-import androidx.compose.ui.input.key.KeyEventType
+import androidx.compose.ui.input.key.KeyEventType.KeyDown
 import androidx.compose.ui.input.key.KeyInputModifier
 import androidx.compose.ui.input.key.isShiftPressed
 import androidx.compose.ui.input.key.key
@@ -89,7 +89,9 @@ import androidx.compose.ui.node.Owner
 import androidx.compose.ui.node.OwnerSnapshotObserver
 import androidx.compose.ui.node.RootForTest
 import androidx.compose.ui.semantics.SemanticsModifierCore
+import androidx.compose.ui.semantics.SemanticsNode
 import androidx.compose.ui.semantics.SemanticsOwner
+import androidx.compose.ui.semantics.outerSemantics
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.input.PlatformTextInputService
 import androidx.compose.ui.text.input.TextInputService
@@ -100,7 +102,10 @@ import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.util.trace
 import androidx.compose.ui.viewinterop.AndroidViewHolder
+import androidx.core.view.AccessibilityDelegateCompat
 import androidx.core.view.ViewCompat
+import androidx.core.view.accessibility.AccessibilityNodeInfoCompat
+import androidx.core.view.accessibility.AccessibilityNodeProviderCompat
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.ViewTreeLifecycleOwner
@@ -149,13 +154,11 @@ internal class AndroidComposeView(context: Context) :
     //  that this common logic can be used by all owners.
     private val keyInputModifier: KeyInputModifier = KeyInputModifier(
         onKeyEvent = {
-            if (it.type == KeyEventType.KeyDown) {
-                getFocusDirection(it)?.let { direction ->
-                    focusManager.moveFocus(direction)
-                    return@KeyInputModifier true
-                }
-            }
-            false
+            val focusDirection = getFocusDirection(it)
+            if (focusDirection == null || it.type != KeyDown) return@KeyInputModifier false
+
+            // Consume the key event if we moved focus.
+            focusManager.moveFocus(focusDirection)
         },
         onPreviewKeyEvent = null
     )
@@ -226,7 +229,7 @@ internal class AndroidComposeView(context: Context) :
     override var showLayoutBounds = false
 
     private var _androidViewsHandler: AndroidViewsHandler? = null
-    private val androidViewsHandler: AndroidViewsHandler
+    internal val androidViewsHandler: AndroidViewsHandler
         get() {
             if (_androidViewsHandler == null) {
                 _androidViewsHandler = AndroidViewsHandler(context)
@@ -234,9 +237,7 @@ internal class AndroidComposeView(context: Context) :
             }
             return _androidViewsHandler!!
         }
-    private val viewLayersContainer by lazy(LazyThreadSafetyMode.NONE) {
-        ViewLayerContainer(context).also { addView(it) }
-    }
+    private var viewLayersContainer: DrawChildContainer? = null
 
     // The constraints being used by the last onMeasure. It is set to null in onLayout. It allows
     // us to detect the case when the View was measured twice with different constraints within
@@ -401,6 +402,30 @@ internal class AndroidComposeView(context: Context) :
     fun addAndroidView(view: AndroidViewHolder, layoutNode: LayoutNode) {
         androidViewsHandler.holderToLayoutNode[view] = layoutNode
         androidViewsHandler.addView(view)
+        androidViewsHandler.layoutNodeToHolder[layoutNode] = view
+        // Fetching AccessibilityNodeInfo from a View which is not set to
+        // IMPORTANT_FOR_ACCESSIBILITY_YES will return null.
+        ViewCompat.setImportantForAccessibility(
+            view,
+            ViewCompat.IMPORTANT_FOR_ACCESSIBILITY_YES
+        )
+        val thisView = this
+        ViewCompat.setAccessibilityDelegate(
+            view,
+            object : AccessibilityDelegateCompat() {
+                override fun onInitializeAccessibilityNodeInfo(
+                    host: View?,
+                    info: AccessibilityNodeInfoCompat?
+                ) {
+                    super.onInitializeAccessibilityNodeInfo(host, info)
+                    var parentId = SemanticsNode(layoutNode.outerSemantics!!, true).parent!!.id
+                    if (parentId == semanticsOwner.rootSemanticsNode.id) {
+                        parentId = AccessibilityNodeProviderCompat.HOST_VIEW_ID
+                    }
+                    info!!.setParent(thisView, parentId)
+                }
+            }
+        )
     }
 
     /**
@@ -410,6 +435,13 @@ internal class AndroidComposeView(context: Context) :
     fun removeAndroidView(view: AndroidViewHolder) {
         androidViewsHandler.removeView(view)
         androidViewsHandler.holderToLayoutNode.remove(view)
+        androidViewsHandler.layoutNodeToHolder.remove(
+            androidViewsHandler.holderToLayoutNode[view]
+        )
+        ViewCompat.setImportantForAccessibility(
+            view,
+            ViewCompat.IMPORTANT_FOR_ACCESSIBILITY_AUTO
+        )
     }
 
     /**
@@ -549,12 +581,20 @@ internal class AndroidComposeView(context: Context) :
                 isRenderNodeCompatible = false
             }
         }
-        return ViewLayer(
-            this,
-            viewLayersContainer,
-            drawBlock,
-            invalidateParentLayer
-        )
+        if (viewLayersContainer == null) {
+            if (!ViewLayer.hasRetrievedMethod) {
+                // Test to see if updateDisplayList() can be called. If this fails then
+                // ViewLayer.shouldUseDispatchDraw will be true.
+                ViewLayer.updateDisplayList(View(context))
+            }
+            if (ViewLayer.shouldUseDispatchDraw) {
+                viewLayersContainer = DrawChildContainer(context)
+            } else {
+                viewLayersContainer = ViewLayerContainer(context)
+            }
+            addView(viewLayersContainer)
+        }
+        return ViewLayer(this, viewLayersContainer!!, drawBlock, invalidateParentLayer)
     }
 
     override fun onSemanticsChange() {
@@ -579,6 +619,7 @@ internal class AndroidComposeView(context: Context) :
             invalidateLayers(root)
         }
         measureAndLayout()
+
         // we don't have to observe here because the root has a layer modifier
         // that will observe all children. The AndroidComposeView has only the
         // root, so it doesn't have to invalidate itself based on model changes.
@@ -590,6 +631,17 @@ internal class AndroidComposeView(context: Context) :
                 layer.updateDisplayList()
             }
             dirtyLayers.clear()
+        }
+
+        if (ViewLayer.shouldUseDispatchDraw) {
+            // We must update the display list of all children using dispatchDraw()
+            // instead of updateDisplayList(). But since we don't want to actually draw
+            // the contents, we will clip out everything from the canvas.
+            val saveCount = canvas.save()
+            canvas.clipRect(0f, 0f, 0f, 0f)
+
+            super.dispatchDraw(canvas)
+            canvas.restoreToCount(saveCount)
         }
     }
 
@@ -791,6 +843,63 @@ internal class AndroidComposeView(context: Context) :
 
     public override fun dispatchHoverEvent(event: MotionEvent): Boolean {
         return accessibilityDelegate.dispatchHoverEvent(event)
+    }
+
+    private fun findViewByAccessibilityIdRootedAtCurrentView(
+        accessibilityId: Int,
+        currentView: View
+    ): View? {
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.Q) {
+            val getAccessibilityViewIdMethod = View::class.java
+                .getDeclaredMethod("getAccessibilityViewId")
+            getAccessibilityViewIdMethod.isAccessible = true
+            if (getAccessibilityViewIdMethod.invoke(currentView) == accessibilityId) {
+                return currentView
+            }
+            if (currentView is ViewGroup) {
+                for (i in 0 until currentView.childCount) {
+                    val foundView = findViewByAccessibilityIdRootedAtCurrentView(
+                        accessibilityId,
+                        currentView.getChildAt(i)
+                    )
+                    if (foundView != null) {
+                        return foundView
+                    }
+                }
+            }
+        }
+        return null
+    }
+
+    /**
+     * This overrides an @hide method in ViewGroup. Because of the @hide, the override keyword
+     * cannot be used, but the override works anyway because the ViewGroup method is not final.
+     * In Android P and earlier, the call path is
+     * AccessibilityInteractionController#findViewByAccessibilityId ->
+     * View#findViewByAccessibilityId -> ViewGroup#findViewByAccessibilityIdTraversal. In Android
+     * Q and later, AccessibilityInteractionController#findViewByAccessibilityId uses
+     * AccessibilityNodeIdManager and findViewByAccessibilityIdTraversal is only used by autofill.
+     */
+    public fun findViewByAccessibilityIdTraversal(accessibilityId: Int): View? {
+        try {
+            // AccessibilityInteractionController#findViewByAccessibilityId doesn't call this
+            // method in Android Q and later. Ideally, we should only define this method in
+            // Android P and earlier, but since we don't have a way to do so, we can simply
+            // invoke the hidden parent method after Android P. If in new android, the hidden method
+            // ViewGroup#findViewByAccessibilityIdTraversal signature is changed or removed, we can
+            // simply return null here because there will be no call to this method.
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+                val findViewByAccessibilityIdTraversalMethod = View::class.java
+                    .getDeclaredMethod("findViewByAccessibilityIdTraversal", Int::class.java)
+                findViewByAccessibilityIdTraversalMethod.isAccessible = true
+                return findViewByAccessibilityIdTraversalMethod.invoke(this, accessibilityId) as?
+                    View
+            } else {
+                return findViewByAccessibilityIdRootedAtCurrentView(accessibilityId, this)
+            }
+        } catch (e: NoSuchMethodException) {
+            return null
+        }
     }
 
     override val isLifecycleInResumedState: Boolean

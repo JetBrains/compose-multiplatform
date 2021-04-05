@@ -17,6 +17,7 @@
 package androidx.compose.foundation.lazy
 
 import androidx.compose.ui.layout.Placeable
+import androidx.compose.ui.util.fastFirstOrNull
 
 /**
  * @param itemProvider the provider so we can compose a header if it wasn't composed already
@@ -71,14 +72,13 @@ internal class LazyListHeaders(
         scope: Placeable.PlacementScope,
         layoutWidth: Int,
         layoutHeight: Int,
-        offset: Int,
-        reverseOrder: Boolean
+        offset: Int
     ) {
         if (item.index == currentHeaderListPosition) {
             currentHeaderItem = item
             currentHeaderOffset = offset
         } else {
-            item.place(scope, layoutWidth, layoutHeight, offset, reverseOrder)
+            item.place(scope, layoutWidth, layoutHeight, offset)
             if (item.index == nextHeaderListPosition) {
                 nextHeaderOffset = offset
                 nextHeaderSize = item.size
@@ -88,10 +88,8 @@ internal class LazyListHeaders(
 
     fun onAfterItemsPlacing(
         scope: Placeable.PlacementScope,
-        mainAxisLayoutSize: Int,
         layoutWidth: Int,
-        layoutHeight: Int,
-        reverseOrder: Boolean
+        layoutHeight: Int
     ) {
         if (currentHeaderListPosition == -1) {
             // we have no headers needing special handling
@@ -99,35 +97,20 @@ internal class LazyListHeaders(
         }
 
         val headerItem = currentHeaderItem
-            ?: notUsedButComposedItems?.find { it.index == currentHeaderListPosition }
+            ?: notUsedButComposedItems?.fastFirstOrNull { it.index == currentHeaderListPosition }
             ?: itemProvider.getAndMeasure(DataIndex(currentHeaderListPosition))
 
-        var headerOffset = if (!reverseOrder) {
-            if (currentHeaderOffset != Int.MIN_VALUE) {
-                maxOf(-startContentPadding, currentHeaderOffset)
-            } else {
-                -startContentPadding
-            }
+        var headerOffset = if (currentHeaderOffset != Int.MIN_VALUE) {
+            maxOf(-startContentPadding, currentHeaderOffset)
         } else {
-            if (currentHeaderOffset != Int.MIN_VALUE) {
-                minOf(
-                    mainAxisLayoutSize + startContentPadding - headerItem.size,
-                    currentHeaderOffset
-                )
-            } else {
-                mainAxisLayoutSize + startContentPadding - headerItem.size
-            }
+            -startContentPadding
         }
         // if we have a next header overlapping with the current header, the next one will be
         // pushing the current one away from the viewport.
         if (nextHeaderOffset != Int.MIN_VALUE) {
-            if (!reverseOrder) {
-                headerOffset = minOf(headerOffset, nextHeaderOffset - headerItem.size)
-            } else {
-                headerOffset = maxOf(headerOffset, nextHeaderOffset + headerItem.size)
-            }
+            headerOffset = minOf(headerOffset, nextHeaderOffset - headerItem.size)
         }
 
-        headerItem.place(scope, layoutWidth, layoutHeight, headerOffset, reverseOrder)
+        headerItem.place(scope, layoutWidth, layoutHeight, headerOffset)
     }
 }

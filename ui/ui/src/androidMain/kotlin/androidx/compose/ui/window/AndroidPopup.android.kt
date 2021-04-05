@@ -60,6 +60,7 @@ import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.util.fastMap
 import androidx.lifecycle.ViewTreeLifecycleOwner
 import androidx.lifecycle.ViewTreeViewModelStoreOwner
 import androidx.savedstate.ViewTreeSavedStateRegistryOwner
@@ -278,7 +279,7 @@ private inline fun SimpleStack(modifier: Modifier, noinline content: @Composable
                 }
             }
             else -> {
-                val placeables = measurables.map { it.measure(constraints) }
+                val placeables = measurables.fastMap { it.measure(constraints) }
                 var width = 0
                 var height = 0
                 for (i in 0..placeables.lastIndex) {

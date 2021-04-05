@@ -36,6 +36,7 @@ import androidx.compose.ui.graphics.vector.PathNode.RelativeReflectiveCurveTo
 import androidx.compose.ui.graphics.vector.PathNode.RelativeReflectiveQuadTo
 import androidx.compose.ui.graphics.vector.PathNode.RelativeVerticalTo
 import androidx.compose.ui.graphics.vector.PathNode.VerticalTo
+import androidx.compose.ui.util.fastForEach
 import kotlin.math.PI
 import kotlin.math.abs
 import kotlin.math.atan2
@@ -108,7 +109,7 @@ class PathParser {
         reflectiveCtrlPoint.reset()
 
         var previousNode: PathNode? = null
-        for (node in nodes) {
+        nodes.fastForEach { node ->
             if (previousNode == null) previousNode = node
             when (node) {
                 is Close -> close(target)
@@ -123,13 +124,13 @@ class PathParser {
                 is RelativeCurveTo -> node.relativeCurveTo(target)
                 is CurveTo -> node.curveTo(target)
                 is RelativeReflectiveCurveTo ->
-                    node.relativeReflectiveCurveTo(previousNode.isCurve, target)
-                is ReflectiveCurveTo -> node.reflectiveCurveTo(previousNode.isCurve, target)
+                    node.relativeReflectiveCurveTo(previousNode!!.isCurve, target)
+                is ReflectiveCurveTo -> node.reflectiveCurveTo(previousNode!!.isCurve, target)
                 is RelativeQuadTo -> node.relativeQuadTo(target)
                 is QuadTo -> node.quadTo(target)
                 is RelativeReflectiveQuadTo ->
-                    node.relativeReflectiveQuadTo(previousNode.isQuad, target)
-                is ReflectiveQuadTo -> node.reflectiveQuadTo(previousNode.isQuad, target)
+                    node.relativeReflectiveQuadTo(previousNode!!.isQuad, target)
+                is ReflectiveQuadTo -> node.reflectiveQuadTo(previousNode!!.isQuad, target)
                 is RelativeArcTo -> node.relativeArcTo(target)
                 is ArcTo -> node.arcTo(target)
             }

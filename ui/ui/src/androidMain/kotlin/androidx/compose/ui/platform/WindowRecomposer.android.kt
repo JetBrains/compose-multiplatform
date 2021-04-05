@@ -29,7 +29,6 @@ import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.ViewTreeLifecycleOwner
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.CoroutineStart
-import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.android.asCoroutineDispatcher
 import kotlinx.coroutines.launch
@@ -108,13 +107,15 @@ object WindowRecomposerPolicy {
     )
 
     // Don't expose the actual AtomicReference as @PublishedApi; we might convert to atomicfu later
-    /** @suppress This should be internal @PublishedApi */
-    fun getAndSetFactory(
+    @Suppress("ShowingMemberInHiddenClass")
+    @PublishedApi
+    internal fun getAndSetFactory(
         factory: WindowRecomposerFactory
     ): WindowRecomposerFactory = this.factory.getAndSet(factory)
 
-    /** @suppress This should be internal @PublishedApi */
-    fun compareAndSetFactory(
+    @Suppress("ShowingMemberInHiddenClass")
+    @PublishedApi
+    internal fun compareAndSetFactory(
         expected: WindowRecomposerFactory,
         factory: WindowRecomposerFactory
     ): Boolean = this.factory.compareAndSet(expected, factory)
@@ -202,7 +203,6 @@ internal val View.windowRecomposer: Recomposer
         }
     }
 
-@OptIn(ExperimentalCoroutinesApi::class)
 private fun View.createLifecycleAwareViewTreeRecomposer(): Recomposer {
     val currentThreadContext = AndroidUiDispatcher.CurrentThread
     val pausableClock = currentThreadContext[MonotonicFrameClock]?.let {

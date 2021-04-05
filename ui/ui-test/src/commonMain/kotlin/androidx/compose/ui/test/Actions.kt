@@ -22,7 +22,11 @@ import androidx.compose.ui.layout.boundsInParent
 import androidx.compose.ui.layout.positionInRoot
 import androidx.compose.ui.semantics.AccessibilityAction
 import androidx.compose.ui.semantics.SemanticsActions
+import androidx.compose.ui.semantics.SemanticsNode
+import androidx.compose.ui.semantics.SemanticsProperties.HorizontalScrollAxisRange
+import androidx.compose.ui.semantics.SemanticsProperties.VerticalScrollAxisRange
 import androidx.compose.ui.semantics.SemanticsPropertyKey
+import androidx.compose.ui.semantics.getOrNull
 import androidx.compose.ui.unit.toSize
 import kotlin.math.max
 import kotlin.math.min
@@ -76,7 +80,7 @@ fun SemanticsNodeInteraction.performScrollTo(): SemanticsNodeInteraction {
     val mustScrollLeft = target.right > viewPort.right
     val mustScrollRight = target.left < viewPort.left
 
-    val dx = if (mustScrollLeft && !mustScrollRight) {
+    val rawDx = if (mustScrollLeft && !mustScrollRight) {
         // scroll left: positive dx
         min(target.left - viewPort.left, target.right - viewPort.right)
     } else if (mustScrollRight && !mustScrollLeft) {
@@ -87,7 +91,7 @@ fun SemanticsNodeInteraction.performScrollTo(): SemanticsNodeInteraction {
         0f
     }
 
-    val dy = if (mustScrollUp && !mustScrollDown) {
+    val rawDy = if (mustScrollUp && !mustScrollDown) {
         // scroll up: positive dy
         min(target.top - viewPort.top, target.bottom - viewPort.bottom)
     } else if (mustScrollDown && !mustScrollUp) {
@@ -97,6 +101,9 @@ fun SemanticsNodeInteraction.performScrollTo(): SemanticsNodeInteraction {
         // already in viewport
         0f
     }
+
+    val dx = if (scrollableNode.isReversedHorizontally) -rawDx else rawDx
+    val dy = if (scrollableNode.isReversedVertically) -rawDy else rawDy
 
     @OptIn(InternalTestApi::class)
     testContext.testOwner.runOnUiThread {
@@ -183,7 +190,7 @@ fun <T : Function<Boolean>> SemanticsNodeInteraction.performSemanticsAction(
 
     @OptIn(InternalTestApi::class)
     testContext.testOwner.runOnUiThread {
-        node.config[key].action?.let { invocation(it) }
+        node.config[key].action?.let(invocation)
     }
 }
 
@@ -205,3 +212,9 @@ fun SemanticsNodeInteraction.performSemanticsAction(
 ) {
     performSemanticsAction(key) { it.invoke() }
 }
+
+private val SemanticsNode.isReversedHorizontally: Boolean
+    get() = config.getOrNull(HorizontalScrollAxisRange)?.reverseScrolling == true
+
+private val SemanticsNode.isReversedVertically: Boolean
+    get() = config.getOrNull(VerticalScrollAxisRange)?.reverseScrolling == true

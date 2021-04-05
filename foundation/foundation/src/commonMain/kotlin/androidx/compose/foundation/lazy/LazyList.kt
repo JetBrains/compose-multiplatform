@@ -26,8 +26,7 @@ import androidx.compose.foundation.layout.calculateEndPadding
 import androidx.compose.foundation.layout.calculateStartPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.saveable.rememberSaveableStateHolder
+import androidx.compose.runtime.State
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clipToBounds
@@ -36,15 +35,10 @@ import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.LayoutDirection
 
-internal interface LazyKeyAndScopedContentFactory {
-    fun getKey(index: Int): Any
-    fun getContent(index: Int, scope: LazyItemScope): @Composable() () -> Unit
-}
-
 @Composable
 internal fun LazyList(
-    /** The total size of the list */
-    itemsCount: Int,
+    /** State object containing the latest item provider */
+    stateOfItemsProvider: State<LazyListItemsProvider>,
     /** Modifier to be applied for the inner layout */
     modifier: Modifier,
     /** State controlling the scroll position */
@@ -64,21 +58,14 @@ internal fun LazyList(
     /** The alignment to align items vertically. Required when isVertical is false */
     verticalAlignment: Alignment.Vertical? = null,
     /** The horizontal arrangement for items. Required when isVertical is false */
-    horizontalArrangement: Arrangement.Horizontal? = null,
-    /** The list of indexes of the sticky header items */
-    headerIndexes: List<Int> = emptyList(),
-    scopedFactory: LazyKeyAndScopedContentFactory
+    horizontalArrangement: Arrangement.Horizontal? = null
 ) {
     val isRtl = LocalLayoutDirection.current == LayoutDirection.Rtl
     // reverse scroll by default, to have "natural" gesture that goes reversed to layout
     // if rtl and horizontal, do not reverse to make it right-to-left
     val reverseScrollDirection = if (!isVertical && isRtl) reverseLayout else !reverseLayout
 
-    val saveableStateHolder = rememberSaveableStateHolder()
-    val factory = remember {
-        LazyListItemContentFactory(saveableStateHolder, scopedFactory, itemsCount)
-    }
-    factory.update(scopedFactory, itemsCount, state)
+    val itemContentFactory = rememberItemContentFactory(stateOfItemsProvider, state)
 
     SubcomposeLayout(
         modifier
@@ -95,11 +82,13 @@ internal fun LazyList(
     ) { constraints ->
         constraints.assertNotNestingScrollableContainers(isVertical)
 
+        val itemsProvider = stateOfItemsProvider.value
+
         // Update the state's cached Density
         state.density = Density(density, fontScale)
 
         // this will update the scope object if the constrains have been changed
-        factory.updateItemScope(this, constraints)
+        itemContentFactory.updateItemScope(this, constraints)
 
         val startContentPadding = if (isVertical) {
             contentPadding.calculateTopPadding()
@@ -119,11 +108,14 @@ internal fun LazyList(
         }
         val spaceBetweenItems = spaceBetweenItemsDp.roundToPx()
 
+        val itemsCount = itemsProvider.itemsCount
+
         val itemProvider = LazyMeasuredItemProvider(
             constraints,
             isVertical,
             this,
-            factory
+            itemsProvider,
+            itemContentFactory
         ) { index, key, placeables ->
             // we add spaceBetweenItems as an extra spacing for all items apart from the last one so
             // the lazy list measuring logic will take it into account.
@@ -135,6 +127,7 @@ internal fun LazyList(
                 horizontalAlignment = horizontalAlignment,
                 verticalAlignment = verticalAlignment,
                 layoutDirection = layoutDirection,
+                reverseLayout = reverseLayout,
                 startContentPadding = startContentPadding,
                 endContentPadding = endContentPadding,
                 spacing = spacing,
@@ -155,8 +148,13 @@ internal fun LazyList(
 
         state.applyMeasureResult(measureResult)
 
-        val headers = if (headerIndexes.isNotEmpty()) {
-            LazyListHeaders(itemProvider, headerIndexes, measureResult, startContentPadding)
+        val headers = if (itemsProvider.headerIndexes.isNotEmpty()) {
+            LazyListHeaders(
+                itemProvider,
+                itemsProvider.headerIndexes,
+                measureResult,
+                startContentPadding
+            )
         } else {
             null
         }

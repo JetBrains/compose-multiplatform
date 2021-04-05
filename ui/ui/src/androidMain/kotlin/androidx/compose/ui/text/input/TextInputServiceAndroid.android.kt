@@ -21,14 +21,15 @@ import android.content.Context
 import android.os.Build
 import android.text.InputType
 import android.util.Log
+import android.view.KeyEvent
 import android.view.View
 import android.view.ViewTreeObserver
+import android.view.inputmethod.BaseInputConnection
 import android.view.inputmethod.EditorInfo
 import android.view.inputmethod.InputConnection
 import android.view.inputmethod.InputMethodManager
 import androidx.compose.ui.geometry.Rect
 import androidx.compose.ui.text.TextRange
-import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.channels.Channel
 import kotlin.math.roundToInt
 
@@ -49,6 +50,8 @@ internal class TextInputServiceAndroid(val view: View) : PlatformTextInputServic
     private var state = TextFieldValue(text = "", selection = TextRange.Zero)
     private var imeOptions = ImeOptions.Default
     private var ic: RecordingInputConnection? = null
+    // used for sendKeyEvent delegation
+    private var baseInputConnection: BaseInputConnection = BaseInputConnection(view, false)
     private var focusedRect: android.graphics.Rect? = null
 
     private var _imm: InputMethodManager? = null
@@ -100,13 +103,17 @@ internal class TextInputServiceAndroid(val view: View) : PlatformTextInputServic
         return RecordingInputConnection(
             initState = state,
             autoCorrect = imeOptions.autoCorrect,
-            eventCallback = object : InputEventCallback {
+            eventCallback = object : InputEventCallback2 {
                 override fun onEditCommands(editCommands: List<EditCommand>) {
                     onEditCommand(editCommands)
                 }
 
                 override fun onImeAction(imeAction: ImeAction) {
                     onImeActionPerformed(imeAction)
+                }
+
+                override fun onKeyEvent(event: KeyEvent) {
+                    baseInputConnection.sendKeyEvent(event)
                 }
             }
         ).also { ic = it }
@@ -158,7 +165,6 @@ internal class TextInputServiceAndroid(val view: View) : PlatformTextInputServic
         showKeyboardChannel.offer(false)
     }
 
-    @OptIn(FlowPreview::class)
     suspend fun keyboardVisibilityEventLoop() {
         // TODO(b/180071033): Allow for more IMPLICIT flag to be passed.
         for (showKeyboard in showKeyboardChannel) {
@@ -175,6 +181,11 @@ internal class TextInputServiceAndroid(val view: View) : PlatformTextInputServic
     }
 
     override fun updateState(oldValue: TextFieldValue?, newValue: TextFieldValue) {
+        if (DEBUG) { Log.d(TAG, "InputService.updateState: $oldValue -> $newValue") }
+
+        // update the latest TextFieldValue in InputConnection
+        ic?.mTextFieldValue = newValue
+
         if (oldValue == newValue) return
 
         this.state = newValue
@@ -184,6 +195,8 @@ internal class TextInputServiceAndroid(val view: View) : PlatformTextInputServic
                 // when selection is the same but composition has changed, need to reset the input.
                 (it.selection == newValue.selection && it.composition != newValue.composition)
         } ?: false
+
+        if (DEBUG) { Log.d(TAG, "InputService.updateState: $state / $restartInput(restartInput) ") }
 
         if (restartInput) {
             restartInput()

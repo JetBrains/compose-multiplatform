@@ -14,39 +14,67 @@
  * limitations under the License.
  */
 
-package androidx.compose.integration.macrobenchmark
+package androidx.benchmark.integration.macrobenchmark
 
 import android.content.Intent
 import androidx.benchmark.macro.CompilationMode
 import androidx.benchmark.macro.StartupMode
 import androidx.benchmark.macro.StartupTimingMetric
+import androidx.benchmark.macro.isSupportedWithVmSettings
 import androidx.benchmark.macro.junit4.MacrobenchmarkRule
 
-const val TargetPackage = "androidx.compose.integration.macrobenchmark.target"
+const val TARGET_PACKAGE = "androidx.benchmark.integration.compose.target"
 
-/**
- * Simplified interface for standardizing e.g. package,
- * compilation types, and iteration count across project
- */
 fun MacrobenchmarkRule.measureStartup(
-    profileCompiled: Boolean,
+    compilationMode: CompilationMode,
     startupMode: StartupMode,
-    iterations: Int = 5,
+    iterations: Int = 3,
     setupIntent: Intent.() -> Unit = {}
 ) = measureRepeated(
-    packageName = TargetPackage,
+    packageName = TARGET_PACKAGE,
     metrics = listOf(StartupTimingMetric()),
-    compilationMode = if (profileCompiled) {
-        CompilationMode.SpeedProfile(warmupIterations = 3)
-    } else {
-        CompilationMode.None
-    },
+    compilationMode = compilationMode,
     iterations = iterations,
     startupMode = startupMode
 ) {
     pressHome()
     val intent = Intent()
-    intent.setPackage(TargetPackage)
+    intent.setPackage(TARGET_PACKAGE)
     setupIntent(intent)
     startActivityAndWait(intent)
+}
+
+fun createStartupCompilationParams(
+    startupModes: List<StartupMode> = listOf(StartupMode.HOT, StartupMode.WARM, StartupMode.COLD),
+    compilationModes: List<CompilationMode> = listOf(
+        CompilationMode.None,
+        CompilationMode.Interpreted,
+        CompilationMode.SpeedProfile()
+    )
+): List<Array<Any>> = mutableListOf<Array<Any>>().apply {
+    for (startupMode in startupModes) {
+        for (compilationMode in compilationModes) {
+            // Skip configs that can't run, so they don't clutter Studio benchmark
+            // output with AssumptionViolatedException dumps
+            if (compilationMode.isSupportedWithVmSettings()) {
+                add(arrayOf(startupMode, compilationMode))
+            }
+        }
+    }
+}
+
+fun createCompilationParams(
+    compilationModes: List<CompilationMode> = listOf(
+        CompilationMode.None,
+        CompilationMode.Interpreted,
+        CompilationMode.SpeedProfile()
+    )
+): List<Array<Any>> = mutableListOf<Array<Any>>().apply {
+    for (compilationMode in compilationModes) {
+        // Skip configs that can't run, so they don't clutter Studio benchmark
+        // output with AssumptionViolatedException dumps
+        if (compilationMode.isSupportedWithVmSettings()) {
+            add(arrayOf(compilationMode))
+        }
+    }
 }

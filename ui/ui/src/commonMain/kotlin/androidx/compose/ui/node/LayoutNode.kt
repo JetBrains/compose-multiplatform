@@ -31,7 +31,6 @@ import androidx.compose.ui.input.nestedscroll.NestedScrollModifier
 import androidx.compose.ui.input.pointer.PointerInputFilter
 import androidx.compose.ui.input.pointer.PointerInputModifier
 import androidx.compose.ui.layout.AlignmentLine
-import androidx.compose.ui.layout.HorizontalAlignmentLine
 import androidx.compose.ui.layout.IntrinsicMeasurable
 import androidx.compose.ui.layout.IntrinsicMeasureScope
 import androidx.compose.ui.layout.LayoutCoordinates
@@ -48,7 +47,6 @@ import androidx.compose.ui.layout.ParentDataModifier
 import androidx.compose.ui.layout.Placeable
 import androidx.compose.ui.layout.Remeasurement
 import androidx.compose.ui.layout.RemeasurementModifier
-import androidx.compose.ui.layout.merge
 import androidx.compose.ui.node.LayoutNode.LayoutState.LayingOut
 import androidx.compose.ui.node.LayoutNode.LayoutState.Measuring
 import androidx.compose.ui.node.LayoutNode.LayoutState.NeedsRelayout
@@ -62,7 +60,6 @@ import androidx.compose.ui.semantics.outerSemantics
 import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.LayoutDirection
-import kotlin.math.roundToInt
 
 /**
  * Enable to log changes to the LayoutNode tree.  This logging is quite chatty.
@@ -102,17 +99,20 @@ internal class LayoutNode : Measurable, Remeasurement, OwnerScope, LayoutInfo, C
 
     // the list of nodes where the virtual children are unfolded (their children are represented
     // as our direct children)
-    private val _unfoldedChildren = mutableVectorOf<LayoutNode>()
+    private var _unfoldedChildren: MutableVector<LayoutNode>? = null
 
     private fun recreateUnfoldedChildrenIfDirty() {
         if (unfoldedVirtualChildrenListDirty) {
             unfoldedVirtualChildrenListDirty = false
-            _unfoldedChildren.clear()
+            val unfoldedChildren = _unfoldedChildren ?: mutableVectorOf<LayoutNode>().also {
+                _unfoldedChildren = it
+            }
+            unfoldedChildren.clear()
             _foldedChildren.forEach {
                 if (it.isVirtual) {
-                    _unfoldedChildren.addAll(it._children)
+                    unfoldedChildren.addAll(it._children)
                 } else {
-                    _unfoldedChildren.add(it)
+                    unfoldedChildren.add(it)
                 }
             }
         }
@@ -135,7 +135,7 @@ internal class LayoutNode : Measurable, Remeasurement, OwnerScope, LayoutInfo, C
             _foldedChildren
         } else {
             recreateUnfoldedChildrenIfDirty()
-            _unfoldedChildren
+            _unfoldedChildren!!
         }
 
     /**
@@ -491,12 +491,13 @@ internal class LayoutNode : Measurable, Remeasurement, OwnerScope, LayoutInfo, C
     /**
      * The alignment lines of this layout, inherited + intrinsic
      */
-    internal val alignmentLines: MutableMap<AlignmentLine, Int> = hashMapOf()
+    internal var alignmentLines: LayoutNodeAlignmentLines? = null
+        private set
 
     /**
      * The alignment lines provided by this layout at the last measurement
      */
-    internal val providedAlignmentLines: MutableMap<AlignmentLine, Int> = hashMapOf()
+    internal var providedAlignmentLines: Map<AlignmentLine, Int> = emptyMap()
 
     internal val mDrawScope: LayoutNodeDrawScope = sharedDrawScope
 
@@ -557,8 +558,6 @@ internal class LayoutNode : Measurable, Remeasurement, OwnerScope, LayoutInfo, C
         private set
 
     internal var alignmentUsageByParent = UsageByParent.NotUsed
-
-    private val previousAlignmentLines = mutableMapOf<AlignmentLine, Int>()
 
     @Deprecated("Temporary API to support ConstraintLayout prototyping.")
     internal var canMultiMeasure: Boolean = false
@@ -638,13 +637,17 @@ internal class LayoutNode : Measurable, Remeasurement, OwnerScope, LayoutInfo, C
                 owner!!.onSemanticsChange()
             }
             val addedCallback = hasNewPositioningCallback()
-            onPositionedCallbacks.clear()
+            onPositionedCallbacks?.clear()
 
             // Create a new chain of LayoutNodeWrappers, reusing existing ones from wrappers
             // when possible.
             val outerWrapper = modifier.foldOut(innerLayoutNodeWrapper) { mod, toWrap ->
                 var wrapper = toWrap
                 if (mod is OnGloballyPositionedModifier) {
+                    val onPositionedCallbacks = onPositionedCallbacks
+                        ?: mutableVectorOf<OnGloballyPositionedModifier>().also {
+                            onPositionedCallbacks = it
+                        }
                     onPositionedCallbacks += mod
                 }
                 if (mod is RemeasurementModifier) {
@@ -763,7 +766,7 @@ internal class LayoutNode : Measurable, Remeasurement, OwnerScope, LayoutInfo, C
     /**
      * List of all OnPositioned callbacks in the modifier chain.
      */
-    private val onPositionedCallbacks = mutableVectorOf<OnGloballyPositionedModifier>()
+    private var onPositionedCallbacks: MutableVector<OnGloballyPositionedModifier>? = null
 
     /**
      * Flag used by [OnPositionedDispatcher] to identify LayoutNodes that have already
@@ -812,30 +815,11 @@ internal class LayoutNode : Measurable, Remeasurement, OwnerScope, LayoutInfo, C
     }
 
     /**
-     * Returns the alignment line value for a given alignment line without affecting whether
-     * the flag for whether the alignment line was read.
-     */
-    internal fun getAlignmentLine(alignmentLine: AlignmentLine): Int? {
-        val linePos = alignmentLines[alignmentLine] ?: return null
-        var pos = Offset(linePos.toFloat(), linePos.toFloat())
-        var wrapper = innerLayoutNodeWrapper
-        while (wrapper != outerLayoutNodeWrapper) {
-            pos = wrapper.toParentPosition(pos)
-            wrapper = wrapper.wrappedBy!!
-        }
-        pos = wrapper.toParentPosition(pos)
-        return if (alignmentLine is HorizontalAlignmentLine) {
-            pos.y.roundToInt()
-        } else {
-            pos.x.roundToInt()
-        }
-    }
-
-    /**
      * Return true if there is a new [OnGloballyPositionedModifier] assigned to this Layout.
      */
     private fun hasNewPositioningCallback(): Boolean {
-        return modifier.foldOut(false) { mod, hasNewCallback ->
+        val onPositionedCallbacks = onPositionedCallbacks
+        return onPositionedCallbacks != null && modifier.foldOut(false) { mod, hasNewCallback ->
             hasNewCallback ||
                 (mod is OnGloballyPositionedModifier && mod !in onPositionedCallbacks)
         }
@@ -922,6 +906,9 @@ internal class LayoutNode : Measurable, Remeasurement, OwnerScope, LayoutInfo, C
                     // all the placed children.
                     if (child.placeOrder == NotPlacedPlaceOrder) {
                         child.markSubtreeAsNotPlaced()
+                        // we have to invalidate here in order to stop displaying the child
+                        // which is not placed anymore.
+                        invalidateLayer()
                     }
                     child.alignmentLinesRead = child.alignmentLinesQueriedSinceLastLayout
                 }
@@ -930,28 +917,10 @@ internal class LayoutNode : Measurable, Remeasurement, OwnerScope, LayoutInfo, C
             alignmentLinesCalculatedDuringLastLayout = false
             if (alignmentLinesRequired) {
                 alignmentLinesCalculatedDuringLastLayout = true
-                previousAlignmentLines.clear()
-                previousAlignmentLines.putAll(alignmentLines)
-                alignmentLines.clear()
-                _children.forEach { child ->
-                    if (!child.isPlaced) return@forEach
-                    child.alignmentLines.keys.forEach { childLine ->
-                        val linePositionInContainer = child.getAlignmentLine(childLine)!!
-                        // If the line was already provided by a previous child, merge the values.
-                        alignmentLines[childLine] = if (childLine in alignmentLines) {
-                            childLine.merge(
-                                alignmentLines.getValue(childLine),
-                                linePositionInContainer
-                            )
-                        } else {
-                            linePositionInContainer
-                        }
-                    }
+                val alignments = alignmentLines ?: LayoutNodeAlignmentLines(this).also {
+                    alignmentLines = it
                 }
-                alignmentLines += providedAlignmentLines
-                if (previousAlignmentLines != alignmentLines) {
-                    onAlignmentsChanged()
-                }
+                alignments.recalculate()
             }
             layoutState = Ready
         }
@@ -1055,13 +1024,12 @@ internal class LayoutNode : Measurable, Remeasurement, OwnerScope, LayoutInfo, C
             layoutState = endState
         }
         isCalculatingAlignmentLines = false
-        return alignmentLines
+        return alignmentLines?.getLastCalculation() ?: emptyMap()
     }
 
     internal fun handleMeasureResult(measureResult: MeasureResult) {
         innerLayoutNodeWrapper.measureResult = measureResult
-        this.providedAlignmentLines.clear()
-        this.providedAlignmentLines += measureResult.alignmentLines
+        providedAlignmentLines = measureResult.alignmentLines
     }
 
     /**
@@ -1093,7 +1061,7 @@ internal class LayoutNode : Measurable, Remeasurement, OwnerScope, LayoutInfo, C
         if (!isPlaced) {
             return // it hasn't been placed, so don't make a call
         }
-        onPositionedCallbacks.forEach { it.onGloballyPositioned(coordinates) }
+        onPositionedCallbacks?.forEach { it.onGloballyPositioned(coordinates) }
     }
 
     /**
@@ -1185,8 +1153,17 @@ internal class LayoutNode : Measurable, Remeasurement, OwnerScope, LayoutInfo, C
         }
 
         modifier.foldIn(Unit) { _, mod ->
-            val wrapper = wrapperCache.firstOrNull { it.modifier === mod }
-            wrapper?.toBeReusedForSameModifier = true
+            var wrapper = wrapperCache.lastOrNull {
+                it.modifier === mod && !it.toBeReusedForSameModifier
+            }
+            // we want to walk up the chain up all LayoutNodeWrappers for the same modifier
+            while (wrapper != null) {
+                wrapper.toBeReusedForSameModifier = true
+                wrapper = if (wrapper.isChained)
+                    wrapper.wrappedBy as? DelegatingLayoutNodeWrapper<*>
+                else
+                    null
+            }
         }
     }
 

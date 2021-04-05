@@ -452,26 +452,26 @@ fun Color(
  */
 @Stable
 fun lerp(start: Color, stop: Color, /*@FloatRange(from = 0.0, to = 1.0)*/ fraction: Float): Color {
-    val linearColorSpace = ColorSpaces.LinearExtendedSrgb
-    val startColor = start.convert(linearColorSpace)
-    val endColor = stop.convert(linearColorSpace)
+    val colorSpace = ColorSpaces.Oklab
+    val startColor = start.convert(colorSpace)
+    val endColor = stop.convert(colorSpace)
 
-    val startA = startColor.alpha
-    val startR = startColor.red
-    val startG = startColor.green
+    val startAlpha = startColor.alpha
+    val startL = startColor.red
+    val startA = startColor.green
     val startB = startColor.blue
 
-    val endA = endColor.alpha
-    val endR = endColor.red
-    val endG = endColor.green
+    val endAlpha = endColor.alpha
+    val endL = endColor.red
+    val endA = endColor.green
     val endB = endColor.blue
 
     val interpolated = Color(
-        alpha = lerp(startA, endA, fraction),
-        red = lerp(startR, endR, fraction),
-        green = lerp(startG, endG, fraction),
+        alpha = lerp(startAlpha, endAlpha, fraction),
+        red = lerp(startL, endL, fraction),
+        green = lerp(startA, endA, fraction),
         blue = lerp(startB, endB, fraction),
-        colorSpace = linearColorSpace
+        colorSpace = colorSpace
     )
     return interpolated.convert(stop.colorSpace)
 }

@@ -27,9 +27,19 @@ import androidx.compose.ui.inspection.util.ThreadUtils
  * This method can take a long time, especially the first time, and should be called off the main
  * thread.
  */
-fun InspectorNode.convertParameters(layoutInspectorTree: LayoutInspectorTree): List<NodeParameter> {
+fun InspectorNode.convertParameters(
+    layoutInspectorTree: LayoutInspectorTree,
+    rootId: Long,
+    maxRecursions: Int,
+    maxInitialIterableSize: Int
+): List<NodeParameter> {
     ThreadUtils.assertOffMainThread()
-    return layoutInspectorTree.convertParameters(this)
+    return layoutInspectorTree.convertParameters(
+        rootId,
+        this,
+        maxRecursions,
+        maxInitialIterableSize
+    )
 }
 
 /**

@@ -14,22 +14,20 @@
  * limitations under the License.
  */
 
-@file:Suppress("DEPRECATION") // LongPressDragObserver
-
 package androidx.compose.foundation.text
 
-import androidx.compose.ui.geometry.Offset
-import androidx.compose.foundation.legacygestures.LongPressDragObserver
-import androidx.compose.ui.layout.LayoutCoordinates
 import androidx.compose.foundation.text.selection.Selectable
 import androidx.compose.foundation.text.selection.Selection
-import androidx.compose.foundation.text.selection.SelectionRegistrar
+import androidx.compose.foundation.text.selection.SelectionRegistrarImpl
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.layout.LayoutCoordinates
 import androidx.compose.ui.text.style.ResolvedTextDirection
-import com.google.common.truth.Truth.assertThat
 import com.nhaarman.mockitokotlin2.doReturn
 import com.nhaarman.mockitokotlin2.mock
+import com.nhaarman.mockitokotlin2.spy
 import com.nhaarman.mockitokotlin2.times
 import com.nhaarman.mockitokotlin2.verify
+import com.nhaarman.mockitokotlin2.whenever
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -38,39 +36,26 @@ import org.junit.runners.JUnit4
 @RunWith(JUnit4::class)
 @OptIn(InternalFoundationTextApi::class)
 class TextSelectionLongPressDragTest {
-    private val selectionRegistrar = mock<SelectionRegistrar>()
-    private val selectable = mock<Selectable>()
+    private val selectionRegistrar = spy(SelectionRegistrarImpl())
+    private val selectableId = 1L
+    private val selectable = mock<Selectable>().also {
+        whenever(it.selectableId).thenReturn(selectableId)
+    }
 
-    private val startSelectable = mock<Selectable>()
-    private val endSelectable = mock<Selectable>()
-
-    private val fakeInitialSelection: Selection = Selection(
+    private val fakeSelection: Selection = Selection(
         start = Selection.AnchorInfo(
             direction = ResolvedTextDirection.Ltr,
             offset = 0,
-            selectable = startSelectable
+            selectableId = selectableId
         ),
         end = Selection.AnchorInfo(
             direction = ResolvedTextDirection.Ltr,
             offset = 5,
-            selectable = endSelectable
+            selectableId = selectableId
         )
     )
 
-    private val fakeResultSelection: Selection = Selection(
-        start = Selection.AnchorInfo(
-            direction = ResolvedTextDirection.Ltr,
-            offset = 5,
-            selectable = endSelectable
-        ),
-        end = Selection.AnchorInfo(
-            direction = ResolvedTextDirection.Ltr,
-            offset = 0,
-            selectable = startSelectable
-        )
-    )
-
-    private lateinit var gesture: LongPressDragObserver
+    private lateinit var gesture: TextDragObserver
     private lateinit var layoutCoordinates: LayoutCoordinates
     private lateinit var state: TextState
 
@@ -82,21 +67,20 @@ class TextSelectionLongPressDragTest {
             on { isAttached } doReturn true
         }
 
-        state = TextState(mock<TextDelegate>())
-        state.selectionRange = null
+        state = TextState(mock(), selectableId)
         state.layoutCoordinates = layoutCoordinates
 
-        gesture = longPressDragObserver(
-            state = state,
-            selectionRegistrar = selectionRegistrar
-        )
+        val controller = TextController(state).also {
+            it.update(selectionRegistrar)
+        }
+        gesture = controller.longPressDragObserver
     }
 
     @Test
     fun longPressDragObserver_onLongPress_calls_notifySelectionInitiated() {
         val position = Offset(100f, 100f)
 
-        gesture.onLongPress(position)
+        gesture.onStart(position)
 
         verify(selectionRegistrar, times(1)).notifySelectionUpdateStart(
             layoutCoordinates = layoutCoordinates,
@@ -111,17 +95,15 @@ class TextSelectionLongPressDragTest {
         val beginPosition1 = Offset(30f, 20f)
         val dragDistance2 = Offset(100f, 300f)
         val beginPosition2 = Offset(300f, 200f)
-        gesture.onLongPress(beginPosition1)
-        gesture.onDragStart()
+        gesture.onStart(beginPosition1)
         gesture.onDrag(dragDistance1)
         // Setup. Cancel selection and reselect.
 //        selectionManager.onRelease()
         // Start the new selection
-        gesture.onLongPress(beginPosition2)
-        state.selectionRange = fakeInitialSelection.toTextRange()
+        gesture.onStart(beginPosition2)
+        selectionRegistrar.subselections = mapOf(selectableId to fakeSelection)
 
         // Act. Reset selectionManager.dragTotalDistance to zero.
-        gesture.onDragStart()
         gesture.onDrag(dragDistance2)
 
         // Verify.
@@ -137,13 +119,10 @@ class TextSelectionLongPressDragTest {
     fun longPressDragObserver_onDrag_calls_notifySelectionDrag() {
         val dragDistance = Offset(15f, 10f)
         val beginPosition = Offset(30f, 20f)
-        gesture.onLongPress(beginPosition)
-        state.selectionRange = fakeInitialSelection.toTextRange()
-        gesture.onDragStart()
+        gesture.onStart(beginPosition)
+        selectionRegistrar.subselections = mapOf(selectableId to fakeSelection)
 
-        val result = gesture.onDrag(dragDistance)
-
-        assertThat(result).isEqualTo(dragDistance)
+        gesture.onDrag(dragDistance)
         verify(selectionRegistrar, times(1))
             .notifySelectionUpdate(
                 layoutCoordinates = layoutCoordinates,
@@ -154,12 +133,10 @@ class TextSelectionLongPressDragTest {
 
     @Test
     fun longPressDragObserver_onStop_calls_notifySelectionEnd() {
-        val dragDistance = Offset(15f, 10f)
         val beginPosition = Offset(30f, 20f)
-        gesture.onLongPress(beginPosition)
-        state.selectionRange = fakeInitialSelection.toTextRange()
-        gesture.onDragStart()
-        gesture.onStop(dragDistance)
+        gesture.onStart(beginPosition)
+        selectionRegistrar.subselections = mapOf(selectableId to fakeSelection)
+        gesture.onStop()
 
         verify(selectionRegistrar, times(1))
             .notifySelectionUpdateEnd()
@@ -168,9 +145,8 @@ class TextSelectionLongPressDragTest {
     @Test
     fun longPressDragObserver_onCancel_calls_notifySelectionEnd() {
         val beginPosition = Offset(30f, 20f)
-        gesture.onLongPress(beginPosition)
-        state.selectionRange = fakeInitialSelection.toTextRange()
-        gesture.onDragStart()
+        gesture.onStart(beginPosition)
+        selectionRegistrar.subselections = mapOf(selectableId to fakeSelection)
         gesture.onCancel()
 
         verify(selectionRegistrar, times(1))

@@ -99,7 +99,7 @@ class SemanticsTests {
     }
 
     @Test
-    fun depthFirstLabelConcat() {
+    fun depthFirstPropertyConcat() {
         val root = "root"
         val child1 = "child1"
         val grandchild1 = "grandchild1"
@@ -108,17 +108,17 @@ class SemanticsTests {
         rule.setContent {
             SimpleTestLayout(
                 Modifier.testTag(TestTag)
-                    .semantics(mergeDescendants = true) { contentDescription = root }
+                    .semantics(mergeDescendants = true) { testProperty = root }
             ) {
-                SimpleTestLayout(Modifier.semantics { contentDescription = child1 }) {
-                    SimpleTestLayout(Modifier.semantics { contentDescription = grandchild1 }) { }
-                    SimpleTestLayout(Modifier.semantics { contentDescription = grandchild2 }) { }
+                SimpleTestLayout(Modifier.semantics { testProperty = child1 }) {
+                    SimpleTestLayout(Modifier.semantics { testProperty = grandchild1 }) { }
+                    SimpleTestLayout(Modifier.semantics { testProperty = grandchild2 }) { }
                 }
-                SimpleTestLayout(Modifier.semantics { contentDescription = child2 }) { }
+                SimpleTestLayout(Modifier.semantics { testProperty = child2 }) { }
             }
         }
 
-        rule.onNodeWithTag(TestTag).assertContentDescriptionEquals(
+        rule.onNodeWithTag(TestTag).assertTestPropertyEquals(
             "$root, $child1, $grandchild1, $grandchild2, $child2"
         )
     }
@@ -131,15 +131,36 @@ class SemanticsTests {
         val label2 = "bar"
         rule.setContent {
             SimpleTestLayout(Modifier.semantics(mergeDescendants = true) {}.testTag(tag1)) {
-                SimpleTestLayout(Modifier.semantics { contentDescription = label1 }) { }
+                SimpleTestLayout(Modifier.semantics { testProperty = label1 }) { }
                 SimpleTestLayout(Modifier.semantics(mergeDescendants = true) {}.testTag(tag2)) {
-                    SimpleTestLayout(Modifier.semantics { contentDescription = label2 }) { }
+                    SimpleTestLayout(Modifier.semantics { testProperty = label2 }) { }
                 }
             }
         }
 
-        rule.onNodeWithTag(tag1).assertContentDescriptionEquals(label1)
-        rule.onNodeWithTag(tag2).assertContentDescriptionEquals(label2)
+        rule.onNodeWithTag(tag1).assertTestPropertyEquals(label1)
+        rule.onNodeWithTag(tag2).assertTestPropertyEquals(label2)
+    }
+
+    @Test
+    fun nestedMergedSubtree_includeAllMergeableChildren() {
+        val tag1 = "tag1"
+        val tag2 = "tag2"
+        val label1 = "foo"
+        val label2 = "bar"
+        val label3 = "hi"
+        rule.setContent {
+            SimpleTestLayout(Modifier.semantics(mergeDescendants = true) {}.testTag(tag1)) {
+                SimpleTestLayout(Modifier.semantics { testProperty = label1 }) { }
+                SimpleTestLayout(Modifier.semantics(mergeDescendants = true) {}.testTag(tag2)) {
+                    SimpleTestLayout(Modifier.semantics { testProperty = label2 }) { }
+                }
+                SimpleTestLayout(Modifier.semantics { testProperty = label3 }) { }
+            }
+        }
+
+        rule.onNodeWithTag(tag1).assertTestPropertyEquals("$label1, $label3")
+        rule.onNodeWithTag(tag2).assertTestPropertyEquals(label2)
     }
 
     @Test
@@ -151,12 +172,12 @@ class SemanticsTests {
         val label3 = "baz"
         rule.setContent {
             SimpleTestLayout(Modifier.semantics(mergeDescendants = true) {}.testTag(tag1)) {
-                SimpleTestLayout(Modifier.semantics { contentDescription = label1 }) { }
+                SimpleTestLayout(Modifier.semantics { testProperty = label1 }) { }
                 SimpleTestLayout(Modifier.clearAndSetSemantics {}) {
-                    SimpleTestLayout(Modifier.semantics { contentDescription = label2 }) { }
+                    SimpleTestLayout(Modifier.semantics { testProperty = label2 }) { }
                 }
-                SimpleTestLayout(Modifier.clearAndSetSemantics { contentDescription = label3 }) {
-                    SimpleTestLayout(Modifier.semantics { contentDescription = label2 }) { }
+                SimpleTestLayout(Modifier.clearAndSetSemantics { testProperty = label3 }) {
+                    SimpleTestLayout(Modifier.semantics { testProperty = label2 }) { }
                 }
                 SimpleTestLayout(
                     Modifier.semantics(mergeDescendants = true) {}.testTag(tag2)
@@ -167,7 +188,7 @@ class SemanticsTests {
             }
         }
 
-        rule.onNodeWithTag(tag1).assertContentDescriptionEquals("$label1, $label3")
+        rule.onNodeWithTag(tag1).assertTestPropertyEquals("$label1, $label3")
         rule.onNodeWithTag(tag2).assertTextEquals(label1)
     }
 
@@ -182,26 +203,26 @@ class SemanticsTests {
             SimpleTestLayout(Modifier.semantics(mergeDescendants = true) {}.testTag(tag1)) {
                 SimpleTestLayout(
                     Modifier
-                        .clearAndSetSemantics { contentDescription = label1 }
+                        .clearAndSetSemantics { testProperty = label1 }
                         .semantics { text = AnnotatedString(label2) }
                 ) {}
                 SimpleTestLayout(
                     Modifier
-                        .semantics { contentDescription = label3 }
+                        .semantics { testProperty = label3 }
                         .clearAndSetSemantics { text = AnnotatedString(label3) }
                 ) {}
             }
             SimpleTestLayout(
                 Modifier.testTag(tag2)
-                    .semantics { contentDescription = label1 }
+                    .semantics { testProperty = label1 }
                     .clearAndSetSemantics {}
                     .semantics { text = AnnotatedString(label1) }
             ) {}
         }
 
-        rule.onNodeWithTag(tag1).assertContentDescriptionEquals("$label1, $label3")
+        rule.onNodeWithTag(tag1).assertTestPropertyEquals("$label1, $label3")
         rule.onNodeWithTag(tag1).assertTextEquals(label3)
-        rule.onNodeWithTag(tag2).assertContentDescriptionEquals("$label1")
+        rule.onNodeWithTag(tag2).assertTestPropertyEquals("$label1")
         rule.onNodeWithTag(tag2).assertDoesNotHaveProperty(SemanticsProperties.Text)
     }
 
@@ -212,17 +233,17 @@ class SemanticsTests {
         rule.setContent {
             SimpleTestLayout(Modifier.semantics(mergeDescendants = true) {}.testTag(TestTag)) {
                 if (showSubtree.value) {
-                    SimpleTestLayout(Modifier.semantics { contentDescription = label }) { }
+                    SimpleTestLayout(Modifier.semantics { testProperty = label }) { }
                 }
             }
         }
 
-        rule.onNodeWithTag(TestTag).assertContentDescriptionEquals(label)
+        rule.onNodeWithTag(TestTag).assertTestPropertyEquals(label)
 
         rule.runOnIdle { showSubtree.value = false }
 
         rule.onNodeWithTag(TestTag)
-            .assertDoesNotHaveProperty(SemanticsProperties.ContentDescription)
+            .assert(SemanticsMatcher.keyNotDefined(TestProperty))
 
         rule.onAllNodesWithText(label).assertCountEquals(0)
     }
@@ -234,7 +255,7 @@ class SemanticsTests {
         val showNewNode = mutableStateOf(false)
         rule.setContent {
             SimpleTestLayout(Modifier.semantics(mergeDescendants = true) {}.testTag(TestTag)) {
-                SimpleTestLayout(Modifier.semantics { contentDescription = label }) { }
+                SimpleTestLayout(Modifier.semantics { testProperty = label }) { }
                 if (showNewNode.value) {
                     SimpleTestLayout(Modifier.semantics { stateDescription = value }) { }
                 }
@@ -242,13 +263,13 @@ class SemanticsTests {
         }
 
         rule.onNodeWithTag(TestTag)
-            .assertContentDescriptionEquals(label)
+            .assertTestPropertyEquals(label)
             .assertDoesNotHaveProperty(SemanticsProperties.StateDescription)
 
         rule.runOnIdle { showNewNode.value = true }
 
         rule.onNodeWithTag(TestTag)
-            .assertContentDescriptionEquals(label)
+            .assertTestPropertyEquals(label)
             .assertValueEquals(value)
     }
 
@@ -351,17 +372,17 @@ class SemanticsTests {
             SimpleTestLayout(Modifier.testTag(TestTag).semantics(mergeDescendants = true) {}) {
                 SimpleTestLayout(
                     Modifier.semantics {
-                        contentDescription = if (isAfter.value) afterLabel else beforeLabel
+                        testProperty = if (isAfter.value) afterLabel else beforeLabel
                     }
                 ) {}
             }
         }
 
-        rule.onNodeWithTag(TestTag).assertContentDescriptionEquals(beforeLabel)
+        rule.onNodeWithTag(TestTag).assertTestPropertyEquals(beforeLabel)
 
         rule.runOnIdle { isAfter.value = true }
 
-        rule.onNodeWithTag(TestTag).assertContentDescriptionEquals(afterLabel)
+        rule.onNodeWithTag(TestTag).assertTestPropertyEquals(afterLabel)
     }
 
     @Test
@@ -706,6 +727,15 @@ class SemanticsTests {
 private fun SemanticsNodeInteraction.assertDoesNotHaveProperty(property: SemanticsPropertyKey<*>) {
     assert(SemanticsMatcher.keyNotDefined(property))
 }
+
+private val TestProperty = SemanticsPropertyKey<String>("TestProperty") { parent, child ->
+    if (parent == null) child else "$parent, $child"
+}
+private var SemanticsPropertyReceiver.testProperty by TestProperty
+
+private fun SemanticsNodeInteraction.assertTestPropertyEquals(value: String) = assert(
+    SemanticsMatcher.expectValue(TestProperty, value)
+)
 
 // Falsely mark the layout counter stable to avoid influencing recomposition behavior
 @Stable

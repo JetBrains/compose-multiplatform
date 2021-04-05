@@ -32,7 +32,6 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.swing.Swing
 import org.jetbrains.skija.Canvas
-import org.jetbrains.skiko.HardwareLayer
 import org.jetbrains.skiko.SkiaLayer
 import org.jetbrains.skiko.SkiaRenderer
 import java.awt.Point
@@ -113,7 +112,7 @@ internal class ComposeLayer {
             get() = this@ComposeLayer.density
     }
 
-    val component: HardwareLayer
+    val component: SkiaLayer
         get() = wrapped
 
     init {
@@ -162,6 +161,17 @@ internal class ComposeLayer {
                     event
                 )
             }
+
+            override fun mouseEntered(event: MouseEvent) = events.post {
+                owners.onMouseEntered(
+                    (event.x * density.density).toInt(),
+                    (event.y * density.density).toInt()
+                )
+            }
+
+            override fun mouseExited(event: MouseEvent) = events.post {
+                owners.onMouseExited()
+            }
         })
         wrapped.addMouseMotionListener(object : MouseMotionAdapter() {
             override fun mouseDragged(event: MouseEvent) = events.post {
@@ -188,6 +198,7 @@ internal class ComposeLayer {
                 )
             }
         }
+        wrapped.focusTraversalKeysEnabled = false
         wrapped.addKeyListener(object : KeyAdapter() {
             override fun keyPressed(event: KeyEvent) = events.post {
                 owners.onKeyPressed(event)

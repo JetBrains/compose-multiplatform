@@ -16,18 +16,13 @@
 
 package androidx.compose.material
 
-import androidx.compose.animation.core.Animatable
-import androidx.compose.animation.core.AnimationVector1D
-import androidx.compose.animation.core.TweenSpec
 import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.Immutable
 import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.Immutable
 import androidx.compose.runtime.Stable
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.staticCompositionLocalOf
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -39,7 +34,6 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.util.fastForEach
 import androidx.compose.ui.util.fastMap
 import androidx.compose.ui.util.fastMaxBy
-import kotlinx.coroutines.launch
 
 /**
  * State for [Scaffold] composable component.
@@ -227,9 +221,6 @@ private fun ScaffoldLayout(
     fab: @Composable () -> Unit,
     bottomBar: @Composable () -> Unit
 ) {
-    val fabAnimatableState =
-        remember { mutableStateOf<Animatable<Float, AnimationVector1D>?>(null) }
-    val scope = rememberCoroutineScope()
     SubcomposeLayout { constraints ->
         val layoutWidth = constraints.maxWidth
         val layoutHeight = constraints.maxHeight
@@ -249,16 +240,16 @@ private fun ScaffoldLayout(
 
             val snackbarHeight = snackbarPlaceables.fastMaxBy { it.height }?.height ?: 0
 
-            val fabPlaceables = subcompose(ScaffoldLayoutContent.Fab, fab).fastMap {
-                it.measure(looseConstraints)
-            }
+            val fabPlaceables =
+                subcompose(ScaffoldLayoutContent.Fab, fab).mapNotNull { measurable ->
+                    measurable.measure(looseConstraints).takeIf { it.height != 0 && it.width != 0 }
+                }
 
-            val fabWidth = fabPlaceables.fastMaxBy { it.width }?.width ?: 0
-            val fabHeight = fabPlaceables.fastMaxBy { it.height }?.height ?: 0
-
-            // FAB distance from the left of the layout, taking into account LTR / RTL
-            val fabLeftOffset = if (fabWidth != 0 && fabHeight != 0) {
-                if (fabPosition == FabPosition.End) {
+            val fabPlacement = if (fabPlaceables.isNotEmpty()) {
+                val fabWidth = fabPlaceables.fastMaxBy { it.width }!!.width
+                val fabHeight = fabPlaceables.fastMaxBy { it.height }!!.height
+                // FAB distance from the left of the layout, taking into account LTR / RTL
+                val fabLeftOffset = if (fabPosition == FabPosition.End) {
                     if (layoutDirection == LayoutDirection.Ltr) {
                         layoutWidth - FabSpacing.roundToPx() - fabWidth
                     } else {
@@ -267,28 +258,10 @@ private fun ScaffoldLayout(
                 } else {
                     (layoutWidth - fabWidth) / 2
                 }
-            } else {
-                0
-            }
 
-            val floatOffset = fabLeftOffset.toFloat()
-
-            val fabAnimatable = fabAnimatableState.value ?: Animatable(floatOffset).also {
-                fabAnimatableState.value = it
-            }
-            if (fabAnimatable.targetValue != floatOffset) {
-                scope.launch {
-                    fabAnimatable.animateTo(
-                        targetValue = floatOffset,
-                        animationSpec = FabPositionAnimationSpec
-                    )
-                }
-            }
-
-            val fabPlacement = if (fabWidth != 0 && fabHeight != 0) {
                 FabPlacement(
                     isDocked = isFabDocked,
-                    left = fabAnimatable.value.toInt(),
+                    left = fabLeftOffset,
                     width = fabWidth,
                     height = fabHeight
                 )
@@ -304,30 +277,23 @@ private fun ScaffoldLayout(
             }.fastMap { it.measure(looseConstraints) }
 
             val bottomBarHeight = bottomBarPlaceables.fastMaxBy { it.height }?.height ?: 0
-
-            val fabOffsetFromBottom = if (fabWidth != 0 && fabHeight != 0) {
+            val fabOffsetFromBottom = fabPlacement?.let {
                 if (bottomBarHeight == 0) {
-                    fabHeight + FabSpacing.roundToPx()
+                    it.height + FabSpacing.roundToPx()
                 } else {
                     if (isFabDocked) {
                         // Total height is the bottom bar height + half the FAB height
-                        bottomBarHeight + (fabHeight / 2)
+                        bottomBarHeight + (it.height / 2)
                     } else {
                         // Total height is the bottom bar height + the FAB height + the padding
                         // between the FAB and bottom bar
-                        bottomBarHeight + fabHeight + FabSpacing.roundToPx()
+                        bottomBarHeight + it.height + FabSpacing.roundToPx()
                     }
                 }
-            } else {
-                0
             }
 
             val snackbarOffsetFromBottom = if (snackbarHeight != 0) {
-                snackbarHeight + if (fabOffsetFromBottom != 0) {
-                    fabOffsetFromBottom
-                } else {
-                    bottomBarHeight
-                }
+                snackbarHeight + (fabOffsetFromBottom ?: bottomBarHeight)
             } else {
                 0
             }
@@ -355,8 +321,10 @@ private fun ScaffoldLayout(
                 it.place(0, layoutHeight - bottomBarHeight)
             }
             // Explicitly not using placeRelative here as `leftOffset` already accounts for RTL
-            fabPlaceables.fastForEach {
-                it.place(fabAnimatable.value.toInt(), layoutHeight - fabOffsetFromBottom)
+            fabPlacement?.let { placement ->
+                fabPlaceables.fastForEach {
+                    it.place(placement.left, layoutHeight - fabOffsetFromBottom!!)
+                }
             }
         }
     }
@@ -389,5 +357,3 @@ internal val LocalFabPlacement = staticCompositionLocalOf<FabPlacement?> { null 
 private val FabSpacing = 16.dp
 
 private enum class ScaffoldLayoutContent { TopBar, MainContent, Snackbar, Fab, BottomBar }
-
-private val FabPositionAnimationSpec = TweenSpec<Float>(durationMillis = 200)

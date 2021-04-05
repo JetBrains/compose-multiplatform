@@ -225,28 +225,41 @@ internal suspend fun <T, V : AnimationVector> AnimationState<T, V>.animate(
     val initialVelocityVector = animation.getVelocityVectorFromNanos(0)
     var lateInitScope: AnimationScope<T, V>? = null
     try {
-        val startTimeNanosSpecified =
-            if (startTimeNanos == AnimationConstants.UnspecifiedTime) {
-                animation.callWithFrameNanos { it }
-            } else {
-                startTimeNanos
-            }
-        lateInitScope = AnimationScope(
-            initialValue = initialValue,
-            typeConverter = animation.typeConverter,
-            initialVelocityVector = initialVelocityVector,
-            lastFrameTimeNanos = startTimeNanosSpecified,
-            targetValue = animation.targetValue,
-            startTimeNanos = startTimeNanosSpecified,
-            isRunning = true,
-            onCancel = { isRunning = false }
-        )
-        // First frame
-        lateInitScope.doAnimationFrame(startTimeNanosSpecified, animation, this, block)
-        // Subsequent frames
-        while (lateInitScope.isRunning) {
+        if (startTimeNanos == AnimationConstants.UnspecifiedTime) {
             animation.callWithFrameNanos {
-                lateInitScope.doAnimationFrame(it, animation, this, block)
+                lateInitScope = AnimationScope(
+                    initialValue = initialValue,
+                    typeConverter = animation.typeConverter,
+                    initialVelocityVector = initialVelocityVector,
+                    lastFrameTimeNanos = it,
+                    targetValue = animation.targetValue,
+                    startTimeNanos = it,
+                    isRunning = true,
+                    onCancel = { isRunning = false }
+                ).apply {
+                    // First frame
+                    doAnimationFrame(it, animation, this@animate, block)
+                }
+            }
+        } else {
+            lateInitScope = AnimationScope(
+                initialValue = initialValue,
+                typeConverter = animation.typeConverter,
+                initialVelocityVector = initialVelocityVector,
+                lastFrameTimeNanos = startTimeNanos,
+                targetValue = animation.targetValue,
+                startTimeNanos = startTimeNanos,
+                isRunning = true,
+                onCancel = { isRunning = false }
+            ).apply {
+                // First frame
+                doAnimationFrame(startTimeNanos, animation, this@animate, block)
+            }
+        }
+        // Subsequent frames
+        while (lateInitScope!!.isRunning) {
+            animation.callWithFrameNanos {
+                lateInitScope!!.doAnimationFrame(it, animation, this, block)
             }
         }
         // End of animation

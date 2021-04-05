@@ -17,6 +17,8 @@
 package androidx.compose.animation.demos
 
 import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.EnterTransition
+import androidx.compose.animation.ExitTransition
 import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.animation.expandHorizontally
 import androidx.compose.animation.expandIn
@@ -26,27 +28,32 @@ import androidx.compose.animation.fadeOut
 import androidx.compose.animation.shrinkHorizontally
 import androidx.compose.animation.shrinkOut
 import androidx.compose.animation.shrinkVertically
+import androidx.compose.animation.slideIn
+import androidx.compose.animation.slideInHorizontally
+import androidx.compose.animation.slideInVertically
+import androidx.compose.animation.slideOut
+import androidx.compose.animation.slideOutHorizontally
+import androidx.compose.animation.slideOutVertically
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.selection.selectable
 import androidx.compose.material.Button
 import androidx.compose.material.Checkbox
-import androidx.compose.material.RadioButton
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -66,6 +73,9 @@ import androidx.compose.ui.Alignment.Companion.TopEnd
 import androidx.compose.ui.Alignment.Companion.TopStart
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.unit.IntOffset
+import androidx.compose.ui.unit.IntSize
+import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 
 @Composable
@@ -75,7 +85,10 @@ fun EnterExitTransitionDemo() {
 
         var alignment by remember { mutableStateOf(TopStart) }
         var visible by remember { mutableStateOf(true) }
-        val (selectedOption, onOptionSelected) = remember { mutableStateOf(0) }
+        val selectedOptions = remember { mutableStateListOf(false, true, false) }
+        val onOptionSelected: (Int) -> Unit = remember {
+            { selectedOptions[it] = !selectedOptions[it] }
+        }
         Column(Modifier.fillMaxSize()) {
             Button(
                 modifier = Modifier.align(CenterHorizontally),
@@ -116,7 +129,13 @@ fun EnterExitTransitionDemo() {
                         Text("Bottom\nStart")
                     }
                 }
-                CenterMenu(selectedOption, oppositeAlignment.value, alignment, visible)
+                CenterMenu(
+                    Modifier.weight(1f),
+                    selectedOptions,
+                    oppositeAlignment.value,
+                    alignment,
+                    visible
+                )
                 Box(Modifier.fillMaxHeight().wrapContentWidth()) {
                     Button(
                         modifier = Modifier.align(TopStart),
@@ -158,7 +177,7 @@ fun EnterExitTransitionDemo() {
             }
 
             AlignmentOption(oppositeAlignment)
-            FadeOptions(selectedOption, onOptionSelected)
+            TransitionOptions(selectedOptions, onOptionSelected)
         }
     }
 }
@@ -177,46 +196,80 @@ fun AlignmentOption(state: MutableState<Boolean>) {
 @OptIn(ExperimentalAnimationApi::class)
 @Composable
 fun CenterMenu(
-    selectedOption: Int,
+    modifier: Modifier = Modifier,
+    selectedOptions: List<Boolean>,
     oppositeDirection: Boolean,
     alignment: Alignment,
     visible: Boolean
 ) {
-    Box(with(RowScope) { Modifier.fillMaxHeight().weight(1f) }) {
+    Box(modifier.fillMaxHeight()) {
 
         val animationAlignment = if (oppositeDirection) opposite(alignment) else alignment
-        val enter = when (animationAlignment) {
+        val expand = when (animationAlignment) {
             TopCenter -> expandVertically(expandFrom = Top)
             BottomCenter -> expandVertically(expandFrom = Bottom)
             CenterStart -> expandHorizontally(expandFrom = Start)
             CenterEnd -> expandHorizontally(expandFrom = End)
             else -> expandIn(animationAlignment)
-        }.run {
-            if (selectedOption >= 1) {
-                this + fadeIn()
-            } else {
-                this
-            }
         }
 
-        val exit = when (animationAlignment) {
+        val shrink = when (animationAlignment) {
             TopCenter -> shrinkVertically(shrinkTowards = Top)
             BottomCenter -> shrinkVertically(shrinkTowards = Bottom)
             CenterStart -> shrinkHorizontally(shrinkTowards = Start)
             CenterEnd -> shrinkHorizontally(shrinkTowards = End)
             else -> shrinkOut(animationAlignment)
-        }.run {
-            if (selectedOption >= 2) {
-                this + fadeOut()
-            } else {
-                this
+        }
+
+        val slideIn = when (alignment) {
+            TopCenter -> slideInVertically({ -it })
+            BottomCenter -> slideInVertically({ it })
+            CenterStart -> slideInHorizontally({ -it })
+            CenterEnd -> slideInHorizontally({ it })
+            TopStart -> slideIn({ IntOffset(-it.width, -it.height) })
+            BottomStart -> slideIn({ IntOffset(-it.width, it.height) })
+            TopEnd -> slideIn({ IntOffset(it.width, -it.height) })
+            BottomEnd -> slideIn({ IntOffset(it.width, it.height) })
+            else -> slideIn({ alignment.align(it, IntSize.Zero, LayoutDirection.Ltr) })
+        }
+        val slideOut = when (alignment) {
+            TopCenter -> slideOutVertically({ -it })
+            BottomCenter -> slideOutVertically({ it })
+            CenterStart -> slideOutHorizontally({ -it })
+            CenterEnd -> slideOutHorizontally({ it })
+            TopStart -> slideOut({ IntOffset(-it.width, -it.height) })
+            BottomStart -> slideOut({ IntOffset(-it.width, it.height) })
+            TopEnd -> slideOut({ IntOffset(it.width, -it.height) })
+            BottomEnd -> slideOut({ IntOffset(it.width, it.height) })
+            else -> slideOut({ alignment.align(IntSize.Zero, it, LayoutDirection.Ltr) })
+        }
+
+        var enter: EnterTransition? = null
+        selectedOptions.forEachIndexed { index: Int, selected: Boolean ->
+            if (selected) {
+                enter = when (index) {
+                    0 -> enter?.plus(fadeIn()) ?: fadeIn()
+                    1 -> enter?.plus(expand) ?: expand
+                    else -> enter?.plus(slideIn) ?: slideIn
+                }
             }
         }
+        var exit: ExitTransition? = null
+        selectedOptions.forEachIndexed { index: Int, selected: Boolean ->
+            if (selected) {
+                exit = when (index) {
+                    0 -> exit?.plus(fadeOut()) ?: fadeOut()
+                    1 -> exit?.plus(shrink) ?: shrink
+                    else -> exit?.plus(slideOut) ?: slideOut
+                }
+            }
+        }
+
         AnimatedVisibility(
             visible,
-            Modifier.align(alignment),
-            enter = enter,
-            exit = exit
+            if (selectedOptions[1]) Modifier.align(alignment) else Modifier,
+            enter = enter ?: fadeIn(),
+            exit = exit ?: fadeOut()
         ) {
             val menuText = remember {
                 mutableListOf<String>().apply {
@@ -235,29 +288,25 @@ fun CenterMenu(
 }
 
 @Composable
-fun FadeOptions(selectedOption: Int, onOptionSelected: (Int) -> Unit) {
+fun TransitionOptions(selectedOptions: List<Boolean>, onOptionSelected: (Int) -> Unit) {
     Column {
-        Text(
-            text = "Combine with:",
-            modifier = Modifier.padding(start = 16.dp)
-        )
         val radioOptions =
-            listOf("No Fade", "Fade In", "Fade Out", "Fade In & Fade out")
+            listOf("Fade", "Expand/Shrink", "Slide")
         radioOptions.forEachIndexed { i, text ->
             Row(
                 Modifier
                     .fillMaxWidth()
                     .height(30.dp)
                     .selectable(
-                        selected = (i == selectedOption),
+                        selected = selectedOptions[i],
                         onClick = { onOptionSelected(i) }
                     )
                     .padding(horizontal = 16.dp),
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                RadioButton(
-                    selected = (i == selectedOption),
-                    onClick = { onOptionSelected(i) }
+                Checkbox(
+                    checked = selectedOptions[i],
+                    onCheckedChange = { onOptionSelected(i) }
                 )
                 Text(
                     text = text,

@@ -267,7 +267,7 @@ internal class AndroidParagraph constructor(
         )
     }
 
-    private val wordBoundary: WordBoundary by lazy {
+    private val wordBoundary: WordBoundary by lazy(LazyThreadSafetyMode.NONE) {
         WordBoundary(textLocale, layout.text)
     }
 

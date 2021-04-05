@@ -18,6 +18,9 @@
 
 package androidx.compose.ui.lint
 
+import androidx.compose.lint.Names
+import androidx.compose.lint.inheritsFrom
+import androidx.compose.lint.isComposable
 import androidx.compose.ui.lint.ModifierDeclarationDetector.Companion.ComposableModifierFactory
 import androidx.compose.ui.lint.ModifierDeclarationDetector.Companion.ModifierFactoryReturnType
 import com.android.tools.lint.client.api.UElementHandler
@@ -32,7 +35,6 @@ import com.android.tools.lint.detector.api.Severity
 import com.android.tools.lint.detector.api.SourceCodeScanner
 import com.intellij.psi.PsiClass
 import com.intellij.psi.PsiType
-import com.intellij.psi.util.InheritanceUtil
 import org.jetbrains.kotlin.psi.KtCallableDeclaration
 import org.jetbrains.kotlin.psi.KtDeclarationWithBody
 import org.jetbrains.kotlin.psi.KtFunction
@@ -49,9 +51,11 @@ import java.util.EnumSet
 /**
  * [Detector] that checks functions returning Modifiers for consistency with guidelines.
  *
- * - Modifier factory functions must return Modifier as their type, and not a subclass of Modifier
- * - Modifier factory functions must be defined as an extension on Modifier to allow fluent chaining
- * - Modifier factory functions must not be marked as @Composable, and should use `composed` instead
+ * - Modifier factory functions should return Modifier as their type, and not a subclass of Modifier
+ * - Modifier factory functions should be defined as an extension on Modifier to allow fluent
+ * chaining
+ * - Modifier factory functions should not be marked as @Composable, and should use `composed`
+ * instead
  */
 class ModifierDeclarationDetector : Detector(), SourceCodeScanner {
     override fun getApplicableUastTypes() = listOf(UMethod::class.java)
@@ -62,7 +66,7 @@ class ModifierDeclarationDetector : Detector(), SourceCodeScanner {
             val returnType = node.returnType ?: return
 
             // Ignore functions that do not return Modifier or something implementing Modifier
-            if (!InheritanceUtil.isInheritor(returnType, ModifierFqn)) return
+            if (!returnType.inheritsFrom(Names.Ui.Modifier)) return
 
             val source = node.sourcePsi
 
@@ -99,7 +103,7 @@ class ModifierDeclarationDetector : Detector(), SourceCodeScanner {
                 "androidx.compose.ui.composed {} in their implementation instead of being marked " +
                 "as @Composable. This allows Modifiers to be referenced in top level variables " +
                 "and constructed outside of the composition.",
-            Category.CORRECTNESS, 3, Severity.ERROR,
+            Category.CORRECTNESS, 3, Severity.WARNING,
             Implementation(
                 ModifierDeclarationDetector::class.java,
                 EnumSet.of(Scope.JAVA_FILE, Scope.TEST_SOURCES)
@@ -108,10 +112,10 @@ class ModifierDeclarationDetector : Detector(), SourceCodeScanner {
 
         val ModifierFactoryReturnType = Issue.create(
             "ModifierFactoryReturnType",
-            "Modifier factory functions must return Modifier",
-            "Modifier factory functions must return Modifier as their type, and not a " +
+            "Modifier factory functions should return Modifier",
+            "Modifier factory functions should return Modifier as their type, and not a " +
                 "subtype of Modifier (such as Modifier.Element).",
-            Category.CORRECTNESS, 3, Severity.ERROR,
+            Category.CORRECTNESS, 3, Severity.WARNING,
             Implementation(
                 ModifierDeclarationDetector::class.java,
                 EnumSet.of(Scope.JAVA_FILE, Scope.TEST_SOURCES)
@@ -120,10 +124,10 @@ class ModifierDeclarationDetector : Detector(), SourceCodeScanner {
 
         val ModifierFactoryExtensionFunction = Issue.create(
             "ModifierFactoryExtensionFunction",
-            "Modifier factory functions must be extensions on Modifier",
-            "Modifier factory functions must be defined as extension functions on" +
+            "Modifier factory functions should be extensions on Modifier",
+            "Modifier factory functions should be defined as extension functions on" +
                 " Modifier to allow modifiers to be fluently chained.",
-            Category.CORRECTNESS, 3, Severity.ERROR,
+            Category.CORRECTNESS, 3, Severity.WARNING,
             Implementation(
                 ModifierDeclarationDetector::class.java,
                 EnumSet.of(Scope.JAVA_FILE, Scope.TEST_SOURCES)
@@ -183,7 +187,7 @@ private fun UMethod.checkReceiver(context: JavaContext) {
             ModifierDeclarationDetector.ModifierFactoryExtensionFunction,
             this,
             context.getNameLocation(this),
-            "Modifier factory functions must be extensions on Modifier",
+            "Modifier factory functions should be extensions on Modifier",
             lintFix
         )
     }
@@ -205,7 +209,7 @@ private fun UMethod.checkReceiver(context: JavaContext) {
                 .name("Add Modifier receiver")
                 .range(context.getLocation(source))
                 .text(name)
-                .with("$ModifierShortName.$name")
+                .with("${Names.Ui.Modifier.shortName}.$name")
                 .autoFix()
                 .build()
         )
@@ -218,10 +222,10 @@ private fun UMethod.checkReceiver(context: JavaContext) {
             )?.qualifiedName
         val hasModifierReceiver = if (receiverFqn != null) {
             // If we could resolve the class, match fqn
-            receiverFqn == ModifierFqn
+            receiverFqn == Names.Ui.Modifier.javaFqn
         } else {
             // Otherwise just try and match the short names
-            receiverShortName == ModifierShortName
+            receiverShortName == Names.Ui.Modifier.shortName
         }
         if (!hasModifierReceiver) {
             report(
@@ -230,7 +234,7 @@ private fun UMethod.checkReceiver(context: JavaContext) {
                     .name("Change receiver to Modifier")
                     .range(context.getLocation(source))
                     .text(receiverShortName)
-                    .with(ModifierShortName)
+                    .with(Names.Ui.Modifier.shortName)
                     .autoFix()
                     .build()
             )
@@ -247,12 +251,12 @@ private fun UMethod.checkReturnType(context: JavaContext, returnType: PsiType) {
             ModifierFactoryReturnType,
             this,
             context.getNameLocation(this),
-            "Modifier factory functions must have a return type of Modifier",
+            "Modifier factory functions should have a return type of Modifier",
             lintFix
         )
     }
 
-    if (returnType.canonicalText == ModifierFqn) return
+    if (returnType.canonicalText == Names.Ui.Modifier.javaFqn) return
 
     val source = sourcePsi
     if (source is KtCallableDeclaration && source.returnTypeString != null) {
@@ -264,7 +268,7 @@ private fun UMethod.checkReturnType(context: JavaContext, returnType: PsiType) {
                 .name("Change return type to Modifier")
                 .range(context.getLocation(this))
                 .text(source.returnTypeString)
-                .with(ModifierShortName)
+                .with(Names.Ui.Modifier.shortName)
                 .autoFix()
                 .build()
         )
@@ -282,7 +286,7 @@ private fun UMethod.checkReturnType(context: JavaContext, returnType: PsiType) {
                     .name("Change return type to Modifier")
                     .range(context.getLocation(this))
                     .text(getterReturnType)
-                    .with(ModifierShortName)
+                    .with(Names.Ui.Modifier.shortName)
                     .autoFix()
                     .build()
             )
@@ -299,7 +303,7 @@ private fun UMethod.checkReturnType(context: JavaContext, returnType: PsiType) {
                     .name("Change return type to Modifier")
                     .range(context.getLocation(source.property))
                     .text(propertyType)
-                    .with(ModifierShortName)
+                    .with(Names.Ui.Modifier.shortName)
                     .autoFix()
                     .build()
             )
@@ -316,7 +320,7 @@ private fun UMethod.checkReturnType(context: JavaContext, returnType: PsiType) {
                 .name("Add explicit Modifier return type")
                 .range(context.getLocation(this))
                 .pattern("[ \\t\\n]+=")
-                .with(": $ModifierShortName =")
+                .with(": ${Names.Ui.Modifier.shortName} =")
                 .autoFix()
                 .build()
         )

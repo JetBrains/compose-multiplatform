@@ -54,7 +54,7 @@ class InspectableTests : ToolingTest() {
                 Column {
                     Box(
                         Modifier.size(100.dp).drawBehind {
-                            drawRect(Color(0xFF))
+                            drawRect(Color.Black)
                         }
                     )
                 }
@@ -146,6 +146,9 @@ class InspectableTests : ToolingTest() {
             receiver.block()
             assertFalse(receiver.parameterCursor.hasNext())
         }
+
+        // Skip Inspectable
+        callCursor.next()
 
         // OneParameter(1)
         validate {
@@ -296,7 +299,7 @@ class InspectableTests : ToolingTest() {
             Inspectable(CompositionDataRecord.create()) {
                 Column {
                     InInspectionModeOnly {
-                        Box(Modifier.size(100.dp).background(color = Color(0xFF)))
+                        Box(Modifier.size(100.dp).background(color = Color.Black))
                         displayed = true
                     }
                 }
@@ -312,7 +315,7 @@ class InspectableTests : ToolingTest() {
         show {
             Column {
                 InInspectionModeOnly {
-                    Box(Modifier.size(100.dp).background(color = Color(0xFF)))
+                    Box(Modifier.size(100.dp).background(color = Color.Black))
                     displayed = true
                 }
             }
@@ -337,7 +340,7 @@ class InspectableTests : ToolingTest() {
                 it != null && it.sourceFile == "InspectableTests.kt"
             }
         }
-        val names = parameters.first().parameters.map { it.name }
+        val names = parameters.drop(1).first().parameters.map { it.name }
         assertEquals(
             "text, modifier, color, fontSize, fontStyle, fontWeight, fontFamily, " +
                 "letterSpacing, textDecoration, textAlign, lineHeight, overflow, softWrap, " +

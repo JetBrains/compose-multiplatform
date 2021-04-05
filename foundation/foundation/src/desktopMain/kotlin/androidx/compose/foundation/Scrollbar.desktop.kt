@@ -14,36 +14,39 @@
  * limitations under the License.
  */
 
-@file:Suppress("DEPRECATION")
-
 package androidx.compose.foundation
 
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.core.TweenSpec
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.lazy.LazyListState
+import androidx.compose.foundation.gestures.awaitFirstDown
+import androidx.compose.foundation.gestures.drag
+import androidx.compose.foundation.gestures.forEachGesture
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Immutable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.staticCompositionLocalOf
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.composed
+import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.geometry.Offset
-import androidx.compose.foundation.legacygestures.DragObserver
-import androidx.compose.foundation.legacygestures.pressIndicatorGestureFilter
-import androidx.compose.foundation.legacygestures.rawDragGestureFilter
 import androidx.compose.foundation.interaction.DragInteraction
 import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.gestures.detectTapAndPress
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.input.pointer.pointerMoveFilter
+import androidx.compose.ui.input.pointer.consumePositionChange
+import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.input.pointer.positionChange
 import androidx.compose.ui.layout.Layout
 import androidx.compose.ui.layout.MeasurePolicy
 import androidx.compose.ui.platform.LocalDensity
@@ -53,7 +56,6 @@ import androidx.compose.ui.unit.constrainHeight
 import androidx.compose.ui.unit.constrainWidth
 import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import kotlin.math.roundToInt
 import kotlin.math.sign
@@ -181,7 +183,6 @@ private fun Scrollbar(
     interactionSource: MutableInteractionSource,
     isVertical: Boolean
 ) = with(LocalDensity.current) {
-    val scope = rememberCoroutineScope()
     val dragInteraction = remember { mutableStateOf<DragInteraction.Start?>(null) }
     DisposableEffect(interactionSource) {
         onDispose {
@@ -211,48 +212,6 @@ private fun Scrollbar(
         }
     }
 
-    val dragObserver = object : DragObserver {
-        override fun onStart(downPosition: Offset) {
-            scope.launch {
-                dragInteraction.value?.let { oldInteraction ->
-                    interactionSource.emit(
-                        DragInteraction.Cancel(oldInteraction)
-                    )
-                }
-                val interaction = DragInteraction.Start()
-                interactionSource.emit(interaction)
-                dragInteraction.value = interaction
-            }
-        }
-
-        override fun onStop(velocity: Offset) {
-            scope.launch {
-                dragInteraction.value?.let { interaction ->
-                    interactionSource.emit(
-                        DragInteraction.Stop(interaction)
-                    )
-                    dragInteraction.value = null
-                }
-            }
-        }
-
-        override fun onCancel() {
-            scope.launch {
-                dragInteraction.value?.let { interaction ->
-                    interactionSource.emit(
-                        DragInteraction.Cancel(interaction)
-                    )
-                    dragInteraction.value = null
-                }
-            }
-        }
-
-        override fun onDrag(dragDistance: Offset): Offset {
-            sliderAdapter.position += if (isVertical) dragDistance.y else dragDistance.x
-            return dragDistance
-        }
-    }
-
     val color by animateColorAsState(
         if (isHover) style.hoverColor else style.unhoverColor,
         animationSpec = TweenSpec(durationMillis = style.hoverDurationMillis)
@@ -265,7 +224,9 @@ private fun Scrollbar(
             Box(
                 Modifier
                     .background(if (isVisible) color else Color.Transparent, style.shape)
-                    .rawDragGestureFilter(dragObserver)
+                    .scrollbarDrag(interactionSource, dragInteraction) { offset ->
+                        sliderAdapter.position += if (isVertical) offset.y else offset.x
+                    }
             )
         },
         modifier
@@ -278,7 +239,32 @@ private fun Scrollbar(
     )
 }
 
-@Suppress("DEPRECATION") // press gesture filter
+private fun Modifier.scrollbarDrag(
+    interactionSource: MutableInteractionSource,
+    draggedInteraction: MutableState<DragInteraction.Start?>,
+    onDelta: (Offset) -> Unit
+): Modifier = pointerInput(interactionSource, draggedInteraction, onDelta) {
+    forEachGesture {
+        awaitPointerEventScope {
+            val down = awaitFirstDown(requireUnconsumed = false)
+            val interaction = DragInteraction.Start()
+            interactionSource.tryEmit(interaction)
+            draggedInteraction.value = interaction
+            val isSuccess = drag(down.id) { change ->
+                onDelta.invoke(change.positionChange())
+                change.consumePositionChange()
+            }
+            val finishInteraction = if (isSuccess) {
+                DragInteraction.Stop(interaction)
+            } else {
+                DragInteraction.Cancel(interaction)
+            }
+            interactionSource.tryEmit(finishInteraction)
+            draggedInteraction.value = null
+        }
+    }
+}
+
 private fun Modifier.scrollOnPressOutsideSlider(
     isVertical: Boolean,
     sliderAdapter: SliderAdapter,
@@ -309,12 +295,16 @@ private fun Modifier.scrollOnPressOutsideSlider(
             }
         }
     }
-
-    pressIndicatorGestureFilter(
-        onStart = { targetOffset = it },
-        onStop = { targetOffset = null },
-        onCancel = { targetOffset = null }
-    )
+    Modifier.pointerInput(Unit) {
+        detectTapAndPress(
+            onPress = { offset ->
+                targetOffset = offset
+                tryAwaitRelease()
+                targetOffset = null
+            },
+            onTap = {}
+        )
+    }
 }
 
 /**

@@ -17,6 +17,8 @@
 package androidx.compose.integration.macrobenchmark.target
 
 import android.os.Bundle
+import android.view.Choreographer
+import android.view.View
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.layout.Row
@@ -29,27 +31,49 @@ import androidx.compose.material.Card
 import androidx.compose.material.Checkbox
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.Recomposer
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.dp
 
 class LazyColumnActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        val itemCount = intent.getIntExtra(EXTRA_ITEM_COUNT, 1000)
+        val itemCount = intent.getIntExtra(EXTRA_ITEM_COUNT, 3000)
 
         setContent {
-            LazyColumn(modifier = Modifier.fillMaxWidth()) {
+            LazyColumn(
+                modifier = Modifier.fillMaxWidth().semantics { contentDescription = "IamLazy" }
+            ) {
                 items(List(itemCount) { Entry("Item $it") }) {
                     ListRow(it)
                 }
             }
         }
+
+        launchIdlenessTracking()
     }
 
     companion object {
         const val EXTRA_ITEM_COUNT = "ITEM_COUNT"
     }
+}
+
+private fun ComponentActivity.launchIdlenessTracking() {
+    val contentView: View = findViewById(android.R.id.content)
+    val callback: Choreographer.FrameCallback = object : Choreographer.FrameCallback {
+        override fun doFrame(frameTimeNanos: Long) {
+            if (Recomposer.runningRecomposers.value.any { it.hasPendingWork }) {
+                contentView.contentDescription = "COMPOSE-BUSY"
+            } else {
+                contentView.contentDescription = "COMPOSE-IDLE"
+            }
+            Choreographer.getInstance().postFrameCallback(this)
+        }
+    }
+    Choreographer.getInstance().postFrameCallback(callback)
 }
 
 @Composable

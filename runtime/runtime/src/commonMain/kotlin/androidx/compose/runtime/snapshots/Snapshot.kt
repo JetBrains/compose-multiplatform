@@ -20,7 +20,7 @@ package androidx.compose.runtime.snapshots
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.InternalComposeApi
-import androidx.compose.runtime.ThreadLocal
+import androidx.compose.runtime.SnapshotThreadLocal
 import androidx.compose.runtime.synchronized
 
 /**
@@ -588,7 +588,7 @@ open class MutableSnapshot internal constructor(
                 takeNewGlobalSnapshot(previousGlobalSnapshot, emptyLambda)
                 val globalModified = previousGlobalSnapshot.modified
                 if (globalModified != null && globalModified.isNotEmpty())
-                    applyObservers.toList() to globalModified
+                    applyObservers.toMutableList() to globalModified
                 else
                     emptyList<(Set<Any>, Snapshot) -> Unit>() to null
             } else {
@@ -609,7 +609,7 @@ open class MutableSnapshot internal constructor(
                 this.modified = null
                 previousGlobalSnapshot.modified = null
 
-                applyObservers.toList() to globalModified
+                applyObservers.toMutableList() to globalModified
             }
         }
 
@@ -1129,7 +1129,7 @@ internal class GlobalSnapshot(id: Int, invalid: SnapshotIdSet) :
                 } else null
                 )?.let {
                 it.firstOrNull() ?: { state: Any ->
-                    it.forEach { it(state) }
+                    it.fastForEach { it(state) }
                 }
             }
         }
@@ -1355,7 +1355,10 @@ private fun mergedWriteObserver(
  */
 private const val INVALID_SNAPSHOT = 0
 
-private val threadSnapshot = ThreadLocal<Snapshot>()
+/**
+ * Current thread snapshot
+ */
+private val threadSnapshot = SnapshotThreadLocal<Snapshot>()
 
 // A global synchronization object. This synchronization object should be taken before modifying any
 // of the fields below.
@@ -1426,8 +1429,8 @@ private fun <T> advanceGlobalSnapshot(block: (invalid: SnapshotIdSet) -> T): T {
     // observers.
     val modified = previousGlobalSnapshot.modified
     if (modified != null) {
-        val observers = sync { applyObservers.toList() }
-        for (observer in observers) {
+        val observers: List<(Set<Any>, Snapshot) -> Unit> = sync { applyObservers.toMutableList() }
+        observers.fastForEach { observer ->
             observer(modified, previousGlobalSnapshot)
         }
     }
@@ -1575,6 +1578,27 @@ internal fun <T : StateRecord> T.writableRecord(state: StateObject, snapshot: Sn
     return newData
 }
 
+internal fun <T : StateRecord> T.overwritableRecord(
+    state: StateObject,
+    snapshot: Snapshot,
+    candidate: T
+): T {
+    if (snapshot.readOnly) {
+        // If the snapshot is read-only, use the snapshot recordModified to report it.
+        snapshot.recordModified(state)
+    }
+    val id = snapshot.id
+
+    if (candidate.snapshotId == id) return candidate
+
+    val newData = newOverwritableRecord(state, snapshot)
+    newData.snapshotId = id
+
+    snapshot.recordModified(state)
+
+    return newData
+}
+
 internal fun <T : StateRecord> T.newWritableRecord(state: StateObject, snapshot: Snapshot): T {
     // Calling used() on a state object might return the same record for each thread calling
     // used() therefore selecting the record to reuse should be guarded.
@@ -1588,16 +1612,32 @@ internal fun <T : StateRecord> T.newWritableRecord(state: StateObject, snapshot:
     // cache the result of readable() as the mutating thread calls to writable() can change the
     // result of readable().
     @Suppress("UNCHECKED_CAST")
-    val newData = (used(state, snapshot.id, openSnapshots) as T?)?.apply {
+    val newData = newOverwritableRecord(state, snapshot)
+    newData.assign(this)
+    newData.snapshotId = snapshot.id
+    return newData
+}
+
+internal fun <T : StateRecord> T.newOverwritableRecord(state: StateObject, snapshot: Snapshot): T {
+    // Calling used() on a state object might return the same record for each thread calling
+    // used() therefore selecting the record to reuse should be guarded.
+
+    // Note: setting the snapshotId to Int.MAX_VALUE will make it invalid for all snapshots.
+    // This means the lock can be released as used() will no longer select it. Using id could
+    // also be used but it puts the object into a state where the reused value appears to be
+    // the current valid value for the snapshot. This is not an issue if the snapshot is only
+    // being read from a single thread but using Int.MAX_VALUE allows multiple readers,
+    // single writer, of a snapshot. Note that threads reading a mutating snapshot should not
+    // cache the result of readable() as the mutating thread calls to writable() can change the
+    // result of readable().
+    @Suppress("UNCHECKED_CAST")
+    return (used(state, snapshot.id, openSnapshots) as T?)?.apply {
         snapshotId = Int.MAX_VALUE
     } ?: create().apply {
         snapshotId = Int.MAX_VALUE
         this.next = state.firstStateRecord
         state.prependStateRecord(this as T)
     } as T
-    newData.assign(this)
-    newData.snapshotId = snapshot.id
-    return newData
 }
 
 @PublishedApi
@@ -1640,6 +1680,34 @@ inline fun <T : StateRecord, R> T.writable(state: StateObject, block: T.() -> R)
     return sync {
         snapshot = Snapshot.current
         this.writableRecord(state, snapshot).block()
+    }.also {
+        notifyWrite(snapshot, state)
+    }
+}
+
+/**
+ * Call [block] with a writable state record for the given record. It is assumed that this is
+ * called for the first state record in a state object. A record is writable if it was created in
+ * the current mutable snapshot. This should only be used when the record will be overwritten in
+ * its entirety (such as having only one field and that field is written to).
+ *
+ * WARNING: If the caller doesn't overwrite all the fields in the state record the object will be
+ * inconsistent and the fields not written are almost guaranteed to be incorrect. If it is
+ * possible that [block] will not write to all the fields use [writable] instead.
+ *
+ * @param state The object that has this record in its record list.
+ * @param candidate The current for the snapshot record returned by [withCurrent]
+ * @param block The block that will mutate all the field of the record.
+ */
+internal inline fun <T : StateRecord, R> T.overwritable(
+    state: StateObject,
+    candidate: T,
+    block: T.() -> R
+): R {
+    var snapshot: Snapshot = snapshotInitializer
+    return sync {
+        snapshot = Snapshot.current
+        this.overwritableRecord(state, snapshot, candidate).block()
     }.also {
         notifyWrite(snapshot, state)
     }

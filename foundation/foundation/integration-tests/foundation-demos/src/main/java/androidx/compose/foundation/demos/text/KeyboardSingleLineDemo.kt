@@ -125,7 +125,7 @@ private fun MyTextField(data: ImeOptionsData) {
         modifier = demoTextFieldModifiers.defaultMinSize(100.dp),
         value = state.value,
         keyboardOptions = data.keyboardOptions,
-        keyboardActions = KeyboardActions { keyboardController?.hideSoftwareKeyboard() },
+        keyboardActions = KeyboardActions { keyboardController?.hide() },
         singleLine = data.singleLine,
         onValueChange = { state.value = it },
         textStyle = TextStyle(fontSize = fontSize8),

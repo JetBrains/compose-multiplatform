@@ -18,6 +18,7 @@ package androidx.compose.desktop
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionContext
 import org.jetbrains.skiko.ClipComponent
+import org.jetbrains.skiko.GraphicsApi
 import java.awt.Component
 import javax.swing.JFrame
 import javax.swing.JLayeredPane
@@ -28,6 +29,7 @@ import javax.swing.JLayeredPane
  * @param parent The parent AppFrame that wraps the ComposeWindow.
  */
 class ComposeWindow(val parent: AppFrame) : JFrame() {
+    private var isDisposed = false
     internal val layer = ComposeLayer()
     private val pane = object : JLayeredPane() {
         override fun setBounds(x: Int, y: Int, width: Int, height: Int) {
@@ -76,7 +78,10 @@ class ComposeWindow(val parent: AppFrame) : JFrame() {
     }
 
     override fun dispose() {
-        layer.dispose()
+        if (!isDisposed) {
+            layer.dispose()
+            isDisposed = true
+        }
         super.dispose()
     }
 
@@ -86,4 +91,18 @@ class ComposeWindow(val parent: AppFrame) : JFrame() {
             layer.component.requestFocus()
         }
     }
+
+    /**
+     * Retrieve underlying platform-specific operating system handle for the window where ComposeWindow is rendered.
+     * Currently returns HWND on Windows, Drawable on X11 and 0 on macOS.
+     */
+    val windowHandle: Long
+        get() = layer.component.windowHandle
+
+    /**
+     * Returns low level rendering API used for rendering in this ComposeWindow. API is automatically selected based on
+     * operating system, graphical hardware and `SKIKO_RENDER_API` environment variable.
+     */
+    val renderApi: GraphicsApi
+        get() = layer.component.renderApi
 }

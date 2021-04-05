@@ -450,36 +450,38 @@ class CompositionLocalTests {
         validate()
     }
 
+    @Composable
+    fun ReadSomeDataCompositionLocal(
+        compositionLocal: CompositionLocal<SomeData>,
+        composed: StableRef<Boolean>,
+    ) {
+        composed.value = true
+        Text(value = compositionLocal.current.value)
+    }
+
     @Test
     fun providingANewDataClassValueShouldNotRecompose() = compositionTest {
         val invalidates = mutableListOf<RecomposeScope>()
         fun doInvalidate() = invalidates.forEach { it.invalidate() }.also { invalidates.clear() }
         val someDataCompositionLocal = compositionLocalOf(structuralEqualityPolicy()) { SomeData() }
-        var composed = false
-
-        @Composable
-        fun ReadSomeDataCompositionLocal(
-            compositionLocal: CompositionLocal<SomeData>
-        ) {
-            composed = true
-            Text(value = compositionLocal.current.value)
-        }
+        val composed = StableRef(false)
 
         compose {
             invalidates.add(currentRecomposeScope)
             CompositionLocalProvider(
                 someDataCompositionLocal provides SomeData("provided")
             ) {
-                ReadSomeDataCompositionLocal(someDataCompositionLocal)
+                ReadSomeDataCompositionLocal(someDataCompositionLocal, composed)
             }
         }
 
-        assertTrue(composed)
-        composed = false
+        assertTrue(composed.value)
+        composed.value = false
         doInvalidate()
         expectNoChanges()
-        assertFalse(composed)
+        assertFalse(composed.value)
     }
 }
 
-private data class SomeData(val value: String = "default")
+data class SomeData(val value: String = "default")
+@Stable class StableRef<T>(var value: T)

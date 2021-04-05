@@ -67,12 +67,14 @@ class PrintToStringTest {
         val result = rule.onNodeWithText("Hello")
             .printToString(maxDepth = 0)
 
-        assertThat(obfuscateNodesInfo(result)).matches(
-            "" +
-                "Node #X at \\(l=X, t=X, r=X, b=X\\)px\n" +
-                "Text = 'Hello'\n" +
-                "GetTextLayoutResult = 'AccessibilityAction\\(label=null, action=.*\\)'\n" +
-                "Has 1 sibling"
+        assertThat(obfuscateNodesInfo(result)).isEqualTo(
+            """
+                Printing with useUnmergedTree = 'false'
+                Node #X at (l=X, t=X, r=X, b=X)px
+                Text = 'Hello'
+                Actions = [GetTextLayoutResult]
+                Has 1 sibling
+            """.trimIndent()
         )
     }
 
@@ -86,16 +88,18 @@ class PrintToStringTest {
             .onChildren()
             .printToString()
 
-        assertThat(obfuscateNodesInfo(result)).matches(
-            "" +
-                "1\\) Node #X at \\(l=X, t=X, r=X, b=X\\)px\n" +
-                "Text = 'Hello'\n" +
-                "GetTextLayoutResult = 'AccessibilityAction\\(label=null, action=.*\\)'\n" +
-                "Has 1 sibling\n" +
-                "2\\) Node #X at \\(l=X, t=X, r=X, b=X\\)px\n" +
-                "Text = 'World'\n" +
-                "GetTextLayoutResult = 'AccessibilityAction\\(label=null, action=.*\\)'\n" +
-                "Has 1 sibling"
+        assertThat(obfuscateNodesInfo(result)).isEqualTo(
+            """
+                Printing with useUnmergedTree = 'false'
+                1) Node #X at (l=X, t=X, r=X, b=X)px
+                Text = 'Hello'
+                Actions = [GetTextLayoutResult]
+                Has 1 sibling
+                2) Node #X at (l=X, t=X, r=X, b=X)px
+                Text = 'World'
+                Actions = [GetTextLayoutResult]
+                Has 1 sibling
+            """.trimIndent()
         )
     }
 
@@ -115,23 +119,23 @@ class PrintToStringTest {
         val result = rule.onRoot()
             .printToString()
 
-        assertThat(obfuscateNodesInfo(result)).matches(
-            "" +
-                "Node #X at \\(l=X, t=X, r=X, b=X\\)px\n" +
-                " ..*Node #X at \\(l=X, t=X, r=X, b=X\\)px, Tag: 'column'\n" +
-                "   Disabled = 'kotlin.Unit'\n" +
-                "    .-Node #X at \\(l=X, t=X, r=X, b=X\\)px, Tag: 'box'\n" +
-                "    . Disabled = 'kotlin.Unit'\n" +
-                "    .  .-Node #X at \\(l=X, t=X, r=X, b=X\\)px\n" +
-                "    .    Role = 'Button'\n" +
-                "    .    OnClick = 'AccessibilityAction\\(label=null, action=.*\\)'\n" +
-                "    .    Text = 'Button'\n" +
-                "    .    GetTextLayoutResult = 'AccessibilityAction\\(label=null, " +
-                "action=.*\\)'\n" +
-                "    .    MergeDescendants = 'true'\n" +
-                "    .-Node #X at \\(l=X, t=X, r=X, b=X\\)px\n" +
-                "      Text = 'Hello'\n" +
-                "      GetTextLayoutResult = 'AccessibilityAction\\(label=null, action=.*\\).*'"
+        assertThat(obfuscateNodesInfo(result)).isEqualTo(
+            """
+                Printing with useUnmergedTree = 'false'
+                Node #X at (l=X, t=X, r=X, b=X)px
+                 |-Node #X at (l=X, t=X, r=X, b=X)px, Tag: 'column'
+                   [Disabled]
+                    |-Node #X at (l=X, t=X, r=X, b=X)px, Tag: 'box'
+                    | [Disabled]
+                    |  |-Node #X at (l=X, t=X, r=X, b=X)px
+                    |    Role = 'Button'
+                    |    Text = 'Button'
+                    |    Actions = [OnClick, GetTextLayoutResult]
+                    |    MergeDescendants = 'true'
+                    |-Node #X at (l=X, t=X, r=X, b=X)px
+                      Text = 'Hello'
+                      Actions = [GetTextLayoutResult]
+            """.trimIndent()
         )
     }
 
@@ -155,13 +159,15 @@ class PrintToStringTest {
             .printToString(maxDepth = 1)
 
         assertThat(obfuscateNodesInfo(result)).isEqualTo(
-            "" +
-                "1) Node #X at (l=X, t=X, r=X, b=X)px, Tag: 'tag1'\n" +
-                " |-Node #X at (l=X, t=X, r=X, b=X)px, Tag: 'tag11'\n" +
-                "   Has 1 child\n" +
-                "2) Node #X at (l=X, t=X, r=X, b=X)px, Tag: 'tag2'\n" +
-                " |-Node #X at (l=X, t=X, r=X, b=X)px, Tag: 'tag22'\n" +
-                "   Has 1 child"
+            """
+                Printing with useUnmergedTree = 'false'
+                1) Node #X at (l=X, t=X, r=X, b=X)px, Tag: 'tag1'
+                 |-Node #X at (l=X, t=X, r=X, b=X)px, Tag: 'tag11'
+                   Has 1 child
+                2) Node #X at (l=X, t=X, r=X, b=X)px, Tag: 'tag2'
+                 |-Node #X at (l=X, t=X, r=X, b=X)px, Tag: 'tag22'
+                   Has 1 child
+            """.trimIndent()
         )
     }
 

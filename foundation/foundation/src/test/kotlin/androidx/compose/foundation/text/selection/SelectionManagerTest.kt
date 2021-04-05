@@ -45,15 +45,32 @@ import org.junit.runners.JUnit4
 class SelectionManagerTest {
     private val selectionRegistrar = spy(SelectionRegistrarImpl())
     private val selectable = FakeSelectable()
+    private val selectableId = 1L
     private val selectionManager = SelectionManager(selectionRegistrar)
 
     private val containerLayoutCoordinates = mock<LayoutCoordinates> {
         on { isAttached } doReturn true
     }
-    private val startSelectable = mock<Selectable>()
-    private val endSelectable = mock<Selectable>()
-    private val middleSelectable = mock<Selectable>()
-    private val lastSelectable = mock<Selectable>()
+
+    private val startSelectableId = 2L
+    private val startSelectable = mock<Selectable> {
+        whenever(it.selectableId).thenReturn(startSelectableId)
+    }
+
+    private val endSelectableId = 3L
+    private val endSelectable = mock<Selectable> {
+        whenever(it.selectableId).thenReturn(endSelectableId)
+    }
+
+    private val middleSelectableId = 4L
+    private val middleSelectable = mock<Selectable> {
+        whenever(it.selectableId).thenReturn(middleSelectableId)
+    }
+
+    private val lastSelectableId = 5L
+    private val lastSelectable = mock<Selectable> {
+        whenever(it.selectableId).thenReturn(lastSelectableId)
+    }
 
     private val startCoordinates = Offset(3f, 30f)
     private val endCoordinates = Offset(3f, 600f)
@@ -63,12 +80,12 @@ class SelectionManagerTest {
             start = Selection.AnchorInfo(
                 direction = ResolvedTextDirection.Ltr,
                 offset = 0,
-                selectable = startSelectable
+                selectableId = startSelectableId
             ),
             end = Selection.AnchorInfo(
                 direction = ResolvedTextDirection.Ltr,
                 offset = 5,
-                selectable = endSelectable
+                selectableId = endSelectableId
             )
         )
 
@@ -78,6 +95,7 @@ class SelectionManagerTest {
 
     @Before
     fun setup() {
+        selectable.selectableId = selectableId
         selectionRegistrar.subscribe(selectable)
         selectionManager.containerLayoutCoordinates = containerLayoutCoordinates
         selectionManager.hapticFeedBack = hapticFeedback
@@ -123,8 +141,11 @@ class SelectionManagerTest {
 
     @Test
     fun mergeSelections_multiple_selectables_calls_getSelection_multiple_times() {
-        val selectable_another = mock<Selectable>()
-        selectionRegistrar.subscribe(selectable_another)
+        val anotherSelectableId = 100L
+        val selectableAnother = mock<Selectable>()
+        whenever(selectableAnother.selectableId).thenReturn(anotherSelectableId)
+
+        selectionRegistrar.subscribe(selectableAnother)
 
         selectionManager.mergeSelections(
             startPosition = startCoordinates,
@@ -140,7 +161,7 @@ class SelectionManagerTest {
         assertThat(selectable.lastLongPress).isEqualTo(false)
         assertThat(selectable.lastPreviousSelection).isEqualTo(fakeSelection)
 
-        verify(selectable_another, times(1))
+        verify(selectableAnother, times(1))
             .getSelection(
                 startPosition = startCoordinates,
                 endPosition = endCoordinates,
@@ -190,12 +211,12 @@ class SelectionManagerTest {
             start = Selection.AnchorInfo(
                 direction = ResolvedTextDirection.Ltr,
                 offset = startOffset,
-                selectable = selectable
+                selectableId = selectableId
             ),
             end = Selection.AnchorInfo(
                 direction = ResolvedTextDirection.Ltr,
                 offset = endOffset,
-                selectable = selectable
+                selectableId = selectableId
             ),
             handlesCrossed = false
         )
@@ -216,12 +237,12 @@ class SelectionManagerTest {
             start = Selection.AnchorInfo(
                 direction = ResolvedTextDirection.Ltr,
                 offset = startOffset,
-                selectable = selectable
+                selectableId = selectableId
             ),
             end = Selection.AnchorInfo(
                 direction = ResolvedTextDirection.Ltr,
                 offset = endOffset,
-                selectable = selectable
+                selectableId = selectableId
             ),
             handlesCrossed = true
         )
@@ -250,12 +271,12 @@ class SelectionManagerTest {
             start = Selection.AnchorInfo(
                 direction = ResolvedTextDirection.Ltr,
                 offset = startOffset,
-                selectable = startSelectable
+                selectableId = startSelectableId
             ),
             end = Selection.AnchorInfo(
                 direction = ResolvedTextDirection.Ltr,
                 offset = endOffset,
-                selectable = endSelectable
+                selectableId = endSelectableId
             ),
             handlesCrossed = false
         )
@@ -289,12 +310,12 @@ class SelectionManagerTest {
             start = Selection.AnchorInfo(
                 direction = ResolvedTextDirection.Ltr,
                 offset = startOffset,
-                selectable = startSelectable
+                selectableId = startSelectableId
             ),
             end = Selection.AnchorInfo(
                 direction = ResolvedTextDirection.Ltr,
                 offset = endOffset,
-                selectable = endSelectable
+                selectableId = endSelectableId
             ),
             handlesCrossed = true
         )
@@ -329,12 +350,12 @@ class SelectionManagerTest {
             start = Selection.AnchorInfo(
                 direction = ResolvedTextDirection.Ltr,
                 offset = startOffset,
-                selectable = selectable
+                selectableId = selectableId
             ),
             end = Selection.AnchorInfo(
                 direction = ResolvedTextDirection.Ltr,
                 offset = endOffset,
-                selectable = selectable
+                selectableId = selectableId
             ),
             handlesCrossed = true
         )
@@ -360,12 +381,12 @@ class SelectionManagerTest {
             start = Selection.AnchorInfo(
                 direction = ResolvedTextDirection.Ltr,
                 offset = startOffset,
-                selectable = selectable
+                selectableId = selectableId
             ),
             end = Selection.AnchorInfo(
                 direction = ResolvedTextDirection.Ltr,
                 offset = endOffset,
-                selectable = selectable
+                selectableId = selectableId
             ),
             handlesCrossed = true
         )
@@ -393,12 +414,12 @@ class SelectionManagerTest {
             start = Selection.AnchorInfo(
                 direction = ResolvedTextDirection.Ltr,
                 offset = startOffset,
-                selectable = selectable
+                selectableId = selectableId
             ),
             end = Selection.AnchorInfo(
                 direction = ResolvedTextDirection.Ltr,
                 offset = endOffset,
-                selectable = selectable
+                selectableId = selectableId
             ),
             handlesCrossed = true
         )
@@ -416,18 +437,18 @@ class SelectionManagerTest {
     }
 
     @Test
-    fun cancel_selection_calls_getSelection_selection_becomes_null() {
+    fun onRelease_selectionMap_is_setToEmpty() {
         val fakeSelection =
             Selection(
                 start = Selection.AnchorInfo(
                     direction = ResolvedTextDirection.Ltr,
                     offset = 0,
-                    selectable = startSelectable
+                    selectableId = startSelectableId
                 ),
                 end = Selection.AnchorInfo(
                     direction = ResolvedTextDirection.Ltr,
                     offset = 5,
-                    selectable = endSelectable
+                    selectableId = endSelectableId
                 )
             )
         var selection: Selection? = fakeSelection
@@ -438,13 +459,7 @@ class SelectionManagerTest {
 
         selectionManager.onRelease()
 
-        assertThat(selectable.getSelectionCalledTimes).isEqualTo(1)
-        assertThat(selectable.lastStartPosition).isEqualTo(Offset(-1f, -1f))
-        assertThat(selectable.lastEndPosition).isEqualTo(Offset(-1f, -1f))
-        assertThat(selectable.lastContainerLayoutCoordinates)
-            .isEqualTo(selectionManager.requireContainerCoordinates())
-        assertThat(selectable.lastLongPress).isEqualTo(false)
-        assertThat(selectable.lastPreviousSelection).isEqualTo(fakeSelection)
+        verify(selectionRegistrar).subselections = emptyMap()
 
         assertThat(selection).isNull()
         verify(spyLambda, times(1)).invoke(null)
@@ -461,12 +476,12 @@ class SelectionManagerTest {
                 start = Selection.AnchorInfo(
                     direction = ResolvedTextDirection.Ltr,
                     offset = 0,
-                    selectable = startSelectable
+                    selectableId = startSelectableId
                 ),
                 end = Selection.AnchorInfo(
                     direction = ResolvedTextDirection.Ltr,
                     offset = 5,
-                    selectable = endSelectable
+                    selectableId = startSelectableId
                 )
             )
         var selection: Selection? = fakeSelection
@@ -475,16 +490,12 @@ class SelectionManagerTest {
         selectionManager.onSelectionChange = spyLambda
         selectionManager.selection = fakeSelection
 
-        selectionRegistrar.notifySelectableChange(selectable)
+        selectionRegistrar.subselections = mapOf(
+            startSelectableId to fakeSelection
+        )
+        selectionRegistrar.notifySelectableChange(startSelectableId)
 
-        assertThat(selectable.getSelectionCalledTimes).isEqualTo(1)
-        assertThat(selectable.lastStartPosition).isEqualTo(Offset(-1f, -1f))
-        assertThat(selectable.lastEndPosition).isEqualTo(Offset(-1f, -1f))
-        assertThat(selectable.lastContainerLayoutCoordinates)
-            .isEqualTo(selectionManager.requireContainerCoordinates())
-        assertThat(selectable.lastLongPress).isEqualTo(false)
-        assertThat(selectable.lastPreviousSelection).isEqualTo(fakeSelection)
-
+        verify(selectionRegistrar).subselections = emptyMap()
         assertThat(selection).isNull()
         verify(spyLambda, times(1)).invoke(null)
         verify(

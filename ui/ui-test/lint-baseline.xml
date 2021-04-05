@@ -1,26 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<issues format="5" by="lint 4.2.0-beta02" client="gradle" variant="debug" version="4.2.0-beta02">
-
-    <issue
-        id="UnknownIssueId"
-        message="Unknown issue id &quot;ComposableLambdaParameterNaming&quot;">
-        <location
-            file="build.gradle"/>
-    </issue>
-
-    <issue
-        id="UnknownIssueId"
-        message="Unknown issue id &quot;ComposableLambdaParameterPosition&quot;">
-        <location
-            file="build.gradle"/>
-    </issue>
-
-    <issue
-        id="UnknownIssueId"
-        message="Unknown issue id &quot;ComposableNaming&quot;">
-        <location
-            file="build.gradle"/>
-    </issue>
+<issues format="5" by="lint 4.2.0-beta04" client="gradle" variant="debug" version="4.2.0-beta04">
 
     <issue
         id="UnsafeNewApiCall"
@@ -29,7 +8,7 @@
         errorLine2="                                       ~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/androidMain/kotlin/androidx/compose/ui/test/android/WindowCapture.android.kt"
-            line="59"
+            line="64"
             column="40"/>
     </issue>
 
@@ -40,7 +19,7 @@
         errorLine2="              ~~~~~~~">
         <location
             file="src/androidMain/kotlin/androidx/compose/ui/test/android/WindowCapture.android.kt"
-            line="95"
+            line="100"
             column="15"/>
     </issue>
 

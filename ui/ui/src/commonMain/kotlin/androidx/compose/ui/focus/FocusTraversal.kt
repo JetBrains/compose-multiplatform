@@ -65,16 +65,18 @@ internal fun ModifiedFocusNode.moveFocus(focusDirection: FocusDirection): Boolea
 
     // If no custom focus traversal order is specified, perform a search for the appropriate item
     // to move focus to.
-    return when (focusDirection) {
-        Next, Previous -> {
-            // TODO(b/170155659): Perform one dimensional focus search.
-            false
-        }
-        Left, Right, Up, Down -> {
-            // TODO(b/170155926): Perform two dimensional focus search.
-            false
-        }
+    val nextNode = when (focusDirection) {
+        Next, Previous -> null // TODO(b/170155659): Perform one dimensional focus search.
+        Left, Right, Up, Down -> twoDimensionalFocusSearch(focusDirection)
     }
+
+    // If we found a potential next item, call requestFocus() to move focus to it.
+    if (nextNode != null) {
+        nextNode.requestFocus(propagateFocus = false)
+        return true
+    }
+
+    return false
 }
 
 internal fun ModifiedFocusNode.findActiveFocusNode(): ModifiedFocusNode? {

@@ -27,6 +27,7 @@ import androidx.compose.ui.focus.FocusState.Inactive
 import androidx.compose.ui.focus.findFocusableChildren
 import androidx.compose.ui.focus.searchChildrenForFocusNode
 import androidx.compose.ui.geometry.Rect
+import androidx.compose.ui.layout.boundsInRoot
 import androidx.compose.ui.util.fastForEach
 
 internal class ModifiedFocusNode(
@@ -45,21 +46,15 @@ internal class ModifiedFocusNode(
             sendOnFocusEvent(value)
         }
 
-    // TODO(b/175900268): Add API to allow a parent to extends the bounds of the focus Modifier.
-    //  For now we just use the bounds of this node.
-    val focusRect: Rect
-        get() = Rect(
-            left = position.x.toFloat(),
-            top = position.y.toFloat(),
-            right = size.width.toFloat(),
-            bottom = size.height.toFloat()
-        )
-
     var focusedChild: ModifiedFocusNode?
         get() = modifier.focusedChild
         set(value) {
             modifier.focusedChild = value
         }
+
+    // TODO(b/175900268): Add API to allow a parent to extends the bounds of the focus Modifier.
+    //  For now we just use the bounds of this node.
+    fun focusRect(): Rect = boundsInRoot()
 
     // TODO(b/152051577): Measure the performance of focusableChildren.
     //  Consider caching the children.

@@ -16,6 +16,7 @@
 
 package androidx.compose.foundation.text.selection
 
+import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.compositionLocalOf
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.layout.LayoutCoordinates
@@ -25,20 +26,36 @@ import androidx.compose.ui.layout.LayoutCoordinates
  */
 internal interface SelectionRegistrar {
     /**
+     * The map stored current selection information on each [Selectable]. A selectable can query
+     * its selected range using its [Selectable.selectableId]. This field is backed by a
+     * [MutableState]. And any composable reading this field will be recomposed once its value
+     * changed.
+     */
+    val subselections: Map<Long, Selection>
+
+    /**
      * Subscribe to SelectionContainer selection changes.
+     * @param selectable the [Selectable] that is subscribing to this [SelectionRegistrar].
      */
     fun subscribe(selectable: Selectable): Selectable
 
     /**
      * Unsubscribe from SelectionContainer selection changes.
+     * @param selectable the [Selectable] that is unsubscribing to this [SelectionRegistrar].
      */
     fun unsubscribe(selectable: Selectable)
+
+    /**
+     * Return a unique ID for a [Selectable].
+     * @see [Selectable.selectableId]
+     */
+    fun nextSelectableId(): Long
 
     /**
      * When the Global Position of a subscribed [Selectable] changes, this method
      * is called.
      */
-    fun notifyPositionChange()
+    fun notifyPositionChange(selectableId: Long)
 
     /**
      * Call this method to notify the [SelectionContainer] that the selection has been initiated.
@@ -95,9 +112,23 @@ internal interface SelectionRegistrar {
      * Call this method to notify the [SelectionContainer] that the content of the passed
      * selectable has been changed.
      *
-     * @param selectable the selectable whose the content has been updated.
+     * @param selectableId the ID of the selectable whose the content has been updated.
      */
-    fun notifySelectableChange(selectable: Selectable)
+    fun notifySelectableChange(selectableId: Long)
+
+    companion object {
+        /**
+         * Representing an invalid ID for [Selectable].
+         */
+        const val InvalidSelectableId = 0L
+    }
+}
+
+/**
+ * Helper function that checks if there is a selection on this CoreText.
+ */
+internal fun SelectionRegistrar?.hasSelection(selectableId: Long): Boolean {
+    return this?.subselections?.containsKey(selectableId) ?: false
 }
 
 /**

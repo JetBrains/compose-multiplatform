@@ -18,6 +18,7 @@
 
 package androidx.compose.ui.lint
 
+import androidx.compose.lint.Stubs
 import com.android.tools.lint.checks.infrastructure.LintDetectorTest
 import com.android.tools.lint.detector.api.Detector
 import com.android.tools.lint.detector.api.Issue
@@ -58,16 +59,16 @@ class ModifierParameterDetectorTest : LintDetectorTest() {
                 ) {}
             """
             ),
-            composableStub,
-            modifierStub
+            kotlin(Stubs.Composable),
+            kotlin(Stubs.Modifier)
         )
             .run()
             .expect(
                 """
-src/androidx/compose/ui/foo/test.kt:10: Error: Modifier parameter should be named modifier [ModifierParameter]
+src/androidx/compose/ui/foo/test.kt:10: Warning: Modifier parameter should be named modifier [ModifierParameter]
                     buttonModifier: Modifier = Modifier,
                     ~~~~~~~~~~~~~~
-1 errors, 0 warnings
+0 errors, 1 warnings
             """
             )
             .expectFixDiffs(
@@ -99,16 +100,16 @@ Fix for src/androidx/compose/ui/foo/test.kt line 10: Change name to modifier:
                 ) {}
             """
             ),
-            composableStub,
-            modifierStub
+            kotlin(Stubs.Composable),
+            kotlin(Stubs.Modifier)
         )
             .run()
             .expect(
                 """
-src/androidx/compose/ui/foo/test.kt:10: Error: Modifier parameter should have a type of Modifier [ModifierParameter]
+src/androidx/compose/ui/foo/test.kt:10: Warning: Modifier parameter should have a type of Modifier [ModifierParameter]
                     modifier: Modifier.Element,
                     ~~~~~~~~
-1 errors, 0 warnings
+0 errors, 1 warnings
             """
             )
             .expectFixDiffs(
@@ -142,16 +143,16 @@ Fix for src/androidx/compose/ui/foo/test.kt line 10: Change type to Modifier:
                 ) {}
             """
             ),
-            composableStub,
-            modifierStub
+            kotlin(Stubs.Composable),
+            kotlin(Stubs.Modifier)
         )
             .run()
             .expect(
                 """
-src/androidx/compose/ui/foo/TestModifier.kt:12: Error: Optional Modifier parameter should have a default value of Modifier [ModifierParameter]
+src/androidx/compose/ui/foo/TestModifier.kt:12: Warning: Optional Modifier parameter should have a default value of Modifier [ModifierParameter]
                     modifier: Modifier = TestModifier,
                     ~~~~~~~~
-1 errors, 0 warnings
+0 errors, 1 warnings
             """
             )
             .expectFixDiffs(
@@ -183,16 +184,16 @@ Fix for src/androidx/compose/ui/foo/TestModifier.kt line 12: Change default valu
                 ) {}
             """
             ),
-            composableStub,
-            modifierStub
+            kotlin(Stubs.Composable),
+            kotlin(Stubs.Modifier)
         )
             .run()
             .expect(
                 """
-src/androidx/compose/ui/foo/test.kt:11: Error: Modifier parameter should be the first optional parameter [ModifierParameter]
+src/androidx/compose/ui/foo/test.kt:11: Warning: Modifier parameter should be the first optional parameter [ModifierParameter]
                     modifier: Modifier = Modifier,
                     ~~~~~~~~
-1 errors, 0 warnings
+0 errors, 1 warnings
             """
             )
     }
@@ -218,25 +219,25 @@ src/androidx/compose/ui/foo/test.kt:11: Error: Modifier parameter should be the 
                 ) {}
             """
             ),
-            composableStub,
-            modifierStub
+            kotlin(Stubs.Composable),
+            kotlin(Stubs.Modifier)
         )
             .run()
             .expect(
                 """
-src/androidx/compose/ui/foo/TestModifier.kt:13: Error: Modifier parameter should be named modifier [ModifierParameter]
+src/androidx/compose/ui/foo/TestModifier.kt:13: Warning: Modifier parameter should be named modifier [ModifierParameter]
                     buttonModifier: Modifier.Element = TestModifier,
                     ~~~~~~~~~~~~~~
-src/androidx/compose/ui/foo/TestModifier.kt:13: Error: Modifier parameter should be the first optional parameter [ModifierParameter]
+src/androidx/compose/ui/foo/TestModifier.kt:13: Warning: Modifier parameter should be the first optional parameter [ModifierParameter]
                     buttonModifier: Modifier.Element = TestModifier,
                     ~~~~~~~~~~~~~~
-src/androidx/compose/ui/foo/TestModifier.kt:13: Error: Modifier parameter should have a type of Modifier [ModifierParameter]
+src/androidx/compose/ui/foo/TestModifier.kt:13: Warning: Modifier parameter should have a type of Modifier [ModifierParameter]
                     buttonModifier: Modifier.Element = TestModifier,
                     ~~~~~~~~~~~~~~
-src/androidx/compose/ui/foo/TestModifier.kt:13: Error: Optional Modifier parameter should have a default value of Modifier [ModifierParameter]
+src/androidx/compose/ui/foo/TestModifier.kt:13: Warning: Optional Modifier parameter should have a default value of Modifier [ModifierParameter]
                     buttonModifier: Modifier.Element = TestModifier,
                     ~~~~~~~~~~~~~~
-4 errors, 0 warnings
+0 errors, 4 warnings
             """
             )
             .expectFixDiffs(
@@ -273,8 +274,8 @@ Fix for src/androidx/compose/ui/foo/TestModifier.kt line 13: Change default valu
                 ) {}
             """
             ),
-            composableStub,
-            modifierStub
+            kotlin(Stubs.Composable),
+            kotlin(Stubs.Modifier)
         )
             .run()
             .expectClean()
@@ -302,8 +303,8 @@ Fix for src/androidx/compose/ui/foo/TestModifier.kt line 13: Change default valu
                 ) {}
             """
             ),
-            composableStub,
-            modifierStub
+            kotlin(Stubs.Composable),
+            kotlin(Stubs.Modifier)
         )
             .run()
             .expectClean()
@@ -336,8 +337,8 @@ Fix for src/androidx/compose/ui/foo/TestModifier.kt line 13: Change default valu
                 ) {}
             """
             ),
-            composableStub,
-            modifierStub
+            kotlin(Stubs.Composable),
+            kotlin(Stubs.Modifier)
         )
             .run()
             .expectClean()

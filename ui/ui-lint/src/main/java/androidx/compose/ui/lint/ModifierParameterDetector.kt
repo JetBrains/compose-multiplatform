@@ -18,6 +18,10 @@
 
 package androidx.compose.ui.lint
 
+import androidx.compose.lint.Names
+import androidx.compose.lint.inheritsFrom
+import androidx.compose.lint.isComposable
+import androidx.compose.lint.returnsUnit
 import com.android.tools.lint.client.api.UElementHandler
 import com.android.tools.lint.detector.api.Category
 import com.android.tools.lint.detector.api.Detector
@@ -28,8 +32,6 @@ import com.android.tools.lint.detector.api.LintFix
 import com.android.tools.lint.detector.api.Scope
 import com.android.tools.lint.detector.api.Severity
 import com.android.tools.lint.detector.api.SourceCodeScanner
-import com.intellij.psi.PsiType
-import com.intellij.psi.util.InheritanceUtil
 import org.jetbrains.kotlin.psi.KtNameReferenceExpression
 import org.jetbrains.kotlin.psi.KtParameter
 import org.jetbrains.uast.UElement
@@ -56,11 +58,10 @@ class ModifierParameterDetector : Detector(), SourceCodeScanner {
             if (!node.isComposable) return
 
             // Ignore non-unit composable functions
-            if (node.returnType != PsiType.VOID) return
+            if (!node.returnsUnit) return
 
             val modifierParameter = node.uastParameters.firstOrNull { parameter ->
-                parameter.sourcePsi is KtParameter &&
-                    InheritanceUtil.isInheritor(parameter.type, ModifierFqn)
+                parameter.sourcePsi is KtParameter && parameter.type.inheritsFrom(Names.Ui.Modifier)
             } ?: return
 
             // Need to strongly type this or else Kotlinc cannot resolve overloads for
@@ -69,12 +70,14 @@ class ModifierParameterDetector : Detector(), SourceCodeScanner {
 
             val source = modifierParameter.sourcePsi as KtParameter
 
+            val modifierName = Names.Ui.Modifier.shortName
+
             if (modifierParameter.name != ModifierParameterName) {
                 context.report(
                     ModifierParameter,
                     node,
                     context.getNameLocation(modifierParameterElement),
-                    "$ModifierShortName parameter should be named $ModifierParameterName",
+                    "$modifierName parameter should be named $ModifierParameterName",
                     LintFix.create()
                         .replace()
                         .name("Change name to $ModifierParameterName")
@@ -85,18 +88,18 @@ class ModifierParameterDetector : Detector(), SourceCodeScanner {
                 )
             }
 
-            if (modifierParameter.type.canonicalText != ModifierFqn) {
+            if (modifierParameter.type.canonicalText != Names.Ui.Modifier.javaFqn) {
                 context.report(
                     ModifierParameter,
                     node,
                     context.getNameLocation(modifierParameterElement),
-                    "$ModifierShortName parameter should have a type of $ModifierShortName",
+                    "$modifierName parameter should have a type of $modifierName",
                     LintFix.create()
                         .replace()
                         .range(context.getLocation(modifierParameterElement))
-                        .name("Change type to $ModifierShortName")
+                        .name("Change type to $modifierName")
                         .text(source.typeReference!!.text)
-                        .with(ModifierShortName)
+                        .with(modifierName)
                         .autoFix()
                         .build()
                 )
@@ -107,19 +110,19 @@ class ModifierParameterDetector : Detector(), SourceCodeScanner {
                 // If the default value is not a reference expression, then it isn't `Modifier`
                 // anyway and we can just report an error
                 val referenceExpression = source.defaultValue as? KtNameReferenceExpression
-                if (referenceExpression?.getReferencedName() != ModifierShortName) {
+                if (referenceExpression?.getReferencedName() != modifierName) {
                     context.report(
                         ModifierParameter,
                         node,
                         context.getNameLocation(modifierParameterElement),
-                        "Optional $ModifierShortName parameter should have a default value " +
-                            "of `$ModifierShortName`",
+                        "Optional $modifierName parameter should have a default value " +
+                            "of `$modifierName`",
                         LintFix.create()
                             .replace()
                             .range(context.getLocation(modifierParameterElement))
-                            .name("Change default value to $ModifierShortName")
+                            .name("Change default value to $modifierName")
                             .text(defaultValue.text)
-                            .with(ModifierShortName)
+                            .with(modifierName)
                             .autoFix()
                             .build()
                     )
@@ -133,7 +136,7 @@ class ModifierParameterDetector : Detector(), SourceCodeScanner {
                         ModifierParameter,
                         node,
                         context.getNameLocation(modifierParameterElement),
-                        "$ModifierShortName parameter should be the first optional parameter",
+                        "$modifierName parameter should be the first optional parameter",
                         // Hard to make a lint fix for this and keep parameter formatting, so
                         // ignore it
                     )
@@ -148,11 +151,12 @@ class ModifierParameterDetector : Detector(), SourceCodeScanner {
             "Guidelines for Modifier parameters in a Composable function",
             "The first (or only) Modifier parameter in a Composable function should follow the " +
                 "following rules:" +
-                "- Be named `$ModifierParameterName`" +
-                "- Have a type of `$ModifierShortName`" +
-                "- Either have no default value, or have a default value of `$ModifierShortName`" +
-                "- If optional, be the first optional parameter in the parameter list",
-            Category.CORRECTNESS, 3, Severity.ERROR,
+                "\n- Be named `$ModifierParameterName`" +
+                "\n- Have a type of `${Names.Ui.Modifier.shortName}`" +
+                "\n- Either have no default value, or have a default value of " +
+                "`${Names.Ui.Modifier.shortName}`" +
+                "\n- If optional, be the first optional parameter in the parameter list",
+            Category.CORRECTNESS, 3, Severity.WARNING,
             Implementation(
                 ModifierParameterDetector::class.java,
                 EnumSet.of(Scope.JAVA_FILE, Scope.TEST_SOURCES)
@@ -161,4 +165,4 @@ class ModifierParameterDetector : Detector(), SourceCodeScanner {
     }
 }
 
-private val ModifierParameterName = ModifierShortName.decapitalize(Locale.ROOT)
+private val ModifierParameterName = Names.Ui.Modifier.shortName.decapitalize(Locale.ROOT)

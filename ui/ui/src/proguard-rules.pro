@@ -17,3 +17,7 @@
 # R8 to complain about them not being there during optimization.
 -dontwarn android.view.RenderNode
 -dontwarn android.view.DisplayListCanvas
+
+-keepclassmember class androidx.compose.ui.platform.ViewLayerContainer {
+    protected void dispatchGetDisplayList();
+}

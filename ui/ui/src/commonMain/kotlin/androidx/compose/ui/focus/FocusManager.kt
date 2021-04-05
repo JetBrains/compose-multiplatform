@@ -35,6 +35,7 @@ import androidx.compose.ui.input.pointer.changedToUpIgnoreConsumed
 import androidx.compose.ui.input.pointer.consumeDownChange
 import androidx.compose.ui.input.pointer.positionChangeConsumed
 import androidx.compose.ui.unit.IntSize
+import androidx.compose.ui.util.fastAll
 import androidx.compose.ui.util.fastAny
 import androidx.compose.ui.util.fastForEach
 
@@ -192,7 +193,7 @@ private class FocusTapGestureFilter : PointerInputFilter() {
         if (pass == PointerEventPass.Main) {
 
             if (primed &&
-                changes.all { it.changedToUp() }
+                changes.fastAll { it.changedToUp() }
             ) {
                 val pointerPxPosition: Offset = changes[0].previousPosition
                 if (changes.fastAny { !upBlockedPointers.contains(it.id) }) {
@@ -211,7 +212,7 @@ private class FocusTapGestureFilter : PointerInputFilter() {
                 }
             }
 
-            if (changes.all { it.changedToDown() }) {
+            if (changes.fastAll { it.changedToDown() }) {
                 // Reset in case we were incorrectly left waiting on a delayUp message.
                 reset()
                 // If all of the changes are down, can become primed.
@@ -219,7 +220,7 @@ private class FocusTapGestureFilter : PointerInputFilter() {
             }
 
             if (primed) {
-                changes.forEach {
+                changes.fastForEach {
                     if (it.changedToDown()) {
                         downPointers.add(it.id)
                     }

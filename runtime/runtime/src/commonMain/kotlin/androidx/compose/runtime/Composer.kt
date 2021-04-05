@@ -21,6 +21,9 @@
 package androidx.compose.runtime
 
 import androidx.compose.runtime.collection.IdentityScopeMap
+import androidx.compose.runtime.snapshots.fastForEach
+import androidx.compose.runtime.snapshots.fastMap
+import androidx.compose.runtime.snapshots.fastToSet
 import androidx.compose.runtime.tooling.LocalInspectionTables
 import androidx.compose.runtime.tooling.CompositionData
 import kotlinx.collections.immutable.PersistentMap
@@ -1250,7 +1253,7 @@ internal class ComposerImpl(
 
     private fun validateRecomposeScopeAnchors(slotTable: SlotTable) {
         val scopes = slotTable.slots.mapNotNull { it as? RecomposeScopeImpl }
-        for (scope in scopes) {
+        scopes.fastForEach { scope ->
             scope.anchor?.let { anchor ->
                 check(scope in slotTable.slotsOf(anchor.toIndexFor(slotTable))) {
                     val dataIndex = slotTable.slots.indexOf(scope)
@@ -1328,10 +1331,16 @@ internal class ComposerImpl(
             sideEffects += effect
         }
 
+        val hasEffects: Boolean
+            get() = sideEffects.isNotEmpty() ||
+                forgetting.isNotEmpty() ||
+                remembering.isNotEmpty()
+
         fun dispatchRememberObservers() {
             // Send forgets
             if (forgetting.isNotEmpty()) {
-                for (instance in forgetting.reversed()) {
+                for (index in forgetting.indices.reversed()) {
+                    val instance = forgetting[index]
                     if (instance !in abandoning)
                         instance.onForgotten()
                 }
@@ -1339,7 +1348,7 @@ internal class ComposerImpl(
 
             // Send remembers
             if (remembering.isNotEmpty()) {
-                for (instance in remembering) {
+                remembering.fastForEach { instance ->
                     abandoning.remove(instance)
                     instance.onRemembered()
                 }
@@ -1348,7 +1357,7 @@ internal class ComposerImpl(
 
         fun dispatchSideEffects() {
             if (sideEffects.isNotEmpty()) {
-                for (sideEffect in sideEffects) {
+                sideEffects.fastForEach { sideEffect ->
                     sideEffect()
                 }
                 sideEffects.clear()
@@ -1357,11 +1366,13 @@ internal class ComposerImpl(
 
         fun dispatchAbandons() {
             if (abandoning.isNotEmpty()) {
-                val iterator = abandoning.iterator()
-                while (iterator.hasNext()) {
-                    val instance = iterator.next()
-                    iterator.remove()
-                    instance.onAbandoned()
+                trace("Compose:dispatchAbandons") {
+                    val iterator = abandoning.iterator()
+                    while (iterator.hasNext()) {
+                        val instance = iterator.next()
+                        iterator.remove()
+                        instance.onAbandoned()
+                    }
                 }
             }
         }
@@ -1373,7 +1384,7 @@ internal class ComposerImpl(
     internal fun applyChanges() {
         trace("Compose:applyChanges") {
             val invalidationAnchors = slotTable.read { reader ->
-                invalidations.map { reader.anchor(it.location) to it }
+                invalidations.fastMap { reader.anchor(it.location) to it }
             }
 
             val manager = RememberEventDispatcher(abandonSet)
@@ -1383,7 +1394,7 @@ internal class ComposerImpl(
                 // Apply all changes
                 slotTable.write { slots ->
                     val applier = applier
-                    changes.forEach { change ->
+                    changes.fastForEach { change ->
                         change(applier, slots, manager)
                     }
                     changes.clear()
@@ -1406,8 +1417,12 @@ internal class ComposerImpl(
                 // Side effects run after lifecycle observers so that any remembered objects
                 // that implement RememberObserver receive onRemembered before a side effect
                 // that captured it and operates on it can run.
-                manager.dispatchRememberObservers()
-                manager.dispatchSideEffects()
+                if (manager.hasEffects) {
+                    trace("Compose:dispatchEffects") {
+                        manager.dispatchRememberObservers()
+                        manager.dispatchSideEffects()
+                    }
+                }
 
                 if (pendingInvalidScopes) {
                     pendingInvalidScopes = false
@@ -2075,7 +2090,7 @@ internal class ComposerImpl(
 
             // usedKeys contains the keys that were used in the new composition, therefore if a key
             // doesn't exist in this set, it needs to be removed.
-            val usedKeys = current.toSet()
+            val usedKeys = current.fastToSet()
 
             val placedKeys = mutableSetOf<KeyInfo>()
             var currentIndex = 0
@@ -2803,7 +2818,7 @@ internal class ComposerImpl(
             val insertTable = insertTable
             recordSlotEditingOperation { applier, slots, rememberManager ->
                 insertTable.write { writer ->
-                    for (fixup in fixups) {
+                    fixups.fastForEach { fixup ->
                         fixup(applier, writer, rememberManager)
                     }
                 }

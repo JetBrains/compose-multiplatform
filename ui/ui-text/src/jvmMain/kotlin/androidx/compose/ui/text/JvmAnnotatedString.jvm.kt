@@ -17,6 +17,7 @@
 package androidx.compose.ui.text
 
 import androidx.compose.ui.text.AnnotatedString.Range
+import androidx.compose.ui.util.fastMap
 
 import java.util.SortedSet
 
@@ -40,14 +41,14 @@ internal actual fun AnnotatedString.transform(
         offsetMap.put(end, resultStr.length)
     }
 
-    val newSpanStyles = spanStyles.map {
+    val newSpanStyles = spanStyles.fastMap {
         // The offset map must have mapping entry from all style start, end position.
         Range(it.item, offsetMap[it.start]!!, offsetMap[it.end]!!)
     }
-    val newParaStyles = paragraphStyles.map {
+    val newParaStyles = paragraphStyles.fastMap {
         Range(it.item, offsetMap[it.start]!!, offsetMap[it.end]!!)
     }
-    val newAnnotations = annotations.map {
+    val newAnnotations = annotations.fastMap {
         Range(it.item, offsetMap[it.start]!!, offsetMap[it.end]!!)
     }
 
@@ -69,7 +70,7 @@ private fun <T> collectRangeTransitions(
     ranges: List<Range<T>>,
     target: SortedSet<Int>
 ) {
-    ranges.fold(target) { acc, range ->
+    ranges.fastFold(target) { acc, range ->
         acc.apply {
             add(range.start)
             add(range.end)

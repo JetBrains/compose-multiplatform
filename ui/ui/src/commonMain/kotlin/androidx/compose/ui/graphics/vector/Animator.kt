@@ -29,13 +29,16 @@ import androidx.compose.animation.core.keyframes
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.State
 import androidx.compose.runtime.remember
+import androidx.compose.ui.fastZip
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.graphics.colorspace.ColorSpace
 import androidx.compose.ui.graphics.colorspace.ColorSpaces
+import androidx.compose.ui.util.fastForEach
 import androidx.compose.ui.util.fastMaxBy
+import androidx.compose.ui.util.fastSumBy
 import androidx.compose.ui.util.lerp
 
 internal sealed class Animator {
@@ -81,7 +84,7 @@ internal data class ObjectAnimator(
         overallDuration: Int,
         parentDelay: Int
     ) {
-        for (holder in holders) {
+        holders.fastForEach { holder ->
             holder.AnimateIn(
                 override,
                 transition,
@@ -100,7 +103,7 @@ internal data class AnimatorSet(
 
     override val totalDuration = when (ordering) {
         Ordering.Together -> animators.fastMaxBy { it.totalDuration }?.totalDuration ?: 0
-        Ordering.Sequentially -> animators.sumBy { it.totalDuration }
+        Ordering.Sequentially -> animators.fastSumBy { it.totalDuration }
     }
 
     @Composable
@@ -112,13 +115,13 @@ internal data class AnimatorSet(
     ) {
         when (ordering) {
             Ordering.Together -> {
-                for (animator in animators) {
+                animators.fastForEach { animator ->
                     animator.Configure(transition, override, overallDuration, parentDelay)
                 }
             }
             Ordering.Sequentially -> {
                 var accumulatedDelay = parentDelay
-                for (animator in animators) {
+                animators.fastForEach { animator ->
                     animator.Configure(transition, override, overallDuration, accumulatedDelay)
                     accumulatedDelay += animator.totalDuration
                 }
@@ -187,7 +190,7 @@ internal sealed class PropertyValuesHolder1D<T>(
                 keyframes {
                     durationMillis = duration
                     delayMillis = delay
-                    for (keyframe in animatorKeyframes) {
+                    animatorKeyframes.fastForEach { keyframe ->
                         val time = (duration * keyframe.fraction).toInt()
                         addKeyframe(keyframe, time, keyframe.interpolator)
                     }
@@ -196,7 +199,7 @@ internal sealed class PropertyValuesHolder1D<T>(
                 keyframes {
                     durationMillis = duration
                     delayMillis = overallDuration - duration - delay
-                    for (keyframe in animatorKeyframes) {
+                    animatorKeyframes.fastForEach { keyframe ->
                         val time = (duration * (1 - keyframe.fraction)).toInt()
                         addKeyframe(keyframe, time, keyframe.interpolator.transpose())
                     }
@@ -509,7 +512,7 @@ private fun Easing.transpose(): Easing {
 }
 
 private fun lerp(start: List<PathNode>, stop: List<PathNode>, fraction: Float): List<PathNode> {
-    return start.zip(stop) { a, b -> lerp(a, b, fraction) }
+    return start.fastZip(stop) { a, b -> lerp(a, b, fraction) }
 }
 
 /**

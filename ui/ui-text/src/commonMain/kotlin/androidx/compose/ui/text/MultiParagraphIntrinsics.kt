@@ -19,6 +19,8 @@ package androidx.compose.ui.text
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.style.TextDirection
 import androidx.compose.ui.unit.Density
+import androidx.compose.ui.util.fastMap
+import androidx.compose.ui.util.fastMaxBy
 
 /**
  * Calculates and provides the intrinsic width and height of text that contains [ParagraphStyle].
@@ -45,14 +47,14 @@ class MultiParagraphIntrinsics(
     resourceLoader: Font.ResourceLoader
 ) : ParagraphIntrinsics {
 
-    override val minIntrinsicWidth: Float by lazy {
-        infoList.maxByOrNull {
+    override val minIntrinsicWidth: Float by lazy(LazyThreadSafetyMode.NONE) {
+        infoList.fastMaxBy {
             it.intrinsics.minIntrinsicWidth
         }?.intrinsics?.minIntrinsicWidth ?: 0f
     }
 
-    override val maxIntrinsicWidth: Float by lazy {
-        infoList.maxByOrNull {
+    override val maxIntrinsicWidth: Float by lazy(LazyThreadSafetyMode.NONE) {
+        infoList.fastMaxBy {
             it.intrinsics.maxIntrinsicWidth
         }?.intrinsics?.maxIntrinsicWidth ?: 0f
     }
@@ -109,7 +111,7 @@ class MultiParagraphIntrinsics(
 }
 
 private fun List<AnnotatedString.Range<Placeholder>>.getLocalPlaceholders(start: Int, end: Int) =
-    filter { intersect(start, end, it.start, it.end) }.map {
+    fastFilter { intersect(start, end, it.start, it.end) }.fastMap {
         require(start <= it.start && it.end <= end) {
             "placeholder can not overlap with paragraph."
         }

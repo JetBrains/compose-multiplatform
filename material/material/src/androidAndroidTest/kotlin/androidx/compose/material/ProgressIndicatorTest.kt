@@ -15,8 +15,14 @@
  */
 package androidx.compose.material
 
+import android.os.Build
+import androidx.compose.foundation.layout.size
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.testutils.assertPixelColor
+import androidx.compose.testutils.assertPixels
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.toPixelMap
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.semantics.ProgressBarRangeInfo
 import androidx.compose.ui.test.ExperimentalTestApi
@@ -25,11 +31,15 @@ import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.assertRangeInfoEquals
 import androidx.compose.ui.test.assertValueEquals
 import androidx.compose.ui.test.assertWidthIsEqualTo
+import androidx.compose.ui.test.captureToImage
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
+import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.LargeTest
+import androidx.test.filters.SdkSuppress
+import org.junit.Assert.assertEquals
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -172,5 +182,64 @@ class ProgressIndicatorTest {
 
         contentToTest
             .assertIsSquareWithSize(40.dp)
+    }
+
+    @SdkSuppress(minSdkVersion = Build.VERSION_CODES.O)
+    @Test
+    fun determinateLinearProgressIndicator_sizeModifier() {
+        val expectedWidth = 100.dp
+        val expectedHeight = 10.dp
+        val expectedSize = with(rule.density) {
+            IntSize(expectedWidth.roundToPx(), expectedHeight.roundToPx())
+        }
+        val tag = "progress_indicator"
+        rule.setContent {
+            LinearProgressIndicator(
+                modifier = Modifier.testTag(tag).size(expectedWidth, expectedHeight),
+                progress = 1f,
+                color = Color.Blue
+            )
+        }
+
+        rule.onNodeWithTag(tag)
+            .captureToImage()
+            .assertPixels(expectedSize = expectedSize) {
+                Color.Blue
+            }
+    }
+
+    @SdkSuppress(minSdkVersion = Build.VERSION_CODES.O)
+    @Test
+    fun indeterminateLinearProgressIndicator_sizeModifier() {
+        val expectedWidth = 100.dp
+        val expectedHeight = 10.dp
+        val expectedSize = with(rule.density) {
+            IntSize(expectedWidth.roundToPx(), expectedHeight.roundToPx())
+        }
+        rule.mainClock.autoAdvance = false
+        val tag = "progress_indicator"
+        rule.setContent {
+
+            LinearProgressIndicator(
+                modifier = Modifier.testTag(tag).size(expectedWidth, expectedHeight),
+                color = Color.Blue
+            )
+        }
+
+        rule.mainClock.advanceTimeBy(100)
+
+        rule.onNodeWithTag(tag)
+            .captureToImage()
+            .toPixelMap()
+            .let {
+                assertEquals(expectedSize.width, it.width)
+                assertEquals(expectedSize.height, it.height)
+                // Assert on the first pixel column, to make sure that the progress indicator draws
+                // to the expect height.
+                // We can't assert width as the width dynamically changes during the animation
+                for (i in 0 until it.height) {
+                    it.assertPixelColor(Color.Blue, 0, i)
+                }
+            }
     }
 }

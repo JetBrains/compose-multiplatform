@@ -18,6 +18,7 @@
 
 package androidx.compose.runtime.lint
 
+import androidx.compose.lint.Stubs
 import com.android.tools.lint.checks.infrastructure.LintDetectorTest
 import com.android.tools.lint.detector.api.Detector
 import com.android.tools.lint.detector.api.Issue
@@ -50,7 +51,7 @@ class ComposableNamingDetectorTest : LintDetectorTest() {
                 fun button() {}
             """
             ),
-            composableStub
+            kotlin(Stubs.Composable)
         )
             .run()
             .expect(
@@ -84,7 +85,7 @@ Fix for src/androidx/compose/runtime/foo/test.kt line 7: Change to Button:
                 fun Button() {}
             """
             ),
-            composableStub
+            kotlin(Stubs.Composable)
         )
             .run()
             .expectClean()
@@ -103,7 +104,7 @@ Fix for src/androidx/compose/runtime/foo/test.kt line 7: Change to Button:
                 fun getInt(): Int { return 5 }
             """
             ),
-            composableStub
+            kotlin(Stubs.Composable)
         )
             .run()
             .expectClean()
@@ -122,7 +123,7 @@ Fix for src/androidx/compose/runtime/foo/test.kt line 7: Change to Button:
                 fun GetInt(): Int { return 5 }
             """
             ),
-            composableStub
+            kotlin(Stubs.Composable)
         )
             .run()
             .expect(

@@ -28,7 +28,6 @@ import androidx.compose.ui.graphics.Color
 import androidx.test.core.app.ActivityScenario
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.LargeTest
-import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
@@ -46,7 +45,7 @@ class WindowRecomposerTest {
      * Test that a Recomposer that doesn't shut down with the activity doesn't inadvertently
      * keep a reference to the Activity
      */
-    @OptIn(ExperimentalCoroutinesApi::class, InternalComposeUiApi::class)
+    @OptIn(InternalComposeUiApi::class)
     @Test
     @LargeTest
     fun activityGarbageCollected() {

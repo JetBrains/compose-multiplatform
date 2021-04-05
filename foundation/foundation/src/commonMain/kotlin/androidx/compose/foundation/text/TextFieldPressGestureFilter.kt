@@ -16,27 +16,32 @@
 
 package androidx.compose.foundation.text
 
+import androidx.compose.foundation.gestures.detectTapAndPress
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.interaction.PressInteraction
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.composed
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.input.pointer.pointerInput
 import kotlinx.coroutines.launch
-import androidx.compose.foundation.legacygestures.pressIndicatorGestureFilter
 
 /**
- * Required for the press [MutableInteractionSource] consistency for TextField.
+ * Required for the press and tap [MutableInteractionSource] consistency for TextField.
  */
-@Suppress("ModifierInspectorInfo", "DEPRECATION")
-internal fun Modifier.pressGestureFilter(
+@Suppress("ModifierInspectorInfo")
+internal fun Modifier.tapPressTextFieldModifier(
     interactionSource: MutableInteractionSource?,
-    enabled: Boolean = true
+    enabled: Boolean = true,
+    onTap: (Offset) -> Unit
 ): Modifier = if (enabled) composed {
     val scope = rememberCoroutineScope()
     val pressedInteraction = remember { mutableStateOf<PressInteraction.Press?>(null) }
+    val onTapState = rememberUpdatedState(onTap)
     DisposableEffect(interactionSource) {
         onDispose {
             pressedInteraction.value?.let { oldValue ->
@@ -46,37 +51,35 @@ internal fun Modifier.pressGestureFilter(
             }
         }
     }
-    pressIndicatorGestureFilter(
-        onStart = {
-            scope.launch {
-                // Remove any old interactions if we didn't fire stop / cancel properly
-                pressedInteraction.value?.let { oldValue ->
-                    val interaction = PressInteraction.Cancel(oldValue)
+    Modifier.pointerInput(interactionSource) {
+        detectTapAndPress(
+            onPress = {
+                scope.launch {
+                    // Remove any old interactions if we didn't fire stop / cancel properly
+                    pressedInteraction.value?.let { oldValue ->
+                        val interaction = PressInteraction.Cancel(oldValue)
+                        interactionSource?.emit(interaction)
+                        pressedInteraction.value = null
+                    }
+                    val interaction = PressInteraction.Press(it)
                     interactionSource?.emit(interaction)
-                    pressedInteraction.value = null
+                    pressedInteraction.value = interaction
                 }
-                val interaction = PressInteraction.Press(it)
-                interactionSource?.emit(interaction)
-                pressedInteraction.value = interaction
-            }
-        },
-        onStop = {
-            scope.launch {
-                pressedInteraction.value?.let {
-                    val interaction = PressInteraction.Release(it)
-                    interactionSource?.emit(interaction)
-                    pressedInteraction.value = null
+                val success = tryAwaitRelease()
+                scope.launch {
+                    pressedInteraction.value?.let { oldValue ->
+                        val interaction =
+                            if (success) {
+                                PressInteraction.Release(oldValue)
+                            } else {
+                                PressInteraction.Cancel(oldValue)
+                            }
+                        interactionSource?.emit(interaction)
+                        pressedInteraction.value = null
+                    }
                 }
-            }
-        },
-        onCancel = {
-            scope.launch {
-                pressedInteraction.value?.let {
-                    val interaction = PressInteraction.Cancel(it)
-                    interactionSource?.emit(interaction)
-                    pressedInteraction.value = null
-                }
-            }
-        }
-    )
+            },
+            onTap = { onTapState.value.invoke(it) }
+        )
+    }
 } else this

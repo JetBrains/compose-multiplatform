@@ -97,6 +97,33 @@ class ComposerParamSignatureTests : AbstractCodegenSignatureTest() {
     }
 
     @Test
+    fun testStrangeReceiverIssue(): Unit = codegen(
+        """
+        import androidx.compose.runtime.ExplicitGroupsComposable
+        import androidx.compose.runtime.NonRestartableComposable
+        class Foo
+
+        @Composable
+        @ExplicitGroupsComposable
+        fun A(foo: Foo) {
+            foo.b()
+        }
+
+        @Composable
+        @ExplicitGroupsComposable
+        inline fun Foo.b(label: String = "") {
+            c(this, label)
+        }
+
+        @Composable
+        @ExplicitGroupsComposable
+        inline fun c(foo: Foo, label: String) {
+            used(label)
+        }
+        """
+    )
+
+    @Test
     fun testInterfaceMethodWithComposableParameter(): Unit = validateBytecode(
         """
             @Composable
@@ -139,7 +166,16 @@ class ComposerParamSignatureTests : AbstractCodegenSignatureTest() {
             f: Float,
             g: Long,
             h: Double
-        ) {}
+        ) {
+            used(a)
+            used(b)
+            used(c)
+            used(d)
+            used(e)
+            used(f)
+            used(g)
+            used(h)
+        }
         """
     ) {
         assert(it.contains("INVOKEINTERFACE androidx/compose/runtime/Composer.changed (Z)Z"))
@@ -159,7 +195,9 @@ class ComposerParamSignatureTests : AbstractCodegenSignatureTest() {
         import androidx.compose.runtime.Stable
 
         @Stable class Bar
-        @Composable fun Foo(a: Bar) {}
+        @Composable fun Foo(a: Bar) {
+            used(a)
+        }
         """
     ) {
         assert(!it.contains("INVOKEINTERFACE androidx/compose/runtime/Composer.changed (Z)Z"))
@@ -177,7 +215,9 @@ class ComposerParamSignatureTests : AbstractCodegenSignatureTest() {
     fun testInlineClassChangedCalls(): Unit = validateBytecode(
         """
         inline class Bar(val value: Int)
-        @Composable fun Foo(a: Bar) {}
+        @Composable fun Foo(a: Bar) {
+            used(a)
+        }
         """
     ) {
         assert(!it.contains("INVOKESTATIC Bar.box-impl (I)LBar;"))
@@ -191,7 +231,9 @@ class ComposerParamSignatureTests : AbstractCodegenSignatureTest() {
     fun testNullableInlineClassChangedCalls(): Unit = validateBytecode(
         """
         inline class Bar(val value: Int)
-        @Composable fun Foo(a: Bar?) {}
+        @Composable fun Foo(a: Bar?) {
+            used(a)
+        }
         """
     ) {
         val testClass = it.split("public final class ").single { it.startsWith("test/TestKt") }
@@ -1081,11 +1123,9 @@ class ComposerParamSignatureTests : AbstractCodegenSignatureTest() {
               public final static Wat(Landroidx/compose/runtime/Composer;I)V
               public final static Foo(ILandroidx/compose/runtime/Composer;I)V
               private final static Foo%goo(Landroidx/compose/runtime/Composer;I)V
-              public final static synthetic access%Foo%goo(Landroidx/compose/runtime/Composer;I)V
               final static INNERCLASS TestKt%Wat%1 null null
               public final static INNERCLASS TestKt%Foo%Bar null Bar
               final static INNERCLASS TestKt%Foo%1 null null
-              final static INNERCLASS TestKt%Foo%goo%1 null null
             }
             final class TestKt%Wat%1 extends kotlin/jvm/internal/Lambda implements kotlin/jvm/functions/Function2 {
               <init>(I)V
@@ -1099,17 +1139,6 @@ class ComposerParamSignatureTests : AbstractCodegenSignatureTest() {
               public <init>()V
               public final baz(Landroidx/compose/runtime/Composer;I)V
               OUTERCLASS TestKt Foo (ILandroidx/compose/runtime/Composer;I)V
-              final static INNERCLASS TestKt%Foo%Bar%baz%1 null null
-              public final static INNERCLASS TestKt%Foo%Bar null Bar
-            }
-            final class TestKt%Foo%Bar%baz%1 extends kotlin/jvm/internal/Lambda implements kotlin/jvm/functions/Function2 {
-              <init>(LTestKt%Foo%Bar;I)V
-              public final invoke(Landroidx/compose/runtime/Composer;I)V
-              public synthetic bridge invoke(Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;
-              final synthetic LTestKt%Foo%Bar; %tmp0_rcvr
-              final synthetic I %%changed
-              OUTERCLASS TestKt%Foo%Bar baz (Landroidx/compose/runtime/Composer;I)V
-              final static INNERCLASS TestKt%Foo%Bar%baz%1 null null
               public final static INNERCLASS TestKt%Foo%Bar null Bar
             }
             final class TestKt%Foo%1 extends kotlin/jvm/internal/Lambda implements kotlin/jvm/functions/Function2 {
@@ -1120,14 +1149,6 @@ class ComposerParamSignatureTests : AbstractCodegenSignatureTest() {
               final synthetic I %%changed
               OUTERCLASS TestKt Foo (ILandroidx/compose/runtime/Composer;I)V
               final static INNERCLASS TestKt%Foo%1 null null
-            }
-            final class TestKt%Foo%goo%1 extends kotlin/jvm/internal/Lambda implements kotlin/jvm/functions/Function2 {
-              <init>(I)V
-              public final invoke(Landroidx/compose/runtime/Composer;I)V
-              public synthetic bridge invoke(Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;
-              final synthetic I %%changed
-              OUTERCLASS TestKt Foo%goo (Landroidx/compose/runtime/Composer;I)V
-              final static INNERCLASS TestKt%Foo%goo%1 null null
             }
         """
     )

@@ -13,12 +13,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-@file:Suppress("DEPRECATION_ERROR")
 
 package androidx.compose.foundation.text
 
-import androidx.compose.foundation.interaction.Interaction
 import androidx.compose.foundation.gestures.Orientation
+import androidx.compose.foundation.interaction.Interaction
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.text.selection.LocalTextSelectionColors
@@ -269,9 +268,11 @@ internal fun CoreTextField(
         if (!it.isFocused) manager.deselect()
     }
 
-    val focusRequestTapModifier = Modifier.focusRequestTapModifier(
-        enabled = enabled,
-        onTap = { offset ->
+    val selectionModifier =
+        Modifier.longPressDragGestureFilter(manager.touchSelectionObserver, enabled)
+
+    val pointerModifier = if (isInTouchMode) {
+        Modifier.tapPressTextFieldModifier(interactionSource, enabled) { offset ->
             tapToFocus(state, focusRequester, !readOnly)
             if (state.hasFocus) {
                 if (!state.selectionIsOn) {
@@ -288,21 +289,9 @@ internal fun CoreTextField(
                     manager.deselect(offset)
                 }
             }
-        }
-    )
-
-    val selectionModifier =
-        Modifier.longPressDragGestureFilter(manager.touchSelectionObserver, enabled)
-
-    val pointerModifier = if (isInTouchMode) {
-        Modifier.pressGestureFilter(interactionSource = interactionSource, enabled = enabled)
-            .then(selectionModifier)
-            .then(focusRequestTapModifier)
+        }.then(selectionModifier)
     } else {
-        Modifier.mouseDragGestureFilter(
-            manager.mouseSelectionObserver(onStart = { focusRequester.requestFocus() }),
-            enabled = enabled
-        )
+        Modifier.mouseDragGestureDetector(manager::mouseSelectionDetector, enabled = enabled)
     }
 
     val drawModifier = Modifier.drawBehind {
@@ -432,6 +421,16 @@ internal fun CoreTextField(
         onDispose { manager.hideSelectionToolbar() }
     }
 
+    val textKeyInputModifier =
+        Modifier.textFieldKeyInput(
+            state = state,
+            manager = manager,
+            value = value,
+            editable = !readOnly,
+            singleLine = maxLines == 1,
+            offsetMapping = offsetMapping
+        )
+
     // Modifiers that should be applied to the outer text field container. Usually those include
     // gesture and semantics modifiers.
     val decorationBoxModifier = modifier
@@ -439,6 +438,7 @@ internal fun CoreTextField(
         .then(pointerModifier)
         .then(semanticsModifier)
         .then(focusModifier)
+        .then(textKeyInputModifier)
         .onGloballyPositioned {
             state.layoutResult?.decorationBoxCoordinates = it
         }
@@ -459,7 +459,6 @@ internal fun CoreTextField(
                 .then(drawModifier)
                 .then(onPositionedModifier)
                 .textFieldMinSize(textStyle)
-                .textFieldKeyboardModifier(manager)
 
             SimpleLayout(coreTextFieldModifier) {
                 Layout({ }) { _, constraints ->
@@ -497,8 +496,6 @@ internal fun CoreTextField(
         }
     }
 }
-
-internal expect fun Modifier.textFieldKeyboardModifier(manager: TextFieldSelectionManager): Modifier
 
 @OptIn(InternalFoundationTextApi::class)
 internal class TextFieldState(

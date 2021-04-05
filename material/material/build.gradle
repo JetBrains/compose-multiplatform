@@ -16,8 +16,7 @@
 
 import androidx.build.AndroidXUiPlugin
 import androidx.build.LibraryGroups
-import androidx.build.Publish
-import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
+import androidx.build.LibraryType
 
 import static androidx.build.dependencies.DependenciesKt.*
 
@@ -67,6 +66,8 @@ dependencies {
         androidTestImplementation(MOCKITO_KOTLIN, {
             exclude group: "org.mockito" // to keep control on the mockito version
         })
+
+        lintPublish project(":compose:material:material-lint")
     }
 }
 
@@ -131,7 +132,7 @@ if(AndroidXUiPlugin.isMultiplatformEnabled(project)) {
 
 androidx {
     name = "Compose Material Components"
-    publish = Publish.SNAPSHOT_AND_RELEASE
+    type = LibraryType.PUBLISHED_LIBRARY
     mavenGroup = LibraryGroups.Compose.MATERIAL
     inceptionYear = "2018"
     description = "Compose Material Design Components library"

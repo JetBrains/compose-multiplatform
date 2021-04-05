@@ -121,11 +121,23 @@ message Parameter {
       DIMENSION_EM = 11;
       LAMBDA = 12;
       FUNCTION_REFERENCE = 13;
+      ITERABLE = 14;
     }
 
     Type type = 1;
     int32 name = 2;
     repeated Parameter elements = 3;
+    ParameterReference reference = 4;
+
+    // For elements inside another Parameter instance, this index refer to the
+    // "natural" index of the parent composite value in the agent.
+    //
+    // We record this to be able to identify a reference to another parameter in
+    // the client and agent. Note that e.g:
+    //   - null elements in a List are omitted
+    // A reference will indicate the index among all values, such that we don't
+    // have to count nulls during a GetParameterDetailsCommand.
+    sint32 index = 5;
 
     oneof value {
         int32 int32_value = 11;
@@ -137,6 +149,22 @@ message Parameter {
     }
 }
 
+// A reference to a "part" of a parameter value
+message ParameterReference {
+  sint64 composable_id = 1;
+
+  // Identifies an index into a ParameterGroup
+  int32 parameter_index = 2;
+
+  // If the parameter value is a composite value such as:
+  //    List<MyClass>
+  // then:
+  //    composite_index[0] is the index into the List
+  //    composite_index[1] is the index into the fields in MyClass
+  //    composite_index[2] is the index into the field found by [1] etc...
+  repeated int32 composite_index = 3;
+}
+
 // A collection of all parameters associated with a single composable
 message ParameterGroup {
   sint64 composable_id = 1;
@@ -144,6 +172,14 @@ message ParameterGroup {
 }
 
 // ======= COMMANDS, RESPONSES, AND EVENTS =======
+
+// Response fired when incoming command bytes cannot be parsed or handled. This may occur if a newer
+// version of the client tries to interact with an older inspector.
+message UnknownCommandResponse {
+  // The initial command bytes received that couldn't be handled. By returning this back to the
+  // client, it should be able to identify what they sent that failed on the inspector side.
+  bytes command_bytes = 1;
+}
 
 // Request all composables found under a layout tree rooted under the specified view
 message GetComposablesCommand {
@@ -163,6 +199,14 @@ message GetParametersCommand {
   // As an optimization, we can skip over searching system composables if we know we don't care
   // about them.
   bool skip_system_composables = 3;
+  // Max number of recursions into nested composite parameter values.
+  // It is possible to dig in further by using: GetParameterDetailsCommand.
+  // If not specified the default is 2.
+  int32 max_recursions = 4;
+  // Max number of initial elements in an iterable such as a List/Array.
+  // It is possible to request more elements by using: GetParameterDetailsCommand.
+  // If not specified the default is 5.
+  int32 max_initial_iterable_size = 5;
 }
 
 message GetParametersResponse {
@@ -175,6 +219,8 @@ message GetParametersResponse {
 message GetAllParametersCommand {
   int64 root_view_id = 1;
   bool skip_system_composables = 2;
+  int32 max_recursions = 3;
+  int32 max_initial_iterable_size = 4;
 }
 
 message GetAllParametersResponse {
@@ -183,11 +229,29 @@ message GetAllParametersResponse {
   repeated ParameterGroup parameter_groups = 3;
 }
 
+// Request parameter details for the parameter specified
+message GetParameterDetailsCommand {
+  int64 root_view_id = 1;
+  ParameterReference reference = 2;
+  int32 start_index = 3;
+  int32 max_elements = 4;
+  bool skip_system_composables = 5;
+  int32 max_recursions = 6;
+  int32 max_initial_iterable_size = 7;
+}
+
+message GetParameterDetailsResponse {
+  int64 root_view_id = 1; // Echoed from GetParameterDetailsCommand
+  repeated StringEntry strings = 2;
+  Parameter parameter = 3;
+}
+
 message Command {
   oneof specialized {
     GetComposablesCommand get_composables_command = 1;
     GetParametersCommand get_parameters_command = 2;
     GetAllParametersCommand get_all_parameters_command = 3;
+    GetParameterDetailsCommand get_parameter_details_command = 4;
   }
 }
 
@@ -196,5 +260,8 @@ message Response {
     GetComposablesResponse get_composables_response = 1;
     GetParametersResponse get_parameters_response = 2;
     GetAllParametersResponse get_all_parameters_response = 3;
+    GetParameterDetailsResponse get_parameter_details_response = 4;
+
+    UnknownCommandResponse unknown_command_response = 100;
   }
 }

@@ -19,8 +19,7 @@ package androidx.compose.foundation.interaction
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.State
-import androidx.compose.runtime.derivedStateOf
-import androidx.compose.runtime.mutableStateListOf
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.geometry.Offset
 import kotlinx.coroutines.flow.collect
@@ -80,15 +79,17 @@ interface PressInteraction : Interaction {
  */
 @Composable
 fun InteractionSource.collectIsPressedAsState(): State<Boolean> {
-    val pressInteractions = remember { mutableStateListOf<PressInteraction.Press>() }
+    val isPressed = remember { mutableStateOf(false) }
     LaunchedEffect(this) {
+        val pressInteractions = mutableListOf<PressInteraction.Press>()
         interactions.collect { interaction ->
             when (interaction) {
                 is PressInteraction.Press -> pressInteractions.add(interaction)
                 is PressInteraction.Release -> pressInteractions.remove(interaction.press)
                 is PressInteraction.Cancel -> pressInteractions.remove(interaction.press)
             }
+            isPressed.value = pressInteractions.isNotEmpty()
         }
     }
-    return remember { derivedStateOf { pressInteractions.isNotEmpty() } }
+    return isPressed
 }

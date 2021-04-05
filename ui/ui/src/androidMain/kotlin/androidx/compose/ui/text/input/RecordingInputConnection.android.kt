@@ -44,7 +44,7 @@ internal val TAG = "RecordingIC"
  */
 internal class RecordingInputConnection(
     initState: TextFieldValue,
-    val eventCallback: InputEventCallback,
+    val eventCallback: InputEventCallback2,
     val autoCorrect: Boolean
 ) : InputConnection {
 
@@ -81,12 +81,8 @@ internal class RecordingInputConnection(
      * contents has changed if needed.
      */
     fun updateInputState(state: TextFieldValue, imm: InputMethodManager, view: View) {
-        val prev = mTextFieldValue
+        if (DEBUG) { Log.d(TAG, "updateInputState: $state") }
         mTextFieldValue = state
-
-        if (prev == state) {
-            return
-        }
 
         if (extractedTextMonitorMode) {
             imm.updateExtractedText(view, currentExtractedTextRequestToken, state.toExtractedText())
@@ -135,7 +131,7 @@ internal class RecordingInputConnection(
         if (DEBUG) { Log.d(TAG, "endBatchEdit()") }
         batchDepth--
         if (batchDepth == 0 && editCommands.isNotEmpty()) {
-            eventCallback.onEditCommands(editCommands.toList())
+            eventCallback.onEditCommands(editCommands.toMutableList())
             editCommands.clear()
         }
         return batchDepth > 0
@@ -195,34 +191,7 @@ internal class RecordingInputConnection(
 
     override fun sendKeyEvent(event: KeyEvent): Boolean {
         if (DEBUG) { Log.d(TAG, "sendKeyEvent($event)") }
-        if (event.action != KeyEvent.ACTION_DOWN) {
-            return true // Only interested in KEY_DOWN event.
-        }
-
-        // TODO(siyamed): This part does not match to android behavior
-        //  on android key events go up to view system, dispatch to the focused field
-        //  then applied separately.
-        //  we probably need key event modifiers at the textfield layer to handle
-        //  the events.
-        val op = when (event.keyCode) {
-            KeyEvent.KEYCODE_DEL -> BackspaceCommand()
-            KeyEvent.KEYCODE_DPAD_LEFT -> MoveCursorCommand(-1)
-            KeyEvent.KEYCODE_DPAD_RIGHT -> MoveCursorCommand(1)
-            else -> {
-                val unicodeChar = event.unicodeChar
-                if (unicodeChar != 0) {
-                    CommitTextCommand(String(Character.toChars(unicodeChar)), 1)
-                } else {
-                    // do nothing
-                    // Android BaseInputConnection calls
-                    // inputMethodManager.dispatchKeyEventFromInputMethod(view, event);
-                    // which was added in N, not sure what to call on L and M
-                    null
-                }
-            }
-        }
-
-        if (op != null) addEditCommandWithBatch(op)
+        eventCallback.onKeyEvent(event)
         return true
     }
 
@@ -252,12 +221,30 @@ internal class RecordingInputConnection(
     }
 
     override fun getExtractedText(request: ExtractedTextRequest?, flags: Int): ExtractedText {
-        if (DEBUG) { Log.d(TAG, "getExtractedText($request, $flags)") }
+        if (DEBUG) {
+            Log.d(TAG, "getExtractedText($request, $flags)")
+        }
         extractedTextMonitorMode = (flags and InputConnection.GET_EXTRACTED_TEXT_MONITOR) != 0
         if (extractedTextMonitorMode) {
             currentExtractedTextRequestToken = request?.token ?: 0
         }
-        return mTextFieldValue.toExtractedText()
+        val extractedText = mTextFieldValue.toExtractedText()
+
+        if (DEBUG) {
+            with(extractedText) {
+                Log.d(
+                    TAG,
+                    "getExtractedText() return: text: $text" +
+                        ",partialStartOffset $partialStartOffset" +
+                        ",partialEndOffset $partialEndOffset" +
+                        ",selectionStart $selectionStart" +
+                        ",selectionEnd $selectionEnd" +
+                        ",flags $flags"
+                )
+            }
+        }
+
+        return extractedText
     }
 
     // /////////////////////////////////////////////////////////////////////////////////////////////

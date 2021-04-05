@@ -21,7 +21,6 @@ import androidx.compose.ui.draw.DrawCacheModifier
 import androidx.compose.ui.draw.DrawModifier
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Canvas
-import androidx.compose.ui.layout.MeasureResult
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.toSize
 
@@ -80,16 +79,10 @@ internal class ModifiedDrawNode(
             invalidateCache = true
         }
 
-    override var measureResult: MeasureResult
-        get() = super.measureResult
-        set(value) {
-            if (super.measuredSize.width != value.width ||
-                super.measuredSize.height != value.height
-            ) {
-                invalidateCache = true
-            }
-            super.measureResult = value
-        }
+    override fun onMeasureResultChanged(width: Int, height: Int) {
+        super.onMeasureResultChanged(width, height)
+        invalidateCache = true
+    }
 
     // This is not thread safe
     override fun performDraw(canvas: Canvas) {
@@ -119,10 +112,8 @@ internal class ModifiedDrawNode(
         private val onCommitAffectingModifiedDrawNode: (ModifiedDrawNode) -> Unit =
             { modifiedDrawNode ->
                 if (modifiedDrawNode.isValid) {
-                    // Note this intentionally does not invalidate the layer as Owner implementations
-                    // already observe and invalidate the layer on state changes. Instead just
-                    // mark the cache dirty so that it will be re-created on the next draw
                     modifiedDrawNode.invalidateCache = true
+                    modifiedDrawNode.invalidateLayer()
                 }
             }
     }

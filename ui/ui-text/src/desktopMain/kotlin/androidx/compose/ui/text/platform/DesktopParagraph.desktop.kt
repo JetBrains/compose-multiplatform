@@ -53,6 +53,7 @@ import org.jetbrains.skija.Paint
 import org.jetbrains.skija.Typeface
 import org.jetbrains.skija.paragraph.Alignment as SkAlignment
 import org.jetbrains.skija.paragraph.BaselineMode
+import org.jetbrains.skija.paragraph.Direction as SkDirection
 import org.jetbrains.skija.paragraph.LineMetrics
 import org.jetbrains.skija.paragraph.ParagraphBuilder
 import org.jetbrains.skija.paragraph.ParagraphStyle
@@ -62,7 +63,6 @@ import org.jetbrains.skija.paragraph.RectHeightMode
 import org.jetbrains.skija.paragraph.RectWidthMode
 import org.jetbrains.skija.paragraph.TextBox
 import java.lang.UnsupportedOperationException
-import java.nio.charset.Charset
 import java.util.WeakHashMap
 import kotlin.math.floor
 import org.jetbrains.skija.Rect as SkRect
@@ -149,16 +149,21 @@ internal class DesktopParagraph(
         get() = paragraphIntrinsics.maxIntrinsicWidth
 
     override val firstBaseline: Float
-        get() = para.getLineMetrics().firstOrNull()?.run { baseline.toFloat() } ?: 0f
+        get() = lineMetrics.firstOrNull()?.run { baseline.toFloat() } ?: 0f
 
     override val lastBaseline: Float
-        get() = para.getLineMetrics().lastOrNull()?.run { baseline.toFloat() } ?: 0f
+        get() = lineMetrics.lastOrNull()?.run { baseline.toFloat() } ?: 0f
 
     override val didExceedMaxLines: Boolean
         get() = para.didExceedMaxLines()
 
     override val lineCount: Int
-        get() = para.lineNumber.toInt()
+        // workaround for https://bugs.chromium.org/p/skia/issues/detail?id=11321
+        get() = if (text == "") {
+            1
+        } else {
+            para.lineNumber.toInt()
+        }
 
     override val placeholderRects: List<Rect?>
         get() =
@@ -180,58 +185,70 @@ internal class DesktopParagraph(
         return path
     }
 
-    private val cursorWidth = 2.0f
-    override fun getCursorRect(offset: Int) =
-        getBoxForwardByOffset(offset)?.let { box ->
-            Rect(box.rect.left, box.rect.top, box.rect.left + cursorWidth, box.rect.bottom)
-        } ?: getBoxBackwardByOffset(offset)?.let { box ->
-            Rect(box.rect.right, box.rect.top, box.rect.right + cursorWidth, box.rect.bottom)
-        } ?: Rect(0f, 0f, cursorWidth, paragraphIntrinsics.builder.defaultHeight)
+    override fun getCursorRect(offset: Int): Rect {
+        val horizontal = getHorizontalPosition(offset, true)
+        val line = lineMetricsForOffset(offset)!!
 
-    override fun getLineLeft(lineIndex: Int): Float {
-        println("Paragraph.getLineLeft $lineIndex")
-        return 0.0f
+        return Rect(
+            horizontal,
+            (line.baseline - line.ascent).toFloat(),
+            horizontal,
+            (line.baseline + line.descent).toFloat()
+        )
     }
 
-    override fun getLineRight(lineIndex: Int): Float {
-        println("Paragraph.getLineRight $lineIndex")
-        return 0.0f
-    }
+    override fun getLineLeft(lineIndex: Int): Float =
+        lineMetrics.getOrNull(lineIndex)?.left?.toFloat() ?: 0f
+
+    override fun getLineRight(lineIndex: Int): Float =
+        lineMetrics.getOrNull(lineIndex)?.right?.toFloat() ?: 0f
 
     override fun getLineTop(lineIndex: Int) =
-        para.lineMetrics.getOrNull(lineIndex)?.let { line ->
+        lineMetrics.getOrNull(lineIndex)?.let { line ->
             floor((line.baseline - line.ascent).toFloat())
         } ?: 0f
 
     override fun getLineBottom(lineIndex: Int) =
-        para.lineMetrics.getOrNull(lineIndex)?.let { line ->
+        lineMetrics.getOrNull(lineIndex)?.let { line ->
             floor((line.baseline + line.descent).toFloat())
         } ?: 0f
 
     private fun lineMetricsForOffset(offset: Int): LineMetrics? {
-        // For some reasons SkParagraph Line metrics use (UTF-8) byte offsets for start and end
-        // indexes
-        val byteOffset = text.substring(0, offset).toByteArray(Charset.forName("UTF-8")).size
-        val metrics = para.lineMetrics
+        val metrics = lineMetrics
         for (line in metrics) {
-            if (byteOffset < line.endIndex) {
+            if (offset < line.endIndex) {
                 return line
             }
+        }
+        if (metrics.isEmpty()) {
+            return null
         }
         return metrics.last()
     }
 
-    override fun getLineHeight(lineIndex: Int) = para.lineMetrics[lineIndex].height.toFloat()
+    override fun getLineHeight(lineIndex: Int) = lineMetrics[lineIndex].height.toFloat()
 
-    override fun getLineWidth(lineIndex: Int) = para.lineMetrics[lineIndex].width.toFloat()
+    override fun getLineWidth(lineIndex: Int) = lineMetrics[lineIndex].width.toFloat()
 
-    override fun getLineStart(lineIndex: Int) = para.lineMetrics[lineIndex].startIndex.toInt()
+    override fun getLineStart(lineIndex: Int) = lineMetrics[lineIndex].startIndex.toInt()
 
     override fun getLineEnd(lineIndex: Int, visibleEnd: Boolean) =
         if (visibleEnd) {
-            para.lineMetrics[lineIndex].endExcludingWhitespaces.toInt()
+            val metrics = lineMetrics[lineIndex]
+            // workarounds for https://bugs.chromium.org/p/skia/issues/detail?id=11321 :(
+            // we are waiting for fixes
+            if (lineIndex > 0 && metrics.startIndex < lineMetrics[lineIndex - 1].endIndex) {
+                metrics.endIndex.toInt()
+            } else if (
+                metrics.startIndex < text.length &&
+                text[metrics.startIndex.toInt()] == '\n'
+            ) {
+                metrics.startIndex.toInt()
+            } else {
+                metrics.endExcludingWhitespaces.toInt()
+            }
         } else {
-            para.lineMetrics[lineIndex].endIndex.toInt()
+            lineMetrics[lineIndex].endIndex.toInt()
         }
 
     override fun isLineEllipsized(lineIndex: Int) = false
@@ -246,12 +263,38 @@ internal class DesktopParagraph(
     }
 
     override fun getHorizontalPosition(offset: Int, usePrimaryDirection: Boolean): Float {
-        return if (usePrimaryDirection) {
-            getHorizontalPositionForward(offset) ?: getHorizontalPositionBackward(offset) ?: 0f
-        } else {
-            getHorizontalPositionBackward(offset) ?: getHorizontalPositionForward(offset) ?: 0f
+        val prevBox = getBoxBackwardByOffset(offset)
+        val nextBox = getBoxForwardByOffset(offset)
+        return when {
+            prevBox == null -> {
+                val line = lineMetricsForOffset(offset)!!
+                return when (getParagraphDirection(offset)) {
+                    ResolvedTextDirection.Ltr -> line.left.toFloat()
+                    ResolvedTextDirection.Rtl -> line.right.toFloat()
+                }
+            }
+
+            nextBox == null || usePrimaryDirection || nextBox.direction == prevBox.direction ->
+                prevBox.cursorHorizontalPosition()
+
+            else ->
+                nextBox.cursorHorizontalPosition(true)
         }
     }
+
+    // workaround for https://bugs.chromium.org/p/skia/issues/detail?id=11321 :(
+    private val lineMetrics: Array<LineMetrics>
+        get() = if (text == "") {
+            val height = paragraphIntrinsics.builder.defaultHeight.toDouble()
+            arrayOf(
+                LineMetrics(
+                    0, 0, 0, 0, true,
+                    height, 0.0, height, height, 0.0, 0.0, height, 0
+                )
+            )
+        } else {
+            para.lineMetrics
+        }
 
     private fun getBoxForwardByOffset(offset: Int): TextBox? {
         var to = offset + 1
@@ -288,17 +331,15 @@ internal class DesktopParagraph(
         return null
     }
 
-    private fun getHorizontalPositionForward(from: Int) =
-        getBoxForwardByOffset(from)?.rect?.left
-
-    private fun getHorizontalPositionBackward(to: Int) =
-        getBoxBackwardByOffset(to)?.rect?.right
-
     override fun getParagraphDirection(offset: Int): ResolvedTextDirection =
-        ResolvedTextDirection.Ltr
+        paragraphIntrinsics.textDirection
 
     override fun getBidiRunDirection(offset: Int): ResolvedTextDirection =
-        ResolvedTextDirection.Ltr
+        when (getBoxForwardByOffset(offset)?.direction) {
+            org.jetbrains.skija.paragraph.Direction.RTL -> ResolvedTextDirection.Rtl
+            org.jetbrains.skija.paragraph.Direction.LTR -> ResolvedTextDirection.Ltr
+            null -> ResolvedTextDirection.Ltr
+        }
 
     override fun getOffsetForPosition(position: Offset): Int {
         return para.getGlyphPositionAtCoordinate(position.x, position.y).position
@@ -309,8 +350,17 @@ internal class DesktopParagraph(
         return box.rect.toComposeRect()
     }
 
-    override fun getWordBoundary(offset: Int) = para.getWordBoundary(offset).let {
-        TextRange(it.start, it.end)
+    override fun getWordBoundary(offset: Int): TextRange {
+        return when {
+            (text[offset].isLetterOrDigit()) -> para.getWordBoundary(offset).let {
+                TextRange(it.start, it.end)
+            }
+            (text.getOrNull(offset - 1)?.isLetterOrDigit() ?: false) ->
+                para.getWordBoundary(offset - 1).let {
+                    TextRange(it.start, it.end)
+                }
+            else -> TextRange(offset, offset)
+        }
     }
 
     override fun paint(
@@ -503,7 +553,8 @@ internal class ParagraphBuilder(
     var maxLines: Int = Int.MAX_VALUE,
     val spanStyles: List<Range<SpanStyle>>,
     val placeholders: List<Range<Placeholder>>,
-    val density: Density
+    val density: Density,
+    val textDirection: ResolvedTextDirection
 ) {
     private lateinit var initialStyle: SpanStyle
     private lateinit var defaultStyle: ComputedStyle
@@ -713,6 +764,7 @@ internal class ParagraphBuilder(
         style.textAlign?.let {
             pStyle.alignment = it.toSkAlignment()
         }
+        pStyle.direction = textDirection.toSkDirection()
         return pStyle
     }
 
@@ -793,11 +845,11 @@ fun PlaceholderVerticalAlign.toSkPlaceholderAlignment(): PlaceholderAlignment {
     }
 }
 
-fun Shadow.toSkShadow(): SkShadow {
+internal fun Shadow.toSkShadow(): SkShadow {
     return SkShadow(color.toArgb(), offset.x, offset.y, blurRadius.toDouble())
 }
 
-fun TextAlign.toSkAlignment(): SkAlignment {
+internal fun TextAlign.toSkAlignment(): SkAlignment {
     return when (this) {
         TextAlign.Left -> SkAlignment.LEFT
         TextAlign.Right -> SkAlignment.RIGHT
@@ -805,5 +857,19 @@ fun TextAlign.toSkAlignment(): SkAlignment {
         TextAlign.Justify -> SkAlignment.JUSTIFY
         TextAlign.Start -> SkAlignment.START
         TextAlign.End -> SkAlignment.END
+    }
+}
+
+internal fun ResolvedTextDirection.toSkDirection(): SkDirection {
+    return when (this) {
+        ResolvedTextDirection.Ltr -> SkDirection.LTR
+        ResolvedTextDirection.Rtl -> SkDirection.RTL
+    }
+}
+
+internal fun TextBox.cursorHorizontalPosition(opposite: Boolean = false): Float {
+    return when (direction) {
+        SkDirection.LTR, null -> if (opposite) rect.left else rect.right
+        SkDirection.RTL -> if (opposite) rect.right else rect.left
     }
 }

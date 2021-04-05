@@ -31,6 +31,8 @@ import androidx.compose.ui.unit.dp
  * Creates a [GraphicsLayerModifier] that draws the shadow. The [elevation] defines the visual
  * depth of the physical object. The physical object has a shape specified by [shape].
  *
+ * If the passed [shape] is concave the shadow will not be drawn on Android versions less than 10.
+ *
  * Note that [elevation] is only affecting the shadow size and doesn't change the drawing order.
  * Use [zIndex] modifier if you want to draw the elements with larger [elevation] after all the
  * elements with a smaller one.

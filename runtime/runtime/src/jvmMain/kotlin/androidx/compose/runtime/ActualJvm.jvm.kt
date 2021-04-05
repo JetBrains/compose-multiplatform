@@ -16,6 +16,9 @@
 
 package androidx.compose.runtime
 
+import androidx.compose.runtime.internal.ThreadMap
+import androidx.compose.runtime.internal.emptyThreadMap
+
 internal actual typealias AtomicReference<V> = java.util.concurrent.atomic.AtomicReference<V>
 
 internal actual open class ThreadLocal<T> actual constructor(
@@ -32,6 +35,23 @@ internal actual open class ThreadLocal<T> actual constructor(
 
     override fun initialValue(): T? {
         return initialValue.invoke()
+    }
+}
+
+internal actual class SnapshotThreadLocal<T> {
+    private val map = AtomicReference<ThreadMap>(emptyThreadMap)
+    private val writeMutex = Any()
+
+    @Suppress("UNCHECKED_CAST")
+    actual fun get(): T? = map.get().get(Thread.currentThread().id) as T?
+
+    actual fun set(value: T?) {
+        val key = Thread.currentThread().id
+        synchronized(writeMutex) {
+            val current = map.get()
+            if (current.trySet(key, value)) return
+            map.set(current.newWith(key, value))
+        }
     }
 }
 

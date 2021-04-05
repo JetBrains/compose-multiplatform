@@ -17,6 +17,7 @@
 package androidx.compose.ui.test
 
 import androidx.compose.ui.geometry.Rect
+import androidx.compose.ui.semantics.AccessibilityAction
 import androidx.compose.ui.semantics.SemanticsConfiguration
 import androidx.compose.ui.semantics.SemanticsNode
 import androidx.compose.ui.semantics.SemanticsProperties
@@ -42,7 +43,8 @@ fun SemanticsNodeInteraction.printToString(
     maxDepth: Int = Int.MAX_VALUE
 ): String {
     val result = fetchSemanticsNode()
-    return result.printToString(maxDepth)
+    return "Printing with useUnmergedTree = '$useUnmergedTree'\n" +
+        result.printToString(maxDepth)
 }
 
 /**
@@ -84,11 +86,12 @@ fun SemanticsNodeInteractionCollection.printToString(
     maxDepth: Int = 0
 ): String {
     val nodes = fetchSemanticsNodes()
-    return if (nodes.isEmpty()) {
-        "There were 0 nodes found!"
-    } else {
-        nodes.printToString(maxDepth)
-    }
+    return "Printing with useUnmergedTree = '$useUnmergedTree'\n" +
+        if (nodes.isEmpty()) {
+            "There were 0 nodes found!"
+        } else {
+            nodes.printToString(maxDepth)
+        }
 }
 
 /**
@@ -218,8 +221,22 @@ private fun rectToShortString(rect: Rect): String {
 }
 
 private fun StringBuilder.appendConfigInfo(config: SemanticsConfiguration, indent: String = "") {
+    val actions = mutableListOf<String>()
+    val units = mutableListOf<String>()
     for ((key, value) in config) {
         if (key == SemanticsProperties.TestTag) {
+            continue
+        }
+
+        if (value is AccessibilityAction<*>) {
+            // Avoids printing stuff like "action = 'AccessibilityAction\(label=null, action=.*\)'"
+            actions.add(key.name)
+            continue
+        }
+
+        if (value is Unit) {
+            // Avoids printing stuff like "Disabled = 'kotlin.Unit'"
+            units.add(key.name)
             continue
         }
 
@@ -242,6 +259,22 @@ private fun StringBuilder.appendConfigInfo(config: SemanticsConfiguration, inden
         }
 
         append("'")
+    }
+
+    if (units.isNotEmpty()) {
+        appendLine()
+        append(indent)
+        append("[")
+        append(units.joinToString(separator = ", "))
+        append("]")
+    }
+
+    if (actions.isNotEmpty()) {
+        appendLine()
+        append(indent)
+        append("Actions = [")
+        append(actions.joinToString(separator = ", "))
+        append("]")
     }
 
     if (config.isMergingSemanticsOfDescendants) {

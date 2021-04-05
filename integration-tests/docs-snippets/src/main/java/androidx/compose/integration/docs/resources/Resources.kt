@@ -149,6 +149,7 @@ private fun ResourcesSnippet8() {
     Icon(Icons.Rounded.Menu, contentDescription = "Localized description")
 }
 
+@Suppress("UnnecessaryLambdaCreation")
 private object ResourcesSnippet9 {
     // Define and load the fonts of the app
     private val light = Font(R.font.raleway_light, FontWeight.W300)

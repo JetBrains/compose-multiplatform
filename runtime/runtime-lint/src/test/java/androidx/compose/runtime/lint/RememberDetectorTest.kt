@@ -18,6 +18,7 @@
 
 package androidx.compose.runtime.lint
 
+import androidx.compose.lint.Stubs
 import com.android.tools.lint.checks.infrastructure.LintDetectorTest
 import com.android.tools.lint.detector.api.Detector
 import com.android.tools.lint.detector.api.Issue
@@ -107,8 +108,8 @@ class RememberDetectorTest : LintDetectorTest() {
                 }
             """
             ),
-            composableStub,
-            rememberStub
+            kotlin(Stubs.Composable),
+            kotlin(Stubs.Remember)
         )
             .run()
             .expect(
@@ -218,8 +219,8 @@ src/androidx/compose/runtime/foo/FooState.kt:61: Error: remember calls must not 
                 }
             """
             ),
-            composableStub,
-            rememberStub
+            kotlin(Stubs.Composable),
+            kotlin(Stubs.Remember)
         )
             .run()
             .expect(
@@ -329,8 +330,8 @@ src/androidx/compose/runtime/foo/FooState.kt:61: Error: remember calls must not 
                 }
             """
             ),
-            composableStub,
-            rememberStub
+            kotlin(Stubs.Composable),
+            kotlin(Stubs.Remember)
         )
             .run()
             .expectClean()

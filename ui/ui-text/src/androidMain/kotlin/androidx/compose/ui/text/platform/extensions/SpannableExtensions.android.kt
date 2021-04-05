@@ -45,6 +45,7 @@ import androidx.compose.ui.text.android.style.LineHeightSpan
 import androidx.compose.ui.text.android.style.ShadowSpan
 import androidx.compose.ui.text.android.style.SkewXSpan
 import androidx.compose.ui.text.android.style.TypefaceSpan
+import androidx.compose.ui.text.fastFilter
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontSynthesis
@@ -149,7 +150,8 @@ internal fun Spannable.setSpanStyles(
     // applied after all spans that changes the fontSize.
     val lowPrioritySpans = ArrayList<SpanRange>()
 
-    for (spanStyleRange in spanStyles) {
+    for (i in spanStyles.indices) {
+        val spanStyleRange = spanStyles[i]
         val start = spanStyleRange.start
         val end = spanStyleRange.end
 
@@ -208,7 +210,7 @@ private fun Spannable.setFontAttributes(
     spanStyles: List<AnnotatedString.Range<SpanStyle>>,
     typefaceAdapter: TypefaceAdapter
 ) {
-    val fontRelatedSpanStyles = spanStyles.filter {
+    val fontRelatedSpanStyles = spanStyles.fastFilter {
         it.item.hasFontAttributes() || it.item.fontSynthesis != null
     }
     flattenStylesAndApply(fontRelatedSpanStyles) { spanStyle, start, end ->
@@ -263,19 +265,19 @@ internal fun flattenStylesAndApply(
 
         // Check all spans that intersects with this transition range.
         var mergedSpanStyle: SpanStyle? = null
-        for (spanStyle in spanStyles) {
+        spanStyles.fastForEach { spanStyle ->
             if (
                 intersect(lastTransitionOffsets, transitionOffset, spanStyle.start, spanStyle.end)
             ) {
                 if (mergedSpanStyle == null) {
                     mergedSpanStyle = SpanStyle()
                 }
-                mergedSpanStyle = mergedSpanStyle.merge(spanStyle.item)
+                mergedSpanStyle = mergedSpanStyle!!.merge(spanStyle.item)
             }
         }
 
-        if (mergedSpanStyle != null) {
-            block(mergedSpanStyle, lastTransitionOffsets, transitionOffset)
+        mergedSpanStyle?.let {
+            block(it, lastTransitionOffsets, transitionOffset)
         }
 
         lastTransitionOffsets = transitionOffset

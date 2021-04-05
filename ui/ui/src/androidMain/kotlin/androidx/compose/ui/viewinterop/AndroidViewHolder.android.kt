@@ -184,7 +184,7 @@ internal abstract class AndroidViewHolder(
      */
     val layoutNode: LayoutNode = run {
         // TODO(soboleva): add layout direction here?
-        // TODO(popam): forward pointer input, accessibility, focus
+        // TODO(popam): forward pointer input and focus
         // Prepare layout node that proxies measure and layout passes to the View.
         val layoutNode = LayoutNode()
 

@@ -21,6 +21,8 @@ import androidx.compose.runtime.snapshots.MutableSnapshot
 import androidx.compose.runtime.snapshots.Snapshot
 import androidx.compose.runtime.snapshots.SnapshotApplyResult
 import androidx.compose.runtime.snapshots.fastForEach
+import androidx.compose.runtime.snapshots.fastMap
+import androidx.compose.runtime.snapshots.fastMapNotNull
 import androidx.compose.runtime.tooling.CompositionData
 import kotlinx.collections.immutable.persistentSetOf
 import kotlinx.coroutines.CancellableContinuation
@@ -298,10 +300,12 @@ class Recomposer(
         override val changeCount: Long
             get() = this@Recomposer.changeCount
         fun saveStateAndDisposeForHotReload(): List<HotReloadable> {
-            val compositions = synchronized(stateLock) { knownCompositions.toList() }
+            val compositions: List<ControlledComposition> = synchronized(stateLock) {
+                knownCompositions.toMutableList()
+            }
             return compositions
-                .mapNotNull { it as? CompositionImpl }
-                .map { HotReloadable(it).apply { clearContent() } }
+                .fastMapNotNull { it as? CompositionImpl }
+                .fastMap { HotReloadable(it).apply { clearContent() } }
         }
     }
 
@@ -409,10 +413,10 @@ class Recomposer(
             // each time, but because we've installed the broadcastFrameClock as the scope
             // clock above for user code to locate.
             parentFrameClock.withFrameNanos { frameTime ->
-                trace("recomposeFrame") {
-                    // Dispatch MonotonicFrameClock frames first; this may produce new
-                    // composer invalidations that we must handle during the same frame.
-                    if (broadcastFrameClock.hasAwaiters) {
+                // Dispatch MonotonicFrameClock frames first; this may produce new
+                // composer invalidations that we must handle during the same frame.
+                if (broadcastFrameClock.hasAwaiters) {
+                    trace("Recomposer:animation") {
                         // Propagate the frame time to anyone who is awaiting from the
                         // recomposer clock.
                         broadcastFrameClock.sendFrame(frameTime)
@@ -420,7 +424,9 @@ class Recomposer(
                         // Ensure any global changes are observed
                         Snapshot.sendApplyNotifications()
                     }
+                }
 
+                trace("Recomposer:recompose") {
                     // Drain any composer invalidations from snapshot changes and record
                     // composers to work on
                     synchronized(stateLock) {
@@ -527,10 +533,10 @@ class Recomposer(
             // each time, but because we've installed the broadcastFrameClock as the scope
             // clock above for user code to locate.
             parentFrameClock.withFrameNanos { frameTime ->
-                trace("recomposeFrame") {
-                    // Dispatch MonotonicFrameClock frames first; this may produce new
-                    // composer invalidations that we must handle during the same frame.
-                    if (broadcastFrameClock.hasAwaiters) {
+                // Dispatch MonotonicFrameClock frames first; this may produce new
+                // composer invalidations that we must handle during the same frame.
+                if (broadcastFrameClock.hasAwaiters) {
+                    trace("Recomposer:animation") {
                         // Propagate the frame time to anyone who is awaiting from the
                         // recomposer clock.
                         broadcastFrameClock.sendFrame(frameTime)
@@ -538,7 +544,9 @@ class Recomposer(
                         // Ensure any global changes are observed
                         Snapshot.sendApplyNotifications()
                     }
+                }
 
+                trace("Recomposer:recompose") {
                     // Drain any composer invalidations from snapshot changes and record
                     // composers to work on.
                     // We'll do these synchronously to make the current frame.
@@ -604,10 +612,11 @@ class Recomposer(
         }
     }
 
+    @OptIn(ExperimentalComposeApi::class)
     private suspend fun recompositionRunner(
         block: suspend CoroutineScope.(parentFrameClock: MonotonicFrameClock) -> Unit
     ) {
-        val parentFrameClock = coroutineContext[MonotonicFrameClock] ?: DefaultMonotonicFrameClock
+        val parentFrameClock = coroutineContext.monotonicFrameClock
         withContext(broadcastFrameClock) {
             // Enforce mutual exclusion of callers; register self as current runner
             val callingJob = coroutineContext.job
@@ -868,8 +877,8 @@ class Recomposer(
             // to ensure that we pause recompositions before this call.
             @Suppress("UNCHECKED_CAST")
             val holders = token as List<HotReloadable>
-            holders.forEach { it.resetContent() }
-            holders.forEach { it.recompose() }
+            holders.fastForEach { it.resetContent() }
+            holders.fastForEach { it.recompose() }
         }
     }
 }

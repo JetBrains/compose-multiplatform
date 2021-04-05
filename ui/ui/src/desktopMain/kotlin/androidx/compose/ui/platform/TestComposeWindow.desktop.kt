@@ -121,4 +121,25 @@ class TestComposeWindow(
     fun onMouseScroll(x: Int, y: Int, event: MouseScrollEvent) {
         owners.onMouseScroll(x, y, event)
     }
+
+    /**
+     * Process mouse move event
+     */
+    fun onMouseMoved(x: Int, y: Int) {
+        owners.onMouseMoved(x, y)
+    }
+
+    /**
+     * Process mouse enter event
+     */
+    fun onMouseEntered(x: Int, y: Int) {
+        owners.onMouseEntered(x, y)
+    }
+
+    /**
+     * Process mouse exit event
+     */
+    fun onMouseExited() {
+        owners.onMouseExited()
+    }
 }

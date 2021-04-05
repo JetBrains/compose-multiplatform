@@ -16,6 +16,10 @@
 
 package androidx.compose.foundation.text.selection
 
+import androidx.compose.foundation.AtomicLong
+import androidx.compose.runtime.setValue
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.layout.LayoutCoordinates
 
@@ -32,15 +36,30 @@ internal class SelectionRegistrarImpl : SelectionRegistrar {
     private val _selectables = mutableListOf<Selectable>()
 
     /**
-     * Getter for handlers that returns an List.
+     * Getter for handlers that returns a List.
      */
     internal val selectables: List<Selectable>
         get() = _selectables
 
+    private val _selectableMap = mutableMapOf<Long, Selectable>()
+
+    /**
+     * A map from selectable keys to subscribed selectables.
+     */
+    internal val selectableMap: Map<Long, Selectable>
+        get() = _selectableMap
+
+    /**
+     * The incremental id to be assigned to each selectable. It starts from 1 and 0 is used to
+     * denote an invalid id.
+     * @see SelectionRegistrar.InvalidSelectableId
+     */
+    private var incrementId = AtomicLong(1)
+
     /**
      * The callback to be invoked when the position change was triggered.
      */
-    internal var onPositionChangeCallback: (() -> Unit)? = null
+    internal var onPositionChangeCallback: ((Long) -> Unit)? = null
 
     /**
      * The callback to be invoked when the selection is initiated.
@@ -60,16 +79,41 @@ internal class SelectionRegistrarImpl : SelectionRegistrar {
     /**
      * The callback to be invoked when one of the selectable has changed.
      */
-    internal var onSelectableChangeCallback: ((Selectable) -> Unit)? = null
+    internal var onSelectableChangeCallback: ((Long) -> Unit)? = null
+
+    /**
+     * The callback to be invoked after a selectable is unsubscribed from this [SelectionRegistrar].
+     */
+    internal var afterSelectableUnsubscribe: ((Long) -> Unit)? = null
+
+    override var subselections: Map<Long, Selection> by mutableStateOf(emptyMap())
 
     override fun subscribe(selectable: Selectable): Selectable {
+        require(selectable.selectableId != SelectionRegistrar.InvalidSelectableId) {
+            "The selectable contains an invalid id: ${selectable.selectableId}"
+        }
+        require(!_selectableMap.containsKey(selectable.selectableId)) {
+            "Another selectable with the id: $selectable.selectableId has already subscribed."
+        }
+        _selectableMap[selectable.selectableId] = selectable
         _selectables.add(selectable)
         sorted = false
         return selectable
     }
 
     override fun unsubscribe(selectable: Selectable) {
+        if (!_selectableMap.containsKey(selectable.selectableId)) return
         _selectables.remove(selectable)
+        _selectableMap.remove(selectable.selectableId)
+        afterSelectableUnsubscribe?.invoke(selectable.selectableId)
+    }
+
+    override fun nextSelectableId(): Long {
+        var id = incrementId.getAndIncrement()
+        while (id == SelectionRegistrar.InvalidSelectableId) {
+            id = incrementId.getAndIncrement()
+        }
+        return id
     }
 
     /**
@@ -80,38 +124,37 @@ internal class SelectionRegistrarImpl : SelectionRegistrar {
         if (!sorted) {
             // Sort selectables by y-coordinate first, and then x-coordinate, to match English
             // hand-writing habit.
-            _selectables.sortWith(
-                Comparator { a: Selectable, b: Selectable ->
-                    val layoutCoordinatesA = a.getLayoutCoordinates()
-                    val layoutCoordinatesB = b.getLayoutCoordinates()
+            _selectables.sortWith { a: Selectable, b: Selectable ->
+                val layoutCoordinatesA = a.getLayoutCoordinates()
+                val layoutCoordinatesB = b.getLayoutCoordinates()
 
-                    val positionA =
-                        if (layoutCoordinatesA != null) containerLayoutCoordinates.localPositionOf(
-                            layoutCoordinatesA,
-                            Offset.Zero
-                        )
-                        else Offset.Zero
-                    val positionB =
-                        if (layoutCoordinatesB != null) containerLayoutCoordinates.localPositionOf(
-                            layoutCoordinatesB,
-                            Offset.Zero
-                        )
-                        else Offset.Zero
-
-                    if (positionA.y == positionB.y) compareValues(positionA.x, positionB.x)
-                    else compareValues(positionA.y, positionB.y)
+                val positionA = if (layoutCoordinatesA != null) {
+                    containerLayoutCoordinates.localPositionOf(layoutCoordinatesA, Offset.Zero)
+                } else {
+                    Offset.Zero
                 }
-            )
+                val positionB = if (layoutCoordinatesB != null) {
+                    containerLayoutCoordinates.localPositionOf(layoutCoordinatesB, Offset.Zero)
+                } else {
+                    Offset.Zero
+                }
+
+                if (positionA.y == positionB.y) {
+                    compareValues(positionA.x, positionB.x)
+                } else {
+                    compareValues(positionA.y, positionB.y)
+                }
+            }
             sorted = true
         }
         return selectables
     }
 
-    override fun notifyPositionChange() {
+    override fun notifyPositionChange(selectableId: Long) {
         // Set the variable sorted to be false, when the global position of a registered
         // selectable changes.
         sorted = false
-        onPositionChangeCallback?.invoke()
+        onPositionChangeCallback?.invoke(selectableId)
     }
 
     override fun notifySelectionUpdateStart(
@@ -133,7 +176,7 @@ internal class SelectionRegistrarImpl : SelectionRegistrar {
         onSelectionUpdateEndCallback?.invoke()
     }
 
-    override fun notifySelectableChange(selectable: Selectable) {
-        onSelectableChangeCallback?.invoke(selectable)
+    override fun notifySelectableChange(selectableId: Long) {
+        onSelectableChangeCallback?.invoke(selectableId)
     }
 }

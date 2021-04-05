@@ -17,7 +17,7 @@
 
 import androidx.build.AndroidXUiPlugin
 import androidx.build.LibraryGroups
-import androidx.build.Publish
+import androidx.build.LibraryType
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 import static androidx.build.dependencies.DependenciesKt.*
@@ -59,6 +59,8 @@ dependencies {
         androidTestImplementation(JUNIT)
         androidTestImplementation(project(":compose:animation:animation"))
         androidTestImplementation(project(":compose:ui:ui-test-junit4"))
+
+        lintPublish project(":compose:animation:animation-core-lint")
     }
 }
 
@@ -109,7 +111,7 @@ if (AndroidXUiPlugin.isMultiplatformEnabled(project)) {
 
 androidx {
     name = "Compose Animation Core"
-    publish = Publish.SNAPSHOT_AND_RELEASE
+    type = LibraryType.PUBLISHED_LIBRARY
     mavenGroup = LibraryGroups.Compose.ANIMATION
     inceptionYear = "2019"
     description = "Animation engine and animation primitives that are the building blocks of the Compose animation library"

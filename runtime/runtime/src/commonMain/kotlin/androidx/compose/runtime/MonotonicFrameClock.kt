@@ -81,8 +81,9 @@ suspend inline fun <R> MonotonicFrameClock.withFrameMillis(
  * [CoroutineContext]'s [MonotonicFrameClock] or a default frame clock if one is not present
  * in the [CoroutineContext].
  */
+@OptIn(ExperimentalComposeApi::class)
 suspend fun <R> withFrameNanos(onFrame: (frameTimeMillis: Long) -> R): R =
-    (coroutineContext[MonotonicFrameClock] ?: DefaultMonotonicFrameClock).withFrameNanos(onFrame)
+    coroutineContext.monotonicFrameClock.withFrameNanos(onFrame)
 
 /**
  * Suspends until a new frame is requested, immediately invokes [onFrame] with the frame time
@@ -102,5 +103,17 @@ suspend fun <R> withFrameNanos(onFrame: (frameTimeMillis: Long) -> R): R =
  * [CoroutineContext]'s [MonotonicFrameClock] or a default frame clock if one is not present
  * in the [CoroutineContext].
  */
+@OptIn(ExperimentalComposeApi::class)
 suspend fun <R> withFrameMillis(onFrame: (frameTimeMillis: Long) -> R): R =
-    (coroutineContext[MonotonicFrameClock] ?: DefaultMonotonicFrameClock).withFrameMillis(onFrame)
+    coroutineContext.monotonicFrameClock.withFrameMillis(onFrame)
+
+/**
+ * Returns the [MonotonicFrameClock] for this [CoroutineContext] or throws [IllegalStateException]
+ * if one is not present.
+ */
+@ExperimentalComposeApi
+val CoroutineContext.monotonicFrameClock: MonotonicFrameClock
+    get() = this[MonotonicFrameClock] ?: error(
+        "A MonotonicFrameClock is not available in this CoroutineContext. Callers should supply " +
+            "an appropriate MonotonicFrameClock using withContext."
+    )

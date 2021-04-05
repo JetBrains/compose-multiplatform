@@ -24,18 +24,20 @@ import androidx.compose.ui.geometry.MutableRect
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Rect
 import androidx.compose.ui.geometry.toRect
-import androidx.compose.ui.input.nestedscroll.NestedScrollDelegatingWrapper
 import androidx.compose.ui.graphics.Canvas
 import androidx.compose.ui.graphics.GraphicsLayerScope
 import androidx.compose.ui.graphics.Matrix
 import androidx.compose.ui.graphics.Paint
 import androidx.compose.ui.graphics.ReusableGraphicsLayerScope
+import androidx.compose.ui.input.nestedscroll.NestedScrollDelegatingWrapper
 import androidx.compose.ui.input.pointer.PointerInputFilter
+import androidx.compose.ui.layout.AlignmentLine
 import androidx.compose.ui.layout.LayoutCoordinates
 import androidx.compose.ui.layout.Measurable
 import androidx.compose.ui.layout.MeasureResult
 import androidx.compose.ui.layout.MeasureScope
 import androidx.compose.ui.layout.Placeable
+import androidx.compose.ui.layout.VerticalAlignmentLine
 import androidx.compose.ui.layout.findRoot
 import androidx.compose.ui.layout.positionInRoot
 import androidx.compose.ui.unit.Constraints
@@ -50,7 +52,7 @@ import androidx.compose.ui.unit.plus
 internal abstract class LayoutNodeWrapper(
     internal val layoutNode: LayoutNode
 ) : Placeable(), Measurable, LayoutCoordinates, OwnerScope, (Canvas) -> Unit {
-    internal open val wrapped: LayoutNodeWrapper? = null
+    internal open val wrapped: LayoutNodeWrapper? get() = null
     internal var wrappedBy: LayoutNodeWrapper? = null
 
     /**
@@ -69,7 +71,7 @@ internal abstract class LayoutNodeWrapper(
         private set
 
     private var _isAttached = false
-    override val isAttached: Boolean
+    final override val isAttached: Boolean
         get() {
             if (_isAttached) {
                 require(layoutNode.isAttached)
@@ -78,21 +80,32 @@ internal abstract class LayoutNodeWrapper(
         }
 
     private var _measureResult: MeasureResult? = null
-    open var measureResult: MeasureResult
+    var measureResult: MeasureResult
         get() = _measureResult ?: error(UnmeasuredError)
         internal set(value) {
-            if (value.width != _measureResult?.width || value.height != _measureResult?.height) {
-                val layer = layer
-                if (layer != null) {
-                    layer.resize(IntSize(value.width, value.height))
-                } else {
-                    wrappedBy?.invalidateLayer()
+            val old = _measureResult
+            if (value !== old) {
+                _measureResult = value
+                if (old == null || value.width != old.width || value.height != old.height) {
+                    onMeasureResultChanged(value.width, value.height)
                 }
-                layoutNode.owner?.onLayoutChange(layoutNode)
             }
-            _measureResult = value
-            measuredSize = IntSize(measureResult.width, measureResult.height)
         }
+
+    /**
+     * Called when the width or height of [measureResult] change. The object instance pointed to
+     * by [measureResult] may or may not have changed.
+     */
+    protected open fun onMeasureResultChanged(width: Int, height: Int) {
+        val layer = layer
+        if (layer != null) {
+            layer.resize(IntSize(width, height))
+        } else {
+            wrappedBy?.invalidateLayer()
+        }
+        layoutNode.owner?.onLayoutChange(layoutNode)
+        measuredSize = IntSize(width, height)
+    }
 
     var position: IntOffset = IntOffset.Zero
         private set
@@ -100,13 +113,13 @@ internal abstract class LayoutNodeWrapper(
     var zIndex: Float = 0f
         protected set
 
-    override val parentLayoutCoordinates: LayoutCoordinates?
+    final override val parentLayoutCoordinates: LayoutCoordinates?
         get() {
             check(isAttached) { ExpectAttachedLayoutCoordinates }
             return layoutNode.outerLayoutNodeWrapper.wrappedBy
         }
 
-    override val parentCoordinates: LayoutCoordinates?
+    final override val parentCoordinates: LayoutCoordinates?
         get() {
             check(isAttached) { ExpectAttachedLayoutCoordinates }
             return wrappedBy?.getWrappedByCoordinates()
@@ -143,19 +156,26 @@ internal abstract class LayoutNodeWrapper(
         return x >= 0f && y >= 0f && x < measuredWidth && y < measuredHeight
     }
 
-    /**
-     * Measures the modified child.
-     */
-    abstract fun performMeasure(constraints: Constraints): Placeable
-
-    /**
-     * Measures the modified child.
-     */
-    final override fun measure(constraints: Constraints): Placeable {
+    protected inline fun performingMeasure(
+        constraints: Constraints,
+        block: () -> Placeable
+    ): Placeable {
         measurementConstraints = constraints
-        val result = performMeasure(constraints)
+        val result = block()
         layer?.resize(measuredSize)
         return result
+    }
+
+    abstract fun calculateAlignmentLine(alignmentLine: AlignmentLine): Int
+
+    final override fun get(alignmentLine: AlignmentLine): Int {
+        val measuredPosition = calculateAlignmentLine(alignmentLine)
+        if (measuredPosition == AlignmentLine.Unspecified) return AlignmentLine.Unspecified
+        return measuredPosition + if (alignmentLine is VerticalAlignmentLine) {
+            apparentToRealOffset.x
+        } else {
+            apparentToRealOffset.y
+        }
     }
 
     /**
@@ -202,9 +222,6 @@ internal abstract class LayoutNodeWrapper(
     // implementation of draw block passed to the OwnedLayer
     override fun invoke(canvas: Canvas) {
         if (layoutNode.isPlaced) {
-            require(layoutNode.layoutState == LayoutNode.LayoutState.Ready) {
-                "Layer is redrawn for LayoutNode in state ${layoutNode.layoutState} [$layoutNode]"
-            }
             snapshotObserver.observeReads(this, onCommitAffectingLayer) {
                 performDraw(canvas)
             }
@@ -434,16 +451,16 @@ internal abstract class LayoutNodeWrapper(
      * local coordinate system.
      */
     open fun fromParentPosition(position: Offset): Offset {
+        val relativeToWrapperPosition = position - this.position
         val layer = layer
-        val targetPosition = if (layer == null) {
-            position
+        return if (layer == null) {
+            relativeToWrapperPosition
         } else {
             val inverse = matrixCache
             layer.getMatrix(inverse)
             inverse.invert()
-            inverse.map(position)
+            inverse.map(relativeToWrapperPosition)
         }
-        return targetPosition - this.position
     }
 
     protected fun drawBorder(canvas: Canvas, paint: Paint) {
