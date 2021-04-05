@@ -36,7 +36,7 @@ internal val currentArch by lazy {
     when (osArch) {
         "x86_64", "amd64" -> Arch.X64
         "aarch64" -> Arch.Arm64
-        else -> error("Unknown OS arch: $osArch")
+        else -> error("Unsupported OS arch: $osArch")
     }
 }
 
