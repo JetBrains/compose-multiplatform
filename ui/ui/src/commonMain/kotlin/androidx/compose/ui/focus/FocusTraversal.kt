@@ -16,14 +16,12 @@
 
 package androidx.compose.ui.focus
 
-import androidx.compose.ui.focus.FocusDirectionInternal.Down
-import androidx.compose.ui.focus.FocusDirectionInternal.In
-import androidx.compose.ui.focus.FocusDirectionInternal.Left
-import androidx.compose.ui.focus.FocusDirectionInternal.Next
-import androidx.compose.ui.focus.FocusDirectionInternal.Out
-import androidx.compose.ui.focus.FocusDirectionInternal.Previous
-import androidx.compose.ui.focus.FocusDirectionInternal.Right
-import androidx.compose.ui.focus.FocusDirectionInternal.Up
+import androidx.compose.ui.focus.FocusDirection.Down
+import androidx.compose.ui.focus.FocusDirection.Left
+import androidx.compose.ui.focus.FocusDirection.Next
+import androidx.compose.ui.focus.FocusDirection.Previous
+import androidx.compose.ui.focus.FocusDirection.Right
+import androidx.compose.ui.focus.FocusDirection.Up
 import androidx.compose.ui.focus.FocusRequester.Companion.Default
 import androidx.compose.ui.focus.FocusState.Active
 import androidx.compose.ui.focus.FocusState.ActiveParent
@@ -31,7 +29,6 @@ import androidx.compose.ui.focus.FocusState.Captured
 import androidx.compose.ui.focus.FocusState.Disabled
 import androidx.compose.ui.focus.FocusState.Inactive
 import androidx.compose.ui.node.ModifiedFocusNode
-import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.LayoutDirection.Ltr
 import androidx.compose.ui.unit.LayoutDirection.Rtl
 
@@ -40,35 +37,25 @@ import androidx.compose.ui.unit.LayoutDirection.Rtl
  */
 enum class FocusDirection { Next, Previous, Left, Right, Up, Down }
 
-// TODO(b/184086802): In 2.0, delete FocusDirectionInternal and add In and Out to FocusDirection.
-/**
- * This enum specifies the direction of the requested focus change.
- *
- * This enum is similar to [FocusDirection], but it contains the additional values [In] which can
- * be used to move focus from a parent to one of its children, and [Out] which moves focus to
- * the parent.
- */
-internal enum class FocusDirectionInternal { Next, Previous, Left, Right, Up, Down, In, Out }
-
 /**
  * Moves focus based on the requested focus direction.
  *
  * @param focusDirection The requested direction to move focus.
- * @return whether a focus node was found. If a focus node was found and the focus request was
- * not granted, this function still returns true.
+ * @return whether focus was moved or not.
  */
-internal fun ModifiedFocusNode.moveFocus(focusDirection: FocusDirectionInternal): Boolean {
-    // TODO(b/176847718): Pass the layout direction as a parameter instead of this hardcoded value.
-    val layoutDirection: LayoutDirection = Ltr
+internal fun ModifiedFocusNode.moveFocus(focusDirection: FocusDirection): Boolean {
+    val activeNode = findActiveFocusNode()
 
     // If there is no active node in this sub-hierarchy, we can't move focus.
-    val activeNode = findActiveFocusNode() ?: return false
+    if (activeNode == null) {
+        return false
+    }
 
     // TODO(b/175899779) If the direction is "Next", cache the current node so we can come back
     //  to the same place if the user requests "Previous"
 
     // Check if a custom focus traversal order is specified.
-    val nextFocusRequester = activeNode.customFocusSearch(focusDirection, layoutDirection)
+    val nextFocusRequester = activeNode.customFocusSearch(focusDirection)
     if (nextFocusRequester != Default) {
         // TODO(b/175899786): We ideally need to check if the nextFocusRequester points to something
         //  that is visible and focusable in the current mode (Touch/Non-Touch mode).
@@ -81,17 +68,15 @@ internal fun ModifiedFocusNode.moveFocus(focusDirection: FocusDirectionInternal)
     val nextNode = when (focusDirection) {
         Next, Previous -> null // TODO(b/170155659): Perform one dimensional focus search.
         Left, Right, Up, Down -> twoDimensionalFocusSearch(focusDirection)
-        In -> {
-            // we search among the children of the active item.
-            val direction = when (layoutDirection) { Rtl -> Left; Ltr -> Right }
-            activeNode.twoDimensionalFocusSearch(direction)
-        }
-        Out -> activeNode.findParentFocusNode()
-    } ?: return false
+    }
 
     // If we found a potential next item, call requestFocus() to move focus to it.
-    nextNode.requestFocus(propagateFocus = false)
-    return true
+    if (nextNode != null) {
+        nextNode.requestFocus(propagateFocus = false)
+        return true
+    }
+
+    return false
 }
 
 internal fun ModifiedFocusNode.findActiveFocusNode(): ModifiedFocusNode? {
@@ -107,12 +92,13 @@ internal fun ModifiedFocusNode.findActiveFocusNode(): ModifiedFocusNode? {
  * Allowing parents higher up the hierarchy to overwrite the focus order specified by their
  * children.
  */
-private fun ModifiedFocusNode.customFocusSearch(
-    focusDirection: FocusDirectionInternal,
-    layoutDirection: LayoutDirection
-): FocusRequester {
+private fun ModifiedFocusNode.customFocusSearch(focusDirection: FocusDirection): FocusRequester {
     val focusOrder = FocusOrder()
     wrappedBy?.populateFocusOrder(focusOrder)
+
+    // TODO(b/176847718): Pass the layout direction as a parameter to customFocusSearch, and use
+    //  that instead of this hardcoded value.
+    val layoutDirection = Ltr
 
     return when (focusDirection) {
         Next -> focusOrder.next
@@ -127,11 +113,5 @@ private fun ModifiedFocusNode.customFocusSearch(
             Ltr -> focusOrder.end
             Rtl -> focusOrder.start
         }.takeUnless { it == Default } ?: focusOrder.right
-        // TODO(b/183746982): add focus order API for "In" and "Out".
-        //  Developers can to specify a custom "In" to specify which child should be visited when
-        //  the user presses dPad center. (They can also redirect the "In" to some other item).
-        //  Developers can specify a custom "Out" to specify which composable should take focus
-        //  when the user presses the back button.
-        In, Out -> Default
     }
 }

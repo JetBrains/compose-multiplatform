@@ -16,15 +16,23 @@
 
 package androidx.compose.ui.focus
 
+import androidx.compose.foundation.layout.offset
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusDirection.Down
 import androidx.compose.ui.focus.FocusDirection.Left
 import androidx.compose.ui.focus.FocusDirection.Right
 import androidx.compose.ui.focus.FocusDirection.Up
+import androidx.compose.ui.layout.Layout
+import androidx.compose.ui.layout.MeasurePolicy
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.test.junit4.ComposeContentTestRule
 import androidx.compose.ui.test.junit4.createComposeRule
+import androidx.compose.ui.unit.Constraints
+import androidx.compose.ui.unit.IntOffset
 import androidx.test.filters.LargeTest
 import androidx.test.filters.MediumTest
 import com.google.common.truth.Truth.assertThat
@@ -5037,4 +5045,34 @@ class TwoDimensionalFocusTraversalThreeItemsTest(private val focusDirection: Foc
         }
         rule.runOnIdle { initialFocus.requestFocus() }
     }
+}
+
+@Composable
+private fun FocusableBox(
+    isFocused: MutableState<Boolean>,
+    x: Int,
+    y: Int,
+    width: Int,
+    height: Int,
+    focusRequester: FocusRequester? = null,
+    content: @Composable () -> Unit = {}
+) {
+    Layout(
+        content = content,
+        modifier = Modifier
+            .offset { IntOffset(x, y) }
+            .focusRequester(focusRequester ?: FocusRequester())
+            .onFocusChanged { isFocused.value = it.isFocused }
+            .focusModifier(),
+        measurePolicy = remember(width, height) {
+            MeasurePolicy { measurables, _ ->
+                val constraint = Constraints(width, width, height, height)
+                layout(width, height) {
+                    measurables.forEach {
+                        it.measure(constraint).place(0, 0)
+                    }
+                }
+            }
+        }
+    )
 }
