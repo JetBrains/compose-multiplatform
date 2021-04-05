@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package androidx.benchmark.integration.macrobenchmark
+package androidx.compose.integration.macrobenchmark
 
 import android.content.Intent
 import androidx.benchmark.macro.CompilationMode
@@ -23,7 +23,7 @@ import androidx.benchmark.macro.StartupTimingMetric
 import androidx.benchmark.macro.isSupportedWithVmSettings
 import androidx.benchmark.macro.junit4.MacrobenchmarkRule
 
-const val TARGET_PACKAGE = "androidx.benchmark.integration.compose.target"
+const val TARGET_PACKAGE = "androidx.compose.integration.macrobenchmark.target"
 
 fun MacrobenchmarkRule.measureStartup(
     compilationMode: CompilationMode,
