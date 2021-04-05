@@ -25,6 +25,8 @@ WORKDIR  androidx-main
 RUN ~/bin/repo init -u https://android.googlesource.com/platform/manifest \
     -b androidx-main --partial-clone --clone-filter=blob:limit=10M
 RUN ~/bin/repo sync -c --no-tags --no-clone-bundle -j4
-RUN ln -sf /androidx-main/tools/ /mnt/tools
-RUN ln -sf /androidx-main/prebuilts/ /mnt/prebuilts
-RUN ln -sf /androidx-main/external /mnt/external
+
+RUN mkdir -p /mnt/agent
+RUN ln -sf /androidx-main/tools/ /mnt/agent/tools
+RUN ln -sf /androidx-main/prebuilts/ /mnt/agent/prebuilts
+RUN ln -sf /androidx-main/external /mnt/agent/external
