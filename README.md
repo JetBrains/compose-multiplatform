@@ -1,5 +1,7 @@
 [![official project](http://jb.gg/badges/official.svg)](https://confluence.jetbrains.com/display/ALL/JetBrains+on+GitHub)
-[![Latest version](https://img.shields.io/github/tag/JetBrains/compose-jb.svg?color=1081c2)](https://github.com/JetBrains/compose-jb/tags)
+[![Latest release](https://img.shields.io/github/v/release/JetBrains/compose-jb?color=brightgreen&label=latest%20release)](https://github.com/JetBrains/compose-jb/releases/latest)
+[![Latest build](https://img.shields.io/github/v/release/JetBrains/compose-jb?color=orange&include_prereleases&label=latest%20build)](https://github.com/JetBrains/compose-jb/releases)
+
 # Compose for Desktop, by JetBrains
 ![](artwork/readme/apps.png)
 Compose Kotlin UI framework port for desktop platforms (macOS, Linux, Windows), components outside of the core Compose repository
