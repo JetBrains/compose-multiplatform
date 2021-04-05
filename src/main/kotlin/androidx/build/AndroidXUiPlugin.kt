@@ -136,21 +136,59 @@ class AndroidXUiPlugin : Plugin<Project> {
         private fun Project.configureAndroidCommonOptions(testedExtension: TestedExtension) {
             testedExtension.defaultConfig.minSdkVersion(21)
 
-            testedExtension.lintOptions.apply {
-                // Too many Kotlin features require synthetic accessors - we want to rely on R8 to
-                // remove these accessors
-                disable("SyntheticAccessor")
-                // Composable naming is normally a warning, but we ignore (in AndroidX)
-                // warnings in Lint, so we make it an error here so it will fail the build.
-                // Note that this causes 'UnknownIssueId' lint warnings in the build log when
-                // Lint tries to apply this rule to modules that do not have this lint check.
-                // Unfortunately suppressing this doesn't seem to work, and disabling it causes
-                // it just to log `Lint: Unknown issue id "ComposableNaming"`, which will still
-                // cause the build log simplifier to fail.
-                error("ComposableNaming")
-                error("ComposableLambdaParameterNaming")
-                error("ComposableLambdaParameterPosition")
-                error("CompositionLocalNaming")
+            afterEvaluate { project ->
+                val isPublished = project.extensions.findByType(AndroidXExtension::class.java)
+                    ?.type == LibraryType.PUBLISHED_LIBRARY
+
+                testedExtension.lintOptions.apply {
+                    // Too many Kotlin features require synthetic accessors - we want to rely on R8 to
+                    // remove these accessors
+                    disable("SyntheticAccessor")
+                    // These lint checks are normally a warning (or lower), but we ignore (in AndroidX)
+                    // warnings in Lint, so we make it an error here so it will fail the build.
+                    // Note that this causes 'UnknownIssueId' lint warnings in the build log when
+                    // Lint tries to apply this rule to modules that do not have this lint check, so
+                    // we disable that check too
+                    disable("UnknownIssueId")
+                    error("ComposableNaming")
+                    error("ComposableLambdaParameterNaming")
+                    error("ComposableLambdaParameterPosition")
+                    error("CompositionLocalNaming")
+                    error("ComposableModifierFactory")
+                    error("InvalidColorHexValue")
+                    error("MissingColorAlphaChannel")
+                    error("ModifierFactoryReturnType")
+                    error("ModifierFactoryExtensionFunction")
+                    error("ModifierParameter")
+
+                    // Paths we want to enable ListIterator checks for - for higher level levels it
+                    // won't have a noticeable performance impact, and we don't want developers
+                    // reading high level library code to worry about this.
+                    val listIteratorPaths = listOf(
+                        "compose:foundation",
+                        "compose:runtime",
+                        "compose:ui",
+                        "text"
+                    )
+
+                    // Paths we want to disable ListIteratorChecks for - these are not runtime
+                    // libraries and so Iterator allocation is not relevant.
+                    val ignoreListIteratorFilter = listOf(
+                        "compose:ui:ui-test",
+                        "compose:ui:ui-tooling",
+                        "compose:ui:ui-inspection",
+                    )
+
+                    // Disable ListIterator if we are not in a matching path, or we are in an
+                    // unpublished project
+                    if (
+                        listIteratorPaths.none { path.contains(it) } ||
+                        ignoreListIteratorFilter.any { path.contains(it) } ||
+                        !isPublished
+                    ) {
+                        disable("ListIterator")
+                    }
+                }
             }
 
             // TODO(148540713): remove this exclusion when Lint can support using multiple lint jars
@@ -162,7 +200,7 @@ class AndroidXUiPlugin : Plugin<Project> {
                 "lintChecks",
                 project.dependencies.project(
                     mapOf(
-                        "path" to ":compose:internal-lint-checks",
+                        "path" to ":compose:lint:internal-lint-checks",
                         "configuration" to "shadow"
                     )
                 )

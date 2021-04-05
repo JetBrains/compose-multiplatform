@@ -142,6 +142,7 @@ class AndroidXDocsPlugin : Plugin<Project> {
                             it.exclude("**/META-INF/**")
                             it.exclude("**/OWNERS")
                             it.exclude("**/package.html")
+                            it.exclude("**/*.md")
                         }
                     }
                 }
@@ -304,7 +305,7 @@ class AndroidXDocsPlugin : Plugin<Project> {
                 val filePath = "${project.getDistributionDirectory().canonicalPath}/"
                 val fileName = "$baseName-$buildId.zip"
                 val destinationFile = filePath + fileName
-                description = "Zips Java documentation (generated via Doclava in the " +
+                description = "Zips Kotlin documentation (generated via Dokka in the " +
                     "style of d.android.com) into $destinationFile"
             }
         }

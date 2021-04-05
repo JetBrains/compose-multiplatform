@@ -27,7 +27,7 @@ const val ANDROIDX_TEST_MONITOR = "androidx.test:monitor:1.3.0"
 const val ANDROIDX_TEST_RULES = "androidx.test:rules:1.3.0"
 const val ANDROIDX_TEST_RUNNER = "androidx.test:runner:1.3.0"
 const val ANDROIDX_TEST_UIAUTOMATOR = "androidx.test.uiautomator:uiautomator:2.2.0"
-const val AUTO_COMMON = "com.google.auto:auto-common:0.10"
+const val AUTO_COMMON = "com.google.auto:auto-common:0.11"
 const val AUTO_SERVICE_ANNOTATIONS = "com.google.auto.service:auto-service-annotations:1.0-rc6"
 const val AUTO_SERVICE_PROCESSOR = "com.google.auto.service:auto-service:1.0-rc6"
 const val AUTO_VALUE = "com.google.auto.value:auto-value:1.6.3"
@@ -89,7 +89,7 @@ internal lateinit var kspVersion: String
 val KSP_VERSION get() = kspVersion
 val KOTLIN_KSP_API get() = "com.google.devtools.ksp:symbol-processing-api:$KSP_VERSION"
 val KOTLIN_KSP get() = "com.google.devtools.ksp:symbol-processing:$KSP_VERSION"
-const val KOTLIN_GRADLE_PLUGIN = "org.jetbrains.kotlin:kotlin-gradle-plugin:1.4.31"
+const val KOTLIN_GRADLE_PLUGIN = "org.jetbrains.kotlin:kotlin-gradle-plugin:1.4.32"
 
 const val KOTLIN_METADATA = "me.eugeniomarletti.kotlin.metadata:kotlin-metadata:1.4.0"
 const val KOTLIN_METADATA_JVM = "org.jetbrains.kotlinx:kotlinx-metadata-jvm:0.1.0"
@@ -108,7 +108,7 @@ const val PLAY_SERVICES_BASE = "com.google.android.gms:play-services-base:17.0.0
 const val REACTIVE_STREAMS = "org.reactivestreams:reactive-streams:1.0.0"
 const val RX_JAVA = "io.reactivex.rxjava2:rxjava:2.2.9"
 const val RX_JAVA3 = "io.reactivex.rxjava3:rxjava:3.0.0"
-val SKIKO_VERSION = System.getenv("SKIKO_VERSION") ?: "0.2.16"
+val SKIKO_VERSION = System.getenv("SKIKO_VERSION") ?: "0.2.21"
 val SKIKO = "org.jetbrains.skiko:skiko-jvm:$SKIKO_VERSION"
 val SKIKO_LINUX_X64 = "org.jetbrains.skiko:skiko-jvm-runtime-linux-x64:$SKIKO_VERSION"
 val SKIKO_MACOS_X64 = "org.jetbrains.skiko:skiko-jvm-runtime-macos-x64:$SKIKO_VERSION"
@@ -127,6 +127,7 @@ val SKIKO_CURRENT_OS by lazy {
     }
 }
 const val TRUTH = "com.google.truth:truth:1.0.1"
+const val VIEW_BINDING = "androidx.databinding:viewbinding:4.1.2"
 const val XERIAL = "org.xerial:sqlite-jdbc:3.25.2"
 const val XPP3 = "xpp3:xpp3:1.1.4c"
 const val XMLPULL = "xmlpull:xmlpull:1.1.3.1"

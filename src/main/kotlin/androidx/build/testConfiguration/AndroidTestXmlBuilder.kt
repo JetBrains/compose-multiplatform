@@ -59,31 +59,29 @@ class ConfigBuilder {
             .append(APK_INSTALL_OPTION.replace("APK_NAME", testApkName))
         if (!appApkName.isNullOrEmpty())
             sb.append(APK_INSTALL_OPTION.replace("APK_NAME", appApkName!!))
+        // Temporary hardcoded hack for b/181810492
+        else if (applicationId == "androidx.benchmark.macro.test") {
+            sb.append(
+                APK_INSTALL_OPTION.replace(
+                    "APK_NAME",
+                    /* ktlint-disable max-line-length */
+                    "benchmark-integration-tests-macrobenchmark-target_macrobenchmark-target-release.apk"
+                    /* ktlint-enable max-line-length */
+                )
+            )
+        }
         sb.append(TARGET_PREPARER_CLOSE)
             .append(TEST_BLOCK_OPEN)
             .append(RUNNER_OPTION.replace("TEST_RUNNER", testRunner))
             .append(PACKAGE_OPTION.replace("APPLICATION_ID", applicationId))
-        if (runAllTests) {
-            if (!isPostsubmit) {
-                sb.append(FLAKY_TEST_OPTION)
-            }
-            sb.append(TEST_BLOCK_CLOSE)
-        } else {
-            if (!isPostsubmit) {
-                sb.append(FLAKY_TEST_OPTION)
-            }
-            sb.append(SMALL_TEST_OPTIONS)
-                .append(TEST_BLOCK_CLOSE)
-                .append(TEST_BLOCK_OPEN)
-            if (!isPostsubmit) {
-                sb.append(FLAKY_TEST_OPTION)
-            }
-            sb.append(RUNNER_OPTION.replace("TEST_RUNNER", testRunner))
-                .append(PACKAGE_OPTION.replace("APPLICATION_ID", applicationId))
-                .append(MEDIUM_TEST_OPTIONS)
-                .append(TEST_BLOCK_CLOSE)
+        if (!isPostsubmit) {
+            sb.append(FLAKY_TEST_OPTION)
         }
-        sb.append(CONFIGURATION_CLOSE)
+        if (!runAllTests) {
+            sb.append(SMALL_AND_MEDIUM_TEST_OPTIONS)
+        }
+        sb.append(TEST_BLOCK_CLOSE)
+            .append(CONFIGURATION_CLOSE)
         return sb.toString()
     }
 }
@@ -176,31 +174,13 @@ class MediaConfigBuilder {
             if (!isPostsubmit) {
                 sb.append(FLAKY_TEST_OPTION)
             }
-            sb.append(SMALL_TEST_OPTIONS)
+            sb.append(SMALL_AND_MEDIUM_TEST_OPTIONS)
                 .append(TEST_BLOCK_CLOSE)
                 .append(TEST_BLOCK_OPEN)
                 .append(RUNNER_OPTION.replace("TEST_RUNNER", testRunner))
-                .append(PACKAGE_OPTION.replace("APPLICATION_ID", clientApplicationId))
-                .append(mediaInstrumentationArgs())
-                .append(MEDIUM_TEST_OPTIONS)
-            if (!isPostsubmit) {
-                sb.append(FLAKY_TEST_OPTION)
-            }
-            sb.append(TEST_BLOCK_CLOSE)
-                .append(TEST_BLOCK_OPEN)
-                .append(RUNNER_OPTION.replace("TEST_RUNNER", testRunner))
                 .append(PACKAGE_OPTION.replace("APPLICATION_ID", serviceApplicationId))
                 .append(mediaInstrumentationArgs())
-                .append(SMALL_TEST_OPTIONS)
-            if (!isPostsubmit) {
-                sb.append(FLAKY_TEST_OPTION)
-            }
-            sb.append(TEST_BLOCK_CLOSE)
-                .append(TEST_BLOCK_OPEN)
-                .append(RUNNER_OPTION.replace("TEST_RUNNER", testRunner))
-                .append(PACKAGE_OPTION.replace("APPLICATION_ID", serviceApplicationId))
-                .append(mediaInstrumentationArgs())
-                .append(MEDIUM_TEST_OPTIONS)
+                .append(SMALL_AND_MEDIUM_TEST_OPTIONS)
             if (!isPostsubmit) {
                 sb.append(FLAKY_TEST_OPTION)
             }
@@ -244,7 +224,7 @@ private val CONFIGURATION_CLOSE = """
 """.trimIndent()
 
 private val MIN_API_LEVEL_CONTROLLER_OBJECT = """
-    <object type="module_controller" class="com.android.tradefed.testtype.suite.module.ShippingApiLevelModuleController">
+    <object type="module_controller" class="com.android.tradefed.testtype.suite.module.MinApiLevelModuleController">
     <option name="min-api-level" value="MIN_SDK" />
     </object>
 
@@ -270,6 +250,10 @@ private val SETUP_INCLUDE = """
 
 """.trimIndent()
 
+/**
+ * We can't remove the apk on API < 27 due to a platform crash that occurs
+ * when handling a PACKAGE_CHANGED broadcast after the package has been removed. b/37264334
+ */
 private val TARGET_PREPARER_OPEN = """
     <target_preparer class="com.android.tradefed.targetprep.suite.SuiteApkInstaller">
     <option name="cleanup-apks" value="false" />
@@ -278,6 +262,7 @@ private val TARGET_PREPARER_OPEN = """
 
 private val MEDIA_TARGET_PREPARER_OPEN = """
     <target_preparer class="com.android.tradefed.targetprep.suite.SuiteApkInstaller">
+    <option name="cleanup-apks" value="true" />
 
 """.trimIndent()
 
@@ -327,14 +312,9 @@ private val FLAKY_TEST_OPTION = """
 
 """.trimIndent()
 
-private val SMALL_TEST_OPTIONS = """
+private val SMALL_AND_MEDIUM_TEST_OPTIONS = """
     <option name="size" value="small" />
-
-""".trimIndent()
-
-private val MEDIUM_TEST_OPTIONS = """
     <option name="size" value="medium" />
-
 """.trimIndent()
 
 private val CLIENT_PREVIOUS = """

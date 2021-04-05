@@ -159,6 +159,11 @@ fun Project.configureLint(lintOptions: LintOptions, extension: AndroidXExtension
                 disable("BanUncheckedReflection")
             }
 
+            // Only run certain checks where API tracking is important.
+            if (extension.type.checkApi is RunApiTasks.No) {
+                disable("IllegalExperimentalApiUsage")
+            }
+
             // If the project has not overridden the lint config, set the default one.
             if (lintConfig == null) {
                 // suppress warnings more specifically than issue-wide severity (regexes)
