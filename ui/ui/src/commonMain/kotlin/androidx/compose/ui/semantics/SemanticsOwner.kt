@@ -44,7 +44,7 @@ class SemanticsOwner internal constructor(private val rootNode: LayoutNode) {
  * list.
  */
 fun SemanticsOwner.getAllSemanticsNodes(mergingEnabled: Boolean): List<SemanticsNode> {
-    return getAllSemanticsNodesToMap(mergingEnabled).values.toList()
+    return getAllSemanticsNodesToMap(useUnmergedTree = !mergingEnabled).values.toList()
 }
 
 /**
