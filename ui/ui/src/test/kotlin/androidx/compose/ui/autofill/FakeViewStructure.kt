@@ -1,5 +1,5 @@
 /*
- * Copyright 2019 The Android Open Source Project
+ * Copyright 2021 The Android Open Source Project
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package androidx.compose.testutils.fake
+package androidx.compose.ui.autofill
 
 import android.graphics.Matrix
 import android.graphics.Rect
@@ -52,12 +52,12 @@ import androidx.annotation.RequiresApi
  * @suppress
  */
 @RequiresApi(Build.VERSION_CODES.O)
-data class FakeViewStructure(
+internal data class FakeAndroidViewStructure(
     var virtualId: Int = 0,
     var packageName: String? = null,
     var typeName: String? = null,
     var entryName: String? = null,
-    var children: MutableList<FakeViewStructure> = mutableListOf(),
+    var children: MutableList<FakeAndroidViewStructure> = mutableListOf(),
     var bounds: Rect? = null,
     private val autofillId: AutofillId? = generateAutofillId(),
     private var autofillType: Int = View.AUTOFILL_TYPE_NONE,
@@ -85,11 +85,11 @@ data class FakeViewStructure(
     override fun getChildCount() = children.count()
 
     override fun addChildCount(childCount: Int): Int {
-        repeat(childCount) { children.add(FakeViewStructure(autofillId = autofillId)) }
+        repeat(childCount) { children.add(FakeAndroidViewStructure(autofillId = autofillId)) }
         return children.count() - childCount
     }
 
-    override fun newChild(index: Int): FakeViewStructure {
+    override fun newChild(index: Int): FakeAndroidViewStructure {
         if (index >= children.count()) error("Call addChildCount() before calling newChild()")
         return children[index]
     }
@@ -124,7 +124,7 @@ data class FakeViewStructure(
         this.bounds = Rect(left, top, width - left, height - top)
     }
 
-    override fun equals(other: Any?) = other is FakeViewStructure &&
+    override fun equals(other: Any?) = other is FakeAndroidViewStructure &&
         other.virtualId == virtualId &&
         other.packageName == packageName &&
         other.typeName == typeName &&
