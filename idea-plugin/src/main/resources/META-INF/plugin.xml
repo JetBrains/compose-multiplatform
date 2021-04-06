@@ -15,5 +15,6 @@
                 implementationClass="org.jetbrains.compose.desktop.idea.preview.PreviewRunLineMarkerContributor"/>
         <runConfigurationProducer
                 implementation="org.jetbrains.compose.desktop.idea.preview.PreviewRunConfigurationProducer"/>
+        <deadCode implementation="org.jetbrains.compose.desktop.idea.preview.PreviewEntryPoint" />
     </extensions>
 </idea-plugin>
