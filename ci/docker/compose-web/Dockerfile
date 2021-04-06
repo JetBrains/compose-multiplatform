@@ -37,4 +37,3 @@ RUN ln -sf /androidx-main/external /mnt/agent/external
 
 RUN rm -rf /androidx-main/frameworks/support
 RUN apt-get clean 
-RUN apt-get purge wget
