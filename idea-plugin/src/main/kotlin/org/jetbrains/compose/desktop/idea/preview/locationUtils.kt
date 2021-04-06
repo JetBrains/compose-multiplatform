@@ -1,6 +1,17 @@
 /*
- * Copyright 2020-2021 JetBrains s.r.o. and respective authors and developers.
- * Use of this source code is governed by the Apache 2.0 license that can be found in the LICENSE.txt file.
+ * Copyright (C) 2019 The Android Open Source Project
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
 
 package org.jetbrains.compose.desktop.idea.preview
@@ -17,6 +28,11 @@ import org.jetbrains.kotlin.resolve.descriptorUtil.fqNameSafe
 import org.jetbrains.kotlin.resolve.lazy.BodyResolveMode
 
 internal const val DESKTOP_PREVIEW_ANNOTATION_FQN = "androidx.compose.ui.tooling.desktop.preview.Preview"
+
+/**
+ * Utils based on functions from AOSP, taken from
+ * tools/adt/idea/compose-designer/src/com/android/tools/idea/compose/preview/util/PreviewElement.kt
+ */
 
 /**
  *  Whether this function is properly annotated with [PREVIEW_ANNOTATION_FQN] and is defined in a valid location.
