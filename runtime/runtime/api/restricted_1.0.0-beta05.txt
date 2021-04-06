@@ -480,6 +480,9 @@ package androidx.compose.runtime.internal {
   public final class ComposableLambdaN_jvmKt {
   }
 
+  public final class DecoyKt {
+  }
+
   public final class LiveLiteralKt {
     method public static boolean isLiveLiteralsEnabled();
   }

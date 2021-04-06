@@ -519,6 +519,24 @@ package androidx.compose.runtime.internal {
     method @androidx.compose.runtime.ComposeCompilerApi public static androidx.compose.runtime.internal.ComposableLambdaN composableLambdaNInstance(int key, boolean tracked, String? sourceInformation, int arity, Object block);
   }
 
+  @androidx.compose.runtime.ExperimentalComposeApi @kotlin.annotation.Target(allowedTargets={kotlin.annotation.AnnotationTarget, kotlin.annotation.AnnotationTarget}) public @interface Decoy {
+    method public abstract String[] signature();
+    method public abstract String targetName();
+    property public abstract String![] signature;
+    property public abstract String targetName;
+  }
+
+  @androidx.compose.runtime.ExperimentalComposeApi @kotlin.annotation.Target(allowedTargets={kotlin.annotation.AnnotationTarget, kotlin.annotation.AnnotationTarget}) public @interface DecoyImplementation {
+    method public abstract long id();
+    method public abstract String name();
+    property public abstract long id;
+    property public abstract String name;
+  }
+
+  public final class DecoyKt {
+    method @androidx.compose.runtime.ComposeCompilerApi public static Void illegalDecoyCallException(String fName);
+  }
+
   @androidx.compose.runtime.ComposeCompilerApi @kotlin.annotation.Retention(kotlin.annotation.AnnotationRetention) @kotlin.annotation.Target(allowedTargets=kotlin.annotation.AnnotationTarget) public @interface LiveLiteralFileInfo {
     method public abstract String file();
     property public abstract String file;
