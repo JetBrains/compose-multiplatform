@@ -129,11 +129,13 @@ internal class SelectionManager(private val selectionRegistrar: SelectionRegistr
     var containerLayoutCoordinates: LayoutCoordinates? = null
         set(value) {
             field = value
-            val positionInWindow = value?.positionInWindow()
-            if (hasFocus && previousPosition != positionInWindow) {
-                previousPosition = positionInWindow
-                updateHandleOffsets()
-                updateSelectionToolbarPosition()
+            if (hasFocus && selection != null) {
+                val positionInWindow = value?.positionInWindow()
+                if (previousPosition != positionInWindow) {
+                    previousPosition = positionInWindow
+                    updateHandleOffsets()
+                    updateSelectionToolbarPosition()
+                }
             }
         }
 
