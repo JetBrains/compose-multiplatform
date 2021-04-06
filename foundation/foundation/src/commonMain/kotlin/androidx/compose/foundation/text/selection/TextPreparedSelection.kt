@@ -71,7 +71,9 @@ internal abstract class BaseTextPreparedSelection<T : BaseTextPreparedSelection<
         if (resetCachedX) {
             state.resetCachedX()
         }
-        block()
+        if (text.isNotEmpty()) {
+            block()
+        }
         return this as T
     }
 

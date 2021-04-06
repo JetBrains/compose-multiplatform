@@ -106,6 +106,26 @@ class TextPreparedSelectionTest {
     }
 
     @Test
+    fun textSelection_byWordMovements_empty() {
+        selectionTest("") {
+            it.moveCursorRightByWord()
+            expectedSelection(TextRange(0))
+            it.moveCursorLeftByWord()
+            expectedSelection(TextRange(0))
+        }
+    }
+
+    @Test
+    fun textSelection_byParagraphMovements_empty() {
+        selectionTest("") {
+            it.moveCursorNextByParagraph()
+            expectedSelection(TextRange(0))
+            it.moveCursorPrevByParagraph()
+            expectedSelection(TextRange(0))
+        }
+    }
+
+    @Test
     fun textSelection_lineMovements() {
         selectionTest("ab\ncde\n\ngi", initSelection = TextRange(1)) {
             it.moveCursorDownByLine()
