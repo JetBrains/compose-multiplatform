@@ -62,6 +62,7 @@ import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.semantics.SemanticsActions
 import androidx.compose.ui.semantics.SemanticsProperties
 import androidx.compose.ui.semantics.getOrNull
+import androidx.compose.ui.test.ExperimentalTestApi
 import androidx.compose.ui.test.SemanticsMatcher
 import androidx.compose.ui.test.SemanticsNodeInteraction
 import androidx.compose.ui.test.assert
@@ -81,6 +82,7 @@ import androidx.compose.ui.test.performGesture
 import androidx.compose.ui.test.performSemanticsAction
 import androidx.compose.ui.test.performTextClearance
 import androidx.compose.ui.test.performTextInput
+import androidx.compose.ui.test.performTextInputSelection
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.TextLayoutResult
 import androidx.compose.ui.text.TextRange
@@ -716,6 +718,101 @@ class TextFieldTest {
         rule.runOnIdle {
             // Not asserting total size as we have other interactions here too
             assertThat(interactions.filterIsInstance<FocusInteraction.Focus>()).hasSize(1)
+        }
+    }
+
+    @Test
+    fun textField_stringOverload_callsOnValueChange_whenTextChange() {
+        var onValueChangeCalled: Boolean
+
+        rule.setContent {
+            val state = remember { mutableStateOf("abc") }
+            BasicTextField(
+                modifier = Modifier.testTag(Tag),
+                value = state.value,
+                onValueChange = {
+                    onValueChangeCalled = true
+                    state.value = it
+                }
+            )
+        }
+
+        @OptIn(ExperimentalTestApi::class)
+        rule.onNodeWithTag(Tag)
+            .performClick()
+            .performTextInputSelection(TextRange(0, 0))
+
+        // reset
+        onValueChangeCalled = false
+
+        // change selection
+        @OptIn(ExperimentalTestApi::class)
+        rule.onNodeWithTag(Tag)
+            .performTextInputSelection(TextRange(1, 1))
+
+        rule.runOnIdle {
+            assertThat(onValueChangeCalled).isFalse()
+        }
+
+        // change text
+        rule.onNodeWithTag(Tag)
+            .performTextInput("d")
+
+        rule.runOnIdle {
+            assertThat(onValueChangeCalled).isTrue()
+        }
+    }
+
+    @Test
+    fun textField_callsOnValueChange_whenTextFieldValueChange() {
+        var onValueChangeCalled: Boolean
+
+        rule.setContent {
+            val state = remember { mutableStateOf(TextFieldValue("abc")) }
+            BasicTextField(
+                modifier = Modifier.testTag(Tag),
+                value = state.value,
+                onValueChange = {
+                    onValueChangeCalled = true
+                    state.value = it
+                }
+            )
+        }
+
+        @OptIn(ExperimentalTestApi::class)
+        rule.onNodeWithTag(Tag)
+            .performClick()
+            .performTextInputSelection(TextRange(0, 0))
+
+        // reset flag since click might change selection
+        onValueChangeCalled = false
+
+        @OptIn(ExperimentalTestApi::class)
+        rule.onNodeWithTag(Tag)
+            .performTextInputSelection(TextRange(1, 1))
+
+        // selection changed
+        rule.runOnIdle {
+            assertThat(onValueChangeCalled).isTrue()
+        }
+
+        // reset flag
+        onValueChangeCalled = false
+
+        // set selection to same value, no change should occur
+        @OptIn(ExperimentalTestApi::class)
+        rule.onNodeWithTag(Tag)
+            .performTextInputSelection(TextRange(1, 1))
+
+        rule.runOnIdle {
+            assertThat(onValueChangeCalled).isFalse()
+        }
+
+        rule.onNodeWithTag(Tag)
+            .performTextInput("d")
+
+        rule.runOnIdle {
+            assertThat(onValueChangeCalled).isTrue()
         }
     }
 }
