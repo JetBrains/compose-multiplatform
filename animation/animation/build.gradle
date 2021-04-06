@@ -57,6 +57,8 @@ dependencies {
         androidTestImplementation(ANDROIDX_TEST_RULES)
         androidTestImplementation(ANDROIDX_TEST_RUNNER)
         androidTestImplementation(JUNIT)
+
+        lintPublish project(":compose:animation:animation-lint")
     }
 }
 
