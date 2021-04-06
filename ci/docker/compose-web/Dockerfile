@@ -27,7 +27,7 @@ RUN chmod a+x ~/bin/repo
 RUN mkdir androidx-main 
 WORKDIR  androidx-main
 RUN ~/bin/repo init -u https://android.googlesource.com/platform/manifest \
-    -b androidx-main --partial-clone --clone-filter=blob:limit=10M
+    -b androidx-main --depth=1 --partial-clone --clone-filter=blob:limit=10M
 RUN ~/bin/repo sync -c --no-tags --no-clone-bundle -j4
 
 RUN mkdir -p /mnt/agent
@@ -35,5 +35,6 @@ RUN ln -sf /androidx-main/tools/ /mnt/agent/tools
 RUN ln -sf /androidx-main/prebuilts/ /mnt/agent/prebuilts
 RUN ln -sf /androidx-main/external /mnt/agent/external
 
+RUN rm -rf /androidx-main/frameworks/support
 RUN apt-get clean 
-RUN apt-get purge curl && rm -rf /var/lib/apt/lists/* /var/cache/apt/*
+RUN apt-get purge wget
