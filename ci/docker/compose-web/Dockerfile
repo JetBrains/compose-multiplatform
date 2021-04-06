@@ -1,32 +1,39 @@
 FROM ubuntu:20.10
 
-ENV LANG='en_US.UTF-8' LANGUAGE='en_US:en' LC_ALL='en_US.UTF-8'
-
 SHELL ["/bin/bash", "-c"]
 
 RUN echo "dash dash/sh boolean false" | debconf-set-selections
 RUN dpkg-reconfigure -f noninteractive dash
 
 RUN dpkg --add-architecture i386 && apt-get update -yqq && apt-get install -y \
-    curl \
     git \
+    gnupg2 \
     python3 \
-    python-is-python3
+    python-is-python3 \
+    wget
 
-RUN apt-get clean 
+ARG CHROME_VERSION="google-chrome-stable"
+
+RUN wget -q -O - https://dl-ssl.google.com/linux/linux_signing_key.pub | apt-key add -
+RUN echo "deb http://dl.google.com/linux/chrome/deb/ stable main" >> /etc/apt/sources.list.d/google-chrome.list \
+    && apt-get update -yqq && apt-get install -y \
+    ${CHROME_VERSION:-google-chrome-stable}
 
 RUN mkdir ~/bin
 ENV PATH=~/bin:$PATH
 
-RUN curl https://storage.googleapis.com/git-repo-downloads/repo > ~/bin/repo
+RUN wget -P ~/bin https://storage.googleapis.com/git-repo-downloads/repo
 RUN chmod a+x ~/bin/repo
 RUN mkdir androidx-main 
 WORKDIR  androidx-main
 RUN ~/bin/repo init -u https://android.googlesource.com/platform/manifest \
-    -b androidx-main --partial-clone --clone-filter=blob:limit=10M
+    #-b androidx-main --partial-clone --clone-filter=blob:limit=10M
 RUN ~/bin/repo sync -c --no-tags --no-clone-bundle -j4
 
 RUN mkdir -p /mnt/agent
 RUN ln -sf /androidx-main/tools/ /mnt/agent/tools
 RUN ln -sf /androidx-main/prebuilts/ /mnt/agent/prebuilts
 RUN ln -sf /androidx-main/external /mnt/agent/external
+
+RUN apt-get clean 
+RUN apt-get purge curl && rm -rf /var/lib/apt/lists/* /var/cache/apt/*
