@@ -20,7 +20,6 @@ import android.app.Activity
 import android.view.View
 import android.view.ViewStructure
 import androidx.autofill.HintConstants.AUTOFILL_HINT_PERSON_NAME
-import androidx.compose.testutils.fake.FakeViewStructure
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.geometry.Rect
 import androidx.compose.ui.test.ComposeUiRobolectricTestRunner
@@ -55,7 +54,7 @@ class AndroidPopulateViewStructureTest {
     @Test
     fun populateViewStructure_emptyAutofillTree() {
         // Arrange.
-        val viewStructure: ViewStructure = FakeViewStructure()
+        val viewStructure: ViewStructure = FakeAndroidViewStructure()
 
         // Act.
         androidAutofill.populateViewStructure(viewStructure)
@@ -75,14 +74,14 @@ class AndroidPopulateViewStructureTest {
         autofillTree += autofillNode
 
         // Act.
-        val viewStructure = FakeViewStructure()
+        val viewStructure = FakeAndroidViewStructure()
         androidAutofill.populateViewStructure(viewStructure)
 
         // Assert.
         assertThat(viewStructure).isEqualTo(
-            FakeViewStructure().apply {
+            FakeAndroidViewStructure().apply {
                 children.add(
-                    FakeViewStructure().apply {
+                    FakeAndroidViewStructure().apply {
                         virtualId = autofillNode.id
                         packageName = currentPackage
                         setAutofillType(View.AUTOFILL_TYPE_TEXT)
@@ -112,14 +111,14 @@ class AndroidPopulateViewStructureTest {
         autofillTree += emailAutofillNode
 
         // Act.
-        val viewStructure: ViewStructure = FakeViewStructure()
+        val viewStructure: ViewStructure = FakeAndroidViewStructure()
         androidAutofill.populateViewStructure(viewStructure)
 
         // Assert.
         assertThat(viewStructure).isEqualTo(
-            FakeViewStructure().apply {
+            FakeAndroidViewStructure().apply {
                 children.add(
-                    FakeViewStructure().apply {
+                    FakeAndroidViewStructure().apply {
                         virtualId = nameAutofillNode.id
                         packageName = currentPackage
                         setAutofillType(View.AUTOFILL_TYPE_TEXT)
@@ -128,7 +127,7 @@ class AndroidPopulateViewStructureTest {
                     }
                 )
                 children.add(
-                    FakeViewStructure().apply {
+                    FakeAndroidViewStructure().apply {
                         virtualId = emailAutofillNode.id
                         packageName = currentPackage
                         setAutofillType(View.AUTOFILL_TYPE_TEXT)

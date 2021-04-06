@@ -21,7 +21,6 @@ import android.view.View
 import android.view.ViewStructure
 import android.view.autofill.AutofillValue
 import androidx.autofill.HintConstants.AUTOFILL_HINT_PERSON_NAME
-import androidx.compose.testutils.fake.FakeViewStructure
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.geometry.Rect
 import androidx.compose.ui.platform.LocalAutofill
