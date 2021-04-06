@@ -22,6 +22,9 @@ import kotlinx.metadata.ClassName
  * Contains common names used for lint checks.
  */
 object Names {
+    object Animation {
+        val PackageName = Package("androidx.compose.animation")
+    }
     object AnimationCore {
         val PackageName = Package("androidx.compose.animation.core")
     }

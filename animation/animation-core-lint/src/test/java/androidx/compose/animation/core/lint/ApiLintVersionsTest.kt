@@ -16,9 +16,8 @@
 
 @file:Suppress("UnstableApiUsage")
 
-package androidx.compose.material.lint
+package androidx.compose.animation.core.lint
 
-import androidx.compose.animation.core.lint.AnimationCoreIssueRegistry
 import com.android.tools.lint.client.api.LintClient
 import com.android.tools.lint.detector.api.CURRENT_API
 import com.google.common.truth.Truth.assertThat

@@ -44,9 +44,9 @@ dependencies {
 }
 
 androidx {
-    name = "Compose Material Lint Checks"
+    name = "Compose Animation Lint Checks"
     type = LibraryType.LINT
-    mavenGroup = LibraryGroups.Compose.MATERIAL
+    mavenGroup = LibraryGroups.Compose.ANIMATION
     inceptionYear = "2021"
-    description = "Compose Material Lint Checks"
+    description = "Compose Animation Lint Checks"
 }
