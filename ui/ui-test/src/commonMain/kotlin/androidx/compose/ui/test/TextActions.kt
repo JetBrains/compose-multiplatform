@@ -17,10 +17,12 @@
 package androidx.compose.ui.test
 
 import androidx.compose.ui.semantics.SemanticsProperties
+import androidx.compose.ui.text.TextRange
 import androidx.compose.ui.text.input.CommitTextCommand
 import androidx.compose.ui.text.input.DeleteAllCommand
 import androidx.compose.ui.text.input.EditCommand
 import androidx.compose.ui.text.input.ImeAction
+import androidx.compose.ui.text.input.SetSelectionCommand
 
 /**
  * Clears the text in this node in similar way to IME.
@@ -36,6 +38,16 @@ fun SemanticsNodeInteraction.performTextClearance() {
  */
 fun SemanticsNodeInteraction.performTextInput(text: String) {
     sendTextInputCommand(listOf(CommitTextCommand(text, 1)))
+}
+
+/**
+ * Sends the given selection to this node in similar way to IME.
+ *
+ * @param selection selection to send
+ */
+@ExperimentalTestApi
+fun SemanticsNodeInteraction.performTextInputSelection(selection: TextRange) {
+    sendTextInputCommand(listOf(SetSelectionCommand(selection.min, selection.max)))
 }
 
 /**
