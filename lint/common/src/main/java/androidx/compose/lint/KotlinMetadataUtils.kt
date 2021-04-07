@@ -116,7 +116,8 @@ private fun PsiAnnotation.toHeader(): KotlinClassHeader {
  * signature.
  */
 private fun KmDeclarationContainer.findKmFunctionForPsiMethod(method: PsiMethod): KmFunction? {
-    val expectedName = method.name
+    // Strip any mangled part of the name in case of inline classes
+    val expectedName = method.name.substringBefore("-")
     val expectedSignature = ClassUtil.getAsmMethodSignature(method)
 
     return functions.find {
