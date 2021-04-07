@@ -115,14 +115,6 @@ class UnnecessaryLambdaCreationDetector : Detector(), SourceCodeScanner {
             // with 0 parameters, but one that has a receiver scope (SomeScope.() -> Unit).
             if (functionType != argumentType) return
 
-            // Unfortunately if the types come from a separate module, we don't have access to
-            // the type information in the function / argument, so instead we just get an error
-            // type. If both compare equally, and they are reporting an error type, we cannot do
-            // anything about this so just skip warning. This will only happen if there _are_
-            // types, i.e a scoped / parameterized function type, so it's rare enough that it
-            // shouldn't matter that much in practice.
-            if (functionType.reference.canonicalText.contains(NonExistentClass)) return
-
             val expectedComposable = node.isComposable
 
             // Hack to get the psi of the lambda declaration / source. The !!s here probably
@@ -148,9 +140,7 @@ class UnnecessaryLambdaCreationDetector : Detector(), SourceCodeScanner {
     }
 
     companion object {
-        private const val NonExistentClass = "error.NonExistentClass"
-
-        private const val explanation =
+        private const val Explanation =
             "Creating this extra lambda instead of just passing the already captured lambda means" +
                 " that during code generation the Compose compiler will insert code around " +
                 "this lambda to track invalidations. This adds some extra runtime cost so you" +
@@ -159,7 +149,7 @@ class UnnecessaryLambdaCreationDetector : Detector(), SourceCodeScanner {
         val ISSUE = Issue.create(
             "UnnecessaryLambdaCreation",
             "Creating an unnecessary lambda to emit a captured lambda",
-            explanation,
+            Explanation,
             Category.PERFORMANCE, 5, Severity.ERROR,
             Implementation(
                 UnnecessaryLambdaCreationDetector::class.java,
