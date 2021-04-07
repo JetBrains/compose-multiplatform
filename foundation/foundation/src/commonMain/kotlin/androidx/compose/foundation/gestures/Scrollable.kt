@@ -209,10 +209,11 @@ private class ScrollingLogic(
 
     suspend fun doFlingAnimation(available: Velocity): Velocity {
         var result: Velocity = available
-        // come up with the better threshold, but we need it since spline curve gives us NaNs
         scrollableState.scroll {
-            val outerScopeScroll: (Float) -> Float =
-                { delta -> this.dispatchScroll(delta.reverseIfNeeded(), NestedScrollSource.Fling) }
+            val outerScopeScroll: (Float) -> Float = { delta ->
+                delta - this.dispatchScroll(delta.reverseIfNeeded(), NestedScrollSource.Fling)
+                    .reverseIfNeeded()
+            }
             val scope = object : ScrollScope {
                 override fun scrollBy(pixels: Float): Float {
                     return outerScopeScroll.invoke(pixels)
@@ -220,7 +221,8 @@ private class ScrollingLogic(
             }
             with(scope) {
                 with(flingBehavior) {
-                    result = performFling(available.toFloat().reverseIfNeeded()).toVelocity()
+                    result = performFling(available.toFloat().reverseIfNeeded())
+                        .reverseIfNeeded().toVelocity()
                 }
             }
         }
@@ -282,6 +284,7 @@ private class DefaultFlingBehavior(
     private val flingDecay: DecayAnimationSpec<Float>
 ) : FlingBehavior {
     override suspend fun ScrollScope.performFling(initialVelocity: Float): Float {
+        // come up with the better threshold, but we need it since spline curve gives us NaNs
         return if (abs(initialVelocity) > 1f) {
             var velocityLeft = initialVelocity
             var lastValue = 0f
@@ -290,11 +293,11 @@ private class DefaultFlingBehavior(
                 initialVelocity = initialVelocity,
             ).animateDecay(flingDecay) {
                 val delta = value - lastValue
-                val left = scrollBy(delta)
+                val consumed = scrollBy(delta)
                 lastValue = value
                 velocityLeft = this.velocity
                 // avoid rounding errors and stop if anything is unconsumed
-                if (abs(left) > 0.5f) this.cancelAnimation()
+                if (abs(delta - consumed) > 0.5f) this.cancelAnimation()
             }
             velocityLeft
         } else {
