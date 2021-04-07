@@ -743,6 +743,79 @@ class ScrollableTest {
 
     @Test
     @OptIn(ExperimentalTestApi::class)
+    fun scrollable_nestedScrollAbove_reversed_proxiesPostCycles() =
+        runBlockingWithManualClock { clock ->
+            var value = 0f
+            var expectedLeft = 0f
+            val velocityFlung = 5000f
+            val controller = ScrollableState(
+                consumeScrollDelta = {
+                    val toConsume = it * 0.345f
+                    value += toConsume
+                    expectedLeft = it - toConsume
+                    toConsume
+                }
+            )
+            val parent = object : NestedScrollConnection {
+                override fun onPostScroll(
+                    consumed: Offset,
+                    available: Offset,
+                    source: NestedScrollSource
+                ): Offset {
+                    // we should get in post scroll as much as left in controller callback
+                    assertThat(available.x).isEqualTo(-expectedLeft)
+                    return available
+                }
+
+                override suspend fun onPostFling(
+                    consumed: Velocity,
+                    available: Velocity
+                ): Velocity {
+                    val expected = velocityFlung - consumed.x
+                    assertThat(consumed.x).isLessThan(velocityFlung)
+                    assertThat(abs(available.x - expected)).isLessThan(0.1f)
+                    return available
+                }
+            }
+
+            rule.setContent {
+                Box {
+                    Box(
+                        contentAlignment = Alignment.Center,
+                        modifier = Modifier
+                            .size(300.dp)
+                            .nestedScroll(parent)
+                    ) {
+                        Box(
+                            modifier = Modifier.size(300.dp)
+                                .testTag(scrollableBoxTag)
+                                .scrollable(
+                                    state = controller,
+                                    reverseDirection = true,
+                                    orientation = Orientation.Horizontal
+                                )
+                        )
+                    }
+                }
+            }
+
+            rule.onNodeWithTag(scrollableBoxTag).performGesture {
+                this.swipeWithVelocity(
+                    start = this.center,
+                    end = Offset(this.center.x + 500f, this.center.y),
+                    durationMillis = 300,
+                    endVelocity = velocityFlung
+                )
+            }
+
+            advanceClockWhileAwaitersExist(clock)
+            advanceClockWhileAwaitersExist(clock)
+
+            // all assertions in callback above
+        }
+
+    @Test
+    @OptIn(ExperimentalTestApi::class)
     fun scrollable_nestedScrollBelow_listensDispatches() = runBlocking(AutoTestFrameClock()) {
         var value = 0f
         var expectedConsumed = 0f
@@ -1103,6 +1176,7 @@ class ScrollableTest {
     @Test
     fun scrollable_flingBehaviourCalled_correctScope() {
         var total = 0f
+        var returned = 0f
         val controller = ScrollableState(
             consumeScrollDelta = {
                 total += it
@@ -1111,7 +1185,7 @@ class ScrollableTest {
         )
         val flingBehaviour = object : FlingBehavior {
             override suspend fun ScrollScope.performFling(initialVelocity: Float): Float {
-                scrollBy(123f)
+                returned = scrollBy(123f)
                 return 0f
             }
         }
@@ -1138,12 +1212,14 @@ class ScrollableTest {
 
         rule.runOnIdle {
             assertThat(total).isEqualTo(prevTotal + 123)
+            assertThat(returned).isEqualTo(123f)
         }
     }
 
     @Test
     fun scrollable_flingBehaviourCalled_reversed_correctScope() {
         var total = 0f
+        var returned = 0f
         val controller = ScrollableState(
             consumeScrollDelta = {
                 total += it
@@ -1152,7 +1228,7 @@ class ScrollableTest {
         )
         val flingBehaviour = object : FlingBehavior {
             override suspend fun ScrollScope.performFling(initialVelocity: Float): Float {
-                scrollBy(123f)
+                returned = scrollBy(123f)
                 return 0f
             }
         }
@@ -1180,6 +1256,7 @@ class ScrollableTest {
 
         rule.runOnIdle {
             assertThat(total).isEqualTo(prevTotal + 123)
+            assertThat(returned).isEqualTo(123f)
         }
     }
 
