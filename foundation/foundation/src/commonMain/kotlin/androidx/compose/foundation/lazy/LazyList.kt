@@ -33,6 +33,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clipToBounds
 import androidx.compose.ui.layout.SubcomposeLayout
 import androidx.compose.ui.platform.LocalLayoutDirection
+import androidx.compose.ui.semantics.CollectionInfo
+import androidx.compose.ui.semantics.collectionInfo
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.LayoutDirection
 
@@ -85,6 +88,12 @@ internal fun LazyList(
             .clipToBounds()
             .padding(contentPadding)
             .then(state.remeasurementModifier)
+            .semantics {
+                collectionInfo = CollectionInfo(
+                    rowCount = if (isVertical) -1 else 1,
+                    columnCount = if (isVertical) 1 else -1
+                )
+            }
     ) { constraints ->
         constraints.assertNotNestingScrollableContainers(isVertical)
 

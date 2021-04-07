@@ -59,9 +59,9 @@ import androidx.compose.ui.text.platform.toAccessibilitySpannableString
 import androidx.compose.ui.util.fastForEach
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.fastJoinToString
-import androidx.compose.ui.fastReduce
-import androidx.compose.ui.fastZipWithNext
 import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.platform.accessibility.setCollectionInfo
+import androidx.compose.ui.platform.accessibility.setCollectionItemInfo
 import androidx.compose.ui.semantics.AccessibilityAction
 import androidx.compose.ui.semantics.LiveRegionMode
 import androidx.compose.ui.semantics.ProgressBarRangeInfo
@@ -76,7 +76,6 @@ import androidx.core.view.accessibility.AccessibilityNodeInfoCompat
 import androidx.core.view.accessibility.AccessibilityNodeProviderCompat
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.delay
-import kotlin.math.abs
 import kotlin.math.ceil
 import kotlin.math.floor
 
@@ -2043,104 +2042,6 @@ internal class AndroidComposeViewAccessibilityDelegateCompat(val view: AndroidCo
             return concatenateChildrenContentDescriptionAndText(node).fastJoinToString()
         }
         return null
-    }
-
-    private fun setCollectionInfo(node: SemanticsNode, info: AccessibilityNodeInfoCompat) {
-        val groupedChildren = mutableListOf<SemanticsNode>()
-
-        if (node.config.getOrNull(SemanticsProperties.SelectableGroup) != null) {
-            node.children.fastForEach { childNode ->
-                // we assume that Tabs and RadioButtons are not mixed under a single group
-                if (childNode.config.contains(SemanticsProperties.Selected)) {
-                    groupedChildren.add(childNode)
-                }
-            }
-        }
-
-        if (groupedChildren.isNotEmpty()) {
-            /* When we provide a more complex CollectionInfo object, we will use it to determine
-            the number of rows, columns, and selection mode. Currently we assume mutual
-            exclusivity and liner layout (aka Column or Row). We determine if the layout is
-            horizontal or vertical by checking the bounds of the children
-            */
-            val isHorizontal = calculateIfHorizontallyStacked(groupedChildren)
-            info.setCollectionInfo(
-                AccessibilityNodeInfoCompat.CollectionInfoCompat.obtain(
-                    if (isHorizontal) 1 else groupedChildren.count(),
-                    if (isHorizontal) groupedChildren.count() else 1,
-                    false,
-                    getSelectionMode(groupedChildren)
-                )
-            )
-        }
-    }
-
-    private fun setCollectionItemInfo(node: SemanticsNode, info: AccessibilityNodeInfoCompat) {
-        if (!node.config.contains(SemanticsProperties.Selected)) return
-
-        val groupedChildren = mutableListOf<SemanticsNode>()
-
-        // for "tab" item find all siblings to calculate the index
-        val parentNode = node.parent ?: return
-        if (parentNode.config.getOrNull(SemanticsProperties.SelectableGroup) != null) {
-            // find all siblings to calculate the index
-            parentNode.children.fastForEach { childNode ->
-                if (childNode.config.contains(SemanticsProperties.Selected)) {
-                    groupedChildren.add(childNode)
-                }
-            }
-        }
-
-        if (groupedChildren.isNotEmpty()) {
-            val isHorizontal = calculateIfHorizontallyStacked(groupedChildren)
-
-            groupedChildren.fastForEachIndexed { index, tabNode ->
-                if (tabNode.id == node.id) {
-                    val itemInfo = AccessibilityNodeInfoCompat.CollectionItemInfoCompat.obtain(
-                        if (isHorizontal) 0 else index,
-                        1,
-                        if (isHorizontal) index else 0,
-                        1,
-                        false,
-                        tabNode.config.getOrElse(SemanticsProperties.Selected) { false }
-                    )
-                    if (itemInfo != null) {
-                        info.setCollectionItemInfo(itemInfo)
-                    }
-                }
-            }
-        }
-    }
-
-    /** A naïve algorithm to determine if elements are stacked vertically or horizontally */
-    private fun calculateIfHorizontallyStacked(items: List<SemanticsNode>): Boolean {
-        if (items.count() < 2) return true
-
-        val deltas = items.fastZipWithNext { el1, el2 ->
-            Offset(
-                abs(el1.boundsInRoot.center.x - el2.boundsInRoot.center.x),
-                abs(el1.boundsInRoot.center.y - el2.boundsInRoot.center.y)
-            )
-        }
-        val (deltaX, deltaY) = when (deltas.count()) {
-            1 -> deltas.first()
-            else -> deltas.fastReduce { result, element -> result + element }
-        }
-        return deltaY < deltaX
-    }
-
-    private fun getSelectionMode(items: List<SemanticsNode>): Int {
-        var numberOfSelectedItems = 0
-        items.fastForEach {
-            if (it.config.getOrElse(SemanticsProperties.Selected) { false }) {
-                numberOfSelectedItems += 1
-            }
-        }
-        return when (numberOfSelectedItems) {
-            0 -> AccessibilityNodeInfoCompat.CollectionInfoCompat.SELECTION_MODE_NONE
-            1 -> AccessibilityNodeInfoCompat.CollectionInfoCompat.SELECTION_MODE_SINGLE
-            else -> AccessibilityNodeInfoCompat.CollectionInfoCompat.SELECTION_MODE_MULTIPLE
-        }
     }
 
     // TODO(b/160820721): use AccessibilityNodeProviderCompat instead of AccessibilityNodeProvider
