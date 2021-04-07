@@ -18,10 +18,10 @@ package androidx.compose.foundation.benchmark.text
 
 import androidx.compose.testutils.benchmark.ComposeBenchmarkRule
 import androidx.compose.testutils.benchmark.benchmarkDrawPerf
-import androidx.compose.testutils.benchmark.benchmarkFirstComposeFast
-import androidx.compose.testutils.benchmark.benchmarkFirstDrawFast
-import androidx.compose.testutils.benchmark.benchmarkFirstLayoutFast
-import androidx.compose.testutils.benchmark.benchmarkFirstMeasureFast
+import androidx.compose.testutils.benchmark.benchmarkFirstCompose
+import androidx.compose.testutils.benchmark.benchmarkFirstDraw
+import androidx.compose.testutils.benchmark.benchmarkFirstLayout
+import androidx.compose.testutils.benchmark.benchmarkFirstMeasure
 import androidx.compose.testutils.benchmark.benchmarkLayoutPerf
 import androidx.compose.testutils.benchmark.toggleStateBenchmarkDraw
 import androidx.compose.testutils.benchmark.toggleStateBenchmarkLayout
@@ -85,7 +85,7 @@ class TextBasicBenchmark(
      */
     @Test
     fun first_compose() {
-        benchmarkRule.benchmarkFirstComposeFast(caseFactory)
+        benchmarkRule.benchmarkFirstCompose(caseFactory)
     }
 
     /**
@@ -94,7 +94,7 @@ class TextBasicBenchmark(
      */
     @Test
     fun first_measure() {
-        benchmarkRule.benchmarkFirstMeasureFast(caseFactory)
+        benchmarkRule.benchmarkFirstMeasure(caseFactory)
     }
 
     /**
@@ -103,7 +103,7 @@ class TextBasicBenchmark(
      */
     @Test
     fun first_layout() {
-        benchmarkRule.benchmarkFirstLayoutFast(caseFactory)
+        benchmarkRule.benchmarkFirstLayout(caseFactory)
     }
 
     /**
@@ -111,7 +111,7 @@ class TextBasicBenchmark(
      */
     @Test
     fun first_draw() {
-        benchmarkRule.benchmarkFirstDrawFast(caseFactory)
+        benchmarkRule.benchmarkFirstDraw(caseFactory)
     }
 
     /**
