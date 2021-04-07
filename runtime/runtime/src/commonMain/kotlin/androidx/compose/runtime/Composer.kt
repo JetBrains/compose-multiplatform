@@ -22,6 +22,7 @@ package androidx.compose.runtime
 
 import androidx.compose.runtime.collection.IdentityArraySet
 import androidx.compose.runtime.collection.IdentityScopeMap
+import androidx.compose.runtime.snapshots.currentSnapshot
 import androidx.compose.runtime.snapshots.fastForEach
 import androidx.compose.runtime.snapshots.fastMap
 import androidx.compose.runtime.snapshots.fastToSet
@@ -954,6 +955,7 @@ internal class ComposerImpl(
     private var providersInvalid = false
     private val providersInvalidStack = IntStack()
     private var childrenComposing: Int = 0
+    private var snapshot = currentSnapshot()
 
     private val invalidateStack = Stack<RecomposeScopeImpl>()
 
@@ -2477,11 +2479,13 @@ internal class ComposerImpl(
             val scope = RecomposeScopeImpl(composition as CompositionImpl)
             invalidateStack.push(scope)
             updateValue(scope)
+            scope.start(snapshot.id)
         } else {
             val invalidation = invalidations.removeLocation(reader.parent)
             val scope = reader.next() as RecomposeScopeImpl
             scope.requiresRecompose = invalidation != null
             invalidateStack.push(scope)
+            scope.start(snapshot.id)
         }
     }
 
@@ -2498,6 +2502,9 @@ internal class ComposerImpl(
         val scope = if (invalidateStack.isNotEmpty()) invalidateStack.pop()
         else null
         scope?.requiresRecompose = false
+        scope?.end(snapshot.id)?.let {
+            record { _, _, _ -> it(composition) }
+        }
         val result = if (scope != null && (scope.used || collectParameterInformation)) {
             if (scope.anchor == null) {
                 scope.anchor = if (inserting) {
@@ -2547,6 +2554,7 @@ internal class ComposerImpl(
         check(!isComposing) { "Reentrant composition is not supported" }
         trace("Compose:recompose") {
             invalidations.clear()
+            snapshot = currentSnapshot()
             invalidationsRequested.forEach { scope ->
                 val location = scope.anchor?.location ?: return
                 invalidations.add(Invalidation(scope, location))

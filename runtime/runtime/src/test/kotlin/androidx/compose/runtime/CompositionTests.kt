@@ -45,6 +45,7 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.test.runBlockingTest
+import kotlin.random.Random
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertFalse
@@ -2472,6 +2473,42 @@ class CompositionTests {
 
         repeat(10) {
             invalidateLast()
+            expectChanges()
+        }
+
+        invalidateFirst()
+        expectNoChanges()
+    }
+
+    @Suppress("UnrememberedMutableState")
+    @Composable
+    fun Indirect(iteration: Int, states: MutableList<MutableState<Int>>) {
+        val state = mutableStateOf(Random.nextInt())
+        states.add(state)
+        Text("$iteration state = ${state.value}")
+    }
+
+    @Composable
+    fun ComposeIndirect(iteration: State<Int>, states: MutableList<MutableState<Int>>) {
+        Text("Iteration ${iteration.value}")
+        Indirect(iteration.value, states)
+    }
+
+    @Test // Regression b/182822837
+    fun testObservationScopes_IndirectInvalidate() = compositionTest {
+        val states = mutableListOf<MutableState<Int>>()
+        val iteration = mutableStateOf(0)
+
+        compose {
+            ComposeIndirect(iteration, states)
+        }
+
+        fun nextIteration() = iteration.value++
+        fun invalidateLast() = states.last().value++
+        fun invalidateFirst() = states.first().value++
+
+        repeat(10) {
+            nextIteration()
             expectChanges()
         }
 

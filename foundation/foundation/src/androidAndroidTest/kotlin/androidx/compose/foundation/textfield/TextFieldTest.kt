@@ -801,6 +801,7 @@ class TextFieldTest {
             // reset flag
             onValueChangeCalled = false
         }
+        rule.waitUntil { onValueChangeCalled == false }
 
         // set selection to same value, no change should occur
         @OptIn(ExperimentalTestApi::class)

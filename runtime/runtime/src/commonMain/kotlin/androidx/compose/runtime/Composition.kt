@@ -527,6 +527,7 @@ internal class CompositionImpl(
             composer.currentRecomposeScope?.let {
                 it.used = true
                 observations.add(value, it)
+                it.recordRead(value)
             }
         }
     }
@@ -615,6 +616,10 @@ internal class CompositionImpl(
 
         parent.invalidate(this)
         return if (isComposing) InvalidationResult.DEFERRED else InvalidationResult.SCHEDULED
+    }
+
+    internal fun removeObservation(instance: Any, scope: RecomposeScopeImpl) {
+        observations.remove(instance, scope)
     }
 
     /**
