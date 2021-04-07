@@ -59,6 +59,7 @@ private fun OuterLvl1(outerOuterIndex: Int) {
             .border(3.dp, Color.Black)
             .height(350.dp)
             .background(Color.Yellow),
+        reverseLayout = true,
         contentPadding = PaddingValues(60.dp)
     ) {
         repeat(3) { outerIndex ->
