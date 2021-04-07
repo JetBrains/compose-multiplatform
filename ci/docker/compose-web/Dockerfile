@@ -35,5 +35,9 @@ RUN ln -sf /androidx-main/tools/ /mnt/agent/tools
 RUN ln -sf /androidx-main/prebuilts/ /mnt/agent/prebuilts
 RUN ln -sf /androidx-main/external /mnt/agent/external
 
-RUN rm -rf /androidx-main/frameworks/support
+RUN rm -rf /androidx-main/frameworks \
+           /androidx-main/prebuilts/fullsdk-darwin \
+           /androidx-main/prebuilts/jdk/jdk11/darwin-x86 \
+           /androidx-main/prebuilts/jdk/jdk8/darwin-x86
+
 RUN apt-get clean 
