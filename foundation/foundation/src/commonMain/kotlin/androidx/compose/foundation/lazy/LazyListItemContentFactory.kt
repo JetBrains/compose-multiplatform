@@ -31,7 +31,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.Dp
-import androidx.compose.ui.unit.dp
 
 @Composable
 internal fun rememberItemContentFactory(
@@ -86,13 +85,14 @@ internal class LazyListItemContentFactory(
      * Return cached item content lambda or creates a new lambda and puts it in the cache.
      */
     fun getContent(index: Int, key: Any): @Composable () -> Unit {
-        val cachedContent = lambdasCache.getOrPut(key) { CachedItemContent(index, key) }
+        val cachedContent = lambdasCache.getOrPut(key) { CachedItemContent(index, itemScope, key) }
         cachedContent.index = index
         return cachedContent.content
     }
 
     private inner class CachedItemContent(
         initialIndex: Int,
+        private val scope: LazyItemScopeImpl,
         val key: Any
     ) {
         var index by mutableStateOf(initialIndex)
@@ -100,7 +100,7 @@ internal class LazyListItemContentFactory(
         val content: @Composable () -> Unit = @Composable {
             val itemsProvider = itemsProvider.value
             if (index < itemsProvider.itemsCount) {
-                val content = itemsProvider.getContent(index, itemScope)
+                val content = itemsProvider.getContent(index, scope)
                 saveableStateHolder.SaveableStateProvider(key, content)
             }
         }
@@ -109,22 +109,15 @@ internal class LazyListItemContentFactory(
     /**
      * The cached instance of the scope to be used for composing items.
      */
-    private var itemScope by mutableStateOf(InitialLazyItemsScopeImpl)
-    private var lastDensity: Density = Density(0f, 0f)
-    private var lastConstraints: Constraints = Constraints()
+    private var itemScope = InitialLazyItemsScopeImpl
 
     /**
      * Updates the [itemScope] with the last [constraints] we got from the parent.
      */
     fun updateItemScope(density: Density, constraints: Constraints) {
-        if (lastDensity != density || lastConstraints != constraints) {
-            lastDensity = density
-            lastConstraints = constraints
-            with(density) {
-                val width = constraints.maxWidth.toDp()
-                val height = constraints.maxHeight.toDp()
-                itemScope = LazyItemScopeImpl(width, height)
-            }
+        if (itemScope.density != density || itemScope.constraints != constraints) {
+            itemScope = LazyItemScopeImpl(density, constraints)
+            lambdasCache.clear()
         }
     }
 }
@@ -133,12 +126,15 @@ internal class LazyListItemContentFactory(
  * Pre-allocated initial value for [LazyItemScopeImpl] to not have it nullable and avoid using
  * late init.
  */
-private val InitialLazyItemsScopeImpl = LazyItemScopeImpl(0.dp, 0.dp)
+private val InitialLazyItemsScopeImpl = LazyItemScopeImpl(Density(0f, 0f), Constraints())
 
 private data class LazyItemScopeImpl(
-    val maxWidth: Dp,
-    val maxHeight: Dp
+    val density: Density,
+    val constraints: Constraints
 ) : LazyItemScope {
+    private val maxWidth: Dp = with(density) { constraints.maxWidth.toDp() }
+    private val maxHeight: Dp = with(density) { constraints.maxHeight.toDp() }
+
     override fun Modifier.fillParentMaxSize(fraction: Float) = size(
         maxWidth * fraction,
         maxHeight * fraction
