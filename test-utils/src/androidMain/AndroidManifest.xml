@@ -14,4 +14,11 @@
      limitations under the License.
 -->
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="androidx.compose.testutils"/>
+    package="androidx.compose.testutils">
+    <application>
+        <activity
+            android:name="androidx.activity.ComponentActivity"
+            android:theme="@style/TestTheme"
+            android:exported="true" />
+    </application>
+</manifest>

@@ -15,7 +15,7 @@
 -->
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="androidx.compose.ui.tooling.data.test">
-
-    <application/>
-
+    <application>
+        <activity android:name="androidx.compose.ui.tooling.data.TestActivity" />
+    </application>
 </manifest>

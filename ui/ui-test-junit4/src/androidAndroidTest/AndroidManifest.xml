@@ -17,8 +17,6 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="androidx.compose.ui.test.junit4">
     <application>
-        <activity android:name="androidx.activity.ComponentActivity"
-            android:theme="@style/TestTheme" />
         <activity android:name="androidx.compose.ui.test.junit4.CustomActivity"
             android:theme="@android:style/Theme.Material.NoActionBar.Fullscreen" />
         <activity android:name="androidx.compose.ui.test.junit4.MultipleActivitiesFindTest$Activity1" />

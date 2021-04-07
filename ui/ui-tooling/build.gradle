@@ -50,6 +50,7 @@ dependencies {
     androidTestImplementation(ANDROIDX_TEST_RULES)
     androidTestImplementation(project(":compose:foundation:foundation-layout"))
     androidTestImplementation(project(":compose:foundation:foundation"))
+    androidTestImplementation(project(":compose:test-utils"))
     androidTestImplementation(TRUTH)
     androidTestImplementation(KOTLIN_REFLECT)
     androidTestImplementation(project(":ui:ui-animation-tooling-internal"))
