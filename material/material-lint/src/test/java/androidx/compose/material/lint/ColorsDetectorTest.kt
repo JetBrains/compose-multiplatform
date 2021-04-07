@@ -334,6 +334,54 @@ src/androidx/compose/material/foo/test.kt:22: Error: Conflicting 'on' color for 
     }
 
     @Test
+    fun trackVariableAssignment() {
+        lint().files(
+            kotlin(
+                """
+                package androidx.compose.material.foo
+
+                import androidx.compose.material.*
+                import androidx.compose.ui.graphics.*
+
+                val testColor1 = Color.Black
+
+                fun test() {
+                    val colors = lightColors(
+                        primary = Color.Green,
+                        background = Color.Green,
+                        onPrimary = testColor1,
+                        onBackground = Color.Black,
+                    )
+
+                    val testColor2 = Color.Black
+
+                    val colors2 = lightColors(
+                        primary = Color.Green,
+                        background = Color.Green,
+                        onPrimary = testColor2,
+                        onBackground = Color.Black,
+                    )
+
+                    var testColor3 = Color.Green
+                    testColor3 = Color.Black
+
+                    val colors2 = lightColors(
+                        primary = Color.Green,
+                        background = Color.Green,
+                        onPrimary = testColor3,
+                        onBackground = Color.Black,
+                    )
+                }
+            """
+            ),
+            ColorStub,
+            ColorsStub
+        )
+            .run()
+            .expectClean()
+    }
+
+    @Test
     fun noErrors() {
         lint().files(
             kotlin(
