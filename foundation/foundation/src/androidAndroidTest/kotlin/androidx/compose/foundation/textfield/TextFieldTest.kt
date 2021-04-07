@@ -723,7 +723,7 @@ class TextFieldTest {
 
     @Test
     fun textField_stringOverload_callsOnValueChange_whenTextChange() {
-        var onValueChangeCalled: Boolean
+        var onValueChangeCalled = false
 
         rule.setContent {
             val state = remember { mutableStateOf("abc") }
@@ -743,7 +743,9 @@ class TextFieldTest {
             .performTextInputSelection(TextRange(0, 0))
 
         // reset
-        onValueChangeCalled = false
+        rule.runOnIdle {
+            onValueChangeCalled = false
+        }
 
         // change selection
         @OptIn(ExperimentalTestApi::class)
@@ -765,7 +767,7 @@ class TextFieldTest {
 
     @Test
     fun textField_callsOnValueChange_whenTextFieldValueChange() {
-        var onValueChangeCalled: Boolean
+        var onValueChangeCalled = false
 
         rule.setContent {
             val state = remember { mutableStateOf(TextFieldValue("abc")) }
@@ -785,7 +787,9 @@ class TextFieldTest {
             .performTextInputSelection(TextRange(0, 0))
 
         // reset flag since click might change selection
-        onValueChangeCalled = false
+        rule.runOnIdle {
+            onValueChangeCalled = false
+        }
 
         @OptIn(ExperimentalTestApi::class)
         rule.onNodeWithTag(Tag)
@@ -794,10 +798,9 @@ class TextFieldTest {
         // selection changed
         rule.runOnIdle {
             assertThat(onValueChangeCalled).isTrue()
+            // reset flag
+            onValueChangeCalled = false
         }
-
-        // reset flag
-        onValueChangeCalled = false
 
         // set selection to same value, no change should occur
         @OptIn(ExperimentalTestApi::class)
