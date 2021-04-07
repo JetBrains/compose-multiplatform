@@ -59,7 +59,7 @@ import androidx.savedstate.ViewTreeSavedStateRegistryOwner
 /**
  * Properties used to customize the behavior of a [Dialog].
  *
- * @property dismissOnClickOutside whether the dialog can be dismissed by pressing the back button.
+ * @property dismissOnBackPress whether the dialog can be dismissed by pressing the back button.
  * If true, pressing the back button will call onDismissRequest.
  * @property dismissOnClickOutside whether the dialog can be dismissed by clicking outside the
  * dialog's bounds. If true, clicking outside the dialog will call onDismissRequest.
