@@ -16,6 +16,8 @@
 
 package androidx.compose.runtime
 
+import androidx.compose.runtime.collection.IdentityArrayIntMap
+
 /**
  * Represents a recomposable scope or section of the composition hierarchy. Can be used to
  * manually invalidate the scope to schedule it for recomposition.
@@ -117,4 +119,53 @@ internal class RecomposeScopeImpl(
      * and implements [ScopeUpdateScope].
      */
     override fun updateScope(block: (Composer, Int) -> Unit) { this.block = block }
+
+    private var currentToken = 0
+    private var trackedInstances: IdentityArrayIntMap? = null
+
+    /**
+     * Called when composition start composing into this scope. The [token] is a value that is
+     * unique everytime this is called. This is currently the snapshot id but that shouldn't be
+     * relied on.
+     */
+    fun start(token: Int) { currentToken = token }
+
+    /**
+     * Track instances that were read in scope.
+     */
+    fun recordRead(instance: Any) {
+        (trackedInstances ?: IdentityArrayIntMap().also { trackedInstances = it })
+            .add(instance, currentToken)
+    }
+
+    /**
+     * Called when composition is completed for this scope. The [token] is the same token passed
+     * in the previous call to [start]. If [end] returns a non-null value the lambda returned
+     * will be called during [ControlledComposition.applyChanges].
+     */
+    fun end(token: Int): ((Composition) -> Unit)? {
+        return trackedInstances?.let { instances ->
+            // If any value previous observed was not read in this current composition
+            // schedule the value to be removed from the observe scope and removed from the
+            // observations tracked by the composition.
+            // [used] is false if the scope was skipped. If the scope was skipped we should
+            // leave the observations unmodified.
+            if (
+                used && instances.any { _, instanceToken -> instanceToken != token }
+            ) { composition ->
+                if (
+                    currentToken == token && instances == trackedInstances &&
+                    composition is CompositionImpl
+                ) {
+                    instances.removeValueIf { instance, instanceToken ->
+                        (instanceToken != token).also { remove ->
+                            if (remove)
+                                composition.removeObservation(instance, this)
+                        }
+                    }
+                    if (instances.size == 0) trackedInstances = null
+                }
+            } else null
+        }
+    }
 }
