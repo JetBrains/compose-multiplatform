@@ -35,6 +35,7 @@ dependencies {
     api(RX_JAVA)
 
     androidTestImplementation(project(":compose:ui:ui-test-junit4"))
+    androidTestImplementation(project(":compose:test-utils"))
     androidTestImplementation(ANDROIDX_TEST_RUNNER)
     androidTestImplementation(JUNIT)
     androidTestImplementation(TRUTH)

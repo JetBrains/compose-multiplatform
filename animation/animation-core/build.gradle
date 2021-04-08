@@ -59,6 +59,7 @@ dependencies {
         androidTestImplementation(JUNIT)
         androidTestImplementation(project(":compose:animation:animation"))
         androidTestImplementation(project(":compose:ui:ui-test-junit4"))
+        androidTestImplementation(project(":compose:test-utils"))
 
         lintPublish project(":compose:animation:animation-core-lint")
     }
@@ -104,6 +105,7 @@ if (AndroidXUiPlugin.isMultiplatformEnabled(project)) {
                 implementation(JUNIT)
                 implementation(project(":compose:animation:animation"))
                 implementation(project(":compose:ui:ui-test-junit4"))
+                implementation(project(":compose:test-utils"))
             }
         }
     }
