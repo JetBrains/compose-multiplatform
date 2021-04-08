@@ -233,7 +233,7 @@ class LazyRowTest {
         }
 
         rule.onNodeWithTag(LazyListTag)
-            .scrollBy(x = 102.dp, density = rule.density)
+            .scrollBy(x = 105.dp, density = rule.density)
 
         rule.onNodeWithTag("1")
             .assertDoesNotExist()
