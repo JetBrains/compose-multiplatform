@@ -53,7 +53,10 @@ class CheckboxesInRowsBenchmark(private val numberOfCheckboxes: Int) {
 
     @Test
     fun first_compose() {
-        benchmarkRule.benchmarkFirstCompose(checkboxCaseFactory)
+        benchmarkRule.benchmarkFirstCompose(
+            checkboxCaseFactory,
+            assertNoPendingRecompositions = false
+        )
     }
 
     @Test

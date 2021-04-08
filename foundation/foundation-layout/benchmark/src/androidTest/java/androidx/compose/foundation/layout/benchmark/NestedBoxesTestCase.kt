@@ -18,7 +18,7 @@ package androidx.compose.foundation.layout.benchmark
 
 import androidx.compose.foundation.layout.Box
 import androidx.compose.runtime.Composable
-import androidx.compose.testutils.LayeredComposeTestCase
+import androidx.compose.testutils.ComposeTestCase
 
 /**
  * Test case representing a layout hierarchy of nested boxes.
@@ -26,10 +26,10 @@ import androidx.compose.testutils.LayeredComposeTestCase
 class NestedBoxesTestCase(
     private val depth: Int,
     private val children: Int
-) : LayeredComposeTestCase {
+) : ComposeTestCase {
 
     @Composable
-    override fun MeasuredContent() {
+    override fun Content() {
         Box {
             Boxes(depth - 1, children)
         }
