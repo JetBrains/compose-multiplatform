@@ -130,7 +130,12 @@ private const val PointerInputModifierNoParamError =
  */
 // This deprecated-error function shadows the varargs overload so that the varargs version
 // is not used without key parameters.
-@Suppress("DeprecatedCallableAddReplaceWith", "UNUSED_PARAMETER", "unused")
+@Suppress(
+    "DeprecatedCallableAddReplaceWith",
+    "UNUSED_PARAMETER",
+    "unused",
+    "ModifierFactoryUnreferencedReceiver"
+)
 @Deprecated(PointerInputModifierNoParamError, level = DeprecationLevel.ERROR)
 fun Modifier.pointerInput(
     block: suspend PointerInputScope.() -> Unit
