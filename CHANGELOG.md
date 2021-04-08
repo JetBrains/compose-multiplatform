@@ -1,4 +1,4 @@
-# M3
+# M3 (Feb 2021)
    * Improve [TextField](https://github.com/JetBrains/compose-jb/issues/277)
    * Support [SVG](https://github.com/JetBrains/compose-jb/tree/master/tutorials/Image_And_Icons_Manipulations#loading-svg-images)
    * Support [vsync](https://github.com/JetBrains/skiko/pull/44),  [sync composition with rendering frames](https://android-review.googlesource.com/c/platform/frameworks/support/+/1534675)
