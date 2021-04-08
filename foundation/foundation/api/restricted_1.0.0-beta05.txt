@@ -149,7 +149,7 @@ package androidx.compose.foundation.gestures {
     method public suspend Object? drag(optional androidx.compose.foundation.MutatePriority dragPriority, kotlin.jvm.functions.Function2<? super androidx.compose.foundation.gestures.DragScope,? super kotlin.coroutines.Continuation<? super kotlin.Unit>,?> block, kotlin.coroutines.Continuation<? super kotlin.Unit> p);
   }
 
-  public interface FlingBehavior {
+  @androidx.compose.runtime.Stable public interface FlingBehavior {
     method public suspend Object? performFling(androidx.compose.foundation.gestures.ScrollScope, float initialVelocity, kotlin.coroutines.Continuation<? super java.lang.Float> p);
   }
 
