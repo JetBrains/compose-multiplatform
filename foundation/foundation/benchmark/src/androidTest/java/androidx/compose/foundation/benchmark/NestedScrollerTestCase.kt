@@ -28,10 +28,12 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.material.MaterialTheme
+import androidx.compose.material.Surface
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
-import androidx.compose.testutils.LayeredComposeTestCase
+import androidx.compose.testutils.ComposeTestCase
 import androidx.compose.testutils.ToggleableTestCase
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -43,16 +45,20 @@ import kotlin.random.Random
 /**
  * Test case that puts many horizontal scrollers in a vertical scroller
  */
-class NestedScrollerTestCase : LayeredComposeTestCase, ToggleableTestCase {
+class NestedScrollerTestCase : ComposeTestCase, ToggleableTestCase {
     // ScrollerPosition must now be constructed during composition to obtain the Density
     private lateinit var scrollState: ScrollState
 
     @Composable
-    override fun MeasuredContent() {
+    override fun Content() {
         scrollState = rememberScrollState()
-        LazyColumn {
-            items(5) { index ->
-                SquareRow(index == 0)
+        MaterialTheme {
+            Surface {
+                LazyColumn {
+                    items(5) { index ->
+                        SquareRow(index == 0)
+                    }
+                }
             }
         }
     }

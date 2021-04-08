@@ -18,10 +18,10 @@ package androidx.compose.foundation.benchmark.text
 
 import androidx.compose.testutils.benchmark.ComposeBenchmarkRule
 import androidx.compose.testutils.benchmark.benchmarkDrawPerf
-import androidx.compose.testutils.benchmark.benchmarkFirstCompose
-import androidx.compose.testutils.benchmark.benchmarkFirstDraw
-import androidx.compose.testutils.benchmark.benchmarkFirstLayout
-import androidx.compose.testutils.benchmark.benchmarkFirstMeasure
+import androidx.compose.testutils.benchmark.benchmarkFirstComposeFast
+import androidx.compose.testutils.benchmark.benchmarkFirstDrawFast
+import androidx.compose.testutils.benchmark.benchmarkFirstLayoutFast
+import androidx.compose.testutils.benchmark.benchmarkFirstMeasureFast
 import androidx.compose.testutils.benchmark.benchmarkLayoutPerf
 import androidx.compose.testutils.benchmark.toggleStateBenchmarkDraw
 import androidx.compose.testutils.benchmark.toggleStateBenchmarkLayout
@@ -77,7 +77,7 @@ class TextFieldToggleTextBenchmark(
      */
     @Test
     fun first_compose() {
-        benchmarkRule.benchmarkFirstCompose(caseFactory)
+        benchmarkRule.benchmarkFirstComposeFast(caseFactory)
     }
 
     /**
@@ -87,7 +87,7 @@ class TextFieldToggleTextBenchmark(
      */
     @Test
     fun first_measure() {
-        benchmarkRule.benchmarkFirstMeasure(caseFactory)
+        benchmarkRule.benchmarkFirstMeasureFast(caseFactory)
     }
 
     /**
@@ -96,7 +96,7 @@ class TextFieldToggleTextBenchmark(
      */
     @Test
     fun first_layout() {
-        benchmarkRule.benchmarkFirstLayout(caseFactory)
+        benchmarkRule.benchmarkFirstLayoutFast(caseFactory)
     }
 
     /**
@@ -105,7 +105,7 @@ class TextFieldToggleTextBenchmark(
      */
     @Test
     fun first_draw() {
-        benchmarkRule.benchmarkFirstDraw(caseFactory)
+        benchmarkRule.benchmarkFirstDrawFast(caseFactory)
     }
 
     /**

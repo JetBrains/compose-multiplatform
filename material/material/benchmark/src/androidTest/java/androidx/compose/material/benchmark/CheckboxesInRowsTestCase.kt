@@ -27,7 +27,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.testutils.LayeredComposeTestCase
+import androidx.compose.testutils.ComposeTestCase
 import androidx.compose.testutils.ToggleableTestCase
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -38,29 +38,24 @@ import androidx.compose.ui.Modifier
  */
 class CheckboxesInRowsTestCase(
     private val amountOfCheckboxes: Int
-) : LayeredComposeTestCase, ToggleableTestCase {
+) : ComposeTestCase, ToggleableTestCase {
 
     private val states = mutableListOf<MutableState<Boolean>>()
 
     @Composable
-    override fun MeasuredContent() {
-        Column {
-            repeat(amountOfCheckboxes) {
-                Row {
-                    Text(text = "Check Me!")
-                    CheckboxWithState(
-                        Modifier.weight(1f).wrapContentSize(Alignment.CenterEnd)
-                    )
-                }
-            }
-        }
-    }
-
-    @Composable
-    override fun ContentWrappers(content: () -> Unit) {
+    override fun Content() {
         MaterialTheme {
             Surface {
-                content()
+                Column {
+                    repeat(amountOfCheckboxes) {
+                        Row {
+                            Text(text = "Check Me!")
+                            CheckboxWithState(
+                                Modifier.weight(1f).wrapContentSize(Alignment.CenterEnd)
+                            )
+                        }
+                    }
+                }
             }
         }
     }
