@@ -51,12 +51,15 @@ import androidx.compose.ui.autofill.registerCallback
 import androidx.compose.ui.autofill.unregisterCallback
 import androidx.compose.ui.focus.FOCUS_TAG
 import androidx.compose.ui.focus.FocusDirection
-import androidx.compose.ui.focus.FocusDirection.Down
-import androidx.compose.ui.focus.FocusDirection.Left
-import androidx.compose.ui.focus.FocusDirection.Next
-import androidx.compose.ui.focus.FocusDirection.Previous
-import androidx.compose.ui.focus.FocusDirection.Right
-import androidx.compose.ui.focus.FocusDirection.Up
+import androidx.compose.ui.focus.FocusDirectionInternal
+import androidx.compose.ui.focus.FocusDirectionInternal.Down
+import androidx.compose.ui.focus.FocusDirectionInternal.In
+import androidx.compose.ui.focus.FocusDirectionInternal.Left
+import androidx.compose.ui.focus.FocusDirectionInternal.Next
+import androidx.compose.ui.focus.FocusDirectionInternal.Out
+import androidx.compose.ui.focus.FocusDirectionInternal.Previous
+import androidx.compose.ui.focus.FocusDirectionInternal.Right
+import androidx.compose.ui.focus.FocusDirectionInternal.Up
 import androidx.compose.ui.focus.FocusManager
 import androidx.compose.ui.focus.FocusManagerImpl
 import androidx.compose.ui.geometry.Offset
@@ -64,6 +67,8 @@ import androidx.compose.ui.graphics.Canvas
 import androidx.compose.ui.graphics.CanvasHolder
 import androidx.compose.ui.hapticfeedback.AndroidHapticFeedback
 import androidx.compose.ui.hapticfeedback.HapticFeedback
+import androidx.compose.ui.input.key.Key.Companion.Back
+import androidx.compose.ui.input.key.Key.Companion.DirectionCenter
 import androidx.compose.ui.input.key.Key.Companion.DirectionDown
 import androidx.compose.ui.input.key.Key.Companion.DirectionLeft
 import androidx.compose.ui.input.key.Key.Companion.DirectionRight
@@ -157,8 +162,21 @@ internal class AndroidComposeView(context: Context) :
             val focusDirection = getFocusDirection(it)
             if (focusDirection == null || it.type != KeyDown) return@KeyInputModifier false
 
+            val focusMoveSuccess = with(focusManager) {
+                when (focusDirection) {
+                    Up -> moveFocus(FocusDirection.Up)
+                    Down -> moveFocus(FocusDirection.Down)
+                    Left -> moveFocus(FocusDirection.Left)
+                    Right -> moveFocus(FocusDirection.Right)
+                    In -> moveFocusIn()
+                    Out -> moveFocusOut()
+                    Next -> moveFocus(FocusDirection.Next)
+                    Previous -> moveFocus(FocusDirection.Previous)
+                }
+            }
+
             // Consume the key event if we moved focus.
-            focusManager.moveFocus(focusDirection)
+            focusMoveSuccess
         },
         onPreviewKeyEvent = null
     )
@@ -587,10 +605,10 @@ internal class AndroidComposeView(context: Context) :
                 // ViewLayer.shouldUseDispatchDraw will be true.
                 ViewLayer.updateDisplayList(View(context))
             }
-            if (ViewLayer.shouldUseDispatchDraw) {
-                viewLayersContainer = DrawChildContainer(context)
+            viewLayersContainer = if (ViewLayer.shouldUseDispatchDraw) {
+                DrawChildContainer(context)
             } else {
-                viewLayersContainer = ViewLayerContainer(context)
+                ViewLayerContainer(context)
             }
             addView(viewLayersContainer)
         }
@@ -605,13 +623,17 @@ internal class AndroidComposeView(context: Context) :
         accessibilityDelegate.onLayoutChange(layoutNode)
     }
 
-    override fun getFocusDirection(keyEvent: KeyEvent): FocusDirection? = when (keyEvent.key) {
-        Tab -> if (keyEvent.isShiftPressed) Previous else Next
-        DirectionRight -> Right
-        DirectionLeft -> Left
-        DirectionUp -> Up
-        DirectionDown -> Down
-        else -> null
+    override fun getFocusDirection(keyEvent: KeyEvent): FocusDirectionInternal? {
+        return when (keyEvent.key) {
+            Tab -> if (keyEvent.isShiftPressed) Previous else Next
+            DirectionRight -> Right
+            DirectionLeft -> Left
+            DirectionUp -> Up
+            DirectionDown -> Down
+            DirectionCenter -> In
+            Back -> Out
+            else -> null
+        }
     }
 
     override fun dispatchDraw(canvas: android.graphics.Canvas) {
@@ -880,7 +902,7 @@ internal class AndroidComposeView(context: Context) :
      * Q and later, AccessibilityInteractionController#findViewByAccessibilityId uses
      * AccessibilityNodeIdManager and findViewByAccessibilityIdTraversal is only used by autofill.
      */
-    public fun findViewByAccessibilityIdTraversal(accessibilityId: Int): View? {
+    fun findViewByAccessibilityIdTraversal(accessibilityId: Int): View? {
         try {
             // AccessibilityInteractionController#findViewByAccessibilityId doesn't call this
             // method in Android Q and later. Ideally, we should only define this method in
@@ -888,14 +910,13 @@ internal class AndroidComposeView(context: Context) :
             // invoke the hidden parent method after Android P. If in new android, the hidden method
             // ViewGroup#findViewByAccessibilityIdTraversal signature is changed or removed, we can
             // simply return null here because there will be no call to this method.
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+            return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
                 val findViewByAccessibilityIdTraversalMethod = View::class.java
                     .getDeclaredMethod("findViewByAccessibilityIdTraversal", Int::class.java)
                 findViewByAccessibilityIdTraversalMethod.isAccessible = true
-                return findViewByAccessibilityIdTraversalMethod.invoke(this, accessibilityId) as?
-                    View
+                findViewByAccessibilityIdTraversalMethod.invoke(this, accessibilityId) as? View
             } else {
-                return findViewByAccessibilityIdRootedAtCurrentView(accessibilityId, this)
+                findViewByAccessibilityIdRootedAtCurrentView(accessibilityId, this)
             }
         } catch (e: NoSuchMethodException) {
             return null
@@ -911,7 +932,7 @@ internal class AndroidComposeView(context: Context) :
         private var getBooleanMethod: Method? = null
 
         // TODO(mount): replace with ViewCompat.isShowingLayoutBounds() when it becomes available.
-        @SuppressLint("PrivateApi")
+        @SuppressLint("PrivateApi", "BanUncheckedReflection")
         private fun getIsShowingLayoutBounds(): Boolean = try {
             if (systemPropertiesClass == null) {
                 systemPropertiesClass = Class.forName("android.os.SystemProperties")
