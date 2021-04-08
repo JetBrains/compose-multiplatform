@@ -142,7 +142,7 @@ class SemanticsNode internal constructor(
      * In addition, if mergeDescendants and mergingEnabled are both true, then it
      * also includes the semantics properties of descendant nodes.
      */
-    // TODO(aelias): This is too expensive for a val (full subtree recreation every call);
+    // TODO(b/184376083): This is too expensive for a val (full subtree recreation every call);
     //               optimize this when the merging algorithm is improved.
     val config: SemanticsConfiguration
         get() {
@@ -171,10 +171,14 @@ class SemanticsNode internal constructor(
     private val isMergingSemanticsOfDescendants: Boolean
         get() = mergingEnabled && unmergedConfig.isMergingSemanticsOfDescendants
 
-    internal fun unmergedChildren(): List<SemanticsNode> {
+    internal fun unmergedChildren(sortByBounds: Boolean = false): List<SemanticsNode> {
         val unmergedChildren: MutableList<SemanticsNode> = mutableListOf()
 
-        val semanticsChildren = this.layoutNode.findOneLayerOfSemanticsWrappers()
+        val semanticsChildren = if (sortByBounds) {
+            this.layoutNode.findOneLayerOfSemanticsWrappersSortedByBounds()
+        } else {
+            this.layoutNode.findOneLayerOfSemanticsWrappers()
+        }
         semanticsChildren.fastForEach { semanticsChild ->
             unmergedChildren.add(SemanticsNode(semanticsChild, mergingEnabled))
         }
@@ -182,29 +186,44 @@ class SemanticsNode internal constructor(
         return unmergedChildren
     }
 
-    /** Contains the children in inverse hit test order (i.e. paint order).
+    /**
+     * Contains the children in inverse hit test order (i.e. paint order).
      *
      * Note that if mergingEnabled and mergeDescendants are both true, then there
      * are no children (except those that are themselves mergeDescendants).
      */
-    // TODO(aelias): This is too expensive for a val (full subtree recreation every call);
+    // TODO(b/184376083): This is too expensive for a val (full subtree recreation every call);
     //               optimize this when the merging algorithm is improved.
     val children: List<SemanticsNode>
-        get() {
-            // Replacing semantics never appear to have any children in the merged tree.
-            if (mergingEnabled && unmergedConfig.isClearingSemantics) {
-                return listOf()
-            }
+        get() = getChildren(sortByBounds = false)
 
-            if (isMergingSemanticsOfDescendants) {
-                // In most common merging scenarios like Buttons, this will return nothing.
-                // In cases like a clickable Row itself containing a Button, this will
-                // return the Button as a child.
-                return findOneLayerOfMergingSemanticsNodes()
-            }
+    /**
+     * Contains the children sorted by bounds: top to down, left to right(right to left in RTL
+     * mode).
+     *
+     * Note that if mergingEnabled and mergeDescendants are both true, then there
+     * are no children (except those that are themselves mergeDescendants).
+     */
+    // TODO(b/184376083): This is too expensive for a val (full subtree recreation every call);
+    //               optimize this when the merging algorithm is improved.
+    internal val childrenSortedByBounds: List<SemanticsNode>
+        get() = getChildren(sortByBounds = true)
 
-            return unmergedChildren()
+    private fun getChildren(sortByBounds: Boolean): List<SemanticsNode> {
+        // Replacing semantics never appear to have any children in the merged tree.
+        if (mergingEnabled && unmergedConfig.isClearingSemantics) {
+            return listOf()
         }
+
+        if (isMergingSemanticsOfDescendants) {
+            // In most common merging scenarios like Buttons, this will return nothing.
+            // In cases like a clickable Row itself containing a Button, this will
+            // return the Button as a child.
+            return findOneLayerOfMergingSemanticsNodes(sortByBounds = sortByBounds)
+        }
+
+        return unmergedChildren(sortByBounds)
+    }
 
     /**
      * Visits the immediate children of this node.
@@ -264,13 +283,14 @@ class SemanticsNode internal constructor(
         }
 
     private fun findOneLayerOfMergingSemanticsNodes(
-        list: MutableList<SemanticsNode> = mutableListOf<SemanticsNode>()
+        list: MutableList<SemanticsNode> = mutableListOf(),
+        sortByBounds: Boolean = false
     ): List<SemanticsNode> {
-        unmergedChildren().fastForEach { child ->
-            if (child.isMergingSemanticsOfDescendants == true) {
+        unmergedChildren(sortByBounds).fastForEach { child ->
+            if (child.isMergingSemanticsOfDescendants) {
                 list.add(child)
             } else {
-                if (child.unmergedConfig.isClearingSemantics == false) {
+                if (!child.unmergedConfig.isClearingSemantics) {
                     child.findOneLayerOfMergingSemanticsNodes(list)
                 }
             }
@@ -328,7 +348,7 @@ internal fun SemanticsNode.findChildById(id: Int): SemanticsNode? {
 }
 
 private fun LayoutNode.findOneLayerOfSemanticsWrappers(
-    list: MutableList<SemanticsWrapper> = mutableListOf<SemanticsWrapper>()
+    list: MutableList<SemanticsWrapper> = mutableListOf()
 ): List<SemanticsWrapper> {
     zSortedChildren.forEach { child ->
         val outerSemantics = child.outerSemantics
