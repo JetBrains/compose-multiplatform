@@ -71,7 +71,5 @@ interface LayeredComposeTestCase : ComposeTestCase {
      * The lifecycle rules for this method are same as for [Content]
      */
     @Composable
-    fun ContentWrappers(content: @Composable () -> Unit) {
-        content()
-    }
+    fun ContentWrappers(content: @Composable () -> Unit)
 }

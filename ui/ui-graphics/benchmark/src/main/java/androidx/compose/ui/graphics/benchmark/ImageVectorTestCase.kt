@@ -29,7 +29,7 @@ import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.graphics.vector.PathData
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.foundation.layout.size
-import androidx.compose.testutils.LayeredComposeTestCase
+import androidx.compose.testutils.ComposeTestCase
 import androidx.compose.ui.graphics.vector.rememberVectorPainter
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
@@ -40,21 +40,16 @@ import androidx.compose.ui.unit.dp
  * Subclasses are responsible for providing the vector asset, so we can test and benchmark different
  * methods of loading / creating this asset.
  */
-sealed class ImageVectorTestCase : LayeredComposeTestCase {
+sealed class ImageVectorTestCase : ComposeTestCase {
 
     @Composable
-    override fun MeasuredContent() {
-        Box(
-            Modifier.testTag(testTag)
-                .size(24.dp)
-                .paint(getPainter())
-        )
-    }
-
-    @Composable
-    override fun ContentWrappers(content: @Composable () -> Unit) {
+    override fun Content() {
         Box {
-            content()
+            Box(
+                Modifier.testTag(testTag)
+                    .size(24.dp)
+                    .paint(getPainter())
+            )
         }
     }
 
