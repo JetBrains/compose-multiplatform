@@ -56,11 +56,13 @@ class LazyListsContentPaddingTest {
     val rule = createComposeRule()
 
     private var itemSize: Dp = Dp.Infinity
+    private var smallPaddingSize: Dp = Dp.Infinity
 
     @Before
     fun before() {
         with(rule.density) {
             itemSize = 50.toDp()
+            smallPaddingSize = 12.toDp()
         }
     }
 
@@ -68,7 +70,6 @@ class LazyListsContentPaddingTest {
     fun column_contentPaddingIsApplied() {
         lateinit var state: LazyListState
         val containerSize = itemSize * 2
-        val smallPaddingSize = itemSize / 4
         val largePaddingSize = itemSize
         rule.setContent {
             LazyColumn(
@@ -341,7 +342,6 @@ class LazyListsContentPaddingTest {
     fun row_contentPaddingIsApplied() {
         lateinit var state: LazyListState
         val containerSize = itemSize * 2
-        val smallPaddingSize = itemSize / 4
         val largePaddingSize = itemSize
         rule.setContent {
             LazyRow(
