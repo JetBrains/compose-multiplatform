@@ -21,10 +21,8 @@
 package androidx.compose.runtime
 
 import androidx.compose.runtime.collection.IdentityArraySet
-import androidx.compose.runtime.collection.IdentityScopeMap
 import androidx.compose.runtime.snapshots.currentSnapshot
 import androidx.compose.runtime.snapshots.fastForEach
-import androidx.compose.runtime.snapshots.fastMap
 import androidx.compose.runtime.snapshots.fastToSet
 import androidx.compose.runtime.tooling.CompositionData
 import androidx.compose.runtime.tooling.LocalInspectionTables
@@ -228,7 +226,8 @@ internal enum class InvalidationResult {
      * The invalidation was ignored because the associated recompose scope is no longer part of the
      * composition or has yet to be entered in the composition. This could occur for invalidations
      * called on scopes that are no longer part of composition or if the scope was invalidated
-     * before the applyChanges() was called that will enter the scope into the composition.
+     * before [ControlledComposition.applyChanges] was called that will enter the scope into the
+     * composition.
      */
     IGNORED,
 
@@ -460,7 +459,7 @@ interface Composer {
      *
      * This method is called near the beginning of a [Composable] function with default
      * parameters and surrounds the remembered values or [Composable] calls necessary to produce
-     * the default parameters. For example, for model: Model = remember { DefaultModel() }` the
+     * the default parameters. For example, for `model: Model = remember { DefaultModel() }` the
      * call to [remember] is called inside a [startDefaults] group.
      */
     @ComposeCompilerApi
@@ -946,7 +945,6 @@ internal class ComposerImpl(
     private var nodeCountVirtualOverrides: HashMap<Int, Int>? = null
     private var collectParameterInformation = false
     private var nodeExpected = false
-    private val observations = IdentityScopeMap<RecomposeScopeImpl>()
     private val invalidations: MutableList<Invalidation> = mutableListOf()
     internal var pendingInvalidScopes = false
     private val entersStack = IntStack()
@@ -1284,62 +1282,6 @@ internal class ComposerImpl(
         }
     }
 
-    /**
-     * Apply the changes to the tree that were collected during the last composition.
-     */
-    internal fun applyChanges() {
-        trace("Compose:applyChanges") {
-            val invalidationAnchors = slotTable.read { reader ->
-                invalidations.fastMap { reader.anchor(it.location) to it }
-            }
-
-            val manager = RememberEventDispatcher(abandonSet)
-            try {
-                applier.onBeginChanges()
-
-                // Apply all changes
-                slotTable.write { slots ->
-                    val applier = applier
-                    changes.fastForEach { change ->
-                        change(applier, slots, manager)
-                    }
-                    changes.clear()
-                }
-
-                applier.onEndChanges()
-
-                providerUpdates.clear()
-
-                @Suppress("ReplaceManualRangeWithIndicesCalls") // Avoids allocation of an iterator
-                for (index in 0 until invalidationAnchors.size) {
-                    val (anchor, invalidation) = invalidationAnchors[index]
-                    if (anchor.valid) {
-                        invalidation.location = anchor.toIndexFor(slotTable)
-                    } else {
-                        invalidations.remove(invalidation)
-                    }
-                }
-
-                // Side effects run after lifecycle observers so that any remembered objects
-                // that implement RememberObserver receive onRemembered before a side effect
-                // that captured it and operates on it can run.
-                if (manager.hasEffects) {
-                    trace("Compose:dispatchEffects") {
-                        manager.dispatchRememberObservers()
-                        manager.dispatchSideEffects()
-                    }
-                }
-
-                if (pendingInvalidScopes) {
-                    pendingInvalidScopes = false
-                    observations.removeValueIf { scope -> !scope.valid }
-                }
-            } finally {
-                manager.dispatchAbandons()
-            }
-        }
-    }
-
     @OptIn(InternalComposeApi::class)
     internal fun dispose() {
         trace("Compose:Composer.dispose") {
@@ -1476,9 +1418,9 @@ internal class ComposerImpl(
 
     /**
      * Determine if the current slot table value is equal to the given value, if true, the value
-     * is scheduled to be skipped during [applyChanges] and [changes] return false; otherwise
-     * [applyChanges] will update the slot table to [value]. In either case the composer's slot
-     * table is advanced.
+     * is scheduled to be skipped during [ControlledComposition.applyChanges] and [changes] return
+     * false; otherwise [ControlledComposition.applyChanges] will update the slot table to [value].
+     * In either case the composer's slot table is advanced.
      *
      * @param value the value to be compared.
      */
@@ -1803,7 +1745,8 @@ internal class ComposerImpl(
     }
 
     /**
-     * The number of changes that have been scheduled to be applied during [applyChanges].
+     * The number of changes that have been scheduled to be applied during
+     * [ControlledComposition.applyChanges].
      *
      * Slot table movement (skipping groups and nodes) will be coalesced so this number is
      * possibly less than the total changes detected.
@@ -2524,7 +2467,8 @@ internal class ComposerImpl(
 
     /**
      * Synchronously compose the initial composition of [content]. This collects all the changes
-     * which must be applied by [applyChanges] to build the tree implied by [content].
+     * which must be applied by [ControlledComposition.applyChanges] to build the tree implied by
+     * [content].
      */
     internal fun composeContent(
         invalidationsRequested: IdentityArraySet<RecomposeScopeImpl>,
@@ -2536,7 +2480,7 @@ internal class ComposerImpl(
 
     /**
      * Synchronously recompose all invalidated groups. This collects the changes which must be
-     * applied by [applyChanges] to have an effect.
+     * applied by [ControlledComposition.applyChanges] to have an effect.
      */
     internal fun recompose(invalidationsRequested: IdentityArraySet<RecomposeScopeImpl>): Boolean {
         check(changes.isEmpty()) { "Expected applyChanges() to have been called" }
