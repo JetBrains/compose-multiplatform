@@ -16,40 +16,13 @@
 
 package androidx.compose.lint
 
-import com.intellij.psi.impl.compiled.ClsMethodImpl
-import kotlinx.metadata.Flag
-import org.jetbrains.kotlin.lexer.KtTokens.INLINE_KEYWORD
-import org.jetbrains.kotlin.psi.KtFunction
 import org.jetbrains.kotlin.psi.KtLambdaExpression
 import org.jetbrains.kotlin.psi.KtParameter
 import org.jetbrains.kotlin.psi.KtSimpleNameExpression
 import org.jetbrains.kotlin.psi.psiUtil.collectDescendantsOfType
 import org.jetbrains.kotlin.psi.psiUtil.isAncestor
-import org.jetbrains.uast.UCallExpression
 import org.jetbrains.uast.ULambdaExpression
-import org.jetbrains.uast.resolveToUElement
 import org.jetbrains.uast.toUElement
-
-/**
- * @return whether the resolved declaration for this call expression is an inline function
- */
-val UCallExpression.isDeclarationInline: Boolean
-    get() {
-        return when (val source = resolveToUElement()?.sourcePsi) {
-            // Parsing a method defined in a class file
-            is ClsMethodImpl -> {
-                val flags = source.toKmFunction()?.flags ?: return false
-                return Flag.Function.IS_INLINE(flags)
-            }
-            // Parsing a method defined in Kotlin source
-            is KtFunction -> {
-                source.hasModifier(INLINE_KEYWORD)
-            }
-            // Parsing another declaration (such as a property) which cannot be inline, or
-            // a non-Kotlin declaration
-            else -> false
-        }
-    }
 
 /**
  * Returns a list of unreferenced parameters in [this]. If no parameters have been specified, but
