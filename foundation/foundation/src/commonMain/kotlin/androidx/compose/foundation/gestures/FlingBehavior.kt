@@ -16,12 +16,15 @@
 
 package androidx.compose.foundation.gestures
 
+import androidx.compose.runtime.Stable
+
 /**
  * Interface to specify fling behavior.
  *
  * When drag has ended with velocity in [scrollable], [performFling] is invoked to perform fling
  * animation and update state via [ScrollScope.scrollBy]
  */
+@Stable
 interface FlingBehavior {
     /**
      * Perform settling via fling animation with given velocity and suspend until fling has
