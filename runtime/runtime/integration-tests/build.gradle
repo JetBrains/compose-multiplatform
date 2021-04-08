@@ -35,6 +35,7 @@ dependencies {
         androidTestImplementation(project(":compose:ui:ui"))
         androidTestImplementation(project(":compose:ui:ui-test-junit4"))
         androidTestImplementation(project(":compose:runtime:runtime"))
+        androidTestImplementation(project(":compose:test-utils"))
         androidTestImplementation(project(":activity:activity-compose"))
 
         androidTestImplementation(JUNIT)
@@ -90,6 +91,7 @@ if(AndroidXUiPlugin.isMultiplatformEnabled(project)) {
             androidAndroidTest.dependencies {
                 implementation(project(":compose:ui:ui"))
                 implementation(project(":compose:ui:ui-test-junit4"))
+                implementation(project(":compose:test-utils"))
                 implementation(project(":activity:activity-compose"))
                 implementation(ANDROIDX_TEST_EXT_JUNIT)
                 implementation(ANDROIDX_TEST_RULES)
