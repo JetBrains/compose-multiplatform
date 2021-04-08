@@ -298,7 +298,7 @@ class AndroidXDocsPlugin : Plugin<Project> {
             dependencies.add(project.dependencies.create(DACKKA_DEPENDENCY))
         }
 
-        project.tasks.register("dackkaDocs", DackkaTask::class.java) { task ->
+        val dackkaTask = project.tasks.register("dackkaDocs", DackkaTask::class.java) { task ->
             task.apply {
                 dependsOn(dackkaConfiguration)
                 dependsOn(unzipDocsTask)
@@ -312,6 +312,26 @@ class AndroidXDocsPlugin : Plugin<Project> {
                 destinationDir = generatedDocsDir
                 samplesDir = unzippedSamplesSources
                 sourcesDir = unzippedDocsSources
+            }
+        }
+
+        project.tasks.register("zipDackkaDocs", Zip::class.java) { task ->
+            task.apply {
+                dependsOn(dackkaTask)
+                from(generatedDocsDir)
+
+                val baseName = "dackka-$docsType-docs"
+                val buildId = getBuildId()
+                archiveBaseName.set(baseName)
+                archiveVersion.set(buildId)
+                destinationDirectory.set(project.getDistributionDirectory())
+                group = JavaBasePlugin.DOCUMENTATION_GROUP
+
+                val filePath = "${project.getDistributionDirectory().canonicalPath}/"
+                val fileName = "$baseName-$buildId.zip"
+                val destinationFile = filePath + fileName
+                description = "Zips Java and Kotlin documentation (generated via Dackka in the" +
+                    " style of d.android.com) into $destinationFile"
             }
         }
     }
