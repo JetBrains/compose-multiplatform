@@ -23,6 +23,7 @@ import android.os.Build
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
+import android.os.SystemClock
 import android.util.Log
 import android.view.MotionEvent
 import android.view.View
@@ -118,6 +119,12 @@ internal class AndroidComposeViewAccessibilityDelegateCompat(val view: AndroidCo
          * frame.
          */
         const val SendRecurringAccessibilityEventsIntervalMillis: Long = 100
+
+        /**
+         * Timeout to determine whether a text selection changed event and the pending text
+         * traversed event could be resulted from the same traverse action.
+         */
+        const val TextTraversedEventTimeoutMillis: Long = 1000
         private val AccessibilityActionsResourceIds = intArrayOf(
             R.id.accessibility_custom_action_0,
             R.id.accessibility_custom_action_1,
@@ -177,6 +184,16 @@ internal class AndroidComposeViewAccessibilityDelegateCompat(val view: AndroidCo
     private val subtreeChangedLayoutNodes = ArraySet<LayoutNode>()
     private val boundsUpdateChannel = Channel<Unit>(Channel.CONFLATED)
     private var currentSemanticsNodesInvalidated = true
+
+    private class PendingTextTraversedEvent(
+        val node: SemanticsNode,
+        val action: Int,
+        val granularity: Int,
+        val fromIndex: Int,
+        val toIndex: Int,
+        val traverseTime: Long
+    )
+    private var pendingTextTraversedEvent: PendingTextTraversedEvent? = null
 
     // Up to date semantics nodes in pruned semantics tree. It always reflects the current
     // semantics tree. They key is the virtual view id(the root node has a key of
@@ -839,6 +856,24 @@ internal class AndroidComposeViewAccessibilityDelegateCompat(val view: AndroidCo
         }
 
         return event
+    }
+
+    private fun createTextSelectionChangedEvent(
+        virtualViewId: Int,
+        fromIndex: Int?,
+        toIndex: Int?,
+        itemCount: Int?,
+        text: String?
+    ): AccessibilityEvent {
+        return createEvent(
+            virtualViewId,
+            AccessibilityEvent.TYPE_VIEW_TEXT_SELECTION_CHANGED
+        ).apply {
+            fromIndex?.let { this.fromIndex = it }
+            toIndex?.let { this.toIndex = it }
+            itemCount?.let { this.itemCount = it }
+            text?.let { this.text.add(it) }
+        }
     }
 
     /**
@@ -1556,16 +1591,16 @@ internal class AndroidComposeViewAccessibilityDelegateCompat(val view: AndroidCo
                     // do we need to overwrite TextRange equals?
                     SemanticsProperties.TextSelectionRange -> {
                         val newText = getTextForTextField(newNode) ?: ""
-                        val event = createEvent(
-                            semanticsNodeIdToAccessibilityVirtualNodeId(id),
-                            AccessibilityEvent.TYPE_VIEW_TEXT_SELECTION_CHANGED
-                        )
                         val textRange = newNode.config[SemanticsProperties.TextSelectionRange]
-                        event.fromIndex = textRange.start
-                        event.toIndex = textRange.end
-                        event.itemCount = newText.length
-                        event.text.add(trimToSize(newText, ParcelSafeTextLength))
+                        val event = createTextSelectionChangedEvent(
+                            semanticsNodeIdToAccessibilityVirtualNodeId(id),
+                            textRange.start,
+                            textRange.end,
+                            newText.length,
+                            trimToSize(newText, ParcelSafeTextLength)
+                        )
                         sendEvent(event)
+                        sendPendingTextTraversedAtGranularityEvent(newNode.id)
                     }
                     SemanticsProperties.HorizontalScrollAxisRange,
                     SemanticsProperties.VerticalScrollAxisRange -> {
@@ -1764,34 +1799,45 @@ internal class AndroidComposeViewAccessibilityDelegateCompat(val view: AndroidCo
             selectionStart = if (forward) segmentEnd else segmentStart
             selectionEnd = selectionStart
         }
-        setAccessibilitySelection(node, selectionStart, selectionEnd, true)
         val action =
             if (forward)
                 AccessibilityNodeInfoCompat.ACTION_NEXT_AT_MOVEMENT_GRANULARITY
             else AccessibilityNodeInfoCompat.ACTION_PREVIOUS_AT_MOVEMENT_GRANULARITY
-        sendViewTextTraversedAtGranularityEvent(node, action, granularity, segmentStart, segmentEnd)
+        pendingTextTraversedEvent = PendingTextTraversedEvent(
+            node,
+            action,
+            granularity,
+            segmentStart,
+            segmentEnd,
+            SystemClock.uptimeMillis()
+        )
+        setAccessibilitySelection(node, selectionStart, selectionEnd, true)
         return true
     }
 
-    private fun sendViewTextTraversedAtGranularityEvent(
-        node: SemanticsNode,
-        action: Int,
-        granularity: Int,
-        fromIndex: Int,
-        toIndex: Int
-    ) {
-        val event = createEvent(
-            node.id,
-            AccessibilityEvent.TYPE_VIEW_TEXT_TRAVERSED_AT_MOVEMENT_GRANULARITY
-        )
-        event.fromIndex = fromIndex
-        event.toIndex = toIndex
-        event.action = action
-        event.movementGranularity = granularity
-        event.text.add(
-            getIterableTextForAccessibility(node) ?: calculateContentDescriptionFromChildren(node)
-        )
-        sendEvent(event)
+    private fun sendPendingTextTraversedAtGranularityEvent(semanticsNodeId: Int) {
+        pendingTextTraversedEvent?.let {
+            // not the same node, do nothing. Don't set pendingTextTraversedEvent to null either.
+            if (semanticsNodeId != it.node.id) {
+                return
+            }
+            if (SystemClock.uptimeMillis() - it.traverseTime <= TextTraversedEventTimeoutMillis) {
+                val event = createEvent(
+                    semanticsNodeIdToAccessibilityVirtualNodeId(it.node.id),
+                    AccessibilityEvent.TYPE_VIEW_TEXT_TRAVERSED_AT_MOVEMENT_GRANULARITY
+                )
+                event.fromIndex = it.fromIndex
+                event.toIndex = it.toIndex
+                event.action = it.action
+                event.movementGranularity = it.granularity
+                event.text.add(
+                    getIterableTextForAccessibility(it.node)
+                        ?: calculateContentDescriptionFromChildren(it.node)
+                )
+                sendEvent(event)
+            }
+        }
+        pendingTextTraversedEvent = null
     }
 
     private fun setAccessibilitySelection(
@@ -1816,17 +1862,22 @@ internal class AndroidComposeViewAccessibilityDelegateCompat(val view: AndroidCo
         if (start == end && end == accessibilityCursorPosition) {
             return false
         }
-        if (getIterableTextForAccessibility(node) == null) {
-            return false
-        }
-        accessibilityCursorPosition = if (start >= 0 && start == end &&
-            end <= getIterableTextForAccessibility(node)!!.length
-        ) {
+        val text = getIterableTextForAccessibility(node) ?: return false
+        accessibilityCursorPosition = if (start >= 0 && start == end && end <= text.length) {
             start
         } else {
             AccessibilityCursorPositionUndefined
         }
-        sendEventForVirtualView(node.id, AccessibilityEvent.TYPE_VIEW_TEXT_SELECTION_CHANGED)
+        val nonEmptyText = text.isNotEmpty()
+        val event = createTextSelectionChangedEvent(
+            semanticsNodeIdToAccessibilityVirtualNodeId(node.id),
+            if (nonEmptyText) accessibilityCursorPosition else null,
+            if (nonEmptyText) accessibilityCursorPosition else null,
+            if (nonEmptyText) text.length else null,
+            text
+        )
+        sendEvent(event)
+        sendPendingTextTraversedAtGranularityEvent(node.id)
         return true
     }
 
