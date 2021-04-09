@@ -18,8 +18,10 @@ package androidx.compose.material.textfield
 
 import android.os.Build
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.requiredHeight
 import androidx.compose.foundation.layout.requiredWidth
+import androidx.compose.foundation.layout.width
 import androidx.compose.material.GOLDEN_MATERIAL
 import androidx.compose.material.LocalContentColor
 import androidx.compose.material.Text
@@ -42,7 +44,9 @@ import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.performGesture
 import androidx.compose.ui.test.swipeLeft
 import androidx.compose.ui.test.up
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.input.TextFieldValue
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import androidx.test.ext.junit.runners.AndroidJUnit4
@@ -463,6 +467,36 @@ class TextFieldScreenshotTest {
         rule.mainClock.advanceTimeBy(250)
 
         assertAgainstGolden("textField_readOnly_scrolled")
+    }
+
+    @Test
+    fun textField_textCenterAligned() {
+        rule.setMaterialContent {
+            TextField(
+                value = "Hello world",
+                onValueChange = {},
+                modifier = Modifier.width(300.dp).testTag(TextFieldTag),
+                textStyle = TextStyle(textAlign = TextAlign.Center),
+                singleLine = true
+            )
+        }
+
+        assertAgainstGolden("textField_textCenterAligned")
+    }
+
+    @Test
+    fun textField_textAlignedToEnd() {
+        rule.setMaterialContent {
+            TextField(
+                value = "Hello world",
+                onValueChange = {},
+                modifier = Modifier.fillMaxWidth().testTag(TextFieldTag),
+                textStyle = TextStyle(textAlign = TextAlign.End),
+                singleLine = true
+            )
+        }
+
+        assertAgainstGolden("textField_textAlignedToEnd")
     }
 
     private fun SemanticsNodeInteraction.focus() {
