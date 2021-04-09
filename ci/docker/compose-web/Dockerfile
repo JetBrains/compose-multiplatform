@@ -20,6 +20,7 @@ RUN echo "deb http://dl.google.com/linux/chrome/deb/ stable main" >> /etc/apt/so
     ${CHROME_VERSION:-google-chrome-stable}
 
 COPY chrome-no-sandbox /usr/bin/chrome-no-sandbox 
+COPY gradle.properties /root/.gradle/gradle.properties
 RUN chmod u+x /usr/bin/chrome-no-sandbox
 
 RUN mkdir ~/bin
