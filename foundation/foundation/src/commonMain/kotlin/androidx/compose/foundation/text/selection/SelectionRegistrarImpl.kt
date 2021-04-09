@@ -64,12 +64,17 @@ internal class SelectionRegistrarImpl : SelectionRegistrar {
     /**
      * The callback to be invoked when the selection is initiated.
      */
-    internal var onSelectionUpdateStartCallback: ((LayoutCoordinates, Offset) -> Unit)? = null
+    internal var onSelectionUpdateStartCallback: (
+        (LayoutCoordinates, Offset, SelectionAdjustment) -> Unit
+    )? = null
 
     /**
      * The callback to be invoked when the selection is updated.
+     * If the first offset is null it means that the start of selection is unknown for the caller.
      */
-    internal var onSelectionUpdateCallback: ((LayoutCoordinates, Offset, Offset) -> Unit)? = null
+    internal var onSelectionUpdateCallback: (
+        (LayoutCoordinates, Offset?, Offset, SelectionAdjustment) -> Unit
+    )? = null
 
     /**
      * The callback to be invoked when selection update finished.
@@ -159,17 +164,37 @@ internal class SelectionRegistrarImpl : SelectionRegistrar {
 
     override fun notifySelectionUpdateStart(
         layoutCoordinates: LayoutCoordinates,
-        startPosition: Offset
+        startPosition: Offset,
+        adjustment: SelectionAdjustment
     ) {
-        onSelectionUpdateStartCallback?.invoke(layoutCoordinates, startPosition)
+        onSelectionUpdateStartCallback?.invoke(layoutCoordinates, startPosition, adjustment)
+    }
+
+    override fun notifySelectionUpdate(
+        layoutCoordinates: LayoutCoordinates,
+        endPosition: Offset,
+        adjustment: SelectionAdjustment
+    ) {
+        onSelectionUpdateCallback?.invoke(
+            layoutCoordinates,
+            null,
+            endPosition,
+            adjustment
+        )
     }
 
     override fun notifySelectionUpdate(
         layoutCoordinates: LayoutCoordinates,
         startPosition: Offset,
-        endPosition: Offset
+        endPosition: Offset,
+        adjustment: SelectionAdjustment
     ) {
-        onSelectionUpdateCallback?.invoke(layoutCoordinates, startPosition, endPosition)
+        onSelectionUpdateCallback?.invoke(
+            layoutCoordinates,
+            startPosition,
+            endPosition,
+            adjustment
+        )
     }
 
     override fun notifySelectionUpdateEnd() {

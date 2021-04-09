@@ -157,7 +157,7 @@ class SelectionManagerDragTest {
         assertThat(selectable.lastEndPosition).isEqualTo(childToLocalOffset)
         assertThat(selectable.lastContainerLayoutCoordinates)
             .isEqualTo(selectionManager.requireContainerCoordinates())
-        assertThat(selectable.lastLongPress).isEqualTo(false)
+        assertThat(selectable.lastAdjustment).isEqualTo(SelectionAdjustment.NONE)
         assertThat(selectable.lastIsStartHandle).isEqualTo(true)
         assertThat(selectable.lastPreviousSelection).isEqualTo(fakeInitialSelection)
 
@@ -184,7 +184,7 @@ class SelectionManagerDragTest {
         assertThat(selectable.lastEndPosition).isEqualTo(childToLocalOffset + dragDistance)
         assertThat(selectable.lastContainerLayoutCoordinates)
             .isEqualTo(selectionManager.requireContainerCoordinates())
-        assertThat(selectable.lastLongPress).isEqualTo(false)
+        assertThat(selectable.lastAdjustment).isEqualTo(SelectionAdjustment.NONE)
         assertThat(selectable.lastIsStartHandle).isEqualTo(false)
         assertThat(selectable.lastPreviousSelection).isEqualTo(fakeInitialSelection)
 
@@ -202,7 +202,7 @@ internal class FakeSelectable : Selectable {
     var lastStartPosition: Offset? = null
     var lastEndPosition: Offset? = null
     var lastContainerLayoutCoordinates: LayoutCoordinates? = null
-    var lastLongPress: Boolean? = null
+    var lastAdjustment: SelectionAdjustment? = null
     var lastPreviousSelection: Selection? = null
     var lastIsStartHandle: Boolean? = null
     var getSelectionCalledTimes = 0
@@ -214,7 +214,8 @@ internal class FakeSelectable : Selectable {
         startPosition: Offset,
         endPosition: Offset,
         containerLayoutCoordinates: LayoutCoordinates,
-        longPress: Boolean,
+        adjustment: SelectionAdjustment,
+        ensureAtLeastOneChar: Boolean,
         previousSelection: Selection?,
         isStartHandle: Boolean
     ): Selection? {
@@ -222,7 +223,7 @@ internal class FakeSelectable : Selectable {
         lastStartPosition = startPosition
         lastEndPosition = endPosition
         lastContainerLayoutCoordinates = containerLayoutCoordinates
-        lastLongPress = longPress
+        lastAdjustment = adjustment
         lastPreviousSelection = previousSelection
         lastIsStartHandle = isStartHandle
         return selectionToReturn
