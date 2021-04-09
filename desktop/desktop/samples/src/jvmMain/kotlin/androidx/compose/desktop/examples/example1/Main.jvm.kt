@@ -177,7 +177,7 @@ private fun LeftColumn(modifier: Modifier) = Box(modifier.fillMaxSize()) {
 @OptIn(ExperimentalComposeUiApi::class)
 @Composable
 private fun ScrollableContent(scrollState: ScrollState) {
-    val amount = remember { mutableStateOf(0) }
+    val amount = remember { mutableStateOf(0f) }
     val animation = remember { mutableStateOf(true) }
     Column(Modifier.fillMaxSize().verticalScroll(scrollState)) {
         val window = LocalAppWindow.current.window
@@ -403,12 +403,12 @@ private fun ScrollableContent(scrollState: ScrollState) {
         }
 
         Slider(
-            value = amount.value.toFloat() / 100f,
-            onValueChange = { amount.value = (it * 100).toInt() }
+            value = amount.value / 100f,
+            onValueChange = { amount.value = (it * 100) }
         )
         TextField(
             value = amount.value.toString(),
-            onValueChange = { amount.value = it.toIntOrNull() ?: 42 },
+            onValueChange = { amount.value = it.toFloatOrNull() ?: 42f },
             label = { Text(text = "Input1") }
         )
 
