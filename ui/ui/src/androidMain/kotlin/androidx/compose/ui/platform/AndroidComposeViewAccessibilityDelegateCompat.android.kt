@@ -295,7 +295,7 @@ internal class AndroidComposeViewAccessibilityDelegateCompat(val view: AndroidCo
         }
         info.packageName = view.context.packageName
 
-        semanticsNode.children.fastForEach { child ->
+        semanticsNode.childrenSortedByBounds.fastForEach { child ->
             if (currentSemanticsNodes.contains(child.id)) {
                 val holder = view.androidViewsHandler.layoutNodeToHolder[child.layoutNode]
                 if (holder != null) {
@@ -1991,7 +1991,7 @@ internal class AndroidComposeViewAccessibilityDelegateCompat(val view: AndroidCo
         fun concatenateChildrenContentDescriptionAndText(node: SemanticsNode): List<String> {
             val childDescriptions = mutableListOf<String>()
 
-            node.unmergedChildren().fastForEach { childNode ->
+            node.unmergedChildren(true).fastForEach { childNode ->
                 // Don't merge child that merges its children because that child node will be focused
                 // separately
                 if (childNode.unmergedConfig.isMergingSemanticsOfDescendants) {
