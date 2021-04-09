@@ -21,7 +21,9 @@ import androidx.compose.ui.inspection.LambdaLocation
 import androidx.compose.ui.inspection.inspector.InspectorNode
 import androidx.compose.ui.inspection.inspector.NodeParameter
 import androidx.compose.ui.inspection.inspector.NodeParameterReference
+import androidx.compose.ui.inspection.inspector.ParameterKind
 import androidx.compose.ui.inspection.inspector.ParameterType
+import androidx.compose.ui.inspection.inspector.systemPackages
 import layoutinspector.compose.inspection.LayoutInspectorComposeProtocol.Bounds
 import layoutinspector.compose.inspection.LayoutInspectorComposeProtocol.ComposableNode
 import layoutinspector.compose.inspection.LayoutInspectorComposeProtocol.LambdaValue
@@ -31,7 +33,7 @@ import layoutinspector.compose.inspection.LayoutInspectorComposeProtocol.Quad
 import layoutinspector.compose.inspection.LayoutInspectorComposeProtocol.Rect
 
 fun InspectorNode.toComposableNode(stringTable: StringTable): ComposableNode {
-    return toComposableNodeImpl(stringTable).build()
+    return toComposableNodeImpl(stringTable).resetSystemFlag().build()
 }
 
 private fun InspectorNode.toComposableNodeImpl(stringTable: StringTable): ComposableNode.Builder {
@@ -67,9 +69,28 @@ private fun InspectorNode.toComposableNodeImpl(stringTable: StringTable): Compos
             }
         }.build()
 
+        flags = flags()
+
         children.forEach { child -> addChildren(child.toComposableNodeImpl(stringTable)) }
     }
 }
+
+private fun InspectorNode.flags(): Int {
+    var flags = 0
+    if (packageHash in systemPackages) {
+        flags = flags or ComposableNode.Flags.SYSTEM_CREATED_VALUE
+    }
+    if (mergedSemantics.isNotEmpty()) {
+        flags = flags or ComposableNode.Flags.HAS_MERGED_SEMANTICS_VALUE
+    }
+    if (unmergedSemantics.isNotEmpty()) {
+        flags = flags or ComposableNode.Flags.HAS_UNMERGED_SEMANTICS_VALUE
+    }
+    return flags
+}
+
+private fun ComposableNode.Builder.resetSystemFlag(): ComposableNode.Builder =
+    apply { flags = flags and ComposableNode.Flags.SYSTEM_CREATED_VALUE.inv() }
 
 fun ParameterType.convert(): Parameter.Type {
     return when (this) {
@@ -87,6 +108,23 @@ fun ParameterType.convert(): Parameter.Type {
         ParameterType.Lambda -> Parameter.Type.LAMBDA
         ParameterType.FunctionReference -> Parameter.Type.FUNCTION_REFERENCE
         ParameterType.Iterable -> Parameter.Type.ITERABLE
+    }
+}
+
+fun ParameterKind.convert(): ParameterReference.Kind {
+    return when (this) {
+        ParameterKind.Normal -> ParameterReference.Kind.NORMAL
+        ParameterKind.MergedSemantics -> ParameterReference.Kind.MERGED_SEMANTICS
+        ParameterKind.UnmergedSemantics -> ParameterReference.Kind.UNMERGED_SEMANTICS
+    }
+}
+
+fun ParameterReference.Kind.convert(): ParameterKind {
+    return when (this) {
+        ParameterReference.Kind.NORMAL -> ParameterKind.Normal
+        ParameterReference.Kind.MERGED_SEMANTICS -> ParameterKind.MergedSemantics
+        ParameterReference.Kind.UNMERGED_SEMANTICS -> ParameterKind.UnmergedSemantics
+        else -> ParameterKind.Normal
     }
 }
 

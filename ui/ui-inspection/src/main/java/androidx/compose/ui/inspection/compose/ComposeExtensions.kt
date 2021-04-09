@@ -19,7 +19,42 @@ package androidx.compose.ui.inspection.compose
 import androidx.compose.ui.inspection.inspector.InspectorNode
 import androidx.compose.ui.inspection.inspector.LayoutInspectorTree
 import androidx.compose.ui.inspection.inspector.NodeParameter
+import androidx.compose.ui.inspection.inspector.ParameterKind
+import androidx.compose.ui.inspection.inspector.ParameterKind.MergedSemantics
+import androidx.compose.ui.inspection.inspector.ParameterKind.Normal
+import androidx.compose.ui.inspection.inspector.ParameterKind.UnmergedSemantics
+import androidx.compose.ui.inspection.proto.StringTable
+import androidx.compose.ui.inspection.proto.convertAll
 import androidx.compose.ui.inspection.util.ThreadUtils
+import layoutinspector.compose.inspection.LayoutInspectorComposeProtocol.ParameterGroup
+
+/**
+ * Convert parameters and semantics from [InspectorNode] into a [ParameterGroup].
+ */
+fun InspectorNode.convertToParameterGroup(
+    layoutInspectorTree: LayoutInspectorTree,
+    rootId: Long,
+    maxRecursions: Int,
+    maxInitialIterableSize: Int,
+    stringTable: StringTable
+): ParameterGroup = ParameterGroup.newBuilder().apply {
+    composableId = id
+    addAllParameter(
+        convertParameters(
+            layoutInspectorTree, Normal, rootId, maxRecursions, maxInitialIterableSize
+        ).convertAll(stringTable)
+    )
+    addAllMergedSemantics(
+        convertParameters(
+            layoutInspectorTree, MergedSemantics, rootId, maxRecursions, maxInitialIterableSize
+        ).convertAll(stringTable)
+    )
+    addAllUnmergedSemantics(
+        convertParameters(
+            layoutInspectorTree, UnmergedSemantics, rootId, maxRecursions, maxInitialIterableSize
+        ).convertAll(stringTable)
+    )
+}.build()
 
 /**
  * Convert [InspectorNode] into [NodeParameter]s.
@@ -29,6 +64,7 @@ import androidx.compose.ui.inspection.util.ThreadUtils
  */
 fun InspectorNode.convertParameters(
     layoutInspectorTree: LayoutInspectorTree,
+    kind: ParameterKind,
     rootId: Long,
     maxRecursions: Int,
     maxInitialIterableSize: Int
@@ -37,6 +73,7 @@ fun InspectorNode.convertParameters(
     return layoutInspectorTree.convertParameters(
         rootId,
         this,
+        kind,
         maxRecursions,
         maxInitialIterableSize
     )

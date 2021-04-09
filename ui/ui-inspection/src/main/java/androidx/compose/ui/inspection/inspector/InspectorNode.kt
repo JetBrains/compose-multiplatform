@@ -96,10 +96,26 @@ class InspectorNode internal constructor(
     val parameters: List<RawParameter>,
 
     /**
+     * The merged semantics information of this Composable.
+     */
+    val mergedSemantics: List<RawParameter>,
+
+    /**
+     * The un-merged semantics information of this Composable.
+     */
+    val unmergedSemantics: List<RawParameter>,
+
+    /**
      * The children nodes of this Composable.
      */
     val children: List<InspectorNode>
-)
+) {
+    fun parametersByKind(kind: ParameterKind): List<RawParameter> = when (kind) {
+        ParameterKind.Normal -> parameters
+        ParameterKind.MergedSemantics -> mergedSemantics
+        ParameterKind.UnmergedSemantics -> unmergedSemantics
+    }
+}
 
 data class QuadBounds(
     val x0: Int,
@@ -122,7 +138,9 @@ class RawParameter(val name: String, val value: Any?)
  */
 internal class MutableInspectorNode {
     var id = 0L
-    var layoutNodes = mutableListOf<LayoutInfo>()
+    val layoutNodes = mutableListOf<LayoutInfo>()
+    val mergedSemantics = mutableListOf<RawParameter>()
+    val unmergedSemantics = mutableListOf<RawParameter>()
     var name = ""
     var fileName = ""
     var packageHash = -1
@@ -145,6 +163,8 @@ internal class MutableInspectorNode {
         width = 0
         height = 0
         layoutNodes.clear()
+        mergedSemantics.clear()
+        unmergedSemantics.clear()
         bounds = null
         children.clear()
     }
@@ -172,13 +192,18 @@ internal class MutableInspectorNode {
         width = node.width
         height = node.height
         bounds = node.bounds
+        mergedSemantics.addAll(node.mergedSemantics)
+        unmergedSemantics.addAll(node.unmergedSemantics)
         parameters.addAll(node.parameters)
         children.addAll(node.children)
     }
 
-    fun build(): InspectorNode =
+    fun build(withSemantics: Boolean = true): InspectorNode =
         InspectorNode(
             id, name, fileName, packageHash, lineNumber, offset, length, left, top, width, height,
-            bounds, parameters.toList(), children.toList()
+            bounds, parameters.toList(),
+            if (withSemantics) mergedSemantics.toList() else emptyList(),
+            if (withSemantics) unmergedSemantics.toList() else emptyList(),
+            children.toList()
         )
 }

@@ -16,9 +16,11 @@
 
 package androidx.compose.ui.inspection.inspector
 
+import android.util.Log
 import android.view.ViewGroup
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.text.BasicText
@@ -46,6 +48,10 @@ import androidx.compose.ui.inspection.testdata.TestActivity
 import androidx.compose.ui.layout.GraphicLayerInfo
 import androidx.compose.ui.platform.LocalInspectionMode
 import androidx.compose.ui.platform.isDebugInspectorInfoEnabled
+import androidx.compose.ui.semantics.clearAndSetSemantics
+import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.semantics.text
+import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.tooling.data.Group
@@ -95,6 +101,17 @@ class LayoutInspectorTreeTest {
         isDebugInspectorInfoEnabled = true
     }
 
+    private fun findAndroidComposeView(view: ViewGroup): ViewGroup? {
+        for (i in 0 until view.childCount) {
+            val subView = view.getChildAt(i) as ViewGroup
+            if (subView.javaClass.simpleName == "AndroidComposeView") {
+                return subView
+            }
+            findAndroidComposeView(subView)?.let { return it }
+        }
+        return null
+    }
+
     @After
     fun after() {
         isDebugInspectorInfoEnabled = false
@@ -122,14 +139,7 @@ class LayoutInspectorTreeTest {
         val nodes = builder.convert(view)
         dumpNodes(nodes, builder)
 
-        validate(nodes, builder, checkParameters = false) {
-            node(
-                name = "Box",
-                isRenderNode = true,
-                children = listOf("Inspectable")
-            )
-            node("Inspectable", children = listOf("CompositionLocalProvider"))
-            node("CompositionLocalProvider", children = listOf("Column"))
+        validate(nodes, builder) {
             node(
                 name = "Column",
                 fileName = "LayoutInspectorTreeTest.kt",
@@ -194,22 +204,7 @@ class LayoutInspectorTreeTest {
         val nodes = builder.convert(view)
         dumpNodes(nodes, builder)
 
-        validate(nodes, builder, checkParameters = false) {
-            node(
-                name = "Box",
-                isRenderNode = true,
-                children = listOf("Inspectable")
-            )
-            node(
-                name = "Inspectable",
-                hasTransformations = true,
-                children = listOf("CompositionLocalProvider")
-            )
-            node(
-                name = "CompositionLocalProvider",
-                hasTransformations = true,
-                children = listOf("MaterialTheme")
-            )
+        validate(nodes, builder) {
             node(
                 name = "MaterialTheme",
                 hasTransformations = true,
@@ -251,7 +246,7 @@ class LayoutInspectorTreeTest {
         dumpNodes(nodes, builder)
 
         if (DEBUG) {
-            validate(nodes, builder, checkParameters = false) {
+            validate(nodes, builder) {
                 node("Box", children = listOf("ModalDrawer"))
                 node("ModalDrawer", children = listOf("Column", "Text"))
                 node("Column", children = listOf("Text", "Button"))
@@ -289,7 +284,7 @@ class LayoutInspectorTreeTest {
         dumpNodes(nodes, builder)
 
         if (DEBUG) {
-            validate(nodes, builder, checkParameters = false) {
+            validate(nodes, builder) {
                 node("Box", children = listOf("ModalDrawer"))
                 node("ModalDrawer", children = listOf("WithConstraints"))
                 node("WithConstraints", children = listOf("SubcomposeLayout"))
@@ -389,26 +384,78 @@ class LayoutInspectorTreeTest {
         assertThat(node?.id).isGreaterThan(0)
     }
 
+    @Test
+    fun testSemantics() {
+        Log.w("Semantics", "Hello there")
+        val slotTableRecord = CompositionDataRecord.create()
+
+        show {
+            Inspectable(slotTableRecord) {
+                Column {
+                    Text(text = "Studio")
+                    Row(modifier = Modifier.semantics(true) {}) {
+                        Text(text = "Hello")
+                        Text(text = "World")
+                    }
+                    Row(modifier = Modifier.clearAndSetSemantics { text = AnnotatedString("to") }) {
+                        Text(text = "Hello")
+                        Text(text = "World")
+                    }
+                }
+            }
+        }
+
+        val androidComposeView = findAndroidComposeView(view)!!
+        androidComposeView.setTag(R.id.inspection_slot_table_set, slotTableRecord.store)
+        val builder = LayoutInspectorTree()
+        val nodes = builder.convert(androidComposeView)
+        validate(nodes, builder, checkSemantics = true) {
+            node("Column", children = listOf("Text", "Row", "Row"))
+            node(
+                name = "Text",
+                isRenderNode = true,
+                mergedSemantics = "Studio",
+                unmergedSemantics = "Studio"
+            )
+            node("Row", children = listOf("Text", "Text"), mergedSemantics = "Hello, World")
+            node("Text", isRenderNode = true, unmergedSemantics = "Hello")
+            node("Text", isRenderNode = true, unmergedSemantics = "World")
+            node(
+                name = "Row",
+                children = listOf("Text", "Text"),
+                mergedSemantics = "to",
+                unmergedSemantics = "to"
+            )
+            node("Text", isRenderNode = true, unmergedSemantics = "Hello")
+            node("Text", isRenderNode = true, unmergedSemantics = "World")
+        }
+    }
+
     @Suppress("SameParameterValue")
     private fun validate(
         result: List<InspectorNode>,
         builder: LayoutInspectorTree,
-        checkParameters: Boolean,
+        checkParameters: Boolean = false,
+        checkSemantics: Boolean = false,
         block: TreeValidationReceiver.() -> Unit = {}
     ) {
         val nodes = result.flatMap { flatten(it) }.listIterator()
-        // Ignore a starting CompositionLocalProvider...
-        if (nodes.next().name != "CompositionLocalProvider") {
-            nodes.previous()
-        }
-        val tree = TreeValidationReceiver(nodes, density, checkParameters, builder)
+        ignoreStart(nodes, "Box", "Inspectable", "CompositionLocalProvider")
+        val tree = TreeValidationReceiver(nodes, density, checkParameters, checkSemantics, builder)
         tree.block()
+    }
+
+    private fun ignoreStart(nodes: ListIterator<InspectorNode>, vararg names: String) {
+        for (name in names) {
+            assertThat(nodes.next().name).isEqualTo(name)
+        }
     }
 
     private class TreeValidationReceiver(
         val nodeIterator: Iterator<InspectorNode>,
         val density: Density,
         val checkParameters: Boolean,
+        val checkSemantics: Boolean,
         val builder: LayoutInspectorTree
     ) {
         fun node(
@@ -417,7 +464,8 @@ class LayoutInspectorTreeTest {
             lineNumber: Int = -1,
             isRenderNode: Boolean = false,
             hasTransformations: Boolean = false,
-
+            mergedSemantics: String = "",
+            unmergedSemantics: String = "",
             left: Dp = Dp.Unspecified,
             top: Dp = Dp.Unspecified,
             width: Dp = Dp.Unspecified,
@@ -458,9 +506,18 @@ class LayoutInspectorTreeTest {
                 }
             }
 
+            if (checkSemantics) {
+                val merged = node.mergedSemantics.singleOrNull { it.name == "Text" }?.value
+                assertWithMessage(message).that(merged?.toString() ?: "").isEqualTo(mergedSemantics)
+                val unmerged = node.unmergedSemantics.singleOrNull { it.name == "Text" }?.value
+                assertWithMessage(message).that(unmerged?.toString() ?: "")
+                    .isEqualTo(unmergedSemantics)
+            }
+
             if (checkParameters) {
-                val params =
-                    builder.convertParameters(ROOT_ID, node, MAX_RECURSIONS, MAX_ITERABLE_SIZE)
+                val params = builder.convertParameters(
+                    ROOT_ID, node, ParameterKind.Normal, MAX_RECURSIONS, MAX_ITERABLE_SIZE
+                )
                 val receiver = ParameterValidationReceiver(params.listIterator())
                 receiver.block()
                 receiver.checkFinished(name)
@@ -527,7 +584,9 @@ class LayoutInspectorTreeTest {
         print(")")
         if (generateParameters && node.parameters.isNotEmpty()) {
             generateParameters(
-                builder.convertParameters(ROOT_ID, node, MAX_RECURSIONS, MAX_ITERABLE_SIZE),
+                builder.convertParameters(
+                    ROOT_ID, node, ParameterKind.Normal, MAX_RECURSIONS, MAX_ITERABLE_SIZE
+                ),
                 0
             )
         }
