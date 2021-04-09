@@ -16,7 +16,6 @@
 
 package androidx.compose.ui.text.platform.extensions
 
-import android.graphics.Typeface
 import android.os.Build
 import android.text.Spannable
 import android.text.Spanned
@@ -36,6 +35,7 @@ import androidx.compose.ui.graphics.isSpecified
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.SpanStyle
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.android.InternalPlatformTextApi
 import androidx.compose.ui.text.android.style.BaselineShiftSpan
 import androidx.compose.ui.text.android.style.FontFeatureSpan
@@ -46,7 +46,6 @@ import androidx.compose.ui.text.android.style.ShadowSpan
 import androidx.compose.ui.text.android.style.SkewXSpan
 import androidx.compose.ui.text.android.style.TypefaceSpan
 import androidx.compose.ui.text.fastFilter
-import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontSynthesis
 import androidx.compose.ui.text.font.FontWeight
@@ -138,12 +137,13 @@ internal fun Spannable.setLineHeight(
 }
 
 internal fun Spannable.setSpanStyles(
+    contextTextStyle: TextStyle,
     spanStyles: List<AnnotatedString.Range<SpanStyle>>,
     density: Density,
     typefaceAdapter: TypefaceAdapter
 ) {
 
-    setFontAttributes(spanStyles, typefaceAdapter)
+    setFontAttributes(contextTextStyle, spanStyles, typefaceAdapter)
 
     // LetterSpacingSpanPx/LetterSpacingSpanSP has lower priority than normal spans. Because
     // letterSpacing relies on the fontSize on [Paint] to compute Px/Sp from Em. So it must be
@@ -205,15 +205,57 @@ private fun Spannable.setSpanStyle(
     }
 }
 
+/**
+ * Set font related [SpanStyle]s to this [Spannable].
+ *
+ * Different from other styles, font related styles needs to be flattened first and then applied.
+ * This is required because on certain API levels the [FontWeight] is not supported by framework,
+ * and we have to resolve font settings and create typeface first and then set it directly on
+ * TextPaint.
+ *
+ * Notice that a [contextTextStyle] is also required when we flatten the font related styles.
+ * For example:
+ *  the entire text has the TextStyle(fontFamily = Sans-serif)
+ *  Hi Hello World
+ *  [ bold ]
+ * FontWeight.Bold is set in range [0, 8).
+ * The resolved TypefaceSpan should be TypefaceSpan("Sans-serif", "bold") in range [0, 8).
+ * As demonstrated above, the fontFamily information is from [contextTextStyle].
+ *
+ * @see flattenFontStylesAndApply
+ *
+ * @param contextTextStyle the global [TextStyle] for the entire string.
+ * @param spanStyles the [spanStyles] to be applied, this function will first filter out the font
+ * related [SpanStyle]s and then apply them to this [Spannable].
+ * @param typefaceAdapter the [TypefaceAdapter] used to resolve font.
+ */
 @OptIn(InternalPlatformTextApi::class)
 private fun Spannable.setFontAttributes(
+    contextTextStyle: TextStyle,
     spanStyles: List<AnnotatedString.Range<SpanStyle>>,
     typefaceAdapter: TypefaceAdapter
 ) {
     val fontRelatedSpanStyles = spanStyles.fastFilter {
         it.item.hasFontAttributes() || it.item.fontSynthesis != null
     }
-    flattenStylesAndApply(fontRelatedSpanStyles) { spanStyle, start, end ->
+
+    // Create a SpanStyle if contextTextStyle has font related attributes, otherwise use
+    // null to avoid unnecessary object creation.
+    val contextFontSpanStyle = if (contextTextStyle.hasFontAttributes()) {
+        SpanStyle(
+            fontFamily = contextTextStyle.fontFamily,
+            fontWeight = contextTextStyle.fontWeight,
+            fontStyle = contextTextStyle.fontStyle,
+            fontSynthesis = contextTextStyle.fontSynthesis
+        )
+    } else {
+        null
+    }
+
+    flattenFontStylesAndApply(
+        contextFontSpanStyle,
+        fontRelatedSpanStyles
+    ) { spanStyle, start, end ->
         setSpan(
             TypefaceSpan(
                 typefaceAdapter.create(
@@ -234,16 +276,24 @@ private fun Spannable.setFontAttributes(
  * Flatten styles in the [spanStyles], so that overlapping styles are merged, and then apply the
  * [block] on the merged [SpanStyle].
  *
+ * @param contextFontSpanStyle the global [SpanStyle]. It act as if every [spanStyles] is applied
+ * on top of it. This parameter is nullable. A null value is exactly the same as a default
+ * SpanStyle, but avoids unnecessary object creation.
  * @param spanStyles the input [SpanStyle] ranges to be flattened.
  * @param block the function to be applied on the merged [SpanStyle].
  */
-internal fun flattenStylesAndApply(
+internal fun flattenFontStylesAndApply(
+    contextFontSpanStyle: SpanStyle?,
     spanStyles: List<AnnotatedString.Range<SpanStyle>>,
     block: (SpanStyle, Int, Int) -> Unit
 ) {
     if (spanStyles.size <= 1) {
         if (spanStyles.isNotEmpty()) {
-            block(spanStyles[0].item, spanStyles[0].start, spanStyles[0].end)
+            block(
+                contextFontSpanStyle.merge(spanStyles[0].item),
+                spanStyles[0].start,
+                spanStyles[0].end
+            )
         }
         return
     }
@@ -264,15 +314,12 @@ internal fun flattenStylesAndApply(
         }
 
         // Check all spans that intersects with this transition range.
-        var mergedSpanStyle: SpanStyle? = null
+        var mergedSpanStyle = contextFontSpanStyle
         spanStyles.fastForEach { spanStyle ->
             if (
                 intersect(lastTransitionOffsets, transitionOffset, spanStyle.start, spanStyle.end)
             ) {
-                if (mergedSpanStyle == null) {
-                    mergedSpanStyle = SpanStyle()
-                }
-                mergedSpanStyle = mergedSpanStyle!!.merge(spanStyle.item)
+                mergedSpanStyle = mergedSpanStyle.merge(spanStyle.item)
             }
         }
 
@@ -404,20 +451,18 @@ private fun Spannable.setBaselineShift(baselineShift: BaselineShift?, start: Int
     }
 }
 
-private fun createTypeface(
-    fontFamily: FontFamily?,
-    weight: Int,
-    isItalic: Boolean,
-    fontSynthesis: FontSynthesis?,
-    typefaceAdapter: TypefaceAdapter
-): Typeface {
-    val fontWeight = FontWeight(weight)
-    val fontStyle = if (isItalic) FontStyle.Italic else FontStyle.Normal
+/**
+ * Returns true if there is any font settings on this [TextStyle].
+ * @see hasFontAttributes
+ */
+private fun TextStyle.hasFontAttributes(): Boolean {
+    return toSpanStyle().hasFontAttributes() || fontSynthesis != null
+}
 
-    return typefaceAdapter.create(
-        fontFamily = fontFamily,
-        fontWeight = fontWeight,
-        fontStyle = fontStyle,
-        fontSynthesis = fontSynthesis ?: FontSynthesis.All
-    )
+/**
+ * Helper function that merges a nullable [SpanStyle] with another [SpanStyle].
+ */
+private fun SpanStyle?.merge(spanStyle: SpanStyle): SpanStyle {
+    if (this == null) return spanStyle
+    return this.merge(spanStyle)
 }
