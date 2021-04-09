@@ -17,6 +17,7 @@
 package androidx.build.testConfiguration
 
 import androidx.build.dependencyTracker.ProjectSubset
+import androidx.build.isPresubmitBuild
 import androidx.build.renameApkForTesting
 import com.android.build.api.variant.BuiltArtifactsLoader
 import org.gradle.api.DefaultTask
@@ -85,7 +86,7 @@ abstract class GenerateTestConfigurationTask : DefaultTask() {
 
     private fun writeConfigFileContent(
         outputFile: RegularFileProperty,
-        isConstrained: Boolean = true
+        isConstrained: Boolean = false
     ) {
         /*
         Testing an Android Application project involves 2 APKS: an application to be instrumented,
@@ -107,17 +108,12 @@ abstract class GenerateTestConfigurationTask : DefaultTask() {
                 configBuilder.appApkName(appName)
             }
         }
+        configBuilder.isPostsubmit(!isPresubmitBuild())
         when (affectedModuleDetectorSubset.get()) {
             ProjectSubset.CHANGED_PROJECTS -> {
-                configBuilder.isPostsubmit(false)
-                configBuilder.runAllTests(true)
-            }
-            ProjectSubset.ALL_AFFECTED_PROJECTS -> {
-                configBuilder.isPostsubmit(true)
                 configBuilder.runAllTests(true)
             }
             ProjectSubset.DEPENDENT_PROJECTS -> {
-                configBuilder.isPostsubmit(false)
                 // Don't ever run full tests of RV if it is dependent, since they take > 45 minutes
                 if (isConstrained || testProjectPath.get().contains("recyclerview")) {
                     configBuilder.runAllTests(false)
