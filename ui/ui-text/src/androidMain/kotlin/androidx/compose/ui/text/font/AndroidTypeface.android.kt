@@ -37,6 +37,7 @@ import androidx.compose.ui.text.platform.AndroidTypefaceWrapper
  *                        all fonts in fontFamily.
  * @return [androidx.compose.ui.text.font.Typeface] instance
  */
+// TODO what is the goal of styles here? it is being used in only a single place
 fun Typeface(
     context: Context,
     fontFamily: FontFamily,
