@@ -2,7 +2,7 @@ import org.jetbrains.kotlin.gradle.dsl.KotlinJvmCompile
 
 plugins {
     id("java")
-    id("org.jetbrains.kotlin.jvm") version "1.4.31"
+    id("org.jetbrains.kotlin.jvm") version "1.4.32"
     id("org.jetbrains.intellij") version "0.7.2"
     id("org.jetbrains.changelog") version "1.1.2"
 }
@@ -27,7 +27,7 @@ intellij {
     setPlugins(
         "java",
         "com.intellij.gradle",
-        "org.jetbrains.kotlin:203-1.4.31-release-IJ7148.5"
+        "org.jetbrains.kotlin:203-1.4.32-release-IJ7148.5"
     )
 }
 

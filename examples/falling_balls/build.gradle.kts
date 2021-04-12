@@ -4,9 +4,9 @@ import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
     // __KOTLIN_COMPOSE_VERSION__
-    kotlin("jvm") version "1.4.31"
+    kotlin("jvm") version "1.4.32"
     // __LATEST_COMPOSE_RELEASE_VERSION__
-    id("org.jetbrains.compose") version "0.3.2"
+    id("org.jetbrains.compose") version "0.4.0-build180"
 }
 
 group = "me.user"

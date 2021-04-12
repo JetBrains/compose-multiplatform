@@ -3,9 +3,9 @@ import org.jetbrains.compose.compose
 plugins {
     id("org.jetbrains.intellij") version "0.6.5"
     java
-    kotlin("jvm") version "1.4.31"
+    kotlin("jvm") version "1.4.32"
     // __LATEST_COMPOSE_RELEASE_VERSION__
-    id("org.jetbrains.compose") version "0.3.2"
+    id("org.jetbrains.compose") version "0.4.0-build180"
 }
 
 group = "org.example"
