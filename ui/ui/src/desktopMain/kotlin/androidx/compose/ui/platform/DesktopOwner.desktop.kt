@@ -78,6 +78,8 @@ import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.LayoutDirection
 
+private typealias Command = () -> Unit
+
 @OptIn(
     ExperimentalComposeUiApi::class,
     InternalCoreApi::class
@@ -145,7 +147,7 @@ internal class DesktopOwner(
     override val rootForTest = this
 
     override val snapshotObserver = OwnerSnapshotObserver { command ->
-        command()
+        onDispatchCommand?.invoke(command)
     }
     private val pointerInputEventProcessor = PointerInputEventProcessor(root)
     private val measureAndLayoutDelegate = MeasureAndLayoutDelegate(root)
@@ -217,6 +219,7 @@ internal class DesktopOwner(
 
     val needsRender get() = needsLayout || needsDraw
     var onNeedsRender: (() -> Unit)? = null
+    var onDispatchCommand: ((Command) -> Unit)? = null
 
     fun render(canvas: org.jetbrains.skija.Canvas, width: Int, height: Int) {
         needsLayout = false
