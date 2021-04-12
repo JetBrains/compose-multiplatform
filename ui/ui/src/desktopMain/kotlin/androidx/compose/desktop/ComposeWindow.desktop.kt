@@ -17,6 +17,7 @@ package androidx.compose.desktop
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionContext
+import androidx.compose.runtime.CompositionLocalProvider
 import org.jetbrains.skiko.ClipComponent
 import org.jetbrains.skiko.GraphicsApi
 import java.awt.Component
@@ -26,9 +27,8 @@ import javax.swing.JLayeredPane
 /**
  * ComposeWindow is a window for building UI using Compose for Desktop.
  * ComposeWindow inherits javax.swing.JFrame.
- * @param parent The parent AppFrame that wraps the ComposeWindow.
  */
-class ComposeWindow(val parent: AppFrame) : JFrame() {
+class ComposeWindow : JFrame() {
     private var isDisposed = false
     internal val layer = ComposeLayer()
     private val pane = object : JLayeredPane() {
@@ -73,8 +73,13 @@ class ComposeWindow(val parent: AppFrame) : JFrame() {
     ) {
         layer.setContent(
             parentComposition = parentComposition,
-            content = content
-        )
+        ) {
+            CompositionLocalProvider(
+                LocalLayerContainer provides this
+            ) {
+                content()
+            }
+        }
     }
 
     override fun dispose() {
