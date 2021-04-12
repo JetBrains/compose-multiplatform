@@ -35,11 +35,6 @@ import androidx.compose.ui.node.Ref
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.TextLayoutResult
 import androidx.compose.ui.text.TextStyle
-import androidx.compose.ui.text.font.Font
-import androidx.compose.ui.text.font.FontStyle
-import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.font.test.R
-import androidx.compose.ui.text.font.toFontFamily
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.Density
@@ -272,13 +267,7 @@ private fun TestingText(
     onTextLayout: (TextLayoutResult) -> Unit = {}
 ) {
     val textStyle = remember {
-        TextStyle(
-            fontFamily = Font(
-                R.font.sample_font,
-                FontWeight.Normal,
-                FontStyle.Normal
-            ).toFontFamily()
-        )
+        TextStyle(fontFamily = TEST_FONT_FAMILY)
     }
     CoreText(
         AnnotatedString(text),

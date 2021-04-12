@@ -26,11 +26,6 @@ import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.TextLayoutResult
 import androidx.compose.ui.text.TextRange
 import androidx.compose.ui.text.TextStyle
-import androidx.compose.ui.text.font.Font
-import androidx.compose.ui.text.font.FontStyle
-import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.font.test.R
-import androidx.compose.ui.text.font.toFontFamily
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.test.ext.junit.runners.AndroidJUnit4
@@ -187,13 +182,7 @@ class TextPreparedSelectionTest {
             CompositionLocalProvider(LocalLayoutDirection provides direction) {
                 BasicText(
                     text = initText,
-                    style = TextStyle(
-                        fontFamily = Font(
-                            R.font.sample_font,
-                            FontWeight.Normal,
-                            FontStyle.Normal
-                        ).toFontFamily()
-                    ),
+                    style = TextStyle(fontFamily = TEST_FONT_FAMILY),
                     onTextLayout = { textLayout = it }
                 )
             }
@@ -217,13 +206,7 @@ class TextPreparedSelectionTest {
         rule.setContent {
             BasicText(
                 text = initText,
-                style = TextStyle(
-                    fontFamily = Font(
-                        R.font.sample_font,
-                        FontWeight.Normal,
-                        FontStyle.Normal
-                    ).toFontFamily()
-                ),
+                style = TextStyle(fontFamily = TEST_FONT_FAMILY),
                 onTextLayout = { textLayout = it }
             )
         }

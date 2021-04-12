@@ -15,9 +15,7 @@
  */
 package androidx.compose.foundation.text
 
-import android.content.Context
 import android.graphics.Bitmap
-import android.graphics.Typeface
 import androidx.compose.ui.graphics.Canvas
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Paint
@@ -26,14 +24,11 @@ import androidx.compose.ui.text.TextLayoutResult
 import androidx.compose.ui.text.TextPainter
 import androidx.compose.ui.text.TextRange
 import androidx.compose.ui.text.TextStyle
-import androidx.compose.ui.text.font.Font
-import androidx.compose.ui.text.font.ResourceFont
 import androidx.compose.ui.text.input.OffsetMapping
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.LayoutDirection
-import androidx.core.content.res.ResourcesCompat
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.SmallTest
 import androidx.test.platform.app.InstrumentationRegistry
@@ -49,15 +44,6 @@ class TextFieldDelegateIntegrationTest {
     private val context = InstrumentationRegistry.getInstrumentation().context
     private val resourceLoader = TestFontResourceLoader(context)
     private val layoutDirection = LayoutDirection.Ltr
-
-    private class TestFontResourceLoader(val context: Context) : Font.ResourceLoader {
-        override fun load(font: Font): Typeface {
-            return when (font) {
-                is ResourceFont -> ResourcesCompat.getFont(context, font.resId)!!
-                else -> throw IllegalArgumentException("Unknown font type: $font")
-            }
-        }
-    }
 
     @Test
     fun draw_selection_test() {

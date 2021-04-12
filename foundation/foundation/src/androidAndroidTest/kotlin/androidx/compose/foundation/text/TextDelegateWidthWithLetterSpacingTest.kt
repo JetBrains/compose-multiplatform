@@ -16,11 +16,8 @@
 
 package androidx.compose.foundation.text
 
-import androidx.compose.foundation.text.selection.BASIC_MEASURE_FONT
-import androidx.compose.foundation.text.selection.TestFontResourceLoader
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.TextStyle
-import androidx.compose.ui.text.font.toFontFamily
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.Density
@@ -37,7 +34,7 @@ import org.junit.runner.RunWith
 @RunWith(AndroidJUnit4::class)
 @SmallTest
 class TextDelegateWidthWithLetterSpacingTest {
-    private val fontFamily = BASIC_MEASURE_FONT.toFontFamily()
+    private val fontFamily = TEST_FONT_FAMILY
 
     /**
      * values are exact values for the repro case (on Pixel4, Android 11)

@@ -150,5 +150,11 @@ class FontTestData {
             weight = FontWeight.W900,
             style = FontStyle.Italic
         )
+
+        val FONT_INVALID = Font(
+            resId = R.font.invalid_font,
+            weight = FontWeight.W900,
+            style = FontStyle.Italic
+        )
     }
 }
