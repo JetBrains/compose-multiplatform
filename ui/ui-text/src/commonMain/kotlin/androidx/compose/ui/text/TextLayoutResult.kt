@@ -445,7 +445,11 @@ class TextLayoutResult constructor(
     }
 }
 
-/*@VisibleForTesting*/
+@Deprecated(
+    "Unused public function which was added for testing. The function does not do " +
+        "anything usable for Compose text APIs. The function is now deprecated and will be " +
+        "removed soon"
+)
 fun createTextLayoutResult(
     layoutInput: TextLayoutInput =
         TextLayoutInput(
