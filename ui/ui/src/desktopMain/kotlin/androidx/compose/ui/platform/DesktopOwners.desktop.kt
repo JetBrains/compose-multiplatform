@@ -39,7 +39,7 @@ internal val DesktopOwnersAmbient = staticCompositionLocalOf<DesktopOwners> {
 }
 
 internal class DesktopOwners(
-    coroutineScope: CoroutineScope,
+    private val coroutineScope: CoroutineScope,
     component: DesktopComponent = DummyDesktopComponent,
     private val invalidate: () -> Unit = {},
 ) {
@@ -84,6 +84,12 @@ internal class DesktopOwners(
         }
     }
 
+    private fun dispatchCommand(command: () -> Unit) {
+        coroutineScope.launch(coroutineContext) {
+            command()
+        }
+    }
+
     /**
      * Returns true if there are pending recompositions, draws or dispatched tasks.
      * Can be called from any thread.
@@ -95,11 +101,13 @@ internal class DesktopOwners(
     fun register(desktopOwner: DesktopOwner) {
         list.add(desktopOwner)
         desktopOwner.onNeedsRender = ::invalidateIfNeeded
+        desktopOwner.onDispatchCommand = ::dispatchCommand
         invalidateIfNeeded()
     }
 
     fun unregister(desktopOwner: DesktopOwner) {
         list.remove(desktopOwner)
+        desktopOwner.onDispatchCommand = null
         desktopOwner.onNeedsRender = null
         invalidateIfNeeded()
     }
