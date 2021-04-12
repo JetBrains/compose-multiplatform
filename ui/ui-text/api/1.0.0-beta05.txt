@@ -363,7 +363,7 @@ package androidx.compose.ui.text {
   }
 
   public final class TextLayoutResultKt {
-    method public static androidx.compose.ui.text.TextLayoutResult createTextLayoutResult-2H_Vf2E(optional androidx.compose.ui.text.TextLayoutInput layoutInput, optional androidx.compose.ui.text.MultiParagraph multiParagraph, optional long size);
+    method @Deprecated public static androidx.compose.ui.text.TextLayoutResult createTextLayoutResult-2H_Vf2E(optional androidx.compose.ui.text.TextLayoutInput layoutInput, optional androidx.compose.ui.text.MultiParagraph multiParagraph, optional long size);
   }
 
   public final class TextPainter {
