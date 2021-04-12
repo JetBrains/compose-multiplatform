@@ -562,6 +562,7 @@ private const val DOCLAVA_DEPENDENCY = "com.android:doclava:1.0.6"
 private val dackkaDirsToProcess = listOf(
     "androidx/benchmark/**",
     "androidx/collection/**",
+    "androidx/compose/**",
     "androidx/paging/**"
 )
 
