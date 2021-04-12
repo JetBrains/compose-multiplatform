@@ -8,13 +8,14 @@ package org.jetbrains.compose.gradle
 import org.gradle.internal.impldep.org.testng.Assert
 import org.gradle.testkit.runner.TaskOutcome
 import org.jetbrains.compose.desktop.application.internal.OS
+import org.jetbrains.compose.desktop.application.internal.currentArch
 import org.jetbrains.compose.desktop.application.internal.currentOS
 import org.jetbrains.compose.desktop.application.internal.currentTarget
 import org.jetbrains.compose.test.*
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assumptions
 import org.junit.jupiter.api.Test
-import java.nio.charset.Charset
+import java.io.File
 import java.util.jar.JarFile
 
 class DesktopApplicationTest : GradlePluginTestBase() {
@@ -187,6 +188,30 @@ class DesktopApplicationTest : GradlePluginTestBase() {
                 check.taskOutcome(":suggestRuntimeModules", TaskOutcome.SUCCESS)
                 check.logContains("Suggested runtime modules to include:")
                 check.logContains("modules(\"java.instrument\", \"jdk.unsupported\")")
+            }
+        }
+    }
+
+    @Test
+    fun testUnpackSkiko() {
+        with(testProject(TestProjects.unpackSkiko)) {
+            gradle(":runDistributable").build().checks { check ->
+                check.taskOutcome(":runDistributable", TaskOutcome.SUCCESS)
+
+                val libraryPathPattern = "Read skiko library path: '(.*)'".toRegex()
+                val m = libraryPathPattern.find(check.log)
+                val skikoDir = m?.groupValues?.get(1)?.let(::File)
+                if (skikoDir == null || !skikoDir.exists()) {
+                    error("Invalid skiko path: $skikoDir")
+                }
+                val filesToFind = when (currentOS) {
+                    OS.Linux -> listOf("libskiko-linux-${currentArch.id}.so")
+                    OS.Windows -> listOf("skiko-windows-${currentArch.id}.dll", "icudtl.dat")
+                    OS.MacOS -> listOf("libskiko-macos-${currentArch.id}.dylib")
+                }
+                for (fileName in filesToFind) {
+                    skikoDir.resolve(fileName).checkExists()
+                }
             }
         }
     }

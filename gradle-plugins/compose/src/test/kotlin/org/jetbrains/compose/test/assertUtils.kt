@@ -21,6 +21,9 @@ internal fun BuildResult.checks(fn: (BuildResultChecks) -> Unit) {
 }
 
 internal class BuildResultChecks(private val result: BuildResult) {
+    val log: String
+        get() = result.output
+
     fun logContains(substring: String) {
         if (!result.output.contains(substring)) {
             throw AssertionError("Test output does not contain the expected string: '$substring'")

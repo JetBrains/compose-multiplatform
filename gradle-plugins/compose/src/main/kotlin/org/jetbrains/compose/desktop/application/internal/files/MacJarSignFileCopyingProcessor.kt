@@ -9,7 +9,9 @@ import org.gradle.process.ExecOperations
 import org.jetbrains.compose.desktop.application.internal.MacUtils
 import org.jetbrains.compose.desktop.application.internal.isJarFile
 import org.jetbrains.compose.desktop.application.internal.validation.ValidatedMacOSSigningSettings
-import java.io.*
+import java.io.ByteArrayOutputStream
+import java.io.File
+import java.io.PrintStream
 import java.util.regex.Pattern
 import java.util.zip.ZipEntry
 import java.util.zip.ZipInputStream
@@ -51,50 +53,46 @@ internal class MacJarSignFileCopyingProcessor(
     }
 
     override fun copy(source: File, target: File) {
-        if (!source.isJarFile) {
+        if (source.isJarFile) {
+            signNativeLibsInJar(source, target)
+        } else {
             SimpleFileCopyingProcessor.copy(source, target)
-            return
-        }
-
-        if (target.exists()) target.delete()
-
-        ZipInputStream(FileInputStream(source).buffered()).use { zin ->
-            ZipOutputStream(FileOutputStream(target).buffered()).use { zout ->
-                copyAndSignNativeLibs(zin, zout)
+            if (source.name.isDylibPath) {
+                signDylib(target)
             }
         }
     }
 
-    private fun copyAndSignNativeLibs(zin: ZipInputStream, zout: ZipOutputStream) {
-        for (sourceEntry in generateSequence { zin.nextEntry }) {
-            if (!sourceEntry.name.endsWith(".dylib")) {
-                zout.putNextEntry(ZipEntry(sourceEntry))
-                zin.copyTo(zout)
+    private fun signNativeLibsInJar(source: File, target: File) {
+        if (target.exists()) target.delete()
+
+        transformJar(source, target) { zin, zout, entry ->
+            if (entry.name.isDylibPath) {
+                signDylibEntry(zin, zout, entry)
             } else {
-
-                val unpackedDylibFile = tempDir.resolve(sourceEntry.name.substringAfterLast("/"))
-                try {
-                    unpackedDylibFile.outputStream().buffered().use {
-                        zin.copyTo(it)
-                    }
-
-                    signDylib(unpackedDylibFile)
-                    val targetEntry = ZipEntry(sourceEntry.name).apply {
-                        comment = sourceEntry.comment
-                        extra = sourceEntry.extra
-                        method = sourceEntry.method
-                        size = unpackedDylibFile.length()
-                    }
-                    zout.putNextEntry(targetEntry)
-
-                    unpackedDylibFile.inputStream().buffered().use {
-                        it.copyTo(zout)
-                    }
-                } finally {
-                    unpackedDylibFile.delete()
+                zout.withNewEntry(ZipEntry(entry)) {
+                    zin.copyTo(zout)
                 }
             }
-            zout.closeEntry()
+        }
+    }
+
+    private fun signDylibEntry(zin: ZipInputStream, zout: ZipOutputStream, sourceEntry: ZipEntry) {
+        val unpackedDylibFile = tempDir.resolve(sourceEntry.name.substringAfterLast("/"))
+        try {
+            zin.copyTo(unpackedDylibFile)
+            signDylib(unpackedDylibFile)
+            val targetEntry = ZipEntry(sourceEntry.name).apply {
+                comment = sourceEntry.comment
+                extra = sourceEntry.extra
+                method = sourceEntry.method
+                size = unpackedDylibFile.length()
+            }
+            zout.withNewEntry(ZipEntry(targetEntry)) {
+                unpackedDylibFile.copyTo(zout)
+            }
+        } finally {
+            unpackedDylibFile.delete()
         }
     }
 
@@ -121,3 +119,6 @@ internal class MacJarSignFileCopyingProcessor(
         }.assertNormalExitValue()
     }
 }
+
+private val String.isDylibPath
+    get() = endsWith(".dylib")

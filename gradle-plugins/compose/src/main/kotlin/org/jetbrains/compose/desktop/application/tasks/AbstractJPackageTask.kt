@@ -6,6 +6,7 @@
 package org.jetbrains.compose.desktop.application.tasks
 
 import org.gradle.api.file.*
+import org.gradle.api.internal.file.FileOperations
 import org.gradle.api.provider.ListProperty
 import org.gradle.api.provider.Property
 import org.gradle.api.provider.Provider
@@ -17,19 +18,19 @@ import org.gradle.work.InputChanges
 import org.jetbrains.compose.desktop.application.dsl.MacOSSigningSettings
 import org.jetbrains.compose.desktop.application.dsl.TargetFormat
 import org.jetbrains.compose.desktop.application.internal.*
+import org.jetbrains.compose.desktop.application.internal.files.*
 import org.jetbrains.compose.desktop.application.internal.files.MacJarSignFileCopyingProcessor
-import org.jetbrains.compose.desktop.application.internal.files.SimpleFileCopyingProcessor
 import org.jetbrains.compose.desktop.application.internal.files.fileHash
+import org.jetbrains.compose.desktop.application.internal.files.transformJar
 import org.jetbrains.compose.desktop.application.internal.validation.ValidatedMacOSSigningSettings
 import org.jetbrains.compose.desktop.application.internal.validation.validate
-import java.io.File
-import java.io.Serializable
+import java.io.*
 import java.util.*
+import java.util.zip.ZipEntry
 import javax.inject.Inject
 import kotlin.collections.HashMap
 import kotlin.collections.HashSet
-import java.io.ObjectInputStream
-import java.io.ObjectOutputStream
+import kotlin.collections.ArrayList
 
 abstract class AbstractJPackageTask @Inject constructor(
     @get:Input
@@ -181,6 +182,9 @@ abstract class AbstractJPackageTask @Inject constructor(
     @get:LocalState
     protected val signDir: Provider<Directory> = project.layout.buildDirectory.dir("compose/tmp/sign")
 
+    @get:LocalState
+    protected val skikoDir: Provider<Directory> = project.layout.buildDirectory.dir("compose/tmp/skiko")
+
     @get:Internal
     private val libsDir: Provider<Directory> = workingDir.map {
         it.dir("libs")
@@ -197,10 +201,10 @@ abstract class AbstractJPackageTask @Inject constructor(
     override fun makeArgs(tmpDir: File): MutableList<String> = super.makeArgs(tmpDir).apply {
         if (targetFormat == TargetFormat.AppImage || appImage.orNull == null) {
             // Args, that can only be used, when creating an app image or an installer w/o --app-image parameter
-            cliArg("--input", tmpDir)
+            cliArg("--input", libsDir)
             cliArg("--runtime-image", runtimeImage)
 
-            val mappedJar = libsMapping[launcherMainJar.ioFile]
+            val mappedJar = libsMapping[launcherMainJar.ioFile]?.singleOrNull()
                 ?: error("Main jar was not processed correctly: ${launcherMainJar.ioFile}")
             cliArg("--main-jar", mappedJar)
             cliArg("--main-class", launcherMainClass)
@@ -217,6 +221,7 @@ abstract class AbstractJPackageTask @Inject constructor(
             launcherJvmArgs.orNull?.forEach {
                 cliArg("--java-options", "'$it'")
             }
+            cliArg("--java-options", "'-Dskiko.library.path=${'$'}APPDIR'")
             if (currentOS == OS.MacOS) {
                 macDockName.orNull?.let { dockName ->
                     cliArg("--java-options", "'-Xdock:name=$dockName'")
@@ -298,7 +303,9 @@ abstract class AbstractJPackageTask @Inject constructor(
 
             try {
                 for (change in allChanges) {
-                    libsMapping.remove(change.file)?.let { fileOperations.delete(it) }
+                    libsMapping.remove(change.file)?.let { files ->
+                        files.forEach { fileOperations.delete(it) }
+                    }
                     if (change.changeType != ChangeType.REMOVED) {
                         outdatedLibs.add(change.file)
                     }
@@ -315,7 +322,7 @@ abstract class AbstractJPackageTask @Inject constructor(
     }
 
     override fun prepareWorkingDir(inputChanges: InputChanges) {
-        val libsDirFile = libsDir.ioFile
+        val libsDir = libsDir.ioFile
         val fileProcessor =
             withValidatedMacOSSigning { signing ->
                 val tmpDirForSign = signDir.ioFile
@@ -328,18 +335,25 @@ abstract class AbstractJPackageTask @Inject constructor(
                     signing = signing
                 )
             } ?: SimpleFileCopyingProcessor
+        fun copyFileToLibsDir(sourceFile: File): File {
+            val targetFileName =
+                if (sourceFile.isJarFile) "${sourceFile.nameWithoutExtension}-${fileHash(sourceFile)}.jar"
+                else sourceFile.name
+            val targetFile = libsDir.resolve(targetFileName)
+            fileProcessor.copy(sourceFile, targetFile)
+            return targetFile
+        }
 
         val outdatedLibs = invalidateMappedLibs(inputChanges)
         for (sourceFile in outdatedLibs) {
             assert(sourceFile.exists()) { "Lib file does not exist: $sourceFile" }
 
-            val targetFileName =
-                if (sourceFile.isJarFile)
-                    "${sourceFile.nameWithoutExtension}-${fileHash(sourceFile)}.jar"
-                else sourceFile.name
-            val targetFile = libsDirFile.resolve(targetFileName)
-            fileProcessor.copy(sourceFile, targetFile)
-            libsMapping[sourceFile] = targetFile
+            libsMapping[sourceFile] = if (isSkikoForCurrentOS(sourceFile)) {
+                val unpackedFiles = unpackSkikoForCurrentOS(sourceFile, skikoDir.ioFile, fileOperations)
+                unpackedFiles.map { copyFileToLibsDir(it) }
+            } else {
+                listOf(copyFileToLibsDir(sourceFile))
+            }
         }
     }
 
@@ -422,23 +436,25 @@ abstract class AbstractJPackageTask @Inject constructor(
 // Serializable is only needed to avoid breaking configuration cache:
 // https://docs.gradle.org/current/userguide/configuration_cache.html#config_cache:requirements
 private class FilesMapping : Serializable {
-    private var mapping = HashMap<File, File>()
+    private var mapping = HashMap<File, List<File>>()
 
-    operator fun get(key: File): File? =
+    operator fun get(key: File): List<File>? =
         mapping[key]
 
-    operator fun set(key: File, value: File) {
+    operator fun set(key: File, value: List<File>) {
         mapping[key] = value
     }
 
-    fun remove(key: File): File? =
+    fun remove(key: File): List<File>? =
         mapping.remove(key)
 
     fun loadFrom(mappingFile: File) {
         mappingFile.readLines().forEach { line ->
             if (line.isNotBlank()) {
-                val (k, v) = line.split(File.pathSeparatorChar)
-                mapping[File(k)] = File(v)
+                val paths = line.splitToSequence(File.pathSeparatorChar)
+                val lib = File(paths.first())
+                val mappedFiles = paths.drop(1).mapTo(ArrayList()) { File(it) }
+                mapping[lib] = mappedFiles
             }
         }
     }
@@ -448,10 +464,9 @@ private class FilesMapping : Serializable {
         mappingFile.bufferedWriter().use { writer ->
             mapping.entries
                 .sortedBy { (k, _) -> k.absolutePath }
-                .forEach { (k, v) ->
-                    writer.append(k.absolutePath)
-                    writer.append(File.pathSeparatorChar)
-                    writer.appendln(v.absolutePath)
+                .forEach { (k, values) ->
+                    (sequenceOf(k) + values.asSequence())
+                        .joinTo(writer, separator = File.pathSeparator, transform = { it.absolutePath })
                 }
         }
     }
@@ -461,6 +476,39 @@ private class FilesMapping : Serializable {
     }
 
     private fun readObject(stream: ObjectInputStream) {
-        mapping = stream.readObject() as HashMap<File, File>
+        mapping = stream.readObject() as HashMap<File, List<File>>
     }
+}
+
+private fun isSkikoForCurrentOS(lib: File): Boolean =
+    lib.name.startsWith("skiko-jvm-runtime-${currentOS.id}-${currentArch.id}")
+            && lib.name.endsWith(".jar")
+
+private fun unpackSkikoForCurrentOS(sourceJar: File, skikoDir: File, fileOperations: FileOperations): List<File> {
+    val entriesToUnpack = when (currentOS) {
+        OS.MacOS -> setOf("libskiko-macos-${currentArch.id}.dylib")
+        OS.Linux -> setOf("skiko-windows-${currentArch.id}.dll", "icudtl.dat")
+        OS.Windows -> setOf("libskiko-linux-${currentArch.id}.so")
+    }
+
+    // output files: unpacked libs, corresponding .sha256 files, and target jar
+    val outputFiles = ArrayList<File>(entriesToUnpack.size * 2 + 1)
+    val targetJar = skikoDir.resolve(sourceJar.name)
+    outputFiles.add(targetJar)
+
+    fileOperations.delete(skikoDir)
+    fileOperations.mkdir(skikoDir)
+    transformJar(sourceJar, targetJar) { zin, zout, entry ->
+        // check both entry or entry.sha256
+        if (entry.name.removeSuffix(".sha256") in entriesToUnpack) {
+            val unpackedFile = skikoDir.resolve(entry.name.substringAfterLast("/"))
+            zin.copyTo(unpackedFile)
+            outputFiles.add(unpackedFile)
+        } else {
+            zout.withNewEntry(ZipEntry(entry)) {
+                zin.copyTo(zout)
+            }
+        }
+    }
+    return outputFiles
 }
