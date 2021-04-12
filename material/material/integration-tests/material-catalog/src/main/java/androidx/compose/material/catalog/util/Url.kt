@@ -25,8 +25,13 @@ fun Context.openUrl(url: String) {
     startActivity(intent)
 }
 
-const val GUIDELINES_URL = "https://material.io/components"
-const val DOCS_URL = "https://developer.android.com/jetpack/androidx/releases/compose-material"
-const val SOURCE_URL = "https://cs.android.com/androidx/platform/frameworks/support/+/" +
-    "androidx-main:compose/material/"
-const val ISSUE_URL = "https://issuetracker.google.com/issues/new?component=742043"
+const val GuidelinesUrl = "https://material.io/components"
+const val DocsUrl = "https://developer.android.com/reference/kotlin/androidx/compose/" +
+    "material/package-summary"
+const val SourceUrl = "https://cs.android.com/androidx/platform/frameworks/support/+/" +
+    "androidx-main:compose/material/" +
+    "material/src/commonMain/kotlin/androidx/compose/material"
+const val SampleSourceUrl = "https://cs.android.com/androidx/platform/frameworks/support/+/" +
+    "androidx-main:compose/material/" +
+    "material/samples/src/main/java/androidx/compose/material/samples"
+const val IssueUrl = "https://issuetracker.google.com/issues/new?component=742043"
