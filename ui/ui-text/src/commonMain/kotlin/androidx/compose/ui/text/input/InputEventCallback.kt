@@ -19,6 +19,9 @@ package androidx.compose.ui.text.input
 /**
  * An interface of listening IME events.
  */
+@Deprecated(
+    "This function is not being used by any APIs. API is now deprecated and will be removed"
+)
 interface InputEventCallback {
     /**
      * Called when IME sends some input events.
