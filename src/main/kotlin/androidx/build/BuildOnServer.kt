@@ -53,6 +53,8 @@ open class BuildOnServer : DefaultTask() {
         )
 
         if (project.isDocumentationEnabled()) {
+            filesNames.add("dackka-tip-of-tree-docs-$buildId.zip")
+            filesNames.add("dackka-public-docs-$buildId.zip")
             filesNames.add("doclava-tip-of-tree-docs-$buildId.zip")
             filesNames.add("doclava-public-docs-$buildId.zip")
             filesNames.add("dokka-tip-of-tree-docs-$buildId.zip")

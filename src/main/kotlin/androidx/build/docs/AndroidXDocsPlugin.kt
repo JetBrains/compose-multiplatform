@@ -315,7 +315,7 @@ class AndroidXDocsPlugin : Plugin<Project> {
             }
         }
 
-        project.tasks.register("zipDackkaDocs", Zip::class.java) { task ->
+        val zipTask = project.tasks.register("zipDackkaDocs", Zip::class.java) { task ->
             task.apply {
                 dependsOn(dackkaTask)
                 from(generatedDocsDir)
@@ -334,6 +334,8 @@ class AndroidXDocsPlugin : Plugin<Project> {
                     " style of d.android.com) into $destinationFile"
             }
         }
+
+        project.addToBuildOnServer(zipTask)
     }
 
     private fun configureDokka(
