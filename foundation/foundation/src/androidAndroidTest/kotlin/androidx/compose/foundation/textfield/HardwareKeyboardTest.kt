@@ -23,6 +23,7 @@ import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.requiredSize
 import androidx.compose.foundation.text.BasicTextField
+import androidx.compose.foundation.text.TEST_FONT_FAMILY
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableStateOf
@@ -38,11 +39,6 @@ import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.performKeyPress
 import androidx.compose.ui.text.TextRange
 import androidx.compose.ui.text.TextStyle
-import androidx.compose.ui.text.font.Font
-import androidx.compose.ui.text.font.FontStyle
-import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.font.test.R
-import androidx.compose.ui.text.font.toFontFamily
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.input.TextInputService
 import androidx.compose.ui.unit.dp
@@ -305,11 +301,7 @@ class HardwareKeyboardTest {
                 BasicTextField(
                     value = state.value,
                     textStyle = TextStyle(
-                        fontFamily = Font(
-                            R.font.sample_font,
-                            FontWeight.Normal,
-                            FontStyle.Normal
-                        ).toFontFamily(),
+                        fontFamily = TEST_FONT_FAMILY,
                         fontSize = 10.sp
                     ),
                     modifier = modifier.focusRequester(focusFequester),

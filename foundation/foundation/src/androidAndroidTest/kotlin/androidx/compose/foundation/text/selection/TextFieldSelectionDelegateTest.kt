@@ -18,6 +18,8 @@ package androidx.compose.foundation.text.selection
 
 import androidx.activity.ComponentActivity
 import androidx.compose.foundation.text.InternalFoundationTextApi
+import androidx.compose.foundation.text.TEST_FONT_FAMILY
+import androidx.compose.foundation.text.TestFontResourceLoader
 import androidx.compose.foundation.text.TextDelegate
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
 import androidx.compose.ui.text.AnnotatedString
@@ -25,7 +27,6 @@ import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.TextLayoutResult
 import androidx.compose.ui.text.TextRange
 import androidx.compose.ui.text.TextStyle
-import androidx.compose.ui.text.font.toFontFamily
 import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.LayoutDirection
@@ -45,7 +46,7 @@ class TextFieldSelectionDelegateTest {
     @get:Rule
     val composeTestRule = createAndroidComposeRule<ComponentActivity>()
 
-    private val fontFamily = BASIC_MEASURE_FONT.toFontFamily()
+    private val fontFamily = TEST_FONT_FAMILY
     private val context = InstrumentationRegistry.getInstrumentation().context
     private val defaultDensity = Density(density = 1f)
     private val resourceLoader = TestFontResourceLoader(context)

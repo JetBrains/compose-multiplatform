@@ -17,14 +17,11 @@
 package androidx.compose.foundation.text
 
 import androidx.compose.foundation.text.matchers.isZero
-import androidx.compose.foundation.text.selection.BASIC_MEASURE_FONT
-import androidx.compose.foundation.text.selection.TestFontResourceLoader
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Canvas
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.TextStyle
-import androidx.compose.ui.text.font.toFontFamily
 import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.LayoutDirection
@@ -42,7 +39,7 @@ import kotlin.math.floor
 @SmallTest
 class TextLayoutResultIntegrationTest {
 
-    private val fontFamily = BASIC_MEASURE_FONT.toFontFamily()
+    private val fontFamily = TEST_FONT_FAMILY
     private val density = Density(density = 1f)
     private val context = InstrumentationRegistry.getInstrumentation().context
     private val resourceLoader = TestFontResourceLoader(context)

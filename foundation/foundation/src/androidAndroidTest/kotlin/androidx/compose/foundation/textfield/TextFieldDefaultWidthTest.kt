@@ -21,6 +21,7 @@ import androidx.compose.foundation.layout.defaultMinSize
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.requiredWidth
 import androidx.compose.foundation.text.BasicTextField
+import androidx.compose.foundation.text.TEST_FONT_FAMILY
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.Modifier
@@ -28,10 +29,6 @@ import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.text.TextStyle
-import androidx.compose.ui.text.font.Font
-import androidx.compose.ui.text.font.FontStyle
-import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.font.toFontFamily
 import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
@@ -188,17 +185,11 @@ private fun DefaultWidthTextField(
     modifier: Modifier,
     density: Density
 ) {
-    val font = Font(
-        resId = androidx.compose.ui.text.font.test.R.font.sample_font,
-        weight = FontWeight.Normal,
-        style = FontStyle.Normal
-    )
-
     CompositionLocalProvider(LocalDensity provides density) {
         androidx.compose.foundation.layout.Box {
             BasicTextField(
                 value = text,
-                textStyle = TextStyle(fontSize = fontSize, fontFamily = font.toFontFamily()),
+                textStyle = TextStyle(fontSize = fontSize, fontFamily = TEST_FONT_FAMILY),
                 onValueChange = {},
                 modifier = modifier
             )
