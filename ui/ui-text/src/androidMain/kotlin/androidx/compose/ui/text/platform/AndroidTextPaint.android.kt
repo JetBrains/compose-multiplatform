@@ -23,7 +23,10 @@ import androidx.compose.ui.graphics.isSpecified
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.text.style.TextDecoration
 
-internal class AndroidTextPaint(flags: Int) : TextPaint(flags) {
+internal class AndroidTextPaint(flags: Int, density: Float) : TextPaint(flags) {
+    init {
+        this.density = density
+    }
     private var textDecoration: TextDecoration = TextDecoration.None
     private var shadow: Shadow = Shadow.None
 

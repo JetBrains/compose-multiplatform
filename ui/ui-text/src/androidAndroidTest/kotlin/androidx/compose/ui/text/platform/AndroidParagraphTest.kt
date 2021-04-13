@@ -61,6 +61,7 @@ import com.nhaarman.mockitokotlin2.verify
 import org.junit.Test
 import org.junit.runner.RunWith
 import kotlin.math.ceil
+import kotlin.math.roundToInt
 
 @OptIn(InternalPlatformTextApi::class)
 @RunWith(AndroidJUnit4::class)
@@ -244,7 +245,9 @@ class AndroidParagraphTest {
                 width = paragraphWidth
             )
 
-            assertThat(paragraph.charSequence).hasSpan(AbsoluteSizeSpan::class, 0, text.length)
+            assertThat(paragraph.charSequence).hasSpan(AbsoluteSizeSpan::class, 0, text.length) {
+                it.size == fontSize.toPx().roundToInt() && !it.dip
+            }
         }
     }
 
