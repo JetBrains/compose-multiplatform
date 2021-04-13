@@ -95,6 +95,21 @@ private object LifecycleSnippet3 {
 
 private object LifecycleSnippet4 {
     @Composable
+    fun MovieOverview(movie: Movie) {
+        Column {
+            // Side effect explained later in the docs. If MovieOverview
+            // recomposes, while fetching the image is in progress,
+            // it is cancelled and restarted.
+            val image = loadNetworkImage(movie.url)
+            MovieHeader(image)
+
+            /* ... */
+        }
+    }
+}
+
+private object LifecycleSnippet5 {
+    @Composable
     fun MoviesScreen(movies: List<Movie>) {
         Column {
             for (movie in movies) {
@@ -106,7 +121,7 @@ private object LifecycleSnippet4 {
     }
 }
 
-private object LifecycleSnippet5 {
+private object LifecycleSnippet6 {
     @Composable
     fun MoviesScreen(movies: List<Movie>) {
         LazyColumn {
@@ -117,7 +132,7 @@ private object LifecycleSnippet5 {
     }
 }
 
-private object LifecycleSnippet6 {
+private object LifecycleSnippet7 {
     // Marking the type as stable to favor skipping and smart recompositions.
     @Stable
     interface UiState<T : Result<T>> {
@@ -130,7 +145,7 @@ private object LifecycleSnippet6 {
 }
 
 @ExperimentalMaterialApi
-private object LifecycleSnippet7 {
+private object LifecycleSnippet8 {
     @Composable
     fun MyScreen(
         state: UiState<List<Movie>>,
@@ -141,7 +156,7 @@ private object LifecycleSnippet7 {
         if (state.hasError) {
 
             // `LaunchedEffect` will cancel and re-launch if `scaffoldState` changes
-            LaunchedEffect(scaffoldState) {
+            LaunchedEffect(scaffoldState.snackbarHostState) {
                 // Show snackbar using a coroutine, when the coroutine is cancelled the
                 // snackbar will automatically dismiss. This coroutine will cancel whenever
                 // `state.hasError` is false, and only start when `state.hasError`
@@ -160,7 +175,7 @@ private object LifecycleSnippet7 {
 }
 
 @ExperimentalMaterialApi
-private object LifecycleSnippet8 {
+private object LifecycleSnippet9 {
     @Composable
     fun MoviesScreen(scaffoldState: ScaffoldState = rememberScaffoldState()) {
 
@@ -185,7 +200,7 @@ private object LifecycleSnippet8 {
     }
 }
 
-private object LifecycleSnippet9 {
+private object LifecycleSnippet10 {
     @Composable
     fun LandingScreen(onTimeout: () -> Unit) {
 
@@ -195,7 +210,7 @@ private object LifecycleSnippet9 {
 
         // Create an effect that matches the lifecycle of LandingScreen.
         // If LandingScreen recomposes, the delay shouldn't start again.
-        LaunchedEffect(Unit) {
+        LaunchedEffect(true) {
             delay(SplashWaitTimeMillis)
             currentOnTimeout()
         }
@@ -204,7 +219,7 @@ private object LifecycleSnippet9 {
     }
 }
 
-private object LifecycleSnippet10 {
+private object LifecycleSnippet11 {
     @Composable
     fun BackHandler(backDispatcher: OnBackPressedDispatcher, onBack: () -> Unit) {
 
@@ -234,7 +249,7 @@ private object LifecycleSnippet10 {
     }
 }
 
-private object LifecycleSnippet11 {
+private object LifecycleSnippet12 {
     @Composable
     fun BackHandler(
         backDispatcher: OnBackPressedDispatcher,
@@ -264,7 +279,7 @@ private object LifecycleSnippet11 {
     }
 }
 
-private object LifecycleSnippet12 {
+private object LifecycleSnippet13 {
     @Composable
     fun loadNetworkImage(
         url: String,
@@ -290,7 +305,7 @@ private object LifecycleSnippet12 {
     }
 }
 
-private object LifecycleSnippet13 {
+private object LifecycleSnippet14 {
     @Composable
     fun TodoList(highPriorityKeywords: List<String> = listOf("Review", "Unblock", "Compose")) {
 
@@ -312,7 +327,7 @@ private object LifecycleSnippet13 {
     }
 }
 
-private object LifecycleSnippet14 {
+private object LifecycleSnippet15 {
     @Composable
     fun BackHandler(backDispatcher: OnBackPressedDispatcher, onBack: () -> Unit) {
         // START - DO NOT COPY IN CODE SNIPPET
@@ -347,7 +362,9 @@ private fun LoginError() { }
 
 @Composable
 private fun MovieOverview(movie: Movie) { }
-private data class Movie(val id: Long)
+@Composable
+private fun MovieHeader(image: Image) { }
+private data class Movie(val id: Long, val url: String)
 
 private data class UiState<T>(
     val loading: Boolean = false,
@@ -375,3 +392,4 @@ private class Greeting(val name: String)
 private fun prepareGreeting(user: User, weather: Weather) = Greeting("haha")
 
 private fun String.containsWord(input: List<String>): Boolean = false
+private fun loadNetworkImage(url: String): Image { TODO() }
