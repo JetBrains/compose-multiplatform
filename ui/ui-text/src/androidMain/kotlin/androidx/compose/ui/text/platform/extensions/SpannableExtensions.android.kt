@@ -367,7 +367,7 @@ internal fun Spannable.setFontSize(fontSize: TextUnit, density: Density, start: 
     when (fontSize.type) {
         TextUnitType.Sp -> with(density) {
             setSpan(
-                AbsoluteSizeSpan(fontSize.toPx().roundToInt(), true),
+                AbsoluteSizeSpan(/* size */ fontSize.toPx().roundToInt(), /* dip */ false),
                 start,
                 end
             )

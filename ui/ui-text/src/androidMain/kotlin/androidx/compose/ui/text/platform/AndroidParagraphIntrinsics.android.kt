@@ -45,7 +45,7 @@ internal class AndroidParagraphIntrinsics(
     val density: Density
 ) : ParagraphIntrinsics {
 
-    internal val textPaint = AndroidTextPaint(Paint.ANTI_ALIAS_FLAG)
+    internal val textPaint = AndroidTextPaint(Paint.ANTI_ALIAS_FLAG, density.density)
 
     internal val charSequence: CharSequence
 
