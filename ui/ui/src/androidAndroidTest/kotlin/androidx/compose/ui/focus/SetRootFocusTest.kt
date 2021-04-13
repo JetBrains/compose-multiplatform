@@ -71,20 +71,16 @@ class SetRootFocusTest {
         }
         rule.onNodeWithTag(focusable).performClick()
         rule.waitForIdle()
-        focusChanged.await(10, SECONDS)
-        rule.runOnIdle {
-            assertThat(isFocused).isTrue()
-            focusChanged = CountDownLatch(1)
-        }
+        focusChanged.await(1, SECONDS)
+        rule.runOnIdle { assertThat(isFocused).isTrue() }
+        focusChanged = CountDownLatch(1)
 
         // Act.
         rule.onNodeWithTag(nonFocusable).performClick()
 
         // Assert.
         rule.waitForIdle()
-        focusChanged.await(10, SECONDS)
-        rule.runOnIdle {
-            assertThat(isFocused).isFalse()
-        }
+        focusChanged.await(1, SECONDS)
+        rule.runOnIdle { assertThat(isFocused).isFalse() }
     }
 }
