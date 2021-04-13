@@ -68,6 +68,7 @@ internal class AndroidComposeTestCaseRunner<T : ComposeTestCase>(
 
     internal var view: View? = null
         private set
+    override fun getHostView(): View = view!!
 
     override var didLastRecomposeHaveChanges = false
         private set
