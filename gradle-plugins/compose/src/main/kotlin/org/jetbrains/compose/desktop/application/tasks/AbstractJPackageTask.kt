@@ -487,8 +487,8 @@ private fun isSkikoForCurrentOS(lib: File): Boolean =
 private fun unpackSkikoForCurrentOS(sourceJar: File, skikoDir: File, fileOperations: FileOperations): List<File> {
     val entriesToUnpack = when (currentOS) {
         OS.MacOS -> setOf("libskiko-macos-${currentArch.id}.dylib")
-        OS.Linux -> setOf("skiko-windows-${currentArch.id}.dll", "icudtl.dat")
-        OS.Windows -> setOf("libskiko-linux-${currentArch.id}.so")
+        OS.Windows -> setOf("skiko-windows-${currentArch.id}.dll", "icudtl.dat")
+        OS.Linux -> setOf("libskiko-linux-${currentArch.id}.so")
     }
 
     // output files: unpacked libs, corresponding .sha256 files, and target jar
