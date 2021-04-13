@@ -23,42 +23,32 @@
 
 package androidx.compose.integration.docs.libraries
 
-import android.content.Context
 import android.graphics.Bitmap
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.material.Text
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.DisposableEffect
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.State
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.livedata.observeAsState
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
-import androidx.compose.ui.graphics.ImageBitmap
-import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.CircularProgressIndicator
+import androidx.compose.material.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.State
+import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewmodel.compose.viewModel
-import androidx.navigation.NavBackStackEntry
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
+import androidx.navigation.compose.navigation
 import kotlinx.coroutines.flow.Flow
 
 /**
  * This file lets DevRel track changes to snippets present in
- * https://developer.android.com/jetpack/compose/xxxxxxxxxx
+ * https://developer.android.com/jetpack/compose/libraries
  *
  * No action required if it's modified.
  */
@@ -104,60 +94,6 @@ private object LibrariesSnippet3 {
 }
 
 private object LibrariesSnippet4 {
-    @Composable
-    fun fetchImage(url: String): ImageBitmap? {
-        // Holds our current image, and will be updated by the onCommit lambda below
-        var image by remember(url) { mutableStateOf<ImageBitmap?>(null) }
-
-        DisposableEffect(url) {
-            // This onCommit lambda will be invoked every time url changes
-
-            val listener = object : ExampleImageLoader.Listener() {
-                override fun onSuccess(bitmap: Bitmap) {
-                    // When the image successfully loads, update our image state
-                    image = bitmap.asImageBitmap()
-                }
-            }
-
-            // Now execute the image loader
-            val imageLoader = ExampleImageLoader.get()
-            imageLoader.load(url).into(listener)
-
-            onDispose {
-                // If we leave composition, cancel any pending requests
-                imageLoader.cancel(listener)
-            }
-        }
-
-        // Return the state-backed image property. Any callers of this function
-        // will be recomposed once the image finishes loading
-        return image
-    }
-}
-
-private object LibrariesSnippet5 {
-    /** Example suspending loadImage function */
-    suspend fun loadImage(url: String): ImageBitmap = TODO()
-
-    @Composable
-    fun fetchImage(url: String): ImageBitmap? {
-        // This holds our current image, and will be updated by the
-        // launchInComposition lambda below
-        var image by remember(url) { mutableStateOf<ImageBitmap?>(null) }
-
-        // LaunchedEffect will automatically launch a coroutine to execute
-        // the given block. If the `url` changes, any previously launched coroutine
-        // will be cancelled, and a new coroutine launched.
-        LaunchedEffect(url) {
-            image = loadImage(url)
-        }
-
-        // Return the state-backed image property
-        return image
-    }
-}
-
-private object LibrariesSnippet6 {
     @HiltViewModel
     class ExampleViewModel @Inject constructor(
         private val savedStateHandle: SavedStateHandle,
@@ -170,16 +106,14 @@ private object LibrariesSnippet6 {
     ) { /* ... */ }
 }
 
-private object LibrariesSnippet7 {
+private object LibrariesSnippet5 {
     @Composable
     fun MyApp() {
         NavHost(navController, startDestination = startRoute) {
             composable("example") { backStackEntry ->
                 // Creates a ViewModel from the current BackStackEntry
-                val exampleViewModel: ExampleViewModel =
-                    viewModel(
-                        HiltViewModelFactory(LocalContext.current, backStackEntry)
-                    )
+                // Available in the androidx.hilt:hilt-navigation-compose artifact
+                val exampleViewModel = hiltNavGraphViewModel<ExampleViewModel>()
                 ExampleScreen(exampleViewModel)
             }
             /* ... */
@@ -187,7 +121,22 @@ private object LibrariesSnippet7 {
     }
 }
 
-private object LibrariesSnippet8 {
+private object LibrariesSnippet6 {
+    @Composable
+    fun MyApp() {
+        NavHost(navController, startDestination = startRoute) {
+            navigation(startDestination = innerStartRoute, route = "Parent") {
+                // ...
+                composable("exampleWithRoute") { backStackEntry ->
+                    val parentViewModel = hiltNavGraphViewModel<ParentViewModel>("Parent")
+                    ExampleWithRouteScreen(parentViewModel)
+                }
+            }
+        }
+    }
+}
+
+private object LibrariesSnippet7 {
     @Composable
     fun MyExample(flow: Flow<PagingData<String>>) {
         val lazyPagingItems = flow.collectAsLazyPagingItems()
@@ -199,7 +148,7 @@ private object LibrariesSnippet8 {
     }
 }
 
-private object LibrariesSnippet9 {
+private object LibrariesSnippet8 {
     @Composable
     fun MyExample() {
         CoilImage(
@@ -249,18 +198,21 @@ private class ExampleRepository
 private annotation class HiltViewModel
 private annotation class Inject
 
+private class ParentViewModel : ViewModel()
 private class ExampleViewModel : ViewModel() {
     val exampleLiveData = MutableLiveData(" ")
 }
 
-private fun viewModel(factory: HiltViewModelFactory): ExampleViewModel {
-    TODO()
-}
-
-private class HiltViewModelFactory(context: Context, backStackEntry: NavBackStackEntry)
+private inline fun <reified VM : ViewModel> hiltNavGraphViewModel(): VM { TODO() }
+private inline fun <reified VM : ViewModel> hiltNavGraphViewModel(route: String): VM { TODO() }
 
 @Composable
 private fun ExampleScreen(vm: ExampleViewModel) {
+    TODO()
+}
+
+@Composable
+private fun ExampleWithRouteScreen(vm: ParentViewModel) {
     TODO()
 }
 
@@ -274,6 +226,7 @@ private fun CoilImage(
 }
 
 private val navController: NavHostController = TODO()
+private val innerStartRoute: String = TODO()
 private val startRoute: String = TODO()
 
 private class PagingData<T>
