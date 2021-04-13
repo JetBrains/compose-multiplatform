@@ -22,12 +22,16 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.activity.ComponentActivity
 import androidx.compose.foundation.gestures.detectTapGestures
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.snapshots.Snapshot
+import androidx.compose.ui.AbsoluteAlignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.OpenComposeView
 import androidx.compose.ui.composed
@@ -181,18 +185,20 @@ class AndroidPointerInputTest {
         var consumedDownPosition: Offset? = null
         rule.runOnUiThread {
             container.setContent {
-                Layout(
-                    {},
-                    Modifier
-                        .consumeDownGestureFilter {
-                            consumedDownPosition = it
-                        }
-                        .onGloballyPositioned {
-                            latch.countDown()
-                        }
-                ) { _, _ ->
-                    val sizePx = size.value
-                    layout(sizePx, sizePx) {}
+                Box(Modifier.fillMaxSize().wrapContentSize(align = AbsoluteAlignment.TopLeft)) {
+                    Layout(
+                        {},
+                        Modifier
+                            .consumeDownGestureFilter {
+                                consumedDownPosition = it
+                            }
+                            .onGloballyPositioned {
+                                latch.countDown()
+                            }
+                    ) { _, _ ->
+                        val sizePx = size.value
+                        layout(sizePx, sizePx) {}
+                    }
                 }
             }
         }
@@ -204,7 +210,6 @@ class AndroidPointerInputTest {
             size.value = 20
             // this call will synchronously mark the LayoutNode as needs remeasure
             Snapshot.sendApplyNotifications()
-            val androidComposeView = container.getChildAt(0) as AndroidComposeView
             val locationInWindow = IntArray(2).also {
                 container.getLocationInWindow(it)
             }
@@ -219,7 +224,7 @@ class AndroidPointerInputTest {
             )
 
             // we expect it to first remeasure and only then process
-            androidComposeView.dispatchTouchEvent(motionEvent)
+            findRootView(container).dispatchTouchEvent(motionEvent)
 
             assertThat(consumedDownPosition).isEqualTo(Offset(15f, 15f))
         }
