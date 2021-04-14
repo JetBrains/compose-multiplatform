@@ -20,7 +20,9 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.catalog.insets.navigationBarsPadding
+import androidx.compose.material.catalog.model.Component
 import androidx.compose.material.catalog.model.Example
+import androidx.compose.material.catalog.model.Theme
 import androidx.compose.material.catalog.ui.common.CatalogScaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -28,12 +30,20 @@ import androidx.compose.ui.Modifier
 
 @Composable
 fun Example(
+    component: Component,
     example: Example,
+    theme: Theme,
+    onThemeChange: (theme: Theme) -> Unit,
     onBackClick: () -> Unit
 ) {
     CatalogScaffold(
         topBarTitle = example.name,
         showBackNavigationIcon = true,
+        theme = theme,
+        guidelinesUrl = component.guidelinesUrl,
+        docsUrl = component.docsUrl,
+        sourceUrl = example.sourceUrl,
+        onThemeChange = onThemeChange,
         onBackClick = onBackClick
     ) { paddingValues ->
         Box(
