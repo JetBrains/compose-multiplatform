@@ -41,7 +41,7 @@ data class PieceData(val game: Game, val velocity: Float, val color: Color) {
     fun update(dt: Long) {
         if (clicked) return
         val delta = (dt / 1E8 * velocity).toFloat()
-        position = if (position < game.size.height) position + delta else 0f
+        position = if (position < game.size.second.value) position + delta else 0f
     }
 
     fun click() {
