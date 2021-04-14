@@ -79,6 +79,10 @@ class ModifierDeclarationDetector : Detector(), SourceCodeScanner {
             // Ignore functions that do not return Modifier or something implementing Modifier
             if (!returnType.inheritsFrom(Names.Ui.Modifier)) return
 
+            // Ignore ParentDataModifiers - this is a special type of Modifier where the type is
+            // used to provide data for use in layout, so we don't want to warn here.
+            if (returnType.inheritsFrom(Names.Ui.Layout.ParentDataModifier)) return
+
             val source = node.sourcePsi
 
             // If this node is a property that is a constructor parameter, ignore it.

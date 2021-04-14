@@ -87,9 +87,6 @@ object Stubs {
         """
         package androidx.compose.ui
 
-        import androidx.compose.ui.platform.InspectorInfo
-        import androidx.compose.ui.platform.InspectorValueInfo
-
         @Suppress("ModifierFactoryExtensionFunction")
         interface Modifier {
             infix fun then(other: Modifier): Modifier =
