@@ -34,6 +34,7 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.SmallTest
 import com.google.common.truth.Truth.assertThat
 import org.junit.Before
+import org.junit.Ignore
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -140,6 +141,7 @@ class KeyEventToFocusDirectionTest {
         assertThat(focusDirection).isEqualTo(In)
     }
 
+    @Ignore("Disabled due to b/185211677")
     @Test
     fun back_out() {
         // Arrange.
