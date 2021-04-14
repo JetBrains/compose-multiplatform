@@ -159,21 +159,25 @@ internal class TextFieldDelegate {
                 return
             }
 
-            val bbox = if (value.selection.max < value.text.length) {
-                textLayoutResult.getBoundingBox(
-                    offsetMapping.originalToTransformed(value.selection.max)
-                )
-            } else if (value.selection.max != 0) {
-                textLayoutResult.getBoundingBox(
-                    offsetMapping.originalToTransformed(value.selection.max) - 1
-                )
-            } else {
-                val defaultSize = computeSizeForDefaultText(
-                    textDelegate.style,
-                    textDelegate.density,
-                    textDelegate.resourceLoader
-                )
-                Rect(0f, 0f, 1.0f, defaultSize.height.toFloat())
+            val bbox = when {
+                value.selection.max < value.text.length -> {
+                    textLayoutResult.getBoundingBox(
+                        offsetMapping.originalToTransformed(value.selection.max)
+                    )
+                }
+                value.selection.max != 0 -> {
+                    textLayoutResult.getBoundingBox(
+                        offsetMapping.originalToTransformed(value.selection.max) - 1
+                    )
+                }
+                else -> {
+                    val defaultSize = computeSizeForDefaultText(
+                        textDelegate.style,
+                        textDelegate.density,
+                        textDelegate.resourceLoader
+                    )
+                    Rect(0f, 0f, 1.0f, defaultSize.height.toFloat())
+                }
             }
             val globalLT = layoutCoordinates.localToRoot(Offset(bbox.left, bbox.top))
 

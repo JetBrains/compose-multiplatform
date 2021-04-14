@@ -223,9 +223,9 @@ class TextFieldTest {
         BasicTextField(
             value = state.value,
             modifier = Modifier.fillMaxSize(),
-            onValueChange = {
-                if (it.all { it.isDigit() }) {
-                    state.value = it
+            onValueChange = { value ->
+                if (value.all { it.isDigit() }) {
+                    state.value = value
                 }
             }
         )

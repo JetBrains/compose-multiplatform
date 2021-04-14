@@ -48,7 +48,7 @@ import org.junit.runner.RunWith
 @SmallTest
 class AndroidTypefaceTest {
 
-    val context = InstrumentationRegistry.getInstrumentation().targetContext
+    val context = InstrumentationRegistry.getInstrumentation().targetContext!!
 
     private fun androidTypefaceFromFontFamily(
         context: Context,

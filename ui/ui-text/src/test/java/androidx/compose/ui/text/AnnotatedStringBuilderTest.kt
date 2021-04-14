@@ -149,12 +149,12 @@ class AnnotatedStringBuilderTest {
 
         val expectedString = "$text$appendedText"
         val expectedSpanStyles = listOf(
-            Range<SpanStyle>(
+            Range(
                 item = SpanStyle(color),
                 start = 0,
                 end = text.length
             ),
-            Range<SpanStyle>(
+            Range(
                 item = SpanStyle(appendedColor),
                 start = text.length,
                 end = expectedString.length
@@ -162,12 +162,12 @@ class AnnotatedStringBuilderTest {
         )
 
         val expectedParagraphStyles = listOf(
-            Range<ParagraphStyle>(
+            Range(
                 item = ParagraphStyle(lineHeight = lineHeight),
                 start = 0,
                 end = text.length
             ),
-            Range<ParagraphStyle>(
+            Range(
                 item = ParagraphStyle(lineHeight = appendedLineHeight),
                 start = text.length,
                 end = expectedString.length
@@ -452,7 +452,7 @@ class AnnotatedStringBuilderTest {
 
         assertThat(buildResult.paragraphStyles).isEmpty()
         assertThat(buildResult.spanStyles).isEqualTo(
-            listOf(Range<SpanStyle>(style, 0, buildResult.length))
+            listOf(Range(style, 0, buildResult.length))
         )
     }
 
@@ -468,7 +468,7 @@ class AnnotatedStringBuilderTest {
 
         assertThat(buildResult.spanStyles).isEmpty()
         assertThat(buildResult.paragraphStyles).isEqualTo(
-            listOf(Range<ParagraphStyle>(style, 0, buildResult.length))
+            listOf(Range(style, 0, buildResult.length))
         )
     }
 
@@ -507,12 +507,12 @@ class AnnotatedStringBuilderTest {
 
         val expectedString = "$text1 $text2"
         val expectedSpanStyles = listOf(
-            Range<SpanStyle>(spanStyle1, 0, text1.length),
-            Range<SpanStyle>(spanStyle2, text1.length + 1, expectedString.length)
+            Range(spanStyle1, 0, text1.length),
+            Range(spanStyle2, text1.length + 1, expectedString.length)
         )
         val expectedParagraphStyles = listOf(
-            Range<ParagraphStyle>(paragraphStyle1, 0, text1.length),
-            Range<ParagraphStyle>(paragraphStyle2, text1.length + 1, expectedString.length)
+            Range(paragraphStyle1, 0, text1.length),
+            Range(paragraphStyle2, text1.length + 1, expectedString.length)
         )
 
         assertThat(buildResult.text).isEqualTo(expectedString)
@@ -777,14 +777,14 @@ class AnnotatedStringBuilderTest {
         return AnnotatedString(
             text = text,
             spanStyles = listOf(
-                Range<SpanStyle>(
+                Range(
                     item = SpanStyle(color),
                     start = 0,
                     end = text.length
                 )
             ),
             paragraphStyles = listOf(
-                Range<ParagraphStyle>(
+                Range(
                     item = ParagraphStyle(lineHeight = lineHeight),
                     start = 0,
                     end = text.length

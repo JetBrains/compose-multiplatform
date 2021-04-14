@@ -224,11 +224,7 @@ class SelectionHandlesTest {
 @Suppress("DEPRECATION")
 // We only need this because IR compiler doesn't like converting lambdas to Runnables
 private fun androidx.test.rule.ActivityTestRule<*>.runOnUiThreadIR(block: () -> Unit) {
-    val runnable: Runnable = object : Runnable {
-        override fun run() {
-            block()
-        }
-    }
+    val runnable = Runnable { block() }
     runOnUiThread(runnable)
 }
 
@@ -306,11 +302,9 @@ fun androidx.test.rule.ActivityTestRule<*>.waitAndScreenShot(
     srcRect.offset(offset[0], offset[1])
     val latch = CountDownLatch(1)
     var copyResult = 0
-    val onCopyFinished = object : PixelCopy.OnPixelCopyFinishedListener {
-        override fun onPixelCopyFinished(result: Int) {
-            copyResult = result
-            latch.countDown()
-        }
+    val onCopyFinished = PixelCopy.OnPixelCopyFinishedListener { result ->
+        copyResult = result
+        latch.countDown()
     }
     PixelCopy.request(activity.window, srcRect, dest, onCopyFinished, handler!!)
     assertTrue("Pixel copy latch timed out", latch.await(1, TimeUnit.SECONDS))

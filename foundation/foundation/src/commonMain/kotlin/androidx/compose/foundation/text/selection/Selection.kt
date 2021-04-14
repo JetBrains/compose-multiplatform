@@ -71,8 +71,11 @@ internal data class Selection(
         if (other == null) return this
 
         var selection = this
-        if (handlesCrossed) selection = selection.copy(start = other.start)
-        else selection = selection.copy(end = other.end)
+        selection = if (handlesCrossed) {
+            selection.copy(start = other.start)
+        } else {
+            selection.copy(end = other.end)
+        }
 
         return selection
     }

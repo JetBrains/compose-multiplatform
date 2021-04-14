@@ -83,7 +83,7 @@ class KeyboardActionsTest(private val imeAction: ImeAction) {
         rule.onNodeWithTag(initialTextField).performImeAction()
 
         // Assert.
-        actionTriggerLog.forEach { action, triggered ->
+        actionTriggerLog.forEach { (action, triggered) ->
             when (action) {
                 imeAction -> assertThat(triggered).isTrue()
                 else -> assertThat(triggered).isFalse()

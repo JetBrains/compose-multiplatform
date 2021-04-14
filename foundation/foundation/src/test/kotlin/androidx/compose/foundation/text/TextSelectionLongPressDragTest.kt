@@ -64,7 +64,7 @@ class TextSelectionLongPressDragTest {
     fun setup() {
         selectionRegistrar.subscribe(selectable)
 
-        layoutCoordinates = mock<LayoutCoordinates> {
+        layoutCoordinates = mock {
             on { isAttached } doReturn true
         }
 

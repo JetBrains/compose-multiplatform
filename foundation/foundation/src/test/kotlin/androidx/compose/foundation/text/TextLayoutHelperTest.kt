@@ -14,8 +14,12 @@
  * limitations under the License.
  */
 
-package androidx.compose.ui.text
+package androidx.compose.foundation.text
 
+import androidx.compose.ui.text.AnnotatedString
+import androidx.compose.ui.text.TextLayoutInput
+import androidx.compose.ui.text.TextLayoutResult
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.Constraints

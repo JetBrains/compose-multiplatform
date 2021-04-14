@@ -707,6 +707,9 @@ package androidx.compose.foundation.text {
   public final class TextFieldSizeKt {
   }
 
+  public final class TextLayoutHelperKt {
+  }
+
   public final class TextLayoutResultProxyKt {
   }
 
@@ -767,13 +770,6 @@ package androidx.compose.foundation.text.selection {
   }
 
   public final class TextSelectionMouseDetectorKt {
-  }
-
-}
-
-package androidx.compose.ui.text {
-
-  public final class TextLayoutHelperKt {
   }
 
 }
