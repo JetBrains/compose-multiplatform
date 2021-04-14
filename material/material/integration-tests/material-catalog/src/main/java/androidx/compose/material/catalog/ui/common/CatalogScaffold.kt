@@ -17,35 +17,74 @@
 package androidx.compose.material.catalog.ui.common
 
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.material.ExperimentalMaterialApi
+import androidx.compose.material.ModalBottomSheetLayout
+import androidx.compose.material.ModalBottomSheetValue
 import androidx.compose.material.Scaffold
-import androidx.compose.material.catalog.util.DOCS_URL
-import androidx.compose.material.catalog.util.GUIDELINES_URL
-import androidx.compose.material.catalog.util.ISSUE_URL
-import androidx.compose.material.catalog.util.SOURCE_URL
+import androidx.compose.material.catalog.model.Theme
+import androidx.compose.material.catalog.ui.theme.ThemePicker
+import androidx.compose.material.catalog.util.DocsUrl
+import androidx.compose.material.catalog.util.GuidelinesUrl
+import androidx.compose.material.catalog.util.IssueUrl
+import androidx.compose.material.catalog.util.SourceUrl
 import androidx.compose.material.catalog.util.openUrl
+import androidx.compose.material.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import kotlinx.coroutines.launch
 
+@OptIn(ExperimentalMaterialApi::class)
 @Composable
 fun CatalogScaffold(
     topBarTitle: String,
     showBackNavigationIcon: Boolean = false,
+    theme: Theme,
+    guidelinesUrl: String = GuidelinesUrl,
+    docsUrl: String = DocsUrl,
+    sourceUrl: String = SourceUrl,
+    issueUrl: String = IssueUrl,
+    onThemeChange: (theme: Theme) -> Unit,
     onBackClick: () -> Unit = {},
     content: @Composable (PaddingValues) -> Unit
 ) {
-    val context = LocalContext.current
-    Scaffold(
-        topBar = {
-            CatalogTopAppBar(
-                title = topBarTitle,
-                showBackNavigationIcon = showBackNavigationIcon,
-                onBackClick = onBackClick,
-                onGuidelinesClick = { context.openUrl(GUIDELINES_URL) },
-                onDocsClick = { context.openUrl(DOCS_URL) },
-                onSourceClick = { context.openUrl(SOURCE_URL) },
-                onIssueClick = { context.openUrl(ISSUE_URL) }
+    val coroutineScope = rememberCoroutineScope()
+    val sheetState = rememberModalBottomSheetState(ModalBottomSheetValue.Hidden)
+    ModalBottomSheetLayout(
+        sheetState = sheetState,
+        sheetContent = {
+            ThemePicker(
+                theme = theme,
+                onThemeChange = { theme ->
+                    coroutineScope.launch {
+                        sheetState.hide()
+                        onThemeChange(theme)
+                    }
+                }
             )
         },
-        content = content
-    )
+        // Default scrim color is onSurface which is incorrect in dark theme
+        // https://issuetracker.google.com/issues/183697056
+        scrimColor = SheetScrimColor
+    ) {
+        val context = LocalContext.current
+        Scaffold(
+            topBar = {
+                CatalogTopAppBar(
+                    title = topBarTitle,
+                    showBackNavigationIcon = showBackNavigationIcon,
+                    onBackClick = onBackClick,
+                    onThemeClick = { coroutineScope.launch { sheetState.show() } },
+                    onGuidelinesClick = { context.openUrl(guidelinesUrl) },
+                    onDocsClick = { context.openUrl(docsUrl) },
+                    onSourceClick = { context.openUrl(sourceUrl) },
+                    onIssueClick = { context.openUrl(issueUrl) }
+                )
+            },
+            content = content
+        )
+    }
 }
+
+private val SheetScrimColor = Color.Black.copy(alpha = 0.32f)

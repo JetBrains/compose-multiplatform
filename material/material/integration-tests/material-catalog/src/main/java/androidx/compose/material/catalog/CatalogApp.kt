@@ -17,14 +17,24 @@
 package androidx.compose.material.catalog
 
 import androidx.compose.material.catalog.insets.ProvideWindowInsets
+import androidx.compose.material.catalog.model.Theme
+import androidx.compose.material.catalog.model.ThemeSaver
 import androidx.compose.material.catalog.ui.theme.CatalogTheme
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 
 @Composable
 fun CatalogApp() {
     ProvideWindowInsets {
-        CatalogTheme {
-            NavGraph()
+        var theme by rememberSaveable(stateSaver = ThemeSaver) { mutableStateOf(Theme()) }
+        CatalogTheme(theme = theme) {
+            NavGraph(
+                theme = theme,
+                onThemeChange = { theme = it }
+            )
         }
     }
 }
