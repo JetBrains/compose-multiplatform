@@ -27,6 +27,6 @@
         <!-- enable profileableByShell for non-intrusive profiling tools -->
         <!--suppress AndroidElementNotAllowed -->
         <profileable android:shell="true"/>
-        <activity android:name="androidx.compose.ui.input.pointer.TestActivity" />
+        <activity android:name="androidx.compose.ui.benchmark.input.pointer.TestActivity" />
     </application>
 </manifest>

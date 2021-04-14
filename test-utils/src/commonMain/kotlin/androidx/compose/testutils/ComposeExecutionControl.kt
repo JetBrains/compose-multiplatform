@@ -16,6 +16,8 @@
 
 package androidx.compose.testutils
 
+import android.view.View
+
 /**
  * Test scope accessible from execution controlled tests to test compose.
  */
@@ -89,6 +91,8 @@ interface ComposeExecutionControl {
      * Note this is also called as part of [doFrame]
      */
     fun recompose()
+
+    fun getHostView(): View
 }
 
 /**
