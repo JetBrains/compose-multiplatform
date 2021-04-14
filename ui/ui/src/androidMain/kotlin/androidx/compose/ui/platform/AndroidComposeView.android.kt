@@ -67,7 +67,6 @@ import androidx.compose.ui.graphics.Canvas
 import androidx.compose.ui.graphics.CanvasHolder
 import androidx.compose.ui.hapticfeedback.AndroidHapticFeedback
 import androidx.compose.ui.hapticfeedback.HapticFeedback
-import androidx.compose.ui.input.key.Key.Companion.Back
 import androidx.compose.ui.input.key.Key.Companion.DirectionCenter
 import androidx.compose.ui.input.key.Key.Companion.DirectionDown
 import androidx.compose.ui.input.key.Key.Companion.DirectionLeft
@@ -640,7 +639,11 @@ internal class AndroidComposeView(context: Context) :
             DirectionUp -> Up
             DirectionDown -> Down
             DirectionCenter -> In
-            Back -> Out
+            // TODO(b/183746743): Enable Back after fixing issue with DemoTests (b/185211677).
+            // If we use the back button to clear focus, then the demo tests need two Back
+            // events when an item is focused. Either remove initial focus from the affected
+            // Demos or call clearFocus() before sending the Back key event.
+            // Back -> Out
             else -> null
         }
     }
