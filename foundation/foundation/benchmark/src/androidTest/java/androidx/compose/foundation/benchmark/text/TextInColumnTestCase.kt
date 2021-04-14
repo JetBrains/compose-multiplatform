@@ -40,7 +40,7 @@ class TextInColumnTestCase(
     private val texts: List<AnnotatedString>,
     private val width: Dp,
     private val fontSize: TextUnit
-) : LayeredComposeTestCase, ToggleableTestCase {
+) : LayeredComposeTestCase(), ToggleableTestCase {
 
     private val color = mutableStateOf(Color.Black)
 
