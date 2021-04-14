@@ -43,6 +43,33 @@ class ModifierDeclarationDetectorTest : LintDetectorTest() {
             ModifierDeclarationDetector.ModifierFactoryUnreferencedReceiver
         )
 
+    // Simplified Density.kt stubs
+    private val DensityStub = kotlin(
+        """
+            package androidx.compose.ui.unit
+
+            interface Density
+        """
+    )
+
+    // Simplified ParentDataModifier.kt / Measurable.kt merged stubs
+    private val MeasurableAndParentDataModifierStub = kotlin(
+        """
+            package androidx.compose.ui.layout
+
+            import androidx.compose.ui.Modifier
+            import androidx.compose.ui.unit.Density
+
+            interface ParentDataModifier : Modifier.Element {
+                fun Density.modifyParentData(parentData: Any?): Any?
+            }
+
+            interface Measurable {
+                val parentData: Any?
+            }
+        """
+    )
+
     @Test
     fun functionReturnsModifierElement() {
         lint().files(
@@ -627,6 +654,32 @@ src/androidx/compose/ui/foo/TestModifier.kt:34: Error: Modifier factory function
 7 errors, 1 warnings
             """
             )
+    }
+
+    @Test
+    fun ignoresParentDataModifiers() {
+        lint().files(
+            kotlin(
+                """
+                package androidx.compose.ui.foo
+
+                import androidx.compose.ui.layout.Measurable
+                import androidx.compose.ui.layout.ParentDataModifier
+                import androidx.compose.ui.unit.Density
+
+                private val Measurable.boxChildData: FooData? get() = parentData as? FooData
+
+                private class FooData(var boolean: Boolean) : ParentDataModifier {
+                    override fun Density.modifyParentData(parentData: Any?) = this
+                }
+            """
+            ),
+            kotlin(Stubs.Modifier),
+            DensityStub,
+            MeasurableAndParentDataModifierStub
+        )
+            .run()
+            .expectClean()
     }
 
     @Test
