@@ -9,7 +9,7 @@ plugins {
 
 fun properties(key: String) = project.findProperty(key).toString()
 
-group = "org.jetbrains.compose.desktop.ide.preview"
+group = "org.jetbrains.compose.desktop.ide"
 version = properties("deploy.version")
 
 repositories {
@@ -18,7 +18,7 @@ repositories {
 }
 
 intellij {
-    pluginName = "Compose Desktop Preview"
+    pluginName = "Compose for Desktop IDE Support"
     type = "IC"
     downloadSources = true
     updateSinceUntilBuild = true
@@ -31,6 +31,11 @@ intellij {
     )
 }
 
+tasks.buildSearchableOptions {
+    // temporary workaround
+    enabled = false
+}
+
 tasks {
     // Set the compatibility versions to 1.8
     withType<JavaCompile> {
@@ -39,5 +44,10 @@ tasks {
     }
     withType<KotlinJvmCompile> {
         kotlinOptions.jvmTarget = "1.8"
+    }
+
+    publishPlugin {
+        token(System.getenv("IDE_PLUGIN_PUBLISH_TOKEN"))
+        channels("Alpha")
     }
 }

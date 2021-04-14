@@ -1,20 +1,31 @@
 <idea-plugin>
-    <id>org.jetbrains.compose.desktop.idea.preview</id>
-    <name>Compose Desktop Preview</name>
+    <id>org.jetbrains.compose.desktop.ide</id>
+    <name>Compose for Desktop IDE Support</name>
     <vendor>JetBrains</vendor>
+    <description>
+        <![CDATA[
+        IDE support for developing
+        <a href="https://www.jetbrains.com/lp/compose/">Compose for Desktop</a>
+        applications.
+        The main feature at the moment is IDE preview of composable functions
+        marked by @Preview annotation.
+        ]]>
+
+    </description>
 
     <!-- Product and plugin compatibility requirements -->
     <!-- https://plugins.jetbrains.com/docs/intellij/plugin-compatibility.html -->
     <depends>com.intellij.modules.platform</depends>
+    <depends>com.intellij.modules.java</depends>
     <depends>com.intellij.gradle</depends>
     <depends>org.jetbrains.kotlin</depends>
 
     <extensions defaultExtensionNs="com.intellij">
         <runLineMarkerContributor
                 language="kotlin"
-                implementationClass="org.jetbrains.compose.desktop.idea.preview.PreviewRunLineMarkerContributor"/>
+                implementationClass="org.jetbrains.compose.desktop.ide.preview.PreviewRunLineMarkerContributor"/>
         <runConfigurationProducer
-                implementation="org.jetbrains.compose.desktop.idea.preview.PreviewRunConfigurationProducer"/>
-        <deadCode implementation="org.jetbrains.compose.desktop.idea.preview.PreviewEntryPoint" />
+                implementation="org.jetbrains.compose.desktop.ide.preview.PreviewRunConfigurationProducer"/>
+        <deadCode implementation="org.jetbrains.compose.desktop.ide.preview.PreviewEntryPoint" />
     </extensions>
 </idea-plugin>

@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.jetbrains.compose.desktop.idea.preview
+package org.jetbrains.compose.desktop.ide.preview
 
 import com.intellij.psi.util.parentOfType
 import org.jetbrains.kotlin.asJava.findFacadeClass

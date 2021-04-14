@@ -3,7 +3,7 @@
  * Use of this source code is governed by the Apache 2.0 license that can be found in the LICENSE.txt file.
  */
 
-package org.jetbrains.compose.desktop.idea.preview
+package org.jetbrains.compose.desktop.ide.preview
 
 internal object PreviewMessages {
     fun runPreview(name: String): String = "Preview $name"
