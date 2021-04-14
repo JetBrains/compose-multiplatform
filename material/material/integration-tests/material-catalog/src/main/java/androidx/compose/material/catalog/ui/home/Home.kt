@@ -43,7 +43,7 @@ fun Home(
     onComponentClick: (component: Component) -> Unit
 ) {
     CatalogScaffold(
-        topBarTitle = stringResource(id = R.string.material_components),
+        topBarTitle = stringResource(id = R.string.compose_material),
         theme = theme,
         onThemeChange = onThemeChange
     ) { paddingValues ->
