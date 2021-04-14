@@ -16,31 +16,25 @@
 
 package androidx.compose.ui.benchmark.input.pointer
 
-import android.view.View
-import android.view.ViewGroup
-import androidx.activity.compose.setContent
-import androidx.benchmark.junit4.BenchmarkRule
-import androidx.benchmark.junit4.measureRepeated
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.requiredHeight
 import androidx.compose.foundation.text.BasicText
 import androidx.compose.runtime.Composable
+import androidx.compose.testutils.ComposeTestCase
+import androidx.compose.testutils.benchmark.ComposeBenchmarkRule
+import androidx.compose.testutils.doFramesUntilNoChangesPending
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.dp
-import androidx.test.annotation.UiThreadTest
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.LargeTest
 import com.google.common.truth.Truth.assertThat
-import org.junit.Assert
-import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
-import java.util.concurrent.TimeUnit
 
 /**
  * Benchmark for simply tapping on an item in Compose.
@@ -68,43 +62,9 @@ import java.util.concurrent.TimeUnit
 @RunWith(AndroidJUnit4::class)
 class ComposeTapIntegrationBenchmark {
 
-    private lateinit var rootView: View
-    private lateinit var expectedLabel: String
-
-    private var itemHeightDp = 0.dp // Is set to correct value during composition.
-    private var actualClickCount = 0
-    private var expectedClickCount = 0
-
     @get:Rule
-    val benchmarkRule = BenchmarkRule()
+    val benchmarkRule = ComposeBenchmarkRule()
 
-    @Suppress("DEPRECATION")
-    @get:Rule
-    val activityTestRule = androidx.test.rule.ActivityTestRule(TestActivity::class.java)
-
-    @Before
-    fun setup() {
-        val activity = activityTestRule.activity
-        Assert.assertTrue(
-            "timed out waiting for activity focus",
-            activity.hasFocusLatch.await(5, TimeUnit.SECONDS)
-        )
-
-        rootView = activity.findViewById<ViewGroup>(android.R.id.content)
-
-        activityTestRule.runOnUiThread {
-            activity.setContent {
-                with(LocalDensity.current) {
-                    itemHeightDp = ItemHeightPx.toDp()
-                }
-                App()
-            }
-        }
-    }
-
-    // This test requires more hit test processing so changes to hit testing will be tracked more
-    // by this test.
-    @UiThreadTest
     @Test
     fun clickOnLateItem() {
         // As items that are laid out last are hit tested first (so z order is respected), item
@@ -113,7 +73,6 @@ class ComposeTapIntegrationBenchmark {
     }
 
     // This test requires less hit testing so changes to dispatch will be tracked more by this test.
-    @UiThreadTest
     @Test
     fun clickOnEarlyItemFyi() {
         // As items that are laid out last are hit tested first (so z order is respected), item
@@ -123,68 +82,84 @@ class ComposeTapIntegrationBenchmark {
     }
 
     private fun clickOnItem(item: Int, expectedLabel: String) {
-
-        this.expectedLabel = expectedLabel
-
         // half height of an item + top of the chosen item = middle of the chosen item
         val y = (ItemHeightPx / 2) + (item * ItemHeightPx)
 
-        val down = MotionEvent(
-            0,
-            android.view.MotionEvent.ACTION_DOWN,
-            1,
-            0,
-            arrayOf(PointerProperties(0)),
-            arrayOf(PointerCoords(0f, y)),
-            rootView
-        )
+        benchmarkRule.runBenchmarkFor({ ComposeTapTestCase() }) {
+            doFramesUntilNoChangesPending()
 
-        val up = MotionEvent(
-            10,
-            android.view.MotionEvent.ACTION_UP,
-            1,
-            0,
-            arrayOf(PointerProperties(0)),
-            arrayOf(PointerCoords(0f, y)),
-            rootView
-        )
+            val case = getTestCase()
+            case.expectedLabel = expectedLabel
 
-        benchmarkRule.measureRepeated {
-            rootView.dispatchTouchEvent(down)
-            rootView.dispatchTouchEvent(up)
-            expectedClickCount++
-        }
+            val rootView = getHostView()
 
-        assertThat(actualClickCount).isEqualTo(expectedClickCount)
-    }
+            val down = MotionEvent(
+                0,
+                android.view.MotionEvent.ACTION_DOWN,
+                1,
+                0,
+                arrayOf(PointerProperties(0)),
+                arrayOf(PointerCoords(0f, y)),
+                rootView
+            )
 
-    @Composable
-    fun App() {
-        EmailList(NumItems)
-    }
+            val up = MotionEvent(
+                10,
+                android.view.MotionEvent.ACTION_UP,
+                1,
+                0,
+                arrayOf(PointerProperties(0)),
+                arrayOf(PointerCoords(0f, y)),
+                rootView
+            )
 
-    @Composable
-    fun EmailList(count: Int) {
-        Column {
-            repeat(count) { i ->
-                Email("$i")
+            benchmarkRule.measureRepeated {
+                rootView.dispatchTouchEvent(down)
+                rootView.dispatchTouchEvent(up)
+                case.expectedClickCount++
+                assertThat(case.actualClickCount).isEqualTo(case.expectedClickCount)
             }
         }
     }
 
-    @Composable
-    fun Email(label: String) {
-        BasicText(
-            text = label,
-            modifier = Modifier
-                .pointerInput(label) {
-                    detectTapGestures {
-                        assertThat(label).isEqualTo(expectedLabel)
-                        actualClickCount++
-                    }
+    private class ComposeTapTestCase : ComposeTestCase {
+        private var itemHeightDp = 0.dp // Is set to correct value during composition.
+        var actualClickCount = 0
+        var expectedClickCount = 0
+        lateinit var expectedLabel: String
+
+        @Composable
+        override fun Content() {
+            with(LocalDensity.current) {
+                itemHeightDp = ItemHeightPx.toDp()
+            }
+
+            EmailList(NumItems)
+        }
+
+        @Composable
+        fun EmailList(count: Int) {
+            Column {
+                repeat(count) { i ->
+                    Email("$i")
                 }
-                .fillMaxWidth()
-                .requiredHeight(itemHeightDp)
-        )
+            }
+        }
+
+        @Composable
+        fun Email(label: String) {
+            BasicText(
+                text = label,
+                modifier = Modifier
+                    .pointerInput(label) {
+                        detectTapGestures {
+                            assertThat(label).isEqualTo(expectedLabel)
+                            actualClickCount++
+                        }
+                    }
+                    .fillMaxWidth()
+                    .requiredHeight(itemHeightDp)
+            )
+        }
     }
 }
