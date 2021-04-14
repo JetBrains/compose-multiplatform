@@ -544,6 +544,16 @@ interface Composer {
     /**
      * A Compose compiler plugin API. DO NOT call directly.
      *
+     * Start a group that tracks a the code that will create or update a node that is generated
+     * as part of the tree implied by the composition. A reusable node can be reused in a
+     * reusable group even if the group key is changed.
+     */
+    @ComposeCompilerApi
+    fun startReusableNode()
+
+    /**
+     * A Compose compiler plugin API. DO NOT call directly.
+     *
      * Report the [factory] that will be used to create the node that will be generated into the
      * tree implied by the composition. This will only be called if [inserting] is is `true`.
      *
@@ -569,6 +579,48 @@ interface Composer {
      */
     @ComposeCompilerApi
     fun endNode()
+
+    /**
+     * A Compose compiler plugin API. DO NOT call directly.
+     *
+     * Start a reuse group. Unlike a movable group, in a reuse group if the [dataKey] changes
+     * the composition shifts into a reusing state cause the composer to act like it is
+     * inserting (e.g. [cache] acts as if all values are invalid, [changed] always returns
+     * true, etc.) even though it is recomposing until it encounters a reusable node. If the
+     * node is reusable it temporarily shifts into recomposition for the node and then shifts
+     * back to reusing for the children.  If a non-reusable node is generated the composer
+     * shifts to inserting for the node and all of its children.
+     *
+     * @param key An compiler generated key based on the source location of the call.
+     * @param dataKey A key provided by the [ReusableContent] composable function that is used to
+     * determine if the composition shifts into a reusing state for this group.
+     */
+    @ComposeCompilerApi
+    fun startReusableGroup(key: Int, dataKey: Any?)
+
+    /**
+     * A Compose compiler plugin API. DO NOT call directly.
+     *
+     * Called at the end of a reusable group.
+     */
+    @ComposeCompilerApi
+    fun endReusableGroup()
+
+    /**
+     * A Compose compiler plugin API. DO NOT call directly.
+     *
+     * Temporarily disable reusing if it is enabled.
+     */
+    @ComposeCompilerApi
+    fun disableReusing()
+
+    /**
+     * A Compose compiler plugin API. DO NOT call directly.
+     *
+     * Reenable reusing if it was previously enabled before the last call to [disableReusing].
+     */
+    @ComposeCompilerApi
+    fun enableReusing()
 
     /**
      * A Compose compiler plugin API. DO NOT call directly.
@@ -951,6 +1003,8 @@ internal class ComposerImpl(
     private val providerUpdates = HashMap<Int, CompositionLocalMap>()
     private var providersInvalid = false
     private val providersInvalidStack = IntStack()
+    private var reusing = false
+    private var reusingGroup = -1
     private var childrenComposing: Int = 0
     private var snapshot = currentSnapshot()
 
@@ -1173,7 +1227,7 @@ internal class ComposerImpl(
      */
     @ComposeCompilerApi
     override val skipping: Boolean get() {
-        return !inserting &&
+        return !inserting && !reusing &&
             !providersInvalid &&
             currentRecomposeScope?.requiresRecompose == false
     }
@@ -1336,6 +1390,16 @@ internal class ComposerImpl(
      * is scheduled to be inserted at the current location.
      */
     override fun startNode() {
+        val key = if (inserting) nodeKey
+        else if (reusing)
+            if (reader.groupKey == nodeKey) nodeKeyReplace else nodeKey
+        else if (reader.groupKey == nodeKeyReplace) nodeKeyReplace
+        else nodeKey
+        start(key, null, true, null)
+        nodeExpected = true
+    }
+
+    override fun startReusableNode() {
         start(nodeKey, null, true, null)
         nodeExpected = true
     }
@@ -1383,6 +1447,31 @@ internal class ComposerImpl(
      */
     override fun endNode() = end(isNode = true)
 
+    override fun startReusableGroup(key: Int, dataKey: Any?) {
+        if (reader.groupKey == key && reader.groupAux != dataKey && reusingGroup < 0) {
+            // Starting to reuse nodes
+            reusingGroup = reader.currentGroup
+            reusing = true
+        }
+        start(key, null, false, dataKey)
+    }
+
+    override fun endReusableGroup() {
+        if (reusing && reader.parent == reusingGroup) {
+            reusingGroup = -1
+            reusing = false
+        }
+        end(isNode = false)
+    }
+
+    override fun disableReusing() {
+        reusing = false
+    }
+
+    override fun enableReusing() {
+        reusing = reusingGroup >= 0
+    }
+
     /**
      * Schedule a change to be applied to a node's property. This change will be applied to the
      * node that is the current node in the tree which was either created by [createNode].
@@ -1413,7 +1502,7 @@ internal class ComposerImpl(
     internal fun nextSlot(): Any? = if (inserting) {
         validateNodeNotExpected()
         Composer.Empty
-    } else reader.next()
+    } else reader.next().let { if (reusing) Composer.Empty else it }
 
     /**
      * Determine if the current slot table value is equal to the given value, if true, the value
@@ -1785,7 +1874,7 @@ internal class ComposerImpl(
     private fun start(key: Int, objectKey: Any?, isNode: Boolean, data: Any?) {
         validateNodeNotExpected()
 
-        updateCompoundKeyWhenWeEnterGroup(key, objectKey)
+        updateCompoundKeyWhenWeEnterGroup(key, objectKey, data)
 
         // Check for the insert fast path. If we are already inserting (creating nodes) then
         // there is no need to track insert, deletes and moves with a pending changes object.
@@ -1923,10 +2012,18 @@ internal class ComposerImpl(
 
         if (inserting) {
             val parent = writer.parent
-            updateCompoundKeyWhenWeExitGroup(writer.groupKey(parent), writer.groupObjectKey(parent))
+            updateCompoundKeyWhenWeExitGroup(
+                writer.groupKey(parent),
+                writer.groupObjectKey(parent),
+                writer.groupAux(parent)
+            )
         } else {
             val parent = reader.parent
-            updateCompoundKeyWhenWeExitGroup(reader.groupKey(parent), reader.groupObjectKey(parent))
+            updateCompoundKeyWhenWeExitGroup(
+                reader.groupKey(parent),
+                reader.groupObjectKey(parent),
+                reader.groupAux(parent)
+            )
         }
         var expectedNodeCount = groupNodeCount
         val pending = pending
@@ -2310,12 +2407,16 @@ internal class ComposerImpl(
                 recomposeGroup,
                 recomposeKey
             ) rol 3
-            ) xor (
-            if (reader.hasObjectKey(group))
-                reader.groupObjectKey(group)?.hashCode() ?: 0
-            else reader.groupKey(group)
-            )
+            ) xor reader.groupCompoundKeyPart(group)
     }
+
+    private fun SlotReader.groupCompoundKeyPart(group: Int) =
+        if (hasObjectKey(group)) groupObjectKey(group)?.hashCode() ?: 0
+        else groupKey(group).let {
+            if (it == reusingGroup) groupAux(group)?.let { aux ->
+                if (aux == Composer.Empty) it else aux.hashCode()
+            } ?: it else it
+        }
 
     internal fun invalidateForResult(scope: RecomposeScopeImpl): InvalidationResult {
         if (scope.defaultsInScope) {
@@ -2369,11 +2470,12 @@ internal class ComposerImpl(
             val reader = reader
             val key = reader.groupKey
             val dataKey = reader.groupObjectKey
-            updateCompoundKeyWhenWeEnterGroup(key, dataKey)
+            val aux = reader.groupAux
+            updateCompoundKeyWhenWeEnterGroup(key, dataKey, aux)
             startReaderGroup(reader.isNode, null)
             recomposeToGroupEnd()
             reader.endGroup()
-            updateCompoundKeyWhenWeExitGroup(key, dataKey)
+            updateCompoundKeyWhenWeExitGroup(key, dataKey, aux)
         }
     }
 
@@ -2962,9 +3064,12 @@ internal class ComposerImpl(
         }
     }
 
-    private fun updateCompoundKeyWhenWeEnterGroup(groupKey: Int, dataKey: Any?) {
+    private fun updateCompoundKeyWhenWeEnterGroup(groupKey: Int, dataKey: Any?, data: Any?) {
         if (dataKey == null)
-            updateCompoundKeyWhenWeEnterGroupKeyHash(groupKey)
+            if (data != null && groupKey == reuseKey && data != Composer.Empty)
+                updateCompoundKeyWhenWeEnterGroupKeyHash(data.hashCode())
+            else
+                updateCompoundKeyWhenWeEnterGroupKeyHash(groupKey)
         else
             updateCompoundKeyWhenWeEnterGroupKeyHash(dataKey.hashCode())
     }
@@ -2973,9 +3078,12 @@ internal class ComposerImpl(
         compoundKeyHash = (compoundKeyHash rol 3) xor keyHash
     }
 
-    private fun updateCompoundKeyWhenWeExitGroup(groupKey: Int, dataKey: Any?) {
+    private fun updateCompoundKeyWhenWeExitGroup(groupKey: Int, dataKey: Any?, data: Any?) {
         if (dataKey == null)
-            updateCompoundKeyWhenWeExitGroupKeyHash(groupKey)
+            if (data != null && groupKey == reuseKey && data != Composer.Empty)
+                updateCompoundKeyWhenWeExitGroupKeyHash(data.hashCode())
+            else
+                updateCompoundKeyWhenWeExitGroupKeyHash(groupKey)
         else
             updateCompoundKeyWhenWeExitGroupKeyHash(dataKey.hashCode())
     }
@@ -3110,7 +3218,6 @@ inline class Updater<T> constructor(
         composer.apply<Unit, T>(Unit, { this.block() })
     }
 }
-
 @Suppress("EXPERIMENTAL_FEATURE_WARNING")
 inline class SkippableUpdater<T> constructor(
     @PublishedApi internal val composer: Composer
@@ -3300,8 +3407,11 @@ private val KeyInfo.joinedKey: Any get() = if (objectKey != null) JoinedKey(key,
 // a unique key.
 private const val rootKey = 100
 
-// An arbitrary value paired with a boxed Int or a JoinKey data key.
+// An arbitrary key value for a node.
 private const val nodeKey = 125
+
+// An arbitrary key value for a node used to force the node to be replaced.
+private const val nodeKeyReplace = 126
 
 @PublishedApi
 internal const val invocationKey = 200
@@ -3338,3 +3448,6 @@ internal const val referenceKey = 206
 
 @PublishedApi
 internal val reference: Any = OpaqueKey("reference")
+
+@PublishedApi
+internal const val reuseKey = 207

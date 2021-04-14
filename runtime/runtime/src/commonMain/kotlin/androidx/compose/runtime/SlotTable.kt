@@ -1765,7 +1765,7 @@ internal class SlotWriter(
             check(!anchorsRemoved) { "Unexpectedly removed anchors" }
 
             // Update the node count.
-            nodeCount += groups.nodeCount(currentGroup)
+            nodeCount += if (groups.isNode(currentGroup)) 1 else groups.nodeCount(currentGroup)
 
             // Move current passed the insert
             this.currentGroup = currentGroup + groupsToMove
