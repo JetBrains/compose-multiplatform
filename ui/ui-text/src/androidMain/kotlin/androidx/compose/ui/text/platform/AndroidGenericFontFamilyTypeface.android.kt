@@ -44,6 +44,7 @@ internal class AndroidGenericFontFamilyTypeface(
     // Platform never return null with Typeface.create
     private val nativeTypeface = Typeface.create(fontFamily.name, Typeface.NORMAL)!!
 
+    // TODO multiple TypefaceCache's, would be good to unify
     // Cached styled Typeface.
     private val lock = Any()
     @GuardedBy("lock") private val styledCache = SparseArrayCompat<Typeface>(4)

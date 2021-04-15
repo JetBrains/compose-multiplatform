@@ -14,18 +14,7 @@
  * limitations under the License.
  */
 
-package androidx.compose.ui.text.font
+package androidx.compose.ui.text
 
-/**
- * A class that can be used for changing the font used in text.
- */
-interface Typeface {
-
-    // TODO Unused, not tested public function
-    /**
-     * The font family used for creating this Typeface. If a platform Typeface was used, will
-     * return null.
-     *
-     */
-    val fontFamily: FontFamily?
-}
+@RequiresOptIn("This API is experimental and is likely to change in the future.")
+annotation class ExperimentalTextApi
