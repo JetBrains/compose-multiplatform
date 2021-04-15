@@ -21,7 +21,6 @@ import android.os.Build
 import androidx.annotation.DoNotInline
 import androidx.annotation.RequiresApi
 import androidx.collection.LruCache
-import androidx.compose.ui.text.font.AndroidFont
 import androidx.compose.ui.text.font.DefaultFontFamily
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
@@ -32,7 +31,6 @@ import androidx.compose.ui.text.font.FontSynthesis
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.font.GenericFontFamily
 import androidx.compose.ui.text.font.LoadedFontFamily
-import androidx.compose.ui.text.font.ResourceFont
 
 /**
  * Creates a Typeface based on generic font family or a custom [FontFamily].
@@ -58,7 +56,6 @@ internal open class TypefaceAdapter(
         // FontFamily.cpp#computeFakery function in minikin
         private val ANDROID_BOLD = FontWeight.W600
 
-        // TODO multiple TypefaceCache's, would be good to unify
         // 16 is a random number and is not based on any strong logic
         val typefaceCache = LruCache<CacheKey, Typeface>(16)
 
@@ -242,11 +239,7 @@ internal open class TypefaceAdapter(
         val font = fontMatcher.matchFont(fontFamily, fontWeight, fontStyle)
 
         val typeface = try {
-            when (font) {
-                is ResourceFont -> resourceLoader.load(font) as Typeface
-                is AndroidFont -> font.typeface
-                else -> throw IllegalStateException("Unknown font type: $font")
-            }
+            resourceLoader.load(font) as Typeface
         } catch (e: Exception) {
             throw IllegalStateException("Cannot create Typeface from $font")
         }
