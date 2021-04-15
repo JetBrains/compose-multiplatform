@@ -24,7 +24,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.testutils.ComposeTestCase
+import androidx.compose.testutils.LayeredComposeTestCase
 import androidx.compose.testutils.ToggleableTestCase
 import androidx.compose.testutils.benchmark.ComposeBenchmarkRule
 import androidx.compose.testutils.benchmark.benchmarkDrawPerf
@@ -158,7 +158,7 @@ class PaddingBenchmark {
     }
 }
 
-private sealed class PaddingTestCase : ComposeTestCase, ToggleableTestCase {
+private sealed class PaddingTestCase : LayeredComposeTestCase(), ToggleableTestCase {
 
     var paddingState: MutableState<Dp>? = null
 
@@ -169,7 +169,7 @@ private sealed class PaddingTestCase : ComposeTestCase, ToggleableTestCase {
     }
 
     @Composable
-    override fun Content() {
+    override fun MeasuredContent() {
         val padding = remember { mutableStateOf(5.dp) }
         paddingState = padding
 

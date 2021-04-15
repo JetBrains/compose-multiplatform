@@ -22,7 +22,7 @@ import androidx.compose.material.Surface
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.testutils.ComposeTestCase
+import androidx.compose.testutils.LayeredComposeTestCase
 import androidx.compose.testutils.ToggleableTestCase
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.unit.sp
@@ -35,23 +35,28 @@ import androidx.compose.ui.unit.sp
  */
 class TextInColumnSizeToggleTestCase(
     private val numberOfTexts: Int
-) : ComposeTestCase, ToggleableTestCase {
+) : LayeredComposeTestCase(), ToggleableTestCase {
 
     private val fontSize = mutableStateOf(20.sp)
 
     @Composable
-    override fun Content() {
+    override fun MeasuredContent() {
+        Column {
+            repeat(numberOfTexts) {
+                // 32-character text to match dashboards
+                Text(
+                    "Hello World Hello World Hello W",
+                    style = TextStyle(fontSize = fontSize.value)
+                )
+            }
+        }
+    }
+
+    @Composable
+    override fun ContentWrappers(content: @Composable () -> Unit) {
         MaterialTheme {
             Surface {
-                Column {
-                    repeat(numberOfTexts) {
-                        // 32-character text to match dashboards
-                        Text(
-                            "Hello World Hello World Hello W",
-                            style = TextStyle(fontSize = fontSize.value)
-                        )
-                    }
-                }
+                content()
             }
         }
     }

@@ -50,7 +50,7 @@ class TextFieldToggleTextTestCase(
     private val textNumber: Int,
     private val width: Dp,
     private val fontSize: TextUnit
-) : LayeredComposeTestCase, ToggleableTestCase {
+) : LayeredComposeTestCase(), ToggleableTestCase {
 
     private val textInputService = TextInputService(TestPlatformTextInputService())
 

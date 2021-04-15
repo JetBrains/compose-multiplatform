@@ -20,10 +20,9 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.size
-import androidx.compose.material.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.testutils.ComposeTestCase
+import androidx.compose.testutils.LayeredComposeTestCase
 import androidx.compose.testutils.ToggleableTestCase
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -38,20 +37,18 @@ import androidx.compose.ui.unit.dp
  */
 class RectsInColumnSharedModelTestCase(
     private val amountOfRectangles: Int
-) : ComposeTestCase, ToggleableTestCase {
+) : LayeredComposeTestCase(), ToggleableTestCase {
 
     private val color = mutableStateOf(Color.Black)
 
     @Composable
-    override fun Content() {
-        MaterialTheme {
-            Column {
-                repeat(amountOfRectangles) { i ->
-                    if (i == 0) {
-                        Box(Modifier.size(100.dp, 50.dp).background(color = color.value))
-                    } else {
-                        Box(Modifier.size(100.dp, 50.dp).background(color = Color.Green))
-                    }
+    override fun MeasuredContent() {
+        Column {
+            repeat(amountOfRectangles) { i ->
+                if (i == 0) {
+                    Box(Modifier.size(100.dp, 50.dp).background(color = color.value))
+                } else {
+                    Box(Modifier.size(100.dp, 50.dp).background(color = Color.Green))
                 }
             }
         }
