@@ -320,6 +320,7 @@ package androidx.compose.ui.unit {
   }
 
   public final class TextUnitKt {
+    method @androidx.compose.runtime.ExperimentalComposeApi public static long TextUnit(float value, androidx.compose.ui.unit.TextUnitType type);
     method public static long getEm(float);
     method public static long getEm(double);
     method public static long getEm(int);
