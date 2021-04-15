@@ -23,9 +23,9 @@ import androidx.compose.material.ModalBottomSheetValue
 import androidx.compose.material.Scaffold
 import androidx.compose.material.catalog.model.Theme
 import androidx.compose.material.catalog.ui.theme.ThemePicker
-import androidx.compose.material.catalog.util.DocsUrl
 import androidx.compose.material.catalog.util.GuidelinesUrl
 import androidx.compose.material.catalog.util.IssueUrl
+import androidx.compose.material.catalog.util.ReleasesUrl
 import androidx.compose.material.catalog.util.SourceUrl
 import androidx.compose.material.catalog.util.openUrl
 import androidx.compose.material.rememberModalBottomSheetState
@@ -42,7 +42,7 @@ fun CatalogScaffold(
     showBackNavigationIcon: Boolean = false,
     theme: Theme,
     guidelinesUrl: String = GuidelinesUrl,
-    docsUrl: String = DocsUrl,
+    docsUrl: String = ReleasesUrl,
     sourceUrl: String = SourceUrl,
     issueUrl: String = IssueUrl,
     onThemeChange: (theme: Theme) -> Unit,

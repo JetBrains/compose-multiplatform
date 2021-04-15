@@ -15,7 +15,6 @@ dependencies {
     implementation(project(":compose:foundation:foundation-layout:integration-tests:foundation-layout-demos"))
     implementation(project(":compose:foundation:foundation:integration-tests:foundation-demos"))
     implementation(project(":compose:material:material:integration-tests:material-demos"))
-    implementation(project(":compose:material:material:integration-tests:material-catalog"))
     implementation(project(":navigation:navigation-compose:integration-tests:navigation-demos"))
     implementation(project(":compose:ui:ui:integration-tests:ui-demos"))
 
