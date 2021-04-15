@@ -27,7 +27,6 @@ import androidx.compose.ui.text.fastDistinctBy
  * @see GenericFontFamily
  */
 @Immutable
-// TODO Unused parameter canLoadSynchronously
 sealed class FontFamily(val canLoadSynchronously: Boolean) {
     companion object {
         /**
