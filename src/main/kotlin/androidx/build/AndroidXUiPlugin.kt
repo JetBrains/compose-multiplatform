@@ -238,6 +238,7 @@ class AndroidXUiPlugin : Plugin<Project> {
                         "src/commonMain/resources",
                         "src/androidMain/res"
                     )
+                    assets.srcDirs("src/androidMain/assets")
 
                     // Keep Kotlin files in java source sets so the source set is not empty when
                     // running unit tests which would prevent the tests from running in CI.
@@ -254,6 +255,7 @@ class AndroidXUiPlugin : Plugin<Project> {
                 sourceSets.findByName("androidTest")?.apply {
                     java.srcDirs("src/androidAndroidTest/kotlin")
                     res.srcDirs("src/androidAndroidTest/res")
+                    assets.srcDirs("src/androidAndroidTest/assets")
 
                     // Keep Kotlin files in java source sets so the source set is not empty when
                     // running unit tests which would prevent the tests from running in CI.
