@@ -24,7 +24,7 @@ import androidx.compose.material.RadioButton
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.testutils.ComposeTestCase
+import androidx.compose.testutils.LayeredComposeTestCase
 import androidx.compose.testutils.ToggleableTestCase
 import androidx.compose.testutils.benchmark.ComposeBenchmarkRule
 import androidx.compose.testutils.benchmark.benchmarkFirstCompose
@@ -57,7 +57,7 @@ class RadioGroupBenchmark {
 
     @Test
     fun first_compose() {
-        benchmarkRule.benchmarkFirstCompose(radioCaseFactory, assertNoPendingRecompositions = false)
+        benchmarkRule.benchmarkFirstCompose(radioCaseFactory)
     }
 
     @Test
@@ -99,7 +99,7 @@ class RadioGroupBenchmark {
     }
 }
 
-internal class RadioGroupTestCase : ComposeTestCase, ToggleableTestCase {
+internal class RadioGroupTestCase : LayeredComposeTestCase(), ToggleableTestCase {
 
     private val radiosCount = 10
     private val options = (0 until radiosCount).toList()
@@ -110,25 +110,30 @@ internal class RadioGroupTestCase : ComposeTestCase, ToggleableTestCase {
     }
 
     @Composable
-    override fun Content() {
-        MaterialTheme {
-            Column {
-                options.forEach { item ->
-                    Row(
-                        modifier = Modifier.selectable(
-                            selected = (select.value == item),
-                            onClick = { select.value = item }
-                        ),
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        Text(item.toString())
-                        RadioButton(
-                            selected = (select.value == item),
-                            onClick = { select.value = item }
-                        )
-                    }
+    override fun MeasuredContent() {
+        Column {
+            options.forEach { item ->
+                Row(
+                    modifier = Modifier.selectable(
+                        selected = (select.value == item),
+                        onClick = { select.value = item }
+                    ),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Text(item.toString())
+                    RadioButton(
+                        selected = (select.value == item),
+                        onClick = { select.value = item }
+                    )
                 }
             }
+        }
+    }
+
+    @Composable
+    override fun ContentWrappers(content: @Composable () -> Unit) {
+        MaterialTheme {
+            content()
         }
     }
 }

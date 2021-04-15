@@ -28,7 +28,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.testutils.ComposeTestCase
+import androidx.compose.testutils.LayeredComposeTestCase
 import androidx.compose.testutils.ToggleableTestCase
 import androidx.compose.testutils.benchmark.ComposeBenchmarkRule
 import androidx.compose.testutils.benchmark.benchmarkDrawPerf
@@ -231,7 +231,7 @@ class SimpleComponentImplementationBenchmark {
 class ComponentWithModifiersTestCase : SimpleComponentImplementationTestCase() {
 
     @Composable
-    override fun Content() {
+    override fun MeasuredContent() {
         val innerSize = getInnerSize()
         Box(
             Modifier.size(48.dp)
@@ -249,7 +249,7 @@ class ComponentWithModifiersTestCase : SimpleComponentImplementationTestCase() {
 class ComponentWithRedrawTestCase : SimpleComponentImplementationTestCase() {
 
     @Composable
-    override fun Content() {
+    override fun MeasuredContent() {
         val innerSize = getInnerSize()
         val stroke = Stroke()
         Canvas(Modifier.size(48.dp)) {
@@ -261,7 +261,7 @@ class ComponentWithRedrawTestCase : SimpleComponentImplementationTestCase() {
 
 class ComponentWithTwoLayoutNodesTestCase : SimpleComponentImplementationTestCase() {
     @Composable
-    override fun Content() {
+    override fun MeasuredContent() {
         Box(
             modifier = Modifier
                 .size(48.dp)
@@ -280,8 +280,8 @@ class ComponentWithTwoLayoutNodesTestCase : SimpleComponentImplementationTestCas
     }
 }
 
-abstract class SimpleComponentImplementationTestCase : ComposeTestCase, ToggleableTestCase {
-
+abstract class SimpleComponentImplementationTestCase :
+    LayeredComposeTestCase(), ToggleableTestCase {
     private var state: MutableState<Dp>? = null
 
     @Composable

@@ -24,7 +24,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.runtime.Composable
-import androidx.compose.testutils.ComposeTestCase
+import androidx.compose.testutils.LayeredComposeTestCase
 import androidx.compose.testutils.ToggleableTestCase
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -34,11 +34,11 @@ import kotlinx.coroutines.runBlocking
 /**
  * Test case that puts a large number of boxes in a column in a vertical scroller to force scrolling.
  */
-class ScrollerTestCase : ComposeTestCase, ToggleableTestCase {
+class ScrollerTestCase : LayeredComposeTestCase(), ToggleableTestCase {
     private lateinit var scrollState: ScrollState
 
     @Composable
-    override fun Content() {
+    override fun MeasuredContent() {
         scrollState = rememberScrollState()
         Column(Modifier.verticalScroll(scrollState)) {
             Column(Modifier.fillMaxHeight()) {
