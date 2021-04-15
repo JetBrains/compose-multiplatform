@@ -18,8 +18,17 @@ package androidx.compose.ui.text.platform
 
 import android.content.Context
 import android.graphics.Typeface
+import android.os.Build
 import android.util.TypedValue
+import androidx.annotation.DoNotInline
+import androidx.annotation.RequiresApi
 import androidx.collection.LruCache
+import androidx.compose.ui.text.ExperimentalTextApi
+import androidx.compose.ui.text.android.InternalPlatformTextApi
+import androidx.compose.ui.text.font.AndroidAssetFont
+import androidx.compose.ui.text.font.AndroidFileDescriptorFont
+import androidx.compose.ui.text.font.AndroidFileFont
+import androidx.compose.ui.text.font.AndroidFont
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontListFontFamily
@@ -88,30 +97,69 @@ internal class AndroidFontListTypeface(
  * Global Android NativeTypeface cache.
  */
 internal object AndroidTypefaceCache {
+
+    // TODO multiple TypefaceCache's, would be good to unify
+    private val cache = LruCache<String, Typeface>(16)
+
     /**
      * Returns NativeTypeface for [font] if it is in cache. Otherwise create new NativeTypeface and
      * put it into internal cache.
      */
-    fun getOrCreate(context: Context, font: Font): Typeface = when (font) {
-        is ResourceFont -> getOrCreateByResourceId(context, font.resId)
-        else -> throw IllegalArgumentException("Unknown font type: $font")
-    }
+    @OptIn(InternalPlatformTextApi::class, ExperimentalTextApi::class)
+    fun getOrCreate(context: Context, font: Font): Typeface {
+        val key = getKey(context, font)
 
-    private val cache = LruCache<String, Typeface>(16)
+        key?.let {
+            cache.get(key)?.let { return it }
+        }
 
-    private fun getOrCreateByResourceId(context: Context, resId: Int): Typeface {
-        val value = TypedValue()
-        context.resources.getValue(resId, value, true)
-        // We use the file path as a key of the request cache.
-        val key = value.string?.toString() ?: return createTypeface(context, resId)
+        val typeface = when (font) {
+            is ResourceFont ->
+                if (Build.VERSION.SDK_INT >= 26) {
+                    AndroidResourceFontLoaderHelper.create(context, font.resId)
+                } else {
+                    ResourcesCompat.getFont(context, font.resId)!!
+                }
+            is AndroidFont -> font.typeface
+            else -> throw IllegalArgumentException("Unknown font type: $font")
+        }
 
-        cache.get(key)?.let { return it }
-        val typeface = createTypeface(context, resId)
-        cache.put(key, typeface) // eventually consistent
+        key?.let { cache.put(key, typeface) }
+
         return typeface
     }
 
-    private fun createTypeface(context: Context, resId: Int): Typeface =
-        ResourcesCompat.getFont(context, resId)
-            ?: throw IllegalArgumentException("Unable to load Font $resId")
+    /**
+     * Utility method to generate a key for caching purposes.
+     */
+    fun getKey(context: Context, font: Font): String? {
+        return when (font) {
+            is ResourceFont -> {
+                val value = TypedValue()
+                context.resources.getValue(font.resId, value, true)
+                "res:${value.string?.toString()!!}"
+            }
+            is AndroidAssetFont -> {
+                "asset:${font.path}"
+            }
+            // do not cache File based Fonts, since the user might change the font
+            is AndroidFileFont -> null
+            is AndroidFileDescriptorFont -> null
+            else -> throw IllegalArgumentException("Unknown font type: $font")
+        }
+    }
+}
+
+/**
+ * This class is here to ensure that the classes that use this API will get verified and can be
+ * AOT compiled. It is expected that this class will soft-fail verification, but the classes
+ * which use this method will pass.
+ */
+@RequiresApi(26)
+private object AndroidResourceFontLoaderHelper {
+    @RequiresApi(26)
+    @DoNotInline
+    fun create(context: Context, resourceId: Int): Typeface {
+        return context.resources.getFont(resourceId)
+    }
 }
