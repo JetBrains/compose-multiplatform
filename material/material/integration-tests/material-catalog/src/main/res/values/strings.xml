@@ -17,9 +17,8 @@
 
 <resources>
 
-    <string name="app_name">Compose Material catalog</string>
-
-    <string name="material_components">Material Components</string>
+    <string name="compose_material">Compose Material</string>
+    <string name="compose_material_catalog">Compose Material Catalog</string>
 
     <string name="description">Description</string>
     <string name="examples">Examples</string>
