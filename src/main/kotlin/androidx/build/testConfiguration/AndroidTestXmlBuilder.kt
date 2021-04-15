@@ -74,14 +74,27 @@ class ConfigBuilder {
             .append(TEST_BLOCK_OPEN)
             .append(RUNNER_OPTION.replace("TEST_RUNNER", testRunner))
             .append(PACKAGE_OPTION.replace("APPLICATION_ID", applicationId))
-        if (!isPostsubmit) {
-            sb.append(FLAKY_TEST_OPTION)
+        if (runAllTests) {
+            if (!isPostsubmit) {
+                sb.append(FLAKY_TEST_OPTION)
+            }
+            sb.append(TEST_BLOCK_CLOSE)
+        } else {
+            if (!isPostsubmit) {
+                sb.append(FLAKY_TEST_OPTION)
+            }
+            sb.append(SMALL_TEST_OPTIONS)
+                .append(TEST_BLOCK_CLOSE)
+                .append(TEST_BLOCK_OPEN)
+            if (!isPostsubmit) {
+                sb.append(FLAKY_TEST_OPTION)
+            }
+            sb.append(RUNNER_OPTION.replace("TEST_RUNNER", testRunner))
+                .append(PACKAGE_OPTION.replace("APPLICATION_ID", applicationId))
+                .append(MEDIUM_TEST_OPTIONS)
+                .append(TEST_BLOCK_CLOSE)
         }
-        if (!runAllTests) {
-            sb.append(SMALL_AND_MEDIUM_TEST_OPTIONS)
-        }
-        sb.append(TEST_BLOCK_CLOSE)
-            .append(CONFIGURATION_CLOSE)
+        sb.append(CONFIGURATION_CLOSE)
         return sb.toString()
     }
 }
@@ -174,13 +187,31 @@ class MediaConfigBuilder {
             if (!isPostsubmit) {
                 sb.append(FLAKY_TEST_OPTION)
             }
-            sb.append(SMALL_AND_MEDIUM_TEST_OPTIONS)
+            sb.append(SMALL_TEST_OPTIONS)
                 .append(TEST_BLOCK_CLOSE)
+                .append(TEST_BLOCK_OPEN)
+                .append(RUNNER_OPTION.replace("TEST_RUNNER", testRunner))
+                .append(PACKAGE_OPTION.replace("APPLICATION_ID", clientApplicationId))
+                .append(mediaInstrumentationArgs())
+                .append(MEDIUM_TEST_OPTIONS)
+            if (!isPostsubmit) {
+                sb.append(FLAKY_TEST_OPTION)
+            }
+            sb.append(TEST_BLOCK_CLOSE)
                 .append(TEST_BLOCK_OPEN)
                 .append(RUNNER_OPTION.replace("TEST_RUNNER", testRunner))
                 .append(PACKAGE_OPTION.replace("APPLICATION_ID", serviceApplicationId))
                 .append(mediaInstrumentationArgs())
-                .append(SMALL_AND_MEDIUM_TEST_OPTIONS)
+                .append(SMALL_TEST_OPTIONS)
+            if (!isPostsubmit) {
+                sb.append(FLAKY_TEST_OPTION)
+            }
+            sb.append(TEST_BLOCK_CLOSE)
+                .append(TEST_BLOCK_OPEN)
+                .append(RUNNER_OPTION.replace("TEST_RUNNER", testRunner))
+                .append(PACKAGE_OPTION.replace("APPLICATION_ID", serviceApplicationId))
+                .append(mediaInstrumentationArgs())
+                .append(MEDIUM_TEST_OPTIONS)
             if (!isPostsubmit) {
                 sb.append(FLAKY_TEST_OPTION)
             }
@@ -312,9 +343,14 @@ private val FLAKY_TEST_OPTION = """
 
 """.trimIndent()
 
-private val SMALL_AND_MEDIUM_TEST_OPTIONS = """
+private val SMALL_TEST_OPTIONS = """
     <option name="size" value="small" />
+
+""".trimIndent()
+
+private val MEDIUM_TEST_OPTIONS = """
     <option name="size" value="medium" />
+
 """.trimIndent()
 
 private val CLIENT_PREVIOUS = """

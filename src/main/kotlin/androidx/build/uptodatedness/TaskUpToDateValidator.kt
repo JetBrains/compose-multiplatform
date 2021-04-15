@@ -138,6 +138,7 @@ val DONT_TRY_RERUNNING_TASKS = setOf(
     // More information about the fact that these dokka tasks rerun can be found at b/167569304
     "dokkaKotlinDocs",
     "zipDokkaDocs",
+    "dackkaDocs",
 
     // Flakily not up-to-date, b/176120659
     "doclavaDocs",
