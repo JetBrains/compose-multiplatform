@@ -20,8 +20,8 @@ import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.requiredSize
+import androidx.compose.foundation.layout.width
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.test.assertIsDisplayed
@@ -159,7 +159,7 @@ class LazyListHeadersTest {
         }
 
         rule.onNodeWithTag(LazyListTag)
-            .scrollBy(y = 102.dp, density = rule.density)
+            .scrollBy(y = 105.dp, density = rule.density)
 
         rule.onNodeWithTag(firstHeaderTag)
             .assertDoesNotExist()
@@ -286,7 +286,7 @@ class LazyListHeadersTest {
         }
 
         rule.onNodeWithTag(LazyListTag)
-            .scrollBy(x = 102.dp, density = rule.density)
+            .scrollBy(x = 105.dp, density = rule.density)
 
         rule.onNodeWithTag(firstHeaderTag)
             .assertDoesNotExist()

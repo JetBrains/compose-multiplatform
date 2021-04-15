@@ -18,8 +18,10 @@ package androidx.compose.material.textfield
 
 import android.os.Build
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.requiredHeight
 import androidx.compose.foundation.layout.requiredWidth
+import androidx.compose.foundation.layout.width
 import androidx.compose.material.GOLDEN_MATERIAL
 import androidx.compose.material.LocalContentColor
 import androidx.compose.material.OutlinedTextField
@@ -42,7 +44,9 @@ import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.performGesture
 import androidx.compose.ui.test.swipeLeft
 import androidx.compose.ui.test.up
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.input.TextFieldValue
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import androidx.test.ext.junit.runners.AndroidJUnit4
@@ -475,6 +479,36 @@ class OutlinedTextFieldScreenshotTest {
         rule.mainClock.advanceTimeBy(250)
 
         assertAgainstGolden("outlinedTextField_readOnly_scrolled")
+    }
+
+    @Test
+    fun outlinedTextField_textCenterAligned() {
+        rule.setMaterialContent {
+            OutlinedTextField(
+                value = "Hello world",
+                onValueChange = {},
+                modifier = Modifier.width(300.dp).testTag(TextFieldTag),
+                textStyle = TextStyle(textAlign = TextAlign.Center),
+                singleLine = true
+            )
+        }
+
+        assertAgainstGolden("outlinedTextField_textCenterAligned")
+    }
+
+    @Test
+    fun outlinedTextField_textAlignedToEnd() {
+        rule.setMaterialContent {
+            OutlinedTextField(
+                value = "Hello world",
+                onValueChange = {},
+                modifier = Modifier.fillMaxWidth().testTag(TextFieldTag),
+                textStyle = TextStyle(textAlign = TextAlign.End),
+                singleLine = true
+            )
+        }
+
+        assertAgainstGolden("outlinedTextField_textAlignedToEnd")
     }
 
     private fun SemanticsNodeInteraction.focus() {

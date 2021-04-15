@@ -35,11 +35,6 @@ import androidx.compose.ui.node.Ref
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.TextLayoutResult
 import androidx.compose.ui.text.TextStyle
-import androidx.compose.ui.text.font.Font
-import androidx.compose.ui.text.font.FontStyle
-import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.font.test.R
-import androidx.compose.ui.text.font.toFontFamily
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.Density
@@ -243,19 +238,17 @@ class TextLayoutTest {
     }
 
     private fun show(composable: @Composable () -> Unit) {
-        val runnable: Runnable = object : Runnable {
-            override fun run() {
-                activity.setContent {
-                    Layout(composable) { measurables, constraints ->
-                        val placeables = measurables.map {
-                            it.measure(constraints.copy(minWidth = 0, minHeight = 0))
-                        }
-                        layout(constraints.maxWidth, constraints.maxHeight) {
-                            var top = 0
-                            placeables.forEach {
-                                it.placeRelative(0, top)
-                                top += it.height
-                            }
+        val runnable = Runnable {
+            activity.setContent {
+                Layout(composable) { measurables, constraints ->
+                    val placeables = measurables.map {
+                        it.measure(constraints.copy(minWidth = 0, minHeight = 0))
+                    }
+                    layout(constraints.maxWidth, constraints.maxHeight) {
+                        var top = 0
+                        placeables.forEach {
+                            it.placeRelative(0, top)
+                            top += it.height
                         }
                     }
                 }
@@ -272,13 +265,7 @@ private fun TestingText(
     onTextLayout: (TextLayoutResult) -> Unit = {}
 ) {
     val textStyle = remember {
-        TextStyle(
-            fontFamily = Font(
-                R.font.sample_font,
-                FontWeight.Normal,
-                FontStyle.Normal
-            ).toFontFamily()
-        )
+        TextStyle(fontFamily = TEST_FONT_FAMILY)
     }
     CoreText(
         AnnotatedString(text),

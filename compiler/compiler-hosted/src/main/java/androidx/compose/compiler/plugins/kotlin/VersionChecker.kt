@@ -20,6 +20,7 @@ import org.jetbrains.kotlin.backend.common.extensions.IrPluginContext
 import org.jetbrains.kotlin.ir.declarations.IrProperty
 import org.jetbrains.kotlin.ir.expressions.IrConst
 import org.jetbrains.kotlin.ir.expressions.IrConstKind
+import org.jetbrains.kotlin.platform.jvm.isJvm
 
 class VersionChecker(val context: IrPluginContext) {
 
@@ -39,24 +40,28 @@ class VersionChecker(val context: IrPluginContext) {
             2300 to "1.0.0-alpha12",
             2400 to "1.0.0-alpha13",
             2500 to "1.0.0-beta04",
+            2600 to "1.0.0-beta05",
         )
 
         /**
          * The minimum version int that this compiler is guaranteed to be compatible with. Typically
          * this will match the version int that is in ComposeVersion.kt in the runtime.
          */
-        private val minimumRuntimeVersionInt: Int = 2500
+        private val minimumRuntimeVersionInt: Int = 2600
 
         /**
          * The maven version string of this compiler. This string should be updated before/after every
          * release.
          */
-        val compilerVersion: String = "1.0.0-beta04"
+        val compilerVersion: String = "1.0.0-beta05"
         private val minimumRuntimeVersion: String
             get() = versionTable[minimumRuntimeVersionInt] ?: "unknown"
     }
 
     fun check() {
+        // version checker accesses bodies of the functions that are not deserialized in KLIB
+        if (!context.platform.isJvm()) return
+
         val versionClass = context.referenceClass(ComposeFqNames.ComposeVersion)
         if (versionClass == null) {
             // If the version class isn't present, it likely means that compose runtime isn't on the

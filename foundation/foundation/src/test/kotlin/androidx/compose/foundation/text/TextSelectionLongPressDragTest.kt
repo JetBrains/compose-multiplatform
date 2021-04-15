@@ -18,6 +18,7 @@ package androidx.compose.foundation.text
 
 import androidx.compose.foundation.text.selection.Selectable
 import androidx.compose.foundation.text.selection.Selection
+import androidx.compose.foundation.text.selection.SelectionAdjustment
 import androidx.compose.foundation.text.selection.SelectionRegistrarImpl
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.layout.LayoutCoordinates
@@ -63,7 +64,7 @@ class TextSelectionLongPressDragTest {
     fun setup() {
         selectionRegistrar.subscribe(selectable)
 
-        layoutCoordinates = mock<LayoutCoordinates> {
+        layoutCoordinates = mock {
             on { isAttached } doReturn true
         }
 
@@ -84,7 +85,8 @@ class TextSelectionLongPressDragTest {
 
         verify(selectionRegistrar, times(1)).notifySelectionUpdateStart(
             layoutCoordinates = layoutCoordinates,
-            startPosition = position
+            startPosition = position,
+            adjustment = SelectionAdjustment.WORD
         )
     }
 
@@ -111,7 +113,8 @@ class TextSelectionLongPressDragTest {
             .notifySelectionUpdate(
                 layoutCoordinates = layoutCoordinates,
                 startPosition = beginPosition2,
-                endPosition = beginPosition2 + dragDistance2
+                endPosition = beginPosition2 + dragDistance2,
+                adjustment = SelectionAdjustment.NONE
             )
     }
 
@@ -127,7 +130,8 @@ class TextSelectionLongPressDragTest {
             .notifySelectionUpdate(
                 layoutCoordinates = layoutCoordinates,
                 startPosition = beginPosition,
-                endPosition = beginPosition + dragDistance
+                endPosition = beginPosition + dragDistance,
+                adjustment = SelectionAdjustment.NONE
             )
     }
 

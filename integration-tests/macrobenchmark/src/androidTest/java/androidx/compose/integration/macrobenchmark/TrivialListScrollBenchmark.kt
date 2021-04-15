@@ -18,7 +18,6 @@ package androidx.compose.integration.macrobenchmark
 
 import android.content.Intent
 import android.graphics.Point
-import androidx.benchmark.integration.macrobenchmark.createCompilationParams
 import androidx.benchmark.macro.CompilationMode
 import androidx.benchmark.macro.FrameTimingMetric
 import androidx.benchmark.macro.junit4.MacrobenchmarkRule

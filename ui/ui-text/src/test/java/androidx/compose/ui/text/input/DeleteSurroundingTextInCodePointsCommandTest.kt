@@ -92,7 +92,7 @@ class DeleteSurroundingTextInCodePointsCommandTest {
 
         DeleteSurroundingTextInCodePointsCommand(2, 2).applyTo(eb)
 
-        assertEquals("$CH1", eb.toString())
+        assertEquals(CH1, eb.toString())
         assertEquals(2, eb.cursor)
         assertFalse(eb.hasComposition())
     }

@@ -253,11 +253,9 @@ internal object BoxScopeInstance : BoxScope {
     )
 }
 
-@get:Suppress("ModifierFactoryReturnType", "ModifierFactoryExtensionFunction")
 private val Measurable.boxChildData: BoxChildData? get() = parentData as? BoxChildData
 private val Measurable.matchesParentSize: Boolean get() = boxChildData?.matchParentSize ?: false
 
-@Suppress("ModifierFactoryReturnType", "ModifierFactoryExtensionFunction")
 private class BoxChildData(
     var alignment: Alignment,
     var matchParentSize: Boolean = false,

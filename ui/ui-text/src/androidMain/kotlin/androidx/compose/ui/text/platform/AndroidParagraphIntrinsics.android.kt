@@ -45,7 +45,7 @@ internal class AndroidParagraphIntrinsics(
     val density: Density
 ) : ParagraphIntrinsics {
 
-    internal val textPaint = AndroidTextPaint(Paint.ANTI_ALIAS_FLAG)
+    internal val textPaint = AndroidTextPaint(Paint.ANTI_ALIAS_FLAG, density.density)
 
     internal val charSequence: CharSequence
 
@@ -64,21 +64,20 @@ internal class AndroidParagraphIntrinsics(
 
     init {
         val notAppliedStyle = textPaint.applySpanStyle(
-            style.toSpanStyle(),
-            typefaceAdapter,
-            density
+            style = style.toSpanStyle(),
+            typefaceAdapter = typefaceAdapter,
+            density = density
         )
 
         charSequence = createCharSequence(
             text = text,
             contextFontSize = textPaint.textSize,
-            lineHeight = style.lineHeight,
-            textIndent = style.textIndent,
+            contextTextStyle = style,
             spanStyles = listOf(
                 AnnotatedString.Range(
-                    notAppliedStyle,
-                    0,
-                    text.length
+                    item = notAppliedStyle,
+                    start = 0,
+                    end = text.length
                 )
             ) + spanStyles,
             placeholders = placeholders,

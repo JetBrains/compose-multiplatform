@@ -20,7 +20,7 @@ import com.android.tools.lint.client.api.IssueRegistry
 import com.android.tools.lint.detector.api.CURRENT_API
 
 /**
- * [IssueRegistry] containing runtime specific lint issues.
+ * [IssueRegistry] containing Material specific lint issues.
  */
 class MaterialIssueRegistry : IssueRegistry() {
     // Tests are run with this version. We ensure that with ApiLintVersionsTest

@@ -389,7 +389,10 @@ private fun IconsWithTextFieldLayout(
                 placeholder(Modifier.layoutId(PlaceholderId).padding(horizontal = TextFieldPadding))
             }
 
-            Box(Modifier.layoutId(TextFieldId).padding(horizontal = TextFieldPadding)) {
+            Box(
+                modifier = Modifier.layoutId(TextFieldId).padding(horizontal = TextFieldPadding),
+                propagateMinConstraints = true
+            ) {
                 textField()
             }
 

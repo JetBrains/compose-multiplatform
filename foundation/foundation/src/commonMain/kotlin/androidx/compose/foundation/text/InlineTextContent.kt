@@ -82,5 +82,5 @@ class InlineTextContent(
      * The composable to be inserted into the text layout.
      * The string parameter passed to it will the alternateText given to [appendInlineContent].
      */
-    val children: @Composable() (String) -> Unit
+    val children: @Composable (String) -> Unit
 )

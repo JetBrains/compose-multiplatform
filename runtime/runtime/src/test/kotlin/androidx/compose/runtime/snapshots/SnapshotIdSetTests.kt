@@ -269,6 +269,18 @@ class SnapshotIdSetTests {
         test(1024)
     }
 
+    @Test // Regression b/182822837
+    fun shouldReportTheCorrectLowest() {
+        fun test(number: Int) {
+            val set = SnapshotIdSet.EMPTY.set(number)
+            assertEquals(number, set.lowest(-1))
+        }
+
+        repeat(64) {
+            test(it)
+        }
+    }
+
     @Test // Regression: b/147836978
     fun shouldValidWhenSetIsLarge() {
         val data = """

@@ -29,7 +29,6 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.font.Typeface
 import androidx.compose.ui.text.font.toFontFamily
 import androidx.compose.ui.text.matchers.assertThat
-import androidx.compose.ui.text.test.R
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.MediumTest
 import androidx.test.filters.SdkSuppress
@@ -49,7 +48,7 @@ import org.junit.runner.RunWith
 @SmallTest
 class AndroidTypefaceTest {
 
-    val context = InstrumentationRegistry.getInstrumentation().targetContext
+    val context = InstrumentationRegistry.getInstrumentation().targetContext!!
 
     private fun androidTypefaceFromFontFamily(
         context: Context,
@@ -429,7 +428,7 @@ class AndroidTypefaceTest {
 
     @Test(expected = IllegalStateException::class)
     fun throwsExceptionIfFontIsNotReadable() {
-        val fontFamily = FontFamily(Font(R.font.invalid_font))
+        val fontFamily = FontFamily(FontTestData.FONT_INVALID)
         androidTypefaceFromFontFamily(context, fontFamily)
     }
 

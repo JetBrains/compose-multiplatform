@@ -34,7 +34,7 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 @SmallTest
 class AndroidTypefaceSubsetTest {
 
-    val context = InstrumentationRegistry.getInstrumentation().targetContext
+    val context = InstrumentationRegistry.getInstrumentation().targetContext!!
 
     val fontFamily = FontFamily(
         FontTestData.FONT_100_REGULAR,

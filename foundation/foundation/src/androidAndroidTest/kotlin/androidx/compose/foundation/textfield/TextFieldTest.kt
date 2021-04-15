@@ -62,6 +62,7 @@ import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.semantics.SemanticsActions
 import androidx.compose.ui.semantics.SemanticsProperties
 import androidx.compose.ui.semantics.getOrNull
+import androidx.compose.ui.test.ExperimentalTestApi
 import androidx.compose.ui.test.SemanticsMatcher
 import androidx.compose.ui.test.SemanticsNodeInteraction
 import androidx.compose.ui.test.assert
@@ -81,6 +82,7 @@ import androidx.compose.ui.test.performGesture
 import androidx.compose.ui.test.performSemanticsAction
 import androidx.compose.ui.test.performTextClearance
 import androidx.compose.ui.test.performTextInput
+import androidx.compose.ui.test.performTextInputSelection
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.TextLayoutResult
 import androidx.compose.ui.text.TextRange
@@ -100,6 +102,7 @@ import androidx.test.filters.LargeTest
 import androidx.test.filters.MediumTest
 import androidx.test.filters.SdkSuppress
 import com.google.common.truth.Truth.assertThat
+import com.google.common.truth.Truth.assertWithMessage
 import com.nhaarman.mockitokotlin2.any
 import com.nhaarman.mockitokotlin2.argumentCaptor
 import com.nhaarman.mockitokotlin2.atLeastOnce
@@ -109,6 +112,7 @@ import com.nhaarman.mockitokotlin2.verify
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
+import org.junit.Ignore
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -219,9 +223,9 @@ class TextFieldTest {
         BasicTextField(
             value = state.value,
             modifier = Modifier.fillMaxSize(),
-            onValueChange = {
-                if (it.all { it.isDigit() }) {
-                    state.value = it
+            onValueChange = { value ->
+                if (value.all { it.isDigit() }) {
+                    state.value = value
                 }
             }
         )
@@ -422,7 +426,7 @@ class TextFieldTest {
     fun defaultSemantics() {
         rule.setContent {
             BasicTextField(
-                modifier = Modifier.testTag("textField"),
+                modifier = Modifier.testTag(Tag),
                 value = "",
                 onValueChange = {},
                 decorationBox = {
@@ -434,7 +438,7 @@ class TextFieldTest {
             )
         }
 
-        rule.onNodeWithTag("textField")
+        rule.onNodeWithTag(Tag)
             .assertEditableTextEquals("")
             .assertTextEquals("label")
             .assertHasClickAction()
@@ -452,7 +456,7 @@ class TextFieldTest {
             .assert(SemanticsMatcher.keyIsDefined(SemanticsActions.GetTextLayoutResult))
 
         val textLayoutResults = mutableListOf<TextLayoutResult>()
-        rule.onNodeWithTag("textField")
+        rule.onNodeWithTag(Tag)
             .performSemanticsAction(SemanticsActions.GetTextLayoutResult) { it(textLayoutResults) }
         assert(textLayoutResults.size == 1) { "TextLayoutResult is null" }
     }
@@ -462,16 +466,16 @@ class TextFieldTest {
         rule.setContent {
             var value by remember { mutableStateOf("") }
             BasicTextField(
-                modifier = Modifier.testTag("textField"),
+                modifier = Modifier.testTag(Tag),
                 value = value,
                 onValueChange = { value = it }
             )
         }
 
-        rule.onNodeWithTag("textField")
+        rule.onNodeWithTag(Tag)
             .assert(isNotFocused())
             .performSemanticsAction(SemanticsActions.OnClick)
-        rule.onNodeWithTag("textField")
+        rule.onNodeWithTag(Tag)
             .assert(isFocused())
     }
 
@@ -487,10 +491,10 @@ class TextFieldTest {
         }
 
         val hello = AnnotatedString("Hello")
-        rule.onNodeWithTag("textField")
+        rule.onNodeWithTag(Tag)
             .assertEditableTextEquals("")
             .performSemanticsAction(SemanticsActions.SetText) { it(hello) }
-        rule.onNodeWithTag("textField")
+        rule.onNodeWithTag(Tag)
             .assertEditableTextEquals(hello.text)
             .assert(
                 SemanticsMatcher.expectValue(
@@ -499,9 +503,9 @@ class TextFieldTest {
                 )
             )
 
-        rule.onNodeWithTag("textField")
+        rule.onNodeWithTag(Tag)
             .performSemanticsAction(SemanticsActions.SetSelection) { it(1, 3, true) }
-        rule.onNodeWithTag("textField")
+        rule.onNodeWithTag(Tag)
             .assert(
                 SemanticsMatcher.expectValue(
                     SemanticsProperties.TextSelectionRange,
@@ -716,6 +720,108 @@ class TextFieldTest {
         rule.runOnIdle {
             // Not asserting total size as we have other interactions here too
             assertThat(interactions.filterIsInstance<FocusInteraction.Focus>()).hasSize(1)
+        }
+    }
+
+    @Test
+    fun textField_stringOverload_callsOnValueChange_whenTextChange() {
+        var onValueChangeCalled = false
+
+        rule.setContent {
+            val state = remember { mutableStateOf("abc") }
+            BasicTextField(
+                modifier = Modifier.testTag(Tag),
+                value = state.value,
+                onValueChange = {
+                    onValueChangeCalled = true
+                    state.value = it
+                }
+            )
+        }
+
+        @OptIn(ExperimentalTestApi::class)
+        rule.onNodeWithTag(Tag)
+            .performClick()
+            .performTextInputSelection(TextRange(0, 0))
+
+        // reset
+        rule.runOnIdle {
+            onValueChangeCalled = false
+        }
+
+        // change selection
+        @OptIn(ExperimentalTestApi::class)
+        rule.onNodeWithTag(Tag)
+            .performTextInputSelection(TextRange(1, 1))
+
+        rule.runOnIdle {
+            assertThat(onValueChangeCalled).isFalse()
+        }
+
+        // change text
+        rule.onNodeWithTag(Tag)
+            .performTextInput("d")
+
+        rule.runOnIdle {
+            assertThat(onValueChangeCalled).isTrue()
+        }
+    }
+
+    @Test
+    @Ignore // b/184750119
+    fun textField_callsOnValueChange_whenTextFieldValueChange() {
+        var onValueChangeCalled = false
+        var lastSeenTextFieldValue = TextFieldValue()
+
+        rule.setContent {
+            val state = remember { mutableStateOf(TextFieldValue("abc")) }
+            BasicTextField(
+                modifier = Modifier.testTag(Tag),
+                value = state.value,
+                onValueChange = {
+                    onValueChangeCalled = true
+                    lastSeenTextFieldValue = it
+                    state.value = it
+                }
+            )
+        }
+
+        @OptIn(ExperimentalTestApi::class)
+        rule.onNodeWithTag(Tag)
+            .performClick()
+            .performTextInputSelection(TextRange(0, 0))
+
+        // reset flag since click might change selection
+        rule.runOnIdle {
+            onValueChangeCalled = false
+        }
+
+        @OptIn(ExperimentalTestApi::class)
+        rule.onNodeWithTag(Tag)
+            .performTextInputSelection(TextRange(1, 1))
+
+        // selection changed
+        rule.runOnIdle {
+            assertWithMessage("$lastSeenTextFieldValue").that(onValueChangeCalled).isTrue()
+            // reset flag
+            onValueChangeCalled = false
+        }
+        rule.waitUntil { onValueChangeCalled == false }
+
+        // set selection to same value, no change should occur
+        @OptIn(ExperimentalTestApi::class)
+        rule.onNodeWithTag(Tag)
+            .performTextInputSelection(TextRange(1, 1))
+
+        rule.runOnIdle {
+            assertWithMessage("$lastSeenTextFieldValue").that(onValueChangeCalled).isFalse()
+        }
+
+        rule.onNodeWithTag(Tag)
+            .performTextInput("d")
+
+        rule.runOnIdle {
+            assertWithMessage("$lastSeenTextFieldValue").that(onValueChangeCalled).isTrue()
         }
     }
 }

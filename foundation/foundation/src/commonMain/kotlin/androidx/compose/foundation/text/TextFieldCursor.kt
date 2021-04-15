@@ -45,7 +45,7 @@ internal fun Modifier.cursor(
     val cursorAlpha = remember { Animatable(1f) }
     val isBrushSpecified = !(cursorBrush is SolidColor && cursorBrush.value.isUnspecified)
     if (state.hasFocus && value.selection.collapsed && isBrushSpecified) {
-        LaunchedEffect(cursorBrush, value.annotatedString) {
+        LaunchedEffect(cursorBrush, value.annotatedString, value.selection) {
             cursorAlpha.animateTo(0f, cursorAnimationSpec)
         }
         drawWithContent {

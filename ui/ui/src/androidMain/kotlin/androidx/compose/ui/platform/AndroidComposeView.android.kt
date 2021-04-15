@@ -51,12 +51,15 @@ import androidx.compose.ui.autofill.registerCallback
 import androidx.compose.ui.autofill.unregisterCallback
 import androidx.compose.ui.focus.FOCUS_TAG
 import androidx.compose.ui.focus.FocusDirection
-import androidx.compose.ui.focus.FocusDirection.Down
-import androidx.compose.ui.focus.FocusDirection.Left
-import androidx.compose.ui.focus.FocusDirection.Next
-import androidx.compose.ui.focus.FocusDirection.Previous
-import androidx.compose.ui.focus.FocusDirection.Right
-import androidx.compose.ui.focus.FocusDirection.Up
+import androidx.compose.ui.focus.FocusDirectionInternal
+import androidx.compose.ui.focus.FocusDirectionInternal.Down
+import androidx.compose.ui.focus.FocusDirectionInternal.In
+import androidx.compose.ui.focus.FocusDirectionInternal.Left
+import androidx.compose.ui.focus.FocusDirectionInternal.Next
+import androidx.compose.ui.focus.FocusDirectionInternal.Out
+import androidx.compose.ui.focus.FocusDirectionInternal.Previous
+import androidx.compose.ui.focus.FocusDirectionInternal.Right
+import androidx.compose.ui.focus.FocusDirectionInternal.Up
 import androidx.compose.ui.focus.FocusManager
 import androidx.compose.ui.focus.FocusManagerImpl
 import androidx.compose.ui.geometry.Offset
@@ -64,6 +67,7 @@ import androidx.compose.ui.graphics.Canvas
 import androidx.compose.ui.graphics.CanvasHolder
 import androidx.compose.ui.hapticfeedback.AndroidHapticFeedback
 import androidx.compose.ui.hapticfeedback.HapticFeedback
+import androidx.compose.ui.input.key.Key.Companion.DirectionCenter
 import androidx.compose.ui.input.key.Key.Companion.DirectionDown
 import androidx.compose.ui.input.key.Key.Companion.DirectionLeft
 import androidx.compose.ui.input.key.Key.Companion.DirectionRight
@@ -157,8 +161,21 @@ internal class AndroidComposeView(context: Context) :
             val focusDirection = getFocusDirection(it)
             if (focusDirection == null || it.type != KeyDown) return@KeyInputModifier false
 
+            val focusMoveSuccess = with(focusManager) {
+                when (focusDirection) {
+                    Up -> moveFocus(FocusDirection.Up)
+                    Down -> moveFocus(FocusDirection.Down)
+                    Left -> moveFocus(FocusDirection.Left)
+                    Right -> moveFocus(FocusDirection.Right)
+                    In -> moveFocusIn()
+                    Out -> moveFocusOut()
+                    Next -> moveFocus(FocusDirection.Next)
+                    Previous -> moveFocus(FocusDirection.Previous)
+                }
+            }
+
             // Consume the key event if we moved focus.
-            focusManager.moveFocus(focusDirection)
+            focusMoveSuccess
         },
         onPreviewKeyEvent = null
     )
@@ -261,7 +278,16 @@ internal class AndroidComposeView(context: Context) :
 
     private val tmpPositionArray = intArrayOf(0, 0)
     private val tmpOffsetArray = floatArrayOf(0f, 0f)
-    private val tmpMatrix = Matrix()
+    private val viewToWindowMatrix = Matrix()
+    private val windowToViewMatrix = Matrix()
+    private var lastMatrixRecalculationDrawingTime = -1L
+
+    /**
+     * On some devices, the `getLocationOnScreen()` returns `(0, 0)` even when the Window
+     * is offset in special circumstances. This contains the screen coordinates of the containing
+     * Window the last time the [viewToWindowMatrix] and [windowToViewMatrix] were recalculated.
+     */
+    private var windowPosition = Offset.Infinite
 
     // Used to track whether or not there was an exception while creating an MRenderNode
     // so that we don't have to continue using try/catch after fails once.
@@ -587,10 +613,10 @@ internal class AndroidComposeView(context: Context) :
                 // ViewLayer.shouldUseDispatchDraw will be true.
                 ViewLayer.updateDisplayList(View(context))
             }
-            if (ViewLayer.shouldUseDispatchDraw) {
-                viewLayersContainer = DrawChildContainer(context)
+            viewLayersContainer = if (ViewLayer.shouldUseDispatchDraw) {
+                DrawChildContainer(context)
             } else {
-                viewLayersContainer = ViewLayerContainer(context)
+                ViewLayerContainer(context)
             }
             addView(viewLayersContainer)
         }
@@ -605,13 +631,21 @@ internal class AndroidComposeView(context: Context) :
         accessibilityDelegate.onLayoutChange(layoutNode)
     }
 
-    override fun getFocusDirection(keyEvent: KeyEvent): FocusDirection? = when (keyEvent.key) {
-        Tab -> if (keyEvent.isShiftPressed) Previous else Next
-        DirectionRight -> Right
-        DirectionLeft -> Left
-        DirectionUp -> Up
-        DirectionDown -> Down
-        else -> null
+    override fun getFocusDirection(keyEvent: KeyEvent): FocusDirectionInternal? {
+        return when (keyEvent.key) {
+            Tab -> if (keyEvent.isShiftPressed) Previous else Next
+            DirectionRight -> Right
+            DirectionLeft -> Left
+            DirectionUp -> Up
+            DirectionDown -> Down
+            DirectionCenter -> In
+            // TODO(b/183746743): Enable Back after fixing issue with DemoTests (b/185211677).
+            // If we use the back button to clear focus, then the demo tests need two Back
+            // events when an item is focused. Either remove initial focus from the affected
+            // Demos or call clearFocus() before sending the Back key event.
+            // Back -> Out
+            else -> null
+        }
     }
 
     override fun dispatchDraw(canvas: android.graphics.Canvas) {
@@ -741,6 +775,7 @@ internal class AndroidComposeView(context: Context) :
 
     // TODO(shepshapard): Test this method.
     override fun dispatchTouchEvent(motionEvent: MotionEvent): Boolean {
+        recalculateWindowPosition(motionEvent)
         measureAndLayout()
         val processResult = trace("AndroidOwner:onTouch") {
             val pointerInputEvent = motionEventAdapter.convertToPointerInputEvent(motionEvent, this)
@@ -763,31 +798,65 @@ internal class AndroidComposeView(context: Context) :
     }
 
     override fun localToScreen(localPosition: Offset): Offset {
-        tmpMatrix.reset()
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-            TransformMatrixApi29.transformMatrixToScreen(this, tmpMatrix)
-        } else {
-            TransformMatrixApi28.transformMatrixToScreen(this, tmpMatrix, tmpPositionArray)
-        }
+        recalculateWindowPosition()
         val points = tmpOffsetArray
         points[0] = localPosition.x
         points[1] = localPosition.y
-        tmpMatrix.mapPoints(points)
-        return Offset(points[0], points[1])
+        viewToWindowMatrix.mapPoints(points)
+        return Offset(
+            points[0] + windowPosition.x,
+            points[1] + windowPosition.y
+        )
     }
 
     override fun screenToLocal(positionOnScreen: Offset): Offset {
-        tmpMatrix.reset()
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-            TransformMatrixApi29.transformMatrixFromScreen(this, tmpMatrix)
-        } else {
-            TransformMatrixApi28.transformMatrixFromScreen(this, tmpMatrix, tmpPositionArray)
-        }
+        recalculateWindowPosition()
         val points = tmpOffsetArray
-        points[0] = positionOnScreen.x
-        points[1] = positionOnScreen.y
-        tmpMatrix.mapPoints(points)
+        points[0] = positionOnScreen.x - windowPosition.x
+        points[1] = positionOnScreen.y - windowPosition.y
+        windowToViewMatrix.mapPoints(points)
         return Offset(points[0], points[1])
+    }
+
+    private fun recalculateWindowPosition(motionEvent: MotionEvent) {
+        lastMatrixRecalculationDrawingTime = drawingTime
+        recalculateWindowViewTransforms()
+        val points = tmpOffsetArray
+        points[0] = motionEvent.x
+        points[1] = motionEvent.y
+        viewToWindowMatrix.mapPoints(points)
+
+        windowPosition = Offset(
+            motionEvent.rawX - points[0],
+            motionEvent.rawY - points[1]
+        )
+    }
+
+    private fun recalculateWindowPosition() {
+        val drawingTime = drawingTime
+        if (drawingTime != lastMatrixRecalculationDrawingTime) {
+            lastMatrixRecalculationDrawingTime = drawingTime
+            recalculateWindowViewTransforms()
+            var viewParent = parent
+            var view: View = this
+            while (viewParent is ViewGroup) {
+                view = viewParent
+                viewParent = view.parent
+            }
+            view.getLocationOnScreen(tmpPositionArray)
+            val screenX = tmpPositionArray[0].toFloat()
+            val screenY = tmpPositionArray[1].toFloat()
+            view.getLocationInWindow(tmpPositionArray)
+            val windowX = tmpPositionArray[0].toFloat()
+            val windowY = tmpPositionArray[1].toFloat()
+            windowPosition = Offset(screenX - windowX, screenY - windowY)
+        }
+    }
+
+    private fun recalculateWindowViewTransforms() {
+        viewToWindowMatrix.reset()
+        transformMatrixToWindow(this, viewToWindowMatrix)
+        viewToWindowMatrix.invert(windowToViewMatrix)
     }
 
     override fun onCheckIsTextEditor(): Boolean = textInputServiceAndroid.isEditorFocused()
@@ -796,30 +865,20 @@ internal class AndroidComposeView(context: Context) :
         textInputServiceAndroid.createInputConnection(outAttrs)
 
     override fun calculateLocalPosition(positionInWindow: Offset): Offset {
-        tmpMatrix.reset()
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-            TransformMatrixApi29.transformMatrixFromWindow(this, tmpMatrix, tmpPositionArray)
-        } else {
-            TransformMatrixApi28.transformMatrixFromWindow(this, tmpMatrix)
-        }
+        recalculateWindowPosition()
         val points = tmpOffsetArray
         points[0] = positionInWindow.x
         points[1] = positionInWindow.y
-        tmpMatrix.mapPoints(points)
+        windowToViewMatrix.mapPoints(points)
         return Offset(points[0], points[1])
     }
 
     override fun calculatePositionInWindow(localPosition: Offset): Offset {
-        tmpMatrix.reset()
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-            TransformMatrixApi29.transformMatrixToWindow(this, tmpMatrix, tmpPositionArray)
-        } else {
-            TransformMatrixApi28.transformMatrixToWindow(this, tmpMatrix)
-        }
+        recalculateWindowPosition()
         val points = tmpOffsetArray
         points[0] = localPosition.x
         points[1] = localPosition.y
-        tmpMatrix.mapPoints(points)
+        viewToWindowMatrix.mapPoints(points)
         return Offset(points[0], points[1])
     }
 
@@ -880,7 +939,7 @@ internal class AndroidComposeView(context: Context) :
      * Q and later, AccessibilityInteractionController#findViewByAccessibilityId uses
      * AccessibilityNodeIdManager and findViewByAccessibilityIdTraversal is only used by autofill.
      */
-    public fun findViewByAccessibilityIdTraversal(accessibilityId: Int): View? {
+    fun findViewByAccessibilityIdTraversal(accessibilityId: Int): View? {
         try {
             // AccessibilityInteractionController#findViewByAccessibilityId doesn't call this
             // method in Android Q and later. Ideally, we should only define this method in
@@ -888,14 +947,13 @@ internal class AndroidComposeView(context: Context) :
             // invoke the hidden parent method after Android P. If in new android, the hidden method
             // ViewGroup#findViewByAccessibilityIdTraversal signature is changed or removed, we can
             // simply return null here because there will be no call to this method.
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+            return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
                 val findViewByAccessibilityIdTraversalMethod = View::class.java
                     .getDeclaredMethod("findViewByAccessibilityIdTraversal", Int::class.java)
                 findViewByAccessibilityIdTraversalMethod.isAccessible = true
-                return findViewByAccessibilityIdTraversalMethod.invoke(this, accessibilityId) as?
-                    View
+                findViewByAccessibilityIdTraversalMethod.invoke(this, accessibilityId) as? View
             } else {
-                return findViewByAccessibilityIdRootedAtCurrentView(accessibilityId, this)
+                findViewByAccessibilityIdRootedAtCurrentView(accessibilityId, this)
             }
         } catch (e: NoSuchMethodException) {
             return null
@@ -911,7 +969,7 @@ internal class AndroidComposeView(context: Context) :
         private var getBooleanMethod: Method? = null
 
         // TODO(mount): replace with ViewCompat.isShowingLayoutBounds() when it becomes available.
-        @SuppressLint("PrivateApi")
+        @SuppressLint("PrivateApi", "BanUncheckedReflection")
         private fun getIsShowingLayoutBounds(): Boolean = try {
             if (systemPropertiesClass == null) {
                 systemPropertiesClass = Class.forName("android.os.SystemProperties")
@@ -924,6 +982,20 @@ internal class AndroidComposeView(context: Context) :
             getBooleanMethod?.invoke(null, "debug.layout", false) as? Boolean ?: false
         } catch (e: Exception) {
             false
+        }
+
+        fun transformMatrixToWindow(view: View, matrix: Matrix) {
+            val parentView = view.parent
+            if (parentView is View) {
+                transformMatrixToWindow(parentView, matrix)
+                matrix.preTranslate(-view.scrollX.toFloat(), -view.scrollY.toFloat())
+                matrix.preTranslate(view.left.toFloat(), view.top.toFloat())
+            }
+
+            val viewMatrix = view.matrix
+            if (!viewMatrix.isIdentity) {
+                matrix.preConcat(viewMatrix)
+            }
         }
     }
 
@@ -959,94 +1031,6 @@ private fun layoutDirectionFromInt(layoutDirection: Int): LayoutDirection = when
     android.util.LayoutDirection.LTR -> LayoutDirection.Ltr
     android.util.LayoutDirection.RTL -> LayoutDirection.Rtl
     else -> LayoutDirection.Ltr
-}
-
-private fun View.findRootView(): View {
-    var contentView: View = this
-    var parent = contentView.parent
-    while (parent is View) {
-        contentView = parent
-        parent = contentView.parent
-    }
-    return contentView
-}
-
-private class TransformMatrixApi28 {
-    companion object {
-        fun transformMatrixToWindow(view: View, matrix: Matrix) =
-            transformFromLocal(view, matrix, null)
-
-        fun transformMatrixToScreen(view: View, matrix: Matrix, tmpPositionArray: IntArray) =
-            transformFromLocal(view, matrix, tmpPositionArray)
-
-        fun transformMatrixFromWindow(view: View, matrix: Matrix) =
-            transformToLocal(view, matrix, null)
-
-        fun transformMatrixFromScreen(view: View, matrix: Matrix, tmpPositionArray: IntArray) =
-            transformToLocal(view, matrix, tmpPositionArray)
-
-        private fun transformFromLocal(view: View, transform: Matrix, tmpPositionArray: IntArray?) {
-            val parentView = view.parent
-            if (parentView is View) {
-                transformFromLocal(parentView, transform, tmpPositionArray)
-                transform.preTranslate(-view.scrollX.toFloat(), -view.scrollY.toFloat())
-                transform.preTranslate(view.left.toFloat(), view.top.toFloat())
-            } else if (tmpPositionArray != null) {
-                view.getLocationOnScreen(tmpPositionArray)
-                transform.preTranslate(tmpPositionArray[0].toFloat(), tmpPositionArray[1].toFloat())
-            }
-
-            val matrix = view.matrix
-            if (!matrix.isIdentity) {
-                transform.preConcat(matrix)
-            }
-        }
-
-        private fun transformToLocal(view: View, transform: Matrix, tmpPositionArray: IntArray?) {
-            val parentView = view.parent
-            if (parentView is View) {
-                transformToLocal(parentView, transform, tmpPositionArray)
-                transform.postTranslate(view.scrollX.toFloat(), view.scrollY.toFloat())
-                transform.postTranslate(-view.left.toFloat(), -view.top.toFloat())
-            } else if (tmpPositionArray != null) {
-                view.getLocationOnScreen(tmpPositionArray)
-                transform.postTranslate(
-                    -tmpPositionArray[0].toFloat(),
-                    -tmpPositionArray[1].toFloat()
-                )
-            }
-
-            val matrix = view.matrix
-            if (!matrix.isIdentity) {
-                matrix.invert(matrix)
-                transform.postConcat(matrix)
-            }
-        }
-    }
-}
-
-private class TransformMatrixApi29 {
-    @RequiresApi(Build.VERSION_CODES.Q)
-    companion object {
-        fun transformMatrixToScreen(view: View, matrix: Matrix) =
-            view.transformMatrixToGlobal(matrix)
-
-        fun transformMatrixToWindow(view: View, matrix: Matrix, tmpPositionArray: IntArray) {
-            val rootView = view.findRootView()
-            rootView.getLocationOnScreen(tmpPositionArray)
-            matrix.preTranslate(-tmpPositionArray[0].toFloat(), -tmpPositionArray[1].toFloat())
-            view.transformMatrixToGlobal(matrix)
-        }
-        fun transformMatrixFromScreen(view: View, matrix: Matrix) =
-            view.transformMatrixToLocal(matrix)
-
-        fun transformMatrixFromWindow(view: View, matrix: Matrix, tmpPositionArray: IntArray) {
-            val rootView = view.findRootView()
-            rootView.getLocationOnScreen(tmpPositionArray)
-            matrix.postTranslate(tmpPositionArray[0].toFloat(), tmpPositionArray[1].toFloat())
-            view.transformMatrixToLocal(matrix)
-        }
-    }
 }
 
 /** @suppress */

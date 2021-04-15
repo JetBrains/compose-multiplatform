@@ -54,6 +54,13 @@ class ParagraphBenchmark(
             arrayOf(TextType.PlainText, TextType.StyledText),
             arrayOf(Alphabet.Latin, Alphabet.Cjk)
         )
+
+        // A fake resource loader required to construct Paragraph
+        val resourceLoader = object : Font.ResourceLoader {
+            override fun load(font: Font): Any {
+                return false
+            }
+        }
     }
 
     @get:Rule
@@ -75,13 +82,6 @@ class ParagraphBenchmark(
             textBenchmarkRule.widthDp,
             instrumentationContext.resources.displayMetrics
         )
-    }
-
-    // A fake resource loader required to construct Paragraph
-    private val resourceLoader = object : Font.ResourceLoader {
-        override fun load(font: Font): Any {
-            return false
-        }
     }
 
     private fun text(textGenerator: RandomTextGenerator): AnnotatedString {

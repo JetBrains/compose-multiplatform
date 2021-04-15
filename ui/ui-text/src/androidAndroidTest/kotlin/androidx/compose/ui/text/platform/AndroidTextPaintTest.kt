@@ -16,6 +16,7 @@
 
 package androidx.compose.ui.text.platform
 
+import android.graphics.Paint
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shadow
@@ -31,17 +32,25 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 @RunWith(AndroidJUnit4::class)
 @SmallTest
 class AndroidTextPaintTest {
+    @Test
+    fun constructor() {
+        val density = 15.0f
+        val textPaint = AndroidTextPaint(Paint.ANTI_ALIAS_FLAG, density)
+
+        assertThat(textPaint.density).isEqualTo(15.0f)
+        assertThat(textPaint.flags and Paint.ANTI_ALIAS_FLAG).isNotEqualTo(0)
+    }
 
     @Test
     fun textDecoration_defaultValues() {
-        val textPaint = AndroidTextPaint(0)
+        val textPaint = defaultTextPaint
         assertThat(textPaint.isUnderlineText).isFalse()
         assertThat(textPaint.isStrikeThruText).isFalse()
     }
 
     @Test
     fun setTextDecoration_withNone() {
-        val textPaint = AndroidTextPaint(0)
+        val textPaint = defaultTextPaint
         textPaint.setTextDecoration(TextDecoration.None)
         assertThat(textPaint.isUnderlineText).isFalse()
         assertThat(textPaint.isStrikeThruText).isFalse()
@@ -49,7 +58,7 @@ class AndroidTextPaintTest {
 
     @Test
     fun setTextDecoration_withNull() {
-        val textPaint = AndroidTextPaint(0)
+        val textPaint = defaultTextPaint
         textPaint.setTextDecoration(null)
         assertThat(textPaint.isUnderlineText).isFalse()
         assertThat(textPaint.isStrikeThruText).isFalse()
@@ -57,7 +66,7 @@ class AndroidTextPaintTest {
 
     @Test
     fun setTextDecoration_withUnderline() {
-        val textPaint = AndroidTextPaint(0)
+        val textPaint = defaultTextPaint
         textPaint.setTextDecoration(TextDecoration.Underline)
         assertThat(textPaint.isUnderlineText).isTrue()
         assertThat(textPaint.isStrikeThruText).isFalse()
@@ -65,7 +74,7 @@ class AndroidTextPaintTest {
 
     @Test
     fun setTextDecoration_withLineThrough() {
-        val textPaint = AndroidTextPaint(0)
+        val textPaint = defaultTextPaint
         textPaint.setTextDecoration(TextDecoration.LineThrough)
         assertThat(textPaint.isUnderlineText).isFalse()
         assertThat(textPaint.isStrikeThruText).isTrue()
@@ -73,7 +82,7 @@ class AndroidTextPaintTest {
 
     @Test
     fun setTextDecoration_withLineThroughAndUnderline() {
-        val textPaint = AndroidTextPaint(0)
+        val textPaint = defaultTextPaint
         textPaint.setTextDecoration(
             TextDecoration.combine(
                 listOf(TextDecoration.LineThrough, TextDecoration.Underline)
@@ -85,7 +94,7 @@ class AndroidTextPaintTest {
 
     @Test
     fun setTextDecoration_changeDecorationToNull() {
-        val textPaint = AndroidTextPaint(0)
+        val textPaint = defaultTextPaint
         textPaint.setTextDecoration(
             TextDecoration.combine(
                 listOf(TextDecoration.LineThrough, TextDecoration.Underline)
@@ -102,7 +111,7 @@ class AndroidTextPaintTest {
     @Test
     fun setColor_to_valid_value() {
         val color = Color.Red
-        val textPaint = AndroidTextPaint(0)
+        val textPaint = defaultTextPaint
         textPaint.setColor(color)
 
         assertThat(textPaint.color).isEqualTo(color.toArgb())
@@ -110,7 +119,7 @@ class AndroidTextPaintTest {
 
     @Test
     fun setColor_to_unspecified() {
-        val textPaint = AndroidTextPaint(0)
+        val textPaint = defaultTextPaint
         textPaint.setColor(Color.Unspecified)
         assertThat(textPaint.color).isNotEqualTo(Color.Unspecified.toArgb())
 
@@ -123,7 +132,7 @@ class AndroidTextPaintTest {
 
     @Test
     fun setColor_to_transparent() {
-        val textPaint = AndroidTextPaint(0)
+        val textPaint = defaultTextPaint
         textPaint.setColor(Color.Transparent)
         assertThat(textPaint.color).isEqualTo(Color.Transparent.toArgb())
 
@@ -137,7 +146,7 @@ class AndroidTextPaintTest {
     @SdkSuppress(minSdkVersion = 29)
     @Test
     fun shadow_default_values() {
-        val textPaint = AndroidTextPaint(0)
+        val textPaint = defaultTextPaint
 
         // default color is 0 since we do not update it
         assertThat(textPaint.shadowLayerDx).isEqualTo(0f)
@@ -153,7 +162,7 @@ class AndroidTextPaintTest {
         val dy = 2f
         val radius = 3f
         val color = Color.Red
-        val textPaint = AndroidTextPaint(0)
+        val textPaint = defaultTextPaint
 
         textPaint.setShadow(Shadow(color, Offset(dx, dy), radius))
 
@@ -170,7 +179,7 @@ class AndroidTextPaintTest {
         val dy = 2f
         val radius = 3f
         val color = Color.Red
-        val textPaint = AndroidTextPaint(0)
+        val textPaint = defaultTextPaint
 
         textPaint.setShadow(Shadow(color, Offset(dx, dy), radius))
         textPaint.setShadow(Shadow.None)
@@ -188,7 +197,7 @@ class AndroidTextPaintTest {
         val dy = 2f
         val radius = 3f
         val color = Color.Red
-        val textPaint = AndroidTextPaint(0)
+        val textPaint = defaultTextPaint
 
         textPaint.setShadow(Shadow(color, Offset(dx, dy), radius))
         textPaint.setShadow(null)
@@ -198,4 +207,6 @@ class AndroidTextPaintTest {
         assertThat(textPaint.shadowLayerRadius).isEqualTo(0f)
         assertThat(textPaint.shadowLayerColor).isEqualTo(0)
     }
+
+    private val defaultTextPaint get() = AndroidTextPaint(flags = 0, density = 1.0f)
 }

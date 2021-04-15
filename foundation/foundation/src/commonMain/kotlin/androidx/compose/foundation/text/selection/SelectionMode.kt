@@ -58,16 +58,16 @@ internal enum class SelectionMode {
             start: Offset,
             end: Offset
         ): Boolean {
-            if (start.y >= bounds.top && start.y < bounds.bottom &&
+            return if (start.y >= bounds.top && start.y < bounds.bottom &&
                 end.y >= bounds.top && end.y < bounds.bottom
             ) {
                 // When the start and end of the selection are in the same row of widgets, check if
                 // x coordinates of the start and end are crossed each other.
-                return start.x > end.x
+                start.x > end.x
             } else {
                 // When the start and end of the selection are not in the same row of widgets, check
                 // if y coordinates of the start and end are crossed each other.
-                return start.y > end.y
+                start.y > end.y
             }
         }
     },
@@ -107,16 +107,16 @@ internal enum class SelectionMode {
             start: Offset,
             end: Offset
         ): Boolean {
-            if (start.x >= bounds.left && start.x < bounds.right &&
+            return if (start.x >= bounds.left && start.x < bounds.right &&
                 end.x >= bounds.left && end.x < bounds.right
             ) {
                 // When the start and end of the selection are in the same column of widgets,
                 // check if y coordinates of the start and end are crossed each other.
-                return start.y > end.y
+                start.y > end.y
             } else {
                 // When the start and end of the selection are not in the same column of widgets,
                 // check if x coordinates of the start and end are crossed each other.
-                return start.x > end.x
+                start.x > end.x
             }
         }
     };

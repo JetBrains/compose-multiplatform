@@ -22,23 +22,36 @@ import androidx.compose.ui.inspection.util.asIntArray
  * A reference to a parameter to a [NodeParameter]
  *
  * @param nodeId is the id of the node the parameter belongs to
- * @param parameterIndex is the parameter index among [InspectorNode.parameters]
+ * @param kind is this a reference to a normal, merged, or unmerged semantic parameter.
+ * @param parameterIndex index into [InspectorNode.parameters], [InspectorNode.mergedSemantics],
+ *        or [InspectorNode.unMergedSemantics]
  * @param indices are indices into the composite parameter
  */
 class NodeParameterReference(
     val nodeId: Long,
+    val kind: ParameterKind,
     val parameterIndex: Int,
     val indices: IntArray
 ) {
     constructor (
         nodeId: Long,
+        kind: ParameterKind,
         parameterIndex: Int,
         indices: List<Int>
-    ) : this(nodeId, parameterIndex, indices.asIntArray())
+    ) : this(nodeId, kind, parameterIndex, indices.asIntArray())
 
     // For testing:
     override fun toString(): String {
         val suffix = if (indices.isNotEmpty()) ", ${indices.joinToString()}" else ""
-        return "[$nodeId, $parameterIndex$suffix]"
+        return "[$nodeId, $kind, $parameterIndex$suffix]"
     }
+}
+
+/**
+ * Identifies which kind of parameter the [NodeParameterReference] is a reference to.
+ */
+enum class ParameterKind {
+    Normal,
+    MergedSemantics,
+    UnmergedSemantics
 }

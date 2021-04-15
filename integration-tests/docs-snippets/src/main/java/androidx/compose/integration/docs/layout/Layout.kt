@@ -274,7 +274,7 @@ private object LayoutSnippet11 {
 private object LayoutSnippet12 {
     fun Modifier.firstBaselineToTop(
         firstBaselineToTop: Dp
-    ) = Modifier.layout { measurable, constraints ->
+    ) = layout { measurable, constraints ->
         // Measure the composable
         val placeable = measurable.measure(constraints)
 

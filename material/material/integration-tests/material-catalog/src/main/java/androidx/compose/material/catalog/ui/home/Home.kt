@@ -26,6 +26,7 @@ import androidx.compose.material.catalog.R
 import androidx.compose.material.catalog.insets.LocalWindowInsets
 import androidx.compose.material.catalog.insets.toPaddingValues
 import androidx.compose.material.catalog.model.Component
+import androidx.compose.material.catalog.model.Theme
 import androidx.compose.material.catalog.ui.common.CatalogScaffold
 import androidx.compose.material.catalog.ui.component.ComponentItem
 import androidx.compose.runtime.Composable
@@ -37,10 +38,14 @@ import androidx.compose.ui.unit.dp
 @OptIn(ExperimentalFoundationApi::class)
 fun Home(
     components: List<Component>,
+    theme: Theme,
+    onThemeChange: (theme: Theme) -> Unit,
     onComponentClick: (component: Component) -> Unit
 ) {
     CatalogScaffold(
-        topBarTitle = stringResource(id = R.string.material_components)
+        topBarTitle = stringResource(id = R.string.material_components),
+        theme = theme,
+        onThemeChange = onThemeChange
     ) { paddingValues ->
         BoxWithConstraints(modifier = Modifier.padding(paddingValues)) {
             val cellsCount = maxOf((maxWidth / HomeCellMinSize).toInt(), 1)

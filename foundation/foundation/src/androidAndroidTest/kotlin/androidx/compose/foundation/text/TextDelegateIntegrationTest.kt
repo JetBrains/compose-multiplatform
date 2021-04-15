@@ -17,7 +17,6 @@
 package androidx.compose.foundation.text
 
 import android.graphics.Bitmap
-import androidx.compose.foundation.text.selection.TestFontResourceLoader
 import androidx.compose.ui.geometry.Rect
 import androidx.compose.ui.graphics.Canvas
 import androidx.compose.ui.graphics.Color
@@ -26,9 +25,7 @@ import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.TextLayoutResult
 import androidx.compose.ui.text.TextStyle
-import androidx.compose.ui.text.font.toFontFamily
 import androidx.compose.foundation.text.matchers.assertThat
-import androidx.compose.foundation.text.selection.BASIC_MEASURE_FONT
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.Density
@@ -46,7 +43,7 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 @SmallTest
 class TextDelegateIntegrationTest {
 
-    private val fontFamily = BASIC_MEASURE_FONT.toFontFamily()
+    private val fontFamily = TEST_FONT_FAMILY
     private val density = Density(density = 1f)
     private val context = InstrumentationRegistry.getInstrumentation().context
     private val resourceLoader = TestFontResourceLoader(context)

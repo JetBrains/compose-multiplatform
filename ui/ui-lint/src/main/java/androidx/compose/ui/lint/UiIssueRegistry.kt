@@ -30,6 +30,7 @@ class UiIssueRegistry : IssueRegistry() {
         ModifierDeclarationDetector.ComposableModifierFactory,
         ModifierDeclarationDetector.ModifierFactoryExtensionFunction,
         ModifierDeclarationDetector.ModifierFactoryReturnType,
+        ModifierDeclarationDetector.ModifierFactoryUnreferencedReceiver,
         ModifierParameterDetector.ModifierParameter
     )
 }

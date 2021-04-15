@@ -159,21 +159,25 @@ internal class TextFieldDelegate {
                 return
             }
 
-            val bbox = if (value.selection.max < value.text.length) {
-                textLayoutResult.getBoundingBox(
-                    offsetMapping.originalToTransformed(value.selection.max)
-                )
-            } else if (value.selection.max != 0) {
-                textLayoutResult.getBoundingBox(
-                    offsetMapping.originalToTransformed(value.selection.max) - 1
-                )
-            } else {
-                val defaultSize = computeSizeForDefaultText(
-                    textDelegate.style,
-                    textDelegate.density,
-                    textDelegate.resourceLoader
-                )
-                Rect(0f, 0f, 1.0f, defaultSize.height.toFloat())
+            val bbox = when {
+                value.selection.max < value.text.length -> {
+                    textLayoutResult.getBoundingBox(
+                        offsetMapping.originalToTransformed(value.selection.max)
+                    )
+                }
+                value.selection.max != 0 -> {
+                    textLayoutResult.getBoundingBox(
+                        offsetMapping.originalToTransformed(value.selection.max) - 1
+                    )
+                }
+                else -> {
+                    val defaultSize = computeSizeForDefaultText(
+                        textDelegate.style,
+                        textDelegate.density,
+                        textDelegate.resourceLoader
+                    )
+                    Rect(0f, 0f, 1.0f, defaultSize.height.toFloat())
+                }
             }
             val globalLT = layoutCoordinates.localToRoot(Offset(bbox.left, bbox.top))
 
@@ -222,6 +226,33 @@ internal class TextFieldDelegate {
         }
 
         /**
+         * Starts a new input connection.
+         *
+         * @param textInputService The text input service
+         * @param value The editor state
+         * @param editProcessor The edit processor
+         * @param onValueChange The callback called when the new editor state arrives.
+         * @param onImeActionPerformed The callback called when the editor action arrives.
+         * @param imeOptions Keyboard configuration such as single line, auto correct etc.
+         */
+        @JvmStatic
+        internal fun restartInput(
+            textInputService: TextInputService,
+            value: TextFieldValue,
+            editProcessor: EditProcessor,
+            imeOptions: ImeOptions,
+            onValueChange: (TextFieldValue) -> Unit,
+            onImeActionPerformed: (ImeAction) -> Unit
+        ): TextInputSession {
+            return textInputService.startInput(
+                value = value.copy(),
+                imeOptions = imeOptions,
+                onEditCommand = { onEditCommand(it, editProcessor, onValueChange) },
+                onImeActionPerformed = onImeActionPerformed
+            )
+        }
+
+        /**
          * Called when the composable gained input focus
          *
          * @param textInputService The text input service
@@ -240,10 +271,12 @@ internal class TextFieldDelegate {
             onValueChange: (TextFieldValue) -> Unit,
             onImeActionPerformed: (ImeAction) -> Unit
         ): TextInputSession {
-            val textInputSession = textInputService.startInput(
-                value = value.copy(),
+            val textInputSession = restartInput(
+                textInputService = textInputService,
+                value = value,
+                editProcessor = editProcessor,
                 imeOptions = imeOptions,
-                onEditCommand = { onEditCommand(it, editProcessor, onValueChange) },
+                onValueChange = onValueChange,
                 onImeActionPerformed = onImeActionPerformed
             )
 

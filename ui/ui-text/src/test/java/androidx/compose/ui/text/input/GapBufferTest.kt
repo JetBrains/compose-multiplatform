@@ -693,29 +693,29 @@ class GapBufferTest {
 
         val r = Random(10 /* fix the seed for reproduction */)
 
-        val INSERT_TEXTS = arrayOf(SHORT_TEXT, MEDIUM_TEXT, LONG_TEXT)
-        val DEL_LENGTHS = arrayOf(1, 10, 100)
+        val insertTexts = arrayOf(SHORT_TEXT, MEDIUM_TEXT, LONG_TEXT)
+        val delLengths = arrayOf(1, 10, 100)
 
         var c = LONG_INIT_TEXT.length / 2
 
         for (i in 0..100) {
             when (r.nextInt() % 4) {
                 0 -> { // insert
-                    val txt = INSERT_TEXTS.random(r)
+                    val txt = insertTexts.random(r)
                     assertReplace(c, c, txt, sb, gb)
                     c += txt.length
                 }
                 1 -> { // forward delete
-                    assertReplace(c, c + DEL_LENGTHS.random(r), "", sb, gb)
+                    assertReplace(c, c + delLengths.random(r), "", sb, gb)
                 }
                 2 -> { // backspacing
-                    val len = DEL_LENGTHS.random(r)
+                    val len = delLengths.random(r)
                     assertReplace(c - len, c, "", sb, gb)
                     c -= len
                 }
                 3 -> { // replacing
-                    val txt = INSERT_TEXTS.random(r)
-                    val len = DEL_LENGTHS.random(r)
+                    val txt = insertTexts.random(r)
+                    val len = delLengths.random(r)
 
                     assertReplace(c, c + len, txt, sb, gb)
                 }

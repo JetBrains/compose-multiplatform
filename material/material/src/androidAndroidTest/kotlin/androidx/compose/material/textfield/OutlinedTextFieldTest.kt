@@ -30,7 +30,6 @@ import androidx.compose.material.LocalTextStyle
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.OutlinedTextField
 import androidx.compose.material.Text
-import androidx.compose.material.TextField
 import androidx.compose.material.TextFieldPadding
 import androidx.compose.material.runOnIdleWithDensity
 import androidx.compose.material.setMaterialContent
@@ -96,9 +95,9 @@ class OutlinedTextFieldTest {
     val rule = createComposeRule()
 
     @Test
-    fun testTextField_setSmallWidth() {
+    fun testOutlinedTextField_setSmallWidth() {
         rule.setMaterialContentForSizeAssertions {
-            TextField(
+            OutlinedTextField(
                 value = "input",
                 onValueChange = {},
                 label = {},
@@ -109,9 +108,9 @@ class OutlinedTextFieldTest {
     }
 
     @Test
-    fun testTextField_defaultWidth() {
+    fun testOutlinedTextField_defaultWidth() {
         rule.setMaterialContentForSizeAssertions {
-            TextField(
+            OutlinedTextField(
                 value = "input",
                 onValueChange = {},
                 label = {}

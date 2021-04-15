@@ -268,10 +268,9 @@ internal fun CoreTextField(
         if (!it.isFocused) manager.deselect()
     }
 
-    val selectionModifier =
-        Modifier.longPressDragGestureFilter(manager.touchSelectionObserver, enabled)
-
     val pointerModifier = if (isInTouchMode) {
+        val selectionModifier =
+            Modifier.longPressDragGestureFilter(manager.touchSelectionObserver, enabled)
         Modifier.tapPressTextFieldModifier(interactionSource, enabled) { offset ->
             tapToFocus(state, focusRequester, !readOnly)
             if (state.hasFocus) {
@@ -291,7 +290,10 @@ internal fun CoreTextField(
             }
         }.then(selectionModifier)
     } else {
-        Modifier.mouseDragGestureDetector(manager::mouseSelectionDetector, enabled = enabled)
+        Modifier.mouseDragGestureDetector(
+            observer = manager.mouseSelectionObserver,
+            enabled = enabled
+        )
     }
 
     val drawModifier = Modifier.drawBehind {
@@ -419,6 +421,20 @@ internal fun CoreTextField(
 
     DisposableEffect(manager) {
         onDispose { manager.hideSelectionToolbar() }
+    }
+
+    DisposableEffect(imeOptions) {
+        if (textInputService != null && state.hasFocus) {
+            state.inputSession = TextFieldDelegate.restartInput(
+                textInputService = textInputService,
+                value = value,
+                editProcessor = state.processor,
+                imeOptions = imeOptions,
+                onValueChange = onValueChangeWrapper,
+                onImeActionPerformed = onImeActionPerformedWrapper
+            )
+        }
+        onDispose { /* do nothing */ }
     }
 
     val textKeyInputModifier =

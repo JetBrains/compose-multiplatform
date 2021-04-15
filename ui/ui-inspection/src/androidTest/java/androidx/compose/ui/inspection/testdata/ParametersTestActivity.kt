@@ -19,6 +19,7 @@ package androidx.compose.ui.inspection.testdata
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.compose.foundation.layout.Column
 import androidx.compose.material.Button
 import androidx.compose.material.Text
 import androidx.compose.ui.text.font.Font
@@ -27,6 +28,8 @@ import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.inspection.test.R
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.semantics.semantics
 
 class ParametersTestActivity : ComponentActivity() {
     private val fontFamily = FontFamily(
@@ -45,13 +48,16 @@ class ParametersTestActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
-            Button(onClick = { println("smth") }) {
-                Text("one", fontFamily = fontFamily)
+            Column(modifier = Modifier.semantics(true) {}) {
+                Button(onClick = { println("smth") }) {
+                    Text("one", fontFamily = fontFamily)
+                }
+                Button(onClick = ::testClickHandler) {
+                    Text("two", fontFamily = fontFamily)
+                }
+                FunctionWithIntArray(intArrayOf(10, 11, 12, 13, 14, 15, 16, 17))
+                Text("four")
             }
-            Button(onClick = ::testClickHandler) {
-                Text("two", fontFamily = fontFamily)
-            }
-            FunctionWithIntArray(intArrayOf(10, 11, 12, 13, 14, 15, 16, 17))
         }
     }
 }

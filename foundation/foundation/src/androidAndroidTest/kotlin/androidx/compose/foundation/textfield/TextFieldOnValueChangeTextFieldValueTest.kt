@@ -60,7 +60,7 @@ class TextFieldOnValueChangeTextFieldValueTest {
     @get:Rule
     val rule = createComposeRule()
 
-    val onValueChange: (androidx.compose.ui.text.input.TextFieldValue) -> Unit = mock()
+    val onValueChange: (TextFieldValue) -> Unit = mock()
 
     lateinit var onEditCommandCallback: (List<EditCommand>) -> Unit
 
