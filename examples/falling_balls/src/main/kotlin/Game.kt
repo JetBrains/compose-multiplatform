@@ -8,9 +8,8 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.onSizeChanged
-import androidx.compose.ui.unit.IntSize
-import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
+import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.unit.*
 import kotlin.random.Random
 
 class Game {
@@ -21,7 +20,7 @@ class Game {
     )
     private var startTime = 0L
 
-    var size by mutableStateOf(IntSize(0, 0))
+    var size by mutableStateOf(Pair(0.dp, 0.dp))
 
     var pieces = mutableStateListOf<PieceData>()
         private set
@@ -75,6 +74,7 @@ class Game {
 @Composable
 fun FallingBallsGame() {
     val game = remember { Game() }
+    val density = LocalDensity.current
     Column {
         Text(
             "Catch balls!${if (game.finished) " Game over!" else ""}",
@@ -110,9 +110,11 @@ fun FallingBallsGame() {
         if (game.started) {
             Box(modifier = Modifier
                 .fillMaxWidth()
-                .fillMaxHeight(0.5f)
+                .fillMaxHeight()
                 .onSizeChanged {
-                    game.size = it
+                    with(density) {
+                        game.size = it.width.toDp() to it.height.toDp()
+                    }
                 }
             ) {
                 game.pieces.forEachIndexed { index, piece -> Piece(index, piece) }
