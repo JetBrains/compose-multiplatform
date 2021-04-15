@@ -69,12 +69,16 @@ class DemoTest {
             .filterIsInstance<ComposableDemo>()
             .sortedBy { it.title }
             .first()
-        // Click on the first demo
+
+        // Click on the first demo.
         val demoTitle = testDemo.title
         rule.onNodeWithText(demoTitle).performScrollTo().performClick()
-
         assertAppBarHasTitle(demoTitle)
+
+        // Navigate back to root screen.
+        Espresso.closeSoftKeyboard()
         Espresso.pressBack()
+        rule.waitForIdle()
         assertIsOnRootScreen()
     }
 
@@ -173,13 +177,13 @@ class DemoTest {
             fastForwardClock()
         }
 
-        while (rule.onAllNodes(isDialog()).isNotEmpty()) {
-            rule.waitForIdle()
-            Espresso.pressBack()
-        }
-
         rule.waitForIdle()
+        while (rule.onAllNodes(isDialog()).isNotEmpty()) {
+            Espresso.pressBack()
+            rule.waitForIdle()
+        }
         Espresso.pressBack()
+        rule.waitForIdle()
 
         if (fastForwardClock) {
             // Pump press back
