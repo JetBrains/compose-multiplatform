@@ -28,7 +28,7 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 @SmallTest
 class AndroidTypefaceCacheTest {
 
-    val context = InstrumentationRegistry.getInstrumentation().targetContext
+    val context = InstrumentationRegistry.getInstrumentation().targetContext!!
 
     @Test
     fun cached_instance_for_the_same_input() {

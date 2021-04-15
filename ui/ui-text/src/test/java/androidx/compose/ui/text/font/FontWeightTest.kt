@@ -132,7 +132,7 @@ class FontWeightTest {
     }
 
     @Test
-    fun `compareTo`() {
+    fun compareTo() {
         assertThat(FontWeight.W400.compareTo(FontWeight.W400)).isEqualTo(0)
         assertThat(FontWeight.W400.compareTo(FontWeight.W300)).isEqualTo(1)
         assertThat(FontWeight.W400.compareTo(FontWeight.W500)).isEqualTo(-1)

@@ -99,7 +99,7 @@ class ParagraphIntrinsicIntegrationTest {
                 text = text,
                 fontSize = fontSize,
                 spanStyles = listOf(
-                    Range<SpanStyle>(
+                    Range(
                         item = SpanStyle(fontSize = styledFontSize),
                         start = "a ".length,
                         end = "a bb ".length
@@ -183,7 +183,7 @@ class ParagraphIntrinsicIntegrationTest {
                 text = text,
                 fontSize = fontSize,
                 spanStyles = listOf(
-                    Range<SpanStyle>(
+                    Range(
                         item = SpanStyle(fontSize = styledFontSize),
                         start = "a".length,
                         end = "a bb ".length

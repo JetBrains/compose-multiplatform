@@ -239,7 +239,7 @@ internal fun ComposeTestRule.singleSelectionHandleMatches(viewMatcher: Matcher<i
         .check(ViewAssertions.matches(viewMatcher))
 }
 
-internal class SingleSelectionHandleMatcher() : TypeSafeMatcher<Root>() {
+internal class SingleSelectionHandleMatcher : TypeSafeMatcher<Root>() {
 
     var lastSeenWindowParams: WindowManager.LayoutParams? = null
 

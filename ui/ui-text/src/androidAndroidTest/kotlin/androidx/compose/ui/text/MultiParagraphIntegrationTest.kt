@@ -48,7 +48,6 @@ class MultiParagraphIntegrationTest {
     private val fontFamilyMeasureFont = BASIC_MEASURE_FONT.toFontFamily()
     private val context = InstrumentationRegistry.getInstrumentation().context
     private val defaultDensity = Density(density = 1f)
-    private val cursorWidth = 4f
     private val ltrLocaleList = LocaleList("en")
     private val rtlLocaleList = LocaleList("ar")
 
@@ -425,16 +424,14 @@ class MultiParagraphIntegrationTest {
 
     @Test
     fun getBidiRunDirection() {
-        with(defaultDensity) {
-            val text = createAnnotatedString("a\u05D0", "\u05D0a")
-            val paragraph = simpleMultiParagraph(text = text)
+        val text = createAnnotatedString("a\u05D0", "\u05D0a")
+        val paragraph = simpleMultiParagraph(text = text)
 
-            assertThat(paragraph.getBidiRunDirection(0)).isEqualTo(ResolvedTextDirection.Ltr)
-            assertThat(paragraph.getBidiRunDirection(1)).isEqualTo(ResolvedTextDirection.Rtl)
+        assertThat(paragraph.getBidiRunDirection(0)).isEqualTo(ResolvedTextDirection.Ltr)
+        assertThat(paragraph.getBidiRunDirection(1)).isEqualTo(ResolvedTextDirection.Rtl)
 
-            assertThat(paragraph.getBidiRunDirection(2)).isEqualTo(ResolvedTextDirection.Rtl)
-            assertThat(paragraph.getBidiRunDirection(3)).isEqualTo(ResolvedTextDirection.Ltr)
-        }
+        assertThat(paragraph.getBidiRunDirection(2)).isEqualTo(ResolvedTextDirection.Rtl)
+        assertThat(paragraph.getBidiRunDirection(3)).isEqualTo(ResolvedTextDirection.Ltr)
     }
 
     @Test(expected = java.lang.IllegalArgumentException::class)
@@ -1216,12 +1213,12 @@ class MultiParagraphIntegrationTest {
         val text = AnnotatedString(
             text = "ab",
             paragraphStyles = listOf(
-                Range<ParagraphStyle>(
+                Range(
                     item = ParagraphStyle(textDirection = TextDirection.Content),
                     start = 0,
                     end = "a".length
                 ),
-                Range<ParagraphStyle>(
+                Range(
                     // skip setting [TextDirection] on purpose, should inherit from the
                     // main [ParagraphStyle]
                     item = ParagraphStyle(),
@@ -1252,7 +1249,7 @@ class MultiParagraphIntegrationTest {
         val fontSize = 20
         val width = 2.em
         val placeholders = listOf(
-            AnnotatedString.Range(
+            Range(
                 Placeholder(width, 1.em, PlaceholderVerticalAlign.AboveBaseline),
                 0,
                 1
@@ -1283,7 +1280,7 @@ class MultiParagraphIntegrationTest {
         val fontSize = 20
         val width = 30.sp
         val placeholders = listOf(
-            AnnotatedString.Range(
+            Range(
                 Placeholder(width, 1.em, PlaceholderVerticalAlign.AboveBaseline),
                 0,
                 1
@@ -1315,7 +1312,7 @@ class MultiParagraphIntegrationTest {
         val width = 2.em
         val height = 1.em
         val placeholders = listOf(
-            AnnotatedString.Range(
+            Range(
                 Placeholder(width, height, PlaceholderVerticalAlign.AboveBaseline),
                 0,
                 1
@@ -1352,12 +1349,12 @@ class MultiParagraphIntegrationTest {
         val width = 2.em
         val height = 1.em
         val placeholders = listOf(
-            AnnotatedString.Range(
+            Range(
                 Placeholder(width, height, PlaceholderVerticalAlign.AboveBaseline),
                 0,
                 1
             ),
-            AnnotatedString.Range(
+            Range(
                 Placeholder(width, height, PlaceholderVerticalAlign.AboveBaseline),
                 2,
                 3
@@ -1402,7 +1399,7 @@ class MultiParagraphIntegrationTest {
         val width = 2.em
         val height = 1.em
         val placeholders = listOf(
-            AnnotatedString.Range(
+            Range(
                 Placeholder(width, height, PlaceholderVerticalAlign.AboveBaseline),
                 1,
                 3
@@ -1444,7 +1441,7 @@ class MultiParagraphIntegrationTest {
     private fun simpleMultiParagraphIntrinsics(
         text: AnnotatedString,
         fontSize: TextUnit = TextUnit.Unspecified,
-        placeholders: List<AnnotatedString.Range<Placeholder>> = listOf()
+        placeholders: List<Range<Placeholder>> = listOf()
     ): MultiParagraphIntrinsics {
         return MultiParagraphIntrinsics(
             text,
