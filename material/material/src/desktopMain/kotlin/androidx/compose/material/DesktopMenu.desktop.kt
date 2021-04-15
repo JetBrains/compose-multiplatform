@@ -29,6 +29,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.TransformOrigin
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.DpOffset
+import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Popup
 
@@ -86,7 +87,7 @@ fun DropdownMenu(
         }
 
         Popup(
-            isFocusable = true,
+            focusable = true,
             onDismissRequest = onDismissRequest,
             popupPositionProvider = popupPositionProvider
         ) {
@@ -133,4 +134,59 @@ fun DropdownMenuItem(
         interactionSource = interactionSource,
         content = content
     )
+}
+
+/**
+ *
+ * A [ContextMenu] behaves similarly to [Popup] and will use the current position of the mouse
+ * cursor to position itself on screen.
+ *
+ * The [content] of a [ContextMenu] will typically be [DropdownMenuItem]s, as well as custom
+ * content. Using [DropdownMenuItem]s will result in a menu that matches the Material
+ * specification for menus.
+ *
+ * @param expanded Whether the menu is currently open and visible to the user
+ * @param onDismissRequest Called when the user requests to dismiss the menu, such as by
+ * tapping outside the menu's bounds
+ * @param offset [DpOffset] to be added to the position of the menu
+ */
+@Suppress("ModifierParameter")
+@Composable
+fun ContextMenu(
+    expanded: Boolean,
+    onDismissRequest: () -> Unit,
+    modifier: Modifier = Modifier,
+    offset: DpOffset = DpOffset(0.dp, 0.dp),
+    content: @Composable ColumnScope.() -> Unit
+) {
+    val contextMenuPaddingOffset = IntOffset(0, DropdownMenuVerticalPadding.value.toInt())
+
+    val expandedStates = remember { MutableTransitionState(false) }
+    expandedStates.targetState = expanded
+
+    if (expandedStates.currentState || expandedStates.targetState) {
+        val transformOriginState = remember { mutableStateOf(TransformOrigin.Center) }
+        val density = LocalDensity.current
+        val popupPositionProvider = DropdownMenuPositionProvider(
+            offset,
+            density
+        ) { parentBounds, menuBounds ->
+            transformOriginState.value = calculateTransformOrigin(parentBounds, menuBounds)
+        }
+
+        Popup(
+            focusable = true,
+            contextMenu = true,
+            offset = contextMenuPaddingOffset,
+            onDismissRequest = onDismissRequest,
+            popupPositionProvider = popupPositionProvider
+        ) {
+            DropdownMenuContent(
+                expandedStates = expandedStates,
+                transformOriginState = transformOriginState,
+                modifier = modifier,
+                content = content
+            )
+        }
+    }
 }

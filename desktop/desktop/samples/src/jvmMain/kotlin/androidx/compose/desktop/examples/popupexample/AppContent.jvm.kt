@@ -35,7 +35,7 @@ import androidx.compose.material.AlertDialog
 import androidx.compose.material.Button
 import androidx.compose.material.ButtonDefaults
 import androidx.compose.material.Checkbox
-import androidx.compose.material.DropdownMenu
+import androidx.compose.material.ContextMenu
 import androidx.compose.material.DropdownMenuItem
 import androidx.compose.material.RadioButton
 import androidx.compose.material.Surface
@@ -312,7 +312,7 @@ fun PopupSample(displayed: Boolean, onDismiss: () -> Unit) {
             Popup(
                 alignment = Alignment.TopCenter,
                 offset = IntOffset(0, 50),
-                isFocusable = true,
+                focusable = true,
                 onDismissRequest = onDismiss
             ) {
                 println("Ambient value is ${AmbientTest.current}.")
@@ -426,7 +426,7 @@ fun ContextMenu() {
                 .height(35.dp)
                 .padding(start = 4.dp, end = 4.dp)
         )
-        DropdownMenu(
+        ContextMenu(
             expanded = showMenu.value,
             onDismissRequest = { showMenu.value = false }
         ) {
