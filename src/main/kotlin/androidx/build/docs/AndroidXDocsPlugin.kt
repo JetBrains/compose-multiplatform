@@ -114,7 +114,8 @@ class AndroidXDocsPlugin : Plugin<Project> {
             unzippedSourcesForDackka,
             unzipSourcesForDackkaTask,
             unzippedSamplesSources,
-            unzipSamplesTask
+            unzipSamplesTask,
+            dependencyClasspath
         )
         configureDokka(
             unzippedDocsSources,
@@ -290,7 +291,8 @@ class AndroidXDocsPlugin : Plugin<Project> {
         unzippedDocsSources: File,
         unzipDocsTask: TaskProvider<Sync>,
         unzippedSamplesSources: File,
-        unzipSamplesTask: TaskProvider<Sync>
+        unzipSamplesTask: TaskProvider<Sync>,
+        dependencyClasspath: FileCollection
     ) {
         val generatedDocsDir = project.file("${project.buildDir}/dackkaDocs")
 
@@ -312,6 +314,8 @@ class AndroidXDocsPlugin : Plugin<Project> {
                 destinationDir = generatedDocsDir
                 samplesDir = unzippedSamplesSources
                 sourcesDir = unzippedDocsSources
+                docsProjectDir = File(project.rootDir, "docs-public")
+                dependenciesClasspath = androidJarFile(project) + dependencyClasspath
             }
         }
 
