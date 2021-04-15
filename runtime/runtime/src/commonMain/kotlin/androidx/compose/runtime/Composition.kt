@@ -17,9 +17,10 @@
 @file:OptIn(InternalComposeApi::class)
 package androidx.compose.runtime
 
+import androidx.compose.runtime.collection.IdentityArrayMap
+import androidx.compose.runtime.collection.IdentityArraySet
 import kotlin.coroutines.CoroutineContext
 import kotlin.coroutines.EmptyCoroutineContext
-import androidx.compose.runtime.collection.IdentityArraySet
 import androidx.compose.runtime.collection.IdentityScopeMap
 import androidx.compose.runtime.snapshots.fastForEach
 
@@ -333,6 +334,11 @@ internal class CompositionImpl(
     private val observations = IdentityScopeMap<RecomposeScopeImpl>()
 
     /**
+     * A map of object read during derived states to the corresponding derived state.
+     */
+    private val derivedStates = IdentityScopeMap<DerivedState<*>>()
+
+    /**
      * A list of changes calculated by [Composer] to be applied to the [Applier] and the
      * [SlotTable] to reflect the result of composition. This is a list of lambdas that need to
      * be invoked in order to produce the desired effects.
@@ -349,11 +355,13 @@ internal class CompositionImpl(
     private val observationsProcessed = IdentityScopeMap<RecomposeScopeImpl>()
 
     /**
-     * The set of the invalid [RecomposeScope]s. If this set is non-empty the current state of
+     * A map of the invalid [RecomposeScope]s. If this map is non-empty the current state of
      * the composition does not reflect the current state of the objects it observes and should
-     * be recomposed by calling [recompose].
+     * be recomposed by calling [recompose]. Tbe value is a map of values that invalidated the
+     * scope. The scope is checked with these instances to ensure the value has changed. This is
+     * used to only invalidate the scope if a [derivedStateOf] object changes.
      */
-    private var invalidations = IdentityArraySet<RecomposeScopeImpl>()
+    private var invalidations = IdentityArrayMap<RecomposeScopeImpl, IdentityArraySet<Any>?>()
 
     /**
      * As [RecomposeScope]s are removed the corresponding entries in the observations set must be
@@ -521,7 +529,7 @@ internal class CompositionImpl(
 
     override fun observesAnyOf(values: Set<Any>): Boolean {
         for (value in values) {
-            if (value in observations) return true
+            if (value in observations || value in derivedStates) return true
         }
         return false
     }
@@ -530,22 +538,29 @@ internal class CompositionImpl(
 
     private fun addPendingInvalidationsLocked(values: Set<Any>) {
         var invalidated: HashSet<RecomposeScopeImpl>? = null
+
+        fun invalidate(value: Any) {
+            observations.forEachScopeOf(value) { scope ->
+                if (
+                    !observationsProcessed.remove(value, scope) &&
+                    scope.invalidateForResult(value) != InvalidationResult.IGNORED
+                ) {
+                    val set = invalidated
+                        ?: HashSet<RecomposeScopeImpl>().also {
+                            invalidated = it
+                        }
+                    set.add(scope)
+                }
+            }
+        }
+
         for (value in values) {
             if (value is RecomposeScopeImpl) {
-                value.invalidateForResult()
+                value.invalidateForResult(null)
             } else {
-                observations.forEachScopeOf(value) { scope ->
-                    if (!observationsProcessed.remove(value, scope) &&
-                        scope.invalidateForResult() != InvalidationResult.IGNORED
-                    ) {
-                        (
-                            invalidated ?: (
-                                HashSet<RecomposeScopeImpl>().also {
-                                    invalidated = it
-                                }
-                                )
-                            ).add(scope)
-                    }
+                invalidate(value)
+                derivedStates.forEachScopeOf(value) {
+                    invalidate(it)
                 }
             }
         }
@@ -560,17 +575,36 @@ internal class CompositionImpl(
             composer.currentRecomposeScope?.let {
                 it.used = true
                 observations.add(value, it)
+
+                // Record derived state dependency mapping
+                if (value is DerivedState<*>) {
+                    value.dependencies.forEach { dependency ->
+                        derivedStates.add(dependency, value)
+                    }
+                }
+
                 it.recordRead(value)
             }
         }
     }
 
-    override fun recordWriteOf(value: Any) = synchronized(lock) {
+    private fun invalidateScopeOfLocked(value: Any) {
+        // Invalidate any recompose scopes that read this value.
         observations.forEachScopeOf(value) { scope ->
-            if (scope.invalidateForResult() == InvalidationResult.IMMINENT) {
+            if (scope.invalidateForResult(value) == InvalidationResult.IMMINENT) {
                 // If we process this during recordWriteOf, ignore it when recording modifications
                 observationsProcessed.add(value, scope)
             }
+        }
+    }
+
+    override fun recordWriteOf(value: Any) = synchronized(lock) {
+        invalidateScopeOfLocked(value)
+
+        // If writing to dependency of a derived value and the value is changed, invalidate the
+        // scopes that read the derived value.
+        derivedStates.forEachScopeOf(value) {
+            invalidateScopeOfLocked(it)
         }
     }
 
@@ -608,6 +642,7 @@ internal class CompositionImpl(
                 if (pendingInvalidScopes) {
                     pendingInvalidScopes = false
                     observations.removeValueIf { scope -> !scope.valid }
+                    derivedStates.removeValueIf { derivedValue -> derivedValue !in observations }
                 }
             } finally {
                 manager.dispatchAbandons()
@@ -631,7 +666,7 @@ internal class CompositionImpl(
         }
     }
 
-    fun invalidate(scope: RecomposeScopeImpl): InvalidationResult {
+    fun invalidate(scope: RecomposeScopeImpl, instance: Any?): InvalidationResult {
         if (scope.defaultsInScope) {
             scope.defaultsInvalid = true
         }
@@ -641,11 +676,18 @@ internal class CompositionImpl(
         val location = anchor.toIndexFor(slotTable)
         if (location < 0)
             return InvalidationResult.IGNORED // The scope was removed from the composition
-        if (isComposing && composer.tryImminentInvalidation(scope)) {
+        if (isComposing && composer.tryImminentInvalidation(scope, instance)) {
             // The invalidation was redirected to the composer.
             return InvalidationResult.IMMINENT
         }
-        invalidations.add(scope)
+
+        // invalidations[scope] containing an explicit null means it was invalidated
+        // unconditionally.
+        if (instance == null) {
+            invalidations[scope] = null
+        } else {
+            invalidations.addValue(scope, instance)
+        }
 
         parent.invalidate(this)
         return if (isComposing) InvalidationResult.DEFERRED else InvalidationResult.SCHEDULED
@@ -656,12 +698,14 @@ internal class CompositionImpl(
     }
 
     /**
-     * This takes ownership of the invalidations. Invalidations
+     * This takes ownership of the current invalidations and sets up a new array map to hold the
+     * new invalidations.
      */
-    private fun takeInvalidations(): IdentityArraySet<RecomposeScopeImpl> =
-        invalidations.also {
-            invalidations = IdentityArraySet()
-        }
+    private fun takeInvalidations(): IdentityArrayMap<RecomposeScopeImpl, IdentityArraySet<Any>?> {
+        val invalidations = invalidations
+        this.invalidations = IdentityArrayMap()
+        return invalidations
+    }
 
     /**
      * Helper for [verifyConsistent] to ensure the anchor match there respective invalidation
@@ -795,3 +839,14 @@ private class HotReloader {
  */
 @TestOnly
 fun simulateHotReload(context: Any) = HotReloader.simulateHotReload(context)
+
+private fun <K : Any, V : Any> IdentityArrayMap<K, IdentityArraySet<V>?>.addValue(
+    key: K,
+    value: V
+) {
+    if (key in this) {
+        this[key]?.add(value)
+    } else {
+        this[key] = IdentityArraySet<V>().also { it.add(value) }
+    }
+}

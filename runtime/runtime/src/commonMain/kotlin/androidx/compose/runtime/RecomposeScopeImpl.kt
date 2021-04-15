@@ -17,6 +17,8 @@
 package androidx.compose.runtime
 
 import androidx.compose.runtime.collection.IdentityArrayIntMap
+import androidx.compose.runtime.collection.IdentityArrayMap
+import androidx.compose.runtime.collection.IdentityArraySet
 
 /**
  * Represents a recomposable scope or section of the composition hierarchy. Can be used to
@@ -31,6 +33,13 @@ interface RecomposeScope {
     fun invalidate()
 }
 
+private const val UsedFlag = 0x01
+private const val DefaultsInScopeFlag = 0x02
+private const val DefaultsInvalidFlag = 0x04
+private const val RequiresRecomposeFlag = 0x08
+private const val SkippedFlag = 0x10
+private const val RereadingFlag = 0x20
+
 /**
  * A RecomposeScope is created for a region of the composition that can be recomposed independently
  * of the rest of the composition. The composer will position the slot table to the location
@@ -40,6 +49,9 @@ interface RecomposeScope {
 internal class RecomposeScopeImpl(
     var composition: CompositionImpl?
 ) : ScopeUpdateScope, RecomposeScope {
+
+    private var flags: Int = 0
+
     /**
      * An anchor to the location in the slot table that start the group associated with this
      * recompose scope.
@@ -58,7 +70,15 @@ internal class RecomposeScopeImpl(
      * This is used as the result of [Composer.endRestartGroup] and indicates whether the lambda
      * that is stored in [block] will be used.
      */
-    var used = false
+    var used: Boolean
+        get() = flags and UsedFlag != 0
+        set(value) {
+            if (value) {
+                flags = flags or UsedFlag
+            } else {
+                flags = flags and UsedFlag.inv()
+            }
+        }
 
     /**
      * Set to true when the there are function default calculations in the scope. These are
@@ -66,20 +86,44 @@ internal class RecomposeScopeImpl(
      * change the this scope needs to be recomposed but the default values can be skipped if they
      * where not invalidated.
      */
-    var defaultsInScope = false
+    var defaultsInScope: Boolean
+        get() = flags and DefaultsInScopeFlag != 0
+        set(value) {
+            if (value) {
+                flags = flags or DefaultsInScopeFlag
+            } else {
+                flags = flags and DefaultsInScopeFlag.inv()
+            }
+        }
 
     /**
      * Tracks whether any of the calculations in the default values were changed. See
      * [defaultsInScope] for details.
      */
-    var defaultsInvalid = false
+    var defaultsInvalid: Boolean
+        get() = flags and DefaultsInvalidFlag != 0
+        set(value) {
+            if (value) {
+                flags = flags or DefaultsInvalidFlag
+            } else {
+                flags = flags and DefaultsInvalidFlag.inv()
+            }
+        }
 
     /**
      * Tracks whether the scope was invalidated directly but was recomposed because the caller
      * was recomposed. This ensures that a scope invalidated directly will recompose even if its
      * parameters are the same as the previous recomposition.
      */
-    var requiresRecompose = false
+    var requiresRecompose: Boolean
+        get() = flags and RequiresRecomposeFlag != 0
+        set(value) {
+            if (value) {
+                flags = flags or RequiresRecomposeFlag
+            } else {
+                flags = flags and RequiresRecomposeFlag.inv()
+            }
+        }
 
     /**
      * The lambda to call to restart the scopes composition.
@@ -100,8 +144,8 @@ internal class RecomposeScopeImpl(
      * Invalidate the group which will cause [composition] to request this scope be recomposed,
      * and an [InvalidationResult] will be returned.
      */
-    fun invalidateForResult(): InvalidationResult =
-        composition?.invalidate(this) ?: InvalidationResult.IGNORED
+    fun invalidateForResult(value: Any?): InvalidationResult =
+        composition?.invalidate(this, value) ?: InvalidationResult.IGNORED
 
     /**
      * Invalidate the group which will cause [composition] to request this scope be recomposed.
@@ -110,7 +154,7 @@ internal class RecomposeScopeImpl(
      * invalidate on the composer.
      */
     override fun invalidate() {
-        composition?.invalidate(this)
+        composition?.invalidate(this, null)
     }
 
     /**
@@ -121,12 +165,29 @@ internal class RecomposeScopeImpl(
 
     private var currentToken = 0
     private var trackedInstances: IdentityArrayIntMap? = null
+    private var trackedDependencies: IdentityArrayMap<DerivedState<*>, Any?>? = null
+    private var rereading: Boolean
+        get() = flags and RereadingFlag != 0
+        set(value) {
+            if (value) {
+                flags = flags or RereadingFlag
+            } else {
+                flags = flags and RereadingFlag.inv()
+            }
+        }
 
     /**
      * Indicates whether the scope was skipped (e.g. [scopeSkipped] was called.
      */
-    internal var skipped = false
-        private set
+    internal var skipped: Boolean
+        get() = flags and SkippedFlag != 0
+        private set(value) {
+            if (value) {
+                flags = flags or SkippedFlag
+            } else {
+                flags = flags and SkippedFlag.inv()
+            }
+        }
 
     /**
      * Called when composition start composing into this scope. The [token] is a value that is
@@ -141,12 +202,56 @@ internal class RecomposeScopeImpl(
     fun scopeSkipped() {
         skipped = true
     }
+
     /**
      * Track instances that were read in scope.
      */
     fun recordRead(instance: Any) {
+        if (rereading) return
         (trackedInstances ?: IdentityArrayIntMap().also { trackedInstances = it })
             .add(instance, currentToken)
+        if (instance is DerivedState<*>) {
+            val tracked = trackedDependencies ?: IdentityArrayMap<DerivedState<*>, Any?>().also {
+                trackedDependencies = it
+            }
+            tracked[instance] = instance.currentValue
+        }
+    }
+
+    /**
+     * Determine if the scope should be considered invalid.
+     *
+     * @param instances The set of objects reported as invalidating this scope.
+     */
+    fun isInvalidFor(instances: IdentityArraySet<Any>?): Boolean {
+        // If a non-empty instances exists and contains only derived state objects with their
+        // default values, then the scope should not be considered invalid. Otherwise the scope
+        // should if it was invalidated by any other kind of instance.
+        if (instances == null) return true
+        val trackedDependencies = trackedDependencies ?: return true
+        if (
+            instances.isNotEmpty() &&
+            instances.all { instance ->
+                instance is DerivedState<*> && trackedDependencies[instance] == instance.value
+            }
+        )
+            return false
+        return true
+    }
+
+    fun rereadTrackedInstances() {
+        composition?.let { composition ->
+            trackedInstances?.let { trackedInstances ->
+                rereading = true
+                try {
+                    trackedInstances.forEach { value, _ ->
+                        composition.recordReadOf(value)
+                    }
+                } finally {
+                    rereading = false
+                }
+            }
+        }
     }
 
     /**
@@ -159,7 +264,7 @@ internal class RecomposeScopeImpl(
             // If any value previous observed was not read in this current composition
             // schedule the value to be removed from the observe scope and removed from the
             // observations tracked by the composition.
-            // [used] is false if the scope was skipped. If the scope was skipped we should
+            // [skipped] is true if the scope was skipped. If the scope was skipped we should
             // leave the observations unmodified.
             if (
                 !skipped && instances.any { _, instanceToken -> instanceToken != token }
@@ -170,8 +275,17 @@ internal class RecomposeScopeImpl(
                 ) {
                     instances.removeValueIf { instance, instanceToken ->
                         (instanceToken != token).also { remove ->
-                            if (remove)
+                            if (remove) {
                                 composition.removeObservation(instance, this)
+                                (instance as? DerivedState<*>)?.let {
+                                    trackedDependencies?.let { dependencies ->
+                                        dependencies.remove(it)
+                                        if (dependencies.size == 0) {
+                                            trackedDependencies = null
+                                        }
+                                    }
+                                }
+                            }
                         }
                     }
                     if (instances.size == 0) trackedInstances = null

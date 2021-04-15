@@ -308,6 +308,9 @@ package androidx.compose.runtime {
     method public void invalidate();
   }
 
+  public final class RecomposeScopeImplKt {
+  }
+
   public final class Recomposer extends androidx.compose.runtime.CompositionContext {
     ctor public Recomposer(kotlin.coroutines.CoroutineContext effectCoroutineContext);
     method public androidx.compose.runtime.RecomposerInfo asRecomposerInfo();
