@@ -111,11 +111,9 @@ object Arrangement {
             layoutDirection: LayoutDirection,
             outPositions: IntArray
         ) = if (layoutDirection == LayoutDirection.Ltr) {
-            placeLeftOrTop(sizes, outPositions)
+            placeLeftOrTop(sizes, outPositions, reverseInput = false)
         } else {
-            sizes.reverse()
-            placeRightOrBottom(totalSize, sizes, outPositions)
-            outPositions.reverse()
+            placeRightOrBottom(totalSize, sizes, outPositions, reverseInput = true)
         }
 
         override fun toString() = "Arrangement#Start"
@@ -134,11 +132,9 @@ object Arrangement {
             layoutDirection: LayoutDirection,
             outPositions: IntArray
         ) = if (layoutDirection == LayoutDirection.Ltr) {
-            placeRightOrBottom(totalSize, sizes, outPositions)
+            placeRightOrBottom(totalSize, sizes, outPositions, reverseInput = false)
         } else {
-            sizes.reverse()
-            placeLeftOrTop(sizes, outPositions)
-            outPositions.reverse()
+            placeLeftOrTop(sizes, outPositions, reverseInput = true)
         }
 
         override fun toString() = "Arrangement#End"
@@ -155,7 +151,7 @@ object Arrangement {
             totalSize: Int,
             sizes: IntArray,
             outPositions: IntArray
-        ) = placeLeftOrTop(sizes, outPositions)
+        ) = placeLeftOrTop(sizes, outPositions, reverseInput = false)
 
         override fun toString() = "Arrangement#Top"
     }
@@ -171,7 +167,7 @@ object Arrangement {
             totalSize: Int,
             sizes: IntArray,
             outPositions: IntArray
-        ) = placeRightOrBottom(totalSize, sizes, outPositions)
+        ) = placeRightOrBottom(totalSize, sizes, outPositions, reverseInput = false)
 
         override fun toString() = "Arrangement#Start"
     }
@@ -190,18 +186,16 @@ object Arrangement {
             layoutDirection: LayoutDirection,
             outPositions: IntArray
         ) = if (layoutDirection == LayoutDirection.Ltr) {
-            placeCenter(totalSize, sizes, outPositions)
+            placeCenter(totalSize, sizes, outPositions, reverseInput = false)
         } else {
-            sizes.reverse()
-            placeCenter(totalSize, sizes, outPositions)
-            outPositions.reverse()
+            placeCenter(totalSize, sizes, outPositions, reverseInput = true)
         }
 
         override fun Density.arrange(
             totalSize: Int,
             sizes: IntArray,
             outPositions: IntArray
-        ) = placeCenter(totalSize, sizes, outPositions)
+        ) = placeCenter(totalSize, sizes, outPositions, reverseInput = false)
 
         override fun toString() = "Arrangement#Center"
     }
@@ -221,18 +215,16 @@ object Arrangement {
             layoutDirection: LayoutDirection,
             outPositions: IntArray
         ) = if (layoutDirection == LayoutDirection.Ltr) {
-            placeSpaceEvenly(totalSize, sizes, outPositions)
+            placeSpaceEvenly(totalSize, sizes, outPositions, reverseInput = false)
         } else {
-            sizes.reverse()
-            placeSpaceEvenly(totalSize, sizes, outPositions)
-            outPositions.reverse()
+            placeSpaceEvenly(totalSize, sizes, outPositions, reverseInput = true)
         }
 
         override fun Density.arrange(
             totalSize: Int,
             sizes: IntArray,
             outPositions: IntArray
-        ) = placeSpaceEvenly(totalSize, sizes, outPositions)
+        ) = placeSpaceEvenly(totalSize, sizes, outPositions, reverseInput = false)
 
         override fun toString() = "Arrangement#SpaceEvenly"
     }
@@ -252,18 +244,16 @@ object Arrangement {
             layoutDirection: LayoutDirection,
             outPositions: IntArray
         ) = if (layoutDirection == LayoutDirection.Ltr) {
-            placeSpaceBetween(totalSize, sizes, outPositions)
+            placeSpaceBetween(totalSize, sizes, outPositions, reverseInput = false)
         } else {
-            sizes.reverse()
-            placeSpaceBetween(totalSize, sizes, outPositions)
-            outPositions.reverse()
+            placeSpaceBetween(totalSize, sizes, outPositions, reverseInput = true)
         }
 
         override fun Density.arrange(
             totalSize: Int,
             sizes: IntArray,
             outPositions: IntArray
-        ) = placeSpaceBetween(totalSize, sizes, outPositions)
+        ) = placeSpaceBetween(totalSize, sizes, outPositions, reverseInput = false)
 
         override fun toString() = "Arrangement#SpaceBetween"
     }
@@ -284,18 +274,16 @@ object Arrangement {
             layoutDirection: LayoutDirection,
             outPositions: IntArray
         ) = if (layoutDirection == LayoutDirection.Ltr) {
-            placeSpaceAround(totalSize, sizes, outPositions)
+            placeSpaceAround(totalSize, sizes, outPositions, reverseInput = false)
         } else {
-            sizes.reverse()
-            placeSpaceAround(totalSize, sizes, outPositions)
-            outPositions.reverse()
+            placeSpaceAround(totalSize, sizes, outPositions, reverseInput = true)
         }
 
         override fun Density.arrange(
             totalSize: Int,
             sizes: IntArray,
             outPositions: IntArray
-        ) = placeSpaceAround(totalSize, sizes, outPositions)
+        ) = placeSpaceAround(totalSize, sizes, outPositions, reverseInput = false)
 
         override fun toString() = "Arrangement#SpaceAround"
     }
@@ -381,7 +369,7 @@ object Arrangement {
                 sizes: IntArray,
                 layoutDirection: LayoutDirection,
                 outPositions: IntArray
-            ) = placeLeftOrTop(sizes, outPositions)
+            ) = placeLeftOrTop(sizes, outPositions, reverseInput = false)
 
             override fun toString() = "AbsoluteArrangement#Left"
         }
@@ -401,7 +389,7 @@ object Arrangement {
                 sizes: IntArray,
                 layoutDirection: LayoutDirection,
                 outPositions: IntArray
-            ) = placeCenter(totalSize, sizes, outPositions)
+            ) = placeCenter(totalSize, sizes, outPositions, reverseInput = false)
 
             override fun toString() = "AbsoluteArrangement#Center"
         }
@@ -422,7 +410,7 @@ object Arrangement {
                 sizes: IntArray,
                 layoutDirection: LayoutDirection,
                 outPositions: IntArray
-            ) = placeRightOrBottom(totalSize, sizes, outPositions)
+            ) = placeRightOrBottom(totalSize, sizes, outPositions, reverseInput = false)
 
             override fun toString() = "AbsoluteArrangement#Right"
         }
@@ -443,7 +431,7 @@ object Arrangement {
                 sizes: IntArray,
                 layoutDirection: LayoutDirection,
                 outPositions: IntArray
-            ) = placeSpaceBetween(totalSize, sizes, outPositions)
+            ) = placeSpaceBetween(totalSize, sizes, outPositions, reverseInput = false)
 
             override fun toString() = "AbsoluteArrangement#SpaceBetween"
         }
@@ -464,7 +452,7 @@ object Arrangement {
                 sizes: IntArray,
                 layoutDirection: LayoutDirection,
                 outPositions: IntArray
-            ) = placeSpaceEvenly(totalSize, sizes, outPositions)
+            ) = placeSpaceEvenly(totalSize, sizes, outPositions, reverseInput = false)
 
             override fun toString() = "AbsoluteArrangement#SpaceEvenly"
         }
@@ -486,7 +474,7 @@ object Arrangement {
                 sizes: IntArray,
                 layoutDirection: LayoutDirection,
                 outPositions: IntArray
-            ) = placeSpaceAround(totalSize, sizes, outPositions)
+            ) = placeSpaceAround(totalSize, sizes, outPositions, reverseInput = false)
 
             override fun toString() = "AbsoluteArrangement#SpaceAround"
         }
@@ -610,44 +598,60 @@ object Arrangement {
     internal fun placeRightOrBottom(
         totalSize: Int,
         size: IntArray,
-        outPosition: IntArray
+        outPosition: IntArray,
+        reverseInput: Boolean
     ) {
         val consumedSize = size.fold(0) { a, b -> a + b }
         var current = totalSize - consumedSize
-        size.forEachIndexed { index, it ->
+        size.forEachIndexed(reverseInput) { index, it ->
             outPosition[index] = current
             current += it
         }
     }
 
-    internal fun placeLeftOrTop(size: IntArray, outPosition: IntArray) {
+    internal fun placeLeftOrTop(size: IntArray, outPosition: IntArray, reverseInput: Boolean) {
         var current = 0
-        size.forEachIndexed { index, it ->
+        size.forEachIndexed(reverseInput) { index, it ->
             outPosition[index] = current
             current += it
         }
     }
 
-    internal fun placeCenter(totalSize: Int, size: IntArray, outPosition: IntArray) {
+    internal fun placeCenter(
+        totalSize: Int,
+        size: IntArray,
+        outPosition: IntArray,
+        reverseInput: Boolean
+    ) {
         val consumedSize = size.fold(0) { a, b -> a + b }
         var current = (totalSize - consumedSize).toFloat() / 2
-        size.forEachIndexed { index, it ->
+        size.forEachIndexed(reverseInput) { index, it ->
             outPosition[index] = current.roundToInt()
             current += it.toFloat()
         }
     }
 
-    internal fun placeSpaceEvenly(totalSize: Int, size: IntArray, outPosition: IntArray) {
+    internal fun placeSpaceEvenly(
+        totalSize: Int,
+        size: IntArray,
+        outPosition: IntArray,
+        reverseInput: Boolean
+    ) {
         val consumedSize = size.fold(0) { a, b -> a + b }
         val gapSize = (totalSize - consumedSize).toFloat() / (size.size + 1)
         var current = gapSize
-        size.forEachIndexed { index, it ->
+        size.forEachIndexed(reverseInput) { index, it ->
             outPosition[index] = current.roundToInt()
             current += it.toFloat() + gapSize
         }
     }
 
-    internal fun placeSpaceBetween(totalSize: Int, size: IntArray, outPosition: IntArray) {
+    internal fun placeSpaceBetween(
+        totalSize: Int,
+        size: IntArray,
+        outPosition: IntArray,
+        reverseInput: Boolean
+    ) {
         val consumedSize = size.fold(0) { a, b -> a + b }
         val gapSize = if (size.size > 1) {
             (totalSize - consumedSize).toFloat() / (size.size - 1)
@@ -655,12 +659,18 @@ object Arrangement {
             0f
         }
         var current = 0f
-        size.forEachIndexed { index, it ->
+        size.forEachIndexed(reverseInput) { index, it ->
             outPosition[index] = current.roundToInt()
             current += it.toFloat() + gapSize
         }
     }
-    internal fun placeSpaceAround(totalSize: Int, size: IntArray, outPosition: IntArray) {
+
+    internal fun placeSpaceAround(
+        totalSize: Int,
+        size: IntArray,
+        outPosition: IntArray,
+        reverseInput: Boolean
+    ) {
         val consumedSize = size.fold(0) { a, b -> a + b }
         val gapSize = if (size.isNotEmpty()) {
             (totalSize - consumedSize).toFloat() / size.size
@@ -668,9 +678,19 @@ object Arrangement {
             0f
         }
         var current = gapSize / 2
-        size.forEachIndexed { index, it ->
+        size.forEachIndexed(reverseInput) { index, it ->
             outPosition[index] = current.roundToInt()
             current += it.toFloat() + gapSize
+        }
+    }
+
+    private inline fun IntArray.forEachIndexed(reversed: Boolean, action: (Int, Int) -> Unit) {
+        if (!reversed) {
+            forEachIndexed(action)
+        } else {
+            for (i in (size - 1) downTo 0) {
+                action(i, get(i))
+            }
         }
     }
 }
