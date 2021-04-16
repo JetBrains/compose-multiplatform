@@ -12,7 +12,7 @@ object Deps {
 
         object Compose {
             // __LATEST_COMPOSE_RELEASE_VERSION__
-            private const val VERSION = "0.4.0-build180"
+            private const val VERSION = "0.4.0-build183"
             const val gradlePlugin = "org.jetbrains.compose:compose-gradle-plugin:$VERSION"
         }
     }
@@ -37,7 +37,7 @@ object Deps {
 
     object ArkIvanov {
         object MVIKotlin {
-            private const val VERSION = "2.0.1"
+            private const val VERSION = "2.0.2"
             const val rx = "com.arkivanov.mvikotlin:rx:$VERSION"
             const val mvikotlin = "com.arkivanov.mvikotlin:mvikotlin:$VERSION"
             const val mvikotlinMain = "com.arkivanov.mvikotlin:mvikotlin-main:$VERSION"
@@ -49,7 +49,7 @@ object Deps {
         }
 
         object Decompose {
-            private const val VERSION = "0.2.1"
+            private const val VERSION = "0.2.3"
             const val decompose = "com.arkivanov.decompose:decompose:$VERSION"
             const val decomposeIosX64 = "com.arkivanov.decompose:decompose-iosx64:$VERSION"
             const val decomposeIosArm64 = "com.arkivanov.decompose:decompose-iosarm64:$VERSION"
@@ -59,7 +59,7 @@ object Deps {
 
     object Badoo {
         object Reaktive {
-            private const val VERSION = "1.1.20"
+            private const val VERSION = "1.1.22"
             const val reaktive = "com.badoo.reaktive:reaktive:$VERSION"
             const val reaktiveTesting = "com.badoo.reaktive:reaktive-testing:$VERSION"
             const val utils = "com.badoo.reaktive:utils:$VERSION"
