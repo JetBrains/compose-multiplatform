@@ -98,7 +98,7 @@ interface BoxWithConstraintsScope : BoxScope {
      */
     val minHeight: Dp
     /**
-     * The minimum height in [Dp].
+     * The maximum height in [Dp].
      *
      * @see constraints for the values in pixels.
      */
