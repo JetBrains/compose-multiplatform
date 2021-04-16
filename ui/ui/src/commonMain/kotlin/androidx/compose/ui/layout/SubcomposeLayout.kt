@@ -21,7 +21,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.ComposeNode
 import androidx.compose.runtime.Composition
 import androidx.compose.runtime.CompositionContext
-import androidx.compose.runtime.RememberObserver
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.currentComposer
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCompositionContext
@@ -62,6 +62,11 @@ fun SubcomposeLayout(
 ) {
     val state = remember { SubcomposeLayoutState() }
     state.compositionContext = rememberCompositionContext()
+    DisposableEffect(state) {
+        onDispose {
+            state.disposeCurrentNodes()
+        }
+    }
 
     val materialized = currentComposer.materialize(modifier)
     val density = LocalDensity.current
@@ -97,19 +102,15 @@ interface SubcomposeMeasureScope : MeasureScope {
     fun subcompose(slotId: Any?, content: @Composable () -> Unit): List<Measurable>
 }
 
-private class SubcomposeLayoutState :
-    SubcomposeMeasureScope,
-    RememberObserver {
-    var compositionContext: CompositionContext? = null
-
-    // MeasureScope delegation
-    override var layoutDirection: LayoutDirection = LayoutDirection.Rtl
-    override var density: Float = 0f
-    override var fontScale: Float = 0f
+/**
+ * Contains the state used by [SubcomposeLayout].
+ */
+internal class SubcomposeLayoutState {
+    internal var compositionContext: CompositionContext? = null
 
     // Pre-allocated lambdas to update LayoutNode
-    val setRoot: LayoutNode.() -> Unit = { root = this }
-    val setMeasurePolicy:
+    internal val setRoot: LayoutNode.() -> Unit = { root = this }
+    internal val setMeasurePolicy:
         LayoutNode.(SubcomposeMeasureScope.(Constraints) -> MeasureResult) -> Unit =
             { measurePolicy = createMeasurePolicy(it) }
 
@@ -118,8 +119,9 @@ private class SubcomposeLayoutState :
     private var currentIndex = 0
     private val nodeToNodeState = mutableMapOf<LayoutNode, NodeState>()
     private val slodIdToNode = mutableMapOf<Any?, LayoutNode>()
+    private val scope = Scope()
 
-    override fun subcompose(slotId: Any?, content: @Composable () -> Unit): List<Measurable> {
+    internal fun subcompose(slotId: Any?, content: @Composable () -> Unit): List<Measurable> {
         val root = root!!
         val layoutState = root.layoutState
         check(layoutState == LayoutState.Measuring || layoutState == LayoutState.LayingOut) {
@@ -205,11 +207,11 @@ private class SubcomposeLayoutState :
             measurables: List<Measurable>,
             constraints: Constraints
         ): MeasureResult {
-            this@SubcomposeLayoutState.layoutDirection = layoutDirection
-            this@SubcomposeLayoutState.density = density
-            this@SubcomposeLayoutState.fontScale = fontScale
+            scope.layoutDirection = layoutDirection
+            scope.density = density
+            scope.fontScale = fontScale
             currentIndex = 0
-            val result = block(constraints)
+            val result = scope.block(constraints)
             val indexAfterMeasure = currentIndex
             return object : MeasureResult {
                 override val width: Int
@@ -228,11 +230,7 @@ private class SubcomposeLayoutState :
         }
     }
 
-    override fun onRemembered() {
-        // do nothing
-    }
-
-    override fun onForgotten() {
+    internal fun disposeCurrentNodes() {
         nodeToNodeState.values.forEach {
             it.composition!!.dispose()
         }
@@ -240,11 +238,19 @@ private class SubcomposeLayoutState :
         slodIdToNode.clear()
     }
 
-    override fun onAbandoned() = onForgotten()
-
     private class NodeState(
         val slotId: Any?,
         var content: @Composable () -> Unit,
         var composition: Composition? = null
     )
+
+    private inner class Scope : SubcomposeMeasureScope {
+        // MeasureScope delegation
+        override var layoutDirection: LayoutDirection = LayoutDirection.Rtl
+        override var density: Float = 0f
+        override var fontScale: Float = 0f
+
+        override fun subcompose(slotId: Any?, content: @Composable () -> Unit) =
+            this@SubcomposeLayoutState.subcompose(slotId, content)
+    }
 }
