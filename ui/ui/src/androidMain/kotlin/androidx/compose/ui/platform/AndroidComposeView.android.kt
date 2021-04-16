@@ -30,6 +30,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.view.ViewStructure
 import android.view.ViewTreeObserver
+import android.view.animation.AnimationUtils
 import android.view.autofill.AutofillValue
 import android.view.inputmethod.EditorInfo
 import android.view.inputmethod.InputConnection
@@ -280,7 +281,7 @@ internal class AndroidComposeView(context: Context) :
     private val tmpOffsetArray = floatArrayOf(0f, 0f)
     private val viewToWindowMatrix = Matrix()
     private val windowToViewMatrix = Matrix()
-    private var lastMatrixRecalculationDrawingTime = -1L
+    private var lastMatrixRecalculationAnimationTime = -1L
 
     /**
      * On some devices, the `getLocationOnScreen()` returns `(0, 0)` even when the Window
@@ -775,7 +776,6 @@ internal class AndroidComposeView(context: Context) :
 
     // TODO(shepshapard): Test this method.
     override fun dispatchTouchEvent(motionEvent: MotionEvent): Boolean {
-        recalculateWindowPosition(motionEvent)
         measureAndLayout()
         val processResult = trace("AndroidOwner:onTouch") {
             val pointerInputEvent = motionEventAdapter.convertToPointerInputEvent(motionEvent, this)
@@ -818,24 +818,10 @@ internal class AndroidComposeView(context: Context) :
         return Offset(points[0], points[1])
     }
 
-    private fun recalculateWindowPosition(motionEvent: MotionEvent) {
-        lastMatrixRecalculationDrawingTime = drawingTime
-        recalculateWindowViewTransforms()
-        val points = tmpOffsetArray
-        points[0] = motionEvent.x
-        points[1] = motionEvent.y
-        viewToWindowMatrix.mapPoints(points)
-
-        windowPosition = Offset(
-            motionEvent.rawX - points[0],
-            motionEvent.rawY - points[1]
-        )
-    }
-
     private fun recalculateWindowPosition() {
-        val drawingTime = drawingTime
-        if (drawingTime != lastMatrixRecalculationDrawingTime) {
-            lastMatrixRecalculationDrawingTime = drawingTime
+        val animationTime = AnimationUtils.currentAnimationTimeMillis()
+        if (animationTime != lastMatrixRecalculationAnimationTime) {
+            lastMatrixRecalculationAnimationTime = animationTime
             recalculateWindowViewTransforms()
             var viewParent = parent
             var view: View = this
@@ -964,6 +950,24 @@ internal class AndroidComposeView(context: Context) :
         get() = viewTreeOwners?.lifecycleOwner
             ?.lifecycle?.currentState == Lifecycle.State.RESUMED
 
+    private fun transformMatrixToWindow(view: View, matrix: Matrix) {
+        val parentView = view.parent
+        if (parentView is View) {
+            transformMatrixToWindow(parentView, matrix)
+            matrix.preTranslate(-view.scrollX.toFloat(), -view.scrollY.toFloat())
+            matrix.preTranslate(view.left.toFloat(), view.top.toFloat())
+        } else {
+            view.getLocationInWindow(tmpPositionArray)
+            matrix.preTranslate(-view.scrollX.toFloat(), -view.scrollY.toFloat())
+            matrix.preTranslate(tmpPositionArray[0].toFloat(), tmpPositionArray[1].toFloat())
+        }
+
+        val viewMatrix = view.matrix
+        if (!viewMatrix.isIdentity) {
+            matrix.preConcat(viewMatrix)
+        }
+    }
+
     companion object {
         private var systemPropertiesClass: Class<*>? = null
         private var getBooleanMethod: Method? = null
@@ -982,20 +986,6 @@ internal class AndroidComposeView(context: Context) :
             getBooleanMethod?.invoke(null, "debug.layout", false) as? Boolean ?: false
         } catch (e: Exception) {
             false
-        }
-
-        fun transformMatrixToWindow(view: View, matrix: Matrix) {
-            val parentView = view.parent
-            if (parentView is View) {
-                transformMatrixToWindow(parentView, matrix)
-                matrix.preTranslate(-view.scrollX.toFloat(), -view.scrollY.toFloat())
-                matrix.preTranslate(view.left.toFloat(), view.top.toFloat())
-            }
-
-            val viewMatrix = view.matrix
-            if (!viewMatrix.isIdentity) {
-                matrix.preConcat(viewMatrix)
-            }
         }
     }
 
