@@ -145,7 +145,7 @@ internal class LayoutNode : Measurable, Remeasurement, OwnerScope, LayoutInfo, C
 
     /**
      * The parent node in the LayoutNode hierarchy. This is `null` when the [LayoutNode]
-     * is not attached attached to a hierarchy or is the root of the hierarchy.
+     * is not attached to a hierarchy or is the root of the hierarchy.
      */
     internal var parent: LayoutNode? = null
         get() {
@@ -183,6 +183,11 @@ internal class LayoutNode : Measurable, Remeasurement, OwnerScope, LayoutInfo, C
      * A cache of modifiers to be used when setting and reusing previous modifiers.
      */
     private var wrapperCache = mutableVectorOf<DelegatingLayoutNodeWrapper<*>>()
+
+    /**
+     * [requestRemeasure] calls will be ignored while this flag is true.
+     */
+    private var ignoreRemeasureRequests = false
 
     /**
      * Inserts a child [LayoutNode] at a particular index. If this LayoutNode [owner] is not `null`
@@ -1036,7 +1041,15 @@ internal class LayoutNode : Measurable, Remeasurement, OwnerScope, LayoutInfo, C
      * Used to request a new measurement + layout pass from the owner.
      */
     internal fun requestRemeasure() {
-        owner?.onRequestMeasure(this)
+        if (!ignoreRemeasureRequests) {
+            owner?.onRequestMeasure(this)
+        }
+    }
+
+    internal inline fun ignoreRemeasureRequests(block: () -> Unit) {
+        ignoreRemeasureRequests = true
+        block()
+        ignoreRemeasureRequests = false
     }
 
     /**
