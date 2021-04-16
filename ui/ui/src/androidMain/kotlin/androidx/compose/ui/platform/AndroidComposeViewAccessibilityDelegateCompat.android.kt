@@ -322,6 +322,7 @@ internal class AndroidComposeViewAccessibilityDelegateCompat(val view: AndroidCo
         }
 
         setText(semanticsNode, info)
+        setContentInvalid(semanticsNode, info)
         info.stateDescription =
             semanticsNode.config.getOrNull(SemanticsProperties.StateDescription)
 
@@ -678,6 +679,14 @@ internal class AndroidComposeViewAccessibilityDelegateCompat(val view: AndroidCo
                 actionIdToLabel.put(virtualViewId, currentActionIdToLabel)
                 labelToActionId.put(virtualViewId, currentLabelToActionId)
             }
+        }
+    }
+
+    /** Set the error text for this node */
+    private fun setContentInvalid(node: SemanticsNode, info: AccessibilityNodeInfoCompat) {
+        if (node.config.contains(SemanticsProperties.Error)) {
+            info.isContentInvalid = true
+            info.error = node.config.getOrNull(SemanticsProperties.Error)
         }
     }
 

@@ -38,6 +38,8 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
+import androidx.compose.ui.semantics.error
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.TextRange
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
@@ -101,16 +103,24 @@ fun TextFieldWithPlaceholder() {
 @Composable
 fun TextFieldWithErrorState() {
     var text by rememberSaveable { mutableStateOf("") }
-    val isValid = text.count() > 5 && '@' in text
+    var isError by rememberSaveable { mutableStateOf(false) }
+
+    fun validate(text: String) { isError = text.count() < 5 }
 
     TextField(
         value = text,
-        onValueChange = { text = it },
-        label = {
-            val label = if (isValid) "Email" else "Email*"
-            Text(label)
+        onValueChange = {
+            text = it
+            isError = false
         },
-        isError = !isValid
+        singleLine = true,
+        label = { Text(if (isError) "Email*" else "Email") },
+        isError = isError,
+        keyboardActions = KeyboardActions { validate(text) },
+        modifier = Modifier.semantics {
+            // Provide localized description of the error
+            if (isError) error("Email format is invalid.")
+        }
     )
 }
 
@@ -118,26 +128,17 @@ fun TextFieldWithErrorState() {
 @Composable
 fun TextFieldWithHelperMessage() {
     var text by rememberSaveable { mutableStateOf("") }
-    val invalidInput = text.count() < 5 || '@' !in text
 
     Column {
         TextField(
             value = text,
             onValueChange = { text = it },
-            label = {
-                val label = if (invalidInput) "Email*" else "Email"
-                Text(label)
-            },
-            isError = invalidInput
+            label = { Text("Label") }
         )
-        val textColor = if (invalidInput) {
-            MaterialTheme.colors.error
-        } else {
-            MaterialTheme.colors.onSurface.copy(alpha = ContentAlpha.medium)
-        }
         Text(
-            text = if (invalidInput) "Requires '@' and at least 5 symbols" else "Helper message",
-            style = MaterialTheme.typography.caption.copy(color = textColor),
+            text = "Helper message",
+            color = MaterialTheme.colors.onSurface.copy(alpha = ContentAlpha.medium),
+            style = MaterialTheme.typography.caption,
             modifier = Modifier.padding(start = 16.dp)
         )
     }

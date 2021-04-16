@@ -36,6 +36,7 @@ import androidx.compose.material.LocalContentAlpha
 import androidx.compose.material.LocalContentColor
 import androidx.compose.material.LocalTextStyle
 import androidx.compose.material.MaterialTheme
+import androidx.compose.material.Strings.DefaultErrorMessage
 import androidx.compose.material.Text
 import androidx.compose.material.TextField
 import androidx.compose.material.TextFieldDefaults
@@ -69,14 +70,18 @@ import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.platform.SoftwareKeyboardController
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.semantics.SemanticsProperties
+import androidx.compose.ui.semantics.error
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.test.ExperimentalTestApi
 import androidx.compose.ui.test.SemanticsMatcher
+import androidx.compose.ui.test.assert
 import androidx.compose.ui.test.assertHeightIsEqualTo
 import androidx.compose.ui.test.assertWidthIsEqualTo
 import androidx.compose.ui.test.captureToImage
 import androidx.compose.ui.test.click
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
+import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.performGesture
 import androidx.compose.ui.text.TextStyle
@@ -1062,6 +1067,39 @@ class TextFieldTest {
             .assertPixels {
                 Color.White
             }
+    }
+
+    @Test
+    fun testErrorSemantics_defaultMessage() {
+        rule.setMaterialContent {
+            TextField(
+                value = "test",
+                onValueChange = {},
+                isError = true
+            )
+        }
+
+        rule.onNodeWithText("test")
+            .assert(SemanticsMatcher.keyIsDefined(SemanticsProperties.Error))
+            .assert(SemanticsMatcher.expectValue(SemanticsProperties.Error, DefaultErrorMessage))
+    }
+
+    @Test
+    fun testErrorSemantics_messageOverridable() {
+        val errorMessage = "Special symbols not allowed"
+        rule.setMaterialContent {
+            var isError = remember { mutableStateOf(true) }
+            TextField(
+                value = "test",
+                onValueChange = {},
+                modifier = Modifier.semantics { if (isError.value) error(errorMessage) },
+                isError = isError.value
+            )
+        }
+
+        rule.onNodeWithText("test")
+            .assert(SemanticsMatcher.keyIsDefined(SemanticsProperties.Error))
+            .assert(SemanticsMatcher.expectValue(SemanticsProperties.Error, errorMessage))
     }
 
     private val View.isSoftwareKeyboardShown: Boolean
