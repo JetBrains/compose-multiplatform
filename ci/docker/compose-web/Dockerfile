@@ -6,6 +6,7 @@ RUN echo "dash dash/sh boolean false" | debconf-set-selections
 RUN dpkg-reconfigure -f noninteractive dash
 
 RUN dpkg --add-architecture i386 && apt-get update -yqq && apt-get install -y \
+    firefox \
     git \
     gnupg2 \
     python3 \
