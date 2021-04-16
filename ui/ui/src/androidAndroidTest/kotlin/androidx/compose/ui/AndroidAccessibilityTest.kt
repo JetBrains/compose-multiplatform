@@ -55,6 +55,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.platform.AndroidComposeView
 import androidx.compose.ui.platform.AndroidComposeViewAccessibilityDelegateCompat
 import androidx.compose.ui.platform.LocalDensity
@@ -1682,6 +1683,28 @@ class AndroidAccessibilityTest {
             assertEquals(size.roundToPx(), resultHeight)
             assertEquals(10.dp.roundToPx(), rect.left)
             assertEquals(10.dp.roundToPx(), rect.top)
+        }
+    }
+
+    @Test
+    fun testSemanticsNodePositionAndBounds_doesNotThrow_whenLayoutNodeNotAttached() {
+        var emitNode by mutableStateOf(true)
+        rule.setContent {
+            if (emitNode) {
+                Box(Modifier.size(100.dp).testTag("tag"))
+            }
+        }
+
+        val semanticNode = rule.onNodeWithTag("tag").fetchSemanticsNode()
+        rule.runOnIdle {
+            emitNode = false
+        }
+
+        rule.runOnIdle {
+            assertEquals(Offset.Zero, semanticNode.positionInRoot)
+            assertEquals(Offset.Zero, semanticNode.positionInWindow)
+            assertEquals(androidx.compose.ui.geometry.Rect.Zero, semanticNode.boundsInRoot)
+            assertEquals(androidx.compose.ui.geometry.Rect.Zero, semanticNode.boundsInWindow)
         }
     }
 

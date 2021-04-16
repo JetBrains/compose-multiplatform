@@ -1,3 +1,4 @@
+
 /*
  * Copyright 2020 The Android Open Source Project
  *
@@ -62,6 +63,7 @@ import androidx.compose.ui.semantics.getTextLayoutResult
 import androidx.compose.ui.semantics.heading
 import androidx.compose.ui.semantics.horizontalScrollAxisRange
 import androidx.compose.ui.semantics.liveRegion
+import androidx.compose.ui.semantics.error
 import androidx.compose.ui.semantics.onClick
 import androidx.compose.ui.semantics.onLongClick
 import androidx.compose.ui.semantics.pasteText
@@ -496,6 +498,31 @@ class AndroidComposeViewAccessibilityDelegateCompatTest {
                 info.unwrap().availableExtraData
             )
         }
+    }
+
+    @Test
+    fun testPopulateAccessibilityNodeInfoProperties_setContentInvalid_customDescription() {
+        val errorDescription = "Invalid format"
+        val semanticsNode = createSemanticsNodeWithProperties(1, true) {
+            error(errorDescription)
+        }
+
+        accessibilityDelegate.populateAccessibilityNodeInfoProperties(1, info, semanticsNode)
+
+        assertTrue(info.isContentInvalid)
+        assertEquals(errorDescription, info.error)
+    }
+
+    @Test
+    fun testPopulateAccessibilityNodeInfoProperties_setContentInvalid_emptyDescription() {
+        val semanticsNode = createSemanticsNodeWithProperties(1, true) {
+            error("")
+        }
+
+        accessibilityDelegate.populateAccessibilityNodeInfoProperties(1, info, semanticsNode)
+
+        assertTrue(info.isContentInvalid)
+        assertTrue(info.error.isEmpty())
     }
 
     @Test
