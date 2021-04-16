@@ -1804,12 +1804,17 @@ private class MockOwner(
     override fun measureAndLayout() {
     }
 
+    @ExperimentalComposeUiApi
     override fun createLayer(
         drawBlock: (Canvas) -> Unit,
         invalidateParentLayer: () -> Unit
     ): OwnedLayer {
         return object : OwnedLayer {
             override val layerId: Long
+                get() = 0
+
+            @ExperimentalComposeUiApi
+            override val ownerViewId: Long
                 get() = 0
 
             override fun updateLayerProperties(
