@@ -214,6 +214,8 @@ class LazyListState constructor(
     override val isScrollInProgress: Boolean
         get() = scrollableState.isScrollInProgress
 
+    internal var onScrolledListener: LazyListOnScrolledListener? = null
+
     // TODO: Coroutine scrolling APIs will allow this to be private again once we have more
     //  fine-grained control over scrolling
     /*@VisibleForTesting*/
@@ -232,7 +234,9 @@ class LazyListState constructor(
         // inside measuring we do scrollToBeConsumed.roundToInt() so there will be no scroll if
         // we have less than 0.5 pixels
         if (abs(scrollToBeConsumed) > 0.5f) {
+            val preScrollToBeConsumed = scrollToBeConsumed
             remeasurement.forceRemeasure()
+            onScrolledListener?.onScrolled(preScrollToBeConsumed - scrollToBeConsumed)
         }
 
         // here scrollToBeConsumed is already consumed during the forceRemeasure invocation
@@ -355,4 +359,8 @@ private object EmptyLazyListLayoutInfo : LazyListLayoutInfo {
     override val viewportStartOffset = 0
     override val viewportEndOffset = 0
     override val totalItemsCount = 0
+}
+
+internal interface LazyListOnScrolledListener {
+    fun onScrolled(delta: Float)
 }

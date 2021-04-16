@@ -107,6 +107,7 @@ class LazyItemStateRestoration {
             assertThat(realState).isEqualTo(1)
             runBlocking {
                 state.scrollToItem(1, 5)
+                state.scrollToItem(1, 6)
             }
         }
 
