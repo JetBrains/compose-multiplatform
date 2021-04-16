@@ -1,0 +1,63 @@
+initscript {
+    repositories {
+        maven { url "https://plugins.gradle.org/m2" }
+    }
+    dependencies {
+    classpath "gradle.plugin.com.dorongold.plugins:task-tree:1.5"
+    }
+}
+
+rootProject {
+    apply plugin: com.dorongold.gradle.tasktree.TaskTreePlugin
+}
+
+
+settingsEvaluated { settings ->
+    settings.pluginManagement {
+        repositories.clear()
+
+        repositories {
+            mavenCentral()
+            gradlePluginPortal()
+            google()
+            maven {
+                url("https://packages.jetbrains.team/maven/p/ui/dev")
+            }
+        }
+    }
+}
+
+allprojects {
+    buildscript {
+        repositories {
+            mavenCentral()
+            gradlePluginPortal()
+            google()
+            maven {
+                url("https://packages.jetbrains.team/maven/p/ui/dev")
+            }
+            maven {
+                url("https://dl.bintray.com/kotlin/kotlin-dev")
+            }
+            maven {
+                url("https://maven.pkg.jetbrains.space/public/p/compose/dev")
+            }
+        }
+    }
+
+    repositories {
+        mavenCentral()
+        gradlePluginPortal()
+        google()
+        jcenter()
+        maven {
+            url("https://packages.jetbrains.team/maven/p/ui/dev")
+        }
+        maven {
+            url("https://dl.bintray.com/kotlin/kotlin-dev")
+        }
+        maven {
+            url("https://maven.pkg.jetbrains.space/public/p/compose/dev")
+        }
+    }
+}
