@@ -64,7 +64,7 @@ inline class Offset internal constructor(internal val packedValue: Long) {
     val x: Float
         get() {
             // Explicitly compare against packed values to avoid auto-boxing of Size.Unspecified
-            check(this.packedValue != Size.Unspecified.packedValue) {
+            check(this.packedValue != Unspecified.packedValue) {
                 "Offset is unspecified"
             }
             return unpackFloat1(packedValue)
@@ -74,7 +74,7 @@ inline class Offset internal constructor(internal val packedValue: Long) {
     val y: Float
         get() {
             // Explicitly compare against packed values to avoid auto-boxing of Size.Unspecified
-            check(this.packedValue != Size.Unspecified.packedValue) {
+            check(this.packedValue != Unspecified.packedValue) {
                 "Offset is unspecified"
             }
             return unpackFloat2(packedValue)
