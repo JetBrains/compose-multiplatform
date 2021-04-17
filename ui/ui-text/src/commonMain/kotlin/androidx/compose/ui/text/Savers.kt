@@ -23,6 +23,8 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shadow
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.intl.Locale
+import androidx.compose.ui.text.intl.LocaleList
 import androidx.compose.ui.text.style.BaselineShift
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.text.style.TextGeometricTransform
@@ -206,7 +208,7 @@ internal val SpanStyleSaver = Saver<SpanStyle, Any>(
             save(it.letterSpacing, TextUnit.Saver, this),
             save(it.baselineShift, BaselineShift.Saver, this),
             save(it.textGeometricTransform, TextGeometricTransform.Saver, this),
-            save(-1), // TODO save localeList
+            save(it.localeList, LocaleList.Saver, this),
             save(it.background, Color.Saver, this),
             save(it.textDecoration, TextDecoration.Saver, this),
             save(it.shadow, Shadow.Saver, this)
@@ -225,7 +227,7 @@ internal val SpanStyleSaver = Saver<SpanStyle, Any>(
             letterSpacing = restore(list[7], TextUnit.Saver)!!,
             baselineShift = restore(list[8], BaselineShift.Saver),
             textGeometricTransform = restore(list[9], TextGeometricTransform.Saver),
-            // val localeList = list[10]  // TODO restore localeList
+            localeList = restore(list[10], LocaleList.Saver),
             background = restore(list[11], Color.Saver)!!,
             textDecoration = restore(list[12], TextDecoration.Saver),
             shadow = restore(list[13], Shadow.Saver)
@@ -370,4 +372,28 @@ private val OffsetSaver = Saver<Offset, Any>(
             Offset(restore(list[0])!!, restore(list[1])!!)
         }
     }
+)
+
+internal val LocaleList.Companion.Saver: Saver<LocaleList, Any>
+    get() = LocaleListSaver
+
+private val LocaleListSaver = Saver<LocaleList, Any>(
+    save = {
+        it.localeList.fastMap { locale ->
+            save(locale, Locale.Saver, this)
+        }
+    },
+    restore = {
+        @Suppress("UNCHECKED_CAST")
+        val list = it as List<Any>
+        LocaleList(list.fastMap { item -> restore(item, Locale.Saver)!! })
+    }
+)
+
+internal val Locale.Companion.Saver: Saver<Locale, Any>
+    get() = LocaleSaver
+
+private val LocaleSaver = Saver<Locale, Any>(
+    save = { it.toLanguageTag() },
+    restore = { Locale(languageTag = it as String) }
 )

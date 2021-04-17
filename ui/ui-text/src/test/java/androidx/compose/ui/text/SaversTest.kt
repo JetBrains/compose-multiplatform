@@ -24,6 +24,8 @@ import androidx.compose.ui.graphics.Shadow
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontSynthesis
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.intl.Locale
+import androidx.compose.ui.text.intl.LocaleList
 import androidx.compose.ui.text.style.BaselineShift
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextDecoration
@@ -183,7 +185,11 @@ class SaversTest {
             letterSpacing = 2.em,
             baselineShift = BaselineShift.Superscript,
             textGeometricTransform = TextGeometricTransform(2f, 3f),
-            // localeList =
+            localeList = LocaleList(
+                Locale("sr-Latn-SR"),
+                Locale("sr-Cyrl-SR"),
+                Locale.current
+            ),
             background = Color.Blue,
             textDecoration = TextDecoration.LineThrough,
             shadow = Shadow(color = Color.Red, offset = Offset(2f, 2f), blurRadius = 4f)
@@ -368,5 +374,25 @@ class SaversTest {
 
         val restored: AnnotatedString = AnnotatedStringSaver.restore(saved!!)!!
         assertThat(restored).isEqualTo(original)
+    }
+
+    @Test
+    fun test_Locale() {
+        val original = Locale("sr-Latn-SR")
+        val saved = with(Locale.Saver) { defaultSaverScope.save(original) }
+
+        assertThat(Locale.Saver.restore(saved!!)).isEqualTo(original)
+    }
+
+    @Test
+    fun test_LocaleList() {
+        val original = LocaleList(
+            Locale("sr-Latn-SR"),
+            Locale("sr-Cyrl-SR"),
+            Locale.current
+        )
+        val saved = with(LocaleList.Saver) { defaultSaverScope.save(original) }
+
+        assertThat(LocaleList.Saver.restore(saved!!)).isEqualTo(original)
     }
 }
