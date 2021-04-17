@@ -16,6 +16,7 @@
 
 package androidx.compose.ui.text
 
+import androidx.compose.runtime.ExperimentalComposeApi
 import androidx.compose.runtime.Immutable
 import androidx.compose.runtime.Stable
 import androidx.compose.ui.text.AnnotatedString.Builder
@@ -338,6 +339,22 @@ class AnnotatedString internal constructor(
          */
         fun addStringAnnotation(tag: String, annotation: String, start: Int, end: Int) {
             annotations.add(MutableRange(annotation, start, end, tag))
+        }
+
+        /**
+         * Set a [TtsAnnotation] for the given [range].
+         *
+         * @param ttsAnnotation an object stores text to speech metadata that intended for the
+         * TTS engine.
+         * @param start the inclusive starting offset of the range
+         * @param end the exclusive end offset of the range
+         * @see getStringAnnotations
+         * @sample androidx.compose.ui.text.samples.AnnotatedStringAddStringAnnotationSample
+         */
+        @ExperimentalComposeApi
+        @Suppress("SetterReturnsThis")
+        fun addTtsAnnotation(ttsAnnotation: TtsAnnotation, start: Int, end: Int) {
+            annotations.add(MutableRange(ttsAnnotation, start, end))
         }
 
         /**
@@ -699,6 +716,58 @@ inline fun <R : Any> Builder.withStyle(
     crossinline block: Builder.() -> R
 ): R {
     val index = pushStyle(style)
+    return try {
+        block(this)
+    } finally {
+        pop(index)
+    }
+}
+
+/**
+ * Pushes an annotation to the [AnnotatedString.Builder], executes [block] and then pops the
+ * annotation.
+ *
+ * @param tag the tag used to distinguish annotations
+ * @param annotation the string annotation attached on this AnnotatedString
+ * @param block function to be executed
+ *
+ * @return result of the [block]
+ *
+ * @see AnnotatedString.Builder.pushStringAnnotation
+ * @see AnnotatedString.Builder.pop
+ */
+@ExperimentalComposeApi
+inline fun <R : Any> Builder.withAnnotation(
+    tag: String,
+    annotation: String,
+    crossinline block: Builder.() -> R
+): R {
+    val index = pushStringAnnotation(tag, annotation)
+    return try {
+        block(this)
+    } finally {
+        pop(index)
+    }
+}
+
+/**
+ * Pushes an [TtsAnnotation] to the [AnnotatedString.Builder], executes [block] and then pops the
+ * annotation.
+ *
+ * @param ttsAnnotation an object stores text to speech metadata that intended for the TTS engine.
+ * @param block function to be executed
+ *
+ * @return result of the [block]
+ *
+ * @see AnnotatedString.Builder.pushStringAnnotation
+ * @see AnnotatedString.Builder.pop
+ */
+@ExperimentalComposeApi
+inline fun <R : Any> Builder.withAnnotation(
+    ttsAnnotation: TtsAnnotation,
+    crossinline block: Builder.() -> R
+): R {
+    val index = pushTtsAnnotation(ttsAnnotation)
     return try {
         block(this)
     } finally {

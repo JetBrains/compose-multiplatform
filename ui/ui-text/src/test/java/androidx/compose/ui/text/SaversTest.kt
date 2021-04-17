@@ -16,6 +16,7 @@
 
 package androidx.compose.ui.text
 
+import androidx.compose.runtime.ExperimentalComposeApi
 import androidx.compose.runtime.saveable.SaverScope
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
@@ -295,6 +296,77 @@ class SaversTest {
         val saved = with(TextIndent.Saver) { defaultSaverScope.save(original) }
         val restored = TextIndent.Saver.restore(saved!!)
 
+        assertThat(restored).isEqualTo(original)
+    }
+
+    @Test
+    fun test_AnnotatedString() {
+        val original = AnnotatedString("abc")
+        val saved = with(AnnotatedStringSaver) { defaultSaverScope.save(original) }
+
+        assertThat(AnnotatedStringSaver.restore(saved!!)).isEqualTo(original)
+    }
+
+    @Test
+    fun test_AnnotatedString_withSpanStyles() {
+        val original = buildAnnotatedString {
+            withStyle(SpanStyle(color = Color.Red)) { append("1") }
+            withStyle(SpanStyle(fontStyle = FontStyle.Italic)) { append("2") }
+        }
+
+        val saved = with(AnnotatedStringSaver) { defaultSaverScope.save(original) }
+
+        val restored: AnnotatedString = AnnotatedStringSaver.restore(saved!!)!!
+        assertThat(restored).isEqualTo(original)
+    }
+
+    @Test
+    fun test_AnnotatedString_withParagraphStyles() {
+        val original = buildAnnotatedString {
+            withStyle(ParagraphStyle(textAlign = TextAlign.Justify)) { append("1") }
+            withStyle(ParagraphStyle(textDirection = TextDirection.Rtl)) { append("2") }
+        }
+
+        val saved = with(AnnotatedStringSaver) { defaultSaverScope.save(original) }
+
+        val restored: AnnotatedString = AnnotatedStringSaver.restore(saved!!)!!
+        assertThat(restored).isEqualTo(original)
+    }
+
+    @OptIn(ExperimentalComposeApi::class)
+    @Test
+    fun test_AnnotatedString_withAnnotations() {
+        val original = buildAnnotatedString {
+            withAnnotation(tag = "Tag1", annotation = "Annotation1") { append("1") }
+            withAnnotation(VerbatimTtsAnnotation("verbatim1")) { append("2") }
+            withAnnotation(tag = "Tag2", annotation = "Annotation2") { append("3") }
+            withAnnotation(VerbatimTtsAnnotation("verbatim2")) { append("4") }
+        }
+
+        val saved = with(AnnotatedStringSaver) { defaultSaverScope.save(original) }
+
+        val restored: AnnotatedString = AnnotatedStringSaver.restore(saved!!)!!
+
+        assertThat(restored).isEqualTo(original)
+    }
+
+    @OptIn(ExperimentalComposeApi::class)
+    @Test
+    fun test_AnnotatedString_withSpanAndParagraphStylesAndAnnotations() {
+        val original = buildAnnotatedString {
+            withStyle(ParagraphStyle(textAlign = TextAlign.Justify)) { append("1") }
+            withStyle(ParagraphStyle(textDirection = TextDirection.Rtl)) { append("2") }
+            withStyle(SpanStyle(color = Color.Red)) { append("3") }
+            withStyle(SpanStyle(fontStyle = FontStyle.Italic)) { append("4") }
+            withAnnotation(tag = "Tag1", annotation = "Annotation1") { append("5") }
+            withAnnotation(VerbatimTtsAnnotation("verbatim1")) { append("6") }
+            withAnnotation(tag = "Tag2", annotation = "Annotation2") { append("7") }
+            withAnnotation(VerbatimTtsAnnotation("verbatim2")) { append("8") }
+        }
+
+        val saved = with(AnnotatedStringSaver) { defaultSaverScope.save(original) }
+
+        val restored: AnnotatedString = AnnotatedStringSaver.restore(saved!!)!!
         assertThat(restored).isEqualTo(original)
     }
 }
