@@ -16,6 +16,7 @@
 
 package androidx.compose.ui.layout
 
+import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 
 /**
@@ -79,4 +80,13 @@ interface GraphicLayerInfo {
      * LayoutNode.
      */
     val layerId: Long
+
+    /**
+     * The uniqueDrawingId of the owner view of this graphics layer. This is used by
+     * tooling to match a layer to the associated owner AndroidComposeView.
+     */
+    @get:ExperimentalComposeUiApi
+    @ExperimentalComposeUiApi
+    val ownerViewId: Long
+        get() = 0
 }

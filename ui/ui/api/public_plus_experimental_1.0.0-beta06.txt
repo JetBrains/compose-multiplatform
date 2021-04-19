@@ -1595,7 +1595,9 @@ package androidx.compose.ui.layout {
 
   public interface GraphicLayerInfo {
     method public long getLayerId();
+    method @androidx.compose.ui.ExperimentalComposeUiApi public default long getOwnerViewId();
     property public abstract long layerId;
+    property @androidx.compose.ui.ExperimentalComposeUiApi public default long ownerViewId;
   }
 
   public final class HorizontalAlignmentLine extends androidx.compose.ui.layout.AlignmentLine {

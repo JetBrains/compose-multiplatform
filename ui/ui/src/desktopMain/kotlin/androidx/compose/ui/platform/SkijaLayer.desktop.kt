@@ -16,6 +16,7 @@
 
 package androidx.compose.ui.platform
 
+import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.geometry.Rect
 import androidx.compose.ui.geometry.toRect
 import androidx.compose.ui.graphics.Canvas
@@ -72,6 +73,10 @@ internal class SkijaLayer(
     private var shadowElevation: Float = 0f
 
     override val layerId = lastId++
+
+    @ExperimentalComposeUiApi
+    override val ownerViewId: Long
+        get() = 0
 
     override fun destroy() {
         picture?.close()

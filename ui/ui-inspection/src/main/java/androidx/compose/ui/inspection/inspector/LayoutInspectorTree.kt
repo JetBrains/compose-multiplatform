@@ -19,6 +19,7 @@ package androidx.compose.ui.inspection.inspector
 import android.view.View
 import androidx.compose.runtime.InternalComposeApi
 import androidx.compose.runtime.tooling.CompositionData
+import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.R
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.layout.GraphicLayerInfo
@@ -108,7 +109,7 @@ class LayoutInspectorTree {
             ?: return emptyList()
         clear()
         collectSemantics(view)
-        val result = convert(tables)
+        val result = convert(tables, view)
         clear()
         return result
     }
@@ -201,8 +202,8 @@ class LayoutInspectorTree {
     }
 
     @OptIn(InternalComposeApi::class)
-    private fun convert(tables: Set<CompositionData>): List<InspectorNode> {
-        val trees = tables.map { convert(it) }
+    private fun convert(tables: Set<CompositionData>, view: View): List<InspectorNode> {
+        val trees = tables.mapNotNull { convert(it, view) }
         return when (trees.size) {
             0 -> listOf()
             1 -> addTree(mutableListOf(), trees.single())
@@ -310,10 +311,10 @@ class LayoutInspectorTree {
     }
 
     @OptIn(InternalComposeApi::class, UiToolingDataApi::class)
-    private fun convert(table: CompositionData): MutableInspectorNode {
+    private fun convert(table: CompositionData, view: View): MutableInspectorNode? {
         val fakeParent = newNode()
         addToParent(fakeParent, listOf(convert(table.asTree())), buildFakeChildNodes = true)
-        return fakeParent
+        return if (belongsToView(fakeParent.layoutNodes, view)) fakeParent else null
     }
 
     @OptIn(UiToolingDataApi::class)
@@ -487,6 +488,15 @@ class LayoutInspectorTree {
             .filterIsInstance<GraphicLayerInfo>()
             .map { it.layerId }
             .firstOrNull() ?: 0
+
+    @OptIn(ExperimentalComposeUiApi::class)
+    private fun belongsToView(layoutNodes: List<LayoutInfo>, view: View): Boolean =
+        layoutNodes.asSequence().flatMap { node ->
+            node.getModifierInfo().asSequence()
+                .map { it.extra }
+                .filterIsInstance<GraphicLayerInfo>()
+                .mapNotNull { it.ownerViewId }
+        }.contains(view.uniqueDrawingId)
 
     @OptIn(UiToolingDataApi::class)
     private fun addParameters(parameters: List<ParameterInformation>, node: MutableInspectorNode) =

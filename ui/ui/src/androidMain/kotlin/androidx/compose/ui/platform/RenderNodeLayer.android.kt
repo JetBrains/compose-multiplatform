@@ -17,7 +17,9 @@
 package androidx.compose.ui.platform
 
 import android.os.Build
+import android.view.View
 import androidx.annotation.RequiresApi
+import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.graphics.TransformOrigin
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Canvas
@@ -67,6 +69,23 @@ internal class RenderNodeLayer(
 
     override val layerId: Long
         get() = renderNode.uniqueId
+
+    @ExperimentalComposeUiApi
+    override val ownerViewId: Long
+        get() = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+            UniqueDrawingIdApi29.getUniqueDrawingId(ownerView)
+        } else {
+            -1
+        }
+
+    @RequiresApi(29)
+    private class UniqueDrawingIdApi29 {
+        @RequiresApi(29)
+        companion object {
+            @JvmStatic
+            fun getUniqueDrawingId(view: View) = view.uniqueDrawingId
+        }
+    }
 
     override fun updateLayerProperties(
         scaleX: Float,
