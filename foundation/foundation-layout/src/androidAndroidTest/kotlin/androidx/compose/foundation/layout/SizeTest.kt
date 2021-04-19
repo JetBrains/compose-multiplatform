@@ -1953,4 +1953,25 @@ class SizeTest : LayoutTest() {
         val root = findComposeView()
         waitForDraw(root)
     }
+
+    @Test
+    fun sizeModifiers_doNotCauseCrashesWhenCreatingConstraints() {
+        show {
+            Box(Modifier.sizeIn(minWidth = -1.dp))
+            Box(Modifier.sizeIn(minWidth = 10.dp, maxWidth = 5.dp))
+            Box(Modifier.sizeIn(minHeight = -1.dp))
+            Box(Modifier.sizeIn(minHeight = 10.dp, maxHeight = 5.dp))
+            Box(
+                Modifier.sizeIn(
+                    minWidth = Dp.Infinity,
+                    maxWidth = Dp.Infinity,
+                    minHeight = Dp.Infinity,
+                    maxHeight = Dp.Infinity
+                )
+            )
+            Box(Modifier.defaultMinSize(minWidth = -1.dp, minHeight = -1.dp))
+        }
+        val root = findComposeView()
+        waitForDraw(root)
+    }
 }
