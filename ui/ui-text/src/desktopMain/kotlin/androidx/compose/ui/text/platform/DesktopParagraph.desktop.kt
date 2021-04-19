@@ -730,7 +730,7 @@ internal class ParagraphBuilder(
                         height = fontSizeInHierarchy(
                             density,
                             currentStyle.fontSize,
-                            cut.placeholder.width
+                            cut.placeholder.height
                         ),
                     )
                     ops.add(op)
