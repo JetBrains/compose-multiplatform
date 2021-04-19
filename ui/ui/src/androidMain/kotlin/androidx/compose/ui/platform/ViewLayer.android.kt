@@ -19,6 +19,8 @@ package androidx.compose.ui.platform
 import android.os.Build
 import android.view.View
 import android.view.ViewOutlineProvider
+import androidx.annotation.RequiresApi
+import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Canvas
 import androidx.compose.ui.graphics.CanvasHolder
@@ -70,6 +72,23 @@ internal class ViewLayer(
 
     override val layerId: Long
         get() = id.toLong()
+
+    @ExperimentalComposeUiApi
+    override val ownerViewId: Long
+        get() = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+            UniqueDrawingIdApi29.getUniqueDrawingId(ownerView)
+        } else {
+            -1
+        }
+
+    @RequiresApi(29)
+    private class UniqueDrawingIdApi29 {
+        @RequiresApi(29)
+        companion object {
+            @JvmStatic
+            fun getUniqueDrawingId(view: View) = view.uniqueDrawingId
+        }
+    }
 
     /**
      * Configure the camera distance on the View in pixels. View already has a get/setCameraDistance
