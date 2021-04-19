@@ -14,6 +14,8 @@
  * limitations under the License.
  */
 
+
+import androidx.build.AndroidXUiPlugin
 import androidx.build.LibraryGroups
 import androidx.build.LibraryType
 
@@ -23,38 +25,96 @@ plugins {
     id("AndroidXPlugin")
     id("com.android.library")
     id("AndroidXUiPlugin")
-    id("org.jetbrains.kotlin.android")
 }
+
+AndroidXUiPlugin.applyAndConfigureKotlinPlugin(project)
 
 dependencies {
     kotlinPlugin(project(":compose:compiler:compiler"))
 
-    implementation(KOTLIN_STDLIB)
+    if(!AndroidXUiPlugin.isMultiplatformEnabled(project)) {
+        implementation(KOTLIN_STDLIB)
 
-    api("androidx.annotation:annotation:1.1.0")
+        api("androidx.annotation:annotation:1.1.0")
 
-    api(project(":compose:runtime:runtime"))
-    api(project(":compose:ui:ui"))
-    api(project(":compose:ui:ui-tooling-data"))
-    implementation(project(":compose:material:material"))
-    implementation "androidx.activity:activity-ktx:1.2.0"
+        api(project(":compose:runtime:runtime"))
+        api(project(":compose:ui:ui"))
+        api(project(":compose:ui:ui-tooling-data"))
+        implementation(project(":compose:material:material"))
+        implementation "androidx.activity:activity-ktx:1.2.0"
 
-    // kotlin-reflect and tooling-animation-internal are provided by Studio at runtime
-    compileOnly(project(":ui:ui-animation-tooling-internal"))
-    compileOnly(KOTLIN_REFLECT)
+        // kotlin-reflect and tooling-animation-internal are provided by Studio at runtime
+        compileOnly(project(":ui:ui-animation-tooling-internal"))
+        compileOnly(KOTLIN_REFLECT)
 
-    androidTestImplementation(project(":compose:ui:ui-test-junit4"))
+        androidTestImplementation(project(":compose:ui:ui-test-junit4"))
 
-    androidTestImplementation(JUNIT)
-    androidTestImplementation(ANDROIDX_TEST_RUNNER)
-    androidTestImplementation(ANDROIDX_TEST_RULES)
-    androidTestImplementation(project(":compose:foundation:foundation-layout"))
-    androidTestImplementation(project(":compose:foundation:foundation"))
-    androidTestImplementation(project(":compose:test-utils"))
-    androidTestImplementation(TRUTH)
-    androidTestImplementation(KOTLIN_REFLECT)
-    androidTestImplementation(project(":ui:ui-animation-tooling-internal"))
+        androidTestImplementation(JUNIT)
+        androidTestImplementation(ANDROIDX_TEST_RUNNER)
+        androidTestImplementation(ANDROIDX_TEST_RULES)
+        androidTestImplementation(project(":compose:foundation:foundation-layout"))
+        androidTestImplementation(project(":compose:foundation:foundation"))
+        androidTestImplementation(project(":compose:test-utils"))
+        androidTestImplementation(TRUTH)
+        androidTestImplementation(KOTLIN_REFLECT)
+        androidTestImplementation(project(":ui:ui-animation-tooling-internal"))
+    }
 }
+
+if(AndroidXUiPlugin.isMultiplatformEnabled(project)) {
+    kotlin {
+        android()
+        jvm("desktop")
+
+        /*
+         * When updating dependencies, make sure to make the an an analogous update in the
+         * corresponding block above
+         */
+        sourceSets {
+            commonMain.dependencies {
+                implementation(KOTLIN_STDLIB_COMMON)
+
+            }
+            androidMain.dependencies {
+                api("androidx.annotation:annotation:1.1.0")
+
+                api(project(":compose:runtime:runtime"))
+                api(project(":compose:ui:ui"))
+                api(project(":compose:ui:ui-tooling-data"))
+                implementation(project(":compose:material:material"))
+                implementation "androidx.activity:activity-ktx:1.2.0"
+
+                // kotlin-reflect and tooling-animation-internal are provided by Studio at runtime
+                compileOnly(project(":ui:ui-animation-tooling-internal"))
+                compileOnly(KOTLIN_REFLECT)
+            }
+
+            androidMain.dependsOn(jvmMain)
+            desktopMain.dependsOn(jvmMain)
+
+            desktopMain.dependencies {
+                implementation(KOTLIN_STDLIB)
+                implementation(project(":compose:runtime:runtime"))
+                implementation(project(":compose:ui:ui"))
+            }
+
+            androidAndroidTest.dependencies {
+                implementation(project(":compose:ui:ui-test-junit4"))
+
+                implementation(JUNIT)
+                implementation(ANDROIDX_TEST_RUNNER)
+                implementation(ANDROIDX_TEST_RULES)
+                implementation(project(":compose:foundation:foundation-layout"))
+                implementation(project(":compose:foundation:foundation"))
+                implementation(project(":compose:test-utils"))
+                implementation(TRUTH)
+                implementation(KOTLIN_REFLECT)
+                implementation(project(":ui:ui-animation-tooling-internal"))
+            }
+        }
+    }
+}
+
 
 androidx {
     name = "Compose Tooling"
