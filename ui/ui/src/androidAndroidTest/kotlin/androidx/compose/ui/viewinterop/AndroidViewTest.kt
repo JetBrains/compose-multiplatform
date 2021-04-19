@@ -466,6 +466,7 @@ class AndroidViewTest {
     }
 
     @Test
+    @SdkSuppress(minSdkVersion = Build.VERSION_CODES.O)
     fun androidView_clipsToBounds() {
         val size = 20
         val sizeDp = with(rule.density) { size.toDp() }
