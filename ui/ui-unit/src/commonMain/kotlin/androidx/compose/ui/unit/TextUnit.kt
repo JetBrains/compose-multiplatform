@@ -17,6 +17,7 @@
 
 package androidx.compose.ui.unit
 
+import androidx.compose.runtime.ExperimentalComposeApi
 import androidx.compose.runtime.Immutable
 import androidx.compose.runtime.Stable
 import androidx.compose.ui.geometry.isSpecified
@@ -42,11 +43,14 @@ private const val UNIT_TYPE_EM = 0x02L shl 32 // 0x2_0000_0000
 /**
  * An enum class defining for type of [TextUnit].
  */
-enum class TextUnitType {
-    Unspecified,
-    Sp,
-    Em
+enum class TextUnitType(internal val type: Long) {
+    Unspecified(UNIT_TYPE_UNSPECIFIED),
+    Sp(UNIT_TYPE_SP),
+    Em(UNIT_TYPE_EM)
 }
+
+@ExperimentalComposeApi
+fun TextUnit(value: Float, type: TextUnitType): TextUnit = pack(type.type, value)
 
 /**
  * The unit used for text related dimension value.
