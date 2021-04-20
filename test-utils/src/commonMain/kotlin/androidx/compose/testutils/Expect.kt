@@ -37,6 +37,11 @@ fun expectAssertionError(
  * Runs the [block] and asserts that a [T] is thrown with the [expectedMessage] if [expectError]
  * is `true`, or that nothing is thrown if [expectError] is `false`. The [expectedMessage] is a
  * regex with just the option [DOT_MATCHES_ALL] enabled.
+ *
+ * @param expectedMessage A regular expression that matches the entire expected error message. If
+ * you don't want to verify the entire error message, use `.*` in the appropriate places. The
+ * option [DOT_MATCHES_ALL] is enabled so you can match new lines with `.*`. Don't forget to
+ * escape special characters like `[`, `(` or `*` (and double escaping for `\`).
  */
 inline fun <reified T : Throwable> expectError(
     expectError: Boolean = true,
@@ -79,12 +84,12 @@ internal fun throwExpectError(
     } ?: ""
 
     fun String.plusMessage(message: String?): String {
-        return if (expectedMessage == null) this else "$this with message \"$message\""
+        return if (expectedMessage == null) this else "$this with message\n\"\"\"$message\"\"\"\n"
     }
 
     val expected = expectedClassName?.let { "a $it".plusMessage(expectedMessage) } ?: "nothing"
     val actual = thrown?.run { "a ${javaClass.simpleName}".plusMessage(message) } ?: "nothing"
     throw AssertionError(
-        "Expected that $expected was thrown, but $actual was thrown$stackTrace"
+        "Expected that $expected would be thrown, but $actual was thrown$stackTrace"
     )
 }
