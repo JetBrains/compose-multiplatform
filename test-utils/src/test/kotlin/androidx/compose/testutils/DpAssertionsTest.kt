@@ -17,13 +17,11 @@
 package androidx.compose.testutils
 
 import androidx.compose.ui.unit.dp
-import androidx.test.ext.junit.runners.AndroidJUnit4
-import androidx.test.filters.SmallTest
 import org.junit.Test
 import org.junit.runner.RunWith
+import org.junit.runners.JUnit4
 
-@SmallTest
-@RunWith(AndroidJUnit4::class)
+@RunWith(JUnit4::class)
 class DpAssertionsTest {
 
     @Test
