@@ -20,7 +20,7 @@ import androidx.compose.animation.core.AnimationConstants
 import androidx.compose.animation.core.AnimationState
 import androidx.compose.animation.core.animateTo
 import androidx.compose.animation.core.calculateTargetValue
-import androidx.compose.animation.defaultDecayAnimationSpec
+import androidx.compose.animation.rememberSplineBasedDecay
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -596,7 +596,7 @@ private fun LazyWithFlingConfig() {
             "Custom fling config will dance back and forth when you fling",
             modifier = Modifier.padding(16.dp)
         )
-        val defaultDecay = defaultDecayAnimationSpec()
+        val defaultDecay = rememberSplineBasedDecay<Float>()
         val flingConfig = remember {
             object : FlingBehavior {
                 override suspend fun ScrollScope.performFling(initialVelocity: Float): Float {

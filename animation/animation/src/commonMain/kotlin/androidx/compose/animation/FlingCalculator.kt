@@ -16,14 +16,10 @@
 
 package androidx.compose.animation
 
-import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.Density
 import kotlin.math.exp
 import kotlin.math.ln
 import kotlin.math.sign
-
-// copy-paste of
-// src/androidMain/kotlin/androidx/compose/foundation/animation/AndroidFlingCalculator.android.kt
 
 /**
  * Earth's gravity in SI units (m/s^2); used to compute deceleration based on friction.
@@ -33,7 +29,7 @@ private const val InchesPerMeter = 39.37f
 
 /**
  * The default rate of deceleration for a fling if not specified in the
- * [AndroidFlingCalculator] constructor.
+ * [FlingCalculator] constructor.
  */
 private val DecelerationRate = (ln(0.78) / ln(0.9)).toFloat()
 
@@ -48,9 +44,9 @@ private fun computeDeceleration(friction: Float, density: Float): Float =
  * Configuration for Android-feel flinging motion at the given density.
  *
  * @param friction scroll friction.
- * @param density density of the screen. Use [LocalDensity] to get current density in composition.
+ * @param density density of the screen. Use LocalDensity to get current density in composition.
  */
-internal class AndroidFlingCalculator(
+internal class FlingCalculator(
     private val friction: Float,
     val density: Density
 ) {
@@ -127,7 +123,7 @@ internal class AndroidFlingCalculator(
         fun velocity(time: Long): Float {
             val splinePos = if (duration > 0) time / duration.toFloat() else 1f
             return AndroidFlingSpline.flingPosition(splinePos).velocityCoefficient *
-                distance / duration * 1000.0f
+                sign(initialVelocity) * distance / duration * 1000.0f
         }
     }
 }

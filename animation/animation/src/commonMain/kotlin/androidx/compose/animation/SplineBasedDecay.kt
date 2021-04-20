@@ -16,11 +16,11 @@
 
 package androidx.compose.animation
 
+import androidx.compose.animation.core.DecayAnimationSpec
+import androidx.compose.animation.core.generateDecayAnimationSpec
+import androidx.compose.ui.unit.Density
 import kotlin.math.abs
 import kotlin.math.ln
-
-// copy-paste of
-// src/androidMain/kotlin/androidx/compose/foundation/animation/AndroidFlingSpline.android.kt
 
 private const val Inflection = 0.35f // Tension lines cross at (Inflection, 1)
 private const val StartTension = 0.5f
@@ -126,3 +126,6 @@ internal object AndroidFlingSpline {
         val velocityCoefficient: Float
     )
 }
+
+fun <T> splineBasedDecay(density: Density): DecayAnimationSpec<T> =
+    SplineBasedFloatDecayAnimationSpec(density).generateDecayAnimationSpec()

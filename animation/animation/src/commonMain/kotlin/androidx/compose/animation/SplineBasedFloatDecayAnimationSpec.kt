@@ -20,12 +20,16 @@ import androidx.compose.animation.core.FloatDecayAnimationSpec
 import androidx.compose.ui.unit.Density
 import kotlin.math.sign
 
-internal class DesktopDefaultDecayAnimationSpec(density: Density) : FloatDecayAnimationSpec {
-    // TODO(demin): extract common SplineBasedFlingCalculator if any other OS uses similar
-    //  fling implementation
-    // temporarily we use android implementation of fling decay
-    private val flingCalculator = AndroidFlingCalculator(
-        friction = 0.015f,
+/**
+ * A native Android fling curve decay.
+ *
+ * @param density density of the display
+ */
+class SplineBasedFloatDecayAnimationSpec(density: Density) :
+    FloatDecayAnimationSpec {
+
+    private val flingCalculator = FlingCalculator(
+        friction = platformFlingScrollFriction,
         density = density
     )
 
@@ -49,7 +53,7 @@ internal class DesktopDefaultDecayAnimationSpec(density: Density) : FloatDecayAn
 
     @Suppress("MethodNameUnits")
     override fun getDurationNanos(initialValue: Float, initialVelocity: Float): Long =
-        flingCalculator.flingDuration(initialVelocity)
+        flingCalculator.flingDuration(initialVelocity) * 1_000_000L
 
     @Suppress("MethodNameUnits")
     override fun getVelocityFromNanos(
@@ -61,3 +65,5 @@ internal class DesktopDefaultDecayAnimationSpec(density: Density) : FloatDecayAn
         return flingCalculator.flingInfo(initialVelocity).velocity(playTimeMillis)
     }
 }
+
+internal expect val platformFlingScrollFriction: Float
