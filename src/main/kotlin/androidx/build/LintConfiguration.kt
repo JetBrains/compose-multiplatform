@@ -56,14 +56,34 @@ fun Project.configureNonAndroidProjectForLint(extension: AndroidXExtension) {
 }
 
 fun Project.configureAndroidProjectForLint(lintOptions: LintOptions, extension: AndroidXExtension) {
+    project.afterEvaluate {
+        // makes sure that the lintDebug task will exist, so we can find it by name
+        setUpLintDebugIfNeeded()
+    }
     configureLint(lintOptions, extension)
     tasks.named("lint").configure { task ->
         // We already run lintDebug, we don't need to run lint which lints the release variant
         task.enabled = false
     }
     afterEvaluate {
-        tasks.named("lintDebug").configure { task ->
-            AffectedModuleDetector.configureTaskGuard(task)
+        for (variant in project.agpVariants) {
+            tasks.named("lint${variant.name.capitalize()}").configure { task ->
+                AffectedModuleDetector.configureTaskGuard(task)
+            }
+        }
+    }
+}
+
+private fun Project.setUpLintDebugIfNeeded() {
+    val variants = project.agpVariants
+    val variantNames = variants.map({ v -> v.name })
+    if (!variantNames.contains("debug")) {
+        tasks.register("lintDebug") {
+            for (variantName in variantNames) {
+                if (variantName.toLowerCase().contains("debug")) {
+                    it.dependsOn(tasks.named("lint${variantName.capitalize()}"))
+                }
+            }
         }
     }
 }
