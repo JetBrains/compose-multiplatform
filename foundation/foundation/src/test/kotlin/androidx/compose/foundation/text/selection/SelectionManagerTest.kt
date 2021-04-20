@@ -167,8 +167,7 @@ class SelectionManagerTest {
                 endPosition = endCoordinates,
                 containerLayoutCoordinates = selectionManager.requireContainerCoordinates(),
                 adjustment = SelectionAdjustment.NONE,
-                previousSelection = fakeSelection,
-                ensureAtLeastOneChar = true
+                previousSelection = fakeSelection
             )
         verify(
             hapticFeedback,

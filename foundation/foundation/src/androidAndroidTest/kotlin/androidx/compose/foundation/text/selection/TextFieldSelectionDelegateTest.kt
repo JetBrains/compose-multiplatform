@@ -25,7 +25,6 @@ import androidx.compose.ui.test.junit4.createAndroidComposeRule
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.TextLayoutResult
-import androidx.compose.ui.text.TextRange
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.Density
@@ -68,10 +67,8 @@ class TextFieldSelectionDelegateTest {
             rawStartOffset = 2,
             rawEndOffset = 2,
             previousSelection = null,
-            previousHandlesCrossed = false,
             isStartHandle = true,
-            adjustment = SelectionAdjustment.WORD,
-            ensureAtLeastOneChar = true
+            adjustment = SelectionAdjustment.WORD
         )
 
         // Assert.
@@ -96,10 +93,8 @@ class TextFieldSelectionDelegateTest {
             rawStartOffset = 5,
             rawEndOffset = 5,
             previousSelection = null,
-            previousHandlesCrossed = false,
             isStartHandle = true,
-            adjustment = SelectionAdjustment.WORD,
-            ensureAtLeastOneChar = true
+            adjustment = SelectionAdjustment.WORD
         )
 
         // Assert.
@@ -127,10 +122,8 @@ class TextFieldSelectionDelegateTest {
             rawStartOffset = rawStartOffset,
             rawEndOffset = rawEndOffset,
             previousSelection = null,
-            previousHandlesCrossed = false,
             isStartHandle = true,
-            adjustment = SelectionAdjustment.WORD,
-            ensureAtLeastOneChar = true
+            adjustment = SelectionAdjustment.WORD
         )
 
         // Assert.
@@ -158,10 +151,8 @@ class TextFieldSelectionDelegateTest {
             rawStartOffset = rawStartOffset,
             rawEndOffset = rawEndOffset,
             previousSelection = null,
-            previousHandlesCrossed = false,
             isStartHandle = true,
-            adjustment = SelectionAdjustment.WORD,
-            ensureAtLeastOneChar = true
+            adjustment = SelectionAdjustment.WORD
         )
 
         // Assert.
@@ -189,11 +180,9 @@ class TextFieldSelectionDelegateTest {
             textLayoutResult = textLayoutResult,
             rawStartOffset = startOffset,
             rawEndOffset = endOffset,
-            previousSelection = TextRange(0, 0),
-            previousHandlesCrossed = false,
+            previousSelection = null,
             isStartHandle = true,
-            adjustment = SelectionAdjustment.NONE,
-            ensureAtLeastOneChar = true
+            adjustment = SelectionAdjustment.NONE
         )
 
         // Assert.
@@ -221,11 +210,9 @@ class TextFieldSelectionDelegateTest {
             textLayoutResult = textLayoutResult,
             rawStartOffset = startOffset,
             rawEndOffset = endOffset,
-            previousSelection = TextRange(0, 0),
-            previousHandlesCrossed = false,
+            previousSelection = null,
             isStartHandle = true,
-            adjustment = SelectionAdjustment.NONE,
-            ensureAtLeastOneChar = true
+            adjustment = SelectionAdjustment.CHARACTER
         )
 
         // Assert.
@@ -255,11 +242,9 @@ class TextFieldSelectionDelegateTest {
             textLayoutResult = textLayoutResult,
             rawStartOffset = startOffset,
             rawEndOffset = endOffset,
-            previousSelection = TextRange(0, 0),
-            previousHandlesCrossed = false,
+            previousSelection = null,
             isStartHandle = true,
-            adjustment = SelectionAdjustment.NONE,
-            ensureAtLeastOneChar = true
+            adjustment = SelectionAdjustment.CHARACTER
         )
 
         // Assert.
@@ -287,11 +272,9 @@ class TextFieldSelectionDelegateTest {
             textLayoutResult = textLayoutResult,
             rawStartOffset = startOffset,
             rawEndOffset = endOffset,
-            previousSelection = TextRange(0, 0),
-            previousHandlesCrossed = false,
+            previousSelection = null,
             isStartHandle = true,
-            adjustment = SelectionAdjustment.NONE,
-            ensureAtLeastOneChar = true
+            adjustment = SelectionAdjustment.CHARACTER
         )
 
         // Assert.
@@ -319,11 +302,9 @@ class TextFieldSelectionDelegateTest {
             textLayoutResult = textLayoutResult,
             rawStartOffset = startOffset,
             rawEndOffset = endOffset,
-            previousSelection = TextRange(0, 0),
-            previousHandlesCrossed = false,
+            previousSelection = null,
             isStartHandle = true,
-            adjustment = SelectionAdjustment.NONE,
-            ensureAtLeastOneChar = true
+            adjustment = SelectionAdjustment.CHARACTER
         )
 
         // Assert.
@@ -353,11 +334,9 @@ class TextFieldSelectionDelegateTest {
             textLayoutResult = textLayoutResult,
             rawStartOffset = startOffset,
             rawEndOffset = endOffset,
-            previousSelection = TextRange(0, 0),
-            previousHandlesCrossed = false,
+            previousSelection = null,
             isStartHandle = true,
-            adjustment = SelectionAdjustment.NONE,
-            ensureAtLeastOneChar = true
+            adjustment = SelectionAdjustment.CHARACTER,
         )
 
         // Assert.

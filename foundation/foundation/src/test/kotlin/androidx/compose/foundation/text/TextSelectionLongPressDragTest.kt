@@ -114,7 +114,7 @@ class TextSelectionLongPressDragTest {
                 layoutCoordinates = layoutCoordinates,
                 startPosition = beginPosition2,
                 endPosition = beginPosition2 + dragDistance2,
-                adjustment = SelectionAdjustment.NONE
+                adjustment = SelectionAdjustment.CHARACTER
             )
     }
 
@@ -131,7 +131,7 @@ class TextSelectionLongPressDragTest {
                 layoutCoordinates = layoutCoordinates,
                 startPosition = beginPosition,
                 endPosition = beginPosition + dragDistance,
-                adjustment = SelectionAdjustment.NONE
+                adjustment = SelectionAdjustment.CHARACTER
             )
     }
 
