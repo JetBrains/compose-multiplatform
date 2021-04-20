@@ -28,12 +28,13 @@ import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.text.style.TextGeometricTransform
 import androidx.compose.ui.text.style.TextIndent
 import androidx.compose.ui.unit.TextUnit
+import androidx.compose.ui.util.fastMap
 
 /**
  * Utility function to be able to save nullable values. It also enables not to use with() scope
  * for readability/syntactic purposes.
  */
-private fun <T : Saver<Original, Saveable>, Original, Saveable> save(
+internal fun <T : Saver<Original, Saveable>, Original, Saveable> save(
     value: Original?,
     saver: T,
     scope: SaverScope
@@ -45,7 +46,7 @@ private fun <T : Saver<Original, Saveable>, Original, Saveable> save(
  * Utility function to restore nullable values. It also enables not to use with() scope
  * for readability/syntactic purposes.
  */
-private inline fun <T : Saver<Original, Saveable>, Original, Saveable, reified Result> restore(
+internal inline fun <T : Saver<Original, Saveable>, Original, Saveable, reified Result> restore(
     value: Saveable?,
     saver: T
 ): Result? {
@@ -56,16 +57,121 @@ private inline fun <T : Saver<Original, Saveable>, Original, Saveable, reified R
 /**
  * Utility function to save nullable values that does not require a Saver.
  */
-private fun <T> save(value: T?): T? {
+internal fun <T> save(value: T?): T? {
     return value
 }
 
 /**
  * Utility function to restore nullable values that does not require a Saver.
  */
-private inline fun <reified Result> restore(value: Any?): Result? {
+internal inline fun <reified Result> restore(value: Any?): Result? {
     return value?.let { it as Result }
 }
+
+internal val AnnotatedStringSaver = Saver<AnnotatedString, Any>(
+    save = {
+        arrayListOf(
+            save(it.text),
+            save(it.spanStyles, AnnotationRangeListSaver, this),
+            save(it.paragraphStyles, AnnotationRangeListSaver, this),
+            save(it.annotations, AnnotationRangeListSaver, this),
+        )
+    },
+    restore = {
+        val list = it as List<Any?>
+        AnnotatedString(
+            text = restore(list[0])!!,
+            spanStyles = restore(list[1], AnnotationRangeListSaver)!!,
+            paragraphStyles = restore(list[2], AnnotationRangeListSaver)!!,
+            annotations = restore(list[3], AnnotationRangeListSaver)!!,
+        )
+    }
+)
+
+private val AnnotationRangeListSaver = Saver<List<AnnotatedString.Range<out Any>>, Any>(
+    save = {
+        it.fastMap { range ->
+            save(range, AnnotationRangeSaver, this)
+        }
+    },
+    restore = {
+        @Suppress("UNCHECKED_CAST")
+        val list = it as List<Any>
+        list.fastMap { item ->
+            val range: AnnotatedString.Range<out Any> = restore(item, AnnotationRangeSaver)!!
+            range
+        }
+    }
+)
+
+private enum class AnnotationType {
+    Paragraph,
+    Span,
+    VerbatimTts,
+    String
+}
+
+private val AnnotationRangeSaver = Saver<AnnotatedString.Range<out Any>, Any>(
+    save = {
+        val marker = when (it.item) {
+            is ParagraphStyle -> AnnotationType.Paragraph
+            is SpanStyle -> AnnotationType.Span
+            is VerbatimTtsAnnotation -> AnnotationType.VerbatimTts
+            else -> AnnotationType.String
+        }
+
+        val item = when (marker) {
+            AnnotationType.Paragraph -> save(it.item as ParagraphStyle, ParagraphStyleSaver, this)
+            AnnotationType.Span -> save(it.item as SpanStyle, SpanStyleSaver, this)
+            AnnotationType.VerbatimTts -> save(
+                it.item as VerbatimTtsAnnotation,
+                VerbatimTtsAnnotationSaver,
+                this
+            )
+            AnnotationType.String -> save(it.item)
+        }
+
+        arrayListOf(
+            save(marker),
+            item,
+            save(it.start),
+            save(it.end),
+            save(it.tag)
+        )
+    },
+    restore = {
+        @Suppress("UNCHECKED_CAST")
+        val list = it as List<Any>
+        val marker: AnnotationType = restore(list[0])!!
+        val start: Int = restore(list[2])!!
+        val end: Int = restore(list[3])!!
+        val tag: String = restore(list[4])!!
+
+        when (marker) {
+            AnnotationType.Paragraph -> {
+                val item: ParagraphStyle = restore(list[1], ParagraphStyleSaver)!!
+                AnnotatedString.Range(item = item, start = start, end = end, tag = tag)
+            }
+            AnnotationType.Span -> {
+                val item: SpanStyle = restore(list[1], SpanStyleSaver)!!
+                AnnotatedString.Range(item = item, start = start, end = end, tag = tag)
+            }
+            AnnotationType.VerbatimTts -> {
+                val item: VerbatimTtsAnnotation = restore(list[1], VerbatimTtsAnnotationSaver)!!
+                AnnotatedString.Range(item = item, start = start, end = end, tag = tag)
+            }
+            AnnotationType.String -> {
+                val item: String = restore(list[1])!!
+                AnnotatedString.Range(item = item, start = start, end = end, tag = tag)
+            }
+        }
+    }
+)
+
+private val VerbatimTtsAnnotationSaver = Saver<VerbatimTtsAnnotation, Any>(
+    save = { save(it.verbatim) },
+    restore = { VerbatimTtsAnnotation(restore(it)!!) }
+)
 
 internal val ParagraphStyleSaver = Saver<ParagraphStyle, Any>(
     save = {
@@ -182,6 +288,20 @@ private val BaselineShiftSaver = Saver<BaselineShift, Any>(
     save = { it.multiplier },
     restore = {
         BaselineShift(it as Float)
+    }
+)
+
+internal val TextRange.Companion.Saver: Saver<TextRange, Any>
+    get() = TextRangeSaver
+
+private val TextRangeSaver = Saver<TextRange, Any>(
+    save = {
+        arrayListOf(save(it.start), save(it.end))
+    },
+    restore = {
+        @Suppress("UNCHECKED_CAST")
+        val list = it as List<Any>
+        TextRange(restore(list[0])!!, restore(list[1])!!)
     }
 )
 

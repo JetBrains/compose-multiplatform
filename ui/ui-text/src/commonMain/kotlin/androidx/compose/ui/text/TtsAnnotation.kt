@@ -30,4 +30,19 @@ sealed class TtsAnnotation
  */
 class VerbatimTtsAnnotation(
     val verbatim: String
-) : TtsAnnotation()
+) : TtsAnnotation() {
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (other !is VerbatimTtsAnnotation) return false
+        if (verbatim != other.verbatim) return false
+        return true
+    }
+
+    override fun hashCode(): Int {
+        return verbatim.hashCode()
+    }
+
+    override fun toString(): String {
+        return "VerbatimTtsAnnotation(verbatim=$verbatim)"
+    }
+}
