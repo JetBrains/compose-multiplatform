@@ -466,6 +466,7 @@ class AndroidXPlugin : Plugin<Project> {
 
         if (project.isCoverageEnabled()) {
             Jacoco.registerClassFilesTask(project, this)
+            Jacoco.registerAgentPropertiesFilesGenerateTask(project, this)
         }
 
         project.configureTestConfigGeneration(this)
