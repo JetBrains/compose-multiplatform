@@ -228,7 +228,7 @@ private fun StringBuilder.appendConfigInfo(config: SemanticsConfiguration, inden
             continue
         }
 
-        if (value is AccessibilityAction<*>) {
+        if (value is AccessibilityAction<*> || value is Function<*>) {
             // Avoids printing stuff like "action = 'AccessibilityAction\(label=null, action=.*\)'"
             actions.add(key.name)
             continue

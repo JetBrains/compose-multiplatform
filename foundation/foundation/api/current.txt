@@ -420,6 +420,9 @@ package androidx.compose.foundation.lazy {
   @kotlin.DslMarker public @interface LazyScopeMarker {
   }
 
+  public final class LazySemanticsKt {
+  }
+
   public final class Lazy_androidKt {
   }
 
