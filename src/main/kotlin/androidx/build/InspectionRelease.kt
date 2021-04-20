@@ -16,28 +16,30 @@
 
 package androidx.build
 
-import androidx.inspection.gradle.DexInspectorTask
 import androidx.inspection.gradle.InspectionPlugin
+import androidx.inspection.gradle.createConsumeInspectionConfiguration
 import org.gradle.api.Project
-import org.gradle.api.tasks.Copy
+import org.gradle.api.tasks.Sync
 import java.io.File
 
 /**
  * Copies artifacts prepared by InspectionPlugin into $destDir/inspection
  */
 fun Project.publishInspectionArtifacts() {
-    val copy = tasks.register("copyInspectionArtifacts", Copy::class.java) {
-        it.destinationDir = File(getDistributionDirectory(), "inspection")
-    }
-    addToBuildOnServer(copy)
+    val configuration = createConsumeInspectionConfiguration()
+    val topLevelProject = this
     subprojects { project ->
-        project.plugins.withType(InspectionPlugin::class.java) {
-            project.tasks.withType(DexInspectorTask::class.java) { inspectionTask ->
-                copy.configure {
-                    it.from(inspectionTask.outputFile)
-                    it.dependsOn(inspectionTask)
-                }
+        project.afterEvaluate {
+            if (project.plugins.hasPlugin(InspectionPlugin::class.java)) {
+                topLevelProject.dependencies.add(configuration.name, project)
             }
         }
     }
+
+    val sync = tasks.register("copyInspectionArtifacts", Sync::class.java) {
+        it.dependsOn(configuration)
+        it.from(configuration)
+        it.destinationDir = File(getDistributionDirectory(), "inspection")
+    }
+    addToBuildOnServer(sync)
 }
