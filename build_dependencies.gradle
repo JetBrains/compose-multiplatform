@@ -75,4 +75,6 @@ build_libs.kotlinpoet = "com.squareup:kotlinpoet:1.4.0"
 
 build_libs.hilt_plugin = "com.google.dagger:hilt-android-gradle-plugin:${build_versions.hilt}"
 
+build_libs.shadow = "com.github.jengelman.gradle.plugins:shadow:6.1.0"
+
 rootProject.ext["build_libs"] = build_libs

@@ -138,8 +138,6 @@ const val SQLDELIGHT_COROUTINES_EXT = "com.squareup.sqldelight:coroutines-extens
 
 const val ROBOLECTRIC = "org.robolectric:robolectric:4.4-alpha-2"
 
-const val SHADOW_PLUGIN = "com.github.jengelman.gradle.plugins:shadow:5.2.0"
-
 const val PROTOBUF = "com.google.protobuf:protobuf-java:3.4.0"
 const val PROTOBUF_COMPILER = "com.google.protobuf:protoc:3.10.0"
 const val PROTOBUF_LITE = "com.google.protobuf:protobuf-javalite:3.10.0"
