@@ -21,10 +21,19 @@ import com.android.build.gradle.BaseExtension
 import com.android.build.gradle.LibraryExtension
 import com.android.build.gradle.api.BaseVariant
 import org.gradle.api.DomainObjectSet
+import org.gradle.api.Project
 
 val BaseExtension.variants: DomainObjectSet<out BaseVariant>
     get() = when (this) {
         is AppExtension -> applicationVariants
         is LibraryExtension -> libraryVariants
         else -> error("Unhandled plugin ${this::class.java}")
+    }
+
+val Project.agpVariants: DomainObjectSet<out BaseVariant>
+    get() {
+        val extension = checkNotNull(project.extensions.findByType(BaseExtension::class.java)) {
+            "${project.name} has no BaseExtension"
+        }
+        return extension.variants
     }
