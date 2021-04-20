@@ -24,6 +24,7 @@ import androidx.test.platform.app.InstrumentationRegistry
 import com.google.common.truth.Truth.assertThat
 import org.junit.After
 import org.junit.Before
+import org.junit.Ignore
 import org.junit.Test
 import org.junit.runner.RunWith
 import java.io.File
@@ -76,6 +77,7 @@ class AndroidFontTest {
         assertThat(font.typeface).isNotNull()
     }
 
+    @Ignore
     @Test
     @MediumTest
     fun test_load_from_file_descriptor() {

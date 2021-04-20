@@ -27,6 +27,7 @@ import androidx.test.platform.app.InstrumentationRegistry
 import com.nhaarman.mockitokotlin2.mock
 import org.junit.After
 import org.junit.Before
+import org.junit.Ignore
 import org.junit.Test
 import org.junit.runner.RunWith
 import java.io.File
@@ -81,6 +82,7 @@ class TypefaceAdapterFileTest {
         assertThat(typeface.bitmap("~")).isNotEqualToBitmap(defaultTypeface.bitmap("~"))
     }
 
+    @Ignore
     @Test
     @MediumTest
     fun customSingleFont_fromFile() {

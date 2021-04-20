@@ -49,6 +49,7 @@ import androidx.test.filters.LargeTest
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
+import org.junit.Ignore
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -324,6 +325,7 @@ class AnimatedVisibilityTest {
         }
     }
 
+    @Ignore
     @OptIn(ExperimentalAnimationApi::class)
     @Test
     fun animateVisibilityFadeTest() {
