@@ -425,17 +425,11 @@ fun Modifier.requiredSizeIn(
  * @sample androidx.compose.foundation.layout.samples.FillHalfWidthModifier
  */
 @Stable
+@Suppress("ModifierInspectorInfo")
 fun Modifier.fillMaxWidth(/*@FloatRange(from = 0.0, to = 1.0)*/ fraction: Float = 1f) =
-    this.then(
-        FillModifier(
-            direction = Direction.Horizontal,
-            scale = fraction,
-            inspectorInfo = debugInspectorInfo {
-                name = "fillMaxWidth"
-                properties["fraction"] = fraction
-            }
-        )
-    )
+    this.then(if (fraction == 1f) FillWholeMaxWidth else createFillWidthModifier(fraction))
+
+private val FillWholeMaxWidth = createFillWidthModifier(1f)
 
 /**
  * Have the content fill (possibly only partially) the [Constraints.maxHeight] of the incoming
@@ -452,17 +446,11 @@ fun Modifier.fillMaxWidth(/*@FloatRange(from = 0.0, to = 1.0)*/ fraction: Float 
  * @sample androidx.compose.foundation.layout.samples.FillHalfHeightModifier
  */
 @Stable
+@Suppress("ModifierInspectorInfo")
 fun Modifier.fillMaxHeight(/*@FloatRange(from = 0.0, to = 1.0)*/ fraction: Float = 1f) =
-    this.then(
-        FillModifier(
-            direction = Direction.Vertical,
-            scale = fraction,
-            inspectorInfo = debugInspectorInfo {
-                name = "fillMaxHeight"
-                properties["fraction"] = fraction
-            }
-        )
-    )
+    this.then(if (fraction == 1f) FillWholeMaxHeight else createFillHeightModifier(fraction))
+
+private val FillWholeMaxHeight = createFillHeightModifier(1f)
 
 /**
  * Have the content fill (possibly only partially) the [Constraints.maxWidth] and
@@ -483,17 +471,11 @@ fun Modifier.fillMaxHeight(/*@FloatRange(from = 0.0, to = 1.0)*/ fraction: Float
  * @sample androidx.compose.foundation.layout.samples.FillHalfSizeModifier
  */
 @Stable
+@Suppress("ModifierInspectorInfo")
 fun Modifier.fillMaxSize(/*@FloatRange(from = 0.0, to = 1.0)*/ fraction: Float = 1f) =
-    this.then(
-        FillModifier(
-            direction = Direction.Both,
-            scale = fraction,
-            inspectorInfo = debugInspectorInfo {
-                name = "fillMaxSize"
-                properties["fraction"] = fraction
-            }
-        )
-    )
+    this.then(if (fraction == 1f) FillWholeMaxSize else createFillSizeModifier(fraction))
+
+private val FillWholeMaxSize = createFillSizeModifier(1f)
 
 /**
  * Allow the content to measure at its desired width without regard for the incoming measurement
@@ -508,25 +490,23 @@ fun Modifier.fillMaxSize(/*@FloatRange(from = 0.0, to = 1.0)*/ fraction: Float =
  * @sample androidx.compose.foundation.layout.samples.SimpleWrapContentHorizontallyAlignedModifier
  */
 @Stable
-// TODO(popam): avoid recreating modifier for common align
+@Suppress("ModifierInspectorInfo")
 fun Modifier.wrapContentWidth(
     align: Alignment.Horizontal = Alignment.CenterHorizontally,
     unbounded: Boolean = false
 ) = this.then(
-    WrapContentModifier(
-        direction = Direction.Horizontal,
-        unbounded = unbounded,
-        alignmentCallback = { size, layoutDirection ->
-            IntOffset(align.align(0, size.width, layoutDirection), 0)
-        },
-        align,
-        inspectorInfo = debugInspectorInfo {
-            name = "wrapContentWidth"
-            properties["align"] = align
-            properties["unbounded"] = unbounded
-        }
-    )
+    if (align == Alignment.CenterHorizontally && !unbounded) {
+        WrapContentWidthCenter
+    } else if (align == Alignment.Start && !unbounded) {
+        WrapContentWidthStart
+    } else {
+        createWrapContentWidthModifier(align, unbounded)
+    }
 )
+
+private val WrapContentWidthCenter =
+    createWrapContentWidthModifier(Alignment.CenterHorizontally, false)
+private val WrapContentWidthStart = createWrapContentWidthModifier(Alignment.Start, false)
 
 /**
  * Allow the content to measure at its desired height without regard for the incoming measurement
@@ -539,26 +519,24 @@ fun Modifier.wrapContentWidth(
  * Example usage:
  * @sample androidx.compose.foundation.layout.samples.SimpleWrapContentVerticallyAlignedModifier
  */
-// TODO(popam): avoid recreating modifier for common align
 @Stable
+@Suppress("ModifierInspectorInfo")
 fun Modifier.wrapContentHeight(
     align: Alignment.Vertical = Alignment.CenterVertically,
     unbounded: Boolean = false
 ) = this.then(
-    WrapContentModifier(
-        direction = Direction.Vertical,
-        unbounded = unbounded,
-        alignmentCallback = { size, _ ->
-            IntOffset(0, align.align(0, size.height))
-        },
-        align,
-        inspectorInfo = debugInspectorInfo {
-            name = "wrapContentHeight"
-            properties["align"] = align
-            properties["unbounded"] = unbounded
-        }
-    )
+    if (align == Alignment.CenterVertically && !unbounded) {
+        WrapContentHeightCenter
+    } else if (align == Alignment.Top && !unbounded) {
+        WrapContentHeightTop
+    } else {
+        createWrapContentHeightModifier(align, unbounded)
+    }
 )
+
+private val WrapContentHeightCenter =
+    createWrapContentHeightModifier(Alignment.CenterVertically, false)
+private val WrapContentHeightTop = createWrapContentHeightModifier(Alignment.Top, false)
 
 /**
  * Allow the content to measure at its desired size without regard for the incoming measurement
@@ -572,24 +550,22 @@ fun Modifier.wrapContentHeight(
  * @sample androidx.compose.foundation.layout.samples.SimpleWrapContentAlignedModifier
  */
 @Stable
+@Suppress("ModifierInspectorInfo")
 fun Modifier.wrapContentSize(
     align: Alignment = Alignment.Center,
     unbounded: Boolean = false
 ) = this.then(
-    WrapContentModifier(
-        direction = Direction.Both,
-        unbounded = unbounded,
-        alignmentCallback = { size, layoutDirection ->
-            align.align(IntSize.Zero, size, layoutDirection)
-        },
-        align,
-        inspectorInfo = debugInspectorInfo {
-            name = "wrapContentSize"
-            properties["align"] = align
-            properties["unbounded"] = unbounded
-        }
-    )
+    if (align == Alignment.Center && !unbounded) {
+        WrapContentSizeCenter
+    } else if (align == Alignment.TopStart && !unbounded) {
+        WrapContentSizeTopStart
+    } else {
+        createWrapContentSizeModifier(align, unbounded)
+    }
 )
+
+private val WrapContentSizeCenter = createWrapContentSizeModifier(Alignment.Center, false)
+private val WrapContentSizeTopStart = createWrapContentSizeModifier(Alignment.TopStart, false)
 
 /**
  * Constrain the size of the wrapped layout only when it would be otherwise unconstrained:
@@ -619,7 +595,7 @@ fun Modifier.defaultMinSize(
 
 private class FillModifier(
     private val direction: Direction,
-    private val scale: Float,
+    private val fraction: Float,
     inspectorInfo: InspectorInfo.() -> Unit
 ) : LayoutModifier, InspectorValueInfo(inspectorInfo) {
     override fun MeasureScope.measure(
@@ -629,7 +605,7 @@ private class FillModifier(
         val minWidth: Int
         val maxWidth: Int
         if (constraints.hasBoundedWidth && direction != Direction.Vertical) {
-            val width = (constraints.maxWidth * scale).roundToInt()
+            val width = (constraints.maxWidth * fraction).roundToInt()
                 .coerceIn(constraints.minWidth, constraints.maxWidth)
             minWidth = width
             maxWidth = width
@@ -640,7 +616,7 @@ private class FillModifier(
         val minHeight: Int
         val maxHeight: Int
         if (constraints.hasBoundedHeight && direction != Direction.Horizontal) {
-            val height = (constraints.maxHeight * scale).roundToInt()
+            val height = (constraints.maxHeight * fraction).roundToInt()
                 .coerceIn(constraints.minHeight, constraints.maxHeight)
             minHeight = height
             maxHeight = height
@@ -658,10 +634,40 @@ private class FillModifier(
     }
 
     override fun equals(other: Any?) =
-        other is FillModifier && direction == other.direction && scale == other.scale
+        other is FillModifier && direction == other.direction && fraction == other.fraction
 
-    override fun hashCode() = direction.hashCode() * 31 + scale.hashCode()
+    override fun hashCode() = direction.hashCode() * 31 + fraction.hashCode()
 }
+
+@Suppress("ModifierFactoryExtensionFunction", "ModifierFactoryReturnType")
+private fun createFillWidthModifier(fraction: Float) = FillModifier(
+    direction = Direction.Horizontal,
+    fraction = fraction,
+    inspectorInfo = {
+        name = "fillMaxWidth"
+        properties["fraction"] = fraction
+    }
+)
+
+@Suppress("ModifierFactoryExtensionFunction", "ModifierFactoryReturnType")
+private fun createFillHeightModifier(fraction: Float) = FillModifier(
+    direction = Direction.Vertical,
+    fraction = fraction,
+    inspectorInfo = {
+        name = "fillMaxHeight"
+        properties["fraction"] = fraction
+    }
+)
+
+@Suppress("ModifierFactoryExtensionFunction", "ModifierFactoryReturnType")
+private fun createFillSizeModifier(fraction: Float) = FillModifier(
+    direction = Direction.Both,
+    fraction = fraction,
+    inspectorInfo = {
+        name = "fillMaxSize"
+        properties["fraction"] = fraction
+    }
+)
 
 private class SizeModifier(
     private val minWidth: Dp = Dp.Unspecified,
@@ -861,6 +867,60 @@ private class WrapContentModifier(
     override fun hashCode() =
         (direction.hashCode() * 31 + unbounded.hashCode()) * 31 + align.hashCode()
 }
+
+@Suppress("ModifierFactoryExtensionFunction", "ModifierFactoryReturnType")
+private fun createWrapContentWidthModifier(
+    align: Alignment.Horizontal,
+    unbounded: Boolean
+) = WrapContentModifier(
+    direction = Direction.Horizontal,
+    unbounded = unbounded,
+    alignmentCallback = { size, layoutDirection ->
+        IntOffset(align.align(0, size.width, layoutDirection), 0)
+    },
+    align,
+    inspectorInfo = {
+        name = "wrapContentWidth"
+        properties["align"] = align
+        properties["unbounded"] = unbounded
+    }
+)
+
+@Suppress("ModifierFactoryExtensionFunction", "ModifierFactoryReturnType")
+private fun createWrapContentHeightModifier(
+    align: Alignment.Vertical,
+    unbounded: Boolean
+) = WrapContentModifier(
+    direction = Direction.Vertical,
+    unbounded = unbounded,
+    alignmentCallback = { size, _ ->
+        IntOffset(0, align.align(0, size.height))
+    },
+    align,
+    inspectorInfo = {
+        name = "wrapContentHeight"
+        properties["align"] = align
+        properties["unbounded"] = unbounded
+    }
+)
+
+@Suppress("ModifierFactoryExtensionFunction", "ModifierFactoryReturnType")
+private fun createWrapContentSizeModifier(
+    align: Alignment,
+    unbounded: Boolean
+) = WrapContentModifier(
+    direction = Direction.Both,
+    unbounded = unbounded,
+    alignmentCallback = { size, layoutDirection ->
+        align.align(IntSize.Zero, size, layoutDirection)
+    },
+    align,
+    inspectorInfo = {
+        name = "wrapContentSize"
+        properties["align"] = align
+        properties["unbounded"] = unbounded
+    }
+)
 
 private class UnspecifiedConstraintsModifier(
     val minWidth: Dp = Dp.Unspecified,
