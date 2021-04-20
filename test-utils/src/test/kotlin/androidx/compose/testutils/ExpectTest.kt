@@ -18,7 +18,10 @@ package androidx.compose.testutils
 
 import com.google.common.truth.Truth.assertWithMessage
 import org.junit.Test
+import org.junit.runner.RunWith
+import org.junit.runners.JUnit4
 
+@RunWith(JUnit4::class)
 class ExpectTest {
 
     class TestException(message: String? = null) : Exception(message)
@@ -47,7 +50,7 @@ class ExpectTest {
     @Test
     fun expectError_gotNothing() {
         expectErrorMessage(
-            "Expected that a TestException was thrown, but nothing was thrown"
+            "Expected that a TestException would be thrown, but nothing was thrown"
         ) {
             expectError<TestException> {
             }
@@ -57,7 +60,8 @@ class ExpectTest {
     @Test
     fun expectError_gotDifferentError() {
         expectErrorMessage(
-            "Expected that a TestException was thrown, but a IllegalStateException was thrown:\n=="
+            "Expected that a TestException would be thrown, " +
+                "but a IllegalStateException was thrown:\n=="
         ) {
             expectError<TestException> {
                 throw IllegalStateException()
@@ -74,7 +78,7 @@ class ExpectTest {
     @Test
     fun expectNoError_gotError() {
         expectErrorMessage(
-            "Expected that nothing was thrown, but a TestException was thrown:\n=="
+            "Expected that nothing would be thrown, but a TestException was thrown:\n=="
         ) {
             expectError<TestException>(false) {
                 throw TestException()
@@ -85,7 +89,7 @@ class ExpectTest {
     @Test
     fun expectNoError_gotDifferentError() {
         expectErrorMessage(
-            "Expected that nothing was thrown, but a IllegalStateException was thrown:\n=="
+            "Expected that nothing would be thrown, but a IllegalStateException was thrown:\n=="
         ) {
             expectError<TestException>(false) {
                 throw IllegalStateException()
@@ -103,8 +107,8 @@ class ExpectTest {
     @Test
     fun expectErrorWithMessage_gotErrorWithDifferentMessage() {
         expectErrorMessage(
-            "Expected that a TestException with message \"message\" was thrown, " +
-                "but a TestException with message \"message x\" was thrown:\n=="
+            "Expected that a TestException with message\n\"\"\"message\"\"\"\n would be thrown, " +
+                "but a TestException with message\n\"\"\"message x\"\"\"\n was thrown:\n=="
         ) {
             expectError<TestException>(expectedMessage = "message") {
                 throw TestException("message x")
