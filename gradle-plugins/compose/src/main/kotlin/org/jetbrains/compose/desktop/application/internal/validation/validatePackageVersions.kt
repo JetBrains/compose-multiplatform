@@ -58,11 +58,11 @@ private class ErrorsCollector {
         correctFormat: String? = null
     ) {
         val msg = buildString {
-            appendln("* Illegal version for '$targetFormat': $error.")
+            appendLine("* Illegal version for '$targetFormat': $error.")
             if (correctFormat != null) {
-                appendln("  * Correct format: $correctFormat")
+                appendLine("  * Correct format: $correctFormat")
             }
-            appendln("  * You can specify the correct version using DSL properties: " +
+            appendLine("  * You can specify the correct version using DSL properties: " +
                     dslPropertiesFor(targetFormat).joinToString(", ")
             )
         }
