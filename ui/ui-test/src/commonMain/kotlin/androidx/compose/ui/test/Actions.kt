@@ -22,8 +22,10 @@ import androidx.compose.ui.layout.boundsInParent
 import androidx.compose.ui.layout.positionInRoot
 import androidx.compose.ui.semantics.AccessibilityAction
 import androidx.compose.ui.semantics.SemanticsActions
+import androidx.compose.ui.semantics.SemanticsActions.ScrollToIndex
 import androidx.compose.ui.semantics.SemanticsNode
 import androidx.compose.ui.semantics.SemanticsProperties.HorizontalScrollAxisRange
+import androidx.compose.ui.semantics.SemanticsProperties.IndexForKey
 import androidx.compose.ui.semantics.SemanticsProperties.VerticalScrollAxisRange
 import androidx.compose.ui.semantics.SemanticsPropertyKey
 import androidx.compose.ui.semantics.getOrNull
@@ -54,6 +56,9 @@ fun SemanticsNodeInteraction.performClick(): SemanticsNodeInteraction {
  * by the smallest amount such that this node fills the entire viewport. A scroll parent is a
  * parent node that has the semantics action [SemanticsActions.ScrollBy] (usually implemented by
  * defining [scrollBy][androidx.compose.ui.semantics.scrollBy]).
+ *
+ * This action should be performed on the [node][SemanticsNodeInteraction] that is part of the
+ * scrollable content, not on the scrollable container.
  *
  * Throws an [AssertionError] if there is no scroll parent.
  */
@@ -108,6 +113,68 @@ fun SemanticsNodeInteraction.performScrollTo(): SemanticsNodeInteraction {
     @OptIn(InternalTestApi::class)
     testContext.testOwner.runOnUiThread {
         scrollableNode.config[SemanticsActions.ScrollBy].action?.invoke(dx, dy)
+    }
+
+    return this
+}
+
+/**
+ * Scrolls a scrollable container with items to the item with the given [index].
+ *
+ * Note that not all scrollable containers have item indices. For example, a
+ * [scrollable][androidx.compose.foundation.gestures.scrollable] doesn't have items with an
+ * index, while [LazyColumn][androidx.compose.foundation.lazy.LazyColumn] does.
+ *
+ * This action should be performed on a [node][SemanticsNodeInteraction] that is a scrollable
+ * container, not on a node that is part of the content of that container.
+ *
+ * Throws an [AssertionError] if the node doesn't have [ScrollToIndex] defined.
+ *
+ * @param index The index of the item to scroll to
+ * @see hasScrollToIndexAction
+ */
+@ExperimentalTestApi
+fun SemanticsNodeInteraction.performScrollToIndex(index: Int): SemanticsNodeInteraction {
+    val node = fetchSemanticsNode("Failed: performScrollToIndex($index)")
+    requireSemantics(node, ScrollToIndex) {
+        "Failed to scroll to index $index"
+    }
+
+    @OptIn(InternalTestApi::class)
+    testContext.testOwner.runOnUiThread {
+        node.config[ScrollToIndex].action!!.invoke(index)
+    }
+    return this
+}
+
+/**
+ * Scrolls a scrollable container with keyed items to the item with the given [key], such as
+ * [LazyColumn][androidx.compose.foundation.lazy.LazyColumn] or
+ * [LazyRow][androidx.compose.foundation.lazy.LazyRow].
+ *
+ * This action should be performed on a [node][SemanticsNodeInteraction] that is a scrollable
+ * container, not on a node that is part of the content of that container.
+ *
+ * Throws an [AssertionError] if the node doesn't have [IndexForKey] or [ScrollToIndex] defined.
+ *
+ * @param key The key of the item to scroll to
+ * @see hasScrollToKeyAction
+ */
+@ExperimentalTestApi
+fun SemanticsNodeInteraction.performScrollToKey(key: Any): SemanticsNodeInteraction {
+    val node = fetchSemanticsNode("Failed: performScrollToKey(\"$key\")")
+    requireSemantics(node, IndexForKey, ScrollToIndex) {
+        "Failed to scroll to the item identified by \"$key\""
+    }
+
+    val index = node.config[IndexForKey].invoke(key)
+    require(index >= 0) {
+        "Failed to scroll to the item identified by \"$key\", couldn't find the key."
+    }
+
+    @OptIn(InternalTestApi::class)
+    testContext.testOwner.runOnUiThread {
+        node.config[ScrollToIndex].action!!.invoke(index)
     }
 
     return this
@@ -179,13 +246,8 @@ fun <T : Function<Boolean>> SemanticsNodeInteraction.performSemanticsAction(
     invocation: (T) -> Unit
 ) {
     val node = fetchSemanticsNode("Failed to perform ${key.name} action.")
-    if (key !in node.config) {
-        throw AssertionError(
-            buildGeneralErrorMessage(
-                "Failed to perform ${key.name} action as it is not defined on the node.",
-                selector, node
-            )
-        )
+    requireSemantics(node, key) {
+        "Failed to perform action ${key.name}"
     }
 
     @OptIn(InternalTestApi::class)
@@ -218,3 +280,15 @@ private val SemanticsNode.isReversedHorizontally: Boolean
 
 private val SemanticsNode.isReversedVertically: Boolean
     get() = config.getOrNull(VerticalScrollAxisRange)?.reverseScrolling == true
+
+private fun SemanticsNodeInteraction.requireSemantics(
+    node: SemanticsNode,
+    vararg properties: SemanticsPropertyKey<*>,
+    errorMessage: () -> String
+) {
+    val missingProperties = properties.filter { it !in node.config }
+    if (missingProperties.isNotEmpty()) {
+        val msg = "${errorMessage()}, the node is missing [${missingProperties.joinToString()}]"
+        throw AssertionError(buildGeneralErrorMessage(msg, selector, node))
+    }
+}

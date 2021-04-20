@@ -273,7 +273,8 @@ fun hasTestTag(testTag: String): SemanticsMatcher =
 fun isDialog(): SemanticsMatcher =
     SemanticsMatcher.keyIsDefined(SemanticsProperties.IsDialog)
 
-/** Returns whether the node is a popup.
+/**
+ * Returns whether the node is a popup.
  *
  * This only checks if the node itself is a popup, not if it is _part of_ a popup. Use
  * `hasAnyAncestorThat(isPopup())` for that.
@@ -300,6 +301,27 @@ fun hasImeAction(actionType: ImeAction) =
  */
 fun hasSetTextAction() =
     SemanticsMatcher.keyIsDefined(SemanticsActions.SetText)
+
+/**
+ * Returns whether the node defines the ability to scroll to an item index.
+ *
+ * Note that not all scrollable containers have item indices. For example, a
+ * [scrollable][androidx.compose.foundation.gestures.scrollable] doesn't have items with an
+ * index, while [LazyColumn][androidx.compose.foundation.lazy.LazyColumn] does.
+ */
+@ExperimentalTestApi
+fun hasScrollToIndexAction() =
+    SemanticsMatcher.keyIsDefined(SemanticsActions.ScrollToIndex)
+
+/**
+ * Returns whether the node defines the ability to scroll to an item identified by a key, such as
+ * [LazyColumn][androidx.compose.foundation.lazy.LazyColumn] or
+ * [LazyRow][androidx.compose.foundation.lazy.LazyRow].
+ */
+@ExperimentalTestApi
+fun hasScrollToKeyAction() =
+    SemanticsMatcher.keyIsDefined(SemanticsActions.ScrollToIndex)
+        .and(SemanticsMatcher.keyIsDefined(SemanticsProperties.IndexForKey))
 
 /**
  * Return whether the node is the root semantics node.
