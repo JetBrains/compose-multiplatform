@@ -7,10 +7,7 @@ package org.jetbrains.compose.gradle
 
 import org.gradle.internal.impldep.org.testng.Assert
 import org.gradle.testkit.runner.TaskOutcome
-import org.jetbrains.compose.desktop.application.internal.OS
-import org.jetbrains.compose.desktop.application.internal.currentArch
-import org.jetbrains.compose.desktop.application.internal.currentOS
-import org.jetbrains.compose.desktop.application.internal.currentTarget
+import org.jetbrains.compose.desktop.application.internal.*
 import org.jetbrains.compose.test.*
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assumptions
@@ -155,6 +152,55 @@ class DesktopApplicationTest : GradlePluginTestBase() {
                 val appDir = testWorkDir.resolve("build/compose/binaries/main/app/TestPackage.app/Contents/")
                 val infoPlist = appDir.resolve("Info.plist").checkExists().checkExists()
                 infoPlist.readText().checkContains("<key>NSSupportsAutomaticGraphicsSwitching</key><true/>")
+            }
+        }
+    }
+
+    @Test
+    fun testMacSign() {
+        Assumptions.assumeTrue(currentOS == OS.MacOS)
+
+        fun security(vararg args: Any): ProcessRunResult {
+            val args = args.map {
+                if (it is File) it.absolutePath else it.toString()
+            }
+            return runProcess(MacUtils.security, args)
+        }
+
+        fun withNewDefaultKeychain(newKeychain: File, fn: () -> Unit) {
+            val originalKeychain =
+                security("default-keychain")
+                    .out
+                    .trim()
+                    .trim('"')
+
+            try {
+                security("default-keychain", "-s", newKeychain)
+                fn()
+            } finally {
+                security("default-keychain", "-s", originalKeychain)
+            }
+        }
+
+        with(testProject(TestProjects.macSign)) {
+            val keychain = file("compose.test.keychain")
+            val password = "compose.test"
+
+            withNewDefaultKeychain(keychain) {
+                security("default-keychain", "-s", keychain)
+                security("unlock-keychain", "-p", password, keychain)
+
+                gradle(":createDistributable").build().checks { check ->
+                    check.taskOutcome(":createDistributable", TaskOutcome.SUCCESS)
+                    val appDir = testWorkDir.resolve("build/compose/binaries/main/app/TestPackage.app/")
+                    val result = runProcess(MacUtils.codesign, args = listOf("--verify", "--verbose", appDir.absolutePath))
+                    val actualOutput = result.err.trim()
+                    val expectedOutput = """
+                        |${appDir.absolutePath}: valid on disk
+                        |${appDir.absolutePath}: satisfies its Designated Requirement
+                    """.trimMargin().trim()
+                    Assert.assertEquals(expectedOutput, actualOutput)
+                }
             }
         }
     }

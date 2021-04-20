@@ -172,12 +172,13 @@ abstract class AbstractJPackageTask @Inject constructor(
     @get:Nested
     internal var nonValidatedMacSigningSettings: MacOSSigningSettings? = null
 
-    private inline fun <T> withValidatedMacOSSigning(fn: (ValidatedMacOSSigningSettings) -> T): T? =
-        nonValidatedMacSigningSettings?.let { nonValidated ->
-            if (currentOS == OS.MacOS && nonValidated.sign.get()) {
-                fn(nonValidated.validate(nonValidatedMacBundleID))
-            } else null
-        }
+    private val macSigner: MacSigner? by lazy {
+        val nonValidatedSettings = nonValidatedMacSigningSettings
+        if (currentOS == OS.MacOS && nonValidatedSettings?.sign?.get() == true) {
+            val validatedSettings = nonValidatedSettings.validate(nonValidatedMacBundleID)
+            MacSigner(validatedSettings, runExternalTool)
+        } else null
+    }
 
     @get:LocalState
     protected val signDir: Provider<Directory> = project.layout.buildDirectory.dir("compose/tmp/sign")
@@ -272,11 +273,11 @@ abstract class AbstractJPackageTask @Inject constructor(
                 cliArg("--mac-package-name", macPackageName)
                 cliArg("--mac-package-identifier", nonValidatedMacBundleID)
 
-                withValidatedMacOSSigning { signing ->
+                macSigner?.let { signer ->
                     cliArg("--mac-sign", true)
-                    cliArg("--mac-signing-key-user-name", signing.identity)
-                    cliArg("--mac-signing-keychain", signing.keychain)
-                    cliArg("--mac-package-signing-prefix", signing.prefix)
+                    cliArg("--mac-signing-key-user-name", signer.settings.identity)
+                    cliArg("--mac-signing-keychain", signer.settings.keychain)
+                    cliArg("--mac-package-signing-prefix", signer.settings.prefix)
                 }
             }
         }
@@ -324,16 +325,12 @@ abstract class AbstractJPackageTask @Inject constructor(
     override fun prepareWorkingDir(inputChanges: InputChanges) {
         val libsDir = libsDir.ioFile
         val fileProcessor =
-            withValidatedMacOSSigning { signing ->
+            macSigner?.let { signer ->
                 val tmpDirForSign = signDir.ioFile
                 fileOperations.delete(tmpDirForSign)
                 tmpDirForSign.mkdirs()
 
-                MacJarSignFileCopyingProcessor(
-                    tempDir = tmpDirForSign,
-                    execOperations = execOperations,
-                    signing = signing
-                )
+                MacJarSignFileCopyingProcessor(signer, tmpDirForSign)
             } ?: SimpleFileCopyingProcessor
         fun copyFileToLibsDir(sourceFile: File): File {
             val targetFileName =
@@ -388,7 +385,8 @@ abstract class AbstractJPackageTask @Inject constructor(
     private fun patchInfoPlistIfNeeded() {
         if (currentOS != OS.MacOS || targetFormat != TargetFormat.AppImage) return
 
-        val infoPlist = destinationDir.ioFile.resolve("${packageName.get()}.app/Contents/Info.plist")
+        val appDir = destinationDir.ioFile.resolve("${packageName.get()}.app/")
+        val infoPlist = appDir.resolve("Contents/Info.plist")
         if (!infoPlist.exists()) return
 
         val content = infoPlist.readText()
@@ -405,12 +403,13 @@ abstract class AbstractJPackageTask @Inject constructor(
         if (i >= 0) {
             val newContent = buildString {
                 append(content.substring(0, i))
-                appendln(stringToAppend)
+                appendLine(stringToAppend)
                 append("  ")
-                appendln(content.substring(i, content.length))
+                appendLine(content.substring(i, content.length))
             }
             infoPlist.writeText(newContent)
         }
+        macSigner?.sign(appDir)
     }
 
     override fun initState() {

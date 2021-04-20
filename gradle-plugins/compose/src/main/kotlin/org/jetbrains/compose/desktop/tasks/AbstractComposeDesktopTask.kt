@@ -16,7 +16,9 @@ import org.gradle.api.tasks.Internal
 import org.gradle.api.tasks.LocalState
 import org.gradle.process.ExecOperations
 import org.gradle.process.ExecResult
+import org.jetbrains.compose.desktop.application.internal.*
 import org.jetbrains.compose.desktop.application.internal.ComposeProperties
+import org.jetbrains.compose.desktop.application.internal.ExternalToolRunner
 import org.jetbrains.compose.desktop.application.internal.alsoOutputTo
 import org.jetbrains.compose.desktop.application.internal.ioFile
 import org.jetbrains.compose.desktop.application.internal.notNullProperty
@@ -48,71 +50,7 @@ abstract class AbstractComposeDesktopTask : DefaultTask() {
         })
     }
 
-    internal fun runExternalTool(
-        tool: File,
-        args: Collection<String>,
-        environment: Map<String, Any> = emptyMap(),
-        workingDir: File? = null,
-        checkExitCodeIsNormal: Boolean = true,
-        processStdout: Function1<String, Unit>? = null,
-        forceLogToFile: Boolean = false
-    ): ExecResult {
-        val logsDir = logsDir.ioFile
-        logsDir.mkdirs()
-
-        val toolName = tool.nameWithoutExtension
-        val logToConsole = verbose.get() && !forceLogToFile
-        val outFile = logsDir.resolve("${toolName}-${currentTimeStamp()}-out.txt")
-        val errFile = logsDir.resolve("${toolName}-${currentTimeStamp()}-err.txt")
-
-        val result = outFile.outputStream().buffered().use { outFileStream ->
-            errFile.outputStream().buffered().use { errFileStream ->
-                execOperations.exec { spec ->
-                    spec.executable = tool.absolutePath
-                    spec.args(*args.toTypedArray())
-                    workingDir?.let { wd -> spec.workingDir(wd) }
-                    spec.environment(environment)
-                    // check exit value later
-                    spec.isIgnoreExitValue = true
-
-                    if (logToConsole) {
-                        spec.standardOutput = spec.standardOutput.alsoOutputTo(outFileStream)
-                        spec.errorOutput = spec.errorOutput.alsoOutputTo(errFileStream)
-                    } else {
-                        spec.standardOutput = outFileStream
-                        spec.errorOutput = errFileStream
-                    }
-                }
-            }
-        }
-
-        if (checkExitCodeIsNormal && result.exitValue != 0) {
-            val errMsg = buildString {
-                appendln("External tool execution failed:")
-                val cmd = (listOf(tool.absolutePath) + args).joinToString(", ")
-                appendln("* Command: [$cmd]")
-                appendln("* Working dir: [${workingDir?.absolutePath.orEmpty()}]")
-                appendln("* Exit code: ${result.exitValue}")
-                appendln("* Standard output log: ${outFile.absolutePath}")
-                appendln("* Error log: ${errFile.absolutePath}")
-            }
-
-            error(errMsg)
-        }
-
-        if (processStdout != null) {
-            processStdout(outFile.readText())
-        }
-
-        if (result.exitValue == 0) {
-            outFile.delete()
-            errFile.delete()
-        }
-
-        return result
-    }
-
-    private fun currentTimeStamp() =
-        LocalDateTime.now()
-            .format(DateTimeFormatter.ofPattern("yyyy-MM-dd-HH-mm-ss"))
+    @get:Internal
+    internal val runExternalTool: ExternalToolRunner
+        get() = ExternalToolRunner(verbose, logsDir, execOperations)
 }
