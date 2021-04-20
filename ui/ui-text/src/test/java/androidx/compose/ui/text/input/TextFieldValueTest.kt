@@ -29,6 +29,8 @@ import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontSynthesis
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.intl.Locale
+import androidx.compose.ui.text.intl.LocaleList
 import androidx.compose.ui.text.style.BaselineShift
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextDecoration
@@ -183,6 +185,11 @@ class TextFieldValueTest {
                     letterSpacing = 2.em,
                     baselineShift = BaselineShift.Superscript,
                     textGeometricTransform = TextGeometricTransform(2f, 3f),
+                    localeList = LocaleList(
+                        Locale("sr-Latn-SR"),
+                        Locale("sr-Cyrl-SR"),
+                        Locale.current
+                    ),
                     background = Color.Blue,
                     textDecoration = TextDecoration.LineThrough,
                     shadow = Shadow(color = Color.Red, offset = Offset(2f, 2f), blurRadius = 4f)
