@@ -134,6 +134,7 @@ fun Modifier.padding(all: Dp) =
  * Example usage:
  * @sample androidx.compose.foundation.layout.samples.PaddingValuesModifier
  */
+@Stable
 fun Modifier.padding(paddingValues: PaddingValues) =
     this.then(
         PaddingValuesModifier(
@@ -281,7 +282,7 @@ fun PaddingValues(all: Dp): PaddingValues = PaddingValuesImpl(all, all, all, all
  * dp along the top and bottom edges.
  */
 @Stable
-fun PaddingValues(horizontal: Dp, vertical: Dp): PaddingValues =
+fun PaddingValues(horizontal: Dp = 0.dp, vertical: Dp = 0.dp): PaddingValues =
     PaddingValuesImpl(horizontal, vertical, horizontal, vertical)
 
 /**
