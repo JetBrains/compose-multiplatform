@@ -121,6 +121,7 @@ abstract class SdkResourceGenerator : DefaultTask() {
                     }
             }
             project.tasks.named("compileTestJava").configure { it.dependsOn(provider) }
+            project.tasks.named("processTestResources").configure { it.dependsOn(provider) }
 
             val convention = project.convention.getPlugin<JavaPluginConvention>()
             val resources = convention.sourceSets.getByName("test").resources
