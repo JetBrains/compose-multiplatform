@@ -182,6 +182,10 @@ class DemoTest {
             Espresso.pressBack()
             rule.waitForIdle()
         }
+
+        clearFocusFromDemo()
+        rule.waitForIdle()
+
         Espresso.pressBack()
         rule.waitForIdle()
 
@@ -211,6 +215,23 @@ class DemoTest {
 
     private fun SemanticsNodeInteractionCollection.isNotEmpty(): Boolean {
         return fetchSemanticsNodes(atLeastOneRootRequired = false).isNotEmpty()
+    }
+
+    private fun clearFocusFromDemo() {
+        with(rule.activity) {
+            if (hostView.hasFocus()) {
+                if (hostView.isFocused) {
+                    // One of the Compose components has focus.
+                    focusManager.clearFocus(forcedClear = true)
+                } else {
+                    // A child view has focus. (View interop scenario).
+                    // We could also use hostViewGroup.focusedChild?.clearFocus(), but the
+                    // interop views might end up being focused if one of them is marked as
+                    // focusedByDefault. So we clear focus by requesting focus on the owner.
+                    rule.runOnUiThread { hostView.requestFocus() }
+                }
+            }
+        }
     }
 }
 
