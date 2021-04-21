@@ -89,7 +89,7 @@ object Dokka {
             task.noJdkLink = true
             task.noStdlibLink = true
             task.noAndroidSdkLink = true
-            task.dokkaFatJar = "org.jetbrains.dokka:dokka-fatjar:0.9.17-g013"
+            task.dokkaFatJar = "org.jetbrains.dokka:dokka-fatjar:0.9.17-g014"
         }
     }
 
