@@ -67,6 +67,12 @@ object SemanticsProperties {
     /** @see SemanticsPropertyReceiver.selectableGroup */
     val SelectableGroup = SemanticsPropertyKey<Unit>("SelectableGroup")
 
+    /** @see SemanticsPropertyReceiver.collectionInfo */
+    val CollectionInfo = SemanticsPropertyKey<CollectionInfo>("CollectionInfo")
+
+    /** @see SemanticsPropertyReceiver.collectionItemInfo */
+    val CollectionItemInfo = SemanticsPropertyKey<CollectionItemInfo>("CollectionItemInfo")
+
     /**
      * @see SemanticsPropertyReceiver.heading
      */
@@ -481,6 +487,39 @@ class ProgressBarRangeInfo(
 }
 
 /**
+ * Information about the collection.
+ *
+ * A collection of items has [rowCount] rows and [columnCount] columns.
+ * For example, a vertical list is a collection with one column, as many rows as the list items
+ * that are important for accessibility; A table is a collection with several rows and several
+ * columns.
+ *
+ * @param rowCount the number of rows in the collection, or -1 if unknown
+ * @param columnCount the number of columns in the collection, or -1 if unknown
+ */
+class CollectionInfo(val rowCount: Int, val columnCount: Int)
+
+/**
+ * Information about the item of a collection.
+ *
+ * A collection item is contained in a collection, it starts at a given [rowIndex] and
+ * [columnIndex] in the collection, and spans one or more rows and columns. For example, a header
+ * of two related table columns starts at the first row and the first column, spans one row and
+ * two columns.
+ *
+ * @param rowIndex the index of the row at which item is located
+ * @param rowSpan the number of rows the item spans
+ * @param columnIndex the index of the column at which item is located
+ * @param columnSpan the number of columns the item spans
+ */
+class CollectionItemInfo(
+    val rowIndex: Int,
+    val rowSpan: Int,
+    val columnIndex: Int,
+    val columnSpan: Int
+)
+
+/**
  * The scroll state of one axis if this node is scrollable.
  *
  * @param value current 0-based scroll position value (either in pixels, or lazy-item count)
@@ -693,8 +732,6 @@ fun SemanticsPropertyReceiver.dialog() {
  * properties of this element. But some elements with subtle differences need an exact role. If
  * an exact role is not listed in [Role], this property should not be set and the framework will
  * automatically resolve it.
- *
- * @see SemanticsProperties.Role
  */
 var SemanticsPropertyReceiver.role by SemanticsProperties.Role
 
@@ -737,6 +774,21 @@ var SemanticsPropertyReceiver.imeAction by SemanticsProperties.ImeAction
 var SemanticsPropertyReceiver.selected by SemanticsProperties.Selected
 
 /**
+ * This semantics marks node as a collection and provides the required information.
+ *
+ * @see collectionItemInfo
+ */
+var SemanticsPropertyReceiver.collectionInfo by SemanticsProperties.CollectionInfo
+
+/**
+ * This semantics marks node as an items of a collection and provides the required information.
+ *
+ * If you mark items of a collection, you should also be marking the collection with
+ * [collectionInfo].
+ */
+var SemanticsPropertyReceiver.collectionItemInfo by SemanticsProperties.CollectionItemInfo
+
+/**
  * The state of a toggleable component.
  *
  * The presence of this property indicates that the element is toggleable.
@@ -770,6 +822,11 @@ fun SemanticsPropertyReceiver.indexForKey(mapping: (Any) -> Int) {
 
 /**
  * The node is marked as a collection of horizontally or vertically stacked selectable elements.
+ *
+ * Unlike [collectionInfo] which marks a collection of any elements and asks developer to
+ * provide all the required information like number of elements etc., this semantics will
+ * populate the number of selectable elements automatically. Note that if you use this semantics
+ * with lazy collections, it won't get the number of elements in the collection.
  *
  * @see SemanticsPropertyReceiver.selected
 */
