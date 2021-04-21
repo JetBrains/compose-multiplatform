@@ -21,37 +21,43 @@ import android.content.Context
 import android.content.Intent
 import android.content.SharedPreferences
 import android.os.Bundle
+import android.view.View
 import android.view.Window
 import androidx.activity.ComponentActivity
 import androidx.activity.OnBackPressedCallback
 import androidx.activity.OnBackPressedDispatcher
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
-import androidx.lifecycle.Lifecycle
-import androidx.lifecycle.LifecycleEventObserver
-import androidx.preference.PreferenceManager
 import androidx.compose.integration.demos.common.ActivityDemo
 import androidx.compose.integration.demos.common.Demo
 import androidx.compose.integration.demos.common.DemoCategory
-import androidx.compose.ui.graphics.toArgb
 import androidx.compose.material.Colors
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.darkColors
 import androidx.compose.material.lightColors
+import androidx.compose.runtime.Composable
 import androidx.compose.runtime.SideEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.Saver
 import androidx.compose.runtime.saveable.listSaver
 import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.focus.FocusManager
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.platform.ComposeView
+import androidx.compose.ui.platform.LocalFocusManager
+import androidx.compose.ui.platform.LocalView
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.LifecycleEventObserver
+import androidx.preference.PreferenceManager
 
 /**
  * Main [Activity] containing all Compose related demos.
  */
 class DemoActivity : ComponentActivity() {
+    lateinit var hostView: View
+    lateinit var focusManager: FocusManager
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -59,6 +65,8 @@ class DemoActivity : ComponentActivity() {
         ComposeView(this).also {
             setContentView(it)
         }.setContent {
+            hostView = LocalView.current
+            focusManager = LocalFocusManager.current
             val activityStarter = fun(demo: ActivityDemo<*>) {
                 startActivity(Intent(this, demo.activityClass.java))
             }
