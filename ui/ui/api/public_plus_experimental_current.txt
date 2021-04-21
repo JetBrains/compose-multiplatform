@@ -2197,6 +2197,13 @@ package androidx.compose.ui.platform {
 
 }
 
+package androidx.compose.ui.platform.accessibility {
+
+  public final class CollectionInfoKt {
+  }
+
+}
+
 package androidx.compose.ui.platform.actionmodecallback {
 
   public final class TextActionModeCallback_androidKt {
@@ -2258,6 +2265,26 @@ package androidx.compose.ui.semantics {
     method public String? getLabel();
     property public final T? action;
     property public final String? label;
+  }
+
+  public final class CollectionInfo {
+    ctor public CollectionInfo(int rowCount, int columnCount);
+    method public int getColumnCount();
+    method public int getRowCount();
+    property public final int columnCount;
+    property public final int rowCount;
+  }
+
+  public final class CollectionItemInfo {
+    ctor public CollectionItemInfo(int rowIndex, int rowSpan, int columnIndex, int columnSpan);
+    method public int getColumnIndex();
+    method public int getColumnSpan();
+    method public int getRowIndex();
+    method public int getRowSpan();
+    property public final int columnIndex;
+    property public final int columnSpan;
+    property public final int rowIndex;
+    property public final int rowSpan;
   }
 
   public final class CustomAccessibilityAction {
@@ -2420,6 +2447,8 @@ package androidx.compose.ui.semantics {
   }
 
   public final class SemanticsProperties {
+    method public androidx.compose.ui.semantics.SemanticsPropertyKey<androidx.compose.ui.semantics.CollectionInfo> getCollectionInfo();
+    method public androidx.compose.ui.semantics.SemanticsPropertyKey<androidx.compose.ui.semantics.CollectionItemInfo> getCollectionItemInfo();
     method public androidx.compose.ui.semantics.SemanticsPropertyKey<java.lang.String> getContentDescription();
     method public androidx.compose.ui.semantics.SemanticsPropertyKey<kotlin.Unit> getDisabled();
     method public androidx.compose.ui.semantics.SemanticsPropertyKey<androidx.compose.ui.text.AnnotatedString> getEditableText();
@@ -2445,6 +2474,8 @@ package androidx.compose.ui.semantics {
     method public androidx.compose.ui.semantics.SemanticsPropertyKey<androidx.compose.ui.text.TextRange> getTextSelectionRange();
     method public androidx.compose.ui.semantics.SemanticsPropertyKey<androidx.compose.ui.state.ToggleableState> getToggleableState();
     method public androidx.compose.ui.semantics.SemanticsPropertyKey<androidx.compose.ui.semantics.ScrollAxisRange> getVerticalScrollAxisRange();
+    property public final androidx.compose.ui.semantics.SemanticsPropertyKey<androidx.compose.ui.semantics.CollectionInfo> CollectionInfo;
+    property public final androidx.compose.ui.semantics.SemanticsPropertyKey<androidx.compose.ui.semantics.CollectionItemInfo> CollectionItemInfo;
     property public final androidx.compose.ui.semantics.SemanticsPropertyKey<java.lang.String> ContentDescription;
     property public final androidx.compose.ui.semantics.SemanticsPropertyKey<kotlin.Unit> Disabled;
     property public final androidx.compose.ui.semantics.SemanticsPropertyKey<androidx.compose.ui.text.AnnotatedString> EditableText;
@@ -2482,6 +2513,8 @@ package androidx.compose.ui.semantics {
     method public static void dismiss(androidx.compose.ui.semantics.SemanticsPropertyReceiver, optional String? label, kotlin.jvm.functions.Function0<java.lang.Boolean>? action);
     method public static void error(androidx.compose.ui.semantics.SemanticsPropertyReceiver, String description);
     method public static void expand(androidx.compose.ui.semantics.SemanticsPropertyReceiver, optional String? label, kotlin.jvm.functions.Function0<java.lang.Boolean>? action);
+    method public static androidx.compose.ui.semantics.CollectionInfo getCollectionInfo(androidx.compose.ui.semantics.SemanticsPropertyReceiver);
+    method public static androidx.compose.ui.semantics.CollectionItemInfo getCollectionItemInfo(androidx.compose.ui.semantics.SemanticsPropertyReceiver);
     method public static String getContentDescription(androidx.compose.ui.semantics.SemanticsPropertyReceiver);
     method public static java.util.List<androidx.compose.ui.semantics.CustomAccessibilityAction> getCustomActions(androidx.compose.ui.semantics.SemanticsPropertyReceiver);
     method public static androidx.compose.ui.text.AnnotatedString getEditableText(androidx.compose.ui.semantics.SemanticsPropertyReceiver);
@@ -2511,6 +2544,8 @@ package androidx.compose.ui.semantics {
     method public static void scrollBy(androidx.compose.ui.semantics.SemanticsPropertyReceiver, optional String? label, kotlin.jvm.functions.Function2<? super java.lang.Float,? super java.lang.Float,java.lang.Boolean>? action);
     method public static void scrollToIndex(androidx.compose.ui.semantics.SemanticsPropertyReceiver, optional String? label, kotlin.jvm.functions.Function1<? super java.lang.Integer,java.lang.Boolean> action);
     method public static void selectableGroup(androidx.compose.ui.semantics.SemanticsPropertyReceiver);
+    method public static void setCollectionInfo(androidx.compose.ui.semantics.SemanticsPropertyReceiver, androidx.compose.ui.semantics.CollectionInfo p);
+    method public static void setCollectionItemInfo(androidx.compose.ui.semantics.SemanticsPropertyReceiver, androidx.compose.ui.semantics.CollectionItemInfo p);
     method public static void setContentDescription(androidx.compose.ui.semantics.SemanticsPropertyReceiver, String p);
     method public static void setCustomActions(androidx.compose.ui.semantics.SemanticsPropertyReceiver, java.util.List<androidx.compose.ui.semantics.CustomAccessibilityAction> p);
     method public static void setEditableText(androidx.compose.ui.semantics.SemanticsPropertyReceiver, androidx.compose.ui.text.AnnotatedString p);
