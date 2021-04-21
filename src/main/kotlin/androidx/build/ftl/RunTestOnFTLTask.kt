@@ -16,16 +16,21 @@
 
 package androidx.build.ftl
 
+import androidx.build.getDistributionDirectory
+import androidx.build.getSupportRootFolder
 import com.android.build.gradle.api.ApkVariant
 import com.android.build.gradle.api.ApkVariantOutput
 import com.android.build.gradle.api.TestVariant
-import com.google.gson.Gson
 import org.gradle.api.DefaultTask
 import org.gradle.api.GradleException
 import org.gradle.api.Project
+import org.gradle.api.file.DirectoryProperty
 import org.gradle.api.file.RegularFileProperty
+import org.gradle.api.provider.Property
+import org.gradle.api.tasks.CacheableTask
+import org.gradle.api.tasks.Copy
 import org.gradle.api.tasks.InputFile
-import org.gradle.api.tasks.OutputFile
+import org.gradle.api.tasks.OutputDirectory
 import org.gradle.api.tasks.PathSensitive
 import org.gradle.api.tasks.PathSensitivity
 import org.gradle.api.tasks.TaskAction
@@ -45,6 +50,7 @@ import javax.inject.Inject
  * Due to the limitations of FTL, this task only support application instrumentation tests for now.
  */
 @Suppress("UnstableApiUsage") // for gradle property APIs
+@CacheableTask
 abstract class RunTestOnFTLTask @Inject constructor(
     private val workerExecutor: WorkerExecutor
 ) : DefaultTask() {
@@ -63,8 +69,8 @@ abstract class RunTestOnFTLTask @Inject constructor(
     /**
      * Output file to write the results
      */
-    @get:OutputFile
-    abstract val testResults: RegularFileProperty
+    @get:OutputDirectory
+    abstract val testResults: DirectoryProperty
 
     @TaskAction
     fun executeTest() {
@@ -74,35 +80,37 @@ abstract class RunTestOnFTLTask @Inject constructor(
             it.testApk.set(testApk)
             it.testedApk.set(testedApk)
             it.testResults.set(testResults)
+            it.projectPath.set(project.relativeResultPath())
         }
     }
 
     interface RunFTLTestParams : WorkParameters {
+        val projectPath: Property<String>
         val testApk: RegularFileProperty
         val testedApk: RegularFileProperty
-        val testResults: RegularFileProperty
+        val testResults: DirectoryProperty
     }
 
     abstract class RunFTLTestWorkAction @Inject constructor(
         private val execOperations: ExecOperations
     ) : WorkAction<RunFTLTestParams> {
         override fun execute() {
+            val localTestResultDir = parameters.testResults.asFile.get()
+            localTestResultDir.apply {
+                deleteRecursively()
+                mkdirs()
+            }
             val testApk = parameters.testApk.asFile.get()
             val testedApk = parameters.testedApk.asFile.get()
             val gcloud = GCloudCLIWrapper(execOperations)
-            val result = gcloud.runTest(
+            val params = GCloudCLIWrapper.RunTestParameters(
                 testedApk = testedApk,
-                testApk = testApk
+                testApk = testApk,
+                projectPath = parameters.projectPath.get(),
+                resultsLocalDir = localTestResultDir
+
             )
-            val outFile = parameters.testResults.asFile.get()
-            outFile.parentFile.mkdirs()
-            val gson = Gson()
-            outFile.bufferedWriter(Charsets.UTF_8).use {
-                gson.toJson(
-                    result,
-                    it
-                )
-            }
+            val result = gcloud.runTest(params)
             val failed = result.filterNot {
                 it.passed
             }
@@ -114,7 +122,6 @@ abstract class RunTestOnFTLTask @Inject constructor(
 
     companion object {
         private const val TASK_SUFFIX = "OnFirebaseTestLab"
-        private const val TEST_OUTPUT_FILE_NAME = "testResults.json"
 
         /**
          * Creates an FTL test runner task and returns it.
@@ -128,16 +135,26 @@ abstract class RunTestOnFTLTask @Inject constructor(
             val testedVariant = testVariant.testedVariant as? ApkVariant
                 ?: return null
             val taskName = testVariant.name + TASK_SUFFIX
+            val testResultDir = project.layout.buildDirectory.dir(
+                "ftl-results"
+            )
+            // create task to copy results into dist directory
+            val copyToDistTask = project.tasks.register(
+                "copyResultsOf${taskName}ToDist",
+                Copy::class.java
+            ) {
+                it.description = "Copy test results from $taskName into DIST folder"
+                it.group = "build"
+                it.from(testResultDir)
+                it.into(
+                    project.getDistributionDirectory()
+                        .resolve("ftl-results/${project.relativeResultPath()}/$taskName")
+                )
+            }
             return project.tasks.register(taskName, RunTestOnFTLTask::class.java) { task ->
                 task.description = "Run ${testVariant.name} tests on Firebase Test Lab"
                 task.group = "Verification"
-                task.testResults.set(
-                    project.layout.buildDirectory.dir(
-                        "ftl-results"
-                    ).map {
-                        it.file(TEST_OUTPUT_FILE_NAME)
-                    }
-                )
+                task.testResults.set(testResultDir)
                 task.dependsOn(testVariant.packageApplicationProvider)
                 task.dependsOn(testedVariant.packageApplicationProvider)
 
@@ -153,7 +170,16 @@ abstract class RunTestOnFTLTask @Inject constructor(
                         .firstOrNull()
                         ?.outputFile
                 )
+                task.finalizedBy(copyToDistTask)
             }
         }
     }
 }
+
+/**
+ * Returns the relative path of the project wrt the support root. This path is used for both
+ * local dist path and cloud bucket paths.
+ */
+private fun Project.relativeResultPath() = projectDir.relativeTo(
+    project.getSupportRootFolder()
+).path
