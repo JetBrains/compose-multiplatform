@@ -40,6 +40,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.navigation.NavController
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -128,7 +129,8 @@ private object LibrariesSnippet6 {
             navigation(startDestination = innerStartRoute, route = "Parent") {
                 // ...
                 composable("exampleWithRoute") { backStackEntry ->
-                    val parentViewModel = hiltNavGraphViewModel<ParentViewModel>("Parent")
+                    val parentViewModel =
+                        navController.hiltNavGraphViewModel<ParentViewModel>("Parent")
                     ExampleWithRouteScreen(parentViewModel)
                 }
             }
@@ -204,7 +206,9 @@ private class ExampleViewModel : ViewModel() {
 }
 
 private inline fun <reified VM : ViewModel> hiltNavGraphViewModel(): VM { TODO() }
-private inline fun <reified VM : ViewModel> hiltNavGraphViewModel(route: String): VM { TODO() }
+inline fun <reified VM : ViewModel> NavController.hiltNavGraphViewModel(route: String): VM {
+    TODO()
+}
 
 @Composable
 private fun ExampleScreen(vm: ExampleViewModel) {
