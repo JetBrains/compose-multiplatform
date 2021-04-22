@@ -91,6 +91,11 @@ class RadioButtonScreenshotTest {
         rule.onNodeWithTag(wrapperTestTag).performGesture {
             down(center)
         }
+
+        // Ripples are drawn on the RenderThread, not the main (UI) thread, so we can't wait for
+        // synchronization. Instead just wait until after the ripples are finished animating.
+        Thread.sleep(300)
+
         assertSelectableAgainstGolden("radioButton_pressed")
     }
 
@@ -137,6 +142,10 @@ class RadioButtonScreenshotTest {
         rule.waitForIdle() // Wait for measure
         rule.mainClock.advanceTimeBy(milliseconds = 80)
 
+        // Ripples are drawn on the RenderThread, not the main (UI) thread, so we can't wait for
+        // synchronization. Instead just wait until after the ripples are finished animating.
+        Thread.sleep(300)
+
         assertSelectableAgainstGolden("radioButton_animateToSelected")
     }
 
@@ -162,6 +171,10 @@ class RadioButtonScreenshotTest {
         rule.mainClock.advanceTimeByFrame()
         rule.waitForIdle() // Wait for measure
         rule.mainClock.advanceTimeBy(milliseconds = 80)
+
+        // Ripples are drawn on the RenderThread, not the main (UI) thread, so we can't wait for
+        // synchronization. Instead just wait until after the ripples are finished animating.
+        Thread.sleep(300)
 
         assertSelectableAgainstGolden("radioButton_animateToNotSelected")
     }
