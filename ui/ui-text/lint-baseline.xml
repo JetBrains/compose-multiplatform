@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<issues format="5" by="lint 4.2.0-beta04" client="gradle" variant="debug" version="4.2.0-beta04">
+<issues format="5" by="lint 4.2.0-beta06" client="gradle" variant="debug" version="4.2.0-beta06">
 
     <issue
-        id="UnsafeNewApiCall"
-        message="This call is to a method from API 23, the call containing class androidx.compose.ui.text.android.StaticLayoutFactory is not annotated with @RequiresApi(x) where x is at least 23. Either annotate the containing class with at least @RequiresApi(23) or move the call to a static method in a wrapper class annotated with at least @RequiresApi(23)."
+        id="ClassVerificationFailure"
+        message="This call references a method added in API level 23; however, the containing class androidx.compose.ui.text.android.StaticLayoutFactory is reachable from earlier API levels and will fail run-time class verification."
         errorLine1="            Builder.obtain(text, start, end, paint, width)"
         errorLine2="                    ~~~~~~">
         <location
@@ -13,8 +13,8 @@
     </issue>
 
     <issue
-        id="UnsafeNewApiCall"
-        message="This call is to a method from API 23, the call containing class androidx.compose.ui.text.android.StaticLayoutFactory is not annotated with @RequiresApi(x) where x is at least 23. Either annotate the containing class with at least @RequiresApi(23) or move the call to a static method in a wrapper class annotated with at least @RequiresApi(23)."
+        id="ClassVerificationFailure"
+        message="This call references a method added in API level 23; however, the containing class androidx.compose.ui.text.android.StaticLayoutFactory is reachable from earlier API levels and will fail run-time class verification."
         errorLine1="                    setTextDirection(textDir)"
         errorLine2="                    ~~~~~~~~~~~~~~~~">
         <location
@@ -24,8 +24,8 @@
     </issue>
 
     <issue
-        id="UnsafeNewApiCall"
-        message="This call is to a method from API 23, the call containing class androidx.compose.ui.text.android.StaticLayoutFactory is not annotated with @RequiresApi(x) where x is at least 23. Either annotate the containing class with at least @RequiresApi(23) or move the call to a static method in a wrapper class annotated with at least @RequiresApi(23)."
+        id="ClassVerificationFailure"
+        message="This call references a method added in API level 23; however, the containing class androidx.compose.ui.text.android.StaticLayoutFactory is reachable from earlier API levels and will fail run-time class verification."
         errorLine1="                    setAlignment(alignment)"
         errorLine2="                    ~~~~~~~~~~~~">
         <location
@@ -35,8 +35,8 @@
     </issue>
 
     <issue
-        id="UnsafeNewApiCall"
-        message="This call is to a method from API 23, the call containing class androidx.compose.ui.text.android.StaticLayoutFactory is not annotated with @RequiresApi(x) where x is at least 23. Either annotate the containing class with at least @RequiresApi(23) or move the call to a static method in a wrapper class annotated with at least @RequiresApi(23)."
+        id="ClassVerificationFailure"
+        message="This call references a method added in API level 23; however, the containing class androidx.compose.ui.text.android.StaticLayoutFactory is reachable from earlier API levels and will fail run-time class verification."
         errorLine1="                    setMaxLines(maxLines)"
         errorLine2="                    ~~~~~~~~~~~">
         <location
@@ -46,8 +46,8 @@
     </issue>
 
     <issue
-        id="UnsafeNewApiCall"
-        message="This call is to a method from API 23, the call containing class androidx.compose.ui.text.android.StaticLayoutFactory is not annotated with @RequiresApi(x) where x is at least 23. Either annotate the containing class with at least @RequiresApi(23) or move the call to a static method in a wrapper class annotated with at least @RequiresApi(23)."
+        id="ClassVerificationFailure"
+        message="This call references a method added in API level 23; however, the containing class androidx.compose.ui.text.android.StaticLayoutFactory is reachable from earlier API levels and will fail run-time class verification."
         errorLine1="                    setEllipsize(ellipsize)"
         errorLine2="                    ~~~~~~~~~~~~">
         <location
@@ -57,8 +57,8 @@
     </issue>
 
     <issue
-        id="UnsafeNewApiCall"
-        message="This call is to a method from API 23, the call containing class androidx.compose.ui.text.android.StaticLayoutFactory is not annotated with @RequiresApi(x) where x is at least 23. Either annotate the containing class with at least @RequiresApi(23) or move the call to a static method in a wrapper class annotated with at least @RequiresApi(23)."
+        id="ClassVerificationFailure"
+        message="This call references a method added in API level 23; however, the containing class androidx.compose.ui.text.android.StaticLayoutFactory is reachable from earlier API levels and will fail run-time class verification."
         errorLine1="                    setEllipsizedWidth(ellipsizedWidth)"
         errorLine2="                    ~~~~~~~~~~~~~~~~~~">
         <location
@@ -68,8 +68,8 @@
     </issue>
 
     <issue
-        id="UnsafeNewApiCall"
-        message="This call is to a method from API 23, the call containing class androidx.compose.ui.text.android.StaticLayoutFactory is not annotated with @RequiresApi(x) where x is at least 23. Either annotate the containing class with at least @RequiresApi(23) or move the call to a static method in a wrapper class annotated with at least @RequiresApi(23)."
+        id="ClassVerificationFailure"
+        message="This call references a method added in API level 23; however, the containing class androidx.compose.ui.text.android.StaticLayoutFactory is reachable from earlier API levels and will fail run-time class verification."
         errorLine1="                    setLineSpacing(lineSpacingExtra, lineSpacingMultiplier)"
         errorLine2="                    ~~~~~~~~~~~~~~">
         <location
@@ -79,8 +79,8 @@
     </issue>
 
     <issue
-        id="UnsafeNewApiCall"
-        message="This call is to a method from API 26, the call containing class androidx.compose.ui.text.android.StaticLayoutFactory is not annotated with @RequiresApi(x) where x is at least 26. Either annotate the containing class with at least @RequiresApi(26) or move the call to a static method in a wrapper class annotated with at least @RequiresApi(26)."
+        id="ClassVerificationFailure"
+        message="This call references a method added in API level 26; however, the containing class androidx.compose.ui.text.android.StaticLayoutFactory is reachable from earlier API levels and will fail run-time class verification."
         errorLine1="                        setJustificationMode(justificationMode)"
         errorLine2="                        ~~~~~~~~~~~~~~~~~~~~">
         <location
@@ -90,8 +90,8 @@
     </issue>
 
     <issue
-        id="UnsafeNewApiCall"
-        message="This call is to a method from API 23, the call containing class androidx.compose.ui.text.android.StaticLayoutFactory is not annotated with @RequiresApi(x) where x is at least 23. Either annotate the containing class with at least @RequiresApi(23) or move the call to a static method in a wrapper class annotated with at least @RequiresApi(23)."
+        id="ClassVerificationFailure"
+        message="This call references a method added in API level 23; however, the containing class androidx.compose.ui.text.android.StaticLayoutFactory is reachable from earlier API levels and will fail run-time class verification."
         errorLine1="                    setIncludePad(includePadding)"
         errorLine2="                    ~~~~~~~~~~~~~">
         <location
@@ -101,8 +101,8 @@
     </issue>
 
     <issue
-        id="UnsafeNewApiCall"
-        message="This call is to a method from API 28, the call containing class androidx.compose.ui.text.android.StaticLayoutFactory is not annotated with @RequiresApi(x) where x is at least 28. Either annotate the containing class with at least @RequiresApi(28) or move the call to a static method in a wrapper class annotated with at least @RequiresApi(28)."
+        id="ClassVerificationFailure"
+        message="This call references a method added in API level 28; however, the containing class androidx.compose.ui.text.android.StaticLayoutFactory is reachable from earlier API levels and will fail run-time class verification."
         errorLine1="                        setUseLineSpacingFromFallbacks(fallbackLineSpacing)"
         errorLine2="                        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
@@ -112,8 +112,8 @@
     </issue>
 
     <issue
-        id="UnsafeNewApiCall"
-        message="This call is to a method from API 23, the call containing class androidx.compose.ui.text.android.StaticLayoutFactory is not annotated with @RequiresApi(x) where x is at least 23. Either annotate the containing class with at least @RequiresApi(23) or move the call to a static method in a wrapper class annotated with at least @RequiresApi(23)."
+        id="ClassVerificationFailure"
+        message="This call references a method added in API level 23; however, the containing class androidx.compose.ui.text.android.StaticLayoutFactory is reachable from earlier API levels and will fail run-time class verification."
         errorLine1="                    setBreakStrategy(breakStrategy)"
         errorLine2="                    ~~~~~~~~~~~~~~~~">
         <location
@@ -123,8 +123,8 @@
     </issue>
 
     <issue
-        id="UnsafeNewApiCall"
-        message="This call is to a method from API 23, the call containing class androidx.compose.ui.text.android.StaticLayoutFactory is not annotated with @RequiresApi(x) where x is at least 23. Either annotate the containing class with at least @RequiresApi(23) or move the call to a static method in a wrapper class annotated with at least @RequiresApi(23)."
+        id="ClassVerificationFailure"
+        message="This call references a method added in API level 23; however, the containing class androidx.compose.ui.text.android.StaticLayoutFactory is reachable from earlier API levels and will fail run-time class verification."
         errorLine1="                    setHyphenationFrequency(hyphenationFrequency)"
         errorLine2="                    ~~~~~~~~~~~~~~~~~~~~~~~">
         <location
@@ -134,8 +134,8 @@
     </issue>
 
     <issue
-        id="UnsafeNewApiCall"
-        message="This call is to a method from API 23, the call containing class androidx.compose.ui.text.android.StaticLayoutFactory is not annotated with @RequiresApi(x) where x is at least 23. Either annotate the containing class with at least @RequiresApi(23) or move the call to a static method in a wrapper class annotated with at least @RequiresApi(23)."
+        id="ClassVerificationFailure"
+        message="This call references a method added in API level 23; however, the containing class androidx.compose.ui.text.android.StaticLayoutFactory is reachable from earlier API levels and will fail run-time class verification."
         errorLine1="                    setIndents(leftIndents, rightIndents)"
         errorLine2="                    ~~~~~~~~~~">
         <location
@@ -145,8 +145,8 @@
     </issue>
 
     <issue
-        id="UnsafeNewApiCall"
-        message="This call is to a method from API 23, the call containing class androidx.compose.ui.text.android.StaticLayoutFactory is not annotated with @RequiresApi(x) where x is at least 23. Either annotate the containing class with at least @RequiresApi(23) or move the call to a static method in a wrapper class annotated with at least @RequiresApi(23)."
+        id="ClassVerificationFailure"
+        message="This call references a method added in API level 23; however, the containing class androidx.compose.ui.text.android.StaticLayoutFactory is reachable from earlier API levels and will fail run-time class verification."
         errorLine1="                }.build()"
         errorLine2="                  ~~~~~">
         <location
