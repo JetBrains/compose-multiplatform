@@ -229,7 +229,7 @@ internal class SkijaLayer(
         val zParams = Point3(0f, 0f, shadowElevation)
 
         // TODO: configurable?
-        val lightPos = Point3(0f, 0f, 600.dp.toPx())
+        val lightPos = Point3(0f, -300.dp.toPx(), 600.dp.toPx())
         val lightRad = 800.dp.toPx()
 
         val ambientAlpha = 0.039f * alpha
