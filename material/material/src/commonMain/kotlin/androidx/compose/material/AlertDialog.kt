@@ -94,18 +94,21 @@ internal fun ColumnScope.AlertDialogBaselineLayout(
     title: @Composable (() -> Unit)?,
     text: @Composable (() -> Unit)?
 ) {
-    Layout({
-        title?.let { title ->
-            Box(TitlePadding.layoutId("title").align(Alignment.Start)) {
-                title()
+    Layout(
+        {
+            title?.let { title ->
+                Box(TitlePadding.layoutId("title").align(Alignment.Start)) {
+                    title()
+                }
             }
-        }
-        text?.let { text ->
-            Box(TextPadding.layoutId("text").align(Alignment.Start)) {
-                text()
+            text?.let { text ->
+                Box(TextPadding.layoutId("text").align(Alignment.Start)) {
+                    text()
+                }
             }
-        }
-    }) { measurables, constraints ->
+        },
+        Modifier.weight(1f, false)
+    ) { measurables, constraints ->
         // Measure with loose constraints for height as we don't want the text to take up more
         // space than it needs
         val titlePlaceable = measurables.firstOrNull { it.layoutId == "title" }?.measure(
