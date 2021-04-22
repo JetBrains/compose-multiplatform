@@ -80,7 +80,7 @@ internal class RenderingTestScope(
         owner?.dispose()
         val owner = DesktopOwner(owners)
         owner.setContent {
-            CompositionLocalProvider(DesktopPlatformAmbient provides platform) {
+            CompositionLocalProvider(LocalDesktopPlatform provides platform) {
                 content()
             }
         }

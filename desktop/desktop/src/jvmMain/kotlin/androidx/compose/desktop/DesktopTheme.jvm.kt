@@ -16,8 +16,8 @@
 
 package androidx.compose.desktop
 
+import androidx.compose.foundation.LocalScrollbarStyle
 import androidx.compose.foundation.ScrollbarStyle
-import androidx.compose.foundation.ScrollbarStyleAmbient
 import androidx.compose.material.Colors
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Shapes
@@ -52,6 +52,6 @@ fun DesktopTheme(
     ),
     content: @Composable () -> Unit
 ) = CompositionLocalProvider(
-    ScrollbarStyleAmbient provides scrollbar,
+    LocalScrollbarStyle provides scrollbar,
     content = content
 )

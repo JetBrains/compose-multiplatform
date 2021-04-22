@@ -37,16 +37,16 @@ internal fun DesktopOwner.setContent(
 
     val composition = Composition(DesktopUiApplier(root), parent ?: container.recomposer)
     composition.setContent {
-        ProvideDesktopAmbients(this, content)
+        ProvideDesktopCompositionsLocals(this, content)
     }
 
     return composition
 }
 @OptIn(ExperimentalComposeUiApi::class)
 @Composable
-private fun ProvideDesktopAmbients(owner: DesktopOwner, content: @Composable () -> Unit) {
+private fun ProvideDesktopCompositionsLocals(owner: DesktopOwner, content: @Composable () -> Unit) {
     CompositionLocalProvider(
-        DesktopOwnersAmbient provides owner.container
+        LocalDesktopOwners provides owner.container
     ) {
         ProvideCommonCompositionLocals(
             owner = owner,
