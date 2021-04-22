@@ -34,7 +34,7 @@ import java.awt.event.KeyEvent
 import java.awt.event.MouseEvent
 import androidx.compose.ui.input.key.KeyEvent as ComposeKeyEvent
 
-internal val DesktopOwnersAmbient = staticCompositionLocalOf<DesktopOwners> {
+internal val LocalDesktopOwners = staticCompositionLocalOf<DesktopOwners> {
     error("CompositionLocal DesktopOwnersAmbient not provided")
 }
 

@@ -53,15 +53,15 @@ import androidx.compose.ui.input.pointer.pointerMoveFilter
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.window.DialogProperties
 import androidx.compose.ui.window.Dialog
+import androidx.compose.ui.window.DialogProperties
 import androidx.compose.ui.window.Notifier
 import androidx.compose.ui.window.Popup
 import androidx.compose.ui.window.Tray
 import androidx.compose.ui.window.WindowDraggableArea
-import java.awt.event.ActionListener
-import java.awt.event.ActionEvent
 import java.awt.Toolkit
+import java.awt.event.ActionEvent
+import java.awt.event.ActionListener
 import javax.swing.JButton
 
 @Composable
@@ -277,7 +277,7 @@ fun content() {
                     TextBox(text = "Alert Dialog")
                 },
                 text = {
-                    println("Ambient value is ${AmbientTest.current}.")
+                    println("CompositionLocal value is ${LocalTest.current}.")
                     TextBox(text = "Increment amount?")
                     DisposableEffect(Unit) {
                         onDispose {
@@ -315,7 +315,7 @@ fun PopupSample(displayed: Boolean, onDismiss: () -> Unit) {
                 focusable = true,
                 onDismissRequest = onDismiss
             ) {
-                println("Ambient value is ${AmbientTest.current}.")
+                println("CompositionLocal value is ${LocalTest.current}.")
                 PopupContent(onDismiss)
                 DisposableEffect(Unit) {
                     onDispose {
