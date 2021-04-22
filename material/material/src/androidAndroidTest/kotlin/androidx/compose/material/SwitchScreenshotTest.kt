@@ -145,9 +145,14 @@ class SwitchScreenshotTest {
             }
         }
 
-        rule.onNodeWithTag(wrapperTestTag).performGesture {
+        rule.onNode(isToggleable()).performGesture {
             down(center)
         }
+
+        // Ripples are drawn on the RenderThread, not the main (UI) thread, so we can't wait for
+        // synchronization. Instead just wait until after the ripples are finished animating.
+        Thread.sleep(300)
+
         assertToggeableAgainstGolden("switch_pressed")
     }
 
@@ -193,11 +198,14 @@ class SwitchScreenshotTest {
         rule.waitForIdle()
         rule.mainClock.advanceTimeBy(milliseconds = 96)
 
+        // Ripples are drawn on the RenderThread, not the main (UI) thread, so we can't wait for
+        // synchronization. Instead just wait until after the ripples are finished animating.
+        Thread.sleep(300)
+
         assertToggeableAgainstGolden("switch_animateToChecked")
     }
 
     @Test
-    @Suppress("DEPRECATION") // Due to clockTestRule
     fun switchTest_checked_animateToUnchecked() {
         rule.setMaterialContent {
             val isChecked = remember { mutableStateOf(true) }
@@ -219,11 +227,14 @@ class SwitchScreenshotTest {
         rule.waitForIdle()
         rule.mainClock.advanceTimeBy(milliseconds = 96)
 
+        // Ripples are drawn on the RenderThread, not the main (UI) thread, so we can't wait for
+        // synchronization. Instead just wait until after the ripples are finished animating.
+        Thread.sleep(300)
+
         assertToggeableAgainstGolden("switch_animateToUnchecked")
     }
 
     private fun assertToggeableAgainstGolden(goldenName: String) {
-        // TODO: replace with find(isToggeable()) after b/157687898 is fixed
         rule.onNodeWithTag(wrapperTestTag)
             .captureToImage()
             .assertAgainstGolden(screenshotRule, goldenName)
