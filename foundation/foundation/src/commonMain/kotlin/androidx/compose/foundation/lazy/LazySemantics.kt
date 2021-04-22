@@ -18,6 +18,8 @@ package androidx.compose.foundation.lazy
 
 import androidx.compose.runtime.State
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.semantics.CollectionInfo
+import androidx.compose.ui.semantics.collectionInfo
 import androidx.compose.ui.semantics.indexForKey
 import androidx.compose.ui.semantics.scrollToIndex
 import androidx.compose.ui.semantics.semantics
@@ -27,7 +29,8 @@ import kotlinx.coroutines.launch
 internal fun Modifier.lazyListSemantics(
     stateOfItemsProvider: State<LazyListItemsProvider>,
     state: LazyListState,
-    coroutineScope: CoroutineScope
+    coroutineScope: CoroutineScope,
+    isVertical: Boolean
 ): Modifier {
     return semantics {
         indexForKey { needle ->
@@ -50,5 +53,10 @@ internal fun Modifier.lazyListSemantics(
             }
             true
         }
+
+        collectionInfo = CollectionInfo(
+            rowCount = if (isVertical) -1 else 1,
+            columnCount = if (isVertical) 1 else -1
+        )
     }
 }
