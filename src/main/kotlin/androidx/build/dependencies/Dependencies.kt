@@ -142,6 +142,8 @@ const val PROTOBUF = "com.google.protobuf:protobuf-java:3.4.0"
 const val PROTOBUF_COMPILER = "com.google.protobuf:protoc:3.10.0"
 const val PROTOBUF_LITE = "com.google.protobuf:protobuf-javalite:3.10.0"
 
+const val WIRE_RUNTIME = "com.squareup.wire:wire-runtime:3.6.0"
+
 const val JARJAR = "org.anarres.jarjar:jarjar-gradle:1.0.1"
 
 // The following versions change depending on whether we are in the main or ui project - the
