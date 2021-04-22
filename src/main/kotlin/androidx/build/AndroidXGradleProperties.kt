@@ -111,6 +111,12 @@ const val PLAYGROUND_DOKKA_BUILD_ID = "androidx.playground.dokkaBuildId"
  */
 const val VALIDATE_NO_UNRECOGNIZED_MESSAGES = "androidx.validateNoUnrecognizedMessages"
 
+/**
+ * Specifies to run the build twice and validate that the second build doesn't run more
+ * tasks than expected.
+ */
+const val VERIFY_UP_TO_DATE = "androidx.verifyUpToDate"
+
 const val EXPERIMENTAL_KOTLIN_BACKEND_ENABLED = "androidx.experimentalKotlinBackendEnabled"
 
 val ALL_ANDROIDX_PROPERTIES = setOf(
@@ -127,6 +133,7 @@ val ALL_ANDROIDX_PROPERTIES = setOf(
     USE_MAX_DEP_VERSIONS,
     TEST_FAILURES_DO_NOT_FAIL_TEST_TASK,
     VALIDATE_NO_UNRECOGNIZED_MESSAGES,
+    VERIFY_UP_TO_DATE,
     WRITE_VERSIONED_API_FILES,
     AffectedModuleDetector.CHANGED_PROJECTS_ARG,
     AffectedModuleDetector.ENABLE_ARG,
