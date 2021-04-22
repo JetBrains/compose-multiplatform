@@ -17,24 +17,24 @@ package androidx.compose.ui.window
 
 import androidx.compose.desktop.LocalLayerContainer
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.rememberCompositionContext
 import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.getValue
+import androidx.compose.runtime.rememberCompositionContext
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
-import androidx.compose.ui.input.pointer.changedToDown
-import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.input.pointer.PointerEventPass
 import androidx.compose.ui.input.pointer.PointerInputScope
+import androidx.compose.ui.input.pointer.changedToDown
+import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.Layout
 import androidx.compose.ui.layout.onGloballyPositioned
-import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.DesktopOwner
-import androidx.compose.ui.platform.DesktopOwnersAmbient
+import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.platform.LocalDesktopOwners
 import androidx.compose.ui.platform.setContent
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.IntRect
@@ -116,7 +116,7 @@ private fun PopupLayout(
     onDismissRequest: (() -> Unit)?,
     content: @Composable () -> Unit
 ) {
-    val owners = DesktopOwnersAmbient.current
+    val owners = LocalDesktopOwners.current
     val density = LocalDensity.current
     val container = LocalLayerContainer.current
 

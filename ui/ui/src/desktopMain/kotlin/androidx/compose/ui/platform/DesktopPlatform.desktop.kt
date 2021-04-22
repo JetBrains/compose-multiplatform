@@ -18,7 +18,12 @@ package androidx.compose.ui.platform
 
 import androidx.compose.runtime.staticCompositionLocalOf
 
-val DesktopPlatformAmbient = staticCompositionLocalOf(DesktopPlatform::Current)
+// TODO(demin): changing DesktopPlatform is confusing.
+//  Replace DesktopPlatform by DesktopLookAndFeel
+//  (https://github.com/JetBrains/compose-jb/issues/303).
+//  Or get rid of it completely
+//  and provide appropriate Local's (LocalMouseScrollConfig, etc).
+val LocalDesktopPlatform = staticCompositionLocalOf(DesktopPlatform::Current)
 
 enum class DesktopPlatform {
     Linux,
@@ -30,7 +35,7 @@ enum class DesktopPlatform {
          * Identify OS on which the application is currently running.
          *
          * If it is needed to know the current platform in @Composable function,
-         * use [DesktopPlatformAmbient] instead of this function, so composable functions can
+         * use [LocalDesktopPlatform] instead of this function, so composable functions can
          * change their behaviour if we change platform in tests or in application settings
          * (some applications maybe will have this setting)
          */

@@ -104,7 +104,7 @@ class TestComposeWindow(
         val owner = DesktopOwner(owners, density)
         owner.setContent {
             CompositionLocalProvider(
-                DesktopPlatformAmbient provides desktopPlatform
+                LocalDesktopPlatform provides desktopPlatform
             ) {
                 content()
             }
