@@ -19,6 +19,7 @@ package androidx.build.docs
 import androidx.build.SupportConfig
 import androidx.build.addToBuildOnServer
 import androidx.build.dackka.DackkaTask
+import androidx.build.dependencies.KOTLIN_VERSION
 import androidx.build.doclava.DacOptions
 import androidx.build.doclava.DoclavaTask
 import androidx.build.doclava.GENERATE_DOCS_CONFIG
@@ -45,7 +46,6 @@ import org.gradle.api.attributes.DocsType
 import org.gradle.api.attributes.Usage
 import org.gradle.api.file.FileCollection
 import org.gradle.api.model.ObjectFactory
-import org.gradle.api.plugins.ExtraPropertiesExtension
 import org.gradle.api.plugins.JavaBasePlugin
 import org.gradle.api.tasks.Sync
 import org.gradle.api.tasks.TaskProvider
@@ -265,11 +265,9 @@ class AndroidXDocsPlugin : Plugin<Project> {
         }
         listOf(docsCompileClasspath, docsRuntimeClasspath).forEach { config ->
             config.resolutionStrategy {
-                val versions = (project.rootProject.property("ext") as ExtraPropertiesExtension)
-                    .let { it.get("build_versions") as Map<*, *> }
                 it.eachDependency { details ->
                     if (details.requested.group == "org.jetbrains.kotlin") {
-                        details.useVersion(versions["kotlin"] as String)
+                        details.useVersion(KOTLIN_VERSION)
                     }
                 }
             }
@@ -314,6 +312,9 @@ class AndroidXDocsPlugin : Plugin<Project> {
                 destinationDir = generatedDocsDir
                 samplesDir = unzippedSamplesSources
                 sourcesDir = unzippedDocsSources
+                includes = unzippedDocsSources.walkTopDown()
+                    .filter { it.name.endsWith("documentation.md") }
+                    .joinToString(",")
                 docsProjectDir = File(project.rootDir, "docs-public")
                 dependenciesClasspath = androidJarFile(project) + dependencyClasspath
             }
