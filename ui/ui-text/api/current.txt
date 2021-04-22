@@ -488,6 +488,9 @@ package androidx.compose.ui.text.android {
   public final class SpannedExtensionsKt {
   }
 
+  public final class StaticLayoutFactoryKt {
+  }
+
   public final class TempListUtilsKt {
   }
 
