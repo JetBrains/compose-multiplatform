@@ -85,15 +85,15 @@ class ButtonScreenshotTest {
             }
         }
 
-        rule.mainClock.autoAdvance = false
-
         // Start ripple
         rule.onNode(hasClickAction())
             .performGesture { down(center) }
 
-        // Let ripple propagate
         rule.waitForIdle()
-        rule.mainClock.advanceTimeBy(milliseconds = 50)
+        // Ripples are drawn on the RenderThread, not the main (UI) thread, so we can't
+        // properly wait for synchronization. Instead just wait until after the ripples are
+        // finished animating.
+        Thread.sleep(300)
 
         rule.onRoot()
             .captureToImage()
