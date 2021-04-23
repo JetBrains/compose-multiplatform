@@ -14,13 +14,13 @@
  * limitations under the License.
  */
 // Add ext.libs for library versions
-def libs = [:]
+def excludes = [:]
 
-libs.exclude_bytebuddy = {
+excludes.bytebuddy = {
     exclude group: "net.bytebuddy"
 }
 
-libs.exclude_for_espresso = {
+excludes.espresso = {
     exclude group: "androidx.annotation"
     exclude group: "androidx.appcompat"
     exclude group: "androidx.recyclerview"
@@ -31,4 +31,4 @@ libs.exclude_for_espresso = {
     exclude group: "androidx.core"
 }
 
-rootProject.ext["libs"] = libs
+rootProject.ext["excludes"] = excludes
