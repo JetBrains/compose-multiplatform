@@ -16,9 +16,19 @@
 
 package androidx.compose.ui.window
 
+import androidx.compose.desktop.ComposeWindow
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.size
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.ExperimentalComposeUiApi
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.unit.dp
 import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.CompletableDeferred
 import org.junit.Test
@@ -59,5 +69,56 @@ class ApplicationTest {
 
         onEffectLaunch.await()
         shouldEnd.complete(Unit)
+    }
+
+    @Test
+    fun `run two applications`() = runApplicationTest {
+        var window1: ComposeWindow? = null
+        var window2: ComposeWindow? = null
+
+        var isOpen1 by mutableStateOf(true)
+        var isOpen2 by mutableStateOf(true)
+
+        launchApplication {
+            if (isOpen1) {
+                Window(
+                    onCloseRequest = {},
+                    state = rememberWindowState(
+                        size = WindowSize(600.dp, 600.dp),
+                    )
+                ) {
+                    window1 = this.window
+                    Box(Modifier.size(32.dp).background(Color.Red))
+                }
+            }
+        }
+
+        launchApplication {
+            if (isOpen2) {
+                Window(
+                    onCloseRequest = {},
+                    state = rememberWindowState(
+                        size = WindowSize(300.dp, 300.dp),
+                    )
+                ) {
+                    window2 = this.window
+                    Box(Modifier.size(32.dp).background(Color.Blue))
+                }
+            }
+        }
+
+        awaitIdle()
+        assertThat(window1?.isShowing).isTrue()
+        assertThat(window2?.isShowing).isTrue()
+
+        isOpen1 = false
+        awaitIdle()
+        assertThat(window1?.isShowing).isFalse()
+        assertThat(window2?.isShowing).isTrue()
+
+        isOpen2 = false
+        awaitIdle()
+        assertThat(window1?.isShowing).isFalse()
+        assertThat(window2?.isShowing).isFalse()
     }
 }
