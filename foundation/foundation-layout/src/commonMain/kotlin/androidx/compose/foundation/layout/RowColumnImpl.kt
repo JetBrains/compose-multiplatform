@@ -197,12 +197,7 @@ internal fun rowColumnMeasurePolicy(
             }
 
             // Compute the Row or Column size and position the children.
-            val mainAxisLayoutSize =
-                if (totalWeight > 0f && constraints.mainAxisMax != Constraints.Infinity) {
-                    constraints.mainAxisMax
-                } else {
-                    max(fixedSpace + weightedSpace, constraints.mainAxisMin)
-                }
+            val mainAxisLayoutSize = max(fixedSpace + weightedSpace, constraints.mainAxisMin)
             val crossAxisLayoutSize = if (constraints.crossAxisMax != Constraints.Infinity &&
                 crossAxisSize == SizeMode.Expand
             ) {
