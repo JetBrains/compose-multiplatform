@@ -86,9 +86,9 @@ dependencies {
         androidTestImplementation(KOTLIN_COROUTINES_TEST)
         androidTestImplementation(ESPRESSO_CORE)
         androidTestImplementation(JUNIT)
-        androidTestImplementation(DEXMAKER_MOCKITO, libs.exclude_bytebuddy)
+        androidTestImplementation(DEXMAKER_MOCKITO, excludes.bytebuddy)
         // DexMaker has it"s own MockMaker
-        androidTestImplementation(MOCKITO_CORE, libs.exclude_bytebuddy)
+        androidTestImplementation(MOCKITO_CORE, excludes.bytebuddy)
         // DexMaker has it"s own MockMaker
         androidTestImplementation(TRUTH)
         androidTestImplementation(MOCKITO_KOTLIN, {
@@ -190,9 +190,9 @@ if(AndroidXUiPlugin.isMultiplatformEnabled(project)) {
                 implementation(KOTLIN_COROUTINES_TEST)
                 implementation(ESPRESSO_CORE)
                 implementation(JUNIT)
-                implementation(DEXMAKER_MOCKITO, libs.exclude_bytebuddy)
+                implementation(DEXMAKER_MOCKITO, excludes.bytebuddy)
                 // DexMaker has it"s own MockMaker
-                implementation(MOCKITO_CORE, libs.exclude_bytebuddy)
+                implementation(MOCKITO_CORE, excludes.bytebuddy)
                 // DexMaker has it"s own MockMaker
                 implementation(TRUTH)
                 implementation(MOCKITO_KOTLIN, {
