@@ -22,6 +22,7 @@ import androidx.build.studioType
 import org.gradle.api.DefaultTask
 import org.gradle.api.GradleException
 import org.gradle.api.Project
+import org.gradle.api.artifacts.VersionCatalogsExtension
 import org.gradle.api.internal.tasks.userinput.UserInputHandler
 import org.gradle.api.plugins.ExtraPropertiesExtension
 import org.gradle.api.tasks.Internal
@@ -60,10 +61,25 @@ abstract class StudioTask : DefaultTask() {
     @get:Internal
     protected open val installParentDir: File = project.rootDir
 
-    private val OurStudioVersions: StudioVersions
-        get() {
-            return StudioVersions.loadFrom(installParentDir)
+    @Suppress("UnstableApiUsage") // For use of VersionCatalog
+    private val ourStudioVersions by lazy {
+        val libs = project.extensions.getByType(
+            VersionCatalogsExtension::class.java
+        ).find("libs").get()
+        fun getVersion(key: String): String {
+            val version = libs.findVersion(key)
+            return if (version.isPresent) {
+                version.get().requiredVersion
+            } else {
+                throw GradleException("Could not find a version for `$key`")
+            }
         }
+        StudioVersions(
+            getVersion("androidStudio"),
+            getVersion("androidStudioIdea"),
+            getVersion("androidStudioBuildId")
+        )
+    }
 
     /**
      * Directory name (not path) that Studio will be unzipped into.
@@ -71,7 +87,7 @@ abstract class StudioTask : DefaultTask() {
     private val studioDirectoryName: String
         get() {
             val osName = StudioPlatformUtilities.osName
-            with(OurStudioVersions) {
+            with(ourStudioVersions) {
                 return "android-studio-ide-$ideaMajorVersion.$studioBuildNumber-$osName"
             }
         }
@@ -134,7 +150,7 @@ abstract class StudioTask : DefaultTask() {
             studioInstallationDir.parentFile.deleteRecursively()
             // Create installation directory and any needed parent directories
             studioInstallationDir.mkdirs()
-            studioArchiveCreator(project, OurStudioVersions, studioArchiveName, studioArchivePath)
+            studioArchiveCreator(project, ourStudioVersions, studioArchiveName, studioArchivePath)
             println("Extracting archive...")
             extractStudioArchive()
             with(platformUtilities) { updateJvmHeapSize() }
