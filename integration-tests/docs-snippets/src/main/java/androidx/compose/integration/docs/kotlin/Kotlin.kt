@@ -72,7 +72,8 @@ import kotlin.math.roundToInt
 }
 
 @Composable private fun KotlinSnippet2() {
-    Text(text = "Hello, Android!",
+    Text(
+        text = "Hello, Android!",
         color = Color.Unspecified,
         fontSize = TextUnit.Unspecified,
         letterSpacing = TextUnit.Unspecified,
@@ -81,12 +82,13 @@ import kotlin.math.roundToInt
 }
 
 @Composable private fun KotlinSnippet3() {
-    Button( // ...
+    Button(
+        // ...
         onClick = {
             // do something
             // do something else
         }
-    ) { /*...*/ }
+    ) { /* ... */ }
 }
 
 @Composable private fun KotlinSnippet4() {
@@ -135,7 +137,7 @@ import kotlin.math.roundToInt
             // This method accepts a lambda of type DrawScope.() -> Unit
             // therefore in this lambda we can access properties and functions
             // available from DrawScope, such as the `drawRectangle` function.
-            drawRect(/*...*/)
+            drawRect(/* ... */)
         }
     )
 }
@@ -222,7 +224,8 @@ private object KotlinSnippet12 {
 @Composable private fun KotlinSnippet14() {
     // Create a CoroutineScope that follows this composable's lifecycle
     val composableScope = rememberCoroutineScope()
-    Button( // ...
+    Button(
+        // ...
         onClick = {
             // Create a new coroutine that scrolls to the top of the list
             // and call the ViewModel to load data
