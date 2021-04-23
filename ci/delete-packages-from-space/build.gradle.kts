@@ -209,7 +209,6 @@ fun Space.deletePackages(packagesFile: File) {
             }
             packagesFile.copyTo(packagesFile.resolveSibling(packagesFile.nameWithoutExtension + ".deleted.txt"))
             packagesFile.delete()
-            System.exit(0)
         }
     }
 }
