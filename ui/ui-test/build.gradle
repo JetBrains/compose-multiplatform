@@ -52,8 +52,8 @@ dependencies {
         androidTestImplementation(project(":compose:test-utils"))
         androidTestImplementation(project(":compose:ui:ui-test-junit4"))
         androidTestImplementation(TRUTH)
-        androidTestImplementation(MOCKITO_CORE, libs.exclude_bytebuddy) // DexMaker has it"s own MockMaker
-        androidTestImplementation(DEXMAKER_MOCKITO, libs.exclude_bytebuddy) // DexMaker has it"s own MockMaker
+        androidTestImplementation(MOCKITO_CORE, excludes.bytebuddy) // DexMaker has it"s own MockMaker
+        androidTestImplementation(DEXMAKER_MOCKITO, excludes.bytebuddy) // DexMaker has it"s own MockMaker
         androidTestImplementation(MOCKITO_KOTLIN, {
             exclude group: "org.mockito" // to keep control on the mockito version
         })
@@ -96,8 +96,8 @@ if (AndroidXUiPlugin.isMultiplatformEnabled(project)) {
                 implementation(project(":compose:ui:ui-test-junit4"))
                 implementation(project(":activity:activity-compose"))
                 implementation(TRUTH)
-                implementation(MOCKITO_CORE, libs.exclude_bytebuddy) // DexMaker has it"s own MockMaker
-                implementation(DEXMAKER_MOCKITO, libs.exclude_bytebuddy) // DexMaker has it"s own MockMaker
+                implementation(MOCKITO_CORE, excludes.bytebuddy) // DexMaker has it"s own MockMaker
+                implementation(DEXMAKER_MOCKITO, excludes.bytebuddy) // DexMaker has it"s own MockMaker
                 implementation(MOCKITO_KOTLIN, {
                     exclude group: "org.mockito" // to keep control on the mockito version
                 })
