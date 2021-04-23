@@ -45,14 +45,12 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.integration.docs.databinding.ExampleLayoutBinding
 import androidx.compose.material.Button
 import androidx.compose.material.ButtonDefaults
 import androidx.compose.material.FloatingActionButton
-import androidx.compose.material.Icon
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.material.TextField
@@ -71,10 +69,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.AbstractComposeView
 import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.colorResource
-import androidx.compose.ui.res.dimensionResource
-import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.compose.ui.viewinterop.AndroidViewBinding
@@ -225,21 +219,7 @@ private object InteropSnippet6 {
     }
 }
 
-@Composable
-private fun RowScope.InteropSnippet7() {
-    Text(
-        text = stringResource(R.string.ok),
-        modifier = Modifier.padding(dimensionResource(R.dimen.padding_small))
-    )
-
-    Icon(
-        painter = painterResource(R.drawable.ic_plane),
-        contentDescription = stringResource(R.string.plane_description),
-        tint = colorResource(R.color.Blue700)
-    )
-}
-
-private object InteropSnippet8 {
+private object InteropSnippet7 {
     @Composable
     fun rememberCustomView(): CustomView {
         val context = LocalContext.current
@@ -248,7 +228,7 @@ private object InteropSnippet8 {
 }
 
 /* ktlint-disable indent */
-private object InteropSnippet9 {
+private object InteropSnippet8 {
     class ExampleActivity : AppCompatActivity() {
         override fun onCreate(savedInstanceState: Bundle?) {
             super.onCreate(savedInstanceState)
@@ -271,7 +251,7 @@ private object InteropSnippet9 {
     }
 }
 
-private object InteropSnippet10 {
+private object InteropSnippet9 {
     // import com.google.android.material.composethemeadapter.MdcTheme
 
     class ExampleActivity : AppCompatActivity() {
@@ -279,7 +259,7 @@ private object InteropSnippet10 {
             super.onCreate(savedInstanceState)
 
             setContent {
-                // We use MdcTheme instead of MaterialTheme
+                // Use MdcTheme instead of MaterialTheme
                 // Colors, typography, and shape have been read from the
                 // View-based theme used in this Activity
                 MdcTheme {
@@ -290,7 +270,7 @@ private object InteropSnippet10 {
     }
 }
 
-private object InteropSnippet11 {
+private object InteropSnippet10 {
     class ExampleActivity : AppCompatActivity() {
         override fun onCreate(savedInstanceState: Bundle?) {
             super.onCreate(savedInstanceState)
@@ -306,7 +286,7 @@ private object InteropSnippet11 {
     }
 }
 
-private object InteropSnippet12 {
+private object InteropSnippet11 {
     class ExampleActivity : AppCompatActivity() {
         override fun onCreate(savedInstanceState: Bundle?) {
             super.onCreate(savedInstanceState)
@@ -339,7 +319,7 @@ private object InteropSnippet12 {
     }
 }
 
-private object InteropSnippet13 {
+private object InteropSnippet12 {
     @Composable
     fun MyComposable() {
         BoxWithConstraints {
@@ -354,7 +334,7 @@ private object InteropSnippet13 {
     }
 }
 
-private object InteropSnippet14 {
+private object InteropSnippet13 {
     class ExampleActivity : AppCompatActivity() {
         override fun onCreate(savedInstanceState: Bundle?) {
             super.onCreate(savedInstanceState)
@@ -386,7 +366,7 @@ private object InteropSnippet14 {
     }
 }
 
-private object InteropSnippet15 {
+private object InteropSnippet14 {
     @Composable
     fun MyScreen() {
         NavHost(rememberNavController(), startDestination = "profile/{userId}") {
@@ -408,7 +388,7 @@ private object InteropSnippet15 {
     }
 }
 
-private object InteropSnippet16 {
+private object InteropSnippet15 {
     @Composable
     fun BackHandler(
         enabled: Boolean,
@@ -448,7 +428,7 @@ private object InteropSnippet16 {
     }
 }
 
-private object InteropSnippet17 {
+private object InteropSnippet16 {
     class CustomViewGroup @JvmOverloads constructor(
         context: Context,
         attrs: AttributeSet? = null,
@@ -485,7 +465,7 @@ private object InteropSnippet17 {
     }
 }
 
-private object InteropSnippet18 {
+private object InteropSnippet17 {
     @Composable
     fun CallToActionButton(
         text: String,
@@ -521,7 +501,7 @@ private object InteropSnippet18 {
     }
 }
 
-private object InteropSnippet19 {
+private object InteropSnippet18 {
     class ExampleActivity : Activity() {
 
         private lateinit var binding: ActivityExampleBinding
@@ -539,7 +519,7 @@ private object InteropSnippet19 {
     }
 }
 
-private object InteropSnippet20 {
+private object InteropSnippet19 {
     @Composable
     fun SystemBroadcastReceiver(
         systemAction: String,
@@ -709,7 +689,7 @@ private class GreetingViewModelFactory(val userId: String) : ViewModelProvider.F
 }
 private class ActivityExampleBinding {
     val root: Int = 0
-    lateinit var callToAction: InteropSnippet18.CallToActionViewButton
+    lateinit var callToAction: InteropSnippet17.CallToActionViewButton
     companion object {
         fun inflate(li: LayoutInflater): ActivityExampleBinding { TODO() }
     }
