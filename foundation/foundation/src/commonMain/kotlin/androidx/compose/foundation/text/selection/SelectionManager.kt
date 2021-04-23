@@ -216,8 +216,7 @@ internal class SelectionManager(private val selectionRegistrar: SelectionRegistr
                     startPosition = startPositionOrCurrent,
                     endPosition = convertToContainerCoordinates(layoutCoordinates, endPosition),
                     isStartHandle = false,
-                    adjustment = selectionMode,
-                    ensureAtLeastOneChar = touchMode
+                    adjustment = selectionMode
                 )
             }
 
@@ -324,8 +323,6 @@ internal class SelectionManager(private val selectionRegistrar: SelectionRegistr
      *
      * @param startPosition [Offset] for the start of the selection
      * @param endPosition [Offset] for the end of the selection
-     * @param adjustment [Selection] range is adjusted according to this param
-     * @param ensureAtLeastOneChar should selection contain at least one character
      * @param previousSelection previous selection
      *
      * @return a [Pair] of a [Selection] object which is constructed by combining all
@@ -337,7 +334,6 @@ internal class SelectionManager(private val selectionRegistrar: SelectionRegistr
         startPosition: Offset,
         endPosition: Offset,
         adjustment: SelectionAdjustment = SelectionAdjustment.NONE,
-        ensureAtLeastOneChar: Boolean = true,
         previousSelection: Selection? = null,
         isStartHandle: Boolean = true
     ): Pair<Selection?, Map<Long, Selection>> {
@@ -350,8 +346,7 @@ internal class SelectionManager(private val selectionRegistrar: SelectionRegistr
                     containerLayoutCoordinates = requireContainerCoordinates(),
                     previousSelection = previousSelection,
                     isStartHandle = isStartHandle,
-                    adjustment = adjustment,
-                    ensureAtLeastOneChar = ensureAtLeastOneChar
+                    adjustment = adjustment
                 )
                 selection?.let { subselections[selectable.selectableId] = it }
                 merge(mergedSelection, selection)
@@ -611,7 +606,6 @@ internal class SelectionManager(private val selectionRegistrar: SelectionRegistr
         startPosition: Offset?,
         endPosition: Offset?,
         adjustment: SelectionAdjustment = SelectionAdjustment.NONE,
-        ensureAtLeastOneChar: Boolean = true,
         isStartHandle: Boolean = true
     ) {
         if (startPosition == null || endPosition == null) return
@@ -621,7 +615,6 @@ internal class SelectionManager(private val selectionRegistrar: SelectionRegistr
             adjustment = adjustment,
             isStartHandle = isStartHandle,
             previousSelection = selection,
-            ensureAtLeastOneChar = ensureAtLeastOneChar
         )
         if (newSelection != selection) {
             selectionRegistrar.subselections = newSubselection

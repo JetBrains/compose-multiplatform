@@ -215,7 +215,6 @@ internal class FakeSelectable : Selectable {
         endPosition: Offset,
         containerLayoutCoordinates: LayoutCoordinates,
         adjustment: SelectionAdjustment,
-        ensureAtLeastOneChar: Boolean,
         previousSelection: Selection?,
         isStartHandle: Boolean
     ): Selection? {
