@@ -19,7 +19,7 @@ class ConfirmDeletionDialog {
             ) {
                 vbox {
                     hbox() {
-                        label(text: "Are you shure you want to delete these packages?")
+                        label(text: "Are you sure you want to delete these packages?")
                     }
                     scrollPane(verticalScrollBarPolicy: JScrollPane.VERTICAL_SCROLLBAR_ALWAYS) {
                         textArea(text: packagesToBeDeleted, columns: 60, rows: 20)
