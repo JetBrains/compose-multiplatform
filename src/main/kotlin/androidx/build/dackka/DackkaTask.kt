@@ -22,6 +22,7 @@ import org.gradle.api.file.FileCollection
 import org.gradle.api.provider.ListProperty
 import org.gradle.api.provider.SetProperty
 import org.gradle.api.tasks.Classpath
+import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.InputFiles
 import org.gradle.api.tasks.OutputDirectory
 import org.gradle.api.tasks.TaskAction
@@ -52,6 +53,10 @@ abstract class DackkaTask @Inject constructor(
     @InputFiles
     lateinit var sourcesDir: File
 
+    // String representing names of .md files to be included in documentation
+    @Input
+    lateinit var includes: String
+
     // Directory containing the docs project and package-lists
     @InputFiles
     lateinit var docsProjectDir: File
@@ -80,6 +85,8 @@ abstract class DackkaTask @Inject constructor(
                 "${it.value}^${docsProjectDir.toPath()}/package-lists/${it.key}/package-list^^"
         }
 
+        val includesString = if (includes.isNotEmpty()) { "-includes $includes" } else { "" }
+
         return listOf(
 
             // moduleName arg needs to be present but is not used the generated docs
@@ -98,7 +105,7 @@ abstract class DackkaTask @Inject constructor(
             // Configuration of sources. The generated string looks like this:
             // "-sourceSet -src /path/to/src -samples /path/to/samples ..."
             "-sourceSet",
-            "-src $sourcesDir -samples $samplesDir -classpath $classPath"
+            "-src $sourcesDir -samples $samplesDir -classpath $classPath $includesString"
         )
     }
 
