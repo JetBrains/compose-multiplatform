@@ -15,7 +15,9 @@
  */
 
 // Ignore lint warnings in documentation snippets
-@file:Suppress("unused", "UNUSED_PARAMETER", "UNUSED_VARIABLE")
+@file:Suppress(
+    "unused", "UNUSED_PARAMETER", "UNUSED_VARIABLE", "SimplifyBooleanWithConstants"
+)
 
 package androidx.compose.integration.docs.lifecycle
 
@@ -26,6 +28,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.Button
 import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.Scaffold
@@ -46,8 +49,13 @@ import androidx.compose.runtime.produceState
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.rememberUpdatedState
+import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Modifier
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.filter
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import kotlin.random.Random
 
@@ -327,7 +335,26 @@ private object LifecycleSnippet14 {
     }
 }
 
-private object LifecycleSnippet15 {
+@Composable
+private fun LifecycleSnippet15(messages: List<Message>) {
+    val listState = rememberLazyListState()
+
+    LazyColumn(state = listState) {
+        // ...
+    }
+
+    LaunchedEffect(listState) {
+        snapshotFlow { listState.firstVisibleItemIndex }
+            .map { index -> index > 0 }
+            .distinctUntilChanged()
+            .filter { it == true }
+            .collect {
+                MyAnalyticsService.sendScrolledPastFirstItemEvent()
+            }
+    }
+}
+
+private object LifecycleSnippet16 {
     @Composable
     fun BackHandler(backDispatcher: OnBackPressedDispatcher, onBack: () -> Unit) {
         // START - DO NOT COPY IN CODE SNIPPET
@@ -375,6 +402,7 @@ private data class UiState<T>(
         get() = exception != null
 }
 
+private class Message(val id: Long)
 private class Image
 private class ImageRepository {
     fun load(url: String): Image? = if (Random.nextInt() == 0) Image() else null // Avoid warnings
@@ -393,3 +421,7 @@ private fun prepareGreeting(user: User, weather: Weather) = Greeting("haha")
 
 private fun String.containsWord(input: List<String>): Boolean = false
 private fun loadNetworkImage(url: String): String = ""
+
+private object MyAnalyticsService {
+    fun sendScrolledPastFirstItemEvent() = Unit
+}
