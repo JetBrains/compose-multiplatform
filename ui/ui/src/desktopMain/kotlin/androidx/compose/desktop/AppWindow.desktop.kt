@@ -22,7 +22,7 @@ import androidx.compose.runtime.compositionLocalOf
 import androidx.compose.ui.platform.Keyboard
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.IntSize
-import androidx.compose.ui.window.MenuBar
+import androidx.compose.ui.window.v1.MenuBar
 import java.awt.Container
 import java.awt.Frame
 import java.awt.event.ComponentAdapter

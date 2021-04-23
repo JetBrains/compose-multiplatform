@@ -17,9 +17,9 @@ package androidx.compose.desktop.examples.popupexample
 
 import androidx.compose.desktop.AppManager
 import androidx.compose.ui.input.key.Key
-import androidx.compose.ui.window.MenuItem
-import androidx.compose.ui.window.KeyStroke
 import androidx.compose.ui.window.Notifier
+import androidx.compose.ui.window.v1.KeyStroke
+import androidx.compose.ui.window.v1.MenuItem
 
 object MenuItems {
     val Exit = MenuItem(
