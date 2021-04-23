@@ -30,6 +30,7 @@ import androidx.compose.ui.layout.LayoutCoordinates
 
 internal enum class SelectionAdjustment {
     NONE,
+    CHARACTER,
     WORD,
     PARAGRAPH
 }
