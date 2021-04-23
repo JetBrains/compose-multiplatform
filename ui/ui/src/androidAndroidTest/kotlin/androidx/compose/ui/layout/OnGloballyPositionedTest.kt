@@ -339,6 +339,7 @@ class OnGloballyPositionedTest {
         return offset
     }
 
+    @FlakyTest(bugId = 180508644)
     @Test
     fun onPositionedIsCalledWhenComposeContainerPositionChanged() {
         var positionedLatch = CountDownLatch(1)
