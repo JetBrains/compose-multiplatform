@@ -20,6 +20,7 @@ import androidx.compose.desktop.AppManager
 import androidx.compose.desktop.AppWindow
 import androidx.compose.desktop.ComposeWindow
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCompositionContext
@@ -37,6 +38,7 @@ import java.awt.event.ComponentEvent
 import java.awt.event.WindowAdapter
 import java.awt.event.WindowEvent
 import javax.swing.JFrame
+import javax.swing.JMenuBar
 
 // TODO(demin): support focus management
 /**
@@ -242,4 +244,26 @@ interface WindowScope : OwnerWindowScope {
     val window: ComposeWindow
 
     override val ownerWindow: Window get() = window
+}
+
+/**
+ * Composes menu bar on the top of the window
+ *
+ * @param content content of the menu bar (list of menus)
+ */
+@Composable
+fun WindowScope.MenuBar(content: @Composable MenuBarScope.() -> Unit) {
+    val parentComposition = rememberCompositionContext()
+
+    DisposableEffect(Unit) {
+        val menu = JMenuBar()
+        val composition = menu.setContent(parentComposition, content)
+        window.jMenuBar = menu
+        composition to menu
+
+        onDispose {
+            window.jMenuBar = null
+            composition.dispose()
+        }
+    }
 }
