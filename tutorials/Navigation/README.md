@@ -150,7 +150,7 @@ This pattern should be chosen if any of the following apply:
 
 1. You support Multipaltform targets with different UI frameworks, and you want to share the navigation logic between them. For example if you support Desktop with Compose UI, iOS with SwiftUI and/or JavaScript with React UI.
 2. You want to keep children running while in the back stack (stopped, but not destroyed).
-3. You are targetting Android and need instance retaining functionality in children (aka AndroidX [ViewModels](https://developer.android.com/topic/libraries/architecture/viewmodel)) and you want to hide this logic as implementation details.
+3. You are targeting Android and need instance retaining functionality in children (aka AndroidX [ViewModels](https://developer.android.com/topic/libraries/architecture/viewmodel)) and you want to hide this logic as implementation details.
 4. You want to keep the navigation logic (and probably the business logic) separate from UI.
 
 The first point is quite obvious. If Compose is not the only UI you are using and you want to share the navigation logic, then it can not be managed by Compose.
