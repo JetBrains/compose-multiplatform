@@ -73,6 +73,7 @@ object LibraryGroups {
     val PERCENTLAYOUT = LibraryGroup("androidx.percentlayout", LibraryVersions.PERCENTLAYOUT)
     val PREFERENCE = LibraryGroup("androidx.preference", LibraryVersions.PREFERENCE)
     val PRINT = LibraryGroup("androidx.print", LibraryVersions.PRINT)
+    val PROFILEINSTALLER = LibraryGroup("androidx.profileinstaller", LibraryVersions.PROFILEINSTALLER)
     val RECOMMENDATION = LibraryGroup("androidx.recommendation", LibraryVersions.RECOMMENDATION)
     val RECYCLERVIEW = LibraryGroup("androidx.recyclerview", null)
     val REMOTECALLBACK = LibraryGroup("androidx.remotecallback", LibraryVersions.REMOTECALLBACK)
