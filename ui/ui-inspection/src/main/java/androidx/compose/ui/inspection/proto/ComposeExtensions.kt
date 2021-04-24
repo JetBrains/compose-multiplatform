@@ -205,6 +205,7 @@ fun NodeParameter.convert(stringTable: StringTable): Parameter {
 fun NodeParameterReference.convert(): ParameterReference {
     val reference = this
     return ParameterReference.newBuilder().apply {
+        kind = reference.kind.convert()
         composableId = reference.nodeId
         parameterIndex = reference.parameterIndex
         addAllCompositeIndex(reference.indices.asIterable())
