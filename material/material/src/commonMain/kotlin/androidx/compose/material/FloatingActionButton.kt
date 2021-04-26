@@ -51,7 +51,11 @@ import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.flow.collect
 
 /**
- * A floating action button (FAB) is a button that represents the primary action of a screen.
+ * <a href="https://material.io/components/buttons-floating-action-button" class="external" target="_blank">Material Design floating action button</a>.
+ *
+ * A floating action button (FAB) represents the primary action of a screen.
+ *
+ * ![Floating action button image](https://developer.android.com/images/reference/androidx/compose/material/floating-action-button.png)
  *
  * This FAB is typically used with an [Icon]:
  *
@@ -113,7 +117,11 @@ fun FloatingActionButton(
 }
 
 /**
- * A floating action button (FAB) is a button that represents the primary action of a screen.
+ * <a href="https://material.io/components/buttons-floating-action-button#extended-fab" class="external" target="_blank">Material Design extended floating action button</a>.
+ *
+ * The extended FAB is wider than a regular FAB, and it includes a text label.
+ *
+ * ![Extended floating action button image](https://developer.android.com/images/reference/androidx/compose/material/extended-floating-action-button.png)
  *
  * This extended FAB contains text and an optional icon that will be placed at the start. See
  * [FloatingActionButton] for a FAB that just contains some content, typically an icon.

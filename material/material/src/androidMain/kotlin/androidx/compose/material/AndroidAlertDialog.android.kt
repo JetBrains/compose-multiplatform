@@ -28,7 +28,11 @@ import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
 
 /**
- * Alert dialog is a [Dialog] which interrupts the user with urgent information, details or actions.
+ * <a href="https://material.io/components/dialogs#alert-dialog" class="external" target="_blank">Material Design alert dialog</a>.
+ *
+ * Alert dialogs interrupt users with urgent information, details, or actions.
+ *
+ * ![Dialogs image](https://developer.android.com/images/reference/androidx/compose/material/dialogs.png)
  *
  * The dialog will position its buttons based on the available space. By default it will try to
  * place them horizontally next to each other and fallback to horizontal placement if not enough
@@ -94,7 +98,11 @@ fun AlertDialog(
 }
 
 /**
- * Alert dialog is a [Dialog] which interrupts the user with urgent information, details or actions.
+ * <a href="https://material.io/components/dialogs#alert-dialog" class="external" target="_blank">Material Design alert dialog</a>.
+ *
+ * Alert dialogs interrupt users with urgent information, details, or actions.
+ *
+ * ![Dialogs image](https://developer.android.com/images/reference/androidx/compose/material/dialogs.png)
  *
  * This function can be used to fully customize the button area, e.g. with:
  *

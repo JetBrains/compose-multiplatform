@@ -25,7 +25,11 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 
 /**
- * Cards are [Surface]s that display content and actions on a single topic.
+ * <a href="https://material.io/components/cards" class="external" target="_blank">Material Design card</a>.
+ *
+ * Cards contain content and actions about a single subject.
+ *
+ * ![Cards image](https://developer.android.com/images/reference/androidx/compose/material/cards.png)
  *
  * @sample androidx.compose.material.samples.CardSample
  *

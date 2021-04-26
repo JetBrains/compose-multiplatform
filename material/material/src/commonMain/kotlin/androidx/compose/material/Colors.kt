@@ -28,8 +28,12 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.takeOrElse
 
 /**
- * Collection of colors in the
- * [Material color specification](https://material.io/design/color/the-color-system.html#color-theme-creation)
+ * <a href="https://material.io/design/color/the-color-system.html" class="external" target="_blank">Material Design color system</a>.
+ *
+ * The Material Design color system can help you create a color theme that reflects your brand or
+ * style.
+ *
+ * ![Color image](https://developer.android.com/images/reference/androidx/compose/material/color.png)
  *
  * To create a light set of colors using the baseline values, use [lightColors]
  * To create a dark set of colors using the baseline values, use [darkColors]
