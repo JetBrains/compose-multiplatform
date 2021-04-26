@@ -380,10 +380,6 @@ class ViewWindowInsetObserver(private val view: View) {
 
         // Add an OnAttachStateChangeListener to request an inset pass each time we're attached
         // to the window
-        val attachListener = object : View.OnAttachStateChangeListener {
-            override fun onViewAttachedToWindow(v: View) = v.requestApplyInsets()
-            override fun onViewDetachedFromWindow(v: View) = Unit
-        }
         view.addOnAttachStateChangeListener(attachListener)
 
         if (windowInsetsAnimationsEnabled) {
