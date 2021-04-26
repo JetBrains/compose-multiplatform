@@ -81,6 +81,15 @@ class AndroidXRootPlugin : Plugin<Project> {
         if (partiallyDejetifyArchiveTask != null)
             buildOnServerTask.dependsOn(partiallyDejetifyArchiveTask)
 
+        buildOnServerTask.dependsOn(
+            tasks.register(
+                "saveSystemStats",
+                SaveSystemStatsTask::class.java
+            ) { task ->
+                task.outputFile.set(File(project.getDistributionDirectory(), "system_stats.txt"))
+            }
+        )
+
         extra.set("projects", ConcurrentHashMap<String, String>())
         buildOnServerTask.dependsOn(tasks.named(CheckExternalDependencyLicensesTask.TASK_NAME))
         // Anchor task that invokes running all subprojects :validateProperties tasks which ensure that
