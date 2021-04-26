@@ -316,9 +316,11 @@ class BottomNavigationScreenshotTest {
         goldenIdentifier: String
     ) {
         if (interaction != null) {
-            // Start ripple
-            scope.launch {
-                interactionSource.emit(interaction)
+            composeTestRule.runOnIdle {
+                // Start ripple
+                scope.launch {
+                    interactionSource.emit(interaction)
+                }
             }
 
             composeTestRule.waitForIdle()
