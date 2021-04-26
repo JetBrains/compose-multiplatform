@@ -48,6 +48,7 @@ import androidx.compose.ui.text.style.TextGeometricTransform
 import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.isUnspecified
 import androidx.compose.ui.unit.TextUnit
+import androidx.compose.ui.unit.isSpecified
 import androidx.compose.ui.unit.sp
 import org.jetbrains.skija.Paint
 import org.jetbrains.skija.Typeface
@@ -61,7 +62,9 @@ import org.jetbrains.skija.paragraph.PlaceholderAlignment
 import org.jetbrains.skija.paragraph.PlaceholderStyle
 import org.jetbrains.skija.paragraph.RectHeightMode
 import org.jetbrains.skija.paragraph.RectWidthMode
+import org.jetbrains.skija.paragraph.StrutStyle
 import org.jetbrains.skija.paragraph.TextBox
+import java.lang.IllegalStateException
 import java.lang.UnsupportedOperationException
 import java.util.WeakHashMap
 import kotlin.math.floor
@@ -764,6 +767,25 @@ internal class ParagraphBuilder(
         style.textAlign?.let {
             pStyle.alignment = it.toSkAlignment()
         }
+
+        if (style.lineHeight.isSpecified) {
+            val strutStyle = StrutStyle()
+
+            strutStyle.isEnabled = true
+            strutStyle.isHeightOverridden = true
+            val fontSize = with(density) {
+                style.fontSize.orDefaultFontSize().toPx()
+            }
+            val lineHeight = when {
+                style.lineHeight.isSp -> with(density) {
+                    style.lineHeight.toPx()
+                }
+                style.lineHeight.isEm -> fontSize * style.lineHeight.value
+                else -> throw IllegalStateException()
+            }
+            strutStyle.height = lineHeight / fontSize
+            pStyle.strutStyle = strutStyle
+        }
         pStyle.direction = textDirection.toSkDirection()
         return pStyle
     }
@@ -790,12 +812,14 @@ internal class ParagraphBuilder(
     }
 }
 
+private fun TextUnit.orDefaultFontSize() = when {
+    isUnspecified -> DefaultFontSize
+    isEm -> DefaultFontSize * value
+    else -> this
+}
+
 private fun SpanStyle.withDefaultFontSize(): SpanStyle {
-    val fontSize = when {
-        this.fontSize.isUnspecified -> DefaultFontSize
-        this.fontSize.isEm -> DefaultFontSize * this.fontSize.value
-        else -> this.fontSize
-    }
+    val fontSize = this.fontSize.orDefaultFontSize()
     val letterSpacing = when {
         this.letterSpacing.isEm -> fontSize * this.letterSpacing.value
         else -> this.letterSpacing
