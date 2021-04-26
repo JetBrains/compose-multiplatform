@@ -121,15 +121,20 @@ class WrapperTest {
     @Test
     fun detachedFromLifecycleWhenDisposed() {
         lateinit var owner: RegistryOwner
-        activityScenario.onActivity {
-            owner = RegistryOwner()
-        }
         val composedLatch = CountDownLatch(1)
-
         lateinit var view: ComposeView
         activityScenario.onActivity {
+            owner = RegistryOwner()
             view = ComposeView(it)
-            it.setContentView(view)
+            it.setContentView(
+                // Wrap the ComposeView in a FrameLayout to be the content view;
+                // the default recomposer factory will install itself at the content view
+                // and use the available ViewTreeLifecycleOwner there. The added layer of
+                // nesting here isolates *only* the ComposeView's lifecycle observation.
+                FrameLayout(it).apply {
+                    addView(view)
+                }
+            )
             ViewTreeLifecycleOwner.set(view, owner)
             view.setContent {
                 composedLatch.countDown()
