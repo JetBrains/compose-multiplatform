@@ -1,4 +1,4 @@
-# Integration Compose for Desktop into Swing-based aplication
+# Integration Compose for Desktop into Swing-based application
 
 ## What is covered
 
