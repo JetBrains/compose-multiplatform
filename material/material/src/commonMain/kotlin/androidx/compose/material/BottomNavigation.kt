@@ -58,8 +58,11 @@ import kotlin.math.roundToInt
 // TODO: b/149825331 add documentation references to Scaffold here and samples for using
 // BottomNavigation inside a Scaffold
 /**
- * BottomNavigation is a component placed at the bottom of the screen that represents primary
- * destinations in your application.
+ * <a href="https://material.io/components/bottom-navigation" class="external" target="_blank">Material Design bottom navigation</a>.
+ *
+ * Bottom navigation bars allow movement between primary destinations in an app.
+ *
+ * ![Bottom navigation image](https://developer.android.com/images/reference/androidx/compose/material/bottom-navigation.png)
  *
  * BottomNavigation should contain multiple [BottomNavigationItem]s, each representing a singular
  * destination.
@@ -109,7 +112,7 @@ fun BottomNavigation(
 }
 
 /**
- * A BottomNavigationItem represents a singular primary destination in your application.
+ * <a href="https://material.io/components/bottom-navigation" class="external" target="_blank">Material Design bottom navigation</a> item.
  *
  * The recommended configuration for a BottomNavigationItem depends on how many items there are
  * inside a [BottomNavigation]:

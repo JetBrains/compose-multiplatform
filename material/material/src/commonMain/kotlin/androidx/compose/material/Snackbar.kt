@@ -38,6 +38,8 @@ import androidx.compose.ui.unit.dp
 import kotlin.math.max
 
 /**
+ * <a href="https://material.io/components/snackbars" class="external" target="_blank">Material Design snackbar</a>.
+ *
  * Snackbars provide brief messages about app processes at the bottom of the screen.
  *
  * Snackbars inform users of a process that an app has performed or will perform. They appear
@@ -46,6 +48,8 @@ import kotlin.math.max
  *
  * A Snackbar can contain a single action. Because Snackbar disappears automatically, the action
  * shouldn't be "Dismiss" or "Cancel".
+ *
+ * ![Snackbars image](https://developer.android.com/images/reference/androidx/compose/material/snackbars.png)
  *
  * This components provides only the visuals of the [Snackbar]. If you need to show a [Snackbar]
  * with defaults on the screen, use [ScaffoldState.snackbarHostState] and
@@ -105,6 +109,8 @@ fun Snackbar(
 }
 
 /**
+ * <a href="https://material.io/components/snackbars" class="external" target="_blank">Material Design snackbar</a>.
+ *
  * Snackbars provide brief messages about app processes at the bottom of the screen.
  *
  * Snackbars inform users of a process that an app has performed or will perform. They appear
@@ -113,6 +119,8 @@ fun Snackbar(
  *
  * A Snackbar can contain a single action. Because they disappear automatically, the action
  * shouldn't be "Dismiss" or "Cancel".
+ *
+ * ![Snackbars image](https://developer.android.com/images/reference/androidx/compose/material/snackbars.png)
  *
  * This version of snackbar is designed to work with [SnackbarData] provided by the
  * [SnackbarHost], which is usually used inside of the [Scaffold].

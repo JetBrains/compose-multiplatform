@@ -57,8 +57,13 @@ import kotlin.math.max
 import kotlin.math.roundToInt
 
 /**
- * Material Design implementation of an
- * [Outlined TextField](https://material.io/components/text-fields/#outlined-text-field)
+ * <a href="https://material.io/components/text-fields#outlined-text-field" class="external" target="_blank">Material Design outlined text field</a>.
+ *
+ * Outlined text fields have less visual emphasis than filled text fields. When they appear in
+ * places like forms, where many text fields are placed together, their reduced emphasis helps
+ * simplify the layout.
+ *
+ * ![Outlined text field image](https://developer.android.com/images/reference/androidx/compose/material/outlined-text-field.png)
  *
  * See example usage:
  * @sample androidx.compose.material.samples.SimpleOutlinedTextFieldSample
@@ -166,8 +171,13 @@ fun OutlinedTextField(
 }
 
 /**
- * Material Design implementation of an
- * [Outlined TextField](https://material.io/components/text-fields/#outlined-text-field)
+ * <a href="https://material.io/components/text-fields#outlined-text-field" class="external" target="_blank">Material Design outlined text field</a>.
+ *
+ * Outlined text fields have less visual emphasis than filled text fields. When they appear in
+ * places like forms, where many text fields are placed together, their reduced emphasis helps
+ * simplify the layout.
+ *
+ * ![Outlined text field image](https://developer.android.com/images/reference/androidx/compose/material/outlined-text-field.png)
  *
  * See example usage:
  * @sample androidx.compose.material.samples.OutlinedTextFieldSample

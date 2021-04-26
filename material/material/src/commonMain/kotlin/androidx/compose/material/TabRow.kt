@@ -56,6 +56,14 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 
 /**
+ * <a href="https://material.io/components/tabs#fixed-tabs" class="external" target="_blank">Material Design fixed tabs</a>.
+ *
+ * Fixed tabs display all tabs in a set simultaneously. They are best for switching between related
+ * content quickly, such as between transportation methods in a map. To navigate between fixed tabs,
+ * tap an individual tab, or swipe left or right in the content area.
+ *
+ * ![Fixed tabs image](https://developer.android.com/images/reference/androidx/compose/material/fixed-tabs.png)
+ *
  * A TabRow contains a row of [Tab]s, and displays an indicator underneath the currently
  * selected tab. A TabRow places its tabs evenly spaced along the entire row, with each tab
  * taking up an equal amount of space. See [ScrollableTabRow] for a tab row that does not enforce
@@ -176,6 +184,13 @@ fun TabRow(
 }
 
 /**
+ * <a href="https://material.io/components/tabs#scrollable-tabs" class="external" target="_blank">Material Design scrollable tabs</a>.
+ *
+ * When a set of tabs cannot fit on screen, use scrollable tabs. Scrollable tabs can use longer text
+ * labels and a larger number of tabs. They are best used for browsing on touch interfaces.
+ *
+ * ![Scrollable tabs image](https://developer.android.com/images/reference/androidx/compose/material/scrollable-tabs.png)
+ *
  * A ScrollableTabRow contains a row of [Tab]s, and displays an indicator underneath the currently
  * selected tab. A ScrollableTabRow places its tabs offset from the starting edge, and allows
  * scrolling to tabs that are placed off screen. For a fixed tab row that does not allow

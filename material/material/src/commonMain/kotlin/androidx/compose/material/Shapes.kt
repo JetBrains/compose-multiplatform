@@ -23,6 +23,13 @@ import androidx.compose.runtime.staticCompositionLocalOf
 import androidx.compose.ui.unit.dp
 
 /**
+ * <a href="https://material.io/design/shape/about-shape.html" class="external" target="_blank">Material Design shape</a>.
+ *
+ * Material surfaces can be displayed in different shapes. Shapes direct attention, identify
+ * components, communicate state, and express brand.
+ *
+ * ![Shape image](https://developer.android.com/images/reference/androidx/compose/material/shape.png)
+ *
  * Components are grouped into shape categories based on their size. These categories provide a
  * way to change multiple component values at once, by changing the category’s values.
  * Shape categories include:

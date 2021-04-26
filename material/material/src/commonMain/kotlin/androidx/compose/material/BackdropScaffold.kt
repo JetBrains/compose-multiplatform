@@ -189,9 +189,12 @@ fun rememberBackdropScaffoldState(
 }
 
 /**
+ * <a href="https://material.io/components/backdrop" class="external" target="_blank">Material Design backdrop</a>.
+ *
  * A backdrop appears behind all other surfaces in an app, displaying contextual and actionable
- * content. It is composed of two surfaces: a back layer and a front layer. The back layer
- * displays actions and context, and these control and inform the front layer's content.
+ * content.
+ *
+ * ![Backdrop image](https://developer.android.com/images/reference/androidx/compose/material/backdrop.png)
  *
  * This component provides an API to put together several material components to construct your
  * screen. For a similar component which implements the basic material design layout strategy

@@ -46,7 +46,11 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 
 /**
- * Component to represent two states, selected and not selected.
+ * <a href="https://material.io/components/radio-buttons" class="external" target="_blank">Material Design radio button</a>.
+ *
+ * Radio buttons allow users to select one option from a set.
+ *
+ * ![Radio buttons image](https://developer.android.com/images/reference/androidx/compose/material/radio-buttons.png)
  *
  * @sample androidx.compose.material.samples.RadioButtonSample
  *

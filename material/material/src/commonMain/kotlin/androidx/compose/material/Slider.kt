@@ -80,12 +80,16 @@ import kotlinx.coroutines.launch
 import kotlin.math.abs
 
 /**
+ * <a href="https://material.io/components/sliders" class="external" target="_blank">Material Design slider</a>.
+ *
  * Sliders allow users to make selections from a range of values.
  *
  * Sliders reflect a range of values along a bar, from which users may select a single value.
  * They are ideal for adjusting settings such as volume, brightness, or applying image filters.
  *
- * Use continuous sliders allow users to make meaningful selections that don’t
+ * ![Sliders image](https://developer.android.com/images/reference/androidx/compose/material/sliders.png)
+ *
+ * Use continuous sliders to allow users to make meaningful selections that don’t
  * require a specific value:
  *
  * @sample androidx.compose.material.samples.SliderSample
