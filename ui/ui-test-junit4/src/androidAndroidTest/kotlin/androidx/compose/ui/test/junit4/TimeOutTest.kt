@@ -146,6 +146,25 @@ class TimeOutTest {
         }
     }
 
+    @Test(timeout = 10_000)
+    fun checkIdlingResource_causesTimeout() {
+        // Block idleness with an IdlingResource
+        rule.registerIdlingResource(
+            object : androidx.compose.ui.test.IdlingResource {
+                override val isIdleNow: Boolean = false
+                override fun getDiagnosticMessageIfBusy(): String {
+                    return "Never IDLE"
+                }
+            }
+        )
+        IdlingPolicies.setIdlingResourceTimeout(300, TimeUnit.MILLISECONDS)
+        expectError<ComposeNotIdleException>(
+            expectedMessage = ".*\\[busy\\] Never IDLE.*\\[idle\\] .*ComposeIdlingResource.*"
+        ) {
+            rule.waitForIdle()
+        }
+    }
+
     @Test(timeout = 5000)
     fun timeout_testIsolation_check() {
         // This test is here to guarantee that even if we crash on infinite recompositions after

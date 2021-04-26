@@ -34,11 +34,16 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.test.IdlingResource
 import androidx.test.espresso.Espresso.onIdle
 import androidx.test.filters.LargeTest
 import com.google.common.truth.Truth.assertThat
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.runBlocking
 import org.junit.Rule
 import org.junit.Test
+import java.util.concurrent.Executors
 
 @LargeTest
 class ComposeIdlingResourceTest {
@@ -98,6 +103,40 @@ class ComposeIdlingResourceTest {
         onIdle()
         // Verify it was finished
         assertThat(animationRunning).isFalse()
+    }
+
+    @Test
+    fun testIdlingResourcesAreQueried() {
+        val idlingResource = object : IdlingResource {
+            var readCount = MutableStateFlow(0)
+
+            override var isIdleNow: Boolean = false
+                get() {
+                    readCount.value++
+                    return field
+                }
+
+            // Returns a lambda that suspends until isIdleNow is queried 10 more times
+            fun delayedTransitionToIdle(): () -> Unit {
+                return {
+                    runBlocking {
+                        val start = readCount.value
+                        readCount.first { it == start + 10 }
+                        isIdleNow = true
+                    }
+                }
+            }
+        }
+
+        rule.registerIdlingResource(idlingResource)
+        Executors.newSingleThreadExecutor().execute(idlingResource.delayedTransitionToIdle())
+
+        val startReadCount = idlingResource.readCount.value
+        rule.waitForIdle()
+        val endReadCount = idlingResource.readCount.value
+
+        assertThat(idlingResource.isIdleNow).isTrue()
+        assertThat(endReadCount - startReadCount).isAtLeast(10)
     }
 
     @Composable
