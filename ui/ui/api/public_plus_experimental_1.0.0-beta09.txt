@@ -2770,6 +2770,7 @@ package androidx.compose.ui.window {
   }
 
   @androidx.compose.runtime.Immutable public final class PopupProperties {
+    ctor @androidx.compose.ui.ExperimentalComposeUiApi public PopupProperties(optional boolean focusable, optional boolean dismissOnBackPress, optional boolean dismissOnClickOutside, optional androidx.compose.ui.window.SecureFlagPolicy securePolicy, optional boolean excludeFromSystemGesture, optional boolean clippingEnabled, optional boolean useDefaultMaxWidth);
     ctor public PopupProperties(optional boolean focusable, optional boolean dismissOnBackPress, optional boolean dismissOnClickOutside, optional androidx.compose.ui.window.SecureFlagPolicy securePolicy, optional boolean excludeFromSystemGesture, optional boolean clippingEnabled);
     method public boolean getClippingEnabled();
     method public boolean getDismissOnBackPress();
@@ -2777,12 +2778,14 @@ package androidx.compose.ui.window {
     method public boolean getExcludeFromSystemGesture();
     method public boolean getFocusable();
     method public androidx.compose.ui.window.SecureFlagPolicy getSecurePolicy();
+    method @androidx.compose.ui.ExperimentalComposeUiApi public boolean getUseDefaultMaxWidth();
     property public final boolean clippingEnabled;
     property public final boolean dismissOnBackPress;
     property public final boolean dismissOnClickOutside;
     property public final boolean excludeFromSystemGesture;
     property public final boolean focusable;
     property public final androidx.compose.ui.window.SecureFlagPolicy securePolicy;
+    property @androidx.compose.ui.ExperimentalComposeUiApi public final boolean useDefaultMaxWidth;
   }
 
   public enum SecureFlagPolicy {
