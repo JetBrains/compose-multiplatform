@@ -47,6 +47,12 @@ dependencies {
         testImplementation(ANDROIDX_TEST_RUNNER)
         testImplementation(JUNIT)
         testImplementation(TRUTH)
+
+        androidTestImplementation(project(":compose:test-utils"))
+        androidTestImplementation(ANDROIDX_TEST_RULES)
+        androidTestImplementation(ANDROIDX_TEST_RUNNER)
+        androidTestImplementation(JUNIT)
+        androidTestImplementation(TRUTH)
     }
 }
 
@@ -69,11 +75,18 @@ if(AndroidXUiPlugin.isMultiplatformEnabled(project)) {
                 implementation(project(":compose:ui:ui-util"))
             }
 
-            desktopMain.dependencies {
-                implementation(KOTLIN_STDLIB)
-            }
+            desktopMain.dependsOn(jvmMain)
 
             test.dependencies {
+                implementation(ANDROIDX_TEST_RULES)
+                implementation(ANDROIDX_TEST_RUNNER)
+                implementation(JUNIT)
+                implementation(TRUTH)
+            }
+
+            androidAndroidTest.dependencies {
+                implementation(project(":compose:test-utils"))
+
                 implementation(ANDROIDX_TEST_RULES)
                 implementation(ANDROIDX_TEST_RUNNER)
                 implementation(JUNIT)
@@ -89,4 +102,8 @@ androidx {
     mavenGroup = LibraryGroups.Compose.MATERIAL
     inceptionYear = "2020"
     description = "Material ripple used to build interactive components"
+    // Disable strict API mode for MPP builds as it will fail to compile androidAndroidTest
+    // sources, as it doesn't understand that they are tests and thinks they should have explicit
+    // visibility
+    legacyDisableKotlinStrictApiMode = AndroidXUiPlugin.isMultiplatformEnabled(project)
 }

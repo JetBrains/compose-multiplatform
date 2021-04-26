@@ -659,7 +659,7 @@ class MaterialRippleThemeTest {
             }
         }
 
-        rule.runOnUiThread {
+        rule.runOnIdle {
             scope!!.launch {
                 interactionSource.emit(PressInteraction.Press(Offset(10f, 10f)))
             }
@@ -706,8 +706,10 @@ class MaterialRippleThemeTest {
         }
 
         // Start ripple
-        scope.launch {
-            interactionSource.emit(interaction)
+        rule.runOnIdle {
+            scope.launch {
+                interactionSource.emit(interaction)
+            }
         }
 
         // Advance to the end of the ripple / state layer animation
