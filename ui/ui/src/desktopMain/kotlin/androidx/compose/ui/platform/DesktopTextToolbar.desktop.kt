@@ -24,7 +24,6 @@ internal class DesktopTextToolbar : TextToolbar {
         get() = TextToolbarStatus.Hidden
 
     override fun hide() {
-        println("TextToolbar.hide not implemented yet")
     }
 
     override fun showMenu(
@@ -34,6 +33,5 @@ internal class DesktopTextToolbar : TextToolbar {
         onCutRequested: ActionCallback?,
         onSelectAllRequested: ActionCallback?
     ) {
-        println("TextToolbar.showMenu not implemented yet")
     }
 }
