@@ -77,4 +77,6 @@ build_libs.hilt_plugin = "com.google.dagger:hilt-android-gradle-plugin:${build_v
 
 build_libs.shadow = "com.github.jengelman.gradle.plugins:shadow:6.1.0"
 
+build_libs.wire_plugin = "com.squareup.wire:wire-gradle-plugin:3.6.0"
+
 rootProject.ext["build_libs"] = build_libs
