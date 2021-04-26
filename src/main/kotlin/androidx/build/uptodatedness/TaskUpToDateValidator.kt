@@ -16,6 +16,7 @@
 
 package androidx.build.uptodatedness
 
+import androidx.build.VERIFY_UP_TO_DATE
 import org.gradle.api.GradleException
 import org.gradle.api.Project
 import org.gradle.api.Task
@@ -33,7 +34,7 @@ import java.util.Date
  */
 
 const val DISALLOW_TASK_EXECUTION_FLAG_NAME = "disallowExecution"
-const val RECORD_FLAG_NAME = "verifyUpToDate"
+const val RECORD_FLAG_NAME = VERIFY_UP_TO_DATE
 
 // Temporary set of exempt tasks that are known to still be out-of-date after running once
 // Entries in this set may be task names (like assembleDebug) or task paths
@@ -291,7 +292,7 @@ class TaskUpToDateValidator {
             }
 
             val reproductionMessage = "\nTo reproduce this error you can try running " +
-                "`./gradlew ${task.path} -PverifyUpToDate`\n"
+                "`./gradlew ${task.path} -P$RECORD_FLAG_NAME`\n"
             val readLogsMessage = "\nYou can check why Gradle executed ${task.path} by " +
                 "passing the '--info' flag to Gradle and then searching stdout for output " +
                 "generated immediately before the task began to execute.\n" +
