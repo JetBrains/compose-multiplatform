@@ -119,11 +119,11 @@ internal class DesktopOwners(
             dispatcher.flush()
             frameClock.sendFrame(nanoTime)
 
-            listCopy.clear()
             listCopy.addAll(list)
             for (owner in listCopy) {
                 owner.render(canvas, width, height)
             }
+            listCopy.clear()
         }
 
         invalidateIfNeeded()

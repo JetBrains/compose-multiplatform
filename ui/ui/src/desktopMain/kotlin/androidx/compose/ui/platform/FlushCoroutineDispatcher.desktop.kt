@@ -48,11 +48,11 @@ internal class FlushCoroutineDispatcher(
 
     fun flush() {
         synchronized(tasks) {
-            tasksCopy.clear()
             tasksCopy.addAll(tasks)
             tasks.clear()
         }
 
         tasksCopy.forEach(Runnable::run)
+        tasksCopy.clear()
     }
 }
