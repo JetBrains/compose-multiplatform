@@ -5,4 +5,3 @@ pluginManagement {
 }
 
 include(":compose")
-include(":compose-preview-runtime")
