@@ -40,12 +40,13 @@ object BundleInsideHelper {
      *
      * Used project are expected
      *
+     * @see forInsideAar(String, String)
+     *
      * @receiver the project that should bundle jars specified by these configurations
-     * @param from specifies from which package the rename should happen
-     * @param to specifies to which package to put the renamed classes
+     * @param relocations a list of package relocations to apply
      */
     @JvmStatic
-    fun Project.forInsideAar(from: String, to: String) {
+    fun Project.forInsideAar(relocations: List<Relocation>) {
         val bundle = configurations.create("bundleInside")
         val bundleDebug = configurations.create("debugBundleInside") {
             it.extendsFrom(bundle)
@@ -53,8 +54,12 @@ object BundleInsideHelper {
         val bundleRelease = configurations.create("releaseBundleInside") {
             it.extendsFrom(bundle)
         }
-        val repackageRelease = configureRepackageTaskForType("Release", from, to, bundleRelease)
-        val repackageDebug = configureRepackageTaskForType("Debug", from, to, bundleDebug)
+        val repackageRelease = configureRepackageTaskForType(
+            "Release",
+            relocations,
+            bundleRelease
+        )
+        val repackageDebug = configureRepackageTaskForType("Debug", relocations, bundleDebug)
 
         // Add to AGP's configurations so these jars get packaged inside of the aar.
         dependencies.add(
@@ -68,6 +73,26 @@ object BundleInsideHelper {
             task.dependsOn(repackageDebug)
             task.dependsOn(repackageRelease)
         }
+    }
+    /**
+     * Creates 3 configurations for the users to use that will be used bundle these dependency
+     * jars inside of libs/ directory inside of the aar.
+     *
+     * ```
+     * dependencies {
+     *   bundleInside(project(":foo"))
+     * }
+     * ```
+     *
+     * Used project are expected
+     *
+     * @receiver the project that should bundle jars specified by these configurations
+     * @param from specifies from which package the rename should happen
+     * @param to specifies to which package to put the renamed classes
+     */
+    @JvmStatic
+    fun Project.forInsideAar(from: String, to: String) {
+        forInsideAar(listOf(Relocation(from, to)))
     }
 
     /**
@@ -88,7 +113,11 @@ object BundleInsideHelper {
     @JvmStatic
     fun Project.forInsideJar(from: String, to: String) {
         val bundle = configurations.create("bundleInside")
-        val repackage = configureRepackageTaskForType("jar", from, to, bundle)
+        val repackage = configureRepackageTaskForType(
+            "jar",
+            listOf(Relocation(from, to)),
+            bundle
+        )
         dependencies.add("compileOnly", files(repackage.flatMap { it.archiveFile }))
         dependencies.add("testImplementation", files(repackage.flatMap { it.archiveFile }))
 
@@ -165,10 +194,11 @@ object BundleInsideHelper {
         }
     }
 
+    data class Relocation(val from: String, val to: String)
+
     private fun Project.configureRepackageTaskForType(
         type: String,
-        from: String,
-        to: String,
+        relocations: List<Relocation>,
         configuration: Configuration
     ): TaskProvider<ShadowJar> {
         return tasks.register(
@@ -177,7 +207,9 @@ object BundleInsideHelper {
         ) { task ->
             task.apply {
                 configurations = listOf(configuration)
-                relocate(from, to)
+                for (relocation in relocations) {
+                    relocate(relocation.from, relocation.to)
+                }
                 archiveBaseName.set("repackaged-$type")
                 archiveVersion.set("")
                 destinationDirectory.set(File(buildDir, "repackaged"))
