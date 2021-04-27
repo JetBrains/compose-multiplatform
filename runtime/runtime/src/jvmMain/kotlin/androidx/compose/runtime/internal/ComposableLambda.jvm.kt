@@ -33,7 +33,6 @@ import androidx.compose.runtime.Stable
  */
 @Suppress("NAME_SHADOWING")
 @Stable
-@OptIn(ComposeCompilerApi::class)
 /* ktlint-disable parameter-list-wrapping */ // TODO(https://github.com/pinterest/ktlint/issues/921): reenable
 internal actual class ComposableLambdaImpl actual constructor(
     val key: Int,

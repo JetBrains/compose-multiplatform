@@ -68,7 +68,7 @@ package androidx.compose.runtime {
     method @androidx.compose.runtime.Composable public static androidx.compose.runtime.CompositionContext rememberCompositionContext();
   }
 
-  @kotlin.RequiresOptIn(level=kotlin.RequiresOptIn.Level, message="This API is intended to be targeted by the Compose Compiler Plugin and not called " + "directly.") @kotlin.annotation.Target(allowedTargets={kotlin.annotation.AnnotationTarget, kotlin.annotation.AnnotationTarget, kotlin.annotation.AnnotationTarget, kotlin.annotation.AnnotationTarget}) public @interface ComposeCompilerApi {
+  @kotlin.annotation.Target(allowedTargets={kotlin.annotation.AnnotationTarget, kotlin.annotation.AnnotationTarget, kotlin.annotation.AnnotationTarget, kotlin.annotation.AnnotationTarget}) public @interface ComposeCompilerApi {
   }
 
   public interface Composer {
