@@ -18,6 +18,7 @@ package androidx.compose.foundation.text.selection
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
+import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.geometry.Offset
@@ -34,8 +35,10 @@ import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.window.Popup
 import androidx.compose.ui.window.PopupPositionProvider
+import androidx.compose.ui.window.PopupProperties
 import kotlin.math.roundToInt
 
+@OptIn(ExperimentalComposeUiApi::class)
 @Composable
 internal actual fun SelectionHandle(
     startHandlePosition: Offset?,
@@ -157,6 +160,7 @@ private fun HandleDrawLayout(
     }
 }
 
+@OptIn(ExperimentalComposeUiApi::class)
 @Composable
 private fun SelectionHandlePopup(
     startHandlePosition: Offset?,
@@ -181,6 +185,7 @@ private fun SelectionHandlePopup(
 
     Popup(
         popupPositionProvider = popupPositioner,
+        properties = PopupProperties(excludeFromSystemGesture = true),
         content = content
     )
 }
