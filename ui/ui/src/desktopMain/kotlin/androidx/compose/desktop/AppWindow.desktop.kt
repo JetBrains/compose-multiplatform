@@ -111,7 +111,7 @@ class AppWindow : AppFrame {
             "AppWindow should be created inside AWT Event Thread (use SwingUtilities.invokeLater " +
                 "or just dsl for creating window: Window { })"
         }
-        window = ComposeWindow(parent = this)
+        window = ComposeWindow()
         window.apply {
             defaultCloseOperation = WindowConstants.DISPOSE_ON_CLOSE
             addWindowListener(object : WindowAdapter() {
@@ -122,7 +122,7 @@ class AppWindow : AppFrame {
                             onDispose?.invoke()
                             onDismiss?.invoke()
                             events.invokeOnClose()
-                            AppManager.removeWindow(parent)
+                            AppManager.removeWindow(this@AppWindow)
                         }
                     }
                 }
@@ -137,7 +137,7 @@ class AppWindow : AppFrame {
                 override fun windowGainedFocus(event: WindowEvent) {
                     // Dialogs should not receive a common application menu bar
                     if (invoker == null) {
-                        window.setJMenuBar(parent.menuBar?.menuBar)
+                        window.setJMenuBar(this@AppWindow.menuBar?.menuBar)
                     }
                     events.invokeOnFocusGet()
                 }
@@ -417,7 +417,6 @@ class AppWindow : AppFrame {
         window.setContent(parentComposition) {
             CompositionLocalProvider(
                 LocalAppWindow provides this,
-                LocalLayerContainer provides window,
                 content = content
             )
         }
