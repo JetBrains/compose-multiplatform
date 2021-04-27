@@ -19,7 +19,6 @@ package androidx.compose.ui.tooling.inspector
 import android.util.Log
 import android.view.View
 import androidx.compose.foundation.shape.CornerSize
-import androidx.compose.runtime.ComposeCompilerApi
 import androidx.compose.runtime.internal.ComposableLambda
 import androidx.compose.ui.AbsoluteAlignment
 import androidx.compose.ui.Modifier
@@ -273,7 +272,6 @@ internal class ParameterFactory(private val inlineClassConverter: InlineClassCon
             try {
                 recursions++
                 createFromConstant(name, value)?.let { return it }
-                @OptIn(ComposeCompilerApi::class)
                 return when (value) {
                     is AnnotatedString -> NodeParameter(name, ParameterType.String, value.text)
                     is BaselineShift -> createFromBaselineShift(name, value)
@@ -323,7 +321,6 @@ internal class ParameterFactory(private val inlineClassConverter: InlineClassCon
             return NodeParameter(name, ParameterType.String, converted)
         }
 
-        @OptIn(ComposeCompilerApi::class)
         private fun createFromCLambda(name: String, value: ComposableLambda): NodeParameter? = try {
             val lambda = value.javaClass.getDeclaredField("_block")
                 .apply { isAccessible = true }

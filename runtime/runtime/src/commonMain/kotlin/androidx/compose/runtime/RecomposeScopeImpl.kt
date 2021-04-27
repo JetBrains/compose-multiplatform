@@ -37,7 +37,6 @@ interface RecomposeScope {
  * stored in [anchor] and call [block] when recomposition is requested. It is created by
  * [Composer.startRestartGroup] and is used to track how to restart the group.
  */
-@OptIn(ComposeCompilerApi::class)
 internal class RecomposeScopeImpl(
     var composition: CompositionImpl?
 ) : ScopeUpdateScope, RecomposeScope {

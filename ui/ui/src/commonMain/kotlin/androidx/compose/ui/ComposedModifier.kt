@@ -17,7 +17,6 @@
 package androidx.compose.ui
 
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.ComposeCompilerApi
 import androidx.compose.runtime.Composer
 import androidx.compose.ui.platform.InspectorInfo
 import androidx.compose.ui.platform.InspectorValueInfo
@@ -55,7 +54,6 @@ private class ComposedModifier(
  * You almost certainly do not need to call this function directly.
  */
 @Suppress("ModifierFactoryExtensionFunction")
-@OptIn(ComposeCompilerApi::class)
 fun Composer.materialize(modifier: Modifier): Modifier {
     if (modifier.all { it !is ComposedModifier }) return modifier
 

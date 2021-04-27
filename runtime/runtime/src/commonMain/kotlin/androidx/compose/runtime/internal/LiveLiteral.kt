@@ -63,7 +63,6 @@ var isLiveLiteralsEnabled: Boolean = false
  * Caution: This API is intended to be used by tooling only. Use at your own risk.
  */
 @InternalComposeApi
-@OptIn(ComposeCompilerApi::class)
 fun enableLiveLiterals() {
     isLiveLiteralsEnabled = true
 }
