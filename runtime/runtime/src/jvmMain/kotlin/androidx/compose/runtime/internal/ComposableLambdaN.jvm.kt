@@ -27,7 +27,6 @@ import kotlin.jvm.functions.FunctionN
 private const val SLOTS_PER_INT = 10
 
 @Stable
-@OptIn(ComposeCompilerApi::class)
 internal class ComposableLambdaNImpl(
     val key: Int,
     private val tracked: Boolean,

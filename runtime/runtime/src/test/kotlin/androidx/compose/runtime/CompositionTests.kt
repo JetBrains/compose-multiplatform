@@ -1952,7 +1952,6 @@ class CompositionTests {
         var innerScope: RecomposeScope? = null
 
         @Composable
-        @OptIn(ComposeCompilerApi::class)
         fun Test() {
             outerScope = currentRecomposeScope
             outerKeys.add(currentComposer.compoundKeyHash)
@@ -2516,7 +2515,6 @@ class CompositionTests {
         expectNoChanges()
     }
 
-    @OptIn(ComposeCompilerApi::class)
     @Test
     fun testApplierBeginEndCallbacks() = compositionTest {
         val checks = mutableListOf<String>()

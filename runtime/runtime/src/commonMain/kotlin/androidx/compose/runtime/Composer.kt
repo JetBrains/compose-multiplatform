@@ -16,7 +16,6 @@
 
 @file:OptIn(
     InternalComposeApi::class,
-    ComposeCompilerApi::class
 )
 package androidx.compose.runtime
 
@@ -3010,7 +3009,6 @@ inline class Updater<T> constructor(
      * @see update
      */
     @Suppress("NOTHING_TO_INLINE") // Inlining the compare has noticeable impact
-    @OptIn(ComposeCompilerApi::class)
     inline fun set(
         value: Int,
         noinline block: T.(value: Int) -> Unit
