@@ -251,6 +251,9 @@ internal abstract class LayoutNodeWrapper(
                 it.destroy()
                 layoutNode.innerLayerWrapperIsDirty = true
                 invalidateParentLayer()
+                if (isAttached) {
+                    layoutNode.owner?.onLayoutChange(layoutNode)
+                }
             }
             layer = null
         }
@@ -285,6 +288,7 @@ internal abstract class LayoutNodeWrapper(
         } else {
             require(layerBlock == null)
         }
+        layoutNode.owner?.onLayoutChange(layoutNode)
     }
 
     private val invalidateParentLayer: () -> Unit = {
