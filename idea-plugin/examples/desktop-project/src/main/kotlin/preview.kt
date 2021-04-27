@@ -1,10 +1,11 @@
 import androidx.compose.material.Text
 import androidx.compose.material.Button
 import androidx.compose.runtime.*
-import androidx.compose.ui.tooling.desktop.preview.Preview
+import androidx.compose.desktop.ui.tooling.preview.Preview
 
 @Preview
-fun examplePreview() = @Composable {
+@Composable
+fun examplePreview() {
     var text by remember { mutableStateOf("Hello, World!") }
 
     Button(onClick = {

@@ -3,7 +3,7 @@ import org.jetbrains.compose.compose
 plugins {
     // __KOTLIN_COMPOSE_VERSION__
     kotlin("jvm") version "1.5.10"
-    id("org.jetbrains.compose") version "0.4.0-idea-preview-build57"
+    id("org.jetbrains.compose") version "0.0.0-non-interactive-preview-build88"
 }
 
 repositories {
@@ -13,6 +13,7 @@ repositories {
 
 dependencies {
     implementation("org.jetbrains.kotlinx:kotlinx-collections-immutable:0.3.4")
+    implementation(compose.uiTooling)
     implementation(compose.desktop.currentOs)
     implementation("org.jetbrains.kotlin:kotlin-reflect")
 }
