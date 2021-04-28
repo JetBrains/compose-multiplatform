@@ -22,7 +22,6 @@ import android.view.autofill.AutofillManager
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.geometry.Rect
 import androidx.compose.ui.graphics.toComposeRect
-import androidx.compose.ui.test.ComposeUiRobolectricTestRunner
 import com.google.common.truth.Truth.assertThat
 import org.junit.Before
 import org.junit.Rule
@@ -30,13 +29,14 @@ import org.junit.Test
 import org.junit.rules.ExpectedException
 import org.junit.runner.RunWith
 import org.robolectric.Robolectric
+import org.robolectric.RobolectricTestRunner
 import org.robolectric.annotation.Config
 import org.robolectric.annotation.Implementation
 import org.robolectric.annotation.Implements
 import org.robolectric.shadow.api.Shadow
 
 @OptIn(ExperimentalComposeUiApi::class)
-@RunWith(ComposeUiRobolectricTestRunner::class)
+@RunWith(RobolectricTestRunner::class)
 @Config(
     shadows = [ShadowAutofillManager::class],
     minSdk = 26
