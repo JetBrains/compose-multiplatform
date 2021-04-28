@@ -21,10 +21,14 @@ import android.view.View
 import android.view.ViewGroup
 import android.view.inspector.WindowInspector
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.text.BasicText
 import androidx.compose.material.AlertDialog
 import androidx.compose.material.Button
@@ -49,6 +53,7 @@ import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.inspection.rules.show
 import androidx.compose.ui.inspection.testdata.TestActivity
 import androidx.compose.ui.layout.GraphicLayerInfo
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalInspectionMode
 import androidx.compose.ui.platform.isDebugInspectorInfoEnabled
 import androidx.compose.ui.semantics.clearAndSetSemantics
@@ -64,6 +69,7 @@ import androidx.compose.ui.tooling.data.position
 import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.test.ext.junit.rules.ActivityScenarioRule
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.LargeTest
@@ -530,17 +536,106 @@ class LayoutInspectorTreeTest {
         assertThat(button.height).isLessThan(dialogView.height)
     }
 
+    // WARNING: The formatting of the lines below here affect test results.
+    val titleLine = Throwable().stackTrace[0].lineNumber + 3
+
+    @Composable
+    private fun Title() {
+        val maxOffset = with(LocalDensity.current) { 80.dp.toPx() }
+        val minOffset = with(LocalDensity.current) { 80.dp.toPx() }
+        val offset = maxOffset.coerceAtLeast(minOffset)
+        Column(
+            verticalArrangement = Arrangement.Bottom,
+            modifier = Modifier
+                .heightIn(min = 128.dp)
+                .graphicsLayer { translationY = offset }
+                .background(color = MaterialTheme.colors.background)
+        ) {
+            Spacer(Modifier.height(16.dp))
+            Text(
+                text = "Snack",
+                style = MaterialTheme.typography.h4,
+                color = MaterialTheme.colors.secondary,
+                modifier = Modifier.padding(horizontal = 24.dp)
+            )
+            Text(
+                text = "Tagline",
+                style = MaterialTheme.typography.subtitle2,
+                fontSize = 20.sp,
+                color = MaterialTheme.colors.secondary,
+                modifier = Modifier.padding(horizontal = 24.dp)
+            )
+            Spacer(Modifier.height(4.dp))
+            Text(
+                text = "$2.95",
+                style = MaterialTheme.typography.h6,
+                color = MaterialTheme.colors.primary,
+                modifier = Modifier.padding(horizontal = 24.dp)
+            )
+            Spacer(Modifier.height(8.dp))
+        }
+    }
+    // WARNING: End formatted section
+
+    @Test
+    fun testLineNumbers() {
+        // WARNING: The formatting of the lines below here affect test results.
+        val testLine = Throwable().stackTrace[0].lineNumber
+        val slotTableRecord = CompositionDataRecord.create()
+
+        show {
+            Inspectable(slotTableRecord) {
+                Column {
+                    Title()
+                }
+            }
+        }
+        // WARNING: End formatted section
+
+        val androidComposeView = findAndroidComposeView()
+        androidComposeView.setTag(R.id.inspection_slot_table_set, slotTableRecord.store)
+        val builder = LayoutInspectorTree()
+        val nodes = builder.convert(androidComposeView)
+        dumpNodes(nodes, androidComposeView, builder)
+
+        validate(nodes, builder, checkLineNumbers = true, checkRenderNodes = false) {
+            node("Column", lineNumber = testLine + 5, children = listOf("Title"))
+            node("Title", lineNumber = testLine + 6, children = listOf("Column"))
+            node(
+                name = "Column",
+                lineNumber = titleLine + 4,
+                children = listOf("Spacer", "Text", "Text", "Spacer", "Text", "Spacer")
+            )
+            node("Spacer", lineNumber = titleLine + 11)
+            node("Text", lineNumber = titleLine + 12)
+            node("Text", lineNumber = titleLine + 18)
+            node("Spacer", lineNumber = titleLine + 25)
+            node("Text", lineNumber = titleLine + 26)
+            node("Spacer", lineNumber = titleLine + 32)
+        }
+    }
+
     @Suppress("SameParameterValue")
     private fun validate(
         result: List<InspectorNode>,
         builder: LayoutInspectorTree,
         checkParameters: Boolean = false,
         checkSemantics: Boolean = false,
+        checkLineNumbers: Boolean = false,
+        checkRenderNodes: Boolean = true,
         block: TreeValidationReceiver.() -> Unit = {}
     ) {
         val nodes = result.flatMap { flatten(it) }.listIterator()
         ignoreStart(nodes, "Box", "Inspectable", "CompositionLocalProvider")
-        val tree = TreeValidationReceiver(nodes, density, checkParameters, checkSemantics, builder)
+        val tree = TreeValidationReceiver(
+            nodes,
+            density,
+            checkParameters,
+            checkSemantics,
+            checkLineNumbers,
+            checkRenderNodes,
+            builder
+        )
         tree.block()
     }
 
@@ -555,6 +650,8 @@ class LayoutInspectorTreeTest {
         val density: Density,
         val checkParameters: Boolean,
         val checkSemantics: Boolean,
+        val checkLineNumbers: Boolean,
+        val checkRenderNodes: Boolean,
         val builder: LayoutInspectorTree
     ) {
         fun node(
@@ -582,10 +679,12 @@ class LayoutInspectorTreeTest {
             if (lineNumber != -1) {
                 assertWithMessage(message).that(node.lineNumber).isEqualTo(lineNumber)
             }
-            if (isRenderNode) {
-                assertWithMessage(message).that(node.id).isGreaterThan(0L)
-            } else {
-                assertWithMessage(message).that(node.id).isLessThan(0L)
+            if (checkRenderNodes) {
+                if (isRenderNode) {
+                    assertWithMessage(message).that(node.id).isGreaterThan(0L)
+                } else {
+                    assertWithMessage(message).that(node.id).isLessThan(0L)
+                }
             }
             if (hasTransformations) {
                 assertWithMessage(message).that(node.bounds).isNotNull()
@@ -611,6 +710,10 @@ class LayoutInspectorTreeTest {
                 val unmerged = node.unmergedSemantics.singleOrNull { it.name == "Text" }?.value
                 assertWithMessage(message).that(unmerged?.toString() ?: "")
                     .isEqualTo(unmergedSemantics)
+            }
+
+            if (checkLineNumbers) {
+                assertThat(node.lineNumber).isEqualTo(lineNumber)
             }
 
             if (checkParameters) {
