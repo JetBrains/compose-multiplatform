@@ -572,6 +572,7 @@ private val dackkaDirsToProcess = listOf(
     "androidx/compose/**",
     "androidx/navigation/**",
     "androidx/paging/**",
+    "androidx/room/**",
     "androidx/window/**"
 )
 
