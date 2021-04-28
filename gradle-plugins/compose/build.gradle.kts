@@ -25,6 +25,7 @@ buildConfig {
     packageName = "org.jetbrains.compose"
     clsName = "ComposeBuildConfig"
     buildConfigField("String", "composeVersion", BuildProperties.composeVersion(project))
+    buildConfigField("Boolean", "isComposeWithWeb", BuildProperties.isComposeWithWeb(project).toString())
 }
 
 val embedded by configurations.creating
