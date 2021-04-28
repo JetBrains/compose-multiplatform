@@ -22,13 +22,6 @@ plugins {
     id("com.android.library")
 }
 
-android {
-    compileOptions {
-        targetCompatibility = JavaVersion.VERSION_1_7
-        sourceCompatibility = JavaVersion.VERSION_1_7
-    }
-}
-
 dependencies {
     api("androidx.annotation:annotation:1.1.0")
 }
