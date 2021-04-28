@@ -16,6 +16,7 @@ import org.jetbrains.compose.desktop.DesktopExtension
 import org.jetbrains.compose.desktop.application.internal.configureApplicationImpl
 import org.jetbrains.compose.desktop.application.internal.currentTarget
 import org.jetbrains.compose.desktop.preview.internal.initializePreview
+import org.jetbrains.compose.web.internal.initializeWeb
 import org.jetbrains.kotlin.gradle.plugin.KotlinDependencyHandler
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
@@ -37,8 +38,11 @@ class ComposePlugin : Plugin<Project> {
         }
 
         project.initializePreview()
+        if (ComposeBuildConfig.isComposeWithWeb) {
+            project.initializeWeb(composeExtension)
+        }
 
-        project.pluginManager.apply(ComposeCompilerKotlinSupportPlugin::class.java)
+        project.plugins.apply(ComposeCompilerKotlinSupportPlugin::class.java)
 
         project.afterEvaluate {
             if (desktopExtension._isApplicationInitialized) {
@@ -112,6 +116,9 @@ class ComposePlugin : Plugin<Project> {
         val runtime get() = composeDependency("org.jetbrains.compose.runtime:runtime")
         val ui get() = composeDependency("org.jetbrains.compose.ui:ui")
         val materialIconsExtended get() = composeDependency("org.jetbrains.compose.material:material-icons-extended")
+        val web: WebDependencies =
+            if (ComposeBuildConfig.isComposeWithWeb) WebDependencies
+            else error("This version of Compose plugin does not support 'compose.web.*' dependencies")
     }
 
     object DesktopDependencies {
@@ -139,6 +146,12 @@ class ComposePlugin : Plugin<Project> {
 
         val currentOs by lazy {
             composeDependency("org.jetbrains.compose.desktop:desktop-jvm-${currentTarget.id}")
+        }
+    }
+
+    object WebDependencies {
+        val web by lazy {
+            composeDependency("org.jetbrains.compose.web:web")
         }
     }
 }
