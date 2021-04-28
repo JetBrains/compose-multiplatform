@@ -118,6 +118,7 @@ val ALLOW_RERUNNING_TASKS = setOf(
     ":camera:integration-tests:camera-testapp-core:packageDebug",
     ":camera:integration-tests:camera-testapp-extensions:mergeLibDexDebug",
     ":camera:integration-tests:camera-testapp-extensions:packageDebug",
+    ":camera:integration-tests:camera-testapp-extensions:GenerateTestConfigurationdebugAndroidTest",
     ":camera:integration-tests:camera-testapp-uiwidgets:mergeLibDexDebug",
     ":camera:integration-tests:camera-testapp-uiwidgets:packageDebug",
     ":camera:integration-tests:camera-testapp-core:GenerateTestConfigurationdebug",
