@@ -674,9 +674,9 @@ class AndroidXPlugin : Plugin<Project> {
         const val EXTENSION_NAME = "androidx"
 
         /**
-         * Fail the build if a non-Studio task runs for more than 30 minutes.
+         * Fail the build if a non-Studio task runs longer than expected
          */
-        const val TASK_TIMEOUT_MINUTES = 30L
+        const val TASK_TIMEOUT_MINUTES = 45L
     }
 }
 
