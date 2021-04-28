@@ -217,6 +217,10 @@ internal class RenderNodeApi23(val ownerView: AndroidComposeView) : DeviceRender
         return renderNode.getMatrix(matrix)
     }
 
+    override fun getInverseMatrix(matrix: android.graphics.Matrix) {
+        return renderNode.getInverseMatrix(matrix)
+    }
+
     override fun drawInto(canvas: android.graphics.Canvas) {
         (canvas as DisplayListCanvas).drawRenderNode(renderNode)
     }
