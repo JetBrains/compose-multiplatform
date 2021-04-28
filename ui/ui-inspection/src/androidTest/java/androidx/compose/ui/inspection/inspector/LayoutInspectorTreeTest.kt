@@ -25,6 +25,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
@@ -45,6 +46,7 @@ import androidx.compose.runtime.InternalComposeApi
 import androidx.compose.runtime.currentComposer
 import androidx.compose.runtime.tooling.CompositionData
 import androidx.compose.runtime.tooling.LocalInspectionTables
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.R
 import androidx.compose.ui.graphics.Color
@@ -69,6 +71,7 @@ import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.window.Popup
 import androidx.test.ext.junit.rules.ActivityScenarioRule
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.LargeTest
@@ -455,7 +458,7 @@ class LayoutInspectorTreeTest {
     }
 
     @Test
-    fun testFilterOutAlertDialogFromApp() {
+    fun testDialog() {
         val slotTableRecord = CompositionDataRecord.create()
 
         show {
@@ -474,25 +477,108 @@ class LayoutInspectorTreeTest {
             }
         }
         val composeViews = findAllAndroidComposeViews()
-        val appView = composeViews[0] // composeView[1] contains the contents of the dialog
+        val appView = composeViews[0]
+        val dialogView = composeViews[1]
         appView.setTag(R.id.inspection_slot_table_set, slotTableRecord.store)
-        val builder = LayoutInspectorTree()
-        val nodes = builder.convert(appView)
-        dumpNodes(nodes, appView, builder)
+        dialogView.setTag(R.id.inspection_slot_table_set, slotTableRecord.store)
 
-        // Verify that there are no Composable nodes from the dialog in the application itself:
-        validate(nodes, builder) {
+        val builder = LayoutInspectorTree()
+
+        val appNodes = builder.convert(appView)
+        dumpNodes(appNodes, appView, builder)
+
+        // Verify that the main app does not contain the Popup
+        validate(appNodes, builder) {
             node(
                 name = "Column",
                 fileName = "LayoutInspectorTreeTest.kt",
-                left = 0.0.dp, top = 0.0.dp, width = 76.0.dp, height = 18.9.dp,
                 children = listOf("Text")
             )
             node(
                 name = "Text",
                 isRenderNode = true,
                 fileName = "LayoutInspectorTreeTest.kt",
-                left = 0.0.dp, top = 0.0.dp, width = 76.0.dp, height = 18.9.dp,
+            )
+        }
+
+        val dialogContentNodes = builder.convert(dialogView)
+        val dialogNodes = builder.addSubCompositionRoots(dialogView, dialogContentNodes)
+        dumpNodes(dialogNodes, dialogView, builder)
+
+        // Verify that the AlertDialog is captured with content
+        validate(dialogNodes, builder, ignoreElementsFromShow = false) {
+            node(
+                name = "AlertDialog",
+                fileName = "LayoutInspectorTreeTest.kt",
+                children = listOf("Button")
+            )
+            node(
+                name = "Button",
+                fileName = "LayoutInspectorTreeTest.kt",
+                isRenderNode = true,
+                children = listOf("Text")
+            )
+            node(
+                name = "Text",
+                isRenderNode = true,
+                fileName = "LayoutInspectorTreeTest.kt",
+            )
+        }
+    }
+
+    @Test
+    fun testPopup() {
+        val slotTableRecord = CompositionDataRecord.create()
+
+        show {
+            Inspectable(slotTableRecord) {
+                Column(modifier = Modifier.fillMaxSize()) {
+                    Text("Compose Text")
+                    Popup(alignment = Alignment.Center) {
+                        Text("This is a popup")
+                    }
+                }
+            }
+        }
+        val composeViews = findAllAndroidComposeViews()
+        val appView = composeViews[0]
+        val popupView = composeViews[1]
+        appView.setTag(R.id.inspection_slot_table_set, slotTableRecord.store)
+        popupView.setTag(R.id.inspection_slot_table_set, slotTableRecord.store)
+        val builder = LayoutInspectorTree()
+
+        val appNodes = builder.convert(appView)
+        dumpNodes(appNodes, appView, builder)
+
+        // Verify that the main app does not contain the Popup
+        validate(appNodes, builder) {
+            node(
+                name = "Column",
+                fileName = "LayoutInspectorTreeTest.kt",
+                children = listOf("Text")
+            )
+            node(
+                name = "Text",
+                isRenderNode = true,
+                fileName = "LayoutInspectorTreeTest.kt",
+            )
+        }
+
+        val popupContentNodes = builder.convert(popupView)
+        val popupNodes = builder.addSubCompositionRoots(popupView, popupContentNodes)
+        dumpNodes(popupNodes, popupView, builder)
+
+        // Verify that the Popup is captured with content
+        validate(popupNodes, builder, ignoreElementsFromShow = false) {
+            node(
+                name = "Popup",
+                fileName = "LayoutInspectorTreeTest.kt",
+                children = listOf("Text")
+            )
+            node(
+                name = "Text",
+                isRenderNode = true,
+                fileName = "LayoutInspectorTreeTest.kt",
             )
         }
     }
@@ -584,10 +670,13 @@ class LayoutInspectorTreeTest {
         checkSemantics: Boolean = false,
         checkLineNumbers: Boolean = false,
         checkRenderNodes: Boolean = true,
+        ignoreElementsFromShow: Boolean = true,
         block: TreeValidationReceiver.() -> Unit = {}
     ) {
         val nodes = result.flatMap { flatten(it) }.listIterator()
-        ignoreStart(nodes, "Box")
+        if (ignoreElementsFromShow) {
+            ignoreStart(nodes, "Box")
+        }
         val tree = TreeValidationReceiver(
             nodes,
             density,

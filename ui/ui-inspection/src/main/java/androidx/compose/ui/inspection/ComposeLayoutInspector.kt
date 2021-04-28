@@ -283,7 +283,7 @@ class ComposeLayoutInspector(
     ): List<AndroidComposeViewWrapper> {
         ThreadUtils.assertOnMainThread()
 
-        layoutInspectorTree.resetGeneratedId()
+        layoutInspectorTree.resetAccumulativeState()
         return WindowInspector.getGlobalWindowViews()
             .asSequence()
             .filter { root ->

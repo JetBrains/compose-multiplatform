@@ -18,6 +18,8 @@ package androidx.compose.ui.inspection.inspector
 
 import androidx.compose.ui.layout.LayoutInfo
 
+internal const val UNDEFINED_ID = 0L
+
 /**
  * Node representing a Composable for the Layout Inspector.
  */
@@ -137,7 +139,7 @@ class RawParameter(val name: String, val value: Any?)
  * Mutable version of [InspectorNode].
  */
 internal class MutableInspectorNode {
-    var id = 0L
+    var id = UNDEFINED_ID
     val layoutNodes = mutableListOf<LayoutInfo>()
     val mergedSemantics = mutableListOf<RawParameter>()
     val unmergedSemantics = mutableListOf<RawParameter>()
@@ -157,7 +159,7 @@ internal class MutableInspectorNode {
 
     fun reset() {
         markUnwanted()
-        id = 0L
+        id = UNDEFINED_ID
         left = 0
         top = 0
         width = 0
