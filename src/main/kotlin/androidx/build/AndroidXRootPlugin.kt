@@ -112,7 +112,7 @@ class AndroidXRootPlugin : Plugin<Project> {
                 )
             )
             project.plugins.withType(AndroidBasePlugin::class.java) {
-                buildOnServerTask.dependsOn("${project.path}:assembleDebug")
+                buildOnServerTask.dependsOn("${project.path}:assembleRelease")
                 if (!project.usingMaxDepVersions()) {
                     project.afterEvaluate {
                         project.agpVariants.all { variant ->
