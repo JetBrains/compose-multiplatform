@@ -22,6 +22,8 @@ import androidx.compose.runtime.tooling.CompositionData
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.R
 import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.inspection.framework.ancestors
+import androidx.compose.ui.inspection.framework.isRoot
 import androidx.compose.ui.layout.GraphicLayerInfo
 import androidx.compose.ui.layout.LayoutInfo
 import androidx.compose.ui.node.RootForTest
@@ -206,7 +208,8 @@ class LayoutInspectorTree {
 
     @OptIn(InternalComposeApi::class)
     private fun convert(tables: Set<CompositionData>, view: View): List<InspectorNode> {
-        view.getLocationOnScreen(rootLocation)
+        val decorView = view.ancestors().first { it.isRoot() }
+        decorView.getLocationOnScreen(rootLocation)
         val trees = tables.mapNotNull { convert(it, view) }
         return when (trees.size) {
             0 -> listOf()
