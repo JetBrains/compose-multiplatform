@@ -23,9 +23,9 @@ import androidx.compose.ui.draw.DrawModifier
 import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.focus.FocusDirectionInternal
 import androidx.compose.ui.focus.FocusManager
+import androidx.compose.ui.geometry.MutableRect
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Canvas
-import androidx.compose.ui.graphics.Matrix
 import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.graphics.TransformOrigin
 import androidx.compose.ui.graphics.drawscope.ContentDrawScope
@@ -1854,8 +1854,10 @@ private class MockOwner(
             override fun destroy() {
             }
 
-            override fun getMatrix(matrix: Matrix) {
+            override fun mapBounds(rect: MutableRect, inverse: Boolean) {
             }
+
+            override fun mapOffset(point: Offset, inverse: Boolean) = point
         }
     }
 
