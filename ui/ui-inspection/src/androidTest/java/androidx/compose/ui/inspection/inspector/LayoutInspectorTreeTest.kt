@@ -46,6 +46,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.R
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.inspection.framework.ancestors
+import androidx.compose.ui.inspection.framework.isRoot
 import androidx.compose.ui.inspection.rules.show
 import androidx.compose.ui.inspection.testdata.TestActivity
 import androidx.compose.ui.layout.GraphicLayerInfo
@@ -629,7 +631,8 @@ class LayoutInspectorTreeTest {
 
     private fun findTopPosition(view: View): Dp {
         val location = IntArray(2)
-        view.getLocationOnScreen(location)
+        val decorView = view.ancestors().first { it.isRoot() }
+        decorView.getLocationOnScreen(location)
         return with(density) { location[1].toDp() }
     }
 
