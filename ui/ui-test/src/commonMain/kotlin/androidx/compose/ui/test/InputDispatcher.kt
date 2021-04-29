@@ -59,13 +59,6 @@ internal abstract class InputDispatcher(
 ) {
     companion object {
         /**
-         * Whether or not injection of events should be suspended in between events until [now]
-         * is at least the `eventTime` of the next event to inject. If `true`, will suspend until
-         * the next `eventTime`, if `false`, will send the event immediately without suspending.
-         */
-        internal var dispatchInRealTime: Boolean = true
-
-        /**
          * The minimum time between two successive injected MotionEvents, 10 milliseconds.
          * Ideally, the value should reflect a realistic pointer input sample rate, but that
          * depends on too many factors. Instead, the value is chosen comfortably below the
@@ -79,21 +72,6 @@ internal abstract class InputDispatcher(
          */
         private const val DownTimeNotSet = -1L
     }
-
-    /**
-     * The time difference between enqueuing the first event of the gesture and dispatching it.
-     *
-     * When the first event of a gesture is enqueued, its eventTime is fixed to the current time.
-     * However, there is inevitably some time between enqueuing and dispatching of that event.
-     * This means that event is going to be "late" by [gestureLateness] milliseconds when it is
-     * dispatched. Because the dispatcher wants to align events with the current time, it will
-     * dispatch all events that are late immediately and without delay, until it has reached an
-     * event whose eventTime is in the future (i.e. an event that is "early").
-     *
-     * The [gestureLateness] will be used to offset all events, effectively aligning the first
-     * event with the dispatch time.
-     */
-    protected var gestureLateness: Long? = null
 
     /**
      * The down time of the next gesture, if a gesture will follow the one that is currently in
@@ -128,7 +106,6 @@ internal abstract class InputDispatcher(
         val state = testContext.states.remove(root)
         if (state?.partialGesture != null) {
             nextDownTime = state.nextDownTime
-            gestureLateness = state.gestureLateness
             partialGesture = state.partialGesture
         }
     }
@@ -138,7 +115,6 @@ internal abstract class InputDispatcher(
             testContext.states[root] =
                 InputDispatcherState(
                     nextDownTime,
-                    gestureLateness,
                     partialGesture
                 )
         }
@@ -598,14 +574,10 @@ internal class PartialGesture(val downTime: Long, startPosition: Offset, pointer
  * @param nextDownTime The downTime of the start of the next gesture, when chaining gestures.
  * This property will only be restored if an incomplete gesture was in progress when the
  * state of the [InputDispatcher] was saved.
- * @param gestureLateness The time difference in milliseconds between enqueuing the first
- * event of the gesture and dispatching it. Depending on the implementation of
- * [InputDispatcher], this may or may not be used.
  * @param partialGesture The state of an incomplete gesture. If no gesture was in progress
  * when the state of the [InputDispatcher] was saved, this will be `null`.
  */
 internal data class InputDispatcherState(
     val nextDownTime: Long,
-    var gestureLateness: Long?,
     val partialGesture: PartialGesture?
 )

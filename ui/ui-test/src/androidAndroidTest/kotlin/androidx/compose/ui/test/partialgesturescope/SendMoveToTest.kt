@@ -55,7 +55,7 @@ class SendMoveToTest() {
     val rule = createComposeRule()
 
     @get:Rule
-    val inputDispatcherRule: TestRule = InputDispatcherTestRule(disableDispatchInRealTime = true)
+    val inputDispatcherRule: TestRule = InputDispatcherTestRule()
 
     private val recorder = MultiPointerInputRecorder()
 

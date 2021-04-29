@@ -26,20 +26,13 @@ import org.junit.runners.model.Statement
  * of MotionEvents in real time (skips the suspend before injection of an event) or to change
  * the time between consecutive injected events.
  *
- * @param disableDispatchInRealTime If set, controls whether or not events with an eventTime
- * in the future will be dispatched as soon as possible or at that exact eventTime. If
- * `false` or not set, will suspend until the eventTime, if `true`, will send the event
- * immediately without suspending. See also [InputDispatcher.dispatchInRealTime].
  * @param eventPeriodOverride If set, specifies a different period in milliseconds between
  * two consecutive injected motion events injected by this [InputDispatcher]. If not
  * set, the event period of 10 milliseconds is unchanged.
  *
  * @see InputDispatcher.eventPeriodMillis
  */
-internal class InputDispatcherTestRule(
-    private val disableDispatchInRealTime: Boolean = false,
-    private val eventPeriodOverride: Long? = null
-) : TestRule {
+internal class InputDispatcherTestRule(private val eventPeriodOverride: Long? = null) : TestRule {
 
     override fun apply(base: Statement, description: Description?): Statement {
         return ModifyingStatement(base)
@@ -47,18 +40,12 @@ internal class InputDispatcherTestRule(
 
     inner class ModifyingStatement(private val base: Statement) : Statement() {
         override fun evaluate() {
-            if (disableDispatchInRealTime) {
-                InputDispatcher.dispatchInRealTime = false
-            }
             if (eventPeriodOverride != null) {
                 InputDispatcher.eventPeriodMillis = eventPeriodOverride
             }
             try {
                 base.evaluate()
             } finally {
-                if (disableDispatchInRealTime) {
-                    InputDispatcher.dispatchInRealTime = true
-                }
                 if (eventPeriodOverride != null) {
                     InputDispatcher.eventPeriodMillis = 10L
                 }
