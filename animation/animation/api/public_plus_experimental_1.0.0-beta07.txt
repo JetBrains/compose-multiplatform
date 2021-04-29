@@ -1,0 +1,86 @@
+// Signature format: 4.0
+package androidx.compose.animation {
+
+  public final class AndroidActualDefaultDecayAnimationSpec_androidKt {
+    method @Deprecated @androidx.compose.runtime.Composable public static androidx.compose.animation.core.DecayAnimationSpec<java.lang.Float> defaultDecayAnimationSpec();
+  }
+
+  public final class AnimatedVisibilityKt {
+    method @androidx.compose.animation.ExperimentalAnimationApi @androidx.compose.runtime.Composable public static void AnimatedVisibility(boolean visible, optional androidx.compose.ui.Modifier modifier, optional androidx.compose.animation.EnterTransition enter, optional androidx.compose.animation.ExitTransition exit, optional boolean initiallyVisible, kotlin.jvm.functions.Function0<kotlin.Unit> content);
+    method @androidx.compose.animation.ExperimentalAnimationApi @androidx.compose.runtime.Composable public static void AnimatedVisibility(androidx.compose.foundation.layout.RowScope, boolean visible, optional androidx.compose.ui.Modifier modifier, optional androidx.compose.animation.EnterTransition enter, optional androidx.compose.animation.ExitTransition exit, optional boolean initiallyVisible, kotlin.jvm.functions.Function0<kotlin.Unit> content);
+    method @androidx.compose.animation.ExperimentalAnimationApi @androidx.compose.runtime.Composable public static void AnimatedVisibility(androidx.compose.foundation.layout.ColumnScope, boolean visible, optional androidx.compose.ui.Modifier modifier, optional androidx.compose.animation.EnterTransition enter, optional androidx.compose.animation.ExitTransition exit, optional boolean initiallyVisible, kotlin.jvm.functions.Function0<kotlin.Unit> content);
+  }
+
+  public final class AnimationModifierKt {
+    method public static androidx.compose.ui.Modifier animateContentSize(androidx.compose.ui.Modifier, optional androidx.compose.animation.core.FiniteAnimationSpec<androidx.compose.ui.unit.IntSize> animationSpec, optional kotlin.jvm.functions.Function2<? super androidx.compose.ui.unit.IntSize,? super androidx.compose.ui.unit.IntSize,kotlin.Unit>? finishedListener);
+  }
+
+  public final class ColorVectorConverterKt {
+    method public static kotlin.jvm.functions.Function1<androidx.compose.ui.graphics.colorspace.ColorSpace,androidx.compose.animation.core.TwoWayConverter<androidx.compose.ui.graphics.Color,androidx.compose.animation.core.AnimationVector4D>> getVectorConverter(androidx.compose.ui.graphics.Color.Companion);
+  }
+
+  public final class CrossfadeKt {
+    method @androidx.compose.runtime.Composable public static <T> void Crossfade(T? targetState, optional androidx.compose.ui.Modifier modifier, optional androidx.compose.animation.core.FiniteAnimationSpec<java.lang.Float> animationSpec, kotlin.jvm.functions.Function1<? super T,kotlin.Unit> content);
+  }
+
+  public final class EnterExitTransitionKt {
+    method @androidx.compose.animation.ExperimentalAnimationApi @androidx.compose.runtime.Stable public static androidx.compose.animation.EnterTransition expandHorizontally(optional androidx.compose.ui.Alignment.Horizontal expandFrom, optional kotlin.jvm.functions.Function1<? super java.lang.Integer,java.lang.Integer> initialWidth, optional androidx.compose.animation.core.FiniteAnimationSpec<androidx.compose.ui.unit.IntSize> animationSpec, optional boolean clip);
+    method @androidx.compose.animation.ExperimentalAnimationApi @androidx.compose.runtime.Stable public static androidx.compose.animation.EnterTransition expandIn(optional androidx.compose.ui.Alignment expandFrom, optional kotlin.jvm.functions.Function1<? super androidx.compose.ui.unit.IntSize,androidx.compose.ui.unit.IntSize> initialSize, optional androidx.compose.animation.core.FiniteAnimationSpec<androidx.compose.ui.unit.IntSize> animationSpec, optional boolean clip);
+    method @androidx.compose.animation.ExperimentalAnimationApi @androidx.compose.runtime.Stable public static androidx.compose.animation.EnterTransition expandVertically(optional androidx.compose.ui.Alignment.Vertical expandFrom, optional kotlin.jvm.functions.Function1<? super java.lang.Integer,java.lang.Integer> initialHeight, optional androidx.compose.animation.core.FiniteAnimationSpec<androidx.compose.ui.unit.IntSize> animationSpec, optional boolean clip);
+    method @androidx.compose.animation.ExperimentalAnimationApi @androidx.compose.runtime.Stable public static androidx.compose.animation.EnterTransition fadeIn(optional float initialAlpha, optional androidx.compose.animation.core.FiniteAnimationSpec<java.lang.Float> animationSpec);
+    method @androidx.compose.animation.ExperimentalAnimationApi @androidx.compose.runtime.Stable public static androidx.compose.animation.ExitTransition fadeOut(optional float targetAlpha, optional androidx.compose.animation.core.FiniteAnimationSpec<java.lang.Float> animationSpec);
+    method @androidx.compose.animation.ExperimentalAnimationApi @androidx.compose.runtime.Stable public static androidx.compose.animation.ExitTransition shrinkHorizontally(optional androidx.compose.ui.Alignment.Horizontal shrinkTowards, optional kotlin.jvm.functions.Function1<? super java.lang.Integer,java.lang.Integer> targetWidth, optional androidx.compose.animation.core.FiniteAnimationSpec<androidx.compose.ui.unit.IntSize> animationSpec, optional boolean clip);
+    method @androidx.compose.animation.ExperimentalAnimationApi @androidx.compose.runtime.Stable public static androidx.compose.animation.ExitTransition shrinkOut(optional androidx.compose.ui.Alignment shrinkTowards, optional kotlin.jvm.functions.Function1<? super androidx.compose.ui.unit.IntSize,androidx.compose.ui.unit.IntSize> targetSize, optional androidx.compose.animation.core.FiniteAnimationSpec<androidx.compose.ui.unit.IntSize> animationSpec, optional boolean clip);
+    method @androidx.compose.animation.ExperimentalAnimationApi @androidx.compose.runtime.Stable public static androidx.compose.animation.ExitTransition shrinkVertically(optional androidx.compose.ui.Alignment.Vertical shrinkTowards, optional kotlin.jvm.functions.Function1<? super java.lang.Integer,java.lang.Integer> targetHeight, optional androidx.compose.animation.core.FiniteAnimationSpec<androidx.compose.ui.unit.IntSize> animationSpec, optional boolean clip);
+    method @androidx.compose.animation.ExperimentalAnimationApi @androidx.compose.runtime.Stable public static androidx.compose.animation.EnterTransition slideIn(kotlin.jvm.functions.Function1<? super androidx.compose.ui.unit.IntSize,androidx.compose.ui.unit.IntOffset> initialOffset, optional androidx.compose.animation.core.FiniteAnimationSpec<androidx.compose.ui.unit.IntOffset> animationSpec);
+    method @androidx.compose.animation.ExperimentalAnimationApi @androidx.compose.runtime.Stable public static androidx.compose.animation.EnterTransition slideInHorizontally(optional kotlin.jvm.functions.Function1<? super java.lang.Integer,java.lang.Integer> initialOffsetX, optional androidx.compose.animation.core.FiniteAnimationSpec<androidx.compose.ui.unit.IntOffset> animationSpec);
+    method @androidx.compose.animation.ExperimentalAnimationApi @androidx.compose.runtime.Stable public static androidx.compose.animation.EnterTransition slideInVertically(optional kotlin.jvm.functions.Function1<? super java.lang.Integer,java.lang.Integer> initialOffsetY, optional androidx.compose.animation.core.FiniteAnimationSpec<androidx.compose.ui.unit.IntOffset> animationSpec);
+    method @androidx.compose.animation.ExperimentalAnimationApi @androidx.compose.runtime.Stable public static androidx.compose.animation.ExitTransition slideOut(kotlin.jvm.functions.Function1<? super androidx.compose.ui.unit.IntSize,androidx.compose.ui.unit.IntOffset> targetOffset, optional androidx.compose.animation.core.FiniteAnimationSpec<androidx.compose.ui.unit.IntOffset> animationSpec);
+    method @androidx.compose.animation.ExperimentalAnimationApi @androidx.compose.runtime.Stable public static androidx.compose.animation.ExitTransition slideOutHorizontally(optional kotlin.jvm.functions.Function1<? super java.lang.Integer,java.lang.Integer> targetOffsetX, optional androidx.compose.animation.core.FiniteAnimationSpec<androidx.compose.ui.unit.IntOffset> animationSpec);
+    method @androidx.compose.animation.ExperimentalAnimationApi @androidx.compose.runtime.Stable public static androidx.compose.animation.ExitTransition slideOutVertically(optional kotlin.jvm.functions.Function1<? super java.lang.Integer,java.lang.Integer> targetOffsetY, optional androidx.compose.animation.core.FiniteAnimationSpec<androidx.compose.ui.unit.IntOffset> animationSpec);
+  }
+
+  @androidx.compose.animation.ExperimentalAnimationApi @androidx.compose.runtime.Immutable public abstract sealed class EnterTransition {
+    method @androidx.compose.runtime.Stable public final operator androidx.compose.animation.EnterTransition plus(androidx.compose.animation.EnterTransition enter);
+  }
+
+  @androidx.compose.animation.ExperimentalAnimationApi @androidx.compose.runtime.Immutable public abstract sealed class ExitTransition {
+    method @androidx.compose.runtime.Stable public final operator androidx.compose.animation.ExitTransition plus(androidx.compose.animation.ExitTransition exit);
+  }
+
+  @kotlin.RequiresOptIn(message="This is an experimental animation API.") @kotlin.annotation.Target(allowedTargets={kotlin.annotation.AnnotationTarget, kotlin.annotation.AnnotationTarget, kotlin.annotation.AnnotationTarget}) public @interface ExperimentalAnimationApi {
+  }
+
+  public final class FlingCalculatorKt {
+  }
+
+  public final class SingleValueAnimationKt {
+    method public static androidx.compose.animation.core.Animatable<androidx.compose.ui.graphics.Color,androidx.compose.animation.core.AnimationVector4D> Animatable-8_81llA(long initialValue);
+    method @androidx.compose.runtime.Composable public static androidx.compose.runtime.State<androidx.compose.ui.graphics.Color> animateColorAsState-m3E411Q(long targetValue, optional androidx.compose.animation.core.AnimationSpec<androidx.compose.ui.graphics.Color> animationSpec, optional kotlin.jvm.functions.Function1<? super androidx.compose.ui.graphics.Color,kotlin.Unit>? finishedListener);
+  }
+
+  public final class SplineBasedDecayKt {
+    method public static <T> androidx.compose.animation.core.DecayAnimationSpec<T> splineBasedDecay(androidx.compose.ui.unit.Density density);
+  }
+
+  public final class SplineBasedFloatDecayAnimationSpec implements androidx.compose.animation.core.FloatDecayAnimationSpec {
+    ctor public SplineBasedFloatDecayAnimationSpec(androidx.compose.ui.unit.Density density);
+    method public float getAbsVelocityThreshold();
+    method public long getDurationNanos(float initialValue, float initialVelocity);
+    method public float getTargetValue(float initialValue, float initialVelocity);
+    method public float getValueFromNanos(long playTimeNanos, float initialValue, float initialVelocity);
+    method public float getVelocityFromNanos(long playTimeNanos, float initialValue, float initialVelocity);
+    property public float absVelocityThreshold;
+  }
+
+  public final class SplineBasedFloatDecayAnimationSpec_androidKt {
+    method @androidx.compose.runtime.Composable public static <T> androidx.compose.animation.core.DecayAnimationSpec<T> rememberSplineBasedDecay();
+  }
+
+  public final class TransitionKt {
+    method @androidx.compose.runtime.Composable public static inline <S> androidx.compose.runtime.State<androidx.compose.ui.graphics.Color> animateColor(androidx.compose.animation.core.Transition<S>, optional kotlin.jvm.functions.Function1<? super androidx.compose.animation.core.Transition.Segment<S>,? extends androidx.compose.animation.core.FiniteAnimationSpec<androidx.compose.ui.graphics.Color>> transitionSpec, optional String label, kotlin.jvm.functions.Function1<? super S,androidx.compose.ui.graphics.Color> targetValueByState);
+    method @androidx.compose.runtime.Composable public static androidx.compose.runtime.State<androidx.compose.ui.graphics.Color> animateColor-Baa6hxQ(androidx.compose.animation.core.InfiniteTransition, long initialValue, long targetValue, androidx.compose.animation.core.InfiniteRepeatableSpec<androidx.compose.ui.graphics.Color> animationSpec);
+  }
+
+}
+
