@@ -444,16 +444,13 @@ package androidx.compose.ui.focus {
     method public static androidx.compose.ui.Modifier focusRequester(androidx.compose.ui.Modifier, androidx.compose.ui.focus.FocusRequester focusRequester);
   }
 
-  public enum FocusState {
-    enum_constant public static final androidx.compose.ui.focus.FocusState Active;
-    enum_constant public static final androidx.compose.ui.focus.FocusState ActiveParent;
-    enum_constant public static final androidx.compose.ui.focus.FocusState Captured;
-    enum_constant public static final androidx.compose.ui.focus.FocusState Disabled;
-    enum_constant public static final androidx.compose.ui.focus.FocusState Inactive;
-  }
-
-  public final class FocusStateKt {
-    method public static boolean isFocused(androidx.compose.ui.focus.FocusState);
+  public interface FocusState {
+    method public boolean getHasFocus();
+    method public boolean isCaptured();
+    method public boolean isFocused();
+    property public abstract boolean hasFocus;
+    property public abstract boolean isCaptured;
+    property public abstract boolean isFocused;
   }
 
   public final class FocusTransactionsKt {

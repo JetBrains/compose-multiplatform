@@ -18,11 +18,11 @@ package androidx.compose.ui.focus
 
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.focus.FocusState.Active
-import androidx.compose.ui.focus.FocusState.ActiveParent
-import androidx.compose.ui.focus.FocusState.Captured
-import androidx.compose.ui.focus.FocusState.Disabled
-import androidx.compose.ui.focus.FocusState.Inactive
+import androidx.compose.ui.focus.FocusStateImpl.Active
+import androidx.compose.ui.focus.FocusStateImpl.ActiveParent
+import androidx.compose.ui.focus.FocusStateImpl.Captured
+import androidx.compose.ui.focus.FocusStateImpl.Disabled
+import androidx.compose.ui.focus.FocusStateImpl.Inactive
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.input.pointer.PointerEvent
 import androidx.compose.ui.input.pointer.PointerEventPass
@@ -46,7 +46,7 @@ interface FocusManager {
      * the root focus modifier.
      *
      *  @param forcedClear: Whether we should forcefully clear focus regardless of whether we have
-     *  any components that have [Captured][FocusState.Captured] focus.
+     *  any components that have Captured focus.
      */
     fun clearFocus(forcedClear: Boolean = false)
 
@@ -158,7 +158,7 @@ internal class FocusManagerImpl(
      * Call this function to set the focus to the root focus modifier.
      *
      * @param forcedClear: Whether we should forcefully clear focus regardless of whether we have
-     * any components that have [Captured][FocusState.Captured] focus.
+     * any components that have captured focus.
      *
      * This could be used to clear focus when a user clicks on empty space outside a focusable
      * component.

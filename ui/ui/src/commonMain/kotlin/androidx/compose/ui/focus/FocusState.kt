@@ -17,49 +17,70 @@
 package androidx.compose.ui.focus
 
 /**
- * Different states of the focus system. These are the states used by the Focus Nodes.
- *
+ * The focus state of a [FocusModifier]. Use [onFocusChanged] or [onFocusEvent] modifiers to
+ * access [FocusState].
  */
-enum class FocusState {
+interface FocusState {
     /**
-     * The focusable component is currently active (i.e. it receives key events).
+     * Whether the component is focused or not.
+     *
+     * @return true if the component is focused, false otherwise.
      */
-    Active,
+    val isFocused: Boolean
+    /**
+     * Whether the focus modifier associated with this [FocusState] has a child that is focused.
+     *
+     * @return true if a child is focused, false otherwise.
+     */
+    val hasFocus: Boolean
 
     /**
-     * One of the descendants of the focusable component is [Active].
+     * Whether focus is captured or not. A focusable component is in a captured state when it
+     * wants to hold onto focus. (Eg. when a text field has an invalid phone number]. When we are
+     * in a captured state, clicking outside the focused item does not clear focus.
+     *
+     * You can capture focus by calling [focusRequester.captureFocus()][captureFocus] and free
+     * focus by calling [focusRequester.freeFocus()][freeFocus].
+     *
+     *  @return true if focus is captured, false otherwise.
      */
-    ActiveParent,
-
-    /**
-     * The focusable component is currently active (has focus), and is in a state where
-     * it does not want to give up focus. (Eg. a text field with an invalid phone number).
-     */
-    Captured,
-
-    /**
-     * The focusable component is not currently focusable. (eg. A disabled button).
-     */
-    Disabled,
-
-    /**
-     * The focusable component does not receive any key events. (ie it is not active,
-     * nor are any of its descendants active).
-     */
-    Inactive
+    val isCaptured: Boolean
 }
 
-/**
- * Converts a [focus state][FocusState] into a boolean value indicating if the component
- * is focused or not.
- *
- * @return true if the component is focused, false otherwise.
- */
-val FocusState.isFocused
-    get() = when (this) {
-        FocusState.Captured,
-        FocusState.Active -> true
-        FocusState.ActiveParent,
-        FocusState.Inactive,
-        FocusState.Disabled -> false
-    }
+// Different states of the focus system. These are the states used by the Focus Nodes.
+internal enum class FocusStateImpl : FocusState {
+    // The focusable component is currently active (i.e. it receives key events).
+    Active,
+
+    // One of the descendants of the focusable component is Active.
+    ActiveParent,
+
+    // The focusable component is currently active (has focus), and is in a state where
+    // it does not want to give up focus. (Eg. a text field with an invalid phone number).
+    Captured,
+
+    // The focusable component is not currently focusable. (eg. A disabled button).
+    Disabled,
+
+    // The focusable component does not receive any key events. (ie it is not active, nor are any
+    // of its descendants active).
+    Inactive;
+
+    override val isFocused: Boolean
+        get() = when (this) {
+            Captured, Active -> true
+            ActiveParent, Inactive, Disabled -> false
+        }
+
+    override val hasFocus: Boolean
+        get() = when (this) {
+            ActiveParent -> true
+            Active, Captured, Disabled, Inactive -> false
+        }
+
+    override val isCaptured: Boolean
+        get() = when (this) {
+            Captured -> true
+            Active, ActiveParent, Inactive, Disabled -> false
+        }
+}

@@ -18,7 +18,6 @@ package androidx.compose.foundation.text
 
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.focus.isFocused
 import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.platform.LocalTextInputService
 import androidx.compose.ui.platform.testTag
