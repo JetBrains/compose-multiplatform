@@ -141,7 +141,7 @@ val ALLOW_RERUNNING_TASKS = setOf(
     ":external:libyuv:buildCMakeRelWithDebInfo[yuv]",
     ":hilt:hilt-navigation-compose:kaptGenerateStubsDebugKotlin",
     ":hilt:hilt-navigation-compose:kaptGenerateStubsReleaseKotlin",
-    ":lint-checks:integration-tests:copyDebugAndroidLintReports",
+    ":lint-checks:integration-tests:copyReleaseAndroidLintReports",
 
     // https://github.com/gradle/gradle/issues/17262
     ":doclava:compileJava",
@@ -180,13 +180,13 @@ val DONT_TRY_RERUNNING_TASKS = setOf(
 
     // We should be able to remove these entries when b/160392650 is fixed
     "lint",
-    "lintAnalyzeDebug",
-    "lintDebug",
+    "lintAnalyzeRelease",
+    "lintRelease",
     "lintVitalRelease",
-    "lintWithExpandProjectionDebug",
-    "lintWithoutExpandProjectionDebug",
-    "lintWithKaptDebug",
-    "lintWithKspDebug",
+    "lintWithExpandProjectionRelease",
+    "lintWithoutExpandProjectionRelease",
+    "lintWithKaptRelease",
+    "lintWithKspRelease",
 )
 
 abstract class TaskUpToDateValidator :
