@@ -26,6 +26,7 @@ import androidx.compose.ui.InternalComposeUiApi
 import androidx.compose.ui.R
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
+import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.ViewTreeLifecycleOwner
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.CoroutineStart
@@ -176,14 +177,41 @@ object WindowRecomposerPolicy {
             object : View.OnAttachStateChangeListener {
                 override fun onViewAttachedToWindow(v: View) {}
                 override fun onViewDetachedFromWindow(v: View) {
-                    unsetJob.cancel()
                     v.removeOnAttachStateChangeListener(this)
+                    // cancel the job to clean up the view tags.
+                    // this will happen immediately since unsetJob is on an immediate dispatcher
+                    // for this view's UI thread instead of waiting for the recomposer to join.
+                    // NOTE: This does NOT cancel the returned recomposer itself, as it may be
+                    // a shared-instance recomposer that should remain running/is reused elsewhere.
+                    unsetJob.cancel()
                 }
             }
         )
         return newRecomposer
     }
 }
+
+/**
+ * Find the "content child" for this view. The content child is the view that is either
+ * a direct child of the view with id [android.R.id.content] (and was therefore set as a
+ * content view into an activity or dialog window) or the root view of the window.
+ *
+ * This is used as opposed to [View.getRootView] as the Android framework can reuse an activity
+ * window's decor views across activity recreation events. Since a window recomposer is associated
+ * with the lifecycle of the host activity, we want that recomposer to shut down and create a new
+ * one for the new activity instance.
+ */
+private val View.contentChild: View
+    get() {
+        var self: View = this
+        var parent: ViewParent? = self.parent
+        while (parent is View) {
+            if (parent.id == android.R.id.content) return self
+            self = parent
+            parent = self.parent
+        }
+        return self
+    }
 
 /**
  * Get or lazily create a [Recomposer] for this view's window. The view must be attached
@@ -195,7 +223,7 @@ internal val View.windowRecomposer: Recomposer
         check(isAttachedToWindow) {
             "Cannot locate windowRecomposer; View $this is not attached to a window"
         }
-        val rootView = rootView
+        val rootView = contentChild
         return when (val rootParentRef = rootView.compositionContext) {
             null -> WindowRecomposerPolicy.createAndInstallWindowRecomposer(rootView)
             is Recomposer -> rootParentRef
@@ -214,20 +242,43 @@ private fun View.createLifecycleAwareViewTreeRecomposer(): Recomposer {
     val viewTreeLifecycleOwner = checkNotNull(ViewTreeLifecycleOwner.get(this)) {
         "ViewTreeLifecycleOwner not found from $this"
     }
+    // Removing the view holding the ViewTreeRecomposer means we may never be reattached again.
+    // Since this factory function is used to create a new recomposer for each invocation and
+    // doesn't reuse a single instance like other factories might, shut it down whenever it
+    // becomes detached. This can easily happen as part of setting a new content view.
+    addOnAttachStateChangeListener(
+        object : View.OnAttachStateChangeListener {
+            override fun onViewAttachedToWindow(v: View?) {}
+            override fun onViewDetachedFromWindow(v: View?) {
+                removeOnAttachStateChangeListener(this)
+                recomposer.cancel()
+            }
+        }
+    )
     viewTreeLifecycleOwner.lifecycle.addObserver(
-        LifecycleEventObserver { _, event ->
-            @Suppress("NON_EXHAUSTIVE_WHEN")
-            when (event) {
-                Lifecycle.Event.ON_CREATE ->
-                    // Undispatched launch since we've configured this scope
-                    // to be on the UI thread
-                    runRecomposeScope.launch(start = CoroutineStart.UNDISPATCHED) {
-                        recomposer.runRecomposeAndApplyChanges()
+        object : LifecycleEventObserver {
+            override fun onStateChanged(lifecycleOwner: LifecycleOwner, event: Lifecycle.Event) {
+                val self = this
+                @Suppress("NON_EXHAUSTIVE_WHEN")
+                when (event) {
+                    Lifecycle.Event.ON_CREATE ->
+                        // Undispatched launch since we've configured this scope
+                        // to be on the UI thread
+                        runRecomposeScope.launch(start = CoroutineStart.UNDISPATCHED) {
+                            try {
+                                recomposer.runRecomposeAndApplyChanges()
+                            } finally {
+                                // If runRecomposeAndApplyChanges returns or this coroutine is
+                                // cancelled it means we no longer care about this lifecycle.
+                                // Clean up the dangling references tied to this observer.
+                                lifecycleOwner.lifecycle.removeObserver(self)
+                            }
+                        }
+                    Lifecycle.Event.ON_START -> pausableClock?.resume()
+                    Lifecycle.Event.ON_STOP -> pausableClock?.pause()
+                    Lifecycle.Event.ON_DESTROY -> {
+                        recomposer.cancel()
                     }
-                Lifecycle.Event.ON_START -> pausableClock?.resume()
-                Lifecycle.Event.ON_STOP -> pausableClock?.pause()
-                Lifecycle.Event.ON_DESTROY -> {
-                    recomposer.cancel()
                 }
             }
         }

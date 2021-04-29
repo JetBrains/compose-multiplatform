@@ -16,7 +16,6 @@
 
 package androidx.compose.ui.test.junit4
 
-import android.os.Looper
 import androidx.activity.ComponentActivity
 import androidx.compose.animation.core.LinearEasing
 import androidx.compose.animation.core.animateFloat
@@ -31,24 +30,20 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.State
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.runtime.snapshots.Snapshot
-import androidx.compose.runtime.withFrameNanos
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.test.junit4.android.ComposeIdlingResource
+import androidx.compose.ui.test.IdlingResource
 import androidx.test.espresso.Espresso.onIdle
 import androidx.test.filters.LargeTest
 import com.google.common.truth.Truth.assertThat
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.CoroutineStart
-import kotlinx.coroutines.async
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.runBlocking
-import org.junit.Ignore
 import org.junit.Rule
 import org.junit.Test
+import java.util.concurrent.Executors
 
 @LargeTest
 class ComposeIdlingResourceTest {
@@ -64,7 +59,6 @@ class ComposeIdlingResourceTest {
 
     @get:Rule
     val rule = createAndroidComposeRule<ComponentActivity>()
-    private val composeIdlingResource = rule.composeIdlingResource
 
     /**
      * High level test to only verify that [ComposeTestRule.runOnIdle] awaits animations.
@@ -111,72 +105,38 @@ class ComposeIdlingResourceTest {
         assertThat(animationRunning).isFalse()
     }
 
-    /**
-     * Detailed test to verify if [ComposeIdlingResource.isIdleNow] reports idleness correctly at
-     * key moments during the animation kick-off process.
-     */
     @Test
-    @Ignore("b/173798666: Idleness not detected after Snapshot.sendApplyNotifications()")
-    fun testAnimationIdle_detailed() {
-        var wasIdleBeforeKickOff = false
-        var wasIdleBeforeApplySnapshot = false
-        var wasIdleAfterApplySnapshot = false
+    fun testIdlingResourcesAreQueried() {
+        val idlingResource = object : IdlingResource {
+            var readCount = MutableStateFlow(0)
 
-        val animationState = mutableStateOf(AnimationStates.From)
-        lateinit var scope: CoroutineScope
-        rule.setContent {
-            scope = rememberCoroutineScope()
-            Ui(animationState)
-        }
+            override var isIdleNow: Boolean = false
+                get() {
+                    readCount.value++
+                    return field
+                }
 
-        runBlocking(scope.coroutineContext) {
-            // Verify that we're on the main thread, which is important for isIdle() later
-            assertThat(Looper.myLooper()).isEqualTo(Looper.getMainLooper())
-        }
-
-        val wasIdleAfterRecompose = rule.runOnIdle {
-            // Record idleness before kickoff of animation
-            wasIdleBeforeKickOff = composeIdlingResource.isIdleNow
-
-            // Kick off the animation
-            animationRunning = true
-            animationState.value = AnimationStates.To
-
-            // Record idleness after kickoff of animation, but before the snapshot is applied
-            wasIdleBeforeApplySnapshot = composeIdlingResource.isIdleNow
-
-            // Apply the snapshot
-            Snapshot.sendApplyNotifications()
-
-            // Record idleness after this snapshot is applied
-            wasIdleAfterApplySnapshot = composeIdlingResource.isIdleNow
-
-            // Record idleness after the first recomposition
-            scope.async(start = CoroutineStart.UNDISPATCHED) {
-                // Await a single recomposition
-                withFrameNanos {}
-                composeIdlingResource.isIdleNow
-            }
-        }.let {
-            runBlocking {
-                it.await()
+            // Returns a lambda that suspends until isIdleNow is queried 10 more times
+            fun delayedTransitionToIdle(): () -> Unit {
+                return {
+                    runBlocking {
+                        val start = readCount.value
+                        readCount.first { it == start + 10 }
+                        isIdleNow = true
+                    }
+                }
             }
         }
 
-        // Wait until it is finished
-        rule.runOnIdle {
-            // Verify it was finished
-            assertThat(animationRunning).isFalse()
+        rule.registerIdlingResource(idlingResource)
+        Executors.newSingleThreadExecutor().execute(idlingResource.delayedTransitionToIdle())
 
-            // Before the animation is kicked off, it is still idle
-            assertThat(wasIdleBeforeKickOff).isTrue()
-            // After animation is kicked off, but before the frame is committed, it must be busy
-            assertThat(wasIdleBeforeApplySnapshot).isFalse()
-            // After the frame is committed, it must still be busy
-            assertThat(wasIdleAfterApplySnapshot).isFalse()
-            // After recomposition, it must still be busy
-            assertThat(wasIdleAfterRecompose).isFalse()
-        }
+        val startReadCount = idlingResource.readCount.value
+        rule.waitForIdle()
+        val endReadCount = idlingResource.readCount.value
+
+        assertThat(idlingResource.isIdleNow).isTrue()
+        assertThat(endReadCount - startReadCount).isAtLeast(10)
     }
 
     @Composable

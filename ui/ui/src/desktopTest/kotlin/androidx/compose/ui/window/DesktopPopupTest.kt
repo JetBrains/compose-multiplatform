@@ -48,22 +48,22 @@ class DesktopPopupTest {
     val rule = createComposeRule()
 
     @Test
-    fun `pass ambients to popup`() {
-        val ambient = staticCompositionLocalOf<Int> {
+    fun `pass composition locals to popup`() {
+        val compositionLocal = staticCompositionLocalOf<Int> {
             error("not set")
         }
 
-        var actualAmbientValue = 0
+        var actualLocalValue = 0
 
         rule.setContent {
-            CompositionLocalProvider(ambient provides 3) {
+            CompositionLocalProvider(compositionLocal provides 3) {
                 Popup {
-                    actualAmbientValue = ambient.current
+                    actualLocalValue = compositionLocal.current
                 }
             }
         }
 
-        Truth.assertThat(actualAmbientValue).isEqualTo(3)
+        Truth.assertThat(actualLocalValue).isEqualTo(3)
     }
 
     @Test

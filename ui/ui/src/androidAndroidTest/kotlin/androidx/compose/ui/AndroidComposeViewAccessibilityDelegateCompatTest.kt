@@ -1,3 +1,4 @@
+
 /*
  * Copyright 2020 The Android Open Source Project
  *
@@ -23,10 +24,7 @@ import android.view.accessibility.AccessibilityEvent
 import android.view.accessibility.AccessibilityNodeInfo
 import android.widget.FrameLayout
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.selection.selectable
-import androidx.compose.foundation.selection.selectableGroup
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
@@ -62,6 +60,7 @@ import androidx.compose.ui.semantics.getTextLayoutResult
 import androidx.compose.ui.semantics.heading
 import androidx.compose.ui.semantics.horizontalScrollAxisRange
 import androidx.compose.ui.semantics.liveRegion
+import androidx.compose.ui.semantics.error
 import androidx.compose.ui.semantics.onClick
 import androidx.compose.ui.semantics.onLongClick
 import androidx.compose.ui.semantics.pasteText
@@ -499,6 +498,31 @@ class AndroidComposeViewAccessibilityDelegateCompatTest {
     }
 
     @Test
+    fun testPopulateAccessibilityNodeInfoProperties_setContentInvalid_customDescription() {
+        val errorDescription = "Invalid format"
+        val semanticsNode = createSemanticsNodeWithProperties(1, true) {
+            error(errorDescription)
+        }
+
+        accessibilityDelegate.populateAccessibilityNodeInfoProperties(1, info, semanticsNode)
+
+        assertTrue(info.isContentInvalid)
+        assertEquals(errorDescription, info.error)
+    }
+
+    @Test
+    fun testPopulateAccessibilityNodeInfoProperties_setContentInvalid_emptyDescription() {
+        val semanticsNode = createSemanticsNodeWithProperties(1, true) {
+            error("")
+        }
+
+        accessibilityDelegate.populateAccessibilityNodeInfoProperties(1, info, semanticsNode)
+
+        assertTrue(info.isContentInvalid)
+        assertTrue(info.error.isEmpty())
+    }
+
+    @Test
     fun test_PasteAction_ifFocused() {
         rule.setContent {
             LocalClipboardManager.current.setText(AnnotatedString("test"))
@@ -817,46 +841,6 @@ class AndroidComposeViewAccessibilityDelegateCompatTest {
                         it.contentChangeTypes == AccessibilityEvent.CONTENT_CHANGE_TYPE_UNDEFINED
                 }
             )
-        )
-    }
-
-    @Test
-    fun testCollectionItemInfo() {
-        rule.setContent {
-            Column(Modifier.selectableGroup()) {
-                Box(Modifier.selectable(selected = true, onClick = {}).testTag("item"))
-                Box(Modifier.selectable(selected = false, onClick = {}))
-            }
-        }
-        val itemNode = rule.onNodeWithTag("item").fetchSemanticsNode()
-        accessibilityDelegate.populateAccessibilityNodeInfoProperties(1, info, itemNode)
-
-        val resultCollectionItemInfo = info.collectionItemInfo
-        assertEquals(0, resultCollectionItemInfo.rowIndex)
-        assertEquals(1, resultCollectionItemInfo.rowSpan)
-        assertEquals(0, resultCollectionItemInfo.columnIndex)
-        assertEquals(1, resultCollectionItemInfo.columnSpan)
-        assertEquals(true, resultCollectionItemInfo.isSelected)
-    }
-
-    @Test
-    fun testCollectionInfo() {
-        rule.setContent {
-            Column(Modifier.selectableGroup().testTag("collection")) {
-                Box(Modifier.size(50.dp).selectable(selected = true, onClick = {}))
-                Box(Modifier.size(50.dp).selectable(selected = false, onClick = {}))
-            }
-        }
-        val collectionNode = rule.onNodeWithTag("collection").fetchSemanticsNode()
-        accessibilityDelegate.populateAccessibilityNodeInfoProperties(1, info, collectionNode)
-
-        val resultCollectionInfo = info.collectionInfo
-        assertEquals(2, resultCollectionInfo.rowCount)
-        assertEquals(1, resultCollectionInfo.columnCount)
-        assertEquals(false, resultCollectionInfo.isHierarchical)
-        assertEquals(
-            AccessibilityNodeInfoCompat.CollectionInfoCompat.SELECTION_MODE_SINGLE,
-            resultCollectionInfo.selectionMode
         )
     }
 

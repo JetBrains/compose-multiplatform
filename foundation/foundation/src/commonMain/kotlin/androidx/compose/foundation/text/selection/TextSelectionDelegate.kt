@@ -25,55 +25,6 @@ import kotlin.math.max
 
 /**
  * This method takes unprocessed selection information as input, and calculates the selection
- * range and check if the selection handles are crossed, for selection with both start and end
- * are in the current composable.
- *
- * @param rawStartOffset unprocessed start offset calculated directly from input position
- * @param rawEndOffset unprocessed end offset calculated directly from input position
- * different location. If the selection anchors point the same location and this is true, the
- * result selection will be adjusted to word boundary. Otherwise, the selection will be adjusted
- * to keep single character selected.
- * @param previousSelection previous selected text range.
- * @param isStartHandle true if the start handle is being dragged
- * @param lastOffset last offset of the text. It's actually the length of the text.
- * @param handlesCrossed true if the selection handles are crossed
- * @param ensureAtLeastOneChar should selection contain at least one character
- *
- * @return the final startOffset, endOffset of the selection, and if the start and end are
- * crossed each other.
- */
-internal fun processAsSingleComposable(
-    rawStartOffset: Int,
-    rawEndOffset: Int,
-    previousSelection: TextRange?,
-    isStartHandle: Boolean,
-    lastOffset: Int,
-    handlesCrossed: Boolean,
-    ensureAtLeastOneChar: Boolean
-): Triple<Int, Int, Boolean> {
-    var startOffset = rawStartOffset
-    var endOffset = rawEndOffset
-    if (startOffset == endOffset && ensureAtLeastOneChar) {
-
-        if (previousSelection == null) return Triple(rawStartOffset, rawStartOffset, false)
-        // If the start and end offset are at the same character, and it's not the initial
-        // selection, then bound to at least one character.
-        val textRange = ensureAtLeastOneChar(
-            offset = rawStartOffset,
-            lastOffset = lastOffset,
-            isStartHandle = isStartHandle,
-            handlesCrossed = handlesCrossed
-        )
-        startOffset = textRange.start
-        endOffset = textRange.end
-    }
-    // Check if the start and end handles are crossed each other.
-    val areHandlesCrossed = startOffset > endOffset
-    return Triple(startOffset, endOffset, areHandlesCrossed)
-}
-
-/**
- * This method takes unprocessed selection information as input, and calculates the selection
  * range for current composable, and check if the selection handles are crossed, for selection with
  * the start and end are in different composables.
  *
@@ -89,8 +40,8 @@ internal fun processAsSingleComposable(
  * @param containsWholeSelectionEnd flag to check if the current composable contains the end of the
  * selection
  *
- * @return the final startOffset, endOffset of the selection, and if the start and end handles are
- * crossed each other.
+ * @return the final textRange which contains the startOffset, endOffset of the selection, and
+ * if the start and end handles are crossed each other.
  */
 internal fun processCrossComposable(
     startPosition: Offset,
@@ -101,7 +52,7 @@ internal fun processCrossComposable(
     bounds: Rect,
     containsWholeSelectionStart: Boolean,
     containsWholeSelectionEnd: Boolean
-): Triple<Int, Int, Boolean> {
+): TextRange? {
     val handlesCrossed = SelectionMode.Vertical.areHandlesCrossed(
         bounds = bounds,
         start = startPosition,
@@ -130,46 +81,61 @@ internal fun processCrossComposable(
         // The same as startOffset.
         rawEndOffset
     }
-    return Triple(startOffset, endOffset, handlesCrossed)
+    if (startOffset == -1 || endOffset == -1) return null
+    return TextRange(startOffset, endOffset)
 }
 
 /**
  * This method returns the adjusted start and end offset of the selection according to [adjustment].
  *
  * @param textLayoutResult a result of the text layout.
- * @param startOffset start offset to be snapped to a word.
- * @param endOffset end offset to be snapped to a word.
- * @param handlesCrossed true if the selection handles are crossed
+ * @param textRange the initial selected text range which needs to be adjusted.
  * @param adjustment how to adjust selection
  *
- * @return the adjusted word-based start and end offset of the selection.
+ * @return the adjusted text selection range.
  */
 internal fun adjustSelection(
     textLayoutResult: TextLayoutResult,
-    startOffset: Int,
-    endOffset: Int,
-    handlesCrossed: Boolean,
+    textRange: TextRange,
+    isStartHandle: Boolean,
+    previousHandlesCrossed: Boolean,
     adjustment: SelectionAdjustment
-): Pair<Int, Int> {
-    val boundaryFun = when (adjustment) {
-        SelectionAdjustment.NONE -> return Pair(startOffset, endOffset)
-        SelectionAdjustment.WORD -> textLayoutResult::getWordBoundary
-        SelectionAdjustment.PARAGRAPH ->
-            textLayoutResult.layoutInput.text.text::getParagraphBoundary
+): TextRange {
+    if (adjustment == SelectionAdjustment.NONE) {
+        return textRange
+    }
+
+    if (adjustment == SelectionAdjustment.CHARACTER) {
+        return if (!textRange.collapsed) {
+            textRange
+        } else {
+            ensureAtLeastOneChar(
+                offset = textRange.start,
+                lastOffset = textLayoutResult.layoutInput.text.lastIndex,
+                isStartHandle = isStartHandle,
+                previousHandlesCrossed = previousHandlesCrossed
+            )
+        }
+    }
+
+    val boundaryFun = if (adjustment == SelectionAdjustment.WORD) {
+        textLayoutResult::getWordBoundary
+    } else {
+        textLayoutResult.layoutInput.text.text::getParagraphBoundary
     }
 
     val maxOffset = textLayoutResult.layoutInput.text.text.length - 1
-    val startBoundary = boundaryFun(startOffset.coerceIn(0, maxOffset))
-    val endBoundary = boundaryFun(endOffset.coerceIn(0, maxOffset))
+    val startBoundary = boundaryFun(textRange.start.coerceIn(0, maxOffset))
+    val endBoundary = boundaryFun(textRange.end.coerceIn(0, maxOffset))
 
     // If handles are not crossed, start should be snapped to the start of the word containing the
     // start offset, and end should be snapped to the end of the word containing the end offset.
     // If handles are crossed, start should be snapped to the end of the word containing the start
     // offset, and end should be snapped to the start of the word containing the end offset.
-    val start = if (handlesCrossed) startBoundary.end else startBoundary.start
-    val end = if (handlesCrossed) endBoundary.start else endBoundary.end
+    val start = if (textRange.reversed) startBoundary.end else startBoundary.start
+    val end = if (textRange.reversed) endBoundary.start else endBoundary.end
 
-    return Pair(start, end)
+    return TextRange(start, end)
 }
 
 /**
@@ -181,7 +147,9 @@ internal fun adjustSelection(
  * this case start and offset equals to each other.
  * @param lastOffset last offset of the text. It's actually the length of the text.
  * @param isStartHandle true if the start handle is being dragged
- * @param handlesCrossed true if the selection handles are crossed
+ * @param previousHandlesCrossed true if the selection handles are crossed in the previous
+ * selection. This function will try to maintain the handle cross state. This can help make
+ * selection stable.
  *
  * @return the adjusted [TextRange].
  */
@@ -189,7 +157,7 @@ private fun ensureAtLeastOneChar(
     offset: Int,
     lastOffset: Int,
     isStartHandle: Boolean,
-    handlesCrossed: Boolean
+    previousHandlesCrossed: Boolean
 ): TextRange {
     // When lastOffset is 0, it can only return an empty TextRange.
     // When previousSelection is null, it won't start a selection and return an empty TextRange.
@@ -216,7 +184,7 @@ private fun ensureAtLeastOneChar(
     // In other cases, this function will try to maintain the current cross handle states.
     // Only in this way the selection can be stable.
     return if (isStartHandle) {
-        if (!handlesCrossed) {
+        if (!previousHandlesCrossed) {
             // Handle is NOT crossed, and the start handle is dragged.
             TextRange(offset - 1, offset)
         } else {
@@ -224,7 +192,7 @@ private fun ensureAtLeastOneChar(
             TextRange(offset + 1, offset)
         }
     } else {
-        if (!handlesCrossed) {
+        if (!previousHandlesCrossed) {
             // Handle is NOT crossed, and the end handle is dragged.
             TextRange(offset, offset + 1)
         } else {

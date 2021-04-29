@@ -178,8 +178,7 @@ class AndroidComposeTestRule<R : TestRule, A : ComponentActivity>(
     internal val composeRootRegistry = ComposeRootRegistry()
 
     private val mainClockImpl: MainTestClockImpl
-    @VisibleForTesting(otherwise = VisibleForTesting.PRIVATE)
-    internal val composeIdlingResource: IdlingResource
+    private val composeIdlingResource: IdlingResource
 
     private val recomposer: Recomposer
     @OptIn(ExperimentalCoroutinesApi::class)

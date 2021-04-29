@@ -1743,6 +1743,25 @@ class RowColumnTest : LayoutTest() {
         }
         assertTrue(latch.await(1, TimeUnit.SECONDS))
     }
+
+    @Test
+    fun testRow_doesNotExpand_whenWeightChildrenDoNotFill() = with(density) {
+        val size = 10
+        var rowWidth = 0
+        val latch = CountDownLatch(1)
+        show {
+            Row(
+                Modifier.onGloballyPositioned {
+                    rowWidth = it.size.width
+                    latch.countDown()
+                }
+            ) {
+                Box(Modifier.weight(1f, false).size(size.toDp()))
+            }
+        }
+        assertTrue(latch.await(1, TimeUnit.SECONDS))
+        assertEquals(size, rowWidth)
+    }
     // endregion
 
     // region Size tests in Column
@@ -2232,6 +2251,25 @@ class RowColumnTest : LayoutTest() {
             }
         }
         assertTrue(latch.await(1, TimeUnit.SECONDS))
+    }
+
+    @Test
+    fun testColumn_doesNotExpand_whenWeightChildrenDoNotFill() = with(density) {
+        val size = 10
+        var columnHeight = 0
+        val latch = CountDownLatch(1)
+        show {
+            Column(
+                Modifier.onGloballyPositioned {
+                    columnHeight = it.size.height
+                    latch.countDown()
+                }
+            ) {
+                Box(Modifier.weight(1f, false).size(size.toDp()))
+            }
+        }
+        assertTrue(latch.await(1, TimeUnit.SECONDS))
+        assertEquals(size, columnHeight)
     }
     // endregion
 

@@ -23,7 +23,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.testutils.ComposeTestCase
+import androidx.compose.testutils.LayeredComposeTestCase
 import androidx.compose.testutils.ToggleableTestCase
 import androidx.compose.testutils.benchmark.ComposeBenchmarkRule
 import androidx.compose.testutils.benchmark.benchmarkFirstCompose
@@ -44,7 +44,7 @@ class TrailingLambdaBenchmark {
 
     @Test
     fun withTrailingLambdas_compose() {
-        benchmarkRule.benchmarkFirstCompose({ WithTrailingLambdas() })
+        benchmarkRule.benchmarkFirstCompose { WithTrailingLambdas() }
     }
 
     @Test
@@ -54,7 +54,7 @@ class TrailingLambdaBenchmark {
 
     @Test
     fun withoutTrailingLambdas_compose() {
-        benchmarkRule.benchmarkFirstCompose({ WithoutTrailingLambdas() })
+        benchmarkRule.benchmarkFirstCompose { WithoutTrailingLambdas() }
     }
 
     @Test
@@ -63,12 +63,12 @@ class TrailingLambdaBenchmark {
     }
 }
 
-private sealed class TrailingLambdaTestCase : ComposeTestCase, ToggleableTestCase {
+private sealed class TrailingLambdaTestCase : LayeredComposeTestCase(), ToggleableTestCase {
 
     var numberState: MutableState<Int>? = null
 
     @Composable
-    override fun Content() {
+    override fun MeasuredContent() {
         val number = remember { mutableStateOf(5) }
         numberState = number
 

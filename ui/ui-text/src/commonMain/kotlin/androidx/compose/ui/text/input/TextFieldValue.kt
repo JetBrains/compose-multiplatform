@@ -18,10 +18,13 @@ package androidx.compose.ui.text.input
 
 import androidx.compose.runtime.Immutable
 import androidx.compose.runtime.saveable.Saver
-import androidx.compose.runtime.saveable.listSaver
 import androidx.compose.ui.text.AnnotatedString
+import androidx.compose.ui.text.AnnotatedStringSaver
+import androidx.compose.ui.text.Saver
 import androidx.compose.ui.text.TextRange
 import androidx.compose.ui.text.constrain
+import androidx.compose.ui.text.restore
+import androidx.compose.ui.text.save
 import kotlin.math.max
 import kotlin.math.min
 
@@ -151,14 +154,19 @@ class TextFieldValue constructor(
         /**
          * The default [Saver] implementation for [TextFieldValue].
          */
-        val Saver = listSaver<TextFieldValue, Any>(
+        val Saver = Saver<TextFieldValue, Any>(
             save = {
-                listOf(it.annotatedString.toString(), it.selection.start, it.selection.end)
+                arrayListOf(
+                    save(it.annotatedString, AnnotatedStringSaver, this),
+                    save(it.selection, TextRange.Saver, this),
+                )
             },
             restore = {
+                @Suppress("UNCHECKED_CAST")
+                val list = it as List<Any>
                 TextFieldValue(
-                    text = it[0] as String,
-                    selection = TextRange(it[1] as Int, it[2] as Int)
+                    annotatedString = restore(list[0], AnnotatedStringSaver)!!,
+                    selection = restore(list[1], TextRange.Saver)!!,
                 )
             }
         )

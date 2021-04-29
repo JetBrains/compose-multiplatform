@@ -35,7 +35,7 @@ import androidx.compose.material.AlertDialog
 import androidx.compose.material.Button
 import androidx.compose.material.ButtonDefaults
 import androidx.compose.material.Checkbox
-import androidx.compose.material.DropdownMenu
+import androidx.compose.material.ContextMenu
 import androidx.compose.material.DropdownMenuItem
 import androidx.compose.material.RadioButton
 import androidx.compose.material.Surface
@@ -53,15 +53,15 @@ import androidx.compose.ui.input.pointer.pointerMoveFilter
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.window.DialogProperties
 import androidx.compose.ui.window.Dialog
+import androidx.compose.ui.window.DialogProperties
 import androidx.compose.ui.window.Notifier
 import androidx.compose.ui.window.Popup
 import androidx.compose.ui.window.Tray
 import androidx.compose.ui.window.WindowDraggableArea
-import java.awt.event.ActionListener
-import java.awt.event.ActionEvent
 import java.awt.Toolkit
+import java.awt.event.ActionEvent
+import java.awt.event.ActionListener
 import javax.swing.JButton
 
 @Composable
@@ -277,7 +277,7 @@ fun content() {
                     TextBox(text = "Alert Dialog")
                 },
                 text = {
-                    println("Ambient value is ${AmbientTest.current}.")
+                    println("CompositionLocal value is ${LocalTest.current}.")
                     TextBox(text = "Increment amount?")
                     DisposableEffect(Unit) {
                         onDispose {
@@ -312,10 +312,10 @@ fun PopupSample(displayed: Boolean, onDismiss: () -> Unit) {
             Popup(
                 alignment = Alignment.TopCenter,
                 offset = IntOffset(0, 50),
-                isFocusable = true,
+                focusable = true,
                 onDismissRequest = onDismiss
             ) {
-                println("Ambient value is ${AmbientTest.current}.")
+                println("CompositionLocal value is ${LocalTest.current}.")
                 PopupContent(onDismiss)
                 DisposableEffect(Unit) {
                     onDispose {
@@ -426,7 +426,7 @@ fun ContextMenu() {
                 .height(35.dp)
                 .padding(start = 4.dp, end = 4.dp)
         )
-        DropdownMenu(
+        ContextMenu(
             expanded = showMenu.value,
             onDismissRequest = { showMenu.value = false }
         ) {

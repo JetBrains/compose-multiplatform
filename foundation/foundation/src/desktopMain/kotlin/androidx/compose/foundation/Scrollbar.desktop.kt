@@ -18,34 +18,34 @@ package androidx.compose.foundation
 
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.core.TweenSpec
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.gestures.awaitFirstDown
+import androidx.compose.foundation.gestures.detectTapAndPress
 import androidx.compose.foundation.gestures.drag
 import androidx.compose.foundation.gestures.forEachGesture
+import androidx.compose.foundation.interaction.DragInteraction
+import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocal
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.Immutable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.getValue
 import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.staticCompositionLocalOf
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.composed
-import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.geometry.Offset
-import androidx.compose.foundation.interaction.DragInteraction
-import androidx.compose.foundation.interaction.MutableInteractionSource
-import androidx.compose.foundation.gestures.detectTapAndPress
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.graphics.Shape
-import androidx.compose.ui.input.pointer.pointerMoveFilter
 import androidx.compose.ui.input.pointer.consumePositionChange
 import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.input.pointer.pointerMoveFilter
 import androidx.compose.ui.input.pointer.positionChange
 import androidx.compose.ui.layout.Layout
 import androidx.compose.ui.layout.MeasurePolicy
@@ -61,15 +61,15 @@ import kotlin.math.roundToInt
 import kotlin.math.sign
 
 /**
- * Ambient used to pass [ScrollbarStyle] down the tree.
+ * [CompositionLocal] used to pass [ScrollbarStyle] down the tree.
  * This value is typically set in some "Theme" composable function
  * (DesktopTheme, MaterialTheme)
  */
-val ScrollbarStyleAmbient = staticCompositionLocalOf { defaultScrollbarStyle() }
+val LocalScrollbarStyle = staticCompositionLocalOf { defaultScrollbarStyle() }
 
 /**
  * Defines visual style of scrollbars (thickness, shapes, colors, etc).
- * Can be passed as a parameter of scrollbar through [ScrollbarStyleAmbient]
+ * Can be passed as a parameter of scrollbar through [LocalScrollbarStyle]
  */
 @Immutable
 data class ScrollbarStyle(
@@ -123,7 +123,7 @@ fun defaultScrollbarStyle() = ScrollbarStyle(
 fun VerticalScrollbar(
     adapter: ScrollbarAdapter,
     modifier: Modifier = Modifier,
-    style: ScrollbarStyle = ScrollbarStyleAmbient.current,
+    style: ScrollbarStyle = LocalScrollbarStyle.current,
     interactionSource: MutableInteractionSource = remember { MutableInteractionSource() }
 ) = Scrollbar(
     adapter,
@@ -163,7 +163,7 @@ fun VerticalScrollbar(
 fun HorizontalScrollbar(
     adapter: ScrollbarAdapter,
     modifier: Modifier = Modifier,
-    style: ScrollbarStyle = ScrollbarStyleAmbient.current,
+    style: ScrollbarStyle = LocalScrollbarStyle.current,
     interactionSource: MutableInteractionSource = remember { MutableInteractionSource() }
 ) = Scrollbar(
     adapter,

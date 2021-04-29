@@ -18,9 +18,9 @@ package androidx.compose.material.catalog.model
 
 import androidx.annotation.DrawableRes
 import androidx.compose.material.catalog.R
+import androidx.compose.material.catalog.util.ComponentGuidelinesUrl
 import androidx.compose.material.catalog.util.DocsUrl
-import androidx.compose.material.catalog.util.GuidelinesUrl
-import androidx.compose.material.catalog.util.SourceUrl
+import androidx.compose.material.catalog.util.MaterialSourceUrl
 
 data class Component(
     val id: Int,
@@ -41,9 +41,9 @@ private val AppBarsBottom = Component(
     description = "A bottom app bar displays navigation and key actions at the bottom of mobile " +
         "screens.",
     icon = R.drawable.ic_app_bars_bottom,
-    guidelinesUrl = "$GuidelinesUrl/app-bars-bottom",
+    guidelinesUrl = "$ComponentGuidelinesUrl/app-bars-bottom",
     docsUrl = "$DocsUrl#bottomappbar",
-    sourceUrl = "$SourceUrl/AppBar.kt",
+    sourceUrl = "$MaterialSourceUrl/AppBar.kt",
     examples = AppBarsBottomExamples
 )
 
@@ -53,9 +53,9 @@ private val AppBarsTop = Component(
     description = "The top app bar displays information and actions relating to the current " +
         "screen.",
     icon = R.drawable.ic_app_bars_top,
-    guidelinesUrl = "$GuidelinesUrl/app-bars-top",
+    guidelinesUrl = "$ComponentGuidelinesUrl/app-bars-top",
     docsUrl = "$DocsUrl#topappbar",
-    sourceUrl = "$SourceUrl/AppBar.kt",
+    sourceUrl = "$MaterialSourceUrl/AppBar.kt",
     examples = AppBarsTopExamples
 )
 
@@ -66,9 +66,9 @@ private val Backdrop = Component(
         "and actionable content.",
     // No backdrop icon
     tintIcon = true,
-    guidelinesUrl = "$GuidelinesUrl/backdrop",
+    guidelinesUrl = "$ComponentGuidelinesUrl/backdrop",
     docsUrl = "$DocsUrl#backdropscaffold",
-    sourceUrl = "$SourceUrl/BackdropScaffold.kt",
+    sourceUrl = "$MaterialSourceUrl/BackdropScaffold.kt",
     examples = BackdropExamples
 )
 
@@ -77,9 +77,9 @@ private val BottomNavigation = Component(
     name = "Bottom navigation",
     description = "Bottom navigation bars allow movement between primary destinations in an app.",
     icon = R.drawable.ic_bottom_navigation,
-    guidelinesUrl = "$GuidelinesUrl/bottom-navigation",
+    guidelinesUrl = "$ComponentGuidelinesUrl/bottom-navigation",
     docsUrl = "$DocsUrl#bottomnavigation",
-    sourceUrl = "$SourceUrl/BottomNavigation.kt",
+    sourceUrl = "$MaterialSourceUrl/BottomNavigation.kt",
     examples = BottomNavigationExamples
 )
 
@@ -88,9 +88,9 @@ private val Buttons = Component(
     name = "Buttons",
     description = "Buttons allow users to take actions, and make choices, with a single tap.",
     icon = R.drawable.ic_buttons,
-    guidelinesUrl = "$GuidelinesUrl/buttons",
+    guidelinesUrl = "$ComponentGuidelinesUrl/buttons",
     docsUrl = "$DocsUrl#backdropscaffold",
-    sourceUrl = "$SourceUrl/BackdropScaffold.kt",
+    sourceUrl = "$MaterialSourceUrl/BackdropScaffold.kt",
     examples = ButtonsExamples
 )
 
@@ -99,9 +99,9 @@ private val ButtonsFloatingActionButton = Component(
     name = "Floating action buttons",
     description = "A floating action button (FAB) represents the primary action of a screen.",
     icon = R.drawable.ic_buttons_floating_action_button,
-    guidelinesUrl = "$GuidelinesUrl/buttons-floating-action-button",
+    guidelinesUrl = "$ComponentGuidelinesUrl/buttons-floating-action-button",
     docsUrl = "$DocsUrl#floatingactionbutton",
-    sourceUrl = "$SourceUrl/FloatingActionButton.kt",
+    sourceUrl = "$MaterialSourceUrl/FloatingActionButton.kt",
     examples = ButtonsFloatingActionButtonExamples
 )
 
@@ -110,9 +110,9 @@ private val Cards = Component(
     name = "Cards",
     description = "Cards contain content and actions about a single subject.",
     icon = R.drawable.ic_cards,
-    guidelinesUrl = "$GuidelinesUrl/cards",
+    guidelinesUrl = "$ComponentGuidelinesUrl/cards",
     docsUrl = "$DocsUrl#card",
-    sourceUrl = "$SourceUrl/Card.kt",
+    sourceUrl = "$MaterialSourceUrl/Card.kt",
     examples = CardsExamples
 )
 
@@ -122,9 +122,9 @@ private val Checkboxes = Component(
     description = "Checkboxes allow the user to select one or more items from a set or turn an " +
         "option on or off.",
     icon = R.drawable.ic_checkboxes,
-    guidelinesUrl = "$GuidelinesUrl/checkboxes",
+    guidelinesUrl = "$ComponentGuidelinesUrl/checkboxes",
     docsUrl = "$DocsUrl#checkbox",
-    sourceUrl = "$SourceUrl/Checkbox.kt",
+    sourceUrl = "$MaterialSourceUrl/Checkbox.kt",
     examples = CheckboxesExamples
 )
 
@@ -134,9 +134,9 @@ private val Dialogs = Component(
     description = "Dialogs inform users about a task and can contain critical information, " +
         "require decisions, or involve multiple tasks.",
     icon = R.drawable.ic_dialogs,
-    guidelinesUrl = "$GuidelinesUrl/dialogs",
+    guidelinesUrl = "$ComponentGuidelinesUrl/dialogs",
     docsUrl = "$DocsUrl#alertdialog",
-    sourceUrl = "$SourceUrl/AlertDialog.kt",
+    sourceUrl = "$MaterialSourceUrl/AlertDialog.kt",
     examples = DialogsExamples
 )
 
@@ -146,9 +146,9 @@ private val Dividers = Component(
     description = "A divider is a thin line that groups content in lists and layouts.",
     // No dividers icon
     tintIcon = true,
-    guidelinesUrl = "$GuidelinesUrl/dividers",
+    guidelinesUrl = "$ComponentGuidelinesUrl/dividers",
     docsUrl = "$DocsUrl#divider",
-    sourceUrl = "$SourceUrl/Divider.kt",
+    sourceUrl = "$MaterialSourceUrl/Divider.kt",
     examples = DividersExamples
 )
 
@@ -157,9 +157,9 @@ private val Lists = Component(
     name = "Lists",
     description = "Lists are continuous, vertical indexes of text or images.",
     icon = R.drawable.ic_lists,
-    guidelinesUrl = "$GuidelinesUrl/lists",
+    guidelinesUrl = "$ComponentGuidelinesUrl/lists",
     docsUrl = "$DocsUrl#listitem",
-    sourceUrl = "$SourceUrl/ListItem.kt",
+    sourceUrl = "$MaterialSourceUrl/ListItem.kt",
     examples = ListsExamples
 )
 
@@ -168,9 +168,9 @@ private val Menus = Component(
     name = "Menus",
     description = "Menus display a list of choices on temporary surfaces.",
     icon = R.drawable.ic_menus,
-    guidelinesUrl = "$GuidelinesUrl/menus",
+    guidelinesUrl = "$ComponentGuidelinesUrl/menus",
     docsUrl = "$DocsUrl#dropdownmenu",
-    sourceUrl = "$SourceUrl/Menu.kt",
+    sourceUrl = "$MaterialSourceUrl/Menu.kt",
     examples = MenusExamples
 )
 
@@ -179,9 +179,9 @@ private val NavigationDrawer = Component(
     name = "Navigation drawer",
     description = "Navigation drawers provide access to destinations in your app.",
     icon = R.drawable.ic_navigation_drawer,
-    guidelinesUrl = "$GuidelinesUrl/navigation-drawer",
+    guidelinesUrl = "$ComponentGuidelinesUrl/navigation-drawer",
     docsUrl = "$DocsUrl#modaldrawer",
-    sourceUrl = "$SourceUrl/Drawer.kt",
+    sourceUrl = "$MaterialSourceUrl/Drawer.kt",
     examples = NavigationDrawerExamples
 )
 
@@ -191,9 +191,9 @@ private val ProgressIndicators = Component(
     description = "Progress indicators express an unspecified wait time or display the length of " +
         "a process.",
     icon = R.drawable.ic_progress_indicators,
-    guidelinesUrl = "$GuidelinesUrl/progress-indicators",
+    guidelinesUrl = "$ComponentGuidelinesUrl/progress-indicators",
     docsUrl = "$DocsUrl#circularprogressindicator",
-    sourceUrl = "$SourceUrl/ProgressIndicator.kt",
+    sourceUrl = "$MaterialSourceUrl/ProgressIndicator.kt",
     examples = ProgressIndicatorsExamples
 )
 
@@ -202,9 +202,9 @@ private val RadioButtons = Component(
     name = "Radio buttons",
     description = "Radio buttons allow the user to select one option from a set.",
     icon = R.drawable.ic_radio_buttons,
-    guidelinesUrl = "$GuidelinesUrl/radio-buttons",
+    guidelinesUrl = "$ComponentGuidelinesUrl/radio-buttons",
     docsUrl = "$DocsUrl#radiobutton",
-    sourceUrl = "$SourceUrl/RadioButton.kt",
+    sourceUrl = "$MaterialSourceUrl/RadioButton.kt",
     examples = RadioButtonsExamples
 )
 
@@ -214,9 +214,9 @@ private val SheetsBottom = Component(
     description = "Bottom sheets are surfaces containing supplementary content that are anchored " +
         "to the bottom of the screen.",
     icon = R.drawable.ic_sheets_bottom,
-    guidelinesUrl = "$GuidelinesUrl/sheets-bottom",
+    guidelinesUrl = "$ComponentGuidelinesUrl/sheets-bottom",
     docsUrl = "$DocsUrl#bottomsheetscaffold",
-    sourceUrl = "$SourceUrl/BottomSheetScaffold.kt",
+    sourceUrl = "$MaterialSourceUrl/BottomSheetScaffold.kt",
     examples = SheetsBottomExamples
 )
 
@@ -225,9 +225,9 @@ private val Sliders = Component(
     name = "Sliders",
     description = "Sliders allow users to make selections from a range of values.",
     icon = R.drawable.ic_sliders,
-    guidelinesUrl = "$GuidelinesUrl/sliders",
+    guidelinesUrl = "$ComponentGuidelinesUrl/sliders",
     docsUrl = "$DocsUrl#slider",
-    sourceUrl = "$SourceUrl/Slider.kt",
+    sourceUrl = "$MaterialSourceUrl/Slider.kt",
     examples = SlidersExamples
 )
 
@@ -237,9 +237,9 @@ private val Snackbars = Component(
     description = "Snackbars provide brief messages about app processes at the bottom of the " +
         "screen.",
     icon = R.drawable.ic_snackbars,
-    guidelinesUrl = "$GuidelinesUrl/snackbars",
+    guidelinesUrl = "$ComponentGuidelinesUrl/snackbars",
     docsUrl = "$DocsUrl#snackbar",
-    sourceUrl = "$SourceUrl/Snackbar.kt",
+    sourceUrl = "$MaterialSourceUrl/Snackbar.kt",
     examples = SnackbarsExamples
 )
 
@@ -248,9 +248,9 @@ private val Switches = Component(
     name = "Switches",
     description = "Switches toggle the state of a single setting on or off.",
     icon = R.drawable.ic_switches,
-    guidelinesUrl = "$GuidelinesUrl/switches",
+    guidelinesUrl = "$ComponentGuidelinesUrl/switches",
     docsUrl = "$DocsUrl#switch",
-    sourceUrl = "$SourceUrl/Switch.kt",
+    sourceUrl = "$MaterialSourceUrl/Switch.kt",
     examples = SwitchesExamples
 )
 
@@ -260,9 +260,9 @@ private val Tabs = Component(
     description = "Tabs organize content across different screens, data sets, and other " +
         "interactions.",
     icon = R.drawable.ic_tabs,
-    guidelinesUrl = "$GuidelinesUrl/tabs",
+    guidelinesUrl = "$ComponentGuidelinesUrl/tabs",
     docsUrl = "$DocsUrl#tab",
-    sourceUrl = "$SourceUrl/Tab.kt",
+    sourceUrl = "$MaterialSourceUrl/Tab.kt",
     examples = TabsExamples
 )
 
@@ -271,9 +271,9 @@ private val TextFields = Component(
     name = "Text fields",
     description = "Text fields let users enter and edit text.",
     icon = R.drawable.ic_text_fields,
-    guidelinesUrl = "$GuidelinesUrl/text-fields",
+    guidelinesUrl = "$ComponentGuidelinesUrl/text-fields",
     docsUrl = "$DocsUrl#textfield",
-    sourceUrl = "$SourceUrl/TextField.kt",
+    sourceUrl = "$MaterialSourceUrl/TextField.kt",
     examples = TextFieldsExamples
 )
 

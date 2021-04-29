@@ -21,17 +21,19 @@ import android.content.Context
 import android.graphics.Outline
 import android.graphics.PixelFormat
 import android.graphics.Rect
+import android.os.Build
 import android.view.Gravity
 import android.view.KeyEvent
 import android.view.MotionEvent
 import android.view.View
 import android.view.ViewOutlineProvider
 import android.view.WindowManager
+import androidx.annotation.RequiresApi
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionContext
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.Immutable
-import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.compositionLocalOf
 import androidx.compose.runtime.derivedStateOf
@@ -42,6 +44,7 @@ import androidx.compose.runtime.rememberCompositionContext
 import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.layout.Layout
@@ -55,8 +58,8 @@ import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.semantics.popup
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.Density
-import androidx.compose.ui.unit.IntRect
 import androidx.compose.ui.unit.IntOffset
+import androidx.compose.ui.unit.IntRect
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
@@ -78,16 +81,35 @@ import kotlin.math.roundToInt
  * focusable then this property does nothing.
  * @property dismissOnClickOutside Whether the popup can be dismissed by clicking outside the
  * popup's bounds. If true, clicking outside the popup will call onDismissRequest.
- * @param securePolicy Policy for setting [WindowManager.LayoutParams.FLAG_SECURE] on the popup's
+ * @property securePolicy Policy for setting [WindowManager.LayoutParams.FLAG_SECURE] on the popup's
  * window.
+ * @property excludeFromSystemGesture A flag to check whether to set the systemGestureExclusionRects.
+ * The default is true.
  */
 @Immutable
-class PopupProperties(
+class PopupProperties @ExperimentalComposeUiApi constructor(
     val focusable: Boolean = false,
     val dismissOnBackPress: Boolean = true,
     val dismissOnClickOutside: Boolean = true,
-    val securePolicy: SecureFlagPolicy = SecureFlagPolicy.Inherit
+    val securePolicy: SecureFlagPolicy = SecureFlagPolicy.Inherit,
+    @get:ExperimentalComposeUiApi
+    val excludeFromSystemGesture: Boolean = true
 ) {
+    @OptIn(ExperimentalComposeUiApi::class)
+    constructor(
+        focusable: Boolean = false,
+        dismissOnBackPress: Boolean = true,
+        dismissOnClickOutside: Boolean = true,
+        securePolicy: SecureFlagPolicy = SecureFlagPolicy.Inherit,
+    ) : this (
+        focusable,
+        dismissOnBackPress,
+        dismissOnClickOutside,
+        securePolicy,
+        true
+    )
+
+    @OptIn(ExperimentalComposeUiApi::class)
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
         if (other !is PopupProperties) return false
@@ -96,16 +118,19 @@ class PopupProperties(
         if (dismissOnBackPress != other.dismissOnBackPress) return false
         if (dismissOnClickOutside != other.dismissOnClickOutside) return false
         if (securePolicy != other.securePolicy) return false
+        if (excludeFromSystemGesture != other.excludeFromSystemGesture) return false
 
         return true
     }
 
+    @OptIn(ExperimentalComposeUiApi::class)
     override fun hashCode(): Int {
         var result = dismissOnBackPress.hashCode()
         result = 31 * result + focusable.hashCode()
         result = 31 * result + dismissOnBackPress.hashCode()
         result = 31 * result + dismissOnClickOutside.hashCode()
         result = 31 * result + securePolicy.hashCode()
+        result = 31 * result + excludeFromSystemGesture.hashCode()
         return result
     }
 }
@@ -329,6 +354,12 @@ private class PopupLayout(
 
     private val maxSupportedElevation = 30.dp
 
+    private val popupLayoutHelper: PopupLayoutHelper = if (Build.VERSION.SDK_INT >= 29) {
+        PopupLayoutHelperImpl29()
+    } else {
+        PopupLayoutHelperImpl()
+    }
+
     init {
         id = android.R.id.content
         ViewTreeLifecycleOwner.set(this, ViewTreeLifecycleOwner.get(composeView))
@@ -441,6 +472,7 @@ private class PopupLayout(
     /**
      * Updates the position of the popup based on current position properties.
      */
+    @OptIn(ExperimentalComposeUiApi::class)
     fun updatePosition() {
         val parentBounds = parentBounds ?: return
         val popupContentSize = popupContentSize ?: return
@@ -460,6 +492,12 @@ private class PopupLayout(
 
         params.x = popupPosition.x
         params.y = popupPosition.y
+
+        if (properties.excludeFromSystemGesture) {
+            // Resolve conflict with gesture navigation back when dragging this handle view on the
+            // edge of the screen.
+            popupLayoutHelper.setGestureExclusionRects(this, windowSize.width, windowSize.height)
+        }
 
         windowManager.updateViewLayout(this, params)
     }
@@ -551,6 +589,30 @@ private class PopupLayout(
         right = right,
         bottom = bottom
     )
+}
+
+private interface PopupLayoutHelper {
+    fun setGestureExclusionRects(composeView: View, width: Int, height: Int)
+}
+
+private class PopupLayoutHelperImpl : PopupLayoutHelper {
+    override fun setGestureExclusionRects(composeView: View, width: Int, height: Int) {
+        // do nothing
+    }
+}
+
+@RequiresApi(29)
+private class PopupLayoutHelperImpl29 : PopupLayoutHelper {
+    override fun setGestureExclusionRects(composeView: View, width: Int, height: Int) {
+        composeView.systemGestureExclusionRects = mutableListOf(
+            Rect(
+                0,
+                0,
+                width,
+                height
+            )
+        )
+    }
 }
 
 internal fun View.isFlagSecureEnabled(): Boolean {

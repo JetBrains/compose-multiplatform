@@ -19,7 +19,7 @@ package androidx.compose.foundation.gestures
 import androidx.compose.animation.core.AnimationState
 import androidx.compose.animation.core.DecayAnimationSpec
 import androidx.compose.animation.core.animateDecay
-import androidx.compose.animation.defaultDecayAnimationSpec
+import androidx.compose.animation.rememberSplineBasedDecay
 import androidx.compose.foundation.MutatePriority
 import androidx.compose.foundation.gestures.Orientation.Horizontal
 import androidx.compose.foundation.interaction.MutableInteractionSource
@@ -106,7 +106,7 @@ object ScrollableDefaults {
      */
     @Composable
     fun flingBehavior(): FlingBehavior {
-        val flingSpec = defaultDecayAnimationSpec()
+        val flingSpec = rememberSplineBasedDecay<Float>()
         return remember(flingSpec) {
             DefaultFlingBehavior(flingSpec)
         }
@@ -163,8 +163,11 @@ private class ScrollingLogic(
     val scrollableState: ScrollableState,
     val flingBehavior: FlingBehavior
 ) {
-    fun Float.toOffset(): Offset =
-        if (orientation == Horizontal) Offset(this, 0f) else Offset(0f, this)
+    fun Float.toOffset(): Offset = when {
+        this == 0f -> Offset.Zero
+        orientation == Horizontal -> Offset(this, 0f)
+        else -> Offset(0f, this)
+    }
 
     fun Float.toVelocity(): Velocity =
         if (orientation == Horizontal) Velocity(this, 0f) else Velocity(0f, this)
@@ -178,16 +181,19 @@ private class ScrollingLogic(
     fun Float.reverseIfNeeded(): Float = if (reverseDirection) this * -1 else this
 
     fun ScrollScope.dispatchScroll(scrollDelta: Float, source: NestedScrollSource): Float {
-        val scrollOffset = scrollDelta.toOffset()
-        val preConsumedByParent = nestedScrollDispatcher.value
-            .dispatchPreScroll(scrollOffset, source)
+        val nestedScrollDispatcher = nestedScrollDispatcher.value
+        val preConsumedByParent = nestedScrollDispatcher
+            .dispatchPreScroll(scrollDelta.toOffset(), source)
 
-        val scrollAvailable = scrollOffset - preConsumedByParent
-        val consumed = scrollBy(scrollAvailable.toFloat().reverseIfNeeded())
-            .reverseIfNeeded().toOffset()
+        val scrollAvailable = scrollDelta - preConsumedByParent.toFloat()
+        val consumed = scrollBy(scrollAvailable.reverseIfNeeded()).reverseIfNeeded()
         val leftForParent = scrollAvailable - consumed
-        nestedScrollDispatcher.value.dispatchPostScroll(consumed, leftForParent, source)
-        return leftForParent.toFloat()
+        nestedScrollDispatcher.dispatchPostScroll(
+            consumed.toOffset(),
+            leftForParent.toOffset(),
+            source
+        )
+        return leftForParent
     }
 
     fun performRawScroll(scroll: Offset): Offset {

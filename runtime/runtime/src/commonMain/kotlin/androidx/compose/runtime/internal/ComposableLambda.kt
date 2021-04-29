@@ -44,7 +44,6 @@ internal fun differentBits(slot: Int): Int = bitsForSlot(0b10, slot)
  */
 @Suppress("NAME_SHADOWING")
 @Stable
-@OptIn(ComposeCompilerApi::class)
 /* ktlint-disable parameter-list-wrapping */ // TODO(https://github.com/pinterest/ktlint/issues/921): reenable
 internal expect class ComposableLambdaImpl(
     key: Int,

@@ -34,7 +34,7 @@ import java.awt.event.KeyEvent
 import java.awt.event.MouseEvent
 import androidx.compose.ui.input.key.KeyEvent as ComposeKeyEvent
 
-internal val DesktopOwnersAmbient = staticCompositionLocalOf<DesktopOwners> {
+internal val LocalDesktopOwners = staticCompositionLocalOf<DesktopOwners> {
     error("CompositionLocal DesktopOwnersAmbient not provided")
 }
 
@@ -119,11 +119,11 @@ internal class DesktopOwners(
             dispatcher.flush()
             frameClock.sendFrame(nanoTime)
 
-            listCopy.clear()
             listCopy.addAll(list)
             for (owner in listCopy) {
                 owner.render(canvas, width, height)
             }
+            listCopy.clear()
         }
 
         invalidateIfNeeded()

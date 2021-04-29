@@ -15,28 +15,32 @@
  */
 package androidx.compose.ui.window
 
+import androidx.compose.desktop.LocalLayerContainer
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.rememberCompositionContext
 import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCompositionContext
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
-import androidx.compose.ui.input.pointer.changedToDown
-import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.input.pointer.PointerEventPass
 import androidx.compose.ui.input.pointer.PointerInputScope
+import androidx.compose.ui.input.pointer.changedToDown
+import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.Layout
 import androidx.compose.ui.layout.onGloballyPositioned
-import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.DesktopOwner
-import androidx.compose.ui.platform.DesktopOwnersAmbient
+import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.platform.LocalDesktopOwners
 import androidx.compose.ui.platform.setContent
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.IntRect
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.round
+import java.awt.Point
 
 /**
  * Opens a popup with the given content.
@@ -50,7 +54,7 @@ import androidx.compose.ui.unit.round
  * @param offset An offset from the original aligned position of the popup. Offset respects the
  * Ltr/Rtl context, thus in Ltr it will be added to the original aligned position and in Rtl it
  * will be subtracted from it.
- * @param isFocusable Indicates if the popup can grab the focus.
+ * @param focusable Indicates if the popup can grab the focus.
  * @param onDismissRequest Executes when the user clicks outside of the popup.
  * @param content The content to be displayed inside the popup.
  */
@@ -58,7 +62,7 @@ import androidx.compose.ui.unit.round
 fun Popup(
     alignment: Alignment = Alignment.TopStart,
     offset: IntOffset = IntOffset(0, 0),
-    isFocusable: Boolean = false,
+    focusable: Boolean = false,
     onDismissRequest: (() -> Unit)? = null,
     content: @Composable () -> Unit
 ) {
@@ -71,8 +75,8 @@ fun Popup(
 
     Popup(
         popupPositionProvider = popupPositioner,
-        isFocusable = isFocusable,
         onDismissRequest = onDismissRequest,
+        focusable = focusable,
         content = content
     )
 }
@@ -85,39 +89,47 @@ fun Popup(
  * @sample androidx.compose.ui.samples.PopupSample
  *
  * @param popupPositionProvider Provides the screen position of the popup.
- * @param isFocusable Indicates if the popup can grab the focus.
  * @param onDismissRequest Executes when the user clicks outside of the popup.
+ * @param focusable Indicates if the popup can grab the focus.
+ * @property contextMenu Places the popup window below the lower-right rectangle of the mouse
+ * cursor image (basic context menu behaviour).
  * @param content The content to be displayed inside the popup.
  */
 @Composable
 fun Popup(
     popupPositionProvider: PopupPositionProvider,
-    isFocusable: Boolean = false,
+    offset: IntOffset = IntOffset.Zero,
     onDismissRequest: (() -> Unit)? = null,
+    focusable: Boolean = false,
+    contextMenu: Boolean = false,
     content: @Composable () -> Unit
 ) {
-    PopupLayout(popupPositionProvider, isFocusable, onDismissRequest, content)
+    PopupLayout(popupPositionProvider, offset, focusable, contextMenu, onDismissRequest, content)
 }
 
 @Composable
 private fun PopupLayout(
     popupPositionProvider: PopupPositionProvider,
-    isFocusable: Boolean,
+    offset: IntOffset,
+    focusable: Boolean,
+    contextMenu: Boolean,
     onDismissRequest: (() -> Unit)?,
     content: @Composable () -> Unit
 ) {
-    val owners = DesktopOwnersAmbient.current
+    val owners = LocalDesktopOwners.current
     val density = LocalDensity.current
+    val container = LocalLayerContainer.current
 
-    val parentBounds = remember { mutableStateOf(IntRect.Zero) }
-    val popupBounds = remember { mutableStateOf(IntRect.Zero) }
+    var parentBounds by remember { mutableStateOf(IntRect.Zero) }
+    var popupBounds by remember { mutableStateOf(IntRect.Zero) }
+    val pointClick = remember { container.getMousePosition() }
 
     // getting parent bounds
     Layout(
         content = {},
         modifier = Modifier.onGloballyPositioned { childCoordinates ->
             val coordinates = childCoordinates.parentCoordinates!!
-            parentBounds.value = IntRect(
+            parentBounds = IntRect(
                 coordinates.localToWindow(Offset.Zero).round(),
                 coordinates.size
             )
@@ -133,10 +145,10 @@ private fun PopupLayout(
         val composition = owner.setContent(parent = parentComposition) {
             Layout(
                 content = content,
-                modifier = Modifier.pointerInput(isFocusable, onDismissRequest) {
+                modifier = Modifier.pointerInput(focusable, onDismissRequest) {
                     detectDown(
-                        onDown = { offset ->
-                            if (isFocusable && isOutsideRectTap(popupBounds.value, offset)) {
+                        onDown = { point ->
+                            if (focusable && isOutsideRectTap(popupBounds, point)) {
                                 onDismissRequest?.invoke()
                             }
                         }
@@ -154,17 +166,27 @@ private fun PopupLayout(
                     layout(constraints.maxWidth, constraints.maxHeight) {
                         measurables.forEach {
                             val placeable = it.measure(constraints)
-                            val offset = popupPositionProvider.calculatePosition(
-                                anchorBounds = parentBounds.value,
-                                windowSize = windowSize,
-                                layoutDirection = layoutDirection,
-                                popupContentSize = IntSize(placeable.width, placeable.height)
-                            )
-                            popupBounds.value = IntRect(
-                                offset,
+                            var position: IntOffset
+                            if (contextMenu) {
+                                position = calculateContextMenuPosition(
+                                    pointClick,
+                                    offset,
+                                    parentBounds,
+                                    density.density
+                                )
+                            } else {
+                                position = popupPositionProvider.calculatePosition(
+                                    anchorBounds = parentBounds,
+                                    windowSize = windowSize,
+                                    layoutDirection = layoutDirection,
+                                    popupContentSize = IntSize(placeable.width, placeable.height)
+                                )
+                            }
+                            popupBounds = IntRect(
+                                position,
                                 IntSize(placeable.width, placeable.height)
                             )
-                            placeable.place(offset.x, offset.y)
+                            placeable.place(position.x, position.y)
                         }
                     }
                 }
@@ -195,4 +217,16 @@ private suspend fun PointerInputScope.detectDown(onDown: (Offset) -> Unit) {
             }
         }
     }
+}
+
+private fun calculateContextMenuPosition(
+    point: Point,
+    dropdownMenuPadding: IntOffset,
+    parentRect: IntRect,
+    density: Float
+): IntOffset {
+    return IntOffset(
+        (point.x * density).toInt(),
+        ((point.y + dropdownMenuPadding.y) * density).toInt() - parentRect.height
+    )
 }

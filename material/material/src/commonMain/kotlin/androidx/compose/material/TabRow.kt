@@ -221,7 +221,7 @@ fun ScrollableTabRow(
     tabs: @Composable () -> Unit
 ) {
     Surface(
-        modifier = modifier.selectableGroup(),
+        modifier = modifier,
         color = backgroundColor,
         contentColor = contentColor
     ) {
@@ -237,6 +237,7 @@ fun ScrollableTabRow(
             Modifier.fillMaxWidth()
                 .wrapContentSize(align = Alignment.CenterStart)
                 .horizontalScroll(scrollState)
+                .selectableGroup()
                 .clipToBounds()
         ) { constraints ->
             val minTabWidth = ScrollableTabRowMinimumTabWidth.roundToPx()

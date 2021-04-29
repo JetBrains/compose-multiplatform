@@ -398,7 +398,7 @@ internal class TextController(val state: TextState) {
                     layoutCoordinates = it,
                     startPosition = dragBeginPosition,
                     endPosition = dragBeginPosition + dragTotalDistance,
-                    adjustment = SelectionAdjustment.NONE
+                    adjustment = SelectionAdjustment.CHARACTER
                 )
             }
         }

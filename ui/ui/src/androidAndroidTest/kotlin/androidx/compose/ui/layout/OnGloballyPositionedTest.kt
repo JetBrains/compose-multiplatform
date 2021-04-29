@@ -50,6 +50,7 @@ import androidx.compose.ui.test.onRoot
 import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.window.Popup
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import androidx.test.filters.FlakyTest
 import androidx.test.filters.MediumTest
 import com.google.common.truth.Truth.assertThat
 import org.junit.Assert.assertEquals
@@ -285,6 +286,7 @@ class OnGloballyPositionedTest {
         }
     }
 
+    @FlakyTest(bugId = 180508644)
     @Test
     fun onPositionedIsCalledWhenComposeContainerIsScrolled() {
         var positionedLatch = CountDownLatch(1)
@@ -337,6 +339,7 @@ class OnGloballyPositionedTest {
         return offset
     }
 
+    @FlakyTest(bugId = 180508644)
     @Test
     fun onPositionedIsCalledWhenComposeContainerPositionChanged() {
         var positionedLatch = CountDownLatch(1)

@@ -38,7 +38,7 @@ import androidx.compose.ui.input.mouse.MouseScrollEvent
 import androidx.compose.ui.input.mouse.MouseScrollOrientation
 import androidx.compose.ui.input.mouse.MouseScrollUnit
 import androidx.compose.ui.platform.DesktopPlatform
-import androidx.compose.ui.platform.DesktopPlatformAmbient
+import androidx.compose.ui.platform.LocalDesktopPlatform
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.test.ExperimentalTestApi
 import androidx.compose.ui.test.GestureScope
@@ -455,7 +455,7 @@ class ScrollbarTest {
 
     @Composable
     private fun withTestEnvironment(content: @Composable () -> Unit) = CompositionLocalProvider(
-        ScrollbarStyleAmbient provides ScrollbarStyle(
+        LocalScrollbarStyle provides ScrollbarStyle(
             minimalHeight = 16.dp,
             thickness = 8.dp,
             shape = RectangleShape,
@@ -463,7 +463,7 @@ class ScrollbarTest {
             unhoverColor = Color.Black,
             hoverColor = Color.Red
         ),
-        DesktopPlatformAmbient provides DesktopPlatform.MacOS,
+        LocalDesktopPlatform provides DesktopPlatform.MacOS,
         content = content
     )
 }

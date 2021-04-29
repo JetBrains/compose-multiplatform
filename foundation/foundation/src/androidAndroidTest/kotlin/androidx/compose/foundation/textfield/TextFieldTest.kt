@@ -38,6 +38,7 @@ import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.ExperimentalComposeApi
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -52,6 +53,7 @@ import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.RectangleShape
+import androidx.compose.ui.graphics.Shadow
 import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.platform.LocalTextInputService
@@ -84,9 +86,16 @@ import androidx.compose.ui.test.performTextClearance
 import androidx.compose.ui.test.performTextInput
 import androidx.compose.ui.test.performTextInputSelection
 import androidx.compose.ui.text.AnnotatedString
+import androidx.compose.ui.text.ParagraphStyle
+import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.TextLayoutResult
 import androidx.compose.ui.text.TextRange
 import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.VerbatimTtsAnnotation
+import androidx.compose.ui.text.buildAnnotatedString
+import androidx.compose.ui.text.font.FontStyle
+import androidx.compose.ui.text.font.FontSynthesis
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.CommitTextCommand
 import androidx.compose.ui.text.input.EditCommand
 import androidx.compose.ui.text.input.ImeAction
@@ -95,7 +104,18 @@ import androidx.compose.ui.text.input.PlatformTextInputService
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.input.TextFieldValue.Companion.Saver
 import androidx.compose.ui.text.input.TextInputService
+import androidx.compose.ui.text.intl.Locale
+import androidx.compose.ui.text.intl.LocaleList
+import androidx.compose.ui.text.style.BaselineShift
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextDecoration
+import androidx.compose.ui.text.style.TextDirection
+import androidx.compose.ui.text.style.TextGeometricTransform
+import androidx.compose.ui.text.style.TextIndent
+import androidx.compose.ui.text.withAnnotation
+import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.em
 import androidx.compose.ui.unit.sp
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.LargeTest
@@ -395,6 +415,72 @@ class TextFieldTest {
             assertThat(state!!.value).isEqualTo(
                 TextFieldValue("test", TextRange(1, 2))
             )
+        }
+    }
+
+    @OptIn(ExperimentalComposeApi::class)
+    @Test
+    fun textFieldValue_saverRestoresState_withAnnotatedString() {
+        var state: MutableState<TextFieldValue>? = null
+        val annotatedString = buildAnnotatedString {
+            withStyle(ParagraphStyle(textAlign = TextAlign.Justify)) { append("1") }
+            withStyle(SpanStyle(fontStyle = FontStyle.Italic)) { append("2") }
+            withAnnotation(tag = "Tag1", annotation = "Annotation1") { append("3") }
+            withAnnotation(VerbatimTtsAnnotation("verbatim1")) { append("4") }
+            withAnnotation(tag = "Tag2", annotation = "Annotation2") { append("5") }
+            withAnnotation(VerbatimTtsAnnotation("verbatim2")) { append("6") }
+            withStyle(
+                SpanStyle(
+                    color = Color.Red,
+                    fontSize = 10.sp,
+                    fontWeight = FontWeight.Bold,
+                    fontStyle = FontStyle.Italic,
+                    fontSynthesis = FontSynthesis.All,
+                    fontFeatureSettings = "feature settings",
+                    letterSpacing = 2.em,
+                    baselineShift = BaselineShift.Superscript,
+                    textGeometricTransform = TextGeometricTransform(2f, 3f),
+                    localeList = LocaleList(
+                        Locale("sr-Latn-SR"),
+                        Locale("sr-Cyrl-SR"),
+                        Locale.current
+                    ),
+                    background = Color.Blue,
+                    textDecoration = TextDecoration.LineThrough,
+                    shadow = Shadow(color = Color.Red, offset = Offset(2f, 2f), blurRadius = 4f)
+
+                )
+            ) {
+                append("7")
+            }
+            withStyle(
+                ParagraphStyle(
+                    textAlign = TextAlign.Justify,
+                    textDirection = TextDirection.Rtl,
+                    lineHeight = 10.sp,
+                    textIndent = TextIndent(firstLine = 2.sp, restLine = 3.sp)
+                )
+            ) {
+                append("8")
+            }
+        }
+        val newTextFieldValue = TextFieldValue(annotatedString, TextRange(1, 2))
+
+        val restorationTester = StateRestorationTester(rule)
+        restorationTester.setContent {
+            state = rememberSaveable(stateSaver = Saver) { mutableStateOf(TextFieldValue()) }
+        }
+
+        rule.runOnIdle {
+            state!!.value = newTextFieldValue
+            // we null it to ensure recomposition happened
+            state = null
+        }
+
+        restorationTester.emulateSavedInstanceStateRestore()
+
+        rule.runOnIdle {
+            assertThat(state!!.value).isEqualTo(newTextFieldValue)
         }
     }
 

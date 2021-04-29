@@ -16,6 +16,9 @@
 
 package androidx.compose.ui.platform
 
+import androidx.compose.ui.ExperimentalComposeUiApi
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.geometry.MutableRect
 import androidx.compose.ui.geometry.Rect
 import androidx.compose.ui.geometry.toRect
 import androidx.compose.ui.graphics.Canvas
@@ -54,7 +57,8 @@ internal class SkijaLayer(
     private var position = IntOffset.Zero
     private var outlineCache =
         OutlineCache(getDensity(), size, RectangleShape, LayoutDirection.Ltr)
-    private val matrix = Matrix()
+    // Internal for testing
+    internal val matrix = Matrix()
     private val pictureRecorder = PictureRecorder()
     private var picture: Picture? = null
     private var isDestroyed = false
@@ -72,6 +76,10 @@ internal class SkijaLayer(
     private var shadowElevation: Float = 0f
 
     override val layerId = lastId++
+
+    @ExperimentalComposeUiApi
+    override val ownerViewId: Long
+        get() = 0
 
     override fun destroy() {
         picture?.close()
@@ -96,8 +104,23 @@ internal class SkijaLayer(
         }
     }
 
-    override fun getMatrix(matrix: Matrix) {
-        matrix.setFrom(this.matrix)
+    override fun mapOffset(point: Offset, inverse: Boolean): Offset {
+        return getMatrix(inverse).map(point)
+    }
+
+    override fun mapBounds(rect: MutableRect, inverse: Boolean) {
+        getMatrix(inverse).map(rect)
+    }
+
+    private fun getMatrix(inverse: Boolean): Matrix {
+        return if (inverse) {
+            Matrix().apply {
+                setFrom(matrix)
+                invert()
+            }
+        } else {
+            matrix
+        }
     }
 
     override fun updateLayerProperties(
@@ -224,7 +247,7 @@ internal class SkijaLayer(
         val zParams = Point3(0f, 0f, shadowElevation)
 
         // TODO: configurable?
-        val lightPos = Point3(0f, 0f, 600.dp.toPx())
+        val lightPos = Point3(0f, -300.dp.toPx(), 600.dp.toPx())
         val lightRad = 800.dp.toPx()
 
         val ambientAlpha = 0.039f * alpha

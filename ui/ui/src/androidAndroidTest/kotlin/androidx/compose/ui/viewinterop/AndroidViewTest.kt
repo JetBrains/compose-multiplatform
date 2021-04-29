@@ -70,6 +70,7 @@ import com.google.common.truth.Truth.assertThat
 import org.hamcrest.CoreMatchers.endsWith
 import org.hamcrest.CoreMatchers.equalTo
 import org.hamcrest.CoreMatchers.instanceOf
+import org.junit.Ignore
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -465,7 +466,9 @@ class AndroidViewTest {
         }
     }
 
+    @Ignore
     @Test
+    @SdkSuppress(minSdkVersion = Build.VERSION_CODES.O)
     fun androidView_clipsToBounds() {
         val size = 20
         val sizeDp = with(rule.density) { size.toDp() }

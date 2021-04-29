@@ -78,7 +78,7 @@ fun main() = SwingUtilities.invokeLater {
         )
     ).show {
         CompositionLocalProvider(
-            AmbientTest provides 42
+            LocalTest provides 42
         ) {
             content()
         }

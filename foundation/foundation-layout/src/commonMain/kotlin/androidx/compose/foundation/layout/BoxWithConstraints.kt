@@ -39,7 +39,12 @@ import androidx.compose.ui.unit.LayoutDirection
  * the layout according to the [contentAlignment]. For individually specifying the alignments
  * of the children layouts, use the [BoxScope.align] modifier.
  * By default, the content will be measured without the [Box]'s incoming min constraints,
- * unless [propagateMinConstraints] is `true`.
+ * unless [propagateMinConstraints] is `true`. As an example, setting [propagateMinConstraints] to
+ * `true` can be useful when the [BoxWithConstraints] has content on which modifiers cannot be
+ * specified directly and setting a min size on the content of the [BoxWithConstraints] is needed.
+ * If [propagateMinConstraints] is set to `true`, the min size set on the [BoxWithConstraints] will
+ * also be applied to the content, whereas otherwise the min size will only apply to the
+ * [BoxWithConstraints].
  * When the content has more than one layout child the layout children will be stacked one
  * on top of the other (positioned as explained above) in the composition order.
  *
@@ -93,7 +98,7 @@ interface BoxWithConstraintsScope : BoxScope {
      */
     val minHeight: Dp
     /**
-     * The minimum height in [Dp].
+     * The maximum height in [Dp].
      *
      * @see constraints for the values in pixels.
      */

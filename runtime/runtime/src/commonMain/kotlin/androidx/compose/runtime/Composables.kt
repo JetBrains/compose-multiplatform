@@ -20,7 +20,6 @@ package androidx.compose.runtime
  * Remember the value produced by [calculation]. [calculation] will only be evaluated during the composition.
  * Recomposition will always return the value produced by composition.
  */
-@OptIn(ComposeCompilerApi::class)
 @Composable
 inline fun <T> remember(calculation: @DisallowComposableCalls () -> T): T =
     currentComposer.cache(false, calculation)
@@ -29,7 +28,6 @@ inline fun <T> remember(calculation: @DisallowComposableCalls () -> T): T =
  * Remember the value returned by [calculation] if [key1] is equal to the previous composition,
  * otherwise produce and remember a new value by calling [calculation].
  */
-@OptIn(ComposeCompilerApi::class)
 @Composable
 inline fun <T> remember(
     key1: Any?,
@@ -42,7 +40,6 @@ inline fun <T> remember(
  * Remember the value returned by [calculation] if [key1] and [key2] are equal to the previous
  * composition, otherwise produce and remember a new value by calling [calculation].
  */
-@OptIn(ComposeCompilerApi::class)
 @Composable
 inline fun <T> remember(
     key1: Any?,
@@ -59,7 +56,6 @@ inline fun <T> remember(
  * Remember the value returned by [calculation] if [key1], [key2] and [key3] are equal to the
  * previous composition, otherwise produce and remember a new value by calling [calculation].
  */
-@OptIn(ComposeCompilerApi::class)
 @Composable
 inline fun <T> remember(
     key1: Any?,
@@ -79,7 +75,6 @@ inline fun <T> remember(
  * Remember the value returned by [calculation] if all values of [keys] are equal to the previous
  * composition, otherwise produce and remember a new value by calling [calculation].
  */
-@OptIn(ComposeCompilerApi::class)
 @Composable
 inline fun <T> remember(
     vararg keys: Any?,
@@ -184,7 +179,6 @@ val currentCompositeKeyHash: Int
  * @see Applier
  * @see Composition
  */
-@OptIn(ComposeCompilerApi::class)
 // ComposeNode is a special case of readonly composable and handles creating its own groups, so
 // it is okay to use.
 @Suppress("NONREADONLY_CALL_IN_READONLY_COMPOSABLE", "UnnecessaryLambdaCreation")
@@ -222,7 +216,6 @@ val currentCompositeKeyHash: Int
  * @see Applier
  * @see Composition
  */
-@OptIn(ComposeCompilerApi::class)
 // ComposeNode is a special case of readonly composable and handles creating its own groups, so
 // it is okay to use.
 @Suppress("NONREADONLY_CALL_IN_READONLY_COMPOSABLE")
@@ -269,7 +262,6 @@ inline fun <T : Any?, reified E : Applier<*>> ComposeNode(
  * @see Applier
  * @see Composition
  */
-@OptIn(ComposeCompilerApi::class)
 @Composable @ExplicitGroupsComposable
 inline fun <T, reified E : Applier<*>> ComposeNode(
     noinline factory: () -> T,

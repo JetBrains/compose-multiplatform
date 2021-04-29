@@ -172,8 +172,7 @@ internal class TextFieldSelectionManager {
                     transformedStartOffset = offset,
                     transformedEndOffset = offset,
                     isStartHandle = false,
-                    adjustment = SelectionAdjustment.WORD,
-                    ensureAtLeastOneChar = true
+                    adjustment = SelectionAdjustment.WORD
                 )
                 dragBeginOffsetInText = offset
             }
@@ -200,8 +199,7 @@ internal class TextFieldSelectionManager {
                     transformedStartOffset = startOffset,
                     transformedEndOffset = endOffset,
                     isStartHandle = false,
-                    adjustment = SelectionAdjustment.WORD,
-                    ensureAtLeastOneChar = true
+                    adjustment = SelectionAdjustment.WORD
                 )
             }
             state?.showFloatingToolbar = false
@@ -226,8 +224,7 @@ internal class TextFieldSelectionManager {
                     transformedStartOffset = startOffset,
                     transformedEndOffset = clickOffset,
                     isStartHandle = false,
-                    adjustment = SelectionAdjustment.NONE,
-                    ensureAtLeastOneChar = false
+                    adjustment = SelectionAdjustment.NONE
                 )
                 return true
             }
@@ -250,8 +247,7 @@ internal class TextFieldSelectionManager {
                     transformedStartOffset = startOffset,
                     transformedEndOffset = dragOffset,
                     isStartHandle = false,
-                    adjustment = SelectionAdjustment.NONE,
-                    ensureAtLeastOneChar = false
+                    adjustment = SelectionAdjustment.NONE
                 )
                 return true
             }
@@ -274,8 +270,7 @@ internal class TextFieldSelectionManager {
                     transformedStartOffset = clickOffset,
                     transformedEndOffset = clickOffset,
                     isStartHandle = false,
-                    adjustment = adjustment,
-                    ensureAtLeastOneChar = false
+                    adjustment = adjustment
                 )
                 return true
             }
@@ -297,8 +292,7 @@ internal class TextFieldSelectionManager {
                     transformedStartOffset = dragBeginOffsetInText!!,
                     transformedEndOffset = dragOffset,
                     isStartHandle = false,
-                    adjustment = adjustment,
-                    ensureAtLeastOneChar = false
+                    adjustment = adjustment
                 )
                 return true
             }
@@ -340,8 +334,7 @@ internal class TextFieldSelectionManager {
                         transformedStartOffset = startOffset,
                         transformedEndOffset = endOffset,
                         isStartHandle = isStartHandle,
-                        adjustment = SelectionAdjustment.NONE,
-                        ensureAtLeastOneChar = true
+                        adjustment = SelectionAdjustment.CHARACTER
                     )
                 }
                 state?.showFloatingToolbar = false
@@ -611,8 +604,7 @@ internal class TextFieldSelectionManager {
         transformedStartOffset: Int,
         transformedEndOffset: Int,
         isStartHandle: Boolean,
-        adjustment: SelectionAdjustment,
-        ensureAtLeastOneChar: Boolean
+        adjustment: SelectionAdjustment
     ) {
         val transformedSelection = TextRange(
             offsetMapping.originalToTransformed(value.selection.start),
@@ -624,10 +616,8 @@ internal class TextFieldSelectionManager {
             rawStartOffset = transformedStartOffset,
             rawEndOffset = transformedEndOffset,
             previousSelection = if (transformedSelection.collapsed) null else transformedSelection,
-            previousHandlesCrossed = transformedSelection.reversed,
             isStartHandle = isStartHandle,
-            adjustment = adjustment,
-            ensureAtLeastOneChar = ensureAtLeastOneChar
+            adjustment = adjustment
         )
 
         val originalSelection = TextRange(

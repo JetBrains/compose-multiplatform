@@ -55,6 +55,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.platform.AndroidComposeView
 import androidx.compose.ui.platform.AndroidComposeViewAccessibilityDelegateCompat
 import androidx.compose.ui.platform.LocalDensity
@@ -62,9 +63,11 @@ import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.semantics.SemanticsActions
+import androidx.compose.ui.semantics.SemanticsNode
 import androidx.compose.ui.semantics.SemanticsProperties
 import androidx.compose.ui.semantics.clearAndSetSemantics
 import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.getOrNull
 import androidx.compose.ui.semantics.paneTitle
 import androidx.compose.ui.semantics.role
 import androidx.compose.ui.semantics.semantics
@@ -681,8 +684,7 @@ class AndroidAccessibilityTest {
     }
 
     @Test
-    @Ignore("b/178524529")
-    fun traverseEventBeforeSelectionEvent_whenTraverseTextField() {
+    fun selectionEventBeforeTraverseEvent_whenTraverseTextField() {
         val tag = "TextFieldTag"
         val text = "h"
         container.setContent {
@@ -702,54 +704,62 @@ class AndroidAccessibilityTest {
         val textFieldNode = rule.onNodeWithTag(tag)
             .assertIsDisplayed()
             .fetchSemanticsNode("couldn't find node with tag $tag")
-
         waitForSubtreeEventToSend()
-        val args = Bundle()
-        args.putInt(
-            AccessibilityNodeInfoCompat.ACTION_ARGUMENT_MOVEMENT_GRANULARITY_INT,
-            AccessibilityNodeInfoCompat.MOVEMENT_GRANULARITY_CHARACTER
-        )
-        args.putBoolean(AccessibilityNodeInfoCompat.ACTION_ARGUMENT_EXTEND_SELECTION_BOOLEAN, false)
-        val provider = delegate.getAccessibilityNodeProvider(androidComposeView).provider as
-            AccessibilityNodeProvider
-        provider.performAction(
-            textFieldNode.id,
-            AccessibilityNodeInfoCompat.ACTION_NEXT_AT_MOVEMENT_GRANULARITY,
-            args
-        )
+        rule.runOnUiThread {
+            provider.performAction(
+                textFieldNode.id,
+                AccessibilityNodeInfoCompat.ACTION_NEXT_AT_MOVEMENT_GRANULARITY,
+                createMovementGranularityCharacterArgs()
+            )
+        }
 
-        val selectionEvent = delegate.createEvent(
-            textFieldNode.id,
-            AccessibilityEvent.TYPE_VIEW_TEXT_SELECTION_CHANGED
-        )
-        selectionEvent.fromIndex = text.length
-        selectionEvent.toIndex = text.length
-        selectionEvent.itemCount = text.length
-        selectionEvent.text.add(text)
-
-        val traverseEvent = delegate.createEvent(
-            textFieldNode.id,
-            AccessibilityEvent.TYPE_VIEW_TEXT_TRAVERSED_AT_MOVEMENT_GRANULARITY
-        )
-        traverseEvent.fromIndex = 0
-        traverseEvent.toIndex = 1
-        traverseEvent.action = AccessibilityNodeInfoCompat.ACTION_NEXT_AT_MOVEMENT_GRANULARITY
-        traverseEvent.movementGranularity =
-            AccessibilityNodeInfoCompat.MOVEMENT_GRANULARITY_CHARACTER
-        traverseEvent.text.add(text)
-
+        val selectionEvent = createSelectionChangedFromIndexOneToOneEvent(textFieldNode)
+        val traverseEvent = createCharacterTraverseFromIndexZeroEvent(textFieldNode)
         rule.runOnIdle {
             verify(container, atLeastOnce()).requestSendAccessibilityEvent(
                 eq(androidComposeView), argument.capture()
             )
             val values = argument.allValues
-            // Note right now the event ordering is incorrect. The ordering in test needs to be
-            // changed when the event ordering if fixed.
             val traverseEventIndex = eventIndex(values, traverseEvent)
             val selectionEventIndex = eventIndex(values, selectionEvent)
             assertNotEquals(-1, traverseEventIndex)
             assertNotEquals(-1, selectionEventIndex)
-            assertTrue(traverseEventIndex < selectionEventIndex)
+            assertTrue(traverseEventIndex > selectionEventIndex)
+        }
+    }
+
+    @Test
+    fun selectionEventBeforeTraverseEvent_whenTraverseText() {
+        val tag = "TextTag"
+        val text = "h"
+        container.setContent {
+            BasicText(text, Modifier.testTag(tag))
+        }
+
+        val textNode = rule.onNodeWithTag(tag)
+            .assertIsDisplayed()
+            .fetchSemanticsNode("couldn't find node with tag $tag")
+        waitForSubtreeEventToSend()
+        rule.runOnUiThread {
+            provider.performAction(
+                textNode.id,
+                AccessibilityNodeInfoCompat.ACTION_NEXT_AT_MOVEMENT_GRANULARITY,
+                createMovementGranularityCharacterArgs()
+            )
+        }
+
+        val selectionEvent = createSelectionChangedFromIndexOneToOneEvent(textNode)
+        val traverseEvent = createCharacterTraverseFromIndexZeroEvent(textNode)
+        rule.runOnIdle {
+            verify(container, atLeastOnce()).requestSendAccessibilityEvent(
+                eq(androidComposeView), argument.capture()
+            )
+            val values = argument.allValues
+            val traverseEventIndex = eventIndex(values, traverseEvent)
+            val selectionEventIndex = eventIndex(values, selectionEvent)
+            assertNotEquals(-1, traverseEventIndex)
+            assertNotEquals(-1, selectionEventIndex)
+            assertTrue(traverseEventIndex > selectionEventIndex)
         }
     }
 
@@ -1685,6 +1695,28 @@ class AndroidAccessibilityTest {
         }
     }
 
+    @Test
+    fun testSemanticsNodePositionAndBounds_doesNotThrow_whenLayoutNodeNotAttached() {
+        var emitNode by mutableStateOf(true)
+        rule.setContent {
+            if (emitNode) {
+                Box(Modifier.size(100.dp).testTag("tag"))
+            }
+        }
+
+        val semanticNode = rule.onNodeWithTag("tag").fetchSemanticsNode()
+        rule.runOnIdle {
+            emitNode = false
+        }
+
+        rule.runOnIdle {
+            assertEquals(Offset.Zero, semanticNode.positionInRoot)
+            assertEquals(Offset.Zero, semanticNode.positionInWindow)
+            assertEquals(androidx.compose.ui.geometry.Rect.Zero, semanticNode.boundsInRoot)
+            assertEquals(androidx.compose.ui.geometry.Rect.Zero, semanticNode.boundsInWindow)
+        }
+    }
+
     private fun eventIndex(list: List<AccessibilityEvent>, event: AccessibilityEvent): Int {
         for (i in list.indices) {
             if (ReflectionEquals(list[i], null).matches(event)) {
@@ -1716,5 +1748,56 @@ class AndroidAccessibilityTest {
         // which will affect our next accessibility events from semantics tree comparison.
         rule.mainClock.advanceTimeBy(5000)
         rule.waitForIdle()
+    }
+
+    private fun createMovementGranularityCharacterArgs(): Bundle {
+        return Bundle().apply {
+            this.putInt(
+                AccessibilityNodeInfoCompat.ACTION_ARGUMENT_MOVEMENT_GRANULARITY_INT,
+                AccessibilityNodeInfoCompat.MOVEMENT_GRANULARITY_CHARACTER
+            )
+            this.putBoolean(
+                AccessibilityNodeInfoCompat.ACTION_ARGUMENT_EXTEND_SELECTION_BOOLEAN,
+                false
+            )
+        }
+    }
+
+    private fun createSelectionChangedFromIndexOneToOneEvent(
+        textNode: SemanticsNode
+    ): AccessibilityEvent {
+        return delegate.createEvent(
+            textNode.id,
+            AccessibilityEvent.TYPE_VIEW_TEXT_SELECTION_CHANGED
+        ).apply {
+            this.fromIndex = 1
+            this.toIndex = 1
+            getTraversedText(textNode)?.let {
+                this.itemCount = it.length
+                this.text.add(it)
+            }
+        }
+    }
+
+    private fun createCharacterTraverseFromIndexZeroEvent(
+        textNode: SemanticsNode
+    ): AccessibilityEvent {
+        return delegate.createEvent(
+            textNode.id,
+            AccessibilityEvent.TYPE_VIEW_TEXT_TRAVERSED_AT_MOVEMENT_GRANULARITY
+        ).apply {
+            this.fromIndex = 0
+            this.toIndex = 1
+            this.action = AccessibilityNodeInfoCompat.ACTION_NEXT_AT_MOVEMENT_GRANULARITY
+            this.movementGranularity = AccessibilityNodeInfoCompat.MOVEMENT_GRANULARITY_CHARACTER
+            getTraversedText(textNode)?.let { this.text.add(it) }
+        }
+    }
+
+    private fun getTraversedText(textNode: SemanticsNode): String? {
+        return (
+            textNode.config.getOrNull(SemanticsProperties.EditableText)
+                ?: textNode.config.getOrNull(SemanticsProperties.Text)
+            )?.text
     }
 }

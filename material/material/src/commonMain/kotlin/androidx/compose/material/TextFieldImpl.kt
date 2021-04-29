@@ -27,6 +27,7 @@ import androidx.compose.foundation.interaction.collectIsFocusedAsState
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.material.Strings.DefaultErrorMessage
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.getValue
@@ -43,6 +44,8 @@ import androidx.compose.ui.layout.MeasureScope
 import androidx.compose.ui.layout.Placeable
 import androidx.compose.ui.platform.InspectorValueInfo
 import androidx.compose.ui.platform.debugInspectorInfo
+import androidx.compose.ui.semantics.error
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.input.VisualTransformation
@@ -132,10 +135,14 @@ internal fun TextFieldImpl(
                 }
             } else null
 
+        // Developers need to handle invalid input manually. But since we don't provide error
+        // message slot API, we can set the default error message in case developers forget about
+        // it.
+        val textFieldModifier = modifier.semantics { if (isError) error(DefaultErrorMessage) }
         when (type) {
             TextFieldType.Filled -> {
                 TextFieldLayout(
-                    modifier = modifier,
+                    modifier = textFieldModifier,
                     value = value,
                     onValueChange = onValueChange,
                     enabled = enabled,
@@ -164,7 +171,7 @@ internal fun TextFieldImpl(
             }
             TextFieldType.Outlined -> {
                 OutlinedTextFieldLayout(
-                    modifier = modifier,
+                    modifier = textFieldModifier,
                     value = value,
                     onValueChange = onValueChange,
                     enabled = enabled,

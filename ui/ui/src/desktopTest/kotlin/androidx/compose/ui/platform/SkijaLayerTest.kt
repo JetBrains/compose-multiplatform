@@ -17,7 +17,6 @@
 package androidx.compose.ui.platform
 
 import androidx.compose.ui.geometry.Offset
-import androidx.compose.ui.graphics.Matrix
 import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.graphics.TransformOrigin
@@ -39,12 +38,11 @@ class SkijaLayerTest {
     val rule = createComposeRule()
 
     private val layer = TestSkijaLayer()
-    private val matrix = Matrix()
     private val cos45 = cos(PI / 4)
 
     @Test
     fun initial() {
-        layer.getMatrix(matrix)
+        val matrix = layer.matrix
 
         assertEquals(IntOffset(0, 0), matrix.map(Offset(0f, 0f)).round())
         assertEquals(IntOffset(100, 10), matrix.map(Offset(100f, 10f)).round())
@@ -53,7 +51,7 @@ class SkijaLayerTest {
     @Test
     fun move() {
         layer.move(IntOffset(10, 20))
-        layer.getMatrix(matrix)
+        val matrix = layer.matrix
 
         assertEquals(IntOffset(0, 0), matrix.map(Offset(0f, 0f)).round())
         assertEquals(IntOffset(100, 10), matrix.map(Offset(100f, 10f)).round())
@@ -62,7 +60,7 @@ class SkijaLayerTest {
     @Test
     fun resize() {
         layer.resize(IntSize(100, 10))
-        layer.getMatrix(matrix)
+        val matrix = layer.matrix
 
         assertEquals(IntOffset(0, 0), matrix.map(Offset(0f, 0f)).round())
         assertEquals(IntOffset(100, 10), matrix.map(Offset(100f, 10f)).round())
@@ -72,7 +70,7 @@ class SkijaLayerTest {
     fun `resize and move`() {
         layer.resize(IntSize(100, 10))
         layer.move(IntOffset(10, 20))
-        layer.getMatrix(matrix)
+        val matrix = layer.matrix
 
         assertEquals(IntOffset(0, 0), matrix.map(Offset(0f, 0f)).round())
         assertEquals(IntOffset(100, 10), matrix.map(Offset(100f, 10f)).round())
@@ -86,7 +84,7 @@ class SkijaLayerTest {
             translationY = 20f,
             transformOrigin = TransformOrigin(0f, 0f)
         )
-        layer.getMatrix(matrix)
+        val matrix = layer.matrix
 
         assertEquals(IntOffset(10, 20), matrix.map(Offset(0f, 0f)).round())
         assertEquals(IntOffset(110, 30), matrix.map(Offset(100f, 10f)).round())
@@ -100,7 +98,7 @@ class SkijaLayerTest {
             translationY = 20f,
             transformOrigin = TransformOrigin(1f, 1f)
         )
-        layer.getMatrix(matrix)
+        val matrix = layer.matrix
 
         assertEquals(IntOffset(10, 20), matrix.map(Offset(0f, 0f)).round())
         assertEquals(IntOffset(110, 30), matrix.map(Offset(100f, 10f)).round())
@@ -114,7 +112,7 @@ class SkijaLayerTest {
             scaleY = 4f,
             transformOrigin = TransformOrigin(0f, 0f)
         )
-        layer.getMatrix(matrix)
+        val matrix = layer.matrix
 
         assertEquals(IntOffset(0, 0), matrix.map(Offset(0f, 0f)).round())
         assertEquals(IntOffset(200, 40), matrix.map(Offset(100f, 10f)).round())
@@ -128,7 +126,7 @@ class SkijaLayerTest {
             scaleY = 4f,
             transformOrigin = TransformOrigin(1f, 1f)
         )
-        layer.getMatrix(matrix)
+        val matrix = layer.matrix
 
         assertEquals(IntOffset(-100, -30), matrix.map(Offset(0f, 0f)).round())
         assertEquals(IntOffset(100, 10), matrix.map(Offset(100f, 10f)).round())
@@ -141,7 +139,7 @@ class SkijaLayerTest {
             rotationX = 45f,
             transformOrigin = TransformOrigin(0f, 0f)
         )
-        layer.getMatrix(matrix)
+        val matrix = layer.matrix
 
         val y = (10 * cos45).roundToInt()
         assertEquals(IntOffset(0, 0), matrix.map(Offset(0f, 0f)).round())
@@ -155,7 +153,7 @@ class SkijaLayerTest {
             rotationX = 45f,
             transformOrigin = TransformOrigin(1f, 1f)
         )
-        layer.getMatrix(matrix)
+        val matrix = layer.matrix
 
         val y = 10 * (1 - cos45.toFloat())
         println(matrix.map(Offset(0f, 0f)))
@@ -171,7 +169,7 @@ class SkijaLayerTest {
             rotationY = 45f,
             transformOrigin = TransformOrigin(0f, 0f)
         )
-        layer.getMatrix(matrix)
+        val matrix = layer.matrix
 
         val x = (100 * cos45).roundToInt()
         assertEquals(IntOffset(0, 0), matrix.map(Offset(0f, 0f)).round())
@@ -185,7 +183,7 @@ class SkijaLayerTest {
             rotationY = 45f,
             transformOrigin = TransformOrigin(1f, 1f)
         )
-        layer.getMatrix(matrix)
+        val matrix = layer.matrix
 
         val x = (100 * (1 - cos45)).roundToInt()
         assertEquals(IntOffset(x, 0), matrix.map(Offset(0f, 0f)).round())
@@ -199,7 +197,7 @@ class SkijaLayerTest {
             rotationZ = 90f,
             transformOrigin = TransformOrigin(0f, 0f)
         )
-        layer.getMatrix(matrix)
+        val matrix = layer.matrix
 
         assertEquals(IntOffset(0, 0), matrix.map(Offset(0f, 0f)).round())
         assertEquals(IntOffset(-10, 100), matrix.map(Offset(100f, 10f)).round())
@@ -212,7 +210,7 @@ class SkijaLayerTest {
             rotationZ = 90f,
             transformOrigin = TransformOrigin(1f, 1f)
         )
-        layer.getMatrix(matrix)
+        val matrix = layer.matrix
 
         assertEquals(IntOffset(110, -90), matrix.map(Offset(0f, 0f)).round())
         assertEquals(IntOffset(100, 10), matrix.map(Offset(100f, 10f)).round())
@@ -228,7 +226,7 @@ class SkijaLayerTest {
             scaleY = 4f,
             transformOrigin = TransformOrigin(0f, 0f)
         )
-        layer.getMatrix(matrix)
+        val matrix = layer.matrix
 
         assertEquals(IntOffset(0 + 60, 0 + 7), matrix.map(Offset(0f, 0f)).round())
         assertEquals(IntOffset(100 * 2 + 60, 10 * 4 + 7), matrix.map(Offset(100f, 10f)).round())
@@ -243,7 +241,7 @@ class SkijaLayerTest {
             rotationZ = 90f,
             transformOrigin = TransformOrigin(0f, 0f)
         )
-        layer.getMatrix(matrix)
+        val matrix = layer.matrix
 
         assertEquals(IntOffset(0 + 60, 0 + 7), matrix.map(Offset(0f, 0f)).round())
         assertEquals(IntOffset(-10 + 60, 100 + 7), matrix.map(Offset(100f, 10f)).round())
@@ -258,7 +256,7 @@ class SkijaLayerTest {
             rotationX = 45f,
             transformOrigin = TransformOrigin(0f, 0f)
         )
-        layer.getMatrix(matrix)
+        val matrix = layer.matrix
 
         val y = (10 * cos45).roundToInt()
         val translationY = (7 * cos45).roundToInt()
@@ -275,7 +273,7 @@ class SkijaLayerTest {
             rotationY = 45f,
             transformOrigin = TransformOrigin(0f, 0f)
         )
-        layer.getMatrix(matrix)
+        val matrix = layer.matrix
 
         val x = (100 * cos45).roundToInt()
         val translationX = (60 * cos45).roundToInt()
@@ -292,7 +290,7 @@ class SkijaLayerTest {
             rotationZ = 90f,
             transformOrigin = TransformOrigin(0f, 0f)
         )
-        layer.getMatrix(matrix)
+        val matrix = layer.matrix
 
         assertEquals(IntOffset(0, 0), matrix.map(Offset(0f, 0f)).round())
         assertEquals(IntOffset(-10 * 4, 100 * 2), matrix.map(Offset(100f, 10f)).round())
@@ -309,7 +307,7 @@ class SkijaLayerTest {
             rotationZ = 90f,
             transformOrigin = TransformOrigin(0f, 0f)
         )
-        layer.getMatrix(matrix)
+        val matrix = layer.matrix
 
         assertEquals(IntOffset(0 + 60, 0 + 7), matrix.map(Offset(0f, 0f)).round())
         assertEquals(IntOffset(-10 * 4 + 60, 100 * 2 + 7), matrix.map(Offset(100f, 10f)).round())

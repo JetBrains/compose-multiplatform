@@ -315,17 +315,19 @@ class BottomNavigationScreenshotTest {
         interaction: Interaction? = null,
         goldenIdentifier: String
     ) {
-        composeTestRule.mainClock.autoAdvance = false
-
         if (interaction != null) {
-            // Start ripple
-            scope.launch {
-                interactionSource.emit(interaction)
+            composeTestRule.runOnIdle {
+                // Start ripple
+                scope.launch {
+                    interactionSource.emit(interaction)
+                }
             }
 
-            // Advance to somewhere in the middle of the animation for the ripple
             composeTestRule.waitForIdle()
-            composeTestRule.mainClock.advanceTimeBy(milliseconds = 80)
+            // Ripples are drawn on the RenderThread, not the main (UI) thread, so we can't
+            // properly wait for synchronization. Instead just wait until after the ripples are
+            // finished animating.
+            Thread.sleep(300)
         }
 
         // Capture and compare screenshots

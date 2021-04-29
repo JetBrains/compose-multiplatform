@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<issues format="5" by="lint 4.2.0-beta04" client="gradle" variant="debug" version="4.2.0-beta04">
+<issues format="5" by="lint 4.2.0-beta06" client="gradle" variant="debug" version="4.2.0-beta06">
 
     <issue
         id="BanTargetApiAnnotation"
@@ -15,28 +15,17 @@
     <issue
         id="BanUncheckedReflection"
         message="Calling Method.invoke without an SDK check"
-        errorLine1="            getBooleanMethod?.invoke(null, &quot;debug.layout&quot;, false) as? Boolean ?: false"
-        errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/androidMain/kotlin/androidx/compose/ui/platform/AndroidComposeView.android.kt"
-            line="815"
-            column="13"/>
-    </issue>
-
-    <issue
-        id="BanUncheckedReflection"
-        message="Calling Method.invoke without an SDK check"
-        errorLine1="            updateDisplayListIfDirtyMethod?.invoke(view)"
-        errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        errorLine1="                updateDisplayListIfDirtyMethod?.invoke(view)"
+        errorLine2="                ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/androidMain/kotlin/androidx/compose/ui/platform/ViewLayer.android.kt"
-            line="288"
-            column="13"/>
+            line="315"
+            column="17"/>
     </issue>
 
     <issue
-        id="UnsafeNewApiCall"
-        message="This call is to a method from API 26, the call containing class androidx.compose.ui.autofill.AndroidAutofillDebugUtils_androidKt is not annotated with @RequiresApi(x) where x is at least 26. Either annotate the containing class with at least @RequiresApi(26) or move the call to a static method in a wrapper class annotated with at least @RequiresApi(26)."
+        id="ClassVerificationFailure"
+        message="This call references a method added in API level 26; however, the containing class androidx.compose.ui.autofill.AndroidAutofillDebugUtils_androidKt is reachable from earlier API levels and will fail run-time class verification."
         errorLine1="    autofillManager.registerCallback(AutofillCallback)"
         errorLine2="                    ~~~~~~~~~~~~~~~~">
         <location
@@ -46,8 +35,8 @@
     </issue>
 
     <issue
-        id="UnsafeNewApiCall"
-        message="This call is to a method from API 26, the call containing class androidx.compose.ui.autofill.AndroidAutofillDebugUtils_androidKt is not annotated with @RequiresApi(x) where x is at least 26. Either annotate the containing class with at least @RequiresApi(26) or move the call to a static method in a wrapper class annotated with at least @RequiresApi(26)."
+        id="ClassVerificationFailure"
+        message="This call references a method added in API level 26; however, the containing class androidx.compose.ui.autofill.AndroidAutofillDebugUtils_androidKt is reachable from earlier API levels and will fail run-time class verification."
         errorLine1="    autofillManager.unregisterCallback(AutofillCallback)"
         errorLine2="                    ~~~~~~~~~~~~~~~~~~">
         <location
@@ -57,25 +46,47 @@
     </issue>
 
     <issue
-        id="UnsafeNewApiCall"
-        message="This call is to a method from API 23, the call containing class androidx.compose.ui.res.ColorResources_androidKt is not annotated with @RequiresApi(x) where x is at least 23. Either annotate the containing class with at least @RequiresApi(23) or move the call to a static method in a wrapper class annotated with at least @RequiresApi(23)."
+        id="ClassVerificationFailure"
+        message="This call references a method added in API level 23; however, the containing class androidx.compose.ui.res.ColorResources_androidKt is reachable from earlier API levels and will fail run-time class verification."
         errorLine1="        Color(context.resources.getColor(id, context.theme))"
         errorLine2="                                ~~~~~~~~">
         <location
             file="src/androidMain/kotlin/androidx/compose/ui/res/ColorResources.android.kt"
-            line="35"
+            line="37"
             column="33"/>
     </issue>
 
     <issue
-        id="UnsafeNewApiCall"
-        message="This call is to a method from API 23, the call containing class androidx.compose.ui.platform.actionmodecallback.FloatingTextActionModeCallback is not annotated with @RequiresApi(x) where x is at least 23. Either annotate the containing class with at least @RequiresApi(23) or move the call to a static method in a wrapper class annotated with at least @RequiresApi(23)."
+        id="ClassVerificationFailure"
+        message="This call references a method added in API level 23; however, the containing class androidx.compose.ui.platform.actionmodecallback.FloatingTextActionModeCallback is reachable from earlier API levels and will fail run-time class verification."
         errorLine1=") : ActionMode.Callback2() {"
         errorLine2="    ~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/androidMain/kotlin/androidx/compose/ui/platform/actionmodecallback/FloatingTextActionModeCallback.android.kt"
             line="30"
             column="5"/>
+    </issue>
+
+    <issue
+        id="ClassVerificationFailure"
+        message="This call references a method added in API level 29; however, the containing class androidx.compose.ui.input.pointer.MotionEventAdapter_androidKt is reachable from earlier API levels and will fail run-time class verification."
+        errorLine1="    return Offset(getRawX(index), getRawY(index))"
+        errorLine2="                  ~~~~~~~">
+        <location
+            file="src/androidMain/kotlin/androidx/compose/ui/input/pointer/MotionEventAdapter.android.kt"
+            line="191"
+            column="19"/>
+    </issue>
+
+    <issue
+        id="ClassVerificationFailure"
+        message="This call references a method added in API level 29; however, the containing class androidx.compose.ui.input.pointer.MotionEventAdapter_androidKt is reachable from earlier API levels and will fail run-time class verification."
+        errorLine1="    return Offset(getRawX(index), getRawY(index))"
+        errorLine2="                                  ~~~~~~~">
+        <location
+            file="src/androidMain/kotlin/androidx/compose/ui/input/pointer/MotionEventAdapter.android.kt"
+            line="191"
+            column="35"/>
     </issue>
 
 </issues>

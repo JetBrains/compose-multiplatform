@@ -177,6 +177,9 @@ src/foo/test.kt:20: Error: Target state parameter param is not used [UnusedCross
                 Crossfade(foo) { param -> if (param) { /**/ } else { /**/ } }
                 Crossfade(foo, content = { param -> if (param) { /**/ } else { /**/ } })
 
+                val content : @Composable (Boolean) -> Unit = {}
+                Crossfade(foo, content = content)
+
                 Crossfade(foo) { param ->
                     foo.let {
                         it.let {

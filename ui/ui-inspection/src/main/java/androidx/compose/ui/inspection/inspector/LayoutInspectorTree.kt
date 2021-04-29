@@ -19,6 +19,7 @@ package androidx.compose.ui.inspection.inspector
 import android.view.View
 import androidx.compose.runtime.InternalComposeApi
 import androidx.compose.runtime.tooling.CompositionData
+import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.R
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.layout.GraphicLayerInfo
@@ -84,6 +85,7 @@ class LayoutInspectorTree {
     private val parameterFactory = ParameterFactory(inlineClassConverter)
     private val cache = ArrayDeque<MutableInspectorNode>()
     private var generatedId = -1L
+    private val rootLocation = IntArray(2)
     /** Map from [LayoutInfo] to the nearest [InspectorNode] that contains it */
     private val claimedNodes = IdentityHashMap<LayoutInfo, InspectorNode>()
     /** Map from parent tree to child trees that are about to be stitched together */
@@ -108,7 +110,7 @@ class LayoutInspectorTree {
             ?: return emptyList()
         clear()
         collectSemantics(view)
-        val result = convert(tables)
+        val result = convert(tables, view)
         clear()
         return result
     }
@@ -191,6 +193,8 @@ class LayoutInspectorTree {
     }
 
     private fun clear() {
+        rootLocation[0] = 0
+        rootLocation[1] = 0
         cache.clear()
         inlineClassConverter.clear()
         claimedNodes.clear()
@@ -201,8 +205,9 @@ class LayoutInspectorTree {
     }
 
     @OptIn(InternalComposeApi::class)
-    private fun convert(tables: Set<CompositionData>): List<InspectorNode> {
-        val trees = tables.map { convert(it) }
+    private fun convert(tables: Set<CompositionData>, view: View): List<InspectorNode> {
+        view.getLocationOnScreen(rootLocation)
+        val trees = tables.mapNotNull { convert(it, view) }
         return when (trees.size) {
             0 -> listOf()
             1 -> addTree(mutableListOf(), trees.single())
@@ -310,10 +315,10 @@ class LayoutInspectorTree {
     }
 
     @OptIn(InternalComposeApi::class, UiToolingDataApi::class)
-    private fun convert(table: CompositionData): MutableInspectorNode {
+    private fun convert(table: CompositionData, view: View): MutableInspectorNode? {
         val fakeParent = newNode()
         addToParent(fakeParent, listOf(convert(table.asTree())), buildFakeChildNodes = true)
-        return fakeParent
+        return if (belongsToView(fakeParent.layoutNodes, view)) fakeParent else null
     }
 
     @OptIn(UiToolingDataApi::class)
@@ -413,8 +418,8 @@ class LayoutInspectorTree {
     @OptIn(UiToolingDataApi::class)
     private fun parsePosition(group: Group, node: MutableInspectorNode) {
         val box = group.box
-        node.top = box.top
-        node.left = box.left
+        node.top = box.top + rootLocation[1]
+        node.left = box.left + rootLocation[0]
         node.height = box.bottom - box.top
         node.width = box.right - box.left
     }
@@ -487,6 +492,15 @@ class LayoutInspectorTree {
             .filterIsInstance<GraphicLayerInfo>()
             .map { it.layerId }
             .firstOrNull() ?: 0
+
+    @OptIn(ExperimentalComposeUiApi::class)
+    private fun belongsToView(layoutNodes: List<LayoutInfo>, view: View): Boolean =
+        layoutNodes.asSequence().flatMap { node ->
+            node.getModifierInfo().asSequence()
+                .map { it.extra }
+                .filterIsInstance<GraphicLayerInfo>()
+                .mapNotNull { it.ownerViewId }
+        }.contains(view.uniqueDrawingId)
 
     @OptIn(UiToolingDataApi::class)
     private fun addParameters(parameters: List<ParameterInformation>, node: MutableInspectorNode) =

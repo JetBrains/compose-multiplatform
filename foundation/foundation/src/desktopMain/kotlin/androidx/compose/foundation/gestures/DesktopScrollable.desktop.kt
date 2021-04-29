@@ -20,12 +20,12 @@ package androidx.compose.foundation.gestures
 
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.composed
-import androidx.compose.ui.input.mouse.MouseScrollUnit
 import androidx.compose.ui.input.mouse.MouseScrollOrientation
+import androidx.compose.ui.input.mouse.MouseScrollUnit
 import androidx.compose.ui.input.mouse.mouseScrollFilter
-import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.DesktopPlatform
-import androidx.compose.ui.platform.DesktopPlatformAmbient
+import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.platform.LocalDesktopPlatform
 import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.dp
 import kotlin.math.sqrt
@@ -39,7 +39,7 @@ internal actual fun Modifier.mouseScrollable(
     onScroll: (Float) -> Unit
 ): Modifier = composed {
     val density = LocalDensity.current
-    val desktopPlatform = DesktopPlatformAmbient.current
+    val desktopPlatform = LocalDesktopPlatform.current
     val config = PlatformScrollConfig(density, desktopPlatform)
 
     mouseScrollFilter { event, bounds ->

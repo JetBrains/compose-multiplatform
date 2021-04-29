@@ -18,20 +18,16 @@ package androidx.compose.material
 
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.core.tween
-import androidx.compose.foundation.interaction.FocusInteraction
-import androidx.compose.foundation.interaction.Interaction
 import androidx.compose.foundation.interaction.InteractionSource
+import androidx.compose.foundation.interaction.collectIsFocusedAsState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Immutable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.Stable
 import androidx.compose.runtime.State
-import androidx.compose.runtime.mutableStateListOf
-import androidx.compose.runtime.remember
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
-import kotlinx.coroutines.flow.collect
 
 /**
  * Represents the colors of the input text, background and content (including label, placeholder,
@@ -327,25 +323,12 @@ private class DefaultTextFieldColors(
         isError: Boolean,
         interactionSource: InteractionSource
     ): State<Color> {
-        val interactions = remember { mutableStateListOf<Interaction>() }
-        LaunchedEffect(interactionSource) {
-            interactionSource.interactions.collect { interaction ->
-                when (interaction) {
-                    is FocusInteraction.Focus -> {
-                        interactions.add(interaction)
-                    }
-                    is FocusInteraction.Unfocus -> {
-                        interactions.remove(interaction.focus)
-                    }
-                }
-            }
-        }
-        val interaction = interactions.lastOrNull()
+        val focused by interactionSource.collectIsFocusedAsState()
 
         val targetValue = when {
             !enabled -> disabledIndicatorColor
             isError -> errorIndicatorColor
-            interaction is FocusInteraction.Focus -> focusedIndicatorColor
+            focused -> focusedIndicatorColor
             else -> unfocusedIndicatorColor
         }
         return if (enabled) {
@@ -371,25 +354,12 @@ private class DefaultTextFieldColors(
         error: Boolean,
         interactionSource: InteractionSource
     ): State<Color> {
-        val interactions = remember { mutableStateListOf<Interaction>() }
-        LaunchedEffect(interactionSource) {
-            interactionSource.interactions.collect { interaction ->
-                when (interaction) {
-                    is FocusInteraction.Focus -> {
-                        interactions.add(interaction)
-                    }
-                    is FocusInteraction.Unfocus -> {
-                        interactions.remove(interaction.focus)
-                    }
-                }
-            }
-        }
-        val interaction = interactions.lastOrNull()
+        val focused by interactionSource.collectIsFocusedAsState()
 
         val targetValue = when {
             !enabled -> disabledLabelColor
             error -> errorLabelColor
-            interaction is FocusInteraction.Focus -> focusedLabelColor
+            focused -> focusedLabelColor
             else -> unfocusedLabelColor
         }
         return if (enabled) {

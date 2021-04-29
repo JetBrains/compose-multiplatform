@@ -48,7 +48,8 @@ class CrossfadeDetector : Detector(), SourceCodeScanner {
 
     override fun visitMethodCall(context: JavaContext, node: UCallExpression, method: PsiMethod) {
         if (method.isInPackageName(Names.Animation.PackageName)) {
-            val lambdaArgument = node.valueArguments.filterIsInstance<ULambdaExpression>().first()
+            val lambdaArgument = node.valueArguments.filterIsInstance<ULambdaExpression>()
+                .firstOrNull() ?: return
 
             lambdaArgument.findUnreferencedParameters().forEach { unreferencedParameter ->
                 val location = unreferencedParameter.parameter

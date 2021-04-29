@@ -242,6 +242,9 @@ package androidx.compose.ui.text {
     enum_constant public static final androidx.compose.ui.text.PlaceholderVerticalAlign Top;
   }
 
+  public final class SaversKt {
+  }
+
   @androidx.compose.runtime.Immutable public final class SpanStyle {
     method public androidx.compose.ui.text.SpanStyle copy-D5kMcog(optional long color, optional long fontSize, optional androidx.compose.ui.text.font.FontWeight? fontWeight, optional androidx.compose.ui.text.font.FontStyle? fontStyle, optional androidx.compose.ui.text.font.FontSynthesis? fontSynthesis, optional androidx.compose.ui.text.font.FontFamily? fontFamily, optional String? fontFeatureSettings, optional long letterSpacing, optional androidx.compose.ui.text.style.BaselineShift? baselineShift, optional androidx.compose.ui.text.style.TextGeometricTransform? textGeometricTransform, optional androidx.compose.ui.text.intl.LocaleList? localeList, optional long background, optional androidx.compose.ui.text.style.TextDecoration? textDecoration, optional androidx.compose.ui.graphics.Shadow? shadow);
     method public operator boolean equals(Object? other);
@@ -485,6 +488,9 @@ package androidx.compose.ui.text.android {
   public final class SpannedExtensionsKt {
   }
 
+  public final class StaticLayoutFactoryKt {
+  }
+
   public final class TempListUtilsKt {
   }
 
@@ -501,6 +507,9 @@ package androidx.compose.ui.text.android.style {
 }
 
 package androidx.compose.ui.text.font {
+
+  public final class AndroidFontKt {
+  }
 
   public final class AndroidTypeface_androidKt {
     method public static androidx.compose.ui.text.font.FontFamily FontFamily(android.graphics.Typeface typeface);
