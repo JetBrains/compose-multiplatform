@@ -24,7 +24,6 @@
 
 package androidx.compose.integration.docs.interoperability
 
-import android.app.Activity
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
@@ -32,58 +31,36 @@ import android.content.IntentFilter
 import android.graphics.Bitmap
 import android.graphics.Color
 import android.os.Bundle
-import android.util.AttributeSet
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.LinearLayout
-import android.widget.TextView
-import androidx.activity.OnBackPressedCallback
-import androidx.activity.OnBackPressedDispatcher
 import androidx.activity.compose.setContent
 import androidx.appcompat.app.AppCompatActivity
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.padding
 import androidx.compose.integration.docs.databinding.ExampleLayoutBinding
 import androidx.compose.material.Button
-import androidx.compose.material.ButtonDefaults
-import androidx.compose.material.FloatingActionButton
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
-import androidx.compose.material.TextField
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
-import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.State
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberUpdatedState
-import androidx.compose.runtime.setValue
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.AbstractComposeView
 import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.compose.ui.viewinterop.AndroidViewBinding
-import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.ViewModelProvider
-import androidx.lifecycle.viewmodel.compose.viewModel
-import androidx.navigation.compose.NavHost
-import androidx.navigation.compose.composable
-import androidx.navigation.compose.rememberNavController
 
 /**
  * This file lets DevRel track changes to snippets present in
- * https://developer.android.com/jetpack/compose/interop
+ * https://developer.android.com/jetpack/compose/interop/interop-apis
  *
  * No action required if it's modified.
  */
@@ -251,274 +228,6 @@ private object InteropSnippet8 {
     }
 }
 
-private object InteropSnippet9 {
-    // import com.google.android.material.composethemeadapter.MdcTheme
-
-    class ExampleActivity : AppCompatActivity() {
-        override fun onCreate(savedInstanceState: Bundle?) {
-            super.onCreate(savedInstanceState)
-
-            setContent {
-                // Use MdcTheme instead of MaterialTheme
-                // Colors, typography, and shape have been read from the
-                // View-based theme used in this Activity
-                MdcTheme {
-                    ExampleComposable(/*...*/)
-                }
-            }
-        }
-    }
-}
-
-private object InteropSnippet10 {
-    class ExampleActivity : AppCompatActivity() {
-        override fun onCreate(savedInstanceState: Bundle?) {
-            super.onCreate(savedInstanceState)
-
-            setContent {
-                AppCompatTheme {
-                    // Colors, typography, and shape have been read from the
-                    // View-based theme used in this Activity
-                    ExampleComposable(/*...*/)
-                }
-            }
-        }
-    }
-}
-
-private object InteropSnippet11 {
-    class ExampleActivity : AppCompatActivity() {
-        override fun onCreate(savedInstanceState: Bundle?) {
-            super.onCreate(savedInstanceState)
-
-            WindowCompat.setDecorFitsSystemWindows(window, false)
-
-            setContent {
-                MaterialTheme {
-                    ProvideWindowInsets {
-                        MyScreen()
-                    }
-                }
-            }
-        }
-    }
-
-    @Composable
-    fun MyScreen() {
-        Box {
-            FloatingActionButton(
-                modifier = Modifier
-                    .align(Alignment.BottomEnd)
-                    .padding(16.dp) // normal 16dp of padding for FABs
-                    .navigationBarsPadding(), // Move it out from under the nav bar
-                onClick = { }
-            ) {
-                Icon( /* ... */)
-            }
-        }
-    }
-}
-
-private object InteropSnippet12 {
-    @Composable
-    fun MyComposable() {
-        BoxWithConstraints {
-            if (minWidth < 480.dp) {
-                /* Show grid with 4 columns */
-            } else if (minWidth < 720.dp) {
-                /* Show grid with 8 columns */
-            } else {
-                /* Show grid with 12 columns */
-            }
-        }
-    }
-}
-
-private object InteropSnippet13 {
-    class ExampleActivity : AppCompatActivity() {
-        override fun onCreate(savedInstanceState: Bundle?) {
-            super.onCreate(savedInstanceState)
-
-            setContent {
-                MaterialTheme {
-                    Column {
-                        Greeting("user1")
-                        Greeting("user2")
-                    }
-                }
-            }
-        }
-    }
-
-    @Composable
-    fun Greeting(userId: String) {
-        val greetingViewModel: GreetingViewModel = viewModel(
-            factory = GreetingViewModelFactory(userId)
-        )
-        val messageUser by greetingViewModel.message.observeAsState("")
-
-        Text(messageUser)
-    }
-
-    class GreetingViewModel(private val userId: String) : ViewModel() {
-        private val _message = MutableLiveData("Hi $userId")
-        val message: LiveData<String> = _message
-    }
-}
-
-private object InteropSnippet14 {
-    @Composable
-    fun MyScreen() {
-        NavHost(rememberNavController(), startDestination = "profile/{userId}") {
-            /* ... */
-            composable("profile/{userId}") { backStackEntry ->
-                Greeting(backStackEntry.arguments?.getString("userId") ?: "")
-            }
-        }
-    }
-
-    @Composable
-    fun Greeting(userId: String) {
-        val greetingViewModel: GreetingViewModel = viewModel(
-            factory = GreetingViewModelFactory(userId)
-        )
-        val messageUser by greetingViewModel.message.observeAsState("")
-
-        Text(messageUser)
-    }
-}
-
-private object InteropSnippet15 {
-    @Composable
-    fun BackHandler(
-        enabled: Boolean,
-        backDispatcher: OnBackPressedDispatcher,
-        onBack: () -> Unit
-    ) {
-
-        // Safely update the current `onBack` lambda when a new one is provided
-        val currentOnBack by rememberUpdatedState(onBack)
-
-        // Remember in Composition a back callback that calls the `onBack` lambda
-        val backCallback = remember {
-            // Always intercept back events. See the SideEffect for a more complete version
-            object : OnBackPressedCallback(true) {
-                override fun handleOnBackPressed() {
-                    currentOnBack()
-                }
-            }
-        }
-
-        // On every successful composition, update the callback with the `enabled` value
-        // to tell `backCallback` whether back events should be intercepted or not
-        SideEffect {
-            backCallback.isEnabled = enabled
-        }
-
-        // If `backDispatcher` changes, dispose and reset the effect
-        DisposableEffect(backDispatcher) {
-            // Add callback to the backDispatcher
-            backDispatcher.addCallback(backCallback)
-
-            // When the effect leaves the Composition, remove the callback
-            onDispose {
-                backCallback.remove()
-            }
-        }
-    }
-}
-
-private object InteropSnippet16 {
-    class CustomViewGroup @JvmOverloads constructor(
-        context: Context,
-        attrs: AttributeSet? = null,
-        defStyle: Int = 0
-    ) : LinearLayout(context, attrs, defStyle) {
-
-        // Source of truth in the View system as mutableStateOf
-        // to make it thread-safe for Compose
-        private var text by mutableStateOf("")
-
-        private val textView: TextView
-
-        init {
-            orientation = VERTICAL
-
-            textView = TextView(context)
-            val composeView = ComposeView(context).apply {
-                setContent {
-                    MaterialTheme {
-                        TextField(value = text, onValueChange = { updateState(it) })
-                    }
-                }
-            }
-
-            addView(textView)
-            addView(composeView)
-        }
-
-        // Update both the source of truth and the TextView
-        private fun updateState(newValue: String) {
-            text = newValue
-            textView.text = newValue
-        }
-    }
-}
-
-private object InteropSnippet17 {
-    @Composable
-    fun CallToActionButton(
-        text: String,
-        onClick: () -> Unit,
-        modifier: Modifier = Modifier,
-    ) {
-        Button(
-            colors = ButtonDefaults.buttonColors(
-                backgroundColor = MaterialTheme.colors.secondary
-            ),
-            onClick = onClick,
-            modifier = modifier,
-        ) {
-            Text(text)
-        }
-    }
-
-    class CallToActionViewButton @JvmOverloads constructor(
-        context: Context,
-        attrs: AttributeSet? = null,
-        defStyle: Int = 0
-    ) : AbstractComposeView(context, attrs, defStyle) {
-
-        var text by mutableStateOf<String>("")
-        var onClick by mutableStateOf<() -> Unit>({})
-
-        @Composable
-        override fun Content() {
-            YourAppTheme {
-                CallToActionButton(text, onClick)
-            }
-        }
-    }
-}
-
-private object InteropSnippet18 {
-    class ExampleActivity : Activity() {
-
-        private lateinit var binding: ActivityExampleBinding
-
-        override fun onCreate(savedInstanceState: Bundle?) {
-            super.onCreate(savedInstanceState)
-            binding = ActivityExampleBinding.inflate(layoutInflater)
-            setContentView(binding.root)
-
-            binding.callToAction.apply {
-                text = getString(R.string.something)
-                onClick = { /* Do something */ }
-            }
-        }
-    }
-}
-
 private object InteropSnippet19 {
     @Composable
     fun SystemBroadcastReceiver(
@@ -578,19 +287,18 @@ private object R {
     object string {
         const val ok = 4
         const val plane_description = 5
-        const val something = 6
     }
 
     object dimen {
-        const val padding_small = 7
+        const val padding_small = 6
     }
 
     object drawable {
-        const val ic_plane = 8
+        const val ic_plane = 7
     }
 
     object color {
-        const val Blue700 = 9
+        const val Blue700 = 8
     }
 }
 
@@ -605,7 +313,7 @@ private class DataExample(val title: String = "")
 
 private val data = DataExample()
 private fun startActivity(): Nothing = TODO()
-class ExampleViewModel : ViewModel() {
+private class ExampleViewModel : ViewModel() {
     val exampleLiveData = MutableLiveData(" ")
 }
 
@@ -627,35 +335,6 @@ private class DummyInto {
     fun into(listener: ExampleImageLoader.Listener) {}
 }
 
-private fun ExampleComposable() {}
-@Composable
-private fun MdcTheme(content: @Composable () -> Unit) {
-}
-
-@Composable
-private fun AppCompatTheme(content: @Composable () -> Unit) {
-}
-
-@Composable
-private fun BlueTheme(content: @Composable () -> Unit) {
-}
-
-@Composable
-private fun PinkTheme(content: @Composable () -> Unit) {
-}
-
-@Composable
-private fun YourAppTheme(content: @Composable () -> Unit) {
-}
-
-@Composable
-private fun ProvideWindowInsets(content: @Composable () -> Unit) {
-}
-
-@Composable
-private fun Icon() {
-}
-
 private open class Fragment {
 
     lateinit var context: Context
@@ -668,29 +347,4 @@ private open class Fragment {
     }
 
     fun requireContext(): Context = TODO()
-}
-
-private class WindowCompat {
-    companion object {
-        fun setDecorFitsSystemWindows(window: Any, bool: Boolean) {}
-    }
-}
-
-private fun Modifier.navigationBarsPadding(): Modifier = this
-
-private class GreetingViewModel : ViewModel() {
-    val _message = MutableLiveData("")
-    val message: LiveData<String> = _message
-}
-private class GreetingViewModelFactory(val userId: String) : ViewModelProvider.Factory {
-    override fun <T : ViewModel?> create(modelClass: Class<T>): T {
-        TODO("Not yet implemented")
-    }
-}
-private class ActivityExampleBinding {
-    val root: Int = 0
-    lateinit var callToAction: InteropSnippet17.CallToActionViewButton
-    companion object {
-        fun inflate(li: LayoutInflater): ActivityExampleBinding { TODO() }
-    }
 }
