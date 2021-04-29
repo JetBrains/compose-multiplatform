@@ -1404,9 +1404,6 @@ package androidx.compose.ui.input.pointer {
     property public final boolean positionChange;
   }
 
-  public final class HitPathTrackerKt {
-  }
-
   public final class MotionEventAdapter_androidKt {
   }
 
