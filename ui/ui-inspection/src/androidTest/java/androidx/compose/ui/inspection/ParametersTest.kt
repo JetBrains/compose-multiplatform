@@ -160,8 +160,13 @@ class ParametersTest {
             .getParametersResponse
 
         val text = params.findUnmerged("Text")
+        assertThat(text.type).isEqualTo(Parameter.Type.ITERABLE)
         val strings = params.stringsList
-        checkStringParam(strings, text, "Text", "one", 0)
+        val first = text.elementsList[0]
+
+        assertThat(strings.toMap()[text.name]).isEqualTo("Text")
+        assertThat(strings.toMap()[first.int32Value]).isEqualTo("one")
+        assertThat(text.elementsList.size).isEqualTo(1)
     }
 
     @Test
@@ -176,7 +181,17 @@ class ParametersTest {
 
         val text = params.findMerged("Text")
         val strings = params.stringsList
-        checkStringParam(strings, text, "Text", "three, four, five", 0)
+
+        assertThat(text.type).isEqualTo(Parameter.Type.ITERABLE)
+        val first = text.elementsList[0]
+        val second = text.elementsList[1]
+        val third = text.elementsList[2]
+
+        assertThat(strings.toMap()[text.name]).isEqualTo("Text")
+        assertThat(strings.toMap()[first.int32Value]).isEqualTo("three")
+        assertThat(strings.toMap()[second.int32Value]).isEqualTo("four")
+        assertThat(strings.toMap()[third.int32Value]).isEqualTo("five")
+        assertThat(text.elementsList.size).isEqualTo(3)
     }
 }
 

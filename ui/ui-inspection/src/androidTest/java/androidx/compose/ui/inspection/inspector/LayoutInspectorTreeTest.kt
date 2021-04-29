@@ -442,20 +442,24 @@ class LayoutInspectorTreeTest {
             node(
                 name = "Text",
                 isRenderNode = true,
-                mergedSemantics = "Studio",
-                unmergedSemantics = "Studio"
+                mergedSemantics = "[Studio]",
+                unmergedSemantics = "[Studio]"
             )
-            node("Row", children = listOf("Text", "Text"), mergedSemantics = "Hello, World")
-            node("Text", isRenderNode = true, unmergedSemantics = "Hello")
-            node("Text", isRenderNode = true, unmergedSemantics = "World")
             node(
                 name = "Row",
                 children = listOf("Text", "Text"),
-                mergedSemantics = "to",
-                unmergedSemantics = "to"
+                mergedSemantics = "[Hello, World]"
             )
-            node("Text", isRenderNode = true, unmergedSemantics = "Hello")
-            node("Text", isRenderNode = true, unmergedSemantics = "World")
+            node("Text", isRenderNode = true, unmergedSemantics = "[Hello]")
+            node("Text", isRenderNode = true, unmergedSemantics = "[World]")
+            node(
+                name = "Row",
+                children = listOf("Text", "Text"),
+                mergedSemantics = "[to]",
+                unmergedSemantics = "[to]"
+            )
+            node("Text", isRenderNode = true, unmergedSemantics = "[Hello]")
+            node("Text", isRenderNode = true, unmergedSemantics = "[World]")
         }
     }
 
