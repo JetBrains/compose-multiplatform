@@ -26,7 +26,7 @@ build_versions.kotlin = "1.4.32"
 build_versions.kotlin_coroutines = "1.4.3"
 build_versions.ksp = "1.4.32-1.0.0-alpha07"
 
-build_versions.hilt = "2.34-beta"
+build_versions.hilt = "2.35"
 
 def agpOverride = System.getenv("GRADLE_PLUGIN_VERSION")
 if (agpOverride != null) {
@@ -47,7 +47,7 @@ def getSourceDokkaVersion() {
 if (System.getenv("BUILD_DOKKA") != null) {
     build_versions.dokka = getSourceDokkaVersion()
 } else {
-    build_versions.dokka = "0.9.17-g013"
+    build_versions.dokka = "0.9.17-g014"
 }
 
 rootProject.ext["build_versions"] = build_versions
@@ -74,5 +74,9 @@ build_libs.dokka_gradle = [
 build_libs.kotlinpoet = "com.squareup:kotlinpoet:1.4.0"
 
 build_libs.hilt_plugin = "com.google.dagger:hilt-android-gradle-plugin:${build_versions.hilt}"
+
+build_libs.shadow = "com.github.jengelman.gradle.plugins:shadow:6.1.0"
+
+build_libs.wire_plugin = "com.squareup.wire:wire-gradle-plugin:3.6.0"
 
 rootProject.ext["build_libs"] = build_libs

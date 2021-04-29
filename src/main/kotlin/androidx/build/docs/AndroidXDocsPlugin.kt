@@ -19,6 +19,7 @@ package androidx.build.docs
 import androidx.build.SupportConfig
 import androidx.build.addToBuildOnServer
 import androidx.build.dackka.DackkaTask
+import androidx.build.dependencies.KOTLIN_VERSION
 import androidx.build.doclava.DacOptions
 import androidx.build.doclava.DoclavaTask
 import androidx.build.doclava.GENERATE_DOCS_CONFIG
@@ -45,7 +46,6 @@ import org.gradle.api.attributes.DocsType
 import org.gradle.api.attributes.Usage
 import org.gradle.api.file.FileCollection
 import org.gradle.api.model.ObjectFactory
-import org.gradle.api.plugins.ExtraPropertiesExtension
 import org.gradle.api.plugins.JavaBasePlugin
 import org.gradle.api.tasks.Sync
 import org.gradle.api.tasks.TaskProvider
@@ -114,7 +114,8 @@ class AndroidXDocsPlugin : Plugin<Project> {
             unzippedSourcesForDackka,
             unzipSourcesForDackkaTask,
             unzippedSamplesSources,
-            unzipSamplesTask
+            unzipSamplesTask,
+            dependencyClasspath
         )
         configureDokka(
             unzippedDocsSources,
@@ -264,11 +265,9 @@ class AndroidXDocsPlugin : Plugin<Project> {
         }
         listOf(docsCompileClasspath, docsRuntimeClasspath).forEach { config ->
             config.resolutionStrategy {
-                val versions = (project.rootProject.property("ext") as ExtraPropertiesExtension)
-                    .let { it.get("build_versions") as Map<*, *> }
                 it.eachDependency { details ->
                     if (details.requested.group == "org.jetbrains.kotlin") {
-                        details.useVersion(versions["kotlin"] as String)
+                        details.useVersion(KOTLIN_VERSION)
                     }
                 }
             }
@@ -290,7 +289,8 @@ class AndroidXDocsPlugin : Plugin<Project> {
         unzippedDocsSources: File,
         unzipDocsTask: TaskProvider<Sync>,
         unzippedSamplesSources: File,
-        unzipSamplesTask: TaskProvider<Sync>
+        unzipSamplesTask: TaskProvider<Sync>,
+        dependencyClasspath: FileCollection
     ) {
         val generatedDocsDir = project.file("${project.buildDir}/dackkaDocs")
 
@@ -312,6 +312,11 @@ class AndroidXDocsPlugin : Plugin<Project> {
                 destinationDir = generatedDocsDir
                 samplesDir = unzippedSamplesSources
                 sourcesDir = unzippedDocsSources
+                includes = unzippedDocsSources.walkTopDown()
+                    .filter { it.name.endsWith("documentation.md") }
+                    .joinToString(";")
+                docsProjectDir = File(project.rootDir, "docs-public")
+                dependenciesClasspath = androidJarFile(project) + dependencyClasspath
             }
         }
 
@@ -557,13 +562,14 @@ abstract class SourcesVariantRule : ComponentMetadataRule {
     }
 }
 
-private const val DACKKA_DEPENDENCY = "com.google.devsite:dackka:0.0.1-alpha01"
+private const val DACKKA_DEPENDENCY = "com.google.devsite:dackka:0.0.2"
 private const val DOCLAVA_DEPENDENCY = "com.android:doclava:1.0.6"
 
 // Allowlist for directories that should be processed by Dackka
 private val dackkaDirsToProcess = listOf(
     "androidx/benchmark/**",
     "androidx/collection/**",
+    "androidx/compose/**",
     "androidx/paging/**"
 )
 

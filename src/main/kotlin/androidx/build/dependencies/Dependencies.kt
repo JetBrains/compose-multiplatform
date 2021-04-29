@@ -39,8 +39,8 @@ const val ASSERTJ = "org.assertj:assertj-core:3.11.1"
 const val CHECKER_FRAMEWORK = "org.checkerframework:checker-qual:2.5.3"
 const val CONSTRAINT_LAYOUT = "androidx.constraintlayout:constraintlayout:2.0.1@aar"
 const val CONSTRAINT_LAYOUT_CORE = "androidx.constraintlayout:constraintlayout-core:1.0.0-alpha1"
-const val DAGGER = "com.google.dagger:dagger:2.34"
-const val DAGGER_COMPILER = "com.google.dagger:dagger-compiler:2.34"
+const val DAGGER = "com.google.dagger:dagger:2.35"
+const val DAGGER_COMPILER = "com.google.dagger:dagger-compiler:2.35"
 const val DEXMAKER_MOCKITO = "com.linkedin.dexmaker:dexmaker-mockito:2.25.0"
 const val DEXMAKER_MOCKITO_INLINE = "com.linkedin.dexmaker:dexmaker-mockito-inline:2.25.0"
 const val ESPRESSO_CONTRIB = "androidx.test.espresso:espresso-contrib:3.3.0"
@@ -138,11 +138,11 @@ const val SQLDELIGHT_COROUTINES_EXT = "com.squareup.sqldelight:coroutines-extens
 
 const val ROBOLECTRIC = "org.robolectric:robolectric:4.4-alpha-2"
 
-const val SHADOW_PLUGIN = "com.github.jengelman.gradle.plugins:shadow:5.2.0"
-
 const val PROTOBUF = "com.google.protobuf:protobuf-java:3.4.0"
 const val PROTOBUF_COMPILER = "com.google.protobuf:protoc:3.10.0"
 const val PROTOBUF_LITE = "com.google.protobuf:protobuf-javalite:3.10.0"
+
+const val WIRE_RUNTIME = "com.squareup.wire:wire-runtime:3.6.0"
 
 const val JARJAR = "org.anarres.jarjar:jarjar-gradle:1.0.1"
 

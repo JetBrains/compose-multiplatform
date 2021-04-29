@@ -118,7 +118,10 @@ val taskNamesKnownToDuplicateOutputs = setOf(
     "desktopTestProcessResources",
     "processResources",
     "jvmProcessResources",
-    "desktopProcessResources"
+    "desktopProcessResources",
+    // https://github.com/square/wire/issues/1947
+    "generateDebugProtos",
+    "generateReleaseProtos",
 )
 
 // For this project and all subprojects, collects all tasks and creates a map keyed by their output files

@@ -72,9 +72,10 @@ dependencies {
     cacheableApi(build_libs.dokka_gradle)
     // needed by inspection plugin
     cacheableImplementation("com.google.protobuf:protobuf-gradle-plugin:0.8.13")
+    cacheableImplementation(build_libs.wire_plugin)
     // TODO(aurimas): remove when b/174658825 is fixed
     cacheableImplementation("org.anarres.jarjar:jarjar-gradle:1.0.1")
-    cacheableImplementation("com.github.jengelman.gradle.plugins:shadow:5.2.0")
+    cacheableImplementation(build_libs.shadow)
     // dependencies that aren't used by buildSrc directly but that we resolve here so that the
     // root project doesn't need to re-resolve them and their dependencies on every build
     cacheableRuntimeOnly(build_libs.hilt_plugin)

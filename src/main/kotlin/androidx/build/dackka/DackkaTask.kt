@@ -22,6 +22,7 @@ import org.gradle.api.file.FileCollection
 import org.gradle.api.provider.ListProperty
 import org.gradle.api.provider.SetProperty
 import org.gradle.api.tasks.Classpath
+import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.InputFiles
 import org.gradle.api.tasks.OutputDirectory
 import org.gradle.api.tasks.TaskAction
@@ -40,6 +41,10 @@ abstract class DackkaTask @Inject constructor(
     @get:Classpath
     abstract val dackkaClasspath: ConfigurableFileCollection
 
+    // Classpath containing dependencys of libraries needed to resolve types in docs
+    @InputFiles
+    lateinit var dependenciesClasspath: FileCollection
+
     // Directory containing the code samples
     @InputFiles
     lateinit var samplesDir: File
@@ -48,6 +53,14 @@ abstract class DackkaTask @Inject constructor(
     @InputFiles
     lateinit var sourcesDir: File
 
+    // String representing names of .md files to be included in documentation
+    @Input
+    lateinit var includes: String
+
+    // Directory containing the docs project and package-lists
+    @InputFiles
+    lateinit var docsProjectDir: File
+
     // Location of generated reference docs
     @OutputDirectory
     lateinit var destinationDir: File
@@ -55,6 +68,25 @@ abstract class DackkaTask @Inject constructor(
     // Documentation for Dackka command line usage and arguments can be found at
     // https://kotlin.github.io/dokka/1.4.0/user_guide/cli/usage/
     private fun computeArguments(): List<String> {
+
+        // path comes with colons but dokka expects a semicolon delimited string
+        val classPath = dependenciesClasspath.asPath.replace(':', ';')
+
+        var linksConfiguration = ""
+        mapOf(
+            "coroutinesCore"
+                to "https://kotlin.github.io/kotlinx.coroutines/kotlinx-coroutines-core",
+            "android" to "https://developer.android.com/reference",
+            "guava" to "https://guava.dev/releases/18.0/api/docs/",
+            "kotlin" to "https://kotlinlang.org/api/latest/jvm/stdlib/"
+        ).map {
+            // Dokka sets this format: url^packageListUrl^^url2...
+            linksConfiguration +=
+                "${it.value}^${docsProjectDir.toPath()}/package-lists/${it.key}/package-list^^"
+        }
+
+        val includesString = if (includes.isNotEmpty()) { "-includes $includes" } else { "" }
+
         return listOf(
 
             // moduleName arg needs to be present but is not used the generated docs
@@ -66,10 +98,14 @@ abstract class DackkaTask @Inject constructor(
             "-outputDir",
             "$destinationDir",
 
+            // links to external types
+            "-globalLinks",
+            linksConfiguration,
+
             // Configuration of sources. The generated string looks like this:
             // "-sourceSet -src /path/to/src -samples /path/to/samples ..."
             "-sourceSet",
-            "-src $sourcesDir -samples $samplesDir"
+            "-src $sourcesDir -samples $samplesDir -classpath $classPath $includesString"
         )
     }
 
@@ -106,7 +142,6 @@ abstract class DackkaWorkAction @Inject constructor (
         execOperations.javaexec {
             it.args = parameters.args.get()
             it.classpath(parameters.classpath.get())
-
             // b/183989795 tracks moving this away from an environment variable
             it.environment("DEVSITE_TENANT", "androidx")
         }
