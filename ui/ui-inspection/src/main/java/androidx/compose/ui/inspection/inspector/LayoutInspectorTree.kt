@@ -55,6 +55,7 @@ val systemPackages = setOf(
     packageNameHash("androidx.compose.material.ripple"),
     packageNameHash("androidx.compose.runtime"),
     packageNameHash("androidx.compose.ui"),
+    packageNameHash("androidx.compose.ui.graphics.vector"),
     packageNameHash("androidx.compose.ui.layout"),
     packageNameHash("androidx.compose.ui.platform"),
     packageNameHash("androidx.compose.ui.tooling"),
@@ -65,8 +66,6 @@ val systemPackages = setOf(
 )
 
 private val unwantedCalls = setOf(
-    "emit",
-    "remember",
     "CompositionLocalProvider",
     "Content",
     "Inspectable",
@@ -523,7 +522,10 @@ class LayoutInspectorTree {
     }
 
     private fun unwantedGroup(node: MutableInspectorNode): Boolean =
-        node.packageHash in systemPackages && (hideSystemNodes || node.name in unwantedCalls)
+        (node.packageHash in systemPackages && hideSystemNodes) ||
+            node.name.isEmpty() ||
+            node.name.startsWith("remember") ||
+            node.name in unwantedCalls
 
     private fun newNode(): MutableInspectorNode =
         if (cache.isNotEmpty()) cache.pop() else MutableInspectorNode()

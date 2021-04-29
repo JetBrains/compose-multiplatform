@@ -628,7 +628,7 @@ class LayoutInspectorTreeTest {
         block: TreeValidationReceiver.() -> Unit = {}
     ) {
         val nodes = result.flatMap { flatten(it) }.listIterator()
-        ignoreStart(nodes, "Box", "Inspectable", "CompositionLocalProvider")
+        ignoreStart(nodes, "Box")
         val tree = TreeValidationReceiver(
             nodes,
             density,
