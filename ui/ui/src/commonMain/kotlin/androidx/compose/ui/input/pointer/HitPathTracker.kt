@@ -308,9 +308,7 @@ internal class Node(val pointerInputFilter: PointerInputFilter) : NodeParent() {
         // Dispatch on the bubbling pass.
         internalPointerEvent.dispatchToPointerInputFilter(pointerInputFilter, upPass)
 
-        // Put all of the relevant changes that were in the internalPointerEvent back into all of
-        // the changes, and then set all of the changes back onto the internalPointerEvent.
-        allChanges.putAll(internalPointerEvent.changes)
+        // Set all of the changes back onto the internalPointerEvent.
         internalPointerEvent.changes = allChanges
 
         // We dispatched to at least one pointer input filter so return true.
@@ -374,40 +372,4 @@ internal class Node(val pointerInputFilter: PointerInputFilter) : NodeParent() {
         }
         return list
     }
-}
-
-private inline fun <K, V> MutableMap<K, V>.putOrUpdate(
-    key: K,
-    putValue: V,
-    updateBlock: (valueToUpdate: V) -> V
-) {
-    val value = get(key)
-    if (value == null) {
-        put(key, putValue)
-    } else {
-        put(key, updateBlock(value))
-    }
-}
-
-/**
- * Removes the item at [key] if [removePredicate] returns true, otherwise updates the item with the
- * value returned by [updateBlock].
- *
- * @return True if value was removed, false if updated.
- */
-private inline fun <K, V> MutableMap<K, V>.removeOrUpdate(
-    key: K,
-    removePredicate: (valueToRemove: V) -> Boolean,
-    updateBlock: (valueToUpdate: V) -> V
-): Boolean {
-    val value = get(key)
-    if (value != null) {
-        if (removePredicate(value)) {
-            remove(key)
-            return true
-        } else {
-            put(key, updateBlock(value))
-        }
-    }
-    return false
 }
