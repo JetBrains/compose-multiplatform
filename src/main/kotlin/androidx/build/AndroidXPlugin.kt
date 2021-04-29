@@ -31,7 +31,6 @@ import androidx.build.checkapi.configureProjectForApiTasks
 import androidx.build.dependencyTracker.AffectedModuleDetector
 import androidx.build.gradle.getByType
 import androidx.build.gradle.isRoot
-import androidx.build.jacoco.Jacoco
 import androidx.build.license.configureExternalDependencyLicenseCheck
 import androidx.build.resources.configurePublicResourcesStub
 import androidx.build.studio.StudioTask
@@ -62,14 +61,10 @@ import org.gradle.api.tasks.javadoc.Javadoc
 import org.gradle.api.tasks.testing.Test
 import org.gradle.api.tasks.testing.logging.TestExceptionFormat
 import org.gradle.api.tasks.testing.logging.TestLogEvent
-import org.gradle.kotlin.dsl.apply
-import org.gradle.kotlin.dsl.configure
 import org.gradle.kotlin.dsl.create
 import org.gradle.kotlin.dsl.extra
 import org.gradle.kotlin.dsl.findByType
 import org.gradle.kotlin.dsl.getPlugin
-import org.gradle.testing.jacoco.plugins.JacocoPluginExtension
-import org.gradle.testing.jacoco.tasks.JacocoReport
 import org.jetbrains.kotlin.gradle.dsl.KotlinAndroidProjectExtension
 import org.jetbrains.kotlin.gradle.dsl.KotlinMultiplatformExtension
 import org.jetbrains.kotlin.gradle.plugin.KotlinBasePluginWrapper
@@ -111,9 +106,6 @@ class AndroidXPlugin : Plugin<Project> {
         project.configureTaskTimeouts()
         project.configureMavenArtifactUpload(extension)
         project.configureExternalDependencyLicenseCheck()
-        if (project.isCoverageEnabled()) {
-            project.configureJacoco()
-        }
     }
 
     /**
@@ -383,9 +375,6 @@ class AndroidXPlugin : Plugin<Project> {
             targetCompatibility = VERSION_1_8
         }
 
-        // Force AGP to use our version of JaCoCo
-        @Suppress("deprecation")
-        jacoco.version = Jacoco.VERSION
         compileSdkVersion(COMPILE_SDK_VERSION)
         buildToolsVersion = BUILD_TOOLS_VERSION
         defaultConfig.targetSdkVersion(TARGET_SDK_VERSION)
@@ -393,8 +382,6 @@ class AndroidXPlugin : Plugin<Project> {
         ndkPath = project.getNdkPath().absolutePath
 
         defaultConfig.testInstrumentationRunner = INSTRUMENTATION_RUNNER
-
-        buildTypes.getByName("debug").isTestCoverageEnabled = project.isCoverageEnabled()
 
         testOptions.animationsDisabled = true
         testOptions.unitTests.isReturnDefaultValues = true
@@ -456,11 +443,6 @@ class AndroidXPlugin : Plugin<Project> {
             if (!configuration.name.toLowerCase(Locale.US).contains("androidtest")) {
                 configuration.resolutionStrategy.preferProjectModules()
             }
-        }
-
-        if (project.isCoverageEnabled()) {
-            Jacoco.registerClassFilesTask(project, this)
-            Jacoco.registerAgentPropertiesFilesGenerateTask(project, this)
         }
 
         project.configureTestConfigGeneration(this)
@@ -638,32 +620,6 @@ class AndroidXPlugin : Plugin<Project> {
             aggregateLibraryBuildInfoFileTask.libraryBuildInfoFiles.add(
                 task.flatMap { task -> task.outputFile }
             )
-        }
-    }
-
-    private fun Project.configureJacoco() {
-        apply(plugin = "jacoco")
-        configure<JacocoPluginExtension> {
-            toolVersion = Jacoco.VERSION
-        }
-
-        val zipEcFilesTask = Jacoco.getZipEcFilesTask(this)
-
-        tasks.withType(JacocoReport::class.java).configureEach { task ->
-            task.reports {
-                it.xml.isEnabled = true
-                it.html.isEnabled = false
-                it.csv.isEnabled = false
-
-                it.xml.destination = File(
-                    getHostTestCoverageDirectory(),
-                    "${project.path.asFilenamePrefix()}.xml"
-                )
-            }
-        }
-        // zip follows every jacocoReport task being run
-        zipEcFilesTask.configure { zipTask ->
-            zipTask.dependsOn(tasks.withType(JacocoReport::class.java))
         }
     }
 
