@@ -22,7 +22,7 @@ import org.gradle.api.Project
 import org.gradle.api.tasks.Internal
 import org.gradle.api.tasks.TaskAction
 import org.gradle.api.tasks.options.Option
-import org.jetbrains.kotlin.konan.file.File
+import java.io.File
 
 // first level line filter - we ignore lines that don't contain the following for speed
 const val ROOT_MATCH = "noinspection"
@@ -80,10 +80,11 @@ open class CheckInvalidSuppressTask : DefaultTask() {
                 continue
 
             // check file exists
-            if (!File(filename).exists)
+            val file = File(filename)
+            if (!file.exists())
                 continue
 
-            val lines = File(filename).readStrings()
+            val lines = file.readLines(Charsets.UTF_8).toMutableList()
             for ((i, line) in lines.withIndex()) {
                 if (line.contains(ROOT_MATCH)) {
                     val bad = getInvalidSuppression(line)
@@ -94,7 +95,7 @@ open class CheckInvalidSuppressTask : DefaultTask() {
                             } else {
                                 lines[i] = line.replaceFirst(bad, MATCHERS[bad]!! + " // ")
                             }
-                            File(filename).writeLines(lines)
+                            file.writeText(lines.joinToString(System.lineSeparator()))
                         } else {
                             report += getReportForLine(filename, i, lines, MATCHERS[bad]!!)
                         }
