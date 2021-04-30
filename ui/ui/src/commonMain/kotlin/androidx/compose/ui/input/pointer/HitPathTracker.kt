@@ -17,15 +17,17 @@
 package androidx.compose.ui.input.pointer
 
 import androidx.compose.ui.layout.LayoutCoordinates
-import androidx.compose.ui.layout.findRoot
 import androidx.compose.ui.node.InternalCoreApi
 
 /**
  * Organizes pointers and the [PointerInputFilter]s that they hit into a hierarchy such that
  * [PointerInputChange]s can be dispatched to the [PointerInputFilter]s in a hierarchical fashion.
+ *
+ * @property rootCoordinates the root [LayoutCoordinates] that [PointerInputChange]s will be
+ * relative to.
  */
 @OptIn(InternalCoreApi::class)
-internal class HitPathTracker {
+internal class HitPathTracker(private val rootCoordinates: LayoutCoordinates) {
 
     /*@VisibleForTesting*/
     internal val root: NodeParent = NodeParent()
@@ -107,18 +109,12 @@ internal class HitPathTracker {
      * @return The DispatchChangesRetVal that should be destructured immediately.
      */
     fun dispatchChanges(internalPointerEvent: InternalPointerEvent): DispatchChangesRetVal {
-        var dispatchHit = false
-
-        dispatchHit = root.dispatchChanges(
-            internalPointerEvent,
-            PointerEventPass.Initial,
-            PointerEventPass.Main
-        ) || dispatchHit
-        dispatchHit = root.dispatchChanges(
-            internalPointerEvent,
-            PointerEventPass.Final,
-            null
-        ) || dispatchHit
+        var dispatchHit = root.dispatchMainEventPass(
+            internalPointerEvent.changes,
+            rootCoordinates,
+            internalPointerEvent
+        )
+        dispatchHit = root.dispatchFinalEventPass() || dispatchHit
 
         dispatchChangesRetVal.wasDispatchedToSomething = dispatchHit
         dispatchChangesRetVal.internalPointerEvent = internalPointerEvent
@@ -127,7 +123,7 @@ internal class HitPathTracker {
 
     /**
      * Dispatches cancel events to all tracked [PointerInputFilter]s to notify them that
-     * [PointerInputFilter.onPointerInput] will not be called again until all pointers have been
+     * [PointerInputFilter.onPointerEvent] will not be called again until all pointers have been
      * removed from the application and then at least one is added again, and removes all tracked
      * data.
      */
@@ -166,24 +162,45 @@ internal open class NodeParent {
     val children: MutableSet<Node> = mutableSetOf()
 
     /**
-     * Dispatches the [InternalPointerEvent] down the tree.
+     * Dispatches [changes] down the tree, for the initial and main pass.
      *
-     * Note: [InternalPointerEvent] is expected to be mutated during dispatch.
+     * [changes] and other properties needed in all passes should be cached inside this method so
+     * they can be reused in [dispatchFinalEventPass], since the passes happen consecutively.
+     *
+     * @param changes the map containing [PointerInputChange]s that will be dispatched to
+     * relevant [PointerInputFilter]s
+     * @param parentCoordinates the [LayoutCoordinates] the positional information in [changes]
+     * is relative to
+     * @param internalPointerEvent the [InternalPointerEvent] needed to construct [PointerEvent]s
      */
-    open fun dispatchChanges(
-        internalPointerEvent: InternalPointerEvent,
-        downPass: PointerEventPass,
-        upPass: PointerEventPass?
+    open fun dispatchMainEventPass(
+        changes: Map<PointerId, PointerInputChange>,
+        parentCoordinates: LayoutCoordinates,
+        internalPointerEvent: InternalPointerEvent
     ): Boolean {
-        var dispatchedToSomething = false
+        var dispatched = false
         children.forEach {
-            dispatchedToSomething = it.dispatchChanges(
-                internalPointerEvent,
-                downPass,
-                upPass
-            ) || dispatchedToSomething
+            dispatched = it.dispatchMainEventPass(
+                changes,
+                parentCoordinates,
+                internalPointerEvent
+            ) || dispatched
         }
-        return dispatchedToSomething
+        return dispatched
+    }
+
+    /**
+     * Dispatches the final event pass down the tree.
+     *
+     * Properties cached in [dispatchMainEventPass] should be reset after this method, to ensure
+     * clean state for a future pass where pointer IDs / positions might be different.
+     */
+    open fun dispatchFinalEventPass(): Boolean {
+        var dispatched = false
+        children.forEach {
+            dispatched = it.dispatchFinalEventPass() || dispatched
+        }
+        return dispatched
     }
 
     /**
@@ -267,49 +284,148 @@ internal class Node(val pointerInputFilter: PointerInputFilter) : NodeParent() {
 
     val pointerIds: MutableSet<PointerId> = mutableSetOf()
 
-    override fun dispatchChanges(
-        internalPointerEvent: InternalPointerEvent,
-        downPass: PointerEventPass,
-        upPass: PointerEventPass?
+    /**
+     * Cached properties that will be set before the main event pass, and reset after the final
+     * pass. Since we know that these won't change within the entire pass, we don't need to
+     * calculate / create these for each pass / multiple times during a pass.
+     *
+     * @see buildCache
+     * @see clearCache
+     */
+    private val relevantChanges: MutableMap<PointerId, PointerInputChange> = mutableMapOf()
+    private var coordinates: LayoutCoordinates? = null
+    private var pointerEvent: PointerEvent? = null
+
+    override fun dispatchMainEventPass(
+        changes: Map<PointerId, PointerInputChange>,
+        parentCoordinates: LayoutCoordinates,
+        internalPointerEvent: InternalPointerEvent
     ): Boolean {
-
-        // TODO(shepshapard): Creating a new map everytime here, we could create a reusable one
-        //  per node.
-        // Filter for changes that are associated with pointer ids that are relevant to this node.
-        val relevantChanges =
-            internalPointerEvent.changes.filterTo(mutableMapOf()) { entry ->
-                pointerIds.contains(entry.key)
-            }
-
-        if (relevantChanges.isEmpty()) {
-            // If there are not relevant changes, there is nothing to process so return false.
-            return false
-        }
-
-        // Store all of the changes locally and put the relevant changes back into our event.
-        val allChanges = internalPointerEvent.changes
-        internalPointerEvent.changes = relevantChanges
+        // Build the cache that will be used for both the main and final pass
+        buildCache(changes, parentCoordinates, internalPointerEvent)
 
         // TODO(b/158243568): The below dispatching operations may cause the pointerInputFilter to
         //  become detached. Currently, they just no-op if it becomes detached and the detached
         //  pointerInputFilters are removed from being tracked with the next event. I currently
         //  believe they should be detached immediately. Though, it is possible they should be
         //  detached after the conclusion of dispatch (so onCancel isn't called during calls
-        //  to onPointerEvent).
+        //  to onPointerEvent). As a result we guard each successive dispatch with the same check.
+        return dispatchIfNeeded {
+            val event = pointerEvent!!
+            val size = coordinates!!.size
+            // Dispatch on the tunneling pass.
+            pointerInputFilter.onPointerEvent(event, PointerEventPass.Initial, size)
 
-        // Dispatch on the tunneling pass.
-        internalPointerEvent.dispatchToPointerInputFilter(pointerInputFilter, downPass)
+            // Dispatch to children.
+            if (pointerInputFilter.isAttached) {
+                children.forEach {
+                    it.dispatchMainEventPass(
+                        // Pass only the already-filtered and position-translated changes down to
+                        // children
+                        relevantChanges,
+                        coordinates!!,
+                        internalPointerEvent
+                    )
+                }
+            }
 
-        // Dispatch to children.
-        if (pointerInputFilter.isAttached) {
-            children.forEach { it.dispatchChanges(internalPointerEvent, downPass, upPass) }
+            if (pointerInputFilter.isAttached) {
+                // Dispatch on the bubbling pass.
+                pointerInputFilter.onPointerEvent(event, PointerEventPass.Main, size)
+            }
+        }
+    }
+
+    override fun dispatchFinalEventPass(): Boolean {
+        // TODO(b/158243568): The below dispatching operations may cause the pointerInputFilter to
+        //  become detached. Currently, they just no-op if it becomes detached and the detached
+        //  pointerInputFilters are removed from being tracked with the next event. I currently
+        //  believe they should be detached immediately. Though, it is possible they should be
+        //  detached after the conclusion of dispatch (so onCancel isn't called during calls
+        //  to onPointerEvent). As a result we guard each successive dispatch with the same check.
+        val result = dispatchIfNeeded {
+            val event = pointerEvent!!
+            val size = coordinates!!.size
+            // Dispatch on the tunneling pass.
+            pointerInputFilter.onPointerEvent(event, PointerEventPass.Final, size)
+
+            // Dispatch to children.
+            if (pointerInputFilter.isAttached) {
+                children.forEach { it.dispatchFinalEventPass() }
+            }
+        }
+        clearCache()
+        return result
+    }
+
+    /**
+     * Calculates cached properties that will be stored in this [Node] for the duration of both
+     * [dispatchMainEventPass] and [dispatchFinalEventPass]. This allows us to avoid repeated
+     * work between passes, and within passes, as these properties won't change during the
+     * overall dispatch.
+     *
+     * @see clearCache
+     */
+    private fun buildCache(
+        changes: Map<PointerId, PointerInputChange>,
+        parentCoordinates: LayoutCoordinates,
+        internalPointerEvent: InternalPointerEvent
+    ) {
+        // Avoid future work if we know this node will no-op
+        if (!pointerInputFilter.isAttached) return
+
+        coordinates = pointerInputFilter.layoutCoordinates
+
+        for ((key, change) in changes) {
+            // Filter for changes that are associated with pointer ids that are relevant to this
+            // node
+            if (key in pointerIds) {
+                // And translate their position relative to the parent coordinates, to give us a
+                // change local to the PointerInputFilter's coordinates
+                relevantChanges[key] = change.copy(
+                    previousPosition = coordinates!!.localPositionOf(
+                        parentCoordinates,
+                        change.previousPosition
+                    ),
+                    currentPosition = coordinates!!.localPositionOf(
+                        parentCoordinates,
+                        change.position
+                    )
+                )
+            }
         }
 
-        // Dispatch on the bubbling pass.
-        internalPointerEvent.dispatchToPointerInputFilter(pointerInputFilter, upPass)
+        if (relevantChanges.isEmpty()) return
 
-        // Set all of the changes back onto the internalPointerEvent.
-        internalPointerEvent.changes = allChanges
+        pointerEvent = PointerEvent(relevantChanges.values.toList(), internalPointerEvent)
+    }
+
+    /**
+     * Resets cached properties in case this node will continue to track different [pointerIds]
+     * than the ones we built the cache for, instead of being removed.
+     *
+     * @see buildCache
+     */
+    private fun clearCache() {
+        relevantChanges.clear()
+        coordinates = null
+        pointerEvent = null
+    }
+
+    /**
+     * Calls [block] if there are relevant changes, and if [pointerInputFilter] is attached
+     *
+     * @return whether [block] was called
+     */
+    private inline fun dispatchIfNeeded(
+        block: () -> Unit
+    ): Boolean {
+        // If there are no relevant changes, there is nothing to process so return false.
+        if (relevantChanges.isEmpty()) return false
+        // If the input filter is not attached, avoid dispatching
+        if (!pointerInputFilter.isAttached) return false
+
+        block()
 
         // We dispatched to at least one pointer input filter so return true.
         return true
@@ -330,46 +446,5 @@ internal class Node(val pointerInputFilter: PointerInputFilter) : NodeParent() {
     override fun toString(): String {
         return "Node(pointerInputFilter=$pointerInputFilter, children=$children, " +
             "pointerIds=$pointerIds)"
-    }
-
-    /**
-     * Dispatches [this] to [filter].
-     *
-     * This includes offsetting the pointer coordinates to be relative to [filter].  Also manages
-     * cases where the [filter] is removed from the hierarchy during dispatch.
-     *
-     * Is a no-op if [filter] is not attached or [pass] is null.
-     */
-    private fun InternalPointerEvent.dispatchToPointerInputFilter(
-        filter: PointerInputFilter,
-        pass: PointerEventPass?
-    ) {
-        if (pass == null || !pointerInputFilter.isAttached) {
-            return
-        }
-
-        // Get the position before dispatch as the PointerInputFilter may not be attached after
-        // dispatch or could have moved in some synchronous way (an Android parent may have moved
-        // for example) and we actually want to add back whatever position was previously
-        // subtracted.
-        val coordinates = filter.layoutCoordinates!!
-        val root = coordinates.findRoot()
-
-        val pointerEvent = PointerEvent(changesInLocal(root, coordinates), this)
-        filter.onPointerEvent(pointerEvent, pass, coordinates.size)
-    }
-
-    private fun InternalPointerEvent.changesInLocal(
-        root: LayoutCoordinates,
-        local: LayoutCoordinates
-    ): List<PointerInputChange> {
-        val list = mutableListOf<PointerInputChange>()
-        changes.values.forEach { change ->
-            list += change.copy(
-                previousPosition = local.localPositionOf(root, change.previousPosition),
-                currentPosition = local.localPositionOf(root, change.position)
-            )
-        }
-        return list
     }
 }
