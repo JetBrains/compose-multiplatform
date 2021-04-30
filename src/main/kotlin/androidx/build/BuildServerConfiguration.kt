@@ -35,6 +35,20 @@ fun getBuildId(): String {
 }
 
 /**
+ * Gets set to true when the build id is prefixed with P.
+ *
+ * In AffectedModuleDetector, we return a different ProjectSubset in presubmit vs.
+ * postsubmit, to get the desired test behaviors.
+ */
+fun isPresubmitBuild(): Boolean {
+    return if (System.getenv("BUILD_NUMBER") != null) {
+        System.getenv("BUILD_NUMBER").startsWith("P")
+    } else {
+        false
+    }
+}
+
+/**
  * The DIST_DIR is where you want to save things from the build. The build server will copy
  * the contents of DIST_DIR to somewhere and make it available.
  */
