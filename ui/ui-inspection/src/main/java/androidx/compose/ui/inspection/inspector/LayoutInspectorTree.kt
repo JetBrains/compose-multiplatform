@@ -24,6 +24,7 @@ import androidx.compose.ui.R
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.layout.GraphicLayerInfo
 import androidx.compose.ui.layout.LayoutInfo
+import androidx.compose.ui.node.Ref
 import androidx.compose.ui.node.RootForTest
 import androidx.compose.ui.platform.ViewRootForInspector
 import androidx.compose.ui.semantics.SemanticsModifier
@@ -373,6 +374,13 @@ class LayoutInspectorTree {
         input: List<MutableInspectorNode>,
         buildFakeChildNodes: Boolean = false
     ) {
+        if (parentNode.name == "AndroidView") {
+            // Special case:
+            // We may have captured the View id from an AndroidView Composable.
+            // Add the viewId to the child ComposeNode that should be present.
+            input.singleOrNull()?.viewId = subCompositions.latestViewId()
+        }
+
         var id: Long? = null
         input.forEach { node ->
             if (node.name.isEmpty() && !(buildFakeChildNodes && node.layoutNodes.isNotEmpty())) {
@@ -584,10 +592,12 @@ class LayoutInspectorTree {
      *   The Popup/Dialog composable itself, and a few helping composables (the root) will
      *   not be included in the SlotTree with the contents, instead these composables
      *   will be found in the SlotTree for the main app and they all have empty sizes.
-     * - Other examples will be added later.
+     *   The aim is to collect these sub-composition roots such that they can be added to
+     *   the [InspectorNode]s of the contents.
      *
-     * The aim is to collect these sub-composition roots such that they can be added to
-     * the [InspectorNode]s of the dialog/popup contents.
+     * - AndroidView: When this is used in a compose app we will see a similar pattern in
+     *   the SlotTree except there isn't a sub-composition to stitch in. But we need to
+     *   collect the view id separately from the "AndroidView" node itself.
      */
     @OptIn(UiToolingDataApi::class)
     private inner class SubCompositionRoots {
@@ -606,6 +616,9 @@ class LayoutInspectorTree {
 
         /** Set to true when stitching in the contents of the sub-composition */
         private var stitching = false
+
+        /** Last captured view that is believed to be an embbed View under an AndroidView node */
+        private var androidView = UNDEFINED_ID
 
         /**
          * The sub-composition roots found.
@@ -655,10 +668,21 @@ class LayoutInspectorTree {
             if (!capturing) {
                 return
             }
-            val root = group.data.filterIsInstance<ViewRootForInspector>().singleOrNull() ?: return
-            val view = root.subCompositionView ?: return
-            val composeOwner = if (view.childCount == 1) view.getChildAt(0) else return
-            ownerView = composeOwner.uniqueDrawingId
+            val root = group.data.filterIsInstance<ViewRootForInspector>().singleOrNull()
+                ?: group.data.filterIsInstance<Ref<ViewRootForInspector>>().singleOrNull()?.value
+                ?: return
+
+            val view = root.subCompositionView
+            if (view != null) {
+                val composeOwner = if (view.childCount == 1) view.getChildAt(0) else return
+                ownerView = composeOwner.uniqueDrawingId
+            } else {
+                androidView = root.viewRoot?.uniqueDrawingId ?: UNDEFINED_ID
+                // Store the viewRoot such that we can move the View under the compose node
+                // in Studio. We do not need to capture the Groups found for this case, so
+                // we call "reset" here to stop capturing.
+                clear()
+            }
         }
 
         /**
@@ -670,6 +694,12 @@ class LayoutInspectorTree {
             } else if (rootGroup in group.children) {
                 rootGroup = group
             }
+        }
+
+        fun latestViewId(): Long {
+            val id = androidView
+            androidView = UNDEFINED_ID
+            return id
         }
 
         /**

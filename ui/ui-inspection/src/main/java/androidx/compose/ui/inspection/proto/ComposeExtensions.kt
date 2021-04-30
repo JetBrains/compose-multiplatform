@@ -74,6 +74,7 @@ private fun InspectorNode.toComposableNodeImpl(
         }.build()
 
         flags = flags()
+        viewId = inspectorNode.viewId
 
         children.forEach { child ->
             addChildren(child.toComposableNodeImpl(stringTable, windowPos))

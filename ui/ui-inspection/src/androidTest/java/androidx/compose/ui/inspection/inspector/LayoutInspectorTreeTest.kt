@@ -19,6 +19,7 @@ package androidx.compose.ui.inspection.inspector
 import android.view.View
 import android.view.ViewGroup
 import android.view.inspector.WindowInspector
+import android.widget.TextView
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -71,6 +72,7 @@ import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.viewinterop.AndroidView
 import androidx.compose.ui.window.Popup
 import androidx.test.ext.junit.rules.ActivityScenarioRule
 import androidx.test.ext.junit.runners.AndroidJUnit4
@@ -583,6 +585,44 @@ class LayoutInspectorTreeTest {
         }
     }
 
+    @Test
+    fun testAndroidView() {
+        val slotTableRecord = CompositionDataRecord.create()
+
+        show {
+            Inspectable(slotTableRecord) {
+                Column {
+                    Text("Compose Text")
+                    AndroidView({ context ->
+                        TextView(context).apply {
+                            text = "AndroidView"
+                        }
+                    })
+                }
+            }
+        }
+        val composeView = findAndroidComposeView() as ViewGroup
+        composeView.setTag(R.id.inspection_slot_table_set, slotTableRecord.store)
+        val builder = LayoutInspectorTree()
+        builder.hideSystemNodes = false
+        val nodes = builder.convert(composeView)
+        dumpNodes(nodes, composeView, builder)
+        val androidView = nodes.flatMap { flatten(it) }.single { it.name == "AndroidView" }
+
+        validate(listOf(androidView), builder, ignoreElementsFromShow = false) {
+            node(
+                name = "AndroidView",
+                fileName = "LayoutInspectorTreeTest.kt",
+                children = listOf("ComposeNode")
+            )
+            node(
+                name = "ComposeNode",
+                fileName = "AndroidView.android.kt",
+                hasViewIdUnder = composeView,
+            )
+        }
+    }
+
     // WARNING: The formatting of the lines below here affect test results.
     val titleLine = Throwable().stackTrace[0].lineNumber + 3
 
@@ -673,6 +713,9 @@ class LayoutInspectorTreeTest {
         ignoreElementsFromShow: Boolean = true,
         block: TreeValidationReceiver.() -> Unit = {}
     ) {
+        if (DEBUG) {
+            return
+        }
         val nodes = result.flatMap { flatten(it) }.listIterator()
         if (ignoreElementsFromShow) {
             ignoreStart(nodes, "Box")
@@ -709,6 +752,7 @@ class LayoutInspectorTreeTest {
             fileName: String? = null,
             lineNumber: Int = -1,
             isRenderNode: Boolean = false,
+            hasViewIdUnder: View? = null,
             hasTransformations: Boolean = false,
             mergedSemantics: String = "",
             unmergedSemantics: String = "",
@@ -735,6 +779,12 @@ class LayoutInspectorTreeTest {
                 } else {
                     assertWithMessage(message).that(node.id).isLessThan(0L)
                 }
+            }
+            if (hasViewIdUnder != null) {
+                assertWithMessage(message).that(node.viewId).isGreaterThan(0L)
+                assertWithMessage(message).that(hasViewIdUnder.hasChild(node.viewId)).isTrue()
+            } else {
+                assertWithMessage(message).that(node.viewId).isEqualTo(0L)
             }
             if (hasTransformations) {
                 assertWithMessage(message).that(node.bounds).isNotNull()
@@ -774,6 +824,18 @@ class LayoutInspectorTreeTest {
                 receiver.block()
                 receiver.checkFinished(name)
             }
+        }
+
+        private fun View.hasChild(id: Long): Boolean {
+            if (this !is ViewGroup) {
+                return false
+            }
+            for (index in 0..childCount) {
+                if (getChildAt(index).uniqueDrawingId == id) {
+                    return true
+                }
+            }
+            return false
         }
     }
 

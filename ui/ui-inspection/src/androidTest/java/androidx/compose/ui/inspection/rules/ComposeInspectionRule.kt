@@ -56,7 +56,7 @@ class ComposeInspectionRule(
     val clazz: KClass<out ComponentActivity>,
     private val useInspector: Boolean = true
 ) : ExternalResource() {
-    private val rootsForTest = mutableListOf<ViewRootForTest>()
+    val rootsForTest = mutableListOf<ViewRootForTest>()
     val roots = mutableListOf<View>()
     val rootId: Long
         get() = roots.single().uniqueDrawingId

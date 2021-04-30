@@ -18,6 +18,7 @@ package androidx.compose.ui.inspection.util
 
 import layoutinspector.compose.inspection.LayoutInspectorComposeProtocol
 import layoutinspector.compose.inspection.LayoutInspectorComposeProtocol.Command
+import layoutinspector.compose.inspection.LayoutInspectorComposeProtocol.ComposableNode
 import layoutinspector.compose.inspection.LayoutInspectorComposeProtocol.GetComposablesCommand
 import layoutinspector.compose.inspection.LayoutInspectorComposeProtocol.GetParametersCommand
 import layoutinspector.compose.inspection.LayoutInspectorComposeProtocol.GetParameterDetailsCommand
@@ -69,3 +70,6 @@ fun GetComposablesCommand(
             .setGeneration(generation)
             .build()
     }.build()
+
+fun ComposableNode.flatten(): List<ComposableNode> =
+    listOf(this).plus(this.childrenList.flatMap { it.flatten() })

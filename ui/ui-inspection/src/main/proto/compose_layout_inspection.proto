@@ -88,6 +88,8 @@ message ComposableNode {
       HAS_UNMERGED_SEMANTICS = 0x4;
     }
     int32 flags = 9;
+
+    int64 view_id = 10;
 }
 
 // In Android, a resource id is a simple integer. This class holds the namespace, type, and name
