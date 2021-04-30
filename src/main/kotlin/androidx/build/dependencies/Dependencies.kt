@@ -144,8 +144,6 @@ const val PROTOBUF_LITE = "com.google.protobuf:protobuf-javalite:3.10.0"
 
 const val WIRE_RUNTIME = "com.squareup.wire:wire-runtime:3.6.0"
 
-const val JARJAR = "org.anarres.jarjar:jarjar-gradle:1.0.1"
-
 // The following versions change depending on whether we are in the main or ui project - the
 // specific versions are configured in build_dependencies.gradle as they are needed during
 // buildSrc configuration. They are then set here in AndroidXPlugin when configuring the root
