@@ -120,6 +120,7 @@ internal class RecomposeScopeImpl(
     override fun updateScope(block: (Composer, Int) -> Unit) { this.block = block }
 
     private var currentToken = 0
+    private var skipped = false
     private var trackedInstances: IdentityArrayIntMap? = null
 
     /**
@@ -127,8 +128,14 @@ internal class RecomposeScopeImpl(
      * unique everytime this is called. This is currently the snapshot id but that shouldn't be
      * relied on.
      */
-    fun start(token: Int) { currentToken = token }
+    fun start(token: Int) {
+        currentToken = token
+        skipped = false
+    }
 
+    fun scopeSkipped() {
+        skipped = true
+    }
     /**
      * Track instances that were read in scope.
      */
@@ -150,7 +157,7 @@ internal class RecomposeScopeImpl(
             // [used] is false if the scope was skipped. If the scope was skipped we should
             // leave the observations unmodified.
             if (
-                used && instances.any { _, instanceToken -> instanceToken != token }
+                !skipped && instances.any { _, instanceToken -> instanceToken != token }
             ) { composition ->
                 if (
                     currentToken == token && instances == trackedInstances &&
