@@ -55,6 +55,7 @@ import androidx.compose.ui.platform.AbstractComposeView
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.platform.LocalView
+import androidx.compose.ui.platform.ViewRootForInspector
 import androidx.compose.ui.semantics.popup
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.Density
@@ -338,6 +339,7 @@ private inline fun SimpleStack(modifier: Modifier, noinline content: @Composable
  * @param composeView The parent view of the popup which is the AndroidComposeView.
  */
 @SuppressLint("ViewConstructor")
+@OptIn(ExperimentalComposeUiApi::class)
 private class PopupLayout(
     private var onDismissRequest: (() -> Unit)?,
     private var properties: PopupProperties,
@@ -345,7 +347,7 @@ private class PopupLayout(
     private val composeView: View,
     density: Density,
     initialPositionProvider: PopupPositionProvider
-) : AbstractComposeView(composeView.context) {
+) : AbstractComposeView(composeView.context), ViewRootForInspector {
     private val windowManager =
         composeView.context.getSystemService(Context.WINDOW_SERVICE) as WindowManager
     private val params = createLayoutParams()
@@ -368,6 +370,8 @@ private class PopupLayout(
     } else {
         PopupLayoutHelperImpl()
     }
+
+    override val subCompositionView: AbstractComposeView get() = this
 
     init {
         id = android.R.id.content
