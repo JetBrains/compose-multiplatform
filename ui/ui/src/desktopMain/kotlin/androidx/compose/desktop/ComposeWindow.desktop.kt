@@ -36,6 +36,19 @@ class ComposeWindow : JFrame() {
             layer.wrapped.setSize(width, height)
             super.setBounds(x, y, width, height)
         }
+
+        override fun add(component: Component): Component {
+            val clipComponent = ClipComponent(component)
+            clipMap.put(component, clipComponent)
+            layer.wrapped.clipComponents.add(clipComponent)
+            return add(component, Integer.valueOf(0))
+        }
+
+        override fun remove(component: Component) {
+            layer.wrapped.clipComponents.remove(clipMap.get(component)!!)
+            clipMap.remove(component)
+            super.remove(component)
+        }
     }
 
     private val clipMap = mutableMapOf<Component, ClipComponent>()
@@ -47,15 +60,10 @@ class ComposeWindow : JFrame() {
     }
 
     override fun add(component: Component): Component {
-        val clipComponent = ClipComponent(component)
-        clipMap.put(component, clipComponent)
-        layer.wrapped.clipComponents.add(clipComponent)
-        return pane.add(component, Integer.valueOf(0))
+        return pane.add(component)
     }
 
     override fun remove(component: Component) {
-        layer.wrapped.clipComponents.remove(clipMap.get(component)!!)
-        clipMap.remove(component)
         pane.remove(component)
     }
 
@@ -75,7 +83,7 @@ class ComposeWindow : JFrame() {
             parentComposition = parentComposition,
         ) {
             CompositionLocalProvider(
-                LocalLayerContainer provides this
+                LocalLayerContainer provides pane
             ) {
                 content()
             }
