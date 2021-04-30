@@ -17,7 +17,6 @@
 package androidx.build.testConfiguration
 
 import androidx.build.dependencyTracker.ProjectSubset
-import androidx.build.isPresubmitBuild
 import androidx.build.renameApkForTesting
 import com.android.build.api.variant.BuiltArtifacts
 import com.android.build.api.variant.BuiltArtifactsLoader
@@ -175,16 +174,21 @@ abstract class GenerateMediaTestConfigurationTask : DefaultTask() {
             .isServicePrevious(isServicePrevious)
             .tag("androidx_unit_tests")
             .tag("media_compat")
-        configBuilder.isPostsubmit(!isPresubmitBuild())
         when (affectedModuleDetectorSubset.get()) {
             ProjectSubset.CHANGED_PROJECTS -> {
+                configBuilder.isPostsubmit(false)
+                configBuilder.runAllTests(true)
+            }
+            ProjectSubset.ALL_AFFECTED_PROJECTS -> {
+                configBuilder.isPostsubmit(true)
                 configBuilder.runAllTests(true)
             }
             ProjectSubset.DEPENDENT_PROJECTS -> {
+                configBuilder.isPostsubmit(false)
                 if (isConstrained) {
                     configBuilder.runAllTests(false)
                 } else {
-                    configBuilder.runAllTests(true)
+                    configBuilder.runAllTests(false)
                 }
             }
             else -> {
