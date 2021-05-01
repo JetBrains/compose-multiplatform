@@ -152,13 +152,16 @@ private fun createPointerInputEventData(
     index: Int,
     upIndex: Int?
 ): PointerInputEventData {
-    val position = Offset(motionEvent.getX(index), motionEvent.getY(index))
-    val rawPosition = if (index == 0) {
-        Offset(motionEvent.rawX, motionEvent.rawY)
+    var position = Offset(motionEvent.getX(index), motionEvent.getY(index))
+    val rawPosition: Offset
+    if (index == 0) {
+        rawPosition = Offset(motionEvent.rawX, motionEvent.rawY)
+        position = positionCalculator.screenToLocal(rawPosition)
     } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-        motionEvent.toRawOffset(index)
+        rawPosition = motionEvent.toRawOffset(index)
+        position = positionCalculator.screenToLocal(rawPosition)
     } else {
-        positionCalculator.localToScreen(position)
+        rawPosition = positionCalculator.localToScreen(position)
     }
     val toolType = when (motionEvent.getToolType(index)) {
         MotionEvent.TOOL_TYPE_UNKNOWN -> PointerType.Unknown
