@@ -451,10 +451,6 @@ class AndroidXPlugin : Plugin<Project> {
 
         project.configureErrorProneForAndroid(variants)
 
-        // Set the officially published version to be the debug version with minimum dependency
-        // versions.
-        defaultPublishConfig(Release.DEFAULT_PUBLISH_CONFIG)
-
         // workaround for b/120487939
         project.configurations.all { configuration ->
             // Gradle seems to crash on androidtest configurations
