@@ -27,5 +27,12 @@
         <runConfigurationProducer
                 implementation="org.jetbrains.compose.desktop.ide.preview.PreviewRunConfigurationProducer"/>
         <deadCode implementation="org.jetbrains.compose.desktop.ide.preview.PreviewEntryPoint" />
+
+        <runLineMarkerContributor
+                language="kotlin"
+                implementationClass="org.jetbrains.compose.web.ide.run.WebRunLineMarkerContributor"/>
+        <runConfigurationProducer
+                implementation="org.jetbrains.compose.web.ide.run.WebRunConfigurationProducer"/>
+
     </extensions>
 </idea-plugin>

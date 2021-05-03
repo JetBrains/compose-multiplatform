@@ -22,6 +22,7 @@ import com.intellij.execution.configurations.ConfigurationFactory
 import com.intellij.openapi.externalSystem.util.ExternalSystemApiUtil
 import com.intellij.openapi.util.Ref
 import com.intellij.psi.PsiElement
+import org.jetbrains.compose.common.modulePath
 import org.jetbrains.kotlin.psi.KtNamedFunction
 import org.jetbrains.kotlin.psi.psiUtil.getNonStrictParentOfType
 import org.jetbrains.plugins.gradle.service.execution.GradleExternalTaskConfigurationType
@@ -74,9 +75,6 @@ class PreviewRunConfigurationProducer : LazyRunConfigurationProducer<GradleRunCo
         return true
     }
 }
-
-private fun ConfigurationContext.modulePath(): String? =
-    ExternalSystemApiUtil.getExternalProjectPath(location?.module)
 
 private fun previewTargetGradleArg(target: String): String =
     "-Pcompose.desktop.preview.target=$target"
