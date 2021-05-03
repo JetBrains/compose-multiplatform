@@ -72,11 +72,7 @@ const val JAVAPOET = "com.squareup:javapoet:1.13.0"
 const val JSQLPARSER = "com.github.jsqlparser:jsqlparser:3.1"
 const val JSR250 = "javax.annotation:javax.annotation-api:1.2"
 const val JUNIT = "junit:junit:4.12"
-const val KOTLINPOET = "com.squareup:kotlinpoet:1.4.0"
-const val KOTLINPOET_METADATA = "com.squareup:kotlinpoet-metadata:1.4.0"
-const val KOTLINPOET_METADATA_SPECS = "com.squareup:kotlinpoet-metadata-specs:1.4.0"
-const val KOTLINPOET_CLASSINSPECTOR_ELEMENTS =
-    "com.squareup:kotlinpoet-classinspector-elements:1.4.0"
+const val KOTLINPOET = "com.squareup:kotlinpoet:1.8.0"
 const val KOTLIN_COMPILE_TESTING = "com.github.tschuchortdev:kotlin-compile-testing:1.3.6"
 const val KOTLIN_COMPILE_TESTING_KSP = "com.github.tschuchortdev:kotlin-compile-testing-ksp:1.3.6"
 
