@@ -2388,7 +2388,7 @@ internal class ComposerImpl(
     @ComposeCompilerApi
     override fun skipToGroupEnd() {
         check(groupNodeCount == 0) { "No nodes can be emitted before calling skipAndEndGroup" }
-        currentRecomposeScope?.used = false
+        currentRecomposeScope?.scopeSkipped()
         if (invalidations.isEmpty()) {
             skipReaderToGroupEnd()
         } else {
