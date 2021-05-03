@@ -1,11 +1,13 @@
 # Style DSL in Compose Web
-**The API is experimental and breaking changes can be expected**
+**The API is experimental, and breaking changes can be expected**
 
-## What is covered
-In this tutorial we have a look at how to style the components.
+## Introduction
+In this tutorial we have a look at how to style the components using the Style DSL. It’s a typesafe DSL for style sheets, which you can use to express CSS rules in your Kotlin code, and even modify styles based on the state of your Compose application.
 
 
 ### Inline Style
+
+You can declare inline styles via the `style` block of a component
 
 ```kotlin
 Div(
@@ -27,7 +29,7 @@ In HTML, it will look like this:
 
 
 ### Stylesheet
-An alternative way is to define a Stylesheet with rules:
+An alternative way is to define a Stylesheet that contains rules:
 
 ```kotlin
 object AppStylesheet : StyleSheet() {
@@ -67,6 +69,8 @@ In HTML, it will look like this:
 ```
 
 ### Selectors examples
+
+The Style DSL also provides a way to combine and unify selectors:
 
 ```kotlin
 object AppStylesheet : StyleSheet() {
@@ -110,6 +114,8 @@ object AppStylesheet : StyleSheet() {
 
 ### Media query example
 
+To specify media queries, you can use the `media` function, which takes the related query, and a block of styles:
+
 ```kotlin
 object AppStylesheet : StyleSheet() {
     val container by style {
@@ -125,6 +131,8 @@ object AppStylesheet : StyleSheet() {
 ```
 
 ### CSS Variables
+
+The style DSL also provides support for CSS variables.
 
 ```kotlin
 object MyVariables : CSSVariables {

@@ -1,9 +1,9 @@
 # Compose for Web
-**The API is experimental and breaking changes can be expected**
+**The API is experimental, and breaking changes can be expected**
 
 ### Content:
 
-[Getting Started with Compose for Web](Getting_Started/README.md) - create and configure a simple project
+[Getting Started With Compose for Web](Getting_Started/README.md) - create and configure a simple project
 
 [Building web UI](Building_UI/README.md) - overview of the basic features Compose for Web provides to build web UIs 
 

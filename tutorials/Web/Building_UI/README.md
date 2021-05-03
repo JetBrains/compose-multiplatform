@@ -1,14 +1,14 @@
 # Building the UI with Compose Web
 
-**The API is experimental and breaking changes can be expected**
+**The API is experimental, and breaking changes can be expected**
 
-## What is covered
+## Introduction
 
-In this tutorial we will look at several examples with Composable DOM DSL code.
+In this tutorial we will look at several examples that use the Composable DOM DSL to describe the user interface for your web application.
 
 ### Entry point
 
-Compose Web manages the DOM tree or a subtree. It needs an HTML node that will be a root of the composition.
+Compose for Web needs an HTML node that will be a root of its composition. Inside this root node, Compose then manages its own DOM tree.
 
 ```kotlin
 renderComposable(rootElementId = "root") {
@@ -18,10 +18,9 @@ renderComposable(rootElementId = "root") {
 
 ### HTML tags in Compose DOM DSL
 
-Compose DOM DSL doesn't have a Composable for every HTML tag yet.  
-Mostly used tags can be used out of a box.
+While the DOM DSL for Compose for Web doesn't provide a Composable for every HTML tag yet, the most used HTML tags can be used directly out of a box.
 
-Let's have a look at `Div` (most other tags have the same signature):
+Let's have a look at the Composable for a `Div` tag (most other tags have the same signature):
 
 ```kotlin
 Div(
@@ -36,7 +35,7 @@ Div(
 }
 ```
 
-Let's have a look at `Input`, its signature is a bit different:
+For convenience, some tags like `Input`, `A`, `Form`, or `Img` allow you to specify some extra parameters in the signature that are specific to the respective HTML tag. For example, let’s look at the `Input` tag:
 
 ```kotlin
 Input(
@@ -47,24 +46,21 @@ Input(
 )
 ```
 
-Input type can also be specified in `attrs` block:
+We can use the `type` parameter which is provided for our convenience, or can use the `attrs` block to specify the input type:
 
 ```kotlin
 Input(attrs = { type(InputType.Text) })
 ```
 
-To make it more convenient, `Input` and some other tags like `A`, `Form`, `Img` have extra parameters in the signature,
-so `attrs` block could be skipped.
-
 ### Text
 
-`Text` allows to add a text content. It doesn't have any parameters:
+The `Text` allows you to add text content to an HTML tag. Besides, the text content it represents, it does not have any parameters:
 
 ```kotlin
 Text("Arbitrary text")
 ```
 
-To style the text it needs to be wrapped in a container with a style applied:
+If you want to apply styles to text, it needs to be wrapped in a container with a style applied, like a `Span` or `P`:
 
 ```kotlin
 Span(
@@ -74,18 +70,16 @@ Span(
 }
 ```
 
-In HTML, it will look like this:
+This corresponds to the following HTML code:
 ```html
 <span style="color: red;">Red text</span>
 ```
 
 ### Attributes
 
-In the examples above we've already seen `attrs` parameter.
-It allows us to specify element's attributes and properties.
+The `attrs` parameter (which we’ve already seen in some of the previous examples) allows us to specify element's attributes and properties.
 
-Currently, not all attributes are supported out of a box.
-Therefore, let's start with setting a custom (or not yet supported) attribute:
+The most flexible way to define attributes is by using the `attr` function, which allows you to specify the attribute name and its value.
 
 ```kotlin
 Div(
@@ -95,9 +89,11 @@ Div(
 ) { /* content */ }
 ```
 
+However, with this approach, Compose for Web is not able to validate that the attribute exists on the HTML element, or is valid. This is why we also provide a set of helper functions for common attributes.
+
 #### Common attributes
 
-Let's have a look at some common attributes that can be used out of a box:
+Here are some examples of common attributes that are available for most Composables representing HTML tags:
 
 ```kotlin
 attrs = {
@@ -113,9 +109,8 @@ attrs = {
 ```
 
 #### Element specific attributes 
-Some elements have specific attributes (meaningful only to that particular tag).
 
-For example, in tag `A` there are available all common attributes + `A` specific attributes:
+Depending on the element you are working with, you may also have access to some specific attributes – attributes that are only meaningful for this particular tag. For example, the `A` tag provides some specific attributes, that are specific to hyperlinks:
 
 ```kotlin
 A(
@@ -129,7 +124,7 @@ A(
 ) {}
 ```
 
-There are also specific attributes for the following elements:
+Some other elements that provide specific attributes include:
 - Button
 - Form
 - Input
@@ -139,11 +134,11 @@ There are also specific attributes for the following elements:
 - TextArea
 - Img
 
-We plan to add detailed documentation for them later on.
+To discover all attributes that are available in your current scope, you can use your IDE’s autocomplete feature. As we evolve these APIs, we also plan to add detailed documentation for them.
 
 #### Events
 
-To handle an event the event listener has to be declared in `attrs` block:
+You can declare event listeners in the `attrs` block:
 
 ```kotlin
 Button(
@@ -157,11 +152,11 @@ There are more examples about events handling here - [Events Handling](../Events
 
 ### Style
 
-There are two options to set components' style:
-- Using inline style
-- Using Stylesheet
+There are ways to set the style for a component:
+- Using inline styles
+- Using stylesheets
 
-Now we quickly have a look at `style` block where inline style can be defined:
+You can declare inline styles via the `style` block of a component:
 
 ```kotlin
 
@@ -176,4 +171,4 @@ Div(
 ) { /* content goes here */ }
 ```
 
-More detailed overview of Style DSL and examples can be found here - [Style DSL](../Style_Dsl/README.md)
+You can find a more detailed overview of the style DSL, as well as additional examples here - [Style DSL](../Style_Dsl/README.md)

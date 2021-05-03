@@ -1,8 +1,8 @@
 # Events handling in Compose Web
 
-**The API is experimental and breaking changes can be expected**
+**The API is experimental, and breaking changes can be expected**
 
-Events listeners can be added in `attrs` block:
+You can add event listeners in the `attrs` block:
 
 #### onClick
 ```kotlin
@@ -35,10 +35,8 @@ TextArea(
 )
 ```
 
-All wrapped event types inherit from `GenericWrappedEvent`, therefore one can access `nativeEvent`. 
-Native Event is the instance that is actually created by JS runtime - 
+Your event handlers receive wrapped events that inherit from `GenericWrappedEvent`, which also provides access to the underlying `nativeEvent` – the actual event created by JS runtime -
 https://developer.mozilla.org/en-US/docs/Web/API/Event
 
 
-There are more event listeners supported out of a box. We plan to add the documentation for them later on.
-In the meantime, all supported event listeners can be found in the [source code](https://github.com/JetBrains/androidx/blob/compose-web-main/compose/web/src/jsMain/kotlin/androidx/compose/web/attributes/EventsListenerBuilder.kt).
+There are more event listeners supported out of a box. We plan to add the documentation for them later on. In the meantime, you can find all supported event listeners in the [source code](https://github.com/JetBrains/androidx/blob/compose-web-main/compose/web/src/jsMain/kotlin/androidx/compose/web/attributes/EventsListenerBuilder.kt).
