@@ -18,6 +18,7 @@ at https://android.googlesource.com/platform/frameworks/support.
        * [imageviewer](examples/imageviewer) - Image Viewer application for Android and Desktop
        * [issues](examples/issues) - GitHub issue tracker with an adaptive UI and ktor-client
        * [game](examples/falling_balls) - Simple game
+       * [game](examples/falling_balls_with_web) - Simple game for web target
        * [todoapp](examples/todoapp) - TODO items tracker with persistence and multiple screens
        * [widgetsgallery](examples/widgetsgallery) - Gallery of standard widgets
        * [IDEA plugin](examples/intelliJPlugin) - Plugin for IDEA using Compose for Desktop      
