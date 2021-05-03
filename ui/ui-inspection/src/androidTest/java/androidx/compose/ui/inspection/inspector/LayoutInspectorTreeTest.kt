@@ -16,7 +16,6 @@
 
 package androidx.compose.ui.inspection.inspector
 
-import android.util.Log
 import android.view.View
 import android.view.ViewGroup
 import android.view.inspector.WindowInspector
@@ -50,8 +49,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.R
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
-import androidx.compose.ui.inspection.framework.ancestors
-import androidx.compose.ui.inspection.framework.isRoot
 import androidx.compose.ui.inspection.rules.show
 import androidx.compose.ui.inspection.testdata.TestActivity
 import androidx.compose.ui.layout.GraphicLayerInfo
@@ -161,46 +158,45 @@ class LayoutInspectorTreeTest {
         val builder = LayoutInspectorTree()
         val nodes = builder.convert(view)
         dumpNodes(nodes, view, builder)
-        val top = findTopPosition(view)
 
         validate(nodes, builder) {
             node(
                 name = "Column",
                 fileName = "LayoutInspectorTreeTest.kt",
-                left = 0.0.dp, top = top, width = 72.0.dp, height = 78.9.dp,
+                left = 0.0.dp, top = 0.0.dp, width = 72.0.dp, height = 78.9.dp,
                 children = listOf("Text", "Icon", "Surface")
             )
             node(
                 name = "Text",
                 isRenderNode = true,
                 fileName = "LayoutInspectorTreeTest.kt",
-                left = 0.0.dp, top = top, width = 72.0.dp, height = 18.9.dp,
+                left = 0.0.dp, top = 0.0.dp, width = 72.0.dp, height = 18.9.dp,
             )
             node(
                 name = "Icon",
                 isRenderNode = true,
                 fileName = "LayoutInspectorTreeTest.kt",
-                left = 0.0.dp, top = top + 18.9.dp, width = 24.0.dp, height = 24.0.dp,
+                left = 0.0.dp, top = 18.9.dp, width = 24.0.dp, height = 24.0.dp,
             )
             node(
                 name = "Surface",
                 fileName = "LayoutInspectorTreeTest.kt",
                 isRenderNode = true,
-                left = 0.0.dp, top = top + 42.9.dp, width = 64.0.dp, height = 36.0.dp,
+                left = 0.0.dp, top = 42.9.dp, width = 64.0.dp, height = 36.0.dp,
                 children = listOf("Button")
             )
             node(
                 name = "Button",
                 fileName = "LayoutInspectorTreeTest.kt",
                 isRenderNode = true,
-                left = 0.0.dp, top = top + 42.9.dp, width = 64.0.dp, height = 36.0.dp,
+                left = 0.0.dp, top = 42.9.dp, width = 64.0.dp, height = 36.0.dp,
                 children = listOf("Text")
             )
             node(
                 name = "Text",
                 isRenderNode = true,
                 fileName = "LayoutInspectorTreeTest.kt",
-                left = 21.7.dp, top = top + 51.5.dp, width = 20.9.dp, height = 18.9.dp,
+                left = 21.7.dp, top = 51.5.dp, width = 20.9.dp, height = 18.9.dp,
             )
         }
     }
@@ -226,14 +222,13 @@ class LayoutInspectorTreeTest {
         val builder = LayoutInspectorTree()
         val nodes = builder.convert(view)
         dumpNodes(nodes, view, builder)
-        val top = findTopPosition(view)
 
         validate(nodes, builder) {
             node(
                 name = "MaterialTheme",
                 hasTransformations = true,
                 fileName = "LayoutInspectorTreeTest.kt",
-                left = 68.0.dp, top = top + 49.8.dp, width = 88.6.dp, height = 21.7.dp,
+                left = 68.0.dp, top = 49.8.dp, width = 88.6.dp, height = 21.7.dp,
                 children = listOf("Text")
             )
             node(
@@ -241,7 +236,7 @@ class LayoutInspectorTreeTest {
                 isRenderNode = true,
                 hasTransformations = true,
                 fileName = "LayoutInspectorTreeTest.kt",
-                left = 68.0.dp, top = top + 49.8.dp, width = 88.6.dp, height = 21.7.dp,
+                left = 68.0.dp, top = 49.8.dp, width = 88.6.dp, height = 21.7.dp,
             )
         }
     }
@@ -415,7 +410,6 @@ class LayoutInspectorTreeTest {
 
     @Test
     fun testSemantics() {
-        Log.w("Semantics", "Hello there")
         val slotTableRecord = CompositionDataRecord.create()
 
         show {
@@ -485,57 +479,22 @@ class LayoutInspectorTreeTest {
         val builder = LayoutInspectorTree()
         val nodes = builder.convert(appView)
         dumpNodes(nodes, appView, builder)
-        val top = findTopPosition(appView)
 
         // Verify that there are no Composable nodes from the dialog in the application itself:
         validate(nodes, builder) {
             node(
                 name = "Column",
                 fileName = "LayoutInspectorTreeTest.kt",
-                left = 0.0.dp, top = top, width = 76.0.dp, height = 18.9.dp,
+                left = 0.0.dp, top = 0.0.dp, width = 76.0.dp, height = 18.9.dp,
                 children = listOf("Text")
             )
             node(
                 name = "Text",
                 isRenderNode = true,
                 fileName = "LayoutInspectorTreeTest.kt",
-                left = 0.0.dp, top = top, width = 76.0.dp, height = 18.9.dp,
+                left = 0.0.dp, top = 0.0.dp, width = 76.0.dp, height = 18.9.dp,
             )
         }
-    }
-
-    @Test
-    fun testDialogLocation() {
-        val slotTableRecord = CompositionDataRecord.create()
-
-        show {
-            Inspectable(slotTableRecord) {
-                Column {
-                    Text("Hello World!")
-                    AlertDialog(
-                        onDismissRequest = {},
-                        confirmButton = {
-                            Button({}) {
-                                Text("This is the Confirm Button")
-                            }
-                        }
-                    )
-                }
-            }
-        }
-        val composeViews = findAllAndroidComposeViews()
-        val dialogView = composeViews[1] // composeView[0] contains the contents of the app
-        val dialogLocation = IntArray(2)
-        dialogView.getLocationOnScreen(dialogLocation)
-        dialogView.setTag(R.id.inspection_slot_table_set, slotTableRecord.store)
-        val builder = LayoutInspectorTree()
-        val button = builder.convert(dialogView)
-            .flatMap { flatten(it) }
-            .single { it.name == "Button" }
-        assertThat(button.left).isGreaterThan(dialogLocation[0])
-        assertThat(button.top).isGreaterThan(dialogLocation[1])
-        assertThat(button.width).isLessThan(dialogView.width)
-        assertThat(button.height).isLessThan(dialogView.height)
     }
 
     // WARNING: The formatting of the lines below here affect test results.
@@ -731,13 +690,6 @@ class LayoutInspectorTreeTest {
 
     private fun flatten(node: InspectorNode): List<InspectorNode> =
         listOf(node).plus(node.children.flatMap { flatten(it) })
-
-    private fun findTopPosition(view: View): Dp {
-        val location = IntArray(2)
-        val decorView = view.ancestors().first { it.isRoot() }
-        decorView.getLocationOnScreen(location)
-        return with(density) { location[1].toDp() }
-    }
 
     // region DEBUG print methods
     private fun dumpNodes(nodes: List<InspectorNode>, view: View, builder: LayoutInspectorTree) {

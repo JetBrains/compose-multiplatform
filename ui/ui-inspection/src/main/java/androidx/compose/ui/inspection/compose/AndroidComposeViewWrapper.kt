@@ -24,6 +24,7 @@ import androidx.compose.ui.inspection.inspector.LayoutInspectorTree
 import androidx.compose.ui.inspection.proto.StringTable
 import androidx.compose.ui.inspection.proto.toComposableNodes
 import androidx.compose.ui.inspection.util.ThreadUtils
+import androidx.compose.ui.unit.IntOffset
 import layoutinspector.compose.inspection.LayoutInspectorComposeProtocol.ComposableRoot
 
 /**
@@ -72,7 +73,7 @@ private fun View.isSystemView(): Boolean {
  */
 class AndroidComposeViewWrapper(
     layoutInspectorTree: LayoutInspectorTree,
-    composeView: View,
+    private val composeView: View,
     skipSystemComposables: Boolean
 ) {
     companion object {
@@ -105,9 +106,14 @@ class AndroidComposeViewWrapper(
     fun createComposableRoot(stringTable: StringTable): ComposableRoot {
         ThreadUtils.assertOnMainThread()
 
+        val decorView = composeView.ancestors().last()
+        val location = IntArray(2)
+        decorView.getLocationOnScreen(location)
+        val windowPos = IntOffset(location[0], location[1])
+
         return ComposableRoot.newBuilder().apply {
             viewId = viewParent.uniqueDrawingId
-            addAllNodes(inspectorNodes.toComposableNodes(stringTable))
+            addAllNodes(inspectorNodes.toComposableNodes(stringTable, windowPos))
         }.build()
     }
 }
