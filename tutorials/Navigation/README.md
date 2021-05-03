@@ -252,7 +252,7 @@ class Root(
     private val router =
         router<Configuration, Content>(
             initialConfiguration = Configuration.List, // Starting with List
-            componentFactory = ::createChild // The Router calls this function, providing the child Configuration and ComponentContext 
+            childFactory = ::createChild // The Router calls this function, providing the child Configuration and ComponentContext 
         )
 
     val routerState = router.state
@@ -279,8 +279,8 @@ class Root(
 
 @Composable
 fun RootUi(root: Root) {
-    Children(root.routerState) { child, _ ->
-        child()
+    Children(root.routerState) { child ->
+        child.instance()
     }
 }
 ```
@@ -326,46 +326,37 @@ By using this pattern, the navigation logic is kept and managed inside `@Composa
 
 This pattern should be chosen if you prefer to use Compose for more than just UI, and none of the first pattern's points apply.
 
-Decompose does not provide an out-of-the-box `Navigator` for pure `@Composable` world. But it is pretty easy to write your own with it. You can experiment and come up with your own API.
+Decompose does not provide any out-of-the-box `@Composable` navigation API. But it is pretty easy to write your own with it. You can experiment and come up with your own API.
 
-Please refer to the following article for an implementation of the `Navigator`: "[A comprehensive hundred-line navigation for Jetpack/Desktop Compose](https://proandroiddev.com/a-comprehensive-hundred-line-navigation-for-jetpack-desktop-compose-5b723c4f256e)". It also explains some additional features, like back button handling, transition animations, etc.
+Please refer to the following article for implementation details: "[A comprehensive hundred-line navigation for Jetpack/Desktop Compose](https://proandroiddev.com/a-comprehensive-hundred-line-navigation-for-jetpack-desktop-compose-5b723c4f256e)". It also explains some additional features, like back button handling, transition animations, etc.
 
 ### A very basic example:
 
 ``` kotlin
 import androidx.compose.runtime.Composable
-import com.arkivanov.decompose.Navigator
 import com.arkivanov.decompose.Router
-import com.arkivanov.decompose.extensions.compose.jetbrains.Children
 import com.arkivanov.decompose.statekeeper.Parcelable
 
 @Composable
-fun <C : Parcelable> Navigator(
-    initialConfiguration: C,
-    content: @Composable Navigator<C>.(C) -> Unit
-) {
-    val router = router<C>()
-
-    Children(router.state) { _, configuration ->
-        router.content(configuration)
-    }
-}
-
-@Composable
-private fun <C : Parcelable> router(): Router<C, C> = 
-    TODO("See the article mentioned above for an implementation")
+inline fun <reified C : Parcelable> rememberRouter(
+    noinline initialConfiguration: () -> C
+): Router<C, Any> =
+    TODO("See the article mentioned above for the implementation")
 ```
 
 First of all we need the `Router` from the Decompose library. Once we have it, all we need to do is to use the `Children` function. The `Children` function listens for the `Router` state changes, and renders the currently active child using the provided callback. The article mentioned above explains the implementation details.
 
-Using the `Navigator`:
+Using the `Router`:
 
 ``` kotlin
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import com.arkivanov.composenavigatorexample.navigator.rememberRouter
+import com.arkivanov.decompose.extensions.compose.jetbrains.Children
 import com.arkivanov.decompose.pop
 import com.arkivanov.decompose.push
+
 
 @Composable
 fun ItemList(
@@ -398,21 +389,26 @@ fun ItemDetails(
 
 @Composable
 fun Root(database: Database) {
-    Navigator<Configuration>(
-        initialConfiguration = Configuration.List // Starting with List
-    ) { configuration ->
-        when (configuration) {
+    // Create and remember the Router
+    val router =
+        rememberRouter<Configuration>(
+            initialConfiguration = { Configuration.List } // Start with the List screen
+        )
+
+    // Render children
+    Children(routerState = router.state) { screen ->
+        when (val configuration = screen.configuration) {
             is Configuration.List ->
                 ItemList(
                     database = database, // Supply dependencies
-                    onItemClick = { push(Configuration.Details(itemId = it)) } // Push Details on item click
+                    onItemClick = { router.push(Configuration.Details(itemId = it)) } // Push Details on item click
                 )
 
             is Configuration.Details ->
                 ItemDetails(
                     itemId = configuration.itemId, // Safely pass arguments
                     database = database, // Supply dependencies
-                    onBackClick = ::pop // Go back to List
+                    onBackClick = router::pop // Go back to List
                 )
         }.let {} // Ensure exhaustiveness
     }
