@@ -19,7 +19,7 @@ package androidx.compose.ui.input.pointer
 import android.view.MotionEvent
 
 internal actual class InternalPointerEvent constructor(
-    actual var changes: Map<PointerId, PointerInputChange>,
+    actual val changes: Map<PointerId, PointerInputChange>,
     val motionEvent: MotionEvent
 ) {
     actual constructor(

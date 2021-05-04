@@ -37,7 +37,7 @@ class HitPathTrackerTest {
 
     @Before
     fun setup() {
-        hitPathTracker = HitPathTracker()
+        hitPathTracker = HitPathTracker(LayoutCoordinatesStub())
     }
 
     @Test

@@ -57,5 +57,5 @@ internal expect class InternalPointerEvent(
     changes: Map<PointerId, PointerInputChange>,
     pointerInputEvent: PointerInputEvent
 ) {
-    var changes: Map<PointerId, PointerInputChange>
+    val changes: Map<PointerId, PointerInputChange>
 }

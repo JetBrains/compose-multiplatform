@@ -32,7 +32,7 @@ internal interface PositionCalculator {
 @OptIn(InternalCoreApi::class)
 internal class PointerInputEventProcessor(val root: LayoutNode) {
 
-    private val hitPathTracker = HitPathTracker()
+    private val hitPathTracker = HitPathTracker(root.coordinates)
     private val pointerInputChangeEventProducer = PointerInputChangeEventProducer()
 
     /**
