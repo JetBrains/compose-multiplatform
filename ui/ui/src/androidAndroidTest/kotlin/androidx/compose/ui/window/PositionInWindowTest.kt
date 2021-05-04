@@ -48,6 +48,7 @@ import androidx.compose.ui.test.swipe
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.round
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import androidx.test.filters.FlakyTest
 import androidx.test.filters.MediumTest
 import androidx.test.filters.SdkSuppress
 import com.google.common.truth.Truth.assertThat
@@ -207,6 +208,7 @@ class PositionInWindowTest {
         }
     }
 
+    @FlakyTest(bugId = 186669179)
     @Test
     fun positionInMovingPopup() {
         val smallBoxTag = "smallBox"
