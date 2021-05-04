@@ -17,7 +17,7 @@ repositories {
 }
 
 intellij {
-    pluginName = "Compose for Desktop IDE Support"
+    pluginName = "Compose Multiplatform IDE Support"
     type = properties("platform.type")
     version = properties("platform.version")
     downloadSources = properties("platform.download.sources").toBoolean()
