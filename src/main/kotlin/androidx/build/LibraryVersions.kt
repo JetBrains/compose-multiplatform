@@ -48,7 +48,7 @@ object LibraryVersions {
     val CONTENTPAGER = Version("1.1.0-alpha01")
     val COMPOSE = Version(System.getenv("COMPOSE_CUSTOM_VERSION") ?: "1.0.0-beta07")
     val COORDINATORLAYOUT = Version("1.2.0-alpha01")
-    val CORE = Version("1.6.0-alpha04")
+    val CORE = Version("1.6.0-beta01")
     val CORE_ANIMATION = Version("1.0.0-alpha03")
     val CORE_ANIMATION_TESTING = Version("1.0.0-alpha03")
     val CORE_APPDIGEST = Version("1.0.0-alpha01")
