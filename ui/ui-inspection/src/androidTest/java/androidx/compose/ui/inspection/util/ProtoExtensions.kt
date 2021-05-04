@@ -57,10 +57,15 @@ fun GetParameterDetailsCommand(
     }.build()
 }.build()
 
-fun GetComposablesCommand(rootViewId: Long, skipSystemComposables: Boolean = true) =
+fun GetComposablesCommand(
+    rootViewId: Long,
+    skipSystemComposables: Boolean = true,
+    generation: Int = 1
+) =
     Command.newBuilder().apply {
         getComposablesCommand = GetComposablesCommand.newBuilder()
             .setRootViewId(rootViewId)
             .setSkipSystemComposables(skipSystemComposables)
+            .setGeneration(generation)
             .build()
     }.build()

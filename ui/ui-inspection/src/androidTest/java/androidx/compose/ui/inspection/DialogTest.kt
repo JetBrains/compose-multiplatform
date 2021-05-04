@@ -43,7 +43,7 @@ class DialogTest {
         val dialogViewId = rule.roots.last().uniqueDrawingId
         val app = rule.inspectorTester.sendCommand(GetComposablesCommand(appViewId))
             .getComposablesResponse
-        val dialog = rule.inspectorTester.sendCommand(GetComposablesCommand(dialogViewId, false))
+        val dialog = rule.inspectorTester.sendCommand(GetComposablesCommand(dialogViewId))
             .getComposablesResponse
         val appRoots = app.roots()
         val dialogRoots = dialog.roots()
@@ -51,7 +51,7 @@ class DialogTest {
         assertThat(appRoots).hasSize(1)
         assertThat(dialogRoots).hasSize(1)
         assertThat(appRoots.single().name).isEqualTo("Column")
-        assertThat(dialogRoots.single().name).isEqualTo("DialogLayout")
+        assertThat(dialogRoots.single().name).isEqualTo("AlertDialog")
         val location = IntArray(2)
         dialogViewRoot.getLocationOnScreen(location)
         assertThat(dialogRoots.single().left).isEqualTo(location[0])

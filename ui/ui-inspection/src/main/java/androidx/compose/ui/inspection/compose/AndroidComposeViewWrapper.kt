@@ -20,12 +20,9 @@ import android.content.res.Resources
 import android.view.View
 import androidx.compose.ui.inspection.framework.ancestors
 import androidx.compose.ui.inspection.framework.isRoot
+import androidx.compose.ui.inspection.inspector.InspectorNode
 import androidx.compose.ui.inspection.inspector.LayoutInspectorTree
-import androidx.compose.ui.inspection.proto.StringTable
-import androidx.compose.ui.inspection.proto.toComposableNodes
 import androidx.compose.ui.inspection.util.ThreadUtils
-import androidx.compose.ui.unit.IntOffset
-import layoutinspector.compose.inspection.LayoutInspectorComposeProtocol.ComposableRoot
 
 /**
  * Returns true if this view represents a special type that bridges between the legacy UI
@@ -72,18 +69,25 @@ private fun View.isSystemView(): Boolean {
  * UI thread.
  */
 class AndroidComposeViewWrapper(
-    layoutInspectorTree: LayoutInspectorTree,
+    private val layoutInspectorTree: LayoutInspectorTree,
+    val rootView: View,
     private val composeView: View,
     skipSystemComposables: Boolean
 ) {
     companion object {
         fun tryCreateFor(
             layoutInspectorTree: LayoutInspectorTree,
-            view: View,
+            rootView: View,
+            composeView: View,
             skipSystemComposables: Boolean
         ): AndroidComposeViewWrapper? {
-            return if (view.isAndroidComposeView()) {
-                AndroidComposeViewWrapper(layoutInspectorTree, view, skipSystemComposables)
+            return if (composeView.isAndroidComposeView()) {
+                AndroidComposeViewWrapper(
+                    layoutInspectorTree,
+                    rootView,
+                    composeView,
+                    skipSystemComposables
+                )
             } else {
                 null
             }
@@ -95,25 +99,14 @@ class AndroidComposeViewWrapper(
         check(composeView.isAndroidComposeView())
     }
 
-    private val viewParent =
+    val viewParent =
         if (!skipSystemComposables) composeView
         else composeView.ancestors().first { !it.isSystemView() || it.isRoot() }
 
-    val inspectorNodes = layoutInspectorTree.apply {
+    private val inspectorNodes = layoutInspectorTree.apply {
         this.hideSystemNodes = skipSystemComposables
     }.convert(composeView)
 
-    fun createComposableRoot(stringTable: StringTable): ComposableRoot {
-        ThreadUtils.assertOnMainThread()
-
-        val decorView = composeView.ancestors().last()
-        val location = IntArray(2)
-        decorView.getLocationOnScreen(location)
-        val windowPos = IntOffset(location[0], location[1])
-
-        return ComposableRoot.newBuilder().apply {
-            viewId = viewParent.uniqueDrawingId
-            addAllNodes(inspectorNodes.toComposableNodes(stringTable, windowPos))
-        }.build()
-    }
+    fun createNodes(): List<InspectorNode> =
+        layoutInspectorTree.addSubCompositionRoots(composeView, inspectorNodes)
 }
