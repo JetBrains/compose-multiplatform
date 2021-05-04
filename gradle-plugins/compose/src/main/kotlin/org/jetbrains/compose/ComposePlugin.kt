@@ -116,7 +116,7 @@ class ComposePlugin : Plugin<Project> {
         val runtime get() = composeDependency("org.jetbrains.compose.runtime:runtime")
         val ui get() = composeDependency("org.jetbrains.compose.ui:ui")
         val materialIconsExtended get() = composeDependency("org.jetbrains.compose.material:material-icons-extended")
-        val web: WebDependencies =
+        val web: WebDependencies get() =
             if (ComposeBuildConfig.isComposeWithWeb) WebDependencies
             else error("This version of Compose plugin does not support 'compose.web.*' dependencies")
     }
