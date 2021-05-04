@@ -26,8 +26,8 @@ fun main() {
         fallingBalls(
             remember {
                 JsGame()?.apply {
-                    width = 600
-                    height = 400
+                    width = root.offsetWidth
+                    height = root.offsetHeight
                 }
             }
         )

@@ -20,10 +20,12 @@ import org.jetbrains.compose.common.ui.background
 import org.jetbrains.compose.common.foundation.border
 import org.jetbrains.compose.common.ui.size
 import org.jetbrains.compose.common.core.graphics.Color
+import org.jetbrains.compose.common.foundation.layout.fillMaxHeight
+import org.jetbrains.compose.common.foundation.layout.fillMaxWidth
 
 @Composable
 fun fallingBalls(game: Game) {
-    Column() {
+    Column(Modifier.fillMaxWidth().fillMaxHeight(1f)) {
         Box() {
             Text(
                 "Catch balls!${if (game.finished) " Game over!" else ""}",
@@ -76,9 +78,8 @@ fun fallingBalls(game: Game) {
         if (game.started) {
             Box(
                 Modifier
-//                    .fillMaxWidth()
-//                    .fillMaxHeight(0.5f)
-                    .background(Color(248, 248, 255))
+                    .fillMaxWidth()
+                    .fillMaxHeight(1f)
                     .size(game.width.dp, game.height.dp)
                     .onSizeChanged {
                         game.size = it

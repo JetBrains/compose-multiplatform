@@ -14,7 +14,7 @@ import androidx.compose.web.css.Position
 @Composable
 actual fun Modifier.position(width: Dp, height: Dp): Modifier  = castOrCreate().apply {
     add {
-        position(Position.Relative)
+        position(Position.Absolute)
         top(height.value.px)
         left(width.value.px)
     }
