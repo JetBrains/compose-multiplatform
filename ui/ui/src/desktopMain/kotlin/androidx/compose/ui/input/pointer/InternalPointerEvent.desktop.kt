@@ -19,7 +19,7 @@ package androidx.compose.ui.input.pointer
 import java.awt.event.MouseEvent
 
 internal actual class InternalPointerEvent constructor(
-    actual var changes: Map<PointerId, PointerInputChange>,
+    actual val changes: Map<PointerId, PointerInputChange>,
     val mouseEvent: MouseEvent?
 ) {
     actual constructor(
