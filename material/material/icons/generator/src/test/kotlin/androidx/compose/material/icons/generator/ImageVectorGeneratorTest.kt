@@ -72,7 +72,7 @@ private val ExpectedFile = """
     import androidx.compose.ui.graphics.vector.ImageVector
     import androidx.compose.ui.graphics.vector.group
 
-    val Icons.Filled.TestVector: ImageVector
+    public val Icons.Filled.TestVector: ImageVector
         get() {
             if (_testVector != null) {
                 return _testVector!!
