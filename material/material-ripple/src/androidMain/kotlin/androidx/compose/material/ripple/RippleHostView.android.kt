@@ -58,6 +58,11 @@ internal class RippleHostView(
         // noop
     }
 
+    override fun refreshDrawableState() {
+        // We don't want the View to manage the drawable state, so avoid updating the ripple's
+        // state (via View.mBackground) when we lose window focus, or other events.
+    }
+
     /**
      * A [RippleDrawable] cannot be dynamically changed between bounded / unbounded states - as a
      * result we need to create a new instance when we need to draw a different type.
