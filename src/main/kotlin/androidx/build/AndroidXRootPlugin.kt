@@ -27,10 +27,11 @@ import androidx.build.studio.StudioTask.Companion.registerStudioTask
 import androidx.build.uptodatedness.TaskUpToDateValidator
 import com.android.build.gradle.api.AndroidBasePlugin
 import com.android.build.gradle.internal.tasks.factory.dependsOn
+import org.gradle.api.GradleException
 import org.gradle.api.Plugin
 import org.gradle.api.Project
+import org.gradle.api.artifacts.VersionCatalogsExtension
 import org.gradle.api.artifacts.component.ModuleComponentSelector
-import org.gradle.api.plugins.ExtraPropertiesExtension
 import org.gradle.api.plugins.JavaPlugin
 import org.gradle.api.tasks.bundling.Zip
 import org.gradle.api.tasks.bundling.ZipEntryCompression
@@ -237,19 +238,24 @@ class AndroidXRootPlugin : Plugin<Project> {
         }
     }
 
+    @Suppress("UnstableApiUsage")
     private fun Project.setDependencyVersions() {
-        val buildVersions = (project.rootProject.property("ext") as ExtraPropertiesExtension)
-            .let { it.get("build_versions") as Map<*, *> }
-
-        fun getVersion(key: String) = checkNotNull(buildVersions[key]) {
-            "Could not find a version for `$key`"
-        }.toString()
-
+        val libs = project.extensions.getByType(
+            VersionCatalogsExtension::class.java
+        ).find("libs").get()
+        fun getVersion(key: String): String {
+            val version = libs.findVersion(key)
+            return if (version.isPresent) {
+                version.get().requiredVersion
+            } else {
+                throw GradleException("Could not find a version for `$key`")
+            }
+        }
         androidx.build.dependencies.kotlinVersion = getVersion("kotlin")
-        androidx.build.dependencies.kotlinCoroutinesVersion = getVersion("kotlin_coroutines")
+        androidx.build.dependencies.kotlinCoroutinesVersion = getVersion("kotlinCoroutines")
         androidx.build.dependencies.kspVersion = getVersion("ksp")
-        androidx.build.dependencies.agpVersion = getVersion("agp")
-        androidx.build.dependencies.lintVersion = getVersion("lint")
+        androidx.build.dependencies.agpVersion = getVersion("androidGradlePlugin")
+        androidx.build.dependencies.lintVersion = getVersion("androidLint")
         androidx.build.dependencies.hiltVersion = getVersion("hilt")
     }
 
