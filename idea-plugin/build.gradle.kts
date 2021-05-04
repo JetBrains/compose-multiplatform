@@ -18,15 +18,14 @@ repositories {
 
 intellij {
     pluginName = "Compose for Desktop IDE Support"
-    type = "IC"
-    downloadSources = true
-    updateSinceUntilBuild = true
-    version = "203.7717.56"
+    type = properties("platform.type")
+    version = properties("platform.version")
+    downloadSources = properties("platform.download.sources").toBoolean()
 
     setPlugins(
         "java",
         "com.intellij.gradle",
-        "org.jetbrains.kotlin:203-1.4.32-release-IJ7148.5"
+        "org.jetbrains.kotlin"
     )
 }
 
@@ -47,6 +46,16 @@ tasks {
 
     publishPlugin {
         token(System.getenv("IDE_PLUGIN_PUBLISH_TOKEN"))
-        channels("Alpha")
+        channels(properties("plugin.channels"))
+    }
+
+    patchPluginXml {
+        sinceBuild(properties("plugin.since.build"))
+        untilBuild(properties("plugin.until.build"))
+    }
+
+    runPluginVerifier {
+        ideVersions(properties("plugin.verifier.ide.versions"))
+        downloadDirectory("${project.buildDir}/pluginVerifier/ides")
     }
 }
