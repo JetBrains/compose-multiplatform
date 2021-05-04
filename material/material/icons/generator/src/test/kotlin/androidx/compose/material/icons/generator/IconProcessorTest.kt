@@ -53,7 +53,7 @@ class IconProcessorTest {
         val generatedApiFile = temporaryFolder.newFile("generated-api.txt")
 
         val processor = IconProcessor(
-            iconDirectory = iconDirectory,
+            iconDirectories = iconDirectory.listFiles()!!.toList(),
             expectedApiFile = expectedApiFile,
             generatedApiFile = generatedApiFile
         )
@@ -91,7 +91,7 @@ class IconProcessorTest {
         val generatedApiFile = temporaryFolder.newFile("generated-api.txt")
 
         val processor = IconProcessor(
-            iconDirectory = iconDirectory,
+            iconDirectories = iconDirectory.listFiles()!!.toList(),
             expectedApiFile = expectedApiFile,
             generatedApiFile = generatedApiFile
         )
@@ -123,7 +123,7 @@ class IconProcessorTest {
         val generatedApiFile = temporaryFolder.newFile("generated-api.txt")
 
         val processor = IconProcessor(
-            iconDirectory = iconDirectory,
+            iconDirectories = iconDirectory.listFiles()!!.toList(),
             expectedApiFile = expectedApiFile,
             generatedApiFile = generatedApiFile
         )
@@ -157,7 +157,7 @@ class IconProcessorTest {
         val generatedApiFile = temporaryFolder.newFile("generated-api.txt")
 
         val processor = IconProcessor(
-            iconDirectory = iconDirectory,
+            iconDirectories = iconDirectory.listFiles()!!.toList(),
             expectedApiFile = expectedApiFile,
             generatedApiFile = generatedApiFile
         )

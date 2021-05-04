@@ -47,9 +47,10 @@ import java.io.File
  * icons in [iconDirectory].
  */
 class IconProcessor(
-    private val iconDirectory: File,
+    private val iconDirectories: List<File>,
     private val expectedApiFile: File,
-    private val generatedApiFile: File
+    private val generatedApiFile: File,
+    private val verifyApi: Boolean = true
 ) {
     /**
      * @return a list of processed [Icon]s, from the given [iconDirectory].
@@ -57,15 +58,17 @@ class IconProcessor(
     fun process(): List<Icon> {
         val icons = loadIcons()
 
-        ensureIconsExistInAllThemes(icons)
-        writeApiFile(icons, generatedApiFile)
-        checkApi(expectedApiFile, generatedApiFile)
+        if (verifyApi) {
+            ensureIconsExistInAllThemes(icons)
+            writeApiFile(icons, generatedApiFile)
+            checkApi(expectedApiFile, generatedApiFile)
+        }
 
         return icons
     }
 
     private fun loadIcons(): List<Icon> {
-        val themeDirs = iconDirectory.listFiles()!!.filter { it.isDirectory }
+        val themeDirs = iconDirectories
 
         return themeDirs.flatMap { dir ->
             val theme = dir.name.toIconTheme()
