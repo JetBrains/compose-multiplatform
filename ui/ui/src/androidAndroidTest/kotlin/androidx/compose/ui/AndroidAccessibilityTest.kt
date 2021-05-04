@@ -56,6 +56,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.graphics.toAndroidRect
 import androidx.compose.ui.platform.AndroidComposeView
 import androidx.compose.ui.platform.AndroidComposeViewAccessibilityDelegateCompat
 import androidx.compose.ui.platform.LocalDensity
@@ -468,14 +469,18 @@ class AndroidAccessibilityTest {
         val data = info.extras
             .getParcelableArray(AccessibilityNodeInfo.EXTRA_DATA_TEXT_CHARACTER_LOCATION_KEY)
         assertEquals(1, data!!.size)
-        val rectF = data[0] as RectF
-        val expectedRect = textLayoutResult.getBoundingBox(0).translate(
+
+        val rectF = data[0] as RectF // result in screen coordinates
+        val expectedRectInLocalCoords = textLayoutResult.getBoundingBox(0).translate(
             textFieldNode.positionInWindow
         )
-        assertEquals(expectedRect.left, rectF.left)
-        assertEquals(expectedRect.top, rectF.top)
-        assertEquals(expectedRect.right, rectF.right)
-        assertEquals(expectedRect.bottom, rectF.bottom)
+        val expectedTopLeftInScreenCoords = androidComposeView.localToScreen(
+            expectedRectInLocalCoords.toAndroidRect().topLeftToOffset()
+        )
+        assertEquals(expectedTopLeftInScreenCoords.x, rectF.left)
+        assertEquals(expectedTopLeftInScreenCoords.y, rectF.top)
+        assertEquals(expectedRectInLocalCoords.width, rectF.width())
+        assertEquals(expectedRectInLocalCoords.height, rectF.height())
     }
 
     // This test needs to be improved after text merging(b/157474582) is fixed.
@@ -510,14 +515,18 @@ class AndroidAccessibilityTest {
         val data = info.extras
             .getParcelableArray(AccessibilityNodeInfo.EXTRA_DATA_TEXT_CHARACTER_LOCATION_KEY)
         assertEquals(length, data!!.size)
-        val rectF = data[0] as RectF
-        val expectedRect = textLayoutResult.getBoundingBox(0).translate(
+
+        val rectF = data[0] as RectF // result in screen coordinates
+        val expectedRectInLocalCoords = textLayoutResult.getBoundingBox(0).translate(
             textNode.positionInWindow
         )
-        assertEquals(expectedRect.left, rectF.left)
-        assertEquals(expectedRect.top, rectF.top)
-        assertEquals(expectedRect.right, rectF.right)
-        assertEquals(expectedRect.bottom, rectF.bottom)
+        val expectedTopLeftInScreenCoords = androidComposeView.localToScreen(
+            expectedRectInLocalCoords.toAndroidRect().topLeftToOffset()
+        )
+        assertEquals(expectedTopLeftInScreenCoords.x, rectF.left)
+        assertEquals(expectedTopLeftInScreenCoords.y, rectF.top)
+        assertEquals(expectedRectInLocalCoords.width, rectF.width())
+        assertEquals(expectedRectInLocalCoords.height, rectF.height())
     }
 
     @Test
@@ -1667,15 +1676,19 @@ class AndroidAccessibilityTest {
     @Test
     fun testReportedBounds_withOffset() {
         val size = 100.dp
+        val offset = 10.dp
+        val density = Density(1f)
         container.setContent {
-            Column {
-                Box(
-                    Modifier
-                        .size(size)
-                        .offset(10.dp, 10.dp)
-                        .testTag("tag")
-                        .semantics { contentDescription = "Test" }
-                )
+            CompositionLocalProvider(LocalDensity provides density) {
+                Column {
+                    Box(
+                        Modifier
+                            .size(size)
+                            .offset(offset, offset)
+                            .testTag("tag")
+                            .semantics { contentDescription = "Test" }
+                    )
+                }
             }
         }
 
@@ -1686,12 +1699,13 @@ class AndroidAccessibilityTest {
         accessibilityNodeInfo.getBoundsInScreen(rect)
         val resultWidth = rect.right - rect.left
         val resultHeight = rect.bottom - rect.top
+        val resultInLocalCoords = androidComposeView.screenToLocal(rect.topLeftToOffset())
 
-        with(rule.density) {
+        with(density) {
             assertEquals(size.roundToPx(), resultWidth)
             assertEquals(size.roundToPx(), resultHeight)
-            assertEquals(10.dp.roundToPx(), rect.left)
-            assertEquals(10.dp.roundToPx(), rect.top)
+            assertEquals(10.dp.toPx(), resultInLocalCoords.x)
+            assertEquals(10.dp.toPx(), resultInLocalCoords.y)
         }
     }
 
@@ -1801,3 +1815,5 @@ class AndroidAccessibilityTest {
             )?.text
     }
 }
+
+private fun Rect.topLeftToOffset() = Offset(this.left.toFloat(), this.top.toFloat())
