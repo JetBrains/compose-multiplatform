@@ -4,6 +4,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.web.attributes.ATarget
 import androidx.compose.web.attributes.target
 import androidx.compose.web.elements.*
+import androidx.compose.web.css.*
 import com.sample.components.ContainerInSection
 import com.sample.style.*
 
@@ -16,8 +17,25 @@ fun JoinUs() {
             Div(attrs = {
                 classes(WtCols.wtCol9, WtCols.wtColMd11, WtCols.wtColSm12)
             }) {
+
                 P(attrs = {
                     classes(WtTexts.wtSubtitle2)
+                }) {
+                    Text("Interested in Compose for other platforms?")
+
+                    P {
+                        Text("Have a look at ")
+                        A(href = "https://www.jetbrains.com/lp/compose/", attrs = {
+                            classes(WtTexts.wtLink)
+                            target(ATarget.Blank)
+                        }) {
+                            Text("Compose for Desktop")
+                        }
+                    }
+                }
+
+                P(attrs = {
+                    classes(WtTexts.wtSubtitle2, WtOffsets.wtTopOffset24)
                 }) {
                     Text("Feel free to join the ")
                     LinkToSlack(
