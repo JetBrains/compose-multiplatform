@@ -132,7 +132,7 @@ open class AndroidXExtension(val project: Project) {
             }
             // TODO: rework this to use LibraryType. Fork Library and KolinOnlyLibrary?
             if (project.path.contains("-ktx")) return false
-            if (project.path.startsWith(":compose")) return false
+            if (project.path.contains("compose")) return false
             if (project.path.startsWith(":ui")) return false
             return field
         }
