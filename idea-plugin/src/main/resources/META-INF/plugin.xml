@@ -1,6 +1,6 @@
 <idea-plugin>
     <id>org.jetbrains.compose.desktop.ide</id>
-    <name>Compose for Desktop IDE Support</name>
+    <name>Compose Multiplatform IDE Support</name>
     <vendor>JetBrains</vendor>
     <description>
         <![CDATA[
