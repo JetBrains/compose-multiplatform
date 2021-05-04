@@ -124,11 +124,22 @@ def saveConfigurationResolution(configuration, destFile) {
 }
 
 // Parses a file into a list of Dependency objects representing a ResolvedConfiguration
-def parseConfigurationResolution(savedFile) {
+def parseConfigurationResolution(savedFile, throwOnError) {
     def savedText = savedFile.text
     def filenames = savedText.split("\n")
+    def valid = true
     def dependencies = filenames.collect { filename ->
+        if (!project.file(filename).exists()) {
+            if (throwOnError) {
+                throw new GradleException("\nFile " + filename + " listed as a resolved dependency in " + savedFile + " does not exist!\n\nFor more information, see b/187075069")
+            } else {
+                valid = false
+            }
+        }
         project.dependencies.create(project.files(filename))
+    }
+    if (!valid) {
+        return null
     }
     return dependencies
 }
@@ -141,13 +152,22 @@ def resolveConfiguration(configuration) {
     def outputsFile = new File(cacheDir, "/result")
 
     def inputText = fingerprintConfiguration(configuration)
-    if (!inputsFile.exists() || inputsFile.text != inputText) {
+    def parsed = null
+    if (inputsFile.exists() && inputsFile.text == inputText) {
+        // Try to parse the previously resolved configuration, but don't give up if it mentions a
+        // nonexistent file. If something has since deleted one of the referenced files, we will
+        // try to reresolve that file later
+        parsed = parseConfigurationResolution(outputsFile, false)
+    }
+    // If the configuration has changed or if any of its files have been deleted, reresolve it
+    if (parsed == null) {
         cacheDir.mkdirs()
         saveConfigurationResolution(configuration, outputsFile)
         inputsFile.text = inputText
+        // confirm that the resolved configuration parses successfully
+        parsed = parseConfigurationResolution(outputsFile, true)
     }
-    def result = parseConfigurationResolution(outputsFile)
-    return result
+    return parsed
 }
 
 // Computes a unique string from a Configuration based on its dependencies
