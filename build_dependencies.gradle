@@ -24,7 +24,7 @@ build_versions.lint = build_versions.studio["lint"]
 
 build_versions.kotlin = "1.4.32"
 build_versions.kotlin_coroutines = "1.4.3"
-build_versions.ksp = "1.4.32-1.0.0-alpha07"
+build_versions.ksp = "1.4.32-1.0.0-alpha08"
 
 build_versions.hilt = "2.35"
 
