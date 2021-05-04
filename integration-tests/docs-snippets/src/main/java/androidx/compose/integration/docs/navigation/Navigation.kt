@@ -168,7 +168,9 @@ private fun NavigationSnippet11(items: List<Screen>) {
                         selected = currentRoute == screen.route,
                         onClick = {
                             // This is the equivalent to popUpTo the start destination
-                            navController.popBackStack(navController.graph.startDestination, false)
+                            navController.popBackStack(
+                                navController.graph.startDestinationId, false
+                            )
 
                             // This if check gives us a "singleTop" behavior where we do not create a
                             // second instance of the composable if we are already on that destination
