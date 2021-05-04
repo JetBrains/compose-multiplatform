@@ -11,25 +11,20 @@ import androidx.compose.web.css.Style
 import org.jetbrains.compose.web.ui.Styles
 
 class JsGame : Game() {
-    override fun saveTime() {
-        previousTime = window.performance.now().toLong()
-    }
+    override fun now() = window.performance.now().toLong()
 }
 
 fun main() {
     val root = document.getElementById("root") as HTMLElement
 
-    renderComposable(
-        root = root
-    ) {
+    renderComposable(root = root) {
         Style(Styles)
-        fallingBalls(
-            remember {
-                JsGame()?.apply {
-                    width = root.offsetWidth
-                    height = root.offsetHeight
-                }
+        val game = remember {
+            JsGame().apply {
+              width = root.offsetWidth
+              height = root.offsetHeight
             }
-        )
+        }
+        fallingBalls(game)
     }
 }

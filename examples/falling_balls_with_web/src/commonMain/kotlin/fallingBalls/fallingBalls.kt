@@ -86,7 +86,7 @@ fun fallingBalls(game: Game) {
                     }
             ) {
                 game.pieces.forEachIndexed { index, piece ->
-                    piece(index, piece)
+                    Piece(index, piece)
                 }
             }
         }

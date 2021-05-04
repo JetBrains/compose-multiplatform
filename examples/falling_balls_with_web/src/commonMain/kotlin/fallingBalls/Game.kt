@@ -42,17 +42,17 @@ abstract class Game {
 
     var numBlocks by mutableStateOf(5)
 
-    fun isInBoundaries(pieceData: PieceData): Boolean = pieceData.position < size.height
+    fun isInBoundaries(pieceData: PieceData) = pieceData.position < size.height
 
-    abstract fun saveTime()
+    abstract fun now(): Long
 
     fun togglePause() {
         paused = !paused
-        saveTime()
+        previousTime = Long.MAX_VALUE
     }
 
     fun start() {
-        saveTime()
+        previousTime = now()
         startTime = previousTime
         clicked = 0
         started = true

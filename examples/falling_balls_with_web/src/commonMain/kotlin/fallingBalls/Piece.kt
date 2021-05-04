@@ -16,7 +16,7 @@ import jetbrains.compose.common.shapes.CircleShape
 import org.jetbrains.compose.common.demo.position
 
 @Composable
-fun piece(index: Int, piece: PieceData) {
+fun Piece(index: Int, piece: PieceData) {
     val boxSize = 40.dp
     Box(
         Modifier
