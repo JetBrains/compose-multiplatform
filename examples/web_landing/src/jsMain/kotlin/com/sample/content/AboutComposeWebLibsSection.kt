@@ -12,7 +12,7 @@ import com.sample.style.*
 data class CardWithListPresentation(
     val title: String,
     val list: List<String>,
-    val linkOnCard: LinkOnCard? = null
+    val links: List<LinkOnCard> = emptyList()
 )
 
 private fun createAboutComposeWebCards(): List<CardWithListPresentation> {
@@ -24,16 +24,14 @@ private fun createAboutComposeWebCards(): List<CardWithListPresentation> {
                 "Use a type-safe HTML DSL to build your UI representation",
                 "Get full control over the look and feel of your application by creating stylesheets with a typesafe CSS DSL",
                 "Integrate with other JavaScript libraries via DOM subtrees"
-            ),
-            linkOnCard = null//LinkOnCard("Learn more", "#")
+            )
         ),
         CardWithListPresentation(
             title = "Multiplatform Widgets With Web Support",
             list = listOf(
                 "Use and build Compose widgets that work on Android, Desktop, and Web by utilizing Kotlin's expect-actual mechanisms to provide platform-specific implementations",
                 "Experiment with a set of layout primitives and APIs that mimic the features you already know from Compose for Desktop and Android"
-            ),
-            linkOnCard = null//LinkOnCard("Learn more", "#")
+            )
         )
     )
 }
@@ -81,7 +79,7 @@ fun ComposeWebLibraries() {
 private fun CardWithList(card: CardWithListPresentation) {
     Card(
         title = card.title,
-        linkOnCard = card.linkOnCard
+        links = card.links
     ) {
         Ul(attrs = {
             classes(WtTexts.wtText2)

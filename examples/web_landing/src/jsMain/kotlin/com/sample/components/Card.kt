@@ -11,75 +11,74 @@ import com.sample.style.*
 data class LinkOnCard(val linkText: String, val linkUrl: String)
 
 @Composable
-fun Card(title: String, linkOnCard: LinkOnCard?, content: @Composable () -> Unit) {
+private fun CardTitle(title: String, darkTheme: Boolean = false) {
+    H3(attrs = {
+        classes {
+            +WtTexts.wtH3
+            if (darkTheme) +WtTexts.wtH3ThemeDark
+        }
+    }) {
+        Text(title)
+    }
+}
+
+@Composable
+private fun CardLink(link: LinkOnCard) {
+    A(
+        attrs = {
+            classes(WtTexts.wtLink, WtOffsets.wtTopOffset24)
+            target(ATarget.Blank)
+        },
+        href = link.linkUrl
+    ) {
+        Text(link.linkText)
+    }
+}
+
+@Composable
+fun Card(
+    title: String,
+    links: List<LinkOnCard>,
+    darkTheme: Boolean = false,
+    wtExtraStyleClasses: List<String> = listOf(WtCols.wtCol6, WtCols.wtColMd6, WtCols.wtColSm12),
+    content: @Composable () -> Unit
+) {
     Div(attrs = {
-        classes(
-            WtCards.wtCard,
-            WtCards.wtCardThemeLight,
-            WtCols.wtCol6,
-            WtCols.wtColMd6,
-            WtCols.wtColSm12,
-            WtOffsets.wtTopOffset24,
-        )
+        classes {
+            +WtCards.wtCard
+            +WtOffsets.wtTopOffset24
+            wtExtraStyleClasses.forEach { +it }
+            +if (darkTheme) WtCards.wtCardThemeDark else WtCards.wtCardThemeLight
+        }
     }) {
         Div(attrs = {
             classes(WtCards.wtCardSection, WtCards.wtVerticalFlex)
         }) {
-            Div(attrs = { classes(WtCards.wtVerticalFlexGrow) }) {
-                H3(attrs = {
-                    classes(WtTexts.wtH3)
-                }) {
-                    Text(title)
-                }
 
+            Div(attrs = { classes(WtCards.wtVerticalFlexGrow) }) {
+                CardTitle(title = title, darkTheme = darkTheme)
                 content()
             }
 
-            if (linkOnCard != null) {
-                A(attrs = {
-                    classes(WtTexts.wtLink, WtOffsets.wtTopOffset24)
-                    target(ATarget.Blank)
-                }, href = linkOnCard.linkUrl) {
-                    Text(linkOnCard.linkText)
-                }
+            links.forEach {
+                CardLink(it)
             }
         }
     }
 }
 
 @Composable
-fun CardDark(title: String, linkOnCard: LinkOnCard?, content: @Composable () -> Unit) {
-    Div(attrs = {
-        classes(
-            WtCards.wtCard,
-            WtCards.wtCardThemeDark,
-            WtCols.wtCol4,
-            WtCols.wtColMd6,
-            WtCols.wtColSm12,
-            WtOffsets.wtTopOffset24,
-        )
-    }) {
-        Div(attrs = {
-            classes(WtCards.wtCardSection, WtCards.wtVerticalFlex)
-        }) {
-            Div(attrs = { classes(WtCards.wtVerticalFlexGrow) }) {
-                H3(attrs = {
-                    classes(WtTexts.wtH3, WtTexts.wtH3ThemeDark)
-                }) {
-                    Text(title)
-                }
-
-                content()
-            }
-
-            if (linkOnCard != null) {
-                A(attrs = {
-                    classes(WtTexts.wtLink, WtOffsets.wtTopOffset24)
-                    target(ATarget.Blank)
-                }, href = linkOnCard.linkUrl) {
-                    Text(linkOnCard.linkText)
-                }
-            }
-        }
-    }
+fun CardDark(
+    title: String,
+    links: List<LinkOnCard>,
+    wtExtraStyleClasses: List<String> = listOf(WtCols.wtCol6, WtCols.wtColMd6, WtCols.wtColSm12),
+    content: @Composable () -> Unit
+) {
+    Card(
+        title = title,
+        links = links,
+        darkTheme = true,
+        wtExtraStyleClasses = wtExtraStyleClasses,
+        content = content
+    )
 }

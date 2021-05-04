@@ -11,8 +11,7 @@ import com.sample.style.*
 private data class GetStartedCardPresentation(
     val title: String,
     val content: String,
-    val link1: LinkOnCard? = null,
-    val link2: LinkOnCard? = null,
+    val links: List<LinkOnCard>
 )
 
 private fun getCards(): List<GetStartedCardPresentation> {
@@ -20,27 +19,36 @@ private fun getCards(): List<GetStartedCardPresentation> {
         GetStartedCardPresentation(
             title = "Start tutorial here",
             content = "In this tutorial we will see how to create our first web UI application using Compose for Web.",
-            link1 = LinkOnCard(
-                linkText = "View tutorial",
-                linkUrl = "https://github.com/JetBrains/compose-jb/tree/master/tutorials/Web/Getting_Started"
+            links = listOf(
+                LinkOnCard(
+                    linkText = "View tutorial",
+                    linkUrl = "https://github.com/JetBrains/compose-jb/tree/master/tutorials/Web/Getting_Started"
+                )
             )
         ),
         GetStartedCardPresentation(
             title = "Landing page example",
             content = "An example of a landing page built using the Composable DOM API and Stylesheet DSL.",
-            link1 = LinkOnCard(
-                linkText = "Explore the source code",
-                linkUrl = "https://github.com/JetBrains/compose-jb/tree/master/examples/web_landing"
+            links = listOf(
+                LinkOnCard(
+                    linkText = "Explore the source code",
+                    linkUrl = "https://github.com/JetBrains/compose-jb/tree/master/examples/web_landing"
+                )
             )
         ),
         GetStartedCardPresentation(
             title = "Falling Balls app example",
             content = "This example demonstrates the use of multiplatform widgets – sharing user interface code between Compose for Desktop and Web.",
-            link1 = LinkOnCard(
-                linkText = "Explore the source code",
-                linkUrl = "https://github.com/JetBrains/compose-jb/tree/master/examples/falling_balls_with_web"
-            ),
-            link2 = null
+            links = listOf(
+                LinkOnCard(
+                    linkText = "Explore the source code",
+                    linkUrl = "https://github.com/JetBrains/compose-jb/tree/master/examples/falling_balls_with_web"
+                ),
+                LinkOnCard(
+                    linkText = "Play",
+                    linkUrl = "https://falling-balls.ui.pages.jetbrains.team/"
+                )
+            )
         )
     )
 }
@@ -87,7 +95,8 @@ fun GetStarted() {
             getCards().forEach {
                 CardDark(
                     title = it.title,
-                    linkOnCard = it.link1
+                    links = it.links,
+                    wtExtraStyleClasses = listOf(WtCols.wtCol4, WtCols.wtColMd6, WtCols.wtColSm12)
                 ) {
                     CardContent(it.content)
                 }
