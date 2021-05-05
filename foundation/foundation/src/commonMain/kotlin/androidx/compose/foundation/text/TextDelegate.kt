@@ -18,7 +18,6 @@ package androidx.compose.foundation.text
 
 import androidx.compose.runtime.Stable
 import androidx.compose.ui.graphics.Canvas
-import androidx.compose.ui.graphics.Paint
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.MultiParagraph
 import androidx.compose.ui.text.MultiParagraphIntrinsics
@@ -269,28 +268,6 @@ class TextDelegate(
          */
         fun paint(canvas: Canvas, textLayoutResult: TextLayoutResult) {
             TextPainter.paint(canvas, textLayoutResult)
-        }
-
-        /**
-         * Draws text background of the given range.
-         *
-         * If the given range is empty, do nothing.
-         *
-         * @param start inclusive start character offset of the drawing range.
-         * @param end exclusive end character offset of the drawing range.
-         * @param paint used to draw background.
-         * @param canvas the target canvas.
-         */
-        fun paintBackground(
-            start: Int,
-            end: Int,
-            paint: Paint,
-            canvas: Canvas,
-            textLayoutResult: TextLayoutResult
-        ) {
-            if (start == end) return
-            val selectionPath = textLayoutResult.multiParagraph.getPathForRange(start, end)
-            canvas.drawPath(selectionPath, paint)
         }
     }
 }
