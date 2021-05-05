@@ -35,6 +35,7 @@ import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.staticCompositionLocalOf
 import androidx.compose.ui.Modifier
@@ -243,24 +244,29 @@ private fun Modifier.scrollbarDrag(
     interactionSource: MutableInteractionSource,
     draggedInteraction: MutableState<DragInteraction.Start?>,
     onDelta: (Offset) -> Unit
-): Modifier = pointerInput(interactionSource, draggedInteraction, onDelta) {
-    forEachGesture {
-        awaitPointerEventScope {
-            val down = awaitFirstDown(requireUnconsumed = false)
-            val interaction = DragInteraction.Start()
-            interactionSource.tryEmit(interaction)
-            draggedInteraction.value = interaction
-            val isSuccess = drag(down.id) { change ->
-                onDelta.invoke(change.positionChange())
-                change.consumePositionChange()
+): Modifier = composed {
+    val currentInteractionSource by rememberUpdatedState(interactionSource)
+    val currentDraggedInteraction by rememberUpdatedState(draggedInteraction)
+    val currentOnDelta by rememberUpdatedState(onDelta)
+    pointerInput(Unit) {
+        forEachGesture {
+            awaitPointerEventScope {
+                val down = awaitFirstDown(requireUnconsumed = false)
+                val interaction = DragInteraction.Start()
+                currentInteractionSource.tryEmit(interaction)
+                currentDraggedInteraction.value = interaction
+                val isSuccess = drag(down.id) { change ->
+                    currentOnDelta.invoke(change.positionChange())
+                    change.consumePositionChange()
+                }
+                val finishInteraction = if (isSuccess) {
+                    DragInteraction.Stop(interaction)
+                } else {
+                    DragInteraction.Cancel(interaction)
+                }
+                currentInteractionSource.tryEmit(finishInteraction)
+                currentDraggedInteraction.value = null
             }
-            val finishInteraction = if (isSuccess) {
-                DragInteraction.Stop(interaction)
-            } else {
-                DragInteraction.Cancel(interaction)
-            }
-            interactionSource.tryEmit(finishInteraction)
-            draggedInteraction.value = null
         }
     }
 }
