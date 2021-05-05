@@ -89,7 +89,7 @@ class TextDelegate(
     val overflow: TextOverflow = TextOverflow.Clip,
     val density: Density,
     val resourceLoader: Font.ResourceLoader,
-    val placeholders: List<AnnotatedString.Range<Placeholder>> = listOf()
+    val placeholders: List<AnnotatedString.Range<Placeholder>> = emptyList()
 ) {
     /*@VisibleForTesting*/
     internal var paragraphIntrinsics: MultiParagraphIntrinsics? = null
@@ -203,7 +203,7 @@ class TextDelegate(
         prevResult: TextLayoutResult? = null
     ): TextLayoutResult {
         if (prevResult != null && prevResult.canReuse(
-                text, style, maxLines, softWrap, overflow, density, layoutDirection,
+                text, style, placeholders, maxLines, softWrap, overflow, density, layoutDirection,
                 resourceLoader, constraints
             )
         ) {

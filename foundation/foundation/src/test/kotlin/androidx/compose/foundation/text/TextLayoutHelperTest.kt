@@ -17,6 +17,8 @@
 package androidx.compose.foundation.text
 
 import androidx.compose.ui.text.AnnotatedString
+import androidx.compose.ui.text.Placeholder
+import androidx.compose.ui.text.PlaceholderVerticalAlign
 import androidx.compose.ui.text.TextLayoutInput
 import androidx.compose.ui.text.TextLayoutResult
 import androidx.compose.ui.text.TextStyle
@@ -27,6 +29,7 @@ import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.em
+import androidx.compose.ui.unit.sp
 import com.google.common.truth.Truth.assertThat
 import com.nhaarman.mockitokotlin2.mock
 import org.junit.Before
@@ -64,12 +67,13 @@ class TextLayoutHelperTest {
     }
 
     @Test
-    fun testCanResue_same() {
+    fun testCanReuse_same() {
         val constraints = Constraints.fixedWidth(100)
         assertThat(
             referenceResult.canReuse(
                 text = AnnotatedString.Builder("Hello, World").toAnnotatedString(),
                 style = TextStyle(),
+                placeholders = emptyList(),
                 maxLines = 1,
                 softWrap = true,
                 overflow = TextOverflow.Ellipsis,
@@ -82,12 +86,13 @@ class TextLayoutHelperTest {
     }
 
     @Test
-    fun testCanResue_different_text() {
+    fun testCanReuse_different_text() {
         val constraints = Constraints.fixedWidth(100)
         assertThat(
             referenceResult.canReuse(
                 text = AnnotatedString.Builder("Hello, Android").toAnnotatedString(),
                 style = TextStyle(),
+                placeholders = emptyList(),
                 maxLines = 1,
                 softWrap = true,
                 overflow = TextOverflow.Ellipsis,
@@ -100,12 +105,13 @@ class TextLayoutHelperTest {
     }
 
     @Test
-    fun testCanResue_different_style() {
+    fun testCanReuse_different_style() {
         val constraints = Constraints.fixedWidth(100)
         assertThat(
             referenceResult.canReuse(
                 text = AnnotatedString.Builder("Hello, World").toAnnotatedString(),
                 style = TextStyle(fontSize = 1.5.em),
+                placeholders = emptyList(),
                 maxLines = 1,
                 softWrap = true,
                 overflow = TextOverflow.Ellipsis,
@@ -118,12 +124,13 @@ class TextLayoutHelperTest {
     }
 
     @Test
-    fun testCanResue_different_maxLines() {
+    fun testCanReuse_different_maxLines() {
         val constraints = Constraints.fixedWidth(100)
         assertThat(
             referenceResult.canReuse(
                 text = AnnotatedString.Builder("Hello, World").toAnnotatedString(),
                 style = TextStyle(),
+                placeholders = emptyList(),
                 maxLines = 2,
                 softWrap = true,
                 overflow = TextOverflow.Ellipsis,
@@ -136,12 +143,13 @@ class TextLayoutHelperTest {
     }
 
     @Test
-    fun testCanResue_different_softWrap() {
+    fun testCanReuse_different_softWrap() {
         val constraints = Constraints.fixedWidth(100)
         assertThat(
             referenceResult.canReuse(
                 text = AnnotatedString.Builder("Hello, World").toAnnotatedString(),
                 style = TextStyle(),
+                placeholders = emptyList(),
                 maxLines = 1,
                 softWrap = false,
                 overflow = TextOverflow.Ellipsis,
@@ -154,12 +162,13 @@ class TextLayoutHelperTest {
     }
 
     @Test
-    fun testCanResue_different_overflow() {
+    fun testCanReuse_different_overflow() {
         val constraints = Constraints.fixedWidth(100)
         assertThat(
             referenceResult.canReuse(
                 text = AnnotatedString.Builder("Hello, World").toAnnotatedString(),
                 style = TextStyle(),
+                placeholders = emptyList(),
                 maxLines = 1,
                 softWrap = true,
                 overflow = TextOverflow.Clip,
@@ -172,12 +181,13 @@ class TextLayoutHelperTest {
     }
 
     @Test
-    fun testCanResue_different_density() {
+    fun testCanReuse_different_density() {
         val constraints = Constraints.fixedWidth(100)
         assertThat(
             referenceResult.canReuse(
                 text = AnnotatedString.Builder("Hello, World").toAnnotatedString(),
                 style = TextStyle(),
+                placeholders = emptyList(),
                 maxLines = 1,
                 softWrap = true,
                 overflow = TextOverflow.Ellipsis,
@@ -190,12 +200,13 @@ class TextLayoutHelperTest {
     }
 
     @Test
-    fun testCanResue_different_layoutDirection() {
+    fun testCanReuse_different_layoutDirection() {
         val constraints = Constraints.fixedWidth(100)
         assertThat(
             referenceResult.canReuse(
                 text = AnnotatedString.Builder("Hello, World").toAnnotatedString(),
                 style = TextStyle(),
+                placeholders = emptyList(),
                 maxLines = 1,
                 softWrap = true,
                 overflow = TextOverflow.Ellipsis,
@@ -208,12 +219,13 @@ class TextLayoutHelperTest {
     }
 
     @Test
-    fun testCanResue_different_resourceLoader() {
+    fun testCanReuse_different_resourceLoader() {
         val constraints = Constraints.fixedWidth(100)
         assertThat(
             referenceResult.canReuse(
                 text = AnnotatedString.Builder("Hello, World").toAnnotatedString(),
                 style = TextStyle(),
+                placeholders = emptyList(),
                 maxLines = 1,
                 softWrap = true,
                 overflow = TextOverflow.Ellipsis,
@@ -226,11 +238,36 @@ class TextLayoutHelperTest {
     }
 
     @Test
-    fun testCanResue_different_constraints() {
+    fun testCanReuse_different_constraints() {
         assertThat(
             referenceResult.canReuse(
                 text = AnnotatedString.Builder("Hello, World").toAnnotatedString(),
                 style = TextStyle(),
+                placeholders = emptyList(),
+                maxLines = 1,
+                softWrap = true,
+                overflow = TextOverflow.Ellipsis,
+                density = Density(1.0f),
+                layoutDirection = LayoutDirection.Ltr,
+                resourceLoader = resourceLoader,
+                constraints = Constraints.fixedWidth(200)
+            )
+        ).isFalse()
+    }
+
+    @Test
+    fun testCanReuse_different_placeholders() {
+        assertThat(
+            referenceResult.canReuse(
+                text = AnnotatedString.Builder("Hello, World").toAnnotatedString(),
+                style = TextStyle(),
+                placeholders = listOf(
+                    AnnotatedString.Range(
+                        item = Placeholder(10.sp, 20.sp, PlaceholderVerticalAlign.AboveBaseline),
+                        start = 0,
+                        end = 5
+                    )
+                ),
                 maxLines = 1,
                 softWrap = true,
                 overflow = TextOverflow.Ellipsis,
