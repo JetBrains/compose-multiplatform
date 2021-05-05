@@ -34,6 +34,7 @@ internal class PointerInputEventProcessor(val root: LayoutNode) {
 
     private val hitPathTracker = HitPathTracker(root.coordinates)
     private val pointerInputChangeEventProducer = PointerInputChangeEventProducer()
+    private val hitResult: MutableList<PointerInputFilter> = mutableListOf()
 
     /**
      * Receives [PointerInputEvent]s and process them through the tree rooted on [root].
@@ -54,44 +55,41 @@ internal class PointerInputEventProcessor(val root: LayoutNode) {
         val internalPointerEvent =
             pointerInputChangeEventProducer.produce(pointerEvent, positionCalculator)
 
-        // TODO(shepshapard): Create fast forEach for maps?
-
         // Add new hit paths to the tracker due to down events.
-        internalPointerEvent
-            .changes
-            .filter { (_, pointerInputChange) -> pointerInputChange.changedToDownIgnoreConsumed() }
-            .forEach { (_, pointerInputChange) ->
-                val hitResult: MutableList<PointerInputFilter> = mutableListOf()
+        internalPointerEvent.changes.values.forEach { pointerInputChange ->
+            if (pointerInputChange.changedToDownIgnoreConsumed()) {
                 root.hitTest(
                     pointerInputChange.position,
                     hitResult
                 )
                 if (hitResult.isNotEmpty()) {
                     hitPathTracker.addHitPath(pointerInputChange.id, hitResult)
+                    hitResult.clear()
                 }
             }
+        }
 
         // Remove [PointerInputFilter]s that are no longer valid and refresh the offset information
         // for those that are.
         hitPathTracker.removeDetachedPointerInputFilters()
 
         // Dispatch to PointerInputFilters
-        val (resultingChanges, dispatchedToSomething) =
-            hitPathTracker.dispatchChanges(internalPointerEvent)
+        val dispatchedToSomething = hitPathTracker.dispatchChanges(internalPointerEvent)
 
-        // Remove hit paths from the tracker due to up events.
-        internalPointerEvent
-            .changes
-            .filter { (_, pointerInputChange) -> pointerInputChange.changedToUpIgnoreConsumed() }
-            .forEach { (_, pointerInputChange) ->
+        var anyMovementConsumed = false
+
+        // Remove hit paths from the tracker due to up events, and calculate if we have consumed
+        // any movement
+        internalPointerEvent.changes.values.forEach { pointerInputChange ->
+            if (pointerInputChange.changedToUpIgnoreConsumed()) {
                 hitPathTracker.removeHitPath(pointerInputChange.id)
             }
+            if (pointerInputChange.positionChangeConsumed()) {
+                anyMovementConsumed = true
+            }
+        }
 
-        // TODO(shepshapard): Don't allocate on every call.
-        return ProcessResult(
-            dispatchedToSomething,
-            resultingChanges.changes.any { (_, value) -> value.positionChangeConsumed() }
-        )
+        return ProcessResult(dispatchedToSomething, anyMovementConsumed)
     }
 
     /**
@@ -154,8 +152,7 @@ private class PointerInputChangeEventProducer {
                     previousPointerInputData[it.id] = PointerInputData(
                         it.uptime,
                         it.positionOnScreen,
-                        it.down,
-                        it.type
+                        it.down
                     )
                 } else {
                     previousPointerInputData.remove(it.id)
@@ -167,15 +164,14 @@ private class PointerInputChangeEventProducer {
     /**
      * Clears all tracked information.
      */
-    internal fun clear() {
+    fun clear() {
         previousPointerInputData.clear()
     }
 
     private class PointerInputData(
         val uptime: Long,
         val positionOnScreen: Offset,
-        val down: Boolean,
-        val type: PointerType
+        val down: Boolean
     )
 }
 
@@ -183,7 +179,6 @@ private class PointerInputChangeEventProducer {
  * The result of a call to [PointerInputEventProcessor.process].
  */
 // TODO(shepshpard): Not sure if storing these values in a int is most efficient overall.
-@Suppress("EXPERIMENTAL_FEATURE_WARNING")
 internal inline class ProcessResult(private val value: Int) {
     val dispatchedToAPointerInputModifier
         get() = (value and 1) != 0
