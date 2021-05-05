@@ -279,7 +279,7 @@ internal class CompositionImpl(
     private val parent: CompositionContext,
 
     /**
-     * The applier to use to update the tree managed by the compositon.
+     * The applier to use to update the tree managed by the composition.
      */
     private val applier: Applier<*>,
 
@@ -344,7 +344,7 @@ internal class CompositionImpl(
      * As [RecomposeScope]s are removed the corresponding entries in the observations set must be
      * removed as well. This process is expensive so should only be done if it is certain the
      * [observations] set contains [RecomposeScope] that is no longer needed. [pendingInvalidScopes]
-     * is set to true whenver a [RecomposeScope] is removed from the [slotTable].
+     * is set to true whenever a [RecomposeScope] is removed from the [slotTable].
      */
     internal var pendingInvalidScopes = false
 

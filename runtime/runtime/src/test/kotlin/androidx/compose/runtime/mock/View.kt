@@ -100,3 +100,5 @@ open class View {
         it.toString()
     }
 }
+
+fun View.flatten(): List<View> = listOf(this) + children.flatMap { it.flatten() }
