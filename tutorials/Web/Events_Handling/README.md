@@ -35,6 +35,20 @@ TextArea(
 )
 ```
 
+
+#### Other event handlers
+
+For events that don't have their own configuration functions in the `attrs` block, you can use `addEventListener` with the `name` of the event, `options`, and an pass an `eventListener` which receives a `WrappedEvent`. In this example, we're defining the behavior of a `Form` element when it triggers the `submit` event:
+
+```
+Form(attrs = {
+    this.addEventListener("submit") {
+        console.log("Hello, Submit!")
+        it.nativeEvent.preventDefault()
+    }
+})
+```
+
 Your event handlers receive wrapped events that inherit from `GenericWrappedEvent`, which also provides access to the underlying `nativeEvent` – the actual event created by JS runtime -
 https://developer.mozilla.org/en-US/docs/Web/API/Event
 
