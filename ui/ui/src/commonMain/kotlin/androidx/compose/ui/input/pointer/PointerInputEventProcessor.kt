@@ -118,7 +118,9 @@ private class PointerInputChangeEventProducer {
      */
     fun produce(pointerInputEvent: PointerInputEvent, positionCalculator: PositionCalculator):
         InternalPointerEvent {
-            val changes: MutableMap<PointerId, PointerInputChange> = mutableMapOf()
+            val changes: MutableMap<PointerId, PointerInputChange> =
+                // Set initial capacity to avoid resizing - we know the size the map will be.
+                LinkedHashMap(pointerInputEvent.pointers.size)
             pointerInputEvent.pointers.fastForEach {
                 val previousTime: Long
                 val previousPosition: Offset
