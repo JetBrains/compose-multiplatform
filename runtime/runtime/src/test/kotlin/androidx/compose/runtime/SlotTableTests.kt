@@ -1231,6 +1231,52 @@ class SlotTableTests {
         sourceTable.verifyWellFormed()
     }
 
+    @Test
+    fun testMovingANodeGroup() {
+        val sourceTable = SlotTable()
+        val anchors = mutableListOf<Anchor>()
+        sourceTable.write { writer ->
+            writer.beginInsert()
+            anchors.add(writer.anchor())
+            writer.startNode(10, 10)
+            writer.update(100)
+            writer.update(200)
+            writer.endGroup()
+            writer.endInsert()
+        }
+        sourceTable.verifyWellFormed()
+
+        val destinationTable = SlotTable()
+        destinationTable.write { writer ->
+            writer.beginInsert()
+            writer.startGroup(treeRoot)
+            writer.startGroup(1000)
+            writer.endGroup()
+            writer.endGroup()
+            writer.endInsert()
+        }
+        destinationTable.verifyWellFormed()
+
+        destinationTable.write { writer ->
+            writer.startGroup()
+            writer.startGroup()
+            writer.beginInsert()
+            writer.moveFrom(sourceTable, anchors.first().toIndexFor(sourceTable))
+            writer.endInsert()
+            writer.skipToGroupEnd()
+            writer.endGroup()
+            writer.skipToGroupEnd()
+            writer.endGroup()
+        }
+        destinationTable.verifyWellFormed()
+        destinationTable.read { reader ->
+            val anchor = anchors.first()
+            assertEquals(125, reader.groupKey(anchor))
+            assertEquals(10, reader.groupObjectKey(anchor.toIndexFor(destinationTable)))
+        }
+        sourceTable.verifyWellFormed()
+    }
+
     @org.junit.Test
     fun testMovingMultipleRootGroups() {
         val sourceTable = SlotTable()

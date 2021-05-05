@@ -56,6 +56,10 @@ package androidx.compose.runtime {
     method @androidx.compose.runtime.Composable public static inline <T extends java.lang.Object, reified E extends androidx.compose.runtime.Applier<?>> void ComposeNode(kotlin.jvm.functions.Function0<? extends T> factory, kotlin.jvm.functions.Function1<? super androidx.compose.runtime.Updater<T>,? extends kotlin.Unit> update);
     method @androidx.compose.runtime.Composable public static inline <T extends java.lang.Object, reified E extends androidx.compose.runtime.Applier<?>> void ComposeNode(kotlin.jvm.functions.Function0<? extends T> factory, kotlin.jvm.functions.Function1<? super androidx.compose.runtime.Updater<T>,? extends kotlin.Unit> update, kotlin.jvm.functions.Function0<? extends kotlin.Unit> content);
     method @androidx.compose.runtime.Composable @androidx.compose.runtime.ExplicitGroupsComposable public static inline <T, reified E extends androidx.compose.runtime.Applier<?>> void ComposeNode(kotlin.jvm.functions.Function0<? extends T> factory, kotlin.jvm.functions.Function1<? super androidx.compose.runtime.Updater<T>,? extends kotlin.Unit> update, kotlin.jvm.functions.Function1<? super androidx.compose.runtime.SkippableUpdater<T>,? extends kotlin.Unit> skippableUpdate, kotlin.jvm.functions.Function0<? extends kotlin.Unit> content);
+    method @androidx.compose.runtime.Composable public static inline <T extends java.lang.Object, reified E extends androidx.compose.runtime.Applier<?>> void ReusableComposeNode(kotlin.jvm.functions.Function0<? extends T> factory, kotlin.jvm.functions.Function1<? super androidx.compose.runtime.Updater<T>,? extends kotlin.Unit> update);
+    method @androidx.compose.runtime.Composable public static inline <T extends java.lang.Object, reified E extends androidx.compose.runtime.Applier<?>> void ReusableComposeNode(kotlin.jvm.functions.Function0<? extends T> factory, kotlin.jvm.functions.Function1<? super androidx.compose.runtime.Updater<T>,? extends kotlin.Unit> update, kotlin.jvm.functions.Function0<? extends kotlin.Unit> content);
+    method @androidx.compose.runtime.Composable @androidx.compose.runtime.ExplicitGroupsComposable public static inline <T, reified E extends androidx.compose.runtime.Applier<?>> void ReusableComposeNode(kotlin.jvm.functions.Function0<? extends T> factory, kotlin.jvm.functions.Function1<? super androidx.compose.runtime.Updater<T>,? extends kotlin.Unit> update, kotlin.jvm.functions.Function1<? super androidx.compose.runtime.SkippableUpdater<T>,? extends kotlin.Unit> skippableUpdate, kotlin.jvm.functions.Function0<? extends kotlin.Unit> content);
+    method @androidx.compose.runtime.Composable public static inline void ReusableContent(Object? key, kotlin.jvm.functions.Function0<kotlin.Unit> content);
     method @androidx.compose.runtime.Composable @androidx.compose.runtime.ReadOnlyComposable public static androidx.compose.runtime.Composer getCurrentComposer();
     method @androidx.compose.runtime.Composable public static int getCurrentCompositeKeyHash();
     method @androidx.compose.runtime.Composable @androidx.compose.runtime.ReadOnlyComposable public static androidx.compose.runtime.RecomposeScope getCurrentRecomposeScope();
@@ -83,11 +87,14 @@ package androidx.compose.runtime {
     method @androidx.compose.runtime.ComposeCompilerApi public default boolean changed(long value);
     method @androidx.compose.runtime.ComposeCompilerApi public default boolean changed(double value);
     method @androidx.compose.runtime.ComposeCompilerApi public <T> void createNode(kotlin.jvm.functions.Function0<? extends T> factory);
+    method @androidx.compose.runtime.ComposeCompilerApi public void disableReusing();
+    method @androidx.compose.runtime.ComposeCompilerApi public void enableReusing();
     method @androidx.compose.runtime.ComposeCompilerApi public void endDefaults();
     method @androidx.compose.runtime.ComposeCompilerApi public void endMovableGroup();
     method @androidx.compose.runtime.ComposeCompilerApi public void endNode();
     method @androidx.compose.runtime.ComposeCompilerApi public void endReplaceableGroup();
     method @androidx.compose.runtime.ComposeCompilerApi public androidx.compose.runtime.ScopeUpdateScope? endRestartGroup();
+    method @androidx.compose.runtime.ComposeCompilerApi public void endReusableGroup();
     method public androidx.compose.runtime.Applier<?> getApplier();
     method @org.jetbrains.annotations.TestOnly public kotlin.coroutines.CoroutineContext getApplyCoroutineContext();
     method @org.jetbrains.annotations.TestOnly public androidx.compose.runtime.ControlledComposition getComposition();
@@ -109,6 +116,8 @@ package androidx.compose.runtime {
     method @androidx.compose.runtime.ComposeCompilerApi public void startReplaceableGroup(int key, String? sourceInformation);
     method @androidx.compose.runtime.ComposeCompilerApi public androidx.compose.runtime.Composer startRestartGroup(int key);
     method @androidx.compose.runtime.ComposeCompilerApi public androidx.compose.runtime.Composer startRestartGroup(int key, String? sourceInformation);
+    method @androidx.compose.runtime.ComposeCompilerApi public void startReusableGroup(int key, Object? dataKey);
+    method @androidx.compose.runtime.ComposeCompilerApi public void startReusableNode();
     method @androidx.compose.runtime.ComposeCompilerApi public void updateRememberedValue(Object? value);
     method @androidx.compose.runtime.ComposeCompilerApi public void useNode();
     property public abstract androidx.compose.runtime.Applier<?> applier;
