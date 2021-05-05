@@ -17,6 +17,7 @@
 package androidx.compose.foundation.text
 
 import androidx.compose.ui.text.AnnotatedString
+import androidx.compose.ui.text.Placeholder
 import androidx.compose.ui.text.TextLayoutResult
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.Font
@@ -30,17 +31,19 @@ import androidx.compose.ui.unit.LayoutDirection
  *
  * @param text a text to be used for computing text layout.
  * @param style a text style to be used for computing text layout.
+ * @param placeholders a list of [Placeholder]s to be used for computing text layout.
  * @param maxLines a maximum number of lines to be used for computing text layout.
  * @param softWrap whether doing softwrap or not to be used for computing text layout.
  * @param overflow an overflow type to be used for computing text layout.
  * @param density a density to be used for computing text layout.
  * @param layoutDirection a layout direction to be used for computing text layout.
- * @param resourceLoader a resource loader to be used for computing text layout.
  * @param constraints a constraint to be used for computing text layout.
  */
+@OptIn(InternalFoundationTextApi::class)
 internal fun TextLayoutResult.canReuse(
     text: AnnotatedString,
     style: TextStyle,
+    placeholders: List<AnnotatedString.Range<Placeholder>>,
     maxLines: Int,
     softWrap: Boolean,
     overflow: TextOverflow,
@@ -55,6 +58,7 @@ internal fun TextLayoutResult.canReuse(
     if (!(
         layoutInput.text == text &&
             layoutInput.style.canReuseLayout(style) &&
+            layoutInput.placeholders == placeholders &&
             layoutInput.maxLines == maxLines &&
             layoutInput.softWrap == softWrap &&
             layoutInput.overflow == overflow &&
@@ -70,7 +74,7 @@ internal fun TextLayoutResult.canReuse(
     if (constraints.minWidth != layoutInput.constraints.minWidth) return false
 
     if (!(softWrap || overflow == TextOverflow.Ellipsis)) {
-        // If width does not mattter, we can result the same layout.
+        // If width does not matter, we can result the same layout.
         return true
     }
     return constraints.maxWidth == layoutInput.constraints.maxWidth
