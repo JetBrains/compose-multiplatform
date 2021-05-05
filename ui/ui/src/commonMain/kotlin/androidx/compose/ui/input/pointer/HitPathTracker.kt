@@ -16,6 +16,8 @@
 
 package androidx.compose.ui.input.pointer
 
+import androidx.compose.runtime.collection.MutableVector
+import androidx.compose.runtime.collection.mutableVectorOf
 import androidx.compose.ui.layout.LayoutCoordinates
 import androidx.compose.ui.node.InternalCoreApi
 
@@ -31,23 +33,6 @@ internal class HitPathTracker(private val rootCoordinates: LayoutCoordinates) {
 
     /*@VisibleForTesting*/
     internal val root: NodeParent = NodeParent()
-
-    private val retainedHitPaths: MutableSet<PointerId> = mutableSetOf()
-
-    internal interface DispatchChangesRetVal {
-        operator fun component1(): InternalPointerEvent
-        operator fun component2(): Boolean
-    }
-
-    private class DispatchChangesRetValImpl : DispatchChangesRetVal {
-        lateinit var internalPointerEvent: InternalPointerEvent
-        var wasDispatchedToSomething: Boolean = false
-        override operator fun component1() = internalPointerEvent
-        override operator fun component2() = wasDispatchedToSomething
-    }
-
-    // See https://youtrack.jetbrains.com/issue/KT-39905.
-    private val dispatchChangesRetVal = DispatchChangesRetValImpl()
 
     /**
      * Associates a [pointerId] to a list of hit [pointerInputFilters] and keeps track of them.
@@ -67,9 +52,11 @@ internal class HitPathTracker(private val rootCoordinates: LayoutCoordinates) {
         eachPin@ for (i in pointerInputFilters.indices) {
             val pointerInputFilter = pointerInputFilters[i]
             if (merging) {
-                val node = parent.children.find { it.pointerInputFilter == pointerInputFilter }
+                val node = parent.children.firstOrNull {
+                    it.pointerInputFilter == pointerInputFilter
+                }
                 if (node != null) {
-                    node.pointerIds.add(pointerId)
+                    if (pointerId !in node.pointerIds) node.pointerIds.add(pointerId)
                     parent = node
                     continue@eachPin
                 } else {
@@ -89,26 +76,17 @@ internal class HitPathTracker(private val rootCoordinates: LayoutCoordinates) {
      * therefore no longer associated with any pointer ids.
      */
     fun removeHitPath(pointerId: PointerId) {
-        removeHitPathInternal(pointerId)
-        removeHitPathInternal(pointerId)
+        root.recursivelyRemovePointerId(pointerId)
     }
 
     /**
      * Dispatches [internalPointerEvent] through the hierarchy.
      *
-     * Returns a [DispatchChangesRetVal] that should not be referenced directly, but instead
-     * should be destrutured immediately.  Each instance of [HitPathTracker] reuses a single
-     * [DispatchChangesRetVal] and mutates it for each return for performance reasons.
-     *
-     * [DispatchChangesRetVal.component1] references the resulting changes after dispatch.
-     * [DispatchChangesRetVal.component2] is true if the dispatch reached at least one
-     * [PointerInputModifier].
-     *
      * @param internalPointerEvent The change to dispatch.
      *
-     * @return The DispatchChangesRetVal that should be destructured immediately.
+     * @return whether this event was dispatched to a [PointerInputFilter]
      */
-    fun dispatchChanges(internalPointerEvent: InternalPointerEvent): DispatchChangesRetVal {
+    fun dispatchChanges(internalPointerEvent: InternalPointerEvent): Boolean {
         var dispatchHit = root.dispatchMainEventPass(
             internalPointerEvent.changes,
             rootCoordinates,
@@ -116,9 +94,7 @@ internal class HitPathTracker(private val rootCoordinates: LayoutCoordinates) {
         )
         dispatchHit = root.dispatchFinalEventPass() || dispatchHit
 
-        dispatchChangesRetVal.wasDispatchedToSomething = dispatchHit
-        dispatchChangesRetVal.internalPointerEvent = internalPointerEvent
-        return dispatchChangesRetVal
+        return dispatchHit
     }
 
     /**
@@ -128,7 +104,6 @@ internal class HitPathTracker(private val rootCoordinates: LayoutCoordinates) {
      * data.
      */
     fun processCancel() {
-        retainedHitPaths.clear()
         root.dispatchCancel()
         root.clear()
     }
@@ -142,13 +117,6 @@ internal class HitPathTracker(private val rootCoordinates: LayoutCoordinates) {
     fun removeDetachedPointerInputFilters() {
         root.removeDetachedPointerInputFilters()
     }
-
-    /**
-     * Actually removes hit paths.
-     */
-    private fun removeHitPathInternal(pointerId: PointerId) {
-        root.removePointerId(pointerId)
-    }
 }
 
 /**
@@ -159,7 +127,7 @@ internal class HitPathTracker(private val rootCoordinates: LayoutCoordinates) {
 /*@VisibleForTesting*/
 @OptIn(InternalCoreApi::class)
 internal open class NodeParent {
-    val children: MutableSet<Node> = mutableSetOf()
+    val children: MutableVector<Node> = mutableVectorOf()
 
     /**
      * Dispatches [changes] down the tree, for the initial and main pass.
@@ -221,54 +189,33 @@ internal open class NodeParent {
      * Removes all child [Node]s that are no longer attached to the compose tree.
      */
     fun removeDetachedPointerInputFilters() {
-        children.removeAndProcess(
-            removeIf = {
-                !it.pointerInputFilter.isAttached
-            },
-            ifRemoved = {
-                it.dispatchCancel()
-            },
-            ifKept = {
-                it.removeDetachedPointerInputFilters()
+        var index = 0
+        while (index < children.size) {
+            val child = children[index]
+            if (!child.pointerInputFilter.isAttached) {
+                children.removeAt(index)
+                child.dispatchCancel()
+            } else {
+                index++
+                child.removeDetachedPointerInputFilters()
             }
-        )
+        }
     }
 
     /**
      * Removes the tracking of [pointerId] and removes all child [Node]s that are no longer
-     * tracking
-     * any [PointerId]s.
+     * tracking any [PointerId]s.
      */
-    fun removePointerId(pointerId: PointerId) {
-        children.forEach {
-            it.pointerIds.remove(pointerId)
-        }
-        children.removeAll {
-            it.pointerIds.isEmpty()
-        }
-        children.forEach {
-            it.removePointerId(pointerId)
-        }
-    }
-
-    /**
-     * With each item, if calling [removeIf] with it is true, removes the item from [this] and calls
-     * [ifRemoved] with it, otherwise calls [ifKept] with it.
-     */
-    private fun <T> MutableIterable<T>.removeAndProcess(
-        removeIf: (T) -> Boolean,
-        ifRemoved: (T) -> Unit,
-        ifKept: (T) -> Unit
-    ) {
-        with(iterator()) {
-            while (hasNext()) {
-                val next = next()
-                if (removeIf(next)) {
-                    remove()
-                    ifRemoved(next)
-                } else {
-                    ifKept(next)
-                }
+    fun recursivelyRemovePointerId(pointerId: PointerId) {
+        var index = 0
+        while (index < children.size) {
+            val child = children[index]
+            child.pointerIds.remove(pointerId)
+            if (child.pointerIds.isEmpty()) {
+                children.removeAt(index)
+            } else {
+                child.recursivelyRemovePointerId(pointerId)
+                index++
             }
         }
     }
@@ -282,7 +229,13 @@ internal open class NodeParent {
 @OptIn(InternalCoreApi::class)
 internal class Node(val pointerInputFilter: PointerInputFilter) : NodeParent() {
 
-    val pointerIds: MutableSet<PointerId> = mutableSetOf()
+    // Note: this is essentially a set, and writes should be guarded accordingly. We use a
+    // MutableVector here instead since a set ends up being quite heavy, and calls to
+    // set.contains() show up noticeably (~1%) in traces. Since the maximum size of this vector
+    // is small (due to the limited amount of concurrent PointerIds there _could_ be), iterating
+    // through the small vector in most cases should have a lower performance impact than using a
+    // set.
+    val pointerIds: MutableVector<PointerId> = mutableVectorOf()
 
     /**
      * Cached properties that will be set before the main event pass, and reset after the final
