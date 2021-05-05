@@ -48,7 +48,7 @@ dependencies {
         implementation(project(":compose:ui:ui-text"))
         implementation(project(":compose:ui:ui-util"))
 
-
+        testImplementation(project(":compose:test-utils"))
         testImplementation(ANDROIDX_TEST_RULES)
         testImplementation(ANDROIDX_TEST_RUNNER)
         testImplementation(JUNIT)

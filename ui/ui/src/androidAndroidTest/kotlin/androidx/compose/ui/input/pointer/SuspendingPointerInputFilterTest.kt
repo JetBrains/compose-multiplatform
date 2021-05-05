@@ -22,11 +22,11 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.snapshots.Snapshot
+import androidx.compose.testutils.TestViewConfiguration
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.platform.InspectableValue
 import androidx.compose.ui.platform.ValueElement
-import androidx.compose.ui.platform.ViewConfiguration
 import androidx.compose.ui.platform.isDebugInspectorInfoEnabled
 import androidx.compose.ui.test.TestActivity
 import androidx.compose.ui.unit.IntSize
@@ -68,7 +68,7 @@ class SuspendingPointerInputFilterTest {
 
     @Test
     fun testAwaitSingleEvent(): Unit = runBlockingTest {
-        val filter = SuspendingPointerInputFilter(FakeViewConfiguration())
+        val filter = SuspendingPointerInputFilter(TestViewConfiguration())
 
         val result = CompletableDeferred<PointerEvent>()
         launch {
@@ -97,7 +97,7 @@ class SuspendingPointerInputFilterTest {
 
     @Test
     fun testAwaitSeveralEvents(): Unit = runBlockingTest {
-        val filter = SuspendingPointerInputFilter(FakeViewConfiguration())
+        val filter = SuspendingPointerInputFilter(TestViewConfiguration())
         val results = Channel<PointerEvent>(Channel.UNLIMITED)
         launch {
             with(filter) {
@@ -132,7 +132,7 @@ class SuspendingPointerInputFilterTest {
 
     @Test
     fun testSyntheticCancelEvent(): Unit = runBlockingTest {
-        val filter = SuspendingPointerInputFilter(FakeViewConfiguration())
+        val filter = SuspendingPointerInputFilter(TestViewConfiguration())
         val results = Channel<PointerEvent>(Channel.UNLIMITED)
         launch {
             with(filter) {
@@ -200,7 +200,7 @@ class SuspendingPointerInputFilterTest {
 
     @Test
     fun testCancelledHandlerBlock() = runBlockingTest {
-        val filter = SuspendingPointerInputFilter(FakeViewConfiguration())
+        val filter = SuspendingPointerInputFilter(TestViewConfiguration())
         val counter = TestCounter()
         val handler = launch {
             with(filter) {
@@ -303,17 +303,6 @@ private class PointerInputChangeEmitter(id: Int = 0) {
             previousPressed = down
         }
     }
-}
-
-private class FakeViewConfiguration : ViewConfiguration {
-    override val longPressTimeoutMillis: Long
-        get() = 500
-    override val doubleTapTimeoutMillis: Long
-        get() = 300
-    override val doubleTapMinTimeMillis: Long
-        get() = 40
-    override val touchSlop: Float
-        get() = 18f
 }
 
 private class TestCounter {

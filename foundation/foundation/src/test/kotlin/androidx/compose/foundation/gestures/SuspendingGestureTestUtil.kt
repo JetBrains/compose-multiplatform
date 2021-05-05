@@ -19,13 +19,14 @@ package androidx.compose.foundation.gestures
 import androidx.compose.runtime.Applier
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Composer
-import androidx.compose.runtime.InternalComposeApi
 import androidx.compose.runtime.CompositionLocalProvider
-import androidx.compose.runtime.Recomposer
 import androidx.compose.runtime.ControlledComposition
-import androidx.compose.runtime.currentComposer
+import androidx.compose.runtime.InternalComposeApi
 import androidx.compose.runtime.MonotonicFrameClock
+import androidx.compose.runtime.Recomposer
+import androidx.compose.runtime.currentComposer
 import androidx.compose.runtime.withRunningRecomposer
+import androidx.compose.testutils.TestViewConfiguration
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.input.pointer.ConsumedData
@@ -39,7 +40,6 @@ import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.materialize
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalViewConfiguration
-import androidx.compose.ui.platform.ViewConfiguration
 import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.IntSize
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -345,19 +345,5 @@ internal class SuspendingGestureTestUtil(
             error("Unexpected")
         }
         override fun clear() {}
-    }
-
-    private class TestViewConfiguration : ViewConfiguration {
-        override val longPressTimeoutMillis: Long
-            get() = 500
-
-        override val doubleTapTimeoutMillis: Long
-            get() = 300
-
-        override val doubleTapMinTimeMillis: Long
-            get() = 40
-
-        override val touchSlop: Float
-            get() = 18f
     }
 }
