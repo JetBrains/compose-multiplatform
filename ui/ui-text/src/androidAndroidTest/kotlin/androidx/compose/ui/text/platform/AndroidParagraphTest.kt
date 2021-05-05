@@ -9,8 +9,6 @@ import android.text.style.LeadingMarginSpan
 import android.text.style.LocaleSpan
 import android.text.style.RelativeSizeSpan
 import android.text.style.ScaleXSpan
-import android.text.style.StrikethroughSpan
-import android.text.style.UnderlineSpan
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Canvas
 import androidx.compose.ui.graphics.Color
@@ -29,6 +27,7 @@ import androidx.compose.ui.text.android.style.LetterSpacingSpanEm
 import androidx.compose.ui.text.android.style.LetterSpacingSpanPx
 import androidx.compose.ui.text.android.style.ShadowSpan
 import androidx.compose.ui.text.android.style.SkewXSpan
+import androidx.compose.ui.text.android.style.TextDecorationSpan
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontSynthesis
@@ -165,7 +164,13 @@ class AndroidParagraphTest {
         )
 
         assertThat(paragraph.charSequence.toString()).isEqualTo(text)
-        assertThat(paragraph.charSequence).hasSpan(StrikethroughSpan::class, 0, text.length)
+        assertThat(paragraph.charSequence).hasSpan(
+            spanClazz = TextDecorationSpan::class,
+            start = 0,
+            end = text.length
+        ) {
+            !it.isUnderlineText && it.isStrikethroughText
+        }
     }
 
     @Test
@@ -180,7 +185,13 @@ class AndroidParagraphTest {
         )
 
         assertThat(paragraph.charSequence.toString()).isEqualTo(text)
-        assertThat(paragraph.charSequence).hasSpan(UnderlineSpan::class, 0, text.length)
+        assertThat(paragraph.charSequence).hasSpan(
+            spanClazz = TextDecorationSpan::class,
+            start = 0,
+            end = text.length
+        ) {
+            it.isUnderlineText && !it.isStrikethroughText
+        }
     }
 
     @Test
@@ -195,7 +206,13 @@ class AndroidParagraphTest {
         )
 
         assertThat(paragraph.charSequence.toString()).isEqualTo(text)
-        assertThat(paragraph.charSequence).hasSpan(StrikethroughSpan::class, 0, "abc".length)
+        assertThat(paragraph.charSequence).hasSpan(
+            spanClazz = TextDecorationSpan::class,
+            start = 0,
+            end = "abc".length
+        ) {
+            !it.isUnderlineText && it.isStrikethroughText
+        }
     }
 
     @Test
@@ -210,7 +227,13 @@ class AndroidParagraphTest {
         )
 
         assertThat(paragraph.charSequence.toString()).isEqualTo(text)
-        assertThat(paragraph.charSequence).hasSpan(UnderlineSpan::class, 0, "abc".length)
+        assertThat(paragraph.charSequence).hasSpan(
+            spanClazz = TextDecorationSpan::class,
+            start = 0,
+            end = "abc".length
+        ) {
+            it.isUnderlineText && !it.isStrikethroughText
+        }
     }
 
     @Test
@@ -227,8 +250,13 @@ class AndroidParagraphTest {
         )
 
         assertThat(paragraph.charSequence.toString()).isEqualTo(text)
-        assertThat(paragraph.charSequence).hasSpan(UnderlineSpan::class, 0, "abc".length)
-        assertThat(paragraph.charSequence).hasSpan(StrikethroughSpan::class, 0, "abc".length)
+        assertThat(paragraph.charSequence).hasSpan(
+            spanClazz = TextDecorationSpan::class,
+            start = 0,
+            end = "abc".length
+        ) {
+            it.isUnderlineText && it.isStrikethroughText
+        }
     }
 
     @Test
@@ -551,7 +579,7 @@ class AndroidParagraphTest {
     }
 
     @Test
-    fun testAnnotatedString_setTextGeometricTransformWithNull_noSpanSet() {
+    fun testAnnotatedString_setDefaultTextGeometricTransform() {
         val text = "abcde"
         val spanStyle = SpanStyle(textGeometricTransform = TextGeometricTransform())
 
@@ -561,8 +589,16 @@ class AndroidParagraphTest {
             width = 100.0f // width is not important
         )
 
-        assertThat(paragraph.charSequence).spans(ScaleXSpan::class).isEmpty()
-        assertThat(paragraph.charSequence).spans(SkewXSpan::class).isEmpty()
+        assertThat(paragraph.charSequence).hasSpan(ScaleXSpan::class, 0, text.length) {
+            it.scaleX == 1.0f
+        }
+        assertThat(paragraph.charSequence).hasSpan(
+            spanClazz = SkewXSpan::class,
+            start = 0,
+            end = text.length
+        ) {
+            it.skewX == 0.0f
+        }
     }
 
     @Test
@@ -584,7 +620,9 @@ class AndroidParagraphTest {
         assertThat(paragraph.charSequence).hasSpan(ScaleXSpan::class, 0, text.length) {
             it.scaleX == scaleX
         }
-        assertThat(paragraph.charSequence).spans(SkewXSpan::class).isEmpty()
+        assertThat(paragraph.charSequence).hasSpan(SkewXSpan::class, 0, text.length) {
+            it.skewX == 0.0f
+        }
     }
 
     @Test
@@ -602,7 +640,9 @@ class AndroidParagraphTest {
         assertThat(paragraph.charSequence).hasSpan(SkewXSpan::class, 0, text.length) {
             it.skewX == skewX
         }
-        assertThat(paragraph.charSequence).spans(ScaleXSpan::class).isEmpty()
+        assertThat(paragraph.charSequence).hasSpan(ScaleXSpan::class, 0, text.length) {
+            it.scaleX == 1.0f
+        }
     }
 
     @Test
