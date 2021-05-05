@@ -56,7 +56,7 @@ fun main() {
                         }
                         Row(modifier = Modifier.fillMaxWidth()) {
                             Button("Refresh", Modifier.weight(1f), { writeDebugInfo() })
-                            Button("Open file", Modifier.weight(1f), { revealDebugOutput() })
+                            Button("Open file", Modifier.weight(1f), { revealDebugOutput(fileName) })
                             Button("Close", Modifier.weight(1f), { window.close() })
                         }
                     }
