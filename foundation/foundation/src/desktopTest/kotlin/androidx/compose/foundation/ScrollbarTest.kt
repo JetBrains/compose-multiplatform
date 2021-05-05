@@ -56,7 +56,6 @@ import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.runBlocking
-import org.jetbrains.skija.Surface
 import org.junit.Assert.assertEquals
 import org.junit.Ignore
 import org.junit.Rule
@@ -67,10 +66,6 @@ import org.junit.Test
 class ScrollbarTest {
     @get:Rule
     val rule = createComposeRule()
-
-    // don't inline, surface controls canvas life time
-    private val surface = Surface.makeRasterN32Premul(100, 100)
-    private val canvas = surface.canvas
 
     @Test
     fun `drag slider to the middle`() {
@@ -85,6 +80,21 @@ class ScrollbarTest {
             }
             rule.awaitIdle()
             rule.onNodeWithTag("box0").assertTopPositionInRootIsEqualTo(-50.dp)
+        }
+    }
+
+    @Test
+    fun `drag slider when it is hidden`() {
+        runBlocking(Dispatchers.Main) {
+            rule.setContent {
+                TestBox(size = 100.dp, childSize = 20.dp, childCount = 1, scrollbarWidth = 10.dp)
+            }
+            rule.awaitIdle()
+            rule.onNodeWithTag("scrollbar").performGesture {
+                instantSwipe(start = Offset(0f, 25f), end = Offset(0f, 50f))
+            }
+            rule.awaitIdle()
+            rule.onNodeWithTag("box0").assertTopPositionInRootIsEqualTo(0.dp)
         }
     }
 

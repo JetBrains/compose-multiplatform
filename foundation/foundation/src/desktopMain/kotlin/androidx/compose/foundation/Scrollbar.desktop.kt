@@ -103,7 +103,7 @@ fun defaultScrollbarStyle() = ScrollbarStyle(
  *     val state = rememberScrollState(0f)
  *
  *     Box(Modifier.fillMaxSize()) {
- *         ScrollableColumn(state = state) {
+ *         Box(modifier = Modifier.verticalScroll(state)) {
  *             ...
  *         }
  *
@@ -135,7 +135,7 @@ fun VerticalScrollbar(
 
 /**
  * Horizontal scrollbar that can be attached to some scrollable
- * component (ScrollableRow, LazyRow) and share common state with it.
+ * component (Modifier.verticalScroll(), LazyRow) and share common state with it.
  *
  * Can be placed independently.
  *
@@ -143,7 +143,7 @@ fun VerticalScrollbar(
  *     val state = rememberScrollState(0f)
  *
  *     Box(Modifier.fillMaxSize()) {
- *         ScrollableRow(state = state) {
+ *         Box(modifier = Modifier.verticalScroll(state)) {
  *             ...
  *         }
  *
@@ -338,7 +338,7 @@ fun rememberScrollbarAdapter(
 }
 
 /**
- * ScrollbarAdapter for ScrollableColumn and ScrollableRow
+ * ScrollbarAdapter for Modifier.verticalScroll and Modifier.horizontalScroll
  *
  * [scrollState] is instance of [ScrollState] which is used by scrollable component
  *
@@ -346,7 +346,7 @@ fun rememberScrollbarAdapter(
  *     val state = rememberScrollState(0f)
  *
  *     Box(Modifier.fillMaxSize()) {
- *         ScrollableColumn(state = state) {
+ *         Box(modifier = Modifier.verticalScroll(state)) {
  *             ...
  *         }
  *
@@ -483,7 +483,12 @@ private class SliderAdapter(
             .coerceAtLeast(minHeight)
             .coerceAtMost(containerSize.toFloat())
 
-    private val scrollScale get() = (containerSize - size) / (contentSize - containerSize)
+    private val scrollScale: Float
+        get() {
+            val extraScrollbarSpace = containerSize - size
+            val extraContentSpace = contentSize - containerSize
+            return if (extraContentSpace == 0f) 1f else extraScrollbarSpace / extraContentSpace
+        }
 
     var position: Float
         get() = scrollScale * adapter.scrollOffset
