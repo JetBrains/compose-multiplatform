@@ -36,12 +36,12 @@ import androidx.compose.foundation.layout.requiredWidth
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.text.BasicText
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
+import androidx.compose.testutils.WithTouchSlop
 import androidx.compose.testutils.assertIsEqualTo
 import androidx.compose.testutils.assertPixels
 import androidx.compose.testutils.runBlockingWithManualClock
@@ -51,8 +51,6 @@ import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
-import androidx.compose.ui.platform.LocalViewConfiguration
-import androidx.compose.ui.platform.ViewConfiguration
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.test.ExperimentalTestApi
 import androidx.compose.ui.test.SemanticsNodeInteraction
@@ -1407,26 +1405,13 @@ internal fun IntegerSubject.isEqualTo(expected: Int, tolerance: Int) {
     isIn(Range.closed(expected - tolerance, expected + tolerance))
 }
 
-internal val TestTouchSlop = 18f
-
-private val FakeViewConfiguration = object : ViewConfiguration {
-    override val longPressTimeoutMillis: Long
-        get() = 500L
-    override val doubleTapTimeoutMillis: Long
-        get() = 300L
-    override val doubleTapMinTimeMillis: Long
-        get() = 40L
-    override val touchSlop: Float
-        get() = TestTouchSlop
-}
+internal const val TestTouchSlop = 18f
 
 internal fun ComposeContentTestRule.setContentWithTestViewConfiguration(
     composable: @Composable () -> Unit
 ) {
     this.setContent {
-        CompositionLocalProvider(LocalViewConfiguration provides FakeViewConfiguration) {
-            composable()
-        }
+        WithTouchSlop(TestTouchSlop, composable)
     }
 }
 
