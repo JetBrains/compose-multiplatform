@@ -16,13 +16,12 @@
 
 package androidx.build.dependencyTracker
 
-import androidx.build.dependencyTracker.AffectedModuleDetector.Companion.CHANGED_PROJECTS_ARG
-import androidx.build.dependencyTracker.AffectedModuleDetector.Companion.DEPENDENT_PROJECTS_ARG
 import androidx.build.dependencyTracker.AffectedModuleDetector.Companion.ENABLE_ARG
 import androidx.build.getDistributionDirectory
 import androidx.build.gitclient.GitClient
 import androidx.build.gitclient.GitClientImpl
 import androidx.build.gradle.isRoot
+import androidx.build.isPresubmitBuild
 import org.gradle.BuildAdapter
 import org.gradle.api.GradleException
 import org.gradle.api.Project
@@ -45,23 +44,15 @@ import org.gradle.api.logging.Logger
  *  DEPENDENT_PROJECTS -- Any projects that have a dependency on any of the projects
  *      in the CHANGED_PROJECTS set.
  *
- *  ALL_AFFECTED_PROJECTS -- The union of CHANGED_PROJECTS and DEPENDENT_PROJECTS,
- *      which encompasses all projects that could possibly break due to the changes.
- *
  *  NONE -- A status to return for a project when it is not supposed to be built.
  */
-enum class ProjectSubset { DEPENDENT_PROJECTS, CHANGED_PROJECTS, ALL_AFFECTED_PROJECTS, NONE }
+enum class ProjectSubset { DEPENDENT_PROJECTS, CHANGED_PROJECTS, NONE }
 
 /**
  * A utility class that can discover which files are changed based on git history.
  *
  * To enable this, you need to pass [ENABLE_ARG] into the build as a command line parameter
  * (-P<name>)
- *
- * Passing [DEPENDENT_PROJECTS_ARG] will result in only DEPENDENT_PROJECTS being returned (see enum)
- * Passing [CHANGED_PROJECTS_ARG] will behave likewise.
- *
- * If neither of those are passed, ALL_AFFECTED_PROJECTS is returned.
  *
  * Currently, it checks git logs to find last merge CL to discover where the anchor CL is.
  *
@@ -100,18 +91,12 @@ abstract class AffectedModuleDetector(
         private const val ROOT_PROP_NAME = "affectedModuleDetector"
         private const val LOG_FILE_NAME = "affected_module_detector_log.txt"
         const val ENABLE_ARG = "androidx.enableAffectedModuleDetection"
-        const val DEPENDENT_PROJECTS_ARG = "androidx.dependentProjects"
-        const val CHANGED_PROJECTS_ARG = "androidx.changedProjects"
         const val BASE_COMMIT_ARG = "androidx.affectedModuleDetector.baseCommit"
+
         @JvmStatic
         fun configure(gradle: Gradle, rootProject: Project) {
             val enabled = rootProject.hasProperty(ENABLE_ARG) &&
                 rootProject.findProperty(ENABLE_ARG) != "false"
-            val subset = when {
-                rootProject.hasProperty(DEPENDENT_PROJECTS_ARG) -> ProjectSubset.DEPENDENT_PROJECTS
-                rootProject.hasProperty(CHANGED_PROJECTS_ARG) -> ProjectSubset.CHANGED_PROJECTS
-                else -> ProjectSubset.ALL_AFFECTED_PROJECTS
-            }
             if (!enabled) {
                 setInstance(rootProject, AcceptAll())
                 return
@@ -136,7 +121,6 @@ abstract class AffectedModuleDetector(
                         rootProject = rootProject,
                         logger = logger,
                         ignoreUnknownProjects = false,
-                        projectSubset = subset,
                         baseCommitOverride = baseCommitOverride
                     ).also {
                         if (!enabled) {
@@ -215,6 +199,7 @@ private class AcceptAll(
         logger?.info("[AcceptAll] wrapper returned $wrappedResult but I'll return true")
         return true
     }
+
     override fun getSubset(project: Project): ProjectSubset {
         val wrappedResult = wrapped?.getSubset(project)
         logger?.info("[AcceptAll] wrapper returned $wrappedResult but I'll return CHANGED_PROJECTS")
@@ -234,10 +219,10 @@ class AffectedModuleDetectorImpl constructor(
     logger: Logger?,
     // used for debugging purposes when we want to ignore non module files
     private val ignoreUnknownProjects: Boolean = false,
-    private val projectSubset: ProjectSubset = ProjectSubset.ALL_AFFECTED_PROJECTS,
     private val cobuiltTestPaths: Set<Set<String>> = COBUILT_TEST_PATHS,
     private val alwaysBuildIfExistsPaths: Set<String> = ALWAYS_BUILD_IF_EXISTS,
     private val injectedGitClient: GitClient? = null,
+    private val isPresubmit: Boolean = isPresubmitBuild(),
     private val baseCommitOverride: String? = null
 ) : AffectedModuleDetector(logger) {
     private val git by lazy {
@@ -257,18 +242,22 @@ class AffectedModuleDetectorImpl constructor(
     }
 
     val affectedProjects by lazy {
-        findAffectedProjects()
+        changedProjects + dependentProjects
     }
 
-    private val changedProjects by lazy {
+    val changedProjects by lazy {
         findChangedProjects()
     }
 
-    private val dependentProjects by lazy {
+    val dependentProjects by lazy {
         findDependentProjects()
     }
 
     private var unknownFiles: MutableSet<String> = mutableSetOf()
+
+    val buildAll by lazy {
+        shouldBuildAll()
+    }
 
     private val cobuiltTestProjects by lazy {
         lookupProjectSetsFromPaths(cobuiltTestPaths)
@@ -281,20 +270,16 @@ class AffectedModuleDetectorImpl constructor(
         alwaysBuildIfExistsPaths.map { path -> rootProject.findProject(path) }.filterNotNull()
     }
 
-    /**
-     * Gets set to true when there are unknown files in the build. There
-     * are two cases when we want to build all by default, even though the
-     * real detector is in use; in presubmit, or in postsubmit. We know the
-     * build is postsubmit when there are no files changed. Thus, we can
-     * change the behavior of presubmit builds based on this flag.
-     *
-     * In this case, we return a different ProjectSubset in presubmit vs.
-     * postsubmit, to get the desired test behaviors.
-     */
-    private var isPresubmit: Boolean = false
+    private val buildContainsNonProjectFileChanges by lazy {
+        unknownFiles.isNotEmpty()
+    }
 
     override fun shouldInclude(project: Project): Boolean {
-        return (project.isRoot || affectedProjects.contains(project))
+        return if (project.isRoot || buildAll) {
+            true
+        } else {
+            affectedProjects.contains(project)
+        }
     }
 
     override fun getSubset(project: Project): ProjectSubset {
@@ -302,13 +287,10 @@ class AffectedModuleDetectorImpl constructor(
             changedProjects.contains(project) -> {
                 ProjectSubset.CHANGED_PROJECTS
             }
-            dependentProjects.contains(project) || isPresubmit -> {
+            dependentProjects.contains(project) ||
+                isPresubmit ||
+                buildContainsNonProjectFileChanges -> {
                 ProjectSubset.DEPENDENT_PROJECTS
-            }
-            // This should only happen in situations where everything gets built
-            // and there are no changed files (aka postsubmit)
-            affectedProjects.contains(project) -> {
-                ProjectSubset.ALL_AFFECTED_PROJECTS
             }
             else -> {
                 ProjectSubset.NONE
@@ -367,46 +349,25 @@ class AffectedModuleDetectorImpl constructor(
     }
 
     /**
-     * By default, finds all modules that are affected by current changes
-     *
-     * With param dependentProjects, finds only modules dependent on directly changed modules
-     *
-     * With param changedProjects, finds only directly changed modules
-     *
-     * If it cannot determine the containing module for a file (e.g. buildSrc or root), it
-     * defaults to all projects unless [ignoreUnknownProjects] is set to true. However,
-     * with param changedProjects, it only returns the placeholder-test (see companion object
-     * below).
-     * This is because we run all tests including @large on the changed set. So when we must
-     * build all, we only want to run @small and @medium tests in the test runner for
-     * DEPENDENT_PROJECTS.
-     *
-     * Also detects modules whose tests are codependent at runtime.
+     * Determines whether we are in a state where we want to build all projects, instead of
+     * only affected ones. This occurs for buildSrc changes, as well as in situations where
+     * we determine there are no changes within our repository (e.g. prebuilts change only)
      */
-    private fun findAffectedProjects(): Set<Project> {
-        // In this case we don't care about any of the logic below, we're only concerned with
-        // running the changed projects in this test runner
-        if (projectSubset == ProjectSubset.CHANGED_PROJECTS) {
-            return changedProjects
-        }
+    private fun shouldBuildAll(): Boolean {
 
-        var buildAll = false
-
+        var shouldBuildAll = false
         // Should only trigger if there are no changedFiles
         if (changedProjects.size == alwaysBuild.size && unknownFiles.isEmpty()) {
-            buildAll = true
+            shouldBuildAll = true
         } else if (unknownFiles.isNotEmpty()) {
-            buildAll = true
-            isPresubmit = true
+            shouldBuildAll = true
         }
         logger?.info(
             "unknownFiles: $unknownFiles, changedProjects: $changedProjects, buildAll: " +
-                "$buildAll"
+                "$shouldBuildAll"
         )
 
-        // If we're in a buildAll state, we return allProjects unless it's the changed target,
-        // Since the changed target runs all tests and we don't want 3+ hour presubmit runs
-        if (buildAll) {
+        if (shouldBuildAll) {
             logger?.info("Building all projects")
             if (unknownFiles.isEmpty()) {
                 logger?.info("because no changed files were detected")
@@ -419,18 +380,8 @@ class AffectedModuleDetectorImpl constructor(
                     """.trimIndent()
                 )
             }
-            when (projectSubset) {
-                ProjectSubset.DEPENDENT_PROJECTS -> return allProjects
-                ProjectSubset.ALL_AFFECTED_PROJECTS -> return allProjects
-                else -> {}
-            }
         }
-
-        return when (projectSubset) {
-            ProjectSubset.ALL_AFFECTED_PROJECTS -> changedProjects + dependentProjects
-            ProjectSubset.CHANGED_PROJECTS -> changedProjects
-            else -> dependentProjects
-        }
+        return shouldBuildAll
     }
 
     private fun lookupProjectSetsFromPaths(allSets: Set<Set<String>>): Set<Set<Project>> {
