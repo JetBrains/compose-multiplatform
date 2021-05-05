@@ -27,8 +27,6 @@ import android.text.style.LocaleSpan
 import android.text.style.MetricAffectingSpan
 import android.text.style.RelativeSizeSpan
 import android.text.style.ScaleXSpan
-import android.text.style.StrikethroughSpan
-import android.text.style.UnderlineSpan
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shadow
 import androidx.compose.ui.graphics.isSpecified
@@ -44,6 +42,7 @@ import androidx.compose.ui.text.android.style.LetterSpacingSpanPx
 import androidx.compose.ui.text.android.style.LineHeightSpan
 import androidx.compose.ui.text.android.style.ShadowSpan
 import androidx.compose.ui.text.android.style.SkewXSpan
+import androidx.compose.ui.text.android.style.TextDecorationSpan
 import androidx.compose.ui.text.android.style.TypefaceSpan
 import androidx.compose.ui.text.fastFilter
 import androidx.compose.ui.text.font.FontStyle
@@ -393,12 +392,8 @@ private fun Spannable.setGeometricTransform(
     end: Int
 ) {
     textGeometricTransform?.let {
-        if (it.scaleX != 1.0f) {
-            setSpan(ScaleXSpan(it.scaleX), start, end)
-        }
-        if (it.skewX != 0f) {
-            setSpan(SkewXSpan(it.skewX), start, end)
-        }
+        setSpan(ScaleXSpan(it.scaleX), start, end)
+        setSpan(SkewXSpan(it.skewX), start, end)
     }
 }
 
@@ -427,14 +422,14 @@ internal fun Spannable.setFontSize(fontSize: TextUnit, density: Density, start: 
     }
 }
 
+@OptIn(InternalPlatformTextApi::class)
 internal fun Spannable.setTextDecoration(textDecoration: TextDecoration?, start: Int, end: Int) {
     textDecoration?.let {
-        if (TextDecoration.Underline in it) {
-            setSpan(UnderlineSpan(), start, end)
-        }
-        if (TextDecoration.LineThrough in it) {
-            setSpan(StrikethroughSpan(), start, end)
-        }
+        val textDecorationSpan = TextDecorationSpan(
+            isUnderlineText = TextDecoration.Underline in it,
+            isStrikethroughText = TextDecoration.LineThrough in it
+        )
+        setSpan(textDecorationSpan, start, end)
     }
 }
 
