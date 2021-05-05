@@ -26,12 +26,15 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.async
 
-private val fileName = "debug-info.txt"
+private val fileName = "${System.getProperty("user.home")}/.debug-writer/debug-info.txt"
 private var output by mutableStateOf("")
-private var isReady by mutableStateOf(false)
+private var isReady by mutableStateOf(true)
 
 fun main() {
-    enableDebugWritingTo(fileName)
+    val result = enableDebugWritingTo(fileName)
+    if (!result) {
+        output = "Failed to cteate file: $fileName"
+    }
 
     Window(
         title = "DebugWriter",
@@ -56,14 +59,25 @@ fun main() {
                         }
                         Row(modifier = Modifier.fillMaxWidth()) {
                             Button("Refresh", Modifier.weight(1f), { writeDebugInfo() })
-                            Button("Open file", Modifier.weight(1f), { revealDebugOutput(fileName) })
+                            Button(
+                                text = "Open file",
+                                modifier = Modifier.weight(1f),
+                                action = {
+                                    if(!revealDebugOutput(fileName)) {
+                                        output = "Failed to open file: $fileName"
+                                    }
+                                }
+                            )
                             Button("Close", Modifier.weight(1f), { window.close() })
                         }
                     }
                 }
             }
         }
-        writeDebugInfo()
+
+        if (result) {
+            writeDebugInfo()
+        }
     }
 }
 
@@ -72,6 +86,9 @@ private fun writeDebugInfo() {
     GlobalScope.async {
         delay(2000L)
         isReady = true
-        output = readDebugOutput(fileName)
+        val result = readDebugOutput(fileName)
+        output = if (result.isEmpty())
+                "Something went wrong and $fileName is empty."
+            else result
     }
 }
