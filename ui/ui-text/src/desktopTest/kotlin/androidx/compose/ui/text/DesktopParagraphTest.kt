@@ -18,11 +18,11 @@ package androidx.compose.ui.text
 
 import androidx.compose.ui.geometry.Rect
 import androidx.compose.ui.test.junit4.createComposeRule
+import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.font.FontFamily
-import androidx.compose.ui.text.platform.FontLoader
 import androidx.compose.ui.text.platform.Font
+import androidx.compose.ui.text.platform.FontLoader
 import androidx.compose.ui.text.style.TextDirection
 import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.sp
@@ -72,7 +72,7 @@ class DesktopParagraphTest {
 
     @Test
     fun getBoundingBox_multicodepoints() {
-        assumeLinux()
+        assumeTrue(isLinux)
         with(defaultDensity) {
             val text = "h\uD83E\uDDD1\uD83C\uDFFF\u200D\uD83E\uDDB0"
             val fontSize = 50.sp
@@ -239,9 +239,5 @@ class DesktopParagraphTest {
             density = density ?: defaultDensity,
             resourceLoader = fontLoader
         )
-    }
-
-    private fun assumeLinux() {
-        assumeTrue(System.getProperty("os.name").startsWith("Linux"))
     }
 }
