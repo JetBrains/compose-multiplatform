@@ -37,7 +37,7 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.geometry.Offset
-import androidx.compose.ui.graphics.Paint
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.drawscope.drawIntoCanvas
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.input.pointer.pointerInput
@@ -154,7 +154,7 @@ internal fun CoreText(
         placeholders = placeholders
     )
     state.onTextLayout = onTextLayout
-    state.selectionPaint.color = selectionBackgroundColor
+    state.selectionBackgroundColor = selectionBackgroundColor
 
     val controller = remember { TextController(state) }
     controller.update(selectionRegistrar)
@@ -491,12 +491,9 @@ internal class TextController(val state: TextState) {
     @OptIn(InternalFoundationTextApi::class)
     private fun Modifier.drawTextAndSelectionBehind(): Modifier =
         this.graphicsLayer().drawBehind {
-            drawIntoCanvas { canvas ->
-                val textLayoutResult = state.layoutResult
-                val selectionPaint = state.selectionPaint
+            state.layoutResult?.let {
                 val selection = selectionRegistrar?.subselections?.get(state.selectableId)
 
-                if (textLayoutResult == null) return@drawIntoCanvas
                 if (selection != null) {
                     val start = if (!selection.handlesCrossed) {
                         selection.start.offset
@@ -508,15 +505,15 @@ internal class TextController(val state: TextState) {
                     } else {
                         selection.start.offset
                     }
-                    TextDelegate.paintBackground(
-                        start,
-                        end,
-                        selectionPaint,
-                        canvas,
-                        textLayoutResult
-                    )
+
+                    if (start != end) {
+                        val selectionPath = it.multiParagraph.getPathForRange(start, end)
+                        drawPath(selectionPath, state.selectionBackgroundColor)
+                    }
                 }
-                TextDelegate.paint(canvas, textLayoutResult)
+                drawIntoCanvas { canvas ->
+                    TextDelegate.paint(canvas, it)
+                }
             }
         }
 }
@@ -542,8 +539,8 @@ internal class TextState(
     /** The global position calculated during the last notifyPosition callback */
     var previousGlobalPosition: Offset = Offset.Zero
 
-    /** The paint used to draw highlight background for selected text. */
-    val selectionPaint: Paint = Paint()
+    /** The background color of selection */
+    var selectionBackgroundColor: Color = Color.Unspecified
 }
 
 /**
