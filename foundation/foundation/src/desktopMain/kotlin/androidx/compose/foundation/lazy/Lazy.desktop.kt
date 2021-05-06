@@ -19,3 +19,13 @@ package androidx.compose.foundation.lazy
 internal actual fun getDefaultLazyKeyFor(index: Int): Any = DefaultLazyKey(index)
 
 private data class DefaultLazyKey(private val index: Int)
+
+@Composable
+internal actual fun LazyListPrefetcher(
+    lazyListState: LazyListState,
+    stateOfItemsProvider: State<LazyListItemsProvider>,
+    itemContentFactory: LazyListItemContentFactory,
+    subcomposeLayoutState: SubcomposeLayoutState
+) {
+    // there is no prefetch implementation on desktop yet
+}
