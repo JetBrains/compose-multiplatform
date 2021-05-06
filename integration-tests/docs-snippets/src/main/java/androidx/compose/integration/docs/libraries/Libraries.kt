@@ -44,8 +44,7 @@ import androidx.navigation.NavBackStackEntry
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
-import androidx.navigation.compose.getBackStackEntry
-import androidx.navigation.compose.navigation
+import androidx.navigation.navigation
 import kotlinx.coroutines.flow.Flow
 
 /**
