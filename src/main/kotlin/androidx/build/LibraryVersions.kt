@@ -69,7 +69,7 @@ object LibraryVersions {
     val FUTURES = Version("1.2.0-alpha01")
     val GRIDLAYOUT = Version("1.1.0-alpha01")
     val HEIFWRITER = Version("1.1.0-alpha02")
-    val HILT = Version("1.0.0-beta01")
+    val HILT = Version("1.1.0-alpha01")
     val HILT_NAVIGATION_COMPOSE = Version("1.0.0-alpha02")
     val INSPECTION = Version("1.0.0")
     val INTERPOLATOR = Version("1.1.0-alpha01")
