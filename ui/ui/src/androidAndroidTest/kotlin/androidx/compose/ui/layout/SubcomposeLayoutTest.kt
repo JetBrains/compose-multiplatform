@@ -20,6 +20,7 @@ import android.os.Build
 import android.widget.FrameLayout
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.requiredSize
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
@@ -66,6 +67,7 @@ class SubcomposeLayoutTest {
 
     @get:Rule
     val rule = createAndroidComposeRule<TestActivity>()
+
     @get:Rule
     val excessiveAssertions = AndroidOwnerExtraAssertionsRule()
 
@@ -554,6 +556,271 @@ class SubcomposeLayoutTest {
             "state was used after reattaching view",
             stateUsedLatch.await(1, TimeUnit.SECONDS)
         )
+    }
+
+    @Test
+    fun precompose() {
+        val addSlot = mutableStateOf(false)
+        var composingCounter = 0
+        var composedDuringMeasure = false
+        val state = SubcomposeLayoutState()
+        val content: @Composable () -> Unit = {
+            composingCounter++
+        }
+
+        rule.setContent {
+            SubcomposeLayout(state) {
+                if (addSlot.value) {
+                    composedDuringMeasure = true
+                    subcompose(Unit, content)
+                }
+                layout(10, 10) {}
+            }
+        }
+
+        rule.runOnIdle {
+            assertThat(composingCounter).isEqualTo(0)
+            state.precompose(Unit, content)
+        }
+
+        rule.runOnIdle {
+            assertThat(composingCounter).isEqualTo(1)
+
+            assertThat(composedDuringMeasure).isFalse()
+            addSlot.value = true
+        }
+
+        rule.runOnIdle {
+            assertThat(composedDuringMeasure).isTrue()
+            assertThat(composingCounter).isEqualTo(1)
+        }
+    }
+
+    @Test
+    fun disposePrecomposedItem() {
+        var composed = false
+        var disposed = false
+        val state = SubcomposeLayoutState()
+
+        rule.setContent {
+            SubcomposeLayout(state) {
+                layout(10, 10) {}
+            }
+        }
+
+        val slot = rule.runOnIdle {
+            state.precompose(Unit) {
+                DisposableEffect(Unit) {
+                    composed = true
+                    onDispose {
+                        disposed = true
+                    }
+                }
+            }
+        }
+
+        rule.runOnIdle {
+            assertThat(composed).isTrue()
+            assertThat(disposed).isFalse()
+
+            slot.dispose()
+        }
+
+        rule.runOnIdle {
+            assertThat(disposed).isTrue()
+        }
+    }
+
+    @Test
+    fun composeItemRegularlyAfterDisposingPrecomposedItem() {
+        val addSlot = mutableStateOf(false)
+        var composingCounter = 0
+        var enterCounter = 0
+        var exitCounter = 0
+        val state = SubcomposeLayoutState()
+        val content: @Composable () -> Unit = @Composable {
+            composingCounter++
+            DisposableEffect(Unit) {
+                enterCounter++
+                onDispose {
+                    exitCounter++
+                }
+            }
+        }
+
+        rule.setContent {
+            SubcomposeLayout(state) {
+                if (addSlot.value) {
+                    subcompose(Unit, content)
+                }
+                layout(10, 10) {}
+            }
+        }
+
+        val slot = rule.runOnIdle {
+            state.precompose(Unit, content)
+        }
+
+        rule.runOnIdle {
+            slot.dispose()
+        }
+
+        rule.runOnIdle {
+            assertThat(composingCounter).isEqualTo(1)
+            assertThat(enterCounter).isEqualTo(1)
+            assertThat(exitCounter).isEqualTo(1)
+
+            addSlot.value = true
+        }
+
+        rule.runOnIdle {
+            assertThat(composingCounter).isEqualTo(2)
+            assertThat(enterCounter).isEqualTo(2)
+            assertThat(exitCounter).isEqualTo(1)
+        }
+    }
+
+    @Test
+    fun precomposeTwoItems() {
+        val addSlots = mutableStateOf(false)
+        var composing1Counter = 0
+        var composing2Counter = 0
+        val state = SubcomposeLayoutState()
+        val content1: @Composable () -> Unit = {
+            composing1Counter++
+        }
+        val content2: @Composable () -> Unit = {
+            composing2Counter++
+        }
+
+        rule.setContent {
+            SubcomposeLayout(state) {
+                subcompose(0) { }
+                if (addSlots.value) {
+                    subcompose(1, content1)
+                    subcompose(2, content2)
+                }
+                subcompose(3) { }
+                layout(10, 10) {}
+            }
+        }
+
+        rule.runOnIdle {
+            assertThat(composing1Counter).isEqualTo(0)
+            assertThat(composing2Counter).isEqualTo(0)
+            state.precompose(1, content1)
+            state.precompose(2, content2)
+        }
+
+        rule.runOnIdle {
+            assertThat(composing1Counter).isEqualTo(1)
+            assertThat(composing2Counter).isEqualTo(1)
+            addSlots.value = true
+        }
+
+        rule.runOnIdle {
+            assertThat(composing1Counter).isEqualTo(1)
+            assertThat(composing2Counter).isEqualTo(1)
+        }
+    }
+
+    @Test
+    fun precomposedItemDisposedWhenSubcomposeLayoutIsDisposed() {
+        val emitLayout = mutableStateOf(true)
+        var enterCounter = 0
+        var exitCounter = 0
+        val state = SubcomposeLayoutState()
+        val content: @Composable () -> Unit = @Composable {
+            DisposableEffect(Unit) {
+                enterCounter++
+                onDispose {
+                    exitCounter++
+                }
+            }
+        }
+
+        rule.setContent {
+            if (emitLayout.value) {
+                SubcomposeLayout(state) {
+                    layout(10, 10) {}
+                }
+            }
+        }
+
+        rule.runOnIdle {
+            state.precompose(Unit, content)
+        }
+
+        rule.runOnIdle {
+            assertThat(enterCounter).isEqualTo(1)
+            assertThat(exitCounter).isEqualTo(0)
+            emitLayout.value = false
+        }
+
+        rule.runOnIdle {
+            assertThat(exitCounter).isEqualTo(1)
+        }
+    }
+
+    @Test
+    fun precomposeIsNotTriggeringParentRemeasure() {
+        val state = SubcomposeLayoutState()
+
+        var measureCount = 0
+        var layoutCount = 0
+
+        rule.setContent {
+            SubcomposeLayout(state) {
+                measureCount++
+                layout(10, 10) {
+                    layoutCount++
+                }
+            }
+        }
+
+        rule.runOnIdle {
+            assertThat(measureCount).isEqualTo(1)
+            assertThat(layoutCount).isEqualTo(1)
+            state.precompose(Unit) {
+                Box(Modifier.fillMaxSize())
+            }
+        }
+
+        rule.runOnIdle {
+            assertThat(measureCount).isEqualTo(1)
+            assertThat(layoutCount).isEqualTo(1)
+        }
+    }
+
+    @Test
+    fun precomposedItemDisposalIsNotTriggeringParentRemeasure() {
+        val state = SubcomposeLayoutState()
+
+        var measureCount = 0
+        var layoutCount = 0
+
+        rule.setContent {
+            SubcomposeLayout(state) {
+                measureCount++
+                layout(10, 10) {
+                    layoutCount++
+                }
+            }
+        }
+
+        rule.runOnIdle {
+            assertThat(measureCount).isEqualTo(1)
+            assertThat(layoutCount).isEqualTo(1)
+            val handle = state.precompose(Unit) {
+                Box(Modifier.fillMaxSize())
+            }
+            handle.dispose()
+        }
+
+        rule.runOnIdle {
+            assertThat(measureCount).isEqualTo(1)
+            assertThat(layoutCount).isEqualTo(1)
+        }
     }
 }
 
