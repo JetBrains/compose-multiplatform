@@ -1249,92 +1249,6 @@ internal class ComposerImpl(
         collectParameterInformation = true
     }
 
-    /**
-     * Helper for collecting remember observers for later strictly ordered dispatch.
-     *
-     * This includes support for the deprecated [RememberObserver] which should be
-     * removed with it.
-     */
-    private class RememberEventDispatcher(
-        private val abandoning: MutableSet<RememberObserver>
-    ) : RememberManager {
-        private val remembering = mutableListOf<RememberObserver>()
-        private val forgetting = mutableListOf<RememberObserver>()
-        private val sideEffects = mutableListOf<() -> Unit>()
-
-        override fun remembering(instance: RememberObserver) {
-            forgetting.lastIndexOf(instance).let { index ->
-                if (index >= 0) {
-                    forgetting.removeAt(index)
-                    abandoning.remove(instance)
-                } else {
-                    remembering.add(instance)
-                }
-            }
-        }
-
-        override fun forgetting(instance: RememberObserver) {
-            remembering.lastIndexOf(instance).let { index ->
-                if (index >= 0) {
-                    remembering.removeAt(index)
-                    abandoning.remove(instance)
-                } else {
-                    forgetting.add(instance)
-                }
-            }
-        }
-
-        override fun sideEffect(effect: () -> Unit) {
-            sideEffects += effect
-        }
-
-        val hasEffects: Boolean
-            get() = sideEffects.isNotEmpty() ||
-                forgetting.isNotEmpty() ||
-                remembering.isNotEmpty()
-
-        fun dispatchRememberObservers() {
-            // Send forgets
-            if (forgetting.isNotEmpty()) {
-                for (index in forgetting.indices.reversed()) {
-                    val instance = forgetting[index]
-                    if (instance !in abandoning)
-                        instance.onForgotten()
-                }
-            }
-
-            // Send remembers
-            if (remembering.isNotEmpty()) {
-                remembering.fastForEach { instance ->
-                    abandoning.remove(instance)
-                    instance.onRemembered()
-                }
-            }
-        }
-
-        fun dispatchSideEffects() {
-            if (sideEffects.isNotEmpty()) {
-                sideEffects.fastForEach { sideEffect ->
-                    sideEffect()
-                }
-                sideEffects.clear()
-            }
-        }
-
-        fun dispatchAbandons() {
-            if (abandoning.isNotEmpty()) {
-                trace("Compose:dispatchAbandons") {
-                    val iterator = abandoning.iterator()
-                    while (iterator.hasNext()) {
-                        val instance = iterator.next()
-                        iterator.remove()
-                        instance.onAbandoned()
-                    }
-                }
-            }
-        }
-    }
-
     @OptIn(InternalComposeApi::class)
     internal fun dispose() {
         trace("Compose:Composer.dispose") {
@@ -1343,17 +1257,6 @@ internal class ComposerImpl(
             invalidations.clear()
             changes.clear()
             applier.clear()
-            if (slotTable.groupsSize > 0) {
-                val manager = RememberEventDispatcher(abandonSet)
-                slotTable.write { writer ->
-                    writer.removeCurrentGroup(manager)
-                }
-                providerUpdates.clear()
-                applier.clear()
-                manager.dispatchRememberObservers()
-            } else {
-                applier.clear()
-            }
             isDisposed = true
         }
     }
@@ -3229,7 +3132,7 @@ inline class SkippableUpdater<T> constructor(
     }
 }
 
-private fun SlotWriter.removeCurrentGroup(rememberManager: RememberManager) {
+internal fun SlotWriter.removeCurrentGroup(rememberManager: RememberManager) {
     // Notify the lifecycle manager of any observers leaving the slot table
     // The notification order should ensure that listeners are notified of leaving
     // in opposite order that they are notified of entering.
