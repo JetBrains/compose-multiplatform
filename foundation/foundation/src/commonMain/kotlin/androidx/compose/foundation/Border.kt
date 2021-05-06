@@ -36,8 +36,7 @@ import androidx.compose.ui.platform.debugInspectorInfo
 import androidx.compose.ui.unit.Dp
 
 /**
- * Modify element to add border with appearance specified with a [border] and a [shape], pad the
- * content by the [BorderStroke.width] and clip it.
+ * Modify element to add border with appearance specified with a [border] and a [shape] and clip it.
  *
  * @sample androidx.compose.foundation.samples.BorderSample()
  *
@@ -48,8 +47,8 @@ fun Modifier.border(border: BorderStroke, shape: Shape = RectangleShape) =
     border(width = border.width, brush = border.brush, shape = shape)
 
 /**
- * Returns a [Modifier] that adds border with appearance specified with [width], [color] and a
- * [shape], pads the content by the [width] and clips it.
+ * Modify element to add border with appearance specified with a [width], a [color] and a [shape]
+ * and clip it.
  *
  * @sample androidx.compose.foundation.samples.BorderSampleWithDataClass()
  *
@@ -61,8 +60,8 @@ fun Modifier.border(width: Dp, color: Color, shape: Shape = RectangleShape) =
     border(width, SolidColor(color), shape)
 
 /**
- * Returns a [Modifier] that adds border with appearance specified with [width], [brush] and a
- * [shape], pads the content by the [width] and clips it.
+ * Modify element to add border with appearance specified with a [width], a [brush] and a [shape]
+ * and clip it.
  *
  * @sample androidx.compose.foundation.samples.BorderSampleWithBrush()
  *
