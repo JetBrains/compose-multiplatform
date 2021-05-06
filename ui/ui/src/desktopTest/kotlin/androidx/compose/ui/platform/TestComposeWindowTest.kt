@@ -23,6 +23,9 @@ import androidx.compose.material.Icon
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AccountBox
 import androidx.compose.ui.Modifier
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.swing.Swing
 import org.junit.Test
 
 class TestComposeWindowTest {
@@ -39,6 +42,14 @@ class TestComposeWindowTest {
                     )
                 }
             }
+        }
+    }
+
+    @Test(timeout = 5000)
+    fun `disposing TestComposeWindow should not cancel coroutineContext's Job`() {
+        runBlocking(Dispatchers.Swing) {
+            val window = TestComposeWindow(100, 100, coroutineContext = coroutineContext)
+            window.dispose()
         }
     }
 }
