@@ -459,7 +459,16 @@ internal class CompositionImpl(
             if (!disposed) {
                 disposed = true
                 composable = {}
+                if (slotTable.groupsSize > 0) {
+                    val manager = RememberEventDispatcher(abandonSet)
+                    slotTable.write { writer ->
+                        writer.removeCurrentGroup(manager)
+                    }
+                    applier.clear()
+                    manager.dispatchRememberObservers()
+                }
                 composer.dispose()
+                parent.unregisterComposition(this)
                 parent.unregisterComposition(this)
             }
         }
