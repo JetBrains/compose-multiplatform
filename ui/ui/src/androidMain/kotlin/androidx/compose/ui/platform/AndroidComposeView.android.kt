@@ -19,7 +19,6 @@ package androidx.compose.ui.platform
 import android.annotation.SuppressLint
 import android.content.Context
 import android.content.res.Configuration
-import android.graphics.Matrix
 import android.graphics.Rect
 import android.os.Build
 import android.os.Looper
@@ -66,6 +65,8 @@ import androidx.compose.ui.focus.FocusManagerImpl
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Canvas
 import androidx.compose.ui.graphics.CanvasHolder
+import androidx.compose.ui.graphics.Matrix
+import androidx.compose.ui.graphics.setFrom
 import androidx.compose.ui.hapticfeedback.AndroidHapticFeedback
 import androidx.compose.ui.hapticfeedback.HapticFeedback
 import androidx.compose.ui.input.key.Key.Companion.Back
@@ -279,9 +280,9 @@ internal class AndroidComposeView(context: Context) :
     private var globalPosition: IntOffset = IntOffset.Zero
 
     private val tmpPositionArray = intArrayOf(0, 0)
-    private val tmpOffsetArray = floatArrayOf(0f, 0f)
     private val viewToWindowMatrix = Matrix()
     private val windowToViewMatrix = Matrix()
+    private val tmpCalculationMatrix = Matrix()
     private var lastMatrixRecalculationAnimationTime = -1L
 
     /**
@@ -796,23 +797,18 @@ internal class AndroidComposeView(context: Context) :
 
     override fun localToScreen(localPosition: Offset): Offset {
         recalculateWindowPosition()
-        val points = tmpOffsetArray
-        points[0] = localPosition.x
-        points[1] = localPosition.y
-        viewToWindowMatrix.mapPoints(points)
+        val local = viewToWindowMatrix.map(localPosition)
         return Offset(
-            points[0] + windowPosition.x,
-            points[1] + windowPosition.y
+            local.x + windowPosition.x,
+            local.y + windowPosition.y
         )
     }
 
     override fun screenToLocal(positionOnScreen: Offset): Offset {
         recalculateWindowPosition()
-        val points = tmpOffsetArray
-        points[0] = positionOnScreen.x - windowPosition.x
-        points[1] = positionOnScreen.y - windowPosition.y
-        windowToViewMatrix.mapPoints(points)
-        return Offset(points[0], points[1])
+        val x = positionOnScreen.x - windowPosition.x
+        val y = positionOnScreen.y - windowPosition.y
+        return windowToViewMatrix.map(Offset(x, y))
     }
 
     private fun recalculateWindowPosition() {
@@ -839,7 +835,7 @@ internal class AndroidComposeView(context: Context) :
     private fun recalculateWindowViewTransforms() {
         viewToWindowMatrix.reset()
         transformMatrixToWindow(this, viewToWindowMatrix)
-        viewToWindowMatrix.invert(windowToViewMatrix)
+        viewToWindowMatrix.invertTo(windowToViewMatrix)
     }
 
     override fun onCheckIsTextEditor(): Boolean = textInputServiceAndroid.isEditorFocused()
@@ -849,20 +845,12 @@ internal class AndroidComposeView(context: Context) :
 
     override fun calculateLocalPosition(positionInWindow: Offset): Offset {
         recalculateWindowPosition()
-        val points = tmpOffsetArray
-        points[0] = positionInWindow.x
-        points[1] = positionInWindow.y
-        windowToViewMatrix.mapPoints(points)
-        return Offset(points[0], points[1])
+        return windowToViewMatrix.map(positionInWindow)
     }
 
     override fun calculatePositionInWindow(localPosition: Offset): Offset {
         recalculateWindowPosition()
-        val points = tmpOffsetArray
-        points[0] = localPosition.x
-        points[1] = localPosition.y
-        viewToWindowMatrix.mapPoints(points)
-        return Offset(points[0], points[1])
+        return viewToWindowMatrix.map(localPosition)
     }
 
     override fun onConfigurationChanged(newConfig: Configuration) {
@@ -922,6 +910,7 @@ internal class AndroidComposeView(context: Context) :
      * Q and later, AccessibilityInteractionController#findViewByAccessibilityId uses
      * AccessibilityNodeIdManager and findViewByAccessibilityIdTraversal is only used by autofill.
      */
+    @Suppress("unused")
     fun findViewByAccessibilityIdTraversal(accessibilityId: Int): View? {
         try {
             // AccessibilityInteractionController#findViewByAccessibilityId doesn't call this
@@ -963,6 +952,24 @@ internal class AndroidComposeView(context: Context) :
         if (!viewMatrix.isIdentity) {
             matrix.preConcat(viewMatrix)
         }
+    }
+
+    /**
+     * Like [android.graphics.Matrix.preConcat], for a Compose [Matrix] that accepts an [other]
+     * [android.graphics.Matrix].
+     */
+    private fun Matrix.preConcat(other: android.graphics.Matrix) {
+        tmpCalculationMatrix.setFrom(other)
+        preTransform(tmpCalculationMatrix)
+    }
+
+    /**
+     * Like [android.graphics.Matrix.preTranslate], for a Compose [Matrix]
+     */
+    private fun Matrix.preTranslate(x: Float, y: Float) {
+        tmpCalculationMatrix.reset()
+        tmpCalculationMatrix.translate(x, y)
+        preTransform(tmpCalculationMatrix)
     }
 
     companion object {
@@ -1040,4 +1047,106 @@ internal object AndroidComposeViewVerificationHelperMethods {
         // not to add the default focus highlight to the whole compose view
         view.defaultFocusHighlightEnabled = defaultFocusHighlightEnabled
     }
+}
+
+/**
+ * Sets this [Matrix] to be the result of this * [other]
+ */
+private fun Matrix.preTransform(other: Matrix) {
+    val v00 = dot(other, 0, this, 0)
+    val v01 = dot(other, 0, this, 1)
+    val v02 = dot(other, 0, this, 2)
+    val v03 = dot(other, 0, this, 3)
+    val v10 = dot(other, 1, this, 0)
+    val v11 = dot(other, 1, this, 1)
+    val v12 = dot(other, 1, this, 2)
+    val v13 = dot(other, 1, this, 3)
+    val v20 = dot(other, 2, this, 0)
+    val v21 = dot(other, 2, this, 1)
+    val v22 = dot(other, 2, this, 2)
+    val v23 = dot(other, 2, this, 3)
+    val v30 = dot(other, 3, this, 0)
+    val v31 = dot(other, 3, this, 1)
+    val v32 = dot(other, 3, this, 2)
+    val v33 = dot(other, 3, this, 3)
+    this[0, 0] = v00
+    this[0, 1] = v01
+    this[0, 2] = v02
+    this[0, 3] = v03
+    this[1, 0] = v10
+    this[1, 1] = v11
+    this[1, 2] = v12
+    this[1, 3] = v13
+    this[2, 0] = v20
+    this[2, 1] = v21
+    this[2, 2] = v22
+    this[2, 3] = v23
+    this[3, 0] = v30
+    this[3, 1] = v31
+    this[3, 2] = v32
+    this[3, 3] = v33
+}
+
+// Taken from Matrix.kt
+private fun dot(m1: Matrix, row: Int, m2: Matrix, column: Int): Float {
+    return m1[row, 0] * m2[0, column] +
+        m1[row, 1] * m2[1, column] +
+        m1[row, 2] * m2[2, column] +
+        m1[row, 3] * m2[3, column]
+}
+
+/**
+ * Sets [other] to be the inverse of this
+ */
+private fun Matrix.invertTo(other: Matrix) {
+    val a00 = this[0, 0]
+    val a01 = this[0, 1]
+    val a02 = this[0, 2]
+    val a03 = this[0, 3]
+    val a10 = this[1, 0]
+    val a11 = this[1, 1]
+    val a12 = this[1, 2]
+    val a13 = this[1, 3]
+    val a20 = this[2, 0]
+    val a21 = this[2, 1]
+    val a22 = this[2, 2]
+    val a23 = this[2, 3]
+    val a30 = this[3, 0]
+    val a31 = this[3, 1]
+    val a32 = this[3, 2]
+    val a33 = this[3, 3]
+    val b00 = a00 * a11 - a01 * a10
+    val b01 = a00 * a12 - a02 * a10
+    val b02 = a00 * a13 - a03 * a10
+    val b03 = a01 * a12 - a02 * a11
+    val b04 = a01 * a13 - a03 * a11
+    val b05 = a02 * a13 - a03 * a12
+    val b06 = a20 * a31 - a21 * a30
+    val b07 = a20 * a32 - a22 * a30
+    val b08 = a20 * a33 - a23 * a30
+    val b09 = a21 * a32 - a22 * a31
+    val b10 = a21 * a33 - a23 * a31
+    val b11 = a22 * a33 - a23 * a32
+    val det =
+        (b00 * b11 - b01 * b10 + b02 * b09 + b03 * b08 - b04 * b07 + b05 * b06)
+    if (det == 0.0f) {
+        return
+    }
+    val invDet = 1.0f / det
+    other[0, 0] = ((a11 * b11 - a12 * b10 + a13 * b09) * invDet)
+    other[0, 1] = ((-a01 * b11 + a02 * b10 - a03 * b09) * invDet)
+    other[0, 2] = ((a31 * b05 - a32 * b04 + a33 * b03) * invDet)
+    other[0, 3] = ((-a21 * b05 + a22 * b04 - a23 * b03) * invDet)
+    other[1, 0] = ((-a10 * b11 + a12 * b08 - a13 * b07) * invDet)
+    other[1, 1] = ((a00 * b11 - a02 * b08 + a03 * b07) * invDet)
+    other[1, 2] = ((-a30 * b05 + a32 * b02 - a33 * b01) * invDet)
+    other[1, 3] = ((a20 * b05 - a22 * b02 + a23 * b01) * invDet)
+    other[2, 0] = ((a10 * b10 - a11 * b08 + a13 * b06) * invDet)
+    other[2, 1] = ((-a00 * b10 + a01 * b08 - a03 * b06) * invDet)
+    other[2, 2] = ((a30 * b04 - a31 * b02 + a33 * b00) * invDet)
+    other[2, 3] = ((-a20 * b04 + a21 * b02 - a23 * b00) * invDet)
+    other[3, 0] = ((-a10 * b09 + a11 * b07 - a12 * b06) * invDet)
+    other[3, 1] = ((a00 * b09 - a01 * b07 + a02 * b06) * invDet)
+    other[3, 2] = ((-a30 * b03 + a31 * b01 - a32 * b00) * invDet)
+    other[3, 3] = ((a20 * b03 - a21 * b01 + a22 * b00) * invDet)
 }
