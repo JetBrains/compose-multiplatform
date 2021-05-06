@@ -307,7 +307,8 @@ class AffectedModuleDetectorImpl constructor(
      * Returns allProjects if there are no previous merge CLs, which shouldn't happen.
      */
     private fun findChangedProjects(): Set<Project> {
-        val lastMergeSha = baseCommitOverride ?: git.findPreviousMergeCL() ?: return allProjects
+        val lastMergeSha = baseCommitOverride
+            ?: git.findPreviousSubmittedChange() ?: return allProjects
         val changedFiles = git.findChangedFilesSince(
             sha = lastMergeSha,
             includeUncommitted = true
