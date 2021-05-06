@@ -1682,6 +1682,22 @@ class LayoutNodeTest {
     }
 
     @Test
+    fun layerParamChangeCallsOnLayoutChange() {
+        val node = LayoutNode(20, 20, 100, 100, Modifier.graphicsLayer())
+        val owner = MockOwner()
+        node.attach(owner)
+        assertEquals(0, owner.layoutChangeCount)
+        node.innerLayoutNodeWrapper.onLayerBlockUpdated { scaleX = 0.5f }
+        assertEquals(1, owner.layoutChangeCount)
+        repeat(2) {
+            node.innerLayoutNodeWrapper.onLayerBlockUpdated { scaleX = 1f }
+        }
+        assertEquals(2, owner.layoutChangeCount)
+        node.innerLayoutNodeWrapper.onLayerBlockUpdated(null)
+        assertEquals(3, owner.layoutChangeCount)
+    }
+
+    @Test
     fun reuseModifiersThatImplementMultipleModifierInterfaces() {
         val drawAndLayoutModifier: Modifier = object : DrawModifier, LayoutModifier {
             override fun MeasureScope.measure(

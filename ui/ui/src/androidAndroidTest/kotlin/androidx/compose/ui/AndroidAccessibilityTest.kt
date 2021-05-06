@@ -57,6 +57,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.toAndroidRect
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.platform.AndroidComposeView
 import androidx.compose.ui.platform.AndroidComposeViewAccessibilityDelegateCompat
 import androidx.compose.ui.platform.LocalDensity
@@ -1356,6 +1357,87 @@ class AndroidAccessibilityTest {
     }
 
     @Test
+    fun testLayerParamChange_setCorrectBounds_syntaxOne() {
+        var scale by mutableStateOf(1f)
+        container.setContent {
+            // testTag must not be on the same node with graphicsLayer, otherwise we will have
+            // semantics change notification.
+            Box(Modifier.graphicsLayer(scaleX = scale, scaleY = scale).requiredSize(300.dp)) {
+                Box(Modifier.matchParentSize().testTag("node"))
+            }
+        }
+
+        val node = rule.onNodeWithTag("node").fetchSemanticsNode()
+        var info: AccessibilityNodeInfo = AccessibilityNodeInfo.obtain()
+        rule.runOnUiThread {
+            info = provider.createAccessibilityNodeInfo(node.id)
+        }
+        with(rule.density) {
+            val size = 300.dp.roundToPx()
+            val rect = Rect()
+            info.getBoundsInScreen(rect)
+            assertEquals(size, rect.width())
+            assertEquals(size, rect.height())
+        }
+
+        scale = 0.5f
+        info.recycle()
+        rule.runOnIdle {
+            info = provider.createAccessibilityNodeInfo(node.id)
+        }
+        with(rule.density) {
+            val size = 150.dp.roundToPx()
+            val rect = Rect()
+            info.getBoundsInScreen(rect)
+            assertEquals(size, rect.width())
+            assertEquals(size, rect.height())
+        }
+    }
+
+    @Test
+    fun testLayerParamChange_setCorrectBounds_syntaxTwo() {
+        var scale by mutableStateOf(1f)
+        container.setContent {
+            // testTag must not be on the same node with graphicsLayer, otherwise we will have
+            // semantics change notification.
+            Box(
+                Modifier.graphicsLayer {
+                    scaleX = scale
+                    scaleY = scale
+                }.requiredSize(300.dp)
+            ) {
+                Box(Modifier.matchParentSize().testTag("node"))
+            }
+        }
+
+        val node = rule.onNodeWithTag("node").fetchSemanticsNode()
+        var info: AccessibilityNodeInfo = AccessibilityNodeInfo.obtain()
+        rule.runOnUiThread {
+            info = provider.createAccessibilityNodeInfo(node.id)
+        }
+        with(rule.density) {
+            val size = 300.dp.roundToPx()
+            val rect = Rect()
+            info.getBoundsInScreen(rect)
+            assertEquals(size, rect.width())
+            assertEquals(size, rect.height())
+        }
+
+        scale = 0.5f
+        info.recycle()
+        rule.runOnIdle {
+            info = provider.createAccessibilityNodeInfo(node.id)
+        }
+        with(rule.density) {
+            val size = 150.dp.roundToPx()
+            val rect = Rect()
+            info.getBoundsInScreen(rect)
+            assertEquals(size, rect.width())
+            assertEquals(size, rect.height())
+        }
+    }
+
+    @Test
     fun testDialog_setCorrectBounds() {
         var dialogComposeView: AndroidComposeView? = null
         container.setContent {
@@ -1389,10 +1471,10 @@ class AndroidAccessibilityTest {
             val textPositionOnScreenX = viewPosition[0] + offset
             val textPositionOnScreenY = viewPosition[1] + offset
 
-            val textRect = android.graphics.Rect()
+            val textRect = Rect()
             info.getBoundsInScreen(textRect)
             assertEquals(
-                android.graphics.Rect(
+                Rect(
                     textPositionOnScreenX,
                     textPositionOnScreenY,
                     textPositionOnScreenX + size,
