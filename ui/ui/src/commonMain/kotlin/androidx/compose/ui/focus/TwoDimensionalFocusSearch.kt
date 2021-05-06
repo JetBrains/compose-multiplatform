@@ -16,10 +16,10 @@
 
 package androidx.compose.ui.focus
 
-import androidx.compose.ui.focus.FocusDirectionInternal.Down
-import androidx.compose.ui.focus.FocusDirectionInternal.Left
-import androidx.compose.ui.focus.FocusDirectionInternal.Right
-import androidx.compose.ui.focus.FocusDirectionInternal.Up
+import androidx.compose.ui.focus.FocusDirection.Companion.Down
+import androidx.compose.ui.focus.FocusDirection.Companion.Left
+import androidx.compose.ui.focus.FocusDirection.Companion.Right
+import androidx.compose.ui.focus.FocusDirection.Companion.Up
 import androidx.compose.ui.focus.FocusState.Active
 import androidx.compose.ui.focus.FocusState.ActiveParent
 import androidx.compose.ui.focus.FocusState.Captured
@@ -36,13 +36,13 @@ private const val noActiveChild = "ActiveParent must have a focusedChild"
 
 /**
  *  Perform a search among the immediate children of this [node][ModifiedFocusNode] in the
- *  specified [direction][FocusDirectionInternal] and return the node that is to be focused next. If one
+ *  specified [direction][FocusDirection] and return the node that is to be focused next. If one
  *  of the children is currently focused, we start from that point and search in the specified
- *  [direction][FocusDirectionInternal]. If none of the children are currently focused, we pick the
- *  top-left or bottom right based on the specified [direction][FocusDirectionInternal].
+ *  [direction][FocusDirection]. If none of the children are currently focused, we pick the
+ *  top-left or bottom right based on the specified [direction][FocusDirection].
  */
 internal fun ModifiedFocusNode.twoDimensionalFocusSearch(
-    direction: FocusDirectionInternal
+    direction: FocusDirection
 ): ModifiedFocusNode? {
     return when (focusState) {
         Inactive -> this
@@ -89,7 +89,7 @@ internal fun ModifiedFocusNode.twoDimensionalFocusSearch(
 //  valid candidates.
 private fun List<ModifiedFocusNode>.findBestCandidate(
     focusRect: Rect,
-    direction: FocusDirectionInternal
+    direction: FocusDirection
 ): ModifiedFocusNode? {
     // Pick an impossible rectangle as the initial best candidate Rect.
     var bestCandidate = when (direction) {
@@ -118,7 +118,7 @@ private fun isBetterCandidate(
     proposedCandidate: Rect,
     currentCandidate: Rect,
     focusedRect: Rect,
-    direction: FocusDirectionInternal
+    direction: FocusDirection
 ): Boolean {
 
     // Is this Rect a candidate for the next focus given the direction? This checks whether the
@@ -191,7 +191,7 @@ private fun beamBeats(
     source: Rect,
     rect1: Rect,
     rect2: Rect,
-    direction: FocusDirectionInternal
+    direction: FocusDirection
 ): Boolean {
     // Do the "beams" w.r.t the given direction's axis of rect1 and rect2 overlap?
     fun Rect.inSourceBeam() = when (direction) {

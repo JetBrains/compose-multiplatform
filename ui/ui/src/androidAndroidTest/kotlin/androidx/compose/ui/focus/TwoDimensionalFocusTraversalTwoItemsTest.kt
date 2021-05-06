@@ -19,10 +19,10 @@ package androidx.compose.ui.focus
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.ExperimentalComposeUiApi
-import androidx.compose.ui.focus.FocusDirection.Down
-import androidx.compose.ui.focus.FocusDirection.Left
-import androidx.compose.ui.focus.FocusDirection.Right
-import androidx.compose.ui.focus.FocusDirection.Up
+import androidx.compose.ui.focus.FocusDirection.Companion.Down
+import androidx.compose.ui.focus.FocusDirection.Companion.Left
+import androidx.compose.ui.focus.FocusDirection.Companion.Right
+import androidx.compose.ui.focus.FocusDirection.Companion.Up
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.test.junit4.ComposeContentTestRule
 import androidx.compose.ui.test.junit4.createComposeRule
@@ -37,7 +37,7 @@ import org.junit.runners.Parameterized
 private const val invalid = "Not applicable to a 2D focus search."
 
 @RunWith(Parameterized::class)
-class TwoDimensionalFocusTraversalTwoItemsTest(private val focusDirection: FocusDirection) {
+class TwoDimensionalFocusTraversalTwoItemsTest(focusDirectionInt: Int) {
     @get:Rule
     val rule = createComposeRule()
 
@@ -45,11 +45,12 @@ class TwoDimensionalFocusTraversalTwoItemsTest(private val focusDirection: Focus
     private val initialFocus: FocusRequester = FocusRequester()
     private val focusedItem = mutableStateOf(false)
     private val candidate = mutableStateOf(false)
+    private val focusDirection = FocusDirection(focusDirectionInt)
 
     companion object {
         @JvmStatic
-        @Parameterized.Parameters(name = "direction={0}")
-        fun initParameters() = listOf(Left, Right, Up, Down)
+        @Parameterized.Parameters(name = "{0}")
+        fun initParameters() = listOf(Left, Right, Up, Down).map { it.value }
     }
 
     /**

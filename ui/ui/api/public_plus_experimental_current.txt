@@ -307,13 +307,35 @@ package androidx.compose.ui.focus {
     method public static androidx.compose.ui.Modifier onFocusChanged(androidx.compose.ui.Modifier, kotlin.jvm.functions.Function1<? super androidx.compose.ui.focus.FocusState,kotlin.Unit> onFocusChanged);
   }
 
-  public enum FocusDirection {
-    enum_constant public static final androidx.compose.ui.focus.FocusDirection Down;
-    enum_constant public static final androidx.compose.ui.focus.FocusDirection Left;
-    enum_constant public static final androidx.compose.ui.focus.FocusDirection Next;
-    enum_constant public static final androidx.compose.ui.focus.FocusDirection Previous;
-    enum_constant public static final androidx.compose.ui.focus.FocusDirection Right;
-    enum_constant public static final androidx.compose.ui.focus.FocusDirection Up;
+  public final inline class FocusDirection {
+    ctor public FocusDirection();
+    method public static int constructor-impl(int value);
+    method public static inline boolean equals-impl(int p, Object? p1);
+    method public static boolean equals-impl0(int p1, int p2);
+    method public int getValue();
+    method public static inline int hashCode-impl(int p);
+    method public static String toString-impl(int $this);
+    property public final int value;
+    field public static final androidx.compose.ui.focus.FocusDirection.Companion Companion;
+  }
+
+  public static final class FocusDirection.Companion {
+    method public int getDown-dhqQ-8s();
+    method public int getIn-dhqQ-8s();
+    method public int getLeft-dhqQ-8s();
+    method public int getNext-dhqQ-8s();
+    method public int getOut-dhqQ-8s();
+    method public int getPrevious-dhqQ-8s();
+    method public int getRight-dhqQ-8s();
+    method public int getUp-dhqQ-8s();
+    property public final int Down;
+    property public final int In;
+    property public final int Left;
+    property public final int Next;
+    property public final int Out;
+    property public final int Previous;
+    property public final int Right;
+    property public final int Up;
   }
 
   public interface FocusEventModifier extends androidx.compose.ui.Modifier.Element {
@@ -326,9 +348,9 @@ package androidx.compose.ui.focus {
 
   public interface FocusManager {
     method public void clearFocus(optional boolean forcedClear);
-    method public boolean moveFocus(androidx.compose.ui.focus.FocusDirection focusDirection);
-    method @androidx.compose.ui.ExperimentalComposeUiApi public boolean moveFocusIn();
-    method @androidx.compose.ui.ExperimentalComposeUiApi public boolean moveFocusOut();
+    method public boolean moveFocus-3ESFkO8(int focusDirection);
+    method @Deprecated @androidx.compose.ui.ExperimentalComposeUiApi public default boolean moveFocusIn();
+    method @Deprecated @androidx.compose.ui.ExperimentalComposeUiApi public default boolean moveFocusOut();
   }
 
   public final class FocusModifierKt {

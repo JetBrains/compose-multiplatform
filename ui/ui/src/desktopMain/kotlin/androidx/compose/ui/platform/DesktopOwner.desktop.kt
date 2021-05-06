@@ -25,15 +25,14 @@ import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.autofill.Autofill
 import androidx.compose.ui.autofill.AutofillTree
 import androidx.compose.ui.focus.FocusDirection
-import androidx.compose.ui.focus.FocusDirectionInternal
-import androidx.compose.ui.focus.FocusDirectionInternal.Down
-import androidx.compose.ui.focus.FocusDirectionInternal.In
-import androidx.compose.ui.focus.FocusDirectionInternal.Left
-import androidx.compose.ui.focus.FocusDirectionInternal.Next
-import androidx.compose.ui.focus.FocusDirectionInternal.Out
-import androidx.compose.ui.focus.FocusDirectionInternal.Previous
-import androidx.compose.ui.focus.FocusDirectionInternal.Right
-import androidx.compose.ui.focus.FocusDirectionInternal.Up
+import androidx.compose.ui.focus.FocusDirection.Companion.Down
+import androidx.compose.ui.focus.FocusDirection.Companion.In
+import androidx.compose.ui.focus.FocusDirection.Companion.Left
+import androidx.compose.ui.focus.FocusDirection.Companion.Next
+import androidx.compose.ui.focus.FocusDirection.Companion.Out
+import androidx.compose.ui.focus.FocusDirection.Companion.Previous
+import androidx.compose.ui.focus.FocusDirection.Companion.Right
+import androidx.compose.ui.focus.FocusDirection.Companion.Up
 import androidx.compose.ui.focus.FocusManager
 import androidx.compose.ui.focus.FocusManagerImpl
 import androidx.compose.ui.geometry.Offset
@@ -118,21 +117,8 @@ internal class DesktopOwner(
             val focusDirection = getFocusDirection(it)
             if (focusDirection == null || it.type != KeyDown) return@KeyInputModifier false
 
-            val focusMoveSuccess = with(focusManager) {
-                when (focusDirection) {
-                    Up -> moveFocus(FocusDirection.Up)
-                    Down -> moveFocus(FocusDirection.Down)
-                    Left -> moveFocus(FocusDirection.Left)
-                    Right -> moveFocus(FocusDirection.Right)
-                    In -> moveFocusIn()
-                    Out -> moveFocusOut()
-                    Next -> moveFocus(FocusDirection.Next)
-                    Previous -> moveFocus(FocusDirection.Previous)
-                }
-            }
-
             // Consume the key event if we moved focus.
-            focusMoveSuccess
+            focusManager.moveFocus(focusDirection)
         },
         onPreviewKeyEvent = null
     )
@@ -286,7 +272,7 @@ internal class DesktopOwner(
 
     override fun onLayoutChange(layoutNode: LayoutNode) = Unit
 
-    override fun getFocusDirection(keyEvent: KeyEvent): FocusDirectionInternal? {
+    override fun getFocusDirection(keyEvent: KeyEvent): FocusDirection? {
         return when (keyEvent.key) {
             Tab -> if (keyEvent.isShiftPressed) Previous else Next
             DirectionRight -> Right

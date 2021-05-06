@@ -25,10 +25,10 @@ import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.focus.FocusDirection.Down
-import androidx.compose.ui.focus.FocusDirection.Left
-import androidx.compose.ui.focus.FocusDirection.Right
-import androidx.compose.ui.focus.FocusDirection.Up
+import androidx.compose.ui.focus.FocusDirection.Companion.Down
+import androidx.compose.ui.focus.FocusDirection.Companion.Left
+import androidx.compose.ui.focus.FocusDirection.Companion.Right
+import androidx.compose.ui.focus.FocusDirection.Companion.Up
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.test.junit4.createComposeRule
@@ -43,14 +43,16 @@ private const val invalid = "Not applicable to a 2D focus search."
 
 @MediumTest
 @RunWith(Parameterized::class)
-class TwoDimensionalFocusTraversalInitialFocusTest(private val focusDirection: FocusDirection) {
+class TwoDimensionalFocusTraversalInitialFocusTest(focusDirectionInt: Int) {
     @get:Rule
     val rule = createComposeRule()
+
+    private val focusDirection = FocusDirection(focusDirectionInt)
 
     companion object {
         @JvmStatic
         @Parameterized.Parameters(name = "{0}")
-        fun initParameters() = listOf(Left, Right, Up, Down)
+        fun initParameters() = listOf(Left, Right, Up, Down).map { it.value }
     }
 
     @Test
@@ -93,7 +95,7 @@ class TwoDimensionalFocusTraversalInitialFocusTest(private val focusDirection: F
     @Test
     fun initialFocus_whenThereIsOnlyOneFocusable() {
         // Arrange.
-        var isFocused = mutableStateOf(false)
+        val isFocused = mutableStateOf(false)
         lateinit var view: View
         lateinit var focusManager: FocusManager
         rule.setContent {

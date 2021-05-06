@@ -1,3 +1,29 @@
 // Baseline format: 1.0
+AddedAbstractMethod: androidx.compose.ui.focus.FocusManager#moveFocus-3ESFkO8(int):
+    Added method androidx.compose.ui.focus.FocusManager.moveFocus-3ESFkO8(int)
+
+
+ChangedSuperclass: androidx.compose.ui.focus.FocusDirection:
+    Class androidx.compose.ui.focus.FocusDirection superclass changed from java.lang.Enum to java.lang.Object
+
+
 RemovedClass: androidx.compose.ui.input.pointer.HitPathTrackerKt:
     Removed class androidx.compose.ui.input.pointer.HitPathTrackerKt
+
+
+RemovedField: androidx.compose.ui.focus.FocusDirection#Down:
+    Removed enum constant androidx.compose.ui.focus.FocusDirection.Down
+RemovedField: androidx.compose.ui.focus.FocusDirection#Left:
+    Removed enum constant androidx.compose.ui.focus.FocusDirection.Left
+RemovedField: androidx.compose.ui.focus.FocusDirection#Next:
+    Removed enum constant androidx.compose.ui.focus.FocusDirection.Next
+RemovedField: androidx.compose.ui.focus.FocusDirection#Previous:
+    Removed enum constant androidx.compose.ui.focus.FocusDirection.Previous
+RemovedField: androidx.compose.ui.focus.FocusDirection#Right:
+    Removed enum constant androidx.compose.ui.focus.FocusDirection.Right
+RemovedField: androidx.compose.ui.focus.FocusDirection#Up:
+    Removed enum constant androidx.compose.ui.focus.FocusDirection.Up
+
+
+RemovedMethod: androidx.compose.ui.focus.FocusManager#moveFocus(androidx.compose.ui.focus.FocusDirection):
+    Removed method androidx.compose.ui.focus.FocusManager.moveFocus(androidx.compose.ui.focus.FocusDirection)

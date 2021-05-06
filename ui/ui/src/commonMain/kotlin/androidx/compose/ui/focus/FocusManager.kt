@@ -60,25 +60,39 @@ interface FocusManager {
      */
     fun moveFocus(focusDirection: FocusDirection): Boolean
 
-    // TODO(b/184086802): In 2.0, after deleting FocusDirectionInternal and adding "In" to
-    //  FocusDirection, deprecate and remove this function.
     /**
      * Moves focus to one of the children of the currently focused item.
      *
-     * @return true if focus was moved successfully.
-     */
-    @ExperimentalComposeUiApi
-    fun moveFocusIn(): Boolean
-
-    // TODO(b/184086802): In 2.0, after deleting FocusDirectionInternal and adding "Out" to
-    //  FocusDirection, deprecate and remove this function.
-    /**
-     * Moves focus to the nearest focusable parent of the currently focused item.
+     * This function is deprecated. Use FocusManager.moveFocus(FocusDirection.In) instead.
      *
      * @return true if focus was moved successfully.
      */
     @ExperimentalComposeUiApi
-    fun moveFocusOut(): Boolean
+    @Deprecated(
+        message = "Use FocusManager.moveFocus(FocusDirection.In) instead",
+        ReplaceWith(
+            "moveFocus(In)",
+            "androidx.compose.ui.focus.FocusDirection.Companion.In"
+        )
+    )
+    fun moveFocusIn(): Boolean = false
+
+    /**
+     * Moves focus to the nearest focusable parent of the currently focused item.
+     *
+     *  This function is deprecated. Use FocusManager.moveFocus(FocusDirection.Out) instead.
+     *
+     * @return true if focus was moved successfully.
+     */
+    @ExperimentalComposeUiApi
+    @Deprecated(
+        message = "Use FocusManager.moveFocus(FocusDirection.Out) instead",
+        ReplaceWith(
+            "moveFocus(Out)",
+            "androidx.compose.ui.focus.FocusDirection.Companion.Out"
+        )
+    )
+    fun moveFocusOut(): Boolean = false
 }
 
 /**
@@ -173,35 +187,7 @@ internal class FocusManagerImpl(
      * @return true if focus was moved successfully. false if the focused item is unchanged.
      */
     override fun moveFocus(focusDirection: FocusDirection): Boolean {
-        val internalFocusDirection = when (focusDirection) {
-            FocusDirection.Next -> FocusDirectionInternal.Next
-            FocusDirection.Previous -> FocusDirectionInternal.Previous
-            FocusDirection.Left -> FocusDirectionInternal.Left
-            FocusDirection.Right -> FocusDirectionInternal.Right
-            FocusDirection.Up -> FocusDirectionInternal.Up
-            FocusDirection.Down -> FocusDirectionInternal.Down
-        }
-        return focusModifier.focusNode.moveFocus(internalFocusDirection)
-    }
-
-    /**
-     * Moves focus to one of the children of the currently focused item.
-     *
-     * @return true if focus was moved successfully.
-     */
-    @ExperimentalComposeUiApi
-    override fun moveFocusIn(): Boolean {
-        return focusModifier.focusNode.moveFocus(FocusDirectionInternal.In)
-    }
-
-    /**
-     * Moves focus to the nearest focusable parent of the currently focused item.
-     *
-     * @return true if focus was moved successfully.
-     */
-    @ExperimentalComposeUiApi
-    override fun moveFocusOut(): Boolean {
-        return focusModifier.focusNode.moveFocus(FocusDirectionInternal.Out)
+        return focusModifier.focusNode.moveFocus(focusDirection)
     }
 }
 
