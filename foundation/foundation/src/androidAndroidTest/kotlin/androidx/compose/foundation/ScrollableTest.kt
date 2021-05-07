@@ -942,6 +942,84 @@ class ScrollableTest {
 
     @Test
     @OptIn(ExperimentalTestApi::class)
+    fun scrollable_nestedScroll_disabledConnectionNoOp() =
+        runBlockingWithManualClock { clock ->
+            var childValue = 0f
+            var parentValue = 0f
+            var selfValue = 0f
+            val childController = ScrollableState(
+                consumeScrollDelta = {
+                    childValue += it / 2
+                    it / 2
+                }
+            )
+            val middleController = ScrollableState(
+                consumeScrollDelta = {
+                    selfValue += it / 2
+                    it / 2
+                }
+            )
+            val parentController = ScrollableState(
+                consumeScrollDelta = {
+                    parentValue += it / 2
+                    it / 2
+                }
+            )
+
+            rule.setContent {
+                Box {
+                    Box(
+                        modifier = Modifier.size(300.dp)
+                            .scrollable(
+                                state = parentController,
+                                orientation = Orientation.Horizontal
+                            )
+                    ) {
+                        Box(
+                            Modifier.size(200.dp)
+                                .scrollable(
+                                    enabled = false,
+                                    orientation = Orientation.Horizontal,
+                                    state = middleController
+                                )
+                        ) {
+                            Box(
+                                Modifier.size(200.dp)
+                                    .testTag(scrollableBoxTag)
+                                    .scrollable(
+                                        orientation = Orientation.Horizontal,
+                                        state = childController
+                                    )
+                            )
+                        }
+                    }
+                }
+            }
+
+            rule.runOnIdle {
+                assertThat(parentValue).isEqualTo(0f)
+                assertThat(selfValue).isEqualTo(0f)
+                assertThat(childValue).isEqualTo(0f)
+            }
+
+            rule.onNodeWithTag(scrollableBoxTag)
+                .performGesture {
+                    swipe(center, center.copy(x = center.x + 100f))
+                }
+
+            advanceClockWhileAwaitersExist(clock)
+
+            rule.runOnIdle {
+                assertThat(childValue).isGreaterThan(0f)
+                // disabled middle node doesn't consume
+                assertThat(selfValue).isEqualTo(0f)
+                // but allow nested scroll to propagate up correctly
+                assertThat(parentValue).isGreaterThan(0f)
+            }
+        }
+
+    @Test
+    @OptIn(ExperimentalTestApi::class)
     fun scrollable_interactionSource() = runBlocking {
         val interactionSource = MutableInteractionSource()
         var total = 0f
