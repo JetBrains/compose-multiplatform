@@ -85,6 +85,7 @@ if(AndroidXUiPlugin.isMultiplatformEnabled(project)) {
 
                 implementation("androidx.annotation:annotation:1.1.0")
                 implementation(KOTLIN_COROUTINES_CORE)
+                implementation(KOTLIN_COROUTINES_TEST)
             }
 
             androidMain.dependencies {
@@ -99,7 +100,6 @@ if(AndroidXUiPlugin.isMultiplatformEnabled(project)) {
                 implementation(ANDROIDX_TEST_MONITOR)
                 implementation(ESPRESSO_CORE)
                 implementation(ESPRESSO_IDLING_RESOURCE)
-                implementation(KOTLIN_COROUTINES_TEST)
             }
 
             androidAndroidTest.dependencies {

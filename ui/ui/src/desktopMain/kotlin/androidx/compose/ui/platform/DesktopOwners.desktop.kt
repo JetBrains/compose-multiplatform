@@ -73,7 +73,7 @@ internal class DesktopOwners(
 
     private val dispatcher = FlushCoroutineDispatcher(coroutineScope)
     private val frameClock = BroadcastFrameClock(onNewAwaiters = ::invalidateIfNeeded)
-    private val coroutineContext = dispatcher + frameClock
+    private val coroutineContext = coroutineScope.coroutineContext + dispatcher + frameClock
 
     internal val recomposer = Recomposer(coroutineContext)
     internal val platformInputService: DesktopPlatformInput = DesktopPlatformInput(component)
