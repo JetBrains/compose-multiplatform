@@ -126,6 +126,22 @@ class ScrollbarTest {
         }
     }
 
+    // TODO(demin): write a test when we support DesktopComposeTestRule.mainClock:
+    //  see https://github.com/JetBrains/compose-jb/issues/637
+//    fun `move mouse to the slider and drag it`() {
+//        ...
+//        rule.performMouseMove(0, 25)
+//        rule.mainClock.advanceTimeByFrame()
+//        down(Offset(0f, 25f))
+//        rule.mainClock.advanceTimeByFrame()
+//        moveTo(Offset(0f, 30f))
+//        rule.mainClock.advanceTimeByFrame()
+//        moveTo(Offset(0f, 50f))
+//        rule.mainClock.advanceTimeByFrame()
+//        up()
+//        ...
+//    }
+
     // TODO(demin): enable after we resolve b/171889442
     @Ignore("Enable after we resolve b/171889442")
     @Test
@@ -363,6 +379,10 @@ class ScrollbarTest {
         (this as DesktopComposeTestRule).window.onMouseScroll(
             x, y, MouseScrollEvent(MouseScrollUnit.Line(delta), MouseScrollOrientation.Vertical)
         )
+    }
+
+    private fun ComposeTestRule.performMouseMove(x: Int, y: Int) {
+        (this as DesktopComposeTestRule).window.onMouseMoved(x, y)
     }
 
     @Composable
