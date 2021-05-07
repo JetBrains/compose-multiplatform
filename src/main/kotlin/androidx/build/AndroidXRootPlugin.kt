@@ -112,7 +112,7 @@ class AndroidXRootPlugin : Plugin<Project> {
                 )
             )
             project.plugins.withType(AndroidBasePlugin::class.java) {
-                buildOnServerTask.dependsOn("${project.path}:assembleDebug")
+                buildOnServerTask.dependsOn("${project.path}:assembleRelease")
                 if (!project.usingMaxDepVersions()) {
                     project.afterEvaluate {
                         project.agpVariants.all { variant ->
@@ -159,7 +159,7 @@ class AndroidXRootPlugin : Plugin<Project> {
             buildOnServerTask.dependsOn(Jacoco.createUberJarTask(this))
         }
 
-        val zipTestConfigsWithApks = project.tasks.register(
+        project.tasks.register(
             ZIP_TEST_CONFIGS_WITH_APKS_TASK, Zip::class.java
         ) {
             it.destinationDirectory.set(project.getDistributionDirectory())
@@ -168,7 +168,7 @@ class AndroidXRootPlugin : Plugin<Project> {
             // We're mostly zipping a bunch of .apk files that are already compressed
             it.entryCompression = ZipEntryCompression.STORED
         }
-        val zipConstrainedTestConfigsWithApks = project.tasks.register(
+        project.tasks.register(
             ZIP_CONSTRAINED_TEST_CONFIGS_WITH_APKS_TASK, Zip::class.java
         ) {
             it.destinationDirectory.set(project.getDistributionDirectory())
@@ -177,8 +177,6 @@ class AndroidXRootPlugin : Plugin<Project> {
             // We're mostly zipping a bunch of .apk files that are already compressed
             it.entryCompression = ZipEntryCompression.STORED
         }
-        buildOnServerTask.dependsOn(zipTestConfigsWithApks)
-        buildOnServerTask.dependsOn(zipConstrainedTestConfigsWithApks)
 
         AffectedModuleDetector.configure(gradle, this)
 

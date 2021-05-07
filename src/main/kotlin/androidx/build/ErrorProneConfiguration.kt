@@ -65,7 +65,7 @@ fun Project.configureErrorProneForAndroid(variants: DomainObjectSet<out BaseVari
     val errorProneConfiguration = createErrorProneConfiguration()
     variants.all { variant ->
         // Using getName() instead of name due to b/150427408
-        if (variant.buildType.getName() == BuilderConstants.DEBUG) {
+        if (variant.buildType.getName() == BuilderConstants.RELEASE) {
             val task = variant.javaCompileProvider
             (variant as BaseVariant).annotationProcessorConfiguration.extendsFrom(
                 errorProneConfiguration
