@@ -25,13 +25,17 @@ import androidx.compose.foundation.layout.requiredSize
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.background
 import androidx.compose.ui.draw.assertColor
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.asAndroidBitmap
+import androidx.compose.ui.layout.RootMeasurePolicy.measure
 import androidx.compose.ui.platform.AndroidOwnerExtraAssertionsRule
 import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.platform.LocalDensity
@@ -820,6 +824,185 @@ class SubcomposeLayoutTest {
         rule.runOnIdle {
             assertThat(measureCount).isEqualTo(1)
             assertThat(layoutCount).isEqualTo(1)
+        }
+    }
+
+    @Test
+    fun slotsKeptForReuse() {
+        val items = mutableStateOf(listOf(0, 1, 2, 3, 4))
+        val state = SubcomposeLayoutState(2)
+
+        composeItems(state, items)
+
+        rule.runOnIdle {
+            items.value = listOf(2, 3)
+        }
+
+        assertNodes(
+            exists = /*active*/ listOf(2, 3) + /*reusable*/ listOf(1, 4),
+            doesNotExist = /*disposed*/ listOf(0)
+        )
+    }
+
+    @Test
+    fun newSlotIsUsingReusedSlot() {
+        val items = mutableStateOf(listOf(0, 1, 2, 3, 4))
+        val state = SubcomposeLayoutState(2)
+
+        composeItems(state, items)
+
+        rule.runOnIdle {
+            items.value = listOf(2, 3)
+            // 1 and 4 are now in reusable buffer
+        }
+
+        rule.runOnIdle {
+            items.value = listOf(2, 3, 5)
+            // the last reusable slot (4) will be used for composing 5
+        }
+
+        assertNodes(
+            exists = /*active*/ listOf(2, 3, 5) + /*reusable*/ listOf(1),
+            doesNotExist = /*disposed*/ listOf(0, 4)
+        )
+    }
+
+    @Test
+    fun theSameSlotIsUsedWhileItIsInReusableList() {
+        val items = mutableStateOf(listOf(0, 1, 2, 3, 4))
+        val state = SubcomposeLayoutState(2)
+
+        composeItems(state, items)
+
+        rule.runOnIdle {
+            items.value = listOf(2, 3)
+            // 1 and 4 are now in reusable buffer
+        }
+
+        rule.runOnIdle {
+            items.value = listOf(2, 3, 1)
+            // slot 1 should be taken back from reusable
+        }
+
+        assertNodes(
+            exists = /*active*/ listOf(2, 3, 1) + /*reusable*/ listOf(4)
+        )
+    }
+
+    @Test
+    fun prefetchIsUsingReusableNodes() {
+        val items = mutableStateOf(listOf(0, 1, 2, 3, 4))
+        val state = SubcomposeLayoutState(2)
+
+        composeItems(state, items)
+
+        rule.runOnIdle {
+            items.value = listOf(2, 3)
+            // 1 and 4 are now in reusable buffer
+        }
+
+        rule.runOnIdle {
+            state.precompose(5) {
+                ItemContent(5)
+            }
+            // prefetch should take slot 4 from reuse
+        }
+
+        assertNodes(
+            exists = /*active*/ listOf(2, 3) + /*prefetch*/ listOf(5) + /*reusable*/ listOf(1)
+        )
+    }
+
+    @Test
+    fun prefetchSlotWhichIsInReusableList() {
+        val items = mutableStateOf(listOf(0, 1, 2, 3, 4))
+        val state = SubcomposeLayoutState(3)
+
+        composeItems(state, items)
+
+        rule.runOnIdle {
+            items.value = listOf(2)
+            // 1, 3 and 4 are now in reusable buffer
+        }
+
+        rule.runOnIdle {
+            state.precompose(3) {
+                ItemContent(3)
+            }
+            // prefetch should take slot 3 from reuse
+        }
+
+        assertNodes(
+            exists = /*active*/ listOf(2) + /*prefetch*/ listOf(3) + /*reusable*/ listOf(1, 4),
+            doesNotExist = listOf(0)
+        )
+    }
+
+    @Test
+    fun nothingIsReusedWhenMaxSlotsAre0() {
+        val items = mutableStateOf(listOf(0, 1, 2, 3, 4))
+        val state = SubcomposeLayoutState(0)
+
+        composeItems(state, items)
+
+        rule.runOnIdle {
+            items.value = listOf(2, 4)
+        }
+
+        assertNodes(
+            exists = listOf(2, 4),
+            doesNotExist = listOf(0, 1, 3)
+        )
+    }
+
+    @Test
+    fun reuse1Node() {
+        val items = mutableStateOf(listOf(0, 1, 2, 3))
+        val state = SubcomposeLayoutState(1)
+
+        composeItems(state, items)
+
+        rule.runOnIdle {
+            items.value = listOf(0, 1)
+        }
+
+        assertNodes(
+            exists = /*active*/ listOf(0, 1) + /*reusable*/ listOf(3),
+            doesNotExist = /*disposed*/ listOf(2)
+        )
+    }
+
+    private fun composeItems(
+        state: SubcomposeLayoutState,
+        items: MutableState<List<Int>>
+    ) {
+        rule.setContent {
+            SubcomposeLayout(state) { constraints ->
+                items.value.forEach {
+                    subcompose(it) {
+                        ItemContent(it)
+                    }.forEach {
+                        it.measure(constraints)
+                    }
+                }
+                layout(10, 10) {}
+            }
+        }
+    }
+
+    @Composable
+    private fun ItemContent(index: Int) {
+        Box(Modifier.fillMaxSize().testTag("$index"))
+    }
+
+    private fun assertNodes(exists: List<Int>, doesNotExist: List<Int> = emptyList()) {
+        exists.forEach {
+            rule.onNodeWithTag("$it")
+                .assertExists()
+        }
+        doesNotExist.forEach {
+            rule.onNodeWithTag("$it")
+                .assertDoesNotExist()
         }
     }
 }
