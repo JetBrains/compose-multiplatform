@@ -128,8 +128,6 @@ abstract class GenerateTestConfigurationTask : DefaultTask() {
             configBuilder.isBenchmark(true)
             if (configBuilder.isPostsubmit) {
                 configBuilder.tag("microbenchmarks")
-            } else {
-                configBuilder.tag("microbenchmarks_presubmit")
             }
         } else if (testProjectPath.get().endsWith("macrobenchmark")) {
             configBuilder.tag("macrobenchmarks")
