@@ -32,6 +32,7 @@ import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.Immutable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -195,7 +196,13 @@ private fun Scrollbar(
     }
 
     var containerSize by remember { mutableStateOf(0) }
-    var isHover by remember { mutableStateOf(false) }
+    var isHovered by remember { mutableStateOf(false) }
+
+    val isHighlighted by remember {
+        derivedStateOf {
+            isHovered || dragInteraction.value is DragInteraction.Start
+        }
+    }
 
     val minimalHeight = style.minimalHeight.toPx()
     val sliderAdapter = remember(adapter, containerSize, minimalHeight) {
@@ -214,7 +221,7 @@ private fun Scrollbar(
     }
 
     val color by animateColorAsState(
-        if (isHover) style.hoverColor else style.unhoverColor,
+        if (isHighlighted) style.hoverColor else style.unhoverColor,
         animationSpec = TweenSpec(durationMillis = style.hoverDurationMillis)
     )
 
@@ -232,8 +239,8 @@ private fun Scrollbar(
         },
         modifier
             .pointerMoveFilter(
-                onExit = { isHover = false; true },
-                onEnter = { isHover = true; true }
+                onExit = { isHovered = false; false },
+                onEnter = { isHovered = true; false }
             )
             .scrollOnPressOutsideSlider(isVertical, sliderAdapter, adapter, containerSize),
         measurePolicy

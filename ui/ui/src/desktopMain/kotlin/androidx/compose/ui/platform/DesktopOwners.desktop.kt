@@ -143,18 +143,18 @@ internal class DesktopOwners(
         pointerId += 1
     }
 
-    fun onMouseDragged(x: Int, y: Int, nativeEvent: MouseEvent? = null) {
-        lastOwner?.processPointerInput(pointerInputEvent(nativeEvent, x, y, isMousePressed))
+    fun onMouseMoved(x: Int, y: Int, nativeEvent: MouseEvent? = null) {
+        val event = pointerInputEvent(nativeEvent, x, y, isMousePressed)
+        val result = lastOwner?.processPointerInput(event)
+        if (result?.anyMovementConsumed != true) {
+            val position = Offset(x.toFloat(), y.toFloat())
+            lastOwner?.onPointerMove(position)
+        }
     }
 
     fun onMouseScroll(x: Int, y: Int, event: MouseScrollEvent) {
         val position = Offset(x.toFloat(), y.toFloat())
         lastOwner?.onMouseScroll(position, event)
-    }
-
-    fun onMouseMoved(x: Int, y: Int) {
-        val position = Offset(x.toFloat(), y.toFloat())
-        lastOwner?.onPointerMove(position)
     }
 
     fun onMouseEntered(x: Int, y: Int) {

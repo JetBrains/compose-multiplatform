@@ -59,6 +59,7 @@ import androidx.compose.ui.input.pointer.PointerInputEventProcessor
 import androidx.compose.ui.input.pointer.PointerInputFilter
 import androidx.compose.ui.input.pointer.PointerMoveEventFilter
 import androidx.compose.ui.input.pointer.PositionCalculator
+import androidx.compose.ui.input.pointer.ProcessResult
 import androidx.compose.ui.input.pointer.TestPointerInputEventData
 import androidx.compose.ui.layout.RootMeasurePolicy
 import androidx.compose.ui.layout.boundsInWindow
@@ -303,9 +304,9 @@ internal class DesktopOwner(
         root.draw(DesktopCanvas(canvas))
     }
 
-    internal fun processPointerInput(event: PointerInputEvent) {
+    internal fun processPointerInput(event: PointerInputEvent): ProcessResult {
         measureAndLayout()
-        pointerInputEventProcessor.process(event, this)
+        return pointerInputEventProcessor.process(event, this)
     }
 
     override fun processPointerInput(nanoTime: Long, pointers: List<TestPointerInputEventData>) {
