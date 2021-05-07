@@ -20,6 +20,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.ExperimentalComposeUiApi
+import androidx.compose.ui.focus.FocusDirection.Companion.In
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.test.junit4.ComposeContentTestRule
 import androidx.compose.ui.test.junit4.createComposeRule
@@ -56,7 +57,7 @@ class TwoDimensionalFocusTraversalInTest {
         }
 
         // Act.
-        focusManager.moveFocusIn()
+        focusManager.moveFocus(In)
 
         // Assert.
         rule.runOnIdle {
@@ -84,7 +85,7 @@ class TwoDimensionalFocusTraversalInTest {
         }
 
         // Act.
-        focusManager.moveFocusIn()
+        focusManager.moveFocus(In)
 
         // Assert.
         rule.runOnIdle {
@@ -117,7 +118,7 @@ class TwoDimensionalFocusTraversalInTest {
         }
 
         // Act.
-        focusManager.moveFocusIn()
+        focusManager.moveFocus(In)
 
         // Assert.
         rule.runOnIdle {
@@ -156,7 +157,7 @@ class TwoDimensionalFocusTraversalInTest {
         }
 
         // Act.
-        focusManager.moveFocusIn()
+        focusManager.moveFocus(In)
 
         // Assert.
         rule.runOnIdle {

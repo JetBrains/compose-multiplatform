@@ -16,14 +16,15 @@
 
 package androidx.compose.ui.focus
 
-import androidx.compose.ui.focus.FocusDirectionInternal.Down
-import androidx.compose.ui.focus.FocusDirectionInternal.In
-import androidx.compose.ui.focus.FocusDirectionInternal.Left
-import androidx.compose.ui.focus.FocusDirectionInternal.Next
-import androidx.compose.ui.focus.FocusDirectionInternal.Out
-import androidx.compose.ui.focus.FocusDirectionInternal.Previous
-import androidx.compose.ui.focus.FocusDirectionInternal.Right
-import androidx.compose.ui.focus.FocusDirectionInternal.Up
+import androidx.compose.ui.ExperimentalComposeUiApi
+import androidx.compose.ui.focus.FocusDirection.Companion.Down
+import androidx.compose.ui.focus.FocusDirection.Companion.In
+import androidx.compose.ui.focus.FocusDirection.Companion.Left
+import androidx.compose.ui.focus.FocusDirection.Companion.Next
+import androidx.compose.ui.focus.FocusDirection.Companion.Out
+import androidx.compose.ui.focus.FocusDirection.Companion.Previous
+import androidx.compose.ui.focus.FocusDirection.Companion.Right
+import androidx.compose.ui.focus.FocusDirection.Companion.Up
 import androidx.compose.ui.input.key.Key
 import androidx.compose.ui.input.key.KeyEvent
 import androidx.compose.ui.input.key.nativeKeyCode
@@ -137,6 +138,7 @@ class KeyEventToFocusDirectionTest {
         val focusDirection = owner.getFocusDirection(keyEvent)
 
         // Assert.
+        @OptIn(ExperimentalComposeUiApi::class)
         assertThat(focusDirection).isEqualTo(In)
     }
 
@@ -149,6 +151,7 @@ class KeyEventToFocusDirectionTest {
         val focusDirection = owner.getFocusDirection(keyEvent)
 
         // Assert.
+        @OptIn(ExperimentalComposeUiApi::class)
         assertThat(focusDirection).isEqualTo(Out)
     }
 }
