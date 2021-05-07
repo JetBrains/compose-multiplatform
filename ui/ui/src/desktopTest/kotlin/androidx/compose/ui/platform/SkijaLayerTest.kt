@@ -156,8 +156,6 @@ class SkijaLayerTest {
         val matrix = layer.matrix
 
         val y = 10 * (1 - cos45.toFloat())
-        println(matrix.map(Offset(0f, 0f)))
-        println(matrix.map(Offset(100f, 10f)))
         assertEquals(Offset(0f, y), matrix.map(Offset(0f, 0f)))
         assertEquals(Offset(100f, 10f), matrix.map(Offset(100f, 10f)))
     }
