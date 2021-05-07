@@ -18,9 +18,9 @@ package androidx.compose.ui.input.key
 
 import android.view.KeyEvent.ACTION_DOWN
 import android.view.KeyEvent.ACTION_UP
-import androidx.compose.ui.input.key.KeyEventType.KeyDown
-import androidx.compose.ui.input.key.KeyEventType.KeyUp
-import androidx.compose.ui.input.key.KeyEventType.Unknown
+import androidx.compose.ui.input.key.KeyEventType.Companion.KeyDown
+import androidx.compose.ui.input.key.KeyEventType.Companion.KeyUp
+import androidx.compose.ui.input.key.KeyEventType.Companion.Unknown
 
 /**
  * The native Android [KeyEvent][NativeKeyEvent].

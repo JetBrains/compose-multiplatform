@@ -32,7 +32,7 @@ fun keyEvent(key: Key, keyEventType: KeyEventType): KeyEvent {
     val action = when (keyEventType) {
         KeyEventType.KeyDown -> KEY_PRESSED
         KeyEventType.KeyUp -> KEY_RELEASED
-        KeyEventType.Unknown -> error("Unknown key event type")
+        else -> error("Unknown key event type")
     }
     return KeyEvent(
         KeyEventAwt(

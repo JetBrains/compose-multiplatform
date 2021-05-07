@@ -1343,15 +1343,30 @@ package androidx.compose.ui.input.key {
     property public final android.view.KeyEvent nativeKeyEvent;
   }
 
-  public enum KeyEventType {
-    enum_constant public static final androidx.compose.ui.input.key.KeyEventType KeyDown;
-    enum_constant public static final androidx.compose.ui.input.key.KeyEventType KeyUp;
-    enum_constant public static final androidx.compose.ui.input.key.KeyEventType Unknown;
+  public final inline class KeyEventType {
+    ctor public KeyEventType();
+    method public static int constructor-impl(int value);
+    method public static inline boolean equals-impl(int p, Object? p1);
+    method public static boolean equals-impl0(int p1, int p2);
+    method public int getValue();
+    method public static inline int hashCode-impl(int p);
+    method public static String toString-impl(int $this);
+    property public final int value;
+    field public static final androidx.compose.ui.input.key.KeyEventType.Companion Companion;
+  }
+
+  public static final class KeyEventType.Companion {
+    method public int getKeyDown-CS__XNY();
+    method public int getKeyUp-CS__XNY();
+    method public int getUnknown-CS__XNY();
+    property public final int KeyDown;
+    property public final int KeyUp;
+    property public final int Unknown;
   }
 
   public final class KeyEvent_androidKt {
     method public static long getKey-ZmokQxo(android.view.KeyEvent);
-    method public static androidx.compose.ui.input.key.KeyEventType getType-ZmokQxo(android.view.KeyEvent);
+    method public static int getType-ZmokQxo(android.view.KeyEvent);
     method public static int getUtf16CodePoint-ZmokQxo(android.view.KeyEvent);
     method public static boolean isAltPressed-ZmokQxo(android.view.KeyEvent);
     method public static boolean isCtrlPressed-ZmokQxo(android.view.KeyEvent);
