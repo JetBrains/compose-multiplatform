@@ -60,9 +60,6 @@ import kotlinx.coroutines.flow.collect
  * Contained buttons are high-emphasis, distinguished by their use of elevation and fill. They
  * contain actions that are primary to your app.
  *
- * To make a button clickable, you must provide an onClick. If no onClick is provided, this button
- * will display itself as disabled.
- *
  * The default text style for internal [Text] components will be set to [Typography.button]. Text
  * color will try to match the correlated color for the background color. For example if the
  * background color is set to [Colors.primary] then the text will by default use
@@ -155,9 +152,6 @@ fun Button(
  * Outlined buttons are also a lower emphasis alternative to contained buttons, or a higher emphasis
  * alternative to text buttons.
  *
- * To make a button clickable, you must provide an onClick. If no onClick is provided, this button
- * will display itself as disabled.
- *
  * The default text style for internal [Text] components will be set to [Typography.button]. Text
  * color will try to match the correlated color for the background color. For example if the
  * background color is set to [Colors.primary] then the text will by default use
@@ -212,9 +206,6 @@ fun OutlinedButton(
  *
  * Text buttons are typically used for less-pronounced actions, including those located in cards and
  * dialogs.
- *
- * To make a button clickable, you must provide an onClick. If no onClick is provided, this button
- * will display itself as disabled.
  *
  * The default text style for internal [Text] components will be set to [Typography.button]. Text
  * color will try to match the correlated color for the background color. For example if the

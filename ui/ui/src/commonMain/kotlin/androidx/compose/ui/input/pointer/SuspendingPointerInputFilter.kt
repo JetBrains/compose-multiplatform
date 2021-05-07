@@ -147,7 +147,8 @@ fun Modifier.pointerInput(
  * [pointerInput] [block]s may call [PointerInputScope.awaitPointerEventScope] to install a pointer
  * input handler that can [AwaitPointerEventScope.awaitPointerEvent] to receive and consume
  * pointer input events. Extension functions on [PointerInputScope] or [AwaitPointerEventScope]
- * may be defined to perform higher-level gesture detection.
+ * may be defined to perform higher-level gesture detection. The pointer input handling [block]
+ * will be cancelled and **re-started** when [pointerInput] is recomposed with a different [key1].
  */
 fun Modifier.pointerInput(
     key1: Any?,
@@ -174,7 +175,9 @@ fun Modifier.pointerInput(
  * [pointerInput] [block]s may call [PointerInputScope.awaitPointerEventScope] to install a pointer
  * input handler that can [AwaitPointerEventScope.awaitPointerEvent] to receive and consume
  * pointer input events. Extension functions on [PointerInputScope] or [AwaitPointerEventScope]
- * may be defined to perform higher-level gesture detection.
+ * may be defined to perform higher-level gesture detection. The pointer input handling [block]
+ * will be cancelled and **re-started** when [pointerInput] is recomposed with a different [key1] or
+ * [key2].
  */
 fun Modifier.pointerInput(
     key1: Any?,
@@ -203,7 +206,8 @@ fun Modifier.pointerInput(
  * [pointerInput] [block]s may call [PointerInputScope.awaitPointerEventScope] to install a pointer
  * input handler that can [AwaitPointerEventScope.awaitPointerEvent] to receive and consume
  * pointer input events. Extension functions on [PointerInputScope] or [AwaitPointerEventScope]
- * may be defined to perform higher-level gesture detection.
+ * may be defined to perform higher-level gesture detection. The pointer input handling [block]
+ * will be cancelled and **re-started** when [pointerInput] is recomposed with any different [keys].
  */
 fun Modifier.pointerInput(
     vararg keys: Any?,
