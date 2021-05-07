@@ -53,6 +53,7 @@ object LibraryGroups {
     val EXIFINTERFACE = LibraryGroup("androidx.exifinterface", LibraryVersions.EXIFINTERFACE)
     val FRAGMENT = LibraryGroup("androidx.fragment", LibraryVersions.FRAGMENT)
     val GRIDLAYOUT = LibraryGroup("androidx.gridlayout", LibraryVersions.GRIDLAYOUT)
+    val HEALTH = LibraryGroup("androidx.health", null)
     val HEIFWRITER = LibraryGroup("androidx.heifwriter", LibraryVersions.HEIFWRITER)
     val HILT = LibraryGroup("androidx.hilt", null)
     val INSPECTION = LibraryGroup("androidx.inspection", LibraryVersions.INSPECTION)
