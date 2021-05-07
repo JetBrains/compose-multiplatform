@@ -30,7 +30,6 @@ private const val SLOTS_PER_INT = 10
 internal class ComposableLambdaNImpl(
     val key: Int,
     private val tracked: Boolean,
-    private val sourceInformation: String?,
     override val arity: Int
 ) : ComposableLambdaN {
     private var _block: Any? = null
@@ -112,7 +111,7 @@ internal class ComposableLambdaNImpl(
         var c = args[realParams] as Composer
         val allArgsButLast = args.slice(0 until args.size - 1).toTypedArray()
         val lastChanged = args[args.size - 1] as Int
-        c = c.startRestartGroup(key, sourceInformation)
+        c = c.startRestartGroup(key)
         trackRead(c)
         val dirty = lastChanged or if (c.changed(this))
             differentBits(realParams)
@@ -146,14 +145,13 @@ fun composableLambdaN(
     composer: Composer,
     key: Int,
     tracked: Boolean,
-    sourceInformation: String?,
     arity: Int,
     block: Any
 ): ComposableLambdaN {
     composer.startReplaceableGroup(key)
     val slot = composer.rememberedValue()
     val result = if (slot === Composer.Empty) {
-        val value = ComposableLambdaNImpl(key, tracked, sourceInformation, arity)
+        val value = ComposableLambdaNImpl(key, tracked, arity)
         composer.updateRememberedValue(value)
         value
     } else {
@@ -170,12 +168,10 @@ fun composableLambdaN(
 fun composableLambdaNInstance(
     key: Int,
     tracked: Boolean,
-    sourceInformation: String?,
     arity: Int,
     block: Any
 ): ComposableLambdaN = ComposableLambdaNImpl(
     key,
     tracked,
-    sourceInformation,
     arity
 ).apply { update(block) }

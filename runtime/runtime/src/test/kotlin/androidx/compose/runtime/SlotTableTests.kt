@@ -3139,6 +3139,95 @@ class SlotTableTests {
         }
         slots.verifyWellFormed()
     }
+
+    @Test
+    fun canInsertAuxData() {
+        val slots = SlotTable().also {
+            it.write { writer ->
+                writer.insert {
+                    // Insert a normal aux data.
+                    writer.startData(10, 10, "10")
+                    writer.endGroup()
+
+                    // Insert using insertAux
+                    writer.startGroup(20)
+                    writer.insertAux("20")
+                    writer.endGroup()
+
+                    // Insert using insertAux after a slot value was added.
+                    writer.startGroup(30)
+                    writer.update(300)
+                    writer.insertAux("30")
+                    writer.endGroup()
+
+                    // Insert using insertAux after a group with an object key
+                    writer.startGroup(40, 40)
+                    writer.insertAux("40")
+                    writer.endGroup()
+
+                    // Insert aux into an object key with a value slot and then add another value.
+                    writer.startGroup(50, 50)
+                    writer.update(500)
+                    writer.insertAux("50")
+                    writer.update(501)
+                    writer.endGroup()
+
+                    // Insert aux after two slot values and then add another value.
+                    writer.startGroup(60)
+                    writer.update(600)
+                    writer.update(601)
+                    writer.insertAux("60")
+                    writer.update(602)
+                    writer.endGroup()
+
+                    // Write a trail group to ensure that the slot table is valid after the
+                    // insertAux
+                    writer.startGroup(1000)
+                    writer.update(10000)
+                    writer.update(10001)
+                    writer.endGroup()
+                }
+            }
+        }
+        slots.verifyWellFormed()
+        slots.read { reader ->
+            assertEquals(10, reader.groupKey)
+            assertEquals(10, reader.groupObjectKey)
+            assertEquals("10", reader.groupAux)
+            reader.skipGroup()
+            assertEquals(20, reader.groupKey)
+            assertEquals("20", reader.groupAux)
+            reader.skipGroup()
+            assertEquals(30, reader.groupKey)
+            assertEquals("30", reader.groupAux)
+            reader.startGroup()
+            assertEquals(300, reader.next())
+            reader.endGroup()
+            assertEquals(40, reader.groupKey)
+            assertEquals(40, reader.groupObjectKey)
+            assertEquals("40", reader.groupAux)
+            reader.skipGroup()
+            assertEquals(50, reader.groupKey)
+            assertEquals(50, reader.groupObjectKey)
+            assertEquals("50", reader.groupAux)
+            reader.startGroup()
+            assertEquals(500, reader.next())
+            assertEquals(501, reader.next())
+            reader.endGroup()
+            assertEquals(60, reader.groupKey)
+            assertEquals("60", reader.groupAux)
+            reader.startGroup()
+            assertEquals(600, reader.next())
+            assertEquals(601, reader.next())
+            assertEquals(602, reader.next())
+            reader.endGroup()
+            assertEquals(1000, reader.groupKey)
+            reader.startGroup()
+            assertEquals(10000, reader.next())
+            assertEquals(10001, reader.next())
+            reader.endGroup()
+        }
+    }
 }
 
 @OptIn(InternalComposeApi::class)
