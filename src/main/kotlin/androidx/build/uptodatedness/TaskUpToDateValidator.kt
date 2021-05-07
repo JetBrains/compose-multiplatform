@@ -37,8 +37,8 @@ const val DISALLOW_TASK_EXECUTION_FLAG_NAME = "disallowExecution"
 const val RECORD_FLAG_NAME = VERIFY_UP_TO_DATE
 
 // Temporary set of exempt tasks that are known to still be out-of-date after running once
-// Entries in this set may be task names (like assembleDebug) or task paths
-// (like :core:core:assembleDebug)
+// Entries in this set may be task names (like assembleRelease) or task paths
+// (like :core:core:assembleRelease)
 // Entries in this set do still get rerun because they might produce files that are needed by
 // subsequent tasks
 val ALLOW_RERUNNING_TASKS = setOf(
