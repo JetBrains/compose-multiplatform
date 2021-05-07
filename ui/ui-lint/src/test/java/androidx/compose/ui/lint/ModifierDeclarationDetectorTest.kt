@@ -22,6 +22,7 @@ import androidx.compose.lint.Stubs
 import com.android.tools.lint.checks.infrastructure.LintDetectorTest
 import com.android.tools.lint.detector.api.Detector
 import com.android.tools.lint.detector.api.Issue
+import org.junit.Ignore
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.junit.runners.JUnit4
@@ -107,6 +108,7 @@ Fix for src/androidx/compose/ui/foo/TestModifier.kt line 8: Change return type t
             )
     }
 
+    @Ignore("b/187539461")
     @Test
     fun getterReturnsModifierElement() {
         lint().files(
@@ -202,6 +204,7 @@ Fix for src/androidx/compose/ui/foo/TestModifier.kt line 8: Add explicit Modifie
             )
     }
 
+    @Ignore("b/187539461")
     @Test
     fun getterImplicitlyReturnsModifierElement() {
         lint().files(
@@ -352,6 +355,7 @@ Fix for src/androidx/compose/ui/foo/TestModifier.kt line 8: Change return type t
             .expectClean()
     }
 
+    @Ignore("b/187539461")
     @Test
     fun noModifierReceiver() {
         lint().files(
@@ -420,6 +424,7 @@ Fix for src/androidx/compose/ui/foo/TestModifier.kt line 20: Add Modifier receiv
             )
     }
 
+    @Ignore("b/187539461")
     @Test
     fun incorrectReceiver() {
         lint().files(
@@ -488,6 +493,7 @@ Fix for src/androidx/compose/ui/foo/TestModifier.kt line 20: Change receiver to 
             )
     }
 
+    @Ignore("b/187539461")
     @Test
     fun composableModifierFactories() {
         lint().files(

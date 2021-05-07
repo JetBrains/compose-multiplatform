@@ -21,7 +21,6 @@ import android.content.Context
 import android.graphics.Canvas
 import android.graphics.DashPathEffect
 import android.graphics.Paint
-import android.os.Build
 import android.os.Bundle
 import android.util.AttributeSet
 import android.util.Log
@@ -382,17 +381,13 @@ internal class ComposeViewAdapter : FrameLayout {
         return this.getDesignInfoMethodOrNull()?.let { designInfoMethod ->
             try {
                 // Workaround for unchecked Method.invoke
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-                    val result = designInfoMethod.invoke(
-                        this,
-                        x,
-                        y,
-                        designInfoProvidersArgument
-                    )
-                    (result as String).ifEmpty { null }
-                } else {
-                    null
-                }
+                val result = designInfoMethod.invoke(
+                    this,
+                    x,
+                    y,
+                    designInfoProvidersArgument
+                )
+                (result as String).ifEmpty { null }
             } catch (e: Exception) {
                 null
             }

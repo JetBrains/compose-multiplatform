@@ -88,5 +88,6 @@ private fun registerIconGenerationTask(
 private fun BaseVariant.registerIconGenerationTask(
     task: IconGenerationTask
 ) {
+    @Suppress("DEPRECATION") // b/186887831
     registerJavaGeneratingTask(task, task.generatedSrcMainDirectory)
 }
