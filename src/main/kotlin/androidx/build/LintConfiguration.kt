@@ -34,6 +34,16 @@ private const val UPDATE_LINT_BASELINE = "updateLintBaseline"
 private const val LINT_BASELINE_CONTINUE = "lint.baselines.continue"
 
 fun Project.configureNonAndroidProjectForLint(extension: AndroidXExtension) {
+    if (path == ":buildSrc-tests:project-subsets" ||
+        path == ":lint-checks:tests" ||
+        path == ":paging:paging-common-ktx" ||
+        path == ":compose:compiler:compiler" ||
+        path == ":room:integration-tests:room-incremental-annotation-processing" ||
+        path == ":compose:compiler:compiler-hosted:integration-tests:kotlin-compiler-repackaged" ||
+        path == ":lifecycle:integration-tests:incrementality"
+    ) {
+        return // disabled for AGP 7.0.0-alpha15 due to b/180408027
+    }
     apply(mapOf("plugin" to "com.android.lint"))
 
     // Create fake variant tasks since that is what is invoked by developers.
@@ -42,6 +52,10 @@ fun Project.configureNonAndroidProjectForLint(extension: AndroidXExtension) {
         AffectedModuleDetector.configureTaskGuard(task)
     }
     tasks.register("lintDebug") {
+        it.dependsOn(lintTask)
+        it.enabled = false
+    }
+    tasks.register("lintAnalyzeDebug") {
         it.dependsOn(lintTask)
         it.enabled = false
     }
@@ -59,6 +73,10 @@ fun Project.configureAndroidProjectForLint(lintOptions: LintOptions, extension: 
     project.afterEvaluate {
         // makes sure that the lintDebug task will exist, so we can find it by name
         setUpLintDebugIfNeeded()
+    }
+    tasks.register("lintAnalyze") {
+        it.dependsOn("lintDebug")
+        it.enabled = false
     }
     configureLint(lintOptions, extension)
     tasks.named("lint").configure { task ->
@@ -101,6 +119,11 @@ fun Project.configureLint(lintOptions: LintOptions, extension: AndroidXExtension
     // If -PupdateLintBaseline was set we should update the baseline if it exists
     val updateLintBaseline = hasProperty(UPDATE_LINT_BASELINE) && !isTestingLintItself
 
+    lintOptions.apply {
+        // Skip lintVital tasks on assemble. We explicitly run lintRelease for libraries.
+        isCheckReleaseBuilds = false
+    }
+
     // Lint is configured entirely in afterEvaluate so that individual projects cannot easily
     // disable individual checks in the DSL for any reason.
     afterEvaluate {
@@ -112,9 +135,6 @@ fun Project.configureLint(lintOptions: LintOptions, extension: AndroidXExtension
 
             // Workaround for b/177359055 where 27.2.0-beta04 incorrectly computes severity.
             isCheckAllWarnings = true
-
-            // Skip lintVital tasks on assemble. We explicitly run lintRelease for libraries.
-            isCheckReleaseBuilds = false
 
             // Write output directly to the console (and nowhere else).
             textReport = true
@@ -148,6 +168,22 @@ fun Project.configureLint(lintOptions: LintOptions, extension: AndroidXExtension
 
             // Disable a check that conflicts with our workaround for b/177359055
             disable("LintBaseline")
+
+            // Broken in 7.0.0-alpha15 due to b/180408990
+            disable("RestrictedApi")
+            disable("VisibleForTests")
+
+            // Broken in 7.0.0-alpha15 due to b/187343720
+            disable("UnusedResources")
+
+            // Broken in 7.0.0-alpha15 due to b/187341964
+            disable("VectorDrawableCompat")
+
+            // Broken in 7.0.0-alpha15 due to b/187418637
+            disable("EnforceSampledAnnotation")
+
+            // Broken in 7.0.0-alpha15 due to b/187508590
+            disable("InvalidPackage")
 
             // Provide stricter enforcement for project types intended to run on a device.
             if (extension.type.compilationTarget == CompilationTarget.DEVICE) {
@@ -201,8 +237,8 @@ fun Project.configureLint(lintOptions: LintOptions, extension: AndroidXExtension
                 textReport = false
 
                 listOf(
-                    tasks.named("lintDebug"),
-                    tasks.named("lint"),
+                    tasks.named("lintAnalyzeDebug"),
+                    tasks.named("lintAnalyze"),
                 ).forEach { task ->
                     task.configure {
                         // Delete any existing baseline so that we clear old obsolete entries.
@@ -232,6 +268,21 @@ fun Project.configureLint(lintOptions: LintOptions, extension: AndroidXExtension
 
                 // Continue running after errors or after creating a new, blank baseline file.
                 System.setProperty(LINT_BASELINE_CONTINUE, "true")
+            }
+
+            listOf(
+                tasks.named("lintAnalyzeDebug"),
+                tasks.named("lintAnalyze"),
+            ).forEach { task ->
+                task.configure {
+                    it.doLast {
+                        // Workaround for b/187319075 where lint uses the wrong output dir.
+                        var lintBuildDir = File(project.projectDir, "build")
+                        if (lintBuildDir.isDirectory) {
+                            lintBuildDir.deleteRecursively()
+                        }
+                    }
+                }
             }
 
             // Lint complains when it generates a new, blank baseline file so we'll just avoid

@@ -136,7 +136,15 @@ val ALLOW_RERUNNING_TASKS = setOf(
     ":benchmark:benchmark-macro:extractReleaseAnnotations",
     ":benchmark:benchmark-macro:extractDebugAnnotations",
     ":benchmark:benchmark-macro:generateApi",
-    ":benchmark:benchmark-macro:runErrorProne"
+    ":benchmark:benchmark-macro:runErrorProne",
+    ":benchmark:benchmark-macro:lintAnalyzeDebug",
+    ":benchmark:benchmark-macro:lintDebug",
+    "configureCMakeDebug",
+    "buildCMakeDebug",
+    "configureCMakeRelWithDebInfo",
+    "buildCMakeRelWithDebInfo",
+    ":appsearch:appsearch-local-storage:buildCMakeDebug[icing]",
+    ":appsearch:appsearch-local-storage:buildCMakeRelWithDebInfo[icing]"
 )
 
 // Additional tasks that are expected to be temporarily out-of-date after running once
@@ -154,11 +162,6 @@ val DONT_TRY_RERUNNING_TASKS = setOf(
 
     // Flakily not up-to-date, b/176120659
     "doclavaDocs",
-
-    // We should be able to remove these entries when b/160392650 is fixed
-    "lint",
-    "lintDebug",
-    "lintVitalRelease",
 )
 
 class TaskUpToDateValidator {
