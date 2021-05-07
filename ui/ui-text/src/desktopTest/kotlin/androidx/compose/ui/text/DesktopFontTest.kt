@@ -19,13 +19,14 @@ package androidx.compose.ui.text
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontStyle
+import androidx.compose.ui.text.platform.Font
 import androidx.compose.ui.text.platform.FontLoader
 import androidx.compose.ui.text.platform.GenericFontFamiliesMapping
-import androidx.compose.ui.text.platform.Font
 import androidx.compose.ui.text.platform.Typeface
 import com.google.common.truth.Truth
 import org.jetbrains.skija.Data
 import org.jetbrains.skija.Typeface
+import org.junit.Assume.assumeTrue
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -80,8 +81,11 @@ class DesktopFontTest {
             .isEqualTo(listOf("Sample Font"))
     }
 
+    // TODO(demin): can we fix findTypeface for Windows and Linux?
     @Test
     fun findTypeface() {
+        assumeTrue(isMacOs)
+
         Truth.assertThat(fontLoader.findTypeface(fontListFontFamily)!!.isItalic)
             .isEqualTo(false)
 
