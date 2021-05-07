@@ -195,22 +195,41 @@ fun Project.configureLint(lintOptions: LintOptions, extension: AndroidXExtension
             // be able to burn down existing violations. That's hard to enforce, though, so we'll
             // generally allow teams to update their baseline files with a publicly-known flag.
             if (updateLintBaseline) {
-                // Continue generating baselines regardless of errors
+                // Continue generating baselines regardless of errors.
                 isAbortOnError = false
-                // Avoid printing every single lint error to the terminal
+                // Avoid printing every single lint error to the terminal.
                 textReport = false
-                val lintDebugTask = tasks.named("lintDebug")
-                lintDebugTask.configure {
-                    it.doFirst {
-                        lintBaseline.delete()
+
+                listOf(
+                    tasks.named("lintDebug"),
+                    tasks.named("lint"),
+                ).forEach { task ->
+                    task.configure {
+                        // Delete any existing baseline so that we clear old obsolete entries.
+                        it.doFirst {
+                            lintBaseline.delete()
+                        }
+
+                        // Delete empty generated baselines because they are annoying.
+                        it.doLast {
+                            if (lintBaseline.exists()) {
+                                val hasAnyIssues = lintBaseline.reader().useLines { lines ->
+                                    lines.any { line ->
+                                        line.endsWith("<issue")
+                                    }
+                                }
+                                if (!hasAnyIssues) {
+                                    // Using println is consistent with lint's own output.
+                                    println(
+                                        "Removed empty baseline file ${lintBaseline.absolutePath}"
+                                    )
+                                    lintBaseline.delete()
+                                }
+                            }
+                        }
                     }
                 }
-                val lintTask = tasks.named("lint")
-                lintTask.configure {
-                    it.doFirst {
-                        lintBaseline.delete()
-                    }
-                }
+
                 // Continue running after errors or after creating a new, blank baseline file.
                 System.setProperty(LINT_BASELINE_CONTINUE, "true")
             }
