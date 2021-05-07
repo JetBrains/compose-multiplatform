@@ -25,6 +25,7 @@ import androidx.compose.ui.node.RootForTest
 import androidx.compose.ui.unit.Density
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.Runnable
 import kotlinx.coroutines.cancel
 import org.jetbrains.skija.Surface
@@ -59,7 +60,7 @@ class TestComposeWindow(
     private val canvas = surface.canvas
     private var owner: DesktopOwner? = null
 
-    private val coroutineScope = CoroutineScope(coroutineContext)
+    private val coroutineScope = CoroutineScope(coroutineContext + Job())
     private val frameDispatcher: FrameDispatcher = FrameDispatcher(
         onFrame = { onFrame() },
         context = coroutineScope.coroutineContext

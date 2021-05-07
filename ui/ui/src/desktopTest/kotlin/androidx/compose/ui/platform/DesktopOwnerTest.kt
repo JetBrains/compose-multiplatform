@@ -46,8 +46,11 @@ import androidx.compose.ui.input.mouse.MouseScrollOrientation
 import androidx.compose.ui.input.mouse.MouseScrollUnit
 import androidx.compose.ui.layout.Layout
 import androidx.compose.ui.test.junit4.DesktopScreenshotTestRule
+import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.unit.dp
 import com.google.common.truth.Truth
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.runBlocking
 import org.junit.Assert.assertFalse
 import org.junit.Rule
 import org.junit.Test
@@ -55,6 +58,8 @@ import org.junit.Test
 class DesktopOwnerTest {
     @get:Rule
     val screenshotRule = DesktopScreenshotTestRule("ui/ui-desktop/ui")
+    @get:Rule
+    val composeRule = createComposeRule()
 
     @Test(timeout = 5000)
     fun `rendering of Box state change`() = renderingTest(width = 40, height = 40) {
@@ -349,4 +354,18 @@ class DesktopOwnerTest {
         awaitNextRender()
         Truth.assertThat(effectIsLaunched).isTrue()
     }
+
+    @Test(expected = TestException::class)
+    fun `catch exception in LaunchedEffect`() {
+        runBlocking(Dispatchers.Main) {
+            composeRule.setContent {
+                LaunchedEffect(Unit) {
+                    throw TestException()
+                }
+            }
+            composeRule.awaitIdle()
+        }
+    }
+
+    private class TestException : RuntimeException()
 }

@@ -49,10 +49,6 @@ actual fun createComposeRule(): ComposeContentTestRule = DesktopComposeTestRule(
 @OptIn(InternalTestApi::class)
 class DesktopComposeTestRule : ComposeContentTestRule {
 
-    companion object {
-        var current: DesktopComposeTestRule? = null
-    }
-
     override val density: Density
         get() = Density(1f, 1f)
 
@@ -61,13 +57,13 @@ class DesktopComposeTestRule : ComposeContentTestRule {
 
     internal val testDisplaySize: IntSize get() = IntSize(1024, 768)
 
+    private var uncaughtExceptionHandler = UncaughtExceptionHandler()
     lateinit var window: TestComposeWindow
 
     private val testOwner = DesktopTestOwner(this)
     private val testContext = createTestContext(testOwner)
 
     override fun apply(base: Statement, description: Description?): Statement {
-        current = this
         return object : Statement() {
             override fun evaluate() {
                 window = runOnUiThread(::createWindow)
@@ -77,6 +73,8 @@ class DesktopComposeTestRule : ComposeContentTestRule {
                 } finally {
                     runOnUiThread(window::dispose)
                 }
+
+                uncaughtExceptionHandler.throwUncaught()
             }
         }
     }
@@ -86,7 +84,7 @@ class DesktopComposeTestRule : ComposeContentTestRule {
         height = testDisplaySize.height,
         density = density,
         nanoTime = System::nanoTime, // TODO(demin): use mainClock?
-        coroutineContext = Dispatchers.Swing
+        coroutineContext = Dispatchers.Swing + uncaughtExceptionHandler
     )
 
     private fun isIdle() =
@@ -96,6 +94,7 @@ class DesktopComposeTestRule : ComposeContentTestRule {
     override fun waitForIdle() {
         while (!isIdle()) {
             Thread.sleep(10)
+            uncaughtExceptionHandler.throwUncaught()
         }
     }
 
@@ -103,6 +102,7 @@ class DesktopComposeTestRule : ComposeContentTestRule {
     override suspend fun awaitIdle() {
         while (!isIdle()) {
             delay(10)
+            uncaughtExceptionHandler.throwUncaught()
         }
     }
 
