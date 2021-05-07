@@ -399,6 +399,11 @@ class AndroidXPlugin : Plugin<Project> {
         testOptions.animationsDisabled = true
         testOptions.unitTests.isReturnDefaultValues = true
 
+        // Include resources in Robolectric tests as a workaround for b/184641296 and
+        // ensure the build directory exists as a workaround for b/187970292.
+        testOptions.unitTests.isIncludeAndroidResources = true
+        if (!project.buildDir.exists()) project.buildDir.mkdirs()
+
         defaultConfig.minSdkVersion(DEFAULT_MIN_SDK_VERSION)
         project.afterEvaluate {
             val minSdkVersion = defaultConfig.minSdkVersion!!.apiLevel
