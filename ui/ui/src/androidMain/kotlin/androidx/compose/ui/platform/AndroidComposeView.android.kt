@@ -447,8 +447,8 @@ internal class AndroidComposeView(context: Context) :
                     info: AccessibilityNodeInfoCompat?
                 ) {
                     super.onInitializeAccessibilityNodeInfo(host, info)
-                    var parentId = SemanticsNode(layoutNode.outerSemantics!!, true).parent!!.id
-                    if (parentId == semanticsOwner.rootSemanticsNode.id) {
+                    var parentId = SemanticsNode(layoutNode.outerSemantics!!, false).parent!!.id
+                    if (parentId == semanticsOwner.unmergedRootSemanticsNode.id) {
                         parentId = AccessibilityNodeProviderCompat.HOST_VIEW_ID
                     }
                     info!!.setParent(thisView, parentId)

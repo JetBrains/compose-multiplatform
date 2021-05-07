@@ -33,6 +33,7 @@ import androidx.compose.foundation.layout.requiredWidth
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.selection.selectable
+import androidx.compose.foundation.selection.toggleable
 import androidx.compose.foundation.shape.CutCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.Checkbox
@@ -244,7 +245,7 @@ fun MaterialTextFieldDemo() {
                 ) {
                     RadioButton(
                         selected = (textType == selectedTextField.name),
-                        onClick = { selectedTextField = TextFieldType.valueOf(textType) }
+                        onClick = null
                     )
                     Text(
                         text = textType,
@@ -374,8 +375,15 @@ private fun OptionRow(
     onCheckedChange: (Boolean) -> Unit,
     enabled: Boolean = true
 ) {
-    Row(Modifier.padding(start = 10.dp, top = 10.dp)) {
-        Checkbox(checked = checked, onCheckedChange = onCheckedChange, enabled = enabled)
+    Row(
+        Modifier
+            .padding(start = 10.dp, top = 10.dp)
+            .fillMaxWidth()
+            .toggleable(
+                value = checked, onValueChange = onCheckedChange, enabled = enabled
+            )
+    ) {
+        Checkbox(checked = checked, onCheckedChange = null, enabled = enabled)
         Spacer(Modifier.width(20.dp))
         Text(text = title, style = MaterialTheme.typography.body1)
     }
