@@ -60,13 +60,9 @@ class TextFieldDelegateIntegrationTest {
 
         val expectedBitmap = layoutResult.toBitmap()
         val expectedCanvas = Canvas(android.graphics.Canvas(expectedBitmap))
-        TextDelegate.paintBackground(
-            0,
-            1,
-            Paint().apply { color = selectionColor },
-            expectedCanvas,
-            layoutResult
-        )
+        val selectionPath = layoutResult.multiParagraph.getPathForRange(0, 1)
+        expectedCanvas.drawPath(selectionPath, Paint().apply { color = selectionColor })
+
         TextPainter.paint(expectedCanvas, layoutResult)
 
         val actualBitmap = layoutResult.toBitmap()
