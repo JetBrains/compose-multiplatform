@@ -22,15 +22,12 @@ import androidx.benchmark.junit4.BenchmarkRule
 import androidx.benchmark.junit4.measureRepeated
 import androidx.compose.foundation.text.InternalFoundationTextApi
 import androidx.compose.foundation.text.TextDelegate
-import androidx.compose.testutils.benchmark.measureRepeatedRecordingCanvas
 import androidx.test.filters.LargeTest
 import androidx.test.platform.app.InstrumentationRegistry
 import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.graphics.Canvas
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ImageBitmap
-import androidx.compose.ui.graphics.Paint
 import androidx.compose.ui.text.benchmark.RandomTextGenerator
 import androidx.compose.ui.text.benchmark.TextBenchmarkTestRule
 import androidx.compose.ui.text.TextStyle
@@ -43,7 +40,6 @@ import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.junit.runners.Parameterized
-import kotlin.math.ceil
 import kotlin.math.roundToInt
 
 @OptIn(InternalFoundationTextApi::class)
@@ -212,34 +208,4 @@ class TextDelegateBenchmark(
             }
         }
     }
-
-    /**
-     * Measure the time taken by TextDelegate.paintBackground.
-     */
-    @Test
-    fun paintBackground() {
-        textBenchmarkTestRule.generator { textGenerator ->
-            val textDelegate = textDelegate(textGenerator)
-            val layoutResult = textDelegate.layout(
-                Constraints(maxWidth = width),
-                layoutDirection
-            )
-            val paint = Paint().also { it.color = Color.Yellow }
-
-            benchmarkRule.measureRepeatedRecordingCanvas(
-                width = layoutResult.size.width,
-                height = layoutResult.size.height
-            ) { canvas ->
-                TextDelegate.paintBackground(
-                    start = 0,
-                    end = textLength / 2,
-                    paint = paint,
-                    canvas = canvas,
-                    textLayoutResult = layoutResult
-                )
-            }
-        }
-    }
 }
-
-fun Float.toIntPx(): Int = ceil(this).roundToInt()
