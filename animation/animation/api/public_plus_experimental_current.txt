@@ -6,9 +6,20 @@ package androidx.compose.animation {
   }
 
   public final class AnimatedVisibilityKt {
-    method @androidx.compose.animation.ExperimentalAnimationApi @androidx.compose.runtime.Composable public static void AnimatedVisibility(boolean visible, optional androidx.compose.ui.Modifier modifier, optional androidx.compose.animation.EnterTransition enter, optional androidx.compose.animation.ExitTransition exit, optional boolean initiallyVisible, kotlin.jvm.functions.Function0<kotlin.Unit> content);
-    method @androidx.compose.animation.ExperimentalAnimationApi @androidx.compose.runtime.Composable public static void AnimatedVisibility(androidx.compose.foundation.layout.RowScope, boolean visible, optional androidx.compose.ui.Modifier modifier, optional androidx.compose.animation.EnterTransition enter, optional androidx.compose.animation.ExitTransition exit, optional boolean initiallyVisible, kotlin.jvm.functions.Function0<kotlin.Unit> content);
-    method @androidx.compose.animation.ExperimentalAnimationApi @androidx.compose.runtime.Composable public static void AnimatedVisibility(androidx.compose.foundation.layout.ColumnScope, boolean visible, optional androidx.compose.ui.Modifier modifier, optional androidx.compose.animation.EnterTransition enter, optional androidx.compose.animation.ExitTransition exit, optional boolean initiallyVisible, kotlin.jvm.functions.Function0<kotlin.Unit> content);
+    method @androidx.compose.animation.ExperimentalAnimationApi @androidx.compose.runtime.Composable public static void AnimatedVisibility(boolean visible, optional androidx.compose.ui.Modifier modifier, optional androidx.compose.animation.EnterTransition enter, optional androidx.compose.animation.ExitTransition exit, kotlin.jvm.functions.Function1<? super androidx.compose.animation.AnimatedVisibilityScope,kotlin.Unit> content);
+    method @androidx.compose.animation.ExperimentalAnimationApi @androidx.compose.runtime.Composable public static void AnimatedVisibility(androidx.compose.foundation.layout.RowScope, boolean visible, optional androidx.compose.ui.Modifier modifier, optional androidx.compose.animation.EnterTransition enter, optional androidx.compose.animation.ExitTransition exit, kotlin.jvm.functions.Function1<? super androidx.compose.animation.AnimatedVisibilityScope,kotlin.Unit> content);
+    method @androidx.compose.animation.ExperimentalAnimationApi @androidx.compose.runtime.Composable public static void AnimatedVisibility(androidx.compose.foundation.layout.ColumnScope, boolean visible, optional androidx.compose.ui.Modifier modifier, optional androidx.compose.animation.EnterTransition enter, optional androidx.compose.animation.ExitTransition exit, kotlin.jvm.functions.Function1<? super androidx.compose.animation.AnimatedVisibilityScope,kotlin.Unit> content);
+    method @androidx.compose.animation.ExperimentalAnimationApi @androidx.compose.runtime.Composable public static void AnimatedVisibility(androidx.compose.animation.core.MutableTransitionState<java.lang.Boolean> visibleState, optional androidx.compose.ui.Modifier modifier, androidx.compose.animation.EnterTransition enter, androidx.compose.animation.ExitTransition exit, kotlin.jvm.functions.Function1<? super androidx.compose.animation.AnimatedVisibilityScope,kotlin.Unit> content);
+    method @androidx.compose.animation.ExperimentalAnimationApi @androidx.compose.runtime.Composable public static void AnimatedVisibility(androidx.compose.foundation.layout.RowScope, androidx.compose.animation.core.MutableTransitionState<java.lang.Boolean> visibleState, optional androidx.compose.ui.Modifier modifier, optional androidx.compose.animation.EnterTransition enter, optional androidx.compose.animation.ExitTransition exit, kotlin.jvm.functions.Function1<? super androidx.compose.animation.AnimatedVisibilityScope,kotlin.Unit> content);
+    method @androidx.compose.animation.ExperimentalAnimationApi @androidx.compose.runtime.Composable public static void AnimatedVisibility(androidx.compose.foundation.layout.ColumnScope, androidx.compose.animation.core.MutableTransitionState<java.lang.Boolean> visibleState, optional androidx.compose.ui.Modifier modifier, optional androidx.compose.animation.EnterTransition enter, optional androidx.compose.animation.ExitTransition exit, kotlin.jvm.functions.Function1<? super androidx.compose.animation.AnimatedVisibilityScope,kotlin.Unit> content);
+    method @androidx.compose.animation.ExperimentalAnimationApi @androidx.compose.runtime.Composable public static <T> void AnimatedVisibility(androidx.compose.animation.core.Transition<T>, kotlin.jvm.functions.Function1<? super T,java.lang.Boolean> visible, optional androidx.compose.ui.Modifier modifier, optional androidx.compose.animation.EnterTransition enter, optional androidx.compose.animation.ExitTransition exit, kotlin.jvm.functions.Function1<? super androidx.compose.animation.AnimatedVisibilityScope,kotlin.Unit> content);
+    method @Deprecated @androidx.compose.animation.ExperimentalAnimationApi @androidx.compose.runtime.Composable public static void AnimatedVisibility(boolean visible, optional androidx.compose.ui.Modifier modifier, androidx.compose.animation.EnterTransition enter, androidx.compose.animation.ExitTransition exit, boolean initiallyVisible, kotlin.jvm.functions.Function0<kotlin.Unit> content);
+  }
+
+  @androidx.compose.animation.ExperimentalAnimationApi public final class AnimatedVisibilityScope {
+    method public androidx.compose.ui.Modifier animateEnterExit(androidx.compose.ui.Modifier, optional androidx.compose.animation.EnterTransition enter, optional androidx.compose.animation.ExitTransition exit);
+    method public androidx.compose.animation.core.Transition<androidx.compose.animation.EnterExitState> getTransition();
+    property public final androidx.compose.animation.core.Transition<androidx.compose.animation.EnterExitState> transition;
   }
 
   public final class AnimationModifierKt {
@@ -21,6 +32,12 @@ package androidx.compose.animation {
 
   public final class CrossfadeKt {
     method @androidx.compose.runtime.Composable public static <T> void Crossfade(T? targetState, optional androidx.compose.ui.Modifier modifier, optional androidx.compose.animation.core.FiniteAnimationSpec<java.lang.Float> animationSpec, kotlin.jvm.functions.Function1<? super T,kotlin.Unit> content);
+  }
+
+  @androidx.compose.animation.ExperimentalAnimationApi public enum EnterExitState {
+    enum_constant public static final androidx.compose.animation.EnterExitState PostExit;
+    enum_constant public static final androidx.compose.animation.EnterExitState PreEnter;
+    enum_constant public static final androidx.compose.animation.EnterExitState Visible;
   }
 
   public final class EnterExitTransitionKt {
@@ -42,10 +59,22 @@ package androidx.compose.animation {
 
   @androidx.compose.animation.ExperimentalAnimationApi @androidx.compose.runtime.Immutable public abstract sealed class EnterTransition {
     method @androidx.compose.runtime.Stable public final operator androidx.compose.animation.EnterTransition plus(androidx.compose.animation.EnterTransition enter);
+    field public static final androidx.compose.animation.EnterTransition.Companion Companion;
+  }
+
+  public static final class EnterTransition.Companion {
+    method public androidx.compose.animation.EnterTransition getNone();
+    property public final androidx.compose.animation.EnterTransition None;
   }
 
   @androidx.compose.animation.ExperimentalAnimationApi @androidx.compose.runtime.Immutable public abstract sealed class ExitTransition {
     method @androidx.compose.runtime.Stable public final operator androidx.compose.animation.ExitTransition plus(androidx.compose.animation.ExitTransition exit);
+    field public static final androidx.compose.animation.ExitTransition.Companion Companion;
+  }
+
+  public static final class ExitTransition.Companion {
+    method public androidx.compose.animation.ExitTransition getNone();
+    property public final androidx.compose.animation.ExitTransition None;
   }
 
   @kotlin.RequiresOptIn(message="This is an experimental animation API.") @kotlin.annotation.Target(allowedTargets={kotlin.annotation.AnnotationTarget, kotlin.annotation.AnnotationTarget, kotlin.annotation.AnnotationTarget}) public @interface ExperimentalAnimationApi {

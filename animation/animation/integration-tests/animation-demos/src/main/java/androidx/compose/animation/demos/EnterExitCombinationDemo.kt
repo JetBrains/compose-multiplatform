@@ -79,7 +79,7 @@ import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 
 @Composable
-fun EnterExitTransitionDemo() {
+fun EnterExitCombinationDemo() {
     Column(Modifier.fillMaxWidth().padding(top = 20.dp)) {
         val oppositeAlignment = remember { mutableStateOf(true) }
 

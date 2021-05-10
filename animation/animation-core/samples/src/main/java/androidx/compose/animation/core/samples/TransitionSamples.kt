@@ -18,11 +18,13 @@ package androidx.compose.animation.core.samples
 
 import androidx.annotation.Sampled
 import androidx.compose.animation.animateColor
+import androidx.compose.animation.core.ExperimentalTransitionApi
 import androidx.compose.animation.core.MutableTransitionState
 import androidx.compose.animation.core.Spring
 import androidx.compose.animation.core.Transition
 import androidx.compose.animation.core.animateDp
 import androidx.compose.animation.core.animateFloat
+import androidx.compose.animation.core.createChildTransition
 import androidx.compose.animation.core.keyframes
 import androidx.compose.animation.core.snap
 import androidx.compose.animation.core.spring
@@ -34,9 +36,12 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.layout.wrapContentSize
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Button
 import androidx.compose.material.Card
 import androidx.compose.material.Icon
@@ -51,6 +56,8 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.input.pointer.pointerInput
@@ -321,6 +328,121 @@ fun DoubleTapToLikeSample() {
                     ),
                 tint = Color.Red
             )
+        }
+    }
+}
+
+@Composable
+@Suppress("UNUSED_PARAMETER")
+@Sampled
+fun CreateChildTransitionSample() {
+    // enum class DialerState { DialerMinimized, NumberPad }
+    @OptIn(ExperimentalTransitionApi::class)
+    @Composable
+    fun DialerButton(visibilityTransition: Transition<Boolean>, modifier: Modifier) {
+        val scale by visibilityTransition.animateFloat { visible ->
+            if (visible) 1f else 2f
+        }
+        Box(modifier.scale(scale).background(Color.Black)) {
+            // Content goes here
+        }
+    }
+
+    @Composable
+    fun NumberPad(visibilityTransition: Transition<Boolean>) {
+        // Create animations using the provided Transition for visibility change here...
+    }
+
+    @OptIn(ExperimentalTransitionApi::class)
+    @Composable
+    fun childTransitionSample() {
+        var dialerState by remember { mutableStateOf(DialerState.NumberPad) }
+        Box(Modifier.fillMaxSize()) {
+            val parentTransition = updateTransition(dialerState)
+
+            // Animate to different corner radius based on target state
+            val cornerRadius by parentTransition.animateDp {
+                if (it == DialerState.NumberPad) 0.dp else 20.dp
+            }
+
+            Box(
+                Modifier.align(Alignment.BottomCenter).widthIn(50.dp).heightIn(50.dp)
+                    .clip(RoundedCornerShape(cornerRadius))
+            ) {
+                NumberPad(
+                    // Creates a child transition that derives its target state from the parent
+                    // transition, and the mapping from parent state to child state.
+                    // This will allow:
+                    // 1) Parent transition to account for additional animations in the child
+                    // Transitions before it considers itself finished. This is useful when you
+                    // have a subsequent action after all animations triggered by a state change
+                    // have finished.
+                    // 2) Separation of concerns. This allows the child composable (i.e.
+                    // NumberPad) to only care about its own visibility, rather than knowing about
+                    // DialerState.
+                    visibilityTransition = parentTransition.createChildTransition {
+                        // This is the lambda that defines how the parent target state maps to
+                        // child target state.
+                        it == DialerState.NumberPad
+                    }
+                    // Note: If it's not important for the animations within the child composable to
+                    // be observable, it's perfectly valid to not hoist the animations through
+                    // a Transition object and instead use animate*AsState.
+                )
+                DialerButton(
+                    visibilityTransition = parentTransition.createChildTransition {
+                        it == DialerState.DialerMinimized
+                    },
+                    modifier = Modifier.matchParentSize()
+                )
+            }
+        }
+    }
+}
+
+enum class DialerState {
+    DialerMinimized,
+    NumberPad
+}
+
+@OptIn(ExperimentalTransitionApi::class)
+@Composable
+fun TransitionStateIsIdleSample() {
+    @Composable
+    fun SelectableItem(selectedState: MutableTransitionState<Boolean>) {
+        val transition = updateTransition(selectedState)
+        val cornerRadius by transition.animateDp { selected -> if (selected) 10.dp else 0.dp }
+        val backgroundColor by transition.animateColor { selected ->
+            if (selected) Color.Red else Color.White
+        }
+        Box(Modifier.background(backgroundColor, RoundedCornerShape(cornerRadius))) {
+            // Item content goes here
+        }
+    }
+
+    @OptIn(ExperimentalTransitionApi::class)
+    @Composable
+    fun ItemsSample(selectedId: Int) {
+        Column {
+            repeat(3) { id ->
+                Box {
+                    // Initialize the selected state as false to produce a transition going from
+                    // false to true if `selected` parameter is true when entering composition.
+                    val selectedState = remember { MutableTransitionState(false) }
+                    // Mutate target state as needed.
+                    selectedState.targetState = id == selectedId
+                    // Now we pass the `MutableTransitionState` to the `Selectable` item and
+                    // observe state change.
+                    SelectableItem(selectedState)
+                    if (selectedState.isIdle && selectedState.targetState) {
+                        // If isIdle == true, it means the transition has arrived at its target state
+                        // and there is no pending animation.
+                        // Now we can do something after the selection transition is
+                        // finished:
+                        Text("Nice choice")
+                    }
+                }
+            }
         }
     }
 }
