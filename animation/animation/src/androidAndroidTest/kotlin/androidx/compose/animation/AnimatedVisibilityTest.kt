@@ -16,29 +16,34 @@
 
 package androidx.compose.animation
 
+import androidx.compose.animation.EnterExitState.PostExit
+import androidx.compose.animation.EnterExitState.Visible
+import androidx.compose.animation.core.FastOutLinearInEasing
 import androidx.compose.animation.core.FastOutSlowInEasing
+import androidx.compose.animation.core.InternalAnimationApi
 import androidx.compose.animation.core.LinearOutSlowInEasing
+import androidx.compose.animation.core.MutableTransitionState
 import androidx.compose.animation.core.tween
+import androidx.compose.animation.core.updateTransition
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.requiredSize
 import androidx.compose.foundation.layout.size
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
+import androidx.compose.runtime.withFrameNanos
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.platform.LocalDensity
-import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.test.ExperimentalTestApi
-import androidx.compose.ui.test.captureToImage
 import androidx.compose.ui.test.junit4.createComposeRule
-import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.IntSize
@@ -49,14 +54,13 @@ import androidx.test.filters.LargeTest
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
-import org.junit.Ignore
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 
 @RunWith(AndroidJUnit4::class)
 @LargeTest
-@OptIn(ExperimentalTestApi::class)
+@OptIn(ExperimentalTestApi::class, InternalAnimationApi::class)
 class AnimatedVisibilityTest {
 
     @get:Rule
@@ -325,60 +329,181 @@ class AnimatedVisibilityTest {
         }
     }
 
-    @Ignore
-    @OptIn(ExperimentalAnimationApi::class)
+    // Test different animations for fade in and fade out, in a complete run without interruptions
+    @OptIn(ExperimentalAnimationApi::class, InternalAnimationApi::class)
     @Test
     fun animateVisibilityFadeTest() {
         var visible by mutableStateOf(false)
-        val colors = mutableListOf<Int>()
+        val easing = FastOutLinearInEasing
+        val easingOut = FastOutSlowInEasing
+        var alpha by mutableStateOf(0f)
         rule.setContent {
-            Box(Modifier.size(size = 20.dp).background(Color.Black)) {
-                AnimatedVisibility(
-                    visible,
-                    enter = fadeIn(animationSpec = tween(500)),
-                    exit = fadeOut(animationSpec = tween(500)),
-                    modifier = Modifier.testTag("AnimV")
-                ) {
-                    Box(modifier = Modifier.size(size = 20.dp).background(Color.White))
+            AnimatedVisibility(
+                visible,
+                enter = fadeIn(animationSpec = tween(500, easing = easing)),
+                exit = fadeOut(animationSpec = tween(300, easing = easingOut)),
+            ) {
+                Box(modifier = Modifier.size(size = 20.dp).background(Color.White))
+                LaunchedEffect(visible) {
+                    var exit = false
+                    val enterExit = transition
+                    while (true) {
+                        withFrameNanos {
+                            if (enterExit.targetState == Visible) {
+                                alpha = enterExit.animations.firstOrNull {
+                                    it.label == "alpha"
+                                }?.value as Float
+                                val fraction =
+                                    (enterExit.playTimeNanos / 1_000_000) / 500f
+                                if (enterExit.currentState != Visible) {
+                                    assertEquals(easing.transform(fraction), alpha, 0.01f)
+                                } else {
+                                    // When currentState = targetState, the playTime will be reset
+                                    // to 0. So compare alpha against expected visible value.
+                                    assertEquals(1f, alpha)
+                                    exit = true
+                                }
+                            } else if (enterExit.targetState == PostExit) {
+                                alpha = enterExit.animations.firstOrNull {
+                                    it.label == "alpha"
+                                }?.value as Float
+                                val fraction =
+                                    (enterExit.playTimeNanos / 1_000_000) / 300f
+                                if (enterExit.currentState != PostExit) {
+                                    assertEquals(
+                                        1f - easingOut.transform(fraction),
+                                        alpha,
+                                        0.01f
+                                    )
+                                } else {
+                                    // When currentState = targetState, the playTime will be reset
+                                    // to 0. So compare alpha against expected invisible value.
+                                    assertEquals(0f, alpha)
+                                    exit = true
+                                }
+                            } else {
+                                exit = enterExit.currentState == enterExit.targetState
+                            }
+                        }
+                        if (exit) break
+                    }
                 }
             }
         }
         rule.runOnIdle {
             visible = true
         }
-        rule.mainClock.autoAdvance = false
-        while (colors.isEmpty() || colors.last() != 0xffffffff.toInt()) {
-            rule.mainClock.advanceTimeByFrame()
-            rule.onNodeWithTag("AnimV").apply {
-                val data = IntArray(1)
-                data[0] = 0
-                captureToImage().readPixels(data, 10, 10, 1, 1)
-                colors.add(data[0])
-            }
-        }
-        for (i in 1 until colors.size) {
-            // Check every color against the previous one to ensure the alpha is non-decreasing
-            // during fade in.
-            assertTrue(colors[i] >= colors[i - 1])
-        }
-        assertTrue(colors[0] < 0xfffffffff)
-        colors.clear()
         rule.runOnIdle {
+            // At this point fade in has finished, expect alpha = 1
+            assertEquals(1f, alpha)
             visible = false
         }
-        while (colors.isEmpty() || colors.last() != 0xff000000.toInt()) {
-            rule.mainClock.advanceTimeByFrame()
-            rule.onNodeWithTag("AnimV").apply {
-                val data = IntArray(1)
-                data[0] = 0
-                captureToImage().readPixels(data, 10, 10, 1, 1)
-                colors.add(data[0])
+        rule.runOnIdle {
+            // At this point fade out has finished, expect alpha = 0
+            assertEquals(0f, alpha)
+        }
+    }
+
+    @OptIn(ExperimentalAnimationApi::class)
+    @Test
+    fun testEnterTransitionNoneAndExitTransitionNone() {
+        val testModifier by mutableStateOf(TestModifier())
+        val visible = MutableTransitionState(false)
+        var disposed by mutableStateOf(false)
+        rule.mainClock.autoAdvance = false
+        rule.setContent {
+            CompositionLocalProvider(LocalDensity provides Density(1f)) {
+                AnimatedVisibility(
+                    visible, testModifier,
+                    enter = EnterTransition.None,
+                    exit = ExitTransition.None
+                ) {
+                    Box(Modifier.requiredSize(100.dp, 100.dp)) {
+                        DisposableEffect(Unit) {
+                            onDispose {
+                                disposed = true
+                            }
+                        }
+                    }
+                }
             }
         }
-        for (i in 1 until colors.size) {
-            // Check every color against the previous one to ensure the alpha is non-increasing
-            // during fade out.
-            assertTrue(colors[i] <= colors[i - 1])
+
+        rule.runOnIdle {
+            assertEquals(0, testModifier.width)
+            assertEquals(0, testModifier.height)
+            visible.targetState = true
+        }
+        rule.mainClock.advanceTimeByFrame()
+        rule.mainClock.advanceTimeByFrame()
+        rule.runOnIdle {
+            assertEquals(100, testModifier.width)
+            assertEquals(100, testModifier.height)
+            assertFalse(disposed)
+            visible.targetState = false
+        }
+        rule.mainClock.advanceTimeByFrame()
+        rule.mainClock.advanceTimeByFrame()
+        rule.runOnIdle {
+            assertTrue(disposed)
+        }
+    }
+
+    private enum class TestState { State1, State2, State3 }
+
+    @OptIn(ExperimentalAnimationApi::class)
+    @Test
+    fun testTransitionExtensionAnimatedVisibility() {
+        val testModifier by mutableStateOf(TestModifier())
+        val testState = mutableStateOf(TestState.State1)
+        var currentState = TestState.State1
+        var disposed by mutableStateOf(false)
+        rule.mainClock.autoAdvance = false
+        rule.setContent {
+            CompositionLocalProvider(LocalDensity provides Density(1f)) {
+                val transition = updateTransition(testState.value)
+                currentState = transition.currentState
+                transition.AnimatedVisibility(
+                    // Only visible in State2
+                    visible = { it == TestState.State2 },
+                    modifier = testModifier,
+                    enter = expandIn(animationSpec = tween(100)),
+                    exit = shrinkOut(animationSpec = tween(100))
+                ) {
+                    Box(Modifier.requiredSize(100.dp, 100.dp)) {
+                        DisposableEffect(Unit) {
+                            onDispose {
+                                disposed = true
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        rule.runOnIdle {
+            assertEquals(0, testModifier.width)
+            assertEquals(0, testModifier.height)
+            testState.value = TestState.State2
+        }
+        while (currentState != TestState.State2) {
+            assertTrue(testModifier.width < 100)
+            rule.mainClock.advanceTimeByFrame()
+        }
+        rule.runOnIdle {
+            assertEquals(100, testModifier.width)
+            assertEquals(100, testModifier.height)
+            testState.value = TestState.State3
+        }
+        while (currentState != TestState.State3) {
+            assertTrue(testModifier.width > 0)
+            assertFalse(disposed)
+            rule.mainClock.advanceTimeByFrame()
+        }
+        rule.mainClock.advanceTimeByFrame()
+        rule.runOnIdle {
+            assertEquals(0, testModifier.width)
+            assertEquals(0, testModifier.height)
+            assertTrue(disposed)
         }
     }
 }
