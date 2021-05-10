@@ -248,7 +248,7 @@ internal open class TypefaceAdapter(
                 else -> throw IllegalStateException("Unknown font type: $font")
             }
         } catch (e: Exception) {
-            throw IllegalStateException("Cannot create Typeface from $font")
+            throw IllegalStateException("Cannot create Typeface from $font", e)
         }
 
         val loadedFontIsSameAsRequest = fontWeight == font.weight && fontStyle == font.style
