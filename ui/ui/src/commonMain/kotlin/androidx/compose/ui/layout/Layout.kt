@@ -20,7 +20,7 @@ package androidx.compose.ui.layout
 
 import androidx.compose.runtime.Applier
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.ComposeNode
+import androidx.compose.runtime.ReusableComposeNode
 import androidx.compose.runtime.SkippableUpdater
 import androidx.compose.runtime.currentComposer
 import androidx.compose.ui.Modifier
@@ -71,7 +71,7 @@ import androidx.compose.ui.util.fastMap
 ) {
     val density = LocalDensity.current
     val layoutDirection = LocalLayoutDirection.current
-    ComposeNode<ComposeUiNode, Applier<Any>>(
+    ReusableComposeNode<ComposeUiNode, Applier<Any>>(
         factory = ComposeUiNode.Constructor,
         update = {
             set(measurePolicy, ComposeUiNode.SetMeasurePolicy)
@@ -192,7 +192,7 @@ fun MultiMeasureLayout(
     val density = LocalDensity.current
     val layoutDirection = LocalLayoutDirection.current
 
-    ComposeNode<LayoutNode, Applier<Any>>(
+    ReusableComposeNode<LayoutNode, Applier<Any>>(
         factory = LayoutNode.Constructor,
         update = {
             set(materialized, ComposeUiNode.SetModifier)

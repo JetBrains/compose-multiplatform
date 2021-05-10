@@ -17,9 +17,9 @@
 package androidx.compose.runtime.saveable
 
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.CompositionLocalProvider
-import androidx.compose.runtime.key
+import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.ReusableContent
 import androidx.compose.runtime.remember
 
 /**
@@ -73,7 +73,7 @@ private class SaveableStateHolderImpl(
 
     @Composable
     override fun SaveableStateProvider(key: Any, content: @Composable () -> Unit) {
-        key(key) {
+        ReusableContent(key) {
             val registryHolder = remember {
                 require(parentSaveableStateRegistry?.canBeSaved(key) ?: true) {
                     "Type of the key $key is not supported. On Android you can only use types " +
@@ -85,7 +85,7 @@ private class SaveableStateHolderImpl(
                 LocalSaveableStateRegistry provides registryHolder.registry,
                 content = content
             )
-            DisposableEffect(key) {
+            DisposableEffect(Unit) {
                 require(key !in registryHolders) { "Key $key was used multiple times " }
                 savedStates -= key
                 registryHolders[key] = registryHolder

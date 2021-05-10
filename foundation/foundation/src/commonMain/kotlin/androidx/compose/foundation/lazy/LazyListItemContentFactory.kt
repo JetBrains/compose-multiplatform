@@ -100,8 +100,11 @@ internal class LazyListItemContentFactory(
         val content: @Composable () -> Unit = @Composable {
             val itemsProvider = itemsProvider.value
             if (index < itemsProvider.itemsCount) {
-                val content = itemsProvider.getContent(index, scope)
-                saveableStateHolder.SaveableStateProvider(key, content)
+                val key = itemsProvider.getKey(index)
+                if (key == this.key) {
+                    val content = itemsProvider.getContent(index, scope)
+                    saveableStateHolder.SaveableStateProvider(key, content)
+                }
             }
         }
     }

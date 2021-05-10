@@ -70,7 +70,7 @@ internal fun LazyList(
 
     val itemContentFactory = rememberItemContentFactory(stateOfItemsProvider, state)
 
-    val subcomposeLayoutState = remember { SubcomposeLayoutState() }
+    val subcomposeLayoutState = remember { SubcomposeLayoutState(MaxItemsToRetainForReuse) }
     LazyListPrefetcher(state, stateOfItemsProvider, itemContentFactory, subcomposeLayoutState)
 
     SubcomposeLayout(
@@ -183,6 +183,8 @@ internal fun LazyList(
         )
     }
 }
+
+private const val MaxItemsToRetainForReuse = 2
 
 /**
  * Platform specific implementation of lazy list prefetching - precomposing next items in
