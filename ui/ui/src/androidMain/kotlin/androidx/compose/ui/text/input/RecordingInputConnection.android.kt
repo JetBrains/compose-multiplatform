@@ -55,7 +55,7 @@ internal class RecordingInputConnection(
     @VisibleForTesting
     internal var mTextFieldValue: TextFieldValue = initState
         set(value) {
-            if (DEBUG) { Log.d(TAG, "New InputState has set: $value -> $mTextFieldValue") }
+            if (DEBUG) { Log.d(TAG, "RecordingInputConnection.mTextFieldValue : $field -> $value") }
             field = value
         }
 
@@ -74,6 +74,9 @@ internal class RecordingInputConnection(
      */
     private var extractedTextMonitorMode = false
 
+    // The recoding editing ops.
+    private val editCommands = mutableListOf<EditCommand>()
+
     /**
      * Updates the input state and tells it to the IME.
      *
@@ -81,7 +84,7 @@ internal class RecordingInputConnection(
      * contents has changed if needed.
      */
     fun updateInputState(state: TextFieldValue, imm: InputMethodManager, view: View) {
-        if (DEBUG) { Log.d(TAG, "updateInputState: $state") }
+        if (DEBUG) { Log.d(TAG, "RecordingInputConnection.updateInputState: $state") }
         mTextFieldValue = state
 
         if (extractedTextMonitorMode) {
@@ -94,7 +97,7 @@ internal class RecordingInputConnection(
         if (DEBUG) {
             Log.d(
                 TAG,
-                "updateSelection(" +
+                "RecordingInputConnection.updateSelection(" +
                     "selection = (${state.selection.min},${state.selection.max}), " +
                     "composition = ($compositionStart, $compositionEnd)"
             )
@@ -103,9 +106,6 @@ internal class RecordingInputConnection(
             view, state.selection.min, state.selection.max, compositionStart, compositionEnd
         )
     }
-
-    // The recoding editing ops.
-    private val editCommands = mutableListOf<EditCommand>()
 
     // Add edit op to internal list with wrapping batch edit.
     private fun addEditCommandWithBatch(editCommand: EditCommand) {
