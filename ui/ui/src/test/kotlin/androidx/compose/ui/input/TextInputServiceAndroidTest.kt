@@ -418,6 +418,26 @@ class TextInputServiceAndroidTest {
     }
 
     @Test
+    fun test_fill_editor_info_multi_line_with_default_action() {
+        textInputService.startInput(
+            value = TextFieldValue(""),
+            imeOptions = ImeOptions(
+                singleLine = false,
+                keyboardType = KeyboardType.Text,
+                imeAction = ImeAction.Default
+            ),
+            onEditCommand = {},
+            onImeActionPerformed = {}
+        )
+
+        EditorInfo().let { info ->
+            textInputService.createInputConnection(info)
+            assertFalse((InputType.TYPE_TEXT_FLAG_MULTI_LINE and info.inputType) == 0)
+            assertFalse((EditorInfo.IME_FLAG_NO_ENTER_ACTION and info.imeOptions) == 0)
+        }
+    }
+
+    @Test
     fun test_fill_editor_info_single_line() {
         textInputService.startInput(
             value = TextFieldValue(""),
