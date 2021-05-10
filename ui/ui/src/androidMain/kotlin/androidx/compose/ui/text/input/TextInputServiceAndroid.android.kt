@@ -33,6 +33,8 @@ import androidx.compose.ui.text.TextRange
 import kotlinx.coroutines.channels.Channel
 import kotlin.math.roundToInt
 
+private const val DEBUG_CLASS = "TextInputServiceAndroid"
+
 /**
  * Provide Android specific input service with the Operating System.
  */
@@ -153,7 +155,7 @@ internal class TextInputServiceAndroid(val view: View) : PlatformTextInputServic
     }
 
     private fun restartInput() {
-        if (DEBUG) Log.d(TAG, "restartInput")
+        if (DEBUG) Log.d(TAG, "$DEBUG_CLASS.restartInput")
         imm.restartInput(view)
     }
 
@@ -182,13 +184,13 @@ internal class TextInputServiceAndroid(val view: View) : PlatformTextInputServic
 
     override fun updateState(oldValue: TextFieldValue?, newValue: TextFieldValue) {
         if (DEBUG) {
-            Log.d(TAG, "TextInputServiceAndroid.updateState called: $oldValue -> $newValue")
+            Log.d(TAG, "$DEBUG_CLASS.updateState called: $oldValue -> $newValue")
         }
 
         // update the latest TextFieldValue in InputConnection
         ic?.mTextFieldValue = newValue
 
-        if (DEBUG) { Log.d(TAG, "TextInputServiceAndroid.updateState early return") }
+        if (DEBUG) { Log.d(TAG, "$DEBUG_CLASS.updateState early return") }
 
         if (oldValue == newValue) return
 
@@ -201,7 +203,7 @@ internal class TextInputServiceAndroid(val view: View) : PlatformTextInputServic
         } ?: false
 
         if (DEBUG) {
-            Log.d(TAG, "TextInputServiceAndroid.updateState: restart($restartInput), state: $state")
+            Log.d(TAG, "$DEBUG_CLASS.updateState: restart($restartInput), state: $state")
         }
 
         if (restartInput) {
