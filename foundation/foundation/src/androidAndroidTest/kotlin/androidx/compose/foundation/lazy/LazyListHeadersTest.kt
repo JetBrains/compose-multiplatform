@@ -25,6 +25,7 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.test.assertIsDisplayed
+import androidx.compose.ui.test.assertIsNotDisplayed
 import androidx.compose.ui.test.assertLeftPositionInRootIsEqualTo
 import androidx.compose.ui.test.assertTopPositionInRootIsEqualTo
 import androidx.compose.ui.test.junit4.createComposeRule
@@ -162,7 +163,7 @@ class LazyListHeadersTest {
             .scrollBy(y = 105.dp, density = rule.density)
 
         rule.onNodeWithTag(firstHeaderTag)
-            .assertDoesNotExist()
+            .assertIsNotDisplayed()
 
         rule.onNodeWithTag(secondHeaderTag)
             .assertIsDisplayed()
@@ -289,7 +290,7 @@ class LazyListHeadersTest {
             .scrollBy(x = 105.dp, density = rule.density)
 
         rule.onNodeWithTag(firstHeaderTag)
-            .assertDoesNotExist()
+            .assertIsNotDisplayed()
 
         rule.onNodeWithTag(secondHeaderTag)
             .assertIsDisplayed()

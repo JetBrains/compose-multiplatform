@@ -237,7 +237,7 @@ class LazyRowTest {
             .scrollBy(x = 105.dp, density = rule.density)
 
         rule.onNodeWithTag("1")
-            .assertDoesNotExist()
+            .assertIsNotDisplayed()
 
         rule.onNodeWithTag("2")
             .assertIsDisplayed()
@@ -264,7 +264,7 @@ class LazyRowTest {
             .scrollBy(x = 150.dp, density = rule.density)
 
         rule.onNodeWithTag("1")
-            .assertDoesNotExist()
+            .assertIsNotDisplayed()
 
         rule.onNodeWithTag("2")
             .assertIsDisplayed()
@@ -524,10 +524,12 @@ class LazyRowTest {
 
     @Test
     fun scrollsLeftInRtl() {
+        lateinit var state: LazyListState
         rule.setContentWithTestViewConfiguration {
             CompositionLocalProvider(LocalLayoutDirection provides LayoutDirection.Rtl) {
                 Box(Modifier.width(100.dp)) {
-                    LazyRow(Modifier.testTag(LazyListTag)) {
+                    state = rememberLazyListState()
+                    LazyRow(Modifier.testTag(LazyListTag), state) {
                         items(4) {
                             Spacer(
                                 Modifier.width(101.dp).fillParentMaxHeight().testTag("$it")
@@ -541,11 +543,10 @@ class LazyRowTest {
         rule.onNodeWithTag(LazyListTag)
             .scrollBy(x = (-150).dp, density = rule.density)
 
-        rule.onNodeWithTag("0")
-            .assertDoesNotExist()
-
-        rule.onNodeWithTag("1")
-            .assertIsDisplayed()
+        rule.runOnIdle {
+            assertThat(state.firstVisibleItemIndex).isEqualTo(1)
+            assertThat(state.firstVisibleItemScrollOffset).isGreaterThan(0)
+        }
     }
 
     @Test
