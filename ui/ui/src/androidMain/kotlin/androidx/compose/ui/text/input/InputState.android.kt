@@ -21,6 +21,7 @@ import android.view.inputmethod.ExtractedText
 internal fun TextFieldValue.toExtractedText(): ExtractedText {
     val res = ExtractedText()
     res.text = text
+    res.startOffset = 0
     res.partialEndOffset = text.length
     res.partialStartOffset = -1 // -1 means full text
     res.selectionStart = selection.min

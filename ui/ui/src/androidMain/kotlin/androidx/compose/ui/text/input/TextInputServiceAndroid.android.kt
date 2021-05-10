@@ -181,10 +181,14 @@ internal class TextInputServiceAndroid(val view: View) : PlatformTextInputServic
     }
 
     override fun updateState(oldValue: TextFieldValue?, newValue: TextFieldValue) {
-        if (DEBUG) { Log.d(TAG, "InputService.updateState: $oldValue -> $newValue") }
+        if (DEBUG) {
+            Log.d(TAG, "TextInputServiceAndroid.updateState called: $oldValue -> $newValue")
+        }
 
         // update the latest TextFieldValue in InputConnection
         ic?.mTextFieldValue = newValue
+
+        if (DEBUG) { Log.d(TAG, "TextInputServiceAndroid.updateState early return") }
 
         if (oldValue == newValue) return
 
@@ -196,7 +200,9 @@ internal class TextInputServiceAndroid(val view: View) : PlatformTextInputServic
                 (it.selection == newValue.selection && it.composition != newValue.composition)
         } ?: false
 
-        if (DEBUG) { Log.d(TAG, "InputService.updateState: $state / $restartInput(restartInput) ") }
+        if (DEBUG) {
+            Log.d(TAG, "TextInputServiceAndroid.updateState: restart($restartInput), state: $state")
+        }
 
         if (restartInput) {
             restartInput()
@@ -279,9 +285,9 @@ internal class TextInputServiceAndroid(val view: View) : PlatformTextInputServic
                 // TextView.java#setInputTypeSingleLine
                 outInfo.inputType = outInfo.inputType or InputType.TYPE_TEXT_FLAG_MULTI_LINE
 
-                // adding this flag caused b/171598334, leaving here on purpose for future reference
-                // TextView.java#onCreateInputConnection
-                // outInfo.imeOptions = outInfo.imeOptions or EditorInfo.IME_FLAG_NO_ENTER_ACTION
+                if (imeOptions.imeAction == ImeAction.Default) {
+                    outInfo.imeOptions = outInfo.imeOptions or EditorInfo.IME_FLAG_NO_ENTER_ACTION
+                }
             }
         }
 
