@@ -31,5 +31,7 @@
         <activity android:name="androidx.compose.runtime.saveable.RecreationTest7Activity" />
         <activity android:name="androidx.compose.runtime.saveable.RecreationTest8Activity" />
         <activity android:name="androidx.compose.runtime.saveable.SaveableStateHolderTest$Activity" />
+        <activity android:name="androidx.compose.runtime.saveable.PopupsRecreationTestActivity" />
+        <activity android:name="androidx.compose.runtime.saveable.DialogsRecreationTestActivity" />
     </application>
 </manifest>
