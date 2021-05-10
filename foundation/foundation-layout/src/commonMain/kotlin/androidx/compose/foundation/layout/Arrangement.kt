@@ -563,12 +563,12 @@ object Arrangement {
             outPositions: IntArray
         ) {
             if (sizes.isEmpty()) return
-            val spacePx = with(density) { space.roundToPx() }
+            val spacePx = space.roundToPx()
 
             var occupied = 0
             var lastSpace = 0
-            if (layoutDirection == LayoutDirection.Rtl && rtlMirror) sizes.reverse()
-            sizes.forEachIndexed { index, it ->
+            val reversed = rtlMirror && layoutDirection == LayoutDirection.Rtl
+            sizes.forEachIndexed(reversed) { index, it ->
                 outPositions[index] = min(occupied, totalSize - it)
                 lastSpace = min(spacePx, totalSize - outPositions[index] - it)
                 occupied = outPositions[index] + it + lastSpace
@@ -581,8 +581,6 @@ object Arrangement {
                     outPositions[index] += groupPosition
                 }
             }
-
-            if (layoutDirection == LayoutDirection.Rtl && rtlMirror) outPositions.reverse()
         }
 
         override fun Density.arrange(
