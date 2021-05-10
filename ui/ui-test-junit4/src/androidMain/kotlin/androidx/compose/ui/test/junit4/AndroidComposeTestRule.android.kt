@@ -342,6 +342,7 @@ class AndroidComposeTestRule<R : TestRule, A : ComponentActivity>(
                 }
                 base.evaluate()
             } finally {
+                textInputServiceFactory = oldTextInputFactory
                 recomposer.cancel()
                 // FYI: Not canceling these scope below would end up cleanupTestCoroutines
                 // throwing errors on active coroutines
@@ -350,7 +351,6 @@ class AndroidComposeTestRule<R : TestRule, A : ComponentActivity>(
                 coroutineExceptionHandler.throwUncaught()
                 @OptIn(ExperimentalCoroutinesApi::class)
                 testCoroutineDispatcher.cleanupTestCoroutines()
-                textInputServiceFactory = oldTextInputFactory
                 // Dispose the content
                 if (disposeContentHook != null) {
                     runOnUiThread {
