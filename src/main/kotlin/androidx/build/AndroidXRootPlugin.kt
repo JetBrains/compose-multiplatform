@@ -53,7 +53,6 @@ class AndroidXRootPlugin : Plugin<Project> {
         tasks.register("listAndroidXProperties", ListAndroidXPropertiesTask::class.java)
         setDependencyVersions()
         configureKtlintCheckFile()
-        configureCheckInvalidSuppress()
         tasks.register(CheckExternalDependencyLicensesTask.TASK_NAME)
 
         val buildOnServerTask = tasks.create(
