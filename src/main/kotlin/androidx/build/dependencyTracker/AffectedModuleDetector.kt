@@ -477,7 +477,15 @@ class AffectedModuleDetectorImpl constructor(
             setOf(
                 ":compose:integration-tests:macrobenchmark",
                 ":compose:integration-tests:macrobenchmark-target"
-            ), // link compose's macrobenchmark and its target
+            ),
+            setOf(
+                ":emoji2:integration-tests:init-disabled-macrobenchmark",
+                ":emoji2:integration-tests:init-disabled-macrobenchmark-target",
+            ),
+            setOf(
+                ":emoji2:integration-tests:init-enabled-macrobenchmark",
+                ":emoji2:integration-tests:init-enabled-macrobenchmark-target",
+            ),
         )
     }
 }
