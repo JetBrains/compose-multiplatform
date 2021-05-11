@@ -133,7 +133,7 @@ class RecordingInputConnectionTest {
             selection = TextRange.Zero
         )
 
-        assertEquals("", ic.getSelectedText(0))
+        assertEquals(null, ic.getSelectedText(0))
 
         // Set "Hello, World", and place the cursor between "H" and "e".
         ic.mTextFieldValue = TextFieldValue(
