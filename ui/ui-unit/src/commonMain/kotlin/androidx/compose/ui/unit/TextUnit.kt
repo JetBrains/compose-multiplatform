@@ -17,7 +17,6 @@
 
 package androidx.compose.ui.unit
 
-import androidx.compose.runtime.ExperimentalComposeApi
 import androidx.compose.runtime.Immutable
 import androidx.compose.runtime.Stable
 import androidx.compose.ui.geometry.isSpecified
@@ -49,7 +48,7 @@ enum class TextUnitType(internal val type: Long) {
     Em(UNIT_TYPE_EM)
 }
 
-@ExperimentalComposeApi
+@ExperimentalUnitApi
 fun TextUnit(value: Float, type: TextUnitType): TextUnit = pack(type.type, value)
 
 /**
