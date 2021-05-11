@@ -2344,34 +2344,6 @@ internal class ComposerImpl(
             } ?: it else it
         }
 
-    internal fun invalidateForResult(scope: RecomposeScopeImpl): InvalidationResult {
-        if (scope.defaultsInScope) {
-            scope.defaultsInvalid = true
-        }
-        val anchor = scope.anchor
-        if (anchor == null || !slotTable.ownsAnchor(anchor) || !anchor.valid)
-            return InvalidationResult.IGNORED // The scope has not yet entered the composition
-        val location = anchor.toIndexFor(slotTable)
-        if (location < 0)
-            return InvalidationResult.IGNORED // The scope was removed from the composition
-        invalidations.insertIfMissing(location, scope)
-        if (isComposing && location >= reader.currentGroup) {
-            // if we are invalidating a scope that is going to be traversed during this
-            // composition.
-            return InvalidationResult.IMMINENT
-        }
-        parentContext.invalidate(composition)
-        return if (isComposing) InvalidationResult.DEFERRED else InvalidationResult.SCHEDULED
-    }
-
-    /**
-     * Unlike [invalidateForResult] above, this method can be called on any thread and synchronizes
-     * with the parent reference to ensure [invalidateForResult] is called on the correct thread.
-     */
-    internal fun invalidate(scope: RecomposeScopeImpl) {
-        parentContext.invalidateScope(scope)
-    }
-
     internal fun tryImminentInvalidation(scope: RecomposeScopeImpl): Boolean {
         val anchor = scope.anchor ?: return false
         val location = anchor.toIndexFor(slotTable)
