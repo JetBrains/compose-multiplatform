@@ -110,11 +110,11 @@ internal class RecordingInputConnection(
 
     // Add edit op to internal list with wrapping batch edit.
     private fun addEditCommandWithBatch(editCommand: EditCommand) {
-        beginBatchEdit()
+        beginBatchEditInternal()
         try {
             editCommands.add(editCommand)
         } finally {
-            endBatchEdit()
+            endBatchEditInternal()
         }
     }
 
@@ -124,12 +124,20 @@ internal class RecordingInputConnection(
 
     override fun beginBatchEdit(): Boolean {
         if (DEBUG) { Log.d(TAG, "$DEBUG_CLASS.beginBatchEdit()") }
+        return beginBatchEditInternal()
+    }
+
+    private fun beginBatchEditInternal(): Boolean {
         batchDepth++
         return true
     }
 
     override fun endBatchEdit(): Boolean {
         if (DEBUG) { Log.d(TAG, "$DEBUG_CLASS.endBatchEdit()") }
+        return endBatchEditInternal()
+    }
+
+    private fun endBatchEditInternal(): Boolean {
         batchDepth--
         if (batchDepth == 0 && editCommands.isNotEmpty()) {
             eventCallback.onEditCommands(editCommands.toMutableList())
@@ -139,7 +147,7 @@ internal class RecordingInputConnection(
     }
 
     override fun closeConnection() {
-        if (DEBUG) { Log.d(TAG, "closeConnection()") }
+        if (DEBUG) { Log.d(TAG, "$DEBUG_CLASS.closeConnection()") }
         editCommands.clear()
         batchDepth = 0
     }
@@ -206,18 +214,29 @@ internal class RecordingInputConnection(
     // /////////////////////////////////////////////////////////////////////////////////////////////
 
     override fun getTextBeforeCursor(maxChars: Int, flags: Int): CharSequence {
-        if (DEBUG) { Log.d(TAG, "$DEBUG_CLASS.getTextBeforeCursor($maxChars, $flags)") }
-        return mTextFieldValue.getTextBeforeSelection(maxChars).toString()
+        // TODO(b/135556699) should return styled text
+        val result = mTextFieldValue.getTextBeforeSelection(maxChars).toString()
+        if (DEBUG) { Log.d(TAG, "$DEBUG_CLASS.getTextBeforeCursor($maxChars, $flags): $result") }
+        return result
     }
 
     override fun getTextAfterCursor(maxChars: Int, flags: Int): CharSequence {
-        if (DEBUG) { Log.d(TAG, "$DEBUG_CLASS.getTextAfterCursor($maxChars, $flags)") }
-        return mTextFieldValue.getTextAfterSelection(maxChars).toString()
+        // TODO(b/135556699) should return styled text
+        val result = mTextFieldValue.getTextAfterSelection(maxChars).toString()
+        if (DEBUG) { Log.d(TAG, "$DEBUG_CLASS.getTextAfterCursor($maxChars, $flags): $result") }
+        return result
     }
 
-    override fun getSelectedText(flags: Int): CharSequence {
-        if (DEBUG) { Log.d(TAG, "$DEBUG_CLASS.getSelectedText($flags)") }
-        return mTextFieldValue.getSelectedText().toString()
+    override fun getSelectedText(flags: Int): CharSequence? {
+        // https://source.chromium.org/chromium/chromium/src/+/master:content/public/android/java/src/org/chromium/content/browser/input/TextInputState.java;l=56;drc=0e20d1eb38227949805a4c0e9d5cdeddc8d23637
+        val result: CharSequence? = if (mTextFieldValue.selection.collapsed) {
+            null
+        } else {
+            // TODO(b/135556699) should return styled text
+            mTextFieldValue.getSelectedText().toString()
+        }
+        if (DEBUG) { Log.d(TAG, "$DEBUG_CLASS.getSelectedText($flags): $result") }
+        return result
     }
 
     override fun requestCursorUpdates(cursorUpdateMode: Int): Boolean {
@@ -234,6 +253,7 @@ internal class RecordingInputConnection(
         if (extractedTextMonitorMode) {
             currentExtractedTextRequestToken = request?.token ?: 0
         }
+        // TODO(b/135556699) should return styled text
         val extractedText = mTextFieldValue.toExtractedText()
 
         if (DEBUG) {
