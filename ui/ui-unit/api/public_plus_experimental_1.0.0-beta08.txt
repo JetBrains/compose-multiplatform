@@ -157,6 +157,9 @@ package androidx.compose.ui.unit {
   public static final class DpRect.Companion {
   }
 
+  @kotlin.RequiresOptIn(message="This API is experimental and is likely to change in the future.") public @interface ExperimentalUnitApi {
+  }
+
   @androidx.compose.runtime.Immutable public final inline class IntOffset {
     ctor public IntOffset();
     method @androidx.compose.runtime.Stable public static operator int component1-impl(long $this);
@@ -320,7 +323,7 @@ package androidx.compose.ui.unit {
   }
 
   public final class TextUnitKt {
-    method @androidx.compose.runtime.ExperimentalComposeApi public static long TextUnit(float value, androidx.compose.ui.unit.TextUnitType type);
+    method @androidx.compose.ui.unit.ExperimentalUnitApi public static long TextUnit(float value, androidx.compose.ui.unit.TextUnitType type);
     method public static long getEm(float);
     method public static long getEm(double);
     method public static long getEm(int);
