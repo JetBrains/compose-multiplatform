@@ -192,6 +192,7 @@ package androidx.compose.material {
 
   public final class CardKt {
     method @androidx.compose.runtime.Composable public static void Card-IHU7g64(optional androidx.compose.ui.Modifier modifier, optional androidx.compose.ui.graphics.Shape shape, optional long backgroundColor, optional long contentColor, optional androidx.compose.foundation.BorderStroke? border, optional float elevation, kotlin.jvm.functions.Function0<kotlin.Unit> content);
+    method @androidx.compose.material.ExperimentalMaterialApi @androidx.compose.runtime.Composable public static void Card-VL29DuM(kotlin.jvm.functions.Function0<kotlin.Unit> onClick, optional androidx.compose.ui.Modifier modifier, optional androidx.compose.ui.graphics.Shape shape, optional long backgroundColor, optional long contentColor, optional androidx.compose.foundation.BorderStroke? border, optional float elevation, optional androidx.compose.foundation.interaction.MutableInteractionSource interactionSource, optional androidx.compose.foundation.Indication? indication, optional boolean enabled, optional String? onClickLabel, optional androidx.compose.ui.semantics.Role? role, kotlin.jvm.functions.Function0<kotlin.Unit> content);
   }
 
   @androidx.compose.runtime.Stable public interface CheckboxColors {

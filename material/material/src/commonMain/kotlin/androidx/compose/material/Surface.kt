@@ -162,7 +162,7 @@ fun Surface(
  * will produce semantics to indicate that it is able to be clicked, with [onClickLabel] (if
  * provided), announced by accessibility services.
  *
- * @sample androidx.compose.material.samples.SurfaceSample
+ * @sample androidx.compose.material.samples.ClickableSurfaceSample
  *
  * To modify these default style values used by text, use [ProvideTextStyle] or explicitly
  * pass a new [TextStyle] to your text.
