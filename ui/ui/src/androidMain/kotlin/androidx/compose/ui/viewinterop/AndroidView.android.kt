@@ -24,6 +24,7 @@ import androidx.compose.runtime.CompositionContext
 import androidx.compose.runtime.currentComposer
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCompositionContext
+import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.materialize
 import androidx.compose.ui.node.LayoutNode
@@ -32,6 +33,7 @@ import androidx.compose.ui.node.UiApplier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalLayoutDirection
+import androidx.compose.ui.platform.ViewRootForInspector
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.LayoutDirection
 
@@ -101,12 +103,15 @@ fun <T : View> AndroidView(
  */
 val NoOpUpdate: View.() -> Unit = {}
 
+@OptIn(ExperimentalComposeUiApi::class)
 internal class ViewFactoryHolder<T : View>(
     context: Context,
     parentContext: CompositionContext? = null
-) : AndroidViewHolder(context, parentContext) {
+) : AndroidViewHolder(context, parentContext), ViewRootForInspector {
 
     private var typedView: T? = null
+
+    override val viewRoot: View? get() = parent as? View
 
     var factory: ((Context) -> T)? = null
         set(value) {

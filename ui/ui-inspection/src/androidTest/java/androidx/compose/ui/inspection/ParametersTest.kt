@@ -22,6 +22,7 @@ import androidx.compose.ui.inspection.testdata.ParametersTestActivity
 import androidx.compose.ui.inspection.util.GetComposablesCommand
 import androidx.compose.ui.inspection.util.GetParameterDetailsCommand
 import androidx.compose.ui.inspection.util.GetParametersCommand
+import androidx.compose.ui.inspection.util.flatten
 import androidx.compose.ui.inspection.util.toMap
 import androidx.test.filters.LargeTest
 import com.google.common.truth.Truth.assertThat
@@ -192,9 +193,6 @@ private fun GetComposablesResponse.filter(name: String): List<ComposableNode> {
         strings[it.name] == name
     }
 }
-
-private fun ComposableNode.flatten(): List<ComposableNode> =
-    listOf(this).plus(this.childrenList.flatMap { it.flatten() })
 
 @Suppress("SameParameterValue")
 private fun checkStringParam(
