@@ -75,7 +75,7 @@ package androidx.compose.ui.test {
     method public static androidx.compose.ui.test.SemanticsMatcher hasAnySibling(androidx.compose.ui.test.SemanticsMatcher matcher);
     method public static androidx.compose.ui.test.SemanticsMatcher hasClickAction();
     method public static androidx.compose.ui.test.SemanticsMatcher hasContentDescription(String label, optional boolean substring, optional boolean ignoreCase);
-    method public static androidx.compose.ui.test.SemanticsMatcher hasImeAction(androidx.compose.ui.text.input.ImeAction actionType);
+    method public static androidx.compose.ui.test.SemanticsMatcher hasImeAction-KlQnJC8(int actionType);
     method public static androidx.compose.ui.test.SemanticsMatcher hasNoClickAction();
     method public static androidx.compose.ui.test.SemanticsMatcher hasNoScrollAction();
     method public static androidx.compose.ui.test.SemanticsMatcher hasParent(androidx.compose.ui.test.SemanticsMatcher matcher);

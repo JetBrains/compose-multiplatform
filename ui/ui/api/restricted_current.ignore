@@ -1,45 +1,11 @@
 // Baseline format: 1.0
-AddedAbstractMethod: androidx.compose.ui.focus.FocusManager#moveFocus-3ESFkO8(int):
-    Added method androidx.compose.ui.focus.FocusManager.moveFocus-3ESFkO8(int)
+ChangedType: androidx.compose.ui.semantics.SemanticsPropertiesKt#getImeAction(androidx.compose.ui.semantics.SemanticsPropertyReceiver):
+    Method androidx.compose.ui.semantics.SemanticsPropertiesKt.getImeAction has changed return type from androidx.compose.ui.text.input.ImeAction to int
 
 
-ChangedSuperclass: androidx.compose.ui.focus.FocusDirection:
-    Class androidx.compose.ui.focus.FocusDirection superclass changed from java.lang.Enum to java.lang.Object
-ChangedSuperclass: androidx.compose.ui.input.key.KeyEventType:
-    Class androidx.compose.ui.input.key.KeyEventType superclass changed from java.lang.Enum to java.lang.Object
+InvalidNullConversion: androidx.compose.ui.semantics.SemanticsPropertiesKt#getImeAction(androidx.compose.ui.semantics.SemanticsPropertyReceiver):
+    Attempted to remove @NonNull annotation from method androidx.compose.ui.semantics.SemanticsPropertiesKt.getImeAction(androidx.compose.ui.semantics.SemanticsPropertyReceiver)
 
 
-ChangedType: androidx.compose.ui.input.key.KeyEvent_androidKt#getType-ZmokQxo(android.view.KeyEvent):
-    Method androidx.compose.ui.input.key.KeyEvent_androidKt.getType-ZmokQxo has changed return type from androidx.compose.ui.input.key.KeyEventType to int
-
-
-InvalidNullConversion: androidx.compose.ui.input.key.KeyEvent_androidKt#getType-ZmokQxo(android.view.KeyEvent):
-    Attempted to remove @NonNull annotation from method androidx.compose.ui.input.key.KeyEvent_androidKt.getType-ZmokQxo(android.view.KeyEvent)
-
-
-RemovedClass: androidx.compose.ui.input.pointer.HitPathTrackerKt:
-    Removed class androidx.compose.ui.input.pointer.HitPathTrackerKt
-
-
-RemovedField: androidx.compose.ui.focus.FocusDirection#Down:
-    Removed enum constant androidx.compose.ui.focus.FocusDirection.Down
-RemovedField: androidx.compose.ui.focus.FocusDirection#Left:
-    Removed enum constant androidx.compose.ui.focus.FocusDirection.Left
-RemovedField: androidx.compose.ui.focus.FocusDirection#Next:
-    Removed enum constant androidx.compose.ui.focus.FocusDirection.Next
-RemovedField: androidx.compose.ui.focus.FocusDirection#Previous:
-    Removed enum constant androidx.compose.ui.focus.FocusDirection.Previous
-RemovedField: androidx.compose.ui.focus.FocusDirection#Right:
-    Removed enum constant androidx.compose.ui.focus.FocusDirection.Right
-RemovedField: androidx.compose.ui.focus.FocusDirection#Up:
-    Removed enum constant androidx.compose.ui.focus.FocusDirection.Up
-RemovedField: androidx.compose.ui.input.key.KeyEventType#KeyDown:
-    Removed enum constant androidx.compose.ui.input.key.KeyEventType.KeyDown
-RemovedField: androidx.compose.ui.input.key.KeyEventType#KeyUp:
-    Removed enum constant androidx.compose.ui.input.key.KeyEventType.KeyUp
-RemovedField: androidx.compose.ui.input.key.KeyEventType#Unknown:
-    Removed enum constant androidx.compose.ui.input.key.KeyEventType.Unknown
-
-
-RemovedMethod: androidx.compose.ui.focus.FocusManager#moveFocus(androidx.compose.ui.focus.FocusDirection):
-    Removed method androidx.compose.ui.focus.FocusManager.moveFocus(androidx.compose.ui.focus.FocusDirection)
+RemovedMethod: androidx.compose.ui.semantics.SemanticsPropertiesKt#setImeAction(androidx.compose.ui.semantics.SemanticsPropertyReceiver, androidx.compose.ui.text.input.ImeAction):
+    Removed method androidx.compose.ui.semantics.SemanticsPropertiesKt.setImeAction(androidx.compose.ui.semantics.SemanticsPropertyReceiver,androidx.compose.ui.text.input.ImeAction)

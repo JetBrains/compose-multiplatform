@@ -1,3 +1,17 @@
 // Baseline format: 1.0
-RemovedPackage: androidx.compose.ui.text:
-    Removed package androidx.compose.ui.text
+AddedAbstractMethod: androidx.compose.foundation.text.KeyboardActionScope#defaultKeyboardAction-KlQnJC8(int):
+    Added method androidx.compose.foundation.text.KeyboardActionScope.defaultKeyboardAction-KlQnJC8(int)
+
+
+InvalidNullConversion: Field KeyboardOptions.imeAction:
+    Attempted to remove @NonNull annotation from Field KeyboardOptions.imeAction
+
+
+RemovedMethod: androidx.compose.foundation.text.KeyboardActionScope#defaultKeyboardAction(androidx.compose.ui.text.input.ImeAction):
+    Removed method androidx.compose.foundation.text.KeyboardActionScope.defaultKeyboardAction(androidx.compose.ui.text.input.ImeAction)
+RemovedMethod: androidx.compose.foundation.text.KeyboardOptions#KeyboardOptions(androidx.compose.ui.text.input.KeyboardCapitalization, boolean, androidx.compose.ui.text.input.KeyboardType, androidx.compose.ui.text.input.ImeAction):
+    Removed constructor androidx.compose.foundation.text.KeyboardOptions(androidx.compose.ui.text.input.KeyboardCapitalization,boolean,androidx.compose.ui.text.input.KeyboardType,androidx.compose.ui.text.input.ImeAction)
+RemovedMethod: androidx.compose.foundation.text.KeyboardOptions#copy(androidx.compose.ui.text.input.KeyboardCapitalization, boolean, androidx.compose.ui.text.input.KeyboardType, androidx.compose.ui.text.input.ImeAction):
+    Removed method androidx.compose.foundation.text.KeyboardOptions.copy(androidx.compose.ui.text.input.KeyboardCapitalization,boolean,androidx.compose.ui.text.input.KeyboardType,androidx.compose.ui.text.input.ImeAction)
+RemovedMethod: androidx.compose.foundation.text.KeyboardOptions#getImeAction():
+    Removed method androidx.compose.foundation.text.KeyboardOptions.getImeAction()

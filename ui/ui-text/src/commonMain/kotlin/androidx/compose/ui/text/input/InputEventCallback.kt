@@ -28,6 +28,7 @@ interface InputEventCallback {
      *
      * @param editCommands The list of edit commands.
      */
+    @Suppress("CallbackMethodName")
     fun onEditCommands(editCommands: List<EditCommand>)
 
     /**
@@ -35,5 +36,6 @@ interface InputEventCallback {
      *
      * @param imeAction An IME action.
      */
+    @Suppress("CallbackMethodName")
     fun onImeAction(imeAction: ImeAction)
 }
