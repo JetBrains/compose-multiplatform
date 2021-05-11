@@ -205,6 +205,7 @@ class AndroidXPlaygroundRootPlugin : Plugin<Project> {
         }
         google()
         mavenCentral()
+        @Suppress("DEPRECATION") // b/181908259
         jcenter()
     }
 

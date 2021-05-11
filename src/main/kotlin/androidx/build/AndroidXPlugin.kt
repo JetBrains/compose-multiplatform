@@ -451,10 +451,6 @@ class AndroidXPlugin : Plugin<Project> {
 
         project.configureErrorProneForAndroid(variants)
 
-        // Set the officially published version to be the debug version with minimum dependency
-        // versions.
-        defaultPublishConfig(Release.DEFAULT_PUBLISH_CONFIG)
-
         // workaround for b/120487939
         project.configurations.all { configuration ->
             // Gradle seems to crash on androidtest configurations
@@ -674,9 +670,9 @@ class AndroidXPlugin : Plugin<Project> {
         const val EXTENSION_NAME = "androidx"
 
         /**
-         * Fail the build if a non-Studio task runs for more than 30 minutes.
+         * Fail the build if a non-Studio task runs longer than expected
          */
-        const val TASK_TIMEOUT_MINUTES = 30L
+        const val TASK_TIMEOUT_MINUTES = 45L
     }
 }
 

@@ -113,9 +113,16 @@ class AndroidXUiPlugin : Plugin<Project> {
             return properties.get(COMPOSE_MPP_ENABLED)?.toString()?.toBoolean() ?: false
         }
 
+        /**
+         * @param isMultiplatformEnabled whether this module has a corresponding
+         * multiplatform configuration, or whether it is Android only
+         */
         @JvmStatic
-        fun Project.applyAndConfigureKotlinPlugin() {
-            if (isMultiplatformEnabled()) {
+        @JvmOverloads
+        fun Project.applyAndConfigureKotlinPlugin(
+            isMultiplatformEnabled: Boolean = isMultiplatformEnabled()
+        ) {
+            if (isMultiplatformEnabled) {
                 apply(plugin = "kotlin-multiplatform")
             } else {
                 apply(plugin = "org.jetbrains.kotlin.android")
@@ -123,7 +130,7 @@ class AndroidXUiPlugin : Plugin<Project> {
 
             configureManifests()
             configureForKotlinMultiplatformSourceStructure()
-            if (isMultiplatformEnabled()) {
+            if (isMultiplatformEnabled) {
                 configureForMultiplatform()
             }
 

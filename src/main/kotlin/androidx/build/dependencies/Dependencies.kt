@@ -72,11 +72,7 @@ const val JAVAPOET = "com.squareup:javapoet:1.13.0"
 const val JSQLPARSER = "com.github.jsqlparser:jsqlparser:3.1"
 const val JSR250 = "javax.annotation:javax.annotation-api:1.2"
 const val JUNIT = "junit:junit:4.12"
-const val KOTLINPOET = "com.squareup:kotlinpoet:1.4.0"
-const val KOTLINPOET_METADATA = "com.squareup:kotlinpoet-metadata:1.4.0"
-const val KOTLINPOET_METADATA_SPECS = "com.squareup:kotlinpoet-metadata-specs:1.4.0"
-const val KOTLINPOET_CLASSINSPECTOR_ELEMENTS =
-    "com.squareup:kotlinpoet-classinspector-elements:1.4.0"
+const val KOTLINPOET = "com.squareup:kotlinpoet:1.8.0"
 const val KOTLIN_COMPILE_TESTING = "com.github.tschuchortdev:kotlin-compile-testing:1.3.6"
 const val KOTLIN_COMPILE_TESTING_KSP = "com.github.tschuchortdev:kotlin-compile-testing-ksp:1.3.6"
 
@@ -85,10 +81,7 @@ const val KOTLIN_COMPILE_TESTING_KSP = "com.github.tschuchortdev:kotlin-compile-
  * build dependencies file.
  */
 internal lateinit var kspVersion: String
-
 val KSP_VERSION get() = kspVersion
-val KOTLIN_KSP_API get() = "com.google.devtools.ksp:symbol-processing-api:$KSP_VERSION"
-val KOTLIN_KSP get() = "com.google.devtools.ksp:symbol-processing:$KSP_VERSION"
 const val KOTLIN_GRADLE_PLUGIN = "org.jetbrains.kotlin:kotlin-gradle-plugin:1.4.32"
 
 const val KOTLIN_METADATA_JVM = "org.jetbrains.kotlinx:kotlinx-metadata-jvm:0.2.0"
@@ -143,8 +136,6 @@ const val PROTOBUF_COMPILER = "com.google.protobuf:protoc:3.10.0"
 const val PROTOBUF_LITE = "com.google.protobuf:protobuf-javalite:3.10.0"
 
 const val WIRE_RUNTIME = "com.squareup.wire:wire-runtime:3.6.0"
-
-const val JARJAR = "org.anarres.jarjar:jarjar-gradle:1.0.1"
 
 // The following versions change depending on whether we are in the main or ui project - the
 // specific versions are configured in build_dependencies.gradle as they are needed during
