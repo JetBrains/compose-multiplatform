@@ -71,12 +71,12 @@ class FocusChangedTest {
                 modifier = Modifier
                     .onFocusChanged { focusState = it }
                     .focusRequester(focusRequester)
-                    .focusModifier()
+                    .focusTarget()
             ) {
                 Box(
                     modifier = Modifier
                         .focusRequester(childFocusRequester)
-                        .focusModifier()
+                        .focusTarget()
                 )
             }
         }
@@ -212,7 +212,7 @@ class FocusChangedTest {
     }
 
     @Test
-    fun active_requestFocus_multipleObserversWithExtraFocusModifierInBetween() {
+    fun active_requestFocus_multipleObserversWithExtraFocusTargetInBetween() {
         // Arrange.
         lateinit var focusState1: FocusState
         lateinit var focusState2: FocusState
@@ -224,11 +224,11 @@ class FocusChangedTest {
                 modifier = Modifier
                     .onFocusChanged { focusState1 = it }
                     .onFocusChanged { focusState2 = it }
-                    .focusModifier()
+                    .focusTarget()
                     .onFocusChanged { focusState3 = it }
                     .onFocusChanged { focusState4 = it }
                     .focusRequester(focusRequester)
-                    .focusModifier()
+                    .focusTarget()
             )
         }
 

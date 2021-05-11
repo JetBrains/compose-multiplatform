@@ -281,7 +281,8 @@ package androidx.compose.ui.focus {
   }
 
   public final class FocusModifierKt {
-    method public static androidx.compose.ui.Modifier focusModifier(androidx.compose.ui.Modifier);
+    method @Deprecated public static androidx.compose.ui.Modifier focusModifier(androidx.compose.ui.Modifier);
+    method public static androidx.compose.ui.Modifier focusTarget(androidx.compose.ui.Modifier);
   }
 
   public final class FocusNodeUtilsKt {

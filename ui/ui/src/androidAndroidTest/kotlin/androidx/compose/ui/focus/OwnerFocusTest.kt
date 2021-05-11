@@ -48,7 +48,7 @@ class OwnerFocusTest {
             Box(
                 modifier = Modifier
                     .focusRequester(focusRequester)
-                    .focusModifier()
+                    .focusTarget()
             )
         }
 
@@ -76,7 +76,7 @@ class OwnerFocusTest {
                 modifier = Modifier
                     .onFocusChanged { focusState = it }
                     .focusRequester(focusRequester)
-                    .focusModifier()
+                    .focusTarget()
             )
         }
 
@@ -104,7 +104,7 @@ class OwnerFocusTest {
                 modifier = Modifier
                     .onFocusChanged { focusState = it }
                     .focusRequester(focusRequester)
-                    .focusModifier()
+                    .focusTarget()
             )
         }
 
@@ -131,7 +131,7 @@ class OwnerFocusTest {
                 modifier = Modifier
                     .onFocusChanged { focusState = it }
                     .focusRequester(focusRequester)
-                    .focusModifier()
+                    .focusTarget()
             )
         }
         rule.runOnIdle {
@@ -161,7 +161,7 @@ class OwnerFocusTest {
                 modifier = Modifier
                     .onFocusChanged { focusState = it }
                     .focusRequester(focusRequester)
-                    .focusModifier()
+                    .focusTarget()
             )
         }
         rule.runOnIdle {

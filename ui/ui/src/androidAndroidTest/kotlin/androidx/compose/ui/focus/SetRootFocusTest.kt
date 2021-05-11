@@ -61,7 +61,7 @@ class SetRootFocusTest {
                             isFocused = it.isFocused
                             focusChanged.countDown()
                         }
-                        .focusModifier()
+                        .focusTarget()
                 )
                 BasicText(
                     text = "Non Clickable Text",
