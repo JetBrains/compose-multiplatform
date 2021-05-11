@@ -138,7 +138,7 @@ private fun PopupLayout(
 
     val parentComposition = rememberCompositionContext()
     val (owner, composition) = remember {
-        val owner = DesktopOwner(owners, density)
+        val owner = DesktopOwner(owners, density, !focusable)
         val composition = owner.setContent(parent = parentComposition) {
             Layout(
                 content = content,
