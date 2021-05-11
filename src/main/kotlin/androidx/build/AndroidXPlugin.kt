@@ -297,13 +297,12 @@ class AndroidXPlugin : Plugin<Project> {
         project.addCreateLibraryBuildInfoFileTask(androidXExtension)
         project.configureJavaCompilationWarnings(androidXExtension)
 
-        val verifyDependencyVersionsTask = project.createVerifyDependencyVersionsTask()
-        val checkReleaseReadyTasks = mutableListOf<TaskProvider<out Task>>()
-        if (verifyDependencyVersionsTask != null) {
-            checkReleaseReadyTasks.add(verifyDependencyVersionsTask)
-        }
-        if (checkReleaseReadyTasks.isNotEmpty()) {
-            project.createCheckReleaseReadyTask(checkReleaseReadyTasks)
+        project.configureDependencyVerification(androidXExtension) { taskProvider ->
+            libraryExtension.defaultPublishVariant { libraryVariant ->
+                taskProvider.configure { task ->
+                    task.dependsOn(libraryVariant.javaCompileProvider)
+                }
+            }
         }
 
         val reportLibraryMetrics = project.configureReportLibraryMetricsTask()
@@ -315,10 +314,6 @@ class AndroidXPlugin : Plugin<Project> {
                         zip.inputs.files
                     }
                 )
-            }
-
-            verifyDependencyVersionsTask?.configure { task ->
-                task.dependsOn(libraryVariant.javaCompileProvider)
             }
         }
 
@@ -347,15 +342,13 @@ class AndroidXPlugin : Plugin<Project> {
 
         project.hideJavadocTask()
 
-        val verifyDependencyVersionsTask = project.createVerifyDependencyVersionsTask()
-        verifyDependencyVersionsTask?.configure { task ->
-            task.dependsOn(project.tasks.named(JavaPlugin.COMPILE_JAVA_TASK_NAME))
+        project.configureDependencyVerification(extension) { taskProvider ->
+            taskProvider.configure { task ->
+                task.dependsOn(project.tasks.named(JavaPlugin.COMPILE_JAVA_TASK_NAME))
+            }
         }
 
         project.addCreateLibraryBuildInfoFileTask(extension)
-        if (verifyDependencyVersionsTask != null) {
-            project.createCheckReleaseReadyTask(listOf(verifyDependencyVersionsTask))
-        }
 
         // Standard lint, docs, and Metalava configuration for AndroidX projects.
         project.configureNonAndroidProjectForLint(extension)
@@ -570,6 +563,21 @@ class AndroidXPlugin : Plugin<Project> {
                 }
             }
             variant.configureApkCopy(project, false)
+        }
+    }
+
+    private fun Project.configureDependencyVerification(
+        extension: AndroidXExtension,
+        taskConfigurator: (TaskProvider<VerifyDependencyVersionsTask>) -> Unit
+    ) {
+        afterEvaluate {
+            if (extension.type != LibraryType.SAMPLES) {
+                val verifyDependencyVersionsTask = project.createVerifyDependencyVersionsTask()
+                if (verifyDependencyVersionsTask != null) {
+                    project.createCheckReleaseReadyTask(listOf(verifyDependencyVersionsTask))
+                    taskConfigurator(verifyDependencyVersionsTask)
+                }
+            }
         }
     }
 
