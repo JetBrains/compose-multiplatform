@@ -15,6 +15,11 @@ RUN dpkg --add-architecture i386 && apt-get update -yqq && apt-get install -y \
     unzip \
     wget
 
+
+RUN export CHROME_DRIVER_VERSION=$(wget -qO- https://chromedriver.storage.googleapis.com/LATEST_RELEASE) \
+    && wget https://chromedriver.storage.googleapis.com/${CHROME_DRIVER_VERSION}/chromedriver_linux64.zip -P ~/tmp
+RUN unzip -d /usr/local/bin ~/tmp/chromedriver_linux64.zip && rm ~/tmp/chromedriver_linux64.zip
+
 ARG GRADLE_VERSION=6.8.3
 RUN wget https://services.gradle.org/distributions/gradle-${GRADLE_VERSION}-bin.zip -P /tmp
 RUN unzip -d /opt/gradle /tmp/gradle-${GRADLE_VERSION}-bin.zip
