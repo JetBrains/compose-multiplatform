@@ -89,7 +89,7 @@ class LazyItemStateRestoration {
                 Modifier.requiredSize(20.dp),
                 state = rememberLazyListState().also { state = it }
             ) {
-                items((0..1).toList()) {
+                items((0..10).toList()) {
                     if (it == 0) {
                         realState = rememberSaveable { counter0++ }
                         DisposableEffect(Unit) {
@@ -106,7 +106,11 @@ class LazyItemStateRestoration {
         rule.runOnIdle {
             assertThat(realState).isEqualTo(1)
             runBlocking {
-                state.scrollToItem(1, 5)
+                // we scroll through multiple items to make sure the 0th element is not kept in
+                // the reusable items buffer
+                state.scrollToItem(3)
+                state.scrollToItem(5)
+                state.scrollToItem(8)
             }
         }
 
@@ -184,7 +188,7 @@ class LazyItemStateRestoration {
                 Modifier.requiredSize(20.dp),
                 state = rememberLazyListState().also { state = it }
             ) {
-                items((0..1).toList()) {
+                items((0..10).toList()) {
                     if (it == 0) {
                         LazyRow {
                             item {
@@ -207,7 +211,11 @@ class LazyItemStateRestoration {
         rule.runOnIdle {
             assertThat(realState).isEqualTo(1)
             runBlocking {
-                state.scrollToItem(1, 5)
+                // we scroll through multiple items to make sure the 0th element is not kept in
+                // the reusable items buffer
+                state.scrollToItem(3)
+                state.scrollToItem(5)
+                state.scrollToItem(8)
             }
         }
 

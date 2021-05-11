@@ -18,6 +18,7 @@ package androidx.compose.runtime.mock
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.ComposeNode
+import androidx.compose.runtime.ReusableComposeNode
 import androidx.compose.runtime.NonRestartableComposable
 import androidx.compose.runtime.key
 
@@ -35,6 +36,16 @@ fun <T : Any> Repeated(
 
 @Composable
 fun Linear(content: @Composable () -> Unit) {
+    ReusableComposeNode<View, ViewApplier>(
+        factory = { View().also { it.name = "linear" } },
+        update = { }
+    ) {
+        content()
+    }
+}
+
+@Composable
+fun NonReusableLinear(content: @Composable () -> Unit) {
     ComposeNode<View, ViewApplier>(
         factory = { View().also { it.name = "linear" } },
         update = { }
@@ -45,6 +56,14 @@ fun Linear(content: @Composable () -> Unit) {
 
 @Composable @NonRestartableComposable
 fun Text(value: String) {
+    ReusableComposeNode<View, ViewApplier>(
+        factory = { View().also { it.name = "text" } },
+        update = { set(value) { text = it } }
+    )
+}
+
+@Composable
+fun NonReusableText(value: String) {
     ComposeNode<View, ViewApplier>(
         factory = { View().also { it.name = "text" } },
         update = { set(value) { text = it } }
@@ -53,7 +72,7 @@ fun Text(value: String) {
 
 @Composable
 fun Edit(value: String) {
-    ComposeNode<View, ViewApplier>(
+    ReusableComposeNode<View, ViewApplier>(
         factory = { View().also { it.name = "edit" } },
         update = { set(value) { this.value = it } }
     )
@@ -65,7 +84,7 @@ fun SelectBox(
     content: @Composable () -> Unit
 ) {
     if (selected) {
-        ComposeNode<View, ViewApplier>(
+        ReusableComposeNode<View, ViewApplier>(
             factory = { View().also { it.name = "box" } },
             update = { },
             content = { content() }

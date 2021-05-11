@@ -32,9 +32,11 @@ import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.Immutable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.staticCompositionLocalOf
 import androidx.compose.ui.Modifier
@@ -103,7 +105,7 @@ fun defaultScrollbarStyle() = ScrollbarStyle(
  *     val state = rememberScrollState(0f)
  *
  *     Box(Modifier.fillMaxSize()) {
- *         ScrollableColumn(state = state) {
+ *         Box(modifier = Modifier.verticalScroll(state)) {
  *             ...
  *         }
  *
@@ -135,7 +137,7 @@ fun VerticalScrollbar(
 
 /**
  * Horizontal scrollbar that can be attached to some scrollable
- * component (ScrollableRow, LazyRow) and share common state with it.
+ * component (Modifier.verticalScroll(), LazyRow) and share common state with it.
  *
  * Can be placed independently.
  *
@@ -143,7 +145,7 @@ fun VerticalScrollbar(
  *     val state = rememberScrollState(0f)
  *
  *     Box(Modifier.fillMaxSize()) {
- *         ScrollableRow(state = state) {
+ *         Box(modifier = Modifier.verticalScroll(state)) {
  *             ...
  *         }
  *
@@ -194,7 +196,13 @@ private fun Scrollbar(
     }
 
     var containerSize by remember { mutableStateOf(0) }
-    var isHover by remember { mutableStateOf(false) }
+    var isHovered by remember { mutableStateOf(false) }
+
+    val isHighlighted by remember {
+        derivedStateOf {
+            isHovered || dragInteraction.value is DragInteraction.Start
+        }
+    }
 
     val minimalHeight = style.minimalHeight.toPx()
     val sliderAdapter = remember(adapter, containerSize, minimalHeight) {
@@ -213,7 +221,7 @@ private fun Scrollbar(
     }
 
     val color by animateColorAsState(
-        if (isHover) style.hoverColor else style.unhoverColor,
+        if (isHighlighted) style.hoverColor else style.unhoverColor,
         animationSpec = TweenSpec(durationMillis = style.hoverDurationMillis)
     )
 
@@ -231,8 +239,8 @@ private fun Scrollbar(
         },
         modifier
             .pointerMoveFilter(
-                onExit = { isHover = false; true },
-                onEnter = { isHover = true; true }
+                onExit = { isHovered = false; false },
+                onEnter = { isHovered = true; false }
             )
             .scrollOnPressOutsideSlider(isVertical, sliderAdapter, adapter, containerSize),
         measurePolicy
@@ -243,24 +251,29 @@ private fun Modifier.scrollbarDrag(
     interactionSource: MutableInteractionSource,
     draggedInteraction: MutableState<DragInteraction.Start?>,
     onDelta: (Offset) -> Unit
-): Modifier = pointerInput(interactionSource, draggedInteraction, onDelta) {
-    forEachGesture {
-        awaitPointerEventScope {
-            val down = awaitFirstDown(requireUnconsumed = false)
-            val interaction = DragInteraction.Start()
-            interactionSource.tryEmit(interaction)
-            draggedInteraction.value = interaction
-            val isSuccess = drag(down.id) { change ->
-                onDelta.invoke(change.positionChange())
-                change.consumePositionChange()
+): Modifier = composed {
+    val currentInteractionSource by rememberUpdatedState(interactionSource)
+    val currentDraggedInteraction by rememberUpdatedState(draggedInteraction)
+    val currentOnDelta by rememberUpdatedState(onDelta)
+    pointerInput(Unit) {
+        forEachGesture {
+            awaitPointerEventScope {
+                val down = awaitFirstDown(requireUnconsumed = false)
+                val interaction = DragInteraction.Start()
+                currentInteractionSource.tryEmit(interaction)
+                currentDraggedInteraction.value = interaction
+                val isSuccess = drag(down.id) { change ->
+                    currentOnDelta.invoke(change.positionChange())
+                    change.consumePositionChange()
+                }
+                val finishInteraction = if (isSuccess) {
+                    DragInteraction.Stop(interaction)
+                } else {
+                    DragInteraction.Cancel(interaction)
+                }
+                currentInteractionSource.tryEmit(finishInteraction)
+                currentDraggedInteraction.value = null
             }
-            val finishInteraction = if (isSuccess) {
-                DragInteraction.Stop(interaction)
-            } else {
-                DragInteraction.Cancel(interaction)
-            }
-            interactionSource.tryEmit(finishInteraction)
-            draggedInteraction.value = null
         }
     }
 }
@@ -338,7 +351,7 @@ fun rememberScrollbarAdapter(
 }
 
 /**
- * ScrollbarAdapter for ScrollableColumn and ScrollableRow
+ * ScrollbarAdapter for Modifier.verticalScroll and Modifier.horizontalScroll
  *
  * [scrollState] is instance of [ScrollState] which is used by scrollable component
  *
@@ -346,7 +359,7 @@ fun rememberScrollbarAdapter(
  *     val state = rememberScrollState(0f)
  *
  *     Box(Modifier.fillMaxSize()) {
- *         ScrollableColumn(state = state) {
+ *         Box(modifier = Modifier.verticalScroll(state)) {
  *             ...
  *         }
  *
@@ -483,7 +496,12 @@ private class SliderAdapter(
             .coerceAtLeast(minHeight)
             .coerceAtMost(containerSize.toFloat())
 
-    private val scrollScale get() = (containerSize - size) / (contentSize - containerSize)
+    private val scrollScale: Float
+        get() {
+            val extraScrollbarSpace = containerSize - size
+            val extraContentSpace = contentSize - containerSize
+            return if (extraContentSpace == 0f) 1f else extraScrollbarSpace / extraContentSpace
+        }
 
     var position: Float
         get() = scrollScale * adapter.scrollOffset

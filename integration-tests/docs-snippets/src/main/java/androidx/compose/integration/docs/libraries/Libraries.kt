@@ -40,11 +40,11 @@ import androidx.compose.ui.res.painterResource
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewmodel.compose.viewModel
-import androidx.navigation.NavController
+import androidx.navigation.NavBackStackEntry
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
-import androidx.navigation.compose.navigation
+import androidx.navigation.navigation
 import kotlinx.coroutines.flow.Flow
 
 /**
@@ -108,13 +108,15 @@ private object LibrariesSnippet4 {
 }
 
 private object LibrariesSnippet5 {
+    // import androidx.hilt.navigation.compose.hiltViewModel
+
     @Composable
     fun MyApp() {
         NavHost(navController, startDestination = startRoute) {
             composable("example") { backStackEntry ->
                 // Creates a ViewModel from the current BackStackEntry
                 // Available in the androidx.hilt:hilt-navigation-compose artifact
-                val exampleViewModel = hiltNavGraphViewModel<ExampleViewModel>()
+                val exampleViewModel = hiltViewModel<ExampleViewModel>()
                 ExampleScreen(exampleViewModel)
             }
             /* ... */
@@ -123,14 +125,18 @@ private object LibrariesSnippet5 {
 }
 
 private object LibrariesSnippet6 {
+    // import androidx.hilt.navigation.compose.hiltViewModel
+    // import androidx.navigation.compose.getBackStackEntry
+
     @Composable
     fun MyApp() {
         NavHost(navController, startDestination = startRoute) {
             navigation(startDestination = innerStartRoute, route = "Parent") {
                 // ...
                 composable("exampleWithRoute") { backStackEntry ->
-                    val parentViewModel =
-                        navController.hiltNavGraphViewModel<ParentViewModel>("Parent")
+                    val parentViewModel = hiltViewModel<ParentViewModel>(
+                        navController.getBackStackEntry("Parent")
+                    )
                     ExampleWithRouteScreen(parentViewModel)
                 }
             }
@@ -205,8 +211,8 @@ private class ExampleViewModel : ViewModel() {
     val exampleLiveData = MutableLiveData(" ")
 }
 
-private inline fun <reified VM : ViewModel> hiltNavGraphViewModel(): VM { TODO() }
-inline fun <reified VM : ViewModel> NavController.hiltNavGraphViewModel(route: String): VM {
+private inline fun <reified VM : ViewModel> hiltViewModel(): VM { TODO() }
+private inline fun <reified VM : ViewModel> hiltViewModel(backStackEntry: NavBackStackEntry): VM {
     TODO()
 }
 

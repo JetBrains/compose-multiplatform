@@ -1390,17 +1390,17 @@ internal class AndroidComposeViewAccessibilityDelegateCompat(val view: AndroidCo
                     // are covered and which nodes are not, so the currentSemanticsNodes is not
                     // up to date anymore.
                     // After the subtree events are sent, accessibility services will get the
-                    // current visible/invisible state. We also update our copy here so that our
-                    // incremental changes (represented by accessibility events) are consistent
+                    // current visible/invisible state. We also try to do semantics tree diffing
+                    // to send out the proper accessibility events and update our copy here so that
+                    // our incremental changes (represented by accessibility events) are consistent
                     // with accessibility services. That is: change - notify - new change -
-                    // notify, if we don't update our copy here, we will combine change and new
-                    // change, which is missing finer-grained notification.
-                    // Note that we could update our copy before this delay by posting an update
-                    // copy runnable in onLayoutChange(a code version is in aosp/1553311), similar
-                    // to semanticsChangeChecker, but I think update copy after the subtree
-                    // change events are sent is more accurate because before accessibility
-                    // services receive subtree events, they are not aware of the subtree change.
-                    updateSemanticsNodesCopyAndPanes()
+                    // notify, if we don't do the tree diffing and update our copy here, we will
+                    // combine old change and new change, which is missing finer-grained
+                    // notification.
+                    if (!checkingForSemanticsChanges) {
+                        checkingForSemanticsChanges = true
+                        handler.post(semanticsChangeChecker)
+                    }
                 }
                 subtreeChangedLayoutNodes.clear()
                 delay(SendRecurringAccessibilityEventsIntervalMillis)

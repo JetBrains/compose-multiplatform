@@ -36,8 +36,7 @@ import androidx.compose.runtime.Stable
 /* ktlint-disable parameter-list-wrapping */ // TODO(https://github.com/pinterest/ktlint/issues/921): reenable
 internal actual class ComposableLambdaImpl actual constructor(
     val key: Int,
-    private val tracked: Boolean,
-    private val sourceInformation: String?
+    private val tracked: Boolean
 ) : ComposableLambda {
     private var _block: Any? = null
     private var scope: RecomposeScope? = null
@@ -102,7 +101,7 @@ internal actual class ComposableLambdaImpl actual constructor(
     }
 
     override operator fun invoke(c: Composer, changed: Int): Any? {
-        val c = c.startRestartGroup(key, sourceInformation)
+        val c = c.startRestartGroup(key)
         trackRead(c)
         val dirty = changed or if (c.changed(this)) differentBits(0) else sameBits(0)
         val result = (_block as (c: Composer, changed: Int) -> Any?)(c, dirty)
@@ -111,7 +110,7 @@ internal actual class ComposableLambdaImpl actual constructor(
     }
 
     override operator fun invoke(p1: Any?, c: Composer, changed: Int): Any? {
-        val c = c.startRestartGroup(key, sourceInformation)
+        val c = c.startRestartGroup(key)
         trackRead(c)
         val dirty = changed or if (c.changed(this)) differentBits(1) else sameBits(1)
         val result = (
@@ -130,7 +129,7 @@ internal actual class ComposableLambdaImpl actual constructor(
     }
 
     override operator fun invoke(p1: Any?, p2: Any?, c: Composer, changed: Int): Any? {
-        val c = c.startRestartGroup(key, sourceInformation)
+        val c = c.startRestartGroup(key)
         trackRead(c)
         val dirty = changed or if (c.changed(this)) differentBits(2) else sameBits(2)
         val result = (_block as (p1: Any?, p2: Any?, c: Composer, changed: Int) -> Any?)(
@@ -144,7 +143,7 @@ internal actual class ComposableLambdaImpl actual constructor(
     }
 
     override operator fun invoke(p1: Any?, p2: Any?, p3: Any?, c: Composer, changed: Int): Any? {
-        val c = c.startRestartGroup(key, sourceInformation)
+        val c = c.startRestartGroup(key)
         trackRead(c)
         val dirty = changed or if (c.changed(this)) differentBits(3) else sameBits(3)
         val result = (
@@ -174,7 +173,7 @@ internal actual class ComposableLambdaImpl actual constructor(
         c: Composer,
         changed: Int
     ): Any? {
-        val c = c.startRestartGroup(key, sourceInformation)
+        val c = c.startRestartGroup(key)
         trackRead(c)
         val dirty = changed or if (c.changed(this)) differentBits(4) else sameBits(4)
         val result = (
@@ -209,7 +208,7 @@ internal actual class ComposableLambdaImpl actual constructor(
         c: Composer,
         changed: Int
     ): Any? {
-        val c = c.startRestartGroup(key, sourceInformation)
+        val c = c.startRestartGroup(key)
         trackRead(c)
         val dirty = changed or if (c.changed(this)) differentBits(5) else sameBits(5)
         val result = (
@@ -247,7 +246,7 @@ internal actual class ComposableLambdaImpl actual constructor(
         c: Composer,
         changed: Int
     ): Any? {
-        val c = c.startRestartGroup(key, sourceInformation)
+        val c = c.startRestartGroup(key)
         trackRead(c)
         val dirty = changed or if (c.changed(this)) differentBits(6) else sameBits(6)
         val result = (
@@ -288,7 +287,7 @@ internal actual class ComposableLambdaImpl actual constructor(
         c: Composer,
         changed: Int
     ): Any? {
-        val c = c.startRestartGroup(key, sourceInformation)
+        val c = c.startRestartGroup(key)
         trackRead(c)
         val dirty = changed or if (c.changed(this)) differentBits(7) else sameBits(7)
         val result = (
@@ -332,7 +331,7 @@ internal actual class ComposableLambdaImpl actual constructor(
         c: Composer,
         changed: Int
     ): Any? {
-        val c = c.startRestartGroup(key, sourceInformation)
+        val c = c.startRestartGroup(key)
         trackRead(c)
         val dirty = changed or if (c.changed(this)) differentBits(8) else sameBits(8)
         val result = (
@@ -379,7 +378,7 @@ internal actual class ComposableLambdaImpl actual constructor(
         c: Composer,
         changed: Int
     ): Any? {
-        val c = c.startRestartGroup(key, sourceInformation)
+        val c = c.startRestartGroup(key)
         trackRead(c)
         val dirty = changed or if (c.changed(this)) differentBits(9) else sameBits(9)
         val result = (
@@ -430,7 +429,7 @@ internal actual class ComposableLambdaImpl actual constructor(
         changed: Int,
         changed1: Int
     ): Any? {
-        val c = c.startRestartGroup(key, sourceInformation)
+        val c = c.startRestartGroup(key)
         trackRead(c)
         val dirty = changed1 or if (c.changed(this)) differentBits(10) else sameBits(10)
         val result = (
@@ -486,7 +485,7 @@ internal actual class ComposableLambdaImpl actual constructor(
         changed: Int,
         changed1: Int
     ): Any? {
-        val c = c.startRestartGroup(key, sourceInformation)
+        val c = c.startRestartGroup(key)
         trackRead(c)
         val dirty = changed1 or if (c.changed(this)) differentBits(11) else sameBits(11)
         val result = (
@@ -545,7 +544,7 @@ internal actual class ComposableLambdaImpl actual constructor(
         changed: Int,
         changed1: Int
     ): Any? {
-        val c = c.startRestartGroup(key, sourceInformation)
+        val c = c.startRestartGroup(key)
         trackRead(c)
         val dirty = changed1 or if (c.changed(this)) differentBits(12) else sameBits(12)
         val result = (
@@ -607,7 +606,7 @@ internal actual class ComposableLambdaImpl actual constructor(
         changed: Int,
         changed1: Int
     ): Any? {
-        val c = c.startRestartGroup(key, sourceInformation)
+        val c = c.startRestartGroup(key)
         trackRead(c)
         val dirty = changed1 or if (c.changed(this)) differentBits(13) else sameBits(13)
         val result = (
@@ -689,7 +688,7 @@ internal actual class ComposableLambdaImpl actual constructor(
         changed: Int,
         changed1: Int
     ): Any? {
-        val c = c.startRestartGroup(key, sourceInformation)
+        val c = c.startRestartGroup(key)
         trackRead(c)
         val dirty = changed1 or if (c.changed(this)) differentBits(14) else sameBits(14)
         val result = (
@@ -775,7 +774,7 @@ internal actual class ComposableLambdaImpl actual constructor(
         changed: Int,
         changed1: Int
     ): Any? {
-        val c = c.startRestartGroup(key, sourceInformation)
+        val c = c.startRestartGroup(key)
         trackRead(c)
         val dirty = changed1 or if (c.changed(this)) differentBits(15) else sameBits(15)
         val result = (
@@ -865,7 +864,7 @@ internal actual class ComposableLambdaImpl actual constructor(
         changed: Int,
         changed1: Int
     ): Any? {
-        val c = c.startRestartGroup(key, sourceInformation)
+        val c = c.startRestartGroup(key)
         trackRead(c)
         val dirty = changed1 or if (c.changed(this)) differentBits(16) else sameBits(16)
         val result = (
@@ -959,7 +958,7 @@ internal actual class ComposableLambdaImpl actual constructor(
         changed: Int,
         changed1: Int
     ): Any? {
-        val c = c.startRestartGroup(key, sourceInformation)
+        val c = c.startRestartGroup(key)
         trackRead(c)
         val dirty = changed1 or if (c.changed(this)) differentBits(17) else sameBits(17)
         val result = (
@@ -1057,7 +1056,7 @@ internal actual class ComposableLambdaImpl actual constructor(
         changed: Int,
         changed1: Int
     ): Any? {
-        val c = c.startRestartGroup(key, sourceInformation)
+        val c = c.startRestartGroup(key)
         trackRead(c)
         val dirty = changed1 or if (c.changed(this)) differentBits(18) else sameBits(18)
         val result = (

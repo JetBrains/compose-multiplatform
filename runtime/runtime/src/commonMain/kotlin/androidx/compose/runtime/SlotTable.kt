@@ -1127,6 +1127,37 @@ internal class SlotWriter(
     }
 
     /**
+     * Insert aux data into the parent group.
+     *
+     * This must be done only after at most one value has been inserted into the slot table for
+     * the group.
+     */
+    fun insertAux(value: Any?) {
+        check(insertCount >= 0) { "Cannot insert auxiliary data when not inserting" }
+        val parent = parent
+        val parentGroupAddress = groupIndexToAddress(parent)
+        check(!groups.hasAux(parentGroupAddress)) { "Group already has auxiliary data" }
+        insertSlots(1, parent)
+        val auxIndex = groups.auxIndex(parentGroupAddress)
+        val auxAddress = dataIndexToDataAddress(auxIndex)
+        if (currentSlot > auxIndex) {
+            // One or more values were inserted into the slot table before the aux value, we need
+            // to move them. Currently we only will run into one or two slots (the recompose
+            // scope inserted by a restart group and the lambda value in a composableLambda
+            // instance) so this is the only case currently supported.
+            val slotsToMove = currentSlot - auxIndex
+            check(slotsToMove < 3) { "Moving more than two slot not supported" }
+            if (slotsToMove > 1) {
+                slots[auxAddress + 2] = slots[auxAddress + 1]
+            }
+            slots[auxAddress + 1] = slots[auxAddress]
+        }
+        groups.addAux(parentGroupAddress)
+        slots[auxAddress] = value
+        currentSlot++
+    }
+
+    /**
      * Updates the node for the current node group to [value].
      */
     fun updateNode(value: Any?) = updateNodeOfGroup(currentGroup, value)
@@ -1765,7 +1796,7 @@ internal class SlotWriter(
             check(!anchorsRemoved) { "Unexpectedly removed anchors" }
 
             // Update the node count.
-            nodeCount += groups.nodeCount(currentGroup)
+            nodeCount += if (groups.isNode(currentGroup)) 1 else groups.nodeCount(currentGroup)
 
             // Move current passed the insert
             this.currentGroup = currentGroup + groupsToMove
@@ -2463,7 +2494,7 @@ private const val Group_Fields_Size = 5
 // 31 30 29 28_27 26 25 24_23 22 21 20_19 18 17 16__15 14 13 12_11 10 09 08_07 06 05 04_03 02 01 00
 // 0  n  ks ds r |                                node count                                       |
 // where n is set when the group represents a node
-// where ks is whether the group has a data key slot
+// where ks is whether the group has a object key slot
 // where ds is whether the group has a group data slot
 // where r is always 0 (future use)
 
@@ -2508,6 +2539,11 @@ private fun IntArray.objectKeyIndex(address: Int) = (address * Group_Fields_Size
 }
 private fun IntArray.hasAux(address: Int) =
     this[address * Group_Fields_Size + GroupInfo_Offset] and Aux_Mask != 0
+private fun IntArray.addAux(address: Int) {
+    val arrayIndex = address * Group_Fields_Size + GroupInfo_Offset
+    this[arrayIndex] = this[arrayIndex] or Aux_Mask
+}
+
 private fun IntArray.auxIndex(address: Int) = (address * Group_Fields_Size).let { slot ->
     if (slot >= size) size
     else this[slot + DataAnchor_Offset] +

@@ -18,7 +18,7 @@ package androidx.compose.ui.node
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.autofill.Autofill
 import androidx.compose.ui.autofill.AutofillTree
-import androidx.compose.ui.focus.FocusDirectionInternal
+import androidx.compose.ui.focus.FocusDirection
 import androidx.compose.ui.focus.FocusManager
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Canvas
@@ -180,9 +180,9 @@ internal interface Owner {
     fun onLayoutChange(layoutNode: LayoutNode)
 
     /**
-     * The [FocusDirection][FocusDirectionInternal] represented by the specified keyEvent.
+     * The [FocusDirection] represented by the specified keyEvent.
      */
-    fun getFocusDirection(keyEvent: KeyEvent): FocusDirectionInternal?
+    fun getFocusDirection(keyEvent: KeyEvent): FocusDirection?
 
     val measureIteration: Long
 

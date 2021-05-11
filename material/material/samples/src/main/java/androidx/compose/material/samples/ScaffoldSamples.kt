@@ -103,7 +103,7 @@ fun SimpleScaffoldWithTopBar() {
         },
         content = { innerPadding ->
             LazyColumn(contentPadding = innerPadding) {
-                items(100) {
+                items(count = 100) {
                     Box(
                         Modifier
                             .fillMaxWidth()
@@ -178,7 +178,7 @@ fun ScaffoldWithBottomBarAndCutout() {
         isFloatingActionButtonDocked = true,
         content = { innerPadding ->
             LazyColumn(contentPadding = innerPadding) {
-                items(100) {
+                items(count = 100) {
                     Box(
                         Modifier
                             .fillMaxWidth()

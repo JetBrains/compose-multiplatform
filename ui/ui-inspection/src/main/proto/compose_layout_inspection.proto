@@ -88,6 +88,8 @@ message ComposableNode {
       HAS_UNMERGED_SEMANTICS = 0x4;
     }
     int32 flags = 9;
+
+    int64 view_id = 10;
 }
 
 // In Android, a resource id is a simple integer. This class holds the namespace, type, and name
@@ -206,6 +208,8 @@ message GetComposablesCommand {
    int64 root_view_id = 1;
   // If true, only show composable nodes created by the user's own app
   bool skip_system_composables = 2;
+  // If the cached data generation matches the specified generation then the cache is still valid.
+  int32 generation = 3;
 }
 message GetComposablesResponse {
     // A collection of all text referenced by other fields in this message
@@ -227,6 +231,8 @@ message GetParametersCommand {
   // It is possible to request more elements by using: GetParameterDetailsCommand.
   // If not specified the default is 5.
   int32 max_initial_iterable_size = 5;
+  // If the cached data generation matches the specified generation then the cache is still valid.
+  int32 generation = 6;
 }
 
 message GetParametersResponse {
@@ -241,6 +247,8 @@ message GetAllParametersCommand {
   bool skip_system_composables = 2;
   int32 max_recursions = 3;
   int32 max_initial_iterable_size = 4;
+  // If the cached data generation matches the specified generation then the cache is still valid.
+  int32 generation = 5;
 }
 
 message GetAllParametersResponse {
@@ -258,6 +266,8 @@ message GetParameterDetailsCommand {
   bool skip_system_composables = 5;
   int32 max_recursions = 6;
   int32 max_initial_iterable_size = 7;
+  // If the cached data generation matches the specified generation then the cache is still valid.
+  int32 generation = 8;
 }
 
 message GetParameterDetailsResponse {

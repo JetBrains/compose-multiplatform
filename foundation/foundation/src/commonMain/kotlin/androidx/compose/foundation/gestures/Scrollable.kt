@@ -137,7 +137,9 @@ private fun Modifier.touchScrollImplementation(
     val scrollLogic = rememberUpdatedState(
         ScrollingLogic(orientation, reverseDirection, nestedScrollDispatcher, controller, fling)
     )
-    val nestedScrollConnection = remember { scrollableNestedScrollConnection(scrollLogic) }
+    val nestedScrollConnection = remember(enabled) {
+        scrollableNestedScrollConnection(scrollLogic, enabled)
+    }
     val draggableState = remember { ScrollDraggableState(scrollLogic) }
 
     return draggable(
@@ -269,20 +271,29 @@ private val NoOpScrollScope: ScrollScope = object : ScrollScope {
 }
 
 private fun scrollableNestedScrollConnection(
-    scrollLogic: State<ScrollingLogic>
+    scrollLogic: State<ScrollingLogic>,
+    enabled: Boolean
 ): NestedScrollConnection = object : NestedScrollConnection {
     override fun onPostScroll(
         consumed: Offset,
         available: Offset,
         source: NestedScrollSource
-    ): Offset = scrollLogic.value.performRawScroll(available)
+    ): Offset = if (enabled) {
+        scrollLogic.value.performRawScroll(available)
+    } else {
+        Offset.Zero
+    }
 
     override suspend fun onPostFling(
         consumed: Velocity,
         available: Velocity
     ): Velocity {
-        val velocityLeft = scrollLogic.value.doFlingAnimation(available)
-        return available - velocityLeft
+        return if (enabled) {
+            val velocityLeft = scrollLogic.value.doFlingAnimation(available)
+            available - velocityLeft
+        } else {
+            Velocity.Zero
+        }
     }
 }
 

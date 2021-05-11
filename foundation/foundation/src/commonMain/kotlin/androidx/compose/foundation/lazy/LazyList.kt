@@ -27,11 +27,13 @@ import androidx.compose.foundation.layout.calculateStartPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.State
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clipToBounds
 import androidx.compose.ui.layout.SubcomposeLayout
+import androidx.compose.ui.layout.SubcomposeLayoutState
 import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.LayoutDirection
@@ -68,7 +70,11 @@ internal fun LazyList(
 
     val itemContentFactory = rememberItemContentFactory(stateOfItemsProvider, state)
 
+    val subcomposeLayoutState = remember { SubcomposeLayoutState(MaxItemsToRetainForReuse) }
+    LazyListPrefetcher(state, stateOfItemsProvider, itemContentFactory, subcomposeLayoutState)
+
     SubcomposeLayout(
+        subcomposeLayoutState,
         modifier
             .lazyListSemantics(
                 stateOfItemsProvider = stateOfItemsProvider,
@@ -177,3 +183,17 @@ internal fun LazyList(
         )
     }
 }
+
+private const val MaxItemsToRetainForReuse = 2
+
+/**
+ * Platform specific implementation of lazy list prefetching - precomposing next items in
+ * advance during the scrolling.
+ */
+@Composable
+internal expect fun LazyListPrefetcher(
+    lazyListState: LazyListState,
+    stateOfItemsProvider: State<LazyListItemsProvider>,
+    itemContentFactory: LazyListItemContentFactory,
+    subcomposeLayoutState: SubcomposeLayoutState
+)

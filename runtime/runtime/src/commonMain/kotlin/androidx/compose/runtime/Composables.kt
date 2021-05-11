@@ -129,6 +129,25 @@ inline fun <T> key(
 ) = block()
 
 /**
+ * A utility function to mark a composition as supporting recycling. If the [key] changes the
+ * composition is replaced by a new composition (as would happen for [key]) but reusable nodes
+ * that are emitted by [ReusableComposeNode] are reused.
+ *
+ * @param key the value that is used to trigger recycling. If recomposed with a different value
+ * the composer creates a new composition but tries to reuse reusable nodes.
+ * @param content the composable children that are recyclable.
+ */
+@Composable
+inline fun ReusableContent(
+    key: Any?,
+    content: @Composable () -> Unit
+) {
+    currentComposer.startReusableGroup(reuseKey, key)
+    content()
+    currentComposer.endReusableGroup()
+}
+
+/**
  * TODO(lmr): provide documentation
  */
 val currentComposer: Composer
@@ -198,6 +217,43 @@ val currentCompositeKeyHash: Int
 }
 
 /**
+ * Emits a recyclable node into the composition of type [T].
+ *
+ * This function will throw a runtime exception if [E] is not a subtype of the applier of the
+ * [currentComposer].
+ *
+ * @sample androidx.compose.runtime.samples.CustomTreeComposition
+ *
+ * @param factory A function which will create a new instance of [T]. This function is NOT
+ * guaranteed to be called in place.
+ * @param update A function to perform updates on the node. This will run every time emit is
+ * executed. This function is called in place and will be inlined.
+ *
+ * @see Updater
+ * @see Applier
+ * @see Composition
+ */
+// ComposeNode is a special case of readonly composable and handles creating its own groups, so
+// it is okay to use.
+@Suppress("NONREADONLY_CALL_IN_READONLY_COMPOSABLE", "UnnecessaryLambdaCreation")
+@Composable inline fun <T : Any, reified E : Applier<*>> ReusableComposeNode(
+    noinline factory: () -> T,
+    update: @DisallowComposableCalls Updater<T>.() -> Unit
+) {
+    if (currentComposer.applier !is E) invalidApplier()
+    currentComposer.startReusableNode()
+    if (currentComposer.inserting) {
+        currentComposer.createNode { factory() }
+    } else {
+        currentComposer.useNode()
+    }
+    currentComposer.disableReusing()
+    Updater<T>(currentComposer).update()
+    currentComposer.enableReusing()
+    currentComposer.endNode()
+}
+
+/**
  * Emits a node into the composition of type [T]. Nodes emitted inside of [content] will become
  * children of the emitted node.
  *
@@ -233,6 +289,48 @@ inline fun <T : Any?, reified E : Applier<*>> ComposeNode(
         currentComposer.useNode()
     }
     Updater<T>(currentComposer).update()
+    content()
+    currentComposer.endNode()
+}
+
+/**
+ * Emits a recyclable node into the composition of type [T]. Nodes emitted inside of [content] will
+ * become children of the emitted node.
+ *
+ * This function will throw a runtime exception if [E] is not a subtype of the applier of the
+ * [currentComposer].
+ *
+ * @sample androidx.compose.runtime.samples.CustomTreeComposition
+ *
+ * @param factory A function which will create a new instance of [T]. This function is NOT
+ * guaranteed to be called in place.
+ * @param update A function to perform updates on the node. This will run every time emit is
+ * executed. This function is called in place and will be inlined.
+ * @param content the composable content that will emit the "children" of this node.
+ *
+ * @see Updater
+ * @see Applier
+ * @see Composition
+ */
+// ComposeNode is a special case of readonly composable and handles creating its own groups, so
+// it is okay to use.
+@Suppress("NONREADONLY_CALL_IN_READONLY_COMPOSABLE")
+@Composable
+inline fun <T : Any?, reified E : Applier<*>> ReusableComposeNode(
+    noinline factory: () -> T,
+    update: @DisallowComposableCalls Updater<T>.() -> Unit,
+    content: @Composable () -> Unit
+) {
+    if (currentComposer.applier !is E) invalidApplier()
+    currentComposer.startReusableNode()
+    if (currentComposer.inserting) {
+        currentComposer.createNode(factory)
+    } else {
+        currentComposer.useNode()
+    }
+    currentComposer.disableReusing()
+    Updater<T>(currentComposer).update()
+    currentComposer.enableReusing()
     content()
     currentComposer.endNode()
 }
@@ -278,6 +376,55 @@ inline fun <T, reified E : Applier<*>> ComposeNode(
     }
     Updater<T>(currentComposer).update()
     SkippableUpdater<T>(currentComposer).skippableUpdate()
+    currentComposer.startReplaceableGroup(0x7ab4aae9)
+    content()
+    currentComposer.endReplaceableGroup()
+    currentComposer.endNode()
+}
+
+/**
+ * Emits a recyclable node into the composition of type [T]. Nodes emitted inside of [content] will
+ * become children of the emitted node.
+ *
+ * This function will throw a runtime exception if [E] is not a subtype of the applier of the
+ * [currentComposer].
+ *
+ * @sample androidx.compose.runtime.samples.CustomTreeComposition
+ *
+ * @param factory A function which will create a new instance of [T]. This function is NOT
+ * guaranteed to be called in place.
+ * @param update A function to perform updates on the node. This will run every time emit is
+ * executed. This function is called in place and will be inlined.
+ * @param skippableUpdate A function to perform updates on the node. Unlike [update], this
+ * function is Composable and will therefore be skipped unless it has been invalidated by some
+ * other mechanism. This can be useful to perform expensive calculations for updating the node
+ * where the calculations are likely to have the same inputs over time, so the function's
+ * execution can be skipped.
+ * @param content the composable content that will emit the "children" of this node.
+ *
+ * @see Updater
+ * @see SkippableUpdater
+ * @see Applier
+ * @see Composition
+ */
+@Composable @ExplicitGroupsComposable
+inline fun <T, reified E : Applier<*>> ReusableComposeNode(
+    noinline factory: () -> T,
+    update: @DisallowComposableCalls Updater<T>.() -> Unit,
+    noinline skippableUpdate: @Composable SkippableUpdater<T>.() -> Unit,
+    content: @Composable () -> Unit
+) {
+    if (currentComposer.applier !is E) invalidApplier()
+    currentComposer.startReusableNode()
+    if (currentComposer.inserting) {
+        currentComposer.createNode(factory)
+    } else {
+        currentComposer.useNode()
+    }
+    currentComposer.disableReusing()
+    Updater<T>(currentComposer).update()
+    SkippableUpdater<T>(currentComposer).skippableUpdate()
+    currentComposer.enableReusing()
     currentComposer.startReplaceableGroup(0x7ab4aae9)
     content()
     currentComposer.endReplaceableGroup()

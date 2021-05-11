@@ -30,20 +30,21 @@ plugins {
 
 AndroidXUiPlugin.applyAndConfigureKotlinPlugin(project)
 
+IconGenerationTask.registerExtendedIconMainProject(
+        project,
+        android
+)
+
+apply from: "shared-dependencies.gradle"
+
 dependencies {
     kotlinPlugin(project(":compose:compiler:compiler"))
 
-    if(!AndroidXUiPlugin.isMultiplatformEnabled(project)) {
+    if (!AndroidXUiPlugin.isMultiplatformEnabled(project)) {
         /*
-         * When updating dependencies, make sure to make the an an analogous update in the
+         * When updating dependencies, make sure to make an analogous update in the
          * corresponding block below
          */
-
-        api(project(":compose:material:material-icons-core"))
-
-        implementation(KOTLIN_STDLIB_COMMON)
-        implementation(project(":compose:runtime:runtime"))
-
         androidTestImplementation(ANDROIDX_TEST_RULES)
         androidTestImplementation(ANDROIDX_TEST_RUNNER)
         androidTestImplementation(JUNIT)
@@ -61,21 +62,13 @@ dependencies {
     }
 }
 
-if(AndroidXUiPlugin.isMultiplatformEnabled(project)) {
+if (AndroidXUiPlugin.isMultiplatformEnabled(project)) {
     kotlin {
-        android()
-        jvm("desktop")
         /*
-         * When updating dependencies, make sure to make the an an analogous update in the
+         * When updating dependencies, make sure to make an analogous update in the
          * corresponding block above
          */
         sourceSets {
-            commonMain.dependencies {
-                implementation(KOTLIN_STDLIB_COMMON)
-                api(project(":compose:material:material-icons-core"))
-                implementation(project(":compose:runtime:runtime"))
-            }
-
             androidTest.dependencies {
                 implementation(project(":compose:foundation:foundation"))
                 implementation(project(":compose:foundation:foundation-layout"))
@@ -95,24 +88,52 @@ if(AndroidXUiPlugin.isMultiplatformEnabled(project)) {
     }
 }
 
-android.buildTypes.all {
-    // Jacoco hangs intermittently due to the large number of files
-    testCoverageEnabled = false
-}
+def allThemes = ["filled", "outlined", "rounded", "sharp", "twotone"]
 
-// b/175401659 - disable lint as it takes a long time, and most errors should be caught by lint on
-// material-icons-core anyway
-project.afterEvaluate {
-    tasks.named("lintDebug") {
-        enabled = false
+configurations {
+    embedThemesDebug {
+        attributes {
+            attribute(iconExportAttr, "true")
+            attribute(iconBuildTypeAttr, "debug")
+        }
     }
+    embedThemesRelease {
+        attributes {
+            attribute(iconExportAttr, "true")
+            attribute(iconBuildTypeAttr, "release")
+        }
+    }
+
 }
 
-IconGenerationTask.registerExtendedIconProject(
-        project,
-        android,
-        AndroidXUiPlugin.isMultiplatformEnabled(project)
-)
+if (!AndroidXUiPlugin.isMultiplatformEnabled(project)) {
+    for (themeName in allThemes) {
+        def otherProject = project(":compose:material:material-icons-extended-" + themeName)
+        project.dependencies.add("embedThemesDebug", otherProject)
+        project.dependencies.add("embedThemesRelease", otherProject)
+    }
+    // Compiling all of the icons in this project takes a while,
+    // so when possible, we compile each theme in its own project and merge them here.
+    // Hopefully we can revert this when parallel compilation is supported:
+    // https://youtrack.jetbrains.com/issue/KT-46085
+    android {
+        libraryVariants.all { v ->
+            if (v.name.toLowerCase().contains("debug")) {
+                v.registerPostJavacGeneratedBytecode(configurations.embedThemesDebug)
+            } else {
+                v.registerPostJavacGeneratedBytecode(configurations.embedThemesRelease)
+            }
+        }
+    }
+} else {
+    // We're not sure how to compile these icons in parallel when multiplatform is enabled
+    IconGenerationTask.registerExtendedIconThemeProject(
+            project,
+            android,
+            AndroidXUiPlugin.isMultiplatformEnabled(project)
+    )
+}
+
 
 androidx {
     name = "Compose Material Icons Extended"

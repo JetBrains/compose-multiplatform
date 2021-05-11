@@ -18,21 +18,37 @@ package androidx.compose.ui.window
 import android.os.Build
 import android.view.ViewGroup
 import androidx.activity.ComponentActivity
+import androidx.compose.foundation.background
+import androidx.compose.foundation.gestures.awaitFirstDown
+import androidx.compose.foundation.gestures.drag
+import androidx.compose.foundation.gestures.forEachGesture
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.requiredSize
+import androidx.compose.foundation.layout.size
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.input.pointer.consumeAllChanges
+import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.LayoutCoordinates
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.layout.positionInWindow
 import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.test.TestActivity
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
+import androidx.compose.ui.test.onNodeWithTag
+import androidx.compose.ui.test.performGesture
+import androidx.compose.ui.test.swipe
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.round
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import androidx.test.filters.FlakyTest
 import androidx.test.filters.MediumTest
 import androidx.test.filters.SdkSuppress
 import com.google.common.truth.Truth.assertThat
@@ -189,6 +205,48 @@ class PositionInWindowTest {
             activity.window.decorView.offsetTopAndBottom(10)
             val newPosition = coordinates!!.positionInWindow()
             assertThat(newPosition.y).isEqualTo(position.y + 10)
+        }
+    }
+
+    @FlakyTest(bugId = 186669179)
+    @Test
+    fun positionInMovingPopup() {
+        val smallBoxTag = "smallBox"
+        var offset by mutableStateOf(Offset.Zero)
+        val endOffsetPx = 200f
+
+        rule.setContent {
+            Box(Modifier.fillMaxSize().background(Color.White)) {
+                Popup(offset = offset.round()) {
+                    Box(
+                        Modifier.size(10.dp, 10.dp)
+                            .background(Color.Black)
+                            .testTag(smallBoxTag)
+                            .pointerInput(Unit) {
+                                forEachGesture {
+                                    awaitPointerEventScope {
+                                        val down = awaitFirstDown()
+                                        var previous = down.position
+                                        drag(down.id) {
+                                            it.consumeAllChanges()
+                                            offset += it.position - previous
+                                            previous = it.position
+                                        }
+                                    }
+                                }
+                            }
+                    )
+                }
+            }
+        }
+
+        rule.onNodeWithTag(smallBoxTag)
+            .performGesture {
+                swipe(Offset.Zero, Offset(endOffsetPx, endOffsetPx))
+            }
+
+        rule.runOnIdle {
+            assertThat(offset).isEqualTo(Offset(endOffsetPx, endOffsetPx))
         }
     }
 }

@@ -27,9 +27,8 @@ import android.view.KeyEvent as AndroidKeyEvent
 import android.view.KeyEvent.ACTION_DOWN
 import android.view.KeyEvent.ACTION_UP
 import androidx.compose.ui.input.key.Key.Companion.A
-import androidx.compose.ui.input.key.KeyEventType.KeyUp
-import androidx.compose.ui.input.key.KeyEventType.KeyDown
-import androidx.compose.ui.input.key.KeyEventType.Unknown
+import androidx.compose.ui.input.key.KeyEventType.Companion.KeyDown
+import androidx.compose.ui.input.key.KeyEventType.Companion.KeyUp
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onRoot
 import androidx.compose.ui.test.performKeyPress
@@ -400,7 +399,7 @@ class ProcessKeyInputTest {
         val action = when (keyEventType) {
             KeyDown -> ACTION_DOWN
             KeyUp -> ACTION_UP
-            Unknown -> error("Unknown key event type")
+            else -> error("Unknown key event type")
         }
         return KeyEvent(AndroidKeyEvent(0L, 0L, action, keycode, 0, 0))
     }

@@ -35,6 +35,7 @@ android.defaultConfig {
 dependencies {
     androidTestImplementation(project(":benchmark:benchmark-junit4"))
     androidTestImplementation(project(":benchmark:benchmark-macro-junit4"))
+    androidTestImplementation(project(":internal-testutils-macrobenchmark"))
     androidTestImplementation(ANDROIDX_TEST_RULES)
     androidTestImplementation(ANDROIDX_TEST_EXT_JUNIT)
     androidTestImplementation(ANDROIDX_TEST_CORE)

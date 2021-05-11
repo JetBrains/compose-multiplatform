@@ -43,6 +43,8 @@ internal class MotionEventAdapter {
     @VisibleForTesting
     internal val motionEventToComposePointerIdMap: MutableMap<Int, PointerId> = mutableMapOf()
 
+    private val pointers: MutableList<PointerInputEventData> = mutableListOf()
+
     /**
      * Converts a single [MotionEvent] from an Android event stream into a [PointerInputEvent], or
      * null if the [MotionEvent.getActionMasked] is [ACTION_CANCEL].
@@ -76,12 +78,10 @@ internal class MotionEventAdapter {
             else -> null
         }
 
-        // TODO(shepshapard): Avoid allocating for every event.
-        val pointers: MutableList<PointerInputEventData> = mutableListOf()
+        pointers.clear()
 
         // This converts the MotionEvent into a list of PointerInputEventData, and updates
         // internal record keeping.
-        @Suppress("NAME_SHADOWING")
         for (i in 0 until motionEvent.pointerCount) {
             pointers.add(
                 createPointerInputEventData(
@@ -152,13 +152,16 @@ private fun createPointerInputEventData(
     index: Int,
     upIndex: Int?
 ): PointerInputEventData {
-    val position = Offset(motionEvent.getX(index), motionEvent.getY(index))
-    val rawPosition = if (index == 0) {
-        Offset(motionEvent.rawX, motionEvent.rawY)
+    var position = Offset(motionEvent.getX(index), motionEvent.getY(index))
+    val rawPosition: Offset
+    if (index == 0) {
+        rawPosition = Offset(motionEvent.rawX, motionEvent.rawY)
+        position = positionCalculator.screenToLocal(rawPosition)
     } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-        motionEvent.toRawOffset(index)
+        rawPosition = motionEvent.toRawOffset(index)
+        position = positionCalculator.screenToLocal(rawPosition)
     } else {
-        positionCalculator.localToScreen(position)
+        rawPosition = positionCalculator.localToScreen(position)
     }
     val toolType = when (motionEvent.getToolType(index)) {
         MotionEvent.TOOL_TYPE_UNKNOWN -> PointerType.Unknown

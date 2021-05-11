@@ -37,7 +37,7 @@ class HitPathTrackerTest {
 
     @Before
     fun setup() {
-        hitPathTracker = HitPathTracker()
+        hitPathTracker = HitPathTracker(LayoutCoordinatesStub())
     }
 
     @Test
@@ -443,10 +443,12 @@ class HitPathTrackerTest {
 
     @Test
     fun dispatchChanges_noNodes_nothingChanges() {
-        val (result, _) = hitPathTracker.dispatchChanges(internalPointerEventOf(down(5)))
+        val internalPointerEvent = internalPointerEventOf(down(5))
+
+        hitPathTracker.dispatchChanges(internalPointerEvent)
 
         PointerInputChangeSubject
-            .assertThat(result.changes.values.first())
+            .assertThat(internalPointerEvent.changes.values.first())
             .isStructurallyEqualTo(down(5))
     }
 
@@ -463,10 +465,12 @@ class HitPathTrackerTest {
 
         hitPathTracker.addHitPath(PointerId(13), listOf(pif1))
 
-        val (result, _) = hitPathTracker.dispatchChanges(internalPointerEventOf(down(13)))
+        val internalPointerEvent = internalPointerEventOf(down(13))
+
+        hitPathTracker.dispatchChanges(internalPointerEvent)
 
         PointerInputChangeSubject
-            .assertThat(result.changes.values.first())
+            .assertThat(internalPointerEvent.changes.values.first())
             .isStructurallyEqualTo(down(13).apply { consumeDownChange() })
     }
 
@@ -508,7 +512,9 @@ class HitPathTrackerTest {
         val expectedChange = actualChange.deepCopy()
         val consumedExpectedChange = actualChange.deepCopy().apply { consumePositionChange() }
 
-        val (result, _) = hitPathTracker.dispatchChanges(internalPointerEventOf(actualChange))
+        val internalPointerEvent = internalPointerEventOf(actualChange)
+
+        hitPathTracker.dispatchChanges(internalPointerEvent)
 
         val log1 = log.getOnPointerEventLog()
             .filter { it.pass == PointerEventPass.Initial || it.pass == PointerEventPass.Main }
@@ -570,7 +576,7 @@ class HitPathTrackerTest {
         assertThat(log1[5].pass).isEqualTo(PointerEventPass.Main)
 
         PointerInputChangeSubject
-            .assertThat(result.changes.values.first())
+            .assertThat(internalPointerEvent.changes.values.first())
             .isStructurallyEqualTo(
                 consumedExpectedChange
             )
@@ -628,9 +634,9 @@ class HitPathTrackerTest {
         val consumedExpectedEvent1 = expectedEvent1.deepCopy().apply { consumePositionChange() }
         val consumedExpectedEvent2 = expectedEvent2.deepCopy().apply { consumePositionChange() }
 
-        val (result, _) = hitPathTracker.dispatchChanges(
-            internalPointerEventOf(actualEvent1, actualEvent2)
-        )
+        val internalPointerEvent = internalPointerEventOf(actualEvent1, actualEvent2)
+
+        hitPathTracker.dispatchChanges(internalPointerEvent)
 
         val log1 = log.getOnPointerEventLog()
             .filter { it.pass == PointerEventPass.Initial || it.pass == PointerEventPass.Main }
@@ -712,14 +718,14 @@ class HitPathTrackerTest {
             )
         assertThat(log2[3].pass).isEqualTo(PointerEventPass.Main)
 
-        assertThat(result.changes).hasSize(2)
+        assertThat(internalPointerEvent.changes).hasSize(2)
         PointerInputChangeSubject
-            .assertThat(result.changes[actualEvent1.id])
+            .assertThat(internalPointerEvent.changes[actualEvent1.id])
             .isStructurallyEqualTo(
                 consumedExpectedEvent1
             )
         PointerInputChangeSubject
-            .assertThat(result.changes[actualEvent2.id])
+            .assertThat(internalPointerEvent.changes[actualEvent2.id])
             .isStructurallyEqualTo(
                 consumedExpectedEvent2
             )
@@ -770,9 +776,9 @@ class HitPathTrackerTest {
         val consumedEvent1 = expectedEvent1.deepCopy().apply { consumePositionChange() }
         val consumedEvent2 = expectedEvent2.deepCopy().apply { consumePositionChange() }
 
-        val (result, _) = hitPathTracker.dispatchChanges(
-            internalPointerEventOf(actualEvent1, actualEvent2)
-        )
+        val internalPointerEvent = internalPointerEventOf(actualEvent1, actualEvent2)
+
+        hitPathTracker.dispatchChanges(internalPointerEvent)
 
         val log1 = log.getOnPointerEventLog()
             .filter { it.pass == PointerEventPass.Initial || it.pass == PointerEventPass.Main }
@@ -823,13 +829,13 @@ class HitPathTrackerTest {
             )
         assertThat(log1[5].pass).isEqualTo(PointerEventPass.Main)
 
-        assertThat(result.changes).hasSize(2)
+        assertThat(internalPointerEvent.changes).hasSize(2)
         PointerInputChangeSubject
-            .assertThat(result.changes[actualEvent1.id])
+            .assertThat(internalPointerEvent.changes[actualEvent1.id])
             .isStructurallyEqualTo(consumedEvent1)
 
         PointerInputChangeSubject
-            .assertThat(result.changes[actualEvent2.id])
+            .assertThat(internalPointerEvent.changes[actualEvent2.id])
             .isStructurallyEqualTo(consumedEvent2)
     }
 
@@ -866,9 +872,9 @@ class HitPathTrackerTest {
         val consumedEvent1 = expectedEvent1.deepCopy().apply { consumePositionChange() }
         val consumedEvent2 = expectedEvent2.deepCopy().apply { consumePositionChange() }
 
-        val (result, _) = hitPathTracker.dispatchChanges(
-            internalPointerEventOf(actualEvent1, actualEvent2)
-        )
+        val internalPointerEvent = internalPointerEventOf(actualEvent1, actualEvent2)
+
+        hitPathTracker.dispatchChanges(internalPointerEvent)
 
         val log1 = log.getOnPointerEventLog()
             .filter { it.pass == PointerEventPass.Initial || it.pass == PointerEventPass.Main }
@@ -912,14 +918,14 @@ class HitPathTrackerTest {
             )
         assertThat(log1[3].pass).isEqualTo(PointerEventPass.Main)
 
-        assertThat(result.changes).hasSize(2)
+        assertThat(internalPointerEvent.changes).hasSize(2)
         PointerInputChangeSubject
-            .assertThat(result.changes[actualEvent1.id])
+            .assertThat(internalPointerEvent.changes[actualEvent1.id])
             .isStructurallyEqualTo(
                 consumedEvent1
             )
         PointerInputChangeSubject
-            .assertThat(result.changes[actualEvent2.id])
+            .assertThat(internalPointerEvent.changes[actualEvent2.id])
             .isStructurallyEqualTo(
                 consumedEvent2
             )
@@ -2842,7 +2848,7 @@ class HitPathTrackerTest {
 
     @Test
     fun dispatchChanges_noNodes_reportsWasDispatchedToNothing() {
-        val (_, hitSomething) = hitPathTracker.dispatchChanges(internalPointerEventOf(down(0)))
+        val hitSomething = hitPathTracker.dispatchChanges(internalPointerEventOf(down(0)))
         assertThat(hitSomething).isFalse()
     }
 
@@ -2851,7 +2857,7 @@ class HitPathTrackerTest {
         val pif = PointerInputFilterMock()
         hitPathTracker.addHitPath(PointerId(13), listOf(pif))
 
-        val (_, hitSomething) = hitPathTracker.dispatchChanges(internalPointerEventOf(down(13)))
+        val hitSomething = hitPathTracker.dispatchChanges(internalPointerEventOf(down(13)))
 
         assertThat(hitSomething).isTrue()
     }
@@ -2861,7 +2867,7 @@ class HitPathTrackerTest {
         val pif = PointerInputFilterMock()
         hitPathTracker.addHitPath(PointerId(13), listOf(pif))
 
-        val (_, hitSomething) = hitPathTracker.dispatchChanges(internalPointerEventOf(down(69)))
+        val hitSomething = hitPathTracker.dispatchChanges(internalPointerEventOf(down(69)))
 
         assertThat(hitSomething).isFalse()
     }
@@ -3109,7 +3115,7 @@ class HitPathTrackerTest {
         if (actualNode.children.size != expectedNode.children.size) {
             return false
         }
-        for (child in actualNode.children) {
+        actualNode.children.forEach { child ->
             check = check && expectedNode.children.any {
                 areEqual(child, it)
             }
@@ -3137,7 +3143,7 @@ class HitPathTrackerTest {
         if (actualNode.children.size != expectedNode.children.size) {
             return false
         }
-        for (child in actualNode.children) {
+        actualNode.children.forEach { child ->
             check = check && expectedNode.children.any {
                 areEqual(child, it)
             }

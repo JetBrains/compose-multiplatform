@@ -37,6 +37,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCompositionContext
 import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.R
 import androidx.compose.ui.layout.Layout
@@ -44,6 +45,7 @@ import androidx.compose.ui.platform.AbstractComposeView
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.platform.LocalView
+import androidx.compose.ui.platform.ViewRootForInspector
 import androidx.compose.ui.semantics.dialog
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.Density
@@ -188,6 +190,7 @@ private class DialogLayout(
     }
 }
 
+@OptIn(ExperimentalComposeUiApi::class)
 private class DialogWrapper(
     private var onDismissRequest: () -> Unit,
     private var properties: DialogProperties,
@@ -200,10 +203,14 @@ private class DialogWrapper(
      * So use a wrapped context that sets this attribute for compatibility back to 21.
      */
     ContextThemeWrapper(composeView.context, R.style.DialogWindowTheme)
-) {
+),
+    ViewRootForInspector {
+
     private val dialogLayout: DialogLayout
 
     private val maxSupportedElevation = 30.dp
+
+    override val subCompositionView: AbstractComposeView get() = dialogLayout
 
     init {
         val window = window ?: error("Dialog has no window")

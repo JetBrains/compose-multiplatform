@@ -16,20 +16,20 @@
 
 package androidx.compose.ui.inspection.rules
 
+import android.view.View
 import android.view.inspector.WindowInspector
-import androidx.compose.runtime.tooling.CompositionData
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.tooling.CompositionData
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.R
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.platform.ViewRootForTest
 import androidx.inspection.testing.InspectorTester
 import androidx.test.core.app.ActivityScenario
-import com.google.common.truth.Truth
 import kotlinx.coroutines.runBlocking
 import layoutinspector.compose.inspection.LayoutInspectorComposeProtocol.Command
 import layoutinspector.compose.inspection.LayoutInspectorComposeProtocol.Response
@@ -56,13 +56,17 @@ class ComposeInspectionRule(
     val clazz: KClass<out ComponentActivity>,
     private val useInspector: Boolean = true
 ) : ExternalResource() {
-    var rootId: Long = 0
-        private set
+    val rootsForTest = mutableListOf<ViewRootForTest>()
+    val roots = mutableListOf<View>()
+    val rootId: Long
+        get() = roots.single().uniqueDrawingId
     lateinit var inspectorTester: InspectorTester
         private set
 
-    private val compositionDataSet =
-        Collections.newSetFromMap(WeakHashMap<CompositionData, Boolean>())
+    @Suppress("UNCHECKED_CAST")
+    private val compositionDataSet: Collection<CompositionData>
+        get() = rootsForTest.single().view.getTag(R.id.inspection_slot_table_set)
+            as Collection<CompositionData>
 
     val compositionData: CompositionData
         get() = compositionDataSet.first()
@@ -73,18 +77,16 @@ class ComposeInspectionRule(
         JvmtiRule.ensureInitialised()
         // need to set this special tag on the root view to enable inspection
         ViewRootForTest.onViewCreatedCallback = {
+            rootsForTest.add(it)
             it.view.setTag(
                 R.id.inspection_slot_table_set,
-                compositionDataSet
+                Collections.newSetFromMap(WeakHashMap<CompositionData, Boolean>())
             )
-            ViewRootForTest.onViewCreatedCallback = null
         }
 
         activityScenario = ActivityScenario.launch(clazz.java)
         activityScenario.onActivity {
-            val roots = WindowInspector.getGlobalWindowViews().map { it.uniqueDrawingId }
-            Truth.assertThat(roots).hasSize(1)
-            rootId = roots[0]
+            roots.addAll(WindowInspector.getGlobalWindowViews())
         }
         if (!useInspector) return
         runBlocking {
@@ -96,6 +98,7 @@ class ComposeInspectionRule(
 
     override fun after() {
         if (useInspector) inspectorTester.dispose()
+        ViewRootForTest.onViewCreatedCallback = null
     }
 }
 

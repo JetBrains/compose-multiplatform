@@ -20,16 +20,17 @@ import androidx.compose.animation.VectorConverter
 import androidx.compose.animation.animateColor
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.State
-import androidx.compose.runtime.withFrameNanos
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.runtime.withFrameNanos
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.LargeTest
 import junit.framework.TestCase.assertEquals
+import junit.framework.TestCase.assertFalse
 import junit.framework.TestCase.assertTrue
 import kotlinx.coroutines.delay
 import org.junit.Rule
@@ -48,6 +49,7 @@ class TransitionTest {
         To
     }
 
+    @OptIn(InternalAnimationApi::class)
     @Test
     fun transitionTest() {
         val target = mutableStateOf(AnimStates.From)
@@ -239,6 +241,7 @@ class TransitionTest {
         assertTrue(playTime > 200 * MillisToNanos)
     }
 
+    @OptIn(InternalAnimationApi::class)
     @Test
     fun addNewAnimationInFlightTest() {
         val target = mutableStateOf(AnimStates.From)
@@ -338,5 +341,109 @@ class TransitionTest {
         rule.waitForIdle()
         assertTrue(targetRecreated)
         assertTrue(playTime >= 800 * MillisToNanos)
+    }
+
+    @OptIn(ExperimentalTransitionApi::class)
+    @Test
+    fun testMutableTransitionStateIsIdle() {
+        val mutableTransitionState = MutableTransitionState(false)
+        var transition: Transition<Boolean>? = null
+        rule.setContent {
+            transition = updateTransition(mutableTransitionState).apply {
+                animateFloat {
+                    if (it) 1f else 0f
+                }
+            }
+        }
+        rule.mainClock.autoAdvance = false
+        rule.runOnIdle {
+            assertTrue(mutableTransitionState.isIdle)
+            mutableTransitionState.targetState = true
+            assertFalse(mutableTransitionState.isIdle)
+        }
+
+        while (transition?.currentState != true) {
+            // Animation has not finished or even started from Transition's perspective
+            assertFalse(mutableTransitionState.isIdle)
+            rule.mainClock.advanceTimeByFrame()
+        }
+        assertTrue(mutableTransitionState.isIdle)
+
+        // Now that transition false -> true finished, go back to false
+        rule.runOnIdle {
+            assertTrue(mutableTransitionState.isIdle)
+            mutableTransitionState.targetState = false
+            assertFalse(mutableTransitionState.isIdle)
+        }
+
+        while (transition?.currentState == true) {
+            // Animation has not finished or even started from Transition's perspective
+            assertFalse(mutableTransitionState.isIdle)
+            rule.mainClock.advanceTimeByFrame()
+        }
+        assertTrue(mutableTransitionState.isIdle)
+    }
+
+    @OptIn(ExperimentalTransitionApi::class, InternalAnimationApi::class)
+    @Test
+    fun testCreateChildTransition() {
+        val intState = mutableStateOf(1)
+        val parentTransitionFloat = mutableStateOf(1f)
+        val childTransitionFloat = mutableStateOf(1f)
+        rule.setContent {
+            val transition = updateTransition(intState.value)
+            parentTransitionFloat.value = transition.animateFloat({ tween(100) }) {
+                when (it) {
+                    0 -> 0f
+                    1 -> 1f
+                    else -> 2f
+                }
+            }.value
+            val booleanTransition = transition.createChildTransition {
+                it == 1
+            }
+            childTransitionFloat.value = booleanTransition.animateFloat({ tween(500) }) {
+                if (it) 1f else 0f
+            }.value
+            LaunchedEffect(intState.value) {
+                while (true) {
+                    if (transition.targetState == transition.currentState) {
+                        break
+                    }
+                    withFrameNanos { it }
+                    if (intState.value == 0) {
+                        // 1 -> 0
+                        if (
+                            transition.playTimeNanos > 0 && transition.playTimeNanos <= 500_000_000L
+                        ) {
+                            assertTrue(transition.isRunning)
+                            assertTrue(booleanTransition.isRunning)
+                        }
+                    } else if (intState.value == 2) {
+                        // 0 -> 2
+                        assertFalse(booleanTransition.isRunning)
+                        if (transition.playTimeNanos > 120_000_000L) {
+                            assertFalse(transition.isRunning)
+                        } else if (transition.playTimeNanos > 0) {
+                            assertTrue(transition.isRunning)
+                        }
+                    }
+                }
+            }
+        }
+        rule.runOnIdle {
+            assertEquals(1f, parentTransitionFloat.value)
+            assertEquals(1f, childTransitionFloat.value)
+            intState.value = 0
+        }
+        rule.runOnIdle {
+            assertEquals(0f, parentTransitionFloat.value)
+            assertEquals(0f, childTransitionFloat.value)
+            intState.value = 2
+        }
+        rule.runOnIdle {
+            assertEquals(2f, parentTransitionFloat.value)
+            assertEquals(0f, childTransitionFloat.value)
+        }
     }
 }

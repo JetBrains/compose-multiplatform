@@ -21,7 +21,7 @@ import androidx.compose.ui.autofill.Autofill
 import androidx.compose.ui.autofill.AutofillTree
 import androidx.compose.ui.draw.DrawModifier
 import androidx.compose.ui.draw.drawBehind
-import androidx.compose.ui.focus.FocusDirectionInternal
+import androidx.compose.ui.focus.FocusDirection
 import androidx.compose.ui.focus.FocusManager
 import androidx.compose.ui.geometry.MutableRect
 import androidx.compose.ui.geometry.Offset
@@ -1682,6 +1682,22 @@ class LayoutNodeTest {
     }
 
     @Test
+    fun layerParamChangeCallsOnLayoutChange() {
+        val node = LayoutNode(20, 20, 100, 100, Modifier.graphicsLayer())
+        val owner = MockOwner()
+        node.attach(owner)
+        assertEquals(0, owner.layoutChangeCount)
+        node.innerLayoutNodeWrapper.onLayerBlockUpdated { scaleX = 0.5f }
+        assertEquals(1, owner.layoutChangeCount)
+        repeat(2) {
+            node.innerLayoutNodeWrapper.onLayerBlockUpdated { scaleX = 1f }
+        }
+        assertEquals(2, owner.layoutChangeCount)
+        node.innerLayoutNodeWrapper.onLayerBlockUpdated(null)
+        assertEquals(3, owner.layoutChangeCount)
+    }
+
+    @Test
     fun reuseModifiersThatImplementMultipleModifierInterfaces() {
         val drawAndLayoutModifier: Modifier = object : DrawModifier, LayoutModifier {
             override fun MeasureScope.measure(
@@ -1868,7 +1884,7 @@ private class MockOwner(
         layoutChangeCount++
     }
 
-    override fun getFocusDirection(keyEvent: KeyEvent): FocusDirectionInternal? {
+    override fun getFocusDirection(keyEvent: KeyEvent): FocusDirection? {
         TODO("Not yet implemented")
     }
 

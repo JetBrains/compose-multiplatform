@@ -54,8 +54,8 @@ internal data class PointerInputEventData(
  */
 @OptIn(InternalCoreApi::class)
 internal expect class InternalPointerEvent(
-    changes: MutableMap<PointerId, PointerInputChange>,
+    changes: Map<PointerId, PointerInputChange>,
     pointerInputEvent: PointerInputEvent
 ) {
-    var changes: MutableMap<PointerId, PointerInputChange>
+    val changes: Map<PointerId, PointerInputChange>
 }

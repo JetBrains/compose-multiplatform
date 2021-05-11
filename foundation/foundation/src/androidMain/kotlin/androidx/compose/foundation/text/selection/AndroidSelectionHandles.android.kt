@@ -185,7 +185,10 @@ private fun SelectionHandlePopup(
 
     Popup(
         popupPositionProvider = popupPositioner,
-        properties = PopupProperties(excludeFromSystemGesture = true),
+        properties = PopupProperties(
+            excludeFromSystemGesture = true,
+            clippingEnabled = false
+        ),
         content = content
     )
 }

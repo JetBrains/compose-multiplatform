@@ -55,6 +55,7 @@ import androidx.compose.ui.platform.AbstractComposeView
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.platform.LocalView
+import androidx.compose.ui.platform.ViewRootForInspector
 import androidx.compose.ui.semantics.popup
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.Density
@@ -85,6 +86,10 @@ import kotlin.math.roundToInt
  * window.
  * @property excludeFromSystemGesture A flag to check whether to set the systemGestureExclusionRects.
  * The default is true.
+ * @property clippingEnabled Whether to allow the popup window to extend beyond the bounds of the
+ * screen. By default the window is clipped to the screen boundaries. Setting this to false will
+ * allow windows to be accurately positioned.
+ * The default value is true.
  */
 @Immutable
 class PopupProperties @ExperimentalComposeUiApi constructor(
@@ -93,7 +98,9 @@ class PopupProperties @ExperimentalComposeUiApi constructor(
     val dismissOnClickOutside: Boolean = true,
     val securePolicy: SecureFlagPolicy = SecureFlagPolicy.Inherit,
     @get:ExperimentalComposeUiApi
-    val excludeFromSystemGesture: Boolean = true
+    val excludeFromSystemGesture: Boolean = true,
+    @get:ExperimentalComposeUiApi
+    val clippingEnabled: Boolean = true
 ) {
     @OptIn(ExperimentalComposeUiApi::class)
     constructor(
@@ -106,7 +113,8 @@ class PopupProperties @ExperimentalComposeUiApi constructor(
         dismissOnBackPress,
         dismissOnClickOutside,
         securePolicy,
-        true
+        excludeFromSystemGesture = true,
+        clippingEnabled = true
     )
 
     @OptIn(ExperimentalComposeUiApi::class)
@@ -119,6 +127,7 @@ class PopupProperties @ExperimentalComposeUiApi constructor(
         if (dismissOnClickOutside != other.dismissOnClickOutside) return false
         if (securePolicy != other.securePolicy) return false
         if (excludeFromSystemGesture != other.excludeFromSystemGesture) return false
+        if (clippingEnabled != other.clippingEnabled) return false
 
         return true
     }
@@ -131,6 +140,7 @@ class PopupProperties @ExperimentalComposeUiApi constructor(
         result = 31 * result + dismissOnClickOutside.hashCode()
         result = 31 * result + securePolicy.hashCode()
         result = 31 * result + excludeFromSystemGesture.hashCode()
+        result = 31 * result + clippingEnabled.hashCode()
         return result
     }
 }
@@ -329,6 +339,7 @@ private inline fun SimpleStack(modifier: Modifier, noinline content: @Composable
  * @param composeView The parent view of the popup which is the AndroidComposeView.
  */
 @SuppressLint("ViewConstructor")
+@OptIn(ExperimentalComposeUiApi::class)
 private class PopupLayout(
     private var onDismissRequest: (() -> Unit)?,
     private var properties: PopupProperties,
@@ -336,7 +347,7 @@ private class PopupLayout(
     private val composeView: View,
     density: Density,
     initialPositionProvider: PopupPositionProvider
-) : AbstractComposeView(composeView.context) {
+) : AbstractComposeView(composeView.context), ViewRootForInspector {
     private val windowManager =
         composeView.context.getSystemService(Context.WINDOW_SERVICE) as WindowManager
     private val params = createLayoutParams()
@@ -359,6 +370,8 @@ private class PopupLayout(
     } else {
         PopupLayoutHelperImpl()
     }
+
+    override val subCompositionView: AbstractComposeView get() = this
 
     init {
         id = android.R.id.content
@@ -450,6 +463,14 @@ private class PopupLayout(
         )
     }
 
+    private fun setClippingEnabled(clippingEnabled: Boolean) = applyNewFlags(
+        if (clippingEnabled) {
+            params.flags and (WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS.inv())
+        } else {
+            params.flags or WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS
+        }
+    )
+
     fun updateParameters(
         onDismissRequest: (() -> Unit)?,
         properties: PopupProperties,
@@ -461,6 +482,7 @@ private class PopupLayout(
         this.testTag = testTag
         setIsFocusable(properties.focusable)
         setSecurePolicy(properties.securePolicy)
+        setClippingEnabled(properties.clippingEnabled)
         superSetLayoutDirection(layoutDirection)
     }
 
@@ -562,7 +584,6 @@ private class PopupLayout(
                 WindowManager.LayoutParams.FLAG_IGNORE_CHEEK_PRESSES or
                     WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE or
                     WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE or
-                    WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS or
                     WindowManager.LayoutParams.FLAG_ALT_FOCUSABLE_IM or
                     WindowManager.LayoutParams.FLAG_SPLIT_TOUCH
                 ).inv()
