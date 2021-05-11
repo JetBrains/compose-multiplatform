@@ -16,7 +16,6 @@
 
 package androidx.compose.ui.text
 
-import androidx.compose.runtime.ExperimentalComposeApi
 import androidx.compose.runtime.saveable.Saver
 import androidx.compose.runtime.saveable.SaverScope
 import androidx.compose.ui.geometry.Offset
@@ -29,6 +28,7 @@ import androidx.compose.ui.text.style.BaselineShift
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.text.style.TextGeometricTransform
 import androidx.compose.ui.text.style.TextIndent
+import androidx.compose.ui.unit.ExperimentalUnitApi
 import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.util.fastMap
 
@@ -341,7 +341,7 @@ private val ColorSaver = Saver<Color, Any>(
 internal val TextUnit.Companion.Saver: Saver<TextUnit, Any>
     get() = TextUnitSaver
 
-@OptIn(ExperimentalComposeApi::class)
+@OptIn(ExperimentalUnitApi::class)
 private val TextUnitSaver = Saver<TextUnit, Any>(
     save = {
         arrayListOf(save(it.value), save(it.type))
