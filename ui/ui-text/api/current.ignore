@@ -5,10 +5,14 @@ AddedAbstractMethod: androidx.compose.ui.text.input.InputEventCallback#onImeActi
 
 ChangedSuperclass: androidx.compose.ui.text.input.ImeAction:
     Class androidx.compose.ui.text.input.ImeAction superclass changed from java.lang.Enum to java.lang.Object
+ChangedSuperclass: androidx.compose.ui.text.input.KeyboardType:
+    Class androidx.compose.ui.text.input.KeyboardType superclass changed from java.lang.Enum to java.lang.Object
 
 
 InvalidNullConversion: Field ImeOptions.imeAction:
     Attempted to remove @NonNull annotation from Field ImeOptions.imeAction
+InvalidNullConversion: Field ImeOptions.keyboardType:
+    Attempted to remove @NonNull annotation from Field ImeOptions.keyboardType
 
 
 RemovedDeprecatedMethod: androidx.compose.ui.text.input.InputEventCallback#onImeAction(androidx.compose.ui.text.input.ImeAction):
@@ -31,6 +35,22 @@ RemovedField: androidx.compose.ui.text.input.ImeAction#Search:
     Removed enum constant androidx.compose.ui.text.input.ImeAction.Search
 RemovedField: androidx.compose.ui.text.input.ImeAction#Send:
     Removed enum constant androidx.compose.ui.text.input.ImeAction.Send
+RemovedField: androidx.compose.ui.text.input.KeyboardType#Ascii:
+    Removed enum constant androidx.compose.ui.text.input.KeyboardType.Ascii
+RemovedField: androidx.compose.ui.text.input.KeyboardType#Email:
+    Removed enum constant androidx.compose.ui.text.input.KeyboardType.Email
+RemovedField: androidx.compose.ui.text.input.KeyboardType#Number:
+    Removed enum constant androidx.compose.ui.text.input.KeyboardType.Number
+RemovedField: androidx.compose.ui.text.input.KeyboardType#NumberPassword:
+    Removed enum constant androidx.compose.ui.text.input.KeyboardType.NumberPassword
+RemovedField: androidx.compose.ui.text.input.KeyboardType#Password:
+    Removed enum constant androidx.compose.ui.text.input.KeyboardType.Password
+RemovedField: androidx.compose.ui.text.input.KeyboardType#Phone:
+    Removed enum constant androidx.compose.ui.text.input.KeyboardType.Phone
+RemovedField: androidx.compose.ui.text.input.KeyboardType#Text:
+    Removed enum constant androidx.compose.ui.text.input.KeyboardType.Text
+RemovedField: androidx.compose.ui.text.input.KeyboardType#Uri:
+    Removed enum constant androidx.compose.ui.text.input.KeyboardType.Uri
 
 
 RemovedMethod: androidx.compose.ui.text.input.ImeOptions#ImeOptions(boolean, androidx.compose.ui.text.input.KeyboardCapitalization, boolean, androidx.compose.ui.text.input.KeyboardType, androidx.compose.ui.text.input.ImeAction):
@@ -39,3 +59,5 @@ RemovedMethod: androidx.compose.ui.text.input.ImeOptions#copy(boolean, androidx.
     Removed method androidx.compose.ui.text.input.ImeOptions.copy(boolean,androidx.compose.ui.text.input.KeyboardCapitalization,boolean,androidx.compose.ui.text.input.KeyboardType,androidx.compose.ui.text.input.ImeAction)
 RemovedMethod: androidx.compose.ui.text.input.ImeOptions#getImeAction():
     Removed method androidx.compose.ui.text.input.ImeOptions.getImeAction()
+RemovedMethod: androidx.compose.ui.text.input.ImeOptions#getKeyboardType():
+    Removed method androidx.compose.ui.text.input.ImeOptions.getKeyboardType()

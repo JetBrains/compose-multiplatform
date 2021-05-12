@@ -5,6 +5,8 @@ AddedAbstractMethod: androidx.compose.foundation.text.KeyboardActionScope#defaul
 
 InvalidNullConversion: Field KeyboardOptions.imeAction:
     Attempted to remove @NonNull annotation from Field KeyboardOptions.imeAction
+InvalidNullConversion: Field KeyboardOptions.keyboardType:
+    Attempted to remove @NonNull annotation from Field KeyboardOptions.keyboardType
 
 
 RemovedMethod: androidx.compose.foundation.text.KeyboardActionScope#defaultKeyboardAction(androidx.compose.ui.text.input.ImeAction):
@@ -15,3 +17,5 @@ RemovedMethod: androidx.compose.foundation.text.KeyboardOptions#copy(androidx.co
     Removed method androidx.compose.foundation.text.KeyboardOptions.copy(androidx.compose.ui.text.input.KeyboardCapitalization,boolean,androidx.compose.ui.text.input.KeyboardType,androidx.compose.ui.text.input.ImeAction)
 RemovedMethod: androidx.compose.foundation.text.KeyboardOptions#getImeAction():
     Removed method androidx.compose.foundation.text.KeyboardOptions.getImeAction()
+RemovedMethod: androidx.compose.foundation.text.KeyboardOptions#getKeyboardType():
+    Removed method androidx.compose.foundation.text.KeyboardOptions.getKeyboardType()

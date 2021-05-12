@@ -772,16 +772,16 @@ package androidx.compose.ui.text.input {
   }
 
   @androidx.compose.runtime.Immutable public final class ImeOptions {
-    method public androidx.compose.ui.text.input.ImeOptions copy-TWIFjAI(optional boolean singleLine, optional androidx.compose.ui.text.input.KeyboardCapitalization capitalization, optional boolean autoCorrect, optional androidx.compose.ui.text.input.KeyboardType keyboardType, optional int imeAction);
+    method public androidx.compose.ui.text.input.ImeOptions copy-TWIFjAI(optional boolean singleLine, optional androidx.compose.ui.text.input.KeyboardCapitalization capitalization, optional boolean autoCorrect, optional int keyboardType, optional int imeAction);
     method public boolean getAutoCorrect();
     method public androidx.compose.ui.text.input.KeyboardCapitalization getCapitalization();
     method public int getImeAction-eUduSuo();
-    method public androidx.compose.ui.text.input.KeyboardType getKeyboardType();
+    method public int getKeyboardType-PjHm6EE();
     method public boolean getSingleLine();
     property public final boolean autoCorrect;
     property public final androidx.compose.ui.text.input.KeyboardCapitalization capitalization;
     property public final int imeAction;
-    property public final androidx.compose.ui.text.input.KeyboardType keyboardType;
+    property public final int keyboardType;
     property public final boolean singleLine;
     field public static final androidx.compose.ui.text.input.ImeOptions.Companion Companion;
   }
@@ -803,15 +803,33 @@ package androidx.compose.ui.text.input {
     enum_constant public static final androidx.compose.ui.text.input.KeyboardCapitalization Words;
   }
 
-  public enum KeyboardType {
-    enum_constant public static final androidx.compose.ui.text.input.KeyboardType Ascii;
-    enum_constant public static final androidx.compose.ui.text.input.KeyboardType Email;
-    enum_constant public static final androidx.compose.ui.text.input.KeyboardType Number;
-    enum_constant public static final androidx.compose.ui.text.input.KeyboardType NumberPassword;
-    enum_constant public static final androidx.compose.ui.text.input.KeyboardType Password;
-    enum_constant public static final androidx.compose.ui.text.input.KeyboardType Phone;
-    enum_constant public static final androidx.compose.ui.text.input.KeyboardType Text;
-    enum_constant public static final androidx.compose.ui.text.input.KeyboardType Uri;
+  public final inline class KeyboardType {
+    ctor public KeyboardType();
+    method public static int constructor-impl(int value);
+    method public static inline boolean equals-impl(int p, Object? p1);
+    method public static boolean equals-impl0(int p1, int p2);
+    method public static inline int hashCode-impl(int p);
+    method public static String toString-impl(int $this);
+    field public static final androidx.compose.ui.text.input.KeyboardType.Companion Companion;
+  }
+
+  public static final class KeyboardType.Companion {
+    method public int getAscii-PjHm6EE();
+    method public int getEmail-PjHm6EE();
+    method public int getNumber-PjHm6EE();
+    method public int getNumberPassword-PjHm6EE();
+    method public int getPassword-PjHm6EE();
+    method public int getPhone-PjHm6EE();
+    method public int getText-PjHm6EE();
+    method public int getUri-PjHm6EE();
+    property public final int Ascii;
+    property public final int Email;
+    property public final int Number;
+    property public final int NumberPassword;
+    property public final int Password;
+    property public final int Phone;
+    property public final int Text;
+    property public final int Uri;
   }
 
   public final class MoveCursorCommand implements androidx.compose.ui.text.input.EditCommand {

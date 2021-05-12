@@ -279,8 +279,7 @@ internal class TextInputServiceAndroid(val view: View) : PlatformTextInputServic
                 outInfo.inputType =
                     InputType.TYPE_CLASS_NUMBER or EditorInfo.TYPE_NUMBER_VARIATION_PASSWORD
             }
-            // Note: Don't use an else in this when block. These are specified explicitly so
-            // that we don't forget to update this when keyboardTypes are added/removed.
+            else -> error("Invalid Keyboard Type")
         }
 
         if (!imeOptions.singleLine) {
