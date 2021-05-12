@@ -17,7 +17,7 @@ Following limitations apply to Milestone 3 (M3) release.
 
   * Only 64-bit Windows is supported
   * Only JDK 11 or later is supported due to the memory management scheme used in Skia bindings
-  * Some Linux distributions require additional packages to be instaled, see [this issue](https://github.com/JetBrains/compose-jb/issues/273) for more information
+  * Some Linux distributions require additional packages to be installed, see [this issue](https://github.com/JetBrains/compose-jb/issues/273) for more information
   
 
 [comment]: <> (__SUPPORTED_GRADLE_VERSIONS__)
