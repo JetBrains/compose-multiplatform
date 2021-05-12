@@ -17,18 +17,18 @@
 package androidx.compose.material.demos
 
 import androidx.compose.foundation.BorderStroke
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Card
+import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
@@ -56,10 +56,12 @@ fun ElevationDemo() {
     }
 }
 
+@OptIn(ExperimentalMaterialApi::class)
 @Composable
 private fun ElevatedCard(elevation: Dp) {
     Card(
-        Modifier.padding(start = 10.dp, top = 20.dp, end = 10.dp, bottom = 20.dp),
+        onClick = {},
+        modifier = Modifier.padding(start = 10.dp, top = 20.dp, end = 10.dp, bottom = 20.dp),
         shape = RoundedCornerShape(4.dp),
         border = if (elevation == 0.dp) BorderStroke(1.dp, Color.Gray) else null,
         elevation = elevation
@@ -67,8 +69,7 @@ private fun ElevatedCard(elevation: Dp) {
         Box(
             Modifier
                 .fillMaxWidth()
-                .height(150.dp)
-                .clickable(onClick = {}),
+                .height(150.dp),
             contentAlignment = Alignment.Center
         ) {
             Text("$elevation", style = MaterialTheme.typography.h4)

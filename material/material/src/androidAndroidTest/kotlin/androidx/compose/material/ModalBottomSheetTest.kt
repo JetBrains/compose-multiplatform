@@ -55,6 +55,7 @@ class ModalBottomSheetTest {
 
     private val sheetHeight = 256.dp
     private val sheetTag = "sheetContentTag"
+    private val contentTag = "contentTag"
 
     private fun advanceClock() {
         rule.mainClock.advanceTimeBy(100_000L)
@@ -397,7 +398,13 @@ class ModalBottomSheetTest {
             sheetState = rememberModalBottomSheetState(ModalBottomSheetValue.Expanded)
             ModalBottomSheetLayout(
                 sheetState = sheetState,
-                content = {},
+                content = {
+                    Box(
+                        Modifier
+                            .fillMaxSize()
+                            .testTag(contentTag)
+                    )
+                },
                 sheetContent = {
                     Box(
                         Modifier
@@ -430,7 +437,13 @@ class ModalBottomSheetTest {
             sheetState = rememberModalBottomSheetState(ModalBottomSheetValue.Expanded)
             ModalBottomSheetLayout(
                 sheetState = sheetState,
-                content = {},
+                content = {
+                    Box(
+                        Modifier
+                            .fillMaxSize()
+                            .testTag(contentTag)
+                    )
+                },
                 sheetContent = {
                     Box(
                         Modifier
@@ -462,7 +475,13 @@ class ModalBottomSheetTest {
             sheetState = rememberModalBottomSheetState(ModalBottomSheetValue.HalfExpanded)
             ModalBottomSheetLayout(
                 sheetState = sheetState,
-                content = {},
+                content = {
+                    Box(
+                        Modifier
+                            .fillMaxSize()
+                            .testTag(contentTag)
+                    )
+                },
                 sheetContent = {
                     Box(
                         Modifier
@@ -494,7 +513,7 @@ class ModalBottomSheetTest {
             ModalBottomSheetLayout(
                 modifier = Modifier.testTag(topTag),
                 sheetState = rememberModalBottomSheetState(ModalBottomSheetValue.HalfExpanded),
-                content = { Box(Modifier.fillMaxSize().testTag("content")) },
+                content = { Box(Modifier.fillMaxSize().testTag(contentTag)) },
                 sheetContent = { Box(Modifier.fillMaxSize().testTag(sheetTag)) }
             )
         }
