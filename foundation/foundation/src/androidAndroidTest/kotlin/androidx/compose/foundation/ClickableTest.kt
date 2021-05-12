@@ -16,10 +16,12 @@
 
 package androidx.compose.foundation
 
+import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.interaction.Interaction
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.interaction.PressInteraction
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.text.BasicText
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -27,6 +29,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.InspectableValue
 import androidx.compose.ui.platform.isDebugInspectorInfoEnabled
 import androidx.compose.ui.platform.testTag
@@ -37,11 +40,11 @@ import androidx.compose.ui.test.assert
 import androidx.compose.ui.test.assertHasClickAction
 import androidx.compose.ui.test.assertIsEnabled
 import androidx.compose.ui.test.assertIsNotEnabled
+import androidx.compose.ui.test.cancel
 import androidx.compose.ui.test.center
 import androidx.compose.ui.test.click
 import androidx.compose.ui.test.doubleClick
 import androidx.compose.ui.test.down
-import androidx.compose.ui.test.cancel
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.longClick
 import androidx.compose.ui.test.onNodeWithTag
@@ -50,6 +53,7 @@ import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.performGesture
 import androidx.compose.ui.test.performSemanticsAction
 import androidx.compose.ui.test.up
+import androidx.compose.ui.unit.dp
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.LargeTest
 import androidx.test.filters.MediumTest
@@ -722,5 +726,30 @@ class ClickableTest {
                 "interactionSource"
             )
         }
+    }
+
+    // integration test for b/184872415
+    @Test
+    fun tapGestureTest_tryAwaitRelease_ReturnsTrue() {
+        val wasSuccess = mutableStateOf(false)
+        rule.setContent {
+            Box(
+                Modifier
+                    .size(100.dp)
+                    .testTag("myClickable")
+                    .pointerInput(Unit) {
+                        detectTapGestures(
+                            onPress = {
+                                wasSuccess.value = tryAwaitRelease()
+                            }
+                        )
+                    }
+            )
+        }
+
+        rule.onNodeWithTag("myClickable")
+            .performClick()
+
+        assertThat(wasSuccess.value).isTrue()
     }
 }
