@@ -132,6 +132,20 @@ class IdentityScopeMapTest {
         }
     }
 
+    @Test
+    fun canUseIn() {
+        val valueC = "C"
+        map.add(valueList[0], scopeList[0])
+        map.add(valueList[0], scopeList[1])
+        map.add(valueList[1], scopeList[2])
+        map.add(valueC, scopeList[3])
+
+        assertTrue(valueList[0] in map)
+        assertTrue(valueList[1] in map)
+        assertTrue(valueC in map)
+        assertFalse("D" in map)
+    }
+
     /**
      * Validate the test maintains the internal assumptions of the map.
      */
