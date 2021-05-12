@@ -21,6 +21,7 @@ import androidx.compose.animation.core.TweenSpec
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.MutatePriority
 import androidx.compose.foundation.MutatorMutex
+import androidx.compose.foundation.background
 import androidx.compose.foundation.focusable
 import androidx.compose.foundation.gestures.DragScope
 import androidx.compose.foundation.gestures.DraggableState
@@ -64,6 +65,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.PointMode
 import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.compositeOver
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalLayoutDirection
@@ -392,22 +394,20 @@ private fun SliderImpl(
             } else {
                 ThumbDefaultElevation
             }
-            Surface(
-                shape = CircleShape,
-                color = colors.thumbColor(enabled).value,
-                elevation = if (enabled) elevation else 0.dp,
-                modifier = Modifier
+            Spacer(
+                Modifier
+                    .size(thumbSize, thumbSize)
                     .focusable(interactionSource = interactionSource)
                     .indication(
                         interactionSource = interactionSource,
-                        indication = rememberRipple(
-                            bounded = false,
-                            radius = ThumbRippleRadius
-                        )
+                        indication = rememberRipple(bounded = false, radius = ThumbRippleRadius)
                     )
-            ) {
-                Spacer(Modifier.size(thumbSize, thumbSize))
-            }
+                    .graphicsLayer {
+                        shadowElevation = if (enabled) elevation.toPx() else 0f
+                        shape = CircleShape
+                    }
+                    .background(colors.thumbColor(enabled).value, CircleShape)
+            )
         }
     }
 }

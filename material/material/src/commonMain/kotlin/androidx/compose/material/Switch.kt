@@ -18,6 +18,7 @@ package androidx.compose.material
 
 import androidx.compose.animation.core.TweenSpec
 import androidx.compose.foundation.Canvas
+import androidx.compose.foundation.background
 import androidx.compose.foundation.interaction.Interaction
 import androidx.compose.foundation.interaction.InteractionSource
 import androidx.compose.foundation.gestures.Orientation
@@ -27,6 +28,7 @@ import androidx.compose.foundation.interaction.DragInteraction
 import androidx.compose.foundation.interaction.PressInteraction
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxScope
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
@@ -51,6 +53,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.compositeOver
 import androidx.compose.ui.graphics.drawscope.DrawScope
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.semantics.Role
@@ -195,19 +198,28 @@ private fun BoxScope.SwitchImpl(
         drawTrack(trackColor, TrackWidth.toPx(), TrackStrokeWidth.toPx())
     }
     val thumbColor by colors.thumbColor(enabled, checked)
-    Surface(
-        shape = CircleShape,
-        color = thumbColor,
-        elevation = elevation,
-        modifier = Modifier
+    val elevationOverlay = LocalElevationOverlay.current
+    val absoluteElevation = LocalAbsoluteElevation.current + elevation
+    val resolvedThumbColor =
+        if (thumbColor == MaterialTheme.colors.surface && elevationOverlay != null) {
+            elevationOverlay.apply(thumbColor, absoluteElevation)
+        } else {
+            thumbColor
+        }
+    Spacer(
+        Modifier
             .align(Alignment.CenterStart)
             .offset { IntOffset(thumbValue.value.roundToInt(), 0) }
             .indication(
                 interactionSource = interactionSource,
                 indication = rememberRipple(bounded = false, radius = ThumbRippleRadius)
             )
-            .requiredSize(ThumbDiameter),
-        content = {}
+            .requiredSize(ThumbDiameter)
+            .graphicsLayer {
+                shadowElevation = elevation.toPx()
+                shape = CircleShape
+            }
+            .background(resolvedThumbColor, CircleShape)
     )
 }
 
