@@ -19,6 +19,7 @@ import androidx.build.LibraryType
 import androidx.build.LibraryVersions
 import androidx.build.RunApiTasks
 import androidx.build.SupportConfigKt
+import androidx.build.ComposeJvmTarget
 
 import static androidx.build.AndroidXPlugin.BUILD_ON_SERVER_TASK
 import static androidx.build.dependencies.DependenciesKt.*
@@ -34,9 +35,9 @@ dependencies {
 }
 
 kotlin {
-    jvm() {
-        withJava()
-    }
+    // Replace with jvm() { withJava() }
+    // Once the build switches to Kotlin 1.5
+    ComposeJvmTarget.withJava(jvm())
 
     sourceSets {
         commonMain.dependencies {
