@@ -16,7 +16,6 @@
 
 package androidx.compose.material
 
-import android.annotation.SuppressLint
 import androidx.compose.animation.core.AnimationSpec
 import androidx.compose.animation.core.TweenSpec
 import androidx.compose.animation.core.animateFloatAsState
@@ -286,7 +285,7 @@ fun ModalBottomSheetLayout(
     }
 }
 
-@SuppressLint("ModifierInspectorInfo")
+@Suppress("ModifierInspectorInfo")
 @OptIn(ExperimentalMaterialApi::class)
 private fun Modifier.bottomSheetSwipeable(
     sheetState: ModalBottomSheetState,
