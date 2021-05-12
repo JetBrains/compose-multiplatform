@@ -59,13 +59,13 @@ import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.lerp
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.PointMode
 import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.compositeOver
-import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalLayoutDirection
@@ -402,10 +402,7 @@ private fun SliderImpl(
                         interactionSource = interactionSource,
                         indication = rememberRipple(bounded = false, radius = ThumbRippleRadius)
                     )
-                    .graphicsLayer {
-                        shadowElevation = if (enabled) elevation.toPx() else 0f
-                        shape = CircleShape
-                    }
+                    .shadow(if (enabled) elevation else 0.dp, CircleShape, clip = false)
                     .background(colors.thumbColor(enabled).value, CircleShape)
             )
         }

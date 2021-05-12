@@ -32,10 +32,10 @@ import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.graphics.Shape
-import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.semantics.semantics
@@ -253,10 +253,7 @@ private fun Surface(
     ) {
         Box(
             modifier
-                .graphicsLayer {
-                    this.shadowElevation = elevation.toPx()
-                    this.shape = shape
-                }
+                .shadow(elevation, shape, clip = false)
                 .then(if (border != null) Modifier.border(border, shape) else Modifier)
                 .background(
                     color = backgroundColor,
