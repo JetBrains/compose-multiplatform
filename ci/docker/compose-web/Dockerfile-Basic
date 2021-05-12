@@ -44,3 +44,6 @@ RUN wget -P ~/bin https://storage.googleapis.com/git-repo-downloads/repo
 RUN chmod a+x ~/bin/repo
 RUN mkdir androidx-main 
 WORKDIR  androidx-main
+
+COPY bootstrap.sh bootstrap.sh
+RUN chmod a+x bootstrap.sh

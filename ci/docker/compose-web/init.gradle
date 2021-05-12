@@ -76,4 +76,8 @@ allprojects {
             url("https://maven.pkg.jetbrains.space/public/p/compose/dev")
         }
     }
+
+    task bootstrap(type: Exec) {
+        commandLine "./bootstrap.sh"
+    }
 }
