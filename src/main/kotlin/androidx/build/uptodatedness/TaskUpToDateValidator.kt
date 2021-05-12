@@ -246,6 +246,13 @@ class TaskUpToDateValidator {
             return File(project.buildDir, "TaskUpToDateValidator/inputs")
         }
 
+        fun getPreviousTaskExecutionCompletionTimestamp(task: Task): Date {
+            // we're already saving the inputs of the task into a file,
+            // so we can check the timestamp of that file to know when the task last reran
+            val inputsFile = getTaskInputListPath(task)
+            return Date(inputsFile.lastModified())
+        }
+
         fun checkForChangingSetOfInputs(task: Task): String {
             val previousInputsFile = getTaskInputListPath(task)
             val previousInputs = previousInputsFile.readLines()
@@ -294,8 +301,9 @@ class TaskUpToDateValidator {
                 if (lastModifiedFile != null) {
                     task.path + " declares " + inputFiles.size + " input files. The " +
                         "last modified input file is\n" + lastModifiedFile + "\nmodified at " +
-                        lastModifiedWhen + " (this build started at about " +
-                        getBuildStartTime(task.project) + "). " +
+                        lastModifiedWhen + " (the previous execution of this task completed at " +
+                        getPreviousTaskExecutionCompletionTimestamp(task) + " and this build " +
+                        "started at about " + getBuildStartTime(task.project) + "). " +
                         tryToExplainFileModification(lastModifiedFile, taskGraph)
                 } else {
                     task.path + " declares " + inputFiles.size + " input files.\n"
