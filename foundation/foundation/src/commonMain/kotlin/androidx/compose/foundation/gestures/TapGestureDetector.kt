@@ -111,10 +111,12 @@ suspend fun PointerInputScope.detectTapGestures(
 
     launch {
         while (isActive) {
-            pressScope.reset()
             consumeAllUntilUpSignal.value = false
             val down = awaitChannelDown(consumeOnlyDownsSignal, channel)
-            if (onPress !== NoPressGesture) launch { pressScope.onPress(down.position) }
+            pressScope.reset()
+            if (onPress !== NoPressGesture) launch {
+                pressScope.onPress(down.position)
+            }
             val longPressTimeout = onLongPress?.let { viewConfiguration.longPressTimeoutMillis }
             var upOrCancel: TapGestureEvent? = null
             try {
