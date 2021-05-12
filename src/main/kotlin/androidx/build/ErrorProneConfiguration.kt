@@ -129,6 +129,9 @@ private fun JavaCompile.configureWithErrorProne() {
             "-Xep:InjectScopeAnnotationOnInterfaceOrAbstractClass:OFF",
             "-Xep:InvalidThrows:OFF",
 
+            // Disable checks which are already enforced by lint.
+            "-Xep:PrivateConstructorForUtilityClass:OFF",
+
             // Enforce the following checks.
             "-Xep:JavaTimeDefaultTimeZone:ERROR",
             "-Xep:ParameterNotNullable:ERROR",
@@ -142,7 +145,6 @@ private fun JavaCompile.configureWithErrorProne() {
             "-Xep:IntLongMath:ERROR",
             "-Xep:MissingFail:ERROR",
             "-Xep:JavaLangClash:ERROR",
-            "-Xep:PrivateConstructorForUtilityClass:ERROR",
             "-Xep:TypeParameterUnusedInFormals:ERROR",
             "-Xep:StringSplitter:ERROR",
             "-Xep:ReferenceEquality:ERROR",
