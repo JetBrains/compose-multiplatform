@@ -16,15 +16,14 @@
 
 package androidx.compose.ui.platform.actionmodecallback
 
-import android.annotation.TargetApi
 import android.graphics.Rect
-import android.os.Build
 import android.view.ActionMode
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
+import androidx.annotation.RequiresApi
 
-@TargetApi(Build.VERSION_CODES.M)
+@RequiresApi(23)
 internal class FloatingTextActionModeCallback(
     private val callback: TextActionModeCallback
 ) : ActionMode.Callback2() {
