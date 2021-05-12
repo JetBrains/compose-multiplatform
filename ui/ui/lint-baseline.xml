@@ -19,7 +19,7 @@
         errorLine2="                ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/androidMain/kotlin/androidx/compose/ui/platform/ViewLayer.android.kt"
-            line="315"
+            line="334"
             column="17"/>
     </issue>
 
@@ -74,7 +74,7 @@
         errorLine2="                  ~~~~~~~">
         <location
             file="src/androidMain/kotlin/androidx/compose/ui/input/pointer/MotionEventAdapter.android.kt"
-            line="191"
+            line="194"
             column="19"/>
     </issue>
 
@@ -85,7 +85,7 @@
         errorLine2="                                  ~~~~~~~">
         <location
             file="src/androidMain/kotlin/androidx/compose/ui/input/pointer/MotionEventAdapter.android.kt"
-            line="191"
+            line="194"
             column="35"/>
     </issue>
 
