@@ -111,6 +111,7 @@ class TextSelectionColorsScreenshotTest {
             .assertAgainstGolden(screenshotRule, "text_customSelectionColors")
     }
 
+    @FlakyTest(bugId = 179770443)
     @Test
     fun textField_defaultSelectionColors() {
         rule.setContent {
