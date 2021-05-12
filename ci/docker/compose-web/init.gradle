@@ -78,6 +78,7 @@ allprojects {
     }
 
     task bootstrap(type: Exec) {
-        commandLine "./bootstrap.sh"
+        workingDir "/androidx-main"
+        commandLine "/androidx-main/bootstrap.sh"
     }
 }
