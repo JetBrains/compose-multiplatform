@@ -22,6 +22,7 @@ import androidx.compose.ui.geometry.RoundRect
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.util.fastForEach
+import org.jetbrains.skija.Image
 import org.jetbrains.skija.Matrix44
 import org.jetbrains.skija.impl.Native
 import org.jetbrains.skija.ClipMode as SkijaClipMode
@@ -163,22 +164,14 @@ class DesktopCanvas(val skija: org.jetbrains.skija.Canvas) : Canvas {
     }
 
     override fun drawImage(image: ImageBitmap, topLeftOffset: Offset, paint: Paint) {
-        skija.drawBitmapRect(
-            image.asDesktopBitmap(),
-            SkijaRect.makeXYWH(
-                0f,
-                0f,
-                image.width.toFloat(),
-                image.height.toFloat()
-            ),
-            SkijaRect.makeXYWH(
-                topLeftOffset.x,
-                topLeftOffset.y,
-                image.width.toFloat(),
-                image.height.toFloat()
-            ),
-            paint.skija
-        )
+        val bitmap = image.asDesktopBitmap()
+        Image.makeFromBitmap(bitmap).use { skijaImage ->
+            skija.drawImage(
+                skijaImage,
+                topLeftOffset.x, topLeftOffset.y,
+                paint.skija
+            )
+        }
     }
 
     override fun drawImageRect(
@@ -189,22 +182,25 @@ class DesktopCanvas(val skija: org.jetbrains.skija.Canvas) : Canvas {
         dstSize: IntSize,
         paint: Paint
     ) {
-        skija.drawBitmapRect(
-            image.asDesktopBitmap(),
-            SkijaRect.makeXYWH(
-                srcOffset.x.toFloat(),
-                srcOffset.y.toFloat(),
-                srcSize.width.toFloat(),
-                srcSize.height.toFloat()
-            ),
-            SkijaRect.makeXYWH(
-                dstOffset.x.toFloat(),
-                dstOffset.y.toFloat(),
-                dstSize.width.toFloat(),
-                dstSize.height.toFloat()
-            ),
-            paint.skija
-        )
+        val bitmap = image.asDesktopBitmap()
+        Image.makeFromBitmap(bitmap).use { skijaImage ->
+            skija.drawImageRect(
+                skijaImage,
+                SkijaRect.makeXYWH(
+                    srcOffset.x.toFloat(),
+                    srcOffset.y.toFloat(),
+                    srcSize.width.toFloat(),
+                    srcSize.height.toFloat()
+                ),
+                SkijaRect.makeXYWH(
+                    dstOffset.x.toFloat(),
+                    dstOffset.y.toFloat(),
+                    dstSize.width.toFloat(),
+                    dstSize.height.toFloat()
+                ),
+                paint.skija
+            )
+        }
     }
 
     override fun drawPoints(pointMode: PointMode, points: List<Offset>, paint: Paint) {
