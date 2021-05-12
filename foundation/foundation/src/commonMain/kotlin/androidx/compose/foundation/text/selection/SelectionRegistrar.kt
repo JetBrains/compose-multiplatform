@@ -97,6 +97,14 @@ internal interface SelectionRegistrar {
     )
 
     /**
+     * Call this method to notify the [SelectionContainer] that the selection has been initiated
+     * with selectAll [Selection].
+     *
+     * @param selectableId [selectableId] of the [Selectable]
+     */
+    fun notifySelectionUpdateSelectAll(selectableId: Long)
+
+    /**
      * Call this method to notify the [SelectionContainer] that  the selection has been updated.
      * The caller of this method should make sure that [notifySelectionUpdateStart] is always
      * called once before calling this function. And [notifySelectionUpdateEnd] is always called

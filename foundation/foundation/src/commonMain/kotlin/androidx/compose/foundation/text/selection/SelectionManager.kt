@@ -203,6 +203,21 @@ internal class SelectionManager(private val selectionRegistrar: SelectionRegistr
                 hideSelectionToolbar()
             }
 
+        selectionRegistrar.onSelectionUpdateSelectAll =
+            { selectableId ->
+                val (newSelection, newSubselection) = mergeSelections(
+                    selectableId = selectableId,
+                    previousSelection = selection,
+                )
+                if (newSelection != selection) {
+                    selectionRegistrar.subselections = newSubselection
+                    onSelectionChange(newSelection)
+                }
+
+                focusRequester.requestFocus()
+                hideSelectionToolbar()
+            }
+
         selectionRegistrar.onSelectionUpdateCallback =
             { layoutCoordinates, startPosition, endPosition, selectionMode ->
                 val startPositionOrCurrent = if (startPosition == null) {
@@ -347,6 +362,24 @@ internal class SelectionManager(private val selectionRegistrar: SelectionRegistr
                     isStartHandle = isStartHandle,
                     adjustment = adjustment
                 )
+                selection?.let { subselections[selectable.selectableId] = it }
+                merge(mergedSelection, selection)
+            }
+        if (previousSelection != newSelection) hapticFeedBack?.performHapticFeedback(
+            HapticFeedbackType.TextHandleMove
+        )
+        return Pair(newSelection, subselections)
+    }
+
+    internal fun mergeSelections(
+        previousSelection: Selection? = null,
+        selectableId: Long
+    ): Pair<Selection?, Map<Long, Selection>> {
+        val subselections = mutableMapOf<Long, Selection>()
+        val newSelection = selectionRegistrar.sort(requireContainerCoordinates())
+            .fastFold(null) { mergedSelection: Selection?, selectable: Selectable ->
+                val selection = if (selectable.selectableId == selectableId)
+                    selectable.getSelectAllSelection() else null
                 selection?.let { subselections[selectable.selectableId] = it }
                 merge(mergedSelection, selection)
             }

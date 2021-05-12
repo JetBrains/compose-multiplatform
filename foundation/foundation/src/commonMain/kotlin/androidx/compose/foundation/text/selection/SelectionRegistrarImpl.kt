@@ -69,6 +69,13 @@ internal class SelectionRegistrarImpl : SelectionRegistrar {
     )? = null
 
     /**
+     * The callback to be invoked when the selection is initiated with selectAll [Selection].
+     */
+    internal var onSelectionUpdateSelectAll: (
+        (Long) -> Unit
+    )? = null
+
+    /**
      * The callback to be invoked when the selection is updated.
      * If the first offset is null it means that the start of selection is unknown for the caller.
      */
@@ -168,6 +175,10 @@ internal class SelectionRegistrarImpl : SelectionRegistrar {
         adjustment: SelectionAdjustment
     ) {
         onSelectionUpdateStartCallback?.invoke(layoutCoordinates, startPosition, adjustment)
+    }
+
+    override fun notifySelectionUpdateSelectAll(selectableId: Long) {
+        onSelectionUpdateSelectAll?.invoke(selectableId)
     }
 
     override fun notifySelectionUpdate(

@@ -372,11 +372,17 @@ internal class TextController(val state: TextState) {
             state.layoutCoordinates?.let {
                 if (!it.isAttached) return
 
-                selectionRegistrar?.notifySelectionUpdateStart(
-                    layoutCoordinates = it,
-                    startPosition = startPoint,
-                    adjustment = SelectionAdjustment.WORD
-                )
+                if (outOfBoundary(startPoint, startPoint)) {
+                    selectionRegistrar?.notifySelectionUpdateSelectAll(
+                        selectableId = state.selectableId
+                    )
+                } else {
+                    selectionRegistrar?.notifySelectionUpdateStart(
+                        layoutCoordinates = it,
+                        startPosition = startPoint,
+                        adjustment = SelectionAdjustment.WORD
+                    )
+                }
 
                 dragBeginPosition = startPoint
             }
@@ -394,12 +400,14 @@ internal class TextController(val state: TextState) {
 
                 dragTotalDistance += delta
 
-                selectionRegistrar?.notifySelectionUpdate(
-                    layoutCoordinates = it,
-                    startPosition = dragBeginPosition,
-                    endPosition = dragBeginPosition + dragTotalDistance,
-                    adjustment = SelectionAdjustment.CHARACTER
-                )
+                if (!outOfBoundary(dragBeginPosition, dragBeginPosition + dragTotalDistance)) {
+                    selectionRegistrar?.notifySelectionUpdate(
+                        layoutCoordinates = it,
+                        startPosition = dragBeginPosition,
+                        endPosition = dragBeginPosition + dragTotalDistance,
+                        adjustment = SelectionAdjustment.CHARACTER
+                    )
+                }
             }
         }
 
@@ -482,6 +490,18 @@ internal class TextController(val state: TextState) {
             }
             return true
         }
+    }
+
+    private fun outOfBoundary(start: Offset, end: Offset): Boolean {
+        state.layoutResult?.let {
+            val lastOffset = it.layoutInput.text.text.length
+            val rawStartOffset = it.getOffsetForPosition(start)
+            val rawEndOffset = it.getOffsetForPosition(end)
+
+            return rawStartOffset >= lastOffset - 1 && rawEndOffset >= lastOffset - 1 ||
+                rawStartOffset < 0 && rawEndOffset < 0
+        }
+        return false
     }
 
     /**

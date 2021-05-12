@@ -16,10 +16,13 @@
 
 package androidx.compose.foundation.demos.text
 
+import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
@@ -34,6 +37,7 @@ import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.intl.LocaleList
 import androidx.compose.ui.text.withStyle
+import androidx.compose.ui.unit.dp
 
 @Composable
 fun TextSelectionDemo() {
@@ -53,6 +57,20 @@ fun TextSelectionDemo() {
         item {
             TagLine(tag = "enable and disable selection")
             TextDemoSelectionEnableAndDisable()
+        }
+        item {
+            TagLine(tag = "fix crashing of longpress in the blank area")
+            SelectionContainer {
+                Text(
+                    text = "Hello World\nHello",
+                    modifier = Modifier.fillMaxWidth()
+                        .border(BorderStroke(1.dp, color = Color.Black))
+                        .height(80.dp)
+                )
+            }
+        }
+        item {
+            TagLine(tag = "")
         }
     }
 }
