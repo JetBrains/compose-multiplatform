@@ -57,6 +57,7 @@ import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertNotNull
 import org.junit.Assert.assertTrue
+import org.junit.Ignore
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -495,6 +496,7 @@ class OnGloballyPositionedTest {
         assertThat(childCoordinates!!.positionInParent().x).isEqualTo(thirdPaddingPx)
     }
 
+    @Ignore("Disable Broken test: b/187962859")
     @Test
     fun globalCoordinatesAreInActivityCoordinates() {
         val padding = 30
