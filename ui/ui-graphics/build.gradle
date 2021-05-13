@@ -142,14 +142,3 @@ tasks.withType(KotlinCompile).configureEach {
         ]
     }
 }
-
-android {
-    buildTypes {
-        debug {
-            testCoverageEnabled = false
-        }
-        release {
-            testCoverageEnabled = false
-        }
-    }
-}

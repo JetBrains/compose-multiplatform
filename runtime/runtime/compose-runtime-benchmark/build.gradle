@@ -31,14 +31,6 @@ android {
     lintOptions {
         disable("SyntheticAccessor")
     }
-    buildTypes {
-        debug {
-            testCoverageEnabled = false
-        }
-        release {
-            testCoverageEnabled = false
-        }
-    }
 }
 
 dependencies {

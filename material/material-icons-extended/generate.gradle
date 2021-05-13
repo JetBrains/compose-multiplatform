@@ -35,11 +35,6 @@ dependencies {
     kotlinPlugin(project(":compose:compiler:compiler"))
 }
 
-android.buildTypes.all {
-    // Jacoco hangs intermittently due to the large number of files
-    testCoverageEnabled = false
-}
-
 if (!AndroidXUiPlugin.isMultiplatformEnabled(project)) {
     // We're not sure how to merge icons jars when multiplatform is enabled
     IconGenerationTask.registerExtendedIconThemeProject(
