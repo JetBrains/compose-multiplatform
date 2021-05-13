@@ -17,8 +17,7 @@
 package androidx.compose.ui.text.input
 
 import androidx.compose.ui.text.TextRange
-import org.junit.Assert.assertEquals
-import org.junit.Assert.assertFalse
+import com.google.common.truth.Truth.assertThat
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.junit.runners.JUnit4
@@ -32,9 +31,9 @@ class CommitTextCommandTest {
 
         CommitTextCommand("X", 1).applyTo(eb)
 
-        assertEquals("X", eb.toString())
-        assertEquals(1, eb.cursor)
-        assertFalse(eb.hasComposition())
+        assertThat(eb.toString()).isEqualTo("X")
+        assertThat(eb.cursor).isEqualTo(1)
+        assertThat(eb.hasComposition()).isFalse()
     }
 
     @Test
@@ -43,9 +42,9 @@ class CommitTextCommandTest {
 
         CommitTextCommand("X", 1).applyTo(eb)
 
-        assertEquals("AX", eb.toString())
-        assertEquals(2, eb.cursor)
-        assertFalse(eb.hasComposition())
+        assertThat(eb.toString()).isEqualTo("AX")
+        assertThat(eb.cursor).isEqualTo(2)
+        assertThat(eb.hasComposition()).isFalse()
     }
 
     @Test
@@ -54,9 +53,9 @@ class CommitTextCommandTest {
 
         CommitTextCommand("X", 0).applyTo(eb)
 
-        assertEquals("AX", eb.toString())
-        assertEquals(1, eb.cursor)
-        assertFalse(eb.hasComposition())
+        assertThat(eb.toString()).isEqualTo("AX")
+        assertThat(eb.cursor).isEqualTo(1)
+        assertThat(eb.hasComposition()).isFalse()
     }
 
     @Test
@@ -65,9 +64,9 @@ class CommitTextCommandTest {
 
         CommitTextCommand("X", 2).applyTo(eb)
 
-        assertEquals("AXBCDE", eb.toString())
-        assertEquals(3, eb.cursor)
-        assertFalse(eb.hasComposition())
+        assertThat(eb.toString()).isEqualTo("AXBCDE")
+        assertThat(eb.cursor).isEqualTo(3)
+        assertThat(eb.hasComposition()).isFalse()
     }
 
     @Test
@@ -76,9 +75,9 @@ class CommitTextCommandTest {
 
         CommitTextCommand("X", -2).applyTo(eb)
 
-        assertEquals("ABCDXE", eb.toString())
-        assertEquals(2, eb.cursor)
-        assertFalse(eb.hasComposition())
+        assertThat(eb.toString()).isEqualTo("ABCDXE")
+        assertThat(eb.cursor).isEqualTo(2)
+        assertThat(eb.hasComposition()).isFalse()
     }
 
     @Test
@@ -87,9 +86,9 @@ class CommitTextCommandTest {
 
         CommitTextCommand("", 0).applyTo(eb)
 
-        assertEquals("ABCDE", eb.toString())
-        assertEquals(1, eb.cursor)
-        assertFalse(eb.hasComposition())
+        assertThat(eb.toString()).isEqualTo("ABCDE")
+        assertThat(eb.cursor).isEqualTo(1)
+        assertThat(eb.hasComposition()).isFalse()
     }
 
     @Test
@@ -98,9 +97,9 @@ class CommitTextCommandTest {
 
         CommitTextCommand("", 1).applyTo(eb)
 
-        assertEquals("ABCDE", eb.toString())
-        assertEquals(1, eb.cursor)
-        assertFalse(eb.hasComposition())
+        assertThat(eb.toString()).isEqualTo("ABCDE")
+        assertThat(eb.cursor).isEqualTo(1)
+        assertThat(eb.hasComposition()).isFalse()
     }
 
     @Test
@@ -109,9 +108,9 @@ class CommitTextCommandTest {
 
         CommitTextCommand("", 2).applyTo(eb)
 
-        assertEquals("ABCDE", eb.toString())
-        assertEquals(2, eb.cursor)
-        assertFalse(eb.hasComposition())
+        assertThat(eb.toString()).isEqualTo("ABCDE")
+        assertThat(eb.cursor).isEqualTo(2)
+        assertThat(eb.hasComposition()).isFalse()
     }
 
     @Test
@@ -120,9 +119,9 @@ class CommitTextCommandTest {
 
         CommitTextCommand("", -2).applyTo(eb)
 
-        assertEquals("ABCDE", eb.toString())
-        assertEquals(2, eb.cursor)
-        assertFalse(eb.hasComposition())
+        assertThat(eb.toString()).isEqualTo("ABCDE")
+        assertThat(eb.cursor).isEqualTo(2)
+        assertThat(eb.hasComposition()).isFalse()
     }
 
     @Test
@@ -132,9 +131,9 @@ class CommitTextCommandTest {
         eb.setComposition(1, 4) // Mark "BCD" as composition
         CommitTextCommand("X", 1).applyTo(eb)
 
-        assertEquals("AXE", eb.toString())
-        assertEquals(2, eb.cursor)
-        assertFalse(eb.hasComposition())
+        assertThat(eb.toString()).isEqualTo("AXE")
+        assertThat(eb.cursor).isEqualTo(2)
+        assertThat(eb.hasComposition()).isFalse()
     }
 
     @Test
@@ -143,9 +142,9 @@ class CommitTextCommandTest {
 
         CommitTextCommand("X", 1).applyTo(eb)
 
-        assertEquals("AXE", eb.toString())
-        assertEquals(2, eb.cursor)
-        assertFalse(eb.hasComposition())
+        assertThat(eb.toString()).isEqualTo("AXE")
+        assertThat(eb.cursor).isEqualTo(2)
+        assertThat(eb.hasComposition()).isFalse()
     }
 
     @Test
@@ -157,9 +156,9 @@ class CommitTextCommandTest {
 
         // If composition and selection exists at the same time, replace composition and cancel
         // selection and place cursor.
-        assertEquals("ABXE", eb.toString())
-        assertEquals(3, eb.cursor)
-        assertFalse(eb.hasComposition())
+        assertThat(eb.toString()).isEqualTo("ABXE")
+        assertThat(eb.cursor).isEqualTo(3)
+        assertThat(eb.hasComposition()).isFalse()
     }
 
     @Test
@@ -168,9 +167,9 @@ class CommitTextCommandTest {
 
         CommitTextCommand("X", -1000).applyTo(eb)
 
-        assertEquals("ABCDEX", eb.toString())
-        assertEquals(0, eb.cursor)
-        assertFalse(eb.hasComposition())
+        assertThat(eb.toString()).isEqualTo("ABCDEX")
+        assertThat(eb.cursor).isEqualTo(0)
+        assertThat(eb.hasComposition()).isFalse()
     }
 
     @Test
@@ -179,8 +178,8 @@ class CommitTextCommandTest {
 
         CommitTextCommand("X", 1000).applyTo(eb)
 
-        assertEquals("ABCDEX", eb.toString())
-        assertEquals(6, eb.cursor)
-        assertFalse(eb.hasComposition())
+        assertThat(eb.toString()).isEqualTo("ABCDEX")
+        assertThat(eb.cursor).isEqualTo(6)
+        assertThat(eb.hasComposition()).isFalse()
     }
 }

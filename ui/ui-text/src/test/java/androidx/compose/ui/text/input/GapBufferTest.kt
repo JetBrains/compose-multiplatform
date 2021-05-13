@@ -17,7 +17,7 @@
 package androidx.compose.ui.text.input
 
 import androidx.compose.ui.text.InternalTextApi
-import org.junit.Assert.assertEquals
+import com.google.common.truth.Truth.assertThat
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.junit.runners.JUnit4
@@ -28,9 +28,9 @@ import kotlin.random.Random
 class GapBufferTest {
 
     private fun assertStrWithChars(expected: String, pgb: PartialGapBuffer) {
-        assertEquals(expected, pgb.toString())
-        for (i in 0 until expected.length) {
-            assertEquals(expected[i], pgb[i])
+        assertThat(pgb.toString()).isEqualTo(expected)
+        for (i in expected.indices) {
+            assertThat(pgb[i]).isEqualTo(expected[i])
         }
     }
 

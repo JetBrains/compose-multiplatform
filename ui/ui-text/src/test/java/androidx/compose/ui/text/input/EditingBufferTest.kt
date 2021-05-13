@@ -1,3 +1,4 @@
+
 /*
  * Copyright 2019 The Android Open Source Project
  *
@@ -17,9 +18,7 @@
 package androidx.compose.ui.text.input
 
 import androidx.compose.ui.text.TextRange
-import org.junit.Assert.assertEquals
-import org.junit.Assert.assertFalse
-import org.junit.Assert.assertTrue
+import com.google.common.truth.Truth.assertThat
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.junit.runners.JUnit4
@@ -28,10 +27,10 @@ import org.junit.runners.JUnit4
 class EditingBufferTest {
 
     private fun assertStrWithChars(expected: String, eb: EditingBuffer) {
-        assertEquals(expected.length, eb.length)
-        assertEquals(expected, eb.toString())
+        assertThat(eb.length).isEqualTo(expected.length)
+        assertThat(eb.toString()).isEqualTo(expected)
         for (i in 0 until expected.length) {
-            assertEquals(expected[i], eb[i])
+            assertThat(eb[i]).isEqualTo(expected[i])
         }
     }
 
@@ -42,32 +41,32 @@ class EditingBufferTest {
         eb.replace(0, 0, "A")
 
         assertStrWithChars("A", eb)
-        assertEquals(1, eb.cursor)
-        assertEquals(1, eb.selectionStart)
-        assertEquals(1, eb.selectionEnd)
-        assertFalse(eb.hasComposition())
-        assertEquals(-1, eb.compositionStart)
-        assertEquals(-1, eb.compositionEnd)
+        assertThat(eb.cursor).isEqualTo(1)
+        assertThat(eb.selectionStart).isEqualTo(1)
+        assertThat(eb.selectionEnd).isEqualTo(1)
+        assertThat(eb.hasComposition()).isFalse()
+        assertThat(eb.compositionStart).isEqualTo(-1)
+        assertThat(eb.compositionEnd).isEqualTo(-1)
 
         // Keep inserting text to the end of string. Cursor should follow.
         eb.replace(1, 1, "BC")
         assertStrWithChars("ABC", eb)
-        assertEquals(3, eb.cursor)
-        assertEquals(3, eb.selectionStart)
-        assertEquals(3, eb.selectionEnd)
-        assertFalse(eb.hasComposition())
-        assertEquals(-1, eb.compositionStart)
-        assertEquals(-1, eb.compositionEnd)
+        assertThat(eb.cursor).isEqualTo(3)
+        assertThat(eb.selectionStart).isEqualTo(3)
+        assertThat(eb.selectionEnd).isEqualTo(3)
+        assertThat(eb.hasComposition()).isFalse()
+        assertThat(eb.compositionStart).isEqualTo(-1)
+        assertThat(eb.compositionEnd).isEqualTo(-1)
 
         // Insert into middle position. Cursor should be end of inserted text.
         eb.replace(1, 1, "D")
         assertStrWithChars("ADBC", eb)
-        assertEquals(2, eb.cursor)
-        assertEquals(2, eb.selectionStart)
-        assertEquals(2, eb.selectionEnd)
-        assertFalse(eb.hasComposition())
-        assertEquals(-1, eb.compositionStart)
-        assertEquals(-1, eb.compositionEnd)
+        assertThat(eb.cursor).isEqualTo(2)
+        assertThat(eb.selectionStart).isEqualTo(2)
+        assertThat(eb.selectionEnd).isEqualTo(2)
+        assertThat(eb.hasComposition()).isFalse()
+        assertThat(eb.compositionStart).isEqualTo(-1)
+        assertThat(eb.compositionEnd).isEqualTo(-1)
     }
 
     @Test
@@ -78,71 +77,71 @@ class EditingBufferTest {
 
         // Delete the left character at the cursor.
         assertStrWithChars("BCDE", eb)
-        assertEquals(0, eb.cursor)
-        assertEquals(0, eb.selectionStart)
-        assertEquals(0, eb.selectionEnd)
-        assertFalse(eb.hasComposition())
-        assertEquals(-1, eb.compositionStart)
-        assertEquals(-1, eb.compositionEnd)
+        assertThat(eb.cursor).isEqualTo(0)
+        assertThat(eb.selectionStart).isEqualTo(0)
+        assertThat(eb.selectionEnd).isEqualTo(0)
+        assertThat(eb.hasComposition()).isFalse()
+        assertThat(eb.compositionStart).isEqualTo(-1)
+        assertThat(eb.compositionEnd).isEqualTo(-1)
 
         // Delete the text before the cursor
         eb.replace(0, 2, "")
         assertStrWithChars("DE", eb)
-        assertEquals(0, eb.cursor)
-        assertEquals(0, eb.selectionStart)
-        assertEquals(0, eb.selectionEnd)
-        assertFalse(eb.hasComposition())
-        assertEquals(-1, eb.compositionStart)
-        assertEquals(-1, eb.compositionEnd)
+        assertThat(eb.cursor).isEqualTo(0)
+        assertThat(eb.selectionStart).isEqualTo(0)
+        assertThat(eb.selectionEnd).isEqualTo(0)
+        assertThat(eb.hasComposition()).isFalse()
+        assertThat(eb.compositionStart).isEqualTo(-1)
+        assertThat(eb.compositionEnd).isEqualTo(-1)
 
         // Delete end of the text.
         eb.replace(1, 2, "")
         assertStrWithChars("D", eb)
-        assertEquals(1, eb.cursor)
-        assertEquals(1, eb.selectionStart)
-        assertEquals(1, eb.selectionEnd)
-        assertFalse(eb.hasComposition())
-        assertEquals(-1, eb.compositionStart)
-        assertEquals(-1, eb.compositionEnd)
+        assertThat(eb.cursor).isEqualTo(1)
+        assertThat(eb.selectionStart).isEqualTo(1)
+        assertThat(eb.selectionEnd).isEqualTo(1)
+        assertThat(eb.hasComposition()).isFalse()
+        assertThat(eb.compositionStart).isEqualTo(-1)
+        assertThat(eb.compositionEnd).isEqualTo(-1)
     }
 
     @Test
     fun test_setSelection() {
         val eb = EditingBuffer("ABCDE", TextRange(0, 3))
         assertStrWithChars("ABCDE", eb)
-        assertEquals(-1, eb.cursor)
-        assertEquals(0, eb.selectionStart)
-        assertEquals(3, eb.selectionEnd)
-        assertFalse(eb.hasComposition())
-        assertEquals(-1, eb.compositionStart)
-        assertEquals(-1, eb.compositionEnd)
+        assertThat(eb.cursor).isEqualTo(-1)
+        assertThat(eb.selectionStart).isEqualTo(0)
+        assertThat(eb.selectionEnd).isEqualTo(3)
+        assertThat(eb.hasComposition()).isFalse()
+        assertThat(eb.compositionStart).isEqualTo(-1)
+        assertThat(eb.compositionEnd).isEqualTo(-1)
 
         eb.setSelection(0, 5) // Change the selection
         assertStrWithChars("ABCDE", eb)
-        assertEquals(-1, eb.cursor)
-        assertEquals(0, eb.selectionStart)
-        assertEquals(5, eb.selectionEnd)
-        assertFalse(eb.hasComposition())
-        assertEquals(-1, eb.compositionStart)
-        assertEquals(-1, eb.compositionEnd)
+        assertThat(eb.cursor).isEqualTo(-1)
+        assertThat(eb.selectionStart).isEqualTo(0)
+        assertThat(eb.selectionEnd).isEqualTo(5)
+        assertThat(eb.hasComposition()).isFalse()
+        assertThat(eb.compositionStart).isEqualTo(-1)
+        assertThat(eb.compositionEnd).isEqualTo(-1)
 
         eb.replace(0, 3, "X") // replace function cancel the selection and place cursor.
         assertStrWithChars("XDE", eb)
-        assertEquals(1, eb.cursor)
-        assertEquals(1, eb.selectionStart)
-        assertEquals(1, eb.selectionEnd)
-        assertFalse(eb.hasComposition())
-        assertEquals(-1, eb.compositionStart)
-        assertEquals(-1, eb.compositionEnd)
+        assertThat(eb.cursor).isEqualTo(1)
+        assertThat(eb.selectionStart).isEqualTo(1)
+        assertThat(eb.selectionEnd).isEqualTo(1)
+        assertThat(eb.hasComposition()).isFalse()
+        assertThat(eb.compositionStart).isEqualTo(-1)
+        assertThat(eb.compositionEnd).isEqualTo(-1)
 
         eb.setSelection(0, 2) // Set the selection again
         assertStrWithChars("XDE", eb)
-        assertEquals(-1, eb.cursor)
-        assertEquals(0, eb.selectionStart)
-        assertEquals(2, eb.selectionEnd)
-        assertFalse(eb.hasComposition())
-        assertEquals(-1, eb.compositionStart)
-        assertEquals(-1, eb.compositionEnd)
+        assertThat(eb.cursor).isEqualTo(-1)
+        assertThat(eb.selectionStart).isEqualTo(0)
+        assertThat(eb.selectionEnd).isEqualTo(2)
+        assertThat(eb.hasComposition()).isFalse()
+        assertThat(eb.compositionStart).isEqualTo(-1)
+        assertThat(eb.compositionEnd).isEqualTo(-1)
     }
 
     @Test
@@ -151,39 +150,39 @@ class EditingBufferTest {
 
         eb.setComposition(0, 5) // Make all text as composition
         assertStrWithChars("ABCDE", eb)
-        assertEquals(0, eb.cursor)
-        assertEquals(0, eb.selectionStart)
-        assertEquals(0, eb.selectionEnd)
-        assertTrue(eb.hasComposition())
-        assertEquals(0, eb.compositionStart)
-        assertEquals(5, eb.compositionEnd)
+        assertThat(eb.cursor).isEqualTo(0)
+        assertThat(eb.selectionStart).isEqualTo(0)
+        assertThat(eb.selectionEnd).isEqualTo(0)
+        assertThat(eb.hasComposition()).isTrue()
+        assertThat(eb.compositionStart).isEqualTo(0)
+        assertThat(eb.compositionEnd).isEqualTo(5)
 
         eb.replace(2, 3, "X") // replace function cancel the composition text.
         assertStrWithChars("ABXDE", eb)
-        assertEquals(3, eb.cursor)
-        assertEquals(3, eb.selectionStart)
-        assertEquals(3, eb.selectionEnd)
-        assertFalse(eb.hasComposition())
-        assertEquals(-1, eb.compositionStart)
-        assertEquals(-1, eb.compositionEnd)
+        assertThat(eb.cursor).isEqualTo(3)
+        assertThat(eb.selectionStart).isEqualTo(3)
+        assertThat(eb.selectionEnd).isEqualTo(3)
+        assertThat(eb.hasComposition()).isFalse()
+        assertThat(eb.compositionStart).isEqualTo(-1)
+        assertThat(eb.compositionEnd).isEqualTo(-1)
 
         eb.setComposition(2, 4) // set composition again
         assertStrWithChars("ABXDE", eb)
-        assertEquals(3, eb.cursor)
-        assertEquals(3, eb.selectionStart)
-        assertEquals(3, eb.selectionEnd)
-        assertTrue(eb.hasComposition())
-        assertEquals(2, eb.compositionStart)
-        assertEquals(4, eb.compositionEnd)
+        assertThat(eb.cursor).isEqualTo(3)
+        assertThat(eb.selectionStart).isEqualTo(3)
+        assertThat(eb.selectionEnd).isEqualTo(3)
+        assertThat(eb.hasComposition()).isTrue()
+        assertThat(eb.compositionStart).isEqualTo(2)
+        assertThat(eb.compositionEnd).isEqualTo(4)
 
         eb.cancelComposition() // cancel the composition
         assertStrWithChars("ABE", eb)
-        assertEquals(2, eb.cursor)
-        assertEquals(2, eb.selectionStart)
-        assertEquals(2, eb.selectionEnd)
-        assertFalse(eb.hasComposition())
-        assertEquals(-1, eb.compositionStart)
-        assertEquals(-1, eb.compositionEnd)
+        assertThat(eb.cursor).isEqualTo(2)
+        assertThat(eb.selectionStart).isEqualTo(2)
+        assertThat(eb.selectionEnd).isEqualTo(2)
+        assertThat(eb.hasComposition()).isFalse()
+        assertThat(eb.compositionStart).isEqualTo(-1)
+        assertThat(eb.compositionEnd).isEqualTo(-1)
     }
 
     @Test
@@ -192,39 +191,39 @@ class EditingBufferTest {
 
         eb.setComposition(0, 5) // Make all text as composition
         assertStrWithChars("ABCDE", eb)
-        assertEquals(0, eb.cursor)
-        assertEquals(0, eb.selectionStart)
-        assertEquals(0, eb.selectionEnd)
-        assertTrue(eb.hasComposition())
-        assertEquals(0, eb.compositionStart)
-        assertEquals(5, eb.compositionEnd)
+        assertThat(eb.cursor).isEqualTo(0)
+        assertThat(eb.selectionStart).isEqualTo(0)
+        assertThat(eb.selectionEnd).isEqualTo(0)
+        assertThat(eb.hasComposition()).isTrue()
+        assertThat(eb.compositionStart).isEqualTo(0)
+        assertThat(eb.compositionEnd).isEqualTo(5)
 
         eb.replace(2, 3, "X") // replace function cancel the composition text.
         assertStrWithChars("ABXDE", eb)
-        assertEquals(3, eb.cursor)
-        assertEquals(3, eb.selectionStart)
-        assertEquals(3, eb.selectionEnd)
-        assertFalse(eb.hasComposition())
-        assertEquals(-1, eb.compositionStart)
-        assertEquals(-1, eb.compositionEnd)
+        assertThat(eb.cursor).isEqualTo(3)
+        assertThat(eb.selectionStart).isEqualTo(3)
+        assertThat(eb.selectionEnd).isEqualTo(3)
+        assertThat(eb.hasComposition()).isFalse()
+        assertThat(eb.compositionStart).isEqualTo(-1)
+        assertThat(eb.compositionEnd).isEqualTo(-1)
 
         eb.setComposition(2, 4) // set composition again
         assertStrWithChars("ABXDE", eb)
-        assertEquals(3, eb.cursor)
-        assertEquals(3, eb.selectionStart)
-        assertEquals(3, eb.selectionEnd)
-        assertTrue(eb.hasComposition())
-        assertEquals(2, eb.compositionStart)
-        assertEquals(4, eb.compositionEnd)
+        assertThat(eb.cursor).isEqualTo(3)
+        assertThat(eb.selectionStart).isEqualTo(3)
+        assertThat(eb.selectionEnd).isEqualTo(3)
+        assertThat(eb.hasComposition()).isTrue()
+        assertThat(eb.compositionStart).isEqualTo(2)
+        assertThat(eb.compositionEnd).isEqualTo(4)
 
         eb.commitComposition() // commit the composition
         assertStrWithChars("ABXDE", eb)
-        assertEquals(3, eb.cursor)
-        assertEquals(3, eb.selectionStart)
-        assertEquals(3, eb.selectionEnd)
-        assertFalse(eb.hasComposition())
-        assertEquals(-1, eb.compositionStart)
-        assertEquals(-1, eb.compositionEnd)
+        assertThat(eb.cursor).isEqualTo(3)
+        assertThat(eb.selectionStart).isEqualTo(3)
+        assertThat(eb.selectionEnd).isEqualTo(3)
+        assertThat(eb.hasComposition()).isFalse()
+        assertThat(eb.compositionStart).isEqualTo(-1)
+        assertThat(eb.compositionEnd).isEqualTo(-1)
     }
 
     @Test
@@ -233,30 +232,30 @@ class EditingBufferTest {
 
         eb.cursor = 1
         assertStrWithChars("ABCDE", eb)
-        assertEquals(1, eb.cursor)
-        assertEquals(1, eb.selectionStart)
-        assertEquals(1, eb.selectionEnd)
-        assertFalse(eb.hasComposition())
-        assertEquals(-1, eb.compositionStart)
-        assertEquals(-1, eb.compositionEnd)
+        assertThat(eb.cursor).isEqualTo(1)
+        assertThat(eb.selectionStart).isEqualTo(1)
+        assertThat(eb.selectionEnd).isEqualTo(1)
+        assertThat(eb.hasComposition()).isFalse()
+        assertThat(eb.compositionStart).isEqualTo(-1)
+        assertThat(eb.compositionEnd).isEqualTo(-1)
 
         eb.cursor = 2
         assertStrWithChars("ABCDE", eb)
-        assertEquals(2, eb.cursor)
-        assertEquals(2, eb.selectionStart)
-        assertEquals(2, eb.selectionEnd)
-        assertFalse(eb.hasComposition())
-        assertEquals(-1, eb.compositionStart)
-        assertEquals(-1, eb.compositionEnd)
+        assertThat(eb.cursor).isEqualTo(2)
+        assertThat(eb.selectionStart).isEqualTo(2)
+        assertThat(eb.selectionEnd).isEqualTo(2)
+        assertThat(eb.hasComposition()).isFalse()
+        assertThat(eb.compositionStart).isEqualTo(-1)
+        assertThat(eb.compositionEnd).isEqualTo(-1)
 
         eb.cursor = 5
         assertStrWithChars("ABCDE", eb)
-        assertEquals(5, eb.cursor)
-        assertEquals(5, eb.selectionStart)
-        assertEquals(5, eb.selectionEnd)
-        assertFalse(eb.hasComposition())
-        assertEquals(-1, eb.compositionStart)
-        assertEquals(-1, eb.compositionEnd)
+        assertThat(eb.cursor).isEqualTo(5)
+        assertThat(eb.selectionStart).isEqualTo(5)
+        assertThat(eb.selectionEnd).isEqualTo(5)
+        assertThat(eb.hasComposition()).isFalse()
+        assertThat(eb.compositionStart).isEqualTo(-1)
+        assertThat(eb.compositionEnd).isEqualTo(-1)
     }
 
     @Test
@@ -265,8 +264,8 @@ class EditingBufferTest {
 
         eb.delete(1, 2)
         assertStrWithChars("ACDE", eb)
-        assertEquals(0, eb.cursor)
-        assertFalse(eb.hasComposition())
+        assertThat(eb.cursor).isEqualTo(0)
+        assertThat(eb.hasComposition()).isFalse()
     }
 
     @Test
@@ -275,8 +274,8 @@ class EditingBufferTest {
 
         eb.delete(1, 2)
         assertStrWithChars("ACDE", eb)
-        assertEquals(2, eb.cursor)
-        assertFalse(eb.hasComposition())
+        assertThat(eb.cursor).isEqualTo(2)
+        assertThat(eb.hasComposition()).isFalse()
     }
 
     @Test
@@ -285,9 +284,9 @@ class EditingBufferTest {
 
         eb.delete(1, 2)
         assertStrWithChars("ACDE", eb)
-        assertEquals(0, eb.selectionStart)
-        assertEquals(1, eb.selectionEnd)
-        assertFalse(eb.hasComposition())
+        assertThat(eb.selectionStart).isEqualTo(0)
+        assertThat(eb.selectionEnd).isEqualTo(1)
+        assertThat(eb.hasComposition()).isFalse()
     }
 
     @Test
@@ -296,9 +295,9 @@ class EditingBufferTest {
 
         eb.delete(1, 2)
         assertStrWithChars("ACDE", eb)
-        assertEquals(3, eb.selectionStart)
-        assertEquals(4, eb.selectionEnd)
-        assertFalse(eb.hasComposition())
+        assertThat(eb.selectionStart).isEqualTo(3)
+        assertThat(eb.selectionEnd).isEqualTo(4)
+        assertThat(eb.hasComposition()).isFalse()
     }
 
     @Test
@@ -309,8 +308,8 @@ class EditingBufferTest {
         eb.delete(1, 3)
         // A[]DE
         assertStrWithChars("ADE", eb)
-        assertEquals(1, eb.selectionStart)
-        assertEquals(1, eb.selectionEnd)
+        assertThat(eb.selectionStart).isEqualTo(1)
+        assertThat(eb.selectionEnd).isEqualTo(1)
     }
 
     @Test
@@ -321,8 +320,8 @@ class EditingBufferTest {
         eb.delete(0, 4)
         // []E
         assertStrWithChars("E", eb)
-        assertEquals(0, eb.selectionStart)
-        assertEquals(0, eb.selectionEnd)
+        assertThat(eb.selectionStart).isEqualTo(0)
+        assertThat(eb.selectionEnd).isEqualTo(0)
     }
 
     @Test
@@ -333,8 +332,8 @@ class EditingBufferTest {
         eb.delete(1, 3)
         // A[D]E
         assertStrWithChars("ADE", eb)
-        assertEquals(1, eb.selectionStart)
-        assertEquals(2, eb.selectionEnd)
+        assertThat(eb.selectionStart).isEqualTo(1)
+        assertThat(eb.selectionEnd).isEqualTo(2)
     }
 
     @Test
@@ -345,8 +344,8 @@ class EditingBufferTest {
         eb.delete(3, 5)
         // A[BC]FG
         assertStrWithChars("ABCFG", eb)
-        assertEquals(1, eb.selectionStart)
-        assertEquals(3, eb.selectionEnd)
+        assertThat(eb.selectionStart).isEqualTo(1)
+        assertThat(eb.selectionEnd).isEqualTo(3)
     }
 
     @Test
@@ -357,9 +356,9 @@ class EditingBufferTest {
         eb.delete(2, 3)
 
         assertStrWithChars("ABDE", eb)
-        assertEquals(0, eb.cursor)
-        assertEquals(1, eb.compositionStart)
-        assertEquals(2, eb.compositionEnd)
+        assertThat(eb.cursor).isEqualTo(0)
+        assertThat(eb.compositionStart).isEqualTo(1)
+        assertThat(eb.compositionEnd).isEqualTo(2)
     }
 
     @Test
@@ -370,9 +369,9 @@ class EditingBufferTest {
         eb.delete(2, 3)
 
         assertStrWithChars("ABDE", eb)
-        assertEquals(0, eb.cursor)
-        assertEquals(2, eb.compositionStart)
-        assertEquals(3, eb.compositionEnd)
+        assertThat(eb.cursor).isEqualTo(0)
+        assertThat(eb.compositionStart).isEqualTo(2)
+        assertThat(eb.compositionEnd).isEqualTo(3)
     }
 
     @Test
@@ -383,9 +382,9 @@ class EditingBufferTest {
         eb.delete(2, 4)
 
         assertStrWithChars("ABE", eb)
-        assertEquals(0, eb.cursor)
-        assertEquals(1, eb.compositionStart)
-        assertEquals(2, eb.compositionEnd)
+        assertThat(eb.cursor).isEqualTo(0)
+        assertThat(eb.compositionStart).isEqualTo(1)
+        assertThat(eb.compositionEnd).isEqualTo(2)
     }
 
     @Test
@@ -396,9 +395,9 @@ class EditingBufferTest {
         eb.delete(2, 4)
 
         assertStrWithChars("ABE", eb)
-        assertEquals(0, eb.cursor)
-        assertEquals(2, eb.compositionStart)
-        assertEquals(3, eb.compositionEnd)
+        assertThat(eb.cursor).isEqualTo(0)
+        assertThat(eb.compositionStart).isEqualTo(2)
+        assertThat(eb.compositionEnd).isEqualTo(3)
     }
 
     @Test
@@ -409,9 +408,9 @@ class EditingBufferTest {
         eb.delete(3, 4)
 
         assertStrWithChars("ABCE", eb)
-        assertEquals(0, eb.cursor)
-        assertEquals(2, eb.compositionStart)
-        assertEquals(4, eb.compositionEnd)
+        assertThat(eb.cursor).isEqualTo(0)
+        assertThat(eb.compositionStart).isEqualTo(2)
+        assertThat(eb.compositionEnd).isEqualTo(4)
     }
 
     @Test
@@ -422,7 +421,7 @@ class EditingBufferTest {
         eb.delete(2, 5)
 
         assertStrWithChars("AB", eb)
-        assertEquals(0, eb.cursor)
-        assertFalse(eb.hasComposition())
+        assertThat(eb.cursor).isEqualTo(0)
+        assertThat(eb.hasComposition()).isFalse()
     }
 }
