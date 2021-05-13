@@ -141,7 +141,7 @@ class AndroidXUiPlugin : Plugin<Project> {
         }
 
         private fun Project.configureAndroidCommonOptions(testedExtension: TestedExtension) {
-            testedExtension.defaultConfig.minSdkVersion(21)
+            testedExtension.defaultConfig.minSdk = 21
 
             afterEvaluate { project ->
                 val isPublished = project.extensions.findByType(AndroidXExtension::class.java)

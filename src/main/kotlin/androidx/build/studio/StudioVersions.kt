@@ -20,7 +20,5 @@ package androidx.build.studio
  * Studio version information used for setting up the correct version of Android Studio.
  */
 class StudioVersions(
-    val studioVersion: String,
-    val ideaMajorVersion: String,
-    val studioBuildNumber: String
+    val studioVersion: String
 )

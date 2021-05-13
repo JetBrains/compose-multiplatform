@@ -262,9 +262,8 @@ class AndroidXPlugin : Plugin<Project> {
         }
 
         project.extensions.getByType<LibraryAndroidComponentsExtension>().apply {
-            @Suppress("deprecation")
-            beforeUnitTests(selector().withBuildType("release")) { unitTest ->
-                unitTest.enabled = false
+            beforeVariants(selector().withBuildType("release")) { variant ->
+                variant.enableUnitTest = false
             }
         }
 
@@ -377,7 +376,7 @@ class AndroidXPlugin : Plugin<Project> {
 
         compileSdkVersion(COMPILE_SDK_VERSION)
         buildToolsVersion = BUILD_TOOLS_VERSION
-        defaultConfig.targetSdkVersion(TARGET_SDK_VERSION)
+        defaultConfig.targetSdk = TARGET_SDK_VERSION
         ndkVersion = SupportConfig.NDK_VERSION
         ndkPath = project.getNdkPath().absolutePath
 
@@ -391,9 +390,9 @@ class AndroidXPlugin : Plugin<Project> {
         testOptions.unitTests.isIncludeAndroidResources = true
         if (!project.buildDir.exists()) project.buildDir.mkdirs()
 
-        defaultConfig.minSdkVersion(DEFAULT_MIN_SDK_VERSION)
+        defaultConfig.minSdk = DEFAULT_MIN_SDK_VERSION
         project.afterEvaluate {
-            val minSdkVersion = defaultConfig.minSdkVersion!!.apiLevel
+            val minSdkVersion = defaultConfig.minSdk!!
             check(minSdkVersion >= DEFAULT_MIN_SDK_VERSION) {
                 "minSdkVersion $minSdkVersion lower than the default of $DEFAULT_MIN_SDK_VERSION"
             }
