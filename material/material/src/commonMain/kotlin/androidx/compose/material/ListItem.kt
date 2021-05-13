@@ -40,7 +40,11 @@ import androidx.compose.ui.util.fastForEachIndexed
 import kotlin.math.max
 
 /**
- * Material Design implementation of [list items](https://material.io/components/lists).
+ * <a href="https://material.io/components/lists" class="external" target="_blank">Material Design list</a> item.
+ *
+ * Lists are continuous, vertical indexes of text or images.
+ *
+ * ![Lists image](https://developer.android.com/images/reference/androidx/compose/material/lists.png)
  *
  * To make this [ListItem] clickable, use [Modifier.clickable].
  * To add a background to the [ListItem], wrap it with a [Surface].

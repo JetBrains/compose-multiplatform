@@ -64,7 +64,11 @@ import kotlinx.coroutines.flow.collect
 import kotlin.math.roundToInt
 
 /**
- * A Switch is a two state toggleable component that provides on/off like options
+ * <a href="https://material.io/components/switches" class="external" target="_blank">Material Design switch</a>.
+ *
+ * Switches toggle the state of a single item on or off.
+ *
+ * ![Switches image](https://developer.android.com/images/reference/androidx/compose/material/switches.png)
  *
  * @sample androidx.compose.material.samples.SwitchSample
  *

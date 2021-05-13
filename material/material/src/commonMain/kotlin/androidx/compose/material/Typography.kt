@@ -24,7 +24,15 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.sp
 
 /**
- * Class holding typography definitions as defined by the [Material typography specification](https://material.io/design/typography/the-type-system.html#type-scale).
+ * <a href="https://material.io/design/typography/the-type-system.html#type-scale" class="external" target="_blank">Material Design type scale</a>.
+ *
+ * The Material Design type scale includes a range of contrasting styles that support the needs of
+ * your product and its content.
+ *
+ * The type scale is a combination of thirteen styles that are supported by the type system. It
+ * contains reusable categories of text, each with an intended application and meaning.
+ *
+ * ![Typography image](https://developer.android.com/images/reference/androidx/compose/material/typography.png)
  *
  * @property h1 h1 is the largest headline, reserved for short, important text or numerals.
  * For headlines, you can choose an expressive font, such as a display, handwritten, or script

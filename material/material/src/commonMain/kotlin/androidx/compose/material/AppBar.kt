@@ -47,8 +47,11 @@ import androidx.compose.ui.unit.dp
 import kotlin.math.sqrt
 
 /**
- * A TopAppBar displays information and actions relating to the current screen and is placed at the
- * top of the screen.
+ * <a href="https://material.io/components/app-bars-top" class="external" target="_blank">Material Design top app bar</a>.
+ *
+ * The top app bar displays information and actions relating to the current screen.
+ *
+ * ![App bars: top image](https://developer.android.com/images/reference/androidx/compose/material/app-bars-top.png)
  *
  * This TopAppBar has slots for a title, navigation icon, and actions. Note that the [title] slot
  * is inset from the start according to spec - for custom use cases such as horizontally
@@ -123,8 +126,11 @@ fun TopAppBar(
 }
 
 /**
- * A TopAppBar displays information and actions relating to the current screen and is placed at the
- * top of the screen.
+ * <a href="https://material.io/components/app-bars-top" class="external" target="_blank">Material Design top app bar</a>.
+ *
+ * The top app bar displays information and actions relating to the current screen.
+ *
+ * ![App bars: top image](https://developer.android.com/images/reference/androidx/compose/material/app-bars-top.png)
  *
  * This TopAppBar has no pre-defined slots for content, allowing you to customize the layout of
  * content inside.
@@ -161,8 +167,13 @@ fun TopAppBar(
 }
 
 /**
- * A BottomAppBar displays actions relating to the current screen and is placed at the bottom of
- * the screen. It can also optionally display a [FloatingActionButton], which is either overlaid
+ * <a href="https://material.io/components/app-bars-bottom" class="external" target="_blank">Material Design bottom app bar</a>.
+ *
+ * A bottom app bar displays navigation and key actions at the bottom of screens.
+ *
+ * ![App bars: bottom image](https://developer.android.com/images/reference/androidx/compose/material/app-bars-bottom.png)
+ *
+ * It can also optionally display a [FloatingActionButton], which is either overlaid
  * on top of the BottomAppBar, or inset, carving a cutout in the BottomAppBar.
  *
  * See [BottomAppBar anatomy](https://material.io/components/app-bars-bottom/#anatomy) for the
@@ -170,6 +181,8 @@ fun TopAppBar(
  *
  * Note that when you pass a non-null [cutoutShape] this makes the AppBar shape concave. The shadows
  * for such shapes will not be drawn on Android versions less than 10.
+ *
+ * Also see [BottomNavigation].
  *
  * @sample androidx.compose.material.samples.SimpleBottomAppBar
  *

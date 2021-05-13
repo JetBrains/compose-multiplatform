@@ -199,9 +199,13 @@ fun rememberModalBottomSheetState(
 }
 
 /**
+ * <a href="https://material.io/components/sheets-bottom#modal-bottom-sheet" class="external" target="_blank">Material Design modal bottom sheet</a>.
+ *
  * Modal bottom sheets present a set of choices while blocking interaction with the rest of the
- * screen. They are an alternative to inline menus and simple dialogs on mobile, providing
+ * screen. They are an alternative to inline menus and simple dialogs, providing
  * additional room for content, iconography, and actions.
+ *
+ * ![Modal bottom sheet image](https://developer.android.com/images/reference/androidx/compose/material/modal-bottom-sheet.png)
  *
  * A simple example of a modal bottom sheet looks like this:
  *
