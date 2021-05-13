@@ -29,6 +29,12 @@ plugins {
 
 AndroidXUiPlugin.applyAndConfigureKotlinPlugin(project)
 
+android {
+    lintOptions {
+        disable("InvalidPackage")
+    }
+}
+
 dependencies {
     kotlinPlugin(project(":compose:compiler:compiler"))
 

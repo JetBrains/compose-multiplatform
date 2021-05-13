@@ -20,6 +20,7 @@ package androidx.compose.runtime.lint
 
 import androidx.compose.lint.Stubs
 import com.android.tools.lint.checks.infrastructure.LintDetectorTest
+import com.android.tools.lint.checks.infrastructure.TestFile
 import com.android.tools.lint.detector.api.Detector
 import com.android.tools.lint.detector.api.Issue
 import org.junit.Test
