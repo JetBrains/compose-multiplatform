@@ -126,7 +126,6 @@ fun shouldVerifyConfiguration(configuration: Configuration): Boolean {
     // Don't check any tooling configurations.
     if (name == "annotationProcessor") return false
     if (name == "errorprone") return false
-    if (name.startsWith("jacoco")) return false
     if (name.startsWith("lint")) return false
     if (name == "metalava") return false
 

@@ -20,7 +20,6 @@ import androidx.build.AndroidXPlugin.Companion.ZIP_CONSTRAINED_TEST_CONFIGS_WITH
 import androidx.build.AndroidXPlugin.Companion.ZIP_TEST_CONFIGS_WITH_APKS_TASK
 import androidx.build.dependencyTracker.AffectedModuleDetector
 import androidx.build.gradle.isRoot
-import androidx.build.jacoco.Jacoco
 import androidx.build.license.CheckExternalDependencyLicensesTask
 import androidx.build.playground.VerifyPlaygroundGradlePropertiesTask
 import androidx.build.studio.StudioTask.Companion.registerStudioTask
@@ -147,16 +146,7 @@ class AndroidXRootPlugin : Plugin<Project> {
             }
         }
 
-        val buildTestApks = tasks.register(AndroidXPlugin.BUILD_TEST_APKS_TASK)
-        if (project.isCoverageEnabled()) {
-            val createCoverageJarTask = Jacoco.createCoverageJarTask(this)
-            buildTestApks.configure {
-                it.dependsOn(createCoverageJarTask)
-            }
-            buildOnServerTask.dependsOn(createCoverageJarTask)
-            buildOnServerTask.dependsOn(Jacoco.createZipEcFilesTask(this))
-            buildOnServerTask.dependsOn(Jacoco.createUberJarTask(this))
-        }
+        tasks.register(AndroidXPlugin.BUILD_TEST_APKS_TASK)
 
         project.tasks.register(
             ZIP_TEST_CONFIGS_WITH_APKS_TASK, Zip::class.java

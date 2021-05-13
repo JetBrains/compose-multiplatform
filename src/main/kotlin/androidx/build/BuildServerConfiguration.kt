@@ -101,12 +101,6 @@ fun Project.getHostTestResultDirectory(): File =
     File(getDistributionDirectory(), "host-test-reports")
 
 /**
- * Directory to put host test coverage results so they can be consumed by the testing dashboard.
- */
-fun Project.getHostTestCoverageDirectory(): File =
-    File(getDistributionDirectory(), "host-test-coverage")
-
-/**
  * Whether the build should force all versions to be snapshots.
  */
 fun isSnapshotBuild() = System.getenv("SNAPSHOT") != null

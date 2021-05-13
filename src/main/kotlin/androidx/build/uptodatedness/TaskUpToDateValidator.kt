@@ -82,8 +82,6 @@ val ALLOW_RERUNNING_TASKS = setOf(
     "generatePomFileForMetadataPublication",
     "generatePomFileForSafeargsJavaPluginMarkerMavenPublication",
     "generatePomFileForSafeargsKotlinPluginMarkerMavenPublication",
-    "jacocoPublicDebug",
-    "jacocoTipOfTreeDebug",
     "partiallyDejetifyArchive",
     "publishBenchmarkPluginMarkerMavenPublicationToMavenRepository",
     "publishAndroidDebugPublicationToMavenRepository",
@@ -146,7 +144,6 @@ val DONT_TRY_RERUNNING_TASKS = setOf(
     "listTaskOutputs",
     "validateProperties",
     "tasks",
-    "zipEcFiles",
     // More information about the fact that these dokka tasks rerun can be found at b/167569304
     "dokkaKotlinDocs",
     "zipDokkaDocs",
