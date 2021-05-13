@@ -324,9 +324,30 @@ class LazyListsContentPaddingTest {
                         end = 6.dp,
                         bottom = 8.dp
                     )
+                ) { }
+            }
+        }
+
+        rule.onNodeWithTag(ContainerTag)
+            .assertLeftPositionInRootIsEqualTo(0.dp)
+            .assertTopPositionInRootIsEqualTo(0.dp)
+            .assertWidthIsEqualTo(8.dp)
+            .assertHeightIsEqualTo(12.dp)
+    }
+
+    @Test
+    fun column_contentPaddingAndZeroSizedItem() {
+        rule.setContent {
+            Box(modifier = Modifier.testTag(ContainerTag)) {
+                LazyColumn(
+                    contentPadding = PaddingValues(
+                        start = 2.dp,
+                        top = 4.dp,
+                        end = 6.dp,
+                        bottom = 8.dp
+                    )
                 ) {
-                    items(listOf(0)) {
-                    }
+                    items(0) { }
                 }
             }
         }
@@ -599,8 +620,30 @@ class LazyListsContentPaddingTest {
                         end = 6.dp,
                         bottom = 8.dp
                     )
+                ) { }
+            }
+        }
+
+        rule.onNodeWithTag(ContainerTag)
+            .assertLeftPositionInRootIsEqualTo(0.dp)
+            .assertTopPositionInRootIsEqualTo(0.dp)
+            .assertWidthIsEqualTo(8.dp)
+            .assertHeightIsEqualTo(12.dp)
+    }
+
+    @Test
+    fun row_contentPaddingAndZeroSizedItem() {
+        rule.setContent {
+            Box(modifier = Modifier.testTag(ContainerTag)) {
+                LazyRow(
+                    contentPadding = PaddingValues(
+                        start = 2.dp,
+                        top = 4.dp,
+                        end = 6.dp,
+                        bottom = 8.dp
+                    )
                 ) {
-                    items(listOf(0)) {}
+                    items(0) {}
                 }
             }
         }

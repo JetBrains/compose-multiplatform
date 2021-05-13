@@ -18,6 +18,7 @@ package androidx.compose.foundation.lazy
 
 import androidx.compose.animation.core.snap
 import androidx.compose.foundation.AutoTestFrameClock
+import androidx.compose.foundation.background
 import androidx.compose.foundation.gestures.animateScrollBy
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -37,6 +38,8 @@ import androidx.compose.testutils.assertIsEqualTo
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.drawBehind
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.test.SemanticsNodeInteraction
@@ -46,10 +49,15 @@ import androidx.compose.ui.test.assertIsNotDisplayed
 import androidx.compose.ui.test.assertLeftPositionInRootIsEqualTo
 import androidx.compose.ui.test.assertPositionInRootIsEqualTo
 import androidx.compose.ui.test.assertWidthIsEqualTo
+import androidx.compose.ui.test.center
+import androidx.compose.ui.test.down
 import androidx.compose.ui.test.getUnclippedBoundsInRoot
 import androidx.compose.ui.test.junit4.StateRestorationTester
 import androidx.compose.ui.test.junit4.createComposeRule
+import androidx.compose.ui.test.moveBy
 import androidx.compose.ui.test.onNodeWithTag
+import androidx.compose.ui.test.performGesture
+import androidx.compose.ui.test.up
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
@@ -1068,6 +1076,60 @@ class LazyRowTest {
             }
             assertThat(state.firstVisibleItemIndex).isEqualTo(9)
         }
+    }
+
+    @Test
+    fun overscrollingBackwardFromNotTheFirstPosition() {
+        val containerTag = "container"
+        val itemSizePx = 10
+        val itemSizeDp = with(rule.density) { itemSizePx.toDp() }
+        val containerSize = itemSizeDp * 5
+        rule.setContentWithTestViewConfiguration {
+            Box(
+                Modifier
+                    .testTag(containerTag)
+                    .size(containerSize)
+            ) {
+                LazyRow(
+                    Modifier
+                        .testTag(LazyListTag)
+                        .background(Color.Blue),
+                    state = rememberLazyListState(2, 5)
+                ) {
+                    items(100) {
+                        Box(
+                            Modifier
+                                .fillMaxHeight()
+                                .width(itemSizeDp)
+                                .testTag("$it")
+                        )
+                    }
+                }
+            }
+        }
+
+        rule.onNodeWithTag(LazyListTag)
+            .performGesture {
+                // we do move manually and not with swipe() utility because we want to have one
+                // drag gesture, not multiple smaller ones
+                down(center)
+                moveBy(Offset(-TestTouchSlop, 0f))
+                moveBy(
+                    Offset(
+                        itemSizePx * 15f, // large value which makes us overscroll
+                        0f
+                    )
+                )
+                up()
+            }
+
+        rule.onNodeWithTag(LazyListTag)
+            .assertWidthIsEqualTo(containerSize)
+
+        rule.onNodeWithTag("0")
+            .assertLeftPositionInRootIsEqualTo(0.dp)
+        rule.onNodeWithTag("4")
+            .assertLeftPositionInRootIsEqualTo(containerSize - itemSizeDp)
     }
 
     private fun LazyListState.scrollBy(offset: Dp) {

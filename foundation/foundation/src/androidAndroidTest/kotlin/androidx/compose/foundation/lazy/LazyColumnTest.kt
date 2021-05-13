@@ -68,12 +68,14 @@ import androidx.compose.ui.test.getUnclippedBoundsInRoot
 import androidx.compose.ui.test.junit4.ComposeContentTestRule
 import androidx.compose.ui.test.junit4.StateRestorationTester
 import androidx.compose.ui.test.junit4.createComposeRule
+import androidx.compose.ui.test.moveBy
 import androidx.compose.ui.test.onChildren
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performGesture
 import androidx.compose.ui.test.swipeUp
 import androidx.compose.ui.test.swipeWithVelocity
+import androidx.compose.ui.test.up
 import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
@@ -1382,6 +1384,60 @@ class LazyColumnTest {
             .assertPixels {
                 Color.Blue
             }
+    }
+
+    @Test
+    fun overscrollingBackwardFromNotTheFirstPosition() {
+        val containerTag = "container"
+        val itemSizePx = 10
+        val itemSizeDp = with(rule.density) { itemSizePx.toDp() }
+        val containerSize = itemSizeDp * 5
+        rule.setContentWithTestViewConfiguration {
+            Box(
+                Modifier
+                    .testTag(containerTag)
+                    .size(containerSize)
+            ) {
+                LazyColumn(
+                    Modifier
+                        .testTag(LazyListTag)
+                        .background(Color.Blue),
+                    state = rememberLazyListState(2, 5)
+                ) {
+                    items(100) {
+                        Box(
+                            Modifier
+                                .fillMaxWidth()
+                                .height(itemSizeDp)
+                                .testTag("$it")
+                        )
+                    }
+                }
+            }
+        }
+
+        rule.onNodeWithTag(LazyListTag)
+            .performGesture {
+                // we do move manually and not with swipe() utility because we want to have one
+                // drag gesture, not multiple smaller ones
+                down(center)
+                moveBy(Offset(0f, -TestTouchSlop))
+                moveBy(
+                    Offset(
+                        0f,
+                        itemSizePx * 15f // large value which makes us overscroll
+                    )
+                )
+                up()
+            }
+
+        rule.onNodeWithTag(LazyListTag)
+            .assertHeightIsEqualTo(containerSize)
+
+        rule.onNodeWithTag("0")
+            .assertTopPositionInRootIsEqualTo(0.dp)
+        rule.onNodeWithTag("4")
+            .assertTopPositionInRootIsEqualTo(containerSize - itemSizeDp)
     }
 
     private fun SemanticsNodeInteraction.assertTopPositionIsAlmost(expected: Dp) {
