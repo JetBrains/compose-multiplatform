@@ -174,7 +174,3 @@ tasks.withType(KotlinCompile).configureEach {
         freeCompilerArgs += ["-XXLanguage:+InlineClasses"]
     }
 }
-
-android.buildTypes.all {
-    testCoverageEnabled = false
-}

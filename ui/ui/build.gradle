@@ -249,11 +249,6 @@ tasks.withType(KotlinCompile).configureEach {
 }
 
 android {
-    buildTypes {
-        debug {
-            testCoverageEnabled = false // Breaks Kotlin compiler.
-        }
-    }
     testOptions.unitTests.includeAndroidResources = true
     buildTypes.all {
         consumerProguardFiles("proguard-rules.pro")
