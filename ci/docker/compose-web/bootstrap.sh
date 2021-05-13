@@ -15,7 +15,7 @@ function bootstrap() {
 if [ ! -e /tmp/init ]; then
     touch /tmp/init
     echo "bootstrapping"
-    sleep 10
+    bootstrap
 else
     echo "not bootstrapping, all done"
 fi
