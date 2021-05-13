@@ -24,7 +24,7 @@ import com.android.tools.lint.detector.api.CURRENT_API
  */
 class MaterialIssueRegistry : IssueRegistry() {
     // Tests are run with this version. We ensure that with ApiLintVersionsTest
-    override val api = 8
+    override val api = 10
     override val minApi = CURRENT_API
     override val issues get() = listOf(
         ColorsDetector.ConflictingOnColor

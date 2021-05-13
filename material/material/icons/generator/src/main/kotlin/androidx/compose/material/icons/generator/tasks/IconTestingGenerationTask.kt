@@ -64,6 +64,7 @@ open class IconTestingGenerationTask : IconGenerationTask() {
             variant.registerGeneratedResFolders(
                 project.files(task.generatedResourceDirectory).builtBy(task)
             )
+            @Suppress("DEPRECATION") // b/186887831
             variant.registerJavaGeneratingTask(task, task.generatedSrcAndroidTestDirectory)
         }
     }

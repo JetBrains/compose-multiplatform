@@ -1,92 +1,15 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<issues format="5" by="lint 4.2.0-beta06" client="gradle" variant="debug" version="4.2.0-beta06">
+<issues format="6" by="lint 7.0.0-alpha15" type="baseline" client="cli" name="Lint" variant="all" version="7.0.0-alpha15">
 
     <issue
-        id="BanTargetApiAnnotation"
-        message="Uses @TargetApi annotation"
-        errorLine1="@TargetApi(Build.VERSION_CODES.M)"
-        errorLine2="~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        id="ResourceType"
+        message="Expected resource of type styleable"
+        errorLine1="    val STYLEABLE_ANIMATED_VECTOR_DRAWABLE_TARGET_ANIMATION = 1"
+        errorLine2="                                                              ~">
         <location
-            file="src/androidMain/kotlin/androidx/compose/ui/platform/actionmodecallback/FloatingTextActionModeCallback.android.kt"
-            line="27"
-            column="1"/>
-    </issue>
-
-    <issue
-        id="BanUncheckedReflection"
-        message="Calling Method.invoke without an SDK check"
-        errorLine1="                updateDisplayListIfDirtyMethod?.invoke(view)"
-        errorLine2="                ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/androidMain/kotlin/androidx/compose/ui/platform/ViewLayer.android.kt"
-            line="334"
-            column="17"/>
-    </issue>
-
-    <issue
-        id="ClassVerificationFailure"
-        message="This call references a method added in API level 26; however, the containing class androidx.compose.ui.autofill.AndroidAutofillDebugUtils_androidKt is reachable from earlier API levels and will fail run-time class verification."
-        errorLine1="    autofillManager.registerCallback(AutofillCallback)"
-        errorLine2="                    ~~~~~~~~~~~~~~~~">
-        <location
-            file="src/androidMain/kotlin/androidx/compose/ui/autofill/AndroidAutofillDebugUtils.android.kt"
-            line="67"
-            column="21"/>
-    </issue>
-
-    <issue
-        id="ClassVerificationFailure"
-        message="This call references a method added in API level 26; however, the containing class androidx.compose.ui.autofill.AndroidAutofillDebugUtils_androidKt is reachable from earlier API levels and will fail run-time class verification."
-        errorLine1="    autofillManager.unregisterCallback(AutofillCallback)"
-        errorLine2="                    ~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/androidMain/kotlin/androidx/compose/ui/autofill/AndroidAutofillDebugUtils.android.kt"
-            line="77"
-            column="21"/>
-    </issue>
-
-    <issue
-        id="ClassVerificationFailure"
-        message="This call references a method added in API level 23; however, the containing class androidx.compose.ui.res.ColorResources_androidKt is reachable from earlier API levels and will fail run-time class verification."
-        errorLine1="        Color(context.resources.getColor(id, context.theme))"
-        errorLine2="                                ~~~~~~~~">
-        <location
-            file="src/androidMain/kotlin/androidx/compose/ui/res/ColorResources.android.kt"
-            line="37"
-            column="33"/>
-    </issue>
-
-    <issue
-        id="ClassVerificationFailure"
-        message="This call references a method added in API level 23; however, the containing class androidx.compose.ui.platform.actionmodecallback.FloatingTextActionModeCallback is reachable from earlier API levels and will fail run-time class verification."
-        errorLine1=") : ActionMode.Callback2() {"
-        errorLine2="    ~~~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/androidMain/kotlin/androidx/compose/ui/platform/actionmodecallback/FloatingTextActionModeCallback.android.kt"
-            line="30"
-            column="5"/>
-    </issue>
-
-    <issue
-        id="ClassVerificationFailure"
-        message="This call references a method added in API level 29; however, the containing class androidx.compose.ui.input.pointer.MotionEventAdapter_androidKt is reachable from earlier API levels and will fail run-time class verification."
-        errorLine1="    return Offset(getRawX(index), getRawY(index))"
-        errorLine2="                  ~~~~~~~">
-        <location
-            file="src/androidMain/kotlin/androidx/compose/ui/input/pointer/MotionEventAdapter.android.kt"
-            line="194"
-            column="19"/>
-    </issue>
-
-    <issue
-        id="ClassVerificationFailure"
-        message="This call references a method added in API level 29; however, the containing class androidx.compose.ui.input.pointer.MotionEventAdapter_androidKt is reachable from earlier API levels and will fail run-time class verification."
-        errorLine1="    return Offset(getRawX(index), getRawY(index))"
-        errorLine2="                                  ~~~~~~~">
-        <location
-            file="src/androidMain/kotlin/androidx/compose/ui/input/pointer/MotionEventAdapter.android.kt"
-            line="194"
-            column="35"/>
+            file="src/androidMain/kotlin/androidx/compose/ui/graphics/vector/compat/AndroidVectorResources.android.kt"
+            line="106"
+            column="63"/>
     </issue>
 
 </issues>
