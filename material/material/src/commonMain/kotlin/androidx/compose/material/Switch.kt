@@ -19,12 +19,12 @@ package androidx.compose.material
 import androidx.compose.animation.core.TweenSpec
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
-import androidx.compose.foundation.interaction.Interaction
-import androidx.compose.foundation.interaction.InteractionSource
 import androidx.compose.foundation.gestures.Orientation
-import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.indication
 import androidx.compose.foundation.interaction.DragInteraction
+import androidx.compose.foundation.interaction.Interaction
+import androidx.compose.foundation.interaction.InteractionSource
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.interaction.PressInteraction
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxScope
@@ -48,12 +48,12 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.compositeOver
 import androidx.compose.ui.graphics.drawscope.DrawScope
-import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.semantics.Role
@@ -219,10 +219,7 @@ private fun BoxScope.SwitchImpl(
                 indication = rememberRipple(bounded = false, radius = ThumbRippleRadius)
             )
             .requiredSize(ThumbDiameter)
-            .graphicsLayer {
-                shadowElevation = elevation.toPx()
-                shape = CircleShape
-            }
+            .shadow(elevation, CircleShape, clip = false)
             .background(resolvedThumbColor, CircleShape)
     )
 }
