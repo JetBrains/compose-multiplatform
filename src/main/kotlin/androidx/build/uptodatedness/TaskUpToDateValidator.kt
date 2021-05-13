@@ -159,6 +159,12 @@ val DONT_TRY_RERUNNING_TASKS = setOf(
 
     // Flakily not up-to-date, b/176120659
     "doclavaDocs",
+
+    // We should be able to remove these entries when b/160392650 is fixed
+    "lint",
+    "lintAnalyzeDebug",
+    "lintDebug",
+    "lintVitalRelease",
 )
 
 class TaskUpToDateValidator {
