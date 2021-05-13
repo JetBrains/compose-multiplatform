@@ -85,6 +85,8 @@ enum class FabPosition {
 }
 
 /**
+ * <a href="https://material.io/design/layout/understanding-layout.html" class="external" target="_blank">Material Design layout</a>.
+ *
  * Scaffold implements the basic material design visual layout structure.
  *
  * This component provides API to put together several material components to construct your

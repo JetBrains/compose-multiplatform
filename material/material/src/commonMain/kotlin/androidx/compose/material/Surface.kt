@@ -44,6 +44,8 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 
 /**
+ * <a href="https://material.io/design/environment/surfaces.html" class="external" target="_blank">Material Design surface</a>.
+ *
  * Material surface is the central metaphor in material design. Each surface exists at a given
  * elevation, which influences how that piece of surface visually relates to other surfaces and
  * how that surface casts shadows.

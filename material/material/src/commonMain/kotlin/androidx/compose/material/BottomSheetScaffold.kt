@@ -206,10 +206,14 @@ fun rememberBottomSheetScaffoldState(
 }
 
 /**
+ * <a href="https://material.io/components/sheets-bottom#standard-bottom-sheet" class="external" target="_blank">Material Design standard bottom sheet</a>.
+ *
  * Standard bottom sheets co-exist with the screen’s main UI region and allow for simultaneously
  * viewing and interacting with both regions. They are commonly used to keep a feature or
  * secondary content visible on screen when content in main UI region is frequently scrolled or
  * panned.
+ *
+ * ![Standard bottom sheet image](https://developer.android.com/images/reference/androidx/compose/material/standard-bottom-sheet.png)
  *
  * This component provides an API to put together several material components to construct your
  * screen. For a similar component which implements the basic material design layout strategy

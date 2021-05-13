@@ -52,11 +52,12 @@ import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.flow.collect
 
 /**
- * Material Design implementation of a
- * [Material Contained Button](https://material.io/design/components/buttons.html#contained-button).
+ * <a href="https://material.io/components/buttons#contained-button" class="external" target="_blank">Material Design contained button</a>.
  *
  * Contained buttons are high-emphasis, distinguished by their use of elevation and fill. They
  * contain actions that are primary to your app.
+ *
+ * ![Contained button image](https://developer.android.com/images/reference/androidx/compose/material/contained-button.png)
  *
  * The default text style for internal [Text] components will be set to [Typography.button]. Text
  * color will try to match the correlated color for the background color. For example if the
@@ -136,14 +137,12 @@ fun Button(
 }
 
 /**
- * Material Design implementation of a
- * [Material Outlined Button](https://material.io/design/components/buttons.html#outlined-button).
+ * <a href="https://material.io/components/buttons#outlined-button" class="external" target="_blank">Material Design outlined button</a>.
  *
- * Outlined buttons are medium-emphasis buttons. They contain actions that are important, but are
- * not the primary action in an app.
+ * Outlined buttons are medium-emphasis buttons. They contain actions that are important, but aren't
+ * the primary action in an app.
  *
- * Outlined buttons are also a lower emphasis alternative to contained buttons, or a higher emphasis
- * alternative to text buttons.
+ * ![Outlined button image](https://developer.android.com/images/reference/androidx/compose/material/outlined-button.png)
  *
  * The default text style for internal [Text] components will be set to [Typography.button]. Text
  * color will try to match the correlated color for the background color. For example if the
@@ -194,11 +193,12 @@ fun OutlinedButton(
 )
 
 /**
- * Material Design implementation of a
- * [Material Text Button](https://material.io/design/components/buttons.html#text-button).
+ * <a href="https://material.io/components/buttons#text-button" class="external" target="_blank">Material Design text button</a>.
  *
- * Text buttons are typically used for less-pronounced actions, including those located in cards and
- * dialogs.
+ * Text buttons are typically used for less-pronounced actions, including those located in dialogs
+ * and cards. In cards, text buttons help maintain an emphasis on card content.
+ *
+ * ![Text button image](https://developer.android.com/images/reference/androidx/compose/material/text-button.png)
  *
  * The default text style for internal [Text] components will be set to [Typography.button]. Text
  * color will try to match the correlated color for the background color. For example if the

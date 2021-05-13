@@ -28,7 +28,10 @@ import androidx.compose.runtime.remember
 import androidx.compose.foundation.text.selection.LocalTextSelectionColors
 
 /**
- * A MaterialTheme defines the styling principles from the Material design specification.
+ * <a href="https://material.io/design/material-theming/overview.html" class="external" target="_blank">Material Theming</a>.
+ *
+ * Material Theming refers to the customization of your Material Design app to better reflect your
+ * product’s brand.
  *
  * Material components such as [Button] and [Checkbox] use values provided here when retrieving
  * default values.

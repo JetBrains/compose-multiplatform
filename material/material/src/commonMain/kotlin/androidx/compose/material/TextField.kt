@@ -58,8 +58,12 @@ import kotlin.math.max
 import kotlin.math.roundToInt
 
 /**
- * Material Design implementation of a
- * [Filled TextField](https://material.io/components/text-fields/#filled-text-field)
+ * <a href="https://material.io/components/text-fields#filled-text-field" class="external" target="_blank">Material Design filled text field</a>.
+ *
+ * Filled text fields have more visual emphasis than outlined text fields, making them stand out
+ * when surrounded by other content and components.
+ *
+ * ![Filled text field image](https://developer.android.com/images/reference/androidx/compose/material/filled-text-field.png)
  *
  * If you are looking for an outlined version, see [OutlinedTextField].
  *
@@ -196,8 +200,12 @@ fun TextField(
 }
 
 /**
- * Material Design implementation of a
- * [Filled TextField](https://material.io/components/text-fields/#filled-text-field)
+ * <a href="https://material.io/components/text-fields#filled-text-field" class="external" target="_blank">Material Design filled text field</a>.
+ *
+ * Filled text fields have more visual emphasis than outlined text fields, making them stand out
+ * when surrounded by other content and components.
+ *
+ * ![Filled text field image](https://developer.android.com/images/reference/androidx/compose/material/filled-text-field.png)
  *
  * If you are looking for an outlined version, see [OutlinedTextField].
  *
