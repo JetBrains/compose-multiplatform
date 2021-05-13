@@ -56,7 +56,7 @@ internal class RecordingInputConnection(
     @VisibleForTesting
     internal var mTextFieldValue: TextFieldValue = initState
         set(value) {
-            if (DEBUG) { Log.d(TAG, "$DEBUG_CLASS.mTextFieldValue : $field -> $value") }
+            if (DEBUG) { logDebug("mTextFieldValue : $field -> $value") }
             field = value
         }
 
@@ -78,6 +78,16 @@ internal class RecordingInputConnection(
     // The recoding editing ops.
     private val editCommands = mutableListOf<EditCommand>()
 
+    private var isActive: Boolean = true
+
+    private inline fun ensureActive(block: () -> Unit): Boolean {
+        return isActive.also { applying ->
+            if (applying) {
+                block()
+            }
+        }
+    }
+
     /**
      * Updates the input state and tells it to the IME.
      *
@@ -85,7 +95,10 @@ internal class RecordingInputConnection(
      * contents has changed if needed.
      */
     fun updateInputState(state: TextFieldValue, imm: InputMethodManager, view: View) {
+        if (!isActive) return
+
         if (DEBUG) { Log.d(TAG, "RecordingInputConnection.updateInputState: $state") }
+
         mTextFieldValue = state
 
         if (extractedTextMonitorMode) {
@@ -96,11 +109,10 @@ internal class RecordingInputConnection(
         val compositionStart = state.composition?.min ?: -1
         val compositionEnd = state.composition?.max ?: -1
         if (DEBUG) {
-            Log.d(
-                TAG,
-                "$DEBUG_CLASS.updateSelection(" +
+            logDebug(
+                "updateSelection(" +
                     "selection = (${state.selection.min},${state.selection.max}), " +
-                    "composition = ($compositionStart, $compositionEnd)"
+                    "composition = ($compositionStart, $compositionEnd))"
             )
         }
         imm.updateSelection(
@@ -122,8 +134,8 @@ internal class RecordingInputConnection(
     // Callbacks for text editing session
     // /////////////////////////////////////////////////////////////////////////////////////////////
 
-    override fun beginBatchEdit(): Boolean {
-        if (DEBUG) { Log.d(TAG, "$DEBUG_CLASS.beginBatchEdit()") }
+    override fun beginBatchEdit(): Boolean = ensureActive {
+        if (DEBUG) { logDebug("beginBatchEdit()") }
         return beginBatchEditInternal()
     }
 
@@ -133,7 +145,7 @@ internal class RecordingInputConnection(
     }
 
     override fun endBatchEdit(): Boolean {
-        if (DEBUG) { Log.d(TAG, "$DEBUG_CLASS.endBatchEdit()") }
+        if (DEBUG) { logDebug("endBatchEdit()") }
         return endBatchEditInternal()
     }
 
@@ -147,64 +159,66 @@ internal class RecordingInputConnection(
     }
 
     override fun closeConnection() {
-        if (DEBUG) { Log.d(TAG, "$DEBUG_CLASS.closeConnection()") }
+        if (DEBUG) { logDebug("closeConnection()") }
         editCommands.clear()
         batchDepth = 0
+        isActive = false
     }
 
     // /////////////////////////////////////////////////////////////////////////////////////////////
     // Callbacks for text editing
     // /////////////////////////////////////////////////////////////////////////////////////////////
 
-    override fun commitText(text: CharSequence?, newCursorPosition: Int): Boolean {
-        if (DEBUG) { Log.d(TAG, "$DEBUG_CLASS.commitText(\"$text\", $newCursorPosition)") }
+    override fun commitText(text: CharSequence?, newCursorPosition: Int): Boolean = ensureActive {
+        if (DEBUG) { logDebug("commitText(\"$text\", $newCursorPosition)") }
         addEditCommandWithBatch(CommitTextCommand(text.toString(), newCursorPosition))
-        return true
     }
 
-    override fun setComposingRegion(start: Int, end: Int): Boolean {
-        if (DEBUG) { Log.d(TAG, "$DEBUG_CLASS.setComposingRegion($start, $end)") }
+    override fun setComposingRegion(start: Int, end: Int): Boolean = ensureActive {
+        if (DEBUG) { logDebug("setComposingRegion($start, $end)") }
         addEditCommandWithBatch(SetComposingRegionCommand(start, end))
-        return true
     }
 
-    override fun setComposingText(text: CharSequence?, newCursorPosition: Int): Boolean {
-        if (DEBUG) { Log.d(TAG, "$DEBUG_CLASS.setComposingText(\"$text\", $newCursorPosition)") }
-        addEditCommandWithBatch(SetComposingTextCommand(text.toString(), newCursorPosition))
-        return true
-    }
-
-    override fun deleteSurroundingTextInCodePoints(beforeLength: Int, afterLength: Int): Boolean {
-        if (DEBUG) {
-            Log.d(
-                TAG,
-                "$DEBUG_CLASS.deleteSurroundingTextInCodePoints($beforeLength, $afterLength)"
-            )
+    override fun setComposingText(text: CharSequence?, newCursorPosition: Int): Boolean =
+        ensureActive {
+            if (DEBUG) {
+                logDebug("setComposingText(\"$text\", $newCursorPosition)")
+            }
+            addEditCommandWithBatch(SetComposingTextCommand(text.toString(), newCursorPosition))
         }
-        addEditCommandWithBatch(DeleteSurroundingTextInCodePointsCommand(beforeLength, afterLength))
-        return true
-    }
 
-    override fun deleteSurroundingText(beforeLength: Int, afterLength: Int): Boolean {
-        if (DEBUG) { Log.d(TAG, "$DEBUG_CLASS.deleteSurroundingText($beforeLength, $afterLength)") }
-        addEditCommandWithBatch(DeleteSurroundingTextCommand(beforeLength, afterLength))
-        return true
-    }
+    override fun deleteSurroundingTextInCodePoints(beforeLength: Int, afterLength: Int): Boolean =
+        ensureActive {
+            if (DEBUG) {
+                logDebug("deleteSurroundingTextInCodePoints($beforeLength, $afterLength)")
+            }
+            addEditCommandWithBatch(
+                DeleteSurroundingTextInCodePointsCommand(beforeLength, afterLength)
+            )
+            return true
+        }
 
-    override fun setSelection(start: Int, end: Int): Boolean {
-        if (DEBUG) { Log.d(TAG, "$DEBUG_CLASS.setSelection($start, $end)") }
+    override fun deleteSurroundingText(beforeLength: Int, afterLength: Int): Boolean =
+        ensureActive {
+            if (DEBUG) { logDebug("deleteSurroundingText($beforeLength, $afterLength)") }
+            addEditCommandWithBatch(DeleteSurroundingTextCommand(beforeLength, afterLength))
+            return true
+        }
+
+    override fun setSelection(start: Int, end: Int): Boolean = ensureActive {
+        if (DEBUG) { logDebug("setSelection($start, $end") }
         addEditCommandWithBatch(SetSelectionCommand(start, end))
         return true
     }
 
-    override fun finishComposingText(): Boolean {
-        if (DEBUG) { Log.d(TAG, "$DEBUG_CLASS.finishComposingText()") }
+    override fun finishComposingText(): Boolean = ensureActive {
+        if (DEBUG) { logDebug("finishComposingText(") }
         addEditCommandWithBatch(FinishComposingTextCommand())
         return true
     }
 
-    override fun sendKeyEvent(event: KeyEvent): Boolean {
-        if (DEBUG) { Log.d(TAG, "$DEBUG_CLASS.sendKeyEvent($event)") }
+    override fun sendKeyEvent(event: KeyEvent): Boolean = ensureActive {
+        if (DEBUG) { logDebug("sendKeyEvent($event") }
         eventCallback.onKeyEvent(event)
         return true
     }
@@ -216,14 +230,14 @@ internal class RecordingInputConnection(
     override fun getTextBeforeCursor(maxChars: Int, flags: Int): CharSequence {
         // TODO(b/135556699) should return styled text
         val result = mTextFieldValue.getTextBeforeSelection(maxChars).toString()
-        if (DEBUG) { Log.d(TAG, "$DEBUG_CLASS.getTextBeforeCursor($maxChars, $flags): $result") }
+        if (DEBUG) { logDebug("getTextBeforeCursor($maxChars, $flags): $result") }
         return result
     }
 
     override fun getTextAfterCursor(maxChars: Int, flags: Int): CharSequence {
         // TODO(b/135556699) should return styled text
         val result = mTextFieldValue.getTextAfterSelection(maxChars).toString()
-        if (DEBUG) { Log.d(TAG, "$DEBUG_CLASS.getTextAfterCursor($maxChars, $flags): $result") }
+        if (DEBUG) { logDebug("getTextAfterCursor($maxChars, $flags): $result") }
         return result
     }
 
@@ -235,20 +249,18 @@ internal class RecordingInputConnection(
             // TODO(b/135556699) should return styled text
             mTextFieldValue.getSelectedText().toString()
         }
-        if (DEBUG) { Log.d(TAG, "$DEBUG_CLASS.getSelectedText($flags): $result") }
+        if (DEBUG) { logDebug("getSelectedText($flags): $result") }
         return result
     }
 
-    override fun requestCursorUpdates(cursorUpdateMode: Int): Boolean {
-        if (DEBUG) { Log.d(TAG, "$DEBUG_CLASS.requestCursorUpdates($cursorUpdateMode)") }
+    override fun requestCursorUpdates(cursorUpdateMode: Int): Boolean = ensureActive {
+        if (DEBUG) { logDebug("requestCursorUpdates($cursorUpdateMode") }
         Log.w(TAG, "requestCursorUpdates is not supported")
         return false
     }
 
     override fun getExtractedText(request: ExtractedTextRequest?, flags: Int): ExtractedText {
-        if (DEBUG) {
-            Log.d(TAG, "$DEBUG_CLASS.getExtractedText($request, $flags)")
-        }
+        if (DEBUG) { logDebug("getExtractedText($request, $flags") }
         extractedTextMonitorMode = (flags and InputConnection.GET_EXTRACTED_TEXT_MONITOR) != 0
         if (extractedTextMonitorMode) {
             currentExtractedTextRequestToken = request?.token ?: 0
@@ -258,9 +270,8 @@ internal class RecordingInputConnection(
 
         if (DEBUG) {
             with(extractedText) {
-                Log.d(
-                    TAG,
-                    "$DEBUG_CLASS.getExtractedText() return: text: $text" +
+                logDebug(
+                    "getExtractedText() return: text: $text" +
                         ",partialStartOffset $partialStartOffset" +
                         ",partialEndOffset $partialEndOffset" +
                         ",selectionStart $selectionStart" +
@@ -277,14 +288,14 @@ internal class RecordingInputConnection(
     // Editor action and Key events.
     // /////////////////////////////////////////////////////////////////////////////////////////////
 
-    override fun performContextMenuAction(id: Int): Boolean {
-        if (DEBUG) { Log.d(TAG, "$DEBUG_CLASS.performContextMenuAction($id)") }
+    override fun performContextMenuAction(id: Int): Boolean = ensureActive {
+        if (DEBUG) { logDebug("performContextMenuAction($id") }
         Log.w(TAG, "performContextMenuAction is not supported")
         return false
     }
 
-    override fun performEditorAction(editorAction: Int): Boolean {
-        if (DEBUG) { Log.d(TAG, "$DEBUG_CLASS.performEditorAction($editorAction)") }
+    override fun performEditorAction(editorAction: Int): Boolean = ensureActive {
+        if (DEBUG) { logDebug("performEditorAction($editorAction") }
         val imeAction = when (editorAction) {
             EditorInfo.IME_ACTION_UNSPECIFIED -> ImeAction.Default
             EditorInfo.IME_ACTION_DONE -> ImeAction.Done
@@ -306,8 +317,8 @@ internal class RecordingInputConnection(
     // Unsupported callbacks
     // /////////////////////////////////////////////////////////////////////////////////////////////
 
-    override fun commitCompletion(text: CompletionInfo?): Boolean {
-        if (DEBUG) { Log.d(TAG, "$DEBUG_CLASS.commitCompletion(${text?.text})") }
+    override fun commitCompletion(text: CompletionInfo?): Boolean = ensureActive {
+        if (DEBUG) { logDebug("commitCompletion(${text?.text}") }
         // We don't support this callback.
         // The API documents says this should return if the input connection is no longer valid, but
         // The Chromium implementation already returning false, so assuming it is safe to return
@@ -316,22 +327,20 @@ internal class RecordingInputConnection(
         return false
     }
 
-    override fun commitCorrection(correctionInfo: CorrectionInfo?): Boolean {
-        if (DEBUG) {
-            Log.d(TAG, "$DEBUG_CLASS.commitCorrection($correctionInfo) autoCorrect:$autoCorrect")
-        }
+    override fun commitCorrection(correctionInfo: CorrectionInfo?): Boolean = ensureActive {
+        if (DEBUG) { logDebug("commitCorrection($correctionInfo),autoCorrect:$autoCorrect") }
         // Should add an event here so that we can implement the autocorrect highlight
         // Bug: 170647219
         return autoCorrect
     }
 
     override fun getHandler(): Handler? {
-        if (DEBUG) { Log.d(TAG, "$DEBUG_CLASS.getHandler()") }
+        if (DEBUG) { logDebug("getHandler(") }
         return null // Returns null means using default Handler
     }
 
-    override fun clearMetaKeyStates(states: Int): Boolean {
-        if (DEBUG) { Log.d(TAG, "$DEBUG_CLASS.clearMetaKeyStates($states)") }
+    override fun clearMetaKeyStates(states: Int): Boolean = ensureActive {
+        if (DEBUG) { logDebug("clearMetaKeyStates($states") }
         // We don't support this callback.
         // The API documents says this should return if the input connection is no longer valid, but
         // The Chromium implementation already returning false, so assuming it is safe to return
@@ -341,17 +350,17 @@ internal class RecordingInputConnection(
     }
 
     override fun reportFullscreenMode(enabled: Boolean): Boolean {
-        if (DEBUG) { Log.d(TAG, "$DEBUG_CLASS.reportFullscreenMode($enabled)") }
+        if (DEBUG) { logDebug("reportFullscreenMode($enabled") }
         return false // This value is ignored according to the API docs.
     }
 
     override fun getCursorCapsMode(reqModes: Int): Int {
-        if (DEBUG) { Log.d(TAG, "$DEBUG_CLASS.getCursorCapsMode($reqModes)") }
+        if (DEBUG) { logDebug("getCursorCapsMode($reqModes") }
         return TextUtils.getCapsMode(mTextFieldValue.text, mTextFieldValue.selection.min, reqModes)
     }
 
-    override fun performPrivateCommand(action: String?, data: Bundle?): Boolean {
-        if (DEBUG) { Log.d(TAG, "$DEBUG_CLASS.performPrivateCommand($action, $data)") }
+    override fun performPrivateCommand(action: String?, data: Bundle?): Boolean = ensureActive {
+        if (DEBUG) { logDebug("performPrivateCommand($action, $data)") }
         return true // API doc says we should return true even if we didn't understand the command.
     }
 
@@ -359,8 +368,12 @@ internal class RecordingInputConnection(
         inputContentInfo: InputContentInfo,
         flags: Int,
         opts: Bundle?
-    ): Boolean {
-        if (DEBUG) { Log.d(TAG, "$DEBUG_CLASS.commitContent($inputContentInfo, $flags, $opts)") }
+    ): Boolean = ensureActive {
+        if (DEBUG) { logDebug("commitContent($inputContentInfo, $flags, $opts)") }
         return false // We don't accept any contents.
+    }
+
+    private fun logDebug(message: String) {
+        if (DEBUG) { Log.d(TAG, "$DEBUG_CLASS.$message, $isActive") }
     }
 }
