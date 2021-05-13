@@ -42,10 +42,12 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCompositionContext
 import androidx.compose.runtime.rememberUpdatedState
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.R
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.layout.Layout
 import androidx.compose.ui.layout.onGloballyPositioned
@@ -69,6 +71,7 @@ import androidx.lifecycle.ViewTreeLifecycleOwner
 import androidx.lifecycle.ViewTreeViewModelStoreOwner
 import androidx.savedstate.ViewTreeSavedStateRegistryOwner
 import org.jetbrains.annotations.TestOnly
+import java.util.UUID
 import kotlin.math.roundToInt
 
 /**
@@ -209,7 +212,7 @@ fun Popup(
     val layoutDirection = LocalLayoutDirection.current
     val parentComposition = rememberCompositionContext()
     val currentContent by rememberUpdatedState(content)
-
+    val popupId = rememberSaveable { UUID.randomUUID() }
     val popupLayout = remember {
         PopupLayout(
             onDismissRequest = onDismissRequest,
@@ -217,7 +220,8 @@ fun Popup(
             testTag = testTag,
             composeView = view,
             density = density,
-            initialPositionProvider = popupPositionProvider
+            initialPositionProvider = popupPositionProvider,
+            popupId = popupId
         ).apply {
             setContent(parentComposition) {
                 SimpleStack(
@@ -346,7 +350,8 @@ private class PopupLayout(
     var testTag: String,
     private val composeView: View,
     density: Density,
-    initialPositionProvider: PopupPositionProvider
+    initialPositionProvider: PopupPositionProvider,
+    popupId: UUID
 ) : AbstractComposeView(composeView.context), ViewRootForInspector {
     private val windowManager =
         composeView.context.getSystemService(Context.WINDOW_SERVICE) as WindowManager
@@ -378,6 +383,9 @@ private class PopupLayout(
         ViewTreeLifecycleOwner.set(this, ViewTreeLifecycleOwner.get(composeView))
         ViewTreeViewModelStoreOwner.set(this, ViewTreeViewModelStoreOwner.get(composeView))
         ViewTreeSavedStateRegistryOwner.set(this, ViewTreeSavedStateRegistryOwner.get(composeView))
+        // Set unique id for AbstractComposeView. This allows state restoration for the state
+        // defined inside the Popup via rememberSaveable()
+        setTag(R.id.compose_view_saveable_id_tag, "Popup:$popupId")
 
         // Enable children to draw their shadow by not clipping them
         clipChildren = false

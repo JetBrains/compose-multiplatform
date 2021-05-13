@@ -43,7 +43,7 @@ import java.io.Serializable
 @RunWith(AndroidJUnit4::class)
 class DisposableSaveableStateRegistryTest {
 
-    private val ContainerKey = 100
+    private val ContainerKey = "100"
     private val SaveKey = "key"
     private val SaveValue = 5
 
@@ -66,9 +66,9 @@ class DisposableSaveableStateRegistryTest {
     fun saveAndRestoreWhenTwoParentsShareTheSameStateArray() {
         val owner1 = TestOwner()
         // This emulates two different AndroidComposeViews used inside the same Activity
-        val parentKey1 = 1
+        val parentKey1 = "1"
         val value1 = 1
-        val parentKey2 = 2
+        val parentKey2 = "2"
         val value2 = 2
 
         // save first view

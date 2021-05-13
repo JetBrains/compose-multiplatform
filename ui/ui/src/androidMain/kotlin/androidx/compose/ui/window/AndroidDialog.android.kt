@@ -36,6 +36,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCompositionContext
 import androidx.compose.runtime.rememberUpdatedState
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
@@ -57,6 +58,7 @@ import androidx.compose.ui.util.fastMaxBy
 import androidx.lifecycle.ViewTreeLifecycleOwner
 import androidx.lifecycle.ViewTreeViewModelStoreOwner
 import androidx.savedstate.ViewTreeSavedStateRegistryOwner
+import java.util.UUID
 
 /**
  * Properties used to customize the behavior of a [Dialog].
@@ -119,13 +121,15 @@ fun Dialog(
     val layoutDirection = LocalLayoutDirection.current
     val composition = rememberCompositionContext()
     val currentContent by rememberUpdatedState(content)
+    val dialogId = rememberSaveable { UUID.randomUUID() }
     val dialog = remember(view, density) {
         DialogWrapper(
             onDismissRequest,
             properties,
             view,
             layoutDirection,
-            density
+            density,
+            dialogId
         ).apply {
             setContent(composition) {
                 // TODO(b/159900354): draw a scrim and add margins around the Compose Dialog, and
@@ -196,7 +200,8 @@ private class DialogWrapper(
     private var properties: DialogProperties,
     private val composeView: View,
     layoutDirection: LayoutDirection,
-    density: Density
+    density: Density,
+    dialogId: UUID
 ) : Dialog(
     /**
      * [Window.setClipToOutline] is only available from 22+, but the style attribute exists on 21.
@@ -217,6 +222,9 @@ private class DialogWrapper(
         window.requestFeature(Window.FEATURE_NO_TITLE)
         window.setBackgroundDrawableResource(android.R.color.transparent)
         dialogLayout = DialogLayout(context, window).apply {
+            // Set unique id for AbstractComposeView. This allows state restoration for the state
+            // defined inside the Dialog via rememberSaveable()
+            setTag(R.id.compose_view_saveable_id_tag, "Dialog:$dialogId")
             // Enable children to draw their shadow by not clipping them
             clipChildren = false
             // Allocate space for elevation
