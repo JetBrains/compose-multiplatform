@@ -117,6 +117,21 @@ interface ControlledComposition : Composition {
     fun recordModificationsOf(values: Set<Any>)
 
     /**
+     * Returns true if any of the object instances in [values] is observed by this composition.
+     * This allows detecting if values changed by a previous composition will potentially affect
+     * this composition.
+     */
+    fun observesAnyOf(values: Set<Any>): Boolean
+
+    /**
+     * Execute [block] with [isComposing] set temporarily to `true`. This allows treating
+     * invalidations reported during [prepareCompose] as if they happened while composing to avoid
+     * double invalidations when propagating changes from a parent composition while before
+     * composing the child composition.
+     */
+    fun prepareCompose(block: () -> Unit)
+
+    /**
      * Record that [value] has been read. This is used primarily by the [Recomposer] to inform the
      * composer when the a [MutableState] instance has been read implying it should be observed
      * for changes.
@@ -503,6 +518,15 @@ internal class CompositionImpl(
             }
         }
     }
+
+    override fun observesAnyOf(values: Set<Any>): Boolean {
+        for (value in values) {
+            if (value in observations) return true
+        }
+        return false
+    }
+
+    override fun prepareCompose(block: () -> Unit) = composer.prepareCompose(block)
 
     private fun addPendingInvalidationsLocked(values: Set<Any>) {
         var invalidated: HashSet<RecomposeScopeImpl>? = null

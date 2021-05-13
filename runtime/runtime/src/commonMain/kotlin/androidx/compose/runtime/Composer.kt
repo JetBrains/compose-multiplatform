@@ -2487,6 +2487,15 @@ internal class ComposerImpl(
         doCompose(invalidationsRequested, content)
     }
 
+    internal fun prepareCompose(block: () -> Unit) {
+        check(!isComposing) { "Preparing a composition while composing is not supported" }
+        isComposing = true
+        try {
+            block()
+        } finally {
+            isComposing = false
+        }
+    }
     /**
      * Synchronously recompose all invalidated groups. This collects the changes which must be
      * applied by [ControlledComposition.applyChanges] to have an effect.
@@ -2506,7 +2515,6 @@ internal class ComposerImpl(
     ) {
         check(!isComposing) { "Reentrant composition is not supported" }
         trace("Compose:recompose") {
-            invalidations.clear()
             snapshot = currentSnapshot()
             invalidationsRequested.forEach { scope ->
                 val location = scope.anchor?.location ?: return
@@ -2529,6 +2537,7 @@ internal class ComposerImpl(
                 complete = true
             } finally {
                 isComposing = false
+                invalidations.clear()
                 if (!complete) abortRoot()
             }
         }

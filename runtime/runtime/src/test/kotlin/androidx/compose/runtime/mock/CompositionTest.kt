@@ -53,7 +53,7 @@ fun compositionTest(block: suspend CompositionTestScope.() -> Unit) = runBlockin
                 composition.setContent(block)
             }
 
-            override fun advance(ignorePendingWork: Boolean): Boolean {
+            override fun advanceCount(ignorePendingWork: Boolean): Long {
                 val changeCount = recomposer.changeCount
                 Snapshot.sendApplyNotifications()
                 if (recomposer.hasPendingWork) {
@@ -62,8 +62,10 @@ fun compositionTest(block: suspend CompositionTestScope.() -> Unit) = runBlockin
                         "Potentially infinite recomposition, still recomposing after advancing"
                     }
                 }
-                return recomposer.changeCount != changeCount
+                return recomposer.changeCount - changeCount
             }
+
+            override fun advance(ignorePendingWork: Boolean) = advanceCount(ignorePendingWork) != 0L
 
             override fun verifyConsistent() {
                 (composition as? ControlledComposition)?.verifyConsistent()
@@ -93,6 +95,11 @@ interface CompositionTestScope : TestCoroutineScope {
      * advancing resulted in changes being applied.
      */
     fun advance(ignorePendingWork: Boolean = false): Boolean
+
+    /**
+     * Advance counting the number of time the recomposer ran.
+     */
+    fun advanceCount(ignorePendingWork: Boolean = false): Long
 
     /**
      * Verify the composition is well-formed.

@@ -1,33 +1,5 @@
 // Baseline format: 1.0
-AddedAbstractMethod: androidx.compose.runtime.Composer#disableReusing():
-    Added method androidx.compose.runtime.Composer.disableReusing()
-AddedAbstractMethod: androidx.compose.runtime.Composer#enableReusing():
-    Added method androidx.compose.runtime.Composer.enableReusing()
-AddedAbstractMethod: androidx.compose.runtime.Composer#endReusableGroup():
-    Added method androidx.compose.runtime.Composer.endReusableGroup()
-AddedAbstractMethod: androidx.compose.runtime.Composer#sourceInformation(String):
-    Added method androidx.compose.runtime.Composer.sourceInformation(String)
-AddedAbstractMethod: androidx.compose.runtime.Composer#sourceInformationMarkerEnd():
-    Added method androidx.compose.runtime.Composer.sourceInformationMarkerEnd()
-AddedAbstractMethod: androidx.compose.runtime.Composer#sourceInformationMarkerStart(int, String):
-    Added method androidx.compose.runtime.Composer.sourceInformationMarkerStart(int,String)
-AddedAbstractMethod: androidx.compose.runtime.Composer#startReusableGroup(int, Object):
-    Added method androidx.compose.runtime.Composer.startReusableGroup(int,Object)
-AddedAbstractMethod: androidx.compose.runtime.Composer#startReusableNode():
-    Added method androidx.compose.runtime.Composer.startReusableNode()
-
-
-RemovedMethod: androidx.compose.runtime.Composer#startMovableGroup(int, Object, String):
-    Removed method androidx.compose.runtime.Composer.startMovableGroup(int,Object,String)
-RemovedMethod: androidx.compose.runtime.Composer#startReplaceableGroup(int, String):
-    Removed method androidx.compose.runtime.Composer.startReplaceableGroup(int,String)
-RemovedMethod: androidx.compose.runtime.Composer#startRestartGroup(int, String):
-    Removed method androidx.compose.runtime.Composer.startRestartGroup(int,String)
-RemovedMethod: androidx.compose.runtime.internal.ComposableLambdaKt#composableLambda(androidx.compose.runtime.Composer, int, boolean, String, Object):
-    Removed method androidx.compose.runtime.internal.ComposableLambdaKt.composableLambda(androidx.compose.runtime.Composer,int,boolean,String,Object)
-RemovedMethod: androidx.compose.runtime.internal.ComposableLambdaKt#composableLambdaInstance(int, boolean, String, Object):
-    Removed method androidx.compose.runtime.internal.ComposableLambdaKt.composableLambdaInstance(int,boolean,String,Object)
-RemovedMethod: androidx.compose.runtime.internal.ComposableLambdaN_jvmKt#composableLambdaN(androidx.compose.runtime.Composer, int, boolean, String, int, Object):
-    Removed method androidx.compose.runtime.internal.ComposableLambdaN_jvmKt.composableLambdaN(androidx.compose.runtime.Composer,int,boolean,String,int,Object)
-RemovedMethod: androidx.compose.runtime.internal.ComposableLambdaN_jvmKt#composableLambdaNInstance(int, boolean, String, int, Object):
-    Removed method androidx.compose.runtime.internal.ComposableLambdaN_jvmKt.composableLambdaNInstance(int,boolean,String,int,Object)
+AddedAbstractMethod: androidx.compose.runtime.ControlledComposition#observesAnyOf(java.util.Set<?>):
+    Added method androidx.compose.runtime.ControlledComposition.observesAnyOf(java.util.Set<?>)
+AddedAbstractMethod: androidx.compose.runtime.ControlledComposition#prepareCompose(kotlin.jvm.functions.Function0<kotlin.Unit>):
+    Added method androidx.compose.runtime.ControlledComposition.prepareCompose(kotlin.jvm.functions.Function0<kotlin.Unit>)
