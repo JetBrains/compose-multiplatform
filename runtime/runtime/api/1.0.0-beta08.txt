@@ -181,6 +181,8 @@ package androidx.compose.runtime {
     method public boolean getHasPendingChanges();
     method public void invalidateAll();
     method public boolean isComposing();
+    method public boolean observesAnyOf(java.util.Set<?> values);
+    method public void prepareCompose(kotlin.jvm.functions.Function0<kotlin.Unit> block);
     method public boolean recompose();
     method public void recordModificationsOf(java.util.Set<?> values);
     method public void recordReadOf(Object value);

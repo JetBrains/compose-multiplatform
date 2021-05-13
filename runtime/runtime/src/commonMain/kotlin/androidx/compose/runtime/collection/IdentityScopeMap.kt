@@ -78,6 +78,11 @@ internal class IdentityScopeMap<T : Any> {
     }
 
     /**
+     * Returns true if any scopes are associated with [element]
+     */
+    operator fun contains(element: Any): Boolean = find(element) >= 0
+
+    /**
      * Executes [block] for all scopes mapped to the given [value].
      */
     inline fun forEachScopeOf(value: Any, block: (scope: T) -> Unit) {

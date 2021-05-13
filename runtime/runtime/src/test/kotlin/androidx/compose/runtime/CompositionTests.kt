@@ -2899,6 +2899,29 @@ class CompositionTests {
             assertTrue(composition.isDisposed)
         }
     }
+
+    @OptIn(ExperimentalCoroutinesApi::class)
+    @Test
+    fun testSubcomposeSingleComposition() = compositionTest {
+        var flag by mutableStateOf(true)
+        var flagCopy by mutableStateOf(true)
+        var copyValue = true
+        var rememberedValue = true
+        compose {
+            Text("Parent $flag")
+            flagCopy = flag
+            TestSubcomposition {
+                copyValue = flagCopy
+                rememberedValue = remember(flagCopy) { copyValue }
+            }
+        }
+
+        flag = false
+        val count = advanceCount()
+        assertFalse(copyValue)
+        assertFalse(rememberedValue)
+        assertEquals(1, count)
+    }
 }
 
 @OptIn(InternalComposeApi::class)
