@@ -18,6 +18,10 @@
 -dontwarn android.view.RenderNode
 -dontwarn android.view.DisplayListCanvas
 
--keepclassmember class androidx.compose.ui.platform.ViewLayerContainer {
+-keepclassmembers class androidx.compose.ui.platform.ViewLayerContainer {
     protected void dispatchGetDisplayList();
+}
+
+-keepclassmembers class androidx.compose.ui.platform.AndroidComposeView {
+    android.view.View findViewByAccessibilityIdTraversal(int);
 }
