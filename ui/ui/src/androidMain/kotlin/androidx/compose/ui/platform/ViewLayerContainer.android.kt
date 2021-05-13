@@ -19,6 +19,7 @@ package androidx.compose.ui.platform
 import android.content.Context
 import android.view.View
 import android.view.ViewGroup
+import androidx.compose.ui.R
 import androidx.compose.ui.graphics.Canvas
 import androidx.compose.ui.graphics.nativeCanvas
 
@@ -45,6 +46,9 @@ internal class ViewLayerContainer(context: Context) : DrawChildContainer(context
 internal open class DrawChildContainer(context: Context) : ViewGroup(context) {
     init {
         clipChildren = false
+
+        // Hide this view and its children in tools:
+        setTag(R.id.hide_in_inspector_tag, true)
     }
 
     override fun onLayout(changed: Boolean, l: Int, t: Int, r: Int, b: Int) {

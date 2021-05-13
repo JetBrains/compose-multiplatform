@@ -18,6 +18,7 @@ package androidx.compose.material.ripple
 
 import android.content.Context
 import android.view.ViewGroup
+import androidx.compose.ui.R
 
 /**
  * A root-level container [ViewGroup] that manages creating and assigning [RippleHostView]s used
@@ -64,6 +65,9 @@ internal class RippleContainer(context: Context) : ViewGroup(context) {
         // Since we now have an unused ripple host, the next index should be 1 - the unused host
         // will be used first.
         nextHostIndex = 1
+
+        // Hide this view and its children in tools:
+        setTag(R.id.hide_in_inspector_tag, true)
     }
 
     override fun onLayout(changed: Boolean, l: Int, t: Int, r: Int, b: Int) {
