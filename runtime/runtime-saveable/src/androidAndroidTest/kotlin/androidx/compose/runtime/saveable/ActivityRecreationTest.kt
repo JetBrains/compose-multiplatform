@@ -28,6 +28,8 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.test.R
 import androidx.compose.ui.platform.ComposeView
+import androidx.compose.ui.window.Dialog
+import androidx.compose.ui.window.Popup
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentActivity
 import androidx.lifecycle.Lifecycle
@@ -37,6 +39,7 @@ import androidx.test.filters.MediumTest
 import com.google.common.truth.Truth.assertThat
 import org.junit.Test
 import org.junit.runner.RunWith
+import kotlin.random.Random
 
 @MediumTest
 @RunWith(AndroidJUnit4::class)
@@ -215,6 +218,62 @@ class ActivityRecreationTest {
         }
     }
 
+    @Test
+    fun stateInsidePopupIsRestored() {
+        val activityScenario: ActivityScenario<PopupsRecreationTestActivity> =
+            ActivityScenario.launch(PopupsRecreationTestActivity::class.java)
+
+        activityScenario.moveToState(Lifecycle.State.RESUMED)
+
+        var initialValueInPopup1: Int? = null
+        var initialValueInPopup2: Int? = null
+
+        activityScenario.onActivity {
+            initialValueInPopup1 = it.valueInPopup1
+            initialValueInPopup2 = it.valueInPopup2
+            assertThat(initialValueInPopup1).isNotNull()
+            assertThat(initialValueInPopup2).isNotNull()
+            assertThat(initialValueInPopup1).isNotEqualTo(initialValueInPopup2)
+            it.valueInPopup1 = null
+            it.valueInPopup2 = null
+        }
+
+        activityScenario.recreate()
+
+        activityScenario.onActivity {
+            assertThat(it.valueInPopup1).isEqualTo(initialValueInPopup1)
+            assertThat(it.valueInPopup2).isEqualTo(initialValueInPopup2)
+        }
+    }
+
+    @Test
+    fun stateInsideDialogIsRestored() {
+        val activityScenario: ActivityScenario<DialogsRecreationTestActivity> =
+            ActivityScenario.launch(DialogsRecreationTestActivity::class.java)
+
+        activityScenario.moveToState(Lifecycle.State.RESUMED)
+
+        var initialValueInDialog1: Int? = null
+        var initialValueInDialog2: Int? = null
+
+        activityScenario.onActivity {
+            initialValueInDialog1 = it.valueInDialog1
+            initialValueInDialog2 = it.valueInDialog2
+            assertThat(initialValueInDialog1).isNotNull()
+            assertThat(initialValueInDialog2).isNotNull()
+            assertThat(initialValueInDialog1).isNotEqualTo(initialValueInDialog2)
+            it.valueInDialog1 = null
+            it.valueInDialog2 = null
+        }
+
+        activityScenario.recreate()
+
+        activityScenario.onActivity {
+            assertThat(it.valueInDialog1).isEqualTo(initialValueInDialog1)
+            assertThat(it.valueInDialog2).isEqualTo(initialValueInDialog2)
+        }
+    }
+
     private fun FragmentActivity.findFragment(id: Int) =
         supportFragmentManager.findFragmentById(id) as TestFragment
 }
@@ -379,6 +438,42 @@ val StateAsMapSaver = mapSaver(
         it["state"] as MutableState<Int>
     }
 )
+
+class PopupsRecreationTestActivity : BaseRestorableActivity() {
+
+    var valueInPopup1: Int? = null
+    var valueInPopup2: Int? = null
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        setContent {
+            Popup {
+                valueInPopup1 = rememberSaveable { Random.nextInt() }
+            }
+            Popup {
+                valueInPopup2 = rememberSaveable { Random.nextInt() }
+            }
+        }
+    }
+}
+
+class DialogsRecreationTestActivity : BaseRestorableActivity() {
+
+    var valueInDialog1: Int? = null
+    var valueInDialog2: Int? = null
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        setContent {
+            Dialog(onDismissRequest = {}) {
+                valueInDialog1 = rememberSaveable { Random.nextInt() }
+            }
+            Dialog(onDismissRequest = {}) {
+                valueInDialog2 = rememberSaveable { Random.nextInt() }
+            }
+        }
+    }
+}
 
 abstract class BaseRestorableActivity : FragmentActivity() {
 

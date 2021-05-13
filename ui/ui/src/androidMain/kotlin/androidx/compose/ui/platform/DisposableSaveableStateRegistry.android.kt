@@ -30,6 +30,7 @@ import androidx.compose.runtime.referentialEqualityPolicy
 import androidx.compose.runtime.saveable.SaveableStateRegistry
 import androidx.compose.runtime.snapshots.SnapshotMutableState
 import androidx.compose.runtime.structuralEqualityPolicy
+import androidx.compose.ui.R
 import androidx.savedstate.SavedStateRegistry
 import androidx.savedstate.SavedStateRegistryOwner
 import java.io.Serializable
@@ -41,13 +42,16 @@ internal fun DisposableSaveableStateRegistry(
     view: View,
     owner: SavedStateRegistryOwner
 ): DisposableSaveableStateRegistry {
-    // When AndroidComposeView is composed into some ViewGroup we just added as a child for this
-    // ViewGroup. And we don't have any id on AndroidComposeView as we can't make it unique, but
-    // we require this parent ViewGroup to have an unique id for the saved instance state mechanism
-    // to work (similarly to how it works without Compose). When we composed into Activity our
-    // parent is the ViewGroup with android.R.id.content.
-    val parentId: Int = (view.parent as? View)?.id ?: View.NO_ID
-    return DisposableSaveableStateRegistry(parentId, owner)
+    // The view id of AbstractComposeView is used as a key for SavedStateRegistryOwner. If there
+    // are multiple AbstractComposeViews in the same Activity/Fragment with the same id(or with
+    // no id) this means only the first view will restore its state. There is also an internal
+    // mechanism to provide such id not as an Int to avoid ids collisions via view's tag. This
+    // api is currently internal to compose:ui, we will see in the future if we need to make a
+    // new public api for that use case.
+    val composeView = (view.parent as View)
+    val idFromTag = composeView.getTag(R.id.compose_view_saveable_id_tag) as? String
+    val id = idFromTag ?: composeView.id.toString()
+    return DisposableSaveableStateRegistry(id, owner)
 }
 
 /**
@@ -55,18 +59,14 @@ internal fun DisposableSaveableStateRegistry(
  * saves the values when [SavedStateRegistry] performs save.
  *
  * To provide a namespace we require unique [id]. We can't use the default way of doing it when we
- * have unique id on [AndroidComposeView] because we dynamically create [AndroidComposeView]s and
+ * have unique id on [AbstractComposeView] because we dynamically create [AbstractComposeView]s and
  * there is no way to have a unique id given there are could be any number of
- * [AndroidComposeView]s inside the same Activity. If we use [View.generateViewId]
- * this id will not survive Activity recreation.
- * But it is reasonable to ask our users to have an unique id on the parent ViewGroup in which we
- * compose our [AndroidComposeView]. If Activity.setContent is used then it will be a View with
- * [android.R.id.content], if ViewGroup.setContent is used then we will ask users to provide an
- * id for this ViewGroup. If @GenerateView will be used then we will ask users to set an id on
- * this generated View.
+ * [AbstractComposeView]s inside the same Activity. If we use [View.generateViewId]
+ * this id will not survive Activity recreation. But it is reasonable to ask our users to have an
+ * unique id on [AbstractComposeView].
  */
 internal fun DisposableSaveableStateRegistry(
-    id: Int,
+    id: String,
     savedStateRegistryOwner: SavedStateRegistryOwner
 ): DisposableSaveableStateRegistry {
     val key = "${SaveableStateRegistry::class.java.simpleName}:$id"
