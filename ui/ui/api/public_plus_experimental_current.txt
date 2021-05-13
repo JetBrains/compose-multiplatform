@@ -2581,7 +2581,7 @@ package androidx.compose.ui.semantics {
     method public static androidx.compose.ui.text.AnnotatedString getEditableText(androidx.compose.ui.semantics.SemanticsPropertyReceiver);
     method public static boolean getFocused(androidx.compose.ui.semantics.SemanticsPropertyReceiver);
     method public static androidx.compose.ui.semantics.ScrollAxisRange getHorizontalScrollAxisRange(androidx.compose.ui.semantics.SemanticsPropertyReceiver);
-    method public static androidx.compose.ui.text.input.ImeAction getImeAction(androidx.compose.ui.semantics.SemanticsPropertyReceiver);
+    method public static int getImeAction(androidx.compose.ui.semantics.SemanticsPropertyReceiver);
     method public static androidx.compose.ui.semantics.LiveRegionMode getLiveRegion(androidx.compose.ui.semantics.SemanticsPropertyReceiver);
     method public static String getPaneTitle(androidx.compose.ui.semantics.SemanticsPropertyReceiver);
     method public static androidx.compose.ui.semantics.ProgressBarRangeInfo getProgressBarRangeInfo(androidx.compose.ui.semantics.SemanticsPropertyReceiver);
@@ -2612,7 +2612,7 @@ package androidx.compose.ui.semantics {
     method public static void setEditableText(androidx.compose.ui.semantics.SemanticsPropertyReceiver, androidx.compose.ui.text.AnnotatedString p);
     method public static void setFocused(androidx.compose.ui.semantics.SemanticsPropertyReceiver, boolean p);
     method public static void setHorizontalScrollAxisRange(androidx.compose.ui.semantics.SemanticsPropertyReceiver, androidx.compose.ui.semantics.ScrollAxisRange p);
-    method public static void setImeAction(androidx.compose.ui.semantics.SemanticsPropertyReceiver, androidx.compose.ui.text.input.ImeAction p);
+    method public static void setImeAction-R3uo_t0(androidx.compose.ui.semantics.SemanticsPropertyReceiver, int p);
     method public static void setLiveRegion(androidx.compose.ui.semantics.SemanticsPropertyReceiver, androidx.compose.ui.semantics.LiveRegionMode p);
     method public static void setPaneTitle(androidx.compose.ui.semantics.SemanticsPropertyReceiver, String p);
     method public static void setProgress(androidx.compose.ui.semantics.SemanticsPropertyReceiver, optional String? label, kotlin.jvm.functions.Function1<? super java.lang.Float,java.lang.Boolean>? action);

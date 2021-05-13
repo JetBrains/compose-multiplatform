@@ -1,0 +1,41 @@
+// Baseline format: 1.0
+AddedAbstractMethod: androidx.compose.ui.text.input.InputEventCallback#onImeAction-KlQnJC8(int):
+    Added method androidx.compose.ui.text.input.InputEventCallback.onImeAction-KlQnJC8(int)
+
+
+ChangedSuperclass: androidx.compose.ui.text.input.ImeAction:
+    Class androidx.compose.ui.text.input.ImeAction superclass changed from java.lang.Enum to java.lang.Object
+
+
+InvalidNullConversion: Field ImeOptions.imeAction:
+    Attempted to remove @NonNull annotation from Field ImeOptions.imeAction
+
+
+RemovedDeprecatedMethod: androidx.compose.ui.text.input.InputEventCallback#onImeAction(androidx.compose.ui.text.input.ImeAction):
+    Removed deprecated method androidx.compose.ui.text.input.InputEventCallback.onImeAction(androidx.compose.ui.text.input.ImeAction)
+
+
+RemovedField: androidx.compose.ui.text.input.ImeAction#Default:
+    Removed enum constant androidx.compose.ui.text.input.ImeAction.Default
+RemovedField: androidx.compose.ui.text.input.ImeAction#Done:
+    Removed enum constant androidx.compose.ui.text.input.ImeAction.Done
+RemovedField: androidx.compose.ui.text.input.ImeAction#Go:
+    Removed enum constant androidx.compose.ui.text.input.ImeAction.Go
+RemovedField: androidx.compose.ui.text.input.ImeAction#Next:
+    Removed enum constant androidx.compose.ui.text.input.ImeAction.Next
+RemovedField: androidx.compose.ui.text.input.ImeAction#None:
+    Removed enum constant androidx.compose.ui.text.input.ImeAction.None
+RemovedField: androidx.compose.ui.text.input.ImeAction#Previous:
+    Removed enum constant androidx.compose.ui.text.input.ImeAction.Previous
+RemovedField: androidx.compose.ui.text.input.ImeAction#Search:
+    Removed enum constant androidx.compose.ui.text.input.ImeAction.Search
+RemovedField: androidx.compose.ui.text.input.ImeAction#Send:
+    Removed enum constant androidx.compose.ui.text.input.ImeAction.Send
+
+
+RemovedMethod: androidx.compose.ui.text.input.ImeOptions#ImeOptions(boolean, androidx.compose.ui.text.input.KeyboardCapitalization, boolean, androidx.compose.ui.text.input.KeyboardType, androidx.compose.ui.text.input.ImeAction):
+    Removed constructor androidx.compose.ui.text.input.ImeOptions(boolean,androidx.compose.ui.text.input.KeyboardCapitalization,boolean,androidx.compose.ui.text.input.KeyboardType,androidx.compose.ui.text.input.ImeAction)
+RemovedMethod: androidx.compose.ui.text.input.ImeOptions#copy(boolean, androidx.compose.ui.text.input.KeyboardCapitalization, boolean, androidx.compose.ui.text.input.KeyboardType, androidx.compose.ui.text.input.ImeAction):
+    Removed method androidx.compose.ui.text.input.ImeOptions.copy(boolean,androidx.compose.ui.text.input.KeyboardCapitalization,boolean,androidx.compose.ui.text.input.KeyboardType,androidx.compose.ui.text.input.ImeAction)
+RemovedMethod: androidx.compose.ui.text.input.ImeOptions#getImeAction():
+    Removed method androidx.compose.ui.text.input.ImeOptions.getImeAction()

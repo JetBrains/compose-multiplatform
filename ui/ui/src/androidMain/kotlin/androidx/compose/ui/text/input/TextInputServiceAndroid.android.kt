@@ -254,8 +254,7 @@ internal class TextInputServiceAndroid(val view: View) : PlatformTextInputServic
             ImeAction.Search -> EditorInfo.IME_ACTION_SEARCH
             ImeAction.Send -> EditorInfo.IME_ACTION_SEND
             ImeAction.Done -> EditorInfo.IME_ACTION_DONE
-            // Note: Don't use an else in this when block. These are specified explicitly so
-            // that we don't forget to update this when imeActions are added/removed.
+            else -> error("invalid ImeAction")
         }
         when (imeOptions.keyboardType) {
             KeyboardType.Text -> outInfo.inputType = InputType.TYPE_CLASS_TEXT

@@ -1,0 +1,3 @@
+// Baseline format: 1.0
+RemovedMethod: androidx.compose.ui.test.FiltersKt#hasImeAction(androidx.compose.ui.text.input.ImeAction):
+    Removed method androidx.compose.ui.test.FiltersKt.hasImeAction(androidx.compose.ui.text.input.ImeAction)

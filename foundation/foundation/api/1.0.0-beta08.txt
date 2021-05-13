@@ -593,7 +593,7 @@ package androidx.compose.foundation.text {
   }
 
   public interface KeyboardActionScope {
-    method public void defaultKeyboardAction(androidx.compose.ui.text.input.ImeAction imeAction);
+    method public void defaultKeyboardAction-KlQnJC8(int imeAction);
   }
 
   public final class KeyboardActions {
@@ -623,15 +623,14 @@ package androidx.compose.foundation.text {
   }
 
   @androidx.compose.runtime.Immutable public final class KeyboardOptions {
-    ctor public KeyboardOptions(optional androidx.compose.ui.text.input.KeyboardCapitalization capitalization, optional boolean autoCorrect, optional androidx.compose.ui.text.input.KeyboardType keyboardType, optional androidx.compose.ui.text.input.ImeAction imeAction);
-    method public androidx.compose.foundation.text.KeyboardOptions copy(optional androidx.compose.ui.text.input.KeyboardCapitalization capitalization, optional boolean autoCorrect, optional androidx.compose.ui.text.input.KeyboardType keyboardType, optional androidx.compose.ui.text.input.ImeAction imeAction);
+    method public androidx.compose.foundation.text.KeyboardOptions copy-C1cpEnM(optional androidx.compose.ui.text.input.KeyboardCapitalization capitalization, optional boolean autoCorrect, optional androidx.compose.ui.text.input.KeyboardType keyboardType, optional int imeAction);
     method public boolean getAutoCorrect();
     method public androidx.compose.ui.text.input.KeyboardCapitalization getCapitalization();
-    method public androidx.compose.ui.text.input.ImeAction getImeAction();
+    method public int getImeAction-eUduSuo();
     method public androidx.compose.ui.text.input.KeyboardType getKeyboardType();
     property public final boolean autoCorrect;
     property public final androidx.compose.ui.text.input.KeyboardCapitalization capitalization;
-    property public final androidx.compose.ui.text.input.ImeAction imeAction;
+    property public final int imeAction;
     property public final androidx.compose.ui.text.input.KeyboardType keyboardType;
     field public static final androidx.compose.foundation.text.KeyboardOptions.Companion Companion;
   }

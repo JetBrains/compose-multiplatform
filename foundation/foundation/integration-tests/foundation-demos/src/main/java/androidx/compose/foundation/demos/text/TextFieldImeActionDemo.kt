@@ -17,16 +17,25 @@
 package androidx.compose.foundation.demos.text
 
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.text.input.ImeAction
 
 @Composable
 fun ImeActionDemo() {
     LazyColumn {
-        items(ImeAction.values()) {
-            TagLine(tag = "Ime Action: ${it.name}")
-            EditLine(imeAction = it)
-        }
+        item { Item(ImeAction.None) }
+        item { Item(ImeAction.Default) }
+        item { Item(ImeAction.Go) }
+        item { Item(ImeAction.Search) }
+        item { Item(ImeAction.Send) }
+        item { Item(ImeAction.Previous) }
+        item { Item(ImeAction.Next) }
+        item { Item(ImeAction.Done) }
     }
+}
+
+@Composable
+private fun Item(imeAction: ImeAction) {
+    TagLine(tag = "Ime Action: $imeAction")
+    EditLine(imeAction = imeAction)
 }
