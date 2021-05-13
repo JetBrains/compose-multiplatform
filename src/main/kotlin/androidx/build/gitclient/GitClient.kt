@@ -28,7 +28,7 @@ interface GitClient {
         top: String = "HEAD",
         includeUncommitted: Boolean = false
     ): List<String>
-    fun findPreviousMergeCL(): String?
+    fun findPreviousSubmittedChange(): String?
 
     fun getGitLog(
         gitCommitRange: GitCommitRange,
@@ -89,8 +89,8 @@ class GitClientImpl(
     /**
      * checks the history to find the first merge CL.
      */
-    override fun findPreviousMergeCL(): String? {
-        return commandRunner.executeAndParse(PREV_MERGE_CMD)
+    override fun findPreviousSubmittedChange(): String? {
+        return commandRunner.executeAndParse(PREVIOUS_SUBMITTED_CMD)
             .firstOrNull()
             ?.split(" ")
             ?.firstOrNull()
@@ -240,7 +240,8 @@ class GitClientImpl(
     }
 
     companion object {
-        const val PREV_MERGE_CMD = "git log -1 --merges --oneline"
+        const val PREVIOUS_SUBMITTED_CMD =
+            "git log -1 --merges --oneline --invert-grep --author=android-build-server"
         const val CHANGED_FILES_CMD_PREFIX = "git diff --name-only"
         const val GIT_LOG_CMD_PREFIX = "git log --name-only"
     }
