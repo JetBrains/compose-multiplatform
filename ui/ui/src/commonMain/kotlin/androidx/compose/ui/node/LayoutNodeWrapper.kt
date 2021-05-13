@@ -40,8 +40,10 @@ import androidx.compose.ui.layout.VerticalAlignmentLine
 import androidx.compose.ui.layout.findRoot
 import androidx.compose.ui.layout.positionInRoot
 import androidx.compose.ui.unit.Constraints
+import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.IntSize
+import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.minus
 import androidx.compose.ui.unit.plus
 
@@ -68,6 +70,8 @@ internal abstract class LayoutNodeWrapper(
 
     protected var layerBlock: (GraphicsLayerScope.() -> Unit)? = null
         private set
+    private var layerDensity: Density = layoutNode.density
+    private var layerLayoutDirection: LayoutDirection = layoutNode.layoutDirection
 
     private var _isAttached = false
     final override val isAttached: Boolean
@@ -229,8 +233,11 @@ internal abstract class LayoutNodeWrapper(
     }
 
     fun onLayerBlockUpdated(layerBlock: (GraphicsLayerScope.() -> Unit)?) {
-        val blockHasBeenChanged = this.layerBlock !== layerBlock
+        val layerInvalidated = this.layerBlock !== layerBlock || layerDensity != layoutNode
+            .density || layerLayoutDirection != layoutNode.layoutDirection
         this.layerBlock = layerBlock
+        this.layerDensity = layoutNode.density
+        this.layerLayoutDirection = layoutNode.layoutDirection
         if (isAttached && layerBlock != null) {
             if (layer == null) {
                 layer = layoutNode.requireOwner().createLayer(
@@ -243,7 +250,7 @@ internal abstract class LayoutNodeWrapper(
                 updateLayerParameters()
                 layoutNode.innerLayerWrapperIsDirty = true
                 invalidateParentLayer()
-            } else if (blockHasBeenChanged) {
+            } else if (layerInvalidated) {
                 updateLayerParameters()
             }
         } else {
@@ -282,7 +289,8 @@ internal abstract class LayoutNodeWrapper(
                 transformOrigin = graphicsLayerScope.transformOrigin,
                 shape = graphicsLayerScope.shape,
                 clip = graphicsLayerScope.clip,
-                layoutDirection = layoutNode.layoutDirection
+                layoutDirection = layoutNode.layoutDirection,
+                density = layoutNode.density
             )
             isClipping = graphicsLayerScope.clip
         } else {

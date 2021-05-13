@@ -22,16 +22,17 @@ import androidx.annotation.RequiresApi
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.geometry.MutableRect
 import androidx.compose.ui.geometry.Offset
-import androidx.compose.ui.graphics.TransformOrigin
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Canvas
 import androidx.compose.ui.graphics.CanvasHolder
 import androidx.compose.ui.graphics.Matrix
 import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.graphics.Shape
+import androidx.compose.ui.graphics.TransformOrigin
 import androidx.compose.ui.graphics.nativeCanvas
 import androidx.compose.ui.graphics.setFrom
 import androidx.compose.ui.node.OwnedLayer
+import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.LayoutDirection
@@ -104,7 +105,8 @@ internal class RenderNodeLayer(
         transformOrigin: TransformOrigin,
         shape: Shape,
         clip: Boolean,
-        layoutDirection: LayoutDirection
+        layoutDirection: LayoutDirection,
+        density: Density
     ) {
         this.transformOrigin = transformOrigin
         val wasClippingManually = renderNode.clipToOutline && outlineResolver.clipPath != null
@@ -127,7 +129,8 @@ internal class RenderNodeLayer(
             renderNode.alpha,
             renderNode.clipToOutline,
             renderNode.elevation,
-            layoutDirection
+            layoutDirection,
+            density
         )
         renderNode.setOutline(outlineResolver.outline)
         val isClippingManually = renderNode.clipToOutline && outlineResolver.clipPath != null
