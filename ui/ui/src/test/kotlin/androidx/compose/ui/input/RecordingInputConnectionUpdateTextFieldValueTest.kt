@@ -67,6 +67,22 @@ class RecordingInputConnectionUpdateTextFieldValueTest {
     }
 
     @Test
+    fun test_update_input_state_inactive() {
+        val imm: InputMethodManager = mock()
+        val view: View = mock()
+
+        val previousTextFieldValue = ic.mTextFieldValue
+        ic.closeConnection()
+
+        val inputState = TextFieldValue(text = "Hello, World.", selection = TextRange.Zero)
+        ic.updateInputState(inputState, imm, view)
+
+        assertEquals(previousTextFieldValue, ic.mTextFieldValue)
+        verify(imm, never()).updateSelection(any(), any(), any(), any(), any())
+        verify(imm, never()).updateExtractedText(any(), any(), any())
+    }
+
+    @Test
     fun test_update_input_state_extracted_text_monitor() {
         val imm: InputMethodManager = mock()
         val view: View = mock()
