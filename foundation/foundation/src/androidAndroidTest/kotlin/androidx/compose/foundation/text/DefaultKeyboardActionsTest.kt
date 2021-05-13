@@ -29,14 +29,12 @@ import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.performImeAction
-import androidx.compose.ui.text.input.ImeAction.Default
-import androidx.compose.ui.text.input.ImeAction.None
-import androidx.compose.ui.text.input.ImeAction.Go
-import androidx.compose.ui.text.input.ImeAction.Search
-import androidx.compose.ui.text.input.ImeAction.Send
-import androidx.compose.ui.text.input.ImeAction.Previous
-import androidx.compose.ui.text.input.ImeAction.Next
-import androidx.compose.ui.text.input.ImeAction.Done
+import androidx.compose.ui.text.input.ImeAction.Companion.Go
+import androidx.compose.ui.text.input.ImeAction.Companion.Search
+import androidx.compose.ui.text.input.ImeAction.Companion.Send
+import androidx.compose.ui.text.input.ImeAction.Companion.Previous
+import androidx.compose.ui.text.input.ImeAction.Companion.Next
+import androidx.compose.ui.text.input.ImeAction.Companion.Done
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.ImeOptions
 import androidx.compose.ui.text.input.TextFieldValue
@@ -51,15 +49,25 @@ import org.junit.runners.Parameterized
 @ExperimentalComposeUiApi
 @LargeTest
 @RunWith(Parameterized::class)
-class DefaultKeyboardActionsTest(private val imeAction: ImeAction) {
+class DefaultKeyboardActionsTest(param: Param) {
     @get:Rule
     val rule = createComposeRule()
+
+    // We need to wrap the inline class parameter in another class because Java can't instantiate
+    // the inline class.
+    class Param(val imeAction: ImeAction) {
+        override fun toString() = imeAction.toString()
+    }
+
+    private val imeAction = param.imeAction
 
     companion object {
         @JvmStatic
         @Parameterized.Parameters(name = "ImeAction = {0}")
-        fun initParameters() = ImeAction.values()
-            .filter { it != Default && it != None } // OS never shows a Default or None ImeAction.
+        fun initParameters() = listOf(
+            // OS never shows a Default or None ImeAction.
+            Param(Go), Param(Search), Param(Send), Param(Previous), Param(Next), Param(Done)
+        )
     }
 
     @Test
