@@ -63,14 +63,6 @@ data class JavaCompileInputs(
                 })
             )
             val dependencyClasspath = sourceSet.compileClasspath
-            return fromSourcesAndDeps(sourcePaths, dependencyClasspath, project)
-        }
-
-        fun fromSourcesAndDeps(
-            sourcePaths: FileCollection,
-            dependencyClasspath: FileCollection,
-            project: Project
-        ): JavaCompileInputs {
             return JavaCompileInputs(sourcePaths, dependencyClasspath, androidJarFile(project))
         }
 

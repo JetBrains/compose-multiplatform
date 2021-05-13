@@ -75,10 +75,10 @@ abstract class GenerateApiTask @Inject constructor(
         check(bootClasspath.files.isNotEmpty()) { "Android boot classpath not set." }
         check(sourcePaths.files.isNotEmpty()) { "Source paths not set." }
 
-        val inputs = JavaCompileInputs.fromSourcesAndDeps(
+        val inputs = JavaCompileInputs(
             sourcePaths,
             dependencyClasspath,
-            project
+            bootClasspath
         )
         generateApi(
             metalavaClasspath,
