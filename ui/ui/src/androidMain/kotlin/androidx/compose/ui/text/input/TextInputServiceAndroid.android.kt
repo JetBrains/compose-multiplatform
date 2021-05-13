@@ -49,7 +49,9 @@ internal class TextInputServiceAndroid(val view: View) : PlatformTextInputServic
     private var onEditCommand: (List<EditCommand>) -> Unit = {}
     private var onImeActionPerformed: (ImeAction) -> Unit = {}
 
-    private var state = TextFieldValue(text = "", selection = TextRange.Zero)
+    // Visible for testing
+    internal var state = TextFieldValue(text = "", selection = TextRange.Zero)
+        private set
     private var imeOptions = ImeOptions.Default
     private var ic: RecordingInputConnection? = null
     // used for sendKeyEvent delegation
@@ -187,14 +189,14 @@ internal class TextInputServiceAndroid(val view: View) : PlatformTextInputServic
             Log.d(TAG, "$DEBUG_CLASS.updateState called: $oldValue -> $newValue")
         }
 
+        this.state = newValue
         // update the latest TextFieldValue in InputConnection
         ic?.mTextFieldValue = newValue
 
-        if (DEBUG) { Log.d(TAG, "$DEBUG_CLASS.updateState early return") }
-
-        if (oldValue == newValue) return
-
-        this.state = newValue
+        if (oldValue == newValue) {
+            if (DEBUG) { Log.d(TAG, "$DEBUG_CLASS.updateState early return") }
+            return
+        }
 
         val restartInput = oldValue?.let {
             it.text != newValue.text ||

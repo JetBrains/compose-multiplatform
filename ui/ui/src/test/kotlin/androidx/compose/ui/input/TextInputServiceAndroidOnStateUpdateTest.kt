@@ -75,6 +75,7 @@ class TextInputServiceAndroidOnStateUpdateTest {
         verify(imm, never()).updateSelection(any(), any(), any(), any(), any())
 
         assertThat(inputConnection.mTextFieldValue).isEqualTo(newValue)
+        assertThat(textInputService.state).isEqualTo(newValue)
     }
 
     @Test
@@ -89,6 +90,7 @@ class TextInputServiceAndroidOnStateUpdateTest {
         verify(imm, never()).updateSelection(any(), any(), any(), any(), any())
 
         assertThat(inputConnection.mTextFieldValue).isEqualTo(newValue)
+        assertThat(textInputService.state).isEqualTo(newValue)
     }
 
     @Test
@@ -103,6 +105,7 @@ class TextInputServiceAndroidOnStateUpdateTest {
         verify(imm, times(1)).updateSelection(any(), any(), any(), any(), any())
 
         assertThat(inputConnection.mTextFieldValue).isEqualTo(newValue)
+        assertThat(textInputService.state).isEqualTo(newValue)
     }
 
     @Test
@@ -117,6 +120,7 @@ class TextInputServiceAndroidOnStateUpdateTest {
         verify(imm, times(1)).updateSelection(any(), any(), any(), any(), any())
 
         assertThat(inputConnection.mTextFieldValue).isEqualTo(newValue)
+        assertThat(textInputService.state).isEqualTo(newValue)
     }
 
     @Test
@@ -129,6 +133,25 @@ class TextInputServiceAndroidOnStateUpdateTest {
 
         verify(imm, never()).restartInput(any())
         verify(imm, never()).updateSelection(any(), any(), any(), any(), any())
+
+        assertThat(inputConnection.mTextFieldValue).isEqualTo(value)
+        assertThat(textInputService.state).isEqualTo(value)
+    }
+
+    @Test
+    fun onUpdateState_recreateInputConnection_createsWithCorrectValue() {
+        val value = TextFieldValue("a")
+        textInputService.updateState(
+            oldValue = value,
+            newValue = value
+        )
+
+        verify(imm, never()).restartInput(any())
+        verify(imm, never()).updateSelection(any(), any(), any(), any(), any())
+
+        // recreate the connection
+        inputConnection = textInputService.createInputConnection(EditorInfo())
+            as RecordingInputConnection
 
         assertThat(inputConnection.mTextFieldValue).isEqualTo(value)
     }
