@@ -214,7 +214,7 @@ fun generateApi(
 // Gets arguments for generating the specified api file
 private fun generateApi(
     metalavaClasspath: FileCollection,
-    bootClasspath: Collection<File>,
+    bootClasspath: FileCollection,
     dependencyClasspath: FileCollection,
     sourcePaths: Collection<File>,
     outputLocation: ApiLocation,
@@ -232,7 +232,7 @@ private fun generateApi(
 
 // Generates the specified api file
 fun getGenerateApiArgs(
-    bootClasspath: Collection<File>,
+    bootClasspath: FileCollection,
     dependencyClasspath: FileCollection,
     sourcePaths: Collection<File>,
     outputLocation: ApiLocation?,
@@ -243,7 +243,7 @@ fun getGenerateApiArgs(
     // generate public API txt
     val args = mutableListOf(
         "--classpath",
-        (bootClasspath + dependencyClasspath.files).joinToString(File.pathSeparator),
+        (bootClasspath.files + dependencyClasspath.files).joinToString(File.pathSeparator),
 
         "--source-path",
         sourcePaths.filter { it.exists() }.joinToString(File.pathSeparator),

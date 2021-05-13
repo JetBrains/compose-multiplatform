@@ -161,7 +161,6 @@ fun Project.configureProjectForApiTasks(
                 } ?: return@afterEvaluate
 
                 javaInputs = JavaCompileInputs.fromLibraryVariant(
-                    config.library,
                     variant,
                     project
                 )

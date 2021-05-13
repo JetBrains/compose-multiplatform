@@ -71,7 +71,7 @@ abstract class CheckApiCompatibilityTask @Inject constructor(
 
     @TaskAction
     fun exec() {
-        check(bootClasspath.isNotEmpty()) { "Android boot classpath not set." }
+        check(bootClasspath.files.isNotEmpty()) { "Android boot classpath not set." }
 
         val apiLocation = api.get()
         val referenceApiLocation = referenceApi.get()
