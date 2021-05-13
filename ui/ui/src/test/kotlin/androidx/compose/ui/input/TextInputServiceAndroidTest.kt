@@ -28,12 +28,10 @@ import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.input.TextInputServiceAndroid
+import com.google.common.truth.Truth.assertThat
 import com.nhaarman.mockitokotlin2.eq
 import com.nhaarman.mockitokotlin2.mock
 import com.nhaarman.mockitokotlin2.whenever
-import org.junit.Assert.assertEquals
-import org.junit.Assert.assertFalse
-import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -69,11 +67,11 @@ class TextInputServiceAndroidTest {
 
         EditorInfo().let { info ->
             textInputService.createInputConnection(info)
-            assertTrue((InputType.TYPE_CLASS_TEXT and info.inputType) != 0)
-            assertTrue(
+            assertThat((InputType.TYPE_CLASS_TEXT and info.inputType) != 0).isTrue()
+            assertThat(
                 (EditorInfo.IME_MASK_ACTION and info.imeOptions)
                     == EditorInfo.IME_ACTION_UNSPECIFIED
-            )
+            ).isTrue()
         }
     }
 
@@ -91,12 +89,12 @@ class TextInputServiceAndroidTest {
 
         EditorInfo().let { info ->
             textInputService.createInputConnection(info)
-            assertTrue((InputType.TYPE_CLASS_TEXT and info.inputType) != 0)
-            assertTrue((EditorInfo.IME_FLAG_FORCE_ASCII and info.imeOptions) != 0)
-            assertTrue(
+            assertThat((InputType.TYPE_CLASS_TEXT and info.inputType) != 0).isTrue()
+            assertThat((EditorInfo.IME_FLAG_FORCE_ASCII and info.imeOptions) != 0).isTrue()
+            assertThat(
                 (EditorInfo.IME_MASK_ACTION and info.imeOptions)
                     == EditorInfo.IME_ACTION_UNSPECIFIED
-            )
+            ).isTrue()
         }
     }
 
@@ -114,11 +112,11 @@ class TextInputServiceAndroidTest {
 
         EditorInfo().let { info ->
             textInputService.createInputConnection(info)
-            assertTrue((InputType.TYPE_CLASS_NUMBER and info.inputType) != 0)
-            assertTrue(
+            assertThat((InputType.TYPE_CLASS_NUMBER and info.inputType) != 0).isTrue()
+            assertThat(
                 (EditorInfo.IME_MASK_ACTION and info.imeOptions)
                     == EditorInfo.IME_ACTION_UNSPECIFIED
-            )
+            ).isTrue()
         }
     }
 
@@ -136,11 +134,11 @@ class TextInputServiceAndroidTest {
 
         EditorInfo().let { info ->
             textInputService.createInputConnection(info)
-            assertTrue((InputType.TYPE_CLASS_PHONE and info.inputType) != 0)
-            assertTrue(
+            assertThat((InputType.TYPE_CLASS_PHONE and info.inputType) != 0).isTrue()
+            assertThat(
                 (EditorInfo.IME_MASK_ACTION and info.imeOptions)
                     == EditorInfo.IME_ACTION_UNSPECIFIED
-            )
+            ).isTrue()
         }
     }
 
@@ -158,12 +156,12 @@ class TextInputServiceAndroidTest {
 
         EditorInfo().let { info ->
             textInputService.createInputConnection(info)
-            assertTrue((InputType.TYPE_CLASS_TEXT and info.inputType) != 0)
-            assertTrue((InputType.TYPE_TEXT_VARIATION_URI and info.inputType) != 0)
-            assertTrue(
+            assertThat((InputType.TYPE_CLASS_TEXT and info.inputType) != 0).isTrue()
+            assertThat((InputType.TYPE_TEXT_VARIATION_URI and info.inputType) != 0).isTrue()
+            assertThat(
                 (EditorInfo.IME_MASK_ACTION and info.imeOptions)
                     == EditorInfo.IME_ACTION_UNSPECIFIED
-            )
+            ).isTrue()
         }
     }
 
@@ -181,12 +179,13 @@ class TextInputServiceAndroidTest {
 
         EditorInfo().let { info ->
             textInputService.createInputConnection(info)
-            assertTrue((InputType.TYPE_CLASS_TEXT and info.inputType) != 0)
-            assertTrue((InputType.TYPE_TEXT_VARIATION_EMAIL_ADDRESS and info.inputType) != 0)
-            assertTrue(
+            assertThat((InputType.TYPE_CLASS_TEXT and info.inputType) != 0).isTrue()
+            assertThat((InputType.TYPE_TEXT_VARIATION_EMAIL_ADDRESS and info.inputType) != 0)
+                .isTrue()
+            assertThat(
                 (EditorInfo.IME_MASK_ACTION and info.imeOptions)
                     == EditorInfo.IME_ACTION_UNSPECIFIED
-            )
+            ).isTrue()
         }
     }
 
@@ -204,12 +203,12 @@ class TextInputServiceAndroidTest {
 
         EditorInfo().let { info ->
             textInputService.createInputConnection(info)
-            assertTrue((InputType.TYPE_CLASS_TEXT and info.inputType) != 0)
-            assertTrue((InputType.TYPE_TEXT_VARIATION_PASSWORD and info.inputType) != 0)
-            assertTrue(
+            assertThat((InputType.TYPE_CLASS_TEXT and info.inputType) != 0).isTrue()
+            assertThat((InputType.TYPE_TEXT_VARIATION_PASSWORD and info.inputType) != 0).isTrue()
+            assertThat(
                 (EditorInfo.IME_MASK_ACTION and info.imeOptions)
                     == EditorInfo.IME_ACTION_UNSPECIFIED
-            )
+            ).isTrue()
         }
     }
 
@@ -227,12 +226,12 @@ class TextInputServiceAndroidTest {
 
         EditorInfo().let { info ->
             textInputService.createInputConnection(info)
-            assertTrue((InputType.TYPE_CLASS_NUMBER and info.inputType) != 0)
-            assertTrue((InputType.TYPE_NUMBER_VARIATION_PASSWORD and info.inputType) != 0)
-            assertTrue(
+            assertThat((InputType.TYPE_CLASS_NUMBER and info.inputType) != 0).isTrue()
+            assertThat((InputType.TYPE_NUMBER_VARIATION_PASSWORD and info.inputType) != 0).isTrue()
+            assertThat(
                 (EditorInfo.IME_MASK_ACTION and info.imeOptions)
                     == EditorInfo.IME_ACTION_UNSPECIFIED
-            )
+            ).isTrue()
         }
     }
 
@@ -250,12 +249,12 @@ class TextInputServiceAndroidTest {
 
         EditorInfo().let { info ->
             textInputService.createInputConnection(info)
-            assertTrue((InputType.TYPE_CLASS_TEXT and info.inputType) != 0)
-            assertTrue((EditorInfo.IME_FLAG_FORCE_ASCII and info.imeOptions) != 0)
-            assertTrue(
+            assertThat((InputType.TYPE_CLASS_TEXT and info.inputType) != 0).isTrue()
+            assertThat((EditorInfo.IME_FLAG_FORCE_ASCII and info.imeOptions) != 0).isTrue()
+            assertThat(
                 (EditorInfo.IME_MASK_ACTION and info.imeOptions)
                     == EditorInfo.IME_ACTION_NONE
-            )
+            ).isTrue()
         }
     }
 
@@ -273,12 +272,12 @@ class TextInputServiceAndroidTest {
 
         EditorInfo().let { info ->
             textInputService.createInputConnection(info)
-            assertTrue((InputType.TYPE_CLASS_TEXT and info.inputType) != 0)
-            assertTrue((EditorInfo.IME_FLAG_FORCE_ASCII and info.imeOptions) != 0)
-            assertTrue(
+            assertThat((InputType.TYPE_CLASS_TEXT and info.inputType) != 0).isTrue()
+            assertThat((EditorInfo.IME_FLAG_FORCE_ASCII and info.imeOptions) != 0).isTrue()
+            assertThat(
                 (EditorInfo.IME_MASK_ACTION and info.imeOptions)
                     == EditorInfo.IME_ACTION_GO
-            )
+            ).isTrue()
         }
     }
 
@@ -296,12 +295,12 @@ class TextInputServiceAndroidTest {
 
         EditorInfo().let { info ->
             textInputService.createInputConnection(info)
-            assertTrue((InputType.TYPE_CLASS_TEXT and info.inputType) != 0)
-            assertTrue((EditorInfo.IME_FLAG_FORCE_ASCII and info.imeOptions) != 0)
-            assertTrue(
+            assertThat((InputType.TYPE_CLASS_TEXT and info.inputType) != 0).isTrue()
+            assertThat((EditorInfo.IME_FLAG_FORCE_ASCII and info.imeOptions) != 0).isTrue()
+            assertThat(
                 (EditorInfo.IME_MASK_ACTION and info.imeOptions)
                     == EditorInfo.IME_ACTION_NEXT
-            )
+            ).isTrue()
         }
     }
 
@@ -319,12 +318,12 @@ class TextInputServiceAndroidTest {
 
         EditorInfo().let { info ->
             textInputService.createInputConnection(info)
-            assertTrue((InputType.TYPE_CLASS_TEXT and info.inputType) != 0)
-            assertTrue((EditorInfo.IME_FLAG_FORCE_ASCII and info.imeOptions) != 0)
-            assertTrue(
+            assertThat((InputType.TYPE_CLASS_TEXT and info.inputType) != 0).isTrue()
+            assertThat((EditorInfo.IME_FLAG_FORCE_ASCII and info.imeOptions) != 0).isTrue()
+            assertThat(
                 (EditorInfo.IME_MASK_ACTION and info.imeOptions)
                     == EditorInfo.IME_ACTION_PREVIOUS
-            )
+            ).isTrue()
         }
     }
 
@@ -342,12 +341,12 @@ class TextInputServiceAndroidTest {
 
         EditorInfo().let { info ->
             textInputService.createInputConnection(info)
-            assertTrue((InputType.TYPE_CLASS_TEXT and info.inputType) != 0)
-            assertTrue((EditorInfo.IME_FLAG_FORCE_ASCII and info.imeOptions) != 0)
-            assertTrue(
+            assertThat((InputType.TYPE_CLASS_TEXT and info.inputType) != 0).isTrue()
+            assertThat((EditorInfo.IME_FLAG_FORCE_ASCII and info.imeOptions) != 0).isTrue()
+            assertThat(
                 (EditorInfo.IME_MASK_ACTION and info.imeOptions)
                     == EditorInfo.IME_ACTION_SEARCH
-            )
+            ).isTrue()
         }
     }
 
@@ -365,12 +364,12 @@ class TextInputServiceAndroidTest {
 
         EditorInfo().let { info ->
             textInputService.createInputConnection(info)
-            assertTrue((InputType.TYPE_CLASS_TEXT and info.inputType) != 0)
-            assertTrue((EditorInfo.IME_FLAG_FORCE_ASCII and info.imeOptions) != 0)
-            assertTrue(
+            assertThat((InputType.TYPE_CLASS_TEXT and info.inputType) != 0).isTrue()
+            assertThat((EditorInfo.IME_FLAG_FORCE_ASCII and info.imeOptions) != 0).isTrue()
+            assertThat(
                 (EditorInfo.IME_MASK_ACTION and info.imeOptions)
                     == EditorInfo.IME_ACTION_SEND
-            )
+            ).isTrue()
         }
     }
 
@@ -388,12 +387,12 @@ class TextInputServiceAndroidTest {
 
         EditorInfo().let { info ->
             textInputService.createInputConnection(info)
-            assertTrue((InputType.TYPE_CLASS_TEXT and info.inputType) != 0)
-            assertTrue((EditorInfo.IME_FLAG_FORCE_ASCII and info.imeOptions) != 0)
-            assertTrue(
+            assertThat((InputType.TYPE_CLASS_TEXT and info.inputType) != 0).isTrue()
+            assertThat((EditorInfo.IME_FLAG_FORCE_ASCII and info.imeOptions) != 0).isTrue()
+            assertThat(
                 (EditorInfo.IME_MASK_ACTION and info.imeOptions)
                     == EditorInfo.IME_ACTION_DONE
-            )
+            ).isTrue()
         }
     }
 
@@ -412,8 +411,8 @@ class TextInputServiceAndroidTest {
 
         EditorInfo().let { info ->
             textInputService.createInputConnection(info)
-            assertFalse((InputType.TYPE_TEXT_FLAG_MULTI_LINE and info.inputType) == 0)
-            assertTrue((EditorInfo.IME_FLAG_NO_ENTER_ACTION and info.imeOptions) == 0)
+            assertThat((InputType.TYPE_TEXT_FLAG_MULTI_LINE and info.inputType) == 0).isFalse()
+            assertThat((EditorInfo.IME_FLAG_NO_ENTER_ACTION and info.imeOptions) == 0).isTrue()
         }
     }
 
@@ -432,8 +431,8 @@ class TextInputServiceAndroidTest {
 
         EditorInfo().let { info ->
             textInputService.createInputConnection(info)
-            assertFalse((InputType.TYPE_TEXT_FLAG_MULTI_LINE and info.inputType) == 0)
-            assertFalse((EditorInfo.IME_FLAG_NO_ENTER_ACTION and info.imeOptions) == 0)
+            assertThat((InputType.TYPE_TEXT_FLAG_MULTI_LINE and info.inputType) == 0).isFalse()
+            assertThat((EditorInfo.IME_FLAG_NO_ENTER_ACTION and info.imeOptions) == 0).isFalse()
         }
     }
 
@@ -452,8 +451,8 @@ class TextInputServiceAndroidTest {
 
         EditorInfo().let { info ->
             textInputService.createInputConnection(info)
-            assertTrue((InputType.TYPE_TEXT_FLAG_MULTI_LINE and info.inputType) == 0)
-            assertTrue((EditorInfo.IME_FLAG_NO_ENTER_ACTION and info.imeOptions) == 0)
+            assertThat((InputType.TYPE_TEXT_FLAG_MULTI_LINE and info.inputType) == 0).isTrue()
+            assertThat((EditorInfo.IME_FLAG_NO_ENTER_ACTION and info.imeOptions) == 0).isTrue()
         }
     }
 
@@ -472,8 +471,8 @@ class TextInputServiceAndroidTest {
 
         EditorInfo().let { info ->
             textInputService.createInputConnection(info)
-            assertFalse((EditorInfo.IME_ACTION_DONE and info.imeOptions) == 0)
-            assertTrue((EditorInfo.IME_ACTION_UNSPECIFIED and info.imeOptions) == 0)
+            assertThat((EditorInfo.IME_ACTION_DONE and info.imeOptions) == 0).isFalse()
+            assertThat((EditorInfo.IME_ACTION_UNSPECIFIED and info.imeOptions) == 0).isTrue()
         }
     }
 
@@ -492,8 +491,8 @@ class TextInputServiceAndroidTest {
 
         EditorInfo().let { info ->
             textInputService.createInputConnection(info)
-            assertTrue((InputType.TYPE_TEXT_FLAG_MULTI_LINE and info.inputType) == 0)
-            assertTrue((EditorInfo.IME_FLAG_NO_ENTER_ACTION and info.imeOptions) == 0)
+            assertThat((InputType.TYPE_TEXT_FLAG_MULTI_LINE and info.inputType) == 0).isTrue()
+            assertThat((EditorInfo.IME_FLAG_NO_ENTER_ACTION and info.imeOptions) == 0).isTrue()
         }
     }
 
@@ -512,9 +511,9 @@ class TextInputServiceAndroidTest {
 
         EditorInfo().let { info ->
             textInputService.createInputConnection(info)
-            assertTrue((InputType.TYPE_TEXT_FLAG_CAP_CHARACTERS and info.inputType) == 0)
-            assertTrue((InputType.TYPE_TEXT_FLAG_CAP_WORDS and info.inputType) == 0)
-            assertTrue((InputType.TYPE_TEXT_FLAG_CAP_SENTENCES and info.inputType) == 0)
+            assertThat((InputType.TYPE_TEXT_FLAG_CAP_CHARACTERS and info.inputType) == 0).isTrue()
+            assertThat((InputType.TYPE_TEXT_FLAG_CAP_WORDS and info.inputType) == 0).isTrue()
+            assertThat((InputType.TYPE_TEXT_FLAG_CAP_SENTENCES and info.inputType) == 0).isTrue()
         }
     }
 
@@ -533,9 +532,9 @@ class TextInputServiceAndroidTest {
 
         EditorInfo().let { info ->
             textInputService.createInputConnection(info)
-            assertFalse((InputType.TYPE_TEXT_FLAG_CAP_CHARACTERS and info.inputType) == 0)
-            assertTrue((InputType.TYPE_TEXT_FLAG_CAP_WORDS and info.inputType) == 0)
-            assertTrue((InputType.TYPE_TEXT_FLAG_CAP_SENTENCES and info.inputType) == 0)
+            assertThat((InputType.TYPE_TEXT_FLAG_CAP_CHARACTERS and info.inputType) == 0).isFalse()
+            assertThat((InputType.TYPE_TEXT_FLAG_CAP_WORDS and info.inputType) == 0).isTrue()
+            assertThat((InputType.TYPE_TEXT_FLAG_CAP_SENTENCES and info.inputType) == 0).isTrue()
         }
     }
 
@@ -554,9 +553,9 @@ class TextInputServiceAndroidTest {
 
         EditorInfo().let { info ->
             textInputService.createInputConnection(info)
-            assertTrue((InputType.TYPE_TEXT_FLAG_CAP_CHARACTERS and info.inputType) == 0)
-            assertFalse((InputType.TYPE_TEXT_FLAG_CAP_WORDS and info.inputType) == 0)
-            assertTrue((InputType.TYPE_TEXT_FLAG_CAP_SENTENCES and info.inputType) == 0)
+            assertThat((InputType.TYPE_TEXT_FLAG_CAP_CHARACTERS and info.inputType) == 0).isTrue()
+            assertThat((InputType.TYPE_TEXT_FLAG_CAP_WORDS and info.inputType) == 0).isFalse()
+            assertThat((InputType.TYPE_TEXT_FLAG_CAP_SENTENCES and info.inputType) == 0).isTrue()
         }
     }
 
@@ -575,9 +574,9 @@ class TextInputServiceAndroidTest {
 
         EditorInfo().let { info ->
             textInputService.createInputConnection(info)
-            assertTrue((InputType.TYPE_TEXT_FLAG_CAP_CHARACTERS and info.inputType) == 0)
-            assertTrue((InputType.TYPE_TEXT_FLAG_CAP_WORDS and info.inputType) == 0)
-            assertFalse((InputType.TYPE_TEXT_FLAG_CAP_SENTENCES and info.inputType) == 0)
+            assertThat((InputType.TYPE_TEXT_FLAG_CAP_CHARACTERS and info.inputType) == 0).isTrue()
+            assertThat((InputType.TYPE_TEXT_FLAG_CAP_WORDS and info.inputType) == 0).isTrue()
+            assertThat((InputType.TYPE_TEXT_FLAG_CAP_SENTENCES and info.inputType) == 0).isFalse()
         }
     }
 
@@ -596,9 +595,9 @@ class TextInputServiceAndroidTest {
 
         EditorInfo().let { info ->
             textInputService.createInputConnection(info)
-            assertTrue((InputType.TYPE_TEXT_FLAG_CAP_CHARACTERS and info.inputType) == 0)
-            assertTrue((InputType.TYPE_TEXT_FLAG_CAP_WORDS and info.inputType) == 0)
-            assertTrue((InputType.TYPE_TEXT_FLAG_CAP_SENTENCES and info.inputType) == 0)
+            assertThat((InputType.TYPE_TEXT_FLAG_CAP_CHARACTERS and info.inputType) == 0).isTrue()
+            assertThat((InputType.TYPE_TEXT_FLAG_CAP_WORDS and info.inputType) == 0).isTrue()
+            assertThat((InputType.TYPE_TEXT_FLAG_CAP_SENTENCES and info.inputType) == 0).isTrue()
         }
     }
 
@@ -617,7 +616,7 @@ class TextInputServiceAndroidTest {
 
         EditorInfo().let { info ->
             textInputService.createInputConnection(info)
-            assertFalse((InputType.TYPE_TEXT_FLAG_AUTO_CORRECT and info.inputType) == 0)
+            assertThat((InputType.TYPE_TEXT_FLAG_AUTO_CORRECT and info.inputType) == 0).isFalse()
         }
     }
 
@@ -636,7 +635,7 @@ class TextInputServiceAndroidTest {
 
         EditorInfo().let { info ->
             textInputService.createInputConnection(info)
-            assertTrue((InputType.TYPE_TEXT_FLAG_AUTO_CORRECT and info.inputType) == 0)
+            assertThat((InputType.TYPE_TEXT_FLAG_AUTO_CORRECT and info.inputType) == 0).isTrue()
         }
     }
 
@@ -655,7 +654,7 @@ class TextInputServiceAndroidTest {
 
         EditorInfo().let { info ->
             textInputService.createInputConnection(info)
-            assertTrue((InputType.TYPE_TEXT_FLAG_AUTO_CORRECT and info.inputType) == 0)
+            assertThat((InputType.TYPE_TEXT_FLAG_AUTO_CORRECT and info.inputType) == 0).isTrue()
         }
     }
 
@@ -670,8 +669,8 @@ class TextInputServiceAndroidTest {
 
         EditorInfo().let { info ->
             textInputService.createInputConnection(info)
-            assertEquals(info.initialSelStart, 0)
-            assertEquals(info.initialSelEnd, 0)
+            assertThat(info.initialSelStart).isEqualTo(0)
+            assertThat(info.initialSelEnd).isEqualTo(0)
         }
     }
 
@@ -687,8 +686,8 @@ class TextInputServiceAndroidTest {
 
         EditorInfo().let { info ->
             textInputService.createInputConnection(info)
-            assertEquals(info.initialSelStart, selection.start)
-            assertEquals(info.initialSelEnd, selection.end)
+            assertThat(info.initialSelStart).isEqualTo(selection.start)
+            assertThat(info.initialSelEnd).isEqualTo(selection.end)
         }
     }
 }

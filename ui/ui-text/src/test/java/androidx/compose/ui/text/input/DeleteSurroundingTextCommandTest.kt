@@ -17,8 +17,7 @@
 package androidx.compose.ui.text.input
 
 import androidx.compose.ui.text.TextRange
-import org.junit.Assert.assertEquals
-import org.junit.Assert.assertFalse
+import com.google.common.truth.Truth.assertThat
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.junit.runners.JUnit4
@@ -32,9 +31,9 @@ class DeleteSurroundingTextCommandTest {
 
         DeleteSurroundingTextCommand(0, 1).applyTo(eb)
 
-        assertEquals("ACDE", eb.toString())
-        assertEquals(1, eb.cursor)
-        assertFalse(eb.hasComposition())
+        assertThat(eb.toString()).isEqualTo("ACDE")
+        assertThat(eb.cursor).isEqualTo(1)
+        assertThat(eb.hasComposition()).isFalse()
     }
 
     @Test
@@ -43,9 +42,9 @@ class DeleteSurroundingTextCommandTest {
 
         DeleteSurroundingTextCommand(1, 0).applyTo(eb)
 
-        assertEquals("BCDE", eb.toString())
-        assertEquals(0, eb.cursor)
-        assertFalse(eb.hasComposition())
+        assertThat(eb.toString()).isEqualTo("BCDE")
+        assertThat(eb.cursor).isEqualTo(0)
+        assertThat(eb.hasComposition()).isFalse()
     }
 
     @Test
@@ -54,9 +53,9 @@ class DeleteSurroundingTextCommandTest {
 
         DeleteSurroundingTextCommand(1, 1).applyTo(eb)
 
-        assertEquals("ABE", eb.toString())
-        assertEquals(2, eb.cursor)
-        assertFalse(eb.hasComposition())
+        assertThat(eb.toString()).isEqualTo("ABE")
+        assertThat(eb.cursor).isEqualTo(2)
+        assertThat(eb.hasComposition()).isFalse()
     }
 
     @Test
@@ -65,9 +64,9 @@ class DeleteSurroundingTextCommandTest {
 
         DeleteSurroundingTextCommand(0, 2).applyTo(eb)
 
-        assertEquals("ABE", eb.toString())
-        assertEquals(2, eb.cursor)
-        assertFalse(eb.hasComposition())
+        assertThat(eb.toString()).isEqualTo("ABE")
+        assertThat(eb.cursor).isEqualTo(2)
+        assertThat(eb.hasComposition()).isFalse()
     }
 
     @Test
@@ -76,9 +75,9 @@ class DeleteSurroundingTextCommandTest {
 
         DeleteSurroundingTextCommand(2, 0).applyTo(eb)
 
-        assertEquals("ADE", eb.toString())
-        assertEquals(1, eb.cursor)
-        assertFalse(eb.hasComposition())
+        assertThat(eb.toString()).isEqualTo("ADE")
+        assertThat(eb.cursor).isEqualTo(1)
+        assertThat(eb.hasComposition()).isFalse()
     }
 
     @Test
@@ -87,9 +86,9 @@ class DeleteSurroundingTextCommandTest {
 
         DeleteSurroundingTextCommand(2, 2).applyTo(eb)
 
-        assertEquals("A", eb.toString())
-        assertEquals(1, eb.cursor)
-        assertFalse(eb.hasComposition())
+        assertThat(eb.toString()).isEqualTo("A")
+        assertThat(eb.cursor).isEqualTo(1)
+        assertThat(eb.hasComposition()).isFalse()
     }
 
     @Test
@@ -98,10 +97,10 @@ class DeleteSurroundingTextCommandTest {
 
         DeleteSurroundingTextCommand(1, 1).applyTo(eb)
 
-        assertEquals("ACD", eb.toString())
-        assertEquals(1, eb.selectionStart)
-        assertEquals(3, eb.selectionEnd)
-        assertFalse(eb.hasComposition())
+        assertThat(eb.toString()).isEqualTo("ACD")
+        assertThat(eb.selectionStart).isEqualTo(1)
+        assertThat(eb.selectionEnd).isEqualTo(3)
+        assertThat(eb.hasComposition()).isFalse()
     }
 
     @Test
@@ -110,9 +109,9 @@ class DeleteSurroundingTextCommandTest {
 
         DeleteSurroundingTextCommand(1000, 0).applyTo(eb)
 
-        assertEquals("DE", eb.toString())
-        assertEquals(0, eb.cursor)
-        assertFalse(eb.hasComposition())
+        assertThat(eb.toString()).isEqualTo("DE")
+        assertThat(eb.cursor).isEqualTo(0)
+        assertThat(eb.hasComposition()).isFalse()
     }
 
     @Test
@@ -121,9 +120,9 @@ class DeleteSurroundingTextCommandTest {
 
         DeleteSurroundingTextCommand(0, 1000).applyTo(eb)
 
-        assertEquals("ABC", eb.toString())
-        assertEquals(3, eb.cursor)
-        assertFalse(eb.hasComposition())
+        assertThat(eb.toString()).isEqualTo("ABC")
+        assertThat(eb.cursor).isEqualTo(3)
+        assertThat(eb.hasComposition()).isFalse()
     }
 
     @Test
@@ -132,9 +131,9 @@ class DeleteSurroundingTextCommandTest {
 
         DeleteSurroundingTextCommand(1000, 1000).applyTo(eb)
 
-        assertEquals("", eb.toString())
-        assertEquals(0, eb.cursor)
-        assertFalse(eb.hasComposition())
+        assertThat(eb.toString()).isEqualTo("")
+        assertThat(eb.cursor).isEqualTo(0)
+        assertThat(eb.hasComposition()).isFalse()
     }
 
     @Test
@@ -145,10 +144,10 @@ class DeleteSurroundingTextCommandTest {
 
         DeleteSurroundingTextCommand(1, 1).applyTo(eb)
 
-        assertEquals("ABE", eb.toString())
-        assertEquals(2, eb.cursor)
-        assertEquals(0, eb.compositionStart)
-        assertEquals(1, eb.compositionEnd)
+        assertThat(eb.toString()).isEqualTo("ABE")
+        assertThat(eb.cursor).isEqualTo(2)
+        assertThat(eb.compositionStart).isEqualTo(0)
+        assertThat(eb.compositionEnd).isEqualTo(1)
     }
 
     @Test
@@ -159,10 +158,10 @@ class DeleteSurroundingTextCommandTest {
 
         DeleteSurroundingTextCommand(1, 1).applyTo(eb)
 
-        assertEquals("ABE", eb.toString())
-        assertEquals(2, eb.cursor)
-        assertEquals(2, eb.compositionStart)
-        assertEquals(3, eb.compositionEnd)
+        assertThat(eb.toString()).isEqualTo("ABE")
+        assertThat(eb.cursor).isEqualTo(2)
+        assertThat(eb.compositionStart).isEqualTo(2)
+        assertThat(eb.compositionEnd).isEqualTo(3)
     }
 
     @Test
@@ -173,10 +172,10 @@ class DeleteSurroundingTextCommandTest {
 
         DeleteSurroundingTextCommand(1, 1).applyTo(eb)
 
-        assertEquals("ABE", eb.toString())
-        assertEquals(2, eb.cursor)
-        assertEquals(0, eb.compositionStart)
-        assertEquals(2, eb.compositionEnd)
+        assertThat(eb.toString()).isEqualTo("ABE")
+        assertThat(eb.cursor).isEqualTo(2)
+        assertThat(eb.compositionStart).isEqualTo(0)
+        assertThat(eb.compositionEnd).isEqualTo(2)
     }
 
     @Test
@@ -187,10 +186,10 @@ class DeleteSurroundingTextCommandTest {
 
         DeleteSurroundingTextCommand(1, 1).applyTo(eb)
 
-        assertEquals("ABE", eb.toString())
-        assertEquals(2, eb.cursor)
-        assertEquals(2, eb.compositionStart)
-        assertEquals(3, eb.compositionEnd)
+        assertThat(eb.toString()).isEqualTo("ABE")
+        assertThat(eb.cursor).isEqualTo(2)
+        assertThat(eb.compositionStart).isEqualTo(2)
+        assertThat(eb.compositionEnd).isEqualTo(3)
     }
 
     @Test
@@ -201,9 +200,9 @@ class DeleteSurroundingTextCommandTest {
 
         DeleteSurroundingTextCommand(1, 1).applyTo(eb)
 
-        assertEquals("ABE", eb.toString())
-        assertEquals(2, eb.cursor)
-        assertFalse(eb.hasComposition())
+        assertThat(eb.toString()).isEqualTo("ABE")
+        assertThat(eb.cursor).isEqualTo(2)
+        assertThat(eb.hasComposition()).isFalse()
     }
 
     @Test
@@ -214,9 +213,9 @@ class DeleteSurroundingTextCommandTest {
 
         DeleteSurroundingTextCommand(1, 1).applyTo(eb)
 
-        assertEquals("ABE", eb.toString())
-        assertEquals(2, eb.cursor)
-        assertEquals(0, eb.compositionStart)
-        assertEquals(3, eb.compositionEnd)
+        assertThat(eb.toString()).isEqualTo("ABE")
+        assertThat(eb.cursor).isEqualTo(2)
+        assertThat(eb.compositionStart).isEqualTo(0)
+        assertThat(eb.compositionEnd).isEqualTo(3)
     }
 }

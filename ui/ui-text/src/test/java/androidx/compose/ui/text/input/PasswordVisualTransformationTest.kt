@@ -17,7 +17,7 @@
 package androidx.compose.ui.text.input
 
 import androidx.compose.ui.text.AnnotatedString
-import org.junit.Assert.assertEquals
+import com.google.common.truth.Truth.assertThat
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.junit.runners.JUnit4
@@ -32,10 +32,10 @@ class PasswordVisualTransformationTest {
         val visualText = transformedText.text
         val offsetMapping = transformedText.offsetMapping
 
-        assertEquals("*****", visualText.text)
+        assertThat(visualText.text).isEqualTo("*****")
         for (i in 0..visualText.text.length) {
-            assertEquals(i, offsetMapping.originalToTransformed(i))
-            assertEquals(i, offsetMapping.transformedToOriginal(i))
+            assertThat(offsetMapping.originalToTransformed(i)).isEqualTo(i)
+            assertThat(offsetMapping.transformedToOriginal(i)).isEqualTo(i)
         }
     }
 
@@ -47,10 +47,10 @@ class PasswordVisualTransformationTest {
         val visualText = transformedText.text
         val offsetMapping = transformedText.offsetMapping
 
-        assertEquals("\u2022".repeat(10), visualText.text)
+        assertThat(visualText.text).isEqualTo("\u2022".repeat(10))
         for (i in 0..visualText.text.length) {
-            assertEquals(i, offsetMapping.originalToTransformed(i))
-            assertEquals(i, offsetMapping.transformedToOriginal(i))
+            assertThat(offsetMapping.originalToTransformed(i)).isEqualTo(i)
+            assertThat(offsetMapping.transformedToOriginal(i)).isEqualTo(i)
         }
     }
 }

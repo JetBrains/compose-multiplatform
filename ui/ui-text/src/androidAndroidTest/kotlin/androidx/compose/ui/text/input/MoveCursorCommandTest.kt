@@ -19,8 +19,7 @@ package androidx.compose.ui.text.input
 import androidx.compose.ui.text.TextRange
 import androidx.test.filters.SdkSuppress
 import androidx.test.filters.SmallTest
-import org.junit.Assert.assertEquals
-import org.junit.Assert.assertFalse
+import com.google.common.truth.Truth.assertThat
 import org.junit.Test
 import org.junit.runner.RunWith
 import androidx.test.ext.junit.runners.AndroidJUnit4
@@ -43,9 +42,9 @@ class MoveCursorCommandTest {
 
         MoveCursorCommand(-1).applyTo(eb)
 
-        assertEquals("ABCDE", eb.toString())
-        assertEquals(2, eb.cursor)
-        assertFalse(eb.hasComposition())
+        assertThat(eb.toString()).isEqualTo("ABCDE")
+        assertThat(eb.cursor).isEqualTo(2)
+        assertThat(eb.hasComposition()).isFalse()
     }
 
     @Test
@@ -54,9 +53,9 @@ class MoveCursorCommandTest {
 
         MoveCursorCommand(-2).applyTo(eb)
 
-        assertEquals("ABCDE", eb.toString())
-        assertEquals(1, eb.cursor)
-        assertFalse(eb.hasComposition())
+        assertThat(eb.toString()).isEqualTo("ABCDE")
+        assertThat(eb.cursor).isEqualTo(1)
+        assertThat(eb.hasComposition()).isFalse()
     }
 
     @Test
@@ -65,9 +64,9 @@ class MoveCursorCommandTest {
 
         MoveCursorCommand(-1).applyTo(eb)
 
-        assertEquals("ABCDE", eb.toString())
-        assertEquals(0, eb.cursor)
-        assertFalse(eb.hasComposition())
+        assertThat(eb.toString()).isEqualTo("ABCDE")
+        assertThat(eb.cursor).isEqualTo(0)
+        assertThat(eb.hasComposition()).isFalse()
     }
 
     @Test
@@ -76,9 +75,9 @@ class MoveCursorCommandTest {
 
         MoveCursorCommand(1).applyTo(eb)
 
-        assertEquals("ABCDE", eb.toString())
-        assertEquals(4, eb.cursor)
-        assertFalse(eb.hasComposition())
+        assertThat(eb.toString()).isEqualTo("ABCDE")
+        assertThat(eb.cursor).isEqualTo(4)
+        assertThat(eb.hasComposition()).isFalse()
     }
 
     @Test
@@ -87,9 +86,9 @@ class MoveCursorCommandTest {
 
         MoveCursorCommand(2).applyTo(eb)
 
-        assertEquals("ABCDE", eb.toString())
-        assertEquals(5, eb.cursor)
-        assertFalse(eb.hasComposition())
+        assertThat(eb.toString()).isEqualTo("ABCDE")
+        assertThat(eb.cursor).isEqualTo(5)
+        assertThat(eb.hasComposition()).isFalse()
     }
 
     @Test
@@ -98,9 +97,9 @@ class MoveCursorCommandTest {
 
         MoveCursorCommand(1).applyTo(eb)
 
-        assertEquals("ABCDE", eb.toString())
-        assertEquals(5, eb.cursor)
-        assertFalse(eb.hasComposition())
+        assertThat(eb.toString()).isEqualTo("ABCDE")
+        assertThat(eb.cursor).isEqualTo(5)
+        assertThat(eb.hasComposition()).isFalse()
     }
 
     @Test
@@ -109,9 +108,9 @@ class MoveCursorCommandTest {
 
         MoveCursorCommand(-1).applyTo(eb)
 
-        assertEquals("$CH1$CH2$CH3$CH4$CH5", eb.toString())
-        assertEquals(4, eb.cursor)
-        assertFalse(eb.hasComposition())
+        assertThat(eb.toString()).isEqualTo("$CH1$CH2$CH3$CH4$CH5")
+        assertThat(eb.cursor).isEqualTo(4)
+        assertThat(eb.hasComposition()).isFalse()
     }
 
     @Test
@@ -120,9 +119,9 @@ class MoveCursorCommandTest {
 
         MoveCursorCommand(-2).applyTo(eb)
 
-        assertEquals("$CH1$CH2$CH3$CH4$CH5", eb.toString())
-        assertEquals(2, eb.cursor)
-        assertFalse(eb.hasComposition())
+        assertThat(eb.toString()).isEqualTo("$CH1$CH2$CH3$CH4$CH5")
+        assertThat(eb.cursor).isEqualTo(2)
+        assertThat(eb.hasComposition()).isFalse()
     }
 
     @Test
@@ -131,9 +130,9 @@ class MoveCursorCommandTest {
 
         MoveCursorCommand(1).applyTo(eb)
 
-        assertEquals("$CH1$CH2$CH3$CH4$CH5", eb.toString())
-        assertEquals(8, eb.cursor)
-        assertFalse(eb.hasComposition())
+        assertThat(eb.toString()).isEqualTo("$CH1$CH2$CH3$CH4$CH5")
+        assertThat(eb.cursor).isEqualTo(8)
+        assertThat(eb.hasComposition()).isFalse()
     }
 
     @Test
@@ -142,9 +141,9 @@ class MoveCursorCommandTest {
 
         MoveCursorCommand(2).applyTo(eb)
 
-        assertEquals("$CH1$CH2$CH3$CH4$CH5", eb.toString())
-        assertEquals(10, eb.cursor)
-        assertFalse(eb.hasComposition())
+        assertThat(eb.toString()).isEqualTo("$CH1$CH2$CH3$CH4$CH5")
+        assertThat(eb.cursor).isEqualTo(10)
+        assertThat(eb.hasComposition()).isFalse()
     }
 
     @Test
@@ -154,9 +153,9 @@ class MoveCursorCommandTest {
 
         MoveCursorCommand(-1).applyTo(eb)
 
-        assertEquals("$FAMILY$FAMILY", eb.toString())
-        assertEquals(0, eb.cursor)
-        assertFalse(eb.hasComposition())
+        assertThat(eb.toString()).isEqualTo("$FAMILY$FAMILY")
+        assertThat(eb.cursor).isEqualTo(0)
+        assertThat(eb.hasComposition()).isFalse()
     }
 
     @Test
@@ -166,8 +165,8 @@ class MoveCursorCommandTest {
 
         MoveCursorCommand(1).applyTo(eb)
 
-        assertEquals("$FAMILY$FAMILY", eb.toString())
-        assertEquals(2 * FAMILY.length, eb.cursor)
-        assertFalse(eb.hasComposition())
+        assertThat(eb.toString()).isEqualTo("$FAMILY$FAMILY")
+        assertThat(eb.cursor).isEqualTo(2 * FAMILY.length)
+        assertThat(eb.hasComposition()).isFalse()
     }
 }
