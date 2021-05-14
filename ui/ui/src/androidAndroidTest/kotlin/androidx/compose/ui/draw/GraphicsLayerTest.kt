@@ -322,10 +322,10 @@ class GraphicsLayerTest {
                             clip = true
                         )
                             .requiredSize(20.toDp(), 10.toDp())
+                            .align(AbsoluteAlignment.TopLeft)
                             .onGloballyPositioned {
                                 coords1 = it
                             }
-                            .align(AbsoluteAlignment.TopLeft)
                     )
                     Box(
                         Modifier
@@ -335,10 +335,10 @@ class GraphicsLayerTest {
                                 clip = true
                             )
                             .requiredSize(10.toDp())
+                            .align(AbsoluteAlignment.BottomRight)
                             .onGloballyPositioned {
                                 coords2 = it
                             }
-                            .align(AbsoluteAlignment.BottomRight)
                     )
                 }
             }

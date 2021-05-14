@@ -107,8 +107,9 @@ fun ActivityScenario<out ComponentActivity>.show(composable: @Composable () -> U
     onActivity {
         it.setContent {
             Box(
-                Modifier.onGloballyPositioned { positionedLatch.countDown() }
+                Modifier
                     .fillMaxSize()
+                    .onGloballyPositioned { positionedLatch.countDown() }
             ) {
                 composable()
             }
