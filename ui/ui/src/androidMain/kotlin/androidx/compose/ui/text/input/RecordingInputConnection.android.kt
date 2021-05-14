@@ -97,7 +97,7 @@ internal class RecordingInputConnection(
     fun updateInputState(state: TextFieldValue, imm: InputMethodManager, view: View) {
         if (!isActive) return
 
-        if (DEBUG) { Log.d(TAG, "RecordingInputConnection.updateInputState: $state") }
+        if (DEBUG) { logDebug("RecordingInputConnection.updateInputState: $state") }
 
         mTextFieldValue = state
 
