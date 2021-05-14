@@ -149,11 +149,11 @@ package androidx.compose.foundation.layout {
     method @androidx.compose.runtime.Stable public static androidx.compose.ui.Modifier padding-wxomhCo(androidx.compose.ui.Modifier, float all);
   }
 
-  @androidx.compose.runtime.Immutable public interface PaddingValues {
-    method @androidx.compose.runtime.Stable public float calculateBottomPadding-D9Ej5fM();
-    method @androidx.compose.runtime.Stable public float calculateLeftPadding-D9Ej5fM(androidx.compose.ui.unit.LayoutDirection layoutDirection);
-    method @androidx.compose.runtime.Stable public float calculateRightPadding-D9Ej5fM(androidx.compose.ui.unit.LayoutDirection layoutDirection);
-    method @androidx.compose.runtime.Stable public float calculateTopPadding-D9Ej5fM();
+  @androidx.compose.runtime.Stable public interface PaddingValues {
+    method public float calculateBottomPadding-D9Ej5fM();
+    method public float calculateLeftPadding-D9Ej5fM(androidx.compose.ui.unit.LayoutDirection layoutDirection);
+    method public float calculateRightPadding-D9Ej5fM(androidx.compose.ui.unit.LayoutDirection layoutDirection);
+    method public float calculateTopPadding-D9Ej5fM();
   }
 
   @androidx.compose.runtime.Immutable public static final class PaddingValues.Absolute implements androidx.compose.foundation.layout.PaddingValues {
