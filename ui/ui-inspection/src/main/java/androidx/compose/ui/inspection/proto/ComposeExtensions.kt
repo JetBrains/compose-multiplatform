@@ -17,6 +17,7 @@
 package androidx.compose.ui.inspection.proto
 
 import android.view.inspector.WindowInspector
+import androidx.annotation.VisibleForTesting
 import androidx.compose.ui.inspection.LambdaLocation
 import androidx.compose.ui.inspection.inspector.InspectorNode
 import androidx.compose.ui.inspection.inspector.NodeParameter
@@ -36,6 +37,8 @@ import layoutinspector.compose.inspection.LayoutInspectorComposeProtocol.Rect
 fun InspectorNode.toComposableNode(stringTable: StringTable, windowPos: IntOffset): ComposableNode {
     return toComposableNodeImpl(stringTable, windowPos).resetSystemFlag().build()
 }
+
+private val SELECTOR_EXPR = Regex("(\\\$(lambda-)?[0-9]+)+$")
 
 private fun InspectorNode.toComposableNodeImpl(
     stringTable: StringTable,
@@ -188,12 +191,23 @@ private fun Parameter.Builder.setFunctionType(value: Any?, stringTable: StringTa
         packageName = stringTable.put(lambdaClassName.substringBeforeLast("."))
         functionName = if (value.size == 2 && value[1] != null && value[1] is String)
             stringTable.put(value[1] as String) else 0
-        lambdaName = stringTable.put(lambdaClassName.substringAfterLast("$"))
+        lambdaName = stringTable.put(findLambdaSelector(lambdaClassName))
         fileName = stringTable.put(location.fileName)
         startLineNumber = location.startLine
         endLineNumber = location.endLine
     }.build()
 }
+
+/**
+ * Return the lambda selector from the [lambdaClassName].
+ *
+ * Example:
+ * - className: com.example.composealertdialog.ComposableSingletons$MainActivityKt$lambda-10$1$2$2$1
+ * - selector:  lambda-10$1$2$2$1
+ */
+@VisibleForTesting
+fun findLambdaSelector(lambdaClassName: String): String =
+    SELECTOR_EXPR.find(lambdaClassName)?.value?.substring(1) ?: ""
 
 fun NodeParameter.convert(stringTable: StringTable): Parameter {
     val nodeParam = this
