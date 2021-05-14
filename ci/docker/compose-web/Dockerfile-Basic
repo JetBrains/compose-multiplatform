@@ -47,5 +47,3 @@ WORKDIR  androidx-main
 
 COPY bootstrap.sh bootstrap.sh
 RUN chmod a+x bootstrap.sh
-
-ENTRYPOINT ./bootstrap.sh
