@@ -16,6 +16,7 @@
 
 package androidx.compose.ui.semantics
 
+import androidx.compose.ui.geometry.Rect
 import androidx.compose.ui.layout.boundsInRoot
 import androidx.compose.ui.node.LayoutNode
 import androidx.compose.ui.node.LayoutNodeWrapper
@@ -42,7 +43,13 @@ internal fun LayoutNode.findOneLayerOfSemanticsWrappersSortedByBounds(
         }
     }
 
-    val holders = children.fastMap { NodeLocationHolder(this, it) }
+    if (!isAttached) {
+        return list
+    }
+    val holders = ArrayList<NodeLocationHolder>()
+    children.fastForEach {
+        if (it.isAttached) holders.add(NodeLocationHolder(this, it))
+    }
     val sortedChildren = sortWithStrategy(holders).fastMap { it.node }
 
     sortedChildren.fastForEach { child ->
@@ -66,11 +73,29 @@ internal class NodeLocationHolder internal constructor(
 
     internal enum class ComparisonStrategy { Stripe, Location }
 
-    private val location =
-        subtreeRoot.innerLayoutNodeWrapper.localBoundingBoxOf(node.findWrapperToGetBounds())
+    private val location: Rect?
+
     private val layoutDirection = subtreeRoot.layoutDirection
 
+    init {
+        val subtreeRootWrapper = subtreeRoot.innerLayoutNodeWrapper
+        val nodeWrapper = node.findWrapperToGetBounds()
+        location = if (subtreeRootWrapper.isAttached && nodeWrapper.isAttached) {
+            subtreeRootWrapper.localBoundingBoxOf(nodeWrapper)
+        } else {
+            null
+        }
+    }
+
     override fun compareTo(other: NodeLocationHolder): Int {
+        if (location == null) {
+            // put the unattached nodes at last. This probably can save accessibility services time.
+            return 1
+        }
+        if (other.location == null) {
+            return -1
+        }
+
         if (comparisonStrategy == ComparisonStrategy.Stripe) {
             // First is above second.
             if (location.bottom - other.location.top <= 0) {
@@ -110,16 +135,17 @@ internal class NodeLocationHolder internal constructor(
             return if (widthDifference < 0) 1 else -1
         }
 
-        // Find a child of each view with different screen bounds.
+        // Find a child of each view with different screen bounds. If we get here, node and
+        // other.node must be attached.
         val view1Bounds = node.findWrapperToGetBounds().boundsInRoot()
         val view2Bounds = other.node.findWrapperToGetBounds().boundsInRoot()
         val child1 = node.findNodeByPredicateTraversal {
-            val tempRect = it.findWrapperToGetBounds().boundsInRoot()
-            view1Bounds != tempRect
+            val wrapper = it.findWrapperToGetBounds()
+            wrapper.isAttached && view1Bounds != wrapper.boundsInRoot()
         }
         val child2 = other.node.findNodeByPredicateTraversal {
-            val tempRect = it.findWrapperToGetBounds().boundsInRoot()
-            view2Bounds != tempRect
+            val wrapper = it.findWrapperToGetBounds()
+            wrapper.isAttached && view2Bounds != wrapper.boundsInRoot()
         }
         // Compare the children recursively
         if ((child1 != null) && (child2 != null)) {

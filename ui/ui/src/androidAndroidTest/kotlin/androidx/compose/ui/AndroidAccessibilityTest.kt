@@ -2093,6 +2093,56 @@ class AndroidAccessibilityTest {
         }
     }
 
+    @Test
+    fun testSemanticsSort_doesNotThrow_whenLayoutNodeWrapperNotAttached() {
+        rule.setContent {
+            Box(Modifier.size(100.dp).testTag("parent")) {
+                Box(Modifier.size(100.dp).testTag("child"))
+            }
+        }
+
+        val parent = rule.onNodeWithTag("parent").fetchSemanticsNode()
+        val child = rule.onNodeWithTag("child").fetchSemanticsNode()
+
+        rule.runOnIdle {
+            child.layoutNode.innerLayoutNodeWrapper.detach()
+            child.outerSemanticsNodeWrapper.detach()
+        }
+
+        rule.runOnIdle {
+            assertEquals(1, parent.unmergedChildren(true).size)
+            assertEquals(0, child.unmergedChildren(true).size)
+        }
+    }
+
+    @Test
+    fun testSemanticsSort_doesNotThrow_whenLayoutNodeWrapperNotAttached_compare() {
+        rule.setContent {
+            Box(Modifier.size(100.dp).testTag("parent")) {
+                Box(Modifier.size(100.dp).testTag("child1")) {
+                    Box(Modifier.size(50.dp).testTag("grandChild1"))
+                }
+                Box(Modifier.size(100.dp).testTag("child2")) {
+                    Box(Modifier.size(50.dp).testTag("grandChild2"))
+                }
+            }
+        }
+
+        val parent = rule.onNodeWithTag("parent").fetchSemanticsNode()
+        val grandChild1 = rule.onNodeWithTag("grandChild1").fetchSemanticsNode()
+        val grandChild2 = rule.onNodeWithTag("grandChild2").fetchSemanticsNode()
+        rule.runOnIdle {
+            grandChild1.layoutNode.innerLayoutNodeWrapper.detach()
+            grandChild1.outerSemanticsNodeWrapper.detach()
+            grandChild2.layoutNode.innerLayoutNodeWrapper.detach()
+            grandChild2.outerSemanticsNodeWrapper.detach()
+        }
+
+        rule.runOnIdle {
+            assertEquals(2, parent.unmergedChildren(true).size)
+        }
+    }
+
     private fun eventIndex(list: List<AccessibilityEvent>, event: AccessibilityEvent): Int {
         for (i in list.indices) {
             if (ReflectionEquals(list[i], null).matches(event)) {
