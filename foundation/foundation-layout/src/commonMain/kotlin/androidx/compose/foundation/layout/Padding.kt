@@ -185,27 +185,23 @@ fun Modifier.absolutePadding(
  * See the [PaddingValues] factories and [Absolute] for convenient ways to
  * build [PaddingValues].
  */
-@Immutable
+@Stable
 interface PaddingValues {
     /**
      * The padding to be applied along the left edge inside a box.
      */
-    @Stable
     fun calculateLeftPadding(layoutDirection: LayoutDirection): Dp
     /**
      * The padding to be applied along the top edge inside a box.
      */
-    @Stable
     fun calculateTopPadding(): Dp
     /**
      * The padding to be applied along the right edge inside a box.
      */
-    @Stable
     fun calculateRightPadding(layoutDirection: LayoutDirection): Dp
     /**
      * The padding to be applied along the bottom edge inside a box.
      */
-    @Stable
     fun calculateBottomPadding(): Dp
 
     /**
