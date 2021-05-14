@@ -260,7 +260,7 @@ internal class DesktopOwner(
         drawBlock: (Canvas) -> Unit,
         invalidateParentLayer: () -> Unit
     ) = SkijaLayer(
-        this::density,
+        density,
         invalidateParentLayer = {
             invalidateParentLayer()
             requestDraw()
