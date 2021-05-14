@@ -28,12 +28,16 @@ import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberUpdatedState
+import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.composed
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.input.nestedscroll.NestedScrollConnection
 import androidx.compose.ui.input.nestedscroll.NestedScrollDispatcher
 import androidx.compose.ui.input.nestedscroll.NestedScrollSource
+import androidx.compose.ui.input.nestedscroll.NestedScrollSource.Companion.Drag
+import androidx.compose.ui.input.nestedscroll.NestedScrollSource.Companion.Fling
+import androidx.compose.ui.input.nestedscroll.NestedScrollSource.Companion.Relocate
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.input.pointer.PointerType
 import androidx.compose.ui.platform.debugInspectorInfo
@@ -207,6 +211,13 @@ private class ScrollingLogic(
         }
     }
 
+    fun performRelocationScroll(scroll: Offset): Offset {
+        nestedScrollDispatcher.value.coroutineScope.launch {
+            scrollableState.animateScrollBy(scroll.toFloat().reverseIfNeeded())
+        }
+        return scroll
+    }
+
     suspend fun onDragStopped(axisVelocity: Float) {
         val velocity = axisVelocity.toVelocity()
         val preConsumedByParent = nestedScrollDispatcher.value.dispatchPreFling(velocity)
@@ -219,8 +230,7 @@ private class ScrollingLogic(
         var result: Velocity = available
         scrollableState.scroll {
             val outerScopeScroll: (Float) -> Float = { delta ->
-                delta - this.dispatchScroll(delta.reverseIfNeeded(), NestedScrollSource.Fling)
-                    .reverseIfNeeded()
+                delta - this.dispatchScroll(delta.reverseIfNeeded(), Fling).reverseIfNeeded()
             }
             val scope = object : ScrollScope {
                 override fun scrollBy(pixels: Float): Float {
@@ -246,7 +256,7 @@ private class ScrollDraggableState(
     override fun dragBy(pixels: Float) {
         with(scrollLogic.value) {
             with(latestScrollScope) {
-                dispatchScroll(pixels, NestedScrollSource.Drag)
+                dispatchScroll(pixels, Drag)
             }
         }
     }
@@ -279,7 +289,13 @@ private fun scrollableNestedScrollConnection(
         available: Offset,
         source: NestedScrollSource
     ): Offset = if (enabled) {
-        scrollLogic.value.performRawScroll(available)
+        @Suppress("DEPRECATION")
+        when (source) {
+            Drag, Fling -> scrollLogic.value.performRawScroll(available)
+            @OptIn(ExperimentalComposeUiApi::class)
+            Relocate -> scrollLogic.value.performRelocationScroll(available)
+            else -> error("$source scroll not supported.")
+        }
     } else {
         Offset.Zero
     }

@@ -24,7 +24,7 @@ import androidx.compose.ui.composed
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Offset.Companion.Zero
 import androidx.compose.ui.input.nestedscroll.NestedScrollDelegatingWrapper
-import androidx.compose.ui.input.nestedscroll.NestedScrollSource.Drag
+import androidx.compose.ui.input.nestedscroll.NestedScrollSource.Companion.Relocate
 import androidx.compose.ui.node.LayoutNodeWrapper
 import androidx.compose.ui.platform.debugInspectorInfo
 import kotlin.math.abs
@@ -88,7 +88,8 @@ private fun NestedScrollDelegatingWrapper.bringIntoView(child: LayoutCoordinates
     // TODO(b/187432148): We ideally shouldn't be using internal connection functions. We need to
     //  build a better system with a more granular API that allows us to send scroll requests to
     //  specific parents.
-    modifier.connection.onPostScroll(Zero, offset, Drag)
+    @Suppress("DEPRECATION")
+    modifier.connection.onPostScroll(Zero, offset, @OptIn(ExperimentalComposeUiApi::class) Relocate)
 
     wrappedBy?.findPreviousNestedScrollWrapper()?.bringIntoView(child)
 }
