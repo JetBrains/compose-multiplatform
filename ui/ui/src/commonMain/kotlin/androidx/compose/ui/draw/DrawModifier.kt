@@ -96,9 +96,21 @@ private class DrawBackgroundModifier(
     val onDraw: DrawScope.() -> Unit,
     inspectorInfo: InspectorInfo.() -> Unit
 ) : DrawModifier, InspectorValueInfo(inspectorInfo) {
+
     override fun ContentDrawScope.draw() {
         onDraw()
         drawContent()
+    }
+
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (other !is DrawBackgroundModifier) return false
+
+        return onDraw == other.onDraw
+    }
+
+    override fun hashCode(): Int {
+        return onDraw.hashCode()
     }
 }
 
@@ -202,6 +214,22 @@ private data class DrawContentCacheModifier(
     override fun ContentDrawScope.draw() {
         cacheDrawScope.drawResult!!.block(this)
     }
+
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (other !is DrawContentCacheModifier) return false
+
+        if (cacheDrawScope != other.cacheDrawScope) return false
+        if (onBuildDrawCache != other.onBuildDrawCache) return false
+
+        return true
+    }
+
+    override fun hashCode(): Int {
+        var result = cacheDrawScope.hashCode()
+        result = 31 * result + onBuildDrawCache.hashCode()
+        return result
+    }
 }
 
 /**
@@ -214,18 +242,35 @@ class DrawResult internal constructor(internal var block: ContentDrawScope.() ->
  * Creates a [DrawModifier] that allows the developer to draw before or after the layout's
  * contents. It also allows the modifier to adjust the layout's canvas.
  */
-// TODO: Inline this function -- it breaks with current compiler
-/*inline*/ fun Modifier.drawWithContent(
+fun Modifier.drawWithContent(
     onDraw: ContentDrawScope.() -> Unit
 ): Modifier = this.then(
-    object : DrawModifier, InspectorValueInfo(
-        debugInspectorInfo {
+    DrawWithContentModifier(
+        onDraw = onDraw,
+        inspectorInfo = debugInspectorInfo {
             name = "drawWithContent"
             properties["onDraw"] = onDraw
         }
-    ) {
-        override fun ContentDrawScope.draw() {
-            onDraw()
-        }
-    }
+    )
 )
+
+private class DrawWithContentModifier(
+    val onDraw: ContentDrawScope.() -> Unit,
+    inspectorInfo: InspectorInfo.() -> Unit
+) : DrawModifier, InspectorValueInfo(inspectorInfo) {
+
+    override fun ContentDrawScope.draw() {
+        onDraw()
+    }
+
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (other !is DrawWithContentModifier) return false
+
+        return onDraw == other.onDraw
+    }
+
+    override fun hashCode(): Int {
+        return onDraw.hashCode()
+    }
+}
