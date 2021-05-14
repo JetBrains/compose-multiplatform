@@ -17,7 +17,7 @@
 package androidx.compose.ui.text.input
 
 import androidx.compose.ui.text.InternalTextApi
-import com.google.common.truth.Truth.assertThat
+import androidx.compose.ui.text.matchers.assertThat
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.junit.runners.JUnit4
@@ -27,600 +27,538 @@ import kotlin.random.Random
 @RunWith(JUnit4::class)
 class GapBufferTest {
 
-    private fun assertStrWithChars(expected: String, pgb: PartialGapBuffer) {
-        assertThat(pgb.toString()).isEqualTo(expected)
-        for (i in expected.indices) {
-            assertThat(pgb[i]).isEqualTo(expected[i])
-        }
-    }
-
     @Test
     fun insertTest_insert_to_empty_string() {
-        assertStrWithChars(
-            "A",
+        assertThat(
             PartialGapBuffer("").apply {
                 replace(0, 0, "A")
             }
-        )
+        ).hasChars("A")
     }
 
     @Test
     fun insertTest_insert_and_append() {
-        assertStrWithChars(
-            "BA",
+        assertThat(
             PartialGapBuffer("").apply {
                 replace(0, 0, "A")
                 replace(0, 0, "B")
             }
-        )
+        ).hasChars("BA")
     }
 
     @Test
     fun insertTest_insert_and_prepend() {
-        assertStrWithChars(
-            "AB",
+        assertThat(
             PartialGapBuffer("").apply {
                 replace(0, 0, "A")
                 replace(1, 1, "B")
             }
-        )
+        ).hasChars("AB")
     }
 
     @Test
     fun insertTest_insert_and_insert_into_middle() {
-        assertStrWithChars(
-            "ABA",
+        assertThat(
             PartialGapBuffer("").apply {
                 replace(0, 0, "AA")
                 replace(1, 1, "B")
             }
-        )
+        ).hasChars("ABA")
     }
 
     @Test
     fun insertTest_intoExistingText_prepend() {
-        assertStrWithChars(
-            "AXX",
+        assertThat(
             PartialGapBuffer("XX").apply {
                 replace(0, 0, "A")
             }
-        )
+        ).hasChars("AXX")
     }
 
     @Test
     fun insertTest_intoExistingText_insert_into_middle() {
-        assertStrWithChars(
-            "XAX",
+        assertThat(
             PartialGapBuffer("XX").apply {
                 replace(1, 1, "A")
             }
-        )
+        ).hasChars("XAX")
     }
 
     @Test
     fun insertTest_intoExistingText_append() {
-        assertStrWithChars(
-            "XXA",
+        assertThat(
             PartialGapBuffer("XX").apply {
                 replace(2, 2, "A")
             }
-        )
+        ).hasChars("XXA")
     }
 
     @Test
     fun insertTest_intoExistingText_prepend_and_prepend() {
-        assertStrWithChars(
-            "BAXX",
+        assertThat(
             PartialGapBuffer("XX").apply {
                 replace(0, 0, "A")
                 replace(0, 0, "B")
             }
-        )
+        ).hasChars("BAXX")
     }
 
     @Test
     fun insertTest_intoExistingText_prepend_and_append() {
-        assertStrWithChars(
-            "ABXX",
+        assertThat(
             PartialGapBuffer("XX").apply {
                 replace(0, 0, "A")
                 replace(1, 1, "B")
             }
-        )
+        ).hasChars("ABXX")
     }
 
     @Test
     fun insertTest_intoExistingText_prepend_and_insert_middle() {
-        assertStrWithChars(
-            "AXBX",
+        assertThat(
             PartialGapBuffer("XX").apply {
                 replace(0, 0, "A")
                 replace(2, 2, "B")
             }
-        )
+        ).hasChars("AXBX")
     }
 
     @Test
     fun insertTest_intoExistingText_insert_two_chars_and_append() {
-        assertStrWithChars(
-            "ABAXX",
+        assertThat(
             PartialGapBuffer("XX").apply {
                 replace(0, 0, "AA")
                 replace(1, 1, "B")
             }
-        )
+        ).hasChars("ABAXX")
     }
 
     @Test
     fun deleteTest_insert_and_delete_from_head() {
-        assertStrWithChars(
-            "BC",
+        assertThat(
             PartialGapBuffer("").apply {
                 replace(0, 0, "ABC")
                 replace(0, 1, "")
             }
-        )
+        ).hasChars("BC")
     }
 
     @Test
     fun deleteTest_insert_and_delete_middle() {
-        assertStrWithChars(
-            "AC",
+        assertThat(
             PartialGapBuffer("").apply {
                 replace(0, 0, "ABC")
                 replace(1, 2, "")
             }
-        )
+        ).hasChars("AC")
     }
 
     @Test
     fun deleteTest_insert_and_delete_tail() {
-        assertStrWithChars(
-            "AB",
+        assertThat(
             PartialGapBuffer("").apply {
                 replace(0, 0, "ABC")
                 replace(2, 3, "")
             }
-        )
+        ).hasChars("AB")
     }
 
     @Test
     fun deleteTest_insert_and_delete_two_head() {
-        assertStrWithChars(
-            "C",
+        assertThat(
             PartialGapBuffer("").apply {
                 replace(0, 0, "ABC")
                 replace(0, 2, "")
             }
-        )
+        ).hasChars("C")
     }
 
     @Test
     fun deleteTest_insert_and_delete_two_tail() {
-        assertStrWithChars(
-            "A",
+        assertThat(
             PartialGapBuffer("").apply {
                 replace(0, 0, "ABC")
                 replace(1, 3, "")
             }
-        )
+        ).hasChars("A")
     }
 
     @Test
     fun deleteTest_insert_and_delete_with_two_instruction_from_haed() {
-        assertStrWithChars(
-            "C",
+        assertThat(
             PartialGapBuffer("").apply {
                 replace(0, 0, "ABC")
                 replace(0, 1, "")
                 replace(0, 1, "")
             }
-        )
+        ).hasChars("C")
     }
 
     @Test
     fun deleteTest_insert_and_delet_with_two_instruction_from_head_and_tail() {
-        assertStrWithChars(
-            "B",
+        assertThat(
             PartialGapBuffer("").apply {
                 replace(0, 0, "ABC")
                 replace(0, 1, "")
                 replace(1, 2, "")
             }
-        )
+        ).hasChars("B")
     }
 
     @Test
     fun deleteTest_insert_and_delet_with_two_instruction_from_tail() {
-        assertStrWithChars(
-            "A",
+        assertThat(
             PartialGapBuffer("").apply {
                 replace(0, 0, "ABC")
                 replace(1, 2, "")
                 replace(1, 2, "")
             }
-        )
+        ).hasChars("A")
     }
 
     @Test
     fun deleteTest_insert_and_delete_three_chars() {
-        assertStrWithChars(
-            "",
+        assertThat(
             PartialGapBuffer("").apply {
                 replace(0, 0, "ABC")
                 replace(0, 3, "")
             }
-        )
+        ).hasChars("")
     }
 
     @Test
     fun deleteTest_insert_and_delete_three_chars_with_three_instructions() {
-        assertStrWithChars(
-            "",
+        assertThat(
             PartialGapBuffer("").apply {
                 replace(0, 0, "ABC")
                 replace(0, 1, "")
                 replace(0, 1, "")
                 replace(0, 1, "")
             }
-        )
+        ).hasChars("")
     }
 
     @Test
     fun deleteTest_fromExistingText_from_head() {
-        assertStrWithChars(
-            "BC",
+        assertThat(
             PartialGapBuffer("ABC").apply {
                 replace(0, 1, "")
             }
-        )
+        ).hasChars("BC")
     }
 
     @Test
     fun deleteTest_fromExistingText_from_middle() {
-        assertStrWithChars(
-            "AC",
+        assertThat(
             PartialGapBuffer("ABC").apply {
                 replace(1, 2, "")
             }
-        )
+        ).hasChars("AC")
     }
 
     @Test
     fun deleteTest_fromExistingText_from_tail() {
-        assertStrWithChars(
-            "AB",
+        assertThat(
             PartialGapBuffer("ABC").apply {
                 replace(2, 3, "")
             }
-        )
+        ).hasChars("AB")
     }
 
     @Test
     fun deleteTest_fromExistingText_delete_two_chars_from_head() {
-        assertStrWithChars(
-            "C",
+        assertThat(
             PartialGapBuffer("ABC").apply {
                 replace(0, 2, "")
             }
-        )
+        ).hasChars("C")
     }
 
     @Test
     fun deleteTest_fromExistingText_delete_two_chars_from_tail() {
-        assertStrWithChars(
-            "A",
+        assertThat(
             PartialGapBuffer("ABC").apply {
                 replace(1, 3, "")
             }
-        )
+        ).hasChars("A")
     }
 
     @Test
     fun deleteTest_fromExistingText_delete_two_chars_with_two_instruction_from_head() {
-        assertStrWithChars(
-            "C",
+        assertThat(
             PartialGapBuffer("ABC").apply {
                 replace(0, 1, "")
                 replace(0, 1, "")
             }
-        )
+        ).hasChars("C")
     }
 
     @Test
     fun deleteTest_fromExistingText_delete_two_chars_with_two_instruction_from_head_and_tail() {
-        assertStrWithChars(
-            "B",
+        assertThat(
             PartialGapBuffer("ABC").apply {
                 replace(0, 1, "")
                 replace(1, 2, "")
             }
-        )
+        ).hasChars("B")
     }
 
     @Test
     fun deleteTest_fromExistingText_delete_two_chars_with_two_instruction_from_tail() {
-        assertStrWithChars(
-            "A",
+        assertThat(
             PartialGapBuffer("ABC").apply {
                 replace(1, 2, "")
                 replace(1, 2, "")
             }
-        )
+        ).hasChars("A")
     }
 
     @Test
     fun deleteTest_fromExistingText_delete_three_chars() {
-        assertStrWithChars(
-            "",
+        assertThat(
             PartialGapBuffer("ABC").apply {
                 replace(0, 3, "")
             }
-        )
+        ).hasChars("")
     }
 
     @Test
     fun deleteTest_fromExistingText_delete_three_chars_with_three_instructions() {
-        assertStrWithChars(
-            "",
+        assertThat(
             PartialGapBuffer("ABC").apply {
                 replace(0, 1, "")
                 replace(0, 1, "")
                 replace(0, 1, "")
             }
-        )
+        ).hasChars("")
     }
 
     @Test
     fun replaceTest_head() {
-        assertStrWithChars(
-            "XBC",
+        assertThat(
             PartialGapBuffer("").apply {
                 replace(0, 0, "ABC")
                 replace(0, 1, "X")
             }
-        )
+        ).hasChars("XBC")
     }
 
     @Test
     fun replaceTest_middle() {
-        assertStrWithChars(
-            "AXC",
+        assertThat(
             PartialGapBuffer("").apply {
                 replace(0, 0, "ABC")
                 replace(1, 2, "X")
             }
-        )
+        ).hasChars("AXC")
     }
 
     @Test
     fun replaceTest_tail() {
-        assertStrWithChars(
-            "ABX",
+        assertThat(
             PartialGapBuffer("").apply {
                 replace(0, 0, "ABC")
                 replace(2, 3, "X")
             }
-        )
+        ).hasChars("ABX")
     }
 
     @Test
     fun replaceTest_head_two_chars() {
-        assertStrWithChars(
-            "XC",
+        assertThat(
             PartialGapBuffer("").apply {
                 replace(0, 0, "ABC")
                 replace(0, 2, "X")
             }
-        )
+        ).hasChars("XC")
     }
 
     @Test
     fun replaceTest_middle_two_chars() {
-        assertStrWithChars(
-            "AX",
+        assertThat(
             PartialGapBuffer("").apply {
                 replace(0, 0, "ABC")
                 replace(1, 3, "X")
             }
-        )
+        ).hasChars("AX")
     }
 
     @Test
     fun replaceTest_three_chars() {
-        assertStrWithChars(
-            "X",
+        assertThat(
             PartialGapBuffer("").apply {
                 replace(0, 0, "ABC")
                 replace(0, 3, "X")
             }
-        )
+        ).hasChars("X")
     }
 
     @Test
     fun replaceTest_one_char_with_two_chars_from_head() {
-        assertStrWithChars(
-            "XYBC",
+        assertThat(
             PartialGapBuffer("").apply {
                 replace(0, 0, "ABC")
                 replace(0, 1, "XY")
             }
-        )
+        ).hasChars("XYBC")
     }
 
     @Test
     fun replaceTest_one_char_with_two_chars_from_middle() {
-        assertStrWithChars(
-            "AXYC",
+        assertThat(
             PartialGapBuffer("").apply {
                 replace(0, 0, "ABC")
                 replace(1, 2, "XY")
             }
-        )
+        ).hasChars("AXYC")
     }
 
     @Test
     fun replaceTest_one_char_with_two_chars_from_tail() {
-        assertStrWithChars(
-            "ABXY",
+        assertThat(
             PartialGapBuffer("").apply {
                 replace(0, 0, "ABC")
                 replace(2, 3, "XY")
             }
-        )
+        ).hasChars("ABXY")
     }
 
     @Test
     fun replaceTest_two_chars_with_two_chars_from_head() {
-        assertStrWithChars(
-            "XYC",
+        assertThat(
             PartialGapBuffer("").apply {
                 replace(0, 0, "ABC")
                 replace(0, 2, "XY")
             }
-        )
+        ).hasChars("XYC")
     }
 
     @Test
     fun replaceTest_two_chars_with_two_chars_from_tail() {
-        assertStrWithChars(
-            "AXY",
+        assertThat(
             PartialGapBuffer("").apply {
                 replace(0, 0, "ABC")
                 replace(1, 3, "XY")
             }
-        )
+        ).hasChars("AXY")
     }
 
     @Test
     fun replaceTest_three_chars_with_two_char() {
-        assertStrWithChars(
-            "XY",
+        assertThat(
             PartialGapBuffer("").apply {
                 replace(0, 0, "ABC")
                 replace(0, 3, "XY")
             }
-        )
+        ).hasChars("XY")
     }
 
     @Test
     fun replaceTest_fromExistingText_head() {
-        assertStrWithChars(
-            "XBC",
+        assertThat(
             PartialGapBuffer("ABC").apply {
                 replace(0, 1, "X")
             }
-        )
+        ).hasChars("XBC")
     }
 
     @Test
     fun replaceTest_fromExistingText_middle() {
-        assertStrWithChars(
-            "AXC",
+        assertThat(
             PartialGapBuffer("ABC").apply {
                 replace(1, 2, "X")
             }
-        )
+        ).hasChars("AXC")
     }
 
     @Test
     fun replaceTest_fromExistingText_tail() {
-        assertStrWithChars(
-            "ABX",
+        assertThat(
             PartialGapBuffer("ABC").apply {
                 replace(2, 3, "X")
             }
-        )
+        ).hasChars("ABX")
     }
 
     @Test
     fun replaceTest_fromExistingText_two_chars_with_one_char_from_head() {
-        assertStrWithChars(
-            "XC",
+        assertThat(
             PartialGapBuffer("ABC").apply {
                 replace(0, 2, "X")
             }
-        )
+        ).hasChars("XC")
     }
 
     @Test
     fun replaceTest_fromExistingText_two_chars_with_one_char_from_tail() {
-        assertStrWithChars(
-            "AX",
+        assertThat(
             PartialGapBuffer("ABC").apply {
                 replace(1, 3, "X")
             }
-        )
+        ).hasChars("AX")
     }
 
     @Test
     fun replaceTest_fromExistingText_three_chars() {
-        assertStrWithChars(
-            "X",
+        assertThat(
             PartialGapBuffer("ABC").apply {
                 replace(0, 3, "X")
             }
-        )
+        ).hasChars("X")
     }
 
     @Test
     fun replaceTest_fromExistingText_one_char_with_two_chars_from_head() {
-        assertStrWithChars(
-            "XYBC",
+        assertThat(
             PartialGapBuffer("ABC").apply {
                 replace(0, 1, "XY")
             }
-        )
+        ).hasChars("XYBC")
     }
 
     @Test
     fun replaceTest_fromExistingText_one_char_with_two_chars_from_middle() {
-        assertStrWithChars(
-            "AXYC",
+        assertThat(
             PartialGapBuffer("ABC").apply {
                 replace(1, 2, "XY")
             }
-        )
+        ).hasChars("AXYC")
     }
 
     @Test
     fun replaceTest_fromExistingText_one_char_with_two_chars_from_tail() {
-        assertStrWithChars(
-            "ABXY",
+        assertThat(
             PartialGapBuffer("ABC").apply {
                 replace(2, 3, "XY")
             }
-        )
+        ).hasChars("ABXY")
     }
 
     @Test
     fun replaceTest_fromExistingText_two_chars_with_two_chars_from_head() {
-        assertStrWithChars(
-            "XYC",
+        assertThat(
             PartialGapBuffer("ABC").apply {
                 replace(0, 2, "XY")
             }
-        )
+        ).hasChars("XYC")
     }
 
     @Test
     fun replaceTest_fromExistingText_two_chars_with_two_chars_from_tail() {
-        assertStrWithChars(
-            "AXY",
+        assertThat(
             PartialGapBuffer("ABC").apply {
                 replace(1, 3, "XY")
             }
-        )
+        ).hasChars("AXY")
     }
 
     @Test
     fun replaceTest_fromExistingText_three_chars_with_three_chars() {
-        assertStrWithChars(
-            "XY",
+        assertThat(
             PartialGapBuffer("ABC").apply {
                 replace(0, 3, "XY")
             }
-        )
+        ).hasChars("XY")
     }
 
     // Compare with the result of StringBuffer. We trust the StringBuffer works correctly
@@ -633,7 +571,7 @@ class GapBufferTest {
     ) {
         sb.replace(start, end, str)
         gb.replace(start, end, str)
-        assertStrWithChars(sb.toString(), gb)
+        assertThat(gb).hasChars(sb.toString())
     }
 
     private val LONG_INIT_TEXT = "ABCDEFGHIJKLMNOPQRSTUVWXYZ".repeat(256)

@@ -84,6 +84,8 @@ internal class TextInputServiceAndroid(val view: View) : PlatformTextInputServic
     }
 
     init {
+        if (DEBUG) { Log.d(TAG, "$DEBUG_CLASS.create") }
+
         view.addOnAttachStateChangeListener(object : View.OnAttachStateChangeListener {
             override fun onViewDetachedFromWindow(v: View?) {
                 v?.rootView?.viewTreeObserver?.removeOnGlobalLayoutListener(layoutListener)
@@ -120,7 +122,10 @@ internal class TextInputServiceAndroid(val view: View) : PlatformTextInputServic
                     baseInputConnection.sendKeyEvent(event)
                 }
             }
-        ).also { ic = it }
+        ).also {
+            ic = it
+            if (DEBUG) { Log.d(TAG, "$DEBUG_CLASS.createInputConnection: $ic") }
+        }
     }
 
     /**
@@ -134,6 +139,8 @@ internal class TextInputServiceAndroid(val view: View) : PlatformTextInputServic
         onEditCommand: (List<EditCommand>) -> Unit,
         onImeActionPerformed: (ImeAction) -> Unit
     ) {
+        if (DEBUG) { Log.d(TAG, "$DEBUG_CLASS.startInput") }
+
         editorHasFocus = true
         state = value
         this.imeOptions = imeOptions
@@ -147,6 +154,8 @@ internal class TextInputServiceAndroid(val view: View) : PlatformTextInputServic
     }
 
     override fun stopInput() {
+        if (DEBUG) { Log.d(TAG, "$DEBUG_CLASS.stopInput") }
+
         editorHasFocus = false
         onEditCommand = {}
         onImeActionPerformed = {}
@@ -162,10 +171,12 @@ internal class TextInputServiceAndroid(val view: View) : PlatformTextInputServic
     }
 
     override fun showSoftwareKeyboard() {
+        if (DEBUG) { Log.d(TAG, "$DEBUG_CLASS.showSoftwareKeyboard") }
         showKeyboardChannel.offer(true)
     }
 
     override fun hideSoftwareKeyboard() {
+        if (DEBUG) { Log.d(TAG, "$DEBUG_CLASS.hideSoftwareKeyboard") }
         showKeyboardChannel.offer(false)
     }
 
@@ -177,8 +188,10 @@ internal class TextInputServiceAndroid(val view: View) : PlatformTextInputServic
             // because we start consuming from it before we finish producing all the values. We poll
             // to make sure that we use the most recent value.
             if (showKeyboardChannel.poll() ?: showKeyboard) {
+                if (DEBUG) { Log.d(TAG, "$DEBUG_CLASS.keyboardVisibilityEventLoop.showSoftInput") }
                 imm.showSoftInput(view, 0)
             } else {
+                if (DEBUG) { Log.d(TAG, "$DEBUG_CLASS.keyboardVisibilityEventLoop.hideSoftInput") }
                 imm.hideSoftInputFromWindow(view.windowToken, 0)
             }
         }
