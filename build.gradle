@@ -68,7 +68,7 @@ dependencies {
     cacheableImplementation(gradleApi())
     cacheableApi(libs.dokkaGradlePlugin)
     // needed by inspection plugin
-    cacheableImplementation("com.google.protobuf:protobuf-gradle-plugin:0.8.13")
+    cacheableImplementation(libs.protobufGradlePlugin)
     cacheableImplementation(libs.wireGradlePlugin)
     cacheableImplementation(libs.shadow)
     // dependencies that aren't used by buildSrc directly but that we resolve here so that the
