@@ -21,8 +21,8 @@ import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.focus.FocusState.Inactive
-import androidx.compose.ui.focus.FocusState.Active
+import androidx.compose.ui.focus.FocusStateImpl.Inactive
+import androidx.compose.ui.focus.FocusStateImpl.Active
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.test.ext.junit.runners.AndroidJUnit4
