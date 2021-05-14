@@ -17,16 +17,25 @@
 package androidx.compose.foundation.demos.text
 
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.text.input.KeyboardType
 
 @Composable
 fun KeyboardTypeDemo() {
     LazyColumn {
-        items(KeyboardType.values()) {
-            TagLine(tag = "Keyboard Type: ${it.name}")
-            EditLine(keyboardType = it)
-        }
+        item { Item(KeyboardType.Text) }
+        item { Item(KeyboardType.Ascii) }
+        item { Item(KeyboardType.Number) }
+        item { Item(KeyboardType.Phone) }
+        item { Item(KeyboardType.Uri) }
+        item { Item(KeyboardType.Email) }
+        item { Item(KeyboardType.Password) }
+        item { Item(KeyboardType.NumberPassword) }
     }
+}
+
+@Composable
+private fun Item(keyboardType: KeyboardType) {
+    TagLine(tag = "Keyboard Type: $keyboardType")
+    EditLine(keyboardType = keyboardType)
 }
