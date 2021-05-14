@@ -101,7 +101,8 @@ internal fun adjustSelection(
     previousHandlesCrossed: Boolean,
     adjustment: SelectionAdjustment
 ): TextRange {
-    if (adjustment == SelectionAdjustment.NONE) {
+    val textLength = textLayoutResult.layoutInput.text.text.length
+    if (adjustment == SelectionAdjustment.NONE || textLength == 0) {
         return textRange
     }
 
@@ -124,7 +125,7 @@ internal fun adjustSelection(
         textLayoutResult.layoutInput.text.text::getParagraphBoundary
     }
 
-    val maxOffset = textLayoutResult.layoutInput.text.text.length - 1
+    val maxOffset = textLength - 1
     val startBoundary = boundaryFun(textRange.start.coerceIn(0, maxOffset))
     val endBoundary = boundaryFun(textRange.end.coerceIn(0, maxOffset))
 
