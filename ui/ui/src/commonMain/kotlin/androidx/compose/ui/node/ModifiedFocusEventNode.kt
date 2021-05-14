@@ -18,7 +18,7 @@ package androidx.compose.ui.node
 
 import androidx.compose.ui.focus.FocusEventModifier
 import androidx.compose.ui.focus.FocusState
-import androidx.compose.ui.focus.FocusState.Inactive
+import androidx.compose.ui.focus.FocusStateImpl.Inactive
 import androidx.compose.ui.focus.searchChildrenForFocusNode
 
 internal class ModifiedFocusEventNode(

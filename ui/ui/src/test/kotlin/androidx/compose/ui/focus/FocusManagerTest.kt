@@ -16,11 +16,11 @@
 
 package androidx.compose.ui.focus
 
-import androidx.compose.ui.focus.FocusState.Active
-import androidx.compose.ui.focus.FocusState.ActiveParent
-import androidx.compose.ui.focus.FocusState.Captured
-import androidx.compose.ui.focus.FocusState.Disabled
-import androidx.compose.ui.focus.FocusState.Inactive
+import androidx.compose.ui.focus.FocusStateImpl.Active
+import androidx.compose.ui.focus.FocusStateImpl.ActiveParent
+import androidx.compose.ui.focus.FocusStateImpl.Captured
+import androidx.compose.ui.focus.FocusStateImpl.Disabled
+import androidx.compose.ui.focus.FocusStateImpl.Inactive
 import androidx.compose.ui.node.InnerPlaceable
 import androidx.compose.ui.node.LayoutNode
 import androidx.compose.ui.node.ModifiedFocusNode
@@ -36,7 +36,7 @@ class FocusManagerTest(private val initialFocusState: FocusState) {
     companion object {
         @JvmStatic
         @Parameterized.Parameters(name = "rootInitialFocus = {0}")
-        fun initParameters() = FocusState.values()
+        fun initParameters(): List<FocusState> = FocusStateImpl.values().asList()
     }
 
     private val focusModifier = FocusModifier(Inactive)
@@ -56,7 +56,7 @@ class FocusManagerTest(private val initialFocusState: FocusState) {
     @Test
     fun takeFocus_onlyInactiveChangesState() {
         // Arrange.
-        focusModifier.focusState = initialFocusState
+        focusModifier.focusState = initialFocusState as FocusStateImpl
 
         // Act.
         focusManager.takeFocus()
@@ -73,7 +73,7 @@ class FocusManagerTest(private val initialFocusState: FocusState) {
     @Test
     fun releaseFocus_changesStateToInactive() {
         // Arrange.
-        focusModifier.focusState = initialFocusState
+        focusModifier.focusState = initialFocusState as FocusStateImpl
         if (initialFocusState == ActiveParent) {
             val childLayoutNode = LayoutNode()
             val child = ModifiedFocusNode(InnerPlaceable(childLayoutNode), FocusModifier(Active))
@@ -96,7 +96,7 @@ class FocusManagerTest(private val initialFocusState: FocusState) {
     @Test
     fun clearFocus_forced() {
         // Arrange.
-        focusModifier.focusState = initialFocusState
+        focusModifier.focusState = initialFocusState as FocusStateImpl
         if (initialFocusState == ActiveParent) {
             val childLayoutNode = LayoutNode()
             val child = ModifiedFocusNode(InnerPlaceable(childLayoutNode), FocusModifier(Active))
@@ -121,7 +121,7 @@ class FocusManagerTest(private val initialFocusState: FocusState) {
     @Test
     fun clearFocus_notForced() {
         // Arrange.
-        focusModifier.focusState = initialFocusState
+        focusModifier.focusState = initialFocusState as FocusStateImpl
         if (initialFocusState == ActiveParent) {
             val childLayoutNode = LayoutNode()
             val child = ModifiedFocusNode(InnerPlaceable(childLayoutNode), FocusModifier(Active))

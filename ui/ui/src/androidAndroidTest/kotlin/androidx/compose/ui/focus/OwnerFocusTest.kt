@@ -19,8 +19,6 @@ package androidx.compose.ui.focus
 import android.view.View
 import androidx.compose.foundation.layout.Box
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.focus.FocusState.Active
-import androidx.compose.ui.focus.FocusState.Inactive
 import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.test.junit4.createComposeRule
@@ -70,7 +68,7 @@ class OwnerFocusTest {
     fun whenOwnerGainsFocus_focusModifiersAreUpdated() {
         // Arrange.
         lateinit var ownerView: View
-        var focusState = Inactive
+        lateinit var focusState: FocusState
         val focusRequester = FocusRequester()
         rule.setFocusableContent {
             ownerView = LocalView.current
@@ -89,7 +87,7 @@ class OwnerFocusTest {
 
         // Assert.
         rule.runOnIdle {
-            assertThat(focusState).isEqualTo(Active)
+            assertThat(focusState.isFocused).isTrue()
         }
     }
 
@@ -98,7 +96,7 @@ class OwnerFocusTest {
     fun whenWindowGainsFocus_focusModifiersAreUpdated() {
         // Arrange.
         lateinit var ownerView: View
-        var focusState = Inactive
+        lateinit var focusState: FocusState
         val focusRequester = FocusRequester()
         rule.setFocusableContent {
             ownerView = LocalView.current
@@ -117,7 +115,7 @@ class OwnerFocusTest {
 
         // Assert.
         rule.runOnIdle {
-            assertThat(focusState).isEqualTo(Active)
+            assertThat(focusState.isFocused).isTrue()
         }
     }
 
@@ -125,7 +123,7 @@ class OwnerFocusTest {
     fun whenOwnerLosesFocus_focusModifiersAreUpdated() {
         // Arrange.
         lateinit var ownerView: View
-        var focusState = Inactive
+        lateinit var focusState: FocusState
         val focusRequester = FocusRequester()
         rule.setFocusableContent {
             ownerView = LocalView.current
@@ -147,7 +145,7 @@ class OwnerFocusTest {
 
         // Assert.
         rule.runOnIdle {
-            assertThat(focusState).isEqualTo(Inactive)
+            assertThat(focusState.isFocused).isFalse()
         }
     }
 
@@ -155,7 +153,7 @@ class OwnerFocusTest {
     fun whenWindowLosesFocus_focusStateIsUnchanged() {
         // Arrange.
         lateinit var ownerView: View
-        var focusState = Inactive
+        lateinit var focusState: FocusState
         val focusRequester = FocusRequester()
         rule.setFocusableContent {
             ownerView = LocalView.current
@@ -177,7 +175,7 @@ class OwnerFocusTest {
 
         // Assert.
         rule.runOnIdle {
-            assertThat(focusState).isEqualTo(Active)
+            assertThat(focusState.isFocused).isTrue()
         }
     }
 

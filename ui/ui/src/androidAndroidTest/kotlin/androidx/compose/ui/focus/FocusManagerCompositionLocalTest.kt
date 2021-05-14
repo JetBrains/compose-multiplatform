@@ -18,9 +18,6 @@ package androidx.compose.ui.focus
 
 import androidx.compose.foundation.layout.Box
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.focus.FocusState.Active
-import androidx.compose.ui.focus.FocusState.ActiveParent
-import androidx.compose.ui.focus.FocusState.Inactive
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.test.ext.junit.runners.AndroidJUnit4
@@ -41,7 +38,7 @@ class FocusManagerCompositionLocalTest {
         // Arrange.
         lateinit var focusManager: FocusManager
         lateinit var focusRequester: FocusRequester
-        var focusState = Inactive
+        lateinit var focusState: FocusState
         rule.setFocusableContent {
             focusManager = LocalFocusManager.current
             focusRequester = FocusRequester()
@@ -54,14 +51,14 @@ class FocusManagerCompositionLocalTest {
         }
         rule.runOnIdle {
             focusRequester.requestFocus()
-            assertThat(focusState).isEqualTo(Active)
+            assertThat(focusState.isFocused).isTrue()
         }
 
         // Act.
         rule.runOnIdle { focusManager.clearFocus() }
 
         // Assert.
-        rule.runOnIdle { assertThat(focusState).isEqualTo(Inactive) }
+        rule.runOnIdle { assertThat(focusState.isFocused).isFalse() }
     }
 
     @Test
@@ -69,9 +66,9 @@ class FocusManagerCompositionLocalTest {
         // Arrange.
         lateinit var focusManager: FocusManager
         lateinit var focusRequester: FocusRequester
-        var focusState = Inactive
-        var parentFocusState = Inactive
-        var grandparentFocusState = Inactive
+        lateinit var focusState: FocusState
+        lateinit var parentFocusState: FocusState
+        lateinit var grandparentFocusState: FocusState
         rule.setFocusableContent {
             focusManager = LocalFocusManager.current
             focusRequester = FocusRequester()
@@ -96,9 +93,9 @@ class FocusManagerCompositionLocalTest {
         }
         rule.runOnIdle {
             focusRequester.requestFocus()
-            assertThat(grandparentFocusState).isEqualTo(ActiveParent)
-            assertThat(parentFocusState).isEqualTo(ActiveParent)
-            assertThat(focusState).isEqualTo(Active)
+            assertThat(grandparentFocusState.hasFocus).isTrue()
+            assertThat(parentFocusState.hasFocus).isTrue()
+            assertThat(focusState.isFocused).isTrue()
         }
 
         // Act.
@@ -106,9 +103,9 @@ class FocusManagerCompositionLocalTest {
 
         // Assert.
         rule.runOnIdle {
-            assertThat(grandparentFocusState).isEqualTo(Inactive)
-            assertThat(parentFocusState).isEqualTo(Inactive)
-            assertThat(focusState).isEqualTo(Inactive)
+            assertThat(grandparentFocusState.hasFocus).isFalse()
+            assertThat(parentFocusState.hasFocus).isFalse()
+            assertThat(focusState.isFocused).isFalse()
         }
     }
 }
