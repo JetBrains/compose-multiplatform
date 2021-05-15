@@ -16,9 +16,6 @@
 
 package androidx.compose.ui.text.input
 
-import android.annotation.SuppressLint
-import android.content.Context
-import android.os.Build
 import android.text.InputType
 import android.util.Log
 import android.view.KeyEvent
@@ -27,9 +24,9 @@ import android.view.ViewTreeObserver
 import android.view.inputmethod.BaseInputConnection
 import android.view.inputmethod.EditorInfo
 import android.view.inputmethod.InputConnection
-import android.view.inputmethod.InputMethodManager
 import androidx.compose.ui.geometry.Rect
 import androidx.compose.ui.text.TextRange
+import androidx.core.view.inputmethod.EditorInfoCompat
 import kotlinx.coroutines.channels.Channel
 import kotlin.math.roundToInt
 
@@ -38,7 +35,10 @@ private const val DEBUG_CLASS = "TextInputServiceAndroid"
 /**
  * Provide Android specific input service with the Operating System.
  */
-internal class TextInputServiceAndroid(val view: View) : PlatformTextInputService {
+internal class TextInputServiceAndroid(
+    val view: View,
+    private val inputMethodManager: InputMethodManager
+) : PlatformTextInputService {
     /** True if the currently editable composable has connected */
     private var editorHasFocus = false
 
@@ -55,21 +55,11 @@ internal class TextInputServiceAndroid(val view: View) : PlatformTextInputServic
     private var imeOptions = ImeOptions.Default
     private var ic: RecordingInputConnection? = null
     // used for sendKeyEvent delegation
-    private var baseInputConnection: BaseInputConnection = BaseInputConnection(view, false)
-    private var focusedRect: android.graphics.Rect? = null
+    private val baseInputConnection by lazy(LazyThreadSafetyMode.NONE) {
+        BaseInputConnection(view, false)
+    }
 
-    private var _imm: InputMethodManager? = null
-    /**
-     * The editable buffer used for BaseInputConnection.
-     */
-    private val imm: InputMethodManager
-        get() {
-            if (_imm == null) {
-                _imm = view.context.getSystemService(Context.INPUT_METHOD_SERVICE) as
-                    InputMethodManager
-            }
-            return _imm!!
-        }
+    private var focusedRect: android.graphics.Rect? = null
 
     /**
      * A channel that is used to send ShowKeyboard/HideKeyboard commands. Send 'true' for
@@ -82,6 +72,8 @@ internal class TextInputServiceAndroid(val view: View) : PlatformTextInputServic
         // latest focused rectangle whenever global layout has changed.
         focusedRect?.let { view.requestRectangleOnScreen(it) }
     }
+
+    internal constructor(view: View) : this(view, InputMethodManagerImpl(view.context))
 
     init {
         if (DEBUG) { Log.d(TAG, "$DEBUG_CLASS.create") }
@@ -104,7 +96,8 @@ internal class TextInputServiceAndroid(val view: View) : PlatformTextInputServic
         if (!editorHasFocus) {
             return null
         }
-        fillEditorInfo(outAttrs)
+
+        outAttrs.update(imeOptions, state)
 
         return RecordingInputConnection(
             initState = state,
@@ -167,7 +160,7 @@ internal class TextInputServiceAndroid(val view: View) : PlatformTextInputServic
 
     private fun restartInput() {
         if (DEBUG) Log.d(TAG, "$DEBUG_CLASS.restartInput")
-        imm.restartInput(view)
+        inputMethodManager.restartInput(view)
     }
 
     override fun showSoftwareKeyboard() {
@@ -189,10 +182,10 @@ internal class TextInputServiceAndroid(val view: View) : PlatformTextInputServic
             // to make sure that we use the most recent value.
             if (showKeyboardChannel.poll() ?: showKeyboard) {
                 if (DEBUG) { Log.d(TAG, "$DEBUG_CLASS.keyboardVisibilityEventLoop.showSoftInput") }
-                imm.showSoftInput(view, 0)
+                inputMethodManager.showSoftInput(view)
             } else {
                 if (DEBUG) { Log.d(TAG, "$DEBUG_CLASS.keyboardVisibilityEventLoop.hideSoftInput") }
-                imm.hideSoftInputFromWindow(view.windowToken, 0)
+                inputMethodManager.hideSoftInputFromWindow(view.windowToken)
             }
         }
     }
@@ -224,7 +217,7 @@ internal class TextInputServiceAndroid(val view: View) : PlatformTextInputServic
         if (restartInput) {
             restartInput()
         } else {
-            ic?.updateInputState(this.state, imm, view)
+            ic?.updateInputState(this.state, inputMethodManager, view)
         }
     }
 
@@ -246,97 +239,94 @@ internal class TextInputServiceAndroid(val view: View) : PlatformTextInputServic
             view.requestRectangleOnScreen(focusedRect)
         }
     }
+}
 
-    /**
-     * Fills necessary info of EditorInfo.
-     */
-    private fun fillEditorInfo(outInfo: EditorInfo) {
-        outInfo.imeOptions = when (imeOptions.imeAction) {
-            ImeAction.Default -> {
-                if (imeOptions.singleLine) {
-                    // this is the last resort to enable single line
-                    // Android IME still show return key even if multi line is not send
-                    // TextView.java#onCreateInputConnection
-                    EditorInfo.IME_ACTION_DONE
-                } else {
-                    EditorInfo.IME_ACTION_UNSPECIFIED
-                }
-            }
-            ImeAction.None -> EditorInfo.IME_ACTION_NONE
-            ImeAction.Go -> EditorInfo.IME_ACTION_GO
-            ImeAction.Next -> EditorInfo.IME_ACTION_NEXT
-            ImeAction.Previous -> EditorInfo.IME_ACTION_PREVIOUS
-            ImeAction.Search -> EditorInfo.IME_ACTION_SEARCH
-            ImeAction.Send -> EditorInfo.IME_ACTION_SEND
-            ImeAction.Done -> EditorInfo.IME_ACTION_DONE
-            else -> error("invalid ImeAction")
-        }
-        when (imeOptions.keyboardType) {
-            KeyboardType.Text -> outInfo.inputType = InputType.TYPE_CLASS_TEXT
-            KeyboardType.Ascii -> {
-                outInfo.inputType = InputType.TYPE_CLASS_TEXT
-                outInfo.imeOptions = outInfo.imeOptions or EditorInfo.IME_FLAG_FORCE_ASCII
-            }
-            KeyboardType.Number -> outInfo.inputType = InputType.TYPE_CLASS_NUMBER
-            KeyboardType.Phone -> outInfo.inputType = InputType.TYPE_CLASS_PHONE
-            KeyboardType.Uri ->
-                outInfo.inputType = InputType.TYPE_CLASS_TEXT or EditorInfo.TYPE_TEXT_VARIATION_URI
-            KeyboardType.Email ->
-                outInfo.inputType =
-                    InputType.TYPE_CLASS_TEXT or EditorInfo.TYPE_TEXT_VARIATION_EMAIL_ADDRESS
-            KeyboardType.Password -> {
-                outInfo.inputType =
-                    InputType.TYPE_CLASS_TEXT or EditorInfo.TYPE_TEXT_VARIATION_PASSWORD
-            }
-            KeyboardType.NumberPassword -> {
-                outInfo.inputType =
-                    InputType.TYPE_CLASS_NUMBER or EditorInfo.TYPE_NUMBER_VARIATION_PASSWORD
-            }
-            else -> error("Invalid Keyboard Type")
-        }
-
-        if (!imeOptions.singleLine) {
-            if (hasFlag(outInfo.inputType, InputType.TYPE_CLASS_TEXT)) {
-                // TextView.java#setInputTypeSingleLine
-                outInfo.inputType = outInfo.inputType or InputType.TYPE_TEXT_FLAG_MULTI_LINE
-
-                if (imeOptions.imeAction == ImeAction.Default) {
-                    outInfo.imeOptions = outInfo.imeOptions or EditorInfo.IME_FLAG_NO_ENTER_ACTION
-                }
+/**
+ * Fills necessary info of EditorInfo.
+ */
+internal fun EditorInfo.update(imeOptions: ImeOptions, textFieldValue: TextFieldValue) {
+    this.imeOptions = when (imeOptions.imeAction) {
+        ImeAction.Default -> {
+            if (imeOptions.singleLine) {
+                // this is the last resort to enable single line
+                // Android IME still show return key even if multi line is not send
+                // TextView.java#onCreateInputConnection
+                EditorInfo.IME_ACTION_DONE
+            } else {
+                EditorInfo.IME_ACTION_UNSPECIFIED
             }
         }
-
-        if (hasFlag(outInfo.inputType, InputType.TYPE_CLASS_TEXT)) {
-            when (imeOptions.capitalization) {
-                KeyboardCapitalization.None -> {
-                    /* do nothing */
-                }
-                KeyboardCapitalization.Characters -> {
-                    outInfo.inputType = outInfo.inputType or InputType.TYPE_TEXT_FLAG_CAP_CHARACTERS
-                }
-                KeyboardCapitalization.Words -> {
-                    outInfo.inputType = outInfo.inputType or InputType.TYPE_TEXT_FLAG_CAP_WORDS
-                }
-                KeyboardCapitalization.Sentences -> {
-                    outInfo.inputType = outInfo.inputType or InputType.TYPE_TEXT_FLAG_CAP_SENTENCES
-                }
-            }
-
-            if (imeOptions.autoCorrect) {
-                outInfo.inputType = outInfo.inputType or InputType.TYPE_TEXT_FLAG_AUTO_CORRECT
-            }
+        ImeAction.None -> EditorInfo.IME_ACTION_NONE
+        ImeAction.Go -> EditorInfo.IME_ACTION_GO
+        ImeAction.Next -> EditorInfo.IME_ACTION_NEXT
+        ImeAction.Previous -> EditorInfo.IME_ACTION_PREVIOUS
+        ImeAction.Search -> EditorInfo.IME_ACTION_SEARCH
+        ImeAction.Send -> EditorInfo.IME_ACTION_SEND
+        ImeAction.Done -> EditorInfo.IME_ACTION_DONE
+        else -> error("invalid ImeAction")
+    }
+    when (imeOptions.keyboardType) {
+        KeyboardType.Text -> this.inputType = InputType.TYPE_CLASS_TEXT
+        KeyboardType.Ascii -> {
+            this.inputType = InputType.TYPE_CLASS_TEXT
+            this.imeOptions = this.imeOptions or EditorInfo.IME_FLAG_FORCE_ASCII
         }
-
-        outInfo.initialSelStart = state.selection.start
-        outInfo.initialSelEnd = state.selection.end
-
-        @SuppressLint("UnsafeNewApiCall")
-        if (Build.VERSION.SDK_INT >= 30) {
-            outInfo.setInitialSurroundingText(state.text)
+        KeyboardType.Number -> this.inputType = InputType.TYPE_CLASS_NUMBER
+        KeyboardType.Phone -> this.inputType = InputType.TYPE_CLASS_PHONE
+        KeyboardType.Uri ->
+            this.inputType = InputType.TYPE_CLASS_TEXT or EditorInfo.TYPE_TEXT_VARIATION_URI
+        KeyboardType.Email ->
+            this.inputType =
+                InputType.TYPE_CLASS_TEXT or EditorInfo.TYPE_TEXT_VARIATION_EMAIL_ADDRESS
+        KeyboardType.Password -> {
+            this.inputType =
+                InputType.TYPE_CLASS_TEXT or EditorInfo.TYPE_TEXT_VARIATION_PASSWORD
         }
-
-        outInfo.imeOptions = outInfo.imeOptions or EditorInfo.IME_FLAG_NO_FULLSCREEN
+        KeyboardType.NumberPassword -> {
+            this.inputType =
+                InputType.TYPE_CLASS_NUMBER or EditorInfo.TYPE_NUMBER_VARIATION_PASSWORD
+        }
+        else -> error("Invalid Keyboard Type")
     }
 
-    private fun hasFlag(bits: Int, flag: Int): Boolean = (bits and flag) == flag
+    if (!imeOptions.singleLine) {
+        if (hasFlag(this.inputType, InputType.TYPE_CLASS_TEXT)) {
+            // TextView.java#setInputTypeSingleLine
+            this.inputType = this.inputType or InputType.TYPE_TEXT_FLAG_MULTI_LINE
+
+            if (imeOptions.imeAction == ImeAction.Default) {
+                this.imeOptions = this.imeOptions or EditorInfo.IME_FLAG_NO_ENTER_ACTION
+            }
+        }
+    }
+
+    if (hasFlag(this.inputType, InputType.TYPE_CLASS_TEXT)) {
+        when (imeOptions.capitalization) {
+            KeyboardCapitalization.None -> {
+                /* do nothing */
+            }
+            KeyboardCapitalization.Characters -> {
+                this.inputType = this.inputType or InputType.TYPE_TEXT_FLAG_CAP_CHARACTERS
+            }
+            KeyboardCapitalization.Words -> {
+                this.inputType = this.inputType or InputType.TYPE_TEXT_FLAG_CAP_WORDS
+            }
+            KeyboardCapitalization.Sentences -> {
+                this.inputType = this.inputType or InputType.TYPE_TEXT_FLAG_CAP_SENTENCES
+            }
+        }
+
+        if (imeOptions.autoCorrect) {
+            this.inputType = this.inputType or InputType.TYPE_TEXT_FLAG_AUTO_CORRECT
+        }
+    }
+
+    this.initialSelStart = textFieldValue.selection.start
+    this.initialSelEnd = textFieldValue.selection.end
+
+    EditorInfoCompat.setInitialSurroundingText(this, textFieldValue.text)
+
+    this.imeOptions = this.imeOptions or EditorInfo.IME_FLAG_NO_FULLSCREEN
 }
+
+private fun hasFlag(bits: Int, flag: Int): Boolean = (bits and flag) == flag

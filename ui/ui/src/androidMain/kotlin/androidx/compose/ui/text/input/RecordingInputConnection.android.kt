@@ -29,7 +29,6 @@ import android.view.inputmethod.ExtractedText
 import android.view.inputmethod.ExtractedTextRequest
 import android.view.inputmethod.InputConnection
 import android.view.inputmethod.InputContentInfo
-import android.view.inputmethod.InputMethodManager
 import androidx.annotation.VisibleForTesting
 
 internal const val DEBUG = false
@@ -94,7 +93,11 @@ internal class RecordingInputConnection(
      * This function may emits updateSelection and updateExtractedText to notify IMEs that the text
      * contents has changed if needed.
      */
-    fun updateInputState(state: TextFieldValue, imm: InputMethodManager, view: View) {
+    fun updateInputState(
+        state: TextFieldValue,
+        inputMethodManager: InputMethodManager,
+        view: View
+    ) {
         if (!isActive) return
 
         if (DEBUG) { logDebug("RecordingInputConnection.updateInputState: $state") }
@@ -102,7 +105,11 @@ internal class RecordingInputConnection(
         mTextFieldValue = state
 
         if (extractedTextMonitorMode) {
-            imm.updateExtractedText(view, currentExtractedTextRequestToken, state.toExtractedText())
+            inputMethodManager.updateExtractedText(
+                view,
+                currentExtractedTextRequestToken,
+                state.toExtractedText()
+            )
         }
 
         // updateSelection API requires -1 if there is no composition
@@ -115,7 +122,7 @@ internal class RecordingInputConnection(
                     "composition = ($compositionStart, $compositionEnd))"
             )
         }
-        imm.updateSelection(
+        inputMethodManager.updateSelection(
             view, state.selection.min, state.selection.max, compositionStart, compositionEnd
         )
     }
