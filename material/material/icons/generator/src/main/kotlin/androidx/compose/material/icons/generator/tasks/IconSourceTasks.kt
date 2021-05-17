@@ -21,7 +21,9 @@ import androidx.compose.material.icons.generator.IconWriter
 import com.android.build.gradle.api.BaseVariant
 import org.gradle.api.Project
 import org.gradle.api.tasks.CacheableTask
+import org.gradle.api.tasks.TaskProvider
 import org.jetbrains.kotlin.gradle.plugin.KotlinSourceSet
+import java.io.File
 
 /**
  * Task responsible for converting core icons from xml to a programmatic representation.
@@ -36,13 +38,15 @@ open class CoreIconGenerationTask : IconGenerationTask() {
          * Registers [CoreIconGenerationTask] in [project].
          */
         fun register(project: Project, variant: BaseVariant? = null) {
-            val task = project.createGenerationTask(
+            val (task, buildDirectory) = project.registerGenerationTask(
                 "generateCoreIcons",
                 CoreIconGenerationTask::class.java,
                 variant
             )
-            if (variant == null) registerIconGenerationTask(project, task) // multiplatform
-            else variant.registerIconGenerationTask(task) // agp
+            // Multiplatform
+            if (variant == null) registerIconGenerationTask(project, task, buildDirectory)
+            // AGP
+            else variant.registerIconGenerationTask(task, buildDirectory)
         }
     }
 }
@@ -60,34 +64,40 @@ open class ExtendedIconGenerationTask : IconGenerationTask() {
          * Registers [ExtendedIconGenerationTask] in [project]. (for use with mpp)
          */
         fun register(project: Project, variant: BaseVariant? = null) {
-            val task = project.createGenerationTask(
+            val (task, buildDirectory) = project.registerGenerationTask(
                 "generateExtendedIcons",
                 ExtendedIconGenerationTask::class.java,
                 variant
             )
-            if (variant == null) registerIconGenerationTask(project, task) // multiplatform
-            else variant.registerIconGenerationTask(task) // agp
+            // Multiplatform
+            if (variant == null) registerIconGenerationTask(project, task, buildDirectory)
+            // AGP
+            else variant.registerIconGenerationTask(task, buildDirectory)
         }
     }
 }
 
 /**
- * Helper to register [task] as the Kotlin source generating task for [project].
+ * Helper to register [task] that outputs to [buildDirectory] as the Kotlin source generating
+ * task for [project].
  */
 private fun registerIconGenerationTask(
     project: Project,
-    task: IconGenerationTask
+    task: TaskProvider<*>,
+    buildDirectory: File
 ) {
     val sourceSet = project.getMultiplatformSourceSet(KotlinSourceSet.COMMON_MAIN_SOURCE_SET_NAME)
-    sourceSet.kotlin.srcDir(project.files(task.generatedSrcMainDirectory).builtBy(task))
+    val generatedSrcMainDirectory = buildDirectory.resolve(IconGenerationTask.GeneratedSrcMain)
+    sourceSet.kotlin.srcDir(project.files(generatedSrcMainDirectory).builtBy(task))
 }
 
 /**
- * Helper to register [task] as the java source generating task.
+ * Helper to register [task] as the java source generating task that outputs to [buildDirectory].
  */
 private fun BaseVariant.registerIconGenerationTask(
-    task: IconGenerationTask
+    task: TaskProvider<*>,
+    buildDirectory: File
 ) {
-    @Suppress("DEPRECATION") // b/186887831
-    registerJavaGeneratingTask(task, task.generatedSrcMainDirectory)
+    val generatedSrcMainDirectory = buildDirectory.resolve(IconGenerationTask.GeneratedSrcMain)
+    registerJavaGeneratingTask(task, generatedSrcMainDirectory)
 }
