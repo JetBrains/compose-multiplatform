@@ -29,16 +29,18 @@ import androidx.build.gradle.getByType
 import androidx.build.hasAndroidTestSourceCode
 import androidx.build.hasBenchmarkPlugin
 import androidx.build.renameApkForTesting
-import com.android.build.api.artifact.SingleArtifact
 import com.android.build.api.artifact.Artifacts
+import com.android.build.api.artifact.SingleArtifact
 import com.android.build.api.extension.AndroidComponentsExtension
 import com.android.build.api.extension.ApplicationAndroidComponentsExtension
+import com.android.build.api.variant.ApplicationVariant
+import com.android.build.api.variant.LibraryVariant
 import com.android.build.gradle.TestedExtension
 import com.android.build.gradle.tasks.PackageAndroidArtifact
 import org.gradle.api.Project
 import org.gradle.api.file.DuplicatesStrategy
-import org.gradle.api.tasks.bundling.Zip
 import org.gradle.api.tasks.TaskProvider
+import org.gradle.api.tasks.bundling.Zip
 import java.io.File
 
 /**
@@ -339,8 +341,12 @@ private fun Project.configureMacrobenchmarkConfigTask(
 
 fun Project.configureTestConfigGeneration(testedExtension: TestedExtension) {
     extensions.getByType<AndroidComponentsExtension<*, *, *>>().apply {
-        @Suppress("deprecation")
-        androidTests(selector().all()) { androidTest ->
+        onVariants { variant ->
+            val androidTest = when (variant) {
+                is ApplicationVariant -> variant.androidTest
+                is LibraryVariant -> variant.androidTest
+                else -> return@onVariants
+            } ?: return@onVariants
             when {
                 path.contains("media2:media2-session:version-compat-tests:") -> {
                     createOrUpdateMediaTestConfigurationGenerationTask(
