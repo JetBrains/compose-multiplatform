@@ -2037,9 +2037,6 @@ package androidx.compose.ui.platform {
     property protected boolean shouldCreateCompositionOnAttachedToWindow;
   }
 
-  public final class ComposeView_androidKt {
-  }
-
   public final class CompositionLocalsKt {
     method public static androidx.compose.runtime.ProvidableCompositionLocal<androidx.compose.ui.platform.AccessibilityManager> getLocalAccessibilityManager();
     method @androidx.compose.ui.ExperimentalComposeUiApi public static androidx.compose.runtime.ProvidableCompositionLocal<androidx.compose.ui.autofill.Autofill> getLocalAutofill();
