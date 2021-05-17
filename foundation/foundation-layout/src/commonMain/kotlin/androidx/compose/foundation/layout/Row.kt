@@ -30,8 +30,8 @@ import androidx.compose.ui.platform.debugInspectorInfo
 
 /**
  * A layout composable that places its children in a horizontal sequence. For a layout composable
- * that places its children in a vertical sequence, see [Column]. For a layout that places children
- * in a horizontal sequence and is also scrollable, see `ScrollableRow`. For a horizontally
+ * that places its children in a vertical sequence, see [Column]. Note that by default items do
+ * not scroll; see `Modifier.horizontalScroll` to add this behavior. For a horizontally
  * scrollable list that only composes and lays out the currently visible items see `LazyRow`.
  *
  * The [Row] layout is able to assign children widths according to their weights provided
