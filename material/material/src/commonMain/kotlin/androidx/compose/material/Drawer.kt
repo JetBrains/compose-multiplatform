@@ -535,10 +535,10 @@ fun BottomDrawer(
             )
             Surface(
                 drawerConstraints
+                    .offset { IntOffset(x = 0, y = drawerState.offset.value.roundToInt()) }
                     .onGloballyPositioned { position ->
                         drawerHeight = position.size.height.toFloat()
                     }
-                    .offset { IntOffset(x = 0, y = drawerState.offset.value.roundToInt()) }
                     .semantics {
                         paneTitle = Strings.NavigationMenu
                         if (drawerState.isOpen) {

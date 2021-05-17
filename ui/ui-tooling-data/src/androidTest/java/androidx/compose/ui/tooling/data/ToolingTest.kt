@@ -57,8 +57,9 @@ open class ToolingTest {
         activityTestRule.onUiThread {
             activity.setContent {
                 Box(
-                    Modifier.onGloballyPositioned { positionedLatch.countDown() }
+                    Modifier
                         .fillMaxSize()
+                        .onGloballyPositioned { positionedLatch.countDown() }
                 ) {
                     composable()
                 }
@@ -85,8 +86,9 @@ open class ToolingTest {
             }
             activity.setContent {
                 Box(
-                    Modifier.onGloballyPositioned { positionedLatch.countDown() }
+                    Modifier
                         .fillMaxSize()
+                        .onGloballyPositioned { positionedLatch.countDown() }
                 ) {
                     content()
                 }

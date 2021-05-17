@@ -48,6 +48,7 @@ import androidx.compose.ui.test.TestActivity
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
 import androidx.compose.ui.test.onRoot
 import androidx.compose.ui.unit.Constraints
+import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Popup
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.FlakyTest
@@ -564,11 +565,12 @@ class OnGloballyPositionedTest {
             with(LocalDensity.current) {
                 Box {
                     Box(
-                        Modifier.onGloballyPositioned {
-                            realLeft = it.positionInParent().x
-                        }
+                        Modifier
                             .fillMaxSize()
-                            .padding(start = left.value.toDp()),
+                            .padding(start = left.value.toDp())
+                            .onGloballyPositioned {
+                                realLeft = it.positionInParent().x
+                            }
                     )
                 }
             }
@@ -716,6 +718,38 @@ class OnGloballyPositionedTest {
             val inWindow = coords!!.positionInWindow()
             assertEquals(10f, inWindow.x)
             assertEquals(10f, inWindow.y)
+        }
+    }
+
+    @Test
+    fun coordinatesOfTheModifierAreReported() {
+        var coords1: LayoutCoordinates? = null
+        var coords2: LayoutCoordinates? = null
+        var coords3: LayoutCoordinates? = null
+        rule.setContent {
+            Box(
+                Modifier
+                    .fillMaxSize()
+                    .onGloballyPositioned {
+                        coords1 = it
+                    }
+                    .padding(2.dp)
+                    .onGloballyPositioned {
+                        coords2 = it
+                    }
+                    .padding(3.dp)
+                    .onGloballyPositioned {
+                        coords3 = it
+                    }
+            )
+        }
+
+        rule.runOnIdle {
+            assertEquals(0f, coords1!!.positionInWindow().x)
+            val padding1 = with(rule.density) { 2.dp.roundToPx() }
+            assertEquals(padding1.toFloat(), coords2!!.positionInWindow().x)
+            val padding2 = padding1 + with(rule.density) { 3.dp.roundToPx() }
+            assertEquals(padding2.toFloat(), coords3!!.positionInWindow().x)
         }
     }
 }

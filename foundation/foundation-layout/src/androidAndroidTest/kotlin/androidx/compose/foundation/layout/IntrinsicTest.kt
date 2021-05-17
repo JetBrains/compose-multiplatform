@@ -57,11 +57,11 @@ class IntrinsicTest : LayoutTest() {
         show {
             Box {
                 FixedIntrinsicsBox(
-                    Modifier.onGloballyPositioned { coordinates: LayoutCoordinates ->
-                        minIntrinsicWidthSize.value = coordinates.size
+                    Modifier.width(IntrinsicSize.Min).onGloballyPositioned {
+                        minIntrinsicWidthSize.value = it.size
                         positionedLatch.countDown()
                     }
-                        .width(IntrinsicSize.Min).saveLayoutInfo(
+                        .saveLayoutInfo(
                             size = childSize,
                             position = childPosition,
                             positionedLatch = positionedLatch
@@ -86,10 +86,10 @@ class IntrinsicTest : LayoutTest() {
         show {
             Box {
                 FixedIntrinsicsBox(
-                    Modifier.onGloballyPositioned { coordinates: LayoutCoordinates ->
-                        minIntrinsicHeightSize.value = coordinates.size
+                    Modifier.height(IntrinsicSize.Min).onGloballyPositioned {
+                        minIntrinsicHeightSize.value = it.size
                         positionedLatch.countDown()
-                    }.height(IntrinsicSize.Min).saveLayoutInfo(
+                    }.saveLayoutInfo(
                         size = childSize,
                         position = childPosition,
                         positionedLatch = positionedLatch
@@ -114,10 +114,10 @@ class IntrinsicTest : LayoutTest() {
         show {
             Box {
                 FixedIntrinsicsBox(
-                    Modifier.onGloballyPositioned { coordinates: LayoutCoordinates ->
-                        maxIntrinsicWidthSize.value = coordinates.size
+                    Modifier.width(IntrinsicSize.Max).onGloballyPositioned {
+                        maxIntrinsicWidthSize.value = it.size
                         positionedLatch.countDown()
-                    }.width(IntrinsicSize.Max).saveLayoutInfo(
+                    }.saveLayoutInfo(
                         size = childSize,
                         position = childPosition,
                         positionedLatch = positionedLatch
@@ -142,10 +142,10 @@ class IntrinsicTest : LayoutTest() {
         show {
             Box {
                 FixedIntrinsicsBox(
-                    Modifier.onGloballyPositioned { coordinates: LayoutCoordinates ->
-                        maxIntrinsicHeightSize.value = coordinates.size
+                    Modifier.height(IntrinsicSize.Max).onGloballyPositioned {
+                        maxIntrinsicHeightSize.value = it.size
                         positionedLatch.countDown()
-                    }.height(IntrinsicSize.Max).saveLayoutInfo(
+                    }.saveLayoutInfo(
                         size = childSize,
                         position = childPosition,
                         positionedLatch = positionedLatch
@@ -171,10 +171,10 @@ class IntrinsicTest : LayoutTest() {
             Box {
                 ConstrainedBox(DpConstraints(maxWidth = 5.dp)) {
                     FixedIntrinsicsBox(
-                        Modifier.onGloballyPositioned { coordinates: LayoutCoordinates ->
-                            minIntrinsicWidthSize.value = coordinates.size
+                        Modifier.width(IntrinsicSize.Min).onGloballyPositioned {
+                            minIntrinsicWidthSize.value = it.size
                             positionedLatch.countDown()
-                        }.width(IntrinsicSize.Min).saveLayoutInfo(
+                        }.saveLayoutInfo(
                             size = childSize,
                             position = childPosition,
                             positionedLatch = positionedLatch
@@ -201,10 +201,10 @@ class IntrinsicTest : LayoutTest() {
             Box {
                 ConstrainedBox(DpConstraints(minWidth = 15.dp)) {
                     FixedIntrinsicsBox(
-                        Modifier.onGloballyPositioned { coordinates: LayoutCoordinates ->
-                            minIntrinsicWidthSize.value = coordinates.size
+                        Modifier.width(IntrinsicSize.Min).onGloballyPositioned {
+                            minIntrinsicWidthSize.value = it.size
                             positionedLatch.countDown()
-                        }.width(IntrinsicSize.Min).saveLayoutInfo(
+                        }.saveLayoutInfo(
                             size = childSize,
                             position = childPosition,
                             positionedLatch = positionedLatch

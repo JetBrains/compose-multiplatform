@@ -22,8 +22,8 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.requiredHeight
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.requiredHeight
 import androidx.compose.foundation.layout.requiredSize
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Favorite
@@ -320,12 +320,12 @@ class BottomSheetScaffoldTest {
                     drawerContent = {
                         Box(
                             Modifier
-                                .onGloballyPositioned { positioned: LayoutCoordinates ->
-                                    drawerChildPosition = positioned.positionInParent()
-                                }
                                 .fillMaxWidth()
                                 .height(50.dp)
                                 .background(color = Color.Blue)
+                                .onGloballyPositioned { positioned: LayoutCoordinates ->
+                                    drawerChildPosition = positioned.positionInParent()
+                                }
                         )
                     }
                 ) {
@@ -355,13 +355,13 @@ class BottomSheetScaffoldTest {
                 topBar = {
                     Box(
                         Modifier
+                            .fillMaxWidth()
+                            .height(50.dp)
+                            .background(color = Color.Red)
                             .onGloballyPositioned { positioned: LayoutCoordinates ->
                                 appbarPosition = positioned.localToWindow(Offset.Zero)
                                 appbarSize = positioned.size
                             }
-                            .fillMaxWidth()
-                            .height(50.dp)
-                            .background(color = Color.Red)
                     )
                 },
                 sheetContent = {

@@ -92,9 +92,10 @@ class AnimatedVisibilityTest {
                     )
                 ) {
                     Box(
-                        Modifier.onGloballyPositioned {
-                            offset = it.localToRoot(Offset.Zero)
-                        }.requiredSize(100.dp, 100.dp)
+                        Modifier.requiredSize(100.dp, 100.dp)
+                            .onGloballyPositioned {
+                                offset = it.localToRoot(Offset.Zero)
+                            }
                     ) {
                         DisposableEffect(Unit) {
                             onDispose {
@@ -202,9 +203,10 @@ class AnimatedVisibilityTest {
                 )
             ) {
                 Box(
-                    Modifier.onGloballyPositioned {
-                        offset = it.localToRoot(Offset.Zero)
-                    }.requiredSize(100.dp, 100.dp)
+                    Modifier.requiredSize(100.dp, 100.dp)
+                        .onGloballyPositioned {
+                            offset = it.localToRoot(Offset.Zero)
+                        }
                 ) {
                     DisposableEffect(Unit) {
                         onDispose {
