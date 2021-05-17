@@ -84,4 +84,5 @@ private val PlaceholderVerticalAlign.spanVerticalAlign: Int
         PlaceholderVerticalAlign.TextTop -> PlaceholderSpan.ALIGN_TEXT_TOP
         PlaceholderVerticalAlign.TextBottom -> PlaceholderSpan.ALIGN_TEXT_BOTTOM
         PlaceholderVerticalAlign.TextCenter -> PlaceholderSpan.ALIGN_TEXT_CENTER
+        else -> error("Invalid PlaceholderVerticalAlign")
     }

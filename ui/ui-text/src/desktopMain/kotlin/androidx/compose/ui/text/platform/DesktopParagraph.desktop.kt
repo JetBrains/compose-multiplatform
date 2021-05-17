@@ -866,6 +866,7 @@ fun PlaceholderVerticalAlign.toSkPlaceholderAlignment(): PlaceholderAlignment {
         PlaceholderVerticalAlign.Top -> PlaceholderAlignment.TOP
         PlaceholderVerticalAlign.Bottom -> PlaceholderAlignment.BOTTOM
         PlaceholderVerticalAlign.Center -> PlaceholderAlignment.MIDDLE
+        else -> error("Invalid PlaceholderVerticalAlign.")
     }
 }
 

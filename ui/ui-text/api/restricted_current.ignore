@@ -3,6 +3,8 @@ AddedAbstractMethod: androidx.compose.ui.text.input.InputEventCallback#onImeActi
     Added method androidx.compose.ui.text.input.InputEventCallback.onImeAction-KlQnJC8(int)
 
 
+ChangedSuperclass: androidx.compose.ui.text.PlaceholderVerticalAlign:
+    Class androidx.compose.ui.text.PlaceholderVerticalAlign superclass changed from java.lang.Enum to java.lang.Object
 ChangedSuperclass: androidx.compose.ui.text.input.ImeAction:
     Class androidx.compose.ui.text.input.ImeAction superclass changed from java.lang.Enum to java.lang.Object
 ChangedSuperclass: androidx.compose.ui.text.input.KeyboardType:
@@ -13,6 +15,8 @@ InvalidNullConversion: Field ImeOptions.imeAction:
     Attempted to remove @NonNull annotation from Field ImeOptions.imeAction
 InvalidNullConversion: Field ImeOptions.keyboardType:
     Attempted to remove @NonNull annotation from Field ImeOptions.keyboardType
+InvalidNullConversion: Field Placeholder.placeholderVerticalAlign:
+    Attempted to remove @NonNull annotation from Field Placeholder.placeholderVerticalAlign
 
 
 RemovedClass: androidx.compose.ui.text.JvmCharHelpers_jvmKt:
@@ -23,6 +27,20 @@ RemovedDeprecatedMethod: androidx.compose.ui.text.input.InputEventCallback#onIme
     Removed deprecated method androidx.compose.ui.text.input.InputEventCallback.onImeAction(androidx.compose.ui.text.input.ImeAction)
 
 
+RemovedField: androidx.compose.ui.text.PlaceholderVerticalAlign#AboveBaseline:
+    Removed enum constant androidx.compose.ui.text.PlaceholderVerticalAlign.AboveBaseline
+RemovedField: androidx.compose.ui.text.PlaceholderVerticalAlign#Bottom:
+    Removed enum constant androidx.compose.ui.text.PlaceholderVerticalAlign.Bottom
+RemovedField: androidx.compose.ui.text.PlaceholderVerticalAlign#Center:
+    Removed enum constant androidx.compose.ui.text.PlaceholderVerticalAlign.Center
+RemovedField: androidx.compose.ui.text.PlaceholderVerticalAlign#TextBottom:
+    Removed enum constant androidx.compose.ui.text.PlaceholderVerticalAlign.TextBottom
+RemovedField: androidx.compose.ui.text.PlaceholderVerticalAlign#TextCenter:
+    Removed enum constant androidx.compose.ui.text.PlaceholderVerticalAlign.TextCenter
+RemovedField: androidx.compose.ui.text.PlaceholderVerticalAlign#TextTop:
+    Removed enum constant androidx.compose.ui.text.PlaceholderVerticalAlign.TextTop
+RemovedField: androidx.compose.ui.text.PlaceholderVerticalAlign#Top:
+    Removed enum constant androidx.compose.ui.text.PlaceholderVerticalAlign.Top
 RemovedField: androidx.compose.ui.text.input.ImeAction#Default:
     Removed enum constant androidx.compose.ui.text.input.ImeAction.Default
 RemovedField: androidx.compose.ui.text.input.ImeAction#Done:
@@ -57,6 +75,10 @@ RemovedField: androidx.compose.ui.text.input.KeyboardType#Uri:
     Removed enum constant androidx.compose.ui.text.input.KeyboardType.Uri
 
 
+RemovedMethod: androidx.compose.ui.text.Placeholder#copy-KJSDsNM(long, long, androidx.compose.ui.text.PlaceholderVerticalAlign):
+    Removed method androidx.compose.ui.text.Placeholder.copy-KJSDsNM(long,long,androidx.compose.ui.text.PlaceholderVerticalAlign)
+RemovedMethod: androidx.compose.ui.text.Placeholder#getPlaceholderVerticalAlign():
+    Removed method androidx.compose.ui.text.Placeholder.getPlaceholderVerticalAlign()
 RemovedMethod: androidx.compose.ui.text.input.ImeOptions#ImeOptions(boolean, androidx.compose.ui.text.input.KeyboardCapitalization, boolean, androidx.compose.ui.text.input.KeyboardType, androidx.compose.ui.text.input.ImeAction):
     Removed constructor androidx.compose.ui.text.input.ImeOptions(boolean,androidx.compose.ui.text.input.KeyboardCapitalization,boolean,androidx.compose.ui.text.input.KeyboardType,androidx.compose.ui.text.input.ImeAction)
 RemovedMethod: androidx.compose.ui.text.input.ImeOptions#copy(boolean, androidx.compose.ui.text.input.KeyboardCapitalization, boolean, androidx.compose.ui.text.input.KeyboardType, androidx.compose.ui.text.input.ImeAction):
