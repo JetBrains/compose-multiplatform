@@ -37,7 +37,7 @@ abstract class GenerateApiStubClassesTask @Inject constructor(
         runWithArgs(
             listOf(
                 "--classpath",
-                (bootClasspath + dependencyClasspath.files).joinToString(File.pathSeparator),
+                (bootClasspath.files + dependencyClasspath.files).joinToString(File.pathSeparator),
 
                 "--source-path",
                 sourcePaths.filter { it.exists() }.joinToString(File.pathSeparator),

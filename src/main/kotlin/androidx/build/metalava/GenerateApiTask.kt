@@ -60,7 +60,7 @@ abstract class GenerateApiTask @Inject constructor(
     abstract val apiLocation: Property<ApiLocation>
 
     @OutputFiles
-    fun getTaskOutputs(): List<File>? {
+    fun getTaskOutputs(): List<File> {
         val prop = apiLocation.get()
         return listOfNotNull(
             prop.publicApiFile,
@@ -72,13 +72,13 @@ abstract class GenerateApiTask @Inject constructor(
 
     @TaskAction
     fun exec() {
-        check(bootClasspath.isNotEmpty()) { "Android boot classpath not set." }
+        check(bootClasspath.files.isNotEmpty()) { "Android boot classpath not set." }
         check(sourcePaths.files.isNotEmpty()) { "Source paths not set." }
 
-        val inputs = JavaCompileInputs.fromSourcesAndDeps(
+        val inputs = JavaCompileInputs(
             sourcePaths,
             dependencyClasspath,
-            project
+            bootClasspath
         )
         generateApi(
             metalavaClasspath,

@@ -28,7 +28,6 @@ import org.gradle.api.tasks.Optional
 import org.gradle.api.tasks.PathSensitive
 import org.gradle.api.tasks.PathSensitivity
 import org.gradle.workers.WorkerExecutor
-import java.io.File
 import javax.inject.Inject
 
 /** Base class for invoking Metalava. */
@@ -40,9 +39,9 @@ abstract class MetalavaTask @Inject constructor(
     @get:Classpath
     abstract val metalavaClasspath: ConfigurableFileCollection
 
-    /** Android's boot classpath. Obtained from [BaseExtension.getBootClasspath]. */
+    /** Android's boot classpath */
     @get:Classpath
-    lateinit var bootClasspath: Collection<File>
+    lateinit var bootClasspath: FileCollection
 
     /** Dependencies of [sourcePaths]. */
     @get:Classpath
