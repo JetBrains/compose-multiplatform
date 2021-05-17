@@ -35,8 +35,8 @@ import androidx.compose.ui.semantics.SemanticsActions
 import androidx.compose.ui.semantics.SemanticsProperties
 import androidx.compose.ui.test.SemanticsMatcher
 import androidx.compose.ui.test.assert
+import androidx.compose.ui.test.assertRangeInfoEquals
 import androidx.compose.ui.test.assertHeightIsEqualTo
-import androidx.compose.ui.test.assertValueEquals
 import androidx.compose.ui.test.assertWidthIsEqualTo
 import androidx.compose.ui.test.center
 import androidx.compose.ui.test.centerX
@@ -85,11 +85,11 @@ class SliderTest {
         rule.runOnIdle {
             state.value = 2f
         }
-        rule.onNodeWithTag(tag).assertValueEquals("100 percent")
+        rule.onNodeWithTag(tag).assertRangeInfoEquals(ProgressBarRangeInfo(1f, 0f..1f, 0))
         rule.runOnIdle {
             state.value = -123145f
         }
-        rule.onNodeWithTag(tag).assertValueEquals("0 percent")
+        rule.onNodeWithTag(tag).assertRangeInfoEquals(ProgressBarRangeInfo(0f, 0f..1f, 0))
     }
 
     @Test(expected = IllegalArgumentException::class)
@@ -111,27 +111,19 @@ class SliderTest {
         }
 
         rule.onNodeWithTag(tag)
-            .assertValueEquals("0 percent")
-            .assert(
-                SemanticsMatcher.expectValue(
-                    SemanticsProperties.ProgressBarRangeInfo,
-                    ProgressBarRangeInfo(0f, 0f..1f, 0)
-                )
-            )
+            .assertRangeInfoEquals(ProgressBarRangeInfo(0f, 0f..1f, 0))
             .assert(SemanticsMatcher.keyIsDefined(SemanticsActions.SetProgress))
 
         rule.runOnUiThread {
             state.value = 0.5f
         }
 
-        rule.onNodeWithTag(tag)
-            .assertValueEquals("50 percent")
+        rule.onNodeWithTag(tag).assertRangeInfoEquals(ProgressBarRangeInfo(0.5f, 0f..1f, 0))
 
         rule.onNodeWithTag(tag)
             .performSemanticsAction(SemanticsActions.SetProgress) { it(0.7f) }
 
-        rule.onNodeWithTag(tag)
-            .assertValueEquals("70 percent")
+        rule.onNodeWithTag(tag).assertRangeInfoEquals(ProgressBarRangeInfo(0.7f, 0f..1f, 0))
     }
 
     @Test
@@ -146,27 +138,19 @@ class SliderTest {
         }
 
         rule.onNodeWithTag(tag)
-            .assertValueEquals("0 percent")
-            .assert(
-                SemanticsMatcher.expectValue(
-                    SemanticsProperties.ProgressBarRangeInfo,
-                    ProgressBarRangeInfo(0f, 0f..1f, 4)
-                )
-            )
+            .assertRangeInfoEquals(ProgressBarRangeInfo(0f, 0f..1f, 4))
             .assert(SemanticsMatcher.keyIsDefined(SemanticsActions.SetProgress))
 
         rule.runOnUiThread {
             state.value = 0.6f
         }
 
-        rule.onNodeWithTag(tag)
-            .assertValueEquals("60 percent")
+        rule.onNodeWithTag(tag).assertRangeInfoEquals(ProgressBarRangeInfo(0.6f, 0f..1f, 4))
 
         rule.onNodeWithTag(tag)
             .performSemanticsAction(SemanticsActions.SetProgress) { it(0.75f) }
 
-        rule.onNodeWithTag(tag)
-            .assertValueEquals("80 percent")
+        rule.onNodeWithTag(tag).assertRangeInfoEquals(ProgressBarRangeInfo(0.8f, 0f..1f, 4))
     }
 
     @Test

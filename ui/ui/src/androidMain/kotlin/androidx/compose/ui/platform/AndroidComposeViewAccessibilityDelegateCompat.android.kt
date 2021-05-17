@@ -66,6 +66,7 @@ import androidx.compose.ui.platform.accessibility.setCollectionItemInfo
 import androidx.compose.ui.semantics.AccessibilityAction
 import androidx.compose.ui.semantics.LiveRegionMode
 import androidx.compose.ui.semantics.ProgressBarRangeInfo
+import androidx.compose.ui.state.ToggleableState
 import androidx.compose.ui.text.InternalTextApi
 import androidx.compose.ui.util.fastForEachIndexed
 import androidx.core.view.AccessibilityDelegateCompat
@@ -79,6 +80,7 @@ import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.delay
 import kotlin.math.ceil
 import kotlin.math.floor
+import kotlin.math.roundToInt
 
 private fun LayoutNode.findClosestParentNode(selector: (LayoutNode) -> Boolean): LayoutNode? {
     var currentParent = this.parent
@@ -299,15 +301,14 @@ internal class AndroidComposeViewAccessibilityDelegateCompat(val view: AndroidCo
         semanticsNode: SemanticsNode
     ) {
         info.className = ClassName
-        semanticsNode.config.getOrNull(SemanticsProperties.Role)?.let {
-            when (it) {
-                Role.Button -> info.className = "android.widget.Button"
-                Role.Checkbox -> info.className = "android.widget.CheckBox"
-                Role.Switch -> info.className = "android.widget.Switch"
-                Role.RadioButton -> info.className = "android.widget.RadioButton"
-                Role.Tab -> info.roleDescription = AccessibilityRoleDescriptions.Tab
-                Role.Image -> info.className = "android.widget.ImageView"
-            }
+        val role = semanticsNode.config.getOrNull(SemanticsProperties.Role)
+        when (role) {
+            Role.Button -> info.className = "android.widget.Button"
+            Role.Checkbox -> info.className = "android.widget.CheckBox"
+            Role.Switch -> info.className = "android.widget.Switch"
+            Role.RadioButton -> info.className = "android.widget.RadioButton"
+            Role.Tab -> info.roleDescription = view.context.resources.getString(R.string.tab)
+            Role.Image -> info.className = "android.widget.ImageView"
         }
         info.packageName = view.context.packageName
 
@@ -339,8 +340,58 @@ internal class AndroidComposeViewAccessibilityDelegateCompat(val view: AndroidCo
 
         setText(semanticsNode, info)
         setContentInvalid(semanticsNode, info)
+
         info.stateDescription =
             semanticsNode.config.getOrNull(SemanticsProperties.StateDescription)
+        val toggleState = semanticsNode.config.getOrNull(SemanticsProperties.ToggleableState)
+        toggleState?.let {
+            info.isCheckable = true
+            when (it) {
+                ToggleableState.On -> {
+                    info.isChecked = true
+                    // Unfortunately, talback has a bug of using "checked", so we set state
+                    // description here
+                    if (role == Role.Switch && info.stateDescription == null) {
+                        info.stateDescription = view.context.resources.getString(R.string.on)
+                    }
+                }
+                ToggleableState.Off -> {
+                    info.isChecked = false
+                    // Unfortunately, talkback has a bug of using "not checked", so we set state
+                    // description here
+                    if (role == Role.Switch && info.stateDescription == null) {
+                        info.stateDescription = view.context.resources.getString(R.string.off)
+                    }
+                }
+                ToggleableState.Indeterminate -> {
+                    if (info.stateDescription == null) {
+                        info.stateDescription =
+                            view.context.resources.getString(R.string.indeterminate)
+                    }
+                }
+            }
+        }
+        semanticsNode.config.getOrNull(SemanticsProperties.Selected)?.let {
+            if (role == Role.Tab) {
+                // Tab in native android uses selected property
+                info.isSelected = it
+            } else {
+                // Make a workaround here so talkback doesn't say "double tap to toggle" for
+                // selected items(this will be different from native android).
+                info.isCheckable = !it
+                info.isChecked = it
+                if (info.stateDescription == null) {
+                    // If a radio entry (radio button + text) is selectable, it won't have the role
+                    // RadioButton, so if we use info.isCheckable/info.isChecked, talkback will say
+                    // "checked/not checked" instead "selected/note selected".
+                    info.stateDescription = if (it) {
+                        view.context.resources.getString(R.string.selected)
+                    } else {
+                        view.context.resources.getString(R.string.not_selected)
+                    }
+                }
+            }
+        }
 
         // If the node has a content description (in unmerged config), it will be used. Otherwise
         // for merging node we concatenate content descriptions and texts from its children.
@@ -498,6 +549,29 @@ internal class AndroidComposeViewAccessibilityDelegateCompat(val view: AndroidCo
                     rangeInfo.range.endInclusive,
                     rangeInfo.current
                 )
+                // let's set state description here and use state description change events.
+                // otherwise, we need to send out type_view_selected event, as the old android
+                // versions do. But the support for type_view_selected event for progress bars
+                // maybe deprecated in talkback in the future.
+                if (info.stateDescription == null) {
+                    val valueRange = rangeInfo.range
+                    val progress = (
+                        if (valueRange.endInclusive - valueRange.start == 0f) 0f
+                        else (rangeInfo.current - valueRange.start) /
+                            (valueRange.endInclusive - valueRange.start)
+                        ).coerceIn(0f, 1f)
+
+                    // We only display 0% or 100% when it is exactly 0% or 100%.
+                    val percent = when (progress) {
+                        0f -> 0
+                        1f -> 100
+                        else -> (progress * 100).roundToInt().coerceIn(1, 99)
+                    }
+                    info.stateDescription =
+                        view.context.resources.getString(R.string.template_percent, percent)
+                }
+            } else if (info.stateDescription == null) {
+                info.stateDescription = view.context.resources.getString(R.string.in_progress)
             }
             if (semanticsNode.config.contains(SemanticsActions.SetProgress) &&
                 semanticsNode.enabled()
@@ -965,7 +1039,10 @@ internal class AndroidComposeViewAccessibilityDelegateCompat(val view: AndroidCo
         // Actions can't be performed when disabled.
         when (action) {
             AccessibilityNodeInfoCompat.ACTION_CLICK -> {
-                return node.config.getOrNull(SemanticsActions.OnClick)?.action?.invoke() ?: false
+                val result =
+                    node.config.getOrNull(SemanticsActions.OnClick)?.action?.invoke() ?: false
+                sendEventForVirtualView(virtualViewId, AccessibilityEvent.TYPE_VIEW_CLICKED)
+                return result
             }
             AccessibilityNodeInfoCompat.ACTION_LONG_CLICK -> {
                 return node.config.getOrNull(SemanticsActions.OnLongClick)?.action?.invoke()
@@ -1532,7 +1609,8 @@ internal class AndroidComposeViewAccessibilityDelegateCompat(val view: AndroidCo
                             )
                         }
                     }
-                    SemanticsProperties.StateDescription ->
+                    SemanticsProperties.StateDescription, SemanticsProperties.ToggleableState,
+                    SemanticsProperties.Selected, SemanticsProperties.ProgressBarRangeInfo ->
                         sendEventForVirtualView(
                             semanticsNodeIdToAccessibilityVirtualNodeId(id),
                             AccessibilityEvent.TYPE_WINDOW_CONTENT_CHANGED,

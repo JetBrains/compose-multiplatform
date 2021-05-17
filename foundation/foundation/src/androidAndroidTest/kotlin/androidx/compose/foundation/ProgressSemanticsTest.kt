@@ -28,7 +28,6 @@ import androidx.compose.ui.semantics.getOrNull
 import androidx.compose.ui.test.SemanticsMatcher
 import androidx.compose.ui.test.assert
 import androidx.compose.ui.test.assertRangeInfoEquals
-import androidx.compose.ui.test.assertValueEquals
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.unit.dp
@@ -61,7 +60,6 @@ class ProgressSemanticsTest {
         }
 
         rule.onNodeWithTag(tag)
-            .assertValueEquals("0 percent")
             .assertRangeInfoEquals(ProgressBarRangeInfo(0f, 0f..1f))
 
         rule.runOnUiThread {
@@ -69,7 +67,6 @@ class ProgressSemanticsTest {
         }
 
         rule.onNodeWithTag(tag)
-            .assertValueEquals("1 percent")
             .assertRangeInfoEquals(ProgressBarRangeInfo(0.005f, 0f..1f))
 
         rule.runOnUiThread {
@@ -77,7 +74,6 @@ class ProgressSemanticsTest {
         }
 
         rule.onNodeWithTag(tag)
-            .assertValueEquals("50 percent")
             .assertRangeInfoEquals(ProgressBarRangeInfo(0.5f, 0f..1f))
     }
 
@@ -94,9 +90,6 @@ class ProgressSemanticsTest {
                     .background(color = Color.Cyan)
             )
         }
-
-        rule.onNodeWithTag(tag)
-            .assertValueEquals(Strings.InProgress)
 
         rule.onNodeWithTag(tag)
             .assert(

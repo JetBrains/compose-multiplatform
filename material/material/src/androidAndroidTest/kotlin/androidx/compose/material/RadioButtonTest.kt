@@ -30,7 +30,6 @@ import androidx.compose.ui.test.assert
 import androidx.compose.ui.test.assertHasNoClickAction
 import androidx.compose.ui.test.assertIsNotSelected
 import androidx.compose.ui.test.assertIsSelected
-import androidx.compose.ui.test.assertValueEquals
 import androidx.compose.ui.test.isFocusable
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
@@ -55,10 +54,10 @@ class RadioButtonTest {
     private val itemThree = "Sap"
 
     private fun SemanticsNodeInteraction.assertHasSelectedSemantics(): SemanticsNodeInteraction =
-        assertIsSelected().assertValueEquals("Selected")
+        assertIsSelected()
 
     private fun SemanticsNodeInteraction.assertHasUnSelectedSemantics(): SemanticsNodeInteraction =
-        assertIsNotSelected().assertValueEquals("Not selected")
+        assertIsNotSelected()
 
     private val options = listOf(itemOne, itemTwo, itemThree)
 

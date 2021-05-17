@@ -47,6 +47,8 @@ import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.requiredSize
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.progressSemantics
+import androidx.compose.foundation.selection.selectable
 import androidx.compose.foundation.selection.toggleable
 import androidx.compose.foundation.text.BasicText
 import androidx.compose.foundation.text.BasicTextField
@@ -78,8 +80,10 @@ import androidx.compose.ui.test.SemanticsMatcher
 import androidx.compose.ui.test.TestActivity
 import androidx.compose.ui.test.assert
 import androidx.compose.ui.test.assertIsDisplayed
+import androidx.compose.ui.test.assertIsNotSelected
 import androidx.compose.ui.test.assertIsOff
 import androidx.compose.ui.test.assertIsOn
+import androidx.compose.ui.test.assertIsSelected
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
@@ -181,6 +185,39 @@ class AndroidAccessibilityTest {
             .fetchSemanticsNode("couldn't find node with tag $tag")
         val accessibilityNodeInfo = provider.createAccessibilityNodeInfo(toggleableNode.id)
         assertEquals("android.view.View", accessibilityNodeInfo.className)
+        assertTrue(accessibilityNodeInfo.isClickable)
+        assertTrue(accessibilityNodeInfo.isVisibleToUser)
+        assertTrue(accessibilityNodeInfo.isCheckable)
+        assertTrue(accessibilityNodeInfo.isChecked)
+        assertTrue(
+            accessibilityNodeInfo.actionList.contains(
+                AccessibilityNodeInfo.AccessibilityAction(ACTION_CLICK, "toggle")
+            )
+        )
+    }
+
+    @Test
+    fun testCreateAccessibilityNodeInfo_forSwitch() {
+        val tag = "Toggleable"
+        container.setContent {
+            var checked by remember { mutableStateOf(true) }
+            Box(
+                Modifier
+                    .toggleable(
+                        value = checked,
+                        role = Role.Switch,
+                        onValueChange = { checked = it }
+                    )
+                    .testTag(tag)
+            ) {
+                BasicText("ToggleableText")
+            }
+        }
+
+        val toggleableNode = rule.onNodeWithTag(tag)
+            .fetchSemanticsNode("couldn't find node with tag $tag")
+        val accessibilityNodeInfo = provider.createAccessibilityNodeInfo(toggleableNode.id)
+        assertEquals("android.widget.Switch", accessibilityNodeInfo.className)
         val stateDescription = when {
             Build.VERSION.SDK_INT >= Build.VERSION_CODES.R -> {
                 accessibilityNodeInfo.stateDescription
@@ -194,7 +231,7 @@ class AndroidAccessibilityTest {
                 null
             }
         }
-        assertEquals("Checked", stateDescription)
+        assertEquals("On", stateDescription)
         assertTrue(accessibilityNodeInfo.isClickable)
         assertTrue(accessibilityNodeInfo.isVisibleToUser)
         assertTrue(
@@ -202,6 +239,150 @@ class AndroidAccessibilityTest {
                 AccessibilityNodeInfo.AccessibilityAction(ACTION_CLICK, null)
             )
         )
+    }
+
+    @Test
+    fun testCreateAccessibilityNodeInfo_forSelectable() {
+        val tag = "Selectable"
+        container.setContent {
+            Box(Modifier.selectable(selected = true, onClick = {}).testTag(tag)) {
+                BasicText("Text")
+            }
+        }
+
+        val toggleableNode = rule.onNodeWithTag(tag)
+            .fetchSemanticsNode("couldn't find node with tag $tag")
+        val accessibilityNodeInfo = provider.createAccessibilityNodeInfo(toggleableNode.id)
+        assertEquals("android.view.View", accessibilityNodeInfo.className)
+        val stateDescription = when {
+            Build.VERSION.SDK_INT >= Build.VERSION_CODES.R -> {
+                accessibilityNodeInfo.stateDescription
+            }
+            Build.VERSION.SDK_INT >= 19 -> {
+                accessibilityNodeInfo.extras.getCharSequence(
+                    "androidx.view.accessibility.AccessibilityNodeInfoCompat.STATE_DESCRIPTION_KEY"
+                )
+            }
+            else -> {
+                null
+            }
+        }
+        assertEquals("Selected", stateDescription)
+        assertFalse(accessibilityNodeInfo.isClickable)
+        assertTrue(accessibilityNodeInfo.isVisibleToUser)
+        assertFalse(accessibilityNodeInfo.isCheckable)
+        assertFalse(
+            accessibilityNodeInfo.actionList.contains(
+                AccessibilityNodeInfo.AccessibilityAction(ACTION_CLICK, null)
+            )
+        )
+    }
+
+    @Test
+    fun testCreateAccessibilityNodeInfo_forTab() {
+        val tag = "Selectable"
+        container.setContent {
+            Box(Modifier.selectable(selected = true, onClick = {}, role = Role.Tab).testTag(tag)) {
+                BasicText("Text")
+            }
+        }
+
+        val toggleableNode = rule.onNodeWithTag(tag)
+            .fetchSemanticsNode("couldn't find node with tag $tag")
+        val accessibilityNodeInfo = provider.createAccessibilityNodeInfo(toggleableNode.id)
+        assertEquals("android.view.View", accessibilityNodeInfo.className)
+        val stateDescription = when {
+            Build.VERSION.SDK_INT >= Build.VERSION_CODES.R -> {
+                accessibilityNodeInfo.stateDescription
+            }
+            Build.VERSION.SDK_INT >= 19 -> {
+                accessibilityNodeInfo.extras.getCharSequence(
+                    "androidx.view.accessibility.AccessibilityNodeInfoCompat.STATE_DESCRIPTION_KEY"
+                )
+            }
+            else -> {
+                null
+            }
+        }
+        assertNull(stateDescription)
+        assertFalse(accessibilityNodeInfo.isClickable)
+        assertTrue(accessibilityNodeInfo.isVisibleToUser)
+        assertTrue(accessibilityNodeInfo.isSelected)
+        assertFalse(
+            accessibilityNodeInfo.actionList.contains(
+                AccessibilityNodeInfo.AccessibilityAction(ACTION_CLICK, null)
+            )
+        )
+    }
+
+    @Test
+    fun testCreateAccessibilityNodeInfo_progressIndicator_determinate() {
+        val tag = "progress"
+        container.setContent {
+            Box(Modifier.progressSemantics(0.5f).testTag(tag)) {
+                BasicText("Text")
+            }
+        }
+
+        val node = rule.onNodeWithTag(tag)
+            .fetchSemanticsNode("couldn't find node with tag $tag")
+        val accessibilityNodeInfo = provider.createAccessibilityNodeInfo(node.id)
+        assertEquals("android.widget.ProgressBar", accessibilityNodeInfo.className)
+        val stateDescription = when {
+            Build.VERSION.SDK_INT >= Build.VERSION_CODES.R -> {
+                accessibilityNodeInfo.stateDescription
+            }
+            Build.VERSION.SDK_INT >= 19 -> {
+                accessibilityNodeInfo.extras.getCharSequence(
+                    "androidx.view.accessibility.AccessibilityNodeInfoCompat.STATE_DESCRIPTION_KEY"
+                )
+            }
+            else -> {
+                null
+            }
+        }
+        assertEquals("50 percent.", stateDescription)
+        assertEquals(
+            AccessibilityNodeInfoCompat.RangeInfoCompat.RANGE_TYPE_FLOAT,
+            accessibilityNodeInfo.rangeInfo.getType()
+        )
+        assertEquals(0.5f, accessibilityNodeInfo.rangeInfo.getCurrent())
+        assertEquals(0f, accessibilityNodeInfo.rangeInfo.getMin())
+        assertEquals(1f, accessibilityNodeInfo.rangeInfo.getMax())
+    }
+
+    @Test
+    fun testCreateAccessibilityNodeInfo_progressIndicator_determinate_indeterminate() {
+        val tag = "progress"
+        container.setContent {
+            Box(
+                Modifier
+                    .progressSemantics()
+                    .testTag(tag)
+            ) {
+                BasicText("Text")
+            }
+        }
+
+        val toggleableNode = rule.onNodeWithTag(tag)
+            .fetchSemanticsNode("couldn't find node with tag $tag")
+        val accessibilityNodeInfo = provider.createAccessibilityNodeInfo(toggleableNode.id)
+        assertEquals("android.widget.ProgressBar", accessibilityNodeInfo.className)
+        val stateDescription = when {
+            Build.VERSION.SDK_INT >= Build.VERSION_CODES.R -> {
+                accessibilityNodeInfo.stateDescription
+            }
+            Build.VERSION.SDK_INT >= 19 -> {
+                accessibilityNodeInfo.extras.getCharSequence(
+                    "androidx.view.accessibility.AccessibilityNodeInfoCompat.STATE_DESCRIPTION_KEY"
+                )
+            }
+            else -> {
+                null
+            }
+        }
+        assertEquals("In progress", stateDescription)
+        assertNull(accessibilityNodeInfo.rangeInfo)
     }
 
     @Test
@@ -531,6 +712,35 @@ class AndroidAccessibilityTest {
     }
 
     @Test
+    fun sendClickedEvent_whenClick() {
+        val tag = "Clickable"
+        container.setContent {
+            Box(Modifier.clickable(onClick = {}).testTag(tag)) {
+                BasicText("Text")
+            }
+        }
+
+        waitForSubtreeEventToSend()
+        val node = rule.onNodeWithTag(tag)
+            .fetchSemanticsNode("couldn't find node with tag $tag")
+        rule.runOnUiThread {
+            assertTrue(provider.performAction(node.id, ACTION_CLICK, null))
+        }
+
+        rule.runOnIdle {
+            verify(container, times(1)).requestSendAccessibilityEvent(
+                eq(androidComposeView),
+                argThat(
+                    ArgumentMatcher {
+                        getAccessibilityEventSourceSemanticsNodeId(it) == node.id &&
+                            it.eventType == AccessibilityEvent.TYPE_VIEW_CLICKED
+                    }
+                )
+            )
+        }
+    }
+
+    @Test
     fun sendStateChangeEvent_whenClickToggleable() {
         val tag = "Toggleable"
         container.setContent {
@@ -556,18 +766,88 @@ class AndroidAccessibilityTest {
         val toggleableNode = rule.onNodeWithTag(tag)
             .fetchSemanticsNode("couldn't find node with tag $tag")
 
-        val stateEvent = delegate.createEvent(
-            toggleableNode.id,
-            AccessibilityEvent.TYPE_WINDOW_CONTENT_CHANGED
-        )
-        stateEvent.contentChangeTypes = AccessibilityEvent.CONTENT_CHANGE_TYPE_STATE_DESCRIPTION
-
         rule.runOnIdle {
-            verify(container, atLeastOnce()).requestSendAccessibilityEvent(
-                eq(androidComposeView), argument.capture()
+            verify(container, times(1)).requestSendAccessibilityEvent(
+                eq(androidComposeView),
+                argThat(
+                    ArgumentMatcher {
+                        getAccessibilityEventSourceSemanticsNodeId(it) == toggleableNode.id &&
+                            it.eventType == AccessibilityEvent.TYPE_WINDOW_CONTENT_CHANGED &&
+                            it.contentChangeTypes ==
+                            AccessibilityEvent.CONTENT_CHANGE_TYPE_STATE_DESCRIPTION
+                    }
+                )
             )
-            val values = argument.allValues
-            assertTrue(containsEvent(values, stateEvent))
+        }
+    }
+
+    @Test
+    fun sendStateChangeEvent_whenSelectedChange() {
+        val tag = "Selectable"
+        container.setContent {
+            var selected by remember { mutableStateOf(false) }
+            Box(
+                Modifier
+                    .selectable(selected = selected, onClick = { selected = true })
+                    .testTag(tag)
+            ) {
+                BasicText("Text")
+            }
+        }
+
+        rule.onNodeWithTag(tag)
+            .assertIsDisplayed()
+            .assertIsNotSelected()
+
+        waitForSubtreeEventToSend()
+        rule.onNodeWithTag(tag)
+            .performClick()
+            .assertIsSelected()
+
+        val node = rule.onNodeWithTag(tag)
+            .fetchSemanticsNode("couldn't find node with tag $tag")
+        rule.runOnIdle {
+            verify(container, times(1)).requestSendAccessibilityEvent(
+                eq(androidComposeView),
+                argThat(
+                    ArgumentMatcher {
+                        getAccessibilityEventSourceSemanticsNodeId(it) == node.id &&
+                            it.eventType == AccessibilityEvent.TYPE_WINDOW_CONTENT_CHANGED &&
+                            it.contentChangeTypes ==
+                            AccessibilityEvent.CONTENT_CHANGE_TYPE_STATE_DESCRIPTION
+                    }
+                )
+            )
+        }
+    }
+
+    @Test
+    fun sendStateChangeEvent_whenRangeInfoChange() {
+        val tag = "Progress"
+        var current by mutableStateOf(0.5f)
+        container.setContent {
+            Box(Modifier.progressSemantics(current).testTag(tag)) {
+                BasicText("Text")
+            }
+        }
+        waitForSubtreeEventToSend()
+
+        current = 0.9f
+
+        val node = rule.onNodeWithTag(tag)
+            .fetchSemanticsNode("couldn't find node with tag $tag")
+        rule.runOnIdle {
+            verify(container, times(1)).requestSendAccessibilityEvent(
+                eq(androidComposeView),
+                argThat(
+                    ArgumentMatcher {
+                        getAccessibilityEventSourceSemanticsNodeId(it) == node.id &&
+                            it.eventType == AccessibilityEvent.TYPE_WINDOW_CONTENT_CHANGED &&
+                            it.contentChangeTypes ==
+                            AccessibilityEvent.CONTENT_CHANGE_TYPE_STATE_DESCRIPTION
+                    }
+                )
+            )
         }
     }
 
