@@ -648,19 +648,15 @@ internal class LayoutNode : Measurable, Remeasurement, OwnerScope, LayoutInfo, C
             // when possible.
             val outerWrapper = modifier.foldOut(innerLayoutNodeWrapper) { mod, toWrap ->
                 var wrapper = toWrap
-                if (mod is OnGloballyPositionedModifier) {
-                    val onPositionedCallbacks = onPositionedCallbacks
-                        ?: mutableVectorOf<OnGloballyPositionedModifier>().also {
-                            onPositionedCallbacks = it
-                        }
-                    onPositionedCallbacks += mod
-                }
                 if (mod is RemeasurementModifier) {
                     mod.onRemeasurementAvailable(this)
                 }
 
                 val delegate = reuseLayoutNodeWrapper(mod, toWrap)
                 if (delegate != null) {
+                    if (delegate is OnGloballyPositionedModifierWrapper) {
+                        getOrCreateOnPositionedCallbacks() += delegate
+                    }
                     wrapper = delegate
                 } else {
                     // The order in which the following blocks occur matters. For example, the
@@ -702,6 +698,11 @@ internal class LayoutNode : Measurable, Remeasurement, OwnerScope, LayoutInfo, C
                     }
                     if (mod is OnRemeasuredModifier) {
                         wrapper = RemeasureModifierWrapper(wrapper, mod).assignChained(toWrap)
+                    }
+                    if (mod is OnGloballyPositionedModifier) {
+                        wrapper =
+                            OnGloballyPositionedModifierWrapper(wrapper, mod).assignChained(toWrap)
+                        getOrCreateOnPositionedCallbacks() += wrapper
                     }
                 }
                 wrapper
@@ -771,7 +772,12 @@ internal class LayoutNode : Measurable, Remeasurement, OwnerScope, LayoutInfo, C
     /**
      * List of all OnPositioned callbacks in the modifier chain.
      */
-    private var onPositionedCallbacks: MutableVector<OnGloballyPositionedModifier>? = null
+    private var onPositionedCallbacks: MutableVector<OnGloballyPositionedModifierWrapper>? = null
+
+    private fun getOrCreateOnPositionedCallbacks() = onPositionedCallbacks
+        ?: mutableVectorOf<OnGloballyPositionedModifierWrapper>().also {
+            onPositionedCallbacks = it
+        }
 
     /**
      * Flag used by [OnPositionedDispatcher] to identify LayoutNodes that have already
@@ -824,9 +830,9 @@ internal class LayoutNode : Measurable, Remeasurement, OwnerScope, LayoutInfo, C
      */
     private fun hasNewPositioningCallback(): Boolean {
         val onPositionedCallbacks = onPositionedCallbacks
-        return onPositionedCallbacks != null && modifier.foldOut(false) { mod, hasNewCallback ->
-            hasNewCallback ||
-                (mod is OnGloballyPositionedModifier && mod !in onPositionedCallbacks)
+        return modifier.foldOut(false) { mod, hasNewCallback ->
+            hasNewCallback || mod is OnGloballyPositionedModifier &&
+                (onPositionedCallbacks?.firstOrNull { mod == it.modifier } == null)
         }
     }
 
@@ -1074,7 +1080,9 @@ internal class LayoutNode : Measurable, Remeasurement, OwnerScope, LayoutInfo, C
         if (!isPlaced) {
             return // it hasn't been placed, so don't make a call
         }
-        onPositionedCallbacks?.forEach { it.onGloballyPositioned(coordinates) }
+        onPositionedCallbacks?.forEach {
+            it.modifier.onGloballyPositioned(it)
+        }
     }
 
     /**

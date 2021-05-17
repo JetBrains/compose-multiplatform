@@ -472,8 +472,8 @@ internal fun CoreTextField(
                 )
                 .then(cursorModifier)
                 .then(drawModifier)
-                .then(onPositionedModifier)
                 .textFieldMinSize(textStyle)
+                .then(onPositionedModifier)
 
             SimpleLayout(coreTextFieldModifier) {
                 Layout({ }) { _, constraints ->

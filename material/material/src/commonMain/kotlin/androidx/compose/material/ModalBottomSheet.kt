@@ -255,11 +255,11 @@ fun ModalBottomSheetLayout(
             Modifier
                 .fillMaxWidth()
                 .nestedScroll(sheetState.nestedScrollConnection)
+                .offset { IntOffset(0, sheetState.offset.value.roundToInt()) }
+                .bottomSheetSwipeable(sheetState, fullHeight, sheetHeightState)
                 .onGloballyPositioned {
                     sheetHeightState.value = it.size.height.toFloat()
                 }
-                .offset { IntOffset(0, sheetState.offset.value.roundToInt()) }
-                .bottomSheetSwipeable(sheetState, fullHeight, sheetHeightState)
                 .semantics {
                     if (sheetState.isVisible) {
                         dismiss {

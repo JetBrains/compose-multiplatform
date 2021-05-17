@@ -83,11 +83,11 @@ class AlignmentLineTest : LayoutTest() {
             ) {
                 AlignmentLineLayout(
                     childDp, 0.dp, testLine, lineDp,
-                    Modifier.onGloballyPositioned {
+                    Modifier.paddingFrom(testLine, beforeDp, afterDp).onGloballyPositioned {
                         childSize.value = it.size
                         childPosition.value = it.positionInRoot()
                         layoutLatch.countDown()
-                    }.paddingFrom(testLine, beforeDp, afterDp)
+                    }
                 )
             }
         }
@@ -129,11 +129,11 @@ class AlignmentLineTest : LayoutTest() {
             ) {
                 AlignmentLineLayout(
                     0.dp, childDp, testLine, lineDp,
-                    Modifier.onGloballyPositioned {
+                    Modifier.paddingFrom(testLine, beforeDp, afterDp).onGloballyPositioned {
                         childSize.value = it.size
                         childPosition.value = it.positionInRoot()
                         layoutLatch.countDown()
-                    }.paddingFrom(testLine, beforeDp, afterDp)
+                    }
                 )
             }
         }
@@ -198,8 +198,9 @@ class AlignmentLineTest : LayoutTest() {
             Box(Modifier.saveLayoutInfo(parentSize, Ref(), layoutLatch)) {
                 AlignmentLineLayout(
                     0.dp, childDp, testLine, lineDp,
-                    Modifier.saveLayoutInfo(childSize, childPosition, layoutLatch)
+                    Modifier
                         .paddingFrom(testLine, beforeDp, afterDp)
+                        .saveLayoutInfo(childSize, childPosition, layoutLatch)
                 )
             }
         }
@@ -231,8 +232,8 @@ class AlignmentLineTest : LayoutTest() {
                 AlignmentLineLayout(
                     childDp, 0.dp, testLine, lineDp,
                     Modifier.sizeIn(maxWidth = maxWidth)
-                        .saveLayoutInfo(childSize, childPosition, layoutLatch)
                         .paddingFrom(testLine, beforeDp, afterDp)
+                        .saveLayoutInfo(childSize, childPosition, layoutLatch)
                 )
             }
         }
@@ -265,8 +266,8 @@ class AlignmentLineTest : LayoutTest() {
                 AlignmentLineLayout(
                     0.dp, childDp, testLine, lineDp,
                     Modifier.sizeIn(maxHeight = maxHeight)
-                        .saveLayoutInfo(childSize, childPosition, layoutLatch)
                         .paddingFrom(testLine, beforeDp, afterDp)
+                        .saveLayoutInfo(childSize, childPosition, layoutLatch)
                 )
             }
         }
