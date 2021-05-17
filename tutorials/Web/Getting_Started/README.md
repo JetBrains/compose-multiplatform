@@ -96,18 +96,18 @@ fun main() {
     renderComposable(rootElementId = "root") {
         Div(style = { padding(25.px) }) {
             Button(attrs = {
-                onClick { count = count - 1 }
+                onClick { count -= 1 }
             }) {
                 Text("-")
             }
 
             Span(style = { padding(15.px) }) {
-                Text("${count}")
+                Text("$count")
             }
 
 
             Button(attrs = {
-                onClick { count = count + 1 }
+                onClick { count += 1 }
             }) {
                 Text("+")
             }
