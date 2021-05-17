@@ -66,16 +66,16 @@ internal actual class PlatformRipple actual constructor(
         color: State<Color>,
         rippleAlpha: State<RippleAlpha>
     ): RippleIndicationInstance {
+        val view = findNearestViewGroup()
         // Fallback to drawing inside Compose if needed, using the common implementation
-        if (!LocalRippleNativeRendering.current) {
+        // TODO(b/188112048): Remove isInEditMode once RenderThread support is fixed in Layoutlib.
+        if (!LocalRippleNativeRendering.current || view.isInEditMode) {
             return remember(interactionSource, this) {
                 CommonRippleIndicationInstance(bounded, radius, color, rippleAlpha)
             }
         }
 
         // Create or get the RippleContainer attached to the nearest root Compose view
-
-        val view = findNearestViewGroup()
 
         var rippleContainer: RippleContainer? = null
 
