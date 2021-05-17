@@ -25,7 +25,6 @@ import androidx.build.playground.VerifyPlaygroundGradlePropertiesTask
 import androidx.build.studio.StudioTask.Companion.registerStudioTask
 import androidx.build.uptodatedness.TaskUpToDateValidator
 import com.android.build.gradle.api.AndroidBasePlugin
-import com.android.build.gradle.internal.tasks.factory.dependsOn
 import org.gradle.api.GradleException
 import org.gradle.api.Plugin
 import org.gradle.api.Project
@@ -132,7 +131,9 @@ class AndroidXRootPlugin : Plugin<Project> {
                 "validateProperties",
                 ValidatePropertiesTask::class.java
             )
-            validateAllProperties.dependsOn(validateProperties)
+            validateAllProperties.configure {
+                it.dependsOn(validateProperties)
+            }
         }
 
         if (partiallyDejetifyArchiveTask != null) {

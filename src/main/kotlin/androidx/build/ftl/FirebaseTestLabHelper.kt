@@ -18,7 +18,6 @@ package androidx.build.ftl
 
 import androidx.build.gradle.isRoot
 import com.android.build.gradle.TestedExtension
-import com.android.build.gradle.internal.tasks.factory.dependsOn
 import org.gradle.api.Project
 
 /**
@@ -56,7 +55,7 @@ internal class FirebaseTestLabHelper(
     private fun configure(project: Project, testedExtension: TestedExtension) {
         testedExtension.testVariants.all { testVariant ->
             RunTestOnFTLTask.create(project, testVariant)?.let { ftlTask ->
-                anchorTask.dependsOn(ftlTask)
+                anchorTask.configure { it.dependsOn(ftlTask) }
             }
         }
     }
