@@ -17,6 +17,7 @@
 package androidx.compose.ui.platform
 
 import android.content.Context
+import android.os.IBinder
 import android.util.AttributeSet
 import android.view.View
 import android.view.ViewGroup
@@ -29,14 +30,6 @@ import androidx.compose.ui.node.InternalCoreApi
 import androidx.compose.ui.node.Owner
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.ViewTreeLifecycleOwner
-import androidx.savedstate.ViewTreeSavedStateRegistryOwner
-
-private const val MissingViewTreeDependenciesMessage =
-    "If you are adding this ComposeView to an AppCompatActivity, make sure you " +
-        "are using AppCompat version 1.3+. If you are adding this ComposeView to a " +
-        "Fragment, make sure you are using Fragment version 1.3+. For other cases, manually " +
-        "set owners on this view by using `ViewTreeLifecycleOwner.set()` and " +
-        "`ViewTreeSavedStateRegistryOwner.set()`."
 
 /**
  * Base class for custom [android.view.View]s implemented using Jetpack Compose UI.
@@ -63,12 +56,44 @@ abstract class AbstractComposeView @JvmOverloads constructor(
         clipToPadding = false
     }
 
+    /**
+     * The first time we successfully locate this we'll save it here.
+     * If this View moves to the [android.view.ViewOverlay] we won't be able
+     * to find view tree dependencies; this happens when using transition APIs
+     * to animate views out in particular.
+     */
+    private var cachedViewTreeCompositionContext: CompositionContext? = null
+
+    /**
+     * The [getWindowToken] of the window this view was last attached to.
+     * If we become attached to a new window we clear [cachedViewTreeCompositionContext]
+     * so that we might appeal to the (possibly lazily created) [windowRecomposer]
+     * if [findViewTreeCompositionContext] can't locate one instead of using the previous
+     * [cachedViewTreeCompositionContext].
+     */
+    private var previousAttachedWindowToken: IBinder? = null
+        set(value) {
+            if (field !== value) {
+                field = value
+                cachedViewTreeCompositionContext = null
+            }
+        }
+
     private var composition: Composition? = null
 
+    /**
+     * The explicitly set [CompositionContext] to use as the parent of compositions created
+     * for this view. Set by [setParentCompositionContext].
+     *
+     * If set to a non-null value [cachedViewTreeCompositionContext] will be cleared.
+     */
     private var parentContext: CompositionContext? = null
         set(value) {
             if (field !== value) {
                 field = value
+                if (value != null) {
+                    cachedViewTreeCompositionContext = null
+                }
                 val old = composition
                 if (old !== null) {
                     old.dispose()
@@ -175,30 +200,31 @@ abstract class AbstractComposeView @JvmOverloads constructor(
         }
     }
 
-    private fun checkViewTreeOwners() {
-        checkNotNull(ViewTreeLifecycleOwner.get(this)) {
-            "ViewTreeLifecycleOwner not set for this ComposeView. " +
-                MissingViewTreeDependenciesMessage
-        }
-        checkNotNull(ViewTreeSavedStateRegistryOwner.get(this)) {
-            "ViewTreeSavedStateRegistryOwner not set for this ComposeView. " +
-                MissingViewTreeDependenciesMessage
-        }
-        // Not checking for ViewTreeViewModelStoreOwner as we don't need it inside Compose,
-        // but we provide it in ComponentActivity.setContent for convenience.
-    }
+    /**
+     * Determine the correct [CompositionContext] to use as the parent of this view's
+     * composition. This can result in caching a looked-up [CompositionContext] for use
+     * later. See [cachedViewTreeCompositionContext] for more details.
+     *
+     * If [cachedViewTreeCompositionContext] is available but [findViewTreeCompositionContext]
+     * cannot find a parent context, we will use the cached context if present before appealing
+     * to the [windowRecomposer], as [windowRecomposer] can lazily create a recomposer.
+     * If we're reattached to the same window and [findViewTreeCompositionContext] can't find the
+     * context that [windowRecomposer] would install, we might be in the [getOverlay] of some
+     * part of the view hierarchy to animate the disappearance of this and other views. We still
+     * need to be able to compose/recompose in this state without creating a brand new recomposer
+     * to do it, as well as still locate any view tree dependencies.
+     */
+    private fun resolveParentCompositionContext() = parentContext
+        ?: findViewTreeCompositionContext()?.also { cachedViewTreeCompositionContext = it }
+        ?: cachedViewTreeCompositionContext
+        ?: windowRecomposer.also { cachedViewTreeCompositionContext = it }
 
     @Suppress("DEPRECATION") // Still using ViewGroup.setContent for now
     private fun ensureCompositionCreated() {
         if (composition == null) {
-            if (isAttachedToWindow) {
-                checkViewTreeOwners()
-            }
             try {
                 creatingComposition = true
-                composition = setContent(
-                    parentContext ?: findViewTreeCompositionContext() ?: windowRecomposer
-                ) {
+                composition = setContent(resolveParentCompositionContext()) {
                     Content()
                 }
             } finally {
@@ -227,9 +253,7 @@ abstract class AbstractComposeView @JvmOverloads constructor(
     override fun onAttachedToWindow() {
         super.onAttachedToWindow()
 
-        if (composition != null) {
-            checkViewTreeOwners()
-        }
+        previousAttachedWindowToken = windowToken
 
         if (shouldCreateCompositionOnAttachedToWindow) {
             ensureCompositionCreated()

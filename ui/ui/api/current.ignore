@@ -21,6 +21,8 @@ InvalidNullConversion: androidx.compose.ui.semantics.SemanticsPropertiesKt#getIm
 
 RemovedClass: androidx.compose.ui.focus.FocusStateKt:
     Removed class androidx.compose.ui.focus.FocusStateKt
+RemovedClass: androidx.compose.ui.platform.ComposeView_androidKt:
+    Removed class androidx.compose.ui.platform.ComposeView_androidKt
 
 
 RemovedField: androidx.compose.ui.focus.FocusState#Active:
