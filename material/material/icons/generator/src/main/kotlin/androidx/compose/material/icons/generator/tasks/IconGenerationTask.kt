@@ -32,9 +32,11 @@ import org.gradle.api.tasks.PathSensitive
 import org.gradle.api.tasks.PathSensitivity
 import org.gradle.api.tasks.TaskAction
 import org.gradle.api.tasks.Internal
+import org.gradle.api.tasks.TaskProvider
 import org.jetbrains.kotlin.gradle.dsl.KotlinMultiplatformExtension
 import org.jetbrains.kotlin.gradle.plugin.KotlinSourceSet
 import java.io.File
+import java.util.Locale
 
 /**
  * Base [org.gradle.api.Task] for tasks relating to icon generation.
@@ -110,15 +112,15 @@ abstract class IconGenerationTask : DefaultTask() {
 
     @get:OutputDirectory
     val generatedSrcMainDirectory: File
-        get() = buildDirectory.resolve("src/commonMain/kotlin")
+        get() = buildDirectory.resolve(GeneratedSrcMain)
 
     @get:OutputDirectory
     val generatedSrcAndroidTestDirectory: File
-        get() = buildDirectory.resolve("src/androidAndroidTest/kotlin")
+        get() = buildDirectory.resolve(GeneratedSrcAndroidTest)
 
     @get:OutputDirectory
     val generatedResourceDirectory: File
-        get() = buildDirectory.resolve("generatedIcons/res")
+        get() = buildDirectory.resolve(GeneratedResource)
 
     /**
      * The action for this task
@@ -183,6 +185,12 @@ abstract class IconGenerationTask : DefaultTask() {
                 IconTestingGenerationTask.register(project, variant)
             }
         }
+
+        const val GeneratedSrcMain = "src/commonMain/kotlin"
+
+        const val GeneratedSrcAndroidTest = "src/androidAndroidTest/kotlin"
+
+        const val GeneratedResource = "generatedIcons/res"
     }
 }
 
@@ -195,14 +203,14 @@ private const val GeneratorProject = ":compose:material:material:icons:generator
  *
  * @param variant the [BaseVariant] to associate this task with, or `null` if this task does not
  * change between variants.
- * @return the created [T] of [IconGenerationTask]
+ * @return a [Pair] of the created [TaskProvider] of [T] of [IconGenerationTask], and the [File]
+ * for the directory that files will be generated to
  */
-@Suppress("DefaultLocale")
-fun <T : IconGenerationTask> Project.createGenerationTask(
+fun <T : IconGenerationTask> Project.registerGenerationTask(
     taskName: String,
     taskClass: Class<T>,
     variant: BaseVariant? = null
-): T {
+): Pair<TaskProvider<T>, File> {
     val variantName = variant?.name ?: "allVariants"
 
     val themeName = if (project.name.contains("material-icons-extended-")) {
@@ -211,10 +219,12 @@ fun <T : IconGenerationTask> Project.createGenerationTask(
         null
     }
 
-    return tasks.create("$taskName${variantName.capitalize()}", taskClass) {
+    val buildDirectory = project.buildDir.resolve("generatedIcons/$variantName")
+
+    return tasks.register("$taskName${variantName.capitalize(Locale.getDefault())}", taskClass) {
         it.themeName = themeName
-        it.buildDirectory = project.buildDir.resolve("generatedIcons/$variantName")
-    }
+        it.buildDirectory = buildDirectory
+    } to buildDirectory
 }
 
 fun Project.getMultiplatformSourceSet(name: String): KotlinSourceSet {
