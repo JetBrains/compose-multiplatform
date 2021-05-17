@@ -49,6 +49,7 @@ import androidx.compose.material.samples.OutlinedTextFieldSample
 import androidx.compose.material.samples.PasswordTextField
 import androidx.compose.material.samples.RadioButtonSample
 import androidx.compose.material.samples.RadioGroupSample
+import androidx.compose.material.samples.RangeSliderSample
 import androidx.compose.material.samples.ScaffoldWithCoroutinesSnackbar
 import androidx.compose.material.samples.ScaffoldWithCustomSnackbar
 import androidx.compose.material.samples.ScaffoldWithSimpleSnackbar
@@ -62,6 +63,7 @@ import androidx.compose.material.samples.SimpleOutlinedTextFieldSample
 import androidx.compose.material.samples.SimpleTextFieldSample
 import androidx.compose.material.samples.SimpleTopAppBar
 import androidx.compose.material.samples.SliderSample
+import androidx.compose.material.samples.StepRangeSliderSample
 import androidx.compose.material.samples.StepsSliderSample
 import androidx.compose.material.samples.SwitchSample
 import androidx.compose.material.samples.TextAndIconTabs
@@ -424,7 +426,21 @@ val SlidersExamples = listOf(
         sourceUrl = SlidersExampleSourceUrl
     ) {
         StepsSliderSample()
-    }
+    },
+    Example(
+        name = ::RangeSliderSample.name,
+        description = SlidersExampleDescription,
+        sourceUrl = SlidersExampleSourceUrl
+    ) {
+        RangeSliderSample()
+    },
+    Example(
+        name = ::StepRangeSliderSample.name,
+        description = SlidersExampleDescription,
+        sourceUrl = SlidersExampleSourceUrl
+    ) {
+        StepRangeSliderSample()
+    },
 )
 
 private const val SnackbarsExampleDescription = "Snackbars examples"

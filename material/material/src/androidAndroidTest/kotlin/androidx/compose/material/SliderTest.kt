@@ -62,7 +62,6 @@ import kotlinx.coroutines.launch
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
-import kotlin.math.abs
 
 @MediumTest
 @RunWith(AndroidJUnit4::class)
@@ -207,7 +206,7 @@ class SliderTest {
                 expected = calculateFraction(left, right, centerX + 100 - slop)
             }
         rule.runOnIdle {
-            Truth.assertThat(abs(state.value - expected)).isLessThan(0.001f)
+            Truth.assertThat(state.value).isWithin(0.001f).of(expected)
         }
     }
 
@@ -236,7 +235,7 @@ class SliderTest {
                 expected = calculateFraction(left, right, centerX + 50)
             }
         rule.runOnIdle {
-            Truth.assertThat(abs(state.value - expected)).isLessThan(0.001f)
+            Truth.assertThat(state.value).isWithin(0.001f).of(expected)
         }
     }
 
@@ -268,7 +267,7 @@ class SliderTest {
             }
 
         rule.runOnIdle {
-            Truth.assertThat(abs(state.value - expected)).isLessThan(0.001f)
+            Truth.assertThat(state.value).isWithin(0.001f).of(expected)
         }
     }
 
@@ -303,7 +302,7 @@ class SliderTest {
                 expected = calculateFraction(left, right, centerX - 100 + slop)
             }
         rule.runOnIdle {
-            Truth.assertThat(abs(state.value - expected)).isLessThan(0.001f)
+            Truth.assertThat(state.value).isWithin(0.001f).of(expected)
         }
     }
 
@@ -334,7 +333,38 @@ class SliderTest {
                 expected = calculateFraction(left, right, centerX - 50)
             }
         rule.runOnIdle {
-            Truth.assertThat(abs(state.value - expected)).isLessThan(0.001f)
+            Truth.assertThat(state.value).isWithin(0.001f).of(expected)
+        }
+    }
+
+    @Test
+    fun rangeSlider_tap_rtl() {
+        val state = mutableStateOf(0f)
+
+        rule.setMaterialContent {
+            CompositionLocalProvider(LocalLayoutDirection provides LayoutDirection.Rtl) {
+                Slider(
+                    modifier = Modifier.testTag(tag),
+                    value = state.value,
+                    onValueChange = { state.value = it }
+                )
+            }
+        }
+
+        rule.runOnUiThread {
+            Truth.assertThat(state.value).isEqualTo(0f)
+        }
+
+        var expected = 0f
+
+        rule.onNodeWithTag(tag)
+            .performGesture {
+                down(Offset(centerX + 50, centerY))
+                up()
+                expected = calculateFraction(left, right, centerX - 50)
+            }
+        rule.runOnIdle {
+            Truth.assertThat(state.value).isWithin(0.001f).of(expected)
         }
     }
 
@@ -471,6 +501,213 @@ class SliderTest {
             Truth.assertThat(interactions[1]).isInstanceOf(PressInteraction.Cancel::class.java)
             Truth.assertThat((interactions[1] as PressInteraction.Cancel).press)
                 .isEqualTo(interactions[0])
+        }
+    }
+
+    @ExperimentalMaterialApi
+    @Test
+    fun rangeSlider_dragThumb() {
+        val state = mutableStateOf(0f..1f)
+        var slop = 0f
+
+        rule.setMaterialContent {
+            slop = LocalViewConfiguration.current.touchSlop
+            RangeSlider(
+                modifier = Modifier.testTag(tag),
+                values = state.value,
+                onValueChange = { state.value = it }
+            )
+        }
+
+        rule.runOnUiThread {
+            Truth.assertThat(state.value).isEqualTo(0f..1f)
+        }
+
+        var expected = 0f
+
+        rule.onNodeWithTag(tag)
+            .performGesture {
+                down(center)
+                moveBy(Offset(100f, 0f))
+                up()
+                expected = calculateFraction(left, right, centerX + 100 - slop)
+            }
+        rule.runOnIdle {
+            Truth.assertThat(state.value.start).isEqualTo(0f)
+            Truth.assertThat(state.value.endInclusive).isWithin(0.001f).of(expected)
+        }
+    }
+
+    @ExperimentalMaterialApi
+    @Test
+    fun rangeSlider_tap() {
+        val state = mutableStateOf(0f..1f)
+
+        rule.setMaterialContent {
+            RangeSlider(
+                modifier = Modifier.testTag(tag),
+                values = state.value,
+                onValueChange = { state.value = it }
+            )
+        }
+
+        rule.runOnUiThread {
+            Truth.assertThat(state.value).isEqualTo(0f..1f)
+        }
+
+        var expected = 0f
+
+        rule.onNodeWithTag(tag)
+            .performGesture {
+                down(Offset(centerX + 50, centerY))
+                up()
+                expected = calculateFraction(left, right, centerX + 50)
+            }
+        rule.runOnIdle {
+            Truth.assertThat(state.value.endInclusive).isWithin(0.001f).of(expected)
+            Truth.assertThat(state.value.start).isEqualTo(0f)
+        }
+    }
+
+    @ExperimentalMaterialApi
+    @Test
+    fun rangeSlider_tap_rangeChange() {
+        val state = mutableStateOf(0f..25f)
+        val rangeEnd = mutableStateOf(.25f)
+
+        rule.setMaterialContent {
+            RangeSlider(
+                modifier = Modifier.testTag(tag),
+                values = state.value,
+                onValueChange = { state.value = it },
+                valueRange = 0f..rangeEnd.value
+            )
+        }
+        // change to 1 since [calculateFraction] coerces between 0..1
+        rule.runOnUiThread {
+            rangeEnd.value = 1f
+        }
+
+        var expected = 0f
+
+        rule.onNodeWithTag(tag)
+            .performGesture {
+                down(Offset(centerX + 50, centerY))
+                up()
+                expected = calculateFraction(left, right, centerX + 50)
+            }
+
+        rule.runOnIdle {
+            Truth.assertThat(state.value.endInclusive).isWithin(0.001f).of(expected)
+        }
+    }
+
+    @ExperimentalMaterialApi
+    @Test
+    fun rangeSlider_drag_rtl() {
+        val state = mutableStateOf(0f..1f)
+        var slop = 0f
+
+        rule.setMaterialContent {
+            CompositionLocalProvider(LocalLayoutDirection provides LayoutDirection.Rtl) {
+                slop = LocalViewConfiguration.current.touchSlop
+                RangeSlider(
+                    modifier = Modifier.testTag(tag),
+                    values = state.value,
+                    onValueChange = { state.value = it }
+                )
+            }
+        }
+
+        rule.runOnUiThread {
+            Truth.assertThat(state.value).isEqualTo(0f..1f)
+        }
+
+        var expected = 0f
+
+        rule.onNodeWithTag(tag)
+            .performGesture {
+                down(center)
+                moveBy(Offset(100f, 0f))
+                up()
+                // subtract here as we're in rtl and going in the opposite direction
+                expected = calculateFraction(left, right, centerX - 100 + slop)
+            }
+        rule.runOnIdle {
+            Truth.assertThat(state.value.start).isEqualTo(0f)
+            Truth.assertThat(state.value.endInclusive).isWithin(0.001f).of(expected)
+        }
+    }
+
+    @ExperimentalMaterialApi
+    @Test
+    fun rangeSlider_closeThumbs_dragRight() {
+        val state = mutableStateOf(0.5f..0.5f)
+        var slop = 0f
+
+        rule.setMaterialContent {
+            slop = LocalViewConfiguration.current.touchSlop
+            RangeSlider(
+                modifier = Modifier.testTag(tag),
+                values = state.value,
+                onValueChange = { state.value = it }
+            )
+        }
+
+        rule.runOnUiThread {
+            Truth.assertThat(state.value).isEqualTo(0.5f..0.5f)
+        }
+
+        var expected = 0f
+
+        rule.onNodeWithTag(tag)
+            .performGesture {
+                down(center)
+                moveBy(Offset(slop, 0f))
+                moveBy(Offset(100f, 0f))
+                up()
+                // subtract here as we're in rtl and going in the opposite direction
+                expected = calculateFraction(left, right, centerX + 100)
+            }
+        rule.runOnIdle {
+            Truth.assertThat(state.value.start).isEqualTo(0.5f)
+            Truth.assertThat(state.value.endInclusive).isWithin(0.001f).of(expected)
+        }
+    }
+
+    @ExperimentalMaterialApi
+    @Test
+    fun rangeSlider_closeThumbs_dragLeft() {
+        val state = mutableStateOf(0.5f..0.5f)
+        var slop = 0f
+
+        rule.setMaterialContent {
+            slop = LocalViewConfiguration.current.touchSlop
+            RangeSlider(
+                modifier = Modifier.testTag(tag),
+                values = state.value,
+                onValueChange = { state.value = it }
+            )
+        }
+
+        rule.runOnUiThread {
+            Truth.assertThat(state.value).isEqualTo(0.5f..0.5f)
+        }
+
+        var expected = 0f
+
+        rule.onNodeWithTag(tag)
+            .performGesture {
+                down(center)
+                moveBy(Offset(-slop - 1, 0f))
+                moveBy(Offset(-100f, 0f))
+                up()
+                // subtract here as we're in rtl and going in the opposite direction
+                expected = calculateFraction(left, right, centerX - 100)
+            }
+        rule.runOnIdle {
+            Truth.assertThat(state.value.start).isWithin(0.001f).of(expected)
+            Truth.assertThat(state.value.endInclusive).isEqualTo(0.5f)
         }
     }
 }
