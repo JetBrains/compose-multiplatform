@@ -9,3 +9,5 @@ implement them and how they look and behave on real devices.
 * Uses the same samples as API reference docs
 * Theme picker to change Material Theming values at runtime
 * Links to guidelines, docs, source code, and issue tracker
+
+[> Releases](https://github.com/android/compose-samples/releases)
