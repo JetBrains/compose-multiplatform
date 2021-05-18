@@ -26,57 +26,154 @@ internal class LayoutNodeAlignmentLines(
     private val layoutNode: LayoutNode
 ) {
     /**
-     * The alignment lines of this layout, inherited + intrinsic
+     * `true` when the alignment lines needs to be recalculated because they might have changed.
      */
-    private val alignmentLines: MutableMap<AlignmentLine, Int> = hashMapOf()
+    internal var dirty = true
 
-    private val previousAlignmentLines = mutableMapOf<AlignmentLine, Int>()
+    /**
+     * `true` when the alignment lines were used by the parent during measurement.
+     */
+    internal var usedDuringParentMeasurement = false
 
-    fun getLastCalculation(): Map<AlignmentLine, Int> = alignmentLines
+    /**
+     * `true` when the alignment lines have been used by the parent during the current layout (or
+     * previous layout if there is no layout in progress).
+     */
+    internal var usedDuringParentLayout = false
+    /**
+     * `true` when the alignment lines were used by the parent during the last completed layout.
+     */
+    internal var previousUsedDuringParentLayout = false
 
-    fun recalculate() {
-        previousAlignmentLines.clear()
-        previousAlignmentLines.putAll(alignmentLines)
-        alignmentLines.clear()
-        layoutNode._children.forEach { child ->
-            val childAlignments = child.alignmentLines
-            if (!child.isPlaced || childAlignments == null) return@forEach
-            childAlignments.alignmentLines.keys.forEach { childLine ->
-                val linePositionInContainer = childAlignments.getAlignmentLine(childLine)!!
-                // If the line was already provided by a previous child, merge the values.
-                alignmentLines[childLine] = if (childLine in alignmentLines) {
-                    childLine.merge(
-                        alignmentLines.getValue(childLine),
-                        linePositionInContainer
-                    )
-                } else {
-                    linePositionInContainer
-                }
+    /**
+     * `true` when the alignment lines were used by the modifier of the node during measurement.
+     */
+    internal var usedByModifierMeasurement = false
+
+    /**
+     * `true` when the alignment lines were used by the modifier of the node during measurement.
+     */
+    internal var usedByModifierLayout = false
+
+    /**
+     * `true` when the direct parent or our modifier relies on our alignment lines.
+     */
+    internal val queried get() = usedDuringParentMeasurement ||
+        previousUsedDuringParentLayout || usedByModifierMeasurement ||
+        usedByModifierLayout
+
+    /**
+     * The closest layout node ancestor who was asked for alignment lines, either by the parent or
+     * their own modifier. If the owner stops being queried for alignment lines, we have to
+     * [recalculateQueryOwner] to find the new owner if one exists.
+     */
+    private var queryOwner: LayoutNode? = null
+
+    /**
+     * Whether the alignment lines of this node are relevant (whether an ancestor depends on them).
+     */
+    internal val required: Boolean get() {
+        recalculateQueryOwner()
+        return queryOwner != null
+    }
+
+    /**
+     * Updates the alignment lines query owner according to the current values of the
+     * alignmentUsedBy* of the layout nodes in the hierarchy.
+     */
+    internal fun recalculateQueryOwner() {
+        queryOwner = if (queried) {
+            layoutNode
+        } else {
+            val parent = layoutNode.parent ?: return
+            val parentQueryOwner = parent.alignmentLines.queryOwner
+            if (parentQueryOwner != null && parentQueryOwner.alignmentLines.queried) {
+                parentQueryOwner
+            } else {
+                val owner = queryOwner
+                if (owner == null || owner.alignmentLines.queried) return
+                owner.parent?.alignmentLines?.recalculateQueryOwner()
+                owner.parent?.alignmentLines?.queryOwner
             }
-        }
-        alignmentLines += layoutNode.providedAlignmentLines
-        if (previousAlignmentLines != alignmentLines) {
-            layoutNode.onAlignmentsChanged()
         }
     }
 
     /**
-     * Returns the alignment line value for a given alignment line without affecting whether
-     * the flag for whether the alignment line was read.
+     * The alignment lines of this layout, inherited + intrinsic
      */
-    private fun getAlignmentLine(alignmentLine: AlignmentLine): Int? {
-        val linePos = alignmentLines[alignmentLine] ?: return null
-        var pos = Offset(linePos.toFloat(), linePos.toFloat())
-        var wrapper = layoutNode.innerLayoutNodeWrapper
-        while (wrapper != layoutNode.outerLayoutNodeWrapper) {
-            pos = wrapper.toParentPosition(pos)
-            wrapper = wrapper.wrappedBy!!
+    private val alignmentLines: MutableMap<AlignmentLine, Int> = hashMapOf()
+
+    fun getLastCalculation(): Map<AlignmentLine, Int> = alignmentLines
+
+    fun recalculate() {
+        alignmentLines.clear()
+        /**
+         * Returns the alignment line value for a given alignment line without affecting whether
+         * the flag for whether the alignment line was read.
+         */
+        fun addAlignmentLine(
+            alignmentLine: AlignmentLine,
+            initialPosition: Int,
+            initialWrapper: LayoutNodeWrapper
+        ) {
+            var position = Offset(initialPosition.toFloat(), initialPosition.toFloat())
+            var wrapper = initialWrapper
+            while (true) {
+                position = wrapper.toParentPosition(position)
+                wrapper = wrapper.wrappedBy!!
+                if (wrapper == layoutNode.innerLayoutNodeWrapper) break
+                if (alignmentLine in wrapper.providedAlignmentLines) {
+                    val newPosition = wrapper[alignmentLine]
+                    position = Offset(newPosition.toFloat(), newPosition.toFloat())
+                }
+            }
+            val positionInContainer = if (alignmentLine is HorizontalAlignmentLine) {
+                position.y.roundToInt()
+            } else {
+                position.x.roundToInt()
+            }
+            // If the line was already provided by a previous child, merge the values.
+            alignmentLines[alignmentLine] = if (alignmentLine in alignmentLines) {
+                alignmentLine.merge(
+                    alignmentLines.getValue(alignmentLine),
+                    positionInContainer
+                )
+            } else {
+                positionInContainer
+            }
         }
-        pos = wrapper.toParentPosition(pos)
-        return if (alignmentLine is HorizontalAlignmentLine) {
-            pos.y.roundToInt()
-        } else {
-            pos.x.roundToInt()
+        layoutNode._children.forEach { child ->
+            if (!child.isPlaced) return@forEach
+            if (child.alignmentLines.dirty) {
+                // It did not need relayout, but we still call layout to recalculate
+                // alignment lines.
+                child.layoutChildren()
+            }
+            // Add alignment lines on the child node.
+            child.alignmentLines.alignmentLines.forEach { (childLine, linePosition) ->
+                addAlignmentLine(childLine, linePosition, child.innerLayoutNodeWrapper)
+            }
+
+            // Add alignment lines on the modifier of the child.
+            var wrapper = child.innerLayoutNodeWrapper.wrappedBy!!
+            while (wrapper != layoutNode.innerLayoutNodeWrapper) {
+                wrapper.providedAlignmentLines.forEach { childLine ->
+                    addAlignmentLine(childLine, wrapper[childLine], wrapper)
+                }
+                wrapper = wrapper.wrappedBy!!
+            }
         }
+        alignmentLines += layoutNode.innerLayoutNodeWrapper.measureResult.alignmentLines
+        dirty = false
+    }
+
+    internal fun reset() {
+        dirty = true
+        usedDuringParentMeasurement = false
+        previousUsedDuringParentLayout = false
+        usedDuringParentLayout = false
+        usedByModifierMeasurement = false
+        usedByModifierLayout = false
+        queryOwner = null
     }
 }

@@ -36,9 +36,10 @@ internal class OuterMeasurablePlaceable(
         check(measuredOnce)
         return measurementConstraints
     }
+    internal var duringAlignmentLinesQuery = false
+
     private var lastPosition: IntOffset = IntOffset.Zero
     private var lastLayerBlock: (GraphicsLayerScope.() -> Unit)? = null
-    private var lastProvidedAlignmentLines: MutableMap<AlignmentLine, Int>? = null
     private var lastZIndex: Float = 0f
 
     /**
@@ -87,6 +88,8 @@ internal class OuterMeasurablePlaceable(
         if (layoutNode.layoutState == LayoutState.NeedsRemeasure ||
             measurementConstraints != constraints
         ) {
+            layoutNode.alignmentLines.usedByModifierMeasurement = false
+            layoutNode._children.forEach { it.alignmentLines.usedDuringParentMeasurement = false }
             measuredOnce = true
             layoutNode.layoutState = LayoutState.Measuring
             measurementConstraints = constraints
@@ -94,8 +97,12 @@ internal class OuterMeasurablePlaceable(
             owner.snapshotObserver.observeMeasureSnapshotReads(layoutNode) {
                 outerWrapper.measure(constraints)
             }
-            layoutNode.layoutState = LayoutState.NeedsRelayout
-            notifyAlignmentChanges()
+            // The resulting layout state might be Ready. This can happen when the layout node's
+            // own modifier is querying an alignment line during measurement, therefore we
+            // need to also layout the layout node.
+            if (layoutNode.layoutState == LayoutState.Measuring) {
+                layoutNode.layoutState = LayoutState.NeedsRelayout
+            }
             val sizeChanged = outerWrapper.size != outerWrapperPreviousMeasuredSize ||
                 outerWrapper.width != width ||
                 outerWrapper.height != height
@@ -106,26 +113,6 @@ internal class OuterMeasurablePlaceable(
         return false
     }
 
-    private fun notifyAlignmentChanges() {
-        // optimized to only create a lastProvidedAlignmentLines when we do have non empty map
-        if (layoutNode.providedAlignmentLines.isNotEmpty()) {
-            val previous = lastProvidedAlignmentLines ?: mutableMapOf<AlignmentLine, Int>().also {
-                lastProvidedAlignmentLines = it
-            }
-            if (layoutNode.providedAlignmentLines != previous) {
-                previous.clear()
-                previous.putAll(layoutNode.providedAlignmentLines)
-                layoutNode.onAlignmentsChanged()
-            }
-        } else {
-            val previous = lastProvidedAlignmentLines
-            if (previous != null && previous.isNotEmpty()) {
-                previous.clear()
-                layoutNode.onAlignmentsChanged()
-            }
-        }
-    }
-
     // We are setting our measuredSize to match the coerced outerWrapper size, to prevent
     // double offseting for layout cooperation. However, this means that here we need
     // to override these getters to make the measured values correct in Measured.
@@ -133,7 +120,17 @@ internal class OuterMeasurablePlaceable(
     override val measuredWidth: Int get() = outerWrapper.measuredWidth
     override val measuredHeight: Int get() = outerWrapper.measuredHeight
 
-    override fun get(alignmentLine: AlignmentLine): Int = outerWrapper[alignmentLine]
+    override fun get(alignmentLine: AlignmentLine): Int {
+        if (layoutNode.parent?.layoutState == LayoutState.Measuring) {
+            layoutNode.alignmentLines.usedDuringParentMeasurement = true
+        } else if (layoutNode.parent?.layoutState == LayoutState.LayingOut) {
+            layoutNode.alignmentLines.usedDuringParentLayout = true
+        }
+        duringAlignmentLinesQuery = true
+        val result = outerWrapper[alignmentLine]
+        duringAlignmentLinesQuery = false
+        return result
+    }
 
     override fun placeAt(
         position: IntOffset,
@@ -144,6 +141,7 @@ internal class OuterMeasurablePlaceable(
         lastPosition = position
         lastZIndex = zIndex
         lastLayerBlock = layerBlock
+        layoutNode.alignmentLines.usedByModifierLayout = false
         with(PlacementScope) {
             if (layerBlock == null) {
                 outerWrapper.place(position, lastZIndex)

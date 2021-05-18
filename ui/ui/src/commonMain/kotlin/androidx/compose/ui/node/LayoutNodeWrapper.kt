@@ -88,8 +88,39 @@ internal abstract class LayoutNodeWrapper(
                 if (old == null || value.width != old.width || value.height != old.height) {
                     onMeasureResultChanged(value.width, value.height)
                 }
+                // We do not simply compare against old.alignmentLines in case this is a
+                // MutableStateMap and the same instance might be passed.
+                if ((!oldAlignmentLines.isNullOrEmpty() || value.alignmentLines.isNotEmpty()) &&
+                    value.alignmentLines != oldAlignmentLines
+                ) {
+                    if (wrapped?.layoutNode == layoutNode) {
+                        layoutNode.parent?.onAlignmentsChanged()
+                        // We might need to request remeasure or relayout for the parent in
+                        // case they ask for the lines so we are the query owner, without
+                        // marking dirty our alignment lines (because only the modifier's changed).
+                        if (layoutNode.alignmentLines.usedDuringParentMeasurement) {
+                            layoutNode.parent?.requestRemeasure()
+                        } else if (layoutNode.alignmentLines.usedDuringParentLayout) {
+                            layoutNode.parent?.requestRelayout()
+                        }
+                    } else {
+                        // It means we are an InnerPlaceable.
+                        layoutNode.onAlignmentsChanged()
+                    }
+                    layoutNode.alignmentLines.dirty = true
+
+                    val oldLines = oldAlignmentLines
+                        ?: (mutableMapOf<AlignmentLine, Int>().also { oldAlignmentLines = it })
+                    oldLines.clear()
+                    oldLines.putAll(value.alignmentLines)
+                }
             }
         }
+
+    private var oldAlignmentLines: MutableMap<AlignmentLine, Int>? = null
+
+    override val providedAlignmentLines: Set<AlignmentLine>
+        get() = _measureResult?.alignmentLines?.keys ?: emptySet()
 
     /**
      * Called when the width or height of [measureResult] change. The object instance pointed to
@@ -189,6 +220,11 @@ internal abstract class LayoutNodeWrapper(
                 layer.move(position)
             } else {
                 wrappedBy?.invalidateLayer()
+            }
+            if (wrapped?.layoutNode != layoutNode) {
+                layoutNode.onAlignmentsChanged()
+            } else {
+                layoutNode.parent?.onAlignmentsChanged()
             }
             layoutNode.owner?.onLayoutChange(layoutNode)
         }

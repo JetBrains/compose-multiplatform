@@ -36,9 +36,6 @@ internal open class DelegatingLayoutNodeWrapper<T : Modifier.Element>(
     override var wrapped: LayoutNodeWrapper,
     open var modifier: T
 ) : LayoutNodeWrapper(wrapped.layoutNode) {
-    override val providedAlignmentLines: Set<AlignmentLine>
-        get() = wrapped.providedAlignmentLines
-
     override val measureScope: MeasureScope get() = wrapped.measureScope
 
     /**

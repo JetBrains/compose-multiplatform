@@ -621,16 +621,24 @@ class OnGloballyPositionedTest {
     @Test
     fun testAlignmentLinesArePresent() {
         val latch = CountDownLatch(1)
-        val line = VerticalAlignmentLine(::min)
+        val line1 = VerticalAlignmentLine(::min)
+        val line2 = HorizontalAlignmentLine(::min)
         val lineValue = 10
         rule.setContent {
             val onPositioned = Modifier.onGloballyPositioned { coordinates: LayoutCoordinates ->
-                assertEquals(1, coordinates.providedAlignmentLines.size)
-                assertEquals(lineValue, coordinates[line])
+                assertEquals(2, coordinates.providedAlignmentLines.size)
+                assertEquals(lineValue, coordinates[line1])
+                assertEquals(lineValue, coordinates[line2])
                 latch.countDown()
             }
-            Layout(modifier = onPositioned, content = { }) { _, _ ->
-                layout(0, 0, mapOf(line to lineValue)) { }
+            val lineProvider = Modifier.layout { measurable, constraints ->
+                val placeable = measurable.measure(constraints)
+                layout(0, 0, mapOf(line2 to lineValue)) {
+                    placeable.place(0, 0)
+                }
+            }
+            Layout(modifier = onPositioned.then(lineProvider), content = { }) { _, _ ->
+                layout(0, 0, mapOf(line1 to lineValue)) { }
             }
         }
         assertTrue(latch.await(1, TimeUnit.SECONDS))
