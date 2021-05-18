@@ -344,6 +344,32 @@ class TextFieldSelectionDelegateTest {
         assertThat(range.end).isEqualTo(endOffset)
     }
 
+    @Test
+    fun getTextFieldSelection_empty_string() {
+        val text = ""
+        val fontSize = 20.sp
+
+        val textLayoutResult = simpleTextLayout(
+            text = text,
+            fontSize = fontSize,
+            density = defaultDensity
+        )
+
+        // Act.
+        val range = getTextFieldSelection(
+            textLayoutResult = textLayoutResult,
+            rawStartOffset = 0,
+            rawEndOffset = 0,
+            previousSelection = null,
+            isStartHandle = true,
+            adjustment = SelectionAdjustment.WORD
+        )
+
+        // Assert.
+        assertThat(range.start).isEqualTo(0)
+        assertThat(range.end).isEqualTo(0)
+    }
+
     @OptIn(InternalFoundationTextApi::class)
     private fun simpleTextLayout(
         text: String = "",
