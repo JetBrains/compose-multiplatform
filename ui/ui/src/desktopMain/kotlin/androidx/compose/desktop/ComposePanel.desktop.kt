@@ -18,6 +18,7 @@ package androidx.compose.desktop
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import org.jetbrains.skiko.ClipComponent
+import org.jetbrains.skiko.GraphicsApi
 import java.awt.Color
 import java.awt.Component
 import javax.swing.JLayeredPane
@@ -112,4 +113,12 @@ class ComposePanel : JLayeredPane() {
             layer!!.component.requestFocus()
         }
     }
+
+    /**
+     * Returns low-level rendering API used for rendering in this ComposeWindow. API is
+     * automatically selected based on operating system, graphical hardware and `SKIKO_RENDER_API`
+     * environment variable.
+     */
+    val renderApi: GraphicsApi
+        get() = if (layer != null) layer!!.component.renderApi else GraphicsApi.UNKNOWN
 }
