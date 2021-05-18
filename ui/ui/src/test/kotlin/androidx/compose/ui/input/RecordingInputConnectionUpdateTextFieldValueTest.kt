@@ -19,9 +19,9 @@ package androidx.compose.ui.input
 import android.view.View
 import android.view.inputmethod.ExtractedText
 import android.view.inputmethod.InputConnection
-import android.view.inputmethod.InputMethodManager
 import androidx.compose.ui.text.TextRange
 import androidx.compose.ui.text.input.InputEventCallback2
+import androidx.compose.ui.text.input.InputMethodManager
 import androidx.compose.ui.text.input.RecordingInputConnection
 import androidx.compose.ui.text.input.TextFieldValue
 import com.google.common.truth.Truth.assertThat
