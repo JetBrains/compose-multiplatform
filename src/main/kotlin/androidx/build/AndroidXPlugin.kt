@@ -472,7 +472,7 @@ class AndroidXPlugin : Plugin<Project> {
             buildTestApksTask.configure {
                 it.dependsOn(variant.assembleProvider)
             }
-            variant.configureApkZipping(project, true)
+            variant.configureApkCopy(project, true)
         }
 
         // AGP warns if we use project.buildDir (or subdirs) for CMake's generated
@@ -482,10 +482,7 @@ class AndroidXPlugin : Plugin<Project> {
             File(project.buildDir, "../nativeBuildStaging")
     }
 
-    /**
-     * Configures the ZIP_TEST_CONFIGS_WITH_APKS_TASK to include the test apk if applicable
-     */
-    private fun ApkVariant.configureApkZipping(
+    private fun ApkVariant.configureApkCopy(
         project: Project,
         testApk: Boolean
     ) {
@@ -497,6 +494,17 @@ class AndroidXPlugin : Plugin<Project> {
             }
 
             addToTestZips(project, packageTask)
+
+            packageTask.doLast {
+                project.copy {
+                    it.from(packageTask.outputDirectory)
+                    it.include("*.apk")
+                    it.into(File(project.getDistributionDirectory(), "apks"))
+                    it.rename { fileName ->
+                        fileName.renameApkForTesting(project.path, project.hasBenchmarkPlugin())
+                    }
+                }
+            }
         }
     }
 
@@ -561,7 +569,7 @@ class AndroidXPlugin : Plugin<Project> {
                     it.dependsOn(variant.assembleProvider)
                 }
             }
-            variant.configureApkZipping(project, false)
+            variant.configureApkCopy(project, false)
         }
     }
 
