@@ -1,0 +1,49 @@
+plugins {
+    id("kotlin-multiplatform")
+    id("org.jetbrains.compose")
+}
+
+
+kotlin {
+    jvm()
+    js(IR) {
+        browser() {
+            testTask {
+                testLogging.showStandardStreams = true
+                useKarma {
+                    useChromeHeadless()
+                    useFirefox()
+                }
+            }
+        }
+        binaries.executable()
+    }
+
+    sourceSets {
+        commonMain {
+            dependencies {
+                implementation(compose.runtime)
+                implementation(kotlin("stdlib-common"))
+            }
+        }
+
+        jsMain {
+            dependencies {
+                implementation(kotlin("stdlib-js"))
+                implementation(npm('css-typed-om', '0.4.0'))
+            }
+        }
+
+        jsTest {
+            dependencies {
+                implementation kotlin("test-js")
+            }
+        }
+
+        jvmMain {
+            dependencies {
+                implementation(compose.desktop.currentOs)
+            }
+        }
+    }
+}
