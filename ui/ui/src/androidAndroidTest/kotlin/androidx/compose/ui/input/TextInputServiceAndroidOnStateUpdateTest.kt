@@ -16,43 +16,42 @@
 
 package androidx.compose.ui.input
 
-import android.content.Context
 import android.view.View
 import android.view.inputmethod.EditorInfo
-import android.view.inputmethod.InputMethodManager
 import androidx.compose.ui.text.TextRange
 import androidx.compose.ui.text.input.ImeOptions
+import androidx.compose.ui.text.input.InputMethodManager
 import androidx.compose.ui.text.input.RecordingInputConnection
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.input.TextInputServiceAndroid
+import androidx.test.ext.junit.runners.AndroidJUnit4
+import androidx.test.filters.SmallTest
+import androidx.test.platform.app.InstrumentationRegistry
 import com.google.common.truth.Truth.assertThat
 import com.nhaarman.mockitokotlin2.any
-import com.nhaarman.mockitokotlin2.eq
 import com.nhaarman.mockitokotlin2.mock
 import com.nhaarman.mockitokotlin2.never
 import com.nhaarman.mockitokotlin2.times
 import com.nhaarman.mockitokotlin2.verify
-import com.nhaarman.mockitokotlin2.whenever
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
-import org.junit.runners.JUnit4
 
-@RunWith(JUnit4::class)
+@SmallTest
+@RunWith(AndroidJUnit4::class)
 class TextInputServiceAndroidOnStateUpdateTest {
 
     private lateinit var textInputService: TextInputServiceAndroid
-    private lateinit var imm: InputMethodManager
+    private lateinit var inputMethodManager: InputMethodManager
     private lateinit var inputConnection: RecordingInputConnection
 
     @Before
     fun setup() {
-        imm = mock()
-        val view: View = mock()
-        val context: Context = mock()
-        whenever(context.getSystemService(eq(Context.INPUT_METHOD_SERVICE))).thenReturn(imm)
-        whenever(view.context).thenReturn(context)
-        textInputService = TextInputServiceAndroid(view)
+        val view = View(InstrumentationRegistry.getInstrumentation().context)
+        inputMethodManager = mock()
+        textInputService = TextInputServiceAndroid(view, mock())
+
+        textInputService = TextInputServiceAndroid(view, inputMethodManager)
         textInputService.startInput(
             value = TextFieldValue(""),
             imeOptions = ImeOptions.Default,
@@ -71,8 +70,8 @@ class TextInputServiceAndroidOnStateUpdateTest {
             newValue = newValue
         )
 
-        verify(imm, times(1)).restartInput(any())
-        verify(imm, never()).updateSelection(any(), any(), any(), any(), any())
+        verify(inputMethodManager, times(1)).restartInput(any())
+        verify(inputMethodManager, never()).updateSelection(any(), any(), any(), any(), any())
 
         assertThat(inputConnection.mTextFieldValue).isEqualTo(newValue)
         assertThat(textInputService.state).isEqualTo(newValue)
@@ -86,8 +85,8 @@ class TextInputServiceAndroidOnStateUpdateTest {
             newValue = newValue
         )
 
-        verify(imm, times(1)).restartInput(any())
-        verify(imm, never()).updateSelection(any(), any(), any(), any(), any())
+        verify(inputMethodManager, times(1)).restartInput(any())
+        verify(inputMethodManager, never()).updateSelection(any(), any(), any(), any(), any())
 
         assertThat(inputConnection.mTextFieldValue).isEqualTo(newValue)
         assertThat(textInputService.state).isEqualTo(newValue)
@@ -101,8 +100,8 @@ class TextInputServiceAndroidOnStateUpdateTest {
             newValue = newValue
         )
 
-        verify(imm, never()).restartInput(any())
-        verify(imm, times(1)).updateSelection(any(), any(), any(), any(), any())
+        verify(inputMethodManager, never()).restartInput(any())
+        verify(inputMethodManager, times(1)).updateSelection(any(), any(), any(), any(), any())
 
         assertThat(inputConnection.mTextFieldValue).isEqualTo(newValue)
         assertThat(textInputService.state).isEqualTo(newValue)
@@ -116,8 +115,8 @@ class TextInputServiceAndroidOnStateUpdateTest {
             newValue = newValue
         )
 
-        verify(imm, never()).restartInput(any())
-        verify(imm, times(1)).updateSelection(any(), any(), any(), any(), any())
+        verify(inputMethodManager, never()).restartInput(any())
+        verify(inputMethodManager, times(1)).updateSelection(any(), any(), any(), any(), any())
 
         assertThat(inputConnection.mTextFieldValue).isEqualTo(newValue)
         assertThat(textInputService.state).isEqualTo(newValue)
@@ -131,8 +130,8 @@ class TextInputServiceAndroidOnStateUpdateTest {
             newValue = value
         )
 
-        verify(imm, never()).restartInput(any())
-        verify(imm, never()).updateSelection(any(), any(), any(), any(), any())
+        verify(inputMethodManager, never()).restartInput(any())
+        verify(inputMethodManager, never()).updateSelection(any(), any(), any(), any(), any())
 
         assertThat(inputConnection.mTextFieldValue).isEqualTo(value)
         assertThat(textInputService.state).isEqualTo(value)
@@ -146,8 +145,8 @@ class TextInputServiceAndroidOnStateUpdateTest {
             newValue = value
         )
 
-        verify(imm, never()).restartInput(any())
-        verify(imm, never()).updateSelection(any(), any(), any(), any(), any())
+        verify(inputMethodManager, never()).restartInput(any())
+        verify(inputMethodManager, never()).updateSelection(any(), any(), any(), any(), any())
 
         // recreate the connection
         inputConnection = textInputService.createInputConnection(EditorInfo())
