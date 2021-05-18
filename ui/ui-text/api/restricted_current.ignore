@@ -15,6 +15,10 @@ InvalidNullConversion: Field ImeOptions.keyboardType:
     Attempted to remove @NonNull annotation from Field ImeOptions.keyboardType
 
 
+RemovedClass: androidx.compose.ui.text.JvmCharHelpers_jvmKt:
+    Removed class androidx.compose.ui.text.JvmCharHelpers_jvmKt
+
+
 RemovedDeprecatedMethod: androidx.compose.ui.text.input.InputEventCallback#onImeAction(androidx.compose.ui.text.input.ImeAction):
     Removed deprecated method androidx.compose.ui.text.input.InputEventCallback.onImeAction(androidx.compose.ui.text.input.ImeAction)
 

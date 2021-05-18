@@ -77,7 +77,7 @@ package androidx.compose.ui.text {
   public final class JvmAnnotatedString_jvmKt {
   }
 
-  public final class JvmCharHelpers_jvmKt {
+  public final class JvmCharHelpers_androidKt {
   }
 
   public final class MultiParagraph {
