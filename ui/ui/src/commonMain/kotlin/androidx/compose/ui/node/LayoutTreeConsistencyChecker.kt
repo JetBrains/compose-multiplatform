@@ -68,7 +68,8 @@ internal class LayoutTreeConsistencyChecker(
                 return relayoutNodes.contains(this) ||
                     parentLayoutState == LayoutNode.LayoutState.NeedsRemeasure ||
                     parentLayoutState == LayoutNode.LayoutState.NeedsRelayout ||
-                    parentLayoutState == LayoutNode.LayoutState.Measuring
+                    parentLayoutState == LayoutNode.LayoutState.Measuring ||
+                    parentLayoutState == LayoutNode.LayoutState.LayingOut
             }
         }
         return true

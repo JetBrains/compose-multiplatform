@@ -23,7 +23,6 @@ import androidx.compose.ui.node.LayoutNode.LayoutState.NeedsRemeasure
 import androidx.compose.ui.node.LayoutNode.LayoutState.Ready
 import androidx.compose.ui.node.LayoutNode.UsageByParent.InLayoutBlock
 import androidx.compose.ui.node.LayoutNode.UsageByParent.InMeasureBlock
-import androidx.compose.ui.node.LayoutNode.UsageByParent.NotUsed
 import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.util.fastForEach
 
@@ -200,13 +199,9 @@ internal class MeasureAndLayoutDelegate(private val root: LayoutNode) {
             duringMeasureLayout = true
             try {
                 relayoutNodes.popEach { layoutNode ->
-                    val alignmentLinesOwner = layoutNode.alignmentLinesQueryOwner
                     if (layoutNode.isPlaced ||
                         layoutNode.canAffectParent ||
-                        (
-                            alignmentLinesOwner != null && alignmentLinesOwner
-                                .alignmentUsageByParent != NotUsed
-                            )
+                        layoutNode.alignmentLines.required
                     ) {
                         if (layoutNode.layoutState == NeedsRemeasure) {
                             if (doRemeasure(layoutNode, rootConstraints)) {
@@ -266,5 +261,5 @@ internal class MeasureAndLayoutDelegate(private val root: LayoutNode) {
 
     private val LayoutNode.canAffectParent
         get() = layoutState == NeedsRemeasure &&
-            (measuredByParent == InMeasureBlock || alignmentLinesQueryOwner != null)
+            (measuredByParent == InMeasureBlock || alignmentLines.required)
 }

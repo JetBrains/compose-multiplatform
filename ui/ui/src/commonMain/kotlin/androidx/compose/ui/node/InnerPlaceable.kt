@@ -35,9 +35,6 @@ internal class InnerPlaceable(
     layoutNode: LayoutNode
 ) : LayoutNodeWrapper(layoutNode), Density by layoutNode.measureScope {
 
-    override val providedAlignmentLines: Set<AlignmentLine>
-        get() = layoutNode.providedAlignmentLines.keys
-
     override val measureScope get() = layoutNode.measureScope
 
     override fun measure(constraints: Constraints): Placeable = performingMeasure(constraints) {
