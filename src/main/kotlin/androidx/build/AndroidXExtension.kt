@@ -155,6 +155,8 @@ open class AndroidXExtension(val project: Project) {
 
     var legacyDisableKotlinStrictApiMode = false
 
+    var benchmarkRunAlsoInterpreted = false
+
     fun shouldEnforceKotlinStrictApiMode(): Boolean {
         return !legacyDisableKotlinStrictApiMode &&
             shouldConfigureApiTasks()

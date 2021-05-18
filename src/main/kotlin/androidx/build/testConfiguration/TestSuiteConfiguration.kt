@@ -18,6 +18,7 @@
 
 package androidx.build.testConfiguration
 
+import androidx.build.AndroidXExtension
 import androidx.build.AndroidXPlugin
 import androidx.build.AndroidXPlugin.Companion.ZIP_CONSTRAINED_TEST_CONFIGS_WITH_APKS_TASK
 import androidx.build.AndroidXPlugin.Companion.ZIP_TEST_CONFIGS_WITH_APKS_TASK
@@ -82,7 +83,13 @@ fun Project.createTestConfigurationGenerationTask(
         } else {
             task.minSdk.set(minSdk)
         }
-        task.hasBenchmarkPlugin.set(this.hasBenchmarkPlugin())
+        val hasBenchmarkPlugin = this.hasBenchmarkPlugin()
+        task.hasBenchmarkPlugin.set(hasBenchmarkPlugin)
+        if (hasBenchmarkPlugin) {
+            task.benchmarkRunAlsoInterpreted.set(
+                extensions.getByType<AndroidXExtension>().benchmarkRunAlsoInterpreted
+            )
+        }
         task.testRunner.set(testRunner)
         task.testProjectPath.set(this.path)
         task.affectedModuleDetectorSubset.set(
