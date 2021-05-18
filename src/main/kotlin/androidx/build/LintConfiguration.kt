@@ -133,9 +133,6 @@ fun Project.configureLint(lintOptions: LintOptions, extension: AndroidXExtension
             }
             isIgnoreWarnings = true
 
-            // Workaround for b/177359055 where 27.2.0-beta04 incorrectly computes severity.
-            isCheckAllWarnings = true
-
             // Write output directly to the console (and nowhere else).
             textReport = true
             htmlReport = false
@@ -165,9 +162,6 @@ fun Project.configureLint(lintOptions: LintOptions, extension: AndroidXExtension
 
             // Disable the TODO check until we have a policy that requires it.
             disable("StopShip")
-
-            // Disable a check that conflicts with our workaround for b/177359055
-            disable("LintBaseline")
 
             // Broken in 7.0.0-alpha15 due to b/180408990
             disable("RestrictedApi")
