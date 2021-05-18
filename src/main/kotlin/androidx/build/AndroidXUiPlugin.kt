@@ -25,6 +25,7 @@ import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.api.artifacts.type.ArtifactTypeDefinition
 import org.gradle.api.attributes.Attribute
+import org.gradle.api.file.DuplicatesStrategy
 import org.gradle.api.tasks.ClasspathNormalizer
 import org.gradle.kotlin.dsl.apply
 import org.gradle.kotlin.dsl.findByType
@@ -280,6 +281,14 @@ class AndroidXUiPlugin : Plugin<Project> {
             val multiplatformExtension = checkNotNull(multiplatformExtension) {
                 "Unable to configureForMultiplatform() when " +
                     "multiplatformExtension is null (multiplatform plugin not enabled?)"
+            }
+
+            /**
+             * Temporary workaround for https://youtrack.jetbrains.com/issue/KT-46096
+             * Should be removed once the build switches to Kotlin 1.5
+             */
+            tasks.withType(org.gradle.jvm.tasks.Jar::class.java).configureEach { jar ->
+                jar.duplicatesStrategy = DuplicatesStrategy.INCLUDE
             }
 
             /*
