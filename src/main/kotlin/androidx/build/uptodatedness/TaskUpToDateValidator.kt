@@ -142,7 +142,8 @@ val ALLOW_RERUNNING_TASKS = setOf(
     "configureCMakeRelWithDebInfo",
     "buildCMakeRelWithDebInfo",
     ":appsearch:appsearch-local-storage:buildCMakeDebug[icing]",
-    ":appsearch:appsearch-local-storage:buildCMakeRelWithDebInfo[icing]"
+    ":appsearch:appsearch-local-storage:buildCMakeRelWithDebInfo[icing]",
+    ":hilt:hilt-navigation-compose:kaptGenerateStubsReleaseKotlin"
 )
 
 // Additional tasks that are expected to be temporarily out-of-date after running once
