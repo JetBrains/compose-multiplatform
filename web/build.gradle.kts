@@ -2,7 +2,6 @@ import org.gradle.api.publish.PublishingExtension
 
 plugins {
     id("org.jetbrains.kotlin.multiplatform") version("1.4.32") apply(false)
-    id("org.jetbrains.compose") version "0.0.0-web-dev-12" apply(false)
 }
 
 
@@ -45,3 +44,4 @@ subprojects {
         }
     }
 }
+
