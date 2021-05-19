@@ -1847,7 +1847,8 @@ private class MockOwner(
                 transformOrigin: TransformOrigin,
                 shape: Shape,
                 clip: Boolean,
-                layoutDirection: LayoutDirection
+                layoutDirection: LayoutDirection,
+                density: Density
             ) {
             }
 

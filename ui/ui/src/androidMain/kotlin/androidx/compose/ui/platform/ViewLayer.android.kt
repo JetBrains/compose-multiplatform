@@ -26,15 +26,16 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Canvas
 import androidx.compose.ui.graphics.CanvasHolder
+import androidx.compose.ui.graphics.Matrix
 import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.RectangleShape
-import androidx.compose.ui.unit.IntOffset
-import androidx.compose.ui.unit.IntSize
-import androidx.compose.ui.graphics.TransformOrigin
-import androidx.compose.ui.graphics.Matrix
 import androidx.compose.ui.graphics.Shape
+import androidx.compose.ui.graphics.TransformOrigin
 import androidx.compose.ui.graphics.setFrom
 import androidx.compose.ui.node.OwnedLayer
+import androidx.compose.ui.unit.Density
+import androidx.compose.ui.unit.IntOffset
+import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.LayoutDirection
 import java.lang.reflect.Field
 import java.lang.reflect.Method
@@ -124,7 +125,8 @@ internal class ViewLayer(
         transformOrigin: TransformOrigin,
         shape: Shape,
         clip: Boolean,
-        layoutDirection: LayoutDirection
+        layoutDirection: LayoutDirection,
+        density: Density
     ) {
         this.mTransformOrigin = transformOrigin
         this.scaleX = scaleX
@@ -148,7 +150,8 @@ internal class ViewLayer(
             this.alpha,
             this.clipToOutline,
             this.elevation,
-            layoutDirection
+            layoutDirection,
+            density
         )
         updateOutlineResolver()
         val isClippingManually = manualClipPath != null

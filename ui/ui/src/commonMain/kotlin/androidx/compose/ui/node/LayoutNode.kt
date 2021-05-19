@@ -470,6 +470,12 @@ internal class LayoutNode : Measurable, Remeasurement, OwnerScope, LayoutInfo, C
      * The screen density to be used by this layout.
      */
     override var density: Density = Density(1f)
+        set(value) {
+            if (field != value) {
+                field = value
+                onDensityOrLayoutDirectionChanged()
+            }
+        }
 
     /**
      * The scope used to [measure][MeasurePolicy.measure] children.
@@ -487,10 +493,18 @@ internal class LayoutNode : Measurable, Remeasurement, OwnerScope, LayoutInfo, C
         set(value) {
             if (field != value) {
                 field = value
-                requestRemeasure()
-                invalidateLayer()
+                onDensityOrLayoutDirectionChanged()
             }
         }
+
+    private fun onDensityOrLayoutDirectionChanged() {
+        // measure/layout modifiers on the node
+        requestRemeasure()
+        // draw modifiers on the node
+        parent?.invalidateLayer()
+        // and draw modifiers after graphics layers on the node
+        invalidateLayers()
+    }
 
     /**
      * The measured width of this layout and all of its [modifier]s. Shortcut for `size.width`.

@@ -334,7 +334,8 @@ class SkijaLayerTest {
     ) {
         updateLayerProperties(
             scaleX, scaleY, alpha, translationX, translationY, shadowElevation, rotationX,
-            rotationY, rotationZ, cameraDistance, transformOrigin, shape, clip, LayoutDirection.Ltr
+            rotationY, rotationZ, cameraDistance, transformOrigin, shape, clip, LayoutDirection.Ltr,
+            Density(1f, 1f)
         )
     }
 }

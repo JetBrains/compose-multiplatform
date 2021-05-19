@@ -34,7 +34,7 @@ import android.graphics.Outline as AndroidOutline
 /**
  * Resolves the [AndroidOutline] from the [Shape] of an [OwnedLayer].
  */
-internal class OutlineResolver(private val density: Density) {
+internal class OutlineResolver(private var density: Density) {
 
     /**
      * Flag to determine if the shape specified on the outline is supported.
@@ -119,7 +119,8 @@ internal class OutlineResolver(private val density: Density) {
         alpha: Float,
         clipToOutline: Boolean,
         elevation: Float,
-        layoutDirection: LayoutDirection
+        layoutDirection: LayoutDirection,
+        density: Density
     ): Boolean {
         cachedOutline.alpha = alpha
         val shapeChanged = this.shape != shape
@@ -134,6 +135,10 @@ internal class OutlineResolver(private val density: Density) {
         }
         if (this.layoutDirection != layoutDirection) {
             this.layoutDirection = layoutDirection
+            cacheIsDirty = true
+        }
+        if (this.density != density) {
+            this.density = density
             cacheIsDirty = true
         }
         return shapeChanged
