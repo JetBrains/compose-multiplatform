@@ -1672,7 +1672,7 @@ package androidx.compose.ui.layout {
   }
 
   public final class OnGloballyPositionedModifierKt {
-    method public static inline androidx.compose.ui.Modifier onGloballyPositioned(androidx.compose.ui.Modifier, kotlin.jvm.functions.Function1<? super androidx.compose.ui.layout.LayoutCoordinates,kotlin.Unit> onGloballyPositioned);
+    method @androidx.compose.runtime.Stable public static androidx.compose.ui.Modifier onGloballyPositioned(androidx.compose.ui.Modifier, kotlin.jvm.functions.Function1<? super androidx.compose.ui.layout.LayoutCoordinates,kotlin.Unit> onGloballyPositioned);
   }
 
   public interface OnRemeasuredModifier extends androidx.compose.ui.Modifier.Element {
@@ -1680,7 +1680,7 @@ package androidx.compose.ui.layout {
   }
 
   public final class OnRemeasuredModifierKt {
-    method public static inline androidx.compose.ui.Modifier onSizeChanged(androidx.compose.ui.Modifier, kotlin.jvm.functions.Function1<? super androidx.compose.ui.unit.IntSize,kotlin.Unit> onSizeChanged);
+    method @androidx.compose.runtime.Stable public static androidx.compose.ui.Modifier onSizeChanged(androidx.compose.ui.Modifier, kotlin.jvm.functions.Function1<? super androidx.compose.ui.unit.IntSize,kotlin.Unit> onSizeChanged);
   }
 
   public interface ParentDataModifier extends androidx.compose.ui.Modifier.Element {

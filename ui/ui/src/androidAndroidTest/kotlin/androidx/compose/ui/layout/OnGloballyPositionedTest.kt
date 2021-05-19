@@ -53,7 +53,9 @@ import androidx.compose.ui.window.Popup
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.FlakyTest
 import androidx.test.filters.MediumTest
+import androidx.test.filters.SmallTest
 import com.google.common.truth.Truth.assertThat
+import org.junit.Assert
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertNotNull
@@ -759,6 +761,28 @@ class OnGloballyPositionedTest {
             val padding2 = padding1 + with(rule.density) { 3.dp.roundToPx() }
             assertEquals(padding2.toFloat(), coords3!!.positionInWindow().x)
         }
+    }
+
+    @Test
+    @SmallTest
+    fun modifierIsReturningEqualObjectForTheSameLambda() {
+        val lambda: (LayoutCoordinates) -> Unit = { }
+        assertEquals(Modifier.onGloballyPositioned(lambda), Modifier.onGloballyPositioned(lambda))
+    }
+
+    @Test
+    @SmallTest
+    fun modifierIsReturningNotEqualObjectForDifferentLambdas() {
+        val lambda1: (LayoutCoordinates) -> Unit = {
+            it.isAttached
+        }
+        val lambda2: (LayoutCoordinates) -> Unit = {
+            !it.isAttached
+        }
+        Assert.assertNotEquals(
+            Modifier.onGloballyPositioned(lambda1),
+            Modifier.onGloballyPositioned(lambda2)
+        )
     }
 }
 
