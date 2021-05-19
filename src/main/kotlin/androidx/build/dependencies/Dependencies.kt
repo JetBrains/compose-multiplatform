@@ -84,7 +84,7 @@ internal lateinit var kspVersion: String
 val KSP_VERSION get() = kspVersion
 const val KOTLIN_GRADLE_PLUGIN = "org.jetbrains.kotlin:kotlin-gradle-plugin:1.5.0"
 
-const val KOTLIN_METADATA_JVM = "org.jetbrains.kotlinx:kotlinx-metadata-jvm:0.2.0"
+const val KOTLIN_METADATA_JVM = "org.jetbrains.kotlinx:kotlinx-metadata-jvm:0.3.0"
 
 const val LEAKCANARY = "com.squareup.leakcanary:leakcanary-android:2.2"
 const val LEAKCANARY_INSTRUMENTATION =
