@@ -163,7 +163,15 @@ private data class HorizontalScrollLayoutModifier(
         measurable: Measurable,
         constraints: Constraints
     ): MeasureResult {
-        val childConstraints = constraints.copy(maxWidth = Constraints.Infinity)
+        // If the maxIntrinsicWidth of the children is already smaller than the constraint, pass
+        // the original constraints so that the children has more information to  determine its
+        // size.
+        val maxIntrinsicWidth = measurable.maxIntrinsicWidth(constraints.maxHeight)
+        val childConstraints = if (maxIntrinsicWidth < constraints.maxWidth) {
+            constraints
+        } else {
+            constraints.copy(maxWidth = Constraints.Infinity)
+        }
         val placeable = measurable.measure(childConstraints)
         val width = min(placeable.width, constraints.maxWidth)
 
