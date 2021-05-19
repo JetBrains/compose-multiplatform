@@ -360,7 +360,7 @@ class AffectedModuleDetectorImpl constructor(
         // Should only trigger if there are no changedFiles
         if (changedProjects.size == alwaysBuild.size && unknownFiles.isEmpty()) {
             shouldBuildAll = true
-        } else if (unknownFiles.isNotEmpty()) {
+        } else if (unknownFiles.isNotEmpty() && !isGithubInfraChange()) {
             shouldBuildAll = true
         }
         logger?.info(
@@ -383,6 +383,17 @@ class AffectedModuleDetectorImpl constructor(
             }
         }
         return shouldBuildAll
+    }
+
+    /**
+     * Returns true if all unknown changed files are contained in github setup related files.
+     * (.github, playground-common). These files will not affect aosp hence should not invalidate
+     * changed file tracking (e.g. not cause running all tests)
+     */
+    private fun isGithubInfraChange(): Boolean {
+        return unknownFiles.all {
+            it.contains(".github") || it.contains("playground-common")
+        }
     }
 
     private fun lookupProjectSetsFromPaths(allSets: Set<Set<String>>): Set<Set<Project>> {
