@@ -137,7 +137,9 @@ internal class SkijaLayer(
         transformOrigin: TransformOrigin,
         shape: Shape,
         clip: Boolean,
-        layoutDirection: LayoutDirection
+        layoutDirection: LayoutDirection,
+        // TODO: start using this density
+        density: Density
     ) {
         this.transformOrigin = transformOrigin
         this.translationX = translationX
