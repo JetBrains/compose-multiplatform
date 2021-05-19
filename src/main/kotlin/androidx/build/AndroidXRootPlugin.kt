@@ -244,7 +244,6 @@ class AndroidXRootPlugin : Plugin<Project> {
         androidx.build.dependencies.kspVersion = getVersion("ksp")
         androidx.build.dependencies.agpVersion = getVersion("androidGradlePlugin")
         androidx.build.dependencies.lintVersion = getVersion("androidLint")
-        androidx.build.dependencies.hiltVersion = getVersion("hilt")
     }
 
     companion object {
