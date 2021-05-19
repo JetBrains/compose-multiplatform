@@ -312,7 +312,7 @@ class SkijaLayerTest {
     }
 
     private fun TestSkijaLayer() = SkijaLayer(
-        { Density(1f, 1f) },
+        Density(1f, 1f),
         invalidateParentLayer = {},
         drawBlock = {}
     )
