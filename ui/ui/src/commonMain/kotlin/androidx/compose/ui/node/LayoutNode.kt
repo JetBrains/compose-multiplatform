@@ -207,7 +207,7 @@ internal class LayoutNode : Measurable, Remeasurement, OwnerScope, LayoutInfo, C
 
         instance.parent = this
         _foldedChildren.add(index, instance)
-        zSortedChildrenInvalidated = true
+        onZSortedChildrenInvalidated()
 
         if (instance.isVirtual) {
             require(!isVirtual) { "Virtual LayoutNode can't be added into a virtual parent" }
@@ -223,6 +223,14 @@ internal class LayoutNode : Measurable, Remeasurement, OwnerScope, LayoutInfo, C
         }
     }
 
+    private fun onZSortedChildrenInvalidated() {
+        if (isVirtual) {
+            parent?.onZSortedChildrenInvalidated()
+        } else {
+            zSortedChildrenInvalidated = true
+        }
+    }
+
     /**
      * Removes one or more children, starting at [index].
      */
@@ -233,7 +241,7 @@ internal class LayoutNode : Measurable, Remeasurement, OwnerScope, LayoutInfo, C
         val attached = owner != null
         for (i in index + count - 1 downTo index) {
             val child = _foldedChildren.removeAt(i)
-            zSortedChildrenInvalidated = true
+            onZSortedChildrenInvalidated()
             if (DebugChanges) {
                 println("$child removed from $this at index $i")
             }
@@ -263,7 +271,7 @@ internal class LayoutNode : Measurable, Remeasurement, OwnerScope, LayoutInfo, C
             child.parent = null
         }
         _foldedChildren.clear()
-        zSortedChildrenInvalidated = true
+        onZSortedChildrenInvalidated()
 
         virtualChildrenCount = 0
         invalidateUnfoldedVirtualChildren()
@@ -293,7 +301,7 @@ internal class LayoutNode : Measurable, Remeasurement, OwnerScope, LayoutInfo, C
 
             _foldedChildren.add(toIndex, child)
         }
-        zSortedChildrenInvalidated = true
+        onZSortedChildrenInvalidated()
 
         invalidateUnfoldedVirtualChildren()
         requestRemeasure()
@@ -386,6 +394,7 @@ internal class LayoutNode : Measurable, Remeasurement, OwnerScope, LayoutInfo, C
                 _zSortedChildren.clear()
                 _zSortedChildren.addAll(_children)
                 _zSortedChildren.sortWith(ZComparator)
+                zSortedChildrenInvalidated = false
             }
             return _zSortedChildren
         }
@@ -812,7 +821,7 @@ internal class LayoutNode : Measurable, Remeasurement, OwnerScope, LayoutInfo, C
         }
         if (newZIndex != zIndex) {
             zIndex = newZIndex
-            zSortedChildrenInvalidated = true
+            parent?.onZSortedChildrenInvalidated()
             parent?.invalidateLayer()
         }
 
