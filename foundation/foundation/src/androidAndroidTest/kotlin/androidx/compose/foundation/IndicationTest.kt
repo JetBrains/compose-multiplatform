@@ -98,6 +98,8 @@ class IndicationTest {
 
         var scope: CoroutineScope? = null
 
+        rule.mainClock.autoAdvance = false
+
         rule.setContent {
             scope = rememberCoroutineScope()
             Box(
@@ -121,9 +123,14 @@ class IndicationTest {
             .performGesture {
                 down(center)
             }
+
+        // Advance past the tap timeout
+        rule.mainClock.advanceTimeBy(TapIndicationDelay)
+
         rule.runOnIdle {
             assertThat(countDownLatch.count).isEqualTo(1)
         }
+
         rule.onNodeWithTag(testTag)
             .assertExists()
             .performGesture {

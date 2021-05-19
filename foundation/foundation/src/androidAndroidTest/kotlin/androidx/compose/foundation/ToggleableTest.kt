@@ -221,6 +221,8 @@ class ToggleableTest {
 
         var scope: CoroutineScope? = null
 
+        rule.mainClock.autoAdvance = false
+
         rule.setContent {
             scope = rememberCoroutineScope()
             Box {
@@ -250,6 +252,9 @@ class ToggleableTest {
         rule.onNodeWithText("ToggleableText")
             .performGesture { down(center) }
 
+        // Advance past the tap timeout
+        rule.mainClock.advanceTimeBy(TapIndicationDelay)
+
         rule.runOnIdle {
             assertThat(interactions).hasSize(1)
             assertThat(interactions.first()).isInstanceOf(PressInteraction.Press::class.java)
@@ -273,6 +278,8 @@ class ToggleableTest {
         var emitToggleableText by mutableStateOf(true)
 
         var scope: CoroutineScope? = null
+
+        rule.mainClock.autoAdvance = false
 
         rule.setContent {
             scope = rememberCoroutineScope()
@@ -305,6 +312,9 @@ class ToggleableTest {
         rule.onNodeWithText("ToggleableText")
             .performGesture { down(center) }
 
+        // Advance past the tap timeout
+        rule.mainClock.advanceTimeBy(TapIndicationDelay)
+
         rule.runOnIdle {
             assertThat(interactions).hasSize(1)
             assertThat(interactions.first()).isInstanceOf(PressInteraction.Press::class.java)
@@ -314,6 +324,8 @@ class ToggleableTest {
         rule.runOnIdle {
             emitToggleableText = false
         }
+
+        rule.mainClock.advanceTimeByFrame()
 
         rule.runOnIdle {
             assertThat(interactions).hasSize(2)

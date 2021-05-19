@@ -16,7 +16,10 @@
 
 package androidx.compose.foundation
 
+import androidx.compose.foundation.gestures.Orientation
 import androidx.compose.foundation.gestures.detectTapGestures
+import androidx.compose.foundation.gestures.draggable
+import androidx.compose.foundation.gestures.rememberDraggableState
 import androidx.compose.foundation.interaction.Interaction
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.interaction.PressInteraction
@@ -42,11 +45,14 @@ import androidx.compose.ui.test.assertIsEnabled
 import androidx.compose.ui.test.assertIsNotEnabled
 import androidx.compose.ui.test.cancel
 import androidx.compose.ui.test.center
+import androidx.compose.ui.test.centerLeft
+import androidx.compose.ui.test.centerRight
 import androidx.compose.ui.test.click
 import androidx.compose.ui.test.doubleClick
 import androidx.compose.ui.test.down
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.longClick
+import androidx.compose.ui.test.moveTo
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
@@ -426,6 +432,8 @@ class ClickableTest {
 
         var scope: CoroutineScope? = null
 
+        rule.mainClock.autoAdvance = false
+
         rule.setContent {
             scope = rememberCoroutineScope()
             Box {
@@ -453,6 +461,18 @@ class ClickableTest {
 
         rule.onNodeWithTag("myClickable")
             .performGesture { down(center) }
+
+        val halfTapIndicationDelay = TapIndicationDelay / 2
+
+        rule.mainClock.advanceTimeBy(halfTapIndicationDelay)
+
+        // Haven't reached the tap delay yet, so we shouldn't have started a press
+        rule.runOnIdle {
+            assertThat(interactions).isEmpty()
+        }
+
+        // Advance past the tap delay
+        rule.mainClock.advanceTimeBy(halfTapIndicationDelay)
 
         rule.runOnIdle {
             assertThat(interactions).hasSize(1)
@@ -472,10 +492,223 @@ class ClickableTest {
     }
 
     @Test
+    fun clickableTest_interactionSource_immediateRelease() {
+        val interactionSource = MutableInteractionSource()
+
+        var scope: CoroutineScope? = null
+
+        rule.mainClock.autoAdvance = false
+
+        rule.setContent {
+            scope = rememberCoroutineScope()
+            Box {
+                BasicText(
+                    "ClickableText",
+                    modifier = Modifier
+                        .testTag("myClickable")
+                        .combinedClickable(
+                            interactionSource = interactionSource,
+                            indication = null
+                        ) {}
+                )
+            }
+        }
+
+        val interactions = mutableListOf<Interaction>()
+
+        scope!!.launch {
+            interactionSource.interactions.collect { interactions.add(it) }
+        }
+
+        rule.runOnIdle {
+            assertThat(interactions).isEmpty()
+        }
+
+        rule.onNodeWithTag("myClickable")
+            .performGesture {
+                down(center)
+                up()
+            }
+
+        // We haven't reached the tap delay, but we have finished a press so we should have
+        // emitted both press and release
+        rule.runOnIdle {
+            assertThat(interactions).hasSize(2)
+            assertThat(interactions.first()).isInstanceOf(PressInteraction.Press::class.java)
+            assertThat(interactions[1]).isInstanceOf(PressInteraction.Release::class.java)
+            assertThat((interactions[1] as PressInteraction.Release).press)
+                .isEqualTo(interactions[0])
+        }
+    }
+
+    @Test
+    fun clickableTest_interactionSource_immediateCancel() {
+        val interactionSource = MutableInteractionSource()
+
+        var scope: CoroutineScope? = null
+
+        rule.mainClock.autoAdvance = false
+
+        rule.setContent {
+            scope = rememberCoroutineScope()
+            Box {
+                BasicText(
+                    "ClickableText",
+                    modifier = Modifier
+                        .testTag("myClickable")
+                        .combinedClickable(
+                            interactionSource = interactionSource,
+                            indication = null
+                        ) {}
+                )
+            }
+        }
+
+        val interactions = mutableListOf<Interaction>()
+
+        scope!!.launch {
+            interactionSource.interactions.collect { interactions.add(it) }
+        }
+
+        rule.runOnIdle {
+            assertThat(interactions).isEmpty()
+        }
+
+        rule.onNodeWithTag("myClickable")
+            .performGesture {
+                down(center)
+                cancel()
+            }
+
+        // We haven't reached the tap delay, and a cancel was emitted, so no press should ever be
+        // shown
+        rule.runOnIdle {
+            assertThat(interactions).isEmpty()
+        }
+    }
+
+    @Test
+    fun clickableTest_interactionSource_immediateDrag() {
+        val interactionSource = MutableInteractionSource()
+
+        var scope: CoroutineScope? = null
+
+        rule.mainClock.autoAdvance = false
+
+        rule.setContent {
+            scope = rememberCoroutineScope()
+            Box {
+                BasicText(
+                    "ClickableText",
+                    modifier = Modifier
+                        .testTag("myClickable")
+                        .draggable(
+                            state = rememberDraggableState {},
+                            orientation = Orientation.Horizontal
+                        )
+                        .combinedClickable(
+                            interactionSource = interactionSource,
+                            indication = null
+                        ) {}
+                )
+            }
+        }
+
+        val interactions = mutableListOf<Interaction>()
+
+        scope!!.launch {
+            interactionSource.interactions.collect { interactions.add(it) }
+        }
+
+        rule.runOnIdle {
+            assertThat(interactions).isEmpty()
+        }
+
+        rule.onNodeWithTag("myClickable")
+            .performGesture {
+                down(centerLeft)
+                moveTo(centerRight)
+            }
+
+        rule.mainClock.advanceTimeBy(TapIndicationDelay)
+
+        // We started a drag before the timeout, so no press should be emitted
+        rule.runOnIdle {
+            assertThat(interactions).isEmpty()
+        }
+    }
+
+    @Test
+    fun clickableTest_interactionSource_dragAfterTimeout() {
+        val interactionSource = MutableInteractionSource()
+
+        var scope: CoroutineScope? = null
+
+        rule.mainClock.autoAdvance = false
+
+        rule.setContent {
+            scope = rememberCoroutineScope()
+            Box {
+                BasicText(
+                    "ClickableText",
+                    modifier = Modifier
+                        .testTag("myClickable")
+                        .draggable(
+                            state = rememberDraggableState {},
+                            orientation = Orientation.Horizontal
+                        )
+                        .combinedClickable(
+                            interactionSource = interactionSource,
+                            indication = null
+                        ) {}
+                )
+            }
+        }
+
+        val interactions = mutableListOf<Interaction>()
+
+        scope!!.launch {
+            interactionSource.interactions.collect { interactions.add(it) }
+        }
+
+        rule.runOnIdle {
+            assertThat(interactions).isEmpty()
+        }
+
+        rule.onNodeWithTag("myClickable")
+            .performGesture {
+                down(centerLeft)
+            }
+
+        rule.mainClock.advanceTimeBy(TapIndicationDelay)
+
+        rule.runOnIdle {
+            assertThat(interactions).hasSize(1)
+            assertThat(interactions.first()).isInstanceOf(PressInteraction.Press::class.java)
+        }
+
+        rule.onNodeWithTag("myClickable")
+            .performGesture {
+                moveTo(centerRight)
+            }
+
+        // The drag should cancel the press
+        rule.runOnIdle {
+            assertThat(interactions).hasSize(2)
+            assertThat(interactions.first()).isInstanceOf(PressInteraction.Press::class.java)
+            assertThat(interactions[1]).isInstanceOf(PressInteraction.Cancel::class.java)
+            assertThat((interactions[1] as PressInteraction.Cancel).press)
+                .isEqualTo(interactions[0])
+        }
+    }
+
+    @Test
     fun clickableTest_interactionSource_cancelledGesture() {
         val interactionSource = MutableInteractionSource()
 
         var scope: CoroutineScope? = null
+
+        rule.mainClock.autoAdvance = false
 
         rule.setContent {
             scope = rememberCoroutineScope()
@@ -504,6 +737,8 @@ class ClickableTest {
 
         rule.onNodeWithTag("myClickable")
             .performGesture { down(center) }
+
+        rule.mainClock.advanceTimeBy(TapIndicationDelay)
 
         rule.runOnIdle {
             assertThat(interactions).hasSize(1)
@@ -528,6 +763,8 @@ class ClickableTest {
         var emitClickableText by mutableStateOf(true)
 
         var scope: CoroutineScope? = null
+
+        rule.mainClock.autoAdvance = false
 
         rule.setContent {
             scope = rememberCoroutineScope()
@@ -559,6 +796,8 @@ class ClickableTest {
         rule.onNodeWithTag("myClickable")
             .performGesture { down(center) }
 
+        rule.mainClock.advanceTimeBy(TapIndicationDelay)
+
         rule.runOnIdle {
             assertThat(interactions).hasSize(1)
             assertThat(interactions.first()).isInstanceOf(PressInteraction.Press::class.java)
@@ -568,6 +807,8 @@ class ClickableTest {
         rule.runOnIdle {
             emitClickableText = false
         }
+
+        rule.mainClock.advanceTimeByFrame()
 
         rule.runOnIdle {
             assertThat(interactions).hasSize(2)
