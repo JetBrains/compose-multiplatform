@@ -60,7 +60,7 @@ import kotlin.math.sin
  * This is often used as input for [ColorFilter.colorMatrix] and applied at draw time
  * through [Paint.colorFilter]
  */
-@Suppress("EXPERIMENTAL_FEATURE_WARNING")
+@Suppress("INLINE_CLASS_DEPRECATED", "EXPERIMENTAL_FEATURE_WARNING")
 inline class ColorMatrix(
     val values: FloatArray = floatArrayOf(
         1f, 0f, 0f, 0f, 0f,

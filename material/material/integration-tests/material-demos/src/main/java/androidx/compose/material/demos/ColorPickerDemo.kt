@@ -220,7 +220,7 @@ private fun MagnifierLabel(modifier: Modifier, color: Color) {
         Row(modifier) {
             Box(Modifier.weight(0.25f).fillMaxHeight().background(color))
             // Add `#` and drop alpha characters
-            val text = "#" + Integer.toHexString(color.toArgb()).toUpperCase(Locale.ROOT).drop(2)
+            val text = "#" + Integer.toHexString(color.toArgb()).uppercase(Locale.ROOT).drop(2)
             val textStyle = LocalTextStyle.current.copy(textAlign = TextAlign.Center)
             Text(
                 text = text,

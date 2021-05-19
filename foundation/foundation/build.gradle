@@ -103,6 +103,7 @@ if(AndroidXUiPlugin.isMultiplatformEnabled(project)) {
             }
 
             desktopMain.dependsOn(jvmMain)
+            androidMain.dependsOn(jvmMain)
 
             desktopMain.dependencies {
                 implementation(KOTLIN_STDLIB)

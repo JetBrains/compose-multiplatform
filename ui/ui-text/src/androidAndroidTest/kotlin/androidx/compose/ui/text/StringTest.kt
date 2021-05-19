@@ -54,14 +54,14 @@ class StringTest {
 
     @Test
     fun LocaleDependent_uppercase() {
-        val upperI = "i".toUpperCase(Locale.forLanguageTag("tr"))
+        val upperI = "i".uppercase(Locale.forLanguageTag("tr"))
         assertThat("hijkl".toUpperCase(LocaleList("tr")))
             .isEqualTo("H${upperI}JKL")
     }
 
     @Test
     fun LocaleDependent_lowercase() {
-        val upperI = "i".toUpperCase(Locale.forLanguageTag("tr"))
+        val upperI = "i".uppercase(Locale.forLanguageTag("tr"))
         assertThat("h${upperI}jkl".toLowerCase(LocaleList("tr")))
             .isEqualTo("hijkl")
     }

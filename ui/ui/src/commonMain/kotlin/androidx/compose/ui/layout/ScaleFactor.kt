@@ -33,7 +33,7 @@ fun ScaleFactor(scaleX: Float, scaleY: Float) = ScaleFactor(packFloats(scaleX, s
 /**
  * Holds 2 dimensional scaling factors for horizontal and vertical axes
  */
-@Suppress("EXPERIMENTAL_FEATURE_WARNING")
+@Suppress("INLINE_CLASS_DEPRECATED", "EXPERIMENTAL_FEATURE_WARNING")
 @Immutable
 inline class ScaleFactor internal constructor(@PublishedApi internal val packedValue: Long) {
 

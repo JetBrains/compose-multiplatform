@@ -127,7 +127,7 @@ class SubcomposeLayoutTest {
                 }
 
                 val maxWidth = placeables.maxByOrNull { it.width }!!.width
-                val height = placeables.sumBy { it.height }
+                val height = placeables.sumOf { it.height }
 
                 layout(maxWidth, height) {
                     placeables.fold(0) { top, placeable ->
@@ -288,7 +288,7 @@ class SubcomposeLayoutTest {
         SubcomposeLayout { constraints ->
             val placeables = subcompose(Unit, content).map { it.measure(constraints) }
             val maxWidth = placeables.maxByOrNull { it.width }!!.width
-            val height = placeables.sumBy { it.height }
+            val height = placeables.sumOf { it.height }
             layout(maxWidth, height) {
                 placeables.forEach { it.place(0, 0) }
             }

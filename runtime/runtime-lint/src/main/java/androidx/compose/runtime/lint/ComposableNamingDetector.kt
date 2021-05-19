@@ -54,6 +54,7 @@ class ComposableNamingDetector : Detector(), SourceCodeScanner {
 
             if (node.returnsUnit) {
                 if (!capitalizedFunctionName) {
+                    @Suppress("DEPRECATION") // b/187985877
                     val capitalizedName = name.capitalize(Locale.getDefault())
                     context.report(
                         ComposableNaming,
@@ -72,6 +73,7 @@ class ComposableNamingDetector : Detector(), SourceCodeScanner {
                 }
             } else {
                 if (capitalizedFunctionName) {
+                    @Suppress("DEPRECATION") // b/187985877
                     val lowercaseName = name.decapitalize(Locale.getDefault())
                     context.report(
                         ComposableNaming,
