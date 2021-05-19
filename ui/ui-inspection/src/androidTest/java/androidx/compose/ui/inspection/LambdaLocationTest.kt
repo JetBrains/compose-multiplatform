@@ -40,5 +40,7 @@ class LambdaLocationTest {
             .isEqualTo(LambdaLocation("TestLambdas.kt", 22, 24))
         assertThat(LambdaLocation.resolve(TestLambdas.inlined))
             .isEqualTo(LambdaLocation("TestLambdas.kt", 27, 28))
+        assertThat(LambdaLocation.resolve(TestLambdas.inlinedParameter))
+            .isEqualTo(LambdaLocation("TestLambdas.kt", 31, 31))
     }
 }
