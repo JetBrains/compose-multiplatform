@@ -35,10 +35,12 @@ class LambdaLocationTest {
     @Test
     fun test() {
         assertThat(LambdaLocation.resolve(TestLambdas.short))
-            .isEqualTo(LambdaLocation("TestLambdas.kt", 20, 20))
+            .isEqualTo(LambdaLocation("TestLambdas.kt", 22, 22))
         assertThat(LambdaLocation.resolve(TestLambdas.long))
-            .isEqualTo(LambdaLocation("TestLambdas.kt", 22, 24))
+            .isEqualTo(LambdaLocation("TestLambdas.kt", 24, 26))
         assertThat(LambdaLocation.resolve(TestLambdas.inlined))
-            .isEqualTo(LambdaLocation("TestLambdas.kt", 27, 28))
+            .isEqualTo(LambdaLocation("TestLambdas.kt", 29, 30))
+        assertThat(LambdaLocation.resolve(TestLambdas.inlinedParameter))
+            .isEqualTo(LambdaLocation("TestLambdas.kt", 33, 33))
     }
 }
