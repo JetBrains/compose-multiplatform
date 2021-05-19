@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<issues format="6" by="lint 7.0.0-alpha15" type="baseline" client="cli" name="Lint" variant="all" version="7.0.0-alpha15">
+<issues format="6" by="lint 7.1.0-alpha01" type="baseline" client="cli" name="Lint" variant="all" version="7.1.0-alpha01">
 
     <issue
         id="ResourceType"
@@ -14,12 +14,12 @@
 
     <issue
         id="BanUncheckedReflection"
-        message="Calling Method.invoke without an SDK check"
+        message="Calling `Method.invoke` without an SDK check"
         errorLine1="                updateDisplayListIfDirtyMethod?.invoke(view)"
         errorLine2="                ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/androidMain/kotlin/androidx/compose/ui/platform/ViewLayer.android.kt"
-            line="337"
+            line="341"
             column="17"/>
     </issue>
 
