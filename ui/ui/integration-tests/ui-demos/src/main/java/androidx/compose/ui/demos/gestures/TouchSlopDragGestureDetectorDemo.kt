@@ -33,7 +33,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.input.pointer.consumeAllChanges
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.dp
@@ -78,18 +77,16 @@ fun DragGestureFilterDemo() {
                     if (canStartVertically.value) {
                         detectVerticalDragGestures(
                             onDragEnd = { canStartVertically.value = !canStartVertically.value }
-                        ) { change, dragDistance ->
+                        ) { _, dragDistance ->
                             offset.value =
                                 Offset(x = offset.value.x, y = offset.value.y + dragDistance)
-                            change.consumeAllChanges()
                         }
                     } else {
                         detectHorizontalDragGestures(
                             onDragEnd = { canStartVertically.value = !canStartVertically.value }
-                        ) { change, dragDistance ->
+                        ) { _, dragDistance ->
                             offset.value =
                                 Offset(x = offset.value.x + dragDistance, y = offset.value.y)
-                            change.consumeAllChanges()
                         }
                     }
                 }

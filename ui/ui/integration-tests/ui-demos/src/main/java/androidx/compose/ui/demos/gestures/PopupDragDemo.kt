@@ -30,7 +30,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.input.pointer.consumeAllChanges
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -52,9 +51,8 @@ fun PopupDragDemo() {
                 Box(
                     Modifier
                         .pointerInput(Unit) {
-                            detectDragGestures { change, dragAmount ->
+                            detectDragGestures { _, dragAmount ->
                                 offset.value = offset.value + dragAmount
-                                change.consumeAllChanges()
                             }
                         }
                         .size(70.dp)

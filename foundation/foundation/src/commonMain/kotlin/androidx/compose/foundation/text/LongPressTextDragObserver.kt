@@ -20,7 +20,6 @@ import androidx.compose.foundation.gestures.detectDragGestures
 import androidx.compose.foundation.gestures.detectDragGesturesAfterLongPress
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.input.pointer.PointerInputScope
-import androidx.compose.ui.input.pointer.consumeAllChanges
 
 internal interface TextDragObserver {
     fun onStart(startPoint: Offset)
@@ -36,8 +35,7 @@ internal suspend fun PointerInputScope.detectDragGesturesAfterLongPressWithObser
     observer: TextDragObserver
 ) = detectDragGesturesAfterLongPress(
     onDragEnd = { observer.onStop() },
-    onDrag = { change, offset ->
-        change.consumeAllChanges()
+    onDrag = { _, offset ->
         observer.onDrag(offset)
     },
     onDragStart = {
@@ -50,8 +48,7 @@ internal suspend fun PointerInputScope.detectDragGesturesWithObserver(
     observer: TextDragObserver
 ) = detectDragGestures(
     onDragEnd = { observer.onStop() },
-    onDrag = { change, offset ->
-        change.consumeAllChanges()
+    onDrag = { _, offset ->
         observer.onDrag(offset)
     },
     onDragStart = {

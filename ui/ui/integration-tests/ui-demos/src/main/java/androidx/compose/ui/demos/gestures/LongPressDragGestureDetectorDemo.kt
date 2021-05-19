@@ -31,7 +31,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
-import androidx.compose.ui.input.pointer.consumeAllChanges
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.dp
@@ -61,9 +60,8 @@ fun LongPressDragGestureFilterDemo() {
                         onDragStart = { color.value = Blue },
                         onDragEnd = { color.value = Grey },
                         onDragCancel = { color.value = Grey }
-                    ) { change, dragAmount ->
+                    ) { _, dragAmount ->
                         offset.value += dragAmount
-                        change.consumeAllChanges()
                     }
                 }
                 .background(color.value)
