@@ -11,5 +11,8 @@ pluginManagement {
     }
 }
 
-include "core"
-include "integration"
+include "web-core"
+include "web-integration"
+
+project(":web-core").projectDir = file("$rootDir/core")
+project(":web-integration").projectDir = file("$rootDir/integration")

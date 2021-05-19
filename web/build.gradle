@@ -4,7 +4,9 @@ plugins {
 }
 
 
-allprojects {
+subprojects {
+    apply plugin: "maven-publish"
+
     repositories {
         gradlePluginPortal()
         mavenCentral()

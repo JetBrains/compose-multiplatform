@@ -35,7 +35,7 @@ kotlin {
         commonMain {
             dependencies {
                 implementation(compose.runtime)
-                implementation(project(":core"))
+                implementation(project(":web-core"))
                 implementation(kotlin("stdlib-common"))
             }
         }
