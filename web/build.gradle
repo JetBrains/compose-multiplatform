@@ -15,6 +15,17 @@ subprojects {
                     version = System.getenv("COMPOSE_WEB_VERSION")
                 }
             }
+
+            repositories {
+                maven {
+                    name "internal"
+                    url "https://maven.pkg.jetbrains.space/public/p/compose/dev"
+                    credentials {
+                        username = project.hasProperty("COMPOSE_REPO_USERNAME") ? "$COMPOSE_REPO_USERNAME" : ""
+                        password = project.hasProperty("COMPOSE_REPO_KEY") ? "$COMPOSE_REPO_KEY" : ""
+                    }
+                }
+            }
         }
     }
 
