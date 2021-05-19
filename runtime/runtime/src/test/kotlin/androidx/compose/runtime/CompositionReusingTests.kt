@@ -179,6 +179,46 @@ class CompositionReusingTests {
         revalidate()
         assertNotEquals(firstCompositeHash, lastCompositeHash)
     }
+
+    @Test // regression test for b/188567661
+    fun compositeHashCodeIsConsistent() = compositionTest {
+        var key by mutableStateOf(0)
+        var localValue by mutableStateOf(0)
+        var lastCompositeHash = 0
+
+        compose {
+            ReusableContent(key) {
+                Linear {
+                    Text("Key = $key: $localValue")
+                    lastCompositeHash = currentCompositeKeyHash
+                }
+            }
+        }
+
+        validate {
+            Linear {
+                Text("Key = $key: $localValue")
+            }
+        }
+
+        val compositeHashForKey0 = lastCompositeHash
+
+        localValue++
+        expectChanges()
+        revalidate()
+        assertEquals(compositeHashForKey0, lastCompositeHash)
+
+        key++
+        expectChanges()
+        revalidate()
+        val compositeHashForKey1 = lastCompositeHash
+        assertNotEquals(compositeHashForKey0, compositeHashForKey1)
+
+        localValue++
+        expectChanges()
+        revalidate()
+        assertEquals(compositeHashForKey1, lastCompositeHash)
+    }
 }
 
 private fun View.findTextWith(contains: String) =
