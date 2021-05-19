@@ -7,6 +7,17 @@ plugins {
 subprojects {
     apply plugin: "maven-publish"
 
+    pluginManager.withPlugin("maven-publish") {
+        publishing {
+            publications {
+                maven(MavenPublication) {
+                    groupId = "org.jetbrains.compose.web"
+                    version = System.getenv("COMPOSE_WEB_VERSION")
+                }
+            }
+        }
+    }
+
     repositories {
         gradlePluginPortal()
         mavenCentral()
