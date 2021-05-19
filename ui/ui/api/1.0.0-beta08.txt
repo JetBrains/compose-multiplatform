@@ -1382,7 +1382,7 @@ package androidx.compose.ui.input.pointer {
   }
 
   @androidx.compose.runtime.Immutable public final class PointerInputChange {
-    method public androidx.compose.ui.input.pointer.PointerInputChange copy-aJ2ieLA(optional long id, optional long currentTime, optional long currentPosition, optional boolean currentPressed, optional long previousTime, optional long previousPosition, optional boolean previousPressed, optional androidx.compose.ui.input.pointer.ConsumedData consumed, optional androidx.compose.ui.input.pointer.PointerType type);
+    method public androidx.compose.ui.input.pointer.PointerInputChange copy-aJ2ieLA(optional long id, optional long currentTime, optional long currentPosition, optional boolean currentPressed, optional long previousTime, optional long previousPosition, optional boolean previousPressed, optional androidx.compose.ui.input.pointer.ConsumedData consumed, optional int type);
     method public androidx.compose.ui.input.pointer.ConsumedData getConsumed();
     method public long getId-J3iCeTQ();
     method public long getPosition-F1C5BW0();
@@ -1390,7 +1390,7 @@ package androidx.compose.ui.input.pointer {
     method public long getPreviousPosition-F1C5BW0();
     method public boolean getPreviousPressed();
     method public long getPreviousUptimeMillis();
-    method public androidx.compose.ui.input.pointer.PointerType getType();
+    method public int getType-T8wyACA();
     method public long getUptimeMillis();
     property public final androidx.compose.ui.input.pointer.ConsumedData consumed;
     property public final long id;
@@ -1399,7 +1399,7 @@ package androidx.compose.ui.input.pointer {
     property public final long previousPosition;
     property public final boolean previousPressed;
     property public final long previousUptimeMillis;
-    property public final androidx.compose.ui.input.pointer.PointerType type;
+    property public final int type;
     property public final long uptimeMillis;
   }
 
@@ -1437,12 +1437,28 @@ package androidx.compose.ui.input.pointer {
   public final class PointerInteropUtils_androidKt {
   }
 
-  public enum PointerType {
-    enum_constant public static final androidx.compose.ui.input.pointer.PointerType Eraser;
-    enum_constant public static final androidx.compose.ui.input.pointer.PointerType Mouse;
-    enum_constant public static final androidx.compose.ui.input.pointer.PointerType Stylus;
-    enum_constant public static final androidx.compose.ui.input.pointer.PointerType Touch;
-    enum_constant public static final androidx.compose.ui.input.pointer.PointerType Unknown;
+  public final inline class PointerType {
+    ctor public PointerType();
+    method public static inline boolean equals-impl(int p, Object? p1);
+    method public static boolean equals-impl0(int p1, int p2);
+    method public int getValue();
+    method public static inline int hashCode-impl(int p);
+    method public static String toString-impl(int $this);
+    property public final int value;
+    field public static final androidx.compose.ui.input.pointer.PointerType.Companion Companion;
+  }
+
+  public static final class PointerType.Companion {
+    method public int getEraser-T8wyACA();
+    method public int getMouse-T8wyACA();
+    method public int getStylus-T8wyACA();
+    method public int getTouch-T8wyACA();
+    method public int getUnknown-T8wyACA();
+    property public final int Eraser;
+    property public final int Mouse;
+    property public final int Stylus;
+    property public final int Touch;
+    property public final int Unknown;
   }
 
   public final class RequestDisallowInterceptTouchEvent implements kotlin.jvm.functions.Function1<java.lang.Boolean,kotlin.Unit> {
