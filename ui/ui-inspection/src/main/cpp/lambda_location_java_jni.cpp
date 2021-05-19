@@ -327,9 +327,8 @@ jobject resolveLocation(JNIEnv *env, jclass lambda_class) {
             break;
         }
         bool isInvokeMethod = strcmp(name, "invoke") == 0;
-        bool isInvokeWithInlineParameter = strncmp(name, "invoke-", 7) == 0;
         jvmti->Deallocate((unsigned char *)name);
-        if (!isInvokeMethod && !isInvokeWithInlineParameter) {
+        if (!isInvokeMethod) {
             continue; // Ignore if the method name doesn't match "invoke"
         }
 
