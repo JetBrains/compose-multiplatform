@@ -27,9 +27,6 @@ object TestLambdas {
         val sum = a + fct(b) { it * it }
         sum - a
     }
-    val inlinedParameter = { o: Offset ->
-        o.value * 2
-    }
 
     /**
      * This inline function will appear at a line numbers
@@ -40,11 +37,4 @@ object TestLambdas {
         val b = n * a + 3
         return b - a
     }
-
-    /**
-     * This inline class is used as a parameter in the lambda: [inlinedParameter]
-     * Such lambdas have a mangled part in the invoke method.
-     */
-    @Suppress("EXPERIMENTAL_FEATURE_WARNING")
-    inline class Offset(val value: Long)
 }
