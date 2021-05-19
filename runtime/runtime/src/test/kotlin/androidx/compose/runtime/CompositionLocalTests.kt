@@ -481,6 +481,53 @@ class CompositionLocalTests {
         expectNoChanges()
         assertFalse(composed.value)
     }
+
+    @Test // Regression test for b/186094122
+    fun currentRetrievesCorrectValues() = compositionTest {
+        val state = mutableStateOf(0)
+        val providedValue = mutableStateOf(100)
+        val local = compositionLocalOf { 0 }
+        val static = staticCompositionLocalOf { -1 }
+        val providedStatic = mutableStateOf(2000)
+        var includeProviders by mutableStateOf(true)
+
+        @Composable
+        fun Validate(providedValue: Int) {
+            val currentValue = local.current
+            assertEquals(providedValue, currentValue)
+            state.value // Observe state for invalidates.
+        }
+
+        compose {
+            if (includeProviders) {
+                CompositionLocalProvider(
+                    local provides providedValue.value,
+                    static provides providedStatic.value
+                ) {
+                    Validate(providedValue.value)
+                }
+            }
+        }
+
+        // Force an providerUpdates entry to be created.
+        providedStatic.value++
+        advance()
+
+        // Force a new provider scope to be created
+        includeProviders = false
+        advance()
+
+        includeProviders = true
+        advance()
+
+        // Change the provided value
+        providedValue.value++
+        advance()
+
+        // Ensure the old providerUpdates is not longer contains old values.
+        state.value++
+        advance()
+    }
 }
 
 data class SomeData(val value: String = "default")

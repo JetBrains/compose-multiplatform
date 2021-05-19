@@ -1211,7 +1211,6 @@ internal class ComposerImpl(
     private fun endRoot() {
         endGroup()
         parentContext.doneComposing()
-
         endGroup()
         recordEndRoot()
         finalizeCompose()
@@ -2538,6 +2537,7 @@ internal class ComposerImpl(
             } finally {
                 isComposing = false
                 invalidations.clear()
+                providerUpdates.clear()
                 if (!complete) abortRoot()
             }
         }
