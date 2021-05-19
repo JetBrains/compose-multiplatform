@@ -2338,7 +2338,7 @@ internal class ComposerImpl(
     private fun SlotReader.groupCompoundKeyPart(group: Int) =
         if (hasObjectKey(group)) groupObjectKey(group)?.hashCode() ?: 0
         else groupKey(group).let {
-            if (it == reusingGroup) groupAux(group)?.let { aux ->
+            if (it == reuseKey) groupAux(group)?.let { aux ->
                 if (aux == Composer.Empty) it else aux.hashCode()
             } ?: it else it
         }
