@@ -68,7 +68,6 @@ class AndroidXUiPlugin : Plugin<Project> {
                     }
 
                     project.tasks.withType(KotlinCompile::class.java).configureEach { compile ->
-                        compile.kotlinOptions.useIR = true
                         // TODO(b/157230235): remove when this is enabled by default
                         compile.kotlinOptions.freeCompilerArgs += "-Xopt-in=kotlin.RequiresOptIn"
                         compile.inputs.files({ kotlinPlugin.files })
@@ -129,10 +128,14 @@ class AndroidXUiPlugin : Plugin<Project> {
                 apply(plugin = "org.jetbrains.kotlin.android")
             }
 
+            // https://youtrack.jetbrains.com/issue/KT-46368
+            apply(plugin = "dev.zacsweers.kgp-150-leak-patcher")
+
             configureManifests()
-            configureForKotlinMultiplatformSourceStructure()
-            if (isMultiplatformEnabled) {
+            if (isMultiplatformEnabled()) {
                 configureForMultiplatform()
+            } else {
+                configureForKotlinMultiplatformSourceStructure()
             }
 
             tasks.withType(KotlinCompile::class.java).configureEach { compile ->
