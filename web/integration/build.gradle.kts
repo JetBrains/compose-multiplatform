@@ -6,14 +6,14 @@ plugins {
 
 kotlin {
     jvm {
-        jvmTest {
+        tasks.named<Test>("jvmTest") {
             testLogging.showStandardStreams = true
 
             useJUnitPlatform()
 
             systemProperty(
                 "COMPOSE_WEB_INTEGRATION_TESTS_DISTRIBUTION",
-                new File(buildDir, "developmentExecutable")
+                File(buildDir, "developmentExecutable")
             )
         }
     }
@@ -32,7 +32,7 @@ kotlin {
     }
 
     sourceSets {
-        commonMain {
+        val commonMain by getting {
             dependencies {
                 implementation(compose.runtime)
                 implementation(project(":web-core"))
@@ -40,20 +40,20 @@ kotlin {
             }
         }
 
-        jsMain {
+        val jsMain by getting {
             dependencies {
                 implementation(kotlin("stdlib-js"))
-                implementation(npm('highlight.js', '10.7.2'))
+                implementation(npm("highlight.js", "10.7.2"))
             }
         }
 
-        jsTest {
+        val jsTest by getting {
             dependencies {
-                implementation kotlin("test-js")
+                implementation(kotlin("test-js"))
             }
         }
 
-        jvmTest {
+        val jvmTest by getting {
             dependencies {
                 implementation("org.slf4j:slf4j-api:1.7.30")
                 implementation("org.slf4j:slf4j-simple:1.7.30")
@@ -71,4 +71,6 @@ kotlin {
     }
 }
 
-jvmTest.dependsOn(jsBrowserDevelopmentWebpack)
+tasks.named<Test>("jvmTest") {
+    dependsOn(tasks.named("jsBrowserDevelopmentWebpack"))
+}

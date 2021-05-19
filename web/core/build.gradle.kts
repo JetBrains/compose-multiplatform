@@ -20,27 +20,27 @@ kotlin {
     }
 
     sourceSets {
-        commonMain {
+        val commonMain by getting {
             dependencies {
                 implementation(compose.runtime)
                 implementation(kotlin("stdlib-common"))
             }
         }
 
-        jsMain {
+        val jsMain by getting {
             dependencies {
                 implementation(kotlin("stdlib-js"))
-                implementation(npm('css-typed-om', '0.4.0'))
+                implementation(npm("css-typed-om", "0.4.0"))
             }
         }
 
-        jsTest {
+        val jsTest by getting {
             dependencies {
-                implementation kotlin("test-js")
+                implementation(kotlin("test-js"))
             }
         }
 
-        jvmMain {
+        val jvmMain by getting {
             dependencies {
                 implementation(compose.desktop.currentOs)
             }
