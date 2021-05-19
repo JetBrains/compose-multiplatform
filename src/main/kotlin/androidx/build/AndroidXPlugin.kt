@@ -61,6 +61,7 @@ import org.gradle.api.tasks.javadoc.Javadoc
 import org.gradle.api.tasks.testing.Test
 import org.gradle.api.tasks.testing.logging.TestExceptionFormat
 import org.gradle.api.tasks.testing.logging.TestLogEvent
+import org.gradle.kotlin.dsl.apply
 import org.gradle.kotlin.dsl.create
 import org.gradle.kotlin.dsl.extra
 import org.gradle.kotlin.dsl.findByType
@@ -210,6 +211,10 @@ class AndroidXPlugin : Plugin<Project> {
             if (project.hasProperty(EXPERIMENTAL_KOTLIN_BACKEND_ENABLED)) {
                 task.kotlinOptions.freeCompilerArgs += listOf("-Xuse-ir=true")
             }
+
+            // Not directly impacting us, but a bunch of issues like KT-46512, probably prudent
+            // for us to just disable until Kotlin 1.5.10+ to avoid end users hitting users
+            task.kotlinOptions.freeCompilerArgs += listOf("-Xsam-conversions=class")
         }
         project.afterEvaluate {
             if (extension.shouldEnforceKotlinStrictApiMode()) {
@@ -225,6 +230,9 @@ class AndroidXPlugin : Plugin<Project> {
                 configureAndroidLibraryWithMultiplatformPluginOptions()
             }
         }
+
+        // https://youtrack.jetbrains.com/issue/KT-46368
+        project.apply(plugin = "dev.zacsweers.kgp-150-leak-patcher")
     }
 
     @Suppress("UnstableApiUsage") // AGP DSL APIs
