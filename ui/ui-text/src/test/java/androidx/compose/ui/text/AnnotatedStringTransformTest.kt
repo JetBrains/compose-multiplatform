@@ -68,7 +68,7 @@ class AnnotatedStringTransformTest {
 
         val uppercase = input.toUpperCase()
 
-        assertThat(uppercase.text).isEqualTo(input.text.toUpperCase())
+        assertThat(uppercase.text).isEqualTo(input.text.uppercase())
     }
 
     @Test
@@ -80,7 +80,7 @@ class AnnotatedStringTransformTest {
 
         val uppercase = input.toUpperCase()
 
-        assertThat(uppercase.text).isEqualTo(input.text.toUpperCase())
+        assertThat(uppercase.text).isEqualTo(input.text.uppercase())
     }
 
     @Test
@@ -100,7 +100,7 @@ class AnnotatedStringTransformTest {
 
         val uppercase = input.toUpperCase()
 
-        assertThat(uppercase.text).isEqualTo(input.text.toUpperCase())
+        assertThat(uppercase.text).isEqualTo(input.text.uppercase())
         assertThat(uppercase.spanStyles).isEqualTo(input.spanStyles)
         assertThat(uppercase.paragraphStyles).isEqualTo(input.paragraphStyles)
     }
@@ -122,7 +122,7 @@ class AnnotatedStringTransformTest {
 
         val lowercase = input.toLowerCase()
 
-        assertThat(lowercase.text).isEqualTo(input.text.toLowerCase())
+        assertThat(lowercase.text).isEqualTo(input.text.lowercase())
         assertThat(lowercase.spanStyles).isEqualTo(input.spanStyles)
         assertThat(lowercase.paragraphStyles).isEqualTo(input.paragraphStyles)
     }
@@ -142,8 +142,10 @@ class AnnotatedStringTransformTest {
             )
         )
 
+        @Suppress("DEPRECATION") // b/187985877
         val capitalized = input.capitalize()
 
+        @Suppress("DEPRECATION") // b/187985877
         assertThat(capitalized.text).isEqualTo(input.text.capitalize())
         assertThat(capitalized.spanStyles).isEqualTo(input.spanStyles)
         assertThat(capitalized.paragraphStyles).isEqualTo(input.paragraphStyles)
@@ -164,8 +166,10 @@ class AnnotatedStringTransformTest {
             )
         )
 
+        @Suppress("DEPRECATION") // b/187985877
         val decapitalized = input.decapitalize()
 
+        @Suppress("DEPRECATION") // b/187985877
         assertThat(decapitalized.text).isEqualTo(input.text.decapitalize())
         assertThat(decapitalized.spanStyles).isEqualTo(input.spanStyles)
         assertThat(decapitalized.paragraphStyles).isEqualTo(input.paragraphStyles)
@@ -185,9 +189,10 @@ class AnnotatedStringTransformTest {
                 makeRange(paraStyle2, "iii hhh (jjj)")
             )
         )
-
+        @Suppress("DEPRECATION") // b/187985877
         val capitalized = input.capitalize(LocaleList("tr"))
 
+        @Suppress("DEPRECATION") // b/187985877
         assertThat(capitalized.text).isEqualTo(input.text.capitalize(Locale.forLanguageTag("tr")))
         assertThat(capitalized.spanStyles).isEqualTo(input.spanStyles)
         assertThat(capitalized.paragraphStyles).isEqualTo(input.paragraphStyles)
@@ -208,8 +213,10 @@ class AnnotatedStringTransformTest {
             )
         )
 
+        @Suppress("DEPRECATION") // b/187985877
         val decapitalized = input.decapitalize(LocaleList("tr"))
 
+        @Suppress("DEPRECATION") // b/187985877
         assertThat(decapitalized.text).isEqualTo(
             input.text.decapitalize(Locale.forLanguageTag("tr"))
         )
@@ -234,9 +241,9 @@ class AnnotatedStringTransformTest {
 
         val uppercase = input.toUpperCase(LocaleList("tr"))
 
-        assertThat(uppercase.text).isEqualTo(input.text.toUpperCase(Locale.forLanguageTag("tr")))
+        assertThat(uppercase.text).isEqualTo(input.text.uppercase(Locale.forLanguageTag("tr")))
 
-        val upperI = "i".toUpperCase(Locale.forLanguageTag("tr"))
+        val upperI = "i".uppercase(Locale.forLanguageTag("tr"))
 
         assertThat(uppercase.spanStyles).isEqualTo(
             listOf(
@@ -271,11 +278,11 @@ class AnnotatedStringTransformTest {
         val lowercase = input.toLowerCase(LocaleList("lt"))
 
         assertThat(lowercase.text).isEqualTo(
-            input.text.toLowerCase(Locale.forLanguageTag("lt"))
+            input.text.lowercase(Locale.forLanguageTag("lt"))
         )
 
         // Usually generate U+0069 U+0307 U+0300
-        val lowerIDot = "Ì".toLowerCase(Locale.forLanguageTag("lt"))
+        val lowerIDot = "Ì".lowercase(Locale.forLanguageTag("lt"))
         assertThat(lowercase.spanStyles).isEqualTo(
             listOf(
                 makeRange(spanStyle1, "(hhh $lowerIDot$lowerIDot$lowerIDot yyy)"),

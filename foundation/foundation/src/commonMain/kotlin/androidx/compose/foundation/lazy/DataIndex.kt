@@ -19,7 +19,7 @@ package androidx.compose.foundation.lazy
 /**
  * Represents an index in the list of items of lazy list.
  */
-@Suppress("NOTHING_TO_INLINE", "EXPERIMENTAL_FEATURE_WARNING")
+@Suppress("NOTHING_TO_INLINE", "INLINE_CLASS_DEPRECATED", "EXPERIMENTAL_FEATURE_WARNING")
 internal inline class DataIndex(val value: Int) {
     inline operator fun inc(): DataIndex = DataIndex(value + 1)
     inline operator fun dec(): DataIndex = DataIndex(value - 1)

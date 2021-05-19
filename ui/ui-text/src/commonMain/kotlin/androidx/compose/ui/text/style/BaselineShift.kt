@@ -28,7 +28,7 @@ import androidx.compose.ui.util.lerp
  *
  * @param multiplier shift the baseline by multiplier * (baseline - ascent)
  */
-@Suppress("EXPERIMENTAL_FEATURE_WARNING")
+@Suppress("INLINE_CLASS_DEPRECATED", "EXPERIMENTAL_FEATURE_WARNING")
 @Immutable
 inline class BaselineShift(val multiplier: Float) {
     companion object {

@@ -75,7 +75,7 @@ private val unwantedCalls = setOf(
 )
 
 private fun packageNameHash(packageName: String) =
-    packageName.fold(0) { hash, char -> hash * 31 + char.toInt() }.absoluteValue
+    packageName.fold(0) { hash, char -> hash * 31 + char.code }.absoluteValue
 
 /**
  * Generator of a tree for the Layout Inspector.

@@ -62,7 +62,7 @@ fun TextUnit(value: Float, type: TextUnitType): TextUnit = pack(type.type, value
  * Note that do not store this value in your persistent storage or send to another process since
  * the internal representation may be changed in future.
  */
-@Suppress("EXPERIMENTAL_FEATURE_WARNING")
+@Suppress("INLINE_CLASS_DEPRECATED", "EXPERIMENTAL_FEATURE_WARNING")
 @Immutable
 inline class TextUnit internal constructor(internal val packedValue: Long) {
     /**

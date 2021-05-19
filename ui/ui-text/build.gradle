@@ -110,6 +110,7 @@ if(AndroidXUiPlugin.isMultiplatformEnabled(project)) {
             }
 
             desktopMain.dependsOn(jvmMain)
+            androidMain.dependsOn(jvmMain)
 
             androidMain.dependencies {
                 api("androidx.annotation:annotation:1.1.0")

@@ -83,6 +83,7 @@ package androidx.compose.ui.graphics
  *
  * This table shows that numbers higher than 1024 lose all fractional precision.
  */
+@Suppress("INLINE_CLASS_DEPRECATED", "EXPERIMENTAL_FEATURE_WARNING")
 internal inline class Float16(val halfValue: Short) : Comparable<Float16> {
 
     /**

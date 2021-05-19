@@ -41,7 +41,7 @@ fun TextRange(/*@IntRange(from = 0)*/ start: Int, /*@IntRange(from = 0)*/ end: I
  * (exclusive). [end] can be smaller than [start] and in those cases [min] and [max] can be
  * used in order to fetch the values.
  */
-@Suppress("EXPERIMENTAL_FEATURE_WARNING")
+@Suppress("INLINE_CLASS_DEPRECATED", "EXPERIMENTAL_FEATURE_WARNING")
 @Immutable
 inline class TextRange internal constructor(private val packedValue: Long) {
 

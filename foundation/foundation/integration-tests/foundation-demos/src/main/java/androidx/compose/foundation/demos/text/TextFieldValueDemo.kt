@@ -61,7 +61,7 @@ fun TextFieldValueDemo() {
             BasicTextField(
                 value = uppercaseValue,
                 onValueChange = {
-                    uppercaseValue = it.toUpperCase(java.util.Locale.US)
+                    uppercaseValue = it.uppercase(java.util.Locale.US)
                 },
                 textStyle = TextStyle(fontSize = fontSize8),
                 modifier = demoTextFieldModifiers

@@ -19,6 +19,7 @@ package androidx.compose.ui.text.input
 /**
  * Values representing the different available Keyboard Types.
  */
+@Suppress("INLINE_CLASS_DEPRECATED", "EXPERIMENTAL_FEATURE_WARNING")
 inline class KeyboardType(private val value: Int) {
 
     override fun toString(): String {

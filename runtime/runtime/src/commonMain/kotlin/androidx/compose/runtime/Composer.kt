@@ -3021,7 +3021,7 @@ internal class ComposerImpl(
  *
  * @see ComposeNode
  */
-@Suppress("EXPERIMENTAL_FEATURE_WARNING")
+@Suppress("INLINE_CLASS_DEPRECATED", "EXPERIMENTAL_FEATURE_WARNING")
 inline class Updater<T> constructor(
     @PublishedApi internal val composer: Composer
 ) {
@@ -3135,7 +3135,7 @@ inline class Updater<T> constructor(
         composer.apply<Unit, T>(Unit, { this.block() })
     }
 }
-@Suppress("EXPERIMENTAL_FEATURE_WARNING")
+@Suppress("INLINE_CLASS_DEPRECATED", "EXPERIMENTAL_FEATURE_WARNING")
 inline class SkippableUpdater<T> constructor(
     @PublishedApi internal val composer: Composer
 ) {
