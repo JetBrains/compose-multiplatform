@@ -208,7 +208,7 @@ bool isInlined(
  * Analyze the lines of a method to find start and end line excluding inlined functions.
  * @param jvmti the JVMTI environment
  * @param lineCount number of lines found in the method
- * @param lines the actual lines
+ * @param lines the actual lines sorted by line_number
  * @param variableCount the number of entries of the local variables
  * @param variables the actual variables
  * @param start_line_ptr on return will hold the start line of this method or 0 if not found
@@ -232,21 +232,42 @@ bool analyzeLines(
     dumpMethod(lineCount, lines, variableCount, variables, rangeCount, ranges);
 #endif
 
+    // First find the start_line (ignore inlined information here):
     for (int i=0; i<lineCount; i++) {
         jvmtiLineNumberEntry *line = &lines[i];
         int line_number = line->line_number;
-        if (line_number > 0 && !isInlined(line, rangeCount, ranges)) {
-            if (start_line == 0) {
-                start_line = line_number;
-                end_line = line_number;
-            }
-            else if (line_number < start_line) {
-                start_line = line_number;
-            }
-            else if (line_number > end_line) {
-                end_line = line_number;
-            }
+        if (line_number != 0) {
+            start_line = line_number;
+            break;
         }
+    }
+
+    // Then find the end_line:
+    if (start_line > 0) {
+
+        // Some line numbers may appear multiple times in the line table.
+        // The algorithm below will check all the locations for a given line number.
+        // If any of the locations for a given line is inside an inline range, the line is excluded.
+
+        int prev_line = INT_MAX;
+        bool prev_inlined = true;
+        for (int i=lineCount - 1; i>=0; i--) {
+            jvmtiLineNumberEntry *line = &lines[i];
+            int line_number = line->line_number;
+            if (line_number == 0) {
+                continue;
+            }
+            if (prev_line > line_number) {
+                if (!prev_inlined) {
+                    break;
+                } else {
+                    prev_line = line_number;
+                    prev_inlined = false;
+                }
+            }
+            prev_inlined |= isInlined(line, rangeCount, ranges);
+        }
+        end_line = !prev_inlined ? prev_line : start_line;
     }
     jvmti->Deallocate((unsigned char *)ranges);
     *start_line_ptr = start_line;
@@ -281,6 +302,10 @@ void deallocateVariables(
 void deallocateLines(jvmtiEnv *jvmti, jvmtiLineNumberEntry **lines_ptr) {
     jvmti->Deallocate((unsigned char *)*lines_ptr);
     *lines_ptr = nullptr;
+}
+
+int compareLineNumberEntry(const void *a, const void * b) {
+    return ((jvmtiLineNumberEntry*)a)->line_number - ((jvmtiLineNumberEntry*)b)->line_number;
 }
 
 const int ACC_BRIDGE = 0x40;
@@ -341,6 +366,7 @@ jobject resolveLocation(JNIEnv *env, jclass lambda_class) {
         if (CheckJvmtiError(jvmti, error)) {
             break;
         }
+        qsort(lines, lineCount, sizeof(jvmtiLineNumberEntry), compareLineNumberEntry);
 
         if (analyzeLines(jvmti, lineCount, lines, variableCount, variables,
                          &start_line, &end_line)) {
