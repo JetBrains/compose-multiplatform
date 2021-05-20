@@ -92,7 +92,6 @@ private fun PsiAnnotation.toHeader(): KotlinClassHeader {
 
     val kind = attributes["k"]?.parseInt()
     val metadataVersion = attributes["mv"]?.parseIntArray()
-    val bytecodeVersion = attributes["bv"]?.parseIntArray()
     val data1 = attributes["d1"]?.parseStringArray()
     val data2 = attributes["d2"]?.parseStringArray()
     val extraString = attributes["xs"]?.parseString()
@@ -102,7 +101,6 @@ private fun PsiAnnotation.toHeader(): KotlinClassHeader {
     return KotlinClassHeader(
         kind,
         metadataVersion,
-        bytecodeVersion,
         data1,
         data2,
         extraString,
