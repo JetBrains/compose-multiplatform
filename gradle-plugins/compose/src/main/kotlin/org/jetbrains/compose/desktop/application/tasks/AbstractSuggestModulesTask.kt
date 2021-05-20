@@ -17,7 +17,6 @@ import org.jetbrains.compose.desktop.application.internal.*
 import org.jetbrains.compose.desktop.application.internal.ComposeProperties
 import org.jetbrains.compose.desktop.application.internal.normalizedPath
 import org.jetbrains.compose.desktop.tasks.AbstractComposeDesktopTask
-import org.jetbrains.kotlin.konan.file.File
 
 abstract class AbstractSuggestModulesTask : AbstractComposeDesktopTask() {
     @get:Input
@@ -53,7 +52,7 @@ abstract class AbstractSuggestModulesTask : AbstractComposeDesktopTask() {
             add("--multi-release")
             add(jvmTarget.get())
             add("--class-path")
-            add(files.joinToString(File.pathSeparator) { it.normalizedPath() })
+            add(files.joinToString(java.io.File.pathSeparator) { it.normalizedPath() })
             add(launcherMainJar.ioFile.normalizedPath())
         }
 
