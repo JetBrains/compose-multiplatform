@@ -38,9 +38,11 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.text.BasicText
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.testutils.WithTouchSlop
 import androidx.compose.testutils.assertIsEqualTo
@@ -90,7 +92,9 @@ import com.google.common.collect.Range
 import com.google.common.truth.IntegerSubject
 import com.google.common.truth.Truth.assertThat
 import com.google.common.truth.Truth.assertWithMessage
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import org.junit.Rule
 import org.junit.Test
@@ -1530,6 +1534,56 @@ class LazyColumnTest {
         rule.runOnIdle {
             assertThat(state.firstVisibleItemIndex).isEqualTo(2)
             assertThat(state.firstVisibleItemScrollOffset).isEqualTo(10)
+        }
+    }
+
+    @Test
+    fun animateScrollToItemDoesNotScrollPastItem() {
+        lateinit var state: LazyListState
+        lateinit var scope: CoroutineScope
+        var target = 0
+        var reverse = false
+        rule.setContent {
+            val listState = rememberLazyListState()
+            val effectScope = rememberCoroutineScope()
+            SideEffect {
+                state = listState
+                scope = effectScope
+            }
+            LazyColumn(Modifier.fillMaxSize(), listState) {
+                items(2500) { _ ->
+                    Box(Modifier.size(100.dp))
+                }
+            }
+
+            if (reverse) {
+                assertThat(listState.firstVisibleItemIndex).isAtLeast(target)
+            } else {
+                assertThat(listState.firstVisibleItemIndex).isAtMost(target)
+            }
+        }
+
+        // Try a bunch of different targets with varying spacing
+        listOf(500, 800, 1500, 1600, 1800).forEach {
+            target = it
+            scope.launch {
+                state.animateScrollToItem(target)
+            }
+
+            rule.waitForIdle()
+            assertThat(state.firstVisibleItemIndex).isEqualTo(target)
+        }
+
+        reverse = true
+
+        listOf(1600, 1500, 800, 500, 0).forEach {
+            target = it
+            scope.launch {
+                state.animateScrollToItem(target)
+            }
+
+            rule.waitForIdle()
+            assertThat(state.firstVisibleItemIndex).isEqualTo(target)
         }
     }
 
