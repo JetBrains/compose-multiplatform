@@ -24,7 +24,7 @@ import androidx.compose.runtime.snapshots.fastForEach
 import androidx.compose.runtime.snapshots.fastMap
 import androidx.compose.runtime.snapshots.fastMapNotNull
 import androidx.compose.runtime.tooling.CompositionData
-import kotlinx.collections.immutable.persistentSetOf
+import androidx.compose.runtime.external.kotlinx.collections.immutable.persistentSetOf
 import kotlinx.coroutines.CancellableContinuation
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CoroutineScope

@@ -41,7 +41,6 @@ dependencies {
         api(KOTLIN_COROUTINES_ANDROID)
 
         implementation("androidx.annotation:annotation:1.1.0")
-        implementation("org.jetbrains.kotlinx:kotlinx-collections-immutable-jvm:0.3.4")
         implementation(KOTLIN_STDLIB)
 
         testImplementation(KOTLIN_TEST_JUNIT)
@@ -74,7 +73,6 @@ if(AndroidXUiPlugin.isMultiplatformEnabled(project)) {
             commonMain.dependencies {
                 implementation(KOTLIN_STDLIB_COMMON)
                 implementation(KOTLIN_COROUTINES_CORE)
-                implementation("org.jetbrains.kotlinx:kotlinx-collections-immutable:0.3.4")
             }
             jvmMain.dependencies {
                 implementation(KOTLIN_STDLIB)
