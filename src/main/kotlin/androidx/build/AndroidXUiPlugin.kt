@@ -132,7 +132,7 @@ class AndroidXUiPlugin : Plugin<Project> {
             apply(plugin = "dev.zacsweers.kgp-150-leak-patcher")
 
             configureManifests()
-            if (isMultiplatformEnabled()) {
+            if (isMultiplatformEnabled) {
                 configureForMultiplatform()
             } else {
                 configureForKotlinMultiplatformSourceStructure()
