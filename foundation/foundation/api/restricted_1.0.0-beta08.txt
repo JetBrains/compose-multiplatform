@@ -649,6 +649,9 @@ package androidx.compose.foundation.text {
   public final class StringHelpersKt {
   }
 
+  public final class StringHelpers_androidKt {
+  }
+
   public final class StringHelpers_jvmKt {
   }
 
