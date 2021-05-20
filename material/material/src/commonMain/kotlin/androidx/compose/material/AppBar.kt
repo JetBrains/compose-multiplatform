@@ -276,7 +276,7 @@ private data class BottomAppBarCutoutShape(
         val path = Path().apply {
             addCutoutShape(layoutDirection, density)
             // Subtract this path from the bounding rectangle
-            op(boundingRectangle, this, PathOperation.difference)
+            op(boundingRectangle, this, PathOperation.Difference)
         }
         return Outline.Generic(path)
     }

@@ -3496,7 +3496,7 @@ class ParagraphIntegrationTest {
             // Select "ab"
             val actualPath = paragraph.getPathForRange(0, 2)
 
-            val diff = Path.combine(PathOperation.difference, expectedPath, actualPath).getBounds()
+            val diff = Path.combine(PathOperation.Difference, expectedPath, actualPath).getBounds()
             assertThat(diff).isEqualTo(Rect.Zero)
         }
     }
@@ -3540,7 +3540,7 @@ class ParagraphIntegrationTest {
             // Select "bc\nab"
             val actualPath = paragraph.getPathForRange(1, 6)
 
-            val diff = Path.combine(PathOperation.difference, expectedPath, actualPath).getBounds()
+            val diff = Path.combine(PathOperation.Difference, expectedPath, actualPath).getBounds()
             assertThat(diff).isEqualTo(Rect.Zero)
         }
     }
@@ -3587,7 +3587,7 @@ class ParagraphIntegrationTest {
             val actualPath =
                 paragraph.getPathForRange(selectionLTRStart, textLTR.length + selectionRTLEnd)
 
-            val diff = Path.combine(PathOperation.difference, expectedPath, actualPath).getBounds()
+            val diff = Path.combine(PathOperation.Difference, expectedPath, actualPath).getBounds()
             assertThat(diff).isEqualTo(Rect.Zero)
         }
     }
@@ -3645,7 +3645,7 @@ class ParagraphIntegrationTest {
             // Try to select "\uDD1E\uD834\uDD1F", only "\uD834\uDD1F" is selected.
             val actualPath = paragraph.getPathForRange(1, text.length)
 
-            val diff = Path.combine(PathOperation.difference, expectedPath, actualPath).getBounds()
+            val diff = Path.combine(PathOperation.Difference, expectedPath, actualPath).getBounds()
             assertThat(diff).isEqualTo(Rect.Zero)
         }
     }
@@ -3671,7 +3671,7 @@ class ParagraphIntegrationTest {
             // Try to select "\uDD1E\uD834", actually "\uD834\uDD1F" is selected.
             val actualPath = paragraph.getPathForRange(1, text.length - 1)
 
-            val diff = Path.combine(PathOperation.difference, expectedPath, actualPath).getBounds()
+            val diff = Path.combine(PathOperation.Difference, expectedPath, actualPath).getBounds()
             assertThat(diff).isEqualTo(Rect.Zero)
         }
     }
@@ -3697,7 +3697,7 @@ class ParagraphIntegrationTest {
             // Try to select "\uDD1E", get vertical line segment after this character.
             val actualPath = paragraph.getPathForRange(1, 2)
 
-            val diff = Path.combine(PathOperation.difference, expectedPath, actualPath).getBounds()
+            val diff = Path.combine(PathOperation.Difference, expectedPath, actualPath).getBounds()
             assertThat(diff).isEqualTo(Rect.Zero)
         }
     }
@@ -3731,7 +3731,7 @@ class ParagraphIntegrationTest {
             // Select "\u1F603\u1F604"
             val actualPath = paragraph.getPathForRange(1, text.length - 1)
 
-            val diff = Path.combine(PathOperation.difference, expectedPath, actualPath).getBounds()
+            val diff = Path.combine(PathOperation.Difference, expectedPath, actualPath).getBounds()
             assertThat(diff).isEqualTo(Rect.Zero)
         }
     }
@@ -3758,7 +3758,7 @@ class ParagraphIntegrationTest {
             val actualPath = paragraph.getPathForRange(0, 1)
 
             assertThat(lineLeft).isEqualTo(lineRight)
-            val diff = Path.combine(PathOperation.difference, expectedPath, actualPath).getBounds()
+            val diff = Path.combine(PathOperation.Difference, expectedPath, actualPath).getBounds()
             assertThat(diff).isEqualTo(Rect.Zero)
         }
     }
@@ -3785,7 +3785,7 @@ class ParagraphIntegrationTest {
             val actualPath = paragraph.getPathForRange(0, 1)
 
             assertThat(lineLeft).isEqualTo(lineRight)
-            val diff = Path.combine(PathOperation.difference, expectedPath, actualPath).getBounds()
+            val diff = Path.combine(PathOperation.Difference, expectedPath, actualPath).getBounds()
             assertThat(diff).isEqualTo(Rect.Zero)
         }
     }

@@ -16,6 +16,8 @@
 
 package androidx.compose.ui.graphics
 
+import androidx.compose.runtime.Immutable
+
 /**
  * Effect applied to the geometry of a drawing primitive. For example, this can be used
  * to draw shapes as a dashed or shaped pattern, or apply a treatment around line segment
@@ -95,34 +97,45 @@ internal expect fun actualStampedPathEffect(
  *
  * @sample androidx.compose.ui.graphics.samples.StampedPathEffectSample
  */
-enum class StampedPathEffectStyle {
+@Suppress("INLINE_CLASS_DEPRECATED", "EXPERIMENTAL_FEATURE_WARNING")
+@Immutable
+inline class StampedPathEffectStyle internal constructor(val value: Int) {
 
-    /**
-     * Translate the path shape into the specified location aligning the top left of the path with
-     * the drawn geometry. This does not modify the path itself.
-     *
-     * For example, a circle drawn with a square path and [Translate] will draw the square path
-     * repeatedly with the top left corner of each stamped square along the curvature of the circle.
-     */
-    Translate,
+    companion object {
+        /**
+         * Translate the path shape into the specified location aligning the top left of the path with
+         * the drawn geometry. This does not modify the path itself.
+         *
+         * For example, a circle drawn with a square path and [Translate] will draw the square path
+         * repeatedly with the top left corner of each stamped square along the curvature of the circle.
+         */
+        val Translate = StampedPathEffectStyle(0)
 
-    /**
-     * Rotates the path shape its center along the curvature of the drawn geometry. This does not
-     * modify the path itself.
-     *
-     * For example, a circle drawn with a square path and [Rotate] will draw the square path
-     * repeatedly with the center of each stamped square along the curvature of the circle as well
-     * as each square being rotated along the circumference.
-     */
-    Rotate,
+        /**
+         * Rotates the path shape its center along the curvature of the drawn geometry. This does not
+         * modify the path itself.
+         *
+         * For example, a circle drawn with a square path and [Rotate] will draw the square path
+         * repeatedly with the center of each stamped square along the curvature of the circle as well
+         * as each square being rotated along the circumference.
+         */
+        val Rotate = StampedPathEffectStyle(1)
 
-    /**
-     * Modifies the points within the path such that they fit within the drawn geometry. This will
-     * turn straight lines into curves.
-     *
-     * For example, a circle drawn with a square path and [Morph] will modify the straight lines
-     * of the square paths to be curves such that each stamped square is rendered as an arc around
-     * the curvature of the circle.
-     */
-    Morph
+        /**
+         * Modifies the points within the path such that they fit within the drawn geometry. This will
+         * turn straight lines into curves.
+         *
+         * For example, a circle drawn with a square path and [Morph] will modify the straight lines
+         * of the square paths to be curves such that each stamped square is rendered as an arc around
+         * the curvature of the circle.
+         */
+        val Morph = StampedPathEffectStyle(2)
+    }
+
+    override fun toString() = when (this) {
+        Translate -> "Translate"
+        Rotate -> "Rotate"
+        Morph -> "Morph"
+        else -> "Unknown"
+    }
 }

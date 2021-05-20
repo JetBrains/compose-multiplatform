@@ -16,16 +16,28 @@
 
 package androidx.compose.ui.graphics
 
+import androidx.compose.runtime.Immutable
+
 /**
  * Defines how a new clip region should be merged with the existing clip
  * region.
  *
  * Used by [Canvas.clipRect].
  */
-enum class ClipOp {
-    /** Subtract the new region from the existing region. */
-    Difference,
+@Suppress("INLINE_CLASS_DEPRECATED", "EXPERIMENTAL_FEATURE_WARNING")
+@Immutable
+inline class ClipOp internal constructor(val value: Int) {
+    companion object {
+        /** Subtract the new region from the existing region. */
+        val Difference = ClipOp(0)
 
-    /** Intersect the new region from the existing region. */
-    Intersect
+        /** Intersect the new region from the existing region. */
+        val Intersect = ClipOp(1)
+    }
+
+    override fun toString() = when (this) {
+        Difference -> "Difference"
+        Intersect -> "Intersect"
+        else -> "Unknown"
+    }
 }

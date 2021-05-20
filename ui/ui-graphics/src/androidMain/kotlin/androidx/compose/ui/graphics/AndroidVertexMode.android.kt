@@ -16,10 +16,9 @@
 
 package androidx.compose.ui.graphics
 
-actual typealias NativeVertexMode = android.graphics.Canvas.VertexMode
-
-actual fun VertexMode.toNativeVertexMode() = when (this) {
+fun VertexMode.toAndroidVertexMode() = when (this) {
     VertexMode.Triangles -> android.graphics.Canvas.VertexMode.TRIANGLES
     VertexMode.TriangleStrip -> android.graphics.Canvas.VertexMode.TRIANGLE_STRIP
     VertexMode.TriangleFan -> android.graphics.Canvas.VertexMode.TRIANGLE_FAN
+    else -> android.graphics.Canvas.VertexMode.TRIANGLES
 }

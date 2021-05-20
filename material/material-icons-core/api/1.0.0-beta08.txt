@@ -29,7 +29,7 @@ package androidx.compose.material.icons {
 
   public final class IconsKt {
     method public static inline androidx.compose.ui.graphics.vector.ImageVector materialIcon(String name, kotlin.jvm.functions.Function1<? super androidx.compose.ui.graphics.vector.ImageVector.Builder,androidx.compose.ui.graphics.vector.ImageVector.Builder> block);
-    method public static inline androidx.compose.ui.graphics.vector.ImageVector.Builder materialPath(androidx.compose.ui.graphics.vector.ImageVector.Builder, optional float fillAlpha, optional float strokeAlpha, optional androidx.compose.ui.graphics.PathFillType pathFillType, kotlin.jvm.functions.Function1<? super androidx.compose.ui.graphics.vector.PathBuilder,kotlin.Unit> pathBuilder);
+    method public static inline androidx.compose.ui.graphics.vector.ImageVector.Builder materialPath-E-tN-BY(androidx.compose.ui.graphics.vector.ImageVector.Builder, optional float fillAlpha, optional float strokeAlpha, optional int pathFillType, kotlin.jvm.functions.Function1<? super androidx.compose.ui.graphics.vector.PathBuilder,kotlin.Unit> pathBuilder);
   }
 
 }

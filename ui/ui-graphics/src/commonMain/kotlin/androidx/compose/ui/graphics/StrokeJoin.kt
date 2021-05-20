@@ -16,6 +16,8 @@
 
 package androidx.compose.ui.graphics
 
+import androidx.compose.runtime.Immutable
+
 /**
  * Styles to use for line joins.
  *
@@ -23,20 +25,31 @@ package androidx.compose.ui.graphics
  * rectangles, not points drawn as lines with [Canvas.drawPoints].
  * See [Paint.strokeJoin].
  */
-enum class StrokeJoin {
-    /**
-     * Joins between line segments form sharp corners.
-     */
-    Miter,
+@Suppress("INLINE_CLASS_DEPRECATED", "EXPERIMENTAL_FEATURE_WARNING")
+@Immutable
+inline class StrokeJoin internal constructor(val value: Int) {
+    companion object {
+        /**
+         * Joins between line segments form sharp corners.
+         */
+        val Miter = StrokeJoin(0)
 
-    /**
-     * Joins between line segments are semi-circular.
-     */
-    Round,
+        /**
+         * Joins between line segments are semi-circular.
+         */
+        val Round = StrokeJoin(1)
 
-    /**
-     * Joins between line segments connect the corners of the butt ends of the
-     * line segments to give a beveled appearance.
-     */
-    Bevel
+        /**
+         * Joins between line segments connect the corners of the butt ends of the
+         * line segments to give a beveled appearance.
+         */
+        val Bevel = StrokeJoin(2)
+    }
+
+    override fun toString() = when (this) {
+        Miter -> "Miter"
+        Round -> "Round"
+        Bevel -> "Bevel"
+        else -> "Unknown"
+    }
 }

@@ -415,3 +415,36 @@ class AndroidBlendModeTest {
         }
     }
 }
+
+private fun BlendMode.Companion.values(): Array<BlendMode> =
+    arrayOf(
+        Clear,
+        Src,
+        Dst,
+        SrcOver,
+        DstOver,
+        SrcIn,
+        DstIn,
+        SrcOut,
+        DstOut,
+        SrcAtop,
+        DstAtop,
+        Xor,
+        Plus,
+        Modulate,
+        Screen,
+        Overlay,
+        Darken,
+        Lighten,
+        ColorDodge,
+        ColorBurn,
+        Hardlight,
+        Softlight,
+        Difference,
+        Exclusion,
+        Multiply,
+        Hue,
+        Saturation,
+        Color,
+        Luminosity
+    )

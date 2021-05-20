@@ -47,6 +47,10 @@ MissingBuildMethod: androidx.compose.ui.graphics.vector.PathBuilder:
     androidx.compose.ui.graphics.vector.PathBuilder does not declare a `build()` method, but builder classes are expected to
 
 
+MissingNullability: androidx.compose.ui.graphics.BlendMode#toString-impl(int):
+    Missing nullability on method `toString-impl` return
+MissingNullability: androidx.compose.ui.graphics.ClipOp#toString-impl(int):
+    Missing nullability on method `toString-impl` return
 MissingNullability: androidx.compose.ui.graphics.ColorMatrix#constructor-impl(float[]):
     Missing nullability on method `constructor-impl` return
 MissingNullability: androidx.compose.ui.graphics.ColorMatrix#convertRgbToYuv-impl(float[]) parameter #0:
@@ -63,6 +67,10 @@ MissingNullability: androidx.compose.ui.graphics.ColorMatrix#toString-impl(float
     Missing nullability on method `toString-impl` return
 MissingNullability: androidx.compose.ui.graphics.ColorMatrix#toString-impl(float[]) parameter #0:
     Missing nullability on parameter `p` in method `toString-impl`
+MissingNullability: androidx.compose.ui.graphics.FilterQuality#toString-impl(int):
+    Missing nullability on method `toString-impl` return
+MissingNullability: androidx.compose.ui.graphics.ImageBitmapConfig#toString-impl(int):
+    Missing nullability on method `toString-impl` return
 MissingNullability: androidx.compose.ui.graphics.Matrix#constructor-impl(float[]):
     Missing nullability on method `constructor-impl` return
 MissingNullability: androidx.compose.ui.graphics.Matrix#equals-impl(float[], Object) parameter #0:
@@ -75,6 +83,20 @@ MissingNullability: androidx.compose.ui.graphics.Matrix#reset-impl(float[]) para
     Missing nullability on parameter `$this` in method `reset-impl`
 MissingNullability: androidx.compose.ui.graphics.Matrix#toString-impl(float[]) parameter #0:
     Missing nullability on parameter `$this` in method `toString-impl`
+MissingNullability: androidx.compose.ui.graphics.PaintingStyle#toString-impl(int):
+    Missing nullability on method `toString-impl` return
+MissingNullability: androidx.compose.ui.graphics.PathFillType#toString-impl(int):
+    Missing nullability on method `toString-impl` return
+MissingNullability: androidx.compose.ui.graphics.PathOperation#toString-impl(int):
+    Missing nullability on method `toString-impl` return
+MissingNullability: androidx.compose.ui.graphics.StampedPathEffectStyle#toString-impl(int):
+    Missing nullability on method `toString-impl` return
+MissingNullability: androidx.compose.ui.graphics.StrokeJoin#toString-impl(int):
+    Missing nullability on method `toString-impl` return
+MissingNullability: androidx.compose.ui.graphics.TileMode#toString-impl(int):
+    Missing nullability on method `toString-impl` return
+MissingNullability: androidx.compose.ui.graphics.colorspace.ColorModel#toString-impl(long):
+    Missing nullability on method `toString-impl` return
 
 
 NotCloseable: androidx.compose.ui.graphics.AndroidPath:

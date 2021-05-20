@@ -275,7 +275,7 @@ class ClipDrawTest {
                     op(
                         Path().apply { addRect(Rect(0f, 0f, 30f, 30f)) },
                         Path().apply { addRect(Rect(10f, 10f, 20f, 20f)) },
-                        PathOperation.difference
+                        PathOperation.Difference
                     )
                 }
             )

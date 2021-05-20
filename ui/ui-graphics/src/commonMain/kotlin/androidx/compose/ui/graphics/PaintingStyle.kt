@@ -16,25 +16,38 @@
 
 package androidx.compose.ui.graphics
 
+import androidx.compose.runtime.Immutable
+
 /**
  * Strategies for painting shapes and paths on a canvas.
  *
  * See [Paint.style].
  */
-enum class PaintingStyle {
+@Suppress("INLINE_CLASS_DEPRECATED", "EXPERIMENTAL_FEATURE_WARNING")
+@Immutable
+inline class PaintingStyle internal constructor(val value: Int) {
 
-    /**
-     * Apply the [Paint] to the inside of the shape. For example, when
-     * applied to the [Canvas.drawCircle] call, this results in a disc
-     * of the given size being painted.
-     */
-    Fill,
+    companion object {
 
-    /**
-     * Apply the [Paint] to the edge of the shape. For example, when
-     * applied to the [Canvas.drawCircle] call, this results is a hoop
-     * of the given size being painted. The line drawn on the edge will
-     * be the width given by the [Paint.strokeWidth] property.
-     */
-    Stroke
+        /**
+         * Apply the [Paint] to the inside of the shape. For example, when
+         * applied to the [Canvas.drawCircle] call, this results in a disc
+         * of the given size being painted.
+         */
+        val Fill = PaintingStyle(0)
+
+        /**
+         * Apply the [Paint] to the edge of the shape. For example, when
+         * applied to the [Canvas.drawCircle] call, this results is a hoop
+         * of the given size being painted. The line drawn on the edge will
+         * be the width given by the [Paint.strokeWidth] property.
+         */
+        val Stroke = PaintingStyle(1)
+    }
+
+    override fun toString() = when (this) {
+        Fill -> "Fill"
+        Stroke -> "Stroke"
+        else -> "Unknown"
+    }
 }
