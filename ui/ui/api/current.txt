@@ -2351,7 +2351,7 @@ package androidx.compose.ui.semantics {
   public final class SemanticsProperties {
     method public androidx.compose.ui.semantics.SemanticsPropertyKey<androidx.compose.ui.semantics.CollectionInfo> getCollectionInfo();
     method public androidx.compose.ui.semantics.SemanticsPropertyKey<androidx.compose.ui.semantics.CollectionItemInfo> getCollectionItemInfo();
-    method public androidx.compose.ui.semantics.SemanticsPropertyKey<java.lang.String> getContentDescription();
+    method public androidx.compose.ui.semantics.SemanticsPropertyKey<java.util.List<java.lang.String>> getContentDescription();
     method public androidx.compose.ui.semantics.SemanticsPropertyKey<kotlin.Unit> getDisabled();
     method public androidx.compose.ui.semantics.SemanticsPropertyKey<androidx.compose.ui.text.AnnotatedString> getEditableText();
     method public androidx.compose.ui.semantics.SemanticsPropertyKey<java.lang.String> getError();
@@ -2372,13 +2372,13 @@ package androidx.compose.ui.semantics {
     method public androidx.compose.ui.semantics.SemanticsPropertyKey<java.lang.Boolean> getSelected();
     method public androidx.compose.ui.semantics.SemanticsPropertyKey<java.lang.String> getStateDescription();
     method public androidx.compose.ui.semantics.SemanticsPropertyKey<java.lang.String> getTestTag();
-    method public androidx.compose.ui.semantics.SemanticsPropertyKey<androidx.compose.ui.text.AnnotatedString> getText();
+    method public androidx.compose.ui.semantics.SemanticsPropertyKey<java.util.List<androidx.compose.ui.text.AnnotatedString>> getText();
     method public androidx.compose.ui.semantics.SemanticsPropertyKey<androidx.compose.ui.text.TextRange> getTextSelectionRange();
     method public androidx.compose.ui.semantics.SemanticsPropertyKey<androidx.compose.ui.state.ToggleableState> getToggleableState();
     method public androidx.compose.ui.semantics.SemanticsPropertyKey<androidx.compose.ui.semantics.ScrollAxisRange> getVerticalScrollAxisRange();
     property public final androidx.compose.ui.semantics.SemanticsPropertyKey<androidx.compose.ui.semantics.CollectionInfo> CollectionInfo;
     property public final androidx.compose.ui.semantics.SemanticsPropertyKey<androidx.compose.ui.semantics.CollectionItemInfo> CollectionItemInfo;
-    property public final androidx.compose.ui.semantics.SemanticsPropertyKey<java.lang.String> ContentDescription;
+    property public final androidx.compose.ui.semantics.SemanticsPropertyKey<java.util.List<java.lang.String>> ContentDescription;
     property public final androidx.compose.ui.semantics.SemanticsPropertyKey<kotlin.Unit> Disabled;
     property public final androidx.compose.ui.semantics.SemanticsPropertyKey<androidx.compose.ui.text.AnnotatedString> EditableText;
     property public final androidx.compose.ui.semantics.SemanticsPropertyKey<java.lang.String> Error;
@@ -2399,7 +2399,7 @@ package androidx.compose.ui.semantics {
     property public final androidx.compose.ui.semantics.SemanticsPropertyKey<java.lang.Boolean> Selected;
     property public final androidx.compose.ui.semantics.SemanticsPropertyKey<java.lang.String> StateDescription;
     property public final androidx.compose.ui.semantics.SemanticsPropertyKey<java.lang.String> TestTag;
-    property public final androidx.compose.ui.semantics.SemanticsPropertyKey<androidx.compose.ui.text.AnnotatedString> Text;
+    property public final androidx.compose.ui.semantics.SemanticsPropertyKey<java.util.List<androidx.compose.ui.text.AnnotatedString>> Text;
     property public final androidx.compose.ui.semantics.SemanticsPropertyKey<androidx.compose.ui.text.TextRange> TextSelectionRange;
     property public final androidx.compose.ui.semantics.SemanticsPropertyKey<androidx.compose.ui.state.ToggleableState> ToggleableState;
     property public final androidx.compose.ui.semantics.SemanticsPropertyKey<androidx.compose.ui.semantics.ScrollAxisRange> VerticalScrollAxisRange;
@@ -2447,7 +2447,7 @@ package androidx.compose.ui.semantics {
     method public static void selectableGroup(androidx.compose.ui.semantics.SemanticsPropertyReceiver);
     method public static void setCollectionInfo(androidx.compose.ui.semantics.SemanticsPropertyReceiver, androidx.compose.ui.semantics.CollectionInfo p);
     method public static void setCollectionItemInfo(androidx.compose.ui.semantics.SemanticsPropertyReceiver, androidx.compose.ui.semantics.CollectionItemInfo p);
-    method public static void setContentDescription(androidx.compose.ui.semantics.SemanticsPropertyReceiver, String p);
+    method public static void setContentDescription(androidx.compose.ui.semantics.SemanticsPropertyReceiver, String value);
     method public static void setCustomActions(androidx.compose.ui.semantics.SemanticsPropertyReceiver, java.util.List<androidx.compose.ui.semantics.CustomAccessibilityAction> p);
     method public static void setEditableText(androidx.compose.ui.semantics.SemanticsPropertyReceiver, androidx.compose.ui.text.AnnotatedString p);
     method public static void setFocused(androidx.compose.ui.semantics.SemanticsPropertyReceiver, boolean p);
@@ -2462,7 +2462,7 @@ package androidx.compose.ui.semantics {
     method public static void setSelection(androidx.compose.ui.semantics.SemanticsPropertyReceiver, optional String? label, kotlin.jvm.functions.Function3<? super java.lang.Integer,? super java.lang.Integer,? super java.lang.Boolean,java.lang.Boolean>? action);
     method public static void setStateDescription(androidx.compose.ui.semantics.SemanticsPropertyReceiver, String p);
     method public static void setTestTag(androidx.compose.ui.semantics.SemanticsPropertyReceiver, String p);
-    method public static void setText(androidx.compose.ui.semantics.SemanticsPropertyReceiver, androidx.compose.ui.text.AnnotatedString p);
+    method public static void setText(androidx.compose.ui.semantics.SemanticsPropertyReceiver, androidx.compose.ui.text.AnnotatedString value);
     method public static void setText(androidx.compose.ui.semantics.SemanticsPropertyReceiver, optional String? label, kotlin.jvm.functions.Function1<? super androidx.compose.ui.text.AnnotatedString,java.lang.Boolean>? action);
     method public static void setTextSelectionRange-Hy0MoUY(androidx.compose.ui.semantics.SemanticsPropertyReceiver, long p);
     method public static void setToggleableState(androidx.compose.ui.semantics.SemanticsPropertyReceiver, androidx.compose.ui.state.ToggleableState p);

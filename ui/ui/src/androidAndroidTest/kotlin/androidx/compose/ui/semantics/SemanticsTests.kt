@@ -721,9 +721,9 @@ class SemanticsTests {
                 Modifier.testTag(TestTag)
             ) {
                 SimpleTestLayout(
-                    Modifier.zIndex(1f).semantics { contentDescription = child1 }
+                    Modifier.zIndex(1f).semantics { testTag = child1 }
                 ) {}
-                SimpleTestLayout(Modifier.semantics { contentDescription = child2 }) { }
+                SimpleTestLayout(Modifier.semantics { testTag = child2 }) { }
             }
         }
 
@@ -731,11 +731,11 @@ class SemanticsTests {
         assertEquals(2, root.children.size)
         assertEquals(
             child2,
-            root.children[0].config.getOrNull(SemanticsProperties.ContentDescription)
+            root.children[0].config.getOrNull(SemanticsProperties.TestTag)
         )
         assertEquals(
             child1,
-            root.children[1].config.getOrNull(SemanticsProperties.ContentDescription)
+            root.children[1].config.getOrNull(SemanticsProperties.TestTag)
         )
     }
 
@@ -751,10 +751,10 @@ class SemanticsTests {
                     Modifier
                         .requiredSize(50.dp)
                         .zIndex(1f)
-                        .semantics { contentDescription = child1 }
+                        .semantics { testTag = child1 }
                 ) {}
                 SimpleTestLayout(
-                    Modifier.requiredSize(50.dp).semantics { contentDescription = child2 }
+                    Modifier.requiredSize(50.dp).semantics { testTag = child2 }
                 ) {}
             }
         }
@@ -763,11 +763,11 @@ class SemanticsTests {
         assertEquals(2, root.childrenSortedByBounds.size)
         assertEquals(
             child1,
-            root.childrenSortedByBounds[0].config.getOrNull(SemanticsProperties.ContentDescription)
+            root.childrenSortedByBounds[0].config.getOrNull(SemanticsProperties.TestTag)
         )
         assertEquals(
             child2,
-            root.childrenSortedByBounds[1].config.getOrNull(SemanticsProperties.ContentDescription)
+            root.childrenSortedByBounds[1].config.getOrNull(SemanticsProperties.TestTag)
         )
     }
 
@@ -783,10 +783,10 @@ class SemanticsTests {
                     Modifier
                         .requiredSize(50.dp)
                         .zIndex(1f)
-                        .semantics { contentDescription = child1 }
+                        .semantics { testTag = child1 }
                 ) {}
                 SimpleTestLayout(
-                    Modifier.requiredSize(50.dp).semantics { contentDescription = child2 }
+                    Modifier.requiredSize(50.dp).semantics { testTag = child2 }
                 ) {}
             }
         }
@@ -795,11 +795,11 @@ class SemanticsTests {
         assertEquals(2, root.childrenSortedByBounds.size)
         assertEquals(
             child1,
-            root.childrenSortedByBounds[0].config.getOrNull(SemanticsProperties.ContentDescription)
+            root.childrenSortedByBounds[0].config.getOrNull(SemanticsProperties.TestTag)
         )
         assertEquals(
             child2,
-            root.childrenSortedByBounds[1].config.getOrNull(SemanticsProperties.ContentDescription)
+            root.childrenSortedByBounds[1].config.getOrNull(SemanticsProperties.TestTag)
         )
     }
 
@@ -815,10 +815,10 @@ class SemanticsTests {
                     Modifier
                         .requiredSize(50.dp)
                         .offset(x = 0.dp, y = 50.dp)
-                        .semantics { contentDescription = child1 }
+                        .semantics { testTag = child1 }
                 ) {}
                 SimpleTestLayout(
-                    Modifier.requiredSize(50.dp).semantics { contentDescription = child2 }
+                    Modifier.requiredSize(50.dp).semantics { testTag = child2 }
                 ) {}
             }
         }
@@ -827,11 +827,11 @@ class SemanticsTests {
         assertEquals(2, root.childrenSortedByBounds.size)
         assertEquals(
             child2,
-            root.childrenSortedByBounds[0].config.getOrNull(SemanticsProperties.ContentDescription)
+            root.childrenSortedByBounds[0].config.getOrNull(SemanticsProperties.TestTag)
         )
         assertEquals(
             child1,
-            root.childrenSortedByBounds[1].config.getOrNull(SemanticsProperties.ContentDescription)
+            root.childrenSortedByBounds[1].config.getOrNull(SemanticsProperties.TestTag)
         )
     }
 
@@ -847,10 +847,10 @@ class SemanticsTests {
                     Modifier
                         .requiredSize(50.dp)
                         .offset(x = 50.dp, y = 0.dp)
-                        .semantics { contentDescription = child1 }
+                        .semantics { testTag = child1 }
                 ) {}
                 SimpleTestLayout(
-                    Modifier.requiredSize(50.dp).semantics { contentDescription = child2 }
+                    Modifier.requiredSize(50.dp).semantics { testTag = child2 }
                 ) {}
             }
         }
@@ -859,11 +859,11 @@ class SemanticsTests {
         assertEquals(2, root.childrenSortedByBounds.size)
         assertEquals(
             child2,
-            root.childrenSortedByBounds[0].config.getOrNull(SemanticsProperties.ContentDescription)
+            root.childrenSortedByBounds[0].config.getOrNull(SemanticsProperties.TestTag)
         )
         assertEquals(
             child1,
-            root.childrenSortedByBounds[1].config.getOrNull(SemanticsProperties.ContentDescription)
+            root.childrenSortedByBounds[1].config.getOrNull(SemanticsProperties.TestTag)
         )
     }
 
@@ -879,10 +879,10 @@ class SemanticsTests {
                     Modifier
                         .requiredSize(50.dp)
                         .offset(x = 0.dp, y = 20.dp)
-                        .semantics { contentDescription = child1 }
+                        .semantics { testTag = child1 }
                 ) {}
                 SimpleTestLayout(
-                    Modifier.requiredSize(50.dp).semantics { contentDescription = child2 }
+                    Modifier.requiredSize(50.dp).semantics { testTag = child2 }
                 ) {}
             }
         }
@@ -891,11 +891,11 @@ class SemanticsTests {
         assertEquals(2, root.childrenSortedByBounds.size)
         assertEquals(
             child2,
-            root.childrenSortedByBounds[0].config.getOrNull(SemanticsProperties.ContentDescription)
+            root.childrenSortedByBounds[0].config.getOrNull(SemanticsProperties.TestTag)
         )
         assertEquals(
             child1,
-            root.childrenSortedByBounds[1].config.getOrNull(SemanticsProperties.ContentDescription)
+            root.childrenSortedByBounds[1].config.getOrNull(SemanticsProperties.TestTag)
         )
     }
 
@@ -911,13 +911,13 @@ class SemanticsTests {
                     Modifier
                         .requiredSize(50.dp)
                         .offset(x = 20.dp, y = 0.dp)
-                        .semantics { contentDescription = child1 }
+                        .semantics { testTag = child1 }
                 ) {}
                 SimpleTestLayout(
                     Modifier
                         .requiredSize(50.dp)
                         .offset(x = 0.dp, y = 20.dp)
-                        .semantics { contentDescription = child2 }
+                        .semantics { testTag = child2 }
                 ) {}
             }
         }
@@ -926,11 +926,11 @@ class SemanticsTests {
         assertEquals(2, root.childrenSortedByBounds.size)
         assertEquals(
             child2,
-            root.childrenSortedByBounds[0].config.getOrNull(SemanticsProperties.ContentDescription)
+            root.childrenSortedByBounds[0].config.getOrNull(SemanticsProperties.TestTag)
         )
         assertEquals(
             child1,
-            root.childrenSortedByBounds[1].config.getOrNull(SemanticsProperties.ContentDescription)
+            root.childrenSortedByBounds[1].config.getOrNull(SemanticsProperties.TestTag)
         )
     }
 
@@ -946,13 +946,13 @@ class SemanticsTests {
                     Modifier
                         .requiredSize(100.dp)
                         .offset(x = 25.dp, y = 20.dp)
-                        .semantics { contentDescription = child1 }
+                        .semantics { testTag = child1 }
                 ) {}
                 SimpleTestLayout(
                     Modifier
                         .requiredSize(100.dp)
                         .padding(25.dp)
-                        .semantics { contentDescription = child2 }
+                        .semantics { testTag = child2 }
                 ) {}
             }
         }
@@ -961,11 +961,11 @@ class SemanticsTests {
         assertEquals(2, root.childrenSortedByBounds.size)
         assertEquals(
             child1,
-            root.childrenSortedByBounds[0].config.getOrNull(SemanticsProperties.ContentDescription)
+            root.childrenSortedByBounds[0].config.getOrNull(SemanticsProperties.TestTag)
         )
         assertEquals(
             child2,
-            root.childrenSortedByBounds[1].config.getOrNull(SemanticsProperties.ContentDescription)
+            root.childrenSortedByBounds[1].config.getOrNull(SemanticsProperties.TestTag)
         )
     }
 
@@ -981,13 +981,13 @@ class SemanticsTests {
                     Modifier
                         .requiredSize(100.dp)
                         .offset(x = 20.dp, y = 25.dp)
-                        .semantics { contentDescription = child1 }
+                        .semantics { testTag = child1 }
                 ) {}
                 SimpleTestLayout(
                     Modifier
                         .requiredSize(100.dp)
                         .padding(25.dp)
-                        .semantics { contentDescription = child2 }
+                        .semantics { testTag = child2 }
                 ) {}
             }
         }
@@ -996,11 +996,11 @@ class SemanticsTests {
         assertEquals(2, root.childrenSortedByBounds.size)
         assertEquals(
             child1,
-            root.childrenSortedByBounds[0].config.getOrNull(SemanticsProperties.ContentDescription)
+            root.childrenSortedByBounds[0].config.getOrNull(SemanticsProperties.TestTag)
         )
         assertEquals(
             child2,
-            root.childrenSortedByBounds[1].config.getOrNull(SemanticsProperties.ContentDescription)
+            root.childrenSortedByBounds[1].config.getOrNull(SemanticsProperties.TestTag)
         )
     }
 
@@ -1018,7 +1018,7 @@ class SemanticsTests {
                         SimpleTestLayout(
                             Modifier
                                 .requiredSize(100.dp)
-                                .semantics { contentDescription = child1 }
+                                .semantics { testTag = child1 }
                         ) {}
                     },
                     Offset(0f, size),
@@ -1026,7 +1026,7 @@ class SemanticsTests {
                         SimpleTestLayout(
                             Modifier
                                 .requiredSize(100.dp)
-                                .semantics { contentDescription = child2 }
+                                .semantics { testTag = child2 }
                         ) {}
                     },
                     Offset(0f, 0f)
@@ -1038,11 +1038,11 @@ class SemanticsTests {
         assertEquals(2, root.childrenSortedByBounds.size)
         assertEquals(
             child2,
-            root.childrenSortedByBounds[0].config.getOrNull(SemanticsProperties.ContentDescription)
+            root.childrenSortedByBounds[0].config.getOrNull(SemanticsProperties.TestTag)
         )
         assertEquals(
             child1,
-            root.childrenSortedByBounds[1].config.getOrNull(SemanticsProperties.ContentDescription)
+            root.childrenSortedByBounds[1].config.getOrNull(SemanticsProperties.TestTag)
         )
     }
 
@@ -1060,7 +1060,7 @@ class SemanticsTests {
                         SimpleTestLayout(
                             Modifier
                                 .requiredSize(100.dp)
-                                .semantics { contentDescription = child1 }
+                                .semantics { testTag = child1 }
                         ) {}
                     },
                     Offset(size, 0f),
@@ -1068,7 +1068,7 @@ class SemanticsTests {
                         SimpleTestLayout(
                             Modifier
                                 .requiredSize(100.dp)
-                                .semantics { contentDescription = child2 }
+                                .semantics { testTag = child2 }
                         ) {}
                     },
                     Offset(0f, 0f)
@@ -1080,11 +1080,11 @@ class SemanticsTests {
         assertEquals(2, root.childrenSortedByBounds.size)
         assertEquals(
             child2,
-            root.childrenSortedByBounds[0].config.getOrNull(SemanticsProperties.ContentDescription)
+            root.childrenSortedByBounds[0].config.getOrNull(SemanticsProperties.TestTag)
         )
         assertEquals(
             child1,
-            root.childrenSortedByBounds[1].config.getOrNull(SemanticsProperties.ContentDescription)
+            root.childrenSortedByBounds[1].config.getOrNull(SemanticsProperties.TestTag)
         )
     }
 
@@ -1102,17 +1102,17 @@ class SemanticsTests {
                     SimpleTestLayout(
                         Modifier
                             .requiredSize(100.dp)
-                            .semantics { contentDescription = child1 }
+                            .semantics { testTag = child1 }
                     ) {}
                     SimpleTestLayout(
                         Modifier
                             .requiredSize(100.dp)
-                            .semantics { contentDescription = child2 }
+                            .semantics { testTag = child2 }
                     ) {}
                     SimpleTestLayout(
                         Modifier
                             .requiredSize(100.dp)
-                            .semantics { contentDescription = child3 }
+                            .semantics { testTag = child3 }
                     ) {}
                 }
                 CompositionLocalProvider(LocalLayoutDirection provides LayoutDirection.Rtl) {
@@ -1121,17 +1121,17 @@ class SemanticsTests {
                         SimpleTestLayout(
                             Modifier
                                 .requiredSize(100.dp)
-                                .semantics { contentDescription = rtlChild1 }
+                                .semantics { testTag = rtlChild1 }
                         ) {}
                         SimpleTestLayout(
                             Modifier
                                 .requiredSize(100.dp)
-                                .semantics { contentDescription = rtlChild2 }
+                                .semantics { testTag = rtlChild2 }
                         ) {}
                         SimpleTestLayout(
                             Modifier
                                 .requiredSize(100.dp)
-                                .semantics { contentDescription = rtlChild3 }
+                                .semantics { testTag = rtlChild3 }
                         ) {}
                     }
                 }
@@ -1144,29 +1144,29 @@ class SemanticsTests {
         // Ltr
         assertEquals(
             child1,
-            root.childrenSortedByBounds[0].config.getOrNull(SemanticsProperties.ContentDescription)
+            root.childrenSortedByBounds[0].config.getOrNull(SemanticsProperties.TestTag)
         )
         assertEquals(
             child2,
-            root.childrenSortedByBounds[1].config.getOrNull(SemanticsProperties.ContentDescription)
+            root.childrenSortedByBounds[1].config.getOrNull(SemanticsProperties.TestTag)
         )
         assertEquals(
             child3,
-            root.childrenSortedByBounds[2].config.getOrNull(SemanticsProperties.ContentDescription)
+            root.childrenSortedByBounds[2].config.getOrNull(SemanticsProperties.TestTag)
         )
 
         // Rtl
         assertEquals(
             rtlChild1,
-            root.childrenSortedByBounds[3].config.getOrNull(SemanticsProperties.ContentDescription)
+            root.childrenSortedByBounds[3].config.getOrNull(SemanticsProperties.TestTag)
         )
         assertEquals(
             rtlChild2,
-            root.childrenSortedByBounds[4].config.getOrNull(SemanticsProperties.ContentDescription)
+            root.childrenSortedByBounds[4].config.getOrNull(SemanticsProperties.TestTag)
         )
         assertEquals(
             rtlChild3,
-            root.childrenSortedByBounds[5].config.getOrNull(SemanticsProperties.ContentDescription)
+            root.childrenSortedByBounds[5].config.getOrNull(SemanticsProperties.TestTag)
         )
     }
 }
