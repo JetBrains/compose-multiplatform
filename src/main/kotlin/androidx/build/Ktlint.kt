@@ -42,11 +42,12 @@ fun Project.configureKtlint() {
     val outputDir = "${project.buildDir}/reports/ktlint/"
     val inputDir = "src"
     val includeFiles = "**/*.kt"
-    val excludeFiles = "**/test-data/**/*.kt"
+    val excludeTestDataFiles = "**/test-data/**/*.kt"
+    val excludeExternalFiles = "**/external/**/*.kt"
     val inputFiles = project.fileTree(
         mutableMapOf(
             "dir" to inputDir, "include" to includeFiles,
-            "exclude" to excludeFiles
+            "exclude" to listOf(excludeTestDataFiles, excludeExternalFiles)
         )
     )
     val outputFile = "${outputDir}ktlint-checkstyle-report.xml"
@@ -65,7 +66,8 @@ fun Project.configureKtlint() {
             "--reporter=plain",
             "--reporter=checkstyle,output=$outputFile",
             "$inputDir/$includeFiles",
-            "!$inputDir/$excludeFiles"
+            "!$inputDir/$excludeTestDataFiles",
+            "!$inputDir/$excludeExternalFiles"
         )
     }
 
@@ -90,7 +92,8 @@ fun Project.configureKtlint() {
             "--reporter=plain",
             "--reporter=checkstyle,output=$outputFile",
             "$inputDir/$includeFiles",
-            "!$inputDir/$excludeFiles"
+            "!$inputDir/$excludeTestDataFiles",
+            "!$inputDir/$excludeExternalFiles"
         )
     }
 }
