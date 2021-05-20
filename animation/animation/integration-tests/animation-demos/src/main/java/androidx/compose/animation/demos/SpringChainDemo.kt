@@ -44,7 +44,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
-import androidx.compose.ui.input.pointer.consumeAllChanges
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
@@ -55,8 +54,7 @@ fun SpringChainDemo() {
     var leader by remember { mutableStateOf(Offset(200f, 200f)) }
     Box(
         Modifier.fillMaxSize().pointerInput(Unit) {
-            detectDragGestures { change, dragAmount ->
-                change.consumeAllChanges()
+            detectDragGestures { _, dragAmount ->
                 leader += dragAmount
             }
         }
