@@ -151,7 +151,7 @@ class ComposePlugin : Plugin<Project> {
 
     object WebDependencies {
         val web by lazy {
-            composeDependency("org.jetbrains.compose.web:web")
+            composeDependency("org.jetbrains.compose.web:web-core")
         }
     }
 }
