@@ -415,8 +415,7 @@ fun ContextMenu() {
 
     Surface(
         modifier = Modifier
-            .padding(start = 4.dp, top = 2.dp)
-            .clickable(onClick = { showMenu.value = true }),
+            .padding(start = 4.dp, top = 2.dp),
         color = Color(255, 255, 255, 40),
         shape = RoundedCornerShape(4.dp)
     ) {
@@ -425,6 +424,7 @@ fun ContextMenu() {
             modifier = Modifier
                 .height(35.dp)
                 .padding(start = 4.dp, end = 4.dp)
+                .clickable(onClick = { showMenu.value = true })
         )
         ContextMenu(
             expanded = showMenu.value,
