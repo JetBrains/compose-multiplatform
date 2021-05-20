@@ -912,8 +912,7 @@ internal class ParameterFactory(private val inlineClassConverter: InlineClassCon
             when (value.type) {
                 TextUnitType.Sp -> NodeParameter(name, ParameterType.DimensionSp, value.value)
                 TextUnitType.Em -> NodeParameter(name, ParameterType.DimensionEm, value.value)
-                TextUnitType.Unspecified ->
-                    NodeParameter(name, ParameterType.String, "Unspecified")
+                else -> NodeParameter(name, ParameterType.String, "Unspecified")
             }
 
         private fun createFromImageVector(name: String, value: ImageVector): NodeParameter =

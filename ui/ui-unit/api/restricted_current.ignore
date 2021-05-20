@@ -1,0 +1,15 @@
+// Baseline format: 1.0
+ChangedSuperclass: androidx.compose.ui.unit.TextUnitType:
+    Class androidx.compose.ui.unit.TextUnitType superclass changed from java.lang.Enum to java.lang.Object
+
+
+RemovedField: androidx.compose.ui.unit.TextUnitType#Em:
+    Removed enum constant androidx.compose.ui.unit.TextUnitType.Em
+RemovedField: androidx.compose.ui.unit.TextUnitType#Sp:
+    Removed enum constant androidx.compose.ui.unit.TextUnitType.Sp
+RemovedField: androidx.compose.ui.unit.TextUnitType#Unspecified:
+    Removed enum constant androidx.compose.ui.unit.TextUnitType.Unspecified
+
+
+RemovedMethod: androidx.compose.ui.unit.TextUnit#getType-impl(long):
+    Removed method androidx.compose.ui.unit.TextUnit.getType-impl(long)
