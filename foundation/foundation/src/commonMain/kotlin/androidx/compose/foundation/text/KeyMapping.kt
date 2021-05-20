@@ -37,12 +37,18 @@ internal fun commonKeyMapping(
     return object : KeyMapping {
         override fun map(event: KeyEvent): KeyCommand? {
             return when {
+                shortcutModifier(event) && event.isShiftPressed ->
+                    when (event.key) {
+                        Key.Z -> KeyCommand.REDO
+                        else -> null
+                    }
                 shortcutModifier(event) ->
                     when (event.key) {
                         Key.C, Key.Insert -> KeyCommand.COPY
                         Key.V -> KeyCommand.PASTE
                         Key.X -> KeyCommand.CUT
                         Key.A -> KeyCommand.SELECT_ALL
+                        Key.Z -> KeyCommand.UNDO
                         else -> null
                     }
                 event.isCtrlPressed -> null

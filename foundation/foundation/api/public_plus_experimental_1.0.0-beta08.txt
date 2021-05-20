@@ -721,6 +721,12 @@ package androidx.compose.foundation.text {
   public final class TouchMode_androidKt {
   }
 
+  public final class UndoManagerKt {
+  }
+
+  public final class UndoManager_jvmKt {
+  }
+
 }
 
 package androidx.compose.foundation.text.selection {
