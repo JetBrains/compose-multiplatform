@@ -4,8 +4,9 @@ plugins {
     id("org.jetbrains.kotlin.multiplatform") version("1.4.32") apply(false)
 }
 
+val COMPOSE_WEB_VERSION: String by project
 
-subprojects {
+subprojects { 
     apply(plugin = "maven-publish")
 
     pluginManager.withPlugin("maven-publish") {
@@ -13,7 +14,7 @@ subprojects {
             publications {
                 create<MavenPublication>("maven") {
                     groupId = "org.jetbrains.compose.web"
-                    version = System.getenv("COMPOSE_WEB_VERSION")
+                    version = COMPOSE_WEB_VERSION
                 }
             }
 
