@@ -20,14 +20,12 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.semantics.SemanticsPropertyReceiver
-import androidx.compose.ui.semantics.editableText
 import androidx.compose.ui.semantics.selected
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.semantics.testTag
 import androidx.compose.ui.semantics.toggleableState
 import androidx.compose.ui.state.ToggleableState
 import androidx.compose.ui.test.junit4.createComposeRule
-import androidx.compose.ui.text.AnnotatedString
 import org.junit.Rule
 import org.junit.Test
 
@@ -154,56 +152,6 @@ class AssertsTest {
 
         rule.onNodeWithTag("test")
             .assertIsNotSelected()
-    }
-
-    @Test
-    fun assertTextFieldText_isOk() {
-        rule.setContent {
-            BoundaryNode { testTag = "test"; editableText = AnnotatedString("Hello World") }
-        }
-
-        rule.onNodeWithTag("test")
-            .assertTextEquals("Hello World")
-    }
-
-    @Test(expected = AssertionError::class)
-    fun assertTextFieldText_fails() {
-        rule.setContent {
-            BoundaryNode { testTag = "test"; editableText = AnnotatedString("Hello World") }
-        }
-
-        rule.onNodeWithTag("test")
-            .assertTextEquals("Hello")
-    }
-
-    @Test
-    fun assertTextFieldText_substring_isOk() {
-        rule.setContent {
-            BoundaryNode { testTag = "test"; editableText = AnnotatedString("Hello World") }
-        }
-
-        rule.onNodeWithTag("test")
-            .assertTextContains("Hello")
-    }
-
-    @Test(expected = AssertionError::class)
-    fun assertTextFieldText_substring_fails() {
-        rule.setContent {
-            BoundaryNode { testTag = "test"; editableText = AnnotatedString("Hello World") }
-        }
-
-        rule.onNodeWithTag("test")
-            .assertTextContains("hello")
-    }
-
-    @Test
-    fun assertTextFieldText_substring_ignoreCase_isOk() {
-        rule.setContent {
-            BoundaryNode { testTag = "test"; editableText = AnnotatedString("Hello World") }
-        }
-
-        rule.onNodeWithTag("test")
-            .assertTextContains("hello", ignoreCase = true)
     }
 
     @Composable

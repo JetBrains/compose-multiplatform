@@ -115,7 +115,7 @@ class ErrorMessagesTest {
         expectErrorMessageStartsWith(
             """
                 Failed to perform a gesture.
-                Reason: Expected exactly '1' node but found '2' nodes that satisfy: (Text = 'Toggle' (ignoreCase: false))
+                Reason: Expected exactly '1' node but found '2' nodes that satisfy: (Text + EditableText contains 'Toggle' (ignoreCase: false))
                 Nodes found:
                 1) Node #X at (l=X, t=X, r=X, b=X)px, Tag: 'MyButton'
             """.trimIndent()
@@ -170,7 +170,7 @@ class ErrorMessagesTest {
         expectErrorMessageStartsWith(
             """
                 Failed to assert count of nodes.
-                Reason: Expected '3' nodes but found '2' nodes that satisfy: (Text = 'Toggle' (ignoreCase: false))
+                Reason: Expected '3' nodes but found '2' nodes that satisfy: (Text + EditableText contains 'Toggle' (ignoreCase: false))
                 Nodes found:
                 1) Node #X at (l=X, t=X, r=X, b=X)px
             """.trimIndent()
@@ -189,7 +189,7 @@ class ErrorMessagesTest {
         expectErrorMessage(
             """
                 Failed to assert count of nodes.
-                Reason: Expected '3' nodes but could not find any node that satisfies: (Text = 'Toggle2' (ignoreCase: false))
+                Reason: Expected '3' nodes but could not find any node that satisfies: (Text + EditableText contains 'Toggle2' (ignoreCase: false))
             """.trimIndent()
         ) {
             rule.onAllNodesWithText("Toggle2")
@@ -214,10 +214,10 @@ class ErrorMessagesTest {
                 Failed to perform a gesture.
                 The node is no longer in the tree, last known semantics:
                 Node #X at (l=X, t=X, r=X, b=X)px
-                Text = 'Hello'
+                Text = '[Hello]'
                 Actions = [GetTextLayoutResult]
                 Has 1 sibling
-                Original selector: Text = 'Hello' (ignoreCase: false)
+                Original selector: Text + EditableText contains 'Hello' (ignoreCase: false)
             """.trimIndent()
         ) {
             node.performClick()
@@ -242,10 +242,10 @@ class ErrorMessagesTest {
                 Failed: assertExists.
                 The node is no longer in the tree, last known semantics:
                 Node #X at (l=X, t=X, r=X, b=X)px
-                Text = 'Hello'
+                Text = '[Hello]'
                 Actions = [GetTextLayoutResult]
                 Has 1 sibling
-                Original selector: Text = 'Hello' (ignoreCase: false)
+                Original selector: Text + EditableText contains 'Hello' (ignoreCase: false)
             """.trimIndent()
         ) {
             node.assertExists()
@@ -270,10 +270,10 @@ class ErrorMessagesTest {
                 Failed to assert the following: (OnClick is defined)
                 The node is no longer in the tree, last known semantics:
                 Node #X at (l=X, t=X, r=X, b=X)px
-                Text = 'Hello'
+                Text = '[Hello]'
                 Actions = [GetTextLayoutResult]
                 Has 1 sibling
-                Original selector: Text = 'Hello' (ignoreCase: false)
+                Original selector: Text + EditableText contains 'Hello' (ignoreCase: false)
             """.trimIndent()
         ) {
             node.assertHasClickAction()

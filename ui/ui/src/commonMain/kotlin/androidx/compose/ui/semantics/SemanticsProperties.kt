@@ -21,7 +21,6 @@ import androidx.compose.ui.state.ToggleableState
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.TextLayoutResult
 import androidx.compose.ui.text.TextRange
-import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.input.ImeAction
 import kotlin.reflect.KProperty
 
@@ -36,9 +35,11 @@ object SemanticsProperties {
     /**
      * @see SemanticsPropertyReceiver.contentDescription
      */
-    val ContentDescription = SemanticsPropertyKey<String>(
+    val ContentDescription = SemanticsPropertyKey<List<String>>(
         name = "ContentDescription",
-        mergePolicy = { parentValue, _ -> parentValue }
+        mergePolicy = { parentValue, childValue ->
+            parentValue?.toMutableList()?.also { it.addAll(childValue) } ?: childValue
+        }
     )
 
     /**
@@ -167,18 +168,10 @@ object SemanticsProperties {
     /**
      * @see SemanticsPropertyReceiver.text
      */
-    val Text = SemanticsPropertyKey<AnnotatedString>(
+    val Text = SemanticsPropertyKey<List<AnnotatedString>>(
         name = "Text",
         mergePolicy = { parentValue, childValue ->
-            if (parentValue == null) {
-                childValue
-            } else {
-                buildAnnotatedString {
-                    append(parentValue)
-                    append(", ")
-                    append(childValue)
-                }
-            }
+            parentValue?.toMutableList()?.also { it.addAll(childValue) } ?: childValue
         }
     )
 
@@ -345,10 +338,7 @@ class SemanticsPropertyKey<T>(
     // TODO(KT-6519): Remove this getter
     // TODO(KT-32770): Cannot deprecate this either as the getter is considered called by "by"
     final operator fun getValue(thisRef: SemanticsPropertyReceiver, property: KProperty<*>): T {
-        throw UnsupportedOperationException(
-            "You cannot retrieve a semantics property directly - " +
-                "use one of the SemanticsConfiguration.getOr* methods instead"
-        )
+        return throwSemanticsGetNotSupported()
     }
 
     final operator fun setValue(
@@ -362,6 +352,13 @@ class SemanticsPropertyKey<T>(
     override fun toString(): String {
         return "SemanticsPropertyKey: $name"
     }
+}
+
+private fun <T> throwSemanticsGetNotSupported(): T {
+    throw UnsupportedOperationException(
+        "You cannot retrieve a semantics property directly - " +
+            "use one of the SemanticsConfiguration.getOr* methods instead"
+    )
 }
 
 /**
@@ -610,10 +607,12 @@ interface SemanticsPropertyReceiver {
 /**
  * Developer-set content description of the semantics node.
  *
- * If this is not set, accessibility services will present the text of this node as the content
- * description.
+ * If this is not set, accessibility services will present the [text][SemanticsProperties.Text] of
+ * this node as the content.
  */
-var SemanticsPropertyReceiver.contentDescription by SemanticsProperties.ContentDescription
+var SemanticsPropertyReceiver.contentDescription: String
+    get() = throwSemanticsGetNotSupported()
+    set(value) { set(SemanticsProperties.ContentDescription, listOf(value)) }
 
 /**
  * Developer-set state description of the semantics node.
@@ -746,7 +745,9 @@ var SemanticsPropertyReceiver.testTag by SemanticsProperties.TestTag
  *
  * @see SemanticsPropertyReceiver.editableText
  */
-var SemanticsPropertyReceiver.text by SemanticsProperties.Text
+var SemanticsPropertyReceiver.text: AnnotatedString
+    get() = throwSemanticsGetNotSupported()
+    set(value) { set(SemanticsProperties.Text, listOf(value)) }
 
 /**
  * Input text of the text field. It must be real text entered by the user instead of

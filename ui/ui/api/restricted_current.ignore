@@ -11,12 +11,22 @@ ChangedClass: androidx.compose.ui.focus.FocusState:
     Class androidx.compose.ui.focus.FocusState changed class/interface declaration
 
 
+ChangedType: androidx.compose.ui.semantics.SemanticsProperties#getContentDescription():
+    Method androidx.compose.ui.semantics.SemanticsProperties.getContentDescription has changed return type from androidx.compose.ui.semantics.SemanticsPropertyKey<java.lang.String> to androidx.compose.ui.semantics.SemanticsPropertyKey<java.util.List<java.lang.String>>
+ChangedType: androidx.compose.ui.semantics.SemanticsProperties#getText():
+    Method androidx.compose.ui.semantics.SemanticsProperties.getText has changed return type from androidx.compose.ui.semantics.SemanticsPropertyKey<androidx.compose.ui.text.AnnotatedString> to androidx.compose.ui.semantics.SemanticsPropertyKey<java.util.List<androidx.compose.ui.text.AnnotatedString>>
 ChangedType: androidx.compose.ui.semantics.SemanticsPropertiesKt#getImeAction(androidx.compose.ui.semantics.SemanticsPropertyReceiver):
     Method androidx.compose.ui.semantics.SemanticsPropertiesKt.getImeAction has changed return type from androidx.compose.ui.text.input.ImeAction to int
 
 
 InvalidNullConversion: androidx.compose.ui.semantics.SemanticsPropertiesKt#getImeAction(androidx.compose.ui.semantics.SemanticsPropertyReceiver):
     Attempted to remove @NonNull annotation from method androidx.compose.ui.semantics.SemanticsPropertiesKt.getImeAction(androidx.compose.ui.semantics.SemanticsPropertyReceiver)
+
+
+ParameterNameChange: androidx.compose.ui.semantics.SemanticsPropertiesKt#setContentDescription(androidx.compose.ui.semantics.SemanticsPropertyReceiver, String) parameter #1:
+    Attempted to change parameter name from p to value in method androidx.compose.ui.semantics.SemanticsPropertiesKt.setContentDescription
+ParameterNameChange: androidx.compose.ui.semantics.SemanticsPropertiesKt#setText(androidx.compose.ui.semantics.SemanticsPropertyReceiver, androidx.compose.ui.text.AnnotatedString) parameter #1:
+    Attempted to change parameter name from p to value in method androidx.compose.ui.semantics.SemanticsPropertiesKt.setText
 
 
 RemovedClass: androidx.compose.ui.focus.FocusStateKt:

@@ -129,64 +129,89 @@ fun SemanticsNodeInteraction.assertIsNotFocused(): SemanticsNodeInteraction =
     assert(isNotFocused())
 
 /**
- * Asserts that the node's content description equals the given [value].
+ * Asserts that the node's content description contains exactly the given [values] and nothing else.
  *
- * Throws [AssertionError] if the node's value is not equal to `value`, or if the node has no value
+ * Note that in merged semantics tree there can be a list of content descriptions that got merged
+ * from the child nodes. Typically an accessibility tooling will decide based on its heuristics
+ * which ones to announce.
  *
- * @param ignoreCase Whether case should be ignored.
+ * Throws [AssertionError] if the node's descriptions don't contain all items from [values], or
+ * if the descriptions contain extra items that are not in [values].
+ *
+ * @param values List of values to match (the order does not matter)
  * @see SemanticsProperties.ContentDescription
  */
 fun SemanticsNodeInteraction.assertContentDescriptionEquals(
-    value: String,
-    ignoreCase: Boolean = false
-): SemanticsNodeInteraction = assert(hasContentDescription(value, ignoreCase = ignoreCase))
+    vararg values: String
+): SemanticsNodeInteraction = assert(hasContentDescriptionExactly(*values))
 
 /**
- * Asserts that the node's content description contains the given [value] as a substring.
+ * Asserts that the node's content description contains the given [value].
+ *
+ * Note that in merged semantics tree there can be a list of content descriptions that got merged
+ * from the child nodes. Typically an accessibility tooling will decide based on its heuristics
+ * which ones to announce.
  *
  * Throws [AssertionError] if the node's value does not contain `value`, or if the node has no value
  *
+ * @param value Value to match as one of the items in the list of content descriptions.
+ * @param substring Whether this can be satisfied as a substring match of an item in the list of
+ * descriptions.
  * @param ignoreCase Whether case should be ignored.
  * @see SemanticsProperties.ContentDescription
  */
 fun SemanticsNodeInteraction.assertContentDescriptionContains(
     value: String,
+    substring: Boolean = false,
     ignoreCase: Boolean = false
 ): SemanticsNodeInteraction =
-    assert(hasContentDescription(value, substring = true, ignoreCase = ignoreCase))
+    assert(hasContentDescription(value, substring = substring, ignoreCase = ignoreCase))
 
 /**
- * Asserts that the node's text equals the given [value].
+ * Asserts that the node's text contains exactly the given [values] and nothing else.
  *
- * If the node is a text field, it will compare input text and other texts that the text field
- * might have, for example label or placeholder.
+ * This will also search in [SemanticsProperties.EditableText] by default.
  *
- * Throws [AssertionError] if the node's value is not equal to `value`, or if the node has no value
+ * Note that in merged semantics tree there can be a list of text items that got merged from
+ * the child nodes. Typically an accessibility tooling will decide based on its heuristics which
+ * ones to use.
  *
- * @param ignoreCase Whether case should be ignored.
- * @see SemanticsProperties.Text
+ * Throws [AssertionError] if the node's text values don't contain all items from [values], or
+ * if the text values contain extra items that are not in [values].
+ *
+ * @param values List of values to match (the order does not matter)
+ * @param includeEditableText Whether to also assert against the editable text.
+ * @see SemanticsProperties.ContentDescription
  */
 fun SemanticsNodeInteraction.assertTextEquals(
-    value: String,
-    ignoreCase: Boolean = false
+    vararg values: String,
+    includeEditableText: Boolean = true
 ): SemanticsNodeInteraction =
-    assert(hasText(value, ignoreCase = ignoreCase))
+    assert(hasTextExactly(*values, includeEditableText = includeEditableText))
 
 /**
- * Asserts that the node's text contains the given [value] as a substring.
+ * Asserts that the node's text contains the given [value].
  *
- * If the node is a text field, it will compare input text and other texts that the text field
- * might have, for example label or placeholder.
-
+ * This will also search in [SemanticsProperties.EditableText].
+ *
+ * Note that in merged semantics tree there can be a list of text items that got merged from
+ * the child nodes. Typically an accessibility tooling will decide based on its heuristics which
+ * ones to use.
+ *
  * Throws [AssertionError] if the node's value does not contain `value`, or if the node has no value
  *
+ * @param value Value to match as one of the items in the list of text values.
+ * @param substring Whether this can be satisfied as a substring match of an item in the list of
+ * text.
  * @param ignoreCase Whether case should be ignored.
  * @see SemanticsProperties.Text
  */
 fun SemanticsNodeInteraction.assertTextContains(
     value: String,
+    substring: Boolean = false,
     ignoreCase: Boolean = false
-): SemanticsNodeInteraction = assert(hasText(value, substring = true, ignoreCase = ignoreCase))
+): SemanticsNodeInteraction =
+    assert(hasText(value, substring = substring, ignoreCase = ignoreCase))
 
 /**
  * Asserts the node's value equals the given value.

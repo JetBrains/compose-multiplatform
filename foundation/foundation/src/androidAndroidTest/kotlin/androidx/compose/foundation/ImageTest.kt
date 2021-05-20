@@ -51,6 +51,7 @@ import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.semantics.SemanticsProperties
 import androidx.compose.ui.test.SemanticsMatcher
 import androidx.compose.ui.test.assert
+import androidx.compose.ui.test.assertContentDescriptionEquals
 import androidx.compose.ui.test.captureToImage
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
@@ -576,7 +577,7 @@ class ImageTest {
         }
         rule.onNodeWithTag(testTag)
             .assert(SemanticsMatcher.expectValue(SemanticsProperties.Role, Role.Image))
-            .assert(SemanticsMatcher.expectValue(SemanticsProperties.ContentDescription, "asdf"))
+            .assertContentDescriptionEquals("asdf")
     }
 
     @Test

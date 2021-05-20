@@ -546,7 +546,7 @@ class TextFieldTest {
 
         rule.onNodeWithTag(Tag)
             .assertEditableTextEquals("")
-            .assertTextEquals("label")
+            .assertTextEquals("label", includeEditableText = false)
             .assertHasClickAction()
             .assert(hasSetTextAction())
             .assert(hasImeAction(ImeAction.Default))

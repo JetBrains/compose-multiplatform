@@ -1,3 +1,15 @@
 // Baseline format: 1.0
+ParameterNameChange: androidx.compose.ui.test.FiltersKt#hasContentDescription(String, boolean, boolean) parameter #0:
+    Attempted to change parameter name from label to value in method androidx.compose.ui.test.FiltersKt.hasContentDescription
+
+
+RemovedMethod: androidx.compose.ui.test.AssertionsKt#assertContentDescriptionContains(androidx.compose.ui.test.SemanticsNodeInteraction, String, boolean):
+    Removed method androidx.compose.ui.test.AssertionsKt.assertContentDescriptionContains(androidx.compose.ui.test.SemanticsNodeInteraction,String,boolean)
+RemovedMethod: androidx.compose.ui.test.AssertionsKt#assertContentDescriptionEquals(androidx.compose.ui.test.SemanticsNodeInteraction, String, boolean):
+    Removed method androidx.compose.ui.test.AssertionsKt.assertContentDescriptionEquals(androidx.compose.ui.test.SemanticsNodeInteraction,String,boolean)
+RemovedMethod: androidx.compose.ui.test.AssertionsKt#assertTextContains(androidx.compose.ui.test.SemanticsNodeInteraction, String, boolean):
+    Removed method androidx.compose.ui.test.AssertionsKt.assertTextContains(androidx.compose.ui.test.SemanticsNodeInteraction,String,boolean)
+RemovedMethod: androidx.compose.ui.test.AssertionsKt#assertTextEquals(androidx.compose.ui.test.SemanticsNodeInteraction, String, boolean):
+    Removed method androidx.compose.ui.test.AssertionsKt.assertTextEquals(androidx.compose.ui.test.SemanticsNodeInteraction,String,boolean)
 RemovedMethod: androidx.compose.ui.test.FiltersKt#hasImeAction(androidx.compose.ui.text.input.ImeAction):
     Removed method androidx.compose.ui.test.FiltersKt.hasImeAction(androidx.compose.ui.text.input.ImeAction)
