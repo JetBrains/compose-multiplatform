@@ -14,7 +14,18 @@
  * limitations under the License.
  */
 
-package androidx.compose.foundation.text
+package androidx.compose.ui.text
 
-internal actual fun StringBuilder.appendCodePointX(codePoint: Int): StringBuilder =
-    this.appendCodePoint(codePoint)
+import org.jetbrains.skija.BreakIterator
+
+internal actual fun String.findPrecedingBreak(index: Int): Int {
+    val it = BreakIterator.makeCharacterInstance()
+    it.setText(this)
+    return it.preceding(index)
+}
+
+internal actual fun String.findFollowingBreak(index: Int): Int {
+    val it = BreakIterator.makeCharacterInstance()
+    it.setText(this)
+    return it.following(index)
+}
