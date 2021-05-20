@@ -27,6 +27,7 @@ import androidx.compose.ui.input.pointer.changedToUp
 import androidx.compose.ui.input.pointer.positionChangeConsumed
 import androidx.compose.ui.input.pointer.changedToUpIgnoreConsumed
 import androidx.compose.ui.input.pointer.consumeDownChange
+import androidx.compose.ui.input.pointer.consumePositionChange
 import androidx.compose.ui.input.pointer.isOutOfBounds
 import androidx.compose.ui.input.pointer.positionChange
 import androidx.compose.ui.input.pointer.positionChangeIgnoreConsumed
@@ -178,11 +179,11 @@ suspend fun AwaitPointerEventScope.awaitDragOrCancellation(
 /**
  * Gesture detector that waits for pointer down and touch slop in any direction and then
  * calls [onDrag] for each drag event. It follows the touch slop detection of
- * [awaitTouchSlopOrCancellation], so [onDrag] must consume the position change
- * if it wants to accept the drag motion. [onDragStart] will be called when touch slop in passed
+ * [awaitTouchSlopOrCancellation] but will consume the position change automatically
+ * once the touch slop has been crossed. [onDragStart] will be called when touch slop in passed
  * with the last known pointer position provided. [onDragEnd] is called after all pointers are up
- * and [onDragCancel] is called if another gesture has consumed pointer input, canceling
- * this gesture.
+ * and [onDragCancel] is called if another gesture has consumed pointer input, canceling this
+ * gesture.
  *
  * Example Usage:
  * @sample androidx.compose.foundation.samples.DetectDragGesturesSample
@@ -201,14 +202,20 @@ suspend fun PointerInputScope.detectDragGestures(
         awaitPointerEventScope {
             val down = awaitFirstDown(requireUnconsumed = false)
             var drag: PointerInputChange?
+            var overSlop = Offset.Zero
             do {
-                drag = awaitTouchSlopOrCancellation(down.id, onDrag)
+                drag = awaitTouchSlopOrCancellation(down.id) { change, over ->
+                    change.consumePositionChange()
+                    overSlop = over
+                }
             } while (drag != null && !drag.positionChangeConsumed())
             if (drag != null) {
                 onDragStart.invoke(drag.position)
+                onDrag(drag, overSlop)
                 if (
                     !drag(drag.id) {
                         onDrag(it, it.positionChange())
+                        it.consumePositionChange()
                     }
                 ) {
                     onDragCancel()
@@ -222,10 +229,10 @@ suspend fun PointerInputScope.detectDragGestures(
 
 /**
  * Gesture detector that waits for pointer down and long press, after which it calls [onDrag] for
- * each drag event. [onDrag] must consume the position change if it wants to accept the drag
- * motion. [onDragStart] will be called when long press in detected with the last known pointer
- * position provided. [onDragEnd] is called after all pointers are up and [onDragCancel] is
- * called if another gesture has consumed pointer input, canceling this gesture.
+ * each drag event. [onDragStart] will be called when long press in detected with the last known
+ * pointer position provided. [onDragEnd] is called after all pointers are up and [onDragCancel] is
+ * called if another gesture has consumed pointer input, canceling this gesture. This function
+ * will automatically consume all the position change after the long press.
  *
  * Example Usage:
  * @sample androidx.compose.foundation.samples.DetectDragWithLongPressGesturesSample
@@ -250,7 +257,12 @@ suspend fun PointerInputScope.detectDragGesturesAfterLongPress(
                 onDragStart.invoke(drag.position)
 
                 awaitPointerEventScope {
-                    if (drag(drag.id) { onDrag(it, it.positionChange()) }) {
+                    if (
+                        drag(drag.id) {
+                            onDrag(it, it.positionChange())
+                            it.consumePositionChange()
+                        }
+                    ) {
                         // consume up if we quit drag gracefully with the up
                         currentEvent.changes.fastForEach {
                             if (it.changedToUp()) {
@@ -358,11 +370,11 @@ suspend fun AwaitPointerEventScope.awaitVerticalDragOrCancellation(
 /**
  * Gesture detector that waits for pointer down and touch slop in the vertical direction and then
  * calls [onVerticalDrag] for each vertical drag event. It follows the touch slop detection of
- * [awaitVerticalTouchSlopOrCancellation], so [onVerticalDrag] must consume the position change
- * if it wants to accept the drag motion. [onDragStart] will be called when touch slop in passed
- * with the last known pointer position provided. [onDragEnd] is called after all pointers are up
- * and [onDragCancel] is called if another gesture has consumed pointer input, canceling
- * this gesture.
+ * [awaitVerticalTouchSlopOrCancellation], but will consume the position change automatically
+ * once the touch slop has been crossed. [onDragStart] will be called when
+ * touch slop in passed with the last known pointer position provided. [onDragEnd] is called
+ * after all pointers are up and [onDragCancel] is called if another gesture has consumed pointer
+ * input, canceling this gesture.
  *
  * This gesture detector will coordinate with [detectHorizontalDragGestures] and
  * [awaitHorizontalTouchSlopOrCancellation] to ensure only vertical or horizontal dragging
@@ -383,12 +395,18 @@ suspend fun PointerInputScope.detectVerticalDragGestures(
     forEachGesture {
         awaitPointerEventScope {
             val down = awaitFirstDown(requireUnconsumed = false)
-            val drag = awaitVerticalTouchSlopOrCancellation(down.id, onVerticalDrag)
+            var overSlop = 0f
+            val drag = awaitVerticalTouchSlopOrCancellation(down.id) { change, over ->
+                change.consumePositionChange()
+                overSlop = over
+            }
             if (drag != null) {
                 onDragStart.invoke(drag.position)
+                onVerticalDrag.invoke(drag, overSlop)
                 if (
                     verticalDrag(drag.id) {
                         onVerticalDrag(it, it.positionChange().y)
+                        it.consumePositionChange()
                     }
                 ) {
                     onDragEnd()
@@ -484,11 +502,11 @@ suspend fun AwaitPointerEventScope.awaitHorizontalDragOrCancellation(
 /**
  * Gesture detector that waits for pointer down and touch slop in the horizontal direction and
  * then calls [onHorizontalDrag] for each horizontal drag event. It follows the touch slop
- * detection of [awaitHorizontalTouchSlopOrCancellation], so [onHorizontalDrag] must consume the position
- * change if it wants to accept the drag motion. [onDragStart] will be called when touch slop in
- * passed with the last known pointer position provided. [onDragEnd] is called after all pointers
- * are up and [onDragCancel] is called if another gesture has consumed pointer input, canceling
- * this gesture.
+ * detection of [awaitHorizontalTouchSlopOrCancellation], but will consume the position change
+ * automatically once the touch slop has been crossed. [onDragStart] will be called when touch
+ * slop in passed with the last known pointer position provided. [onDragEnd] is called after all
+ * pointers are up and [onDragCancel] is called if another gesture has consumed pointer input,
+ * canceling this gesture.
  *
  * This gesture detector will coordinate with [detectVerticalDragGestures] and
  * [awaitVerticalTouchSlopOrCancellation] to ensure only vertical or horizontal dragging is locked,
@@ -509,12 +527,18 @@ suspend fun PointerInputScope.detectHorizontalDragGestures(
     forEachGesture {
         awaitPointerEventScope {
             val down = awaitFirstDown(requireUnconsumed = false)
-            val drag = awaitHorizontalTouchSlopOrCancellation(down.id, onHorizontalDrag)
+            var overSlop = 0f
+            val drag = awaitHorizontalTouchSlopOrCancellation(down.id) { change, over ->
+                change.consumePositionChange()
+                overSlop = over
+            }
             if (drag != null) {
                 onDragStart.invoke(drag.position)
+                onHorizontalDrag(drag, overSlop)
                 if (
                     horizontalDrag(drag.id) {
                         onHorizontalDrag(it, it.positionChange().x)
+                        it.consumePositionChange()
                     }
                 ) {
                     onDragEnd()
