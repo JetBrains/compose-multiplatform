@@ -260,27 +260,3 @@ android {
     sourceSets.androidTest.assets.srcDirs +=
             project.rootDir.absolutePath + "/../../golden/compose/ui/ui"
 }
-
-if(AndroidXUiPlugin.isMultiplatformEnabled(project)) {
-    // An ugly hack to workaround b/159426957
-    // causing MPP+AGP to conflict.
-    // See also: https://youtrack.jetbrains.com/issue/KT-34650
-    // See also: https://youtrack.jetbrains.com/issue/KT-39712
-    afterEvaluate {
-        ["Api", "Implementation", "CompileOnly", "RuntimeOnly"].each { scope ->
-            def erroneousExtendsFrom = [
-                    "androidTest$scope",
-                    "androidTestDebug$scope",
-            ].collect { configurations[it] }
-            [
-                    "androidDebugUnitTest$scope",
-                    "test$scope",
-                    "testDebug$scope",
-                    "testRelease$scope"
-            ].each {
-                def configuration = configurations[it]
-                configuration.setExtendsFrom(configuration.extendsFrom - erroneousExtendsFrom)
-            }
-        }
-    }
-}
