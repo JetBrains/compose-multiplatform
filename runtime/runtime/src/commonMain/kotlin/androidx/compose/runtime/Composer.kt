@@ -25,8 +25,8 @@ import androidx.compose.runtime.snapshots.fastForEach
 import androidx.compose.runtime.snapshots.fastToSet
 import androidx.compose.runtime.tooling.CompositionData
 import androidx.compose.runtime.tooling.LocalInspectionTables
-import kotlinx.collections.immutable.PersistentMap
-import kotlinx.collections.immutable.persistentHashMapOf
+import androidx.compose.runtime.external.kotlinx.collections.immutable.PersistentMap
+import androidx.compose.runtime.external.kotlinx.collections.immutable.persistentHashMapOf
 import kotlin.coroutines.CoroutineContext
 
 internal typealias Change = (
