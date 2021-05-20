@@ -19,8 +19,8 @@ package androidx.compose.ui.tooling
 import android.app.Activity
 import android.os.Bundle
 import androidx.compose.animation.core.InternalAnimationApi
-import androidx.compose.ui.tooling.data.UiToolingDataApi
 import androidx.compose.ui.tooling.animation.PreviewAnimationClock
+import androidx.compose.ui.tooling.data.UiToolingDataApi
 import androidx.compose.ui.tooling.test.R
 import androidx.test.filters.LargeTest
 import androidx.test.filters.MediumTest
@@ -121,31 +121,49 @@ class ComposeViewAdapterTest {
     }
 
     @Test
-    fun animatedVisibilityIsIgnored() {
-        assertRendersCorrectly(
-            "androidx.compose.ui.tooling.TestAnimationPreviewKt",
-            "AnimatedVisibilityPreview"
-        )
+    fun animatedVisibilityIsTracked() {
+        val clock = PreviewAnimationClock()
 
         activityTestRule.runOnUiThread {
-            // Verify that this composable has no animations, since we should ignore
-            // AnimatedVisibility animations
+            composeViewAdapter.init(
+                "androidx.compose.ui.tooling.TestAnimationPreviewKt",
+                "AnimatedVisibilityPreview"
+            )
+            composeViewAdapter.clock = clock
             assertFalse(composeViewAdapter.hasAnimations())
+            assertTrue(clock.trackedAnimatedVisibility.isEmpty())
+        }
+
+        waitFor("Composable to have animations", 1, TimeUnit.SECONDS) {
+            // Handle the case where onLayout was called too soon. Calling requestLayout will
+            // make sure onLayout will be called again.
+            composeViewAdapter.requestLayout()
+            composeViewAdapter.hasAnimations()
+        }
+
+        activityTestRule.runOnUiThread {
+            val animation = clock.trackedAnimatedVisibility.single()
+            assertEquals("My Animated Visibility", animation.label)
         }
     }
 
     @Test
+    fun transitionAnimatedVisibilityIsTrackedAsTransition() {
+        checkTransitionIsSubscribed("TransitionAnimatedVisibilityPreview", "transition.AV")
+    }
+
+    @Test
     fun transitionAnimationsAreSubscribedToTheClock() {
-        checkComposableAnimationIsSubscribed("CheckBoxPreview")
+        checkTransitionIsSubscribed("CheckBoxPreview", "checkBoxAnim")
     }
 
     @Test
     fun transitionAnimationsWithSubcomposition() {
-        checkComposableAnimationIsSubscribed("CheckBoxScaffoldPreview")
+        checkTransitionIsSubscribed("CheckBoxScaffoldPreview", "checkBoxAnim")
     }
 
     @OptIn(InternalAnimationApi::class)
-    private fun checkComposableAnimationIsSubscribed(composableName: String) {
+    private fun checkTransitionIsSubscribed(composableName: String, label: String) {
         val clock = PreviewAnimationClock()
 
         activityTestRule.runOnUiThread {
@@ -167,7 +185,7 @@ class ComposeViewAdapterTest {
 
         activityTestRule.runOnUiThread {
             val animation = clock.trackedTransitions.single()
-            assertEquals("checkBoxAnim", animation.label)
+            assertEquals(label, animation.label)
         }
     }
 
