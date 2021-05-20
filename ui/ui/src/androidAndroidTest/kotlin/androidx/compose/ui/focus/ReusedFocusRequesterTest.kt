@@ -42,7 +42,7 @@ class ReusedFocusRequesterTest {
                 modifier = Modifier
                     .onFocusChanged { focusState = it }
                     .focusRequester(focusRequester)
-                    .focusModifier()
+                    .focusTarget()
             )
         }
 
@@ -66,13 +66,13 @@ class ReusedFocusRequesterTest {
                 modifier = Modifier
                     .onFocusChanged { focusState1 = it }
                     .focusRequester(focusRequester)
-                    .focusModifier()
+                    .focusTarget()
             )
             Box(
                 modifier = Modifier
                     .onFocusChanged { focusState2 = it }
                     .focusRequester(focusRequester)
-                    .focusModifier()
+                    .focusTarget()
             )
         }
 
@@ -98,19 +98,19 @@ class ReusedFocusRequesterTest {
                 modifier = Modifier
                     .onFocusChanged { focusState1 = it }
                     .focusRequester(focusRequester)
-                    .focusModifier()
+                    .focusTarget()
             )
             Box(
                 modifier = Modifier
                     .onFocusChanged { focusState2 = it }
                     .focusRequester(focusRequester)
-                    .focusModifier()
+                    .focusTarget()
             )
             Box(
                 modifier = Modifier
                     .onFocusChanged { focusState3 = it }
                     .focusRequester(focusRequester)
-                    .focusModifier()
+                    .focusTarget()
             )
         }
 

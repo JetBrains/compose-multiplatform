@@ -37,7 +37,7 @@ class FocusRequesterTest {
     val rule = createComposeRule()
 
     @Test
-    fun requestFocus_noFocusModifierInLayoutNode() {
+    fun requestFocus_noFocusTargetInLayoutNode() {
         // Arrange.
         lateinit var focusState: FocusState
         val focusRequester = FocusRequester()
@@ -59,7 +59,7 @@ class FocusRequesterTest {
     }
 
     @Test
-    fun requestFocus_focusModifierInLayoutNode_butBeforeFocusRequester() {
+    fun requestFocus_focusTargetInLayoutNode_butBeforeFocusRequester() {
         // Arrange.
         lateinit var focusState: FocusState
         val focusRequester = FocusRequester()
@@ -67,7 +67,7 @@ class FocusRequesterTest {
             Box(
                 modifier = Modifier
                     .onFocusChanged { focusState = it }
-                    .focusModifier()
+                    .focusTarget()
                     .focusRequester(focusRequester)
             )
         }
@@ -82,7 +82,7 @@ class FocusRequesterTest {
     }
 
     @Test
-    fun requestFocus_focusModifierInLayoutNode() {
+    fun requestFocus_focusTargetInLayoutNode() {
         // Arrange.
         lateinit var focusState: FocusState
         val focusRequester = FocusRequester()
@@ -91,7 +91,7 @@ class FocusRequesterTest {
                 modifier = Modifier
                     .onFocusChanged { focusState = it }
                     .focusRequester(focusRequester)
-                    .focusModifier()
+                    .focusTarget()
             )
         }
 
@@ -105,7 +105,7 @@ class FocusRequesterTest {
     }
 
     @Test
-    fun requestFocus_focusModifierInChildLayoutNode() {
+    fun requestFocus_focusTargetInChildLayoutNode() {
         // Arrange.
         lateinit var focusState: FocusState
         val focusRequester = FocusRequester()
@@ -115,7 +115,7 @@ class FocusRequesterTest {
                     .focusRequester(focusRequester)
                     .onFocusChanged { focusState = it }
             ) {
-                Box(modifier = Modifier.focusModifier())
+                Box(modifier = Modifier.focusTarget())
             }
         }
 
@@ -129,7 +129,7 @@ class FocusRequesterTest {
     }
 
     @Test
-    fun requestFocus_focusModifierAndReferenceInChildLayoutNode() {
+    fun requestFocus_focusTargetAndReferenceInChildLayoutNode() {
         // Arrange.
         lateinit var focusState: FocusState
         val focusRequester = FocusRequester()
@@ -140,7 +140,7 @@ class FocusRequesterTest {
                 Box(
                     modifier = Modifier
                         .focusRequester(focusRequester)
-                        .focusModifier()
+                        .focusTarget()
                 )
             }
         }
@@ -155,7 +155,7 @@ class FocusRequesterTest {
     }
 
     @Test
-    fun requestFocus_focusModifierAndObserverInChildLayoutNode() {
+    fun requestFocus_focusTargetAndObserverInChildLayoutNode() {
         // Arrange.
         lateinit var focusState: FocusState
         val focusRequester = FocusRequester()
@@ -166,7 +166,7 @@ class FocusRequesterTest {
                 Box(
                     modifier = Modifier
                         .onFocusChanged { focusState = it }
-                        .focusModifier()
+                        .focusTarget()
                 )
             }
         }
@@ -181,7 +181,7 @@ class FocusRequesterTest {
     }
 
     @Test
-    fun requestFocus_focusModifierInDistantDescendantLayoutNode() {
+    fun requestFocus_focusTargetInDistantDescendantLayoutNode() {
         // Arrange.
         lateinit var focusState: FocusState
         val focusRequester = FocusRequester()
@@ -197,7 +197,7 @@ class FocusRequesterTest {
                             Box {
                                 Box {
                                     Box(
-                                        modifier = Modifier.focusModifier()
+                                        modifier = Modifier.focusTarget()
                                     )
                                 }
                             }
@@ -229,12 +229,12 @@ class FocusRequesterTest {
                 Box(
                     modifier = Modifier
                         .onFocusChanged { focusState1 = it }
-                        .focusModifier()
+                        .focusTarget()
                 )
                 Box(
                     modifier = Modifier
                         .onFocusChanged { focusState2 = it }
-                        .focusModifier()
+                        .focusTarget()
                 )
             }
         }
@@ -264,12 +264,12 @@ class FocusRequesterTest {
                 Box(
                     modifier = Modifier
                         .focusRequester(focusRequester1)
-                        .focusModifier()
+                        .focusTarget()
                 )
                 Box(
                     modifier = Modifier
                         .focusRequester(focusRequester2)
-                        .focusModifier()
+                        .focusTarget()
                 )
             }
         }

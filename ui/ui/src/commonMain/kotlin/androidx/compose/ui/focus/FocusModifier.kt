@@ -38,6 +38,9 @@ internal class FocusModifier(
     inspectorInfo: InspectorInfo.() -> Unit = NoInspectorInfo
 ) : Modifier.Element, InspectorValueInfo(inspectorInfo) {
 
+    // TODO(b/188684110): Move focusState and focusedChild to ModiedFocusNode and make this
+    //  modifier stateless.
+
     var focusState: FocusStateImpl = initialFocus
 
     var focusedChild: ModifiedFocusNode? = null
@@ -48,6 +51,17 @@ internal class FocusModifier(
 /**
  * Add this modifier to a component to make it focusable.
  */
+fun Modifier.focusTarget(): Modifier = composed(debugInspectorInfo { name = "focusTarget" }) {
+    remember { FocusModifier(Inactive) }
+}
+
+/**
+ * Add this modifier to a component to make it focusable.
+ */
+@Deprecated(
+    "Replaced by focusTarget",
+    ReplaceWith("focusTarget()", "androidx.compose.ui.focus.focusTarget")
+)
 fun Modifier.focusModifier(): Modifier = composed(debugInspectorInfo { name = "focusModifier" }) {
     remember { FocusModifier(Inactive) }
 }
