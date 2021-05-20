@@ -40,7 +40,6 @@ import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.IntRect
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.round
-import java.awt.Point
 
 /**
  * Opens a popup with the given content.
@@ -98,19 +97,17 @@ fun Popup(
 @Composable
 fun Popup(
     popupPositionProvider: PopupPositionProvider,
-    offset: IntOffset = IntOffset.Zero,
     onDismissRequest: (() -> Unit)? = null,
     focusable: Boolean = false,
     contextMenu: Boolean = false,
     content: @Composable () -> Unit
 ) {
-    PopupLayout(popupPositionProvider, offset, focusable, contextMenu, onDismissRequest, content)
+    PopupLayout(popupPositionProvider, focusable, contextMenu, onDismissRequest, content)
 }
 
 @Composable
 private fun PopupLayout(
     popupPositionProvider: PopupPositionProvider,
-    offset: IntOffset,
     focusable: Boolean,
     contextMenu: Boolean,
     onDismissRequest: (() -> Unit)?,
@@ -118,11 +115,11 @@ private fun PopupLayout(
 ) {
     val owners = LocalDesktopOwners.current
     val density = LocalDensity.current
-    val container = LocalLayerContainer.current
+    val component = if (contextMenu) LocalLayerContainer.current else null
 
     var parentBounds by remember { mutableStateOf(IntRect.Zero) }
     var popupBounds by remember { mutableStateOf(IntRect.Zero) }
-    val pointClick = remember { container.getMousePosition() }
+    val pointClick = remember { component?.getMousePosition() }
 
     // getting parent bounds
     Layout(
@@ -168,11 +165,9 @@ private fun PopupLayout(
                             val placeable = it.measure(constraints)
                             var position: IntOffset
                             if (contextMenu) {
-                                position = calculateContextMenuPosition(
-                                    pointClick,
-                                    offset,
-                                    parentBounds,
-                                    density.density
+                                position = IntOffset(
+                                    (pointClick!!.x * density.density).toInt(),
+                                    (pointClick.y * density.density).toInt()
                                 )
                             } else {
                                 position = popupPositionProvider.calculatePosition(
@@ -217,16 +212,4 @@ private suspend fun PointerInputScope.detectDown(onDown: (Offset) -> Unit) {
             }
         }
     }
-}
-
-private fun calculateContextMenuPosition(
-    point: Point,
-    dropdownMenuPadding: IntOffset,
-    parentRect: IntRect,
-    density: Float
-): IntOffset {
-    return IntOffset(
-        (point.x * density).toInt(),
-        ((point.y + dropdownMenuPadding.y) * density).toInt() - parentRect.height
-    )
 }
