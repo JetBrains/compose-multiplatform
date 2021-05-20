@@ -257,18 +257,33 @@ fun Modifier.combinedClickable(
 ) = composed(
     factory = {
         val onClickState = rememberUpdatedState(onClick)
+        val onLongClickState = rememberUpdatedState(onLongClick)
+        val onDoubleClickState = rememberUpdatedState(onDoubleClick)
+        val hasLongClick = onLongClick != null
+        val hasDoubleClick = onDoubleClick != null
         val pressedInteraction = remember { mutableStateOf<PressInteraction.Press?>(null) }
         val gesture = if (enabled) {
+            // Handles the case where a long click causes a null onLongClick lambda to be passed,
+            // so we can cancel the existing press.
+            DisposableEffect(hasLongClick) {
+                onDispose {
+                    pressedInteraction.value?.let { oldValue ->
+                        val interaction = PressInteraction.Cancel(oldValue)
+                        interactionSource.tryEmit(interaction)
+                        pressedInteraction.value = null
+                    }
+                }
+            }
             PressedInteractionSourceDisposableEffect(interactionSource, pressedInteraction)
-            Modifier.pointerInput(onDoubleClick, onLongClick, interactionSource) {
+            Modifier.pointerInput(interactionSource, hasLongClick, hasDoubleClick) {
                 detectTapGestures(
-                    onDoubleTap = if (onDoubleClick != null) {
-                        { onDoubleClick() }
+                    onDoubleTap = if (hasDoubleClick) {
+                        { onDoubleClickState.value?.invoke() }
                     } else {
                         null
                     },
-                    onLongPress = if (onLongClick != null) {
-                        { onLongClick() }
+                    onLongPress = if (hasLongClick) {
+                        { onLongClickState.value?.invoke() }
                     } else {
                         null
                     },
