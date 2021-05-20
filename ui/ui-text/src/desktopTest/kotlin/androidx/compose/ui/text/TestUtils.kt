@@ -18,7 +18,7 @@ package androidx.compose.ui.text
 
 import java.util.Locale
 
-private val os = System.getProperty("os.name").toLowerCase(Locale.US)
+private val os = System.getProperty("os.name").lowercase(Locale.US)
 internal val isLinux = os.startsWith("linux")
 internal val isWindows = os.startsWith("win")
 internal val isMacOs = os.startsWith("mac")
