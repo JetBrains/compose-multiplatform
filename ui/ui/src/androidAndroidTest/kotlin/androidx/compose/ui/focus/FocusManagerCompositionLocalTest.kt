@@ -46,7 +46,7 @@ class FocusManagerCompositionLocalTest {
                 modifier = Modifier
                     .focusRequester(focusRequester)
                     .onFocusChanged { focusState = it }
-                    .focusModifier()
+                    .focusTarget()
             )
         }
         rule.runOnIdle {
@@ -75,18 +75,18 @@ class FocusManagerCompositionLocalTest {
             Box(
                 modifier = Modifier
                     .onFocusChanged { grandparentFocusState = it }
-                    .focusModifier()
+                    .focusTarget()
             ) {
                 Box(
                     modifier = Modifier
                         .onFocusChanged { parentFocusState = it }
-                        .focusModifier()
+                        .focusTarget()
                 ) {
                     Box(
                         modifier = Modifier
                             .focusRequester(focusRequester)
                             .onFocusChanged { focusState = it }
-                            .focusModifier()
+                            .focusTarget()
                     )
                 }
             }

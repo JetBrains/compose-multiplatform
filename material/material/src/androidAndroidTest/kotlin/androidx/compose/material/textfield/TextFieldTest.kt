@@ -55,8 +55,8 @@ import androidx.compose.testutils.assertShape
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
-import androidx.compose.ui.focus.focusModifier
 import androidx.compose.ui.focus.focusRequester
+import androidx.compose.ui.focus.focusTarget
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.RectangleShape
@@ -282,7 +282,7 @@ class TextFieldTest {
                 TextField(
                     modifier = Modifier
                         .focusRequester(parentFocusRequester)
-                        .focusModifier()
+                        .focusTarget()
                         .focusRequester(focusRequester)
                         .testTag(TextfieldTag),
                     value = "input",
@@ -314,7 +314,7 @@ class TextFieldTest {
                 TextField(
                     modifier = Modifier
                         .focusRequester(parentFocusRequester)
-                        .focusModifier()
+                        .focusTarget()
                         .focusRequester(focusRequester)
                         .testTag(TextfieldTag),
                     value = "input",
