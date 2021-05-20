@@ -1849,7 +1849,7 @@ package androidx.compose.ui.layout {
 
   @androidx.compose.ui.ExperimentalComposeUiApi public final class RelocationRequester {
     ctor public RelocationRequester();
-    method public void bringIntoParentBounds();
+    method public void bringIntoView();
   }
 
   public final class RelocationRequesterModifierKt {

@@ -36,6 +36,7 @@ import androidx.compose.ui.focus.FocusDirection.Companion.Up
 import androidx.compose.ui.focus.FocusManager
 import androidx.compose.ui.focus.FocusManagerImpl
 import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.geometry.Rect
 import androidx.compose.ui.graphics.Canvas
 import androidx.compose.ui.graphics.DesktopCanvas
 import androidx.compose.ui.input.key.Key.Companion.Back
@@ -284,6 +285,10 @@ internal class DesktopOwner(
             Back -> Out
             else -> null
         }
+    }
+
+    override fun requestRectangleOnScreen(rect: Rect) {
+        // TODO: Scroll the owner to bring the specified rectangle into view.
     }
 
     override fun calculatePositionInWindow(localPosition: Offset): Offset = localPosition
