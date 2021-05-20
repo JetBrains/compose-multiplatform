@@ -261,3 +261,16 @@ android {
     sourceSets.androidTest.assets.srcDirs +=
             project.rootDir.absolutePath + "/../../golden/compose/ui/ui"
 }
+
+// Diagnostics for b/188565660
+project.afterEvaluate {
+    tasks.named("compileReleaseKotlin").configure { t ->
+        t.doLast {
+            def moduleFile = project.file("${buildDir}/tmp/kotlin-classes/release/META-INF/ui_release.kotlin_module")
+            // This file should be large, about 3.2K. If this file is short then many symbols will fail to resolve
+            if (moduleFile.length() < 250) {
+                throw new GradleException("kotlin_module file ($moduleFile) too short! See b/188565660 for more information. File text: ${moduleFile.text}")
+            }
+        }
+    }
+}
