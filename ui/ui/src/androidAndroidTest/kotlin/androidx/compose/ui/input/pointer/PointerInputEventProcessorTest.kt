@@ -109,7 +109,13 @@ class PointerInputEventProcessorTest {
 
     @Test
     fun pointerTypePassed() {
-        val pointerTypes = PointerType.values()
+        val pointerTypes = listOf(
+            PointerType.Unknown,
+            PointerType.Touch,
+            PointerType.Mouse,
+            PointerType.Stylus,
+            PointerType.Eraser
+        )
 
         // Arrange
         val pointerInputFilter = PointerInputFilterMock()
