@@ -578,6 +578,158 @@ class ClickableTest {
         }
     }
 
+    /**
+     * Regression test for b/186223077
+     *
+     * Tests that if a long click causes the long click lambda to change instances, we will still
+     * correctly wait for the up event and emit [PressInteraction.Release].
+     */
+    @Test
+    @LargeTest
+    fun clickableTest_longClick_interactionSource_continuesTrackingPressAfterLambdasChange() {
+        val interactionSource = MutableInteractionSource()
+
+        var onLongClick by mutableStateOf({})
+        val finalLongClick = {}
+        val initialLongClick = { onLongClick = finalLongClick }
+        // Simulate the long click causing a recomposition, and changing the lambda instance
+        onLongClick = initialLongClick
+
+        var scope: CoroutineScope? = null
+
+        rule.mainClock.autoAdvance = false
+
+        rule.setContent {
+            scope = rememberCoroutineScope()
+            Box {
+                BasicText(
+                    "ClickableText",
+                    modifier = Modifier
+                        .testTag("myClickable")
+                        .combinedClickable(
+                            onLongClick = onLongClick,
+                            interactionSource = interactionSource,
+                            indication = null
+                        ) {}
+                )
+            }
+        }
+
+        val interactions = mutableListOf<Interaction>()
+
+        scope!!.launch {
+            interactionSource.interactions.collect { interactions.add(it) }
+        }
+
+        rule.runOnIdle {
+            assertThat(interactions).isEmpty()
+            assertThat(onLongClick).isEqualTo(initialLongClick)
+        }
+
+        rule.onNodeWithTag("myClickable")
+            .performGesture { down(center) }
+
+        // Simulate a long click
+        rule.mainClock.advanceTimeBy(1000)
+        // Run another frame to trigger recomposition caused by the long click
+        rule.mainClock.advanceTimeByFrame()
+
+        // We should have a press interaction, with no release, even though the lambda instance
+        // has changed
+        rule.runOnIdle {
+            assertThat(interactions).hasSize(1)
+            assertThat(interactions.first()).isInstanceOf(PressInteraction.Press::class.java)
+            assertThat(onLongClick).isEqualTo(finalLongClick)
+        }
+
+        rule.onNodeWithTag("myClickable")
+            .performGesture { up() }
+
+        // The up should now cause a release
+        rule.runOnIdle {
+            assertThat(interactions).hasSize(2)
+            assertThat(interactions.first()).isInstanceOf(PressInteraction.Press::class.java)
+            assertThat(interactions[1]).isInstanceOf(PressInteraction.Release::class.java)
+            assertThat((interactions[1] as PressInteraction.Release).press)
+                .isEqualTo(interactions[0])
+        }
+    }
+
+    /**
+     * Regression test for b/186223077
+     *
+     * Tests that if a long click causes the long click lambda to become null, we will emit
+     * [PressInteraction.Cancel].
+     */
+    @Test
+    @LargeTest
+    fun clickableTest_longClick_interactionSource_cancelsIfLongClickBecomesNull() {
+        val interactionSource = MutableInteractionSource()
+
+        var onLongClick: (() -> Unit)? by mutableStateOf(null)
+        val initialLongClick = { onLongClick = null }
+        // Simulate the long click causing a recomposition, and changing the lambda to be null
+        onLongClick = initialLongClick
+
+        var scope: CoroutineScope? = null
+
+        rule.mainClock.autoAdvance = false
+
+        rule.setContent {
+            scope = rememberCoroutineScope()
+            Box {
+                BasicText(
+                    "ClickableText",
+                    modifier = Modifier
+                        .testTag("myClickable")
+                        .combinedClickable(
+                            onLongClick = onLongClick,
+                            interactionSource = interactionSource,
+                            indication = null
+                        ) {}
+                )
+            }
+        }
+
+        val interactions = mutableListOf<Interaction>()
+
+        scope!!.launch {
+            interactionSource.interactions.collect { interactions.add(it) }
+        }
+
+        rule.runOnIdle {
+            assertThat(interactions).isEmpty()
+            assertThat(onLongClick).isEqualTo(initialLongClick)
+        }
+
+        rule.onNodeWithTag("myClickable")
+            .performGesture { down(center) }
+
+        // Initial press
+        rule.mainClock.advanceTimeBy(100)
+
+        rule.runOnIdle {
+            assertThat(interactions).hasSize(1)
+            assertThat(interactions.first()).isInstanceOf(PressInteraction.Press::class.java)
+            assertThat(onLongClick).isEqualTo(initialLongClick)
+        }
+
+        // Long click
+        rule.mainClock.advanceTimeBy(1000)
+        // Run another frame to trigger recomposition caused by the long click
+        rule.mainClock.advanceTimeByFrame()
+
+        // The new onLongClick lambda should be null, and so we should cancel the existing press.
+        rule.runOnIdle {
+            assertThat(interactions).hasSize(2)
+            assertThat(interactions.first()).isInstanceOf(PressInteraction.Press::class.java)
+            assertThat(interactions[1]).isInstanceOf(PressInteraction.Cancel::class.java)
+            assertThat((interactions[1] as PressInteraction.Cancel).press)
+                .isEqualTo(interactions[0])
+            assertThat(onLongClick).isNull()
+        }
+    }
+
     @Test
     @LargeTest
     fun clickableTest_click_withDoubleClick_andLongClick_disabled() {
