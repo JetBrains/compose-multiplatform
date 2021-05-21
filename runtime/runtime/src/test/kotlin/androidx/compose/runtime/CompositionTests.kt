@@ -2922,6 +2922,44 @@ class CompositionTests {
         assertFalse(rememberedValue)
         assertEquals(1, count)
     }
+
+    @Test // regression test for b/188015757
+    fun testRestartOfDefaultFunctions() = compositionTest {
+
+        @Composable
+        fun Test() {
+            Defaults()
+            use(stateB)
+        }
+
+        compose {
+            Test()
+        }
+
+        // Force Defaults to skip
+        stateB++
+        advance()
+
+        // Force Defaults to recompose
+        stateA++
+        advance()
+    }
+}
+
+var stateA by mutableStateOf(1000)
+var stateB by mutableStateOf(2000)
+
+fun use(@Suppress("UNUSED_PARAMETER") v: Int) {}
+
+fun calculateSomething() = 4
+
+@Composable // used in testRestartOfDefaultFunctions
+fun Defaults(a: Int = 1, b: Int = 2, c: Int = 3, d: Int = calculateSomething()) {
+    assertEquals(1, a)
+    assertEquals(2, b)
+    assertEquals(3, c)
+    assertEquals(4, d)
+    use(stateA)
 }
 
 @OptIn(InternalComposeApi::class)

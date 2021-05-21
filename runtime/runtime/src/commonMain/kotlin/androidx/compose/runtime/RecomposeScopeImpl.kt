@@ -120,8 +120,13 @@ internal class RecomposeScopeImpl(
     override fun updateScope(block: (Composer, Int) -> Unit) { this.block = block }
 
     private var currentToken = 0
-    private var skipped = false
     private var trackedInstances: IdentityArrayIntMap? = null
+
+    /**
+     * Indicates whether the scope was skipped (e.g. [scopeSkipped] was called.
+     */
+    internal var skipped = false
+        private set
 
     /**
      * Called when composition start composing into this scope. The [token] is a value that is
