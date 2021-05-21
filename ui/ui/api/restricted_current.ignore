@@ -11,6 +11,10 @@ ChangedClass: androidx.compose.ui.focus.FocusState:
     Class androidx.compose.ui.focus.FocusState changed class/interface declaration
 
 
+ChangedSuperclass: androidx.compose.ui.input.pointer.PointerType:
+    Class androidx.compose.ui.input.pointer.PointerType superclass changed from java.lang.Enum to java.lang.Object
+
+
 ChangedType: androidx.compose.ui.semantics.SemanticsProperties#getContentDescription():
     Method androidx.compose.ui.semantics.SemanticsProperties.getContentDescription has changed return type from androidx.compose.ui.semantics.SemanticsPropertyKey<java.lang.String> to androidx.compose.ui.semantics.SemanticsPropertyKey<java.util.List<java.lang.String>>
 ChangedType: androidx.compose.ui.semantics.SemanticsProperties#getText():
@@ -19,6 +23,8 @@ ChangedType: androidx.compose.ui.semantics.SemanticsPropertiesKt#getImeAction(an
     Method androidx.compose.ui.semantics.SemanticsPropertiesKt.getImeAction has changed return type from androidx.compose.ui.text.input.ImeAction to int
 
 
+InvalidNullConversion: Field PointerInputChange.type:
+    Attempted to remove @NonNull annotation from Field PointerInputChange.type
 InvalidNullConversion: androidx.compose.ui.semantics.SemanticsPropertiesKt#getImeAction(androidx.compose.ui.semantics.SemanticsPropertyReceiver):
     Attempted to remove @NonNull annotation from method androidx.compose.ui.semantics.SemanticsPropertiesKt.getImeAction(androidx.compose.ui.semantics.SemanticsPropertyReceiver)
 
@@ -45,7 +51,21 @@ RemovedField: androidx.compose.ui.focus.FocusState#Disabled:
     Removed enum constant androidx.compose.ui.focus.FocusState.Disabled
 RemovedField: androidx.compose.ui.focus.FocusState#Inactive:
     Removed enum constant androidx.compose.ui.focus.FocusState.Inactive
+RemovedField: androidx.compose.ui.input.pointer.PointerType#Eraser:
+    Removed enum constant androidx.compose.ui.input.pointer.PointerType.Eraser
+RemovedField: androidx.compose.ui.input.pointer.PointerType#Mouse:
+    Removed enum constant androidx.compose.ui.input.pointer.PointerType.Mouse
+RemovedField: androidx.compose.ui.input.pointer.PointerType#Stylus:
+    Removed enum constant androidx.compose.ui.input.pointer.PointerType.Stylus
+RemovedField: androidx.compose.ui.input.pointer.PointerType#Touch:
+    Removed enum constant androidx.compose.ui.input.pointer.PointerType.Touch
+RemovedField: androidx.compose.ui.input.pointer.PointerType#Unknown:
+    Removed enum constant androidx.compose.ui.input.pointer.PointerType.Unknown
 
 
+RemovedMethod: androidx.compose.ui.input.pointer.PointerInputChange#copy-aJ2ieLA(long, long, long, boolean, long, long, boolean, androidx.compose.ui.input.pointer.ConsumedData, androidx.compose.ui.input.pointer.PointerType):
+    Removed method androidx.compose.ui.input.pointer.PointerInputChange.copy-aJ2ieLA(long,long,long,boolean,long,long,boolean,androidx.compose.ui.input.pointer.ConsumedData,androidx.compose.ui.input.pointer.PointerType)
+RemovedMethod: androidx.compose.ui.input.pointer.PointerInputChange#getType():
+    Removed method androidx.compose.ui.input.pointer.PointerInputChange.getType()
 RemovedMethod: androidx.compose.ui.semantics.SemanticsPropertiesKt#setImeAction(androidx.compose.ui.semantics.SemanticsPropertyReceiver, androidx.compose.ui.text.input.ImeAction):
     Removed method androidx.compose.ui.semantics.SemanticsPropertiesKt.setImeAction(androidx.compose.ui.semantics.SemanticsPropertyReceiver,androidx.compose.ui.text.input.ImeAction)
