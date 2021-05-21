@@ -105,7 +105,7 @@ class FocusManagerTest(private val initialFocusState: FocusState) {
         }
 
         // Act.
-        focusManager.clearFocus(forcedClear = true)
+        focusManager.clearFocus(force = true)
 
         // Assert.
         assertThat(focusModifier.focusState).isEqualTo(
@@ -130,7 +130,7 @@ class FocusManagerTest(private val initialFocusState: FocusState) {
         }
 
         // Act.
-        focusManager.clearFocus(forcedClear = false)
+        focusManager.clearFocus(force = false)
 
         // Assert.
         assertThat(focusModifier.focusState).isEqualTo(

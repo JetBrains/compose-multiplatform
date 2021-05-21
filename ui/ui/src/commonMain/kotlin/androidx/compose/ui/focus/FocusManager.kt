@@ -45,10 +45,10 @@ interface FocusManager {
      * Call this function to clear focus from the currently focused component, and set the focus to
      * the root focus modifier.
      *
-     *  @param forcedClear: Whether we should forcefully clear focus regardless of whether we have
+     *  @param force: Whether we should forcefully clear focus regardless of whether we have
      *  any components that have Captured focus.
      */
-    fun clearFocus(forcedClear: Boolean = false)
+    fun clearFocus(force: Boolean = false)
 
     /**
      * Moves focus in the specified [direction][FocusDirection].
@@ -157,13 +157,13 @@ internal class FocusManagerImpl(
     /**
      * Call this function to set the focus to the root focus modifier.
      *
-     * @param forcedClear: Whether we should forcefully clear focus regardless of whether we have
+     * @param force: Whether we should forcefully clear focus regardless of whether we have
      * any components that have captured focus.
      *
      * This could be used to clear focus when a user clicks on empty space outside a focusable
      * component.
      */
-    override fun clearFocus(forcedClear: Boolean) {
+    override fun clearFocus(force: Boolean) {
         // If this hierarchy had focus before clearing it, it indicates that the host view has
         // focus. So after clearing focus within the compose hierarchy, we should reset the root
         // focus modifier to "Active" to maintain consistency with the host view.
@@ -172,7 +172,7 @@ internal class FocusManagerImpl(
             Disabled, Inactive -> false
         }
 
-        if (focusModifier.focusNode.clearFocus(forcedClear) && rootWasFocused) {
+        if (focusModifier.focusNode.clearFocus(force) && rootWasFocused) {
             focusModifier.focusState = Active
         }
     }

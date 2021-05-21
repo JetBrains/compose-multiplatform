@@ -347,7 +347,7 @@ package androidx.compose.ui.focus {
   }
 
   public interface FocusManager {
-    method public void clearFocus(optional boolean forcedClear);
+    method public void clearFocus(optional boolean force);
     method public boolean moveFocus-3ESFkO8(int focusDirection);
     method @Deprecated @androidx.compose.ui.ExperimentalComposeUiApi public default boolean moveFocusIn();
     method @Deprecated @androidx.compose.ui.ExperimentalComposeUiApi public default boolean moveFocusOut();
