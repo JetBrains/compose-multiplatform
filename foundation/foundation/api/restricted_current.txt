@@ -36,6 +36,9 @@ package androidx.compose.foundation {
     method public static androidx.compose.ui.Modifier clickable(androidx.compose.ui.Modifier, androidx.compose.foundation.interaction.MutableInteractionSource interactionSource, androidx.compose.foundation.Indication? indication, optional boolean enabled, optional String? onClickLabel, optional androidx.compose.ui.semantics.Role? role, kotlin.jvm.functions.Function0<kotlin.Unit> onClick);
   }
 
+  public final class Clickable_androidKt {
+  }
+
   public final class DarkTheme_androidKt {
     method @androidx.compose.runtime.Composable @androidx.compose.runtime.ReadOnlyComposable public static boolean isSystemInDarkTheme();
   }

@@ -136,6 +136,8 @@ class SelectableTest {
 
         var scope: CoroutineScope? = null
 
+        rule.mainClock.autoAdvance = false
+
         rule.setContent {
             scope = rememberCoroutineScope()
             Box {
@@ -165,6 +167,9 @@ class SelectableTest {
         rule.onNodeWithText("SelectableText")
             .performGesture { down(center) }
 
+        // Advance past the tap timeout
+        rule.mainClock.advanceTimeBy(TapIndicationDelay)
+
         rule.runOnIdle {
             assertThat(interactions).hasSize(1)
             assertThat(interactions.first()).isInstanceOf(PressInteraction.Press::class.java)
@@ -188,6 +193,8 @@ class SelectableTest {
         var emitSelectableText by mutableStateOf(true)
 
         var scope: CoroutineScope? = null
+
+        rule.mainClock.autoAdvance = false
 
         rule.setContent {
             scope = rememberCoroutineScope()
@@ -220,6 +227,9 @@ class SelectableTest {
         rule.onNodeWithText("SelectableText")
             .performGesture { down(center) }
 
+        // Advance past the tap timeout
+        rule.mainClock.advanceTimeBy(TapIndicationDelay)
+
         rule.runOnIdle {
             assertThat(interactions).hasSize(1)
             assertThat(interactions.first()).isInstanceOf(PressInteraction.Press::class.java)
@@ -229,6 +239,8 @@ class SelectableTest {
         rule.runOnIdle {
             emitSelectableText = false
         }
+
+        rule.mainClock.advanceTimeByFrame()
 
         rule.runOnIdle {
             assertThat(interactions).hasSize(2)
