@@ -437,17 +437,28 @@ private class LazyScrollbarAdapter(
             scrollState.firstVisibleItemScrollOffset
 
     override suspend fun scrollTo(containerSize: Int, scrollOffset: Float) {
-        val scrollOffsetCoerced = scrollOffset.coerceIn(0f, maxScrollOffset(containerSize))
+        // In case of very big values, we can catch an overflow, so convert values to double and
+        // coerce them
+//        val averageItemSize = 26.000002f
+//        val scrollOffsetCoerced = 2.54490608E8.toFloat()
+//        val index = (scrollOffsetCoerced / averageItemSize).toInt() // 9788100
+//        val offset = (scrollOffsetCoerced - index * averageItemSize) // -16.0
+//        println(offset)
+
+        val maximumValue = maxScrollOffset(containerSize).toDouble()
+        val scrollOffsetCoerced = scrollOffset.toDouble().coerceIn(0.0, maximumValue)
+        val averageItemSize = averageItemSize.toDouble()
 
         val index = (scrollOffsetCoerced / averageItemSize)
             .toInt()
             .coerceAtLeast(0)
             .coerceAtMost(itemCount - 1)
 
-        scrollState.scrollToItem(
-            index = index,
-            scrollOffset = (scrollOffsetCoerced - index * averageItemSize).toInt()
-        )
+        val offset = (scrollOffsetCoerced - index * averageItemSize)
+            .toInt()
+            .coerceAtLeast(0)
+
+        scrollState.scrollToItem(index = index, scrollOffset = offset)
     }
 
     override fun maxScrollOffset(containerSize: Int) =
