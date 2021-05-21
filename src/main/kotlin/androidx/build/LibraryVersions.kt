@@ -100,7 +100,7 @@ object LibraryVersions {
     val RECYCLERVIEW = Version("1.3.0-alpha01")
     val RECYCLERVIEW_SELECTION = Version("1.2.0-alpha02")
     val REMOTECALLBACK = Version("1.0.0-alpha02")
-    val RESOURCEINSPECTION = Version("1.0.0-alpha01")
+    val RESOURCEINSPECTION = Version("1.0.0-alpha02")
     val ROOM = Version("2.4.0-alpha03")
     val SAVEDSTATE = Version("1.2.0-alpha01")
     val SECURITY = Version("1.1.0-alpha04")
