@@ -498,16 +498,16 @@ fun Animations(isCircularEnabled: Boolean) = Row {
 private fun RightColumn(modifier: Modifier) = Box {
     val state = rememberLazyListState()
     val itemCount = 100000
-    val itemHeight = 20.dp
 
     LazyColumn(modifier.graphicsLayer(alpha = 0.5f), state = state) {
         items((1..itemCount).toList()) { x ->
+            val itemHeight = 20.dp + 20.dp * Math.random().toFloat()
             Text(x.toString(), Modifier.graphicsLayer(alpha = 0.5f).height(itemHeight))
         }
     }
 
     VerticalScrollbar(
-        rememberScrollbarAdapter(state, itemCount, itemHeight),
+        rememberScrollbarAdapter(state),
         Modifier.align(Alignment.CenterEnd)
     )
 }

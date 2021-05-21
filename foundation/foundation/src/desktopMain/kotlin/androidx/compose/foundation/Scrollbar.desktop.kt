@@ -22,6 +22,7 @@ import androidx.compose.foundation.gestures.awaitFirstDown
 import androidx.compose.foundation.gestures.detectTapAndPress
 import androidx.compose.foundation.gestures.drag
 import androidx.compose.foundation.gestures.forEachGesture
+import androidx.compose.foundation.gestures.scrollBy
 import androidx.compose.foundation.interaction.DragInteraction
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Box
@@ -59,6 +60,7 @@ import androidx.compose.ui.unit.constrainWidth
 import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.runBlocking
+import kotlin.math.abs
 import kotlin.math.roundToInt
 import kotlin.math.sign
 
@@ -348,18 +350,34 @@ fun rememberScrollbarAdapter(
  * Create and [remember] [ScrollbarAdapter] for lazy scrollable container and current instance of
  * [scrollState] and item configuration
  */
+@Suppress("UNUSED_PARAMETER")
 @ExperimentalFoundationApi
 @Composable
+@Deprecated(
+    "itemCount and averageItemSize are calculated automatically. Use " +
+        "another overload rememberScrollbarAdapter without passing them",
+    ReplaceWith("rememberScrollbarAdapter(scrollState)")
+)
 fun rememberScrollbarAdapter(
     scrollState: LazyListState,
     itemCount: Int,
     averageItemSize: Dp
 ): ScrollbarAdapter {
-    val averageItemSizePx = with(LocalDensity.current) {
-        averageItemSize.toPx()
+    return remember(scrollState) {
+        ScrollbarAdapter(scrollState)
     }
-    return remember(scrollState, itemCount, averageItemSizePx) {
-        ScrollbarAdapter(scrollState, itemCount, averageItemSizePx)
+}
+
+/**
+ * Create and [remember] [ScrollbarAdapter] for lazy scrollable container and current instance of
+ * [scrollState]
+ */
+@Composable
+fun rememberScrollbarAdapter(
+    scrollState: LazyListState,
+): ScrollbarAdapter {
+    return remember(scrollState) {
+        ScrollbarAdapter(scrollState)
     }
 }
 
@@ -399,22 +417,16 @@ private class ScrollableScrollbarAdapter(
         scrollState.maxValue.toFloat()
 }
 
-// TODO(demin): if item height is different then slider will have wrong
-//  position when we dragging it (we can drag it to the beginning, but content will not be at the
-//  beginning). We can implement adaptive scrollbar height after b/170472532
-
 /**
- * Experimental ScrollbarAdapter for lazy lists. Doesn't work stable with non-fixed item height.
+ * ScrollbarAdapter for lazy lists.
  *
  * [scrollState] is instance of [LazyListState] which is used by scrollable component
  *
- * Scrollbar size and position will be calculated by passed [itemCount] and [averageItemSize]
+ * Scrollbar size and position will be dynamically changed on the current visible content.
  *
  * Example:
  *     Box(Modifier.fillMaxSize()) {
  *         val state = rememberLazyListState()
- *         val itemCount = 100
- *         val itemHeight = 20.dp
  *
  *         LazyColumn(state = state) {
  *             ...
@@ -422,34 +434,39 @@ private class ScrollableScrollbarAdapter(
  *
  *         VerticalScrollbar(
  *             Modifier.align(Alignment.CenterEnd),
- *             rememberScrollbarAdapter(state, itemCount, itemHeight)
+ *             rememberScrollbarAdapter(state)
  *         )
  *     }
  */
-@ExperimentalFoundationApi
 fun ScrollbarAdapter(
-    scrollState: LazyListState,
-    itemCount: Int,
-    averageItemSize: Float
+    scrollState: LazyListState
 ): ScrollbarAdapter = LazyScrollbarAdapter(
-    scrollState, itemCount, averageItemSize
+    scrollState
 )
 
 private class LazyScrollbarAdapter(
-    private val scrollState: LazyListState,
-    private val itemCount: Int,
-    private val averageItemSize: Float
+    private val scrollState: LazyListState
 ) : ScrollbarAdapter {
-    init {
-        require(itemCount >= 0f) { "itemCount should be non-negative ($itemCount)" }
-        require(averageItemSize > 0f) { "averageItemSize should be positive ($averageItemSize)" }
-    }
-
     override val scrollOffset: Float
         get() = scrollState.firstVisibleItemIndex * averageItemSize +
             scrollState.firstVisibleItemScrollOffset
 
     override suspend fun scrollTo(containerSize: Int, scrollOffset: Float) {
+        val distance = scrollOffset - this@LazyScrollbarAdapter.scrollOffset
+
+        // if we scroll less than containerSize we need to use scrollBy function to avoid
+        // undesirable scroll jumps (when an item size is different)
+        //
+        // if we scroll more than containerSize we should immediately jump to this position
+        // without recreating all items between the current and the new position
+        if (abs(distance) <= containerSize) {
+            scrollState.scrollBy(distance)
+        } else {
+            snapTo(containerSize, scrollOffset)
+        }
+    }
+
+    private suspend fun snapTo(containerSize: Int, scrollOffset: Float) {
         // In case of very big values, we can catch an overflow, so convert values to double and
         // coerce them
 //        val averageItemSize = 26.000002f
@@ -476,6 +493,18 @@ private class LazyScrollbarAdapter(
 
     override fun maxScrollOffset(containerSize: Int) =
         averageItemSize * itemCount - containerSize
+
+    private val itemCount get() = scrollState.layoutInfo.totalItemsCount
+
+    private val averageItemSize by derivedStateOf {
+        scrollState
+            .layoutInfo
+            .visibleItemsInfo
+            .asSequence()
+            .map { it.size }
+            .average()
+            .toFloat()
+    }
 }
 
 /**
