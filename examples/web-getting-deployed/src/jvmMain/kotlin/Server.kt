@@ -15,7 +15,7 @@ import kotlinx.html.id
 import kotlinx.html.script
 import kotlinx.html.title
 
-var jsFileName = "web-deploy-getting-started.js"
+var jsFileName = "web-getting-deployed.js"
 var jsFileMapName = "$jsFileName.map"
 
 fun Application.main() {
@@ -27,7 +27,7 @@ fun Application.main() {
         get("/") {
             call.respondHtml {
                 head {
-                    title("web-deploy-getting-started")
+                    title("web-getting-deployed")
                 }
                 body {
                     div { id = "root" } // Required by Compose Web

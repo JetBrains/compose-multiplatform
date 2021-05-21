@@ -28,8 +28,6 @@ kotlin {
             dependencies {
                 implementation(compose.web.web)
                 implementation(compose.runtime)
-
-                implementation("io.ktor:ktor-client-js:$ktorVersion")
             }
         }
         val jvmMain by getting {
@@ -69,16 +67,8 @@ war.apply {
     webInf {
         from("src/jvmMain/resources")
         into("classes") {
-
-            /** To be discovered by Ktor's static resource loader, the JS file *must* reside in this `/WEB-INF/classes/` location. */
             from(jsFile)
-
-            /** The Map file is optionally served for debugging, see: `isJsDebugEnabled` in [Server] */
             from(jsFileMap)
-
-            into("images") {
-                from("static/images")
-            }
         }
     }
     group = "application"

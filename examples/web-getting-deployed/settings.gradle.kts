@@ -5,5 +5,5 @@ pluginManagement {
     }
 }
 
-rootProject.name = "web-deploy-getting-started"
+rootProject.name = "web-getting-deployed"
 
