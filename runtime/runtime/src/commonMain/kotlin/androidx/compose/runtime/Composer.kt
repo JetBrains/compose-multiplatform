@@ -2439,7 +2439,10 @@ internal class ComposerImpl(
         scope?.end(snapshot.id)?.let {
             record { _, _, _ -> it(composition) }
         }
-        val result = if (scope != null && (scope.used || collectParameterInformation)) {
+        val result = if (scope != null &&
+            !scope.skipped &&
+            (scope.used || collectParameterInformation)
+        ) {
             if (scope.anchor == null) {
                 scope.anchor = if (inserting) {
                     writer.anchor(writer.parent)
