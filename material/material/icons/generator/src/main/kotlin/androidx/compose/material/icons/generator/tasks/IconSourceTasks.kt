@@ -44,7 +44,13 @@ open class CoreIconGenerationTask : IconGenerationTask() {
                 variant
             )
             // Multiplatform
-            if (variant == null) registerIconGenerationTask(project, task, buildDirectory)
+            if (variant == null) {
+                registerIconGenerationTask(project, task, buildDirectory)
+                project.afterEvaluate {
+                    // Workaround: https://github.com/gradle/gradle/issues/17250
+                    project.getTasksByName("sourceJarRelease", false).single().dependsOn(task)
+                }
+            }
             // AGP
             else variant.registerIconGenerationTask(task, buildDirectory)
         }
@@ -70,7 +76,13 @@ open class ExtendedIconGenerationTask : IconGenerationTask() {
                 variant
             )
             // Multiplatform
-            if (variant == null) registerIconGenerationTask(project, task, buildDirectory)
+            if (variant == null) {
+                registerIconGenerationTask(project, task, buildDirectory)
+                project.afterEvaluate {
+                    // Workaround: https://github.com/gradle/gradle/issues/17250
+                    project.getTasksByName("sourceJarRelease", false).single().dependsOn(task)
+                }
+            }
             // AGP
             else variant.registerIconGenerationTask(task, buildDirectory)
         }
