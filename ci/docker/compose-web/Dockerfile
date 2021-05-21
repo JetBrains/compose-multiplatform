@@ -20,7 +20,7 @@ RUN export CHROME_DRIVER_VERSION=$(wget -qO- https://chromedriver.storage.google
     && wget https://chromedriver.storage.googleapis.com/${CHROME_DRIVER_VERSION}/chromedriver_linux64.zip -P ~/tmp
 RUN unzip -d /usr/local/bin ~/tmp/chromedriver_linux64.zip && rm ~/tmp/chromedriver_linux64.zip
 
-ARG GRADLE_VERSION=6.8.3
+ARG GRADLE_VERSION=7.0.2
 RUN wget https://services.gradle.org/distributions/gradle-${GRADLE_VERSION}-bin.zip -P /tmp
 RUN unzip -d /opt/gradle /tmp/gradle-${GRADLE_VERSION}-bin.zip
 ENV GRADLE_HOME=/opt/gradle/gradle-${GRADLE_VERSION}
