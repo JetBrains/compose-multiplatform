@@ -87,6 +87,7 @@ import androidx.compose.ui.input.pointer.PointerEventPass
 import androidx.compose.ui.input.pointer.PointerInputFilter
 import androidx.compose.ui.input.pointer.PointerInputModifier
 import androidx.compose.ui.input.pointer.pointerMoveFilter
+import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.res.imageResource
 import androidx.compose.ui.res.svgResource
 import androidx.compose.ui.res.vectorXmlResource
@@ -120,6 +121,7 @@ fun main() {
 
 @Composable
 private fun App() {
+    val uriHandler = LocalUriHandler.current
     DesktopMaterialTheme {
         Scaffold(
             topBar = {
@@ -137,9 +139,9 @@ private fun App() {
             },
             floatingActionButton = {
                 ExtendedFloatingActionButton(
-                    text = { Text("BUTTON") },
+                    text = { Text("Open URL") },
                     onClick = {
-                        println("Floating button clicked")
+                        uriHandler.openUri("https://google.com")
                     }
                 )
             },
