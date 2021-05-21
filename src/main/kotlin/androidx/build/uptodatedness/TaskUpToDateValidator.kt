@@ -143,6 +143,7 @@ val ALLOW_RERUNNING_TASKS = setOf(
     "buildCMakeRelWithDebInfo",
     ":appsearch:appsearch-local-storage:buildCMakeDebug[icing]",
     ":appsearch:appsearch-local-storage:buildCMakeRelWithDebInfo[icing]",
+    ":hilt:hilt-navigation-compose:kaptGenerateStubsDebugKotlin",
     ":hilt:hilt-navigation-compose:kaptGenerateStubsReleaseKotlin"
 )
 
