@@ -414,7 +414,7 @@ private val EmptyCanvas = android.graphics.Canvas()
         // TODO(njawad) align drawVertices blendMode parameter usage with framework
         // android.graphics.Canvas#drawVertices does not consume a blendmode argument
         internalCanvas.drawVertices(
-            vertices.vertexMode.toNativeVertexMode(),
+            vertices.vertexMode.toAndroidVertexMode(),
             vertices.positions.size,
             vertices.positions,
             0, // TODO(njawad) figure out proper vertOffset)

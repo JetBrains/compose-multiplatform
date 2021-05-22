@@ -17,7 +17,6 @@
 package androidx.compose.ui.graphics
 
 import androidx.compose.ui.geometry.Offset
-import org.jetbrains.skija.FilterTileMode
 import org.jetbrains.skija.GradientStyle
 
 actual typealias Shader = org.jetbrains.skija.Shader
@@ -32,7 +31,7 @@ internal actual fun ActualLinearGradientShader(
     validateColorStops(colors, colorStops)
     return Shader.makeLinearGradient(
         from.x, from.y, to.x, to.y, colors.toIntArray(), colorStops?.toFloatArray(),
-        GradientStyle(tileMode.toSkijaRect(), true, identityMatrix33())
+        GradientStyle(tileMode.toDesktopTileMode(), true, identityMatrix33())
     )
 }
 
@@ -50,7 +49,7 @@ internal actual fun ActualRadialGradientShader(
         radius,
         colors.toIntArray(),
         colorStops?.toFloatArray(),
-        GradientStyle(tileMode.toSkijaRect(), true, identityMatrix33())
+        GradientStyle(tileMode.toDesktopTileMode(), true, identityMatrix33())
     )
 }
 
@@ -74,15 +73,9 @@ internal actual fun ActualImageShader(
     tileModeY: TileMode
 ): Shader {
     return image.asDesktopBitmap().makeShader(
-        tileModeX.toSkijaTileMode(),
-        tileModeY.toSkijaTileMode()
+        tileModeX.toDesktopTileMode(),
+        tileModeY.toDesktopTileMode()
     )
-}
-
-private fun TileMode.toSkijaTileMode() = when (this) {
-    TileMode.Clamp -> FilterTileMode.CLAMP
-    TileMode.Repeated -> FilterTileMode.REPEAT
-    TileMode.Mirror -> FilterTileMode.MIRROR
 }
 
 private fun List<Color>.toIntArray(): IntArray =
@@ -102,10 +95,4 @@ private fun validateColorStops(colors: List<Color>, colorStops: List<Float>?) {
                 " equal length."
         )
     }
-}
-
-private fun TileMode.toSkijaRect() = when (this) {
-    TileMode.Clamp -> FilterTileMode.CLAMP
-    TileMode.Repeated -> FilterTileMode.REPEAT
-    TileMode.Mirror -> FilterTileMode.MIRROR
 }

@@ -57,4 +57,5 @@ internal fun StampedPathEffectStyle.toSkijaStampedPathEffectStyle(): SkijaPathEf
         StampedPathEffectStyle.Morph -> SkijaPathEffect.Style.MORPH
         StampedPathEffectStyle.Rotate -> SkijaPathEffect.Style.ROTATE
         StampedPathEffectStyle.Translate -> SkijaPathEffect.Style.TRANSLATE
+        else -> SkijaPathEffect.Style.TRANSLATE
     }

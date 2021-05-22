@@ -1,0 +1,3 @@
+// Baseline format: 1.0
+RemovedMethod: androidx.compose.material.icons.IconsKt#materialPath(androidx.compose.ui.graphics.vector.ImageVector.Builder, float, float, androidx.compose.ui.graphics.PathFillType, kotlin.jvm.functions.Function1<? super androidx.compose.ui.graphics.vector.PathBuilder,kotlin.Unit>):
+    Removed method androidx.compose.material.icons.IconsKt.materialPath(androidx.compose.ui.graphics.vector.ImageVector.Builder,float,float,androidx.compose.ui.graphics.PathFillType,kotlin.jvm.functions.Function1<? super androidx.compose.ui.graphics.vector.PathBuilder,kotlin.Unit>)

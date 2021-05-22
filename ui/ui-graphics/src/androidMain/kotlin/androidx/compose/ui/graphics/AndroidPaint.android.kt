@@ -183,6 +183,7 @@ internal fun NativePaint.setNativeStrokeCap(value: StrokeCap) {
         StrokeCap.Square -> android.graphics.Paint.Cap.SQUARE
         StrokeCap.Round -> android.graphics.Paint.Cap.ROUND
         StrokeCap.Butt -> android.graphics.Paint.Cap.BUTT
+        else -> android.graphics.Paint.Cap.BUTT
     }
 }
 
@@ -199,6 +200,7 @@ internal fun NativePaint.setNativeStrokeJoin(value: StrokeJoin) {
         StrokeJoin.Miter -> android.graphics.Paint.Join.MITER
         StrokeJoin.Bevel -> android.graphics.Paint.Join.BEVEL
         StrokeJoin.Round -> android.graphics.Paint.Join.ROUND
+        else -> android.graphics.Paint.Join.MITER
     }
 }
 

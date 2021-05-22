@@ -402,7 +402,7 @@ fun ColorSpace.connect(
         return Connector.identity(this)
     }
 
-    return if (this.model === ColorModel.Rgb && destination.model === ColorModel.Rgb) {
+    return if (this.model == ColorModel.Rgb && destination.model == ColorModel.Rgb) {
         Connector.RgbConnector(
             this as Rgb,
             destination as Rgb,

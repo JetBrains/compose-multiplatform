@@ -16,34 +16,49 @@
 
 package androidx.compose.ui.graphics
 
-// Quality levels for image filters.
-//
-// See [Paint.filterQuality].
-enum class FilterQuality {
+import androidx.compose.runtime.Immutable
 
-    /**
-     * Fastest possible filtering, albeit also the lowest quality
-     * Typically this implies nearest-neighbour filtering.
-     */
-    None,
+/**
+ * Quality levels for image filters.
+ * See [Paint.filterQuality].
+ */
+@Suppress("INLINE_CLASS_DEPRECATED", "EXPERIMENTAL_FEATURE_WARNING")
+@Immutable
+inline class FilterQuality internal constructor(val value: Int) {
 
-    /**
-     * Better quality than [None], faster than [Medium].
-     * Typically this implies bilinear interpolation.
-     */
-    Low,
+    companion object {
+        /**
+         * Fastest possible filtering, albeit also the lowest quality
+         * Typically this implies nearest-neighbour filtering.
+         */
+        val None = FilterQuality(0)
 
-    /**
-     * Better quality than [Low], faster than [High].
-     *
-     * Typically this implies a combination of bilinear interpolation and
-     * pyramidal parametric prefiltering (mipmaps).
-     */
-    Medium,
+        /**
+         * Better quality than [None], faster than [Medium].
+         * Typically this implies bilinear interpolation.
+         */
+        val Low = FilterQuality(1)
 
-    /**
-     * Best possible quality filtering, albeit also the slowest.
-     * Typically this implies bicubic interpolation or better.
-     */
-    High,
+        /**
+         * Better quality than [Low], faster than [High].
+         *
+         * Typically this implies a combination of bilinear interpolation and
+         * pyramidal parametric prefiltering (mipmaps).
+         */
+        val Medium = FilterQuality(2)
+
+        /**
+         * Best possible quality filtering, albeit also the slowest.
+         * Typically this implies bicubic interpolation or better.
+         */
+        val High = FilterQuality(3)
+    }
+
+    override fun toString() = when (this) {
+        None -> "None"
+        Low -> "Low"
+        Medium -> "Medium"
+        High -> "High"
+        else -> "Unknown"
+    }
 }

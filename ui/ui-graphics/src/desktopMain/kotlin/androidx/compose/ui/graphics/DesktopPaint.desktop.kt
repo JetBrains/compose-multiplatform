@@ -115,18 +115,21 @@ class DesktopPaint : Paint {
     private fun PaintingStyle.toSkija() = when (this) {
         PaintingStyle.Fill -> SkijaPaintMode.FILL
         PaintingStyle.Stroke -> SkijaPaintMode.STROKE
+        else -> SkijaPaintMode.FILL
     }
 
     private fun StrokeCap.toSkija() = when (this) {
         StrokeCap.Butt -> SkijaPaintStrokeCap.BUTT
         StrokeCap.Round -> SkijaPaintStrokeCap.ROUND
         StrokeCap.Square -> SkijaPaintStrokeCap.SQUARE
+        else -> SkijaPaintStrokeCap.BUTT
     }
 
     private fun StrokeJoin.toSkija() = when (this) {
         StrokeJoin.Miter -> SkijaPaintStrokeJoin.MITER
         StrokeJoin.Round -> SkijaPaintStrokeJoin.ROUND
         StrokeJoin.Bevel -> SkijaPaintStrokeJoin.BEVEL
+        else -> SkijaPaintStrokeJoin.MITER
     }
 
     private fun FilterQuality.toSkija() = when (this) {
@@ -134,6 +137,7 @@ class DesktopPaint : Paint {
         FilterQuality.Low -> SkijaFilterQuality.LOW
         FilterQuality.Medium -> SkijaFilterQuality.MEDIUM
         FilterQuality.High -> SkijaFilterQuality.HIGH
+        else -> SkijaFilterQuality.NONE
     }
 }
 

@@ -16,6 +16,7 @@
 
 package androidx.compose.ui.graphics
 
+import androidx.compose.runtime.Immutable
 import androidx.compose.ui.graphics.colorspace.ColorSpace
 import androidx.compose.ui.graphics.colorspace.ColorSpaces
 
@@ -140,86 +141,99 @@ fun ImageBitmap.toPixelMap(
  * how pixels are stored. This affects the quality (color depth) as
  * well as the ability to display transparent/translucent colors.
  */
-enum class ImageBitmapConfig {
-    /**
-     * Each pixel is stored on 4 bytes. Each channel (RGB and alpha
-     * for translucency) is stored with 8 bits of precision (256
-     * possible values.)
-     *
-     * This configuration is very flexible and offers the best
-     * quality. It should be used whenever possible.
-     *
-     *      Use this formula to pack into 32 bits:
-     *
-     * ```
-     * val color =
-     *    ((A and 0xff) shl 24) or
-     *    ((B and 0xff) shl 16) or
-     *    ((G and 0xff) shl 8) or
-     *    (R and 0xff)
-     * ```
-     */
-    Argb8888,
+@Suppress("INLINE_CLASS_DEPRECATED", "EXPERIMENTAL_FEATURE_WARNING")
+@Immutable
+inline class ImageBitmapConfig internal constructor(val value: Int) {
+    companion object {
+        /**
+         * Each pixel is stored on 4 bytes. Each channel (RGB and alpha
+         * for translucency) is stored with 8 bits of precision (256
+         * possible values.)
+         *
+         * This configuration is very flexible and offers the best
+         * quality. It should be used whenever possible.
+         *
+         *      Use this formula to pack into 32 bits:
+         *
+         * ```
+         * val color =
+         *    ((A and 0xff) shl 24) or
+         *    ((B and 0xff) shl 16) or
+         *    ((G and 0xff) shl 8) or
+         *    (R and 0xff)
+         * ```
+         */
+        val Argb8888 = ImageBitmapConfig(0)
 
-    /**
-     * Each pixel is stored as a single translucency (alpha) channel.
-     * This is very useful to efficiently store masks for instance.
-     * No color information is stored.
-     * With this configuration, each pixel requires 1 byte of memory.
-     */
-    Alpha8,
+        /**
+         * Each pixel is stored as a single translucency (alpha) channel.
+         * This is very useful to efficiently store masks for instance.
+         * No color information is stored.
+         * With this configuration, each pixel requires 1 byte of memory.
+         */
+        val Alpha8 = ImageBitmapConfig(1)
 
-    /**
-     * Each pixel is stored on 2 bytes and only the RGB channels are
-     * encoded: red is stored with 5 bits of precision (32 possible
-     * values), green is stored with 6 bits of precision (64 possible
-     * values) and blue is stored with 5 bits of precision.
-     *
-     * This configuration can produce slight visual artifacts depending
-     * on the configuration of the source. For instance, without
-     * dithering, the result might show a greenish tint. To get better
-     * results dithering should be applied.
-     *
-     * This configuration may be useful when using opaque bitmaps
-     * that do not require high color fidelity.
-     *
-     *      Use this formula to pack into 16 bits:
-     * ```
-     *  val color =
-     *      ((R and 0x1f) shl 11) or
-     *      ((G and 0x3f) shl 5) or
-     *      (B and 0x1f)
-     * ```
-     */
-    Rgb565,
+        /**
+         * Each pixel is stored on 2 bytes and only the RGB channels are
+         * encoded: red is stored with 5 bits of precision (32 possible
+         * values), green is stored with 6 bits of precision (64 possible
+         * values) and blue is stored with 5 bits of precision.
+         *
+         * This configuration can produce slight visual artifacts depending
+         * on the configuration of the source. For instance, without
+         * dithering, the result might show a greenish tint. To get better
+         * results dithering should be applied.
+         *
+         * This configuration may be useful when using opaque bitmaps
+         * that do not require high color fidelity.
+         *
+         *      Use this formula to pack into 16 bits:
+         * ```
+         *  val color =
+         *      ((R and 0x1f) shl 11) or
+         *      ((G and 0x3f) shl 5) or
+         *      (B and 0x1f)
+         * ```
+         */
+        val Rgb565 = ImageBitmapConfig(2)
 
-    /**
-     * Each pixel is stored on 8 bytes. Each channel (RGB and alpha
-     * for translucency) is stored as a
-     * half-precision floating point value.
-     *
-     * This configuration is particularly suited for wide-gamut and
-     * HDR content.
-     *
-     *      Use this formula to pack into 64 bits:
-     * ```
-     *    val color =
-     *      ((A and 0xffff) shl 48) or
-     *      ((B and 0xffff) shl 32) or
-     *      ((G and 0xffff) shl 16) or
-     *      (R and 0xffff)
-     * ```
-     */
-    F16,
+        /**
+         * Each pixel is stored on 8 bytes. Each channel (RGB and alpha
+         * for translucency) is stored as a
+         * half-precision floating point value.
+         *
+         * This configuration is particularly suited for wide-gamut and
+         * HDR content.
+         *
+         *      Use this formula to pack into 64 bits:
+         * ```
+         *    val color =
+         *      ((A and 0xffff) shl 48) or
+         *      ((B and 0xffff) shl 32) or
+         *      ((G and 0xffff) shl 16) or
+         *      (R and 0xffff)
+         * ```
+         */
+        val F16 = ImageBitmapConfig(3)
 
-    /**
-     * Special configuration, when an ImageBitmap is stored only in graphic memory.
-     * ImageBitmaps in this configuration are always immutable.
-     *
-     * It is optimal for cases, when the only operation with the ImageBitmap is to draw it on a
-     * screen.
-     */
-    Gpu
+        /**
+         * Special configuration, when an ImageBitmap is stored only in graphic memory.
+         * ImageBitmaps in this configuration are always immutable.
+         *
+         * It is optimal for cases, when the only operation with the ImageBitmap is to draw it on a
+         * screen.
+         */
+        val Gpu = ImageBitmapConfig(4)
+    }
+
+    override fun toString() = when (this) {
+        Argb8888 -> "Argb8888"
+        Alpha8 -> "Alpha8"
+        Rgb565 -> "Rgb565"
+        F16 -> "F16"
+        Gpu -> "Gpu"
+        else -> "Unknown"
+    }
 }
 
 internal expect fun ActualImageBitmap(
