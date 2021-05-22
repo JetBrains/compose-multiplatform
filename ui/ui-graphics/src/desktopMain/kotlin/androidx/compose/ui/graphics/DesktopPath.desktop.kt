@@ -188,11 +188,12 @@ class DesktopPath(
     }
 
     private fun PathOperation.toSkijaOperation() = when (this) {
-        PathOperation.difference -> PathOp.DIFFERENCE
-        PathOperation.intersect -> PathOp.INTERSECT
-        PathOperation.union -> PathOp.UNION
-        PathOperation.xor -> PathOp.XOR
-        PathOperation.reverseDifference -> PathOp.REVERSE_DIFFERENCE
+        PathOperation.Difference -> PathOp.DIFFERENCE
+        PathOperation.Intersect -> PathOp.INTERSECT
+        PathOperation.Union -> PathOp.UNION
+        PathOperation.Xor -> PathOp.XOR
+        PathOperation.ReverseDifference -> PathOp.REVERSE_DIFFERENCE
+        else -> PathOp.XOR
     }
 
     override val isConvex: Boolean get() = internalPath.isConvex

@@ -16,35 +16,44 @@
 
 package androidx.compose.ui.graphics
 
+import androidx.compose.runtime.Immutable
+
 /**
  * Determines the winding rule that decides how the interior of a [Path] is
  * calculated.
  *
  * This enum is used by the [Path.fillType] property.
  */
-enum class PathFillType {
-    /**
-     * The interior is defined by a non-zero sum of signed edge crossings.
-     *
-     * For a given point, the point is considered to be on the inside of the path
-     * if a line drawn from the point to infinity crosses lines going clockwise
-     * around the point a different number of times than it crosses lines going
-     * counter-clockwise around that point.
-     *
-     * See: <https://en.wikipedia.org/wiki/Nonzero-rule>
-     */
-    NonZero,
+@Suppress("INLINE_CLASS_DEPRECATED", "EXPERIMENTAL_FEATURE_WARNING")
+@Immutable
+inline class PathFillType internal constructor(val value: Int) {
+    companion object {
+        /**
+         * The interior is defined by a non-zero sum of signed edge crossings.
+         *
+         * For a given point, the point is considered to be on the inside of the path
+         * if a line drawn from the point to infinity crosses lines going clockwise
+         * around the point a different number of times than it crosses lines going
+         * counter-clockwise around that point.
+         *
+         * See: <https://en.wikipedia.org/wiki/Nonzero-rule>
+         */
+        val NonZero = PathFillType(0)
 
-    /**
-     * The interior is defined by an odd number of edge crossings.
-     *
-     * For a given point, the point is considered to be on the inside of the path
-     * if a line drawn from the point to infinity crosses an odd number of lines.
-     *
-     * See: <https://en.wikipedia.org/wiki/Even-odd_rule>
-     */
-    EvenOdd
+        /**
+         * The interior is defined by an odd number of edge crossings.
+         *
+         * For a given point, the point is considered to be on the inside of the path
+         * if a line drawn from the point to infinity crosses an odd number of lines.
+         *
+         * See: <https://en.wikipedia.org/wiki/Even-odd_rule>
+         */
+        val EvenOdd = PathFillType(1)
+    }
 
-    // TODO b/162283938 (njawad) Android support inverse winding and inverse even odd. Should we
-    //  add these to compose as well?
+    override fun toString() = when (this) {
+        NonZero -> "NonZero"
+        EvenOdd -> "EvenOdd"
+        else -> "Unknown"
+    }
 }

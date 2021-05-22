@@ -461,7 +461,7 @@ package androidx.compose.ui.graphics.vector {
     method public float getDefaultWidth-D9Ej5fM();
     method public String getName();
     method public androidx.compose.ui.graphics.vector.VectorGroup getRoot();
-    method public androidx.compose.ui.graphics.BlendMode getTintBlendMode();
+    method public int getTintBlendMode-0nO6VwU();
     method public long getTintColor-0d7_KjU();
     method public float getViewportHeight();
     method public float getViewportWidth();
@@ -469,7 +469,7 @@ package androidx.compose.ui.graphics.vector {
     property public final float defaultWidth;
     property public final String name;
     property public final androidx.compose.ui.graphics.vector.VectorGroup root;
-    property public final androidx.compose.ui.graphics.BlendMode tintBlendMode;
+    property public final int tintBlendMode;
     property public final long tintColor;
     property public final float viewportHeight;
     property public final float viewportWidth;
@@ -478,7 +478,7 @@ package androidx.compose.ui.graphics.vector {
 
   public static final class ImageVector.Builder {
     method public androidx.compose.ui.graphics.vector.ImageVector.Builder addGroup(optional String name, optional float rotate, optional float pivotX, optional float pivotY, optional float scaleX, optional float scaleY, optional float translationX, optional float translationY, optional java.util.List<? extends androidx.compose.ui.graphics.vector.PathNode> clipPathData);
-    method public androidx.compose.ui.graphics.vector.ImageVector.Builder addPath(java.util.List<? extends androidx.compose.ui.graphics.vector.PathNode> pathData, optional androidx.compose.ui.graphics.PathFillType pathFillType, optional String name, optional androidx.compose.ui.graphics.Brush? fill, optional float fillAlpha, optional androidx.compose.ui.graphics.Brush? stroke, optional float strokeAlpha, optional float strokeLineWidth, optional androidx.compose.ui.graphics.StrokeCap strokeLineCap, optional androidx.compose.ui.graphics.StrokeJoin strokeLineJoin, optional float strokeLineMiter, optional float trimPathStart, optional float trimPathEnd, optional float trimPathOffset);
+    method public androidx.compose.ui.graphics.vector.ImageVector.Builder addPath-MBUPpgE(java.util.List<? extends androidx.compose.ui.graphics.vector.PathNode> pathData, optional int pathFillType, optional String name, optional androidx.compose.ui.graphics.Brush? fill, optional float fillAlpha, optional androidx.compose.ui.graphics.Brush? stroke, optional float strokeAlpha, optional float strokeLineWidth, optional int strokeLineCap, optional int strokeLineJoin, optional float strokeLineMiter, optional float trimPathStart, optional float trimPathEnd, optional float trimPathOffset);
     method public androidx.compose.ui.graphics.vector.ImageVector build();
     method public androidx.compose.ui.graphics.vector.ImageVector.Builder clearGroup();
   }
@@ -488,7 +488,7 @@ package androidx.compose.ui.graphics.vector {
 
   public final class ImageVectorKt {
     method public static inline androidx.compose.ui.graphics.vector.ImageVector.Builder group(androidx.compose.ui.graphics.vector.ImageVector.Builder, optional String name, optional float rotate, optional float pivotX, optional float pivotY, optional float scaleX, optional float scaleY, optional float translationX, optional float translationY, optional java.util.List<? extends androidx.compose.ui.graphics.vector.PathNode> clipPathData, kotlin.jvm.functions.Function1<? super androidx.compose.ui.graphics.vector.ImageVector.Builder,kotlin.Unit> block);
-    method public static inline androidx.compose.ui.graphics.vector.ImageVector.Builder path(androidx.compose.ui.graphics.vector.ImageVector.Builder, optional String name, optional androidx.compose.ui.graphics.Brush? fill, optional float fillAlpha, optional androidx.compose.ui.graphics.Brush? stroke, optional float strokeAlpha, optional float strokeLineWidth, optional androidx.compose.ui.graphics.StrokeCap strokeLineCap, optional androidx.compose.ui.graphics.StrokeJoin strokeLineJoin, optional float strokeLineMiter, optional androidx.compose.ui.graphics.PathFillType pathFillType, kotlin.jvm.functions.Function1<? super androidx.compose.ui.graphics.vector.PathBuilder,kotlin.Unit> pathBuilder);
+    method public static inline androidx.compose.ui.graphics.vector.ImageVector.Builder path-XZu8tSg(androidx.compose.ui.graphics.vector.ImageVector.Builder, optional String name, optional androidx.compose.ui.graphics.Brush? fill, optional float fillAlpha, optional androidx.compose.ui.graphics.Brush? stroke, optional float strokeAlpha, optional float strokeLineWidth, optional int strokeLineCap, optional int strokeLineJoin, optional float strokeLineMiter, optional int pathFillType, kotlin.jvm.functions.Function1<? super androidx.compose.ui.graphics.vector.PathBuilder,kotlin.Unit> pathBuilder);
   }
 
   public abstract sealed class VNode {
@@ -507,7 +507,7 @@ package androidx.compose.ui.graphics.vector {
 
   public final class VectorComposeKt {
     method @androidx.compose.runtime.Composable public static void Group(optional String name, optional float rotation, optional float pivotX, optional float pivotY, optional float scaleX, optional float scaleY, optional float translationX, optional float translationY, optional java.util.List<? extends androidx.compose.ui.graphics.vector.PathNode> clipPathData, kotlin.jvm.functions.Function0<kotlin.Unit> content);
-    method @androidx.compose.runtime.Composable public static void Path(java.util.List<? extends androidx.compose.ui.graphics.vector.PathNode> pathData, optional androidx.compose.ui.graphics.PathFillType pathFillType, optional String name, optional androidx.compose.ui.graphics.Brush? fill, optional float fillAlpha, optional androidx.compose.ui.graphics.Brush? stroke, optional float strokeAlpha, optional float strokeLineWidth, optional androidx.compose.ui.graphics.StrokeCap strokeLineCap, optional androidx.compose.ui.graphics.StrokeJoin strokeLineJoin, optional float strokeLineMiter, optional float trimPathStart, optional float trimPathEnd, optional float trimPathOffset);
+    method @androidx.compose.runtime.Composable public static void Path-MBUPpgE(java.util.List<? extends androidx.compose.ui.graphics.vector.PathNode> pathData, optional int pathFillType, optional String name, optional androidx.compose.ui.graphics.Brush? fill, optional float fillAlpha, optional androidx.compose.ui.graphics.Brush? stroke, optional float strokeAlpha, optional float strokeLineWidth, optional int strokeLineCap, optional int strokeLineJoin, optional float strokeLineMiter, optional float trimPathStart, optional float trimPathEnd, optional float trimPathOffset);
   }
 
   @androidx.compose.runtime.Immutable public final class VectorGroup extends androidx.compose.ui.graphics.vector.VectorNode implements java.lang.Iterable<androidx.compose.ui.graphics.vector.VectorNode> kotlin.jvm.internal.markers.KMappedMarker {
@@ -538,10 +538,10 @@ package androidx.compose.ui.graphics.vector {
   public final class VectorKt {
     method public static inline java.util.List<androidx.compose.ui.graphics.vector.PathNode> PathData(kotlin.jvm.functions.Function1<? super androidx.compose.ui.graphics.vector.PathBuilder,kotlin.Unit> block);
     method public static java.util.List<androidx.compose.ui.graphics.vector.PathNode> addPathNodes(String? pathStr);
-    method public static androidx.compose.ui.graphics.PathFillType getDefaultFillType();
-    method public static androidx.compose.ui.graphics.StrokeCap getDefaultStrokeLineCap();
-    method public static androidx.compose.ui.graphics.StrokeJoin getDefaultStrokeLineJoin();
-    method public static androidx.compose.ui.graphics.BlendMode getDefaultTintBlendMode();
+    method public static int getDefaultFillType();
+    method public static int getDefaultStrokeLineCap();
+    method public static int getDefaultStrokeLineJoin();
+    method public static int getDefaultTintBlendMode();
     method public static long getDefaultTintColor();
     method public static java.util.List<androidx.compose.ui.graphics.vector.PathNode> getEmptyPath();
     field public static final String DefaultGroupName = "";
@@ -571,7 +571,7 @@ package androidx.compose.ui.graphics.vector {
 
   public final class VectorPainterKt {
     method @androidx.compose.runtime.Composable public static androidx.compose.ui.graphics.vector.VectorPainter rememberVectorPainter(androidx.compose.ui.graphics.vector.ImageVector image);
-    method @androidx.compose.runtime.Composable public static androidx.compose.ui.graphics.vector.VectorPainter rememberVectorPainter-u_AqRoo(float defaultWidth, float defaultHeight, optional float viewportWidth, optional float viewportHeight, optional String name, optional long tintColor, optional androidx.compose.ui.graphics.BlendMode tintBlendMode, kotlin.jvm.functions.Function2<? super java.lang.Float,? super java.lang.Float,kotlin.Unit> content);
+    method @androidx.compose.runtime.Composable public static androidx.compose.ui.graphics.vector.VectorPainter rememberVectorPainter-u_AqRoo(float defaultWidth, float defaultHeight, optional float viewportWidth, optional float viewportHeight, optional String name, optional long tintColor, optional int tintBlendMode, kotlin.jvm.functions.Function2<? super java.lang.Float,? super java.lang.Float,kotlin.Unit> content);
     field public static final String RootGroupName = "VectorRootGroup";
   }
 
@@ -580,11 +580,11 @@ package androidx.compose.ui.graphics.vector {
     method public float getFillAlpha();
     method public String getName();
     method public java.util.List<androidx.compose.ui.graphics.vector.PathNode> getPathData();
-    method public androidx.compose.ui.graphics.PathFillType getPathFillType();
+    method public int getPathFillType-Rg-k1Os();
     method public androidx.compose.ui.graphics.Brush? getStroke();
     method public float getStrokeAlpha();
-    method public androidx.compose.ui.graphics.StrokeCap getStrokeLineCap();
-    method public androidx.compose.ui.graphics.StrokeJoin getStrokeLineJoin();
+    method public int getStrokeLineCap-KaPHkGw();
+    method public int getStrokeLineJoin-LxFBmk8();
     method public float getStrokeLineMiter();
     method public float getStrokeLineWidth();
     method public float getTrimPathEnd();
@@ -594,11 +594,11 @@ package androidx.compose.ui.graphics.vector {
     property public final float fillAlpha;
     property public final String name;
     property public final java.util.List<androidx.compose.ui.graphics.vector.PathNode> pathData;
-    property public final androidx.compose.ui.graphics.PathFillType pathFillType;
+    property public final int pathFillType;
     property public final androidx.compose.ui.graphics.Brush? stroke;
     property public final float strokeAlpha;
-    property public final androidx.compose.ui.graphics.StrokeCap strokeLineCap;
-    property public final androidx.compose.ui.graphics.StrokeJoin strokeLineJoin;
+    property public final int strokeLineCap;
+    property public final int strokeLineJoin;
     property public final float strokeLineMiter;
     property public final float strokeLineWidth;
     property public final float trimPathEnd;

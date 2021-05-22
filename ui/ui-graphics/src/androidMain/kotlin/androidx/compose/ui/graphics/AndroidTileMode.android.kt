@@ -16,10 +16,10 @@
 
 package androidx.compose.ui.graphics
 
-actual typealias NativeTileMode = android.graphics.Shader.TileMode
-
-actual fun TileMode.toNativeTileMode(): NativeTileMode = when (this) {
+fun TileMode.toAndroidTileMode(): android.graphics.Shader.TileMode = when (this) {
     TileMode.Clamp -> android.graphics.Shader.TileMode.CLAMP
     TileMode.Repeated -> android.graphics.Shader.TileMode.REPEAT
     TileMode.Mirror -> android.graphics.Shader.TileMode.MIRROR
+    // Always fallback to TileMode.Clamp
+    else -> android.graphics.Shader.TileMode.CLAMP
 }

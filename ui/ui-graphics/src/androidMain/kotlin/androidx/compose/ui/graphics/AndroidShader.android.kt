@@ -39,7 +39,7 @@ internal actual fun ActualLinearGradientShader(
         to.y,
         colors.toIntArray(),
         colorStops?.toFloatArray(),
-        tileMode.toNativeTileMode()
+        tileMode.toAndroidTileMode()
     )
 }
 
@@ -57,7 +57,7 @@ internal actual fun ActualRadialGradientShader(
         radius,
         colors.toIntArray(),
         colorStops?.toFloatArray(),
-        tileMode.toNativeTileMode()
+        tileMode.toAndroidTileMode()
     )
 }
 
@@ -82,8 +82,8 @@ internal actual fun ActualImageShader(
 ): Shader {
     return BitmapShader(
         image.asAndroidBitmap(),
-        tileModeX.toNativeTileMode(),
-        tileModeY.toNativeTileMode()
+        tileModeX.toAndroidTileMode(),
+        tileModeY.toAndroidTileMode()
     )
 }
 

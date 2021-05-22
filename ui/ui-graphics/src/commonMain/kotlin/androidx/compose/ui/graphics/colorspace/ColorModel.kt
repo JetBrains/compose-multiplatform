@@ -16,7 +16,10 @@
 
 package androidx.compose.ui.graphics.colorspace
 
-import androidx.compose.ui.graphics.colorspace.ColorModel.Rgb
+import androidx.compose.runtime.Immutable
+import androidx.compose.runtime.Stable
+import androidx.compose.ui.util.packInts
+import androidx.compose.ui.util.unpackInt1
 
 /**
  * A color model is required by a [ColorSpace] to describe the
@@ -24,41 +27,63 @@ import androidx.compose.ui.graphics.colorspace.ColorModel.Rgb
  * model is the [RGB][Rgb] color model which defines a color
  * as represented by a tuple of 3 numbers (red, green and blue).
  */
-enum class ColorModel(
+@Suppress("INLINE_CLASS_DEPRECATED", "EXPERIMENTAL_FEATURE_WARNING")
+@Immutable
+inline class ColorModel internal constructor (
+    /**
+     * pack both the number of components and an ordinal value to distinguish between
+     * different ColorModel types that have the same number of components
+     */
+    internal val packedValue: Long
+) {
     /**
      * Returns the number of components for this color model.
      *
      * @return An integer between 1 and 4
      */
     /*@IntRange(from = 1, to = 4)*/
+    @Stable
     val componentCount: Int
-) {
-    /**
-     * The RGB model is a color model with 3 components that
-     * refer to the three additive primiaries: red, green
-     * and blue.
-     */
-    Rgb(3),
+        get() {
+            return unpackInt1(packedValue)
+        }
 
-    /**
-     * The XYZ model is a color model with 3 components that
-     * are used to model human color vision on a basic sensory
-     * level.
-     */
-    Xyz(3),
+    companion object {
+        /**
+         * The RGB model is a color model with 3 components that
+         * refer to the three additive primiaries: red, green
+         * and blue.
+         */
+        val Rgb = ColorModel(packInts(3, 0))
 
-    /**
-     * The Lab model is a color model with 3 components used
-     * to describe a color space that is more perceptually
-     * uniform than XYZ.
-     */
-    Lab(3),
+        /**
+         * The XYZ model is a color model with 3 components that
+         * are used to model human color vision on a basic sensory
+         * level.
+         */
+        val Xyz = ColorModel(packInts(3, 1))
 
-    /**
-     * The CMYK model is a color model with 4 components that
-     * refer to four inks used in color printing: cyan, magenta,
-     * yellow and black (or key). CMYK is a subtractive color
-     * model.
-     */
-    Cmyk(4)
+        /**
+         * The Lab model is a color model with 3 components used
+         * to describe a color space that is more perceptually
+         * uniform than XYZ.
+         */
+        val Lab = ColorModel(packInts(3, 2))
+
+        /**
+         * The CMYK model is a color model with 4 components that
+         * refer to four inks used in color printing: cyan, magenta,
+         * yellow and black (or key). CMYK is a subtractive color
+         * model.
+         */
+        val Cmyk = ColorModel(packInts(4, 3))
+    }
+
+    override fun toString() = when (this) {
+        Rgb -> "Rgb"
+        Xyz -> "Xyz"
+        Lab -> "Lab"
+        Cmyk -> "Cmyk"
+        else -> "Unknown"
+    }
 }

@@ -541,7 +541,7 @@ private fun Color.getComponents(): FloatArray = floatArrayOf(red, green, blue, a
 @Stable
 fun Color.luminance(): Float {
     val colorSpace = colorSpace
-    require(colorSpace.model === ColorModel.Rgb) {
+    require(colorSpace.model == ColorModel.Rgb) {
         "The specified color must be encoded in an RGB color space. " +
             "The supplied color space is ${colorSpace.model}"
     }

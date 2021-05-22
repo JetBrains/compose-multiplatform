@@ -62,4 +62,5 @@ internal fun StampedPathEffectStyle.toAndroidPathDashPathEffectStyle() =
         StampedPathEffectStyle.Morph -> PathDashPathEffect.Style.MORPH
         StampedPathEffectStyle.Rotate -> PathDashPathEffect.Style.ROTATE
         StampedPathEffectStyle.Translate -> PathDashPathEffect.Style.TRANSLATE
+        else -> PathDashPathEffect.Style.TRANSLATE
     }

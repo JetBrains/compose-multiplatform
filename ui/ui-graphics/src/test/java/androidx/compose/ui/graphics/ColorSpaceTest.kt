@@ -434,12 +434,12 @@ class ColorSpaceTest {
 
         assertSame(ColorSpaces.Srgb, connector.source)
         assertSame(ColorSpaces.DciP3, connector.destination)
-        assertSame(RenderIntent.Perceptual, connector.renderIntent)
+        assertEquals(RenderIntent.Perceptual, connector.renderIntent)
 
         connector = ColorSpaces.Srgb.connect(ColorSpaces.Srgb)
 
         assertSame(connector.destination, connector.source)
-        assertSame(RenderIntent.Relative, connector.renderIntent)
+        assertEquals(RenderIntent.Relative, connector.renderIntent)
 
         connector = ColorSpaces.DciP3.connect()
         assertSame(ColorSpaces.Srgb, connector.destination)
@@ -534,7 +534,7 @@ class ColorSpaceTest {
         val connector = ColorSpaces.Srgb.connect(ColorSpaces.Srgb)
 
         assertSame(connector.source, connector.destination)
-        assertSame(RenderIntent.Relative, connector.renderIntent)
+        assertEquals(RenderIntent.Relative, connector.renderIntent)
 
         val source = floatArrayOf(0.11112f, 0.22227f, 0.444448f)
 

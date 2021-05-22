@@ -319,7 +319,7 @@ class DesktopCanvas(val skija: org.jetbrains.skija.Canvas) : Canvas {
     override fun drawVertices(vertices: Vertices, blendMode: BlendMode, paint: Paint) {
         org.jetbrains.skija.Canvas._nDrawVertices(
             skija._ptr,
-            vertices.vertexMode.toSkijaMode(),
+            vertices.vertexMode.toDesktopVertexMode(),
             vertices.positions,
             vertices.colors,
             vertices.textureCoordinates,
@@ -329,15 +329,10 @@ class DesktopCanvas(val skija: org.jetbrains.skija.Canvas) : Canvas {
         )
     }
 
-    private fun VertexMode.toSkijaMode() = when (this) {
-        VertexMode.Triangles -> 0
-        VertexMode.TriangleStrip -> 1
-        VertexMode.TriangleFan -> 2
-    }
-
     private fun ClipOp.toSkija() = when (this) {
         ClipOp.Difference -> SkijaClipMode.DIFFERENCE
         ClipOp.Intersect -> SkijaClipMode.INTERSECT
+        else -> SkijaClipMode.INTERSECT
     }
 
     private fun Matrix.toSkija() = Matrix44(

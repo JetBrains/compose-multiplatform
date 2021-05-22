@@ -16,6 +16,11 @@
 
 package androidx.compose.ui.graphics
 
-actual typealias NativeTileMode = TileMode
+import org.jetbrains.skija.FilterTileMode
 
-actual fun TileMode.toNativeTileMode(): NativeTileMode = this
+fun TileMode.toDesktopTileMode(): FilterTileMode = when (this) {
+    TileMode.Clamp -> FilterTileMode.CLAMP
+    TileMode.Repeated -> FilterTileMode.REPEAT
+    TileMode.Mirror -> FilterTileMode.MIRROR
+    else -> FilterTileMode.CLAMP
+}
