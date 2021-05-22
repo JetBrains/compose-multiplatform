@@ -1,7 +1,7 @@
 import org.gradle.api.publish.PublishingExtension
 
 plugins {
-    id("org.jetbrains.kotlin.multiplatform") version("1.4.32") apply(false)
+    id("org.jetbrains.kotlin.multiplatform") version("1.5.0") apply(false)
 }
 
 val COMPOSE_WEB_VERSION: String by project
