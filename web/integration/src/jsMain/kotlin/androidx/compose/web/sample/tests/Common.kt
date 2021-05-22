@@ -7,9 +7,7 @@ import androidx.compose.web.renderComposableInBody
 import kotlin.properties.ReadOnlyProperty
 import kotlin.reflect.KProperty
 
-internal class TestCase {
-    lateinit var composable: @Composable () -> Unit
-
+internal class TestCase(val composable: @Composable () -> Unit) {
     operator fun provideDelegate(
         thisRef: Any,
         property: KProperty<*>
@@ -23,9 +21,7 @@ internal class TestCase {
 }
 
 internal fun testCase(composable: @Composable () -> Unit): TestCase {
-    return TestCase().apply {
-        this.composable = composable
-    }
+    return TestCase(composable)
 }
 
 internal val testCases = mutableMapOf<String, TestCase>()
