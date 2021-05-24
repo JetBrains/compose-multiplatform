@@ -38,7 +38,5 @@
             android:name=".DemoSettingsActivity"
             android:label="Demo Theme Settings"
             android:theme="@style/Theme.AppCompat.Light.DarkActionBar" />
-
-        <meta-data android:value="true" android:name="COMPOSE_TEXT_FIELD_UNDO_ENABLED"/>
     </application>
 </manifest>
