@@ -23,7 +23,6 @@ import android.view.MotionEvent
 import android.view.View
 import android.view.ViewGroup
 import androidx.compose.ui.node.LayoutNode
-import androidx.compose.ui.node.LayoutNode.LayoutState.NeedsRemeasure
 import androidx.compose.ui.viewinterop.AndroidViewHolder
 
 /**
@@ -41,12 +40,26 @@ internal class AndroidViewsHandler(context: Context) : ViewGroup(context) {
     val layoutNodeToHolder = hashMapOf<LayoutNode, AndroidViewHolder>()
 
     override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
-        // Layout will be handled by component nodes.
-        setMeasuredDimension(0, 0)
+        // Layout will be handled by component nodes. However, we act like proper measurement
+        // here in case ViewRootImpl did forceLayout().
+        require(MeasureSpec.getMode(widthMeasureSpec) == MeasureSpec.EXACTLY)
+        require(MeasureSpec.getMode(heightMeasureSpec) == MeasureSpec.EXACTLY)
+        setMeasuredDimension(
+            MeasureSpec.getSize(widthMeasureSpec),
+            MeasureSpec.getSize(heightMeasureSpec)
+        )
     }
 
     override fun measureChildren(widthMeasureSpec: Int, heightMeasureSpec: Int) {
-        // Layout will be handled by component nodes.
+        // Layout has already been handled by component nodes and we know the size of each View.
+        // However, we act like proper measurement here in case ViewRootImpl did forceLayout(),
+        // in order to clear properly the layout state of the handler & holders.
+        holderToLayoutNode.keys.forEach {
+            it.measure(
+                MeasureSpec.makeMeasureSpec(it.measuredWidth, MeasureSpec.EXACTLY),
+                MeasureSpec.makeMeasureSpec(it.measuredHeight, MeasureSpec.EXACTLY)
+            )
+        }
     }
 
     override fun onLayout(changed: Boolean, l: Int, t: Int, r: Int, b: Int) {
@@ -82,10 +95,8 @@ internal class AndroidViewsHandler(context: Context) : ViewGroup(context) {
         for (i in 0 until childCount) {
             val child = getChildAt(i)
             val node = holderToLayoutNode[child]
-            if (child.isLayoutRequested && node != null &&
-                node.layoutState != NeedsRemeasure
-            ) {
-                holderToLayoutNode[child]!!.requestRemeasure()
+            if (child.isLayoutRequested && node != null) {
+                node.requestRemeasure()
             }
         }
     }
