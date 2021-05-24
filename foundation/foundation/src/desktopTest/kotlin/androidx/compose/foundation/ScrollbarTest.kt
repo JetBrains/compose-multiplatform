@@ -499,7 +499,7 @@ class ScrollbarTest {
             }
 
             VerticalScrollbar(
-                adapter = rememberScrollbarAdapter(state, childCount, childSize),
+                adapter = rememberScrollbarAdapter(state),
                 reverseLayout = reverseLayout,
                 modifier = Modifier
                     .width(scrollbarWidth)
