@@ -18,7 +18,10 @@ package androidx.compose.ui.inspection.compose
 
 import android.content.res.Resources
 import android.view.View
+import android.view.ViewGroup
+import androidx.compose.ui.R
 import androidx.compose.ui.inspection.framework.ancestors
+import androidx.compose.ui.inspection.framework.getChildren
 import androidx.compose.ui.inspection.framework.isRoot
 import androidx.compose.ui.inspection.inspector.InspectorNode
 import androidx.compose.ui.inspection.inspector.LayoutInspectorTree
@@ -71,7 +74,7 @@ private fun View.isSystemView(): Boolean {
 class AndroidComposeViewWrapper(
     private val layoutInspectorTree: LayoutInspectorTree,
     val rootView: View,
-    private val composeView: View,
+    private val composeView: ViewGroup,
     skipSystemComposables: Boolean
 ) {
     companion object {
@@ -85,7 +88,7 @@ class AndroidComposeViewWrapper(
                 AndroidComposeViewWrapper(
                     layoutInspectorTree,
                     rootView,
-                    composeView,
+                    composeView as ViewGroup,
                     skipSystemComposables
                 )
             } else {
@@ -102,6 +105,11 @@ class AndroidComposeViewWrapper(
     val viewParent =
         if (!skipSystemComposables) composeView
         else composeView.ancestors().first { !it.isSystemView() || it.isRoot() }
+
+    val viewsToSkip: List<Long> =
+        composeView.getChildren()
+            .filter { it.getTag(R.id.hide_in_inspector_tag) != null }
+            .map { it.uniqueDrawingId }
 
     private val inspectorNodes = layoutInspectorTree.apply {
         this.hideSystemNodes = skipSystemComposables
