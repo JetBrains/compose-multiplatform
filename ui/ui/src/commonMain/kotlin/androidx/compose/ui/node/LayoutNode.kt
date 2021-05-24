@@ -535,7 +535,8 @@ internal class LayoutNode : Measurable, Remeasurement, OwnerScope, LayoutInfo, C
      * every placed node assigns this variable to [parent]s [nextChildPlaceOrder] and increments
      * this counter. Not placed items will still have [NotPlacedPlaceOrder] set.
      */
-    private var placeOrder: Int = NotPlacedPlaceOrder
+    internal var placeOrder: Int = NotPlacedPlaceOrder
+        private set
 
     /**
      * The counter on a parent node which is used by its children to understand the order in which
@@ -840,17 +841,10 @@ internal class LayoutNode : Measurable, Remeasurement, OwnerScope, LayoutInfo, C
         }
 
         if (!isPlaced) {
-            isPlaced = true
             // when the visibility of a child has been changed we need to invalidate
             // parents inner layer - the layer in which this child will be drawn
             parent?.invalidateLayer()
-            // plus all the inner layers that were invalidated while the node was not placed
-            forEachDelegate {
-                if (it.lastLayerDrawingWasSkipped) {
-                    it.invalidateLayer()
-                }
-            }
-            markSubtreeAsPlaced()
+            markNodeAndSubtreeAsPlaced()
         }
 
         if (parent != null) {
@@ -917,13 +911,43 @@ internal class LayoutNode : Measurable, Remeasurement, OwnerScope, LayoutInfo, C
         if (alignmentLines.dirty && alignmentLines.required) alignmentLines.recalculate()
     }
 
-    private fun markSubtreeAsPlaced() {
-        _children.forEach {
-            // if the layout state is not Ready then isPlaced will be set during the layout
-            if (it.layoutState == Ready && it.placeOrder != NotPlacedPlaceOrder) {
-                it.isPlaced = true
-                it.markSubtreeAsPlaced()
+    private fun markNodeAndSubtreeAsPlaced() {
+        isPlaced = true
+        // invalidate all the nodes layers that were invalidated while the node was not placed
+        forEachDelegateIncludingInner {
+            if (it.lastLayerDrawingWasSkipped) {
+                it.invalidateLayer()
             }
+        }
+        _children.forEach {
+            // this child was placed during the previous parent's layoutChildren(). this means that
+            // before the parent became not placed this child was placed. we need to restore that
+            if (it.placeOrder != NotPlacedPlaceOrder) {
+                it.markNodeAndSubtreeAsPlaced()
+                rescheduleRemeasureOrRelayout(it)
+            }
+        }
+    }
+
+    private fun rescheduleRemeasureOrRelayout(it: LayoutNode) {
+        when (val state = it.layoutState) {
+            NeedsRemeasure, NeedsRelayout -> {
+                // we need to reset the state before requesting as otherwise the request
+                // would be ignored.
+                it.layoutState = Ready
+                // this node was scheduled for remeasure or relayout while it was not
+                // placed. such requests are ignored for non-placed nodes so we have to
+                // re-schedule remeasure or relayout.
+                if (state == NeedsRemeasure) {
+                    it.requestRemeasure()
+                } else {
+                    it.requestRelayout()
+                }
+            }
+            Ready -> {
+                // no extra work required and node is ready to be displayed
+            }
+            else -> throw IllegalStateException("Unexpected state ${it.layoutState}")
         }
     }
 
@@ -1252,7 +1276,7 @@ internal class LayoutNode : Measurable, Remeasurement, OwnerScope, LayoutInfo, C
         /**
          * Constant used by [placeOrder].
          */
-        private const val NotPlacedPlaceOrder = Int.MAX_VALUE
+        internal const val NotPlacedPlaceOrder = Int.MAX_VALUE
 
         /**
          * Pre-allocated constructor to be used with ComposeNode
