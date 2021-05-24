@@ -109,3 +109,5 @@ RemovedMethod: androidx.compose.ui.input.pointer.PointerInputChange#getType():
     Removed method androidx.compose.ui.input.pointer.PointerInputChange.getType()
 RemovedMethod: androidx.compose.ui.semantics.SemanticsPropertiesKt#setImeAction(androidx.compose.ui.semantics.SemanticsPropertyReceiver, androidx.compose.ui.text.input.ImeAction):
     Removed method androidx.compose.ui.semantics.SemanticsPropertiesKt.setImeAction(androidx.compose.ui.semantics.SemanticsPropertyReceiver,androidx.compose.ui.text.input.ImeAction)
+RemovedMethod: androidx.compose.ui.window.PopupProperties#PopupProperties(boolean, boolean, boolean, androidx.compose.ui.window.SecureFlagPolicy):
+    Removed constructor androidx.compose.ui.window.PopupProperties(boolean,boolean,boolean,androidx.compose.ui.window.SecureFlagPolicy)
