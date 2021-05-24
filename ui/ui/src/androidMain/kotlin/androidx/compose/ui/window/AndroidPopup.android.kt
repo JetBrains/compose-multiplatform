@@ -95,32 +95,14 @@ import kotlin.math.roundToInt
  * The default value is true.
  */
 @Immutable
-class PopupProperties @ExperimentalComposeUiApi constructor(
+class PopupProperties(
     val focusable: Boolean = false,
     val dismissOnBackPress: Boolean = true,
     val dismissOnClickOutside: Boolean = true,
     val securePolicy: SecureFlagPolicy = SecureFlagPolicy.Inherit,
-    @get:ExperimentalComposeUiApi
     val excludeFromSystemGesture: Boolean = true,
-    @get:ExperimentalComposeUiApi
     val clippingEnabled: Boolean = true
 ) {
-    @OptIn(ExperimentalComposeUiApi::class)
-    constructor(
-        focusable: Boolean = false,
-        dismissOnBackPress: Boolean = true,
-        dismissOnClickOutside: Boolean = true,
-        securePolicy: SecureFlagPolicy = SecureFlagPolicy.Inherit,
-    ) : this (
-        focusable,
-        dismissOnBackPress,
-        dismissOnClickOutside,
-        securePolicy,
-        excludeFromSystemGesture = true,
-        clippingEnabled = true
-    )
-
-    @OptIn(ExperimentalComposeUiApi::class)
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
         if (other !is PopupProperties) return false
@@ -135,7 +117,6 @@ class PopupProperties @ExperimentalComposeUiApi constructor(
         return true
     }
 
-    @OptIn(ExperimentalComposeUiApi::class)
     override fun hashCode(): Int {
         var result = dismissOnBackPress.hashCode()
         result = 31 * result + focusable.hashCode()
@@ -502,7 +483,6 @@ private class PopupLayout(
     /**
      * Updates the position of the popup based on current position properties.
      */
-    @OptIn(ExperimentalComposeUiApi::class)
     fun updatePosition() {
         val parentBounds = parentBounds ?: return
         val popupContentSize = popupContentSize ?: return
