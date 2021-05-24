@@ -22,8 +22,10 @@ kotlin {
         val commonMain by getting {
             dependencies {
                 implementation(compose.runtime)
-                implementation(project(":web-core"))
                 implementation(kotlin("stdlib-common"))
+
+                implementation(project(":web-core"))
+                implementation(project(":web-widgets"))
             }
         }
 

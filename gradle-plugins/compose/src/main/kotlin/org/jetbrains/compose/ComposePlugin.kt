@@ -150,8 +150,12 @@ class ComposePlugin : Plugin<Project> {
     }
 
     object WebDependencies {
-        val web by lazy {
+        val core by lazy {
             composeDependency("org.jetbrains.compose.web:web-core")
+        }
+
+        val widgets by lazy {
+            composeDependency("org.jetbrains.compose.web:web-widgets")
         }
     }
 }

@@ -20,9 +20,11 @@ pluginManagement {
 }
 
 include("web-core")
+include("web-widgets")
 include("web-integration-core")
 include("web-integration-widgets")
 
 project(":web-core").projectDir = file("$rootDir/core")
+project(":web-widgets").projectDir = file("$rootDir/widgets")
 project(":web-integration-core").projectDir = file("$rootDir/integration-core")
 project(":web-integration-widgets").projectDir = file("$rootDir/integration-widgets")
