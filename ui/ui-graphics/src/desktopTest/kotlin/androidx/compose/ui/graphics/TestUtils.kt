@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package androidx.compose.ui.text
+package androidx.compose.ui.graphics
 
 private val os = System.getProperty("os.name").lowercase()
 internal val isLinux = os.startsWith("linux")
