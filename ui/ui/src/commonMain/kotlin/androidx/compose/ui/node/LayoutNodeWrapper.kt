@@ -121,6 +121,9 @@ internal abstract class LayoutNodeWrapper(
             }
         }
 
+    private val hasMeasureResult: Boolean
+        get() = _measureResult != null
+
     private var oldAlignmentLines: MutableMap<AlignmentLine, Int>? = null
 
     override val providedAlignmentLines: Set<AlignmentLine>
@@ -198,6 +201,7 @@ internal abstract class LayoutNodeWrapper(
     abstract fun calculateAlignmentLine(alignmentLine: AlignmentLine): Int
 
     final override fun get(alignmentLine: AlignmentLine): Int {
+        if (!hasMeasureResult) return AlignmentLine.Unspecified
         val measuredPosition = calculateAlignmentLine(alignmentLine)
         if (measuredPosition == AlignmentLine.Unspecified) return AlignmentLine.Unspecified
         return measuredPosition + if (alignmentLine is VerticalAlignmentLine) {
