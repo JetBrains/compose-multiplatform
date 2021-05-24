@@ -74,6 +74,7 @@ class ComposeLayoutInspector(
         val rootView: View,
         val viewParent: View,
         val nodes: List<InspectorNode>,
+        val viewsToSkip: List<Long>
     ) {
         /** The cached nodes as a map from node id to InspectorNode */
         val lookup = nodes.flatMap { it.flatten() }.associateBy { it.id }
@@ -149,8 +150,11 @@ class ComposeLayoutInspector(
                 addAllStrings(stringTable.toStringEntries())
                 addRoots(
                     ComposableRoot.newBuilder().apply {
-                        viewId = data?.viewParent?.uniqueDrawingId ?: 0L
-                        addAllNodes(composeNodes)
+                        if (data != null) {
+                            viewId = data.viewParent.uniqueDrawingId
+                            addAllNodes(composeNodes)
+                            addAllViewsToSkip(data.viewsToSkip)
+                        }
                     }
                 )
             }.build()
@@ -281,7 +285,7 @@ class ComposeLayoutInspector(
         val data = ThreadUtils.runOnMainThread {
             layoutInspectorTree.resetAccumulativeState()
             val data = getAndroidComposeViews(rootViewId, skipSystemComposables, generation).map {
-                CacheData(it.rootView, it.viewParent, it.createNodes())
+                CacheData(it.rootView, it.viewParent, it.createNodes(), it.viewsToSkip)
             }
             layoutInspectorTree.resetAccumulativeState()
             data
