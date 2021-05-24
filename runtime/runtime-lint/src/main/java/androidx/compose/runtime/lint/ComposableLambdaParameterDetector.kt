@@ -135,25 +135,31 @@ class ComposableLambdaParameterDetector : Detector(), SourceCodeScanner {
 
     companion object {
         val ComposableLambdaParameterNaming = Issue.create(
-            "ComposableLambdaParameterNaming",
-            "Primary composable lambda parameter not named `content`",
-            "Composable functions with only one composable lambda parameter should use the name " +
-                "`content` for the parameter.",
-            Category.CORRECTNESS, 3, Severity.IGNORE,
-            Implementation(
+            id = "ComposableLambdaParameterNaming",
+            briefDescription = "Primary composable lambda parameter not named `content`",
+            explanation = "Composable functions with only one composable lambda parameter should " +
+                "use the name `content` for the parameter.",
+            category = Category.CORRECTNESS,
+            priority = 3,
+            severity = Severity.WARNING,
+            enabledByDefault = false,
+            implementation = Implementation(
                 ComposableLambdaParameterDetector::class.java,
                 EnumSet.of(Scope.JAVA_FILE, Scope.TEST_SOURCES)
             )
         )
 
         val ComposableLambdaParameterPosition = Issue.create(
-            "ComposableLambdaParameterPosition",
-            "Non-trailing primary composable lambda parameter",
-            "Composable functions with only one composable lambda parameter should place the " +
-                "parameter at the end of the parameter list, so it can be used as a trailing " +
-                "lambda.",
-            Category.CORRECTNESS, 3, Severity.IGNORE,
-            Implementation(
+            id = "ComposableLambdaParameterPosition",
+            briefDescription = "Non-trailing primary composable lambda parameter",
+            explanation = "Composable functions with only one composable lambda parameter should " +
+                "place the parameter at the end of the parameter list, so it can be used as a " +
+                "trailing lambda.",
+            category = Category.CORRECTNESS,
+            priority = 3,
+            severity = Severity.WARNING,
+            enabledByDefault = false,
+            implementation = Implementation(
                 ComposableLambdaParameterDetector::class.java,
                 EnumSet.of(Scope.JAVA_FILE, Scope.TEST_SOURCES)
             )

@@ -170,6 +170,9 @@ abstract class IconGenerationTask : DefaultTask() {
             // b/175401659 - disable lint as it takes a long time, and most errors should
             // be caught by lint on material-icons-core anyway
             project.afterEvaluate {
+                project.tasks.named("lintAnalyzeDebug") { t ->
+                    t.enabled = false
+                }
                 project.tasks.named("lintDebug") { t ->
                     t.enabled = false
                 }

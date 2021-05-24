@@ -16,13 +16,15 @@
 
 package androidx.compose.lint
 
-import com.intellij.psi.impl.compiled.ClsMethodImpl
+import com.intellij.psi.PsiMethod
 import com.intellij.psi.impl.compiled.ClsParameterImpl
+import com.intellij.psi.impl.light.LightParameter
 import kotlinx.metadata.jvm.annotations
 import org.jetbrains.kotlin.psi.KtAnnotated
 import org.jetbrains.kotlin.psi.KtFunction
 import org.jetbrains.kotlin.psi.KtProperty
 import org.jetbrains.kotlin.psi.KtTypeReference
+import org.jetbrains.kotlin.psi.psiUtil.getParentOfType
 import org.jetbrains.uast.UAnnotation
 import org.jetbrains.uast.UAnonymousClass
 import org.jetbrains.uast.UCallExpression
@@ -35,7 +37,6 @@ import org.jetbrains.uast.UTypeReferenceExpression
 import org.jetbrains.uast.UVariable
 import org.jetbrains.uast.getContainingDeclaration
 import org.jetbrains.uast.getContainingUClass
-import org.jetbrains.uast.getContainingUMethod
 import org.jetbrains.uast.getParameterForArgument
 import org.jetbrains.uast.toUElement
 import org.jetbrains.uast.withContainingElements
@@ -110,14 +111,21 @@ val UVariable.isComposable: Boolean
  * Returns whether this parameter's type is @Composable or not
  */
 val UParameter.isComposable: Boolean
-    get() = when (sourcePsi) {
+    get() = when {
         // The parameter is in a class file. Currently type annotations aren't currently added to
         // the underlying type (https://youtrack.jetbrains.com/issue/KT-45307), so instead we use
         // the metadata annotation.
-        is ClsParameterImpl -> {
+        sourcePsi is ClsParameterImpl
+            // In some cases when a method is defined in bytecode and the call fails to resolve
+            // to the ClsMethodImpl, sourcePsi can be null. In this case we can instead use javaPsi
+            // which will have a light implementation. Note that javaPsi will return a light
+            // implementation for most Kotlin declarations too, so we need to first check to see if
+            // the sourcePsi is null.
+            // https://youtrack.jetbrains.com/issue/KT-46883
+            || (sourcePsi == null && javaPsi is LightParameter) -> {
             // Find the containing method, so we can get metadata from the containing class
-            val containingMethod = getContainingUMethod()!!.sourcePsi as ClsMethodImpl
-            val kmFunction = containingMethod.toKmFunction()
+            val containingMethod = javaPsi!!.getParentOfType<PsiMethod>(true)
+            val kmFunction = containingMethod!!.toKmFunction()
 
             val kmValueParameter = kmFunction?.valueParameters?.find {
                 it.name == name
@@ -236,10 +244,9 @@ private val UTypeReferenceExpression.isComposable: Boolean
     get() {
         if (type.hasAnnotation(Names.Runtime.Composable.javaFqn)) return true
 
-        // Annotations should be available on the PsiType itself in 1.4.30+, but we are
-        // currently on an older version of UAST / Kotlin embedded compiled
-        // (https://youtrack.jetbrains.com/issue/KT-45244), so we need to manually check the
-        // underlying type reference. Until then, the above check will always fail.
+        // Annotations on the types of local properties (val foo: @Composable () -> Unit = {})
+        // are currently not present on the PsiType, we so need to manually check the underlying
+        // type reference. (https://youtrack.jetbrains.com/issue/KT-45244)
         return (sourcePsi as? KtTypeReference)?.hasComposableAnnotation == true
     }
 
