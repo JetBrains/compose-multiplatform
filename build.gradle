@@ -68,7 +68,6 @@ dependencies {
     cacheableApi(libs.androidGradlePlugin)
     cacheableImplementation(libs.dexMemberList)
     cacheableApi(libs.kotlinGradlePlugin)
-    cacheableImplementation(libs.kotlinPoet)
     cacheableImplementation(gradleApi())
     cacheableApi(libs.dokkaGradlePlugin)
     // needed by inspection plugin
