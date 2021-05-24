@@ -1,6 +1,6 @@
 plugins {
-	kotlin("multiplatform") version "1.4.32"
-	id("org.jetbrains.compose") version "0.0.0-web-dev-12"
+	kotlin("multiplatform") version "1.5.0"
+	id("org.jetbrains.compose") version "0.0.0-web-dev-13"
 }
 
 repositories {
@@ -17,10 +17,11 @@ kotlin {
 	sourceSets {
 		val jsMain by getting {
 			dependencies {
-				implementation(compose.web.web)
+				implementation(compose.web.core)
 				implementation(compose.runtime)
-				implementation("org.jetbrains:kotlin-react:17.0.2-pre.155-kotlin-1.4.32")
-				implementation("org.jetbrains:kotlin-react-dom:17.0.2-pre.155-kotlin-1.4.32")
+				implementation("org.jetbrains.kotlin-wrappers:kotlin-react:17.0.2-pre.201-kotlin-1.5.0")
+				implementation("org.jetbrains.kotlin-wrappers:kotlin-react-dom:17.0.2-pre.201-kotlin-1.5.0")
+				implementation("org.jetbrains.kotlin-wrappers:kotlin-styled:5.3.0-pre.201-kotlin-1.5.0")
 				implementation(npm("react", "17.0.2"))
 				implementation(npm("react-dom", "17.0.2"))
 				implementation(npm("react-youtube-lite", "1.0.1"))
