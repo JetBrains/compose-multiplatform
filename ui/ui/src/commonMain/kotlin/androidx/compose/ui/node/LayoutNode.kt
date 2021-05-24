@@ -373,6 +373,7 @@ internal class LayoutNode : Measurable, Remeasurement, OwnerScope, LayoutInfo, C
             child.detach()
         }
         placeOrder = NotPlacedPlaceOrder
+        previousPlaceOrder = NotPlacedPlaceOrder
         isPlaced = false
     }
 
@@ -537,6 +538,12 @@ internal class LayoutNode : Measurable, Remeasurement, OwnerScope, LayoutInfo, C
      */
     internal var placeOrder: Int = NotPlacedPlaceOrder
         private set
+
+    /**
+     * The value [placeOrder] had during the previous parent [layoutChildren]. Helps us to
+     * understand if the order did change.
+     */
+    private var previousPlaceOrder: Int = NotPlacedPlaceOrder
 
     /**
      * The counter on a parent node which is used by its children to understand the order in which
@@ -882,6 +889,7 @@ internal class LayoutNode : Measurable, Remeasurement, OwnerScope, LayoutInfo, C
                 nextChildPlaceOrder = 0
                 _children.forEach { child ->
                     // and reset the place order for all the children before placing them
+                    child.previousPlaceOrder = child.placeOrder
                     child.placeOrder = NotPlacedPlaceOrder
                     child.alignmentLines.usedDuringParentLayout = false
                 }
@@ -891,11 +899,12 @@ internal class LayoutNode : Measurable, Remeasurement, OwnerScope, LayoutInfo, C
                     // we set `placeOrder` to NotPlacedPlaceOrder for all the children, then
                     // during the placeChildren() invocation the real order will be assigned for
                     // all the placed children.
-                    if (child.placeOrder == NotPlacedPlaceOrder) {
-                        child.markSubtreeAsNotPlaced()
-                        // we have to invalidate here in order to stop displaying the child
-                        // which is not placed anymore.
+                    if (child.previousPlaceOrder != child.placeOrder) {
+                        onZSortedChildrenInvalidated()
                         invalidateLayer()
+                        if (child.placeOrder == NotPlacedPlaceOrder) {
+                            child.markSubtreeAsNotPlaced()
+                        }
                     }
                     child.alignmentLines.previousUsedDuringParentLayout =
                         child.alignmentLines.usedDuringParentLayout
