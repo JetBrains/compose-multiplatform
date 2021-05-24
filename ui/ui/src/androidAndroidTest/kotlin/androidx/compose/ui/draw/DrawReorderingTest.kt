@@ -1038,6 +1038,62 @@ class DrawReorderingTest {
         )
     }
 
+    @Test
+    @SdkSuppress(minSdkVersion = Build.VERSION_CODES.O)
+    fun placingInDifferentOrderTriggersRedraw() {
+        var reverseOrder by mutableStateOf(false)
+        rule.runOnUiThread {
+            activity.setContent {
+                Layout(
+                    content = {
+                        FixedSize(30) {
+                            FixedSize(
+                                10,
+                                Modifier.padding(10)
+                                    .background(Color.White)
+                            )
+                        }
+                        FixedSize(30) {
+                            FixedSize(
+                                30,
+                                Modifier.background(Color.Red)
+                            )
+                        }
+                    },
+                    modifier = Modifier.drawLatchModifier()
+                ) { measurables, _ ->
+                    val newConstraints = Constraints.fixed(30, 30)
+                    val placeables = measurables.map { m ->
+                        m.measure(newConstraints)
+                    }
+                    layout(newConstraints.maxWidth, newConstraints.maxWidth) {
+                        if (!reverseOrder) {
+                            placeables[0].place(0, 0)
+                            placeables[1].place(0, 0)
+                        } else {
+                            placeables[1].place(0, 0)
+                            placeables[0].place(0, 0)
+                        }
+                    }
+                }
+            }
+        }
+
+        assertTrue(drawLatch.await(1, TimeUnit.SECONDS))
+
+        rule.runOnUiThread {
+            drawLatch = CountDownLatch(1)
+            reverseOrder = true
+        }
+
+        rule.validateSquareColors(
+            outerColor = Color.Red,
+            innerColor = Color.White,
+            size = 10,
+            drawLatch = drawLatch
+        )
+    }
+
     fun Modifier.drawLatchModifier() = drawBehind { drawLatch.countDown() }
 }
 
