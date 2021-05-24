@@ -299,6 +299,7 @@ internal abstract class LayoutNodeWrapper(
                 }
             }
             layer = null
+            lastLayerDrawingWasSkipped = false
         }
     }
 

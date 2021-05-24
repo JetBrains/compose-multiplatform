@@ -17,20 +17,21 @@
 package androidx.compose.ui.draw
 
 import android.os.Build
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.requiredSize
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.State
-import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.background
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.layout.Layout
 import androidx.compose.ui.layout.assertCenterPixelColor
+import androidx.compose.ui.layout.layout
+import androidx.compose.ui.platform.AndroidOwnerExtraAssertionsRule
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.test.captureToImage
 import androidx.compose.ui.test.junit4.createComposeRule
@@ -49,6 +50,9 @@ class InvalidatingNotPlacedChildTest {
 
     @get:Rule
     val composeTestRule = createComposeRule()
+
+    @get:Rule
+    val excessiveAssertions = AndroidOwnerExtraAssertionsRule()
 
     @Test
     @SdkSuppress(minSdkVersion = Build.VERSION_CODES.O)
@@ -116,44 +120,6 @@ class InvalidatingNotPlacedChildTest {
 
     @Test
     @SdkSuppress(minSdkVersion = Build.VERSION_CODES.O)
-    fun grandChildIsDisplayedCorrectlyWhenTheColorWasChangedWhileNotPlaced() {
-        val shouldPlace = mutableStateOf(false)
-        var color by mutableStateOf(Color.Gray)
-        composeTestRule.setContent {
-            ConditionallyPlacedChild(
-                shouldPlace,
-                Modifier.background(Color.Blue)
-                    .testTag("node")
-            ) {
-                MeasureInLayoutBlock {
-                    Spacer(
-                        Modifier.fillMaxSize()
-                            .graphicsLayer()
-                            .background(color)
-                    )
-                }
-            }
-        }
-
-        composeTestRule.runOnIdle {
-            shouldPlace.value = false
-        }
-
-        composeTestRule.runOnIdle {
-            color = Color.Red
-        }
-
-        composeTestRule.runOnIdle {
-            shouldPlace.value = true
-        }
-
-        composeTestRule.onNodeWithTag("node")
-            .captureToImage()
-            .assertCenterPixelColor(Color.Red)
-    }
-
-    @Test
-    @SdkSuppress(minSdkVersion = Build.VERSION_CODES.O)
     fun childIsNotDisplayedWhenIsNotPlacedAnymore() {
         val shouldPlace = mutableStateOf(true)
         composeTestRule.setContent {
@@ -179,30 +145,289 @@ class InvalidatingNotPlacedChildTest {
             .captureToImage()
             .assertCenterPixelColor(Color.Blue)
     }
+
+    @Test
+    @SdkSuppress(minSdkVersion = Build.VERSION_CODES.O)
+    fun childRedrawRequestedWhileNotPlaced() {
+        assertChangeWhileNotPlacedIsApplied { shouldPlace, color ->
+            ConditionallyPlacedChild(shouldPlace) {
+                Spacer(
+                    Modifier.fillMaxSize()
+                        .drawBehind {
+                            drawRect(color.value)
+                        }
+                )
+            }
+        }
+    }
+
+    @Test
+    @SdkSuppress(minSdkVersion = Build.VERSION_CODES.O)
+    fun childRedrawRequestedWhileNotPlaced_hadLayer() {
+        assertChangeWhileNotPlacedIsApplied { shouldPlace, color ->
+            ConditionallyPlacedChild(shouldPlace) {
+                Spacer(
+                    Modifier.fillMaxSize()
+                        .graphicsLayer()
+                        .drawBehind {
+                            drawRect(color.value)
+                        }
+                )
+            }
+        }
+    }
+
+    @Test
+    @SdkSuppress(minSdkVersion = Build.VERSION_CODES.O)
+    fun childRedrawRequestedWhileNotPlaced_hadLayerAsLastModifierInTheChain() {
+        assertChangeWhileNotPlacedIsApplied { shouldPlace, color ->
+            ConditionallyPlacedChild(shouldPlace) {
+                Box(Modifier.graphicsLayer()) {
+                    Spacer(
+                        Modifier.fillMaxSize()
+                            .drawBehind {
+                                drawRect(color.value)
+                            }
+                    )
+                }
+            }
+        }
+    }
+
+    @Test
+    @SdkSuppress(minSdkVersion = Build.VERSION_CODES.O)
+    fun childRedrawRequestedWhileNotPlaced_placedWithLayer() {
+        assertChangeWhileNotPlacedIsApplied { shouldPlace, color ->
+            ConditionallyPlacedChild(shouldPlace, placeWithLayer = true) {
+                Spacer(
+                    Modifier.fillMaxSize()
+                        .drawBehind {
+                            drawRect(color.value)
+                        }
+                )
+            }
+        }
+    }
+
+    @Test
+    @SdkSuppress(minSdkVersion = Build.VERSION_CODES.O)
+    fun childRedrawAndRemeasureRequestedWhileNotPlaced() {
+        assertChangeWhileNotPlacedIsApplied { shouldPlace, color ->
+            ConditionallyPlacedChild(shouldPlace) {
+                Spacer(
+                    Modifier.fillMaxSize()
+                        .layout(useDuringMeasure = color)
+                        .drawBehind {
+                            drawRect(color.value)
+                        }
+                )
+            }
+        }
+    }
+
+    @Test
+    @SdkSuppress(minSdkVersion = Build.VERSION_CODES.O)
+    fun childRedrawAndRelayoutRequestedWhileNotPlaced() {
+        assertChangeWhileNotPlacedIsApplied { shouldPlace, color ->
+            ConditionallyPlacedChild(shouldPlace) {
+                Spacer(
+                    Modifier.fillMaxSize()
+                        .layout(useDuringLayout = color)
+                        .drawBehind {
+                            drawRect(color.value)
+                        }
+                )
+            }
+        }
+    }
+
+    @Test
+    @SdkSuppress(minSdkVersion = Build.VERSION_CODES.O)
+    fun grandChildRedrawRequestedWhileNotPlaced() {
+        assertChangeWhileNotPlacedIsApplied { shouldPlace, color ->
+            ConditionallyPlacedChild(shouldPlace) {
+                MeasureInLayoutBlock {
+                    Spacer(
+                        Modifier.fillMaxSize()
+                            .drawBehind {
+                                drawRect(color.value)
+                            }
+                    )
+                }
+            }
+        }
+    }
+
+    @Test
+    @SdkSuppress(minSdkVersion = Build.VERSION_CODES.O)
+    fun grandChildRedrawRequestedWhileNotPlaced_hadLayer() {
+        assertChangeWhileNotPlacedIsApplied { shouldPlace, color ->
+            ConditionallyPlacedChild(shouldPlace) {
+                MeasureInLayoutBlock {
+                    Spacer(
+                        Modifier.fillMaxSize()
+                            .graphicsLayer()
+                            .drawBehind {
+                                drawRect(color.value)
+                            }
+                    )
+                }
+            }
+        }
+    }
+
+    @Test
+    @SdkSuppress(minSdkVersion = Build.VERSION_CODES.O)
+    fun grandChildRedrawRequestedWhileNotPlaced_hadLayerAsLastModifierInTheChain() {
+        assertChangeWhileNotPlacedIsApplied { shouldPlace, color ->
+            ConditionallyPlacedChild(shouldPlace) {
+                MeasureInLayoutBlock {
+                    Box(Modifier.graphicsLayer()) {
+                        Spacer(
+                            Modifier.fillMaxSize()
+                                .drawBehind {
+                                    drawRect(color.value)
+                                }
+                        )
+                    }
+                }
+            }
+        }
+    }
+
+    @Test
+    @SdkSuppress(minSdkVersion = Build.VERSION_CODES.O)
+    fun grandChildRedrawRequestedWhileNotPlaced_placedWithLayer() {
+        assertChangeWhileNotPlacedIsApplied { shouldPlace, color ->
+            ConditionallyPlacedChild(shouldPlace) {
+                MeasureInLayoutBlock(placeWithLayer = true) {
+                    Spacer(
+                        Modifier.fillMaxSize()
+                            .drawBehind {
+                                drawRect(color.value)
+                            }
+                    )
+                }
+            }
+        }
+    }
+
+    @Test
+    @SdkSuppress(minSdkVersion = Build.VERSION_CODES.O)
+    fun grandChildRedrawAndRemeasureRequestedWhileNotPlaced() {
+        assertChangeWhileNotPlacedIsApplied { shouldPlace, color ->
+            ConditionallyPlacedChild(shouldPlace) {
+                MeasureInLayoutBlock {
+                    Spacer(
+                        Modifier.fillMaxSize()
+                            .layout(useDuringMeasure = color)
+                            .drawBehind {
+                                drawRect(color.value)
+                            }
+                    )
+                }
+            }
+        }
+    }
+
+    @Test
+    @SdkSuppress(minSdkVersion = Build.VERSION_CODES.O)
+    fun grandChildRedrawAndRelayoutRequestedWhileNotPlaced() {
+        assertChangeWhileNotPlacedIsApplied { shouldPlace, color ->
+            ConditionallyPlacedChild(shouldPlace) {
+                MeasureInLayoutBlock {
+                    Spacer(
+                        Modifier.fillMaxSize()
+                            .layout(useDuringLayout = color)
+                            .drawBehind {
+                                drawRect(color.value)
+                            }
+                    )
+                }
+            }
+        }
+    }
+
+    fun assertChangeWhileNotPlacedIsApplied(
+        content: @Composable (State<Boolean>, State<Color>) -> Unit
+    ) {
+        val shouldPlace = mutableStateOf(true)
+        var color = mutableStateOf(Color.Gray)
+        composeTestRule.setContent {
+            Box(
+                Modifier.background(Color.Blue)
+                    .testTag("node")
+            ) {
+                content(shouldPlace, color)
+            }
+        }
+
+        composeTestRule.runOnIdle {
+            shouldPlace.value = false
+        }
+
+        composeTestRule.runOnIdle {
+            color.value = Color.Red
+        }
+
+        composeTestRule.runOnIdle {
+            shouldPlace.value = true
+        }
+
+        composeTestRule.onNodeWithTag("node")
+            .captureToImage()
+            .assertCenterPixelColor(Color.Red)
+    }
 }
 
 @Composable
 private fun ConditionallyPlacedChild(
     shouldPlace: State<Boolean>,
-    modifier: Modifier,
+    modifier: Modifier = Modifier,
+    placeWithLayer: Boolean = false,
     content: @Composable () -> Unit
 ) {
     Layout(content = content, modifier = modifier) { measurables, constraints ->
         val placeable = measurables.first().measure(constraints)
         layout(placeable.width, placeable.height) {
             if (shouldPlace.value) {
-                placeable.place(0, 0)
+                if (placeWithLayer) {
+                    placeable.placeWithLayer(0, 0)
+                } else {
+                    placeable.place(0, 0)
+                }
             }
         }
     }
 }
 
 @Composable
-private fun MeasureInLayoutBlock(content: @Composable () -> Unit) {
-    Layout(content = content) { measurables, constraints ->
+private fun MeasureInLayoutBlock(
+    modifier: Modifier = Modifier,
+    placeWithLayer: Boolean = false,
+    content: @Composable () -> Unit
+) {
+    Layout(content = content, modifier = modifier) { measurables, constraints ->
         val size = 5.dp.roundToPx()
         layout(size, size) {
-            measurables.first().measure(constraints).place(0, 0)
+            val placeable = measurables.first().measure(constraints)
+            if (placeWithLayer) {
+                placeable.placeWithLayer(0, 0)
+            } else {
+                placeable.place(0, 0)
+            }
         }
+    }
+}
+
+private fun Modifier.layout(
+    useDuringMeasure: State<*>? = null,
+    useDuringLayout: State<*>? = null,
+): Modifier = layout { measurable, constraints ->
+    useDuringMeasure?.value
+    val placeable = measurable.measure(constraints)
+    layout(placeable.width, placeable.height) {
+        useDuringLayout?.value
+        placeable.place(0, 0)
     }
 }
