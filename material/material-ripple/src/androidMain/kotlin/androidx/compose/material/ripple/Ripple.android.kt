@@ -22,8 +22,6 @@ import android.view.ViewGroup
 import androidx.compose.foundation.interaction.InteractionSource
 import androidx.compose.foundation.interaction.PressInteraction
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.CompositionLocal
-import androidx.compose.runtime.ProvidableCompositionLocal
 import androidx.compose.runtime.RememberObserver
 import androidx.compose.runtime.Stable
 import androidx.compose.runtime.State
@@ -31,7 +29,6 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
-import androidx.compose.runtime.staticCompositionLocalOf
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.drawscope.ContentDrawScope
@@ -57,7 +54,6 @@ internal actual class PlatformRipple actual constructor(
     radius: Dp,
     color: State<Color>
 ) : Ripple(bounded, radius, color) {
-    @OptIn(ExperimentalRippleApi::class)
     @Composable
     override fun rememberUpdatedRippleInstance(
         interactionSource: InteractionSource,
@@ -67,9 +63,8 @@ internal actual class PlatformRipple actual constructor(
         rippleAlpha: State<RippleAlpha>
     ): RippleIndicationInstance {
         val view = findNearestViewGroup()
-        // Fallback to drawing inside Compose if needed, using the common implementation
         // TODO(b/188112048): Remove isInEditMode once RenderThread support is fixed in Layoutlib.
-        if (!LocalRippleNativeRendering.current || view.isInEditMode) {
+        if (view.isInEditMode) {
             return remember(interactionSource, this) {
                 CommonRippleIndicationInstance(bounded, radius, color, rippleAlpha)
             }
@@ -108,33 +103,20 @@ internal actual class PlatformRipple actual constructor(
      */
     @Composable
     private fun findNearestViewGroup(): ViewGroup {
-        var view: View? = LocalView.current
+        var view: View = LocalView.current
         while (view !is ViewGroup) {
+            val parent = view.parent
             // We should never get to a ViewParent that isn't a View, without finding a ViewGroup
-            // first
-            view = view?.parent as View
+            // first - throw an exception if we do.
+            require(parent is View) {
+                "Couldn't find a valid parent for $view. Are you overriding LocalView and " +
+                    "providing a View that is not attached to the view hierarchy?"
+            }
+            view = parent
         }
         return view
     }
 }
-
-@RequiresOptIn(
-    "This ripple API is experimental and may change / be removed in the future."
-)
-public annotation class ExperimentalRippleApi
-
-/**
- * [CompositionLocal] that configures whether native ripples are used to draw the ripple effect
- * inside components. If set to false, the ripples will be drawn inside Compose, consistent with
- * the behavior in previous Compose releases. This is a temporary API, and will be removed when
- * native ripples are stable in Compose.
- *
- * If you use this to avoid a bug with native ripples, please [file a bug](https://issuetracker.google.com/issues/new?component=612128)
- */
-@get:ExperimentalRippleApi
-@ExperimentalRippleApi
-public val LocalRippleNativeRendering: ProvidableCompositionLocal<Boolean> =
-    staticCompositionLocalOf { true }
 
 /**
  * Android specific [RippleIndicationInstance]. This uses a [RippleHostView] provided by
