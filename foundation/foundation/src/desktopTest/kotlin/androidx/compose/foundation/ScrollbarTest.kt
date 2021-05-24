@@ -314,6 +314,35 @@ class ScrollbarTest {
     @Suppress("SameParameterValue")
     @OptIn(ExperimentalFoundationApi::class)
     @Test(timeout = 3000)
+    fun `scroll in reversed lazy list`() {
+        runBlocking(Dispatchers.Main) {
+            lateinit var state: LazyListState
+
+            rule.setContent {
+                state = rememberLazyListState()
+                LazyTestBox(
+                    state,
+                    size = 100.dp,
+                    childSize = 20.dp,
+                    childCount = 20,
+                    scrollbarWidth = 10.dp,
+                    reverseLayout = true
+                )
+            }
+            rule.awaitIdle()
+
+            rule.onNodeWithTag("scrollbar").performGesture {
+                instantSwipe(start = Offset(0f, 99f), end = Offset(0f, 88f))
+            }
+            rule.awaitIdle()
+            assertEquals(2, state.firstVisibleItemIndex)
+            assertEquals(4, state.firstVisibleItemScrollOffset)
+        }
+    }
+
+    @Suppress("SameParameterValue")
+    @OptIn(ExperimentalFoundationApi::class)
+    @Test(timeout = 3000)
     fun `scroll by more than one page in lazy list`() {
         runBlocking(Dispatchers.Main) {
             lateinit var state: LazyListState
@@ -456,11 +485,13 @@ class ScrollbarTest {
         childSize: Dp,
         childCount: Int,
         scrollbarWidth: Dp,
+        reverseLayout: Boolean = false
     ) = withTestEnvironment {
         Box(Modifier.size(size)) {
             LazyColumn(
                 Modifier.fillMaxSize().testTag("column"),
-                state
+                state,
+                reverseLayout = reverseLayout
             ) {
                 items((0 until childCount).toList()) {
                     Box(Modifier.size(childSize).testTag("box$it"))
@@ -469,6 +500,7 @@ class ScrollbarTest {
 
             VerticalScrollbar(
                 adapter = rememberScrollbarAdapter(state, childCount, childSize),
+                reverseLayout = reverseLayout,
                 modifier = Modifier
                     .width(scrollbarWidth)
                     .fillMaxHeight()

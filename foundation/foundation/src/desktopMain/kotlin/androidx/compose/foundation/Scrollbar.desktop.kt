@@ -117,6 +117,10 @@ fun defaultScrollbarStyle() = ScrollbarStyle(
  *
  * @param adapter [ScrollbarAdapter] that will be used to communicate with scrollable component
  * @param modifier the modifier to apply to this layout
+ * @param reverseLayout reverse the direction of scrolling and layout, when `true`
+ * and [LazyListState.firstVisibleItemIndex] == 0 then scrollbar
+ * will be at the bottom of the container.
+ * It is usually used in pair with `LazyColumn(reverseLayout = true)`
  * @param style [ScrollbarStyle] to define visual style of scrollbar
  * @param interactionSource [MutableInteractionSource] that will be used to dispatch
  * [DragInteraction.Start] when this Scrollbar is being dragged.
@@ -125,11 +129,13 @@ fun defaultScrollbarStyle() = ScrollbarStyle(
 fun VerticalScrollbar(
     adapter: ScrollbarAdapter,
     modifier: Modifier = Modifier,
+    reverseLayout: Boolean = false,
     style: ScrollbarStyle = LocalScrollbarStyle.current,
     interactionSource: MutableInteractionSource = remember { MutableInteractionSource() }
 ) = Scrollbar(
     adapter,
     modifier,
+    reverseLayout,
     style,
     interactionSource,
     isVertical = true
@@ -157,6 +163,10 @@ fun VerticalScrollbar(
  *
  * @param adapter [ScrollbarAdapter] that will be used to communicate with scrollable component
  * @param modifier the modifier to apply to this layout
+ * @param reverseLayout reverse the direction of scrolling and layout, when `true`
+ * and [LazyListState.firstVisibleItemIndex] == 0 then scrollbar
+ * will be at the end of the container.
+ * It is usually used in pair with `LazyRow(reverseLayout = true)`
  * @param style [ScrollbarStyle] to define visual style of scrollbar
  * @param interactionSource [MutableInteractionSource] that will be used to dispatch
  * [DragInteraction.Start] when this Scrollbar is being dragged.
@@ -165,11 +175,13 @@ fun VerticalScrollbar(
 fun HorizontalScrollbar(
     adapter: ScrollbarAdapter,
     modifier: Modifier = Modifier,
+    reverseLayout: Boolean = false,
     style: ScrollbarStyle = LocalScrollbarStyle.current,
     interactionSource: MutableInteractionSource = remember { MutableInteractionSource() }
 ) = Scrollbar(
     adapter,
     modifier,
+    reverseLayout,
     style,
     interactionSource,
     isVertical = false
@@ -181,6 +193,7 @@ fun HorizontalScrollbar(
 private fun Scrollbar(
     adapter: ScrollbarAdapter,
     modifier: Modifier = Modifier,
+    reverseLayout: Boolean,
     style: ScrollbarStyle,
     interactionSource: MutableInteractionSource,
     isVertical: Boolean
@@ -205,8 +218,8 @@ private fun Scrollbar(
     }
 
     val minimalHeight = style.minimalHeight.toPx()
-    val sliderAdapter = remember(adapter, containerSize, minimalHeight) {
-        SliderAdapter(adapter, containerSize, minimalHeight)
+    val sliderAdapter = remember(adapter, containerSize, minimalHeight, reverseLayout) {
+        SliderAdapter(adapter, containerSize, minimalHeight, reverseLayout)
     }
 
     val scrollThickness = style.thickness.roundToPx()
@@ -497,7 +510,8 @@ interface ScrollbarAdapter {
 private class SliderAdapter(
     val adapter: ScrollbarAdapter,
     val containerSize: Int,
-    val minHeight: Float
+    val minHeight: Float,
+    val reverseLayout: Boolean
 ) {
     private val contentSize get() = adapter.maxScrollOffset(containerSize) + containerSize
     private val visiblePart get() = containerSize.toFloat() / contentSize
@@ -514,11 +528,21 @@ private class SliderAdapter(
             return if (extraContentSpace == 0f) 1f else extraScrollbarSpace / extraContentSpace
         }
 
-    var position: Float
+    private var rawPosition: Float
         get() = scrollScale * adapter.scrollOffset
         set(value) {
             runBlocking {
                 adapter.scrollTo(containerSize, value / scrollScale)
+            }
+        }
+
+    var position: Float
+        get() = if (reverseLayout) containerSize - size - rawPosition else rawPosition
+        set(value) {
+            rawPosition = if (reverseLayout) {
+                containerSize - size - value
+            } else {
+                value
             }
         }
 
