@@ -35,8 +35,5 @@ package androidx.compose.material.ripple {
     method public static androidx.compose.runtime.ProvidableCompositionLocal<androidx.compose.material.ripple.RippleTheme> getLocalRippleTheme();
   }
 
-  public final class Ripple_androidKt {
-  }
-
 }
 
