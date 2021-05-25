@@ -16,7 +16,6 @@
 
 package androidx.compose.testutils
 
-import android.annotation.TargetApi
 import android.app.Activity
 import android.graphics.Bitmap
 import android.graphics.Canvas
@@ -28,6 +27,7 @@ import android.view.DisplayListCanvas
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
+import androidx.annotation.RequiresApi
 import androidx.activity.ComponentActivity
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionContext
@@ -79,6 +79,8 @@ internal class AndroidComposeTestCaseRunner<T : ComposeTestCase>(
 
     private val screenWithSpec: Int
     private val screenHeightSpec: Int
+
+    @Suppress("NewApi") // NewApi doesn't understand Kotlin `when` (b/189459502)
     private val capture = when {
         supportsRenderNode -> RenderNodeCapture()
         supportsMRenderNode -> MRenderNodeCapture()
@@ -342,7 +344,7 @@ private interface DrawCapture {
     fun endRecording()
 }
 
-@TargetApi(Build.VERSION_CODES.Q)
+@RequiresApi(Build.VERSION_CODES.Q)
 private class RenderNodeCapture : DrawCapture {
     private val renderNode = RenderNode("Test")
 
