@@ -47,8 +47,9 @@ import androidx.compose.ui.demos.gestures.RawDragGestureFilterDemo
 import androidx.compose.ui.demos.gestures.ScaleGestureFilterDemo
 import androidx.compose.ui.demos.gestures.ScrollGestureFilterDemo
 import androidx.compose.ui.demos.gestures.VerticalScrollerInDrawerDemo
-import androidx.compose.ui.demos.input.nestedscroll.BringIntoParentBoundsDemo
+import androidx.compose.ui.demos.input.nestedscroll.BringIntoViewDemo
 import androidx.compose.ui.demos.keyinput.KeyInputDemo
+import androidx.compose.ui.demos.scroll.RequestRectangleOnScreenDemo
 import androidx.compose.ui.demos.viewinterop.ViewInteropDemo
 import androidx.compose.ui.samples.NestedScrollConnectionSample
 
@@ -128,7 +129,8 @@ private val GraphicsDemos = DemoCategory(
 private val RelocationDemos = DemoCategory(
     "Relocation",
     listOf(
-        ComposableDemo("Bring Item Into View") { BringIntoParentBoundsDemo() }
+        ComposableDemo("Bring Into View") { BringIntoViewDemo() },
+        ComposableDemo("Request Rectangle On Screen") { RequestRectangleOnScreenDemo() }
     )
 )
 

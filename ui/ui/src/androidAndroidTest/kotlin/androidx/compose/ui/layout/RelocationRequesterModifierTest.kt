@@ -105,7 +105,7 @@ class RelocationRequesterModifierTest(private val orientation: Orientation) {
         }
 
         // Act.
-        rule.runOnIdle { relocationRequester.bringIntoParentBounds() }
+        rule.runOnIdle { relocationRequester.bringIntoView() }
 
         // Assert.
         rule.waitForIdle()
@@ -144,7 +144,7 @@ class RelocationRequesterModifierTest(private val orientation: Orientation) {
         }
 
         // Act.
-        rule.runOnIdle { relocationRequester.bringIntoParentBounds() }
+        rule.runOnIdle { relocationRequester.bringIntoView() }
 
         // Assert.
         rule.waitForIdle()
@@ -183,7 +183,7 @@ class RelocationRequesterModifierTest(private val orientation: Orientation) {
         }
 
         // Act.
-        rule.runOnIdle { relocationRequester.bringIntoParentBounds() }
+        rule.runOnIdle { relocationRequester.bringIntoView() }
 
         // Assert.
         rule.waitForIdle()
@@ -228,7 +228,7 @@ class RelocationRequesterModifierTest(private val orientation: Orientation) {
         }
 
         // Act.
-        rule.runOnIdle { relocationRequester.bringIntoParentBounds() }
+        rule.runOnIdle { relocationRequester.bringIntoView() }
 
         // Assert.
         rule.waitForIdle()
@@ -273,7 +273,7 @@ class RelocationRequesterModifierTest(private val orientation: Orientation) {
         }
 
         // Act.
-        rule.runOnIdle { relocationRequester.bringIntoParentBounds() }
+        rule.runOnIdle { relocationRequester.bringIntoView() }
 
         // Assert.
         rule.waitForIdle()
@@ -308,7 +308,7 @@ class RelocationRequesterModifierTest(private val orientation: Orientation) {
         }
 
         // Act.
-        rule.runOnIdle { relocationRequester.bringIntoParentBounds() }
+        rule.runOnIdle { relocationRequester.bringIntoView() }
 
         // Assert.
         rule.waitForIdle()
@@ -348,7 +348,7 @@ class RelocationRequesterModifierTest(private val orientation: Orientation) {
         rule.awaitIdle()
 
         // Act.
-        relocationRequester.bringIntoParentBounds()
+        relocationRequester.bringIntoView()
 
         // Assert.
         rule.awaitIdle()
@@ -388,7 +388,7 @@ class RelocationRequesterModifierTest(private val orientation: Orientation) {
         rule.awaitIdle()
 
         // Act.
-        relocationRequester.bringIntoParentBounds()
+        relocationRequester.bringIntoView()
 
         // Assert.
         rule.awaitIdle()
@@ -446,7 +446,7 @@ class RelocationRequesterModifierTest(private val orientation: Orientation) {
             rule.awaitIdle()
 
             // Act.
-            relocationRequester.bringIntoParentBounds()
+            relocationRequester.bringIntoView()
 
             // Assert.
             rule.awaitIdle()
@@ -504,7 +504,7 @@ class RelocationRequesterModifierTest(private val orientation: Orientation) {
             rule.awaitIdle()
 
             // Act.
-            relocationRequester.bringIntoParentBounds()
+            relocationRequester.bringIntoView()
 
             // Assert.
             rule.awaitIdle()
@@ -557,7 +557,7 @@ class RelocationRequesterModifierTest(private val orientation: Orientation) {
             rule.awaitIdle()
 
             // Act.
-            relocationRequester.bringIntoParentBounds()
+            relocationRequester.bringIntoView()
 
             // Assert.
             rule.awaitIdle()
@@ -615,7 +615,7 @@ class RelocationRequesterModifierTest(private val orientation: Orientation) {
             rule.awaitIdle()
 
             // Act.
-            relocationRequester.bringIntoParentBounds()
+            relocationRequester.bringIntoView()
 
             // Assert.
             rule.awaitIdle()
@@ -693,7 +693,7 @@ class RelocationRequesterModifierTest(private val orientation: Orientation) {
         rule.awaitIdle()
 
         // Act.
-        relocationRequester.bringIntoParentBounds()
+        relocationRequester.bringIntoView()
 
         // Assert.
         rule.awaitIdle()
@@ -757,7 +757,7 @@ class RelocationRequesterModifierTest(private val orientation: Orientation) {
             rule.awaitIdle()
 
             // Act.
-            relocationRequester.bringIntoParentBounds()
+            relocationRequester.bringIntoView()
 
             // Assert.
             rule.awaitIdle()
