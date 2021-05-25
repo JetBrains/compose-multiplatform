@@ -17,6 +17,7 @@
 package androidx.compose.foundation.lazy
 
 import androidx.compose.foundation.assertNotNestingScrollableContainers
+import androidx.compose.foundation.clipScrollableContainer
 import androidx.compose.foundation.gestures.FlingBehavior
 import androidx.compose.foundation.gestures.Orientation
 import androidx.compose.foundation.gestures.scrollable
@@ -31,7 +32,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clipToBounds
 import androidx.compose.ui.layout.SubcomposeLayout
 import androidx.compose.ui.layout.SubcomposeLayoutState
 import androidx.compose.ui.platform.LocalLayoutDirection
@@ -89,7 +89,7 @@ internal fun LazyList(
                 flingBehavior = flingBehavior,
                 state = state
             )
-            .clipToBounds()
+            .clipScrollableContainer(isVertical)
             .padding(contentPadding)
             .then(state.remeasurementModifier)
     ) { constraints ->
