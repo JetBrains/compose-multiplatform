@@ -30,6 +30,7 @@ dependencies {
 
     androidTestImplementation(project(":compose:ui:ui-test-junit4"))
     androidTestImplementation(ANDROIDX_TEST_RUNNER)
+    androidTestImplementation(ANDROIDX_TEST_CORE)
 }
 
 android {
