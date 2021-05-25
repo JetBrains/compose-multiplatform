@@ -406,7 +406,7 @@ private fun BottomSheetScaffoldStack(
 
             val fabOffsetX = when (floatingActionButtonPosition) {
                 FabPosition.Center -> (placeable.width - fabPlaceable.width) / 2
-                FabPosition.End -> placeable.width - fabPlaceable.width - FabEndSpacing.roundToPx()
+                else -> placeable.width - fabPlaceable.width - FabEndSpacing.roundToPx()
             }
             val fabOffsetY = sheetOffsetY - fabPlaceable.height / 2
 
