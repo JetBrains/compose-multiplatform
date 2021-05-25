@@ -16,7 +16,6 @@
 
 package androidx.compose.ui.graphics.vector
 
-import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.BlendMode
 import androidx.compose.ui.graphics.Canvas
 import androidx.compose.ui.graphics.Color
@@ -43,6 +42,7 @@ internal class DrawCache {
     private var cachedCanvas: Canvas? = null
     private var scopeDensity: Density? = null
     private var layoutDirection: LayoutDirection = LayoutDirection.Ltr
+    private var size: IntSize = IntSize.Zero
 
     private val cacheScope = CanvasDrawScope()
 
@@ -72,6 +72,7 @@ internal class DrawCache {
             mCachedImage = targetImage
             cachedCanvas = targetCanvas
         }
+        this.size = size
         cacheScope.draw(density, layoutDirection, targetCanvas, size.toSize()) {
             clear()
             block()
@@ -92,7 +93,7 @@ internal class DrawCache {
             "drawCachedImage must be invoked first before attempting to draw the result " +
                 "into another destination"
         }
-        target.drawImage(targetImage, Offset.Zero, alpha = alpha, colorFilter = colorFilter)
+        target.drawImage(targetImage, srcSize = size, alpha = alpha, colorFilter = colorFilter)
     }
 
     /**
