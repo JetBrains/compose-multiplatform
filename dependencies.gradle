@@ -31,4 +31,10 @@ excludes.espresso = {
     exclude group: "androidx.core"
 }
 
+excludes.mlkit = {
+    exclude group: "androidx.fragment"
+    exclude group: "androidx.core"
+    exclude group: "androidx.exifinterface"
+}
+
 rootProject.ext["excludes"] = excludes
