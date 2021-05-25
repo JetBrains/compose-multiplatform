@@ -99,7 +99,7 @@ object AppStylesheet : StyleSheet() {
     }
     
     // A convenient way to create a class selector
-    // AppStylesheet.container can be used a class name in components
+    // AppStylesheet.container can be used as a class in component attrs
     val container by style {
         color("red")
         
