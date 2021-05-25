@@ -191,12 +191,7 @@ internal class AndroidComposeView(context: Context) :
     override val autofillTree = AutofillTree()
 
     // OwnedLayers that are dirty and should be redrawn.
-    private val dirtyLayers = mutableListOf<OwnedLayer>()
-    // OwnerLayers that invalidated themselves during their last draw. They will be redrawn
-    // during the next AndroidComposeView dispatchDraw pass.
-    private var postponedDirtyLayers: MutableList<OwnedLayer>? = null
-
-    private var isDrawingContent = false
+    internal val dirtyLayers = mutableListOf<OwnedLayer>()
 
     private val motionEventAdapter = MotionEventAdapter()
     private val pointerInputEventProcessor = PointerInputEventProcessor(root)
@@ -644,7 +639,6 @@ internal class AndroidComposeView(context: Context) :
         }
         measureAndLayout()
 
-        isDrawingContent = true
         // we don't have to observe here because the root has a layer modifier
         // that will observe all children. The AndroidComposeView has only the
         // root, so it doesn't have to invalidate itself based on model changes.
@@ -655,18 +649,7 @@ internal class AndroidComposeView(context: Context) :
                 val layer = dirtyLayers[i]
                 layer.updateDisplayList()
             }
-        }
-        dirtyLayers.clear()
-        isDrawingContent = false
-
-        // updateDisplayList operations performed above (during root.draw and during the explicit
-        // layer.updateDisplayList() calls) can result in the same layers being invalidated. These
-        // layers have been added to postponedDirtyLayers and will be redrawn during the next
-        // dispatchDraw.
-        if (postponedDirtyLayers != null) {
-            val postponed = postponedDirtyLayers!!
-            dirtyLayers.addAll(postponed)
-            postponed.clear()
+            dirtyLayers.clear()
         }
 
         if (ViewLayer.shouldUseDispatchDraw) {
@@ -678,20 +661,6 @@ internal class AndroidComposeView(context: Context) :
 
             super.dispatchDraw(canvas)
             canvas.restoreToCount(saveCount)
-        }
-    }
-
-    internal fun notifyLayerIsDirty(layer: OwnedLayer, isDirty: Boolean) {
-        if (!isDirty) {
-            // It is correct to remove the layer here regardless of this if, but for performance
-            // we are hackily not doing the removal here in order to just do clear() a bit later.
-            if (!isDrawingContent) require(dirtyLayers.remove(layer))
-        } else if (!isDrawingContent) {
-            dirtyLayers += layer
-        } else {
-            val postponed = postponedDirtyLayers
-                ?: mutableListOf<OwnedLayer>().also { postponedDirtyLayers = it }
-            postponed += layer
         }
     }
 
