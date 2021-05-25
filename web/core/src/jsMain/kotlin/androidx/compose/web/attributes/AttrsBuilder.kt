@@ -74,6 +74,5 @@ class ClassesAttrBuilder {
 }
 
 val setClassList: (HTMLElement, Array<out String>) -> Unit = { e, classList ->
-    e.className = ""
     e.classList.add(*classList)
 }

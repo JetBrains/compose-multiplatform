@@ -6,9 +6,11 @@ import androidx.compose.runtime.setValue
 import androidx.compose.web.attributes.disabled
 import androidx.compose.web.attributes.forId
 import androidx.compose.web.elements.Button
+import androidx.compose.web.elements.Div
 import androidx.compose.web.elements.Label
 import androidx.compose.web.elements.Text
 import org.w3c.dom.HTMLButtonElement
+import org.w3c.dom.HTMLDivElement
 import runTest
 import kotlin.test.Test
 import kotlin.test.assertEquals
@@ -79,5 +81,88 @@ class AttributesTests {
         waitChanges()
 
         assertEquals("", btn.getAttribute("disabled"))
+    }
+
+    @Test
+    fun multipleClassesCallsAddMoreClasses() = runTest {
+        composition {
+            Div(attrs = {
+                classes("a", "b")
+                classes("c", "d")
+            }) {}
+        }
+
+        val div = root.firstChild as HTMLDivElement
+        assertEquals(
+            expected = "a b c d",
+            actual = div.getAttribute("class")
+        )
+    }
+
+    @Test
+    fun multipleClassesBuildersCallsAddMoreClasses() = runTest {
+        composition {
+            Div(attrs = {
+                classes("a", "b")
+                classes {
+                    +"c"
+                    +"d"
+                }
+            }) {}
+        }
+
+        val div = root.firstChild as HTMLDivElement
+        assertEquals(
+            expected = "a b c d",
+            actual = div.getAttribute("class")
+        )
+    }
+
+
+    @Test
+    fun multipleClassesBuildersCallsAddMoreClasses2() = runTest {
+        composition {
+            Div(attrs = {
+                classes {
+                    +"c"
+                    +"d"
+                }
+                classes("a", "b")
+            }) {}
+        }
+
+        val div = root.firstChild as HTMLDivElement
+        assertEquals(
+            expected = "c d a b",
+            actual = div.getAttribute("class")
+        )
+    }
+
+    @Test
+    fun multipleClassesBuildersCallsWithConditionsAddCorrectClasses() = runTest {
+        val addClassD = mutableStateOf(true)
+        composition {
+            Div(attrs = {
+                classes {
+                    +"c"
+                    if (addClassD.value) +"d"
+                }
+                classes("a", "b")
+            }) {}
+        }
+
+        val div = root.firstChild as HTMLDivElement
+        assertEquals(
+            expected = "c d a b",
+            actual = div.getAttribute("class")
+        )
+
+        addClassD.value = false
+        waitChanges()
+
+        assertEquals(
+            expected = "c a b",
+            actual = div.getAttribute("class")
+        )
     }
 }
