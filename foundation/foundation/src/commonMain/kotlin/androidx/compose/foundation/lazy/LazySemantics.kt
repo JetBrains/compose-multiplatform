@@ -16,13 +16,19 @@
 
 package androidx.compose.foundation.lazy
 
+import androidx.compose.foundation.gestures.ScrollableState
+import androidx.compose.foundation.gestures.scrollBy
 import androidx.compose.runtime.State
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.semantics.CollectionInfo
+import androidx.compose.ui.semantics.ScrollAxisRange
 import androidx.compose.ui.semantics.collectionInfo
+import androidx.compose.ui.semantics.horizontalScrollAxisRange
 import androidx.compose.ui.semantics.indexForKey
+import androidx.compose.ui.semantics.scrollBy
 import androidx.compose.ui.semantics.scrollToIndex
 import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.semantics.verticalScrollAxisRange
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 
@@ -41,6 +47,31 @@ internal fun Modifier.lazyListSemantics(
                 }
             }
             -1
+        }
+
+        val accessibilityScrollState = ScrollAxisRange(
+            value = {
+                // This is a simple way of representing the current position without
+                // needing any lazy items to be measured. It's good enough so far, because
+                // screen-readers care mostly about whether scroll position changed or not
+                // rather than the actual offset in pixels.
+                state.firstVisibleItemIndex + state.firstVisibleItemScrollOffset / 100_000f
+            },
+            maxValue = { Float.POSITIVE_INFINITY }
+        )
+        if (isVertical) {
+            verticalScrollAxisRange = accessibilityScrollState
+        } else {
+            horizontalScrollAxisRange = accessibilityScrollState
+        }
+
+        scrollBy { x, y ->
+            val delta = if (isVertical) { y } else { x }
+            coroutineScope.launch {
+                (state as ScrollableState).scrollBy(delta)
+            }
+            // TODO(aelias): is it important to return false if we know in advance we cannot scroll?
+            true
         }
 
         scrollToIndex { index ->

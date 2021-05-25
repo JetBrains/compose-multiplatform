@@ -45,8 +45,10 @@ import androidx.compose.ui.geometry.Rect
 import androidx.compose.ui.graphics.toAndroidRect
 import androidx.compose.ui.layout.boundsInParent
 import androidx.compose.ui.node.LayoutNode
+import androidx.compose.ui.node.OwnerScope
 import androidx.compose.ui.semantics.CustomAccessibilityAction
 import androidx.compose.ui.semantics.Role
+import androidx.compose.ui.semantics.ScrollAxisRange
 import androidx.compose.ui.semantics.SemanticsActions
 import androidx.compose.ui.semantics.SemanticsActions.CustomActions
 import androidx.compose.ui.semantics.SemanticsNode
@@ -1198,6 +1200,33 @@ internal class AndroidComposeViewAccessibilityDelegateCompat(val view: AndroidCo
             AccessibilityNodeInfoCompat.ACTION_DISMISS -> {
                 return node.config.getOrNull(SemanticsActions.Dismiss)?.action?.invoke() ?: false
             }
+            android.R.id.accessibilityActionShowOnScreen -> {
+                // TODO(b/190865803): Consider scrolling nested containers instead of only the first one.
+                var scrollableAncestor: SemanticsNode? = node.parent
+                var scrollAction = scrollableAncestor?.config?.getOrNull(SemanticsActions.ScrollBy)
+                while (scrollableAncestor != null) {
+                    if (scrollAction != null) {
+                        break
+                    }
+                    scrollableAncestor = scrollableAncestor.parent
+                    scrollAction = scrollableAncestor?.config?.getOrNull(SemanticsActions.ScrollBy)
+                }
+                if (scrollableAncestor == null) {
+                    return false
+                }
+
+                // TalkBack expects the minimum amount of movement to fully reveal the node.
+                var xDelta = node.size.width - node.boundsInWindow.width
+                if (node.boundsInWindow.left == scrollableAncestor.positionInWindow.x) {
+                    xDelta = -xDelta
+                }
+                var yDelta = node.size.height - node.boundsInWindow.height
+                if (node.boundsInWindow.top == scrollableAncestor.positionInWindow.y) {
+                    yDelta = -yDelta
+                }
+
+                return scrollAction?.action?.invoke(xDelta, yDelta) ?: false
+            }
             // TODO: handling for other system actions
             else -> {
                 val label = actionIdToLabel[virtualViewId]?.get(action) ?: return false
@@ -1601,14 +1630,23 @@ internal class AndroidComposeViewAccessibilityDelegateCompat(val view: AndroidCo
     internal fun sendSemanticsPropertyChangeEvents(
         newSemanticsNodes: Map<Int, SemanticsNodeWithAdjustedBounds>
     ) {
+        val oldScrollObservationScopes = ArrayList(scrollObservationScopes)
+        scrollObservationScopes.clear()
         for (id in newSemanticsNodes.keys) {
             // We do doing this search because the new configuration is set as a whole, so we
             // can't indicate which property is changed when setting the new configuration.
             val oldNode = previousSemanticsNodes[id] ?: continue
             val newNode = newSemanticsNodes[id]?.semanticsNode
             var propertyChanged = false
+
             for (entry in newNode!!.config) {
-                if (entry.value == oldNode.config.getOrNull(entry.key)) {
+                var newlyObservingScroll = false
+                if (entry.key == SemanticsProperties.HorizontalScrollAxisRange ||
+                    entry.key == SemanticsProperties.VerticalScrollAxisRange
+                ) {
+                    newlyObservingScroll = registerScrollingId(id, oldScrollObservationScopes)
+                }
+                if (!newlyObservingScroll && entry.value == oldNode.config.getOrNull(entry.key)) {
                     continue
                 }
                 @Suppress("UNCHECKED_CAST")
@@ -1707,47 +1745,16 @@ internal class AndroidComposeViewAccessibilityDelegateCompat(val view: AndroidCo
                     SemanticsProperties.HorizontalScrollAxisRange,
                     SemanticsProperties.VerticalScrollAxisRange -> {
                         // TODO(yingleiw): Add throttling for scroll/state events.
-                        val newXState = newNode.config.getOrNull(
-                            SemanticsProperties.HorizontalScrollAxisRange
-                        )
-                        val oldXState = oldNode.config.getOrNull(
-                            SemanticsProperties.HorizontalScrollAxisRange
-                        )
-                        val newYState = newNode.config.getOrNull(
-                            SemanticsProperties.VerticalScrollAxisRange
-                        )
-                        val oldYState = oldNode.config.getOrNull(
-                            SemanticsProperties.VerticalScrollAxisRange
-                        )
                         notifySubtreeAccessibilityStateChangedIfNeeded(newNode.layoutNode)
-                        val deltaX = if (newXState != null && oldXState != null) {
-                            newXState.value() - oldXState.value()
-                        } else {
-                            0f
-                        }
-                        val deltaY = if (newYState != null && oldYState != null) {
-                            newYState.value() - oldYState.value()
-                        } else {
-                            0f
-                        }
-                        if (deltaX != 0f || deltaY != 0f) {
-                            val event = createEvent(
-                                semanticsNodeIdToAccessibilityVirtualNodeId(id),
-                                AccessibilityEvent.TYPE_VIEW_SCROLLED
-                            )
-                            if (newXState != null) {
-                                event.scrollX = newXState.value().toInt()
-                                event.maxScrollX = newXState.maxValue().toInt()
-                            }
-                            if (newYState != null) {
-                                event.scrollY = newYState.value().toInt()
-                                event.maxScrollY = newYState.maxValue().toInt()
-                            }
-                            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
-                                Api28Impl.setScrollEventDelta(event, deltaX.toInt(), deltaY.toInt())
-                            }
-                            sendEvent(event)
-                        }
+
+                        val scope = scrollObservationScopes.findById(id)!!
+                        scope.horizontalScrollAxisRange = newNode.config.getOrNull(
+                            SemanticsProperties.HorizontalScrollAxisRange
+                        )
+                        scope.verticalScrollAxisRange = newNode.config.getOrNull(
+                            SemanticsProperties.VerticalScrollAxisRange
+                        )
+                        sendScrollEventIfNeeded(scope)
                     }
                     SemanticsProperties.Focused -> {
                         if (entry.value as Boolean) {
@@ -1810,6 +1817,93 @@ internal class AndroidComposeViewAccessibilityDelegateCompat(val view: AndroidCo
                     AccessibilityEvent.TYPE_WINDOW_CONTENT_CHANGED,
                     AccessibilityEvent.CONTENT_CHANGE_TYPE_UNDEFINED
                 )
+            }
+        }
+    }
+
+    // List of visible scrollable nodes (which are observing scroll state snapshot writes).
+    private val scrollObservationScopes = mutableListOf<ScrollObservationScope>()
+
+    /*
+     * Lambda to store in scrolling snapshot observer, which must never be recreated because
+     * the snapshot system makes use of lambda reference comparisons.
+     * (Note that recent versions of the Kotlin compiler do maintain a persistent
+     * object for most lambda expressions, so this is just for the purpose of explicitness.)
+     */
+    private val sendScrollEventIfNeededLambda: (ScrollObservationScope) -> Unit = {
+        this.sendScrollEventIfNeeded(it)
+    }
+
+    private fun registerScrollingId(
+        id: Int,
+        oldScrollObservationScopes: List<ScrollObservationScope>
+    ): Boolean {
+        var newlyObservingScroll = false
+        val oldScope = oldScrollObservationScopes.findById(id)
+        val newScope = if (oldScope != null) {
+            oldScope
+        } else {
+            newlyObservingScroll = true
+            ScrollObservationScope(
+                semanticsNodeId = id,
+                allScopes = scrollObservationScopes,
+                oldXValue = null,
+                oldYValue = null,
+                horizontalScrollAxisRange = null,
+                verticalScrollAxisRange = null
+            )
+        }
+        scrollObservationScopes.add(newScope)
+        return newlyObservingScroll
+    }
+
+    private fun sendScrollEventIfNeeded(scrollObservationScope: ScrollObservationScope) {
+        if (!scrollObservationScope.isValid) {
+            return
+        }
+        view.snapshotObserver.observeReads(scrollObservationScope, sendScrollEventIfNeededLambda) {
+            val newXState = scrollObservationScope.horizontalScrollAxisRange
+            val newYState = scrollObservationScope.verticalScrollAxisRange
+            val oldXValue = scrollObservationScope.oldXValue
+            val oldYValue = scrollObservationScope.oldYValue
+
+            val deltaX = if (newXState != null && oldXValue != null) {
+                newXState.value() - oldXValue
+            } else {
+                0f
+            }
+            val deltaY = if (newYState != null && oldYValue != null) {
+                newYState.value() - oldYValue
+            } else {
+                0f
+            }
+
+            if (deltaX != 0f || deltaY != 0f) {
+                val event = createEvent(
+                    semanticsNodeIdToAccessibilityVirtualNodeId(
+                        scrollObservationScope.semanticsNodeId
+                    ),
+                    AccessibilityEvent.TYPE_VIEW_SCROLLED
+                )
+                if (newXState != null) {
+                    event.scrollX = newXState.value().toInt()
+                    event.maxScrollX = newXState.maxValue().toInt()
+                }
+                if (newYState != null) {
+                    event.scrollY = newYState.value().toInt()
+                    event.maxScrollY = newYState.maxValue().toInt()
+                }
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
+                    Api28Impl.setScrollEventDelta(event, deltaX.toInt(), deltaY.toInt())
+                }
+                sendEvent(event)
+            }
+
+            if (newXState != null) {
+                scrollObservationScope.oldXValue = newXState.value()
+            }
+            if (newYState != null) {
+                scrollObservationScope.oldYValue = newYState.value()
             }
         }
     }
@@ -2341,4 +2435,27 @@ internal object AccessibilityNodeInfoVerificationHelperMethods {
     fun setAvailableExtraData(node: AccessibilityNodeInfo, data: List<String>) {
         node.availableExtraData = data
     }
+}
+
+// These objects are used as snapshot observation scopes for the purpose of sending accessibility
+// scroll events whenever the scroll offset changes.  There is one per scroller and their lifecycle
+// is the same as the scroller's lifecycle in the semantics tree.
+internal class ScrollObservationScope(
+    val semanticsNodeId: Int,
+    val allScopes: List<ScrollObservationScope>,
+    var oldXValue: Float?,
+    var oldYValue: Float?,
+    var horizontalScrollAxisRange: ScrollAxisRange?,
+    var verticalScrollAxisRange: ScrollAxisRange?
+) : OwnerScope {
+    override val isValid get() = allScopes.contains(this)
+}
+
+internal fun List<ScrollObservationScope>.findById(id: Int): ScrollObservationScope? {
+    for (index in indices) {
+        if (this[index].semanticsNodeId == id) {
+            return this[index]
+        }
+    }
+    return null
 }

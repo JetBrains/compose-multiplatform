@@ -25,9 +25,11 @@ import android.view.accessibility.AccessibilityNodeInfo
 import android.widget.FrameLayout
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.size
+import androidx.compose.runtime.snapshots.Snapshot
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
+import androidx.compose.runtime.structuralEqualityPolicy
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Rect
 import androidx.compose.ui.node.InnerPlaceable
@@ -597,55 +599,46 @@ class AndroidComposeViewAccessibilityDelegateCompatTest {
     }
 
     @Test
-    fun notSendScrollEvent_whenOnlyScrollAxisRangeMaxValueChanges() {
-        val oldSemanticsNode = createSemanticsNodeWithProperties(1, true) {
-            this.verticalScrollAxisRange = ScrollAxisRange({ 0f }, { 0f }, false)
+    fun sendScrollEvent_byStateObservation() {
+        var scrollValue by mutableStateOf(0f, structuralEqualityPolicy())
+        var scrollMaxValue by mutableStateOf(100f, structuralEqualityPolicy())
+
+        val semanticsNode = createSemanticsNodeWithProperties(1, false) {
+            verticalScrollAxisRange = ScrollAxisRange({ scrollValue }, { scrollMaxValue })
         }
+
         accessibilityDelegate.previousSemanticsNodes[1] =
             AndroidComposeViewAccessibilityDelegateCompat.SemanticsNodeCopy(
-                oldSemanticsNode,
+                semanticsNode,
                 mapOf()
             )
         val newNodes = mutableMapOf<Int, SemanticsNodeWithAdjustedBounds>()
-        newNodes[1] = createSemanticsNodeWithAdjustedBoundsWithProperties(1, true) {
-            this.verticalScrollAxisRange = ScrollAxisRange({ 0f }, { 5f }, false)
-        }
-        accessibilityDelegate.sendSemanticsPropertyChangeEvents(newNodes)
-
-        verify(container, never()).requestSendAccessibilityEvent(
-            eq(androidComposeView),
-            argThat(
-                ArgumentMatcher {
-                    it.eventType == AccessibilityEvent.TYPE_VIEW_SCROLLED
-                }
-            )
+        newNodes[1] = SemanticsNodeWithAdjustedBounds(
+            semanticsNode,
+            android.graphics.Rect()
         )
-    }
 
-    @Test
-    fun sendScrollEvent_whenScrollAxisRangeValueChanges() {
-        val oldSemanticsNode = createSemanticsNodeWithProperties(2, false) {
-            this.verticalScrollAxisRange = ScrollAxisRange({ 0f }, { 5f }, false)
+        try {
+            accessibilityDelegate.view.snapshotObserver.startObserving()
+
+            accessibilityDelegate.sendSemanticsPropertyChangeEvents(newNodes)
+
+            Snapshot.notifyObjectsInitialized()
+            scrollValue = 1f
+            Snapshot.sendApplyNotifications()
+        } finally {
+            accessibilityDelegate.view.snapshotObserver.stopObserving()
         }
-        accessibilityDelegate.previousSemanticsNodes[2] =
-            AndroidComposeViewAccessibilityDelegateCompat.SemanticsNodeCopy(
-                oldSemanticsNode,
-                mapOf()
-            )
-        val newNodes = mutableMapOf<Int, SemanticsNodeWithAdjustedBounds>()
-        newNodes[2] = createSemanticsNodeWithAdjustedBoundsWithProperties(2, false) {
-            this.verticalScrollAxisRange = ScrollAxisRange({ 2f }, { 5f }, false)
-        }
-        accessibilityDelegate.sendSemanticsPropertyChangeEvents(newNodes)
 
         verify(container, times(1)).requestSendAccessibilityEvent(
             eq(androidComposeView),
             argThat(
                 ArgumentMatcher {
-                    it.eventType == AccessibilityEvent.TYPE_VIEW_SCROLLED && it.scrollY == 2 &&
-                        it.maxScrollY == 5 &&
+                    it.eventType == AccessibilityEvent.TYPE_VIEW_SCROLLED &&
+                        it.scrollY == 1 &&
+                        it.maxScrollY == 100 &&
                         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
-                            it.scrollDeltaY == 2
+                            it.scrollDeltaY == 1
                         } else {
                             true
                         }
