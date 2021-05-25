@@ -13,6 +13,7 @@ pluginManagement {
     resolutionStrategy {
         eachPlugin {
             if (requested.id.id == "org.jetbrains.compose") {
+                println("[build] compose core version: ${extra["COMPOSE_CORE_VERSION"]}")
                 useModule("org.jetbrains.compose:org.jetbrains.compose.gradle.plugin:${extra["COMPOSE_CORE_VERSION"]}")
             }
         }
