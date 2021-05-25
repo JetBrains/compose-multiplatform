@@ -53,6 +53,8 @@ InvalidNullConversion: androidx.compose.ui.semantics.SemanticsPropertiesKt#getIm
     Attempted to remove @NonNull annotation from method androidx.compose.ui.semantics.SemanticsPropertiesKt.getImeAction(androidx.compose.ui.semantics.SemanticsPropertyReceiver)
 
 
+ParameterNameChange: androidx.compose.ui.focus.FocusManager#clearFocus(boolean) parameter #0:
+    Attempted to change parameter name from forcedClear to force in method androidx.compose.ui.focus.FocusManager.clearFocus
 ParameterNameChange: androidx.compose.ui.semantics.SemanticsPropertiesKt#setContentDescription(androidx.compose.ui.semantics.SemanticsPropertyReceiver, String) parameter #1:
     Attempted to change parameter name from p to value in method androidx.compose.ui.semantics.SemanticsPropertiesKt.setContentDescription
 ParameterNameChange: androidx.compose.ui.semantics.SemanticsPropertiesKt#setText(androidx.compose.ui.semantics.SemanticsPropertyReceiver, androidx.compose.ui.text.AnnotatedString) parameter #1:

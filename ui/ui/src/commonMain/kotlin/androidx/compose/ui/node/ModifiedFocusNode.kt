@@ -92,7 +92,7 @@ internal class ModifiedFocusNode(
         when (focusState) {
             // If this node is focused, set the focus on the root layoutNode before removing it.
             Active, Captured -> {
-                layoutNode.owner?.focusManager?.clearFocus(forcedClear = true)
+                layoutNode.owner?.focusManager?.clearFocus(force = true)
             }
             // Propagate the state of the next focus node to any focus observers in the hierarchy.
             ActiveParent -> {
