@@ -164,6 +164,7 @@ import androidx.compose.ui.test.up
 import androidx.compose.ui.test.width
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.unit.dp
+import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import android.view.KeyEvent as AndroidKeyEvent
@@ -370,6 +371,7 @@ private fun TestingCheatSheetAssertions() {
         .getUnclippedBoundsInRoot()
 }
 
+@OptIn(DelicateCoroutinesApi::class)
 @RequiresApi(Build.VERSION_CODES.O)
 private fun TestingCheatSheetOther() {
 

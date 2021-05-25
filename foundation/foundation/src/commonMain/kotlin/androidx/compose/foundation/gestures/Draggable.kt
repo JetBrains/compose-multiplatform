@@ -271,7 +271,7 @@ internal fun Modifier.draggable(
                             isDragSuccessful = false
                             if (!isActive) throw cancellation
                         } finally {
-                            channel.offer(if (isDragSuccessful) DragStopped else DragCancelled)
+                            channel.trySend(if (isDragSuccessful) DragStopped else DragCancelled)
                         }
                     }
                 }
@@ -318,9 +318,9 @@ private suspend fun AwaitPointerEventScope.awaitDrag(
     val overSlopOffset = initialDelta.toOffset(orientation)
     val adjustedStart = startEvent.position - overSlopOffset *
         sign(startEvent.position.toFloat(orientation))
-    channel.offer(DragStarted(adjustedStart))
+    channel.trySend(DragStarted(adjustedStart))
 
-    channel.offer(
+    channel.trySend(
         DragDelta(
             if (reverseDirection) initialDelta * -1 else initialDelta,
             startEvent.uptimeMillis
@@ -330,7 +330,7 @@ private suspend fun AwaitPointerEventScope.awaitDrag(
     val dragTick: (PointerInputChange) -> Unit = { event: PointerInputChange ->
         val delta = event.positionChange().toFloat(orientation)
         event.consumePositionChange()
-        channel.offer(DragDelta(if (reverseDirection) delta * -1 else delta, event.uptimeMillis))
+        channel.trySend(DragDelta(if (reverseDirection) delta * -1 else delta, event.uptimeMillis))
     }
     return if (orientation == Orientation.Vertical) {
         verticalDrag(startEvent.id, dragTick)
