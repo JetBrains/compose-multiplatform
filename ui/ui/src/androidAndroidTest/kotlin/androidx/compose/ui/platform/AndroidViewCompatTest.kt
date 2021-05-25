@@ -639,50 +639,6 @@ class AndroidViewCompatTest {
             .assertPixels(expectedColorProvider = offsetColorProvider)
     }
 
-    @Test
-    fun testInvalidationsDuringDraw_withLayerInBetween() {
-        var view: InvalidateDuringComputeScroll? = null
-        rule.setContent {
-            val context = LocalContext.current
-            view = remember { InvalidateDuringComputeScroll(context) }
-            // Note having a graphics layer here will cause the updateDisplayList to not happen
-            // in the initial redraw traversal.
-            AndroidView(factory = { view!! }, modifier = Modifier.graphicsLayer().graphicsLayer())
-        }
-
-        val invalidatesDuringScroll = 4
-        rule.runOnIdle {
-            view!!.apply {
-                draws = 0
-                this.invalidatesDuringScroll = invalidatesDuringScroll
-                invalidate()
-            }
-        }
-
-        rule.runOnIdle { assertEquals(invalidatesDuringScroll + 1, view!!.draws) }
-    }
-
-    @Test
-    fun testInvalidationsDuringDraw_sameLayerAsAndroidComposeView() {
-        var view: InvalidateDuringComputeScroll? = null
-        rule.setContent {
-            val context = LocalContext.current
-            view = remember { InvalidateDuringComputeScroll(context) }
-            AndroidView(factory = { view!! })
-        }
-
-        val invalidatesDuringScroll = 4
-        rule.runOnIdle {
-            view!!.apply {
-                draws = 0
-                this.invalidatesDuringScroll = invalidatesDuringScroll
-                invalidate()
-            }
-        }
-
-        rule.runOnIdle { assertEquals(invalidatesDuringScroll + 1, view!!.draws) }
-    }
-
     class ColoredSquareView(context: Context) : View(context) {
         var size: Int = 100
             set(value) {
@@ -737,23 +693,6 @@ class AndroidViewCompatTest {
             widthMeasureSpecRef?.value = widthMeasureSpec
             heightMeasureSpecRef?.value = heightMeasureSpec
             setMeasuredDimension(0, 0)
-        }
-    }
-
-    class InvalidateDuringComputeScroll(context: Context) : View(context) {
-        var draws = 0
-        var invalidatesDuringScroll = 0
-
-        override fun computeScroll() {
-            if (invalidatesDuringScroll > 0) {
-                --invalidatesDuringScroll
-                invalidate()
-            }
-        }
-
-        override fun onDraw(canvas: Canvas?) {
-            super.onDraw(canvas)
-            ++draws
         }
     }
 
