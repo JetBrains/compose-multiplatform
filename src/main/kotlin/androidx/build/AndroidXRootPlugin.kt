@@ -38,8 +38,12 @@ import org.gradle.kotlin.dsl.extra
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 import java.io.File
 import java.util.concurrent.ConcurrentHashMap
+import org.gradle.build.event.BuildEventsListenerRegistry
 
-class AndroidXRootPlugin : Plugin<Project> {
+abstract class AndroidXRootPlugin : Plugin<Project> {
+    @get:javax.inject.Inject
+    abstract val registry: BuildEventsListenerRegistry
+
     override fun apply(project: Project) {
         if (!project.isRoot) {
             throw Exception("This plugin should only be applied to root project")
@@ -219,7 +223,7 @@ class AndroidXRootPlugin : Plugin<Project> {
 
         registerStudioTask()
 
-        TaskUpToDateValidator.setup(project)
+        TaskUpToDateValidator.setup(project, registry)
 
         project.tasks.register("listTaskOutputs", ListTaskOutputsTask::class.java) { task ->
             task.setOutput(File(project.getDistributionDirectory(), "task_outputs.txt"))
