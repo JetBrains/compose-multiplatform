@@ -230,9 +230,6 @@ class AndroidXPlugin : Plugin<Project> {
                 configureAndroidLibraryWithMultiplatformPluginOptions()
             }
         }
-
-        // https://youtrack.jetbrains.com/issue/KT-46368
-        project.apply(plugin = "dev.zacsweers.kgp-150-leak-patcher")
     }
 
     @Suppress("UnstableApiUsage") // AGP DSL APIs

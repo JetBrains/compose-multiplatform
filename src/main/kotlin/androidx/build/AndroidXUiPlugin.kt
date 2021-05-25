@@ -128,9 +128,6 @@ class AndroidXUiPlugin : Plugin<Project> {
                 apply(plugin = "org.jetbrains.kotlin.android")
             }
 
-            // https://youtrack.jetbrains.com/issue/KT-46368
-            apply(plugin = "dev.zacsweers.kgp-150-leak-patcher")
-
             configureManifests()
             if (isMultiplatformEnabled) {
                 configureForMultiplatform()
