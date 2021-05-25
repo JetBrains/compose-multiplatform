@@ -562,7 +562,7 @@ abstract class SourcesVariantRule : ComponentMetadataRule {
     }
 }
 
-private const val DACKKA_DEPENDENCY = "com.google.devsite:dackka:0.0.4"
+private const val DACKKA_DEPENDENCY = "com.google.devsite:dackka:0.0.5"
 private const val DOCLAVA_DEPENDENCY = "com.android:doclava:1.0.6"
 
 // Allowlist for directories that should be processed by Dackka
