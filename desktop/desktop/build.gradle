@@ -68,8 +68,17 @@ kotlin {
     }
 }
 
+File getGoldenPath(Project project) {
+    if (System.getenv("COMPOSE_DESKTOP_GITHUB_BUILD") != null) {
+        def externalPath = SupportConfigKt.getExternalProjectPath(project)
+        return new File(externalPath, "golden")
+    } else {
+        return new File("${rootDir.absolutePath}/../../golden").getCanonicalFile()
+    }
+}
+
 tasks.findByName("jvmTest").configure {
-    systemProperties["GOLDEN_PATH"] = project.rootDir.absolutePath + "/../../golden"
+    systemProperties["GOLDEN_PATH"] = getGoldenPath(project).toString()
 }
 
 androidx {
