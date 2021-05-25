@@ -50,12 +50,6 @@ internal class RenderNodeLayer(
      * True when the RenderNodeLayer has been invalidated and not yet drawn.
      */
     private var isDirty = false
-        set(value) {
-            if (value != field) {
-                field = value
-                ownerView.notifyLayerIsDirty(this, value)
-            }
-        }
     private val outlineResolver = OutlineResolver(ownerView.density)
     private var isDestroyed = false
     private var drawnWithZ = false
@@ -186,6 +180,7 @@ internal class RenderNodeLayer(
     override fun invalidate() {
         if (!isDirty && !isDestroyed) {
             ownerView.invalidate()
+            ownerView.dirtyLayers += this
             isDirty = true
         }
     }
@@ -218,21 +213,23 @@ internal class RenderNodeLayer(
             }
         } else {
             drawBlock(canvas)
-            isDirty = false
         }
+        isDirty = false
     }
 
     override fun updateDisplayList() {
         if (isDirty || !renderNode.hasDisplayList) {
-            isDirty = false
             val clipPath = if (renderNode.clipToOutline) outlineResolver.clipPath else null
+
             renderNode.record(canvasHolder, clipPath, drawBlock)
+
+            isDirty = false
         }
     }
 
     override fun destroy() {
         isDestroyed = true
-        isDirty = false
+        ownerView.dirtyLayers -= this
         ownerView.requestClearInvalidObservations()
     }
 

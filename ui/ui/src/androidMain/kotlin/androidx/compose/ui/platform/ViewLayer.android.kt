@@ -56,12 +56,7 @@ internal class ViewLayer(
     private val manualClipPath: Path? get() =
         if (!clipToOutline) null else outlineResolver.clipPath
     var isInvalidated = false
-        private set(value) {
-            if (value != field) {
-                field = value
-                ownerView.notifyLayerIsDirty(this, value)
-            }
-        }
+        private set
     private var drawnWithZ = false
     private val canvasHolder = CanvasHolder()
 
@@ -230,7 +225,6 @@ internal class ViewLayer(
     }
 
     override fun dispatchDraw(canvas: android.graphics.Canvas) {
-        isInvalidated = false
         canvasHolder.drawInto(canvas) {
             val clipPath = manualClipPath
             if (clipPath != null) {
@@ -241,6 +235,7 @@ internal class ViewLayer(
             if (clipPath != null) {
                 restore()
             }
+            isInvalidated = false
         }
     }
 
@@ -248,6 +243,7 @@ internal class ViewLayer(
         if (!isInvalidated) {
             isInvalidated = true
             super.invalidate()
+            ownerView.dirtyLayers += this
             ownerView.invalidate()
         }
     }
@@ -259,14 +255,14 @@ internal class ViewLayer(
         container.postOnAnimation {
             container.removeView(this)
         }
-        isInvalidated = false
+        ownerView.dirtyLayers -= this
         ownerView.requestClearInvalidObservations()
     }
 
     override fun updateDisplayList() {
         if (isInvalidated && !shouldUseDispatchDraw) {
-            isInvalidated = false
             updateDisplayList(this)
+            isInvalidated = false
         }
     }
 
