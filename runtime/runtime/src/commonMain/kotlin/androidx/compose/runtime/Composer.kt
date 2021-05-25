@@ -3081,9 +3081,10 @@ inline class Updater<T> constructor(
         value: Int,
         noinline block: T.(value: Int) -> Unit
     ) = with(composer) {
+        val inserting = inserting
         if (inserting || rememberedValue() != value) {
             updateRememberedValue(value)
-            composer.apply(value, block)
+            if (!inserting) apply(value, block)
         }
     }
 
@@ -3102,9 +3103,10 @@ inline class Updater<T> constructor(
         value: V,
         block: T.(value: V) -> Unit
     ) = with(composer) {
+        val inserting = inserting
         if (inserting || rememberedValue() != value) {
             updateRememberedValue(value)
-            composer.apply(value, block)
+            if (!inserting) apply(value, block)
         }
     }
 
