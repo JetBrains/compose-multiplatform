@@ -62,6 +62,7 @@ import androidx.compose.ui.focus.FocusDirection.Companion.Up
 import androidx.compose.ui.focus.FocusManager
 import androidx.compose.ui.focus.FocusManagerImpl
 import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.geometry.Rect as ComposeRect
 import androidx.compose.ui.graphics.Canvas
 import androidx.compose.ui.graphics.CanvasHolder
 import androidx.compose.ui.graphics.Matrix
@@ -638,6 +639,10 @@ internal class AndroidComposeView(context: Context) :
         }
     }
 
+    override fun requestRectangleOnScreen(rect: ComposeRect) {
+        requestRectangleOnScreen(rect.toRect())
+    }
+
     override fun dispatchDraw(canvas: android.graphics.Canvas) {
         if (!isAttachedToWindow) {
             invalidateLayers(root)
@@ -1167,4 +1172,8 @@ private fun Matrix.invertTo(other: Matrix) {
     other[3, 1] = ((a00 * b09 - a01 * b07 + a02 * b06) * invDet)
     other[3, 2] = ((-a30 * b03 + a31 * b01 - a32 * b00) * invDet)
     other[3, 3] = ((a20 * b03 - a21 * b01 + a22 * b00) * invDet)
+}
+
+private fun ComposeRect.toRect(): Rect {
+    return Rect(left.toInt(), top.toInt(), right.toInt(), bottom.toInt())
 }

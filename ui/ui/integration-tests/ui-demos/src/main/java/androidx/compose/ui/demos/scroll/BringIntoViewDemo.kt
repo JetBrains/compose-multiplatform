@@ -42,7 +42,7 @@ import androidx.compose.ui.unit.dp
 
 @OptIn(ExperimentalComposeUiApi::class)
 @Composable
-fun BringIntoParentBoundsDemo() {
+fun BringIntoViewDemo() {
     val greenRequester = remember { RelocationRequester() }
     val redRequester = remember { RelocationRequester() }
     Column {
@@ -54,10 +54,10 @@ fun BringIntoParentBoundsDemo() {
             Box(Modifier.background(Red).size(100.dp).relocationRequester(redRequester))
             Box(Modifier.background(LightGray).size(100.dp))
         }
-        Button(onClick = { greenRequester.bringIntoParentBounds() }) {
+        Button(onClick = { greenRequester.bringIntoView() }) {
             Text("Bring Green box into view")
         }
-        Button(onClick = { redRequester.bringIntoParentBounds() }) {
+        Button(onClick = { redRequester.bringIntoView() }) {
             Text("Bring Red box into view")
         }
     }

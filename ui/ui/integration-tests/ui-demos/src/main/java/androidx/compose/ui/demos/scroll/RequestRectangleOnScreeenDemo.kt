@@ -14,37 +14,40 @@
  * limitations under the License.
  */
 
-package androidx.compose.ui.samples
+package androidx.compose.ui.demos.scroll
 
-import androidx.annotation.Sampled
-import androidx.compose.foundation.horizontalScroll
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.rememberScrollState
 import androidx.compose.material.Button
 import androidx.compose.material.Text
+import androidx.compose.material.TextField
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.RelocationRequester
 import androidx.compose.ui.layout.relocationRequester
 import androidx.compose.ui.unit.dp
 
-@ExperimentalComposeUiApi
-@Sampled
+@OptIn(ExperimentalComposeUiApi::class)
 @Composable
-fun BringIntoViewSample() {
+fun RequestRectangleOnScreenDemo() {
     val relocationRequester = remember { RelocationRequester() }
     Column {
-        Box(Modifier.width(100.dp).horizontalScroll(rememberScrollState())) {
-            Box(Modifier.size(100.dp))
-            Box(Modifier.size(100.dp).relocationRequester(relocationRequester))
-        }
+        TextField(value = "Click here to bring up the soft keyboard", onValueChange = {})
         Button(onClick = { relocationRequester.bringIntoView() }) {
-            Text("Bring box into view")
+            Text("Bring blue rectangle into view")
         }
+        Spacer(Modifier.weight(weight = 1f, fill = true))
+        Box(
+            Modifier
+                .size(50.dp)
+                .background(Color.Blue)
+                .relocationRequester(relocationRequester)
+        )
     }
 }

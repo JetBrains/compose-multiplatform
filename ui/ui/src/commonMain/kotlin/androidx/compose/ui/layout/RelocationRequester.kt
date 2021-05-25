@@ -24,20 +24,20 @@ import androidx.compose.ui.ExperimentalComposeUiApi
  * This class can be used to send relocation requests. Pass it as a parameter to
  * [Modifier.relocationRequester()][relocationRequester].
  *
- * For instance, you can call [RelocationRequester.bringIntoParentBounds][bringIntoParentBounds] to
+ * For instance, you can call [RelocationRequester.bringIntoView][bringIntoView] to
  * make all the scrollable parents scroll so that the specified item is brought into parent
  * bounds. This sample demonstrates this use case:
  *
- * @sample androidx.compose.ui.samples.BringIntoParentBoundsSample
+ * @sample androidx.compose.ui.samples.BringIntoViewSample
  */
 @ExperimentalComposeUiApi
 class RelocationRequester {
     internal val modifiers: MutableVector<RelocationRequesterModifier> = mutableVectorOf()
 
     /**
-     * Bring this item into parent bounds by making all the scrollable parents scroll appropriately.
+     * Bring this item into bounds by making all the scrollable parents scroll appropriately.
      */
-    fun bringIntoParentBounds() {
-        modifiers.forEach { it.bringIntoParentBounds() }
+    fun bringIntoView() {
+        modifiers.forEach { it.bringIntoView() }
     }
 }
