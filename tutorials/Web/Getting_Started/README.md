@@ -42,8 +42,8 @@ pluginManagement {
 ```kotlin
 // Add compose gradle plugin
 plugins {
-    kotlin("multiplatform") version "1.4.32"
-    id("org.jetbrains.compose") version "0.0.0-web-dev-11"
+    kotlin("multiplatform") version "1.5.0"
+    id("org.jetbrains.compose") version "0.0.0-web-dev-13"
 }
 
 // Add maven repositories
@@ -61,7 +61,7 @@ kotlin {
     sourceSets {
         val jsMain by getting {
             dependencies {
-                implementation(compose.web.web)
+                implementation(compose.web.core)
                 implementation(compose.runtime)
             }
         }
