@@ -47,7 +47,7 @@ internal actual fun SelectionHandle(
     directions: Pair<ResolvedTextDirection, ResolvedTextDirection>,
     handlesCrossed: Boolean,
     modifier: Modifier,
-    handle: (@Composable () -> Unit)?
+    content: @Composable (() -> Unit)?
 ) {
     SelectionHandlePopup(
         startHandlePosition = startHandlePosition,
@@ -56,14 +56,14 @@ internal actual fun SelectionHandle(
         directions = directions,
         handlesCrossed = handlesCrossed
     ) {
-        if (handle == null) {
+        if (content == null) {
             DefaultSelectionHandle(
                 modifier = modifier,
                 isStartHandle = isStartHandle,
                 directions = directions,
                 handlesCrossed = handlesCrossed
             )
-        } else handle()
+        } else content()
     }
 }
 

@@ -31,6 +31,7 @@ import androidx.compose.ui.InternalComposeUiApi
 import androidx.lifecycle.LifecycleOwner
 import androidx.test.ext.junit.rules.activityScenarioRule
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import androidx.test.filters.LargeTest
 import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.runBlocking
@@ -57,6 +58,7 @@ class ComposeViewOverlayTest {
      * originally attached to the target window "for real."
      */
     @OptIn(InternalComposeUiApi::class)
+    @LargeTest
     @Test
     fun testComposeViewMovedToOverlay() {
         var factoryCallCount = 0

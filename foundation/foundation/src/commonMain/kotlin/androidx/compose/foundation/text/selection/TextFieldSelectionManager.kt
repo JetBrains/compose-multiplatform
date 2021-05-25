@@ -682,7 +682,7 @@ internal fun TextFieldSelectionHandle(
         modifier = Modifier.pointerInput(observer) {
             detectDragGesturesWithObserver(observer)
         },
-        handle = null
+        content = null
     )
 }
 

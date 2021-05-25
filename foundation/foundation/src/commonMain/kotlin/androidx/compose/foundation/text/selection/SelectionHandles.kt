@@ -33,7 +33,7 @@ internal expect fun SelectionHandle(
     directions: Pair<ResolvedTextDirection, ResolvedTextDirection>,
     handlesCrossed: Boolean,
     modifier: Modifier,
-    handle: (@Composable () -> Unit)?
+    content: @Composable (() -> Unit)?
 )
 
 /**
