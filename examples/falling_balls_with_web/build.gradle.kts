@@ -2,8 +2,8 @@
 import org.jetbrains.compose.desktop.application.dsl.TargetFormat
 
 plugins {
-    id("org.jetbrains.kotlin.multiplatform") version "1.4.32"
-    id("org.jetbrains.compose") version "0.0.0-web-dev-12"
+    id("org.jetbrains.kotlin.multiplatform") version "1.5.0"
+    id("org.jetbrains.compose") version "0.0.0-web-dev-13"
 }
 
 version = "1.0-SNAPSHOT"
@@ -30,7 +30,7 @@ kotlin {
         val commonMain by getting {
             dependencies {
                 implementation(kotlin("stdlib-common"))
-                implementation(compose.web.web)
+                implementation(compose.web.widgets)
                 implementation(compose.runtime)
             }
         }

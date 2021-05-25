@@ -1,6 +1,6 @@
 plugins {
-    id("org.jetbrains.kotlin.multiplatform") version "1.4.32"
-    id("org.jetbrains.compose") version "0.0.0-web-dev-11"
+    id("org.jetbrains.kotlin.multiplatform") version "1.5.0"
+    id("org.jetbrains.compose") version "0.0.0-web-dev-13"
 }
 
 repositories {
@@ -18,7 +18,7 @@ kotlin {
         val jsMain by getting {
             dependencies {
                 implementation(npm("highlight.js", "10.7.2"))
-                implementation(compose.web.web)
+                implementation(compose.web.core)
                 implementation(compose.runtime)
             }
         }
