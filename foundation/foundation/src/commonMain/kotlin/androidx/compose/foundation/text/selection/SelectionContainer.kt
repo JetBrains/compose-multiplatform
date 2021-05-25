@@ -113,7 +113,7 @@ internal fun SelectionContainer(
                             modifier = Modifier.pointerInput(observer) {
                                 detectDragGesturesWithObserver(observer)
                             },
-                            handle = null
+                            content = null
                         )
                     }
                 }

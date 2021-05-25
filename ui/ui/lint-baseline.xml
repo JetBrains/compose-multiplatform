@@ -12,4 +12,70 @@
             column="63"/>
     </issue>
 
+    <issue
+        id="BanUncheckedReflection"
+        message="Calling Method.invoke without an SDK check"
+        errorLine1="                updateDisplayListIfDirtyMethod?.invoke(view)"
+        errorLine2="                ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/androidMain/kotlin/androidx/compose/ui/platform/ViewLayer.android.kt"
+            line="337"
+            column="17"/>
+    </issue>
+
+    <issue
+        id="ClassVerificationFailure"
+        message="This call references a method added in API level 26; however, the containing class androidx.compose.ui.autofill.AndroidAutofillDebugUtils_androidKt is reachable from earlier API levels and will fail run-time class verification."
+        errorLine1="    autofillManager.registerCallback(AutofillCallback)"
+        errorLine2="                    ~~~~~~~~~~~~~~~~">
+        <location
+            file="src/androidMain/kotlin/androidx/compose/ui/autofill/AndroidAutofillDebugUtils.android.kt"
+            line="67"
+            column="21"/>
+    </issue>
+
+    <issue
+        id="ClassVerificationFailure"
+        message="This call references a method added in API level 26; however, the containing class androidx.compose.ui.autofill.AndroidAutofillDebugUtils_androidKt is reachable from earlier API levels and will fail run-time class verification."
+        errorLine1="    autofillManager.unregisterCallback(AutofillCallback)"
+        errorLine2="                    ~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/androidMain/kotlin/androidx/compose/ui/autofill/AndroidAutofillDebugUtils.android.kt"
+            line="77"
+            column="21"/>
+    </issue>
+
+    <issue
+        id="ClassVerificationFailure"
+        message="This call references a method added in API level 23; however, the containing class androidx.compose.ui.res.ColorResources_androidKt is reachable from earlier API levels and will fail run-time class verification."
+        errorLine1="        Color(context.resources.getColor(id, context.theme))"
+        errorLine2="                                ~~~~~~~~">
+        <location
+            file="src/androidMain/kotlin/androidx/compose/ui/res/ColorResources.android.kt"
+            line="37"
+            column="33"/>
+    </issue>
+
+    <issue
+        id="ClassVerificationFailure"
+        message="This call references a method added in API level 29; however, the containing class androidx.compose.ui.input.pointer.MotionEventAdapter_androidKt is reachable from earlier API levels and will fail run-time class verification."
+        errorLine1="    return Offset(getRawX(index), getRawY(index))"
+        errorLine2="                  ~~~~~~~">
+        <location
+            file="src/androidMain/kotlin/androidx/compose/ui/input/pointer/MotionEventAdapter.android.kt"
+            line="194"
+            column="19"/>
+    </issue>
+
+    <issue
+        id="ClassVerificationFailure"
+        message="This call references a method added in API level 29; however, the containing class androidx.compose.ui.input.pointer.MotionEventAdapter_androidKt is reachable from earlier API levels and will fail run-time class verification."
+        errorLine1="    return Offset(getRawX(index), getRawY(index))"
+        errorLine2="                                  ~~~~~~~">
+        <location
+            file="src/androidMain/kotlin/androidx/compose/ui/input/pointer/MotionEventAdapter.android.kt"
+            line="194"
+            column="35"/>
+    </issue>
+
 </issues>

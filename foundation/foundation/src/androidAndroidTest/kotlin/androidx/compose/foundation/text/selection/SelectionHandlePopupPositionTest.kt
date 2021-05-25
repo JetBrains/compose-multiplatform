@@ -187,7 +187,7 @@ class SelectionHandlePopupPositionTest {
                             modifier = Modifier.onGloballyPositioned {
                                 measureLatch.countDown()
                             },
-                            handle = null
+                            content = null
                         )
                     }
                 }

@@ -214,7 +214,12 @@ Fix for src/androidx/compose/ui/foo/Foo.kt line 9: Rename text to content:
                 @Composable
                 fun Button(
                     text: @Composable (() -> Unit)?,
-                    icon: @Composable () -> Unit,
+                    foo: Int
+                ) {}
+
+                @Composable
+                fun Button2(
+                    text: (@Composable () -> Unit)?,
                     foo: Int
                 ) {}
             """
@@ -222,7 +227,35 @@ Fix for src/androidx/compose/ui/foo/Foo.kt line 9: Rename text to content:
             kotlin(Stubs.Composable)
         )
             .run()
-            .expectClean()
+            .expect(
+                """
+src/androidx/compose/ui/foo/test.kt:8: Warning: Composable lambda parameter should be named content [ComposableLambdaParameterNaming]
+                    text: @Composable (() -> Unit)?,
+                    ~~~~
+src/androidx/compose/ui/foo/test.kt:14: Warning: Composable lambda parameter should be named content [ComposableLambdaParameterNaming]
+                    text: (@Composable () -> Unit)?,
+                    ~~~~
+src/androidx/compose/ui/foo/test.kt:8: Warning: Composable lambda parameter should be the last parameter so it can be used as a trailing lambda [ComposableLambdaParameterPosition]
+                    text: @Composable (() -> Unit)?,
+                    ~~~~
+src/androidx/compose/ui/foo/test.kt:14: Warning: Composable lambda parameter should be the last parameter so it can be used as a trailing lambda [ComposableLambdaParameterPosition]
+                    text: (@Composable () -> Unit)?,
+                    ~~~~
+0 errors, 4 warnings
+            """
+            )
+            .expectFixDiffs(
+                """
+Fix for src/androidx/compose/ui/foo/test.kt line 8: Rename text to content:
+@@ -8 +8
+-                     text: @Composable (() -> Unit)?,
++                     content: @Composable (() -> Unit)?,
+Fix for src/androidx/compose/ui/foo/test.kt line 14: Rename text to content:
+@@ -14 +14
+-                     text: (@Composable () -> Unit)?,
++                     content: (@Composable () -> Unit)?,
+            """
+            )
     }
 
     @Test
