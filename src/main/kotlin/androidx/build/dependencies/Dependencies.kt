@@ -197,5 +197,3 @@ val LINT_API_LATEST get() = "com.android.tools.lint:lint-api:$lintVersion"
 val LINT_CHECKS_LATEST get() = "com.android.tools.lint:lint-checks:$lintVersion"
 val LINT_CORE get() = "com.android.tools.lint:lint:$lintVersion"
 val LINT_TESTS get() = "com.android.tools.lint:lint-tests:$lintVersion"
-
-const val MLKIT_GMS_BARCODE = "com.google.android.gms:play-services-mlkit-barcode-scanning:16.1.4"
