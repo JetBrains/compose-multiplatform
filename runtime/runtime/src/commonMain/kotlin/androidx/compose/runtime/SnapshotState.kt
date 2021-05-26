@@ -74,7 +74,7 @@ fun <T> mutableStateOf(
  * @see [mutableStateOf]
  */
 @Stable
-interface State<T> {
+interface State<out T> {
     val value: T
 }
 

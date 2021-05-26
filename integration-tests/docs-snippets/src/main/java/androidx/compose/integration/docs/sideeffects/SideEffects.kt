@@ -210,7 +210,7 @@ private object SideEffectsSnippet6 {
         // Creates a State<T> with Result.Loading as initial value
         // If either `url` or `imageRepository` changes, the running producer
         // will cancel and will be re-launched with the new inputs.
-        return produceState(initialValue = Result.Loading, url, imageRepository) {
+        return produceState<Result<Image>>(initialValue = Result.Loading, url, imageRepository) {
 
             // In a coroutine, can make suspend calls
             val image = imageRepository.load(url)
