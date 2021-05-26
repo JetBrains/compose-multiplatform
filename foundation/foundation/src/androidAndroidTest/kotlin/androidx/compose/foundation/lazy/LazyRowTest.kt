@@ -1169,6 +1169,65 @@ class LazyRowTest {
             )
     }
 
+    @Test
+    fun initialScrollPositionIsCorrectWhenItemsAreLoadedAsynchronously() {
+        lateinit var state: LazyListState
+        var itemsCount by mutableStateOf(0)
+        rule.setContent {
+            state = rememberLazyListState(2, 10)
+            LazyRow(Modifier.fillMaxSize(), state) {
+                items(itemsCount) {
+                    Box(Modifier.size(20.dp))
+                }
+            }
+        }
+
+        rule.runOnIdle {
+            itemsCount = 100
+        }
+
+        rule.runOnIdle {
+            assertThat(state.firstVisibleItemIndex).isEqualTo(2)
+            assertThat(state.firstVisibleItemScrollOffset).isEqualTo(10)
+        }
+    }
+
+    @Test
+    fun restoredScrollPositionIsCorrectWhenItemsAreLoadedAsynchronously() {
+        lateinit var state: LazyListState
+        var itemsCount = 100
+        val recomposeCounter = mutableStateOf(0)
+        val tester = StateRestorationTester(rule)
+        tester.setContent {
+            state = rememberLazyListState()
+            LazyRow(Modifier.fillMaxSize(), state) {
+                recomposeCounter.value
+                items(itemsCount) {
+                    Box(Modifier.size(20.dp))
+                }
+            }
+        }
+
+        rule.runOnIdle {
+            runBlocking {
+                state.scrollToItem(2, 10)
+            }
+            itemsCount = 0
+        }
+
+        tester.emulateSavedInstanceStateRestore()
+
+        rule.runOnIdle {
+            itemsCount = 100
+            recomposeCounter.value = 1
+        }
+
+        rule.runOnIdle {
+            assertThat(state.firstVisibleItemIndex).isEqualTo(2)
+            assertThat(state.firstVisibleItemScrollOffset).isEqualTo(10)
+        }
+    }
+
     private fun LazyListState.scrollBy(offset: Dp) {
         runBlocking(Dispatchers.Main + AutoTestFrameClock()) {
             animateScrollBy(with(rule.density) { offset.roundToPx().toFloat() }, snap())
