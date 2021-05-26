@@ -15,7 +15,7 @@
  */
 package androidx.compose.desktop
 
-import androidx.compose.ui.window.MenuBar
+import androidx.compose.ui.window.v1.MenuBar
 
 object AppManager {
 

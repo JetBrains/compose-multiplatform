@@ -1,5 +1,5 @@
 /*
- * Copyright 2020 The Android Open Source Project
+ * Copyright 2021 The Android Open Source Project
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,15 +13,15 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package androidx.compose.ui.window
+package androidx.compose.ui.window.v1
 
-import java.awt.event.ActionListener
-import java.awt.event.ActionEvent
 import java.awt.Image
 import java.awt.PopupMenu
 import java.awt.SystemTray
 import java.awt.TrayIcon
 import java.awt.TrayIcon.MessageType
+import java.awt.event.ActionEvent
+import java.awt.event.ActionListener
 
 /**
  * Tray is class for working with the system tray.
