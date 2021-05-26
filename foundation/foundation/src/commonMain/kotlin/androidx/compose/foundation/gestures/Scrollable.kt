@@ -147,7 +147,7 @@ private fun Modifier.touchScrollImplementation(
     val draggableState = remember { ScrollDraggableState(scrollLogic) }
 
     return draggable(
-        draggableState,
+        { draggableState },
         orientation = orientation,
         enabled = enabled,
         interactionSource = interactionSource,
@@ -199,7 +199,7 @@ private class ScrollingLogic(
             leftForParent.toOffset(),
             source
         )
-        return leftForParent
+        return if (source == Drag) consumed else leftForParent
     }
 
     fun performRawScroll(scroll: Offset): Offset {
@@ -250,20 +250,20 @@ private class ScrollingLogic(
 
 private class ScrollDraggableState(
     val scrollLogic: State<ScrollingLogic>
-) : DraggableState, DragScope {
+) : ConsumptionBasedDraggableState, ConsumptionBasedDragScope {
     var latestScrollScope: ScrollScope = NoOpScrollScope
 
-    override fun dragBy(pixels: Float) {
+    override fun dragBy(pixels: Float): Float {
         with(scrollLogic.value) {
             with(latestScrollScope) {
-                dispatchScroll(pixels, Drag)
+                return dispatchScroll(pixels, Drag)
             }
         }
     }
 
     override suspend fun drag(
         dragPriority: MutatePriority,
-        block: suspend DragScope.() -> Unit
+        block: suspend ConsumptionBasedDragScope.() -> Unit
     ) {
         scrollLogic.value.scrollableState.scroll(dragPriority) {
             latestScrollScope = this
