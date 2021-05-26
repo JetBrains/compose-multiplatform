@@ -26,7 +26,6 @@ inline fun <TScope, T, reified E : Applier<*>> ComposeDomNode(
     noinline factory: () -> T,
     elementScope: TScope,
     noinline attrsSkippableUpdate: @Composable SkippableUpdater<T>.() -> Unit,
-    noinline styleSkippableUpdate: @Composable SkippableUpdater<T>.() -> Unit,
     content: @Composable TScope.() -> Unit
 ) {
     if (currentComposer.applier !is E) error("Invalid applier")
@@ -36,11 +35,11 @@ inline fun <TScope, T, reified E : Applier<*>> ComposeDomNode(
     } else {
         currentComposer.useNode()
     }
-//    Updater<T>(currentComposer).update()
+
     SkippableUpdater<T>(currentComposer).apply {
         attrsSkippableUpdate()
-        styleSkippableUpdate()
     }
+
     currentComposer.startReplaceableGroup(0x7ab4aae9)
     content(elementScope)
     currentComposer.endReplaceableGroup()
@@ -78,12 +77,6 @@ inline fun <TTag : Tag, THTMLElement : HTMLElement> TagElement(
                 set(attrsApplied.propertyUpdates, DomNodeWrapper.UpdateProperties)
                 set(attrsApplied.styleBuilder, DomNodeWrapper.UpdateStyleDeclarations)
             }
-        },
-        styleSkippableUpdate = {
-//            val style = StyleBuilderImpl().apply(applyStyle)
-//            update {
-//                set(style, DomNodeWrapper.UpdateStyleDeclarations)
-//            }
         },
         elementScope = scope,
         content = content
