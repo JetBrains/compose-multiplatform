@@ -293,7 +293,7 @@ internal class AndroidComposeView(context: Context) :
      * Current [ViewTreeOwners]. Use [setOnViewTreeOwnersAvailable] if you want to
      * execute your code when the object will be created.
      */
-    var viewTreeOwners: ViewTreeOwners? = null
+    var viewTreeOwners: ViewTreeOwners? by mutableStateOf(null)
         private set
 
     private var onViewTreeOwnersAvailable: ((ViewTreeOwners) -> Unit)? = null
@@ -716,7 +716,8 @@ internal class AndroidComposeView(context: Context) :
         val viewTreeOwners = viewTreeOwners
         if (viewTreeOwners != null) {
             callback(viewTreeOwners)
-        } else {
+        }
+        if (!isAttachedToWindow) {
             onViewTreeOwnersAvailable = callback
         }
     }
@@ -764,15 +765,34 @@ internal class AndroidComposeView(context: Context) :
         snapshotObserver.startObserving()
         ifDebug { if (autofillSupported()) _autofill?.registerCallback() }
 
-        if (viewTreeOwners == null) {
-            val lifecycleOwner = ViewTreeLifecycleOwner.get(this) ?: throw IllegalStateException(
-                "Composed into the View which doesn't propagate ViewTreeLifecycleOwner!"
-            )
-            val savedStateRegistryOwner =
-                ViewTreeSavedStateRegistryOwner.get(this) ?: throw IllegalStateException(
+        val lifecycleOwner = ViewTreeLifecycleOwner.get(this)
+        val savedStateRegistryOwner = ViewTreeSavedStateRegistryOwner.get(this)
+
+        val oldViewTreeOwners = viewTreeOwners
+        // We need to change the ViewTreeOwner if there isn't one yet (null)
+        // or if either the lifecycleOwner or savedStateRegistryOwner has changed.
+        val resetViewTreeOwner = oldViewTreeOwners == null ||
+            (
+                (lifecycleOwner != null && savedStateRegistryOwner != null) &&
+                    (
+                        lifecycleOwner !== oldViewTreeOwners.lifecycleOwner ||
+                            savedStateRegistryOwner !== oldViewTreeOwners.lifecycleOwner
+                        )
+                )
+        if (resetViewTreeOwner) {
+            if (lifecycleOwner == null) {
+                throw IllegalStateException(
+                    "Composed into the View which doesn't propagate ViewTreeLifecycleOwner!"
+                )
+            }
+            if (savedStateRegistryOwner == null) {
+                throw IllegalStateException(
                     "Composed into the View which doesn't propagate" +
                         "ViewTreeSavedStateRegistryOwner!"
                 )
+            }
+            oldViewTreeOwners?.lifecycleOwner?.lifecycle?.removeObserver(this)
+            lifecycleOwner.lifecycle.addObserver(this)
             val viewTreeOwners = ViewTreeOwners(
                 lifecycleOwner = lifecycleOwner,
                 savedStateRegistryOwner = savedStateRegistryOwner
