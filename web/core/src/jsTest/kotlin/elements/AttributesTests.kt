@@ -1,4 +1,4 @@
-package elements
+package org.jetbrains.compose.web.core.tests
 
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.getValue
@@ -11,7 +11,6 @@ import androidx.compose.web.elements.Label
 import androidx.compose.web.elements.Text
 import org.w3c.dom.HTMLButtonElement
 import org.w3c.dom.HTMLDivElement
-import runTest
 import kotlin.test.Test
 import kotlin.test.assertEquals
 

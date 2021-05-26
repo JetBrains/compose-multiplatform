@@ -1,3 +1,5 @@
+package org.jetbrains.compose.web.core.tests
+
 import androidx.compose.web.css.AlignContent
 import androidx.compose.web.css.AlignItems
 import androidx.compose.web.css.AlignSelf

@@ -1,4 +1,4 @@
-package elements
+package org.jetbrains.compose.web.core.tests
 
 import androidx.compose.web.attributes.InputType
 import androidx.compose.web.elements.Button
@@ -10,7 +10,6 @@ import org.w3c.dom.HTMLTextAreaElement
 import org.w3c.dom.events.Event
 import org.w3c.dom.events.InputEvent
 import org.w3c.dom.events.MouseEvent
-import runTest
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertTrue

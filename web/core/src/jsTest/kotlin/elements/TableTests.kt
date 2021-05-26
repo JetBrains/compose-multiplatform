@@ -1,4 +1,4 @@
-package elements
+package org.jetbrains.compose.web.core.tests
 
 import androidx.compose.web.attributes.Scope
 import androidx.compose.web.attributes.colspan
@@ -17,7 +17,6 @@ import androidx.compose.web.elements.Th
 import androidx.compose.web.elements.Thead
 import androidx.compose.web.elements.Tr
 import org.w3c.dom.HTMLElement
-import runTest
 import kotlin.test.Test
 import kotlin.test.assertEquals
 

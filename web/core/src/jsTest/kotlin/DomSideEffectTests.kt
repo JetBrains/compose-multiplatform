@@ -1,3 +1,5 @@
+package org.jetbrains.compose.web.core.tests
+
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
