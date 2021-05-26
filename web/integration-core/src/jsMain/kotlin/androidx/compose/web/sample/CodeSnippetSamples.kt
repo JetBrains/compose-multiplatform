@@ -20,8 +20,10 @@ fun KotlinCodeSnippets() {
     val currentSnippet = remember { mutableStateOf("") }
 
     Div(
-        style = {
-            padding(5.px)
+        {
+            style {
+                padding(5.px)
+            }
         }
     ) {
         H4 {

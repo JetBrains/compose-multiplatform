@@ -1,7 +1,13 @@
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
+import androidx.compose.web.css.Color
+import androidx.compose.web.css.backgroundColor
+import androidx.compose.web.css.border
 import androidx.compose.web.css.color
+import androidx.compose.web.css.opacity
+import androidx.compose.web.css.padding
+import androidx.compose.web.css.px
 import androidx.compose.web.elements.Span
 import androidx.compose.web.elements.Text
 import kotlin.test.Test
@@ -15,11 +21,13 @@ class InlineStyleTests {
         var isRed by mutableStateOf(true)
         composition {
             Span(
-                style = {
-                    if (isRed) {
-                        color("red")
-                    } else {
-                        color("green")
+                {
+                    style {
+                        if (isRed) {
+                            color("red")
+                        } else {
+                            color("green")
+                        }
                     }
                 }
             ) {
@@ -46,9 +54,11 @@ class InlineStyleTests {
         var isRed by mutableStateOf(false)
         composition {
             Span(
-                style = {
-                    if (isRed) {
-                        color("red")
+                {
+                    style {
+                        if (isRed) {
+                            color("red")
+                        }
                     }
                 }
             ) {
@@ -75,9 +85,11 @@ class InlineStyleTests {
         var isRed by mutableStateOf(true)
         composition {
             Span(
-                style = {
-                    if (isRed) {
-                        color("red")
+                {
+                    style {
+                        if (isRed) {
+                            color("red")
+                        }
                     }
                 }
             ) {
@@ -104,9 +116,11 @@ class InlineStyleTests {
         var isRed by mutableStateOf(true)
         composition {
             Span(
-                style = {
-                    if (isRed) {
-                        color("red")
+                {
+                    style {
+                        if (isRed) {
+                            color("red")
+                        }
                     }
                 }
             ) {
@@ -133,5 +147,28 @@ class InlineStyleTests {
                 actual = root.innerHTML
             )
         }
+    }
+
+    @Test
+    fun sequentialStyleAccumulation() = runTest {
+        val k by mutableStateOf(40)
+        composition {
+            Span({
+                style {
+                    opacity(k / 100f)
+                }
+
+                id("container")
+
+                style {
+                    padding(k.px)
+                }
+            }) {}
+        }
+
+        assertEquals(
+            expected = "<span id=\"container\" style=\"opacity: 0.4; padding: 40px;\"></span>",
+            actual = root.innerHTML
+        )
     }
 }

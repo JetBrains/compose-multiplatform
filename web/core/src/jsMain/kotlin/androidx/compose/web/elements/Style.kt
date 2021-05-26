@@ -54,7 +54,6 @@ inline fun Style(
         applyAttrs = {
             applyAttrs()
         },
-        applyStyle = {}
     ) {
         DomSideEffect(cssRules) { style ->
             style.sheet?.let { sheet ->

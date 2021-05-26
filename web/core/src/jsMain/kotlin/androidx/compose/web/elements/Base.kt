@@ -26,7 +26,6 @@ inline fun <TScope, T, reified E : Applier<*>> ComposeDomNode(
     noinline factory: () -> T,
     elementScope: TScope,
     noinline attrsSkippableUpdate: @Composable SkippableUpdater<T>.() -> Unit,
-    noinline styleSkippableUpdate: @Composable SkippableUpdater<T>.() -> Unit,
     content: @Composable TScope.() -> Unit
 ) {
     if (currentComposer.applier !is E) error("Invalid applier")
@@ -36,11 +35,11 @@ inline fun <TScope, T, reified E : Applier<*>> ComposeDomNode(
     } else {
         currentComposer.useNode()
     }
-//    Updater<T>(currentComposer).update()
+
     SkippableUpdater<T>(currentComposer).apply {
         attrsSkippableUpdate()
-        styleSkippableUpdate()
     }
+
     currentComposer.startReplaceableGroup(0x7ab4aae9)
     content(elementScope)
     currentComposer.endReplaceableGroup()
@@ -55,7 +54,6 @@ class DisposableEffectHolder(
 inline fun <TTag : Tag, THTMLElement : HTMLElement> TagElement(
     tagName: String,
     crossinline applyAttrs: AttrsBuilder<TTag>.() -> Unit,
-    crossinline applyStyle: StyleBuilder.() -> Unit,
     content: @Composable ElementScope<THTMLElement>.() -> Unit
 ) {
     val scope = remember { ElementScopeImpl<THTMLElement>() }
@@ -71,18 +69,13 @@ inline fun <TTag : Tag, THTMLElement : HTMLElement> TagElement(
             val attrsApplied = AttrsBuilder<TTag>().also { it.applyAttrs() }
             refEffect.effect = attrsApplied.refEffect
             val attrsCollected = attrsApplied.collect()
-            val events = attrsApplied.asList()
+            val events = attrsApplied.collectListeners()
 
             update {
                 set(attrsCollected, DomNodeWrapper.UpdateAttrs)
                 set(events, DomNodeWrapper.UpdateListeners)
                 set(attrsApplied.propertyUpdates, DomNodeWrapper.UpdateProperties)
-            }
-        },
-        styleSkippableUpdate = {
-            val style = StyleBuilderImpl().apply(applyStyle)
-            update {
-                set(style, DomNodeWrapper.UpdateStyleDeclarations)
+                set(attrsApplied.styleBuilder, DomNodeWrapper.UpdateStyleDeclarations)
             }
         },
         elementScope = scope,

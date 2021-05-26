@@ -2,13 +2,20 @@ package androidx.compose.web.attributes
 
 import androidx.compose.runtime.DisposableEffectResult
 import androidx.compose.runtime.DisposableEffectScope
+import androidx.compose.web.css.StyleBuilder
+import androidx.compose.web.css.StyleBuilderImpl
 import org.w3c.dom.HTMLElement
 
 class AttrsBuilder<TTag : Tag> : EventsListenerBuilder() {
-    private val map = mutableMapOf<String, String>()
+    private val attributesMap = mutableMapOf<String, String>()
+    val styleBuilder = StyleBuilderImpl()
 
     val propertyUpdates = mutableListOf<Pair<(HTMLElement, Any) -> Unit, Any>>()
     var refEffect: (DisposableEffectScope.(HTMLElement) -> DisposableEffectResult)? = null
+
+    fun style(builder: StyleBuilder.() -> Unit) {
+        styleBuilder.apply(builder)
+    }
 
     inline fun classes(builder: ClassesAttrBuilder.() -> Unit) =
         prop(setClassList, ClassesAttrBuilder().apply(builder).asList().toTypedArray())
@@ -30,22 +37,22 @@ class AttrsBuilder<TTag : Tag> : EventsListenerBuilder() {
     }
 
     fun attr(attr: String, value: String?): AttrsBuilder<TTag> {
-        if (value == null && attr in map) {
-            map.remove(attr)
-        } else if (value != null) {
-            map[attr] = value
+        if (value == null) {
+            attributesMap.remove(attr)
+        } else {
+            attributesMap[attr] = value
         }
 
         return this
     }
 
     @Suppress("UNCHECKED_CAST")
-    fun <E : HTMLElement, V : Any> prop(update: (E, V) -> Unit, value: V) {
+    fun <E : HTMLElement, V> prop(update: (E, V) -> Unit, value: V) {
         propertyUpdates.add((update to value) as Pair<(HTMLElement, Any) -> Unit, Any>)
     }
 
     fun collect(): Map<String, String> {
-        return map
+        return attributesMap
     }
 
     companion object {

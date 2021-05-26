@@ -214,7 +214,7 @@ open class EventsListenerBuilder {
         listeners.add(DragEventListener(DRAGLEAVE, options, listener))
     }
 
-    fun asList(): List<WrappedEventListener<*>> = listeners
+    fun collectListeners(): List<WrappedEventListener<*>> = listeners
 
     fun addEventListener(
         eventName: String,
