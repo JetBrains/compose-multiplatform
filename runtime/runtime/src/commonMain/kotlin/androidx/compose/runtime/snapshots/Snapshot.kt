@@ -678,6 +678,7 @@ open class MutableSnapshot internal constructor(
     }
 
     override fun notifyObjectsInitialized() {
+        if (applied || disposed) return
         advance()
     }
 
