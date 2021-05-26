@@ -22,7 +22,16 @@ import androidx.compose.foundation.text.selection.SelectionAdjustment
 import androidx.compose.foundation.text.selection.SelectionRegistrarImpl
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.layout.LayoutCoordinates
+import androidx.compose.ui.text.AnnotatedString
+import androidx.compose.ui.text.TextLayoutInput
+import androidx.compose.ui.text.TextLayoutResult
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.style.ResolvedTextDirection
+import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.unit.Constraints
+import androidx.compose.ui.unit.Density
+import androidx.compose.ui.unit.IntSize
+import androidx.compose.ui.unit.LayoutDirection
 import com.nhaarman.mockitokotlin2.doReturn
 import com.nhaarman.mockitokotlin2.mock
 import com.nhaarman.mockitokotlin2.spy
@@ -70,6 +79,22 @@ class TextSelectionLongPressDragTest {
 
         state = TextState(mock(), selectableId)
         state.layoutCoordinates = layoutCoordinates
+        state.layoutResult = TextLayoutResult(
+            TextLayoutInput(
+                text = AnnotatedString.Builder("Hello, World").toAnnotatedString(),
+                style = TextStyle(),
+                placeholders = listOf(),
+                maxLines = 1,
+                softWrap = true,
+                overflow = TextOverflow.Ellipsis,
+                density = Density(1.0f),
+                layoutDirection = LayoutDirection.Ltr,
+                resourceLoader = mock(),
+                constraints = Constraints.fixedWidth(100)
+            ),
+            multiParagraph = mock(),
+            size = IntSize(50, 50)
+        )
 
         val controller = TextController(state).also {
             it.update(selectionRegistrar)
@@ -80,6 +105,7 @@ class TextSelectionLongPressDragTest {
     @Test
     fun longPressDragObserver_onLongPress_calls_notifySelectionInitiated() {
         val position = Offset(100f, 100f)
+        whenever(state.layoutResult?.getOffsetForPosition(position)).thenReturn("Hello".length)
 
         gesture.onStart(position)
 
@@ -91,12 +117,34 @@ class TextSelectionLongPressDragTest {
     }
 
     @Test
+    fun longPressDragObserver_onLongPress_out_of_boundary_calls_notifySelectionUpdateSelectAll() {
+        val position = Offset(100f, 100f)
+        whenever(state.layoutResult?.getOffsetForPosition(position))
+            .thenReturn("Hello, World".length)
+
+        gesture.onStart(position)
+
+        verify(selectionRegistrar, times(1)).notifySelectionUpdateSelectAll(
+            selectableId = selectableId
+        )
+    }
+
+    @Test
     fun longPressDragObserver_onDragStart_reset_dragTotalDistance() {
         // Setup. Make sure selectionManager.dragTotalDistance is not 0.
         val dragDistance1 = Offset(15f, 10f)
         val beginPosition1 = Offset(30f, 20f)
         val dragDistance2 = Offset(100f, 300f)
         val beginPosition2 = Offset(300f, 200f)
+        whenever(state.layoutResult?.getOffsetForPosition(beginPosition1))
+            .thenReturn("Hello".length)
+        whenever(state.layoutResult?.getOffsetForPosition(beginPosition1 + dragDistance1))
+            .thenReturn("Hello".length)
+        whenever(state.layoutResult?.getOffsetForPosition(beginPosition2))
+            .thenReturn("Hello".length)
+        whenever(state.layoutResult?.getOffsetForPosition(beginPosition2 + dragDistance2))
+            .thenReturn("Hello".length)
+
         gesture.onStart(beginPosition1)
         gesture.onDrag(dragDistance1)
         // Setup. Cancel selection and reselect.
@@ -122,11 +170,36 @@ class TextSelectionLongPressDragTest {
     fun longPressDragObserver_onDrag_calls_notifySelectionDrag() {
         val dragDistance = Offset(15f, 10f)
         val beginPosition = Offset(30f, 20f)
+        whenever(state.layoutResult?.getOffsetForPosition(beginPosition))
+            .thenReturn("Hello".length)
+        whenever(state.layoutResult?.getOffsetForPosition(beginPosition + dragDistance))
+            .thenReturn("Hello".length)
         gesture.onStart(beginPosition)
         selectionRegistrar.subselections = mapOf(selectableId to fakeSelection)
 
         gesture.onDrag(dragDistance)
         verify(selectionRegistrar, times(1))
+            .notifySelectionUpdate(
+                layoutCoordinates = layoutCoordinates,
+                startPosition = beginPosition,
+                endPosition = beginPosition + dragDistance,
+                adjustment = SelectionAdjustment.CHARACTER
+            )
+    }
+
+    @Test
+    fun longPressDragObserver_onDrag_out_of_boundary_not_call_notifySelectionDrag() {
+        val dragDistance = Offset(15f, 10f)
+        val beginPosition = Offset(30f, 20f)
+        whenever(state.layoutResult?.getOffsetForPosition(beginPosition))
+            .thenReturn("Hello, World".length)
+        whenever(state.layoutResult?.getOffsetForPosition(beginPosition + dragDistance))
+            .thenReturn("Hello, World".length)
+        gesture.onStart(beginPosition)
+        selectionRegistrar.subselections = mapOf(selectableId to fakeSelection)
+
+        gesture.onDrag(dragDistance)
+        verify(selectionRegistrar, times(0))
             .notifySelectionUpdate(
                 layoutCoordinates = layoutCoordinates,
                 startPosition = beginPosition,
