@@ -202,7 +202,8 @@ class SubcomposeLayoutState(
         val itemIndex = root.foldedChildren.indexOf(node)
         if (itemIndex < currentIndex) {
             throw IllegalArgumentException(
-                "$slotId was already used with subcompose during this measuring pass"
+                "Key $slotId was already used. If you are using LazyColumn/Row please make sure " +
+                    "you provide a unique key for each item."
             )
         }
         if (currentIndex != itemIndex) {
