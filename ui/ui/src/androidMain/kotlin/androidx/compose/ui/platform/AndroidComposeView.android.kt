@@ -113,6 +113,7 @@ import androidx.core.view.AccessibilityDelegateCompat
 import androidx.core.view.ViewCompat
 import androidx.core.view.accessibility.AccessibilityNodeInfoCompat
 import androidx.core.view.accessibility.AccessibilityNodeProviderCompat
+import androidx.lifecycle.DefaultLifecycleObserver
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.ViewTreeLifecycleOwner
@@ -125,7 +126,7 @@ import android.view.KeyEvent as AndroidKeyEvent
 @OptIn(ExperimentalComposeUiApi::class)
 @RequiresApi(Build.VERSION_CODES.LOLLIPOP)
 internal class AndroidComposeView(context: Context) :
-    ViewGroup(context), Owner, ViewRootForTest, PositionCalculator {
+    ViewGroup(context), Owner, ViewRootForTest, PositionCalculator, DefaultLifecycleObserver {
 
     /**
      * Signal that AndroidComposeView's superclass constructors have finished running.
@@ -351,6 +352,12 @@ internal class AndroidComposeView(context: Context) :
         ViewCompat.setAccessibilityDelegate(this, accessibilityDelegate)
         ViewRootForTest.onViewCreatedCallback?.invoke(this)
         root.attach(this)
+    }
+
+    override fun onResume(owner: LifecycleOwner) {
+        // Refresh in onResume in case the value has changed.
+        @OptIn(InternalCoreApi::class)
+        showLayoutBounds = getIsShowingLayoutBounds()
     }
 
     override fun onFocusChanged(gainFocus: Boolean, direction: Int, previouslyFocusedRect: Rect?) {
@@ -754,7 +761,6 @@ internal class AndroidComposeView(context: Context) :
         super.onAttachedToWindow()
         invalidateLayoutNodeMeasurement(root)
         invalidateLayers(root)
-        showLayoutBounds = getIsShowingLayoutBounds()
         snapshotObserver.startObserving()
         ifDebug { if (autofillSupported()) _autofill?.registerCallback() }
 
@@ -775,6 +781,7 @@ internal class AndroidComposeView(context: Context) :
             onViewTreeOwnersAvailable?.invoke(viewTreeOwners)
             onViewTreeOwnersAvailable = null
         }
+        viewTreeOwners!!.lifecycleOwner.lifecycle.addObserver(this)
         viewTreeObserver.addOnGlobalLayoutListener(globalLayoutListener)
         viewTreeObserver.addOnScrollChangedListener(scrollChangedListener)
     }
@@ -782,6 +789,7 @@ internal class AndroidComposeView(context: Context) :
     override fun onDetachedFromWindow() {
         super.onDetachedFromWindow()
         snapshotObserver.stopObserving()
+        viewTreeOwners?.lifecycleOwner?.lifecycle?.removeObserver(this)
         ifDebug { if (autofillSupported()) _autofill?.unregisterCallback() }
         viewTreeObserver.removeOnGlobalLayoutListener(globalLayoutListener)
         viewTreeObserver.removeOnScrollChangedListener(scrollChangedListener)
