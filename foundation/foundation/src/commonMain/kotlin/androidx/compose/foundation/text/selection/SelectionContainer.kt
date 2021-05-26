@@ -25,7 +25,6 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalClipboardManager
@@ -71,7 +70,6 @@ fun DisableSelection(content: @Composable () -> Unit) {
  * The selection composable wraps composables and let them to be selectable. It paints the selection
  * area with start and end handles.
  */
-@OptIn(ExperimentalComposeUiApi::class)
 @Suppress("ComposableLambdaParameterNaming")
 @Composable
 internal fun SelectionContainer(

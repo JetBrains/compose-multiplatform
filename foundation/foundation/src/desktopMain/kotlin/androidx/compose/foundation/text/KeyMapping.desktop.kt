@@ -24,6 +24,7 @@ import androidx.compose.ui.input.key.isMetaPressed
 import androidx.compose.ui.input.key.isShiftPressed
 import androidx.compose.ui.input.key.key
 import androidx.compose.ui.platform.DesktopPlatform
+import java.awt.event.KeyEvent as AwtKeyEvent
 
 internal actual val platformDefaultKeyMapping: KeyMapping =
     when (DesktopPlatform.Current) {
@@ -34,69 +35,69 @@ internal actual val platformDefaultKeyMapping: KeyMapping =
                     return when {
                         event.isShiftPressed && event.isAltPressed ->
                             when (event.key) {
-                                Key.DirectionLeft -> KeyCommand.SELECT_LEFT_WORD
-                                Key.DirectionRight -> KeyCommand.SELECT_RIGHT_WORD
-                                Key.DirectionUp -> KeyCommand.SELECT_PREV_PARAGRAPH
-                                Key.DirectionDown -> KeyCommand.SELECT_NEXT_PARAGRAPH
+                                MappedKeys.DirectionLeft -> KeyCommand.SELECT_LEFT_WORD
+                                MappedKeys.DirectionRight -> KeyCommand.SELECT_RIGHT_WORD
+                                MappedKeys.DirectionUp -> KeyCommand.SELECT_PREV_PARAGRAPH
+                                MappedKeys.DirectionDown -> KeyCommand.SELECT_NEXT_PARAGRAPH
                                 else -> null
                             }
                         event.isShiftPressed && event.isMetaPressed ->
                             when (event.key) {
-                                Key.DirectionLeft -> KeyCommand.SELECT_LINE_LEFT
-                                Key.DirectionRight -> KeyCommand.SELECT_LINE_RIGHT
-                                Key.DirectionUp -> KeyCommand.SELECT_HOME
-                                Key.DirectionDown -> KeyCommand.SELECT_END
+                                MappedKeys.DirectionLeft -> KeyCommand.SELECT_LINE_LEFT
+                                MappedKeys.DirectionRight -> KeyCommand.SELECT_LINE_RIGHT
+                                MappedKeys.DirectionUp -> KeyCommand.SELECT_HOME
+                                MappedKeys.DirectionDown -> KeyCommand.SELECT_END
                                 else -> null
                             }
 
                         event.isMetaPressed ->
                             when (event.key) {
-                                Key.DirectionLeft -> KeyCommand.LINE_LEFT
-                                Key.DirectionRight -> KeyCommand.LINE_RIGHT
-                                Key.DirectionUp -> KeyCommand.HOME
-                                Key.DirectionDown -> KeyCommand.END
-                                Key.Backspace -> KeyCommand.DELETE_FROM_LINE_START
+                                MappedKeys.DirectionLeft -> KeyCommand.LINE_LEFT
+                                MappedKeys.DirectionRight -> KeyCommand.LINE_RIGHT
+                                MappedKeys.DirectionUp -> KeyCommand.HOME
+                                MappedKeys.DirectionDown -> KeyCommand.END
+                                MappedKeys.Backspace -> KeyCommand.DELETE_FROM_LINE_START
                                 else -> null
                             }
 
                         // Emacs-like shortcuts
                         event.isCtrlPressed && event.isShiftPressed && event.isAltPressed -> {
                             when (event.key) {
-                                Key.F -> KeyCommand.SELECT_RIGHT_WORD
-                                Key.B -> KeyCommand.SELECT_LEFT_WORD
+                                MappedKeys.F -> KeyCommand.SELECT_RIGHT_WORD
+                                MappedKeys.B -> KeyCommand.SELECT_LEFT_WORD
                                 else -> null
                             }
                         }
                         event.isCtrlPressed && event.isAltPressed -> {
                             when (event.key) {
-                                Key.F -> KeyCommand.RIGHT_WORD
-                                Key.B -> KeyCommand.LEFT_WORD
+                                MappedKeys.F -> KeyCommand.RIGHT_WORD
+                                MappedKeys.B -> KeyCommand.LEFT_WORD
                                 else -> null
                             }
                         }
                         event.isCtrlPressed && event.isShiftPressed -> {
                             when (event.key) {
-                                Key.F -> KeyCommand.SELECT_RIGHT_CHAR
-                                Key.B -> KeyCommand.SELECT_LEFT_CHAR
-                                Key.P -> KeyCommand.SELECT_UP
-                                Key.N -> KeyCommand.SELECT_DOWN
-                                Key.A -> KeyCommand.SELECT_LINE_START
-                                Key.E -> KeyCommand.SELECT_LINE_END
+                                MappedKeys.F -> KeyCommand.SELECT_RIGHT_CHAR
+                                MappedKeys.B -> KeyCommand.SELECT_LEFT_CHAR
+                                MappedKeys.P -> KeyCommand.SELECT_UP
+                                MappedKeys.N -> KeyCommand.SELECT_DOWN
+                                MappedKeys.A -> KeyCommand.SELECT_LINE_START
+                                MappedKeys.E -> KeyCommand.SELECT_LINE_END
                                 else -> null
                             }
                         }
                         event.isCtrlPressed -> {
                             when (event.key) {
-                                Key.F -> KeyCommand.LEFT_CHAR
-                                Key.B -> KeyCommand.RIGHT_CHAR
-                                Key.P -> KeyCommand.UP
-                                Key.N -> KeyCommand.DOWN
-                                Key.A -> KeyCommand.LINE_START
-                                Key.E -> KeyCommand.LINE_END
-                                Key.H -> KeyCommand.DELETE_PREV_CHAR
-                                Key.D -> KeyCommand.DELETE_NEXT_CHAR
-                                Key.K -> KeyCommand.DELETE_TO_LINE_END
-                                Key.O -> KeyCommand.NEW_LINE
+                                MappedKeys.F -> KeyCommand.LEFT_CHAR
+                                MappedKeys.B -> KeyCommand.RIGHT_CHAR
+                                MappedKeys.P -> KeyCommand.UP
+                                MappedKeys.N -> KeyCommand.DOWN
+                                MappedKeys.A -> KeyCommand.LINE_START
+                                MappedKeys.E -> KeyCommand.LINE_END
+                                MappedKeys.H -> KeyCommand.DELETE_PREV_CHAR
+                                MappedKeys.D -> KeyCommand.DELETE_NEXT_CHAR
+                                MappedKeys.K -> KeyCommand.DELETE_TO_LINE_END
+                                MappedKeys.O -> KeyCommand.NEW_LINE
                                 else -> null
                             }
                         }
@@ -104,18 +105,18 @@ internal actual val platformDefaultKeyMapping: KeyMapping =
 
                         event.isShiftPressed ->
                             when (event.key) {
-                                Key.MoveHome -> KeyCommand.SELECT_HOME
-                                Key.MoveEnd -> KeyCommand.SELECT_END
+                                MappedKeys.MoveHome -> KeyCommand.SELECT_HOME
+                                MappedKeys.MoveEnd -> KeyCommand.SELECT_END
                                 else -> null
                             }
                         event.isAltPressed ->
                             when (event.key) {
-                                Key.DirectionLeft -> KeyCommand.LEFT_WORD
-                                Key.DirectionRight -> KeyCommand.RIGHT_WORD
-                                Key.DirectionUp -> KeyCommand.PREV_PARAGRAPH
-                                Key.DirectionDown -> KeyCommand.NEXT_PARAGRAPH
-                                Key.Delete -> KeyCommand.DELETE_NEXT_WORD
-                                Key.Backspace -> KeyCommand.DELETE_PREV_WORD
+                                MappedKeys.DirectionLeft -> KeyCommand.LEFT_WORD
+                                MappedKeys.DirectionRight -> KeyCommand.RIGHT_WORD
+                                MappedKeys.DirectionUp -> KeyCommand.PREV_PARAGRAPH
+                                MappedKeys.DirectionDown -> KeyCommand.NEXT_PARAGRAPH
+                                MappedKeys.Delete -> KeyCommand.DELETE_NEXT_WORD
+                                MappedKeys.Backspace -> KeyCommand.DELETE_PREV_WORD
                                 else -> null
                             }
                         else -> null
@@ -126,3 +127,37 @@ internal actual val platformDefaultKeyMapping: KeyMapping =
 
         else -> defaultKeyMapping
     }
+
+internal actual object MappedKeys {
+    actual val A: Key = Key(AwtKeyEvent.VK_A)
+    val B: Key = Key(AwtKeyEvent.VK_B)
+    val D: Key = Key(AwtKeyEvent.VK_D)
+    actual val C: Key = Key(AwtKeyEvent.VK_C)
+    val E: Key = Key(AwtKeyEvent.VK_E)
+    val F: Key = Key(AwtKeyEvent.VK_F)
+    actual val H: Key = Key(AwtKeyEvent.VK_H)
+    val K: Key = Key(AwtKeyEvent.VK_K)
+    val N: Key = Key(AwtKeyEvent.VK_N)
+    val O: Key = Key(AwtKeyEvent.VK_O)
+    val P: Key = Key(AwtKeyEvent.VK_P)
+    actual val V: Key = Key(AwtKeyEvent.VK_V)
+    actual val X: Key = Key(AwtKeyEvent.VK_X)
+    actual val Z: Key = Key(AwtKeyEvent.VK_Z)
+    actual val Backslash: Key = Key(AwtKeyEvent.VK_BACK_SLASH)
+    actual val DirectionLeft: Key = Key(AwtKeyEvent.VK_LEFT)
+    actual val DirectionRight: Key = Key(AwtKeyEvent.VK_RIGHT)
+    actual val DirectionUp: Key = Key(AwtKeyEvent.VK_UP)
+    actual val DirectionDown: Key = Key(AwtKeyEvent.VK_DOWN)
+    actual val PageUp: Key = Key(AwtKeyEvent.VK_PAGE_UP)
+    actual val PageDown: Key = Key(AwtKeyEvent.VK_PAGE_DOWN)
+    actual val MoveHome: Key = Key(AwtKeyEvent.VK_HOME)
+    actual val MoveEnd: Key = Key(AwtKeyEvent.VK_END)
+    actual val Insert: Key = Key(AwtKeyEvent.VK_INSERT)
+    actual val Enter: Key = Key(AwtKeyEvent.VK_ENTER)
+    actual val Backspace: Key = Key(AwtKeyEvent.VK_BACK_SPACE)
+    actual val Delete: Key = Key(AwtKeyEvent.VK_DELETE)
+    actual val Paste: Key = Key(AwtKeyEvent.VK_PASTE)
+    actual val Cut: Key = Key(AwtKeyEvent.VK_CUT)
+    val Copy: Key = Key(AwtKeyEvent.VK_COPY)
+    actual val Tab: Key = Key(AwtKeyEvent.VK_TAB)
+}

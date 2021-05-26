@@ -16,7 +16,7 @@
 
 package androidx.compose.foundation.text.selection
 
-import androidx.compose.ui.input.key.Key
+import androidx.compose.foundation.text.MappedKeys
 import androidx.compose.ui.input.key.KeyEvent
 import androidx.compose.ui.input.key.isCtrlPressed
 import androidx.compose.ui.input.key.isMetaPressed
@@ -27,7 +27,7 @@ import androidx.compose.ui.platform.DesktopPlatform
 // it would end up being a function for any conceptual keyevent (selectall, cut, copy, paste)
 // TODO(b/1564937)
 internal actual fun isCopyKeyEvent(keyEvent: KeyEvent) =
-    keyEvent.key == Key.C && when (DesktopPlatform.Current) {
+    keyEvent.key == MappedKeys.C && when (DesktopPlatform.Current) {
         DesktopPlatform.MacOS -> keyEvent.isMetaPressed
         else -> keyEvent.isCtrlPressed
-    } || keyEvent.key == Key.Copy
+    } || keyEvent.key == MappedKeys.Copy

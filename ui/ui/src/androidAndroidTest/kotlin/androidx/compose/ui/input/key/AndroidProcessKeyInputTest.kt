@@ -21,6 +21,7 @@ import android.view.KeyEvent.ACTION_UP as ActionUp
 import android.view.KeyEvent.KEYCODE_A as KeyCodeA
 import android.view.View
 import androidx.compose.foundation.layout.Box
+import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
@@ -45,6 +46,7 @@ import android.view.KeyEvent as AndroidKeyEvent
  */
 @SmallTest
 @RunWith(Parameterized::class)
+@OptIn(ExperimentalComposeUiApi::class)
 class AndroidProcessKeyInputTest(private val keyEventAction: Int) {
     @get:Rule
     val rule = createComposeRule()

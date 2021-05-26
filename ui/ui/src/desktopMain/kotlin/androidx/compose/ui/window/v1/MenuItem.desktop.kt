@@ -15,6 +15,7 @@
  */
 package androidx.compose.ui.window.v1
 
+import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.input.key.Key
 import androidx.compose.ui.input.key.nativeKeyCode
 import java.awt.Toolkit
@@ -24,6 +25,7 @@ import javax.swing.KeyStroke
  * MenuItem is a class that represents an implementation of an item in a menu.
  * Can be used with Menu or Tray.
  */
+@OptIn(ExperimentalComposeUiApi::class)
 class MenuItem {
 
     /**
