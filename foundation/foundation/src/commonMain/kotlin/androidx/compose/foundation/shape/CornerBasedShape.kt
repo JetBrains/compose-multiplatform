@@ -21,7 +21,6 @@ import androidx.compose.ui.graphics.Outline
 import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.LayoutDirection
-import kotlin.math.min
 
 /**
  * Base class for [Shape]s defined by four [CornerSize]s.
@@ -45,11 +44,21 @@ abstract class CornerBasedShape(
         layoutDirection: LayoutDirection,
         density: Density
     ): Outline {
+        var topStart = topStart.toPx(size, density)
+        var topEnd = topEnd.toPx(size, density)
+        var bottomEnd = bottomEnd.toPx(size, density)
+        var bottomStart = bottomStart.toPx(size, density)
         val minDimension = size.minDimension
-        val topStart = min(topStart.toPx(size, density), minDimension)
-        val topEnd = min(topEnd.toPx(size, density), minDimension)
-        val bottomEnd = min(bottomEnd.toPx(size, density), minDimension - topEnd)
-        val bottomStart = min(bottomStart.toPx(size, density), minDimension - topStart)
+        if (topStart + bottomStart > minDimension) {
+            val scale = minDimension / (topStart + bottomStart)
+            topStart *= scale
+            bottomStart *= scale
+        }
+        if (topEnd + bottomEnd > minDimension) {
+            val scale = minDimension / (topEnd + bottomEnd)
+            topEnd *= scale
+            bottomEnd *= scale
+        }
         require(topStart >= 0.0f && topEnd >= 0.0f && bottomEnd >= 0.0f && bottomStart >= 0.0f) {
             "Corner size in Px can't be negative(topStart = $topStart, topEnd = $topEnd, " +
                 "bottomEnd = $bottomEnd, bottomStart = $bottomStart)!"
