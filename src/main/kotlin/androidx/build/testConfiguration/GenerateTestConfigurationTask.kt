@@ -67,6 +67,10 @@ abstract class GenerateTestConfigurationTask : DefaultTask() {
     abstract val hasBenchmarkPlugin: Property<Boolean>
 
     @get:Input
+    @get:Optional
+    abstract val benchmarkRunAlsoInterpreted: Property<Boolean>
+
+    @get:Input
     abstract val testRunner: Property<String>
 
     @get:Input
@@ -127,6 +131,9 @@ abstract class GenerateTestConfigurationTask : DefaultTask() {
         if (hasBenchmarkPlugin.get()) {
             configBuilder.isBenchmark(true)
             if (configBuilder.isPostsubmit) {
+                if (benchmarkRunAlsoInterpreted.get()) {
+                    configBuilder.tag("microbenchmarks_interpreted")
+                }
                 configBuilder.tag("microbenchmarks")
             }
         } else if (testProjectPath.get().endsWith("macrobenchmark")) {
