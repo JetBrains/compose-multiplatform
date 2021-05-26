@@ -25,6 +25,7 @@ import androidx.build.AndroidXPlugin.Companion.ZIP_TEST_CONFIGS_WITH_APKS_TASK
 import androidx.build.asFilenamePrefix
 import androidx.build.dependencyTracker.AffectedModuleDetector
 import androidx.build.getConstrainedTestConfigDirectory
+import androidx.build.getSupportRootFolder
 import androidx.build.getTestConfigDirectory
 import androidx.build.gradle.getByType
 import androidx.build.hasAndroidTestSourceCode
@@ -59,31 +60,31 @@ fun Project.createTestConfigurationGenerationTask(
     testRunner: String,
     overrideProject: Project = this
 ) {
+    val xmlName = "${path.asFilenamePrefix()}$variantName.xml"
+    rootProject.tasks.named("createModuleInfo").configure {
+        it as ModuleInfoGenerator
+        it.testModules.add(
+            TestModule(
+                name = xmlName,
+                path = projectDir.toRelativeString(getSupportRootFolder())
+            )
+        )
+    }
     val generateTestConfigurationTask = overrideProject.tasks.register(
         "${AndroidXPlugin.GENERATE_TEST_CONFIGURATION_TASK}$variantName",
         GenerateTestConfigurationTask::class.java
     ) { task ->
         task.testFolder.set(artifacts.get(SingleArtifact.APK))
         task.testLoader.set(artifacts.getBuiltArtifactsLoader())
-        task.outputXml.fileValue(
-            File(
-                this.getTestConfigDirectory(),
-                "${this.path.asFilenamePrefix()}$variantName.xml"
-            )
-        )
-        task.constrainedOutputXml.fileValue(
-            File(
-                this.getConstrainedTestConfigDirectory(),
-                "${this.path.asFilenamePrefix()}$variantName.xml"
-            )
-        )
+        task.outputXml.fileValue(File(getTestConfigDirectory(), xmlName))
+        task.constrainedOutputXml.fileValue(File(getConstrainedTestConfigDirectory(), xmlName))
         // Disable work tests on < API 18: b/178127496
-        if (this.path.startsWith(":work:")) {
+        if (path.startsWith(":work:")) {
             task.minSdk.set(maxOf(18, minSdk))
         } else {
             task.minSdk.set(minSdk)
         }
-        val hasBenchmarkPlugin = this.hasBenchmarkPlugin()
+        val hasBenchmarkPlugin = hasBenchmarkPlugin()
         task.hasBenchmarkPlugin.set(hasBenchmarkPlugin)
         if (hasBenchmarkPlugin) {
             task.benchmarkRunAlsoInterpreted.set(
@@ -91,7 +92,7 @@ fun Project.createTestConfigurationGenerationTask(
             )
         }
         task.testRunner.set(testRunner)
-        task.testProjectPath.set(this.path)
+        task.testProjectPath.set(path)
         task.affectedModuleDetectorSubset.set(
             project.provider {
                 AffectedModuleDetector.getProjectSubset(project)
@@ -105,9 +106,9 @@ fun Project.createTestConfigurationGenerationTask(
             it.enabled = this.hasAndroidTestSourceCode()
         }
     }
-    this.rootProject.tasks.findByName(AndroidXPlugin.ZIP_TEST_CONFIGS_WITH_APKS_TASK)!!
+    this.rootProject.tasks.findByName(ZIP_TEST_CONFIGS_WITH_APKS_TASK)!!
         .dependsOn(generateTestConfigurationTask)
-    this.rootProject.tasks.findByName(AndroidXPlugin.ZIP_CONSTRAINED_TEST_CONFIGS_WITH_APKS_TASK)!!
+    this.rootProject.tasks.findByName(ZIP_CONSTRAINED_TEST_CONFIGS_WITH_APKS_TASK)!!
         .dependsOn(generateTestConfigurationTask)
 }
 
