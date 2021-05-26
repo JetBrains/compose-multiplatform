@@ -231,24 +231,43 @@ package androidx.compose.ui.text {
   }
 
   @androidx.compose.runtime.Immutable public final class Placeholder {
-    method public androidx.compose.ui.text.Placeholder copy-KJSDsNM(optional long width, optional long height, optional androidx.compose.ui.text.PlaceholderVerticalAlign placeholderVerticalAlign);
+    method public androidx.compose.ui.text.Placeholder copy-KJSDsNM(optional long width, optional long height, optional int placeholderVerticalAlign);
     method public operator boolean equals(Object? other);
     method public long getHeight-XSAIIZE();
-    method public androidx.compose.ui.text.PlaceholderVerticalAlign getPlaceholderVerticalAlign();
+    method public int getPlaceholderVerticalAlign-J6kI3mc();
     method public long getWidth-XSAIIZE();
     property public final long height;
-    property public final androidx.compose.ui.text.PlaceholderVerticalAlign placeholderVerticalAlign;
+    property public final int placeholderVerticalAlign;
     property public final long width;
   }
 
-  public enum PlaceholderVerticalAlign {
-    enum_constant public static final androidx.compose.ui.text.PlaceholderVerticalAlign AboveBaseline;
-    enum_constant public static final androidx.compose.ui.text.PlaceholderVerticalAlign Bottom;
-    enum_constant public static final androidx.compose.ui.text.PlaceholderVerticalAlign Center;
-    enum_constant public static final androidx.compose.ui.text.PlaceholderVerticalAlign TextBottom;
-    enum_constant public static final androidx.compose.ui.text.PlaceholderVerticalAlign TextCenter;
-    enum_constant public static final androidx.compose.ui.text.PlaceholderVerticalAlign TextTop;
-    enum_constant public static final androidx.compose.ui.text.PlaceholderVerticalAlign Top;
+  public final inline class PlaceholderVerticalAlign {
+    ctor public PlaceholderVerticalAlign();
+    method public static int constructor-impl(int value);
+    method public static inline boolean equals-impl(int p, Object? p1);
+    method public static boolean equals-impl0(int p1, int p2);
+    method public int getValue();
+    method public static inline int hashCode-impl(int p);
+    method public static String toString-impl(int $this);
+    property public final int value;
+    field public static final androidx.compose.ui.text.PlaceholderVerticalAlign.Companion Companion;
+  }
+
+  public static final class PlaceholderVerticalAlign.Companion {
+    method public int getAboveBaseline-J6kI3mc();
+    method public int getBottom-J6kI3mc();
+    method public int getCenter-J6kI3mc();
+    method public int getTextBottom-J6kI3mc();
+    method public int getTextCenter-J6kI3mc();
+    method public int getTextTop-J6kI3mc();
+    method public int getTop-J6kI3mc();
+    property public final int AboveBaseline;
+    property public final int Bottom;
+    property public final int Center;
+    property public final int TextBottom;
+    property public final int TextCenter;
+    property public final int TextTop;
+    property public final int Top;
   }
 
   public final class SaversKt {
