@@ -22,7 +22,7 @@ class EventTests {
 
         composition {
             Button(
-                attrs = {
+                {
                     onClick { handeled = true }
                 }
             ) {}
@@ -81,7 +81,7 @@ class EventTests {
 
         composition {
             TextArea(
-                attrs = {
+                {
                     onTextInput { handeled = true }
                 },
                 value = ""

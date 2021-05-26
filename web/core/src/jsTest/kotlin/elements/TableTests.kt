@@ -26,7 +26,7 @@ class TableTests {
     fun colAttributes() = runTest {
         composition {
             Col(
-                attrs = {
+                {
                     span(2)
                 }
             ) { }
@@ -55,7 +55,7 @@ class TableTests {
                         Th { }
                         Th { }
                         Th(
-                            attrs = {
+                            {
                                 colspan(2)
                             }
                         ) {
@@ -66,12 +66,12 @@ class TableTests {
                         Th { }
                         Th { }
                         Th(
-                            attrs = {
+                            {
                                 scope(Scope.Col)
                             }
                         ) { Text("A") }
                         Th(
-                            attrs = {
+                            {
                                 scope(Scope.Col)
                             }
                         ) { Text("B") }
@@ -80,7 +80,7 @@ class TableTests {
                 Tbody {
                     Tr {
                         Th(
-                            attrs = {
+                            {
                                 scope(Scope.Row)
                                 rowspan(2)
                             }
@@ -88,7 +88,7 @@ class TableTests {
                             Text("Rows")
                         }
                         Th(
-                            attrs = {
+                            {
                                 scope(Scope.Row)
                             }
                         ) {
@@ -103,7 +103,7 @@ class TableTests {
                     }
                     Tr {
                         Th(
-                            attrs = {
+                            {
                                 scope(Scope.Row)
                             }
                         ) {
@@ -120,7 +120,7 @@ class TableTests {
                 Tfoot {
                     Tr {
                         Th(
-                            attrs = {
+                            {
                                 scope(Scope.Row)
                             }
                         ) {

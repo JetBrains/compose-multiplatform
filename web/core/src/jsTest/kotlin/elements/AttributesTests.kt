@@ -67,7 +67,7 @@ class AttributesTests {
 
         composition {
             Button(
-                attrs = {
+                {
                     disabled(disabled)
                 }
             ) {}
@@ -85,7 +85,7 @@ class AttributesTests {
     @Test
     fun multipleClassesCallsAddMoreClasses() = runTest {
         composition {
-            Div(attrs = {
+            Div({
                 classes("a", "b")
                 classes("c", "d")
             }) {}
@@ -101,7 +101,7 @@ class AttributesTests {
     @Test
     fun multipleClassesBuildersCallsAddMoreClasses() = runTest {
         composition {
-            Div(attrs = {
+            Div({
                 classes("a", "b")
                 classes {
                     +"c"
@@ -121,7 +121,7 @@ class AttributesTests {
     @Test
     fun multipleClassesBuildersCallsAddMoreClasses2() = runTest {
         composition {
-            Div(attrs = {
+            Div({
                 classes {
                     +"c"
                     +"d"
@@ -141,7 +141,7 @@ class AttributesTests {
     fun multipleClassesBuildersCallsWithConditionsAddCorrectClasses() = runTest {
         val addClassD = mutableStateOf(true)
         composition {
-            Div(attrs = {
+            Div({
                 classes {
                     +"c"
                     if (addClassD.value) +"d"
