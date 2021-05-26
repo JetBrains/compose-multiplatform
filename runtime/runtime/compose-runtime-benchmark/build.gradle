@@ -56,3 +56,7 @@ dependencies {
     androidTestImplementation("androidx.activity:activity:1.2.0")
     androidTestImplementation(project(":activity:activity-compose"))
 }
+
+androidx {
+    benchmarkRunAlsoInterpreted = true
+}
