@@ -11,6 +11,8 @@ ChangedClass: androidx.compose.ui.focus.FocusState:
     Class androidx.compose.ui.focus.FocusState changed class/interface declaration
 
 
+ChangedSuperclass: androidx.compose.ui.input.nestedscroll.NestedScrollSource:
+    Class androidx.compose.ui.input.nestedscroll.NestedScrollSource superclass changed from java.lang.Enum to java.lang.Object
 ChangedSuperclass: androidx.compose.ui.input.pointer.PointerType:
     Class androidx.compose.ui.input.pointer.PointerType superclass changed from java.lang.Enum to java.lang.Object
 
@@ -77,6 +79,10 @@ RemovedField: androidx.compose.ui.focus.FocusState#Disabled:
     Removed enum constant androidx.compose.ui.focus.FocusState.Disabled
 RemovedField: androidx.compose.ui.focus.FocusState#Inactive:
     Removed enum constant androidx.compose.ui.focus.FocusState.Inactive
+RemovedField: androidx.compose.ui.input.nestedscroll.NestedScrollSource#Drag:
+    Removed enum constant androidx.compose.ui.input.nestedscroll.NestedScrollSource.Drag
+RemovedField: androidx.compose.ui.input.nestedscroll.NestedScrollSource#Fling:
+    Removed enum constant androidx.compose.ui.input.nestedscroll.NestedScrollSource.Fling
 RemovedField: androidx.compose.ui.input.pointer.PointerType#Eraser:
     Removed enum constant androidx.compose.ui.input.pointer.PointerType.Eraser
 RemovedField: androidx.compose.ui.input.pointer.PointerType#Mouse:
@@ -105,6 +111,14 @@ RemovedMethod: androidx.compose.ui.graphics.vector.VectorPath#getStrokeLineCap()
     Removed method androidx.compose.ui.graphics.vector.VectorPath.getStrokeLineCap()
 RemovedMethod: androidx.compose.ui.graphics.vector.VectorPath#getStrokeLineJoin():
     Removed method androidx.compose.ui.graphics.vector.VectorPath.getStrokeLineJoin()
+RemovedMethod: androidx.compose.ui.input.nestedscroll.NestedScrollConnection#onPostScroll-61dr0bI(long, long, androidx.compose.ui.input.nestedscroll.NestedScrollSource):
+    Removed method androidx.compose.ui.input.nestedscroll.NestedScrollConnection.onPostScroll-61dr0bI(long,long,androidx.compose.ui.input.nestedscroll.NestedScrollSource)
+RemovedMethod: androidx.compose.ui.input.nestedscroll.NestedScrollConnection#onPreScroll-ScU7Jk8(long, androidx.compose.ui.input.nestedscroll.NestedScrollSource):
+    Removed method androidx.compose.ui.input.nestedscroll.NestedScrollConnection.onPreScroll-ScU7Jk8(long,androidx.compose.ui.input.nestedscroll.NestedScrollSource)
+RemovedMethod: androidx.compose.ui.input.nestedscroll.NestedScrollDispatcher#dispatchPostScroll-61dr0bI(long, long, androidx.compose.ui.input.nestedscroll.NestedScrollSource):
+    Removed method androidx.compose.ui.input.nestedscroll.NestedScrollDispatcher.dispatchPostScroll-61dr0bI(long,long,androidx.compose.ui.input.nestedscroll.NestedScrollSource)
+RemovedMethod: androidx.compose.ui.input.nestedscroll.NestedScrollDispatcher#dispatchPreScroll-ScU7Jk8(long, androidx.compose.ui.input.nestedscroll.NestedScrollSource):
+    Removed method androidx.compose.ui.input.nestedscroll.NestedScrollDispatcher.dispatchPreScroll-ScU7Jk8(long,androidx.compose.ui.input.nestedscroll.NestedScrollSource)
 RemovedMethod: androidx.compose.ui.input.pointer.PointerInputChange#copy-aJ2ieLA(long, long, long, boolean, long, long, boolean, androidx.compose.ui.input.pointer.ConsumedData, androidx.compose.ui.input.pointer.PointerType):
     Removed method androidx.compose.ui.input.pointer.PointerInputChange.copy-aJ2ieLA(long,long,long,boolean,long,long,boolean,androidx.compose.ui.input.pointer.ConsumedData,androidx.compose.ui.input.pointer.PointerType)
 RemovedMethod: androidx.compose.ui.input.pointer.PointerInputChange#getType():

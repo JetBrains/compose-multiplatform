@@ -1286,9 +1286,9 @@ package androidx.compose.ui.input.nestedscroll {
 
   public interface NestedScrollConnection {
     method public default suspend Object? onPostFling-k5p9STU(long consumed, long available, kotlin.coroutines.Continuation<? super androidx.compose.ui.unit.Velocity> p);
-    method public default long onPostScroll-61dr0bI(long consumed, long available, androidx.compose.ui.input.nestedscroll.NestedScrollSource source);
+    method public default long onPostScroll-61dr0bI(long consumed, long available, int source);
     method public default suspend Object? onPreFling-bHeVL4A(long available, kotlin.coroutines.Continuation<? super androidx.compose.ui.unit.Velocity> p);
-    method public default long onPreScroll-ScU7Jk8(long available, androidx.compose.ui.input.nestedscroll.NestedScrollSource source);
+    method public default long onPreScroll-ScU7Jk8(long available, int source);
   }
 
   public final class NestedScrollDelegatingWrapperKt {
@@ -1297,9 +1297,9 @@ package androidx.compose.ui.input.nestedscroll {
   public final class NestedScrollDispatcher {
     ctor public NestedScrollDispatcher();
     method public suspend Object? dispatchPostFling-k5p9STU(long consumed, long available, kotlin.coroutines.Continuation<? super androidx.compose.ui.unit.Velocity> p);
-    method public long dispatchPostScroll-61dr0bI(long consumed, long available, androidx.compose.ui.input.nestedscroll.NestedScrollSource source);
+    method public long dispatchPostScroll-61dr0bI(long consumed, long available, int source);
     method public suspend Object? dispatchPreFling-bHeVL4A(long available, kotlin.coroutines.Continuation<? super androidx.compose.ui.unit.Velocity> p);
-    method public long dispatchPreScroll-ScU7Jk8(long available, androidx.compose.ui.input.nestedscroll.NestedScrollSource source);
+    method public long dispatchPreScroll-ScU7Jk8(long available, int source);
     method public kotlinx.coroutines.CoroutineScope getCoroutineScope();
     property public final kotlinx.coroutines.CoroutineScope coroutineScope;
   }
@@ -1308,9 +1308,22 @@ package androidx.compose.ui.input.nestedscroll {
     method public static androidx.compose.ui.Modifier nestedScroll(androidx.compose.ui.Modifier, androidx.compose.ui.input.nestedscroll.NestedScrollConnection connection, optional androidx.compose.ui.input.nestedscroll.NestedScrollDispatcher? dispatcher);
   }
 
-  public enum NestedScrollSource {
-    enum_constant public static final androidx.compose.ui.input.nestedscroll.NestedScrollSource Drag;
-    enum_constant public static final androidx.compose.ui.input.nestedscroll.NestedScrollSource Fling;
+  public final inline class NestedScrollSource {
+    ctor public NestedScrollSource();
+    method public static inline boolean equals-impl(int p, Object? p1);
+    method public static boolean equals-impl0(int p1, int p2);
+    method public static inline int hashCode-impl(int p);
+    method public static String toString-impl(int $this);
+    field public static final androidx.compose.ui.input.nestedscroll.NestedScrollSource.Companion Companion;
+  }
+
+  public static final class NestedScrollSource.Companion {
+    method public int getDrag-WNlRxjI();
+    method public int getFling-WNlRxjI();
+    method @Deprecated public int getRelocate-WNlRxjI();
+    property public final int Drag;
+    property public final int Fling;
+    property @Deprecated public final int Relocate;
   }
 
 }
