@@ -40,7 +40,7 @@ class TestCases1 {
         )
 
         Div(
-            attrs = {
+            {
                 id("box")
                 onMouseEnter {
                     println("Mouse enter")
@@ -50,11 +50,12 @@ class TestCases1 {
                     println("Mouse leave")
                     hovered = false
                 }
-            },
-            style = {
-                width(100.px)
-                height(100.px)
-                backgroundColor("red")
+
+                style {
+                    width(100.px)
+                    height(100.px)
+                    backgroundColor("red")
+                }
             }
         ) {}
     }

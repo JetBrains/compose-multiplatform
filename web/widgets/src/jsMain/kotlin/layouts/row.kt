@@ -3,7 +3,6 @@ package org.jetbrains.compose.common.foundation.layout
 import org.jetbrains.compose.common.ui.Modifier
 import androidx.compose.runtime.Composable
 import androidx.compose.web.elements.Div
-import org.jetbrains.compose.common.ui.asStyleBuilderApplier
 import org.jetbrains.compose.common.ui.Alignment
 import org.jetbrains.compose.web.ui.Styles
 
@@ -34,8 +33,7 @@ internal actual fun RowActual(
                     verticalAlignment.asClassName()
                 )
             )
-        },
-        style = modifier.asStyleBuilderApplier()
+        }
     ) {
         content()
     }

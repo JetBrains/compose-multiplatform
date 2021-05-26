@@ -14,16 +14,26 @@ import androidx.compose.web.attributes.name
 import androidx.compose.web.css.CSSVariables
 import androidx.compose.web.css.Color
 import androidx.compose.web.css.LineStyle
-import androidx.compose.web.css.selectors.className
+import androidx.compose.web.css.Style
+import androidx.compose.web.css.StyleSheet
+import androidx.compose.web.css.and
+import androidx.compose.web.css.backgroundColor
+import androidx.compose.web.css.border
 import androidx.compose.web.css.color
 import androidx.compose.web.css.fontSize
 import androidx.compose.web.css.margin
+import androidx.compose.web.css.maxWidth
+import androidx.compose.web.css.media
+import androidx.compose.web.css.minWidth
 import androidx.compose.web.css.opacity
 import androidx.compose.web.css.padding
 import androidx.compose.web.css.percent
 import androidx.compose.web.css.px
+import androidx.compose.web.css.selectors.className
 import androidx.compose.web.css.selectors.hover
 import androidx.compose.web.css.selectors.plus
+import androidx.compose.web.css.value
+import androidx.compose.web.css.variable
 import androidx.compose.web.css.width
 import androidx.compose.web.elements.A
 import androidx.compose.web.elements.Button
@@ -32,16 +42,6 @@ import androidx.compose.web.elements.Input
 import androidx.compose.web.elements.Style
 import androidx.compose.web.elements.Text
 import androidx.compose.web.elements.TextArea
-import androidx.compose.web.css.Style
-import androidx.compose.web.css.StyleSheet
-import androidx.compose.web.css.and
-import androidx.compose.web.css.backgroundColor
-import androidx.compose.web.css.border
-import androidx.compose.web.css.maxWidth
-import androidx.compose.web.css.media
-import androidx.compose.web.css.minWidth
-import androidx.compose.web.css.value
-import androidx.compose.web.css.variable
 import androidx.compose.web.renderComposableInBody
 import androidx.compose.web.sample.tests.launchTestCase
 import kotlinx.browser.window
@@ -101,13 +101,14 @@ fun CounterApp(counter: MutableState<Int>) {
     Counter(counter.value)
 
     Button(
-        style = {
-            color(if (counter.value % 2 == 0) "green" else "red")
-            width((counter.value + 200).px)
-            fontSize(if (counter.value % 2 == 0) 25.px else 30.px)
-            margin(15.px)
-        },
-        attrs = {
+        {
+            style {
+                color(if (counter.value % 2 == 0) "green" else "red")
+                width((counter.value + 200).px)
+                fontSize(if (counter.value % 2 == 0) 25.px else 30.px)
+                margin(15.px)
+            }
+
             onClick { counter.value = counter.value + 1 }
         }
     ) {
@@ -124,9 +125,10 @@ fun Counter(value: Int) {
             draggable(Draggable.True)
             attr("title", "This is a counter!")
             onDrag { println("DRAGGING NOW!!!!") }
-        },
-        style = {
-            color("red")
+
+            style {
+                color("red")
+            }
         }
     ) {
         Text("Counter = $value")
@@ -208,16 +210,15 @@ fun main() {
             Text("My text")
         }
 
-        Div(
-            attrs = {
-                classes(
-                    AppStyleSheet.myClass
-                )
-            },
-            style = {
+        Div({
+            classes(
+                AppStyleSheet.myClass
+            )
+
+            style {
                 opacity(0.3)
             }
-        ) {
+        }) {
             Text("My text")
         }
 
@@ -231,9 +232,10 @@ fun main() {
                         }
                     }
                 )
-            },
-            style = {
-                opacity(30.percent)
+
+                style {
+                    opacity(30.percent)
+                }
             }
         ) {
             Text("My text")
@@ -252,19 +254,18 @@ fun main() {
 
 @Composable
 fun MyInputComponent(text: State<String>, onChange: (String) -> Unit) {
-    Div(
-        style = {
+    Div({
+        style {
             padding(50.px)
-        },
-        attrs = {
-            onTouchStart {
-                println("On touch start")
-            }
-            onTouchEnd {
-                println("On touch end")
-            }
         }
-    ) {
+
+        onTouchStart {
+            println("On touch start")
+        }
+        onTouchEnd {
+            println("On touch end")
+        }
+    }) {
         Text("Test onMouseDown")
     }
 
@@ -343,14 +344,15 @@ fun smallColoredText(text: String) {
                     println("DIV CREATED ${element.id}")
                     onDispose { println("DIV REMOVED ${element.id}") }
                 }
-            },
-            style = {
-                if (globalState.isDarkTheme) {
-                    color("black")
-                } else {
-                    color("green")
+
+                style {
+                    if (globalState.isDarkTheme) {
+                        color("black")
+                    } else {
+                        color("green")
+                    }
                 }
-            }
+            },
         ) {
             Text("Text = $text")
         }

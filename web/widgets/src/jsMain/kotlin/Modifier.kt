@@ -16,23 +16,17 @@ actual fun Modifier.background(color: Color): Modifier = castOrCreate().apply {
     }
 }
 
-fun Modifier.asStyleBuilderApplier(
-    passThroughHandler: (StyleBuilder.() -> Unit)? = null
-): StyleBuilder.() -> Unit = castOrCreate().let { modifier ->
-    val st: StyleBuilder.() -> Unit = {
-        modifier.styleHandlers.forEach { it.invoke(this) }
-        passThroughHandler?.invoke(this)
-    }
-
-    st
-}
-
 fun Modifier.asAttributeBuilderApplier(
     passThroughHandler: (AttrsBuilder<*>.() -> Unit)? = null
 ): AttrsBuilder<*>.() -> Unit =
     castOrCreate().let { modifier ->
         val st: AttrsBuilder<*>.() -> Unit = {
             modifier.attrHandlers.forEach { it.invoke(this) }
+
+            style {
+                modifier.styleHandlers.forEach { it.invoke(this) }
+            }
+
             passThroughHandler?.invoke(this)
         }
 

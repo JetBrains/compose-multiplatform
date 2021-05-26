@@ -43,7 +43,6 @@ import org.w3c.dom.HTMLTextAreaElement
 import org.w3c.dom.HTMLUListElement
 import org.w3c.dom.Text
 
-typealias StyleBuilderContext = StyleBuilder.() -> Unit
 typealias AttrBuilderContext<T> = AttrsBuilder<T>.() -> Unit
 typealias ContentBuilder<T> = @Composable ElementScope<T>.() -> Unit
 
@@ -60,13 +59,11 @@ fun Text(value: String) {
 @Composable
 inline fun Div(
     crossinline attrs: AttrBuilderContext<Tag.Div> = {},
-    crossinline style: StyleBuilderContext = {},
     content: ContentBuilder<HTMLDivElement>
 ) {
     TagElement(
         tagName = "div",
         applyAttrs = attrs,
-        applyStyle = style,
         content = content
     )
 }
@@ -75,7 +72,6 @@ inline fun Div(
 inline fun A(
     href: String? = null,
     crossinline attrs: AttrBuilderContext<Tag.A> = {},
-    crossinline style: StyleBuilderContext = {},
     content: ContentBuilder<HTMLAnchorElement>
 ) {
     TagElement<Tag.A, HTMLAnchorElement>(
@@ -84,7 +80,6 @@ inline fun A(
             href(href)
             attrs()
         },
-        applyStyle = style,
         content = content
     )
 }
@@ -94,7 +89,6 @@ inline fun Input(
     type: InputType = InputType.Text,
     value: String = "",
     crossinline attrs: AttrBuilderContext<Tag.Input> = {},
-    crossinline style: StyleBuilderContext = {},
     content: ContentBuilder<HTMLInputElement> = {}
 ) {
     TagElement<Tag.Input, HTMLInputElement>(
@@ -104,7 +98,6 @@ inline fun Input(
             value(value)
             attrs()
         },
-        applyStyle = style,
         content = content
     )
 }
@@ -112,135 +105,116 @@ inline fun Input(
 @Composable
 inline fun Button(
     crossinline attrs: AttrBuilderContext<Tag.Button> = {},
-    crossinline style: StyleBuilderContext = {},
     content: ContentBuilder<HTMLHeadingElement>
-) = TagElement("button", applyAttrs = attrs, applyStyle = style, content = content)
+) = TagElement("button", applyAttrs = attrs, content = content)
 
 @Composable
 inline fun H1(
     crossinline attrs: AttrBuilderContext<Tag.H> = {},
-    crossinline style: StyleBuilderContext = {},
     content: ContentBuilder<HTMLHeadingElement>
-) = TagElement("h1", applyAttrs = attrs, applyStyle = style, content = content)
+) = TagElement("h1", applyAttrs = attrs, content = content)
 
 @Composable
 inline fun H2(
     crossinline attrs: AttrBuilderContext<Tag.H> = {},
-    crossinline style: StyleBuilderContext = {},
     content: ContentBuilder<HTMLHeadingElement>
-) = TagElement("h2", applyAttrs = attrs, applyStyle = style, content = content)
+) = TagElement("h2", applyAttrs = attrs, content = content)
 
 @Composable
 inline fun H3(
     crossinline attrs: AttrBuilderContext<Tag.H> = {},
-    crossinline style: StyleBuilderContext = {},
     content: ContentBuilder<HTMLHeadingElement>
-) = TagElement("h3", applyAttrs = attrs, applyStyle = style, content = content)
+) = TagElement("h3", applyAttrs = attrs, content = content)
 
 @Composable
 inline fun H4(
     crossinline attrs: AttrBuilderContext<Tag.H> = {},
-    crossinline style: StyleBuilderContext = {},
     content: ContentBuilder<HTMLHeadingElement>
-) = TagElement("h4", applyAttrs = attrs, applyStyle = style, content = content)
+) = TagElement("h4", applyAttrs = attrs, content = content)
 
 @Composable
 inline fun H5(
     crossinline attrs: AttrBuilderContext<Tag.H> = {},
-    crossinline style: StyleBuilderContext = {},
     content: ContentBuilder<HTMLHeadingElement>
-) = TagElement("h5", applyAttrs = attrs, applyStyle = style, content = content)
+) = TagElement("h5", applyAttrs = attrs, content = content)
 
 @Composable
 inline fun H6(
     crossinline attrs: AttrBuilderContext<Tag.H> = {},
-    crossinline style: StyleBuilderContext = {},
     content: ContentBuilder<HTMLHeadingElement>
-) = TagElement("h6", applyAttrs = attrs, applyStyle = style, content = content)
+) = TagElement("h6", applyAttrs = attrs, content = content)
 
 @Composable
 inline fun P(
     crossinline attrs: AttrBuilderContext<Tag.P> = {},
-    crossinline style: StyleBuilderContext = {},
     content: ContentBuilder<HTMLParagraphElement>
-) = TagElement("p", applyAttrs = attrs, applyStyle = style, content = content)
+) = TagElement("p", applyAttrs = attrs, content = content)
 
 @Composable
 inline fun Em(
     crossinline attrs: AttrBuilderContext<Tag> = {},
-    crossinline style: StyleBuilderContext = {},
     content: ContentBuilder<HTMLElement>
-) = TagElement("em", applyAttrs = attrs, applyStyle = style, content = content)
+) = TagElement("em", applyAttrs = attrs, content = content)
 
 @Composable
 inline fun I(
     crossinline attrs: AttrBuilderContext<Tag> = {},
-    crossinline style: StyleBuilderContext = {},
     content: ContentBuilder<HTMLElement>
-) = TagElement("i", applyAttrs = attrs, applyStyle = style, content = content)
+) = TagElement("i", applyAttrs = attrs, content = content)
 
 @Composable
 inline fun B(
     crossinline attrs: AttrBuilderContext<Tag> = {},
-    crossinline style: StyleBuilderContext = {},
     content: ContentBuilder<HTMLElement>
-) = TagElement("b", applyAttrs = attrs, applyStyle = style, content = content)
+) = TagElement("b", applyAttrs = attrs, content = content)
 
 @Composable
 inline fun Small(
     crossinline attrs: AttrBuilderContext<Tag> = {},
-    crossinline style: StyleBuilderContext = {},
     content: ContentBuilder<HTMLElement>
-) = TagElement("small", applyAttrs = attrs, applyStyle = style, content = content)
+) = TagElement("small", applyAttrs = attrs, content = content)
 
 @Composable
 inline fun Span(
     crossinline attrs: AttrBuilderContext<Tag.Span> = {},
-    crossinline style: StyleBuilderContext = {},
     content: ContentBuilder<HTMLSpanElement>
-) = TagElement("span", applyAttrs = attrs, applyStyle = style, content = content)
+) = TagElement("span", applyAttrs = attrs, content = content)
 
 @Composable
 inline fun Br(
     crossinline attrs: AttrBuilderContext<Tag.Br> = {},
-    crossinline style: StyleBuilderContext = {},
     content: ContentBuilder<HTMLBRElement>
-) = TagElement("br", applyAttrs = attrs, applyStyle = style, content = content)
+) = TagElement("br", applyAttrs = attrs, content = content)
 
 @Composable
 inline fun Ul(
     crossinline attrs: AttrBuilderContext<Tag.Ul> = {},
-    crossinline style: StyleBuilderContext = {},
     content: ContentBuilder<HTMLUListElement>,
-) = TagElement("ul", applyAttrs = attrs, applyStyle = style, content = content)
+) = TagElement("ul", applyAttrs = attrs, content = content)
 
 @Composable
 inline fun Ol(
     crossinline attrs: AttrBuilderContext<Tag.Ol> = {},
-    crossinline style: StyleBuilderContext = {},
     content: ContentBuilder<HTMLOListElement>
-) = TagElement("ol", applyAttrs = attrs, applyStyle = style, content = content)
+) = TagElement("ol", applyAttrs = attrs, content = content)
 
 @Composable
 inline fun DOMScope<HTMLOListElement>.Li(
     crossinline attrs: AttrBuilderContext<Tag.Li> = {},
-    crossinline style: StyleBuilderContext = {},
     content: ContentBuilder<HTMLLIElement>
-) = TagElement("li", applyAttrs = attrs, applyStyle = style, content = content)
+) = TagElement("li", applyAttrs = attrs, content = content)
 
 @Composable
 inline fun DOMScope<HTMLUListElement>.Li(
     crossinline attrs: AttrBuilderContext<Tag.Li> = {},
-    crossinline style: StyleBuilderContext = {},
     content: ContentBuilder<HTMLLIElement>
-) = TagElement("li", applyAttrs = attrs, applyStyle = style, content = content)
+) = TagElement("li", applyAttrs = attrs, content = content)
 
 @Composable
 inline fun Img(
     src: String,
     alt: String = "",
     crossinline attrs: AttrBuilderContext<Tag.Img> = {},
-    crossinline style: StyleBuilderContext = {},
     content: ContentBuilder<HTMLImageElement> = {}
 ) = TagElement<Tag.Img, HTMLImageElement>(
     tagName = "img",
@@ -248,14 +222,13 @@ inline fun Img(
         src(src).alt(alt)
         attrs()
     },
-    applyStyle = style, content = content
+    content = content
 )
 
 @Composable
 inline fun Form(
     action: String? = null,
     crossinline attrs: AttrBuilderContext<Tag.Form> = {},
-    crossinline style: StyleBuilderContext = {},
     content: ContentBuilder<HTMLFormElement>
 ) = TagElement<Tag.Form, HTMLFormElement>(
     tagName = "form",
@@ -263,18 +236,16 @@ inline fun Form(
         if (!action.isNullOrEmpty()) action(action)
         attrs()
     },
-    applyStyle = style, content = content
+    content = content
 )
 
 @Composable
 inline fun Select(
     crossinline attrs: AttrBuilderContext<Tag.Select> = {},
-    crossinline style: StyleBuilderContext = {},
     content: ContentBuilder<HTMLSelectElement>
 ) = TagElement(
     tagName = "select",
     applyAttrs = attrs,
-    applyStyle = style,
     content = content
 )
 
@@ -282,7 +253,6 @@ inline fun Select(
 inline fun DOMScope<HTMLUListElement>.Option(
     value: String,
     crossinline attrs: AttrBuilderContext<Tag.Option> = {},
-    crossinline style: StyleBuilderContext = {},
     content: ContentBuilder<HTMLOptionElement>
 ) = TagElement<Tag.Option, HTMLOptionElement>(
     tagName = "option",
@@ -290,7 +260,6 @@ inline fun DOMScope<HTMLUListElement>.Option(
         value(value)
         attrs()
     },
-    applyStyle = style,
     content = content
 )
 
@@ -298,7 +267,6 @@ inline fun DOMScope<HTMLUListElement>.Option(
 inline fun OptGroup(
     label: String,
     crossinline attrs: AttrBuilderContext<Tag.OptGroup> = {},
-    crossinline style: StyleBuilderContext = {},
     content: ContentBuilder<HTMLOptGroupElement>
 ) = TagElement<Tag.OptGroup, HTMLOptGroupElement>(
     tagName = "optgroup",
@@ -306,34 +274,29 @@ inline fun OptGroup(
         label(label)
         attrs()
     },
-    applyStyle = style,
     content = content
 )
 
 @Composable
 inline fun Section(
     crossinline attrs: AttrBuilderContext<Tag> = {},
-    crossinline style: StyleBuilderContext = {},
     content: ContentBuilder<HTMLElement>
 ) = TagElement(
     tagName = "section",
     applyAttrs = attrs,
-    applyStyle = style,
     content = content
 )
 
 @Composable
 inline fun TextArea(
     crossinline attrs: AttrBuilderContext<Tag.TextArea> = {},
-    crossinline style: StyleBuilderContext = {},
     value: String
 ) = TagElement<Tag.TextArea, HTMLTextAreaElement>(
     tagName = "textarea",
     applyAttrs = {
         value(value)
         attrs()
-    },
-    applyStyle = style
+    }
 ) {
     Text(value)
 }
@@ -341,25 +304,21 @@ inline fun TextArea(
 @Composable
 inline fun Nav(
     crossinline attrs: AttrBuilderContext<Tag.Nav> = {},
-    crossinline style: StyleBuilderContext = {},
     content: ContentBuilder<HTMLElement>
 ) = TagElement(
     tagName = "nav",
     applyAttrs = attrs,
-    applyStyle = style,
     content = content
 )
 
 @Composable
 inline fun Pre(
     crossinline attrs: AttrBuilderContext<Tag.Pre> = {},
-    crossinline style: StyleBuilderContext = {},
     content: ContentBuilder<HTMLPreElement>
 ) {
     TagElement(
         tagName = "pre",
         applyAttrs = attrs,
-        applyStyle = style,
         content = content
     )
 }
@@ -367,13 +326,11 @@ inline fun Pre(
 @Composable
 inline fun Code(
     crossinline attrs: AttrBuilderContext<Tag.Code> = {},
-    crossinline style: StyleBuilderContext = {},
     content: ContentBuilder<HTMLElement>
 ) {
     TagElement(
         tagName = "code",
         applyAttrs = attrs,
-        applyStyle = style,
         content = content
     )
 }
@@ -381,13 +338,11 @@ inline fun Code(
 @Composable
 inline fun Main(
     crossinline attrs: AttrBuilderContext<Tag.Div> = {},
-    crossinline style: StyleBuilderContext = {},
     content: ContentBuilder<HTMLElement> = {}
 ) {
     TagElement<Tag.Div, HTMLAnchorElement>(
         tagName = "main",
         applyAttrs = attrs,
-        applyStyle = style,
         content = content
     )
 }
@@ -395,13 +350,11 @@ inline fun Main(
 @Composable
 inline fun Footer(
     crossinline attrs: AttrBuilderContext<Tag.Div> = {},
-    crossinline style: StyleBuilderContext = {},
     content: ContentBuilder<HTMLElement> = {}
 ) {
     TagElement<Tag.Div, HTMLAnchorElement>(
         tagName = "footer",
         applyAttrs = attrs,
-        applyStyle = style,
         content = content
     )
 }
@@ -410,7 +363,6 @@ inline fun Footer(
 inline fun Label(
     forId: String? = null,
     crossinline attrs: AttrBuilderContext<Tag.Label> = {},
-    crossinline style: StyleBuilderContext = {},
     content: ContentBuilder<HTMLElement> = {}
 ) {
     TagElement<Tag.Label, HTMLAnchorElement>(
@@ -419,7 +371,6 @@ inline fun Label(
             forId(forId)
             attrs()
         },
-        applyStyle = style,
         content = content
     )
 }
@@ -427,13 +378,11 @@ inline fun Label(
 @Composable
 inline fun Table(
     crossinline attrs: AttrBuilderContext<Tag.Table> = {},
-    crossinline style: StyleBuilderContext = {},
     content: ContentBuilder<HTMLTableElement>
 ) {
     TagElement(
         tagName = "table",
         applyAttrs = attrs,
-        applyStyle = style,
         content = content
     )
 }
@@ -441,13 +390,11 @@ inline fun Table(
 @Composable
 inline fun Caption(
     crossinline attrs: AttrBuilderContext<Tag.Caption> = {},
-    crossinline style: StyleBuilderContext = {},
     content: ContentBuilder<HTMLTableCaptionElement>
 ) {
     TagElement(
         tagName = "caption",
         applyAttrs = attrs,
-        applyStyle = style,
         content = content
     )
 }
@@ -455,13 +402,11 @@ inline fun Caption(
 @Composable
 inline fun Col(
     crossinline attrs: AttrBuilderContext<Tag.Col> = {},
-    crossinline style: StyleBuilderContext = {},
     content: ContentBuilder<HTMLTableColElement>
 ) {
     TagElement(
         tagName = "col",
         applyAttrs = attrs,
-        applyStyle = style,
         content = content
     )
 }
@@ -469,13 +414,11 @@ inline fun Col(
 @Composable
 inline fun Colgroup(
     crossinline attrs: AttrBuilderContext<Tag.Colgroup> = {},
-    crossinline style: StyleBuilderContext = {},
     content: ContentBuilder<HTMLTableColElement>
 ) {
     TagElement(
         tagName = "colgroup",
         applyAttrs = attrs,
-        applyStyle = style,
         content = content
     )
 }
@@ -483,13 +426,11 @@ inline fun Colgroup(
 @Composable
 inline fun Tr(
     crossinline attrs: AttrBuilderContext<Tag.Tr> = {},
-    crossinline style: StyleBuilderContext = {},
     content: ContentBuilder<HTMLTableRowElement>
 ) {
     TagElement(
         tagName = "tr",
         applyAttrs = attrs,
-        applyStyle = style,
         content = content
     )
 }
@@ -497,13 +438,11 @@ inline fun Tr(
 @Composable
 inline fun Thead(
     crossinline attrs: AttrBuilderContext<Tag.Thead> = {},
-    crossinline style: StyleBuilderContext = {},
     content: ContentBuilder<HTMLTableSectionElement>
 ) {
     TagElement(
         tagName = "thead",
         applyAttrs = attrs,
-        applyStyle = style,
         content = content
     )
 }
@@ -511,13 +450,11 @@ inline fun Thead(
 @Composable
 inline fun Th(
     crossinline attrs: AttrBuilderContext<Tag.Th> = {},
-    crossinline style: StyleBuilderContext = {},
     content: ContentBuilder<HTMLTableCellElement>
 ) {
     TagElement(
         tagName = "th",
         applyAttrs = attrs,
-        applyStyle = style,
         content = content
     )
 }
@@ -525,13 +462,11 @@ inline fun Th(
 @Composable
 inline fun Td(
     crossinline attrs: AttrBuilderContext<Tag.Td> = {},
-    crossinline style: StyleBuilderContext = {},
     content: ContentBuilder<HTMLTableCellElement>
 ) {
     TagElement(
         tagName = "td",
         applyAttrs = attrs,
-        applyStyle = style,
         content = content
     )
 }
@@ -539,13 +474,11 @@ inline fun Td(
 @Composable
 inline fun Tbody(
     crossinline attrs: AttrBuilderContext<Tag.Tbody> = {},
-    crossinline style: StyleBuilderContext = {},
     content: ContentBuilder<HTMLTableSectionElement>
 ) {
     TagElement(
         tagName = "tbody",
         applyAttrs = attrs,
-        applyStyle = style,
         content = content
     )
 }
@@ -553,13 +486,11 @@ inline fun Tbody(
 @Composable
 inline fun Tfoot(
     crossinline attrs: AttrBuilderContext<Tag.Tfoot> = {},
-    crossinline style: StyleBuilderContext = {},
     content: ContentBuilder<HTMLTableSectionElement>
 ) {
     TagElement(
         tagName = "tfoot",
         applyAttrs = attrs,
-        applyStyle = style,
         content = content
     )
 }

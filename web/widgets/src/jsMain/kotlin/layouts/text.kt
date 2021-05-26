@@ -5,7 +5,6 @@ import androidx.compose.web.elements.Text as TextNode
 import androidx.compose.web.elements.Span
 import org.jetbrains.compose.web.ui.Styles
 import org.jetbrains.compose.common.ui.Modifier
-import org.jetbrains.compose.common.ui.asStyleBuilderApplier
 import org.jetbrains.compose.common.ui.asAttributeBuilderApplier
 import org.jetbrains.compose.common.core.graphics.Color
 import androidx.compose.web.css.color
@@ -24,14 +23,15 @@ actual fun TextActual(
     size: TextUnit
 ) {
     Span(
-        style = modifier.asStyleBuilderApplier() {
-            color(RGB(color.red, color.green, color.blue))
-            when (size.unitType) {
-                TextUnitType.Em -> fontSize(size.value.em)
-                TextUnitType.Sp -> fontSize(size.value.px)
+        modifier.asAttributeBuilderApplier {
+            style {
+                color(RGB(color.red, color.green, color.blue))
+                when (size.unitType) {
+                    TextUnitType.Em -> fontSize(size.value.em)
+                    TextUnitType.Sp -> fontSize(size.value.px)
+                }
             }
-        },
-        attrs = modifier.asAttributeBuilderApplier() {
+
             classes(Styles.textClass)
         }
     ) {

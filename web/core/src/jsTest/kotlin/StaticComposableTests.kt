@@ -94,11 +94,13 @@ class StaticComposableTests {
             root = root
         ) {
             Div(
-                style = {
-                    opacity(0.3)
-                    color("red")
-                    opacity(0.2)
-                    color("green")
+                {
+                    style {
+                        opacity(0.3)
+                        color("red")
+                        opacity(0.2)
+                        color("green")
+                    }
                 }
             ) {}
         }
@@ -113,13 +115,17 @@ class StaticComposableTests {
             root = root
         ) {
             Div(
-                style = {
-                    property("border", value("1px solid red"))
+                {
+                    style {
+                        property("border", value("1px solid red"))
+                    }
                 }
             ) {}
             Div(
-                style = {
-                    border(3.px, color = Color("green"))
+                {
+                    style {
+                        border(3.px, color = Color("green"))
+                    }
                 }
             ) {}
         }
@@ -144,13 +150,17 @@ class StaticComposableTests {
             root = root
         ) {
             Div(
-                style = {
-                    order(-4)
+                {
+                    style {
+                        order(-4)
+                    }
                 }
             ) {}
             Div(
-                style = {
-                    order(3)
+                {
+                    style {
+                        order(3)
+                    }
                 }
             ) {}
         }
@@ -166,23 +176,31 @@ class StaticComposableTests {
             root = root
         ) {
             Div(
-                style = {
-                    flexGrow(3)
+                {
+                    style {
+                        flexGrow(3)
+                    }
                 }
             ) {}
             Div(
-                style = {
-                    flexGrow(2.5)
+                {
+                    style {
+                        flexGrow(2.5)
+                    }
                 }
             ) {}
             Div(
-                style = {
-                    flexGrow(1e2)
+                {
+                    style {
+                        flexGrow(1e2)
+                    }
                 }
             ) {}
             Div(
-                style = {
-                    flexGrow(.6)
+                {
+                    style {
+                        flexGrow(.6)
+                    }
                 }
             ) {}
         }
@@ -200,23 +218,31 @@ class StaticComposableTests {
             root = root
         ) {
             Div(
-                style = {
-                    flexShrink(3)
+                {
+                    style {
+                        flexShrink(3)
+                    }
                 }
             ) {}
             Div(
-                style = {
-                    flexShrink(2.5)
+                {
+                    style {
+                        flexShrink(2.5)
+                    }
                 }
             ) {}
             Div(
-                style = {
-                    flexShrink(1e2)
+                {
+                    style {
+                        flexShrink(1e2)
+                    }
                 }
             ) {}
             Div(
-                style = {
-                    flexShrink(.6)
+                {
+                    style {
+                        flexShrink(.6)
+                    }
                 }
             ) {}
         }
@@ -234,8 +260,10 @@ class StaticComposableTests {
             root = root
         ) {
             Div(
-                style = {
-                    width(100.px)
+                {
+                    style {
+                        width(100.px)
+                    }
                 }
             ) {}
         }
@@ -250,23 +278,31 @@ class StaticComposableTests {
             root = root
         ) {
             Div(
-                style = {
-                    borderRadius(3.px)
+                {
+                    style {
+                        borderRadius(3.px)
+                    }
                 }
             ) {}
             Div(
-                style = {
-                    borderRadius(3.px, 5.px)
+                {
+                    style {
+                        borderRadius(3.px, 5.px)
+                    }
                 }
             ) {}
             Div(
-                style = {
-                    borderRadius(3.px, 5.px, 4.px)
+                {
+                    style {
+                        borderRadius(3.px, 5.px, 4.px)
+                    }
                 }
             ) {}
             Div(
-                style = {
-                    borderRadius(3.px, 5.px, 4.px, 1.px)
+                {
+                    style {
+                        borderRadius(3.px, 5.px, 4.px, 1.px)
+                    }
                 }
             ) {}
         }
@@ -287,8 +323,10 @@ class StaticComposableTests {
             root = root
         ) {
             Div(
-                style = {
-                    top(100.px)
+                {
+                    style {
+                        top(100.px)
+                    }
                 }
             ) {}
         }
@@ -303,8 +341,10 @@ class StaticComposableTests {
             root = root
         ) {
             Div(
-                style = {
-                    bottom(100.px)
+                {
+                    style {
+                        bottom(100.px)
+                    }
                 }
             ) {}
         }
@@ -319,8 +359,10 @@ class StaticComposableTests {
             root = root
         ) {
             Div(
-                style = {
-                    left(100.px)
+                {
+                    style {
+                        left(100.px)
+                    }
                 }
             ) {}
         }
@@ -335,8 +377,10 @@ class StaticComposableTests {
             root = root
         ) {
             Div(
-                style = {
-                    right(100.px)
+                {
+                    style {
+                        right(100.px)
+                    }
                 }
             ) {}
         }
@@ -351,8 +395,10 @@ class StaticComposableTests {
             root = root
         ) {
             Div(
-                style = {
-                    height(100.px)
+                {
+                    style {
+                        height(100.px)
+                    }
                 }
             ) {}
         }
@@ -369,8 +415,10 @@ class StaticComposableTests {
         ) {
             enumValues.forEach { displayStyle ->
                 Div(
-                    style = {
-                        display(displayStyle)
+                    {
+                        style {
+                            display(displayStyle)
+                        }
                     }
                 ) { }
             }
@@ -393,8 +441,10 @@ class StaticComposableTests {
         ) {
             enumValues.forEach { flexDirection ->
                 Span(
-                    style = {
-                        flexDirection(flexDirection)
+                    {
+                        style {
+                            flexDirection(flexDirection)
+                        }
                     }
                 ) { }
             }
@@ -417,8 +467,10 @@ class StaticComposableTests {
         ) {
             enumValues.forEach { flexWrap ->
                 Span(
-                    style = {
-                        flexWrap(flexWrap)
+                    {
+                        style {
+                            flexWrap(flexWrap)
+                        }
                     }
                 ) { }
             }
@@ -443,8 +495,10 @@ class StaticComposableTests {
             flexDirections.forEach { flexDirection ->
                 flexWraps.forEach { flexWrap ->
                     Span(
-                        style = {
-                            flexFlow(flexDirection, flexWrap)
+                        {
+                            style {
+                                flexFlow(flexDirection, flexWrap)
+                            }
                         }
                     ) { }
                 }
@@ -470,8 +524,10 @@ class StaticComposableTests {
         ) {
             enumValues.forEach { justifyContent ->
                 Span(
-                    style = {
-                        justifyContent(justifyContent)
+                    {
+                        style {
+                            justifyContent(justifyContent)
+                        }
                     }
                 ) { }
             }
@@ -494,8 +550,10 @@ class StaticComposableTests {
         ) {
             enumValues.forEach { alignSelf ->
                 Span(
-                    style = {
-                        alignSelf(alignSelf)
+                    {
+                        style {
+                            alignSelf(alignSelf)
+                        }
                     }
                 ) { }
             }
@@ -518,8 +576,10 @@ class StaticComposableTests {
         ) {
             enumValues.forEach { alignItems ->
                 Span(
-                    style = {
-                        alignItems(alignItems)
+                    {
+                        style {
+                            alignItems(alignItems)
+                        }
                     }
                 ) { }
             }
@@ -542,8 +602,10 @@ class StaticComposableTests {
         ) {
             enumValues.forEach { alignContent ->
                 Span(
-                    style = {
-                        alignContent(alignContent)
+                    {
+                        style {
+                            alignContent(alignContent)
+                        }
                     }
                 ) { }
             }
@@ -566,8 +628,10 @@ class StaticComposableTests {
         ) {
             enumValues.forEach { position ->
                 Span(
-                    style = {
-                        position(position)
+                    {
+                        style {
+                            position(position)
+                        }
                     }
                 ) { }
             }

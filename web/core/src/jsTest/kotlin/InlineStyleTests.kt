@@ -1,5 +1,5 @@
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.compose.web.css.color
 import androidx.compose.web.elements.Span
@@ -15,11 +15,13 @@ class InlineStyleTests {
         var isRed by mutableStateOf(true)
         composition {
             Span(
-                style = {
-                    if (isRed) {
-                        color("red")
-                    } else {
-                        color("green")
+                {
+                    style {
+                        if (isRed) {
+                            color("red")
+                        } else {
+                            color("green")
+                        }
                     }
                 }
             ) {
@@ -46,9 +48,11 @@ class InlineStyleTests {
         var isRed by mutableStateOf(false)
         composition {
             Span(
-                style = {
-                    if (isRed) {
-                        color("red")
+                {
+                    style {
+                        if (isRed) {
+                            color("red")
+                        }
                     }
                 }
             ) {
@@ -75,9 +79,11 @@ class InlineStyleTests {
         var isRed by mutableStateOf(true)
         composition {
             Span(
-                style = {
-                    if (isRed) {
-                        color("red")
+                {
+                    style {
+                        if (isRed) {
+                            color("red")
+                        }
                     }
                 }
             ) {
@@ -104,9 +110,11 @@ class InlineStyleTests {
         var isRed by mutableStateOf(true)
         composition {
             Span(
-                style = {
-                    if (isRed) {
-                        color("red")
+                {
+                    style {
+                        if (isRed) {
+                            color("red")
+                        }
                     }
                 }
             ) {

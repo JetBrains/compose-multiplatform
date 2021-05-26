@@ -2,7 +2,6 @@ package org.jetbrains.compose.common.foundation.layout
 
 import org.jetbrains.compose.common.ui.Modifier
 import androidx.compose.runtime.Composable
-import org.jetbrains.compose.common.ui.asStyleBuilderApplier
 import androidx.compose.web.elements.Div
 import org.jetbrains.compose.web.ui.Styles
 
@@ -11,8 +10,7 @@ internal actual fun ColumnActual(modifier: Modifier, content: @Composable () -> 
     Div(
         attrs = {
             classes(Styles.columnClass)
-        },
-        style = modifier.asStyleBuilderApplier()
+        }
     ) {
         content()
     }

@@ -55,7 +55,6 @@ class DisposableEffectHolder(
 inline fun <TTag : Tag, THTMLElement : HTMLElement> TagElement(
     tagName: String,
     crossinline applyAttrs: AttrsBuilder<TTag>.() -> Unit,
-    crossinline applyStyle: StyleBuilder.() -> Unit,
     content: @Composable ElementScope<THTMLElement>.() -> Unit
 ) {
     val scope = remember { ElementScopeImpl<THTMLElement>() }
@@ -71,19 +70,20 @@ inline fun <TTag : Tag, THTMLElement : HTMLElement> TagElement(
             val attrsApplied = AttrsBuilder<TTag>().also { it.applyAttrs() }
             refEffect.effect = attrsApplied.refEffect
             val attrsCollected = attrsApplied.collect()
-            val events = attrsApplied.asList()
+            val events = attrsApplied.collectListeners()
 
             update {
                 set(attrsCollected, DomNodeWrapper.UpdateAttrs)
                 set(events, DomNodeWrapper.UpdateListeners)
                 set(attrsApplied.propertyUpdates, DomNodeWrapper.UpdateProperties)
+                set(attrsApplied.styleBuilder, DomNodeWrapper.UpdateStyleDeclarations)
             }
         },
         styleSkippableUpdate = {
-            val style = StyleBuilderImpl().apply(applyStyle)
-            update {
-                set(style, DomNodeWrapper.UpdateStyleDeclarations)
-            }
+//            val style = StyleBuilderImpl().apply(applyStyle)
+//            update {
+//                set(style, DomNodeWrapper.UpdateStyleDeclarations)
+//            }
         },
         elementScope = scope,
         content = content
