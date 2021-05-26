@@ -312,9 +312,6 @@ class AndroidXDocsPlugin : Plugin<Project> {
                 destinationDir = generatedDocsDir
                 samplesDir = unzippedSamplesSources
                 sourcesDir = unzippedDocsSources
-                includes = unzippedDocsSources.walkTopDown()
-                    .filter { it.name.endsWith("documentation.md") }
-                    .joinToString(";")
                 docsProjectDir = File(project.rootDir, "docs-public")
                 dependenciesClasspath = androidJarFile(project) + dependencyClasspath
             }
