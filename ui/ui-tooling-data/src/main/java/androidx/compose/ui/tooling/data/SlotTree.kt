@@ -432,7 +432,7 @@ private fun sourceInformationContextOf(
     return SourceInformationContext(
         name = name,
         sourceFile = sourceFile ?: parent?.sourceFile,
-        packageHash = packageHash,
+        packageHash = if (sourceFile != null) packageHash else parent?.packageHash ?: packageHash,
         locations = sourceLocations,
         repeatOffset = repeatOffset,
         parameters = parameters,
