@@ -13,12 +13,6 @@ repositories {
     maven("https://maven.pkg.jetbrains.space/public/p/compose/dev")
 }
 
-compose.desktop {
-    application {
-        mainClass = ""
-    }
-}
-
 kotlin {
     jvm()
     js(IR) {
