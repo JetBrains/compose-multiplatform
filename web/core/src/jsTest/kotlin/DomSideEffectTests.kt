@@ -29,7 +29,7 @@ class DomSideEffectTests {
             }
         }
         assertEquals(
-            expected = "<div><div style=\"\"><p>Hello World!</p></div></div>",
+            expected = "<div><div><p>Hello World!</p></div></div>",
             actual = root.outerHTML
         )
     }
@@ -57,7 +57,7 @@ class DomSideEffectTests {
         composition { CustomDiv(i) }
 
         assertEquals(
-            expected = "<div><div style=\"\">Value = 0</div></div>",
+            expected = "<div><div>Value = 0</div></div>",
             actual = root.outerHTML
         )
 
@@ -75,7 +75,7 @@ class DomSideEffectTests {
             message = "onDispose should be called with a previous value"
         )
         assertEquals(
-            expected = "<div><div style=\"\">Value = 1</div></div>",
+            expected = "<div><div>Value = 1</div></div>",
             actual = root.outerHTML
         )
     }
@@ -97,7 +97,7 @@ class DomSideEffectTests {
         }
 
         assertEquals(
-            expected = "<div><div style=\"\">Goedemorgen!</div></div>",
+            expected = "<div><div>Goedemorgen!</div></div>",
             actual = root.outerHTML
         )
 

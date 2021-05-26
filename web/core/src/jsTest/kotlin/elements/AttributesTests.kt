@@ -25,7 +25,7 @@ class AttributesTests {
         }
 
         assertEquals(
-            expected = "<label for=\"l1\" style=\"\">label</label>",
+            expected = "<label for=\"l1\">label</label>",
             actual = root.innerHTML
         )
     }
@@ -38,7 +38,7 @@ class AttributesTests {
         }
 
         assertEquals(
-            expected = "<label style=\"\">label</label>",
+            expected = "<label>label</label>",
             actual = root.innerHTML
         )
     }
@@ -57,7 +57,7 @@ class AttributesTests {
         }
 
         assertEquals(
-            expected = "<label for=\"lb1\" style=\"\">label</label>",
+            expected = "<label for=\"lb1\">label</label>",
             actual = root.innerHTML
         )
     }

@@ -137,45 +137,45 @@ class TableTests {
 
         assertEquals(
             expected = """
-            <table style="">
-                <caption style="">CaptionText</caption>
-                <colgroup style="">
-                    <col style="">
-                    <col style="">
-                    <col style="">
+            <table>
+                <caption>CaptionText</caption>
+                <colgroup>
+                    <col>
+                    <col>
+                    <col>
                 </colgroup>
-                <thead style="">
-                    <tr style="">
-                        <th style=""></th>
-                        <th style=""></th>
-                        <th colspan="2" style="">First</th>
+                <thead>
+                    <tr>
+                        <th></th>
+                        <th></th>
+                        <th colspan="2">First</th>
                     </tr>
-                    <tr style="">
-                        <th style=""></th>
-                        <th style=""></th>
-                        <th scope="col" style="">A</th>
-                        <th scope="col" style="">B</th>
+                    <tr>
+                        <th></th>
+                        <th></th>
+                        <th scope="col">A</th>
+                        <th scope="col">B</th>
                     </tr>
                 </thead>
-                <tbody style="">
-                    <tr style="">
-                        <th scope="row" rowspan="2" style="">Rows</th>
-                        <th scope="row" style="">1</th>
-                        <td style="">30</td>
-                        <td style="">40</td>
+                <tbody>
+                    <tr>
+                        <th scope="row" rowspan="2">Rows</th>
+                        <th scope="row">1</th>
+                        <td>30</td>
+                        <td>40</td>
                     </tr>
-                    <tr style="">
-                        <th scope="row" style="">2</th>
-                        <td style="">10</td>
-                        <td style="">20</td>
+                    <tr>
+                        <th scope="row">2</th>
+                        <td>10</td>
+                        <td>20</td>
                     </tr>
                 </tbody>
-                <tfoot style="">
-                    <tr style="">
-                        <th scope="row" style="">Totals</th>
-                        <th style=""></th>
-                        <td style="">40</td>
-                        <td style="">60</td>
+                <tfoot>
+                    <tr>
+                        <th scope="row">Totals</th>
+                        <th></th>
+                        <td>40</td>
+                        <td>60</td>
                     </tr>
                 </tfoot>
             </table>

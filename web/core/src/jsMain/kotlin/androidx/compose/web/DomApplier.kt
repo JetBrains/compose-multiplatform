@@ -80,8 +80,7 @@ class DomNodeWrapper(val node: Node) {
 
     fun updateStyleDeclarations(style: StyleHolder?) {
         val htmlElement = node as? HTMLElement ?: return
-        // TODO: typed-om-polyfill hasn't StylePropertyMap::clear()
-        htmlElement.style.cssText = ""
+        htmlElement.removeAttribute("style")
 
         style?.properties?.forEach { (name, value) ->
             setProperty(htmlElement.attributeStyleMap, name, value)
