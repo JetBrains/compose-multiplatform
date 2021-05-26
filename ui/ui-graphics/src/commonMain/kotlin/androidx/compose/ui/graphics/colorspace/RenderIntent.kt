@@ -28,7 +28,7 @@ import androidx.compose.runtime.Immutable
  */
 @Suppress("INLINE_CLASS_DEPRECATED", "EXPERIMENTAL_FEATURE_WARNING")
 @Immutable
-inline class RenderIntent internal constructor(val value: Int) {
+inline class RenderIntent internal constructor(@Suppress("unused") private val value: Int) {
     companion object {
         /**
          * Compresses the source gamut into the destination gamut.
