@@ -196,19 +196,28 @@ macOS {
     notarization { 
          appleID.set("john.doe@example.com")
          password.set("@keychain:NOTARIZATION_PASSWORD")
+         
+         // optional
+         ascProvider.set("<TEAM_ID>")
     }
 }
 ```
 
 * Set `appleID` to your Apple ID.
-  * Alternatively, the `compose.desktop.mac.notarization.appleID` can be used.
+  * Alternatively, the `compose.desktop.mac.notarization.appleID` Gradle property can be used.
 * Set `password` to the app-specific password created previously.
-    * Alternatively, the `compose.desktop.mac.notarization.password` can be used.
+    * Alternatively, the `compose.desktop.mac.notarization.password` Gradle property can be used.
     * Don't write raw password directly into a build script.
     * If the password was added to the keychain, as described previously, it can be referenced as
      ```
      @keychain:NOTARIZATION_PASSWORD
      ```
+* Set `ascProvider` to your Team ID, if your account is associated with multiple teams.
+    * Alternatively, the `compose.desktop.mac.notarization.ascProvider` Gradle property can be used.
+    * To get a table of team IDs associated with a given username and password, run:
+```
+xcrun altool --list-providers -u <Apple ID> -p <Notarization password>"
+```
 
 ## Using Gradle
 
