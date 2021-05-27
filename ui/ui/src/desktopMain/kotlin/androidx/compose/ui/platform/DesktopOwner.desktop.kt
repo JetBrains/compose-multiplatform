@@ -87,7 +87,8 @@ private typealias Command = () -> Unit
 )
 internal class DesktopOwner(
     val container: DesktopOwners,
-    density: Density = Density(1f, 1f)
+    density: Density = Density(1f, 1f),
+    val isVirtual: Boolean = false,
 ) : Owner, RootForTest, DesktopRootForTest, PositionCalculator {
     internal var size by mutableStateOf(IntSize(0, 0))
 
