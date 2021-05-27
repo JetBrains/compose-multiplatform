@@ -7,8 +7,8 @@
         errorLine1="                val result = designInfoMethod.invoke("
         errorLine2="                             ^">
         <location
-            file="src/main/java/androidx/compose/ui/tooling/preview/ComposeViewAdapter.kt"
-            line="384"
+            file="src/androidMain/kotlin/androidx/compose/ui/tooling/preview/ComposeViewAdapter.kt"
+            line="385"
             column="30"/>
     </issue>
 
@@ -18,9 +18,9 @@
         errorLine1="    return invoke(instance, *arguments)"
         errorLine2="           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
-            file="src/main/java/androidx/compose/ui/tooling/preview/PreviewUtils.kt"
-            line="141"
-            column="12"/>
+            file="src/jvmMain/kotlin/androidx/compose/ui/tooling/preview/CommonPreviewUtils.kt"
+            line="149"
+            column="16"/>
     </issue>
 
     <issue
@@ -29,7 +29,7 @@
         errorLine1="            is ResourceFont -> context.resources.getFont(font.resId)"
         errorLine2="                                                 ~~~~~~~">
         <location
-            file="src/main/java/androidx/compose/ui/tooling/preview/LayoutlibFontResourceLoader.kt"
+            file="src/androidMain/kotlin/androidx/compose/ui/tooling/preview/LayoutlibFontResourceLoader.kt"
             line="33"
             column="50"/>
     </issue>

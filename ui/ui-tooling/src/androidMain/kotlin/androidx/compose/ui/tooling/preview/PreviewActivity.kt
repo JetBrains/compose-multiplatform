@@ -30,6 +30,7 @@ import androidx.compose.runtime.currentComposer
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.platform.ComposeView
+import androidx.compose.ui.tooling.preview.CommonPreviewUtils.invokeComposableViaReflection
 
 /**
  * Activity used to run `@Composable` previews from Android Studio.

@@ -47,6 +47,7 @@ import androidx.compose.ui.tooling.data.SourceLocation
 import androidx.compose.ui.tooling.data.UiToolingDataApi
 import androidx.compose.ui.tooling.data.asTree
 import androidx.compose.ui.tooling.preview.animation.PreviewAnimationClock
+import androidx.compose.ui.tooling.preview.CommonPreviewUtils.invokeComposableViaReflection
 import androidx.compose.ui.unit.IntRect
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleRegistry
