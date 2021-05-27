@@ -19,6 +19,7 @@ internal fun packageVersionFor(
     project.provider {
         app.nativeDistributions.packageVersionFor(targetFormat)
             ?: project.version.toString().takeIf { it != "unspecified" }
+            ?: "1.0.0"
     }
 
 private fun NativeDistributions.packageVersionFor(

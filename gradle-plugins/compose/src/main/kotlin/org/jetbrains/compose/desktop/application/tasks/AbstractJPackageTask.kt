@@ -25,6 +25,7 @@ import org.jetbrains.compose.desktop.application.internal.files.transformJar
 import org.jetbrains.compose.desktop.application.internal.validation.ValidatedMacOSSigningSettings
 import org.jetbrains.compose.desktop.application.internal.validation.validate
 import java.io.*
+import java.nio.file.Files
 import java.util.*
 import java.util.zip.ZipEntry
 import javax.inject.Inject
@@ -184,6 +185,9 @@ abstract class AbstractJPackageTask @Inject constructor(
     protected val signDir: Provider<Directory> = project.layout.buildDirectory.dir("compose/tmp/sign")
 
     @get:LocalState
+    protected val resourcesDir: Provider<Directory> = project.layout.buildDirectory.dir("compose/tmp/resources")
+
+    @get:LocalState
     protected val skikoDir: Provider<Directory> = project.layout.buildDirectory.dir("compose/tmp/skiko")
 
     @get:Internal
@@ -204,6 +208,7 @@ abstract class AbstractJPackageTask @Inject constructor(
             // Args, that can only be used, when creating an app image or an installer w/o --app-image parameter
             cliArg("--input", libsDir)
             cliArg("--runtime-image", runtimeImage)
+            cliArg("--resource-dir", resourcesDir)
 
             val mappedJar = libsMapping[launcherMainJar.ioFile]?.singleOrNull()
                 ?: error("Main jar was not processed correctly: ${launcherMainJar.ioFile}")
@@ -352,6 +357,14 @@ abstract class AbstractJPackageTask @Inject constructor(
                 listOf(copyFileToLibsDir(sourceFile))
             }
         }
+
+        fileOperations.delete(resourcesDir)
+        fileOperations.mkdir(resourcesDir)
+        if (currentOS == OS.MacOS) {
+            InfoPlistBuilder()
+                .also { setInfoPlistValues(it) }
+                .writeToFile(resourcesDir.ioFile.resolve("Info.plist"))
+        }
     }
 
     override fun jvmToolEnvironment(): MutableMap<String, String> =
@@ -367,49 +380,8 @@ abstract class AbstractJPackageTask @Inject constructor(
 
     override fun checkResult(result: ExecResult) {
         super.checkResult(result)
-        patchInfoPlistIfNeeded()
         val outputFile = findOutputFileOrDir(destinationDir.ioFile, targetFormat)
         logger.lifecycle("The distribution is written to ${outputFile.canonicalPath}")
-    }
-
-    /**
-     * https://github.com/JetBrains/compose-jb/issues/545
-     *
-     * Patching Info.plist is necessary to avoid duplicating and supporting
-     * properties set by jpackage.
-     *
-     * Info.plist is patched only on macOS for app image.
-     * Packaged installers receive patched Info.plist through
-     * prebuilt [appImage].
-     */
-    private fun patchInfoPlistIfNeeded() {
-        if (currentOS != OS.MacOS || targetFormat != TargetFormat.AppImage) return
-
-        val appDir = destinationDir.ioFile.resolve("${packageName.get()}.app/")
-        val infoPlist = appDir.resolve("Contents/Info.plist")
-        if (!infoPlist.exists()) return
-
-        val content = infoPlist.readText()
-        val nsSupportsAutomaticGraphicsSwitching = "<key>NSSupportsAutomaticGraphicsSwitching</key>"
-        val stringToAppend = "$nsSupportsAutomaticGraphicsSwitching<true/>"
-        if (content.indexOf(nsSupportsAutomaticGraphicsSwitching) >= 0) return
-
-        /**
-         * Dirty hack: to avoid parsing plist file, let's find known expected key substring,
-         * and insert the necessary keys before it.
-         */
-        val knownExpectedKey = "<key>NSHighResolutionCapable</key>"
-        val i = content.indexOf(knownExpectedKey)
-        if (i >= 0) {
-            val newContent = buildString {
-                append(content.substring(0, i))
-                appendLine(stringToAppend)
-                append("  ")
-                appendLine(content.substring(i, content.length))
-            }
-            infoPlist.writeText(newContent)
-        }
-        macSigner?.sign(appDir)
     }
 
     override fun initState() {
@@ -429,6 +401,32 @@ abstract class AbstractJPackageTask @Inject constructor(
         val mappingFile = libsMappingFile.ioFile
         libsMapping.saveTo(mappingFile)
         logger.debug("Saved libs mapping to $mappingFile")
+    }
+
+    private fun setInfoPlistValues(plist: InfoPlistBuilder) {
+        check(currentOS == OS.MacOS) { "Current OS is not macOS: $currentOS" }
+
+        plist[PlistKeys.LSMinimumSystemVersion] = "10.13"
+        plist[PlistKeys.CFBundleDevelopmentRegion] = "English"
+        plist[PlistKeys.CFBundleAllowMixedLocalizations] = "true"
+        val packageName = packageName.get()
+        plist[PlistKeys.CFBundleExecutable] = packageName
+        plist[PlistKeys.CFBundleIconFile] = "$packageName.icns"
+        val bundleId = nonValidatedMacBundleID.orNull
+            ?: launcherMainClass.get().substringBeforeLast(".")
+        plist[PlistKeys.CFBundleIdentifier] = bundleId
+        plist[PlistKeys.CFBundleInfoDictionaryVersion] = "6.0"
+        plist[PlistKeys.CFBundleName] = packageName
+        plist[PlistKeys.CFBundlePackageType] = "APPL"
+        val packageVersion = packageVersion.get()!!
+        plist[PlistKeys.CFBundleShortVersionString] = packageVersion
+        plist[PlistKeys.LSApplicationCategoryType] = "Unknown"
+        plist[PlistKeys.CFBundleVersion] = packageVersion
+        val year = Calendar.getInstance().get(Calendar.YEAR)
+        plist[PlistKeys.NSHumanReadableCopyright] = packageCopyright.orNull
+            ?: "Copyright (C) $year"
+        plist[PlistKeys.NSSupportsAutomaticGraphicsSwitching] = "true"
+        plist[PlistKeys.NSHighResolutionCapable] = "true"
     }
 }
 

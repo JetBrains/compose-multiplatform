@@ -13,7 +13,9 @@ import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assumptions
 import org.junit.jupiter.api.Test
 import java.io.File
+import java.util.*
 import java.util.jar.JarFile
+import kotlin.collections.HashSet
 
 class DesktopApplicationTest : GradlePluginTestBase() {
     @Test
@@ -143,6 +145,12 @@ class DesktopApplicationTest : GradlePluginTestBase() {
 
     @Test
     fun testMacOptions() {
+        fun String.normalized(): String =
+            trim().replace(
+                "Copyright (C) ${Calendar.getInstance().get(Calendar.YEAR)}",
+                "Copyright (C) CURRENT_YEAR"
+            )
+
         Assumptions.assumeTrue(currentOS == OS.MacOS)
 
         with(testProject(TestProjects.macOptions)) {
@@ -150,8 +158,11 @@ class DesktopApplicationTest : GradlePluginTestBase() {
                 check.taskOutcome(":runDistributable", TaskOutcome.SUCCESS)
                 check.logContains("Hello, from Mac OS!")
                 val appDir = testWorkDir.resolve("build/compose/binaries/main/app/TestPackage.app/Contents/")
-                val infoPlist = appDir.resolve("Info.plist").checkExists().checkExists()
-                infoPlist.readText().checkContains("<key>NSSupportsAutomaticGraphicsSwitching</key><true/>")
+                val actualInfoPlist = appDir.resolve("Info.plist").checkExists()
+                val expectedInfoPlist = testWorkDir.resolve("Expected-Info.Plist")
+                val actualInfoPlistNormalized = actualInfoPlist.readText().normalized()
+                val expectedInfoPlistNormalized = expectedInfoPlist.readText().normalized()
+                Assert.assertEquals(actualInfoPlistNormalized, expectedInfoPlistNormalized)
             }
         }
     }
@@ -200,6 +211,11 @@ class DesktopApplicationTest : GradlePluginTestBase() {
                         |${appDir.absolutePath}: satisfies its Designated Requirement
                     """.trimMargin().trim()
                     Assert.assertEquals(expectedOutput, actualOutput)
+                }
+
+                gradle(":runDistributable").build().checks { check ->
+                    check.taskOutcome(":runDistributable", TaskOutcome.SUCCESS)
+                    check.logContains("Signed app successfully started!")
                 }
             }
         }
