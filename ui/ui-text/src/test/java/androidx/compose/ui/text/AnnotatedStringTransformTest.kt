@@ -142,11 +142,15 @@ class AnnotatedStringTransformTest {
             )
         )
 
-        @Suppress("DEPRECATION") // b/187985877
         val capitalized = input.capitalize()
 
-        @Suppress("DEPRECATION") // b/187985877
-        assertThat(capitalized.text).isEqualTo(input.text.capitalize())
+        assertThat(capitalized.text).isEqualTo(
+            input.text.replaceFirstChar {
+                if (it.isLowerCase()) it.titlecase(
+                    Locale.getDefault()
+                ) else it.toString()
+            }
+        )
         assertThat(capitalized.spanStyles).isEqualTo(input.spanStyles)
         assertThat(capitalized.paragraphStyles).isEqualTo(input.paragraphStyles)
     }
@@ -166,11 +170,11 @@ class AnnotatedStringTransformTest {
             )
         )
 
-        @Suppress("DEPRECATION") // b/187985877
         val decapitalized = input.decapitalize()
 
-        @Suppress("DEPRECATION") // b/187985877
-        assertThat(decapitalized.text).isEqualTo(input.text.decapitalize())
+        assertThat(decapitalized.text).isEqualTo(
+            input.text.replaceFirstChar { it.lowercase(Locale.getDefault()) }
+        )
         assertThat(decapitalized.spanStyles).isEqualTo(input.spanStyles)
         assertThat(decapitalized.paragraphStyles).isEqualTo(input.paragraphStyles)
     }
@@ -189,11 +193,15 @@ class AnnotatedStringTransformTest {
                 makeRange(paraStyle2, "iii hhh (jjj)")
             )
         )
-        @Suppress("DEPRECATION") // b/187985877
         val capitalized = input.capitalize(LocaleList("tr"))
 
-        @Suppress("DEPRECATION") // b/187985877
-        assertThat(capitalized.text).isEqualTo(input.text.capitalize(Locale.forLanguageTag("tr")))
+        assertThat(capitalized.text).isEqualTo(
+            input.text.replaceFirstChar {
+                if (it.isLowerCase()) it.titlecase(
+                    Locale.forLanguageTag("tr")
+                ) else it.toString()
+            }
+        )
         assertThat(capitalized.spanStyles).isEqualTo(input.spanStyles)
         assertThat(capitalized.paragraphStyles).isEqualTo(input.paragraphStyles)
     }
@@ -213,12 +221,10 @@ class AnnotatedStringTransformTest {
             )
         )
 
-        @Suppress("DEPRECATION") // b/187985877
         val decapitalized = input.decapitalize(LocaleList("tr"))
 
-        @Suppress("DEPRECATION") // b/187985877
         assertThat(decapitalized.text).isEqualTo(
-            input.text.decapitalize(Locale.forLanguageTag("tr"))
+            input.text.replaceFirstChar { it.lowercase(Locale.forLanguageTag("tr")) }
         )
         assertThat(decapitalized.spanStyles).isEqualTo(input.spanStyles)
         assertThat(decapitalized.paragraphStyles).isEqualTo(input.paragraphStyles)

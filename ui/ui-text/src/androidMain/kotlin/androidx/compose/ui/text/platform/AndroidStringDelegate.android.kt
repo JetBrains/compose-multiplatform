@@ -31,12 +31,14 @@ internal class AndroidStringDelegate : PlatformStringDelegate {
         string.lowercase((locale as AndroidLocale).javaLocale)
 
     override fun capitalize(string: String, locale: PlatformLocale): String =
-        @Suppress("DEPRECATION") // b/187985877
-        string.capitalize((locale as AndroidLocale).javaLocale)
+        string.replaceFirstChar {
+            if (it.isLowerCase())
+                it.titlecase((locale as AndroidLocale).javaLocale)
+            else it.toString()
+        }
 
     override fun decapitalize(string: String, locale: PlatformLocale): String =
-        @Suppress("DEPRECATION") // b/187985877
-        string.decapitalize((locale as AndroidLocale).javaLocale)
+        string.replaceFirstChar { it.lowercase((locale as AndroidLocale).javaLocale) }
 }
 
 internal actual fun ActualStringDelegate(): PlatformStringDelegate =
