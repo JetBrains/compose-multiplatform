@@ -486,6 +486,10 @@ internal class TextFieldSelectionManager(
             selection = TextRange(0, value.text.length)
         )
         onValueChange(newValue)
+        oldValue = oldValue.copy(selection = newValue.selection)
+        hideSelectionToolbar()
+        state?.showFloatingToolbar = true
+        showSelectionToolbar()
     }
 
     internal fun getHandlePosition(isStartHandle: Boolean): Offset {
@@ -526,7 +530,9 @@ internal class TextFieldSelectionManager(
             }
         } else null
 
-        val selectAll: (() -> Unit)? = if (value.selection.length != value.text.length) {
+        val selectAll: (() -> Unit)? = if (value.selection.length != value.text.length &&
+            oldValue.selection.length != oldValue.text.length
+        ) {
             {
                 selectAll()
             }
