@@ -165,5 +165,8 @@ class ModifierParameterDetector : Detector(), SourceCodeScanner {
     }
 }
 
-@Suppress("DEPRECATION") // b/187985877
-private val ModifierParameterName = Names.Ui.Modifier.shortName.decapitalize(Locale.ROOT)
+private val ModifierParameterName = Names.Ui.Modifier.shortName.replaceFirstChar {
+    it.lowercase(
+        Locale.ROOT
+    )
+}
