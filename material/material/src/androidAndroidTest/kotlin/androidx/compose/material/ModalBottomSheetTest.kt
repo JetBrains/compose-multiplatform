@@ -472,6 +472,58 @@ class ModalBottomSheetTest {
     }
 
     @Test
+    fun modalBottomSheet_respectsConfirmStateChange() {
+        lateinit var sheetState: ModalBottomSheetState
+        rule.setMaterialContent {
+            sheetState = rememberModalBottomSheetState(
+                ModalBottomSheetValue.Expanded,
+                confirmStateChange = { newState ->
+                    newState != ModalBottomSheetValue.Hidden
+                }
+            )
+            ModalBottomSheetLayout(
+                sheetState = sheetState,
+                content = {
+                    Box(
+                        Modifier
+                            .fillMaxSize()
+                            .testTag(contentTag)
+                    )
+                },
+                sheetContent = {
+                    Box(
+                        Modifier
+                            .fillMaxSize()
+                            .testTag(sheetTag)
+                    )
+                }
+            )
+        }
+
+        rule.runOnIdle {
+            assertThat(sheetState.currentValue).isEqualTo(ModalBottomSheetValue.Expanded)
+        }
+
+        rule.onNodeWithTag(sheetTag)
+            .performGesture { swipeDown() }
+
+        advanceClock()
+
+        rule.runOnIdle {
+            assertThat(sheetState.currentValue).isEqualTo(ModalBottomSheetValue.Expanded)
+        }
+
+        rule.onNodeWithTag(sheetTag).onParent()
+            .performSemanticsAction(SemanticsActions.Dismiss)
+
+        advanceClock()
+
+        rule.runOnIdle {
+            assertThat(sheetState.currentValue).isEqualTo(ModalBottomSheetValue.Expanded)
+        }
+    }
+
+    @Test
     fun modalBottomSheet_expandBySwiping() {
         lateinit var sheetState: ModalBottomSheetState
         rule.setMaterialContent {

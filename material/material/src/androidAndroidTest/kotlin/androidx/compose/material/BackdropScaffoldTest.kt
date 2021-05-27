@@ -276,6 +276,40 @@ class BackdropScaffoldTest {
         }
     }
 
+    @Test
+    fun backdropScaffold_respectsConfirmStateChange() {
+        lateinit var scaffoldState: BackdropScaffoldState
+        rule.setContent {
+            scaffoldState = rememberBackdropScaffoldState(
+                Concealed,
+                confirmStateChange = {
+                    it != Revealed
+                }
+            )
+            BackdropScaffold(
+                scaffoldState = scaffoldState,
+                peekHeight = peekHeight,
+                headerHeight = headerHeight,
+                appBar = { Box(Modifier.height(peekHeight)) },
+                backLayerContent = { Box(Modifier.height(contentHeight)) },
+                frontLayerContent = { Box(Modifier.fillMaxSize().testTag(frontLayer)) }
+            )
+        }
+
+        rule.runOnIdle {
+            assertThat(scaffoldState.currentValue).isEqualTo(Concealed)
+        }
+
+        rule.onNodeWithTag(frontLayer)
+            .performGesture { swipeDown() }
+
+        advanceClock()
+
+        rule.runOnIdle {
+            assertThat(scaffoldState.currentValue).isEqualTo(Concealed)
+        }
+    }
+
     /**
      * Tests that the state and offset of [swipeable] are updated when swiping.
      */
@@ -456,6 +490,41 @@ class BackdropScaffoldTest {
 
         rule.runOnIdle {
             assertThat(scaffoldState.currentValue).isEqualTo(Concealed)
+        }
+    }
+
+    @Test
+    fun backdropScaffold_tapOnFrontLayerScrim_respectsVeto() {
+        lateinit var scaffoldState: BackdropScaffoldState
+        rule.setContent {
+            scaffoldState = rememberBackdropScaffoldState(
+                Revealed,
+                confirmStateChange = {
+                    it != Concealed
+                }
+            )
+            BackdropScaffold(
+                scaffoldState = scaffoldState,
+                peekHeight = peekHeight,
+                headerHeight = headerHeight,
+                frontLayerScrimColor = Color.Red,
+                appBar = { Box(Modifier.height(peekHeight)) },
+                backLayerContent = { Box(Modifier.height(contentHeight)) },
+                frontLayerContent = { Box(Modifier.fillMaxSize().testTag(frontLayer)) }
+            )
+        }
+
+        rule.runOnIdle {
+            assertThat(scaffoldState.currentValue).isEqualTo(Revealed)
+        }
+
+        rule.onNodeWithTag(frontLayer)
+            .performGesture { click() }
+
+        advanceClock()
+
+        rule.runOnIdle {
+            assertThat(scaffoldState.currentValue).isEqualTo(Revealed)
         }
     }
 
