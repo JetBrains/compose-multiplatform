@@ -1547,7 +1547,7 @@ package androidx.compose.ui.input.pointer {
   }
 
   public final class PointerInteropFilter_androidKt {
-    method public static androidx.compose.ui.Modifier pointerInteropFilter(androidx.compose.ui.Modifier, optional androidx.compose.ui.input.pointer.RequestDisallowInterceptTouchEvent? requestDisallowInterceptTouchEvent, kotlin.jvm.functions.Function1<? super android.view.MotionEvent,java.lang.Boolean> onTouchEvent);
+    method @androidx.compose.ui.ExperimentalComposeUiApi public static androidx.compose.ui.Modifier pointerInteropFilter(androidx.compose.ui.Modifier, optional androidx.compose.ui.input.pointer.RequestDisallowInterceptTouchEvent? requestDisallowInterceptTouchEvent, kotlin.jvm.functions.Function1<? super android.view.MotionEvent,java.lang.Boolean> onTouchEvent);
   }
 
   public final class PointerInteropUtils_androidKt {
@@ -1577,7 +1577,7 @@ package androidx.compose.ui.input.pointer {
     property public final int Unknown;
   }
 
-  public final class RequestDisallowInterceptTouchEvent implements kotlin.jvm.functions.Function1<java.lang.Boolean,kotlin.Unit> {
+  @androidx.compose.ui.ExperimentalComposeUiApi public final class RequestDisallowInterceptTouchEvent implements kotlin.jvm.functions.Function1<java.lang.Boolean,kotlin.Unit> {
     ctor public RequestDisallowInterceptTouchEvent();
     method public void invoke(boolean disallowIntercept);
   }
