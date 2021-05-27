@@ -22,7 +22,6 @@ import androidx.build.gitclient.GitClient
 import androidx.build.gitclient.GitClientImpl
 import androidx.build.gradle.isRoot
 import androidx.build.isPresubmitBuild
-import org.gradle.BuildAdapter
 import org.gradle.api.GradleException
 import org.gradle.api.Project
 import org.gradle.api.Task
@@ -114,23 +113,21 @@ abstract class AffectedModuleDetector(
             if (baseCommitOverride != null) {
                 logger.info("using base commit override $baseCommitOverride")
             }
-            gradle.addBuildListener(object : BuildAdapter() {
-                override fun projectsEvaluated(gradle: Gradle?) {
-                    logger.lifecycle("projects evaluated")
-                    AffectedModuleDetectorImpl(
-                        rootProject = rootProject,
-                        logger = logger,
-                        ignoreUnknownProjects = false,
-                        baseCommitOverride = baseCommitOverride
-                    ).also {
-                        if (!enabled) {
-                            logger.info("swapping with accept all")
-                            // doing it just for testing
-                            setInstance(rootProject, AcceptAll(it, logger))
-                        } else {
-                            logger.info("using real detector")
-                            setInstance(rootProject, it)
-                        }
+            gradle.taskGraph.whenReady({
+                logger.lifecycle("projects evaluated")
+                AffectedModuleDetectorImpl(
+                    rootProject = rootProject,
+                    logger = logger,
+                    ignoreUnknownProjects = false,
+                    baseCommitOverride = baseCommitOverride
+                ).also {
+                    if (!enabled) {
+                        logger.info("swapping with accept all")
+                        // doing it just for testing
+                        setInstance(rootProject, AcceptAll(it, logger))
+                    } else {
+                        logger.info("using real detector")
+                        setInstance(rootProject, it)
                     }
                 }
             })
