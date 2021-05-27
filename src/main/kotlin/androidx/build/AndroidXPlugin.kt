@@ -645,7 +645,7 @@ class AndroidXPlugin : Plugin<Project> {
         /**
          * Fail the build if a non-Studio task runs longer than expected
          */
-        const val TASK_TIMEOUT_MINUTES = 45L
+        const val TASK_TIMEOUT_MINUTES = 60L
     }
 }
 
