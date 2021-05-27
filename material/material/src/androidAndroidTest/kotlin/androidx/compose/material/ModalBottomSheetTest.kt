@@ -20,8 +20,10 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.layout.positionInRoot
 import androidx.compose.ui.platform.testTag
@@ -431,6 +433,38 @@ class ModalBottomSheetTest {
         rule.runOnIdle {
             assertThat(sheetState.currentValue).isEqualTo(ModalBottomSheetValue.Hidden)
         }
+    }
+
+    @Test
+    fun modalBottomSheet_scrim_doesNotClickWhenTransparent() {
+        val topTag = "ModalBottomSheetLayout"
+        val scrimColor = mutableStateOf(Color.Red)
+        rule.setMaterialContent {
+            ModalBottomSheetLayout(
+                modifier = Modifier.testTag(topTag),
+                scrimColor = scrimColor.value,
+                sheetState = rememberModalBottomSheetState(ModalBottomSheetValue.HalfExpanded),
+                content = { Box(Modifier.fillMaxSize().testTag(contentTag)) },
+                sheetContent = { Box(Modifier.fillMaxSize().testTag(sheetTag)) }
+            )
+        }
+
+        val height = rule.rootHeight()
+        rule.onNodeWithTag(sheetTag)
+            .assertTopPositionInRootIsEqualTo(height / 2)
+        var topNode = rule.onNodeWithTag(topTag).fetchSemanticsNode()
+        assertEquals(3, topNode.children.size)
+        rule.onNodeWithTag(topTag)
+            .onChildAt(1)
+            .assertHasClickAction()
+
+        rule.runOnIdle {
+            scrimColor.value = Color.Unspecified
+        }
+
+        topNode = rule.onNodeWithTag(topTag).fetchSemanticsNode()
+        // only two nodes since there's no scrim
+        assertEquals(2, topNode.children.size)
     }
 
     @Test

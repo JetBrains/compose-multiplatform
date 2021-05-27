@@ -44,6 +44,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.composed
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shape
+import androidx.compose.ui.graphics.isSpecified
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.onGloballyPositioned
@@ -224,8 +225,9 @@ fun rememberModalBottomSheetState(
  * children. Defaults to the matching content color for [sheetBackgroundColor], or if that is not
  * a color from the theme, this will keep the same content color set above the bottom sheet.
  * @param scrimColor The color of the scrim that is applied to the rest of the screen when the
- * bottom sheet is visible. If you set this to `Color.Transparent`, then a scrim will no longer be
- * applied and the bottom sheet will not block interaction with the rest of the screen when visible.
+ * bottom sheet is visible. If the color passed is [Color.Unspecified], then a scrim will no
+ * longer be applied and the bottom sheet will not block interaction with the rest of the screen
+ * when visible.
  * @param content The content of rest of the screen.
  */
 @Composable
@@ -358,7 +360,7 @@ private fun Scrim(
     onDismiss: () -> Unit,
     visible: Boolean
 ) {
-    if (color != Color.Transparent) {
+    if (color.isSpecified) {
         val alpha by animateFloatAsState(
             targetValue = if (visible) 1f else 0f,
             animationSpec = TweenSpec()

@@ -494,6 +494,37 @@ class BackdropScaffoldTest {
     }
 
     @Test
+    fun backdropScaffold_concealByTapingOnFrontLayer_withUnspecifiedColorScrim() {
+        lateinit var scaffoldState: BackdropScaffoldState
+        rule.setContent {
+            scaffoldState = rememberBackdropScaffoldState(Revealed)
+            BackdropScaffold(
+                scaffoldState = scaffoldState,
+                peekHeight = peekHeight,
+                headerHeight = headerHeight,
+                frontLayerScrimColor = Color.Unspecified,
+                appBar = { Box(Modifier.height(peekHeight)) },
+                backLayerContent = { Box(Modifier.height(contentHeight)) },
+                frontLayerContent = { Box(Modifier.fillMaxSize().testTag(frontLayer)) }
+            )
+        }
+
+        rule.runOnIdle {
+            assertThat(scaffoldState.currentValue).isEqualTo(Revealed)
+        }
+
+        rule.onNodeWithTag(frontLayer)
+            .performGesture { click() }
+
+        advanceClock()
+
+        // still revealed if the color is unspecified
+        rule.runOnIdle {
+            assertThat(scaffoldState.currentValue).isEqualTo(Revealed)
+        }
+    }
+
+    @Test
     fun backdropScaffold_tapOnFrontLayerScrim_respectsVeto() {
         lateinit var scaffoldState: BackdropScaffoldState
         rule.setContent {
@@ -529,7 +560,7 @@ class BackdropScaffoldTest {
     }
 
     @Test
-    fun backdropScaffold_scrimIsDisabledWhenTransparent() {
+    fun backdropScaffold_scrimIsDisabledWhenUnspecified() {
         var frontLayerClicks = 0
         lateinit var scaffoldState: BackdropScaffoldState
         rule.setContent {
@@ -538,7 +569,7 @@ class BackdropScaffoldTest {
                 scaffoldState = scaffoldState,
                 peekHeight = peekHeight,
                 headerHeight = headerHeight,
-                frontLayerScrimColor = Color.Transparent,
+                frontLayerScrimColor = Color.Unspecified,
                 appBar = { Box(Modifier.height(peekHeight)) },
                 backLayerContent = { Box(Modifier.height(contentHeight)) },
                 frontLayerContent = {
