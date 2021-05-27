@@ -130,7 +130,7 @@ internal class DesktopOwners(
     }
 
     private val lastOwner: DesktopOwner?
-        get() = list.lastOrNull()
+        get() = list.lastOrNull { !it.isVirtual }
 
     fun onMousePressed(x: Int, y: Int, nativeEvent: MouseEvent? = null) {
         isMousePressed = true

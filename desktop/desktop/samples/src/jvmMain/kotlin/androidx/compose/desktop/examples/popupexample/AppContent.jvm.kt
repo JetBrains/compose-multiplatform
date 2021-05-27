@@ -19,6 +19,7 @@ import androidx.compose.desktop.AppManager
 import androidx.compose.desktop.AppWindow
 import androidx.compose.desktop.SwingPanel
 import androidx.compose.foundation.background
+import androidx.compose.foundation.BoxWithTooltip
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -47,9 +48,8 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.input.pointer.pointerMoveFilter
+import androidx.compose.ui.unit.DpOffset
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
@@ -366,31 +366,26 @@ fun Button(
     color: Color = Color(10, 162, 232),
     size: IntSize = IntSize(200, 35)
 ) {
-    val buttonHover = remember { mutableStateOf(false) }
-    Button(
-        onClick = onClick,
-        colors = ButtonDefaults.buttonColors(
-            backgroundColor =
-                if (buttonHover.value)
-                    Color(color.red / 1.3f, color.green / 1.3f, color.blue / 1.3f)
-                else
-                    color
-        ),
-        modifier = Modifier
-            .size(size.width.dp, size.height.dp)
-            .hover(
-                onEnter = {
-                    buttonHover.value = true
-                    false
-                },
-                onExit = {
-                    buttonHover.value = false
-                    false
-                },
-                onMove = { false }
-            )
+    BoxWithTooltip(
+        tooltip = {
+            Surface(
+                color = Color(210, 210, 210),
+                shape = RoundedCornerShape(4.dp)
+            ) {
+                Text(text = "Tooltip: [$text]", modifier = Modifier.padding(10.dp))
+            }
+        }
     ) {
-        Text(text = text)
+        Button(
+            onClick = onClick,
+            colors = ButtonDefaults.buttonColors(
+                backgroundColor = color
+            ),
+            modifier = Modifier
+                .size(size.width.dp, size.height.dp)
+        ) {
+            Text(text = text)
+        }
     }
 }
 
@@ -412,32 +407,42 @@ fun ContextMenu() {
     val items = listOf("Item A", "Item B", "Item C", "Item D", "Item E", "Item F")
     val showMenu = remember { mutableStateOf(false) }
     val selectedIndex = remember { mutableStateOf(0) }
-
-    Surface(
-        modifier = Modifier
-            .padding(start = 4.dp, top = 2.dp),
-        color = Color(255, 255, 255, 40),
-        shape = RoundedCornerShape(4.dp)
+    BoxWithTooltip(
+        delay = 100,
+        offset = DpOffset(40.dp, 0.dp),
+        tooltip = {
+            Surface(
+                color = Color(210, 210, 210),
+                shape = RoundedCornerShape(4.dp)
+            ) {
+                Text(text = "Tooltip: [ContextMenu]", modifier = Modifier.padding(10.dp))
+            }
+        }
     ) {
-        TextBox(
-            text = "Selected: ${items[selectedIndex.value]}",
-            modifier = Modifier
-                .height(35.dp)
-                .padding(start = 4.dp, end = 4.dp)
-                .clickable(onClick = { showMenu.value = true })
-        )
-        ContextMenu(
-            expanded = showMenu.value,
-            onDismissRequest = { showMenu.value = false }
+        Surface(
+            color = Color(255, 255, 255, 40),
+            shape = RoundedCornerShape(4.dp)
         ) {
-            items.forEachIndexed { index, name ->
-                DropdownMenuItem(
-                    onClick = {
-                        selectedIndex.value = index
-                        showMenu.value = false
+            TextBox(
+                text = "Selected: ${items[selectedIndex.value]}",
+                modifier = Modifier
+                    .height(35.dp)
+                    .padding(start = 4.dp, end = 4.dp)
+                    .clickable(onClick = { showMenu.value = true })
+            )
+            ContextMenu(
+                expanded = showMenu.value,
+                onDismissRequest = { showMenu.value = false }
+            ) {
+                items.forEachIndexed { index, name ->
+                    DropdownMenuItem(
+                        onClick = {
+                            selectedIndex.value = index
+                            showMenu.value = false
+                        }
+                    ) {
+                        Text(text = name)
                     }
-                ) {
-                    Text(text = name)
                 }
             }
         }
@@ -481,18 +486,6 @@ fun RadioButton(text: String, state: MutableState<Boolean>) {
     Spacer(modifier = Modifier.width(5.dp))
     TextBox(text = text)
 }
-
-expect fun Modifier.hover(
-    onEnter: () -> Boolean = { true },
-    onExit: () -> Boolean = { true },
-    onMove: (Offset) -> Boolean = { true }
-): Modifier
-
-actual fun Modifier.hover(
-    onEnter: () -> Boolean,
-    onExit: () -> Boolean,
-    onMove: (Offset) -> Boolean
-): Modifier = this.pointerMoveFilter(onEnter = onEnter, onExit = onExit, onMove = onMove)
 
 private fun image(url: String): java.awt.Image {
     return Toolkit.getDefaultToolkit().getImage(url)
