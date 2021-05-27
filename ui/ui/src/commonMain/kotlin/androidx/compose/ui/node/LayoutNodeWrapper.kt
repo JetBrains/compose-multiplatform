@@ -178,16 +178,6 @@ internal abstract class LayoutNodeWrapper(
 
     private val snapshotObserver get() = layoutNode.requireOwner().snapshotObserver
 
-    /**
-     * Whether a pointer that is relative to the [LayoutNodeWrapper] is in the bounds of this
-     * LayoutNodeWrapper.
-     */
-    fun isPointerInBounds(pointerPosition: Offset): Boolean {
-        val x = pointerPosition.x
-        val y = pointerPosition.y
-        return x >= 0f && y >= 0f && x < measuredWidth && y < measuredHeight
-    }
-
     protected inline fun performingMeasure(
         constraints: Constraints,
         block: () -> Placeable
@@ -601,8 +591,9 @@ internal abstract class LayoutNodeWrapper(
     }
 
     protected fun withinLayerBounds(pointerPosition: Offset): Boolean {
+        val layer = layer
         if (layer != null && isClipping) {
-            return isPointerInBounds(pointerPosition)
+            return layer.isInLayer(pointerPosition)
         }
 
         // If we are here, either we aren't clipping to bounds or we are and the pointer was in

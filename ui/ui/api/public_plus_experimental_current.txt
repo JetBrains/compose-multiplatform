@@ -2143,6 +2143,9 @@ package androidx.compose.ui.platform {
     field public static final androidx.compose.ui.platform.LocalSoftwareKeyboardController INSTANCE;
   }
 
+  public final class ShapeContainingUtilKt {
+  }
+
   @androidx.compose.runtime.Stable @androidx.compose.ui.ExperimentalComposeUiApi public interface SoftwareKeyboardController {
     method public void hide();
     method @Deprecated public default void hideSoftwareKeyboard();

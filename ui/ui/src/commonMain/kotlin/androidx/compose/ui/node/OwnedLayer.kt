@@ -55,6 +55,12 @@ internal interface OwnedLayer : GraphicLayerInfo {
     )
 
     /**
+     * Returns `false` if [position] is outside the clipped region or `true` if clipping
+     * is disabled or it is within the clipped region.
+     */
+    fun isInLayer(position: Offset): Boolean
+
+    /**
      * Changes the position of the layer contents.
      */
     fun move(position: IntOffset)
