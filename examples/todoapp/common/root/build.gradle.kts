@@ -15,20 +15,8 @@ kotlin {
                 export(project(":common:database"))
                 export(project(":common:main"))
                 export(project(":common:edit"))
-
-                when (val target = this.compilation.target.name) {
-                    "iosX64" -> {
-                        export(Deps.ArkIvanov.Decompose.decomposeIosX64)
-                        export(Deps.ArkIvanov.MVIKotlin.mvikotlinMainIosX64)
-                    }
-
-                    "iosArm64" -> {
-                        export(Deps.ArkIvanov.Decompose.decomposeIosArm64)
-                        export(Deps.ArkIvanov.MVIKotlin.mvikotlinMainIosArm64)
-                    }
-
-                    else -> error("Unsupported target: $target")
-                }
+                export(Deps.ArkIvanov.Decompose.decompose)
+                export(Deps.ArkIvanov.MVIKotlin.mvikotlinMain)
             }
         }
     }
@@ -53,20 +41,8 @@ kotlin {
                 api(project(":common:database"))
                 api(project(":common:main"))
                 api(project(":common:edit"))
-            }
-        }
-
-        named("iosX64Main") {
-            dependencies {
-                api(Deps.ArkIvanov.Decompose.decomposeIosX64)
-                api(Deps.ArkIvanov.MVIKotlin.mvikotlinMainIosX64)
-            }
-        }
-
-        named("iosArm64Main") {
-            dependencies {
-                api(Deps.ArkIvanov.Decompose.decomposeIosArm64)
-                api(Deps.ArkIvanov.MVIKotlin.mvikotlinMainIosArm64)
+                api(Deps.ArkIvanov.Decompose.decompose)
+                api(Deps.ArkIvanov.MVIKotlin.mvikotlinMain)
             }
         }
     }
