@@ -25,6 +25,7 @@ import android.view.KeyEvent.KEYCODE_A as KeyCodeA
 import android.view.KeyEvent as AndroidKeyEvent
 import android.view.KeyEvent.ACTION_DOWN
 import android.view.KeyEvent.ACTION_UP
+import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.focus.focusTarget
 import androidx.compose.ui.input.key.Key.Companion.A
 import androidx.compose.ui.input.key.KeyEventType.Companion.KeyDown
@@ -42,6 +43,7 @@ import org.junit.runner.RunWith
 @Suppress("DEPRECATION")
 @MediumTest
 @RunWith(AndroidJUnit4::class)
+@OptIn(ExperimentalComposeUiApi::class)
 class ProcessKeyInputTest {
     @get:Rule
     val rule = createComposeRule()

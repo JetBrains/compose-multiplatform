@@ -16,11 +16,13 @@
 package androidx.compose.desktop.examples.popupexample
 
 import androidx.compose.desktop.AppManager
+import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.input.key.Key
 import androidx.compose.ui.window.Notifier
 import androidx.compose.ui.window.v1.KeyStroke
 import androidx.compose.ui.window.v1.MenuItem
 
+@OptIn(ExperimentalComposeUiApi::class)
 object MenuItems {
     val Exit = MenuItem(
         name = "Exit",
