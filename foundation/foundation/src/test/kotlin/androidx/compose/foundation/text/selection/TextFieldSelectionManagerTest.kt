@@ -43,6 +43,7 @@ import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.util.packInts
 import com.google.common.truth.Truth.assertThat
 import com.nhaarman.mockitokotlin2.any
+import com.nhaarman.mockitokotlin2.anyOrNull
 import com.nhaarman.mockitokotlin2.isNull
 import com.nhaarman.mockitokotlin2.mock
 import com.nhaarman.mockitokotlin2.spy
@@ -428,6 +429,13 @@ class TextFieldSelectionManagerTest {
         manager.selectAll()
 
         assertThat(value.selection).isEqualTo(TextRange(0, text.length))
+        verify(textToolbar, times(1)).showMenu(
+            anyOrNull(),
+            anyOrNull(),
+            anyOrNull(),
+            anyOrNull(),
+            isNull()
+        )
     }
 
     @Test
@@ -440,6 +448,14 @@ class TextFieldSelectionManagerTest {
         manager.selectAll()
 
         assertThat(value.selection).isEqualTo(TextRange(0, text.length))
+
+        verify(textToolbar, times(1)).showMenu(
+            anyOrNull(),
+            anyOrNull(),
+            anyOrNull(),
+            anyOrNull(),
+            isNull()
+        )
     }
 
     @Test
@@ -451,7 +467,7 @@ class TextFieldSelectionManagerTest {
 
         manager.showSelectionToolbar()
 
-        verify(textToolbar, times(1)).showMenu(any(), any(), isNull(), any(), any())
+        verify(textToolbar, times(1)).showMenu(any(), any(), isNull(), any(), anyOrNull())
     }
 
     @Test
@@ -464,7 +480,7 @@ class TextFieldSelectionManagerTest {
 
         manager.showSelectionToolbar()
 
-        verify(textToolbar, times(1)).showMenu(any(), isNull(), any(), isNull(), any())
+        verify(textToolbar, times(1)).showMenu(any(), isNull(), any(), isNull(), anyOrNull())
     }
 
     @Test
@@ -495,7 +511,7 @@ class TextFieldSelectionManagerTest {
 
         manager.showSelectionToolbar()
 
-        verify(textToolbar, times(1)).showMenu(any(), isNull(), any(), isNull(), any())
+        verify(textToolbar, times(1)).showMenu(any(), isNull(), any(), isNull(), anyOrNull())
     }
 
     @Test
