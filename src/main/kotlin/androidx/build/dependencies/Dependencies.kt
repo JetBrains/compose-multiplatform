@@ -19,14 +19,25 @@ package androidx.build.dependencies
 import androidx.build.OperatingSystem
 import androidx.build.getOperatingSystem
 
-const val ANDROIDX_TEST_CORE = "androidx.test:core:1.3.0"
+const val ANDROIDX_TEST_VERSION = "1.3.0"
+const val ANDROIDX_TEST_CORE = "androidx.test:core:$ANDROIDX_TEST_VERSION"
 const val ANDROIDX_TEST_EXT_JUNIT = "androidx.test.ext:junit:1.1.2"
 const val ANDROIDX_TEST_EXT_KTX = "androidx.test.ext:junit-ktx:1.1.2"
-const val ANDROIDX_TEST_EXT_TRUTH = "androidx.test.ext:truth:1.3.0"
-const val ANDROIDX_TEST_MONITOR = "androidx.test:monitor:1.3.0"
-const val ANDROIDX_TEST_RULES = "androidx.test:rules:1.3.0"
-const val ANDROIDX_TEST_RUNNER = "androidx.test:runner:1.3.0"
+const val ANDROIDX_TEST_EXT_TRUTH = "androidx.test.ext:truth:$ANDROIDX_TEST_VERSION"
+const val ANDROIDX_TEST_MONITOR = "androidx.test:monitor:$ANDROIDX_TEST_VERSION"
+const val ANDROIDX_TEST_RULES = "androidx.test:rules:$ANDROIDX_TEST_VERSION"
+const val ANDROIDX_TEST_RUNNER = "androidx.test:runner:$ANDROIDX_TEST_VERSION"
 const val ANDROIDX_TEST_UIAUTOMATOR = "androidx.test.uiautomator:uiautomator:2.2.0"
+
+// Remove ANDROIDX_TEST_*_LATEST once ANDROIDX_TEST_* upgrades to the next stable release
+// after 1.3.0, and replace all usages of ANDROIDX_TEST_*_LATEST with ANDROIDX_TEST_*
+const val ANDROIDX_TEST_LATEST_VERSION = "1.4.0-alpha06"
+const val ANDROIDX_TEST_CORE_LATEST = "androidx.test:core:$ANDROIDX_TEST_LATEST_VERSION"
+const val ANDROIDX_TEST_EXT_TRUTH_LATEST = "androidx.test.ext:truth:$ANDROIDX_TEST_LATEST_VERSION"
+const val ANDROIDX_TEST_MONITOR_LATEST = "androidx.test:monitor:$ANDROIDX_TEST_LATEST_VERSION"
+const val ANDROIDX_TEST_RULES_LATEST = "androidx.test:rules:$ANDROIDX_TEST_LATEST_VERSION"
+const val ANDROIDX_TEST_RUNNER_LATEST = "androidx.test:runner:$ANDROIDX_TEST_LATEST_VERSION"
+
 const val AUTO_COMMON = "com.google.auto:auto-common:0.11"
 const val AUTO_SERVICE_ANNOTATIONS = "com.google.auto.service:auto-service-annotations:1.0-rc6"
 const val AUTO_SERVICE_PROCESSOR = "com.google.auto.service:auto-service:1.0-rc6"
@@ -61,20 +72,14 @@ const val GUAVA_ANDROID = "com.google.guava:guava:$GUAVA_ANDROID_VERSION"
 const val GUAVA_LISTENABLE_FUTURE = "com.google.guava:listenablefuture:1.0"
 const val GRADLE_INCAP_HELPER = "net.ltgt.gradle.incap:incap:0.2"
 const val GRADLE_INCAP_HELPER_PROCESSOR = "net.ltgt.gradle.incap:incap-processor:0.2"
-internal lateinit var hiltVersion: String
-val HILT_ANDROID get() = "com.google.dagger:hilt-android:$hiltVersion"
-val HILT_ANDROID_TESTING get() = "com.google.dagger:hilt-android-testing:$hiltVersion"
-val HILT_ANDROID_GRADLE_PLUGIN get() = "com.google.dagger:hilt-android-gradle-plugin:$hiltVersion"
-val HILT_COMPILER get() = "com.google.dagger:hilt-compiler:$hiltVersion"
-val HILT_CORE get() = "com.google.dagger:hilt-core:$hiltVersion"
 const val INTELLIJ_ANNOTATIONS = "com.intellij:annotations:12.0"
 const val JAVAPOET = "com.squareup:javapoet:1.13.0"
 const val JSQLPARSER = "com.github.jsqlparser:jsqlparser:3.1"
 const val JSR250 = "javax.annotation:javax.annotation-api:1.2"
 const val JUNIT = "junit:junit:4.12"
 const val KOTLINPOET = "com.squareup:kotlinpoet:1.8.0"
-const val KOTLIN_COMPILE_TESTING = "com.github.tschuchortdev:kotlin-compile-testing:1.3.6"
-const val KOTLIN_COMPILE_TESTING_KSP = "com.github.tschuchortdev:kotlin-compile-testing-ksp:1.3.6"
+const val KOTLIN_COMPILE_TESTING = "com.github.tschuchortdev:kotlin-compile-testing:1.4.0"
+const val KOTLIN_COMPILE_TESTING_KSP = "com.github.tschuchortdev:kotlin-compile-testing-ksp:1.4.0"
 
 /**
  * KSP is used both as a plugin and runtime dependency, hence its version is declared in the
@@ -82,9 +87,9 @@ const val KOTLIN_COMPILE_TESTING_KSP = "com.github.tschuchortdev:kotlin-compile-
  */
 internal lateinit var kspVersion: String
 val KSP_VERSION get() = kspVersion
-const val KOTLIN_GRADLE_PLUGIN = "org.jetbrains.kotlin:kotlin-gradle-plugin:1.4.32"
+const val KOTLIN_GRADLE_PLUGIN = "org.jetbrains.kotlin:kotlin-gradle-plugin:1.5.10"
 
-const val KOTLIN_METADATA_JVM = "org.jetbrains.kotlinx:kotlinx-metadata-jvm:0.2.0"
+const val KOTLIN_METADATA_JVM = "org.jetbrains.kotlinx:kotlinx-metadata-jvm:0.3.0"
 
 const val LEAKCANARY = "com.squareup.leakcanary:leakcanary-android:2.2"
 const val LEAKCANARY_INSTRUMENTATION =
@@ -96,11 +101,11 @@ const val MOCKITO_KOTLIN = "com.nhaarman.mockitokotlin2:mockito-kotlin:2.1.0"
 const val MULTIDEX = "androidx.multidex:multidex:2.0.1"
 const val NULLAWAY = "com.uber.nullaway:nullaway:0.3.7"
 const val PLAY_CORE = "com.google.android.play:core:1.9.1"
-const val PLAY_SERVICES_BASE = "com.google.android.gms:play-services-base:17.0.0"
+const val PLAY_SERVICES_BASEMENT = "com.google.android.gms:play-services-basement:17.0.0"
 const val REACTIVE_STREAMS = "org.reactivestreams:reactive-streams:1.0.0"
 const val RX_JAVA = "io.reactivex.rxjava2:rxjava:2.2.9"
 const val RX_JAVA3 = "io.reactivex.rxjava3:rxjava:3.0.0"
-val SKIKO_VERSION = System.getenv("SKIKO_VERSION") ?: "0.2.24"
+val SKIKO_VERSION = System.getenv("SKIKO_VERSION") ?: "0.2.33"
 val SKIKO = "org.jetbrains.skiko:skiko-jvm:$SKIKO_VERSION"
 val SKIKO_LINUX_X64 = "org.jetbrains.skiko:skiko-jvm-runtime-linux-x64:$SKIKO_VERSION"
 val SKIKO_MACOS_X64 = "org.jetbrains.skiko:skiko-jvm-runtime-macos-x64:$SKIKO_VERSION"

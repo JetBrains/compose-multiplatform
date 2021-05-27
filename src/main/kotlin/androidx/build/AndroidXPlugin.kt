@@ -31,7 +31,6 @@ import androidx.build.checkapi.configureProjectForApiTasks
 import androidx.build.dependencyTracker.AffectedModuleDetector
 import androidx.build.gradle.getByType
 import androidx.build.gradle.isRoot
-import androidx.build.jacoco.Jacoco
 import androidx.build.license.configureExternalDependencyLicenseCheck
 import androidx.build.resources.configurePublicResourcesStub
 import androidx.build.studio.StudioTask
@@ -63,13 +62,10 @@ import org.gradle.api.tasks.testing.Test
 import org.gradle.api.tasks.testing.logging.TestExceptionFormat
 import org.gradle.api.tasks.testing.logging.TestLogEvent
 import org.gradle.kotlin.dsl.apply
-import org.gradle.kotlin.dsl.configure
 import org.gradle.kotlin.dsl.create
 import org.gradle.kotlin.dsl.extra
 import org.gradle.kotlin.dsl.findByType
 import org.gradle.kotlin.dsl.getPlugin
-import org.gradle.testing.jacoco.plugins.JacocoPluginExtension
-import org.gradle.testing.jacoco.tasks.JacocoReport
 import org.jetbrains.kotlin.gradle.dsl.KotlinAndroidProjectExtension
 import org.jetbrains.kotlin.gradle.dsl.KotlinMultiplatformExtension
 import org.jetbrains.kotlin.gradle.plugin.KotlinBasePluginWrapper
@@ -111,9 +107,6 @@ class AndroidXPlugin : Plugin<Project> {
         project.configureTaskTimeouts()
         project.configureMavenArtifactUpload(extension)
         project.configureExternalDependencyLicenseCheck()
-        if (project.isCoverageEnabled()) {
-            project.configureJacoco()
-        }
     }
 
     /**
@@ -218,6 +211,10 @@ class AndroidXPlugin : Plugin<Project> {
             if (project.hasProperty(EXPERIMENTAL_KOTLIN_BACKEND_ENABLED)) {
                 task.kotlinOptions.freeCompilerArgs += listOf("-Xuse-ir=true")
             }
+
+            // Not directly impacting us, but a bunch of issues like KT-46512, probably prudent
+            // for us to just disable until Kotlin 1.5.10+ to avoid end users hitting users
+            task.kotlinOptions.freeCompilerArgs += listOf("-Xsam-conversions=class")
         }
         project.afterEvaluate {
             if (extension.shouldEnforceKotlinStrictApiMode()) {
@@ -270,9 +267,8 @@ class AndroidXPlugin : Plugin<Project> {
         }
 
         project.extensions.getByType<LibraryAndroidComponentsExtension>().apply {
-            @Suppress("deprecation")
-            beforeUnitTests(selector().withBuildType("release")) { unitTest ->
-                unitTest.enabled = false
+            beforeVariants(selector().withBuildType("release")) { variant ->
+                variant.enableUnitTest = false
             }
         }
 
@@ -297,13 +293,12 @@ class AndroidXPlugin : Plugin<Project> {
         project.addCreateLibraryBuildInfoFileTask(androidXExtension)
         project.configureJavaCompilationWarnings(androidXExtension)
 
-        val verifyDependencyVersionsTask = project.createVerifyDependencyVersionsTask()
-        val checkReleaseReadyTasks = mutableListOf<TaskProvider<out Task>>()
-        if (verifyDependencyVersionsTask != null) {
-            checkReleaseReadyTasks.add(verifyDependencyVersionsTask)
-        }
-        if (checkReleaseReadyTasks.isNotEmpty()) {
-            project.createCheckReleaseReadyTask(checkReleaseReadyTasks)
+        project.configureDependencyVerification(androidXExtension) { taskProvider ->
+            libraryExtension.defaultPublishVariant { libraryVariant ->
+                taskProvider.configure { task ->
+                    task.dependsOn(libraryVariant.javaCompileProvider)
+                }
+            }
         }
 
         val reportLibraryMetrics = project.configureReportLibraryMetricsTask()
@@ -315,10 +310,6 @@ class AndroidXPlugin : Plugin<Project> {
                         zip.inputs.files
                     }
                 )
-            }
-
-            verifyDependencyVersionsTask?.configure { task ->
-                task.dependsOn(libraryVariant.javaCompileProvider)
             }
         }
 
@@ -347,15 +338,13 @@ class AndroidXPlugin : Plugin<Project> {
 
         project.hideJavadocTask()
 
-        val verifyDependencyVersionsTask = project.createVerifyDependencyVersionsTask()
-        verifyDependencyVersionsTask?.configure { task ->
-            task.dependsOn(project.tasks.named(JavaPlugin.COMPILE_JAVA_TASK_NAME))
+        project.configureDependencyVerification(extension) { taskProvider ->
+            taskProvider.configure { task ->
+                task.dependsOn(project.tasks.named(JavaPlugin.COMPILE_JAVA_TASK_NAME))
+            }
         }
 
         project.addCreateLibraryBuildInfoFileTask(extension)
-        if (verifyDependencyVersionsTask != null) {
-            project.createCheckReleaseReadyTask(listOf(verifyDependencyVersionsTask))
-        }
 
         // Standard lint, docs, and Metalava configuration for AndroidX projects.
         project.configureNonAndroidProjectForLint(extension)
@@ -390,25 +379,25 @@ class AndroidXPlugin : Plugin<Project> {
             targetCompatibility = VERSION_1_8
         }
 
-        // Force AGP to use our version of JaCoCo
-        @Suppress("deprecation")
-        jacoco.version = Jacoco.VERSION
         compileSdkVersion(COMPILE_SDK_VERSION)
         buildToolsVersion = BUILD_TOOLS_VERSION
-        defaultConfig.targetSdkVersion(TARGET_SDK_VERSION)
+        defaultConfig.targetSdk = TARGET_SDK_VERSION
         ndkVersion = SupportConfig.NDK_VERSION
         ndkPath = project.getNdkPath().absolutePath
 
         defaultConfig.testInstrumentationRunner = INSTRUMENTATION_RUNNER
 
-        buildTypes.getByName("debug").isTestCoverageEnabled = project.isCoverageEnabled()
-
         testOptions.animationsDisabled = true
         testOptions.unitTests.isReturnDefaultValues = true
 
-        defaultConfig.minSdkVersion(DEFAULT_MIN_SDK_VERSION)
+        // Include resources in Robolectric tests as a workaround for b/184641296 and
+        // ensure the build directory exists as a workaround for b/187970292.
+        testOptions.unitTests.isIncludeAndroidResources = true
+        if (!project.buildDir.exists()) project.buildDir.mkdirs()
+
+        defaultConfig.minSdk = DEFAULT_MIN_SDK_VERSION
         project.afterEvaluate {
-            val minSdkVersion = defaultConfig.minSdkVersion!!.apiLevel
+            val minSdkVersion = defaultConfig.minSdk!!
             check(minSdkVersion >= DEFAULT_MIN_SDK_VERSION) {
                 "minSdkVersion $minSdkVersion lower than the default of $DEFAULT_MIN_SDK_VERSION"
             }
@@ -458,11 +447,6 @@ class AndroidXPlugin : Plugin<Project> {
             if (!configuration.name.toLowerCase(Locale.US).contains("androidtest")) {
                 configuration.resolutionStrategy.preferProjectModules()
             }
-        }
-
-        if (project.isCoverageEnabled()) {
-            Jacoco.registerClassFilesTask(project, this)
-            Jacoco.registerAgentPropertiesFilesGenerateTask(project, this)
         }
 
         project.configureTestConfigGeneration(this)
@@ -573,6 +557,21 @@ class AndroidXPlugin : Plugin<Project> {
         }
     }
 
+    private fun Project.configureDependencyVerification(
+        extension: AndroidXExtension,
+        taskConfigurator: (TaskProvider<VerifyDependencyVersionsTask>) -> Unit
+    ) {
+        afterEvaluate {
+            if (extension.type != LibraryType.SAMPLES) {
+                val verifyDependencyVersionsTask = project.createVerifyDependencyVersionsTask()
+                if (verifyDependencyVersionsTask != null) {
+                    project.createCheckReleaseReadyTask(listOf(verifyDependencyVersionsTask))
+                    taskConfigurator(verifyDependencyVersionsTask)
+                }
+            }
+        }
+    }
+
     private fun Project.createVerifyDependencyVersionsTask():
         TaskProvider<VerifyDependencyVersionsTask>? {
             /**
@@ -625,32 +624,6 @@ class AndroidXPlugin : Plugin<Project> {
             aggregateLibraryBuildInfoFileTask.libraryBuildInfoFiles.add(
                 task.flatMap { task -> task.outputFile }
             )
-        }
-    }
-
-    private fun Project.configureJacoco() {
-        apply(plugin = "jacoco")
-        configure<JacocoPluginExtension> {
-            toolVersion = Jacoco.VERSION
-        }
-
-        val zipEcFilesTask = Jacoco.getZipEcFilesTask(this)
-
-        tasks.withType(JacocoReport::class.java).configureEach { task ->
-            task.reports {
-                it.xml.isEnabled = true
-                it.html.isEnabled = false
-                it.csv.isEnabled = false
-
-                it.xml.destination = File(
-                    getHostTestCoverageDirectory(),
-                    "${project.path.asFilenamePrefix()}.xml"
-                )
-            }
-        }
-        // zip follows every jacocoReport task being run
-        zipEcFilesTask.configure { zipTask ->
-            zipTask.dependsOn(tasks.withType(JacocoReport::class.java))
         }
     }
 

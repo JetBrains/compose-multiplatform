@@ -52,7 +52,7 @@ abstract class UpdateApiLintBaselineTask @Inject constructor(
 
     @TaskAction
     fun updateBaseline() {
-        check(bootClasspath.isNotEmpty()) { "Android boot classpath not set." }
+        check(bootClasspath.files.isNotEmpty()) { "Android boot classpath not set." }
         val baselineFile = baselines.get().apiLintFile
         val checkArgs = getGenerateApiArgs(
             bootClasspath, dependencyClasspath,
@@ -106,7 +106,7 @@ abstract class IgnoreApiChangesTask @Inject constructor(
 
     @TaskAction
     fun exec() {
-        check(bootClasspath.isNotEmpty()) { "Android boot classpath not set." }
+        check(bootClasspath.files.isNotEmpty()) { "Android boot classpath not set." }
 
         updateBaseline(
             api.get().publicApiFile,
@@ -161,13 +161,13 @@ abstract class IgnoreApiChangesTask @Inject constructor(
 }
 
 private fun getCommonBaselineUpdateArgs(
-    bootClasspath: Collection<File>,
+    bootClasspath: FileCollection,
     dependencyClasspath: FileCollection,
     baselineFile: File
 ): MutableList<String> {
     val args = mutableListOf(
         "--classpath",
-        (bootClasspath + dependencyClasspath.files).joinToString(File.pathSeparator)
+        (bootClasspath.files + dependencyClasspath.files).joinToString(File.pathSeparator)
     )
     args += getCommonBaselineUpdateArgs(baselineFile)
     return args

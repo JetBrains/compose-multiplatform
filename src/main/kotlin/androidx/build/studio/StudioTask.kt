@@ -62,7 +62,7 @@ abstract class StudioTask : DefaultTask() {
     protected open val installParentDir: File = project.rootDir
 
     @Suppress("UnstableApiUsage") // For use of VersionCatalog
-    private val ourStudioVersions by lazy {
+    private val studioVersion by lazy {
         val libs = project.extensions.getByType(
             VersionCatalogsExtension::class.java
         ).find("libs").get()
@@ -74,11 +74,7 @@ abstract class StudioTask : DefaultTask() {
                 throw GradleException("Could not find a version for `$key`")
             }
         }
-        StudioVersions(
-            getVersion("androidStudio"),
-            getVersion("androidStudioIdea"),
-            getVersion("androidStudioBuildId")
-        )
+        getVersion("androidStudio")
     }
 
     /**
@@ -87,9 +83,7 @@ abstract class StudioTask : DefaultTask() {
     private val studioDirectoryName: String
         get() {
             val osName = StudioPlatformUtilities.osName
-            with(ourStudioVersions) {
-                return "android-studio-ide-$ideaMajorVersion.$studioBuildNumber-$osName"
-            }
+            return "android-studio-$studioVersion-$osName"
         }
 
     /**
@@ -150,7 +144,7 @@ abstract class StudioTask : DefaultTask() {
             studioInstallationDir.parentFile.deleteRecursively()
             // Create installation directory and any needed parent directories
             studioInstallationDir.mkdirs()
-            studioArchiveCreator(project, ourStudioVersions, studioArchiveName, studioArchivePath)
+            studioArchiveCreator(project, studioVersion, studioArchiveName, studioArchivePath)
             println("Extracting archive...")
             extractStudioArchive()
             with(platformUtilities) { updateJvmHeapSize() }

@@ -18,6 +18,7 @@
 
 package androidx.build.testConfiguration
 
+import androidx.build.AndroidXExtension
 import androidx.build.AndroidXPlugin
 import androidx.build.AndroidXPlugin.Companion.ZIP_CONSTRAINED_TEST_CONFIGS_WITH_APKS_TASK
 import androidx.build.AndroidXPlugin.Companion.ZIP_TEST_CONFIGS_WITH_APKS_TASK
@@ -29,16 +30,18 @@ import androidx.build.gradle.getByType
 import androidx.build.hasAndroidTestSourceCode
 import androidx.build.hasBenchmarkPlugin
 import androidx.build.renameApkForTesting
-import com.android.build.api.artifact.ArtifactType
 import com.android.build.api.artifact.Artifacts
+import com.android.build.api.artifact.SingleArtifact
 import com.android.build.api.extension.AndroidComponentsExtension
 import com.android.build.api.extension.ApplicationAndroidComponentsExtension
+import com.android.build.api.variant.ApplicationVariant
+import com.android.build.api.variant.LibraryVariant
 import com.android.build.gradle.TestedExtension
 import com.android.build.gradle.tasks.PackageAndroidArtifact
 import org.gradle.api.Project
 import org.gradle.api.file.DuplicatesStrategy
-import org.gradle.api.tasks.bundling.Zip
 import org.gradle.api.tasks.TaskProvider
+import org.gradle.api.tasks.bundling.Zip
 import java.io.File
 
 /**
@@ -60,7 +63,7 @@ fun Project.createTestConfigurationGenerationTask(
         "${AndroidXPlugin.GENERATE_TEST_CONFIGURATION_TASK}$variantName",
         GenerateTestConfigurationTask::class.java
     ) { task ->
-        task.testFolder.set(artifacts.get(ArtifactType.APK))
+        task.testFolder.set(artifacts.get(SingleArtifact.APK))
         task.testLoader.set(artifacts.getBuiltArtifactsLoader())
         task.outputXml.fileValue(
             File(
@@ -80,7 +83,13 @@ fun Project.createTestConfigurationGenerationTask(
         } else {
             task.minSdk.set(minSdk)
         }
-        task.hasBenchmarkPlugin.set(this.hasBenchmarkPlugin())
+        val hasBenchmarkPlugin = this.hasBenchmarkPlugin()
+        task.hasBenchmarkPlugin.set(hasBenchmarkPlugin)
+        if (hasBenchmarkPlugin) {
+            task.benchmarkRunAlsoInterpreted.set(
+                extensions.getByType<AndroidXExtension>().benchmarkRunAlsoInterpreted
+            )
+        }
         task.testRunner.set(testRunner)
         task.testProjectPath.set(this.path)
         task.affectedModuleDetectorSubset.set(
@@ -115,7 +124,7 @@ fun Project.addAppApkToTestConfigGeneration(overrideProject: Project = this) {
         onVariants(selector().withBuildType("debug")) { debugVariant ->
             overrideProject.tasks.withType(GenerateTestConfigurationTask::class.java)
                 .configureEach {
-                    it.appFolder.set(debugVariant.artifacts.get(ArtifactType.APK))
+                    it.appFolder.set(debugVariant.artifacts.get(SingleArtifact.APK))
                     it.appLoader.set(debugVariant.artifacts.getBuiltArtifactsLoader())
                     it.appProjectPath.set(overrideProject.path)
                 }
@@ -206,21 +215,21 @@ fun Project.createOrUpdateMediaTestConfigurationGenerationTask(
         it as GenerateMediaTestConfigurationTask
         if (this.name.contains("client")) {
             if (this.name.contains("previous")) {
-                it.clientPreviousFolder.set(artifacts.get(ArtifactType.APK))
+                it.clientPreviousFolder.set(artifacts.get(SingleArtifact.APK))
                 it.clientPreviousLoader.set(artifacts.getBuiltArtifactsLoader())
                 it.clientPreviousPath.set(this.path)
             } else {
-                it.clientToTFolder.set(artifacts.get(ArtifactType.APK))
+                it.clientToTFolder.set(artifacts.get(SingleArtifact.APK))
                 it.clientToTLoader.set(artifacts.getBuiltArtifactsLoader())
                 it.clientToTPath.set(this.path)
             }
         } else {
             if (this.name.contains("previous")) {
-                it.servicePreviousFolder.set(artifacts.get(ArtifactType.APK))
+                it.servicePreviousFolder.set(artifacts.get(SingleArtifact.APK))
                 it.servicePreviousLoader.set(artifacts.getBuiltArtifactsLoader())
                 it.servicePreviousPath.set(this.path)
             } else {
-                it.serviceToTFolder.set(artifacts.get(ArtifactType.APK))
+                it.serviceToTFolder.set(artifacts.get(SingleArtifact.APK))
                 it.serviceToTLoader.set(artifacts.getBuiltArtifactsLoader())
                 it.serviceToTPath.set(this.path)
             }
@@ -292,7 +301,7 @@ private fun Project.configureMacrobenchmarkConfigTask(
     val configTask = getOrCreateMacrobenchmarkConfigTask(variantName)
     if (path.endsWith("macrobenchmark")) {
         configTask.configure { task ->
-            task.testFolder.set(artifacts.get(ArtifactType.APK))
+            task.testFolder.set(artifacts.get(SingleArtifact.APK))
             task.testLoader.set(artifacts.getBuiltArtifactsLoader())
             task.outputXml.fileValue(
                 File(
@@ -330,7 +339,7 @@ private fun Project.configureMacrobenchmarkConfigTask(
         )!!.dependsOn(configTask)
     } else if (path.endsWith("macrobenchmark-target")) {
         configTask.configure { task ->
-            task.appFolder.set(artifacts.get(ArtifactType.APK))
+            task.appFolder.set(artifacts.get(SingleArtifact.APK))
             task.appLoader.set(artifacts.getBuiltArtifactsLoader())
             task.appProjectPath.set(path)
         }
@@ -338,9 +347,13 @@ private fun Project.configureMacrobenchmarkConfigTask(
 }
 
 fun Project.configureTestConfigGeneration(testedExtension: TestedExtension) {
-    extensions.getByType<AndroidComponentsExtension<*, *>>().apply {
-        @Suppress("deprecation")
-        androidTests(selector().all()) { androidTest ->
+    extensions.getByType<AndroidComponentsExtension<*, *, *>>().apply {
+        onVariants { variant ->
+            val androidTest = when (variant) {
+                is ApplicationVariant -> variant.androidTest
+                is LibraryVariant -> variant.androidTest
+                else -> return@onVariants
+            } ?: return@onVariants
             when {
                 path.contains("media2:media2-session:version-compat-tests:") -> {
                     createOrUpdateMediaTestConfigurationGenerationTask(

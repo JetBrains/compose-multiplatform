@@ -9,7 +9,7 @@ buildscript {
     }
 
     dependencies {
-        classpath libs.kotlinGradlePlugin
+        classpath(libs.kotlinGradlePlugin)
     }
 
     configurations.classpath.resolutionStrategy {
@@ -41,7 +41,10 @@ allprojects {
                     "-Xskip-runtime-version-check",
                     "-Xskip-metadata-version-check",
                     // Allow `@OptIn` and `@UseExperimental`
-                    "-Xopt-in=kotlin.RequiresOptIn"
+                    "-Xopt-in=kotlin.RequiresOptIn",
+                    // Issue where sam conversion in gradle's kts file causes task-out-of-date
+                    // Details: KT-46445 and https://github.com/gradle/gradle/issues/17052
+                    "-Xsam-conversions=class"
             ]
         }
     }
@@ -64,18 +67,17 @@ dependencies {
     cacheableApi(libs.androidGradlePlugin)
     cacheableImplementation(libs.dexMemberList)
     cacheableApi(libs.kotlinGradlePlugin)
-    cacheableImplementation(libs.kotlinPoet)
     cacheableImplementation(gradleApi())
     cacheableApi(libs.dokkaGradlePlugin)
     // needed by inspection plugin
-    cacheableImplementation("com.google.protobuf:protobuf-gradle-plugin:0.8.13")
+    cacheableImplementation(libs.protobufGradlePlugin)
     cacheableImplementation(libs.wireGradlePlugin)
     cacheableImplementation(libs.shadow)
     // dependencies that aren't used by buildSrc directly but that we resolve here so that the
     // root project doesn't need to re-resolve them and their dependencies on every build
     cacheableRuntimeOnly(libs.hiltAndroidGradlePlugin)
     // room kotlintestapp uses the ksp plugin but it does not publish a plugin marker yet
-    cacheableRuntimeOnly(libs.kspGradlePlugin)
+    cacheableApi(libs.kspGradlePlugin)
     // dependencies whose resolutions we don't need to cache
     compileOnly(findGradleKotlinDsl()) // Only one file in this configuration, no need to cache it
     implementation(project("jetpad-integration")) // Doesn't have a .pom, so not slow to load

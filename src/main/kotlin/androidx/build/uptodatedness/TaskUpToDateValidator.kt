@@ -16,14 +16,15 @@
 
 package androidx.build.uptodatedness
 
-import androidx.build.VERIFY_UP_TO_DATE
 import org.gradle.api.GradleException
 import org.gradle.api.Project
 import org.gradle.api.Task
-import org.gradle.api.execution.TaskExecutionGraph
-import org.gradle.kotlin.dsl.extra
-import java.io.File
-import java.util.Date
+import org.gradle.api.services.BuildService
+import org.gradle.api.services.BuildServiceParameters
+import org.gradle.build.event.BuildEventsListenerRegistry
+import org.gradle.tooling.events.FinishEvent
+import org.gradle.tooling.events.OperationCompletionListener
+import org.gradle.tooling.events.task.TaskExecutionResult
 
 /**
  * Validates that all tasks (except a temporary exception list) are considered up-to-date.
@@ -34,7 +35,6 @@ import java.util.Date
  */
 
 const val DISALLOW_TASK_EXECUTION_FLAG_NAME = "disallowExecution"
-const val RECORD_FLAG_NAME = VERIFY_UP_TO_DATE
 
 // Temporary set of exempt tasks that are known to still be out-of-date after running once
 // Entries in this set may be task names (like assembleRelease) or task paths
@@ -82,8 +82,6 @@ val ALLOW_RERUNNING_TASKS = setOf(
     "generatePomFileForMetadataPublication",
     "generatePomFileForSafeargsJavaPluginMarkerMavenPublication",
     "generatePomFileForSafeargsKotlinPluginMarkerMavenPublication",
-    "jacocoPublicDebug",
-    "jacocoTipOfTreeDebug",
     "partiallyDejetifyArchive",
     "publishBenchmarkPluginMarkerMavenPublicationToMavenRepository",
     "publishAndroidDebugPublicationToMavenRepository",
@@ -136,7 +134,22 @@ val ALLOW_RERUNNING_TASKS = setOf(
     ":benchmark:benchmark-macro:extractReleaseAnnotations",
     ":benchmark:benchmark-macro:extractDebugAnnotations",
     ":benchmark:benchmark-macro:generateApi",
-    ":benchmark:benchmark-macro:runErrorProne"
+    ":benchmark:benchmark-macro:runErrorProne",
+    ":benchmark:benchmark-macro:lintAnalyzeDebug",
+    ":benchmark:benchmark-macro:lintDebug",
+    "configureCMakeDebug",
+    "buildCMakeDebug",
+    "configureCMakeRelWithDebInfo",
+    "buildCMakeRelWithDebInfo",
+    ":appsearch:appsearch-local-storage:buildCMakeDebug[icing]",
+    ":appsearch:appsearch-local-storage:buildCMakeRelWithDebInfo[icing]",
+    ":hilt:hilt-navigation-compose:kaptGenerateStubsDebugKotlin",
+    ":hilt:hilt-navigation-compose:kaptGenerateStubsReleaseKotlin",
+
+    // https://github.com/gradle/gradle/issues/17262
+    ":doclava:compileJava",
+    ":doclava:processResources",
+    ":doclava:jar"
 )
 
 // Additional tasks that are expected to be temporarily out-of-date after running once
@@ -146,7 +159,6 @@ val DONT_TRY_RERUNNING_TASKS = setOf(
     "listTaskOutputs",
     "validateProperties",
     "tasks",
-    "zipEcFiles",
     // More information about the fact that these dokka tasks rerun can be found at b/167569304
     "dokkaKotlinDocs",
     "zipDokkaDocs",
@@ -157,26 +169,58 @@ val DONT_TRY_RERUNNING_TASKS = setOf(
 
     // We should be able to remove these entries when b/160392650 is fixed
     "lint",
+    "lintAnalyzeDebug",
     "lintDebug",
     "lintVitalRelease",
 )
 
-class TaskUpToDateValidator {
+class TaskUpToDateValidator :
+    BuildService<TaskUpToDateValidator.Parameters>, OperationCompletionListener {
+    open class Parameters : BuildServiceParameters
+    override fun getParameters(): Parameters {
+        return Parameters()
+    }
+
+    override fun onFinish(event: FinishEvent) {
+        val result = event.result
+        if (result is TaskExecutionResult) {
+            val name = event.descriptor.name
+            val executionReasons = result.executionReasons
+            if (executionReasons.isNullOrEmpty()) {
+                // empty list means task was actually up-to-date, see docs for
+                // TaskExecutionResult.executionReasons
+                // null list means the task already failed, so we'll skip emitting our error
+                return
+            }
+            if (!isAllowedToRerunTask(name)) {
+                throw GradleException(
+                    "Ran two consecutive builds of the same tasks, and in the " +
+                        "second build, observed:\n" +
+                        "task $name not UP-TO-DATE. It was out-of-date because:\n" +
+                        "${result.executionReasons}"
+                )
+            }
+        }
+    }
+
     companion object {
-
-        private val BUILD_START_TIME_KEY = "taskUpToDateValidatorSetupTime"
-
-        private fun shouldRecord(project: Project): Boolean {
-            return project.hasProperty(RECORD_FLAG_NAME)
-        }
-
         private fun shouldValidate(project: Project): Boolean {
-            return project.hasProperty(DISALLOW_TASK_EXECUTION_FLAG_NAME)
+            return project.providers.gradleProperty(DISALLOW_TASK_EXECUTION_FLAG_NAME)
+                .forUseAtConfigurationTime().isPresent()
         }
 
-        private fun isAllowedToRerunTask(task: Task): Boolean {
-            return ALLOW_RERUNNING_TASKS.contains(task.name) ||
-                ALLOW_RERUNNING_TASKS.contains(task.path)
+        private fun isAllowedToRerunTask(taskPath: String): Boolean {
+            if (ALLOW_RERUNNING_TASKS.contains(taskPath)) {
+                return true
+            }
+            val colonIndex = taskPath.lastIndexOf(":")
+            if (colonIndex >= 0) {
+                val taskName = taskPath.substring(colonIndex + 1)
+                if (ALLOW_RERUNNING_TASKS.contains(taskName)) {
+                    return true
+                }
+            }
+            return false
         }
 
         private fun shouldTryRerunningTask(task: Task): Boolean {
@@ -186,159 +230,24 @@ class TaskUpToDateValidator {
                 )
         }
 
-        private fun recordBuildStartTime(rootProject: Project) {
-            rootProject.extra.set(BUILD_START_TIME_KEY, Date())
-        }
+        fun setup(rootProject: Project, registry: BuildEventsListenerRegistry) {
+            if (!shouldValidate(rootProject)) {
+                return
+            }
+            // create listener for validating that any task that reran was expected to rerun
+            val validatorProvider = rootProject.getGradle().getSharedServices()
+                .registerIfAbsent(
+                    "TaskUpToDateValidator",
+                    TaskUpToDateValidator::class.java,
+                    { _ -> }
+                )
+            registry.onTaskCompletion(validatorProvider)
 
-        private fun getBuildStartTime(project: Project): Date {
-            return project.rootProject.extra.get(BUILD_START_TIME_KEY) as Date
-        }
-
-        fun setup(rootProject: Project) {
-            recordBuildStartTime(rootProject)
-            val taskGraph = rootProject.gradle.taskGraph
-            if (shouldValidate(rootProject)) {
-                taskGraph.beforeTask { task ->
-                    if (!shouldTryRerunningTask(task)) {
-                        task.enabled = false
-                    }
+            // skip rerunning tasks that are known to be unnecessary to rerun
+            rootProject.allprojects { subproject ->
+                subproject.tasks.configureEach { task ->
+                    task.onlyIf { shouldTryRerunningTask(task) }
                 }
-            }
-            if (shouldRecord(rootProject) || shouldValidate(rootProject)) {
-                taskGraph.afterTask { task ->
-                    // In the second build, make sure that the task didn't rerun
-                    if (shouldValidate(rootProject)) {
-                        if (task.didWork) {
-                            if (!isAllowedToRerunTask(task)) {
-                                val message = "Ran two consecutive builds of the same tasks," +
-                                    " and in the second build, observed $task to be not " +
-                                    " UP-TO-DATE. This indicates that $task does not declare" +
-                                    " inputs and/or outputs correctly.\n" +
-                                    tryToExplainTaskExecution(task, taskGraph)
-                                throw GradleException(message)
-                            }
-                        }
-                    }
-                    // In the first build, record the task's inputs so that if they change in
-                    // the second build then we can compare.
-                    // In the second build, also record the task's inputs because we recorded
-                    // them in the first build, and we want the two builds to be as similar as
-                    // possible
-                    if (shouldTryRerunningTask(task) && !isAllowedToRerunTask(task)) {
-                        recordTaskInputs(task)
-                    }
-                }
-            }
-        }
-
-        fun recordTaskInputs(task: Task) {
-            val text = task.inputs.files.files.joinToString("\n")
-            val destFile = getTaskInputListPath(task)
-            destFile.parentFile.mkdirs()
-            destFile.writeText(text)
-        }
-
-        fun getTaskInputListPath(task: Task): File {
-            return File(getTasksInputListPath(task.project), task.name)
-        }
-
-        fun getTasksInputListPath(project: Project): File {
-            return File(project.buildDir, "TaskUpToDateValidator/inputs")
-        }
-
-        fun checkForChangingSetOfInputs(task: Task): String {
-            val previousInputsFile = getTaskInputListPath(task)
-            val previousInputs = previousInputsFile.readLines()
-            val currentInputs = task.inputs.files.files.map { f -> f.toString() }
-            val addedInputs = currentInputs.minus(previousInputs)
-            val removedInputs = previousInputs.minus(currentInputs)
-            val addedMessage = if (addedInputs.size > 0) {
-                "Added these " + addedInputs.size + " inputs: " +
-                    addedInputs.joinToString("\n") + "\n"
-            } else {
-                ""
-            }
-            val removedMessage = if (removedInputs.size > 0) {
-                "Removed these " + removedInputs.size + " inputs: " +
-                    removedInputs.joinToString("\n") + "\n"
-            } else {
-                ""
-            }
-            return addedMessage + removedMessage
-        }
-
-        fun tryToExplainTaskExecution(task: Task, taskGraph: TaskExecutionGraph): String {
-            val numOutputFiles = task.outputs.files.files.size
-            val outputsMessage = if (numOutputFiles > 0) {
-                task.path + " declares " + numOutputFiles + " output files. This seems fine.\n"
-            } else {
-                task.path + " declares " + numOutputFiles + " output files. This is probably " +
-                    "an error.\n"
-            }
-
-            val inputFiles = task.inputs.files.files
-            var lastModifiedFile: File? = null
-            var lastModifiedWhen = Date(0)
-            for (inputFile in inputFiles) {
-                val modifiedWhen = Date(inputFile.lastModified())
-                if (modifiedWhen.compareTo(lastModifiedWhen) > 0) {
-                    lastModifiedFile = inputFile
-                    lastModifiedWhen = modifiedWhen
-                }
-            }
-
-            val inputSetModifiedMessage = checkForChangingSetOfInputs(task)
-            val inputsMessage = if (inputSetModifiedMessage != "") {
-                inputSetModifiedMessage
-            } else {
-                if (lastModifiedFile != null) {
-                    task.path + " declares " + inputFiles.size + " input files. The " +
-                        "last modified input file is\n" + lastModifiedFile + "\nmodified at " +
-                        lastModifiedWhen + " (this build started at about " +
-                        getBuildStartTime(task.project) + "). " +
-                        tryToExplainFileModification(lastModifiedFile, taskGraph)
-                } else {
-                    task.path + " declares " + inputFiles.size + " input files.\n"
-                }
-            }
-
-            val reproductionMessage = "\nTo reproduce this error you can try running " +
-                "`./gradlew ${task.path} -P$RECORD_FLAG_NAME`\n"
-            val readLogsMessage = "\nYou can check why Gradle executed ${task.path} by " +
-                "passing the '--info' flag to Gradle and then searching stdout for output " +
-                "generated immediately before the task began to execute.\n" +
-                "Our best guess for the reason that ${task.path} executed is below.\n"
-            return readLogsMessage + outputsMessage + inputsMessage + reproductionMessage
-        }
-
-        fun getTaskDeclaringFile(file: File, taskGraph: TaskExecutionGraph): Task? {
-            for (task in taskGraph.allTasks) {
-                if (task.outputs.files.files.contains(file)) {
-                    return task
-                }
-            }
-            return null
-        }
-
-        fun tryToExplainFileModification(file: File, taskGraph: TaskExecutionGraph): String {
-            // Find the task declaring this file as an output,
-            // or the task declaring one of its parent dirs as an output
-            var createdByTask: Task? = null
-            var declaredFile: File? = file
-            while (createdByTask == null && declaredFile != null) {
-                createdByTask = getTaskDeclaringFile(declaredFile, taskGraph)
-                declaredFile = declaredFile.parentFile
-            }
-            if (createdByTask == null) {
-                return "This file is not declared as the output of any task in this build."
-            }
-            if (isAllowedToRerunTask(createdByTask)) {
-                return "This file is declared as an output of " + createdByTask +
-                    ", which is a task that is not yet validated by the TaskUpToDateValidator"
-            } else {
-                return "This file is decared as an output of " + createdByTask +
-                    ", which is a task that is validated by the TaskUpToDateValidator " +
-                    "(and therefore must not have been out-of-date during this build)"
             }
         }
     }

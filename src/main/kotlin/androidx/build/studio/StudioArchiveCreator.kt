@@ -27,7 +27,7 @@ import java.nio.file.Paths
  */
 typealias StudioArchiveCreator = (
     project: Project,
-    studioVersions: StudioVersions,
+    studioVersion: String,
     filename: String,
     destinationPath: String
 ) -> Unit
@@ -37,13 +37,12 @@ typealias StudioArchiveCreator = (
  */
 val UrlArchiveCreator: StudioArchiveCreator = fun (
     project: Project,
-    studioVersions: StudioVersions,
+    studioVersion: String,
     filename: String,
     destinationPath: String
 ) {
-    val url = with(studioVersions) {
-        "https://dl.google.com/dl/android/studio/ide-zips/$studioVersion/$filename"
-    }
+    val url = "https://dl.google.com/dl/android/studio/ide-zips/$studioVersion/$filename"
+
     val tmpDownloadPath = File("$destinationPath.tmp").absolutePath
 
     println("Downloading $url to $tmpDownloadPath")

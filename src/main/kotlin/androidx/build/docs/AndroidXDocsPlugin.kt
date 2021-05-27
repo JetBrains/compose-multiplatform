@@ -312,9 +312,6 @@ class AndroidXDocsPlugin : Plugin<Project> {
                 destinationDir = generatedDocsDir
                 samplesDir = unzippedSamplesSources
                 sourcesDir = unzippedDocsSources
-                includes = unzippedDocsSources.walkTopDown()
-                    .filter { it.name.endsWith("documentation.md") }
-                    .joinToString(";")
                 docsProjectDir = File(project.rootDir, "docs-public")
                 dependenciesClasspath = androidJarFile(project) + dependencyClasspath
             }
@@ -562,7 +559,7 @@ abstract class SourcesVariantRule : ComponentMetadataRule {
     }
 }
 
-private const val DACKKA_DEPENDENCY = "com.google.devsite:dackka:0.0.4"
+private const val DACKKA_DEPENDENCY = "com.google.devsite:dackka:0.0.5"
 private const val DOCLAVA_DEPENDENCY = "com.android:doclava:1.0.6"
 
 // Allowlist for directories that should be processed by Dackka
@@ -570,7 +567,12 @@ private val dackkaDirsToProcess = listOf(
     "androidx/benchmark/**",
     "androidx/collection/**",
     "androidx/compose/**",
-    "androidx/paging/**"
+    "androidx/datastore/**",
+    "androidx/lifecycle/**",
+    "androidx/navigation/**",
+    "androidx/paging/**",
+    "androidx/room/**",
+    "androidx/window/**"
 )
 
 private val hiddenPackages = listOf(

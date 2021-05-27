@@ -20,13 +20,11 @@ import androidx.build.AndroidXPlugin.Companion.ZIP_CONSTRAINED_TEST_CONFIGS_WITH
 import androidx.build.AndroidXPlugin.Companion.ZIP_TEST_CONFIGS_WITH_APKS_TASK
 import androidx.build.dependencyTracker.AffectedModuleDetector
 import androidx.build.gradle.isRoot
-import androidx.build.jacoco.Jacoco
 import androidx.build.license.CheckExternalDependencyLicensesTask
 import androidx.build.playground.VerifyPlaygroundGradlePropertiesTask
 import androidx.build.studio.StudioTask.Companion.registerStudioTask
 import androidx.build.uptodatedness.TaskUpToDateValidator
 import com.android.build.gradle.api.AndroidBasePlugin
-import com.android.build.gradle.internal.tasks.factory.dependsOn
 import org.gradle.api.GradleException
 import org.gradle.api.Plugin
 import org.gradle.api.Project
@@ -37,10 +35,15 @@ import org.gradle.api.tasks.bundling.Zip
 import org.gradle.api.tasks.bundling.ZipEntryCompression
 import org.gradle.kotlin.dsl.KotlinClosure1
 import org.gradle.kotlin.dsl.extra
+import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 import java.io.File
 import java.util.concurrent.ConcurrentHashMap
+import org.gradle.build.event.BuildEventsListenerRegistry
 
-class AndroidXRootPlugin : Plugin<Project> {
+abstract class AndroidXRootPlugin : Plugin<Project> {
+    @get:javax.inject.Inject
+    abstract val registry: BuildEventsListenerRegistry
+
     override fun apply(project: Project) {
         if (!project.isRoot) {
             throw Exception("This plugin should only be applied to root project")
@@ -133,7 +136,9 @@ class AndroidXRootPlugin : Plugin<Project> {
                 "validateProperties",
                 ValidatePropertiesTask::class.java
             )
-            validateAllProperties.dependsOn(validateProperties)
+            validateAllProperties.configure {
+                it.dependsOn(validateProperties)
+            }
         }
 
         if (partiallyDejetifyArchiveTask != null) {
@@ -147,16 +152,7 @@ class AndroidXRootPlugin : Plugin<Project> {
             }
         }
 
-        val buildTestApks = tasks.register(AndroidXPlugin.BUILD_TEST_APKS_TASK)
-        if (project.isCoverageEnabled()) {
-            val createCoverageJarTask = Jacoco.createCoverageJarTask(this)
-            buildTestApks.configure {
-                it.dependsOn(createCoverageJarTask)
-            }
-            buildOnServerTask.dependsOn(createCoverageJarTask)
-            buildOnServerTask.dependsOn(Jacoco.createZipEcFilesTask(this))
-            buildOnServerTask.dependsOn(Jacoco.createUberJarTask(this))
-        }
+        tasks.register(AndroidXPlugin.BUILD_TEST_APKS_TASK)
 
         project.tasks.register(
             ZIP_TEST_CONFIGS_WITH_APKS_TASK, Zip::class.java
@@ -227,12 +223,14 @@ class AndroidXRootPlugin : Plugin<Project> {
 
         registerStudioTask()
 
-        TaskUpToDateValidator.setup(project)
+        TaskUpToDateValidator.setup(project, registry)
 
         project.tasks.register("listTaskOutputs", ListTaskOutputsTask::class.java) { task ->
             task.setOutput(File(project.getDistributionDirectory(), "task_outputs.txt"))
             task.removePrefix(project.getCheckoutRoot().path)
         }
+
+        project.ensureOneKotlinCompilerRunner()
     }
 
     @Suppress("UnstableApiUsage")
@@ -253,7 +251,23 @@ class AndroidXRootPlugin : Plugin<Project> {
         androidx.build.dependencies.kspVersion = getVersion("ksp")
         androidx.build.dependencies.agpVersion = getVersion("androidGradlePlugin")
         androidx.build.dependencies.lintVersion = getVersion("androidLint")
-        androidx.build.dependencies.hiltVersion = getVersion("hilt")
+    }
+
+    // Experimental workaround for https://youtrack.jetbrains.com/issue/KT-46820
+    // Creates one kotlin compiler runner as soon as possible, to avoid concurrency issues when
+    // trying to create multiple at once
+    private fun Project.ensureOneKotlinCompilerRunner() {
+        val taskGraph = project.gradle.taskGraph
+        taskGraph.whenReady {
+            for (task in taskGraph.allTasks) {
+                val compile = task as? KotlinCompile
+                if (compile != null) {
+                    @Suppress("invisible_member")
+                    compile.compilerRunner()
+                    break
+                }
+            }
+        }
     }
 
     companion object {

@@ -54,11 +54,6 @@ const val VERSION_EXTRA_CHECK_ENABLED = "androidx.versionExtraCheckEnabled"
 const val COMPOSE_MPP_ENABLED = "androidx.compose.multiplatformEnabled"
 
 /**
- * Setting this property enables calculating the fraction of code covered by tests
- */
-const val COVERAGE_ENABLED = "androidx.coverageEnabled"
-
-/**
  * Returns whether the project should generate documentation.
  */
 const val ENABLE_DOCUMENTATION = "androidx.enableDocumentation"
@@ -124,7 +119,6 @@ val ALL_ANDROIDX_PROPERTIES = setOf(
     ALTERNATIVE_PROJECT_URL,
     VERSION_EXTRA_CHECK_ENABLED,
     COMPOSE_MPP_ENABLED,
-    COVERAGE_ENABLED,
     DISPLAY_TEST_OUTPUT,
     ENABLE_DOCUMENTATION,
     PROJECT_SUBSET,
@@ -214,16 +208,6 @@ fun Project.isDocumentationEnabled(): Boolean {
  */
 fun Project.usingMaxDepVersions(): Boolean {
     return project.hasProperty(USE_MAX_DEP_VERSIONS)
-}
-
-/**
- * Returns whether the project has coverage enabled.
- */
-fun Project.isCoverageEnabled(): Boolean {
-    if (project.usingMaxDepVersions()) {
-        return false
-    }
-    return (project.findProperty(COVERAGE_ENABLED) as? String)?.toBoolean() ?: false
 }
 
 /**
