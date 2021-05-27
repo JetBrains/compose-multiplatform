@@ -32,4 +32,10 @@ abstract class MacOSNotarizationSettings {
     val password: Property<String?> = objects.nullableProperty<String>().apply {
         set(ComposeProperties.macNotarizationPassword(providers))
     }
+
+    @get:Input
+    @get:Optional
+    val ascProvider: Property<String?> = objects.nullableProperty<String>().apply {
+        set(ComposeProperties.macNotarizationAscProvider(providers))
+    }
 }

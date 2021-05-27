@@ -17,6 +17,7 @@ internal object ComposeProperties {
     internal const val MAC_SIGN_PREFIX = "compose.desktop.mac.signing.prefix"
     internal const val MAC_NOTARIZATION_APPLE_ID = "compose.desktop.mac.notarization.appleID"
     internal const val MAC_NOTARIZATION_PASSWORD = "compose.desktop.mac.notarization.password"
+    internal const val MAC_NOTARIZATION_ASC_PROVIDER = "compose.desktop.mac.notarization.ascProvider"
 
     fun isVerbose(providers: ProviderFactory): Provider<Boolean> =
         providers.findProperty(VERBOSE).toBoolean()
@@ -41,6 +42,9 @@ internal object ComposeProperties {
 
     fun macNotarizationPassword(providers: ProviderFactory): Provider<String?> =
         providers.findProperty(MAC_NOTARIZATION_PASSWORD)
+
+    fun macNotarizationAscProvider(providers: ProviderFactory): Provider<String?> =
+        providers.findProperty(MAC_NOTARIZATION_ASC_PROVIDER)
 
     private fun ProviderFactory.findProperty(prop: String): Provider<String?> =
         provider {
