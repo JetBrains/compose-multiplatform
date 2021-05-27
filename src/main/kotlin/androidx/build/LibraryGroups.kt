@@ -122,6 +122,13 @@ object LibraryGroups {
  * This object contains the library group, as well as whether libraries
  * in this group are all required to have the same development version.
  */
-data class LibraryGroup(val group: String = "unspecified", val forcedVersion: Version?) {
+data class LibraryGroup(
+    val group: String = "unspecified",
+    val forcedVersion: Version?,
+) : java.io.Serializable {
     val requireSameVersion = (forcedVersion != null)
+
+    companion object {
+        private const val serialVersionUID = 345435634564L
+    }
 }

@@ -61,7 +61,6 @@ import org.gradle.api.tasks.javadoc.Javadoc
 import org.gradle.api.tasks.testing.Test
 import org.gradle.api.tasks.testing.logging.TestExceptionFormat
 import org.gradle.api.tasks.testing.logging.TestLogEvent
-import org.gradle.kotlin.dsl.apply
 import org.gradle.kotlin.dsl.create
 import org.gradle.kotlin.dsl.extra
 import org.gradle.kotlin.dsl.findByType
@@ -107,6 +106,7 @@ class AndroidXPlugin : Plugin<Project> {
         project.configureTaskTimeouts()
         project.configureMavenArtifactUpload(extension)
         project.configureExternalDependencyLicenseCheck()
+        project.configureProjectStructureValidation(extension)
     }
 
     /**
@@ -372,6 +372,23 @@ class AndroidXPlugin : Plugin<Project> {
         }
 
         project.addToProjectMap(extension)
+    }
+
+    private fun Project.configureProjectStructureValidation(
+        extension: AndroidXExtension
+    ) {
+        val validateProjectStructure = tasks.register(
+            "validateProjectStructure",
+            ValidateProjectStructureTask::class.java,
+        )
+
+        // AndroidXExtension.mavenGroup is not readable until afterEvaluate.
+        afterEvaluate {
+            validateProjectStructure.configure { task ->
+                task.enabled = extension.mavenGroup != null
+                task.libraryGroup.set(extension.mavenGroup)
+            }
+        }
     }
 
     private fun TestedExtension.configureAndroidCommonOptions(
