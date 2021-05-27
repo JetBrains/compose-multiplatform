@@ -10,38 +10,39 @@ import androidx.compose.runtime.RememberObserver
 import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.currentComposer
 import androidx.compose.runtime.remember
+import org.w3c.dom.Element
 import org.w3c.dom.HTMLElement
 
-interface DOMScope<out THTMLElement : HTMLElement>
+interface DOMScope<out TElement : Element>
 
-interface ElementScope<out THTMLElement : HTMLElement> : DOMScope<THTMLElement> {
+interface ElementScope<out TElement : Element> : DOMScope<TElement> {
 
     @Composable
     @NonRestartableComposable
     fun DisposableRefEffect(
         key: Any?,
-        effect: DisposableEffectScope.(THTMLElement) -> DisposableEffectResult
+        effect: DisposableEffectScope.(TElement) -> DisposableEffectResult
     )
 
     @Composable
     @NonRestartableComposable
     fun DisposableRefEffect(
-        effect: DisposableEffectScope.(THTMLElement) -> DisposableEffectResult
+        effect: DisposableEffectScope.(TElement) -> DisposableEffectResult
     ) {
         DisposableRefEffect(null, effect)
     }
 
     @Composable
     @NonRestartableComposable
-    fun DomSideEffect(key: Any?, effect: DomEffectScope.(THTMLElement) -> Unit)
+    fun DomSideEffect(key: Any?, effect: DomEffectScope.(TElement) -> Unit)
 
     @Composable
     @NonRestartableComposable
-    fun DomSideEffect(effect: DomEffectScope.(THTMLElement) -> Unit)
+    fun DomSideEffect(effect: DomEffectScope.(TElement) -> Unit)
 }
 
-abstract class ElementScopeBase<out THTMLElement : HTMLElement> : ElementScope<THTMLElement> {
-    abstract val element: THTMLElement
+abstract class ElementScopeBase<out TElement : Element> : ElementScope<TElement> {
+    abstract val element: TElement
 
     private var nextDisposableDomEffectKey = 0
 
@@ -49,7 +50,7 @@ abstract class ElementScopeBase<out THTMLElement : HTMLElement> : ElementScope<T
     @NonRestartableComposable
     override fun DisposableRefEffect(
         key: Any?,
-        effect: DisposableEffectScope.(THTMLElement) -> DisposableEffectResult
+        effect: DisposableEffectScope.(TElement) -> DisposableEffectResult
     ) {
         DisposableEffect(key) { effect(element) }
     }
@@ -59,7 +60,7 @@ abstract class ElementScopeBase<out THTMLElement : HTMLElement> : ElementScope<T
     @OptIn(ComposeCompilerApi::class)
     override fun DomSideEffect(
         key: Any?,
-        effect: DomEffectScope.(THTMLElement) -> Unit
+        effect: DomEffectScope.(TElement) -> Unit
     ) {
         val changed = currentComposer.changed(key)
         val effectHolder = remember(key) {
@@ -72,23 +73,23 @@ abstract class ElementScopeBase<out THTMLElement : HTMLElement> : ElementScope<T
 
     @Composable
     @NonRestartableComposable
-    override fun DomSideEffect(effect: DomEffectScope.(THTMLElement) -> Unit) {
+    override fun DomSideEffect(effect: DomEffectScope.(TElement) -> Unit) {
         DomSideEffect(nextDisposableDomEffectKey++, effect)
     }
 }
 
-open class ElementScopeImpl<THTMLElement : HTMLElement> : ElementScopeBase<THTMLElement>() {
-    public override lateinit var element: THTMLElement
+open class ElementScopeImpl<TElement : Element> : ElementScopeBase<TElement>() {
+    public override lateinit var element: TElement
 }
 
 interface DomEffectScope {
-    fun onDispose(disposeEffect: (HTMLElement) -> Unit)
+    fun onDispose(disposeEffect: (Element) -> Unit)
 }
 
 private class DomDisposableEffectHolder(
-    val elementScope: ElementScopeBase<HTMLElement>
+    val elementScope: ElementScopeBase<Element>
 ) : RememberObserver, DomEffectScope {
-    var onDispose: ((HTMLElement) -> Unit)? = null
+    var onDispose: ((Element) -> Unit)? = null
 
     override fun onRemembered() {}
 
@@ -98,7 +99,7 @@ private class DomDisposableEffectHolder(
 
     override fun onAbandoned() {}
 
-    override fun onDispose(disposeEffect: (HTMLElement) -> Unit) {
+    override fun onDispose(disposeEffect: (Element) -> Unit) {
         onDispose = disposeEffect
     }
 }

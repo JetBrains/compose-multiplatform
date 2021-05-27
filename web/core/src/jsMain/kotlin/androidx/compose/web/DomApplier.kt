@@ -8,6 +8,7 @@ import androidx.compose.web.elements.setProperty
 import androidx.compose.web.elements.setVariable
 import kotlinx.browser.document
 import kotlinx.dom.clear
+import org.w3c.dom.Element
 import org.w3c.dom.HTMLElement
 import org.w3c.dom.Node
 import org.w3c.dom.get
@@ -38,20 +39,10 @@ class DomApplier(
     }
 }
 
-class DomNodeWrapper(val node: Node) {
-
+open class DomNodeWrapper(open val node: Node) {
     constructor(tag: String) : this(document.createElement(tag))
 
-    private var currentListeners: List<WrappedEventListener<*>> = emptyList()
-    private var currentAttrs: Map<String, String?> = emptyMap()
-
-    fun updateProperties(list: List<Pair<(HTMLElement, Any) -> Unit, Any>>) {
-        val htmlElement = node as? HTMLElement ?: return
-
-        if (node.className.isNotEmpty()) node.className = ""
-
-        list.forEach { it.first(htmlElement, it.second) }
-    }
+    private var currentListeners = emptyList<WrappedEventListener<*>>()
 
     fun updateEventListeners(list: List<WrappedEventListener<*>>) {
         val htmlElement = node as? HTMLElement ?: return
@@ -64,29 +55,6 @@ class DomNodeWrapper(val node: Node) {
 
         currentListeners.forEach {
             htmlElement.addEventListener(it.event, it)
-        }
-    }
-
-    fun updateAttrs(attrs: Map<String, String?>) {
-        val htmlElement = node as? HTMLElement ?: return
-        currentAttrs.forEach {
-            htmlElement.removeAttribute(it.key)
-        }
-        currentAttrs = attrs
-        currentAttrs.forEach {
-            if (it.value != null) htmlElement.setAttribute(it.key, it.value ?: "")
-        }
-    }
-
-    fun updateStyleDeclarations(style: StyleHolder?) {
-        val htmlElement = node as? HTMLElement ?: return
-        htmlElement.removeAttribute("style")
-
-        style?.properties?.forEach { (name, value) ->
-            setProperty(htmlElement.attributeStyleMap, name, value)
-        }
-        style?.variables?.forEach { (name, value) ->
-            setVariable(htmlElement.style, name, value)
         }
     }
 
@@ -119,23 +87,36 @@ class DomNodeWrapper(val node: Node) {
             node.insertBefore(child, node.childNodes[toIndex]!!)
         }
     }
+}
 
-    companion object {
 
-        val UpdateAttrs: DomNodeWrapper.(Map<String, String?>) -> Unit = {
-            this.updateAttrs(it)
+class DomElementWrapper(override val node: HTMLElement): DomNodeWrapper(node) {
+    private var currentAttrs = emptyMap<String, String?>()
+
+    fun updateAttrs(attrs: Map<String, String?>) {
+        currentAttrs.forEach {
+            node.removeAttribute(it.key)
         }
-        val UpdateListeners: DomNodeWrapper.(List<WrappedEventListener<*>>) -> Unit = {
-            this.updateEventListeners(it)
+        currentAttrs = attrs
+        currentAttrs.forEach {
+            if (it.value != null) node.setAttribute(it.key, it.value ?: "")
         }
-        val UpdateProperties: DomNodePropertiesUpdater = {
-            this.updateProperties(it)
+    }
+
+    fun updateProperties(list: List<Pair<(Element, Any) -> Unit, Any>>) {
+        if (node.className.isNotEmpty()) node.className = ""
+
+        list.forEach { it.first(node, it.second) }
+    }
+
+    fun updateStyleDeclarations(style: StyleHolder?) {
+        node.removeAttribute("style")
+
+        style?.properties?.forEach { (name, value) ->
+            setProperty(node.attributeStyleMap, name, value)
         }
-        val UpdateStyleDeclarations: DomNodeWrapper.(StyleHolder?) -> Unit = {
-            this.updateStyleDeclarations(it)
+        style?.variables?.forEach { (name, value) ->
+            setVariable(node.style, name, value)
         }
     }
 }
-
-typealias DomNodePropertiesUpdater =
-    DomNodeWrapper.(List<Pair<(HTMLElement, Any) -> Unit, Any>>) -> Unit

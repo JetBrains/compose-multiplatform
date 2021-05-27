@@ -11,12 +11,11 @@ import androidx.compose.runtime.SkippableUpdater
 import androidx.compose.runtime.currentComposer
 import androidx.compose.runtime.remember
 import androidx.compose.web.DomApplier
-import androidx.compose.web.DomNodeWrapper
+import androidx.compose.web.DomElementWrapper
 import androidx.compose.web.attributes.AttrsBuilder
 import androidx.compose.web.attributes.Tag
-import androidx.compose.web.css.StyleBuilder
-import androidx.compose.web.css.StyleBuilderImpl
 import kotlinx.browser.document
+import org.w3c.dom.Element
 import org.w3c.dom.HTMLElement
 
 @OptIn(ComposeCompilerApi::class)
@@ -47,22 +46,22 @@ inline fun <TScope, T, reified E : Applier<*>> ComposeDomNode(
 }
 
 class DisposableEffectHolder(
-    var effect: (DisposableEffectScope.(HTMLElement) -> DisposableEffectResult)? = null
+    var effect: (DisposableEffectScope.(Element) -> DisposableEffectResult)? = null
 )
 
 @Composable
-inline fun <TTag : Tag, THTMLElement : HTMLElement> TagElement(
+inline fun <TTag : Tag, TElement : Element> TagElement(
     tagName: String,
     crossinline applyAttrs: AttrsBuilder<TTag>.() -> Unit,
-    content: @Composable ElementScope<THTMLElement>.() -> Unit
+    content: @Composable ElementScope<TElement>.() -> Unit
 ) {
-    val scope = remember { ElementScopeImpl<THTMLElement>() }
+    val scope = remember { ElementScopeImpl<TElement>() }
     val refEffect = remember { DisposableEffectHolder() }
 
-    ComposeDomNode<ElementScope<THTMLElement>, DomNodeWrapper, DomApplier>(
+    ComposeDomNode<ElementScope<TElement>, DomElementWrapper, DomApplier>(
         factory = {
-            DomNodeWrapper(document.createElement(tagName)).also {
-                scope.element = it.node.unsafeCast<THTMLElement>()
+            DomElementWrapper(document.createElement(tagName) as HTMLElement).also {
+                scope.element = it.node.unsafeCast<TElement>()
             }
         },
         attrsSkippableUpdate = {
@@ -72,10 +71,10 @@ inline fun <TTag : Tag, THTMLElement : HTMLElement> TagElement(
             val events = attrsApplied.collectListeners()
 
             update {
-                set(attrsCollected, DomNodeWrapper.UpdateAttrs)
-                set(events, DomNodeWrapper.UpdateListeners)
-                set(attrsApplied.propertyUpdates, DomNodeWrapper.UpdateProperties)
-                set(attrsApplied.styleBuilder, DomNodeWrapper.UpdateStyleDeclarations)
+                set(attrsCollected, DomElementWrapper::updateAttrs)
+                set(events, DomElementWrapper::updateEventListeners)
+                set(attrsApplied.propertyUpdates, DomElementWrapper::updateProperties)
+                set(attrsApplied.styleBuilder, DomElementWrapper::updateStyleDeclarations)
             }
         },
         elementScope = scope,
