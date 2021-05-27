@@ -100,4 +100,6 @@ internal fun BlendMode.toAndroidBlendMode(): android.graphics.BlendMode = when (
     BlendMode.Saturation -> android.graphics.BlendMode.SATURATION
     BlendMode.Color -> android.graphics.BlendMode.COLOR
     BlendMode.Luminosity -> android.graphics.BlendMode.LUMINOSITY
+    // Always return SRC_OVER as the default if there is no valid alternative
+    else -> android.graphics.BlendMode.SRC_OVER
 }

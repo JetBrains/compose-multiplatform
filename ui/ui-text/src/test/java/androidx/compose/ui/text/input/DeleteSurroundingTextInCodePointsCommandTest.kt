@@ -17,8 +17,7 @@
 package androidx.compose.ui.text.input
 
 import androidx.compose.ui.text.TextRange
-import org.junit.Assert.assertEquals
-import org.junit.Assert.assertFalse
+import com.google.common.truth.Truth.assertThat
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.junit.runners.JUnit4
@@ -37,9 +36,9 @@ class DeleteSurroundingTextInCodePointsCommandTest {
 
         DeleteSurroundingTextInCodePointsCommand(0, 1).applyTo(eb)
 
-        assertEquals("$CH1$CH3$CH4$CH5", eb.toString())
-        assertEquals(2, eb.cursor)
-        assertFalse(eb.hasComposition())
+        assertThat(eb.toString()).isEqualTo("$CH1$CH3$CH4$CH5")
+        assertThat(eb.cursor).isEqualTo(2)
+        assertThat(eb.hasComposition()).isFalse()
     }
 
     @Test
@@ -48,9 +47,9 @@ class DeleteSurroundingTextInCodePointsCommandTest {
 
         DeleteSurroundingTextInCodePointsCommand(1, 0).applyTo(eb)
 
-        assertEquals("$CH2$CH3$CH4$CH5", eb.toString())
-        assertEquals(0, eb.cursor)
-        assertFalse(eb.hasComposition())
+        assertThat(eb.toString()).isEqualTo("$CH2$CH3$CH4$CH5")
+        assertThat(eb.cursor).isEqualTo(0)
+        assertThat(eb.hasComposition()).isFalse()
     }
 
     @Test
@@ -59,9 +58,9 @@ class DeleteSurroundingTextInCodePointsCommandTest {
 
         DeleteSurroundingTextInCodePointsCommand(1, 1).applyTo(eb)
 
-        assertEquals("$CH1$CH2$CH5", eb.toString())
-        assertEquals(4, eb.cursor)
-        assertFalse(eb.hasComposition())
+        assertThat(eb.toString()).isEqualTo("$CH1$CH2$CH5")
+        assertThat(eb.cursor).isEqualTo(4)
+        assertThat(eb.hasComposition()).isFalse()
     }
 
     @Test
@@ -70,9 +69,9 @@ class DeleteSurroundingTextInCodePointsCommandTest {
 
         DeleteSurroundingTextInCodePointsCommand(0, 2).applyTo(eb)
 
-        assertEquals("$CH1$CH2$CH5", eb.toString())
-        assertEquals(4, eb.cursor)
-        assertFalse(eb.hasComposition())
+        assertThat(eb.toString()).isEqualTo("$CH1$CH2$CH5")
+        assertThat(eb.cursor).isEqualTo(4)
+        assertThat(eb.hasComposition()).isFalse()
     }
 
     @Test
@@ -81,9 +80,9 @@ class DeleteSurroundingTextInCodePointsCommandTest {
 
         DeleteSurroundingTextInCodePointsCommand(2, 0).applyTo(eb)
 
-        assertEquals("$CH1$CH4$CH5", eb.toString())
-        assertEquals(2, eb.cursor)
-        assertFalse(eb.hasComposition())
+        assertThat(eb.toString()).isEqualTo("$CH1$CH4$CH5")
+        assertThat(eb.cursor).isEqualTo(2)
+        assertThat(eb.hasComposition()).isFalse()
     }
 
     @Test
@@ -92,9 +91,9 @@ class DeleteSurroundingTextInCodePointsCommandTest {
 
         DeleteSurroundingTextInCodePointsCommand(2, 2).applyTo(eb)
 
-        assertEquals(CH1, eb.toString())
-        assertEquals(2, eb.cursor)
-        assertFalse(eb.hasComposition())
+        assertThat(eb.toString()).isEqualTo(CH1)
+        assertThat(eb.cursor).isEqualTo(2)
+        assertThat(eb.hasComposition()).isFalse()
     }
 
     @Test
@@ -103,10 +102,10 @@ class DeleteSurroundingTextInCodePointsCommandTest {
 
         DeleteSurroundingTextInCodePointsCommand(1, 1).applyTo(eb)
 
-        assertEquals("$CH1$CH3$CH4", eb.toString())
-        assertEquals(2, eb.selectionStart)
-        assertEquals(6, eb.selectionEnd)
-        assertFalse(eb.hasComposition())
+        assertThat(eb.toString()).isEqualTo("$CH1$CH3$CH4")
+        assertThat(eb.selectionStart).isEqualTo(2)
+        assertThat(eb.selectionEnd).isEqualTo(6)
+        assertThat(eb.hasComposition()).isFalse()
     }
 
     @Test
@@ -115,9 +114,9 @@ class DeleteSurroundingTextInCodePointsCommandTest {
 
         DeleteSurroundingTextInCodePointsCommand(1000, 0).applyTo(eb)
 
-        assertEquals("$CH4$CH5", eb.toString())
-        assertEquals(0, eb.cursor)
-        assertFalse(eb.hasComposition())
+        assertThat(eb.toString()).isEqualTo("$CH4$CH5")
+        assertThat(eb.cursor).isEqualTo(0)
+        assertThat(eb.hasComposition()).isFalse()
     }
 
     @Test
@@ -126,9 +125,9 @@ class DeleteSurroundingTextInCodePointsCommandTest {
 
         DeleteSurroundingTextInCodePointsCommand(0, 1000).applyTo(eb)
 
-        assertEquals("$CH1$CH2$CH3", eb.toString())
-        assertEquals(6, eb.cursor)
-        assertFalse(eb.hasComposition())
+        assertThat(eb.toString()).isEqualTo("$CH1$CH2$CH3")
+        assertThat(eb.cursor).isEqualTo(6)
+        assertThat(eb.hasComposition()).isFalse()
     }
 
     @Test
@@ -137,9 +136,9 @@ class DeleteSurroundingTextInCodePointsCommandTest {
 
         DeleteSurroundingTextInCodePointsCommand(1000, 1000).applyTo(eb)
 
-        assertEquals("", eb.toString())
-        assertEquals(0, eb.cursor)
-        assertFalse(eb.hasComposition())
+        assertThat(eb.toString()).isEqualTo("")
+        assertThat(eb.cursor).isEqualTo(0)
+        assertThat(eb.hasComposition()).isFalse()
     }
 
     @Test
@@ -150,10 +149,10 @@ class DeleteSurroundingTextInCodePointsCommandTest {
 
         DeleteSurroundingTextInCodePointsCommand(1, 1).applyTo(eb)
 
-        assertEquals("$CH1$CH2$CH5", eb.toString())
-        assertEquals(4, eb.cursor)
-        assertEquals(0, eb.compositionStart)
-        assertEquals(2, eb.compositionEnd)
+        assertThat(eb.toString()).isEqualTo("$CH1$CH2$CH5")
+        assertThat(eb.cursor).isEqualTo(4)
+        assertThat(eb.compositionStart).isEqualTo(0)
+        assertThat(eb.compositionEnd).isEqualTo(2)
     }
 
     @Test
@@ -164,10 +163,10 @@ class DeleteSurroundingTextInCodePointsCommandTest {
 
         DeleteSurroundingTextInCodePointsCommand(1, 1).applyTo(eb)
 
-        assertEquals("$CH1$CH2$CH5", eb.toString())
-        assertEquals(4, eb.cursor)
-        assertEquals(4, eb.compositionStart)
-        assertEquals(6, eb.compositionEnd)
+        assertThat(eb.toString()).isEqualTo("$CH1$CH2$CH5")
+        assertThat(eb.cursor).isEqualTo(4)
+        assertThat(eb.compositionStart).isEqualTo(4)
+        assertThat(eb.compositionEnd).isEqualTo(6)
     }
 
     @Test
@@ -178,10 +177,10 @@ class DeleteSurroundingTextInCodePointsCommandTest {
 
         DeleteSurroundingTextInCodePointsCommand(1, 1).applyTo(eb)
 
-        assertEquals("$CH1$CH2$CH5", eb.toString())
-        assertEquals(4, eb.cursor)
-        assertEquals(0, eb.compositionStart)
-        assertEquals(4, eb.compositionEnd)
+        assertThat(eb.toString()).isEqualTo("$CH1$CH2$CH5")
+        assertThat(eb.cursor).isEqualTo(4)
+        assertThat(eb.compositionStart).isEqualTo(0)
+        assertThat(eb.compositionEnd).isEqualTo(4)
     }
 
     @Test
@@ -192,10 +191,10 @@ class DeleteSurroundingTextInCodePointsCommandTest {
 
         DeleteSurroundingTextInCodePointsCommand(1, 1).applyTo(eb)
 
-        assertEquals("$CH1$CH2$CH5", eb.toString())
-        assertEquals(4, eb.cursor)
-        assertEquals(4, eb.compositionStart)
-        assertEquals(6, eb.compositionEnd)
+        assertThat(eb.toString()).isEqualTo("$CH1$CH2$CH5")
+        assertThat(eb.cursor).isEqualTo(4)
+        assertThat(eb.compositionStart).isEqualTo(4)
+        assertThat(eb.compositionEnd).isEqualTo(6)
     }
 
     @Test
@@ -206,9 +205,9 @@ class DeleteSurroundingTextInCodePointsCommandTest {
 
         DeleteSurroundingTextInCodePointsCommand(1, 1).applyTo(eb)
 
-        assertEquals("$CH1$CH2$CH5", eb.toString())
-        assertEquals(4, eb.cursor)
-        assertFalse(eb.hasComposition())
+        assertThat(eb.toString()).isEqualTo("$CH1$CH2$CH5")
+        assertThat(eb.cursor).isEqualTo(4)
+        assertThat(eb.hasComposition()).isFalse()
     }
 
     @Test
@@ -219,9 +218,9 @@ class DeleteSurroundingTextInCodePointsCommandTest {
 
         DeleteSurroundingTextInCodePointsCommand(1, 1).applyTo(eb)
 
-        assertEquals("$CH1$CH2$CH5", eb.toString())
-        assertEquals(4, eb.cursor)
-        assertEquals(0, eb.compositionStart)
-        assertEquals(6, eb.compositionEnd)
+        assertThat(eb.toString()).isEqualTo("$CH1$CH2$CH5")
+        assertThat(eb.cursor).isEqualTo(4)
+        assertThat(eb.compositionStart).isEqualTo(0)
+        assertThat(eb.compositionEnd).isEqualTo(6)
     }
 }

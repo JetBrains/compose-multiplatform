@@ -28,13 +28,7 @@ plugins {
 BundleInsideHelper.forInsideLintJar(project)
 
 dependencies {
-    // compileOnly because we use lintChecks and it doesn't allow other types of deps
-    // this ugly hack exists because of b/63873667
-    if (rootProject.hasProperty("android.injected.invoked.from.ide")) {
-        compileOnly(LINT_API_LATEST)
-    } else {
-        compileOnly(LINT_API_MIN)
-    }
+    compileOnly(LINT_API_MIN)
     compileOnly(KOTLIN_STDLIB)
 
     bundleInside(project(":compose:lint:common"))
@@ -42,6 +36,8 @@ dependencies {
     testImplementation(KOTLIN_STDLIB)
     testImplementation(LINT_CORE)
     testImplementation(LINT_TESTS)
+    testImplementation(JUNIT)
+    testImplementation(TRUTH)
 }
 
 androidx {

@@ -17,6 +17,7 @@
 package androidx.compose.ui.inspection.inspector
 
 import android.view.View
+import androidx.annotation.VisibleForTesting
 import androidx.compose.runtime.InternalComposeApi
 import androidx.compose.runtime.tooling.CompositionData
 import androidx.compose.ui.ExperimentalComposeUiApi
@@ -74,8 +75,9 @@ private val unwantedCalls = setOf(
     "ProvideCommonCompositionLocals",
 )
 
-private fun packageNameHash(packageName: String) =
-    packageName.fold(0) { hash, char -> hash * 31 + char.toInt() }.absoluteValue
+@VisibleForTesting
+fun packageNameHash(packageName: String) =
+    packageName.fold(0) { hash, char -> hash * 31 + char.code }.absoluteValue
 
 /**
  * Generator of a tree for the Layout Inspector.

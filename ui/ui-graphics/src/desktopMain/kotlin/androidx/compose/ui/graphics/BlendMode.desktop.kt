@@ -46,4 +46,6 @@ internal fun BlendMode.toSkija() = when (this) {
     BlendMode.Saturation -> org.jetbrains.skija.BlendMode.SATURATION
     BlendMode.Color -> org.jetbrains.skija.BlendMode.COLOR
     BlendMode.Luminosity -> org.jetbrains.skija.BlendMode.LUMINOSITY
+    // Always fallback to default blendmode of src over
+    else -> org.jetbrains.skija.BlendMode.SRC_OVER
 }

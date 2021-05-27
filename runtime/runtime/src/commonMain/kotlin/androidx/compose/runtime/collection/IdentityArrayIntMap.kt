@@ -152,6 +152,12 @@ internal class IdentityArrayIntMap {
         return false
     }
 
+    inline fun forEach(block: (Any, Int) -> Unit) {
+        for (i in 0 until size) {
+            block(keys[i] as Any, values[i])
+        }
+    }
+
     /**
      * Returns the index of [key] in the set or the negative index - 1 of the location where
      * it would have been if it had been in the set.

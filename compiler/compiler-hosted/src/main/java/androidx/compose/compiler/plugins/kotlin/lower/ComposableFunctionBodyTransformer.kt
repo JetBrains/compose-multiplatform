@@ -71,7 +71,6 @@ import org.jetbrains.kotlin.ir.declarations.IrVariable
 import org.jetbrains.kotlin.ir.declarations.impl.IrFunctionImpl
 import org.jetbrains.kotlin.ir.declarations.impl.IrVariableImpl
 import org.jetbrains.kotlin.ir.declarations.name
-import org.jetbrains.kotlin.ir.descriptors.WrappedVariableDescriptor
 import org.jetbrains.kotlin.ir.expressions.IrBlock
 import org.jetbrains.kotlin.ir.expressions.IrBody
 import org.jetbrains.kotlin.ir.expressions.IrBreakContinue
@@ -847,6 +846,15 @@ class ComposableFunctionBodyTransformer(
                 returnVar?.let { irReturn(declaration.symbol, irGet(it)) }
             )
         )
+        if (
+            elideGroups &&
+            collectSourceInformation &&
+            !declaration.descriptor.hasExplicitGroupsAnnotation()
+        ) {
+            scope.realizeEndCalls {
+                irSourceInformationMarkerEnd(body)
+            }
+        }
 
         return declaration
     }
@@ -3520,9 +3528,7 @@ class ComposableFunctionBodyTransformer(
                 realizeCoalescableChildGroup = {
                     scope.realizeGroup(makeEnd)
                     realizeGroup()
-                    realizeCoalescableChildGroup = {
-                        error("Attempted to realize group twice")
-                    }
+                    realizeCoalescableChildGroup = { }
                 }
             }
 
@@ -3573,7 +3579,7 @@ class ComposableFunctionBodyTransformer(
                 }
             }
 
-            protected open fun realizeEndCalls(makeEnd: () -> IrExpression) {
+            open fun realizeEndCalls(makeEnd: () -> IrExpression) {
                 extraEndLocations.forEach {
                     it(makeEnd())
                 }
@@ -3850,7 +3856,6 @@ class ComposableFunctionBodyTransformer(
         ): IrChangedBitMaskVariable {
             used = true
             val temps = params.mapIndexed { index, param ->
-                val descriptor = WrappedVariableDescriptor()
                 IrVariableImpl(
                     UNDEFINED_OFFSET,
                     UNDEFINED_OFFSET,
@@ -3859,14 +3864,13 @@ class ComposableFunctionBodyTransformer(
                     // dirty variable encodes information that could be useful for tooling to
                     // interpret.
                     IrDeclarationOrigin.DEFINED,
-                    IrVariableSymbolImpl(descriptor),
+                    IrVariableSymbolImpl(),
                     Name.identifier(if (index == 0) "\$dirty" else "\$dirty$index"),
                     param.type,
                     isVar,
                     isConst = false,
                     isLateinit = false
                 ).apply {
-                    descriptor.bind(this)
                     initializer = irGet(param)
                 }
             }

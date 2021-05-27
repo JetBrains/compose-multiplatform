@@ -181,8 +181,8 @@ class Alphabet(
     companion object {
         val Latin = Alphabet(
             charRanges = listOf(
-                IntRange('a'.toInt(), 'z'.toInt()),
-                IntRange('A'.toInt(), 'Z'.toInt())
+                IntRange('a'.code, 'z'.code),
+                IntRange('A'.code, 'Z'.code)
             ),
             space = ' ',
             name = "Latin"

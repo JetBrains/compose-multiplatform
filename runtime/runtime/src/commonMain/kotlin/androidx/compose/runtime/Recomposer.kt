@@ -24,7 +24,7 @@ import androidx.compose.runtime.snapshots.fastForEach
 import androidx.compose.runtime.snapshots.fastMap
 import androidx.compose.runtime.snapshots.fastMapNotNull
 import androidx.compose.runtime.tooling.CompositionData
-import kotlinx.collections.immutable.persistentSetOf
+import androidx.compose.runtime.external.kotlinx.collections.immutable.persistentSetOf
 import kotlinx.coroutines.CancellableContinuation
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CoroutineScope
@@ -438,24 +438,48 @@ class Recomposer(
 
                     // Perform recomposition for any invalidated composers
                     val modifiedValues = IdentityArraySet<Any>()
-                    try {
-                        toRecompose.fastForEach { composer ->
-                            performRecompose(composer, modifiedValues)?.let {
-                                toApply += it
+                    val alreadyComposed = IdentityArraySet<ControlledComposition>()
+                    while (toRecompose.isNotEmpty()) {
+                        try {
+                            toRecompose.fastForEach { composition ->
+                                alreadyComposed.add(composition)
+                                performRecompose(composition, modifiedValues)?.let {
+                                    toApply += it
+                                }
+                            }
+                        } finally {
+                            toRecompose.clear()
+                        }
+
+                        // Find any trailing recompositions that need to be composed because
+                        // of a value change by a composition. This can happen, for example, if
+                        // a CompositionLocal changes in a parent and was read in a child
+                        // composition that was otherwise valid.
+                        if (modifiedValues.isNotEmpty()) {
+                            synchronized(stateLock) {
+                                knownCompositions.fastForEach { value ->
+                                    if (
+                                        value !in alreadyComposed &&
+                                        value.observesAnyOf(modifiedValues)
+                                    ) {
+                                        toRecompose += value
+                                    }
+                                }
                             }
                         }
-                        if (toApply.isNotEmpty()) changeCount++
-                    } finally {
-                        toRecompose.clear()
                     }
 
-                    // Perform apply changes
-                    try {
-                        toApply.fastForEach { composition ->
-                            composition.applyChanges()
+                    if (toApply.isNotEmpty()) {
+                        changeCount++
+
+                        // Perform apply changes
+                        try {
+                            toApply.fastForEach { composition ->
+                                composition.applyChanges()
+                            }
+                        } finally {
+                            toApply.clear()
                         }
-                    } finally {
-                        toApply.clear()
                     }
 
                     synchronized(stateLock) {
@@ -729,7 +753,13 @@ class Recomposer(
         if (composition.isComposing || composition.isDisposed) return null
         return if (
             composing(composition, modifiedValues) {
-                modifiedValues?.forEach { composition.recordWriteOf(it) }
+                if (modifiedValues?.isNotEmpty() == true) {
+                    // Record write performed by a previous composition as if they happened during
+                    // composition.
+                    composition.prepareCompose {
+                        modifiedValues.forEach { composition.recordWriteOf(it) }
+                    }
+                }
                 composition.recompose()
             }
         ) composition else null

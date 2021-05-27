@@ -25,7 +25,7 @@ expect class NativeKeyEvent
  * When a user presses a key on a hardware keyboard, a [KeyEvent] is sent to the
  * [KeyInputModifier] that is currently active.
  */
-@Suppress("EXPERIMENTAL_FEATURE_WARNING")
+@Suppress("INLINE_CLASS_DEPRECATED", "EXPERIMENTAL_FEATURE_WARNING")
 inline class KeyEvent(val nativeKeyEvent: NativeKeyEvent)
 
 /**
@@ -79,6 +79,7 @@ expect val KeyEvent.isShiftPressed: Boolean
 /**
  * The type of Key Event.
  */
+@Suppress("INLINE_CLASS_DEPRECATED", "EXPERIMENTAL_FEATURE_WARNING")
 inline class KeyEventType(val value: Int) {
 
     override fun toString(): String {

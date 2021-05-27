@@ -16,13 +16,17 @@
 
 package androidx.compose.foundation.lazy
 
+import android.os.Build
 import androidx.compose.animation.core.snap
 import androidx.compose.foundation.AutoTestFrameClock
+import androidx.compose.foundation.background
 import androidx.compose.foundation.gestures.animateScrollBy
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.requiredHeight
 import androidx.compose.foundation.layout.requiredSize
 import androidx.compose.foundation.layout.requiredSizeIn
@@ -34,9 +38,13 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.compose.testutils.assertIsEqualTo
+import androidx.compose.testutils.assertShape
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.drawBehind
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.test.SemanticsNodeInteraction
@@ -46,15 +54,22 @@ import androidx.compose.ui.test.assertIsNotDisplayed
 import androidx.compose.ui.test.assertLeftPositionInRootIsEqualTo
 import androidx.compose.ui.test.assertPositionInRootIsEqualTo
 import androidx.compose.ui.test.assertWidthIsEqualTo
+import androidx.compose.ui.test.captureToImage
+import androidx.compose.ui.test.center
+import androidx.compose.ui.test.down
 import androidx.compose.ui.test.getUnclippedBoundsInRoot
 import androidx.compose.ui.test.junit4.StateRestorationTester
 import androidx.compose.ui.test.junit4.createComposeRule
+import androidx.compose.ui.test.moveBy
 import androidx.compose.ui.test.onNodeWithTag
+import androidx.compose.ui.test.performGesture
+import androidx.compose.ui.test.up
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.MediumTest
+import androidx.test.filters.SdkSuppress
 import com.google.common.truth.Truth
 import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.Dispatchers
@@ -1067,6 +1082,149 @@ class LazyRowTest {
                 assertThat(it).isLessThan(count)
             }
             assertThat(state.firstVisibleItemIndex).isEqualTo(9)
+        }
+    }
+
+    @Test
+    fun overscrollingBackwardFromNotTheFirstPosition() {
+        val containerTag = "container"
+        val itemSizePx = 10
+        val itemSizeDp = with(rule.density) { itemSizePx.toDp() }
+        val containerSize = itemSizeDp * 5
+        rule.setContentWithTestViewConfiguration {
+            Box(
+                Modifier
+                    .testTag(containerTag)
+                    .size(containerSize)
+            ) {
+                LazyRow(
+                    Modifier
+                        .testTag(LazyListTag)
+                        .background(Color.Blue),
+                    state = rememberLazyListState(2, 5)
+                ) {
+                    items(100) {
+                        Box(
+                            Modifier
+                                .fillMaxHeight()
+                                .width(itemSizeDp)
+                                .testTag("$it")
+                        )
+                    }
+                }
+            }
+        }
+
+        rule.onNodeWithTag(LazyListTag)
+            .performGesture {
+                // we do move manually and not with swipe() utility because we want to have one
+                // drag gesture, not multiple smaller ones
+                down(center)
+                moveBy(Offset(-TestTouchSlop, 0f))
+                moveBy(
+                    Offset(
+                        itemSizePx * 15f, // large value which makes us overscroll
+                        0f
+                    )
+                )
+                up()
+            }
+
+        rule.onNodeWithTag(LazyListTag)
+            .assertWidthIsEqualTo(containerSize)
+
+        rule.onNodeWithTag("0")
+            .assertLeftPositionInRootIsEqualTo(0.dp)
+        rule.onNodeWithTag("4")
+            .assertLeftPositionInRootIsEqualTo(containerSize - itemSizeDp)
+    }
+
+    @SdkSuppress(minSdkVersion = Build.VERSION_CODES.O)
+    @Test
+    fun lazyRowDoesNotClipHorizontalOverdraw() {
+        rule.setContent {
+            Box(Modifier.size(60.dp).testTag("container").background(Color.Gray)) {
+                LazyRow(
+                    Modifier
+                        .padding(20.dp)
+                        .fillMaxSize(),
+                    rememberLazyListState(1)
+                ) {
+                    items(4) {
+                        Box(Modifier.size(20.dp).drawOutsideOfBounds())
+                    }
+                }
+            }
+        }
+
+        rule.onNodeWithTag("container")
+            .captureToImage()
+            .assertShape(
+                density = rule.density,
+                shape = RectangleShape,
+                shapeColor = Color.Red,
+                backgroundColor = Color.Gray,
+                horizontalPadding = 20.dp,
+                verticalPadding = 0.dp
+            )
+    }
+
+    @Test
+    fun initialScrollPositionIsCorrectWhenItemsAreLoadedAsynchronously() {
+        lateinit var state: LazyListState
+        var itemsCount by mutableStateOf(0)
+        rule.setContent {
+            state = rememberLazyListState(2, 10)
+            LazyRow(Modifier.fillMaxSize(), state) {
+                items(itemsCount) {
+                    Box(Modifier.size(20.dp))
+                }
+            }
+        }
+
+        rule.runOnIdle {
+            itemsCount = 100
+        }
+
+        rule.runOnIdle {
+            assertThat(state.firstVisibleItemIndex).isEqualTo(2)
+            assertThat(state.firstVisibleItemScrollOffset).isEqualTo(10)
+        }
+    }
+
+    @Test
+    fun restoredScrollPositionIsCorrectWhenItemsAreLoadedAsynchronously() {
+        lateinit var state: LazyListState
+        var itemsCount = 100
+        val recomposeCounter = mutableStateOf(0)
+        val tester = StateRestorationTester(rule)
+        tester.setContent {
+            state = rememberLazyListState()
+            LazyRow(Modifier.fillMaxSize(), state) {
+                recomposeCounter.value
+                items(itemsCount) {
+                    Box(Modifier.size(20.dp))
+                }
+            }
+        }
+
+        rule.runOnIdle {
+            runBlocking {
+                state.scrollToItem(2, 10)
+            }
+            itemsCount = 0
+        }
+
+        tester.emulateSavedInstanceStateRestore()
+
+        rule.runOnIdle {
+            itemsCount = 100
+            recomposeCounter.value = 1
+        }
+
+        rule.runOnIdle {
+            assertThat(state.firstVisibleItemIndex).isEqualTo(2)
+            assertThat(state.firstVisibleItemScrollOffset).isEqualTo(10)
         }
     }
 

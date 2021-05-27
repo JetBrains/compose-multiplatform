@@ -210,6 +210,20 @@ internal class FakeSelectable : Selectable {
     var selectionToReturn: Selection? = null
     var textToReturn: AnnotatedString? = null
 
+    private val selectableKey = 1L
+    private val fakeSelectAllSelection: Selection = Selection(
+        start = Selection.AnchorInfo(
+            direction = ResolvedTextDirection.Ltr,
+            offset = 0,
+            selectableId = selectableKey
+        ),
+        end = Selection.AnchorInfo(
+            direction = ResolvedTextDirection.Ltr,
+            offset = 10,
+            selectableId = selectableKey
+        )
+    )
+
     override fun getSelection(
         startPosition: Offset,
         endPosition: Offset,
@@ -226,6 +240,10 @@ internal class FakeSelectable : Selectable {
         lastPreviousSelection = previousSelection
         lastIsStartHandle = isStartHandle
         return selectionToReturn
+    }
+
+    override fun getSelectAllSelection(): Selection? {
+        return fakeSelectAllSelection
     }
 
     override fun getText(): AnnotatedString {

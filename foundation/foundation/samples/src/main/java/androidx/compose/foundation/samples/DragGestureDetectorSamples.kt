@@ -162,10 +162,9 @@ fun DetectHorizontalDragGesturesSample() {
                 .width(50.dp)
                 .background(Color.Blue)
                 .pointerInput(Unit) {
-                    detectHorizontalDragGestures { change, dragAmount ->
+                    detectHorizontalDragGestures { _, dragAmount ->
                         val originalX = offsetX.value
                         val newValue = (originalX + dragAmount).coerceIn(0f, width - 50.dp.toPx())
-                        change.consumePositionChange()
                         offsetX.value = newValue
                     }
                 }
@@ -276,10 +275,9 @@ fun DetectVerticalDragGesturesSample() {
                 .height(50.dp)
                 .background(Color.Blue)
                 .pointerInput(Unit) {
-                    detectVerticalDragGestures { change, dragAmount ->
+                    detectVerticalDragGestures { _, dragAmount ->
                         val originalY = offsetY.value
                         val newValue = (originalY + dragAmount).coerceIn(0f, height - 50.dp.toPx())
-                        change.consumePositionChange()
                         offsetY.value = newValue
                     }
                 }
@@ -401,14 +399,13 @@ fun DetectDragGesturesSample() {
                 .size(50.dp)
                 .background(Color.Blue)
                 .pointerInput(Unit) {
-                    detectDragGestures { change, dragAmount ->
+                    detectDragGestures { _, dragAmount ->
                         val original = Offset(offsetX.value, offsetY.value)
                         val summed = original + dragAmount
                         val newValue = Offset(
                             x = summed.x.coerceIn(0f, size.width - 50.dp.toPx()),
                             y = summed.y.coerceIn(0f, size.height - 50.dp.toPx())
                         )
-                        change.consumePositionChange()
                         offsetX.value = newValue.x
                         offsetY.value = newValue.y
                     }
@@ -432,14 +429,13 @@ fun DetectDragWithLongPressGesturesSample() {
                 .size(50.dp)
                 .background(Color.Blue)
                 .pointerInput(Unit) {
-                    detectDragGesturesAfterLongPress { change, dragAmount ->
+                    detectDragGesturesAfterLongPress { _, dragAmount ->
                         val original = Offset(offsetX.value, offsetY.value)
                         val summed = original + dragAmount
                         val newValue = Offset(
                             x = summed.x.coerceIn(0f, size.width - 50.dp.toPx()),
                             y = summed.y.coerceIn(0f, size.height - 50.dp.toPx())
                         )
-                        change.consumePositionChange()
                         offsetX.value = newValue.x
                         offsetY.value = newValue.y
                     }

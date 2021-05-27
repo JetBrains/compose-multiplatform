@@ -36,6 +36,9 @@ package androidx.compose.foundation {
     method public static androidx.compose.ui.Modifier clickable(androidx.compose.ui.Modifier, androidx.compose.foundation.interaction.MutableInteractionSource interactionSource, androidx.compose.foundation.Indication? indication, optional boolean enabled, optional String? onClickLabel, optional androidx.compose.ui.semantics.Role? role, kotlin.jvm.functions.Function0<kotlin.Unit> onClick);
   }
 
+  public final class Clickable_androidKt {
+  }
+
   public final class DarkTheme_androidKt {
     method @androidx.compose.runtime.Composable @androidx.compose.runtime.ReadOnlyComposable public static boolean isSystemInDarkTheme();
   }
@@ -593,7 +596,7 @@ package androidx.compose.foundation.text {
   }
 
   public interface KeyboardActionScope {
-    method public void defaultKeyboardAction(androidx.compose.ui.text.input.ImeAction imeAction);
+    method public void defaultKeyboardAction-KlQnJC8(int imeAction);
   }
 
   public final class KeyboardActions {
@@ -623,16 +626,15 @@ package androidx.compose.foundation.text {
   }
 
   @androidx.compose.runtime.Immutable public final class KeyboardOptions {
-    ctor public KeyboardOptions(optional androidx.compose.ui.text.input.KeyboardCapitalization capitalization, optional boolean autoCorrect, optional androidx.compose.ui.text.input.KeyboardType keyboardType, optional androidx.compose.ui.text.input.ImeAction imeAction);
-    method public androidx.compose.foundation.text.KeyboardOptions copy(optional androidx.compose.ui.text.input.KeyboardCapitalization capitalization, optional boolean autoCorrect, optional androidx.compose.ui.text.input.KeyboardType keyboardType, optional androidx.compose.ui.text.input.ImeAction imeAction);
+    method public androidx.compose.foundation.text.KeyboardOptions copy-C1cpEnM(optional androidx.compose.ui.text.input.KeyboardCapitalization capitalization, optional boolean autoCorrect, optional int keyboardType, optional int imeAction);
     method public boolean getAutoCorrect();
     method public androidx.compose.ui.text.input.KeyboardCapitalization getCapitalization();
-    method public androidx.compose.ui.text.input.ImeAction getImeAction();
-    method public androidx.compose.ui.text.input.KeyboardType getKeyboardType();
+    method public int getImeAction-eUduSuo();
+    method public int getKeyboardType-PjHm6EE();
     property public final boolean autoCorrect;
     property public final androidx.compose.ui.text.input.KeyboardCapitalization capitalization;
-    property public final androidx.compose.ui.text.input.ImeAction imeAction;
-    property public final androidx.compose.ui.text.input.KeyboardType keyboardType;
+    property public final int imeAction;
+    property public final int keyboardType;
     field public static final androidx.compose.foundation.text.KeyboardOptions.Companion Companion;
   }
 
@@ -648,6 +650,9 @@ package androidx.compose.foundation.text {
   }
 
   public final class StringHelpersKt {
+  }
+
+  public final class StringHelpers_androidKt {
   }
 
   public final class StringHelpers_jvmKt {
@@ -684,6 +689,12 @@ package androidx.compose.foundation.text {
   }
 
   public final class TouchMode_androidKt {
+  }
+
+  public final class UndoManagerKt {
+  }
+
+  public final class UndoManager_jvmKt {
   }
 
 }

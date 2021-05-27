@@ -75,6 +75,24 @@ class ParametersTest {
     }
 
     @Test
+    fun contentLambda(): Unit = runBlocking {
+        val composables = rule.inspectorTester.sendCommand(GetComposablesCommand(rule.rootId))
+            .getComposablesResponse
+
+        val buttons = composables.filter("SomeContent")
+        val someId = buttons.single().id
+        val params = rule.inspectorTester.sendCommand(GetParametersCommand(rule.rootId, someId))
+            .getParametersResponse
+
+        val lambdaValue = params.find("content").lambdaValue
+        assertThat(lambdaValue.fileName.resolve(params)).isEqualTo("ParametersTestActivity.kt")
+        assertThat(lambdaValue.startLineNumber).isEqualTo(61)
+        assertThat(lambdaValue.endLineNumber).isEqualTo(64)
+        assertThat(lambdaValue.packageName.resolve(params))
+            .isEqualTo("androidx.compose.ui.inspection.testdata")
+    }
+
+    @Test
     fun functionType(): Unit = runBlocking {
         val composables = rule.inspectorTester.sendCommand(GetComposablesCommand(rule.rootId))
             .getComposablesResponse
@@ -142,8 +160,13 @@ class ParametersTest {
             .getParametersResponse
 
         val text = params.findUnmerged("Text")
+        assertThat(text.type).isEqualTo(Parameter.Type.ITERABLE)
         val strings = params.stringsList
-        checkStringParam(strings, text, "Text", "one", 0)
+        val first = text.elementsList[0]
+
+        assertThat(strings.toMap()[text.name]).isEqualTo("Text")
+        assertThat(strings.toMap()[first.int32Value]).isEqualTo("one")
+        assertThat(text.elementsList.size).isEqualTo(1)
     }
 
     @Test
@@ -158,7 +181,17 @@ class ParametersTest {
 
         val text = params.findMerged("Text")
         val strings = params.stringsList
-        checkStringParam(strings, text, "Text", "three, four", 0)
+
+        assertThat(text.type).isEqualTo(Parameter.Type.ITERABLE)
+        val first = text.elementsList[0]
+        val second = text.elementsList[1]
+        val third = text.elementsList[2]
+
+        assertThat(strings.toMap()[text.name]).isEqualTo("Text")
+        assertThat(strings.toMap()[first.int32Value]).isEqualTo("three")
+        assertThat(strings.toMap()[second.int32Value]).isEqualTo("four")
+        assertThat(strings.toMap()[third.int32Value]).isEqualTo("five")
+        assertThat(text.elementsList.size).isEqualTo(3)
     }
 }
 

@@ -14,7 +14,11 @@
  * limitations under the License.
  */
 
-@file:Suppress("NOTHING_TO_INLINE", "EXPERIMENTAL_FEATURE_WARNING")
+@file:Suppress(
+    "NOTHING_TO_INLINE",
+    "INLINE_CLASS_DEPRECATED",
+    "EXPERIMENTAL_FEATURE_WARNING"
+)
 
 package androidx.compose.ui.unit
 

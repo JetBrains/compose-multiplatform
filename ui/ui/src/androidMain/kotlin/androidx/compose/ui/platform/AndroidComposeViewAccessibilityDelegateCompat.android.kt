@@ -67,7 +67,9 @@ import androidx.compose.ui.semantics.AccessibilityAction
 import androidx.compose.ui.semantics.LiveRegionMode
 import androidx.compose.ui.semantics.ProgressBarRangeInfo
 import androidx.compose.ui.text.InternalTextApi
+import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.util.fastForEachIndexed
+import androidx.compose.ui.util.fastMap
 import androidx.core.view.AccessibilityDelegateCompat
 import androidx.core.view.ViewCompat
 import androidx.core.view.ViewCompat.ACCESSIBILITY_LIVE_REGION_ASSERTIVE
@@ -716,8 +718,19 @@ internal class AndroidComposeViewAccessibilityDelegateCompat(val view: AndroidCo
                 ?.toAccessibilitySpannableString(density = view.density, view.fontLoader),
             ParcelSafeTextLength
         )
+
         val textToAssign = trimToSize(
             node.config.getOrNull(SemanticsProperties.Text)
+                ?.let { list ->
+                    buildAnnotatedString {
+                        list.fastForEach { item ->
+                            if (length > 0) {
+                                append(",")
+                            }
+                            append(item)
+                        }
+                    }
+                }
                 ?.toAccessibilitySpannableString(density = view.density, view.fontLoader),
             ParcelSafeTextLength
         )
@@ -1992,13 +2005,15 @@ internal class AndroidComposeViewAccessibilityDelegateCompat(val view: AndroidCo
         // prioritize content description, even for Text.
         if (node.unmergedConfig.contains(SemanticsProperties.ContentDescription)) {
             return node.unmergedConfig[SemanticsProperties.ContentDescription]
+                .fastJoinToString(",")
         }
 
         if (node.isTextField) {
             return getTextForTextField(node)
         }
 
-        return node.config.getOrNull(SemanticsProperties.Text)?.text
+        return node.config.getOrNull(SemanticsProperties.Text)
+            ?.fastMap { it.text }?.fastJoinToString(",")
     }
 
     /**
@@ -2010,7 +2025,8 @@ internal class AndroidComposeViewAccessibilityDelegateCompat(val view: AndroidCo
 
         val editableText = node.config.getOrNull(SemanticsProperties.EditableText)
         return if (editableText.isNullOrEmpty()) {
-            node.config.getOrNull(SemanticsProperties.Text)?.text
+            node.config.getOrNull(SemanticsProperties.Text)
+                ?.fastMap { it.text }?.fastJoinToString(",")
         } else {
             editableText.text
         }
@@ -2029,7 +2045,7 @@ internal class AndroidComposeViewAccessibilityDelegateCompat(val view: AndroidCo
         val contentDescription =
             node.unmergedConfig.getOrNull(SemanticsProperties.ContentDescription)
         if (!contentDescription.isNullOrEmpty()) {
-            return contentDescription
+            return contentDescription.fastJoinToString(",")
         }
 
         if (node.unmergedConfig.contains(SemanticsProperties.Text) ||
@@ -2060,7 +2076,7 @@ internal class AndroidComposeViewAccessibilityDelegateCompat(val view: AndroidCo
                 val contentDescription =
                     childNode.unmergedConfig.getOrNull(SemanticsProperties.ContentDescription)
                 if (!contentDescription.isNullOrEmpty()) {
-                    childDescriptions.add(contentDescription)
+                    childDescriptions.add(contentDescription.fastJoinToString(","))
                     return@fastForEach
                 }
 
@@ -2076,7 +2092,7 @@ internal class AndroidComposeViewAccessibilityDelegateCompat(val view: AndroidCo
                 // check if it's a text node
                 val text = childNode.unmergedConfig.getOrNull(SemanticsProperties.Text)
                 if (!text.isNullOrEmpty()) {
-                    childDescriptions.add(text.text)
+                    childDescriptions.add(text.fastMap { it.text }.fastJoinToString(","))
                     return@fastForEach
                 }
 

@@ -36,18 +36,24 @@ import org.junit.runners.Parameterized
 private const val invalid = "Not applicable to a 2D focus search."
 
 @RunWith(Parameterized::class)
-class TwoDimensionalFocusTraversalThreeItemsTest(focusDirectionInt: Int) {
+class TwoDimensionalFocusTraversalThreeItemsTest(param: Param) {
     @get:Rule
     val rule = createComposeRule()
 
+    // We need to wrap the inline class parameter in another class because Java can't instantiate
+    // the inline class.
+    class Param(val focusDirection: FocusDirection) {
+        override fun toString() = focusDirection.toString()
+    }
+
     private lateinit var focusManager: FocusManager
     private val initialFocus: FocusRequester = FocusRequester()
-    private val focusDirection = FocusDirection(focusDirectionInt)
+    private val focusDirection = param.focusDirection
 
     companion object {
         @JvmStatic
         @Parameterized.Parameters(name = "{0}")
-        fun initParameters() = listOf(Left, Right, Up, Down).map { it.value }
+        fun initParameters() = listOf(Param(Left), Param(Right), Param(Up), Param(Down))
     }
 
     /**

@@ -67,7 +67,7 @@ private val TextUnit.spanUnit: Int
     get() = when (type) {
         TextUnitType.Sp -> PlaceholderSpan.UNIT_SP
         TextUnitType.Em -> PlaceholderSpan.UNIT_EM
-        TextUnitType.Unspecified -> PlaceholderSpan.UNIT_UNSPECIFIED
+        else -> PlaceholderSpan.UNIT_UNSPECIFIED
     }
 
 /**
@@ -84,4 +84,5 @@ private val PlaceholderVerticalAlign.spanVerticalAlign: Int
         PlaceholderVerticalAlign.TextTop -> PlaceholderSpan.ALIGN_TEXT_TOP
         PlaceholderVerticalAlign.TextBottom -> PlaceholderSpan.ALIGN_TEXT_BOTTOM
         PlaceholderVerticalAlign.TextCenter -> PlaceholderSpan.ALIGN_TEXT_CENTER
+        else -> error("Invalid PlaceholderVerticalAlign")
     }

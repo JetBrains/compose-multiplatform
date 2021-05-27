@@ -84,5 +84,8 @@ internal enum class KeyCommand(
     DESELECT(false),
 
     NEW_LINE(true),
-    TAB(true)
+    TAB(true),
+
+    UNDO(true),
+    REDO(true)
 }

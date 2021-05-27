@@ -156,6 +156,16 @@ class NodeGroup(
     children: Collection<Group>
 ) : Group(key, null, null, box, data, children)
 
+@UiToolingDataApi
+private object EmptyGroup : Group(
+    key = null,
+    name = null,
+    location = null,
+    box = emptyBox,
+    data = emptyList(),
+    children = emptyList()
+)
+
 /**
  * A key that has being joined together to form one key.
  */
@@ -422,7 +432,7 @@ private fun sourceInformationContextOf(
     return SourceInformationContext(
         name = name,
         sourceFile = sourceFile ?: parent?.sourceFile,
-        packageHash = packageHash,
+        packageHash = if (sourceFile != null) packageHash else parent?.packageHash ?: packageHash,
         locations = sourceLocations,
         repeatOffset = repeatOffset,
         parameters = parameters,
@@ -503,7 +513,8 @@ private fun boundsOfLayoutNode(node: LayoutInfo): IntRect {
  * table.
  */
 @UiToolingDataApi
-fun CompositionData.asTree(): Group = compositionGroups.first().getGroup(null)
+fun CompositionData.asTree(): Group = compositionGroups.firstOrNull()?.getGroup(null)
+    ?: EmptyGroup
 
 internal fun IntRect.union(other: IntRect): IntRect {
     if (this == emptyBox) return other else if (other == emptyBox) return this

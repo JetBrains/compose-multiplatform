@@ -38,6 +38,15 @@ if(AndroidXUiPlugin.isMultiplatformEnabled(project)) {
             desktopMain.dependsOn(jvmMain)
         }
     }
+
+    android {
+        sourceSets {
+            main {
+                res.srcDirs += "src/commonMain/resources"
+                res.srcDirs += "src/androidMain/res"
+            }
+        }
+    }
 }
 
 androidx {

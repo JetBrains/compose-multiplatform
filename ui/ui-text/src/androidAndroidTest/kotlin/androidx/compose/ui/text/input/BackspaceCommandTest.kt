@@ -18,8 +18,7 @@ package androidx.compose.ui.text.input
 import androidx.compose.ui.text.TextRange
 import androidx.test.filters.SdkSuppress
 import androidx.test.filters.SmallTest
-import org.junit.Assert.assertEquals
-import org.junit.Assert.assertFalse
+import com.google.common.truth.Truth.assertThat
 import org.junit.Test
 import org.junit.runner.RunWith
 import androidx.test.ext.junit.runners.AndroidJUnit4
@@ -44,9 +43,9 @@ class BackspaceCommandTest {
 
         BackspaceCommand().applyTo(eb)
 
-        assertEquals("BCDE", eb.toString())
-        assertEquals(0, eb.cursor)
-        assertFalse(eb.hasComposition())
+        assertThat(eb.toString()).isEqualTo("BCDE")
+        assertThat(eb.cursor).isEqualTo(0)
+        assertThat(eb.hasComposition()).isFalse()
     }
 
     @Test
@@ -55,9 +54,9 @@ class BackspaceCommandTest {
 
         BackspaceCommand().applyTo(eb)
 
-        assertEquals("ABCDE", eb.toString())
-        assertEquals(0, eb.cursor)
-        assertFalse(eb.hasComposition())
+        assertThat(eb.toString()).isEqualTo("ABCDE")
+        assertThat(eb.cursor).isEqualTo(0)
+        assertThat(eb.hasComposition()).isFalse()
     }
 
     @Test
@@ -66,9 +65,9 @@ class BackspaceCommandTest {
 
         BackspaceCommand().applyTo(eb)
 
-        assertEquals("ABDE", eb.toString())
-        assertEquals(2, eb.cursor)
-        assertFalse(eb.hasComposition())
+        assertThat(eb.toString()).isEqualTo("ABDE")
+        assertThat(eb.cursor).isEqualTo(2)
+        assertThat(eb.hasComposition()).isFalse()
     }
 
     @Test
@@ -78,9 +77,9 @@ class BackspaceCommandTest {
 
         BackspaceCommand().applyTo(eb)
 
-        assertEquals("ABDE", eb.toString())
-        assertEquals(1, eb.cursor)
-        assertFalse(eb.hasComposition())
+        assertThat(eb.toString()).isEqualTo("ABDE")
+        assertThat(eb.cursor).isEqualTo(1)
+        assertThat(eb.hasComposition()).isFalse()
     }
 
     @Test
@@ -89,9 +88,9 @@ class BackspaceCommandTest {
 
         BackspaceCommand().applyTo(eb)
 
-        assertEquals("$SP2$SP3$SP4$SP5", eb.toString())
-        assertEquals(0, eb.cursor)
-        assertFalse(eb.hasComposition())
+        assertThat(eb.toString()).isEqualTo("$SP2$SP3$SP4$SP5")
+        assertThat(eb.cursor).isEqualTo(0)
+        assertThat(eb.hasComposition()).isFalse()
     }
 
     @Test
@@ -100,9 +99,9 @@ class BackspaceCommandTest {
 
         BackspaceCommand().applyTo(eb)
 
-        assertEquals("$SP1$SP2$SP4$SP5", eb.toString())
-        assertEquals(4, eb.cursor)
-        assertFalse(eb.hasComposition())
+        assertThat(eb.toString()).isEqualTo("$SP1$SP2$SP4$SP5")
+        assertThat(eb.cursor).isEqualTo(4)
+        assertThat(eb.hasComposition()).isFalse()
     }
 
     @Test
@@ -112,9 +111,9 @@ class BackspaceCommandTest {
 
         BackspaceCommand().applyTo(eb)
 
-        assertEquals("$SP1$SP2$SP4$SP5", eb.toString())
-        assertEquals(2, eb.cursor)
-        assertFalse(eb.hasComposition())
+        assertThat(eb.toString()).isEqualTo("$SP1$SP2$SP4$SP5")
+        assertThat(eb.cursor).isEqualTo(2)
+        assertThat(eb.hasComposition()).isFalse()
     }
 
     @Test
@@ -127,8 +126,8 @@ class BackspaceCommandTest {
 
         BackspaceCommand().applyTo(eb)
 
-        assertEquals(ZWJ_EMOJI, eb.toString())
-        assertEquals(0, eb.cursor)
-        assertFalse(eb.hasComposition())
+        assertThat(eb.toString()).isEqualTo(ZWJ_EMOJI)
+        assertThat(eb.cursor).isEqualTo(0)
+        assertThat(eb.hasComposition()).isFalse()
     }
 }

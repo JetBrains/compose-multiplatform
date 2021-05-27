@@ -16,25 +16,38 @@
 
 package androidx.compose.ui.graphics
 
+import androidx.compose.runtime.Immutable
+
 /**
  * Styles to use for line endings.
  * See [Paint.strokeCap].
  */
-enum class StrokeCap {
-    /**
-     * Begin and end contours with a flat edge and no extension.
-     */
-    Butt,
+@Suppress("INLINE_CLASS_DEPRECATED", "EXPERIMENTAL_FEATURE_WARNING")
+@Immutable
+inline class StrokeCap internal constructor(val value: Int) {
+    companion object {
+        /**
+         * Begin and end contours with a flat edge and no extension.
+         */
+        val Butt = StrokeCap(0)
 
-    /**
-     * Begin and end contours with a semi-circle extension.
-     */
-    Round,
+        /**
+         * Begin and end contours with a semi-circle extension.
+         */
+        val Round = StrokeCap(1)
 
-    /**
-     * Begin and end contours with a half square extension. This is
-     * similar to extending each contour by half the stroke width (as
-     * given by [Paint.strokeWidth]).
-     */
-    Square
+        /**
+         * Begin and end contours with a half square extension. This is
+         * similar to extending each contour by half the stroke width (as
+         * given by [Paint.strokeWidth]).
+         */
+        val Square = StrokeCap(2)
+    }
+
+    override fun toString() = when (this) {
+        Butt -> "Butt"
+        Round -> "Round"
+        Square -> "Square"
+        else -> "Unknown"
+    }
 }

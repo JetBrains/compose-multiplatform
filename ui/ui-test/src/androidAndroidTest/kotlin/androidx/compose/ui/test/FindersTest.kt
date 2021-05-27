@@ -16,7 +16,9 @@
 
 package androidx.compose.ui.test
 
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.semantics.SemanticsPropertyReceiver
@@ -86,6 +88,21 @@ class FindersTest {
         rule.onNodeWithText("Hello World").assertExists()
     }
 
+    @Test
+    fun findByText_merged_matches() {
+        rule.setContent {
+            Box(Modifier.semantics(mergeDescendants = true) { }) {
+                Text("Hello")
+                Text("World")
+            }
+        }
+
+        rule.onNodeWithText("Hello").assertExists()
+        rule.onNodeWithText("World").assertExists()
+        rule.onAllNodesWithText("Hello").assertCountEquals(1)
+        rule.onAllNodesWithText("World").assertCountEquals(1)
+    }
+
     @Test(expected = AssertionError::class)
     fun findByText_fails() {
         rule.setContent {
@@ -96,6 +113,18 @@ class FindersTest {
         rule.onNodeWithText("World").assertExists()
     }
 
+    @Test(expected = AssertionError::class)
+    fun findByText_merged_fails() {
+        rule.setContent {
+            Box(Modifier.semantics(mergeDescendants = true) { }) {
+                Text("Hello")
+                Text("World")
+            }
+        }
+
+        rule.onNodeWithText("Hello, World").assertExists()
+    }
+
     @Test
     fun findBySubstring_matches() {
         rule.setContent {
@@ -103,6 +132,19 @@ class FindersTest {
         }
 
         rule.onNodeWithText("World", substring = true).assertExists()
+    }
+
+    @Test
+    fun findBySubstring_merged_matches() {
+        rule.setContent {
+            Box(Modifier.semantics(mergeDescendants = true) { }) {
+                Text("Hello")
+                Text("World")
+            }
+        }
+
+        rule.onNodeWithText("Wo", substring = true).assertExists()
+        rule.onNodeWithText("He", substring = true).assertExists()
     }
 
     @Test
@@ -148,6 +190,21 @@ class FindersTest {
         rule.onNodeWithContentDescription("Hello World").assertExists()
     }
 
+    @Test
+    fun findByContentDescription_merged_matches() {
+        rule.setContent {
+            Box(Modifier.semantics(mergeDescendants = true) { }) {
+                Box(Modifier.semantics { contentDescription = "Hello" })
+                Box(Modifier.semantics { contentDescription = "World" })
+            }
+        }
+
+        rule.onNodeWithContentDescription("Hello").assertExists()
+        rule.onNodeWithContentDescription("World").assertExists()
+        rule.onAllNodesWithContentDescription("Hello").assertCountEquals(1)
+        rule.onAllNodesWithContentDescription("World").assertCountEquals(1)
+    }
+
     @Test(expected = AssertionError::class)
     fun findByContentDescription_fails() {
         rule.setContent {
@@ -157,6 +214,18 @@ class FindersTest {
         rule.onNodeWithContentDescription("Hello").assertExists()
     }
 
+    @Test(expected = AssertionError::class)
+    fun findByContentDescription_merged_fails() {
+        rule.setContent {
+            Box(Modifier.semantics(mergeDescendants = true) { }) {
+                Box(Modifier.semantics { contentDescription = "Hello" })
+                Box(Modifier.semantics { contentDescription = "World" })
+            }
+        }
+
+        rule.onNodeWithText("Hello, World").assertExists()
+    }
+
     @Test
     fun findByContentDescription_substring_matches() {
         rule.setContent {
@@ -164,6 +233,19 @@ class FindersTest {
         }
 
         rule.onNodeWithContentDescription("World", substring = true).assertExists()
+    }
+
+    @Test
+    fun findByContentDescription_merged_substring_matches() {
+        rule.setContent {
+            Box(Modifier.semantics(mergeDescendants = true) { }) {
+                Box(Modifier.semantics { contentDescription = "Hello" })
+                Box(Modifier.semantics { contentDescription = "World" })
+            }
+        }
+
+        rule.onNodeWithContentDescription("Wo", substring = true).assertExists()
+        rule.onNodeWithContentDescription("He", substring = true).assertExists()
     }
 
     fun findByContentDescription_substring_noResult() {

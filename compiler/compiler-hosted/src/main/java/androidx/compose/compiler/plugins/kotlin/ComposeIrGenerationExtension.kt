@@ -26,6 +26,7 @@ import androidx.compose.compiler.plugins.kotlin.lower.ComposerParamTransformer
 import androidx.compose.compiler.plugins.kotlin.lower.DurableKeyVisitor
 import androidx.compose.compiler.plugins.kotlin.lower.KlibAssignableParamTransformer
 import androidx.compose.compiler.plugins.kotlin.lower.LiveLiteralTransformer
+import androidx.compose.compiler.plugins.kotlin.lower.annotateComposableFunctions
 import androidx.compose.compiler.plugins.kotlin.lower.decoys.CreateDecoysTransformer
 import androidx.compose.compiler.plugins.kotlin.lower.decoys.RecordDecoySignaturesTransformer
 import androidx.compose.compiler.plugins.kotlin.lower.decoys.SubstituteDecoyCallsTransformer
@@ -43,6 +44,7 @@ import org.jetbrains.kotlin.resolve.DelegatingBindingTrace
 
 class ComposeIrGenerationExtension(
     @Suppress("unused") private val liveLiteralsEnabled: Boolean = false,
+    @Suppress("unused") private val liveLiteralsV2Enabled: Boolean = false,
     private val sourceInformationEnabled: Boolean = true,
     private val intrinsicRememberEnabled: Boolean = true,
     private val decoysEnabled: Boolean = false,
@@ -65,6 +67,8 @@ class ComposeIrGenerationExtension(
         // create a symbol remapper to be used across all transforms
         val symbolRemapper = ComposableSymbolRemapper()
 
+        moduleFragment.annotateComposableFunctions(pluginContext)
+
         ClassStabilityTransformer(
             pluginContext,
             symbolRemapper,
@@ -72,7 +76,8 @@ class ComposeIrGenerationExtension(
         ).lower(moduleFragment)
 
         LiveLiteralTransformer(
-            liveLiteralsEnabled,
+            liveLiteralsEnabled || liveLiteralsV2Enabled,
+            liveLiteralsV2Enabled,
             DurableKeyVisitor(),
             pluginContext,
             symbolRemapper,

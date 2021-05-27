@@ -112,6 +112,7 @@ import kotlin.math.min
  * [color spaces][ColorSpaces] for the exact ranges.
  */
 @Immutable
+@Suppress("INLINE_CLASS_DEPRECATED", "EXPERIMENTAL_FEATURE_WARNING")
 inline class Color(val value: ULong) {
     /**
      * Returns this color's color space.
@@ -540,7 +541,7 @@ private fun Color.getComponents(): FloatArray = floatArrayOf(red, green, blue, a
 @Stable
 fun Color.luminance(): Float {
     val colorSpace = colorSpace
-    require(colorSpace.model === ColorModel.Rgb) {
+    require(colorSpace.model == ColorModel.Rgb) {
         "The specified color must be encoded in an RGB color space. " +
             "The supplied color space is ${colorSpace.model}"
     }

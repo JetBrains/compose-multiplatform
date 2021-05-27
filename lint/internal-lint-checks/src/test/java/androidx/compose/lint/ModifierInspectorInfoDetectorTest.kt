@@ -21,6 +21,7 @@ package androidx.compose.lint
 import com.android.tools.lint.checks.infrastructure.LintDetectorTest
 import com.android.tools.lint.detector.api.Detector
 import com.android.tools.lint.detector.api.Issue
+import org.junit.Ignore
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.junit.runners.JUnit4
@@ -280,6 +281,7 @@ class ModifierInspectorInfoDetectorTest : LintDetectorTest() {
             .expectClean()
     }
 
+    @Ignore("b/187539985")
     @Test
     fun existingInspectorInfoWithAnonymousClass() {
         lint().files(

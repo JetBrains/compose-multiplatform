@@ -111,8 +111,8 @@ open class SwipeableState<T>(
     val overflow: State<Float> get() = overflowState
 
     // Use `Float.NaN` as a placeholder while the state is uninitialised.
-    private val offsetState = mutableStateOf(Float.NaN)
-    private val overflowState = mutableStateOf(Float.NaN)
+    private val offsetState = mutableStateOf(0f)
+    private val overflowState = mutableStateOf(0f)
 
     // the source of truth for the "real"(non ui) position
     // basically position in bounds + overflow

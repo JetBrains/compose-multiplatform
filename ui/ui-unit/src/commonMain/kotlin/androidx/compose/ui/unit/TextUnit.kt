@@ -17,7 +17,6 @@
 
 package androidx.compose.ui.unit
 
-import androidx.compose.runtime.ExperimentalComposeApi
 import androidx.compose.runtime.Immutable
 import androidx.compose.runtime.Stable
 import androidx.compose.ui.geometry.isSpecified
@@ -43,13 +42,25 @@ private const val UNIT_TYPE_EM = 0x02L shl 32 // 0x2_0000_0000
 /**
  * An enum class defining for type of [TextUnit].
  */
-enum class TextUnitType(internal val type: Long) {
-    Unspecified(UNIT_TYPE_UNSPECIFIED),
-    Sp(UNIT_TYPE_SP),
-    Em(UNIT_TYPE_EM)
+@Suppress("INLINE_CLASS_DEPRECATED", "EXPERIMENTAL_FEATURE_WARNING")
+inline class TextUnitType(internal val type: Long) {
+    override fun toString(): String {
+        return when (this) {
+            Unspecified -> "Unspecified"
+            Sp -> "Sp"
+            Em -> "Em"
+            else -> "Invalid"
+        }
+    }
+
+    companion object {
+        val Unspecified = TextUnitType(UNIT_TYPE_UNSPECIFIED)
+        val Sp = TextUnitType(UNIT_TYPE_SP)
+        val Em = TextUnitType(UNIT_TYPE_EM)
+    }
 }
 
-@ExperimentalComposeApi
+@ExperimentalUnitApi
 fun TextUnit(value: Float, type: TextUnitType): TextUnit = pack(type.type, value)
 
 /**
@@ -63,7 +74,7 @@ fun TextUnit(value: Float, type: TextUnitType): TextUnit = pack(type.type, value
  * Note that do not store this value in your persistent storage or send to another process since
  * the internal representation may be changed in future.
  */
-@Suppress("EXPERIMENTAL_FEATURE_WARNING")
+@Suppress("INLINE_CLASS_DEPRECATED", "EXPERIMENTAL_FEATURE_WARNING")
 @Immutable
 inline class TextUnit internal constructor(internal val packedValue: Long) {
     /**
@@ -176,6 +187,7 @@ inline class TextUnit internal constructor(internal val packedValue: Long) {
             TextUnitType.Unspecified -> "Unspecified"
             TextUnitType.Sp -> "$value.sp"
             TextUnitType.Em -> "$value.em"
+            else -> "Invalid"
         }
     }
 

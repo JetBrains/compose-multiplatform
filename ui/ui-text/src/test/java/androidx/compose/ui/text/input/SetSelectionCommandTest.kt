@@ -17,9 +17,7 @@
 package androidx.compose.ui.text.input
 
 import androidx.compose.ui.text.TextRange
-import org.junit.Assert.assertEquals
-import org.junit.Assert.assertFalse
-import org.junit.Assert.assertTrue
+import com.google.common.truth.Truth.assertThat
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.junit.runners.JUnit4
@@ -33,10 +31,10 @@ class SetSelectionCommandTest {
 
         SetSelectionCommand(1, 4).applyTo(eb)
 
-        assertEquals("ABCDE", eb.toString())
-        assertEquals(1, eb.selectionStart)
-        assertEquals(4, eb.selectionEnd)
-        assertFalse(eb.hasComposition())
+        assertThat(eb.toString()).isEqualTo("ABCDE")
+        assertThat(eb.selectionStart).isEqualTo(1)
+        assertThat(eb.selectionEnd).isEqualTo(4)
+        assertThat(eb.hasComposition()).isFalse()
     }
 
     @Test
@@ -47,12 +45,12 @@ class SetSelectionCommandTest {
 
         SetSelectionCommand(2, 4).applyTo(eb)
 
-        assertEquals("ABCDE", eb.toString())
-        assertEquals(2, eb.selectionStart)
-        assertEquals(4, eb.selectionEnd)
-        assertTrue(eb.hasComposition())
-        assertEquals(1, eb.compositionStart)
-        assertEquals(3, eb.compositionEnd)
+        assertThat(eb.toString()).isEqualTo("ABCDE")
+        assertThat(eb.selectionStart).isEqualTo(2)
+        assertThat(eb.selectionEnd).isEqualTo(4)
+        assertThat(eb.hasComposition()).isTrue()
+        assertThat(eb.compositionStart).isEqualTo(1)
+        assertThat(eb.compositionEnd).isEqualTo(3)
     }
 
     @Test
@@ -61,10 +59,10 @@ class SetSelectionCommandTest {
 
         SetSelectionCommand(2, 5).applyTo(eb)
 
-        assertEquals("ABCDE", eb.toString())
-        assertEquals(2, eb.selectionStart)
-        assertEquals(5, eb.selectionEnd)
-        assertFalse(eb.hasComposition())
+        assertThat(eb.toString()).isEqualTo("ABCDE")
+        assertThat(eb.selectionStart).isEqualTo(2)
+        assertThat(eb.selectionEnd).isEqualTo(5)
+        assertThat(eb.hasComposition()).isFalse()
     }
 
     @Test
@@ -73,10 +71,10 @@ class SetSelectionCommandTest {
 
         SetSelectionCommand(4, 1).applyTo(eb)
 
-        assertEquals("ABCDE", eb.toString())
-        assertEquals(1, eb.selectionStart)
-        assertEquals(4, eb.selectionEnd)
-        assertFalse(eb.hasComposition())
+        assertThat(eb.toString()).isEqualTo("ABCDE")
+        assertThat(eb.selectionStart).isEqualTo(1)
+        assertThat(eb.selectionEnd).isEqualTo(4)
+        assertThat(eb.hasComposition()).isFalse()
     }
 
     @Test
@@ -85,9 +83,9 @@ class SetSelectionCommandTest {
 
         SetSelectionCommand(-1000, -1000).applyTo(eb)
 
-        assertEquals("ABCDE", eb.toString())
-        assertEquals(0, eb.cursor)
-        assertFalse(eb.hasComposition())
+        assertThat(eb.toString()).isEqualTo("ABCDE")
+        assertThat(eb.cursor).isEqualTo(0)
+        assertThat(eb.hasComposition()).isFalse()
     }
 
     @Test
@@ -96,9 +94,9 @@ class SetSelectionCommandTest {
 
         SetSelectionCommand(1000, 1000).applyTo(eb)
 
-        assertEquals("ABCDE", eb.toString())
-        assertEquals(5, eb.cursor)
-        assertFalse(eb.hasComposition())
+        assertThat(eb.toString()).isEqualTo("ABCDE")
+        assertThat(eb.cursor).isEqualTo(5)
+        assertThat(eb.hasComposition()).isFalse()
     }
 
     @Test
@@ -107,10 +105,10 @@ class SetSelectionCommandTest {
 
         SetSelectionCommand(-1000, 1000).applyTo(eb)
 
-        assertEquals("ABCDE", eb.toString())
-        assertEquals(0, eb.selectionStart)
-        assertEquals(5, eb.selectionEnd)
-        assertFalse(eb.hasComposition())
+        assertThat(eb.toString()).isEqualTo("ABCDE")
+        assertThat(eb.selectionStart).isEqualTo(0)
+        assertThat(eb.selectionEnd).isEqualTo(5)
+        assertThat(eb.hasComposition()).isFalse()
     }
 
     @Test
@@ -119,9 +117,9 @@ class SetSelectionCommandTest {
 
         SetSelectionCommand(1000, -1000).applyTo(eb)
 
-        assertEquals("ABCDE", eb.toString())
-        assertEquals(0, eb.selectionStart)
-        assertEquals(5, eb.selectionEnd)
-        assertFalse(eb.hasComposition())
+        assertThat(eb.toString()).isEqualTo("ABCDE")
+        assertThat(eb.selectionStart).isEqualTo(0)
+        assertThat(eb.selectionEnd).isEqualTo(5)
+        assertThat(eb.hasComposition()).isFalse()
     }
 }

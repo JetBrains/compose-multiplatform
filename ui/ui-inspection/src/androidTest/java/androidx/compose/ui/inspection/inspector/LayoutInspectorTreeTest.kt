@@ -20,6 +20,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.view.inspector.WindowInspector
 import android.widget.TextView
+import androidx.compose.animation.Crossfade
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -45,6 +46,9 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.InternalComposeApi
 import androidx.compose.runtime.currentComposer
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.tooling.CompositionData
 import androidx.compose.runtime.tooling.LocalInspectionTables
 import androidx.compose.ui.Alignment
@@ -89,7 +93,7 @@ import java.util.Collections
 import java.util.WeakHashMap
 import kotlin.math.roundToInt
 
-private const val DEBUG = false
+private const val DEBUG = true
 private const val ROOT_ID = 3L
 private const val MAX_RECURSIONS = 2
 private const val MAX_ITERABLE_SIZE = 5
@@ -442,20 +446,24 @@ class LayoutInspectorTreeTest {
             node(
                 name = "Text",
                 isRenderNode = true,
-                mergedSemantics = "Studio",
-                unmergedSemantics = "Studio"
+                mergedSemantics = "[Studio]",
+                unmergedSemantics = "[Studio]"
             )
-            node("Row", children = listOf("Text", "Text"), mergedSemantics = "Hello, World")
-            node("Text", isRenderNode = true, unmergedSemantics = "Hello")
-            node("Text", isRenderNode = true, unmergedSemantics = "World")
             node(
                 name = "Row",
                 children = listOf("Text", "Text"),
-                mergedSemantics = "to",
-                unmergedSemantics = "to"
+                mergedSemantics = "[Hello, World]"
             )
-            node("Text", isRenderNode = true, unmergedSemantics = "Hello")
-            node("Text", isRenderNode = true, unmergedSemantics = "World")
+            node("Text", isRenderNode = true, unmergedSemantics = "[Hello]")
+            node("Text", isRenderNode = true, unmergedSemantics = "[World]")
+            node(
+                name = "Row",
+                children = listOf("Text", "Text"),
+                mergedSemantics = "[to]",
+                unmergedSemantics = "[to]"
+            )
+            node("Text", isRenderNode = true, unmergedSemantics = "[Hello]")
+            node("Text", isRenderNode = true, unmergedSemantics = "[World]")
         }
     }
 
@@ -700,6 +708,43 @@ class LayoutInspectorTreeTest {
             node("Text", lineNumber = titleLine + 26)
             node("Spacer", lineNumber = titleLine + 32)
         }
+    }
+
+    @Composable
+    fun First() {
+        Text("First")
+    }
+
+    @Composable
+    fun Second() {
+        Text("Second")
+    }
+
+    @Test
+    fun testCrossfade() {
+        val slotTableRecord = CompositionDataRecord.create()
+
+        show {
+            Inspectable(slotTableRecord) {
+                val showFirst by remember { mutableStateOf(true) }
+                Crossfade(showFirst) {
+                    when (it) {
+                        true -> First()
+                        false -> Second()
+                    }
+                }
+            }
+        }
+        val androidComposeView = findAndroidComposeView()
+        androidComposeView.setTag(R.id.inspection_slot_table_set, slotTableRecord.store)
+        val builder = LayoutInspectorTree()
+        builder.hideSystemNodes = false
+        val first = builder.convert(androidComposeView)
+            .flatMap { flatten(it) }
+            .first { it.name == "First" }
+        val hash = packageNameHash(this.javaClass.name.substringBeforeLast('.'))
+        assertThat(first.fileName).isEqualTo("LayoutInspectorTreeTest.kt")
+        assertThat(first.packageHash).isEqualTo(hash)
     }
 
     @Suppress("SameParameterValue")

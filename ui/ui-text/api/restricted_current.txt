@@ -77,7 +77,7 @@ package androidx.compose.ui.text {
   public final class JvmAnnotatedString_jvmKt {
   }
 
-  public final class JvmCharHelpers_jvmKt {
+  public final class JvmCharHelpers_androidKt {
   }
 
   public final class MultiParagraph {
@@ -222,24 +222,43 @@ package androidx.compose.ui.text {
   }
 
   @androidx.compose.runtime.Immutable public final class Placeholder {
-    method public androidx.compose.ui.text.Placeholder copy-KJSDsNM(optional long width, optional long height, optional androidx.compose.ui.text.PlaceholderVerticalAlign placeholderVerticalAlign);
+    method public androidx.compose.ui.text.Placeholder copy-KJSDsNM(optional long width, optional long height, optional int placeholderVerticalAlign);
     method public operator boolean equals(Object? other);
     method public long getHeight-XSAIIZE();
-    method public androidx.compose.ui.text.PlaceholderVerticalAlign getPlaceholderVerticalAlign();
+    method public int getPlaceholderVerticalAlign-J6kI3mc();
     method public long getWidth-XSAIIZE();
     property public final long height;
-    property public final androidx.compose.ui.text.PlaceholderVerticalAlign placeholderVerticalAlign;
+    property public final int placeholderVerticalAlign;
     property public final long width;
   }
 
-  public enum PlaceholderVerticalAlign {
-    enum_constant public static final androidx.compose.ui.text.PlaceholderVerticalAlign AboveBaseline;
-    enum_constant public static final androidx.compose.ui.text.PlaceholderVerticalAlign Bottom;
-    enum_constant public static final androidx.compose.ui.text.PlaceholderVerticalAlign Center;
-    enum_constant public static final androidx.compose.ui.text.PlaceholderVerticalAlign TextBottom;
-    enum_constant public static final androidx.compose.ui.text.PlaceholderVerticalAlign TextCenter;
-    enum_constant public static final androidx.compose.ui.text.PlaceholderVerticalAlign TextTop;
-    enum_constant public static final androidx.compose.ui.text.PlaceholderVerticalAlign Top;
+  public final inline class PlaceholderVerticalAlign {
+    ctor public PlaceholderVerticalAlign();
+    method public static int constructor-impl(int value);
+    method public static inline boolean equals-impl(int p, Object? p1);
+    method public static boolean equals-impl0(int p1, int p2);
+    method public int getValue();
+    method public static inline int hashCode-impl(int p);
+    method public static String toString-impl(int $this);
+    property public final int value;
+    field public static final androidx.compose.ui.text.PlaceholderVerticalAlign.Companion Companion;
+  }
+
+  public static final class PlaceholderVerticalAlign.Companion {
+    method public int getAboveBaseline-J6kI3mc();
+    method public int getBottom-J6kI3mc();
+    method public int getCenter-J6kI3mc();
+    method public int getTextBottom-J6kI3mc();
+    method public int getTextCenter-J6kI3mc();
+    method public int getTextTop-J6kI3mc();
+    method public int getTop-J6kI3mc();
+    property public final int AboveBaseline;
+    property public final int Bottom;
+    property public final int Center;
+    property public final int TextBottom;
+    property public final int TextCenter;
+    property public final int TextTop;
+    property public final int Top;
   }
 
   public final class SaversKt {
@@ -740,29 +759,48 @@ package androidx.compose.ui.text.input {
   public final class GapBufferKt {
   }
 
-  public enum ImeAction {
-    enum_constant public static final androidx.compose.ui.text.input.ImeAction Default;
-    enum_constant public static final androidx.compose.ui.text.input.ImeAction Done;
-    enum_constant public static final androidx.compose.ui.text.input.ImeAction Go;
-    enum_constant public static final androidx.compose.ui.text.input.ImeAction Next;
-    enum_constant public static final androidx.compose.ui.text.input.ImeAction None;
-    enum_constant public static final androidx.compose.ui.text.input.ImeAction Previous;
-    enum_constant public static final androidx.compose.ui.text.input.ImeAction Search;
-    enum_constant public static final androidx.compose.ui.text.input.ImeAction Send;
+  public final inline class ImeAction {
+    ctor public ImeAction();
+    method public static int constructor-impl(int value);
+    method public static inline boolean equals-impl(int p, Object? p1);
+    method public static boolean equals-impl0(int p1, int p2);
+    method public int getValue();
+    method public static inline int hashCode-impl(int p);
+    method public static String toString-impl(int $this);
+    property public final int value;
+    field public static final androidx.compose.ui.text.input.ImeAction.Companion Companion;
+  }
+
+  public static final class ImeAction.Companion {
+    method public int getDefault-eUduSuo();
+    method public int getDone-eUduSuo();
+    method public int getGo-eUduSuo();
+    method public int getNext-eUduSuo();
+    method public int getNone-eUduSuo();
+    method public int getPrevious-eUduSuo();
+    method public int getSearch-eUduSuo();
+    method public int getSend-eUduSuo();
+    property public final int Default;
+    property public final int Done;
+    property public final int Go;
+    property public final int Next;
+    property public final int None;
+    property public final int Previous;
+    property public final int Search;
+    property public final int Send;
   }
 
   @androidx.compose.runtime.Immutable public final class ImeOptions {
-    ctor public ImeOptions(optional boolean singleLine, optional androidx.compose.ui.text.input.KeyboardCapitalization capitalization, optional boolean autoCorrect, optional androidx.compose.ui.text.input.KeyboardType keyboardType, optional androidx.compose.ui.text.input.ImeAction imeAction);
-    method public androidx.compose.ui.text.input.ImeOptions copy(optional boolean singleLine, optional androidx.compose.ui.text.input.KeyboardCapitalization capitalization, optional boolean autoCorrect, optional androidx.compose.ui.text.input.KeyboardType keyboardType, optional androidx.compose.ui.text.input.ImeAction imeAction);
+    method public androidx.compose.ui.text.input.ImeOptions copy-TWIFjAI(optional boolean singleLine, optional androidx.compose.ui.text.input.KeyboardCapitalization capitalization, optional boolean autoCorrect, optional int keyboardType, optional int imeAction);
     method public boolean getAutoCorrect();
     method public androidx.compose.ui.text.input.KeyboardCapitalization getCapitalization();
-    method public androidx.compose.ui.text.input.ImeAction getImeAction();
-    method public androidx.compose.ui.text.input.KeyboardType getKeyboardType();
+    method public int getImeAction-eUduSuo();
+    method public int getKeyboardType-PjHm6EE();
     method public boolean getSingleLine();
     property public final boolean autoCorrect;
     property public final androidx.compose.ui.text.input.KeyboardCapitalization capitalization;
-    property public final androidx.compose.ui.text.input.ImeAction imeAction;
-    property public final androidx.compose.ui.text.input.KeyboardType keyboardType;
+    property public final int imeAction;
+    property public final int keyboardType;
     property public final boolean singleLine;
     field public static final androidx.compose.ui.text.input.ImeOptions.Companion Companion;
   }
@@ -774,7 +812,7 @@ package androidx.compose.ui.text.input {
 
   @Deprecated public interface InputEventCallback {
     method @Deprecated public void onEditCommands(java.util.List<? extends androidx.compose.ui.text.input.EditCommand> editCommands);
-    method @Deprecated public void onImeAction(androidx.compose.ui.text.input.ImeAction imeAction);
+    method @Deprecated public void onImeAction-KlQnJC8(int imeAction);
   }
 
   public enum KeyboardCapitalization {
@@ -784,15 +822,33 @@ package androidx.compose.ui.text.input {
     enum_constant public static final androidx.compose.ui.text.input.KeyboardCapitalization Words;
   }
 
-  public enum KeyboardType {
-    enum_constant public static final androidx.compose.ui.text.input.KeyboardType Ascii;
-    enum_constant public static final androidx.compose.ui.text.input.KeyboardType Email;
-    enum_constant public static final androidx.compose.ui.text.input.KeyboardType Number;
-    enum_constant public static final androidx.compose.ui.text.input.KeyboardType NumberPassword;
-    enum_constant public static final androidx.compose.ui.text.input.KeyboardType Password;
-    enum_constant public static final androidx.compose.ui.text.input.KeyboardType Phone;
-    enum_constant public static final androidx.compose.ui.text.input.KeyboardType Text;
-    enum_constant public static final androidx.compose.ui.text.input.KeyboardType Uri;
+  public final inline class KeyboardType {
+    ctor public KeyboardType();
+    method public static int constructor-impl(int value);
+    method public static inline boolean equals-impl(int p, Object? p1);
+    method public static boolean equals-impl0(int p1, int p2);
+    method public static inline int hashCode-impl(int p);
+    method public static String toString-impl(int $this);
+    field public static final androidx.compose.ui.text.input.KeyboardType.Companion Companion;
+  }
+
+  public static final class KeyboardType.Companion {
+    method public int getAscii-PjHm6EE();
+    method public int getEmail-PjHm6EE();
+    method public int getNumber-PjHm6EE();
+    method public int getNumberPassword-PjHm6EE();
+    method public int getPassword-PjHm6EE();
+    method public int getPhone-PjHm6EE();
+    method public int getText-PjHm6EE();
+    method public int getUri-PjHm6EE();
+    property public final int Ascii;
+    property public final int Email;
+    property public final int Number;
+    property public final int NumberPassword;
+    property public final int Password;
+    property public final int Phone;
+    property public final int Text;
+    property public final int Uri;
   }
 
   public final class MoveCursorCommand implements androidx.compose.ui.text.input.EditCommand {

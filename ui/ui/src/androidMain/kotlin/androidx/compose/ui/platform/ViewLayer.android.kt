@@ -26,15 +26,16 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Canvas
 import androidx.compose.ui.graphics.CanvasHolder
+import androidx.compose.ui.graphics.Matrix
 import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.RectangleShape
-import androidx.compose.ui.unit.IntOffset
-import androidx.compose.ui.unit.IntSize
-import androidx.compose.ui.graphics.TransformOrigin
-import androidx.compose.ui.graphics.Matrix
 import androidx.compose.ui.graphics.Shape
+import androidx.compose.ui.graphics.TransformOrigin
 import androidx.compose.ui.graphics.setFrom
 import androidx.compose.ui.node.OwnedLayer
+import androidx.compose.ui.unit.Density
+import androidx.compose.ui.unit.IntOffset
+import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.LayoutDirection
 import java.lang.reflect.Field
 import java.lang.reflect.Method
@@ -55,7 +56,12 @@ internal class ViewLayer(
     private val manualClipPath: Path? get() =
         if (!clipToOutline) null else outlineResolver.clipPath
     var isInvalidated = false
-        private set
+        private set(value) {
+            if (value != field) {
+                field = value
+                ownerView.notifyLayerIsDirty(this, value)
+            }
+        }
     private var drawnWithZ = false
     private val canvasHolder = CanvasHolder()
 
@@ -124,7 +130,8 @@ internal class ViewLayer(
         transformOrigin: TransformOrigin,
         shape: Shape,
         clip: Boolean,
-        layoutDirection: LayoutDirection
+        layoutDirection: LayoutDirection,
+        density: Density
     ) {
         this.mTransformOrigin = transformOrigin
         this.scaleX = scaleX
@@ -148,7 +155,8 @@ internal class ViewLayer(
             this.alpha,
             this.clipToOutline,
             this.elevation,
-            layoutDirection
+            layoutDirection,
+            density
         )
         updateOutlineResolver()
         val isClippingManually = manualClipPath != null
@@ -222,6 +230,7 @@ internal class ViewLayer(
     }
 
     override fun dispatchDraw(canvas: android.graphics.Canvas) {
+        isInvalidated = false
         canvasHolder.drawInto(canvas) {
             val clipPath = manualClipPath
             if (clipPath != null) {
@@ -232,7 +241,6 @@ internal class ViewLayer(
             if (clipPath != null) {
                 restore()
             }
-            isInvalidated = false
         }
     }
 
@@ -240,7 +248,6 @@ internal class ViewLayer(
         if (!isInvalidated) {
             isInvalidated = true
             super.invalidate()
-            ownerView.dirtyLayers += this
             ownerView.invalidate()
         }
     }
@@ -252,14 +259,14 @@ internal class ViewLayer(
         container.postOnAnimation {
             container.removeView(this)
         }
-        ownerView.dirtyLayers -= this
+        isInvalidated = false
         ownerView.requestClearInvalidObservations()
     }
 
     override fun updateDisplayList() {
         if (isInvalidated && !shouldUseDispatchDraw) {
-            updateDisplayList(this)
             isInvalidated = false
+            updateDisplayList(this)
         }
     }
 

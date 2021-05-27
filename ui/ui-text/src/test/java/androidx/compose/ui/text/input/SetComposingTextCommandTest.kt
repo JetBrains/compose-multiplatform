@@ -17,9 +17,7 @@
 package androidx.compose.ui.text.input
 
 import androidx.compose.ui.text.TextRange
-import org.junit.Assert.assertEquals
-import org.junit.Assert.assertFalse
-import org.junit.Assert.assertTrue
+import com.google.common.truth.Truth.assertThat
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.junit.runners.JUnit4
@@ -33,11 +31,11 @@ class SetComposingTextCommandTest {
 
         SetComposingTextCommand("X", 1).applyTo(eb)
 
-        assertEquals("X", eb.toString())
-        assertEquals(1, eb.cursor)
-        assertTrue(eb.hasComposition())
-        assertEquals(0, eb.compositionStart)
-        assertEquals(1, eb.compositionEnd)
+        assertThat(eb.toString()).isEqualTo("X")
+        assertThat(eb.cursor).isEqualTo(1)
+        assertThat(eb.hasComposition()).isTrue()
+        assertThat(eb.compositionStart).isEqualTo(0)
+        assertThat(eb.compositionEnd).isEqualTo(1)
     }
 
     @Test
@@ -46,11 +44,11 @@ class SetComposingTextCommandTest {
 
         SetComposingTextCommand("X", 1).applyTo(eb)
 
-        assertEquals("AX", eb.toString())
-        assertEquals(2, eb.cursor)
-        assertTrue(eb.hasComposition())
-        assertEquals(1, eb.compositionStart)
-        assertEquals(2, eb.compositionEnd)
+        assertThat(eb.toString()).isEqualTo("AX")
+        assertThat(eb.cursor).isEqualTo(2)
+        assertThat(eb.hasComposition()).isTrue()
+        assertThat(eb.compositionStart).isEqualTo(1)
+        assertThat(eb.compositionEnd).isEqualTo(2)
     }
 
     @Test
@@ -59,11 +57,11 @@ class SetComposingTextCommandTest {
 
         SetComposingTextCommand("X", 0).applyTo(eb)
 
-        assertEquals("AX", eb.toString())
-        assertEquals(1, eb.cursor)
-        assertTrue(eb.hasComposition())
-        assertEquals(1, eb.compositionStart)
-        assertEquals(2, eb.compositionEnd)
+        assertThat(eb.toString()).isEqualTo("AX")
+        assertThat(eb.cursor).isEqualTo(1)
+        assertThat(eb.hasComposition()).isTrue()
+        assertThat(eb.compositionStart).isEqualTo(1)
+        assertThat(eb.compositionEnd).isEqualTo(2)
     }
 
     @Test
@@ -72,11 +70,11 @@ class SetComposingTextCommandTest {
 
         SetComposingTextCommand("X", 2).applyTo(eb)
 
-        assertEquals("AXBCDE", eb.toString())
-        assertEquals(3, eb.cursor)
-        assertTrue(eb.hasComposition())
-        assertEquals(1, eb.compositionStart)
-        assertEquals(2, eb.compositionEnd)
+        assertThat(eb.toString()).isEqualTo("AXBCDE")
+        assertThat(eb.cursor).isEqualTo(3)
+        assertThat(eb.hasComposition()).isTrue()
+        assertThat(eb.compositionStart).isEqualTo(1)
+        assertThat(eb.compositionEnd).isEqualTo(2)
     }
 
     @Test
@@ -85,11 +83,11 @@ class SetComposingTextCommandTest {
 
         SetComposingTextCommand("X", -2).applyTo(eb)
 
-        assertEquals("ABCDXE", eb.toString())
-        assertEquals(2, eb.cursor)
-        assertTrue(eb.hasComposition())
-        assertEquals(4, eb.compositionStart)
-        assertEquals(5, eb.compositionEnd)
+        assertThat(eb.toString()).isEqualTo("ABCDXE")
+        assertThat(eb.cursor).isEqualTo(2)
+        assertThat(eb.hasComposition()).isTrue()
+        assertThat(eb.compositionStart).isEqualTo(4)
+        assertThat(eb.compositionEnd).isEqualTo(5)
     }
 
     @Test
@@ -98,9 +96,9 @@ class SetComposingTextCommandTest {
 
         SetComposingTextCommand("", 0).applyTo(eb)
 
-        assertEquals("ABCDE", eb.toString())
-        assertEquals(1, eb.cursor)
-        assertFalse(eb.hasComposition())
+        assertThat(eb.toString()).isEqualTo("ABCDE")
+        assertThat(eb.cursor).isEqualTo(1)
+        assertThat(eb.hasComposition()).isFalse()
     }
 
     @Test
@@ -109,9 +107,9 @@ class SetComposingTextCommandTest {
 
         SetComposingTextCommand("", 1).applyTo(eb)
 
-        assertEquals("ABCDE", eb.toString())
-        assertEquals(1, eb.cursor)
-        assertFalse(eb.hasComposition())
+        assertThat(eb.toString()).isEqualTo("ABCDE")
+        assertThat(eb.cursor).isEqualTo(1)
+        assertThat(eb.hasComposition()).isFalse()
     }
 
     @Test
@@ -120,9 +118,9 @@ class SetComposingTextCommandTest {
 
         SetComposingTextCommand("", 2).applyTo(eb)
 
-        assertEquals("ABCDE", eb.toString())
-        assertEquals(2, eb.cursor)
-        assertFalse(eb.hasComposition())
+        assertThat(eb.toString()).isEqualTo("ABCDE")
+        assertThat(eb.cursor).isEqualTo(2)
+        assertThat(eb.hasComposition()).isFalse()
     }
 
     @Test
@@ -131,9 +129,9 @@ class SetComposingTextCommandTest {
 
         SetComposingTextCommand("", -2).applyTo(eb)
 
-        assertEquals("ABCDE", eb.toString())
-        assertEquals(2, eb.cursor)
-        assertFalse(eb.hasComposition())
+        assertThat(eb.toString()).isEqualTo("ABCDE")
+        assertThat(eb.cursor).isEqualTo(2)
+        assertThat(eb.hasComposition()).isFalse()
     }
 
     @Test
@@ -143,11 +141,11 @@ class SetComposingTextCommandTest {
         eb.setComposition(1, 4) // Mark "BCD" as composition
         SetComposingTextCommand("X", 1).applyTo(eb)
 
-        assertEquals("AXE", eb.toString())
-        assertEquals(2, eb.cursor)
-        assertTrue(eb.hasComposition())
-        assertEquals(1, eb.compositionStart)
-        assertEquals(2, eb.compositionEnd)
+        assertThat(eb.toString()).isEqualTo("AXE")
+        assertThat(eb.cursor).isEqualTo(2)
+        assertThat(eb.hasComposition()).isTrue()
+        assertThat(eb.compositionStart).isEqualTo(1)
+        assertThat(eb.compositionEnd).isEqualTo(2)
     }
 
     @Test
@@ -156,11 +154,11 @@ class SetComposingTextCommandTest {
 
         SetComposingTextCommand("X", 1).applyTo(eb)
 
-        assertEquals("AXE", eb.toString())
-        assertEquals(2, eb.cursor)
-        assertTrue(eb.hasComposition())
-        assertEquals(1, eb.compositionStart)
-        assertEquals(2, eb.compositionEnd)
+        assertThat(eb.toString()).isEqualTo("AXE")
+        assertThat(eb.cursor).isEqualTo(2)
+        assertThat(eb.hasComposition()).isTrue()
+        assertThat(eb.compositionStart).isEqualTo(1)
+        assertThat(eb.compositionEnd).isEqualTo(2)
     }
 
     @Test
@@ -172,11 +170,11 @@ class SetComposingTextCommandTest {
 
         // If composition and selection exists at the same time, replace composition and cancel
         // selection and place cursor.
-        assertEquals("ABXE", eb.toString())
-        assertEquals(3, eb.cursor)
-        assertTrue(eb.hasComposition())
-        assertEquals(2, eb.compositionStart)
-        assertEquals(3, eb.compositionEnd)
+        assertThat(eb.toString()).isEqualTo("ABXE")
+        assertThat(eb.cursor).isEqualTo(3)
+        assertThat(eb.hasComposition()).isTrue()
+        assertThat(eb.compositionStart).isEqualTo(2)
+        assertThat(eb.compositionEnd).isEqualTo(3)
     }
 
     @Test
@@ -185,11 +183,11 @@ class SetComposingTextCommandTest {
 
         SetComposingTextCommand("X", -1000).applyTo(eb)
 
-        assertEquals("ABCDEX", eb.toString())
-        assertEquals(0, eb.cursor)
-        assertTrue(eb.hasComposition())
-        assertEquals(5, eb.compositionStart)
-        assertEquals(6, eb.compositionEnd)
+        assertThat(eb.toString()).isEqualTo("ABCDEX")
+        assertThat(eb.cursor).isEqualTo(0)
+        assertThat(eb.hasComposition()).isTrue()
+        assertThat(eb.compositionStart).isEqualTo(5)
+        assertThat(eb.compositionEnd).isEqualTo(6)
     }
 
     @Test
@@ -198,10 +196,10 @@ class SetComposingTextCommandTest {
 
         SetComposingTextCommand("X", 1000).applyTo(eb)
 
-        assertEquals("ABCDEX", eb.toString())
-        assertEquals(6, eb.cursor)
-        assertTrue(eb.hasComposition())
-        assertEquals(5, eb.compositionStart)
-        assertEquals(6, eb.compositionEnd)
+        assertThat(eb.toString()).isEqualTo("ABCDEX")
+        assertThat(eb.cursor).isEqualTo(6)
+        assertThat(eb.hasComposition()).isTrue()
+        assertThat(eb.compositionStart).isEqualTo(5)
+        assertThat(eb.compositionEnd).isEqualTo(6)
     }
 }

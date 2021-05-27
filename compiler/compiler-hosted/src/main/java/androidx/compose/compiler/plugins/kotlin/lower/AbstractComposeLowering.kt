@@ -24,7 +24,6 @@ import androidx.compose.compiler.plugins.kotlin.analysis.Stability
 import androidx.compose.compiler.plugins.kotlin.analysis.StabilityInferencer
 import androidx.compose.compiler.plugins.kotlin.analysis.knownStable
 import androidx.compose.compiler.plugins.kotlin.irTrace
-import androidx.compose.compiler.plugins.kotlin.isComposableCallable
 import org.jetbrains.kotlin.backend.common.extensions.IrPluginContext
 import org.jetbrains.kotlin.backend.common.lower.DeclarationIrBuilder
 import org.jetbrains.kotlin.backend.jvm.lower.inlineclasses.InlineClassAbi
@@ -77,7 +76,6 @@ import org.jetbrains.kotlin.ir.declarations.impl.IrFunctionImpl
 import org.jetbrains.kotlin.ir.declarations.impl.IrTypeParameterImpl
 import org.jetbrains.kotlin.ir.declarations.impl.IrValueParameterImpl
 import org.jetbrains.kotlin.ir.declarations.impl.IrVariableImpl
-import org.jetbrains.kotlin.ir.descriptors.WrappedVariableDescriptor
 import org.jetbrains.kotlin.ir.expressions.IrBranch
 import org.jetbrains.kotlin.ir.expressions.IrCall
 import org.jetbrains.kotlin.ir.expressions.IrConst
@@ -396,11 +394,6 @@ abstract class AbstractComposeLowering(
 
     fun KotlinType.isFinal(): Boolean = (constructor.declarationDescriptor as? ClassDescriptor)
         ?.modality == Modality.FINAL
-
-    @OptIn(ObsoleteDescriptorBasedAPI::class)
-    fun FunctionDescriptor.isComposableCallable(): Boolean {
-        return isComposableCallable(context.bindingContext)
-    }
 
     @OptIn(ObsoleteDescriptorBasedAPI::class)
     fun FunctionDescriptor.allowsComposableCalls(): Boolean {
@@ -929,19 +922,17 @@ abstract class AbstractComposeLowering(
         isVar: Boolean = false,
         origin: IrDeclarationOrigin = IrDeclarationOrigin.IR_TEMPORARY_VARIABLE
     ): IrVariableImpl {
-        val descriptor = WrappedVariableDescriptor()
         return IrVariableImpl(
             value.startOffset,
             value.endOffset,
             origin,
-            IrVariableSymbolImpl(descriptor),
+            IrVariableSymbolImpl(),
             Name.identifier(name),
             irType,
             isVar,
             false,
             false
         ).apply {
-            descriptor.bind(this)
             initializer = value
         }
     }

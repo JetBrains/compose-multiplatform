@@ -40,8 +40,16 @@ import androidx.compose.testutils.assertPixels
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.IntrinsicMeasurable
+import androidx.compose.ui.layout.IntrinsicMeasureScope
+import androidx.compose.ui.layout.Layout
+import androidx.compose.ui.layout.Measurable
+import androidx.compose.ui.layout.MeasurePolicy
+import androidx.compose.ui.layout.MeasureResult
+import androidx.compose.ui.layout.MeasureScope
 import androidx.compose.ui.node.Ref
 import androidx.compose.ui.platform.InspectableValue
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalViewConfiguration
 import androidx.compose.ui.platform.isDebugInspectorInfoEnabled
 import androidx.compose.ui.platform.testTag
@@ -60,6 +68,7 @@ import androidx.compose.ui.text.TextLayoutResult
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.input.VisualTransformation
+import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
 import androidx.test.ext.junit.runners.AndroidJUnit4
@@ -429,6 +438,111 @@ class TextFieldScrollTest {
         assertThat(textFieldScrollPosition.offset)
             .isWithin(0.5f).of(textFieldScrollPosition.maximum)
         assertThat(scrollerPosition.value).isGreaterThan(0)
+    }
+
+    @Test
+    fun textFieldScroll_horizontal_withNarrowerChild_measureWithOriginalConstraints() {
+        val scrollerPosition = TextFieldScrollerPosition(Orientation.Horizontal)
+        val text = "text"
+        var measuredConstraints: Constraints? = null
+        val width = 500
+        val height = 100
+
+        rule.setContent {
+            val textLayoutResultRef: Ref<TextLayoutResultProxy?> = remember { Ref() }
+            val density = LocalDensity.current
+
+            val widthDp = with(density) { width.toDp() }
+            val heightDp = with(density) { height.toDp() }
+
+            Layout(
+                content = {},
+                modifier = Modifier
+                    .size(widthDp, heightDp)
+                    .textFieldScroll(
+                        remember { scrollerPosition },
+                        TextFieldValue(text),
+                        VisualTransformation.None
+                    ) { textLayoutResultRef.value },
+                measurePolicy = object : MeasurePolicy {
+                    override fun MeasureScope.measure(
+                        measurables: List<Measurable>,
+                        constraints: Constraints
+                    ): MeasureResult {
+                        measuredConstraints = constraints
+                        return layout(width / 2, height) {}
+                    }
+
+                    override fun IntrinsicMeasureScope.maxIntrinsicWidth(
+                        measurables: List<IntrinsicMeasurable>,
+                        height: Int
+                    ): Int {
+                        return width / 2
+                    }
+                }
+            )
+        }
+
+        rule.runOnIdle {
+            assertThat(measuredConstraints).isEqualTo(
+                Constraints.fixed(width, height)
+            )
+        }
+    }
+
+    @Test
+    fun textFieldScroll_horizontal_withWiderChild_measureWithInfinityWidthConstraints() {
+        val scrollerPosition = TextFieldScrollerPosition(Orientation.Horizontal)
+        val text = "text"
+        var measuredConstraints: Constraints? = null
+        val width = 500
+        val height = 100
+
+        rule.setContent {
+            val textLayoutResultRef: Ref<TextLayoutResultProxy?> = remember { Ref() }
+            val density = LocalDensity.current
+
+            val widthDp = with(density) { width.toDp() }
+            val heightDp = with(density) { height.toDp() }
+
+            Layout(
+                content = {},
+                modifier = Modifier
+                    .size(widthDp, heightDp)
+                    .textFieldScroll(
+                        remember { scrollerPosition },
+                        TextFieldValue(text),
+                        VisualTransformation.None
+                    ) { textLayoutResultRef.value },
+                measurePolicy = object : MeasurePolicy {
+                    override fun MeasureScope.measure(
+                        measurables: List<Measurable>,
+                        constraints: Constraints
+                    ): MeasureResult {
+                        measuredConstraints = constraints
+                        return layout(width * 2, height) {}
+                    }
+
+                    override fun IntrinsicMeasureScope.maxIntrinsicWidth(
+                        measurables: List<IntrinsicMeasurable>,
+                        height: Int
+                    ): Int {
+                        return width * 2
+                    }
+                }
+            )
+        }
+
+        rule.runOnIdle {
+            assertThat(measuredConstraints).isEqualTo(
+                Constraints(
+                    minWidth = width,
+                    maxWidth = Constraints.Infinity,
+                    minHeight = height,
+                    maxHeight = height
+                )
+            )
+        }
     }
 
     private fun ComposeContentTestRule.setupHorizontallyScrollableContent(

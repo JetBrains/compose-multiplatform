@@ -193,6 +193,26 @@ class SelectionManagerTest {
     }
 
     @Test
+    fun mergeSelections_selectAll() {
+        val anotherSelectableId = 100L
+        val selectableAnother = mock<Selectable>()
+        whenever(selectableAnother.selectableId).thenReturn(anotherSelectableId)
+
+        selectionRegistrar.subscribe(selectableAnother)
+
+        selectionManager.mergeSelections(
+            selectableId = selectableId,
+            previousSelection = fakeSelection
+        )
+
+        verify(selectableAnother, times(0)).getSelectAllSelection()
+        verify(
+            hapticFeedback,
+            times(1)
+        ).performHapticFeedback(HapticFeedbackType.TextHandleMove)
+    }
+
+    @Test
     fun getSelectedText_selection_null_return_null() {
         selectionManager.selection = null
 

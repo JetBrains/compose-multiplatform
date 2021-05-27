@@ -14,71 +14,78 @@
  * limitations under the License.
  */
 
-@file:Suppress("DEPRECATION")
-
 package androidx.compose.ui.window
 
-import androidx.compose.desktop.AppFrame
-import androidx.compose.desktop.AppManager
+import androidx.compose.desktop.AppWindow
+import androidx.compose.desktop.LocalAppWindow
+import androidx.compose.foundation.gestures.awaitFirstDown
+import androidx.compose.foundation.gestures.drag
+import androidx.compose.foundation.gestures.forEachGesture
 import androidx.compose.foundation.layout.Box
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.unit.IntOffset
+import java.awt.event.MouseAdapter
+import java.awt.event.MouseEvent
+import java.awt.event.MouseMotionAdapter
 import java.awt.MouseInfo
+import java.awt.Point
 
+/**
+ * WindowDraggableArea is a component that allows you to drag the window using the mouse.
+ *
+ * @param modifier The modifier to be applied to the layout.
+ */
 @Composable
 fun WindowDraggableArea(
     modifier: Modifier = Modifier,
     content: @Composable() () -> Unit = {}
 ) {
+    val window = LocalAppWindow.current
+    val handler = remember { DragHandler(window) }
+
     Box(
-        modifier = modifier.dragGestureFilter(
-            dragObserver = remember { DragHandler() },
-            startDragImmediately = true
-        )
+        modifier = modifier.pointerInput(Unit) {
+            forEachGesture {
+                awaitPointerEventScope {
+                    awaitFirstDown()
+                    handler.register()
+                }
+            }
+        }
     ) {
         content()
     }
 }
 
-private class DragHandler : DragObserver {
+private class DragHandler(private val window: AppWindow) {
+    private var location = window.window.location.toComposeOffset()
+    private var pointStart = MouseInfo.getPointerInfo().location.toComposeOffset()
 
-    private var location = Offset.Zero
-    private var cursor = Offset.Zero
-    private lateinit var window: AppFrame
-
-    override fun onStart(downPosition: Offset) {
-        if (!this::window.isInitialized) {
-            window = AppManager.focusedWindow!!
+    private val dragListener = object : MouseMotionAdapter() {
+        override fun mouseDragged(event: MouseEvent) = drag()
+    }
+    private val removeListener = object : MouseAdapter() {
+        override fun mouseReleased(event: MouseEvent) {
+            window.removeMouseMotionListener(dragListener)
+            window.removeMouseListener(this)
         }
-        location = Offset(
-            window.x.toFloat(),
-            window.y.toFloat()
-        )
-        val point = MouseInfo.getPointerInfo().getLocation()
-        cursor = Offset(
-            point.x.toFloat(),
-            point.y.toFloat()
-        )
     }
 
-    override fun onStop(velocity: Offset) {
-        location = Offset.Zero
+    fun register() {
+        location = window.window.location.toComposeOffset()
+        pointStart = MouseInfo.getPointerInfo().location.toComposeOffset()
+        window.addMouseListener(removeListener)
+        window.addMouseMotionListener(dragListener)
     }
 
-    override fun onCancel() {
-        location = Offset.Zero
+    private fun drag() {
+        val point = MouseInfo.getPointerInfo().location.toComposeOffset()
+        val location = location + (point - pointStart)
+        window.setLocation(location.x, location.y)
     }
 
-    override fun onDrag(dragDistance: Offset): Offset {
-        val point = MouseInfo.getPointerInfo().getLocation()
-
-        window.setLocation(
-            (location.x - (cursor.x - point.x)).toInt(),
-            (location.y - (cursor.y - point.y)).toInt()
-        )
-
-        return dragDistance
-    }
+    private fun Point.toComposeOffset() = IntOffset(x, y)
 }

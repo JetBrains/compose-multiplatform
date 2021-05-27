@@ -53,12 +53,12 @@ import androidx.compose.ui.input.pointer.pointerMoveFilter
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.window.Dialog
-import androidx.compose.ui.window.DialogProperties
 import androidx.compose.ui.window.Notifier
 import androidx.compose.ui.window.Popup
-import androidx.compose.ui.window.Tray
 import androidx.compose.ui.window.WindowDraggableArea
+import androidx.compose.ui.window.v1.Dialog
+import androidx.compose.ui.window.v1.DialogProperties
+import androidx.compose.ui.window.v1.Tray
 import java.awt.Toolkit
 import java.awt.event.ActionEvent
 import java.awt.event.ActionListener
@@ -415,8 +415,7 @@ fun ContextMenu() {
 
     Surface(
         modifier = Modifier
-            .padding(start = 4.dp, top = 2.dp)
-            .clickable(onClick = { showMenu.value = true }),
+            .padding(start = 4.dp, top = 2.dp),
         color = Color(255, 255, 255, 40),
         shape = RoundedCornerShape(4.dp)
     ) {
@@ -425,6 +424,7 @@ fun ContextMenu() {
             modifier = Modifier
                 .height(35.dp)
                 .padding(start = 4.dp, end = 4.dp)
+                .clickable(onClick = { showMenu.value = true })
         )
         ContextMenu(
             expanded = showMenu.value,

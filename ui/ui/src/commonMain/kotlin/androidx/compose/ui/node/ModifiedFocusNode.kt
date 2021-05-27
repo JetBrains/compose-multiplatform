@@ -19,11 +19,12 @@ package androidx.compose.ui.node
 import androidx.compose.ui.focus.FocusModifier
 import androidx.compose.ui.focus.FocusOrder
 import androidx.compose.ui.focus.FocusState
-import androidx.compose.ui.focus.FocusState.Active
-import androidx.compose.ui.focus.FocusState.ActiveParent
-import androidx.compose.ui.focus.FocusState.Captured
-import androidx.compose.ui.focus.FocusState.Disabled
-import androidx.compose.ui.focus.FocusState.Inactive
+import androidx.compose.ui.focus.FocusStateImpl
+import androidx.compose.ui.focus.FocusStateImpl.Active
+import androidx.compose.ui.focus.FocusStateImpl.ActiveParent
+import androidx.compose.ui.focus.FocusStateImpl.Captured
+import androidx.compose.ui.focus.FocusStateImpl.Disabled
+import androidx.compose.ui.focus.FocusStateImpl.Inactive
 import androidx.compose.ui.focus.findFocusableChildren
 import androidx.compose.ui.focus.searchChildrenForFocusNode
 import androidx.compose.ui.geometry.Rect
@@ -39,7 +40,7 @@ internal class ModifiedFocusNode(
         modifier.focusNode = this
     }
 
-    var focusState: FocusState
+    var focusState: FocusStateImpl
         get() = modifier.focusState
         set(value) {
             modifier.focusState = value
@@ -91,7 +92,7 @@ internal class ModifiedFocusNode(
         when (focusState) {
             // If this node is focused, set the focus on the root layoutNode before removing it.
             Active, Captured -> {
-                layoutNode.owner?.focusManager?.clearFocus(forcedClear = true)
+                layoutNode.owner?.focusManager?.clearFocus(force = true)
             }
             // Propagate the state of the next focus node to any focus observers in the hierarchy.
             ActiveParent -> {

@@ -57,6 +57,18 @@ internal class MultiWidgetSelectionDelegate(
         )
     }
 
+    override fun getSelectAllSelection(): Selection? {
+        val textLayoutResult = layoutResultCallback() ?: return null
+
+        return getAssembledSelectionInfo(
+            startOffset = 0,
+            endOffset = textLayoutResult.layoutInput.text.length,
+            handlesCrossed = false,
+            selectableId = selectableId,
+            textLayoutResult = textLayoutResult
+        )
+    }
+
     override fun getHandlePosition(selection: Selection, isStartHandle: Boolean): Offset {
         // Check if the selection handles's selectable is the current selectable.
         if (isStartHandle && selection.start.selectableId != this.selectableId ||

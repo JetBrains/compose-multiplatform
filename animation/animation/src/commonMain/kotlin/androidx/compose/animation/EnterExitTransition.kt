@@ -18,22 +18,21 @@
 
 package androidx.compose.animation
 
-import android.annotation.SuppressLint
 import androidx.compose.animation.core.AnimationVector2D
 import androidx.compose.animation.core.FiniteAnimationSpec
 import androidx.compose.animation.core.InternalAnimationApi
 import androidx.compose.animation.core.Transition
 import androidx.compose.animation.core.VectorConverter
+import androidx.compose.animation.core.VisibilityThreshold
 import androidx.compose.animation.core.animateFloat
 import androidx.compose.animation.core.createDeferredAnimation
 import androidx.compose.animation.core.spring
-import androidx.compose.animation.core.VisibilityThreshold
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Immutable
 import androidx.compose.runtime.Stable
 import androidx.compose.runtime.State
-import androidx.compose.runtime.key
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.key
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberUpdatedState
@@ -686,7 +685,7 @@ internal data class TransitionData(
     val changeSize: ChangeSize? = null
 )
 
-@SuppressLint("ModifierFactoryExtensionFunction", "ComposableModifierFactory")
+@Suppress("ModifierFactoryExtensionFunction", "ComposableModifierFactory")
 @Composable
 internal fun Transition<EnterExitState>.createModifier(
     enter: EnterTransition,
@@ -745,7 +744,7 @@ internal fun Transition<EnterExitState>.createModifier(
     return modifier
 }
 
-@SuppressLint("ModifierInspectorInfo")
+@Suppress("ModifierInspectorInfo")
 private fun Modifier.slideInOut(
     transition: Transition<EnterExitState>,
     slideIn: State<Slide?>,
@@ -821,7 +820,7 @@ private class SlideModifier(
     }
 }
 
-@SuppressLint("ModifierInspectorInfo")
+@Suppress("ModifierInspectorInfo")
 private fun Modifier.shrinkExpand(
     transition: Transition<EnterExitState>,
     expand: State<ChangeSize?>,

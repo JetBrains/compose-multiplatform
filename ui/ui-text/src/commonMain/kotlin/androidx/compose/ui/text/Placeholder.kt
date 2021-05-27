@@ -84,34 +84,51 @@ class Placeholder(
  * The settings used to specify how a placeholder is vertically aligned within a text line.
  * @see Placeholder
  */
-enum class PlaceholderVerticalAlign {
-    /** Align the bottom of the placeholder with the baseline. */
-    AboveBaseline,
-    /** Align the top of the placeholder with the top of the entire line. */
-    Top,
-    /** Align the bottom of the placeholder with the bottom of the entire line. */
-    Bottom,
-    /** Align the center of the placeholder with the center of the entire line. */
-    Center,
-    /**
-     *  Align the top of the placeholder with the top of the proceeding text.
-     *  It is different from the [Top] when there are texts with different font size, font or other
-     *  styles in the same line. This option will use the proceeding text's top instead of the
-     *  whole line's top.
-     */
-    TextTop,
-    /**
-     * Align the bottom of the placeholder with the bottom of the proceeding text.
-     * It is different from the [TextBottom] when there are texts with different font size, font or
-     * other styles in the same line. This option will use the proceeding text's bottom instead of
-     * the whole line's bottom.
-     */
-    TextBottom,
-    /**
-     * Align the center of the placeholder with the center of the proceeding text.
-     * It is different from the [Center] when there are texts with different font size, font or
-     * other styles in the same line. This option will use the proceeding text's center instead of
-     * the whole line's center.
-     */
-    TextCenter,
+@Suppress("INLINE_CLASS_DEPRECATED")
+inline class PlaceholderVerticalAlign(val value: Int) {
+
+    override fun toString(): String {
+        return when (this) {
+            AboveBaseline -> "AboveBaseline"
+            Top -> "Top"
+            Bottom -> "Bottom"
+            Center -> "Center"
+            TextTop -> "TextTop"
+            TextBottom -> "TextBottom"
+            TextCenter -> "TextCenter"
+            else -> "Invalid"
+        }
+    }
+
+    companion object {
+        /** Align the bottom of the placeholder with the baseline. */
+        val AboveBaseline = PlaceholderVerticalAlign(1)
+        /** Align the top of the placeholder with the top of the entire line. */
+        val Top = PlaceholderVerticalAlign(2)
+        /** Align the bottom of the placeholder with the bottom of the entire line. */
+        val Bottom = PlaceholderVerticalAlign(3)
+        /** Align the center of the placeholder with the center of the entire line. */
+        val Center = PlaceholderVerticalAlign(4)
+        /**
+         *  Align the top of the placeholder with the top of the proceeding text.
+         *  It is different from the [Top] when there are texts with different font size, font or other
+         *  styles in the same line. This option will use the proceeding text's top instead of the
+         *  whole line's top.
+         */
+        val TextTop = PlaceholderVerticalAlign(5)
+        /**
+         * Align the bottom of the placeholder with the bottom of the proceeding text.
+         * It is different from the [TextBottom] when there are texts with different font size, font or
+         * other styles in the same line. This option will use the proceeding text's bottom instead of
+         * the whole line's bottom.
+         */
+        val TextBottom = PlaceholderVerticalAlign(6)
+        /**
+         * Align the center of the placeholder with the center of the proceeding text.
+         * It is different from the [Center] when there are texts with different font size, font or
+         * other styles in the same line. This option will use the proceeding text's center instead of
+         * the whole line's center.
+         */
+        val TextCenter = PlaceholderVerticalAlign(7)
+    }
 }

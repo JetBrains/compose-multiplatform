@@ -45,9 +45,7 @@ val AnimationDemos = DemoCategory(
                 },
                 ComposableDemo("Cross Fade") { CrossfadeDemo() },
                 ComposableDemo("Enter/ExitTransition Combo Demo") { EnterExitCombinationDemo() },
-                ComposableDemo("Sequential Enter/Exit Demo") {
-                    SequentialEnterExitDemo()
-                },
+                ComposableDemo("Modifier.animateEnterExit Demo") { AnimateEnterExitDemo() },
             )
         ),
         DemoCategory(

@@ -1,25 +1,13 @@
 // Baseline format: 1.0
-ChangedType: androidx.compose.material.DrawerState#getCurrentValue():
-    Method androidx.compose.material.DrawerState.getCurrentValue has changed return type from T to androidx.compose.material.DrawerValue
+ChangedSuperclass: androidx.compose.material.FabPosition:
+    Class androidx.compose.material.FabPosition superclass changed from java.lang.Enum to java.lang.Object
 
 
-RemovedClass: androidx.compose.material.BottomDrawerState:
-    Removed class androidx.compose.material.BottomDrawerState
-RemovedClass: androidx.compose.material.BottomDrawerValue:
-    Removed class androidx.compose.material.BottomDrawerValue
+RemovedField: androidx.compose.material.FabPosition#Center:
+    Removed enum constant androidx.compose.material.FabPosition.Center
+RemovedField: androidx.compose.material.FabPosition#End:
+    Removed enum constant androidx.compose.material.FabPosition.End
 
 
-RemovedMethod: androidx.compose.material.DrawerKt#rememberBottomDrawerState(androidx.compose.material.BottomDrawerValue, kotlin.jvm.functions.Function1<? super androidx.compose.material.BottomDrawerValue,java.lang.Boolean>):
-    Removed method androidx.compose.material.DrawerKt.rememberBottomDrawerState(androidx.compose.material.BottomDrawerValue,kotlin.jvm.functions.Function1<? super androidx.compose.material.BottomDrawerValue,java.lang.Boolean>)
-RemovedMethod: androidx.compose.material.DrawerState#getDirection():
-    Removed method androidx.compose.material.DrawerState.getDirection()
-RemovedMethod: androidx.compose.material.DrawerState#getOffset():
-    Removed method androidx.compose.material.DrawerState.getOffset()
-RemovedMethod: androidx.compose.material.DrawerState#getOverflow():
-    Removed method androidx.compose.material.DrawerState.getOverflow()
-RemovedMethod: androidx.compose.material.DrawerState#getTargetValue():
-    Removed method androidx.compose.material.DrawerState.getTargetValue()
-RemovedMethod: androidx.compose.material.DrawerState#performDrag(float):
-    Removed method androidx.compose.material.DrawerState.performDrag(float)
-RemovedMethod: androidx.compose.material.DrawerState#performFling(float, kotlin.coroutines.Continuation<? super kotlin.Unit>):
-    Removed method androidx.compose.material.DrawerState.performFling(float,kotlin.coroutines.Continuation<? super kotlin.Unit>)
+RemovedMethod: androidx.compose.material.ScaffoldKt#Scaffold-axyFlp8(androidx.compose.ui.Modifier, androidx.compose.material.ScaffoldState, kotlin.jvm.functions.Function0<kotlin.Unit>, kotlin.jvm.functions.Function0<kotlin.Unit>, kotlin.jvm.functions.Function1<? super androidx.compose.material.SnackbarHostState,kotlin.Unit>, kotlin.jvm.functions.Function0<kotlin.Unit>, androidx.compose.material.FabPosition, boolean, kotlin.jvm.functions.Function1<? super androidx.compose.foundation.layout.ColumnScope,kotlin.Unit>, boolean, androidx.compose.ui.graphics.Shape, float, long, long, long, long, long, kotlin.jvm.functions.Function1<? super androidx.compose.foundation.layout.PaddingValues,kotlin.Unit>):
+    Removed method androidx.compose.material.ScaffoldKt.Scaffold-axyFlp8(androidx.compose.ui.Modifier,androidx.compose.material.ScaffoldState,kotlin.jvm.functions.Function0<kotlin.Unit>,kotlin.jvm.functions.Function0<kotlin.Unit>,kotlin.jvm.functions.Function1<? super androidx.compose.material.SnackbarHostState,kotlin.Unit>,kotlin.jvm.functions.Function0<kotlin.Unit>,androidx.compose.material.FabPosition,boolean,kotlin.jvm.functions.Function1<? super androidx.compose.foundation.layout.ColumnScope,kotlin.Unit>,boolean,androidx.compose.ui.graphics.Shape,float,long,long,long,long,long,kotlin.jvm.functions.Function1<? super androidx.compose.foundation.layout.PaddingValues,kotlin.Unit>)

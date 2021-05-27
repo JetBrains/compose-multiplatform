@@ -16,6 +16,8 @@
 
 package androidx.compose.ui.inspection.testdata
 
+import androidx.compose.ui.unit.IntOffset
+
 object TestLambdas {
     val short = { s: String -> s.length }
     val long = { a: Int, b: Int ->
@@ -26,6 +28,9 @@ object TestLambdas {
     val inlined = { a: Int, b: Int ->
         val sum = a + fct(b) { it * it }
         sum - a
+    }
+    val inlinedParameter = { o: IntOffset ->
+        o.x * 2
     }
 
     /**

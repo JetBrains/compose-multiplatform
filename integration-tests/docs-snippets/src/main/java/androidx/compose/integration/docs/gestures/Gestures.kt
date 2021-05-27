@@ -59,7 +59,6 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
-import androidx.compose.ui.input.pointer.consumeAllChanges
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.tooling.preview.Preview
@@ -286,8 +285,7 @@ private fun Preview6() {
                 .background(Color.Blue)
                 .size(50.dp)
                 .pointerInput(Unit) {
-                    detectDragGestures { change, dragAmount ->
-                        change.consumeAllChanges()
+                    detectDragGestures { _, dragAmount ->
                         offsetX += dragAmount.x
                         offsetY += dragAmount.y
                     }

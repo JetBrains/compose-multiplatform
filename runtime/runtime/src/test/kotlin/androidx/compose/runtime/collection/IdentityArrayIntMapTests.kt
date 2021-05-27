@@ -95,11 +95,23 @@ class IdentityArrayIntMapTests {
     @Test
     fun anyFindsCorrectValue() {
         val map = IdentityArrayIntMap()
-        val keys = Array<Any>(100) { Any() }
+        val keys = Array(100) { Any() }
         for (i in keys.indices) {
             map.add(keys[i], i)
         }
         assertTrue(map.any { _, value -> value == 20 })
         assertFalse(map.any { _, value -> value > 100 })
+    }
+
+    @Test
+    fun canForEach() {
+        val map = IdentityArrayIntMap()
+        val keys = Array(100) { Any() }
+        for (i in keys.indices) {
+            map.add(keys[i], i)
+        }
+        map.forEach { key, value ->
+            assertEquals(keys.indexOf(key), value)
+        }
     }
 }

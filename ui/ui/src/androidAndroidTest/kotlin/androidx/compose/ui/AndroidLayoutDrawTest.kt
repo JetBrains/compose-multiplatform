@@ -252,7 +252,8 @@ class AndroidLayoutDrawTest {
                 transformOrigin = TransformOrigin.Center,
                 shape = RectangleShape,
                 clip = true,
-                layoutDirection = LayoutDirection.Ltr
+                layoutDirection = LayoutDirection.Ltr,
+                density = Density(1f)
             )
         }
         // Verify that the camera distance is applied properly even after accounting for
@@ -1305,12 +1306,13 @@ class AndroidLayoutDrawTest {
             ++alignmentLinesCalculations
             0
         }
+        var linePosition by mutableStateOf(10)
         activityTestRule.runOnUiThreadIR {
             activity.setContent {
                 val innerChild = @Composable {
                     offset.value // Artificial remeasure.
                     Layout(content = {}) { _, _ ->
-                        layout(0, 0, mapOf(TestLine to 10)) { }
+                        layout(0, 0, mapOf(TestLine to linePosition)) { }
                     }
                 }
                 val child = @Composable {
@@ -1340,12 +1342,12 @@ class AndroidLayoutDrawTest {
         assertEquals(1, alignmentLinesCalculations)
 
         layoutLatch = CountDownLatch(1)
-        activityTestRule.runOnUiThreadIR { offset.value = 20 }
+        activityTestRule.runOnUiThreadIR { offset.value = 20; linePosition = 20 }
         assertTrue(layoutLatch.await(1, TimeUnit.SECONDS))
         assertEquals(1, alignmentLinesCalculations)
 
         layoutLatch = CountDownLatch(1)
-        activityTestRule.runOnUiThreadIR { offset.value = 10 }
+        activityTestRule.runOnUiThreadIR { offset.value = 10; linePosition = 30 }
         assertTrue(layoutLatch.await(1, TimeUnit.SECONDS))
         assertEquals(2, alignmentLinesCalculations)
     }
@@ -1473,26 +1475,44 @@ class AndroidLayoutDrawTest {
             }
         }
         assertTrue(layoutLatch.await(1, TimeUnit.SECONDS))
-        // Two layouts as the alignment line was only queried after the child was placed.
-        assertEquals(2, childLayouts)
+        assertEquals(1, childLayouts)
     }
 
     @Test
     fun testAlignmentLines_whenQueriedAfterPlacing_haveCorrectNumberOfLayouts() {
-        val TestLine = VerticalAlignmentLine(::min)
-        var layoutLatch = CountDownLatch(1)
         var childLayouts = 0
+        var childAlignmentLinesCalculations = 0
+        val TestLine = VerticalAlignmentLine { v1, _ ->
+            ++childAlignmentLinesCalculations
+            v1
+        }
         val offset = mutableStateOf(10)
+        var linePositionState by mutableStateOf(10)
+        var linePosition = 10
+        fun changeLinePosition() {
+            linePosition = 30 - linePosition
+            linePositionState = 30 - linePositionState
+        }
+        var layoutLatch = CountDownLatch(1)
         activityTestRule.runOnUiThreadIR {
             activity.setContent {
-                val child = @Composable {
+                val childChild = @Composable {
                     Layout(content = {}) { _, constraints ->
                         layout(
                             constraints.minWidth,
                             constraints.minHeight,
-                            mapOf(TestLine to 10)
+                            mapOf(TestLine to linePositionState)
                         ) {
                             offset.value // To ensure relayout.
+                        }
+                    }
+                }
+                val child = @Composable {
+                    Layout(content = { childChild(); childChild() }) { measurables, constraints ->
+                        val placeables = measurables.map { it.measure(constraints) }
+                        layout(constraints.minWidth, constraints.minHeight) {
+                            offset.value // To ensure relayout.
+                            placeables.forEach { it.place(0, 0) }
                             ++childLayouts
                         }
                     }
@@ -1503,9 +1523,9 @@ class AndroidLayoutDrawTest {
                     }) { measurables, constraints ->
                         val placeable = measurables[0].measure(constraints)
                         layout(placeable.width, placeable.height) {
-                            if (offset.value > 15) assertEquals(10, placeable[TestLine])
+                            if (offset.value > 15) assertEquals(linePosition, placeable[TestLine])
                             placeable.place(0, 0)
-                            if (offset.value > 5) assertEquals(10, placeable[TestLine])
+                            if (offset.value > 5) assertEquals(linePosition, placeable[TestLine])
                         }
                     }
                 }
@@ -1522,37 +1542,42 @@ class AndroidLayoutDrawTest {
             }
         }
         assertTrue(layoutLatch.await(1, TimeUnit.SECONDS))
-        // Two layouts as the alignment line was only queried after the child was placed.
-        assertEquals(2, childLayouts)
-
-        layoutLatch = CountDownLatch(1)
-        activityTestRule.runOnUiThreadIR { offset.value = 12 }
-        assertTrue(layoutLatch.await(5, TimeUnit.SECONDS))
-        // Just one more layout as the alignment lines were speculatively calculated this time.
-        assertEquals(3, childLayouts)
-
-        layoutLatch = CountDownLatch(1)
-        activityTestRule.runOnUiThreadIR { offset.value = 17 }
-        assertTrue(layoutLatch.await(1, TimeUnit.SECONDS))
-        // One layout as the alignment lines are queried before.
-        assertEquals(4, childLayouts)
-
-        layoutLatch = CountDownLatch(1)
-        activityTestRule.runOnUiThreadIR { offset.value = 12 }
-        assertTrue(layoutLatch.await(1, TimeUnit.SECONDS))
-        // One layout as the alignment lines are still calculated speculatively.
-        assertEquals(5, childLayouts)
+        assertEquals(2, childLayouts + childAlignmentLinesCalculations)
 
         layoutLatch = CountDownLatch(1)
         activityTestRule.runOnUiThreadIR { offset.value = 1 }
         assertTrue(layoutLatch.await(1, TimeUnit.SECONDS))
-        assertEquals(6, childLayouts)
+        assertEquals(3, childLayouts + childAlignmentLinesCalculations)
+
         layoutLatch = CountDownLatch(1)
-        activityTestRule.runOnUiThreadIR { offset.value = 10 }
+        activityTestRule.runOnUiThreadIR { offset.value = 10; changeLinePosition() }
         assertTrue(layoutLatch.await(1, TimeUnit.SECONDS))
-        // Two layouts again, since alignment lines were not queried during last layout,
-        // so we did not calculate them speculatively anymore.
-        assertEquals(8, childLayouts)
+        assertEquals(5, childLayouts + childAlignmentLinesCalculations)
+
+        layoutLatch = CountDownLatch(1)
+        activityTestRule.runOnUiThreadIR { offset.value = 12; changeLinePosition() }
+        assertTrue(layoutLatch.await(1, TimeUnit.SECONDS))
+        assertEquals(7, childLayouts + childAlignmentLinesCalculations)
+
+        layoutLatch = CountDownLatch(1)
+        activityTestRule.runOnUiThreadIR { offset.value = 17; changeLinePosition() }
+        assertTrue(layoutLatch.await(1, TimeUnit.SECONDS))
+        assertEquals(9, childLayouts + childAlignmentLinesCalculations)
+
+        layoutLatch = CountDownLatch(1)
+        activityTestRule.runOnUiThreadIR { offset.value = 12; changeLinePosition() }
+        assertTrue(layoutLatch.await(1, TimeUnit.SECONDS))
+        assertEquals(11, childLayouts + childAlignmentLinesCalculations)
+
+        layoutLatch = CountDownLatch(1)
+        activityTestRule.runOnUiThreadIR { offset.value = 1; changeLinePosition() }
+        assertTrue(layoutLatch.await(1, TimeUnit.SECONDS))
+        assertEquals(13, childLayouts + childAlignmentLinesCalculations)
+
+        layoutLatch = CountDownLatch(1)
+        activityTestRule.runOnUiThreadIR { offset.value = 10; changeLinePosition() }
+        assertTrue(layoutLatch.await(1, TimeUnit.SECONDS))
+        assertEquals(15, childLayouts + childAlignmentLinesCalculations)
     }
 
     @Test
@@ -1632,7 +1657,7 @@ class AndroidLayoutDrawTest {
         testHorizontalLine: HorizontalAlignmentLine,
         assertLines: Modifier.(Int, Int) -> Modifier
     ) {
-        val layoutLatch = CountDownLatch(7)
+        val layoutLatch = CountDownLatch(1)
         activityTestRule.runOnUiThreadIR {
             activity.setContent {
                 val layout = @Composable { modifier: Modifier ->
@@ -3800,8 +3825,8 @@ fun Wrap(
 ) {
     Layout(modifier = modifier, content = content) { measurables, constraints ->
         val placeables = measurables.map { it.measure(constraints) }
-        val width = max(placeables.maxBy { it.width }?.width ?: 0, minWidth)
-        val height = max(placeables.maxBy { it.height }?.height ?: 0, minHeight)
+        val width = max(placeables.maxByOrNull { it.width }?.width ?: 0, minWidth)
+        val height = max(placeables.maxByOrNull { it.height }?.height ?: 0, minHeight)
         layout(width, height) {
             placeables.forEach { it.placeRelative(0, 0) }
         }
@@ -3857,8 +3882,8 @@ fun WrapForceRelayout(
 ) {
     Layout(modifier = modifier, content = content) { measurables, constraints ->
         val placeables = measurables.map { it.measure(constraints) }
-        val width = placeables.maxBy { it.width }?.width ?: 0
-        val height = placeables.maxBy { it.height }?.height ?: 0
+        val width = placeables.maxByOrNull { it.width }?.width ?: 0
+        val height = placeables.maxByOrNull { it.height }?.height ?: 0
         layout(width, height) {
             model.value
             placeables.forEach { it.placeRelative(0, 0) }

@@ -29,6 +29,7 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.requiredHeight
 import androidx.compose.foundation.layout.requiredSize
 import androidx.compose.foundation.layout.requiredSizeIn
@@ -44,12 +45,15 @@ import androidx.compose.runtime.setValue
 import androidx.compose.testutils.WithTouchSlop
 import androidx.compose.testutils.assertIsEqualTo
 import androidx.compose.testutils.assertPixels
+import androidx.compose.testutils.assertShape
 import androidx.compose.testutils.runBlockingWithManualClock
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.test.ExperimentalTestApi
@@ -68,12 +72,14 @@ import androidx.compose.ui.test.getUnclippedBoundsInRoot
 import androidx.compose.ui.test.junit4.ComposeContentTestRule
 import androidx.compose.ui.test.junit4.StateRestorationTester
 import androidx.compose.ui.test.junit4.createComposeRule
+import androidx.compose.ui.test.moveBy
 import androidx.compose.ui.test.onChildren
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performGesture
 import androidx.compose.ui.test.swipeUp
 import androidx.compose.ui.test.swipeWithVelocity
+import androidx.compose.ui.test.up
 import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
@@ -1384,6 +1390,149 @@ class LazyColumnTest {
             }
     }
 
+    @Test
+    fun overscrollingBackwardFromNotTheFirstPosition() {
+        val containerTag = "container"
+        val itemSizePx = 10
+        val itemSizeDp = with(rule.density) { itemSizePx.toDp() }
+        val containerSize = itemSizeDp * 5
+        rule.setContentWithTestViewConfiguration {
+            Box(
+                Modifier
+                    .testTag(containerTag)
+                    .size(containerSize)
+            ) {
+                LazyColumn(
+                    Modifier
+                        .testTag(LazyListTag)
+                        .background(Color.Blue),
+                    state = rememberLazyListState(2, 5)
+                ) {
+                    items(100) {
+                        Box(
+                            Modifier
+                                .fillMaxWidth()
+                                .height(itemSizeDp)
+                                .testTag("$it")
+                        )
+                    }
+                }
+            }
+        }
+
+        rule.onNodeWithTag(LazyListTag)
+            .performGesture {
+                // we do move manually and not with swipe() utility because we want to have one
+                // drag gesture, not multiple smaller ones
+                down(center)
+                moveBy(Offset(0f, -TestTouchSlop))
+                moveBy(
+                    Offset(
+                        0f,
+                        itemSizePx * 15f // large value which makes us overscroll
+                    )
+                )
+                up()
+            }
+
+        rule.onNodeWithTag(LazyListTag)
+            .assertHeightIsEqualTo(containerSize)
+
+        rule.onNodeWithTag("0")
+            .assertTopPositionInRootIsEqualTo(0.dp)
+        rule.onNodeWithTag("4")
+            .assertTopPositionInRootIsEqualTo(containerSize - itemSizeDp)
+    }
+
+    @SdkSuppress(minSdkVersion = Build.VERSION_CODES.O)
+    @Test
+    fun lazyColumnDoesNotClipHorizontalOverdraw() {
+        rule.setContent {
+            Box(Modifier.size(60.dp).testTag("container").background(Color.Gray)) {
+                LazyColumn(
+                    Modifier
+                        .padding(20.dp)
+                        .fillMaxSize(),
+                    rememberLazyListState(1)
+                ) {
+                    items(4) {
+                        Box(Modifier.size(20.dp).drawOutsideOfBounds())
+                    }
+                }
+            }
+        }
+
+        rule.onNodeWithTag("container")
+            .captureToImage()
+            .assertShape(
+                density = rule.density,
+                shape = RectangleShape,
+                shapeColor = Color.Red,
+                backgroundColor = Color.Gray,
+                horizontalPadding = 0.dp,
+                verticalPadding = 20.dp
+            )
+    }
+
+    @Test
+    fun initialScrollPositionIsCorrectWhenItemsAreLoadedAsynchronously() {
+        lateinit var state: LazyListState
+        var itemsCount by mutableStateOf(0)
+        rule.setContent {
+            state = rememberLazyListState(2, 10)
+            LazyColumn(Modifier.fillMaxSize(), state) {
+                items(itemsCount) {
+                    Box(Modifier.size(20.dp))
+                }
+            }
+        }
+
+        rule.runOnIdle {
+            itemsCount = 100
+        }
+
+        rule.runOnIdle {
+            assertThat(state.firstVisibleItemIndex).isEqualTo(2)
+            assertThat(state.firstVisibleItemScrollOffset).isEqualTo(10)
+        }
+    }
+
+    @Test
+    fun restoredScrollPositionIsCorrectWhenItemsAreLoadedAsynchronously() {
+        lateinit var state: LazyListState
+        var itemsCount = 100
+        val recomposeCounter = mutableStateOf(0)
+        val tester = StateRestorationTester(rule)
+        tester.setContent {
+            state = rememberLazyListState()
+            LazyColumn(Modifier.fillMaxSize(), state) {
+                recomposeCounter.value
+                items(itemsCount) {
+                    Box(Modifier.size(20.dp))
+                }
+            }
+        }
+
+        rule.runOnIdle {
+            runBlocking {
+                state.scrollToItem(2, 10)
+            }
+            itemsCount = 0
+        }
+
+        tester.emulateSavedInstanceStateRestore()
+
+        rule.runOnIdle {
+            itemsCount = 100
+            recomposeCounter.value = 1
+        }
+
+        rule.runOnIdle {
+            assertThat(state.firstVisibleItemIndex).isEqualTo(2)
+            assertThat(state.firstVisibleItemScrollOffset).isEqualTo(10)
+        }
+    }
+
     private fun SemanticsNodeInteraction.assertTopPositionIsAlmost(expected: Dp) {
         getUnclippedBoundsInRoot().top.assertIsEqualTo(expected, tolerance = 1.dp)
     }
@@ -1430,3 +1579,12 @@ internal fun SemanticsNodeInteraction.scrollBy(x: Dp = 0.dp, y: Dp = 0.dp, densi
             )
         }
     }
+
+internal fun Modifier.drawOutsideOfBounds() = drawBehind {
+    val inflate = 20.dp.roundToPx().toFloat()
+    drawRect(
+        Color.Red,
+        Offset(-inflate, -inflate),
+        Size(size.width + inflate * 2, size.height + inflate * 2)
+    )
+}

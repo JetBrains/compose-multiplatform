@@ -52,6 +52,7 @@ internal class TextFieldKeyInput(
     val singleLine: Boolean = false,
     val preparedSelectionState: TextPreparedSelectionState,
     val offsetMapping: OffsetMapping = OffsetMapping.Identity,
+    val undoManager: UndoManager? = null,
     private val keyMapping: KeyMapping = platformDefaultKeyMapping,
 ) {
     private fun EditCommand.apply() {
@@ -161,8 +162,16 @@ internal class TextFieldKeyInput(
                 KeyCommand.SELECT_HOME -> moveCursorToHome().selectMovement()
                 KeyCommand.SELECT_END -> moveCursorToEnd().selectMovement()
                 KeyCommand.DESELECT -> deselect()
+                KeyCommand.UNDO -> {
+                    undoManager?.makeSnapshot(value)
+                    undoManager?.undo()?.let { this@TextFieldKeyInput.state.onValueChange(it) }
+                }
+                KeyCommand.REDO -> {
+                    undoManager?.redo()?.let { this@TextFieldKeyInput.state.onValueChange(it) }
+                }
             }
         }
+        undoManager?.forceNextSnapshot()
         return consumed
     }
 
@@ -189,7 +198,8 @@ internal fun Modifier.textFieldKeyInput(
     value: TextFieldValue,
     editable: Boolean,
     singleLine: Boolean,
-    offsetMapping: OffsetMapping
+    offsetMapping: OffsetMapping,
+    undoManager: UndoManager
 ) = composed {
     val preparedSelectionState = remember { TextPreparedSelectionState() }
     val processor = TextFieldKeyInput(
@@ -199,7 +209,8 @@ internal fun Modifier.textFieldKeyInput(
         editable = editable,
         singleLine = singleLine,
         offsetMapping = offsetMapping,
-        preparedSelectionState = preparedSelectionState
+        preparedSelectionState = preparedSelectionState,
+        undoManager = undoManager
     )
     Modifier.onKeyEvent(processor::process)
 }

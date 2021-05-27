@@ -23,30 +23,33 @@ import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.gestures.Orientation
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.offset
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.State
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.Saver
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.composed
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.input.pointer.pointerInput
-import androidx.compose.ui.layout.SubcomposeLayout
+import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.semantics.collapse
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.dismiss
 import androidx.compose.ui.semantics.expand
 import androidx.compose.ui.semantics.onClick
 import androidx.compose.ui.semantics.semantics
-import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
@@ -237,73 +240,86 @@ fun ModalBottomSheetLayout(
     content: @Composable () -> Unit
 ) {
     val scope = rememberCoroutineScope()
-    BottomSheetStack(
-        modifier = modifier,
-        sheetContent = {
-            Surface(
-                Modifier
-                    .fillMaxWidth()
-                    .nestedScroll(sheetState.nestedScrollConnection)
-                    .offset { IntOffset(0, sheetState.offset.value.roundToInt()) }
-                    .semantics {
-                        if (sheetState.isVisible) {
-                            dismiss {
-                                scope.launch { sheetState.hide() }
+    BoxWithConstraints(modifier) {
+        val fullHeight = constraints.maxHeight.toFloat()
+        val sheetHeightState = remember { mutableStateOf<Float?>(null) }
+        Box(Modifier.fillMaxSize()) {
+            content()
+            Scrim(
+                color = scrimColor,
+                onDismiss = { scope.launch { sheetState.hide() } },
+                visible = sheetState.targetValue != ModalBottomSheetValue.Hidden
+            )
+        }
+        Surface(
+            Modifier
+                .fillMaxWidth()
+                .nestedScroll(sheetState.nestedScrollConnection)
+                .offset { IntOffset(0, sheetState.offset.value.roundToInt()) }
+                .bottomSheetSwipeable(sheetState, fullHeight, sheetHeightState)
+                .onGloballyPositioned {
+                    sheetHeightState.value = it.size.height.toFloat()
+                }
+                .semantics {
+                    if (sheetState.isVisible) {
+                        dismiss {
+                            scope.launch { sheetState.hide() }
+                            true
+                        }
+                        if (sheetState.currentValue == ModalBottomSheetValue.HalfExpanded) {
+                            expand {
+                                scope.launch { sheetState.expand() }
                                 true
                             }
-                            if (sheetState.currentValue == ModalBottomSheetValue.HalfExpanded) {
-                                expand {
-                                    scope.launch { sheetState.expand() }
-                                    true
-                                }
-                            } else if (sheetState.isHalfExpandedEnabled) {
-                                collapse {
-                                    scope.launch { sheetState.halfExpand() }
-                                    true
-                                }
+                        } else if (sheetState.isHalfExpandedEnabled) {
+                            collapse {
+                                scope.launch { sheetState.halfExpand() }
+                                true
                             }
                         }
-                    },
-                shape = sheetShape,
-                elevation = sheetElevation,
-                color = sheetBackgroundColor,
-                contentColor = sheetContentColor
-            ) {
-                Column(content = sheetContent)
-            }
-        },
-        content = { constraints, sheetHeight ->
-            val fullHeight = constraints.maxHeight.toFloat()
-            val anchors = if (sheetHeight < fullHeight / 2) {
-                mapOf(
-                    fullHeight to ModalBottomSheetValue.Hidden,
-                    fullHeight - sheetHeight to ModalBottomSheetValue.Expanded
-                )
-            } else {
-                mapOf(
-                    fullHeight to ModalBottomSheetValue.Hidden,
-                    fullHeight / 2 to ModalBottomSheetValue.HalfExpanded,
-                    max(0f, fullHeight - sheetHeight) to ModalBottomSheetValue.Expanded
-                )
-            }
-            val swipeable = Modifier.swipeable(
-                state = sheetState,
-                anchors = anchors,
-                orientation = Orientation.Vertical,
-                enabled = sheetState.currentValue != ModalBottomSheetValue.Hidden,
-                resistance = null
-            )
-
-            Box(Modifier.fillMaxSize().then(swipeable)) {
-                content()
-                Scrim(
-                    color = scrimColor,
-                    onDismiss = { scope.launch { sheetState.hide() } },
-                    visible = sheetState.targetValue != ModalBottomSheetValue.Hidden
-                )
-            }
+                    }
+                },
+            shape = sheetShape,
+            elevation = sheetElevation,
+            color = sheetBackgroundColor,
+            contentColor = sheetContentColor
+        ) {
+            Column(content = sheetContent)
         }
-    )
+    }
+}
+
+@Suppress("ModifierInspectorInfo")
+@OptIn(ExperimentalMaterialApi::class)
+private fun Modifier.bottomSheetSwipeable(
+    sheetState: ModalBottomSheetState,
+    fullHeight: Float,
+    sheetHeightState: State<Float?>
+) = composed {
+    val sheetHeight = sheetHeightState.value
+    if (sheetHeight != null) {
+        val anchors = if (sheetHeight < fullHeight / 2) {
+            mapOf(
+                fullHeight to ModalBottomSheetValue.Hidden,
+                fullHeight - sheetHeight to ModalBottomSheetValue.Expanded
+            )
+        } else {
+            mapOf(
+                fullHeight to ModalBottomSheetValue.Hidden,
+                fullHeight / 2 to ModalBottomSheetValue.HalfExpanded,
+                max(0f, fullHeight - sheetHeight) to ModalBottomSheetValue.Expanded
+            )
+        }
+        Modifier.swipeable(
+            state = sheetState,
+            anchors = anchors,
+            orientation = Orientation.Vertical,
+            enabled = sheetState.currentValue != ModalBottomSheetValue.Hidden,
+            resistance = null
+        )
+    } else {
+        Modifier
+    }
 }
 
 @Composable
@@ -337,32 +353,6 @@ private fun Scrim(
         }
     }
 }
-
-@Composable
-private fun BottomSheetStack(
-    modifier: Modifier,
-    sheetContent: @Composable () -> Unit,
-    content: @Composable (constraints: Constraints, sheetHeight: Float) -> Unit
-) {
-    SubcomposeLayout(modifier) { constraints ->
-        val sheetPlaceable =
-            subcompose(BottomSheetStackSlot.SheetContent, sheetContent)
-                .first().measure(constraints.copy(minWidth = 0, minHeight = 0))
-
-        val sheetHeight = sheetPlaceable.height.toFloat()
-
-        val placeable =
-            subcompose(BottomSheetStackSlot.Content) { content(constraints, sheetHeight) }
-                .first().measure(constraints)
-
-        layout(placeable.width, placeable.height) {
-            placeable.placeRelative(0, 0)
-            sheetPlaceable.placeRelative(0, 0)
-        }
-    }
-}
-
-private enum class BottomSheetStackSlot { SheetContent, Content }
 
 /**
  * Contains useful Defaults for [ModalBottomSheetLayout].

@@ -114,22 +114,22 @@ class ScaffoldTest {
                 topBar = {
                     Box(
                         Modifier
+                            .fillMaxWidth()
+                            .height(50.dp)
+                            .background(color = Color.Red)
                             .onGloballyPositioned { positioned: LayoutCoordinates ->
                                 appbarPosition = positioned.localToWindow(Offset.Zero)
                                 appbarSize = positioned.size
                             }
-                            .fillMaxWidth()
-                            .height(50.dp)
-                            .background(color = Color.Red)
                     )
                 }
             ) {
                 Box(
                     Modifier
-                        .onGloballyPositioned { contentPosition = it.localToWindow(Offset.Zero) }
                         .fillMaxWidth()
                         .height(50.dp)
                         .background(Color.Blue)
+                        .onGloballyPositioned { contentPosition = it.localToWindow(Offset.Zero) }
                 )
             }
         }
@@ -148,25 +148,25 @@ class ScaffoldTest {
                 bottomBar = {
                     Box(
                         Modifier
+                            .fillMaxWidth()
+                            .height(50.dp)
+                            .background(color = Color.Red)
                             .onGloballyPositioned { positioned: LayoutCoordinates ->
                                 appbarPosition = positioned.positionInParent()
                                 appbarSize = positioned.size
                             }
-                            .fillMaxWidth()
-                            .height(50.dp)
-                            .background(color = Color.Red)
                     )
                 }
             ) {
                 Box(
                     Modifier
+                        .fillMaxSize()
+                        .height(50.dp)
+                        .background(color = Color.Blue)
                         .onGloballyPositioned { positioned: LayoutCoordinates ->
                             contentPosition = positioned.positionInParent()
                             contentSize = positioned.size
                         }
-                        .fillMaxSize()
-                        .height(50.dp)
-                        .background(color = Color.Blue)
                 )
             }
         }
@@ -186,12 +186,12 @@ class ScaffoldTest {
                     drawerContent = {
                         Box(
                             Modifier
-                                .onGloballyPositioned { positioned: LayoutCoordinates ->
-                                    drawerChildPosition = positioned.positionInParent()
-                                }
                                 .fillMaxWidth()
                                 .height(50.dp)
                                 .background(color = Color.Blue)
+                                .onGloballyPositioned { positioned: LayoutCoordinates ->
+                                    drawerChildPosition = positioned.positionInParent()
+                                }
                         )
                     },
                     drawerGesturesEnabled = drawerGesturedEnabledState.value
@@ -242,12 +242,12 @@ class ScaffoldTest {
                     drawerContent = {
                         Box(
                             Modifier
-                                .onGloballyPositioned { positioned: LayoutCoordinates ->
-                                    drawerChildPosition = positioned.positionInParent()
-                                }
                                 .fillMaxWidth()
                                 .height(50.dp)
                                 .background(color = Color.Blue)
+                                .onGloballyPositioned { positioned: LayoutCoordinates ->
+                                    drawerChildPosition = positioned.positionInParent()
+                                }
                         )
                     }
                 ) {
@@ -430,12 +430,12 @@ class ScaffoldTest {
                 bottomBar = {
                     Box(
                         Modifier
-                            .onGloballyPositioned { positioned: LayoutCoordinates ->
-                                bottomBarSize = positioned.size
-                            }
                             .fillMaxWidth()
                             .height(100.dp)
                             .background(color = Color.Red)
+                            .onGloballyPositioned { positioned: LayoutCoordinates ->
+                                bottomBarSize = positioned.size
+                            }
                     )
                 }
             ) {

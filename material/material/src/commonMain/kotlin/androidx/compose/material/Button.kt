@@ -19,8 +19,6 @@ package androidx.compose.material
 import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.VectorConverter
 import androidx.compose.foundation.BorderStroke
-import androidx.compose.foundation.clickable
-import androidx.compose.foundation.indication
 import androidx.compose.foundation.interaction.Interaction
 import androidx.compose.foundation.interaction.InteractionSource
 import androidx.compose.foundation.interaction.MutableInteractionSource
@@ -90,6 +88,7 @@ import kotlinx.coroutines.flow.collect
  * this button in different states. See [ButtonDefaults.buttonColors].
  * @param contentPadding The spacing values to apply internally between the container and the content
  */
+@OptIn(ExperimentalMaterialApi::class)
 @Composable
 fun Button(
     onClick: () -> Unit,
@@ -103,24 +102,19 @@ fun Button(
     contentPadding: PaddingValues = ButtonDefaults.ContentPadding,
     content: @Composable RowScope.() -> Unit
 ) {
-    // TODO(aelias): Avoid manually putting the clickable above the clip and
-    // the ripple below the clip once http://b/157687898 is fixed and we have
-    // more flexibility to move the clickable modifier (see candidate approach
-    // aosp/1361921)
     val contentColor by colors.contentColor(enabled)
     Surface(
+        modifier = modifier,
         shape = shape,
         color = colors.backgroundColor(enabled).value,
         contentColor = contentColor.copy(alpha = 1f),
         border = border,
         elevation = elevation?.elevation(enabled, interactionSource)?.value ?: 0.dp,
-        modifier = modifier.clickable(
-            onClick = onClick,
-            enabled = enabled,
-            role = Role.Button,
-            interactionSource = interactionSource,
-            indication = null
-        )
+        onClick = onClick,
+        enabled = enabled,
+        role = Role.Button,
+        interactionSource = interactionSource,
+        indication = rememberRipple()
     ) {
         CompositionLocalProvider(LocalContentAlpha provides contentColor.alpha) {
             ProvideTextStyle(
@@ -132,7 +126,6 @@ fun Button(
                             minWidth = ButtonDefaults.MinWidth,
                             minHeight = ButtonDefaults.MinHeight
                         )
-                        .indication(interactionSource, rememberRipple())
                         .padding(contentPadding),
                     horizontalArrangement = Arrangement.Center,
                     verticalAlignment = Alignment.CenterVertically,

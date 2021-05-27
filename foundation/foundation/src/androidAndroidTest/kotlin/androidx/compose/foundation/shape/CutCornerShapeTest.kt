@@ -249,8 +249,8 @@ fun assertPathsEquals(path1: Path, path2: Path) {
     val diff = Path()
     val reverseDiff = Path()
     Assert.assertTrue(
-        diff.op(path1, path2, PathOperation.difference) &&
-            reverseDiff.op(path2, path1, PathOperation.difference) &&
+        diff.op(path1, path2, PathOperation.Difference) &&
+            reverseDiff.op(path2, path1, PathOperation.Difference) &&
             diff.isEmpty &&
             reverseDiff.isEmpty
     )

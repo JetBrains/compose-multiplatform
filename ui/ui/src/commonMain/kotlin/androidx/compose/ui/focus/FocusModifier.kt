@@ -19,7 +19,7 @@ package androidx.compose.ui.focus
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.composed
-import androidx.compose.ui.focus.FocusState.Inactive
+import androidx.compose.ui.focus.FocusStateImpl.Inactive
 import androidx.compose.ui.node.ModifiedFocusNode
 import androidx.compose.ui.platform.InspectorInfo
 import androidx.compose.ui.platform.InspectorValueInfo
@@ -31,14 +31,17 @@ import androidx.compose.ui.platform.debugInspectorInfo
  * different instance of [FocusModifier] for each focusable component.
  */
 internal class FocusModifier(
-    initialFocus: FocusState,
+    initialFocus: FocusStateImpl,
     // TODO(b/172265016): Make this a required parameter and remove the default value.
     //  Set this value in AndroidComposeView, and other places where we create a focus modifier
     //  using this internal constructor.
     inspectorInfo: InspectorInfo.() -> Unit = NoInspectorInfo
 ) : Modifier.Element, InspectorValueInfo(inspectorInfo) {
 
-    var focusState: FocusState = initialFocus
+    // TODO(b/188684110): Move focusState and focusedChild to ModiedFocusNode and make this
+    //  modifier stateless.
+
+    var focusState: FocusStateImpl = initialFocus
 
     var focusedChild: ModifiedFocusNode? = null
 
@@ -48,6 +51,17 @@ internal class FocusModifier(
 /**
  * Add this modifier to a component to make it focusable.
  */
+fun Modifier.focusTarget(): Modifier = composed(debugInspectorInfo { name = "focusTarget" }) {
+    remember { FocusModifier(Inactive) }
+}
+
+/**
+ * Add this modifier to a component to make it focusable.
+ */
+@Deprecated(
+    "Replaced by focusTarget",
+    ReplaceWith("focusTarget()", "androidx.compose.ui.focus.focusTarget")
+)
 fun Modifier.focusModifier(): Modifier = composed(debugInspectorInfo { name = "focusModifier" }) {
     remember { FocusModifier(Inactive) }
 }

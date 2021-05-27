@@ -20,18 +20,15 @@ import androidx.compose.compiler.plugins.kotlin.KtxNameConventions
 import androidx.compose.compiler.plugins.kotlin.analysis.ComposeWritableSlices
 import androidx.compose.compiler.plugins.kotlin.hasComposableAnnotation
 import androidx.compose.compiler.plugins.kotlin.irTrace
-import androidx.compose.compiler.plugins.kotlin.isComposableCallable
 import androidx.compose.compiler.plugins.kotlin.lower.decoys.isDecoy
 import org.jetbrains.kotlin.backend.common.extensions.IrPluginContext
 import org.jetbrains.kotlin.backend.common.ir.copyTo
 import org.jetbrains.kotlin.backend.jvm.ir.isInlineParameter
 import org.jetbrains.kotlin.backend.jvm.lower.inlineclasses.InlineClassAbi
-import org.jetbrains.kotlin.descriptors.FunctionDescriptor
 import org.jetbrains.kotlin.descriptors.Modality
 import org.jetbrains.kotlin.descriptors.ModuleDescriptor
 import org.jetbrains.kotlin.descriptors.PropertyGetterDescriptor
 import org.jetbrains.kotlin.descriptors.PropertySetterDescriptor
-import org.jetbrains.kotlin.descriptors.SourceElement
 import org.jetbrains.kotlin.ir.IrStatement
 import org.jetbrains.kotlin.ir.ObsoleteDescriptorBasedAPI
 import org.jetbrains.kotlin.ir.UNDEFINED_OFFSET
@@ -44,10 +41,6 @@ import org.jetbrains.kotlin.ir.declarations.IrSimpleFunction
 import org.jetbrains.kotlin.ir.declarations.IrValueParameter
 import org.jetbrains.kotlin.ir.declarations.copyAttributes
 import org.jetbrains.kotlin.ir.declarations.impl.IrFunctionImpl
-import org.jetbrains.kotlin.ir.descriptors.WrappedFunctionDescriptorWithContainerSource
-import org.jetbrains.kotlin.ir.descriptors.WrappedPropertyGetterDescriptor
-import org.jetbrains.kotlin.ir.descriptors.WrappedPropertySetterDescriptor
-import org.jetbrains.kotlin.ir.descriptors.WrappedSimpleFunctionDescriptor
 import org.jetbrains.kotlin.ir.expressions.IrCall
 import org.jetbrains.kotlin.ir.expressions.IrConstructorCall
 import org.jetbrains.kotlin.ir.expressions.IrExpression
@@ -86,7 +79,6 @@ import org.jetbrains.kotlin.ir.visitors.transformChildrenVoid
 import org.jetbrains.kotlin.load.java.JvmAbi
 import org.jetbrains.kotlin.resolve.BindingTrace
 import org.jetbrains.kotlin.resolve.DescriptorUtils
-import org.jetbrains.kotlin.serialization.deserialization.descriptors.DescriptorWithContainerSource
 import org.jetbrains.kotlin.util.OperatorNameConventions
 import kotlin.math.min
 
@@ -155,7 +147,8 @@ class ComposerParamTransformer(
     @OptIn(ObsoleteDescriptorBasedAPI::class)
     fun IrCall.withComposerParamIfNeeded(composerParam: IrValueParameter): IrCall {
         val isComposableLambda = isComposableLambdaInvoke()
-        if (!symbol.descriptor.isComposableCallable() && !isComposableLambda)
+
+        if (!symbol.owner.hasComposableAnnotation() && !isComposableLambda)
             return this
         val ownerFn = when {
             isComposableLambda -> {
@@ -312,7 +305,7 @@ class ComposerParamTransformer(
         }
 
         // if not a composable fn, nothing we need to do
-        if (!descriptor.isComposableCallable(context.bindingContext)) {
+        if (!this.hasComposableAnnotation()) {
             return this
         }
 
@@ -345,23 +338,6 @@ class ComposerParamTransformer(
         return newInvoke
     }
 
-    private fun wrapDescriptor(descriptor: FunctionDescriptor): WrappedSimpleFunctionDescriptor {
-        return when (descriptor) {
-            is PropertyGetterDescriptor ->
-                WrappedPropertyGetterDescriptor()
-            is PropertySetterDescriptor ->
-                WrappedPropertySetterDescriptor()
-            is DescriptorWithContainerSource ->
-                WrappedFunctionDescriptorWithContainerSource()
-            else ->
-                object : WrappedSimpleFunctionDescriptor() {
-                    override fun getSource(): SourceElement {
-                        return descriptor.source
-                    }
-                }
-        }
-    }
-
     @OptIn(ObsoleteDescriptorBasedAPI::class)
     private fun IrFunction.copy(
         isInline: Boolean = this.isInline,
@@ -369,13 +345,12 @@ class ComposerParamTransformer(
     ): IrSimpleFunction {
         // TODO(lmr): use deepCopy instead?
         val descriptor = descriptor
-        val newDescriptor = wrapDescriptor(descriptor)
 
         return IrFunctionImpl(
             startOffset,
             endOffset,
             origin,
-            IrSimpleFunctionSymbolImpl(newDescriptor),
+            IrSimpleFunctionSymbolImpl(),
             name,
             visibility,
             modality,
@@ -390,7 +365,6 @@ class ComposerParamTransformer(
             isFakeOverride,
             containerSource
         ).also { fn ->
-            newDescriptor.bind(fn)
             if (this is IrSimpleFunction) {
                 val propertySymbol = correspondingPropertySymbol
                 if (propertySymbol != null) {
@@ -626,12 +600,11 @@ class ComposerParamTransformer(
         return isInvoke() && dispatchReceiver?.type?.hasComposableAnnotation() == true
     }
 
-    @OptIn(ObsoleteDescriptorBasedAPI::class)
     private fun IrFunction.isNonComposableInlinedLambda(): Boolean {
         for (element in inlinedFunctions) {
             if (element.argument.function != this)
                 continue
-            if (!element.parameter.descriptor.type.hasComposableAnnotation())
+            if (!element.parameter.type.hasComposableAnnotation())
                 return true
         }
         return false

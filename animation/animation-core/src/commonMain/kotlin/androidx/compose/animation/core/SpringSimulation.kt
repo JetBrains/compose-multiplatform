@@ -42,7 +42,7 @@ import kotlin.math.sqrt
  * damping (i.e. damping ratio = 0), the mass will oscillate forever.
  */
 
-@Suppress("EXPERIMENTAL_FEATURE_WARNING")
+@Suppress("INLINE_CLASS_DEPRECATED", "EXPERIMENTAL_FEATURE_WARNING")
 internal inline class Motion(val packedValue: Long) {
     val value: Float
         get() = unpackFloat1(packedValue)

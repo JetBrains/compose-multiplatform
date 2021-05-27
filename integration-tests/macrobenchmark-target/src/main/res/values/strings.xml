@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  ~ Copyright 2021 Google LLC
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~     https://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  -->
+
+<resources>
+    <string name="io_version_name" translation_description="Label for the app version name in Settings.">Version %s</string>
+    <string name="io_about_title" translation_description="Title for the 'About' tab that shows miscellaneous info.">About</string>
+    <string name="io_tos_url" translatable="false">https://policies.google.com/terms</string>
+    <string name="io_privacy_policy_url" translatable="false">https://policies.google.com/privacy</string>
+    <string name="io_settings_time_zone_label" translate_description="Set time zone in app to PST.">Events in Pacific Time Zone (UTC-8)</string>
+    <string name="io_settings_enable_notifications" translate_description="Turn on notifications.">Enable notifications</string>
+    <string name="io_settings_send_anonymous_usage_statistics" translation_description="Enable sending usage statistics.">Send anonymous usage statistics</string>
+    <string name="io_settings_tos" translation_description="Open link to terms of service.">Terms of service</string>
+    <string name="io_settings_privacy_policy" translation_description="Open link to privacy policy.">Privacy policy</string>
+    <string name="io_settings_oss_licenses" translation_description="Open link to open source licenses.">Open sources licenses</string>
+</resources>

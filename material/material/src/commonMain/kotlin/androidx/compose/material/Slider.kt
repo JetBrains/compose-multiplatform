@@ -21,6 +21,7 @@ import androidx.compose.animation.core.TweenSpec
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.MutatePriority
 import androidx.compose.foundation.MutatorMutex
+import androidx.compose.foundation.background
 import androidx.compose.foundation.focusable
 import androidx.compose.foundation.gestures.DragScope
 import androidx.compose.foundation.gestures.DraggableState
@@ -38,6 +39,7 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.requiredSizeIn
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.progressSemantics
@@ -58,6 +60,7 @@ import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.lerp
 import androidx.compose.ui.graphics.Color
@@ -138,7 +141,9 @@ fun Slider(
         if (steps == 0) emptyList() else List(steps + 2) { it.toFloat() / (steps + 1) }
     }
     BoxWithConstraints(
-        modifier.sliderSemantics(value, tickFractions, enabled, onValueChange, valueRange, steps)
+        modifier
+            .requiredSizeIn(minWidth = ThumbRadius * 2, minHeight = ThumbRadius * 2)
+            .sliderSemantics(value, tickFractions, enabled, onValueChange, valueRange, steps)
     ) {
         val isRtl = LocalLayoutDirection.current == LayoutDirection.Rtl
         val maxPx = constraints.maxWidth.toFloat()
@@ -396,22 +401,17 @@ private fun SliderImpl(
             } else {
                 ThumbDefaultElevation
             }
-            Surface(
-                shape = CircleShape,
-                color = colors.thumbColor(enabled).value,
-                elevation = if (enabled) elevation else 0.dp,
-                modifier = Modifier
+            Spacer(
+                Modifier
+                    .size(thumbSize, thumbSize)
                     .focusable(interactionSource = interactionSource)
                     .indication(
                         interactionSource = interactionSource,
-                        indication = rememberRipple(
-                            bounded = false,
-                            radius = ThumbRippleRadius
-                        )
+                        indication = rememberRipple(bounded = false, radius = ThumbRippleRadius)
                     )
-            ) {
-                Spacer(Modifier.size(thumbSize, thumbSize))
-            }
+                    .shadow(if (enabled) elevation else 0.dp, CircleShape, clip = false)
+                    .background(colors.thumbColor(enabled).value, CircleShape)
+            )
         }
     }
 }

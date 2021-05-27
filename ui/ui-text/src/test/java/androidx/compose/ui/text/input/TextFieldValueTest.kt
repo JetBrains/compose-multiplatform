@@ -16,11 +16,11 @@
 
 package androidx.compose.ui.text.input
 
-import androidx.compose.runtime.ExperimentalComposeApi
 import androidx.compose.runtime.saveable.SaverScope
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shadow
+import androidx.compose.ui.text.ExperimentalTextApi
 import androidx.compose.ui.text.ParagraphStyle
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.TextRange
@@ -164,7 +164,7 @@ class TextFieldValueTest {
         assertThat(textFieldValue.composition).isNull()
     }
 
-    @OptIn(ExperimentalComposeApi::class)
+    @OptIn(ExperimentalTextApi::class)
     @Test
     fun test_Saver() {
         val annotatedString = buildAnnotatedString {

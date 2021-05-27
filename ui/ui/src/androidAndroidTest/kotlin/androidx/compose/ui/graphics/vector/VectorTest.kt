@@ -305,6 +305,44 @@ class VectorTest {
         rule.onNodeWithTag(testTag).captureToImage().assertPixels { Color.Blue }
     }
 
+    @SdkSuppress(minSdkVersion = Build.VERSION_CODES.O)
+    @Test
+    fun testVectorChangeSize() {
+        val size = mutableStateOf(200)
+        val color = mutableStateOf(Color.Magenta)
+
+        rule.setContent {
+            val background = Modifier.background(Color.Red).paint(
+                createTestVectorPainter(size.value, color.value),
+                alignment = Alignment.TopStart
+            )
+            AtLeastSize(size = 400, modifier = background) {
+            }
+        }
+
+        takeScreenShot(400).apply {
+            assertEquals(getPixel(100, 100), Color.Magenta.toArgb())
+            assertEquals(getPixel(300, 300), Color.Red.toArgb())
+        }
+
+        size.value = 400
+        color.value = Color.Cyan
+
+        takeScreenShot(400).apply {
+            assertEquals(getPixel(100, 100), Color.Cyan.toArgb())
+            assertEquals(getPixel(300, 300), Color.Cyan.toArgb())
+        }
+
+        size.value = 50
+        color.value = Color.Yellow
+
+        takeScreenShot(400).apply {
+            assertEquals(getPixel(10, 10), Color.Yellow.toArgb())
+            assertEquals(getPixel(100, 100), Color.Red.toArgb())
+            assertEquals(getPixel(300, 300), Color.Red.toArgb())
+        }
+    }
+
     @Composable
     private fun VectorTint(
         size: Int = 200,

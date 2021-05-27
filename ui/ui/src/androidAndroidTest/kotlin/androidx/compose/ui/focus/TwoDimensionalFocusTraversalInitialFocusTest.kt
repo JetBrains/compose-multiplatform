@@ -141,7 +141,7 @@ class TwoDimensionalFocusTraversalInitialFocusTest(focusDirectionInt: Int) {
                 Modifier
                     .focusRequester(initialFocusRequester)
                     .onFocusChanged { isColumnFocused = it.isFocused }
-                    .focusModifier()
+                    .focusTarget()
             ) {
                 Row {
                     FocusableBox(isFocused[0])

@@ -75,7 +75,7 @@ class DesktopSvgResourcesTest {
     }
 
     private fun assumeLinuxOrWindows() {
-        val os = System.getProperty("os.name").toLowerCase(Locale.US)
+        val os = System.getProperty("os.name").lowercase(Locale.US)
         assumeTrue(os.startsWith("linux") || os.startsWith("win"))
     }
 }

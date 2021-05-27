@@ -79,10 +79,11 @@ dependencies {
         testImplementation(project(":compose:ui:ui-test-junit4"))
         testImplementation(project(":compose:test-utils"))
 
-        androidTestImplementation(ANDROIDX_TEST_UIAUTOMATOR)
-        androidTestImplementation(ANDROIDX_TEST_RULES)
-        androidTestImplementation(ANDROIDX_TEST_RUNNER)
+        androidTestImplementation(ANDROIDX_TEST_CORE_LATEST)
+        androidTestImplementation(ANDROIDX_TEST_RULES_LATEST)
+        androidTestImplementation(ANDROIDX_TEST_RUNNER_LATEST)
         androidTestImplementation(ANDROIDX_TEST_EXT_KTX)
+        androidTestImplementation(ANDROIDX_TEST_UIAUTOMATOR)
         androidTestImplementation(KOTLIN_COROUTINES_TEST)
         androidTestImplementation(ESPRESSO_CORE)
         androidTestImplementation(JUNIT)
@@ -249,11 +250,6 @@ tasks.withType(KotlinCompile).configureEach {
 }
 
 android {
-    buildTypes {
-        debug {
-            testCoverageEnabled = false // Breaks Kotlin compiler.
-        }
-    }
     testOptions.unitTests.includeAndroidResources = true
     buildTypes.all {
         consumerProguardFiles("proguard-rules.pro")
@@ -266,25 +262,16 @@ android {
             project.rootDir.absolutePath + "/../../golden/compose/ui/ui"
 }
 
-if(AndroidXUiPlugin.isMultiplatformEnabled(project)) {
-    // An ugly hack to workaround b/159426957
-    // causing MPP+AGP to conflict.
-    // See also: https://youtrack.jetbrains.com/issue/KT-34650
-    // See also: https://youtrack.jetbrains.com/issue/KT-39712
-    afterEvaluate {
-        ["Api", "Implementation", "CompileOnly", "RuntimeOnly"].each { scope ->
-            def erroneousExtendsFrom = [
-                    "androidTest$scope",
-                    "androidTestDebug$scope",
-            ].collect { configurations[it] }
-            [
-                    "androidDebugUnitTest$scope",
-                    "test$scope",
-                    "testDebug$scope",
-                    "testRelease$scope"
-            ].each {
-                def configuration = configurations[it]
-                configuration.setExtendsFrom(configuration.extendsFrom - erroneousExtendsFrom)
+// Diagnostics for b/188565660
+if (!AndroidXUiPlugin.isMultiplatformEnabled(project)) {
+    project.afterEvaluate {
+        tasks.named("compileReleaseKotlin").configure { t ->
+            t.doLast {
+                def moduleFile = project.file("${buildDir}/tmp/kotlin-classes/release/META-INF/ui_release.kotlin_module")
+                // This file should be large, about 3.2K. If this file is short then many symbols will fail to resolve
+                if (moduleFile.length() < 250) {
+                    throw new GradleException("kotlin_module file ($moduleFile) too short! See b/188565660 for more information. File text: ${moduleFile.text}")
+                }
             }
         }
     }

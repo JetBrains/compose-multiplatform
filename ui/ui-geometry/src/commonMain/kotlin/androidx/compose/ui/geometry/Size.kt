@@ -37,7 +37,7 @@ fun Size(width: Float, height: Float) = Size(packFloats(width, height))
  *
  * You can think of this as an [Offset] from the origin.
  */
-@Suppress("EXPERIMENTAL_FEATURE_WARNING")
+@Suppress("INLINE_CLASS_DEPRECATED", "EXPERIMENTAL_FEATURE_WARNING")
 @Immutable
 inline class Size internal constructor(@PublishedApi internal val packedValue: Long) {
 

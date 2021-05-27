@@ -15,6 +15,7 @@
  */
 package androidx.compose.foundation
 
+import android.os.Build
 import android.os.Handler
 import android.os.Looper
 import androidx.annotation.RequiresApi
@@ -24,16 +25,23 @@ import androidx.compose.foundation.gestures.scrollBy
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.text.BasicText
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.testutils.assertPixels
+import androidx.compose.testutils.assertShape
 import androidx.compose.testutils.runBlockingWithManualClock
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.drawBehind
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.platform.InspectableValue
 import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.platform.isDebugInspectorInfoEnabled
@@ -821,5 +829,74 @@ class ScrollTest {
                 "isVertical"
             )
         }
+    }
+
+    @SdkSuppress(minSdkVersion = Build.VERSION_CODES.O)
+    @Test
+    fun horizontalScroller_doesNotClipVerticalOverdraw() {
+        rule.setContent {
+            Box(Modifier.size(60.dp).testTag("container").background(Color.Gray)) {
+                Row(
+                    Modifier
+                        .padding(20.dp)
+                        .fillMaxSize()
+                        .horizontalScroll(rememberScrollState(20))
+                ) {
+                    repeat(4) {
+                        Box(Modifier.size(20.dp).drawOutsideOfBounds())
+                    }
+                }
+            }
+        }
+
+        rule.onNodeWithTag("container")
+            .captureToImage()
+            .assertShape(
+                density = rule.density,
+                shape = RectangleShape,
+                shapeColor = Color.Red,
+                backgroundColor = Color.Gray,
+                horizontalPadding = 20.dp,
+                verticalPadding = 0.dp
+            )
+    }
+
+    @SdkSuppress(minSdkVersion = Build.VERSION_CODES.O)
+    @Test
+    fun verticalScroller_doesNotClipHorizontalOverdraw() {
+        rule.setContent {
+            Box(Modifier.size(60.dp).testTag("container").background(Color.Gray)) {
+                Column(
+                    Modifier
+                        .padding(20.dp)
+                        .fillMaxSize()
+                        .verticalScroll(rememberScrollState(20))
+                ) {
+                    repeat(4) {
+                        Box(Modifier.size(20.dp).drawOutsideOfBounds())
+                    }
+                }
+            }
+        }
+
+        rule.onNodeWithTag("container")
+            .captureToImage()
+            .assertShape(
+                density = rule.density,
+                shape = RectangleShape,
+                shapeColor = Color.Red,
+                backgroundColor = Color.Gray,
+                horizontalPadding = 0.dp,
+                verticalPadding = 20.dp
+            )
+    }
+
+    private fun Modifier.drawOutsideOfBounds() = drawBehind {
+        val inflate = 20.dp.roundToPx().toFloat()
+        drawRect(
+            Color.Red,
+            Offset(-inflate, -inflate),
+            Size(size.width + inflate * 2, size.height + inflate * 2)
+        )
     }
 }

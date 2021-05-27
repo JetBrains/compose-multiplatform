@@ -28,6 +28,7 @@ import androidx.compose.ui.util.unpackInt1
  *
  * @param keyCode an integer code representing the key pressed.
  */
+@Suppress("INLINE_CLASS_DEPRECATED", "EXPERIMENTAL_FEATURE_WARNING")
 actual inline class Key(val keyCode: Long) {
     actual companion object {
         /** Unknown key. */

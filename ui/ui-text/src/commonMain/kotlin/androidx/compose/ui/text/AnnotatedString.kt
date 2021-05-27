@@ -16,7 +16,6 @@
 
 package androidx.compose.ui.text
 
-import androidx.compose.runtime.ExperimentalComposeApi
 import androidx.compose.runtime.Immutable
 import androidx.compose.runtime.Stable
 import androidx.compose.ui.text.AnnotatedString.Builder
@@ -351,7 +350,7 @@ class AnnotatedString internal constructor(
          * @see getStringAnnotations
          * @sample androidx.compose.ui.text.samples.AnnotatedStringAddStringAnnotationSample
          */
-        @ExperimentalComposeApi
+        @ExperimentalTextApi
         @Suppress("SetterReturnsThis")
         fun addTtsAnnotation(ttsAnnotation: TtsAnnotation, start: Int, end: Int) {
             annotations.add(MutableRange(ttsAnnotation, start, end))
@@ -736,7 +735,7 @@ inline fun <R : Any> Builder.withStyle(
  * @see AnnotatedString.Builder.pushStringAnnotation
  * @see AnnotatedString.Builder.pop
  */
-@ExperimentalComposeApi
+@ExperimentalTextApi
 inline fun <R : Any> Builder.withAnnotation(
     tag: String,
     annotation: String,
@@ -762,7 +761,7 @@ inline fun <R : Any> Builder.withAnnotation(
  * @see AnnotatedString.Builder.pushStringAnnotation
  * @see AnnotatedString.Builder.pop
  */
-@ExperimentalComposeApi
+@ExperimentalTextApi
 inline fun <R : Any> Builder.withAnnotation(
     ttsAnnotation: TtsAnnotation,
     crossinline block: Builder.() -> R

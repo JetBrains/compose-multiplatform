@@ -89,12 +89,12 @@ internal fun Spannable.setTextIndent(
             val firstLine = when (indent.firstLine.type) {
                 TextUnitType.Sp -> indent.firstLine.toPx()
                 TextUnitType.Em -> indent.firstLine.value * contextFontSize
-                TextUnitType.Unspecified -> 0f
+                else -> 0f
             }
             val restLine = when (indent.restLine.type) {
                 TextUnitType.Sp -> indent.restLine.toPx()
                 TextUnitType.Em -> indent.restLine.value * contextFontSize
-                TextUnitType.Unspecified -> 0f
+                else -> 0f
             }
             setSpan(
                 LeadingMarginSpan.Standard(
@@ -130,7 +130,7 @@ internal fun Spannable.setLineHeight(
                 length
             )
         }
-        TextUnitType.Unspecified -> {
+        else -> {
         } // Do nothing
     }
 }
@@ -343,7 +343,7 @@ private fun createLetterSpacingSpan(
         TextUnitType.Em -> {
             LetterSpacingSpanEm(letterSpacing.value)
         }
-        TextUnitType.Unspecified -> {
+        else -> {
             null
         }
     }
@@ -417,7 +417,7 @@ internal fun Spannable.setFontSize(fontSize: TextUnit, density: Density, start: 
         TextUnitType.Em -> {
             setSpan(RelativeSizeSpan(fontSize.value), start, end)
         }
-        TextUnitType.Unspecified -> {
+        else -> {
         } // Do nothing
     }
 }

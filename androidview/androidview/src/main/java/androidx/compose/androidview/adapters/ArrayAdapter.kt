@@ -144,7 +144,7 @@ class ArrayAdapter<T> : BaseAdapter(), Filterable {
                 results.values = list
                 results.count = list.size
             } else {
-                val prefixString = prefix.toString().toLowerCase()
+                val prefixString = prefix.toString().lowercase()
 
                 val values = synchronized(lock) { ArrayList<T>(originalValues!!) }
 
@@ -153,7 +153,7 @@ class ArrayAdapter<T> : BaseAdapter(), Filterable {
 
                 for (i in 0 until count) {
                     val value = values[i]
-                    val valueText = value.toString().toLowerCase()
+                    val valueText = value.toString().lowercase()
 
                     // First match against the whole, non-splitted value
                     if (valueText.startsWith(prefixString)) {

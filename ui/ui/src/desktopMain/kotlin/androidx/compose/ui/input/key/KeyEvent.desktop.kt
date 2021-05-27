@@ -47,7 +47,7 @@ actual val KeyEvent.key: Key
  * second from the low-surrogates range (\uDC00-\uDFFF).
  */
 actual val KeyEvent.utf16CodePoint: Int
-    get() = nativeKeyEvent.keyChar.toInt()
+    get() = nativeKeyEvent.keyChar.code
 
 /**
  * The [type][KeyEventType] of key event.

@@ -40,8 +40,10 @@ import androidx.compose.ui.layout.VerticalAlignmentLine
 import androidx.compose.ui.layout.findRoot
 import androidx.compose.ui.layout.positionInRoot
 import androidx.compose.ui.unit.Constraints
+import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.IntSize
+import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.minus
 import androidx.compose.ui.unit.plus
 
@@ -68,6 +70,8 @@ internal abstract class LayoutNodeWrapper(
 
     protected var layerBlock: (GraphicsLayerScope.() -> Unit)? = null
         private set
+    private var layerDensity: Density = layoutNode.density
+    private var layerLayoutDirection: LayoutDirection = layoutNode.layoutDirection
 
     private var _isAttached = false
     final override val isAttached: Boolean
@@ -88,8 +92,39 @@ internal abstract class LayoutNodeWrapper(
                 if (old == null || value.width != old.width || value.height != old.height) {
                     onMeasureResultChanged(value.width, value.height)
                 }
+                // We do not simply compare against old.alignmentLines in case this is a
+                // MutableStateMap and the same instance might be passed.
+                if ((!oldAlignmentLines.isNullOrEmpty() || value.alignmentLines.isNotEmpty()) &&
+                    value.alignmentLines != oldAlignmentLines
+                ) {
+                    if (wrapped?.layoutNode == layoutNode) {
+                        layoutNode.parent?.onAlignmentsChanged()
+                        // We might need to request remeasure or relayout for the parent in
+                        // case they ask for the lines so we are the query owner, without
+                        // marking dirty our alignment lines (because only the modifier's changed).
+                        if (layoutNode.alignmentLines.usedDuringParentMeasurement) {
+                            layoutNode.parent?.requestRemeasure()
+                        } else if (layoutNode.alignmentLines.usedDuringParentLayout) {
+                            layoutNode.parent?.requestRelayout()
+                        }
+                    } else {
+                        // It means we are an InnerPlaceable.
+                        layoutNode.onAlignmentsChanged()
+                    }
+                    layoutNode.alignmentLines.dirty = true
+
+                    val oldLines = oldAlignmentLines
+                        ?: (mutableMapOf<AlignmentLine, Int>().also { oldAlignmentLines = it })
+                    oldLines.clear()
+                    oldLines.putAll(value.alignmentLines)
+                }
             }
         }
+
+    private var oldAlignmentLines: MutableMap<AlignmentLine, Int>? = null
+
+    override val providedAlignmentLines: Set<AlignmentLine>
+        get() = _measureResult?.alignmentLines?.keys ?: emptySet()
 
     /**
      * Called when the width or height of [measureResult] change. The object instance pointed to
@@ -190,6 +225,11 @@ internal abstract class LayoutNodeWrapper(
             } else {
                 wrappedBy?.invalidateLayer()
             }
+            if (wrapped?.layoutNode != layoutNode) {
+                layoutNode.onAlignmentsChanged()
+            } else {
+                layoutNode.parent?.onAlignmentsChanged()
+            }
             layoutNode.owner?.onLayoutChange(layoutNode)
         }
         this.zIndex = zIndex
@@ -229,8 +269,11 @@ internal abstract class LayoutNodeWrapper(
     }
 
     fun onLayerBlockUpdated(layerBlock: (GraphicsLayerScope.() -> Unit)?) {
-        val blockHasBeenChanged = this.layerBlock !== layerBlock
+        val layerInvalidated = this.layerBlock !== layerBlock || layerDensity != layoutNode
+            .density || layerLayoutDirection != layoutNode.layoutDirection
         this.layerBlock = layerBlock
+        this.layerDensity = layoutNode.density
+        this.layerLayoutDirection = layoutNode.layoutDirection
         if (isAttached && layerBlock != null) {
             if (layer == null) {
                 layer = layoutNode.requireOwner().createLayer(
@@ -243,7 +286,7 @@ internal abstract class LayoutNodeWrapper(
                 updateLayerParameters()
                 layoutNode.innerLayerWrapperIsDirty = true
                 invalidateParentLayer()
-            } else if (blockHasBeenChanged) {
+            } else if (layerInvalidated) {
                 updateLayerParameters()
             }
         } else {
@@ -256,6 +299,7 @@ internal abstract class LayoutNodeWrapper(
                 }
             }
             layer = null
+            lastLayerDrawingWasSkipped = false
         }
     }
 
@@ -282,7 +326,8 @@ internal abstract class LayoutNodeWrapper(
                 transformOrigin = graphicsLayerScope.transformOrigin,
                 shape = graphicsLayerScope.shape,
                 clip = graphicsLayerScope.clip,
-                layoutDirection = layoutNode.layoutDirection
+                layoutDirection = layoutNode.layoutDirection,
+                density = layoutNode.density
             )
             isClipping = graphicsLayerScope.clip
         } else {

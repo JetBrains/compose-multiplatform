@@ -136,13 +136,13 @@ Fix for src/androidx/compose/ui/foo/TestModifier.kt line 8: Change return type t
                 """
 src/androidx/compose/ui/foo/TestModifier.kt:8: Warning: Modifier factory functions should have a return type of Modifier [ModifierFactoryReturnType]
                 val Modifier.fooModifier get(): Modifier.Element {
-                                         ~~~
+                             ~~~~~~~~~~~
 src/androidx/compose/ui/foo/TestModifier.kt:12: Warning: Modifier factory functions should have a return type of Modifier [ModifierFactoryReturnType]
                 val Modifier.fooModifier2: Modifier.Element get() {
-                                                            ~~~
+                             ~~~~~~~~~~~~
 src/androidx/compose/ui/foo/TestModifier.kt:16: Warning: Modifier factory functions should have a return type of Modifier [ModifierFactoryReturnType]
                 val Modifier.fooModifier3: Modifier.Element get() = this.then(TestModifier)
-                                                            ~~~
+                             ~~~~~~~~~~~~
 0 errors, 3 warnings
             """
             )
@@ -223,10 +223,10 @@ Fix for src/androidx/compose/ui/foo/TestModifier.kt line 8: Add explicit Modifie
                 """
 src/androidx/compose/ui/foo/TestModifier.kt:8: Warning: Modifier factory functions should have a return type of Modifier [ModifierFactoryReturnType]
                 val Modifier.fooModifier get() = TestModifier
-                                         ~~~
+                             ~~~~~~~~~~~
 src/androidx/compose/ui/foo/TestModifier.kt:8: Error: Modifier factory functions must use the receiver Modifier instance [ModifierFactoryUnreferencedReceiver]
                 val Modifier.fooModifier get() = TestModifier
-                                         ~~~
+                             ~~~~~~~~~~~
 1 errors, 1 warnings
             """
             )
@@ -388,13 +388,13 @@ src/androidx/compose/ui/foo/TestModifier.kt:8: Warning: Modifier factory functio
                     ~~~~~~~~~~~
 src/androidx/compose/ui/foo/TestModifier.kt:12: Warning: Modifier factory functions should be extensions on Modifier [ModifierFactoryExtensionFunction]
                 val fooModifier get(): Modifier {
-                                ~~~
+                    ~~~~~~~~~~~
 src/androidx/compose/ui/foo/TestModifier.kt:16: Warning: Modifier factory functions should be extensions on Modifier [ModifierFactoryExtensionFunction]
                 val fooModifier2: Modifier get() {
-                                           ~~~
+                    ~~~~~~~~~~~~
 src/androidx/compose/ui/foo/TestModifier.kt:20: Warning: Modifier factory functions should be extensions on Modifier [ModifierFactoryExtensionFunction]
                 val fooModifier3: Modifier get() = TestModifier
-                                           ~~~
+                    ~~~~~~~~~~~~
 0 errors, 4 warnings
             """
             )
@@ -456,13 +456,13 @@ src/androidx/compose/ui/foo/TestModifier.kt:8: Warning: Modifier factory functio
                                  ~~~~~~~~~~~
 src/androidx/compose/ui/foo/TestModifier.kt:12: Warning: Modifier factory functions should be extensions on Modifier [ModifierFactoryExtensionFunction]
                 val TestModifier.fooModifier get(): Modifier {
-                                             ~~~
+                                 ~~~~~~~~~~~
 src/androidx/compose/ui/foo/TestModifier.kt:16: Warning: Modifier factory functions should be extensions on Modifier [ModifierFactoryExtensionFunction]
                 val TestModifier.fooModifier2: Modifier get() {
-                                                        ~~~
+                                 ~~~~~~~~~~~~
 src/androidx/compose/ui/foo/TestModifier.kt:20: Warning: Modifier factory functions should be extensions on Modifier [ModifierFactoryExtensionFunction]
                 val TestModifier.fooModifier3: Modifier get() = this.then(TestModifier)
-                                                        ~~~
+                                 ~~~~~~~~~~~~
 0 errors, 4 warnings
             """
             )
@@ -538,10 +538,10 @@ src/androidx/compose/ui/foo/TestModifier.kt:19: Warning: Modifier factory functi
                              ~~~~~~~~~~~~
 src/androidx/compose/ui/foo/TestModifier.kt:23: Warning: Modifier factory functions should not be marked as @Composable, and should use composed instead [ComposableModifierFactory]
                 val Modifier.fooModifier3: Modifier get() {
-                                                    ~~~
+                             ~~~~~~~~~~~~
 src/androidx/compose/ui/foo/TestModifier.kt:29: Warning: Modifier factory functions should not be marked as @Composable, and should use composed instead [ComposableModifierFactory]
                 val Modifier.fooModifier4: Modifier get() =
-                                                    ~~~
+                             ~~~~~~~~~~~~
 0 errors, 4 warnings
             """
             )

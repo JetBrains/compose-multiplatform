@@ -19,6 +19,7 @@ package androidx.compose.foundation.text.selection
 import androidx.compose.foundation.text.InternalFoundationTextApi
 import androidx.compose.foundation.text.TextDragObserver
 import androidx.compose.foundation.text.TextFieldState
+import androidx.compose.foundation.text.UndoManager
 import androidx.compose.foundation.text.detectDragGesturesWithObserver
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -53,7 +54,9 @@ import kotlin.math.min
 /**
  * A bridge class between user interaction to the text field selection.
  */
-internal class TextFieldSelectionManager {
+internal class TextFieldSelectionManager(
+    val undoManager: UndoManager? = null
+) {
 
     /**
      * The current [OffsetMapping] for text field.
@@ -443,6 +446,7 @@ internal class TextFieldSelectionManager {
         )
         onValueChange(newValue)
         setSelectionStatus(false)
+        undoManager?.forceNextSnapshot()
     }
 
     /**
@@ -470,6 +474,7 @@ internal class TextFieldSelectionManager {
         )
         onValueChange(newValue)
         setSelectionStatus(false)
+        undoManager?.forceNextSnapshot()
     }
 
     /*@VisibleForTesting*/
@@ -481,6 +486,10 @@ internal class TextFieldSelectionManager {
             selection = TextRange(0, value.text.length)
         )
         onValueChange(newValue)
+        oldValue = oldValue.copy(selection = newValue.selection)
+        hideSelectionToolbar()
+        state?.showFloatingToolbar = true
+        showSelectionToolbar()
     }
 
     internal fun getHandlePosition(isStartHandle: Boolean): Offset {
@@ -521,7 +530,9 @@ internal class TextFieldSelectionManager {
             }
         } else null
 
-        val selectAll: (() -> Unit)? = if (value.selection.length != value.text.length) {
+        val selectAll: (() -> Unit)? = if (value.selection.length != value.text.length &&
+            oldValue.selection.length != oldValue.text.length
+        ) {
             {
                 selectAll()
             }
@@ -677,7 +688,7 @@ internal fun TextFieldSelectionHandle(
         modifier = Modifier.pointerInput(observer) {
             detectDragGesturesWithObserver(observer)
         },
-        handle = null
+        content = null
     )
 }
 

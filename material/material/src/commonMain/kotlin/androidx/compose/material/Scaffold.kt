@@ -69,19 +69,28 @@ fun rememberScaffoldState(
 /**
  * The possible positions for a [FloatingActionButton] attached to a [Scaffold].
  */
-enum class FabPosition {
-    /**
-     * Position FAB at the bottom of the screen in the center, above the [BottomAppBar] (if it
-     * exists)
-     */
+@Suppress("INLINE_CLASS_DEPRECATED", "EXPERIMENTAL_FEATURE_WARNING")
+inline class FabPosition internal constructor(val value: Int) {
+    companion object {
+        /**
+         * Position FAB at the bottom of the screen in the center, above the [BottomAppBar] (if it
+         * exists)
+         */
+        val Center = FabPosition(0)
 
-    Center,
+        /**
+         * Position FAB at the bottom of the screen at the end, above the [BottomAppBar] (if it
+         * exists)
+         */
+        val End = FabPosition(1)
+    }
 
-    /**
-     * Position FAB at the bottom of the screen at the end, above the [BottomAppBar] (if it
-     * exists)
-     */
-    End
+    override fun toString(): String {
+        return when (this) {
+            Center -> "FabPosition.Center"
+            else -> "FabPosition.End"
+        }
+    }
 }
 
 /**

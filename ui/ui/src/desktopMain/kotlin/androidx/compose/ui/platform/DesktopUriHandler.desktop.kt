@@ -16,9 +16,11 @@
 
 package androidx.compose.ui.platform
 
-// TODO(demin): implement UriHandler
+import java.awt.Desktop
+import java.net.URI
+
 internal class DesktopUriHandler : UriHandler {
     override fun openUri(uri: String) {
-        println("UriHandler.openUri not implemented yet")
+        Desktop.getDesktop().browse(URI(uri))
     }
 }

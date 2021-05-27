@@ -16,7 +16,6 @@
 
 package androidx.compose.ui.graphics
 
-import org.jetbrains.skija.FilterQuality as SkijaFilterQuality
 import org.jetbrains.skija.PaintMode as SkijaPaintMode
 import org.jetbrains.skija.PaintStrokeCap as SkijaPaintStrokeCap
 import org.jetbrains.skija.PaintStrokeJoin as SkijaPaintStrokeJoin
@@ -27,10 +26,6 @@ actual fun Paint(): Paint = DesktopPaint()
 
 class DesktopPaint : Paint {
     internal val skija = org.jetbrains.skija.Paint()
-
-    constructor() {
-        filterQuality = FilterQuality.Medium
-    }
 
     override fun asFrameworkPaint(): NativePaint = skija
 
@@ -88,11 +83,7 @@ class DesktopPaint : Paint {
             field = value
         }
 
-    override var filterQuality: FilterQuality = FilterQuality.None
-        set(value) {
-            skija.filterQuality = value.toSkija()
-            field = value
-        }
+    override var filterQuality: FilterQuality = FilterQuality.Medium
 
     override var shader: Shader? = null
         set(value) {
@@ -115,25 +106,21 @@ class DesktopPaint : Paint {
     private fun PaintingStyle.toSkija() = when (this) {
         PaintingStyle.Fill -> SkijaPaintMode.FILL
         PaintingStyle.Stroke -> SkijaPaintMode.STROKE
+        else -> SkijaPaintMode.FILL
     }
 
     private fun StrokeCap.toSkija() = when (this) {
         StrokeCap.Butt -> SkijaPaintStrokeCap.BUTT
         StrokeCap.Round -> SkijaPaintStrokeCap.ROUND
         StrokeCap.Square -> SkijaPaintStrokeCap.SQUARE
+        else -> SkijaPaintStrokeCap.BUTT
     }
 
     private fun StrokeJoin.toSkija() = when (this) {
         StrokeJoin.Miter -> SkijaPaintStrokeJoin.MITER
         StrokeJoin.Round -> SkijaPaintStrokeJoin.ROUND
         StrokeJoin.Bevel -> SkijaPaintStrokeJoin.BEVEL
-    }
-
-    private fun FilterQuality.toSkija() = when (this) {
-        FilterQuality.None -> SkijaFilterQuality.NONE
-        FilterQuality.Low -> SkijaFilterQuality.LOW
-        FilterQuality.Medium -> SkijaFilterQuality.MEDIUM
-        FilterQuality.High -> SkijaFilterQuality.HIGH
+        else -> SkijaPaintStrokeJoin.MITER
     }
 }
 

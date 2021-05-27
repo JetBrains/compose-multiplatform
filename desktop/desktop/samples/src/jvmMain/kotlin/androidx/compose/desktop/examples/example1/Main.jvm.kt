@@ -87,6 +87,7 @@ import androidx.compose.ui.input.pointer.PointerEventPass
 import androidx.compose.ui.input.pointer.PointerInputFilter
 import androidx.compose.ui.input.pointer.PointerInputModifier
 import androidx.compose.ui.input.pointer.pointerMoveFilter
+import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.res.imageResource
 import androidx.compose.ui.res.svgResource
 import androidx.compose.ui.res.vectorXmlResource
@@ -120,6 +121,7 @@ fun main() {
 
 @Composable
 private fun App() {
+    val uriHandler = LocalUriHandler.current
     DesktopMaterialTheme {
         Scaffold(
             topBar = {
@@ -137,9 +139,9 @@ private fun App() {
             },
             floatingActionButton = {
                 ExtendedFloatingActionButton(
-                    text = { Text("BUTTON") },
+                    text = { Text("Open URL") },
                     onClick = {
-                        println("Floating button clicked")
+                        uriHandler.openUri("https://google.com")
                     }
                 )
             },
@@ -496,16 +498,16 @@ fun Animations(isCircularEnabled: Boolean) = Row {
 private fun RightColumn(modifier: Modifier) = Box {
     val state = rememberLazyListState()
     val itemCount = 100000
-    val itemHeight = 20.dp
 
     LazyColumn(modifier.graphicsLayer(alpha = 0.5f), state = state) {
         items((1..itemCount).toList()) { x ->
+            val itemHeight = 20.dp + 20.dp * Math.random().toFloat()
             Text(x.toString(), Modifier.graphicsLayer(alpha = 0.5f).height(itemHeight))
         }
     }
 
     VerticalScrollbar(
-        rememberScrollbarAdapter(state, itemCount, itemHeight),
+        rememberScrollbarAdapter(state),
         Modifier.align(Alignment.CenterEnd)
     )
 }

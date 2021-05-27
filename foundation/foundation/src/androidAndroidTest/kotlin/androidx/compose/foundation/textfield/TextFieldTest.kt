@@ -33,12 +33,13 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.requiredHeight
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.text.BasicText
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.foundation.text.computeSizeForDefaultText
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
-import androidx.compose.runtime.ExperimentalComposeApi
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -46,16 +47,20 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
+import androidx.compose.testutils.assertPixelColor
 import androidx.compose.testutils.assertShape
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.focus.isFocused
 import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.graphics.Shadow
 import androidx.compose.ui.graphics.SolidColor
+import androidx.compose.ui.graphics.toPixelMap
 import androidx.compose.ui.layout.onGloballyPositioned
+import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.platform.LocalFontLoader
 import androidx.compose.ui.platform.LocalTextInputService
 import androidx.compose.ui.platform.LocalTextToolbar
 import androidx.compose.ui.platform.TextToolbar
@@ -86,6 +91,7 @@ import androidx.compose.ui.test.performTextClearance
 import androidx.compose.ui.test.performTextInput
 import androidx.compose.ui.test.performTextInputSelection
 import androidx.compose.ui.text.AnnotatedString
+import androidx.compose.ui.text.ExperimentalTextApi
 import androidx.compose.ui.text.ParagraphStyle
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.TextLayoutResult
@@ -93,9 +99,12 @@ import androidx.compose.ui.text.TextRange
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.VerbatimTtsAnnotation
 import androidx.compose.ui.text.buildAnnotatedString
+import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontSynthesis
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.font.test.R
+import androidx.compose.ui.text.font.toFontFamily
 import androidx.compose.ui.text.input.CommitTextCommand
 import androidx.compose.ui.text.input.EditCommand
 import androidx.compose.ui.text.input.ImeAction
@@ -114,6 +123,7 @@ import androidx.compose.ui.text.style.TextGeometricTransform
 import androidx.compose.ui.text.style.TextIndent
 import androidx.compose.ui.text.withAnnotation
 import androidx.compose.ui.text.withStyle
+import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.em
 import androidx.compose.ui.unit.sp
@@ -145,6 +155,16 @@ class TextFieldTest {
     val rule = createComposeRule()
 
     private val Tag = "textField"
+
+    // This sample font provides the following features:
+    // 1. The width of most of visible characters equals to font size.
+    // 2. The LTR/RTL characters are rendered as ▶/◀.
+    // 3. The fontMetrics passed to TextPaint has descend - ascend equal to 1.2 * fontSize.
+    private val measureFontFamily = Font(
+        resId = R.font.sample_font,
+        weight = FontWeight.Normal,
+        style = FontStyle.Normal
+    ).toFontFamily()
 
     @Test
     fun textField_focusInSemantics() {
@@ -418,7 +438,7 @@ class TextFieldTest {
         }
     }
 
-    @OptIn(ExperimentalComposeApi::class)
+    @OptIn(ExperimentalTextApi::class)
     @Test
     fun textFieldValue_saverRestoresState_withAnnotatedString() {
         var state: MutableState<TextFieldValue>? = null
@@ -526,7 +546,7 @@ class TextFieldTest {
 
         rule.onNodeWithTag(Tag)
             .assertEditableTextEquals("")
-            .assertTextEquals("label")
+            .assertTextEquals("label", includeEditableText = false)
             .assertHasClickAction()
             .assert(hasSetTextAction())
             .assert(hasImeAction(ImeAction.Default))
@@ -910,6 +930,103 @@ class TextFieldTest {
             assertWithMessage("$lastSeenTextFieldValue").that(onValueChangeCalled).isTrue()
         }
     }
+
+    @Test
+    @SdkSuppress(minSdkVersion = Build.VERSION_CODES.O)
+    fun textField_textAlignCenter_defaultWidth() {
+        val fontSize = 50
+        val density = Density(1f, 1f)
+        val textStyle = TextStyle(
+            textAlign = TextAlign.Center,
+            color = Color.Black,
+            fontFamily = measureFontFamily,
+            fontSize = fontSize.sp
+        )
+        rule.setContent {
+            CompositionLocalProvider(LocalDensity provides density) {
+                BasicTextField(
+                    modifier = Modifier.testTag(Tag),
+                    value = "H",
+                    onValueChange = { },
+                    textStyle = textStyle,
+                    singleLine = true
+                )
+            }
+        }
+
+        rule.waitForIdle()
+        rule.onNodeWithTag(Tag).captureToImage().assertCentered(fontSize)
+    }
+
+    @Test
+    @SdkSuppress(minSdkVersion = Build.VERSION_CODES.O)
+    fun textField_textAlignCenter_widthSmallerThanDefaultWidth() {
+        val fontSize = 50
+        val density = Density(1f, 1f)
+        val textStyle = TextStyle(
+            textAlign = TextAlign.Center,
+            color = Color.Black,
+            fontFamily = measureFontFamily,
+            fontSize = fontSize.sp
+        )
+        rule.setContent {
+            val resourceLoader = LocalFontLoader.current
+            val defaultWidth = computeSizeForDefaultText(
+                style = textStyle,
+                density = density,
+                resourceLoader = resourceLoader,
+                maxLines = 1
+            ).width
+
+            CompositionLocalProvider(LocalDensity provides density) {
+                BasicTextField(
+                    modifier = Modifier.testTag(Tag).width(defaultWidth.dp / 2),
+                    value = "H",
+                    onValueChange = { },
+                    textStyle = textStyle,
+                    singleLine = true
+                )
+            }
+        }
+
+        rule.waitForIdle()
+        rule.onNodeWithTag(Tag).captureToImage().assertCentered(fontSize)
+    }
+
+    @Test
+    @SdkSuppress(minSdkVersion = Build.VERSION_CODES.O)
+    fun textField_textAlignCenter_widthLargerThanDefaultWidth() {
+        val fontSize = 50
+        val density = Density(1f, 1f)
+        val textStyle = TextStyle(
+            textAlign = TextAlign.Center,
+            color = Color.Black,
+            fontFamily = measureFontFamily,
+            fontSize = fontSize.sp
+        )
+        rule.setContent {
+            val resourceLoader = LocalFontLoader.current
+            val defaultWidth = computeSizeForDefaultText(
+                style = textStyle,
+                density = density,
+                resourceLoader = resourceLoader,
+                maxLines = 1
+            ).width
+
+            CompositionLocalProvider(LocalDensity provides density) {
+                BasicTextField(
+                    modifier = Modifier.testTag(Tag).width(defaultWidth.dp * 2),
+                    value = "H",
+                    onValueChange = { },
+                    textStyle = textStyle,
+                    singleLine = true
+                )
+            }
+        }
+
+        rule.waitForIdle()
+        rule.onNodeWithTag(Tag).captureToImage().assertCentered(fontSize)
+    }
 }
 
 private fun SemanticsNodeInteraction.assertEditableTextEquals(
@@ -920,3 +1037,13 @@ private fun SemanticsNodeInteraction.assertEditableTextEquals(
             it.config.getOrNull(SemanticsProperties.EditableText)?.text.equals(value)
         }
     )
+
+private fun ImageBitmap.assertCentered(excludedWidth: Int) {
+    val pixel = toPixelMap()
+    for (y in 0 until height) {
+        for (x in 0 until (width - excludedWidth) / 2) {
+            val leftPixel = pixel[x, y]
+            pixel.assertPixelColor(leftPixel, width - 1 - x, y)
+        }
+    }
+}

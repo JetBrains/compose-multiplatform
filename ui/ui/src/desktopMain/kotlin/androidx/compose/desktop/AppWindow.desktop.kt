@@ -22,11 +22,13 @@ import androidx.compose.runtime.compositionLocalOf
 import androidx.compose.ui.platform.Keyboard
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.IntSize
-import androidx.compose.ui.window.MenuBar
+import androidx.compose.ui.window.v1.MenuBar
 import java.awt.Container
 import java.awt.Frame
 import java.awt.event.ComponentAdapter
 import java.awt.event.ComponentEvent
+import java.awt.event.MouseListener
+import java.awt.event.MouseMotionListener
 import java.awt.event.WindowAdapter
 import java.awt.event.WindowEvent
 import java.awt.image.BufferedImage
@@ -479,6 +481,40 @@ class AppWindow : AppFrame {
         }
         resizable = _resizable
         disconnectPair()
+    }
+
+    /**
+     * Adds the specified mouse listener to receive mouse events from layer component.
+     * @param listener the mouse listener.
+     */
+    override fun addMouseListener(listener: MouseListener) {
+        window.layer.component.addMouseListener(listener)
+    }
+
+    /**
+     * Removes the specified mouse listener so that it no longer receives mouse events
+     * from layer component.
+     * @param listener the mouse listener.
+     */
+    override fun removeMouseListener(listener: MouseListener) {
+        window.layer.component.removeMouseListener(listener)
+    }
+
+    /**
+     * Adds the specified mouse motion listener to receive mouse events from layer component.
+     * @param listener the mouse listener.
+     */
+    override fun addMouseMotionListener(listener: MouseMotionListener) {
+        window.layer.component.addMouseMotionListener(listener)
+    }
+
+    /**
+     * Removes the specified mouse motion listener so that it no longer receives mouse events
+     * from layer component.
+     * @param listener the mouse listener.
+     */
+    override fun removeMouseMotionListener(listener: MouseMotionListener) {
+        window.layer.component.removeMouseMotionListener(listener)
     }
 
     /**

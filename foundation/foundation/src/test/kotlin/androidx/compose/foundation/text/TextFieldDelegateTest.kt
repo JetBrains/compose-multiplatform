@@ -49,7 +49,6 @@ import com.nhaarman.mockitokotlin2.never
 import com.nhaarman.mockitokotlin2.times
 import com.nhaarman.mockitokotlin2.verify
 import com.nhaarman.mockitokotlin2.whenever
-import org.junit.Assert.assertEquals
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -295,7 +294,7 @@ class TextFieldDelegateTest {
         val visualText = transformedText.text
         val offsetMapping = transformedText.offsetMapping
 
-        assertEquals("Hello, World", visualText.text)
+        assertThat(visualText.text).isEqualTo("Hello, World")
         for (i in 0..visualText.text.length) {
             // Identity mapping returns if no visual filter is provided.
             assertThat(offsetMapping.originalToTransformed(i)).isEqualTo(i)

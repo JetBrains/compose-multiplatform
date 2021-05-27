@@ -130,6 +130,34 @@ class IdentityArraySetTest {
         assertEquals(0, verifierSet.size)
     }
 
+    @Test
+    fun canUseAsSetOfT() {
+        val stuff = Array(100) { Stuff(it) }
+        for (i in 0 until 100 step 2) {
+            set.add(stuff[i])
+        }
+        val setOfT: Set<Stuff> = set
+        for (i in 0 until 100) {
+            val expected = i % 2 == 0
+            if (expected) {
+                assertTrue(stuff[i] in set)
+                assertTrue(stuff[i] in setOfT)
+            } else {
+                assertFalse(stuff[i] in set)
+                assertFalse(stuff[i] in setOfT)
+            }
+        }
+        for (element in setOfT) {
+            assertTrue(element.item % 2 == 0)
+            assertEquals(element, stuff[element.item])
+        }
+
+        set.add(stuff[1])
+        assertTrue(stuff[1] in setOfT)
+
+        assertTrue(setOfT.containsAll(listOf(stuff[0], stuff[1], stuff[2])))
+    }
+
     private fun testRemoveValueAtIndex(index: Int) {
         val value = set[index]
         val initialSize = set.size

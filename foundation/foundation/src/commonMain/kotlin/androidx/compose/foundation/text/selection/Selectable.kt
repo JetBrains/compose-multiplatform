@@ -60,6 +60,15 @@ internal interface Selectable {
     ): Selection?
 
     /**
+     * Returns selectAll [Selection] information for a selectable composable. If no selection can be
+     * provided null should be returned.
+     *
+     * @return selectAll [Selection] information for a selectable composable. If no selection can be
+     * provided null should be returned.
+     */
+    fun getSelectAllSelection(): Selection?
+
+    /**
      * Return the [Offset] of a [SelectionHandle].
      *
      * @param selection [Selection] contains the [SelectionHandle]

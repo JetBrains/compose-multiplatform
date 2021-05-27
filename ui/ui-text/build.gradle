@@ -47,7 +47,7 @@ if(!AndroidXUiPlugin.isMultiplatformEnabled(project)) {
         implementation(project(":compose:ui:ui-util"))
         implementation(KOTLIN_STDLIB)
         implementation("androidx.collection:collection:1.1.0")
-        implementation("androidx.core:core:1.5.0-beta01")
+        implementation("androidx.core:core:1.5.0-rc02")
 
         testImplementation(project(":compose:ui:ui-test-font"))
         testImplementation(ANDROIDX_TEST_RULES)
@@ -110,11 +110,12 @@ if(AndroidXUiPlugin.isMultiplatformEnabled(project)) {
             }
 
             desktopMain.dependsOn(jvmMain)
+            androidMain.dependsOn(jvmMain)
 
             androidMain.dependencies {
                 api("androidx.annotation:annotation:1.1.0")
                 implementation("androidx.collection:collection:1.1.0")
-                implementation("androidx.core:core:1.5.0-beta01")
+                implementation("androidx.core:core:1.5.0-rc02")
             }
 
             androidMain.kotlin.srcDirs("../../../text/text/src/main/java")
@@ -173,8 +174,4 @@ tasks.withType(KotlinCompile).configureEach {
     kotlinOptions {
         freeCompilerArgs += ["-XXLanguage:+InlineClasses"]
     }
-}
-
-android.buildTypes.all {
-    testCoverageEnabled = false
 }

@@ -30,7 +30,7 @@ plugins {
 dependencies {
     implementation(gradleApi())
 
-    implementation(AGP_STABLE)
+    implementation(AGP_LATEST)
     implementation(GUAVA)
     implementation(KOTLIN_GRADLE_PLUGIN)
     implementation(KOTLIN_STDLIB)

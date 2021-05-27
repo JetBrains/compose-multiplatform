@@ -17,7 +17,9 @@ package androidx.compose.desktop
 
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.IntSize
-import androidx.compose.ui.window.MenuBar
+import androidx.compose.ui.window.v1.MenuBar
+import java.awt.event.MouseListener
+import java.awt.event.MouseMotionListener
 import java.awt.image.BufferedImage
 import javax.swing.JFrame
 
@@ -189,6 +191,32 @@ abstract class AppFrame {
      * @param height the new height of the window.
      */
     abstract fun setSize(width: Int, height: Int)
+
+    /**
+     * Adds the specified mouse listener to receive mouse events from layer component.
+     * @param listener the mouse listener.
+     */
+    abstract fun addMouseListener(listener: MouseListener)
+
+    /**
+     * Removes the specified mouse listener so that it no longer receives mouse events
+     * from layer component.
+     * @param listener the mouse listener.
+     */
+    abstract fun removeMouseListener(listener: MouseListener)
+
+    /**
+     * Adds the specified mouse motion listener to receive mouse events from layer component.
+     * @param listener the mouse listener.
+     */
+    abstract fun addMouseMotionListener(listener: MouseMotionListener)
+
+    /**
+     * Removes the specified mouse motion listener so that it no longer receives mouse events
+     * from layer component.
+     * @param listener the mouse listener.
+     */
+    abstract fun removeMouseMotionListener(listener: MouseMotionListener)
 
     // TODO(demin): uncomment this after b/175234629 will be fixed
 //    /**

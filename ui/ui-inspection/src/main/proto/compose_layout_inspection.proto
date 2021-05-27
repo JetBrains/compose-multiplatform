@@ -65,6 +65,8 @@ message ComposableRoot {
     int64 view_id = 1;
     // All composables owned by this view (usually just one but could be more)
     repeated ComposableNode nodes = 2;
+    // All views owned by this view that should be hidden
+    repeated int64 views_to_skip = 3;
 }
 
 message ComposableNode {

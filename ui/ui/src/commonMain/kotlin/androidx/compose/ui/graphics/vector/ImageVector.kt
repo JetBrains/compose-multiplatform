@@ -688,7 +688,7 @@ inline fun ImageVector.Builder.group(
     clearGroup()
 }
 
-@Suppress("EXPERIMENTAL_FEATURE_WARNING")
+@Suppress("INLINE_CLASS_DEPRECATED", "EXPERIMENTAL_FEATURE_WARNING")
 private inline class Stack<T>(private val backing: ArrayList<T> = ArrayList<T>()) {
     val size: Int get() = backing.size
 

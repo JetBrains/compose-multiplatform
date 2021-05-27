@@ -16,28 +16,38 @@
 
 package androidx.compose.ui.graphics
 
-expect enum class NativeVertexMode
+import androidx.compose.runtime.Immutable
 
 /**
  * Defines how a list of points is interpreted when drawing a set of triangles.
  *
  * Used by [Canvas.drawVertices].
  */
-enum class VertexMode {
-    /**
-     * Draw each sequence of three points as the vertices of a triangle.
-     */
-    Triangles,
+@Suppress("INLINE_CLASS_DEPRECATED", "EXPERIMENTAL_FEATURE_WARNING")
+@Immutable
+inline class VertexMode internal constructor(val value: Int) {
 
-    /**
-     *  Draw each sliding window of three points as the vertices of a triangle.
-     */
-    TriangleStrip,
+    companion object {
+        /**
+         * Draw each sequence of three points as the vertices of a triangle.
+         */
+        val Triangles = VertexMode(0)
 
-    /**
-     * Draw the first point and each sliding window of two points as the vertices of a triangle.
-     */
-    TriangleFan;
+        /**
+         *  Draw each sliding window of three points as the vertices of a triangle.
+         */
+        val TriangleStrip = VertexMode(1)
+
+        /**
+         * Draw the first point and each sliding window of two points as the vertices of a triangle.
+         */
+        val TriangleFan = VertexMode(2)
+    }
+
+    override fun toString() = when (this) {
+        Triangles -> "Triangles"
+        TriangleStrip -> "TriangleStrip"
+        TriangleFan -> "TriangleFan"
+        else -> "Unknown"
+    }
 }
-
-expect fun VertexMode.toNativeVertexMode(): NativeVertexMode

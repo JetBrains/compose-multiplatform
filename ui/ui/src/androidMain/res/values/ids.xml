@@ -51,4 +51,6 @@
     <item name="wrapped_composition_tag" type="id" />
     <item name="inspection_slot_table_set" type="id" />
     <item name="androidx_compose_ui_view_composition_context" type="id" />
+    <item name="compose_view_saveable_id_tag" type="id" />
+    <item name="hide_in_inspector_tag" type="id" />
 </resources>

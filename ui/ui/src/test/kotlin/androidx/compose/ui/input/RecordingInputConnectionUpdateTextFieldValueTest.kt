@@ -19,11 +19,12 @@ package androidx.compose.ui.input
 import android.view.View
 import android.view.inputmethod.ExtractedText
 import android.view.inputmethod.InputConnection
-import android.view.inputmethod.InputMethodManager
 import androidx.compose.ui.text.TextRange
 import androidx.compose.ui.text.input.InputEventCallback2
+import androidx.compose.ui.text.input.InputMethodManager
 import androidx.compose.ui.text.input.RecordingInputConnection
 import androidx.compose.ui.text.input.TextFieldValue
+import com.google.common.truth.Truth.assertThat
 import com.nhaarman.mockitokotlin2.any
 import com.nhaarman.mockitokotlin2.argumentCaptor
 import com.nhaarman.mockitokotlin2.eq
@@ -31,7 +32,6 @@ import com.nhaarman.mockitokotlin2.mock
 import com.nhaarman.mockitokotlin2.never
 import com.nhaarman.mockitokotlin2.times
 import com.nhaarman.mockitokotlin2.verify
-import org.junit.Assert.assertEquals
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -67,6 +67,22 @@ class RecordingInputConnectionUpdateTextFieldValueTest {
     }
 
     @Test
+    fun test_update_input_state_inactive() {
+        val imm: InputMethodManager = mock()
+        val view: View = mock()
+
+        val previousTextFieldValue = ic.mTextFieldValue
+        ic.closeConnection()
+
+        val inputState = TextFieldValue(text = "Hello, World.", selection = TextRange.Zero)
+        ic.updateInputState(inputState, imm, view)
+
+        assertThat(ic.mTextFieldValue).isEqualTo(previousTextFieldValue)
+        verify(imm, never()).updateSelection(any(), any(), any(), any(), any())
+        verify(imm, never()).updateExtractedText(any(), any(), any())
+    }
+
+    @Test
     fun test_update_input_state_extracted_text_monitor() {
         val imm: InputMethodManager = mock()
         val view: View = mock()
@@ -83,10 +99,10 @@ class RecordingInputConnectionUpdateTextFieldValueTest {
 
         verify(imm, times(1)).updateExtractedText(any(), any(), captor.capture())
 
-        assertEquals(1, captor.allValues.size)
-        assertEquals("Hello, World.", captor.firstValue.text)
-        assertEquals(-1, captor.firstValue.partialStartOffset)
-        assertEquals(0, captor.firstValue.selectionStart)
-        assertEquals(0, captor.firstValue.selectionEnd)
+        assertThat(captor.allValues.size).isEqualTo(1)
+        assertThat(captor.firstValue.text).isEqualTo("Hello, World.")
+        assertThat(captor.firstValue.partialStartOffset).isEqualTo(-1)
+        assertThat(captor.firstValue.selectionStart).isEqualTo(0)
+        assertThat(captor.firstValue.selectionEnd).isEqualTo(0)
     }
 }

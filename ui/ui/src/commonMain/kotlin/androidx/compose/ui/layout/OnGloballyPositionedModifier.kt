@@ -16,7 +16,11 @@
 
 package androidx.compose.ui.layout
 
+import androidx.compose.runtime.Stable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.InspectorInfo
+import androidx.compose.ui.platform.InspectorValueInfo
+import androidx.compose.ui.platform.debugInspectorInfo
 
 /**
  * Invoke [onGloballyPositioned] with the [LayoutCoordinates] of the element when the
@@ -26,14 +30,38 @@ import androidx.compose.ui.Modifier
  * Usage example:
  * @sample androidx.compose.ui.samples.OnGloballyPositioned
  */
-@Suppress("ModifierInspectorInfo") // cannot access crossinline parameter
-inline fun Modifier.onGloballyPositioned(
-    crossinline onGloballyPositioned: (LayoutCoordinates) -> Unit
-) = this.then(object : OnGloballyPositionedModifier {
+@Stable
+fun Modifier.onGloballyPositioned(
+    onGloballyPositioned: (LayoutCoordinates) -> Unit
+) = this.then(
+    OnGloballyPositionedModifierImpl(
+        callback = onGloballyPositioned,
+        inspectorInfo = debugInspectorInfo {
+            name = "onGloballyPositioned"
+            properties["onGloballyPositioned"] = onGloballyPositioned
+        }
+    )
+)
+
+private class OnGloballyPositionedModifierImpl(
+    val callback: (LayoutCoordinates) -> Unit,
+    inspectorInfo: InspectorInfo.() -> Unit
+) : OnGloballyPositionedModifier, InspectorValueInfo(inspectorInfo) {
     override fun onGloballyPositioned(coordinates: LayoutCoordinates) {
-        onGloballyPositioned(coordinates)
+        callback(coordinates)
     }
-})
+
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (other !is OnGloballyPositionedModifierImpl) return false
+
+        return callback == other.callback
+    }
+
+    override fun hashCode(): Int {
+        return callback.hashCode()
+    }
+}
 
 /**
  * A modifier whose [onGloballyPositioned] is called with the final LayoutCoordinates of the

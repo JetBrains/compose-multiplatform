@@ -57,8 +57,6 @@ import androidx.compose.ui.graphics.TransformOrigin
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.input.pointer.PointerInputScope
 import androidx.compose.ui.input.pointer.PointerType
-import androidx.compose.ui.input.pointer.consumeAllChanges
-import androidx.compose.ui.input.pointer.consumePositionChange
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.unit.IntOffset
@@ -228,13 +226,12 @@ fun TouchSlopDragGestures() {
                     .requiredSize(50.dp)
                     .background(Color.Blue)
                     .pointerInput(Unit) {
-                        detectHorizontalDragGestures { change, dragDistance ->
+                        detectHorizontalDragGestures { _, dragDistance ->
                             val offsetPx = offset.toPx()
                             val newOffset =
                                 (offsetPx + dragDistance).coerceIn(0f, width - 50.dp.toPx())
                             val consumed = newOffset - offsetPx
                             if (consumed != 0f) {
-                                change.consumePositionChange()
                                 offset = newOffset.toDp()
                             }
                         }
@@ -256,13 +253,12 @@ fun TouchSlopDragGestures() {
                         .requiredSize(50.dp)
                         .background(Color.Red)
                         .pointerInput(Unit) {
-                            detectVerticalDragGestures { change, dragDistance ->
+                            detectVerticalDragGestures { _, dragDistance ->
                                 val offsetPx = offset.toPx()
                                 val newOffset = (offsetPx + dragDistance)
                                     .coerceIn(0f, height - 50.dp.toPx())
                                 val consumed = newOffset - offsetPx
                                 if (consumed != 0f) {
-                                    change.consumePositionChange()
                                     offset = newOffset.toDp()
                                 }
                             }
@@ -296,8 +292,7 @@ fun OrientationLockDragGestures() {
         Modifier.onSizeChanged {
             size = it
         }.pointerInput(Unit) {
-            detectVerticalDragGestures { change, dragAmount ->
-                change.consumePositionChange()
+            detectVerticalDragGestures { _, dragAmount ->
                 offsetY = (offsetY.toPx() + dragAmount)
                     .coerceIn(0f, size.height.toFloat() - 50.dp.toPx()).toDp()
             }
@@ -310,8 +305,7 @@ fun OrientationLockDragGestures() {
                 .requiredWidth(50.dp)
                 .fillMaxHeight()
                 .pointerInput(Unit) {
-                    detectHorizontalDragGestures { change, dragAmount ->
-                        change.consumePositionChange()
+                    detectHorizontalDragGestures { _, dragAmount ->
                         offsetX = (offsetX.toPx() + dragAmount)
                             .coerceIn(0f, size.width.toFloat() - 50.dp.toPx()).toDp()
                     }
@@ -346,8 +340,7 @@ fun Drag2DGestures() {
                 .background(Color.Blue)
                 .requiredSize(50.dp)
                 .pointerInput(Unit) {
-                    detectDragGestures { change, dragAmount ->
-                        change.consumeAllChanges()
+                    detectDragGestures { _, dragAmount ->
                         offsetX.value = (offsetX.value + dragAmount.x)
                             .coerceIn(0f, size.width.toFloat() - 50.dp.toPx())
 

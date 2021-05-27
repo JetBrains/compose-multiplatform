@@ -1892,9 +1892,9 @@ class AndroidAccessibilityTest {
 
     private fun getTraversedText(textNode: SemanticsNode): String? {
         return (
-            textNode.config.getOrNull(SemanticsProperties.EditableText)
-                ?: textNode.config.getOrNull(SemanticsProperties.Text)
-            )?.text
+            textNode.config.getOrNull(SemanticsProperties.EditableText)?.text
+                ?: textNode.config.getOrNull(SemanticsProperties.Text)?.joinToString(",")
+            )
     }
 }
 

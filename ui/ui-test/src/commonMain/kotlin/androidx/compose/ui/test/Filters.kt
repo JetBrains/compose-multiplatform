@@ -156,43 +156,78 @@ fun hasNoScrollAction(): SemanticsMatcher =
     SemanticsMatcher.keyNotDefined(SemanticsActions.ScrollBy)
 
 /**
- * Returns whether the node's label matches exactly to the given text.
+ * Returns whether the node's content description contains the given [value].
  *
- * @param label Text to match.
+ * Note that in merged semantics tree there can be a list of content descriptions that got merged
+ * from the child nodes. Typically an accessibility tooling will decide based on its heuristics
+ * which ones to announce.
+ *
+ * @param value Value to match as one of the items in the list of content descriptions.
  * @param substring Whether to use substring matching.
  * @param ignoreCase Whether case should be ignored.
  *
  * @see SemanticsProperties.ContentDescription
  */
 fun hasContentDescription(
-    label: String,
+    value: String,
     substring: Boolean = false,
     ignoreCase: Boolean = false
 ): SemanticsMatcher {
     return if (substring) {
         SemanticsMatcher(
-            "${SemanticsProperties.ContentDescription.name} contains '$label' " +
+            "${SemanticsProperties.ContentDescription.name} contains '$value' " +
                 "(ignoreCase: $ignoreCase)"
         ) {
-            it.config.getOrNull(SemanticsProperties.ContentDescription)?.contains(label, ignoreCase)
-                ?: false
+            it.config.getOrNull(SemanticsProperties.ContentDescription)
+                ?.any { item -> item.contains(value, ignoreCase) } ?: false
         }
     } else {
         SemanticsMatcher(
-            "${SemanticsProperties.ContentDescription.name} = '$label' (ignoreCase: $ignoreCase)"
+            "${SemanticsProperties.ContentDescription.name} = '$value' (ignoreCase: $ignoreCase)"
         ) {
-            it.config.getOrNull(SemanticsProperties.ContentDescription).equals(label, ignoreCase)
+            it.config.getOrNull(SemanticsProperties.ContentDescription)
+                ?.any { item -> item.equals(value, ignoreCase) } ?: false
         }
     }
 }
 
 /**
- * Returns whether the node's text matches exactly to the given text.
+ * Returns whether the node's content description contains exactly the given [values] and nothing
+ * else.
  *
- * In case of text field it will compare the given [text] with the input text and other texts like
- * label or placeholder.
+ * Note that in merged semantics tree there can be a list of content descriptions that got merged
+ * from the child nodes. Typically an accessibility tooling will decide based on its heuristics
+ * which ones to announce.
  *
- * @param text Text to match.
+ * @param values List of values to match (the order does not matter)
+ *
+ * @see SemanticsProperties.ContentDescription
+ */
+fun hasContentDescriptionExactly(
+    vararg values: String
+): SemanticsMatcher {
+    val expected = values.toList()
+    return SemanticsMatcher(
+        "${SemanticsProperties.ContentDescription.name} = " +
+            "[${values.joinToString(",")}]"
+    ) { node ->
+        node.config.getOrNull(SemanticsProperties.ContentDescription)
+            ?.let { given ->
+                given.containsAll(expected) && expected.containsAll(given)
+            } ?: values.isEmpty()
+    }
+}
+
+/**
+ * Returns whether the node's text contains the given [text].
+ *
+ * This will also search in [SemanticsProperties.EditableText].
+ *
+ * Note that in merged semantics tree there can be a list of text items that got merged from
+ * the child nodes. Typically an accessibility tooling will decide based on its heuristics which
+ * ones to use.
+ *
+ * @param text Value to match as one of the items in the list of text values.
  * @param substring Whether to use substring matching.
  * @param ignoreCase Whether case should be ignored.
  *
@@ -204,22 +239,67 @@ fun hasText(
     substring: Boolean = false,
     ignoreCase: Boolean = false
 ): SemanticsMatcher {
+    val propertyName = "${SemanticsProperties.Text.name} + ${SemanticsProperties.EditableText.name}"
     return if (substring) {
         SemanticsMatcher(
-            "${SemanticsProperties.Text.name} contains '$text' (ignoreCase: $ignoreCase)"
+            "$propertyName contains '$text' (ignoreCase: $ignoreCase) as substring"
         ) {
-            val editableTextValue = it.config.getOrNull(SemanticsProperties.EditableText)?.text
-            val textValue = it.config.getOrNull(SemanticsProperties.Text)?.text
-            (editableTextValue?.contains(text, ignoreCase) == true) or
-                (textValue?.contains(text, ignoreCase) == true)
+            val isInEditableTextValue = it.config.getOrNull(SemanticsProperties.EditableText)
+                ?.text?.contains(text, ignoreCase) ?: false
+            val isInTextValue = it.config.getOrNull(SemanticsProperties.Text)
+                ?.any { item -> item.text.contains(text, ignoreCase) } ?: false
+            isInEditableTextValue || isInTextValue
         }
     } else {
         SemanticsMatcher(
-            "${SemanticsProperties.Text.name} = '$text' (ignoreCase: $ignoreCase)"
+            "$propertyName contains '$text' (ignoreCase: $ignoreCase)"
         ) {
-            it.config.getOrNull(SemanticsProperties.EditableText)?.text.equals(text, ignoreCase) or
-                it.config.getOrNull(SemanticsProperties.Text)?.text.equals(text, ignoreCase)
+            val isInEditableTextValue = it.config.getOrNull(SemanticsProperties.EditableText)
+                ?.text?.equals(text, ignoreCase) ?: false
+            val isInTextValue = it.config.getOrNull(SemanticsProperties.Text)
+                ?.any { item -> item.text.equals(text, ignoreCase) } ?: false
+            isInEditableTextValue || isInTextValue
         }
+    }
+}
+
+/**
+ * Returns whether the node's text contains exactly the given [values] and nothing else.
+ *
+ * This will also search in [SemanticsProperties.EditableText] by default.
+ *
+ * Note that in merged semantics tree there can be a list of text items that got merged from
+ * the child nodes. Typically an accessibility tooling will decide based on its heuristics which
+ * ones to use.
+ *
+ * @param textValues List of values to match (the order does not matter)
+ * @param includeEditableText Whether to also assert against the editable text.
+ *
+ * @see SemanticsProperties.Text
+ * @see SemanticsProperties.EditableText
+ */
+fun hasTextExactly(
+    vararg textValues: String,
+    includeEditableText: Boolean = true
+): SemanticsMatcher {
+    val expected = textValues.toList()
+    val given = mutableListOf<String>()
+    val propertyName = if (includeEditableText) {
+        "${SemanticsProperties.Text.name} + ${SemanticsProperties.EditableText.name}"
+    } else {
+        SemanticsProperties.Text.name
+    }
+    return SemanticsMatcher(
+        "$propertyName = [${textValues.joinToString(",")}]"
+    ) { node ->
+        given.clear()
+        if (includeEditableText) {
+            node.config.getOrNull(SemanticsProperties.EditableText)
+                ?.let { given.add(it.text) }
+        }
+        node.config.getOrNull(SemanticsProperties.Text)
+            ?.let { given.addAll(it.map { anStr -> anStr.text }) }
+        given.containsAll(expected) && expected.containsAll(given)
     }
 }
 

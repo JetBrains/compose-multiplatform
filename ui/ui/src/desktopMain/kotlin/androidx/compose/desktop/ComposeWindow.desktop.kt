@@ -20,6 +20,7 @@ import androidx.compose.runtime.CompositionContext
 import androidx.compose.runtime.CompositionLocalProvider
 import org.jetbrains.skiko.ClipComponent
 import org.jetbrains.skiko.GraphicsApi
+import org.jetbrains.skiko.SkiaLayer
 import java.awt.Component
 import javax.swing.JFrame
 import javax.swing.JLayeredPane
@@ -36,6 +37,19 @@ class ComposeWindow : JFrame() {
             layer.wrapped.setSize(width, height)
             super.setBounds(x, y, width, height)
         }
+
+        override fun add(component: Component): Component {
+            val clipComponent = ClipComponent(component)
+            clipMap.put(component, clipComponent)
+            layer.wrapped.clipComponents.add(clipComponent)
+            return add(component, Integer.valueOf(0))
+        }
+
+        override fun remove(component: Component) {
+            layer.wrapped.clipComponents.remove(clipMap.get(component)!!)
+            clipMap.remove(component)
+            super.remove(component)
+        }
     }
 
     private val clipMap = mutableMapOf<Component, ClipComponent>()
@@ -47,15 +61,10 @@ class ComposeWindow : JFrame() {
     }
 
     override fun add(component: Component): Component {
-        val clipComponent = ClipComponent(component)
-        clipMap.put(component, clipComponent)
-        layer.wrapped.clipComponents.add(clipComponent)
-        return pane.add(component, Integer.valueOf(0))
+        return pane.add(component)
     }
 
     override fun remove(component: Component) {
-        layer.wrapped.clipComponents.remove(clipMap.get(component)!!)
-        clipMap.remove(component)
         pane.remove(component)
     }
 
@@ -75,7 +84,7 @@ class ComposeWindow : JFrame() {
             parentComposition = parentComposition,
         ) {
             CompositionLocalProvider(
-                LocalLayerContainer provides this
+                LocalLayerContainer provides pane
             ) {
                 content()
             }
@@ -98,15 +107,26 @@ class ComposeWindow : JFrame() {
     }
 
     /**
-     * Retrieve underlying platform-specific operating system handle for the window where ComposeWindow is rendered.
-     * Currently returns HWND on Windows, Drawable on X11 and 0 on macOS.
+     * Registers a task to run when the rendering API changes.
+     */
+    fun onRenderApiChanged(action: () -> Unit) {
+        layer.component.onStateChanged(SkiaLayer.PropertyKind.Renderer) {
+            action()
+        }
+    }
+
+    /**
+     * Retrieve underlying platform-specific operating system handle for the root window where
+     * ComposeWindow is rendered. Currently returns HWND on Windows, Display on X11 and NSWindow
+     * on macOS.
      */
     val windowHandle: Long
         get() = layer.component.windowHandle
 
     /**
-     * Returns low level rendering API used for rendering in this ComposeWindow. API is automatically selected based on
-     * operating system, graphical hardware and `SKIKO_RENDER_API` environment variable.
+     * Returns low-level rendering API used for rendering in this ComposeWindow. API is
+     * automatically selected based on operating system, graphical hardware and `SKIKO_RENDER_API`
+     * environment variable.
      */
     val renderApi: GraphicsApi
         get() = layer.component.renderApi

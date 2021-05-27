@@ -26,8 +26,8 @@ package androidx.compose.ui.test {
     method public static androidx.compose.ui.test.SemanticsNodeInteraction assert(androidx.compose.ui.test.SemanticsNodeInteraction, androidx.compose.ui.test.SemanticsMatcher matcher, optional kotlin.jvm.functions.Function0<java.lang.String>? messagePrefixOnError);
     method public static androidx.compose.ui.test.SemanticsNodeInteractionCollection assertAll(androidx.compose.ui.test.SemanticsNodeInteractionCollection, androidx.compose.ui.test.SemanticsMatcher matcher);
     method public static androidx.compose.ui.test.SemanticsNodeInteractionCollection assertAny(androidx.compose.ui.test.SemanticsNodeInteractionCollection, androidx.compose.ui.test.SemanticsMatcher matcher);
-    method public static androidx.compose.ui.test.SemanticsNodeInteraction assertContentDescriptionContains(androidx.compose.ui.test.SemanticsNodeInteraction, String value, optional boolean ignoreCase);
-    method public static androidx.compose.ui.test.SemanticsNodeInteraction assertContentDescriptionEquals(androidx.compose.ui.test.SemanticsNodeInteraction, String value, optional boolean ignoreCase);
+    method public static androidx.compose.ui.test.SemanticsNodeInteraction assertContentDescriptionContains(androidx.compose.ui.test.SemanticsNodeInteraction, String value, optional boolean substring, optional boolean ignoreCase);
+    method public static androidx.compose.ui.test.SemanticsNodeInteraction assertContentDescriptionEquals(androidx.compose.ui.test.SemanticsNodeInteraction, java.lang.String... values);
     method public static androidx.compose.ui.test.SemanticsNodeInteractionCollection assertCountEquals(androidx.compose.ui.test.SemanticsNodeInteractionCollection, int expectedSize);
     method public static androidx.compose.ui.test.SemanticsNodeInteraction assertHasClickAction(androidx.compose.ui.test.SemanticsNodeInteraction);
     method public static androidx.compose.ui.test.SemanticsNodeInteraction assertHasNoClickAction(androidx.compose.ui.test.SemanticsNodeInteraction);
@@ -44,8 +44,8 @@ package androidx.compose.ui.test {
     method public static androidx.compose.ui.test.SemanticsNodeInteraction assertIsSelected(androidx.compose.ui.test.SemanticsNodeInteraction);
     method public static androidx.compose.ui.test.SemanticsNodeInteraction assertIsToggleable(androidx.compose.ui.test.SemanticsNodeInteraction);
     method public static androidx.compose.ui.test.SemanticsNodeInteraction assertRangeInfoEquals(androidx.compose.ui.test.SemanticsNodeInteraction, androidx.compose.ui.semantics.ProgressBarRangeInfo value);
-    method public static androidx.compose.ui.test.SemanticsNodeInteraction assertTextContains(androidx.compose.ui.test.SemanticsNodeInteraction, String value, optional boolean ignoreCase);
-    method public static androidx.compose.ui.test.SemanticsNodeInteraction assertTextEquals(androidx.compose.ui.test.SemanticsNodeInteraction, String value, optional boolean ignoreCase);
+    method public static androidx.compose.ui.test.SemanticsNodeInteraction assertTextContains(androidx.compose.ui.test.SemanticsNodeInteraction, String value, optional boolean substring, optional boolean ignoreCase);
+    method public static androidx.compose.ui.test.SemanticsNodeInteraction assertTextEquals(androidx.compose.ui.test.SemanticsNodeInteraction, String![] values, optional boolean includeEditableText);
     method public static androidx.compose.ui.test.SemanticsNodeInteraction assertValueEquals(androidx.compose.ui.test.SemanticsNodeInteraction, String value);
   }
 
@@ -74,8 +74,9 @@ package androidx.compose.ui.test {
     method public static androidx.compose.ui.test.SemanticsMatcher hasAnyDescendant(androidx.compose.ui.test.SemanticsMatcher matcher);
     method public static androidx.compose.ui.test.SemanticsMatcher hasAnySibling(androidx.compose.ui.test.SemanticsMatcher matcher);
     method public static androidx.compose.ui.test.SemanticsMatcher hasClickAction();
-    method public static androidx.compose.ui.test.SemanticsMatcher hasContentDescription(String label, optional boolean substring, optional boolean ignoreCase);
-    method public static androidx.compose.ui.test.SemanticsMatcher hasImeAction(androidx.compose.ui.text.input.ImeAction actionType);
+    method public static androidx.compose.ui.test.SemanticsMatcher hasContentDescription(String value, optional boolean substring, optional boolean ignoreCase);
+    method public static androidx.compose.ui.test.SemanticsMatcher hasContentDescriptionExactly(java.lang.String... values);
+    method public static androidx.compose.ui.test.SemanticsMatcher hasImeAction-KlQnJC8(int actionType);
     method public static androidx.compose.ui.test.SemanticsMatcher hasNoClickAction();
     method public static androidx.compose.ui.test.SemanticsMatcher hasNoScrollAction();
     method public static androidx.compose.ui.test.SemanticsMatcher hasParent(androidx.compose.ui.test.SemanticsMatcher matcher);
@@ -85,6 +86,7 @@ package androidx.compose.ui.test {
     method public static androidx.compose.ui.test.SemanticsMatcher hasStateDescription(String value);
     method public static androidx.compose.ui.test.SemanticsMatcher hasTestTag(String testTag);
     method public static androidx.compose.ui.test.SemanticsMatcher hasText(String text, optional boolean substring, optional boolean ignoreCase);
+    method public static androidx.compose.ui.test.SemanticsMatcher hasTextExactly(String![] textValues, optional boolean includeEditableText);
     method public static androidx.compose.ui.test.SemanticsMatcher isDialog();
     method public static androidx.compose.ui.test.SemanticsMatcher isEnabled();
     method public static androidx.compose.ui.test.SemanticsMatcher isFocusable();

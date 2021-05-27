@@ -582,6 +582,7 @@ class LiveLiteralTransformTests : AbstractIrTransformTest() {
         val keyVisitor = DurableKeyVisitor(builtKeys)
         val transformer = object : LiveLiteralTransformer(
             true,
+            false,
             keyVisitor,
             pluginContext,
             symbolRemapper,

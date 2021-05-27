@@ -20,8 +20,8 @@ import com.intellij.lang.jvm.annotation.JvmAnnotationArrayValue
 import com.intellij.lang.jvm.annotation.JvmAnnotationAttributeValue
 import com.intellij.lang.jvm.annotation.JvmAnnotationConstantValue
 import com.intellij.psi.PsiAnnotation
+import com.intellij.psi.PsiClass
 import com.intellij.psi.PsiMethod
-import com.intellij.psi.impl.compiled.ClsMemberImpl
 import com.intellij.psi.impl.compiled.ClsMethodImpl
 import com.intellij.psi.util.ClassUtil
 import kotlinx.metadata.KmDeclarationContainer
@@ -31,23 +31,24 @@ import kotlinx.metadata.jvm.KotlinClassMetadata
 import kotlinx.metadata.jvm.signature
 
 /**
- * @return the corresponding [KmFunction] for this [ClsMethodImpl], or `null` if there is no
- * corresponding [KmFunction].
+ * @return the corresponding [KmFunction] for this [PsiMethod], or `null` if there is no
+ * corresponding [KmFunction]. This method is only meaningful if this [PsiMethod] represents a
+ * method defined in bytecode (most often a [ClsMethodImpl]).
  */
-fun ClsMethodImpl.toKmFunction(): KmFunction? =
-    getKmDeclarationContainer()?.findKmFunctionForPsiMethod(this)
+fun PsiMethod.toKmFunction(): KmFunction? =
+    containingClass!!.getKmDeclarationContainer()?.findKmFunctionForPsiMethod(this)
 
 // TODO: https://youtrack.jetbrains.com/issue/KT-45310
 // Currently there is no built in support for parsing kotlin metadata from kotlin class files, so
 // we need to manually inspect the annotations and work with Cls* (compiled PSI).
 /**
- * Returns the [KmDeclarationContainer] using the kotlin.Metadata annotation present on the
- * surrounding class. Returns null if there is no surrounding annotation (not parsing a Kotlin
+ * Returns the [KmDeclarationContainer] using the kotlin.Metadata annotation present on this
+ * [PsiClass]. Returns null if there is no annotation (not parsing a Kotlin
  * class file), the annotation data is for an unsupported version of Kotlin, or if the metadata
  * represents a synthetic class.
  */
-private fun ClsMemberImpl<*>.getKmDeclarationContainer(): KmDeclarationContainer? {
-    val classKotlinMetadataAnnotation = containingClass?.annotations?.find {
+private fun PsiClass.getKmDeclarationContainer(): KmDeclarationContainer? {
+    val classKotlinMetadataAnnotation = annotations.find {
         // hasQualifiedName() not available on the min version of Lint we compile against
         it.qualifiedName == KotlinMetadataFqn
     } ?: return null
@@ -92,7 +93,6 @@ private fun PsiAnnotation.toHeader(): KotlinClassHeader {
 
     val kind = attributes["k"]?.parseInt()
     val metadataVersion = attributes["mv"]?.parseIntArray()
-    val bytecodeVersion = attributes["bv"]?.parseIntArray()
     val data1 = attributes["d1"]?.parseStringArray()
     val data2 = attributes["d2"]?.parseStringArray()
     val extraString = attributes["xs"]?.parseString()
@@ -102,7 +102,6 @@ private fun PsiAnnotation.toHeader(): KotlinClassHeader {
     return KotlinClassHeader(
         kind,
         metadataVersion,
-        bytecodeVersion,
         data1,
         data2,
         extraString,

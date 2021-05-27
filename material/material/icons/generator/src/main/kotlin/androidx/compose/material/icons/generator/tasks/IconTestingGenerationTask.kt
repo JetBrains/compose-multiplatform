@@ -56,15 +56,20 @@ open class IconTestingGenerationTask : IconGenerationTask() {
          * Registers [IconTestingGenerationTask] in [project] for [variant].
          */
         fun register(project: Project, variant: BaseVariant) {
-            val task = project.createGenerationTask(
+            val (task, buildDirectory) = project.registerGenerationTask(
                 "generateTestFiles",
                 IconTestingGenerationTask::class.java,
                 variant
             )
+
+            val generatedResourceDirectory = buildDirectory.resolve(GeneratedResource)
+
             variant.registerGeneratedResFolders(
-                project.files(task.generatedResourceDirectory).builtBy(task)
+                project.files(generatedResourceDirectory).builtBy(task)
             )
-            variant.registerJavaGeneratingTask(task, task.generatedSrcAndroidTestDirectory)
+
+            val generatedSrcAndroidTestDirectory = buildDirectory.resolve(GeneratedSrcAndroidTest)
+            variant.registerJavaGeneratingTask(task, generatedSrcAndroidTestDirectory)
         }
     }
 }

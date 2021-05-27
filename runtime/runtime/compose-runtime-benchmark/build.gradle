@@ -31,14 +31,6 @@ android {
     lintOptions {
         disable("SyntheticAccessor")
     }
-    buildTypes {
-        debug {
-            testCoverageEnabled = false
-        }
-        release {
-            testCoverageEnabled = false
-        }
-    }
 }
 
 dependencies {
@@ -63,4 +55,8 @@ dependencies {
     androidTestImplementation(project(":benchmark:benchmark-junit4"))
     androidTestImplementation("androidx.activity:activity:1.2.0")
     androidTestImplementation(project(":activity:activity-compose"))
+}
+
+androidx {
+    benchmarkRunAlsoInterpreted = true
 }

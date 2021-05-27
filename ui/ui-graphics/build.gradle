@@ -86,6 +86,7 @@ if(AndroidXUiPlugin.isMultiplatformEnabled(project)) {
 
             desktopMain.dependencies {
                 implementation(KOTLIN_STDLIB)
+                implementation(KOTLIN_STDLIB_JDK8)
                 api(SKIKO)
             }
 
@@ -139,16 +140,5 @@ tasks.withType(KotlinCompile).configureEach {
         freeCompilerArgs += [
             "-XXLanguage:+InlineClasses"
         ]
-    }
-}
-
-android {
-    buildTypes {
-        debug {
-            testCoverageEnabled = false
-        }
-        release {
-            testCoverageEnabled = false
-        }
     }
 }

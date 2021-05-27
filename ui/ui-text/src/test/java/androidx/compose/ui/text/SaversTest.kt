@@ -16,7 +16,6 @@
 
 package androidx.compose.ui.text
 
-import androidx.compose.runtime.ExperimentalComposeApi
 import androidx.compose.runtime.saveable.SaverScope
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
@@ -339,7 +338,7 @@ class SaversTest {
         assertThat(restored).isEqualTo(original)
     }
 
-    @OptIn(ExperimentalComposeApi::class)
+    @OptIn(ExperimentalTextApi::class)
     @Test
     fun test_AnnotatedString_withAnnotations() {
         val original = buildAnnotatedString {
@@ -356,7 +355,7 @@ class SaversTest {
         assertThat(restored).isEqualTo(original)
     }
 
-    @OptIn(ExperimentalComposeApi::class)
+    @OptIn(ExperimentalTextApi::class)
     @Test
     fun test_AnnotatedString_withSpanAndParagraphStylesAndAnnotations() {
         val original = buildAnnotatedString {

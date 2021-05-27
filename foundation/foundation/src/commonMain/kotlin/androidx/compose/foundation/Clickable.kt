@@ -38,6 +38,10 @@ import androidx.compose.ui.semantics.onClick
 import androidx.compose.ui.semantics.onLongClick
 import androidx.compose.ui.semantics.role
 import androidx.compose.ui.semantics.semantics
+import kotlinx.coroutines.cancelAndJoin
+import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 
 /**
  * Configure component to receive clicks via input or accessibility "click" event.
@@ -257,18 +261,33 @@ fun Modifier.combinedClickable(
 ) = composed(
     factory = {
         val onClickState = rememberUpdatedState(onClick)
+        val onLongClickState = rememberUpdatedState(onLongClick)
+        val onDoubleClickState = rememberUpdatedState(onDoubleClick)
+        val hasLongClick = onLongClick != null
+        val hasDoubleClick = onDoubleClick != null
         val pressedInteraction = remember { mutableStateOf<PressInteraction.Press?>(null) }
         val gesture = if (enabled) {
+            // Handles the case where a long click causes a null onLongClick lambda to be passed,
+            // so we can cancel the existing press.
+            DisposableEffect(hasLongClick) {
+                onDispose {
+                    pressedInteraction.value?.let { oldValue ->
+                        val interaction = PressInteraction.Cancel(oldValue)
+                        interactionSource.tryEmit(interaction)
+                        pressedInteraction.value = null
+                    }
+                }
+            }
             PressedInteractionSourceDisposableEffect(interactionSource, pressedInteraction)
-            Modifier.pointerInput(onDoubleClick, onLongClick, interactionSource) {
+            Modifier.pointerInput(interactionSource, hasLongClick, hasDoubleClick) {
                 detectTapGestures(
-                    onDoubleTap = if (onDoubleClick != null) {
-                        { onDoubleClick() }
+                    onDoubleTap = if (hasDoubleClick) {
+                        { onDoubleClickState.value?.invoke() }
                     } else {
                         null
                     },
-                    onLongPress = if (onLongClick != null) {
-                        { onLongClick() }
+                    onLongPress = if (hasLongClick) {
+                        { onLongClickState.value?.invoke() }
                     } else {
                         null
                     },
@@ -329,19 +348,50 @@ internal suspend fun PressGestureScope.handlePressInteraction(
     interactionSource: MutableInteractionSource,
     pressedInteraction: MutableState<PressInteraction.Press?>
 ) {
-    val pressInteraction = PressInteraction.Press(pressPoint)
-    interactionSource.emit(pressInteraction)
-    pressedInteraction.value = pressInteraction
-    val success = tryAwaitRelease()
-    val endInteraction =
-        if (success) {
-            PressInteraction.Release(pressInteraction)
-        } else {
-            PressInteraction.Cancel(pressInteraction)
+    coroutineScope {
+        val delayJob = launch {
+            delay(TapIndicationDelay)
+            val pressInteraction = PressInteraction.Press(pressPoint)
+            interactionSource.emit(pressInteraction)
+            pressedInteraction.value = pressInteraction
         }
-    interactionSource.emit(endInteraction)
-    pressedInteraction.value = null
+        val success = tryAwaitRelease()
+        if (delayJob.isActive) {
+            delayJob.cancelAndJoin()
+            // The press released successfully, before the timeout duration - emit the press
+            // interaction instantly. No else branch - if the press was cancelled before the
+            // timeout, we don't want to emit a press interaction.
+            if (success) {
+                val pressInteraction = PressInteraction.Press(pressPoint)
+                val releaseInteraction = PressInteraction.Release(pressInteraction)
+                interactionSource.emit(pressInteraction)
+                interactionSource.emit(releaseInteraction)
+            }
+        } else {
+            pressedInteraction.value?.let { pressInteraction ->
+                val endInteraction = if (success) {
+                    PressInteraction.Release(pressInteraction)
+                } else {
+                    PressInteraction.Cancel(pressInteraction)
+                }
+                interactionSource.emit(endInteraction)
+            }
+        }
+        pressedInteraction.value = null
+    }
 }
+
+/**
+ * How long to wait before appearing 'pressed' (emitting [PressInteraction.Press]) - if a touch
+ * down will quickly become a drag / scroll, this timeout means that we don't show a press effect.
+ *
+ * TODO: b/168524931 currently this delay is always used since we will require API changes to
+ * allow clickable to know whether it 'is in a scrollable container' - ideally this delay should
+ * only be used if there is the possibility of a scroll / drag. We should also expose this /
+ * [handlePressInteraction] in some similar form, to make it easy for developers to also use this
+ * delay when handling presses.
+ */
+internal expect val TapIndicationDelay: Long
 
 @Composable
 @Suppress("ComposableModifierFactory")

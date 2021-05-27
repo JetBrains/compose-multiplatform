@@ -20,6 +20,7 @@ import androidx.compose.foundation.interaction.Interaction
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.interaction.PressInteraction
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.requiredSize
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -366,6 +367,23 @@ class SliderTest {
             ) { Slider(value = state.value, onValueChange = { state.value = it }) }
             .assertHeightIsEqualTo(48.dp)
             .assertWidthIsEqualTo(100.dp)
+    }
+
+    @Test
+    fun slider_min_size() {
+        rule.setMaterialContent {
+            Box(Modifier.requiredSize(0.dp)) {
+                Slider(
+                    modifier = Modifier.testTag(tag),
+                    value = 0f,
+                    onValueChange = { }
+                )
+            }
+        }
+
+        rule.onNodeWithTag(tag)
+            .assertWidthIsEqualTo(ThumbRadius * 2)
+            .assertHeightIsEqualTo(ThumbRadius * 2)
     }
 
     @Test

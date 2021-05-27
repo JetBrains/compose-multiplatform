@@ -37,16 +37,21 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.focus.FocusManager
 import androidx.compose.ui.focus.FocusRequester
-import androidx.compose.ui.focus.isFocused
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Paint
 import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.graphics.drawscope.drawIntoCanvas
 import androidx.compose.ui.layout.FirstBaseline
+import androidx.compose.ui.layout.IntrinsicMeasurable
+import androidx.compose.ui.layout.IntrinsicMeasureScope
 import androidx.compose.ui.layout.LastBaseline
 import androidx.compose.ui.layout.Layout
 import androidx.compose.ui.layout.LayoutCoordinates
+import androidx.compose.ui.layout.Measurable
+import androidx.compose.ui.layout.MeasurePolicy
+import androidx.compose.ui.layout.MeasureResult
+import androidx.compose.ui.layout.MeasureScope
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.platform.LocalClipboardManager
 import androidx.compose.ui.platform.LocalDensity
@@ -83,6 +88,7 @@ import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.input.TextInputService
 import androidx.compose.ui.text.input.TextInputSession
 import androidx.compose.ui.text.input.VisualTransformation
+import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.Density
 import kotlin.math.max
 import kotlin.math.roundToInt
@@ -231,7 +237,10 @@ internal fun CoreTextField(
     // notify the EditProcessor of value every recomposition
     state.processor.reset(value, state.inputSession)
 
-    val manager = remember { TextFieldSelectionManager() }
+    val undoManager = remember { UndoManager() }
+    undoManager.snapshotIfNeeded(value)
+
+    val manager = remember { TextFieldSelectionManager(undoManager) }
     manager.offsetMapping = offsetMapping
     manager.visualTransformation = visualTransformation
     manager.onValueChange = onValueChangeWrapper
@@ -444,7 +453,8 @@ internal fun CoreTextField(
             value = value,
             editable = !readOnly,
             singleLine = maxLines == 1,
-            offsetMapping = offsetMapping
+            offsetMapping = offsetMapping,
+            undoManager = undoManager
         )
 
     // Modifiers that should be applied to the outer text field container. Usually those include
@@ -473,31 +483,46 @@ internal fun CoreTextField(
                 )
                 .then(cursorModifier)
                 .then(drawModifier)
-                .then(onPositionedModifier)
                 .textFieldMinSize(textStyle)
+                .then(onPositionedModifier)
 
             SimpleLayout(coreTextFieldModifier) {
-                Layout({ }) { _, constraints ->
-                    TextFieldDelegate.layout(
-                        state.textDelegate,
-                        constraints,
-                        layoutDirection,
-                        state.layoutResult?.value
-                    ).let { (width, height, result) ->
-                        if (state.layoutResult?.value != result) {
-                            state.layoutResult = TextLayoutResultProxy(result)
-                            onTextLayout(result)
-                        }
-                        layout(
-                            width,
-                            height,
-                            mapOf(
-                                FirstBaseline to result.firstBaseline.roundToInt(),
-                                LastBaseline to result.lastBaseline.roundToInt()
+                Layout(
+                    content = { },
+                    measurePolicy = object : MeasurePolicy {
+                        override fun MeasureScope.measure(
+                            measurables: List<Measurable>,
+                            constraints: Constraints
+                        ): MeasureResult {
+                            val (width, height, result) = TextFieldDelegate.layout(
+                                state.textDelegate,
+                                constraints,
+                                layoutDirection,
+                                state.layoutResult?.value
                             )
-                        ) {}
+                            if (state.layoutResult?.value != result) {
+                                state.layoutResult = TextLayoutResultProxy(result)
+                                onTextLayout(result)
+                            }
+                            return layout(
+                                width = width,
+                                height = height,
+                                alignmentLines = mapOf(
+                                    FirstBaseline to result.firstBaseline.roundToInt(),
+                                    LastBaseline to result.lastBaseline.roundToInt()
+                                )
+                            ) {}
+                        }
+
+                        override fun IntrinsicMeasureScope.maxIntrinsicWidth(
+                            measurables: List<IntrinsicMeasurable>,
+                            height: Int
+                        ): Int {
+                            state.textDelegate.layoutIntrinsics(layoutDirection)
+                            return state.textDelegate.maxIntrinsicWidth
+                        }
                     }
-                }
+                )
 
                 SelectionToolbarAndHandles(
                     manager = manager,

@@ -17,9 +17,7 @@
 package androidx.compose.ui.text.input
 
 import androidx.compose.ui.text.TextRange
-import org.junit.Assert.assertEquals
-import org.junit.Assert.assertFalse
-import org.junit.Assert.assertTrue
+import com.google.common.truth.Truth.assertThat
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.junit.runners.JUnit4
@@ -33,11 +31,11 @@ class SetComposingRegionCommandTest {
 
         SetComposingRegionCommand(1, 4).applyTo(eb)
 
-        assertEquals("ABCDE", eb.toString())
-        assertEquals(0, eb.cursor)
-        assertTrue(eb.hasComposition())
-        assertEquals(1, eb.compositionStart)
-        assertEquals(4, eb.compositionEnd)
+        assertThat(eb.toString()).isEqualTo("ABCDE")
+        assertThat(eb.cursor).isEqualTo(0)
+        assertThat(eb.hasComposition()).isTrue()
+        assertThat(eb.compositionStart).isEqualTo(1)
+        assertThat(eb.compositionEnd).isEqualTo(4)
     }
 
     @Test
@@ -48,11 +46,11 @@ class SetComposingRegionCommandTest {
 
         SetComposingRegionCommand(2, 4).applyTo(eb)
 
-        assertEquals("ABCDE", eb.toString())
-        assertEquals(0, eb.cursor)
-        assertTrue(eb.hasComposition())
-        assertEquals(2, eb.compositionStart)
-        assertEquals(4, eb.compositionEnd)
+        assertThat(eb.toString()).isEqualTo("ABCDE")
+        assertThat(eb.cursor).isEqualTo(0)
+        assertThat(eb.hasComposition()).isTrue()
+        assertThat(eb.compositionStart).isEqualTo(2)
+        assertThat(eb.compositionEnd).isEqualTo(4)
     }
 
     @Test
@@ -61,12 +59,12 @@ class SetComposingRegionCommandTest {
 
         SetComposingRegionCommand(2, 4).applyTo(eb)
 
-        assertEquals("ABCDE", eb.toString())
-        assertEquals(1, eb.selectionStart)
-        assertEquals(4, eb.selectionEnd)
-        assertTrue(eb.hasComposition())
-        assertEquals(2, eb.compositionStart)
-        assertEquals(4, eb.compositionEnd)
+        assertThat(eb.toString()).isEqualTo("ABCDE")
+        assertThat(eb.selectionStart).isEqualTo(1)
+        assertThat(eb.selectionEnd).isEqualTo(4)
+        assertThat(eb.hasComposition()).isTrue()
+        assertThat(eb.compositionStart).isEqualTo(2)
+        assertThat(eb.compositionEnd).isEqualTo(4)
     }
 
     @Test
@@ -75,11 +73,11 @@ class SetComposingRegionCommandTest {
 
         SetComposingRegionCommand(4, 1).applyTo(eb)
 
-        assertEquals("ABCDE", eb.toString())
-        assertEquals(0, eb.cursor)
-        assertTrue(eb.hasComposition())
-        assertEquals(1, eb.compositionStart)
-        assertEquals(4, eb.compositionEnd)
+        assertThat(eb.toString()).isEqualTo("ABCDE")
+        assertThat(eb.cursor).isEqualTo(0)
+        assertThat(eb.hasComposition()).isTrue()
+        assertThat(eb.compositionStart).isEqualTo(1)
+        assertThat(eb.compositionEnd).isEqualTo(4)
     }
 
     @Test
@@ -88,9 +86,9 @@ class SetComposingRegionCommandTest {
 
         SetComposingRegionCommand(-1000, -1000).applyTo(eb)
 
-        assertEquals("ABCDE", eb.toString())
-        assertEquals(0, eb.cursor)
-        assertFalse(eb.hasComposition())
+        assertThat(eb.toString()).isEqualTo("ABCDE")
+        assertThat(eb.cursor).isEqualTo(0)
+        assertThat(eb.hasComposition()).isFalse()
     }
 
     @Test
@@ -99,9 +97,9 @@ class SetComposingRegionCommandTest {
 
         SetComposingRegionCommand(1000, 1000).applyTo(eb)
 
-        assertEquals("ABCDE", eb.toString())
-        assertEquals(0, eb.cursor)
-        assertFalse(eb.hasComposition())
+        assertThat(eb.toString()).isEqualTo("ABCDE")
+        assertThat(eb.cursor).isEqualTo(0)
+        assertThat(eb.hasComposition()).isFalse()
     }
 
     @Test
@@ -110,11 +108,11 @@ class SetComposingRegionCommandTest {
 
         SetComposingRegionCommand(-1000, 1000).applyTo(eb)
 
-        assertEquals("ABCDE", eb.toString())
-        assertEquals(0, eb.cursor)
-        assertTrue(eb.hasComposition())
-        assertEquals(0, eb.compositionStart)
-        assertEquals(5, eb.compositionEnd)
+        assertThat(eb.toString()).isEqualTo("ABCDE")
+        assertThat(eb.cursor).isEqualTo(0)
+        assertThat(eb.hasComposition()).isTrue()
+        assertThat(eb.compositionStart).isEqualTo(0)
+        assertThat(eb.compositionEnd).isEqualTo(5)
     }
 
     @Test
@@ -123,10 +121,10 @@ class SetComposingRegionCommandTest {
 
         SetComposingRegionCommand(1000, -1000).applyTo(eb)
 
-        assertEquals("ABCDE", eb.toString())
-        assertEquals(0, eb.cursor)
-        assertTrue(eb.hasComposition())
-        assertEquals(0, eb.compositionStart)
-        assertEquals(5, eb.compositionEnd)
+        assertThat(eb.toString()).isEqualTo("ABCDE")
+        assertThat(eb.cursor).isEqualTo(0)
+        assertThat(eb.hasComposition()).isTrue()
+        assertThat(eb.compositionStart).isEqualTo(0)
+        assertThat(eb.compositionEnd).isEqualTo(5)
     }
 }

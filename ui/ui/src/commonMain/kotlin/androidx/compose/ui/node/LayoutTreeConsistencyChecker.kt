@@ -49,7 +49,10 @@ internal class LayoutTreeConsistencyChecker(
     }
 
     private fun LayoutNode.consistentLayoutState(): Boolean {
-        if (isPlaced) {
+        val parent = this.parent
+        if (isPlaced ||
+            placeOrder != LayoutNode.NotPlacedPlaceOrder && parent?.isPlaced == true
+        ) {
             if (layoutState == LayoutNode.LayoutState.NeedsRemeasure &&
                 postponedMeasureRequests.contains(this)
             ) {
@@ -58,7 +61,7 @@ internal class LayoutTreeConsistencyChecker(
                 return true
             }
             // remeasure or relayout is scheduled
-            val parentLayoutState = this.parent?.layoutState
+            val parentLayoutState = parent?.layoutState
             if (layoutState == LayoutNode.LayoutState.NeedsRemeasure) {
                 return relayoutNodes.contains(this) ||
                     parentLayoutState == LayoutNode.LayoutState.NeedsRemeasure ||
@@ -68,7 +71,8 @@ internal class LayoutTreeConsistencyChecker(
                 return relayoutNodes.contains(this) ||
                     parentLayoutState == LayoutNode.LayoutState.NeedsRemeasure ||
                     parentLayoutState == LayoutNode.LayoutState.NeedsRelayout ||
-                    parentLayoutState == LayoutNode.LayoutState.Measuring
+                    parentLayoutState == LayoutNode.LayoutState.Measuring ||
+                    parentLayoutState == LayoutNode.LayoutState.LayingOut
             }
         }
         return true

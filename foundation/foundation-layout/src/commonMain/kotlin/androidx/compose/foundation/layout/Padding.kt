@@ -40,7 +40,8 @@ import androidx.compose.ui.unit.offset
  * Padding is applied before content measurement and takes precedence; content may only be as large
  * as the remaining space.
  *
- * Negative padding is not permitted. See [Modifier.offset].
+ * Negative padding is not permitted — it will cause [IllegalArgumentException].
+ * See [Modifier.offset].
  *
  * Example usage:
  * @sample androidx.compose.foundation.layout.samples.PaddingModifier
@@ -74,7 +75,8 @@ fun Modifier.padding(
  * Padding is applied before content measurement and takes precedence; content may only be as large
  * as the remaining space.
  *
- * Negative padding is not permitted. See [Modifier.offset].
+ * Negative padding is not permitted — it will cause [IllegalArgumentException].
+ * See [Modifier.offset].
  *
  * Example usage:
  * @sample androidx.compose.foundation.layout.samples.SymmetricPaddingModifier
@@ -103,7 +105,8 @@ fun Modifier.padding(
  * Padding is applied before content measurement and takes precedence; content may only be as large
  * as the remaining space.
  *
- * Negative padding is not permitted. See [Modifier.offset].
+ * Negative padding is not permitted — it will cause [IllegalArgumentException].
+ * See [Modifier.offset].
  *
  * Example usage:
  * @sample androidx.compose.foundation.layout.samples.PaddingAllModifier
@@ -129,7 +132,8 @@ fun Modifier.padding(all: Dp) =
  * top, right and bottom. Padding is applied before content measurement and takes precedence;
  * content may only be as large as the remaining space.
  *
- * Negative padding is not permitted. See [Modifier.offset].
+ * Negative padding is not permitted — it will cause [IllegalArgumentException].
+ * See [Modifier.offset].
  *
  * Example usage:
  * @sample androidx.compose.foundation.layout.samples.PaddingValuesModifier
@@ -152,7 +156,8 @@ fun Modifier.padding(paddingValues: PaddingValues) =
  * [padding] to apply relative paddings. Padding is applied before content measurement and takes
  * precedence; content may only be as large as the remaining space.
  *
- * Negative padding is not permitted. See [Modifier.offset].
+ * Negative padding is not permitted — it will cause [IllegalArgumentException].
+ * See [Modifier.offset].
  *
  * Example usage:
  * @sample androidx.compose.foundation.layout.samples.AbsolutePaddingModifier
@@ -185,27 +190,23 @@ fun Modifier.absolutePadding(
  * See the [PaddingValues] factories and [Absolute] for convenient ways to
  * build [PaddingValues].
  */
-@Immutable
+@Stable
 interface PaddingValues {
     /**
      * The padding to be applied along the left edge inside a box.
      */
-    @Stable
     fun calculateLeftPadding(layoutDirection: LayoutDirection): Dp
     /**
      * The padding to be applied along the top edge inside a box.
      */
-    @Stable
     fun calculateTopPadding(): Dp
     /**
      * The padding to be applied along the right edge inside a box.
      */
-    @Stable
     fun calculateRightPadding(layoutDirection: LayoutDirection): Dp
     /**
      * The padding to be applied along the bottom edge inside a box.
      */
-    @Stable
     fun calculateBottomPadding(): Dp
 
     /**

@@ -32,9 +32,9 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.sizeIn
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Stable
+import androidx.compose.runtime.State
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.State
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.Saver
@@ -393,11 +393,6 @@ fun ModalDrawer(
 
         val anchors = mapOf(minValue to DrawerValue.Closed, maxValue to DrawerValue.Open)
         val isRtl = LocalLayoutDirection.current == LayoutDirection.Rtl
-        val blockClicks = if (drawerState.isOpen) {
-            Modifier.pointerInput(Unit) { detectTapGestures {} }
-        } else {
-            Modifier
-        }
         Box(
             Modifier.swipeable(
                 state = drawerState.swipeableState,
@@ -444,7 +439,7 @@ fun ModalDrawer(
                 contentColor = drawerContentColor,
                 elevation = drawerElevation
             ) {
-                Column(Modifier.fillMaxSize().then(blockClicks), content = drawerContent)
+                Column(Modifier.fillMaxSize(), content = drawerContent)
             }
         }
     }
@@ -514,12 +509,6 @@ fun BottomDrawer(
                 expandedHeight to BottomDrawerValue.Expanded
             )
         }
-
-        val blockClicks = if (drawerState.isClosed) {
-            Modifier
-        } else {
-            Modifier.pointerInput(Unit) { detectTapGestures {} }
-        }
         val drawerConstraints = with(LocalDensity.current) {
             Modifier
                 .sizeIn(
@@ -546,10 +535,10 @@ fun BottomDrawer(
             )
             Surface(
                 drawerConstraints
+                    .offset { IntOffset(x = 0, y = drawerState.offset.value.roundToInt()) }
                     .onGloballyPositioned { position ->
                         drawerHeight = position.size.height.toFloat()
                     }
-                    .offset { IntOffset(x = 0, y = drawerState.offset.value.roundToInt()) }
                     .semantics {
                         paneTitle = Strings.NavigationMenu
                         if (drawerState.isOpen) {
@@ -562,7 +551,7 @@ fun BottomDrawer(
                 contentColor = drawerContentColor,
                 elevation = drawerElevation
             ) {
-                Column(blockClicks, content = drawerContent)
+                Column(content = drawerContent)
             }
         }
     }

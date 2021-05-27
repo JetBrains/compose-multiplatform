@@ -86,7 +86,7 @@ class DemoTest {
     @MediumTest
     fun testAllDemosAreBeingTested() {
         assertThat(
-            SplitDemoCategories.sumBy { it.allLaunchableDemos().size }
+            SplitDemoCategories.sumOf { it.allLaunchableDemos().size }
         ).isEqualTo(AllButIgnoredDemos.allLaunchableDemos().size)
     }
 
@@ -222,7 +222,7 @@ class DemoTest {
             if (hostView.hasFocus()) {
                 if (hostView.isFocused) {
                     // One of the Compose components has focus.
-                    focusManager.clearFocus(forcedClear = true)
+                    focusManager.clearFocus(force = true)
                 } else {
                     // A child view has focus. (View interop scenario).
                     // We could also use hostViewGroup.focusedChild?.clearFocus(), but the
