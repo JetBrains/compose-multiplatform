@@ -44,6 +44,7 @@ import android.view.KeyEvent.META_SHIFT_ON as Shift
 
 @SmallTest
 @RunWith(AndroidJUnit4::class)
+@OptIn(ExperimentalComposeUiApi::class)
 class KeyEventToFocusDirectionTest {
     @get:Rule
     val rule = createComposeRule()

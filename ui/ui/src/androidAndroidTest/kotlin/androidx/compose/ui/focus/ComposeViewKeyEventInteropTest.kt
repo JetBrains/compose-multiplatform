@@ -37,6 +37,7 @@ import android.view.KeyEvent.ACTION_DOWN as KeyDown
 
 @MediumTest
 @RunWith(AndroidJUnit4::class)
+@OptIn(ExperimentalComposeUiApi::class)
 class ComposeViewKeyEventInteropTest {
     @get:Rule
     val rule = createAndroidComposeRule<TestActivity>()

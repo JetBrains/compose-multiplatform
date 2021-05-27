@@ -30,6 +30,34 @@ internal interface KeyMapping {
 // desktop, the value depends on the current OS
 internal expect val platformDefaultKeyMapping: KeyMapping
 
+/**
+ * Copied from [Key] as the constants there are experimental
+ */
+internal expect object MappedKeys {
+    val A: Key
+    val C: Key
+    val H: Key
+    val V: Key
+    val X: Key
+    val Z: Key
+    val Backslash: Key
+    val DirectionLeft: Key
+    val DirectionRight: Key
+    val DirectionUp: Key
+    val DirectionDown: Key
+    val PageUp: Key
+    val PageDown: Key
+    val MoveHome: Key
+    val MoveEnd: Key
+    val Insert: Key
+    val Enter: Key
+    val Backspace: Key
+    val Delete: Key
+    val Paste: Key
+    val Cut: Key
+    val Tab: Key
+}
+
 // It's common for all platforms key mapping
 internal fun commonKeyMapping(
     shortcutModifier: (KeyEvent) -> Boolean
@@ -39,48 +67,48 @@ internal fun commonKeyMapping(
             return when {
                 shortcutModifier(event) && event.isShiftPressed ->
                     when (event.key) {
-                        Key.Z -> KeyCommand.REDO
+                        MappedKeys.Z -> KeyCommand.REDO
                         else -> null
                     }
                 shortcutModifier(event) ->
                     when (event.key) {
-                        Key.C, Key.Insert -> KeyCommand.COPY
-                        Key.V -> KeyCommand.PASTE
-                        Key.X -> KeyCommand.CUT
-                        Key.A -> KeyCommand.SELECT_ALL
-                        Key.Z -> KeyCommand.UNDO
+                        MappedKeys.C, MappedKeys.Insert -> KeyCommand.COPY
+                        MappedKeys.V -> KeyCommand.PASTE
+                        MappedKeys.X -> KeyCommand.CUT
+                        MappedKeys.A -> KeyCommand.SELECT_ALL
+                        MappedKeys.Z -> KeyCommand.UNDO
                         else -> null
                     }
                 event.isCtrlPressed -> null
                 event.isShiftPressed ->
                     when (event.key) {
-                        Key.DirectionLeft -> KeyCommand.SELECT_LEFT_CHAR
-                        Key.DirectionRight -> KeyCommand.SELECT_RIGHT_CHAR
-                        Key.DirectionUp -> KeyCommand.SELECT_UP
-                        Key.DirectionDown -> KeyCommand.SELECT_DOWN
-                        Key.PageUp -> KeyCommand.SELECT_PAGE_UP
-                        Key.PageDown -> KeyCommand.SELECT_PAGE_DOWN
-                        Key.MoveHome -> KeyCommand.SELECT_LINE_START
-                        Key.MoveEnd -> KeyCommand.SELECT_LINE_END
-                        Key.Insert -> KeyCommand.PASTE
+                        MappedKeys.DirectionLeft -> KeyCommand.SELECT_LEFT_CHAR
+                        MappedKeys.DirectionRight -> KeyCommand.SELECT_RIGHT_CHAR
+                        MappedKeys.DirectionUp -> KeyCommand.SELECT_UP
+                        MappedKeys.DirectionDown -> KeyCommand.SELECT_DOWN
+                        MappedKeys.PageUp -> KeyCommand.SELECT_PAGE_UP
+                        MappedKeys.PageDown -> KeyCommand.SELECT_PAGE_DOWN
+                        MappedKeys.MoveHome -> KeyCommand.SELECT_LINE_START
+                        MappedKeys.MoveEnd -> KeyCommand.SELECT_LINE_END
+                        MappedKeys.Insert -> KeyCommand.PASTE
                         else -> null
                     }
                 else ->
                     when (event.key) {
-                        Key.DirectionLeft -> KeyCommand.LEFT_CHAR
-                        Key.DirectionRight -> KeyCommand.RIGHT_CHAR
-                        Key.DirectionUp -> KeyCommand.UP
-                        Key.DirectionDown -> KeyCommand.DOWN
-                        Key.PageUp -> KeyCommand.PAGE_UP
-                        Key.PageDown -> KeyCommand.PAGE_DOWN
-                        Key.MoveHome -> KeyCommand.LINE_START
-                        Key.MoveEnd -> KeyCommand.LINE_END
-                        Key.Enter -> KeyCommand.NEW_LINE
-                        Key.Backspace -> KeyCommand.DELETE_PREV_CHAR
-                        Key.Delete -> KeyCommand.DELETE_NEXT_CHAR
-                        Key.Paste -> KeyCommand.PASTE
-                        Key.Cut -> KeyCommand.CUT
-                        Key.Tab -> KeyCommand.TAB
+                        MappedKeys.DirectionLeft -> KeyCommand.LEFT_CHAR
+                        MappedKeys.DirectionRight -> KeyCommand.RIGHT_CHAR
+                        MappedKeys.DirectionUp -> KeyCommand.UP
+                        MappedKeys.DirectionDown -> KeyCommand.DOWN
+                        MappedKeys.PageUp -> KeyCommand.PAGE_UP
+                        MappedKeys.PageDown -> KeyCommand.PAGE_DOWN
+                        MappedKeys.MoveHome -> KeyCommand.LINE_START
+                        MappedKeys.MoveEnd -> KeyCommand.LINE_END
+                        MappedKeys.Enter -> KeyCommand.NEW_LINE
+                        MappedKeys.Backspace -> KeyCommand.DELETE_PREV_CHAR
+                        MappedKeys.Delete -> KeyCommand.DELETE_NEXT_CHAR
+                        MappedKeys.Paste -> KeyCommand.PASTE
+                        MappedKeys.Cut -> KeyCommand.CUT
+                        MappedKeys.Tab -> KeyCommand.TAB
                         else -> null
                     }
             }
@@ -96,28 +124,28 @@ internal val defaultKeyMapping: KeyMapping =
                 return when {
                     event.isShiftPressed && event.isCtrlPressed ->
                         when (event.key) {
-                            Key.DirectionLeft -> KeyCommand.SELECT_LEFT_WORD
-                            Key.DirectionRight -> KeyCommand.SELECT_RIGHT_WORD
-                            Key.DirectionUp -> KeyCommand.SELECT_PREV_PARAGRAPH
-                            Key.DirectionDown -> KeyCommand.SELECT_NEXT_PARAGRAPH
+                            MappedKeys.DirectionLeft -> KeyCommand.SELECT_LEFT_WORD
+                            MappedKeys.DirectionRight -> KeyCommand.SELECT_RIGHT_WORD
+                            MappedKeys.DirectionUp -> KeyCommand.SELECT_PREV_PARAGRAPH
+                            MappedKeys.DirectionDown -> KeyCommand.SELECT_NEXT_PARAGRAPH
                             else -> null
                         }
                     event.isCtrlPressed ->
                         when (event.key) {
-                            Key.DirectionLeft -> KeyCommand.LEFT_WORD
-                            Key.DirectionRight -> KeyCommand.RIGHT_WORD
-                            Key.DirectionUp -> KeyCommand.PREV_PARAGRAPH
-                            Key.DirectionDown -> KeyCommand.NEXT_PARAGRAPH
-                            Key.H -> KeyCommand.DELETE_PREV_CHAR
-                            Key.Delete -> KeyCommand.DELETE_NEXT_WORD
-                            Key.Backspace -> KeyCommand.DELETE_PREV_WORD
-                            Key.Backslash -> KeyCommand.DESELECT
+                            MappedKeys.DirectionLeft -> KeyCommand.LEFT_WORD
+                            MappedKeys.DirectionRight -> KeyCommand.RIGHT_WORD
+                            MappedKeys.DirectionUp -> KeyCommand.PREV_PARAGRAPH
+                            MappedKeys.DirectionDown -> KeyCommand.NEXT_PARAGRAPH
+                            MappedKeys.H -> KeyCommand.DELETE_PREV_CHAR
+                            MappedKeys.Delete -> KeyCommand.DELETE_NEXT_WORD
+                            MappedKeys.Backspace -> KeyCommand.DELETE_PREV_WORD
+                            MappedKeys.Backslash -> KeyCommand.DESELECT
                             else -> null
                         }
                     event.isShiftPressed ->
                         when (event.key) {
-                            Key.MoveHome -> KeyCommand.SELECT_HOME
-                            Key.MoveEnd -> KeyCommand.SELECT_END
+                            MappedKeys.MoveHome -> KeyCommand.SELECT_HOME
+                            MappedKeys.MoveEnd -> KeyCommand.SELECT_END
                             else -> null
                         }
                     else -> null
