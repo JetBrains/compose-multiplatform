@@ -537,6 +537,12 @@ internal class AndroidComposeView(context: Context) :
             measureAndLayoutDelegate.updateRootConstraints(constraints)
             measureAndLayoutDelegate.measureAndLayout()
             setMeasuredDimension(root.width, root.height)
+            if (_androidViewsHandler != null) {
+                androidViewsHandler.measure(
+                    MeasureSpec.makeMeasureSpec(root.width, MeasureSpec.EXACTLY),
+                    MeasureSpec.makeMeasureSpec(root.height, MeasureSpec.EXACTLY)
+                )
+            }
         }
     }
 
@@ -562,10 +568,11 @@ internal class AndroidComposeView(context: Context) :
             // AndroidViewsHandler for accessibility and for Views making assumptions based on
             // the size of their ancestors. Usually the Views in the hierarchy will not
             // be relaid out, as they have not requested layout in the meantime.
-            // However, there is also chance for the AndroidViewsHandler to be isLayoutRequested
-            // at this point, in case the Views hierarchy receives forceLayout().
-            // In this case, calling layout here will relayout to clear the isLayoutRequested
-            // info on the Views, as otherwise further layout requests will be discarded.
+            // However, there is also chance for the AndroidViewsHandler and the children to be
+            // isLayoutRequested at this point, in case the Views hierarchy receives forceLayout().
+            // In case of a forceLayout(), calling layout here will traverse the entire subtree
+            // and replace the Views at the same position, which is needed to clean up their
+            // layout state, which otherwise might cause further requestLayout()s to be blocked.
             androidViewsHandler.layout(0, 0, r - l, b - t)
         }
     }
