@@ -145,6 +145,7 @@ val ALLOW_RERUNNING_TASKS = setOf(
     ":appsearch:appsearch-local-storage:buildCMakeRelWithDebInfo[icing]",
     ":hilt:hilt-navigation-compose:kaptGenerateStubsDebugKotlin",
     ":hilt:hilt-navigation-compose:kaptGenerateStubsReleaseKotlin",
+    ":lint-checks:integration-tests:copyDebugAndroidLintReports",
 
     // https://github.com/gradle/gradle/issues/17262
     ":doclava:compileJava",
