@@ -3,6 +3,7 @@ package org.jetbrains.compose.web.tests.integration.common
 import org.openqa.selenium.remote.RemoteWebDriver
 import org.openqa.selenium.By
 import org.openqa.selenium.support.ui.ExpectedConditions
+import org.openqa.selenium.support.ui.Sleeper
 import org.openqa.selenium.support.ui.WebDriverWait
 
 interface WithChromeDriver {
@@ -16,5 +17,9 @@ fun WithChromeDriver.openTestPage(test: String) {
 }
 
 fun WithChromeDriver.waitTextToBe(textId: String = "txt", value: String) {
-    WebDriverWait(driver, 1).until(ExpectedConditions.textToBe(By.id(textId), value))
+    WebDriverWait(
+        driver, java.time.Clock.systemDefaultZone(), Sleeper.SYSTEM_SLEEPER, 1, 1
+    ).until(
+        ExpectedConditions.textToBe(By.id(textId), value)
+    )
 }
