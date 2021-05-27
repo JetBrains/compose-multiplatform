@@ -10,20 +10,20 @@ import kotlinx.browser.document
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.CoroutineStart
 import kotlinx.coroutines.launch
+import org.w3c.dom.Element
 import org.w3c.dom.HTMLBodyElement
-import org.w3c.dom.HTMLElement
 import org.w3c.dom.get
 /**
  * Use this method to mount the composition at the certain [root]
  *
- * @param root - the [HTMLElement] that will be the root of the DOM tree managed by Compose
+ * @param root - the [Element] that will be the root of the DOM tree managed by Compose
  * @param content - the Composable lambda that defines the composition content
  *
  * @return the instance of the [Composition]
  */
-fun <THTMLElement : HTMLElement> renderComposable(
-    root: THTMLElement,
-    content: @Composable DOMScope<THTMLElement>.() -> Unit
+fun <TElement : Element> renderComposable(
+    root: TElement,
+    content: @Composable DOMScope<TElement>.() -> Unit
 ): Composition {
     GlobalSnapshotManager.ensureStarted()
 
@@ -33,7 +33,7 @@ fun <THTMLElement : HTMLElement> renderComposable(
         applier = DomApplier(DomNodeWrapper(root)),
         parent = recomposer
     )
-    val scope = object : DOMScope<THTMLElement> {}
+    val scope = object : DOMScope<TElement> {}
     composition.setContent @Composable {
         content(scope)
     }
@@ -47,7 +47,7 @@ fun <THTMLElement : HTMLElement> renderComposable(
 /**
  * Use this method to mount the composition at the element with id - [rootElementId].
  *
- * @param rootElementId - the id of the [HTMLElement] that will be the root of the DOM tree managed
+ * @param rootElementId - the id of the [Element] that will be the root of the DOM tree managed
  * by Compose
  * @param content - the Composable lambda that defines the composition content
  *
@@ -56,9 +56,9 @@ fun <THTMLElement : HTMLElement> renderComposable(
 @Suppress("UNCHECKED_CAST")
 fun renderComposable(
     rootElementId: String,
-    content: @Composable DOMScope<HTMLElement>.() -> Unit
+    content: @Composable DOMScope<Element>.() -> Unit
 ): Composition = renderComposable(
-    root = document.getElementById(rootElementId) as HTMLElement,
+    root = document.getElementById(rootElementId)!!,
     content = content
 )
 

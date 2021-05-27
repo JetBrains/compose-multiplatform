@@ -4,14 +4,15 @@ import androidx.compose.runtime.DisposableEffectResult
 import androidx.compose.runtime.DisposableEffectScope
 import androidx.compose.web.css.StyleBuilder
 import androidx.compose.web.css.StyleBuilderImpl
+import org.w3c.dom.Element
 import org.w3c.dom.HTMLElement
 
 class AttrsBuilder<TTag : Tag> : EventsListenerBuilder() {
     private val attributesMap = mutableMapOf<String, String>()
     val styleBuilder = StyleBuilderImpl()
 
-    val propertyUpdates = mutableListOf<Pair<(HTMLElement, Any) -> Unit, Any>>()
-    var refEffect: (DisposableEffectScope.(HTMLElement) -> DisposableEffectResult)? = null
+    val propertyUpdates = mutableListOf<Pair<(Element, Any) -> Unit, Any>>()
+    var refEffect: (DisposableEffectScope.(Element) -> DisposableEffectResult)? = null
 
     fun style(builder: StyleBuilder.() -> Unit) {
         styleBuilder.apply(builder)
@@ -32,7 +33,7 @@ class AttrsBuilder<TTag : Tag> : EventsListenerBuilder() {
     fun tabIndex(value: Int) = attr(TAB_INDEX, value.toString())
     fun spellCheck(value: Boolean) = attr(SPELLCHECK, value.toString())
 
-    fun ref(effect: DisposableEffectScope.(HTMLElement) -> DisposableEffectResult) {
+    fun ref(effect: DisposableEffectScope.(Element) -> DisposableEffectResult) {
         this.refEffect = effect
     }
 
@@ -48,7 +49,7 @@ class AttrsBuilder<TTag : Tag> : EventsListenerBuilder() {
 
     @Suppress("UNCHECKED_CAST")
     fun <E : HTMLElement, V> prop(update: (E, V) -> Unit, value: V) {
-        propertyUpdates.add((update to value) as Pair<(HTMLElement, Any) -> Unit, Any>)
+        propertyUpdates.add((update to value) as Pair<(Element, Any) -> Unit, Any>)
     }
 
     fun collect(): Map<String, String> {
