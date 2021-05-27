@@ -103,7 +103,7 @@ class DomElementWrapper(override val node: HTMLElement): DomNodeWrapper(node) {
         }
     }
 
-    fun updateClassName(list: List<Pair<(Element, Any) -> Unit, Any>>) {
+    fun updateProperties(list: List<Pair<(Element, Any) -> Unit, Any>>) {
         if (node.className.isNotEmpty()) node.className = ""
 
         list.forEach { it.first(node, it.second) }

@@ -12,11 +12,8 @@ import androidx.compose.runtime.currentComposer
 import androidx.compose.runtime.remember
 import androidx.compose.web.DomApplier
 import androidx.compose.web.DomElementWrapper
-import androidx.compose.web.DomNodeWrapper
 import androidx.compose.web.attributes.AttrsBuilder
 import androidx.compose.web.attributes.Tag
-import androidx.compose.web.css.StyleBuilder
-import androidx.compose.web.css.StyleBuilderImpl
 import kotlinx.browser.document
 import org.w3c.dom.Element
 import org.w3c.dom.HTMLElement
@@ -76,7 +73,7 @@ inline fun <TTag : Tag, TElement : Element> TagElement(
             update {
                 set(attrsCollected, DomElementWrapper::updateAttrs)
                 set(events, DomElementWrapper::updateEventListeners)
-                set(attrsApplied.propertyUpdates, DomElementWrapper::updateClassName)
+                set(attrsApplied.propertyUpdates, DomElementWrapper::updateProperties)
                 set(attrsApplied.styleBuilder, DomElementWrapper::updateStyleDeclarations)
             }
         },
