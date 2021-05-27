@@ -24,6 +24,7 @@ import android.view.ViewGroup
 import android.view.ViewParent
 import androidx.compose.runtime.CompositionContext
 import androidx.compose.runtime.snapshots.SnapshotStateObserver
+import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.graphics.drawscope.drawIntoCanvas
@@ -46,6 +47,7 @@ import kotlin.math.roundToInt
  * This API is not designed to be used directly, but rather using the [AndroidView] and
  * `AndroidViewBinding` APIs, which are built on top of [AndroidViewHolder].
  */
+@OptIn(ExperimentalComposeUiApi::class)
 internal abstract class AndroidViewHolder(
     context: Context,
     parentContext: CompositionContext?
