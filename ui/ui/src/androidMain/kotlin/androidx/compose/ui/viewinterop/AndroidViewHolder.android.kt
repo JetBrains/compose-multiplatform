@@ -183,8 +183,6 @@ internal abstract class AndroidViewHolder(
      * The [LayoutNode] will proxy the Compose core calls to the [View].
      */
     val layoutNode: LayoutNode = run {
-        // TODO(soboleva): add layout direction here?
-        // TODO(popam): forward pointer input and focus
         // Prepare layout node that proxies measure and layout passes to the View.
         val layoutNode = LayoutNode()
 
@@ -230,9 +228,7 @@ internal abstract class AndroidViewHolder(
                 if (constraints.minHeight != 0) {
                     getChildAt(0).minimumHeight = constraints.minHeight
                 }
-                // TODO (soboleva): native view should get LD value from Compose?
 
-                // TODO(shepshapard): !! necessary?
                 measure(
                     obtainMeasureSpec(
                         constraints.minWidth,
