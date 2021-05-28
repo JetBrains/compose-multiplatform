@@ -6,7 +6,7 @@ import androidx.compose.desktop.WindowEvents
 import androidx.compose.runtime.*
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.IntSize
-import androidx.compose.ui.window.MenuBar
+import androidx.compose.ui.window.v1.MenuBar
 import kotlinx.coroutines.*
 import kotlinx.coroutines.swing.Swing
 import java.awt.image.BufferedImage

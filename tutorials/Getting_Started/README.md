@@ -35,8 +35,8 @@ packaging JDK 15 or later must be used.
 The Сompose plugin version used in the wizard above may be not the last. Update the version of the plugin to the latest available by editing the `build.gradle.kts` file, finding and updating the version information as shown below. In this example the latest version of the plugin was 0.4.0-build182 and a compatible version of kotlin was 1.4.32. For the latest versions, see the [latest versions](https://github.com/JetBrains/compose-jb/releases) site and the [Kotlin](https://kotlinlang.org/) site.
 ```
 plugins {
-    kotlin("jvm") version "1.4.32"
-    id("org.jetbrains.compose") version "0.4.0-build182"
+    kotlin("jvm") version "1.5.10"
+    id("org.jetbrains.compose") version "0.4.0-rc1"
 }
 ```
 
