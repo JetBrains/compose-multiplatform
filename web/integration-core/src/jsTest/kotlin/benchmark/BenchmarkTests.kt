@@ -1,3 +1,4 @@
+
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import benchmark.AddItems
@@ -32,16 +33,9 @@ class BenchmarkTests {
             run()
         }.toList()
 
-        val o = js("{}")
-        o.benchmark = name
-        o.durations = js("[]")
+        val avgMs = durations.map { it.toInt(DurationUnit.MILLISECONDS) }.average()
 
-        durations.forEach {
-            o.durations.push(it.toInt(DurationUnit.MILLISECONDS))
-            Unit
-        }
-
-        println("BENCHMARK RESULT: " + JSON.stringify(o))
+        println("#$name:$avgMs;")
     }
 
     @Test
