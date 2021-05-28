@@ -29,7 +29,7 @@ at https://android.googlesource.com/platform/frameworks/support.
        * [Image and icon manipulations](tutorials/Image_And_Icons_Manipulations)
        * [Mouse events and hover](tutorials/Mouse_Events)
        * [Scrolling and scrollbars](tutorials/Desktop_Components)
-       * [Tooltips](tutorials/Desktop_Components)
+       * [Tooltips](tutorials/Desktop_Components#tooltips)
        * [Menu, tray, notifications](tutorials/Tray_Notifications_MenuBar)
        * [Keyboard support](tutorials/Keyboard)
        * [Building native distribution](tutorials/Native_distributions_and_local_execution)
