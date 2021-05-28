@@ -273,7 +273,7 @@ package androidx.compose.ui.text {
     method public androidx.compose.ui.text.font.FontFamily? getFontFamily();
     method public String? getFontFeatureSettings();
     method public long getFontSize-XSAIIZE();
-    method public androidx.compose.ui.text.font.FontStyle? getFontStyle();
+    method public androidx.compose.ui.text.font.FontStyle? getFontStyle-4Lr2A7w();
     method public androidx.compose.ui.text.font.FontSynthesis? getFontSynthesis();
     method public androidx.compose.ui.text.font.FontWeight? getFontWeight();
     method public long getLetterSpacing-XSAIIZE();
@@ -431,7 +431,7 @@ package androidx.compose.ui.text {
     method public androidx.compose.ui.text.font.FontFamily? getFontFamily();
     method public String? getFontFeatureSettings();
     method public long getFontSize-XSAIIZE();
-    method public androidx.compose.ui.text.font.FontStyle? getFontStyle();
+    method public androidx.compose.ui.text.font.FontStyle? getFontStyle-4Lr2A7w();
     method public androidx.compose.ui.text.font.FontSynthesis? getFontSynthesis();
     method public androidx.compose.ui.text.font.FontWeight? getFontWeight();
     method public long getLetterSpacing-XSAIIZE();
@@ -532,7 +532,7 @@ package androidx.compose.ui.text.font {
 
   public final class AndroidTypeface_androidKt {
     method public static androidx.compose.ui.text.font.FontFamily FontFamily(android.graphics.Typeface typeface);
-    method public static androidx.compose.ui.text.font.Typeface Typeface(android.content.Context context, androidx.compose.ui.text.font.FontFamily fontFamily, optional java.util.List<? extends kotlin.Pair<androidx.compose.ui.text.font.FontWeight,? extends androidx.compose.ui.text.font.FontStyle>>? styles);
+    method public static androidx.compose.ui.text.font.Typeface Typeface(android.content.Context context, androidx.compose.ui.text.font.FontFamily fontFamily, optional java.util.List<kotlin.Pair<androidx.compose.ui.text.font.FontWeight,androidx.compose.ui.text.font.FontStyle>>? styles);
     method public static androidx.compose.ui.text.font.Typeface Typeface(android.graphics.Typeface typeface);
   }
 
@@ -540,9 +540,9 @@ package androidx.compose.ui.text.font {
   }
 
   @androidx.compose.runtime.Immutable public interface Font {
-    method public androidx.compose.ui.text.font.FontStyle getStyle();
+    method public int getStyle-_-LCdwA();
     method public androidx.compose.ui.text.font.FontWeight getWeight();
-    property public abstract androidx.compose.ui.text.font.FontStyle style;
+    property public abstract int style;
     property public abstract androidx.compose.ui.text.font.FontWeight weight;
   }
 
@@ -576,7 +576,7 @@ package androidx.compose.ui.text.font {
   }
 
   public final class FontKt {
-    method @androidx.compose.runtime.Stable public static androidx.compose.ui.text.font.Font Font(int resId, optional androidx.compose.ui.text.font.FontWeight weight, optional androidx.compose.ui.text.font.FontStyle style);
+    method @androidx.compose.runtime.Stable public static androidx.compose.ui.text.font.Font Font-8TkSW9U(int resId, optional androidx.compose.ui.text.font.FontWeight weight, optional int style);
     method @androidx.compose.runtime.Stable public static androidx.compose.ui.text.font.FontFamily toFontFamily(androidx.compose.ui.text.font.Font);
   }
 
@@ -596,9 +596,24 @@ package androidx.compose.ui.text.font {
     property public final java.util.List<androidx.compose.ui.text.font.Font> fonts;
   }
 
-  public enum FontStyle {
-    enum_constant public static final androidx.compose.ui.text.font.FontStyle Italic;
-    enum_constant public static final androidx.compose.ui.text.font.FontStyle Normal;
+  public final inline class FontStyle {
+    ctor public FontStyle();
+    method public static int constructor-impl(int value);
+    method public static inline boolean equals-impl(int p, Object? p1);
+    method public static boolean equals-impl0(int p1, int p2);
+    method public int getValue();
+    method public static inline int hashCode-impl(int p);
+    method public static String toString-impl(int $this);
+    property public final int value;
+    field public static final androidx.compose.ui.text.font.FontStyle.Companion Companion;
+  }
+
+  public static final class FontStyle.Companion {
+    method public int getItalic-_-LCdwA();
+    method public int getNormal-_-LCdwA();
+    method public java.util.List<androidx.compose.ui.text.font.FontStyle> values();
+    property public final int Italic;
+    property public final int Normal;
   }
 
   public enum FontSynthesis {
@@ -670,12 +685,12 @@ package androidx.compose.ui.text.font {
   }
 
   public final class ResourceFont implements androidx.compose.ui.text.font.Font {
-    method public androidx.compose.ui.text.font.ResourceFont copy(optional int resId, optional androidx.compose.ui.text.font.FontWeight weight, optional androidx.compose.ui.text.font.FontStyle style);
+    method public androidx.compose.ui.text.font.ResourceFont copy-8TkSW9U(optional int resId, optional androidx.compose.ui.text.font.FontWeight weight, optional int style);
     method public int getResId();
-    method public androidx.compose.ui.text.font.FontStyle getStyle();
+    method public int getStyle-_-LCdwA();
     method public androidx.compose.ui.text.font.FontWeight getWeight();
     property public final int resId;
-    property public androidx.compose.ui.text.font.FontStyle style;
+    property public int style;
     property public androidx.compose.ui.text.font.FontWeight weight;
   }
 

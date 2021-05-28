@@ -43,6 +43,7 @@ import com.nhaarman.mockitokotlin2.verify
 import com.nhaarman.mockitokotlin2.whenever
 import org.junit.Test
 import org.junit.runner.RunWith
+import org.mockito.Mockito
 
 @RunWith(AndroidJUnit4::class)
 @SmallTest
@@ -324,7 +325,7 @@ class AndroidTypefaceTest {
         val fontFamily = FontFamily(FontTestData.FONT_200_ITALIC) as FontListFontFamily
 
         val fontMatcher = mock<FontMatcher>()
-        whenever(fontMatcher.matchFont(any<Iterable<Font>>(), any(), any()))
+        whenever(fontMatcher.matchFont(any<Iterable<Font>>(), any(), anyFontStyle()))
             .thenReturn(FontTestData.FONT_200_ITALIC)
 
         AndroidFontListTypeface(
@@ -337,7 +338,7 @@ class AndroidTypefaceTest {
         verify(fontMatcher, times(1)).matchFont(
             any<Iterable<Font>>(),
             eq(fontWeight),
-            eq(fontStyle)
+            eqFontStyle(fontStyle)
         )
     }
 
@@ -538,4 +539,10 @@ class AndroidTypefaceTest {
             )
         ).isEqualTo(android.graphics.Typeface.MONOSPACE)
     }
+}
+
+internal fun anyFontStyle(): FontStyle {
+    return Mockito.argThat { arg: Any ->
+        arg is Int || arg is FontStyle
+    } as FontStyle? ?: FontStyle.Normal
 }
