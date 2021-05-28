@@ -1,14 +1,12 @@
-package org.jetbrainsc.compose.common.demo
-
-import androidx.compose.web.renderComposable
-import kotlinx.browser.document
-import org.w3c.dom.HTMLElement
-import org.jetbrains.compose.demo.falling.views.fallingBalls
-import org.jetbrains.compose.demo.falling.Game
 import androidx.compose.runtime.remember
-import kotlinx.browser.window
 import androidx.compose.web.css.Style
+import androidx.compose.web.renderComposable
+import fallingBalls.Game
+import fallingBalls.fallingBalls
+import kotlinx.browser.document
+import kotlinx.browser.window
 import org.jetbrains.compose.web.ui.Styles
+import org.w3c.dom.HTMLElement
 
 class JsGame : Game() {
     override fun now() = window.performance.now().toLong()
@@ -21,8 +19,8 @@ fun main() {
         Style(Styles)
         val game = remember {
             JsGame().apply {
-              width = root.offsetWidth
-              height = root.offsetHeight
+                width = root.offsetWidth
+                height = root.offsetHeight
             }
         }
         fallingBalls(game)

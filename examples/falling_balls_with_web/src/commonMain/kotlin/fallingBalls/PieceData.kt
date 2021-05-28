@@ -1,8 +1,8 @@
-package org.jetbrains.compose.demo.falling
+package fallingBalls
 
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
-import androidx.compose.runtime.getValue
 import org.jetbrains.compose.common.core.graphics.Color
 
 data class PieceData(val game: Game, val velocity: Float, val color: Color) {

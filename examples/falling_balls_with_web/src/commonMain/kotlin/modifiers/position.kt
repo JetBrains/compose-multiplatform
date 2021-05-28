@@ -1,4 +1,4 @@
-package org.jetbrains.compose.common.demo
+package modifiers
 
 import androidx.compose.runtime.Composable
 import org.jetbrains.compose.common.ui.Modifier

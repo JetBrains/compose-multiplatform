@@ -1,12 +1,11 @@
-package org.jetbrains.compose.common.demo
+package modifiers
 
-import androidx.compose.runtime.Composable
-import org.jetbrains.compose.common.ui.Modifier
-import org.jetbrains.compose.common.foundation.layout.offset
-import org.jetbrains.compose.common.ui.unit.Dp
-import org.jetbrains.compose.common.internal.castOrCreate
-import org.jetbrains.compose.common.ui.unit.implementation
 import androidx.compose.foundation.layout.offset
+import androidx.compose.runtime.Composable
+import org.jetbrains.compose.common.internal.castOrCreate
+import org.jetbrains.compose.common.ui.Modifier
+import org.jetbrains.compose.common.ui.unit.Dp
+import org.jetbrains.compose.common.ui.unit.implementation
 
 @Composable
 actual fun Modifier.position(width: Dp, height: Dp): Modifier = castOrCreate().apply {

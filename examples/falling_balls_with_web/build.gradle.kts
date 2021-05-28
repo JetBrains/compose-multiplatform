@@ -30,9 +30,9 @@ kotlin {
         }
 
         val jvmMain by getting {
-             dependencies {
+            dependencies {
                 implementation(compose.desktop.currentOs)
-             }
+            }
         }
 
 
@@ -47,13 +47,13 @@ kotlin {
 
 compose.desktop {
     application {
-        mainClass = "org.jetbrains.compose.common.demo.AppKt"
+        mainClass = "AppKt"
 
         nativeDistributions {
             targetFormats(TargetFormat.Dmg, TargetFormat.Msi, TargetFormat.Deb)
             packageName = "ImageViewer"
             packageVersion = "1.0.0"
-            
+
             modules("jdk.crypto.ec")
 
             val iconsRoot = project.file("../common/src/desktopMain/resources/images")

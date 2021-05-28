@@ -1,34 +1,27 @@
-package org.jetbrains.compose.demo.falling.views
+package fallingBalls
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.withFrameNanos
-import org.jetbrains.compose.demo.falling.Game
-import org.jetbrains.compose.common.material.Text
-import org.jetbrains.compose.common.foundation.layout.Column
-import org.jetbrains.compose.common.material.Slider
-import org.jetbrains.compose.common.foundation.layout.Row
-import org.jetbrains.compose.common.foundation.layout.Box
-import org.jetbrains.compose.common.material.Button
-import org.jetbrains.compose.common.ui.Modifier
-import org.jetbrains.compose.common.ui.unit.em
-import org.jetbrains.compose.common.ui.unit.dp
-import org.jetbrains.compose.common.foundation.layout.offset
-import org.jetbrains.compose.common.foundation.layout.width
-import org.jetbrains.compose.common.ui.layout.onSizeChanged
-import org.jetbrains.compose.common.ui.background
-import org.jetbrains.compose.common.foundation.border
-import org.jetbrains.compose.common.ui.size
 import org.jetbrains.compose.common.core.graphics.Color
-import org.jetbrains.compose.common.foundation.layout.fillMaxHeight
-import org.jetbrains.compose.common.foundation.layout.fillMaxWidth
+import org.jetbrains.compose.common.foundation.border
+import org.jetbrains.compose.common.foundation.layout.*
+import org.jetbrains.compose.common.material.Button
+import org.jetbrains.compose.common.material.Slider
+import org.jetbrains.compose.common.material.Text
+import org.jetbrains.compose.common.ui.Modifier
+import org.jetbrains.compose.common.ui.background
+import org.jetbrains.compose.common.ui.layout.onSizeChanged
+import org.jetbrains.compose.common.ui.size
+import org.jetbrains.compose.common.ui.unit.dp
+import org.jetbrains.compose.common.ui.unit.em
 
 @Composable
 fun fallingBalls(game: Game) {
     Column(Modifier.fillMaxWidth().fillMaxHeight(1f)) {
         Box() {
             Text(
-                "Catch balls!${if (game.finished) " Game over!" else ""}",
+                "Catch balls!${if (game.finished) " fallingBalls.Game over!" else ""}",
                 size = 1.8f.em,
                 color = Color(218, 120, 91)
             )

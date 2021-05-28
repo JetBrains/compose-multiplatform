@@ -1,11 +1,11 @@
-package org.jetbrains.compose.demo.falling
+package fallingBalls
 
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
-import org.jetbrains.compose.common.ui.unit.IntSize
 import org.jetbrains.compose.common.core.graphics.Color
+import org.jetbrains.compose.common.ui.unit.IntSize
 import kotlin.random.Random
 
 private fun Color.Companion.random() =
