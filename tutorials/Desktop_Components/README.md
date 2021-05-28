@@ -1,12 +1,12 @@
-# Scrollbar usage
+# Desktop components
 
 ## What is covered
 
-In this tutorial, we will show you how to add scrollbars to scrollable lists using Compose for Desktop.
+In this tutorial, we will show you how to use desktop-specific components of Compose for Desktop such as scrollbars and tooltips.
 
-## Scrollbars applying
+## Scrollbars
 
-You can apply scrollbars to scrollable components. The scrollbar and scrollable components share a common state to synchronize with each other. For example, VerticalScrollbar can be attached to Modifier.verticalScroll, and LazyColumnFor and HorizontalScrollbar can be attached to Modifier.horizontalScroll and LazyRowFor.
+You can apply scrollbars to scrollable components. The scrollbar and scrollable components share a common state to synchronize with each other. For example, `VerticalScrollbar` can be attached to `Modifier.verticalScroll`, and `LazyColumnFor` and `HorizontalScrollbar` can be attached to `Modifier.horizontalScroll` and `LazyRowFor`.
 
 ```kotlin
 import androidx.compose.desktop.Window
@@ -93,7 +93,7 @@ fun TextBox(text: String = "Item") {
 
 ## Lazy scrollable components with Scrollbar
 
-You can use scrollbars with lazy scrollable components, for example, LazyColumn.
+You can use scrollbars with lazy scrollable components, for example, `LazyColumn`.
 
 ```kotlin
 import androidx.compose.desktop.Window
@@ -166,7 +166,7 @@ fun TextBox(text: String = "Item") {
 
 ## Theme applying
 
-Scrollbars support themes to change their appearance. The example below shows how to use the DesktopTheme appearance for the scrollbar.
+Scrollbars support themes to change their appearance. The example below shows how to use the `DesktopTheme` appearance for the scrollbar.
 
 ```kotlin
 import androidx.compose.desktop.DesktopTheme
@@ -243,3 +243,63 @@ fun TextBox(text: String = "Item") {
 ```
 
 ![Themed scrollbar](themed_scrollbar.gif)
+
+
+## Tooltips
+
+You can add tooltip to any components using `BoxWithTooltip`. Basically `BoxWithTooltip` is a `Box` with the ability to show a tooltip, and has the same arguments and behavior as `Box`.
+The main arguments of the `BoxWithTooltip` function:
+ - tooltip - composable content representing tooltip
+ - delay - time delay in milliseconds after which the tooltip will be shown (default is 500 ms)
+ - offset - tooltip offset, the default position of the tooltip is under the mouse cursor
+
+```kotlin
+import androidx.compose.desktop.Window
+import androidx.compose.foundation.BoxWithTooltip
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.Button
+import androidx.compose.material.Surface
+import androidx.compose.material.Text
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.draw.shadow
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.DpOffset
+import androidx.compose.ui.unit.IntSize
+
+fun main() = Window(title = "Tooltip Example", size = IntSize(300, 300)) {
+    val buttons = listOf("Button A", "Button B", "Button C", "Button D", "Button E", "Button F")
+    Column(Modifier.fillMaxSize(), Arrangement.spacedBy(5.dp)) {
+        buttons.forEachIndexed { index, name ->
+            // wrap button in BoxWithTooltip
+            BoxWithTooltip(
+                modifier = Modifier.padding(start = 40.dp),
+                tooltip = {
+                    // composable tooltip content
+                    Surface(
+                        modifier = Modifier.shadow(4.dp),
+                        color = Color(255, 255, 210),
+                        shape = RoundedCornerShape(4.dp)
+                    ) {
+                        Text(
+                            text = "Tooltip for ${name}",
+                            modifier = Modifier.padding(10.dp)
+                        )
+                    }
+                },
+                delay = 600, // in milliseconds
+                offset = if (index % 2 == 0) DpOffset(-16.dp, 0.dp) else DpOffset.Zero // tooltip offset
+            ) {
+                Button(onClick = {}) { Text(text = name) }
+            }
+        }
+    }
+}
+```
+
+![Tooltip](tooltips.gif)
