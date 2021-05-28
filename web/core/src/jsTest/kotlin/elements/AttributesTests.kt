@@ -99,52 +99,13 @@ class AttributesTests {
     }
 
     @Test
-    fun multipleClassesBuildersCallsAddMoreClasses() = runTest {
-        composition {
-            Div({
-                classes("a", "b")
-                classes {
-                    +"c"
-                    +"d"
-                }
-            }) {}
-        }
-
-        val div = root.firstChild as HTMLDivElement
-        assertEquals(
-            expected = "a b c d",
-            actual = div.getAttribute("class")
-        )
-    }
-
-
-    @Test
-    fun multipleClassesBuildersCallsAddMoreClasses2() = runTest {
-        composition {
-            Div({
-                classes {
-                    +"c"
-                    +"d"
-                }
-                classes("a", "b")
-            }) {}
-        }
-
-        val div = root.firstChild as HTMLDivElement
-        assertEquals(
-            expected = "c d a b",
-            actual = div.getAttribute("class")
-        )
-    }
-
-    @Test
-    fun multipleClassesBuildersCallsWithConditionsAddCorrectClasses() = runTest {
+    fun multipleClassesCallsWithConditionsAddCorrectClasses() = runTest {
         val addClassD = mutableStateOf(true)
         composition {
             Div({
-                classes {
-                    +"c"
-                    if (addClassD.value) +"d"
+                classes("c")
+                if (addClassD.value) {
+                    classes("d")
                 }
                 classes("a", "b")
             }) {}

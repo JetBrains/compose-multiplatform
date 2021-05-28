@@ -18,9 +18,6 @@ class AttrsBuilder<TTag : Tag> : EventsListenerBuilder() {
         styleBuilder.apply(builder)
     }
 
-    inline fun classes(builder: ClassesAttrBuilder.() -> Unit) =
-        prop(setClassList, ClassesAttrBuilder().apply(builder).asList().toTypedArray())
-
     fun classes(vararg classes: String) = prop(setClassList, classes)
 
     fun id(value: String) = attr(ID, value)
@@ -68,17 +65,6 @@ class AttrsBuilder<TTag : Tag> : EventsListenerBuilder() {
         const val TAB_INDEX = "tabindex"
         const val SPELLCHECK = "spellcheck"
     }
-}
-
-class ClassesAttrBuilder {
-    private val classes = mutableListOf<String>()
-
-    operator fun String.unaryPlus() {
-        classes.add(this)
-    }
-
-    fun asList(): List<String> = classes
-    fun asString(): String = classes.joinToString(" ")
 }
 
 val setClassList: (HTMLElement, Array<out String>) -> Unit = { e, classList ->
