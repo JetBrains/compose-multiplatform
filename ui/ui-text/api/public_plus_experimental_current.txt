@@ -815,14 +815,14 @@ package androidx.compose.ui.text.input {
   }
 
   @androidx.compose.runtime.Immutable public final class ImeOptions {
-    method public androidx.compose.ui.text.input.ImeOptions copy-TWIFjAI(optional boolean singleLine, optional androidx.compose.ui.text.input.KeyboardCapitalization capitalization, optional boolean autoCorrect, optional int keyboardType, optional int imeAction);
+    method public androidx.compose.ui.text.input.ImeOptions copy-TWIFjAI(optional boolean singleLine, optional int capitalization, optional boolean autoCorrect, optional int keyboardType, optional int imeAction);
     method public boolean getAutoCorrect();
-    method public androidx.compose.ui.text.input.KeyboardCapitalization getCapitalization();
+    method public int getCapitalization-IUNYP9k();
     method public int getImeAction-eUduSuo();
     method public int getKeyboardType-PjHm6EE();
     method public boolean getSingleLine();
     property public final boolean autoCorrect;
-    property public final androidx.compose.ui.text.input.KeyboardCapitalization capitalization;
+    property public final int capitalization;
     property public final int imeAction;
     property public final int keyboardType;
     property public final boolean singleLine;
@@ -839,11 +839,24 @@ package androidx.compose.ui.text.input {
     method @Deprecated public void onImeAction-KlQnJC8(int imeAction);
   }
 
-  public enum KeyboardCapitalization {
-    enum_constant public static final androidx.compose.ui.text.input.KeyboardCapitalization Characters;
-    enum_constant public static final androidx.compose.ui.text.input.KeyboardCapitalization None;
-    enum_constant public static final androidx.compose.ui.text.input.KeyboardCapitalization Sentences;
-    enum_constant public static final androidx.compose.ui.text.input.KeyboardCapitalization Words;
+  public final inline class KeyboardCapitalization {
+    ctor public KeyboardCapitalization();
+    method public static inline boolean equals-impl(int p, Object? p1);
+    method public static boolean equals-impl0(int p1, int p2);
+    method public static inline int hashCode-impl(int p);
+    method public static String toString-impl(int $this);
+    field public static final androidx.compose.ui.text.input.KeyboardCapitalization.Companion Companion;
+  }
+
+  public static final class KeyboardCapitalization.Companion {
+    method public int getCharacters-IUNYP9k();
+    method public int getNone-IUNYP9k();
+    method public int getSentences-IUNYP9k();
+    method public int getWords-IUNYP9k();
+    property public final int Characters;
+    property public final int None;
+    property public final int Sentences;
+    property public final int Words;
   }
 
   public final inline class KeyboardType {
