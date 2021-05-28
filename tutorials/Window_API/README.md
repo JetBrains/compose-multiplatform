@@ -43,7 +43,7 @@ import androidx.compose.material.Button
 import androidx.compose.material.Text
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.ui.window.Dialog
+import androidx.compose.ui.window.v1.Dialog
 
 fun main() {
     Window {
@@ -96,10 +96,10 @@ import androidx.compose.ui.input.key.Key
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.IntSize
-import androidx.compose.ui.window.MenuItem
-import androidx.compose.ui.window.KeyStroke
-import androidx.compose.ui.window.Menu
-import androidx.compose.ui.window.MenuBar
+import androidx.compose.ui.window.v1.MenuItem
+import androidx.compose.ui.window.v1.KeyStroke
+import androidx.compose.ui.window.v1.Menu
+import androidx.compose.ui.window.v1.MenuBar
 import java.awt.Color
 import java.awt.image.BufferedImage
 

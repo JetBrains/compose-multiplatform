@@ -97,7 +97,6 @@ You can use scrollbars with lazy scrollable components, for example, LazyColumn.
 
 ```kotlin
 import androidx.compose.desktop.Window
-import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.VerticalScrollbar
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
@@ -124,7 +123,6 @@ fun main() {
     }
 }
 
-@OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun LazyScrollable() {
     Box(
@@ -134,10 +132,9 @@ fun LazyScrollable() {
     ) {
 
         val state = rememberLazyListState()
-        val itemCount = 1000
 
         LazyColumn(Modifier.fillMaxSize().padding(end = 12.dp), state) {
-            items(itemCount) { x ->
+            items(1000) { x ->
                 TextBox("Item #$x")
                 Spacer(modifier = Modifier.height(5.dp))
             }
@@ -145,9 +142,7 @@ fun LazyScrollable() {
         VerticalScrollbar(
             modifier = Modifier.align(Alignment.CenterEnd).fillMaxHeight(),
             adapter = rememberScrollbarAdapter(
-                scrollState = state,
-                itemCount = itemCount,
-                averageItemSize = 37.dp // TextBox height + Spacer height
+                scrollState = state
             )
         )
     }

@@ -22,8 +22,8 @@ import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.window.MenuItem
-import androidx.compose.ui.window.Tray
+import androidx.compose.ui.window.v1.MenuItem
+import androidx.compose.ui.window.v1.Tray
 import java.awt.Color
 import java.awt.image.BufferedImage
 
@@ -167,10 +167,10 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.input.key.Key
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.window.KeyStroke
-import androidx.compose.ui.window.MenuItem
-import androidx.compose.ui.window.Menu
-import androidx.compose.ui.window.MenuBar
+import androidx.compose.ui.window.v1.KeyStroke
+import androidx.compose.ui.window.v1.MenuItem
+import androidx.compose.ui.window.v1.Menu
+import androidx.compose.ui.window.v1.MenuBar
 
 fun main() {
     // To use Apple global menu.
@@ -236,10 +236,10 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.input.key.Key
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.window.KeyStroke
-import androidx.compose.ui.window.MenuItem
-import androidx.compose.ui.window.Menu
-import androidx.compose.ui.window.MenuBar
+import androidx.compose.ui.window.v1.KeyStroke
+import androidx.compose.ui.window.v1.MenuItem
+import androidx.compose.ui.window.v1.Menu
+import androidx.compose.ui.window.v1.MenuBar
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.IntSize
 

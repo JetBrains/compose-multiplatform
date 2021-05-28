@@ -79,6 +79,7 @@ import org.jetbrains.skija.Bitmap
 import org.jetbrains.skija.ColorAlphaType
 import org.jetbrains.skija.IRect
 import org.jetbrains.skija.ImageInfo
+import org.jetbrains.skija.Image
 import java.awt.image.BufferedImage
 import java.io.File
 import javax.imageio.ImageIO
@@ -90,8 +91,8 @@ fun main() {
             modifier = Modifier.fillMaxSize()
         ) {
             drawIntoCanvas { canvas ->
-                canvas.nativeCanvas.drawBitmapRect(
-                    bitmap,
+                canvas.nativeCanvas.drawImageRect(
+                    Image.makeFromBitmap(bitmap),
                     IRect(0, 0, bitmap.getWidth(), bitmap.getHeight()).toRect()
                 )
             }
@@ -272,8 +273,8 @@ import androidx.compose.runtime.DisposableEffect
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.asImageBitmap
-import androidx.compose.ui.window.MenuItem
-import androidx.compose.ui.window.Tray
+import androidx.compose.ui.window.v1.MenuItem
+import androidx.compose.ui.window.v1.Tray
 import org.jetbrains.skija.Image
 import java.awt.image.BufferedImage
 import java.io.ByteArrayOutputStream
