@@ -25,7 +25,7 @@ inline fun <TScope, T, reified E : Applier<*>> ComposeDomNode(
     noinline factory: () -> T,
     elementScope: TScope,
     noinline attrsSkippableUpdate: @Composable SkippableUpdater<T>.() -> Unit,
-    content: @Composable TScope.() -> Unit
+    noinline content: (@Composable TScope.() -> Unit)?
 ) {
     if (currentComposer.applier !is E) error("Invalid applier")
     currentComposer.startNode()
@@ -40,7 +40,7 @@ inline fun <TScope, T, reified E : Applier<*>> ComposeDomNode(
     }
 
     currentComposer.startReplaceableGroup(0x7ab4aae9)
-    content(elementScope)
+    content?.invoke(elementScope)
     currentComposer.endReplaceableGroup()
     currentComposer.endNode()
 }
@@ -50,10 +50,10 @@ class DisposableEffectHolder(
 )
 
 @Composable
-inline fun <TTag : Tag, TElement : Element> TagElement(
+fun <TTag : Tag, TElement : Element> TagElement(
     tagName: String,
-    crossinline applyAttrs: AttrsBuilder<TTag>.() -> Unit,
-    content: @Composable ElementScope<TElement>.() -> Unit
+    applyAttrs: AttrsBuilder<TTag>.() -> Unit,
+    content: (@Composable ElementScope<TElement>.() -> Unit)?
 ) {
     val scope = remember { ElementScopeImpl<TElement>() }
     val refEffect = remember { DisposableEffectHolder() }
