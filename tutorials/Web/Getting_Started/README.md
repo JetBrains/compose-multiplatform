@@ -91,23 +91,23 @@ kotlin {
 #### 7. Add the `Main.kt` file:
 ```kotlin
 fun main() {
-    var count: Int by mutableStateOf(0)
+    val count = mutableStateOf(0)
 
     renderComposable(rootElementId = "root") {
         Div(style = { padding(25.px) }) {
             Button(attrs = {
-                onClick { count -= 1 }
+                onClick { count.value = count.value - 1 }
             }) {
                 Text("-")
             }
 
             Span(style = { padding(15.px) }) {
-                Text("$count")
+                Text("${count.value}")
             }
 
 
             Button(attrs = {
-                onClick { count += 1 }
+                onClick { count.value = count.value + 1 }
             }) {
                 Text("+")
             }
