@@ -45,7 +45,7 @@ class SendMoveTest() {
     val rule = createComposeRule()
 
     @get:Rule
-    val inputDispatcherRule: TestRule = InputDispatcherTestRule(disableDispatchInRealTime = true)
+    val inputDispatcherRule: TestRule = InputDispatcherTestRule()
 
     @Before
     fun setUp() {

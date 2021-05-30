@@ -26,6 +26,7 @@ import androidx.compose.ui.test.createTestContext
 import androidx.compose.ui.test.util.InputDispatcherTestRule
 import androidx.compose.ui.test.util.MotionEventRecorder
 import com.google.common.truth.Truth.assertThat
+import com.nhaarman.mockitokotlin2.any
 import com.nhaarman.mockitokotlin2.doReturn
 import com.nhaarman.mockitokotlin2.mock
 import org.junit.After
@@ -37,14 +38,16 @@ open class InputDispatcherTest(eventPeriodOverride: Long? = null) {
 
     @get:Rule
     val inputDispatcherRule: TestRule = InputDispatcherTestRule(
-        disableDispatchInRealTime = true,
         eventPeriodOverride = eventPeriodOverride
     )
 
     internal val recorder = MotionEventRecorder()
     private val testClock: MainTestClock = mock()
-    private val testOwner: TestOwner = mock() {
+    private val testOwner: TestOwner = mock {
         on { mainClock } doReturn testClock
+        on { runOnUiThread(any<() -> Any>()) }.then {
+            it.getArgument<() -> Any>(0).invoke()
+        }
     }
     private val testContext = createTestContext(testOwner)
     internal val subject = AndroidInputDispatcher(testContext, null, recorder::recordEvent)
