@@ -118,10 +118,7 @@ class SendSwipeVelocityTest(private val config: TestConfig) {
     val rule = createComposeRule()
 
     @get:Rule
-    val inputDispatcherRule: TestRule = InputDispatcherTestRule(
-        disableDispatchInRealTime = true,
-        eventPeriodOverride = eventPeriod
-    )
+    val inputDispatcherRule: TestRule = InputDispatcherTestRule(eventPeriodOverride = eventPeriod)
 
     private val recorder = SinglePointerInputRecorder()
 

@@ -27,13 +27,8 @@ import android.view.MotionEvent.ACTION_POINTER_UP
 import android.view.MotionEvent.ACTION_UP
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.node.RootForTest
-import androidx.compose.ui.platform.AndroidUiDispatcher
 import androidx.compose.ui.platform.ViewRootForTest
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.runBlocking
-import kotlinx.coroutines.withContext
-import kotlin.math.max
 
 internal actual fun createInputDispatcher(
     testContext: TestContext,
@@ -56,7 +51,7 @@ internal class AndroidInputDispatcher(
     private val batchLock = Any()
     // Batched events are generated just-in-time, given the "lateness" of the dispatching (see
     // sendAllSynchronous), so enqueue generators rather than instantiated events
-    private var batchedEvents = mutableListOf<(Long) -> MotionEvent>()
+    private var batchedEvents = mutableListOf<MotionEvent>()
     private var acceptEvents = true
     private var firstEventTime = Long.MAX_VALUE
     private val previousLastEventTime = partialGesture?.lastEventTime
@@ -129,17 +124,17 @@ internal class AndroidInputDispatcher(
             if (firstEventTime == Long.MAX_VALUE) {
                 firstEventTime = eventTime
             }
-            batchedEvents.add { lateness ->
-                val positionInScreen = if (root != null) {
-                    val array = intArrayOf(0, 0)
-                    root.view.getLocationOnScreen(array)
-                    Offset(array[0].toFloat(), array[1].toFloat())
-                } else {
-                    Offset.Zero
-                }
+            val positionInScreen = if (root != null) {
+                val array = intArrayOf(0, 0)
+                root.view.getLocationOnScreen(array)
+                Offset(array[0].toFloat(), array[1].toFloat())
+            } else {
+                Offset.Zero
+            }
+            batchedEvents.add(
                 MotionEvent.obtain(
-                    /* downTime = */ lateness + downTime,
-                    /* eventTime = */ lateness + eventTime,
+                    /* downTime = */ downTime,
+                    /* eventTime = */ eventTime,
                     /* action = */ action + (actionIndex shl ACTION_POINTER_INDEX_SHIFT),
                     /* pointerCount = */ coordinates.size,
                     /* pointerProperties = */ Array(coordinates.size) {
@@ -162,32 +157,24 @@ internal class AndroidInputDispatcher(
                 ).apply {
                     offsetLocation(-positionInScreen.x, -positionInScreen.y)
                 }
-            }
+            )
         }
     }
 
     override fun sendAllSynchronous() {
-        runBlocking {
-            // Must inject on the main thread, because it might modify View properties
-            withContext(AndroidUiDispatcher.Main) {
-                checkAndStopAcceptingEvents()
+        // Must inject on the main thread, because it might modify View properties
+        @OptIn(InternalTestApi::class)
+        testContext.testOwner.runOnUiThread {
+            checkAndStopAcceptingEvents()
 
-                // Use gestureLateness if already calculated; calculate, store and use it otherwise
-                val lateness = gestureLateness ?: max(0, now - firstEventTime).also {
-                    gestureLateness = it
-                }
-
-                // Add lateness so we're on the same timeline as the event times
-                var lastEventTime = (previousLastEventTime ?: firstEventTime) + lateness
-                batchedEvents.forEach {
-                    // Before injecting the next event, pump the clock
-                    // by the difference between this and the last event
-                    val event = it(lateness)
-                    pumpClock(
-                        event.eventTime - lastEventTime.also { lastEventTime = event.eventTime }
-                    )
-                    sendAndRecycleEvent(event)
-                }
+            var lastEventTime = (previousLastEventTime ?: firstEventTime)
+            batchedEvents.forEach { event ->
+                // Before injecting the next event, pump the clock
+                // by the difference between this and the last event
+                pumpClock(
+                    event.eventTime - lastEventTime.also { lastEventTime = event.eventTime }
+                )
+                sendAndRecycleEvent(event)
             }
         }
         // Each invocation of performGesture (Actions.kt) uses a new instance of an input
@@ -220,18 +207,10 @@ internal class AndroidInputDispatcher(
     }
 
     /**
-     * Sends and recycles the given [event]. If [InputDispatcher.dispatchInRealTime] is `true`,
-     * suspends until [now] is equal to the event's `eventTime`. Doesn't suspend otherwise, or if
-     * the event's `eventTime` is before [now].
+     * Sends and recycles the given [event].
      */
-    private suspend fun sendAndRecycleEvent(event: MotionEvent) {
+    private fun sendAndRecycleEvent(event: MotionEvent) {
         try {
-            if (dispatchInRealTime) {
-                val delayMs = event.eventTime - now
-                if (delayMs > 0) {
-                    delay(delayMs)
-                }
-            }
             sendEvent(event)
         } finally {
             event.recycle()

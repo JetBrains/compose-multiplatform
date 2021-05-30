@@ -58,6 +58,11 @@ dependencies {
         implementation(KOTLIN_COROUTINES_CORE)
         implementation(KOTLIN_COROUTINES_TEST)
 
+        testImplementation(project(":compose:material:material"))
+        testImplementation(project(":compose:test-utils"))
+        testImplementation(TRUTH)
+        testImplementation(ROBOLECTRIC)
+
         androidTestImplementation(project(":compose:test-utils"))
         androidTestImplementation(project(":compose:material:material"))
         androidTestImplementation(ANDROIDX_TEST_RULES)
@@ -106,6 +111,13 @@ if(AndroidXUiPlugin.isMultiplatformEnabled(project)) {
                 implementation(ANDROIDX_TEST_MONITOR)
                 implementation(ESPRESSO_CORE)
                 implementation(ESPRESSO_IDLING_RESOURCE)
+            }
+
+            test.dependencies {
+                implementation(project(":compose:material:material"))
+                implementation(project(":compose:test-utils"))
+                implementation(TRUTH)
+                implementation(ROBOLECTRIC)
             }
 
             androidAndroidTest.dependencies {
