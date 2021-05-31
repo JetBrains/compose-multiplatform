@@ -115,6 +115,13 @@ fun main() {
     }
 }
 ```
+In case you see an error:
+`Type 'MutableState<TypeVariable(T)>' has no method 'getValue(Nothing?, KProperty<*>)'...` or 
+`Type 'MutableState<TypeVariable(T)>' has no method 'setValue(Nothing?, KProperty<*>, Int)'...`, please add the imports:
+```kotlin
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.setValue
+```
 
 ## Running the project
 
