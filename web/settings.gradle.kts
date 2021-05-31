@@ -31,6 +31,7 @@ module(":web-core", "$rootDir/core")
 module(":web-widgets", "$rootDir/widgets")
 module(":web-integration-core", "$rootDir/integration-core")
 module(":web-integration-widgets", "$rootDir/integration-widgets")
+module(":web-benchmark-core", "$rootDir/benchmark-core")
 
 if (extra["COMPOSE_WEB_BUILD_WITH_EXAMPLES"]!!.toString().toBoolean() == true) {
     println("building with examples")
