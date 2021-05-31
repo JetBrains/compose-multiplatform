@@ -9,7 +9,7 @@ In this tutorial we have a look at how to style the components using the Style D
 
 You can declare inline styles via the `style` block of a component
 
-```kotlin
+``` kotlin
 Div(
     style = {
         display(DisplayStyle.Flex)
@@ -31,7 +31,7 @@ In HTML, it will look like this:
 ### Stylesheet
 An alternative way is to define a Stylesheet that contains rules:
 
-```kotlin
+``` kotlin
 object AppStylesheet : StyleSheet() {
     val container by style { // container is a class
         display(DisplayStyle.Flex)
@@ -72,7 +72,7 @@ In HTML, it will look like this:
 
 The Style DSL also provides a way to combine and unify selectors:
 
-```kotlin
+``` kotlin
 object AppStylesheet : StyleSheet() {
     
     init {
@@ -116,7 +116,7 @@ object AppStylesheet : StyleSheet() {
 
 To specify media queries, you can use the `media` function, which takes the related query, and a block of styles:
 
-```kotlin
+``` kotlin
 object AppStylesheet : StyleSheet() {
     val container by style {
         padding(48.px)
@@ -134,7 +134,7 @@ object AppStylesheet : StyleSheet() {
 
 The style DSL also provides support for CSS variables.
 
-```kotlin
+``` kotlin
 object MyVariables : CSSVariables {
     // declare a variable
     val contentBackgroundColor by variable<Color>() 
@@ -156,6 +156,57 @@ object MyStyleSheet: StyleSheet() {
         // default value can be provided as well
         // default value is used when the value is not previously set
         backgroundColor(MyVariables.contentBackgroundColor.value(Color("#333")))
+    }
+}
+```
+
+
+### Runnable example
+
+```kotlin
+import androidx.compose.runtime.*
+import androidx.compose.web.elements.*
+import androidx.compose.web.attributes.*
+import androidx.compose.web.css.*
+import androidx.compose.web.renderComposable
+
+object AppStylesheet : StyleSheet() {
+    val container by style { // container is a class
+        display(DisplayStyle.Flex)
+        padding(20.px)
+
+        // custom property (or not supported out of a box)
+        property("font-family", value("Arial, Helvetica, sans-serif"))
+    }
+}
+
+@Composable
+fun Container(content: @Composable () -> Unit) {
+    Div(
+        attrs = { classes(AppStylesheet.container) }
+    ) {
+        content()
+    }
+}
+
+fun main() {
+    renderComposable(rootElementId = "root") {
+        Div(
+            style = {
+                display(DisplayStyle.Flex)
+                padding(20.px)
+
+                // custom property (or not supported out of a box)
+                property("font-family", value("Arial, Helvetica, sans-serif"))
+            }
+        ) { /* content goes here */ }
+
+
+        Style(AppStylesheet)
+
+        Container {
+            Text("Content")
+        }
     }
 }
 ```
