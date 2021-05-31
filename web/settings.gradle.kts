@@ -20,12 +20,12 @@ pluginManagement {
     }
 }
 
-include("web-core")
-include("web-widgets")
-include("web-integration-core")
-include("web-integration-widgets")
+fun module(name: String, path: String) {
+    include(name)
+    project(name).projectDir = file(path)
+}
 
-project(":web-core").projectDir = file("$rootDir/core")
-project(":web-widgets").projectDir = file("$rootDir/widgets")
-project(":web-integration-core").projectDir = file("$rootDir/integration-core")
-project(":web-integration-widgets").projectDir = file("$rootDir/integration-widgets")
+module(":web-core", "$rootDir/core")
+module(":web-widgets", "$rootDir/widgets")
+module(":web-integration-core", "$rootDir/integration-core")
+module(":web-integration-widgets", "$rootDir/integration-widgets")
