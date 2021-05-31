@@ -8,27 +8,28 @@ data class SnippetData(
 fun findSnippets(dirs: List<String>): List<SnippetData> {
   val snippets = mutableListOf<SnippetData>()
   dirs.forEach { dirName ->
-    rootProject
+    val dir = rootProject
       .projectDir
       .parentFile
       .resolve(dirName)
-      .listFiles()
-      .filter { it.name.endsWith(".md") }
-      .forEach { file ->
-      val currentSnippet = kotlin.text.StringBuilder()
-      var snippetStart = 0
-      var lineNumber = 0
-      file.forEachLine { line ->
-        lineNumber++
-        if (line == "```kotlin")
-          snippetStart = lineNumber + 1
-        else if (line == "```" && snippetStart != 0) {
-          snippets.add(SnippetData(file, snippetStart, currentSnippet.toString()))
-          snippetStart = 0
-          currentSnippet.clear()
-        } else {
-          if (snippetStart != 0) {
-            currentSnippet.appendln(line)
+      .listFiles()?.let {
+        it.filter { it.name.endsWith(".md") }
+          .forEach { file ->
+            val currentSnippet = kotlin.text.StringBuilder()
+            var snippetStart = 0
+            var lineNumber = 0
+            file.forEachLine { line ->
+              lineNumber++
+              if (line == "```kotlin")
+                snippetStart = lineNumber + 1
+              else if (line == "```" && snippetStart != 0) {
+                snippets.add(SnippetData(file, snippetStart, currentSnippet.toString()))
+              snippetStart = 0
+              currentSnippet.clear()
+            } else {
+              if (snippetStart != 0) {
+                currentSnippet.appendln(line)
+            }
           }
         }
       }
@@ -78,13 +79,17 @@ fun checkDirs(dirs: List<String>) {
 // with whitespace marks code that shall not be checked.
 tasks.register("check") {
   doLast {
-    val dirs = project
-      .projectDir
-      .parentFile
-      .listFiles()
-      .filter {
-        it.isDirectory && it.name[0].isUpperCase() }
-      .map { it.name }
-    checkDirs(dirs)
+    for (dir in listOf(".", "Web")) {
+      val subdirs = project
+        .projectDir
+        .parentFile
+        .resolve(dir)
+        .listFiles()
+        .filter {
+          it.isDirectory && it.name[0].isUpperCase()
+        }
+        .map { it.name }
+      checkDirs(subdirs.map { "$dir/$it" })
+    }
   }
 }
