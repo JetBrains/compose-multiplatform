@@ -38,11 +38,11 @@ fun findSnippets(dirs: List<String>): List<SnippetData> {
   return snippets
 }
 
-fun cloneTemplate(index: Int, content: String): File {
+fun cloneTemplate(template: String, index: Int, content: String): File {
   val tempDir = file("${project.buildDir.absolutePath}/temp/cloned-$index")
   tempDir.deleteRecursively()
   tempDir.mkdirs()
-  file("${projectDir.parentFile.parentFile.absolutePath}/templates/desktop-template").copyRecursively(tempDir)
+  file("${projectDir.parentFile.parentFile.absolutePath}/templates/$template").copyRecursively(tempDir)
   // tempDir.deleteOnExit()
   File("$tempDir/src/main/kotlin/main.kt").printWriter().use { out ->
     out.println(content)
@@ -50,11 +50,11 @@ fun cloneTemplate(index: Int, content: String): File {
   return tempDir
 }
 
-fun checkDirs(dirs: List<String>) {
+fun checkDirs(dirs: List<String>, template: String) {
   val snippets = findSnippets(dirs)
   snippets.forEachIndexed { index, snippet ->
-    println("process snippet $index at ${snippet.file}:${snippet.lineNumber}")
-    snippet.tempDir = cloneTemplate(index, snippet.content)
+    println("process snippet $index at ${snippet.file}:${snippet.lineNumber} with $template")
+    snippet.tempDir = cloneTemplate(template, index, snippet.content)
     val isWin = System.getProperty("os.name").startsWith("Win")
     val procBuilder = if (isWin) {
         ProcessBuilder("gradlew.bat", "build")
@@ -89,7 +89,7 @@ tasks.register("check") {
           it.isDirectory && it.name[0].isUpperCase()
         }
         .map { it.name }
-      checkDirs(subdirs.map { "$dir/$it" })
+      checkDirs(subdirs.map { "$dir/$it" }, if (dir == ".") "desktop-template" else "web-template")
     }
   }
 }
