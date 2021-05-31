@@ -1,7 +1,11 @@
 # M4
+  * New experimental [Composable Window API](https://github.com/JetBrains/compose-jb/tree/master/tutorials/Window_API_new)
+  * [Tooltips](https://github.com/JetBrains/compose-jb/tree/master/tutorials/Desktop_Components#tooltips)
+  * Use [Metal renderer for macOS by default](https://github.com/JetBrains/skiko/pull/70)
+  * [Expose a swing mouse event in Modifier.pointerInput](https://github.com/JetBrains/compose-jb/issues/129#issuecomment-784149646)
+  * Improved [keyboard support in TextField](https://android-review.googlesource.com/c/platform/frameworks/support/+/1578803)
   * Avoid forcing discrete GPU on multi-GPU MacOS machines in [Skiko](https://github.com/JetBrains/skiko/pull/83) and [native distributions](https://github.com/JetBrains/compose-jb/issues/545)
   * Fixed [memory leak](https://github.com/JetBrains/compose-jb/issues/538)
-  * Improved [keyboard support in TextField](https://android-review.googlesource.com/c/platform/frameworks/support/+/1578803)
 
 # M3 (Feb 2021)
    * Improve [TextField](https://github.com/JetBrains/compose-jb/issues/277)
