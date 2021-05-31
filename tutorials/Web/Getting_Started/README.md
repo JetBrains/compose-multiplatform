@@ -39,7 +39,7 @@ pluginManagement {
 ```
 
 #### 3. Update `build.gradle.kts`:
-```kotlin
+``` kotlin
 // Add compose gradle plugin
 plugins {
     kotlin("multiplatform") version "1.5.0"
@@ -90,6 +90,17 @@ kotlin {
 
 #### 7. Add the `Main.kt` file:
 ```kotlin
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.setValue
+import androidx.compose.web.css.padding
+import androidx.compose.web.css.px
+import androidx.compose.web.elements.Button
+import androidx.compose.web.elements.Div
+import androidx.compose.web.elements.Span
+import androidx.compose.web.elements.Text
+import androidx.compose.web.renderComposable
+
 fun main() {
     var count: Int by mutableStateOf(0)
 
@@ -105,7 +116,6 @@ fun main() {
                 Text("$count")
             }
 
-
             Button(attrs = {
                 onClick { count += 1 }
             }) {
@@ -114,13 +124,6 @@ fun main() {
         }
     }
 }
-```
-In case you see an error:
-`Type 'MutableState<TypeVariable(T)>' has no method 'getValue(Nothing?, KProperty<*>)'...` or 
-`Type 'MutableState<TypeVariable(T)>' has no method 'setValue(Nothing?, KProperty<*>, Int)'...`, please add the imports:
-```kotlin
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.setValue
 ```
 
 ## Running the project
