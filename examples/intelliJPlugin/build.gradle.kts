@@ -5,7 +5,7 @@ plugins {
     java
     kotlin("jvm") version "1.5.10"
     // __LATEST_COMPOSE_RELEASE_VERSION__
-    id("org.jetbrains.compose") version "0.4.0-rc1"
+    id("org.jetbrains.compose") version "0.4.0-rc2"
 }
 
 group = "org.example"
@@ -25,7 +25,7 @@ dependencies {
 
 // See https://github.com/JetBrains/gradle-intellij-plugin/
 intellij {
-    version = "2020.3.2"
+    version = "2021.1"
 }
 tasks.getByName<org.jetbrains.intellij.tasks.PatchPluginXmlTask>("patchPluginXml") {
     changeNotes("""
