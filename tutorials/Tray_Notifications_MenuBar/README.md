@@ -1,4 +1,4 @@
-# Tray and menu notification
+# Menu, tray, notifications
 
 ## What is covered
 
