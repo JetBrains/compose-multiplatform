@@ -3,6 +3,7 @@
 .idea/*
 !.idea/copyright
 !.idea/scopes
+*.iml
 
 # Mac OS files
 
@@ -11,8 +12,10 @@
 # Compiled class file
 *.class
 
-# Log file
+# Log files
 *.log
+hs_err_pid*
+*.hprof
 
 # Package Files #
 *.jar
@@ -25,9 +28,10 @@
 *.tar.gz
 *.rar
 
-# virtual machine crash logs, see http://www.java.com/en/download/help/error_hotspot.xml
-hs_err_pid*
-
 # gradle
-build
+build/
 .gradle
+
+# Android
+/captures
+/local.properties
