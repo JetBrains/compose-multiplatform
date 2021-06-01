@@ -17,6 +17,7 @@
 package androidx.compose.foundation.text.selection
 
 import androidx.compose.foundation.text.InternalFoundationTextApi
+import androidx.compose.foundation.text.HandleState
 import androidx.compose.foundation.text.TextFieldState
 import androidx.compose.foundation.text.TextLayoutResultProxy
 import androidx.compose.ui.focus.FocusRequester
@@ -150,7 +151,7 @@ class TextFieldSelectionManagerTest {
 
         manager.touchSelectionObserver.onStart(dragBeginPosition)
 
-        assertThat(state.selectionIsOn).isTrue()
+        assertThat(state.handleState).isEqualTo(HandleState.Selection)
         assertThat(state.showFloatingToolbar).isTrue()
         assertThat(value.selection).isEqualTo(fakeTextRange)
         verify(
@@ -180,7 +181,7 @@ class TextFieldSelectionManagerTest {
         manager.touchSelectionObserver.onStart(dragBeginPosition)
 
         // Assert
-        assertThat(state.selectionIsOn).isTrue()
+        assertThat(state.handleState).isEqualTo(HandleState.Selection)
         assertThat(state.showFloatingToolbar).isTrue()
         assertThat(value.selection).isEqualTo(TextRange(fakeLineEnd))
         verify(
@@ -287,6 +288,48 @@ class TextFieldSelectionManagerTest {
     }
 
     @Test
+    fun TextFieldSelectionManager_cursorDragObserver_onStart() {
+        manager.cursorDragObserver().onStart(Offset.Zero)
+
+        assertThat(state.draggingHandle).isTrue()
+        assertThat(state.showFloatingToolbar).isFalse()
+        verify(spyLambda, times(0)).invoke(any())
+        verify(
+            hapticFeedback,
+            times(0)
+        ).performHapticFeedback(HapticFeedbackType.TextHandleMove)
+    }
+
+    @Test
+    fun TextFieldSelectionManager_cursorDragObserver_onDrag() {
+        manager.value = TextFieldValue(text = text, selection = TextRange(0, "Hello".length))
+
+        manager.cursorDragObserver().onDrag(dragDistance)
+
+        assertThat(state.showFloatingToolbar).isFalse()
+        assertThat(value.selection).isEqualTo(TextRange(dragOffset, dragOffset))
+        verify(
+            hapticFeedback,
+            times(1)
+        ).performHapticFeedback(HapticFeedbackType.TextHandleMove)
+    }
+
+    @Test
+    fun TextFieldSelectionManager_cursorDragObserver_onStop() {
+        manager.handleDragObserver(false).onStart(Offset.Zero)
+        manager.handleDragObserver(false).onDrag(Offset.Zero)
+
+        manager.cursorDragObserver().onStop()
+
+        assertThat(state.draggingHandle).isFalse()
+        assertThat(state.showFloatingToolbar).isFalse()
+        verify(
+            hapticFeedback,
+            times(0)
+        ).performHapticFeedback(HapticFeedbackType.TextHandleMove)
+    }
+
+    @Test
     fun TextFieldSelectionManager_deselect() {
         whenever(textToolbar.status).thenReturn(TextToolbarStatus.Shown)
         manager.value = TextFieldValue(text = text, selection = TextRange(0, "Hello".length))
@@ -295,7 +338,7 @@ class TextFieldSelectionManagerTest {
 
         verify(textToolbar, times(1)).hide()
         assertThat(value.selection).isEqualTo(TextRange("Hello".length))
-        assertThat(state.selectionIsOn).isFalse()
+        assertThat(state.handleState).isEqualTo(HandleState.None)
     }
 
     @Test
@@ -315,7 +358,7 @@ class TextFieldSelectionManagerTest {
 
         verify(clipboardManager, times(1)).setText(AnnotatedString("Hello"))
         assertThat(value.selection).isEqualTo(TextRange("Hello".length, "Hello".length))
-        assertThat(state.selectionIsOn).isFalse()
+        assertThat(state.handleState).isEqualTo(HandleState.None)
     }
 
     @Test
@@ -329,7 +372,7 @@ class TextFieldSelectionManagerTest {
 
         verify(clipboardManager, times(1)).setText(AnnotatedString("llo"))
         assertThat(value.selection).isEqualTo(TextRange("Hello".length, "Hello".length))
-        assertThat(state.selectionIsOn).isFalse()
+        assertThat(state.handleState).isEqualTo(HandleState.None)
     }
 
     @Test
@@ -362,7 +405,7 @@ class TextFieldSelectionManagerTest {
 
         assertThat(value.text).isEqualTo("HelHellorld")
         assertThat(value.selection).isEqualTo(TextRange("Hello Wo".length, "Hello Wo".length))
-        assertThat(state.selectionIsOn).isFalse()
+        assertThat(state.handleState).isEqualTo(HandleState.None)
     }
 
     @Test
@@ -377,7 +420,7 @@ class TextFieldSelectionManagerTest {
 
         assertThat(value.text).isEqualTo("Hi World")
         assertThat(value.selection).isEqualTo(TextRange("Hi".length, "Hi".length))
-        assertThat(state.selectionIsOn).isFalse()
+        assertThat(state.handleState).isEqualTo(HandleState.None)
     }
 
     @Test
@@ -401,7 +444,7 @@ class TextFieldSelectionManagerTest {
         verify(clipboardManager, times(1)).setText(AnnotatedString(" World"))
         assertThat(value.text).isEqualTo("HelloHello World")
         assertThat(value.selection).isEqualTo(TextRange("Hello".length, "Hello".length))
-        assertThat(state.selectionIsOn).isFalse()
+        assertThat(state.handleState).isEqualTo(HandleState.None)
     }
 
     @Test
@@ -416,7 +459,7 @@ class TextFieldSelectionManagerTest {
         verify(clipboardManager, times(1)).setText(AnnotatedString("llo"))
         assertThat(value.text).isEqualTo("He World")
         assertThat(value.selection).isEqualTo(TextRange("He".length, "He".length))
-        assertThat(state.selectionIsOn).isFalse()
+        assertThat(state.handleState).isEqualTo(HandleState.None)
     }
 
     @Test
