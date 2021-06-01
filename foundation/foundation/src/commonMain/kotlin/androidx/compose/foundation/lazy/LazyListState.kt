@@ -211,13 +211,14 @@ class LazyListState constructor(
 
     internal var onScrolledListener: LazyListOnScrolledListener? = null
 
+    private var canScrollBackward: Boolean = false
+    private var canScrollForward: Boolean = false
+
     // TODO: Coroutine scrolling APIs will allow this to be private again once we have more
     //  fine-grained control over scrolling
     /*@VisibleForTesting*/
     internal fun onScroll(distance: Float): Float {
-        if (distance < 0 && !scrollPosition.canScrollForward ||
-            distance > 0 && !scrollPosition.canScrollBackward
-        ) {
+        if (distance < 0 && !canScrollForward || distance > 0 && !canScrollBackward) {
             return 0f
         }
         check(abs(scrollToBeConsumed) <= 0.5f) {
@@ -276,6 +277,11 @@ class LazyListState constructor(
         )
         scrollToBeConsumed -= measureResult.consumedScroll
         layoutInfoState.value = measureResult
+
+        canScrollForward = measureResult.canScrollForward
+        canScrollBackward = measureResult.firstVisibleItemIndex.value != 0 ||
+            measureResult.firstVisibleItemScrollOffset != 0
+
         numMeasurePasses++
     }
 
@@ -326,11 +332,6 @@ private class ItemRelativeScrollPosition(
     private val scrollOffsetState = mutableStateOf(scrollOffset)
     val observableScrollOffset get() = scrollOffsetState.value
 
-    var canScrollBackward: Boolean = false
-        private set
-    var canScrollForward: Boolean = false
-        private set
-
     private var hadFirstNotEmptyLayout = false
 
     fun update(measureResult: LazyListMeasureResult) {
@@ -341,9 +342,6 @@ private class ItemRelativeScrollPosition(
             hadFirstNotEmptyLayout = true
             update(measureResult.firstVisibleItemIndex, measureResult.firstVisibleItemScrollOffset)
         }
-        this.canScrollForward = measureResult.canScrollForward
-        this.canScrollBackward = measureResult.firstVisibleItemIndex.value != 0 ||
-            measureResult.firstVisibleItemScrollOffset != 0
     }
 
     fun update(index: DataIndex, scrollOffset: Int) {
