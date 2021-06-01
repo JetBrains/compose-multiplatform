@@ -22,10 +22,12 @@ import androidx.compose.ui.platform.ViewLayer
 import java.util.concurrent.CountDownLatch
 
 open class TestActivity : ComponentActivity() {
-
     var receivedKeyEvent: KeyEvent? = null
 
     var hasFocusLatch = CountDownLatch(1)
+
+    var stopLatch = CountDownLatch(1)
+    var resumeLatch = CountDownLatch(1)
 
     init {
         setViewLayerTypeForApi28()
@@ -41,6 +43,24 @@ open class TestActivity : ComponentActivity() {
     override fun onKeyDown(keyCode: Int, event: KeyEvent?): Boolean {
         receivedKeyEvent = event
         return super.onKeyDown(keyCode, event)
+    }
+
+    override fun onStop() {
+        super.onStop()
+        stopLatch.countDown()
+        if (resumedActivity === this) {
+            resumedActivity = null
+        }
+    }
+
+    override fun onResume() {
+        resumedActivity = this
+        super.onResume()
+        resumeLatch.countDown()
+    }
+
+    companion object {
+        var resumedActivity: TestActivity? = null
     }
 }
 

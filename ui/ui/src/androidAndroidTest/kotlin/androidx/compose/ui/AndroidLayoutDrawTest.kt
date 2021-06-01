@@ -18,6 +18,7 @@
 
 package androidx.compose.ui
 
+import android.content.Intent
 import android.graphics.Bitmap
 import android.os.Build
 import android.os.Handler
@@ -2368,8 +2369,7 @@ class AndroidLayoutDrawTest {
                     )
                 }
             }
-            val content = activity.findViewById<ViewGroup>(android.R.id.content)
-            val composeView = content.getChildAt(0) as ComposeView
+            val composeView = activityTestRule.findAndroidComposeView() as AndroidComposeView
             composeView.showLayoutBounds = true
         }
         activityTestRule.waitAndScreenShot().apply {
@@ -2379,6 +2379,41 @@ class AndroidLayoutDrawTest {
             assertRect(Color.Blue, size = 20, holeSize = 18)
             assertRect(Color.White, size = 28, holeSize = 20)
             assertRect(Color.Red, size = 30, holeSize = 28)
+        }
+    }
+
+    // Ensure that showLayoutBounds is reset in onResume() to whatever is set in the
+    // settings.
+    @Test
+    @OptIn(InternalComposeUiApi::class)
+    fun showLayoutBounds_resetOnResume() {
+        activityTestRule.runOnUiThreadIR {
+            activity.setContent {
+            }
+        }
+        val composeView = activityTestRule.findAndroidComposeView() as AndroidComposeView
+        // find out whatever the current setting value is for showLayoutBounds
+        val startShowLayoutBounds = composeView.showLayoutBounds
+
+        activityTestRule.runOnUiThread {
+            val intent = Intent(activity, TestActivity::class.java)
+            activity.startActivity(intent)
+        }
+
+        assertTrue(activity.stopLatch.await(5, TimeUnit.SECONDS))
+
+        activityTestRule.runOnUiThread {
+            // set showLayoutBounds to something different
+            composeView.showLayoutBounds = !startShowLayoutBounds
+            activity.resumeLatch = CountDownLatch(1)
+            TestActivity.resumedActivity!!.finish()
+        }
+
+        assertTrue(activity.resumeLatch.await(5, TimeUnit.SECONDS))
+
+        activityTestRule.runOnUiThread {
+            // ensure showLayoutBounds was reset in onResume()
+            assertEquals(startShowLayoutBounds, composeView.showLayoutBounds)
         }
     }
 
