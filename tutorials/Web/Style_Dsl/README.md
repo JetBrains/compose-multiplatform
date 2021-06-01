@@ -10,15 +10,15 @@ In this tutorial we have a look at how to style the components using the Style D
 You can declare inline styles via the `style` block of a component
 
 ``` kotlin
-Div(
-    style = {
+Div({
+    style {
         display(DisplayStyle.Flex)
         padding(20.px)
         
         // custom property (or not supported out of a box)
         property("font-family", value("Arial, Helvetica, sans-serif"))
     }
-) { /* content goes here */ }
+}) { /* content goes here */ }
 ```
 
 In HTML, it will look like this:
@@ -164,11 +164,10 @@ object MyStyleSheet: StyleSheet() {
 ### Runnable example
 
 ```kotlin
-import androidx.compose.runtime.*
-import androidx.compose.web.elements.*
-import androidx.compose.web.attributes.*
-import androidx.compose.web.css.*
-import androidx.compose.web.renderComposable
+import androidx.compose.runtime.Composable
+import org.jetbrains.compose.web.css.*
+import org.jetbrains.compose.web.dom.*
+import org.jetbrains.compose.web.renderComposable
 
 object AppStylesheet : StyleSheet() {
     val container by style { // container is a class
@@ -191,15 +190,15 @@ fun Container(content: @Composable () -> Unit) {
 
 fun main() {
     renderComposable(rootElementId = "root") {
-        Div(
-            style = {
+        Div({
+            style {
                 display(DisplayStyle.Flex)
                 padding(20.px)
 
                 // custom property (or not supported out of a box)
                 property("font-family", value("Arial, Helvetica, sans-serif"))
             }
-        ) { /* content goes here */ }
+        }) { /* content goes here */ }
 
 
         Style(AppStylesheet)

@@ -175,19 +175,20 @@ You can find a more detailed overview of the style DSL, as well as additional ex
 ### Runnable example
 
 ```kotlin
-import androidx.compose.web.elements.*
-import androidx.compose.web.attributes.*
-import androidx.compose.web.css.*
-import androidx.compose.web.renderComposable
+import androidx.compose.runtime.Composable
+import org.jetbrains.compose.web.attributes.*
+import org.jetbrains.compose.web.css.*
+import org.jetbrains.compose.web.dom.*
+import org.jetbrains.compose.web.renderComposable
 
 fun main() {
     renderComposable(rootElementId = "root") {
         Div(
             attrs = {
                 // specify attributes here
-            },
-            style = {
-                // specify inline style here
+                style {
+                    // specify inline style here
+                }
             }
         ) {
             Text("A text in <div>")
@@ -196,17 +197,16 @@ fun main() {
         Input(
             type = InputType.Text, // All InputTypes supported
             value = "", // sets the input value
-            attrs = {},
-            style = {}
+            attrs = {}
         )
 
         Input(attrs = { type(InputType.Text) })
 
         Text("Arbitrary text")
 
-        Span(
-            style = { color("red") } // inline style
-        ) {
+        Span({
+            style { color("red") } // inline style
+        }) {
             Text("Red text")
         }
 
@@ -241,15 +241,15 @@ fun main() {
             }
         ) { Text("Button") }
 
-        Div(
-            style = {
+        Div({
+            style {
                 display(DisplayStyle.Flex)
                 padding(20.px)
 
                 // custom property
                 property("font-family", value("Arial, Helvetica, sans-serif"))
             }
-        ) { Text("Text in Div with inline style") }
+        }) { Text("Text in Div with inline style") }
     }
 }
 ```

@@ -60,9 +60,9 @@ There are more event listeners supported out of a box. We plan to add the docume
 
 ```kotlin
 import androidx.compose.runtime.*
-import androidx.compose.web.elements.*
-import androidx.compose.web.attributes.*
-import androidx.compose.web.renderComposable
+import org.jetbrains.compose.web.css.*
+import org.jetbrains.compose.web.dom.*
+import org.jetbrains.compose.web.renderComposable
 
 fun main() {
     renderComposable(rootElementId = "root") {
