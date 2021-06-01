@@ -42,8 +42,8 @@ pluginManagement {
 ``` kotlin
 // Add compose gradle plugin
 plugins {
-    kotlin("multiplatform") version "1.5.0"
-    id("org.jetbrains.compose") version "0.0.0-web-dev-13"
+    kotlin("multiplatform") version "1.5.10"
+    id("org.jetbrains.compose") version "0.0.0-web-dev-14"
 }
 
 // Add maven repositories
@@ -105,14 +105,14 @@ fun main() {
     var count: Int by mutableStateOf(0)
 
     renderComposable(rootElementId = "root") {
-        Div(style = { padding(25.px) }) {
+        Div({style { padding(25.px) }}) {
             Button(attrs = {
                 onClick { count -= 1 }
             }) {
                 Text("-")
             }
 
-            Span(style = { padding(15.px) }) {
+            Span({style {padding(15.px) }}) {
                 Text("$count")
             }
 
