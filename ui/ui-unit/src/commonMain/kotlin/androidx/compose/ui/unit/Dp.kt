@@ -99,7 +99,7 @@ inline class Dp(val value: Float) : Comparable<Dp> {
     override /* TODO: inline */ operator fun compareTo(other: Dp) = value.compareTo(other.value)
 
     @Stable
-    override fun toString() = "$value.dp"
+    override fun toString() = if (isUnspecified) "Dp.Unspecified" else "$value.dp"
 
     companion object {
         /**
