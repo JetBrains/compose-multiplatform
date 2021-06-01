@@ -1,8 +1,12 @@
-# OS windows management (new Composable API, experimental)
+# Top level windows management (new Composable API, experimental)
 
 ## What is covered
 
 In this tutorial we will show you how to work with windows using Compose for Desktop.
+
+We represent window state in the shape suitable for Compose-style state manipulations and automatically mapping it into the operating system window state.
+
+So top level windows can be both conditionally created in other composable functions and their window manager state could be manipulated using state produced by rememberWindowState() function.
 
 ## Open and close windows
 
@@ -46,7 +50,9 @@ fun main() = application {
 ```
 ![](window_properties.gif)
 
-You can also close/open windows using a simple `if` statement:
+You can also close/open windows using a simple `if` statement.
+
+When Window leaves the composition (isPerformingTask becomes `false`) - the native window automatically closes.
 ```kotlin
 import androidx.compose.material.Text
 import androidx.compose.runtime.LaunchedEffect
@@ -63,12 +69,12 @@ import kotlinx.coroutines.delay
 fun main() = application {
     var isPerformingTask by remember { mutableStateOf(true) }
     LaunchedEffect(Unit) {
-        delay(2000) // Do some “heavy lifting”
+        delay(2000) // Do some heavy lifting
         isPerformingTask = false
     }
     if (isPerformingTask) {
         Window {
-            Text("Performing some tasks – Please wait!")
+            Text("Performing some tasks. Please wait!")
         }
     } else {
         Window {
@@ -79,7 +85,9 @@ fun main() = application {
 ```
 ![](window_splash.gif)
 
-If window requires some custom logic on close (for example, to show a dialog), you can override close action using `onCloseRequest`:
+If window requires some custom logic on close (for example, to show a dialog), you can override close action using `onCloseRequest`.
+
+See that instead of an imperative approach to closing the window (`window.close()`) we use a declarative - close the window in response of changing the state: `isOpen = false`.
 ```kotlin
 import androidx.compose.material.Button
 import androidx.compose.material.Text
@@ -87,32 +95,26 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
-import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.Window
-import androidx.compose.ui.window.WindowSize
 import androidx.compose.ui.window.application
-import androidx.compose.ui.window.rememberDialogState
-
 @OptIn(ExperimentalComposeUiApi::class)
 fun main() = application {
     var isOpen by remember { mutableStateOf(true) }
-    var isAskToCloseShowing by remember { mutableStateOf(false) }
-
+    var isAskingToClose by remember { mutableStateOf(false) }
     if (isOpen) {
-        Window(onCloseRequest = { isAskToCloseShowing = true }) {
-            Text("Important document")
-
-            if (isAskToCloseShowing) {
+        Window(
+            onCloseRequest = { isAskingToClose = true }
+        ) {
+            if (isAskingToClose) {
                 Dialog(
-                    rememberDialogState(size = WindowSize(300.dp, 100.dp)),
                     title = "Close the document without saving?",
-                    initialAlignment = Alignment.Center,
-                    onCloseRequest = { isAskToCloseShowing = false }
+                    onCloseRequest = { isAskingToClose = false }
                 ) {
-                    Button(onClick = { isOpen = false }) {
+                    Button(
+                        onClick = { isOpen = false }
+                    ) {
                         Text("Yes")
                     }
                 }
@@ -196,6 +198,7 @@ import androidx.compose.ui.window.application
 @OptIn(ExperimentalComposeUiApi::class)
 fun main() = application {
     val applicationState = remember { MyApplicationState() }
+
     for (window in applicationState.windows) {
         MyWindow(window)
     }
@@ -248,12 +251,11 @@ private class MyWindowState(
     fun close() = close(this)
 }
 ```
-(don't forget to define a custom `onCloseRequest` to remove a window from the list)
 ![](multiple_windows.gif)
 
 ## Changing state (maximized, minimized, fullscreen, size, position) of the window.
 
-Some state of the window is hoisted into a separate class `WindowState`. You can change its properties in callbacks or observe it in Composable's:
+Some state of the native window is hoisted into a separate API class `WindowState`. You can change its properties in callbacks or observe it in Composable's:
 
 ```kotlin
 import androidx.compose.foundation.clickable
@@ -310,7 +312,6 @@ fun main() = application {
 ![](state.gif)
 
 ## Handle window-level shortcuts
-(it is not a final variant, we will investigate how can we provide a simple API for that):
 ```kotlin
 import androidx.compose.foundation.layout.Box
 import androidx.compose.material.TextField
@@ -361,6 +362,7 @@ fun main() = application {
     }
 }
 ```
+(currently it is a bit verbose; in the future we will investigate - how can we provide a simple API for handling window key events).
 
 ## Dialogs
 There are two types of window – modal and regular. Below are the functions for creating each type of window:

@@ -1,4 +1,4 @@
-# OS windows management
+# Top level windows management
 
 ## What is covered
 
