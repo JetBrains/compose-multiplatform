@@ -17,13 +17,18 @@
 package androidx.compose.ui.viewinterop
 
 import android.content.Context
+import android.os.Parcelable
+import android.util.SparseArray
 import android.view.View
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.ComposeNode
 import androidx.compose.runtime.CompositionContext
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.currentComposer
+import androidx.compose.runtime.currentCompositeKeyHash
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCompositionContext
+import androidx.compose.runtime.saveable.LocalSaveableStateRegistry
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.materialize
@@ -76,26 +81,45 @@ fun <T : View> AndroidView(
     val density = LocalDensity.current
     val layoutDirection = LocalLayoutDirection.current
     val parentReference = rememberCompositionContext()
-    val viewBlockHolderRef = remember { Ref<ViewFactoryHolder<T>>() }
+    val stateRegistry = LocalSaveableStateRegistry.current
+    val stateKey = currentCompositeKeyHash.toString()
+    val viewFactoryHolderRef = remember { Ref<ViewFactoryHolder<T>>() }
     ComposeNode<LayoutNode, UiApplier>(
         factory = {
             val viewFactoryHolder = ViewFactoryHolder<T>(context, parentReference)
             viewFactoryHolder.factory = factory
-            viewBlockHolderRef.value = viewFactoryHolder
+            @Suppress("UNCHECKED_CAST")
+            val savedState = stateRegistry?.consumeRestored(stateKey) as? SparseArray<Parcelable>
+            if (savedState != null) viewFactoryHolder.typedView?.restoreHierarchyState(savedState)
+            viewFactoryHolderRef.value = viewFactoryHolder
             viewFactoryHolder.layoutNode
         },
         update = {
-            set(materialized) { viewBlockHolderRef.value!!.modifier = it }
-            set(density) { viewBlockHolderRef.value!!.density = it }
-            set(update) { viewBlockHolderRef.value!!.updateBlock = it }
+            set(materialized) { viewFactoryHolderRef.value!!.modifier = it }
+            set(density) { viewFactoryHolderRef.value!!.density = it }
+            set(update) { viewFactoryHolderRef.value!!.updateBlock = it }
             set(layoutDirection) {
-                viewBlockHolderRef.value!!.layoutDirection = when (it) {
+                viewFactoryHolderRef.value!!.layoutDirection = when (it) {
                     LayoutDirection.Ltr -> android.util.LayoutDirection.LTR
                     LayoutDirection.Rtl -> android.util.LayoutDirection.RTL
                 }
             }
         }
     )
+
+    if (stateRegistry != null) {
+        DisposableEffect(stateRegistry, stateKey) {
+            val valueProvider = {
+                val hierarchyState = SparseArray<Parcelable>()
+                viewFactoryHolderRef.value!!.typedView?.saveHierarchyState(hierarchyState)
+                hierarchyState
+            }
+            val entry = stateRegistry.registerProvider(stateKey, valueProvider)
+            onDispose {
+                entry.unregister()
+            }
+        }
+    }
 }
 
 /**
@@ -109,7 +133,7 @@ internal class ViewFactoryHolder<T : View>(
     parentContext: CompositionContext? = null
 ) : AndroidViewHolder(context, parentContext), ViewRootForInspector {
 
-    private var typedView: T? = null
+    internal var typedView: T? = null
 
     override val viewRoot: View? get() = parent as? View
 

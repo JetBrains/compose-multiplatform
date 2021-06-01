@@ -59,6 +59,8 @@ internal abstract class AndroidViewHolder(
         parentContext?.let {
             compositionContext = it
         }
+        // We save state ourselves, depending on composition.
+        isSaveFromParentEnabled = false
     }
 
     /**
