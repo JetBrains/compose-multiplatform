@@ -270,17 +270,17 @@ class LazyListState constructor(
     /**
      *  Updates the state with the new calculated scroll position and consumed scroll.
      */
-    internal fun applyMeasureResult(measureResult: LazyListMeasureResult) {
-        scrollPosition.update(measureResult)
+    internal fun applyMeasureResult(result: LazyListMeasureResult) {
+        scrollPosition.update(result)
         lastVisibleItemIndexNonObservable = DataIndex(
-            measureResult.visibleItemsInfo.lastOrNull()?.index ?: 0
+            result.visibleItemsInfo.lastOrNull()?.index ?: 0
         )
-        scrollToBeConsumed -= measureResult.consumedScroll
-        layoutInfoState.value = measureResult
+        scrollToBeConsumed -= result.consumedScroll
+        layoutInfoState.value = result
 
-        canScrollForward = measureResult.canScrollForward
-        canScrollBackward = measureResult.firstVisibleItemIndex.value != 0 ||
-            measureResult.firstVisibleItemScrollOffset != 0
+        canScrollForward = result.canScrollForward
+        canScrollBackward = (result.firstVisibleItem?.index ?: 0) != 0 ||
+            result.firstVisibleItemScrollOffset != 0
 
         numMeasurePasses++
     }

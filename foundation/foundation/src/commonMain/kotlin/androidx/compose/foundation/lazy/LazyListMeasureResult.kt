@@ -28,8 +28,8 @@ internal class LazyListMeasureResult(
     val items: List<LazyMeasuredItem>,
     /** The main axis offset to be used for the first item in the [items] list.*/
     val itemsScrollOffset: Int,
-    /** The new value for [LazyListState.firstVisibleItemIndex].*/
-    val firstVisibleItemIndex: DataIndex,
+    /** The new first visible item.*/
+    val firstVisibleItem: LazyMeasuredItem?,
     /** The new value for [LazyListState.firstVisibleItemScrollOffset].*/
     val firstVisibleItemScrollOffset: Int,
     /** True if there is some space available to continue scrolling in the forward direction.*/

@@ -47,12 +47,15 @@ internal class LazyListScrollPosition(
     private var hadFirstNotEmptyLayout = false
 
     fun update(measureResult: LazyListMeasureResult) {
+        val firstVisibleItemIndex = measureResult.firstVisibleItem.let {
+            if (it != null) it.index else 0
+        }
         // we ignore the index and offset from measureResult until we get at least one
         // measurement with real items. otherwise the initial index and scroll passed to the
         // state would be lost and overridden with zeros.
         if (hadFirstNotEmptyLayout || measureResult.totalItemsCount > 0) {
             hadFirstNotEmptyLayout = true
-            update(measureResult.firstVisibleItemIndex, measureResult.firstVisibleItemScrollOffset)
+            update(DataIndex(firstVisibleItemIndex), measureResult.firstVisibleItemScrollOffset)
         }
     }
 
