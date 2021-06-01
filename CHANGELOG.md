@@ -1,4 +1,4 @@
-# M4
+# M4 (Jun 2021)
   * New experimental [Composable Window API](https://github.com/JetBrains/compose-jb/tree/master/tutorials/Window_API_new)
   * [Tooltips](https://github.com/JetBrains/compose-jb/tree/master/tutorials/Desktop_Components#tooltips)
   * Use [Metal renderer for macOS by default](https://github.com/JetBrains/skiko/pull/70)
