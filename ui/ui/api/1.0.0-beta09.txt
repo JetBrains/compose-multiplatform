@@ -624,12 +624,25 @@ package androidx.compose.ui.graphics.vector.compat {
 package androidx.compose.ui.hapticfeedback {
 
   public interface HapticFeedback {
-    method public void performHapticFeedback(androidx.compose.ui.hapticfeedback.HapticFeedbackType hapticFeedbackType);
+    method public void performHapticFeedback-CdsT49E(int hapticFeedbackType);
   }
 
-  public enum HapticFeedbackType {
-    enum_constant public static final androidx.compose.ui.hapticfeedback.HapticFeedbackType LongPress;
-    enum_constant public static final androidx.compose.ui.hapticfeedback.HapticFeedbackType TextHandleMove;
+  public final inline class HapticFeedbackType {
+    ctor public HapticFeedbackType();
+    method public static int constructor-impl(int value);
+    method public static inline boolean equals-impl(int p, Object? p1);
+    method public static boolean equals-impl0(int p1, int p2);
+    method public static inline int hashCode-impl(int p);
+    method public static String toString-impl(int $this);
+    field public static final androidx.compose.ui.hapticfeedback.HapticFeedbackType.Companion Companion;
+  }
+
+  public static final class HapticFeedbackType.Companion {
+    method public int getLongPress-5zf0vsI();
+    method public int getTextHandleMove-5zf0vsI();
+    method public java.util.List<androidx.compose.ui.hapticfeedback.HapticFeedbackType> values();
+    property public final int LongPress;
+    property public final int TextHandleMove;
   }
 
 }
