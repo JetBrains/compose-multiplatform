@@ -66,16 +66,22 @@ abstract class Placeable : Measured {
      */
     protected var measuredSize: IntSize = IntSize(0, 0)
         set(value) {
-            field = value
-            width = value.width.coerceIn(
-                measurementConstraints.minWidth,
-                measurementConstraints.maxWidth
-            )
-            height = value.height.coerceIn(
-                measurementConstraints.minHeight,
-                measurementConstraints.maxHeight
-            )
+            if (field != value) {
+                field = value
+                recalculateWidthAndHeight()
+            }
         }
+
+    private fun recalculateWidthAndHeight() {
+        width = measuredSize.width.coerceIn(
+            measurementConstraints.minWidth,
+            measurementConstraints.maxWidth
+        )
+        height = measuredSize.height.coerceIn(
+            measurementConstraints.minHeight,
+            measurementConstraints.maxHeight
+        )
+    }
 
     /**
      * Positions the [Placeable] at [position] in its parent's coordinate system.
@@ -98,6 +104,12 @@ abstract class Placeable : Measured {
      * The constraints used for the measurement made to obtain this [Placeable].
      */
     protected var measurementConstraints: Constraints = DefaultConstraints
+        set(value) {
+            if (field != value) {
+                field = value
+                recalculateWidthAndHeight()
+            }
+        }
 
     /**
      * The offset to be added to an apparent position assigned to this [Placeable] to make it real.

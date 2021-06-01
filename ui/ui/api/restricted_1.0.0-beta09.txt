@@ -1722,7 +1722,7 @@ package androidx.compose.ui.layout {
     method public final int getWidth();
     method protected abstract void placeAt-rMeLuDI(long position, float zIndex, kotlin.jvm.functions.Function1<? super androidx.compose.ui.graphics.GraphicsLayerScope,kotlin.Unit>? layerBlock);
     method protected final void setMeasuredSize-ozmzZPI(long value);
-    method protected final void setMeasurementConstraints-BRTryo0(long p);
+    method protected final void setMeasurementConstraints-BRTryo0(long value);
     property protected final long apparentToRealOffset;
     property public final int height;
     property public int measuredHeight;
