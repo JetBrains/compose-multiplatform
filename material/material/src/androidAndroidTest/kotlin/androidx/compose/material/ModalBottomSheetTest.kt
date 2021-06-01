@@ -21,6 +21,9 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.layout.onGloballyPositioned
+import androidx.compose.ui.layout.positionInRoot
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.semantics.SemanticsActions
 import androidx.compose.ui.test.SemanticsMatcher
@@ -534,5 +537,32 @@ class ModalBottomSheetTest {
             .assertTopPositionInRootIsEqualTo(height)
         topNode = rule.onNodeWithTag(topTag).fetchSemanticsNode()
         assertEquals(2, topNode.children.size)
+    }
+
+    @Test
+    fun modalBottomSheet_hiddenOnTheFirstFrame() {
+        val topTag = "ModalBottomSheetLayout"
+        var lastKnownPosition: Offset? = null
+        rule.setMaterialContent {
+            ModalBottomSheetLayout(
+                modifier = Modifier.testTag(topTag),
+                sheetState = rememberModalBottomSheetState(ModalBottomSheetValue.Hidden),
+                content = { Box(Modifier.fillMaxSize().testTag(contentTag)) },
+                sheetContent = {
+                    Box(
+                        Modifier.fillMaxSize().testTag(sheetTag).onGloballyPositioned {
+                            if (lastKnownPosition != null) {
+                                assertThat(lastKnownPosition).isEqualTo(it.positionInRoot())
+                            }
+                            lastKnownPosition = it.positionInRoot()
+                        }
+                    )
+                }
+            )
+        }
+
+        val height = rule.rootHeight()
+        rule.onNodeWithTag(sheetTag)
+            .assertTopPositionInRootIsEqualTo(height)
     }
 }

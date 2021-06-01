@@ -255,7 +255,16 @@ fun ModalBottomSheetLayout(
             Modifier
                 .fillMaxWidth()
                 .nestedScroll(sheetState.nestedScrollConnection)
-                .offset { IntOffset(0, sheetState.offset.value.roundToInt()) }
+                .offset {
+                    val y = if (sheetState.anchors.isEmpty()) {
+                        // if we don't know our anchors yet, render the sheet as hidden
+                        fullHeight.roundToInt()
+                    } else {
+                        // if we do know our anchors, respect them
+                        sheetState.offset.value.roundToInt()
+                    }
+                    IntOffset(0, y)
+                }
                 .bottomSheetSwipeable(sheetState, fullHeight, sheetHeightState)
                 .onGloballyPositioned {
                     sheetHeightState.value = it.size.height.toFloat()
