@@ -85,9 +85,9 @@ fun main() = application {
 ```
 ![](window_splash.gif)
 
-If window requires some custom logic on close (for example, to show a dialog), you can override close action using `onCloseRequest`.
+If the window requires some custom logic on close (for example, to show a dialog), you can override close action using `onCloseRequest`.
 
-See that instead of an imperative approach to closing the window (`window.close()`) we use a declarative - close the window in response of changing the state: `isOpen = false`.
+See that instead of an imperative approach to closing the window (`window.close()`) we use a declarative - close the window in response to changing the state: `isOpen = false`.
 ```kotlin
 import androidx.compose.material.Button
 import androidx.compose.material.Text
