@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package androidx.compose.androidview.demos
+package androidx.compose.ui.demos.viewinterop
 
 import android.annotation.SuppressLint
 import android.widget.EditText

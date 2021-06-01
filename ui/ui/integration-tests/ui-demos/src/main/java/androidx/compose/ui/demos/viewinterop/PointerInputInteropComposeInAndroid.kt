@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package androidx.compose.androidview.demos
+package androidx.compose.ui.demos.viewinterop
 
 import android.annotation.SuppressLint
 import android.os.Bundle
@@ -24,7 +24,6 @@ import android.view.ViewGroup
 import android.widget.Button
 import android.widget.TextView
 import androidx.activity.ComponentActivity
-import androidx.compose.androidview.adapters.setOnClick
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.detectTapGestures
@@ -48,6 +47,7 @@ import androidx.compose.material.Text
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.demos.R
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.graphics.toArgb
@@ -109,7 +109,7 @@ open class ComposeNothingInAndroidTap : ComponentActivity() {
         val container = findViewById<ComposeView>(R.id.clickableContainer)
         container.isClickable = true
         container.setBackgroundColor(currentColor.toArgb())
-        container.setOnClick {
+        container.setOnClickListener {
             currentColor = if (currentColor == Color.Green) {
                 Color.Red
             } else {
@@ -142,7 +142,7 @@ open class ComposeTapInAndroidTap : ComponentActivity() {
         val container = findViewById<ComposeView>(R.id.clickableContainer)
         container.isClickable = true
         container.setBackgroundColor(currentColor.toArgb())
-        container.setOnClick {
+        container.setOnClickListener {
             currentColor = if (currentColor == Color.Green) {
                 Color.Red
             } else {
@@ -331,7 +331,7 @@ open class ComposeInAndroidDialogDismissDialogDuringDispatch : FragmentActivity(
             "Open the dialog, then click the compose button in the dialog to remove the compose " +
             "button from the hierarchy synchronously."
 
-        findViewById<Button>(R.id.showDialogButton).setOnClick { showDialog() }
+        findViewById<Button>(R.id.showDialogButton).setOnClickListener { showDialog() }
     }
 
     private fun showDialog() {
