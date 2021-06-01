@@ -77,4 +77,28 @@ class UndoManagerTest {
             TextFieldValue("hi")
         )
     }
+
+    @Test
+    fun snapshotIfNeeded_time_based() {
+        val manager = UndoManager(11)
+        manager.makeSnapshot(TextFieldValue("hello"))
+        manager.snapshotIfNeeded(TextFieldValue("hi"), now = 0)
+        assertThat(manager.undo()).isNull()
+
+        manager.snapshotIfNeeded(TextFieldValue("hi"), now = SNAPSHOTS_INTERVAL_MILLIS + 1L)
+        assertThat(manager.undo()).isEqualTo(
+            TextFieldValue("hello")
+        )
+    }
+
+    @Test
+    fun snapshotIfNeeded_forced() {
+        val manager = UndoManager(11)
+        manager.makeSnapshot(TextFieldValue("hello"))
+        manager.forceNextSnapshot()
+        manager.snapshotIfNeeded(TextFieldValue("hi"), now = 0)
+        assertThat(manager.undo()).isEqualTo(
+            TextFieldValue("hello")
+        )
+    }
 }
