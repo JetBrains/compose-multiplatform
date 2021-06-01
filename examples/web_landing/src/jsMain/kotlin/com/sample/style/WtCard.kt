@@ -1,6 +1,6 @@
 package com.sample.style
 
-import androidx.compose.web.css.*
+import org.jetbrains.compose.web.css.*
 
 object WtCards : StyleSheet(AppStylesheet) {
     val wtCard by style {

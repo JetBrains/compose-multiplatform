@@ -4,7 +4,7 @@
  */
 
 @file:Suppress("UNUSED")
-package androidx.compose.web.css
+package org.jetbrains.compose.web.css
 
 import kotlin.js.JsName
 

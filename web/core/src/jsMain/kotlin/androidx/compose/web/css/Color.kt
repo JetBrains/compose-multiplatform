@@ -1,4 +1,4 @@
-package androidx.compose.web.css
+package org.jetbrains.compose.web.css
 
 abstract class Color : CustomStyleValue {
     override fun styleValue(): StylePropertyValue = StylePropertyValue(toString())

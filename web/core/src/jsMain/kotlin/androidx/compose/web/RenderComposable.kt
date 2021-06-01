@@ -1,11 +1,11 @@
-package androidx.compose.web
+package org.jetbrains.compose.web
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Composition
 import androidx.compose.runtime.ControlledComposition
 import androidx.compose.runtime.DefaultMonotonicFrameClock
 import androidx.compose.runtime.Recomposer
-import androidx.compose.web.elements.DOMScope
+import org.jetbrains.compose.web.dom.DOMScope
 import kotlinx.browser.document
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.CoroutineStart

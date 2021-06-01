@@ -1,6 +1,6 @@
-package androidx.compose.web.css
+package org.jetbrains.compose.web.css
 
-import androidx.compose.web.css.selectors.CSSSelector
+import org.jetbrains.compose.web.css.selectors.CSSSelector
 
 interface CSSRulesHolder {
     val cssRules: CSSRuleDeclarationList

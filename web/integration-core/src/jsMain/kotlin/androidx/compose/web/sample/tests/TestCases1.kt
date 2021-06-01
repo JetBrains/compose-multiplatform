@@ -1,16 +1,16 @@
-package androidx.compose.web.sample.tests
+package org.jetbrains.compose.web.sample.tests
 
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
-import androidx.compose.web.css.backgroundColor
-import androidx.compose.web.css.height
-import androidx.compose.web.css.px
-import androidx.compose.web.css.width
-import androidx.compose.web.elements.Button
-import androidx.compose.web.elements.Div
-import androidx.compose.web.elements.Text
+import org.jetbrains.compose.web.css.backgroundColor
+import org.jetbrains.compose.web.css.height
+import org.jetbrains.compose.web.css.px
+import org.jetbrains.compose.web.css.width
+import org.jetbrains.compose.web.dom.Button
+import org.jetbrains.compose.web.dom.Div
+import org.jetbrains.compose.web.dom.Text
 
 class TestCases1 {
     val helloWorldText by testCase {

@@ -1,17 +1,17 @@
 package com.sample.content
 
 import androidx.compose.runtime.Composable
-import androidx.compose.web.attributes.InputType
-import androidx.compose.web.attributes.checked
-import androidx.compose.web.attributes.name
-import androidx.compose.web.css.*
-import androidx.compose.web.css.selectors.CSSSelector
-import androidx.compose.web.css.selectors.descendant
-import androidx.compose.web.css.selectors.selector
-import androidx.compose.web.elements.Form
-import androidx.compose.web.elements.Input
-import androidx.compose.web.elements.Label
-import androidx.compose.web.elements.Text
+import org.jetbrains.compose.web.attributes.InputType
+import org.jetbrains.compose.web.attributes.checked
+import org.jetbrains.compose.web.attributes.name
+import org.jetbrains.compose.web.css.*
+import org.jetbrains.compose.web.css.selectors.CSSSelector
+import org.jetbrains.compose.web.css.selectors.descendant
+import org.jetbrains.compose.web.css.selectors.selector
+import org.jetbrains.compose.web.dom.Form
+import org.jetbrains.compose.web.dom.Input
+import org.jetbrains.compose.web.dom.Label
+import org.jetbrains.compose.web.dom.Text
 import com.sample.style.AppStylesheet
 
 private object SwitcherVariables : CSSVariables {

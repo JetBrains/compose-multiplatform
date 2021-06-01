@@ -1,7 +1,7 @@
 package org.jetbrains.compose.web.core.tests
 
 import androidx.compose.runtime.Composable
-import androidx.compose.web.renderComposable
+import org.jetbrains.compose.web.renderComposable
 import kotlinx.browser.document
 import kotlinx.browser.window
 import kotlinx.coroutines.CoroutineScope

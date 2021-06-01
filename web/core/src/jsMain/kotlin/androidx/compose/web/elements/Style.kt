@@ -1,9 +1,9 @@
-package androidx.compose.web.elements
+package org.jetbrains.compose.web.dom
 
 import androidx.compose.runtime.Composable
-import androidx.compose.web.attributes.AttrsBuilder
-import androidx.compose.web.attributes.Tag
-import androidx.compose.web.css.*
+import org.jetbrains.compose.web.attributes.AttrsBuilder
+import org.jetbrains.compose.web.attributes.Tag
+import org.jetbrains.compose.web.css.*
 import org.w3c.dom.HTMLStyleElement
 import org.w3c.dom.css.CSSGroupingRule
 import org.w3c.dom.css.CSSRule
@@ -30,7 +30,7 @@ inline fun Style(
  * Use this function to mount the <style> tag into the DOM tree.
  *
  * @param cssRules - is a list of style rules.
- * Usually, it's [androidx.compose.web.css.StyleSheet] instance
+ * Usually, it's [org.jetbrains.compose.web.css.StyleSheet] instance
  */
 @Composable
 inline fun Style(

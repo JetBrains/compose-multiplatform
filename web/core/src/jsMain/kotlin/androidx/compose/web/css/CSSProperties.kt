@@ -1,4 +1,4 @@
-package androidx.compose.web.css
+package org.jetbrains.compose.web.css
 
 fun StyleBuilder.opacity(value: Number) {
     property("opacity", value(value))

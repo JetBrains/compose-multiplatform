@@ -1,6 +1,6 @@
-import androidx.compose.web.elements.Div
-import androidx.compose.web.elements.Text
-import androidx.compose.web.renderComposable
+import org.jetbrains.compose.web.dom.Div
+import org.jetbrains.compose.web.dom.Text
+import org.jetbrains.compose.web.renderComposable
 
 fun main() {
     renderComposable(rootElementId = "root") {

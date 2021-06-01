@@ -1,7 +1,7 @@
 package com.sample.style
 
-import androidx.compose.web.css.*
-import androidx.compose.web.css.selectors.CSSSelector
+import org.jetbrains.compose.web.css.*
+import org.jetbrains.compose.web.css.selectors.CSSSelector
 
 object AppCSSVariables : CSSVariables {
     val wtColorGreyLight by variable<Color>()

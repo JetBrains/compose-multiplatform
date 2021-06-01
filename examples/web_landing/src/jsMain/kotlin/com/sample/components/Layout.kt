@@ -1,10 +1,10 @@
 package com.sample.components
 
 import androidx.compose.runtime.Composable
-import androidx.compose.web.css.*
-import androidx.compose.web.elements.Div
-import androidx.compose.web.elements.Main
-import androidx.compose.web.elements.Section
+import org.jetbrains.compose.web.css.*
+import org.jetbrains.compose.web.dom.Div
+import org.jetbrains.compose.web.dom.Main
+import org.jetbrains.compose.web.dom.Section
 import com.sample.style.WtContainer
 import com.sample.style.WtOffsets
 import com.sample.style.WtSections

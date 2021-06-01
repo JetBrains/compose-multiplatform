@@ -1,11 +1,11 @@
-package androidx.compose.web
+package org.jetbrains.compose.web
 
 import androidx.compose.runtime.AbstractApplier
-import androidx.compose.web.attributes.WrappedEventListener
-import androidx.compose.web.css.StyleHolder
-import androidx.compose.web.css.attributeStyleMap
-import androidx.compose.web.elements.setProperty
-import androidx.compose.web.elements.setVariable
+import org.jetbrains.compose.web.attributes.WrappedEventListener
+import org.jetbrains.compose.web.css.StyleHolder
+import org.jetbrains.compose.web.css.attributeStyleMap
+import org.jetbrains.compose.web.dom.setProperty
+import org.jetbrains.compose.web.dom.setVariable
 import kotlinx.browser.document
 import kotlinx.dom.clear
 import org.w3c.dom.Element

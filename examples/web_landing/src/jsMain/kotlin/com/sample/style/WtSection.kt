@@ -1,6 +1,6 @@
 package com.sample.style
 
-import androidx.compose.web.css.*
+import org.jetbrains.compose.web.css.*
 
 object WtSections : StyleSheet(AppStylesheet) {
 
@@ -11,7 +11,7 @@ object WtSections : StyleSheet(AppStylesheet) {
         property(
             propertyName = "padding-bottom",
             value = value(
-                "calc(4*${AppCSSVariables.wtOffsetTopUnit.value(24.px).asString()})"
+                "calc(4*${AppCSSVariables.wtOffsetTopUnit.value(24.px)})"
             )
         )
         backgroundColor("#fff")

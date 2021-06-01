@@ -1,17 +1,17 @@
 package org.jetbrains.compose.web.ui
 
-import androidx.compose.web.css.justifyContent
-import androidx.compose.web.css.JustifyContent
-import androidx.compose.web.css.alignItems
-import androidx.compose.web.css.AlignItems
-import androidx.compose.web.css.flexDirection
-import androidx.compose.web.css.FlexDirection
-import androidx.compose.web.css.display
-import androidx.compose.web.css.DisplayStyle
-import androidx.compose.web.css.left
-import androidx.compose.web.css.px
+import org.jetbrains.compose.web.css.justifyContent
+import org.jetbrains.compose.web.css.JustifyContent
+import org.jetbrains.compose.web.css.alignItems
+import org.jetbrains.compose.web.css.AlignItems
+import org.jetbrains.compose.web.css.flexDirection
+import org.jetbrains.compose.web.css.FlexDirection
+import org.jetbrains.compose.web.css.display
+import org.jetbrains.compose.web.css.DisplayStyle
+import org.jetbrains.compose.web.css.left
+import org.jetbrains.compose.web.css.px
 
-import androidx.compose.web.css.StyleSheet
+import org.jetbrains.compose.web.css.StyleSheet
 
 object Styles : StyleSheet() {
     val columnClass = "compose-web-column"

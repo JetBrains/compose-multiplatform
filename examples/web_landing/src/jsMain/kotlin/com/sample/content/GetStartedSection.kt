@@ -1,8 +1,8 @@
 package com.sample.content
 
 import androidx.compose.runtime.Composable
-import androidx.compose.web.css.*
-import androidx.compose.web.elements.*
+import org.jetbrains.compose.web.css.*
+import org.jetbrains.compose.web.dom.*
 import com.sample.components.CardDark
 import com.sample.components.ContainerInSection
 import com.sample.components.LinkOnCard

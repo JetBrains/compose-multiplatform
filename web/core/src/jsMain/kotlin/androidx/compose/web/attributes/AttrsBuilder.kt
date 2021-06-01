@@ -1,9 +1,9 @@
-package androidx.compose.web.attributes
+package org.jetbrains.compose.web.attributes
 
 import androidx.compose.runtime.DisposableEffectResult
 import androidx.compose.runtime.DisposableEffectScope
-import androidx.compose.web.css.StyleBuilder
-import androidx.compose.web.css.StyleBuilderImpl
+import org.jetbrains.compose.web.css.StyleBuilder
+import org.jetbrains.compose.web.css.StyleBuilderImpl
 import org.w3c.dom.Element
 import org.w3c.dom.HTMLElement
 

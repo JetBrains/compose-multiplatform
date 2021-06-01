@@ -1,4 +1,4 @@
-package androidx.compose.web.elements
+package org.jetbrains.compose.web.dom
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.ComposeCompilerApi

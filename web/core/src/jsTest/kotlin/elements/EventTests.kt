@@ -1,9 +1,9 @@
 package org.jetbrains.compose.web.core.tests
 
-import androidx.compose.web.attributes.InputType
-import androidx.compose.web.elements.Button
-import androidx.compose.web.elements.Input
-import androidx.compose.web.elements.TextArea
+import org.jetbrains.compose.web.attributes.InputType
+import org.jetbrains.compose.web.dom.Button
+import org.jetbrains.compose.web.dom.Input
+import org.jetbrains.compose.web.dom.TextArea
 import org.w3c.dom.HTMLElement
 import org.w3c.dom.HTMLInputElement
 import org.w3c.dom.HTMLTextAreaElement

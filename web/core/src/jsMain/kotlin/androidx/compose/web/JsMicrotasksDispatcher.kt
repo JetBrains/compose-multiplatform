@@ -1,4 +1,4 @@
-package androidx.compose.web
+package org.jetbrains.compose.web
 
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Runnable

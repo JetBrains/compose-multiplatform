@@ -1,4 +1,4 @@
-package androidx.compose.web.events
+package org.jetbrains.compose.web.events
 
 import org.w3c.dom.DragEvent
 import org.w3c.dom.TouchEvent

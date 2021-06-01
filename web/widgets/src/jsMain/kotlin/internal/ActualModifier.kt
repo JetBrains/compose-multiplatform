@@ -1,8 +1,8 @@
 package org.jetbrains.compose.common.internal
 
 import org.jetbrains.compose.common.ui.Modifier
-import androidx.compose.web.css.StyleBuilder
-import androidx.compose.web.attributes.AttrsBuilder
+import org.jetbrains.compose.web.css.StyleBuilder
+import org.jetbrains.compose.web.attributes.AttrsBuilder
 
 class ActualModifier : Modifier {
     val styleHandlers = mutableListOf<StyleBuilder.() -> Unit>()

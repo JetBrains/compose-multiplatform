@@ -1,6 +1,6 @@
 @file:Suppress("UNUSED")
 
-package androidx.compose.web.css
+package org.jetbrains.compose.web.css
 
 // fake interfaces to distinguish units
 expect interface CSSSizeValue : CSSUnitValue

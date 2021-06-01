@@ -2,8 +2,8 @@ package org.jetbrains.compose.common.foundation.layout
 
 import org.jetbrains.compose.common.ui.Modifier
 import org.jetbrains.compose.common.internal.castOrCreate
-import androidx.compose.web.css.width
-import androidx.compose.web.css.percent
+import org.jetbrains.compose.web.css.width
+import org.jetbrains.compose.web.css.percent
 
 actual fun Modifier.fillMaxWidth(): Modifier = castOrCreate().apply {
     add {

@@ -1,7 +1,7 @@
 package com.sample
 
-import androidx.compose.web.css.Style
-import androidx.compose.web.renderComposable
+import org.jetbrains.compose.web.css.Style
+import org.jetbrains.compose.web.renderComposable
 import com.sample.components.*
 import com.sample.content.*
 import com.sample.style.AppStylesheet

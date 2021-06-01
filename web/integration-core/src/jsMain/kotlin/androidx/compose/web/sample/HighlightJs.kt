@@ -1,4 +1,4 @@
-package androidx.compose.web.sample
+package org.jetbrains.compose.web.sample
 
 import org.w3c.dom.HTMLElement
 

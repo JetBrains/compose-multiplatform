@@ -1,4 +1,4 @@
-package androidx.compose.web.elements
+package org.jetbrains.compose.web.dom
 
 import androidx.compose.runtime.Applier
 import androidx.compose.runtime.Composable
@@ -10,10 +10,10 @@ import androidx.compose.runtime.ExplicitGroupsComposable
 import androidx.compose.runtime.SkippableUpdater
 import androidx.compose.runtime.currentComposer
 import androidx.compose.runtime.remember
-import androidx.compose.web.DomApplier
-import androidx.compose.web.DomElementWrapper
-import androidx.compose.web.attributes.AttrsBuilder
-import androidx.compose.web.attributes.Tag
+import org.jetbrains.compose.web.DomApplier
+import org.jetbrains.compose.web.DomElementWrapper
+import org.jetbrains.compose.web.attributes.AttrsBuilder
+import org.jetbrains.compose.web.attributes.Tag
 import kotlinx.browser.document
 import org.w3c.dom.Element
 import org.w3c.dom.HTMLElement

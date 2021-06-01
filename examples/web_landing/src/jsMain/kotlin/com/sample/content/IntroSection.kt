@@ -1,12 +1,12 @@
 package com.sample.content
 
 import androidx.compose.runtime.*
-import androidx.compose.web.attributes.ATarget
-import androidx.compose.web.attributes.AttrsBuilder
-import androidx.compose.web.attributes.Tag
-import androidx.compose.web.attributes.target
-import androidx.compose.web.css.*
-import androidx.compose.web.elements.*
+import org.jetbrains.compose.web.attributes.ATarget
+import org.jetbrains.compose.web.attributes.AttrsBuilder
+import org.jetbrains.compose.web.attributes.Tag
+import org.jetbrains.compose.web.attributes.target
+import org.jetbrains.compose.web.css.*
+import org.jetbrains.compose.web.dom.*
 import com.sample.components.ContainerInSection
 import com.sample.style.*
 import org.w3c.dom.HTMLElement
@@ -224,8 +224,8 @@ private fun ComposeWebStatusMessage() {
 }
 
 @Composable
-inline fun Hr(
-    crossinline attrs: (AttrsBuilder<Tag.Div>.() -> Unit) = {}
+fun Hr(
+    attrs: (AttrsBuilder<Tag.Div>.() -> Unit) = {}
 ) {
     TagElement<Tag.Div, HTMLElement>(
         tagName = "hr",

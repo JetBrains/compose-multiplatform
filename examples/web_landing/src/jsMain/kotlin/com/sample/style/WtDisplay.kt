@@ -1,6 +1,6 @@
 package com.sample.style
 
-import androidx.compose.web.css.*
+import org.jetbrains.compose.web.css.*
 
 object WtDisplay : StyleSheet(AppStylesheet) {
     val wtDisplayNone by style {

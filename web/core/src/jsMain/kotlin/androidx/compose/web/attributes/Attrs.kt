@@ -1,4 +1,4 @@
-package androidx.compose.web.attributes
+package org.jetbrains.compose.web.attributes
 
 import org.w3c.dom.HTMLInputElement
 

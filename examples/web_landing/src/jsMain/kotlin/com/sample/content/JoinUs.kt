@@ -1,10 +1,10 @@
 package com.sample.content
 
 import androidx.compose.runtime.Composable
-import androidx.compose.web.attributes.ATarget
-import androidx.compose.web.attributes.target
-import androidx.compose.web.elements.*
-import androidx.compose.web.css.*
+import org.jetbrains.compose.web.attributes.ATarget
+import org.jetbrains.compose.web.attributes.target
+import org.jetbrains.compose.web.dom.*
+import org.jetbrains.compose.web.css.*
 import com.sample.components.ContainerInSection
 import com.sample.style.*
 

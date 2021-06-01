@@ -1,9 +1,9 @@
-package androidx.compose.web.sample.tests
+package org.jetbrains.compose.web.sample.tests
 
 import androidx.compose.runtime.Composable
-import androidx.compose.web.elements.Span
-import androidx.compose.web.elements.Text
-import androidx.compose.web.renderComposableInBody
+import org.jetbrains.compose.web.dom.Span
+import org.jetbrains.compose.web.dom.Text
+import org.jetbrains.compose.web.renderComposableInBody
 import kotlin.properties.ReadOnlyProperty
 import kotlin.reflect.KProperty
 

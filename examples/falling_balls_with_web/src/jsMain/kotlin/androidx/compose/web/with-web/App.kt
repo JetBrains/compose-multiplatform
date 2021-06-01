@@ -1,13 +1,13 @@
 package org.jetbrainsc.compose.common.demo
 
-import androidx.compose.web.renderComposable
+import org.jetbrains.compose.web.renderComposable
 import kotlinx.browser.document
 import org.w3c.dom.HTMLElement
 import org.jetbrains.compose.demo.falling.views.fallingBalls
 import org.jetbrains.compose.demo.falling.Game
 import androidx.compose.runtime.remember
 import kotlinx.browser.window
-import androidx.compose.web.css.Style
+import org.jetbrains.compose.web.css.Style
 import org.jetbrains.compose.web.ui.Styles
 
 class JsGame : Game() {

@@ -1,14 +1,14 @@
-package androidx.compose.web.sample.tests
+package org.jetbrains.compose.web.sample.tests
 
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
-import androidx.compose.web.attributes.InputType
-import androidx.compose.web.attributes.checked
-import androidx.compose.web.attributes.name
-import androidx.compose.web.elements.Input
-import androidx.compose.web.elements.TextArea
+import org.jetbrains.compose.web.attributes.InputType
+import org.jetbrains.compose.web.attributes.checked
+import org.jetbrains.compose.web.attributes.name
+import org.jetbrains.compose.web.dom.Input
+import org.jetbrains.compose.web.dom.TextArea
 
 class InputsTests {
     val textAreaInputGetsPrinted by testCase {

@@ -1,4 +1,4 @@
-import androidx.compose.web.renderComposable
+import org.jetbrains.compose.web.renderComposable
 import org.jetbrains.compose.common.core.graphics.Color
 import org.jetbrains.compose.common.foundation.layout.Box
 import org.jetbrains.compose.common.ui.Modifier

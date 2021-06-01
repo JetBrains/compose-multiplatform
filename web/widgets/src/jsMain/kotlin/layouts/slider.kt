@@ -2,8 +2,8 @@ package org.jetbrains.compose.common.material
 
 import androidx.compose.runtime.Composable
 import org.jetbrains.compose.common.ui.Modifier
-import androidx.compose.web.elements.Input
-import androidx.compose.web.attributes.InputType
+import org.jetbrains.compose.web.dom.Input
+import org.jetbrains.compose.web.attributes.InputType
 
 @Composable
 actual fun SliderActual(

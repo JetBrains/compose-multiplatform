@@ -1,6 +1,6 @@
 package com.sample.style
 
-import androidx.compose.web.css.*
+import org.jetbrains.compose.web.css.*
 
 object WtOffsets : StyleSheet(AppStylesheet) {
     val wtTopOffset96 by style {

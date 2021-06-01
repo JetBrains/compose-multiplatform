@@ -1,7 +1,7 @@
 package com.sample.style
 
-import androidx.compose.web.css.*
-import androidx.compose.web.css.selectors.hover
+import org.jetbrains.compose.web.css.*
+import org.jetbrains.compose.web.css.selectors.hover
 
 object WtTexts : StyleSheet(AppStylesheet) {
 

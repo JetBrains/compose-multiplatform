@@ -15,10 +15,10 @@
  */
 package org.jetbrainsc.compose.common.demo
 
-import androidx.compose.web.renderComposable
+import org.jetbrains.compose.web.renderComposable
 import kotlinx.browser.document
 import org.w3c.dom.HTMLElement
-import androidx.compose.web.css.Style
+import org.jetbrains.compose.web.css.Style
 import org.jetbrains.compose.web.ui.Styles
 
 fun main() {

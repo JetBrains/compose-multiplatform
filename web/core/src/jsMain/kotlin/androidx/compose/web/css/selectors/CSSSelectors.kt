@@ -1,6 +1,6 @@
-package androidx.compose.web.css.selectors
+package org.jetbrains.compose.web.css.selectors
 
-import androidx.compose.web.css.LanguageCode
+import org.jetbrains.compose.web.css.LanguageCode
 
 sealed class Nth {
     data class Functional(val a: Int? = null, val b: Int? = null) {

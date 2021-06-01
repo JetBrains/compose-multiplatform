@@ -3,15 +3,15 @@ package org.jetbrains.compose.web.core.tests
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
-import androidx.compose.web.css.Color
-import androidx.compose.web.css.backgroundColor
-import androidx.compose.web.css.border
-import androidx.compose.web.css.color
-import androidx.compose.web.css.opacity
-import androidx.compose.web.css.padding
-import androidx.compose.web.css.px
-import androidx.compose.web.elements.Span
-import androidx.compose.web.elements.Text
+import org.jetbrains.compose.web.css.Color
+import org.jetbrains.compose.web.css.backgroundColor
+import org.jetbrains.compose.web.css.border
+import org.jetbrains.compose.web.css.color
+import org.jetbrains.compose.web.css.opacity
+import org.jetbrains.compose.web.css.padding
+import org.jetbrains.compose.web.css.px
+import org.jetbrains.compose.web.dom.Span
+import org.jetbrains.compose.web.dom.Text
 import kotlin.test.Test
 import kotlin.test.assertEquals
 

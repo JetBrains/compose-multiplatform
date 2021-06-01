@@ -1,4 +1,4 @@
-package androidx.compose.web.attributes
+package org.jetbrains.compose.web.attributes
 
 sealed class InputType(val typeStr: String) {
     object Button : InputType("button")

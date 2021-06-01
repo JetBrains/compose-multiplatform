@@ -1,18 +1,18 @@
-package androidx.compose.web.attributes
+package org.jetbrains.compose.web.attributes
 
-import androidx.compose.web.events.WrappedCheckBoxInputEvent
-import androidx.compose.web.events.WrappedClipboardEvent
-import androidx.compose.web.events.WrappedDragEvent
-import androidx.compose.web.events.WrappedEvent
-import androidx.compose.web.events.WrappedFocusEvent
-import androidx.compose.web.events.WrappedInputEvent
-import androidx.compose.web.events.WrappedKeyboardEvent
-import androidx.compose.web.events.WrappedMouseEvent
-import androidx.compose.web.events.WrappedRadioInputEvent
-import androidx.compose.web.events.WrappedTextInputEvent
-import androidx.compose.web.events.WrappedTouchEvent
-import androidx.compose.web.events.WrappedWheelEvent
-import androidx.compose.web.events.GenericWrappedEvent
+import org.jetbrains.compose.web.events.WrappedCheckBoxInputEvent
+import org.jetbrains.compose.web.events.WrappedClipboardEvent
+import org.jetbrains.compose.web.events.WrappedDragEvent
+import org.jetbrains.compose.web.events.WrappedEvent
+import org.jetbrains.compose.web.events.WrappedFocusEvent
+import org.jetbrains.compose.web.events.WrappedInputEvent
+import org.jetbrains.compose.web.events.WrappedKeyboardEvent
+import org.jetbrains.compose.web.events.WrappedMouseEvent
+import org.jetbrains.compose.web.events.WrappedRadioInputEvent
+import org.jetbrains.compose.web.events.WrappedTextInputEvent
+import org.jetbrains.compose.web.events.WrappedTouchEvent
+import org.jetbrains.compose.web.events.WrappedWheelEvent
+import org.jetbrains.compose.web.events.GenericWrappedEvent
 
 open class EventsListenerBuilder {
 

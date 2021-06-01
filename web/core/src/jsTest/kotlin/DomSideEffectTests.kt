@@ -4,8 +4,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
-import androidx.compose.web.elements.Div
-import androidx.compose.web.renderComposable
+import org.jetbrains.compose.web.dom.Div
+import org.jetbrains.compose.web.renderComposable
 import kotlinx.browser.document
 import kotlinx.dom.clear
 import kotlin.test.Test

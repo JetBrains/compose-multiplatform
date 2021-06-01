@@ -1,18 +1,18 @@
-package androidx.compose.web.sample
+package org.jetbrains.compose.web.sample
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.web.attributes.InputType
-import androidx.compose.web.attributes.name
-import androidx.compose.web.css.padding
-import androidx.compose.web.css.px
-import androidx.compose.web.elements.Code
-import androidx.compose.web.elements.Div
-import androidx.compose.web.elements.H4
-import androidx.compose.web.elements.Input
-import androidx.compose.web.elements.Pre
-import androidx.compose.web.elements.Text
+import org.jetbrains.compose.web.attributes.InputType
+import org.jetbrains.compose.web.attributes.name
+import org.jetbrains.compose.web.css.padding
+import org.jetbrains.compose.web.css.px
+import org.jetbrains.compose.web.dom.Code
+import org.jetbrains.compose.web.dom.Div
+import org.jetbrains.compose.web.dom.H4
+import org.jetbrains.compose.web.dom.Input
+import org.jetbrains.compose.web.dom.Pre
+import org.jetbrains.compose.web.dom.Text
 import org.w3c.dom.HTMLElement
 
 @Composable

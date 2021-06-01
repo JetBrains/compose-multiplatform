@@ -4,7 +4,7 @@
  */
 
 @file:Suppress("UNUSED", "NOTHING_TO_INLINE")
-package androidx.compose.web.css
+package org.jetbrains.compose.web.css
 
 import org.w3c.dom.HTMLElement
 import org.w3c.dom.css.*

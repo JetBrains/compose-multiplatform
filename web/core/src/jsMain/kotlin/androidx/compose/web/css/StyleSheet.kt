@@ -1,12 +1,12 @@
-package androidx.compose.web.css
+package org.jetbrains.compose.web.css
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.setValue
-import androidx.compose.web.css.selectors.CSSSelector
-import androidx.compose.web.css.selectors.className
-import androidx.compose.web.elements.Style
+import org.jetbrains.compose.web.css.selectors.CSSSelector
+import org.jetbrains.compose.web.css.selectors.className
+import org.jetbrains.compose.web.dom.Style
 import kotlin.properties.ReadOnlyProperty
 import kotlin.reflect.KProperty
 
