@@ -6,7 +6,7 @@ In this tutorial we will show you how to work with windows using Compose for Des
 
 We represent window state in the shape suitable for Compose-style state manipulations and automatically mapping it into the operating system window state.
 
-So top level windows can be both conditionally created in other composable functions and their window manager state could be manipulated using state produced by rememberWindowState() function.
+So top level windows can be both conditionally created in other composable functions and their window manager state could be manipulated using state produced by `rememberWindowState()` function.
 
 ## Open and close windows
 
