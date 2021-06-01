@@ -74,7 +74,7 @@ class LazyListState constructor(
      * The holder class for the current scroll position.
      */
     private val scrollPosition =
-        ItemRelativeScrollPosition(firstVisibleItemIndex, firstVisibleItemScrollOffset)
+        LazyListScrollPosition(firstVisibleItemIndex, firstVisibleItemScrollOffset)
 
     /**
      * The index of the first item that is visible
@@ -307,16 +307,11 @@ class LazyListState constructor(
  *
  * Allows reading the values without recording the state read: [index] and [scrollOffset].
  * And with recording the state read which makes such reads observable: [observableIndex] and
- * [observableScrollOffset].
- *
- * To update the values use [update].
- *
- * The whole purpose of this class is to allow reading the scroll position without recording the
- * model read as if we do so inside the measure block the extra remeasurement will be scheduled
- * once we update the values in the end of the measure block. Abstracting the variables
- * duplication into a separate class allows us maintain the contract of keeping them in sync.
+ * [observableScrollOffset]. It is important to not record the state read inside the measure
+ * block as otherwise the extra remeasurement will be scheduled once we update the values in the
+ * end of the measure block.
  */
-private class ItemRelativeScrollPosition(
+internal class LazyListScrollPosition(
     initialIndex: Int = 0,
     initialScrollOffset: Int = 0
 ) {
