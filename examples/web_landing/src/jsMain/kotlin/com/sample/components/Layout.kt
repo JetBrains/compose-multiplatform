@@ -11,45 +11,43 @@ import com.sample.style.WtSections
 
 @Composable
 fun Layout(content: @Composable () -> Unit) {
-    Div(
-        style = {
+    Div({
+        style {
             display(DisplayStyle.Flex)
             flexDirection(FlexDirection.Column)
             height(100.percent)
             margin(0.px)
             property("box-sizing", StylePropertyValue("border-box"))
         }
-    ) {
+    }) {
         content()
     }
 }
 
 @Composable
 fun MainContentLayout(content: @Composable () -> Unit) {
-    Main(
-        style = {
+    Main({
+        style {
             property("flex", value("1 0 auto"))
             property("box-sizing", value("border-box"))
         }
-    ) {
+    }) {
         content()
     }
 }
 
 @Composable
 fun ContainerInSection(sectionThemeStyleClass: String? = null, content: @Composable () -> Unit) {
-    Section(attrs = {
+    Section({
         if (sectionThemeStyleClass != null) {
             classes(WtSections.wtSection, sectionThemeStyleClass)
         } else {
             classes(WtSections.wtSection)
         }
     }) {
-        Div(
-            attrs = {
-                classes(WtContainer.wtContainer, WtOffsets.wtTopOffset96)
-            }
-        ) {
+        Div({
+            classes(WtContainer.wtContainer, WtOffsets.wtTopOffset96)
+        }) {
             content()
         }
     }

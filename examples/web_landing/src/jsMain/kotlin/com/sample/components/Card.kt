@@ -12,10 +12,10 @@ data class LinkOnCard(val linkText: String, val linkUrl: String)
 
 @Composable
 private fun CardTitle(title: String, darkTheme: Boolean = false) {
-    H3(attrs = {
-        classes {
-            +WtTexts.wtH3
-            if (darkTheme) +WtTexts.wtH3ThemeDark
+    H3({
+        classes(WtTexts.wtH3)
+        if (darkTheme) {
+            classes(WtTexts.wtH3ThemeDark)
         }
     }) {
         Text(title)
@@ -43,19 +43,15 @@ fun Card(
     wtExtraStyleClasses: List<String> = listOf(WtCols.wtCol6, WtCols.wtColMd6, WtCols.wtColSm12),
     content: @Composable () -> Unit
 ) {
-    Div(attrs = {
-        classes {
-            +WtCards.wtCard
-            +WtOffsets.wtTopOffset24
-            wtExtraStyleClasses.forEach { +it }
-            +if (darkTheme) WtCards.wtCardThemeDark else WtCards.wtCardThemeLight
-        }
+    Div({
+        classes(WtCards.wtCard, WtOffsets.wtTopOffset24, *wtExtraStyleClasses.toTypedArray())
+        classes(if (darkTheme) WtCards.wtCardThemeDark else WtCards.wtCardThemeLight)
     }) {
-        Div(attrs = {
+        Div({
             classes(WtCards.wtCardSection, WtCards.wtVerticalFlex)
         }) {
 
-            Div(attrs = { classes(WtCards.wtVerticalFlexGrow) }) {
+            Div({ classes(WtCards.wtVerticalFlexGrow) }) {
                 CardTitle(title = title, darkTheme = darkTheme)
                 content()
             }

@@ -79,8 +79,9 @@ fun GetStarted() {
             }) {
                 P(attrs = {
                     classes(WtTexts.wtText1)
-                }, style = {
-                    color(Color("#fff"))
+                    style  {
+                        color(Color("#fff"))
+                    }
                 }) {
                     Text("Ready for your next adventure? Learn how to build reactive user interfaces with Compose for Web.")
                 }

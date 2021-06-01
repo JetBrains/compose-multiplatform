@@ -85,8 +85,10 @@ private fun CardWithList(card: CardWithListPresentation) {
             classes(WtTexts.wtText2)
         }) {
             card.list.forEachIndexed { ix, it ->
-                Li(style = {
-                    property("padding-top", value(24.px))
+                Li({
+                    style {
+                        property("padding-top", value(24.px))
+                    }
                 }) { Text(it) }
             }
         }

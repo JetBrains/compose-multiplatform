@@ -14,19 +14,20 @@ import org.w3c.dom.HTMLElement
 @Composable
 fun Intro() {
     ContainerInSection {
-        Div(attrs = {
+        Div({
             classes(WtRows.wtRow, WtRows.wtRowSizeM, WtRows.wtRowSmAlignItemsCenter)
         }) {
 
-            Div(attrs = {
+            Div({
                 classes(WtCols.wtCol2, WtCols.wtColMd3)
-            }, style = {
-                alignSelf(AlignSelf.Start)
+                style {
+                    alignSelf(AlignSelf.Start)
+                }
             }) {
                 Img(src = "i1.svg", attrs = { classes(AppStylesheet.composeLogo) }) {}
             }
 
-            Div(attrs = {
+            Div({
                 classes(
                     WtCols.wtCol10,
                     WtCols.wtColMd8,
@@ -36,10 +37,13 @@ fun Intro() {
             }) {
                 H1(attrs = { classes(WtTexts.wtHero) }) {
                     Text("Compose for ")
-                    Span(style = {
-                        display(DisplayStyle.InlineBlock)
-                        property("white-space", value("nowrap"))
-                    }, attrs = { classes(WtTexts.wtHero) }) {
+                    Span({
+                        classes(WtTexts.wtHero)
+                        style {
+                            display(DisplayStyle.InlineBlock)
+                            property("white-space", value("nowrap"))
+                        }
+                    }) {
                         Text("Web")
 
                         Span(attrs = { classes(AppStylesheet.composeTitleTag) }) {
@@ -47,7 +51,7 @@ fun Intro() {
                         }
                     }
                 }
-                Div(attrs = {
+                Div({
                     classes(WtDisplay.wtDisplayMdNone)
                 }) {
                     IntroAboutComposeWeb()
@@ -66,14 +70,14 @@ fun Intro() {
 
 @Composable
 private fun IntroAboutComposeWeb() {
-    Div(attrs = {
+    Div({
         classes(WtRows.wtRow, WtRows.wtRowSizeM)
     }) {
 
-        Div(attrs = {
+        Div({
             classes(WtCols.wtCol9, WtCols.wtColMd9, WtCols.wtColSm12)
         }) {
-            P(attrs = { classes(WtTexts.wtSubtitle2, WtOffsets.wtTopOffset24) }) {
+            P({ classes(WtTexts.wtSubtitle2, WtOffsets.wtTopOffset24) }) {
                 Text("Reactive web UIs for Kotlin, based on Google's ")
 
                 A(href = "https://developer.android.com/jetpack/compose", attrs = {
@@ -86,15 +90,15 @@ private fun IntroAboutComposeWeb() {
                 Text(" and brought to you by JetBrains")
             }
 
-            P(attrs = {
+            P({
                 classes(WtTexts.wtText1, WtOffsets.wtTopOffset24)
             }) {
-                Text(
-                    "Compose for Web simplifies and accelerates UI development for web applications, " +
-                            "and aims to enable UI code sharing between web, desktop, and Android applications " +
-                            "in the future. Currently in technology preview."
-                )
-            }
+            Text(
+                "Compose for Web simplifies and accelerates UI development for web applications, " +
+                        "and aims to enable UI code sharing between web, desktop, and Android applications " +
+                        "in the future. Currently in technology preview."
+            )
+        }
 
             ComposeWebStatusMessage()
 
@@ -115,14 +119,18 @@ private fun IntroAboutComposeWeb() {
 
 @Composable
 private fun IntroCodeSample() {
-    Div(style = {
-        marginTop(24.px)
-        backgroundColor(Color.RGBA(39, 40, 44, 0.05))
-        borderRadius(8.px)
-        property("font-family", value("'JetBrains Mono', monospace"))
+    Div({
+        style {
+            marginTop(24.px)
+            backgroundColor(Color.RGBA(39, 40, 44, 0.05))
+            borderRadius(8.px)
+            property("font-family", value("'JetBrains Mono', monospace"))
+        }
     }) {
-        Div(style = {
-            property("padding", value("12px 16px"))
+        Div({
+            style {
+                property("padding", value("12px 16px"))
+            }
         }) {
             FormattedCodeSnippet(
                 code = """
@@ -138,10 +146,12 @@ private fun IntroCodeSample() {
             )
         }
 
-        Hr(style = {
-            height(1.px)
-            border(width = 0.px)
-            backgroundColor(Color.RGBA(39, 40, 44, 0.15))
+        Hr({
+            style {
+                height(1.px)
+                border(width = 0.px)
+                backgroundColor(Color.RGBA(39, 40, 44, 0.15))
+            }
         })
 
         IntroCodeSampleResult()
@@ -150,24 +160,26 @@ private fun IntroCodeSample() {
 
 @Composable
 private fun IntroCodeSampleResult() {
-    Div(style = {
-        property("padding", value("12px 16px"))
-        display(DisplayStyle.Flex)
-        flexDirection(FlexDirection.Row)
-        alignItems(AlignItems.Center)
+    Div({
+        style {
+            property("padding", value("12px 16px"))
+            display(DisplayStyle.Flex)
+            flexDirection(FlexDirection.Row)
+            alignItems(AlignItems.Center)
+        }
     }) {
-        Span(
-            attrs = { classes(WtTexts.wtText2) },
-            style = {
+        Span({
+            classes(WtTexts.wtText2)
+            style {
                 property("margin-right", value(8.px))
             }
-        ) {
+        }) {
             Text("Result:")
         }
 
         fun greet() = listOf("Hello", "Hallo", "Hola", "Servus").random()
 
-        Div(attrs = {
+        Div({
             id("greetingContainer")
         }) {
             var greeting by remember { mutableStateOf(greet()) }
@@ -180,22 +192,24 @@ private fun IntroCodeSampleResult() {
 
 @Composable
 private fun ComposeWebStatusMessage() {
-    Div(attrs = {
+    Div({
         classes(WtRows.wtRow, WtRows.wtRowSizeXs, WtOffsets.wtTopOffset24)
     }) {
-        Div(attrs = {
+        Div({
             classes(WtCols.wtColInline)
         }) {
-            Img(src = "ic_info.svg", style = {
-                width(24.px)
-                height(24.px)
+            Img(src = "ic_info.svg", attrs = {
+                style {
+                    width(24.px)
+                    height(24.px)
+                }
             }) {}
         }
 
-        Div(attrs = {
+        Div({
             classes(WtCols.wtColAutoFill)
         }) {
-            P(attrs = {
+            P({
                 classes(WtTexts.wtText3)
             }) {
                 Text(
@@ -211,13 +225,11 @@ private fun ComposeWebStatusMessage() {
 
 @Composable
 inline fun Hr(
-    crossinline attrs: (AttrsBuilder<Tag.Div>.() -> Unit) = {},
-    crossinline style: (StyleBuilder.() -> Unit) = {},
+    crossinline attrs: (AttrsBuilder<Tag.Div>.() -> Unit) = {}
 ) {
     TagElement<Tag.Div, HTMLElement>(
         tagName = "hr",
         applyAttrs = attrs,
-        applyStyle = style,
         content = { }
     )
 }

@@ -28,7 +28,7 @@ private val SimpleCounterSnippet = CodeSnippetData(
                 }) {
                     Text("-")
                 }
-                Span(style = { padding(15.px) }) { /* we use inline style here */
+                Span(attrs = { style { padding(15.px) }}) { /* we use inline style here */
                     Text("${"$"}{count.value}")
                 }
                 Button(attrs = {
@@ -198,18 +198,21 @@ private var selectedSnippetIx: Int by mutableStateOf(0)
 @Composable
 fun CodeSamples() {
     ContainerInSection {
-        Div(attrs = { classes(WtRows.wtRow) }, style = {
-            justifyContent(JustifyContent.SpaceBetween)
+        Div({
+            classes(WtRows.wtRow)
+            style {
+                justifyContent(JustifyContent.SpaceBetween)
+            }
         }) {
-            Div(attrs = { classes(WtCols.wtCol6, WtCols.wtColMd4, WtCols.wtColSm12) }) {
-                H1(attrs = {
+            Div({ classes(WtCols.wtCol6, WtCols.wtColMd4, WtCols.wtColSm12) }) {
+                H1({
                     classes(WtTexts.wtH2)
                 }) {
                     Text("Code samples")
                 }
             }
 
-            Div(attrs = { classes(WtOffsets.wtTopOffsetSm24) }) {
+            Div({ classes(WtOffsets.wtTopOffsetSm24) }) {
                 CodeSampleSwitcher(count = allSnippets.size, current = selectedSnippetIx) {
                     selectedSnippetIx = it
                     currentCodeSnippet = allSnippets[it]
@@ -223,42 +226,42 @@ fun CodeSamples() {
 
 @Composable
 private fun TitledCodeSample(title: String, code: String) {
-    H3(attrs = {
+    H3({
         classes(WtTexts.wtH3, WtOffsets.wtTopOffset48)
     }) {
         Text(title)
     }
 
-    Div(
-        attrs = { classes(WtOffsets.wtTopOffset24) },
-        style = {
+    Div({
+        classes(WtOffsets.wtTopOffset24)
+        style {
             backgroundColor(Color.RGBA(39, 40, 44, 0.05))
             borderRadius(8.px, 8.px, 8.px)
             property("padding", value("12px 16px"))
         }
-    ) {
+    }) {
         FormattedCodeSnippet(code = code)
     }
 }
 
 @Composable
 fun FormattedCodeSnippet(code: String, language: String = "kotlin") {
-    Pre(style = {
-        property("max-height", value(25.em))
-        property("overflow", value("auto"))
-        height(auto)
+    Pre({
+        style {
+            property("max-height", value(25.em))
+            property("overflow", value("auto"))
+            height(auto)
+        }
     }) {
-        Code(
-            attrs = {
-                classes("language-$language", "hljs")
-            },
-            style = {
+        Code({
+            classes("language-$language", "hljs")
+            style {
                 property("font-family", value("'JetBrains Mono', monospace"))
                 property("tab-size", value(4))
                 fontSize(10.pt)
                 backgroundColor(Color("transparent"))
             }
-        ) {
+        }) {
             DomSideEffect(code) {
                 it.setHighlightedCode(code)
             }

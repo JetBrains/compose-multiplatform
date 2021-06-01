@@ -10,34 +10,38 @@ import com.sample.style.*
 
 @Composable
 fun PageFooter() {
-    Footer(style = {
-        flexShrink(0)
-        property("box-sizing", value("border-box"))
+    Footer({
+        style {
+            flexShrink(0)
+            property("box-sizing", value("border-box"))
+        }
     }) {
-        Section(attrs = {
+        Section({
             classes(WtSections.wtSectionBgGrayDark)
-        }, style = {
-            property("padding", value("24px 0"))
+            style {
+                property("padding", value("24px 0"))
+            }
         }) {
-            Div(attrs = { classes(WtContainer.wtContainer) }) {
-                Div(attrs = {
+            Div({ classes(WtContainer.wtContainer) }) {
+                Div({
                     classes(WtRows.wtRow, WtRows.wtRowSizeM, WtRows.wtRowSmAlignItemsCenter)
-                }, style = {
-                    justifyContent(JustifyContent.Center)
-                    flexWrap(FlexWrap.Wrap)
+                    style {
+                        justifyContent(JustifyContent.Center)
+                        flexWrap(FlexWrap.Wrap)
+                    }
                 }) {
 
-                    Div(attrs = {
+                    Div({
                         classes(WtCols.wtColInline)
                     }) {
-                        P(attrs = {
+                        P({
                             classes(WtTexts.wtText1, WtTexts.wtText1ThemeDark)
                         }) {
                             Text("Follow us")
                         }
                     }
 
-                    Div(attrs = {
+                    Div({
                         classes(WtCols.wtColInline)
                     }) {
                         getSocialLinks().forEach { SocialIconLink(it) }
@@ -52,20 +56,21 @@ fun PageFooter() {
 
 @Composable
 private fun CopyrightInFooter() {
-    Div(attrs = {
+    Div({
         classes(WtRows.wtRow, WtRows.wtRowSizeM, WtRows.wtRowSmAlignItemsCenter, WtOffsets.wtTopOffset48)
-    }, style = {
-        justifyContent(JustifyContent.SpaceEvenly)
-        flexWrap(FlexWrap.Wrap)
-        property("padding", value("0px 12px"))
+        style {
+            justifyContent(JustifyContent.SpaceEvenly)
+            flexWrap(FlexWrap.Wrap)
+            property("padding", value("0px 12px"))
+        }
     }) {
-        Span(attrs = {
+        Span({
             classes(WtTexts.wtText3, WtTexts.wtTextPale)
         }) {
             Text("Copyright © 2000-2021  JetBrains s.r.o.")
         }
 
-        Span(attrs = {
+        Span({
             classes(WtTexts.wtText3, WtTexts.wtTextPale)
         }) {
             Text("Developed with drive and IntelliJ IDEA")
@@ -78,9 +83,7 @@ private fun SocialIconLink(link: SocialLink) {
     A(attrs = {
         classes(WtTexts.wtSocialButtonItem)
         target(ATarget.Blank)
-    }, href = link.url, style = {
-
-    }) {
+    }, href = link.url) {
         Img(src = link.iconSvg) {}
     }
 }

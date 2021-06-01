@@ -39,11 +39,11 @@ private fun ElementScope<HTMLElement>.UseReactEffect(
 @Composable
 fun YoutubeReactPlayerWrapper(videoUrl: String) {
     if (videoUrl.isEmpty()) return
-    Div(
-        style = {
+    Div({
+        style {
             width(50.percent)
         }
-    ) {
+    }) {
         UseReactEffect(key = videoUrl) {
             reactPlayer {
                 attrs.url = videoUrl
@@ -70,20 +70,22 @@ fun reactInComposeAppExample() {
                 Button(
                     attrs = {
                         onClick { videoUrl = url }
-                    },
-                    style = {
-                        margin(10.px)
+                        style  {
+                            margin(10.px)
+                        }
                     }
                 ) { Text("Video ${ix + 1}") }
             }
 
             Button(
                 attrs = {
-                    onClick { videoUrl = "" }
+                    onClick {
+                        videoUrl = ""
+                        style {
+                            margin(10.px)
+                        }
+                    }
                 },
-                style = {
-                    margin(10.px)
-                }
             ) { Text("Reset") }
 
             YoutubeReactPlayerWrapper(videoUrl)

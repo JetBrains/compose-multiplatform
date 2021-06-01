@@ -13,12 +13,9 @@ fun Header() {
     Section(attrs = {
         classes(WtSections.wtSectionBgGrayDark)
     }) {
-        Div(attrs = { classes(WtContainer.wtContainer) }) {
-            Div(attrs = {
+        Div({ classes(WtContainer.wtContainer) }) {
+            Div({
                 classes(WtRows.wtRow, WtRows.wtRowSizeM)
-            }, style = {
-                alignItems(AlignItems.Center)
-                justifyContent(JustifyContent.SpaceBetween)
             }) {
                 Logo()
                 // TODO: support i18n
@@ -51,13 +48,11 @@ private fun LanguageButton() {
         Button(attrs = {
             classes(WtTexts.wtButton, WtTexts.wtLangButton)
             onClick { window.alert("Oops! This feature is yet to be implemented") }
-        }, style = {
-            property("cursor", value("pointer"))
         }) {
-            Img(src = "ic_lang.svg", style = {
+            Img(src = "ic_lang.svg", attrs = { style {
                 property("padding-left", value(8.px))
                 property("padding-right", value(8.px))
-            }) {}
+            }}) {}
             Text("English")
         }
     }
