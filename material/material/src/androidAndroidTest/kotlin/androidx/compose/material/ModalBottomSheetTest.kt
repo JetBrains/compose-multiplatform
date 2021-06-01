@@ -20,6 +20,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
@@ -650,5 +651,45 @@ class ModalBottomSheetTest {
         val height = rule.rootHeight()
         rule.onNodeWithTag(sheetTag)
             .assertTopPositionInRootIsEqualTo(height)
+    }
+
+    @Test
+    fun modalBottomSheet_missingAnchors_findsClosest() {
+        val topTag = "ModalBottomSheetLayout"
+        val showShortContent = mutableStateOf(false)
+        val sheetState = ModalBottomSheetState(ModalBottomSheetValue.Hidden)
+        rule.setMaterialContent {
+            LaunchedEffect(showShortContent.value) {
+                sheetState.show()
+            }
+            ModalBottomSheetLayout(
+                modifier = Modifier.testTag(topTag),
+                sheetState = sheetState,
+                content = { Box(Modifier.fillMaxSize().testTag(contentTag)) },
+                sheetContent = {
+                    if (!showShortContent.value) {
+                        Box(Modifier.fillMaxSize().testTag(sheetTag))
+                    } else {
+                        Box(Modifier.fillMaxWidth().height(100.dp))
+                    }
+                }
+            )
+        }
+
+        rule.onNodeWithTag(topTag).performGesture {
+            swipeDown()
+            swipeDown()
+        }
+
+        rule.runOnIdle {
+            assertThat(sheetState.currentValue).isEqualTo(ModalBottomSheetValue.Hidden)
+        }
+
+        rule.runOnIdle {
+            showShortContent.value = true
+        }
+        rule.runOnIdle {
+            assertThat(sheetState.currentValue).isEqualTo(ModalBottomSheetValue.Expanded)
+        }
     }
 }
