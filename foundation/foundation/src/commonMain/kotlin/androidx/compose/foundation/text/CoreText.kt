@@ -176,7 +176,7 @@ internal fun CoreText(
                             )
                         }
                     } else {
-                        Modifier.pointerInput(Unit) {
+                        Modifier.pointerInput(controller.mouseSelectionObserver) {
                             mouseSelectionDetector(
                                 controller.mouseSelectionObserver,
                                 finalPass = true
