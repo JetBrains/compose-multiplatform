@@ -63,6 +63,7 @@ dependencies {
         implementation(KOTLIN_COROUTINES_ANDROID)
 
         implementation("androidx.savedstate:savedstate:1.1.0")
+        implementation("androidx.lifecycle:lifecycle-common-java8:2.3.0")
         implementation("androidx.lifecycle:lifecycle-runtime:2.3.0")
         implementation("androidx.lifecycle:lifecycle-viewmodel:2.3.0")
 
@@ -150,6 +151,7 @@ if(AndroidXUiPlugin.isMultiplatformEnabled(project)) {
                 implementation(KOTLIN_COROUTINES_ANDROID)
 
                 implementation("androidx.savedstate:savedstate:1.1.0")
+                implementation("androidx.lifecycle:lifecycle-common-java8:2.3.0")
                 implementation("androidx.lifecycle:lifecycle-runtime:2.3.0")
                 implementation("androidx.lifecycle:lifecycle-viewmodel:2.3.0")
             }

@@ -144,9 +144,9 @@ class WrapperTest {
         assertTrue(composedLatch.await(1, TimeUnit.SECONDS))
 
         activityScenario.onActivity {
-            assertEquals(1, owner.registry.observerCount)
+            assertEquals(2, owner.registry.observerCount)
             view.disposeComposition()
-            assertEquals(0, owner.registry.observerCount)
+            assertEquals(1, owner.registry.observerCount)
         }
     }
 
