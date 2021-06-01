@@ -12,7 +12,6 @@ pluginManagement {
 
     resolutionStrategy {
         eachPlugin {
-            println("REQ ${requested.id.id}")
             if (requested.id.id == "org.jetbrains.compose") {
                 println("[build] compose core version: ${extra["COMPOSE_CORE_VERSION"]}")
                 useModule("org.jetbrains.compose:org.jetbrains.compose.gradle.plugin:${extra["COMPOSE_CORE_VERSION"]}")
@@ -32,3 +31,8 @@ module(":web-core", "$rootDir/core")
 module(":web-widgets", "$rootDir/widgets")
 module(":web-integration-core", "$rootDir/integration-core")
 module(":web-integration-widgets", "$rootDir/integration-widgets")
+
+if (extra["COMPOSE_WEB_BUILD_WITH_EXAMPLES"]!!.toString().toBoolean() == true) {
+    println("building with examples")
+    module(":examples:falling_balls_with_web", "../examples/falling_balls_with_web")
+}
