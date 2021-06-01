@@ -3,8 +3,6 @@ buildscript {
     val composeVersion = System.getenv("COMPOSE_TEMPLATE_COMPOSE_VERSION") ?: "0.4.0"
 
     repositories {
-        // TODO: remove after new build is published
-        mavenLocal()
         google()
         mavenCentral()
         maven("https://maven.pkg.jetbrains.space/public/p/compose/dev")
