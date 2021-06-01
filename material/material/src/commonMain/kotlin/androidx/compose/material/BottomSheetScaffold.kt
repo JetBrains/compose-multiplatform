@@ -26,6 +26,8 @@ import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.requiredHeightIn
+import androidx.compose.material.BottomSheetValue.Collapsed
+import androidx.compose.material.BottomSheetValue.Expanded
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Stable
 import androidx.compose.runtime.State
@@ -90,7 +92,7 @@ class BottomSheetState(
      * Whether the bottom sheet is expanded.
      */
     val isExpanded: Boolean
-        get() = currentValue == BottomSheetValue.Expanded
+        get() = currentValue == Expanded
 
     /**
      * Whether the bottom sheet is collapsed.
@@ -105,7 +107,7 @@ class BottomSheetState(
      *
      * @return the reason the expand animation ended
      */
-    suspend fun expand() = animateTo(BottomSheetValue.Expanded)
+    suspend fun expand() = animateTo(Expanded)
 
     /**
      * Collapse the bottom sheet with animation and suspend until it if fully collapsed or animation
@@ -291,7 +293,7 @@ fun BottomSheetScaffold(
                 state = scaffoldState.bottomSheetState,
                 anchors = mapOf(
                     fullHeight - peekHeightPx to BottomSheetValue.Collapsed,
-                    fullHeight - bottomSheetHeight to BottomSheetValue.Expanded
+                    fullHeight - bottomSheetHeight to Expanded
                 ),
                 orientation = Orientation.Vertical,
                 enabled = sheetGesturesEnabled,
@@ -301,12 +303,20 @@ fun BottomSheetScaffold(
                 if (peekHeightPx != bottomSheetHeight) {
                     if (scaffoldState.bottomSheetState.isCollapsed) {
                         expand {
-                            scope.launch { scaffoldState.bottomSheetState.expand() }
+                            scope.launch {
+                                if (scaffoldState.bottomSheetState.confirmStateChange(Expanded)) {
+                                    scaffoldState.bottomSheetState.expand()
+                                }
+                            }
                             true
                         }
                     } else {
                         collapse {
-                            scope.launch { scaffoldState.bottomSheetState.collapse() }
+                            scope.launch {
+                                if (scaffoldState.bottomSheetState.confirmStateChange(Collapsed)) {
+                                    scaffoldState.bottomSheetState.collapse()
+                                }
+                            }
                             true
                         }
                     }

@@ -273,6 +273,53 @@ class BottomSheetScaffoldTest {
     }
 
     @Test
+    fun bottomSheetScaffold_respectsConfirmStateChange() {
+        lateinit var bottomSheetState: BottomSheetState
+        rule.setContent {
+            bottomSheetState = rememberBottomSheetState(
+                BottomSheetValue.Collapsed,
+                confirmStateChange = {
+                    it != BottomSheetValue.Expanded
+                }
+            )
+            BottomSheetScaffold(
+                scaffoldState = rememberBottomSheetScaffoldState(
+                    bottomSheetState = bottomSheetState,
+                ),
+                sheetContent = {
+                    Box(Modifier.fillMaxWidth().requiredHeight(300.dp).testTag(sheetContent))
+                },
+                sheetPeekHeight = peekHeight,
+                content = { Text("Content") }
+            )
+        }
+
+        rule.runOnIdle {
+            Truth.assertThat(bottomSheetState.currentValue).isEqualTo(BottomSheetValue.Collapsed)
+        }
+
+        rule.onNodeWithTag(sheetContent)
+            .performGesture { swipeUp() }
+
+        advanceClock()
+
+        rule.runOnIdle {
+            Truth.assertThat(bottomSheetState.currentValue).isEqualTo(BottomSheetValue.Collapsed)
+        }
+
+        rule.onNodeWithTag(sheetContent).onParent()
+            .assert(SemanticsMatcher.keyNotDefined(SemanticsActions.Collapse))
+            .assert(SemanticsMatcher.keyIsDefined(SemanticsActions.Expand))
+            .performSemanticsAction(SemanticsActions.Expand)
+
+        advanceClock()
+
+        rule.runOnIdle {
+            Truth.assertThat(bottomSheetState.currentValue).isEqualTo(BottomSheetValue.Collapsed)
+        }
+    }
+
+    @Test
     fun bottomSheetScaffold_revealBySwiping_gesturesDisabled() {
         lateinit var bottomSheetState: BottomSheetState
         rule.setContent {
