@@ -35,4 +35,5 @@ module(":web-integration-widgets", "$rootDir/integration-widgets")
 if (extra["COMPOSE_WEB_BUILD_WITH_EXAMPLES"]!!.toString().toBoolean() == true) {
     println("building with examples")
     module(":examples:falling_balls_with_web", "../examples/falling_balls_with_web")
+    module(":examples:web_landing", "../examples/web_landing")
 }
