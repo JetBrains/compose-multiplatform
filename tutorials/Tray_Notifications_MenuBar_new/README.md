@@ -2,11 +2,11 @@
 
 ## What is covered
 
-In this tutorial we'll show you how to work with the system tray, send system notifications, and create a menu bar using Compose for Desktop.
+In this tutorial, we'll show you how to work with the system tray, send system notifications, and create a menu bar using Compose for Desktop.
 
 ## Tray
 
-You can add an application icon to the system tray. You can also send notifications to the user using the system tray. There are 3 types of notification:
+You can add an application icon to the system tray. You can also send notifications to the user using the system tray. There are 3 types of notifications:
 
 1. notify - simple notification
 2. warn - warning notification
@@ -126,7 +126,7 @@ import androidx.compose.ui.window.application
 
 @OptIn(ExperimentalComposeUiApi::class)
 fun main() {
-    // Currently we use Swing's menu under the hood, so we need to set this property to change look and feel of the menu on Windows/Linux
+    // Currently we use Swing's menu under the hood, so we need to set this property to change the look and feel of the menu on Windows/Linux
     System.setProperty("skiko.rendering.laf.global", "true")
 
     application {
