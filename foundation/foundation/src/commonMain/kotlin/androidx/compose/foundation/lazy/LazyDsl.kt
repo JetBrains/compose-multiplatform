@@ -41,6 +41,9 @@ interface LazyListScope {
      * @param key a stable and unique key representing the item. Using the same key
      * for multiple items in the list is not allowed. Type of the key should be saveable
      * via Bundle on Android. If null is passed the position in the list will represent the key.
+     * When you specify the key the scroll position will be maintained based on the key, which
+     * means if you add/remove items before the current visible item the item with the given key
+     * will be kept as the first visible one.
      * @param content the content of the item
      */
     fun item(key: Any? = null, content: @Composable LazyItemScope.() -> Unit)
@@ -52,6 +55,9 @@ interface LazyListScope {
      * @param key a factory of stable and unique keys representing the item. Using the same key
      * for multiple items in the list is not allowed. Type of the key should be saveable
      * via Bundle on Android. If null is passed the position in the list will represent the key.
+     * When you specify the key the scroll position will be maintained based on the key, which
+     * means if you add/remove items before the current visible item the item with the given key
+     * will be kept as the first visible one.
      * @param itemContent the content displayed by a single item
      */
     fun items(
@@ -69,6 +75,9 @@ interface LazyListScope {
      * @param key a stable and unique key representing the item. Using the same key
      * for multiple items in the list is not allowed. Type of the key should be saveable
      * via Bundle on Android. If null is passed the position in the list will represent the key.
+     * When you specify the key the scroll position will be maintained based on the key, which
+     * means if you add/remove items before the current visible item the item with the given key
+     * will be kept as the first visible one.
      * @param content the content of the header
      */
     @ExperimentalFoundationApi
@@ -82,6 +91,9 @@ interface LazyListScope {
  * @param key a factory of stable and unique keys representing the item. Using the same key
  * for multiple items in the list is not allowed. Type of the key should be saveable
  * via Bundle on Android. If null is passed the position in the list will represent the key.
+ * When you specify the key the scroll position will be maintained based on the key, which
+ * means if you add/remove items before the current visible item the item with the given key
+ * will be kept as the first visible one.
  * @param itemContent the content displayed by a single item
  */
 inline fun <T> LazyListScope.items(
@@ -99,6 +111,9 @@ inline fun <T> LazyListScope.items(
  * @param key a factory of stable and unique keys representing the item. Using the same key
  * for multiple items in the list is not allowed. Type of the key should be saveable
  * via Bundle on Android. If null is passed the position in the list will represent the key.
+ * When you specify the key the scroll position will be maintained based on the key, which
+ * means if you add/remove items before the current visible item the item with the given key
+ * will be kept as the first visible one.
  * @param itemContent the content displayed by a single item
  */
 inline fun <T> LazyListScope.itemsIndexed(
@@ -116,6 +131,9 @@ inline fun <T> LazyListScope.itemsIndexed(
  * @param key a factory of stable and unique keys representing the item. Using the same key
  * for multiple items in the list is not allowed. Type of the key should be saveable
  * via Bundle on Android. If null is passed the position in the list will represent the key.
+ * When you specify the key the scroll position will be maintained based on the key, which
+ * means if you add/remove items before the current visible item the item with the given key
+ * will be kept as the first visible one.
  * @param itemContent the content displayed by a single item
  */
 inline fun <T> LazyListScope.items(
@@ -133,6 +151,9 @@ inline fun <T> LazyListScope.items(
  * @param key a factory of stable and unique keys representing the item. Using the same key
  * for multiple items in the list is not allowed. Type of the key should be saveable
  * via Bundle on Android. If null is passed the position in the list will represent the key.
+ * When you specify the key the scroll position will be maintained based on the key, which
+ * means if you add/remove items before the current visible item the item with the given key
+ * will be kept as the first visible one.
  * @param itemContent the content displayed by a single item
  */
 inline fun <T> LazyListScope.itemsIndexed(
