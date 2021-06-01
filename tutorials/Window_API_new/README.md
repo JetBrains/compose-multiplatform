@@ -2,15 +2,15 @@
 
 ## What is covered
 
-In this tutorial we will show you how to work with windows using Compose for Desktop.
+In this tutorial, we will show you how to work with windows using Compose for Desktop.
 
-We represent window state in the shape suitable for Compose-style state manipulations and automatically mapping it into the operating system window state.
+We represent the window state in a shape suitable for Compose-style state manipulations and automatically map it to the operating system window state.
 
-So top level windows can be both conditionally created in other composable functions and their window manager state could be manipulated using state produced by `rememberWindowState()` function.
+Top-level windows can be conditionally created in other composable functions and their window manager state can also be manipulated using states produced by the `rememberWindowState()` function.
 
 ## Open and close windows
 
-The main function for creating windows is `Window`. This function should be used in Composable scope. The easiest way to create a Composable scope is to use `application` function:
+The main function for creating windows is `Window`. This function should be used in a Composable scope. The easiest way to create a Composable scope is to use the `application` function:
 
 ```kotlin
 import androidx.compose.ui.ExperimentalComposeUiApi
@@ -25,7 +25,7 @@ fun main() = application {
 }
 ```
 
-`Window` is Composable function. It means you can change its properties in a declarative way:
+`Window` is a Composable function, meaning you can change its properties in a declarative way:
 ```kotlin
 import androidx.compose.material.Button
 import androidx.compose.material.Text
@@ -52,7 +52,8 @@ fun main() = application {
 
 You can also close/open windows using a simple `if` statement.
 
-When Window leaves the composition (isPerformingTask becomes `false`) - the native window automatically closes.
+When the `Window` leaves the composition (`isPerformingTask` becomes `false`) – the native window automatically closes.
+
 ```kotlin
 import androidx.compose.material.Text
 import androidx.compose.runtime.LaunchedEffect
@@ -85,9 +86,9 @@ fun main() = application {
 ```
 ![](window_splash.gif)
 
-If the window requires some custom logic on close (for example, to show a dialog), you can override close action using `onCloseRequest`.
+If the window requires some custom logic on close (for example, to show a dialog), you can override the close action using `onCloseRequest`.
 
-See that instead of an imperative approach to closing the window (`window.close()`) we use a declarative - close the window in response to changing the state: `isOpen = false`.
+Instead of the imperative approach to closing the window (`window.close()`) we use a declarative approach - closing the window in response to a change of the state (`isOpen = false`)..
 ```kotlin
 import androidx.compose.material.Button
 import androidx.compose.material.Text
@@ -99,10 +100,12 @@ import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.Window
 import androidx.compose.ui.window.application
+
 @OptIn(ExperimentalComposeUiApi::class)
 fun main() = application {
     var isOpen by remember { mutableStateOf(true) }
     var isAskingToClose by remember { mutableStateOf(false) }
+    
     if (isOpen) {
         Window(
             onCloseRequest = { isAskingToClose = true }
@@ -125,7 +128,7 @@ fun main() = application {
 ```
 ![](ask_to_close.gif)
 
-If you don't need to close the window on close button and just need to hide it (for example to tray), you can change `windowState.isVisible` state:
+If you don't need to close the window and just need to hide it (for example to the tray), you can change the `windowState.isVisible` state:
 ```kotlin
 import androidx.compose.material.Text
 import androidx.compose.runtime.LaunchedEffect
@@ -185,7 +188,7 @@ fun getTrayIcon(): BufferedImage {
 ```
 ![](hide_instead_of_close.gif)
 
-If application has multiple windows then it is better to hoist its state into a separate class and open/close window in response of some list state changes (see [notepad example](https://github.com/JetBrains/compose-jb/tree/master/examples/notepad) for more complex use cases):
+If an application has multiple windows, then it is better to put its state into a separate class and open/close window in response to `mutableStateListOf` changes (see [notepad example](https://github.com/JetBrains/compose-jb/tree/master/examples/notepad) for more complex use cases):
 ```kotlin
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateListOf
@@ -253,9 +256,9 @@ private class MyWindowState(
 ```
 ![](multiple_windows.gif)
 
-## Changing state (maximized, minimized, fullscreen, size, position) of the window.
+## Changing the state (maximized, minimized, fullscreen, size, position) of the window.
 
-Some state of the native window is hoisted into a separate API class `WindowState`. You can change its properties in callbacks or observe it in Composable's:
+Some states of the native window are moved into a separate API class, `WindowState`. You can change its properties in callbacks or observe it in Composable's:
 
 ```kotlin
 import androidx.compose.foundation.clickable
@@ -362,13 +365,13 @@ fun main() = application {
     }
 }
 ```
-(currently it is a bit verbose; in the future we will investigate - how can we provide a simple API for handling window key events).
+(Currently it is a bit verbose, but in the future we will investigate how we can provide a simple API for handling window key events).
 
 ## Dialogs
-There are two types of window – modal and regular. Below are the functions for creating each type of window:
+There are two types of window – modal and regular. Below are the functions for creating each:
 
 1. Window – regular window type.
-2. Dialog – modal window type. Such a window locks its parent window until the user completes working with it and closes the modal window.
+2. Dialog – modal window type. This type locks its parent window until the user is finished working with it and closes the modal window.
 
 You can see an example of both types of window below.
 
@@ -446,7 +449,7 @@ fun main() = application {
 }
 ```
 
-If you need a dialog that is implemented in Swing, you can wrap it into Composable function:
+If you need a dialog that is implemented in Swing, you can wrap it into a Composable function:
 ```kotlin
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
