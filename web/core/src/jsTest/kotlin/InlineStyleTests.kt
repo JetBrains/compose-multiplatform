@@ -3,13 +3,7 @@ package org.jetbrains.compose.web.core.tests
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
-import org.jetbrains.compose.web.css.Color
-import org.jetbrains.compose.web.css.backgroundColor
-import org.jetbrains.compose.web.css.border
-import org.jetbrains.compose.web.css.color
-import org.jetbrains.compose.web.css.opacity
-import org.jetbrains.compose.web.css.padding
-import org.jetbrains.compose.web.css.px
+import org.jetbrains.compose.web.css.*
 import org.jetbrains.compose.web.dom.Span
 import org.jetbrains.compose.web.dom.Text
 import kotlin.test.Test
@@ -170,6 +164,23 @@ class InlineStyleTests {
 
         assertEquals(
             expected = "<span id=\"container\" style=\"opacity: 0.4; padding: 40px;\"></span>",
+            actual = root.innerHTML
+        )
+    }
+
+    @Test
+    fun heightAuto() = runTest {
+        composition {
+            Span({
+                style {
+                    height(auto)
+                }
+                id("container")
+            })
+        }
+
+        assertEquals(
+            expected = "<span id=\"container\" style=\"height: auto;\"></span>",
             actual = root.innerHTML
         )
     }
