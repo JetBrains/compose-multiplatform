@@ -1,7 +1,9 @@
 import androidx.compose.runtime.Composable
-import androidx.compose.web.elements.Div
-import androidx.compose.web.elements.P
-import androidx.compose.web.elements.Text
+import org.jetbrains.compose.web.css.*
+import org.jetbrains.compose.web.css.selectors.*
+import org.jetbrains.compose.web.attributes.*
+import org.jetbrains.compose.web.dom.*
+import org.jetbrains.compose.web.*
 
 @Composable
 fun AddItems(count: Int) {

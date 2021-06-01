@@ -1,6 +1,10 @@
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Composition
-import androidx.compose.web.renderComposable
+import org.jetbrains.compose.web.css.*
+import org.jetbrains.compose.web.css.selectors.*
+import org.jetbrains.compose.web.attributes.*
+import org.jetbrains.compose.web.dom.*
+import org.jetbrains.compose.web.*
 import kotlinx.browser.document
 import kotlinx.browser.window
 import kotlinx.coroutines.CoroutineScope

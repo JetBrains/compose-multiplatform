@@ -1,5 +1,5 @@
 plugins {
-    id("kotlin-multiplatform")
+    id("org.jetbrains.kotlin.multiplatform")
     id("org.jetbrains.compose")
 }
 
@@ -41,6 +41,14 @@ kotlin {
     }
 }
 
+val printBundleSize by tasks.registering {
+    doLast {
+        val jsFile = buildDir.resolve("distributions/web-benchmark-core.js")
+        val size = jsFile.length()
+        println("##teamcity[buildStatisticValue key='landingPageBundleSize' value='$size']")
+    }
+}
+
 val printBenchmarkResults by tasks.registering {
     doLast {
         val report = buildDir.resolve("reports/tests/jsTest/classes/BenchmarkTests.html").readText()
@@ -58,18 +66,15 @@ val printBenchmarkResults by tasks.registering {
             }
         }?.toMap()
 
-        println("##teamcity[testSuiteStarted name='BenchmarkTests']")
         benchmarks?.forEach {
             // TeamCity messages need to escape '[' and ']' using '|'
             val testName = it.key
                 .replace("[", "|[")
                 .replace("]", "|]")
-            println("##teamcity[testStarted name='$testName']")
-            println("##teamcity[testMetadata name='benchmark avg' type='number' value='${it.value}']")
-            println("##teamcity[testFinished name='$testName']")
+            println("##teamcity[buildStatisticValue key='benchmark_$testName' value='${it.value}']")
         }
-        println("##teamcity[testSuiteFinished name='BenchmarkTests']")
     }
 }
 
 tasks.named("jsTest") { finalizedBy(printBenchmarkResults) }
+tasks.named("build") { finalizedBy(printBundleSize) }
