@@ -12,9 +12,12 @@ pluginManagement {
 
     resolutionStrategy {
         eachPlugin {
+            println("REQ ${requested.id.id}")
             if (requested.id.id == "org.jetbrains.compose") {
                 println("[build] compose core version: ${extra["COMPOSE_CORE_VERSION"]}")
                 useModule("org.jetbrains.compose:org.jetbrains.compose.gradle.plugin:${extra["COMPOSE_CORE_VERSION"]}")
+            } else if (requested.id.id == "org.jetbrains.kotlin.multiplatform") {
+                useModule("org.jetbrains.kotlin.multiplatform:org.jetbrains.kotlin.multiplatform.gradle.plugin:1.5.10")
             }
         }
     }
