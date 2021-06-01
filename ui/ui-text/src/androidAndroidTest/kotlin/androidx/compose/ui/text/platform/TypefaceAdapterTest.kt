@@ -318,7 +318,7 @@ class TypefaceAdapterTest {
         val fontFamily = FontFamily(FONT_200_ITALIC) as FontListFontFamily
 
         val fontMatcher = mock<FontMatcher>()
-        whenever(fontMatcher.matchFont(any(), any(), any()))
+        whenever(fontMatcher.matchFont(any(), any(), anyFontStyle()))
             .thenReturn(FONT_200_ITALIC)
 
         TypefaceAdapter(fontMatcher = fontMatcher, resourceLoader = resourceLoader).create(
@@ -330,7 +330,7 @@ class TypefaceAdapterTest {
         verify(fontMatcher, times(1)).matchFont(
             eq(fontFamily),
             eq(fontWeight),
-            eq(fontStyle)
+            eqFontStyle(fontStyle)
         )
     }
 

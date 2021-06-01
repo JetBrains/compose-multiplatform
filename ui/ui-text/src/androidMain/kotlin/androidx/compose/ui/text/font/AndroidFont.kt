@@ -61,6 +61,7 @@ fun Font(
 @ExperimentalTextApi
 @OptIn(InternalPlatformTextApi::class, ExperimentalTextApi::class)
 @Stable
+@Suppress("StreamFiles")
 fun Font(
     file: File,
     weight: FontWeight = FontWeight.Normal,
