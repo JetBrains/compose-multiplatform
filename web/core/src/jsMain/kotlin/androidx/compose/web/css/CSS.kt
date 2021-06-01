@@ -1,181 +1,28 @@
-/*
- * Copyright 2020-2021 JetBrains s.r.o. and respective authors and developers.
- * Use of this source code is governed by the Apache 2.0 license that can be found in the LICENSE.txt file.
- */
-
 @file:Suppress("UNUSED", "NOTHING_TO_INLINE")
 package org.jetbrains.compose.web.css
 
-import org.w3c.dom.HTMLElement
-import org.w3c.dom.css.*
+import kotlinx.browser.window
+import org.w3c.dom.DOMMatrix
+import org.w3c.dom.DOMMatrixReadOnly
+import org.w3c.dom.Element
+import org.w3c.dom.css.CSSRule
+import org.w3c.dom.css.CSSRuleList
+import org.w3c.dom.css.CSSStyleRule
+import org.w3c.dom.css.ElementCSSInlineStyle
 import org.w3c.dom.css.StyleSheet
-
-actual external interface CSSStyleValue
-
-external interface CSSKeywordValueJS : CSSStyleValue {
-    val value: String
-}
-
-@JsName("CSSKeywordValueActual")
-actual interface CSSKeywordValue : CSSKeywordValueJS, CSSStyleValue {
-    actual override val value: String
-
-    actual companion object {
-        actual inline operator fun invoke(value: String): CSSKeywordValue =
-            CSSKeywordValueKT(value)
-    }
-}
-
-actual interface StylePropertyValue {
-    actual interface String: StylePropertyValue
-    actual interface Number: StylePropertyValue
-    actual interface StyleValue: StylePropertyValue, CSSStyleValue
-    actual companion object {
-       actual inline operator fun invoke(value: kotlin.String): String = value.unsafeCast<String>()
-
-       actual inline operator fun invoke(value: kotlin.Number): Number = value.unsafeCast<Number>()
-
-       actual inline operator fun invoke(value: CSSStyleValue): StyleValue = value.unsafeCast<StyleValue>()
-    }
-}
-
-// type CSSNumeric = number | CSSNumericValue
-actual interface CSSNumeric {
-    actual interface Number : CSSNumeric
-    actual interface NumericValue : CSSNumeric, CSSNumericValue
-    actual companion object {
-       actual inline operator fun invoke(value: kotlin.Number): Number = value.unsafeCast<Number>()
-
-       actual inline operator fun invoke(value: CSSNumericValue): NumericValue = value.unsafeCast<NumericValue>()
-    }
-}
-
-actual external interface CSSMathValue : CSSNumericValue {
-    @JsName("operator")
-    actual val strOperator: String
-}
-
-actual val CSSMathValue.operator: CSSMathOperator
-    get() = CSSMathOperator.valueOf(this.strOperator)
-
-actual external class CSSNumericArray {
-    actual fun forEach(handler: (CSSNumericValue) -> Unit)
-
-    actual val length: Int
-
-    actual operator fun get(index: Int): CSSNumericValue
-}
-
-actual external interface CSSMathSum : CSSMathValue {
-    actual val values: CSSNumericArray
-}
-
-actual interface CSSNumericType {
-    actual val length: Number
-    actual val angle: Number
-    actual val time: Number
-    actual val frequency: Number
-    actual val resolution: Number
-    actual val flex: Number
-    actual val percent: Number
-    @JsName("percentHint")
-    actual val strPercentHint: String
-}
-
-actual val CSSNumericType.percentHint: CSSNumericBaseType
-    get() = CSSNumericBaseType.valueOf(this.strPercentHint)
-
-actual external interface CSSNumericValue : CSSStyleValue
-
-actual external interface CSSUnitValue : CSSNumericValue {
-    actual val value: Number
-    actual val unit: String
-}
-
-actual external interface CSSTypedOM {
-    actual fun number(value: Number): CSSnumberValue
-    actual fun percent(value: Number): CSSpercentValue
-    actual fun em(value: Number): CSSemValue
-    actual fun ex(value: Number): CSSexValue
-    actual fun ch(value: Number): CSSchValue
-    actual fun ic(value: Number): CSSicValue
-    actual fun rem(value: Number): CSSremValue
-    actual fun lh(value: Number): CSSlhValue
-    actual fun rlh(value: Number): CSSrlhValue
-    actual fun vw(value: Number): CSSvwValue
-    actual fun vh(value: Number): CSSvhValue
-    actual fun vi(value: Number): CSSviValue
-    actual fun vb(value: Number): CSSvbValue
-    actual fun vmin(value: Number): CSSvminValue
-    actual fun vmax(value: Number): CSSvmaxValue
-    actual fun cm(value: Number): CSScmValue
-    actual fun mm(value: Number): CSSmmValue
-    actual fun Q(value: Number): CSSQValue
-    actual fun pt(value: Number): CSSptValue
-    actual fun pc(value: Number): CSSpcValue
-    actual fun px(value: Number): CSSpxValue
-    actual fun deg(value: Number): CSSdegValue
-    actual fun grad(value: Number): CSSgradValue
-    actual fun rad(value: Number): CSSradValue
-    actual fun turn(value: Number): CSSturnValue
-    actual fun s(value: Number): CSSsValue
-    actual fun ms(value: Number): CSSmsValue
-    actual fun Hz(value: Number): CSSHzValue
-    actual fun kHz(value: Number): CSSkHzValue
-    actual fun dpi(value: Number): CSSdpiValue
-    actual fun dpcm(value: Number): CSSdpcmValue
-    actual fun dppx(value: Number): CSSdppxValue
-    actual fun fr(value: Number): CSSfrValue
-}
-
-
-class StylePropertyMapKT(private val style: CSSStyleDeclaration, private val clearFn: () -> Unit): StylePropertyMap {
-    override fun set(property: String, value: StylePropertyValue) {
-        style.setProperty(property, value.toString())
-    }
-
-    override fun append(property: String, value: StylePropertyValue) {
-        val oldValues = style.getPropertyValue(property)
-        if (oldValues == undefined) {
-            style.setProperty(property, value.toString())
-        } else {
-            val newValues = listOf(oldValues, value)
-            style.setProperty(property, newValues.joinToString(", "))
-        }
-    }
-
-    override fun delete(property: String) {
-        style.removeProperty(property)
-    }
-
-    override fun clear() {
-        clearFn()
-    }
-
-    override fun has(property: String): Boolean {
-        return style.getPropertyValue(property) as String? != null
-    }
-}
-
-fun Any.polyfillStylePropertyMap(jsFieldName: String, style: CSSStyleDeclaration, clearFn: () -> Unit): StylePropertyMap {
-    val styleMap = this.asDynamic()[jsFieldName]
-    if (styleMap == undefined) {
-        val newStyleMap = StylePropertyMapKT(style, clearFn).also {
-            this.asDynamic()[jsFieldName] = it
-        }
-        this.asDynamic()[jsFieldName] = newStyleMap
-        return newStyleMap
-    }
-    return styleMap.unsafeCast<StylePropertyMap>()
-}
-
 
 inline val StyleSheet.cssRules
     get() = this.asDynamic().cssRules.unsafeCast<CSSRuleList>()
 
-
 inline fun StyleSheet.deleteRule(index: Int) {
     this.asDynamic().deleteRule(index)
+}
+
+inline val CSSStyleRule.styleMap
+    get() = this.asDynamic().styleMap.unsafeCast<StylePropertyMap>()
+
+inline operator fun CSSRuleList.get(index: Int): CSSRule {
+    return this.asDynamic()[index].unsafeCast<CSSRule>()
 }
 
 fun StyleSheet.insertRule(cssRule: String, index: Int? = null): Int {
@@ -186,14 +33,315 @@ fun StyleSheet.insertRule(cssRule: String, index: Int? = null): Int {
     }
 }
 
+val ElementCSSInlineStyle.attributeStyleMap
+    get() = this.asDynamic().attributeStyleMap.unsafeCast<StylePropertyMap>()
 
-inline operator fun CSSRuleList.get(index: Int): CSSRule {
-    return this.asDynamic()[index].unsafeCast<CSSRule>()
+external interface CSSStyleValue {
+    // toString() : string
 }
 
+@JsName("CSSStyleValue")
+open external class CSSStyleValueJS : CSSStyleValue {
+    companion object {
+        fun parse(property: String, cssText: String): CSSStyleValue
+        fun parseAll(property: String, cssText: String): Array<CSSStyleValue>
+    }
+}
 
-external interface StylePropertyMapReadOnly {
+external class CSSVariableReferenceValue(
+    variable: String,
+    fallback: CSSUnparsedValue? = definedExternally
+) {
+    val variable: String
+    val fallback: CSSUnparsedValue?
+}
+
+// type CSSUnparsedSegment = String | CSSVariableReferenceValue
+interface CSSUnparsedSegment {
+    companion object {
+        operator fun invoke(value: String) = value.unsafeCast<CSSUnparsedSegment>()
+        operator fun invoke(value: CSSVariableReferenceValue) =
+            value.unsafeCast<CSSUnparsedSegment>()
+    }
+}
+
+fun CSSUnparsedSegment.asString() = this.asDynamic() as? String
+fun CSSUnparsedSegment.asCSSVariableReferenceValue() =
+    this.asDynamic() as? CSSVariableReferenceValue
+
+external class CSSUnparsedValue(members: Array<CSSUnparsedSegment>) : CSSStyleValue {
+    // TODO: [Symbol.iterator]() : IterableIterator<CSSUnparsedSegment>
+    fun forEach(handler: (CSSUnparsedSegment) -> Unit)
+    val length: Int
+
+    // readonly [index: number]: CSSUnparsedSegment
+    operator fun get(index: Int): CSSUnparsedSegment
+    operator fun set(index: Int, value: CSSUnparsedSegment)
+}
+
+external interface CSSKeywordValue : CSSStyleValue {
+    val value: String
+}
+
+@JsName("CSSKeywordValue")
+external class CSSKeywordValueJS(value: String) : CSSKeywordValue {
+    override val value: String
+}
+
+// type CSSNumberish = number | CSSNumericValue
+interface CSSNumberish {
+    companion object {
+        operator fun invoke(value: Number) = value.unsafeCast<CSSNumberish>()
+        operator fun invoke(value: CSSNumericValue) =
+            value.unsafeCast<CSSNumberish>()
+    }
+}
+
+fun CSSNumberish.asNumber() = this.asDynamic() as? Number
+fun CSSNumberish.asCSSNumericValue(): CSSNumericValue? = this.asDynamic() as? CSSNumericValueJS
+
+// declare enum CSSNumericBaseType {
+//     'length',
+//     'angle',
+//     'time',
+//     'frequency',
+//     'resolution',
+//     'flex',
+//     'percent',
+// }
+enum class CSSNumericBaseType(val value: String) {
+    @JsName("_length")
+    length("length"),
+    angle("angle"),
+    time("time"),
+    frequency("frequency"),
+    resolution("resolution"),
+    flex("flex"),
+    percent("percent")
+}
+
+external interface CSSNumericType {
+    val length: Number
+    val angle: Number
+    val time: Number
+    val frequency: Number
+    val resolution: Number
+    val flex: Number
+    val percent: Number
+    // percentHint: CSSNumericBaseType
+}
+
+val CSSNumericType.percentHint
+    get() = CSSNumericBaseType.valueOf(this.asDynamic().percentHint)
+//    set(value) { this.asDynamic().percentHint = value.value }
+
+external interface CSSNumericValue : CSSStyleValue {
+    fun add(vararg values: CSSNumberish): CSSNumericValue
+    fun sub(vararg values: CSSNumberish): CSSNumericValue
+    fun mul(vararg values: CSSNumberish): CSSNumericValue
+    fun div(vararg values: CSSNumberish): CSSNumericValue
+    fun min(vararg values: CSSNumberish): CSSNumericValue
+    fun max(vararg values: CSSNumberish): CSSNumericValue
+
+    fun equals(vararg values: CSSNumberish): Boolean
+
+    fun to(unit: String): CSSUnitValue
+    fun toSum(vararg units: String): CSSMathSum
+    fun type(): CSSNumericType
+}
+
+abstract external class CSSNumericValueJS : CSSNumericValue {
+    override fun add(vararg values: CSSNumberish): CSSNumericValue
+    override fun sub(vararg values: CSSNumberish): CSSNumericValue
+    override fun mul(vararg values: CSSNumberish): CSSNumericValue
+    override fun div(vararg values: CSSNumberish): CSSNumericValue
+    override fun min(vararg values: CSSNumberish): CSSNumericValue
+    override fun max(vararg values: CSSNumberish): CSSNumericValue
+
+    override fun equals(vararg values: CSSNumberish): Boolean
+
+    override fun to(unit: String): CSSUnitValue
+    override fun toSum(vararg units: String): CSSMathSum
+    override fun type(): CSSNumericType
+
+    companion object {
+        fun parse(cssText: String): CSSNumericValue
+    }
+}
+
+external interface CSSUnitValue : CSSNumericValue {
+    val value: Number
+    val unit: String
+}
+
+external interface CSSTypedUnitValue<T> : CSSNumericValue {
+    val value: Number
+    val unit: T
+}
+
+@JsName("CSSUnitValue")
+external class CSSUnitValueJS(value: Number, unit: String) : CSSNumericValueJS, CSSUnitValue {
+    override val value: Number
+    override val unit: String
+}
+
+// declare enum CSSMathOperator {
+//     'sum',
+//     'product',
+//     'negate',
+//     'invert',
+//     'min',
+//     'max',
+//     'clamp',
+// }
+enum class CSSMathOperator(val value: String) {
+    sum("sum"),
+    product("product"),
+    negate("negate"),
+    invert("invert"),
+    min("min"),
+    max("max"),
+    clamp("clamp")
+}
+
+open external class CSSMathValue : CSSNumericValueJS {
+    // readonly operator: CSSMathOperator
+}
+
+val CSSMathValue.operator
+    get() = CSSMathOperator.valueOf(this.asDynamic().operator)
+//    set(value) { this.asDynamic().operator = value.value }
+
+external class CSSMathSum(vararg args: CSSNumberish) : CSSMathValue {
+    val values: CSSNumericArray
+}
+
+external class CSSMathProduct(vararg args: CSSNumberish) : CSSMathValue {
+    val values: CSSNumericArray
+}
+
+external class CSSMathNegate(arg: CSSNumberish) : CSSMathValue {
+    val value: CSSNumericValue
+}
+
+external class CSSMathInvert(arg: CSSNumberish) : CSSMathValue {
+    val value: CSSNumericValue
+}
+
+external class CSSMathMin(vararg args: CSSNumberish) : CSSMathValue {
+    val values: CSSNumericArray
+}
+
+external class CSSMathMax(vararg args: CSSNumberish) : CSSMathValue {
+    val values: CSSNumericArray
+}
+
+// TODO(yavanosta) : conflict with base class properties
+// Since there is no support for this class in any browser, it's better
+// wait for the implementation.
+// declare class CSSMathClamp extends CSSMathValue {
+// constructor(min: CSSNumberish, val: CSSNumberish, max: CSSNumberish)
+//     readonly min: CSSNumericValue
+//     readonly val: CSSNumericValue
+//     readonly max: CSSNumericValue
+// }
+
+external class CSSNumericArray {
+    // TODO: [Symbol.iterator]() : IterableIterator<CSSNumericValue>
+    fun forEach(handler: (CSSNumericValue) -> Unit)
+    val length: Int
+
+    // readonly [index: number]: CSSNumericValue
+    operator fun get(index: Int): CSSNumericValue
+}
+
+external class CSSTransformValue(transforms: Array<CSSTransformComponent>) : CSSStyleValue {
+    // [Symbol.iterator]() : IterableIterator<CSSTransformComponent>
+    fun forEach(handler: (CSSTransformComponent) -> Unit)
+    val length: Int
+
+    // [index: number]: CSSTransformComponent
+    operator fun get(index: Int): CSSTransformComponent
+    operator fun set(index: Int, value: CSSTransformComponent)
+    val is2D: Boolean
+    fun toMatrix(): DOMMatrix
+}
+
+open external class CSSTransformComponent {
+    val is2D: Boolean
+    fun toMatrix(): DOMMatrix
+    // toString() : string
+}
+
+external class CSSTranslate(
+    x: CSSNumericValue,
+    y: CSSNumericValue,
+    z: CSSNumericValue? = definedExternally
+) : CSSTransformComponent {
+    val x: CSSNumericValue
+    val y: CSSNumericValue
+    val z: CSSNumericValue
+}
+
+external class CSSRotate(angle: CSSNumericValue) : CSSTransformComponent {
+    constructor(x: CSSNumberish, y: CSSNumberish, z: CSSNumberish, angle: CSSNumericValue)
+
+    val x: CSSNumberish
+    val y: CSSNumberish
+    val z: CSSNumberish
+    val angle: CSSNumericValue
+}
+
+external class CSSScale(
+    x: CSSNumberish,
+    y: CSSNumberish,
+    z: CSSNumberish? = definedExternally
+) : CSSTransformComponent {
+    val x: CSSNumberish
+    val y: CSSNumberish
+    val z: CSSNumberish
+}
+
+external class CSSSkew(ax: CSSNumericValue, ay: CSSNumericValue) : CSSTransformComponent {
+    val ax: CSSNumericValue
+    val ay: CSSNumericValue
+}
+
+external class CSSSkewX(ax: CSSNumericValue) : CSSTransformComponent {
+    val ax: CSSNumericValue
+}
+
+external class CSSSkewY(ay: CSSNumericValue) : CSSTransformComponent {
+    val ay: CSSNumericValue
+}
+
+/* Note that skew(x,y) is *not* the same as skewX(x) skewY(y),
+     thus the separate interfaces for all three. */
+
+external class CSSPerspective(length: CSSNumericValue) : CSSTransformComponent {
+    val length: CSSNumericValue
+}
+
+external class CSSMatrixComponent(
+    matrix: DOMMatrixReadOnly,
+    options: CSSMatrixComponentOptions? = definedExternally
+) : CSSTransformComponent {
+    val matrix: DOMMatrix
+}
+
+external interface CSSMatrixComponentOptions {
+    val is2D: Boolean
+}
+
+external class CSSImageValue : CSSStyleValue
+
+open external class StylePropertyMapReadOnly {
+    // TODO: [Symbol.iterator]() : IterableIterator<[string, CSSStyleValue[]]>
+
+    fun get(property: String): CSSStyleValue? // CSSStyleValue | undefined
+    fun getAll(property: String): Array<CSSStyleValue>
     fun has(property: String): Boolean
+    val size: Number
 }
 
 fun StylePropertyMapReadOnly.forEach(handler: (String, Array<CSSStyleValue>) -> Unit) {
@@ -205,24 +353,82 @@ fun StylePropertyMapReadOnly.forEach(handler: (String, Array<CSSStyleValue>) -> 
     }
 }
 
-external interface StylePropertyMap : StylePropertyMapReadOnly {
-    fun set(property: String, value: StylePropertyValue)
-    fun append(property: String, value: StylePropertyValue)
+// CSSStyleValue | string
+interface StylePropertyValue {
+    companion object {
+        operator fun invoke(value: String) = value.unsafeCast<StylePropertyValue>()
+        operator fun invoke(value: Number) = value.unsafeCast<StylePropertyValue>()
+        operator fun invoke(value: CSSStyleValue) = value.unsafeCast<StylePropertyValue>()
+    }
+}
+
+fun StylePropertyValue.asString() = this.asDynamic() as? String
+fun StylePropertyValue.asNumber() = this.asDynamic() as? Number
+fun StylePropertyValue.asCSSStyleValue(): CSSStyleValue? = this.asDynamic() as? CSSStyleValueJS
+
+external class StylePropertyMap : StylePropertyMapReadOnly {
+    fun set(property: String, vararg values: StylePropertyValue)
+    fun append(property: String, vararg values: StylePropertyValue)
     fun delete(property: String)
     fun clear()
 }
 
-@JsName("CSS")
-external val CSSJS: CSSTypedOM
+inline fun Element.computedStyleMap(): StylePropertyMapReadOnly =
+    this.asDynamic().computedStyleMap().unsafeCast<StylePropertyMapReadOnly>()
 
-const val useNativeCSSTypedOM = true
+external class CSS {
+    companion object {
+        fun number(value: Number): CSSUnitValue
+        fun percent(value: Number): CSSUnitValue
 
-actual val CSS: CSSTypedOM = if (useNativeCSSTypedOM && CSSJS != undefined && CSSJS.asDynamic().px != undefined) {
-    CSSJS
-} else CSSKT
+        // <length>
+        fun em(value: Number): CSSUnitValue
+        fun ex(value: Number): CSSUnitValue
+        fun ch(value: Number): CSSUnitValue
+        fun ic(value: Number): CSSUnitValue
+        fun rem(value: Number): CSSUnitValue
+        fun lh(value: Number): CSSUnitValue
+        fun rlh(value: Number): CSSUnitValue
+        fun vw(value: Number): CSSUnitValue
+        fun vh(value: Number): CSSUnitValue
+        fun vi(value: Number): CSSUnitValue
+        fun vb(value: Number): CSSUnitValue
+        fun vmin(value: Number): CSSUnitValue
+        fun vmax(value: Number): CSSUnitValue
+        fun cm(value: Number): CSSUnitValue
+        fun mm(value: Number): CSSUnitValue
+        fun Q(value: Number): CSSUnitValue
 
-val CSSStyleRule.styleMap: StylePropertyMap
-    get() = polyfillStylePropertyMap(if (useNativeCSSTypedOM) "styleMap" else "styleMapKT", this.style) { cssText = "" }
+        //        function _in(value: Number) : CSSUnitValue
+//        export
+//        { _in as in }
+        fun pt(value: Number): CSSUnitValue
+        fun pc(value: Number): CSSUnitValue
+        fun px(value: Number): CSSUnitValue
 
-val HTMLElement.attributeStyleMap: StylePropertyMap
-    get() = polyfillStylePropertyMap(if (useNativeCSSTypedOM) "attributeStyleMap" else "attributeStyleMapKT", this.style) { removeAttribute("style") }
+        // <angle>
+        fun deg(value: Number): CSSUnitValue
+        fun grad(value: Number): CSSUnitValue
+        fun rad(value: Number): CSSUnitValue
+        fun turn(value: Number): CSSUnitValue
+
+        // <time>
+        fun s(value: Number): CSSUnitValue
+        fun ms(value: Number): CSSUnitValue
+
+        // <frequency>
+        fun Hz(value: Number): CSSUnitValue
+        fun kHz(value: Number): CSSUnitValue
+
+        // <resolution>
+        fun dpi(value: Number): CSSUnitValue
+        fun dpcm(value: Number): CSSUnitValue
+        fun dppx(value: Number): CSSUnitValue
+
+        // <flex>
+        fun fr(value: Number): CSSUnitValue
+    }
+}
+
+@Suppress("unused")
+val cssTypedOMPolyfill = CSSTypedOMPolyfill.default(window)

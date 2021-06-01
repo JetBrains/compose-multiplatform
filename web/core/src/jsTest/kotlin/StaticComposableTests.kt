@@ -133,15 +133,14 @@ class StaticComposableTests {
         }
 
         assertEquals("border: 1px solid red;", (root.children[0] as HTMLElement).style.cssText)
-        root.children[1]?.let {
-            val el = it.unsafeCast<HTMLElement>()
+        root.children[1]?.let { el ->
             assertEquals(
                 "green",
-                el.style.getPropertyValue("border-color")
+                el.asDynamic().attributeStyleMap.get("border-color").toString(),
             )
             assertEquals(
                 "3px",
-                el.style.getPropertyValue("border-width"),
+                el.asDynamic().attributeStyleMap.get("border-width").toString(),
             )
         }
     }
