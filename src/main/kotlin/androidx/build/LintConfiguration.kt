@@ -18,6 +18,7 @@ package androidx.build
 
 import androidx.build.dependencyTracker.AffectedModuleDetector
 import androidx.build.gradle.getByType
+import com.android.build.api.extension.AndroidComponentsExtension
 import com.android.build.gradle.internal.dsl.LintOptions
 import org.gradle.api.DefaultTask
 import org.gradle.api.Project
@@ -130,9 +131,9 @@ fun Project.configureLint(lintOptions: LintOptions, extension: AndroidXExtension
         isCheckReleaseBuilds = false
     }
 
-    // Lint is configured entirely in afterEvaluate so that individual projects cannot easily
+    // Lint is configured entirely in finalizeDsl so that individual projects cannot easily
     // disable individual checks in the DSL for any reason.
-    afterEvaluate {
+    val finalizeDsl: () -> Unit = {
         lintOptions.apply {
             if (!isTestingLintItself) {
                 isAbortOnError = true
@@ -280,21 +281,6 @@ fun Project.configureLint(lintOptions: LintOptions, extension: AndroidXExtension
                 System.setProperty(LINT_BASELINE_CONTINUE, "true")
             }
 
-            listOf(
-                tasks.named("lintAnalyzeDebug"),
-                tasks.named("lintAnalyze"),
-            ).forEach { task ->
-                task.configure {
-                    it.doLast {
-                        // Workaround for b/187319075 where lint uses the wrong output dir.
-                        val lintBuildDir = File(project.projectDir, "build")
-                        if (lintBuildDir.isDirectory) {
-                            lintBuildDir.deleteRecursively()
-                        }
-                    }
-                }
-            }
-
             // Lint complains when it generates a new, blank baseline file so we'll just avoid
             // telling it about the baseline if one doesn't already exist OR we're explicitly
             // updating (and creating) baseline files.
@@ -302,6 +288,33 @@ fun Project.configureLint(lintOptions: LintOptions, extension: AndroidXExtension
                 baseline(lintBaseline)
             }
         }
+    }
+
+    afterEvaluate {
+        listOf(
+            tasks.named("lintAnalyzeDebug"),
+            tasks.named("lintAnalyze"),
+        ).forEach { task ->
+            task.configure {
+                it.doLast {
+                    // Workaround for b/187319075 where lint uses the wrong output dir.
+                    val lintBuildDir = File(project.projectDir, "build")
+                    if (lintBuildDir.isDirectory) {
+                        lintBuildDir.deleteRecursively()
+                    }
+                }
+            }
+        }
+    }
+
+    @Suppress("UnstableApiUsage") // Will be stable in AGP 7.0.0
+    val androidComponents = extensions.findByType(AndroidComponentsExtension::class.java)
+    if (null != androidComponents) {
+        @Suppress("UnstableApiUsage")
+        androidComponents.finalizeDsl { finalizeDsl() }
+    } else {
+        // Support the lint standalone plugin case which, as yet, lacks AndroidComponents DSL
+        afterEvaluate { finalizeDsl() }
     }
 }
 
