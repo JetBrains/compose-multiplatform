@@ -481,6 +481,51 @@ class DrawerTest {
 
     @Test
     @LargeTest
+    fun modalDrawer_confirmStateChangeRespect() {
+        lateinit var drawerState: DrawerState
+        rule.setMaterialContent {
+            drawerState = rememberDrawerState(
+                DrawerValue.Open,
+                confirmStateChange = {
+                    it != DrawerValue.Closed
+                }
+            )
+            Box(Modifier.testTag("Drawer")) {
+                ModalDrawer(
+                    drawerState = drawerState,
+                    drawerContent = {
+                        Box(
+                            Modifier.fillMaxSize()
+                                .testTag("content")
+                                .background(color = Color.Magenta)
+                        )
+                    },
+                    content = {
+                        Box(Modifier.fillMaxSize().background(color = Color.Red))
+                    }
+                )
+            }
+        }
+
+        rule.onNodeWithTag("Drawer")
+            .performGesture { swipeLeft() }
+
+        // still open
+        rule.runOnIdle {
+            assertThat(drawerState.currentValue).isEqualTo(DrawerValue.Open)
+        }
+
+        rule.onNodeWithTag("content", useUnmergedTree = true)
+            .onParent()
+            .performSemanticsAction(SemanticsActions.Dismiss)
+
+        rule.runOnIdle {
+            assertThat(drawerState.currentValue).isEqualTo(DrawerValue.Open)
+        }
+    }
+
+    @Test
+    @LargeTest
     fun modalDrawer_openBySwipe_rtl() {
         lateinit var drawerState: DrawerState
         rule.setMaterialContent {
@@ -685,6 +730,53 @@ class DrawerTest {
 
         rule.runOnIdle {
             assertThat(drawerState.currentValue).isEqualTo(BottomDrawerValue.Closed)
+        }
+    }
+
+    @Test
+    @LargeTest
+    fun bottomDrawer_respectsConfirmStateChange(): Unit = runBlocking(AutoTestFrameClock()) {
+        val contentTag = "contentTestTag"
+        lateinit var drawerState: BottomDrawerState
+        rule.setMaterialContent {
+            drawerState = rememberBottomDrawerState(
+                BottomDrawerValue.Expanded,
+                confirmStateChange = {
+                    it != BottomDrawerValue.Closed
+                }
+            )
+            BottomDrawer(
+                drawerState = drawerState,
+                drawerContent = {
+                    Box(
+                        Modifier.height(shortBottomDrawerHeight).testTag(bottomDrawerTag)
+                    )
+                },
+                content = { Box(Modifier.fillMaxSize().testTag(contentTag)) }
+            )
+        }
+
+        rule.runOnIdle {
+            assertThat(drawerState.currentValue).isEqualTo(BottomDrawerValue.Expanded)
+        }
+
+        rule.onNodeWithTag(contentTag)
+            .performGesture { swipeDown() }
+
+        advanceClock()
+
+        rule.runOnIdle {
+            assertThat(drawerState.currentValue).isEqualTo(BottomDrawerValue.Expanded)
+        }
+
+        rule.onNodeWithTag(bottomDrawerTag, useUnmergedTree = true)
+            .onParent()
+            .performSemanticsAction(SemanticsActions.Dismiss)
+
+        advanceClock()
+
+        rule.runOnIdle {
+            assertThat(drawerState.currentValue).isEqualTo(BottomDrawerValue.Expanded)
         }
     }
 

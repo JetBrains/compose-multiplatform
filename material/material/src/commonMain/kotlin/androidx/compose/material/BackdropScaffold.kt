@@ -318,9 +318,21 @@ fun BackdropScaffold(
                 )
                 .semantics {
                     if (scaffoldState.isConcealed) {
-                        collapse { scope.launch { scaffoldState.reveal() }; true }
+                        collapse {
+                            scope.launch {
+                                if (scaffoldState.confirmStateChange(Revealed)) {
+                                    scaffoldState.reveal()
+                                }
+                            }; true
+                        }
                     } else {
-                        expand { scope.launch { scaffoldState.conceal() }; true }
+                        expand {
+                            scope.launch {
+                                if (scaffoldState.confirmStateChange(Concealed)) {
+                                    scaffoldState.conceal()
+                                }
+                            }; true
+                        }
                     }
                 }
 
@@ -340,7 +352,11 @@ fun BackdropScaffold(
                     Scrim(
                         color = frontLayerScrimColor,
                         onDismiss = {
-                            scope.launch { scaffoldState.conceal() }
+                            scope.launch {
+                                if (scaffoldState.confirmStateChange(Concealed)) {
+                                    scaffoldState.conceal()
+                                }
+                            }
                         },
                         visible = scaffoldState.targetValue == Revealed
                     )

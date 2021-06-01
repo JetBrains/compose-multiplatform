@@ -410,7 +410,13 @@ fun ModalDrawer(
             }
             Scrim(
                 open = drawerState.isOpen,
-                onClose = { scope.launch { drawerState.close() } },
+                onClose = {
+                    scope.launch {
+                        if (drawerState.swipeableState.confirmStateChange(DrawerValue.Closed)) {
+                            drawerState.close()
+                        }
+                    }
+                },
                 fraction = {
                     calculateFraction(minValue, maxValue, drawerState.offset.value)
                 },
@@ -431,7 +437,16 @@ fun ModalDrawer(
                     .semantics {
                         paneTitle = Strings.NavigationMenu
                         if (drawerState.isOpen) {
-                            dismiss(action = { scope.launch { drawerState.close() }; true })
+                            dismiss {
+                                scope.launch {
+                                    if (
+                                        drawerState.swipeableState
+                                            .confirmStateChange(DrawerValue.Closed)
+                                    ) {
+                                        drawerState.close()
+                                    }
+                                }; true
+                            }
                         }
                     },
                 shape = drawerShape,
@@ -530,7 +545,13 @@ fun BottomDrawer(
             content()
             BottomDrawerScrim(
                 color = scrimColor,
-                onDismiss = { scope.launch { drawerState.close() } },
+                onDismiss = {
+                    scope.launch {
+                        if (drawerState.confirmStateChange(BottomDrawerValue.Closed)) {
+                            drawerState.close()
+                        }
+                    }
+                },
                 visible = drawerState.targetValue != BottomDrawerValue.Closed
             )
             Surface(
@@ -543,7 +564,13 @@ fun BottomDrawer(
                         paneTitle = Strings.NavigationMenu
                         if (drawerState.isOpen) {
                             // TODO(b/180101663) The action currently doesn't return the correct results
-                            dismiss(action = { scope.launch { drawerState.close() }; true })
+                            dismiss {
+                                scope.launch {
+                                    if (drawerState.confirmStateChange(BottomDrawerValue.Closed)) {
+                                        drawerState.close()
+                                    }
+                                }; true
+                            }
                         }
                     },
                 shape = drawerShape,
