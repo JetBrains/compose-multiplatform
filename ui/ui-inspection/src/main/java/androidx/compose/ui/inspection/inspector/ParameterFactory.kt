@@ -925,7 +925,7 @@ internal class ParameterFactory(private val inlineClassConverter: InlineClassCon
          */
         private fun findBestResourceFont(value: FontListFontFamily): ResourceFont? =
             value.fonts.asSequence().filterIsInstance<ResourceFont>().minByOrNull {
-                abs(it.weight.weight - FontWeight.Normal.weight) + it.style.ordinal
+                abs(it.weight.weight - FontWeight.Normal.weight) + it.style.value
             }
     }
 }

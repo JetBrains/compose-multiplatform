@@ -832,8 +832,8 @@ private fun SpanStyle.withDefaultFontSize(): SpanStyle {
 
 fun FontStyle.toSkFontStyle(): SkFontStyle {
     return when (this) {
-        FontStyle.Normal -> org.jetbrains.skija.FontStyle.NORMAL
         FontStyle.Italic -> org.jetbrains.skija.FontStyle.ITALIC
+        else -> org.jetbrains.skija.FontStyle.NORMAL
     }
 }
 
