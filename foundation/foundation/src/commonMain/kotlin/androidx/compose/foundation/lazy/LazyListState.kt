@@ -74,7 +74,7 @@ class LazyListState constructor(
      * The holder class for the current scroll position.
      */
     private val scrollPosition =
-        ItemRelativeScrollPosition(firstVisibleItemIndex, firstVisibleItemScrollOffset)
+        LazyListScrollPosition(firstVisibleItemIndex, firstVisibleItemScrollOffset)
 
     /**
      * The index of the first item that is visible
@@ -211,13 +211,14 @@ class LazyListState constructor(
 
     internal var onScrolledListener: LazyListOnScrolledListener? = null
 
+    private var canScrollBackward: Boolean = false
+    private var canScrollForward: Boolean = false
+
     // TODO: Coroutine scrolling APIs will allow this to be private again once we have more
     //  fine-grained control over scrolling
     /*@VisibleForTesting*/
     internal fun onScroll(distance: Float): Float {
-        if (distance < 0 && !scrollPosition.canScrollForward ||
-            distance > 0 && !scrollPosition.canScrollBackward
-        ) {
+        if (distance < 0 && !canScrollForward || distance > 0 && !canScrollBackward) {
             return 0f
         }
         check(abs(scrollToBeConsumed) <= 0.5f) {
@@ -269,13 +270,18 @@ class LazyListState constructor(
     /**
      *  Updates the state with the new calculated scroll position and consumed scroll.
      */
-    internal fun applyMeasureResult(measureResult: LazyListMeasureResult) {
-        scrollPosition.update(measureResult)
+    internal fun applyMeasureResult(result: LazyListMeasureResult) {
+        scrollPosition.update(result)
         lastVisibleItemIndexNonObservable = DataIndex(
-            measureResult.visibleItemsInfo.lastOrNull()?.index ?: 0
+            result.visibleItemsInfo.lastOrNull()?.index ?: 0
         )
-        scrollToBeConsumed -= measureResult.consumedScroll
-        layoutInfoState.value = measureResult
+        scrollToBeConsumed -= result.consumedScroll
+        layoutInfoState.value = result
+
+        canScrollForward = result.canScrollForward
+        canScrollBackward = (result.firstVisibleItem?.index ?: 0) != 0 ||
+            result.firstVisibleItemScrollOffset != 0
+
         numMeasurePasses++
     }
 
@@ -292,71 +298,6 @@ class LazyListState constructor(
                 )
             }
         )
-    }
-}
-
-/**
- * Contains the current scroll position represented by the first visible item index and the first
- * visible item scroll offset.
- *
- * Allows reading the values without recording the state read: [index] and [scrollOffset].
- * And with recording the state read which makes such reads observable: [observableIndex] and
- * [observableScrollOffset].
- *
- * To update the values use [update].
- *
- * The whole purpose of this class is to allow reading the scroll position without recording the
- * model read as if we do so inside the measure block the extra remeasurement will be scheduled
- * once we update the values in the end of the measure block. Abstracting the variables
- * duplication into a separate class allows us maintain the contract of keeping them in sync.
- */
-private class ItemRelativeScrollPosition(
-    initialIndex: Int = 0,
-    initialScrollOffset: Int = 0
-) {
-    var index = DataIndex(initialIndex)
-        private set
-
-    var scrollOffset = initialScrollOffset
-        private set
-
-    private val indexState = mutableStateOf(index.value)
-    val observableIndex get() = indexState.value
-
-    private val scrollOffsetState = mutableStateOf(scrollOffset)
-    val observableScrollOffset get() = scrollOffsetState.value
-
-    var canScrollBackward: Boolean = false
-        private set
-    var canScrollForward: Boolean = false
-        private set
-
-    private var hadFirstNotEmptyLayout = false
-
-    fun update(measureResult: LazyListMeasureResult) {
-        // we ignore the index and offset from measureResult until we get at least one
-        // measurement with real items. otherwise the initial index and scroll passed to the
-        // state would be lost and overridden with zeros.
-        if (hadFirstNotEmptyLayout || measureResult.totalItemsCount > 0) {
-            hadFirstNotEmptyLayout = true
-            update(measureResult.firstVisibleItemIndex, measureResult.firstVisibleItemScrollOffset)
-        }
-        this.canScrollForward = measureResult.canScrollForward
-        this.canScrollBackward = measureResult.firstVisibleItemIndex.value != 0 ||
-            measureResult.firstVisibleItemScrollOffset != 0
-    }
-
-    fun update(index: DataIndex, scrollOffset: Int) {
-        require(index.value >= 0f) { "Index should be non-negative (${index.value})" }
-        require(scrollOffset >= 0f) { "scrollOffset should be non-negative ($scrollOffset)" }
-        if (index != this.index) {
-            this.index = index
-            indexState.value = index.value
-        }
-        if (scrollOffset != this.scrollOffset) {
-            this.scrollOffset = scrollOffset
-            scrollOffsetState.value = scrollOffset
-        }
     }
 }
 

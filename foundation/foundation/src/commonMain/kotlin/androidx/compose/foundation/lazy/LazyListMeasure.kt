@@ -50,7 +50,7 @@ internal fun measureLazyList(
             crossAxisSize = 0,
             items = emptyList(),
             itemsScrollOffset = 0,
-            firstVisibleItemIndex = DataIndex(0),
+            firstVisibleItem = null,
             firstVisibleItemScrollOffset = 0,
             canScrollForward = false,
             consumedScroll = 0f,
@@ -195,18 +195,17 @@ internal fun measureLazyList(
         }
 
         // the initial offset for items from visibleItems list
-        val firstItemOffset = -currentFirstItemScrollOffset
+        val visibleItemsScrollOffset = -currentFirstItemScrollOffset
+        var firstItem = visibleItems.firstOrNull()
 
         // even if we compose items to fill the start padding area we should ignore items fully
         // located there for the state's scroll position calculation (first item + first offset)
         if (startContentPadding > 0) {
-            var startPaddingItems = 0
-            while (startPaddingItems < visibleItems.lastIndex) {
-                val size = visibleItems[startPaddingItems].sizeWithSpacings
-                if (size <= currentFirstItemScrollOffset) {
-                    startPaddingItems++
+            for (i in visibleItems.indices) {
+                val size = visibleItems[i].sizeWithSpacings
+                if (size <= currentFirstItemScrollOffset && i != visibleItems.lastIndex) {
                     currentFirstItemScrollOffset -= size
-                    currentFirstItemIndex++
+                    firstItem = visibleItems[i + 1]
                 } else {
                     break
                 }
@@ -219,8 +218,8 @@ internal fun measureLazyList(
             mainAxisSize = mainAxisSize,
             crossAxisSize = maxCrossAxis,
             items = visibleItems,
-            itemsScrollOffset = firstItemOffset,
-            firstVisibleItemIndex = currentFirstItemIndex,
+            itemsScrollOffset = visibleItemsScrollOffset,
+            firstVisibleItem = firstItem,
             firstVisibleItemScrollOffset = currentFirstItemScrollOffset,
             canScrollForward = mainAxisUsed > maxOffset,
             consumedScroll = consumedScroll,
