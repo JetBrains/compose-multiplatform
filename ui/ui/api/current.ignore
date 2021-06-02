@@ -5,6 +5,22 @@ AddedAbstractMethod: androidx.compose.ui.hapticfeedback.HapticFeedback#performHa
 
 ChangedSuperclass: androidx.compose.ui.hapticfeedback.HapticFeedbackType:
     Class androidx.compose.ui.hapticfeedback.HapticFeedbackType superclass changed from java.lang.Enum to java.lang.Object
+ChangedSuperclass: androidx.compose.ui.semantics.LiveRegionMode:
+    Class androidx.compose.ui.semantics.LiveRegionMode superclass changed from java.lang.Enum to java.lang.Object
+ChangedSuperclass: androidx.compose.ui.semantics.Role:
+    Class androidx.compose.ui.semantics.Role superclass changed from java.lang.Enum to java.lang.Object
+
+
+ChangedType: androidx.compose.ui.semantics.SemanticsPropertiesKt#getLiveRegion(androidx.compose.ui.semantics.SemanticsPropertyReceiver):
+    Method androidx.compose.ui.semantics.SemanticsPropertiesKt.getLiveRegion has changed return type from androidx.compose.ui.semantics.LiveRegionMode to int
+ChangedType: androidx.compose.ui.semantics.SemanticsPropertiesKt#getRole(androidx.compose.ui.semantics.SemanticsPropertyReceiver):
+    Method androidx.compose.ui.semantics.SemanticsPropertiesKt.getRole has changed return type from androidx.compose.ui.semantics.Role to int
+
+
+InvalidNullConversion: androidx.compose.ui.semantics.SemanticsPropertiesKt#getLiveRegion(androidx.compose.ui.semantics.SemanticsPropertyReceiver):
+    Attempted to remove @NonNull annotation from method androidx.compose.ui.semantics.SemanticsPropertiesKt.getLiveRegion(androidx.compose.ui.semantics.SemanticsPropertyReceiver)
+InvalidNullConversion: androidx.compose.ui.semantics.SemanticsPropertiesKt#getRole(androidx.compose.ui.semantics.SemanticsPropertyReceiver):
+    Attempted to remove @NonNull annotation from method androidx.compose.ui.semantics.SemanticsPropertiesKt.getRole(androidx.compose.ui.semantics.SemanticsPropertyReceiver)
 
 
 ParameterNameChange: androidx.compose.ui.layout.Placeable#setMeasurementConstraints-BRTryo0(long) parameter #0:
@@ -19,6 +35,22 @@ RemovedField: androidx.compose.ui.hapticfeedback.HapticFeedbackType#LongPress:
     Removed enum constant androidx.compose.ui.hapticfeedback.HapticFeedbackType.LongPress
 RemovedField: androidx.compose.ui.hapticfeedback.HapticFeedbackType#TextHandleMove:
     Removed enum constant androidx.compose.ui.hapticfeedback.HapticFeedbackType.TextHandleMove
+RemovedField: androidx.compose.ui.semantics.LiveRegionMode#Assertive:
+    Removed enum constant androidx.compose.ui.semantics.LiveRegionMode.Assertive
+RemovedField: androidx.compose.ui.semantics.LiveRegionMode#Polite:
+    Removed enum constant androidx.compose.ui.semantics.LiveRegionMode.Polite
+RemovedField: androidx.compose.ui.semantics.Role#Button:
+    Removed enum constant androidx.compose.ui.semantics.Role.Button
+RemovedField: androidx.compose.ui.semantics.Role#Checkbox:
+    Removed enum constant androidx.compose.ui.semantics.Role.Checkbox
+RemovedField: androidx.compose.ui.semantics.Role#Image:
+    Removed enum constant androidx.compose.ui.semantics.Role.Image
+RemovedField: androidx.compose.ui.semantics.Role#RadioButton:
+    Removed enum constant androidx.compose.ui.semantics.Role.RadioButton
+RemovedField: androidx.compose.ui.semantics.Role#Switch:
+    Removed enum constant androidx.compose.ui.semantics.Role.Switch
+RemovedField: androidx.compose.ui.semantics.Role#Tab:
+    Removed enum constant androidx.compose.ui.semantics.Role.Tab
 
 
 RemovedMethod: androidx.compose.ui.focus.FocusDirection#constructor-impl(int):
@@ -35,3 +67,7 @@ RemovedMethod: androidx.compose.ui.input.pointer.PointerInteropFilter_androidKt#
     Removed method androidx.compose.ui.input.pointer.PointerInteropFilter_androidKt.pointerInteropFilter(androidx.compose.ui.Modifier,androidx.compose.ui.input.pointer.RequestDisallowInterceptTouchEvent,kotlin.jvm.functions.Function1<? super android.view.MotionEvent,java.lang.Boolean>)
 RemovedMethod: androidx.compose.ui.input.pointer.PointerType#getValue():
     Removed method androidx.compose.ui.input.pointer.PointerType.getValue()
+RemovedMethod: androidx.compose.ui.semantics.SemanticsPropertiesKt#setLiveRegion(androidx.compose.ui.semantics.SemanticsPropertyReceiver, androidx.compose.ui.semantics.LiveRegionMode):
+    Removed method androidx.compose.ui.semantics.SemanticsPropertiesKt.setLiveRegion(androidx.compose.ui.semantics.SemanticsPropertyReceiver,androidx.compose.ui.semantics.LiveRegionMode)
+RemovedMethod: androidx.compose.ui.semantics.SemanticsPropertiesKt#setRole(androidx.compose.ui.semantics.SemanticsPropertyReceiver, androidx.compose.ui.semantics.Role):
+    Removed method androidx.compose.ui.semantics.SemanticsPropertiesKt.setRole(androidx.compose.ui.semantics.SemanticsPropertyReceiver,androidx.compose.ui.semantics.Role)
