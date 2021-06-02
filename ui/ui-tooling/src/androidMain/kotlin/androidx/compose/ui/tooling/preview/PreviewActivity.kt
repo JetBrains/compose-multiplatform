@@ -19,17 +19,14 @@ package androidx.compose.ui.tooling.preview
 import android.content.pm.ApplicationInfo
 import android.os.Bundle
 import android.util.Log
-import android.view.ViewGroup
 import androidx.activity.ComponentActivity
+import androidx.activity.compose.setContent
 import androidx.compose.material.ExtendedFloatingActionButton
 import androidx.compose.material.Scaffold
 import androidx.compose.material.Text
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.CompositionContext
 import androidx.compose.runtime.currentComposer
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.tooling.preview.CommonPreviewUtils.invokeComposableViaReflection
 
 /**
@@ -133,29 +130,4 @@ class PreviewActivity : ComponentActivity() {
             }
         }
     }
-
-    private fun ComponentActivity.setContent(
-        parent: CompositionContext? = null,
-        content: @Composable () -> Unit
-    ) {
-        val existingComposeView = window.decorView
-            .findViewById<ViewGroup>(android.R.id.content)
-            .getChildAt(0) as? ComposeView
-
-        if (existingComposeView != null) with(existingComposeView) {
-            setParentCompositionContext(parent)
-            setContent(content)
-        } else ComposeView(this).apply {
-            // Set content and parent **before** setContentView
-            // to have ComposeView create the composition on attach
-            setParentCompositionContext(parent)
-            setContent(content)
-            setContentView(this, DefaultActivityContentLayoutParams)
-        }
-    }
-
-    private val DefaultActivityContentLayoutParams = ViewGroup.LayoutParams(
-        ViewGroup.LayoutParams.WRAP_CONTENT,
-        ViewGroup.LayoutParams.WRAP_CONTENT
-    )
 }

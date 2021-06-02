@@ -19,6 +19,7 @@ package androidx.compose.ui.test.junit4
 import android.content.Intent
 import android.os.Bundle
 import androidx.activity.ComponentActivity
+import androidx.activity.compose.setContent
 import androidx.compose.foundation.layout.Box
 import androidx.compose.ui.Modifier
 import androidx.test.espresso.Espresso
