@@ -20,6 +20,7 @@ import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
 import androidx.activity.ComponentActivity
+import androidx.activity.compose.setContent
 import androidx.compose.ui.test.junit4.util.BoundaryNode
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.test.filters.LargeTest

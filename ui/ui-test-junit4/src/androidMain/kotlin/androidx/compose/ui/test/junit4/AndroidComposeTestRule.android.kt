@@ -18,16 +18,14 @@ package androidx.compose.ui.test.junit4
 
 import android.annotation.SuppressLint
 import android.view.View
-import android.view.ViewGroup
 import androidx.activity.ComponentActivity
+import androidx.activity.compose.setContent
 import androidx.annotation.VisibleForTesting
 import androidx.compose.animation.core.InfiniteAnimationPolicy
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.CompositionContext
 import androidx.compose.runtime.Recomposer
 import androidx.compose.ui.InternalComposeUiApi
 import androidx.compose.ui.node.RootForTest
-import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.platform.ViewRootForTest
 import androidx.compose.ui.platform.WindowRecomposerPolicy
 import androidx.compose.ui.platform.textInputServiceFactory
@@ -466,28 +464,3 @@ private fun <A : ComponentActivity> ActivityScenarioRule<A>.getActivity(): A {
     }
     return activity!!
 }
-
-internal fun ComponentActivity.setContent(
-    parent: CompositionContext? = null,
-    content: @Composable () -> Unit
-) {
-    val existingComposeView = window.decorView
-        .findViewById<ViewGroup>(android.R.id.content)
-        .getChildAt(0) as? ComposeView
-
-    if (existingComposeView != null) with(existingComposeView) {
-        setParentCompositionContext(parent)
-        setContent(content)
-    } else ComposeView(this).apply {
-        // Set content and parent **before** setContentView
-        // to have ComposeView create the composition on attach
-        setParentCompositionContext(parent)
-        setContent(content)
-        setContentView(this, DefaultActivityContentLayoutParams)
-    }
-}
-
-private val DefaultActivityContentLayoutParams = ViewGroup.LayoutParams(
-    ViewGroup.LayoutParams.WRAP_CONTENT,
-    ViewGroup.LayoutParams.WRAP_CONTENT
-)

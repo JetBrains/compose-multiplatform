@@ -45,6 +45,7 @@ dependencies {
         implementation(projectOrArtifact(":compose:runtime:runtime"))
         implementation(projectOrArtifact(":compose:ui:ui-unit"))
         implementation(projectOrArtifact(":compose:ui:ui-graphics"))
+        implementation(projectOrArtifact(":activity:activity-compose"))
         implementation(ANDROIDX_TEST_RULES)
 
         // This has stub APIs for access to legacy Android APIs, so we don't want
@@ -76,6 +77,7 @@ if (AndroidXUiPlugin.isMultiplatformEnabled(project)) {
 
             androidMain.dependencies {
                 api("androidx.activity:activity:1.2.0")
+                implementation project(":activity:activity-compose")
                 api(projectOrArtifact(":compose:ui:ui-test-junit4"))
                 api(project(":test-screenshot"))
                 // This has stub APIs for access to legacy Android APIs, so we don't want
