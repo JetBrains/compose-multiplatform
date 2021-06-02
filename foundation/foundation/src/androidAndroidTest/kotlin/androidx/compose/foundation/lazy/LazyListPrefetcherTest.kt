@@ -16,12 +16,14 @@
 
 package androidx.compose.foundation.lazy
 
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.gestures.scrollBy
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.height
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.layout.layout
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.junit4.createComposeRule
@@ -41,7 +43,7 @@ class LazyListPrefetcherTest {
     @get:Rule
     val rule = createComposeRule()
 
-    val itemsSizePx = 30f
+    val itemsSizePx = 30
     val itemsSizeDp = with(rule.density) { itemsSizePx.toDp() }
 
     lateinit var state: LazyListState
@@ -118,6 +120,7 @@ class LazyListPrefetcherTest {
         rule.runOnIdle {
             runBlocking {
                 state.scrollBy(-2f)
+                state.scrollBy(-1f)
             }
         }
 
@@ -207,6 +210,7 @@ class LazyListPrefetcherTest {
         rule.runOnIdle {
             runBlocking {
                 state.scrollBy(-2f)
+                state.scrollBy(-1f)
             }
         }
 
@@ -263,13 +267,59 @@ class LazyListPrefetcherTest {
             .assertExists()
     }
 
+    @OptIn(ExperimentalFoundationApi::class)
+    @Test
+    fun prefetchingStickyHeaderItem() {
+        rule.setContent {
+            state = rememberLazyListState(
+                initialFirstVisibleItemIndex = 1,
+                initialFirstVisibleItemScrollOffset = itemsSizePx / 2
+            )
+            LazyColumn(
+                Modifier.height(itemsSizeDp * 1.5f),
+                state,
+            ) {
+                stickyHeader {
+                    Spacer(
+                        Modifier
+                            .height(itemsSizeDp)
+                            .fillParentMaxWidth()
+                            .testTag("header")
+                    )
+                }
+                items(100) {
+                    Spacer(
+                        Modifier
+                            .height(itemsSizeDp)
+                            .fillParentMaxWidth()
+                            .testTag("$it")
+                    )
+                }
+            }
+        }
+
+        rule.runOnIdle {
+            runBlocking {
+                state.scrollBy(-5f)
+            }
+        }
+
+        rule.onNodeWithTag("header")
+            .assertIsDisplayed()
+        rule.onNodeWithTag("0")
+            .assertIsDisplayed()
+        rule.onNodeWithTag("1")
+            .assertIsDisplayed()
+    }
+
     private fun waitForPrefetch(index: Int) {
         rule.waitUntil {
-            activeNodes.contains(index)
+            activeNodes.contains(index) && activeMeasuredNodes.contains(index)
         }
     }
 
     private val activeNodes = mutableSetOf<Int>()
+    private val activeMeasuredNodes = mutableSetOf<Int>()
 
     private fun composeList(
         firstItem: Int = 0,
@@ -293,9 +343,22 @@ class LazyListPrefetcherTest {
                         activeNodes.add(it)
                         onDispose {
                             activeNodes.remove(it)
+                            activeMeasuredNodes.remove(it)
                         }
                     }
-                    Spacer(Modifier.height(itemsSizeDp).fillParentMaxWidth().testTag("$it"))
+                    Spacer(
+                        Modifier
+                            .height(itemsSizeDp)
+                            .fillParentMaxWidth()
+                            .testTag("$it")
+                            .layout { measurable, constraints ->
+                                val placeable = measurable.measure(constraints)
+                                activeMeasuredNodes.add(it)
+                                layout(placeable.width, placeable.height) {
+                                    placeable.place(0, 0)
+                                }
+                            }
+                    )
                 }
             }
         }

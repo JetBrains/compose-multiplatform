@@ -26,7 +26,11 @@ import androidx.compose.runtime.State
 import androidx.compose.runtime.remember
 import androidx.compose.ui.layout.SubcomposeLayoutState
 import androidx.compose.ui.layout.SubcomposeLayoutState.PrecomposedSlotHandle
+import androidx.compose.ui.layout.SubcomposeMeasureScope
 import androidx.compose.ui.platform.LocalView
+import androidx.compose.ui.unit.Constraints
+import androidx.compose.ui.util.fastAny
+import androidx.compose.ui.util.fastForEach
 import androidx.compose.ui.util.trace
 import java.util.concurrent.TimeUnit
 
@@ -70,10 +74,7 @@ internal actual fun LazyListPrefetcher(
  *    Frame 2 - prefetch [b], [c]
  *    Frame 3 - prefetch [d]
  *    Frame 4 - prefetch [e], [f]
- *    Something similar is not possible with LazyColumn yet. Also, if we nest LazyRow inside
- *    LazyColumn the content of LazyRow will not be composed at all during the prefetch stage as
- *    we only compose during the measuring and the pre-measuring is not yet possible with this
- *    prefetch implementation. Tracking bug: b/187392865.
+ *    Something similar is not possible with LazyColumn yet.
  *
  * 2) Prefetching time estimation only captured during the prefetch.
  *    We currently don't track the time of the regular subcompose call happened during the regular
@@ -114,7 +115,11 @@ private class LazyListPrefetcher(
     private val stateOfItemsProvider: State<LazyListItemsProvider>,
     private val itemContentFactory: LazyListItemContentFactory,
     private val view: View
-) : RememberObserver, LazyListOnScrolledListener, Runnable, Choreographer.FrameCallback {
+) : RememberObserver,
+    LazyListOnScrolledListener,
+    LazyListOnPostMeasureListener,
+    Runnable,
+    Choreographer.FrameCallback {
 
     /**
      * Keeps the scrolling direction during the previous calculation in order to be able to
@@ -134,11 +139,14 @@ private class LazyListPrefetcher(
     private var precomposedSlotHandle: PrecomposedSlotHandle? = null
 
     /**
-     * Average time the prefetching operation takes. Keeping it allows us to not start the work
+     * Average time the prefetching operations takes. Keeping it allows us to not start the work
      * if in this frame we are most likely not going to finish the work in time to not delay the
      * next frame.
      */
-    private var averagePrefetchTimeNs: Long = 0
+    private var averagePrecomposeTimeNs: Long = 0
+    private var averagePremeasureTimeNs: Long = 0
+
+    private var premeasuringIsNeeded = false
 
     private var prefetchScheduled = false
 
@@ -153,29 +161,58 @@ private class LazyListPrefetcher(
      * [indexToPrefetch] will be used as an input.
      */
     override fun run() {
-        if (precomposedSlotHandle != null) {
-            // the precomposition happened already.
+        if (indexToPrefetch == -1 || !prefetchScheduled) {
+            // incorrect input. ignore
             return
         }
-        trace("compose:lazylist:prefetch") {
-            val latestFrameVsyncNs = TimeUnit.MILLISECONDS.toNanos(view.drawingTime)
-            val nextFrameNs = latestFrameVsyncNs + frameIntervalNs
-            val beforeNs = System.nanoTime()
-            if (beforeNs > nextFrameNs || beforeNs + averagePrefetchTimeNs < nextFrameNs) {
-                val index = indexToPrefetch
-                val itemProvider = stateOfItemsProvider.value
-                if (view.windowVisibility == View.VISIBLE &&
-                    index in 0 until itemProvider.itemsCount
-                ) {
-                    precomposedSlotHandle = subcompose(itemProvider, index)
-                    val prefetchTime = System.nanoTime() - beforeNs
-                    updateAveragePrefetchTime(prefetchTime)
+        if (precomposedSlotHandle == null) {
+            trace("compose:lazylist:prefetch:compose") {
+                val latestFrameVsyncNs = TimeUnit.MILLISECONDS.toNanos(view.drawingTime)
+                val nextFrameNs = latestFrameVsyncNs + frameIntervalNs
+                val beforeNs = System.nanoTime()
+                if (beforeNs > nextFrameNs || beforeNs + averagePrecomposeTimeNs < nextFrameNs) {
+                    val index = indexToPrefetch
+                    val itemProvider = stateOfItemsProvider.value
+                    if (view.windowVisibility == View.VISIBLE &&
+                        index in 0 until itemProvider.itemsCount
+                    ) {
+                        precomposedSlotHandle = precompose(itemProvider, index)
+                        averagePrecomposeTimeNs = calculateAverageTime(
+                            System.nanoTime() - beforeNs,
+                            averagePrecomposeTimeNs
+                        )
+                        // now schedule premeasure on the next frame
+                        choreographer.postFrameCallback(this)
+                    } else {
+                        prefetchScheduled = false
+                    }
+                } else {
+                    // there is not enough time left in this frame. we schedule a next frame callback
+                    // in which we are going to post the message in the handler again.
+                    choreographer.postFrameCallback(this)
                 }
-                prefetchScheduled = false
-            } else {
-                // there is not enough time left in this frame. we schedule a next frame callback
-                // in which we are going to post the message in the handler again.
-                choreographer.postFrameCallback(this)
+            }
+        } else {
+            trace("compose:lazylist:prefetch:measure") {
+                // the precomposition happened already. premeasure now
+                val latestFrameVsyncNs = TimeUnit.MILLISECONDS.toNanos(view.drawingTime)
+                val nextFrameNs = latestFrameVsyncNs + frameIntervalNs
+                val beforeNs = System.nanoTime()
+                if (beforeNs > nextFrameNs || beforeNs + averagePremeasureTimeNs < nextFrameNs) {
+                    if (view.windowVisibility == View.VISIBLE) {
+                        premeasuringIsNeeded = true
+                        lazyListState.remeasurement.forceRemeasure()
+                        averagePremeasureTimeNs = calculateAverageTime(
+                            System.nanoTime() - beforeNs,
+                            averagePremeasureTimeNs
+                        )
+                    }
+                    prefetchScheduled = false
+                } else {
+                    // there is not enough time left in this frame. we schedule a next frame callback
+                    // in which we are going to post the message in the handler again.
+                    choreographer.postFrameCallback(this)
+                }
             }
         }
     }
@@ -189,7 +226,7 @@ private class LazyListPrefetcher(
         view.post(this)
     }
 
-    private fun subcompose(
+    private fun precompose(
         itemProvider: LazyListItemsProvider,
         index: Int
     ): PrecomposedSlotHandle {
@@ -198,14 +235,14 @@ private class LazyListPrefetcher(
         return subcomposeLayoutState.precompose(key, content)
     }
 
-    private fun updateAveragePrefetchTime(prefetchTime: Long) {
+    private fun calculateAverageTime(new: Long, current: Long): Long {
         // Calculate a weighted moving average of time taken to compose an item. We use weighted
         // moving average to bias toward more recent measurements, and to minimize storage /
         // computation cost. (the idea is taken from RecycledViewPool)
-        averagePrefetchTimeNs = if (averagePrefetchTimeNs == 0L) {
-            prefetchTime
+        return if (current == 0L) {
+            new
         } else {
-            averagePrefetchTimeNs / 4 * 3 + prefetchTime / 4
+            current / 4 * 3 + new / 4
         }
     }
 
@@ -213,6 +250,9 @@ private class LazyListPrefetcher(
      * The callback to be executed on every scroll.
      */
     override fun onScrolled(delta: Float) {
+        if (!lazyListState.prefetchingEnabled) {
+            return
+        }
         val info = lazyListState.layoutInfo
         if (info.visibleItemsInfo.isNotEmpty()) {
             val scrollingForward = delta < 0
@@ -237,6 +277,7 @@ private class LazyListPrefetcher(
                 this.wasScrollingForward = scrollingForward
                 this.indexToPrefetch = indexToPrefetch
                 this.precomposedSlotHandle = null
+                premeasuringIsNeeded = false
                 if (!prefetchScheduled) {
                     prefetchScheduled = true
                     // schedule the prefetching
@@ -246,12 +287,38 @@ private class LazyListPrefetcher(
         }
     }
 
+    override fun SubcomposeMeasureScope.onPostMeasure(
+        childConstraints: Constraints,
+        result: LazyListMeasureResult
+    ) {
+        val index = indexToPrefetch
+        if (premeasuringIsNeeded && index != -1) {
+            val itemProvider = stateOfItemsProvider.value
+            if (index < itemProvider.itemsCount) {
+                val composedViaRegularFlow = result.visibleItemsInfo.fastAny {
+                    it.index == index
+                }
+                if (composedViaRegularFlow) {
+                    premeasuringIsNeeded = false
+                } else {
+                    val key = itemProvider.getKey(index)
+                    val content = itemContentFactory.getContent(index, key)
+                    subcompose(key, content).fastForEach {
+                        it.measure(childConstraints)
+                    }
+                }
+            }
+        }
+    }
+
     override fun onRemembered() {
         lazyListState.onScrolledListener = this
+        lazyListState.onPostMeasureListener = this
     }
 
     override fun onForgotten() {
         lazyListState.onScrolledListener = null
+        lazyListState.onPostMeasureListener = null
         view.removeCallbacks(this)
     }
 
