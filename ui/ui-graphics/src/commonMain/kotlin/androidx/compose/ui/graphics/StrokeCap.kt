@@ -24,7 +24,7 @@ import androidx.compose.runtime.Immutable
  */
 @Suppress("INLINE_CLASS_DEPRECATED", "EXPERIMENTAL_FEATURE_WARNING")
 @Immutable
-inline class StrokeCap internal constructor(val value: Int) {
+inline class StrokeCap internal constructor(@Suppress("unused") private val value: Int) {
     companion object {
         /**
          * Begin and end contours with a flat edge and no extension.

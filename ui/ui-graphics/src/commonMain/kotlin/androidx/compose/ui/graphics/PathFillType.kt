@@ -26,7 +26,7 @@ import androidx.compose.runtime.Immutable
  */
 @Suppress("INLINE_CLASS_DEPRECATED", "EXPERIMENTAL_FEATURE_WARNING")
 @Immutable
-inline class PathFillType internal constructor(val value: Int) {
+inline class PathFillType internal constructor(@Suppress("unused") private val value: Int) {
     companion object {
         /**
          * The interior is defined by a non-zero sum of signed edge crossings.

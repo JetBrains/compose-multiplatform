@@ -28,7 +28,7 @@ import androidx.compose.runtime.Immutable
 // Must be kept in sync with SkPathOp
 @Suppress("INLINE_CLASS_DEPRECATED", "EXPERIMENTAL_FEATURE_WARNING")
 @Immutable
-inline class PathOperation internal constructor(val value: Int) {
+inline class PathOperation internal constructor(@Suppress("unused") private val value: Int) {
     companion object {
         /**
          * Subtract the second path from the first path.

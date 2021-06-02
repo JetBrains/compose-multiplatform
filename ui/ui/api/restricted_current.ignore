@@ -7,5 +7,15 @@ RemovedClass: androidx.compose.ui.input.pointer.RequestDisallowInterceptTouchEve
     Removed class androidx.compose.ui.input.pointer.RequestDisallowInterceptTouchEvent
 
 
+RemovedMethod: androidx.compose.ui.focus.FocusDirection#constructor-impl(int):
+    Removed method androidx.compose.ui.focus.FocusDirection.constructor-impl(int)
+RemovedMethod: androidx.compose.ui.focus.FocusDirection#getValue():
+    Removed method androidx.compose.ui.focus.FocusDirection.getValue()
+RemovedMethod: androidx.compose.ui.input.key.KeyEventType#constructor-impl(int):
+    Removed method androidx.compose.ui.input.key.KeyEventType.constructor-impl(int)
+RemovedMethod: androidx.compose.ui.input.key.KeyEventType#getValue():
+    Removed method androidx.compose.ui.input.key.KeyEventType.getValue()
 RemovedMethod: androidx.compose.ui.input.pointer.PointerInteropFilter_androidKt#pointerInteropFilter(androidx.compose.ui.Modifier, androidx.compose.ui.input.pointer.RequestDisallowInterceptTouchEvent, kotlin.jvm.functions.Function1<? super android.view.MotionEvent,java.lang.Boolean>):
     Removed method androidx.compose.ui.input.pointer.PointerInteropFilter_androidKt.pointerInteropFilter(androidx.compose.ui.Modifier,androidx.compose.ui.input.pointer.RequestDisallowInterceptTouchEvent,kotlin.jvm.functions.Function1<? super android.view.MotionEvent,java.lang.Boolean>)
+RemovedMethod: androidx.compose.ui.input.pointer.PointerType#getValue():
+    Removed method androidx.compose.ui.input.pointer.PointerType.getValue()

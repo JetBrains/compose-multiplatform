@@ -80,7 +80,7 @@ expect val KeyEvent.isShiftPressed: Boolean
  * The type of Key Event.
  */
 @Suppress("INLINE_CLASS_DEPRECATED", "EXPERIMENTAL_FEATURE_WARNING")
-inline class KeyEventType(val value: Int) {
+inline class KeyEventType internal constructor(@Suppress("unused") private val value: Int) {
 
     override fun toString(): String {
         return when (this) {

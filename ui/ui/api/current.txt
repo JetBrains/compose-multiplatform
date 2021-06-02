@@ -238,13 +238,10 @@ package androidx.compose.ui.focus {
 
   public final inline class FocusDirection {
     ctor public FocusDirection();
-    method public static int constructor-impl(int value);
     method public static inline boolean equals-impl(int p, Object? p1);
     method public static boolean equals-impl0(int p1, int p2);
-    method public int getValue();
     method public static inline int hashCode-impl(int p);
     method public static String toString-impl(int $this);
-    property public final int value;
     field public static final androidx.compose.ui.focus.FocusDirection.Companion Companion;
   }
 
@@ -1241,13 +1238,10 @@ package androidx.compose.ui.input.key {
 
   public final inline class KeyEventType {
     ctor public KeyEventType();
-    method public static int constructor-impl(int value);
     method public static inline boolean equals-impl(int p, Object? p1);
     method public static boolean equals-impl0(int p1, int p2);
-    method public int getValue();
     method public static inline int hashCode-impl(int p);
     method public static String toString-impl(int $this);
-    property public final int value;
     field public static final androidx.compose.ui.input.key.KeyEventType.Companion Companion;
   }
 
@@ -1454,10 +1448,8 @@ package androidx.compose.ui.input.pointer {
     ctor public PointerType();
     method public static inline boolean equals-impl(int p, Object? p1);
     method public static boolean equals-impl0(int p1, int p2);
-    method public int getValue();
     method public static inline int hashCode-impl(int p);
     method public static String toString-impl(int $this);
-    property public final int value;
     field public static final androidx.compose.ui.input.pointer.PointerType.Companion Companion;
   }
 

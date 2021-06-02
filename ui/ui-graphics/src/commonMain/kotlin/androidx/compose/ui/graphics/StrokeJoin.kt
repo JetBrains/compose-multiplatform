@@ -27,7 +27,7 @@ import androidx.compose.runtime.Immutable
  */
 @Suppress("INLINE_CLASS_DEPRECATED", "EXPERIMENTAL_FEATURE_WARNING")
 @Immutable
-inline class StrokeJoin internal constructor(val value: Int) {
+inline class StrokeJoin internal constructor(@Suppress("unused") private val value: Int) {
     companion object {
         /**
          * Joins between line segments form sharp corners.
