@@ -1541,6 +1541,45 @@ class SwipeableTest {
         }
     }
 
+    /**
+     * Tests that the [SwipeableState] is updated if the anchors change.
+     */
+    @Test
+    fun swipeable_anchorsUpdated_whenAnimationInProgress() = runBlocking(AutoTestFrameClock()) {
+        rule.mainClock.autoAdvance = false
+        lateinit var swipeableState: SwipeableState<String>
+        lateinit var anchors: MutableState<Map<Float, String>>
+        setSwipeableContent {
+            swipeableState = rememberSwipeableState("A")
+            anchors = remember { mutableStateOf(mapOf(10f to "A", 50f to "B", 100f to "C")) }
+            Modifier.swipeable(
+                state = swipeableState,
+                anchors = anchors.value,
+                thresholds = { _, _ -> FractionalThreshold(0.5f) },
+                orientation = Orientation.Horizontal
+            )
+        }
+
+        rule.runOnIdle {
+            assertThat(swipeableState.currentValue).isEqualTo("A")
+            assertThat(swipeableState.offset.value).isEqualTo(10f)
+        }
+
+        swipeableState.animateTo("B")
+
+        rule.mainClock.advanceTimeByFrame()
+
+        anchors.value = mapOf(10f to "A", 100f to "C")
+
+        advanceClock()
+
+        rule.runOnIdle {
+            // closes wins
+            assertThat(swipeableState.currentValue).isEqualTo("A")
+            assertThat(swipeableState.offset.value).isEqualTo(10f)
+        }
+    }
+
     @Test
     fun testInspectorValue() {
         val anchors = mapOf(0f to "A", 100f to "B")

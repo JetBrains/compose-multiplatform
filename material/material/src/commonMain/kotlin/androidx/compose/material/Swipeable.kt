@@ -164,17 +164,31 @@ open class SwipeableState<T>(
             // instead. Note that this stops any ongoing animation.
             minBound = Float.NEGATIVE_INFINITY
             maxBound = Float.POSITIVE_INFINITY
-            val targetOffset = newAnchors.getOffset(currentValue)
-                ?: newAnchors.keys.minByOrNull { abs(it - offset.value) }!!
+            val animationTargetValue = animationTarget.value
+            // if we're in the animation already, let's find it a new home
+            val targetOffset = if (animationTargetValue != null) {
+                // first, try to map old state to the new state
+                val oldState = oldAnchors[animationTargetValue]
+                val newState = newAnchors.getOffset(oldState)
+                // return new state if exists, or find the closes one among new anchors
+                newState ?: newAnchors.keys.minByOrNull { abs(it - animationTargetValue) }!!
+            } else {
+                // we're not animating, proceed by finding the new anchors for an old value
+                val actualOldValue = oldAnchors[offset.value]
+                val value = if (actualOldValue == currentValue) currentValue else actualOldValue
+                newAnchors.getOffset(value) ?: newAnchors
+                    .keys.minByOrNull { abs(it - offset.value) }!!
+            }
             try {
                 animateInternalToOffset(targetOffset, animationSpec)
             } catch (c: CancellationException) {
                 // If the animation was interrupted for any reason, snap as a last resort.
                 snapInternalToOffset(targetOffset)
+            } finally {
+                currentValue = newAnchors.getValue(targetOffset)
+                minBound = newAnchors.keys.minOrNull()!!
+                maxBound = newAnchors.keys.maxOrNull()!!
             }
-            currentValue = newAnchors.getValue(targetOffset)
-            minBound = newAnchors.keys.minOrNull()!!
-            maxBound = newAnchors.keys.maxOrNull()!!
         }
     }
 
