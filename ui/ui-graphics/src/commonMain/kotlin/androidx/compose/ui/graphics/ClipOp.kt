@@ -26,7 +26,7 @@ import androidx.compose.runtime.Immutable
  */
 @Suppress("INLINE_CLASS_DEPRECATED", "EXPERIMENTAL_FEATURE_WARNING")
 @Immutable
-inline class ClipOp internal constructor(val value: Int) {
+inline class ClipOp internal constructor(@Suppress("unused") private val value: Int) {
     companion object {
         /** Subtract the new region from the existing region. */
         val Difference = ClipOp(0)

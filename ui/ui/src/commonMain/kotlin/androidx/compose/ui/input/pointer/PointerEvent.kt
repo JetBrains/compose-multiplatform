@@ -101,7 +101,7 @@ expect class PointerEvent @OptIn(InternalCoreApi::class) internal constructor(
 /**
  * The device type that produces a [PointerInputChange], such as a mouse or stylus.
  */
-inline class PointerType internal constructor(val value: Int) {
+inline class PointerType internal constructor(private val value: Int) {
 
     override fun toString(): String = when (value) {
         1 -> "Touch"

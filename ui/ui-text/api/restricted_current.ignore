@@ -19,6 +19,10 @@ RemovedField: androidx.compose.ui.text.font.FontStyle#Normal:
     Removed enum constant androidx.compose.ui.text.font.FontStyle.Normal
 
 
+RemovedMethod: androidx.compose.ui.text.PlaceholderVerticalAlign#constructor-impl(int):
+    Removed method androidx.compose.ui.text.PlaceholderVerticalAlign.constructor-impl(int)
+RemovedMethod: androidx.compose.ui.text.PlaceholderVerticalAlign#getValue():
+    Removed method androidx.compose.ui.text.PlaceholderVerticalAlign.getValue()
 RemovedMethod: androidx.compose.ui.text.SpanStyle#getFontStyle():
     Removed method androidx.compose.ui.text.SpanStyle.getFontStyle()
 RemovedMethod: androidx.compose.ui.text.TextStyle#getFontStyle():
@@ -31,3 +35,9 @@ RemovedMethod: androidx.compose.ui.text.font.ResourceFont#copy(int, androidx.com
     Removed method androidx.compose.ui.text.font.ResourceFont.copy(int,androidx.compose.ui.text.font.FontWeight,androidx.compose.ui.text.font.FontStyle)
 RemovedMethod: androidx.compose.ui.text.font.ResourceFont#getStyle():
     Removed method androidx.compose.ui.text.font.ResourceFont.getStyle()
+RemovedMethod: androidx.compose.ui.text.input.ImeAction#constructor-impl(int):
+    Removed method androidx.compose.ui.text.input.ImeAction.constructor-impl(int)
+RemovedMethod: androidx.compose.ui.text.input.ImeAction#getValue():
+    Removed method androidx.compose.ui.text.input.ImeAction.getValue()
+RemovedMethod: androidx.compose.ui.text.input.KeyboardType#constructor-impl(int):
+    Removed method androidx.compose.ui.text.input.KeyboardType.constructor-impl(int)

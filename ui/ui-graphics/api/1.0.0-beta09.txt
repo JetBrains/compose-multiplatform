@@ -143,10 +143,8 @@ package androidx.compose.ui.graphics {
     ctor public BlendMode();
     method @androidx.compose.runtime.Immutable public static inline boolean equals-impl(int p, Object? p1);
     method public static boolean equals-impl0(int p1, int p2);
-    method public int getValue();
     method @androidx.compose.runtime.Immutable public static inline int hashCode-impl(int p);
     method public static String toString-impl(int $this);
-    property public final int value;
     field public static final androidx.compose.ui.graphics.BlendMode.Companion Companion;
   }
 
@@ -284,10 +282,8 @@ package androidx.compose.ui.graphics {
     ctor public ClipOp();
     method @androidx.compose.runtime.Immutable public static inline boolean equals-impl(int p, Object? p1);
     method public static boolean equals-impl0(int p1, int p2);
-    method public int getValue();
     method @androidx.compose.runtime.Immutable public static inline int hashCode-impl(int p);
     method public static String toString-impl(int $this);
-    property public final int value;
     field public static final androidx.compose.ui.graphics.ClipOp.Companion Companion;
   }
 
@@ -609,10 +605,8 @@ package androidx.compose.ui.graphics {
     ctor public PaintingStyle();
     method @androidx.compose.runtime.Immutable public static inline boolean equals-impl(int p, Object? p1);
     method public static boolean equals-impl0(int p1, int p2);
-    method public int getValue();
     method @androidx.compose.runtime.Immutable public static inline int hashCode-impl(int p);
     method public static String toString-impl(int $this);
-    property public final int value;
     field public static final androidx.compose.ui.graphics.PaintingStyle.Companion Companion;
   }
 
@@ -674,10 +668,8 @@ package androidx.compose.ui.graphics {
     ctor public PathFillType();
     method @androidx.compose.runtime.Immutable public static inline boolean equals-impl(int p, Object? p1);
     method public static boolean equals-impl0(int p1, int p2);
-    method public int getValue();
     method @androidx.compose.runtime.Immutable public static inline int hashCode-impl(int p);
     method public static String toString-impl(int $this);
-    property public final int value;
     field public static final androidx.compose.ui.graphics.PathFillType.Companion Companion;
   }
 
@@ -699,10 +691,8 @@ package androidx.compose.ui.graphics {
     ctor public PathOperation();
     method @androidx.compose.runtime.Immutable public static inline boolean equals-impl(int p, Object? p1);
     method public static boolean equals-impl0(int p1, int p2);
-    method public int getValue();
     method @androidx.compose.runtime.Immutable public static inline int hashCode-impl(int p);
     method public static String toString-impl(int $this);
-    property public final int value;
     field public static final androidx.compose.ui.graphics.PathOperation.Companion Companion;
   }
 
@@ -746,10 +736,8 @@ package androidx.compose.ui.graphics {
     ctor public PointMode();
     method @androidx.compose.runtime.Immutable public static inline boolean equals-impl(int p, Object? p1);
     method public static boolean equals-impl0(int p1, int p2);
-    method public int getValue();
     method @androidx.compose.runtime.Immutable public static inline int hashCode-impl(int p);
     method public static String toString-impl(int $this);
-    property public final int value;
     field public static final androidx.compose.ui.graphics.PointMode.Companion Companion;
   }
 
@@ -823,10 +811,8 @@ package androidx.compose.ui.graphics {
     ctor public StampedPathEffectStyle();
     method @androidx.compose.runtime.Immutable public static inline boolean equals-impl(int p, Object? p1);
     method public static boolean equals-impl0(int p1, int p2);
-    method public int getValue();
     method @androidx.compose.runtime.Immutable public static inline int hashCode-impl(int p);
     method public static String toString-impl(int $this);
-    property public final int value;
     field public static final androidx.compose.ui.graphics.StampedPathEffectStyle.Companion Companion;
   }
 
@@ -843,10 +829,8 @@ package androidx.compose.ui.graphics {
     ctor public StrokeCap();
     method @androidx.compose.runtime.Immutable public static inline boolean equals-impl(int p, Object? p1);
     method public static boolean equals-impl0(int p1, int p2);
-    method public int getValue();
     method @androidx.compose.runtime.Immutable public static inline int hashCode-impl(int p);
     method public static String toString-impl(int $this);
-    property public final int value;
     field public static final androidx.compose.ui.graphics.StrokeCap.Companion Companion;
   }
 
@@ -863,10 +847,8 @@ package androidx.compose.ui.graphics {
     ctor public StrokeJoin();
     method @androidx.compose.runtime.Immutable public static inline boolean equals-impl(int p, Object? p1);
     method public static boolean equals-impl0(int p1, int p2);
-    method public int getValue();
     method @androidx.compose.runtime.Immutable public static inline int hashCode-impl(int p);
     method public static String toString-impl(int $this);
-    property public final int value;
     field public static final androidx.compose.ui.graphics.StrokeJoin.Companion Companion;
   }
 
@@ -887,10 +869,8 @@ package androidx.compose.ui.graphics {
     ctor public TileMode();
     method @androidx.compose.runtime.Immutable public static inline boolean equals-impl(int p, Object? p1);
     method public static boolean equals-impl0(int p1, int p2);
-    method public int getValue();
     method @androidx.compose.runtime.Immutable public static inline int hashCode-impl(int p);
     method public static String toString-impl(int $this);
-    property public final int value;
     field public static final androidx.compose.ui.graphics.TileMode.Companion Companion;
   }
 
@@ -907,10 +887,8 @@ package androidx.compose.ui.graphics {
     ctor public VertexMode();
     method @androidx.compose.runtime.Immutable public static inline boolean equals-impl(int p, Object? p1);
     method public static boolean equals-impl0(int p1, int p2);
-    method public int getValue();
     method @androidx.compose.runtime.Immutable public static inline int hashCode-impl(int p);
     method public static String toString-impl(int $this);
-    property public final int value;
     field public static final androidx.compose.ui.graphics.VertexMode.Companion Companion;
   }
 
@@ -1073,10 +1051,8 @@ package androidx.compose.ui.graphics.colorspace {
     ctor public RenderIntent();
     method @androidx.compose.runtime.Immutable public static inline boolean equals-impl(int p, Object? p1);
     method public static boolean equals-impl0(int p1, int p2);
-    method public int getValue();
     method @androidx.compose.runtime.Immutable public static inline int hashCode-impl(int p);
     method public static String toString-impl(int $this);
-    property public final int value;
     field public static final androidx.compose.ui.graphics.colorspace.RenderIntent.Companion Companion;
   }
 

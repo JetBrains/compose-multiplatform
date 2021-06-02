@@ -59,7 +59,7 @@ import androidx.compose.runtime.Immutable
  */
 @Suppress("INLINE_CLASS_DEPRECATED", "EXPERIMENTAL_FEATURE_WARNING")
 @Immutable
-inline class BlendMode internal constructor(val value: Int) {
+inline class BlendMode internal constructor(@Suppress("unused") private val value: Int) {
 
     companion object {
 

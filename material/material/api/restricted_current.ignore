@@ -1,13 +1,3 @@
 // Baseline format: 1.0
-ChangedSuperclass: androidx.compose.material.FabPosition:
-    Class androidx.compose.material.FabPosition superclass changed from java.lang.Enum to java.lang.Object
-
-
-RemovedField: androidx.compose.material.FabPosition#Center:
-    Removed enum constant androidx.compose.material.FabPosition.Center
-RemovedField: androidx.compose.material.FabPosition#End:
-    Removed enum constant androidx.compose.material.FabPosition.End
-
-
-RemovedMethod: androidx.compose.material.ScaffoldKt#Scaffold-axyFlp8(androidx.compose.ui.Modifier, androidx.compose.material.ScaffoldState, kotlin.jvm.functions.Function0<kotlin.Unit>, kotlin.jvm.functions.Function0<kotlin.Unit>, kotlin.jvm.functions.Function1<? super androidx.compose.material.SnackbarHostState,kotlin.Unit>, kotlin.jvm.functions.Function0<kotlin.Unit>, androidx.compose.material.FabPosition, boolean, kotlin.jvm.functions.Function1<? super androidx.compose.foundation.layout.ColumnScope,kotlin.Unit>, boolean, androidx.compose.ui.graphics.Shape, float, long, long, long, long, long, kotlin.jvm.functions.Function1<? super androidx.compose.foundation.layout.PaddingValues,kotlin.Unit>):
-    Removed method androidx.compose.material.ScaffoldKt.Scaffold-axyFlp8(androidx.compose.ui.Modifier,androidx.compose.material.ScaffoldState,kotlin.jvm.functions.Function0<kotlin.Unit>,kotlin.jvm.functions.Function0<kotlin.Unit>,kotlin.jvm.functions.Function1<? super androidx.compose.material.SnackbarHostState,kotlin.Unit>,kotlin.jvm.functions.Function0<kotlin.Unit>,androidx.compose.material.FabPosition,boolean,kotlin.jvm.functions.Function1<? super androidx.compose.foundation.layout.ColumnScope,kotlin.Unit>,boolean,androidx.compose.ui.graphics.Shape,float,long,long,long,long,long,kotlin.jvm.functions.Function1<? super androidx.compose.foundation.layout.PaddingValues,kotlin.Unit>)
+RemovedMethod: androidx.compose.material.FabPosition#getValue():
+    Removed method androidx.compose.material.FabPosition.getValue()

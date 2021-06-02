@@ -243,13 +243,10 @@ package androidx.compose.ui.text {
 
   public final inline class PlaceholderVerticalAlign {
     ctor public PlaceholderVerticalAlign();
-    method public static int constructor-impl(int value);
     method public static inline boolean equals-impl(int p, Object? p1);
     method public static boolean equals-impl0(int p1, int p2);
-    method public int getValue();
     method public static inline int hashCode-impl(int p);
     method public static String toString-impl(int $this);
-    property public final int value;
     field public static final androidx.compose.ui.text.PlaceholderVerticalAlign.Companion Companion;
   }
 
@@ -791,13 +788,10 @@ package androidx.compose.ui.text.input {
 
   public final inline class ImeAction {
     ctor public ImeAction();
-    method public static int constructor-impl(int value);
     method public static inline boolean equals-impl(int p, Object? p1);
     method public static boolean equals-impl0(int p1, int p2);
-    method public int getValue();
     method public static inline int hashCode-impl(int p);
     method public static String toString-impl(int $this);
-    property public final int value;
     field public static final androidx.compose.ui.text.input.ImeAction.Companion Companion;
   }
 
@@ -854,7 +848,6 @@ package androidx.compose.ui.text.input {
 
   public final inline class KeyboardType {
     ctor public KeyboardType();
-    method public static int constructor-impl(int value);
     method public static inline boolean equals-impl(int p, Object? p1);
     method public static boolean equals-impl0(int p1, int p2);
     method public static inline int hashCode-impl(int p);

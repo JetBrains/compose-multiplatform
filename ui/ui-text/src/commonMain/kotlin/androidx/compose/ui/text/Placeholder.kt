@@ -85,7 +85,9 @@ class Placeholder(
  * @see Placeholder
  */
 @Suppress("INLINE_CLASS_DEPRECATED")
-inline class PlaceholderVerticalAlign(val value: Int) {
+inline class PlaceholderVerticalAlign internal constructor(
+    @Suppress("unused") private val value: Int
+) {
 
     override fun toString(): String {
         return when (this) {
