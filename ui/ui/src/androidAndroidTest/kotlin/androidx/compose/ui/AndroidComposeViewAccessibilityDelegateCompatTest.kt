@@ -49,6 +49,7 @@ import androidx.compose.ui.semantics.SemanticsOwner
 import androidx.compose.ui.semantics.SemanticsPropertyReceiver
 import androidx.compose.ui.semantics.SemanticsWrapper
 import androidx.compose.ui.semantics.collapse
+import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.copyText
 import androidx.compose.ui.semantics.customActions
 import androidx.compose.ui.semantics.cutText
@@ -879,6 +880,22 @@ class AndroidComposeViewAccessibilityDelegateCompatTest {
             }
         ).getAllUncoveredSemanticsNodesToMap()
         assertEquals(0, nodes.size)
+    }
+
+    @Test
+    fun testContentDescriptionCastSuccess() {
+        val oldSemanticsNode = createSemanticsNodeWithProperties(1, true) {
+        }
+        accessibilityDelegate.previousSemanticsNodes[1] =
+            AndroidComposeViewAccessibilityDelegateCompat.SemanticsNodeCopy(
+                oldSemanticsNode,
+                mapOf()
+            )
+        val newNodes = mutableMapOf<Int, SemanticsNodeWithAdjustedBounds>()
+        newNodes[1] = createSemanticsNodeWithAdjustedBoundsWithProperties(1, true) {
+            this.contentDescription = "Hello" // To trigger content description casting
+        }
+        accessibilityDelegate.sendSemanticsPropertyChangeEvents(newNodes)
     }
 
     private fun createSemanticsNodeWithProperties(

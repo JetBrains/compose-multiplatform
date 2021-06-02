@@ -820,7 +820,7 @@ internal class AndroidComposeViewAccessibilityDelegateCompat(val view: AndroidCo
         virtualViewId: Int,
         eventType: Int,
         contentChangeType: Int? = null,
-        contentDescription: CharSequence? = null
+        contentDescription: List<String>? = null
     ): Boolean {
         if (virtualViewId == InvalidId || !isAccessibilityEnabled) {
             return false
@@ -831,7 +831,7 @@ internal class AndroidComposeViewAccessibilityDelegateCompat(val view: AndroidCo
             event.contentChangeTypes = contentChangeType
         }
         if (contentDescription != null) {
-            event.contentDescription = contentDescription
+            event.contentDescription = contentDescription.fastJoinToString(",")
         }
 
         return sendEvent(event)
@@ -1532,6 +1532,7 @@ internal class AndroidComposeViewAccessibilityDelegateCompat(val view: AndroidCo
                 if (entry.value == oldNode.config.getOrNull(entry.key)) {
                     continue
                 }
+                @Suppress("UNCHECKED_CAST")
                 when (entry.key) {
                     SemanticsProperties.PaneTitle -> {
                         val paneTitle = entry.value as String
@@ -1556,7 +1557,7 @@ internal class AndroidComposeViewAccessibilityDelegateCompat(val view: AndroidCo
                             semanticsNodeIdToAccessibilityVirtualNodeId(id),
                             AccessibilityEvent.TYPE_WINDOW_CONTENT_CHANGED,
                             AccessibilityEvent.CONTENT_CHANGE_TYPE_CONTENT_DESCRIPTION,
-                            entry.value as CharSequence
+                            entry.value as List<String>
                         )
                     SemanticsProperties.EditableText -> {
                         // TODO(b/160184953) Add test for SemanticsProperty Text change event
