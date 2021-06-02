@@ -210,7 +210,7 @@ class Transition<S> @PublishedApi internal constructor(
      * [segment] contains the initial state and the target state of the currently on-going
      * transition.
      */
-    var segment: Segment<S> by mutableStateOf(Segment(currentState, currentState))
+    var segment: Segment<S> by mutableStateOf(SegmentImpl(currentState, currentState))
         private set
 
     /**
@@ -310,7 +310,7 @@ class Transition<S> @PublishedApi internal constructor(
             this.currentState = initialState
             this.targetState = targetState
             isSeeking = true
-            segment = Segment(initialState, targetState)
+            segment = SegmentImpl(initialState, targetState)
         }
 
         if (playTimeNanos != lastSeekedTimeNanos) {
@@ -353,7 +353,7 @@ class Transition<S> @PublishedApi internal constructor(
             // update their animation specs
             if (this.targetState != targetState) {
                 // Starting state should be the "next" state when waypoints are impl'ed
-                segment = Segment(this.targetState, targetState)
+                segment = SegmentImpl(this.targetState, targetState)
                 currentState = this.targetState
                 this.targetState = targetState
                 if (!isRunning) {
@@ -520,12 +520,27 @@ class Transition<S> @PublishedApi internal constructor(
         }
     }
 
+    private class SegmentImpl<S>(
+        override val initialState: S,
+        override val targetState: S
+    ) : Segment<S>
+
     /**
      * [Segment] holds [initialState] and [targetState], which are the beginning and end of a
      * transition. These states will be used to obtain the animation spec that will be used for this
      * transition from the child animations.
      */
-    class Segment<S>(val initialState: S, val targetState: S) {
+    interface Segment<S> {
+        /**
+         * Initial state of a Transition Segment. This is the state that transition starts from.
+         */
+        val initialState: S
+
+        /**
+         * Target state of a Transition Segment. This is the state that transition will end on.
+         */
+        val targetState: S
+
         /**
          * Returns whether the provided state matches the [initialState] && the provided
          * [targetState] matches [Segment.targetState].
