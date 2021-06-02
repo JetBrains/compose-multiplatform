@@ -504,13 +504,12 @@ package androidx.compose.animation.core {
     property public final S! targetState;
   }
 
-  public static final class Transition.Segment<S> {
-    ctor public Transition.Segment(S? initialState, S? targetState);
+  public static interface Transition.Segment<S> {
     method public S! getInitialState();
     method public S! getTargetState();
-    method public infix boolean isTransitioningTo(S?, S? targetState);
-    property public final S! initialState;
-    property public final S! targetState;
+    method public default infix boolean isTransitioningTo(S?, S? targetState);
+    property public abstract S! initialState;
+    property public abstract S! targetState;
   }
 
   public final class TransitionKt {
