@@ -36,9 +36,7 @@ fun StyleSheet.insertRule(cssRule: String, index: Int? = null): Int {
 val ElementCSSInlineStyle.attributeStyleMap
     get() = this.asDynamic().attributeStyleMap.unsafeCast<StylePropertyMap>()
 
-external interface CSSStyleValue {
-    // toString() : string
-}
+external interface CSSStyleValue
 
 @JsName("CSSStyleValue")
 open external class CSSStyleValueJS : CSSStyleValue {
@@ -77,15 +75,6 @@ external class CSSUnparsedValue(members: Array<CSSUnparsedSegment>) : CSSStyleVa
     // readonly [index: number]: CSSUnparsedSegment
     operator fun get(index: Int): CSSUnparsedSegment
     operator fun set(index: Int, value: CSSUnparsedSegment)
-}
-
-external interface CSSKeywordValue : CSSStyleValue {
-    val value: String
-}
-
-@JsName("CSSKeywordValue")
-external class CSSKeywordValueJS(value: String) : CSSKeywordValue {
-    override val value: String
 }
 
 // type CSSNumberish = number | CSSNumericValue

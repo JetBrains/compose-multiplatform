@@ -1,11 +1,9 @@
 @file:Suppress("UNUSED")
-
 package org.jetbrains.compose.web.css
 
-interface CSSAutoValue : CSSKeywordValue
+interface CSSAutoValue : CSSStyleValue
 
-val auto = CSSKeywordValueJS("auto").unsafeCast<CSSAutoValue>()
-fun asCSSAutoValue(value: dynamic) = (value as? CSSKeywordValueJS).unsafeCast<CSSAutoValue>()
+val auto = StylePropertyValue("auto").unsafeCast<CSSAutoValue>()
 
 // type CSSSizeOrAutoValue = CSSSizeValue | CSSAutoValue
 interface CSSSizeOrAutoValue : CSSStyleValue, StylePropertyValue {
@@ -16,7 +14,6 @@ interface CSSSizeOrAutoValue : CSSStyleValue, StylePropertyValue {
 }
 
 fun CSSSizeOrAutoValue.asCSSSizeValue() = this.asDynamic() as? CSSUnitValueJS
-fun CSSSizeOrAutoValue.asCSSAutoValue(): CSSAutoValue = asCSSAutoValue(this.asDynamic())
 
 enum class Direction {
     rtl,
