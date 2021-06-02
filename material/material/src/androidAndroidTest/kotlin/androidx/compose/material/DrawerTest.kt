@@ -24,6 +24,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalLayoutDirection
@@ -731,6 +732,47 @@ class DrawerTest {
         rule.runOnIdle {
             assertThat(drawerState.currentValue).isEqualTo(BottomDrawerValue.Closed)
         }
+    }
+
+    @Test
+    fun bottomDrawer_scrim_doesNotClickWhenTransparent() {
+        val topTag = "BottomDrawer"
+        val scrimColor = mutableStateOf(Color.Red)
+        rule.setMaterialContent {
+            BottomDrawer(
+                modifier = Modifier.testTag(topTag),
+                scrimColor = scrimColor.value,
+                drawerState = rememberBottomDrawerState(BottomDrawerValue.Open),
+                drawerContent = {
+                    Box(Modifier.height(shortBottomDrawerHeight).testTag(bottomDrawerTag))
+                },
+                content = {
+                    Box(Modifier.fillMaxSize().testTag("body"))
+                }
+            )
+        }
+
+        val height = rule.rootHeight()
+        val topWhenOpened = height - shortBottomDrawerHeight
+
+        // The drawer should be opened
+        rule.onNodeWithTag(bottomDrawerTag).assertTopPositionInRootIsEqualTo(topWhenOpened)
+
+        var topNode = rule.onNodeWithTag(topTag).fetchSemanticsNode()
+        assertEquals(3, topNode.children.size)
+
+        rule.onNodeWithTag(topTag)
+            .onChildAt(1)
+            .assertHasClickAction()
+
+        rule.runOnIdle {
+            scrimColor.value = Color.Unspecified
+        }
+        rule.waitForIdle()
+
+        topNode = rule.onNodeWithTag(topTag).fetchSemanticsNode()
+        // should be 2 children now
+        assertEquals(2, topNode.children.size)
     }
 
     @Test
