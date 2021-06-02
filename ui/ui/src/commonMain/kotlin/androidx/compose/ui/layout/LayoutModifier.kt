@@ -32,6 +32,8 @@ import androidx.compose.ui.unit.IntSize
  * the [androidx.compose.ui.layout.Layout] component is used to define the layout behavior of
  * multiple children.
  *
+ * @sample androidx.compose.ui.samples.LayoutModifierSample
+ *
  * @see androidx.compose.ui.layout.Layout
  */
 interface LayoutModifier : Modifier.Element {
