@@ -336,17 +336,18 @@ fun main() = application {
     val state = rememberWindowState()
 
     Window(state) {
-    }
+        // Content
+    
+        LaunchedEffect(state) {
+            snapshotFlow { state.size }
+                .onEach(::onWindowResize)
+                .launchIn(this)
 
-    LaunchedEffect(state) {
-        snapshotFlow { state.size }
-            .onEach(::onWindowResize)
-            .launchIn(this)
-
-        snapshotFlow { state.position }
-            .filterNot { it.isInitial }
-            .onEach(::onWindowRelocate)
-            .launchIn(this)
+            snapshotFlow { state.position }
+                .filterNot { it.isInitial }
+                .onEach(::onWindowRelocate)
+                .launchIn(this)
+        }
     }
 }
 
@@ -357,7 +358,6 @@ private fun onWindowResize(size: WindowSize) {
 private fun onWindowRelocate(position: WindowPosition) {
     println("onWindowRelocate $position")
 }
-
 ```
 
 ## Handle window-level shortcuts
