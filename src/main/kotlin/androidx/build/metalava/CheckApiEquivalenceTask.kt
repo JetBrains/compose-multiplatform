@@ -26,6 +26,7 @@ import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.InputFiles
 import org.gradle.api.tasks.TaskAction
 import java.io.File
+import java.util.concurrent.TimeUnit
 
 /** Compares two API txt files against each other. */
 abstract class CheckApiEquivalenceTask : DefaultTask() {
@@ -86,7 +87,7 @@ private fun summarizeDiff(a: File, b: File): String {
     val process = ProcessBuilder(listOf("diff", a.toString(), b.toString()))
         .redirectOutput(ProcessBuilder.Redirect.PIPE)
         .start()
-    process.waitFor()
+    process.waitFor(5, TimeUnit.SECONDS)
     var diffLines = process.inputStream.bufferedReader().readLines().toMutableList()
     val maxSummaryLines = 50
     if (diffLines.size > maxSummaryLines) {
