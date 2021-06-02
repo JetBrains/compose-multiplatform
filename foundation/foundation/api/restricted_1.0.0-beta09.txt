@@ -353,6 +353,9 @@ package androidx.compose.foundation.lazy {
     method public androidx.compose.ui.Modifier fillParentMaxWidth(androidx.compose.ui.Modifier, optional float fraction);
   }
 
+  public final class LazyListHeadersKt {
+  }
+
   public final class LazyListItemContentFactoryKt {
   }
 
