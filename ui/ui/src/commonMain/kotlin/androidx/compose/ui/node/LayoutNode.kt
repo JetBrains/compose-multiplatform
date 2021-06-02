@@ -831,7 +831,21 @@ internal class LayoutNode : Measurable, Remeasurement, OwnerScope, LayoutInfo, C
         hitPointerInputFilters: MutableList<PointerInputFilter>
     ) {
         val positionInWrapped = outerLayoutNodeWrapper.fromParentPosition(pointerPosition)
-        outerLayoutNodeWrapper.hitTest(positionInWrapped, hitPointerInputFilters)
+        outerLayoutNodeWrapper.hitTest(
+            positionInWrapped,
+            hitPointerInputFilters
+        )
+    }
+
+    internal fun hitTestSemantics(
+        pointerPosition: Offset,
+        hitSemanticsWrappers: MutableList<SemanticsWrapper>
+    ) {
+        val positionInWrapped = outerLayoutNodeWrapper.fromParentPosition(pointerPosition)
+        outerLayoutNodeWrapper.hitTestSemantics(
+            positionInWrapped,
+            hitSemanticsWrappers
+        )
     }
 
     /**
