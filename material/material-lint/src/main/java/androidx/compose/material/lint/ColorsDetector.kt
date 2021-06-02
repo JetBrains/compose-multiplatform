@@ -33,8 +33,7 @@ import com.android.tools.lint.detector.api.SourceCodeScanner
 import com.android.tools.lint.detector.api.UastLintUtils
 import com.intellij.psi.PsiParameter
 import com.intellij.psi.PsiVariable
-import org.jetbrains.kotlin.asJava.elements.KtLightElement
-import org.jetbrains.kotlin.psi.KtParameter
+import org.jetbrains.kotlin.asJava.elements.KtLightParameter
 import org.jetbrains.uast.UCallExpression
 import org.jetbrains.uast.UElement
 import org.jetbrains.uast.UExpression
@@ -69,12 +68,7 @@ class ColorsDetector : Detector(), SourceCodeScanner {
             }
 
             val parameters = method.parameterList.parameters.mapIndexed { index, parameter ->
-                // UCallExpressionEx is deprecated, but getArgumentForParameter doesn't exist on
-                // UCallExpression on the version of lint we compile against.
-                // TODO: remove when we upgrade the min lint version we compile against b/182832722
-                @Suppress("DEPRECATION")
-                val argumentForParameter = (node as org.jetbrains.uast.UCallExpressionEx)
-                    .getArgumentForParameter(index)
+                val argumentForParameter = node.getArgumentForParameter(index)
                 ParameterWithArgument(
                     parameter,
                     argumentForParameter
@@ -190,10 +184,8 @@ class ParameterWithArgument(
             // A default value exists (so !! is safe), and we are browsing Kotlin source
             // Note: this should be is KtLightParameter, but this was changed from an interface
             // to a class, so we get an IncompatibleClassChangeError.
-            // TODO: change to KtParameter when we upgrade the min lint version we compile against
-            //  b/182832722
-            parameter is KtLightElement<*, *> -> {
-                (parameter.kotlinOrigin!! as KtParameter).defaultValue.toUElement()
+            parameter is KtLightParameter -> {
+                parameter.kotlinOrigin!!.defaultValue.toUElement()
             }
             // A default value exists, but it is in a class file so we can't access it anymore
             else -> null

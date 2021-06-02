@@ -17,6 +17,7 @@
 package androidx.compose.ui.lint
 
 import com.android.tools.lint.client.api.IssueRegistry
+import com.android.tools.lint.client.api.Vendor
 import com.android.tools.lint.detector.api.CURRENT_API
 
 /**
@@ -32,5 +33,10 @@ class UiIssueRegistry : IssueRegistry() {
         ModifierDeclarationDetector.ModifierFactoryReturnType,
         ModifierDeclarationDetector.ModifierFactoryUnreferencedReceiver,
         ModifierParameterDetector.ModifierParameter
+    )
+    override val vendor = Vendor(
+        vendorName = "Jetpack Compose",
+        identifier = "androidx.compose.ui",
+        feedbackUrl = "https://issuetracker.google.com/issues/new?component=612128"
     )
 }

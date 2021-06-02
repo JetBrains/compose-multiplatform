@@ -17,6 +17,7 @@
 package androidx.compose.material.lint
 
 import com.android.tools.lint.client.api.IssueRegistry
+import com.android.tools.lint.client.api.Vendor
 import com.android.tools.lint.detector.api.CURRENT_API
 
 /**
@@ -28,5 +29,10 @@ class MaterialIssueRegistry : IssueRegistry() {
     override val minApi = CURRENT_API
     override val issues get() = listOf(
         ColorsDetector.ConflictingOnColor
+    )
+    override val vendor = Vendor(
+        vendorName = "Jetpack Compose",
+        identifier = "androidx.compose.material",
+        feedbackUrl = "https://issuetracker.google.com/issues/new?component=612128"
     )
 }
