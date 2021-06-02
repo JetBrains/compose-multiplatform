@@ -19,12 +19,10 @@ import androidx.build.AndroidXUiPlugin
 import androidx.build.LibraryGroups
 import androidx.build.LibraryType
 
-import static androidx.build.dependencies.DependenciesKt.*
-
 plugins {
     id("AndroidXPlugin")
-    id("com.android.library")
     id("AndroidXUiPlugin")
+    id("com.android.library")
 }
 
 AndroidXUiPlugin.applyAndConfigureKotlinPlugin(project)
@@ -38,29 +36,27 @@ dependencies {
         api project(":compose:runtime:runtime")
         api "androidx.annotation:annotation:1.1.0"
 
-        implementation(KOTLIN_STDLIB)
+        implementation(libs.kotlinStdlib)
 
-        testImplementation(JUNIT)
-        testImplementation(TRUTH)
-        testImplementation(ANDROIDX_TEST_CORE)
-        testImplementation(ANDROIDX_TEST_RULES)
+        testImplementation(libs.junit)
+        testImplementation(libs.truth)
+        testImplementation(libs.testCore)
+        testImplementation(libs.testRules)
 
         androidTestImplementation project(':compose:ui:ui')
         androidTestImplementation project(":compose:ui:ui-test-junit4")
         androidTestImplementation project(":compose:test-utils")
         androidTestImplementation "androidx.fragment:fragment:1.3.0"
         androidTestImplementation project(":activity:activity-compose")
-        androidTestImplementation(ANDROIDX_TEST_UIAUTOMATOR)
-        androidTestImplementation(ANDROIDX_TEST_CORE)
-        androidTestImplementation(ANDROIDX_TEST_RULES)
-        androidTestImplementation(ANDROIDX_TEST_RUNNER)
-        androidTestImplementation(ESPRESSO_CORE)
-        androidTestImplementation(JUNIT)
-        androidTestImplementation(TRUTH)
-        androidTestImplementation(DEXMAKER_MOCKITO, excludes.bytebuddy)
-        // DexMaker has it"s own MockMaker
-        androidTestImplementation(MOCKITO_CORE, excludes.bytebuddy)
-        // DexMaker has it"s own MockMaker
+        androidTestImplementation(libs.testUiautomator)
+        androidTestImplementation(libs.testCore)
+        androidTestImplementation(libs.testRules)
+        androidTestImplementation(libs.testRunner)
+        androidTestImplementation(libs.espressoCore)
+        androidTestImplementation(libs.junit)
+        androidTestImplementation(libs.truth)
+        androidTestImplementation(libs.dexmakerMockito)
+        androidTestImplementation(libs.mockitoCore)
 
         lintPublish(project(":compose:runtime:runtime-saveable-lint"))
     }
@@ -75,21 +71,21 @@ if(AndroidXUiPlugin.isMultiplatformEnabled(project)) {
             corresponding block above */
         sourceSets {
             commonMain.dependencies {
-                implementation(KOTLIN_STDLIB_COMMON)
+                implementation(libs.kotlinStdlibCommon)
 
                 api project(":compose:runtime:runtime")
             }
 
             androidMain.dependencies {
-                implementation(KOTLIN_STDLIB)
+                implementation(libs.kotlinStdlib)
                 api "androidx.annotation:annotation:1.1.0"
             }
 
             androidTest.dependencies {
-                implementation(ANDROIDX_TEST_RULES)
-                implementation(ANDROIDX_TEST_RUNNER)
-                implementation(JUNIT)
-                implementation(TRUTH)
+                implementation(libs.testRules)
+                implementation(libs.testRunner)
+                implementation(libs.junit)
+                implementation(libs.truth)
             }
 
             androidAndroidTest.dependencies {
@@ -98,17 +94,15 @@ if(AndroidXUiPlugin.isMultiplatformEnabled(project)) {
                 implementation project(":compose:test-utils")
                 implementation "androidx.fragment:fragment:1.3.0"
                 implementation project(":activity:activity-compose")
-                implementation(ANDROIDX_TEST_UIAUTOMATOR)
-                implementation(ANDROIDX_TEST_CORE)
-                implementation(ANDROIDX_TEST_RULES)
-                implementation(ANDROIDX_TEST_RUNNER)
-                implementation(ESPRESSO_CORE)
-                implementation(JUNIT)
-                implementation(TRUTH)
-                implementation(DEXMAKER_MOCKITO, excludes.bytebuddy)
-                // DexMaker has it"s own MockMaker
-                implementation(MOCKITO_CORE, excludes.bytebuddy)
-                // DexMaker has it"s own MockMaker
+                implementation(libs.testUiautomator)
+                implementation(libs.testCore)
+                implementation(libs.testRules)
+                implementation(libs.testRunner)
+                implementation(libs.espressoCore)
+                implementation(libs.junit)
+                implementation(libs.truth)
+                implementation(libs.dexmakerMockito)
+                implementation(libs.mockitoCore)
             }
         }
     }

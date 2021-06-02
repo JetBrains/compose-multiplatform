@@ -18,8 +18,6 @@
 import androidx.build.AndroidXUiPlugin
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
-import static androidx.build.dependencies.DependenciesKt.*
-
 plugins {
     id("AndroidXPlugin")
     id("com.android.library")
@@ -38,15 +36,15 @@ dependencies {
         androidTestImplementation(project(":compose:test-utils"))
         androidTestImplementation(project(":activity:activity-compose"))
 
-        androidTestImplementation(JUNIT)
-        androidTestImplementation(KOTLIN_TEST_JUNIT)
-        androidTestImplementation(ANDROIDX_TEST_EXT_JUNIT)
-        androidTestImplementation(ANDROIDX_TEST_CORE)
-        androidTestImplementation(ANDROIDX_TEST_RUNNER)
-        androidTestImplementation(ANDROIDX_TEST_RULES)
-        androidTestImplementation(KOTLIN_STDLIB)
-        androidTestImplementation(KOTLIN_REFLECT)
-        androidTestImplementation(TRUTH)
+        androidTestImplementation(libs.junit)
+        androidTestImplementation(libs.kotlinTestJunit)
+        androidTestImplementation(libs.testExtJunit)
+        androidTestImplementation(libs.testCore)
+        androidTestImplementation(libs.testRunner)
+        androidTestImplementation(libs.testRules)
+        androidTestImplementation(libs.kotlinStdlib)
+        androidTestImplementation(libs.kotlinReflect)
+        androidTestImplementation(libs.truth)
     }
 }
 
@@ -61,17 +59,17 @@ if(AndroidXUiPlugin.isMultiplatformEnabled(project)) {
          */
         sourceSets {
             commonMain.dependencies {
-                implementation(KOTLIN_STDLIB_COMMON)
-                implementation(KOTLIN_COROUTINES_CORE)
+                implementation(libs.kotlinStdlibCommon)
+                implementation(libs.kotlinCoroutinesCore)
                 implementation(project(":compose:ui:ui"))
             }
             jvmMain.dependencies {
-                implementation(KOTLIN_STDLIB)
-                api(KOTLIN_COROUTINES_CORE)
+                implementation(libs.kotlinStdlib)
+                api(libs.kotlinCoroutinesCore)
             }
             androidMain {
                 dependencies {
-                    api(KOTLIN_COROUTINES_ANDROID)
+                    api(libs.kotlinCoroutinesAndroid)
                     api("androidx.annotation:annotation:1.1.0")
 
                     implementation("androidx.core:core-ktx:1.1.0")
@@ -80,7 +78,7 @@ if(AndroidXUiPlugin.isMultiplatformEnabled(project)) {
             }
             desktopMain {
                 dependencies {
-                    api(KOTLIN_COROUTINES_SWING)
+                    api(libs.kotlinCoroutinesSwing)
                 }
                 dependsOn(jvmMain)
             }
@@ -93,10 +91,10 @@ if(AndroidXUiPlugin.isMultiplatformEnabled(project)) {
                 implementation(project(":compose:ui:ui-test-junit4"))
                 implementation(project(":compose:test-utils"))
                 implementation(project(":activity:activity-compose"))
-                implementation(ANDROIDX_TEST_EXT_JUNIT)
-                implementation(ANDROIDX_TEST_RULES)
-                implementation(ANDROIDX_TEST_RUNNER)
-                implementation(TRUTH)
+                implementation(libs.testExtJunit)
+                implementation(libs.testRules)
+                implementation(libs.testRunner)
+                implementation(libs.truth)
             }
         }
     }
