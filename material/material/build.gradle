@@ -14,11 +14,10 @@
  * limitations under the License.
  */
 
+
 import androidx.build.AndroidXUiPlugin
 import androidx.build.LibraryGroups
 import androidx.build.LibraryType
-
-import static androidx.build.dependencies.DependenciesKt.*
 
 plugins {
     id("AndroidXPlugin")
@@ -44,28 +43,26 @@ dependencies {
         api(project(":compose:ui:ui"))
         api(project(":compose:ui:ui-text"))
 
-        implementation(KOTLIN_STDLIB_COMMON)
+        implementation(libs.kotlinStdlibCommon)
         implementation(project(":compose:animation:animation"))
         implementation(project(":compose:foundation:foundation-layout"))
         implementation(project(":compose:ui:ui-util"))
 
-        testImplementation(ANDROIDX_TEST_RULES)
-        testImplementation(ANDROIDX_TEST_RUNNER)
-        testImplementation(JUNIT)
-        testImplementation(TRUTH)
+        testImplementation(libs.testRules)
+        testImplementation(libs.testRunner)
+        testImplementation(libs.junit)
+        testImplementation(libs.truth)
 
         androidTestImplementation(project(":compose:material:material:material-samples"))
         androidTestImplementation(project(":compose:test-utils"))
         androidTestImplementation(project(":test-screenshot"))
-        androidTestImplementation(ANDROIDX_TEST_RULES)
-        androidTestImplementation(ANDROIDX_TEST_RUNNER)
-        androidTestImplementation(JUNIT)
-        androidTestImplementation(TRUTH)
-        androidTestImplementation(DEXMAKER_MOCKITO, excludes.bytebuddy) // DexMaker has it"s own MockMaker
-        androidTestImplementation(MOCKITO_CORE, excludes.bytebuddy) // DexMaker has it"s own MockMaker
-        androidTestImplementation(MOCKITO_KOTLIN, {
-            exclude group: "org.mockito" // to keep control on the mockito version
-        })
+        androidTestImplementation(libs.testRules)
+        androidTestImplementation(libs.testRunner)
+        androidTestImplementation(libs.junit)
+        androidTestImplementation(libs.truth)
+        androidTestImplementation(libs.dexmakerMockito)
+        androidTestImplementation(libs.mockitoCore)
+        androidTestImplementation(libs.mockitoKotlin)
 
         lintPublish project(":compose:material:material-lint")
     }
@@ -82,7 +79,7 @@ if(AndroidXUiPlugin.isMultiplatformEnabled(project)) {
          */
         sourceSets {
             commonMain.dependencies {
-                implementation(KOTLIN_STDLIB_COMMON)
+                implementation(libs.kotlinStdlibCommon)
                 api(project(":compose:animation:animation-core"))
                 api(project(":compose:foundation:foundation"))
                 api(project(":compose:material:material-icons-core"))
@@ -101,14 +98,14 @@ if(AndroidXUiPlugin.isMultiplatformEnabled(project)) {
             }
 
             desktopMain.dependencies {
-                implementation(KOTLIN_STDLIB)
+                implementation(libs.kotlinStdlib)
             }
 
             test.dependencies {
-                implementation(ANDROIDX_TEST_RULES)
-                implementation(ANDROIDX_TEST_RUNNER)
-                implementation(JUNIT)
-                implementation(TRUTH)
+                implementation(libs.testRules)
+                implementation(libs.testRunner)
+                implementation(libs.junit)
+                implementation(libs.truth)
             }
 
             androidAndroidTest.dependencies {
@@ -116,15 +113,13 @@ if(AndroidXUiPlugin.isMultiplatformEnabled(project)) {
                 implementation(project(":compose:test-utils"))
                 implementation(project(":test-screenshot"))
 
-                implementation(ANDROIDX_TEST_RULES)
-                implementation(ANDROIDX_TEST_RUNNER)
-                implementation(JUNIT)
-                implementation(TRUTH)
-                implementation(DEXMAKER_MOCKITO, excludes.bytebuddy) // DexMaker has it"s own MockMaker
-                implementation(MOCKITO_CORE, excludes.bytebuddy) // DexMaker has it"s own MockMaker
-                implementation(MOCKITO_KOTLIN, {
-                    exclude group: "org.mockito" // to keep control on the mockito version
-                })
+                implementation(libs.testRules)
+                implementation(libs.testRunner)
+                implementation(libs.junit)
+                implementation(libs.truth)
+                implementation(libs.dexmakerMockito)
+                implementation(libs.mockitoCore)
+                implementation(libs.mockitoKotlin)
             }
         }
     }

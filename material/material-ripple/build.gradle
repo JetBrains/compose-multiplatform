@@ -14,11 +14,10 @@
  * limitations under the License.
  */
 
+
 import androidx.build.AndroidXUiPlugin
 import androidx.build.LibraryGroups
 import androidx.build.LibraryType
-
-import static androidx.build.dependencies.DependenciesKt.*
 
 plugins {
     id("AndroidXPlugin")
@@ -39,20 +38,20 @@ dependencies {
         api(project(":compose:foundation:foundation"))
         api(project(":compose:runtime:runtime"))
 
-        implementation(KOTLIN_STDLIB_COMMON)
+        implementation(libs.kotlinStdlibCommon)
         implementation(project(":compose:animation:animation"))
         implementation(project(":compose:ui:ui-util"))
 
-        testImplementation(ANDROIDX_TEST_RULES)
-        testImplementation(ANDROIDX_TEST_RUNNER)
-        testImplementation(JUNIT)
-        testImplementation(TRUTH)
+        testImplementation(libs.testRules)
+        testImplementation(libs.testRunner)
+        testImplementation(libs.junit)
+        testImplementation(libs.truth)
 
         androidTestImplementation(project(":compose:test-utils"))
-        androidTestImplementation(ANDROIDX_TEST_RULES)
-        androidTestImplementation(ANDROIDX_TEST_RUNNER)
-        androidTestImplementation(JUNIT)
-        androidTestImplementation(TRUTH)
+        androidTestImplementation(libs.testRules)
+        androidTestImplementation(libs.testRunner)
+        androidTestImplementation(libs.junit)
+        androidTestImplementation(libs.truth)
     }
 }
 
@@ -67,7 +66,7 @@ if(AndroidXUiPlugin.isMultiplatformEnabled(project)) {
          */
         sourceSets {
             commonMain.dependencies {
-                implementation(KOTLIN_STDLIB_COMMON)
+                implementation(libs.kotlinStdlibCommon)
                 api(project(":compose:foundation:foundation"))
                 api(project(":compose:runtime:runtime"))
 
@@ -78,19 +77,19 @@ if(AndroidXUiPlugin.isMultiplatformEnabled(project)) {
             desktopMain.dependsOn(jvmMain)
 
             test.dependencies {
-                implementation(ANDROIDX_TEST_RULES)
-                implementation(ANDROIDX_TEST_RUNNER)
-                implementation(JUNIT)
-                implementation(TRUTH)
+                implementation(libs.testRules)
+                implementation(libs.testRunner)
+                implementation(libs.junit)
+                implementation(libs.truth)
             }
 
             androidAndroidTest.dependencies {
                 implementation(project(":compose:test-utils"))
 
-                implementation(ANDROIDX_TEST_RULES)
-                implementation(ANDROIDX_TEST_RUNNER)
-                implementation(JUNIT)
-                implementation(TRUTH)
+                implementation(libs.testRules)
+                implementation(libs.testRunner)
+                implementation(libs.junit)
+                implementation(libs.truth)
             }
         }
     }

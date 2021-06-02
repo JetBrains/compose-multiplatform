@@ -19,8 +19,6 @@
 
 import androidx.build.AndroidXUiPlugin
 
-import static androidx.build.dependencies.DependenciesKt.*
-
 AndroidXUiPlugin.applyAndConfigureKotlinPlugin(project)
 
 dependencies {
@@ -30,7 +28,7 @@ dependencies {
          * corresponding block below
          */
        api(project(":compose:material:material-icons-core"))
-       implementation(KOTLIN_STDLIB_COMMON)
+       implementation(libs.kotlinStdlibCommon)
        implementation(project(":compose:runtime:runtime"))
     }
 }
@@ -46,7 +44,7 @@ if (AndroidXUiPlugin.isMultiplatformEnabled(project)) {
         sourceSets {
             commonMain.dependencies {
                 api(project(":compose:material:material-icons-core"))
-                implementation(KOTLIN_STDLIB_COMMON)
+                implementation(libs.kotlinStdlibCommon)
                 implementation(project(":compose:runtime:runtime"))
             }
         }

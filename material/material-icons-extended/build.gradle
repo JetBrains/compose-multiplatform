@@ -14,13 +14,12 @@
  * limitations under the License.
  */
 
+
 import androidx.build.AndroidXUiPlugin
 import androidx.build.LibraryGroups
 import androidx.build.LibraryType
 import androidx.build.RunApiTasks
 import androidx.compose.material.icons.generator.tasks.IconGenerationTask
-
-import static androidx.build.dependencies.DependenciesKt.*
 
 plugins {
     id("AndroidXPlugin")
@@ -45,11 +44,11 @@ dependencies {
          * When updating dependencies, make sure to make an analogous update in the
          * corresponding block below
          */
-        androidTestImplementation(ANDROIDX_TEST_RULES)
-        androidTestImplementation(ANDROIDX_TEST_RUNNER)
-        androidTestImplementation(JUNIT)
-        androidTestImplementation(KOTLIN_REFLECT)
-        androidTestImplementation(TRUTH)
+        androidTestImplementation(libs.testRules)
+        androidTestImplementation(libs.testRunner)
+        androidTestImplementation(libs.junit)
+        androidTestImplementation(libs.kotlinReflect)
+        androidTestImplementation(libs.truth)
 
         androidTestImplementation(project(":compose:foundation:foundation"))
         androidTestImplementation(project(":compose:foundation:foundation-layout"))
@@ -78,11 +77,11 @@ if (AndroidXUiPlugin.isMultiplatformEnabled(project)) {
                 implementation(project(":activity:activity-compose"))
                 implementation("androidx.appcompat:appcompat:1.3.0-beta01")
 
-                implementation(ANDROIDX_TEST_RULES)
-                implementation(ANDROIDX_TEST_RUNNER)
-                implementation(JUNIT)
-                implementation(KOTLIN_REFLECT)
-                implementation(TRUTH)
+                implementation(libs.testRules)
+                implementation(libs.testRunner)
+                implementation(libs.junit)
+                implementation(libs.kotlinReflect)
+                implementation(libs.truth)
             }
         }
     }
