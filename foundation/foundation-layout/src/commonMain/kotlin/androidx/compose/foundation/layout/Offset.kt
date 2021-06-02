@@ -93,8 +93,9 @@ fun Modifier.absoluteOffset(x: Dp = 0.dp, y: Dp = 0.dp) = this.then(
  * Applying an offset only changes the position of the content, without interfering with
  * its size measurement.
  *
- * This modifier is designed to be used for offsets that change, possibly due to user interactions,
- * the advantage being that it avoids recomposition when the offset is changing.
+ * This modifier is designed to be used for offsets that change, possibly due to user interactions.
+ * It avoids recomposition when the offset is changing, and also adds a graphics layer that
+ * prevents unnecessary redrawing of the context when the offset is changing.
  *
  * This modifier will automatically adjust the horizontal offset according to the layout direction:
  * when the LD is LTR, positive horizontal offsets will move the content to the right and
@@ -122,8 +123,9 @@ fun Modifier.offset(offset: Density.() -> IntOffset) = this.then(
  * Applying an offset only changes the position of the content, without interfering with
  * its size measurement.
  *
- * This modifier is designed to be used for offsets that change, possibly due to user interactions,
- * the advantage being that it avoids recomposition when the offset is changing.
+ * This modifier is designed to be used for offsets that change, possibly due to user interactions.
+ * It avoids recomposition when the offset is changing, and also adds a graphics layer that
+ * prevents unnecessary redrawing of the context when the offset is changing.
  *
  * This modifier will not consider layout direction when calculating the position of the content:
  * a positive horizontal offset will always move the content to the right.
