@@ -2,7 +2,7 @@
 [![Latest release](https://img.shields.io/github/v/release/JetBrains/compose-jb?color=brightgreen&label=latest%20release)](https://github.com/JetBrains/compose-jb/releases/latest)
 [![Latest build](https://img.shields.io/github/v/release/JetBrains/compose-jb?color=orange&include_prereleases&label=latest%20build)](https://github.com/JetBrains/compose-jb/releases)
 
-# Compose for Desktop, by JetBrains
+# Compose for Desktop and Web, by JetBrains
 ![](artwork/readme/apps.png)
 Compose Kotlin UI framework port for desktop platforms (macOS, Linux, Windows), components outside of the core Compose repository
 at https://android.googlesource.com/platform/frameworks/support.
@@ -44,6 +44,6 @@ at https://android.googlesource.com/platform/frameworks/support.
        * [Video Player](components/VideoPlayer)
        * [Split Pane](components/SplitPane)
        
-## Getting latest version of Compose for Desktop ##
+## Getting latest version of Multiplatform Compose ##
 
 See https://github.com/JetBrains/compose-jb/tags for the latest build number.
