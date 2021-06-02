@@ -258,7 +258,8 @@ private class MyWindowState(
 
 ## Changing the state (maximized, minimized, fullscreen, size, position) of the window.
 
-Some states of the native window are moved into a separate API class, `WindowState`. You can change its properties in callbacks or observe it in Composable's:
+Some states of the native window are moved into a separate API class, `WindowState`. You can change its properties in callbacks or observe it in Composable's.
+When some state is changed (window size or position), Composable function will be automatically recomposed.
 
 ```kotlin
 import androidx.compose.foundation.clickable
@@ -313,6 +314,51 @@ fun main() = application {
 }
 ```
 ![](state.gif)
+
+## Listening the state of the window
+Reading the state in composition is useful when you need to update UI, but there are cases when you need to react to the state changes and send a value to another non-composable level of your application (write it to the database, for example):
+
+```
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.snapshotFlow
+import androidx.compose.ui.ExperimentalComposeUiApi
+import androidx.compose.ui.window.Window
+import androidx.compose.ui.window.WindowPosition
+import androidx.compose.ui.window.WindowSize
+import androidx.compose.ui.window.application
+import androidx.compose.ui.window.rememberWindowState
+import kotlinx.coroutines.flow.filterNot
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
+
+@OptIn(ExperimentalComposeUiApi::class)
+fun main() = application {
+    val state = rememberWindowState()
+
+    Window(state) {
+    }
+
+    LaunchedEffect(state) {
+        snapshotFlow { state.size }
+            .onEach(::onWindowResize)
+            .launchIn(this)
+
+        snapshotFlow { state.position }
+            .filterNot { it.isInitial }
+            .onEach(::onWindowRelocate)
+            .launchIn(this)
+    }
+}
+
+private fun onWindowResize(size: WindowSize) {
+    println("onWindowResize $size")
+}
+
+private fun onWindowRelocate(position: WindowPosition) {
+    println("onWindowRelocate $position")
+}
+
+```
 
 ## Handle window-level shortcuts
 ```kotlin
