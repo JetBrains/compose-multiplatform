@@ -14,7 +14,7 @@
 * limitations under the License.
 */
 
-package androidx.ui.desktop
+package androidx.compose.desktop
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement

@@ -15,7 +15,7 @@
  */
 
 
-import androidx.build.AndroidXUiPlugin
+import androidx.build.AndroidXComposePlugin
 import androidx.build.LibraryGroups
 import androidx.build.LibraryType
 import androidx.compose.material.icons.generator.tasks.IconGenerationTask
@@ -23,12 +23,12 @@ import androidx.compose.material.icons.generator.tasks.IconGenerationTask
 plugins {
     id("AndroidXPlugin")
     id("com.android.library")
-    id("AndroidXUiPlugin")
+    id("AndroidXComposePlugin")
 }
 
-AndroidXUiPlugin.applyAndConfigureKotlinPlugin(project)
+AndroidXComposePlugin.applyAndConfigureKotlinPlugin(project)
 
-if (!AndroidXUiPlugin.isMultiplatformEnabled(project)) {
+if (!AndroidXComposePlugin.isMultiplatformEnabled(project)) {
     dependencies {
         /*
          * When updating dependencies, make sure to make the an an analogous update in the
@@ -41,7 +41,7 @@ if (!AndroidXUiPlugin.isMultiplatformEnabled(project)) {
     }
 }
 
-if (AndroidXUiPlugin.isMultiplatformEnabled(project)) {
+if (AndroidXComposePlugin.isMultiplatformEnabled(project)) {
     kotlin {
         android()
         jvm("desktop")
@@ -66,7 +66,7 @@ if (AndroidXUiPlugin.isMultiplatformEnabled(project)) {
 IconGenerationTask.registerCoreIconProject(
         project,
         android,
-        AndroidXUiPlugin.isMultiplatformEnabled(project)
+        AndroidXComposePlugin.isMultiplatformEnabled(project)
 )
 
 androidx {

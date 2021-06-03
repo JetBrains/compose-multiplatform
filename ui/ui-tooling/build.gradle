@@ -14,22 +14,22 @@
  * limitations under the License.
  */
 
-import androidx.build.AndroidXUiPlugin
+import androidx.build.AndroidXComposePlugin
 import androidx.build.LibraryGroups
 import androidx.build.LibraryType
 
 plugins {
     id("AndroidXPlugin")
     id("com.android.library")
-    id("AndroidXUiPlugin")
+    id("AndroidXComposePlugin")
 }
 
-AndroidXUiPlugin.applyAndConfigureKotlinPlugin(project)
+AndroidXComposePlugin.applyAndConfigureKotlinPlugin(project)
 
 dependencies {
     kotlinPlugin(project(":compose:compiler:compiler"))
 
-    if(!AndroidXUiPlugin.isMultiplatformEnabled(project)) {
+    if(!AndroidXComposePlugin.isMultiplatformEnabled(project)) {
         implementation(libs.kotlinStdlib)
 
         api("androidx.annotation:annotation:1.1.0")
@@ -40,8 +40,8 @@ dependencies {
         implementation(project(":compose:material:material"))
         implementation(project(":activity:activity-compose"))
 
-        // kotlin-reflect and tooling-animation-internal are provided by Studio at runtime
-        compileOnly(project(":ui:ui-animation-tooling-internal"))
+        // kotlin-reflect and animation-tooling-internal are provided by Studio at runtime
+        compileOnly(project(":compose:animation:animation-tooling-internal"))
         compileOnly(libs.kotlinReflect)
 
         androidTestImplementation(project(":compose:ui:ui-test-junit4"))
@@ -54,11 +54,11 @@ dependencies {
         androidTestImplementation(project(":compose:test-utils"))
         androidTestImplementation(libs.truth)
         androidTestImplementation(libs.kotlinReflect)
-        androidTestImplementation(project(":ui:ui-animation-tooling-internal"))
+        androidTestImplementation(project(":compose:animation:animation-tooling-internal"))
     }
 }
 
-if(AndroidXUiPlugin.isMultiplatformEnabled(project)) {
+if(AndroidXComposePlugin.isMultiplatformEnabled(project)) {
     kotlin {
         android()
         jvm("desktop")
@@ -82,7 +82,7 @@ if(AndroidXUiPlugin.isMultiplatformEnabled(project)) {
                 implementation(project(":activity:activity-compose"))
 
                 // kotlin-reflect and tooling-animation-internal are provided by Studio at runtime
-                compileOnly(project(":ui:ui-animation-tooling-internal"))
+                compileOnly(project(":compose:animation:animation-tooling-internal"))
                 compileOnly(libs.kotlinReflect)
             }
 
@@ -106,7 +106,7 @@ if(AndroidXUiPlugin.isMultiplatformEnabled(project)) {
                 implementation(project(":compose:test-utils"))
                 implementation(libs.truth)
                 implementation(libs.kotlinReflect)
-                implementation(project(":ui:ui-animation-tooling-internal"))
+                implementation(project(":compose:animation:animation-tooling-internal"))
             }
         }
     }
