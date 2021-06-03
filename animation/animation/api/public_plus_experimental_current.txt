@@ -12,15 +12,14 @@ package androidx.compose.animation {
     method @androidx.compose.animation.ExperimentalAnimationApi public static infix androidx.compose.animation.ContentTransform with(androidx.compose.animation.EnterTransition, androidx.compose.animation.ExitTransition exit);
   }
 
-  @androidx.compose.animation.ExperimentalAnimationApi public final class AnimatedContentScope<S> {
+  @androidx.compose.animation.ExperimentalAnimationApi public final class AnimatedContentScope<S> implements androidx.compose.animation.core.Transition.Segment<S> {
     method public S! getInitialState();
     method public S! getTargetState();
-    method public infix boolean isTransitioningTo(S?, S? targetState);
     method public androidx.compose.animation.EnterTransition slideIntoContainer-GPwtvT8(int towards, optional androidx.compose.animation.core.FiniteAnimationSpec<androidx.compose.ui.unit.IntOffset> animationSpec, optional kotlin.jvm.functions.Function1<? super java.lang.Integer,java.lang.Integer> initialOffset);
     method public androidx.compose.animation.ExitTransition slideOutOfContainer-GPwtvT8(int towards, optional androidx.compose.animation.core.FiniteAnimationSpec<androidx.compose.ui.unit.IntOffset> animationSpec, optional kotlin.jvm.functions.Function1<? super java.lang.Integer,java.lang.Integer> targetOffset);
     method @androidx.compose.animation.ExperimentalAnimationApi public infix androidx.compose.animation.ContentTransform using(androidx.compose.animation.ContentTransform, androidx.compose.animation.SizeTransform? sizeTransform);
-    property public final S! initialState;
-    property public final S! targetState;
+    property public S! initialState;
+    property public S! targetState;
   }
 
   @androidx.compose.runtime.Immutable public static final inline class AnimatedContentScope.SlideDirection {
