@@ -249,7 +249,7 @@ fun Select(
 )
 
 @Composable
-fun DOMScope<HTMLSelectElement>.Option(
+fun Option(
     value: String,
     attrs: AttrBuilderContext<Tag.Option> = {},
     content: ContentBuilder<HTMLOptionElement>? = null
