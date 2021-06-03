@@ -67,7 +67,7 @@ import androidx.compose.ui.graphics.Canvas
 import androidx.compose.ui.graphics.CanvasHolder
 import androidx.compose.ui.graphics.Matrix
 import androidx.compose.ui.graphics.setFrom
-import androidx.compose.ui.hapticfeedback.AndroidHapticFeedback
+import androidx.compose.ui.hapticfeedback.PlatformHapticFeedback
 import androidx.compose.ui.hapticfeedback.HapticFeedback
 import androidx.compose.ui.input.key.Key.Companion.Back
 import androidx.compose.ui.input.key.Key.Companion.DirectionCenter
@@ -329,7 +329,7 @@ internal class AndroidComposeView(context: Context) :
      * Provide haptic feedback to the user. Use the Android version of haptic feedback.
      */
     override val hapticFeedBack: HapticFeedback =
-        AndroidHapticFeedback(this)
+        PlatformHapticFeedback(this)
 
     /**
      * Provide textToolbar to the user, for text-related operation. Use the Android version of

@@ -20,14 +20,37 @@ package androidx.compose.ui.hapticfeedback
  * Constants to be used to perform haptic feedback effects via
  * [HapticFeedback.performHapticFeedback].
  */
-enum class HapticFeedbackType {
-    /**
-     * The user has performed a long press on an object that is resulting
-     * in an action being performed.
-     */
-    LongPress,
-    /**
-     * The user has performed a selection/insertion handle move on text field.
-     */
-    TextHandleMove
+@Suppress("INLINE_CLASS_DEPRECATED")
+inline class HapticFeedbackType(internal val value: Int) {
+
+    override fun toString(): String {
+        return when (this) {
+            LongPress -> "LongPress"
+            TextHandleMove -> "TextHandleMove"
+            else -> "Invalid"
+        }
+    }
+
+    companion object {
+        /**
+         * The user has performed a long press on an object that is resulting
+         * in an action being performed.
+         */
+        val LongPress
+            get() = PlatformHapticFeedbackType.LongPress
+
+        /**
+         * The user has performed a selection/insertion handle move on text field.
+         */
+        val TextHandleMove
+            get() = PlatformHapticFeedbackType.TextHandleMove
+
+        /** Returns a list of possible values of [HapticFeedbackType]. */
+        fun values(): List<HapticFeedbackType> = listOf(LongPress, TextHandleMove)
+    }
+}
+
+internal expect object PlatformHapticFeedbackType {
+    val LongPress: HapticFeedbackType
+    val TextHandleMove: HapticFeedbackType
 }

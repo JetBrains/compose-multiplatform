@@ -1,4 +1,12 @@
 // Baseline format: 1.0
+AddedAbstractMethod: androidx.compose.ui.hapticfeedback.HapticFeedback#performHapticFeedback-CdsT49E(int):
+    Added method androidx.compose.ui.hapticfeedback.HapticFeedback.performHapticFeedback-CdsT49E(int)
+
+
+ChangedSuperclass: androidx.compose.ui.hapticfeedback.HapticFeedbackType:
+    Class androidx.compose.ui.hapticfeedback.HapticFeedbackType superclass changed from java.lang.Enum to java.lang.Object
+
+
 ParameterNameChange: androidx.compose.ui.layout.Placeable#setMeasurementConstraints-BRTryo0(long) parameter #0:
     Attempted to change parameter name from p to value in method androidx.compose.ui.layout.Placeable.setMeasurementConstraints-BRTryo0
 
@@ -7,10 +15,18 @@ RemovedClass: androidx.compose.ui.input.pointer.RequestDisallowInterceptTouchEve
     Removed class androidx.compose.ui.input.pointer.RequestDisallowInterceptTouchEvent
 
 
+RemovedField: androidx.compose.ui.hapticfeedback.HapticFeedbackType#LongPress:
+    Removed enum constant androidx.compose.ui.hapticfeedback.HapticFeedbackType.LongPress
+RemovedField: androidx.compose.ui.hapticfeedback.HapticFeedbackType#TextHandleMove:
+    Removed enum constant androidx.compose.ui.hapticfeedback.HapticFeedbackType.TextHandleMove
+
+
 RemovedMethod: androidx.compose.ui.focus.FocusDirection#constructor-impl(int):
     Removed method androidx.compose.ui.focus.FocusDirection.constructor-impl(int)
 RemovedMethod: androidx.compose.ui.focus.FocusDirection#getValue():
     Removed method androidx.compose.ui.focus.FocusDirection.getValue()
+RemovedMethod: androidx.compose.ui.hapticfeedback.HapticFeedback#performHapticFeedback(androidx.compose.ui.hapticfeedback.HapticFeedbackType):
+    Removed method androidx.compose.ui.hapticfeedback.HapticFeedback.performHapticFeedback(androidx.compose.ui.hapticfeedback.HapticFeedbackType)
 RemovedMethod: androidx.compose.ui.input.key.KeyEventType#constructor-impl(int):
     Removed method androidx.compose.ui.input.key.KeyEventType.constructor-impl(int)
 RemovedMethod: androidx.compose.ui.input.key.KeyEventType#getValue():
