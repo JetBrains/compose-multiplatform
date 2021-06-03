@@ -96,6 +96,7 @@ internal fun LazyList(
         constraints.assertNotNestingScrollableContainers(isVertical)
 
         val itemsProvider = stateOfItemsProvider.value
+        state.updateScrollPositionIfTheFirstItemWasMoved(itemsProvider)
 
         // Update the state's cached Density
         state.density = Density(density, fontScale)

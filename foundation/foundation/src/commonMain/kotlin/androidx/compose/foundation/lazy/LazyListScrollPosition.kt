@@ -46,20 +46,55 @@ internal class LazyListScrollPosition(
 
     private var hadFirstNotEmptyLayout = false
 
-    fun update(measureResult: LazyListMeasureResult) {
-        val firstVisibleItemIndex = measureResult.firstVisibleItem.let {
-            if (it != null) it.index else 0
-        }
+    /** The last know key of the item at [index] position. */
+    private var lastKnownFirstItemKey: Any? = null
+
+    /**
+     * Updates the current scroll position based on the results of the last measurement.
+     */
+    fun updateFromMeasureResult(measureResult: LazyListMeasureResult) {
+        lastKnownFirstItemKey = measureResult.firstVisibleItem?.key
         // we ignore the index and offset from measureResult until we get at least one
         // measurement with real items. otherwise the initial index and scroll passed to the
         // state would be lost and overridden with zeros.
         if (hadFirstNotEmptyLayout || measureResult.totalItemsCount > 0) {
             hadFirstNotEmptyLayout = true
-            update(DataIndex(firstVisibleItemIndex), measureResult.firstVisibleItemScrollOffset)
+            update(
+                DataIndex(measureResult.firstVisibleItem?.index ?: 0),
+                measureResult.firstVisibleItemScrollOffset
+            )
         }
     }
 
-    fun update(index: DataIndex, scrollOffset: Int) {
+    /**
+     * Updates the scroll position - the passed values will be used as a start position for
+     * composing the items during the next measure pass and will be updated by the real
+     * position calculated during the measurement. This means that there is guarantee that
+     * exactly this index and offset will be applied as it is possible that:
+     * a) there will no item at this index in reality
+     * b) item at this index will be smaller than the asked scrollOffset, which means we would
+     * switch to the next item
+     * c) there will be not enough items to fill the viewport after the requested index, so we
+     * would have to compose few elements before the asked index, changing the first visible item.
+     */
+    fun requestPosition(index: DataIndex, scrollOffset: Int) {
+        update(index, scrollOffset)
+        // clear the stored key as we have a direct request to scroll to [index] position and the
+        // next [checkIfFirstVisibleItemWasMoved] shouldn't override this.
+        lastKnownFirstItemKey = null
+    }
+
+    /**
+     * In addition to keeping the first visible item index we also store the key of this item.
+     * When the user provided custom keys for the items this mechanism allows us to detect when
+     * there were items added or removed before our current first visible item and keep this item
+     * as the first visible one even given that its index has been changed.
+     */
+    fun updateScrollPositionIfTheFirstItemWasMoved(itemsProvider: LazyListItemsProvider) {
+        update(findLazyListIndexByKey(lastKnownFirstItemKey, index, itemsProvider), scrollOffset)
+    }
+
+    private fun update(index: DataIndex, scrollOffset: Int) {
         require(index.value >= 0f) { "Index should be non-negative (${index.value})" }
         require(scrollOffset >= 0f) { "scrollOffset should be non-negative ($scrollOffset)" }
         if (index != this.index) {
@@ -69,6 +104,48 @@ internal class LazyListScrollPosition(
         if (scrollOffset != this.scrollOffset) {
             this.scrollOffset = scrollOffset
             scrollOffsetState.value = scrollOffset
+        }
+    }
+
+    private companion object {
+        /**
+         * Finds a position of the item with the given key in the lists. This logic allows us to
+         * detect when there were items added or removed before our current first item.
+         */
+        private fun findLazyListIndexByKey(
+            key: Any?,
+            lastKnownIndex: DataIndex,
+            itemsProvider: LazyListItemsProvider
+        ): DataIndex {
+            if (key == null) {
+                // there were no real item during the previous measure
+                return lastKnownIndex
+            }
+            val totalCount = itemsProvider.itemsCount
+            if (lastKnownIndex.value < totalCount &&
+                key == itemsProvider.getKey(lastKnownIndex.value)
+            ) {
+                // this item is still at the same index
+                return lastKnownIndex
+            }
+            // lets try to find where this item was moved
+            var before = minOf(totalCount - 1, lastKnownIndex.value - 1)
+            var after = lastKnownIndex.value + 1
+            while (before >= 0 || after < totalCount) {
+                if (before >= 0) {
+                    if (key == itemsProvider.getKey(before)) {
+                        return DataIndex(before)
+                    }
+                    before--
+                }
+                if (after < totalCount) {
+                    if (key == itemsProvider.getKey(after)) {
+                        return DataIndex(after)
+                    }
+                    after++
+                }
+            }
+            return lastKnownIndex
         }
     }
 }
