@@ -19,24 +19,15 @@ package androidx.build.dependencies
 import androidx.build.OperatingSystem
 import androidx.build.getOperatingSystem
 
-const val ANDROIDX_TEST_VERSION = "1.3.0"
+const val ANDROIDX_TEST_VERSION = "1.4.0-beta01"
 const val ANDROIDX_TEST_CORE = "androidx.test:core:$ANDROIDX_TEST_VERSION"
-const val ANDROIDX_TEST_EXT_JUNIT = "androidx.test.ext:junit:1.1.2"
-const val ANDROIDX_TEST_EXT_KTX = "androidx.test.ext:junit-ktx:1.1.2"
+const val ANDROIDX_TEST_EXT_JUNIT = "androidx.test.ext:junit:1.1.3-beta01"
+const val ANDROIDX_TEST_EXT_KTX = "androidx.test.ext:junit-ktx:1.1.3-beta01"
 const val ANDROIDX_TEST_EXT_TRUTH = "androidx.test.ext:truth:$ANDROIDX_TEST_VERSION"
 const val ANDROIDX_TEST_MONITOR = "androidx.test:monitor:$ANDROIDX_TEST_VERSION"
 const val ANDROIDX_TEST_RULES = "androidx.test:rules:$ANDROIDX_TEST_VERSION"
 const val ANDROIDX_TEST_RUNNER = "androidx.test:runner:$ANDROIDX_TEST_VERSION"
 const val ANDROIDX_TEST_UIAUTOMATOR = "androidx.test.uiautomator:uiautomator:2.2.0"
-
-// Remove ANDROIDX_TEST_*_LATEST once ANDROIDX_TEST_* upgrades to the next stable release
-// after 1.3.0, and replace all usages of ANDROIDX_TEST_*_LATEST with ANDROIDX_TEST_*
-const val ANDROIDX_TEST_LATEST_VERSION = "1.4.0-alpha06"
-const val ANDROIDX_TEST_CORE_LATEST = "androidx.test:core:$ANDROIDX_TEST_LATEST_VERSION"
-const val ANDROIDX_TEST_EXT_TRUTH_LATEST = "androidx.test.ext:truth:$ANDROIDX_TEST_LATEST_VERSION"
-const val ANDROIDX_TEST_MONITOR_LATEST = "androidx.test:monitor:$ANDROIDX_TEST_LATEST_VERSION"
-const val ANDROIDX_TEST_RULES_LATEST = "androidx.test:rules:$ANDROIDX_TEST_LATEST_VERSION"
-const val ANDROIDX_TEST_RUNNER_LATEST = "androidx.test:runner:$ANDROIDX_TEST_LATEST_VERSION"
 
 const val AUTO_COMMON = "com.google.auto:auto-common:0.11"
 const val AUTO_SERVICE_ANNOTATIONS = "com.google.auto.service:auto-service-annotations:1.0-rc6"
