@@ -2071,7 +2071,7 @@ class CompositionTests {
             }
         }
 
-        fun MockViewValidator.numbers(numbers: List<Int>) {
+        fun MockViewValidator.validateNumbers(numbers: List<Int>) {
             Linear {
                 Linear {
                     for (number in numbers) {
@@ -2081,17 +2081,17 @@ class CompositionTests {
             }
         }
 
-        fun MockViewValidator.item(number: Int, numbers: List<Int>) {
+        fun MockViewValidator.validateItem(number: Int, numbers: List<Int>) {
             Linear {
                 Text("$number")
-                numbers(numbers)
+                validateNumbers(numbers)
             }
         }
 
         fun MockViewValidator.Test() {
             Linear {
                 for ((number, numbers) in items) {
-                    item(number, numbers)
+                    validateItem(number, numbers)
                 }
             }
         }
