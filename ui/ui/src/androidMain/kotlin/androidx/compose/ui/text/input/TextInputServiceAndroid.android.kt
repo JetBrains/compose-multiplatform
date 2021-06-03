@@ -302,9 +302,6 @@ internal fun EditorInfo.update(imeOptions: ImeOptions, textFieldValue: TextField
 
     if (hasFlag(this.inputType, InputType.TYPE_CLASS_TEXT)) {
         when (imeOptions.capitalization) {
-            KeyboardCapitalization.None -> {
-                /* do nothing */
-            }
             KeyboardCapitalization.Characters -> {
                 this.inputType = this.inputType or InputType.TYPE_TEXT_FLAG_CAP_CHARACTERS
             }
@@ -313,6 +310,9 @@ internal fun EditorInfo.update(imeOptions: ImeOptions, textFieldValue: TextField
             }
             KeyboardCapitalization.Sentences -> {
                 this.inputType = this.inputType or InputType.TYPE_TEXT_FLAG_CAP_SENTENCES
+            }
+            else -> {
+                /* do nothing */
             }
         }
 

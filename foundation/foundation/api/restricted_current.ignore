@@ -1,7 +1,15 @@
 // Baseline format: 1.0
+InvalidNullConversion: Field KeyboardOptions.capitalization:
+    Attempted to remove @NonNull annotation from Field KeyboardOptions.capitalization
+
+
 RemovedMethod: androidx.compose.foundation.text.BasicTextKt#BasicText(String, androidx.compose.ui.Modifier, androidx.compose.ui.text.TextStyle, kotlin.jvm.functions.Function1<? super androidx.compose.ui.text.TextLayoutResult,kotlin.Unit>, androidx.compose.ui.text.style.TextOverflow, boolean, int):
     Removed method androidx.compose.foundation.text.BasicTextKt.BasicText(String,androidx.compose.ui.Modifier,androidx.compose.ui.text.TextStyle,kotlin.jvm.functions.Function1<? super androidx.compose.ui.text.TextLayoutResult,kotlin.Unit>,androidx.compose.ui.text.style.TextOverflow,boolean,int)
 RemovedMethod: androidx.compose.foundation.text.BasicTextKt#BasicText(androidx.compose.ui.text.AnnotatedString, androidx.compose.ui.Modifier, androidx.compose.ui.text.TextStyle, kotlin.jvm.functions.Function1<? super androidx.compose.ui.text.TextLayoutResult,kotlin.Unit>, androidx.compose.ui.text.style.TextOverflow, boolean, int, java.util.Map<java.lang.String,androidx.compose.foundation.text.InlineTextContent>):
     Removed method androidx.compose.foundation.text.BasicTextKt.BasicText(androidx.compose.ui.text.AnnotatedString,androidx.compose.ui.Modifier,androidx.compose.ui.text.TextStyle,kotlin.jvm.functions.Function1<? super androidx.compose.ui.text.TextLayoutResult,kotlin.Unit>,androidx.compose.ui.text.style.TextOverflow,boolean,int,java.util.Map<java.lang.String,androidx.compose.foundation.text.InlineTextContent>)
 RemovedMethod: androidx.compose.foundation.text.ClickableTextKt#ClickableText(androidx.compose.ui.text.AnnotatedString, androidx.compose.ui.Modifier, androidx.compose.ui.text.TextStyle, boolean, androidx.compose.ui.text.style.TextOverflow, int, kotlin.jvm.functions.Function1<? super androidx.compose.ui.text.TextLayoutResult,kotlin.Unit>, kotlin.jvm.functions.Function1<? super java.lang.Integer,kotlin.Unit>):
     Removed method androidx.compose.foundation.text.ClickableTextKt.ClickableText(androidx.compose.ui.text.AnnotatedString,androidx.compose.ui.Modifier,androidx.compose.ui.text.TextStyle,boolean,androidx.compose.ui.text.style.TextOverflow,int,kotlin.jvm.functions.Function1<? super androidx.compose.ui.text.TextLayoutResult,kotlin.Unit>,kotlin.jvm.functions.Function1<? super java.lang.Integer,kotlin.Unit>)
+RemovedMethod: androidx.compose.foundation.text.KeyboardOptions#copy-C1cpEnM(androidx.compose.ui.text.input.KeyboardCapitalization, boolean, int, int):
+    Removed method androidx.compose.foundation.text.KeyboardOptions.copy-C1cpEnM(androidx.compose.ui.text.input.KeyboardCapitalization,boolean,int,int)
+RemovedMethod: androidx.compose.foundation.text.KeyboardOptions#getCapitalization():
+    Removed method androidx.compose.foundation.text.KeyboardOptions.getCapitalization()

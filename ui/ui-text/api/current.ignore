@@ -5,12 +5,16 @@ AddedAbstractMethod: androidx.compose.ui.text.font.Font#getStyle-_-LCdwA():
 
 ChangedSuperclass: androidx.compose.ui.text.font.FontStyle:
     Class androidx.compose.ui.text.font.FontStyle superclass changed from java.lang.Enum to java.lang.Object
+ChangedSuperclass: androidx.compose.ui.text.input.KeyboardCapitalization:
+    Class androidx.compose.ui.text.input.KeyboardCapitalization superclass changed from java.lang.Enum to java.lang.Object
 ChangedSuperclass: androidx.compose.ui.text.style.TextOverflow:
     Class androidx.compose.ui.text.style.TextOverflow superclass changed from java.lang.Enum to java.lang.Object
 
 
 InvalidNullConversion: Field Font.style:
     Attempted to remove @NonNull annotation from Field Font.style
+InvalidNullConversion: Field ImeOptions.capitalization:
+    Attempted to remove @NonNull annotation from Field ImeOptions.capitalization
 InvalidNullConversion: Field ResourceFont.style:
     Attempted to remove @NonNull annotation from Field ResourceFont.style
 InvalidNullConversion: Field TextLayoutInput.overflow:
@@ -21,6 +25,14 @@ RemovedField: androidx.compose.ui.text.font.FontStyle#Italic:
     Removed enum constant androidx.compose.ui.text.font.FontStyle.Italic
 RemovedField: androidx.compose.ui.text.font.FontStyle#Normal:
     Removed enum constant androidx.compose.ui.text.font.FontStyle.Normal
+RemovedField: androidx.compose.ui.text.input.KeyboardCapitalization#Characters:
+    Removed enum constant androidx.compose.ui.text.input.KeyboardCapitalization.Characters
+RemovedField: androidx.compose.ui.text.input.KeyboardCapitalization#None:
+    Removed enum constant androidx.compose.ui.text.input.KeyboardCapitalization.None
+RemovedField: androidx.compose.ui.text.input.KeyboardCapitalization#Sentences:
+    Removed enum constant androidx.compose.ui.text.input.KeyboardCapitalization.Sentences
+RemovedField: androidx.compose.ui.text.input.KeyboardCapitalization#Words:
+    Removed enum constant androidx.compose.ui.text.input.KeyboardCapitalization.Words
 RemovedField: androidx.compose.ui.text.style.TextOverflow#Clip:
     Removed enum constant androidx.compose.ui.text.style.TextOverflow.Clip
 RemovedField: androidx.compose.ui.text.style.TextOverflow#Ellipsis:
@@ -53,5 +65,9 @@ RemovedMethod: androidx.compose.ui.text.input.ImeAction#constructor-impl(int):
     Removed method androidx.compose.ui.text.input.ImeAction.constructor-impl(int)
 RemovedMethod: androidx.compose.ui.text.input.ImeAction#getValue():
     Removed method androidx.compose.ui.text.input.ImeAction.getValue()
+RemovedMethod: androidx.compose.ui.text.input.ImeOptions#copy-TWIFjAI(boolean, androidx.compose.ui.text.input.KeyboardCapitalization, boolean, int, int):
+    Removed method androidx.compose.ui.text.input.ImeOptions.copy-TWIFjAI(boolean,androidx.compose.ui.text.input.KeyboardCapitalization,boolean,int,int)
+RemovedMethod: androidx.compose.ui.text.input.ImeOptions#getCapitalization():
+    Removed method androidx.compose.ui.text.input.ImeOptions.getCapitalization()
 RemovedMethod: androidx.compose.ui.text.input.KeyboardType#constructor-impl(int):
     Removed method androidx.compose.ui.text.input.KeyboardType.constructor-impl(int)
