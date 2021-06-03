@@ -87,9 +87,14 @@ internal class LazyListItemContentFactory(
      * Return cached item content lambda or creates a new lambda and puts it in the cache.
      */
     fun getContent(index: Int, key: Any): @Composable () -> Unit {
-        val cachedContent = lambdasCache.getOrPut(key) { CachedItemContent(index, itemScope, key) }
-        cachedContent.index = index
-        return cachedContent.content
+        val cachedContent = lambdasCache[key]
+        return if (cachedContent != null && cachedContent.index == index) {
+            cachedContent.content
+        } else {
+            val newContent = CachedItemContent(index, itemScope, key)
+            lambdasCache[key] = newContent
+            newContent.content
+        }
     }
 
     private inner class CachedItemContent(
