@@ -108,7 +108,7 @@ fun CustomFocusOrderDemo() {
 @Composable
 private fun FocusableText(text: String, modifier: Modifier = Modifier) {
     var color by remember { mutableStateOf(Black) }
-    val focusRequester = FocusRequester()
+    val focusRequester = remember { FocusRequester() }
     Text(
         modifier = modifier
             .border(width = 1.dp, color = Black)

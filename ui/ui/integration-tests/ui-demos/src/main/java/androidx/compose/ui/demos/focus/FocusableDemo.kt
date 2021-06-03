@@ -59,7 +59,7 @@ fun FocusableDemo() {
 @Composable
 private fun FocusableText(text: String) {
     var color by remember { mutableStateOf(Black) }
-    val focusRequester = FocusRequester()
+    val focusRequester = remember { FocusRequester() }
     Text(
         modifier = Modifier
             .focusRequester(focusRequester)

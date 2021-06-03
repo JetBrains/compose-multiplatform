@@ -54,7 +54,7 @@ fun ReuseFocusRequesterDemo() {
         )
 
         // Shared focus requester.
-        val focusRequester = FocusRequester()
+        val focusRequester = remember { FocusRequester() }
 
         var shape by remember { mutableStateOf(CurrentShape.Square) }
         when (shape) {
