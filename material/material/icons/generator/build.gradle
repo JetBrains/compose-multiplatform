@@ -14,13 +14,11 @@
  * limitations under the License.
  */
 
+
 import androidx.build.LibraryGroups
 import androidx.build.LibraryType
-import androidx.build.LibraryVersions
 import androidx.build.Publish
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
-
-import static androidx.build.dependencies.DependenciesKt.*
 
 plugins {
     id("AndroidXPlugin")
@@ -30,16 +28,16 @@ plugins {
 dependencies {
     implementation(gradleApi())
 
-    implementation(AGP_LATEST)
-    implementation(GUAVA)
-    implementation(KOTLIN_GRADLE_PLUGIN)
-    implementation(KOTLIN_STDLIB)
-    implementation(KOTLINPOET)
-    implementation(XMLPULL)
-    implementation(XPP3)
+    implementation(libs.androidGradlePlugin)
+    implementation(libs.guava)
+    implementation(libs.kotlinGradlePlugin)
+    implementation(libs.kotlinStdlib)
+    implementation(libs.kotlinPoet)
+    implementation(libs.xmlpull)
+    implementation(libs.xpp3)
 
-    testImplementation(JUNIT)
-    testImplementation(TRUTH)
+    testImplementation(libs.junit)
+    testImplementation(libs.truth)
 }
 
 androidx {
