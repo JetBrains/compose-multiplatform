@@ -26,11 +26,17 @@ import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.IntrinsicSize
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.requiredHeight
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.requiredWidth
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.material.Divider
 import androidx.compose.material.Icon
 import androidx.compose.material.LocalContentAlpha
 import androidx.compose.material.LocalContentColor
@@ -1102,12 +1108,70 @@ class TextFieldTest {
             .assert(SemanticsMatcher.expectValue(SemanticsProperties.Error, errorMessage))
     }
 
-    private val View.isSoftwareKeyboardShown: Boolean
-        get() {
-            val inputMethodManager =
-                context.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
-            // TODO(b/163742556): This is just a proxy for software keyboard visibility. Find a better
-            //  way to check if the software keyboard is shown.
-            return inputMethodManager.isAcceptingText()
+    @Test
+    fun testTextField_doesNotCrash_rowHeightWithMinIntrinsics() {
+        var textFieldSize: IntSize? = null
+        var dividerSize: IntSize? = null
+        rule.setMaterialContent {
+            val text = remember { mutableStateOf("") }
+            Box {
+                Row(Modifier.height(IntrinsicSize.Min)) {
+                    Divider(
+                        modifier = Modifier
+                            .fillMaxHeight()
+                            .width(10.dp)
+                            .onGloballyPositioned { dividerSize = it.size }
+                    )
+                    TextField(
+                        value = text.value,
+                        label = { Text(text = "Label") },
+                        onValueChange = { text.value = it },
+                        modifier = Modifier.onGloballyPositioned { textFieldSize = it.size }
+                    )
+                }
+            }
         }
+
+        assertThat(dividerSize).isNotNull()
+        assertThat(textFieldSize).isNotNull()
+        assertThat(dividerSize!!.height).isEqualTo(textFieldSize!!.height)
+    }
+
+    @Test
+    fun testTextField_doesNotCrash_columnWidthWithMinIntrinsics() {
+        var textFieldSize: IntSize? = null
+        var dividerSize: IntSize? = null
+        rule.setMaterialContent {
+            val text = remember { mutableStateOf("") }
+            Box {
+                Column(Modifier.width(IntrinsicSize.Min)) {
+                    Divider(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(10.dp)
+                            .onGloballyPositioned { dividerSize = it.size }
+                    )
+                    TextField(
+                        value = text.value,
+                        label = { Text(text = "Label") },
+                        onValueChange = { text.value = it },
+                        modifier = Modifier.onGloballyPositioned { textFieldSize = it.size }
+                    )
+                }
+            }
+        }
+
+        assertThat(dividerSize).isNotNull()
+        assertThat(textFieldSize).isNotNull()
+        assertThat(dividerSize!!.width).isEqualTo(textFieldSize!!.width)
+    }
 }
+
+private val View.isSoftwareKeyboardShown: Boolean
+    get() {
+        val inputMethodManager =
+            context.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
+        // TODO(b/163742556): This is just a proxy for software keyboard visibility. Find a better
+        //  way to check if the software keyboard is shown.
+        return inputMethodManager.isAcceptingText()
+    }
