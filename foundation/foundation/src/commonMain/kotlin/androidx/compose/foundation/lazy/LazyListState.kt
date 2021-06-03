@@ -123,9 +123,9 @@ class LazyListState constructor(
     internal val firstVisibleItemScrollOffsetNonObservable: Int get() = scrollPosition.scrollOffset
 
     /**
-     * Non-observable way of getting the last visible item index.
+     * Non-observable property with the count of items being visible during the last measure pass.
      */
-    internal var lastVisibleItemIndexNonObservable: DataIndex = DataIndex(0)
+    internal var visibleItemsCount = 0
 
     /**
      * Needed for [animateScrollToItem].  Updated on every measure.
@@ -182,7 +182,7 @@ class LazyListState constructor(
     }
 
     internal fun snapToItemIndexInternal(index: Int, scrollOffset: Int) {
-        scrollPosition.update(DataIndex(index), scrollOffset)
+        scrollPosition.requestPosition(DataIndex(index), scrollOffset)
         remeasurement.forceRemeasure()
     }
 
@@ -271,10 +271,8 @@ class LazyListState constructor(
      *  Updates the state with the new calculated scroll position and consumed scroll.
      */
     internal fun applyMeasureResult(result: LazyListMeasureResult) {
-        scrollPosition.update(result)
-        lastVisibleItemIndexNonObservable = DataIndex(
-            result.visibleItemsInfo.lastOrNull()?.index ?: 0
-        )
+        visibleItemsCount = result.visibleItemsInfo.size
+        scrollPosition.updateFromMeasureResult(result)
         scrollToBeConsumed -= result.consumedScroll
         layoutInfoState.value = result
 
@@ -283,6 +281,15 @@ class LazyListState constructor(
             result.firstVisibleItemScrollOffset != 0
 
         numMeasurePasses++
+    }
+
+    /**
+     * When the user provided custom keys for the items we can try to detect when there were
+     * items added or removed before our current first visible item and keep this item
+     * as the first visible one even given that its index has been changed.
+     */
+    internal fun updateScrollPositionIfTheFirstItemWasMoved(itemsProvider: LazyListItemsProvider) {
+        scrollPosition.updateScrollPositionIfTheFirstItemWasMoved(itemsProvider)
     }
 
     companion object {

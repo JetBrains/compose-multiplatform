@@ -73,10 +73,12 @@ internal class LazyListItemContentFactory(
         val itemsProvider = itemsProvider.value
         val itemsCount = itemsProvider.itemsCount
         if (itemsCount > 0) {
+            state.updateScrollPositionIfTheFirstItemWasMoved(itemsProvider)
             val firstVisible = state.firstVisibleItemIndexNonObservable.value
-            val lastVisible = state.lastVisibleItemIndexNonObservable.value
-            for (i in firstVisible..minOf(itemsCount - 1, lastVisible)) {
-                lambdasCache[itemsProvider.getKey(i)]?.index = i
+            val count = state.visibleItemsCount
+            for (i in firstVisible until minOf(itemsCount, firstVisible + count)) {
+                val key = itemsProvider.getKey(i)
+                lambdasCache[key]?.index = i
             }
         }
     }
