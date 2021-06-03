@@ -361,13 +361,12 @@ fun Footer(
 
 @Composable
 fun Hr(
-    attrs: AttrBuilderContext<Tag.Hr> = {},
-    content: ContentBuilder<HTMLHRElement>? = null
+    attrs: AttrBuilderContext<Tag.Hr> = {}
 ) {
     TagElement<Tag.Hr, HTMLHRElement>(
         tagName = "hr", 
         applyAttrs = attrs, 
-        content = content
+        content = null
     )
 }
 
