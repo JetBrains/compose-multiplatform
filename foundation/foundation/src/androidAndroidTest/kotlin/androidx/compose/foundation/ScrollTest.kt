@@ -42,6 +42,12 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.RectangleShape
+import androidx.compose.ui.layout.IntrinsicMeasurable
+import androidx.compose.ui.layout.IntrinsicMeasureScope
+import androidx.compose.ui.layout.Layout
+import androidx.compose.ui.layout.Measurable
+import androidx.compose.ui.layout.MeasurePolicy
+import androidx.compose.ui.layout.MeasureScope
 import androidx.compose.ui.platform.InspectableValue
 import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.platform.isDebugInspectorInfoEnabled
@@ -64,6 +70,7 @@ import androidx.compose.ui.test.swipeDown
 import androidx.compose.ui.test.swipeLeft
 import androidx.compose.ui.test.swipeRight
 import androidx.compose.ui.test.swipeUp
+import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.LayoutDirection
@@ -940,6 +947,55 @@ class ScrollTest {
                 horizontalPadding = 0.dp,
                 verticalPadding = 20.dp
             )
+    }
+
+    @Test
+    fun intrinsicMeasurements() = with(rule.density) {
+        rule.setContent {
+            Layout(
+                content = {
+                    Layout(
+                        {},
+                        Modifier.verticalScroll(rememberScrollState())
+                            .horizontalScroll(rememberScrollState()),
+                        object : MeasurePolicy {
+                            override fun MeasureScope.measure(
+                                measurables: List<Measurable>,
+                                constraints: Constraints,
+                            ) = layout(0, 0) {}
+
+                            override fun IntrinsicMeasureScope.minIntrinsicWidth(
+                                measurables: List<IntrinsicMeasurable>,
+                                height: Int,
+                            ) = 10.dp.roundToPx()
+
+                            override fun IntrinsicMeasureScope.minIntrinsicHeight(
+                                measurables: List<IntrinsicMeasurable>,
+                                width: Int,
+                            ) = 20.dp.roundToPx()
+
+                            override fun IntrinsicMeasureScope.maxIntrinsicWidth(
+                                measurables: List<IntrinsicMeasurable>,
+                                height: Int,
+                            ) = 30.dp.roundToPx()
+
+                            override fun IntrinsicMeasureScope.maxIntrinsicHeight(
+                                measurables: List<IntrinsicMeasurable>,
+                                width: Int,
+                            ) = 40.dp.roundToPx()
+                        }
+                    )
+                }
+            ) { measurables, _ ->
+                val measurable = measurables.first()
+                assertEquals(10.dp.roundToPx(), measurable.minIntrinsicWidth(Constraints.Infinity))
+                assertEquals(20.dp.roundToPx(), measurable.minIntrinsicHeight(Constraints.Infinity))
+                assertEquals(30.dp.roundToPx(), measurable.maxIntrinsicWidth(Constraints.Infinity))
+                assertEquals(40.dp.roundToPx(), measurable.maxIntrinsicHeight(Constraints.Infinity))
+                layout(0, 0) {}
+            }
+        }
+        rule.waitForIdle()
     }
 
     private fun Modifier.drawOutsideOfBounds() = drawBehind {
