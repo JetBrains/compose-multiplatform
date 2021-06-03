@@ -12,6 +12,7 @@ interface Tag {
     object Option : Tag
     object OptGroup : Tag
     object H : Tag
+    object Hr : Tag
     object Ul : Tag
     object Ol : Tag
     object Li : Tag
