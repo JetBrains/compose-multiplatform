@@ -62,7 +62,7 @@ private fun LanguageButton() {
                     property("padding-left", value(8.px))
                     property("padding-right", value(8.px))
                 }
-            }) {}
+            })
             Text("English")
         }
     }

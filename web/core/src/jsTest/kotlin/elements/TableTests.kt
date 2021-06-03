@@ -25,11 +25,9 @@ class TableTests {
     @Test
     fun colAttributes() = runTest {
         composition {
-            Col(
-                {
-                    span(2)
-                }
-            ) { }
+            Col {
+                span(2)
+            }
         }
 
         assertEquals(
@@ -46,9 +44,9 @@ class TableTests {
                     Text("CaptionText")
                 }
                 Colgroup {
-                    Col { }
-                    Col { }
-                    Col { }
+                    Col()
+                    Col()
+                    Col()
                 }
                 Thead {
                     Tr {
