@@ -38,7 +38,7 @@ import androidx.compose.ui.unit.dp
 
 @OptIn(ExperimentalAnimationApi::class)
 @Composable
-fun AnimatedVisibilityContentSizeChangeDemo() {
+fun InspectionAnimatedVisibilityContentSizeChange() {
     Column {
         val isOpen = remember { mutableStateOf(true) }
         val itemListState = remember { mutableStateOf(listOf(1)) }

@@ -134,7 +134,7 @@ private class MyModel {
     }
 }
 
-private val turquoiseColors = listOf(
+internal val turquoiseColors = listOf(
     Color(0xff07688C),
     Color(0xff1986AF),
     Color(0xff50B6CD),

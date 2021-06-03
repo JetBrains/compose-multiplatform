@@ -76,6 +76,8 @@ fun <T> updateTransition(
     return transition
 }
 
+internal const val AnimationDebugDurationScale = 1
+
 /**
  * MutableTransitionState contains two fields: [currentState] and [targetState]. [currentState] is
  * initialized to the provided initialState, and can only be mutated by a [Transition].
@@ -381,7 +383,7 @@ class Transition<S> @PublishedApi internal constructor(
                 LaunchedEffect(this) {
                     while (true) {
                         withFrameNanos {
-                            onFrame(it)
+                            onFrame(it / AnimationDebugDurationScale)
                         }
                     }
                 }
@@ -523,7 +525,16 @@ class Transition<S> @PublishedApi internal constructor(
     private class SegmentImpl<S>(
         override val initialState: S,
         override val targetState: S
-    ) : Segment<S>
+    ) : Segment<S> {
+        override fun equals(other: Any?): Boolean {
+            return other is Segment<*> && initialState == other.initialState &&
+                targetState == other.targetState
+        }
+
+        override fun hashCode(): Int {
+            return initialState.hashCode() * 31 + targetState.hashCode()
+        }
+    }
 
     /**
      * [Segment] holds [initialState] and [targetState], which are the beginning and end of a
