@@ -324,13 +324,13 @@ package androidx.compose.ui.text {
   }
 
   public final class TextLayoutInput {
-    method public androidx.compose.ui.text.TextLayoutInput copy-ih31NyA(optional androidx.compose.ui.text.AnnotatedString text, optional androidx.compose.ui.text.TextStyle style, optional java.util.List<androidx.compose.ui.text.AnnotatedString.Range<androidx.compose.ui.text.Placeholder>> placeholders, optional int maxLines, optional boolean softWrap, optional androidx.compose.ui.text.style.TextOverflow overflow, optional androidx.compose.ui.unit.Density density, optional androidx.compose.ui.unit.LayoutDirection layoutDirection, optional androidx.compose.ui.text.font.Font.ResourceLoader resourceLoader, optional long constraints);
+    method public androidx.compose.ui.text.TextLayoutInput copy-ih31NyA(optional androidx.compose.ui.text.AnnotatedString text, optional androidx.compose.ui.text.TextStyle style, optional java.util.List<androidx.compose.ui.text.AnnotatedString.Range<androidx.compose.ui.text.Placeholder>> placeholders, optional int maxLines, optional boolean softWrap, optional int overflow, optional androidx.compose.ui.unit.Density density, optional androidx.compose.ui.unit.LayoutDirection layoutDirection, optional androidx.compose.ui.text.font.Font.ResourceLoader resourceLoader, optional long constraints);
     method public operator boolean equals(Object? other);
     method public long getConstraints-msEJaDk();
     method public androidx.compose.ui.unit.Density getDensity();
     method public androidx.compose.ui.unit.LayoutDirection getLayoutDirection();
     method public int getMaxLines();
-    method public androidx.compose.ui.text.style.TextOverflow getOverflow();
+    method public int getOverflow-gIe3tQ8();
     method public java.util.List<androidx.compose.ui.text.AnnotatedString.Range<androidx.compose.ui.text.Placeholder>> getPlaceholders();
     method public androidx.compose.ui.text.font.Font.ResourceLoader getResourceLoader();
     method public boolean getSoftWrap();
@@ -340,7 +340,7 @@ package androidx.compose.ui.text {
     property public final androidx.compose.ui.unit.Density density;
     property public final androidx.compose.ui.unit.LayoutDirection layoutDirection;
     property public final int maxLines;
-    property public final androidx.compose.ui.text.style.TextOverflow overflow;
+    property public final int overflow;
     property public final java.util.List<androidx.compose.ui.text.AnnotatedString.Range<androidx.compose.ui.text.Placeholder>> placeholders;
     property public final androidx.compose.ui.text.font.Font.ResourceLoader resourceLoader;
     property public final boolean softWrap;
@@ -1195,10 +1195,22 @@ package androidx.compose.ui.text.style {
     method public static androidx.compose.ui.text.style.TextIndent lerp(androidx.compose.ui.text.style.TextIndent start, androidx.compose.ui.text.style.TextIndent stop, float fraction);
   }
 
-  public enum TextOverflow {
-    enum_constant public static final androidx.compose.ui.text.style.TextOverflow Clip;
-    enum_constant public static final androidx.compose.ui.text.style.TextOverflow Ellipsis;
-    enum_constant public static final androidx.compose.ui.text.style.TextOverflow Visible;
+  public final inline class TextOverflow {
+    ctor public TextOverflow();
+    method public static inline boolean equals-impl(int p, Object? p1);
+    method public static boolean equals-impl0(int p1, int p2);
+    method public static inline int hashCode-impl(int p);
+    method public static String toString-impl(int $this);
+    field public static final androidx.compose.ui.text.style.TextOverflow.Companion Companion;
+  }
+
+  public static final class TextOverflow.Companion {
+    method public int getClip-gIe3tQ8();
+    method public int getEllipsis-gIe3tQ8();
+    method public int getVisible-gIe3tQ8();
+    property public final int Clip;
+    property public final int Ellipsis;
+    property public final int Visible;
   }
 
 }
