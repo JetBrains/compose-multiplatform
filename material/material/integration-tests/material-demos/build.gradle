@@ -12,7 +12,6 @@ dependencies {
     kotlinPlugin(project(":compose:compiler:compiler"))
     implementation(KOTLIN_STDLIB)
 
-    implementation(project(":compose:androidview:androidview"))
     implementation(project(":compose:foundation:foundation"))
     implementation(project(":compose:foundation:foundation-layout"))
     implementation(project(":compose:integration-tests:demos:common"))

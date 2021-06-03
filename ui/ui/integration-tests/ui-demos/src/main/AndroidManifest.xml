@@ -14,4 +14,32 @@
   ~ limitations under the License
   -->
 
-<manifest package="androidx.compose.ui.demos"/>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    package="androidx.compose.ui.demos">
+    <application>
+        <activity
+            android:name=".viewinterop.ComposeNothingInAndroidTap"
+            android:configChanges="orientation|screenSize"
+            android:label="ComposeNothingInAndroidTap Activity" />
+        <activity
+            android:name=".viewinterop.ComposeTapInAndroidTap"
+            android:configChanges="orientation|screenSize"
+            android:label="ComposeTapInAndroidTap Activity" />
+        <activity
+            android:name=".viewinterop.ComposeTapInAndroidScroll"
+            android:configChanges="orientation|screenSize"
+            android:label="ComposeTapInAndroidScroll Activity" />
+        <activity
+            android:name=".viewinterop.ComposeScrollInAndroidScrollSameOrientation"
+            android:configChanges="orientation|screenSize"
+            android:label="ComposeScrollInAndroidScrollSameOrientation Activity" />
+        <activity
+            android:name=".viewinterop.ComposeScrollInAndroidScrollDifferentOrientation"
+            android:configChanges="orientation|screenSize"
+            android:label="ComposeScrollInAndroidScrollDifferentOrientation Activity" />
+        <activity
+            android:name=".viewinterop.ComposeInAndroidDialogDismissDialogDuringDispatch"
+            android:configChanges="orientation|screenSize"
+            android:label="Dialog" />
+    </application>
+</manifest>

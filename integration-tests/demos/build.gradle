@@ -10,7 +10,6 @@ plugins {
 dependencies {
     kotlinPlugin(project(":compose:compiler:compiler"))
 
-    implementation(project(":compose:androidview:androidview:integration-tests:androidview-demos"))
     implementation(project(":compose:animation:animation:integration-tests:animation-demos"))
     implementation(project(":compose:foundation:foundation-layout:integration-tests:foundation-layout-demos"))
     implementation(project(":compose:foundation:foundation:integration-tests:foundation-demos"))
@@ -21,7 +20,6 @@ dependencies {
     implementation(KOTLIN_REFLECT)
     implementation(KOTLIN_STDLIB)
 
-    implementation(project(":compose:androidview:androidview"))
     implementation(project(":compose:foundation:foundation"))
     implementation(project(":compose:foundation:foundation-layout"))
     implementation(project(":compose:integration-tests:demos:common"))
