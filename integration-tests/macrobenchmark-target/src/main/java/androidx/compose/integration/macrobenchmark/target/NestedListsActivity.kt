@@ -1,5 +1,5 @@
 /*
- * Copyright 2020 The Android Open Source Project
+ * Copyright 2021 The Android Open Source Project
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,37 +17,44 @@
 package androidx.compose.integration.macrobenchmark.target
 
 import android.os.Bundle
-import android.view.Choreographer
-import android.view.View
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.Card
-import androidx.compose.material.Checkbox
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.Recomposer
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.dp
 
-class LazyColumnActivity : ComponentActivity() {
+class NestedListsActivity : ComponentActivity() {
+    @OptIn(ExperimentalStdlibApi::class)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
         val itemCount = intent.getIntExtra(EXTRA_ITEM_COUNT, 3000)
+        val items = List(itemCount) { entryIndex ->
+            NestedListEntry(
+                buildList {
+                    repeat(10) {
+                        add("${entryIndex}x$it")
+                    }
+                }
+            )
+        }
 
         setContent {
             LazyColumn(
                 modifier = Modifier.fillMaxWidth().semantics { contentDescription = "IamLazy" }
             ) {
-                items(List(itemCount) { Entry("Item $it") }) {
+                items(items) {
                     ListRow(it)
                 }
             }
@@ -61,37 +68,16 @@ class LazyColumnActivity : ComponentActivity() {
     }
 }
 
-internal fun ComponentActivity.launchIdlenessTracking() {
-    val contentView: View = findViewById(android.R.id.content)
-    val callback: Choreographer.FrameCallback = object : Choreographer.FrameCallback {
-        override fun doFrame(frameTimeNanos: Long) {
-            if (Recomposer.runningRecomposers.value.any { it.hasPendingWork }) {
-                contentView.contentDescription = "COMPOSE-BUSY"
-            } else {
-                contentView.contentDescription = "COMPOSE-IDLE"
-            }
-            Choreographer.getInstance().postFrameCallback(this)
-        }
-    }
-    Choreographer.getInstance().postFrameCallback(callback)
-}
-
 @Composable
-private fun ListRow(entry: Entry) {
-    Card(modifier = Modifier.padding(8.dp)) {
-        Row {
-            Text(
-                text = entry.contents,
-                modifier = Modifier.padding(16.dp)
-            )
-            Spacer(modifier = Modifier.weight(1f, fill = true))
-            Checkbox(
-                checked = false,
-                onCheckedChange = {},
-                modifier = Modifier.padding(16.dp)
-            )
+private fun ListRow(entry: NestedListEntry) {
+    LazyRow(contentPadding = PaddingValues(16.dp)) {
+        items(entry.list) {
+            Card(Modifier.size(108.dp)) {
+                Text(text = it)
+            }
+            Spacer(Modifier.size(16.dp))
         }
     }
 }
 
-data class Entry(val contents: String)
+data class NestedListEntry(val list: List<String>)
