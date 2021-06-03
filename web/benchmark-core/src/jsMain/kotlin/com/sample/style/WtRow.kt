@@ -22,7 +22,7 @@ object WtRows : StyleSheet(AppStylesheet) {
             "margin-left",
             value("calc(-1*${AppCSSVariables.wtHorizontalLayoutGutter.value()})")
         )
-        property("box-sizing", StylePropertyValue("border-box"))
+        property("box-sizing", "border-box".asStylePropertyValue())
     }
     
     val wtRowSizeM by style {

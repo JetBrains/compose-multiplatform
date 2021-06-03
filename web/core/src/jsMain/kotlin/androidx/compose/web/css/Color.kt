@@ -1,7 +1,7 @@
 package org.jetbrains.compose.web.css
 
 abstract class Color : CustomStyleValue {
-    override fun styleValue(): StylePropertyValue = StylePropertyValue(toString())
+    override fun styleValue(): StylePropertyValue = toString().asStylePropertyValue()
 
     data class Named(val value: String) : Color() {
         override fun toString(): String = value

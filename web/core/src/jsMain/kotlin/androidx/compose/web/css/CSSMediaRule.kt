@@ -125,13 +125,13 @@ fun <TBuilder> GenericStyleSheetBuilder<TBuilder>.not(
 ) = CSSMediaQuery.Not(query)
 
 fun <TBuilder> GenericStyleSheetBuilder<TBuilder>.minWidth(value: CSSSizeValue) =
-    CSSMediaQuery.MediaFeature("min-width", StylePropertyValue(value))
+    CSSMediaQuery.MediaFeature("min-width", value.asStylePropertyValue())
 
 fun <TBuilder> GenericStyleSheetBuilder<TBuilder>.maxWidth(value: CSSSizeValue) =
-    CSSMediaQuery.MediaFeature("max-width", StylePropertyValue(value))
+    CSSMediaQuery.MediaFeature("max-width", value.asStylePropertyValue())
 
 fun <TBuilder> GenericStyleSheetBuilder<TBuilder>.minHeight(value: CSSSizeValue) =
-    CSSMediaQuery.MediaFeature("min-height", StylePropertyValue(value))
+    CSSMediaQuery.MediaFeature("min-height", value.asStylePropertyValue())
 
 fun <TBuilder> GenericStyleSheetBuilder<TBuilder>.maxHeight(value: CSSSizeValue) =
-    CSSMediaQuery.MediaFeature("max-height", StylePropertyValue(value))
+    CSSMediaQuery.MediaFeature("max-height", value.asStylePropertyValue())

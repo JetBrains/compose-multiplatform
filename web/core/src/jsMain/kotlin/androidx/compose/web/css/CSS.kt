@@ -343,17 +343,11 @@ fun StylePropertyMapReadOnly.forEach(handler: (String, Array<CSSStyleValue>) -> 
 }
 
 // CSSStyleValue | string
-interface StylePropertyValue {
-    companion object {
-        operator fun invoke(value: String) = value.unsafeCast<StylePropertyValue>()
-        operator fun invoke(value: Number) = value.unsafeCast<StylePropertyValue>()
-        operator fun invoke(value: CSSStyleValue) = value.unsafeCast<StylePropertyValue>()
-    }
-}
+interface StylePropertyValue
 
-fun StylePropertyValue.asString() = this.asDynamic() as? String
-fun StylePropertyValue.asNumber() = this.asDynamic() as? Number
-fun StylePropertyValue.asCSSStyleValue(): CSSStyleValue? = this.asDynamic() as? CSSStyleValueJS
+fun String.asStylePropertyValue() = unsafeCast<StylePropertyValue>()
+fun Number.asStylePropertyValue() = unsafeCast<StylePropertyValue>()
+fun CSSStyleValue.asStylePropertyValue() = unsafeCast<StylePropertyValue>()
 
 external class StylePropertyMap : StylePropertyMapReadOnly {
     fun set(property: String, vararg values: StylePropertyValue)

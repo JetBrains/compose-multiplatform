@@ -5,15 +5,15 @@ fun StyleBuilder.opacity(value: Number) {
 }
 
 fun StyleBuilder.order(value: Int) {
-    property("order", StylePropertyValue(value))
+    property("order", value.asStylePropertyValue())
 }
 
 fun StyleBuilder.flexGrow(value: Number) {
-    property("flex-grow", StylePropertyValue(value))
+    property("flex-grow", value.asStylePropertyValue())
 }
 
 fun StyleBuilder.flexShrink(value: Number) {
-    property("flex-shrink", StylePropertyValue(value))
+    property("flex-shrink", value.asStylePropertyValue())
 }
 
 fun StyleBuilder.opacity(value: CSSpercentValue) {
@@ -194,11 +194,11 @@ class CSSBorder : CustomStyleValue {
     var color: StylePropertyValue? = null
 
     fun width(size: CSSSizeValue) {
-        width = StylePropertyValue(size)
+        width = size.asStylePropertyValue()
     }
 
     fun style(style: LineStyle) {
-        this.style = StylePropertyValue(style.name)
+        this.style = style.name.asStylePropertyValue()
     }
 
     fun color(color: Color) {
@@ -217,7 +217,7 @@ class CSSBorder : CustomStyleValue {
 
     override fun styleValue(): StylePropertyValue {
         val values = listOfNotNull(width, style, color)
-        return StylePropertyValue(values.joinToString(" "))
+        return values.joinToString(" ").asStylePropertyValue()
     }
 }
 
@@ -239,55 +239,55 @@ fun StyleBuilder.border(
 }
 
 fun StyleBuilder.display(displayStyle: DisplayStyle) {
-    property("display", StylePropertyValue(displayStyle.value))
+    property("display", displayStyle.value.asStylePropertyValue())
 }
 
 fun StyleBuilder.flexDirection(flexDirection: FlexDirection) {
-    property("flex-direction", StylePropertyValue(flexDirection.value))
+    property("flex-direction", flexDirection.value.asStylePropertyValue())
 }
 
 fun StyleBuilder.flexWrap(flexWrap: FlexWrap) {
-    property("flex-wrap", StylePropertyValue(flexWrap.value))
+    property("flex-wrap", flexWrap.value.asStylePropertyValue())
 }
 
 fun StyleBuilder.flexFlow(flexDirection: FlexDirection, flexWrap: FlexWrap) {
     property(
         "flex-flow",
-        StylePropertyValue("${flexDirection.value} ${flexWrap.value}")
+        "${flexDirection.value} ${flexWrap.value}".asStylePropertyValue()
     )
 }
 
 fun StyleBuilder.justifyContent(justifyContent: JustifyContent) {
     property(
         "justify-content",
-        StylePropertyValue(justifyContent.value)
+        justifyContent.value.asStylePropertyValue()
     )
 }
 fun StyleBuilder.alignSelf(alignSelf: AlignSelf) {
     property(
         "align-self",
-        StylePropertyValue(alignSelf.value)
+        alignSelf.value.asStylePropertyValue()
     )
 }
 
 fun StyleBuilder.alignItems(alignItems: AlignItems) {
     property(
         "align-items",
-        StylePropertyValue(alignItems.value)
+        alignItems.value.asStylePropertyValue()
     )
 }
 
 fun StyleBuilder.alignContent(alignContent: AlignContent) {
     property(
         "align-content",
-        StylePropertyValue(alignContent.value)
+        alignContent.value.asStylePropertyValue()
     )
 }
 
 fun StyleBuilder.position(position: Position) {
     property(
         "position",
-        StylePropertyValue(position.value)
+        position.value.asStylePropertyValue()
     )
 }
 
@@ -296,11 +296,11 @@ fun StyleBuilder.width(value: CSSSizeOrAutoValue) {
 }
 
 fun StyleBuilder.borderRadius(r: CSSSizeValue) {
-    property("border-radius", StylePropertyValue(r.toString()))
+    property("border-radius", r.toString().asStylePropertyValue())
 }
 
 fun StyleBuilder.borderRadius(topLeft: CSSSizeValue, bottomRight: CSSSizeValue) {
-    property("border-radius", StylePropertyValue("$topLeft $bottomRight"))
+    property("border-radius", "$topLeft $bottomRight".asStylePropertyValue())
 }
 
 fun StyleBuilder.borderRadius(
@@ -308,7 +308,7 @@ fun StyleBuilder.borderRadius(
     topRightAndBottomLeft: CSSSizeValue,
     bottomRight: CSSSizeValue
 ) {
-    property("border-radius", StylePropertyValue("$topLeft $topRightAndBottomLeft $bottomRight"))
+    property("border-radius", "$topLeft $topRightAndBottomLeft $bottomRight".asStylePropertyValue())
 }
 
 fun StyleBuilder.borderRadius(
@@ -317,7 +317,7 @@ fun StyleBuilder.borderRadius(
     bottomRight: CSSSizeValue,
     bottomLeft: CSSSizeValue
 ) {
-    property("border-radius", StylePropertyValue("$topLeft $topRight $bottomRight $bottomLeft"))
+    property("border-radius", "$topLeft $topRight $bottomRight $bottomLeft".asStylePropertyValue())
 }
 
 fun StyleBuilder.width(value: CSSSizeValue) {

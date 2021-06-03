@@ -3,7 +3,7 @@ package org.jetbrains.compose.web.css
 
 interface CSSAutoValue : CSSStyleValue
 
-val auto = StylePropertyValue("auto").unsafeCast<CSSAutoValue>()
+val auto = "auto".unsafeCast<CSSAutoValue>()
 
 // type CSSSizeOrAutoValue = CSSSizeValue | CSSAutoValue
 interface CSSSizeOrAutoValue : CSSStyleValue, StylePropertyValue {
@@ -12,8 +12,6 @@ interface CSSSizeOrAutoValue : CSSStyleValue, StylePropertyValue {
         operator fun invoke(value: CSSAutoValue) = value.unsafeCast<CSSSizeOrAutoValue>()
     }
 }
-
-fun CSSSizeOrAutoValue.asCSSSizeValue() = this.asDynamic() as? CSSUnitValueJS
 
 enum class Direction {
     rtl,
