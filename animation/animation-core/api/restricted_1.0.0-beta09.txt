@@ -483,18 +483,13 @@ package androidx.compose.animation.core {
     property public androidx.compose.animation.core.TwoWayConverter<T,V> typeConverter;
   }
 
-  public final class Transition<S> {
+  @androidx.compose.runtime.Stable public final class Transition<S> {
     ctor @kotlin.PublishedApi internal Transition(androidx.compose.animation.core.MutableTransitionState<S> transitionState, optional String? label);
-    method @kotlin.PublishedApi internal boolean addAnimation(androidx.compose.animation.core.Transition<S>.TransitionAnimationState<?,?> animation);
-    method @kotlin.PublishedApi internal boolean addTransition(androidx.compose.animation.core.Transition<?> transition);
     method public S! getCurrentState();
     method public String? getLabel();
     method public androidx.compose.animation.core.Transition.Segment<S> getSegment();
     method public S! getTargetState();
     method public boolean isRunning();
-    method @kotlin.PublishedApi internal void removeAnimation(androidx.compose.animation.core.Transition<S>.TransitionAnimationState<?,?> animation);
-    method @kotlin.PublishedApi internal boolean removeTransition(androidx.compose.animation.core.Transition<?> transition);
-    method @androidx.compose.runtime.Composable @kotlin.PublishedApi internal void updateTarget(S? targetState);
     property public final S! currentState;
     property public final boolean isRunning;
     property public final String? label;
@@ -521,6 +516,8 @@ package androidx.compose.animation.core {
     method @androidx.compose.runtime.Composable public static inline <S> androidx.compose.runtime.State<androidx.compose.ui.geometry.Rect> animateRect(androidx.compose.animation.core.Transition<S>, optional kotlin.jvm.functions.Function1<? super androidx.compose.animation.core.Transition.Segment<S>,? extends androidx.compose.animation.core.FiniteAnimationSpec<androidx.compose.ui.geometry.Rect>> transitionSpec, optional String label, kotlin.jvm.functions.Function1<? super S,androidx.compose.ui.geometry.Rect> targetValueByState);
     method @androidx.compose.runtime.Composable public static inline <S> androidx.compose.runtime.State<androidx.compose.ui.geometry.Size> animateSize(androidx.compose.animation.core.Transition<S>, optional kotlin.jvm.functions.Function1<? super androidx.compose.animation.core.Transition.Segment<S>,? extends androidx.compose.animation.core.FiniteAnimationSpec<androidx.compose.ui.geometry.Size>> transitionSpec, optional String label, kotlin.jvm.functions.Function1<? super S,androidx.compose.ui.geometry.Size> targetValueByState);
     method @androidx.compose.runtime.Composable public static inline <S, T, V extends androidx.compose.animation.core.AnimationVector> androidx.compose.runtime.State<T> animateValue(androidx.compose.animation.core.Transition<S>, androidx.compose.animation.core.TwoWayConverter<T,V> typeConverter, optional kotlin.jvm.functions.Function1<? super androidx.compose.animation.core.Transition.Segment<S>,? extends androidx.compose.animation.core.FiniteAnimationSpec<T>> transitionSpec, optional String label, kotlin.jvm.functions.Function1<? super S,? extends T> targetValueByState);
+    method @androidx.compose.runtime.Composable @kotlin.PublishedApi internal static <S, T> androidx.compose.animation.core.Transition<T> createChildTransitionInternal(androidx.compose.animation.core.Transition<S>, T? initialState, T? targetState, String label);
+    method @androidx.compose.runtime.Composable @kotlin.PublishedApi internal static <S, T, V extends androidx.compose.animation.core.AnimationVector> androidx.compose.runtime.State<T> createTransitionAnimation(androidx.compose.animation.core.Transition<S>, T? initialValue, T? targetValue, androidx.compose.animation.core.FiniteAnimationSpec<T> animationSpec, androidx.compose.animation.core.TwoWayConverter<T,V> typeConverter, String label);
     method @androidx.compose.runtime.Composable public static <T> androidx.compose.animation.core.Transition<T> updateTransition(T? targetState, optional String? label);
     method @androidx.compose.runtime.Composable public static <T> androidx.compose.animation.core.Transition<T> updateTransition(androidx.compose.animation.core.MutableTransitionState<T> transitionState, optional String? label);
   }
