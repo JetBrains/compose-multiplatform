@@ -18,8 +18,10 @@ package androidx.compose.foundation.lazy
 
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.size
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
@@ -202,6 +204,33 @@ class LazyCustomKeysTest {
                 Item(remember { "${it.id}" })
             }
         }
+    }
+
+    @Test
+    fun updatingTheDataSetIsCorrectlyApplied() {
+        val state = mutableStateOf(emptyList<Int>())
+
+        rule.setContent {
+            LaunchedEffect(Unit) {
+                state.value = listOf(4, 1, 3)
+            }
+
+            val list = state.value
+
+            LazyColumn(Modifier.fillMaxSize()) {
+                items(list, key = { it }) {
+                    Item(it.toString())
+                }
+            }
+        }
+
+        assertItems("4", "1", "3")
+
+        rule.runOnIdle {
+            state.value = listOf(2, 4, 6, 1, 3, 5)
+        }
+
+        assertItems("2", "4", "6", "1", "3", "5")
     }
 
     @Test
