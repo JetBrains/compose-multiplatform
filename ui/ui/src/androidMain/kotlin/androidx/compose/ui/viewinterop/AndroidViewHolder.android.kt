@@ -18,6 +18,7 @@ package androidx.compose.ui.viewinterop
 
 import android.content.Context
 import android.graphics.Rect
+import android.graphics.Region
 import android.os.Looper
 import android.view.View
 import android.view.ViewGroup
@@ -135,6 +136,8 @@ internal abstract class AndroidViewHolder(
 
     internal var onRequestDisallowInterceptTouchEvent: ((Boolean) -> Unit)? = null
 
+    private val location = IntArray(2)
+
     override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
         view?.measure(widthMeasureSpec, heightMeasureSpec)
         setMeasuredDimension(view?.measuredWidth ?: 0, view?.measuredHeight ?: 0)
@@ -180,6 +183,28 @@ internal abstract class AndroidViewHolder(
         // We need to call super here in order to correctly update the dirty flags of the holder.
         super.onDescendantInvalidated(child, target)
         layoutNode.invalidateLayer()
+    }
+
+    // Always mark the region of the View to not be transparent to disable an optimisation which
+    // would otherwise cause certain buggy drawing scenarios. For example, Compose drawing on top
+    // of SurfaceViews included in Compose would sometimes not be displayed, as the drawing is
+    // not done by Views, therefore the area is not known as non-transparent to the View system.
+    override fun gatherTransparentRegion(region: Region?): Boolean {
+        if (region == null) return true
+        getLocationInWindow(location)
+        region.op(
+            location[0],
+            location[1],
+            location[0] + width,
+            location[1] + height,
+            Region.Op.DIFFERENCE
+        )
+        return true
+    }
+
+    override fun requestTransparentRegion(child: View?) {
+        // We are not going to respect children's attempts for using transparent regions.
+        // See gatherTransparentRegion.
     }
 
     /**
