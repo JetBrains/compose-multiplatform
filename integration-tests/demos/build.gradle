@@ -32,7 +32,7 @@ dependencies {
     implementation("androidx.preference:preference-ktx:1.1.1")
 
     androidTestImplementation(project(":compose:ui:ui-test-junit4"))
-
+    androidTestImplementation(ANDROIDX_TEST_CORE)
     androidTestImplementation(ANDROIDX_TEST_RULES)
     androidTestImplementation(ANDROIDX_TEST_RUNNER)
     androidTestImplementation(ESPRESSO_CORE)
