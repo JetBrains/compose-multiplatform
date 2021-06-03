@@ -359,6 +359,18 @@ fun Footer(
 }
 
 @Composable
+fun Hr(
+    attrs: AttrBuilderContext<Tag.Hr> = {},
+    content: ContentBuilder<HTMLHRElement>? = null
+) {
+    TagElement<Tag.Hr, HTMLHRElement>(
+        tagName = "hr", 
+        applyAttrs = attrs, 
+        content = content
+    )
+}
+
+@Composable
 fun Label(
     forId: String? = null,
     attrs: AttrBuilderContext<Tag.Label> = {},
