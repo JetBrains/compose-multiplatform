@@ -283,7 +283,9 @@ private suspend fun <R, T, V : AnimationVector> Animation<T, V>.callWithFrameNan
     return if (isInfinite) {
         withInfiniteAnimationFrameNanos(onFrame)
     } else {
-        withFrameNanos(onFrame)
+        withFrameNanos {
+            onFrame.invoke(it / AnimationDebugDurationScale)
+        }
     }
 }
 
