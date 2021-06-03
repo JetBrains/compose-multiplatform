@@ -48,6 +48,7 @@ dependencies {
 
         implementation(project(":compose:animation:animation-core"))
         implementation(project(":compose:runtime:runtime-saveable"))
+        implementation(project(":activity:activity-compose"))
         implementation("androidx.annotation:annotation:1.1.0")
         implementation("androidx.lifecycle:lifecycle-common:2.3.0")
         implementation("androidx.lifecycle:lifecycle-runtime:2.3.0")
@@ -101,6 +102,7 @@ if(AndroidXUiPlugin.isMultiplatformEnabled(project)) {
 
             androidMain.dependencies {
                 api("androidx.activity:activity:1.2.0")
+                implementation project(":activity:activity-compose")
                 api(ANDROIDX_TEST_EXT_JUNIT)
 
                 implementation(project(":compose:animation:animation-core"))
