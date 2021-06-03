@@ -158,19 +158,15 @@ internal class TextFieldDelegate {
             if (!hasFocus) {
                 return
             }
-
+            val focusOffsetInTransformed = offsetMapping.originalToTransformed(value.selection.max)
             val bbox = when {
-                value.selection.max < value.text.length -> {
-                    textLayoutResult.getBoundingBox(
-                        offsetMapping.originalToTransformed(value.selection.max)
-                    )
+                focusOffsetInTransformed < textLayoutResult.layoutInput.text.length -> {
+                    textLayoutResult.getBoundingBox(focusOffsetInTransformed)
                 }
-                value.selection.max != 0 -> {
-                    textLayoutResult.getBoundingBox(
-                        offsetMapping.originalToTransformed(value.selection.max) - 1
-                    )
+                focusOffsetInTransformed != 0 -> {
+                    textLayoutResult.getBoundingBox(focusOffsetInTransformed - 1)
                 }
-                else -> {
+                else -> { // empty text.
                     val defaultSize = computeSizeForDefaultText(
                         textDelegate.style,
                         textDelegate.density,
