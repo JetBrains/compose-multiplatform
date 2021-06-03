@@ -218,6 +218,7 @@ class AffectedModuleDetectorImpl constructor(
     private val ignoreUnknownProjects: Boolean = false,
     private val cobuiltTestPaths: Set<Set<String>> = COBUILT_TEST_PATHS,
     private val alwaysBuildIfExistsPaths: Set<String> = ALWAYS_BUILD_IF_EXISTS,
+    private val ignoredPaths: Set<String> = IGNORED_PATHS,
     private val injectedGitClient: GitClient? = null,
     private val isPresubmit: Boolean = isPresubmitBuild(),
     private val baseCommitOverride: String? = null
@@ -251,6 +252,9 @@ class AffectedModuleDetectorImpl constructor(
     }
 
     private var unknownFiles: MutableSet<String> = mutableSetOf()
+
+    // Files tracked by git that are not expected to effect the build, thus require no consideration
+    private var ignoredFiles: MutableSet<String> = mutableSetOf()
 
     val buildAll by lazy {
         shouldBuildAll()
@@ -314,18 +318,29 @@ class AffectedModuleDetectorImpl constructor(
         val changedProjects: MutableSet<Project> = alwaysBuild.toMutableSet()
 
         for (filePath in changedFiles) {
-            val containingProject = findContainingProject(filePath)
-            if (containingProject == null) {
-                unknownFiles.add(filePath)
+            if (ignoredPaths.any {
+                filePath.startsWith(it)
+            }
+            ) {
+                ignoredFiles.add(filePath)
                 logger?.info(
-                    "Couldn't find containing project for file$filePath. Adding to unknownFiles."
+                    "Ignoring file: $filePath"
                 )
             } else {
-                changedProjects.add(containingProject)
-                logger?.info(
-                    "For file $filePath containing project is $containingProject. " +
-                        "Adding to changedProjects."
-                )
+                val containingProject = findContainingProject(filePath)
+                if (containingProject == null) {
+                    unknownFiles.add(filePath)
+                    logger?.info(
+                        "Couldn't find containing project for file: $filePath. Adding to " +
+                            "unknownFiles."
+                    )
+                } else {
+                    changedProjects.add(containingProject)
+                    logger?.info(
+                        "For file $filePath containing project is $containingProject. " +
+                            "Adding to changedProjects."
+                    )
+                }
             }
         }
 
@@ -354,8 +369,11 @@ class AffectedModuleDetectorImpl constructor(
     private fun shouldBuildAll(): Boolean {
 
         var shouldBuildAll = false
-        // Should only trigger if there are no changedFiles
-        if (changedProjects.size == alwaysBuild.size && unknownFiles.isEmpty()) {
+        // Should only trigger if there are no changedFiles and no ignored files
+        if (changedProjects.size == alwaysBuild.size &&
+            unknownFiles.isEmpty() &&
+            ignoredFiles.isEmpty()
+        ) {
             shouldBuildAll = true
         } else if (unknownFiles.isNotEmpty() && !isGithubInfraChange()) {
             shouldBuildAll = true
@@ -370,7 +388,7 @@ class AffectedModuleDetectorImpl constructor(
             if (unknownFiles.isEmpty()) {
                 logger?.info("because no changed files were detected")
             } else {
-                logger?.info("because one of the unknown files affects everything in the build")
+                logger?.info("because one of the unknown files may affect everything in the build")
                 logger?.info(
                     """
                     The modules detected as affected by changed files are
@@ -495,6 +513,11 @@ class AffectedModuleDetectorImpl constructor(
                 ":emoji2:integration-tests:init-enabled-macrobenchmark",
                 ":emoji2:integration-tests:init-enabled-macrobenchmark-target",
             ),
+        )
+
+        private val IGNORED_PATHS = setOf(
+            "docs/",
+            "development/"
         )
     }
 }
