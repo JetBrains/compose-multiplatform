@@ -36,7 +36,6 @@ import androidx.compose.ui.test.assertHeightIsEqualTo
 import androidx.compose.ui.test.assertIsEnabled
 import androidx.compose.ui.test.assertIsOff
 import androidx.compose.ui.test.assertIsOn
-import androidx.compose.ui.test.assertValueEquals
 import androidx.compose.ui.test.assertWidthIsEqualTo
 import androidx.compose.ui.test.isFocusable
 import androidx.compose.ui.test.isNotFocusable
@@ -81,12 +80,10 @@ class SwitchTest {
             .assert(SemanticsMatcher.expectValue(SemanticsProperties.Role, Role.Switch))
             .assertIsEnabled()
             .assertIsOn()
-            .assertValueEquals("On")
         rule.onNodeWithTag("unchecked")
             .assert(SemanticsMatcher.expectValue(SemanticsProperties.Role, Role.Switch))
             .assertIsEnabled()
             .assertIsOff()
-            .assertValueEquals("Off")
     }
 
     @Test

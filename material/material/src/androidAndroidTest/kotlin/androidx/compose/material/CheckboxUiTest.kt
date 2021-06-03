@@ -36,7 +36,6 @@ import androidx.compose.ui.test.assert
 import androidx.compose.ui.test.assertIsEnabled
 import androidx.compose.ui.test.assertIsOff
 import androidx.compose.ui.test.assertIsOn
-import androidx.compose.ui.test.assertValueEquals
 import androidx.compose.ui.test.isFocusable
 import androidx.compose.ui.test.isNotFocusable
 import androidx.compose.ui.test.junit4.createComposeRule
@@ -71,13 +70,11 @@ class CheckboxUiTest {
             .assert(SemanticsMatcher.expectValue(SemanticsProperties.Role, Role.Checkbox))
             .assertIsEnabled()
             .assertIsOff()
-            .assertValueEquals("Unchecked")
 
         rule.onNodeWithTag("checkboxChecked")
             .assert(SemanticsMatcher.expectValue(SemanticsProperties.Role, Role.Checkbox))
             .assertIsEnabled()
             .assertIsOn()
-            .assertValueEquals("Checked")
     }
 
     @Test
