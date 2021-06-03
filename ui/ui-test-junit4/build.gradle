@@ -41,7 +41,7 @@ dependencies {
     if(!AndroidXUiPlugin.isMultiplatformEnabled(project)) {
         api(project(":compose:ui:ui-test"))
         api("androidx.activity:activity:1.2.0")
-        api(ANDROIDX_TEST_EXT_JUNIT)
+        api("androidx.test.ext:junit:1.1.2")
         api(JUNIT)
         api(KOTLIN_STDLIB)
         api(KOTLIN_STDLIB_COMMON)
@@ -52,8 +52,8 @@ dependencies {
         implementation("androidx.annotation:annotation:1.1.0")
         implementation("androidx.lifecycle:lifecycle-common:2.3.0")
         implementation("androidx.lifecycle:lifecycle-runtime:2.3.0")
-        implementation(ANDROIDX_TEST_CORE)
-        implementation(ANDROIDX_TEST_MONITOR)
+        implementation("androidx.test:core:1.3.0")
+        implementation("androidx.test:monitor:1.3.0")
         implementation(ESPRESSO_CORE)
         implementation(ESPRESSO_IDLING_RESOURCE)
         implementation(KOTLIN_COROUTINES_CORE)
@@ -103,14 +103,14 @@ if(AndroidXUiPlugin.isMultiplatformEnabled(project)) {
             androidMain.dependencies {
                 api("androidx.activity:activity:1.2.0")
                 implementation project(":activity:activity-compose")
-                api(ANDROIDX_TEST_EXT_JUNIT)
+                api("androidx.test.ext:junit:1.1.2")
 
                 implementation(project(":compose:animation:animation-core"))
                 implementation(project(":compose:runtime:runtime-saveable"))
                 implementation("androidx.lifecycle:lifecycle-common:2.3.0")
                 implementation("androidx.lifecycle:lifecycle-runtime:2.3.0")
-                implementation(ANDROIDX_TEST_CORE)
-                implementation(ANDROIDX_TEST_MONITOR)
+                implementation("androidx.test:core:1.3.0")
+                implementation("androidx.test:monitor:1.3.0")
                 implementation(ESPRESSO_CORE)
                 implementation(ESPRESSO_IDLING_RESOURCE)
             }

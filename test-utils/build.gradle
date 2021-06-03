@@ -46,6 +46,7 @@ dependencies {
         implementation(projectOrArtifact(":compose:ui:ui-unit"))
         implementation(projectOrArtifact(":compose:ui:ui-graphics"))
         implementation(projectOrArtifact(":activity:activity-compose"))
+        implementation(ANDROIDX_TEST_CORE)
         implementation(ANDROIDX_TEST_RULES)
 
         // This has stub APIs for access to legacy Android APIs, so we don't want
@@ -83,6 +84,7 @@ if (AndroidXUiPlugin.isMultiplatformEnabled(project)) {
                 // This has stub APIs for access to legacy Android APIs, so we don't want
                 // any dependency on this module.
                 compileOnly(projectOrArtifact(":compose:ui:ui-android-stubs"))
+                implementation(ANDROIDX_TEST_CORE)
                 implementation(ANDROIDX_TEST_RULES)
             }
 
