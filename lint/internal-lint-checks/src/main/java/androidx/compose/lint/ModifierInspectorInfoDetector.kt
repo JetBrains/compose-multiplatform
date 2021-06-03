@@ -512,7 +512,9 @@ class ModifierInspectorInfoDetector : Detector(), SourceCodeScanner {
 
             override fun visitObjectLiteralExpression(node: UObjectLiteralExpression): Boolean {
                 if (node.valueArgumentCount == 1 &&
-                    node.declaration.superTypes.any { it.canonicalText == InspectorValueInfoClass }
+                    node.declaration.uastSuperTypes.any {
+                        it.getQualifiedName() == InspectorValueInfoClass
+                    }
                 ) {
                     node.valueArguments.first().accept(debugInspectorVisitor)
                     return true
