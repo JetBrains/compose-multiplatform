@@ -29,7 +29,6 @@ import androidx.compose.ui.test.ExperimentalTestApi
 import androidx.compose.ui.test.assertHeightIsEqualTo
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.assertRangeInfoEquals
-import androidx.compose.ui.test.assertValueEquals
 import androidx.compose.ui.test.assertWidthIsEqualTo
 import androidx.compose.ui.test.captureToImage
 import androidx.compose.ui.test.junit4.createComposeRule
@@ -66,7 +65,6 @@ class ProgressIndicatorTest {
 
         rule.onNodeWithTag(tag)
             .assertIsDisplayed()
-            .assertValueEquals("0 percent")
             .assertRangeInfoEquals(ProgressBarRangeInfo(0f, 0f..1f))
 
         rule.runOnUiThread {
@@ -75,7 +73,6 @@ class ProgressIndicatorTest {
 
         rule.onNodeWithTag(tag)
             .assertIsDisplayed()
-            .assertValueEquals("50 percent")
             .assertRangeInfoEquals(ProgressBarRangeInfo(0.5f, 0f..1f))
     }
 
@@ -101,7 +98,7 @@ class ProgressIndicatorTest {
         rule.mainClock.advanceTimeByFrame() // Kick off the animation
 
         rule.onNodeWithTag(tag)
-            .assertValueEquals("In progress")
+            .assertRangeInfoEquals(ProgressBarRangeInfo.Indeterminate)
     }
 
     @Test
@@ -133,7 +130,6 @@ class ProgressIndicatorTest {
 
         rule.onNodeWithTag(tag)
             .assertIsDisplayed()
-            .assertValueEquals("0 percent")
             .assertRangeInfoEquals(ProgressBarRangeInfo(0f, 0f..1f))
 
         rule.runOnUiThread {
@@ -142,7 +138,6 @@ class ProgressIndicatorTest {
 
         rule.onNodeWithTag(tag)
             .assertIsDisplayed()
-            .assertValueEquals("50 percent")
             .assertRangeInfoEquals(ProgressBarRangeInfo(0.5f, 0f..1f))
     }
 
@@ -167,7 +162,7 @@ class ProgressIndicatorTest {
         rule.mainClock.advanceTimeByFrame() // Kick off the animation
 
         rule.onNodeWithTag(tag)
-            .assertValueEquals("In progress")
+            .assertRangeInfoEquals(ProgressBarRangeInfo.Indeterminate)
     }
 
     @Test

@@ -19,7 +19,6 @@ package androidx.compose.foundation.selection
 import androidx.compose.foundation.Indication
 import androidx.compose.foundation.PressedInteractionSourceDisposableEffect
 import androidx.compose.foundation.LocalIndication
-import androidx.compose.foundation.Strings
 import androidx.compose.foundation.gestures.detectTapAndPress
 import androidx.compose.foundation.handlePressInteraction
 import androidx.compose.foundation.indication
@@ -37,12 +36,8 @@ import androidx.compose.ui.semantics.disabled
 import androidx.compose.ui.semantics.onClick
 import androidx.compose.ui.semantics.role
 import androidx.compose.ui.semantics.semantics
-import androidx.compose.ui.semantics.stateDescription
 import androidx.compose.ui.semantics.toggleableState
 import androidx.compose.ui.state.ToggleableState
-import androidx.compose.ui.state.ToggleableState.Indeterminate
-import androidx.compose.ui.state.ToggleableState.Off
-import androidx.compose.ui.state.ToggleableState.On
 
 /**
  * Configure component to make it toggleable via input and accessibility events
@@ -248,14 +243,9 @@ private fun Modifier.toggleableImpl(
         if (role != null) {
             this.role = role
         }
-        this.stateDescription = when (state) {
-            On -> if (role == Role.Switch) Strings.On else Strings.Checked
-            Off -> if (role == Role.Switch) Strings.Off else Strings.Unchecked
-            Indeterminate -> Strings.Indeterminate
-        }
         this.toggleableState = state
 
-        onClick(action = { onClick(); return@onClick true }, label = Strings.Toggle)
+        onClick(action = { onClick(); true })
         if (!enabled) {
             disabled()
         }
