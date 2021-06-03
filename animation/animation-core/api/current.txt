@@ -483,7 +483,7 @@ package androidx.compose.animation.core {
     property public androidx.compose.animation.core.TwoWayConverter<T,V> typeConverter;
   }
 
-  public final class Transition<S> {
+  @androidx.compose.runtime.Stable public final class Transition<S> {
     method public S! getCurrentState();
     method public String? getLabel();
     method public androidx.compose.animation.core.Transition.Segment<S> getSegment();
