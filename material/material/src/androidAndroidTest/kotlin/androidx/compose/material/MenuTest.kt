@@ -233,7 +233,7 @@ class MenuTest {
         val popupSize = IntSize(150, 500)
 
         // The min margin above and below the menu, relative to the screen.
-        val MenuVerticalMargin = 32.dp
+        val MenuVerticalMargin = 48.dp
         val verticalMargin = with(density) { MenuVerticalMargin.roundToPx() }
 
         val position = DropdownMenuPositionProvider(
