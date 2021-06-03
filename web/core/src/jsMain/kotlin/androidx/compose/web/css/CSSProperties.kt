@@ -291,10 +291,6 @@ fun StyleBuilder.position(position: Position) {
     )
 }
 
-fun StyleBuilder.width(value: CSSSizeOrAutoValue) {
-    property("width", value)
-}
-
 fun StyleBuilder.borderRadius(r: CSSSizeValue) {
     property("border-radius", r.toString().asStylePropertyValue())
 }
@@ -320,72 +316,28 @@ fun StyleBuilder.borderRadius(
     property("border-radius", "$topLeft $topRight $bottomRight $bottomLeft".asStylePropertyValue())
 }
 
-fun StyleBuilder.width(value: CSSSizeValue) {
-    width(CSSSizeOrAutoValue(value))
-}
-
-fun StyleBuilder.width(value: CSSAutoValue) {
-    width(CSSSizeOrAutoValue(value))
+fun StyleBuilder.width(value: CSSSizeOrAutoValue) {
+    property("width", value)
 }
 
 fun StyleBuilder.height(value: CSSSizeOrAutoValue) {
     property("height", value)
 }
 
-fun StyleBuilder.height(value: CSSSizeValue) {
-    height(CSSSizeOrAutoValue(value))
-}
-
-fun StyleBuilder.height(value: CSSAutoValue) {
-    height(CSSSizeOrAutoValue(value))
-}
-
 fun StyleBuilder.top(value: CSSSizeOrAutoValue) {
     property("top", value)
-}
-
-fun StyleBuilder.top(value: CSSSizeValue) {
-    top(CSSSizeOrAutoValue(value))
-}
-
-fun StyleBuilder.top(value: CSSAutoValue) {
-    top(CSSSizeOrAutoValue(value))
 }
 
 fun StyleBuilder.bottom(value: CSSSizeOrAutoValue) {
     property("bottom", value)
 }
 
-fun StyleBuilder.bottom(value: CSSSizeValue) {
-    bottom(CSSSizeOrAutoValue(value))
-}
-
-fun StyleBuilder.bottom(value: CSSAutoValue) {
-    bottom(CSSSizeOrAutoValue(value))
-}
-
 fun StyleBuilder.left(value: CSSSizeOrAutoValue) {
     property("left", value)
 }
 
-fun StyleBuilder.left(value: CSSSizeValue) {
-    left(CSSSizeOrAutoValue(value))
-}
-
-fun StyleBuilder.left(value: CSSAutoValue) {
-    left(CSSSizeOrAutoValue(value))
-}
-
 fun StyleBuilder.right(value: CSSSizeOrAutoValue) {
     property("right", value)
-}
-
-fun StyleBuilder.right(value: CSSSizeValue) {
-    right(CSSSizeOrAutoValue(value))
-}
-
-fun StyleBuilder.right(value: CSSAutoValue) {
-    right(CSSSizeOrAutoValue(value))
 }
 
 fun StyleBuilder.fontSize(value: CSSSizeValue) {

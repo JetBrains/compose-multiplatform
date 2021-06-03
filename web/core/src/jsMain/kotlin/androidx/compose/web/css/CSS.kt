@@ -343,7 +343,7 @@ fun StylePropertyMapReadOnly.forEach(handler: (String, Array<CSSStyleValue>) -> 
 }
 
 // CSSStyleValue | string
-interface StylePropertyValue
+external interface StylePropertyValue
 
 fun String.asStylePropertyValue() = unsafeCast<StylePropertyValue>()
 fun Number.asStylePropertyValue() = unsafeCast<StylePropertyValue>()

@@ -2,7 +2,7 @@
 
 package org.jetbrains.compose.web.css
 
-external interface CSSSizeValue : CSSUnitValue
+external interface CSSSizeValue : CSSUnitValue, CSSSizeOrAutoValue
 
 // fake interfaces to distinguish units
 external interface CSSRelValue : CSSSizeValue
