@@ -14,13 +14,12 @@
  * limitations under the License.
  */
 
-package androidx.compose.androidview.demos
+package androidx.compose.ui.demos.viewinterop
 
 import android.graphics.Color
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.compose.androidview.adapters.setOnClick
 import androidx.compose.foundation.background
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.horizontalScroll
@@ -44,6 +43,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.demos.R
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.input.pointer.pointerInteropFilter
@@ -90,16 +90,16 @@ private fun FourAndroidTapInCompose() {
                 LayoutInflater.from(context)
                     .inflate(R.layout.android_4_buttons_in_compose, null).let { view ->
                         view as ViewGroup
-                        view.findViewById<View>(R.id.buttonBlue).setOnClick {
+                        view.findViewById<View>(R.id.buttonBlue).setOnClickListener {
                             view.setBackgroundColor(Color.BLUE)
                         }
-                        view.findViewById<View>(R.id.buttonRed).setOnClick {
+                        view.findViewById<View>(R.id.buttonRed).setOnClickListener {
                             view.setBackgroundColor(Color.RED)
                         }
-                        view.findViewById<View>(R.id.buttonGreen).setOnClick {
+                        view.findViewById<View>(R.id.buttonGreen).setOnClickListener {
                             view.setBackgroundColor(Color.GREEN)
                         }
-                        view.findViewById<View>(R.id.buttonYellow).setOnClick {
+                        view.findViewById<View>(R.id.buttonYellow).setOnClickListener {
                             view.setBackgroundColor(Color.YELLOW)
                         }
                         view
@@ -143,7 +143,7 @@ private fun AndroidTapInComposeTap() {
                     .inflate(R.layout.android_tap_in_compose_tap, null).let { view ->
                         theView = view
                         theView?.setBackgroundColor(Color.GREEN)
-                        view.findViewById<View>(R.id.buttonRed).setOnClick {
+                        view.findViewById<View>(R.id.buttonRed).setOnClickListener {
                             theView?.setBackgroundColor(Color.RED)
                         }
                         view
@@ -174,25 +174,25 @@ private fun AndroidTapInComposeScroll() {
                         view.setBackgroundColor(Color.YELLOW)
                         view.findViewById<View>(R.id.buttonRed).apply {
                             isClickable = false
-                            setOnClick {
+                            setOnClickListener {
                                 view.setBackgroundColor(Color.RED)
                             }
                         }
                         view.findViewById<View>(R.id.buttonGreen).apply {
                             isClickable = false
-                            setOnClick {
+                            setOnClickListener {
                                 view.setBackgroundColor(Color.GREEN)
                             }
                         }
                         view.findViewById<View>(R.id.buttonBlue).apply {
                             isClickable = false
-                            setOnClick {
+                            setOnClickListener {
                                 view.setBackgroundColor(Color.BLUE)
                             }
                         }
                         view.findViewById<View>(R.id.buttonYellow).apply {
                             isClickable = false
-                            setOnClick {
+                            setOnClickListener {
                                 view.setBackgroundColor(Color.YELLOW)
                             }
                         }

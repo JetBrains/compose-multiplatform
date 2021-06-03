@@ -23,6 +23,9 @@ dependencies {
     implementation(project(":compose:ui:ui"))
     implementation(project(":compose:ui:ui-text"))
     implementation(project(":compose:ui:ui-viewbinding"))
+
+    implementation("androidx.fragment:fragment-ktx:1.2.5")
+    implementation("androidx.recyclerview:recyclerview:1.1.0")
 }
 
 android {

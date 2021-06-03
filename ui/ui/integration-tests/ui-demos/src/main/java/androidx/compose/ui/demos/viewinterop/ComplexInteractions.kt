@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package androidx.compose.androidview.demos
+package androidx.compose.ui.demos.viewinterop
 
 import android.view.ViewGroup
 import android.view.ViewGroup.LayoutParams.MATCH_PARENT
@@ -43,8 +43,6 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
 
-// TODO(b/158099918): Add this demo to AndroidViewDemos.kt once b/158099918 has been resolved.
-@Suppress("unused")
 val ComplexTouchInterop = DemoCategory(
     "Complex Touch Interop",
     listOf(
