@@ -260,6 +260,10 @@ fun AttrsBuilder<Tag.Select>.required(value: Boolean = true) =
 
 fun AttrsBuilder<Tag.Select>.size(numberOfRows: Int) =
     attr("size", numberOfRows.toString())
+    
+fun AttrsBuilder<Tag.Select>.value(value: String) {
+    attr("value", value)
+}
 
 /* OptGroup attributes */
 
