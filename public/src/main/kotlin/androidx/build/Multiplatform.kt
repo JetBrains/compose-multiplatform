@@ -24,10 +24,19 @@ import org.gradle.kotlin.dsl.extra
  */
 const val COMPOSE_MPP_ENABLED = "androidx.compose.multiplatformEnabled"
 
+/**
+ * Setting this property enables JS compiler tests of Compose
+ */
+const val COMPOSE_JS_COMPILER_TESTS_ENABLED = "androidx.compose.jsCompilerTestsEnabled"
+
 class Multiplatform {
     companion object {
         fun Project.isMultiplatformEnabled(): Boolean {
             return findProperty(COMPOSE_MPP_ENABLED)?.toString()?.toBoolean() ?: false
+        }
+
+        fun Project.isJsCompilerTestsEnabled(): Boolean {
+            return properties.get(COMPOSE_JS_COMPILER_TESTS_ENABLED)?.toString()?.toBoolean() ?: false
         }
 
         fun setEnabledForProject(project: Project, enabled: Boolean) {

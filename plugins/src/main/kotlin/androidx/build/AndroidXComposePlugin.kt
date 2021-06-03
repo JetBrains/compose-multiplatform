@@ -16,10 +16,18 @@
 
 package androidx.build
 
+import androidx.build.Multiplatform.Companion.isJsCompilerTestsEnabled
 import androidx.build.Multiplatform.Companion.isMultiplatformEnabled
 import kotlin.reflect.KFunction
 import org.gradle.api.Plugin
 import org.gradle.api.Project
+import org.gradle.api.attributes.Usage
+import org.gradle.api.tasks.testing.Test
+import org.gradle.kotlin.dsl.named
+import org.gradle.kotlin.dsl.withType
+import org.jetbrains.kotlin.gradle.plugin.KotlinPlatformType
+import org.jetbrains.kotlin.gradle.plugin.mpp.KotlinUsages
+import org.jetbrains.kotlin.gradle.targets.js.KotlinJsCompilerAttribute
 
 /**
  * Plugin to apply common configuration for Compose projects.
@@ -38,6 +46,48 @@ class AndroidXComposePlugin : Plugin<Project> {
         @JvmStatic
         fun isMultiplatformEnabled(project: Project): Boolean {
             return project.isMultiplatformEnabled()
+        }
+
+        @JvmStatic
+        fun isJsCompilerTestsEnabled(project: Project): Boolean {
+            return project.isJsCompilerTestsEnabled()
+        }
+
+        @JvmStatic
+        fun Project.configureJsCompilerIntegrationTests() {
+            if (!isMultiplatformEnabled() || !isJsCompilerTestsEnabled()) return
+
+            val jsClasspath = configurations.create("testJsRuntimeOnly") { conf ->
+                conf.isCanBeConsumed = false
+                conf.isCanBeResolved = true
+
+                conf.attributes {
+                    it.attribute(KotlinPlatformType.attribute, KotlinPlatformType.js)
+                    it.attribute(
+                        KotlinJsCompilerAttribute.jsCompilerAttribute,
+                        KotlinJsCompilerAttribute.ir)
+                    it.attribute(
+                        Usage.USAGE_ATTRIBUTE,
+                        objects.named(KotlinUsages.KOTLIN_RUNTIME)
+                    )
+                }
+            }
+
+            afterEvaluate {
+                val dependencies by lazy {
+                    jsClasspath.files { true }.joinToString(separator = ":")
+                }
+
+                tasks.withType<Test>().all { task ->
+                    // force dependency on compilation for klibs built from the source
+                    task.inputs.files(jsClasspath)
+                    // use system property to provide files path to the runtime
+                    task.systemProperty(
+                        "androidx.compose.js.classpath",
+                        dependencies
+                    )
+                }
+            }
         }
 
         @JvmOverloads
