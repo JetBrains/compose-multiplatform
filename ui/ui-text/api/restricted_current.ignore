@@ -5,18 +5,28 @@ AddedAbstractMethod: androidx.compose.ui.text.font.Font#getStyle-_-LCdwA():
 
 ChangedSuperclass: androidx.compose.ui.text.font.FontStyle:
     Class androidx.compose.ui.text.font.FontStyle superclass changed from java.lang.Enum to java.lang.Object
+ChangedSuperclass: androidx.compose.ui.text.style.TextOverflow:
+    Class androidx.compose.ui.text.style.TextOverflow superclass changed from java.lang.Enum to java.lang.Object
 
 
 InvalidNullConversion: Field Font.style:
     Attempted to remove @NonNull annotation from Field Font.style
 InvalidNullConversion: Field ResourceFont.style:
     Attempted to remove @NonNull annotation from Field ResourceFont.style
+InvalidNullConversion: Field TextLayoutInput.overflow:
+    Attempted to remove @NonNull annotation from Field TextLayoutInput.overflow
 
 
 RemovedField: androidx.compose.ui.text.font.FontStyle#Italic:
     Removed enum constant androidx.compose.ui.text.font.FontStyle.Italic
 RemovedField: androidx.compose.ui.text.font.FontStyle#Normal:
     Removed enum constant androidx.compose.ui.text.font.FontStyle.Normal
+RemovedField: androidx.compose.ui.text.style.TextOverflow#Clip:
+    Removed enum constant androidx.compose.ui.text.style.TextOverflow.Clip
+RemovedField: androidx.compose.ui.text.style.TextOverflow#Ellipsis:
+    Removed enum constant androidx.compose.ui.text.style.TextOverflow.Ellipsis
+RemovedField: androidx.compose.ui.text.style.TextOverflow#Visible:
+    Removed enum constant androidx.compose.ui.text.style.TextOverflow.Visible
 
 
 RemovedMethod: androidx.compose.ui.text.PlaceholderVerticalAlign#constructor-impl(int):
@@ -25,6 +35,10 @@ RemovedMethod: androidx.compose.ui.text.PlaceholderVerticalAlign#getValue():
     Removed method androidx.compose.ui.text.PlaceholderVerticalAlign.getValue()
 RemovedMethod: androidx.compose.ui.text.SpanStyle#getFontStyle():
     Removed method androidx.compose.ui.text.SpanStyle.getFontStyle()
+RemovedMethod: androidx.compose.ui.text.TextLayoutInput#copy-ih31NyA(androidx.compose.ui.text.AnnotatedString, androidx.compose.ui.text.TextStyle, java.util.List<androidx.compose.ui.text.AnnotatedString.Range<androidx.compose.ui.text.Placeholder>>, int, boolean, androidx.compose.ui.text.style.TextOverflow, androidx.compose.ui.unit.Density, androidx.compose.ui.unit.LayoutDirection, androidx.compose.ui.text.font.Font.ResourceLoader, long):
+    Removed method androidx.compose.ui.text.TextLayoutInput.copy-ih31NyA(androidx.compose.ui.text.AnnotatedString,androidx.compose.ui.text.TextStyle,java.util.List<androidx.compose.ui.text.AnnotatedString.Range<androidx.compose.ui.text.Placeholder>>,int,boolean,androidx.compose.ui.text.style.TextOverflow,androidx.compose.ui.unit.Density,androidx.compose.ui.unit.LayoutDirection,androidx.compose.ui.text.font.Font.ResourceLoader,long)
+RemovedMethod: androidx.compose.ui.text.TextLayoutInput#getOverflow():
+    Removed method androidx.compose.ui.text.TextLayoutInput.getOverflow()
 RemovedMethod: androidx.compose.ui.text.TextStyle#getFontStyle():
     Removed method androidx.compose.ui.text.TextStyle.getFontStyle()
 RemovedMethod: androidx.compose.ui.text.font.Font#getStyle():
