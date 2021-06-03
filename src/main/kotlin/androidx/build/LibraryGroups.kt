@@ -94,7 +94,6 @@ object LibraryGroups {
     val TRACING = LibraryGroup("androidx.tracing", LibraryVersions.TRACING)
     val TRANSITION = LibraryGroup("androidx.transition", LibraryVersions.TRANSITION)
     val TVPROVIDER = LibraryGroup("androidx.tvprovider", LibraryVersions.TVPROVIDER)
-    val UI = LibraryGroup(System.getenv("COMPOSE_CUSTOM_GROUP_UI") ?: "androidx.ui", LibraryVersions.COMPOSE)
     val VECTORDRAWABLE = LibraryGroup("androidx.vectordrawable", null)
     val VERSIONEDPARCELABLE = LibraryGroup("androidx.versionedparcelable", null)
     val VIEWPAGER = LibraryGroup("androidx.viewpager", LibraryVersions.VIEWPAGER)

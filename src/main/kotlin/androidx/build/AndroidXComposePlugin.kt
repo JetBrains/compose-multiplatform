@@ -36,9 +36,9 @@ const val composeSourceOption =
     "plugin:androidx.compose.compiler.plugins.kotlin:sourceInformation=true"
 
 /**
- * Plugin to apply options across all of the androidx.ui projects
+ * Plugin to apply common configuration for Compose projects.
  */
-class AndroidXUiPlugin : Plugin<Project> {
+class AndroidXComposePlugin : Plugin<Project> {
     override fun apply(project: Project) {
         project.plugins.all { plugin ->
             when (plugin) {
