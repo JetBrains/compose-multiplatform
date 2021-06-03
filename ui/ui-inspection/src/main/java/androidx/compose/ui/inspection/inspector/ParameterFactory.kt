@@ -192,9 +192,9 @@ internal class ParameterFactory(private val inlineClassConverter: InlineClassCon
         }
     }
 
-    fun clearCacheFor(rootId: Long) {
+    fun clearReferenceCache() {
         val creator = creatorCache ?: return
-        creator.clearCacheFor(rootId)
+        creator.clearReferenceCache()
     }
 
     private fun loadConstantsFrom(javaClass: Class<*>) {
@@ -384,8 +384,8 @@ internal class ParameterFactory(private val inlineClassConverter: InlineClassCon
             return parameter
         }
 
-        fun clearCacheFor(rootId: Long) {
-            rootValueIndexCache.remove(rootId)
+        fun clearReferenceCache() {
+            rootValueIndexCache.clear()
         }
 
         private fun setup(

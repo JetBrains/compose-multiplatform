@@ -959,7 +959,7 @@ class ParameterFactoryTest {
         maxRecursions: Int,
         maxInitialIterableSize: Int
     ) {
-        factory.clearCacheFor(ROOT_ID)
+        factory.clearReferenceCache()
         val reference = NodeParameterReference(NODE_ID, ParameterKind.Normal, PARAM_INDEX, indices)
         val expanded = expand(
             name,

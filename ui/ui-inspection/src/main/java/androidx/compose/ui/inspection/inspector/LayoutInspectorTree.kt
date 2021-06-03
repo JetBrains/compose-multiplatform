@@ -205,6 +205,7 @@ class LayoutInspectorTree {
     @Suppress("unused")
     fun resetAccumulativeState() {
         subCompositions.resetAccumulativeState()
+        parameterFactory.clearReferenceCache()
         // Reset the generated id. Nodes are assigned an id if there isn't a layout node id present.
         generatedId = -1L
     }
