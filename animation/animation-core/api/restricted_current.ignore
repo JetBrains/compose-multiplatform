@@ -3,5 +3,15 @@ ChangedClass: androidx.compose.animation.core.Transition.Segment:
     Class androidx.compose.animation.core.Transition.Segment changed class/interface declaration
 
 
+RemovedMethod: androidx.compose.animation.core.Transition#addAnimation(androidx.compose.animation.core.Transition<S>.TransitionAnimationState<?,?>):
+    Removed method androidx.compose.animation.core.Transition.addAnimation(androidx.compose.animation.core.Transition<S>.TransitionAnimationState<?,?>)
+RemovedMethod: androidx.compose.animation.core.Transition#addTransition(androidx.compose.animation.core.Transition<?>):
+    Removed method androidx.compose.animation.core.Transition.addTransition(androidx.compose.animation.core.Transition<?>)
+RemovedMethod: androidx.compose.animation.core.Transition#removeAnimation(androidx.compose.animation.core.Transition<S>.TransitionAnimationState<?,?>):
+    Removed method androidx.compose.animation.core.Transition.removeAnimation(androidx.compose.animation.core.Transition<S>.TransitionAnimationState<?,?>)
+RemovedMethod: androidx.compose.animation.core.Transition#removeTransition(androidx.compose.animation.core.Transition<?>):
+    Removed method androidx.compose.animation.core.Transition.removeTransition(androidx.compose.animation.core.Transition<?>)
+RemovedMethod: androidx.compose.animation.core.Transition#updateTarget(S):
+    Removed method androidx.compose.animation.core.Transition.updateTarget(S)
 RemovedMethod: androidx.compose.animation.core.Transition.Segment#Segment(S, S):
     Removed constructor androidx.compose.animation.core.Transition.Segment(S,S)
