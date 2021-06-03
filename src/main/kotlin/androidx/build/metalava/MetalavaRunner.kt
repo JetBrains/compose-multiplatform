@@ -307,7 +307,10 @@ fun getGenerateApiArgs(
             args += HIDE_EXPERIMENTAL_ARGS
         }
         is GenerateApiMode.ExperimentalApi -> {
-            // No additional args needed.
+            args += listOf(
+                "--hide-annotation", "androidx.annotation.RestrictTo"
+            )
+            args += listOf("--show-unannotated")
         }
     }
 
