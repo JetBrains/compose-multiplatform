@@ -21,7 +21,6 @@ import androidx.build.getDistributionDirectory
 import androidx.build.gitclient.GitClient
 import androidx.build.gitclient.GitClientImpl
 import androidx.build.gradle.isRoot
-import androidx.build.isPresubmitBuild
 import org.gradle.api.GradleException
 import org.gradle.api.Project
 import org.gradle.api.Task
@@ -219,7 +218,6 @@ class AffectedModuleDetectorImpl constructor(
     private val cobuiltTestPaths: Set<Set<String>> = COBUILT_TEST_PATHS,
     private val alwaysBuildIfExistsPaths: Set<String> = ALWAYS_BUILD_IF_EXISTS,
     private val injectedGitClient: GitClient? = null,
-    private val isPresubmit: Boolean = isPresubmitBuild(),
     private val baseCommitOverride: String? = null
 ) : AffectedModuleDetector(logger) {
     private val git by lazy {
@@ -284,11 +282,10 @@ class AffectedModuleDetectorImpl constructor(
             changedProjects.contains(project) -> {
                 ProjectSubset.CHANGED_PROJECTS
             }
-            dependentProjects.contains(project) ||
-                isPresubmit ||
-                buildContainsNonProjectFileChanges -> {
+            dependentProjects.contains(project) -> {
                 ProjectSubset.DEPENDENT_PROJECTS
             }
+            // projects that are only included because of buildAll
             else -> {
                 ProjectSubset.NONE
             }
@@ -352,7 +349,6 @@ class AffectedModuleDetectorImpl constructor(
      * we determine there are no changes within our repository (e.g. prebuilts change only)
      */
     private fun shouldBuildAll(): Boolean {
-
         var shouldBuildAll = false
         // Should only trigger if there are no changedFiles
         if (changedProjects.size == alwaysBuild.size && unknownFiles.isEmpty()) {
