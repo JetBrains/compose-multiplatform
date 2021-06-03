@@ -45,7 +45,7 @@ fun SoftwareKeyboardControllerSample() {
     val keyboardController = LocalSoftwareKeyboardController.current
 
     // used to ensure a TextField is focused when showing keyboard
-    val focusRequester = FocusRequester()
+    val focusRequester = remember { FocusRequester() }
     var (text, setText) = remember {
         mutableStateOf("Close keyboard on done ime action (blue ✔️)")
     }

@@ -40,6 +40,7 @@ import androidx.compose.material.icons.filled.Close
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.key
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
@@ -111,7 +112,7 @@ private fun FilterField(
     onFilter: (String) -> Unit,
     modifier: Modifier = Modifier
 ) {
-    val focusRequester = FocusRequester()
+    val focusRequester = remember { FocusRequester() }
     // TODO: replace with Material text field when available
     BasicTextField(
         modifier = modifier.focusRequester(focusRequester),

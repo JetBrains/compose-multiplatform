@@ -37,7 +37,7 @@ import androidx.compose.ui.unit.sp
 
 @Composable
 fun TextFieldFocusTransition() {
-    val focusRequesters = List(6) { FocusRequester() }
+    val focusRequesters = remember { List(6) { FocusRequester() } }
 
     LazyColumn {
         itemsIndexed(focusRequesters) { index, item ->
