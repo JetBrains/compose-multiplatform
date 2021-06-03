@@ -31,7 +31,10 @@ import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.graphics.drawscope.drawIntoCanvas
 import androidx.compose.ui.graphics.nativeCanvas
 import androidx.compose.ui.input.pointer.pointerInteropFilter
+import androidx.compose.ui.layout.IntrinsicMeasurable
+import androidx.compose.ui.layout.IntrinsicMeasureScope
 import androidx.compose.ui.layout.Measurable
+import androidx.compose.ui.layout.MeasurePolicy
 import androidx.compose.ui.layout.MeasureResult
 import androidx.compose.ui.layout.MeasureScope
 import androidx.compose.ui.layout.onGloballyPositioned
@@ -244,9 +247,7 @@ internal abstract class AndroidViewHolder(
             view = null
         }
 
-        layoutNode.measurePolicy = object : LayoutNode.NoIntrinsicsMeasurePolicy(
-            "Intrinsics not supported for Android views"
-        ) {
+        layoutNode.measurePolicy = object : MeasurePolicy {
             override fun MeasureScope.measure(
                 measurables: List<Measurable>,
                 constraints: Constraints
@@ -273,6 +274,42 @@ internal abstract class AndroidViewHolder(
                 return layout(measuredWidth, measuredHeight) {
                     layoutAccordingTo(layoutNode)
                 }
+            }
+
+            override fun IntrinsicMeasureScope.minIntrinsicWidth(
+                measurables: List<IntrinsicMeasurable>,
+                height: Int
+            ) = intrinsicWidth(height)
+
+            override fun IntrinsicMeasureScope.maxIntrinsicWidth(
+                measurables: List<IntrinsicMeasurable>,
+                height: Int
+            ) = intrinsicWidth(height)
+
+            private fun intrinsicWidth(height: Int): Int {
+                measure(
+                    MeasureSpec.makeMeasureSpec(0, MeasureSpec.UNSPECIFIED),
+                    obtainMeasureSpec(0, height, layoutParams!!.height)
+                )
+                return measuredWidth
+            }
+
+            override fun IntrinsicMeasureScope.minIntrinsicHeight(
+                measurables: List<IntrinsicMeasurable>,
+                width: Int
+            ) = intrinsicHeight(width)
+
+            override fun IntrinsicMeasureScope.maxIntrinsicHeight(
+                measurables: List<IntrinsicMeasurable>,
+                width: Int
+            ) = intrinsicHeight(width)
+
+            private fun intrinsicHeight(width: Int): Int {
+                measure(
+                    obtainMeasureSpec(0, width, layoutParams!!.width),
+                    MeasureSpec.makeMeasureSpec(0, MeasureSpec.UNSPECIFIED)
+                )
+                return measuredHeight
             }
         }
         layoutNode

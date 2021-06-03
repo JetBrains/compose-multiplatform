@@ -405,6 +405,72 @@ class AndroidViewCompatTest {
         }
     }
 
+    // Intrinsic measurements.
+
+    @Test
+    fun testIntrinsicMeasurement() {
+        var obtainedWidthMeasureSpec: Int = -1
+        var obtainedHeightMeasureSpec: Int = -1
+        class MeasureSpecsSaver(context: Context) : View(context) {
+            override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
+                obtainedWidthMeasureSpec = widthMeasureSpec
+                obtainedHeightMeasureSpec = heightMeasureSpec
+                setMeasuredDimension(20, 40)
+            }
+        }
+        rule.setContent {
+            Layout(
+                content = {
+                    AndroidView(::MeasureSpecsSaver)
+                }
+            ) { measurables, _ ->
+                val view = measurables.first()
+                assertEquals(20, view.minIntrinsicWidth(70))
+                assertEquals(MeasureSpec.UNSPECIFIED, MeasureSpec.getMode(obtainedWidthMeasureSpec))
+                assertEquals(
+                    MeasureSpec.makeMeasureSpec(70, MeasureSpec.AT_MOST),
+                    obtainedHeightMeasureSpec
+                )
+                assertEquals(20, view.maxIntrinsicWidth(80))
+                assertEquals(MeasureSpec.UNSPECIFIED, MeasureSpec.getMode(obtainedWidthMeasureSpec))
+                assertEquals(
+                    MeasureSpec.makeMeasureSpec(80, MeasureSpec.AT_MOST),
+                    obtainedHeightMeasureSpec
+                )
+                assertEquals(40, view.minIntrinsicHeight(70))
+                assertEquals(
+                    MeasureSpec.makeMeasureSpec(70, MeasureSpec.AT_MOST),
+                    obtainedWidthMeasureSpec
+                )
+                assertEquals(
+                    MeasureSpec.UNSPECIFIED,
+                    MeasureSpec.getMode(obtainedHeightMeasureSpec)
+                )
+                assertEquals(40, view.minIntrinsicHeight(80))
+                assertEquals(
+                    MeasureSpec.makeMeasureSpec(80, MeasureSpec.AT_MOST),
+                    obtainedWidthMeasureSpec
+                )
+                assertEquals(
+                    MeasureSpec.UNSPECIFIED,
+                    MeasureSpec.getMode(obtainedHeightMeasureSpec)
+                )
+                view.measure(Constraints(maxWidth = 50, maxHeight = 50))
+                assertEquals(
+                    MeasureSpec.makeMeasureSpec(50, MeasureSpec.AT_MOST),
+                    obtainedWidthMeasureSpec
+                )
+                assertEquals(
+                    MeasureSpec.makeMeasureSpec(50, MeasureSpec.AT_MOST),
+                    obtainedHeightMeasureSpec
+                )
+                layout(0, 0) {}
+            }
+        }
+    }
+
+    // Other tests.
+
     @Test
     @SdkSuppress(minSdkVersion = Build.VERSION_CODES.O)
     fun testRedrawing_onSubsequentRemeasuring() {
