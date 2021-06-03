@@ -20,15 +20,17 @@ A separate library, `androidx.compose.material:material-icons-extended`, contain
 
 <a href="https://material.io/design/iconography/system-icons.html" class="external" target="_blank">System icons</a> symbolize common actions, files, devices, and directories.
 
-|      | **APIs** | **Description** |
-| ---- | -------- | --------------- |
-| **Icons** | [Icons] | Icons |
-| **Default** | [Icons.Default] | Default icons |
-| **Filled** | [Icons.Filled] | Filled icons |
-| **Outlined** | [Icons.Outlined] | Outlined icons |
-| **Rounded** | [Icons.Rounded] | Rounded icons |
-| **Two tone** | [Icons.TwoTone] | Two tone icons |
-| **Sharp** | [Icons.Sharp] | Sharp icons |
+|      | **APIs** | **Description** | **Preview** |
+| ---- | -------- | --------------- | :---------: |
+| **Icons** | [Icons] | Icons | |
+| **Default** | [Icons.Default] | Default icons | ![Default icon image](https://developer.android.com/images/reference/androidx/compose/material/icons/icon-filled.svg) |
+| **Filled** | [Icons.Filled] | Filled icons | ![Filled icon image](https://developer.android.com/images/reference/androidx/compose/material/icons/icon-filled.svg) |
+| **Outlined** | [Icons.Outlined] | Outlined icons | ![Outlined icon image](https://developer.android.com/images/reference/androidx/compose/material/icons/icon-outlined.svg) |
+| **Rounded** | [Icons.Rounded] | Rounded icons | ![Rounded icon image](https://developer.android.com/images/reference/androidx/compose/material/icons/icon-rounded.svg) |
+| **Two tone** | [Icons.TwoTone] | Two tone icons | ![Two tone icon image](https://developer.android.com/images/reference/androidx/compose/material/icons/icon-two-tone.svg) |
+| **Sharp** | [Icons.Sharp] | Sharp icons | ![Sharp icon image](https://developer.android.com/images/reference/androidx/compose/material/icons/icon-sharp.svg) |
+
+**Note:** [Icons.Default] is an alias for [Icons.Filled].
 
 ### Related components
 
