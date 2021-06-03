@@ -524,6 +524,182 @@ abstract class AbstractIrTransformTest : AbstractCodegenTest() {
         }
     }
 
+    inner class JsCompilation(private val verifySignatures: Boolean = true) : Compilation {
+        private val classpath = System.getProperty("androidx.compose.js.classpath").orEmpty()
+            .split(":")
+            .map { File(it) }
+            .filter { isKotlinLibrary(it) }
+
+        override val enabled: Boolean = classpath.isNotEmpty()
+
+        override fun compile(files: List<KtFile>): IrModuleFragment {
+            val configuration = newConfiguration()
+            val dependencyFiles = classpath.map { it.absolutePath }
+            configuration.put(JSConfigurationKeys.LIBRARIES, dependencyFiles)
+
+            val environment = KotlinCoreEnvironment.createForTests(
+                myTestRootDisposable,
+                configuration,
+                EnvironmentConfigFiles.JS_CONFIG_FILES
+            )
+            setupEnvironment(environment)
+
+            val analyzer = AnalyzerWithCompilerReport(environment.configuration)
+            val deps = jsResolveLibraries(
+                dependencyFiles,
+                emptyList(),
+                environment.configuration[IrMessageLogger.IR_MESSAGE_LOGGER].toResolverLogger()
+            )
+
+            val moduleProvider = JsModuleProvider(environment, deps)
+
+            analyzer.analyzeAndReport(files) {
+                TopDownAnalyzerFacadeForJSIR.analyzeFiles(
+                    files,
+                    environment.project,
+                    environment.configuration,
+                    deps.getFullList().map { moduleProvider.getModuleDescriptor(it) },
+                    friendModuleDescriptors = emptyList(),
+                    thisIsBuiltInsModule = false,
+                    customBuiltInsModule = moduleProvider.builtInsModule,
+                    targetEnvironment = org.jetbrains.kotlin.resolve.CompilerEnvironment
+                )
+            }
+
+            val result = analyzer.analysisResult
+            TopDownAnalyzerFacadeForJSIR.checkForErrors(
+                files,
+                result.bindingContext,
+                ErrorTolerancePolicy.NONE
+            )
+            val mangler = JsManglerDesc
+            val signaturer = IdSignatureDescriptor(mangler)
+
+            val psi2Ir = Psi2IrTranslator(
+                configuration.languageVersionSettings,
+                Psi2IrConfiguration(),
+            )
+
+            val symbolTable = SymbolTable(signaturer, IrFactoryImpl)
+
+            val generatorContext = psi2Ir.createGeneratorContext(
+                result.moduleDescriptor,
+                result.bindingContext,
+                symbolTable,
+                GeneratorExtensions()
+            )
+
+            val irBuiltIns = generatorContext.irBuiltIns
+
+            val messageLogger = environment.configuration[IrMessageLogger.IR_MESSAGE_LOGGER]
+                ?: IrMessageLogger.None
+
+            val irLinker = JsIrLinker(
+                generatorContext.moduleDescriptor,
+                messageLogger,
+                generatorContext.irBuiltIns,
+                generatorContext.symbolTable,
+                JsIrLinker.JsFePluginContext(
+                    result.moduleDescriptor,
+                    generatorContext.symbolTable,
+                    generatorContext.typeTranslator,
+                    generatorContext.irBuiltIns
+                ),
+            )
+
+            deps.getFullList(TopologicalLibraryOrder).forEach {
+                irLinker.deserializeOnlyHeaderModule(moduleProvider.getModuleDescriptor(it), it)
+            }
+
+            val symbols = BuiltinSymbolsBase(
+                irBuiltIns,
+                generatorContext.symbolTable
+            )
+
+            val context = IrPluginContextImpl(
+                module = generatorContext.moduleDescriptor,
+                bindingContext = generatorContext.bindingContext,
+                languageVersionSettings = generatorContext.languageVersionSettings,
+                st = generatorContext.symbolTable,
+                typeTranslator = generatorContext.typeTranslator,
+                irBuiltIns = generatorContext.irBuiltIns,
+                linker = irLinker,
+                symbols = symbols,
+                diagnosticReporter = IrMessageLogger.None,
+            )
+
+            psi2Ir.addPostprocessingStep {
+                postProcessingStep(it, context)
+            }
+
+            val moduleFragment = psi2Ir.generateModuleFragment(
+                generatorContext,
+                files,
+                listOf(irLinker),
+                emptyList(),
+            )
+
+            if (verifySignatures) {
+                moduleFragment.acceptVoid(
+                    ManglerChecker(JsManglerIr, Ir2DescriptorManglerAdapter(JsManglerDesc))
+                )
+            }
+
+            irLinker.postProcess()
+
+            return moduleFragment
+        }
+    }
+
+    private class JsModuleProvider(
+        private val environment: KotlinCoreEnvironment,
+        private val deps: KotlinLibraryResolveResult
+    ) {
+        private val JsFactories = KlibMetadataFactories(
+            { object : KotlinBuiltIns(it) {} },
+            DynamicTypeDeserializer
+        )
+
+        var builtInsModule: ModuleDescriptorImpl? = null
+        val descriptors = mutableMapOf<KotlinLibrary, ModuleDescriptorImpl>()
+        private val storageManager: LockBasedStorageManager =
+            LockBasedStorageManager("ModulesStructure")
+
+        private val moduleDependencies: Map<KotlinLibrary, List<KotlinLibrary>> = run {
+            val result = mutableMapOf<KotlinLibrary, List<KotlinLibrary>>()
+
+            deps.forEach { klib, _ ->
+                val dependencies = deps.filterRoots { it.library == klib }.getFullList(
+                    TopologicalLibraryOrder
+                )
+                result[klib] = dependencies.minus(klib)
+            }
+            result
+        }
+
+        fun getModuleDescriptor(current: KotlinLibrary): ModuleDescriptorImpl =
+            if (current in descriptors) {
+                descriptors.getValue(current)
+            } else {
+                JsFactories.DefaultDeserializedDescriptorFactory.createDescriptorOptionalBuiltIns(
+                    current,
+                    environment.configuration.languageVersionSettings,
+                    storageManager,
+                    builtInsModule?.builtIns,
+                    packageAccessHandler = null,
+                    lookupTracker = LookupTracker.DO_NOTHING
+                ).also { md ->
+                    descriptors[current] = md
+                    if (current.isBuiltIns) builtInsModule = md
+                    md.setDependencies(
+                        listOf(md) + moduleDependencies.getValue(current).map {
+                            getModuleDescriptor(it)
+                        }
+                    )
+                }
+            }
+    }
+
     // This interface enables different Compilation variants for compiler tests
     interface Compilation {
         val enabled: Boolean

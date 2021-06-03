@@ -122,6 +122,7 @@ if(AndroidXComposePlugin.isMultiplatformEnabled(project)) {
             jvmTest.dependencies {
                 implementation kotlin("test-junit")
                 implementation(libs.kotlinCoroutinesTest)
+                implementation(libs.kotlinCoroutinesTest)
             }
             desktopTest {
                 dependsOn jvmTest
