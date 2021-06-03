@@ -208,9 +208,6 @@ class AndroidXPlugin : Plugin<Project> {
         project.tasks.withType(KotlinCompile::class.java).configureEach { task ->
             task.kotlinOptions.jvmTarget = "1.8"
             project.configureJavaCompilationWarnings(task)
-            if (project.hasProperty(EXPERIMENTAL_KOTLIN_BACKEND_ENABLED)) {
-                task.kotlinOptions.freeCompilerArgs += listOf("-Xuse-ir=true")
-            }
 
             // Not directly impacting us, but a bunch of issues like KT-46512, probably prudent
             // for us to just disable until Kotlin 1.5.10+ to avoid end users hitting users
