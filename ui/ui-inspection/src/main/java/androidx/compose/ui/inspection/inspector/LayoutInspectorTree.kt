@@ -17,6 +17,7 @@
 package androidx.compose.ui.inspection.inspector
 
 import android.view.View
+import androidx.annotation.RequiresApi
 import androidx.annotation.VisibleForTesting
 import androidx.compose.runtime.InternalComposeApi
 import androidx.compose.runtime.tooling.CompositionData
@@ -75,6 +76,7 @@ private val unwantedCalls = setOf(
     "ProvideCommonCompositionLocals",
 )
 
+@OptIn(ExperimentalStdlibApi::class)
 @VisibleForTesting
 fun packageNameHash(packageName: String) =
     packageName.fold(0) { hash, char -> hash * 31 + char.code }.absoluteValue
@@ -82,6 +84,7 @@ fun packageNameHash(packageName: String) =
 /**
  * Generator of a tree for the Layout Inspector.
  */
+@RequiresApi(29)
 class LayoutInspectorTree {
     @Suppress("MemberVisibilityCanBePrivate")
     var hideSystemNodes = true
