@@ -33,7 +33,7 @@ import androidx.compose.ui.focus.focusRequester
 @Composable
 fun FocusableSample() {
     // initialize focus reference to be able to request focus programmatically
-    val focusRequester = FocusRequester()
+    val focusRequester = remember { FocusRequester() }
     // MutableInteractionSource to track changes of the component's interactions (like "focused")
     val interactionSource = remember { MutableInteractionSource() }
 

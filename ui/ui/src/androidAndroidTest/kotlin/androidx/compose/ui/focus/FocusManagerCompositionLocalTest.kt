@@ -17,6 +17,7 @@
 package androidx.compose.ui.focus
 
 import androidx.compose.foundation.layout.Box
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.test.junit4.createComposeRule
@@ -41,7 +42,7 @@ class FocusManagerCompositionLocalTest {
         lateinit var focusState: FocusState
         rule.setFocusableContent {
             focusManager = LocalFocusManager.current
-            focusRequester = FocusRequester()
+            focusRequester = remember { FocusRequester() }
             Box(
                 modifier = Modifier
                     .focusRequester(focusRequester)
@@ -71,7 +72,7 @@ class FocusManagerCompositionLocalTest {
         lateinit var grandparentFocusState: FocusState
         rule.setFocusableContent {
             focusManager = LocalFocusManager.current
-            focusRequester = FocusRequester()
+            focusRequester = remember { FocusRequester() }
             Box(
                 modifier = Modifier
                     .onFocusChanged { grandparentFocusState = it }
