@@ -206,8 +206,8 @@ package androidx.compose.ui.text {
     method public androidx.compose.ui.text.ParagraphStyle copy-QrGfzA0(optional androidx.compose.ui.text.style.TextAlign? textAlign, optional androidx.compose.ui.text.style.TextDirection? textDirection, optional long lineHeight, optional androidx.compose.ui.text.style.TextIndent? textIndent);
     method public operator boolean equals(Object? other);
     method public long getLineHeight-XSAIIZE();
-    method public androidx.compose.ui.text.style.TextAlign? getTextAlign();
-    method public androidx.compose.ui.text.style.TextDirection? getTextDirection();
+    method public androidx.compose.ui.text.style.TextAlign? getTextAlign-buA522U();
+    method public androidx.compose.ui.text.style.TextDirection? getTextDirection-mmuk1to();
     method public androidx.compose.ui.text.style.TextIndent? getTextIndent();
     method @androidx.compose.runtime.Stable public androidx.compose.ui.text.ParagraphStyle merge(optional androidx.compose.ui.text.ParagraphStyle? other);
     method @androidx.compose.runtime.Stable public operator androidx.compose.ui.text.ParagraphStyle plus(androidx.compose.ui.text.ParagraphStyle other);
@@ -271,7 +271,7 @@ package androidx.compose.ui.text {
     method public String? getFontFeatureSettings();
     method public long getFontSize-XSAIIZE();
     method public androidx.compose.ui.text.font.FontStyle? getFontStyle-4Lr2A7w();
-    method public androidx.compose.ui.text.font.FontSynthesis? getFontSynthesis();
+    method public androidx.compose.ui.text.font.FontSynthesis? getFontSynthesis-ZQGJjVo();
     method public androidx.compose.ui.text.font.FontWeight? getFontWeight();
     method public long getLetterSpacing-XSAIIZE();
     method public androidx.compose.ui.text.intl.LocaleList? getLocaleList();
@@ -429,15 +429,15 @@ package androidx.compose.ui.text {
     method public String? getFontFeatureSettings();
     method public long getFontSize-XSAIIZE();
     method public androidx.compose.ui.text.font.FontStyle? getFontStyle-4Lr2A7w();
-    method public androidx.compose.ui.text.font.FontSynthesis? getFontSynthesis();
+    method public androidx.compose.ui.text.font.FontSynthesis? getFontSynthesis-ZQGJjVo();
     method public androidx.compose.ui.text.font.FontWeight? getFontWeight();
     method public long getLetterSpacing-XSAIIZE();
     method public long getLineHeight-XSAIIZE();
     method public androidx.compose.ui.text.intl.LocaleList? getLocaleList();
     method public androidx.compose.ui.graphics.Shadow? getShadow();
-    method public androidx.compose.ui.text.style.TextAlign? getTextAlign();
+    method public androidx.compose.ui.text.style.TextAlign? getTextAlign-buA522U();
     method public androidx.compose.ui.text.style.TextDecoration? getTextDecoration();
-    method public androidx.compose.ui.text.style.TextDirection? getTextDirection();
+    method public androidx.compose.ui.text.style.TextDirection? getTextDirection-mmuk1to();
     method public androidx.compose.ui.text.style.TextGeometricTransform? getTextGeometricTransform();
     method public androidx.compose.ui.text.style.TextIndent? getTextIndent();
     method @androidx.compose.runtime.Stable public androidx.compose.ui.text.TextStyle merge(optional androidx.compose.ui.text.TextStyle? other);
@@ -613,11 +613,24 @@ package androidx.compose.ui.text.font {
     property public final int Normal;
   }
 
-  public enum FontSynthesis {
-    enum_constant public static final androidx.compose.ui.text.font.FontSynthesis All;
-    enum_constant public static final androidx.compose.ui.text.font.FontSynthesis None;
-    enum_constant public static final androidx.compose.ui.text.font.FontSynthesis Style;
-    enum_constant public static final androidx.compose.ui.text.font.FontSynthesis Weight;
+  public final inline class FontSynthesis {
+    ctor public FontSynthesis();
+    method public static inline boolean equals-impl(int p, Object? p1);
+    method public static boolean equals-impl0(int p1, int p2);
+    method public static inline int hashCode-impl(int p);
+    method public static String toString-impl(int $this);
+    field public static final androidx.compose.ui.text.font.FontSynthesis.Companion Companion;
+  }
+
+  public static final class FontSynthesis.Companion {
+    method public int getAll-GVVA2EU();
+    method public int getNone-GVVA2EU();
+    method public int getStyle-GVVA2EU();
+    method public int getWeight-GVVA2EU();
+    property public final int All;
+    property public final int None;
+    property public final int Style;
+    property public final int Weight;
   }
 
   @androidx.compose.runtime.Immutable public final class FontWeight implements java.lang.Comparable<androidx.compose.ui.text.font.FontWeight> {
@@ -1120,13 +1133,29 @@ package androidx.compose.ui.text.style {
     enum_constant public static final androidx.compose.ui.text.style.ResolvedTextDirection Rtl;
   }
 
-  public enum TextAlign {
-    enum_constant public static final androidx.compose.ui.text.style.TextAlign Center;
-    enum_constant public static final androidx.compose.ui.text.style.TextAlign End;
-    enum_constant public static final androidx.compose.ui.text.style.TextAlign Justify;
-    enum_constant public static final androidx.compose.ui.text.style.TextAlign Left;
-    enum_constant public static final androidx.compose.ui.text.style.TextAlign Right;
-    enum_constant public static final androidx.compose.ui.text.style.TextAlign Start;
+  public final inline class TextAlign {
+    ctor public TextAlign();
+    method public static inline boolean equals-impl(int p, Object? p1);
+    method public static boolean equals-impl0(int p1, int p2);
+    method public static inline int hashCode-impl(int p);
+    method public static String toString-impl(int $this);
+    field public static final androidx.compose.ui.text.style.TextAlign.Companion Companion;
+  }
+
+  public static final class TextAlign.Companion {
+    method public int getCenter-e0LSkKk();
+    method public int getEnd-e0LSkKk();
+    method public int getJustify-e0LSkKk();
+    method public int getLeft-e0LSkKk();
+    method public int getRight-e0LSkKk();
+    method public int getStart-e0LSkKk();
+    method public java.util.List<androidx.compose.ui.text.style.TextAlign> values();
+    property public final int Center;
+    property public final int End;
+    property public final int Justify;
+    property public final int Left;
+    property public final int Right;
+    property public final int Start;
   }
 
   @androidx.compose.runtime.Immutable public final class TextDecoration {
@@ -1148,12 +1177,26 @@ package androidx.compose.ui.text.style {
     property public final androidx.compose.ui.text.style.TextDecoration Underline;
   }
 
-  public enum TextDirection {
-    enum_constant public static final androidx.compose.ui.text.style.TextDirection Content;
-    enum_constant public static final androidx.compose.ui.text.style.TextDirection ContentOrLtr;
-    enum_constant public static final androidx.compose.ui.text.style.TextDirection ContentOrRtl;
-    enum_constant public static final androidx.compose.ui.text.style.TextDirection Ltr;
-    enum_constant public static final androidx.compose.ui.text.style.TextDirection Rtl;
+  public final inline class TextDirection {
+    ctor public TextDirection();
+    method public static inline boolean equals-impl(int p, Object? p1);
+    method public static boolean equals-impl0(int p1, int p2);
+    method public static inline int hashCode-impl(int p);
+    method public static String toString-impl(int $this);
+    field public static final androidx.compose.ui.text.style.TextDirection.Companion Companion;
+  }
+
+  public static final class TextDirection.Companion {
+    method public int getContent-s_7X-co();
+    method public int getContentOrLtr-s_7X-co();
+    method public int getContentOrRtl-s_7X-co();
+    method public int getLtr-s_7X-co();
+    method public int getRtl-s_7X-co();
+    property public final int Content;
+    property public final int ContentOrLtr;
+    property public final int ContentOrRtl;
+    property public final int Ltr;
+    property public final int Rtl;
   }
 
   @androidx.compose.runtime.Immutable public final class TextGeometricTransform {

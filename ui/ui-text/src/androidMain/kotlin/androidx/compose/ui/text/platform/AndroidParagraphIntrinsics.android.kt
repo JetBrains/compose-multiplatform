@@ -113,6 +113,7 @@ internal fun resolveTextDirectionHeuristics(
                 else -> LayoutCompat.TEXT_DIRECTION_FIRST_STRONG_LTR
             }
         }
+        else -> error("Invalid TextDirection.")
     }
 }
 
