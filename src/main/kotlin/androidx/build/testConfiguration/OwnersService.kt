@@ -70,5 +70,5 @@ internal fun Project.registerOwnersServiceTasks() {
 
 data class TestModule(
     val name: String,
-    val path: String
+    val path: List<String>
 )

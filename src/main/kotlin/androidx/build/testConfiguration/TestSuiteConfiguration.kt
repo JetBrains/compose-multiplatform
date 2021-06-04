@@ -66,7 +66,7 @@ fun Project.createTestConfigurationGenerationTask(
         it.testModules.add(
             TestModule(
                 name = xmlName,
-                path = projectDir.toRelativeString(getSupportRootFolder())
+                path = listOf(projectDir.toRelativeString(getSupportRootFolder()))
             )
         )
     }
