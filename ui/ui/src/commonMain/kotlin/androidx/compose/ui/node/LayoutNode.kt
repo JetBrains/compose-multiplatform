@@ -1050,7 +1050,7 @@ internal class LayoutNode : Measurable, Remeasurement, OwnerScope, LayoutInfo, C
      * Used to request a new measurement + layout pass from the owner.
      */
     internal fun requestRemeasure() {
-        if (!ignoreRemeasureRequests) {
+        if (!ignoreRemeasureRequests && !isVirtual) {
             owner?.onRequestMeasure(this)
         }
     }
@@ -1065,7 +1065,9 @@ internal class LayoutNode : Measurable, Remeasurement, OwnerScope, LayoutInfo, C
      * Used to request a new layout pass from the owner.
      */
     internal fun requestRelayout() {
-        owner?.onRequestRelayout(this)
+        if (!isVirtual) {
+            owner?.onRequestRelayout(this)
+        }
     }
 
     /**
