@@ -14,13 +14,12 @@
  * limitations under the License.
  */
 
-
 import androidx.build.AndroidXUiPlugin
 import androidx.build.LibraryGroups
 import androidx.build.LibraryType
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
-import static androidx.build.dependencies.DependenciesKt.*
+import static androidx.build.dependencies.DependenciesKt.SKIKO_CURRENT_OS
 import static androidx.inspection.gradle.InspectionPluginKt.packageInspector
 
 plugins {
@@ -39,8 +38,8 @@ dependencies {
          * When updating dependencies, make sure to make the an an analogous update in the
          * corresponding block below
          */
-        implementation(KOTLIN_STDLIB_COMMON)
-        implementation(KOTLIN_COROUTINES_CORE)
+        implementation(libs.kotlinStdlibCommon)
+        implementation(libs.kotlinCoroutinesCore)
 
         // TODO: b/160602714 create a lower level module to avoid this dependency on the
         // animation group
@@ -58,44 +57,38 @@ dependencies {
 
         implementation(project(":compose:runtime:runtime"))
         implementation(project(":compose:ui:ui-util"))
-        implementation(KOTLIN_STDLIB)
+        implementation(libs.kotlinStdlib)
         implementation("androidx.autofill:autofill:1.0.0")
-        implementation(KOTLIN_COROUTINES_ANDROID)
+        implementation(libs.kotlinCoroutinesAndroid)
 
         implementation("androidx.savedstate:savedstate:1.1.0")
         implementation("androidx.lifecycle:lifecycle-common-java8:2.3.0")
         implementation("androidx.lifecycle:lifecycle-runtime:2.3.0")
         implementation("androidx.lifecycle:lifecycle-viewmodel:2.3.0")
 
-        testImplementation(ANDROIDX_TEST_RULES)
-        testImplementation(ANDROIDX_TEST_RUNNER)
-        testImplementation(KOTLIN_COROUTINES_TEST)
-        testImplementation(JUNIT)
-        testImplementation(TRUTH)
-        testImplementation(MOCKITO_CORE)
-        testImplementation(MOCKITO_KOTLIN, {
-            exclude group: "org.mockito" // to keep control on the mockito version
-        })
-        testImplementation(ROBOLECTRIC)
+        testImplementation(libs.testRules)
+        testImplementation(libs.testRunner)
+        testImplementation(libs.kotlinCoroutinesTest)
+        testImplementation(libs.junit)
+        testImplementation(libs.truth)
+        testImplementation(libs.mockitoCore)
+        testImplementation(libs.mockitoKotlin)
+        testImplementation(libs.robolectric)
         testImplementation(project(":compose:ui:ui-test-junit4"))
         testImplementation(project(":compose:test-utils"))
 
-        androidTestImplementation(ANDROIDX_TEST_CORE)
-        androidTestImplementation(ANDROIDX_TEST_RULES)
-        androidTestImplementation(ANDROIDX_TEST_RUNNER)
-        androidTestImplementation(ANDROIDX_TEST_EXT_KTX)
-        androidTestImplementation(ANDROIDX_TEST_UIAUTOMATOR)
-        androidTestImplementation(KOTLIN_COROUTINES_TEST)
-        androidTestImplementation(ESPRESSO_CORE)
-        androidTestImplementation(JUNIT)
-        androidTestImplementation(DEXMAKER_MOCKITO, excludes.bytebuddy)
-        // DexMaker has it"s own MockMaker
-        androidTestImplementation(MOCKITO_CORE, excludes.bytebuddy)
-        // DexMaker has it"s own MockMaker
-        androidTestImplementation(TRUTH)
-        androidTestImplementation(MOCKITO_KOTLIN, {
-            exclude group: "org.mockito" // to keep control on the mockito version
-        })
+        androidTestImplementation(libs.testCore)
+        androidTestImplementation(libs.testRules)
+        androidTestImplementation(libs.testRunner)
+        androidTestImplementation(libs.testExtJunitKtx)
+        androidTestImplementation(libs.testUiautomator)
+        androidTestImplementation(libs.kotlinCoroutinesTest)
+        androidTestImplementation(libs.espressoCore)
+        androidTestImplementation(libs.junit)
+        androidTestImplementation(libs.dexmakerMockito)
+        androidTestImplementation(libs.mockitoCore)
+        androidTestImplementation(libs.truth)
+        androidTestImplementation(libs.mockitoKotlin)
         androidTestImplementation(project(":compose:foundation:foundation"))
         androidTestImplementation(project(":compose:foundation:foundation-layout"))
         androidTestImplementation(project(":compose:test-utils"))
@@ -126,8 +119,8 @@ if(AndroidXUiPlugin.isMultiplatformEnabled(project)) {
          */
         sourceSets {
             commonMain.dependencies {
-                implementation(KOTLIN_STDLIB_COMMON)
-                implementation(KOTLIN_COROUTINES_CORE)
+                implementation(libs.kotlinStdlibCommon)
+                implementation(libs.kotlinCoroutinesCore)
 
                 // TODO: b/160602714 create a lower level module to avoid this dependency on the
                 // animation group
@@ -142,13 +135,13 @@ if(AndroidXUiPlugin.isMultiplatformEnabled(project)) {
             }
 
             androidMain.dependencies {
-                implementation(KOTLIN_STDLIB)
+                implementation(libs.kotlinStdlib)
                 // This has stub APIs for access to legacy Android APIs, so we don't want
                 // any dependency on this module.
                 compileOnly(project(":compose:ui:ui-android-stubs"))
                 api("androidx.annotation:annotation:1.1.0")
                 implementation("androidx.autofill:autofill:1.0.0")
-                implementation(KOTLIN_COROUTINES_ANDROID)
+                implementation(libs.kotlinCoroutinesAndroid)
 
                 implementation("androidx.savedstate:savedstate:1.1.0")
                 implementation("androidx.lifecycle:lifecycle-common-java8:2.3.0")
@@ -157,28 +150,26 @@ if(AndroidXUiPlugin.isMultiplatformEnabled(project)) {
             }
 
             jvmMain.dependencies {
-                implementation(KOTLIN_STDLIB)
+                implementation(libs.kotlinStdlib)
             }
 
             androidMain.dependsOn(jvmMain)
             desktopMain {
                 dependencies {
-                    api(KOTLIN_COROUTINES_SWING)
+                    api(libs.kotlinCoroutinesSwing)
                 }
                 dependsOn(jvmMain)
             }
 
             test.dependencies {
-                implementation(ANDROIDX_TEST_RULES)
-                implementation(ANDROIDX_TEST_RUNNER)
-                implementation(KOTLIN_COROUTINES_TEST)
-                implementation(JUNIT)
-                implementation(TRUTH)
-                implementation(MOCKITO_CORE)
-                implementation(MOCKITO_KOTLIN, {
-                    exclude group: "org.mockito" // to keep control on the mockito version
-                })
-                implementation(ROBOLECTRIC)
+                implementation(libs.testRules)
+                implementation(libs.testRunner)
+                implementation(libs.kotlinCoroutinesTest)
+                implementation(libs.junit)
+                implementation(libs.truth)
+                implementation(libs.mockitoCore)
+                implementation(libs.mockitoKotlin)
+                implementation(libs.robolectric)
                 implementation(project(":compose:ui:ui-test-junit4"))
                 implementation(project(":compose:test-utils"))
             }
@@ -186,21 +177,17 @@ if(AndroidXUiPlugin.isMultiplatformEnabled(project)) {
             androidAndroidTest.dependencies {
                 implementation("androidx.fragment:fragment:1.3.0")
                 implementation("androidx.appcompat:appcompat:1.3.0-beta01")
-                implementation(ANDROIDX_TEST_UIAUTOMATOR)
-                implementation(ANDROIDX_TEST_RULES)
-                implementation(ANDROIDX_TEST_RUNNER)
-                implementation(ANDROIDX_TEST_EXT_KTX)
-                implementation(KOTLIN_COROUTINES_TEST)
-                implementation(ESPRESSO_CORE)
-                implementation(JUNIT)
-                implementation(DEXMAKER_MOCKITO, excludes.bytebuddy)
-                // DexMaker has it"s own MockMaker
-                implementation(MOCKITO_CORE, excludes.bytebuddy)
-                // DexMaker has it"s own MockMaker
-                implementation(TRUTH)
-                implementation(MOCKITO_KOTLIN, {
-                    exclude group: "org.mockito" // to keep control on the mockito version
-                })
+                implementation(libs.testUiautomator)
+                implementation(libs.testRules)
+                implementation(libs.testRunner)
+                implementation(libs.testExtJunitKtx)
+                implementation(libs.kotlinCoroutinesTest)
+                implementation(libs.espressoCore)
+                implementation(libs.junit)
+                implementation(libs.dexmakerMockito)
+                implementation(libs.mockitoCore)
+                implementation(libs.truth)
+                implementation(libs.mockitoKotlin)
                 implementation(project(":compose:foundation:foundation"))
                 implementation(project(":compose:foundation:foundation-layout"))
                 implementation(project(":compose:test-utils"))
@@ -213,12 +200,10 @@ if(AndroidXUiPlugin.isMultiplatformEnabled(project)) {
             }
 
             desktopTest.dependencies {
-                implementation(TRUTH)
-                implementation(JUNIT)
-                implementation(MOCKITO_CORE)
-                implementation(MOCKITO_KOTLIN, {
-                    exclude group: "org.mockito" // to keep control on the mockito version
-                })
+                implementation(libs.truth)
+                implementation(libs.junit)
+                implementation(libs.mockitoCore)
+                implementation(libs.mockitoKotlin)
                 implementation(SKIKO_CURRENT_OS)
                 implementation(project(":compose:material:material"))
                 implementation(project(":compose:ui:ui-test-junit4"))

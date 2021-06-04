@@ -18,8 +18,6 @@ import androidx.build.LibraryGroups
 import androidx.build.LibraryType
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
-import static androidx.build.dependencies.DependenciesKt.*
-
 plugins {
     id("AndroidXPlugin")
     id("AndroidXUiPlugin")
@@ -34,7 +32,7 @@ dependencies {
     // Following dependencies will be provided by inspected app itself
     // because compose:ui-inspector can be run only in app with compose:ui:ui
     // thus all its transitive dependencies will be present too.
-    compileOnly(KOTLIN_STDLIB)
+    compileOnly(libs.kotlinStdlib)
     compileOnly("androidx.inspection:inspection:1.0.0")
     compileOnly(project(":compose:runtime:runtime"))
     compileOnly(project(":compose:ui:ui"))
@@ -43,19 +41,19 @@ dependencies {
     implementation(project(":compose:ui:ui-tooling-data"), {
         transitive(false)
     })
-    implementation(KOTLIN_REFLECT, {
+    implementation(libs.kotlinReflect, {
         exclude group: "org.jetbrains.kotlin", module: "kotlin-stdlib"
     })
-    androidTestImplementation(KOTLIN_STDLIB)
-    androidTestImplementation(KOTLIN_COROUTINES_ANDROID)
+    androidTestImplementation(libs.kotlinStdlib)
+    androidTestImplementation(libs.kotlinCoroutinesAndroid)
     androidTestImplementation(project(":compose:ui:ui-tooling-data"))
     androidTestImplementation(project(":compose:ui:ui"))
     androidTestImplementation(project(":compose:material:material"))
     androidTestImplementation(project(":inspection:inspection-testing"))
     androidTestImplementation(project(":activity:activity-compose"))
-    androidTestImplementation(ANDROIDX_TEST_RUNNER)
-    androidTestImplementation(ANDROIDX_TEST_EXT_JUNIT)
-    androidTestImplementation(TRUTH)
+    androidTestImplementation(libs.testRunner)
+    androidTestImplementation(libs.testExtJunit)
+    androidTestImplementation(libs.truth)
 }
 
 androidx {

@@ -14,13 +14,10 @@
  * limitations under the License.
  */
 
-
 import androidx.build.AndroidXUiPlugin
 import androidx.build.LibraryGroups
 import androidx.build.LibraryType
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
-
-import static androidx.build.dependencies.DependenciesKt.*
 
 plugins {
     id("AndroidXPlugin")
@@ -40,19 +37,19 @@ if(!AndroidXUiPlugin.isMultiplatformEnabled(project)) {
         api(project(":compose:ui:ui-geometry"))
         api("androidx.annotation:annotation:1.1.0")
 
-        implementation(KOTLIN_STDLIB)
+        implementation(libs.kotlinStdlib)
         implementation(project(":compose:runtime:runtime"))
         implementation(project(":compose:ui:ui-util"))
 
-        testImplementation(JUNIT)
-        testImplementation(TRUTH)
+        testImplementation(libs.junit)
+        testImplementation(libs.truth)
 
-        androidTestImplementation(ANDROIDX_TEST_RULES)
-        androidTestImplementation(ANDROIDX_TEST_RUNNER)
-        androidTestImplementation(ANDROIDX_TEST_EXT_JUNIT)
-        androidTestImplementation(ESPRESSO_CORE)
-        androidTestImplementation(TRUTH)
-        androidTestImplementation(KOTLIN_TEST)
+        androidTestImplementation(libs.testRules)
+        androidTestImplementation(libs.testRunner)
+        androidTestImplementation(libs.testExtJunit)
+        androidTestImplementation(libs.espressoCore)
+        androidTestImplementation(libs.truth)
+        androidTestImplementation(libs.kotlinTest)
     }
 }
 
@@ -67,14 +64,14 @@ if(AndroidXUiPlugin.isMultiplatformEnabled(project)) {
          */
         sourceSets {
             commonMain.dependencies {
-                implementation(KOTLIN_STDLIB_COMMON)
+                implementation(libs.kotlinStdlibCommon)
                 api(project(":compose:ui:ui-geometry"))
 
                 implementation(project(":compose:runtime:runtime"))
                 implementation(project(":compose:ui:ui-util"))
             }
             jvmMain.dependencies {
-                implementation(KOTLIN_STDLIB)
+                implementation(libs.kotlinStdlib)
             }
             androidMain.dependencies {
                 api("androidx.annotation:annotation:1.1.0")
@@ -85,13 +82,13 @@ if(AndroidXUiPlugin.isMultiplatformEnabled(project)) {
             }
 
             androidTest.dependencies {
-                implementation(TRUTH)
+                implementation(libs.truth)
             }
             androidAndroidTest.dependencies {
-                implementation(ANDROIDX_TEST_RULES)
-                implementation(ANDROIDX_TEST_RUNNER)
-                implementation(ANDROIDX_TEST_EXT_JUNIT)
-                implementation(ESPRESSO_CORE)
+                implementation(libs.testRules)
+                implementation(libs.testRunner)
+                implementation(libs.testExtJunit)
+                implementation(libs.espressoCore)
             }
         }
     }
