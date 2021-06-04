@@ -32,7 +32,7 @@ internal class LazyMeasuredItemProvider(
     private val measuredItemFactory: MeasuredItemFactory
 ) {
     // the constraints we will measure child with. the main axis is not restricted
-    private val childConstraints = Constraints(
+    val childConstraints = Constraints(
         maxWidth = if (isVertical) constraints.maxWidth else Constraints.Infinity,
         maxHeight = if (!isVertical) constraints.maxHeight else Constraints.Infinity
     )
