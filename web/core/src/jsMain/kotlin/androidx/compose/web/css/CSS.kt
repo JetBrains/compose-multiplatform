@@ -362,54 +362,54 @@ inline fun Element.computedStyleMap(): StylePropertyMapReadOnly =
 external class CSS {
     companion object {
         fun number(value: Number): CSSUnitValue
-        fun percent(value: Number): CSSUnitValue
+        fun percent(value: Number): CSSpercentValue
 
         // <length>
-        fun em(value: Number): CSSUnitValue
-        fun ex(value: Number): CSSUnitValue
-        fun ch(value: Number): CSSUnitValue
-        fun ic(value: Number): CSSUnitValue
-        fun rem(value: Number): CSSUnitValue
-        fun lh(value: Number): CSSUnitValue
-        fun rlh(value: Number): CSSUnitValue
-        fun vw(value: Number): CSSUnitValue
-        fun vh(value: Number): CSSUnitValue
-        fun vi(value: Number): CSSUnitValue
-        fun vb(value: Number): CSSUnitValue
-        fun vmin(value: Number): CSSUnitValue
-        fun vmax(value: Number): CSSUnitValue
-        fun cm(value: Number): CSSUnitValue
-        fun mm(value: Number): CSSUnitValue
-        fun Q(value: Number): CSSUnitValue
+        fun em(value: Number): CSSemValue
+        fun ex(value: Number): CSSexValue
+        fun ch(value: Number): CSSchValue
+        fun ic(value: Number): CSSicValue
+        fun rem(value: Number): CSSremValue
+        fun lh(value: Number): CSSlhValue
+        fun rlh(value: Number): CSSrlhValue
+        fun vw(value: Number): CSSvwValue
+        fun vh(value: Number): CSSvhValue
+        fun vi(value: Number): CSSviValue
+        fun vb(value: Number): CSSvbValue
+        fun vmin(value: Number): CSSvminValue
+        fun vmax(value: Number): CSSvmaxValue
+        fun cm(value: Number): CSScmValue
+        fun mm(value: Number): CSSmmValue
+        fun Q(value: Number): CSSQValue
 
         //        function _in(value: Number) : CSSUnitValue
 //        export
 //        { _in as in }
-        fun pt(value: Number): CSSUnitValue
-        fun pc(value: Number): CSSUnitValue
-        fun px(value: Number): CSSUnitValue
+        fun pt(value: Number): CSSptValue
+        fun pc(value: Number): CSSpcValue
+        fun px(value: Number): CSSpxValue
 
         // <angle>
-        fun deg(value: Number): CSSUnitValue
-        fun grad(value: Number): CSSUnitValue
-        fun rad(value: Number): CSSUnitValue
-        fun turn(value: Number): CSSUnitValue
+        fun deg(value: Number): CSSdegValue
+        fun grad(value: Number): CSSgradValue
+        fun rad(value: Number): CSSradValue
+        fun turn(value: Number): CSSturnValue
 
         // <time>
-        fun s(value: Number): CSSUnitValue
-        fun ms(value: Number): CSSUnitValue
+        fun s(value: Number): CSSsValue
+        fun ms(value: Number): CSSmsValue
 
         // <frequency>
-        fun Hz(value: Number): CSSUnitValue
-        fun kHz(value: Number): CSSUnitValue
+        fun Hz(value: Number): CSSHzValue
+        fun kHz(value: Number): CSSkHzValue
 
         // <resolution>
-        fun dpi(value: Number): CSSUnitValue
-        fun dpcm(value: Number): CSSUnitValue
-        fun dppx(value: Number): CSSUnitValue
+        fun dpi(value: Number): CSSdpiValue
+        fun dpcm(value: Number): CSSdpcmValue
+        fun dppx(value: Number): CSSdppxValue
 
         // <flex>
-        fun fr(value: Number): CSSUnitValue
+        fun fr(value: Number): CSSfrValue
     }
 }
 

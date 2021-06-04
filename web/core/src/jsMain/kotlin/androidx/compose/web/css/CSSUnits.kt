@@ -1,7 +1,4 @@
-@file:Suppress("UNUSED")
-
 package org.jetbrains.compose.web.css
-
 external interface CSSSizeValue : CSSUnitValue, CSSSizeOrAutoValue
 
 // fake interfaces to distinguish units
@@ -55,73 +52,73 @@ val Number.number
     get(): CSSUnitValue = CSS.number(this)
 
 val Number.percent
-    get(): CSSpercentValue = CSS.percent(this).unsafeCast<CSSpercentValue>()
+    get(): CSSpercentValue = CSS.percent(this)
 
 val Number.em
-    get(): CSSemValue = CSS.em(this).unsafeCast<CSSemValue>()
+    get(): CSSemValue = CSS.em(this)
 val Number.ex
-    get(): CSSexValue = CSS.ex(this).unsafeCast<CSSexValue>()
+    get(): CSSexValue = CSS.ex(this)
 val Number.ch
-    get(): CSSchValue = CSS.ch(this).unsafeCast<CSSchValue>()
+    get(): CSSchValue = CSS.ch(this)
 val Number.ic
-    get(): CSSicValue = CSS.ic(this).unsafeCast<CSSicValue>()
+    get(): CSSicValue = CSS.ic(this)
 val Number.rem
-    get(): CSSremValue = CSS.rem(this).unsafeCast<CSSremValue>()
+    get(): CSSremValue = CSS.rem(this)
 val Number.lh
-    get(): CSSlhValue = CSS.lh(this).unsafeCast<CSSlhValue>()
+    get(): CSSlhValue = CSS.lh(this)
 val Number.rlh
-    get(): CSSrlhValue = CSS.rlh(this).unsafeCast<CSSrlhValue>()
+    get(): CSSrlhValue = CSS.rlh(this)
 val Number.vw
-    get(): CSSvwValue = CSS.vw(this).unsafeCast<CSSvwValue>()
+    get(): CSSvwValue = CSS.vw(this)
 val Number.vh
-    get(): CSSvhValue = CSS.vh(this).unsafeCast<CSSvhValue>()
+    get(): CSSvhValue = CSS.vh(this)
 val Number.vi
-    get(): CSSviValue = CSS.vi(this).unsafeCast<CSSviValue>()
+    get(): CSSviValue = CSS.vi(this)
 val Number.vb
-    get(): CSSvbValue = CSS.vb(this).unsafeCast<CSSvbValue>()
+    get(): CSSvbValue = CSS.vb(this)
 val Number.vmin
-    get(): CSSvminValue = CSS.vmin(this).unsafeCast<CSSvminValue>()
+    get(): CSSvminValue = CSS.vmin(this)
 val Number.vmax
-    get(): CSSvmaxValue = CSS.vmax(this).unsafeCast<CSSvmaxValue>()
+    get(): CSSvmaxValue = CSS.vmax(this)
 val Number.cm
-    get(): CSScmValue = CSS.cm(this).unsafeCast<CSScmValue>()
+    get(): CSScmValue = CSS.cm(this)
 val Number.mm
-    get(): CSSmmValue = CSS.mm(this).unsafeCast<CSSmmValue>()
+    get(): CSSmmValue = CSS.mm(this)
 val Number.Q
-    get(): CSSQValue = CSS.Q(this).unsafeCast<CSSQValue>()
+    get(): CSSQValue = CSS.Q(this)
 
 val Number.pt
-    get(): CSSptValue = CSS.pt(this).unsafeCast<CSSptValue>()
+    get(): CSSptValue = CSS.pt(this)
 val Number.pc
-    get(): CSSpcValue = CSS.pc(this).unsafeCast<CSSpcValue>()
+    get(): CSSpcValue = CSS.pc(this)
 val Number.px
-    get(): CSSpxValue = CSS.px(this).unsafeCast<CSSpxValue>()
+    get(): CSSpxValue = CSS.px(this)
 
 val Number.deg
-    get(): CSSdegValue = CSS.deg(this).unsafeCast<CSSdegValue>()
+    get(): CSSdegValue = CSS.deg(this)
 val Number.grad
-    get(): CSSgradValue = CSS.grad(this).unsafeCast<CSSgradValue>()
+    get(): CSSgradValue = CSS.grad(this)
 val Number.rad
-    get(): CSSradValue = CSS.rad(this).unsafeCast<CSSradValue>()
+    get(): CSSradValue = CSS.rad(this)
 val Number.turn
-    get(): CSSturnValue = CSS.turn(this).unsafeCast<CSSturnValue>()
+    get(): CSSturnValue = CSS.turn(this)
 
 val Number.s
-    get(): CSSsValue = CSS.s(this).unsafeCast<CSSsValue>()
+    get(): CSSsValue = CSS.s(this)
 val Number.ms
-    get(): CSSmsValue = CSS.ms(this).unsafeCast<CSSmsValue>()
+    get(): CSSmsValue = CSS.ms(this)
 
 val Number.Hz
-    get(): CSSHzValue = CSS.Hz(this).unsafeCast<CSSHzValue>()
+    get(): CSSHzValue = CSS.Hz(this)
 val Number.kHz
-    get(): CSSkHzValue = CSS.kHz(this).unsafeCast<CSSkHzValue>()
+    get(): CSSkHzValue = CSS.kHz(this)
 
 val Number.dpi
-    get(): CSSdpiValue = CSS.dpi(this).unsafeCast<CSSdpiValue>()
+    get(): CSSdpiValue = CSS.dpi(this)
 val Number.dpcm
-    get(): CSSdpcmValue = CSS.dpcm(this).unsafeCast<CSSdpcmValue>()
+    get(): CSSdpcmValue = CSS.dpcm(this)
 val Number.dppx
-    get(): CSSdppxValue = CSS.dppx(this).unsafeCast<CSSdppxValue>()
+    get(): CSSdppxValue = CSS.dppx(this)
 
 val Number.fr
-    get(): CSSfrValue = CSS.fr(this).unsafeCast<CSSfrValue>()
+    get(): CSSfrValue = CSS.fr(this)
