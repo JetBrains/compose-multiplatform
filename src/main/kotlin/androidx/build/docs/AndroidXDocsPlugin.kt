@@ -566,6 +566,7 @@ private const val DOCLAVA_DEPENDENCY = "com.android:doclava:1.0.6"
 private val dackkaDirsToProcess = listOf(
     "androidx/annotation/**",
     "androidx/benchmark/**",
+    "androidx/biometric/**",
     "androidx/collection/**",
     "androidx/compose/**",
     "androidx/datastore/**",
