@@ -14,12 +14,9 @@
  * limitations under the License.
  */
 
-
 import androidx.build.AndroidXUiPlugin
 import androidx.build.LibraryGroups
 import androidx.build.LibraryType
-
-import static androidx.build.dependencies.DependenciesKt.*
 
 plugins {
     id("AndroidXPlugin")
@@ -33,7 +30,7 @@ dependencies {
     kotlinPlugin(project(":compose:compiler:compiler"))
 
     if(!AndroidXUiPlugin.isMultiplatformEnabled(project)) {
-        implementation(KOTLIN_STDLIB)
+        implementation(libs.kotlinStdlib)
 
         api("androidx.annotation:annotation:1.1.0")
 
@@ -45,18 +42,18 @@ dependencies {
 
         // kotlin-reflect and tooling-animation-internal are provided by Studio at runtime
         compileOnly(project(":ui:ui-animation-tooling-internal"))
-        compileOnly(KOTLIN_REFLECT)
+        compileOnly(libs.kotlinReflect)
 
         androidTestImplementation(project(":compose:ui:ui-test-junit4"))
 
-        androidTestImplementation(JUNIT)
-        androidTestImplementation(ANDROIDX_TEST_RUNNER)
-        androidTestImplementation(ANDROIDX_TEST_RULES)
+        androidTestImplementation(libs.junit)
+        androidTestImplementation(libs.testRunner)
+        androidTestImplementation(libs.testRules)
         androidTestImplementation(project(":compose:foundation:foundation-layout"))
         androidTestImplementation(project(":compose:foundation:foundation"))
         androidTestImplementation(project(":compose:test-utils"))
-        androidTestImplementation(TRUTH)
-        androidTestImplementation(KOTLIN_REFLECT)
+        androidTestImplementation(libs.truth)
+        androidTestImplementation(libs.kotlinReflect)
         androidTestImplementation(project(":ui:ui-animation-tooling-internal"))
     }
 }
@@ -72,7 +69,7 @@ if(AndroidXUiPlugin.isMultiplatformEnabled(project)) {
          */
         sourceSets {
             commonMain.dependencies {
-                implementation(KOTLIN_STDLIB_COMMON)
+                implementation(libs.kotlinStdlibCommon)
 
             }
             androidMain.dependencies {
@@ -86,14 +83,14 @@ if(AndroidXUiPlugin.isMultiplatformEnabled(project)) {
 
                 // kotlin-reflect and tooling-animation-internal are provided by Studio at runtime
                 compileOnly(project(":ui:ui-animation-tooling-internal"))
-                compileOnly(KOTLIN_REFLECT)
+                compileOnly(libs.kotlinReflect)
             }
 
             androidMain.dependsOn(jvmMain)
             desktopMain.dependsOn(jvmMain)
 
             desktopMain.dependencies {
-                implementation(KOTLIN_STDLIB)
+                implementation(libs.kotlinStdlib)
                 implementation(project(":compose:runtime:runtime"))
                 implementation(project(":compose:ui:ui"))
             }
@@ -101,14 +98,14 @@ if(AndroidXUiPlugin.isMultiplatformEnabled(project)) {
             androidAndroidTest.dependencies {
                 implementation(project(":compose:ui:ui-test-junit4"))
 
-                implementation(JUNIT)
-                implementation(ANDROIDX_TEST_RUNNER)
-                implementation(ANDROIDX_TEST_RULES)
+                implementation(libs.junit)
+                implementation(libs.testRunner)
+                implementation(libs.testRules)
                 implementation(project(":compose:foundation:foundation-layout"))
                 implementation(project(":compose:foundation:foundation"))
                 implementation(project(":compose:test-utils"))
-                implementation(TRUTH)
-                implementation(KOTLIN_REFLECT)
+                implementation(libs.truth)
+                implementation(libs.kotlinReflect)
                 implementation(project(":ui:ui-animation-tooling-internal"))
             }
         }
