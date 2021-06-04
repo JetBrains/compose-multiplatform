@@ -193,6 +193,7 @@ internal fun TextFieldImpl(
                     indicatorWidth = indicatorWidth,
                     indicatorColor =
                         colors.indicatorColor(enabled, isError, interactionSource).value,
+                    shape = shape,
                     cursorColor = colors.cursorColor(isError).value
                 )
             }

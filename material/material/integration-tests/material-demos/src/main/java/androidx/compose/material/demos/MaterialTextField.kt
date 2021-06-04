@@ -33,6 +33,7 @@ import androidx.compose.foundation.layout.requiredWidth
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.selection.selectable
+import androidx.compose.foundation.shape.CutCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.Checkbox
 import androidx.compose.material.ContentAlpha
@@ -100,6 +101,10 @@ fun TextFieldsDemo() {
         item {
             Text("TextFieldValue overload")
             TextFieldSample()
+        }
+        item {
+            Text("Outlined text field with custom shape")
+            CustomShapeOutlinedTextFieldSample()
         }
     }
 }
@@ -302,6 +307,18 @@ fun MaterialTextFieldDemo() {
             )
         }
     }
+}
+
+@Composable
+fun CustomShapeOutlinedTextFieldSample() {
+    var text by rememberSaveable { mutableStateOf("") }
+
+    OutlinedTextField(
+        value = text,
+        onValueChange = { text = it },
+        label = { Text("Label") },
+        shape = CutCornerShape(5.dp)
+    )
 }
 
 /**
