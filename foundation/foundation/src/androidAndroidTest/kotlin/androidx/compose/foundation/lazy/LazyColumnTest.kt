@@ -1588,6 +1588,29 @@ class LazyColumnTest {
         }
     }
 
+    @Test
+    fun recreatingContentLambdaTriggersItemRecomposition() {
+        val countState = mutableStateOf(0)
+        rule.setContent {
+            val count = countState.value
+            LazyColumn {
+                item {
+                    BasicText(text = "Count $count")
+                }
+            }
+        }
+
+        rule.onNodeWithText("Count 0")
+            .assertIsDisplayed()
+
+        rule.runOnIdle {
+            countState.value++
+        }
+
+        rule.onNodeWithText("Count 1")
+            .assertIsDisplayed()
+    }
+
     private fun SemanticsNodeInteraction.assertTopPositionIsAlmost(expected: Dp) {
         getUnclippedBoundsInRoot().top.assertIsEqualTo(expected, tolerance = 1.dp)
     }
