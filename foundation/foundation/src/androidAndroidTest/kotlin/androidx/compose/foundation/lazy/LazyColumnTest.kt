@@ -17,7 +17,7 @@
 package androidx.compose.foundation.lazy
 
 import android.os.Build
-import androidx.compose.animation.core.advanceClockMillis
+import androidx.compose.testutils.advanceClockMillis
 import androidx.compose.animation.core.snap
 import androidx.compose.foundation.AutoTestFrameClock
 import androidx.compose.foundation.background

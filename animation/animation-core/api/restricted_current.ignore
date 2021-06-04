@@ -3,6 +3,12 @@ ChangedClass: androidx.compose.animation.core.Transition.Segment:
     Class androidx.compose.animation.core.Transition.Segment changed class/interface declaration
 
 
+RemovedClass: androidx.compose.animation.core.ManualFrameClock:
+    Removed class androidx.compose.animation.core.ManualFrameClock
+RemovedClass: androidx.compose.animation.core.ManualFrameClockKt:
+    Removed class androidx.compose.animation.core.ManualFrameClockKt
+
+
 RemovedMethod: androidx.compose.animation.core.Transition#addAnimation(androidx.compose.animation.core.Transition<S>.TransitionAnimationState<?,?>):
     Removed method androidx.compose.animation.core.Transition.addAnimation(androidx.compose.animation.core.Transition<S>.TransitionAnimationState<?,?>)
 RemovedMethod: androidx.compose.animation.core.Transition#addTransition(androidx.compose.animation.core.Transition<?>):

@@ -389,20 +389,6 @@ package androidx.compose.animation.core {
     property public final int durationMillis;
   }
 
-  public final class ManualFrameClock implements androidx.compose.runtime.MonotonicFrameClock {
-    ctor public ManualFrameClock(optional long initialTime);
-    method public void advanceClock(long nanos);
-    method public long getCurrentTime();
-    method public boolean getHasAwaiters();
-    method public suspend <R> Object? withFrameNanos(kotlin.jvm.functions.Function1<? super java.lang.Long,? extends R> onFrame, kotlin.coroutines.Continuation<? super R> p);
-    property public final long currentTime;
-    property public final boolean hasAwaiters;
-  }
-
-  public final class ManualFrameClockKt {
-    method public static void advanceClockMillis(androidx.compose.animation.core.ManualFrameClock, long millis);
-  }
-
   public final class MutableTransitionState<S> {
     ctor public MutableTransitionState(S? initialState);
     method public S! getCurrentState();

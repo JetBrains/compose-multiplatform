@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package androidx.compose.animation.core
+package androidx.compose.testutils
 
 import androidx.compose.runtime.BroadcastFrameClock
 import androidx.compose.runtime.MonotonicFrameClock

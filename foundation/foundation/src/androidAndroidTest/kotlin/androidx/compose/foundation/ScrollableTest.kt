@@ -16,7 +16,7 @@
 
 package androidx.compose.foundation
 
-import androidx.compose.animation.core.ManualFrameClock
+import androidx.compose.testutils.ManualFrameClock
 import androidx.compose.foundation.gestures.FlingBehavior
 import androidx.compose.foundation.gestures.animateScrollBy
 import androidx.compose.foundation.gestures.ScrollableState
