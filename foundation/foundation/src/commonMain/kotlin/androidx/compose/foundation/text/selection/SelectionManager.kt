@@ -20,6 +20,8 @@ package androidx.compose.foundation.text.selection
 
 import androidx.compose.foundation.fastFold
 import androidx.compose.foundation.focusable
+import androidx.compose.foundation.gestures.forEachGesture
+import androidx.compose.foundation.gestures.waitForUpOrCancellation
 import androidx.compose.runtime.State
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -36,6 +38,8 @@ import androidx.compose.ui.hapticfeedback.HapticFeedback
 import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.input.key.KeyEvent
 import androidx.compose.ui.input.key.onKeyEvent
+import androidx.compose.ui.input.pointer.PointerInputScope
+import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.LayoutCoordinates
 import androidx.compose.ui.layout.boundsInWindow
 import androidx.compose.ui.layout.onGloballyPositioned
@@ -44,6 +48,7 @@ import androidx.compose.ui.platform.ClipboardManager
 import androidx.compose.ui.platform.TextToolbar
 import androidx.compose.ui.platform.TextToolbarStatus
 import androidx.compose.ui.text.AnnotatedString
+import kotlinx.coroutines.coroutineScope
 import kotlin.math.max
 import kotlin.math.min
 
@@ -103,6 +108,7 @@ internal class SelectionManager(private val selectionRegistrar: SelectionRegistr
      * Modifier for selection container.
      */
     val modifier get() = Modifier
+        .onClearSelectionRequested { onRelease() }
         .onGloballyPositioned { containerLayoutCoordinates = it }
         .focusRequester(focusRequester)
         .onFocusChanged { focusState ->
@@ -623,6 +629,25 @@ internal class SelectionManager(private val selectionRegistrar: SelectionRegistr
                 showSelectionToolbar()
             }
         }
+    }
+
+    /**
+     * Detect tap without consuming the up event.
+     */
+    private suspend fun PointerInputScope.detectNonConsumingTap(onTap: (Offset) -> Unit) {
+        forEachGesture {
+            coroutineScope {
+                awaitPointerEventScope {
+                    waitForUpOrCancellation()?.let {
+                        onTap(it.position)
+                    }
+                }
+            }
+        }
+    }
+
+    private fun Modifier.onClearSelectionRequested(block: () -> Unit): Modifier {
+        return if (hasFocus) pointerInput(Unit) { detectNonConsumingTap { block() } } else this
     }
 
     private fun convertToContainerCoordinates(
