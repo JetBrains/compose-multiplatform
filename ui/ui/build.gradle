@@ -51,7 +51,7 @@ dependencies {
         // any dependency on this module.
         compileOnly(project(":compose:ui:ui-android-stubs"))
 
-        implementation("androidx.compose.runtime:runtime:1.1.0-rc01")
+        implementation(project(":compose:runtime:runtime"))
         implementation(project(":compose:ui:ui-util"))
         implementation(libs.kotlinStdlib)
         implementation("androidx.autofill:autofill:1.0.0")

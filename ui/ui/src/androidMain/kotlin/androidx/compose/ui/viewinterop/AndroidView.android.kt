@@ -30,6 +30,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCompositionContext
 import androidx.compose.runtime.saveable.LocalSaveableStateRegistry
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.UiComposable
 import androidx.compose.ui.materialize
 import androidx.compose.ui.node.LayoutNode
 import androidx.compose.ui.node.Ref
@@ -68,6 +69,7 @@ import androidx.compose.ui.unit.LayoutDirection
  * @param update The callback to be invoked after the layout is inflated.
  */
 @Composable
+@UiComposable
 fun <T : View> AndroidView(
     factory: (Context) -> T,
     modifier: Modifier = Modifier,

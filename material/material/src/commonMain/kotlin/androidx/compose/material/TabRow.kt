@@ -39,6 +39,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.UiComposable
 import androidx.compose.ui.composed
 import androidx.compose.ui.draw.clipToBounds
 import androidx.compose.ui.graphics.Color
@@ -128,20 +129,23 @@ import kotlinx.coroutines.launch
  * space.
  */
 @Composable
+@UiComposable
 fun TabRow(
     selectedTabIndex: Int,
     modifier: Modifier = Modifier,
     backgroundColor: Color = MaterialTheme.colors.primarySurface,
     contentColor: Color = contentColorFor(backgroundColor),
-    indicator: @Composable (tabPositions: List<TabPosition>) -> Unit = @Composable { tabPositions ->
-        TabRowDefaults.Indicator(
-            Modifier.tabIndicatorOffset(tabPositions[selectedTabIndex])
-        )
-    },
-    divider: @Composable () -> Unit = @Composable {
-        TabRowDefaults.Divider()
-    },
-    tabs: @Composable () -> Unit
+    indicator: @Composable @UiComposable
+        (tabPositions: List<TabPosition>) -> Unit = @Composable { tabPositions ->
+            TabRowDefaults.Indicator(
+                Modifier.tabIndicatorOffset(tabPositions[selectedTabIndex])
+            )
+        },
+    divider: @Composable @UiComposable () -> Unit =
+        @Composable {
+            TabRowDefaults.Divider()
+        },
+    tabs: @Composable @UiComposable () -> Unit
 ) {
     Surface(
         modifier = modifier.selectableGroup(),
@@ -219,21 +223,24 @@ fun TabRow(
  * up equal space.
  */
 @Composable
+@UiComposable
 fun ScrollableTabRow(
     selectedTabIndex: Int,
     modifier: Modifier = Modifier,
     backgroundColor: Color = MaterialTheme.colors.primarySurface,
     contentColor: Color = contentColorFor(backgroundColor),
     edgePadding: Dp = TabRowDefaults.ScrollableTabRowPadding,
-    indicator: @Composable (tabPositions: List<TabPosition>) -> Unit = @Composable { tabPositions ->
-        TabRowDefaults.Indicator(
-            Modifier.tabIndicatorOffset(tabPositions[selectedTabIndex])
-        )
-    },
-    divider: @Composable () -> Unit = @Composable {
-        TabRowDefaults.Divider()
-    },
-    tabs: @Composable () -> Unit
+    indicator: @Composable @UiComposable
+        (tabPositions: List<TabPosition>) -> Unit = @Composable { tabPositions ->
+            TabRowDefaults.Indicator(
+                Modifier.tabIndicatorOffset(tabPositions[selectedTabIndex])
+            )
+        },
+    divider: @Composable @UiComposable () -> Unit =
+        @Composable {
+            TabRowDefaults.Divider()
+        },
+    tabs: @Composable @UiComposable () -> Unit
 ) {
     Surface(
         modifier = modifier,
