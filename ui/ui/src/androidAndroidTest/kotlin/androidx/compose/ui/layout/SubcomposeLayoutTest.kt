@@ -26,16 +26,13 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.MutableState
-import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.background
 import androidx.compose.ui.draw.assertColor
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.asAndroidBitmap
-import androidx.compose.ui.layout.RootMeasurePolicy.measure
 import androidx.compose.ui.platform.AndroidOwnerExtraAssertionsRule
 import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.platform.LocalDensity
@@ -972,6 +969,31 @@ class SubcomposeLayoutTest {
         )
     }
 
+    @Test
+    fun subcomposeLayoutInsideLayoutUsingAlignmentsIsNotCrashing() {
+        // fix for regression from b/189965769
+        val emit = mutableStateOf(false)
+        rule.setContent {
+            LayoutUsingAlignments {
+                Box {
+                    if (emit.value) {
+                        SubcomposeLayout {
+                            subcompose(Unit) {}
+                            layout(10, 10) {}
+                        }
+                    }
+                }
+            }
+        }
+
+        rule.runOnIdle {
+            emit.value = true
+        }
+
+        // awaits that the change is applied and no crash happened
+        rule.runOnIdle { }
+    }
+
     private fun composeItems(
         state: SubcomposeLayoutState,
         items: MutableState<List<Int>>
@@ -1009,4 +1031,15 @@ class SubcomposeLayoutTest {
 
 fun ImageBitmap.assertCenterPixelColor(expectedColor: Color) {
     asAndroidBitmap().assertColor(expectedColor, width / 2, height / 2)
+}
+
+@Composable
+private fun LayoutUsingAlignments(content: @Composable () -> Unit) {
+    Layout(content) { measurables, constraints ->
+        val placeable = measurables.first().measure(constraints)
+        placeable[FirstBaseline]
+        layout(placeable.width, placeable.height) {
+            placeable.place(0, 0)
+        }
+    }
 }
