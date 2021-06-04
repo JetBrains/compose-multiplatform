@@ -94,7 +94,7 @@ private fun java.io.File.readLinePositions(
                 if (isBeginOfLine) {
                     starts.add(position.toInt())
                 }
-                isBeginOfLine = Char(byte.toInt()) == '\n'
+                isBeginOfLine = byte.toInt().toChar() == '\n'
                 position++
             }
             channel.close()
