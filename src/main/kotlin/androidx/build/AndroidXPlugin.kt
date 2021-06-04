@@ -37,7 +37,6 @@ import androidx.build.studio.StudioTask
 import androidx.build.testConfiguration.addAppApkToTestConfigGeneration
 import androidx.build.testConfiguration.addToTestZips
 import androidx.build.testConfiguration.configureTestConfigGeneration
-import com.android.build.api.extension.LibraryAndroidComponentsExtension
 import com.android.build.gradle.AppExtension
 import com.android.build.gradle.AppPlugin
 import com.android.build.gradle.LibraryExtension
@@ -270,7 +269,11 @@ class AndroidXPlugin : Plugin<Project> {
             configureAndroidLibraryOptions(project, androidXExtension)
         }
 
-        project.extensions.getByType<LibraryAndroidComponentsExtension>().apply {
+        // TODO(aurimas): migrate away from this when upgrading to AGP 7.1.0-alpha03 or newer
+        @Suppress("DEPRECATION")
+        project.extensions.getByType<
+            com.android.build.api.extension.LibraryAndroidComponentsExtension
+            >().apply {
             beforeVariants(selector().withBuildType("release")) { variant ->
                 variant.enableUnitTest = false
             }
