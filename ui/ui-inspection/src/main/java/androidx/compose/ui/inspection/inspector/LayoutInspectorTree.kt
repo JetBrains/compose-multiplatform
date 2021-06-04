@@ -547,7 +547,7 @@ class LayoutInspectorTree {
     @OptIn(UiToolingDataApi::class)
     private fun castValue(parameter: ParameterInformation): Any? {
         val value = parameter.value ?: return null
-        if (parameter.inlineClass == null) return value
+        if (parameter.inlineClass == null || !value.javaClass.isPrimitive) return value
         return inlineClassConverter.castParameterValue(parameter.inlineClass, value)
     }
 
