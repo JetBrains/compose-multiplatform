@@ -867,6 +867,7 @@ class LazyColumnTest {
         lateinit var state: LazyListState
         rule.setContentWithTestViewConfiguration {
             state = rememberLazyListState()
+            state.prefetchingEnabled = false
             LazyColumn(
                 Modifier.requiredSize(100.dp).testTag(LazyListTag),
                 state = state

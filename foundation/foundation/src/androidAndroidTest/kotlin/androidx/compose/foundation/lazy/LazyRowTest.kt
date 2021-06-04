@@ -733,6 +733,7 @@ class LazyRowTest {
         lateinit var state: LazyListState
         rule.setContentWithTestViewConfiguration {
             state = rememberLazyListState()
+            state.prefetchingEnabled = false
             LazyRow(Modifier.requiredSize(100.dp), state = state) {
                 items(items) {
                     Spacer(Modifier.requiredSize(20.dp).testTag("$it"))

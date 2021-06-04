@@ -30,6 +30,8 @@ import androidx.compose.runtime.saveable.listSaver
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.layout.Remeasurement
 import androidx.compose.ui.layout.RemeasurementModifier
+import androidx.compose.ui.layout.SubcomposeMeasureScope
+import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.Density
 import kotlin.math.abs
 
@@ -142,7 +144,7 @@ class LazyListState constructor(
      * The [Remeasurement] object associated with our layout. It allows us to remeasure
      * synchronously during scroll.
      */
-    private lateinit var remeasurement: Remeasurement
+    internal lateinit var remeasurement: Remeasurement
 
     /**
      * Only used for testing to confirm that we're not making too many measure passes
@@ -150,6 +152,12 @@ class LazyListState constructor(
     /*@VisibleForTesting*/
     internal var numMeasurePasses: Int = 0
         private set
+
+    /**
+     * Only used for testing to disable prefetching when needed to test the main logic.
+     */
+    /*@VisibleForTesting*/
+    internal var prefetchingEnabled: Boolean = true
 
     /**
      * The modifier which provides [remeasurement].
@@ -210,6 +218,7 @@ class LazyListState constructor(
         get() = scrollableState.isScrollInProgress
 
     internal var onScrolledListener: LazyListOnScrolledListener? = null
+    internal var onPostMeasureListener: LazyListOnPostMeasureListener? = null
 
     private var canScrollBackward: Boolean = false
     private var canScrollForward: Boolean = false
@@ -317,4 +326,11 @@ private object EmptyLazyListLayoutInfo : LazyListLayoutInfo {
 
 internal interface LazyListOnScrolledListener {
     fun onScrolled(delta: Float)
+}
+
+internal interface LazyListOnPostMeasureListener {
+    fun SubcomposeMeasureScope.onPostMeasure(
+        childConstraints: Constraints,
+        result: LazyListMeasureResult
+    )
 }

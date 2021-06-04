@@ -170,6 +170,10 @@ internal fun LazyList(
 
         state.applyMeasureResult(measureResult)
 
+        state.onPostMeasureListener?.apply {
+            onPostMeasure(itemProvider.childConstraints, measureResult)
+        }
+
         layout(
             width = measureResult.layoutWidth,
             height = measureResult.layoutHeight,
