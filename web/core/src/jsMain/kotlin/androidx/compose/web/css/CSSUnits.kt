@@ -60,22 +60,12 @@ val Number.ex
     get(): CSSexValue = CSS.ex(this)
 val Number.ch
     get(): CSSchValue = CSS.ch(this)
-val Number.ic
-    get(): CSSicValue = CSS.ic(this)
-val Number.rem
+val Number.cssRem
     get(): CSSremValue = CSS.rem(this)
-val Number.lh
-    get(): CSSlhValue = CSS.lh(this)
-val Number.rlh
-    get(): CSSrlhValue = CSS.rlh(this)
 val Number.vw
     get(): CSSvwValue = CSS.vw(this)
 val Number.vh
     get(): CSSvhValue = CSS.vh(this)
-val Number.vi
-    get(): CSSviValue = CSS.vi(this)
-val Number.vb
-    get(): CSSvbValue = CSS.vb(this)
 val Number.vmin
     get(): CSSvminValue = CSS.vmin(this)
 val Number.vmax

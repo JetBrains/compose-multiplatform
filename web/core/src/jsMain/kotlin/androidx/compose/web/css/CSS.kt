@@ -368,23 +368,15 @@ external class CSS {
         fun em(value: Number): CSSemValue
         fun ex(value: Number): CSSexValue
         fun ch(value: Number): CSSchValue
-        fun ic(value: Number): CSSicValue
         fun rem(value: Number): CSSremValue
-        fun lh(value: Number): CSSlhValue
-        fun rlh(value: Number): CSSrlhValue
         fun vw(value: Number): CSSvwValue
         fun vh(value: Number): CSSvhValue
-        fun vi(value: Number): CSSviValue
-        fun vb(value: Number): CSSvbValue
         fun vmin(value: Number): CSSvminValue
         fun vmax(value: Number): CSSvmaxValue
         fun cm(value: Number): CSScmValue
         fun mm(value: Number): CSSmmValue
         fun Q(value: Number): CSSQValue
 
-        //        function _in(value: Number) : CSSUnitValue
-//        export
-//        { _in as in }
         fun pt(value: Number): CSSptValue
         fun pc(value: Number): CSSpcValue
         fun px(value: Number): CSSpxValue
