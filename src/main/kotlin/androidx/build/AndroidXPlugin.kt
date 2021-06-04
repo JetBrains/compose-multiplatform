@@ -217,7 +217,11 @@ class AndroidXPlugin : Plugin<Project> {
             task.kotlinOptions.freeCompilerArgs += listOf("-Xsam-conversions=class")
         }
         project.afterEvaluate {
-            if (extension.shouldEnforceKotlinStrictApiMode()) {
+            val isAndroidProject = project.plugins.hasPlugin(LibraryPlugin::class.java) ||
+                project.plugins.hasPlugin(AppPlugin::class.java)
+            // Explicit API mode is broken for Android projects
+            // https://youtrack.jetbrains.com/issue/KT-37652
+            if (extension.shouldEnforceKotlinStrictApiMode() && !isAndroidProject) {
                 project.tasks.withType(KotlinCompile::class.java).configureEach { task ->
                     // Workaround for https://youtrack.jetbrains.com/issue/KT-37652
                     if (task.name.endsWith("TestKotlin")) return@configureEach
