@@ -1,0 +1,26 @@
+# Baseline profile rules for androidx.compose.material
+# =============================================
+HSPLandroidx/compose/material/Colors;->**(**)**
+HSPLandroidx/compose/material/ButtonKt**->**(**)**
+HSPLandroidx/compose/material/AppBarKt**->**(**)**
+HPLandroidx/compose/material/ProgressIndicatorKt;->**(**)**
+HPLandroidx/compose/material/IconKt;->**(**)**
+HSPLandroidx/compose/material/ContentAlpha;->**(**)**
+HSPLandroidx/compose/material/ComposableSingletons$**->**(**)**
+HSPLandroidx/compose/material/DrawerKt;->**(**)**
+HSPLandroidx/compose/material/DrawerState;->**(**)**
+HSPLandroidx/compose/material/FadeInFadeOutState;->**(**)**
+HSPLandroidx/compose/material/FabPosition;->**(**)**
+HSPLandroidx/compose/material/FloatingActionButtonKt**->**(**)**
+HSPLandroidx/compose/material/MaterialTheme;->**(**)**
+HSPLandroidx/compose/material/MaterialTextSelectionColorsKt;->**(**)**
+HSPLandroidx/compose/material/MaterialRippleTheme;->**(**)**
+HSPLandroidx/compose/material/ScaffoldKt**->**(**)**
+HSPLandroidx/compose/material/SnackbarHostKt**->**(**)**
+HSPLandroidx/compose/material/SurfaceKt**->**(**)**
+HSPLandroidx/compose/material/SwipeableKt**->**(**)**
+HSPLandroidx/compose/material/SwipeableState**->**(**)**
+HSPLandroidx/compose/material/TextKt**->**(**)**
+HSPLandroidx/compose/material/Typography;->**(**)**
+# Prioritize only the top level classes for material. (Notably, this ignores icons)
+Landroidx/compose/material/*;
