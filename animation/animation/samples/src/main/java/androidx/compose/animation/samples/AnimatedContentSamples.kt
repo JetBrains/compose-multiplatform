@@ -38,7 +38,6 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CutCornerShape
@@ -101,9 +100,10 @@ fun AnimateIncrementDecrementSample() {
             Text("$targetCount", fontSize = 20.sp)
         }
         Spacer(Modifier.size(20.dp))
-        Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceAround) {
-            Button(onClick = { count++ }) { Text("Plus") }
+        Row(horizontalArrangement = Arrangement.SpaceAround) {
             Button(onClick = { count-- }) { Text("Minus") }
+            Spacer(Modifier.size(60.dp))
+            Button(onClick = { count++ }) { Text("Plus ") }
         }
     }
 }

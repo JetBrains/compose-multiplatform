@@ -260,33 +260,25 @@ infix fun EnterTransition.with(exit: ExitTransition) = ContentTransform(this, ex
  * context of [AnimatedContent], such as [slideIntoContainer] and [slideOutOfContainer].
  */
 @ExperimentalAnimationApi
+// TODO: Consider making AnimatedContentScope an interface before graduating it from experimental
 class AnimatedContentScope<S> internal constructor(
     internal val transition: Transition<S>,
     internal var contentAlignment: Alignment,
     internal var layoutDirection: LayoutDirection
-) {
+) : Transition.Segment<S> {
     /**
      * Initial state of a Transition Segment. This is the state that transition starts from.
      */
-    val initialState: S
+    override val initialState: S
         @Suppress("UnknownNullness")
         get() = transition.segment.initialState
 
     /**
      * Target state of a Transition Segment. This is the state that transition will end on.
      */
-    val targetState: S
+    override val targetState: S
         @Suppress("UnknownNullness")
         get() = transition.segment.targetState
-
-    /**
-     * Returns whether the provided state matches the [initialState] && the provided
-     * [targetState] matches [AnimatedContentScope.targetState].
-     */
-    // TODO: Remove this, and have AnimatedContentScope implement Segment once
-    // b/189994207 is fixed.
-    infix fun S.isTransitioningTo(targetState: S) = this == transition.segment.initialState &&
-        targetState == transition.segment.targetState
 
     /**
      * Customizes the [SizeTransform] of a given [ContentTransform]. For example:
