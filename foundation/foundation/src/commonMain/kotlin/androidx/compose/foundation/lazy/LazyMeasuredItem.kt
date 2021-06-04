@@ -57,7 +57,6 @@ internal class LazyMeasuredItem(
     val crossAxisSize: Int
 
     override var offset: Int = 0
-        private set
 
     init {
         var mainAxisSize = 0
@@ -81,10 +80,8 @@ internal class LazyMeasuredItem(
     fun place(
         scope: Placeable.PlacementScope,
         layoutWidth: Int,
-        layoutHeight: Int,
-        offset: Int
+        layoutHeight: Int
     ) = with(scope) {
-        this@LazyMeasuredItem.offset = offset
         val mainAxisLayoutSize = if (isVertical) layoutHeight else layoutWidth
         var mainAxisOffset = if (reverseLayout) {
             mainAxisLayoutSize - offset - size
