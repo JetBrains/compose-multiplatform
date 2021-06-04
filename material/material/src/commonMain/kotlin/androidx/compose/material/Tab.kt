@@ -349,55 +349,25 @@ private fun TabBaselineLayout(
                     firstBaseline = firstBaseline!!,
                     lastBaseline = lastBaseline!!
                 )
-                textPlaceable != null -> placeText(
-                    density = this@Layout,
-                    textPlaceable = textPlaceable,
-                    tabHeight = tabHeight,
-                    firstBaseline = firstBaseline!!,
-                    lastBaseline = lastBaseline!!
-                )
-                iconPlaceable != null -> placeIcon(iconPlaceable, tabHeight)
-                else -> {}
+                textPlaceable != null -> placeTextOrIcon(textPlaceable, tabHeight)
+                iconPlaceable != null -> placeTextOrIcon(iconPlaceable, tabHeight)
+                else -> {
+                }
             }
         }
     }
 }
 
 /**
- * Places the provided [iconPlaceable] in the vertical center of the provided [tabHeight].
+ * Places the provided [textOrIconPlaceable] in the vertical center of the provided
+ * [tabHeight].
  */
-private fun Placeable.PlacementScope.placeIcon(
-    iconPlaceable: Placeable,
+private fun Placeable.PlacementScope.placeTextOrIcon(
+    textOrIconPlaceable: Placeable,
     tabHeight: Int
 ) {
-    val iconY = (tabHeight - iconPlaceable.height) / 2
-    iconPlaceable.placeRelative(0, iconY)
-}
-
-/**
- * Places the provided [textPlaceable] offset from the bottom of the tab using the correct
- * baseline offset.
- */
-private fun Placeable.PlacementScope.placeText(
-    density: Density,
-    textPlaceable: Placeable,
-    tabHeight: Int,
-    firstBaseline: Int,
-    lastBaseline: Int
-) {
-    val baselineOffset = if (firstBaseline == lastBaseline) {
-        SingleLineTextBaseline
-    } else {
-        DoubleLineTextBaseline
-    }
-
-    // Total offset between the last text baseline and the bottom of the Tab layout
-    val totalOffset = with(density) {
-        baselineOffset.roundToPx() + TabRowDefaults.IndicatorHeight.roundToPx()
-    }
-
-    val textPlaceableY = tabHeight - lastBaseline - totalOffset
-    textPlaceable.placeRelative(0, textPlaceableY)
+    val contentY = (tabHeight - textOrIconPlaceable.height) / 2
+    textOrIconPlaceable.placeRelative(0, contentY)
 }
 
 /**
@@ -452,13 +422,9 @@ private const val TabFadeOutAnimationDuration = 100
 // The horizontal padding on the left and right of text
 private val HorizontalTextPadding = 16.dp
 
-// Distance from the top of the indicator to the text baseline when there is one line of text
-private val SingleLineTextBaseline = 18.dp
 // Distance from the top of the indicator to the text baseline when there is one line of text and an
 // icon
 private val SingleLineTextBaselineWithIcon = 14.dp
-// Distance from the top of the indicator to the last text baseline when there are two lines of text
-private val DoubleLineTextBaseline = 10.dp
 // Distance from the top of the indicator to the last text baseline when there are two lines of text
 // and an icon
 private val DoubleLineTextBaselineWithIcon = 6.dp
