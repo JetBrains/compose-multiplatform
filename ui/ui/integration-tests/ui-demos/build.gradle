@@ -1,5 +1,3 @@
-import static androidx.build.dependencies.DependenciesKt.*
-
 plugins {
     id("AndroidXPlugin")
     id("com.android.library")
@@ -10,7 +8,7 @@ plugins {
 dependencies {
     kotlinPlugin(project(":compose:compiler:compiler"))
 
-    implementation(KOTLIN_STDLIB)
+    implementation(libs.kotlinStdlib)
 
     implementation(project(":compose:animation:animation"))
     implementation(project(":compose:foundation:foundation"))
