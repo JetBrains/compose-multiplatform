@@ -1132,9 +1132,11 @@ class TextFieldTest {
             }
         }
 
-        assertThat(dividerSize).isNotNull()
-        assertThat(textFieldSize).isNotNull()
-        assertThat(dividerSize!!.height).isEqualTo(textFieldSize!!.height)
+        rule.runOnIdle {
+            assertThat(dividerSize).isNotNull()
+            assertThat(textFieldSize).isNotNull()
+            assertThat(dividerSize!!.height).isEqualTo(textFieldSize!!.height)
+        }
     }
 
     @Test
@@ -1161,9 +1163,11 @@ class TextFieldTest {
             }
         }
 
-        assertThat(dividerSize).isNotNull()
-        assertThat(textFieldSize).isNotNull()
-        assertThat(dividerSize!!.width).isEqualTo(textFieldSize!!.width)
+        rule.runOnIdle {
+            assertThat(dividerSize).isNotNull()
+            assertThat(textFieldSize).isNotNull()
+            assertThat(dividerSize!!.width).isEqualTo(textFieldSize!!.width)
+        }
     }
 }
 

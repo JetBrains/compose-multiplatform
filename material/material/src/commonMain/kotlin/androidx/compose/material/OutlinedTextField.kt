@@ -495,7 +495,12 @@ private fun IconsWithTextFieldLayout(
             )
 
         val borderPlaceable = measurables.first { it.layoutId == "border" }.measure(
-            Constraints.fixed(width, height)
+            Constraints(
+                minWidth = if (width != Constraints.Infinity) width else 0,
+                maxWidth = width,
+                minHeight = if (height != Constraints.Infinity) height else 0,
+                maxHeight = height
+            )
         )
         layout(width, height) {
             place(
