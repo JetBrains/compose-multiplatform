@@ -551,9 +551,12 @@ class LayoutInspectorTree {
     @OptIn(UiToolingDataApi::class)
     private fun castValue(parameter: ParameterInformation): Any? {
         val value = parameter.value ?: return null
-        if (parameter.inlineClass == null || !value.javaClass.isPrimitive) return value
+        if (parameter.inlineClass == null || !isPrimitive(value.javaClass)) return value
         return inlineClassConverter.castParameterValue(parameter.inlineClass, value)
     }
+
+    private fun isPrimitive(cls: Class<*>): Boolean =
+        cls.kotlin.javaPrimitiveType != null
 
     private fun unwantedGroup(node: MutableInspectorNode): Boolean =
         (node.packageHash in systemPackages && hideSystemNodes) ||
