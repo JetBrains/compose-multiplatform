@@ -33,30 +33,44 @@ package androidx.compose.ui.text.font
  *
  *  @sample androidx.compose.ui.text.samples.FontFamilySynthesisSample
  **/
-enum class FontSynthesis {
-    /**
-     * Turns off font synthesis. Neither bold nor slanted faces are synthesized if they don't
-     * exist in the [FontFamily]
-     */
-    None,
+@Suppress("INLINE_CLASS_DEPRECATED")
+inline class FontSynthesis internal constructor(internal val value: Int) {
 
-    /**
-     * Only a bold font is synthesized, if it is not available in the [FontFamily]. Slanted fonts
-     * will not be synthesized.
-     */
-    Weight,
+    override fun toString(): String {
+        return when (this) {
+            None -> "None"
+            All -> "All"
+            Weight -> "Weight"
+            Style -> "Style"
+            else -> "Invalid"
+        }
+    }
 
-    /**
-     * Only an slanted font is synthesized, if it is not available in the [FontFamily]. Bold fonts
-     * will not be synthesized.
-     */
-    Style,
+    companion object {
+        /**
+         * Turns off font synthesis. Neither bold nor slanted faces are synthesized if they don't
+         * exist in the [FontFamily]
+         */
+        val None = FontSynthesis(0)
 
-    /**
-     * The system synthesizes both bold and slanted fonts if either of them are not available in
-     * the [FontFamily]
-     */
-    All;
+        /**
+         * The system synthesizes both bold and slanted fonts if either of them are not available in
+         * the [FontFamily]
+         */
+        val All = FontSynthesis(1)
+
+        /**
+         * Only a bold font is synthesized, if it is not available in the [FontFamily]. Slanted fonts
+         * will not be synthesized.
+         */
+        val Weight = FontSynthesis(2)
+
+        /**
+         * Only an slanted font is synthesized, if it is not available in the [FontFamily]. Bold fonts
+         * will not be synthesized.
+         */
+        val Style = FontSynthesis(3)
+    }
 
     internal val isWeightOn: Boolean
         get() = this == All || this == Weight
