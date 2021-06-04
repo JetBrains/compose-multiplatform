@@ -181,6 +181,7 @@ class MaterialTextSelectionColorsScreenshotTest {
             .assertAgainstGolden(screenshotRule, "filledTextField_darkThemeSelectionColors")
     }
 
+    @FlakyTest(bugId = 190120675)
     @Test
     fun outlinedTextField_lightThemeSelectionColors() {
         rule.setContent {
