@@ -53,7 +53,10 @@ import androidx.compose.ui.text.style.TextOverflow
  * @param maxLines An optional maximum number of lines for the text to span, wrapping if
  * necessary. If the text exceeds the given number of lines, it will be truncated according to
  * [overflow] and [softWrap]. If it is not null, then it must be greater than zero.
- * @param onTextLayout Callback that is executed when a new text layout is calculated.
+ * @param onTextLayout Callback that is executed when a new text layout is calculated. A
+ * [TextLayoutResult] object that callback provides contains paragraph information, size of the
+ * text, baselines and other details. The callback can be used to add additional decoration or
+ * functionality to the text. For example, to draw selection around the text.
  * @param onClick Callback that is executed when users click the text. This callback is called
  * with clicked character's offset.
  */

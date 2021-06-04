@@ -33,7 +33,10 @@ import androidx.compose.ui.text.style.TextOverflow
  * @param text The text to be displayed.
  * @param modifier [Modifier] to apply to this layout node.
  * @param style Style configuration for the text such as color, font, line height etc.
- * @param onTextLayout Callback that is executed when a new text layout is calculated.
+ * @param onTextLayout Callback that is executed when a new text layout is calculated. A
+ * [TextLayoutResult] object that callback provides contains paragraph information, size of the
+ * text, baselines and other details. The callback can be used to add additional decoration or
+ * functionality to the text. For example, to draw selection around the text.
  * @param overflow How visual overflow should be handled.
  * @param softWrap Whether the text should break at soft line breaks. If false, the glyphs in the
  * text will be positioned as if there was unlimited horizontal space. If [softWrap] is false,
@@ -71,7 +74,10 @@ fun BasicText(
  * @param text The text to be displayed.
  * @param modifier [Modifier] to apply to this layout node.
  * @param style Style configuration for the text such as color, font, line height etc.
- * @param onTextLayout Callback that is executed when a new text layout is calculated.
+ * @param onTextLayout Callback that is executed when a new text layout is calculated. A
+ * [TextLayoutResult] object that callback provides contains paragraph information, size of the
+ * text, baselines and other details. The callback can be used to add additional decoration or
+ * functionality to the text. For example, to draw selection around the text.
  * @param overflow How visual overflow should be handled.
  * @param softWrap Whether the text should break at soft line breaks. If false, the glyphs in the
  * text will be positioned as if there was unlimited horizontal space. If [softWrap] is false,
