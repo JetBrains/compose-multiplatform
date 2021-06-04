@@ -16,6 +16,7 @@
 
 package androidx.compose.ui.layout
 
+import android.annotation.SuppressLint
 import android.os.Build
 import android.widget.FrameLayout
 import androidx.compose.foundation.layout.Box
@@ -26,9 +27,12 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.ReusableContent
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.background
+import androidx.compose.ui.composed
 import androidx.compose.ui.draw.assertColor
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ImageBitmap
@@ -967,6 +971,53 @@ class SubcomposeLayoutTest {
             exists = /*active*/ listOf(0, 1) + /*reusable*/ listOf(3),
             doesNotExist = /*disposed*/ listOf(2)
         )
+    }
+
+    @SuppressLint("RememberReturnType")
+    @Test
+    fun reusedCompositionResetsRememberedObject() {
+        val slotState = mutableStateOf(0)
+        var lastRememberedSlot: Any? = null
+        var lastRememberedComposedModifierSlot: Any? = null
+
+        rule.setContent {
+            SubcomposeLayout(remember { SubcomposeLayoutState(1) }) { _ ->
+                val slot = slotState.value
+                subcompose(slot) {
+                    ReusableContent(slot) {
+                        remember {
+                            lastRememberedSlot = slot
+                        }
+                        Box(
+                            Modifier.composed {
+                                remember {
+                                    lastRememberedComposedModifierSlot = slot
+                                }
+                                Modifier
+                            }
+                        )
+                    }
+                }
+                layout(10, 10) {}
+            }
+        }
+
+        rule.runOnIdle {
+            assertThat(lastRememberedSlot).isEqualTo(0)
+            assertThat(lastRememberedComposedModifierSlot).isEqualTo(0)
+            slotState.value = 1
+        }
+
+        rule.runOnIdle {
+            assertThat(lastRememberedSlot).isEqualTo(1)
+            assertThat(lastRememberedComposedModifierSlot).isEqualTo(1)
+            slotState.value = 2
+        }
+
+        rule.runOnIdle {
+            assertThat(lastRememberedSlot).isEqualTo(2)
+            assertThat(lastRememberedComposedModifierSlot).isEqualTo(2)
+        }
     }
 
     @Test
