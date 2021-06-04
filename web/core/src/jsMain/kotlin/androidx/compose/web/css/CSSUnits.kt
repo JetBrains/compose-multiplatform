@@ -1,52 +1,52 @@
 package org.jetbrains.compose.web.css
-external interface CSSSizeValue : CSSUnitValue, CSSSizeOrAutoValue
 
-// fake interfaces to distinguish units
-external interface CSSRelValue : CSSSizeValue
-external interface CSSpercentValue : CSSRelValue
-external interface CSSemValue : CSSRelValue
-external interface CSSexValue : CSSRelValue
-external interface CSSchValue : CSSRelValue
-external interface CSSicValue : CSSRelValue
-external interface CSSremValue : CSSRelValue
-external interface CSSlhValue : CSSRelValue
-external interface CSSrlhValue : CSSRelValue
-external interface CSSvwValue : CSSRelValue
-external interface CSSvhValue : CSSRelValue
-external interface CSSviValue : CSSRelValue
-external interface CSSvbValue : CSSRelValue
-external interface CSSvminValue : CSSRelValue
-external interface CSSvmaxValue : CSSRelValue
-external interface CSScmValue : CSSRelValue
-external interface CSSmmValue : CSSRelValue
-external interface CSSQValue : CSSRelValue
+interface CSSSizeValue : CSSUnitValue, CSSSizeOrAutoValue
 
-external interface CSSAbsValue : CSSSizeValue
-external interface CSSptValue : CSSAbsValue
-external interface CSSpcValue : CSSAbsValue
-external interface CSSpxValue : CSSAbsValue
+interface CSSRelValue : CSSSizeValue
+interface CSSpercentValue : CSSRelValue
+interface CSSemValue : CSSRelValue
+interface CSSexValue : CSSRelValue
+interface CSSchValue : CSSRelValue
+interface CSSicValue : CSSRelValue
+interface CSSremValue : CSSRelValue
+interface CSSlhValue : CSSRelValue
+interface CSSrlhValue : CSSRelValue
+interface CSSvwValue : CSSRelValue
+interface CSSvhValue : CSSRelValue
+interface CSSviValue : CSSRelValue
+interface CSSvbValue : CSSRelValue
+interface CSSvminValue : CSSRelValue
+interface CSSvmaxValue : CSSRelValue
+interface CSScmValue : CSSRelValue
+interface CSSmmValue : CSSRelValue
+interface CSSQValue : CSSRelValue
 
-external interface CSSangleValue : CSSUnitValue
-external interface CSSdegValue : CSSangleValue
-external interface CSSgradValue : CSSangleValue
-external interface CSSradValue : CSSangleValue
-external interface CSSturnValue : CSSangleValue
+interface CSSAbsValue : CSSSizeValue
+interface CSSptValue : CSSAbsValue
+interface CSSpcValue : CSSAbsValue
+interface CSSpxValue : CSSAbsValue
 
-external interface CSSTimeValue : CSSUnitValue
-external interface CSSsValue : CSSTimeValue
-external interface CSSmsValue : CSSTimeValue
+interface CSSangleValue : CSSUnitValue
+interface CSSdegValue : CSSangleValue
+interface CSSgradValue : CSSangleValue
+interface CSSradValue : CSSangleValue
+interface CSSturnValue : CSSangleValue
 
-external interface CSSFrequencyValue : CSSUnitValue
-external interface CSSHzValue : CSSFrequencyValue
-external interface CSSkHzValue : CSSFrequencyValue
+interface CSSTimeValue : CSSUnitValue
+interface CSSsValue : CSSTimeValue
+interface CSSmsValue : CSSTimeValue
 
-external interface CSSResolutionValue : CSSUnitValue
-external interface CSSdpiValue : CSSResolutionValue
-external interface CSSdpcmValue : CSSResolutionValue
-external interface CSSdppxValue : CSSResolutionValue
+interface CSSFrequencyValue : CSSUnitValue
+interface CSSHzValue : CSSFrequencyValue
+interface CSSkHzValue : CSSFrequencyValue
 
-external interface CSSFlexValue : CSSUnitValue
-external interface CSSfrValue : CSSFlexValue
+interface CSSResolutionValue : CSSUnitValue
+interface CSSdpiValue : CSSResolutionValue
+interface CSSdpcmValue : CSSResolutionValue
+interface CSSdppxValue : CSSResolutionValue
+
+interface CSSFlexValue : CSSUnitValue
+interface CSSfrValue : CSSFlexValue
 
 val Number.number
     get(): CSSUnitValue = CSS.number(this)
