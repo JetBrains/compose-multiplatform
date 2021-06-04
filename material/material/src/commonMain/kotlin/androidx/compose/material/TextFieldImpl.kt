@@ -352,6 +352,8 @@ private enum class InputPhase {
 internal const val TextFieldId = "TextField"
 internal const val PlaceholderId = "Hint"
 internal const val LabelId = "Label"
+internal const val LeadingId = "Leading"
+internal const val TrailingId = "Trailing"
 
 internal const val AnimationDuration = 150
 private const val PlaceholderAnimationDuration = 83
