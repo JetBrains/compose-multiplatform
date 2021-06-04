@@ -213,19 +213,19 @@ internal class RecordingInputConnection(
         }
 
     override fun setSelection(start: Int, end: Int): Boolean = ensureActive {
-        if (DEBUG) { logDebug("setSelection($start, $end") }
+        if (DEBUG) { logDebug("setSelection($start, $end)") }
         addEditCommandWithBatch(SetSelectionCommand(start, end))
         return true
     }
 
     override fun finishComposingText(): Boolean = ensureActive {
-        if (DEBUG) { logDebug("finishComposingText(") }
+        if (DEBUG) { logDebug("finishComposingText()") }
         addEditCommandWithBatch(FinishComposingTextCommand())
         return true
     }
 
     override fun sendKeyEvent(event: KeyEvent): Boolean = ensureActive {
-        if (DEBUG) { logDebug("sendKeyEvent($event") }
+        if (DEBUG) { logDebug("sendKeyEvent($event)") }
         eventCallback.onKeyEvent(event)
         return true
     }
@@ -261,13 +261,13 @@ internal class RecordingInputConnection(
     }
 
     override fun requestCursorUpdates(cursorUpdateMode: Int): Boolean = ensureActive {
-        if (DEBUG) { logDebug("requestCursorUpdates($cursorUpdateMode") }
+        if (DEBUG) { logDebug("requestCursorUpdates($cursorUpdateMode)") }
         Log.w(TAG, "requestCursorUpdates is not supported")
         return false
     }
 
     override fun getExtractedText(request: ExtractedTextRequest?, flags: Int): ExtractedText {
-        if (DEBUG) { logDebug("getExtractedText($request, $flags") }
+        if (DEBUG) { logDebug("getExtractedText($request, $flags)") }
         extractedTextMonitorMode = (flags and InputConnection.GET_EXTRACTED_TEXT_MONITOR) != 0
         if (extractedTextMonitorMode) {
             currentExtractedTextRequestToken = request?.token ?: 0
@@ -296,13 +296,13 @@ internal class RecordingInputConnection(
     // /////////////////////////////////////////////////////////////////////////////////////////////
 
     override fun performContextMenuAction(id: Int): Boolean = ensureActive {
-        if (DEBUG) { logDebug("performContextMenuAction($id") }
+        if (DEBUG) { logDebug("performContextMenuAction($id)") }
         Log.w(TAG, "performContextMenuAction is not supported")
         return false
     }
 
     override fun performEditorAction(editorAction: Int): Boolean = ensureActive {
-        if (DEBUG) { logDebug("performEditorAction($editorAction") }
+        if (DEBUG) { logDebug("performEditorAction($editorAction)") }
         val imeAction = when (editorAction) {
             EditorInfo.IME_ACTION_UNSPECIFIED -> ImeAction.Default
             EditorInfo.IME_ACTION_DONE -> ImeAction.Done
@@ -325,7 +325,7 @@ internal class RecordingInputConnection(
     // /////////////////////////////////////////////////////////////////////////////////////////////
 
     override fun commitCompletion(text: CompletionInfo?): Boolean = ensureActive {
-        if (DEBUG) { logDebug("commitCompletion(${text?.text}") }
+        if (DEBUG) { logDebug("commitCompletion(${text?.text})") }
         // We don't support this callback.
         // The API documents says this should return if the input connection is no longer valid, but
         // The Chromium implementation already returning false, so assuming it is safe to return
@@ -342,12 +342,12 @@ internal class RecordingInputConnection(
     }
 
     override fun getHandler(): Handler? {
-        if (DEBUG) { logDebug("getHandler(") }
+        if (DEBUG) { logDebug("getHandler()") }
         return null // Returns null means using default Handler
     }
 
     override fun clearMetaKeyStates(states: Int): Boolean = ensureActive {
-        if (DEBUG) { logDebug("clearMetaKeyStates($states") }
+        if (DEBUG) { logDebug("clearMetaKeyStates($states)") }
         // We don't support this callback.
         // The API documents says this should return if the input connection is no longer valid, but
         // The Chromium implementation already returning false, so assuming it is safe to return
@@ -357,12 +357,12 @@ internal class RecordingInputConnection(
     }
 
     override fun reportFullscreenMode(enabled: Boolean): Boolean {
-        if (DEBUG) { logDebug("reportFullscreenMode($enabled") }
+        if (DEBUG) { logDebug("reportFullscreenMode($enabled)") }
         return false // This value is ignored according to the API docs.
     }
 
     override fun getCursorCapsMode(reqModes: Int): Int {
-        if (DEBUG) { logDebug("getCursorCapsMode($reqModes") }
+        if (DEBUG) { logDebug("getCursorCapsMode($reqModes)") }
         return TextUtils.getCapsMode(mTextFieldValue.text, mTextFieldValue.selection.min, reqModes)
     }
 
