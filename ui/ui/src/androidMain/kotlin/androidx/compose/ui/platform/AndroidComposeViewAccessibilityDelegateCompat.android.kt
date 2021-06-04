@@ -311,6 +311,7 @@ internal class AndroidComposeViewAccessibilityDelegateCompat(val view: AndroidCo
             Role.RadioButton -> info.className = "android.widget.RadioButton"
             Role.Tab -> info.roleDescription = view.context.resources.getString(R.string.tab)
             Role.Image -> info.className = "android.widget.ImageView"
+            else -> {}
         }
         info.packageName = view.context.packageName
 
@@ -419,6 +420,7 @@ internal class AndroidComposeViewAccessibilityDelegateCompat(val view: AndroidCo
             info.liveRegion = when (it) {
                 LiveRegionMode.Polite -> ACCESSIBILITY_LIVE_REGION_POLITE
                 LiveRegionMode.Assertive -> ACCESSIBILITY_LIVE_REGION_ASSERTIVE
+                else -> ACCESSIBILITY_LIVE_REGION_POLITE
             }
         }
         info.isClickable = false

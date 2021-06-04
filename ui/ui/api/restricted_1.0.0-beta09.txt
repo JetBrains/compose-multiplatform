@@ -2256,9 +2256,20 @@ package androidx.compose.ui.semantics {
     property public final String label;
   }
 
-  public enum LiveRegionMode {
-    enum_constant public static final androidx.compose.ui.semantics.LiveRegionMode Assertive;
-    enum_constant public static final androidx.compose.ui.semantics.LiveRegionMode Polite;
+  @androidx.compose.runtime.Immutable public final inline class LiveRegionMode {
+    ctor public LiveRegionMode();
+    method @androidx.compose.runtime.Immutable public static inline boolean equals-impl(int p, Object? p1);
+    method public static boolean equals-impl0(int p1, int p2);
+    method @androidx.compose.runtime.Immutable public static inline int hashCode-impl(int p);
+    method public static String toString-impl(int $this);
+    field public static final androidx.compose.ui.semantics.LiveRegionMode.Companion Companion;
+  }
+
+  public static final class LiveRegionMode.Companion {
+    method public int getAssertive-0phEisY();
+    method public int getPolite-0phEisY();
+    property public final int Assertive;
+    property public final int Polite;
   }
 
   public final class ProgressBarRangeInfo {
@@ -2277,13 +2288,28 @@ package androidx.compose.ui.semantics {
     property public final androidx.compose.ui.semantics.ProgressBarRangeInfo Indeterminate;
   }
 
-  public enum Role {
-    enum_constant public static final androidx.compose.ui.semantics.Role Button;
-    enum_constant public static final androidx.compose.ui.semantics.Role Checkbox;
-    enum_constant public static final androidx.compose.ui.semantics.Role Image;
-    enum_constant public static final androidx.compose.ui.semantics.Role RadioButton;
-    enum_constant public static final androidx.compose.ui.semantics.Role Switch;
-    enum_constant public static final androidx.compose.ui.semantics.Role Tab;
+  @androidx.compose.runtime.Immutable public final inline class Role {
+    ctor public Role();
+    method @androidx.compose.runtime.Immutable public static inline boolean equals-impl(int p, Object? p1);
+    method public static boolean equals-impl0(int p1, int p2);
+    method @androidx.compose.runtime.Immutable public static inline int hashCode-impl(int p);
+    method public static String toString-impl(int $this);
+    field public static final androidx.compose.ui.semantics.Role.Companion Companion;
+  }
+
+  public static final class Role.Companion {
+    method public int getButton-o7Vup1c();
+    method public int getCheckbox-o7Vup1c();
+    method public int getImage-o7Vup1c();
+    method public int getRadioButton-o7Vup1c();
+    method public int getSwitch-o7Vup1c();
+    method public int getTab-o7Vup1c();
+    property public final int Button;
+    property public final int Checkbox;
+    property public final int Image;
+    property public final int RadioButton;
+    property public final int Switch;
+    property public final int Tab;
   }
 
   public final class ScrollAxisRange {
@@ -2482,10 +2508,10 @@ package androidx.compose.ui.semantics {
     method public static boolean getFocused(androidx.compose.ui.semantics.SemanticsPropertyReceiver);
     method public static androidx.compose.ui.semantics.ScrollAxisRange getHorizontalScrollAxisRange(androidx.compose.ui.semantics.SemanticsPropertyReceiver);
     method public static int getImeAction(androidx.compose.ui.semantics.SemanticsPropertyReceiver);
-    method public static androidx.compose.ui.semantics.LiveRegionMode getLiveRegion(androidx.compose.ui.semantics.SemanticsPropertyReceiver);
+    method public static int getLiveRegion(androidx.compose.ui.semantics.SemanticsPropertyReceiver);
     method public static String getPaneTitle(androidx.compose.ui.semantics.SemanticsPropertyReceiver);
     method public static androidx.compose.ui.semantics.ProgressBarRangeInfo getProgressBarRangeInfo(androidx.compose.ui.semantics.SemanticsPropertyReceiver);
-    method public static androidx.compose.ui.semantics.Role getRole(androidx.compose.ui.semantics.SemanticsPropertyReceiver);
+    method public static int getRole(androidx.compose.ui.semantics.SemanticsPropertyReceiver);
     method public static boolean getSelected(androidx.compose.ui.semantics.SemanticsPropertyReceiver);
     method public static String getStateDescription(androidx.compose.ui.semantics.SemanticsPropertyReceiver);
     method public static String getTestTag(androidx.compose.ui.semantics.SemanticsPropertyReceiver);
@@ -2512,11 +2538,11 @@ package androidx.compose.ui.semantics {
     method public static void setFocused(androidx.compose.ui.semantics.SemanticsPropertyReceiver, boolean p);
     method public static void setHorizontalScrollAxisRange(androidx.compose.ui.semantics.SemanticsPropertyReceiver, androidx.compose.ui.semantics.ScrollAxisRange p);
     method public static void setImeAction-R3uo_t0(androidx.compose.ui.semantics.SemanticsPropertyReceiver, int p);
-    method public static void setLiveRegion(androidx.compose.ui.semantics.SemanticsPropertyReceiver, androidx.compose.ui.semantics.LiveRegionMode p);
+    method public static void setLiveRegion-QmIH8pA(androidx.compose.ui.semantics.SemanticsPropertyReceiver, int p);
     method public static void setPaneTitle(androidx.compose.ui.semantics.SemanticsPropertyReceiver, String p);
     method public static void setProgress(androidx.compose.ui.semantics.SemanticsPropertyReceiver, optional String? label, kotlin.jvm.functions.Function1<? super java.lang.Float,java.lang.Boolean>? action);
     method public static void setProgressBarRangeInfo(androidx.compose.ui.semantics.SemanticsPropertyReceiver, androidx.compose.ui.semantics.ProgressBarRangeInfo p);
-    method public static void setRole(androidx.compose.ui.semantics.SemanticsPropertyReceiver, androidx.compose.ui.semantics.Role p);
+    method public static void setRole-nYGtkIw(androidx.compose.ui.semantics.SemanticsPropertyReceiver, int p);
     method public static void setSelected(androidx.compose.ui.semantics.SemanticsPropertyReceiver, boolean p);
     method public static void setSelection(androidx.compose.ui.semantics.SemanticsPropertyReceiver, optional String? label, kotlin.jvm.functions.Function3<? super java.lang.Integer,? super java.lang.Integer,? super java.lang.Boolean,java.lang.Boolean>? action);
     method public static void setStateDescription(androidx.compose.ui.semantics.SemanticsPropertyReceiver, String p);
