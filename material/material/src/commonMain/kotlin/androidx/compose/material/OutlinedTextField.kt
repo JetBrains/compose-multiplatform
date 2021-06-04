@@ -397,7 +397,7 @@ private fun IconsWithTextFieldLayout(
             )
 
             if (leading != null) {
-                Box(Modifier.layoutId("leading").iconPadding(start = HorizontalIconPadding)) {
+                Box(Modifier.layoutId(LeadingId).iconPadding(start = HorizontalIconPadding)) {
                     Decoration(
                         contentColor = leadingColor,
                         content = leading
@@ -405,7 +405,7 @@ private fun IconsWithTextFieldLayout(
                 }
             }
             if (trailing != null) {
-                Box(Modifier.layoutId("trailing").iconPadding(end = HorizontalIconPadding)) {
+                Box(Modifier.layoutId(TrailingId).iconPadding(end = HorizontalIconPadding)) {
                     Decoration(
                         contentColor = trailingColor,
                         content = trailing
@@ -435,13 +435,13 @@ private fun IconsWithTextFieldLayout(
         // measure leading icon
         val constraints =
             incomingConstraints.copy(minWidth = 0, minHeight = 0)
-        val leadingPlaceable = measurables.find { it.layoutId == "leading" }?.measure(constraints)
+        val leadingPlaceable = measurables.find { it.layoutId == LeadingId }?.measure(constraints)
         occupiedSpaceHorizontally += widthOrZero(
             leadingPlaceable
         )
 
         // measure trailing icon
-        val trailingPlaceable = measurables.find { it.layoutId == "trailing" }
+        val trailingPlaceable = measurables.find { it.layoutId == TrailingId }
             ?.measure(constraints.offset(horizontal = -occupiedSpaceHorizontally))
         occupiedSpaceHorizontally += widthOrZero(
             trailingPlaceable
