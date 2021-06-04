@@ -132,8 +132,6 @@ external interface CSSNumericValue : CSSStyleValue {
     fun min(vararg values: CSSNumberish): CSSNumericValue
     fun max(vararg values: CSSNumberish): CSSNumericValue
 
-    fun equals(vararg values: CSSNumberish): Boolean
-
     fun to(unit: String): CSSUnitValue
     fun toSum(vararg units: String): CSSMathSum
     fun type(): CSSNumericType
@@ -146,8 +144,6 @@ abstract external class CSSNumericValueJS : CSSNumericValue {
     override fun div(vararg values: CSSNumberish): CSSNumericValue
     override fun min(vararg values: CSSNumberish): CSSNumericValue
     override fun max(vararg values: CSSNumberish): CSSNumericValue
-
-    override fun equals(vararg values: CSSNumberish): Boolean
 
     override fun to(unit: String): CSSUnitValue
     override fun toSum(vararg units: String): CSSMathSum
