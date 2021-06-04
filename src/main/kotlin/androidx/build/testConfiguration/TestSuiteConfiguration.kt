@@ -33,8 +33,6 @@ import androidx.build.hasBenchmarkPlugin
 import androidx.build.renameApkForTesting
 import com.android.build.api.artifact.Artifacts
 import com.android.build.api.artifact.SingleArtifact
-import com.android.build.api.extension.AndroidComponentsExtension
-import com.android.build.api.extension.ApplicationAndroidComponentsExtension
 import com.android.build.api.variant.ApplicationVariant
 import com.android.build.api.variant.LibraryVariant
 import com.android.build.gradle.TestedExtension
@@ -121,7 +119,11 @@ fun Project.createTestConfigurationGenerationTask(
  * alternative project. Default is for the project to register the new config task to itself
  */
 fun Project.addAppApkToTestConfigGeneration(overrideProject: Project = this) {
-    extensions.getByType<ApplicationAndroidComponentsExtension>().apply {
+    // TODO(aurimas): migrate away from this when upgrading to AGP 7.1.0-alpha03 or newer
+    @Suppress("DEPRECATION")
+    extensions.getByType<
+        com.android.build.api.extension.ApplicationAndroidComponentsExtension
+        >().apply {
         onVariants(selector().withBuildType("debug")) { debugVariant ->
             overrideProject.tasks.withType(GenerateTestConfigurationTask::class.java)
                 .configureEach {
@@ -348,7 +350,11 @@ private fun Project.configureMacrobenchmarkConfigTask(
 }
 
 fun Project.configureTestConfigGeneration(testedExtension: TestedExtension) {
-    extensions.getByType<AndroidComponentsExtension<*, *, *>>().apply {
+    // TODO(aurimas): migrate away from this when upgrading to AGP 7.1.0-alpha03 or newer
+    @Suppress("DEPRECATION")
+    extensions.getByType<
+        com.android.build.api.extension.AndroidComponentsExtension<*, *, *>
+        >().apply {
         onVariants { variant ->
             val androidTest = when (variant) {
                 is ApplicationVariant -> variant.androidTest
