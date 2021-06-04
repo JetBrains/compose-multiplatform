@@ -147,12 +147,15 @@ internal class LayoutNode : Measurable, Remeasurement, OwnerScope, LayoutInfo, C
      * The parent node in the LayoutNode hierarchy. This is `null` when the [LayoutNode]
      * is not attached to a hierarchy or is the root of the hierarchy.
      */
-    internal var parent: LayoutNode? = null
+    private var _foldedParent: LayoutNode? = null
+
+    /*
+     * The parent node in the LayoutNode hierarchy, skipping over virtual nodes.
+     */
+    internal val parent: LayoutNode?
         get() {
-            val parent = field
-            return if (parent != null && parent.isVirtual) parent.parent else parent
+            return if (_foldedParent?.isVirtual == true) _foldedParent?.parent else _foldedParent
         }
-        private set
 
     /**
      * The view system [Owner]. This `null` until [attach] is called
@@ -194,18 +197,22 @@ internal class LayoutNode : Measurable, Remeasurement, OwnerScope, LayoutInfo, C
      * then [instance] will become [attach]ed also. [instance] must have a `null` [parent].
      */
     internal fun insertAt(index: Int, instance: LayoutNode) {
-        check(instance.parent == null) {
-            "Cannot insert $instance because it already has a parent"
+        check(instance._foldedParent == null) {
+            "Cannot insert $instance because it already has a parent." +
+                " This tree: " + debugTreeToString() +
+                " Other tree: " + instance._foldedParent?.debugTreeToString()
         }
         check(instance.owner == null) {
-            "Cannot insert $instance because it already has an owner"
+            "Cannot insert $instance because it already has an owner." +
+                " This tree: " + debugTreeToString() +
+                " Other tree: " + instance.debugTreeToString()
         }
 
         if (DebugChanges) {
             println("$instance added to $this at index $index")
         }
 
-        instance.parent = this
+        instance._foldedParent = this
         _foldedChildren.add(index, instance)
         onZSortedChildrenInvalidated()
 
@@ -249,7 +256,7 @@ internal class LayoutNode : Measurable, Remeasurement, OwnerScope, LayoutInfo, C
             if (attached) {
                 child.detach()
             }
-            child.parent = null
+            child._foldedParent = null
 
             if (child.isVirtual) {
                 virtualChildrenCount--
@@ -268,7 +275,7 @@ internal class LayoutNode : Measurable, Remeasurement, OwnerScope, LayoutInfo, C
             if (attached) {
                 child.detach()
             }
-            child.parent = null
+            child._foldedParent = null
         }
         _foldedChildren.clear()
         onZSortedChildrenInvalidated()
@@ -313,12 +320,14 @@ internal class LayoutNode : Measurable, Remeasurement, OwnerScope, LayoutInfo, C
      */
     internal fun attach(owner: Owner) {
         check(this.owner == null) {
-            "Cannot attach $this as it already is attached"
+            "Cannot attach $this as it already is attached.  Tree: " + debugTreeToString()
+        }
+        check(_foldedParent == null || _foldedParent?.owner == owner) {
+            "Attaching to a different owner($owner) than the parent's owner(${parent?.owner})." +
+                " This tree: " + debugTreeToString() +
+                " Parent tree: " + _foldedParent?.debugTreeToString()
         }
         val parent = this.parent
-        check(parent == null || parent.owner == owner) {
-            "Attaching to a different owner($owner) than the parent's owner(${parent?.owner})"
-        }
         if (parent == null) {
             // it is a root node and attached root nodes are always placed (as there is no parent
             // to place them explicitly)
@@ -350,7 +359,7 @@ internal class LayoutNode : Measurable, Remeasurement, OwnerScope, LayoutInfo, C
     internal fun detach() {
         val owner = owner
         checkNotNull(owner) {
-            "Cannot detach node that is already detached!"
+            "Cannot detach node that is already detached!  Tree: " + parent?.debugTreeToString()
         }
         val parent = this.parent
         if (parent != null) {
