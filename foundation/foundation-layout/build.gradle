@@ -18,8 +18,6 @@ import androidx.build.AndroidXUiPlugin
 import androidx.build.LibraryGroups
 import androidx.build.LibraryType
 
-import static androidx.build.dependencies.DependenciesKt.*
-
 plugins {
     id("AndroidXPlugin")
     id("com.android.library")
@@ -42,20 +40,20 @@ dependencies {
 
         implementation(project(":compose:runtime:runtime"))
         implementation(project(":compose:ui:ui-util"))
-        implementation(KOTLIN_STDLIB_COMMON)
+        implementation(libs.kotlinStdlibCommon)
 
-        testImplementation(ANDROIDX_TEST_RULES)
-        testImplementation(ANDROIDX_TEST_RUNNER)
-        testImplementation(JUNIT)
+        testImplementation(libs.testRules)
+        testImplementation(libs.testRunner)
+        testImplementation(libs.junit)
 
         androidTestImplementation(project(":compose:foundation:foundation"))
         androidTestImplementation(project(":compose:ui:ui-test-junit4"))
         androidTestImplementation(project(":compose:test-utils"))
         androidTestImplementation(project(":activity:activity-compose"))
-        androidTestImplementation(ANDROIDX_TEST_RULES)
-        androidTestImplementation(ANDROIDX_TEST_RUNNER)
-        androidTestImplementation(JUNIT)
-        androidTestImplementation(TRUTH)
+        androidTestImplementation(libs.testRules)
+        androidTestImplementation(libs.testRunner)
+        androidTestImplementation(libs.junit)
+        androidTestImplementation(libs.truth)
     }
 }
 
@@ -70,7 +68,7 @@ if(AndroidXUiPlugin.isMultiplatformEnabled(project)) {
          */
         sourceSets {
             commonMain.dependencies {
-                implementation(KOTLIN_STDLIB_COMMON)
+                implementation(libs.kotlinStdlibCommon)
 
                 api(project(":compose:ui:ui"))
                 implementation(project(":compose:runtime:runtime"))
@@ -82,13 +80,13 @@ if(AndroidXUiPlugin.isMultiplatformEnabled(project)) {
             }
 
             desktopMain.dependencies {
-                implementation(KOTLIN_STDLIB)
+                implementation(libs.kotlinStdlib)
             }
 
             androidTest.dependencies {
-                implementation(ANDROIDX_TEST_RULES)
-                implementation(ANDROIDX_TEST_RUNNER)
-                implementation(JUNIT)
+                implementation(libs.testRules)
+                implementation(libs.testRunner)
+                implementation(libs.junit)
             }
 
             androidAndroidTest.dependencies {
@@ -97,10 +95,10 @@ if(AndroidXUiPlugin.isMultiplatformEnabled(project)) {
                 implementation(project(":compose:test-utils"))
                 implementation(project(":activity:activity-compose"))
 
-                implementation(ANDROIDX_TEST_RULES)
-                implementation(ANDROIDX_TEST_RUNNER)
-                implementation(JUNIT)
-                implementation(TRUTH)
+                implementation(libs.testRules)
+                implementation(libs.testRunner)
+                implementation(libs.junit)
+                implementation(libs.truth)
             }
         }
     }
