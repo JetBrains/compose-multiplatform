@@ -135,6 +135,11 @@ external interface CSSNumericValue : CSSStyleValue {
     fun to(unit: String): CSSUnitValue
     fun toSum(vararg units: String): CSSMathSum
     fun type(): CSSNumericType
+
+    @Suppress("NESTED_CLASS_IN_EXTERNAL_INTERFACE")
+    companion object {
+        fun parse(cssText: String): CSSNumericValue
+    }
 }
 
 abstract external class CSSNumericValueJS : CSSNumericValue {
@@ -148,10 +153,6 @@ abstract external class CSSNumericValueJS : CSSNumericValue {
     override fun to(unit: String): CSSUnitValue
     override fun toSum(vararg units: String): CSSMathSum
     override fun type(): CSSNumericType
-
-    companion object {
-        fun parse(cssText: String): CSSNumericValue
-    }
 }
 
 external interface CSSUnitValue : CSSNumericValue {
