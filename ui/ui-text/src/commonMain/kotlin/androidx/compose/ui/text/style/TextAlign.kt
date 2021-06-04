@@ -19,39 +19,60 @@ package androidx.compose.ui.text.style
  * Defines how to align text horizontally. `TextAlign` controls how text aligns in the space it
  * appears.
  */
-enum class TextAlign {
-    /** Align the text on the left edge of the container. */
-    Left,
+@Suppress("INLINE_CLASS_DEPRECATED")
+inline class TextAlign internal constructor(internal val value: Int) {
 
-    /** Align the text on the right edge of the container. */
-    Right,
+    override fun toString(): String {
+        return when (this) {
+            Left -> "Left"
+            Right -> "Right"
+            Center -> "Center"
+            Justify -> "Justify"
+            Start -> "Start"
+            End -> "End"
+            else -> "Invalid"
+        }
+    }
 
-    /** Align the text in the center of the container. */
-    Center,
+    companion object {
+        /** Align the text on the left edge of the container. */
+        val Left = TextAlign(1)
 
-    /**
-     * Stretch lines of text that end with a soft line break to fill the width of
-     * the container.
-     *
-     * Lines that end with hard line breaks are aligned towards the [Start] edge.
-     */
-    Justify,
+        /** Align the text on the right edge of the container. */
+        val Right = TextAlign(2)
 
-    /**
-     * Align the text on the leading edge of the container.
-     *
-     * For Left to Right text ([ResolvedTextDirection.Ltr]), this is the left edge.
-     *
-     * For Right to Left text ([ResolvedTextDirection.Rtl]), like Arabic, this is the right edge.
-     */
-    Start,
+        /** Align the text in the center of the container. */
+        val Center = TextAlign(3)
 
-    /**
-     * Align the text on the trailing edge of the container.
-     *
-     * For Left to Right text ([ResolvedTextDirection.Ltr]), this is the right edge.
-     *
-     * For Right to Left text ([ResolvedTextDirection.Rtl]), like Arabic, this is the left edge.
-     */
-    End
+        /**
+         * Stretch lines of text that end with a soft line break to fill the width of
+         * the container.
+         *
+         * Lines that end with hard line breaks are aligned towards the [Start] edge.
+         */
+        val Justify = TextAlign(4)
+
+        /**
+         * Align the text on the leading edge of the container.
+         *
+         * For Left to Right text ([ResolvedTextDirection.Ltr]), this is the left edge.
+         *
+         * For Right to Left text ([ResolvedTextDirection.Rtl]), like Arabic, this is the right edge.
+         */
+        val Start = TextAlign(5)
+
+        /**
+         * Align the text on the trailing edge of the container.
+         *
+         * For Left to Right text ([ResolvedTextDirection.Ltr]), this is the right edge.
+         *
+         * For Right to Left text ([ResolvedTextDirection.Rtl]), like Arabic, this is the left edge.
+         */
+        val End = TextAlign(6)
+
+        /**
+         * Return a list containing all possible values of TextAlign.
+         */
+        fun values(): List<TextAlign> = listOf(Left, Right, Center, Justify, Start, End)
+    }
 }

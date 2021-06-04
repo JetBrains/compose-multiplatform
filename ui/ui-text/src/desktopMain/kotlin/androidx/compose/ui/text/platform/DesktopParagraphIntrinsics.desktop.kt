@@ -83,7 +83,7 @@ internal class DesktopParagraphIntrinsics(
             TextDirection.Content -> contentBasedTextDirection() ?: ResolvedTextDirection.Ltr
             TextDirection.ContentOrLtr -> contentBasedTextDirection() ?: ResolvedTextDirection.Ltr
             TextDirection.ContentOrRtl -> contentBasedTextDirection() ?: ResolvedTextDirection.Rtl
-            null -> ResolvedTextDirection.Ltr
+            else -> ResolvedTextDirection.Ltr
         }
     }
 

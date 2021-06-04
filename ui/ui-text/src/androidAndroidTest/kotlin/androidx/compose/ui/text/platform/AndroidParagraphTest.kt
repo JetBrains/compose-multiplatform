@@ -66,7 +66,8 @@ import kotlin.math.roundToInt
 @OptIn(InternalPlatformTextApi::class)
 @RunWith(AndroidJUnit4::class)
 @SmallTest
-class AndroidParagraphTest {
+class
+AndroidParagraphTest {
     // This sample font provides the following features:
     // 1. The width of most of visible characters equals to font size.
     // 2. The LTR/RTL characters are rendered as ▶/◀.
@@ -760,7 +761,7 @@ class AndroidParagraphTest {
             fontFamily = any(),
             fontWeight = any(),
             fontStyle = anyFontStyle(),
-            fontSynthesis = any()
+            fontSynthesis = anyFontSynthesis()
         )
         assertThat(paragraph.textPaint.typeface).isNull()
     }
@@ -784,7 +785,7 @@ class AndroidParagraphTest {
             fontFamily = eq(null),
             fontWeight = eq(FontWeight.Bold),
             fontStyle = eqFontStyle(FontStyle.Normal),
-            fontSynthesis = eq(FontSynthesis.All)
+            fontSynthesis = eqFontSynthesis(FontSynthesis.All)
         )
 
         val typeface = paragraph.textPaint.typeface
@@ -811,7 +812,7 @@ class AndroidParagraphTest {
             fontFamily = eq(null),
             fontWeight = eq(FontWeight.Normal),
             fontStyle = eqFontStyle(FontStyle.Italic),
-            fontSynthesis = eq(FontSynthesis.All)
+            fontSynthesis = eqFontSynthesis(FontSynthesis.All)
         )
 
         val typeface = paragraph.textPaint.typeface
@@ -839,7 +840,7 @@ class AndroidParagraphTest {
             fontFamily = eq(fontFamily),
             fontWeight = eq(FontWeight.Normal),
             fontStyle = eqFontStyle(FontStyle.Normal),
-            fontSynthesis = eq(FontSynthesis.All)
+            fontSynthesis = eqFontSynthesis(FontSynthesis.All)
         )
 
         val typeface = paragraph.textPaint.typeface
@@ -865,7 +866,7 @@ class AndroidParagraphTest {
             fontFamily = eq(basicFontFamily),
             fontWeight = eq(FontWeight.Normal),
             fontStyle = eqFontStyle(FontStyle.Normal),
-            fontSynthesis = eq(FontSynthesis.All)
+            fontSynthesis = eqFontSynthesis(FontSynthesis.All)
         )
         val typeface = paragraph.textPaint.typeface
         assertThat(typeface.isBold).isFalse()
@@ -1398,4 +1399,20 @@ internal fun eqFontStyle(fontStyle: FontStyle): FontStyle {
             arg == fontStyle
         }
     } as FontStyle? ?: fontStyle
+}
+
+internal fun eqFontSynthesis(fontSynthesis: FontSynthesis): FontSynthesis {
+    return Mockito.argThat { arg: Any ->
+        if (arg is Int) {
+            arg == fontSynthesis.value
+        } else {
+            arg == fontSynthesis
+        }
+    } as FontSynthesis? ?: fontSynthesis
+}
+
+internal fun anyFontSynthesis(): FontSynthesis {
+    return Mockito.argThat { arg: Any ->
+        arg is Int || arg is FontSynthesis
+    } as FontSynthesis? ?: FontSynthesis.None
 }

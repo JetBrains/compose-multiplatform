@@ -21,39 +21,54 @@ package androidx.compose.ui.text.style
  *
  * @see ResolvedTextDirection
  */
-enum class TextDirection {
-    /**
-     * Always sets the text direction to be Left to Right.
-     */
-    Ltr,
+@Suppress("INLINE_CLASS_DEPRECATED")
+inline class TextDirection internal constructor(internal val value: Int) {
 
-    /**
-     * Always sets the text direction to be Right to Left.
-     */
-    Rtl,
+    override fun toString(): String {
+        return when (this) {
+            Ltr -> "Ltr"
+            Rtl -> "Rtl"
+            Content -> "Content"
+            ContentOrLtr -> "ContentOrLtr"
+            ContentOrRtl -> "ContentOrRtl"
+            else -> "Invalid"
+        }
+    }
 
-    /**
-     * This value indicates that the text direction depends on the first strong directional
-     * character in the text according to the Unicode Bidirectional Algorithm.
-     * If no strong directional character is present, then
-     * [androidx.compose.ui.unit.LayoutDirection] is used to resolve the final TextDirection.
-     * * if used while creating a Paragraph object, [androidx.compose.ui.text.intl.LocaleList] will
-     * be used to resolve the direction as a fallback instead of
-     * [androidx.compose.ui.unit.LayoutDirection].
-     */
-    Content,
+    companion object {
+        /**
+         * Always sets the text direction to be Left to Right.
+         */
+        val Ltr = TextDirection(1)
 
-    /**
-     * This value indicates that the text direction depends on the first strong directional
-     * character in the text according to the Unicode Bidirectional Algorithm. If no strong
-     * directional character is present, then Left to Right will be used as the default direction.
-     */
-    ContentOrLtr,
+        /**
+         * Always sets the text direction to be Right to Left.
+         */
+        val Rtl = TextDirection(2)
 
-    /**
-     * This value indicates that the text direction depends on the first strong directional
-     * character in the text according to the Unicode Bidirectional Algorithm. If no strong
-     * directional character is present, then Right to Left will be used as the default direction.
-     */
-    ContentOrRtl
+        /**
+         * This value indicates that the text direction depends on the first strong directional
+         * character in the text according to the Unicode Bidirectional Algorithm.
+         * If no strong directional character is present, then
+         * [androidx.compose.ui.unit.LayoutDirection] is used to resolve the final TextDirection.
+         * * if used while creating a Paragraph object, [androidx.compose.ui.text.intl.LocaleList] will
+         * be used to resolve the direction as a fallback instead of
+         * [androidx.compose.ui.unit.LayoutDirection].
+         */
+        val Content = TextDirection(3)
+
+        /**
+         * This value indicates that the text direction depends on the first strong directional
+         * character in the text according to the Unicode Bidirectional Algorithm. If no strong
+         * directional character is present, then Left to Right will be used as the default direction.
+         */
+        val ContentOrLtr = TextDirection(4)
+
+        /**
+         * This value indicates that the text direction depends on the first strong directional
+         * character in the text according to the Unicode Bidirectional Algorithm. If no strong
+         * directional character is present, then Right to Left will be used as the default direction.
+         */
+        val ContentOrRtl = TextDirection(5)
+    }
 }

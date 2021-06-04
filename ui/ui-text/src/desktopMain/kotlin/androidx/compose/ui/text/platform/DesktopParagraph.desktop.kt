@@ -882,6 +882,7 @@ internal fun TextAlign.toSkAlignment(): SkAlignment {
         TextAlign.Justify -> SkAlignment.JUSTIFY
         TextAlign.Start -> SkAlignment.START
         TextAlign.End -> SkAlignment.END
+        else -> error("Invalid TextAlign")
     }
 }
 
