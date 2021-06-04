@@ -16,8 +16,6 @@
 
 package androidx.compose.testutils
 
-import androidx.compose.animation.core.ManualFrameClock
-import androidx.compose.animation.core.advanceClockMillis
 import androidx.compose.ui.test.ExperimentalTestApi
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
