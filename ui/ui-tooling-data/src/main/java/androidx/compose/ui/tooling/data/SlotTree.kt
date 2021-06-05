@@ -262,7 +262,6 @@ private fun parseParameters(parameters: String): List<Parameter> {
         return mr.text
             .substring(1)
             .replacePrefix("c#", "androidx.compose.")
-            .replacePrefix("u#", "androidx.ui.")
     }
 
     fun expect(value: String) {

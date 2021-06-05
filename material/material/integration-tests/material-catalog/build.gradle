@@ -20,7 +20,7 @@ import androidx.build.Publish
 plugins {
     id("AndroidXPlugin")
     id("com.android.application")
-    id("AndroidXUiPlugin")
+    id("AndroidXComposePlugin")
     id("org.jetbrains.kotlin.android")
 }
 
