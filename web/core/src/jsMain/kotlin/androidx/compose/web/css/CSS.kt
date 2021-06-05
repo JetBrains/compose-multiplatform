@@ -155,7 +155,7 @@ abstract external class CSSNumericValueJS : CSSNumericValue {
     override fun type(): CSSNumericType
 }
 
-external interface CSSUnitValue : CSSNumericValue {
+external interface CSSUnitValue : CSSNumericValue, StylePropertyValue {
     val value: Number
     val unit: String
 }
