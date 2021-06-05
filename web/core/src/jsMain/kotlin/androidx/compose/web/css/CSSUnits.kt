@@ -48,66 +48,66 @@ class CSSdppxValue(value: Number) : CSSUnitValue(value, "dppx"), CSSResolutionVa
 class CSSfrValue(value: Number) : CSSUnitValue(value, "fr"), CSSFlexValue
 
 val Number.number
-    get(): CSSUnitValue = CSS.number(this)
+    get(): CSSUnitValue = CSSUnitValue(this, "number")
 
 val Number.percent
-    get(): CSSpercentValue = CSS.percent(this)
+    get(): CSSpercentValue = CSSpercentValue(this)
 
 val Number.em
-    get(): CSSemValue = CSS.em(this)
+    get(): CSSemValue = CSSemValue(this)
 val Number.ex
-    get(): CSSexValue = CSS.ex(this)
+    get(): CSSexValue = CSSexValue(this)
 val Number.ch
-    get(): CSSchValue = CSS.ch(this)
+    get(): CSSchValue = CSSchValue(this)
 val Number.cssRem
-    get(): CSSremValue = CSS.rem(this)
+    get(): CSSremValue = CSSremValue(this)
 val Number.vw
-    get(): CSSvwValue = CSS.vw(this)
+    get(): CSSvwValue = CSSvwValue(this)
 val Number.vh
-    get(): CSSvhValue = CSS.vh(this)
+    get(): CSSvhValue = CSSvhValue(this)
 val Number.vmin
-    get(): CSSvminValue = CSS.vmin(this)
+    get(): CSSvminValue = CSSvminValue(this)
 val Number.vmax
-    get(): CSSvmaxValue = CSS.vmax(this)
+    get(): CSSvmaxValue = CSSvmaxValue(this)
 val Number.cm
-    get(): CSScmValue = CSS.cm(this)
+    get(): CSScmValue = CSScmValue(this)
 val Number.mm
-    get(): CSSmmValue = CSS.mm(this)
+    get(): CSSmmValue = CSSmmValue(this)
 val Number.Q
-    get(): CSSQValue = CSS.Q(this)
+    get(): CSSQValue = CSSQValue(this)
 
 val Number.pt
-    get(): CSSptValue = CSS.pt(this)
+    get(): CSSptValue = CSSptValue(this)
 val Number.pc
-    get(): CSSpcValue = CSS.pc(this)
+    get(): CSSpcValue = CSSpcValue(this)
 val Number.px
-    get(): CSSpxValue = CSS.px(this)
+    get(): CSSpxValue = CSSpxValue(this)
 
 val Number.deg
-    get(): CSSdegValue = CSS.deg(this)
+    get(): CSSdegValue = CSSdegValue(this)
 val Number.grad
-    get(): CSSgradValue = CSS.grad(this)
+    get(): CSSgradValue = CSSgradValue(this)
 val Number.rad
-    get(): CSSradValue = CSS.rad(this)
+    get(): CSSradValue = CSSradValue(this)
 val Number.turn
-    get(): CSSturnValue = CSS.turn(this)
+    get(): CSSturnValue = CSSturnValue(this)
 
 val Number.s
-    get(): CSSsValue = CSS.s(this)
+    get(): CSSsValue = CSSsValue(this)
 val Number.ms
-    get(): CSSmsValue = CSS.ms(this)
+    get(): CSSmsValue = CSSmsValue(this)
 
 val Number.Hz
-    get(): CSSHzValue = CSS.Hz(this)
+    get(): CSSHzValue = CSSHzValue(this)
 val Number.kHz
-    get(): CSSkHzValue = CSS.kHz(this)
+    get(): CSSkHzValue = CSSkHzValue(this)
 
 val Number.dpi
-    get(): CSSdpiValue = CSS.dpi(this)
+    get(): CSSdpiValue = CSSdpiValue(this)
 val Number.dpcm
-    get(): CSSdpcmValue = CSS.dpcm(this)
+    get(): CSSdpcmValue = CSSdpcmValue(this)
 val Number.dppx
-    get(): CSSdppxValue = CSS.dppx(this)
+    get(): CSSdppxValue = CSSdppxValue(this)
 
 val Number.fr
-    get(): CSSfrValue = CSS.fr(this)
+    get(): CSSfrValue = CSSfrValue(this)

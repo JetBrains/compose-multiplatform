@@ -292,7 +292,7 @@ fun StyleBuilder.position(position: Position) {
 }
 
 fun StyleBuilder.borderRadius(r: CSSUnitValue) {
-    property("border-radius", r.toString().asStylePropertyValue())
+    property("border-radius", r.asStylePropertyValue())
 }
 
 fun StyleBuilder.borderRadius(topLeft: CSSUnitValue, bottomRight: CSSUnitValue) {
@@ -317,7 +317,7 @@ fun StyleBuilder.borderRadius(
 }
 
 fun StyleBuilder.width(value: CSSUnitValue) {
-    property("width", value)
+    property("width", value.asStylePropertyValue())
 }
 
 fun StyleBuilder.width(value: CSSAutoValue) {
@@ -325,7 +325,7 @@ fun StyleBuilder.width(value: CSSAutoValue) {
 }
 
 fun StyleBuilder.height(value: CSSUnitValue) {
-    property("height", value)
+    property("height", value.asStylePropertyValue())
 }
 
 fun StyleBuilder.height(value: CSSAutoValue) {
@@ -333,7 +333,7 @@ fun StyleBuilder.height(value: CSSAutoValue) {
 }
 
 fun StyleBuilder.top(value: CSSUnitValue) {
-    property("top", value)
+    property("top", value.asStylePropertyValue())
 }
 
 fun StyleBuilder.top(value: CSSAutoValue) {
@@ -341,7 +341,7 @@ fun StyleBuilder.top(value: CSSAutoValue) {
 }
 
 fun StyleBuilder.bottom(value: CSSUnitValue) {
-    property("bottom", value)
+    property("bottom", value.asStylePropertyValue())
 }
 
 fun StyleBuilder.bottom(value: CSSAutoValue) {
@@ -349,7 +349,7 @@ fun StyleBuilder.bottom(value: CSSAutoValue) {
 }
 
 fun StyleBuilder.left(value: CSSUnitValue) {
-    property("left", value)
+    property("left", value.asStylePropertyValue())
 }
 
 fun StyleBuilder.left(value: CSSAutoValue) {
@@ -357,7 +357,7 @@ fun StyleBuilder.left(value: CSSAutoValue) {
 }
 
 fun StyleBuilder.right(value: CSSUnitValue) {
-    property("right", value)
+    property("right", value.asStylePropertyValue())
 }
 
 fun StyleBuilder.right(value: CSSAutoValue) {

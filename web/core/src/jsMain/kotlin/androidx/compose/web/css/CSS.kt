@@ -125,35 +125,25 @@ val CSSNumericType.percentHint
 //    set(value) { this.asDynamic().percentHint = value.value }
 
 external interface CSSNumericValue : CSSStyleValue {
-    fun add(vararg values: CSSNumberish): CSSNumericValue
-    fun sub(vararg values: CSSNumberish): CSSNumericValue
-    fun mul(vararg values: CSSNumberish): CSSNumericValue
-    fun div(vararg values: CSSNumberish): CSSNumericValue
-    fun min(vararg values: CSSNumberish): CSSNumericValue
-    fun max(vararg values: CSSNumberish): CSSNumericValue
-
-    fun to(unit: String): CSSUnitValue
-    fun toSum(vararg units: String): CSSMathSum
-    fun type(): CSSNumericType
-
-    @Suppress("NESTED_CLASS_IN_EXTERNAL_INTERFACE")
-    companion object {
-        fun parse(cssText: String): CSSNumericValue
-    }
+//    fun add(vararg values: CSSNumberish): CSSNumericValue
+//    fun sub(vararg values: CSSNumberish): CSSNumericValue
+//    fun mul(vararg values: CSSNumberish): CSSNumericValue
+//    fun div(vararg values: CSSNumberish): CSSNumericValue
+//    fun min(vararg values: CSSNumberish): CSSNumericValue
+//    fun max(vararg values: CSSNumberish): CSSNumericValue
+//
+//    fun to(unit: String): CSSUnitValue
+//    fun toSum(vararg units: String): CSSMathSum
+//    fun type(): CSSNumericType
+//
+//    @Suppress("NESTED_CLASS_IN_EXTERNAL_INTERFACE")
+//    companion object {
+//        fun parse(cssText: String): CSSNumericValue
+//    }
 }
 
-open external class CSSUnitValue(value: Number, unit: String) : CSSNumericValue, StylePropertyValue {
-    val value: Number
-    val unit: String
-    override fun add(vararg values: CSSNumberish): CSSNumericValue = definedExternally
-    override fun sub(vararg values: CSSNumberish): CSSNumericValue = definedExternally
-    override fun mul(vararg values: CSSNumberish): CSSNumericValue = definedExternally
-    override fun div(vararg values: CSSNumberish): CSSNumericValue = definedExternally
-    override fun min(vararg values: CSSNumberish): CSSNumericValue = definedExternally
-    override fun max(vararg values: CSSNumberish): CSSNumericValue = definedExternally
-    override fun to(unit: String): CSSUnitValue = definedExternally
-    override fun toSum(vararg units: String): CSSMathSum = definedExternally
-    override fun type(): CSSNumericType = definedExternally
+open class CSSUnitValue(val value: Number, val unit: String) : CSSNumericValue {
+    override fun toString(): String = "${value}${unit}"
 }
 
 // declare enum CSSMathOperator {
@@ -176,16 +166,16 @@ enum class CSSMathOperator(val value: String) {
 }
 
 open external class CSSMathValue : CSSNumericValue {
-    // readonly operator: CSSMathOperator
-    override fun add(vararg values: CSSNumberish): CSSNumericValue = definedExternally
-    override fun sub(vararg values: CSSNumberish): CSSNumericValue = definedExternally
-    override fun mul(vararg values: CSSNumberish): CSSNumericValue = definedExternally
-    override fun div(vararg values: CSSNumberish): CSSNumericValue = definedExternally
-    override fun min(vararg values: CSSNumberish): CSSNumericValue = definedExternally
-    override fun max(vararg values: CSSNumberish): CSSNumericValue = definedExternally
-    override fun to(unit: String): CSSUnitValue = definedExternally
-    override fun toSum(vararg units: String): CSSMathSum = definedExternally
-    override fun type(): CSSNumericType = definedExternally
+//    // readonly operator: CSSMathOperator
+//    override fun add(vararg values: CSSNumberish): CSSNumericValue = definedExternally
+//    override fun sub(vararg values: CSSNumberish): CSSNumericValue = definedExternally
+//    override fun mul(vararg values: CSSNumberish): CSSNumericValue = definedExternally
+//    override fun div(vararg values: CSSNumberish): CSSNumericValue = definedExternally
+//    override fun min(vararg values: CSSNumberish): CSSNumericValue = definedExternally
+//    override fun max(vararg values: CSSNumberish): CSSNumericValue = definedExternally
+//    override fun to(unit: String): CSSUnitValue = definedExternally
+//    override fun toSum(vararg units: String): CSSMathSum = definedExternally
+//    override fun type(): CSSNumericType = definedExternally
 }
 
 val CSSMathValue.operator
@@ -339,6 +329,7 @@ external interface StylePropertyValue
 fun String.asStylePropertyValue() = unsafeCast<StylePropertyValue>()
 fun Number.asStylePropertyValue() = unsafeCast<StylePropertyValue>()
 fun CSSStyleValue.asStylePropertyValue() = unsafeCast<StylePropertyValue>()
+fun CSSUnitValue.asStylePropertyValue() = toString().asStylePropertyValue()
 
 external class StylePropertyMap : StylePropertyMapReadOnly {
     fun set(property: String, vararg values: StylePropertyValue)

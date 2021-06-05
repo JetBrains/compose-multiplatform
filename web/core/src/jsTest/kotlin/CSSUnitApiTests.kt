@@ -7,6 +7,29 @@ package org.jetbrains.compose.web.core.tests
 
 import org.jetbrains.compose.web.css.CSS
 import org.jetbrains.compose.web.css.CSSUnitValue
+import org.jetbrains.compose.web.css.CSSchValue
+import org.jetbrains.compose.web.css.CSScmValue
+import org.jetbrains.compose.web.css.CSSdegValue
+import org.jetbrains.compose.web.css.CSSdpcmValue
+import org.jetbrains.compose.web.css.CSSdpiValue
+import org.jetbrains.compose.web.css.CSSdppxValue
+import org.jetbrains.compose.web.css.CSSemValue
+import org.jetbrains.compose.web.css.CSSfrValue
+import org.jetbrains.compose.web.css.CSSgradValue
+import org.jetbrains.compose.web.css.CSSmmValue
+import org.jetbrains.compose.web.css.CSSmsValue
+import org.jetbrains.compose.web.css.CSSpcValue
+import org.jetbrains.compose.web.css.CSSpercentValue
+import org.jetbrains.compose.web.css.CSSptValue
+import org.jetbrains.compose.web.css.CSSpxValue
+import org.jetbrains.compose.web.css.CSSradValue
+import org.jetbrains.compose.web.css.CSSremValue
+import org.jetbrains.compose.web.css.CSSsValue
+import org.jetbrains.compose.web.css.CSSturnValue
+import org.jetbrains.compose.web.css.CSSvhValue
+import org.jetbrains.compose.web.css.CSSvmaxValue
+import org.jetbrains.compose.web.css.CSSvminValue
+import org.jetbrains.compose.web.css.CSSvwValue
 import org.jetbrains.compose.web.css.ch
 import org.jetbrains.compose.web.css.cm
 import org.jetbrains.compose.web.css.cssRem
@@ -47,78 +70,78 @@ class CSSUnitApiTests {
         return assertStructure(otherUnit.value, otherUnit.unit, description)
     }
 
-    @Test
-    fun builderInvocation() {
-        CSS.number(4).assertStructure(4, "number")
-        CSS.percent(4).assertStructure(4, "percent")
-
-        CSS.em(4).assertStructure(4, "em")
-        CSS.ch(4).assertStructure(4, "ch")
-
-        CSS.rem(4).assertStructure(4, "rem")
-
-        CSS.vw(4).assertStructure(4, "vw")
-        CSS.vh(4).assertStructure(4, "vh")
-
-        CSS.vmin(4).assertStructure(4, "vmin")
-        CSS.vmax(4).assertStructure(4, "vmax")
-        CSS.cm(4).assertStructure(4, "cm")
-        CSS.mm(4).assertStructure(4, "mm")
-
-        CSS.pt(4).assertStructure(4, "pt")
-        CSS.pc(4).assertStructure(4, "pc")
-        CSS.px(4).assertStructure(4, "px")
-
-        CSS.deg(4).assertStructure(4, "deg")
-        CSS.grad(4).assertStructure(4, "grad")
-        CSS.rad(4).assertStructure(4, "rad")
-        CSS.turn(4).assertStructure(4, "turn")
-
-        CSS.s(4).assertStructure(4, "s")
-        CSS.ms(4).assertStructure(4, "ms")
-
-        CSS.dpi(4).assertStructure(4, "dpi")
-        CSS.dpcm(4).assertStructure(4, "dpcm")
-        CSS.dppx(4).assertStructure(4, "dppx")
-
-        CSS.fr(4).assertStructure(4, "fr")
-    }
+//    @Test
+//    fun builderInvocation() {
+//        CSS.number(4).assertStructure(4, "number")
+//        CSS.percent(4).assertStructure(4, "percent")
+//
+//        CSS.em(4).assertStructure(4, "em")
+//        CSS.ch(4).assertStructure(4, "ch")
+//
+//        CSS.rem(4).assertStructure(4, "rem")
+//
+//        CSS.vw(4).assertStructure(4, "vw")
+//        CSS.vh(4).assertStructure(4, "vh")
+//
+//        CSS.vmin(4).assertStructure(4, "vmin")
+//        CSS.vmax(4).assertStructure(4, "vmax")
+//        CSS.cm(4).assertStructure(4, "cm")
+//        CSS.mm(4).assertStructure(4, "mm")
+//
+//        CSS.pt(4).assertStructure(4, "pt")
+//        CSS.pc(4).assertStructure(4, "pc")
+//        CSS.px(4).assertStructure(4, "px")
+//
+//        CSS.deg(4).assertStructure(4, "deg")
+//        CSS.grad(4).assertStructure(4, "grad")
+//        CSS.rad(4).assertStructure(4, "rad")
+//        CSS.turn(4).assertStructure(4, "turn")
+//
+//        CSS.s(4).assertStructure(4, "s")
+//        CSS.ms(4).assertStructure(4, "ms")
+//
+//        CSS.dpi(4).assertStructure(4, "dpi")
+//        CSS.dpcm(4).assertStructure(4, "dpcm")
+//        CSS.dppx(4).assertStructure(4, "dppx")
+//
+//        CSS.fr(4).assertStructure(4, "fr")
+//    }
 
     @Test
     fun postfixInvocation() {
-        4.number.assertStructure(CSS.number(4), "number postfix")
-        4.percent.assertStructure(CSS.percent(4), "percent posfix")
+        4.number.assertStructure(CSSUnitValue(4, "number"), "number postfix")
+        4.percent.assertStructure(CSSpercentValue(4), "percent posfix")
 
-        4.em.assertStructure(CSS.em(4), "em postfix")
-        4.ch.assertStructure(CSS.ch(4), "ch postfix")
+        4.em.assertStructure(CSSemValue(4), "em postfix")
+        4.ch.assertStructure(CSSchValue(4), "ch postfix")
 
-        4.cssRem.assertStructure(CSS.rem(4))
+        4.cssRem.assertStructure(CSSremValue(4))
 
-        4.vw.assertStructure(CSS.vw(4),"vw postfix")
-        4.vh.assertStructure(CSS.vh(4), "vh postfix")
+        4.vw.assertStructure(CSSvwValue(4),"vw postfix")
+        4.vh.assertStructure(CSSvhValue(4), "vh postfix")
 
-        4.vmin.assertStructure(CSS.vmin(4), "vmin postfix")
-        4.vmax.assertStructure(CSS.vmax(4), "vmax postfix")
-        4.cm.assertStructure(CSS.cm(4), "cm postfix")
-        4.mm.assertStructure(CSS.mm(4), "mm postfix")
+        4.vmin.assertStructure(CSSvminValue(4), "vmin postfix")
+        4.vmax.assertStructure(CSSvmaxValue(4), "vmax postfix")
+        4.cm.assertStructure(CSScmValue(4), "cm postfix")
+        4.mm.assertStructure(CSSmmValue(4), "mm postfix")
 
-        4.pt.assertStructure(CSS.pt(4), "pt postfix")
-        4.pc.assertStructure(CSS.pc(4), "pc postfix")
-        4.px.assertStructure(CSS.px(4), "px postfix")
+        4.pt.assertStructure(CSSptValue(4), "pt postfix")
+        4.pc.assertStructure(CSSpcValue(4), "pc postfix")
+        4.px.assertStructure(CSSpxValue(4), "px postfix")
 
-        4.deg.assertStructure(CSS.deg(4), "deg postfix")
-        4.grad.assertStructure(CSS.grad(4), "grad postfix")
-        4.rad.assertStructure(CSS.rad(4), "rad postfix")
-        4.turn.assertStructure(CSS.turn(4), "turn postfix")
+        4.deg.assertStructure(CSSdegValue(4), "deg postfix")
+        4.grad.assertStructure(CSSgradValue(4), "grad postfix")
+        4.rad.assertStructure(CSSradValue(4), "rad postfix")
+        4.turn.assertStructure(CSSturnValue(4), "turn postfix")
 
-        4.s.assertStructure(CSS.s(4), "s postfix")
-        4.ms.assertStructure(CSS.ms(4), "ms postfix")
+        4.s.assertStructure(CSSsValue(4), "s postfix")
+        4.ms.assertStructure(CSSmsValue(4), "ms postfix")
 
-        4.dpi.assertStructure(CSS.dpi(4), "dpi postfix")
-        4.dpcm.assertStructure(CSS.dpcm(4), "dpcm postfix")
-        4.dppx.assertStructure(CSS.dppx(4), "dppx postfix")
+        4.dpi.assertStructure(CSSdpiValue(4), "dpi postfix")
+        4.dpcm.assertStructure(CSSdpcmValue(4), "dpcm postfix")
+        4.dppx.assertStructure(CSSdppxValue(4), "dppx postfix")
 
-        4.fr.assertStructure(CSS.fr(4), "fr postfix")
+        4.fr.assertStructure(CSSfrValue(4), "fr postfix")
     }
 
 }
