@@ -19,12 +19,12 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import com.arkivanov.decompose.extensions.compose.jetbrains.asState
+import com.arkivanov.decompose.extensions.compose.jetbrains.subscribeAsState
 import example.todo.common.edit.TodoEdit
 
 @Composable
 fun TodoEditContent(component: TodoEdit) {
-    val model by component.models.asState()
+    val model by component.models.subscribeAsState()
 
     Column(horizontalAlignment = Alignment.CenterHorizontally) {
         TopAppBar(
