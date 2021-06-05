@@ -1,11 +1,9 @@
 @file:Suppress("UNUSED")
 package org.jetbrains.compose.web.css
 
-interface CSSAutoValue : CSSSizeOrAutoValue
+interface CSSAutoValue : StylePropertyValue
 
 val auto = "auto".unsafeCast<CSSAutoValue>()
-
-external interface CSSSizeOrAutoValue : StylePropertyValue
 
 enum class Direction {
     rtl,

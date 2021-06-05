@@ -1,6 +1,6 @@
 package org.jetbrains.compose.web.css
 
-interface CSSSizeValue : CSSUnitValue, CSSSizeOrAutoValue
+interface CSSSizeValue : CSSUnitValue, StylePropertyValue
 
 interface CSSRelValue : CSSSizeValue
 interface CSSpercentValue : CSSRelValue
