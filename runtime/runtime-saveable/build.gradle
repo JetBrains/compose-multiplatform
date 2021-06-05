@@ -15,22 +15,22 @@
  */
 
 
-import androidx.build.AndroidXUiPlugin
+import androidx.build.AndroidXComposePlugin
 import androidx.build.LibraryGroups
 import androidx.build.LibraryType
 
 plugins {
     id("AndroidXPlugin")
-    id("AndroidXUiPlugin")
+    id("AndroidXComposePlugin")
     id("com.android.library")
 }
 
-AndroidXUiPlugin.applyAndConfigureKotlinPlugin(project)
+AndroidXComposePlugin.applyAndConfigureKotlinPlugin(project)
 
 dependencies {
     kotlinPlugin project(":compose:compiler:compiler")
 
-    if(!AndroidXUiPlugin.isMultiplatformEnabled(project)) {
+    if(!AndroidXComposePlugin.isMultiplatformEnabled(project)) {
         /* When updating dependencies, make sure to make the an an analogous update in the
             corresponding block below */
         api project(":compose:runtime:runtime")
@@ -62,7 +62,7 @@ dependencies {
     }
 }
 
-if(AndroidXUiPlugin.isMultiplatformEnabled(project)) {
+if(AndroidXComposePlugin.isMultiplatformEnabled(project)) {
     kotlin {
         android()
         jvm("desktop")

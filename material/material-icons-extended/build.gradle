@@ -14,8 +14,7 @@
  * limitations under the License.
  */
 
-
-import androidx.build.AndroidXUiPlugin
+import androidx.build.AndroidXComposePlugin
 import androidx.build.LibraryGroups
 import androidx.build.LibraryType
 import androidx.build.RunApiTasks
@@ -24,10 +23,10 @@ import androidx.compose.material.icons.generator.tasks.IconGenerationTask
 plugins {
     id("AndroidXPlugin")
     id("com.android.library")
-    id("AndroidXUiPlugin")
+    id("AndroidXComposePlugin")
 }
 
-AndroidXUiPlugin.applyAndConfigureKotlinPlugin(project)
+AndroidXComposePlugin.applyAndConfigureKotlinPlugin(project)
 
 IconGenerationTask.registerExtendedIconMainProject(
         project,
@@ -39,7 +38,7 @@ apply from: "shared-dependencies.gradle"
 dependencies {
     kotlinPlugin(project(":compose:compiler:compiler"))
 
-    if (!AndroidXUiPlugin.isMultiplatformEnabled(project)) {
+    if (!AndroidXComposePlugin.isMultiplatformEnabled(project)) {
         /*
          * When updating dependencies, make sure to make an analogous update in the
          * corresponding block below
@@ -61,7 +60,7 @@ dependencies {
     }
 }
 
-if (AndroidXUiPlugin.isMultiplatformEnabled(project)) {
+if (AndroidXComposePlugin.isMultiplatformEnabled(project)) {
     kotlin {
         /*
          * When updating dependencies, make sure to make an analogous update in the
@@ -105,7 +104,7 @@ configurations {
 
 }
 
-if (!AndroidXUiPlugin.isMultiplatformEnabled(project)) {
+if (!AndroidXComposePlugin.isMultiplatformEnabled(project)) {
     for (themeName in allThemes) {
         def otherProject = project(":compose:material:material-icons-extended-" + themeName)
         project.dependencies.add("embedThemesDebug", otherProject)
@@ -129,7 +128,7 @@ if (!AndroidXUiPlugin.isMultiplatformEnabled(project)) {
     IconGenerationTask.registerExtendedIconThemeProject(
             project,
             android,
-            AndroidXUiPlugin.isMultiplatformEnabled(project)
+            AndroidXComposePlugin.isMultiplatformEnabled(project)
     )
 }
 

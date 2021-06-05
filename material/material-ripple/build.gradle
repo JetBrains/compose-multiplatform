@@ -14,23 +14,22 @@
  * limitations under the License.
  */
 
-
-import androidx.build.AndroidXUiPlugin
+import androidx.build.AndroidXComposePlugin
 import androidx.build.LibraryGroups
 import androidx.build.LibraryType
 
 plugins {
     id("AndroidXPlugin")
     id("com.android.library")
-    id("AndroidXUiPlugin")
+    id("AndroidXComposePlugin")
 }
 
-AndroidXUiPlugin.applyAndConfigureKotlinPlugin(project)
+AndroidXComposePlugin.applyAndConfigureKotlinPlugin(project)
 
 dependencies {
     kotlinPlugin(project(":compose:compiler:compiler"))
 
-    if(!AndroidXUiPlugin.isMultiplatformEnabled(project)) {
+    if(!AndroidXComposePlugin.isMultiplatformEnabled(project)) {
         /*
          * When updating dependencies, make sure to make the an an analogous update in the
          * corresponding block below
@@ -55,7 +54,7 @@ dependencies {
     }
 }
 
-if(AndroidXUiPlugin.isMultiplatformEnabled(project)) {
+if(AndroidXComposePlugin.isMultiplatformEnabled(project)) {
     kotlin {
         android()
         jvm("desktop")
@@ -104,5 +103,5 @@ androidx {
     // Disable strict API mode for MPP builds as it will fail to compile androidAndroidTest
     // sources, as it doesn't understand that they are tests and thinks they should have explicit
     // visibility
-    legacyDisableKotlinStrictApiMode = AndroidXUiPlugin.isMultiplatformEnabled(project)
+    legacyDisableKotlinStrictApiMode = AndroidXComposePlugin.isMultiplatformEnabled(project)
 }

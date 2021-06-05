@@ -15,21 +15,21 @@
  */
 
 
-import androidx.build.AndroidXUiPlugin
+import androidx.build.AndroidXComposePlugin
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
     id("AndroidXPlugin")
     id("com.android.library")
-    id("AndroidXUiPlugin")
+    id("AndroidXComposePlugin")
 }
 
-AndroidXUiPlugin.applyAndConfigureKotlinPlugin(project)
+AndroidXComposePlugin.applyAndConfigureKotlinPlugin(project)
 
 dependencies {
     kotlinPlugin(project(":compose:compiler:compiler"))
 
-    if(!AndroidXUiPlugin.isMultiplatformEnabled(project)) {
+    if(!AndroidXComposePlugin.isMultiplatformEnabled(project)) {
         androidTestImplementation(project(":compose:ui:ui"))
         androidTestImplementation(project(":compose:ui:ui-test-junit4"))
         androidTestImplementation(project(":compose:runtime:runtime"))
@@ -48,7 +48,7 @@ dependencies {
     }
 }
 
-if(AndroidXUiPlugin.isMultiplatformEnabled(project)) {
+if(AndroidXComposePlugin.isMultiplatformEnabled(project)) {
     kotlin {
         android()
         jvm("desktop")

@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import androidx.build.AndroidXUiPlugin
+import androidx.build.AndroidXComposePlugin
 import androidx.build.LibraryGroups
 import androidx.build.LibraryType
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
@@ -25,15 +25,15 @@ import static androidx.inspection.gradle.InspectionPluginKt.packageInspector
 plugins {
     id("AndroidXPlugin")
     id("com.android.library")
-    id("AndroidXUiPlugin")
+    id("AndroidXComposePlugin")
 }
 
-AndroidXUiPlugin.applyAndConfigureKotlinPlugin(project)
+AndroidXComposePlugin.applyAndConfigureKotlinPlugin(project)
 
 dependencies {
     kotlinPlugin(project(":compose:compiler:compiler"))
 
-    if(!AndroidXUiPlugin.isMultiplatformEnabled(project)) {
+    if(!AndroidXComposePlugin.isMultiplatformEnabled(project)) {
         /*
          * When updating dependencies, make sure to make the an an analogous update in the
          * corresponding block below
@@ -108,7 +108,7 @@ dependencies {
 
 packageInspector(project, project(":compose:ui:ui-inspection"))
 
-if(AndroidXUiPlugin.isMultiplatformEnabled(project)) {
+if(AndroidXComposePlugin.isMultiplatformEnabled(project)) {
     kotlin {
         android()
         jvm("desktop")
@@ -221,7 +221,7 @@ androidx {
     legacyDisableKotlinStrictApiMode = true
 }
 
-if(AndroidXUiPlugin.isMultiplatformEnabled(project)) {
+if(AndroidXComposePlugin.isMultiplatformEnabled(project)) {
     tasks.findByName("desktopTest").configure {
         systemProperties["GOLDEN_PATH"] = project.rootDir.absolutePath + "/../../golden"
     }
@@ -264,7 +264,7 @@ def verifyKotlinModule(String variant) {
         }
     }
 }
-if (!AndroidXUiPlugin.isMultiplatformEnabled(project)) {
+if (!AndroidXComposePlugin.isMultiplatformEnabled(project)) {
     for (variant in ["debug", "release"]) {
         verifyKotlinModule(variant)
     }

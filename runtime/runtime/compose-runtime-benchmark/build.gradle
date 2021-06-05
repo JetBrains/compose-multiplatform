@@ -16,7 +16,7 @@
 plugins {
     id("AndroidXPlugin")
     id("com.android.library")
-    id("AndroidXUiPlugin")
+    id("AndroidXComposePlugin")
     id("kotlin-android")
     id("androidx.benchmark")
 }

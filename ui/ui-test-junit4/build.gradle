@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import androidx.build.AndroidXUiPlugin
+import androidx.build.AndroidXComposePlugin
 import androidx.build.LibraryGroups
 import androidx.build.LibraryType
 
@@ -23,10 +23,10 @@ import static androidx.build.dependencies.DependenciesKt.SKIKO
 plugins {
     id("AndroidXPlugin")
     id("com.android.library")
-    id("AndroidXUiPlugin")
+    id("AndroidXComposePlugin")
 }
 
-AndroidXUiPlugin.applyAndConfigureKotlinPlugin(project)
+AndroidXComposePlugin.applyAndConfigureKotlinPlugin(project)
 
 android {
     lintOptions {
@@ -37,7 +37,7 @@ android {
 dependencies {
     kotlinPlugin(project(":compose:compiler:compiler"))
 
-    if(!AndroidXUiPlugin.isMultiplatformEnabled(project)) {
+    if(!AndroidXComposePlugin.isMultiplatformEnabled(project)) {
         api(project(":compose:ui:ui-test"))
         api("androidx.activity:activity:1.2.0")
         api("androidx.test.ext:junit:1.1.2")
@@ -75,7 +75,7 @@ dependencies {
 }
 
 
-if(AndroidXUiPlugin.isMultiplatformEnabled(project)) {
+if(AndroidXComposePlugin.isMultiplatformEnabled(project)) {
     kotlin {
         android()
         jvm("desktop")
