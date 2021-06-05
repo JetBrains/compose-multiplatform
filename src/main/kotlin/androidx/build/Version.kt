@@ -29,7 +29,7 @@ data class Version(
     val minor: Int,
     val patch: Int,
     val extra: String? = null
-) : Comparable<Version> {
+) : Comparable<Version>, java.io.Serializable {
 
     constructor(versionString: String) : this(
         Integer.parseInt(checkedMatcher(versionString).group(1)),
@@ -71,6 +71,8 @@ data class Version(
     }
 
     companion object {
+        private const val serialVersionUID = 345435634563L
+
         private val VERSION_FILE_REGEX = Pattern.compile("^(res-)?(.*).txt$")
         private val VERSION_REGEX = Pattern.compile("^(\\d+)\\.(\\d+)\\.(\\d+)(-.+)?$")
 
