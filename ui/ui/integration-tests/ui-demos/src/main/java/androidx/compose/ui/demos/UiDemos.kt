@@ -48,7 +48,7 @@ import androidx.compose.ui.demos.gestures.RawDragGestureFilterDemo
 import androidx.compose.ui.demos.gestures.ScaleGestureFilterDemo
 import androidx.compose.ui.demos.gestures.ScrollGestureFilterDemo
 import androidx.compose.ui.demos.gestures.VerticalScrollerInDrawerDemo
-import androidx.compose.ui.demos.input.nestedscroll.BringIntoViewDemo
+import androidx.compose.ui.demos.scroll.BringIntoViewDemo
 import androidx.compose.ui.demos.keyinput.KeyInputDemo
 import androidx.compose.ui.demos.scroll.RequestRectangleOnScreenDemo
 import androidx.compose.ui.demos.viewinterop.AndroidInComposeDemos
