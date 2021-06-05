@@ -316,27 +316,51 @@ fun StyleBuilder.borderRadius(
     property("border-radius", "$topLeft $topRight $bottomRight $bottomLeft".asStylePropertyValue())
 }
 
-fun StyleBuilder.width(value: CSSSizeOrAutoValue) {
+fun StyleBuilder.width(value: CSSSizeValue) {
     property("width", value)
 }
 
-fun StyleBuilder.height(value: CSSSizeOrAutoValue) {
+fun StyleBuilder.width(value: CSSAutoValue) {
+    property("width", value)
+}
+
+fun StyleBuilder.height(value: CSSSizeValue) {
     property("height", value)
 }
 
-fun StyleBuilder.top(value: CSSSizeOrAutoValue) {
+fun StyleBuilder.height(value: CSSAutoValue) {
+    property("height", value)
+}
+
+fun StyleBuilder.top(value: CSSSizeValue) {
     property("top", value)
 }
 
-fun StyleBuilder.bottom(value: CSSSizeOrAutoValue) {
+fun StyleBuilder.top(value: CSSAutoValue) {
+    property("top", value)
+}
+
+fun StyleBuilder.bottom(value: CSSSizeValue) {
     property("bottom", value)
 }
 
-fun StyleBuilder.left(value: CSSSizeOrAutoValue) {
+fun StyleBuilder.bottom(value: CSSAutoValue) {
+    property("bottom", value)
+}
+
+fun StyleBuilder.left(value: CSSSizeValue) {
     property("left", value)
 }
 
-fun StyleBuilder.right(value: CSSSizeOrAutoValue) {
+fun StyleBuilder.left(value: CSSAutoValue) {
+    property("left", value)
+}
+
+fun StyleBuilder.right(value: CSSSizeValue) {
+    property("right", value)
+}
+
+fun StyleBuilder.right(value: CSSAutoValue) {
     property("right", value)
 }
 
