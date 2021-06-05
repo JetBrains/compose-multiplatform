@@ -160,11 +160,6 @@ external interface CSSUnitValue : CSSNumericValue {
     val unit: String
 }
 
-external interface CSSTypedUnitValue<T> : CSSNumericValue {
-    val value: Number
-    val unit: T
-}
-
 @JsName("CSSUnitValue")
 external class CSSUnitValueJS(value: Number, unit: String) : CSSNumericValueJS, CSSUnitValue {
     override val value: Number
