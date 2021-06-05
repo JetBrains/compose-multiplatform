@@ -1,50 +1,51 @@
 package org.jetbrains.compose.web.css
 
-interface CSSRelValue : CSSUnitValue
-interface CSSpercentValue : CSSRelValue
-interface CSSemValue : CSSRelValue
-interface CSSexValue : CSSRelValue
-interface CSSchValue : CSSRelValue
-interface CSSicValue : CSSRelValue
-interface CSSremValue : CSSRelValue
-interface CSSlhValue : CSSRelValue
-interface CSSrlhValue : CSSRelValue
-interface CSSvwValue : CSSRelValue
-interface CSSvhValue : CSSRelValue
-interface CSSviValue : CSSRelValue
-interface CSSvbValue : CSSRelValue
-interface CSSvminValue : CSSRelValue
-interface CSSvmaxValue : CSSRelValue
-interface CSScmValue : CSSRelValue
-interface CSSmmValue : CSSRelValue
-interface CSSQValue : CSSRelValue
+interface CSSRelValue
+interface CSSAbsValue
+interface CSSAngleValue
+interface CSSTimeValue
+interface CSSFrequencyValue
+interface CSSResolutionValue
+interface CSSFlexValue
 
-interface CSSAbsValue : CSSUnitValue
-interface CSSptValue : CSSAbsValue
-interface CSSpcValue : CSSAbsValue
-interface CSSpxValue : CSSAbsValue
+interface CSSpercentValue : CSSUnitValue, CSSRelValue
+interface CSSemValue : CSSUnitValue, CSSRelValue
+interface CSSexValue : CSSUnitValue, CSSRelValue
+interface CSSchValue : CSSUnitValue, CSSRelValue
+interface CSSicValue : CSSUnitValue, CSSRelValue
+interface CSSremValue : CSSUnitValue, CSSRelValue
+interface CSSlhValue : CSSUnitValue, CSSRelValue
+interface CSSrlhValue : CSSUnitValue, CSSRelValue
+interface CSSvwValue : CSSUnitValue, CSSRelValue
+interface CSSvhValue : CSSUnitValue, CSSRelValue
+interface CSSviValue : CSSUnitValue, CSSRelValue
+interface CSSvbValue : CSSUnitValue, CSSRelValue
+interface CSSvminValue : CSSUnitValue, CSSRelValue
+interface CSSvmaxValue : CSSUnitValue, CSSRelValue
+interface CSScmValue : CSSUnitValue, CSSRelValue
+interface CSSmmValue : CSSUnitValue, CSSRelValue
+interface CSSQValue : CSSUnitValue, CSSRelValue
 
-interface CSSangleValue : CSSUnitValue
-interface CSSdegValue : CSSangleValue
-interface CSSgradValue : CSSangleValue
-interface CSSradValue : CSSangleValue
-interface CSSturnValue : CSSangleValue
+interface CSSptValue : CSSUnitValue, CSSAbsValue
+interface CSSpcValue : CSSUnitValue, CSSAbsValue
+interface CSSpxValue : CSSUnitValue, CSSAbsValue
 
-interface CSSTimeValue : CSSUnitValue
-interface CSSsValue : CSSTimeValue
-interface CSSmsValue : CSSTimeValue
+interface CSSdegValue : CSSUnitValue, CSSAngleValue
+interface CSSgradValue : CSSUnitValue, CSSAngleValue
+interface CSSradValue : CSSUnitValue, CSSAngleValue
+interface CSSturnValue : CSSUnitValue, CSSAngleValue
 
-interface CSSFrequencyValue : CSSUnitValue
-interface CSSHzValue : CSSFrequencyValue
-interface CSSkHzValue : CSSFrequencyValue
+interface CSSsValue : CSSUnitValue, CSSTimeValue
+interface CSSmsValue : CSSUnitValue, CSSTimeValue
 
-interface CSSResolutionValue : CSSUnitValue
-interface CSSdpiValue : CSSResolutionValue
-interface CSSdpcmValue : CSSResolutionValue
-interface CSSdppxValue : CSSResolutionValue
+interface CSSHzValue : CSSUnitValue, CSSFrequencyValue
+interface CSSkHzValue : CSSUnitValue, CSSFrequencyValue
 
-interface CSSFlexValue : CSSUnitValue
-interface CSSfrValue : CSSFlexValue
+interface CSSdpiValue : CSSUnitValue, CSSResolutionValue
+interface CSSdpcmValue : CSSUnitValue, CSSResolutionValue
+interface CSSdppxValue : CSSUnitValue, CSSResolutionValue
+
+interface CSSfrValue : CSSUnitValue, CSSFlexValue
 
 val Number.number
     get(): CSSUnitValue = CSS.number(this)
