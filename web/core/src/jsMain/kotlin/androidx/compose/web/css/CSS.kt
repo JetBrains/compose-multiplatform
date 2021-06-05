@@ -142,15 +142,9 @@ external interface CSSNumericValue : CSSStyleValue {
     }
 }
 
-external interface CSSUnitValue : CSSNumericValue, StylePropertyValue {
+open external class CSSUnitValue(value: Number, unit: String) : CSSNumericValue, StylePropertyValue {
     val value: Number
     val unit: String
-}
-
-@JsName("CSSUnitValue")
-external class CSSUnitValueJS(value: Number, unit: String) : CSSNumericValue, CSSUnitValue {
-    override val value: Number
-    override val unit: String
     override fun add(vararg values: CSSNumberish): CSSNumericValue = definedExternally
     override fun sub(vararg values: CSSNumberish): CSSNumericValue = definedExternally
     override fun mul(vararg values: CSSNumberish): CSSNumericValue = definedExternally

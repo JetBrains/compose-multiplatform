@@ -8,44 +8,44 @@ interface CSSFrequencyValue
 interface CSSResolutionValue
 interface CSSFlexValue
 
-interface CSSpercentValue : CSSUnitValue, CSSRelValue
-interface CSSemValue : CSSUnitValue, CSSRelValue
-interface CSSexValue : CSSUnitValue, CSSRelValue
-interface CSSchValue : CSSUnitValue, CSSRelValue
-interface CSSicValue : CSSUnitValue, CSSRelValue
-interface CSSremValue : CSSUnitValue, CSSRelValue
-interface CSSlhValue : CSSUnitValue, CSSRelValue
-interface CSSrlhValue : CSSUnitValue, CSSRelValue
-interface CSSvwValue : CSSUnitValue, CSSRelValue
-interface CSSvhValue : CSSUnitValue, CSSRelValue
-interface CSSviValue : CSSUnitValue, CSSRelValue
-interface CSSvbValue : CSSUnitValue, CSSRelValue
-interface CSSvminValue : CSSUnitValue, CSSRelValue
-interface CSSvmaxValue : CSSUnitValue, CSSRelValue
-interface CSScmValue : CSSUnitValue, CSSRelValue
-interface CSSmmValue : CSSUnitValue, CSSRelValue
-interface CSSQValue : CSSUnitValue, CSSRelValue
+class CSSpercentValue(value: Number) : CSSUnitValue(value, "percent"), CSSRelValue
+class CSSemValue(value: Number) : CSSUnitValue(value, "em"), CSSRelValue
+class CSSexValue(value: Number) : CSSUnitValue(value, "ex"), CSSRelValue
+class CSSchValue(value: Number) : CSSUnitValue(value, "ch"), CSSRelValue
+class CSSicValue(value: Number) : CSSUnitValue(value, "ic"), CSSRelValue
+class CSSremValue(value: Number) : CSSUnitValue(value, "rem"), CSSRelValue
+class CSSlhValue(value: Number) : CSSUnitValue(value, "lh"), CSSRelValue
+class CSSrlhValue(value: Number) : CSSUnitValue(value, "rlh"), CSSRelValue
+class CSSvwValue(value: Number) : CSSUnitValue(value, "vw"), CSSRelValue
+class CSSvhValue(value: Number) : CSSUnitValue(value, "vh"), CSSRelValue
+class CSSviValue(value: Number) : CSSUnitValue(value, "vi"), CSSRelValue
+class CSSvbValue(value: Number) : CSSUnitValue(value, "vb"), CSSRelValue
+class CSSvminValue(value: Number) : CSSUnitValue(value, "vmin"), CSSRelValue
+class CSSvmaxValue(value: Number) : CSSUnitValue(value, "vmax"), CSSRelValue
+class CSScmValue(value: Number) : CSSUnitValue(value, "cm"), CSSRelValue
+class CSSmmValue(value: Number) : CSSUnitValue(value, "mm"), CSSRelValue
+class CSSQValue(value: Number) : CSSUnitValue(value, "q"), CSSRelValue
 
-interface CSSptValue : CSSUnitValue, CSSAbsValue
-interface CSSpcValue : CSSUnitValue, CSSAbsValue
-interface CSSpxValue : CSSUnitValue, CSSAbsValue
+class CSSptValue(value: Number) : CSSUnitValue(value, "pt"), CSSAbsValue
+class CSSpcValue(value: Number) : CSSUnitValue(value, "pc"), CSSAbsValue
+class CSSpxValue(value: Number) : CSSUnitValue(value, "px"), CSSAbsValue
 
-interface CSSdegValue : CSSUnitValue, CSSAngleValue
-interface CSSgradValue : CSSUnitValue, CSSAngleValue
-interface CSSradValue : CSSUnitValue, CSSAngleValue
-interface CSSturnValue : CSSUnitValue, CSSAngleValue
+class CSSdegValue(value: Number) : CSSUnitValue(value, "deg"), CSSAngleValue
+class CSSgradValue(value: Number) : CSSUnitValue(value, "grad"), CSSAngleValue
+class CSSradValue(value: Number) : CSSUnitValue(value, "rad"), CSSAngleValue
+class CSSturnValue(value: Number) : CSSUnitValue(value, "turn"), CSSAngleValue
 
-interface CSSsValue : CSSUnitValue, CSSTimeValue
-interface CSSmsValue : CSSUnitValue, CSSTimeValue
+class CSSsValue(value: Number) : CSSUnitValue(value, "s"), CSSTimeValue
+class CSSmsValue(value: Number) : CSSUnitValue(value, "ms"), CSSTimeValue
 
-interface CSSHzValue : CSSUnitValue, CSSFrequencyValue
-interface CSSkHzValue : CSSUnitValue, CSSFrequencyValue
+class CSSHzValue(value: Number) : CSSUnitValue(value, "hz"), CSSFrequencyValue
+class CSSkHzValue(value: Number) : CSSUnitValue(value, "khz"), CSSFrequencyValue
 
-interface CSSdpiValue : CSSUnitValue, CSSResolutionValue
-interface CSSdpcmValue : CSSUnitValue, CSSResolutionValue
-interface CSSdppxValue : CSSUnitValue, CSSResolutionValue
+class CSSdpiValue(value: Number) : CSSUnitValue(value, "dpi"), CSSResolutionValue
+class CSSdpcmValue(value: Number) : CSSUnitValue(value, "dpcm"), CSSResolutionValue
+class CSSdppxValue(value: Number) : CSSUnitValue(value, "dppx"), CSSResolutionValue
 
-interface CSSfrValue : CSSUnitValue, CSSFlexValue
+class CSSfrValue(value: Number) : CSSUnitValue(value, "fr"), CSSFlexValue
 
 val Number.number
     get(): CSSUnitValue = CSS.number(this)
