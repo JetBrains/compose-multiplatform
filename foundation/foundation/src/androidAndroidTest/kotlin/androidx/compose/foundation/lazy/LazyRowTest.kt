@@ -33,6 +33,7 @@ import androidx.compose.foundation.layout.requiredSizeIn
 import androidx.compose.foundation.layout.requiredWidth
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.text.BasicText
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.getValue
@@ -64,6 +65,7 @@ import androidx.compose.ui.test.junit4.StateRestorationTester
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.moveBy
 import androidx.compose.ui.test.onNodeWithTag
+import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performGesture
 import androidx.compose.ui.test.up
 import androidx.compose.ui.unit.Dp
@@ -1281,6 +1283,29 @@ class LazyRowTest {
             rule.waitForIdle()
             assertThat(state.firstVisibleItemIndex).isEqualTo(target)
         }
+    }
+
+    @Test
+    fun recreatingContentLambdaTriggersItemRecomposition() {
+        val countState = mutableStateOf(0)
+        rule.setContent {
+            val count = countState.value
+            LazyRow {
+                item {
+                    BasicText(text = "Count $count")
+                }
+            }
+        }
+
+        rule.onNodeWithText("Count 0")
+            .assertIsDisplayed()
+
+        rule.runOnIdle {
+            countState.value++
+        }
+
+        rule.onNodeWithText("Count 1")
+            .assertIsDisplayed()
     }
 
     private fun LazyListState.scrollBy(offset: Dp) {

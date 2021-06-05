@@ -21,13 +21,13 @@ package androidx.compose.runtime
 
 import androidx.compose.runtime.collection.IdentityArrayMap
 import androidx.compose.runtime.collection.IdentityArraySet
+import androidx.compose.runtime.external.kotlinx.collections.immutable.PersistentMap
+import androidx.compose.runtime.external.kotlinx.collections.immutable.persistentHashMapOf
 import androidx.compose.runtime.snapshots.currentSnapshot
 import androidx.compose.runtime.snapshots.fastForEach
 import androidx.compose.runtime.snapshots.fastToSet
 import androidx.compose.runtime.tooling.CompositionData
 import androidx.compose.runtime.tooling.LocalInspectionTables
-import androidx.compose.runtime.external.kotlinx.collections.immutable.PersistentMap
-import androidx.compose.runtime.external.kotlinx.collections.immutable.persistentHashMapOf
 import kotlin.coroutines.CoroutineContext
 
 internal typealias Change = (
@@ -2532,7 +2532,11 @@ internal class ComposerImpl(
         invalidationsRequested: IdentityArrayMap<RecomposeScopeImpl, IdentityArraySet<Any>?>
     ): Boolean {
         check(changes.isEmpty()) { "Expected applyChanges() to have been called" }
-        if (invalidationsRequested.isNotEmpty()) {
+        // even if invalidationsRequested is empty we still need to recompose if the Composer has
+        // some invalidations scheduled already. it can happen when during some parent composition
+        // there were a change for a state which was used by the child composition. such changes
+        // will be tracked and added into `invalidations` list.
+        if (invalidationsRequested.isNotEmpty() || invalidations.isNotEmpty()) {
             doCompose(invalidationsRequested, null)
             return changes.isNotEmpty()
         }
