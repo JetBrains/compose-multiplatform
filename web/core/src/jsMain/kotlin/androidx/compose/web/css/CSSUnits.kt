@@ -1,170 +1,182 @@
 package org.jetbrains.compose.web.css
 
-interface CSSUnitValue : CSSNumericValue {
+interface CSSUnitValueTyped<T : CSSUnit> : CSSNumericValue {
     val value: Number
-    val unit: CSSUnit
+    val unit: T
     fun asString(): String = "${value}${unit.value}"
 }
+
+interface CSSUnitValue : CSSUnitValueTyped<CSSUnit>
+
+interface CSSUnitRelValue : CSSUnit
+interface CSSUnitAbsValue: CSSUnit
+interface CSSUnitAngleValue: CSSUnit
+interface CSSUnitTimeValue: CSSUnit
+interface CSSUnitFrequencyValue: CSSUnit
+interface CSSUnitResolutionValue: CSSUnit
+interface CSSUnitFlexValue: CSSUnit
+
+interface CSSAngleValue : CSSUnitValueTyped<CSSUnitAngleValue>
 
 sealed interface CSSUnit {
     val value: String
 
-    object percent: CSSUnit {
+    object percent: CSSUnitRelValue {
         override val value: String
             get() = "percent"
     }
 
-    object em: CSSUnit {
+    object em: CSSUnitRelValue {
         override val value: String
             get() = "em"
     }
 
-    object ex: CSSUnit {
+    object ex: CSSUnitRelValue {
         override val value: String
             get() = "ex"
     }
 
-    object ch: CSSUnit {
+    object ch: CSSUnitRelValue {
         override val value: String
             get() = "ch"
     }
 
-    object ic: CSSUnit {
+    object ic: CSSUnitRelValue {
         override val value: String
             get() = "ic"
     }
 
-    object rem: CSSUnit {
+    object rem: CSSUnitRelValue {
         override val value: String
             get() = "rem"
     }
 
-    object lh: CSSUnit {
+    object lh: CSSUnitRelValue {
         override val value: String
             get() = "lh"
     }
 
-    object rlh: CSSUnit {
+    object rlh: CSSUnitRelValue {
         override val value: String
             get() = "rlh"
     }
 
-    object vw: CSSUnit {
+    object vw: CSSUnitRelValue {
         override val value: String
             get() = "vw"
     }
 
-    object vh: CSSUnit {
+    object vh: CSSUnitRelValue {
         override val value: String
             get() = "vh"
     }
 
-    object vi: CSSUnit {
+    object vi: CSSUnitRelValue {
         override val value: String
             get() = "vi"
     }
 
-    object vb: CSSUnit {
+    object vb: CSSUnitRelValue {
         override val value: String
             get() = "vb"
     }
 
-    object vmin: CSSUnit {
+    object vmin: CSSUnitRelValue {
         override val value: String
             get() = "vmin"
     }
 
-    object vmax: CSSUnit {
+    object vmax: CSSUnitRelValue {
         override val value: String
             get() = "vmax"
     }
 
-    object cm: CSSUnit {
+    object cm: CSSUnitRelValue {
         override val value: String
             get() = "cm"
     }
 
-    object mm: CSSUnit {
+    object mm: CSSUnitRelValue {
         override val value: String
             get() = "mm"
     }
 
-    object q: CSSUnit {
+    object q: CSSUnitRelValue {
         override val value: String
             get() = "q"
     }
 
-    object pt: CSSUnit {
+    object pt: CSSUnitAbsValue {
         override val value: String
             get() = "pt"
     }
 
-    object pc: CSSUnit {
+    object pc: CSSUnitAbsValue {
         override val value: String
             get() = "pc"
     }
 
-    object px: CSSUnit {
+    object px: CSSUnitAbsValue {
         override val value: String
             get() = "px"
     }
 
-    object deg: CSSUnit {
+    object deg: CSSUnitAngleValue {
         override val value: String
             get() = "deg"
     }
 
-    object grad: CSSUnit {
+    object grad: CSSUnitAngleValue {
         override val value: String
             get() = "grad"
     }
 
-    object rad: CSSUnit {
+    object rad: CSSUnitAngleValue {
         override val value: String
             get() = "rad"
     }
 
-    object turn: CSSUnit {
+    object turn: CSSUnitAngleValue {
         override val value: String
             get() = "turn"
     }
 
-    object s: CSSUnit {
+    object s: CSSUnitTimeValue {
         override val value: String
             get() = "s"
     }
 
-    object ms: CSSUnit {
+    object ms: CSSUnitTimeValue {
         override val value: String
             get() = "ms"
     }
 
-    object hz: CSSUnit {
+    object hz: CSSUnitFrequencyValue {
         override val value: String
             get() = "hz"
     }
 
-    object khz: CSSUnit {
+    object khz: CSSUnitFrequencyValue {
         override val value: String
             get() = "khz"
     }
 
-    object dpi: CSSUnit {
+    object dpi: CSSUnitResolutionValue {
         override val value: String
             get() = "dpi"
     }
 
-    object dpcm: CSSUnit {
+    object dpcm: CSSUnitResolutionValue {
         override val value: String
             get() = "dpcm"
     }
 
-    object dppx: CSSUnit {
+    object dppx: CSSUnitResolutionValue {
         override val value: String
             get() = "dppx"
     }
 
-    object fr: CSSUnit {
+    object fr: CSSUnitFrequencyValue {
         override val value: String
             get() = "fr"
     }
@@ -175,175 +187,167 @@ sealed interface CSSUnit {
     }
 }
 
-interface CSSRelValue
-interface CSSAbsValue
-interface CSSAngleValue
-interface CSSTimeValue
-interface CSSFrequencyValue
-interface CSSResolutionValue
-interface CSSFlexValue
-
-value class CSSpercentValue(override val value: Number) : CSSUnitValue, CSSRelValue {
+value class CSSpercentValue(override val value: Number) : CSSUnitValue {
     override val unit: CSSUnit
         get() = CSSUnit.percent
 }
 
-value class CSSemValue(override val value: Number) : CSSUnitValue, CSSRelValue {
+value class CSSemValue(override val value: Number) : CSSUnitValue {
     override val unit: CSSUnit
         get() = CSSUnit.em
 }
 
-value class CSSexValue(override val value: Number) : CSSUnitValue, CSSRelValue {
+value class CSSexValue(override val value: Number) : CSSUnitValue {
     override val unit: CSSUnit
         get() = CSSUnit.ex
 }
 
-value class CSSchValue(override val value: Number) : CSSUnitValue, CSSRelValue {
+value class CSSchValue(override val value: Number) : CSSUnitValue {
     override val unit: CSSUnit
         get() = CSSUnit.ch
 }
 
-value class CSSicValue(override val value: Number) : CSSUnitValue, CSSRelValue {
+value class CSSicValue(override val value: Number) : CSSUnitValue {
     override val unit: CSSUnit
         get() = CSSUnit.ic
 }
 
-value class CSSremValue(override val value: Number) : CSSUnitValue, CSSRelValue {
+value class CSSremValue(override val value: Number) : CSSUnitValue {
     override val unit: CSSUnit
         get() = CSSUnit.rem
 }
 
-value class CSSlhValue(override val value: Number) : CSSUnitValue, CSSRelValue {
+value class CSSlhValue(override val value: Number) : CSSUnitValue {
     override val unit: CSSUnit
         get() = CSSUnit.lh
 }
 
-value class CSSrlhValue(override val value: Number) : CSSUnitValue, CSSRelValue {
+value class CSSrlhValue(override val value: Number) : CSSUnitValue {
     override val unit: CSSUnit
         get() = CSSUnit.rlh
 }
 
-value class CSSvwValue(override val value: Number) : CSSUnitValue, CSSRelValue {
+value class CSSvwValue(override val value: Number) : CSSUnitValue {
     override val unit: CSSUnit
         get() = CSSUnit.vw
 }
 
-value class CSSvhValue(override val value: Number) : CSSUnitValue, CSSRelValue {
+value class CSSvhValue(override val value: Number) : CSSUnitValue {
     override val unit: CSSUnit
         get() = CSSUnit.vh
 }
 
-value class CSSviValue(override val value: Number) : CSSUnitValue, CSSRelValue {
+value class CSSviValue(override val value: Number) : CSSUnitValue {
     override val unit: CSSUnit
         get() = CSSUnit.vi
 }
 
-value class CSSvbValue(override val value: Number) : CSSUnitValue, CSSRelValue {
+value class CSSvbValue(override val value: Number) : CSSUnitValue {
     override val unit: CSSUnit
         get() = CSSUnit.vb
 }
 
-value class CSSvminValue(override val value: Number) : CSSUnitValue, CSSRelValue {
+value class CSSvminValue(override val value: Number) : CSSUnitValue {
     override val unit: CSSUnit
         get() = CSSUnit.vmin
 }
 
-value class CSSvmaxValue(override val value: Number) : CSSUnitValue, CSSRelValue {
+value class CSSvmaxValue(override val value: Number) : CSSUnitValue {
     override val unit: CSSUnit
         get() = CSSUnit.vmax
 }
 
-value class CSScmValue(override val value: Number) : CSSUnitValue, CSSRelValue {
+value class CSScmValue(override val value: Number) : CSSUnitValue {
     override val unit: CSSUnit
         get() = CSSUnit.cm
 }
 
-value class CSSmmValue(override val value: Number) : CSSUnitValue, CSSRelValue {
+value class CSSmmValue(override val value: Number) : CSSUnitValue {
     override val unit: CSSUnit
         get() = CSSUnit.mm
 }
 
-value class CSSQValue(override val value: Number) : CSSUnitValue, CSSRelValue {
+value class CSSQValue(override val value: Number) : CSSUnitValue {
     override val unit: CSSUnit
         get() = CSSUnit.q
 }
 
-value class CSSptValue(override val value: Number) : CSSUnitValue, CSSAbsValue {
+value class CSSptValue(override val value: Number) : CSSUnitValue {
     override val unit: CSSUnit
         get() = CSSUnit.pt
 }
 
-value class CSSpcValue(override val value: Number) : CSSUnitValue, CSSAbsValue {
+value class CSSpcValue(override val value: Number) : CSSUnitValue {
     override val unit: CSSUnit
         get() = CSSUnit.pc
 }
 
-value class CSSpxValue(override val value: Number) : CSSUnitValue, CSSAbsValue {
+value class CSSpxValue(override val value: Number) : CSSUnitValue {
     override val unit: CSSUnit
         get() = CSSUnit.px
 }
 
-value class CSSdegValue(override val value: Number) : CSSUnitValue, CSSAngleValue {
-    override val unit: CSSUnit
+value class CSSdegValue(override val value: Number) : CSSAngleValue {
+    override val unit: CSSUnitAngleValue
         get() = CSSUnit.deg
 }
 
-value class CSSgradValue(override val value: Number) : CSSUnitValue, CSSAngleValue {
-    override val unit: CSSUnit
+value class CSSgradValue(override val value: Number) : CSSAngleValue {
+    override val unit: CSSUnitAngleValue
         get() = CSSUnit.grad
 }
 
-value class CSSradValue(override val value: Number) : CSSUnitValue, CSSAngleValue {
-    override val unit: CSSUnit
+value class CSSradValue(override val value: Number) : CSSAngleValue {
+    override val unit: CSSUnitAngleValue
         get() = CSSUnit.rad
 }
 
-value class CSSturnValue(override val value: Number) : CSSUnitValue, CSSAngleValue {
-    override val unit: CSSUnit
+value class CSSturnValue(override val value: Number) : CSSAngleValue {
+    override val unit: CSSUnitAngleValue
         get() = CSSUnit.turn
 }
 
-value class CSSsValue(override val value: Number) : CSSUnitValue, CSSTimeValue {
+value class CSSsValue(override val value: Number) : CSSUnitValue {
     override val unit: CSSUnit
         get() = CSSUnit.s
 }
 
-value class CSSmsValue(override val value: Number) : CSSUnitValue, CSSTimeValue {
+value class CSSmsValue(override val value: Number) : CSSUnitValue {
     override val unit: CSSUnit
         get() = CSSUnit.ms
 }
 
-value class CSSHzValue(override val value: Number) : CSSUnitValue, CSSFrequencyValue {
+value class CSSHzValue(override val value: Number) : CSSUnitValue {
     override val unit: CSSUnit
         get() = CSSUnit.hz
 }
 
-value class CSSkHzValue(override val value: Number) : CSSUnitValue, CSSFrequencyValue {
+value class CSSkHzValue(override val value: Number) : CSSUnitValue {
     override val unit: CSSUnit
         get() = CSSUnit.khz
 }
 
-value class CSSdpiValue(override val value: Number) : CSSUnitValue, CSSResolutionValue {
+value class CSSdpiValue(override val value: Number) : CSSUnitValue {
     override val unit: CSSUnit
         get() = CSSUnit.dpi
 }
 
-value class CSSdpcmValue(override val value: Number) : CSSUnitValue, CSSResolutionValue {
+value class CSSdpcmValue(override val value: Number) : CSSUnitValue {
     override val unit: CSSUnit
         get() = CSSUnit.dpcm
 }
 
-value class CSSdppxValue(override val value: Number) : CSSUnitValue, CSSResolutionValue {
+value class CSSdppxValue(override val value: Number) : CSSUnitValue {
     override val unit: CSSUnit
         get() = CSSUnit.dppx
 }
 
-value class CSSfrValue(override val value: Number) : CSSUnitValue, CSSFlexValue {
+value class CSSfrValue(override val value: Number) : CSSUnitValue {
     override val unit: CSSUnit
         get() = CSSUnit.fr
 }
 
-value class CSSnumberValue(override val value: Number) : CSSUnitValue, CSSFlexValue {
+value class CSSnumberValue(override val value: Number) : CSSUnitValue {
     override val unit: CSSUnit
         get() = CSSUnit.number
 }

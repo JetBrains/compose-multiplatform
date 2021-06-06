@@ -6,6 +6,7 @@
 package org.jetbrains.compose.web.core.tests
 
 import org.jetbrains.compose.web.css.CSSUnitValue
+import org.jetbrains.compose.web.css.CSSUnitValueTyped
 import org.jetbrains.compose.web.css.CSSchValue
 import org.jetbrains.compose.web.css.CSScmValue
 import org.jetbrains.compose.web.css.CSSdegValue
@@ -60,13 +61,13 @@ import kotlin.test.assertEquals
 class CSSUnitApiTests {
     // TODO: Cover CSS.Q, CSS.khz and CSS.hz after we'll get rid from polyfill
 
-    private fun CSSUnitValue.assertStructure(value: Number, unit: String, description: String? = null)  {
+    private fun CSSUnitValueTyped<*>.assertStructure(value: Number, unit: String, description: String? = null)  {
         assertEquals(this.value, value, description)
         assertEquals(this.unit.value, unit, description)
     }
 
     // TODO: use regular assertEqual after we'll get rid from polyfill
-    private fun CSSUnitValue.assertStructure(otherUnit: CSSUnitValue, description: String? = null) {
+    private fun CSSUnitValueTyped<*>.assertStructure(otherUnit: CSSUnitValueTyped<*>, description: String? = null) {
         return assertStructure(otherUnit.value, otherUnit.unit.value, description)
     }
 
