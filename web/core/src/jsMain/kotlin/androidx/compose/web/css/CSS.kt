@@ -343,51 +343,51 @@ external class StylePropertyMap : StylePropertyMapReadOnly {
 inline fun Element.computedStyleMap(): StylePropertyMapReadOnly =
     this.asDynamic().computedStyleMap().unsafeCast<StylePropertyMapReadOnly>()
 
-external class CSS {
-    companion object {
-        fun number(value: Number): CSSUnitValue
-        fun percent(value: Number): CSSpercentValue
-
-        // <length>
-        fun em(value: Number): CSSemValue
-        fun ex(value: Number): CSSexValue
-        fun ch(value: Number): CSSchValue
-        fun rem(value: Number): CSSremValue
-        fun vw(value: Number): CSSvwValue
-        fun vh(value: Number): CSSvhValue
-        fun vmin(value: Number): CSSvminValue
-        fun vmax(value: Number): CSSvmaxValue
-        fun cm(value: Number): CSScmValue
-        fun mm(value: Number): CSSmmValue
-        fun Q(value: Number): CSSQValue
-
-        fun pt(value: Number): CSSptValue
-        fun pc(value: Number): CSSpcValue
-        fun px(value: Number): CSSpxValue
-
-        // <angle>
-        fun deg(value: Number): CSSdegValue
-        fun grad(value: Number): CSSgradValue
-        fun rad(value: Number): CSSradValue
-        fun turn(value: Number): CSSturnValue
-
-        // <time>
-        fun s(value: Number): CSSsValue
-        fun ms(value: Number): CSSmsValue
-
-        // <frequency>
-        fun Hz(value: Number): CSSHzValue
-        fun kHz(value: Number): CSSkHzValue
-
-        // <resolution>
-        fun dpi(value: Number): CSSdpiValue
-        fun dpcm(value: Number): CSSdpcmValue
-        fun dppx(value: Number): CSSdppxValue
-
-        // <flex>
-        fun fr(value: Number): CSSfrValue
-    }
-}
+//external class CSS {
+//    companion object {
+//        fun number(value: Number): CSSUnitValue
+//        fun percent(value: Number): CSSpercentValue
+//
+//        // <length>
+//        fun em(value: Number): CSSemValue
+//        fun ex(value: Number): CSSexValue
+//        fun ch(value: Number): CSSchValue
+//        fun rem(value: Number): CSSremValue
+//        fun vw(value: Number): CSSvwValue
+//        fun vh(value: Number): CSSvhValue
+//        fun vmin(value: Number): CSSvminValue
+//        fun vmax(value: Number): CSSvmaxValue
+//        fun cm(value: Number): CSScmValue
+//        fun mm(value: Number): CSSmmValue
+//        fun Q(value: Number): CSSQValue
+//
+//        fun pt(value: Number): CSSptValue
+//        fun pc(value: Number): CSSpcValue
+//        fun px(value: Number): CSSpxValue
+//
+//        // <angle>
+//        fun deg(value: Number): CSSdegValue
+//        fun grad(value: Number): CSSgradValue
+//        fun rad(value: Number): CSSradValue
+//        fun turn(value: Number): CSSturnValue
+//
+//        // <time>
+//        fun s(value: Number): CSSsValue
+//        fun ms(value: Number): CSSmsValue
+//
+//        // <frequency>
+//        fun Hz(value: Number): CSSHzValue
+//        fun kHz(value: Number): CSSkHzValue
+//
+//        // <resolution>
+//        fun dpi(value: Number): CSSdpiValue
+//        fun dpcm(value: Number): CSSdpcmValue
+//        fun dppx(value: Number): CSSdppxValue
+//
+//        // <flex>
+//        fun fr(value: Number): CSSfrValue
+//    }
+//}
 
 @Suppress("unused")
 val cssTypedOMPolyfill = CSSTypedOMPolyfill.default(window)

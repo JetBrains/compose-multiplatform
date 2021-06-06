@@ -5,7 +5,6 @@
 
 package org.jetbrains.compose.web.core.tests
 
-import org.jetbrains.compose.web.css.CSS
 import org.jetbrains.compose.web.css.CSSUnitValue
 import org.jetbrains.compose.web.css.CSSchValue
 import org.jetbrains.compose.web.css.CSScmValue
@@ -70,43 +69,6 @@ class CSSUnitApiTests {
     private fun CSSUnitValue.assertStructure(otherUnit: CSSUnitValue, description: String? = null) {
         return assertStructure(otherUnit.value, otherUnit.unit, description)
     }
-
-//    @Test
-//    fun builderInvocation() {
-//        CSS.number(4).assertStructure(4, "number")
-//        CSS.percent(4).assertStructure(4, "percent")
-//
-//        CSS.em(4).assertStructure(4, "em")
-//        CSS.ch(4).assertStructure(4, "ch")
-//
-//        CSS.rem(4).assertStructure(4, "rem")
-//
-//        CSS.vw(4).assertStructure(4, "vw")
-//        CSS.vh(4).assertStructure(4, "vh")
-//
-//        CSS.vmin(4).assertStructure(4, "vmin")
-//        CSS.vmax(4).assertStructure(4, "vmax")
-//        CSS.cm(4).assertStructure(4, "cm")
-//        CSS.mm(4).assertStructure(4, "mm")
-//
-//        CSS.pt(4).assertStructure(4, "pt")
-//        CSS.pc(4).assertStructure(4, "pc")
-//        CSS.px(4).assertStructure(4, "px")
-//
-//        CSS.deg(4).assertStructure(4, "deg")
-//        CSS.grad(4).assertStructure(4, "grad")
-//        CSS.rad(4).assertStructure(4, "rad")
-//        CSS.turn(4).assertStructure(4, "turn")
-//
-//        CSS.s(4).assertStructure(4, "s")
-//        CSS.ms(4).assertStructure(4, "ms")
-//
-//        CSS.dpi(4).assertStructure(4, "dpi")
-//        CSS.dpcm(4).assertStructure(4, "dpcm")
-//        CSS.dppx(4).assertStructure(4, "dppx")
-//
-//        CSS.fr(4).assertStructure(4, "fr")
-//    }
 
     @Test
     fun postfixInvocation() {
