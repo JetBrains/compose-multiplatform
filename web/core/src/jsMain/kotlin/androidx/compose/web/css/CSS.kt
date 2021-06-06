@@ -142,8 +142,10 @@ external interface CSSNumericValue : CSSStyleValue {
 //    }
 }
 
-open class CSSUnitValue(val value: Number, val unit: String) : CSSNumericValue {
-    override fun toString(): String = "${value}${unit}"
+interface CSSUnitValue : CSSNumericValue {
+    val value: Number
+    val unit: String
+    fun asString(): String = "${value}${unit}"
 }
 
 // declare enum CSSMathOperator {
@@ -329,7 +331,7 @@ external interface StylePropertyValue
 fun String.asStylePropertyValue() = unsafeCast<StylePropertyValue>()
 fun Number.asStylePropertyValue() = unsafeCast<StylePropertyValue>()
 fun CSSStyleValue.asStylePropertyValue() = unsafeCast<StylePropertyValue>()
-fun CSSUnitValue.asStylePropertyValue() = toString().asStylePropertyValue()
+fun CSSUnitValue.asStylePropertyValue() = asString().asStylePropertyValue()
 
 external class StylePropertyMap : StylePropertyMapReadOnly {
     fun set(property: String, vararg values: StylePropertyValue)

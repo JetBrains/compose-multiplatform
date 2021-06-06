@@ -18,6 +18,7 @@ import org.jetbrains.compose.web.css.CSSfrValue
 import org.jetbrains.compose.web.css.CSSgradValue
 import org.jetbrains.compose.web.css.CSSmmValue
 import org.jetbrains.compose.web.css.CSSmsValue
+import org.jetbrains.compose.web.css.CSSnumberValue
 import org.jetbrains.compose.web.css.CSSpcValue
 import org.jetbrains.compose.web.css.CSSpercentValue
 import org.jetbrains.compose.web.css.CSSptValue
@@ -109,7 +110,7 @@ class CSSUnitApiTests {
 
     @Test
     fun postfixInvocation() {
-        4.number.assertStructure(CSSUnitValue(4, "number"), "number postfix")
+        4.number.assertStructure(CSSnumberValue(4), "number postfix")
         4.percent.assertStructure(CSSpercentValue(4), "percent posfix")
 
         4.em.assertStructure(CSSemValue(4), "em postfix")

@@ -296,7 +296,7 @@ fun StyleBuilder.borderRadius(r: CSSUnitValue) {
 }
 
 fun StyleBuilder.borderRadius(topLeft: CSSUnitValue, bottomRight: CSSUnitValue) {
-    property("border-radius", "$topLeft $bottomRight".asStylePropertyValue())
+    property("border-radius", "${topLeft.asString()} ${bottomRight.asString()}".asStylePropertyValue())
 }
 
 fun StyleBuilder.borderRadius(
@@ -304,7 +304,7 @@ fun StyleBuilder.borderRadius(
     topRightAndBottomLeft: CSSUnitValue,
     bottomRight: CSSUnitValue
 ) {
-    property("border-radius", "$topLeft $topRightAndBottomLeft $bottomRight".asStylePropertyValue())
+    property("border-radius", "${topLeft.asString()} ${topRightAndBottomLeft.asString()} ${bottomRight.asString()}".asStylePropertyValue())
 }
 
 fun StyleBuilder.borderRadius(
@@ -313,7 +313,10 @@ fun StyleBuilder.borderRadius(
     bottomRight: CSSUnitValue,
     bottomLeft: CSSUnitValue
 ) {
-    property("border-radius", "$topLeft $topRight $bottomRight $bottomLeft".asStylePropertyValue())
+    property(
+        "border-radius",
+        "${topLeft.asString()} ${topRight.asString()} ${bottomRight.asString()} ${bottomLeft.asString()}".asStylePropertyValue()
+    )
 }
 
 fun StyleBuilder.width(value: CSSUnitValue) {
@@ -370,18 +373,18 @@ fun StyleBuilder.fontSize(value: CSSUnitValue) {
 
 fun StyleBuilder.margin(value: CSSUnitValue) {
     // marign hasn't Typed OM yet
-    property("margin", value(value.toString()))
+    property("margin", value(value.asString()))
 }
 
 fun StyleBuilder.marginLeft(value: CSSUnitValue) {
-    property("margin-left", value(value.toString()))
+    property("margin-left", value(value.asString()))
 }
 
 fun StyleBuilder.marginTop(value: CSSUnitValue) {
-    property("margin-top", value(value.toString()))
+    property("margin-top", value(value.asString()))
 }
 
 fun StyleBuilder.padding(value: CSSUnitValue) {
     // padding hasn't Typed OM yet
-    property("padding", value(value.toString()))
+    property("padding", value(value.asString()))
 }
