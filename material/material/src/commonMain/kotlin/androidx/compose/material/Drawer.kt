@@ -424,6 +424,7 @@ fun ModalDrawer(
                 },
                 color = scrimColor
             )
+            val navigationMenu = getString(Strings.NavigationMenu)
             Surface(
                 modifier = with(LocalDensity.current) {
                     Modifier
@@ -437,7 +438,7 @@ fun ModalDrawer(
                     .offset { IntOffset(drawerState.offset.value.roundToInt(), 0) }
                     .padding(end = EndDrawerPadding)
                     .semantics {
-                        paneTitle = Strings.NavigationMenu
+                        paneTitle = navigationMenu
                         if (drawerState.isOpen) {
                             dismiss {
                                 if (
@@ -561,6 +562,7 @@ fun BottomDrawer(
                 },
                 visible = drawerState.targetValue != BottomDrawerValue.Closed
             )
+            val navigationMenu = getString(Strings.NavigationMenu)
             Surface(
                 drawerConstraints
                     .offset { IntOffset(x = 0, y = drawerState.offset.value.roundToInt()) }
@@ -568,7 +570,7 @@ fun BottomDrawer(
                         drawerHeight = position.size.height.toFloat()
                     }
                     .semantics {
-                        paneTitle = Strings.NavigationMenu
+                        paneTitle = navigationMenu
                         if (drawerState.isOpen) {
                             // TODO(b/180101663) The action currently doesn't return the correct results
                             dismiss {
@@ -623,13 +625,14 @@ private fun BottomDrawerScrim(
             targetValue = if (visible) 1f else 0f,
             animationSpec = TweenSpec()
         )
+        val closeDrawer = getString(Strings.CloseDrawer)
         val dismissModifier = if (visible) {
             Modifier
                 .pointerInput(onDismiss) {
                     detectTapGestures { onDismiss() }
                 }
                 .semantics(mergeDescendants = true) {
-                    contentDescription = Strings.CloseDrawer
+                    contentDescription = closeDrawer
                     onClick { onDismiss(); true }
                 }
         } else {
@@ -653,11 +656,12 @@ private fun Scrim(
     fraction: () -> Float,
     color: Color
 ) {
+    val closeDrawer = getString(Strings.CloseDrawer)
     val dismissDrawer = if (open) {
         Modifier
             .pointerInput(onClose) { detectTapGestures { onClose() } }
             .semantics(mergeDescendants = true) {
-                contentDescription = Strings.CloseDrawer
+                contentDescription = closeDrawer
                 onClick { onClose(); true }
             }
     } else {

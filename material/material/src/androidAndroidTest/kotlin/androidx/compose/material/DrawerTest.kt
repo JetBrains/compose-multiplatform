@@ -43,6 +43,7 @@ import androidx.compose.ui.test.centerLeft
 import androidx.compose.ui.test.click
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onChildAt
+import androidx.compose.ui.test.onNodeWithContentDescription
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onParent
 import androidx.compose.ui.test.performClick
@@ -231,19 +232,41 @@ class DrawerTest {
     @Test
     @SmallTest
     fun bottomDrawer_hasPaneTitle() {
+        lateinit var navigationMenu: String
         rule.setMaterialContent {
             BottomDrawer(
-                drawerState = rememberBottomDrawerState(BottomDrawerValue.Closed),
+                drawerState = rememberBottomDrawerState(BottomDrawerValue.Open),
                 drawerContent = {
                     Box(Modifier.fillMaxSize().testTag(bottomDrawerTag))
                 },
                 content = {}
             )
+            navigationMenu = getString(Strings.NavigationMenu)
         }
 
         rule.onNodeWithTag(bottomDrawerTag, useUnmergedTree = true)
             .onParent()
-            .assert(SemanticsMatcher.keyIsDefined(SemanticsProperties.PaneTitle))
+            .assert(SemanticsMatcher.expectValue(SemanticsProperties.PaneTitle, navigationMenu))
+    }
+
+    @Test
+    @SmallTest
+    fun modalDrawer_hasPaneTitle() {
+        lateinit var navigationMenu: String
+        rule.setMaterialContent {
+            ModalDrawer(
+                drawerState = rememberDrawerState(DrawerValue.Open),
+                drawerContent = {
+                    Box(Modifier.fillMaxSize().testTag("modalDrawerTag"))
+                },
+                content = {}
+            )
+            navigationMenu = getString(Strings.NavigationMenu)
+        }
+
+        rule.onNodeWithTag("modalDrawerTag", useUnmergedTree = true)
+            .onParent()
+            .assert(SemanticsMatcher.expectValue(SemanticsProperties.PaneTitle, navigationMenu))
     }
 
     @Test
@@ -738,6 +761,7 @@ class DrawerTest {
     fun bottomDrawer_scrim_doesNotClickWhenTransparent() {
         val topTag = "BottomDrawer"
         val scrimColor = mutableStateOf(Color.Red)
+        lateinit var closeDrawer: String
         rule.setMaterialContent {
             BottomDrawer(
                 modifier = Modifier.testTag(topTag),
@@ -750,6 +774,7 @@ class DrawerTest {
                     Box(Modifier.fillMaxSize().testTag("body"))
                 }
             )
+            closeDrawer = getString(Strings.CloseDrawer)
         }
 
         val height = rule.rootHeight()
@@ -761,8 +786,7 @@ class DrawerTest {
         var topNode = rule.onNodeWithTag(topTag).fetchSemanticsNode()
         assertEquals(3, topNode.children.size)
 
-        rule.onNodeWithTag(topTag)
-            .onChildAt(1)
+        rule.onNodeWithContentDescription(closeDrawer)
             .assertHasClickAction()
 
         rule.runOnIdle {
@@ -1098,6 +1122,7 @@ class DrawerTest {
     @Test
     fun modalDrawer_scrimNode_reportToSemanticsWhenOpen_notReportToSemanticsWhenClosed() {
         val topTag = "ModalDrawer"
+        lateinit var closeDrawer: String
         rule.setMaterialContent {
             ModalDrawer(
                 modifier = Modifier.testTag(topTag),
@@ -1109,6 +1134,7 @@ class DrawerTest {
                     Box(Modifier.fillMaxSize().testTag("body"))
                 }
             )
+            closeDrawer = getString(Strings.CloseDrawer)
         }
 
         // The drawer should be opened
@@ -1116,8 +1142,7 @@ class DrawerTest {
 
         var topNode = rule.onNodeWithTag(topTag).fetchSemanticsNode()
         assertEquals(3, topNode.children.size)
-        rule.onNodeWithTag(topTag)
-            .onChildAt(1)
+        rule.onNodeWithContentDescription(closeDrawer)
             .assertHasClickAction()
             .performSemanticsAction(SemanticsActions.OnClick)
 
