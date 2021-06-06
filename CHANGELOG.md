@@ -13,6 +13,7 @@
   * Fix [Dragging prevents pointer move events](https://github.com/JetBrains/compose-jb/issues/134)
   * Fix [Dragging window to another display makes Icon show up incorrectly](https://github.com/JetBrains/compose-jb/issues/677)
   * Fix ["Padding must be non-negative" after resizing window with Slider and Box](https://github.com/JetBrains/compose-jb/issues/367)
+  * Breaking change [old Dialog/Menubar/Tray are moved to androidx.compose.ui.window.v1](https://android-review.googlesource.com/c/platform/frameworks/support/+/1685905)
 
 # M3 (Feb 2021)
    * Improve [TextField](https://github.com/JetBrains/compose-jb/issues/277)
