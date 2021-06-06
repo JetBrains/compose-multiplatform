@@ -62,12 +62,12 @@ class CSSUnitApiTests {
 
     private fun CSSUnitValue.assertStructure(value: Number, unit: String, description: String? = null)  {
         assertEquals(this.value, value, description)
-        assertEquals(this.unit, unit, description)
+        assertEquals(this.unit.value, unit, description)
     }
 
     // TODO: use regular assertEqual after we'll get rid from polyfill
     private fun CSSUnitValue.assertStructure(otherUnit: CSSUnitValue, description: String? = null) {
-        return assertStructure(otherUnit.value, otherUnit.unit, description)
+        return assertStructure(otherUnit.value, otherUnit.unit.value, description)
     }
 
     @Test
