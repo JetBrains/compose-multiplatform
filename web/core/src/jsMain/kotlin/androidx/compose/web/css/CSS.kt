@@ -142,49 +142,6 @@ external interface CSSNumericValue : CSSStyleValue {
 //    }
 }
 
-interface CSSUnitValue : CSSNumericValue {
-    val value: Number
-    val unit: CSSUnit
-    fun asString(): String = "${value}${unit.value}"
-}
-
-sealed class CSSUnit(val value: String) {
-    object percent: CSSUnit("percent")
-    object em: CSSUnit("em")
-    object ex: CSSUnit("ex")
-    object ch: CSSUnit("ch")
-    object ic: CSSUnit("ic")
-    object rem: CSSUnit("rem")
-    object lh: CSSUnit("lh")
-    object rlh: CSSUnit("rlh")
-    object vw: CSSUnit("vw")
-    object vh: CSSUnit("vh")
-    object vi: CSSUnit("vi")
-    object vb: CSSUnit("vb")
-    object vmin: CSSUnit("vmin")
-    object vmax: CSSUnit("vmax")
-    object cm: CSSUnit("cm")
-    object mm: CSSUnit("mm")
-    object q: CSSUnit("q")
-    object pt: CSSUnit("pt")
-    object pc: CSSUnit("pc")
-    object px: CSSUnit("px")
-    object deg: CSSUnit("deg")
-    object grad: CSSUnit("grad")
-    object rad: CSSUnit("rad")
-    object turn: CSSUnit("turn")
-    object s: CSSUnit("s")
-    object ms: CSSUnit("ms")
-    object hz: CSSUnit("hz")
-    object khz: CSSUnit("khz")
-    object dpi: CSSUnit("dpi")
-    object dpcm: CSSUnit("dpcm")
-    object dppx: CSSUnit("dppx")
-    object fr: CSSUnit("fr")
-    object number: CSSUnit("number")
-}
-
-
 // declare enum CSSMathOperator {
 //     'sum',
 //     'product',
