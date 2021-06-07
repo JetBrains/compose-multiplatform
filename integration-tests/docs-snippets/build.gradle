@@ -16,8 +16,6 @@
 
 import androidx.build.Publish
 
-import static androidx.build.dependencies.DependenciesKt.*
-
 plugins {
     id("AndroidXPlugin")
     id("com.android.library")
@@ -43,12 +41,12 @@ dependencies {
     implementation(project(":lifecycle:lifecycle-viewmodel-compose"))
     implementation(project(":paging:paging-compose"))
 
-    implementation(KOTLIN_STDLIB)
-    implementation(KOTLIN_REFLECT)
-    implementation(ANDROIDX_TEST_RULES)
-    implementation(ESPRESSO_CORE)
-    implementation(JUNIT)
-    implementation(TRUTH)
+    implementation(libs.kotlinStdlib)
+    implementation(libs.kotlinReflect)
+    implementation(libs.testRules)
+    implementation(libs.espressoCore)
+    implementation(libs.junit)
+    implementation(libs.truth)
 }
 
 androidx {

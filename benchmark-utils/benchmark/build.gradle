@@ -14,8 +14,6 @@
  * limitations under the License.
  */
 
-import static androidx.build.dependencies.DependenciesKt.*
-
 plugins {
     id("AndroidXPlugin")
     id("com.android.library")
@@ -31,8 +29,8 @@ dependencies {
     androidTestImplementation project(":compose:benchmark-utils")
     androidTestImplementation project(":compose:runtime:runtime")
     androidTestImplementation project(":compose:foundation:foundation-layout")
-    androidTestImplementation(ANDROIDX_TEST_RULES)
-    androidTestImplementation(KOTLIN_STDLIB)
-    androidTestImplementation(KOTLIN_TEST_COMMON)
-    androidTestImplementation(JUNIT)
+    androidTestImplementation(libs.testRules)
+    androidTestImplementation(libs.kotlinStdlib)
+    androidTestImplementation(libs.kotlinTestCommon)
+    androidTestImplementation(libs.junit)
 }

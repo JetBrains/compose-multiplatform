@@ -14,11 +14,8 @@
  * limitations under the License.
  */
 
-
 import androidx.build.AndroidXComposePlugin
 import androidx.build.Publish
-
-import static androidx.build.dependencies.DependenciesKt.*
 
 plugins {
     id("AndroidXPlugin")
@@ -41,21 +38,21 @@ dependencies {
         api(projectOrArtifact(":compose:ui:ui-test-junit4"))
         api(project(":test-screenshot"))
 
-        implementation(KOTLIN_STDLIB_COMMON)
+        implementation(libs.kotlinStdlibCommon)
         implementation(projectOrArtifact(":compose:runtime:runtime"))
         implementation(projectOrArtifact(":compose:ui:ui-unit"))
         implementation(projectOrArtifact(":compose:ui:ui-graphics"))
         implementation(projectOrArtifact(":activity:activity-compose"))
-        implementation(ANDROIDX_TEST_CORE)
-        implementation(ANDROIDX_TEST_RULES)
+        implementation(libs.testCore)
+        implementation(libs.testRules)
 
         // This has stub APIs for access to legacy Android APIs, so we don't want
         // any dependency on this module.
         compileOnly(projectOrArtifact(":compose:ui:ui-android-stubs"))
 
-        testImplementation(TRUTH)
+        testImplementation(libs.truth)
 
-        androidTestImplementation(TRUTH)
+        androidTestImplementation(libs.truth)
         androidTestImplementation(projectOrArtifact(":compose:material:material"))
     }
 }
@@ -69,7 +66,7 @@ if (AndroidXComposePlugin.isMultiplatformEnabled(project)) {
          */
         sourceSets {
             commonMain.dependencies {
-                implementation(KOTLIN_STDLIB_COMMON)
+                implementation(libs.kotlinStdlibCommon)
                 implementation(projectOrArtifact(":compose:runtime:runtime"))
                 implementation(projectOrArtifact(":compose:ui:ui-unit"))
                 implementation(projectOrArtifact(":compose:ui:ui-graphics"))
@@ -84,16 +81,16 @@ if (AndroidXComposePlugin.isMultiplatformEnabled(project)) {
                 // This has stub APIs for access to legacy Android APIs, so we don't want
                 // any dependency on this module.
                 compileOnly(projectOrArtifact(":compose:ui:ui-android-stubs"))
-                implementation(ANDROIDX_TEST_CORE)
-                implementation(ANDROIDX_TEST_RULES)
+                implementation(libs.testCore)
+                implementation(libs.testRules)
             }
 
             test.dependencies {
-                implementation(TRUTH)
+                implementation(libs.truth)
             }
 
             androidAndroidTest.dependencies {
-                implementation(TRUTH)
+                implementation(libs.truth)
                 implementation(projectOrArtifact(":compose:material:material"))
             }
         }
