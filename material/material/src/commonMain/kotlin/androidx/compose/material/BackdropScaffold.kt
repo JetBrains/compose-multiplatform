@@ -305,9 +305,14 @@ fun BackdropScaffold(
             if (stickyFrontLayer) {
                 revealedHeight = min(revealedHeight, backLayerHeight)
             }
+            val nestedScroll = if (gesturesEnabled) {
+                Modifier.nestedScroll(scaffoldState.nestedScrollConnection)
+            } else {
+                Modifier
+            }
 
             val swipeable = Modifier
-                .nestedScroll(scaffoldState.nestedScrollConnection)
+                .then(nestedScroll)
                 .swipeable(
                     state = scaffoldState,
                     anchors = mapOf(
@@ -349,12 +354,13 @@ fun BackdropScaffold(
             ) {
                 Box(Modifier.padding(bottom = peekHeight)) {
                     frontLayerContent()
-
                     Scrim(
                         color = frontLayerScrimColor,
                         onDismiss = {
                             scope.launch {
-                                if (scaffoldState.confirmStateChange(Concealed)) {
+                                if (gesturesEnabled &&
+                                    scaffoldState.confirmStateChange(Concealed)
+                                ) {
                                     scaffoldState.conceal()
                                 }
                             }
