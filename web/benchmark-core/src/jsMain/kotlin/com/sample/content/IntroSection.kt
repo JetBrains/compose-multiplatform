@@ -21,7 +21,7 @@ fun Intro() {
                 classes(WtCols.wtCol2, WtCols.wtColMd3)
                 styleBuilder.alignSelf(AlignSelf.Start)
             }) {
-                Img(src = "i1.svg", attrs = { classes(AppStylesheet.composeLogo) }) {}
+                Img(src = "i1.svg", attrs = { classes(AppStylesheet.composeLogo) })
             }
 
             Div(attrs = {
@@ -202,7 +202,7 @@ private fun ComposeWebStatusMessage() {
                     width(24.px)
                     height(24.px)
                 }
-            }) {}
+            })
         }
 
         Div(attrs = {

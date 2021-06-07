@@ -28,5 +28,5 @@ actual fun SliderActual(
                 onValueChange(value.toFloat())
             }
         }
-    ) {}
+    )
 }

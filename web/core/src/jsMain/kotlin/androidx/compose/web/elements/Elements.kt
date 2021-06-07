@@ -88,8 +88,7 @@ fun A(
 fun Input(
     type: InputType = InputType.Text,
     value: String = "",
-    attrs: AttrBuilderContext<Tag.Input> = {},
-    content: ContentBuilder<HTMLInputElement>? = null
+    attrs: AttrBuilderContext<Tag.Input> = {}
 ) {
     TagElement<Tag.Input, HTMLInputElement>(
         tagName = "input",
@@ -98,7 +97,7 @@ fun Input(
             value(value)
             attrs()
         },
-        content = content
+        content = null
     )
 }
 
@@ -181,10 +180,8 @@ fun Span(
 ) = TagElement("span", applyAttrs = attrs, content = content)
 
 @Composable
-fun Br(
-    attrs: AttrBuilderContext<Tag.Br> = {},
-    content: ContentBuilder<HTMLBRElement>? = null
-) = TagElement("br", applyAttrs = attrs, content = content)
+fun Br(attrs: AttrBuilderContext<Tag.Br> = {}) =
+    TagElement<Tag.Br, HTMLBRElement>("br", applyAttrs = attrs, content = null)
 
 @Composable
 fun Ul(
@@ -214,15 +211,14 @@ fun DOMScope<HTMLUListElement>.Li(
 fun Img(
     src: String,
     alt: String = "",
-    attrs: AttrBuilderContext<Tag.Img> = {},
-    content: ContentBuilder<HTMLImageElement>? = null
+    attrs: AttrBuilderContext<Tag.Img> = {}
 ) = TagElement<Tag.Img, HTMLImageElement>(
     tagName = "img",
     applyAttrs = {
         src(src).alt(alt)
         attrs()
     },
-    content = content
+    content = null
 )
 
 @Composable
@@ -412,13 +408,12 @@ fun Caption(
 
 @Composable
 fun Col(
-    attrs: AttrBuilderContext<Tag.Col> = {},
-    content: ContentBuilder<HTMLTableColElement>? = null
+    attrs: AttrBuilderContext<Tag.Col> = {}
 ) {
-    TagElement(
+    TagElement<Tag.Col, HTMLTableColElement>(
         tagName = "col",
         applyAttrs = attrs,
-        content = content
+        content = null
     )
 }
 
