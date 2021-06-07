@@ -4,12 +4,17 @@ interface CSSSizeValue<out T : CSSUnit> : CSSNumericValue {
     val value: Float
     val unit: T
     fun asString(): String = "${value}${unit.value}"
+    fun newUnit(value: Float): CSSSizeValue<T>
 }
 
-private class CSSUnitValueTyped<out T : CSSUnit>(
+private data class CSSUnitValueTyped<out T : CSSUnit>(
     override val value: Float,
     override val unit: T
-) : CSSSizeValue<T>
+) : CSSSizeValue<T> {
+    override fun newUnit(value: Float): CSSSizeValue<T> = copy(value = value)
+}
+
+operator fun <T : CSSUnit> CSSSizeValue<T>.times(num: Number): CSSSizeValue<T> = newUnit(value * num.toFloat())
 
 typealias CSSUnitValue = CSSSizeValue<CSSUnit>
 typealias CSSpxValue = CSSSizeValue<CSSUnit.px>

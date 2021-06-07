@@ -24,6 +24,7 @@ import org.jetbrains.compose.web.css.pt
 import org.jetbrains.compose.web.css.px
 import org.jetbrains.compose.web.css.rad
 import org.jetbrains.compose.web.css.s
+import org.jetbrains.compose.web.css.times
 import org.jetbrains.compose.web.css.turn
 import org.jetbrains.compose.web.css.vh
 import org.jetbrains.compose.web.css.vmax
@@ -74,4 +75,78 @@ class CSSUnitApiTests {
         assertEquals("4fr", 4.fr.asString())
     }
 
+    @Test
+    fun id() {
+        // TODO: review what exactly number does - most likely we don't need it in our ecosystem
+        assertEquals(4.number, 4.number)
+
+        assertEquals(4.percent, 4.percent)
+
+        assertEquals(4.em, 4.em)
+        assertEquals(4.ch, 4.ch)
+
+        assertEquals(4.cssRem, 4.cssRem)
+
+        assertEquals(4.vw, 4.vw)
+        assertEquals(4.vh, 4.vh)
+
+        assertEquals(4.vmin, 4.vmin)
+        assertEquals(4.vmax, 4.vmax)
+        assertEquals(4.cm, 4.cm)
+        assertEquals(4.mm, 4.mm)
+
+        assertEquals(4.pt, 4.pt)
+        assertEquals(4.pc, 4.pc)
+        assertEquals(4.px, 4.px)
+
+        assertEquals(4.deg, 4.deg)
+        assertEquals(4.grad, 4.grad)
+        assertEquals(4.rad, 4.rad)
+        assertEquals(4.turn, 4.turn)
+
+        assertEquals(4.s, 4.s)
+        assertEquals(4.ms, 4.ms)
+
+        assertEquals(4.dpi, 4.dpi)
+        assertEquals(4.dpcm, 4.dpcm)
+        assertEquals(4.dppx, 4.dppx)
+
+        assertEquals(4.fr, 4.fr)
+    }
+
+    @Test
+    fun arithmeticMultiplicationLeft() {
+        assertEquals(16.percent, 4.percent * 4)
+
+        assertEquals(16.em, 4.em * 4)
+        assertEquals(16.ch, 4.ch * 4)
+
+        assertEquals(16.cssRem, 4.cssRem * 4)
+
+        assertEquals(16.vw, 4.vw * 4)
+        assertEquals(16.vh, 4.vh * 4)
+
+        assertEquals(16.vmin, 4.vmin * 4)
+        assertEquals(16.vmax, 4.vmax * 4)
+        assertEquals(16.cm, 4.cm * 4)
+        assertEquals(16.mm, 4.mm * 4)
+
+        assertEquals(16.pt, 4.pt * 4)
+        assertEquals(16.pc, 4.pc * 4)
+        assertEquals(16.px, 4.px * 4)
+
+        assertEquals(16.deg, 4.deg * 4)
+        assertEquals(16.grad, 4.grad * 4)
+        assertEquals(16.rad, 4.rad * 4)
+        assertEquals(16.turn, 4.turn * 4)
+
+        assertEquals(16.s, 4.s * 4)
+        assertEquals(16.ms, 4.ms * 4)
+
+        assertEquals(16.dpi, 4.dpi * 4)
+        assertEquals(16.dpcm, 4.dpcm * 4)
+        assertEquals(16.dppx, 4.dppx * 4)
+
+        assertEquals(16.fr, 4.fr * 4)
+    }
 }
