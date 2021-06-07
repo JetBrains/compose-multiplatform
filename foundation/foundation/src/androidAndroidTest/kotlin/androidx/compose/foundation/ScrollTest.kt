@@ -52,7 +52,6 @@ import androidx.compose.ui.platform.InspectableValue
 import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.platform.isDebugInspectorInfoEnabled
 import androidx.compose.ui.platform.testTag
-import androidx.compose.ui.test.ExperimentalTestApi
 import androidx.compose.ui.test.GestureScope
 import androidx.compose.ui.test.SemanticsNodeInteraction
 import androidx.compose.ui.test.assertIsDisplayed
@@ -95,7 +94,6 @@ import java.util.concurrent.TimeUnit
 
 @MediumTest
 @RunWith(AndroidJUnit4::class)
-@OptIn(ExperimentalTestApi::class)
 class ScrollTest {
 
     @get:Rule
@@ -167,7 +165,6 @@ class ScrollTest {
         validateVerticalScroller(height = height)
     }
 
-    @OptIn(ExperimentalTestApi::class)
     @SdkSuppress(minSdkVersion = 26)
     @Test
     fun verticalScroller_LargeContent_ScrollToEnd() {
@@ -200,7 +197,6 @@ class ScrollTest {
         validateVerticalScroller(offset = expectedOffset, height = height)
     }
 
-    @OptIn(ExperimentalTestApi::class)
     @SdkSuppress(minSdkVersion = 26)
     @Test
     fun verticalScroller_LargeContent_Reversed_ScrollToEnd() {
@@ -258,7 +254,6 @@ class ScrollTest {
         validateHorizontalScroller(width = width, checkInRtl = true)
     }
 
-    @OptIn(ExperimentalTestApi::class)
     @SdkSuppress(minSdkVersion = 26)
     @Test
     fun horizontalScroller_LargeContent_ScrollToEnd() {
@@ -280,7 +275,6 @@ class ScrollTest {
         validateHorizontalScroller(offset = scrollDistance, width = width)
     }
 
-    @OptIn(ExperimentalTestApi::class)
     @SdkSuppress(minSdkVersion = 26)
     @Test
     fun horizontalScroller_rtl_LargeContent_ScrollToEnd() {
@@ -326,7 +320,6 @@ class ScrollTest {
         validateHorizontalScroller(offset = expectedOffset, width = width, checkInRtl = true)
     }
 
-    @OptIn(ExperimentalTestApi::class)
     @SdkSuppress(minSdkVersion = 26)
     @Test
     fun horizontalScroller_LargeContent_Reversed_ScrollToEnd() {
@@ -347,7 +340,6 @@ class ScrollTest {
         validateHorizontalScroller(offset = expectedOffset, width = width)
     }
 
-    @OptIn(ExperimentalTestApi::class)
     @SdkSuppress(minSdkVersion = 26)
     @Test
     fun horizontalScroller_rtl_LargeContent_Reversed_ScrollToEnd() {
@@ -479,7 +471,6 @@ class ScrollTest {
         )
     }
 
-    @OptIn(ExperimentalTestApi::class)
     @Test
     fun scroller_coerce_whenScrollTo() {
         val scrollState = ScrollState(initial = 0)
@@ -520,7 +511,6 @@ class ScrollTest {
         assertThat(scrollState.value).isEqualTo(scrollState.maxValue)
     }
 
-    @OptIn(ExperimentalTestApi::class)
     @Test
     fun verticalScroller_LargeContent_coerceWhenMaxChanges() {
         val scrollState = ScrollState(initial = 0)
@@ -558,7 +548,6 @@ class ScrollTest {
         assertThat(scrollState.value).isEqualTo(newMax)
     }
 
-    @OptIn(ExperimentalTestApi::class)
     @Test
     fun scroller_coerce_whenScrollSmoothTo() {
         val scrollState = ScrollState(initial = 0)
@@ -630,7 +619,6 @@ class ScrollTest {
         assertThat(scrollState.value).isEqualTo(scrollWhenInterruptFling)
     }
 
-    @OptIn(ExperimentalTestApi::class)
     @Test
     fun scroller_restoresScrollerPosition() {
         val restorationTester = StateRestorationTester(rule)
