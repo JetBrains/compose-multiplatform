@@ -19,6 +19,8 @@ operator fun <T : CSSUnit> Number.times(unit: CSSSizeValue<T>): CSSSizeValue<T> 
 
 operator fun <T : CSSUnit> CSSSizeValue<T>.div(num: Number): CSSSizeValue<T> = newUnit(value / num.toFloat())
 
+operator fun <T: CSSUnit> CSSSizeValue<T>.plus(b: CSSSizeValue<T>): CSSSizeValue<T> = newUnit(value + b.value)
+
 
 typealias CSSUnitValue = CSSSizeValue<CSSUnit>
 typealias CSSpxValue = CSSSizeValue<CSSUnit.px>
