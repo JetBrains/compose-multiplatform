@@ -30,7 +30,7 @@ import android.widget.ImageView
 import androidx.annotation.RequiresApi
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import androidx.compose.runtime.MonotonicFrameClock
+import androidx.annotation.DoNotInline
 import androidx.compose.runtime.Recomposer
 import androidx.compose.runtime.snapshots.Snapshot
 import androidx.compose.ui.platform.ViewRootForTest
@@ -41,7 +41,6 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.test.TestCoroutineDispatcher
-import java.util.concurrent.atomic.AtomicLong
 
 /**
  * Factory method to provide implementation of [ComposeBenchmarkScope].
@@ -86,15 +85,6 @@ internal class AndroidComposeTestCaseRunner<T : ComposeTestCase>(
     }
 
     private var canvas: Canvas? = null
-
-    private class AutoFrameClock(
-        private val singleFrameTimeNanos: Long = 16_000_000
-    ) : MonotonicFrameClock {
-        private val lastFrameTime = AtomicLong(0L)
-
-        override suspend fun <R> withFrameNanos(onFrame: (Long) -> R): R =
-            onFrame(lastFrameTime.getAndAdd(singleFrameTimeNanos))
-    }
 
     private val testCoroutineDispatcher = TestCoroutineDispatcher()
     private val frameClock = TestMonotonicFrameClock(CoroutineScope(testCoroutineDispatcher))
@@ -271,7 +261,7 @@ internal class AndroidComposeTestCaseRunner<T : ComposeTestCase>(
         val imageView = ImageView(activity)
         val bitmap: Bitmap
         if (Build.VERSION.SDK_INT >= 28) {
-            bitmap = Bitmap.createBitmap(picture)
+            bitmap = BitmapHelper.createBitmap(picture)
         } else {
             val width = picture.width.coerceAtLeast(1)
             val height = picture.height.coerceAtLeast(1)
@@ -382,5 +372,13 @@ private class MRenderNodeCapture : DrawCapture {
     override fun endRecording() {
         renderNode.end(canvas!!)
         canvas = null
+    }
+}
+
+@RequiresApi(28)
+private object BitmapHelper {
+    @DoNotInline
+    fun createBitmap(picture: Picture): Bitmap {
+        return Bitmap.createBitmap(picture)
     }
 }

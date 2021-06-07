@@ -19,6 +19,7 @@ package androidx.compose.ui.tooling.preview
 import android.content.Context
 import android.graphics.Typeface
 import android.os.Build
+import androidx.annotation.DoNotInline
 import androidx.annotation.RequiresApi
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.ResourceFont
@@ -27,11 +28,19 @@ import androidx.compose.ui.text.font.ResourceFont
  * Layoutlib implementation for [Font.ResourceLoader]
  */
 internal class LayoutlibFontResourceLoader(private val context: Context) : Font.ResourceLoader {
-    @RequiresApi(Build.VERSION_CODES.O)
     override fun load(font: Font): Typeface {
-        return when (font) {
-            is ResourceFont -> context.resources.getFont(font.resId)
-            else -> throw IllegalArgumentException("Unknown font type: ${font.javaClass.name}")
+        return if (font is ResourceFont && Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            ResourceFontHelper.load(context, font)
+        } else {
+            throw IllegalArgumentException("Unknown font type: ${font.javaClass.name}")
         }
+    }
+}
+
+@RequiresApi(Build.VERSION_CODES.O)
+private object ResourceFontHelper {
+    @DoNotInline
+    fun load(context: Context, font: ResourceFont): Typeface {
+        return context.resources.getFont(font.resId)
     }
 }

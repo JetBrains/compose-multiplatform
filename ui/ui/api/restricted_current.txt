@@ -150,9 +150,6 @@ package androidx.compose.ui {
 
 package androidx.compose.ui.autofill {
 
-  public final class AndroidAutofillDebugUtils_androidKt {
-  }
-
   public final class AndroidAutofillType_androidKt {
   }
 
