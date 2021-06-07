@@ -776,6 +776,38 @@ class DrawerTest {
     }
 
     @Test
+    fun bottomDrawer_scrim_disabledWhenGesturesDisabled() {
+        val topTag = "BottomDrawer"
+        rule.setMaterialContent {
+            BottomDrawer(
+                modifier = Modifier.testTag(topTag),
+                scrimColor = Color.Red,
+                drawerState = rememberBottomDrawerState(BottomDrawerValue.Open),
+                gesturesEnabled = false,
+                drawerContent = {
+                    Box(Modifier.height(shortBottomDrawerHeight).testTag(bottomDrawerTag))
+                },
+                content = {
+                    Box(Modifier.fillMaxSize().testTag("body"))
+                }
+            )
+        }
+
+        val height = rule.rootHeight()
+        val topWhenOpened = height - shortBottomDrawerHeight
+
+        // The drawer should be opened
+        rule.onNodeWithTag(bottomDrawerTag).assertTopPositionInRootIsEqualTo(topWhenOpened)
+
+        rule.onNodeWithTag(topTag)
+            .onChildAt(1)
+            .assertHasClickAction()
+            .performClick()
+        // still open since the scrim should be disabled
+        rule.onNodeWithTag(bottomDrawerTag).assertTopPositionInRootIsEqualTo(topWhenOpened)
+    }
+
+    @Test
     @LargeTest
     fun bottomDrawer_respectsConfirmStateChange(): Unit = runBlocking(AutoTestFrameClock()) {
         val contentTag = "contentTestTag"

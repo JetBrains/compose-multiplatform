@@ -413,7 +413,10 @@ fun ModalDrawer(
                 open = drawerState.isOpen,
                 onClose = {
                     scope.launch {
-                        if (drawerState.swipeableState.confirmStateChange(DrawerValue.Closed)) {
+                        if (
+                            gesturesEnabled &&
+                            drawerState.swipeableState.confirmStateChange(DrawerValue.Closed)
+                        ) {
                             drawerState.close()
                         }
                     }
@@ -534,8 +537,13 @@ fun BottomDrawer(
                     maxHeight = constraints.maxHeight.toDp()
                 )
         }
+        val nestedScroll = if (gesturesEnabled) {
+            Modifier.nestedScroll(drawerState.nestedScrollConnection)
+        } else {
+            Modifier
+        }
         val swipeable = Modifier
-            .nestedScroll(drawerState.nestedScrollConnection)
+            .then(nestedScroll)
             .swipeable(
                 state = drawerState,
                 anchors = anchors,
@@ -550,7 +558,10 @@ fun BottomDrawer(
                 color = scrimColor,
                 onDismiss = {
                     scope.launch {
-                        if (drawerState.confirmStateChange(BottomDrawerValue.Closed)) {
+                        if (
+                            gesturesEnabled &&
+                            drawerState.confirmStateChange(BottomDrawerValue.Closed)
+                        ) {
                             drawerState.close()
                         }
                     }

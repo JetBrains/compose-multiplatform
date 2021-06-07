@@ -597,4 +597,43 @@ class BackdropScaffoldTest {
             assertThat(scaffoldState.currentValue).isEqualTo(Revealed)
         }
     }
+
+    @Test
+    fun backdropScaffold_scrimIsDisabledWhenGesturesDisabled() {
+        var frontLayerClicks = 0
+        lateinit var scaffoldState: BackdropScaffoldState
+        rule.setContent {
+            scaffoldState = rememberBackdropScaffoldState(Revealed)
+            BackdropScaffold(
+                scaffoldState = scaffoldState,
+                peekHeight = peekHeight,
+                headerHeight = headerHeight,
+                gesturesEnabled = false,
+                appBar = { Box(Modifier.height(peekHeight)) },
+                backLayerContent = { Box(Modifier.height(contentHeight)) },
+                frontLayerContent = {
+                    Box(
+                        Modifier.fillMaxSize().testTag(frontLayer).clickable {
+                            frontLayerClicks += 1
+                        }
+                    )
+                }
+            )
+        }
+
+        rule.runOnIdle {
+            assertThat(frontLayerClicks).isEqualTo(0)
+            assertThat(scaffoldState.currentValue).isEqualTo(Revealed)
+        }
+
+        rule.onNodeWithTag(frontLayer)
+            .performGesture { click() }
+
+        advanceClock()
+
+        rule.runOnIdle {
+            // still revealed
+            assertThat(scaffoldState.currentValue).isEqualTo(Revealed)
+        }
+    }
 }

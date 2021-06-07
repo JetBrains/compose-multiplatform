@@ -105,7 +105,7 @@ fun BottomDrawerSample() {
                     content = { Text("Close Drawer") }
                 )
                 LazyColumn {
-                    items(5) {
+                    items(25) {
                         ListItem(
                             text = { Text("Item $it") },
                             icon = {
