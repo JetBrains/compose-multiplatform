@@ -14,7 +14,6 @@
  * limitations under the License.
  */
 
-
 import androidx.build.Publish
 
 plugins {
@@ -27,8 +26,6 @@ plugins {
 dependencies {
     kotlinPlugin project(":compose:compiler:compiler")
     implementation(libs.kotlinStdlib)
-
-    implementation project(":compose:integration-tests:demos:common")
     implementation project(":compose:ui:ui")
     implementation project(":compose:material:material")
     implementation project(":compose:material:material:material-samples")
@@ -37,8 +34,8 @@ dependencies {
 }
 
 androidx {
-    name = "Compose Material catalog"
+    name = "Compose Material Catalog"
     publish = Publish.NONE
     inceptionYear = "2021"
-    description = "This is a project for a Compose Material catalog."
+    description = "This is a project for the Compose Material Catalog."
 }

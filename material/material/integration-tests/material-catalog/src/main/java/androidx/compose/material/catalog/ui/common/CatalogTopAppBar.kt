@@ -57,6 +57,9 @@ fun CatalogTopAppBar(
     onDocsClick: () -> Unit = {},
     onSourceClick: () -> Unit = {},
     onIssueClick: () -> Unit = {},
+    onTermsClick: () -> Unit = {},
+    onPrivacyClick: () -> Unit = {},
+    onLicensesClick: () -> Unit = {}
 ) {
     var moreMenuExpanded by remember { mutableStateOf(false) }
     // Wrapping in a Surface to handle window insets
@@ -107,6 +110,18 @@ fun CatalogTopAppBar(
                         onIssueClick = {
                             onIssueClick()
                             moreMenuExpanded = false
+                        },
+                        onTermsClick = {
+                            onTermsClick()
+                            moreMenuExpanded = false
+                        },
+                        onPrivacyClick = {
+                            onPrivacyClick()
+                            moreMenuExpanded = false
+                        },
+                        onLicensesClick = {
+                            onLicensesClick()
+                            moreMenuExpanded = false
                         }
                     )
                 }
@@ -139,7 +154,10 @@ private fun MoreMenu(
     onGuidelinesClick: () -> Unit,
     onDocsClick: () -> Unit,
     onSourceClick: () -> Unit,
-    onIssueClick: () -> Unit
+    onIssueClick: () -> Unit,
+    onTermsClick: () -> Unit,
+    onPrivacyClick: () -> Unit,
+    onLicensesClick: () -> Unit,
 ) {
     DropdownMenu(
         expanded = expanded,
@@ -157,6 +175,16 @@ private fun MoreMenu(
         Divider()
         DropdownMenuItem(onClick = onIssueClick) {
             Text(stringResource(id = R.string.report_an_issue))
+        }
+        Divider()
+        DropdownMenuItem(onClick = onTermsClick) {
+            Text(stringResource(id = R.string.terms_of_service))
+        }
+        DropdownMenuItem(onClick = onPrivacyClick) {
+            Text(stringResource(id = R.string.privacy_policy))
+        }
+        DropdownMenuItem(onClick = onLicensesClick) {
+            Text(stringResource(id = R.string.open_source_licenses))
         }
     }
 }
