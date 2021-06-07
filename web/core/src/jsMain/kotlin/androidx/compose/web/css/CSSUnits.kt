@@ -28,168 +28,135 @@ sealed interface CSSUnit {
     val value: String
 
     object percent: CSSUnitRel {
-        override val value: String
-            get() = "%"
+        override val value: String = "%"
     }
 
     object em: CSSUnitRel {
-        override val value: String
-            get() = "em"
+        override val value = "em"
     }
 
     object ex: CSSUnitRel {
-        override val value: String
-            get() = "ex"
+        override val value = "ex"
     }
 
     object ch: CSSUnitRel {
-        override val value: String
-            get() = "ch"
+        override val value = "ch"
     }
 
     object ic: CSSUnitRel {
-        override val value: String
-            get() = "ic"
+        override val value = "ic"
     }
 
     object rem: CSSUnitRel {
-        override val value: String
-            get() = "rem"
+        override val value = "rem"
     }
 
     object lh: CSSUnitRel {
-        override val value: String
-            get() = "lh"
+        override val value = "lh"
     }
 
     object rlh: CSSUnitRel {
-        override val value: String
-            get() = "rlh"
+        override val value = "rlh"
     }
 
     object vw: CSSUnitRel {
-        override val value: String
-            get() = "vw"
+        override val value = "vw"
     }
 
     object vh: CSSUnitRel {
-        override val value: String
-            get() = "vh"
+        override val value = "vh"
     }
 
     object vi: CSSUnitRel {
-        override val value: String
-            get() = "vi"
+        override val value = "vi"
     }
 
     object vb: CSSUnitRel {
-        override val value: String
-            get() = "vb"
+        override val value = "vb"
     }
 
     object vmin: CSSUnitRel {
-        override val value: String
-            get() = "vmin"
+        override val value = "vmin"
     }
 
     object vmax: CSSUnitRel {
-        override val value: String
-            get() = "vmax"
+        override val value = "vmax"
     }
 
     object cm: CSSUnitRel {
-        override val value: String
-            get() = "cm"
+        override val value = "cm"
     }
 
     object mm: CSSUnitRel {
-        override val value: String
-            get() = "mm"
+        override val value = "mm"
     }
 
     object q: CSSUnitRel {
-        override val value: String
-            get() = "q"
+        override val value = "q"
     }
 
     object pt: CSSUnitAbs {
-        override val value: String
-            get() = "pt"
+        override val value = "pt"
     }
 
     object pc: CSSUnitAbs {
-        override val value: String
-            get() = "pc"
+        override val value = "pc"
     }
 
     object px: CSSUnitAbs {
-        override val value: String
-            get() = "px"
+        override val value = "px"
     }
 
     object deg: CSSUnitAngle {
-        override val value: String
-            get() = "deg"
+        override val value = "deg"
     }
 
     object grad: CSSUnitAngle {
-        override val value: String
-            get() = "grad"
+        override val value = "grad"
     }
 
     object rad: CSSUnitAngle {
-        override val value: String
-            get() = "rad"
+        override val value = "rad"
     }
 
     object turn: CSSUnitAngle {
-        override val value: String
-            get() = "turn"
+        override val value = "turn"
     }
 
     object s: CSSUnitTime {
-        override val value: String
-            get() = "s"
+        override val value = "s"
     }
 
     object ms: CSSUnitTime {
-        override val value: String
-            get() = "ms"
+        override val value = "ms"
     }
 
     object hz: CSSUnitFrequency {
-        override val value: String
-            get() = "hz"
+        override val value = "hz"
     }
 
     object khz: CSSUnitFrequency {
-        override val value: String
-            get() = "khz"
+        override val value = "khz"
     }
 
     object dpi: CSSUnitResolution {
-        override val value: String
-            get() = "dpi"
+        override val value = "dpi"
     }
 
     object dpcm: CSSUnitResolution {
-        override val value: String
-            get() = "dpcm"
+        override val value = "dpcm"
     }
 
     object dppx: CSSUnitResolution {
-        override val value: String
-            get() = "dppx"
+        override val value = "dppx"
     }
 
     object fr: CSSUnitFlex {
-        override val value: String
-            get() = "fr"
+        override val value = "fr"
     }
 
     object number: CSSUnit {
-        override val value: String
-            get() = "number"
+        override val value = "number"
     }
 }
 
