@@ -1,12 +1,18 @@
 package org.jetbrains.compose.web.css
 
-interface CSSUnitValueTyped<T : CSSUnit> : CSSNumericValue {
+interface CSSUnitValue<out T : CSSUnit> : CSSNumericValue {
     val value: Float
     val unit: T
     fun asString(): String = "${value}${unit.value}"
 }
 
-interface CSSUnitValue : CSSUnitValueTyped<CSSUnit>
+private class CSSUnitValueTyped<out T : CSSUnit>(
+    override val value: Float,
+    override val unit: T
+) : CSSUnitValue<T>
+
+typealias CSSSizeValue = CSSUnitValue<CSSUnit>
+typealias CSSpxValue = CSSUnitValue<CSSUnit.px>
 
 interface CSSUnitRel : CSSUnit
 interface CSSUnitAbs: CSSUnit
@@ -16,14 +22,14 @@ interface CSSUnitFrequency: CSSUnit
 interface CSSUnitResolution: CSSUnit
 interface CSSUnitFlex: CSSUnit
 
-interface CSSAngleValue : CSSUnitValueTyped<CSSUnitAngle>
+typealias CSSAngleValue = CSSUnitValue<CSSUnitAngle>
 
 sealed interface CSSUnit {
     val value: String
 
     object percent: CSSUnitRel {
         override val value: String
-            get() = "percent"
+            get() = "%"
     }
 
     object em: CSSUnitRel {
@@ -187,242 +193,78 @@ sealed interface CSSUnit {
     }
 }
 
-value class CSSpercentValue(override val value: Float) : CSSUnitValue {
-    override val unit: CSSUnit
-        get() = CSSUnit.percent
-}
-
-value class CSSemValue(override val value: Float) : CSSUnitValue {
-    override val unit: CSSUnit
-        get() = CSSUnit.em
-}
-
-value class CSSexValue(override val value: Float) : CSSUnitValue {
-    override val unit: CSSUnit
-        get() = CSSUnit.ex
-}
-
-value class CSSchValue(override val value: Float) : CSSUnitValue {
-    override val unit: CSSUnit
-        get() = CSSUnit.ch
-}
-
-value class CSSicValue(override val value: Float) : CSSUnitValue {
-    override val unit: CSSUnit
-        get() = CSSUnit.ic
-}
-
-value class CSSremValue(override val value: Float) : CSSUnitValue {
-    override val unit: CSSUnit
-        get() = CSSUnit.rem
-}
-
-value class CSSlhValue(override val value: Float) : CSSUnitValue {
-    override val unit: CSSUnit
-        get() = CSSUnit.lh
-}
-
-value class CSSrlhValue(override val value: Float) : CSSUnitValue {
-    override val unit: CSSUnit
-        get() = CSSUnit.rlh
-}
-
-value class CSSvwValue(override val value: Float) : CSSUnitValue {
-    override val unit: CSSUnit
-        get() = CSSUnit.vw
-}
-
-value class CSSvhValue(override val value: Float) : CSSUnitValue {
-    override val unit: CSSUnit
-        get() = CSSUnit.vh
-}
-
-value class CSSviValue(override val value: Float) : CSSUnitValue {
-    override val unit: CSSUnit
-        get() = CSSUnit.vi
-}
-
-value class CSSvbValue(override val value: Float) : CSSUnitValue {
-    override val unit: CSSUnit
-        get() = CSSUnit.vb
-}
-
-value class CSSvminValue(override val value: Float) : CSSUnitValue {
-    override val unit: CSSUnit
-        get() = CSSUnit.vmin
-}
-
-value class CSSvmaxValue(override val value: Float) : CSSUnitValue {
-    override val unit: CSSUnit
-        get() = CSSUnit.vmax
-}
-
-value class CSScmValue(override val value: Float) : CSSUnitValue {
-    override val unit: CSSUnit
-        get() = CSSUnit.cm
-}
-
-value class CSSmmValue(override val value: Float) : CSSUnitValue {
-    override val unit: CSSUnit
-        get() = CSSUnit.mm
-}
-
-value class CSSQValue(override val value: Float) : CSSUnitValue {
-    override val unit: CSSUnit
-        get() = CSSUnit.q
-}
-
-value class CSSptValue(override val value: Float) : CSSUnitValue {
-    override val unit: CSSUnit
-        get() = CSSUnit.pt
-}
-
-value class CSSpcValue(override val value: Float) : CSSUnitValue {
-    override val unit: CSSUnit
-        get() = CSSUnit.pc
-}
-
-value class CSSpxValue(override val value: Float) : CSSUnitValue {
-    override val unit: CSSUnit
-        get() = CSSUnit.px
-}
-
-value class CSSdegValue(override val value: Float) : CSSAngleValue {
-    override val unit: CSSUnitAngle
-        get() = CSSUnit.deg
-}
-
-value class CSSgradValue(override val value: Float) : CSSAngleValue {
-    override val unit: CSSUnitAngle
-        get() = CSSUnit.grad
-}
-
-value class CSSradValue(override val value: Float) : CSSAngleValue {
-    override val unit: CSSUnitAngle
-        get() = CSSUnit.rad
-}
-
-value class CSSturnValue(override val value: Float) : CSSAngleValue {
-    override val unit: CSSUnitAngle
-        get() = CSSUnit.turn
-}
-
-value class CSSsValue(override val value: Float) : CSSUnitValue {
-    override val unit: CSSUnit
-        get() = CSSUnit.s
-}
-
-value class CSSmsValue(override val value: Float) : CSSUnitValue {
-    override val unit: CSSUnit
-        get() = CSSUnit.ms
-}
-
-value class CSSHzValue(override val value: Float) : CSSUnitValue {
-    override val unit: CSSUnit
-        get() = CSSUnit.hz
-}
-
-value class CSSkHzValue(override val value: Float) : CSSUnitValue {
-    override val unit: CSSUnit
-        get() = CSSUnit.khz
-}
-
-value class CSSdpiValue(override val value: Float) : CSSUnitValue {
-    override val unit: CSSUnit
-        get() = CSSUnit.dpi
-}
-
-value class CSSdpcmValue(override val value: Float) : CSSUnitValue {
-    override val unit: CSSUnit
-        get() = CSSUnit.dpcm
-}
-
-value class CSSdppxValue(override val value: Float) : CSSUnitValue {
-    override val unit: CSSUnit
-        get() = CSSUnit.dppx
-}
-
-value class CSSfrValue(override val value: Float) : CSSUnitValue {
-    override val unit: CSSUnit
-        get() = CSSUnit.fr
-}
-
-value class CSSnumberValue(override val value: Float) : CSSUnitValue {
-    override val unit: CSSUnit
-        get() = CSSUnit.number
-}
 
 val Number.number
-    get(): CSSnumberValue = CSSnumberValue(this.toFloat())
+    get(): CSSUnitValue<CSSUnit.number> = CSSUnitValueTyped(this.toFloat(), CSSUnit.number)
 
 val Number.percent
-    get(): CSSpercentValue = CSSpercentValue(this.toFloat())
+    get() : CSSUnitValue<CSSUnit.percent> = CSSUnitValueTyped(this.toFloat(), CSSUnit.percent)
 
 val Number.em
-    get(): CSSemValue = CSSemValue(this.toFloat())
+    get() : CSSUnitValue<CSSUnit.em> = CSSUnitValueTyped(this.toFloat(), CSSUnit.em)
 
 val Number.ex
-    get(): CSSexValue = CSSexValue(this.toFloat())
+    get(): CSSUnitValue<CSSUnit.ex> = CSSUnitValueTyped(this.toFloat(), CSSUnit.ex)
 
 val Number.ch
-    get(): CSSchValue = CSSchValue(this.toFloat())
+    get(): CSSUnitValue<CSSUnit.ch> = CSSUnitValueTyped(this.toFloat(), CSSUnit.ch)
 
 val Number.cssRem
-    get(): CSSremValue = CSSremValue(this.toFloat())
+    get(): CSSUnitValue<CSSUnit.rem> = CSSUnitValueTyped(this.toFloat(), CSSUnit.rem)
 
 val Number.vw
-    get(): CSSvwValue = CSSvwValue(this.toFloat())
+    get(): CSSUnitValue<CSSUnit.vw> = CSSUnitValueTyped(this.toFloat(), CSSUnit.vw)
 
 val Number.vh
-    get(): CSSvhValue = CSSvhValue(this.toFloat())
+    get(): CSSUnitValue<CSSUnit.vh> = CSSUnitValueTyped(this.toFloat(), CSSUnit.vh)
 
 val Number.vmin
-    get(): CSSvminValue = CSSvminValue(this.toFloat())
+    get(): CSSUnitValue<CSSUnit.vmin> = CSSUnitValueTyped(this.toFloat(), CSSUnit.vmin)
 
 val Number.vmax
-    get(): CSSvmaxValue = CSSvmaxValue(this.toFloat())
+    get(): CSSUnitValue<CSSUnit.vmax> = CSSUnitValueTyped(this.toFloat(), CSSUnit.vmax)
 
 val Number.cm
-    get(): CSScmValue = CSScmValue(this.toFloat())
+    get(): CSSUnitValue<CSSUnit.cm> = CSSUnitValueTyped(this.toFloat(), CSSUnit.cm)
 
 val Number.mm
-    get(): CSSmmValue = CSSmmValue(this.toFloat())
+    get(): CSSUnitValue<CSSUnit.mm> = CSSUnitValueTyped(this.toFloat(), CSSUnit.mm)
 
 val Number.Q
-    get(): CSSQValue = CSSQValue(this.toFloat())
+    get() : CSSUnitValue<CSSUnit.q> = CSSUnitValueTyped(this.toFloat(), CSSUnit.q)
 
 val Number.pt
-    get(): CSSptValue = CSSptValue(this.toFloat())
+    get(): CSSUnitValue<CSSUnit.pt> = CSSUnitValueTyped(this.toFloat(), CSSUnit.pt)
 val Number.pc
-    get(): CSSpcValue = CSSpcValue(this.toFloat())
+    get(): CSSUnitValue<CSSUnit.pc> = CSSUnitValueTyped(this.toFloat(), CSSUnit.pc)
 val Number.px
-    get(): CSSpxValue = CSSpxValue(this.toFloat())
+    get(): CSSUnitValue<CSSUnit.px> = CSSUnitValueTyped(this.toFloat(), CSSUnit.px)
 
 val Number.deg
-    get(): CSSdegValue = CSSdegValue(this.toFloat())
+    get(): CSSUnitValue<CSSUnit.deg> = CSSUnitValueTyped(this.toFloat(), CSSUnit.deg)
 val Number.grad
-    get(): CSSgradValue = CSSgradValue(this.toFloat())
+    get(): CSSUnitValue<CSSUnit.grad> = CSSUnitValueTyped(this.toFloat(), CSSUnit.grad)
 val Number.rad
-    get(): CSSradValue = CSSradValue(this.toFloat())
+    get(): CSSUnitValue<CSSUnit.rad> = CSSUnitValueTyped(this.toFloat(), CSSUnit.rad)
 val Number.turn
-    get(): CSSturnValue = CSSturnValue(this.toFloat())
+    get(): CSSUnitValue<CSSUnit.turn> = CSSUnitValueTyped(this.toFloat(), CSSUnit.turn)
 
 val Number.s
-    get(): CSSsValue = CSSsValue(this.toFloat())
+    get(): CSSUnitValue<CSSUnit.s> = CSSUnitValueTyped(this.toFloat(), CSSUnit.s)
 val Number.ms
-    get(): CSSmsValue = CSSmsValue(this.toFloat())
+    get(): CSSUnitValue<CSSUnit.ms> = CSSUnitValueTyped(this.toFloat(), CSSUnit.ms)
 
 val Number.Hz
-    get(): CSSHzValue = CSSHzValue(this.toFloat())
+    get(): CSSUnitValue<CSSUnit.hz> = CSSUnitValueTyped(this.toFloat(), CSSUnit.hz)
 val Number.kHz
-    get(): CSSkHzValue = CSSkHzValue(this.toFloat())
+    get(): CSSUnitValue<CSSUnit.khz> = CSSUnitValueTyped(this.toFloat(), CSSUnit.khz)
 
 val Number.dpi
-    get(): CSSdpiValue = CSSdpiValue(this.toFloat())
+    get(): CSSUnitValue<CSSUnit.dpi> = CSSUnitValueTyped(this.toFloat(), CSSUnit.dpi)
 val Number.dpcm
-    get(): CSSdpcmValue = CSSdpcmValue(this.toFloat())
+    get(): CSSUnitValue<CSSUnit.dpcm> = CSSUnitValueTyped(this.toFloat(), CSSUnit.dpcm)
 val Number.dppx
-    get(): CSSdppxValue = CSSdppxValue(this.toFloat())
+    get(): CSSUnitValue<CSSUnit.dppx> = CSSUnitValueTyped(this.toFloat(), CSSUnit.dppx)
 
 val Number.fr
-    get(): CSSfrValue = CSSfrValue(this.toFloat())
+    get(): CSSUnitValue<CSSUnit.fr> = CSSUnitValueTyped(this.toFloat(), CSSUnit.fr)

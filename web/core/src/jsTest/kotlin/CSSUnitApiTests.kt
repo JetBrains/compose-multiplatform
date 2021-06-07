@@ -6,31 +6,6 @@
 package org.jetbrains.compose.web.core.tests
 
 import org.jetbrains.compose.web.css.CSSUnitValue
-import org.jetbrains.compose.web.css.CSSUnitValueTyped
-import org.jetbrains.compose.web.css.CSSchValue
-import org.jetbrains.compose.web.css.CSScmValue
-import org.jetbrains.compose.web.css.CSSdegValue
-import org.jetbrains.compose.web.css.CSSdpcmValue
-import org.jetbrains.compose.web.css.CSSdpiValue
-import org.jetbrains.compose.web.css.CSSdppxValue
-import org.jetbrains.compose.web.css.CSSemValue
-import org.jetbrains.compose.web.css.CSSfrValue
-import org.jetbrains.compose.web.css.CSSgradValue
-import org.jetbrains.compose.web.css.CSSmmValue
-import org.jetbrains.compose.web.css.CSSmsValue
-import org.jetbrains.compose.web.css.CSSnumberValue
-import org.jetbrains.compose.web.css.CSSpcValue
-import org.jetbrains.compose.web.css.CSSpercentValue
-import org.jetbrains.compose.web.css.CSSptValue
-import org.jetbrains.compose.web.css.CSSpxValue
-import org.jetbrains.compose.web.css.CSSradValue
-import org.jetbrains.compose.web.css.CSSremValue
-import org.jetbrains.compose.web.css.CSSsValue
-import org.jetbrains.compose.web.css.CSSturnValue
-import org.jetbrains.compose.web.css.CSSvhValue
-import org.jetbrains.compose.web.css.CSSvmaxValue
-import org.jetbrains.compose.web.css.CSSvminValue
-import org.jetbrains.compose.web.css.CSSvwValue
 import org.jetbrains.compose.web.css.ch
 import org.jetbrains.compose.web.css.cm
 import org.jetbrains.compose.web.css.cssRem
@@ -61,51 +36,43 @@ import kotlin.test.assertEquals
 class CSSUnitApiTests {
     // TODO: Cover CSS.Q, CSS.khz and CSS.hz after we'll get rid from polyfill
 
-    private fun CSSUnitValueTyped<*>.assertStructure(value: Number, unit: String, description: String? = null)  {
-        assertEquals(this.value, value, description)
-        assertEquals(this.unit.value, unit, description)
-    }
-
-    // TODO: use regular assertEqual after we'll get rid from polyfill
-    private fun CSSUnitValueTyped<*>.assertStructure(otherUnit: CSSUnitValueTyped<*>, description: String? = null) {
-        return assertStructure(otherUnit.value, otherUnit.unit.value, description)
-    }
-
     @Test
     fun postfixInvocation() {
-        4.number.assertStructure(CSSnumberValue(4.toFloat()), "number postfix")
-        4.percent.assertStructure(CSSpercentValue(4.toFloat()), "percent posfix")
+        // TODO: review what exactly number does - most likely we don't need it in our ecosystem
+        assertEquals("4number", 4.number.asString())
 
-        4.em.assertStructure(CSSemValue(4.toFloat()), "em postfix")
-        4.ch.assertStructure(CSSchValue(4.toFloat()), "ch postfix")
+        assertEquals("4%", 4.percent.asString())
 
-        4.cssRem.assertStructure(CSSremValue(4.toFloat()))
+        assertEquals("4em", 4.em.asString())
+        assertEquals("4ch", 4.ch.asString())
 
-        4.vw.assertStructure(CSSvwValue(4.toFloat()),"vw postfix")
-        4.vh.assertStructure(CSSvhValue(4.toFloat()), "vh postfix")
+        assertEquals("4rem", 4.cssRem.asString())
 
-        4.vmin.assertStructure(CSSvminValue(4.toFloat()), "vmin postfix")
-        4.vmax.assertStructure(CSSvmaxValue(4.toFloat()), "vmax postfix")
-        4.cm.assertStructure(CSScmValue(4.toFloat()), "cm postfix")
-        4.mm.assertStructure(CSSmmValue(4.toFloat()), "mm postfix")
+        assertEquals("4vw", 4.vw.asString())
+        assertEquals("4vh", 4.vh.asString())
 
-        4.pt.assertStructure(CSSptValue(4.toFloat()), "pt postfix")
-        4.pc.assertStructure(CSSpcValue(4.toFloat()), "pc postfix")
-        4.px.assertStructure(CSSpxValue(4.toFloat()), "px postfix")
+        assertEquals("4vmin", 4.vmin.asString())
+        assertEquals("4vmax", 4.vmax.asString())
+        assertEquals("4cm", 4.cm.asString())
+        assertEquals("4mm", 4.mm.asString())
 
-        4.deg.assertStructure(CSSdegValue(4.toFloat()), "deg postfix")
-        4.grad.assertStructure(CSSgradValue(4.toFloat()), "grad postfix")
-        4.rad.assertStructure(CSSradValue(4.toFloat()), "rad postfix")
-        4.turn.assertStructure(CSSturnValue(4.toFloat()), "turn postfix")
+        assertEquals("4pt", 4.pt.asString())
+        assertEquals("4pc", 4.pc.asString())
+        assertEquals("4px", 4.px.asString())
 
-        4.s.assertStructure(CSSsValue(4.toFloat()), "s postfix")
-        4.ms.assertStructure(CSSmsValue(4.toFloat()), "ms postfix")
+        assertEquals("4deg", 4.deg.asString())
+        assertEquals("4grad", 4.grad.asString())
+        assertEquals("4rad", 4.rad.asString())
+        assertEquals("4turn", 4.turn.asString())
 
-        4.dpi.assertStructure(CSSdpiValue(4.toFloat()), "dpi postfix")
-        4.dpcm.assertStructure(CSSdpcmValue(4.toFloat()), "dpcm postfix")
-        4.dppx.assertStructure(CSSdppxValue(4.toFloat()), "dppx postfix")
+        assertEquals("4s", 4.s.asString())
+        assertEquals("4ms", 4.ms.asString())
 
-        4.fr.assertStructure(CSSfrValue(4.toFloat()), "fr postfix")
+        assertEquals("4dpi", 4.dpi.asString())
+        assertEquals("4dpcm", 4.dpcm.asString())
+        assertEquals("4dppx", 4.dppx.asString())
+
+        assertEquals("4fr", 4.fr.asString())
     }
 
 }

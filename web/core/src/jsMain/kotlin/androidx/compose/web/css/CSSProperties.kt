@@ -16,7 +16,7 @@ fun StyleBuilder.flexShrink(value: Number) {
     property("flex-shrink", value.asStylePropertyValue())
 }
 
-fun StyleBuilder.opacity(value: CSSpercentValue) {
+fun StyleBuilder.opacity(value: CSSUnitValue<CSSUnit.percent>) {
     property("opacity", value(value.value as Double / 100))
 }
 
@@ -193,7 +193,7 @@ class CSSBorder : CustomStyleValue {
     var style: StylePropertyValue? = null
     var color: StylePropertyValue? = null
 
-    fun width(size: CSSUnitValue) {
+    fun width(size: CSSSizeValue) {
         width = size.asStylePropertyValue()
     }
 
@@ -227,7 +227,7 @@ inline fun StyleBuilder.border(crossinline borderBuild: CSSBorder.() -> Unit) {
 }
 
 fun StyleBuilder.border(
-    width: CSSUnitValue? = null,
+    width: CSSSizeValue? = null,
     style: LineStyle? = null,
     color: Color? = null
 ) {
@@ -291,27 +291,27 @@ fun StyleBuilder.position(position: Position) {
     )
 }
 
-fun StyleBuilder.borderRadius(r: CSSUnitValue) {
+fun StyleBuilder.borderRadius(r: CSSSizeValue) {
     property("border-radius", r.asStylePropertyValue())
 }
 
-fun StyleBuilder.borderRadius(topLeft: CSSUnitValue, bottomRight: CSSUnitValue) {
+fun StyleBuilder.borderRadius(topLeft: CSSSizeValue, bottomRight: CSSSizeValue) {
     property("border-radius", "${topLeft.asString()} ${bottomRight.asString()}".asStylePropertyValue())
 }
 
 fun StyleBuilder.borderRadius(
-    topLeft: CSSUnitValue,
-    topRightAndBottomLeft: CSSUnitValue,
-    bottomRight: CSSUnitValue
+    topLeft: CSSSizeValue,
+    topRightAndBottomLeft: CSSSizeValue,
+    bottomRight: CSSSizeValue
 ) {
     property("border-radius", "${topLeft.asString()} ${topRightAndBottomLeft.asString()} ${bottomRight.asString()}".asStylePropertyValue())
 }
 
 fun StyleBuilder.borderRadius(
-    topLeft: CSSUnitValue,
-    topRight: CSSUnitValue,
-    bottomRight: CSSUnitValue,
-    bottomLeft: CSSUnitValue
+    topLeft: CSSSizeValue,
+    topRight: CSSSizeValue,
+    bottomRight: CSSSizeValue,
+    bottomLeft: CSSSizeValue
 ) {
     property(
         "border-radius",
@@ -319,7 +319,7 @@ fun StyleBuilder.borderRadius(
     )
 }
 
-fun StyleBuilder.width(value: CSSUnitValue) {
+fun StyleBuilder.width(value: CSSSizeValue) {
     property("width", value.asStylePropertyValue())
 }
 
@@ -327,7 +327,7 @@ fun StyleBuilder.width(value: CSSAutoValue) {
     property("width", value)
 }
 
-fun StyleBuilder.height(value: CSSUnitValue) {
+fun StyleBuilder.height(value: CSSSizeValue) {
     property("height", value.asStylePropertyValue())
 }
 
@@ -335,7 +335,7 @@ fun StyleBuilder.height(value: CSSAutoValue) {
     property("height", value)
 }
 
-fun StyleBuilder.top(value: CSSUnitValue) {
+fun StyleBuilder.top(value: CSSSizeValue) {
     property("top", value.asStylePropertyValue())
 }
 
@@ -343,7 +343,7 @@ fun StyleBuilder.top(value: CSSAutoValue) {
     property("top", value)
 }
 
-fun StyleBuilder.bottom(value: CSSUnitValue) {
+fun StyleBuilder.bottom(value: CSSSizeValue) {
     property("bottom", value.asStylePropertyValue())
 }
 
@@ -351,7 +351,7 @@ fun StyleBuilder.bottom(value: CSSAutoValue) {
     property("bottom", value)
 }
 
-fun StyleBuilder.left(value: CSSUnitValue) {
+fun StyleBuilder.left(value: CSSSizeValue) {
     property("left", value.asStylePropertyValue())
 }
 
@@ -359,7 +359,7 @@ fun StyleBuilder.left(value: CSSAutoValue) {
     property("left", value)
 }
 
-fun StyleBuilder.right(value: CSSUnitValue) {
+fun StyleBuilder.right(value: CSSSizeValue) {
     property("right", value.asStylePropertyValue())
 }
 
@@ -367,24 +367,24 @@ fun StyleBuilder.right(value: CSSAutoValue) {
     property("right", value)
 }
 
-fun StyleBuilder.fontSize(value: CSSUnitValue) {
+fun StyleBuilder.fontSize(value: CSSSizeValue) {
     property("font-size", value(value))
 }
 
-fun StyleBuilder.margin(value: CSSUnitValue) {
+fun StyleBuilder.margin(value: CSSSizeValue) {
     // marign hasn't Typed OM yet
     property("margin", value(value.asString()))
 }
 
-fun StyleBuilder.marginLeft(value: CSSUnitValue) {
+fun StyleBuilder.marginLeft(value: CSSSizeValue) {
     property("margin-left", value(value.asString()))
 }
 
-fun StyleBuilder.marginTop(value: CSSUnitValue) {
+fun StyleBuilder.marginTop(value: CSSSizeValue) {
     property("margin-top", value(value.asString()))
 }
 
-fun StyleBuilder.padding(value: CSSUnitValue) {
+fun StyleBuilder.padding(value: CSSSizeValue) {
     // padding hasn't Typed OM yet
     property("padding", value(value.asString()))
 }
