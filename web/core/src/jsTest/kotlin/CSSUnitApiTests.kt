@@ -5,27 +5,29 @@
 
 package org.jetbrains.compose.web.core.tests
 
-import org.jetbrains.compose.web.css.CSS
-import org.jetbrains.compose.web.css.CSSUnitValue
 import org.jetbrains.compose.web.css.ch
 import org.jetbrains.compose.web.css.cm
 import org.jetbrains.compose.web.css.cssRem
 import org.jetbrains.compose.web.css.deg
+import org.jetbrains.compose.web.css.div
 import org.jetbrains.compose.web.css.dpcm
 import org.jetbrains.compose.web.css.dpi
 import org.jetbrains.compose.web.css.dppx
 import org.jetbrains.compose.web.css.em
 import org.jetbrains.compose.web.css.fr
 import org.jetbrains.compose.web.css.grad
+import org.jetbrains.compose.web.css.minus
 import org.jetbrains.compose.web.css.mm
 import org.jetbrains.compose.web.css.ms
 import org.jetbrains.compose.web.css.number
 import org.jetbrains.compose.web.css.pc
 import org.jetbrains.compose.web.css.percent
+import org.jetbrains.compose.web.css.plus
 import org.jetbrains.compose.web.css.pt
 import org.jetbrains.compose.web.css.px
 import org.jetbrains.compose.web.css.rad
 import org.jetbrains.compose.web.css.s
+import org.jetbrains.compose.web.css.times
 import org.jetbrains.compose.web.css.turn
 import org.jetbrains.compose.web.css.vh
 import org.jetbrains.compose.web.css.vmax
@@ -37,88 +39,261 @@ import kotlin.test.assertEquals
 class CSSUnitApiTests {
     // TODO: Cover CSS.Q, CSS.khz and CSS.hz after we'll get rid from polyfill
 
-    private fun CSSUnitValue.assertStructure(value: Number, unit: String, description: String? = null)  {
-        assertEquals(this.value, value, description)
-        assertEquals(this.unit, unit, description)
-    }
-
-    // TODO: use regular assertEqual after we'll get rid from polyfill
-    private fun CSSUnitValue.assertStructure(otherUnit: CSSUnitValue, description: String? = null) {
-        return assertStructure(otherUnit.value, otherUnit.unit, description)
-    }
-
-    @Test
-    fun builderInvocation() {
-        CSS.number(4).assertStructure(4, "number")
-        CSS.percent(4).assertStructure(4, "percent")
-
-        CSS.em(4).assertStructure(4, "em")
-        CSS.ch(4).assertStructure(4, "ch")
-
-        CSS.rem(4).assertStructure(4, "rem")
-
-        CSS.vw(4).assertStructure(4, "vw")
-        CSS.vh(4).assertStructure(4, "vh")
-
-        CSS.vmin(4).assertStructure(4, "vmin")
-        CSS.vmax(4).assertStructure(4, "vmax")
-        CSS.cm(4).assertStructure(4, "cm")
-        CSS.mm(4).assertStructure(4, "mm")
-
-        CSS.pt(4).assertStructure(4, "pt")
-        CSS.pc(4).assertStructure(4, "pc")
-        CSS.px(4).assertStructure(4, "px")
-
-        CSS.deg(4).assertStructure(4, "deg")
-        CSS.grad(4).assertStructure(4, "grad")
-        CSS.rad(4).assertStructure(4, "rad")
-        CSS.turn(4).assertStructure(4, "turn")
-
-        CSS.s(4).assertStructure(4, "s")
-        CSS.ms(4).assertStructure(4, "ms")
-
-        CSS.dpi(4).assertStructure(4, "dpi")
-        CSS.dpcm(4).assertStructure(4, "dpcm")
-        CSS.dppx(4).assertStructure(4, "dppx")
-
-        CSS.fr(4).assertStructure(4, "fr")
-    }
-
     @Test
     fun postfixInvocation() {
-        4.number.assertStructure(CSS.number(4), "number postfix")
-        4.percent.assertStructure(CSS.percent(4), "percent posfix")
+        // TODO: review what exactly number does - most likely we don't need it in our ecosystem
+        assertEquals("4number", 4.number.asString())
 
-        4.em.assertStructure(CSS.em(4), "em postfix")
-        4.ch.assertStructure(CSS.ch(4), "ch postfix")
+        assertEquals("4%", 4.percent.asString())
 
-        4.cssRem.assertStructure(CSS.rem(4))
+        assertEquals("4em", 4.em.asString())
+        assertEquals("4ch", 4.ch.asString())
 
-        4.vw.assertStructure(CSS.vw(4),"vw postfix")
-        4.vh.assertStructure(CSS.vh(4), "vh postfix")
+        assertEquals("4rem", 4.cssRem.asString())
 
-        4.vmin.assertStructure(CSS.vmin(4), "vmin postfix")
-        4.vmax.assertStructure(CSS.vmax(4), "vmax postfix")
-        4.cm.assertStructure(CSS.cm(4), "cm postfix")
-        4.mm.assertStructure(CSS.mm(4), "mm postfix")
+        assertEquals("4vw", 4.vw.asString())
+        assertEquals("4vh", 4.vh.asString())
 
-        4.pt.assertStructure(CSS.pt(4), "pt postfix")
-        4.pc.assertStructure(CSS.pc(4), "pc postfix")
-        4.px.assertStructure(CSS.px(4), "px postfix")
+        assertEquals("4vmin", 4.vmin.asString())
+        assertEquals("4vmax", 4.vmax.asString())
+        assertEquals("4cm", 4.cm.asString())
+        assertEquals("4mm", 4.mm.asString())
 
-        4.deg.assertStructure(CSS.deg(4), "deg postfix")
-        4.grad.assertStructure(CSS.grad(4), "grad postfix")
-        4.rad.assertStructure(CSS.rad(4), "rad postfix")
-        4.turn.assertStructure(CSS.turn(4), "turn postfix")
+        assertEquals("4pt", 4.pt.asString())
+        assertEquals("4pc", 4.pc.asString())
+        assertEquals("4px", 4.px.asString())
 
-        4.s.assertStructure(CSS.s(4), "s postfix")
-        4.ms.assertStructure(CSS.ms(4), "ms postfix")
+        assertEquals("4deg", 4.deg.asString())
+        assertEquals("4grad", 4.grad.asString())
+        assertEquals("4rad", 4.rad.asString())
+        assertEquals("4turn", 4.turn.asString())
 
-        4.dpi.assertStructure(CSS.dpi(4), "dpi postfix")
-        4.dpcm.assertStructure(CSS.dpcm(4), "dpcm postfix")
-        4.dppx.assertStructure(CSS.dppx(4), "dppx postfix")
+        assertEquals("4s", 4.s.asString())
+        assertEquals("4ms", 4.ms.asString())
 
-        4.fr.assertStructure(CSS.fr(4), "fr postfix")
+        assertEquals("4dpi", 4.dpi.asString())
+        assertEquals("4dpcm", 4.dpcm.asString())
+        assertEquals("4dppx", 4.dppx.asString())
+
+        assertEquals("4fr", 4.fr.asString())
     }
 
+    @Test
+    fun id() {
+        // TODO: review what exactly number does - most likely we don't need it in our ecosystem
+        assertEquals(4.number, 4.number)
+
+        assertEquals(4.percent, 4.percent)
+
+        assertEquals(4.em, 4.em)
+        assertEquals(4.ch, 4.ch)
+
+        assertEquals(4.cssRem, 4.cssRem)
+
+        assertEquals(4.vw, 4.vw)
+        assertEquals(4.vh, 4.vh)
+
+        assertEquals(4.vmin, 4.vmin)
+        assertEquals(4.vmax, 4.vmax)
+        assertEquals(4.cm, 4.cm)
+        assertEquals(4.mm, 4.mm)
+
+        assertEquals(4.pt, 4.pt)
+        assertEquals(4.pc, 4.pc)
+        assertEquals(4.px, 4.px)
+
+        assertEquals(4.deg, 4.deg)
+        assertEquals(4.grad, 4.grad)
+        assertEquals(4.rad, 4.rad)
+        assertEquals(4.turn, 4.turn)
+
+        assertEquals(4.s, 4.s)
+        assertEquals(4.ms, 4.ms)
+
+        assertEquals(4.dpi, 4.dpi)
+        assertEquals(4.dpcm, 4.dpcm)
+        assertEquals(4.dppx, 4.dppx)
+
+        assertEquals(4.fr, 4.fr)
+    }
+
+    @Test
+    fun arithmeticMultiplicationLeft() {
+        assertEquals(16.percent, 4.percent * 4)
+
+        assertEquals(16.em, 4.em * 4)
+        assertEquals(16.ch, 4.ch * 4)
+
+        assertEquals(16.cssRem, 4.cssRem * 4)
+
+        assertEquals(16.vw, 4.vw * 4)
+        assertEquals(16.vh, 4.vh * 4)
+
+        assertEquals(16.vmin, 4.vmin * 4)
+        assertEquals(16.vmax, 4.vmax * 4)
+        assertEquals(16.cm, 4.cm * 4)
+        assertEquals(16.mm, 4.mm * 4)
+
+        assertEquals(16.pt, 4.pt * 4)
+        assertEquals(16.pc, 4.pc * 4)
+        assertEquals(16.px, 4.px * 4)
+
+        assertEquals(16.deg, 4.deg * 4)
+        assertEquals(16.grad, 4.grad * 4)
+        assertEquals(16.rad, 4.rad * 4)
+        assertEquals(16.turn, 4.turn * 4)
+
+        assertEquals(16.s, 4.s * 4)
+        assertEquals(16.ms, 4.ms * 4)
+
+        assertEquals(16.dpi, 4.dpi * 4)
+        assertEquals(16.dpcm, 4.dpcm * 4)
+        assertEquals(16.dppx, 4.dppx * 4)
+
+        assertEquals(16.fr, 4.fr * 4)
+    }
+
+    @Test
+    fun arithmeticDivisionLeft() {
+        assertEquals(1.percent, 4.percent / 4)
+
+        assertEquals(1.em, 4.em / 4)
+        assertEquals(1.ch, 4.ch / 4)
+
+        assertEquals(1.cssRem, 4.cssRem / 4)
+
+        assertEquals(1.vw, 4.vw / 4)
+        assertEquals(1.vh, 4.vh / 4)
+
+        assertEquals(1.vmin, 4.vmin / 4)
+        assertEquals(1.vmax, 4.vmax / 4)
+        assertEquals(1.cm, 4.cm / 4)
+        assertEquals(1.mm, 4.mm / 4)
+
+        assertEquals(1.pt, 4.pt / 4)
+        assertEquals(1.pc, 4.pc / 4)
+        assertEquals(1.px, 4.px / 4)
+
+        assertEquals(1.deg, 4.deg / 4)
+        assertEquals(1.grad, 4.grad / 4)
+        assertEquals(1.rad, 4.rad / 4)
+        assertEquals(1.turn, 4.turn / 4)
+
+        assertEquals(1.s, 4.s / 4)
+        assertEquals(1.ms, 4.ms / 4)
+
+        assertEquals(1.dpi, 4.dpi / 4)
+        assertEquals(1.dpcm, 4.dpcm / 4)
+        assertEquals(1.dppx, 4.dppx / 4)
+
+        assertEquals(1.fr, 4.fr / 4)
+    }
+
+    @Test
+    fun arithmeticMultiplicationRight() {
+        assertEquals(12.percent, 3 * 4.percent)
+
+        assertEquals(12.em, 3 * 4.em)
+        assertEquals(12.ch, 3 * 4.ch)
+
+        assertEquals(12.cssRem, 3 * 4.cssRem)
+
+        assertEquals(12.vw, 3 * 4.vw)
+        assertEquals(12.vh, 3 * 4.vh)
+
+        assertEquals(12.vmin, 3 * 4.vmin)
+        assertEquals(12.vmax, 3 * 4.vmax)
+        assertEquals(12.cm, 3 * 4.cm)
+        assertEquals(12.mm, 3 * 4.mm)
+
+        assertEquals(12.pt, 3 * 4.pt)
+        assertEquals(12.pc, 3 * 4.pc)
+        assertEquals(12.px, 3 * 4.px)
+
+        assertEquals(12.deg, 3 * 4.deg)
+        assertEquals(12.grad, 3 * 4.grad)
+        assertEquals(12.rad, 3 * 4.rad)
+        assertEquals(12.turn, 3 * 4.turn)
+
+        assertEquals(12.s, 3 * 4.s)
+        assertEquals(12.ms, 3 * 4.ms)
+
+        assertEquals(12.dpi, 3 * 4.dpi)
+        assertEquals(12.dpcm, 3 * 4.dpcm)
+        assertEquals(12.dppx, 3 * 4.dppx)
+
+        assertEquals(12.fr, 3 * 4.fr)
+    }
+
+    @Test
+    fun addHomogenous() {
+        assertEquals(13.percent, 7.percent + 4.percent + 2.percent)
+
+        assertEquals(13.em, 7.em + 4.em + 2.em)
+        assertEquals(13.ch, 7.ch + 4.ch + 2.ch)
+
+        assertEquals(13.cssRem, 7.cssRem + 4.cssRem + 2.cssRem)
+
+        assertEquals(13.vw, 7.vw + 4.vw + 2.vw)
+        assertEquals(13.vh, 7.vh + 4.vh + 2.vh)
+
+        assertEquals(13.vmin, 7.vmin + 4.vmin + 2.vmin)
+        assertEquals(13.vmax, 7.vmax + 4.vmax + 2.vmax)
+        assertEquals(13.cm, 7.cm + 4.cm + 2.cm)
+        assertEquals(13.mm, 7.mm + 4.mm + 2.mm)
+
+        assertEquals(13.pt, 7.pt + 4.pt + 2.pt)
+        assertEquals(13.pc, 7.pc + 4.pc + 2.pc)
+        assertEquals(13.px, 7.px + 4.px + 2.px)
+
+        assertEquals(13.deg, 7.deg + 4.deg + 2.deg)
+        assertEquals(13.grad, 7.grad + 4.grad + 2.grad)
+        assertEquals(13.rad, 7.rad + 4.rad + 2.rad)
+        assertEquals(13.turn, 7.turn + 4.turn + 2.turn)
+
+        assertEquals(13.s, 7.s + 4.s + 2.s)
+        assertEquals(13.ms, 7.ms + 4.ms + 2.ms)
+
+        assertEquals(13.dpi, 7.dpi + 4.dpi + 2.dpi)
+        assertEquals(13.dpcm, 7.dpcm + 4.dpcm + 2.dpcm)
+        assertEquals(13.dppx, 7.dppx + 4.dppx + 2.dppx)
+
+        assertEquals(13.fr, 7.fr + 4.fr + 2.fr)
+    }
+
+    @Test
+    fun substractHomogenous() {
+        assertEquals(1.percent, 7.percent - 4.percent - 2.percent)
+
+        assertEquals(1.em, 7.em - 4.em - 2.em)
+        assertEquals(1.ch, 7.ch - 4.ch - 2.ch)
+
+        assertEquals(1.cssRem, 7.cssRem - 4.cssRem - 2.cssRem)
+
+        assertEquals(1.vw, 7.vw - 4.vw - 2.vw)
+        assertEquals(1.vh, 7.vh - 4.vh - 2.vh)
+
+        assertEquals(1.vmin, 7.vmin - 4.vmin - 2.vmin)
+        assertEquals(1.vmax, 7.vmax - 4.vmax - 2.vmax)
+        assertEquals(1.cm, 7.cm - 4.cm - 2.cm)
+        assertEquals(1.mm, 7.mm - 4.mm - 2.mm)
+
+        assertEquals(1.pt, 7.pt - 4.pt - 2.pt)
+        assertEquals(1.pc, 7.pc - 4.pc - 2.pc)
+        assertEquals(1.px, 7.px - 4.px - 2.px)
+
+        assertEquals(1.deg, 7.deg - 4.deg - 2.deg)
+        assertEquals(1.grad, 7.grad - 4.grad - 2.grad)
+        assertEquals(1.rad, 7.rad - 4.rad - 2.rad)
+        assertEquals(1.turn, 7.turn - 4.turn - 2.turn)
+
+        assertEquals(1.s, 7.s - 4.s - 2.s)
+        assertEquals(1.ms, 7.ms - 4.ms - 2.ms)
+
+        assertEquals(1.dpi, 7.dpi - 4.dpi - 2.dpi)
+        assertEquals(1.dpcm, 7.dpcm - 4.dpcm - 2.dpcm)
+        assertEquals(1.dppx, 7.dppx - 4.dppx - 2.dppx)
+
+        assertEquals(1.fr, 7.fr - 4.fr - 2.fr)
+    }
 }

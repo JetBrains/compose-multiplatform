@@ -16,7 +16,7 @@ fun StyleBuilder.flexShrink(value: Number) {
     property("flex-shrink", value.asStylePropertyValue())
 }
 
-fun StyleBuilder.opacity(value: CSSpercentValue) {
+fun StyleBuilder.opacity(value: CSSSizeValue<CSSUnit.percent>) {
     property("opacity", value(value.value as Double / 100))
 }
 
@@ -193,7 +193,7 @@ class CSSBorder : CustomStyleValue {
     var style: StylePropertyValue? = null
     var color: StylePropertyValue? = null
 
-    fun width(size: CSSSizeValue) {
+    fun width(size: CSSUnitValue) {
         width = size.asStylePropertyValue()
     }
 
@@ -227,7 +227,7 @@ inline fun StyleBuilder.border(crossinline borderBuild: CSSBorder.() -> Unit) {
 }
 
 fun StyleBuilder.border(
-    width: CSSSizeValue? = null,
+    width: CSSUnitValue? = null,
     style: LineStyle? = null,
     color: Color? = null
 ) {
@@ -291,97 +291,100 @@ fun StyleBuilder.position(position: Position) {
     )
 }
 
-fun StyleBuilder.borderRadius(r: CSSSizeValue) {
-    property("border-radius", r.toString().asStylePropertyValue())
+fun StyleBuilder.borderRadius(r: CSSUnitValue) {
+    property("border-radius", r.asStylePropertyValue())
 }
 
-fun StyleBuilder.borderRadius(topLeft: CSSSizeValue, bottomRight: CSSSizeValue) {
-    property("border-radius", "$topLeft $bottomRight".asStylePropertyValue())
-}
-
-fun StyleBuilder.borderRadius(
-    topLeft: CSSSizeValue,
-    topRightAndBottomLeft: CSSSizeValue,
-    bottomRight: CSSSizeValue
-) {
-    property("border-radius", "$topLeft $topRightAndBottomLeft $bottomRight".asStylePropertyValue())
+fun StyleBuilder.borderRadius(topLeft: CSSUnitValue, bottomRight: CSSUnitValue) {
+    property("border-radius", "${topLeft.asString()} ${bottomRight.asString()}".asStylePropertyValue())
 }
 
 fun StyleBuilder.borderRadius(
-    topLeft: CSSSizeValue,
-    topRight: CSSSizeValue,
-    bottomRight: CSSSizeValue,
-    bottomLeft: CSSSizeValue
+    topLeft: CSSUnitValue,
+    topRightAndBottomLeft: CSSUnitValue,
+    bottomRight: CSSUnitValue
 ) {
-    property("border-radius", "$topLeft $topRight $bottomRight $bottomLeft".asStylePropertyValue())
+    property("border-radius", "${topLeft.asString()} ${topRightAndBottomLeft.asString()} ${bottomRight.asString()}".asStylePropertyValue())
 }
 
-fun StyleBuilder.width(value: CSSSizeValue) {
-    property("width", value)
+fun StyleBuilder.borderRadius(
+    topLeft: CSSUnitValue,
+    topRight: CSSUnitValue,
+    bottomRight: CSSUnitValue,
+    bottomLeft: CSSUnitValue
+) {
+    property(
+        "border-radius",
+        "${topLeft.asString()} ${topRight.asString()} ${bottomRight.asString()} ${bottomLeft.asString()}".asStylePropertyValue()
+    )
+}
+
+fun StyleBuilder.width(value: CSSUnitValue) {
+    property("width", value.asStylePropertyValue())
 }
 
 fun StyleBuilder.width(value: CSSAutoValue) {
     property("width", value)
 }
 
-fun StyleBuilder.height(value: CSSSizeValue) {
-    property("height", value)
+fun StyleBuilder.height(value: CSSUnitValue) {
+    property("height", value.asStylePropertyValue())
 }
 
 fun StyleBuilder.height(value: CSSAutoValue) {
     property("height", value)
 }
 
-fun StyleBuilder.top(value: CSSSizeValue) {
-    property("top", value)
+fun StyleBuilder.top(value: CSSUnitValue) {
+    property("top", value.asStylePropertyValue())
 }
 
 fun StyleBuilder.top(value: CSSAutoValue) {
     property("top", value)
 }
 
-fun StyleBuilder.bottom(value: CSSSizeValue) {
-    property("bottom", value)
+fun StyleBuilder.bottom(value: CSSUnitValue) {
+    property("bottom", value.asStylePropertyValue())
 }
 
 fun StyleBuilder.bottom(value: CSSAutoValue) {
     property("bottom", value)
 }
 
-fun StyleBuilder.left(value: CSSSizeValue) {
-    property("left", value)
+fun StyleBuilder.left(value: CSSUnitValue) {
+    property("left", value.asStylePropertyValue())
 }
 
 fun StyleBuilder.left(value: CSSAutoValue) {
     property("left", value)
 }
 
-fun StyleBuilder.right(value: CSSSizeValue) {
-    property("right", value)
+fun StyleBuilder.right(value: CSSUnitValue) {
+    property("right", value.asStylePropertyValue())
 }
 
 fun StyleBuilder.right(value: CSSAutoValue) {
     property("right", value)
 }
 
-fun StyleBuilder.fontSize(value: CSSSizeValue) {
+fun StyleBuilder.fontSize(value: CSSUnitValue) {
     property("font-size", value(value))
 }
 
-fun StyleBuilder.margin(value: CSSSizeValue) {
+fun StyleBuilder.margin(value: CSSUnitValue) {
     // marign hasn't Typed OM yet
-    property("margin", value(value.toString()))
+    property("margin", value(value.asString()))
 }
 
-fun StyleBuilder.marginLeft(value: CSSSizeValue) {
-    property("margin-left", value(value.toString()))
+fun StyleBuilder.marginLeft(value: CSSUnitValue) {
+    property("margin-left", value(value.asString()))
 }
 
-fun StyleBuilder.marginTop(value: CSSSizeValue) {
-    property("margin-top", value(value.toString()))
+fun StyleBuilder.marginTop(value: CSSUnitValue) {
+    property("margin-top", value(value.asString()))
 }
 
-fun StyleBuilder.padding(value: CSSSizeValue) {
+fun StyleBuilder.padding(value: CSSUnitValue) {
     // padding hasn't Typed OM yet
-    property("padding", value(value.toString()))
+    property("padding", value(value.asString()))
 }

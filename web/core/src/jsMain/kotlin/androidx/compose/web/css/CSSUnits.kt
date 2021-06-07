@@ -1,114 +1,249 @@
 package org.jetbrains.compose.web.css
 
-interface CSSSizeValue : CSSUnitValue, StylePropertyValue
+interface CSSSizeValue<out T : CSSUnit> : CSSNumericValue {
+    val value: Float
+    val unit: T
+    fun asString(): String = "${value}${unit.value}"
+    fun newUnit(value: Float): CSSSizeValue<T>
+}
 
-interface CSSRelValue : CSSSizeValue
-interface CSSpercentValue : CSSRelValue
-interface CSSemValue : CSSRelValue
-interface CSSexValue : CSSRelValue
-interface CSSchValue : CSSRelValue
-interface CSSicValue : CSSRelValue
-interface CSSremValue : CSSRelValue
-interface CSSlhValue : CSSRelValue
-interface CSSrlhValue : CSSRelValue
-interface CSSvwValue : CSSRelValue
-interface CSSvhValue : CSSRelValue
-interface CSSviValue : CSSRelValue
-interface CSSvbValue : CSSRelValue
-interface CSSvminValue : CSSRelValue
-interface CSSvmaxValue : CSSRelValue
-interface CSScmValue : CSSRelValue
-interface CSSmmValue : CSSRelValue
-interface CSSQValue : CSSRelValue
+private data class CSSUnitValueTyped<out T : CSSUnit>(
+    override val value: Float,
+    override val unit: T
+) : CSSSizeValue<T> {
+    override fun newUnit(value: Float): CSSSizeValue<T> = copy(value = value)
+}
 
-interface CSSAbsValue : CSSSizeValue
-interface CSSptValue : CSSAbsValue
-interface CSSpcValue : CSSAbsValue
-interface CSSpxValue : CSSAbsValue
+operator fun <T : CSSUnit> CSSSizeValue<T>.times(num: Number): CSSSizeValue<T> = newUnit(value * num.toFloat())
+operator fun <T : CSSUnit> Number.times(unit: CSSSizeValue<T>): CSSSizeValue<T> = unit.newUnit(unit.value * toFloat())
 
-interface CSSangleValue : CSSUnitValue
-interface CSSdegValue : CSSangleValue
-interface CSSgradValue : CSSangleValue
-interface CSSradValue : CSSangleValue
-interface CSSturnValue : CSSangleValue
+operator fun <T : CSSUnit> CSSSizeValue<T>.div(num: Number): CSSSizeValue<T> = newUnit(value / num.toFloat())
 
-interface CSSTimeValue : CSSUnitValue
-interface CSSsValue : CSSTimeValue
-interface CSSmsValue : CSSTimeValue
+operator fun <T: CSSUnit> CSSSizeValue<T>.plus(b: CSSSizeValue<T>): CSSSizeValue<T> = newUnit(value + b.value)
+operator fun <T: CSSUnit> CSSSizeValue<T>.minus(b: CSSSizeValue<T>): CSSSizeValue<T> = newUnit(value - b.value)
 
-interface CSSFrequencyValue : CSSUnitValue
-interface CSSHzValue : CSSFrequencyValue
-interface CSSkHzValue : CSSFrequencyValue
 
-interface CSSResolutionValue : CSSUnitValue
-interface CSSdpiValue : CSSResolutionValue
-interface CSSdpcmValue : CSSResolutionValue
-interface CSSdppxValue : CSSResolutionValue
+typealias CSSUnitValue = CSSSizeValue<CSSUnit>
+typealias CSSpxValue = CSSSizeValue<CSSUnit.px>
 
-interface CSSFlexValue : CSSUnitValue
-interface CSSfrValue : CSSFlexValue
+interface CSSUnitRel : CSSUnit
+interface CSSUnitAbs: CSSUnit
+interface CSSUnitAngle: CSSUnit
+interface CSSUnitTime: CSSUnit
+interface CSSUnitFrequency: CSSUnit
+interface CSSUnitResolution: CSSUnit
+interface CSSUnitFlex: CSSUnit
+
+typealias CSSAngleValue = CSSSizeValue<CSSUnitAngle>
+
+sealed interface CSSUnit {
+    val value: String
+
+    object percent: CSSUnitRel {
+        override val value: String = "%"
+    }
+
+    object em: CSSUnitRel {
+        override val value = "em"
+    }
+
+    object ex: CSSUnitRel {
+        override val value = "ex"
+    }
+
+    object ch: CSSUnitRel {
+        override val value = "ch"
+    }
+
+    object ic: CSSUnitRel {
+        override val value = "ic"
+    }
+
+    object rem: CSSUnitRel {
+        override val value = "rem"
+    }
+
+    object lh: CSSUnitRel {
+        override val value = "lh"
+    }
+
+    object rlh: CSSUnitRel {
+        override val value = "rlh"
+    }
+
+    object vw: CSSUnitRel {
+        override val value = "vw"
+    }
+
+    object vh: CSSUnitRel {
+        override val value = "vh"
+    }
+
+    object vi: CSSUnitRel {
+        override val value = "vi"
+    }
+
+    object vb: CSSUnitRel {
+        override val value = "vb"
+    }
+
+    object vmin: CSSUnitRel {
+        override val value = "vmin"
+    }
+
+    object vmax: CSSUnitRel {
+        override val value = "vmax"
+    }
+
+    object cm: CSSUnitRel {
+        override val value = "cm"
+    }
+
+    object mm: CSSUnitRel {
+        override val value = "mm"
+    }
+
+    object q: CSSUnitRel {
+        override val value = "q"
+    }
+
+    object pt: CSSUnitAbs {
+        override val value = "pt"
+    }
+
+    object pc: CSSUnitAbs {
+        override val value = "pc"
+    }
+
+    object px: CSSUnitAbs {
+        override val value = "px"
+    }
+
+    object deg: CSSUnitAngle {
+        override val value = "deg"
+    }
+
+    object grad: CSSUnitAngle {
+        override val value = "grad"
+    }
+
+    object rad: CSSUnitAngle {
+        override val value = "rad"
+    }
+
+    object turn: CSSUnitAngle {
+        override val value = "turn"
+    }
+
+    object s: CSSUnitTime {
+        override val value = "s"
+    }
+
+    object ms: CSSUnitTime {
+        override val value = "ms"
+    }
+
+    object hz: CSSUnitFrequency {
+        override val value = "hz"
+    }
+
+    object khz: CSSUnitFrequency {
+        override val value = "khz"
+    }
+
+    object dpi: CSSUnitResolution {
+        override val value = "dpi"
+    }
+
+    object dpcm: CSSUnitResolution {
+        override val value = "dpcm"
+    }
+
+    object dppx: CSSUnitResolution {
+        override val value = "dppx"
+    }
+
+    object fr: CSSUnitFlex {
+        override val value = "fr"
+    }
+
+    object number: CSSUnit {
+        override val value = "number"
+    }
+}
+
 
 val Number.number
-    get(): CSSUnitValue = CSS.number(this)
+    get(): CSSSizeValue<CSSUnit.number> = CSSUnitValueTyped(this.toFloat(), CSSUnit.number)
 
 val Number.percent
-    get(): CSSpercentValue = CSS.percent(this)
+    get() : CSSSizeValue<CSSUnit.percent> = CSSUnitValueTyped(this.toFloat(), CSSUnit.percent)
 
 val Number.em
-    get(): CSSemValue = CSS.em(this)
+    get() : CSSSizeValue<CSSUnit.em> = CSSUnitValueTyped(this.toFloat(), CSSUnit.em)
+
 val Number.ex
-    get(): CSSexValue = CSS.ex(this)
+    get(): CSSSizeValue<CSSUnit.ex> = CSSUnitValueTyped(this.toFloat(), CSSUnit.ex)
+
 val Number.ch
-    get(): CSSchValue = CSS.ch(this)
+    get(): CSSSizeValue<CSSUnit.ch> = CSSUnitValueTyped(this.toFloat(), CSSUnit.ch)
+
 val Number.cssRem
-    get(): CSSremValue = CSS.rem(this)
+    get(): CSSSizeValue<CSSUnit.rem> = CSSUnitValueTyped(this.toFloat(), CSSUnit.rem)
+
 val Number.vw
-    get(): CSSvwValue = CSS.vw(this)
+    get(): CSSSizeValue<CSSUnit.vw> = CSSUnitValueTyped(this.toFloat(), CSSUnit.vw)
+
 val Number.vh
-    get(): CSSvhValue = CSS.vh(this)
+    get(): CSSSizeValue<CSSUnit.vh> = CSSUnitValueTyped(this.toFloat(), CSSUnit.vh)
+
 val Number.vmin
-    get(): CSSvminValue = CSS.vmin(this)
+    get(): CSSSizeValue<CSSUnit.vmin> = CSSUnitValueTyped(this.toFloat(), CSSUnit.vmin)
+
 val Number.vmax
-    get(): CSSvmaxValue = CSS.vmax(this)
+    get(): CSSSizeValue<CSSUnit.vmax> = CSSUnitValueTyped(this.toFloat(), CSSUnit.vmax)
+
 val Number.cm
-    get(): CSScmValue = CSS.cm(this)
+    get(): CSSSizeValue<CSSUnit.cm> = CSSUnitValueTyped(this.toFloat(), CSSUnit.cm)
+
 val Number.mm
-    get(): CSSmmValue = CSS.mm(this)
+    get(): CSSSizeValue<CSSUnit.mm> = CSSUnitValueTyped(this.toFloat(), CSSUnit.mm)
+
 val Number.Q
-    get(): CSSQValue = CSS.Q(this)
+    get() : CSSSizeValue<CSSUnit.q> = CSSUnitValueTyped(this.toFloat(), CSSUnit.q)
 
 val Number.pt
-    get(): CSSptValue = CSS.pt(this)
+    get(): CSSSizeValue<CSSUnit.pt> = CSSUnitValueTyped(this.toFloat(), CSSUnit.pt)
 val Number.pc
-    get(): CSSpcValue = CSS.pc(this)
+    get(): CSSSizeValue<CSSUnit.pc> = CSSUnitValueTyped(this.toFloat(), CSSUnit.pc)
 val Number.px
-    get(): CSSpxValue = CSS.px(this)
+    get(): CSSSizeValue<CSSUnit.px> = CSSUnitValueTyped(this.toFloat(), CSSUnit.px)
 
 val Number.deg
-    get(): CSSdegValue = CSS.deg(this)
+    get(): CSSSizeValue<CSSUnit.deg> = CSSUnitValueTyped(this.toFloat(), CSSUnit.deg)
 val Number.grad
-    get(): CSSgradValue = CSS.grad(this)
+    get(): CSSSizeValue<CSSUnit.grad> = CSSUnitValueTyped(this.toFloat(), CSSUnit.grad)
 val Number.rad
-    get(): CSSradValue = CSS.rad(this)
+    get(): CSSSizeValue<CSSUnit.rad> = CSSUnitValueTyped(this.toFloat(), CSSUnit.rad)
 val Number.turn
-    get(): CSSturnValue = CSS.turn(this)
+    get(): CSSSizeValue<CSSUnit.turn> = CSSUnitValueTyped(this.toFloat(), CSSUnit.turn)
 
 val Number.s
-    get(): CSSsValue = CSS.s(this)
+    get(): CSSSizeValue<CSSUnit.s> = CSSUnitValueTyped(this.toFloat(), CSSUnit.s)
 val Number.ms
-    get(): CSSmsValue = CSS.ms(this)
+    get(): CSSSizeValue<CSSUnit.ms> = CSSUnitValueTyped(this.toFloat(), CSSUnit.ms)
 
 val Number.Hz
-    get(): CSSHzValue = CSS.Hz(this)
+    get(): CSSSizeValue<CSSUnit.hz> = CSSUnitValueTyped(this.toFloat(), CSSUnit.hz)
 val Number.kHz
-    get(): CSSkHzValue = CSS.kHz(this)
+    get(): CSSSizeValue<CSSUnit.khz> = CSSUnitValueTyped(this.toFloat(), CSSUnit.khz)
 
 val Number.dpi
-    get(): CSSdpiValue = CSS.dpi(this)
+    get(): CSSSizeValue<CSSUnit.dpi> = CSSUnitValueTyped(this.toFloat(), CSSUnit.dpi)
 val Number.dpcm
-    get(): CSSdpcmValue = CSS.dpcm(this)
+    get(): CSSSizeValue<CSSUnit.dpcm> = CSSUnitValueTyped(this.toFloat(), CSSUnit.dpcm)
 val Number.dppx
-    get(): CSSdppxValue = CSS.dppx(this)
+    get(): CSSSizeValue<CSSUnit.dppx> = CSSUnitValueTyped(this.toFloat(), CSSUnit.dppx)
 
 val Number.fr
-    get(): CSSfrValue = CSS.fr(this)
+    get(): CSSSizeValue<CSSUnit.fr> = CSSUnitValueTyped(this.toFloat(), CSSUnit.fr)

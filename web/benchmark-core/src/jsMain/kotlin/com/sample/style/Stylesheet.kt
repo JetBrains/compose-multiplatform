@@ -1,28 +1,24 @@
 package com.sample.style
 
-import androidx.compose.runtime.Composable
 import org.jetbrains.compose.web.css.*
 import org.jetbrains.compose.web.css.selectors.*
-import org.jetbrains.compose.web.attributes.*
-import org.jetbrains.compose.web.dom.*
-import org.jetbrains.compose.web.*
 
 object AppCSSVariables : CSSVariables {
     val wtColorGreyLight by variable<Color>()
     val wtColorGreyDark by variable<Color>()
 
-    val wtOffsetTopUnit by variable<CSSSizeValue>()
-    val wtHorizontalLayoutGutter by variable<CSSSizeValue>()
-    val wtFlowUnit by variable<CSSSizeValue>()
+    val wtOffsetTopUnit by variable<CSSUnitValue>()
+    val wtHorizontalLayoutGutter by variable<CSSUnitValue>()
+    val wtFlowUnit by variable<CSSUnitValue>()
 
-    val wtHeroFontSize by variable<CSSSizeValue>()
-    val wtHeroLineHeight by variable<CSSSizeValue>()
-    val wtSubtitle2FontSize by variable<CSSSizeValue>()
-    val wtSubtitle2LineHeight by variable<CSSSizeValue>()
-    val wtH2FontSize by variable<CSSSizeValue>()
-    val wtH2LineHeight by variable<CSSSizeValue>()
-    val wtH3FontSize by variable<CSSSizeValue>()
-    val wtH3LineHeight by variable<CSSSizeValue>()
+    val wtHeroFontSize by variable<CSSUnitValue>()
+    val wtHeroLineHeight by variable<CSSUnitValue>()
+    val wtSubtitle2FontSize by variable<CSSUnitValue>()
+    val wtSubtitle2LineHeight by variable<CSSUnitValue>()
+    val wtH2FontSize by variable<CSSUnitValue>()
+    val wtH2LineHeight by variable<CSSUnitValue>()
+    val wtH3FontSize by variable<CSSUnitValue>()
+    val wtH3LineHeight by variable<CSSUnitValue>()
 
     val wtColCount by variable<Int>()
 }

@@ -15,16 +15,16 @@ abstract class Color : CustomStyleValue {
         override fun toString(): String = "rgba($r, $g, $b, $a)"
     }
 
-    data class HSL(val h: CSSangleValue, val s: Number, val l: Number) : Color() {
+    data class HSL(val h: CSSAngleValue, val s: Number, val l: Number) : Color() {
         constructor(h: Number, s: Number, l: Number) : this(h.deg, s, l)
 
-        override fun toString(): String = "hsl($h, $s%, $l%)"
+        override fun toString(): String = "hsl(${h.asString()}, $s%, $l%)"
     }
 
-    data class HSLA(val h: CSSangleValue, val s: Number, val l: Number, val a: Number) : Color() {
+    data class HSLA(val h: CSSAngleValue, val s: Number, val l: Number, val a: Number) : Color() {
         constructor(h: Number, s: Number, l: Number, a: Number) : this(h.deg, s, l, a)
 
-        override fun toString(): String = "hsla($h, $s%, $l%, $a)"
+        override fun toString(): String = "hsla(${h.asString()}, $s%, $l%, $a)"
     }
 
     companion object {
