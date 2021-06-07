@@ -314,7 +314,7 @@ external interface StylePropertyValue
 fun String.asStylePropertyValue() = unsafeCast<StylePropertyValue>()
 fun Number.asStylePropertyValue() = unsafeCast<StylePropertyValue>()
 fun CSSStyleValue.asStylePropertyValue() = unsafeCast<StylePropertyValue>()
-fun CSSSizeValue.asStylePropertyValue() = asString().asStylePropertyValue()
+fun CSSUnitValue.asStylePropertyValue() = asString().asStylePropertyValue()
 
 external class StylePropertyMap : StylePropertyMapReadOnly {
     fun set(property: String, vararg values: StylePropertyValue)

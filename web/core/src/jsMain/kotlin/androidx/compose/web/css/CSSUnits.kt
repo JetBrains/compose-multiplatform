@@ -1,6 +1,6 @@
 package org.jetbrains.compose.web.css
 
-interface CSSUnitValue<out T : CSSUnit> : CSSNumericValue {
+interface CSSSizeValue<out T : CSSUnit> : CSSNumericValue {
     val value: Float
     val unit: T
     fun asString(): String = "${value}${unit.value}"
@@ -9,10 +9,10 @@ interface CSSUnitValue<out T : CSSUnit> : CSSNumericValue {
 private class CSSUnitValueTyped<out T : CSSUnit>(
     override val value: Float,
     override val unit: T
-) : CSSUnitValue<T>
+) : CSSSizeValue<T>
 
-typealias CSSSizeValue = CSSUnitValue<CSSUnit>
-typealias CSSpxValue = CSSUnitValue<CSSUnit.px>
+typealias CSSUnitValue = CSSSizeValue<CSSUnit>
+typealias CSSpxValue = CSSSizeValue<CSSUnit.px>
 
 interface CSSUnitRel : CSSUnit
 interface CSSUnitAbs: CSSUnit
@@ -22,7 +22,7 @@ interface CSSUnitFrequency: CSSUnit
 interface CSSUnitResolution: CSSUnit
 interface CSSUnitFlex: CSSUnit
 
-typealias CSSAngleValue = CSSUnitValue<CSSUnitAngle>
+typealias CSSAngleValue = CSSSizeValue<CSSUnitAngle>
 
 sealed interface CSSUnit {
     val value: String
@@ -162,76 +162,76 @@ sealed interface CSSUnit {
 
 
 val Number.number
-    get(): CSSUnitValue<CSSUnit.number> = CSSUnitValueTyped(this.toFloat(), CSSUnit.number)
+    get(): CSSSizeValue<CSSUnit.number> = CSSUnitValueTyped(this.toFloat(), CSSUnit.number)
 
 val Number.percent
-    get() : CSSUnitValue<CSSUnit.percent> = CSSUnitValueTyped(this.toFloat(), CSSUnit.percent)
+    get() : CSSSizeValue<CSSUnit.percent> = CSSUnitValueTyped(this.toFloat(), CSSUnit.percent)
 
 val Number.em
-    get() : CSSUnitValue<CSSUnit.em> = CSSUnitValueTyped(this.toFloat(), CSSUnit.em)
+    get() : CSSSizeValue<CSSUnit.em> = CSSUnitValueTyped(this.toFloat(), CSSUnit.em)
 
 val Number.ex
-    get(): CSSUnitValue<CSSUnit.ex> = CSSUnitValueTyped(this.toFloat(), CSSUnit.ex)
+    get(): CSSSizeValue<CSSUnit.ex> = CSSUnitValueTyped(this.toFloat(), CSSUnit.ex)
 
 val Number.ch
-    get(): CSSUnitValue<CSSUnit.ch> = CSSUnitValueTyped(this.toFloat(), CSSUnit.ch)
+    get(): CSSSizeValue<CSSUnit.ch> = CSSUnitValueTyped(this.toFloat(), CSSUnit.ch)
 
 val Number.cssRem
-    get(): CSSUnitValue<CSSUnit.rem> = CSSUnitValueTyped(this.toFloat(), CSSUnit.rem)
+    get(): CSSSizeValue<CSSUnit.rem> = CSSUnitValueTyped(this.toFloat(), CSSUnit.rem)
 
 val Number.vw
-    get(): CSSUnitValue<CSSUnit.vw> = CSSUnitValueTyped(this.toFloat(), CSSUnit.vw)
+    get(): CSSSizeValue<CSSUnit.vw> = CSSUnitValueTyped(this.toFloat(), CSSUnit.vw)
 
 val Number.vh
-    get(): CSSUnitValue<CSSUnit.vh> = CSSUnitValueTyped(this.toFloat(), CSSUnit.vh)
+    get(): CSSSizeValue<CSSUnit.vh> = CSSUnitValueTyped(this.toFloat(), CSSUnit.vh)
 
 val Number.vmin
-    get(): CSSUnitValue<CSSUnit.vmin> = CSSUnitValueTyped(this.toFloat(), CSSUnit.vmin)
+    get(): CSSSizeValue<CSSUnit.vmin> = CSSUnitValueTyped(this.toFloat(), CSSUnit.vmin)
 
 val Number.vmax
-    get(): CSSUnitValue<CSSUnit.vmax> = CSSUnitValueTyped(this.toFloat(), CSSUnit.vmax)
+    get(): CSSSizeValue<CSSUnit.vmax> = CSSUnitValueTyped(this.toFloat(), CSSUnit.vmax)
 
 val Number.cm
-    get(): CSSUnitValue<CSSUnit.cm> = CSSUnitValueTyped(this.toFloat(), CSSUnit.cm)
+    get(): CSSSizeValue<CSSUnit.cm> = CSSUnitValueTyped(this.toFloat(), CSSUnit.cm)
 
 val Number.mm
-    get(): CSSUnitValue<CSSUnit.mm> = CSSUnitValueTyped(this.toFloat(), CSSUnit.mm)
+    get(): CSSSizeValue<CSSUnit.mm> = CSSUnitValueTyped(this.toFloat(), CSSUnit.mm)
 
 val Number.Q
-    get() : CSSUnitValue<CSSUnit.q> = CSSUnitValueTyped(this.toFloat(), CSSUnit.q)
+    get() : CSSSizeValue<CSSUnit.q> = CSSUnitValueTyped(this.toFloat(), CSSUnit.q)
 
 val Number.pt
-    get(): CSSUnitValue<CSSUnit.pt> = CSSUnitValueTyped(this.toFloat(), CSSUnit.pt)
+    get(): CSSSizeValue<CSSUnit.pt> = CSSUnitValueTyped(this.toFloat(), CSSUnit.pt)
 val Number.pc
-    get(): CSSUnitValue<CSSUnit.pc> = CSSUnitValueTyped(this.toFloat(), CSSUnit.pc)
+    get(): CSSSizeValue<CSSUnit.pc> = CSSUnitValueTyped(this.toFloat(), CSSUnit.pc)
 val Number.px
-    get(): CSSUnitValue<CSSUnit.px> = CSSUnitValueTyped(this.toFloat(), CSSUnit.px)
+    get(): CSSSizeValue<CSSUnit.px> = CSSUnitValueTyped(this.toFloat(), CSSUnit.px)
 
 val Number.deg
-    get(): CSSUnitValue<CSSUnit.deg> = CSSUnitValueTyped(this.toFloat(), CSSUnit.deg)
+    get(): CSSSizeValue<CSSUnit.deg> = CSSUnitValueTyped(this.toFloat(), CSSUnit.deg)
 val Number.grad
-    get(): CSSUnitValue<CSSUnit.grad> = CSSUnitValueTyped(this.toFloat(), CSSUnit.grad)
+    get(): CSSSizeValue<CSSUnit.grad> = CSSUnitValueTyped(this.toFloat(), CSSUnit.grad)
 val Number.rad
-    get(): CSSUnitValue<CSSUnit.rad> = CSSUnitValueTyped(this.toFloat(), CSSUnit.rad)
+    get(): CSSSizeValue<CSSUnit.rad> = CSSUnitValueTyped(this.toFloat(), CSSUnit.rad)
 val Number.turn
-    get(): CSSUnitValue<CSSUnit.turn> = CSSUnitValueTyped(this.toFloat(), CSSUnit.turn)
+    get(): CSSSizeValue<CSSUnit.turn> = CSSUnitValueTyped(this.toFloat(), CSSUnit.turn)
 
 val Number.s
-    get(): CSSUnitValue<CSSUnit.s> = CSSUnitValueTyped(this.toFloat(), CSSUnit.s)
+    get(): CSSSizeValue<CSSUnit.s> = CSSUnitValueTyped(this.toFloat(), CSSUnit.s)
 val Number.ms
-    get(): CSSUnitValue<CSSUnit.ms> = CSSUnitValueTyped(this.toFloat(), CSSUnit.ms)
+    get(): CSSSizeValue<CSSUnit.ms> = CSSUnitValueTyped(this.toFloat(), CSSUnit.ms)
 
 val Number.Hz
-    get(): CSSUnitValue<CSSUnit.hz> = CSSUnitValueTyped(this.toFloat(), CSSUnit.hz)
+    get(): CSSSizeValue<CSSUnit.hz> = CSSUnitValueTyped(this.toFloat(), CSSUnit.hz)
 val Number.kHz
-    get(): CSSUnitValue<CSSUnit.khz> = CSSUnitValueTyped(this.toFloat(), CSSUnit.khz)
+    get(): CSSSizeValue<CSSUnit.khz> = CSSUnitValueTyped(this.toFloat(), CSSUnit.khz)
 
 val Number.dpi
-    get(): CSSUnitValue<CSSUnit.dpi> = CSSUnitValueTyped(this.toFloat(), CSSUnit.dpi)
+    get(): CSSSizeValue<CSSUnit.dpi> = CSSUnitValueTyped(this.toFloat(), CSSUnit.dpi)
 val Number.dpcm
-    get(): CSSUnitValue<CSSUnit.dpcm> = CSSUnitValueTyped(this.toFloat(), CSSUnit.dpcm)
+    get(): CSSSizeValue<CSSUnit.dpcm> = CSSUnitValueTyped(this.toFloat(), CSSUnit.dpcm)
 val Number.dppx
-    get(): CSSUnitValue<CSSUnit.dppx> = CSSUnitValueTyped(this.toFloat(), CSSUnit.dppx)
+    get(): CSSSizeValue<CSSUnit.dppx> = CSSUnitValueTyped(this.toFloat(), CSSUnit.dppx)
 
 val Number.fr
-    get(): CSSUnitValue<CSSUnit.fr> = CSSUnitValueTyped(this.toFloat(), CSSUnit.fr)
+    get(): CSSSizeValue<CSSUnit.fr> = CSSUnitValueTyped(this.toFloat(), CSSUnit.fr)

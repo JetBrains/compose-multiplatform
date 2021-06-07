@@ -5,7 +5,6 @@
 
 package org.jetbrains.compose.web.core.tests
 
-import org.jetbrains.compose.web.css.CSSUnitValue
 import org.jetbrains.compose.web.css.ch
 import org.jetbrains.compose.web.css.cm
 import org.jetbrains.compose.web.css.cssRem
