@@ -412,13 +412,11 @@ fun ModalDrawer(
             Scrim(
                 open = drawerState.isOpen,
                 onClose = {
-                    scope.launch {
-                        if (
-                            gesturesEnabled &&
-                            drawerState.swipeableState.confirmStateChange(DrawerValue.Closed)
-                        ) {
-                            drawerState.close()
-                        }
+                    if (
+                        gesturesEnabled &&
+                        drawerState.swipeableState.confirmStateChange(DrawerValue.Closed)
+                    ) {
+                        scope.launch { drawerState.close() }
                     }
                 },
                 fraction = {
@@ -442,13 +440,11 @@ fun ModalDrawer(
                         paneTitle = Strings.NavigationMenu
                         if (drawerState.isOpen) {
                             dismiss {
-                                scope.launch {
-                                    if (
-                                        drawerState.swipeableState
-                                            .confirmStateChange(DrawerValue.Closed)
-                                    ) {
-                                        drawerState.close()
-                                    }
+                                if (
+                                    drawerState.swipeableState
+                                        .confirmStateChange(DrawerValue.Closed)
+                                ) {
+                                    scope.launch { drawerState.close() }
                                 }; true
                             }
                         }
@@ -557,13 +553,10 @@ fun BottomDrawer(
             BottomDrawerScrim(
                 color = scrimColor,
                 onDismiss = {
-                    scope.launch {
-                        if (
-                            gesturesEnabled &&
-                            drawerState.confirmStateChange(BottomDrawerValue.Closed)
-                        ) {
-                            drawerState.close()
-                        }
+                    if (
+                        gesturesEnabled && drawerState.confirmStateChange(BottomDrawerValue.Closed)
+                    ) {
+                        scope.launch { drawerState.close() }
                     }
                 },
                 visible = drawerState.targetValue != BottomDrawerValue.Closed
@@ -579,10 +572,8 @@ fun BottomDrawer(
                         if (drawerState.isOpen) {
                             // TODO(b/180101663) The action currently doesn't return the correct results
                             dismiss {
-                                scope.launch {
-                                    if (drawerState.confirmStateChange(BottomDrawerValue.Closed)) {
-                                        drawerState.close()
-                                    }
+                                if (drawerState.confirmStateChange(BottomDrawerValue.Closed)) {
+                                    scope.launch { drawerState.close() }
                                 }; true
                             }
                         }

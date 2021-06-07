@@ -253,10 +253,8 @@ fun ModalBottomSheetLayout(
             Scrim(
                 color = scrimColor,
                 onDismiss = {
-                    scope.launch {
-                        if (sheetState.confirmStateChange(Hidden)) {
-                            sheetState.hide()
-                        }
+                    if (sheetState.confirmStateChange(Hidden)) {
+                        scope.launch { sheetState.hide() }
                     }
                 },
                 visible = sheetState.targetValue != Hidden
@@ -283,28 +281,22 @@ fun ModalBottomSheetLayout(
                 .semantics {
                     if (sheetState.isVisible) {
                         dismiss {
-                            scope.launch {
-                                if (sheetState.confirmStateChange(Hidden)) {
-                                    sheetState.hide()
-                                }
+                            if (sheetState.confirmStateChange(Hidden)) {
+                                scope.launch { sheetState.hide() }
                             }
                             true
                         }
                         if (sheetState.currentValue == HalfExpanded) {
                             expand {
-                                scope.launch {
-                                    if (sheetState.confirmStateChange(Expanded)) {
-                                        sheetState.expand()
-                                    }
+                                if (sheetState.confirmStateChange(Expanded)) {
+                                    scope.launch { sheetState.expand() }
                                 }
                                 true
                             }
                         } else if (sheetState.isHalfExpandedEnabled) {
                             collapse {
-                                scope.launch {
-                                    if (sheetState.confirmStateChange(HalfExpanded)) {
-                                        sheetState.halfExpand()
-                                    }
+                                if (sheetState.confirmStateChange(HalfExpanded)) {
+                                    scope.launch { sheetState.halfExpand() }
                                 }
                                 true
                             }
