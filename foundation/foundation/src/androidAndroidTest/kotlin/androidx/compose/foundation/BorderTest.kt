@@ -53,6 +53,7 @@ import org.junit.Test
 import org.junit.runner.RunWith
 import org.junit.runners.Parameterized
 import kotlin.math.floor
+import kotlin.math.roundToInt
 
 @MediumTest
 @SdkSuppress(minSdkVersion = Build.VERSION_CODES.O)
@@ -238,6 +239,79 @@ class BorderTest(val shape: Shape) {
             assertEquals(Color.Red, map[width - offsetRight, height - offsetBottom]) // Bottom right
             // inside triangle
             assertEquals(Color.White, map[floor(width * 3f / 4f).toInt(), height / 2])
+        }
+    }
+
+    @Test
+    fun border_non_simple_rounded_rect() {
+        val topleft = 0f
+        val topRight = 5f
+        val bottomRight = 10f
+        val bottomLeft = 15f
+        val roundRectTag = "roundRectTag"
+        var borderPx = 0f
+        rule.setContent {
+            val size = 50.dp
+            val border = 10.dp
+
+            with(LocalDensity.current) {
+                borderPx = border.toPx()
+            }
+            Box(
+                Modifier.testTag(roundRectTag)
+                    .size(size)
+                    .background(Color.White)
+                    .border(
+                        BorderStroke(border, Color.Red),
+                        RoundedCornerShape(
+                            topStart = topleft,
+                            topEnd = topRight,
+                            bottomStart = bottomLeft,
+                            bottomEnd = bottomRight
+                        )
+                    )
+            )
+        }
+
+        rule.onNodeWithTag(roundRectTag).captureToImage().apply {
+            val map = toPixelMap()
+            val offset = 2
+            assertEquals(Color.Red, map[offset, offset])
+            assertEquals(Color.White, map[width - 1, 0])
+            assertEquals(Color.White, map[width - 1, height - 1])
+            assertEquals(Color.White, map[0, height - 1])
+
+            assertEquals(Color.White, map[borderPx.toInt() + offset, borderPx.toInt() + offset])
+            assertEquals(
+                Color.White,
+                map[
+                    map.width - borderPx.toInt() - offset,
+                    borderPx.toInt() + offset
+                ]
+            )
+            assertEquals(
+                Color.White,
+                map[
+                    map.width - borderPx.toInt() - offset,
+                    map.height - borderPx.toInt() - offset
+                ]
+            )
+            assertEquals(
+                Color.White,
+                map[
+                    borderPx.toInt() + offset,
+                    map.height - borderPx.toInt() - offset
+                ]
+            )
+
+            val topRightOffset = (topRight / 2).roundToInt()
+            assertEquals(Color.Red, map[width - 1 - topRightOffset, topRightOffset])
+
+            val bottomRightOffset = (bottomRight / 2).roundToInt()
+            assertEquals(Color.Red, map[width - 1 - bottomRightOffset, bottomRightOffset])
+
+            val bottomLeftOffset = (bottomLeft / 2).roundToInt()
+            assertEquals(Color.Red, map[bottomLeftOffset, height - 1 - bottomLeftOffset])
         }
     }
 
