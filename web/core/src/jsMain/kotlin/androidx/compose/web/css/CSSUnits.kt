@@ -176,7 +176,7 @@ sealed interface CSSUnit {
             get() = "dppx"
     }
 
-    object fr: CSSUnitFrequencyValue {
+    object fr: CSSUnitFlexValue {
         override val value: String
             get() = "fr"
     }
