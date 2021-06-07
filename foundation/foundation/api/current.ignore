@@ -7,6 +7,8 @@ RemovedMethod: androidx.compose.foundation.ClickableKt#clickable(androidx.compos
     Removed method androidx.compose.foundation.ClickableKt.clickable(androidx.compose.ui.Modifier,androidx.compose.foundation.interaction.MutableInteractionSource,androidx.compose.foundation.Indication,boolean,String,androidx.compose.ui.semantics.Role,kotlin.jvm.functions.Function0<kotlin.Unit>)
 RemovedMethod: androidx.compose.foundation.ClickableKt#clickable(androidx.compose.ui.Modifier, boolean, String, androidx.compose.ui.semantics.Role, kotlin.jvm.functions.Function0<kotlin.Unit>):
     Removed method androidx.compose.foundation.ClickableKt.clickable(androidx.compose.ui.Modifier,boolean,String,androidx.compose.ui.semantics.Role,kotlin.jvm.functions.Function0<kotlin.Unit>)
+RemovedMethod: androidx.compose.foundation.DarkTheme_androidKt#isSystemInDarkTheme():
+    Removed method androidx.compose.foundation.DarkTheme_androidKt.isSystemInDarkTheme()
 RemovedMethod: androidx.compose.foundation.selection.SelectableKt#selectable(androidx.compose.ui.Modifier, boolean, androidx.compose.foundation.interaction.MutableInteractionSource, androidx.compose.foundation.Indication, boolean, androidx.compose.ui.semantics.Role, kotlin.jvm.functions.Function0<kotlin.Unit>):
     Removed method androidx.compose.foundation.selection.SelectableKt.selectable(androidx.compose.ui.Modifier,boolean,androidx.compose.foundation.interaction.MutableInteractionSource,androidx.compose.foundation.Indication,boolean,androidx.compose.ui.semantics.Role,kotlin.jvm.functions.Function0<kotlin.Unit>)
 RemovedMethod: androidx.compose.foundation.selection.SelectableKt#selectable(androidx.compose.ui.Modifier, boolean, boolean, androidx.compose.ui.semantics.Role, kotlin.jvm.functions.Function0<kotlin.Unit>):
