@@ -8,175 +8,175 @@ interface CSSUnitValueTyped<T : CSSUnit> : CSSNumericValue {
 
 interface CSSUnitValue : CSSUnitValueTyped<CSSUnit>
 
-interface CSSUnitRelValue : CSSUnit
-interface CSSUnitAbsValue: CSSUnit
-interface CSSUnitAngleValue: CSSUnit
-interface CSSUnitTimeValue: CSSUnit
-interface CSSUnitFrequencyValue: CSSUnit
-interface CSSUnitResolutionValue: CSSUnit
-interface CSSUnitFlexValue: CSSUnit
+interface CSSUnitRel : CSSUnit
+interface CSSUnitAbs: CSSUnit
+interface CSSUnitAngle: CSSUnit
+interface CSSUnitTime: CSSUnit
+interface CSSUnitFrequency: CSSUnit
+interface CSSUnitResolution: CSSUnit
+interface CSSUnitFlex: CSSUnit
 
-interface CSSAngleValue : CSSUnitValueTyped<CSSUnitAngleValue>
+interface CSSAngleValue : CSSUnitValueTyped<CSSUnitAngle>
 
 sealed interface CSSUnit {
     val value: String
 
-    object percent: CSSUnitRelValue {
+    object percent: CSSUnitRel {
         override val value: String
             get() = "percent"
     }
 
-    object em: CSSUnitRelValue {
+    object em: CSSUnitRel {
         override val value: String
             get() = "em"
     }
 
-    object ex: CSSUnitRelValue {
+    object ex: CSSUnitRel {
         override val value: String
             get() = "ex"
     }
 
-    object ch: CSSUnitRelValue {
+    object ch: CSSUnitRel {
         override val value: String
             get() = "ch"
     }
 
-    object ic: CSSUnitRelValue {
+    object ic: CSSUnitRel {
         override val value: String
             get() = "ic"
     }
 
-    object rem: CSSUnitRelValue {
+    object rem: CSSUnitRel {
         override val value: String
             get() = "rem"
     }
 
-    object lh: CSSUnitRelValue {
+    object lh: CSSUnitRel {
         override val value: String
             get() = "lh"
     }
 
-    object rlh: CSSUnitRelValue {
+    object rlh: CSSUnitRel {
         override val value: String
             get() = "rlh"
     }
 
-    object vw: CSSUnitRelValue {
+    object vw: CSSUnitRel {
         override val value: String
             get() = "vw"
     }
 
-    object vh: CSSUnitRelValue {
+    object vh: CSSUnitRel {
         override val value: String
             get() = "vh"
     }
 
-    object vi: CSSUnitRelValue {
+    object vi: CSSUnitRel {
         override val value: String
             get() = "vi"
     }
 
-    object vb: CSSUnitRelValue {
+    object vb: CSSUnitRel {
         override val value: String
             get() = "vb"
     }
 
-    object vmin: CSSUnitRelValue {
+    object vmin: CSSUnitRel {
         override val value: String
             get() = "vmin"
     }
 
-    object vmax: CSSUnitRelValue {
+    object vmax: CSSUnitRel {
         override val value: String
             get() = "vmax"
     }
 
-    object cm: CSSUnitRelValue {
+    object cm: CSSUnitRel {
         override val value: String
             get() = "cm"
     }
 
-    object mm: CSSUnitRelValue {
+    object mm: CSSUnitRel {
         override val value: String
             get() = "mm"
     }
 
-    object q: CSSUnitRelValue {
+    object q: CSSUnitRel {
         override val value: String
             get() = "q"
     }
 
-    object pt: CSSUnitAbsValue {
+    object pt: CSSUnitAbs {
         override val value: String
             get() = "pt"
     }
 
-    object pc: CSSUnitAbsValue {
+    object pc: CSSUnitAbs {
         override val value: String
             get() = "pc"
     }
 
-    object px: CSSUnitAbsValue {
+    object px: CSSUnitAbs {
         override val value: String
             get() = "px"
     }
 
-    object deg: CSSUnitAngleValue {
+    object deg: CSSUnitAngle {
         override val value: String
             get() = "deg"
     }
 
-    object grad: CSSUnitAngleValue {
+    object grad: CSSUnitAngle {
         override val value: String
             get() = "grad"
     }
 
-    object rad: CSSUnitAngleValue {
+    object rad: CSSUnitAngle {
         override val value: String
             get() = "rad"
     }
 
-    object turn: CSSUnitAngleValue {
+    object turn: CSSUnitAngle {
         override val value: String
             get() = "turn"
     }
 
-    object s: CSSUnitTimeValue {
+    object s: CSSUnitTime {
         override val value: String
             get() = "s"
     }
 
-    object ms: CSSUnitTimeValue {
+    object ms: CSSUnitTime {
         override val value: String
             get() = "ms"
     }
 
-    object hz: CSSUnitFrequencyValue {
+    object hz: CSSUnitFrequency {
         override val value: String
             get() = "hz"
     }
 
-    object khz: CSSUnitFrequencyValue {
+    object khz: CSSUnitFrequency {
         override val value: String
             get() = "khz"
     }
 
-    object dpi: CSSUnitResolutionValue {
+    object dpi: CSSUnitResolution {
         override val value: String
             get() = "dpi"
     }
 
-    object dpcm: CSSUnitResolutionValue {
+    object dpcm: CSSUnitResolution {
         override val value: String
             get() = "dpcm"
     }
 
-    object dppx: CSSUnitResolutionValue {
+    object dppx: CSSUnitResolution {
         override val value: String
             get() = "dppx"
     }
 
-    object fr: CSSUnitFlexValue {
+    object fr: CSSUnitFlex {
         override val value: String
             get() = "fr"
     }
@@ -288,22 +288,22 @@ value class CSSpxValue(override val value: Float) : CSSUnitValue {
 }
 
 value class CSSdegValue(override val value: Float) : CSSAngleValue {
-    override val unit: CSSUnitAngleValue
+    override val unit: CSSUnitAngle
         get() = CSSUnit.deg
 }
 
 value class CSSgradValue(override val value: Float) : CSSAngleValue {
-    override val unit: CSSUnitAngleValue
+    override val unit: CSSUnitAngle
         get() = CSSUnit.grad
 }
 
 value class CSSradValue(override val value: Float) : CSSAngleValue {
-    override val unit: CSSUnitAngleValue
+    override val unit: CSSUnitAngle
         get() = CSSUnit.rad
 }
 
 value class CSSturnValue(override val value: Float) : CSSAngleValue {
-    override val unit: CSSUnitAngleValue
+    override val unit: CSSUnitAngle
         get() = CSSUnit.turn
 }
 
@@ -353,7 +353,7 @@ value class CSSnumberValue(override val value: Float) : CSSUnitValue {
 }
 
 val Number.number
-    get(): CSSUnitValue = CSSnumberValue(this.toFloat())
+    get(): CSSnumberValue = CSSnumberValue(this.toFloat())
 
 val Number.percent
     get(): CSSpercentValue = CSSpercentValue(this.toFloat())
