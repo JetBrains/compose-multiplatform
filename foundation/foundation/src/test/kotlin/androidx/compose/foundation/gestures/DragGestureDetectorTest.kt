@@ -22,6 +22,8 @@ import androidx.compose.ui.input.pointer.changedToUpIgnoreConsumed
 import androidx.compose.ui.input.pointer.consumeAllChanges
 import androidx.compose.ui.input.pointer.consumePositionChange
 import androidx.compose.ui.input.pointer.positionChange
+import androidx.compose.ui.input.pointer.util.VelocityTracker
+import androidx.compose.ui.unit.Velocity
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
@@ -30,6 +32,8 @@ import org.junit.Test
 import org.junit.runner.RunWith
 import org.junit.runners.JUnit4
 import org.junit.runners.Parameterized
+import kotlin.math.roundToLong
+import kotlin.random.Random
 
 @RunWith(Parameterized::class)
 class DragGestureDetectorTest(dragType: GestureType) {
@@ -499,5 +503,35 @@ class DragGestureOrderTest {
         progress.up()
         assertTrue(startCount < dragCount)
         assertTrue(dragCount < stopCount)
+    }
+}
+
+@RunWith(JUnit4::class)
+class RelativeVelocityTrackerTest {
+
+    private val vt = VelocityTracker()
+    private val relativeVt = RelativeVelocityTracker()
+
+    @Test
+    fun velocityParity() = velocityCase.executeInComposition {
+        var partial = down(5f, 5f)
+        repeat(25) {
+            partial = partial.moveBy(Offset(Random.nextFloat() * 45, Random.nextFloat() * 71))
+        }
+        partial.up()
+        val absoluteVelocity = vt.calculateVelocity()
+        val relativeVelocity = relativeVt.calculateVelocity()
+        assertTrue(absoluteVelocity != Velocity.Zero)
+        assertTrue(absoluteVelocity.x.roundToLong() == relativeVelocity.x.roundToLong())
+        assertTrue(absoluteVelocity.y.roundToLong() == relativeVelocity.y.roundToLong())
+    }
+
+    private val velocityCase = SuspendingGestureTestUtil {
+        vt.resetTracking()
+        relativeVt.resetTracking()
+        detectDragGestures { change, dragAmount ->
+            relativeVt.addPositionChange(change.uptimeMillis, dragAmount)
+            vt.addPosition(change.uptimeMillis, change.position)
+        }
     }
 }

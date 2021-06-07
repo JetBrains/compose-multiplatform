@@ -41,7 +41,6 @@ import androidx.compose.ui.input.pointer.PointerInputChange
 import androidx.compose.ui.input.pointer.consumePositionChange
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.input.pointer.positionChange
-import androidx.compose.ui.input.pointer.util.VelocityTracker
 import androidx.compose.ui.platform.debugInspectorInfo
 import androidx.compose.ui.unit.Velocity
 import kotlinx.coroutines.CoroutineScope
@@ -178,7 +177,7 @@ fun Modifier.draggable(
     onDragStopped: suspend CoroutineScope.(velocity: Float) -> Unit = {},
     reverseDirection: Boolean = false
 ): Modifier = draggable(
-    state = state,
+    stateFactory = { remember(state) { ConsumeAllDraggableState(state) } },
     orientation = orientation,
     enabled = enabled,
     interactionSource = interactionSource,
@@ -190,7 +189,7 @@ fun Modifier.draggable(
 )
 
 internal fun Modifier.draggable(
-    state: DraggableState,
+    stateFactory: @Composable () -> ConsumptionBasedDraggableState,
     canDrag: (PointerInputChange) -> Boolean,
     orientation: Orientation,
     enabled: Boolean = true,
@@ -202,7 +201,6 @@ internal fun Modifier.draggable(
 ): Modifier = composed(
     inspectorInfo = debugInspectorInfo {
         name = "draggable"
-        properties["canDrag"] = canDrag
         properties["orientation"] = orientation
         properties["enabled"] = enabled
         properties["reverseDirection"] = reverseDirection
@@ -210,9 +208,11 @@ internal fun Modifier.draggable(
         properties["startDragImmediately"] = startDragImmediately
         properties["onDragStarted"] = onDragStarted
         properties["onDragStopped"] = onDragStopped
-        properties["state"] = state
+        properties["stateFactory"] = stateFactory
+        properties["canDrag"] = canDrag
     }
 ) {
+    val state = stateFactory.invoke()
     val draggedInteraction = remember { mutableStateOf<DragInteraction.Start?>(null) }
     DisposableEffect(interactionSource) {
         onDispose {
@@ -228,21 +228,27 @@ internal fun Modifier.draggable(
     val dragLogic by rememberUpdatedState(
         DragLogic(onDragStarted, onDragStopped, draggedInteraction, interactionSource)
     )
-    LaunchedEffect(state) {
+    LaunchedEffect(state, orientation) {
+        val velocityTracker = RelativeVelocityTracker()
         while (isActive) {
             var event = channel.receive()
             if (event !is DragStarted) continue
+            velocityTracker.resetTracking()
             with(dragLogic) { processDragStart(event as DragStarted) }
             try {
                 state.drag(MutatePriority.UserInput) {
                     while (event !is DragStopped && event !is DragCancelled) {
-                        (event as? DragDelta)?.let { dragBy(it.delta) }
+                        (event as? DragDelta)?.let {
+                            val consumed = dragBy(it.delta).toOffset(orientation)
+                            velocityTracker.addPositionChange(it.uptime, consumed)
+                        }
                         event = channel.receive()
                     }
                 }
                 with(dragLogic) {
                     if (event is DragStopped) {
-                        processDragStop(event as DragStopped)
+                        val velocity = velocityTracker.calculateVelocity().toFloat(orientation)
+                        processDragStop(velocity)
                     } else if (event is DragCancelled) {
                         processDragCancel()
                     }
@@ -257,29 +263,15 @@ internal fun Modifier.draggable(
         coroutineScope {
             forEachGesture {
                 awaitPointerEventScope {
-                    val velocityTracker = VelocityTracker()
                     awaitDownAndSlop(canDragState, startImmediatelyState, orientation)?.let {
                         var isDragSuccessful = false
                         try {
-                            isDragSuccessful = awaitDrag(
-                                it,
-                                velocityTracker,
-                                channel,
-                                reverseDirection,
-                                orientation
-                            )
+                            isDragSuccessful = awaitDrag(it, channel, reverseDirection, orientation)
                         } catch (cancellation: CancellationException) {
                             isDragSuccessful = false
                             if (!isActive) throw cancellation
                         } finally {
-                            val event = if (isDragSuccessful) {
-                                val velocity =
-                                    velocityTracker.calculateVelocity().toFloat(orientation)
-                                DragStopped(velocity * if (reverseDirection) -1 else 1)
-                            } else {
-                                DragCancelled
-                            }
-                            channel.offer(event)
+                            channel.offer(if (isDragSuccessful) DragStopped else DragCancelled)
                         }
                     }
                 }
@@ -316,27 +308,29 @@ private suspend fun AwaitPointerEventScope.awaitDownAndSlop(
 
 private suspend fun AwaitPointerEventScope.awaitDrag(
     dragStart: Pair<PointerInputChange, Float>,
-    velocityTracker: VelocityTracker,
     channel: SendChannel<DragEvent>,
     reverseDirection: Boolean,
     orientation: Orientation
 ): Boolean {
     val initialDelta = dragStart.second
     val startEvent = dragStart.first
-    velocityTracker.addPosition(startEvent.uptimeMillis, startEvent.position)
 
     val overSlopOffset = initialDelta.toOffset(orientation)
     val adjustedStart = startEvent.position - overSlopOffset *
         sign(startEvent.position.toFloat(orientation))
     channel.offer(DragStarted(adjustedStart))
 
-    channel.offer(DragDelta(if (reverseDirection) initialDelta * -1 else initialDelta))
+    channel.offer(
+        DragDelta(
+            if (reverseDirection) initialDelta * -1 else initialDelta,
+            startEvent.uptimeMillis
+        )
+    )
 
     val dragTick: (PointerInputChange) -> Unit = { event: PointerInputChange ->
-        velocityTracker.addPosition(event.uptimeMillis, event.position)
         val delta = event.positionChange().toFloat(orientation)
         event.consumePositionChange()
-        channel.offer(DragDelta(if (reverseDirection) delta * -1 else delta))
+        channel.offer(DragDelta(if (reverseDirection) delta * -1 else delta, event.uptimeMillis))
     }
     return if (orientation == Orientation.Vertical) {
         verticalDrag(startEvent.id, dragTick)
@@ -362,12 +356,12 @@ private class DragLogic(
         onDragStarted.invoke(this, event.startPoint)
     }
 
-    suspend fun CoroutineScope.processDragStop(event: DragStopped) {
+    suspend fun CoroutineScope.processDragStop(velocity: Float) {
         dragStartInteraction.value?.let { interaction ->
             interactionSource?.emit(DragInteraction.Stop(interaction))
             dragStartInteraction.value = null
         }
-        onDragStopped.invoke(this, event.velocity)
+        onDragStopped.invoke(this, velocity)
     }
 
     suspend fun CoroutineScope.processDragCancel() {
@@ -401,9 +395,9 @@ private class DefaultDraggableState(val onDelta: (Float) -> Unit) : DraggableSta
 
 private sealed class DragEvent {
     class DragStarted(val startPoint: Offset) : DragEvent()
-    class DragStopped(val velocity: Float) : DragEvent()
+    object DragStopped : DragEvent()
     object DragCancelled : DragEvent()
-    class DragDelta(val delta: Float) : DragEvent()
+    class DragDelta(val delta: Float, val uptime: Long) : DragEvent()
 }
 
 private fun Float.toOffset(orientation: Orientation) =
@@ -414,3 +408,42 @@ private fun Offset.toFloat(orientation: Orientation) =
 
 private fun Velocity.toFloat(orientation: Orientation) =
     if (orientation == Orientation.Vertical) this.y else this.x
+
+// code below is for regression with nested scroll b/179417109
+// come up the proper solution (should be probably a new API for that)
+internal interface ConsumptionBasedDragScope {
+    fun dragBy(pixels: Float): Float
+}
+
+internal interface ConsumptionBasedDraggableState {
+    suspend fun drag(
+        dragPriority: MutatePriority = MutatePriority.Default,
+        block: suspend ConsumptionBasedDragScope.() -> Unit
+    )
+
+    fun dispatchRawDelta(delta: Float)
+}
+
+private class ConsumeAllDraggableState(val origin: DraggableState) :
+    ConsumptionBasedDraggableState, ConsumptionBasedDragScope {
+    var latestConsumptionScope: DragScope? = null
+
+    override fun dragBy(pixels: Float): Float {
+        latestConsumptionScope?.dragBy(pixels)
+        return pixels
+    }
+
+    override suspend fun drag(
+        dragPriority: MutatePriority,
+        block: suspend ConsumptionBasedDragScope.() -> Unit
+    ) {
+        origin.drag(dragPriority) {
+            latestConsumptionScope = this
+            block()
+        }
+    }
+
+    override fun dispatchRawDelta(delta: Float) {
+        origin.dispatchRawDelta(delta)
+    }
+}
