@@ -17,6 +17,9 @@ private data class CSSUnitValueTyped<out T : CSSUnit>(
 operator fun <T : CSSUnit> CSSSizeValue<T>.times(num: Number): CSSSizeValue<T> = newUnit(value * num.toFloat())
 operator fun <T : CSSUnit> Number.times(unit: CSSSizeValue<T>): CSSSizeValue<T> = unit.newUnit(unit.value * toFloat())
 
+operator fun <T : CSSUnit> CSSSizeValue<T>.div(num: Number): CSSSizeValue<T> = newUnit(value / num.toFloat())
+
+
 typealias CSSUnitValue = CSSSizeValue<CSSUnit>
 typealias CSSpxValue = CSSSizeValue<CSSUnit.px>
 

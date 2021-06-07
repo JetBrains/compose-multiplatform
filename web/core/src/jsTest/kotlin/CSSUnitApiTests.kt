@@ -9,6 +9,7 @@ import org.jetbrains.compose.web.css.ch
 import org.jetbrains.compose.web.css.cm
 import org.jetbrains.compose.web.css.cssRem
 import org.jetbrains.compose.web.css.deg
+import org.jetbrains.compose.web.css.div
 import org.jetbrains.compose.web.css.dpcm
 import org.jetbrains.compose.web.css.dpi
 import org.jetbrains.compose.web.css.dppx
@@ -148,6 +149,42 @@ class CSSUnitApiTests {
         assertEquals(16.dppx, 4.dppx * 4)
 
         assertEquals(16.fr, 4.fr * 4)
+    }
+
+    @Test
+    fun arithmeticDivisionLeft() {
+        assertEquals(1.percent, 4.percent / 4)
+
+        assertEquals(1.em, 4.em / 4)
+        assertEquals(1.ch, 4.ch / 4)
+
+        assertEquals(1.cssRem, 4.cssRem / 4)
+
+        assertEquals(1.vw, 4.vw / 4)
+        assertEquals(1.vh, 4.vh / 4)
+
+        assertEquals(1.vmin, 4.vmin / 4)
+        assertEquals(1.vmax, 4.vmax / 4)
+        assertEquals(1.cm, 4.cm / 4)
+        assertEquals(1.mm, 4.mm / 4)
+
+        assertEquals(1.pt, 4.pt / 4)
+        assertEquals(1.pc, 4.pc / 4)
+        assertEquals(1.px, 4.px / 4)
+
+        assertEquals(1.deg, 4.deg / 4)
+        assertEquals(1.grad, 4.grad / 4)
+        assertEquals(1.rad, 4.rad / 4)
+        assertEquals(1.turn, 4.turn / 4)
+
+        assertEquals(1.s, 4.s / 4)
+        assertEquals(1.ms, 4.ms / 4)
+
+        assertEquals(1.dpi, 4.dpi / 4)
+        assertEquals(1.dpcm, 4.dpcm / 4)
+        assertEquals(1.dppx, 4.dppx / 4)
+
+        assertEquals(1.fr, 4.fr / 4)
     }
 
     @Test
