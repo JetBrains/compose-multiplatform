@@ -16,6 +16,7 @@ import org.jetbrains.compose.web.css.dppx
 import org.jetbrains.compose.web.css.em
 import org.jetbrains.compose.web.css.fr
 import org.jetbrains.compose.web.css.grad
+import org.jetbrains.compose.web.css.minus
 import org.jetbrains.compose.web.css.mm
 import org.jetbrains.compose.web.css.ms
 import org.jetbrains.compose.web.css.number
@@ -258,5 +259,41 @@ class CSSUnitApiTests {
         assertEquals(13.dppx, 7.dppx + 4.dppx + 2.dppx)
 
         assertEquals(13.fr, 7.fr + 4.fr + 2.fr)
+    }
+
+    @Test
+    fun substractHomogenous() {
+        assertEquals(1.percent, 7.percent - 4.percent - 2.percent)
+
+        assertEquals(1.em, 7.em - 4.em - 2.em)
+        assertEquals(1.ch, 7.ch - 4.ch - 2.ch)
+
+        assertEquals(1.cssRem, 7.cssRem - 4.cssRem - 2.cssRem)
+
+        assertEquals(1.vw, 7.vw - 4.vw - 2.vw)
+        assertEquals(1.vh, 7.vh - 4.vh - 2.vh)
+
+        assertEquals(1.vmin, 7.vmin - 4.vmin - 2.vmin)
+        assertEquals(1.vmax, 7.vmax - 4.vmax - 2.vmax)
+        assertEquals(1.cm, 7.cm - 4.cm - 2.cm)
+        assertEquals(1.mm, 7.mm - 4.mm - 2.mm)
+
+        assertEquals(1.pt, 7.pt - 4.pt - 2.pt)
+        assertEquals(1.pc, 7.pc - 4.pc - 2.pc)
+        assertEquals(1.px, 7.px - 4.px - 2.px)
+
+        assertEquals(1.deg, 7.deg - 4.deg - 2.deg)
+        assertEquals(1.grad, 7.grad - 4.grad - 2.grad)
+        assertEquals(1.rad, 7.rad - 4.rad - 2.rad)
+        assertEquals(1.turn, 7.turn - 4.turn - 2.turn)
+
+        assertEquals(1.s, 7.s - 4.s - 2.s)
+        assertEquals(1.ms, 7.ms - 4.ms - 2.ms)
+
+        assertEquals(1.dpi, 7.dpi - 4.dpi - 2.dpi)
+        assertEquals(1.dpcm, 7.dpcm - 4.dpcm - 2.dpcm)
+        assertEquals(1.dppx, 7.dppx - 4.dppx - 2.dppx)
+
+        assertEquals(1.fr, 7.fr - 4.fr - 2.fr)
     }
 }
