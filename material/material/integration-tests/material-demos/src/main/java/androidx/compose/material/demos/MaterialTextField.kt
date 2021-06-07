@@ -68,7 +68,7 @@ import androidx.compose.ui.unit.dp
 @Composable
 fun TextFieldsDemo() {
     LazyColumn(
-        modifier = Modifier.fillMaxHeight()
+        modifier = Modifier.fillMaxHeight().width(300.dp)
     ) {
         item {
             Text("Password text field")
