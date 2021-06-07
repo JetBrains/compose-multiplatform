@@ -21,7 +21,11 @@ import androidx.build.RunApiTasks
 import androidx.build.SupportConfigKt
 
 import static androidx.build.AndroidXPlugin.BUILD_ON_SERVER_TASK
-import static androidx.build.dependencies.DependenciesKt.*
+import static androidx.build.dependencies.DependenciesKt.SKIKO_CURRENT_OS
+import static androidx.build.dependencies.DependenciesKt.SKIKO_LINUX_X64
+import static androidx.build.dependencies.DependenciesKt.SKIKO_MACOS_X64
+import static androidx.build.dependencies.DependenciesKt.SKIKO_MACOS_ARM64
+import static androidx.build.dependencies.DependenciesKt.SKIKO_WINDOWS_X64
 
 plugins {
     id("AndroidXPlugin")
@@ -40,7 +44,7 @@ kotlin {
 
     sourceSets {
         commonMain.dependencies {
-            implementation(KOTLIN_STDLIB_COMMON)
+            implementation(libs.kotlinStdlibCommon)
             implementation(project(":compose:ui:ui-util"))
             api(project(":compose:foundation:foundation"))
             api(project(":compose:material:material"))
@@ -49,20 +53,20 @@ kotlin {
         }
 
         jvmMain.dependencies {
-            implementation(KOTLIN_STDLIB)
-            implementation(KOTLIN_STDLIB_JDK8)
-            implementation(KOTLIN_COROUTINES_CORE)
+            implementation(libs.kotlinStdlib)
+            implementation(libs.kotlinStdlibJdk8)
+            implementation(libs.kotlinCoroutinesCore)
         }
 
         jvmTest {
             resources.srcDirs += new File(SupportConfigKt.getExternalProjectPath(project), "noto-fonts/other/")
             resources.srcDirs += "src/jvmTest/res"
             dependencies {
-                implementation(KOTLIN_COROUTINES_TEST)
+                implementation(libs.kotlinCoroutinesTest)
                 implementation(SKIKO_CURRENT_OS)
                 implementation(project(":compose:ui:ui-test-junit4"))
-                implementation(JUNIT)
-                implementation(TRUTH)
+                implementation(libs.junit)
+                implementation(libs.truth)
             }
         }
     }

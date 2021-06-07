@@ -14,8 +14,6 @@
  * limitations under the License.
  */
 
-import static androidx.build.dependencies.DependenciesKt.*
-
 plugins {
     id("AndroidXPlugin")
     id("AndroidXComposePlugin")
@@ -25,7 +23,7 @@ plugins {
 
 dependencies {
     kotlinPlugin(projectOrArtifact(":compose:compiler:compiler"))
-    implementation(KOTLIN_STDLIB)
+    implementation(libs.kotlinStdlib)
 
     api("androidx.activity:activity:1.2.0")
     implementation(projectOrArtifact(":compose:runtime:runtime"))
