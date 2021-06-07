@@ -314,11 +314,17 @@ internal fun OutlinedTextFieldLayout(
     BasicTextField(
         value = value,
         modifier = modifier
+            .then(
+                if (decoratedLabel != null) {
+                    Modifier.padding(top = OutlinedTextFieldTopPadding)
+                } else {
+                    Modifier
+                }
+            )
             .defaultMinSize(
                 minWidth = MinWidth,
-                minHeight = MinHeight + OutlinedTextFieldTopPadding,
-            )
-            .padding(top = OutlinedTextFieldTopPadding),
+                minHeight = MinHeight,
+            ),
         onValueChange = onValueChange,
         enabled = enabled,
         readOnly = readOnly,
