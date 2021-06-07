@@ -149,4 +149,40 @@ class CSSUnitApiTests {
 
         assertEquals(16.fr, 4.fr * 4)
     }
+
+    @Test
+    fun arithmeticMultiplicationRight() {
+        assertEquals(12.percent, 3 * 4.percent)
+
+        assertEquals(12.em, 3 * 4.em)
+        assertEquals(12.ch, 3 * 4.ch)
+
+        assertEquals(12.cssRem, 3 * 4.cssRem)
+
+        assertEquals(12.vw, 3 * 4.vw)
+        assertEquals(12.vh, 3 * 4.vh)
+
+        assertEquals(12.vmin, 3 * 4.vmin)
+        assertEquals(12.vmax, 3 * 4.vmax)
+        assertEquals(12.cm, 3 * 4.cm)
+        assertEquals(12.mm, 3 * 4.mm)
+
+        assertEquals(12.pt, 3 * 4.pt)
+        assertEquals(12.pc, 3 * 4.pc)
+        assertEquals(12.px, 3 * 4.px)
+
+        assertEquals(12.deg, 3 * 4.deg)
+        assertEquals(12.grad, 3 * 4.grad)
+        assertEquals(12.rad, 3 * 4.rad)
+        assertEquals(12.turn, 3 * 4.turn)
+
+        assertEquals(12.s, 3 * 4.s)
+        assertEquals(12.ms, 3 * 4.ms)
+
+        assertEquals(12.dpi, 3 * 4.dpi)
+        assertEquals(12.dpcm, 3 * 4.dpcm)
+        assertEquals(12.dppx, 3 * 4.dppx)
+
+        assertEquals(12.fr, 3 * 4.fr)
+    }
 }
