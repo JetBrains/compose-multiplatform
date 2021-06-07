@@ -15,11 +15,8 @@
  */
 
 import androidx.build.LibraryGroups
-import androidx.build.LibraryVersions
 import androidx.build.Publish
 import androidx.build.RunApiTasks
-
-import static androidx.build.dependencies.DependenciesKt.getKOTLIN_STDLIB
 
 plugins {
     id("AndroidXPlugin")
@@ -27,7 +24,7 @@ plugins {
 }
 
 dependencies {
-    implementation(KOTLIN_STDLIB)
+    implementation(libs.kotlinStdlib)
 }
 
 androidx {
