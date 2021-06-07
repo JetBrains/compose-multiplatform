@@ -136,7 +136,11 @@ interface NestedScrollConnection {
  */
 class NestedScrollDispatcher {
 
-    internal var calculateNestedScrollScope: () -> CoroutineScope? = { null }
+    // lambda to calculate the most outer nested scroll scope for this dispatcher on demand
+    internal var calculateNestedScrollScope: () -> CoroutineScope? = { originNestedScrollScope }
+
+    // the original nested scroll scope for this dispatcher (immediate scope it was created in)
+    internal var originNestedScrollScope: CoroutineScope? = null
 
     /**
      * Get the outer coroutine scope to dispatch nested fling on.
@@ -354,7 +358,7 @@ fun Modifier.nestedScroll(
     remember(connection, resolvedDispatcher, scope) {
         object : NestedScrollModifier {
             override val dispatcher: NestedScrollDispatcher = resolvedDispatcher.also {
-                it.calculateNestedScrollScope = { scope }
+                it.originNestedScrollScope = scope
             }
             override val connection: NestedScrollConnection = connection
         }
