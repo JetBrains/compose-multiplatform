@@ -37,6 +37,7 @@ import androidx.compose.material.MaterialTheme
 import androidx.compose.material.OutlinedTextField
 import androidx.compose.material.Strings
 import androidx.compose.material.Text
+import androidx.compose.material.TextFieldDefaults
 import androidx.compose.material.TextFieldPadding
 import androidx.compose.material.runOnIdleWithDensity
 import androidx.compose.material.setMaterialContent
@@ -53,6 +54,7 @@ import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.layout.positionInRoot
 import androidx.compose.ui.node.Ref
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalTextInputService
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.semantics.SemanticsProperties
@@ -75,6 +77,7 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.PlatformTextInputService
 import androidx.compose.ui.text.input.TextInputService
+import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
 import androidx.test.ext.junit.runners.AndroidJUnit4
@@ -199,6 +202,36 @@ class OutlinedTextFieldTest {
         rule.runOnIdleWithDensity {
             assertThat(focused).isTrue()
         }
+    }
+
+    @Test
+    @SdkSuppress(minSdkVersion = Build.VERSION_CODES.O)
+    fun testOutlinedTextField_noTopPadding_ifNoLabel() {
+        val density = Density(4f)
+        rule.setMaterialContent {
+            CompositionLocalProvider(LocalDensity provides density) {
+                Box(Modifier.testTag("box").background(Color.Red)) {
+                    OutlinedTextField(
+                        value = "",
+                        onValueChange = {},
+                        colors = TextFieldDefaults.outlinedTextFieldColors(
+                            textColor = Color.White,
+                            unfocusedBorderColor = Color.White
+                        ),
+                        shape = RectangleShape
+                    )
+                }
+            }
+        }
+
+        rule.onNodeWithTag("box").captureToImage().assertShape(
+            density = density,
+            horizontalPadding = 1.dp, // OutlinedTextField border thickness
+            verticalPadding = 1.dp, // OutlinedTextField border thickness
+            backgroundColor = Color.White, // OutlinedTextField border color
+            shapeColor = Color.Red, // Color of background as OutlinedTextField is transparent
+            shape = RectangleShape
+        )
     }
 
     @Test
