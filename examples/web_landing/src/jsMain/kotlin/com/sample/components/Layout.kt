@@ -17,7 +17,7 @@ fun Layout(content: @Composable () -> Unit) {
             flexDirection(FlexDirection.Column)
             height(100.percent)
             margin(0.px)
-            property("box-sizing", "border-box".asStylePropertyValue())
+            property("box-sizing", "border-box")
         }
     }) {
         content()
@@ -28,8 +28,8 @@ fun Layout(content: @Composable () -> Unit) {
 fun MainContentLayout(content: @Composable () -> Unit) {
     Main({
         style {
-            property("flex", value("1 0 auto"))
-            property("box-sizing", "border-box".asStylePropertyValue())
+            property("flex", "1 0 auto")
+            property("box-sizing", "border-box")
         }
     }) {
         content()

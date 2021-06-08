@@ -26,14 +26,14 @@ object AppCSSVariables : CSSVariables {
 
 object AppStylesheet : StyleSheet() {
     val composeLogo by style {
-        property("max-width", value(100.percent))
+        property("max-width", 100.percent)
     }
 
     val composeTitleTag by style {
-        property("padding", value("5px 12px"))
-        property("letter-spacing", value("normal"))
-        property("font-weight", value(400))
-        property("line-height", value(24.px))
+        property("padding", "5px 12px")
+        property("letter-spacing", "normal")
+        property("font-weight", 400)
+        property("line-height", 24.px)
 
         position(Position.Relative)
         top((-32).px)
@@ -54,7 +54,7 @@ object AppStylesheet : StyleSheet() {
         "label, a, button" style {
             property(
                 "font-family",
-                value("system-ui,-apple-system,BlinkMacSystemFont,Segoe UI,Roboto,Oxygen,Ubuntu,Cantarell,Droid Sans,Helvetica Neue,Arial,sans-serif")
+                "system-ui,-apple-system,BlinkMacSystemFont,Segoe UI,Roboto,Oxygen,Ubuntu,Cantarell,Droid Sans,Helvetica Neue,Arial,sans-serif"
             )
         }
 
@@ -83,13 +83,13 @@ object AppStylesheet : StyleSheet() {
 
             property(
                 "flex-basis",
-                value("calc(8.33333%*${AppCSSVariables.wtColCount.value()} - ${AppCSSVariables.wtHorizontalLayoutGutter.value()}*2)")
+                "calc(8.33333%*${AppCSSVariables.wtColCount.value()} - ${AppCSSVariables.wtHorizontalLayoutGutter.value()}*2)"
             )
             property(
                 "max-width",
-                value("calc(8.33333%*${AppCSSVariables.wtColCount.value()} - ${AppCSSVariables.wtHorizontalLayoutGutter.value()}*2)")
+                "calc(8.33333%*${AppCSSVariables.wtColCount.value()} - ${AppCSSVariables.wtHorizontalLayoutGutter.value()}*2)"
             )
-            property("box-sizing", value("border-box"))
+            property("box-sizing", "border-box")
         }
     }
 }
