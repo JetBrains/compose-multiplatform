@@ -32,7 +32,6 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.runtime.Composable
 import androidx.compose.testutils.assertAgainstGolden
-import androidx.compose.testutils.runBlockingWithManualClock
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.GOLDEN_UI
 import androidx.compose.ui.Modifier
@@ -42,7 +41,6 @@ import androidx.compose.ui.graphics.Color.Companion.Green
 import androidx.compose.ui.graphics.Color.Companion.LightGray
 import androidx.compose.ui.graphics.Color.Companion.Red
 import androidx.compose.ui.platform.testTag
-import androidx.compose.ui.test.ExperimentalTestApi
 import androidx.compose.ui.test.captureToImage
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
@@ -50,17 +48,13 @@ import androidx.compose.ui.unit.dp
 import androidx.test.filters.MediumTest
 import androidx.test.filters.SdkSuppress
 import androidx.test.screenshot.AndroidXScreenshotTestRule
-import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.runBlocking
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.junit.runners.Parameterized
 
-@OptIn(
-    ExperimentalTestApi::class,
-    ExperimentalComposeUiApi::class,
-    ExperimentalCoroutinesApi::class
-)
+@OptIn(ExperimentalComposeUiApi::class)
 @MediumTest
 @RunWith(Parameterized::class)
 @SdkSuppress(minSdkVersion = O)
@@ -108,7 +102,6 @@ class RelocationRequesterModifierTest(private val orientation: Orientation) {
         rule.runOnIdle { relocationRequester.bringIntoView() }
 
         // Assert.
-        rule.waitForIdle()
         assertScreenshot(if (horizontal) "blueBoxLeft" else "blueBoxTop")
     }
 
@@ -147,7 +140,6 @@ class RelocationRequesterModifierTest(private val orientation: Orientation) {
         rule.runOnIdle { relocationRequester.bringIntoView() }
 
         // Assert.
-        rule.waitForIdle()
         assertScreenshot(if (horizontal) "grayRectangleHorizontal" else "grayRectangleVertical")
     }
 
@@ -186,7 +178,6 @@ class RelocationRequesterModifierTest(private val orientation: Orientation) {
         rule.runOnIdle { relocationRequester.bringIntoView() }
 
         // Assert.
-        rule.waitForIdle()
         assertScreenshot(if (horizontal) "blueBoxLeft" else "blueBoxTop")
     }
 
@@ -231,7 +222,6 @@ class RelocationRequesterModifierTest(private val orientation: Orientation) {
         rule.runOnIdle { relocationRequester.bringIntoView() }
 
         // Assert.
-        rule.waitForIdle()
         assertScreenshot(if (horizontal) "blueBoxRight" else "blueBoxBottom")
     }
 
@@ -276,7 +266,6 @@ class RelocationRequesterModifierTest(private val orientation: Orientation) {
         rule.runOnIdle { relocationRequester.bringIntoView() }
 
         // Assert.
-        rule.waitForIdle()
         assertScreenshot(if (horizontal) "blueBoxCenterHorizontal" else "blueBoxCenterVertical")
     }
 
@@ -311,52 +300,52 @@ class RelocationRequesterModifierTest(private val orientation: Orientation) {
         rule.runOnIdle { relocationRequester.bringIntoView() }
 
         // Assert.
+        assertScreenshot("blueBox")
+    }
+
+    @Test
+    fun itemBiggerThanParentAtTrailingEdge_alreadyVisible_noChange() {
+        // Arrange.
+        val relocationRequester = RelocationRequester()
+        lateinit var scrollState: ScrollState
+        rule.setContent {
+            scrollState = rememberScrollState()
+            Box(
+                Modifier
+                    .size(50.dp)
+                    .testTag(parentBox)
+                    .background(LightGray)
+                    .then(
+                        when (orientation) {
+                            Horizontal -> Modifier.horizontalScroll(scrollState)
+                            Vertical -> Modifier.verticalScroll(scrollState)
+                        }
+                    )
+            ) {
+                // Using a multi-colored item to make sure we can assert that the right part of
+                // the item is visible.
+                RowOrColumn(Modifier.relocationRequester(relocationRequester)) {
+                    Box(Modifier.size(50.dp).background(Red))
+                    Box(Modifier.size(50.dp).background(Green))
+                    Box(Modifier.size(50.dp).background(Blue))
+                }
+            }
+        }
         rule.waitForIdle()
-        assertScreenshot("blueBox")
-    }
-
-    @Test
-    fun itemBiggerThanParentAtTrailingEdge_alreadyVisible_noChange() = runBlockingWithManualClock {
-        // Arrange.
-        val relocationRequester = RelocationRequester()
-        lateinit var scrollState: ScrollState
-        rule.setContent {
-            scrollState = rememberScrollState()
-            Box(
-                Modifier
-                    .size(50.dp)
-                    .testTag(parentBox)
-                    .background(LightGray)
-                    .then(
-                        when (orientation) {
-                            Horizontal -> Modifier.horizontalScroll(scrollState)
-                            Vertical -> Modifier.verticalScroll(scrollState)
-                        }
-                    )
-            ) {
-                // Using a multi-colored item to make sure we can assert that the right part of
-                // the item is visible.
-                RowOrColumn(Modifier.relocationRequester(relocationRequester)) {
-                    Box(Modifier.size(50.dp).background(Red))
-                    Box(Modifier.size(50.dp).background(Green))
-                    Box(Modifier.size(50.dp).background(Blue))
-                }
-            }
+        runBlocking {
+            scrollState.scrollTo(scrollState.maxValue)
         }
-        rule.awaitIdle()
-        scrollState.scrollTo(scrollState.maxValue)
-        rule.awaitIdle()
+        rule.waitForIdle()
 
         // Act.
         relocationRequester.bringIntoView()
 
         // Assert.
-        rule.awaitIdle()
         assertScreenshot("blueBox")
     }
 
     @Test
-    fun itemBiggerThanParentAtCenter_alreadyVisible_noChange() = runBlockingWithManualClock {
+    fun itemBiggerThanParentAtCenter_alreadyVisible_noChange() {
         // Arrange.
         val relocationRequester = RelocationRequester()
         lateinit var scrollState: ScrollState
@@ -383,247 +372,248 @@ class RelocationRequesterModifierTest(private val orientation: Orientation) {
                 }
             }
         }
-        rule.awaitIdle()
-        scrollState.scrollTo(scrollState.maxValue / 2)
-        rule.awaitIdle()
-
-        // Act.
-        relocationRequester.bringIntoView()
-
-        // Assert.
-        rule.awaitIdle()
-        assertScreenshot("blueBox")
-    }
-
-    @Test
-    fun childBeforeVisibleBounds_parentIsScrolledSoThatLeadingEdgeOfChildIsVisible() =
-        runBlockingWithManualClock {
-            // Arrange.
-            val relocationRequester = RelocationRequester()
-            lateinit var scrollState: ScrollState
-            rule.setContent {
-                scrollState = rememberScrollState()
-                Box(
-                    Modifier
-                        .testTag(parentBox)
-                        .background(LightGray)
-                        .then(
-                            when (orientation) {
-                                Horizontal ->
-                                    Modifier
-                                        .size(100.dp, 50.dp)
-                                        .horizontalScroll(scrollState)
-                                Vertical ->
-                                    Modifier
-                                        .size(50.dp, 100.dp)
-                                        .verticalScroll(scrollState)
-                            }
-                        )
-                ) {
-                    Box(
-                        when (orientation) {
-                            Horizontal -> Modifier.size(200.dp, 50.dp)
-                            Vertical -> Modifier.size(50.dp, 200.dp)
-                        }
-                    ) {
-                        Box(
-                            Modifier
-                                .then(
-                                    when (orientation) {
-                                        Horizontal -> Modifier.offset(x = 50.dp)
-                                        Vertical -> Modifier.offset(y = 50.dp)
-                                    }
-                                )
-                                .size(50.dp)
-                                .background(Blue)
-                                .relocationRequester(relocationRequester)
-                        )
-                    }
-                }
-            }
-            rule.awaitIdle()
-            scrollState.scrollTo(scrollState.maxValue)
-            rule.awaitIdle()
-
-            // Act.
-            relocationRequester.bringIntoView()
-
-            // Assert.
-            rule.awaitIdle()
-            assertScreenshot(if (horizontal) "blueBoxLeft" else "blueBoxTop")
-        }
-
-    @Test
-    fun childAfterVisibleBounds_parentIsScrolledSoThatTrailingEdgeOfChildIsVisible() =
-        runBlockingWithManualClock {
-            // Arrange.
-            val relocationRequester = RelocationRequester()
-            lateinit var scrollState: ScrollState
-            rule.setContent {
-                scrollState = rememberScrollState()
-                Box(
-                    Modifier
-                        .testTag(parentBox)
-                        .background(LightGray)
-                        .then(
-                            when (orientation) {
-                                Horizontal ->
-                                    Modifier
-                                        .size(100.dp, 50.dp)
-                                        .horizontalScroll(scrollState)
-                                Vertical ->
-                                    Modifier
-                                        .size(50.dp, 100.dp)
-                                        .verticalScroll(scrollState)
-                            }
-                        )
-                ) {
-                    Box(
-                        when (orientation) {
-                            Horizontal -> Modifier.size(200.dp, 50.dp)
-                            Vertical -> Modifier.size(50.dp, 200.dp)
-                        }
-                    ) {
-                        Box(
-                            Modifier
-                                .then(
-                                    when (orientation) {
-                                        Horizontal -> Modifier.offset(x = 150.dp)
-                                        Vertical -> Modifier.offset(y = 150.dp)
-                                    }
-                                )
-                                .size(50.dp)
-                                .background(Blue)
-                                .relocationRequester(relocationRequester)
-                        )
-                    }
-                }
-            }
-            rule.awaitIdle()
-            scrollState.scrollTo(scrollState.maxValue)
-            rule.awaitIdle()
-
-            // Act.
-            relocationRequester.bringIntoView()
-
-            // Assert.
-            rule.awaitIdle()
-            assertScreenshot(if (horizontal) "blueBoxRight" else "blueBoxBottom")
-        }
-
-    @Test
-    fun childPartiallyVisible_parentIsScrolledSoThatLeadingEdgeOfChildIsVisible() =
-        runBlockingWithManualClock {
-            // Arrange.
-            val relocationRequester = RelocationRequester()
-            lateinit var scrollState: ScrollState
-            rule.setContent {
-                scrollState = rememberScrollState()
-                Box(
-                    Modifier
-                        .testTag(parentBox)
-                        .background(LightGray)
-                        .then(
-                            when (orientation) {
-                                Horizontal ->
-                                    Modifier
-                                        .size(100.dp, 50.dp)
-                                        .horizontalScroll(scrollState)
-                                Vertical ->
-                                    Modifier
-                                        .size(50.dp, 100.dp)
-                                        .verticalScroll(scrollState)
-                            }
-                        )
-                ) {
-                    Box(Modifier.size(200.dp)) {
-                        Box(
-                            Modifier
-                                .then(
-                                    when (orientation) {
-                                        Horizontal -> Modifier.offset(x = 25.dp)
-                                        Vertical -> Modifier.offset(y = 25.dp)
-                                    }
-                                )
-                                .size(50.dp)
-                                .background(Blue)
-                                .relocationRequester(relocationRequester)
-                        )
-                    }
-                }
-            }
-            rule.awaitIdle()
+        rule.waitForIdle()
+        runBlocking {
             scrollState.scrollTo(scrollState.maxValue / 2)
-            rule.awaitIdle()
-
-            // Act.
-            relocationRequester.bringIntoView()
-
-            // Assert.
-            rule.awaitIdle()
-            assertScreenshot(if (horizontal) "blueBoxLeft" else "blueBoxTop")
         }
+        rule.waitForIdle()
+
+        // Act.
+        relocationRequester.bringIntoView()
+
+        // Assert.
+        assertScreenshot("blueBox")
+    }
 
     @Test
-    fun childPartiallyVisible_parentIsScrolledSoThatTrailingEdgeOfChildIsVisible() =
-        runBlockingWithManualClock {
-            // Arrange.
-            val relocationRequester = RelocationRequester()
-            lateinit var scrollState: ScrollState
-            rule.setContent {
-                scrollState = rememberScrollState()
+    fun childBeforeVisibleBounds_parentIsScrolledSoThatLeadingEdgeOfChildIsVisible() {
+        // Arrange.
+        val relocationRequester = RelocationRequester()
+        lateinit var scrollState: ScrollState
+        rule.setContent {
+            scrollState = rememberScrollState()
+            Box(
+                Modifier
+                    .testTag(parentBox)
+                    .background(LightGray)
+                    .then(
+                        when (orientation) {
+                            Horizontal ->
+                                Modifier
+                                    .size(100.dp, 50.dp)
+                                    .horizontalScroll(scrollState)
+                            Vertical ->
+                                Modifier
+                                    .size(50.dp, 100.dp)
+                                    .verticalScroll(scrollState)
+                        }
+                    )
+            ) {
                 Box(
-                    Modifier
-                        .testTag(parentBox)
-                        .background(LightGray)
-                        .then(
-                            when (orientation) {
-                                Horizontal ->
-                                    Modifier
-                                        .size(100.dp, 50.dp)
-                                        .horizontalScroll(scrollState)
-                                Vertical ->
-                                    Modifier
-                                        .size(50.dp, 100.dp)
-                                        .verticalScroll(scrollState)
-                            }
-                        )
+                    when (orientation) {
+                        Horizontal -> Modifier.size(200.dp, 50.dp)
+                        Vertical -> Modifier.size(50.dp, 200.dp)
+                    }
                 ) {
                     Box(
-                        when (orientation) {
-                            Horizontal -> Modifier.size(200.dp, 50.dp)
-                            Vertical -> Modifier.size(50.dp, 200.dp)
-                        }
-                    ) {
-                        Box(
-                            Modifier
-                                .then(
-                                    when (orientation) {
-                                        Horizontal -> Modifier.offset(x = 150.dp)
-                                        Vertical -> Modifier.offset(y = 150.dp)
-                                    }
-                                )
-                                .size(50.dp)
-                                .background(Blue)
-                                .relocationRequester(relocationRequester)
-                        )
-                    }
+                        Modifier
+                            .then(
+                                when (orientation) {
+                                    Horizontal -> Modifier.offset(x = 50.dp)
+                                    Vertical -> Modifier.offset(y = 50.dp)
+                                }
+                            )
+                            .size(50.dp)
+                            .background(Blue)
+                            .relocationRequester(relocationRequester)
+                    )
                 }
             }
-            rule.awaitIdle()
-            scrollState.scrollTo(scrollState.maxValue)
-            rule.awaitIdle()
-
-            // Act.
-            relocationRequester.bringIntoView()
-
-            // Assert.
-            rule.awaitIdle()
-            assertScreenshot(if (horizontal) "blueBoxRight" else "blueBoxBottom")
         }
+        rule.waitForIdle()
+        runBlocking {
+            scrollState.scrollTo(scrollState.maxValue)
+        }
+        rule.waitForIdle()
+
+        // Act.
+        relocationRequester.bringIntoView()
+
+        // Assert.
+        assertScreenshot(if (horizontal) "blueBoxLeft" else "blueBoxTop")
+    }
 
     @Test
-    fun multipleParentsAreScrolledSoThatChildIsVisible() = runBlockingWithManualClock {
+    fun childAfterVisibleBounds_parentIsScrolledSoThatTrailingEdgeOfChildIsVisible() {
+        // Arrange.
+        val relocationRequester = RelocationRequester()
+        lateinit var scrollState: ScrollState
+        rule.setContent {
+            scrollState = rememberScrollState()
+            Box(
+                Modifier
+                    .testTag(parentBox)
+                    .background(LightGray)
+                    .then(
+                        when (orientation) {
+                            Horizontal ->
+                                Modifier
+                                    .size(100.dp, 50.dp)
+                                    .horizontalScroll(scrollState)
+                            Vertical ->
+                                Modifier
+                                    .size(50.dp, 100.dp)
+                                    .verticalScroll(scrollState)
+                        }
+                    )
+            ) {
+                Box(
+                    when (orientation) {
+                        Horizontal -> Modifier.size(200.dp, 50.dp)
+                        Vertical -> Modifier.size(50.dp, 200.dp)
+                    }
+                ) {
+                    Box(
+                        Modifier
+                            .then(
+                                when (orientation) {
+                                    Horizontal -> Modifier.offset(x = 150.dp)
+                                    Vertical -> Modifier.offset(y = 150.dp)
+                                }
+                            )
+                            .size(50.dp)
+                            .background(Blue)
+                            .relocationRequester(relocationRequester)
+                    )
+                }
+            }
+        }
+        rule.waitForIdle()
+        runBlocking {
+            scrollState.scrollTo(scrollState.maxValue)
+        }
+        rule.waitForIdle()
+
+        // Act.
+        relocationRequester.bringIntoView()
+
+        // Assert.
+        assertScreenshot(if (horizontal) "blueBoxRight" else "blueBoxBottom")
+    }
+
+    @Test
+    fun childPartiallyVisible_parentIsScrolledSoThatLeadingEdgeOfChildIsVisible() {
+        // Arrange.
+        val relocationRequester = RelocationRequester()
+        lateinit var scrollState: ScrollState
+        rule.setContent {
+            scrollState = rememberScrollState()
+            Box(
+                Modifier
+                    .testTag(parentBox)
+                    .background(LightGray)
+                    .then(
+                        when (orientation) {
+                            Horizontal ->
+                                Modifier
+                                    .size(100.dp, 50.dp)
+                                    .horizontalScroll(scrollState)
+                            Vertical ->
+                                Modifier
+                                    .size(50.dp, 100.dp)
+                                    .verticalScroll(scrollState)
+                        }
+                    )
+            ) {
+                Box(Modifier.size(200.dp)) {
+                    Box(
+                        Modifier
+                            .then(
+                                when (orientation) {
+                                    Horizontal -> Modifier.offset(x = 25.dp)
+                                    Vertical -> Modifier.offset(y = 25.dp)
+                                }
+                            )
+                            .size(50.dp)
+                            .background(Blue)
+                            .relocationRequester(relocationRequester)
+                    )
+                }
+            }
+        }
+        rule.waitForIdle()
+        runBlocking {
+            scrollState.scrollTo(scrollState.maxValue / 2)
+        }
+        rule.waitForIdle()
+
+        // Act.
+        relocationRequester.bringIntoView()
+
+        // Assert.
+        assertScreenshot(if (horizontal) "blueBoxLeft" else "blueBoxTop")
+    }
+
+    @Test
+    fun childPartiallyVisible_parentIsScrolledSoThatTrailingEdgeOfChildIsVisible() {
+        // Arrange.
+        val relocationRequester = RelocationRequester()
+        lateinit var scrollState: ScrollState
+        rule.setContent {
+            scrollState = rememberScrollState()
+            Box(
+                Modifier
+                    .testTag(parentBox)
+                    .background(LightGray)
+                    .then(
+                        when (orientation) {
+                            Horizontal ->
+                                Modifier
+                                    .size(100.dp, 50.dp)
+                                    .horizontalScroll(scrollState)
+                            Vertical ->
+                                Modifier
+                                    .size(50.dp, 100.dp)
+                                    .verticalScroll(scrollState)
+                        }
+                    )
+            ) {
+                Box(
+                    when (orientation) {
+                        Horizontal -> Modifier.size(200.dp, 50.dp)
+                        Vertical -> Modifier.size(50.dp, 200.dp)
+                    }
+                ) {
+                    Box(
+                        Modifier
+                            .then(
+                                when (orientation) {
+                                    Horizontal -> Modifier.offset(x = 150.dp)
+                                    Vertical -> Modifier.offset(y = 150.dp)
+                                }
+                            )
+                            .size(50.dp)
+                            .background(Blue)
+                            .relocationRequester(relocationRequester)
+                    )
+                }
+            }
+        }
+        rule.waitForIdle()
+        runBlocking {
+            scrollState.scrollTo(scrollState.maxValue)
+        }
+        rule.waitForIdle()
+
+        // Act.
+        relocationRequester.bringIntoView()
+
+        // Assert.
+        assertScreenshot(if (horizontal) "blueBoxRight" else "blueBoxBottom")
+    }
+
+    @Test
+    fun multipleParentsAreScrolledSoThatChildIsVisible() {
         // Arrange.
         val relocationRequester = RelocationRequester()
         lateinit var parentScrollState: ScrollState
@@ -686,83 +676,88 @@ class RelocationRequesterModifierTest(private val orientation: Orientation) {
                 }
             }
         }
-        rule.awaitIdle()
-        parentScrollState.scrollTo(parentScrollState.maxValue)
-        rule.awaitIdle()
-        grandParentScrollState.scrollTo(grandParentScrollState.maxValue)
-        rule.awaitIdle()
+        rule.waitForIdle()
+        runBlocking {
+            parentScrollState.scrollTo(parentScrollState.maxValue)
+        }
+        rule.waitForIdle()
+        runBlocking {
+            grandParentScrollState.scrollTo(grandParentScrollState.maxValue)
+        }
+        rule.waitForIdle()
 
         // Act.
         relocationRequester.bringIntoView()
 
         // Assert.
-        rule.awaitIdle()
         assertScreenshot(if (horizontal) "blueBoxLeft" else "blueBoxTop")
     }
 
     @Test
-    fun multipleParentsAreScrolledInDifferentDirectionsSoThatChildIsVisible() =
-        runBlockingWithManualClock {
-            // Arrange.
-            val relocationRequester = RelocationRequester()
-            lateinit var parentScrollState: ScrollState
-            lateinit var grandParentScrollState: ScrollState
-            rule.setContent {
-                parentScrollState = rememberScrollState()
-                grandParentScrollState = rememberScrollState()
+    fun multipleParentsAreScrolledInDifferentDirectionsSoThatChildIsVisible() {
+        // Arrange.
+        val relocationRequester = RelocationRequester()
+        lateinit var parentScrollState: ScrollState
+        lateinit var grandParentScrollState: ScrollState
+        rule.setContent {
+            parentScrollState = rememberScrollState()
+            grandParentScrollState = rememberScrollState()
+            Box(
+                Modifier
+                    .testTag(parentBox)
+                    .background(LightGray)
+                    .then(
+                        when (orientation) {
+                            Horizontal ->
+                                Modifier
+                                    .size(100.dp, 50.dp)
+                                    .verticalScroll(grandParentScrollState)
+                            Vertical ->
+                                Modifier
+                                    .size(50.dp, 100.dp)
+                                    .horizontalScroll(grandParentScrollState)
+                        }
+                    )
+            ) {
                 Box(
                     Modifier
-                        .testTag(parentBox)
+                        .size(100.dp)
                         .background(LightGray)
                         .then(
                             when (orientation) {
-                                Horizontal ->
-                                    Modifier
-                                        .size(100.dp, 50.dp)
-                                        .verticalScroll(grandParentScrollState)
-                                Vertical ->
-                                    Modifier
-                                        .size(50.dp, 100.dp)
-                                        .horizontalScroll(grandParentScrollState)
+                                Horizontal -> Modifier.horizontalScroll(parentScrollState)
+                                Vertical -> Modifier.verticalScroll(parentScrollState)
                             }
                         )
                 ) {
-                    Box(
-                        Modifier
-                            .size(100.dp)
-                            .background(LightGray)
-                            .then(
-                                when (orientation) {
-                                    Horizontal -> Modifier.horizontalScroll(parentScrollState)
-                                    Vertical -> Modifier.verticalScroll(parentScrollState)
-                                }
-                            )
-                    ) {
-                        Box(Modifier.size(200.dp)) {
-                            Box(
-                                Modifier
-                                    .offset(x = 25.dp, y = 25.dp)
-                                    .size(50.dp)
-                                    .background(Blue)
-                                    .relocationRequester(relocationRequester)
-                            )
-                        }
+                    Box(Modifier.size(200.dp)) {
+                        Box(
+                            Modifier
+                                .offset(x = 25.dp, y = 25.dp)
+                                .size(50.dp)
+                                .background(Blue)
+                                .relocationRequester(relocationRequester)
+                        )
                     }
                 }
             }
-            rule.awaitIdle()
-            parentScrollState.scrollTo(parentScrollState.maxValue)
-            rule.awaitIdle()
-            grandParentScrollState.scrollTo(grandParentScrollState.maxValue)
-            rule.awaitIdle()
-
-            // Act.
-            relocationRequester.bringIntoView()
-
-            // Assert.
-            rule.awaitIdle()
-            assertScreenshot(if (horizontal) "blueBoxLeft" else "blueBoxTop")
         }
+        rule.waitForIdle()
+        runBlocking {
+            parentScrollState.scrollTo(parentScrollState.maxValue)
+        }
+        rule.waitForIdle()
+        runBlocking {
+            grandParentScrollState.scrollTo(grandParentScrollState.maxValue)
+        }
+        rule.waitForIdle()
+
+        // Act.
+        relocationRequester.bringIntoView()
+
+        // Assert.
+        assertScreenshot(if (horizontal) "blueBoxLeft" else "blueBoxTop")
+    }
 
     private val horizontal: Boolean get() = (orientation == Horizontal)
 
