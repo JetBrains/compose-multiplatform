@@ -237,7 +237,7 @@ private fun Project.makeErrorProneTask(
             val compileTask = compileTaskProvider.get()
             it.classpath = compileTask.classpath
             it.source = compileTask.source
-            it.destinationDir = file(buildDir.resolve("errorProne"))
+            it.destinationDirectory.set(file(buildDir.resolve("errorProne")))
             it.options.compilerArgs = compileTask.options.compilerArgs.toMutableList()
             it.options.annotationProcessorPath = compileTask.options.annotationProcessorPath
             it.options.bootstrapClasspath = compileTask.options.bootstrapClasspath
