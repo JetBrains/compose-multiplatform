@@ -31,6 +31,8 @@ internal class LazyListMeasureResult(
     val canScrollForward: Boolean,
     /** The amount of scroll consumed during the measure pass.*/
     val consumedScroll: Float,
+    /** List of items which were composed, but are not a part of [visibleItemsInfo].*/
+    val composedButNotVisibleItems: List<LazyMeasuredItem>?,
     // properties to be used by the Layout's measure result
     /** The calculated layout width */
     val layoutWidth: Int,
