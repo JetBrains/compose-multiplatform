@@ -33,6 +33,7 @@ dependencies {
     implementation(project(":compose:material:material-icons-extended"))
     implementation(project(":compose:runtime:runtime"))
     implementation(project(":compose:runtime:runtime-livedata"))
+    implementation(project(":compose:ui:ui-graphics"))
     implementation(project(":compose:ui:ui-test-junit4"))
     implementation(project(":compose:ui:ui-tooling"))
     implementation(project(":compose:ui:ui-viewbinding"))
