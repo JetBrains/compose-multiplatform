@@ -26,6 +26,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.requiredHeight
 import androidx.compose.foundation.layout.requiredSize
@@ -38,7 +39,6 @@ import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.testutils.assertIsEqualTo
 import androidx.compose.testutils.assertShape
@@ -76,9 +76,7 @@ import androidx.test.filters.MediumTest
 import androidx.test.filters.SdkSuppress
 import com.google.common.truth.Truth
 import com.google.common.truth.Truth.assertThat
-import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import org.junit.Rule
 import org.junit.Test
@@ -1238,15 +1236,12 @@ class LazyRowTest {
     @Test
     fun animateScrollToItemDoesNotScrollPastItem() {
         lateinit var state: LazyListState
-        lateinit var scope: CoroutineScope
         var target = 0
         var reverse = false
         rule.setContent {
             val listState = rememberLazyListState()
-            val effectScope = rememberCoroutineScope()
             SideEffect {
                 state = listState
-                scope = effectScope
             }
             LazyRow(Modifier.fillMaxSize(), listState) {
                 items(2500) { _ ->
@@ -1264,24 +1259,61 @@ class LazyRowTest {
         // Try a bunch of different targets with varying spacing
         listOf(500, 800, 1500, 1600, 1800).forEach {
             target = it
-            scope.launch {
-                state.animateScrollToItem(target)
+            rule.runOnIdle {
+                runBlocking(AutoTestFrameClock()) {
+                    state.animateScrollToItem(target)
+                }
             }
 
-            rule.waitForIdle()
-            assertThat(state.firstVisibleItemIndex).isEqualTo(target)
+            rule.runOnIdle {
+                assertThat(state.firstVisibleItemIndex).isEqualTo(target)
+                assertThat(state.firstVisibleItemScrollOffset).isEqualTo(0)
+            }
         }
 
         reverse = true
 
         listOf(1600, 1500, 800, 500, 0).forEach {
             target = it
-            scope.launch {
-                state.animateScrollToItem(target)
+            rule.runOnIdle {
+                runBlocking(AutoTestFrameClock()) {
+                    state.animateScrollToItem(target)
+                }
             }
 
-            rule.waitForIdle()
-            assertThat(state.firstVisibleItemIndex).isEqualTo(target)
+            rule.runOnIdle {
+                assertThat(state.firstVisibleItemIndex).isEqualTo(target)
+                assertThat(state.firstVisibleItemScrollOffset).isEqualTo(0)
+            }
+        }
+    }
+
+    @Test
+    fun animateScrollToTheLastItemWhenItemsAreLargerThenTheScreen() {
+        lateinit var state: LazyListState
+        rule.setContent {
+            state = rememberLazyListState()
+            LazyRow(Modifier.height(150.dp).width(100.dp), state) {
+                items(20) {
+                    Box(Modifier.size(150.dp))
+                }
+            }
+        }
+
+        // Try a bunch of different start indexes
+        listOf(0, 5, 12).forEach {
+            val startIndex = it
+            rule.runOnIdle {
+                runBlocking(AutoTestFrameClock()) {
+                    state.scrollToItem(startIndex)
+                    state.animateScrollToItem(19)
+                }
+            }
+
+            rule.runOnIdle {
+                assertThat(state.firstVisibleItemIndex).isEqualTo(19)
+                assertThat(state.firstVisibleItemScrollOffset).isEqualTo(0)
+            }
         }
     }
 
