@@ -88,7 +88,7 @@ private fun CardWithList(card: CardWithListPresentation) {
         }) {
             card.list.forEachIndexed { ix, it ->
                 Li(attrs = {
-                    style { property("padding-top", value(24.px)) }
+                    style { property("padding-top", 24.px) }
                 }) { Text(it) }
             }
         }

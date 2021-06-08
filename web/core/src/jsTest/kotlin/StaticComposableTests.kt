@@ -120,7 +120,7 @@ class StaticComposableTests {
             Div(
                 {
                     style {
-                        property("border", value("1px solid red"))
+                        property("border", "1px solid red")
                     }
                 }
             )

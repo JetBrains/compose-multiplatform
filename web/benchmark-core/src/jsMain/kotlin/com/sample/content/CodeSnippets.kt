@@ -241,7 +241,7 @@ private fun TitledCodeSample(title: String, code: String) {
             style {
                 backgroundColor(Color.RGBA(39, 40, 44, 0.05))
                 borderRadius(8.px, 8.px, 8.px)
-                property("padding", value("12px 16px"))
+                property("padding", "12px 16px")
             }
         }
     ) {
@@ -253,8 +253,8 @@ private fun TitledCodeSample(title: String, code: String) {
 fun FormattedCodeSnippet(code: String, language: String = "kotlin") {
     Pre(attrs = {
         style {
-            property("max-height", value(25.em))
-            property("overflow", value("auto"))
+            property("max-height", 25.em)
+            property("overflow", "auto")
             height(auto)
         }
     }) {
@@ -262,8 +262,8 @@ fun FormattedCodeSnippet(code: String, language: String = "kotlin") {
             attrs = {
                 classes("language-$language", "hljs")
                 style {
-                    property("font-family", value("'JetBrains Mono', monospace"))
-                    property("tab-size", value(4))
+                    property("font-family", "'JetBrains Mono', monospace")
+                    property("tab-size", 4)
                     fontSize(10.pt)
                     backgroundColor(Color("transparent"))
                 }

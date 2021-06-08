@@ -6,22 +6,22 @@ interface StyleBuilder {
     fun property(propertyName: String, value: StylePropertyValue)
     fun variable(variableName: String, value: StylePropertyValue)
 
+    fun property(propertyName: String, value: String) = property(propertyName, value.unsafeCast<StylePropertyValue>())
+    fun property(propertyName: String, value: Number) = property(propertyName, value.unsafeCast<StylePropertyValue>())
+    fun variable(variableName: String, value: Number) = property(variableName, value.unsafeCast<StylePropertyValue>())
+    fun variable(variableName: String, value: String) = property(variableName, value.unsafeCast<StylePropertyValue>())
+
     operator fun <TValue> CSSStyleVariable<TValue>.invoke(value: TValue) {
-        variable(this.name, (value as? CustomStyleValue)?.styleValue() ?: value(value.toString()))
+        if (value is CustomStyleValue) {
+            variable(name, value.styleValue())
+        } else {
+            variable(name, value.toString())
+        }
     }
 }
 
-@Suppress("NOTHING_TO_INLINE")
-inline fun StyleBuilder.value(value: String) = value.asStylePropertyValue()
-
-@Suppress("NOTHING_TO_INLINE")
-inline fun StyleBuilder.value(value: Number) = value.asStylePropertyValue()
-
-@Suppress("NOTHING_TO_INLINE")
-inline fun StyleBuilder.value(value: CSSStyleValue) = value.asStylePropertyValue()
-
 fun variableValue(variableName: String, fallback: StylePropertyValue? = null) =
-    "var(--$variableName${fallback?.let { ", $it" } ?: ""})".asStylePropertyValue()
+    "var(--$variableName${fallback?.let { ", $it" } ?: ""})"
 
 interface CSSVariableValue<TValue> : StylePropertyValue {
     companion object {
@@ -65,7 +65,7 @@ fun <TValue> CSSStyleVariable<TValue>.value(fallback: TValue? = null) =
             name,
             fallback?.let {
                 (fallback as? CustomStyleValue)?.styleValue()
-                    ?: fallback.toString().asStylePropertyValue()
+                    ?: fallback.toString().unsafeCast<StylePropertyValue>()
             }
         )
     )
@@ -85,11 +85,17 @@ open class StyleBuilderImpl : StyleBuilder, StyleHolder {
     override val variables: MutableStylePropertyList = mutableListOf()
 
     override fun property(propertyName: String, value: StylePropertyValue) {
-        properties.add(StylePropertyDeclaration(propertyName, value))
+        properties.add(when (value) {
+            is CSSSizeValue<*> -> StylePropertyDeclaration(propertyName, value.asString())
+            else -> StylePropertyDeclaration(propertyName, value)
+        })
     }
 
     override fun variable(variableName: String, value: StylePropertyValue) {
-        variables.add(StylePropertyDeclaration(variableName, value))
+        variables.add(when (value) {
+            is CSSSizeValue<*> -> StylePropertyDeclaration(variableName, value.asString())
+            else -> StylePropertyDeclaration(variableName, value)
+        })
     }
 
     // StylePropertyValue is js native object without equals
@@ -104,7 +110,10 @@ open class StyleBuilderImpl : StyleBuilder, StyleHolder {
 data class StylePropertyDeclaration(
     val name: String,
     val value: StylePropertyValue
-)
+) {
+    constructor(name: String, value: String) : this(name, value.unsafeCast<StylePropertyValue>())
+    constructor(name: String, value: Number) : this(name, value.unsafeCast<StylePropertyValue>())
+}
 typealias StylePropertyList = List<StylePropertyDeclaration>
 typealias MutableStylePropertyList = MutableList<StylePropertyDeclaration>
 

@@ -36,7 +36,7 @@ fun StyleSheet.insertRule(cssRule: String, index: Int? = null): Int {
 val ElementCSSInlineStyle.attributeStyleMap
     get() = this.asDynamic().attributeStyleMap.unsafeCast<StylePropertyMap>()
 
-external interface CSSStyleValue
+external interface CSSStyleValue : StylePropertyValue
 
 @JsName("CSSStyleValue")
 open external class CSSStyleValueJS : CSSStyleValue {
@@ -284,11 +284,6 @@ fun StylePropertyMapReadOnly.forEach(handler: (String, Array<CSSStyleValue>) -> 
 
 // CSSStyleValue | string
 external interface StylePropertyValue
-
-fun String.asStylePropertyValue() = unsafeCast<StylePropertyValue>()
-fun Number.asStylePropertyValue() = unsafeCast<StylePropertyValue>()
-fun CSSStyleValue.asStylePropertyValue() = unsafeCast<StylePropertyValue>()
-fun CSSUnitValue.asStylePropertyValue() = asString().asStylePropertyValue()
 
 external class StylePropertyMap : StylePropertyMapReadOnly {
     fun set(property: String, vararg values: StylePropertyValue)

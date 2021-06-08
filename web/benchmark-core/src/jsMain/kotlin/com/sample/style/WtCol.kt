@@ -110,19 +110,19 @@ object WtCols : StyleSheet(AppStylesheet) {
         forMaxWidth(640.px) {
             AppCSSVariables.wtColCount(0)
             flexGrow(1)
-            property("max-width", value(100.percent))
+            property("max-width", 100.percent)
         }
     }
 
     val wtColAutoFill by style {
         AppCSSVariables.wtColCount(0)
         flexGrow(1)
-        property("max-width", value(100.percent))
+        property("max-width", 100.percent)
     }
 
     val wtColInline by style {
         AppCSSVariables.wtColCount(0)
-        property("max-width", value(100.percent))
-        property("flex-basis", value("auto"))
+        property("max-width", 100.percent)
+        property("flex-basis", "auto")
     }
 }

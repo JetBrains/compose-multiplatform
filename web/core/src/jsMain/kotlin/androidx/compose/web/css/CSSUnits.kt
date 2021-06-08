@@ -1,6 +1,6 @@
 package org.jetbrains.compose.web.css
 
-interface CSSSizeValue<out T : CSSUnit> : CSSNumericValue {
+interface CSSSizeValue<out T : CSSUnit> : StylePropertyValue {
     val value: Float
     val unit: T
     fun asString(): String = "${value}${unit.value}"

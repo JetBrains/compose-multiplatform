@@ -28,9 +28,9 @@ object SwitcherStylesheet : StyleSheet(AppStylesheet) {
             display(DisplayStyle.InlineBlock)
             property("width", SwitcherVariables.labelWidth.value(56.px))
             property("padding", SwitcherVariables.labelPadding.value(10.px))
-            property("transition", value("all 0.3s"))
-            property("text-align", value("center"))
-            property("box-sizing", value("border-box"))
+            property("transition", "all 0.3s")
+            property("text-align", "center")
+            property("box-sizing", "border-box")
 
             border {
                 style(LineStyle.Solid)
