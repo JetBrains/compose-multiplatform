@@ -182,7 +182,8 @@ fun Slider(
                     animateToTarget(draggableState, current, target, velocity)
                     onValueChangeFinished?.invoke()
                 }
-            } else {
+            } else if (!draggableState.isDragging) {
+                // check ifDragging in case the change is still in progress (touch -> drag case)
                 onValueChangeFinished?.invoke()
             }
         }
