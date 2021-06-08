@@ -98,6 +98,7 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.platform.Font
+import androidx.compose.ui.text.platform.FontLoader
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.text.style.TextDecoration.Companion.Underline
@@ -110,7 +111,16 @@ import java.awt.event.MouseEvent
 
 private const val title = "Desktop Compose Elements"
 
-val italicFont = FontFamily(Font("NotoSans-Italic.ttf"))
+val italicFont = try {
+    FontFamily(
+        Font("NotoSans-Italic.ttf").also {
+            // Check that font is loadable.
+            FontLoader().load(it)
+        }
+    )
+} catch (e: Exception) {
+    FontFamily.SansSerif
+}
 
 @OptIn(ExperimentalComposeUiApi::class)
 fun main() {
