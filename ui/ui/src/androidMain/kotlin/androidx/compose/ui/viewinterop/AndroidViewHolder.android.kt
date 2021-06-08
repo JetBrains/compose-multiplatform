@@ -205,11 +205,6 @@ internal abstract class AndroidViewHolder(
         return true
     }
 
-    override fun requestTransparentRegion(child: View?) {
-        // We are not going to respect children's attempts for using transparent regions.
-        // See gatherTransparentRegion.
-    }
-
     /**
      * A [LayoutNode] tree representation for this Android [View] holder.
      * The [LayoutNode] will proxy the Compose core calls to the [View].
