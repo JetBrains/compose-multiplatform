@@ -22,12 +22,11 @@ operator fun <T : CSSUnit> CSSSizeValue<T>.div(num: Number): CSSSizeValue<T> = n
 operator fun <T: CSSUnit> CSSSizeValue<T>.plus(b: CSSSizeValue<T>): CSSSizeValue<T> = newUnit(value + b.value)
 operator fun <T: CSSUnit> CSSSizeValue<T>.minus(b: CSSSizeValue<T>): CSSSizeValue<T> = newUnit(value - b.value)
 
-
-typealias CSSUnitValue = CSSSizeValue<CSSUnit>
-typealias CSSpxValue = CSSSizeValue<CSSUnit.px>
-
-interface CSSUnitRel : CSSUnit
-interface CSSUnitAbs: CSSUnit
+interface CSSUnitLengthOrPercentage: CSSUnit
+interface CSSUnitPercentage: CSSUnitLengthOrPercentage
+interface CSSUnitLength: CSSUnitLengthOrPercentage
+interface CSSUnitRel : CSSUnitLength
+interface CSSUnitAbs: CSSUnitLength
 interface CSSUnitAngle: CSSUnit
 interface CSSUnitTime: CSSUnit
 interface CSSUnitFrequency: CSSUnit
@@ -35,11 +34,17 @@ interface CSSUnitResolution: CSSUnit
 interface CSSUnitFlex: CSSUnit
 
 typealias CSSAngleValue = CSSSizeValue<CSSUnitAngle>
+typealias CSSLengthOrPercentageValue = CSSSizeValue<CSSUnitLengthOrPercentage>
+typealias CSSLengthValue = CSSSizeValue<CSSUnitLength>
+typealias CSSPercentageValue = CSSSizeValue<CSSUnitPercentage>
+typealias CSSUnitValue = CSSSizeValue<CSSUnit>
+typealias CSSpxValue = CSSSizeValue<CSSUnit.px>
+
 
 sealed interface CSSUnit {
     val value: String
 
-    object percent: CSSUnitRel {
+    object percent: CSSUnitPercentage {
         override val value: String = "%"
     }
 

@@ -227,7 +227,7 @@ inline fun StyleBuilder.border(crossinline borderBuild: CSSBorder.() -> Unit) {
 }
 
 fun StyleBuilder.border(
-    width: CSSUnitValue? = null,
+    width: CSSLengthValue? = null,
     style: LineStyle? = null,
     color: Color? = null
 ) {
@@ -335,7 +335,7 @@ fun StyleBuilder.height(value: CSSAutoValue) {
     property("height", value)
 }
 
-fun StyleBuilder.top(value: CSSUnitValue) {
+fun StyleBuilder.top(value: CSSLengthOrPercentageValue) {
     property("top", value.asStylePropertyValue())
 }
 
@@ -343,7 +343,7 @@ fun StyleBuilder.top(value: CSSAutoValue) {
     property("top", value)
 }
 
-fun StyleBuilder.bottom(value: CSSUnitValue) {
+fun StyleBuilder.bottom(value: CSSLengthOrPercentageValue) {
     property("bottom", value.asStylePropertyValue())
 }
 
@@ -351,7 +351,7 @@ fun StyleBuilder.bottom(value: CSSAutoValue) {
     property("bottom", value)
 }
 
-fun StyleBuilder.left(value: CSSUnitValue) {
+fun StyleBuilder.left(value: CSSLengthOrPercentageValue) {
     property("left", value.asStylePropertyValue())
 }
 
@@ -359,7 +359,7 @@ fun StyleBuilder.left(value: CSSAutoValue) {
     property("left", value)
 }
 
-fun StyleBuilder.right(value: CSSUnitValue) {
+fun StyleBuilder.right(value: CSSLengthOrPercentageValue) {
     property("right", value.asStylePropertyValue())
 }
 

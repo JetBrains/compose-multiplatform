@@ -27,6 +27,7 @@ import org.jetbrains.compose.web.css.justifyContent
 import org.jetbrains.compose.web.css.left
 import org.jetbrains.compose.web.css.opacity
 import org.jetbrains.compose.web.css.order
+import org.jetbrains.compose.web.css.percent
 import org.jetbrains.compose.web.css.position
 import org.jetbrains.compose.web.css.px
 import org.jetbrains.compose.web.css.right
@@ -78,7 +79,7 @@ class StaticComposableTests {
                     attr("data-val", "some other data")
                     id("verySpecial")
                 }
-            ) {}
+            )
         }
 
         val el = root.firstChild
@@ -104,7 +105,7 @@ class StaticComposableTests {
                         color("green")
                     }
                 }
-            ) {}
+            )
         }
 
         assertEquals("opacity: 0.2; color: green;", (root.children[0] as HTMLElement).style.cssText)
@@ -122,14 +123,14 @@ class StaticComposableTests {
                         property("border", value("1px solid red"))
                     }
                 }
-            ) {}
+            )
             Div(
                 {
                     style {
                         border(3.px, color = Color("green"))
                     }
                 }
-            ) {}
+            )
         }
 
         assertEquals("border: 1px solid red;", (root.children[0] as HTMLElement).style.cssText)
@@ -157,14 +158,14 @@ class StaticComposableTests {
                         order(-4)
                     }
                 }
-            ) {}
+            )
             Div(
                 {
                     style {
                         order(3)
                     }
                 }
-            ) {}
+            )
         }
 
         assertEquals("order: -4;", (root.children[0] as HTMLElement).style.cssText)
@@ -183,28 +184,28 @@ class StaticComposableTests {
                         flexGrow(3)
                     }
                 }
-            ) {}
+            )
             Div(
                 {
                     style {
                         flexGrow(2.5)
                     }
                 }
-            ) {}
+            )
             Div(
                 {
                     style {
                         flexGrow(1e2)
                     }
                 }
-            ) {}
+            )
             Div(
                 {
                     style {
                         flexGrow(.6)
                     }
                 }
-            ) {}
+            )
         }
 
         assertEquals("flex-grow: 3;", (root.children[0] as HTMLElement).style.cssText)
@@ -225,28 +226,28 @@ class StaticComposableTests {
                         flexShrink(3)
                     }
                 }
-            ) {}
+            )
             Div(
                 {
                     style {
                         flexShrink(2.5)
                     }
                 }
-            ) {}
+            )
             Div(
                 {
                     style {
                         flexShrink(1e2)
                     }
                 }
-            ) {}
+            )
             Div(
                 {
                     style {
                         flexShrink(.6)
                     }
                 }
-            ) {}
+            )
         }
 
         assertEquals("flex-shrink: 3;", (root.children[0] as HTMLElement).style.cssText)
@@ -267,7 +268,7 @@ class StaticComposableTests {
                         width(100.px)
                     }
                 }
-            ) {}
+            )
         }
 
         assertEquals("width: 100px;", (root.children[0] as HTMLElement).style.cssText)
@@ -285,28 +286,28 @@ class StaticComposableTests {
                         borderRadius(3.px)
                     }
                 }
-            ) {}
+            )
             Div(
                 {
                     style {
                         borderRadius(3.px, 5.px)
                     }
                 }
-            ) {}
+            )
             Div(
                 {
                     style {
                         borderRadius(3.px, 5.px, 4.px)
                     }
                 }
-            ) {}
+            )
             Div(
                 {
                     style {
                         borderRadius(3.px, 5.px, 4.px, 1.px)
                     }
                 }
-            ) {}
+            )
         }
 
         assertEquals("border-radius: 3px;", (root.children[0] as HTMLElement).style.cssText)
@@ -330,10 +331,18 @@ class StaticComposableTests {
                         top(100.px)
                     }
                 }
-            ) {}
+            )
+            Div(
+                {
+                    style {
+                        top(100.percent)
+                    }
+                }
+            )
         }
 
         assertEquals("top: 100px;", (root.children[0] as HTMLElement).style.cssText)
+        assertEquals("top: 100%;", (root.children[1] as HTMLElement).style.cssText)
     }
 
     @Test
@@ -348,10 +357,18 @@ class StaticComposableTests {
                         bottom(100.px)
                     }
                 }
-            ) {}
+            )
+            Div(
+                {
+                    style {
+                        bottom(100.percent)
+                    }
+                }
+            )
         }
 
         assertEquals("bottom: 100px;", (root.children[0] as HTMLElement).style.cssText)
+        assertEquals("bottom: 100%;", (root.children[1] as HTMLElement).style.cssText)
     }
 
     @Test
@@ -366,10 +383,18 @@ class StaticComposableTests {
                         left(100.px)
                     }
                 }
-            ) {}
+            )
+            Div(
+                {
+                    style {
+                        left(100.percent)
+                    }
+                }
+            )
         }
 
         assertEquals("left: 100px;", (root.children[0] as HTMLElement).style.cssText)
+        assertEquals("left: 100%;", (root.children[1] as HTMLElement).style.cssText)
     }
 
     @Test
@@ -384,10 +409,18 @@ class StaticComposableTests {
                         right(100.px)
                     }
                 }
-            ) {}
+            )
+            Div(
+                {
+                    style {
+                        right(100.percent)
+                    }
+                }
+            )
         }
 
         assertEquals("right: 100px;", (root.children[0] as HTMLElement).style.cssText)
+        assertEquals("right: 100%;", (root.children[1] as HTMLElement).style.cssText)
     }
 
     @Test
@@ -402,7 +435,7 @@ class StaticComposableTests {
                         height(100.px)
                     }
                 }
-            ) {}
+            )
         }
 
         assertEquals("height: 100px;", (root.children[0] as HTMLElement).style.cssText)
