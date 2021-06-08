@@ -1,5 +1,5 @@
 /*
- * Copyright 2019 The Android Open Source Project
+ * Copyright 2021 The Android Open Source Project
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,18 +16,12 @@
 
 package androidx.compose.foundation
 
-import android.content.res.Configuration
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.ReadOnlyComposable
-import androidx.compose.ui.platform.LocalConfiguration
 
 /**
  * This function should be used to help build responsive UIs that follow the system setting, to
  * avoid harsh contrast changes when switching between applications.
- *
- * This function returns `true` if the [Configuration.UI_MODE_NIGHT_YES] bit is set. It is
- * also possible for this bit to be [Configuration.UI_MODE_NIGHT_UNDEFINED], in which case
- * light theme is treated as the default, and this function returns `false`.
  *
  * It is also recommended to provide user accessible overrides in your application, so users can
  * choose to force an always-light or always-dark theme. To do this, you should provide the current
@@ -44,7 +38,6 @@ import androidx.compose.ui.platform.LocalConfiguration
  */
 @Composable
 @ReadOnlyComposable
-internal actual fun _isSystemInDarkTheme(): Boolean {
-    val uiMode = LocalConfiguration.current.uiMode
-    return (uiMode and Configuration.UI_MODE_NIGHT_MASK) == Configuration.UI_MODE_NIGHT_YES
-}
+fun isSystemInDarkTheme() = _isSystemInDarkTheme()
+
+internal expect fun _isSystemInDarkTheme(): Boolean

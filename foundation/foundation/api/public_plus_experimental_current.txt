@@ -41,8 +41,11 @@ package androidx.compose.foundation {
   public final class Clickable_androidKt {
   }
 
-  public final class DarkTheme_androidKt {
+  public final class DarkThemeKt {
     method @androidx.compose.runtime.Composable @androidx.compose.runtime.ReadOnlyComposable public static boolean isSystemInDarkTheme();
+  }
+
+  public final class DarkTheme_androidKt {
   }
 
   @kotlin.RequiresOptIn(message="This foundation API is experimental and is likely to change or be removed in the " + "future.") public @interface ExperimentalFoundationApi {
