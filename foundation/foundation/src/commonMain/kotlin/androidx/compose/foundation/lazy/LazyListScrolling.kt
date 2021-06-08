@@ -70,7 +70,7 @@ internal suspend fun LazyListState.doSmoothScrollToItem(
                     sequentialAnimation = (anim.velocity != 0f)
                 ) {
                     // If we haven't found the item yet, check if it's visible.
-                    val targetItem = getTargetItem()
+                    var targetItem = getTargetItem()
 
                     if (targetItem == null) {
                         // Springs can overshoot their target, clamp to the desired range
@@ -85,43 +85,48 @@ internal suspend fun LazyListState.doSmoothScrollToItem(
                         }
 
                         val consumed = scrollBy(delta)
-                        if (delta != consumed) {
-                            debugLog { "Hit end" }
-                            cancelAnimation()
-                            loop = false
-                            return@animateTo
-                        }
-                        prevValue += delta
-                        if (forward) {
-                            if (value > boundDistancePx) {
-                                debugLog { "Struck bound going forward" }
-                                cancelAnimation()
-                            }
+                        targetItem = getTargetItem()
+                        if (targetItem != null) {
+                            debugLog { "Found the item after performing scrollBy()" }
                         } else {
-                            if (value < -boundDistancePx) {
-                                debugLog { "Struck bound going backward" }
+                            if (delta != consumed) {
+                                debugLog { "Hit end without finding the item" }
                                 cancelAnimation()
+                                loop = false
+                                return@animateTo
                             }
-                        }
+                            prevValue += delta
+                            if (forward) {
+                                if (value > boundDistancePx) {
+                                    debugLog { "Struck bound going forward" }
+                                    cancelAnimation()
+                                }
+                            } else {
+                                if (value < -boundDistancePx) {
+                                    debugLog { "Struck bound going backward" }
+                                    cancelAnimation()
+                                }
+                            }
 
-                        // Magic constants for teleportation chosen arbitrarily by experiment
-                        if (forward) {
-                            if (
-                                loops >= 2 &&
-                                index - layoutInfo.visibleItemsInfo.last().index > 100
-                            ) {
-                                // Teleport
-                                debugLog { "Teleport forward" }
-                                snapToItemIndexInternal(index = index - 100, scrollOffset = 0)
-                            }
-                        } else {
-                            if (
-                                loops >= 2 &&
-                                layoutInfo.visibleItemsInfo.first().index - index > 100
-                            ) {
-                                // Teleport
-                                debugLog { "Teleport backward" }
-                                snapToItemIndexInternal(index = index + 100, scrollOffset = 0)
+                            // Magic constants for teleportation chosen arbitrarily by experiment
+                            if (forward) {
+                                if (
+                                    loops >= 2 &&
+                                    index - layoutInfo.visibleItemsInfo.last().index > 100
+                                ) {
+                                    // Teleport
+                                    debugLog { "Teleport forward" }
+                                    snapToItemIndexInternal(index = index - 100, scrollOffset = 0)
+                                }
+                            } else {
+                                if (
+                                    loops >= 2 &&
+                                    layoutInfo.visibleItemsInfo.first().index - index > 100
+                                ) {
+                                    // Teleport
+                                    debugLog { "Teleport backward" }
+                                    snapToItemIndexInternal(index = index + 100, scrollOffset = 0)
+                                }
                             }
                         }
                     }
