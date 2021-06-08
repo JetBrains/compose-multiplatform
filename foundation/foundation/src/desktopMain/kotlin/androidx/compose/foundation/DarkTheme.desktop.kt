@@ -16,10 +16,8 @@
 
 package androidx.compose.foundation
 
-import android.content.res.Configuration
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.ReadOnlyComposable
-import androidx.compose.ui.platform.LocalConfiguration
 
 /**
  * This function should be used to help build responsive UIs that follow the system setting, to
@@ -45,6 +43,6 @@ import androidx.compose.ui.platform.LocalConfiguration
 @Composable
 @ReadOnlyComposable
 internal actual fun _isSystemInDarkTheme(): Boolean {
-    val uiMode = LocalConfiguration.current.uiMode
-    return (uiMode and Configuration.UI_MODE_NIGHT_MASK) == Configuration.UI_MODE_NIGHT_YES
+    // TODO: Fix after we get a skiko build with https://github.com/JetBrains/skiko/pull/118
+    return false
 }
