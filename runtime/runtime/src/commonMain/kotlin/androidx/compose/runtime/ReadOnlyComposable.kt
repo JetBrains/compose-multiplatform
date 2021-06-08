@@ -23,7 +23,7 @@ package androidx.compose.runtime
  * This will result in slightly more efficient code.
  *
  * A common use case for this are for functions that only need to be composable in order to read
- * [Ambient] values, but don't call any other composables.
+ * [CompositionLocal] values, but don't call any other composables.
  *
  * Caution: Use of this annotation means that the annotated declaration *MUST* comply with this
  * contract, or else the resulting code's behavior will be undefined.
