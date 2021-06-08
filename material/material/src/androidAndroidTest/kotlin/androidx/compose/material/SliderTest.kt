@@ -391,6 +391,37 @@ class SliderTest {
     }
 
     @Test
+    fun slider_valueChangeFinished_calledOnce() {
+        val state = mutableStateOf(0f)
+        val callCount = mutableStateOf(0)
+
+        rule.setMaterialContent {
+            Slider(
+                modifier = Modifier.testTag(tag),
+                value = state.value,
+                onValueChangeFinished = {
+                    callCount.value += 1
+                },
+                onValueChange = { state.value = it }
+            )
+        }
+
+        rule.runOnIdle {
+            Truth.assertThat(callCount.value).isEqualTo(0)
+        }
+
+        rule.onNodeWithTag(tag).performGesture {
+            down(center)
+            moveBy(Offset(50f, 50f))
+            up()
+        }
+
+        rule.runOnIdle {
+            Truth.assertThat(callCount.value).isEqualTo(1)
+        }
+    }
+
+    @Test
     fun slider_interactionSource_resetWhenDisposed() {
         val interactionSource = MutableInteractionSource()
         var emitSlider by mutableStateOf(true)
