@@ -7,7 +7,7 @@ object WtOffsets : StyleSheet(AppStylesheet) {
         marginTop(96.px)
         property(
             "margin-top",
-            value("calc(4*${AppCSSVariables.wtOffsetTopUnit.value(24.px)})")
+            "calc(4*${AppCSSVariables.wtOffsetTopUnit.value(24.px)})"
         )
     }
 
@@ -15,7 +15,7 @@ object WtOffsets : StyleSheet(AppStylesheet) {
         marginTop(24.px)
         property(
             "margin-top",
-            value("calc(1*${AppCSSVariables.wtOffsetTopUnit.value(24.px)})")
+            "calc(1*${AppCSSVariables.wtOffsetTopUnit.value(24.px)})"
         )
     }
 

@@ -24,7 +24,7 @@ fun Intro() {
                     alignSelf(AlignSelf.Start)
                 }
             }) {
-                Img(src = "i1.svg", attrs = { classes(AppStylesheet.composeLogo) }) {}
+                Img(src = "i1.svg", attrs = { classes(AppStylesheet.composeLogo) })
             }
 
             Div({
@@ -41,7 +41,7 @@ fun Intro() {
                         classes(WtTexts.wtHero)
                         style {
                             display(DisplayStyle.InlineBlock)
-                            property("white-space", "nowrap".asStylePropertyValue())
+                            property("white-space", "nowrap")
                         }
                     }) {
                         Text("Web")
@@ -124,12 +124,12 @@ private fun IntroCodeSample() {
             marginTop(24.px)
             backgroundColor(Color.RGBA(39, 40, 44, 0.05))
             borderRadius(8.px)
-            property("font-family", "'JetBrains Mono', monospace".asStylePropertyValue())
+            property("font-family", "'JetBrains Mono', monospace")
         }
     }) {
         Div({
             style {
-                property("padding", "12px 16px".asStylePropertyValue())
+                property("padding", "12px 16px")
             }
         }) {
             FormattedCodeSnippet(
@@ -162,7 +162,7 @@ private fun IntroCodeSample() {
 private fun IntroCodeSampleResult() {
     Div({
         style {
-            property("padding", "12px 16px".asStylePropertyValue())
+            property("padding", "12px 16px")
             display(DisplayStyle.Flex)
             flexDirection(FlexDirection.Row)
             alignItems(AlignItems.Center)
@@ -171,7 +171,7 @@ private fun IntroCodeSampleResult() {
         Span({
             classes(WtTexts.wtText2)
             style {
-                property("margin-right", 8.px.asStylePropertyValue())
+                property("margin-right", 8.px)
             }
         }) {
             Text("Result:")
@@ -203,7 +203,7 @@ private fun ComposeWebStatusMessage() {
                     width(24.px)
                     height(24.px)
                 }
-            }) {}
+            })
         }
 
         Div({
