@@ -281,7 +281,7 @@ abstract class DoclavaWorkAction @Inject constructor (
 
         execOperations.javaexec {
             it.classpath(classpath)
-            it.main = "com.google.doclava.Doclava"
+            it.mainClass.set("com.google.doclava.Doclava")
             it.args = args
         }
     }

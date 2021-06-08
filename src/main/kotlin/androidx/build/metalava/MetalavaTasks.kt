@@ -225,7 +225,7 @@ object MetalavaTasks {
         ) { task ->
             @Suppress("DEPRECATION") val compileTask = variant.javaCompile
             task.source = project.files(apiStubsDirectory).asFileTree
-            task.destinationDir = apiStubClassesDirectory
+            task.destinationDirectory.set(apiStubClassesDirectory)
 
             task.classpath = compileTask.classpath
             task.options.compilerArgs = compileTask.options.compilerArgs
