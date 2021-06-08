@@ -58,6 +58,7 @@ internal fun measureLazyList(
             firstVisibleItemScrollOffset = 0,
             canScrollForward = false,
             consumedScroll = 0f,
+            composedButNotVisibleItems = null,
             layoutWidth = constraints.minWidth,
             layoutHeight = constraints.minHeight,
             placementBlock = {},
@@ -256,6 +257,7 @@ internal fun measureLazyList(
             firstVisibleItemScrollOffset = currentFirstItemScrollOffset,
             canScrollForward = mainAxisUsed > maxOffset,
             consumedScroll = consumedScroll,
+            composedButNotVisibleItems = notUsedButComposedItems,
             layoutWidth = layoutWidth,
             layoutHeight = layoutHeight,
             placementBlock = {

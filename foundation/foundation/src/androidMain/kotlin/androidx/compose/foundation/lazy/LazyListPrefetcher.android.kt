@@ -295,10 +295,10 @@ private class LazyListPrefetcher(
         if (premeasuringIsNeeded && index != -1) {
             val itemProvider = stateOfItemsProvider.value
             if (index < itemProvider.itemsCount) {
-                val composedViaRegularFlow = result.visibleItemsInfo.fastAny {
-                    it.index == index
-                }
-                if (composedViaRegularFlow) {
+                val isVisibleAlready = result.visibleItemsInfo.fastAny { it.index == index }
+                val composedButNotVisible = result.composedButNotVisibleItems != null &&
+                    result.composedButNotVisibleItems.fastAny { it.index == index }
+                if (isVisibleAlready || composedButNotVisible) {
                     premeasuringIsNeeded = false
                 } else {
                     val key = itemProvider.getKey(index)
