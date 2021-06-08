@@ -47,7 +47,7 @@ internal object GlobalSnapshotManager {
                 }
             }
             Snapshot.registerGlobalWriteObserver {
-                channel.offer(Unit)
+                channel.trySend(Unit)
             }
         }
     }

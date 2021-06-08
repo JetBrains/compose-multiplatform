@@ -16,6 +16,7 @@
 
 package androidx.compose.desktop
 
+import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.channels.Channel
@@ -38,6 +39,7 @@ import kotlin.coroutines.CoroutineContext
  * Without dispatching events we may have a situation
  * when 30 events of scroll block AWT Thread for 1 second, without rerendering content.
  */
+@OptIn(DelicateCoroutinesApi::class)
 internal class AWTDebounceEventQueue constructor(
     // 4 ms is enough for the user not to see the lags
     private val maxNanosToBlockThread: Long = 4_000_000, // 4 milliseconds
@@ -63,6 +65,6 @@ internal class AWTDebounceEventQueue constructor(
     }
 
     fun post(event: () -> Unit) {
-        queue.offer(event)
+        queue.trySend(event)
     }
 }

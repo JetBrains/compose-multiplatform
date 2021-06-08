@@ -1517,7 +1517,7 @@ internal class AndroidComposeViewAccessibilityDelegateCompat(val view: AndroidCo
 
     private fun notifySubtreeAccessibilityStateChangedIfNeeded(layoutNode: LayoutNode) {
         if (subtreeChangedLayoutNodes.add(layoutNode)) {
-            boundsUpdateChannel.offer(Unit)
+            boundsUpdateChannel.trySend(Unit)
         }
     }
 

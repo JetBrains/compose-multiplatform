@@ -362,7 +362,7 @@ fun <T, V : AnimationVector> animateValueAsState(
     val animSpec by rememberUpdatedState(animationSpec)
     val channel = remember { Channel<T>(Channel.CONFLATED) }
     SideEffect {
-        channel.offer(targetValue)
+        channel.trySend(targetValue)
     }
     LaunchedEffect(channel) {
         for (target in channel) {
@@ -371,7 +371,7 @@ fun <T, V : AnimationVector> animateValueAsState(
             // will be received.
             // It may not be an issue elsewhere, but in animation we want to avoid being one
             // frame late.
-            val newTarget = channel.poll() ?: target
+            val newTarget = channel.tryReceive().getOrNull() ?: target
             launch {
                 if (newTarget != animatable.targetValue) {
                     animatable.animateTo(newTarget, animSpec)

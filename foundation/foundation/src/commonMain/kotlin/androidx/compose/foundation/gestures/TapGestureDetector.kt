@@ -321,28 +321,28 @@ private suspend fun AwaitPointerEventScope.translatePointerEventsToChannel(
                 // wait for the main pass of the initial event we already have eaten above
                 awaitPointerEvent()
             }
-            channel.offer(AllUp)
+            channel.trySend(AllUp)
             consumeAllUntilUp.value = false
         } else if (event.changes.fastAll { it.changedToDown() }) {
             val change = event.changes[0]
             change.consumeDownChange()
-            channel.offer(Down(change.position, change.uptimeMillis))
+            channel.trySend(Down(change.position, change.uptimeMillis))
         } else if (!detectDownsOnly.value) {
             if (event.changes.fastAll { it.changedToUp() }) {
                 // All pointers are up
                 val change = event.changes[0]
                 change.consumeDownChange()
-                channel.offer(Up(change.position, change.uptimeMillis))
+                channel.trySend(Up(change.position, change.uptimeMillis))
             } else if (
                 event.changes.fastAny { it.consumed.downChange || it.isOutOfBounds(size) }
             ) {
-                channel.offer(Cancel)
+                channel.trySend(Cancel)
             } else {
                 // Check for cancel by position consumption. We can look on the Final pass of the
                 // existing pointer event because it comes after the Main pass we checked above.
                 val consumeCheck = awaitPointerEvent(PointerEventPass.Final)
                 if (consumeCheck.changes.fastAny { it.positionChangeConsumed() }) {
-                    channel.offer(Cancel)
+                    channel.trySend(Cancel)
                 }
             }
         }

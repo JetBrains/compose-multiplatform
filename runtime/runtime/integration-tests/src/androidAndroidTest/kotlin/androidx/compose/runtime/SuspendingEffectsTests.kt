@@ -56,10 +56,10 @@ class SuspendingEffectsTests : BaseComposeTest() {
             }
         }.then {
             assertEquals(1, counter)
-            ch.offer(Unit)
+            ch.trySend(Unit)
         }.then {
             assertEquals(2, counter)
-            ch.offer(Unit)
+            ch.trySend(Unit)
         }.then {
             assertEquals(3, counter)
         }

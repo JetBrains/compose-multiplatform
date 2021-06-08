@@ -51,7 +51,7 @@ class ProduceStateTests {
 
         assertEquals(0, observedResult, "observedResult after initial composition")
 
-        emitter.offer(1)
+        emitter.trySend(1)
         rule.runOnIdle {
             assertEquals(1, observedResult, "observedResult after emitting new value")
         }
