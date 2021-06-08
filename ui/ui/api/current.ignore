@@ -27,6 +27,8 @@ ParameterNameChange: androidx.compose.ui.layout.Placeable#setMeasurementConstrai
     Attempted to change parameter name from p to value in method androidx.compose.ui.layout.Placeable.setMeasurementConstraints-BRTryo0
 
 
+RemovedClass: androidx.compose.ui.autofill.AndroidAutofillDebugUtils_androidKt:
+    Removed class androidx.compose.ui.autofill.AndroidAutofillDebugUtils_androidKt
 RemovedClass: androidx.compose.ui.input.pointer.RequestDisallowInterceptTouchEvent:
     Removed class androidx.compose.ui.input.pointer.RequestDisallowInterceptTouchEvent
 

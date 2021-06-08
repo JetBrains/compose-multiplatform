@@ -28,6 +28,7 @@ import android.view.PixelCopy
 import android.view.View
 import android.view.ViewTreeObserver
 import android.view.Window
+import androidx.annotation.DoNotInline
 import androidx.annotation.RequiresApi
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.asImageBitmap
@@ -60,8 +61,8 @@ internal fun captureRegionToImage(
     var drawDone = false
     val decorView = windowToCapture.decorView
     handler.post {
-        if (Build.VERSION.SDK_INT >= 29 && decorView.isHardwareAccelerated()) {
-            decorView.viewTreeObserver.registerFrameCommitCallback {
+        if (Build.VERSION.SDK_INT >= 29 && decorView.isHardwareAccelerated) {
+            FrameCommitCallbackHelper.registerFrameCommitCallback(decorView.viewTreeObserver) {
                 drawDone = true
             }
         } else {
@@ -97,7 +98,13 @@ internal fun captureRegionToImage(
         copyResult = result
         latch.countDown()
     }
-    PixelCopy.request(windowToCapture, captureRectInWindow, destBitmap, onCopyFinished, handler)
+    PixelCopyHelper.request(
+        windowToCapture,
+        captureRectInWindow,
+        destBitmap,
+        onCopyFinished,
+        handler
+    )
 
     if (!latch.await(1, TimeUnit.SECONDS)) {
         throw AssertionError("Failed waiting for PixelCopy!")
@@ -123,5 +130,27 @@ private fun MainTestClock.waitUntil(timeoutMillis: Long, condition: () -> Boolea
                 "Condition still not satisfied after $timeoutMillis ms"
             )
         }
+    }
+}
+
+@RequiresApi(29)
+private object FrameCommitCallbackHelper {
+    @DoNotInline
+    fun registerFrameCommitCallback(viewTreeObserver: ViewTreeObserver, runnable: Runnable) {
+        viewTreeObserver.registerFrameCommitCallback(runnable)
+    }
+}
+
+@RequiresApi(Build.VERSION_CODES.O)
+private object PixelCopyHelper {
+    @DoNotInline
+    fun request(
+        source: Window,
+        srcRect: Rect?,
+        dest: Bitmap,
+        listener: PixelCopy.OnPixelCopyFinishedListener,
+        listenerThread: Handler
+    ) {
+        PixelCopy.request(source, srcRect, dest, listener, listenerThread)
     }
 }

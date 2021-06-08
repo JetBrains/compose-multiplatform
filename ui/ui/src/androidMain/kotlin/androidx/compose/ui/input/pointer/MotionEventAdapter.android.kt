@@ -16,7 +16,6 @@
 
 package androidx.compose.ui.input.pointer
 
-import android.annotation.SuppressLint
 import android.os.Build
 import android.view.MotionEvent
 import android.view.MotionEvent.ACTION_CANCEL
@@ -158,7 +157,7 @@ private fun createPointerInputEventData(
         rawPosition = Offset(motionEvent.rawX, motionEvent.rawY)
         position = positionCalculator.screenToLocal(rawPosition)
     } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-        rawPosition = motionEvent.toRawOffset(index)
+        rawPosition = MotionEventHelper.toRawOffset(motionEvent, index)
         position = positionCalculator.screenToLocal(rawPosition)
     } else {
         rawPosition = positionCalculator.localToScreen(position)
@@ -188,8 +187,9 @@ private fun createPointerInputEventData(
  * which use this method will pass.
  */
 @RequiresApi(Build.VERSION_CODES.Q)
-@DoNotInline
-@SuppressLint("UnsafeNewApiCall") // not sure why RequiresApi is not enough
-private fun MotionEvent.toRawOffset(index: Int): Offset {
-    return Offset(getRawX(index), getRawY(index))
+private object MotionEventHelper {
+    @DoNotInline
+    fun toRawOffset(motionEvent: MotionEvent, index: Int): Offset {
+        return Offset(motionEvent.getRawX(index), motionEvent.getRawY(index))
+    }
 }
