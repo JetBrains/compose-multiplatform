@@ -16,6 +16,7 @@
 
 package androidx.build
 
+import org.gradle.api.GradleException
 import org.gradle.api.Project
 import org.gradle.api.plugins.ExtraPropertiesExtension
 import java.io.File
@@ -55,7 +56,15 @@ object SupportConfig {
 }
 
 fun Project.getExternalProjectPath(): File {
-    return File(project.getCheckoutRoot(), "external")
+    val path = if (System.getenv("COMPOSE_DESKTOP_GITHUB_BUILD") != null)
+        File(System.getenv("OUT_DIR")).also {
+            if (!File(it, "doclava").isDirectory()) {
+                throw GradleException("Please checkout doclava to $it")
+            }
+        }
+    else
+        File(rootProject.projectDir, "../../external")
+    return path.getCanonicalFile()
 }
 
 fun Project.getKeystore(): File {

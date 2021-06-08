@@ -2,11 +2,8 @@ import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 buildscript {
     project.ext.supportRootFolder = project.projectDir.getParentFile()
-    repositories {
-        maven {
-            url("${supportRootFolder}/../../prebuilts/androidx/external")
-        }
-    }
+    apply from: "repos.gradle"
+    repos.addMavenRepositories(repositories)
 
     dependencies {
         classpath(libs.kotlinGradlePlugin)
