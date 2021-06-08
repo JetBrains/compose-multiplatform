@@ -38,7 +38,7 @@ fun Intro() {
                         classes(WtTexts.wtHero)
                         style {
                             display(DisplayStyle.InlineBlock)
-                            property("white-space", value("nowrap"))
+                            property("white-space", "nowrap")
                         }
                     }) {
                         Text("Web")
@@ -121,12 +121,12 @@ private fun IntroCodeSample() {
             marginTop(24.px)
             backgroundColor(Color.RGBA(39, 40, 44, 0.05))
             borderRadius(8.px)
-            property("font-family", value("'JetBrains Mono', monospace"))
+            property("font-family", "'JetBrains Mono', monospace")
         }
     }) {
         Div(attrs = {
             style {
-                property("padding", value("12px 16px"))
+                property("padding", "12px 16px")
             }
         }) {
             FormattedCodeSnippet(
@@ -159,7 +159,7 @@ private fun IntroCodeSample() {
 private fun IntroCodeSampleResult() {
     Div(attrs = {
         style {
-            property("padding", value("12px 16px"))
+            property("padding", "12px 16px")
             display(DisplayStyle.Flex)
             flexDirection(FlexDirection.Row)
             alignItems(AlignItems.Center)
@@ -169,7 +169,7 @@ private fun IntroCodeSampleResult() {
             attrs = {
                 classes(WtTexts.wtText2)
                 style {
-                    property("margin-right", value(8.px))
+                    property("margin-right", 8.px)
                 }
             },
         ) {

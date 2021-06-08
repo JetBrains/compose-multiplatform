@@ -54,13 +54,13 @@ private fun LanguageButton() {
             classes(WtTexts.wtButton, WtTexts.wtLangButton)
             onClick { window.alert("Oops! This feature is yet to be implemented") }
             style {
-                property("cursor", value("pointer"))
+                property("cursor", "pointer")
             }
         }) {
             Img(src = "ic_lang.svg", attrs = {
                 style {
-                    property("padding-left", value(8.px))
-                    property("padding-right", value(8.px))
+                    property("padding-left", 8.px)
+                    property("padding-right", 8.px)
                 }
             })
             Text("English")

@@ -16,13 +16,13 @@ object WtRows : StyleSheet(AppStylesheet) {
 
         property(
             "margin-right",
-            value("calc(-1*${AppCSSVariables.wtHorizontalLayoutGutter.value()})")
+            "calc(-1*${AppCSSVariables.wtHorizontalLayoutGutter.value()})"
         )
         property(
             "margin-left",
-            value("calc(-1*${AppCSSVariables.wtHorizontalLayoutGutter.value()})")
+            "calc(-1*${AppCSSVariables.wtHorizontalLayoutGutter.value()})"
         )
-        property("box-sizing", "border-box".asStylePropertyValue())
+        property("box-sizing", "border-box")
     }
     
     val wtRowSizeM by style {

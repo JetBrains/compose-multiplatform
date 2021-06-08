@@ -9,14 +9,12 @@ import org.jetbrains.compose.web.*
 object WtSections : StyleSheet(AppStylesheet) {
 
     val wtSection by style {
-        property("box-sizing", value("border-box"))
-        property("padding-bottom", value(96.px))
-        property("padding-top", value(1.px))
+        property("box-sizing", "border-box")
+        property("padding-bottom", 96.px)
+        property("padding-top", 1.px)
         property(
             propertyName = "padding-bottom",
-            value = value(
-                "calc(4*${AppCSSVariables.wtOffsetTopUnit.value(24.px)})"
-            )
+            value = "calc(4*${AppCSSVariables.wtOffsetTopUnit.value(24.px)})"
         )
         backgroundColor("#fff")
     }
