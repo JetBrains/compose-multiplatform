@@ -35,6 +35,7 @@ import androidx.compose.ui.AbsoluteAlignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.OpenComposeView
 import androidx.compose.ui.composed
+import androidx.compose.ui.findAndroidComposeView
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.gesture.PointerCoords
 import androidx.compose.ui.gesture.PointerProperties
@@ -86,6 +87,39 @@ class AndroidPointerInputTest {
                     ViewGroup.LayoutParams.WRAP_CONTENT
                 )
             )
+        }
+    }
+
+    @Test
+    fun dispatchTouchEvent_invalidCoordinates() {
+        countDown { latch ->
+            rule.runOnUiThread {
+                container.setContent {
+                    FillLayout(
+                        Modifier
+                            .consumeMovementGestureFilter()
+                            .onGloballyPositioned { latch.countDown() }
+                    )
+                }
+            }
+        }
+
+        rule.runOnUiThread {
+            val motionEvent = MotionEvent(
+                0,
+                MotionEvent.ACTION_DOWN,
+                1,
+                0,
+                arrayOf(PointerProperties(0)),
+                arrayOf(PointerCoords(Float.NaN, Float.NaN))
+            )
+
+            val androidComposeView = findAndroidComposeView(container)!!
+            // Act
+            val actual = androidComposeView.dispatchTouchEvent(motionEvent)
+
+            // Assert
+            assertThat(actual).isFalse()
         }
     }
 
