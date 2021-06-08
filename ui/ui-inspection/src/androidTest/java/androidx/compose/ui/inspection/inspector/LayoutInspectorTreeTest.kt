@@ -74,6 +74,7 @@ import androidx.compose.ui.tooling.data.asTree
 import androidx.compose.ui.tooling.data.position
 import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.Dp
+import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.viewinterop.AndroidView
@@ -745,6 +746,33 @@ class LayoutInspectorTreeTest {
         val hash = packageNameHash(this.javaClass.name.substringBeforeLast('.'))
         assertThat(first.fileName).isEqualTo("LayoutInspectorTreeTest.kt")
         assertThat(first.packageHash).isEqualTo(hash)
+    }
+
+    @Composable
+    fun InlineParameters(size: Dp, fontSize: TextUnit) {
+        Text("$size $fontSize")
+    }
+
+    @Test
+    fun testInlineParameterTypes() {
+        val slotTableRecord = CompositionDataRecord.create()
+
+        show {
+            Inspectable(slotTableRecord) {
+                InlineParameters(20.5.dp, 30.sp)
+            }
+        }
+        val androidComposeView = findAndroidComposeView()
+        androidComposeView.setTag(R.id.inspection_slot_table_set, slotTableRecord.store)
+        val builder = LayoutInspectorTree()
+        builder.hideSystemNodes = false
+        val inlineParameters = builder.convert(androidComposeView)
+            .flatMap { flatten(it) }
+            .first { it.name == "InlineParameters" }
+        assertThat(inlineParameters.parameters[0].name).isEqualTo("size")
+        assertThat(inlineParameters.parameters[0].value?.javaClass).isEqualTo(Dp::class.java)
+        assertThat(inlineParameters.parameters[1].name).isEqualTo("fontSize")
+        assertThat(inlineParameters.parameters[1].value?.javaClass).isEqualTo(TextUnit::class.java)
     }
 
     @Suppress("SameParameterValue")
