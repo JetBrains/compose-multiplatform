@@ -303,19 +303,15 @@ fun BottomSheetScaffold(
                 if (peekHeightPx != bottomSheetHeight) {
                     if (scaffoldState.bottomSheetState.isCollapsed) {
                         expand {
-                            scope.launch {
-                                if (scaffoldState.bottomSheetState.confirmStateChange(Expanded)) {
-                                    scaffoldState.bottomSheetState.expand()
-                                }
+                            if (scaffoldState.bottomSheetState.confirmStateChange(Expanded)) {
+                                scope.launch { scaffoldState.bottomSheetState.expand() }
                             }
                             true
                         }
                     } else {
                         collapse {
-                            scope.launch {
-                                if (scaffoldState.bottomSheetState.confirmStateChange(Collapsed)) {
-                                    scaffoldState.bottomSheetState.collapse()
-                                }
+                            if (scaffoldState.bottomSheetState.confirmStateChange(Collapsed)) {
+                                scope.launch { scaffoldState.bottomSheetState.collapse() }
                             }
                             true
                         }
