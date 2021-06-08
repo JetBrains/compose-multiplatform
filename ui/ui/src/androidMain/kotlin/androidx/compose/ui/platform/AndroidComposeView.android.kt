@@ -44,11 +44,10 @@ import androidx.compose.ui.InternalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.autofill.AndroidAutofill
 import androidx.compose.ui.autofill.Autofill
+import androidx.compose.ui.autofill.AutofillCallback
 import androidx.compose.ui.autofill.AutofillTree
 import androidx.compose.ui.autofill.performAutofill
 import androidx.compose.ui.autofill.populateViewStructure
-import androidx.compose.ui.autofill.registerCallback
-import androidx.compose.ui.autofill.unregisterCallback
 import androidx.compose.ui.focus.FOCUS_TAG
 import androidx.compose.ui.focus.FocusDirection
 import androidx.compose.ui.focus.FocusDirection.Companion.Down
@@ -770,7 +769,11 @@ internal class AndroidComposeView(context: Context) :
         invalidateLayoutNodeMeasurement(root)
         invalidateLayers(root)
         snapshotObserver.startObserving()
-        ifDebug { if (autofillSupported()) _autofill?.registerCallback() }
+        ifDebug {
+            if (autofillSupported()) {
+                _autofill?.let { AutofillCallback.register(it) }
+            }
+        }
 
         val lifecycleOwner = ViewTreeLifecycleOwner.get(this)
         val savedStateRegistryOwner = ViewTreeSavedStateRegistryOwner.get(this)
@@ -817,7 +820,11 @@ internal class AndroidComposeView(context: Context) :
         super.onDetachedFromWindow()
         snapshotObserver.stopObserving()
         viewTreeOwners?.lifecycleOwner?.lifecycle?.removeObserver(this)
-        ifDebug { if (autofillSupported()) _autofill?.unregisterCallback() }
+        ifDebug {
+            if (autofillSupported()) {
+                _autofill?.let { AutofillCallback.unregister(it) }
+            }
+        }
         viewTreeObserver.removeOnGlobalLayoutListener(globalLayoutListener)
         viewTreeObserver.removeOnScrollChangedListener(scrollChangedListener)
     }

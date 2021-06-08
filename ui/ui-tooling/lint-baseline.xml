@@ -23,15 +23,4 @@
             column="30"/>
     </issue>
 
-    <issue
-        id="ClassVerificationFailure"
-        message="This call references a method added in API level 26; however, the containing class androidx.compose.ui.tooling.preview.LayoutlibFontResourceLoader is reachable from earlier API levels and will fail run-time class verification."
-        errorLine1="            is ResourceFont -> context.resources.getFont(font.resId)"
-        errorLine2="                                                 ~~~~~~~">
-        <location
-            file="src/androidMain/kotlin/androidx/compose/ui/tooling/preview/LayoutlibFontResourceLoader.kt"
-            line="33"
-            column="50"/>
-    </issue>
-
 </issues>

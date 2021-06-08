@@ -31,7 +31,7 @@ import androidx.compose.ui.ExperimentalComposeUiApi
  * for debug purposes.
  */
 @RequiresApi(Build.VERSION_CODES.O)
-private object AutofillCallback : AutofillManager.AutofillCallback() {
+internal object AutofillCallback : AutofillManager.AutofillCallback() {
     override fun onAutofillEvent(view: View, virtualId: Int, event: Int) {
         super.onAutofillEvent(view, virtualId, event)
         Log.d(
@@ -55,24 +55,22 @@ private object AutofillCallback : AutofillManager.AutofillCallback() {
             }
         )
     }
-}
 
-/**
- * Registers the autofill debug callback.
- */
-@ExperimentalComposeUiApi
-@RequiresApi(Build.VERSION_CODES.O)
-@DoNotInline
-internal fun AndroidAutofill.registerCallback() {
-    autofillManager.registerCallback(AutofillCallback)
-}
+    /**
+     * Registers the autofill debug callback.
+     */
+    @ExperimentalComposeUiApi
+    @DoNotInline
+    fun register(autofill: AndroidAutofill) {
+        autofill.autofillManager.registerCallback(this)
+    }
 
-/**
- * Unregisters the autofill debug callback.
- */
-@ExperimentalComposeUiApi
-@RequiresApi(Build.VERSION_CODES.O)
-@DoNotInline
-internal fun AndroidAutofill.unregisterCallback() {
-    autofillManager.unregisterCallback(AutofillCallback)
+    /**
+     * Unregisters the autofill debug callback.
+     */
+    @ExperimentalComposeUiApi
+    @DoNotInline
+    fun unregister(autofill: AndroidAutofill) {
+        autofill.autofillManager.unregisterCallback(this)
+    }
 }
