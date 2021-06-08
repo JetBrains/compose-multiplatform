@@ -103,7 +103,7 @@ class SuspendingPointerInputFilterTest {
             with(filter) {
                 awaitPointerEventScope {
                     repeat(3) {
-                        results.offer(awaitPointerEvent())
+                        results.trySend(awaitPointerEvent())
                     }
                     results.close()
                 }
@@ -138,7 +138,7 @@ class SuspendingPointerInputFilterTest {
             with(filter) {
                 awaitPointerEventScope {
                     repeat(3) {
-                        results.offer(awaitPointerEvent())
+                        results.trySend(awaitPointerEvent())
                     }
                     results.close()
                 }

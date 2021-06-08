@@ -165,12 +165,12 @@ internal class TextInputServiceAndroid(
 
     override fun showSoftwareKeyboard() {
         if (DEBUG) { Log.d(TAG, "$DEBUG_CLASS.showSoftwareKeyboard") }
-        showKeyboardChannel.offer(true)
+        showKeyboardChannel.trySend(true)
     }
 
     override fun hideSoftwareKeyboard() {
         if (DEBUG) { Log.d(TAG, "$DEBUG_CLASS.hideSoftwareKeyboard") }
-        showKeyboardChannel.offer(false)
+        showKeyboardChannel.trySend(false)
     }
 
     suspend fun keyboardVisibilityEventLoop() {
@@ -180,7 +180,7 @@ internal class TextInputServiceAndroid(
             // on the same thread, there is a possibility that we have a stale value in the channel
             // because we start consuming from it before we finish producing all the values. We poll
             // to make sure that we use the most recent value.
-            if (showKeyboardChannel.poll() ?: showKeyboard) {
+            if (showKeyboardChannel.tryReceive().getOrNull() ?: showKeyboard) {
                 if (DEBUG) { Log.d(TAG, "$DEBUG_CLASS.keyboardVisibilityEventLoop.showSoftInput") }
                 inputMethodManager.showSoftInput(view)
             } else {

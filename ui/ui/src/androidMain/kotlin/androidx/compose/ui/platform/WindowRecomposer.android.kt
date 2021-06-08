@@ -30,6 +30,7 @@ import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.ViewTreeLifecycleOwner
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.CoroutineStart
+import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.android.asCoroutineDispatcher
 import kotlinx.coroutines.launch
@@ -149,6 +150,7 @@ object WindowRecomposerPolicy {
         }
     }
 
+    @OptIn(DelicateCoroutinesApi::class)
     internal fun createAndInstallWindowRecomposer(rootView: View): Recomposer {
         val newRecomposer = factory.get().createRecomposer(rootView)
         rootView.compositionContext = newRecomposer
