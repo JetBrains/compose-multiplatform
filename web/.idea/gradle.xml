@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="GradleMigrationSettings" migrationVersion="1" />
+  <component name="GradleSettings">
+    <option name="linkedExternalProjectsSettings">
+      <GradleProjectSettings>
+        <option name="distributionType" value="DEFAULT_WRAPPED" />
+        <option name="externalProjectPath" value="$PROJECT_DIR$" />
+        <option name="gradleJvm" value="#JAVA_HOME" />
+        <option name="modules">
+          <set>
+            <option value="$PROJECT_DIR$/../examples/falling_balls_with_web" />
+            <option value="$PROJECT_DIR$/../examples/web-getting-started" />
+            <option value="$PROJECT_DIR$/../examples/web-with-react" />
+            <option value="$PROJECT_DIR$/../examples/web_landing" />
+            <option value="$PROJECT_DIR$" />
+            <option value="$PROJECT_DIR$/benchmark-core" />
+            <option value="$PROJECT_DIR$/core" />
+            <option value="$PROJECT_DIR$/examples" />
+            <option value="$PROJECT_DIR$/integration-core" />
+            <option value="$PROJECT_DIR$/integration-widgets" />
+            <option value="$PROJECT_DIR$/widgets" />
+          </set>
+        </option>
+      </GradleProjectSettings>
+    </option>
+  </component>
+</project>

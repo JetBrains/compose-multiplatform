@@ -2,6 +2,8 @@ package org.jetbrains.compose.demo.falling.views
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.withFrameNanos
 import org.jetbrains.compose.demo.falling.Game
 import org.jetbrains.compose.common.material.Text
@@ -22,10 +24,24 @@ import org.jetbrains.compose.common.ui.size
 import org.jetbrains.compose.common.core.graphics.Color
 import org.jetbrains.compose.common.foundation.layout.fillMaxHeight
 import org.jetbrains.compose.common.foundation.layout.fillMaxWidth
+import org.jetbrains.compose.common.material.EditText
 
 @Composable
 fun fallingBalls(game: Game) {
-    Column(Modifier.fillMaxWidth().fillMaxHeight(1f)) {
+    val (text, setText) = remember { mutableStateOf<String>("Ya ya") }
+
+    Column(Modifier
+        .fillMaxWidth()
+        .fillMaxHeight(.8f)
+        .background(Color.Blue)
+    ) {
+        Box() {
+            EditText(text = text, onValueChange = {setText(it)})
+        }
+        Box() {
+            Text("Input val: $text")
+        }
+
         Box() {
             Text(
                 "Catch balls!${if (game.finished) " Game over!" else ""}",

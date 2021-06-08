@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ExternalStorageConfigurationManager" enabled="true" />
+  <component name="FrameworkDetectionExcludesConfiguration">
+    <file type="web" url="file://$PROJECT_DIR$/../examples/falling_balls_with_web" />
+    <file type="web" url="file://$PROJECT_DIR$/../examples/web-getting-started" />
+    <file type="web" url="file://$PROJECT_DIR$/../examples/web-with-react" />
+    <file type="web" url="file://$PROJECT_DIR$/../examples/web_landing" />
+    <file type="web" url="file://$PROJECT_DIR$" />
+  </component>
+  <component name="ProjectRootManager" version="2" languageLevel="JDK_11" default="true" project-jdk-name="11" project-jdk-type="JavaSDK" />
+</project>
