@@ -3461,6 +3461,57 @@ class AndroidLayoutDrawTest {
         assertTrue(latch.await(1, TimeUnit.SECONDS))
     }
 
+    @Test
+    fun noRemeasureWhenWeStopUsingStateInMeasuring() = with(density) {
+        val counter = mutableStateOf(0)
+        var latch = CountDownLatch(1)
+        var parentRemeasures = 0
+        var measurePolicy = mutableStateOf(
+            MeasurePolicy { measurables, constraints ->
+                counter.value
+                parentRemeasures++
+                measurables.first().measure(constraints)
+                layout(1, 1) { }
+            }
+        )
+        activityTestRule.runOnUiThread {
+            activity.setContent {
+                Layout(
+                    content = {
+                        Layout(
+                            content = {}
+                        ) { _, _ ->
+                            counter.value
+                            latch.countDown()
+                            layout(1, 1) { }
+                        }
+                    },
+                    measurePolicy = measurePolicy.value
+                )
+            }
+        }
+
+        assertTrue(latch.await(1, TimeUnit.SECONDS))
+        assertEquals(1, parentRemeasures)
+
+        latch = CountDownLatch(1)
+        measurePolicy.value = MeasurePolicy { measurables, constraints ->
+            // not using counter anymore
+            parentRemeasures++
+            measurables.first().measure(constraints)
+            layout(1, 1) { }
+        }
+
+        assertTrue(latch.await(10000, TimeUnit.SECONDS))
+        assertEquals(2, parentRemeasures)
+
+        latch = CountDownLatch(1)
+        counter.value = 1
+
+        assertTrue(latch.await(10000, TimeUnit.SECONDS))
+        assertEquals(2, parentRemeasures)
+    }
+
     private fun composeSquares(model: SquareModel) {
         activityTestRule.runOnUiThreadIR {
             activity.setContent {
