@@ -404,7 +404,10 @@ private fun IconsWithTextFieldLayout(
     Layout(
         content = {
             if (leading != null) {
-                Box(Modifier.layoutId(LeadingId).iconPadding(start = HorizontalIconPadding)) {
+                Box(
+                    modifier = Modifier.layoutId(LeadingId).then(IconDefaultSizeModifier),
+                    contentAlignment = Alignment.Center
+                ) {
                     Decoration(
                         contentColor = leadingColor,
                         content = leading
@@ -412,26 +415,27 @@ private fun IconsWithTextFieldLayout(
                 }
             }
             if (trailing != null) {
-                Box(Modifier.layoutId(TrailingId).iconPadding(end = HorizontalIconPadding)) {
+                Box(
+                    modifier = Modifier.layoutId(TrailingId).then(IconDefaultSizeModifier),
+                    contentAlignment = Alignment.Center
+                ) {
                     Decoration(
                         contentColor = trailingColor,
                         content = trailing
                     )
                 }
             }
-            val padding = Modifier.padding(horizontal = TextFieldPadding)
+
+            val paddingToIcon = TextFieldPadding - HorizontalIconPadding
+            val padding = Modifier.padding(
+                start = if (leading != null) paddingToIcon else TextFieldPadding,
+                end = if (trailing != null) paddingToIcon else TextFieldPadding
+            )
             if (placeholder != null) {
                 placeholder(Modifier.layoutId(PlaceholderId).then(padding))
             }
             if (label != null) {
-                Box(
-                    modifier = Modifier
-                        .layoutId(LabelId)
-                        .iconPadding(
-                            start = TextFieldPadding,
-                            end = TextFieldPadding
-                        )
-                ) { label() }
+                Box(Modifier.layoutId(LabelId).then(padding)) { label() }
             }
             Box(
                 modifier = Modifier.layoutId(TextFieldId).then(padding),
@@ -529,7 +533,7 @@ private class TextFieldMeasurePolicy(
         )
 
         return layout(width, height) {
-            if (widthOrZero(labelPlaceable) != 0) {
+            if (labelPlaceable != null) {
                 // label's final position is always relative to the baseline
                 val labelEndPosition = (baseLineOffset - lastBaseline).coerceAtLeast(0)
                 placeWithLabel(

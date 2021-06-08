@@ -403,7 +403,10 @@ private fun IconsWithTextFieldLayout(
             )
 
             if (leading != null) {
-                Box(Modifier.layoutId(LeadingId).iconPadding(start = HorizontalIconPadding)) {
+                Box(
+                    modifier = Modifier.layoutId(LeadingId).then(IconDefaultSizeModifier),
+                    contentAlignment = Alignment.Center
+                ) {
                     Decoration(
                         contentColor = leadingColor,
                         content = leading
@@ -411,19 +414,27 @@ private fun IconsWithTextFieldLayout(
                 }
             }
             if (trailing != null) {
-                Box(Modifier.layoutId(TrailingId).iconPadding(end = HorizontalIconPadding)) {
+                Box(
+                    modifier = Modifier.layoutId(TrailingId).then(IconDefaultSizeModifier),
+                    contentAlignment = Alignment.Center
+                ) {
                     Decoration(
                         contentColor = trailingColor,
                         content = trailing
                     )
                 }
             }
+            val paddingToIcon = TextFieldPadding - HorizontalIconPadding
+            val padding = Modifier.padding(
+                start = if (leading != null) paddingToIcon else TextFieldPadding,
+                end = if (trailing != null) paddingToIcon else TextFieldPadding
+            )
             if (placeholder != null) {
-                placeholder(Modifier.layoutId(PlaceholderId).padding(horizontal = TextFieldPadding))
+                placeholder(Modifier.layoutId(PlaceholderId).then(padding))
             }
 
             Box(
-                modifier = Modifier.layoutId(TextFieldId).padding(horizontal = TextFieldPadding),
+                modifier = Modifier.layoutId(TextFieldId).then(padding),
                 propagateMinConstraints = true
             ) {
                 textField()
@@ -603,6 +614,7 @@ private fun Placeable.PlacementScope.place(
     density: Float
 ) {
     val topBottomPadding = (TextFieldPadding.value * density).roundToInt()
+    val iconPadding = HorizontalIconPadding.value * density
 
     // placed center vertically and to the start edge horizontally
     leadingPlaceable?.placeRelative(
@@ -626,9 +638,14 @@ private fun Placeable.PlacementScope.place(
         }
         val positionY =
             startPositionY * (1 - animationProgress) - (it.height / 2) * animationProgress
-        val positionX = (TextFieldPadding.value * density) +
-            widthOrZero(leadingPlaceable) * (1 - animationProgress)
-        it.placeRelative(positionX.roundToInt(), positionY.roundToInt())
+        val positionX = (
+            if (leadingPlaceable == null) {
+                0f
+            } else {
+                (widthOrZero(leadingPlaceable) - iconPadding) * (1 - animationProgress)
+            }
+            ).roundToInt() + topBottomPadding
+        it.placeRelative(positionX, positionY.roundToInt())
     }
 
     // placed center vertically and after the leading icon horizontally if single line text field
