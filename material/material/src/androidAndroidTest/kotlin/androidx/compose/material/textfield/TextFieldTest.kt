@@ -38,6 +38,7 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.Divider
 import androidx.compose.material.Icon
+import androidx.compose.material.IconButton
 import androidx.compose.material.LocalContentAlpha
 import androidx.compose.material.LocalContentColor
 import androidx.compose.material.LocalTextStyle
@@ -70,6 +71,7 @@ import androidx.compose.ui.layout.FirstBaseline
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.layout.positionInRoot
 import androidx.compose.ui.node.Ref
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.platform.LocalTextInputService
 import androidx.compose.ui.platform.LocalView
@@ -101,6 +103,7 @@ import androidx.compose.ui.text.input.PlatformTextInputService
 import androidx.compose.ui.text.input.TextInputService
 import androidx.compose.ui.text.input.TransformedText
 import androidx.compose.ui.text.input.VisualTransformation
+import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -145,7 +148,6 @@ class TextFieldTest {
             TextField(
                 value = "input",
                 onValueChange = {},
-                label = {},
                 modifier = Modifier.height(20.dp)
             )
         }
@@ -158,7 +160,6 @@ class TextFieldTest {
             TextField(
                 value = "input",
                 onValueChange = {},
-                label = {},
                 modifier = Modifier.requiredWidth(40.dp)
             )
         }
@@ -170,8 +171,7 @@ class TextFieldTest {
         rule.setMaterialContentForSizeAssertions {
             TextField(
                 value = "input",
-                onValueChange = {},
-                label = {}
+                onValueChange = {}
             )
         }
             .assertWidthIsEqualTo(ExpectedDefaultTextFieldWidth)
@@ -193,14 +193,12 @@ class TextFieldTest {
                     modifier = Modifier.testTag(textField1Tag),
                     value = "input1",
                     onValueChange = {},
-                    label = {},
                     interactionSource = interactionSource1
                 )
                 TextField(
                     modifier = Modifier.testTag(textField2Tag),
                     value = "input2",
                     onValueChange = {},
-                    label = {},
                     interactionSource = interactionSource2
                 )
             }
@@ -251,7 +249,6 @@ class TextFieldTest {
                 modifier = Modifier.testTag(TextfieldTag),
                 value = "input",
                 onValueChange = {},
-                label = {},
                 interactionSource = interactionSource
             )
         }
@@ -292,8 +289,7 @@ class TextFieldTest {
                         .focusRequester(focusRequester)
                         .testTag(TextfieldTag),
                     value = "input",
-                    onValueChange = {},
-                    label = {}
+                    onValueChange = {}
                 )
             }
         }
@@ -324,8 +320,7 @@ class TextFieldTest {
                         .focusRequester(focusRequester)
                         .testTag(TextfieldTag),
                     value = "input",
-                    onValueChange = {},
-                    label = {}
+                    onValueChange = {}
                 )
             }
         }
@@ -603,7 +598,6 @@ class TextFieldTest {
                     modifier = Modifier.height(height).testTag(TextfieldTag),
                     value = "",
                     onValueChange = {},
-                    label = {},
                     placeholder = {
                         Text(
                             text = "placeholder",
@@ -645,7 +639,7 @@ class TextFieldTest {
                     modifier = Modifier.testTag(TextfieldTag),
                     value = "input",
                     onValueChange = {},
-                    label = {},
+
                     placeholder = {
                         Text(
                             text = "placeholder",
@@ -675,7 +669,6 @@ class TextFieldTest {
                 modifier = Modifier.testTag(TextfieldTag),
                 value = "",
                 onValueChange = {},
-                label = {},
                 placeholder = {
                     Text("placeholder")
                     assertThat(
@@ -699,66 +692,213 @@ class TextFieldTest {
     }
 
     @Test
-    fun testTextField_trailingAndLeading_sizeAndPosition() {
+    fun testTextField_trailingAndLeading_sizeAndPosition_defaultIcon() {
         val textFieldHeight = 60.dp
         val textFieldWidth = 300.dp
-        val size = 30.dp
         val leadingPosition = Ref<Offset>()
         val leadingSize = Ref<IntSize>()
         val trailingPosition = Ref<Offset>()
         val trailingSize = Ref<IntSize>()
+        val density = Density(2f)
 
         rule.setMaterialContent {
-            TextField(
-                value = "text",
-                onValueChange = {},
-                modifier = Modifier.size(textFieldWidth, textFieldHeight),
-                label = {},
-                leadingIcon = {
-                    Box(
-                        Modifier.size(size).onGloballyPositioned {
-                            leadingPosition.value = it.positionInRoot()
-                            leadingSize.value = it.size
-                        }
-                    )
-                },
-                trailingIcon = {
-                    Box(
-                        Modifier.size(size).onGloballyPositioned {
-                            trailingPosition.value = it.positionInRoot()
-                            trailingSize.value = it.size
-                        }
-                    )
-                }
-            )
+            CompositionLocalProvider(LocalDensity provides density) {
+                TextField(
+                    value = "text",
+                    onValueChange = {},
+                    modifier = Modifier.size(textFieldWidth, textFieldHeight),
+                    leadingIcon = {
+                        Icon(
+                            Icons.Default.Favorite,
+                            null,
+                            Modifier.onGloballyPositioned {
+                                leadingPosition.value = it.positionInRoot()
+                                leadingSize.value = it.size
+                            }
+                        )
+                    },
+                    trailingIcon = {
+                        Icon(
+                            Icons.Default.Favorite,
+                            null,
+                            Modifier.onGloballyPositioned {
+                                trailingPosition.value = it.positionInRoot()
+                                trailingSize.value = it.size
+                            }
+                        )
+                    }
+                )
+            }
         }
 
-        rule.runOnIdleWithDensity {
-            // leading
-            assertThat(leadingSize.value).isEqualTo(IntSize(size.roundToPx(), size.roundToPx()))
-            assertThat(leadingPosition.value?.x).isEqualTo(IconPadding.roundToPx().toFloat())
-            assertThat(leadingPosition.value?.y).isEqualTo(
-                ((textFieldHeight.roundToPx() - leadingSize.value!!.height) / 2f).roundToInt()
-                    .toFloat()
-            )
-            // trailing
-            assertThat(trailingSize.value).isEqualTo(IntSize(size.roundToPx(), size.roundToPx()))
-            assertThat(trailingPosition.value?.x).isEqualTo(
-                (textFieldWidth.roundToPx() - IconPadding.roundToPx() - trailingSize.value!!.width)
-                    .toFloat()
-            )
-            assertThat(trailingPosition.value?.y)
-                .isEqualTo(
-                    ((textFieldHeight.roundToPx() - trailingSize.value!!.height) / 2f)
-                        .roundToInt().toFloat()
+        rule.runOnIdle {
+            val size = 24.dp // default icon size
+            with(density) {
+                // leading
+                assertThat(leadingSize.value).isEqualTo(IntSize(size.roundToPx(), size.roundToPx()))
+                assertThat(leadingPosition.value?.x).isEqualTo(IconPadding.roundToPx().toFloat())
+                assertThat(leadingPosition.value?.y).isEqualTo(
+                    ((textFieldHeight.roundToPx() - leadingSize.value!!.height) / 2f).roundToInt()
+                        .toFloat()
                 )
+                // trailing
+                assertThat(trailingSize.value).isEqualTo(
+                    IntSize(
+                        size.roundToPx(),
+                        size.roundToPx()
+                    )
+                )
+                assertThat(trailingPosition.value?.x).isEqualTo(
+                    (
+                        textFieldWidth.roundToPx() - IconPadding.roundToPx() -
+                            trailingSize.value!!.width
+                        ).toFloat()
+                )
+                assertThat(trailingPosition.value?.y)
+                    .isEqualTo(
+                        ((textFieldHeight.roundToPx() - trailingSize.value!!.height) / 2f)
+                            .roundToInt().toFloat()
+                    )
+            }
+        }
+    }
+
+    @Test
+    fun testTextField_trailingAndLeading_sizeAndPosition_iconButton() {
+        val textFieldHeight = 80.dp
+        val textFieldWidth = 300.dp
+        val density = Density(2f)
+
+        var leadingPosition: Offset? = null
+        var leadingSize: IntSize? = null
+        var trailingPosition: Offset? = null
+        var trailingSize: IntSize? = null
+
+        rule.setMaterialContent {
+            CompositionLocalProvider(LocalDensity provides density) {
+                TextField(
+                    value = "text",
+                    onValueChange = {},
+                    modifier = Modifier.size(textFieldWidth, textFieldHeight),
+                    leadingIcon = {
+                        IconButton(
+                            onClick = {},
+                            modifier = Modifier.onGloballyPositioned {
+                                leadingPosition = it.positionInRoot()
+                                leadingSize = it.size
+                            }
+                        ) {
+                            Icon(Icons.Default.Favorite, null)
+                        }
+                    },
+                    trailingIcon = {
+                        IconButton(
+                            onClick = {},
+                            modifier = Modifier.onGloballyPositioned {
+                                trailingPosition = it.positionInRoot()
+                                trailingSize = it.size
+                            }
+                        ) {
+                            Icon(Icons.Default.Favorite, null)
+                        }
+                    }
+                )
+            }
+        }
+
+        rule.runOnIdle {
+            val size = 48.dp // default IconButton size
+
+            with(density) {
+                // leading
+                assertThat(leadingSize).isEqualTo(IntSize(size.roundToPx(), size.roundToPx()))
+                assertThat(leadingPosition?.x).isEqualTo(0f)
+                assertThat(leadingPosition?.y).isEqualTo(
+                    ((textFieldHeight.roundToPx() - leadingSize!!.height) / 2f).roundToInt()
+                        .toFloat()
+                )
+                // trailing
+                assertThat(trailingSize).isEqualTo(
+                    IntSize(size.roundToPx(), size.roundToPx())
+                )
+                assertThat(trailingPosition?.x).isEqualTo(
+                    (textFieldWidth.roundToPx() - trailingSize!!.width).toFloat()
+                )
+                assertThat(trailingPosition?.y)
+                    .isEqualTo(
+                        ((textFieldHeight.roundToPx() - trailingSize!!.height) / 2f)
+                            .roundToInt().toFloat()
+                    )
+            }
+        }
+    }
+
+    @Test
+    fun testTextField_trailingAndLeading_sizeAndPosition_nonDefaultSizeIcon() {
+        val textFieldHeight = 80.dp
+        val textFieldWidth = 300.dp
+        val density = Density(2f)
+        val size = 70.dp
+
+        var leadingPosition: Offset? = null
+        var leadingSize: IntSize? = null
+        var trailingPosition: Offset? = null
+        var trailingSize: IntSize? = null
+
+        rule.setMaterialContent {
+            CompositionLocalProvider(LocalDensity provides density) {
+                TextField(
+                    value = "text",
+                    onValueChange = {},
+                    modifier = Modifier.size(textFieldWidth, textFieldHeight),
+                    leadingIcon = {
+                        Box(
+                            Modifier.size(size).onGloballyPositioned {
+                                leadingPosition = it.positionInRoot()
+                                leadingSize = it.size
+                            }
+                        )
+                    },
+                    trailingIcon = {
+                        Box(
+                            Modifier.size(size).onGloballyPositioned {
+                                trailingPosition = it.positionInRoot()
+                                trailingSize = it.size
+                            }
+                        )
+                    }
+                )
+            }
+        }
+
+        rule.runOnIdle {
+            with(density) {
+                // leading
+                assertThat(leadingSize).isEqualTo(IntSize(size.roundToPx(), size.roundToPx()))
+                assertThat(leadingPosition?.x).isEqualTo(0f)
+                assertThat(leadingPosition?.y).isEqualTo(
+                    ((textFieldHeight.roundToPx() - leadingSize!!.height) / 2f).roundToInt()
+                        .toFloat()
+                )
+                // trailing
+                assertThat(trailingSize).isEqualTo(
+                    IntSize(size.roundToPx(), size.roundToPx())
+                )
+                assertThat(trailingPosition?.x).isEqualTo(
+                    (textFieldWidth.roundToPx() - trailingSize!!.width).toFloat()
+                )
+                assertThat(trailingPosition?.y)
+                    .isEqualTo(
+                        ((textFieldHeight.roundToPx() - trailingSize!!.height) / 2f)
+                            .roundToInt().toFloat()
+                    )
+            }
         }
     }
 
     @Test
     fun testTextField_labelPositionX_initial_withTrailingAndLeading() {
         val height = 60.dp
-        val iconSize = 30.dp
         val labelPosition = Ref<Offset>()
         rule.setMaterialContent {
             Box {
@@ -774,13 +914,14 @@ class TextFieldTest {
                             }
                         )
                     },
-                    trailingIcon = { Box(Modifier.size(iconSize)) },
-                    leadingIcon = { Box(Modifier.size(iconSize)) }
+                    trailingIcon = { Icon(Icons.Default.Favorite, null) },
+                    leadingIcon = { Icon(Icons.Default.Favorite, null) }
                 )
             }
         }
 
         rule.runOnIdleWithDensity {
+            val iconSize = 24.dp // default icon size
             assertThat(labelPosition.value?.x).isEqualTo(
                 (ExpectedPadding.roundToPx() + IconPadding.roundToPx() + iconSize.roundToPx())
                     .toFloat()
@@ -789,7 +930,7 @@ class TextFieldTest {
     }
 
     @Test
-    fun testTextField_labelPositionX_initial_withEmptyTrailingAndLeading() {
+    fun testTextField_labelPositionX_initial_withNullTrailingAndLeading() {
         val height = 60.dp
         val labelPosition = Ref<Offset>()
         rule.setMaterialContent {
@@ -806,8 +947,8 @@ class TextFieldTest {
                             }
                         )
                     },
-                    trailingIcon = {},
-                    leadingIcon = {}
+                    trailingIcon = null,
+                    leadingIcon = null
                 )
             }
         }
@@ -825,7 +966,6 @@ class TextFieldTest {
             TextField(
                 value = "",
                 onValueChange = {},
-                label = {},
                 isError = false,
                 leadingIcon = {
                     assertThat(LocalContentColor.current)
@@ -853,7 +993,6 @@ class TextFieldTest {
             TextField(
                 value = "",
                 onValueChange = {},
-                label = {},
                 isError = true,
                 leadingIcon = {
                     assertThat(LocalContentColor.current)
@@ -883,7 +1022,6 @@ class TextFieldTest {
                     modifier = Modifier.testTag(TextfieldTag),
                     value = text.value,
                     onValueChange = { text.value = it },
-                    label = {},
                     keyboardOptions = KeyboardOptions(
                         imeAction = ImeAction.Go,
                         keyboardType = KeyboardType.Email

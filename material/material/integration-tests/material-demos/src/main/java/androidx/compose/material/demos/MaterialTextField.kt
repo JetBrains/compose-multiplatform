@@ -137,7 +137,7 @@ fun VerticalAlignmentsInTextField() {
         TextField(
             value = text.value,
             onValueChange = { text.value = it },
-            label = { if (label.value) Text("Label") },
+            label = if (label.value) { @Composable { Text("Label") } } else null,
             singleLine = singleLine.value,
             modifier = textFieldModifier
         )
@@ -145,7 +145,7 @@ fun VerticalAlignmentsInTextField() {
         OutlinedTextField(
             value = text.value,
             onValueChange = { text.value = it },
-            label = { if (label.value) Text("Label") },
+            label = if (label.value) { @Composable { Text("Label") } } else null,
             singleLine = singleLine.value,
             modifier = textFieldModifier
         )
@@ -179,11 +179,15 @@ fun MaterialTextFieldDemo() {
                                 "Label" + if (selectedOption == Option.Error) "*" else ""
                             Text(text = label)
                         },
-                        leadingIcon = {
-                            if (leadingChecked) Icon(Icons.Filled.Favorite, "Favorite")
+                        leadingIcon = if (leadingChecked) {
+                            @Composable { Icon(Icons.Filled.Favorite, "Favorite") }
+                        } else {
+                            null
                         },
-                        trailingIcon = {
-                            if (trailingChecked) Icon(Icons.Filled.Info, "Info")
+                        trailingIcon = if (trailingChecked) {
+                            @Composable { Icon(Icons.Filled.Info, "Info") }
+                        } else {
+                            null
                         },
                         isError = selectedOption == Option.Error,
                         modifier = Modifier.requiredWidth(300.dp)
@@ -200,11 +204,15 @@ fun MaterialTextFieldDemo() {
                                 "Label" + if (selectedOption == Option.Error) "*" else ""
                             Text(text = label)
                         },
-                        leadingIcon = {
-                            if (leadingChecked) Icon(Icons.Filled.Favorite, "Favorite")
+                        leadingIcon = if (leadingChecked) {
+                            @Composable { Icon(Icons.Filled.Favorite, "Favorite") }
+                        } else {
+                            null
                         },
-                        trailingIcon = {
-                            if (trailingChecked) Icon(Icons.Filled.Info, "Info")
+                        trailingIcon = if (trailingChecked) {
+                            @Composable { Icon(Icons.Filled.Info, "Info") }
+                        } else {
+                            null
                         },
                         isError = selectedOption == Option.Error,
                         modifier = Modifier.requiredWidth(300.dp)
