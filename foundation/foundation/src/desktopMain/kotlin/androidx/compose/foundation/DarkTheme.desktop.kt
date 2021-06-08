@@ -18,6 +18,8 @@ package androidx.compose.foundation
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.ReadOnlyComposable
+import org.jetbrains.skiko.SystemTheme
+import org.jetbrains.skiko.currentSystemTheme
 
 /**
  * This function should be used to help build responsive UIs that follow the system setting, to
@@ -43,6 +45,5 @@ import androidx.compose.runtime.ReadOnlyComposable
 @Composable
 @ReadOnlyComposable
 internal actual fun _isSystemInDarkTheme(): Boolean {
-    // TODO: Fix after we get a skiko build with https://github.com/JetBrains/skiko/pull/118
-    return false
+    return currentSystemTheme == SystemTheme.DARK
 }
