@@ -53,15 +53,20 @@ class IntegrationTests : BaseIntegrationTests() {
     fun `making screen width less than 400px changes the text color`() {
         openTestPage("smallWidthChangesTheTextColor")
 
-        val span = driver.findElement(By.id("span1"))
-        waitTextToBe(textId = "span1", "This a colored text")
-        driver.manage().window().size = Dimension(1000, 1000)
+        val initialWindowSize = driver.manage().window().size
+        try {
+            val span = driver.findElement(By.id("span1"))
+            waitTextToBe(textId = "span1", "This a colored text")
+            driver.manage().window().size = Dimension(1000, 1000)
 
-        assertEquals("rgba(0, 0, 0, 1)", span.getCssValue("color"))
+            assertEquals("rgba(0, 0, 0, 1)", span.getCssValue("color"))
 
-        driver.manage().window().size = Dimension(300, 300)
-        waitTextToBe(textId = "span1", "This a colored text")
+            driver.manage().window().size = Dimension(300, 300)
+            waitTextToBe(textId = "span1", "This a colored text")
 
-        assertEquals("rgba(255, 0, 0, 1)", span.getCssValue("color"))
+            assertEquals("rgba(255, 0, 0, 1)", span.getCssValue("color"))
+        } finally {
+            driver.manage().window().size = initialWindowSize
+        }
     }
 }
