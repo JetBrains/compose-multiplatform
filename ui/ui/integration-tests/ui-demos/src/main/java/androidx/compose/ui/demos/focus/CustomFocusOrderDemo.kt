@@ -56,7 +56,7 @@ fun CustomFocusOrderDemo() {
             )
         }
         Column(Modifier.fillMaxSize(), SpaceEvenly) {
-            val (item1, item2, item3, item4) = FocusRequester.createRefs()
+            val (item1, item2, item3, item4) = remember { FocusRequester.createRefs() }
             Row(Modifier.fillMaxWidth(), SpaceEvenly) {
                 FocusableText(
                     text = "1",

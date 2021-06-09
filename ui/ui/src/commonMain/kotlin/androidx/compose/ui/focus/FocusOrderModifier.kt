@@ -23,6 +23,8 @@ import androidx.compose.ui.platform.debugInspectorInfo
 
 /**
  * A [modifier][Modifier.Element] that can be used to set a custom focus traversal order.
+ *
+ * @see Modifier.focusOrder
  */
 interface FocusOrderModifier : Modifier.Element {
 
@@ -36,48 +38,66 @@ interface FocusOrderModifier : Modifier.Element {
 
 /**
  * Specifies custom focus destinations that are used instead of the default focus traversal order.
+ *
+ * @sample androidx.compose.ui.samples.CustomFocusOrderSample
  */
 class FocusOrder {
 
     /**
-     * A custom item to be used when the user moves focus to the "next" item.
+     * A custom item to be used when the user requests a focus moves to the "next" item.
+     *
+     * @sample androidx.compose.ui.samples.CustomFocusOrderSample
      */
     var next: FocusRequester = FocusRequester.Default
 
     /**
-     * A custom item to be used when the user moves focus to the "previous" item.
+     * A custom item to be used when the user requests a focus moves to the "previous" item.
+     *
+     * @sample androidx.compose.ui.samples.CustomFocusOrderSample
      */
     var previous: FocusRequester = FocusRequester.Default
 
     /**
      *  A custom item to be used when the user moves focus "up".
+     *
+     *  @sample androidx.compose.ui.samples.CustomFocusOrderSample
      */
     var up: FocusRequester = FocusRequester.Default
 
     /**
      *  A custom item to be used when the user moves focus "down".
+     *
+     *  @sample androidx.compose.ui.samples.CustomFocusOrderSample
      */
     var down: FocusRequester = FocusRequester.Default
 
     /**
-     * A custom item to be used when the user moves focus to the "left" item.
+     * A custom item to be used when the user requests a focus moves to the "left" item.
+     *
+     * @sample androidx.compose.ui.samples.CustomFocusOrderSample
      */
     var left: FocusRequester = FocusRequester.Default
 
     /**
-     * A custom item to be used when the user moves focus to the "right" item.
+     * A custom item to be used when the user requests a focus moves to the "right" item.
+     *
+     * @sample androidx.compose.ui.samples.CustomFocusOrderSample
      */
     var right: FocusRequester = FocusRequester.Default
 
     /**
-     * A custom item to be used when the user moves focus to the "left" in LTR mode and "right"
-     * in RTL mode.
+     * A custom item to be used when the user requests a focus moves to the "left" in LTR mode and
+     * "right" in RTL mode.
+     *
+     * @sample androidx.compose.ui.samples.CustomFocusOrderSample
      */
     var start: FocusRequester = FocusRequester.Default
 
     /**
-     * A custom item to be used when the user moves focus to the "right" in LTR mode and "left"
-     * in RTL mode.
+     * A custom item to be used when the user requests a focus moves to the "right" in LTR mode
+     * and "left" in RTL mode.
+     *
+     * @sample androidx.compose.ui.samples.CustomFocusOrderSample
      */
     var end: FocusRequester = FocusRequester.Default
 }
@@ -98,6 +118,8 @@ internal class FocusOrderModifierImpl(
  * to move the current focus to the [next][FocusOrder.next] item, or wants to move
  * focus [left][FocusOrder.left], [right][FocusOrder.right], [up][FocusOrder.up] or
  * [down][FocusOrder.down].
+ *
+ * @sample androidx.compose.ui.samples.CustomFocusOrderSample
  */
 fun Modifier.focusOrder(focusOrderReceiver: FocusOrder.() -> Unit): Modifier {
     return this.then(
@@ -114,12 +136,16 @@ fun Modifier.focusOrder(focusOrderReceiver: FocusOrder.() -> Unit): Modifier {
 /**
  * A modifier that lets you specify a [FocusRequester] for the current composable so that this
  * [focusRequester] can be used by another composable to specify a custom focus order.
+ *
+ * @sample androidx.compose.ui.samples.CustomFocusOrderSample
  */
 fun Modifier.focusOrder(focusRequester: FocusRequester): Modifier = focusRequester(focusRequester)
 
 /**
  * A modifier that lets you specify a [FocusRequester] for the current composable along with
  * [focusOrder].
+ *
+ * @sample androidx.compose.ui.samples.CustomFocusOrderSample
  */
 fun Modifier.focusOrder(
     focusRequester: FocusRequester,

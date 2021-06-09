@@ -22,14 +22,21 @@ package androidx.compose.ui.input.key
 expect class NativeKeyEvent
 
 /**
- * When a user presses a key on a hardware keyboard, a [KeyEvent] is sent to the
- * [KeyInputModifier] that is currently active.
+ * When a user presses a key on a hardware keyboard, a [KeyEvent] is sent to the item that is
+ * currently focused. Any parent composable can intercept this [key event][KeyEvent] on its way to
+ * the focused item by using [Modifier.onPreviewKeyEvent()]][onPreviewKeyEvent]. If the item is
+ * not consumed, it returns back to each parent and can be intercepted by using
+ * [Modifier.onKeyEvent()]][onKeyEvent].
+ *
+ * @sample androidx.compose.ui.samples.KeyEventSample
  */
 @Suppress("INLINE_CLASS_DEPRECATED", "EXPERIMENTAL_FEATURE_WARNING")
 inline class KeyEvent(val nativeKeyEvent: NativeKeyEvent)
 
 /**
  * The key that was pressed.
+ *
+ * @sample androidx.compose.ui.samples.KeyEventIsAltPressedSample
  */
 expect val KeyEvent.key: Key
 
@@ -53,31 +60,43 @@ expect val KeyEvent.utf16CodePoint: Int
 
 /**
  * The [type][KeyEventType] of key event.
+ *
+ * @sample androidx.compose.ui.samples.KeyEventTypeSample
  */
 expect val KeyEvent.type: KeyEventType
 
 /**
  * Indicates whether the Alt key is pressed.
+ *
+ * @sample androidx.compose.ui.samples.KeyEventIsAltPressedSample
  */
 expect val KeyEvent.isAltPressed: Boolean
 
 /**
  * Indicates whether the Ctrl key is pressed.
+ *
+ * @sample androidx.compose.ui.samples.KeyEventIsCtrlPressedSample
  */
 expect val KeyEvent.isCtrlPressed: Boolean
 
 /**
  * Indicates whether the Meta key is pressed.
+ *
+ * @sample androidx.compose.ui.samples.KeyEventIsMetaPressedSample
  */
 expect val KeyEvent.isMetaPressed: Boolean
 
 /**
  * Indicates whether the Shift key is pressed.
+ *
+ * @sample androidx.compose.ui.samples.KeyEventIsShiftPressedSample
  */
 expect val KeyEvent.isShiftPressed: Boolean
 
 /**
  * The type of Key Event.
+ *
+ * @sample androidx.compose.ui.samples.KeyEventTypeSample
  */
 @Suppress("INLINE_CLASS_DEPRECATED", "EXPERIMENTAL_FEATURE_WARNING")
 inline class KeyEventType internal constructor(@Suppress("unused") private val value: Int) {
@@ -94,16 +113,22 @@ inline class KeyEventType internal constructor(@Suppress("unused") private val v
     companion object {
         /**
          * Unknown key event.
+         *
+         * @sample androidx.compose.ui.samples.KeyEventTypeSample
          */
         val Unknown: KeyEventType = KeyEventType(0)
 
         /**
          * Type of KeyEvent sent when the user lifts their finger off a key on the keyboard.
+         *
+         * @sample androidx.compose.ui.samples.KeyEventTypeSample
          */
         val KeyUp: KeyEventType = KeyEventType(1)
 
         /**
          * Type of KeyEvent sent when the user presses down their finger on a key on the keyboard.
+         *
+         * @sample androidx.compose.ui.samples.KeyEventTypeSample
          */
         val KeyDown: KeyEventType = KeyEventType(2)
     }

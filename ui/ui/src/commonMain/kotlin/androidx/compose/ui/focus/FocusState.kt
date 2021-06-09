@@ -19,14 +19,19 @@ package androidx.compose.ui.focus
 /**
  * The focus state of a [FocusModifier]. Use [onFocusChanged] or [onFocusEvent] modifiers to
  * access [FocusState].
+ *
+ * @sample androidx.compose.ui.samples.FocusableSample
  */
 interface FocusState {
     /**
      * Whether the component is focused or not.
      *
+     * @sample androidx.compose.ui.samples.FocusableSample
+     *
      * @return true if the component is focused, false otherwise.
      */
     val isFocused: Boolean
+
     /**
      * Whether the focus modifier associated with this [FocusState] has a child that is focused.
      *
@@ -36,13 +41,16 @@ interface FocusState {
 
     /**
      * Whether focus is captured or not. A focusable component is in a captured state when it
-     * wants to hold onto focus. (Eg. when a text field has an invalid phone number]. When we are
-     * in a captured state, clicking outside the focused item does not clear focus.
+     * wants to hold onto focus. (Eg. when a text field has an invalid phone number). When we are
+     * in a captured state, clicking on other focusable items does not clear focus from the
+     * currently focused item.
      *
      * You can capture focus by calling [focusRequester.captureFocus()][captureFocus] and free
      * focus by calling [focusRequester.freeFocus()][freeFocus].
      *
      *  @return true if focus is captured, false otherwise.
+     *
+     *  @sample androidx.compose.ui.samples.CaptureFocusSample
      */
     val isCaptured: Boolean
 }

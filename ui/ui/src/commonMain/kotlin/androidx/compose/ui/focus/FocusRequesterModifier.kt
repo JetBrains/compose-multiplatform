@@ -22,14 +22,19 @@ import androidx.compose.ui.platform.InspectorValueInfo
 import androidx.compose.ui.platform.debugInspectorInfo
 
 /**
- * A [modifier][Modifier.Element] that can be used to pass in a [FocusRequester] that can be used
- * to request focus state changes.
+ * A [modifier][Modifier.Element] that is used to pass in a [FocusRequester] that can be used to
+ * request focus state changes.
+ *
+ * @sample androidx.compose.ui.samples.RequestFocusSample
  *
  * @see FocusRequester
+ * @see Modifier.focusRequester
  */
 interface FocusRequesterModifier : Modifier.Element {
     /**
      * An instance of [FocusRequester], that can be used to request focus state changes.
+     *
+     * @sample androidx.compose.ui.samples.RequestFocusSample
      */
     val focusRequester: FocusRequester
 }
@@ -40,7 +45,9 @@ internal class FocusRequesterModifierImpl(
 ) : FocusRequesterModifier, InspectorValueInfo(inspectorInfo)
 
 /**
- * Add this modifier to a component to observe changes to focus state.
+ * Add this modifier to a component to request changes to focus.
+ *
+ * @sample androidx.compose.ui.samples.RequestFocusSample
  */
 fun Modifier.focusRequester(focusRequester: FocusRequester): Modifier {
     return this.then(
