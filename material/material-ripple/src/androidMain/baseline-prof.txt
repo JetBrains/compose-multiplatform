@@ -1,0 +1,11 @@
+# Baseline profile rules for androidx.compose.material.ripple
+# =============================================
+HSPLandroidx/compose/material/ripple/AndroidRippleIndicationInstance;->**(**)**
+HSPLandroidx/compose/material/ripple/PlatformRipple;->**(**)**
+HSPLandroidx/compose/material/ripple/Ripple;->**(**)**
+HSPLandroidx/compose/material/ripple/UnprojectedRipple;->**(**)**
+HSPLandroidx/compose/material/ripple/RippleHostView;->**(**)**
+HSPLandroidx/compose/material/ripple/RippleHostMap;->**(**)**
+HSPLandroidx/compose/material/ripple/RippleContainer;->**(**)**
+HSPLandroidx/compose/material/ripple/RippleAlpha;->**(**)**
+Landroidx/compose/material/ripple/*;

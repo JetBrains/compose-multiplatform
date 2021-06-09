@@ -1,0 +1,22 @@
+# Baseline profile rules for androidx.compose.animation
+# =============================================
+HSPLandroidx/compose/animation/FlingCalculatorKt;->**(**)**
+HSPLandroidx/compose/animation/SplineBasedDecayKt;->**(**)**
+HSPLandroidx/compose/animation/AndroidFlingSpline$FlingResult;-><init>(FF)V
+HSPLandroidx/compose/animation/AndroidFlingSpline$FlingResult;->getDistanceCoefficient()F
+HSPLandroidx/compose/animation/AndroidFlingSpline$FlingResult;->getVelocityCoefficient()F
+HSPLandroidx/compose/animation/AndroidFlingSpline;->**(**)**
+HSPLandroidx/compose/animation/FlingCalculator;->**(**)**
+HSPLandroidx/compose/animation/FlingCalculator$FlingInfo;-><init>(FFJ)V
+HSPLandroidx/compose/animation/FlingCalculator$FlingInfo;->position(J)F
+HSPLandroidx/compose/animation/FlingCalculator$FlingInfo;->velocity(J)F
+HSPLandroidx/compose/animation/AndroidFlingSpline;->**(**)**
+HSPLandroidx/compose/animation/AnimatedVisibilityKt**->**(**)**
+HSPLandroidx/compose/animation/AnimatedVisibilityScope;-><init>(**)V
+HSPLandroidx/compose/animation/CrossfadeKt**->**(**)**
+HSPLandroidx/compose/animation/TransitionData;->**(**)**
+HSPLandroidx/compose/animation/SplineBasedFloatDecayAnimationSpec**->**(**)**
+HSPLandroidx/compose/animation/ChangeSize;->**(**)**
+HSPLandroidx/compose/animation/CrossfadeAnimationItem;->**(**)**
+HSPLandroidx/compose/animation/EnterExitTransitionKt;->**(**)**
+Landroidx/compose/animation/*;
