@@ -358,7 +358,6 @@ internal class LayoutNode : Measurable, Remeasurement, OwnerScope, LayoutInfo, C
             parent.requestRemeasure()
         }
         alignmentLines.reset()
-        alignmentUsageByParent = UsageByParent.NotUsed
         onDetach?.invoke(owner)
         forEachDelegate { it.detach() }
         innerLayoutNodeWrapper.detach()
@@ -463,9 +462,17 @@ internal class LayoutNode : Measurable, Remeasurement, OwnerScope, LayoutInfo, C
         set(value) {
             if (field != value) {
                 field = value
+                intrinsicsPolicy.updateFrom(measurePolicy)
                 requestRemeasure()
             }
         }
+
+    /**
+     * The intrinsic measurements of this layout, backed up by states to trigger
+     * correct remeasurement for layouts using the intrinsics of this layout
+     * when the [measurePolicy] is changing.
+     */
+    internal val intrinsicsPolicy = IntrinsicsPolicy(this)
 
     /**
      * The screen density to be used by this layout.
@@ -518,9 +525,9 @@ internal class LayoutNode : Measurable, Remeasurement, OwnerScope, LayoutInfo, C
     override val height: Int get() = outerMeasurablePlaceable.height
 
     /**
-     * State corresponding to the alignment lines of this layout, inherited + intrinsic
+     * State corresponding to the alignment lines of this layout, inherited + intrinsic.
      */
-    internal var alignmentLines = LayoutNodeAlignmentLines(this)
+    internal val alignmentLines = LayoutNodeAlignmentLines(this)
 
     internal val mDrawScope: LayoutNodeDrawScope = sharedDrawScope
 
@@ -556,8 +563,6 @@ internal class LayoutNode : Measurable, Remeasurement, OwnerScope, LayoutInfo, C
      * Remembers how the node was measured by the parent.
      */
     internal var measuredByParent: UsageByParent = UsageByParent.NotUsed
-
-    internal var alignmentUsageByParent = UsageByParent.NotUsed
 
     @Deprecated("Temporary API to support ConstraintLayout prototyping.")
     internal var canMultiMeasure: Boolean = false
@@ -1050,8 +1055,9 @@ internal class LayoutNode : Measurable, Remeasurement, OwnerScope, LayoutInfo, C
      * Used to request a new measurement + layout pass from the owner.
      */
     internal fun requestRemeasure() {
+        val owner = owner ?: return
         if (!ignoreRemeasureRequests && !isVirtual) {
-            owner?.onRequestMeasure(this)
+            owner.onRequestMeasure(this)
         }
     }
 

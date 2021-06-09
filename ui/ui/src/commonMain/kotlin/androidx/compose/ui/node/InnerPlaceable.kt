@@ -64,29 +64,17 @@ internal class InnerPlaceable(
 
     override fun findLastKeyInputWrapper(): ModifiedKeyInputNode? = findPreviousKeyInputWrapper()
 
-    override fun minIntrinsicWidth(height: Int): Int {
-        return with(layoutNode.measurePolicy) {
-            measureScope.minIntrinsicWidth(layoutNode.children, height)
-        }
-    }
+    override fun minIntrinsicWidth(height: Int) =
+        layoutNode.intrinsicsPolicy.minIntrinsicWidth(height)
 
-    override fun minIntrinsicHeight(width: Int): Int {
-        return with(layoutNode.measurePolicy) {
-            measureScope.minIntrinsicHeight(layoutNode.children, width)
-        }
-    }
+    override fun minIntrinsicHeight(width: Int) =
+        layoutNode.intrinsicsPolicy.minIntrinsicHeight(width)
 
-    override fun maxIntrinsicWidth(height: Int): Int {
-        return with(layoutNode.measurePolicy) {
-            measureScope.maxIntrinsicWidth(layoutNode.children, height)
-        }
-    }
+    override fun maxIntrinsicWidth(height: Int) =
+        layoutNode.intrinsicsPolicy.maxIntrinsicWidth(height)
 
-    override fun maxIntrinsicHeight(width: Int): Int {
-        return with(layoutNode.measurePolicy) {
-            measureScope.maxIntrinsicHeight(layoutNode.children, width)
-        }
-    }
+    override fun maxIntrinsicHeight(width: Int) =
+        layoutNode.intrinsicsPolicy.maxIntrinsicHeight(width)
 
     override fun placeAt(
         position: IntOffset,
