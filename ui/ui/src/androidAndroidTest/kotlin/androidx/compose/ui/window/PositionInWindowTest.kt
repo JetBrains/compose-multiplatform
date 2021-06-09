@@ -30,6 +30,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.findAndroidComposeView
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.pointer.consumeAllChanges
@@ -37,6 +38,7 @@ import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.LayoutCoordinates
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.layout.positionInWindow
+import androidx.compose.ui.platform.AndroidComposeView
 import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.testTag
@@ -202,7 +204,12 @@ class PositionInWindowTest {
         }
 
         rule.runOnIdle {
-            activity.window.decorView.offsetTopAndBottom(10)
+            val decorView = activity.window.decorView as ViewGroup
+            val androidComposeView = findAndroidComposeView(decorView) as AndroidComposeView
+            // Reset this just in case something else has forced a redraw this frame.
+            // This should fix test flakes.
+            androidComposeView.lastMatrixRecalculationAnimationTime = -1
+            decorView.offsetTopAndBottom(10)
             val newPosition = coordinates!!.positionInWindow()
             assertThat(newPosition.y).isEqualTo(position.y + 10)
         }
