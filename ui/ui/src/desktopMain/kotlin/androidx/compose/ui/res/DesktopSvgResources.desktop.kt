@@ -30,8 +30,11 @@ import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.IntSize
 import org.jetbrains.skija.Data
-import org.jetbrains.skija.Point
 import org.jetbrains.skija.svg.SVGDOM
+import org.jetbrains.skija.svg.SVGLength
+import org.jetbrains.skija.svg.SVGLengthUnit
+import org.jetbrains.skija.svg.SVGPreserveAspectRatio
+import org.jetbrains.skija.svg.SVGPreserveAspectRatioAlign
 import java.io.InputStream
 import kotlin.math.ceil
 
@@ -66,15 +69,18 @@ fun loadSvgResource(inputStream: InputStream, density: Density): Painter {
 }
 
 private class SVGPainter(
-    private val SVGDOM: SVGDOM,
+    private val dom: SVGDOM,
     private val density: Density
 ) : Painter() {
+    private val root = dom.root
+
     private val defaultSizePx: Size = run {
-        val containerSize = SVGDOM.containerSize
-        if (containerSize.x == 0f && containerSize.y == 0f) {
+        val width = root?.width?.withUnit(SVGLengthUnit.PX)?.value ?: 0f
+        val height = root?.height?.withUnit(SVGLengthUnit.PX)?.value ?: 0f
+        if (width == 0f && height == 0f) {
             Size.Unspecified
         } else {
-            Size(containerSize.x, containerSize.y)
+            Size(width, height)
         }
     }
 
@@ -118,9 +124,11 @@ private class SVGPainter(
     }
 
     private fun DrawScope.drawSvg(size: Size) {
-        drawIntoCanvas {
-            SVGDOM.containerSize = Point(size.width, size.height)
-            SVGDOM.render(it.nativeCanvas)
+        drawIntoCanvas { canvas ->
+            root?.width = SVGLength(size.width, SVGLengthUnit.PX)
+            root?.height = SVGLength(size.height, SVGLengthUnit.PX)
+            root?.preserveAspectRatio = SVGPreserveAspectRatio(SVGPreserveAspectRatioAlign.NONE)
+            dom.render(canvas.nativeCanvas)
         }
     }
 }
