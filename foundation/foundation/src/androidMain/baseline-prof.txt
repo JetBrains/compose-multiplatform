@@ -1,0 +1,41 @@
+# Baseline profile rules for androidx.compose.foundation
+# =============================================
+#
+# Include all methods in common top level classes
+HSPLandroidx/compose/foundation/Background;->**(**)**
+HSPLandroidx/compose/foundation/BackgroundKt;->**(**)**
+HSPLandroidx/compose/foundation/BorderKt**->**(**)**
+HSPLandroidx/compose/foundation/BorderStroke;->**(**)**
+HSPLandroidx/compose/foundation/CanvasKt;->**(**)**
+HSPLandroidx/compose/foundation/Clickable**->**(**)**
+HSPLandroidx/compose/foundation/Focusable**->**(**)**
+HSPLandroidx/compose/foundation/ImageKt**->**(**)**
+HSPLandroidx/compose/foundation/IndicationKt**->**(**)**
+HSPLandroidx/compose/foundation/IndicationModifier;->**(**)**
+HSPLandroidx/compose/foundation/MutatorMutex;->**(**)**
+HSPLandroidx/compose/foundation/ScrollKt**->**(**)**
+HSPLandroidx/compose/foundation/ScrollState**->**(**)**
+HSPLandroidx/compose/foundation/ScrollingLayoutModifier**->**(**)**
+#
+# Include everything inside of the gestures namespace
+HSPLandroidx/compose/foundation/gestures/**;->**(**)**
+#
+# Include everything inside of the interaction namespace
+HSPLandroidx/compose/foundation/interaction/*;->**(**)**
+#
+# Include everything inside of the lazy namespace
+HSPLandroidx/compose/foundation/lazy/*;->**(**)**
+#
+# common shape classes
+HSPLandroidx/compose/foundation/shape/CornerBasedShape;->**(**)**
+HSPLandroidx/compose/foundation/shape/RoundedCornerShape;->**(**)**
+HSPLandroidx/compose/foundation/shape/CornerSizeKt;->**(**)**
+HSPLandroidx/compose/foundation/shape/DpCornerSize;->**(**)**
+#
+# Include everything inside of the text namespace
+HSPLandroidx/compose/foundation/text/*;->**(**)**
+HSPLandroidx/compose/foundation/text/selection/SimpleLayoutKt**->**(**)**
+HSPLandroidx/compose/foundation/text/selection/TextFieldSelectionManager;->**(**)**
+#
+# Include all of foundation
+Landroidx/compose/foundation/**;

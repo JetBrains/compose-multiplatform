@@ -1,0 +1,71 @@
+# Baseline profile rules for androidx.compose.ui.graphics
+# =============================================
+HSPLandroidx/compose/ui/graphics/AndroidCanvas**->**(**)**
+HSPLandroidx/compose/ui/graphics/AndroidColorFilter_androidKt;->**(**)**
+HSPLandroidx/compose/ui/graphics/AndroidImageBitmap;->**(**)**
+HSPLandroidx/compose/ui/graphics/AndroidImageBitmap_androidKt;->**(**)**
+HSPLandroidx/compose/ui/graphics/AndroidMatrixConversions_androidKt;->**(**)**
+HSPLandroidx/compose/ui/graphics/AndroidPaint;->**(**)**
+HSPLandroidx/compose/ui/graphics/AndroidPaint_androidKt;->**(**)**
+HSPLandroidx/compose/ui/graphics/AndroidPath;->**(**)**
+HSPLandroidx/compose/ui/graphics/AndroidPath_androidKt;->**(**)**
+HSPLandroidx/compose/ui/graphics/BlendMode**->**(**)**
+HSPLandroidx/compose/ui/graphics/BlockGraphicsLayerModifier**->**(**)**
+HSPLandroidx/compose/ui/graphics/Brush;->**(**)**
+HSPLandroidx/compose/ui/graphics/Canvas$DefaultImpls;->**(**)**
+HSPLandroidx/compose/ui/graphics/CanvasHolder;->**(**)**
+HSPLandroidx/compose/ui/graphics/CanvasKt;->**(**)**
+HSPLandroidx/compose/ui/graphics/ClipOp**->**(**)**
+HSPLandroidx/compose/ui/graphics/Color**->**(**)**
+HSPLandroidx/compose/ui/graphics/ColorFilter**->**(**)**
+HSPLandroidx/compose/ui/graphics/ColorKt;->**(**)**
+HSPLandroidx/compose/ui/graphics/Float16**->**(**)**
+HSPLandroidx/compose/ui/graphics/GraphicsLayerModifierKt;->**(**)**
+HSPLandroidx/compose/ui/graphics/Matrix;->**(**)**
+HSPLandroidx/compose/ui/graphics/ImageBitmapConfig**->**(**)**
+HSPLandroidx/compose/ui/graphics/MatrixKt;->**(**)**
+HSPLandroidx/compose/ui/graphics/Outline**->**(**)**
+HSPLandroidx/compose/ui/graphics/PaintingStyle**->**(**)**
+HSPLandroidx/compose/ui/graphics/PathFillType**->**(**)**
+HSPLandroidx/compose/ui/graphics/RectangleShapeKt;->**(**)**
+HSPLandroidx/compose/ui/graphics/RectHelper_androidKt;->**(**)**
+HSPLandroidx/compose/ui/graphics/ReusableGraphicsLayerScope;->**(**)**
+HSPLandroidx/compose/ui/graphics/Shadow;->**(**)**
+HSPLandroidx/compose/ui/graphics/SimpleGraphicsLayerModifier**->**(**)**
+HSPLandroidx/compose/ui/graphics/SolidColor;->**(**)**
+HSPLandroidx/compose/ui/graphics/StrokeCap**->**(**)**
+HSPLandroidx/compose/ui/graphics/StrokeJoin**->**(**)**
+HSPLandroidx/compose/ui/graphics/TransformOrigin**->**(**)**
+HSPLandroidx/compose/ui/graphics/painter/BitmapPainter;->**(**)**
+HSPLandroidx/compose/ui/graphics/painter/Painter**->**(**)**
+HSPLandroidx/compose/ui/graphics/vector/DrawCache;->**(**)**
+#
+# All of colorspace
+HSPLandroidx/compose/ui/graphics/colorspace/**->**(**)**
+#
+# All of drawscope
+HSPLandroidx/compose/ui/graphics/drawscope/**->**(**)**
+#
+# Vector stuff
+HSPLandroidx/compose/ui/graphics/vector/DefaultVectorOverride;->**(**)**
+HSPLandroidx/compose/ui/graphics/vector/DrawCache;->**(**)**
+HSPLandroidx/compose/ui/graphics/vector/GroupComponent;->**(**)**
+HSPLandroidx/compose/ui/graphics/vector/ImageVector**->**(**)**
+HSPLandroidx/compose/ui/graphics/vector/PathBuilder;->**(**)**
+HSPLandroidx/compose/ui/graphics/vector/PathComponent;->**(**)**
+HSPLandroidx/compose/ui/graphics/vector/PathNode**->**(**)**
+HSPLandroidx/compose/ui/graphics/vector/PathParser**->**(**)**
+HSPLandroidx/compose/ui/graphics/vector/Stack;->**(**)**
+HSPLandroidx/compose/ui/graphics/vector/VNode;->**(**)**
+HSPLandroidx/compose/ui/graphics/vector/VectorApplier;->**(**)**
+HSPLandroidx/compose/ui/graphics/vector/VectorComponent;->**(**)**
+HSPLandroidx/compose/ui/graphics/vector/VectorComposeKt**->**(**)**
+HSPLandroidx/compose/ui/graphics/vector/VectorGroup;->**(**)**
+HSPLandroidx/compose/ui/graphics/vector/VectorKt;->**(**)**
+HSPLandroidx/compose/ui/graphics/vector/VectorPainter**->**(**)**
+HSPLandroidx/compose/ui/graphics/vector/VectorPath;->**(**)**
+HSPLandroidx/compose/ui/graphics/vector/compat/AndroidVectorResources;->**(**)**
+HSPLandroidx/compose/ui/graphics/vector/compat/XmlVectorParser_androidKt;->**(**)**
+#
+# Assume ~all classes will get loaded
+Landroidx/compose/ui/graphics/**;
