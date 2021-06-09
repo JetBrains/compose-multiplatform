@@ -133,9 +133,7 @@ inline fun Path.asAndroidPath(): android.graphics.Path =
 
     override fun addRect(rect: Rect) {
         check(_rectIsValid(rect))
-        rectF.set(rect.toAndroidRect())
-        // TODO(njawad) figure out what to do with Path Direction,
-        // Flutter does not use it, Platform does
+        rectF.set(rect.toAndroidRectF())
         internalPath.addRect(rectF, android.graphics.Path.Direction.CCW)
     }
 

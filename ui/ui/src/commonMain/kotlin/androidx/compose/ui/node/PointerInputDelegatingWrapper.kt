@@ -40,15 +40,24 @@ internal class PointerInputDelegatingWrapper(
         pointerPosition: Offset,
         hitPointerInputFilters: MutableList<PointerInputFilter>
     ) {
-        if (isPointerInBounds(pointerPosition)) {
+        if (isPointerInBounds(pointerPosition) && withinLayerBounds(pointerPosition)) {
             // If the pointer is in bounds, we hit the pointer input filter, so add it!
             hitPointerInputFilters.add(modifier.pointerInputFilter)
-        }
 
-        // Also, keep looking to see if we also might hit any children.
-        super.hitTest(
-            pointerPosition,
-            hitPointerInputFilters
-        )
+            // Also, keep looking to see if we also might hit any children.
+            // This avoids checking layer bounds twice as when we call super.hitTest()
+            val positionInWrapped = wrapped.fromParentPosition(pointerPosition)
+            wrapped.hitTest(positionInWrapped, hitPointerInputFilters)
+        }
+    }
+
+    /**
+     * Whether a pointer that is relative to the [LayoutNodeWrapper] is in the bounds of this
+     * LayoutNodeWrapper.
+     */
+    private fun isPointerInBounds(pointerPosition: Offset): Boolean {
+        val x = pointerPosition.x
+        val y = pointerPosition.y
+        return x >= 0f && y >= 0f && x < measuredWidth && y < measuredHeight
     }
 }

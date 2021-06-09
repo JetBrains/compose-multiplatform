@@ -112,6 +112,20 @@ internal class SkijaLayer(
         getMatrix(inverse).map(rect)
     }
 
+    override fun isInLayer(position: Offset): Boolean {
+        if (!clip) {
+            return true
+        }
+
+        val x = position.x
+        val y = position.y
+        if (outlineCache.shape === RectangleShape) {
+            return 0f <= x && x < size.width && 0f <= y && y < size.height
+        }
+
+        return isInOutline(outlineCache.outline!!, x, y)
+    }
+
     private fun getMatrix(inverse: Boolean): Matrix {
         return if (inverse) {
             Matrix().apply {
