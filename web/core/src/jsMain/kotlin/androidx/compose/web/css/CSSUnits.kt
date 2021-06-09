@@ -12,7 +12,7 @@ private data class CSSUnitValueTyped<out T : CSSUnit>(
     override val unit: T
 ) : CSSSizeValue<T> {
     override fun newUnit(value: Float): CSSSizeValue<T> = copy(value = value)
-    override fun toString() = asString()
+    override fun toString(): String = asString()
 }
 
 operator fun <T : CSSUnit> CSSSizeValue<T>.times(num: Number): CSSSizeValue<T> = newUnit(value * num.toFloat())
