@@ -5,6 +5,10 @@
 
 package org.jetbrains.compose.web.core.tests
 
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import org.jetbrains.compose.web.css.ch
 import org.jetbrains.compose.web.css.cm
 import org.jetbrains.compose.web.css.cssRem
@@ -16,6 +20,7 @@ import org.jetbrains.compose.web.css.dppx
 import org.jetbrains.compose.web.css.em
 import org.jetbrains.compose.web.css.fr
 import org.jetbrains.compose.web.css.grad
+import org.jetbrains.compose.web.css.left
 import org.jetbrains.compose.web.css.minus
 import org.jetbrains.compose.web.css.mm
 import org.jetbrains.compose.web.css.ms
@@ -28,11 +33,15 @@ import org.jetbrains.compose.web.css.px
 import org.jetbrains.compose.web.css.rad
 import org.jetbrains.compose.web.css.s
 import org.jetbrains.compose.web.css.times
+import org.jetbrains.compose.web.css.top
 import org.jetbrains.compose.web.css.turn
 import org.jetbrains.compose.web.css.vh
 import org.jetbrains.compose.web.css.vmax
 import org.jetbrains.compose.web.css.vmin
 import org.jetbrains.compose.web.css.vw
+import org.jetbrains.compose.web.dom.Div
+import org.w3c.dom.HTMLElement
+import org.w3c.dom.get
 import kotlin.test.Test
 import kotlin.test.assertEquals
 
@@ -295,5 +304,24 @@ class CSSUnitApiTests {
         assertEquals(1.dppx, 7.dppx - 4.dppx - 2.dppx)
 
         assertEquals(1.fr, 7.fr - 4.fr - 2.fr)
+    }
+
+    @Test
+    fun staticEvaluation() = runTest {
+        composition {
+            Div({
+                var a = 5.px
+                style {
+                    val b = a + 3.px
+                    left(a)
+                    top(b)
+                    a = 20.px
+                }
+            })
+        }
+
+
+        assertEquals("5px", (root.children[0] as HTMLElement).style.left)
+        assertEquals("8px", (root.children[0] as HTMLElement).style.top)
     }
 }
