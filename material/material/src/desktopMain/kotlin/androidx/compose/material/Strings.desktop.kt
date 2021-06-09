@@ -17,18 +17,14 @@
 package androidx.compose.material
 
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.Immutable
-
-@Suppress("INLINE_CLASS_DEPRECATED")
-@Immutable
-internal inline class Strings private constructor(@Suppress("unused") private val value: Int) {
-    companion object {
-        val NavigationMenu = Strings(0)
-        val CloseDrawer = Strings(1)
-        val CloseSheet = Strings(2)
-        val DefaultErrorMessage = Strings(3)
-    }
-}
 
 @Composable
-internal expect fun getString(string: Strings): String
+internal actual fun getString(string: Strings): String {
+    return when (string) {
+        Strings.NavigationMenu -> "Navigation menu"
+        Strings.CloseDrawer -> "Close navigation menu"
+        Strings.CloseSheet -> "Close sheet"
+        Strings.DefaultErrorMessage -> "Invalid input"
+        else -> ""
+    }
+}

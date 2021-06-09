@@ -469,6 +469,9 @@ package androidx.compose.material {
     enum_constant public static final androidx.compose.material.SnackbarResult Dismissed;
   }
 
+  public final class Strings_androidKt {
+  }
+
   public final class SurfaceKt {
     method @androidx.compose.runtime.Composable public static void Surface-IHU7g64(optional androidx.compose.ui.Modifier modifier, optional androidx.compose.ui.graphics.Shape shape, optional long color, optional long contentColor, optional androidx.compose.foundation.BorderStroke? border, optional float elevation, kotlin.jvm.functions.Function0<kotlin.Unit> content);
   }

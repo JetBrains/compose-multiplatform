@@ -28,7 +28,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.defaultMinSize
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.material.Strings.DefaultErrorMessage
+import androidx.compose.material.Strings.Companion.DefaultErrorMessage
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.getValue
@@ -130,7 +130,8 @@ internal fun TextFieldImpl(
         // Developers need to handle invalid input manually. But since we don't provide error
         // message slot API, we can set the default error message in case developers forget about
         // it.
-        val textFieldModifier = modifier.semantics { if (isError) error(DefaultErrorMessage) }
+        val defaultErrorMessage = getString(DefaultErrorMessage)
+        val textFieldModifier = modifier.semantics { if (isError) error(defaultErrorMessage) }
         when (type) {
             TextFieldType.Filled -> {
                 TextFieldLayout(

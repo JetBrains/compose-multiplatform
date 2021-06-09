@@ -32,4 +32,14 @@
     <string name="in_progress">In progress</string>
     <!-- Spoken description of a Tab. -->
     <string name="tab">Tab</string>
+    <!-- Spoken title when a navigation drawer opens. -->
+    <string name="navigation_menu">"Navigation menu"</string>
+    <!--
+      Spoken content description of an element which will close the navigation menu when clicked.
+    -->
+    <string name="close_drawer">"Close navigation menu"</string>
+    <!-- Spoken content description of an element which will close the sheet when clicked. -->
+    <string name="close_sheet">"Close sheet"</string>
+    <!-- Default accessibility error text for an editable text field. -->
+    <string name="default_error_message">"Invalid input"</string>
 </resources>

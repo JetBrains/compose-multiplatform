@@ -35,6 +35,7 @@ import androidx.compose.ui.test.assertHasClickAction
 import androidx.compose.ui.test.assertTopPositionInRootIsEqualTo
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onChildAt
+import androidx.compose.ui.test.onNodeWithContentDescription
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onParent
 import androidx.compose.ui.test.performGesture
@@ -437,9 +438,10 @@ class ModalBottomSheetTest {
     }
 
     @Test
-    fun modalBottomSheet_scrim_doesNotClickWhenTransparent() {
+    fun modalBottomSheet_scrim_doesNotClickWhenClosed_hasContentDescriptionWhenOpen() {
         val topTag = "ModalBottomSheetLayout"
         val scrimColor = mutableStateOf(Color.Red)
+        lateinit var closeSheet: String
         rule.setMaterialContent {
             ModalBottomSheetLayout(
                 modifier = Modifier.testTag(topTag),
@@ -448,6 +450,7 @@ class ModalBottomSheetTest {
                 content = { Box(Modifier.fillMaxSize().testTag(contentTag)) },
                 sheetContent = { Box(Modifier.fillMaxSize().testTag(sheetTag)) }
             )
+            closeSheet = getString(Strings.CloseSheet)
         }
 
         val height = rule.rootHeight()
@@ -455,8 +458,7 @@ class ModalBottomSheetTest {
             .assertTopPositionInRootIsEqualTo(height / 2)
         var topNode = rule.onNodeWithTag(topTag).fetchSemanticsNode()
         assertEquals(3, topNode.children.size)
-        rule.onNodeWithTag(topTag)
-            .onChildAt(1)
+        rule.onNodeWithContentDescription(closeSheet)
             .assertHasClickAction()
 
         rule.runOnIdle {

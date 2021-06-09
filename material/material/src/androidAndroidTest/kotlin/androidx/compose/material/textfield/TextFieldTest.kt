@@ -43,11 +43,12 @@ import androidx.compose.material.LocalContentAlpha
 import androidx.compose.material.LocalContentColor
 import androidx.compose.material.LocalTextStyle
 import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Strings.DefaultErrorMessage
+import androidx.compose.material.Strings.Companion.DefaultErrorMessage
 import androidx.compose.material.Text
 import androidx.compose.material.TextField
 import androidx.compose.material.TextFieldDefaults
 import androidx.compose.material.TextFieldPadding
+import androidx.compose.material.getString
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.runOnIdleWithDensity
@@ -1215,17 +1216,19 @@ class TextFieldTest {
 
     @Test
     fun testErrorSemantics_defaultMessage() {
+        lateinit var errorMessage: String
         rule.setMaterialContent {
             TextField(
                 value = "test",
                 onValueChange = {},
                 isError = true
             )
+            errorMessage = getString(DefaultErrorMessage)
         }
 
         rule.onNodeWithText("test")
             .assert(SemanticsMatcher.keyIsDefined(SemanticsProperties.Error))
-            .assert(SemanticsMatcher.expectValue(SemanticsProperties.Error, DefaultErrorMessage))
+            .assert(SemanticsMatcher.expectValue(SemanticsProperties.Error, errorMessage))
     }
 
     @Test
