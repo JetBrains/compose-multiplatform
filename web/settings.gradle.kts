@@ -36,7 +36,7 @@ module(":web-benchmark-core", "$rootDir/benchmark-core")
 if (extra["COMPOSE_WEB_BUILD_WITH_EXAMPLES"]!!.toString().toBoolean() == true) {
     println("building with examples")
     module(":examples:falling_balls_with_web", "../examples/falling_balls_with_web")
-    module(":examples:web_landing", "../examples/web_landing")
+    module(":examples:compose-web-lp", "../examples/web_landing")
     module(":examples:web-with-react", "../examples/web-with-react")
     module(":examples:web-getting-started", "../examples/web-getting-started")
 }
