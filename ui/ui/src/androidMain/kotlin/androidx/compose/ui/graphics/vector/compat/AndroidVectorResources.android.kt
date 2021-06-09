@@ -16,8 +16,6 @@
 
 package androidx.compose.ui.graphics.vector.compat
 
-import androidx.annotation.StyleableRes
-
 /**
  * Constants used to resolve VectorDrawable attributes during xml inflation
  */
@@ -102,9 +100,7 @@ internal object AndroidVectorResources {
     val STYLEABLE_ANIMATED_VECTOR_DRAWABLE_DRAWABLE = 0
     val STYLEABLE_ANIMATED_VECTOR_DRAWABLE_TARGET =
         intArrayOf(android.R.attr.name, android.R.attr.animation)
-    @StyleableRes
     val STYLEABLE_ANIMATED_VECTOR_DRAWABLE_TARGET_ANIMATION = 1
-    @StyleableRes
     val STYLEABLE_ANIMATED_VECTOR_DRAWABLE_TARGET_NAME = 0
 
     val STYLEABLE_ANIMATOR = intArrayOf(
