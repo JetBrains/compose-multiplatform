@@ -26,6 +26,7 @@ dependencies {
 
     debugImplementation(project(":compose:ui:ui-test-manifest"))
 
+    implementation(project(":compose:ui:ui"))
     androidTestImplementation(project(":compose:ui:ui-test-junit4"))
     androidTestImplementation(libs.testRunner)
     androidTestImplementation(libs.testCore)
