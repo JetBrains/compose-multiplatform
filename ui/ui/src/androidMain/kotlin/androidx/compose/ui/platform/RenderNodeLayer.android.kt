@@ -151,6 +151,20 @@ internal class RenderNodeLayer(
         matrixCache.invalidate()
     }
 
+    override fun isInLayer(position: Offset): Boolean {
+        val x = position.x
+        val y = position.y
+        if (renderNode.clipToBounds) {
+            return 0f <= x && x < renderNode.width && 0f <= y && y < renderNode.height
+        }
+
+        if (renderNode.clipToOutline) {
+            return outlineResolver.isInOutline(position)
+        }
+
+        return true
+    }
+
     override fun resize(size: IntSize) {
         val width = size.width
         val height = size.height

@@ -2012,6 +2012,9 @@ package androidx.compose.ui.platform {
   public final class JvmActuals_jvmKt {
   }
 
+  public final class ShapeContainingUtilKt {
+  }
+
   public final class TestTagKt {
     method @androidx.compose.runtime.Stable public static androidx.compose.ui.Modifier testTag(androidx.compose.ui.Modifier, String tag);
   }

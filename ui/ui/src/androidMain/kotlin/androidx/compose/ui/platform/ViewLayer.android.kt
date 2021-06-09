@@ -169,6 +169,20 @@ internal class ViewLayer(
         matrixCache.invalidate()
     }
 
+    override fun isInLayer(position: Offset): Boolean {
+        val x = position.x
+        val y = position.y
+        if (clipToBounds) {
+            return 0f <= x && x < width && 0f <= y && y < height
+        }
+
+        if (clipToOutline) {
+            return outlineResolver.isInOutline(position)
+        }
+
+        return true
+    }
+
     private fun updateOutlineResolver() {
         this.outlineProvider = if (outlineResolver.outline != null) {
             OutlineProvider
