@@ -8,8 +8,8 @@ interface StyleBuilder {
 
     fun property(propertyName: String, value: String) = property(propertyName, value.unsafeCast<StylePropertyValue>())
     fun property(propertyName: String, value: Number) = property(propertyName, value.unsafeCast<StylePropertyValue>())
-    fun variable(variableName: String, value: Number) = property(variableName, value.unsafeCast<StylePropertyValue>())
-    fun variable(variableName: String, value: String) = property(variableName, value.unsafeCast<StylePropertyValue>())
+    fun variable(variableName: String, value: Number) = variable(variableName, value.unsafeCast<StylePropertyValue>())
+    fun variable(variableName: String, value: String) = variable(variableName, value.unsafeCast<StylePropertyValue>())
 
     operator fun <TValue> CSSStyleVariable<TValue>.invoke(value: TValue) {
         if (value is CustomStyleValue) {

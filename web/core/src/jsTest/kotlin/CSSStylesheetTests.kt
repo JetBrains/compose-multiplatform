@@ -5,13 +5,7 @@
 
 package org.jetbrains.compose.web.core.tests
 
-import org.jetbrains.compose.web.css.CSSUnitValue
-import org.jetbrains.compose.web.css.CSSVariables
-import org.jetbrains.compose.web.css.Style
-import org.jetbrains.compose.web.css.StyleSheet
-import org.jetbrains.compose.web.css.px
-import org.jetbrains.compose.web.css.value
-import org.jetbrains.compose.web.css.variable
+import org.jetbrains.compose.web.css.*
 import org.jetbrains.compose.web.dom.Div
 import org.w3c.dom.HTMLElement
 import org.w3c.dom.get
@@ -38,12 +32,18 @@ object AppStylesheet : StyleSheet() {
     }
 
     val classWithRawVariables by style {
-        AppCSSVariables.stringWidth.value("150px")
-        AppCSSVariables.stringHeight.value("170px")
+        AppCSSVariables.stringWidth("150px")
+        AppCSSVariables.stringHeight("170px")
         property("width", AppCSSVariables.stringWidth.value())
         property("height", AppCSSVariables.stringHeight.value())
     }
 
+    val classWithTypedVariables by style {
+        AppCSSVariables.width(100.px)
+        AppCSSVariables.height(200.px)
+        property("width", AppCSSVariables.width.value())
+        property("height", AppCSSVariables.height.value())
+    }
 }
 
 
@@ -76,18 +76,31 @@ class CSSVariableTests {
         assertEquals(300.toDouble(), boundingRect.height)
     }
 
-//    @Test
-//    fun styleRawVariables() = runTest {
-//        composition {
-//            Style(AppStylesheet)
-//            Div({
-//                classes(AppStylesheet.classWithRawVariables)
-//            })
-//        }
-//
-//        val boundingRect = (root.children[1] as HTMLElement).getBoundingClientRect()
-//        assertEquals(150.toDouble(), boundingRect.width)
-//        assertEquals(170.toDouble(), boundingRect.height)
-//    }
+    @Test
+    fun styleRawVariables() = runTest {
+        composition {
+            Style(AppStylesheet)
+            Div({
+                classes(AppStylesheet.classWithRawVariables)
+            })
+        }
 
+        val boundingRect = (root.children[1] as HTMLElement).getBoundingClientRect()
+        assertEquals(150.toDouble(), boundingRect.width)
+        assertEquals(170.toDouble(), boundingRect.height)
+    }
+
+    @Test
+    fun styleTypedVariables() = runTest {
+        composition {
+            Style(AppStylesheet)
+            Div({
+                classes(AppStylesheet.classWithTypedVariables)
+            })
+        }
+
+        val boundingRect = (root.children[1] as HTMLElement).getBoundingClientRect()
+        assertEquals(100.toDouble(), boundingRect.width)
+        assertEquals(200.toDouble(), boundingRect.height)
+    }
 }
