@@ -208,6 +208,18 @@ class PointerInputChange(
         consumed,
         type
     )
+
+    override fun toString(): String {
+        return "PointerInputChange(id=$id, " +
+            "uptimeMillis=$uptimeMillis, " +
+            "position=$position, " +
+            "pressed=$pressed, " +
+            "previousUptimeMillis=$previousUptimeMillis, " +
+            "previousPosition=$previousPosition, " +
+            "previousPressed=$previousPressed, " +
+            "consumed=$consumed, " +
+            "type=$type)"
+    }
 }
 
 /**
