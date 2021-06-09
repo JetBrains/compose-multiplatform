@@ -16,8 +16,11 @@
 package androidx.compose.ui.window
 
 import android.view.View
+import android.view.View.MEASURED_STATE_TOO_SMALL
+import android.view.ViewGroup
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.requiredHeight
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.requiredWidth
@@ -27,15 +30,19 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.layout.Layout
 import androidx.compose.ui.layout.onGloballyPositioned
+import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.node.Owner
 import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.test.TestActivity
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.getUnclippedBoundsInRoot
 import androidx.compose.ui.test.isRoot
-import androidx.compose.ui.test.junit4.createComposeRule
+import androidx.compose.ui.test.junit4.createAndroidComposeRule
 import androidx.compose.ui.test.onFirst
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.unit.IntOffset
@@ -62,13 +69,14 @@ import org.junit.Test
 import org.junit.runner.RunWith
 import java.util.concurrent.CountDownLatch
 import java.util.concurrent.TimeUnit
+import kotlin.math.roundToInt
 
 @MediumTest
 @RunWith(AndroidJUnit4::class)
 class PopupTest {
 
     @get:Rule
-    val rule = createComposeRule()
+    val rule = createAndroidComposeRule<TestActivity>()
 
     private val testTag = "testedPopup"
     private val offset = IntOffset(10, 10)
@@ -350,6 +358,89 @@ class PopupTest {
 
         // Popup should still be visible
         rule.onNodeWithTag(testTag).assertIsDisplayed()
+    }
+
+    @OptIn(ExperimentalComposeUiApi::class)
+    @Test
+    fun canFillScreenWidth_dependingOnProperty() {
+        var box1Width = 0
+        var box2Width = 0
+        rule.setContent {
+            Popup {
+                Box(Modifier.fillMaxSize().onSizeChanged { box1Width = it.width })
+            }
+            Popup(properties = PopupProperties(useDefaultMaxWidth = true)) {
+                Box(Modifier.fillMaxSize().onSizeChanged { box2Width = it.width })
+            }
+        }
+        rule.runOnIdle {
+            assertThat(box1Width).isEqualTo(
+                (rule.activity.resources.configuration.screenWidthDp * rule.density.density)
+                    .roundToInt()
+            )
+            assertThat(box2Width).isLessThan(box1Width)
+        }
+    }
+
+    @Test
+    fun didNotMeasureTooSmallLast() {
+        rule.setContent {
+            PopupTestTag(testTag) {
+                Popup {
+                    Box(Modifier.fillMaxWidth())
+                }
+            }
+        }
+
+        rule.popupMatches(
+            testTag,
+            object : TypeSafeMatcher<View>() {
+                override fun describeTo(description: Description?) {
+                    description?.appendText("Did not end up in MEASURE_STATE_TOO_SMALL")
+                }
+
+                override fun matchesSafely(item: View): Boolean {
+                    val popupLayout = item.parent as ViewGroup
+                    return popupLayout.measuredState != MEASURED_STATE_TOO_SMALL
+                }
+            }
+        )
+    }
+
+    @Test
+    fun doesNotMeasureContentMultipleTimes() {
+        var measurements = 0
+        rule.setContent {
+            Popup {
+                Box {
+                    Layout({}) { _, constraints ->
+                        ++measurements
+                        // We size to maxWidth to make ViewRootImpl measure multiple times.
+                        layout(constraints.maxWidth, 0) {}
+                    }
+                }
+            }
+        }
+        rule.runOnIdle {
+            assertThat(measurements).isEqualTo(1)
+        }
+    }
+
+    @Test
+    fun resizesWhenContentResizes() {
+        val size1 = 20
+        val size2 = 30
+        var size by mutableStateOf(size1)
+        rule.setContent {
+            PopupTestTag(testTag) {
+                Popup {
+                    Box(Modifier.size(with(rule.density) { size.toDp() }))
+                }
+            }
+        }
+        rule.popupMatches(testTag, matchesSize(20, 20))
+        rule.runOnIdle { size = size2 }
+        rule.popupMatches(testTag, matchesSize(30, 30))
     }
 
     private fun matchesSize(width: Int, height: Int): BoundedMatcher<View, View> {

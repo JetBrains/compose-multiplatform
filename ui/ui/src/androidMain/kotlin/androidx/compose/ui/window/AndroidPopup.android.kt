@@ -26,6 +26,7 @@ import android.view.Gravity
 import android.view.KeyEvent
 import android.view.MotionEvent
 import android.view.View
+import android.view.View.MeasureSpec.makeMeasureSpec
 import android.view.ViewOutlineProvider
 import android.view.WindowManager
 import androidx.annotation.RequiresApi
@@ -93,16 +94,39 @@ import kotlin.math.roundToInt
  * screen. By default the window is clipped to the screen boundaries. Setting this to false will
  * allow windows to be accurately positioned.
  * The default value is true.
+ * @property useDefaultMaxWidth Whether the width of the popup's content should be limited to
+ * the platform default, which is smaller than the screen width.
  */
 @Immutable
-class PopupProperties(
+class PopupProperties @ExperimentalComposeUiApi constructor(
     val focusable: Boolean = false,
     val dismissOnBackPress: Boolean = true,
     val dismissOnClickOutside: Boolean = true,
     val securePolicy: SecureFlagPolicy = SecureFlagPolicy.Inherit,
     val excludeFromSystemGesture: Boolean = true,
-    val clippingEnabled: Boolean = true
+    val clippingEnabled: Boolean = true,
+    @get:ExperimentalComposeUiApi
+    val useDefaultMaxWidth: Boolean = false
 ) {
+    @OptIn(ExperimentalComposeUiApi::class)
+    constructor(
+        focusable: Boolean = false,
+        dismissOnBackPress: Boolean = true,
+        dismissOnClickOutside: Boolean = true,
+        securePolicy: SecureFlagPolicy = SecureFlagPolicy.Inherit,
+        excludeFromSystemGesture: Boolean = true,
+        clippingEnabled: Boolean = true,
+    ) : this (
+        focusable = focusable,
+        dismissOnBackPress = dismissOnBackPress,
+        dismissOnClickOutside = dismissOnClickOutside,
+        securePolicy = securePolicy,
+        excludeFromSystemGesture = excludeFromSystemGesture,
+        clippingEnabled = clippingEnabled,
+        useDefaultMaxWidth = false
+    )
+
+    @OptIn(ExperimentalComposeUiApi::class)
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
         if (other !is PopupProperties) return false
@@ -113,10 +137,12 @@ class PopupProperties(
         if (securePolicy != other.securePolicy) return false
         if (excludeFromSystemGesture != other.excludeFromSystemGesture) return false
         if (clippingEnabled != other.clippingEnabled) return false
+        if (useDefaultMaxWidth != other.useDefaultMaxWidth) return false
 
         return true
     }
 
+    @OptIn(ExperimentalComposeUiApi::class)
     override fun hashCode(): Int {
         var result = dismissOnBackPress.hashCode()
         result = 31 * result + focusable.hashCode()
@@ -125,6 +151,7 @@ class PopupProperties(
         result = 31 * result + securePolicy.hashCode()
         result = 31 * result + excludeFromSystemGesture.hashCode()
         result = 31 * result + clippingEnabled.hashCode()
+        result = 31 * result + useDefaultMaxWidth.hashCode()
         return result
     }
 }
@@ -405,6 +432,42 @@ private class PopupLayout(
     override fun Content() {
         content()
     }
+
+    override fun internalOnMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
+        if (properties.useDefaultMaxWidth) {
+            super.internalOnMeasure(widthMeasureSpec, heightMeasureSpec)
+        } else {
+            // useDefaultMaxWidth false, so don't want to limit the popup width to the Android
+            // platform default. Therefore, we create a new measure spec for width, which
+            // corresponds to the full screen width. We do the same for height, even if
+            // ViewRootImpl gives it to us from the first measure.
+            val displayWidthMeasureSpec = makeMeasureSpec(displayWidth, MeasureSpec.AT_MOST)
+            val displayHeightMeasureSpec = makeMeasureSpec(displayHeight, MeasureSpec.AT_MOST)
+            super.internalOnMeasure(displayWidthMeasureSpec, displayHeightMeasureSpec)
+        }
+    }
+
+    override fun internalOnLayout(changed: Boolean, left: Int, top: Int, right: Int, bottom: Int) {
+        super.internalOnLayout(changed, left, top, right, bottom)
+        // Now set the content size as fixed layout params, such that ViewRootImpl knows
+        // the exact window size.
+        val child = getChildAt(0) ?: return
+        params.width = child.measuredWidth
+        params.height = child.measuredHeight
+        windowManager.updateViewLayout(this, params)
+    }
+
+    private val displayWidth: Int
+        get() {
+            val density = context.resources.displayMetrics.density
+            return (context.resources.configuration.screenWidthDp * density).roundToInt()
+        }
+
+    private val displayHeight: Int
+        get() {
+            val density = context.resources.displayMetrics.density
+            return (context.resources.configuration.screenHeightDp * density).roundToInt()
+        }
 
     /**
      * Taken from PopupWindow
