@@ -96,7 +96,7 @@ object LibraryVersions {
     val PRINT = Version("1.1.0-beta01")
     val PERCENTLAYOUT = Version("1.1.0-alpha01")
     val PREFERENCE = Version("1.2.0-alpha01")
-    val PROFILEINSTALLER = Version("1.0.0-alpha01")
+    val PROFILEINSTALLER = Version("1.0.0-beta01")
     val RECOMMENDATION = Version("1.1.0-alpha01")
     val RECYCLERVIEW = Version("1.3.0-alpha01")
     val RECYCLERVIEW_SELECTION = Version("1.2.0-alpha02")
