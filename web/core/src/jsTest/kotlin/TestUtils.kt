@@ -19,6 +19,9 @@ private val testScope = MainScope()
 class TestScope : CoroutineScope by testScope {
 
     val root = "div".asHtmlElement()
+    init {
+        document.body!!.appendChild(root)
+    }
 
     fun composition(content: @Composable () -> Unit) {
         root.clear()
