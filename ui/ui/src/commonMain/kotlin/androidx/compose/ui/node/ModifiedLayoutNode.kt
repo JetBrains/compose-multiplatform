@@ -16,6 +16,8 @@
 
 package androidx.compose.ui.node
 
+import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.graphics.Canvas
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Paint
@@ -40,24 +42,38 @@ internal class ModifiedLayoutNode(
     }
 
     override fun minIntrinsicWidth(height: Int): Int =
-        with(modifier) {
+        with(modifierFromState()) {
             measureScope.minIntrinsicWidth(wrapped, height)
         }
 
     override fun maxIntrinsicWidth(height: Int): Int =
-        with(modifier) {
+        with(modifierFromState()) {
             measureScope.maxIntrinsicWidth(wrapped, height)
         }
 
     override fun minIntrinsicHeight(width: Int): Int =
-        with(modifier) {
+        with(modifierFromState()) {
             measureScope.minIntrinsicHeight(wrapped, width)
         }
 
     override fun maxIntrinsicHeight(width: Int): Int =
-        with(modifier) {
+        with(modifierFromState()) {
             measureScope.maxIntrinsicHeight(wrapped, width)
         }
+
+    private var modifierState: MutableState<LayoutModifier>? = null
+
+    @Suppress("ModifierFactoryExtensionFunction", "ModifierFactoryReturnType")
+    private fun modifierFromState(): LayoutModifier {
+        val currentModifierState = modifierState ?: mutableStateOf(modifier)
+        modifierState = currentModifierState
+        return currentModifierState.value
+    }
+
+    override fun onModifierChanged() {
+        super.onModifierChanged()
+        modifierState?.value = modifier
+    }
 
     override fun calculateAlignmentLine(alignmentLine: AlignmentLine): Int {
         if (measureResult.alignmentLines.containsKey(alignmentLine)) {
