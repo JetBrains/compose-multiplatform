@@ -357,11 +357,12 @@ private fun Scrim(
             targetValue = if (visible) 1f else 0f,
             animationSpec = TweenSpec()
         )
+        val closeSheet = getString(Strings.CloseSheet)
         val dismissModifier = if (visible) {
             Modifier
                 .pointerInput(onDismiss) { detectTapGestures { onDismiss() } }
                 .semantics(mergeDescendants = true) {
-                    contentDescription = Strings.CloseSheet
+                    contentDescription = closeSheet
                     onClick { onDismiss(); true }
                 }
         } else {

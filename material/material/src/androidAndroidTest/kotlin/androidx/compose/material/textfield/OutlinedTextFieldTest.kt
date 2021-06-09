@@ -41,6 +41,7 @@ import androidx.compose.material.Strings
 import androidx.compose.material.Text
 import androidx.compose.material.TextFieldDefaults
 import androidx.compose.material.TextFieldPadding
+import androidx.compose.material.getString
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.runOnIdleWithDensity
@@ -894,18 +895,20 @@ class OutlinedTextFieldTest {
 
     @Test
     fun testErrorSemantics_defaultMessage() {
+        lateinit var errorMessage: String
         rule.setMaterialContent {
             OutlinedTextField(
                 value = "test",
                 onValueChange = {},
                 isError = true
             )
+            errorMessage = getString(Strings.DefaultErrorMessage)
         }
 
         rule.onNodeWithText("test")
             .assert(SemanticsMatcher.keyIsDefined(SemanticsProperties.Error))
             .assert(
-                SemanticsMatcher.expectValue(SemanticsProperties.Error, Strings.DefaultErrorMessage)
+                SemanticsMatcher.expectValue(SemanticsProperties.Error, errorMessage)
             )
     }
 
