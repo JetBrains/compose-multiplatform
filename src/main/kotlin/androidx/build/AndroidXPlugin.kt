@@ -50,7 +50,7 @@ import org.gradle.api.Project
 import org.gradle.api.Task
 import org.gradle.api.file.DuplicatesStrategy
 import org.gradle.api.plugins.JavaPlugin
-import org.gradle.api.plugins.JavaPluginConvention
+import org.gradle.api.plugins.JavaPluginExtension
 import org.gradle.api.tasks.Copy
 import org.gradle.api.tasks.TaskProvider
 import org.gradle.api.tasks.bundling.Jar
@@ -63,7 +63,6 @@ import org.gradle.api.tasks.testing.logging.TestLogEvent
 import org.gradle.kotlin.dsl.create
 import org.gradle.kotlin.dsl.extra
 import org.gradle.kotlin.dsl.findByType
-import org.gradle.kotlin.dsl.getPlugin
 import org.jetbrains.kotlin.gradle.dsl.KotlinAndroidProjectExtension
 import org.jetbrains.kotlin.gradle.dsl.KotlinMultiplatformExtension
 import org.jetbrains.kotlin.gradle.plugin.KotlinBasePluginWrapper
@@ -167,11 +166,11 @@ class AndroidXPlugin : Plugin<Project> {
             task.finalizedBy(zipHtmlTask)
             task.doFirst {
                 zipHtmlTask.configure {
-                    it.from(htmlReport.destination)
+                    it.from(htmlReport.outputLocation)
                 }
             }
             val xmlReport = task.reports.junitXml
-            if (xmlReport.isEnabled) {
+            if (xmlReport.required.get()) {
                 val zipXmlTask = project.tasks.register(
                     "zipXmlResultsOf${task.name.capitalize()}",
                     Zip::class.java
@@ -185,7 +184,7 @@ class AndroidXPlugin : Plugin<Project> {
                 task.finalizedBy(zipXmlTask)
                 task.doFirst {
                     zipXmlTask.configure {
-                        it.from(xmlReport.destination)
+                        it.from(xmlReport.outputLocation)
                     }
                 }
             }
@@ -332,8 +331,8 @@ class AndroidXPlugin : Plugin<Project> {
         project.configureSourceJarForJava()
 
         // Force Java 1.8 source- and target-compatibilty for all Java libraries.
-        val convention = project.convention.getPlugin<JavaPluginConvention>()
-        convention.apply {
+        val javaExtension = project.extensions.getByType<JavaPluginExtension>()
+        javaExtension.apply {
             sourceCompatibility = VERSION_1_8
             targetCompatibility = VERSION_1_8
         }

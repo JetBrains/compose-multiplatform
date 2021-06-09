@@ -58,7 +58,7 @@ fun Project.configureKtlint() {
         task.description = "Check Kotlin code style."
         task.group = "Verification"
         task.classpath = getKtlintConfiguration()
-        task.main = "com.pinterest.ktlint.Main"
+        task.mainClass.set("com.pinterest.ktlint.Main")
         task.args = listOf(
             "--android",
             "--disabled_rules",
@@ -83,7 +83,7 @@ fun Project.configureKtlint() {
         task.description = "Fix Kotlin code style deviations."
         task.group = "formatting"
         task.classpath = getKtlintConfiguration()
-        task.main = "com.pinterest.ktlint.Main"
+        task.mainClass.set("com.pinterest.ktlint.Main")
         task.args = listOf(
             "--android",
             "-F",
@@ -121,7 +121,7 @@ fun Project.configureKtlintCheckFile() {
         task.description = "Check Kotlin code style."
         task.group = "Verification"
         task.classpath = getKtlintConfiguration()
-        task.main = "com.pinterest.ktlint.Main"
+        task.mainClass.set("com.pinterest.ktlint.Main")
 
         task.doFirst {
             if (task.files.isEmpty()) {
