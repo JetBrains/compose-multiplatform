@@ -31,7 +31,7 @@ import kotlin.math.roundToInt
  * @see BiasAlignment
  * @see BiasAbsoluteAlignment
  */
-@Immutable
+@Stable
 fun interface Alignment {
     /**
      * Calculates the position of a box of size [size] relative to the top left corner of an area
@@ -45,7 +45,7 @@ fun interface Alignment {
      * [Alignment.Horizontal] is often used to define the horizontal alignment of a layout inside a
      * parent layout.
      */
-    @Immutable
+    @Stable
     fun interface Horizontal {
         /**
          * Calculates the horizontal position of a box of width [size] relative to the left
@@ -61,7 +61,7 @@ fun interface Alignment {
      * height. [Alignment.Vertical] is often used to define the vertical alignment of a
      * layout inside a parent layout.
      */
-    @Immutable
+    @Stable
     fun interface Vertical {
         /**
          * Calculates the vertical position of a box of height [size] relative to the top edge of

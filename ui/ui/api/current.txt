@@ -21,7 +21,7 @@ package androidx.compose.ui {
     field public static final androidx.compose.ui.AbsoluteAlignment INSTANCE;
   }
 
-  @androidx.compose.runtime.Immutable public fun interface Alignment {
+  @androidx.compose.runtime.Stable public fun interface Alignment {
     method public long align-oYSo38o(long size, long space, androidx.compose.ui.unit.LayoutDirection layoutDirection);
     field public static final androidx.compose.ui.Alignment.Companion Companion;
   }
@@ -59,11 +59,11 @@ package androidx.compose.ui {
     property public final androidx.compose.ui.Alignment TopStart;
   }
 
-  @androidx.compose.runtime.Immutable public static fun interface Alignment.Horizontal {
+  @androidx.compose.runtime.Stable public static fun interface Alignment.Horizontal {
     method public int align(int size, int space, androidx.compose.ui.unit.LayoutDirection layoutDirection);
   }
 
-  @androidx.compose.runtime.Immutable public static fun interface Alignment.Vertical {
+  @androidx.compose.runtime.Stable public static fun interface Alignment.Vertical {
     method public int align(int size, int space);
   }
 
