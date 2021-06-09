@@ -16,6 +16,7 @@
 
 package androidx.compose.ui.platform
 
+import android.annotation.SuppressLint
 import android.os.Build
 import android.view.View
 import android.view.ViewOutlineProvider
@@ -320,6 +321,7 @@ internal class ViewLayer(
         var shouldUseDispatchDraw = false
             internal set // internal so that tests can use it.
 
+        @SuppressLint("BanUncheckedReflection")
         fun updateDisplayList(view: View) {
             try {
                 if (!hasRetrievedMethod) {
