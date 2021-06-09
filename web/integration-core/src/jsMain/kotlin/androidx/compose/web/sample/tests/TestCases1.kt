@@ -4,13 +4,8 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
-import org.jetbrains.compose.web.css.backgroundColor
-import org.jetbrains.compose.web.css.height
-import org.jetbrains.compose.web.css.px
-import org.jetbrains.compose.web.css.width
-import org.jetbrains.compose.web.dom.Button
-import org.jetbrains.compose.web.dom.Div
-import org.jetbrains.compose.web.dom.Text
+import org.jetbrains.compose.web.css.*
+import org.jetbrains.compose.web.dom.*
 
 class TestCases1 {
     val helloWorldText by testCase {
@@ -58,5 +53,26 @@ class TestCases1 {
                 }
             }
         ) {}
+    }
+
+    val smallWidthChangesTheTextColor by testCase {
+        Style(AppStyleSheet)
+        Span(attrs = {
+            id("span1")
+            classes(AppStyleSheet.textClass)
+        }) {
+            Text("This a colored text")
+        }
+    }
+}
+
+private object AppStyleSheet : StyleSheet() {
+    val textClass by style {
+        color("black")
+        media(maxWidth(400.px)) {
+            self style {
+                color("red")
+            }
+        }
     }
 }
