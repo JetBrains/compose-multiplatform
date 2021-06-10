@@ -21,11 +21,6 @@ import androidx.build.RunApiTasks
 import androidx.build.SupportConfigKt
 
 import static androidx.build.AndroidXPlugin.BUILD_ON_SERVER_TASK
-import static androidx.build.dependencies.DependenciesKt.SKIKO_CURRENT_OS
-import static androidx.build.dependencies.DependenciesKt.SKIKO_LINUX_X64
-import static androidx.build.dependencies.DependenciesKt.SKIKO_MACOS_X64
-import static androidx.build.dependencies.DependenciesKt.SKIKO_MACOS_ARM64
-import static androidx.build.dependencies.DependenciesKt.SKIKO_WINDOWS_X64
 
 plugins {
     id("AndroidXPlugin")
@@ -63,7 +58,7 @@ kotlin {
             resources.srcDirs += "src/jvmTest/res"
             dependencies {
                 implementation(libs.kotlinCoroutinesTest)
-                implementation(SKIKO_CURRENT_OS)
+                implementation(libs.skikoCurrentOs)
                 implementation(project(":compose:ui:ui-test-junit4"))
                 implementation(libs.junit)
                 implementation(libs.truth)
@@ -107,13 +102,13 @@ PublicationContainer.metaClass.jvmOs = { name, skikoDeps ->
                 desktopDependency.appendNode("artifactId", project.name)
                 desktopDependency.appendNode("version", LibraryVersions.COMPOSE)
                 desktopDependency.appendNode("scope", "compile")
-
                 for (skiko in skikoDeps) {
-                    def skikoParts = skiko.split(":")
+                    def skikoModule = skiko.get().module
+                    def skikoVersion = skiko.get().versionConstraint.requiredVersion
                     def skikoDependency = dependenciesNode.appendNode("dependency")
-                    skikoDependency.appendNode("groupId", skikoParts[0])
-                    skikoDependency.appendNode("artifactId", skikoParts[1])
-                    skikoDependency.appendNode("version", skikoParts[2])
+                    skikoDependency.appendNode("groupId", skikoModule.group)
+                    skikoDependency.appendNode("artifactId", skikoModule.name)
+                    skikoDependency.appendNode("version", skikoVersion)
                     skikoDependency.appendNode("scope", "runtime")
                 }
             }
@@ -124,10 +119,10 @@ PublicationContainer.metaClass.jvmOs = { name, skikoDeps ->
 afterEvaluate {
     publishing {
         publications {
-            it.jvmOs("linux-x64", [SKIKO_LINUX_X64])
-            it.jvmOs("macos-x64", [SKIKO_MACOS_X64])
-            it.jvmOs("macos-arm64", [SKIKO_MACOS_ARM64])
-            it.jvmOs("windows-x64", [SKIKO_WINDOWS_X64])
+            it.jvmOs("linux-x64", [libs.skikoLinuxX64])
+            it.jvmOs("macos-x64", [libs.skikoMacOsX64])
+            it.jvmOs("macos-arm64", [libs.skikoMacOsArm64])
+            it.jvmOs("windows-x64", [libs.skikoWindowsX64])
         }
     }
 }

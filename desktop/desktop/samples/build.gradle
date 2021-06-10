@@ -17,7 +17,6 @@
 import androidx.build.SupportConfigKt
 
 import static androidx.build.AndroidXPlugin.BUILD_ON_SERVER_TASK
-import static androidx.build.dependencies.DependenciesKt.SKIKO_CURRENT_OS
 
 plugins {
     id("AndroidXPlugin")
@@ -39,7 +38,7 @@ kotlin {
         }
 
         jvmMain.dependencies {
-            implementation(SKIKO_CURRENT_OS)
+            implementation(libs.skikoCurrentOs)
             implementation(project(":compose:desktop:desktop"))
         }
     }
