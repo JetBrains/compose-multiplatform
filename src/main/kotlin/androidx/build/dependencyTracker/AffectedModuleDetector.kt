@@ -99,14 +99,9 @@ abstract class AffectedModuleDetector(
                 setInstance(rootProject, AcceptAll())
                 return
             }
-            val logger = ToStringLogger.createWithLifecycle(gradle) { log ->
-                val distDir = rootProject.getDistributionDirectory()
-                distDir.let {
-                    val outputFile = it.resolve(LOG_FILE_NAME)
-                    outputFile.writeText(log)
-                    println("wrote dependency log to ${outputFile.absolutePath}")
-                }
-            }
+            val distDir = rootProject.getDistributionDirectory()
+            val outputFile = distDir.resolve(LOG_FILE_NAME)
+            val logger = FileLogger(outputFile)
             logger.info("setup: enabled: $enabled")
             val baseCommitOverride: String? = rootProject.findProperty(BASE_COMMIT_ARG) as String?
             if (baseCommitOverride != null) {
