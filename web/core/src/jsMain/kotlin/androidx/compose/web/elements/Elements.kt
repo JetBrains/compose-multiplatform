@@ -360,8 +360,8 @@ fun Hr(
     attrs: AttrBuilderContext<Tag.Hr> = {}
 ) {
     TagElement<Tag.Hr, HTMLHRElement>(
-        tagName = "hr", 
-        applyAttrs = attrs, 
+        tagName = "hr",
+        applyAttrs = attrs,
         content = null
     )
 }

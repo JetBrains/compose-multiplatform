@@ -51,7 +51,7 @@ class DisposableEffectHolder(
 
 @Composable
 fun <TTag : Tag, TElement : Element> TagElement(
-    tagName: String,
+    elementBuilder: () -> HTMLElement,
     applyAttrs: AttrsBuilder<TTag>.() -> Unit,
     content: (@Composable ElementScope<TElement>.() -> Unit)?
 ) {
@@ -60,7 +60,7 @@ fun <TTag : Tag, TElement : Element> TagElement(
 
     ComposeDomNode<ElementScope<TElement>, DomElementWrapper, DomApplier>(
         factory = {
-            DomElementWrapper(document.createElement(tagName) as HTMLElement).also {
+            DomElementWrapper(elementBuilder()).also {
                 scope.element = it.node.unsafeCast<TElement>()
             }
         },
@@ -85,3 +85,15 @@ fun <TTag : Tag, TElement : Element> TagElement(
         refEffect.effect?.invoke(this, scope.element) ?: onDispose {}
     }
 }
+
+
+@Composable
+fun <TTag : Tag, TElement : Element> TagElement(
+    tagName: String,
+    applyAttrs: AttrsBuilder<TTag>.() -> Unit,
+    content: (@Composable ElementScope<TElement>.() -> Unit)?
+)  = TagElement(
+    elementBuilder = {  document.createElement(tagName) as HTMLElement },
+    applyAttrs = applyAttrs,
+    content = content
+)
