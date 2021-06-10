@@ -153,25 +153,25 @@ fun P(
 fun Em(
     attrs: AttrBuilderContext<Tag> = {},
     content: ContentBuilder<HTMLElement>? = null
-) = TagElement("em", applyAttrs = attrs, content = content)
+) = TagElement(elementBuilder = { ElementBuilder.Em.create() }, applyAttrs = attrs, content = content)
 
 @Composable
 fun I(
     attrs: AttrBuilderContext<Tag> = {},
     content: ContentBuilder<HTMLElement>? = null
-) = TagElement("i", applyAttrs = attrs, content = content)
+) = TagElement(elementBuilder = { ElementBuilder.I.create() }, applyAttrs = attrs, content = content)
 
 @Composable
 fun B(
     attrs: AttrBuilderContext<Tag> = {},
     content: ContentBuilder<HTMLElement>? = null
-) = TagElement("b", applyAttrs = attrs, content = content)
+) = TagElement(elementBuilder = { ElementBuilder.B.create() }, applyAttrs = attrs, content = content)
 
 @Composable
 fun Small(
     attrs: AttrBuilderContext<Tag> = {},
     content: ContentBuilder<HTMLElement>? = null
-) = TagElement("small", applyAttrs = attrs, content = content)
+) = TagElement(elementBuilder = { ElementBuilder.Small.create() }, applyAttrs = attrs, content = content)
 
 @Composable
 fun Span(
@@ -181,31 +181,31 @@ fun Span(
 
 @Composable
 fun Br(attrs: AttrBuilderContext<Tag.Br> = {}) =
-    TagElement<Tag.Br, HTMLBRElement>("br", applyAttrs = attrs, content = null)
+    TagElement<Tag.Br, HTMLBRElement>(elementBuilder = { ElementBuilder.Br.create() }, applyAttrs = attrs, content = null)
 
 @Composable
 fun Ul(
     attrs: AttrBuilderContext<Tag.Ul> = {},
     content: ContentBuilder<HTMLUListElement>? = null
-) = TagElement("ul", applyAttrs = attrs, content = content)
+) = TagElement(elementBuilder = { ElementBuilder.Ul.create() }, applyAttrs = attrs, content = content)
 
 @Composable
 fun Ol(
     attrs: AttrBuilderContext<Tag.Ol> = {},
     content: ContentBuilder<HTMLOListElement>? = null
-) = TagElement("ol", applyAttrs = attrs, content = content)
+) = TagElement(elementBuilder = { ElementBuilder.Ol.create() }, applyAttrs = attrs, content = content)
 
 @Composable
 fun DOMScope<HTMLOListElement>.Li(
     attrs: AttrBuilderContext<Tag.Li> = {},
     content: ContentBuilder<HTMLLIElement>? = null
-) = TagElement("li", applyAttrs = attrs, content = content)
+) = TagElement(elementBuilder = { ElementBuilder.Li.create() }, applyAttrs = attrs, content = content)
 
 @Composable
 fun DOMScope<HTMLUListElement>.Li(
     attrs: AttrBuilderContext<Tag.Li> = {},
     content: ContentBuilder<HTMLLIElement>? = null
-) = TagElement("li", applyAttrs = attrs, content = content)
+) = TagElement(elementBuilder = { ElementBuilder.Li.create() }, applyAttrs = attrs, content = content)
 
 @Composable
 fun Img(
@@ -213,7 +213,7 @@ fun Img(
     alt: String = "",
     attrs: AttrBuilderContext<Tag.Img> = {}
 ) = TagElement<Tag.Img, HTMLImageElement>(
-    tagName = "img",
+    elementBuilder = { ElementBuilder.Img.create() },
     applyAttrs = {
         src(src).alt(alt)
         attrs()
@@ -227,7 +227,7 @@ fun Form(
     attrs: AttrBuilderContext<Tag.Form> = {},
     content: ContentBuilder<HTMLFormElement>? = null
 ) = TagElement<Tag.Form, HTMLFormElement>(
-    tagName = "form",
+    elementBuilder = { ElementBuilder.Form.create() },
     applyAttrs = {
         if (!action.isNullOrEmpty()) action(action)
         attrs()
@@ -240,7 +240,7 @@ fun Select(
     attrs: AttrBuilderContext<Tag.Select> = {},
     content: ContentBuilder<HTMLSelectElement>? = null
 ) = TagElement(
-    tagName = "select",
+    elementBuilder = { ElementBuilder.Select.create() },
     applyAttrs = attrs,
     content = content
 )
@@ -251,7 +251,7 @@ fun Option(
     attrs: AttrBuilderContext<Tag.Option> = {},
     content: ContentBuilder<HTMLOptionElement>? = null
 ) = TagElement<Tag.Option, HTMLOptionElement>(
-    tagName = "option",
+    elementBuilder = { ElementBuilder.Option.create() },
     applyAttrs = {
         value(value)
         attrs()
@@ -265,7 +265,7 @@ fun OptGroup(
     attrs: AttrBuilderContext<Tag.OptGroup> = {},
     content: ContentBuilder<HTMLOptGroupElement>? = null
 ) = TagElement<Tag.OptGroup, HTMLOptGroupElement>(
-    tagName = "optgroup",
+    elementBuilder = { ElementBuilder.OptGroup.create() },
     applyAttrs = {
         label(label)
         attrs()
@@ -278,7 +278,7 @@ fun Section(
     attrs: AttrBuilderContext<Tag> = {},
     content: ContentBuilder<HTMLElement>? = null
 ) = TagElement(
-    tagName = "section",
+    elementBuilder = { ElementBuilder.Section.create() },
     applyAttrs = attrs,
     content = content
 )
@@ -288,7 +288,7 @@ fun TextArea(
     attrs: AttrBuilderContext<Tag.TextArea> = {},
     value: String
 ) = TagElement<Tag.TextArea, HTMLTextAreaElement>(
-    tagName = "textarea",
+    elementBuilder = { ElementBuilder.TextArea.create() },
     applyAttrs = {
         value(value)
         attrs()
@@ -302,7 +302,7 @@ fun Nav(
     attrs: AttrBuilderContext<Tag.Nav> = {},
     content: ContentBuilder<HTMLElement>? = null
 ) = TagElement(
-    tagName = "nav",
+    elementBuilder = { ElementBuilder.Nav.create() },
     applyAttrs = attrs,
     content = content
 )
@@ -313,7 +313,7 @@ fun Pre(
     content: ContentBuilder<HTMLPreElement>? = null
 ) {
     TagElement(
-        tagName = "pre",
+        elementBuilder = { ElementBuilder.Pre.create() },
         applyAttrs = attrs,
         content = content
     )
@@ -325,7 +325,7 @@ fun Code(
     content: ContentBuilder<HTMLElement>? = null
 ) {
     TagElement(
-        tagName = "code",
+        elementBuilder = { ElementBuilder.Code.create() },
         applyAttrs = attrs,
         content = content
     )
@@ -337,7 +337,7 @@ fun Main(
     content: ContentBuilder<HTMLElement>? = null
 ) {
     TagElement<Tag.Div, HTMLAnchorElement>(
-        tagName = "main",
+        elementBuilder = { ElementBuilder.Main.create() },
         applyAttrs = attrs,
         content = content
     )
@@ -349,7 +349,7 @@ fun Footer(
     content: ContentBuilder<HTMLElement>? = null
 ) {
     TagElement<Tag.Div, HTMLAnchorElement>(
-        tagName = "footer",
+        elementBuilder = { ElementBuilder.Footer.create() },
         applyAttrs = attrs,
         content = content
     )
@@ -360,7 +360,7 @@ fun Hr(
     attrs: AttrBuilderContext<Tag.Hr> = {}
 ) {
     TagElement<Tag.Hr, HTMLHRElement>(
-        tagName = "hr",
+        elementBuilder = { ElementBuilder.Hr.create() },
         applyAttrs = attrs,
         content = null
     )
@@ -373,7 +373,7 @@ fun Label(
     content: ContentBuilder<HTMLElement>? = null
 ) {
     TagElement<Tag.Label, HTMLAnchorElement>(
-        tagName = "label",
+        elementBuilder = { ElementBuilder.Label.create() },
         applyAttrs = {
             forId(forId)
             attrs()
@@ -388,7 +388,7 @@ fun Table(
     content: ContentBuilder<HTMLTableElement>? = null
 ) {
     TagElement(
-        tagName = "table",
+        elementBuilder = { ElementBuilder.Table.create() },
         applyAttrs = attrs,
         content = content
     )
@@ -400,7 +400,7 @@ fun Caption(
     content: ContentBuilder<HTMLTableCaptionElement>? = null
 ) {
     TagElement(
-        tagName = "caption",
+        elementBuilder = { ElementBuilder.Caption.create() },
         applyAttrs = attrs,
         content = content
     )
@@ -411,7 +411,7 @@ fun Col(
     attrs: AttrBuilderContext<Tag.Col> = {}
 ) {
     TagElement<Tag.Col, HTMLTableColElement>(
-        tagName = "col",
+        elementBuilder = { ElementBuilder.Col.create() },
         applyAttrs = attrs,
         content = null
     )
@@ -423,7 +423,7 @@ fun Colgroup(
     content: ContentBuilder<HTMLTableColElement>? = null
 ) {
     TagElement(
-        tagName = "colgroup",
+        elementBuilder = { ElementBuilder.Colgroup.create() },
         applyAttrs = attrs,
         content = content
     )
@@ -435,7 +435,7 @@ fun Tr(
     content: ContentBuilder<HTMLTableRowElement>? = null
 ) {
     TagElement(
-        tagName = "tr",
+        elementBuilder = { ElementBuilder.Tr.create() },
         applyAttrs = attrs,
         content = content
     )
@@ -447,7 +447,7 @@ fun Thead(
     content: ContentBuilder<HTMLTableSectionElement>? = null
 ) {
     TagElement(
-        tagName = "thead",
+        elementBuilder = { ElementBuilder.Thead.create() },
         applyAttrs = attrs,
         content = content
     )
@@ -459,7 +459,7 @@ fun Th(
     content: ContentBuilder<HTMLTableCellElement>? = null
 ) {
     TagElement(
-        tagName = "th",
+        elementBuilder = { ElementBuilder.Th.create() },
         applyAttrs = attrs,
         content = content
     )
@@ -471,7 +471,7 @@ fun Td(
     content: ContentBuilder<HTMLTableCellElement>? = null
 ) {
     TagElement(
-        tagName = "td",
+        elementBuilder = { ElementBuilder.Td.create() },
         applyAttrs = attrs,
         content = content
     )
@@ -483,7 +483,7 @@ fun Tbody(
     content: ContentBuilder<HTMLTableSectionElement>? = null
 ) {
     TagElement(
-        tagName = "tbody",
+        elementBuilder = { ElementBuilder.Tbody.create() },
         applyAttrs = attrs,
         content = content
     )
@@ -495,7 +495,7 @@ fun Tfoot(
     content: ContentBuilder<HTMLTableSectionElement>? = null
 ) {
     TagElement(
-        tagName = "tfoot",
+        elementBuilder = { ElementBuilder.Tfoot.create() },
         applyAttrs = attrs,
         content = content
     )

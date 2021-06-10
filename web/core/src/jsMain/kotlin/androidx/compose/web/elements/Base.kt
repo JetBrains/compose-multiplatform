@@ -17,14 +17,32 @@ import org.jetbrains.compose.web.attributes.Tag
 import kotlinx.browser.document
 import org.w3c.dom.Element
 import org.w3c.dom.HTMLAnchorElement
+import org.w3c.dom.HTMLBRElement
 import org.w3c.dom.HTMLButtonElement
 import org.w3c.dom.HTMLDivElement
 import org.w3c.dom.HTMLElement
+import org.w3c.dom.HTMLFormElement
+import org.w3c.dom.HTMLHRElement
 import org.w3c.dom.HTMLHeadElement
 import org.w3c.dom.HTMLHeadingElement
+import org.w3c.dom.HTMLImageElement
 import org.w3c.dom.HTMLInputElement
+import org.w3c.dom.HTMLLIElement
+import org.w3c.dom.HTMLOListElement
+import org.w3c.dom.HTMLOptGroupElement
+import org.w3c.dom.HTMLOptionElement
 import org.w3c.dom.HTMLParagraphElement
+import org.w3c.dom.HTMLPreElement
+import org.w3c.dom.HTMLSelectElement
 import org.w3c.dom.HTMLSpanElement
+import org.w3c.dom.HTMLTableCaptionElement
+import org.w3c.dom.HTMLTableCellElement
+import org.w3c.dom.HTMLTableColElement
+import org.w3c.dom.HTMLTableElement
+import org.w3c.dom.HTMLTableRowElement
+import org.w3c.dom.HTMLTableSectionElement
+import org.w3c.dom.HTMLTextAreaElement
+import org.w3c.dom.HTMLUListElement
 
 @OptIn(ComposeCompilerApi::class)
 @Composable
@@ -76,7 +94,47 @@ class ElementBuilder<THTMLElement : HTMLElement>(private val tagName: String) {
 
         val P = ElementBuilder<HTMLParagraphElement>("p")
 
+        val Em = ElementBuilder<HTMLElement>("em")
+        val I = ElementBuilder<HTMLElement>("i")
+        val B = ElementBuilder<HTMLElement>("b")
+        val Small = ElementBuilder<HTMLElement>("small")
+
         val Span = ElementBuilder<HTMLSpanElement>("span")
+
+        val Br = ElementBuilder<HTMLBRElement>("br")
+
+        val Ul = ElementBuilder<HTMLUListElement>("ul")
+        val Ol = ElementBuilder<HTMLOListElement>("ol")
+
+        val Li = ElementBuilder<HTMLLIElement>("li")
+
+        val Img = ElementBuilder<HTMLImageElement>("img")
+        val Form = ElementBuilder<HTMLFormElement>("form")
+
+        val Select = ElementBuilder<HTMLSelectElement>("select")
+        val Option = ElementBuilder<HTMLOptionElement>("option")
+        val OptGroup = ElementBuilder<HTMLOptGroupElement>("optgroup")
+
+        val Section = ElementBuilder<HTMLElement>("section")
+        val TextArea = ElementBuilder<HTMLTextAreaElement>("textarea")
+        val Nav = ElementBuilder<HTMLElement>("nav")
+        val Pre = ElementBuilder<HTMLPreElement>("pre")
+        val Code = ElementBuilder<HTMLElement>("code")
+
+        val Main = ElementBuilder<HTMLElement>("main")
+        val Footer = ElementBuilder<HTMLElement>("footer")
+        val Hr = ElementBuilder<HTMLHRElement>("hr")
+        val Label = ElementBuilder<HTMLElement>("label")
+        val Table = ElementBuilder<HTMLTableElement>("table")
+        val Caption = ElementBuilder<HTMLTableCaptionElement>("caption")
+        val Col = ElementBuilder<HTMLTableColElement>("col")
+        val Colgroup = ElementBuilder<HTMLTableColElement>("colgroup")
+        val Tr = ElementBuilder<HTMLTableRowElement>("tr")
+        val Thead = ElementBuilder<HTMLTableSectionElement>("thead")
+        val Th = ElementBuilder<HTMLTableCellElement>("th")
+        val Td = ElementBuilder<HTMLTableCellElement>("td")
+        val Tbody = ElementBuilder<HTMLTableSectionElement>("tbody")
+        val Tfoot = ElementBuilder<HTMLTableSectionElement>("tfoot")
     }
 }
 
