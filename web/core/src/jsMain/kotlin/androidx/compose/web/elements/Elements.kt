@@ -18,6 +18,7 @@ import org.jetbrains.compose.web.attributes.value
 import kotlinx.browser.document
 import org.w3c.dom.HTMLAnchorElement
 import org.w3c.dom.HTMLBRElement
+import org.w3c.dom.HTMLButtonElement
 import org.w3c.dom.HTMLDivElement
 import org.w3c.dom.HTMLElement
 import org.w3c.dom.HTMLFormElement
@@ -62,7 +63,7 @@ fun Div(
     content: ContentBuilder<HTMLDivElement>? = null
 ) {
     TagElement(
-        elementBuilder = { ElementBuilder.Div.create() },
+        elementBuilder = ElementBuilder.Div,
         applyAttrs = attrs,
         content = content
     )
@@ -75,7 +76,7 @@ fun A(
     content: ContentBuilder<HTMLAnchorElement>? = null
 ) {
     TagElement<Tag.A, HTMLAnchorElement>(
-        elementBuilder = { ElementBuilder.A.create() },
+        elementBuilder = ElementBuilder.A,
         applyAttrs = {
             href(href)
             attrs()
@@ -91,7 +92,7 @@ fun Input(
     attrs: AttrBuilderContext<Tag.Input> = {}
 ) {
     TagElement<Tag.Input, HTMLInputElement>(
-        elementBuilder = { ElementBuilder.Input.create() },
+        elementBuilder = ElementBuilder.Input,
         applyAttrs = {
             type(type)
             value(value)
@@ -104,108 +105,108 @@ fun Input(
 @Composable
 fun Button(
     attrs: AttrBuilderContext<Tag.Button> = {},
-    content: ContentBuilder<HTMLHeadingElement>? = null
-) = TagElement(elementBuilder = { ElementBuilder.Button.create() }, applyAttrs = attrs, content = content)
+    content: ContentBuilder<HTMLButtonElement>? = null
+) = TagElement(elementBuilder = ElementBuilder.Button, applyAttrs = attrs, content = content)
 
 @Composable
 fun H1(
     attrs: AttrBuilderContext<Tag.H> = {},
     content: ContentBuilder<HTMLHeadingElement>? = null
-) = TagElement(elementBuilder = { ElementBuilder.H1.create() }, applyAttrs = attrs, content = content)
+) = TagElement(elementBuilder = ElementBuilder.H1, applyAttrs = attrs, content = content)
 
 @Composable
 fun H2(
     attrs: AttrBuilderContext<Tag.H> = {},
     content: ContentBuilder<HTMLHeadingElement>? = null
-) = TagElement(elementBuilder = { ElementBuilder.H2.create() }, applyAttrs = attrs, content = content)
+) = TagElement(elementBuilder = ElementBuilder.H2, applyAttrs = attrs, content = content)
 
 @Composable
 fun H3(
     attrs: AttrBuilderContext<Tag.H> = {},
     content: ContentBuilder<HTMLHeadingElement>? = null
-) = TagElement(elementBuilder = { ElementBuilder.H3.create() }, applyAttrs = attrs, content = content)
+) = TagElement(elementBuilder = ElementBuilder.H3, applyAttrs = attrs, content = content)
 
 @Composable
 fun H4(
     attrs: AttrBuilderContext<Tag.H> = {},
     content: ContentBuilder<HTMLHeadingElement>? = null
-) = TagElement(elementBuilder = { ElementBuilder.H4.create() }, applyAttrs = attrs, content = content)
+) = TagElement(elementBuilder = ElementBuilder.H4, applyAttrs = attrs, content = content)
 
 @Composable
 fun H5(
     attrs: AttrBuilderContext<Tag.H> = {},
     content: ContentBuilder<HTMLHeadingElement>? = null
-) = TagElement(elementBuilder = { ElementBuilder.H5.create() }, applyAttrs = attrs, content = content)
+) = TagElement(elementBuilder = ElementBuilder.H5, applyAttrs = attrs, content = content)
 
 @Composable
 fun H6(
     attrs: AttrBuilderContext<Tag.H> = {},
     content: ContentBuilder<HTMLHeadingElement>? = null
-) = TagElement(elementBuilder = { ElementBuilder.H6.create() }, applyAttrs = attrs, content = content)
+) = TagElement(elementBuilder = ElementBuilder.H6, applyAttrs = attrs, content = content)
 
 @Composable
 fun P(
     attrs: AttrBuilderContext<Tag.P> = {},
     content: ContentBuilder<HTMLParagraphElement>? = null
-) = TagElement(elementBuilder = { ElementBuilder.P.create() }, applyAttrs = attrs, content = content)
+) = TagElement(elementBuilder = ElementBuilder.P, applyAttrs = attrs, content = content)
 
 @Composable
 fun Em(
     attrs: AttrBuilderContext<Tag> = {},
     content: ContentBuilder<HTMLElement>? = null
-) = TagElement(elementBuilder = { ElementBuilder.Em.create() }, applyAttrs = attrs, content = content)
+) = TagElement(elementBuilder = ElementBuilder.Em, applyAttrs = attrs, content = content)
 
 @Composable
 fun I(
     attrs: AttrBuilderContext<Tag> = {},
     content: ContentBuilder<HTMLElement>? = null
-) = TagElement(elementBuilder = { ElementBuilder.I.create() }, applyAttrs = attrs, content = content)
+) = TagElement(elementBuilder = ElementBuilder.I, applyAttrs = attrs, content = content)
 
 @Composable
 fun B(
     attrs: AttrBuilderContext<Tag> = {},
     content: ContentBuilder<HTMLElement>? = null
-) = TagElement(elementBuilder = { ElementBuilder.B.create() }, applyAttrs = attrs, content = content)
+) = TagElement(elementBuilder = ElementBuilder.B, applyAttrs = attrs, content = content)
 
 @Composable
 fun Small(
     attrs: AttrBuilderContext<Tag> = {},
     content: ContentBuilder<HTMLElement>? = null
-) = TagElement(elementBuilder = { ElementBuilder.Small.create() }, applyAttrs = attrs, content = content)
+) = TagElement(elementBuilder = ElementBuilder.Small, applyAttrs = attrs, content = content)
 
 @Composable
 fun Span(
     attrs: AttrBuilderContext<Tag.Span> = {},
     content: ContentBuilder<HTMLSpanElement>? = null
-) = TagElement(elementBuilder = { ElementBuilder.Span.create() }, applyAttrs = attrs, content = content)
+) = TagElement(elementBuilder = ElementBuilder.Span, applyAttrs = attrs, content = content)
 
 @Composable
 fun Br(attrs: AttrBuilderContext<Tag.Br> = {}) =
-    TagElement<Tag.Br, HTMLBRElement>(elementBuilder = { ElementBuilder.Br.create() }, applyAttrs = attrs, content = null)
+    TagElement<Tag.Br, HTMLBRElement>(elementBuilder = ElementBuilder.Br, applyAttrs = attrs, content = null)
 
 @Composable
 fun Ul(
     attrs: AttrBuilderContext<Tag.Ul> = {},
     content: ContentBuilder<HTMLUListElement>? = null
-) = TagElement(elementBuilder = { ElementBuilder.Ul.create() }, applyAttrs = attrs, content = content)
+) = TagElement(elementBuilder = ElementBuilder.Ul, applyAttrs = attrs, content = content)
 
 @Composable
 fun Ol(
     attrs: AttrBuilderContext<Tag.Ol> = {},
     content: ContentBuilder<HTMLOListElement>? = null
-) = TagElement(elementBuilder = { ElementBuilder.Ol.create() }, applyAttrs = attrs, content = content)
+) = TagElement(elementBuilder = ElementBuilder.Ol, applyAttrs = attrs, content = content)
 
 @Composable
 fun DOMScope<HTMLOListElement>.Li(
     attrs: AttrBuilderContext<Tag.Li> = {},
     content: ContentBuilder<HTMLLIElement>? = null
-) = TagElement(elementBuilder = { ElementBuilder.Li.create() }, applyAttrs = attrs, content = content)
+) = TagElement(elementBuilder = ElementBuilder.Li, applyAttrs = attrs, content = content)
 
 @Composable
 fun DOMScope<HTMLUListElement>.Li(
     attrs: AttrBuilderContext<Tag.Li> = {},
     content: ContentBuilder<HTMLLIElement>? = null
-) = TagElement(elementBuilder = { ElementBuilder.Li.create() }, applyAttrs = attrs, content = content)
+) = TagElement(elementBuilder = ElementBuilder.Li, applyAttrs = attrs, content = content)
 
 @Composable
 fun Img(
@@ -213,7 +214,7 @@ fun Img(
     alt: String = "",
     attrs: AttrBuilderContext<Tag.Img> = {}
 ) = TagElement<Tag.Img, HTMLImageElement>(
-    elementBuilder = { ElementBuilder.Img.create() },
+    elementBuilder = ElementBuilder.Img,
     applyAttrs = {
         src(src).alt(alt)
         attrs()
@@ -227,7 +228,7 @@ fun Form(
     attrs: AttrBuilderContext<Tag.Form> = {},
     content: ContentBuilder<HTMLFormElement>? = null
 ) = TagElement<Tag.Form, HTMLFormElement>(
-    elementBuilder = { ElementBuilder.Form.create() },
+    elementBuilder = ElementBuilder.Form,
     applyAttrs = {
         if (!action.isNullOrEmpty()) action(action)
         attrs()
@@ -240,7 +241,7 @@ fun Select(
     attrs: AttrBuilderContext<Tag.Select> = {},
     content: ContentBuilder<HTMLSelectElement>? = null
 ) = TagElement(
-    elementBuilder = { ElementBuilder.Select.create() },
+    elementBuilder = ElementBuilder.Select,
     applyAttrs = attrs,
     content = content
 )
@@ -251,7 +252,7 @@ fun Option(
     attrs: AttrBuilderContext<Tag.Option> = {},
     content: ContentBuilder<HTMLOptionElement>? = null
 ) = TagElement<Tag.Option, HTMLOptionElement>(
-    elementBuilder = { ElementBuilder.Option.create() },
+    elementBuilder = ElementBuilder.Option,
     applyAttrs = {
         value(value)
         attrs()
@@ -265,7 +266,7 @@ fun OptGroup(
     attrs: AttrBuilderContext<Tag.OptGroup> = {},
     content: ContentBuilder<HTMLOptGroupElement>? = null
 ) = TagElement<Tag.OptGroup, HTMLOptGroupElement>(
-    elementBuilder = { ElementBuilder.OptGroup.create() },
+    elementBuilder = ElementBuilder.OptGroup,
     applyAttrs = {
         label(label)
         attrs()
@@ -278,7 +279,7 @@ fun Section(
     attrs: AttrBuilderContext<Tag> = {},
     content: ContentBuilder<HTMLElement>? = null
 ) = TagElement(
-    elementBuilder = { ElementBuilder.Section.create() },
+    elementBuilder = ElementBuilder.Section,
     applyAttrs = attrs,
     content = content
 )
@@ -288,7 +289,7 @@ fun TextArea(
     attrs: AttrBuilderContext<Tag.TextArea> = {},
     value: String
 ) = TagElement<Tag.TextArea, HTMLTextAreaElement>(
-    elementBuilder = { ElementBuilder.TextArea.create() },
+    elementBuilder = ElementBuilder.TextArea,
     applyAttrs = {
         value(value)
         attrs()
@@ -302,7 +303,7 @@ fun Nav(
     attrs: AttrBuilderContext<Tag.Nav> = {},
     content: ContentBuilder<HTMLElement>? = null
 ) = TagElement(
-    elementBuilder = { ElementBuilder.Nav.create() },
+    elementBuilder = ElementBuilder.Nav,
     applyAttrs = attrs,
     content = content
 )
@@ -313,7 +314,7 @@ fun Pre(
     content: ContentBuilder<HTMLPreElement>? = null
 ) {
     TagElement(
-        elementBuilder = { ElementBuilder.Pre.create() },
+        elementBuilder = ElementBuilder.Pre,
         applyAttrs = attrs,
         content = content
     )
@@ -325,7 +326,7 @@ fun Code(
     content: ContentBuilder<HTMLElement>? = null
 ) {
     TagElement(
-        elementBuilder = { ElementBuilder.Code.create() },
+        elementBuilder = ElementBuilder.Code,
         applyAttrs = attrs,
         content = content
     )
@@ -336,8 +337,8 @@ fun Main(
     attrs: AttrBuilderContext<Tag.Div> = {},
     content: ContentBuilder<HTMLElement>? = null
 ) {
-    TagElement<Tag.Div, HTMLAnchorElement>(
-        elementBuilder = { ElementBuilder.Main.create() },
+    TagElement<Tag.Div, HTMLElement>(
+        elementBuilder = ElementBuilder.Main,
         applyAttrs = attrs,
         content = content
     )
@@ -348,8 +349,8 @@ fun Footer(
     attrs: AttrBuilderContext<Tag.Div> = {},
     content: ContentBuilder<HTMLElement>? = null
 ) {
-    TagElement<Tag.Div, HTMLAnchorElement>(
-        elementBuilder = { ElementBuilder.Footer.create() },
+    TagElement<Tag.Div, HTMLElement>(
+        elementBuilder = ElementBuilder.Footer,
         applyAttrs = attrs,
         content = content
     )
@@ -360,7 +361,7 @@ fun Hr(
     attrs: AttrBuilderContext<Tag.Hr> = {}
 ) {
     TagElement<Tag.Hr, HTMLHRElement>(
-        elementBuilder = { ElementBuilder.Hr.create() },
+        elementBuilder = ElementBuilder.Hr,
         applyAttrs = attrs,
         content = null
     )
@@ -372,8 +373,8 @@ fun Label(
     attrs: AttrBuilderContext<Tag.Label> = {},
     content: ContentBuilder<HTMLElement>? = null
 ) {
-    TagElement<Tag.Label, HTMLAnchorElement>(
-        elementBuilder = { ElementBuilder.Label.create() },
+    TagElement<Tag.Label, HTMLElement>(
+        elementBuilder = ElementBuilder.Label,
         applyAttrs = {
             forId(forId)
             attrs()
@@ -388,7 +389,7 @@ fun Table(
     content: ContentBuilder<HTMLTableElement>? = null
 ) {
     TagElement(
-        elementBuilder = { ElementBuilder.Table.create() },
+        elementBuilder = ElementBuilder.Table,
         applyAttrs = attrs,
         content = content
     )
@@ -400,7 +401,7 @@ fun Caption(
     content: ContentBuilder<HTMLTableCaptionElement>? = null
 ) {
     TagElement(
-        elementBuilder = { ElementBuilder.Caption.create() },
+        elementBuilder = ElementBuilder.Caption,
         applyAttrs = attrs,
         content = content
     )
@@ -411,7 +412,7 @@ fun Col(
     attrs: AttrBuilderContext<Tag.Col> = {}
 ) {
     TagElement<Tag.Col, HTMLTableColElement>(
-        elementBuilder = { ElementBuilder.Col.create() },
+        elementBuilder = ElementBuilder.Col,
         applyAttrs = attrs,
         content = null
     )
@@ -423,7 +424,7 @@ fun Colgroup(
     content: ContentBuilder<HTMLTableColElement>? = null
 ) {
     TagElement(
-        elementBuilder = { ElementBuilder.Colgroup.create() },
+        elementBuilder = ElementBuilder.Colgroup,
         applyAttrs = attrs,
         content = content
     )
@@ -435,7 +436,7 @@ fun Tr(
     content: ContentBuilder<HTMLTableRowElement>? = null
 ) {
     TagElement(
-        elementBuilder = { ElementBuilder.Tr.create() },
+        elementBuilder = ElementBuilder.Tr,
         applyAttrs = attrs,
         content = content
     )
@@ -447,7 +448,7 @@ fun Thead(
     content: ContentBuilder<HTMLTableSectionElement>? = null
 ) {
     TagElement(
-        elementBuilder = { ElementBuilder.Thead.create() },
+        elementBuilder = ElementBuilder.Thead,
         applyAttrs = attrs,
         content = content
     )
@@ -459,7 +460,7 @@ fun Th(
     content: ContentBuilder<HTMLTableCellElement>? = null
 ) {
     TagElement(
-        elementBuilder = { ElementBuilder.Th.create() },
+        elementBuilder = ElementBuilder.Th,
         applyAttrs = attrs,
         content = content
     )
@@ -471,7 +472,7 @@ fun Td(
     content: ContentBuilder<HTMLTableCellElement>? = null
 ) {
     TagElement(
-        elementBuilder = { ElementBuilder.Td.create() },
+        elementBuilder = ElementBuilder.Td,
         applyAttrs = attrs,
         content = content
     )
@@ -483,7 +484,7 @@ fun Tbody(
     content: ContentBuilder<HTMLTableSectionElement>? = null
 ) {
     TagElement(
-        elementBuilder = { ElementBuilder.Tbody.create() },
+        elementBuilder = ElementBuilder.Tbody,
         applyAttrs = attrs,
         content = content
     )
@@ -495,7 +496,7 @@ fun Tfoot(
     content: ContentBuilder<HTMLTableSectionElement>? = null
 ) {
     TagElement(
-        elementBuilder = { ElementBuilder.Tfoot.create() },
+        elementBuilder = ElementBuilder.Tfoot,
         applyAttrs = attrs,
         content = content
     )

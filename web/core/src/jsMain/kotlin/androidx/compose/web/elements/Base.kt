@@ -35,6 +35,7 @@ import org.w3c.dom.HTMLParagraphElement
 import org.w3c.dom.HTMLPreElement
 import org.w3c.dom.HTMLSelectElement
 import org.w3c.dom.HTMLSpanElement
+import org.w3c.dom.HTMLStyleElement
 import org.w3c.dom.HTMLTableCaptionElement
 import org.w3c.dom.HTMLTableCellElement
 import org.w3c.dom.HTMLTableColElement
@@ -75,12 +76,12 @@ class DisposableEffectHolder(
     var effect: (DisposableEffectScope.(Element) -> DisposableEffectResult)? = null
 )
 
-interface ElementBuilder<THTMLElement : HTMLElement> {
-    fun create(): THTMLElement
+interface ElementBuilder<TElemenet : Element> {
+    fun create(): TElemenet
 
-    private class ElementBuilderImplementation<THTMLElement : HTMLElement>(private val tagName: String) : ElementBuilder<THTMLElement> {
+    private class ElementBuilderImplementation<TElemenet : HTMLElement>(private val tagName: String) : ElementBuilder<TElemenet> {
         private val el: Element by lazy { document.createElement(tagName) }
-        override fun create(): THTMLElement = el.cloneNode() as THTMLElement
+        override fun create(): TElemenet = el.cloneNode() as TElemenet
     }
 
     companion object {
@@ -139,12 +140,14 @@ interface ElementBuilder<THTMLElement : HTMLElement> {
         val Td: ElementBuilder<HTMLTableCellElement> = ElementBuilderImplementation("td")
         val Tbody: ElementBuilder<HTMLTableSectionElement> = ElementBuilderImplementation("tbody")
         val Tfoot: ElementBuilder<HTMLTableSectionElement> = ElementBuilderImplementation("tfoot")
+
+        val Style: ElementBuilder<HTMLStyleElement> = ElementBuilderImplementation("style")
     }
 }
 
 @Composable
 fun <TTag : Tag, TElement : Element> TagElement(
-    elementBuilder: () -> HTMLElement,
+    elementBuilder: ElementBuilder<TElement>,
     applyAttrs: AttrsBuilder<TTag>.() -> Unit,
     content: (@Composable ElementScope<TElement>.() -> Unit)?
 ) {
@@ -153,7 +156,7 @@ fun <TTag : Tag, TElement : Element> TagElement(
 
     ComposeDomNode<ElementScope<TElement>, DomElementWrapper, DomApplier>(
         factory = {
-            DomElementWrapper(elementBuilder()).also {
+            DomElementWrapper(elementBuilder.create() as HTMLElement).also {
                 scope.element = it.node.unsafeCast<TElement>()
             }
         },
@@ -180,13 +183,13 @@ fun <TTag : Tag, TElement : Element> TagElement(
 }
 
 
-@Composable
-fun <TTag : Tag, TElement : Element> TagElement(
-    tagName: String,
-    applyAttrs: AttrsBuilder<TTag>.() -> Unit,
-    content: (@Composable ElementScope<TElement>.() -> Unit)?
-)  = TagElement(
-    elementBuilder = {  document.createElement(tagName) as HTMLElement },
-    applyAttrs = applyAttrs,
-    content = content
-)
+//@Composable
+//fun <TTag : Tag, TElement : Element> TagElement(
+//    tagName: String,
+//    applyAttrs: AttrsBuilder<TTag>.() -> Unit,
+//    content: (@Composable ElementScope<TElement>.() -> Unit)?
+//)  = TagElement(
+//    elementBuilder = object : org.jetbrains.compose.web.dom.ElementBuilder,
+//    applyAttrs = applyAttrs,
+//    content = content
+//)
