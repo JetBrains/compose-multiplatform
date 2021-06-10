@@ -91,7 +91,7 @@ fun Input(
     attrs: AttrBuilderContext<Tag.Input> = {}
 ) {
     TagElement<Tag.Input, HTMLInputElement>(
-        tagName = "input",
+        elementBuilder = { ElementBuilder.Input.create() },
         applyAttrs = {
             type(type)
             value(value)
@@ -105,7 +105,7 @@ fun Input(
 fun Button(
     attrs: AttrBuilderContext<Tag.Button> = {},
     content: ContentBuilder<HTMLHeadingElement>? = null
-) = TagElement("button", applyAttrs = attrs, content = content)
+) = TagElement(elementBuilder = { ElementBuilder.Button.create() }, applyAttrs = attrs, content = content)
 
 @Composable
 fun H1(

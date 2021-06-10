@@ -17,8 +17,10 @@ import org.jetbrains.compose.web.attributes.Tag
 import kotlinx.browser.document
 import org.w3c.dom.Element
 import org.w3c.dom.HTMLAnchorElement
+import org.w3c.dom.HTMLButtonElement
 import org.w3c.dom.HTMLDivElement
 import org.w3c.dom.HTMLElement
+import org.w3c.dom.HTMLInputElement
 import org.w3c.dom.HTMLSpanElement
 
 @OptIn(ComposeCompilerApi::class)
@@ -58,8 +60,10 @@ class ElementBuilder<THTMLElement : HTMLElement>(private val tagName: String) {
 
     companion object {
         val Div = ElementBuilder<HTMLDivElement>("div")
-        val Span = ElementBuilder<HTMLSpanElement>("span")
         val A = ElementBuilder<HTMLAnchorElement>("a")
+        val Input = ElementBuilder<HTMLInputElement>("input")
+        val Button = ElementBuilder<HTMLButtonElement>("button")
+        val Span = ElementBuilder<HTMLSpanElement>("span")
     }
 }
 
