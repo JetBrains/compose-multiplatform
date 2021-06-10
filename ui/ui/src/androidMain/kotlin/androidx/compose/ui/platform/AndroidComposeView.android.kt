@@ -36,6 +36,7 @@ import android.view.inputmethod.InputConnection
 import androidx.annotation.DoNotInline
 import androidx.annotation.RequiresApi
 import androidx.annotation.RestrictTo
+import androidx.annotation.VisibleForTesting
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
@@ -275,7 +276,8 @@ internal class AndroidComposeView(context: Context) :
     private val viewToWindowMatrix = Matrix()
     private val windowToViewMatrix = Matrix()
     private val tmpCalculationMatrix = Matrix()
-    private var lastMatrixRecalculationAnimationTime = -1L
+    @VisibleForTesting
+    internal var lastMatrixRecalculationAnimationTime = -1L
 
     /**
      * On some devices, the `getLocationOnScreen()` returns `(0, 0)` even when the Window
