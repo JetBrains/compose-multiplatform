@@ -75,66 +75,70 @@ class DisposableEffectHolder(
     var effect: (DisposableEffectScope.(Element) -> DisposableEffectResult)? = null
 )
 
-class ElementBuilder<THTMLElement : HTMLElement>(private val tagName: String) {
-    private val el: Element by lazy { document.createElement(tagName) }
-    fun create(): THTMLElement = el.cloneNode() as THTMLElement
+interface ElementBuilder<THTMLElement : HTMLElement> {
+    fun create(): THTMLElement
+
+    private class ElementBuilderImplementation<THTMLElement : HTMLElement>(private val tagName: String) : ElementBuilder<THTMLElement> {
+        private val el: Element by lazy { document.createElement(tagName) }
+        override fun create(): THTMLElement = el.cloneNode() as THTMLElement
+    }
 
     companion object {
-        val Div = ElementBuilder<HTMLDivElement>("div")
-        val A = ElementBuilder<HTMLAnchorElement>("a")
-        val Input = ElementBuilder<HTMLInputElement>("input")
-        val Button = ElementBuilder<HTMLButtonElement>("button")
+        val Div: ElementBuilder<HTMLDivElement> = ElementBuilderImplementation("div")
+        val A: ElementBuilder<HTMLAnchorElement> = ElementBuilderImplementation("a")
+        val Input: ElementBuilder<HTMLInputElement> = ElementBuilderImplementation("input")
+        val Button: ElementBuilder<HTMLButtonElement> = ElementBuilderImplementation("button")
 
-        val H1 = ElementBuilder<HTMLHeadingElement>("h1")
-        val H2 = ElementBuilder<HTMLHeadingElement>("h2")
-        val H3 = ElementBuilder<HTMLHeadingElement>("h3")
-        val H4 = ElementBuilder<HTMLHeadingElement>("h4")
-        val H5 = ElementBuilder<HTMLHeadingElement>("h5")
-        val H6 = ElementBuilder<HTMLHeadingElement>("h6")
+        val H1: ElementBuilder<HTMLHeadingElement> = ElementBuilderImplementation("h1")
+        val H2: ElementBuilder<HTMLHeadingElement> = ElementBuilderImplementation("h2")
+        val H3: ElementBuilder<HTMLHeadingElement> = ElementBuilderImplementation("h3")
+        val H4: ElementBuilder<HTMLHeadingElement> = ElementBuilderImplementation("h4")
+        val H5: ElementBuilder<HTMLHeadingElement> = ElementBuilderImplementation("h5")
+        val H6: ElementBuilder<HTMLHeadingElement> = ElementBuilderImplementation("h6")
 
-        val P = ElementBuilder<HTMLParagraphElement>("p")
+        val P: ElementBuilder<HTMLParagraphElement> = ElementBuilderImplementation<HTMLParagraphElement>("p")
 
-        val Em = ElementBuilder<HTMLElement>("em")
-        val I = ElementBuilder<HTMLElement>("i")
-        val B = ElementBuilder<HTMLElement>("b")
-        val Small = ElementBuilder<HTMLElement>("small")
+        val Em: ElementBuilder<HTMLElement> = ElementBuilderImplementation("em")
+        val I: ElementBuilder<HTMLElement> = ElementBuilderImplementation("i")
+        val B: ElementBuilder<HTMLElement> = ElementBuilderImplementation("b")
+        val Small: ElementBuilder<HTMLElement> = ElementBuilderImplementation("small")
 
-        val Span = ElementBuilder<HTMLSpanElement>("span")
+        val Span: ElementBuilder<HTMLSpanElement> = ElementBuilderImplementation("span")
 
-        val Br = ElementBuilder<HTMLBRElement>("br")
+        val Br: ElementBuilder<HTMLBRElement> = ElementBuilderImplementation("br")
 
-        val Ul = ElementBuilder<HTMLUListElement>("ul")
-        val Ol = ElementBuilder<HTMLOListElement>("ol")
+        val Ul: ElementBuilder<HTMLUListElement> = ElementBuilderImplementation("ul")
+        val Ol: ElementBuilder<HTMLOListElement> = ElementBuilderImplementation("ol")
 
-        val Li = ElementBuilder<HTMLLIElement>("li")
+        val Li: ElementBuilder<HTMLLIElement> = ElementBuilderImplementation("li")
 
-        val Img = ElementBuilder<HTMLImageElement>("img")
-        val Form = ElementBuilder<HTMLFormElement>("form")
+        val Img: ElementBuilder<HTMLImageElement> = ElementBuilderImplementation("img")
+        val Form: ElementBuilder<HTMLFormElement> = ElementBuilderImplementation("form")
 
-        val Select = ElementBuilder<HTMLSelectElement>("select")
-        val Option = ElementBuilder<HTMLOptionElement>("option")
-        val OptGroup = ElementBuilder<HTMLOptGroupElement>("optgroup")
+        val Select: ElementBuilder<HTMLSelectElement> = ElementBuilderImplementation("select")
+        val Option: ElementBuilder<HTMLOptionElement> = ElementBuilderImplementation("option")
+        val OptGroup: ElementBuilder<HTMLOptGroupElement> = ElementBuilderImplementation("optgroup")
 
-        val Section = ElementBuilder<HTMLElement>("section")
-        val TextArea = ElementBuilder<HTMLTextAreaElement>("textarea")
-        val Nav = ElementBuilder<HTMLElement>("nav")
-        val Pre = ElementBuilder<HTMLPreElement>("pre")
-        val Code = ElementBuilder<HTMLElement>("code")
+        val Section: ElementBuilder<HTMLElement> = ElementBuilderImplementation("section")
+        val TextArea: ElementBuilder<HTMLTextAreaElement> = ElementBuilderImplementation("textarea")
+        val Nav: ElementBuilder<HTMLElement> = ElementBuilderImplementation("nav")
+        val Pre: ElementBuilder<HTMLPreElement> = ElementBuilderImplementation("pre")
+        val Code: ElementBuilder<HTMLElement> = ElementBuilderImplementation("code")
 
-        val Main = ElementBuilder<HTMLElement>("main")
-        val Footer = ElementBuilder<HTMLElement>("footer")
-        val Hr = ElementBuilder<HTMLHRElement>("hr")
-        val Label = ElementBuilder<HTMLElement>("label")
-        val Table = ElementBuilder<HTMLTableElement>("table")
-        val Caption = ElementBuilder<HTMLTableCaptionElement>("caption")
-        val Col = ElementBuilder<HTMLTableColElement>("col")
-        val Colgroup = ElementBuilder<HTMLTableColElement>("colgroup")
-        val Tr = ElementBuilder<HTMLTableRowElement>("tr")
-        val Thead = ElementBuilder<HTMLTableSectionElement>("thead")
-        val Th = ElementBuilder<HTMLTableCellElement>("th")
-        val Td = ElementBuilder<HTMLTableCellElement>("td")
-        val Tbody = ElementBuilder<HTMLTableSectionElement>("tbody")
-        val Tfoot = ElementBuilder<HTMLTableSectionElement>("tfoot")
+        val Main: ElementBuilder<HTMLElement> = ElementBuilderImplementation("main")
+        val Footer: ElementBuilder<HTMLElement> = ElementBuilderImplementation("footer")
+        val Hr: ElementBuilder<HTMLHRElement> = ElementBuilderImplementation("hr")
+        val Label: ElementBuilder<HTMLElement> = ElementBuilderImplementation("label")
+        val Table: ElementBuilder<HTMLTableElement> = ElementBuilderImplementation("table")
+        val Caption: ElementBuilder<HTMLTableCaptionElement> = ElementBuilderImplementation("caption")
+        val Col: ElementBuilder<HTMLTableColElement> = ElementBuilderImplementation("col")
+        val Colgroup: ElementBuilder<HTMLTableColElement> = ElementBuilderImplementation("colgroup")
+        val Tr: ElementBuilder<HTMLTableRowElement> = ElementBuilderImplementation("tr")
+        val Thead: ElementBuilder<HTMLTableSectionElement> = ElementBuilderImplementation("thead")
+        val Th: ElementBuilder<HTMLTableCellElement> = ElementBuilderImplementation("th")
+        val Td: ElementBuilder<HTMLTableCellElement> = ElementBuilderImplementation("td")
+        val Tbody: ElementBuilder<HTMLTableSectionElement> = ElementBuilderImplementation("tbody")
+        val Tfoot: ElementBuilder<HTMLTableSectionElement> = ElementBuilderImplementation("tfoot")
     }
 }
 
