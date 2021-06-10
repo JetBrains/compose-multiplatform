@@ -76,12 +76,12 @@ class DisposableEffectHolder(
     var effect: (DisposableEffectScope.(Element) -> DisposableEffectResult)? = null
 )
 
-interface ElementBuilder<TElemenet : Element> {
-    fun create(): TElemenet
+interface ElementBuilder<TElement : Element> {
+    fun create(): TElement
 
-    private class ElementBuilderImplementation<TElemenet : HTMLElement>(private val tagName: String) : ElementBuilder<TElemenet> {
+    private class ElementBuilderImplementation<TElement : HTMLElement>(private val tagName: String) : ElementBuilder<TElement> {
         private val el: Element by lazy { document.createElement(tagName) }
-        override fun create(): TElemenet = el.cloneNode() as TElemenet
+        override fun create(): TElement = el.cloneNode() as TElement
     }
 
     companion object {
