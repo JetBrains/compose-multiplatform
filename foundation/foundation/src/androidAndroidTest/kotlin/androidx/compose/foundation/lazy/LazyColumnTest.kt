@@ -56,6 +56,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.semantics.SemanticsActions
 import androidx.compose.ui.test.SemanticsNodeInteraction
 import androidx.compose.ui.test.assertCountEquals
 import androidx.compose.ui.test.assertHeightIsEqualTo
@@ -76,6 +77,7 @@ import androidx.compose.ui.test.onChildren
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performGesture
+import androidx.compose.ui.test.performSemanticsAction
 import androidx.compose.ui.test.swipeUp
 import androidx.compose.ui.test.swipeWithVelocity
 import androidx.compose.ui.test.up
@@ -1642,6 +1644,46 @@ class LazyColumnTest {
 
         rule.onNodeWithText("Count 1")
             .assertIsDisplayed()
+    }
+
+    @Test
+    fun semanticsScroll_isAnimated() {
+        rule.mainClock.autoAdvance = false
+        val state = LazyListState()
+
+        rule.setContent {
+            LazyColumn(Modifier.testTag(LazyListTag), state = state) {
+                items(50) {
+                    Box(Modifier.height(200.dp))
+                }
+            }
+        }
+
+        rule.waitForIdle()
+        assertThat(state.firstVisibleItemIndex).isEqualTo(0)
+        assertThat(state.firstVisibleItemScrollOffset).isEqualTo(0)
+
+        rule.onNodeWithTag(LazyListTag).performSemanticsAction(SemanticsActions.ScrollBy) {
+            it(0f, 100f)
+        }
+
+        // We haven't advanced time yet, make sure it's still zero
+        assertThat(state.firstVisibleItemIndex).isEqualTo(0)
+        assertThat(state.firstVisibleItemScrollOffset).isEqualTo(0)
+
+        // Advance and make sure we're partway through
+        // Note that we need two frames for the animation to actually happen
+        rule.mainClock.advanceTimeByFrame()
+        rule.mainClock.advanceTimeByFrame()
+
+        // The items are 200dp each, so still the first one, but offset
+        assertThat(state.firstVisibleItemIndex).isEqualTo(0)
+        assertThat(state.firstVisibleItemScrollOffset).isGreaterThan(0)
+        assertThat(state.firstVisibleItemScrollOffset).isLessThan(100)
+
+        // Finish the scroll, make sure we're at the target
+        rule.mainClock.advanceTimeBy(5000)
+        assertThat(state.firstVisibleItemScrollOffset).isEqualTo(100)
     }
 
     private fun SemanticsNodeInteraction.assertTopPositionIsAlmost(expected: Dp) {
