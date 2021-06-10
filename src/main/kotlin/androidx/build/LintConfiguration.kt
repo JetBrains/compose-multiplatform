@@ -129,6 +129,9 @@ fun Project.configureLint(lintOptions: LintOptions, extension: AndroidXExtension
             }
             isIgnoreWarnings = true
 
+            // Run lint on tests. Uses top-level lint.xml to specify checks.
+            isCheckTestSources = true
+
             // Write output directly to the console (and nowhere else).
             textReport = true
             htmlReport = false
@@ -225,41 +228,17 @@ fun Project.configureLint(lintOptions: LintOptions, extension: AndroidXExtension
 
                 // Analyze tasks are responsible for reading baselines and detecting issues, but
                 // they won't detect any issues that are already in the baselines. Delete them
-                // before the task evaluates up-to-date-ness.
-                listOf(
-                    tasks.named("lintAnalyzeDebug"),
-                    tasks.named("lintAnalyze"),
-                ).forEach { task ->
-                    val removeBaselineTask = project.tasks.register(
-                        "removeBaselineOf${task.name.capitalize(Locale.US)}",
-                        RemoveBaselineTask::class.java,
-                    ) { baselineTask ->
-                        baselineTask.baselineFile.set(lintBaseline)
-                    }
-
-                    task.configure {
-                        it.dependsOn(removeBaselineTask)
-                    }
-                }
+                // before the task evaluates up-to-date-ness using:
+                //
+                //     find . -type f -name lint-baseline.xml -exec rm -f {} \;
 
                 // Regular lint tasks are responsible for reading the output of analyze tasks and
                 // generating baseline files. They will fail if they generate a new baseline but
-                // there are no issues, so we need to delete the file as a finalization step.
-                listOf(
-                    tasks.named("lintDebug"),
-                    tasks.named("lint"),
-                ).forEach { task ->
-                    val removeEmptyBaselineTask = project.tasks.register(
-                        "removeEmptyBaselineOf${task.name.capitalize(Locale.US)}",
-                        RemoveEmptyBaselineTask::class.java,
-                    ) { baselineTask ->
-                        baselineTask.baselineFile.set(lintBaseline)
-                    }
-
-                    task.configure {
-                        it.finalizedBy(removeEmptyBaselineTask)
-                    }
-                }
+                // there are no issues, so we need to delete the file as a finalization step using:
+                //
+                //     find . -type f -name lint-baseline.xml \
+                //         -exec awk -v x=5 'NR==x{exit 1}' {} \; \
+                //         -exec rm -f {} \;
 
                 // Continue running after errors or after creating a new, blank baseline file.
                 // This doesn't work right now due to b/188545420, but it's technically correct.
