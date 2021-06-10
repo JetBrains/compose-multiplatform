@@ -62,7 +62,7 @@ fun Div(
     content: ContentBuilder<HTMLDivElement>? = null
 ) {
     TagElement(
-        tagName = "div",
+        elementBuilder = { ElementBuilder.Div.create() },
         applyAttrs = attrs,
         content = content
     )
@@ -75,7 +75,7 @@ fun A(
     content: ContentBuilder<HTMLAnchorElement>? = null
 ) {
     TagElement<Tag.A, HTMLAnchorElement>(
-        tagName = "a",
+        elementBuilder = { ElementBuilder.A.create() },
         applyAttrs = {
             href(href)
             attrs()
@@ -177,7 +177,7 @@ fun Small(
 fun Span(
     attrs: AttrBuilderContext<Tag.Span> = {},
     content: ContentBuilder<HTMLSpanElement>? = null
-) = TagElement("span", applyAttrs = attrs, content = content)
+) = TagElement(elementBuilder = { ElementBuilder.Span.create() }, applyAttrs = attrs, content = content)
 
 @Composable
 fun Br(attrs: AttrBuilderContext<Tag.Br> = {}) =

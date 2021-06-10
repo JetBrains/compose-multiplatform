@@ -16,7 +16,10 @@ import org.jetbrains.compose.web.attributes.AttrsBuilder
 import org.jetbrains.compose.web.attributes.Tag
 import kotlinx.browser.document
 import org.w3c.dom.Element
+import org.w3c.dom.HTMLAnchorElement
+import org.w3c.dom.HTMLDivElement
 import org.w3c.dom.HTMLElement
+import org.w3c.dom.HTMLSpanElement
 
 @OptIn(ComposeCompilerApi::class)
 @Composable
@@ -48,6 +51,17 @@ inline fun <TScope, T, reified E : Applier<*>> ComposeDomNode(
 class DisposableEffectHolder(
     var effect: (DisposableEffectScope.(Element) -> DisposableEffectResult)? = null
 )
+
+class ElementBuilder<THTMLElement : HTMLElement>(private val tagName: String) {
+    private val el: THTMLElement by lazy { document.createElement(tagName) as THTMLElement }
+    fun create() = el.cloneNode(true) as THTMLElement
+
+    companion object {
+        val Div = ElementBuilder<HTMLDivElement>("div")
+        val Span = ElementBuilder<HTMLSpanElement>("span")
+        val A = ElementBuilder<HTMLAnchorElement>("a")
+    }
+}
 
 @Composable
 fun <TTag : Tag, TElement : Element> TagElement(
