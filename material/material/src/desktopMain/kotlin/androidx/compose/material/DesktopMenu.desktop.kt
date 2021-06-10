@@ -68,6 +68,7 @@ import androidx.compose.ui.window.Popup
 fun DropdownMenu(
     expanded: Boolean,
     onDismissRequest: () -> Unit,
+    focusable: Boolean = true,
     modifier: Modifier = Modifier,
     offset: DpOffset = DpOffset(0.dp, 0.dp),
     content: @Composable ColumnScope.() -> Unit
@@ -86,7 +87,7 @@ fun DropdownMenu(
         }
 
         Popup(
-            focusable = true,
+            focusable = focusable,
             onDismissRequest = onDismissRequest,
             popupPositionProvider = popupPositionProvider
         ) {
@@ -154,6 +155,7 @@ fun DropdownMenuItem(
 fun ContextMenu(
     expanded: Boolean,
     onDismissRequest: () -> Unit,
+    focusable: Boolean = true,
     modifier: Modifier = Modifier,
     content: @Composable ColumnScope.() -> Unit
 ) {
@@ -171,7 +173,7 @@ fun ContextMenu(
         }
 
         Popup(
-            focusable = true,
+            focusable = focusable,
             contextMenu = true,
             onDismissRequest = onDismissRequest,
             popupPositionProvider = popupPositionProvider
