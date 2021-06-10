@@ -16,9 +16,6 @@
 
 package androidx.build.dependencies
 
-import androidx.build.OperatingSystem
-import androidx.build.getOperatingSystem
-
 const val ANDROIDX_TEST_VERSION = "1.4.0-beta01"
 const val ANDROIDX_TEST_CORE = "androidx.test:core:$ANDROIDX_TEST_VERSION"
 const val ANDROIDX_TEST_EXT_JUNIT = "androidx.test.ext:junit:1.1.3-beta01"
@@ -55,24 +52,6 @@ const val MATERIAL = "com.google.android.material:material:1.2.1"
 const val MOCKITO_CORE = "org.mockito:mockito-core:2.25.0"
 const val MOCKITO_ANDROID = "org.mockito:mockito-android:2.25.0"
 const val MULTIDEX = "androidx.multidex:multidex:2.0.1"
-val SKIKO_VERSION = System.getenv("SKIKO_VERSION") ?: "0.3.3"
-val SKIKO = "org.jetbrains.skiko:skiko-jvm:$SKIKO_VERSION"
-val SKIKO_LINUX_X64 = "org.jetbrains.skiko:skiko-jvm-runtime-linux-x64:$SKIKO_VERSION"
-val SKIKO_MACOS_X64 = "org.jetbrains.skiko:skiko-jvm-runtime-macos-x64:$SKIKO_VERSION"
-val SKIKO_MACOS_ARM64 = "org.jetbrains.skiko:skiko-jvm-runtime-macos-arm64:$SKIKO_VERSION"
-val SKIKO_WINDOWS_X64 = "org.jetbrains.skiko:skiko-jvm-runtime-windows-x64:$SKIKO_VERSION"
-val SKIKO_CURRENT_OS by lazy {
-    val os = getOperatingSystem()
-    val arch = System.getProperty("os.arch")
-    when (os) {
-        OperatingSystem.MAC -> when (arch) {
-            "aarch64" -> SKIKO_MACOS_ARM64
-            else -> SKIKO_MACOS_X64
-        }
-        OperatingSystem.WINDOWS -> SKIKO_WINDOWS_X64
-        OperatingSystem.LINUX -> SKIKO_LINUX_X64
-    }
-}
 const val TRUTH = "com.google.truth:truth:1.0.1"
 
 const val PROTOBUF = "com.google.protobuf:protobuf-java:3.4.0"
