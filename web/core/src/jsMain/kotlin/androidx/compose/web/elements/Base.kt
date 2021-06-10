@@ -55,8 +55,8 @@ class DisposableEffectHolder(
 )
 
 class ElementBuilder<THTMLElement : HTMLElement>(private val tagName: String) {
-    private val el: THTMLElement by lazy { document.createElement(tagName) as THTMLElement }
-    fun create() = el.cloneNode(true) as THTMLElement
+    private val el: Element by lazy { document.createElement(tagName) }
+    fun create(): THTMLElement = el.cloneNode(true) as THTMLElement
 
     companion object {
         val Div = ElementBuilder<HTMLDivElement>("div")
