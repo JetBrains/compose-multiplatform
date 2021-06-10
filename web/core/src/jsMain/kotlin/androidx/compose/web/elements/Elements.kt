@@ -111,43 +111,43 @@ fun Button(
 fun H1(
     attrs: AttrBuilderContext<Tag.H> = {},
     content: ContentBuilder<HTMLHeadingElement>? = null
-) = TagElement("h1", applyAttrs = attrs, content = content)
+) = TagElement(elementBuilder = { ElementBuilder.H1.create() }, applyAttrs = attrs, content = content)
 
 @Composable
 fun H2(
     attrs: AttrBuilderContext<Tag.H> = {},
     content: ContentBuilder<HTMLHeadingElement>? = null
-) = TagElement("h2", applyAttrs = attrs, content = content)
+) = TagElement(elementBuilder = { ElementBuilder.H2.create() }, applyAttrs = attrs, content = content)
 
 @Composable
 fun H3(
     attrs: AttrBuilderContext<Tag.H> = {},
     content: ContentBuilder<HTMLHeadingElement>? = null
-) = TagElement("h3", applyAttrs = attrs, content = content)
+) = TagElement(elementBuilder = { ElementBuilder.H3.create() }, applyAttrs = attrs, content = content)
 
 @Composable
 fun H4(
     attrs: AttrBuilderContext<Tag.H> = {},
     content: ContentBuilder<HTMLHeadingElement>? = null
-) = TagElement("h4", applyAttrs = attrs, content = content)
+) = TagElement(elementBuilder = { ElementBuilder.H4.create() }, applyAttrs = attrs, content = content)
 
 @Composable
 fun H5(
     attrs: AttrBuilderContext<Tag.H> = {},
     content: ContentBuilder<HTMLHeadingElement>? = null
-) = TagElement("h5", applyAttrs = attrs, content = content)
+) = TagElement(elementBuilder = { ElementBuilder.H5.create() }, applyAttrs = attrs, content = content)
 
 @Composable
 fun H6(
     attrs: AttrBuilderContext<Tag.H> = {},
     content: ContentBuilder<HTMLHeadingElement>? = null
-) = TagElement("h6", applyAttrs = attrs, content = content)
+) = TagElement(elementBuilder = { ElementBuilder.H6.create() }, applyAttrs = attrs, content = content)
 
 @Composable
 fun P(
     attrs: AttrBuilderContext<Tag.P> = {},
     content: ContentBuilder<HTMLParagraphElement>? = null
-) = TagElement("p", applyAttrs = attrs, content = content)
+) = TagElement(elementBuilder = { ElementBuilder.P.create() }, applyAttrs = attrs, content = content)
 
 @Composable
 fun Em(

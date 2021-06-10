@@ -20,7 +20,10 @@ import org.w3c.dom.HTMLAnchorElement
 import org.w3c.dom.HTMLButtonElement
 import org.w3c.dom.HTMLDivElement
 import org.w3c.dom.HTMLElement
+import org.w3c.dom.HTMLHeadElement
+import org.w3c.dom.HTMLHeadingElement
 import org.w3c.dom.HTMLInputElement
+import org.w3c.dom.HTMLParagraphElement
 import org.w3c.dom.HTMLSpanElement
 
 @OptIn(ComposeCompilerApi::class)
@@ -63,6 +66,16 @@ class ElementBuilder<THTMLElement : HTMLElement>(private val tagName: String) {
         val A = ElementBuilder<HTMLAnchorElement>("a")
         val Input = ElementBuilder<HTMLInputElement>("input")
         val Button = ElementBuilder<HTMLButtonElement>("button")
+
+        val H1 = ElementBuilder<HTMLHeadingElement>("h1")
+        val H2 = ElementBuilder<HTMLHeadingElement>("h2")
+        val H3 = ElementBuilder<HTMLHeadingElement>("h3")
+        val H4 = ElementBuilder<HTMLHeadingElement>("h4")
+        val H5 = ElementBuilder<HTMLHeadingElement>("h5")
+        val H6 = ElementBuilder<HTMLHeadingElement>("h6")
+
+        val P = ElementBuilder<HTMLParagraphElement>("p")
+
         val Span = ElementBuilder<HTMLSpanElement>("span")
     }
 }
