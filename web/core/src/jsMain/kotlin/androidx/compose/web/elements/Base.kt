@@ -181,15 +181,3 @@ fun <TTag : Tag, TElement : Element> TagElement(
         refEffect.effect?.invoke(this, scope.element) ?: onDispose {}
     }
 }
-
-
-//@Composable
-//fun <TTag : Tag, TElement : Element> TagElement(
-//    tagName: String,
-//    applyAttrs: AttrsBuilder<TTag>.() -> Unit,
-//    content: (@Composable ElementScope<TElement>.() -> Unit)?
-//)  = TagElement(
-//    elementBuilder = object : org.jetbrains.compose.web.dom.ElementBuilder,
-//    applyAttrs = applyAttrs,
-//    content = content
-//)
