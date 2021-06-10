@@ -839,6 +839,13 @@ internal class AndroidComposeView(context: Context) :
 
     // TODO(shepshapard): Test this method.
     override fun dispatchTouchEvent(motionEvent: MotionEvent): Boolean {
+        if (motionEvent.x.isNaN() ||
+            motionEvent.y.isNaN() ||
+            motionEvent.rawX.isNaN() ||
+            motionEvent.rawY.isNaN()
+        ) {
+            return false // Bad MotionEvent. Don't handle it.
+        }
         measureAndLayout()
         val processResult = trace("AndroidOwner:onTouch") {
             val pointerInputEvent = motionEventAdapter.convertToPointerInputEvent(motionEvent, this)
