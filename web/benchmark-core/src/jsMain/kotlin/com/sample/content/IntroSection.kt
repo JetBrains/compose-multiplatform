@@ -221,14 +221,3 @@ private fun ComposeWebStatusMessage() {
         }
     }
 }
-
-@Composable
-fun Hr(
-    attrs: (AttrsBuilder<Tag.Div>.() -> Unit) = {}
-) {
-    TagElement<Tag.Div, HTMLElement>(
-        tagName = "hr",
-        applyAttrs = attrs,
-        content = { }
-    )
-}
