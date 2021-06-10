@@ -18,8 +18,6 @@ import androidx.build.AndroidXComposePlugin
 import androidx.build.LibraryGroups
 import androidx.build.LibraryType
 
-import static androidx.build.dependencies.DependenciesKt.SKIKO
-
 plugins {
     id("AndroidXPlugin")
     id("com.android.library")
@@ -107,7 +105,7 @@ if (AndroidXComposePlugin.isMultiplatformEnabled(project)) {
             desktopMain.dependencies {
                 implementation(libs.junit)
                 implementation(libs.truth)
-                implementation(SKIKO)
+                implementation(libs.skiko)
             }
 
             androidMain.dependsOn(jvmMain)

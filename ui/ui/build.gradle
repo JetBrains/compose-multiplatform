@@ -19,7 +19,6 @@ import androidx.build.LibraryGroups
 import androidx.build.LibraryType
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
-import static androidx.build.dependencies.DependenciesKt.SKIKO_CURRENT_OS
 import static androidx.inspection.gradle.InspectionPluginKt.packageInspector
 
 plugins {
@@ -205,7 +204,7 @@ if(AndroidXComposePlugin.isMultiplatformEnabled(project)) {
                 implementation(libs.junit)
                 implementation(libs.mockitoCore)
                 implementation(libs.mockitoKotlin)
-                implementation(SKIKO_CURRENT_OS)
+                implementation(libs.skikoCurrentOs)
                 implementation(project(":compose:material:material"))
                 implementation(project(":compose:ui:ui-test-junit4"))
             }
