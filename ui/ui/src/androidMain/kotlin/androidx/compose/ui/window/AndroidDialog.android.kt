@@ -59,6 +59,7 @@ import androidx.lifecycle.ViewTreeLifecycleOwner
 import androidx.lifecycle.ViewTreeViewModelStoreOwner
 import androidx.savedstate.ViewTreeSavedStateRegistryOwner
 import java.util.UUID
+import kotlin.math.roundToInt
 
 /**
  * Properties used to customize the behavior of a [Dialog].
@@ -69,13 +70,30 @@ import java.util.UUID
  * dialog's bounds. If true, clicking outside the dialog will call onDismissRequest.
  * @property securePolicy Policy for setting [WindowManager.LayoutParams.FLAG_SECURE] on the
  * dialog's window.
+ * @property useDefaultMaxWidth Whether the width of the dialog's content should be limited to
+ * the platform default, which is smaller than the screen width.
  */
 @Immutable
-class DialogProperties(
+class DialogProperties @ExperimentalComposeUiApi constructor(
     val dismissOnBackPress: Boolean = true,
     val dismissOnClickOutside: Boolean = true,
-    val securePolicy: SecureFlagPolicy = SecureFlagPolicy.Inherit
+    val securePolicy: SecureFlagPolicy = SecureFlagPolicy.Inherit,
+    @get:ExperimentalComposeUiApi
+    val useDefaultMaxWidth: Boolean = false
 ) {
+    @OptIn(ExperimentalComposeUiApi::class)
+    constructor(
+        dismissOnBackPress: Boolean = true,
+        dismissOnClickOutside: Boolean = true,
+        securePolicy: SecureFlagPolicy = SecureFlagPolicy.Inherit,
+    ) : this (
+        dismissOnBackPress = dismissOnBackPress,
+        dismissOnClickOutside = dismissOnClickOutside,
+        securePolicy = securePolicy,
+        useDefaultMaxWidth = false
+    )
+
+    @OptIn(ExperimentalComposeUiApi::class)
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
         if (other !is DialogProperties) return false
@@ -83,14 +101,17 @@ class DialogProperties(
         if (dismissOnBackPress != other.dismissOnBackPress) return false
         if (dismissOnClickOutside != other.dismissOnClickOutside) return false
         if (securePolicy != other.securePolicy) return false
+        if (useDefaultMaxWidth != other.useDefaultMaxWidth) return false
 
         return true
     }
 
+    @OptIn(ExperimentalComposeUiApi::class)
     override fun hashCode(): Int {
         var result = dismissOnBackPress.hashCode()
         result = 31 * result + dismissOnClickOutside.hashCode()
         result = 31 * result + securePolicy.hashCode()
+        result = 31 * result + useDefaultMaxWidth.hashCode()
         return result
     }
 }
@@ -178,6 +199,8 @@ private class DialogLayout(
 
     private var content: @Composable () -> Unit by mutableStateOf({})
 
+    var useDefaultMaxWidth = false
+
     override var shouldCreateCompositionOnAttachedToWindow: Boolean = false
         private set
 
@@ -187,6 +210,42 @@ private class DialogLayout(
         shouldCreateCompositionOnAttachedToWindow = true
         createComposition()
     }
+
+    override fun internalOnMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
+        if (useDefaultMaxWidth) {
+            super.internalOnMeasure(widthMeasureSpec, heightMeasureSpec)
+        } else {
+            // useDefaultMaxWidth false, so don't want to limit the dialog width to the Android
+            // platform default. Therefore, we create a new measure spec for width, which
+            // corresponds to the full screen width. We do the same for height, even if
+            // ViewRootImpl gives it to us from the first measure.
+            val displayWidthMeasureSpec =
+                MeasureSpec.makeMeasureSpec(displayWidth, MeasureSpec.AT_MOST)
+            val displayHeightMeasureSpec =
+                MeasureSpec.makeMeasureSpec(displayHeight, MeasureSpec.AT_MOST)
+            super.internalOnMeasure(displayWidthMeasureSpec, displayHeightMeasureSpec)
+        }
+    }
+
+    override fun internalOnLayout(changed: Boolean, left: Int, top: Int, right: Int, bottom: Int) {
+        super.internalOnLayout(changed, left, top, right, bottom)
+        // Now set the content size as fixed layout params, such that ViewRootImpl knows
+        // the exact window size.
+        val child = getChildAt(0) ?: return
+        window.setLayout(child.measuredWidth, child.measuredHeight)
+    }
+
+    private val displayWidth: Int
+        get() {
+            val density = context.resources.displayMetrics.density
+            return (context.resources.configuration.screenWidthDp * density).roundToInt()
+        }
+
+    private val displayHeight: Int
+        get() {
+            val density = context.resources.displayMetrics.density
+            return (context.resources.configuration.screenHeightDp * density).roundToInt()
+        }
 
     @Composable
     override fun Content() {
@@ -305,6 +364,7 @@ private class DialogWrapper(
         this.properties = properties
         setSecurePolicy(properties.securePolicy)
         setLayoutDirection(layoutDirection)
+        dialogLayout.useDefaultMaxWidth = properties.useDefaultMaxWidth
     }
 
     fun disposeComposition() {

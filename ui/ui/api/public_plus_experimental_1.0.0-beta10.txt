@@ -2754,13 +2754,16 @@ package androidx.compose.ui.window {
   }
 
   @androidx.compose.runtime.Immutable public final class DialogProperties {
+    ctor @androidx.compose.ui.ExperimentalComposeUiApi public DialogProperties(optional boolean dismissOnBackPress, optional boolean dismissOnClickOutside, optional androidx.compose.ui.window.SecureFlagPolicy securePolicy, optional boolean useDefaultMaxWidth);
     ctor public DialogProperties(optional boolean dismissOnBackPress, optional boolean dismissOnClickOutside, optional androidx.compose.ui.window.SecureFlagPolicy securePolicy);
     method public boolean getDismissOnBackPress();
     method public boolean getDismissOnClickOutside();
     method public androidx.compose.ui.window.SecureFlagPolicy getSecurePolicy();
+    method @androidx.compose.ui.ExperimentalComposeUiApi public boolean getUseDefaultMaxWidth();
     property public final boolean dismissOnBackPress;
     property public final boolean dismissOnClickOutside;
     property public final androidx.compose.ui.window.SecureFlagPolicy securePolicy;
+    property @androidx.compose.ui.ExperimentalComposeUiApi public final boolean useDefaultMaxWidth;
   }
 
   public interface DialogWindowProvider {

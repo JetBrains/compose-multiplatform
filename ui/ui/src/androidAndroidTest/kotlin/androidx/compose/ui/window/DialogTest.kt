@@ -16,16 +16,21 @@
 package androidx.compose.ui.window
 
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.text.BasicText
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.compositionLocalOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.layout.onSizeChanged
+import androidx.compose.ui.test.TestActivity
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.getUnclippedBoundsInRoot
 import androidx.compose.ui.test.isRoot
-import androidx.compose.ui.test.junit4.createComposeRule
+import androidx.compose.ui.test.junit4.createAndroidComposeRule
 import androidx.compose.ui.test.onFirst
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
@@ -36,17 +41,19 @@ import androidx.test.filters.FlakyTest
 import androidx.test.filters.MediumTest
 import androidx.test.platform.app.InstrumentationRegistry.getInstrumentation
 import androidx.test.uiautomator.UiDevice
+import com.google.common.truth.Truth
 import org.junit.Assert.assertEquals
 import org.junit.Ignore
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
+import kotlin.math.roundToInt
 
 @MediumTest
 @RunWith(AndroidJUnit4::class)
 class DialogTest {
     @get:Rule
-    val rule = createComposeRule()
+    val rule = createAndroidComposeRule<TestActivity>()
 
     private val defaultText = "dialogText"
 
@@ -270,6 +277,31 @@ class DialogTest {
         }
         rule.runOnIdle {
             assertEquals(1f, value)
+        }
+    }
+
+    @OptIn(ExperimentalComposeUiApi::class)
+    @Test
+    fun canFillScreenWidth_dependingOnProperty() {
+        var box1Width = 0
+        var box2Width = 0
+        rule.setContent {
+            Dialog(onDismissRequest = {}) {
+                Box(Modifier.fillMaxSize().onSizeChanged { box1Width = it.width })
+            }
+            Dialog(
+                onDismissRequest = {},
+                properties = DialogProperties(useDefaultMaxWidth = true)
+            ) {
+                Box(Modifier.fillMaxSize().onSizeChanged { box2Width = it.width })
+            }
+        }
+        rule.runOnIdle {
+            Truth.assertThat(box1Width).isEqualTo(
+                (rule.activity.resources.configuration.screenWidthDp * rule.density.density)
+                    .roundToInt()
+            )
+            Truth.assertThat(box2Width).isLessThan(box1Width)
         }
     }
 }
