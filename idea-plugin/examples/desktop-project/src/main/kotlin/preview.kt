@@ -6,7 +6,7 @@ import androidx.compose.desktop.ui.tooling.preview.Preview
 @Preview
 @Composable
 fun examplePreview() {
-    var text by remember { mutableStateOf("Hello, World!") }
+    var text by remember { mutableStateOf("Hello, Wo!") }
 
     Button(onClick = {
         text = "Hello, Desktop!"

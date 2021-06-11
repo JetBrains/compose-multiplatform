@@ -17,8 +17,10 @@
 package org.jetbrains.compose.desktop.ide.preview
 
 import com.intellij.execution.actions.ConfigurationContext
+import com.intellij.execution.actions.ConfigurationFromContext
 import com.intellij.execution.actions.LazyRunConfigurationProducer
 import com.intellij.execution.configurations.ConfigurationFactory
+import com.intellij.openapi.components.service
 import com.intellij.openapi.externalSystem.util.ExternalSystemApiUtil
 import com.intellij.openapi.util.Ref
 import com.intellij.psi.PsiElement
@@ -47,13 +49,13 @@ class PreviewRunConfigurationProducer : LazyRunConfigurationProducer<GradleRunCo
         context: ConfigurationContext
     ): Boolean {
         val composeFunction = context.containingComposePreviewFunction() ?: return false
-
         return configuration.run {
-            name == composeFunction.name!!
-                && settings.externalProjectPath == context.modulePath()
-                && settings.scriptParameters.contains(
-                    previewTargetGradleArg(composeFunction.composePreviewFunctionFqn())
-                )
+            name == runConfigurationNameFor(composeFunction)
+                    && settings.externalProjectPath == context.modulePath()
+                    && settings.taskNames.singleOrNull() == configureDesktopPreviewTaskName
+                    && settings.scriptParameters.split(" ").containsAll(
+                        runConfigurationScriptParameters(composeFunction.composePreviewFunctionFqn(), context.port)
+                    )
         }
     }
 
@@ -63,21 +65,33 @@ class PreviewRunConfigurationProducer : LazyRunConfigurationProducer<GradleRunCo
         sourceElement: Ref<PsiElement>
     ): Boolean {
         val composeFunction = context.containingComposePreviewFunction() ?: return false
-
+        // todo: temporary configuration?
         configuration.apply {
-            name = composeFunction.name!!
-            settings.taskNames.add("runComposeDesktopPreview")
+            name = runConfigurationNameFor(composeFunction)
+            settings.taskNames.add(configureDesktopPreviewTaskName)
             settings.externalProjectPath = ExternalSystemApiUtil.getExternalProjectPath(context.location?.module)
-            settings.scriptParameters = listOf(
-                previewTargetGradleArg(composeFunction.composePreviewFunctionFqn())
-            ).joinToString(" ")
+            settings.scriptParameters =
+                runConfigurationScriptParameters(composeFunction.composePreviewFunctionFqn(), context.port)
+                    .joinToString(" ")
         }
+
         return true
     }
 }
 
-private fun previewTargetGradleArg(target: String): String =
-    "-Pcompose.desktop.preview.target=$target"
+private val configureDesktopPreviewTaskName = "configureDesktopPreview"
+
+private fun runConfigurationNameFor(function: KtNamedFunction): String =
+    "Configure Desktop Preview: ${function.name!!}"
+
+private fun runConfigurationScriptParameters(target: String, idePort: Int): List<String> =
+    listOf(
+        "-Pcompose.desktop.preview.target=$target",
+        "-Pcompose.desktop.preview.ide.port=${idePort}"
+    )
+
+private val ConfigurationContext.port: Int
+    get() = project.service<PreviewStateService>().gradleCallbackPort
 
 private fun KtNamedFunction.composePreviewFunctionFqn() = "${getClassName()}.${name}"
 

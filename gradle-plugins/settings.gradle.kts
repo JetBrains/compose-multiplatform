@@ -5,3 +5,4 @@ pluginManagement {
 }
 
 include(":compose")
+include(":desktop-preview-server")

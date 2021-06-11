@@ -4,12 +4,12 @@ import org.gradle.api.Project
 import org.jetbrains.compose.desktop.application.dsl.Application
 import org.jetbrains.compose.desktop.application.internal.javaHomeOrDefault
 import org.jetbrains.compose.desktop.application.internal.provider
-import org.jetbrains.compose.desktop.preview.tasks.AbstractRunComposePreviewTask
+import org.jetbrains.compose.desktop.preview.tasks.AbstractConfigureDesktopPreviewTask
 
 fun Project.initializePreview() {
 }
 
-internal fun AbstractRunComposePreviewTask.configureRunPreviewTask(app: Application) {
+internal fun AbstractConfigureDesktopPreviewTask.configureConfigureDesktopPreviewTask(app: Application) {
     app._configurationSource?.let { configSource ->
         dependsOn(configSource.jarTaskName)
         classpath = configSource.runtimeClasspath(project)
