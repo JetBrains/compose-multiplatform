@@ -26,10 +26,6 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
-import androidx.compose.ui.input.pointer.PointerEventPass
-import androidx.compose.ui.input.pointer.PointerInputScope
-import androidx.compose.ui.input.pointer.changedToDown
-import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.Layout
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.platform.DesktopOwner
@@ -138,19 +134,16 @@ private fun PopupLayout(
 
     val parentComposition = rememberCompositionContext()
     val (owner, composition) = remember {
-        val owner = DesktopOwner(owners, density, !focusable)
+        val owner = DesktopOwner(
+            container = owners,
+            density = density,
+            isPopup = true,
+            isFocusable = focusable,
+            onDismissRequest = onDismissRequest
+        )
         val composition = owner.setContent(parent = parentComposition) {
             Layout(
                 content = content,
-                modifier = Modifier.pointerInput(focusable, onDismissRequest) {
-                    detectDown(
-                        onDown = { point ->
-                            if (focusable && isOutsideRectTap(popupBounds, point)) {
-                                onDismissRequest?.invoke()
-                            }
-                        }
-                    )
-                },
                 measurePolicy = { measurables, constraints ->
                     val width = constraints.maxWidth
                     val height = constraints.maxHeight
@@ -181,6 +174,7 @@ private fun PopupLayout(
                                 position,
                                 IntSize(placeable.width, placeable.height)
                             )
+                            owner.bounds = popupBounds
                             placeable.place(position.x, position.y)
                         }
                     }
@@ -200,16 +194,4 @@ private fun PopupLayout(
 
 private fun isOutsideRectTap(rect: IntRect, point: Offset): Boolean {
     return !rect.contains(IntOffset(point.x.toInt(), point.y.toInt()))
-}
-
-private suspend fun PointerInputScope.detectDown(onDown: (Offset) -> Unit) {
-    while (true) {
-        awaitPointerEventScope {
-            val event = awaitPointerEvent(PointerEventPass.Initial)
-            val down = event.changes.find { it.changedToDown() }
-            if (down != null) {
-                onDown(down.position)
-            }
-        }
-    }
 }
