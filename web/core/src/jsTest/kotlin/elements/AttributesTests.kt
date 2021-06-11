@@ -125,4 +125,28 @@ class AttributesTests {
             actual = div.getAttribute("class")
         )
     }
+
+    @Test
+    fun attributesRecreated() = runTest {
+        var flag by mutableStateOf(true)
+
+        composition {
+            Div({
+                if (flag) {
+                    attr("a", "aa")
+                    attr("b", "bb")
+                } else {
+                    attr("b", "pp")
+                    attr("c", "cc")
+                }
+            })
+        }
+
+        assertEquals("<div a=\"aa\" b=\"bb\"></div>", root.innerHTML)
+
+        flag = false
+
+        waitChanges()
+        assertEquals("<div b=\"pp\" c=\"cc\"></div>", root.innerHTML)
+    }
 }
