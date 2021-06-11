@@ -152,6 +152,9 @@ private class LazyListPrefetcher(
 
     private val choreographer = Choreographer.getInstance()
 
+    /** Is true when LazyList was composed and not yet disposed. */
+    private var isActive = false
+
     init {
         calculateFrameIntervalIfNeeded(view)
     }
@@ -161,7 +164,7 @@ private class LazyListPrefetcher(
      * [indexToPrefetch] will be used as an input.
      */
     override fun run() {
-        if (indexToPrefetch == -1 || !prefetchScheduled) {
+        if (indexToPrefetch == -1 || !prefetchScheduled || !isActive) {
             // incorrect input. ignore
             return
         }
@@ -223,7 +226,9 @@ private class LazyListPrefetcher(
      * prefetch again after this frame.
      */
     override fun doFrame(frameTimeNanos: Long) {
-        view.post(this)
+        if (isActive) {
+            view.post(this)
+        }
     }
 
     private fun precompose(
@@ -255,6 +260,7 @@ private class LazyListPrefetcher(
         }
         val info = lazyListState.layoutInfo
         if (info.visibleItemsInfo.isNotEmpty()) {
+            check(isActive)
             val scrollingForward = delta < 0
             val indexToPrefetch = if (scrollingForward) {
                 info.visibleItemsInfo.last().index + 1
@@ -293,6 +299,7 @@ private class LazyListPrefetcher(
     ) {
         val index = indexToPrefetch
         if (premeasuringIsNeeded && index != -1) {
+            check(isActive)
             val itemProvider = stateOfItemsProvider.value
             if (index < itemProvider.itemsCount) {
                 val isVisibleAlready = result.visibleItemsInfo.fastAny { it.index == index }
@@ -314,12 +321,15 @@ private class LazyListPrefetcher(
     override fun onRemembered() {
         lazyListState.onScrolledListener = this
         lazyListState.onPostMeasureListener = this
+        isActive = true
     }
 
     override fun onForgotten() {
+        isActive = false
         lazyListState.onScrolledListener = null
         lazyListState.onPostMeasureListener = null
         view.removeCallbacks(this)
+        choreographer.removeFrameCallback(this)
     }
 
     override fun onAbandoned() {}
