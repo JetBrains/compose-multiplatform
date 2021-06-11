@@ -79,12 +79,16 @@ class DisposableEffectHolder(
 interface ElementBuilder<TElement : Element> {
     fun create(): TElement
 
-    private class ElementBuilderImplementation<TElement : HTMLElement>(private val tagName: String) : ElementBuilder<TElement> {
+    private open class ElementBuilderImplementation<TElement : HTMLElement>(private val tagName: String) : ElementBuilder<TElement> {
         private val el: Element by lazy { document.createElement(tagName) }
         override fun create(): TElement = el.cloneNode() as TElement
     }
 
     companion object {
+        fun <TElement : HTMLElement> createBuilder(tagName: String): ElementBuilder<TElement> {
+            return object  : ElementBuilderImplementation<TElement>(tagName) {}
+        }
+
         val Div: ElementBuilder<HTMLDivElement> = ElementBuilderImplementation("div")
         val A: ElementBuilder<HTMLAnchorElement> = ElementBuilderImplementation("a")
         val Input: ElementBuilder<HTMLInputElement> = ElementBuilderImplementation("input")
@@ -181,3 +185,14 @@ fun <TTag : Tag, TElement : Element> TagElement(
         refEffect.effect?.invoke(this, scope.element) ?: onDispose {}
     }
 }
+
+@Composable
+fun <TTag : Tag, TElement : Element> TagElement(
+    tagName: String,
+    applyAttrs: AttrsBuilder<TTag>.() -> Unit,
+    content: (@Composable ElementScope<TElement>.() -> Unit)?
+) = TagElement(
+    elementBuilder = ElementBuilder.createBuilder(tagName),
+    applyAttrs = applyAttrs,
+    content = content
+)
