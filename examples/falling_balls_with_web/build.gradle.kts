@@ -9,6 +9,7 @@ plugins {
 version = "1.0-SNAPSHOT"
 
 repositories {
+    mavenLocal()
     mavenCentral()
     maven("https://maven.pkg.jetbrains.space/public/p/compose/dev")
 }
@@ -25,7 +26,8 @@ kotlin {
             dependencies {
                 implementation(kotlin("stdlib-common"))
                 implementation(compose.web.widgets)
-                implementation(compose.runtime)
+                //implementation(compose.runtime)
+                implementation("app.cash.treehouse:compose-runtime:0.2.0-SNAPSHOT")
             }
         }
 

@@ -1,8 +1,6 @@
 <component name="ArtifactManager">
   <artifact type="jar" name="web-benchmark-core-js-0.0.12-SNAPSHOT">
     <output-path>$PROJECT_DIR$/benchmark-core/build/libs</output-path>
-    <root id="archive" name="web-benchmark-core-js-0.0.12-SNAPSHOT.jar">
-      <element id="module-output" name="web.web-benchmark-core.jsMain" />
-    </root>
+    <root id="archive" name="web-benchmark-core-js-0.0.12-SNAPSHOT.jar" />
   </artifact>
 </component>

@@ -1,6 +1,23 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="CompilerConfiguration">
-    <bytecodeTargetLevel target="11" />
+    <bytecodeTargetLevel target="11">
+      <module name="web.examples.falling_balls_with_web.commonMain" target="1.8" />
+      <module name="web.examples.falling_balls_with_web.commonTest" target="1.8" />
+      <module name="web.examples.falling_balls_with_web.jvmMain" target="1.8" />
+      <module name="web.examples.falling_balls_with_web.jvmTest" target="1.8" />
+      <module name="web.web-core.commonMain" target="1.8" />
+      <module name="web.web-core.commonTest" target="1.8" />
+      <module name="web.web-core.jvmMain" target="1.8" />
+      <module name="web.web-core.jvmTest" target="1.8" />
+      <module name="web.web-integration-core.commonMain" target="1.8" />
+      <module name="web.web-integration-core.commonTest" target="1.8" />
+      <module name="web.web-integration-core.jvmMain" target="1.8" />
+      <module name="web.web-integration-core.jvmTest" target="1.8" />
+      <module name="web.web-widgets.commonMain" target="1.8" />
+      <module name="web.web-widgets.commonTest" target="1.8" />
+      <module name="web.web-widgets.jvmMain" target="1.8" />
+      <module name="web.web-widgets.jvmTest" target="1.8" />
+    </bytecodeTargetLevel>
   </component>
 </project>

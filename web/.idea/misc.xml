@@ -6,6 +6,8 @@
     <file type="web" url="file://$PROJECT_DIR$/../examples/web-getting-started" />
     <file type="web" url="file://$PROJECT_DIR$/../examples/web-with-react" />
     <file type="web" url="file://$PROJECT_DIR$/../examples/web_landing" />
+    <file type="web" url="file://$PROJECT_DIR$/../tlcustom/compose/compiler" />
+    <file type="web" url="file://$PROJECT_DIR$/../tlcustom/compose/compiler-hosted" />
     <file type="web" url="file://$PROJECT_DIR$" />
   </component>
   <component name="ProjectRootManager" version="2" languageLevel="JDK_11" default="true" project-jdk-name="11" project-jdk-type="JavaSDK" />

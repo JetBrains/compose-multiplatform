@@ -20,7 +20,7 @@ class ComposeCompilerKotlinSupportPlugin : KotlinCompilerPluginSupportPlugin {
             KotlinPlatformType.jvm -> true
             KotlinPlatformType.js -> isApplicableJsTarget(kotlinCompilation.target)
             KotlinPlatformType.androidJvm -> true
-            KotlinPlatformType.native -> false
+            KotlinPlatformType.native -> true
         }
 
     override fun applyToCompilation(kotlinCompilation: KotlinCompilation<*>): Provider<List<SubpluginOption>> {
@@ -32,7 +32,19 @@ class ComposeCompilerKotlinSupportPlugin : KotlinCompilerPluginSupportPlugin {
 
     override fun getPluginArtifact(): SubpluginArtifact =
         SubpluginArtifact(
+            "app.cash.treehouse",
+            "compose-compiler",
+            "0.2.0-SNAPSHOT"
+        )
+        /*SubpluginArtifact(
             groupId = "org.jetbrains.compose.compiler", artifactId = "compiler", version = composeVersion
+        )*/
+
+    override fun getPluginArtifactForNative(): SubpluginArtifact =
+        SubpluginArtifact(
+            "app.cash.treehouse",
+            "compose-compiler-hosted",
+            "0.2.0-SNAPSHOT"
         )
 
     private fun isApplicableJsTarget(kotlinTarget: KotlinTarget): Boolean {

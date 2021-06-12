@@ -113,7 +113,7 @@ class ComposePlugin : Plugin<Project> {
         val animation get() = composeDependency("org.jetbrains.compose.animation:animation")
         val foundation get() = composeDependency("org.jetbrains.compose.foundation:foundation")
         val material get() = composeDependency("org.jetbrains.compose.material:material")
-        val runtime get() = composeDependency("org.jetbrains.compose.runtime:runtime")
+        val runtime get() = composeDependency("app.cash.treehouse:compose-runtime")
         val ui get() = composeDependency("org.jetbrains.compose.ui:ui")
         val materialIconsExtended get() = composeDependency("org.jetbrains.compose.material:material-icons-extended")
         val web: WebDependencies get() =
