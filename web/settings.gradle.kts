@@ -35,6 +35,9 @@ module(":web-widgets", "$rootDir/widgets")
 module(":web-integration-core", "$rootDir/integration-core")
 module(":web-integration-widgets", "$rootDir/integration-widgets")
 module(":web-benchmark-core", "$rootDir/benchmark-core")
+
+//module(":darwin-core", "$rootDir/core-darwin")
+
 //module(":compose:compiler", "$rootDir/../tlcustom/compose/compiler")
 //module(":compose:compiler-hosted", "$rootDir/../tlcustom/compose/compiler-hosted")
 //module(":compose:runtime", "$rootDir/../tlcustom/compose/runtime")

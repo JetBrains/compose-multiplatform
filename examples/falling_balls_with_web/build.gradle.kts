@@ -26,8 +26,7 @@ kotlin {
             dependencies {
                 implementation(kotlin("stdlib-common"))
                 implementation(compose.web.widgets)
-                //implementation(compose.runtime)
-                implementation("app.cash.treehouse:compose-runtime:0.2.0-SNAPSHOT")
+                implementation(compose.runtime)
             }
         }
 

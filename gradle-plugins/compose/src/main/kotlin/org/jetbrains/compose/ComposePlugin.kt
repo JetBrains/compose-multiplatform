@@ -21,6 +21,7 @@ import org.jetbrains.kotlin.gradle.plugin.KotlinDependencyHandler
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 internal val composeVersion get() = ComposeBuildConfig.composeVersion
+internal val jbComposeVersion get() = "0.0.12-SNAPSHOT"
 
 class ComposePlugin : Plugin<Project> {
     override fun apply(project: Project) {
@@ -122,11 +123,11 @@ class ComposePlugin : Plugin<Project> {
     }
 
     object DesktopDependencies {
-        val common = composeDependency("org.jetbrains.compose.desktop:desktop")
-        val linux_x64 = composeDependency("org.jetbrains.compose.desktop:desktop-jvm-linux-x64")
-        val windows_x64 = composeDependency("org.jetbrains.compose.desktop:desktop-jvm-windows-x64")
-        val macos_x64 = composeDependency("org.jetbrains.compose.desktop:desktop-jvm-macos-x64")
-        val macos_arm64 = composeDependency("org.jetbrains.compose.desktop:desktop-jvm-macos-arm64")
+        val common = jbComposeDependency("org.jetbrains.compose.desktop:desktop")
+        val linux_x64 = jbComposeDependency("org.jetbrains.compose.desktop:desktop-jvm-linux-x64")
+        val windows_x64 = jbComposeDependency("org.jetbrains.compose.desktop:desktop-jvm-windows-x64")
+        val macos_x64 = jbComposeDependency("org.jetbrains.compose.desktop:desktop-jvm-macos-x64")
+        val macos_arm64 = jbComposeDependency("org.jetbrains.compose.desktop:desktop-jvm-macos-arm64")
 
         @Deprecated(
             "compose.desktop.linux is deprecated, use compose.desktop.linux_x64 instead",
@@ -145,7 +146,7 @@ class ComposePlugin : Plugin<Project> {
         val macos = macos_x64
 
         val currentOs by lazy {
-            composeDependency("org.jetbrains.compose.desktop:desktop-jvm-${currentTarget.id}")
+            jbComposeDependency("org.jetbrains.compose.desktop:desktop-jvm-${currentTarget.id}")
         }
     }
 
@@ -167,3 +168,4 @@ fun DependencyHandler.compose(groupWithArtifact: String) = composeDependency(gro
 val DependencyHandler.compose get() = ComposePlugin.Dependencies
 
 private fun composeDependency(groupWithArtifact: String) = "$groupWithArtifact:$composeVersion"
+private fun jbComposeDependency(groupWithArtifact: String) = "$groupWithArtifact:$jbComposeVersion"
