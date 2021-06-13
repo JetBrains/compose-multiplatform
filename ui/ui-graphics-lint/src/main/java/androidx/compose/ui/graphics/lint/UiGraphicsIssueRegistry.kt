@@ -17,6 +17,7 @@
 package androidx.compose.ui.graphics.lint
 
 import com.android.tools.lint.client.api.IssueRegistry
+import com.android.tools.lint.client.api.Vendor
 import com.android.tools.lint.detector.api.CURRENT_API
 
 /**
@@ -29,5 +30,10 @@ class UiGraphicsIssueRegistry : IssueRegistry() {
     override val issues get() = listOf(
         ColorDetector.MissingColorAlphaChannel,
         ColorDetector.InvalidColorHexValue
+    )
+    override val vendor = Vendor(
+        vendorName = "Jetpack Compose",
+        identifier = "androidx.compose.ui.graphics",
+        feedbackUrl = "https://issuetracker.google.com/issues/new?component=612128"
     )
 }

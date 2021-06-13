@@ -22,7 +22,7 @@ plugins {
 }
 
 dependencies {
-    compileOnly(libs.androidLintMinApi)
+    compileOnly(libs.androidLintMinComposeApi)
     compileOnly(libs.kotlinStdlib)
 
     api(libs.kotlinMetadataJvm)

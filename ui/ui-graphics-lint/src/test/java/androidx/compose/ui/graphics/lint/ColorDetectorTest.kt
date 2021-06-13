@@ -18,7 +18,7 @@
 
 package androidx.compose.ui.graphics.lint
 
-import androidx.compose.lint.Stubs
+import androidx.compose.lint.test.Stubs
 import com.android.tools.lint.checks.infrastructure.LintDetectorTest
 import com.android.tools.lint.detector.api.Detector
 import com.android.tools.lint.detector.api.Issue
@@ -61,7 +61,7 @@ class ColorDetectorTest : LintDetectorTest() {
                 val color4 = Color(0x00_00_00L)
             """
             ),
-            kotlin(Stubs.Color)
+            Stubs.Color
         )
             .run()
             .expect(
@@ -124,7 +124,7 @@ Fix for src/test/test.kt line 14: Add `FF` alpha channel:
                 val color3 = Color(0x00_0_0_0L)
             """
             ),
-            kotlin(Stubs.Color)
+            Stubs.Color
         )
             .run()
             .expect(
@@ -176,7 +176,7 @@ src/test/test.kt:8: Warning: Invalid Color hex value [InvalidColorHexValue]
                 val color14 = Color(Random.nextLong())
             """
             ),
-            kotlin(Stubs.Color)
+            Stubs.Color
         )
             .run()
             .expectClean()
