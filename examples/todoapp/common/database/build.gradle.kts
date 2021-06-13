@@ -36,5 +36,11 @@ kotlin {
                 implementation(Deps.Squareup.SQLDelight.nativeDriver)
             }
         }
+
+        jsMain {
+            dependencies {
+                implementation(Deps.Squareup.SQLDelight.sqljsDriver)
+            }
+        }
     }
 }

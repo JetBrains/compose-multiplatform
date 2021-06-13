@@ -8,7 +8,7 @@ struct ContentView: View {
             TodoRootComponent(
                 componentContext: $0,
                 storeFactory: DefaultStoreFactory(),
-                database: TodoDatabaseCompanion().invoke(driver: TodoDatabaseDriverFactoryKt.TodoDatabaseDriver())
+                database: DefaultTodoSharedDatabase(driver: TodoDatabaseDriverFactoryKt.TodoDatabaseDriver())
             )
         }
     

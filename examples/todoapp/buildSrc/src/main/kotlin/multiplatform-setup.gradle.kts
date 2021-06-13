@@ -8,6 +8,10 @@ kotlin {
     android()
     ios()
 
+    js(IR) {
+        browser()
+    }
+
     sourceSets {
         named("commonTest") {
             dependencies {
@@ -24,6 +28,11 @@ kotlin {
         named("desktopTest") {
             dependencies {
                 implementation(Deps.JetBrains.Kotlin.testJunit)
+            }
+        }
+        named("jsTest") {
+            dependencies {
+                implementation(Deps.JetBrains.Kotlin.testJs)
             }
         }
     }

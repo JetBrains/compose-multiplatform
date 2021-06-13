@@ -6,6 +6,7 @@ import com.arkivanov.decompose.value.operator.map
 import com.arkivanov.mvikotlin.core.store.StoreFactory
 import com.badoo.reaktive.base.Consumer
 import com.badoo.reaktive.base.invoke
+import example.todo.common.database.TodoSharedDatabase
 import example.todo.common.main.TodoMain
 import example.todo.common.main.TodoMain.Model
 import example.todo.common.main.TodoMain.Output
@@ -13,12 +14,11 @@ import example.todo.common.main.store.TodoMainStore.Intent
 import example.todo.common.main.store.TodoMainStoreProvider
 import example.todo.common.utils.asValue
 import example.todo.common.utils.getStore
-import example.todo.database.TodoDatabase
 
 class TodoMainComponent(
     componentContext: ComponentContext,
     storeFactory: StoreFactory,
-    database: TodoDatabase,
+    database: TodoSharedDatabase,
     private val output: Consumer<Output>
 ) : TodoMain, ComponentContext by componentContext {
 
@@ -26,7 +26,7 @@ class TodoMainComponent(
         instanceKeeper.getStore {
             TodoMainStoreProvider(
                 storeFactory = storeFactory,
-                database = TodoMainStoreDatabase(queries = database.todoDatabaseQueries)
+                database = TodoMainStoreDatabase(database = database)
             ).provide()
         }
 
