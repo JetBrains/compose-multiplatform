@@ -19,6 +19,7 @@
 package androidx.compose.runtime.lint
 
 import com.android.tools.lint.client.api.IssueRegistry
+import com.android.tools.lint.client.api.Vendor
 import com.android.tools.lint.detector.api.CURRENT_API
 
 /**
@@ -36,5 +37,10 @@ class RuntimeIssueRegistry : IssueRegistry() {
         CompositionLocalNamingDetector.CompositionLocalNaming,
         RememberDetector.RememberReturnType,
         UnrememberedMutableStateDetector.UnrememberedMutableState
+    )
+    override val vendor = Vendor(
+        vendorName = "Jetpack Compose",
+        identifier = "androidx.compose.runtime",
+        feedbackUrl = "https://issuetracker.google.com/issues/new?component=612128"
     )
 }

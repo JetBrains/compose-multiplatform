@@ -18,7 +18,8 @@
 
 package androidx.compose.runtime.saveable.lint
 
-import androidx.compose.lint.Stubs
+import androidx.compose.lint.test.Stubs
+import androidx.compose.lint.test.compiledStub
 import com.android.tools.lint.checks.infrastructure.LintDetectorTest
 import com.android.tools.lint.checks.infrastructure.TestFile
 import com.android.tools.lint.detector.api.Detector
@@ -26,9 +27,6 @@ import com.android.tools.lint.detector.api.Issue
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.junit.runners.JUnit4
-
-// TODO: add tests for methods defined in class files when we update Lint to support bytecode()
-//  test files
 
 /* ktlint-disable max-line-length */
 @RunWith(JUnit4::class)
@@ -41,7 +39,9 @@ class RememberSaveableDetectorTest : LintDetectorTest() {
     override fun getIssues(): MutableList<Issue> =
         mutableListOf(RememberSaveableDetector.RememberSaveableSaverParameter)
 
-    private val rememberSaveableStub: TestFile = kotlin(
+    private val rememberSaveableStub: TestFile = compiledStub(
+        filename = "RememberSaveable.kt",
+        filepath = "androidx/compose/runtime/saveable",
         """
         package androidx.compose.runtime.saveable
 
@@ -77,7 +77,57 @@ class RememberSaveableDetectorTest : LintDetectorTest() {
         @Suppress("UNCHECKED_CAST")
         private fun <T> mutableStateSaver(inner: Saver<T, out Any>) =
             Any() as Saver<MutableState<T>, MutableState<Any?>>
-    """
+        """,
+"""
+        androidx/compose/runtime/saveable/Saver.class:
+        H4sIAAAAAAAAAI1PTUvDQBB9m/QjjVVT60f9BWIOphZBUBG8CJVKoQEvPW2b
+        tWzbbCS7LT3md3mQnP1R4sTai3pwYd6bffOGmXn/eH0DcIEWwwlXUZrIaBWM
+        k/gl0SJIF8rIWASaLwUfzUUQUpJWwRgebvqpnEjF51e9KV/yYM7VJOiPpmJs
+        rsNv/x+l298Sg/dTq6LE0OjNEjOXKngUhkfccHJa8dKmfVkBZQY2I2kli1+b
+        suicwc+zumu1LNdyKLw8c55beeaXnDzzmO84zLN8q213KIqODsNp75+H03xn
+        czWlmysZ7YPmQMQiHol0o57NDEMtlBPFzSIlkxsmi3Qs7mXRcTxYT3iSWpL5
+        TqnEcCMTpSu0FcpYPxsHhBbx4Rfv44j4kuZVyFMdwu7C6aJGCLeArS7q2B6C
+        aexgd4iShqfR0NjTaH4C2V0QQe0BAAA=
+        """,
+        """
+        androidx/compose/runtime/saveable/RememberSaveableKt.class:
+        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
+        """,
+        """
+        META-INF/main.kotlin_module:
+        H4sIAAAAAAAAAGNgYGBmYGBgBGJWKM3ApcUlkZiXUpSfmVKhl5yfW5BfnKpX
+        VJpXkpmbKsTnW1qSmJSTGlySWJLqXcJlzqWIS61ecWJZKkitkFBQam5qblJq
+        UTBUBKiRl4ulJLW4RIjVLT/fu0SJQYsBAFB+NmSMAAAA
+        """
     )
 
     @Test
@@ -110,8 +160,8 @@ class RememberSaveableDetectorTest : LintDetectorTest() {
             """
             ),
             rememberSaveableStub,
-            kotlin(Stubs.Composable),
-            kotlin(Stubs.MutableState)
+            Stubs.Composable,
+            Stubs.MutableState
         )
             .run()
             .expect(
@@ -224,8 +274,8 @@ Fix for src/test/Foo.kt line 22: Change to `stateSaver = fooSaver4`:
             """
             ),
             rememberSaveableStub,
-            kotlin(Stubs.Composable),
-            kotlin(Stubs.MutableState)
+            Stubs.Composable,
+            Stubs.MutableState
         )
             .run()
             .expectClean()

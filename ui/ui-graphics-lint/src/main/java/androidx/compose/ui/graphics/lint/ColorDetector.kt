@@ -50,7 +50,7 @@ class ColorDetector : Detector(), SourceCodeScanner {
                 val argument = node.valueArguments.first()
                 // Ignore non-literal expressions
                 if (argument !is KotlinULiteralExpression) return
-                val argumentText = argument.sourcePsi?.text ?: return
+                val argumentText = argument.sourcePsi.text ?: return
                 val hexPrefix = "0x"
                 val hexIndex = argumentText.indexOf(hexPrefix, ignoreCase = true)
                 // Ignore if this isn't a hex value

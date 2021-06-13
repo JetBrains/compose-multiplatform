@@ -18,7 +18,8 @@
 
 package androidx.compose.animation.lint
 
-import androidx.compose.lint.Stubs
+import androidx.compose.lint.test.Stubs
+import androidx.compose.lint.test.compiledStub
 import com.android.tools.lint.checks.infrastructure.LintDetectorTest
 import com.android.tools.lint.detector.api.Detector
 import com.android.tools.lint.detector.api.Issue
@@ -28,9 +29,6 @@ import org.junit.runners.JUnit4
 
 /* ktlint-disable max-line-length */
 @RunWith(JUnit4::class)
-
-// TODO: add tests for methods defined in class files when we update Lint to support bytecode()
-//  test files
 
 /**
  * Test for [CrossfadeDetector].
@@ -42,7 +40,9 @@ class CrossfadeDetectorTest : LintDetectorTest() {
         mutableListOf(CrossfadeDetector.UnusedCrossfadeTargetStateParameter)
 
     // Simplified Transition.kt stubs
-    private val CrossfadeStub = kotlin(
+    private val CrossfadeStub = compiledStub(
+        filename = "Transition.kt",
+        filepath = "androidx/compose/animation",
         """
             package androidx.compose.animation
 
@@ -53,6 +53,30 @@ class CrossfadeDetectorTest : LintDetectorTest() {
                 targetState: T,
                 content: @Composable (T) -> Unit
             ) {}
+        """,
+"""
+        androidx/compose/animation/TransitionKt.class:
+        H4sIAAAAAAAAAIVSW08TQRT+ZnvZdgFZyr0oIhcBUbcQfLHExJAQGisYW3nh
+        abpd6vQya3amDY/9Lf4D34wPpvHRH2U8s1RBasIme86Zb77znTNn5uevb98B
+        7OMpwyaX9SgU9UvPDzufQhV4XIoO1yKUXjXiUgkTvtE2GIPb5D3utblseKe1
+        ZuATmmDIHkahUhe8HjC82Crf5hTLrVC3hfSavY530ZW+EVTe0TDaLW6fMZwe
+        VF+OZr7aqlbvSj94doPzQQrKihU3yiMni7pSi07gHcZrXmsHRYa1chg1vGag
+        axEXJMylDDW/KnIS6pNuu00s2w+lDqTOwGFYvtGRIDiSvO2VpI4oX/jKxjjD
+        rP8x8FtDgXc84p2AiDTv/w3oGqkYkQYdYBz3MOlgAi7DmOZRI9AVaotGnBsV
+        YFi5a8gMU38obwPN61xzwqxOL0EvgRmTYmAtE1iEXwoTFSiq7zJUBv0ZZ9B3
+        LNdyrEzCsRas+B/08/suGavAVpOZQd+19tJuIm8dW3vzbjI/nUvmKDa2wAqp
+        H5/TViZ9bBvv2kZ6j1FtsKo51LC5mx1PXD/A5y3NkDwMzRubLAsZnHQ7tSCq
+        mks02aHP22c8EmY9BLMV0ZBcdyOKl95fXX1J9oQStP36+pYZ1m/v/r2vf2hO
+        JexGfnAkjPriMOdsRA+7sJCE+YiGFNK0WqdVkXCLvL2TG/uKqS9m1NggmyZi
+        Gg4eUzx3RUEO07GETfgM7W/GbBtbQ36G/Db9WSuuk423n8R2DTvkDwmdpepz
+        50iUMF/CAlkslpDHUgn38eAcTGEZD8+RUUgprCg8UsgpOAqryoDp38bsatcp
+        BAAA
+        """,
+        """
+        META-INF/main.kotlin_module:
+        H4sIAAAAAAAAAGNgYGBmYGBgBGJWKM3ApcUllZiXUpSfmVKhl5yfW5BfnKqX
+        mJeZm1iSmZ8nxBNSlJhXnAlie5dw8XIxp+XnC7GFpBaXeJcoMWgxAACekN3e
+        UwAAAA==
         """
     )
 
@@ -80,7 +104,7 @@ class CrossfadeDetectorTest : LintDetectorTest() {
             """
             ),
             CrossfadeStub,
-            kotlin(Stubs.Composable)
+            Stubs.Composable
         )
             .run()
             .expect(
@@ -142,7 +166,7 @@ src/foo/test.kt:16: Error: Target state parameter _ is not used [UnusedCrossfade
             """
             ),
             CrossfadeStub,
-            kotlin(Stubs.Composable)
+            Stubs.Composable
         )
             .run()
             .expect(
@@ -217,7 +241,7 @@ src/foo/test.kt:20: Error: Target state parameter param is not used [UnusedCross
         """
             ),
             CrossfadeStub,
-            kotlin(Stubs.Composable)
+            Stubs.Composable
         )
             .run()
             .expectClean()
