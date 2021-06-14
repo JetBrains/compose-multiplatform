@@ -97,7 +97,7 @@ interface ElementBuilder<TElement : Element> {
     fun create(): TElement
 
     private open class ElementBuilderImplementation<TElement : Element>(private val tagName: String) : ElementBuilder<TElement> {
-        private val el: Element by lazy { document.createElement(tagName) }
+        private val el = document.createElement(tagName)
         override fun create(): TElement = el.cloneNode() as TElement
     }
 
@@ -106,88 +106,88 @@ interface ElementBuilder<TElement : Element> {
             return object  : ElementBuilderImplementation<TElement>(tagName) {}
         }
 
-        val Address: ElementBuilder<HTMLElement> = ElementBuilderImplementation("address")
-        val Article: ElementBuilder<HTMLElement> = ElementBuilderImplementation("article")
-        val Aside: ElementBuilder<HTMLElement> = ElementBuilderImplementation("aside")
-        val Header: ElementBuilder<HTMLElement> = ElementBuilderImplementation("header")
+        val Address: ElementBuilder<HTMLElement> by lazy { ElementBuilderImplementation("address") }
+        val Article: ElementBuilder<HTMLElement> by lazy { ElementBuilderImplementation("article") }
+        val Aside: ElementBuilder<HTMLElement> by lazy { ElementBuilderImplementation("aside") }
+        val Header: ElementBuilder<HTMLElement> by lazy { ElementBuilderImplementation("header") }
 
-        val Area: ElementBuilder<HTMLAreaElement> = ElementBuilderImplementation("area")
-        val Audio: ElementBuilder<HTMLAudioElement> = ElementBuilderImplementation("audio")
-        val Map: ElementBuilder<HTMLMapElement> = ElementBuilderImplementation("map")
-        val Track: ElementBuilder<HTMLTrackElement> = ElementBuilderImplementation("track")
-        val Video: ElementBuilder<HTMLVideoElement> = ElementBuilderImplementation("video")
+        val Area: ElementBuilder<HTMLAreaElement> by lazy { ElementBuilderImplementation("area") }
+        val Audio: ElementBuilder<HTMLAudioElement> by lazy { ElementBuilderImplementation("audio") }
+        val Map: ElementBuilder<HTMLMapElement> by lazy { ElementBuilderImplementation("map") }
+        val Track: ElementBuilder<HTMLTrackElement> by lazy { ElementBuilderImplementation("track") }
+        val Video: ElementBuilder<HTMLVideoElement> by lazy { ElementBuilderImplementation("video") }
 
-        val Datalist: ElementBuilder<HTMLDataListElement> = ElementBuilderImplementation("datalist")
-        val Fieldset: ElementBuilder<HTMLFieldSetElement> = ElementBuilderImplementation("fieldset")
-        val Legend: ElementBuilder<HTMLLegendElement> = ElementBuilderImplementation("legend")
-        val Meter: ElementBuilder<HTMLMeterElement> = ElementBuilderImplementation("meter")
-        val Output: ElementBuilder<HTMLOutputElement> = ElementBuilderImplementation("output")
-        val Progress: ElementBuilder<HTMLProgressElement> = ElementBuilderImplementation("progress")
+        val Datalist: ElementBuilder<HTMLDataListElement> by lazy { ElementBuilderImplementation("datalist") }
+        val Fieldset: ElementBuilder<HTMLFieldSetElement> by lazy { ElementBuilderImplementation("fieldset") }
+        val Legend: ElementBuilder<HTMLLegendElement> by lazy { ElementBuilderImplementation("legend") }
+        val Meter: ElementBuilder<HTMLMeterElement> by lazy { ElementBuilderImplementation("meter") }
+        val Output: ElementBuilder<HTMLOutputElement> by lazy { ElementBuilderImplementation("output") }
+        val Progress: ElementBuilder<HTMLProgressElement> by lazy { ElementBuilderImplementation("progress") }
 
-        val Embed: ElementBuilder<HTMLEmbedElement> = ElementBuilderImplementation("embed")
-        val Iframe: ElementBuilder<HTMLIFrameElement> = ElementBuilderImplementation("iframe")
-        val Object: ElementBuilder<HTMLObjectElement> = ElementBuilderImplementation("object")
-        val Param: ElementBuilder<HTMLParamElement> = ElementBuilderImplementation("param")
-        val Picture: ElementBuilder<HTMLPictureElement> = ElementBuilderImplementation("picture")
-        val Source: ElementBuilder<HTMLSourceElement> = ElementBuilderImplementation("source")
+        val Embed: ElementBuilder<HTMLEmbedElement> by lazy { ElementBuilderImplementation("embed") }
+        val Iframe: ElementBuilder<HTMLIFrameElement> by lazy { ElementBuilderImplementation("iframe") }
+        val Object: ElementBuilder<HTMLObjectElement> by lazy { ElementBuilderImplementation("object") }
+        val Param: ElementBuilder<HTMLParamElement> by lazy { ElementBuilderImplementation("param") }
+        val Picture: ElementBuilder<HTMLPictureElement> by lazy { ElementBuilderImplementation("picture") }
+        val Source: ElementBuilder<HTMLSourceElement> by lazy { ElementBuilderImplementation("source") }
 
-        val Div: ElementBuilder<HTMLDivElement> = ElementBuilderImplementation("div")
-        val A: ElementBuilder<HTMLAnchorElement> = ElementBuilderImplementation("a")
-        val Input: ElementBuilder<HTMLInputElement> = ElementBuilderImplementation("input")
-        val Button: ElementBuilder<HTMLButtonElement> = ElementBuilderImplementation("button")
+        val Div: ElementBuilder<HTMLDivElement> by lazy { ElementBuilderImplementation("div") }
+        val A: ElementBuilder<HTMLAnchorElement> by lazy { ElementBuilderImplementation("a") }
+        val Input: ElementBuilder<HTMLInputElement> by lazy { ElementBuilderImplementation("input") }
+        val Button: ElementBuilder<HTMLButtonElement> by lazy { ElementBuilderImplementation("button") }
 
-        val H1: ElementBuilder<HTMLHeadingElement> = ElementBuilderImplementation("h1")
-        val H2: ElementBuilder<HTMLHeadingElement> = ElementBuilderImplementation("h2")
-        val H3: ElementBuilder<HTMLHeadingElement> = ElementBuilderImplementation("h3")
-        val H4: ElementBuilder<HTMLHeadingElement> = ElementBuilderImplementation("h4")
-        val H5: ElementBuilder<HTMLHeadingElement> = ElementBuilderImplementation("h5")
-        val H6: ElementBuilder<HTMLHeadingElement> = ElementBuilderImplementation("h6")
+        val H1: ElementBuilder<HTMLHeadingElement> by lazy { ElementBuilderImplementation("h1") }
+        val H2: ElementBuilder<HTMLHeadingElement> by lazy { ElementBuilderImplementation("h2") }
+        val H3: ElementBuilder<HTMLHeadingElement> by lazy { ElementBuilderImplementation("h3") }
+        val H4: ElementBuilder<HTMLHeadingElement> by lazy { ElementBuilderImplementation("h4") }
+        val H5: ElementBuilder<HTMLHeadingElement> by lazy { ElementBuilderImplementation("h5") }
+        val H6: ElementBuilder<HTMLHeadingElement> by lazy { ElementBuilderImplementation("h6") }
 
-        val P: ElementBuilder<HTMLParagraphElement> = ElementBuilderImplementation<HTMLParagraphElement>("p")
+        val P: ElementBuilder<HTMLParagraphElement> by lazy { ElementBuilderImplementation<HTMLParagraphElement>("p") }
 
-        val Em: ElementBuilder<HTMLElement> = ElementBuilderImplementation("em")
-        val I: ElementBuilder<HTMLElement> = ElementBuilderImplementation("i")
-        val B: ElementBuilder<HTMLElement> = ElementBuilderImplementation("b")
-        val Small: ElementBuilder<HTMLElement> = ElementBuilderImplementation("small")
+        val Em: ElementBuilder<HTMLElement> by lazy { ElementBuilderImplementation("em") }
+        val I: ElementBuilder<HTMLElement> by lazy { ElementBuilderImplementation("i") }
+        val B: ElementBuilder<HTMLElement> by lazy { ElementBuilderImplementation("b") }
+        val Small: ElementBuilder<HTMLElement> by lazy { ElementBuilderImplementation("small") }
 
-        val Span: ElementBuilder<HTMLSpanElement> = ElementBuilderImplementation("span")
+        val Span: ElementBuilder<HTMLSpanElement> by lazy { ElementBuilderImplementation("span") }
 
-        val Br: ElementBuilder<HTMLBRElement> = ElementBuilderImplementation("br")
+        val Br: ElementBuilder<HTMLBRElement> by lazy { ElementBuilderImplementation("br") }
 
-        val Ul: ElementBuilder<HTMLUListElement> = ElementBuilderImplementation("ul")
-        val Ol: ElementBuilder<HTMLOListElement> = ElementBuilderImplementation("ol")
+        val Ul: ElementBuilder<HTMLUListElement> by lazy { ElementBuilderImplementation("ul") }
+        val Ol: ElementBuilder<HTMLOListElement> by lazy { ElementBuilderImplementation("ol") }
 
-        val Li: ElementBuilder<HTMLLIElement> = ElementBuilderImplementation("li")
+        val Li: ElementBuilder<HTMLLIElement> by lazy { ElementBuilderImplementation("li") }
 
-        val Img: ElementBuilder<HTMLImageElement> = ElementBuilderImplementation("img")
-        val Form: ElementBuilder<HTMLFormElement> = ElementBuilderImplementation("form")
+        val Img: ElementBuilder<HTMLImageElement> by lazy { ElementBuilderImplementation("img") }
+        val Form: ElementBuilder<HTMLFormElement> by lazy { ElementBuilderImplementation("form") }
 
-        val Select: ElementBuilder<HTMLSelectElement> = ElementBuilderImplementation("select")
-        val Option: ElementBuilder<HTMLOptionElement> = ElementBuilderImplementation("option")
-        val OptGroup: ElementBuilder<HTMLOptGroupElement> = ElementBuilderImplementation("optgroup")
+        val Select: ElementBuilder<HTMLSelectElement> by lazy { ElementBuilderImplementation("select") }
+        val Option: ElementBuilder<HTMLOptionElement> by lazy { ElementBuilderImplementation("option") }
+        val OptGroup: ElementBuilder<HTMLOptGroupElement> by lazy { ElementBuilderImplementation("optgroup") }
 
-        val Section: ElementBuilder<HTMLElement> = ElementBuilderImplementation("section")
-        val TextArea: ElementBuilder<HTMLTextAreaElement> = ElementBuilderImplementation("textarea")
-        val Nav: ElementBuilder<HTMLElement> = ElementBuilderImplementation("nav")
-        val Pre: ElementBuilder<HTMLPreElement> = ElementBuilderImplementation("pre")
-        val Code: ElementBuilder<HTMLElement> = ElementBuilderImplementation("code")
+        val Section: ElementBuilder<HTMLElement> by lazy { ElementBuilderImplementation("section") }
+        val TextArea: ElementBuilder<HTMLTextAreaElement> by lazy { ElementBuilderImplementation("textarea") }
+        val Nav: ElementBuilder<HTMLElement> by lazy { ElementBuilderImplementation("nav") }
+        val Pre: ElementBuilder<HTMLPreElement> by lazy { ElementBuilderImplementation("pre") }
+        val Code: ElementBuilder<HTMLElement> by lazy { ElementBuilderImplementation("code") }
 
-        val Main: ElementBuilder<HTMLElement> = ElementBuilderImplementation("main")
-        val Footer: ElementBuilder<HTMLElement> = ElementBuilderImplementation("footer")
-        val Hr: ElementBuilder<HTMLHRElement> = ElementBuilderImplementation("hr")
-        val Label: ElementBuilder<HTMLLabelElement> = ElementBuilderImplementation("label")
-        val Table: ElementBuilder<HTMLTableElement> = ElementBuilderImplementation("table")
-        val Caption: ElementBuilder<HTMLTableCaptionElement> = ElementBuilderImplementation("caption")
-        val Col: ElementBuilder<HTMLTableColElement> = ElementBuilderImplementation("col")
-        val Colgroup: ElementBuilder<HTMLTableColElement> = ElementBuilderImplementation("colgroup")
-        val Tr: ElementBuilder<HTMLTableRowElement> = ElementBuilderImplementation("tr")
-        val Thead: ElementBuilder<HTMLTableSectionElement> = ElementBuilderImplementation("thead")
-        val Th: ElementBuilder<HTMLTableCellElement> = ElementBuilderImplementation("th")
-        val Td: ElementBuilder<HTMLTableCellElement> = ElementBuilderImplementation("td")
-        val Tbody: ElementBuilder<HTMLTableSectionElement> = ElementBuilderImplementation("tbody")
-        val Tfoot: ElementBuilder<HTMLTableSectionElement> = ElementBuilderImplementation("tfoot")
+        val Main: ElementBuilder<HTMLElement> by lazy { ElementBuilderImplementation("main") }
+        val Footer: ElementBuilder<HTMLElement> by lazy { ElementBuilderImplementation("footer") }
+        val Hr: ElementBuilder<HTMLHRElement> by lazy { ElementBuilderImplementation("hr") }
+        val Label: ElementBuilder<HTMLLabelElement> by lazy { ElementBuilderImplementation("label") }
+        val Table: ElementBuilder<HTMLTableElement> by lazy { ElementBuilderImplementation("table") }
+        val Caption: ElementBuilder<HTMLTableCaptionElement> by lazy { ElementBuilderImplementation("caption") }
+        val Col: ElementBuilder<HTMLTableColElement> by lazy { ElementBuilderImplementation("col") }
+        val Colgroup: ElementBuilder<HTMLTableColElement> by lazy { ElementBuilderImplementation("colgroup") }
+        val Tr: ElementBuilder<HTMLTableRowElement> by lazy { ElementBuilderImplementation("tr") }
+        val Thead: ElementBuilder<HTMLTableSectionElement> by lazy { ElementBuilderImplementation("thead") }
+        val Th: ElementBuilder<HTMLTableCellElement> by lazy { ElementBuilderImplementation("th") }
+        val Td: ElementBuilder<HTMLTableCellElement> by lazy { ElementBuilderImplementation("td") }
+        val Tbody: ElementBuilder<HTMLTableSectionElement> by lazy { ElementBuilderImplementation("tbody") }
+        val Tfoot: ElementBuilder<HTMLTableSectionElement> by lazy { ElementBuilderImplementation("tfoot") }
 
-        val Style: ElementBuilder<HTMLStyleElement> = ElementBuilderImplementation("style")
+        val Style: ElementBuilder<HTMLStyleElement> by lazy { ElementBuilderImplementation("style") }
     }
 }
 
