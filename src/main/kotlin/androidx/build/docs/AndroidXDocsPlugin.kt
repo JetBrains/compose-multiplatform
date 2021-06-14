@@ -574,7 +574,8 @@ private val dackkaDirsToProcess = listOf(
     "androidx/navigation/**",
     "androidx/paging/**",
     "androidx/room/**",
-    "androidx/window/**"
+    "androidx/window/**",
+    "androidx/work/**"
 )
 
 private val hiddenPackages = listOf(
