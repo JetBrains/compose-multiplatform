@@ -40,7 +40,8 @@ data class JavaCompileInputs(
         // Constructs a JavaCompileInputs from a library and its variant
         fun fromLibraryVariant(
             variant: BaseVariant,
-            project: Project
+            project: Project,
+            bootClasspath: FileCollection
         ): JavaCompileInputs {
             val sourceCollection = getSourceCollection(variant, project)
 
@@ -51,7 +52,7 @@ data class JavaCompileInputs(
             return JavaCompileInputs(
                 sourceCollection,
                 dependencyClasspath,
-                androidJarFile(project)
+                bootClasspath
             )
         }
 
