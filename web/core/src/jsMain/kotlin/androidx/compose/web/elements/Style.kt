@@ -2,7 +2,6 @@ package org.jetbrains.compose.web.dom
 
 import androidx.compose.runtime.Composable
 import org.jetbrains.compose.web.attributes.AttrsBuilder
-import org.jetbrains.compose.web.attributes.Tag
 import org.w3c.dom.HTMLStyleElement
 import org.w3c.dom.css.CSSGroupingRule
 import org.w3c.dom.css.CSSRule

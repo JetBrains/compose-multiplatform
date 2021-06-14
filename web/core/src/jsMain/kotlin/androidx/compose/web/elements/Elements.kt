@@ -6,7 +6,6 @@ import org.jetbrains.compose.web.DomApplier
 import org.jetbrains.compose.web.DomNodeWrapper
 import org.jetbrains.compose.web.attributes.AttrsBuilder
 import org.jetbrains.compose.web.attributes.InputType
-import org.jetbrains.compose.web.attributes.Tag
 import org.jetbrains.compose.web.attributes.action
 import org.jetbrains.compose.web.attributes.alt
 import org.jetbrains.compose.web.attributes.forId

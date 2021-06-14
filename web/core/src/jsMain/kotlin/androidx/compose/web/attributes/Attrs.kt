@@ -13,44 +13,6 @@ import org.w3c.dom.HTMLTableCellElement
 import org.w3c.dom.HTMLTableColElement
 import org.w3c.dom.HTMLTextAreaElement
 
-interface Tag {
-    object Div : Tag
-    object A : Tag
-    object Button : Tag
-    object Form : Tag
-    object Input : Tag
-    object Select : Tag
-    object Option : Tag
-    object OptGroup : Tag
-    object H : Tag
-    object Hr : Tag
-    object Ul : Tag
-    object Ol : Tag
-    object Li : Tag
-    object Img : Tag
-    object TextArea : Tag
-    object Nav : Tag
-    object Span : Tag
-    object P : Tag
-    object Br : Tag
-    object Style : Tag
-    object Pre : Tag
-    object Code : Tag
-    object Label : Tag
-    object Table : Tag
-    object Caption : Tag
-    object Col : Tag
-    object Colgroup : Tag
-    object Tr : Tag
-    object Thead : Tag
-    object Th : Tag
-    object Td : Tag
-    object Tbody : Tag
-    object Tfoot : Tag
-}
-
-/* Anchor <a> attributes */
-
 fun AttrsBuilder<HTMLAnchorElement>.href(value: String?) =
     attr("href", value)
 

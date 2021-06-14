@@ -13,7 +13,6 @@ import androidx.compose.runtime.remember
 import org.jetbrains.compose.web.DomApplier
 import org.jetbrains.compose.web.DomElementWrapper
 import org.jetbrains.compose.web.attributes.AttrsBuilder
-import org.jetbrains.compose.web.attributes.Tag
 import kotlinx.browser.document
 import org.w3c.dom.Element
 import org.w3c.dom.HTMLAnchorElement
@@ -23,7 +22,6 @@ import org.w3c.dom.HTMLDivElement
 import org.w3c.dom.HTMLElement
 import org.w3c.dom.HTMLFormElement
 import org.w3c.dom.HTMLHRElement
-import org.w3c.dom.HTMLHeadElement
 import org.w3c.dom.HTMLHeadingElement
 import org.w3c.dom.HTMLImageElement
 import org.w3c.dom.HTMLInputElement
