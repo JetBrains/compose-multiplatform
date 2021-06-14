@@ -34,6 +34,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.requiredHeight
@@ -606,7 +607,7 @@ private fun LazyWithFlingConfig() {
                     var velocityLeft = initialVelocity
                     var lastLeft = 0f
                     var lastFrameTime = unspecifiedFrame
-                    while (abs(lastLeft) < 1f) {
+                    while (abs(lastLeft) < 1f && abs(perDance) > 0) {
                         listOf(perDance * 3 / 4, -perDance * 1 / 4).forEach { toGo ->
                             if (abs(lastLeft) > 1f) return@forEach
                             var lastValue = 0f
@@ -618,7 +619,7 @@ private fun LazyWithFlingConfig() {
                                 sequentialAnimation = lastFrameTime != unspecifiedFrame
                             ) {
                                 val delta = value - lastValue
-                                lastLeft = scrollBy(delta)
+                                lastLeft = delta - scrollBy(delta)
                                 lastValue = value
                                 velocityLeft = this.velocity
                                 lastFrameTime = this.lastFrameTimeNanos
@@ -630,13 +631,18 @@ private fun LazyWithFlingConfig() {
                 }
             }
         }
-        LazyColumn(flingBehavior = flingConfig) {
+        LazyColumn(
+            modifier = Modifier.fillMaxSize(),
+            flingBehavior = flingConfig
+        ) {
             items(100) {
                 Text(
                     text = "$it",
                     fontSize = 20.sp,
                     modifier = Modifier
+                        .fillParentMaxWidth()
                         .background(Color.Gray.copy(alpha = it / 100f))
+                        .border(1.dp, Color.Gray)
                         .padding(16.dp)
                 )
             }
