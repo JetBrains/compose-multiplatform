@@ -27,7 +27,11 @@ import android.util.Log
 import android.widget.FrameLayout
 import androidx.activity.OnBackPressedDispatcher
 import androidx.activity.OnBackPressedDispatcherOwner
+import androidx.activity.compose.LocalActivityResultRegistryOwner
 import androidx.activity.compose.LocalOnBackPressedDispatcherOwner
+import androidx.activity.result.ActivityResultRegistry
+import androidx.activity.result.ActivityResultRegistryOwner
+import androidx.activity.result.contract.ActivityResultContract
 import androidx.annotation.VisibleForTesting
 import androidx.compose.animation.core.InternalAnimationApi
 import androidx.compose.animation.core.Transition
@@ -52,6 +56,7 @@ import androidx.compose.ui.tooling.data.asTree
 import androidx.compose.ui.tooling.preview.animation.PreviewAnimationClock
 import androidx.compose.ui.tooling.preview.CommonPreviewUtils.invokeComposableViaReflection
 import androidx.compose.ui.unit.IntRect
+import androidx.core.app.ActivityOptionsCompat
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleRegistry
 import androidx.lifecycle.ViewModelStoreOwner
@@ -485,6 +490,7 @@ internal class ComposeViewAdapter : FrameLayout {
         CompositionLocalProvider(
             LocalFontLoader provides LayoutlibFontResourceLoader(context),
             LocalOnBackPressedDispatcherOwner provides FakeOnBackPressedDispatcherOwner,
+            LocalActivityResultRegistryOwner provides FakeActivityResultRegistryOwner,
         ) {
             Inspectable(slotTableRecord, content)
         }
@@ -690,5 +696,20 @@ internal class ComposeViewAdapter : FrameLayout {
 
         override fun getOnBackPressedDispatcher() = onBackPressedDispatcher
         override fun getLifecycle() = FakeSavedStateRegistryOwner.lifecycle
+    }
+
+    private val FakeActivityResultRegistryOwner = object : ActivityResultRegistryOwner {
+        private val activityResultRegistry = object : ActivityResultRegistry() {
+            override fun <I : Any?, O : Any?> onLaunch(
+                requestCode: Int,
+                contract: ActivityResultContract<I, O>,
+                input: I,
+                options: ActivityOptionsCompat?
+            ) {
+                throw IllegalStateException("Calling launch() is not supported in Preview")
+            }
+        }
+
+        override fun getActivityResultRegistry(): ActivityResultRegistry = activityResultRegistry
     }
 }

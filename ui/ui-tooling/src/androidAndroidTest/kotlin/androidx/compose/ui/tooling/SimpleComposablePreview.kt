@@ -16,6 +16,7 @@
 
 package androidx.compose.ui.tooling
 
+import androidx.activity.compose.LocalActivityResultRegistryOwner
 import androidx.activity.compose.LocalOnBackPressedDispatcherOwner
 import androidx.compose.material.Surface
 import androidx.compose.material.Text
@@ -94,6 +95,15 @@ private fun OnBackPressedDispatcherPreview() {
         "OnBackPressedDispatcher is not provided"
     )
     Text("OnBackPressedDispatcher preview")
+}
+
+@Preview
+@Composable
+private fun ActivityResultRegistryPreview() {
+    if (LocalActivityResultRegistryOwner.current == null) throw IllegalArgumentException(
+        "ActivityResultRegistry is not provided"
+    )
+    Text("ActivityResultRegistry preview")
 }
 
 class TestGroup {

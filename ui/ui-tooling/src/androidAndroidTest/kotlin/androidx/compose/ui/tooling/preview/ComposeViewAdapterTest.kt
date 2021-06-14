@@ -273,6 +273,14 @@ class ComposeViewAdapterTest {
         )
     }
 
+    @Test
+    fun activityResultRegistryUsedInsidePreview() {
+        assertRendersCorrectly(
+            "androidx.compose.ui.tooling.SimpleComposablePreviewKt",
+            "ActivityResultRegistryPreview"
+        )
+    }
+
     /**
      * Check that no re-composition happens without forcing it.
      */
