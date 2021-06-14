@@ -265,6 +265,14 @@ class ComposeViewAdapterTest {
         )
     }
 
+    @Test
+    fun onBackPressedDispatcherUsedInsidePreview() {
+        assertRendersCorrectly(
+            "androidx.compose.ui.tooling.SimpleComposablePreviewKt",
+            "OnBackPressedDispatcherPreview"
+        )
+    }
+
     /**
      * Check that no re-composition happens without forcing it.
      */

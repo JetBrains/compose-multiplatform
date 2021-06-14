@@ -16,6 +16,7 @@
 
 package androidx.compose.ui.tooling
 
+import androidx.activity.compose.LocalOnBackPressedDispatcherOwner
 import androidx.compose.material.Surface
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
@@ -84,6 +85,15 @@ private fun SaveableStateRegistryPreview() {
         "SaveableStateRegistry is not provided"
     )
     Text("SaveableStateRegistry preview")
+}
+
+@Preview
+@Composable
+private fun OnBackPressedDispatcherPreview() {
+    if (LocalOnBackPressedDispatcherOwner.current == null) throw IllegalArgumentException(
+        "OnBackPressedDispatcher is not provided"
+    )
+    Text("OnBackPressedDispatcher preview")
 }
 
 class TestGroup {

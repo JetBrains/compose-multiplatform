@@ -25,6 +25,9 @@ import android.os.Bundle
 import android.util.AttributeSet
 import android.util.Log
 import android.widget.FrameLayout
+import androidx.activity.OnBackPressedDispatcher
+import androidx.activity.OnBackPressedDispatcherOwner
+import androidx.activity.compose.LocalOnBackPressedDispatcherOwner
 import androidx.annotation.VisibleForTesting
 import androidx.compose.animation.core.InternalAnimationApi
 import androidx.compose.animation.core.Transition
@@ -479,7 +482,10 @@ internal class ComposeViewAdapter : FrameLayout {
         // We need to replace the FontResourceLoader to avoid using ResourcesCompat.
         // ResourcesCompat can not load fonts within Layoutlib and, since Layoutlib always runs
         // the latest version, we do not need it.
-        CompositionLocalProvider(LocalFontLoader provides LayoutlibFontResourceLoader(context)) {
+        CompositionLocalProvider(
+            LocalFontLoader provides LayoutlibFontResourceLoader(context),
+            LocalOnBackPressedDispatcherOwner provides FakeOnBackPressedDispatcherOwner,
+        ) {
             Inspectable(slotTableRecord, content)
         }
     }
@@ -677,5 +683,12 @@ internal class ComposeViewAdapter : FrameLayout {
 
     private val FakeViewModelStoreOwner = ViewModelStoreOwner {
         throw IllegalStateException("ViewModels creation is not supported in Preview")
+    }
+
+    private val FakeOnBackPressedDispatcherOwner = object : OnBackPressedDispatcherOwner {
+        private val onBackPressedDispatcher = OnBackPressedDispatcher()
+
+        override fun getOnBackPressedDispatcher() = onBackPressedDispatcher
+        override fun getLifecycle() = FakeSavedStateRegistryOwner.lifecycle
     }
 }
