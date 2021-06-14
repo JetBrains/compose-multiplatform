@@ -167,10 +167,11 @@ class AndroidXComposePlugin : Plugin<Project> {
                     error("ModifierFactoryReturnType")
                     error("ModifierFactoryExtensionFunction")
                     error("ModifierParameter")
+                    error("UnnecessaryComposedModifier")
 
-                    // Paths we want to enable ListIterator checks for - for higher level levels it
-                    // won't have a noticeable performance impact, and we don't want developers
-                    // reading high level library code to worry about this.
+                    // Paths we want to enable ListIterator checks for - for higher level
+                    // libraries it won't have a noticeable performance impact, and we don't want
+                    // developers reading high level library code to worry about this.
                     val listIteratorPaths = listOf(
                         "compose:foundation",
                         "compose:runtime",
