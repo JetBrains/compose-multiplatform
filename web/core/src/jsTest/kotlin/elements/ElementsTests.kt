@@ -7,7 +7,6 @@ package org.jetbrains.compose.web.core.tests.elements
 
 import androidx.compose.runtime.Composable
 import org.jetbrains.compose.web.attributes.AttrsBuilder
-import org.jetbrains.compose.web.attributes.Tag
 import org.jetbrains.compose.web.core.tests.runTest
 import org.jetbrains.compose.web.dom.A
 import org.jetbrains.compose.web.dom.B
@@ -130,7 +129,7 @@ class ElementsTests {
     fun rawCreation() = runTest {
         @Composable
         fun CustomElement(
-            attrs: AttrsBuilder<Tag.Div>.() -> Unit,
+            attrs: AttrsBuilder<HTMLElement>.() -> Unit,
             content: ContentBuilder<HTMLElement>? = null
         ) {
             TagElement(

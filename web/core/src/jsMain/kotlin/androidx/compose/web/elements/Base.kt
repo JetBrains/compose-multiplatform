@@ -13,7 +13,6 @@ import androidx.compose.runtime.remember
 import org.jetbrains.compose.web.DomApplier
 import org.jetbrains.compose.web.DomElementWrapper
 import org.jetbrains.compose.web.attributes.AttrsBuilder
-import org.jetbrains.compose.web.attributes.Tag
 import kotlinx.browser.document
 import org.w3c.dom.Element
 import org.w3c.dom.HTMLAnchorElement
@@ -23,7 +22,6 @@ import org.w3c.dom.HTMLDivElement
 import org.w3c.dom.HTMLElement
 import org.w3c.dom.HTMLFormElement
 import org.w3c.dom.HTMLHRElement
-import org.w3c.dom.HTMLHeadElement
 import org.w3c.dom.HTMLHeadingElement
 import org.w3c.dom.HTMLImageElement
 import org.w3c.dom.HTMLInputElement
@@ -151,9 +149,9 @@ interface ElementBuilder<TElement : Element> {
 }
 
 @Composable
-fun <TTag : Tag, TElement : Element> TagElement(
+fun <TElement : Element> TagElement(
     elementBuilder: ElementBuilder<TElement>,
-    applyAttrs: AttrsBuilder<TTag>.() -> Unit,
+    applyAttrs: AttrsBuilder<TElement>.() -> Unit,
     content: (@Composable ElementScope<TElement>.() -> Unit)?
 ) {
     val scope = remember { ElementScopeImpl<TElement>() }
@@ -166,7 +164,7 @@ fun <TTag : Tag, TElement : Element> TagElement(
             }
         },
         attrsSkippableUpdate = {
-            val attrsApplied = AttrsBuilder<TTag>().also { it.applyAttrs() }
+            val attrsApplied = AttrsBuilder<TElement>().also { it.applyAttrs() }
             refEffect.effect = attrsApplied.refEffect
             val attrsCollected = attrsApplied.collect()
             val events = attrsApplied.collectListeners()
@@ -188,9 +186,9 @@ fun <TTag : Tag, TElement : Element> TagElement(
 }
 
 @Composable
-fun <TTag : Tag, TElement : Element> TagElement(
+fun <TElement : Element> TagElement(
     tagName: String,
-    applyAttrs: AttrsBuilder<TTag>.() -> Unit,
+    applyAttrs: AttrsBuilder<TElement>.() -> Unit,
     content: (@Composable ElementScope<TElement>.() -> Unit)?
 ) = TagElement(
     elementBuilder = ElementBuilder.createBuilder(tagName),

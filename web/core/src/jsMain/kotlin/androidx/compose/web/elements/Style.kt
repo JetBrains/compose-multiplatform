@@ -2,7 +2,6 @@ package org.jetbrains.compose.web.dom
 
 import androidx.compose.runtime.Composable
 import org.jetbrains.compose.web.attributes.AttrsBuilder
-import org.jetbrains.compose.web.attributes.Tag
 import org.w3c.dom.HTMLStyleElement
 import org.w3c.dom.css.CSSGroupingRule
 import org.w3c.dom.css.CSSRule
@@ -18,7 +17,7 @@ import org.jetbrains.compose.web.css.*
  */
 @Composable
 inline fun Style(
-    crossinline applyAttrs: AttrsBuilder<Tag.Style>.() -> Unit = {},
+    crossinline applyAttrs: AttrsBuilder<HTMLStyleElement>.() -> Unit = {},
     rulesBuild: StyleSheetBuilder.() -> Unit
 ) {
     val builder = StyleSheetBuilderImpl()
@@ -34,10 +33,10 @@ inline fun Style(
  */
 @Composable
 inline fun Style(
-    crossinline applyAttrs: AttrsBuilder<Tag.Style>.() -> Unit = {},
+    crossinline applyAttrs: AttrsBuilder<HTMLStyleElement>.() -> Unit = {},
     cssRules: CSSRuleDeclarationList
 ) {
-    TagElement<Tag.Style, HTMLStyleElement>(
+    TagElement(
         elementBuilder = ElementBuilder.Style,
         applyAttrs = {
             applyAttrs()

@@ -7,7 +7,7 @@ import org.jetbrains.compose.web.css.StyleBuilderImpl
 import org.w3c.dom.Element
 import org.w3c.dom.HTMLElement
 
-class AttrsBuilder<TTag : Tag> : EventsListenerBuilder() {
+class AttrsBuilder<TElement : Element> : EventsListenerBuilder() {
     private val attributesMap = mutableMapOf<String, String>()
     val styleBuilder = StyleBuilderImpl()
 
@@ -34,7 +34,7 @@ class AttrsBuilder<TTag : Tag> : EventsListenerBuilder() {
         this.refEffect = effect
     }
 
-    fun attr(attr: String, value: String?): AttrsBuilder<TTag> {
+    fun attr(attr: String, value: String?): AttrsBuilder<TElement> {
         if (value == null) {
             attributesMap.remove(attr)
         } else {
