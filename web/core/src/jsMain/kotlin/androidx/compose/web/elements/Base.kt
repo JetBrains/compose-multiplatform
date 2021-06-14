@@ -21,8 +21,10 @@ import org.w3c.dom.HTMLAreaElement
 import org.w3c.dom.HTMLAudioElement
 import org.w3c.dom.HTMLBRElement
 import org.w3c.dom.HTMLButtonElement
+import org.w3c.dom.HTMLDataListElement
 import org.w3c.dom.HTMLDivElement
 import org.w3c.dom.HTMLElement
+import org.w3c.dom.HTMLFieldSetElement
 import org.w3c.dom.HTMLFormElement
 import org.w3c.dom.HTMLHRElement
 import org.w3c.dom.HTMLHeadingElement
@@ -30,12 +32,16 @@ import org.w3c.dom.HTMLImageElement
 import org.w3c.dom.HTMLInputElement
 import org.w3c.dom.HTMLLIElement
 import org.w3c.dom.HTMLLabelElement
+import org.w3c.dom.HTMLLegendElement
 import org.w3c.dom.HTMLMapElement
+import org.w3c.dom.HTMLMeterElement
 import org.w3c.dom.HTMLOListElement
 import org.w3c.dom.HTMLOptGroupElement
 import org.w3c.dom.HTMLOptionElement
+import org.w3c.dom.HTMLOutputElement
 import org.w3c.dom.HTMLParagraphElement
 import org.w3c.dom.HTMLPreElement
+import org.w3c.dom.HTMLProgressElement
 import org.w3c.dom.HTMLSelectElement
 import org.w3c.dom.HTMLSpanElement
 import org.w3c.dom.HTMLStyleElement
@@ -104,6 +110,13 @@ interface ElementBuilder<TElement : Element> {
         val Map: ElementBuilder<HTMLMapElement> = ElementBuilderImplementation("map")
         val Track: ElementBuilder<HTMLTrackElement> = ElementBuilderImplementation("track")
         val Video: ElementBuilder<HTMLVideoElement> = ElementBuilderImplementation("video")
+
+        val Datalist: ElementBuilder<HTMLDataListElement> = ElementBuilderImplementation("datalist")
+        val Fieldset: ElementBuilder<HTMLFieldSetElement> = ElementBuilderImplementation("fieldset")
+        val Legend: ElementBuilder<HTMLLegendElement> = ElementBuilderImplementation("legend")
+        val Meter: ElementBuilder<HTMLMeterElement> = ElementBuilderImplementation("meter")
+        val Output: ElementBuilder<HTMLOutputElement> = ElementBuilderImplementation("output")
+        val Progress: ElementBuilder<HTMLProgressElement> = ElementBuilderImplementation("progress")
 
         val Div: ElementBuilder<HTMLDivElement> = ElementBuilderImplementation("div")
         val A: ElementBuilder<HTMLAnchorElement> = ElementBuilderImplementation("a")

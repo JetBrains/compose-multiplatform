@@ -22,8 +22,10 @@ import org.jetbrains.compose.web.dom.Code
 import org.jetbrains.compose.web.dom.Col
 import org.jetbrains.compose.web.dom.Colgroup
 import org.jetbrains.compose.web.dom.ContentBuilder
+import org.jetbrains.compose.web.dom.Datalist
 import org.jetbrains.compose.web.dom.Div
 import org.jetbrains.compose.web.dom.Em
+import org.jetbrains.compose.web.dom.Fieldset
 import org.jetbrains.compose.web.dom.Footer
 import org.jetbrains.compose.web.dom.Form
 import org.jetbrains.compose.web.dom.H1
@@ -38,13 +40,17 @@ import org.jetbrains.compose.web.dom.Hr
 import org.jetbrains.compose.web.dom.I
 import org.jetbrains.compose.web.dom.Img
 import org.jetbrains.compose.web.dom.Label
+import org.jetbrains.compose.web.dom.Legend
 import org.jetbrains.compose.web.dom.Main
+import org.jetbrains.compose.web.dom.Meter
 import org.jetbrains.compose.web.dom.Nav
 import org.jetbrains.compose.web.dom.Ol
 import org.jetbrains.compose.web.dom.OptGroup
 import org.jetbrains.compose.web.dom.Option
+import org.jetbrains.compose.web.dom.Output
 import org.jetbrains.compose.web.dom.P
 import org.jetbrains.compose.web.dom.Pre
+import org.jetbrains.compose.web.dom.Progress
 import org.jetbrains.compose.web.dom.Section
 import org.jetbrains.compose.web.dom.Select
 import org.jetbrains.compose.web.dom.Small
@@ -81,6 +87,13 @@ class ElementsTests {
             Pair({ HTMLMap() }, "MAP"),
             Pair({ Track() }, "TRACK"),
             Pair({ Video() }, "VIDEO"),
+
+            Pair({ Datalist() }, "DATALIST"),
+            Pair({ Fieldset() }, "FIELDSET"),
+            Pair({ Legend() }, "LEGEND"),
+            Pair({ Meter() }, "METER"),
+            Pair({ Output() }, "OUTPUT"),
+            Pair({ Progress() }, "PROGRESS"),
 
             Pair({ Div() }, "DIV"),
             Pair({ A() }, "A"),

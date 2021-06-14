@@ -20,8 +20,10 @@ import org.w3c.dom.HTMLAreaElement
 import org.w3c.dom.HTMLAudioElement
 import org.w3c.dom.HTMLBRElement
 import org.w3c.dom.HTMLButtonElement
+import org.w3c.dom.HTMLDataListElement
 import org.w3c.dom.HTMLDivElement
 import org.w3c.dom.HTMLElement
+import org.w3c.dom.HTMLFieldSetElement
 import org.w3c.dom.HTMLFormElement
 import org.w3c.dom.HTMLHeadingElement
 import org.w3c.dom.HTMLHRElement
@@ -29,12 +31,16 @@ import org.w3c.dom.HTMLImageElement
 import org.w3c.dom.HTMLInputElement
 import org.w3c.dom.HTMLLIElement
 import org.w3c.dom.HTMLLabelElement
+import org.w3c.dom.HTMLLegendElement
 import org.w3c.dom.HTMLMapElement
+import org.w3c.dom.HTMLMeterElement
 import org.w3c.dom.HTMLOListElement
 import org.w3c.dom.HTMLOptGroupElement
 import org.w3c.dom.HTMLOptionElement
+import org.w3c.dom.HTMLOutputElement
 import org.w3c.dom.HTMLParagraphElement
 import org.w3c.dom.HTMLPreElement
+import org.w3c.dom.HTMLProgressElement
 import org.w3c.dom.HTMLSelectElement
 import org.w3c.dom.HTMLSpanElement
 import org.w3c.dom.HTMLTableCaptionElement
@@ -155,6 +161,78 @@ fun Video(
 ) {
     TagElement(
         elementBuilder = ElementBuilder.Video,
+        applyAttrs = attrs,
+        content = content
+    )
+}
+
+@Composable
+fun Datalist(
+    attrs: AttrBuilderContext<HTMLDataListElement> = {},
+    content: ContentBuilder<HTMLDataListElement>? = null
+) {
+    TagElement(
+        elementBuilder = ElementBuilder.Datalist,
+        applyAttrs = attrs,
+        content = content
+    )
+}
+
+@Composable
+fun Fieldset(
+    attrs: AttrBuilderContext<HTMLFieldSetElement> = {},
+    content: ContentBuilder<HTMLFieldSetElement>? = null
+) {
+    TagElement(
+        elementBuilder = ElementBuilder.Fieldset,
+        applyAttrs = attrs,
+        content = content
+    )
+}
+
+@Composable
+fun Legend(
+    attrs: AttrBuilderContext<HTMLLegendElement> = {},
+    content: ContentBuilder<HTMLLegendElement>? = null
+) {
+    TagElement(
+        elementBuilder = ElementBuilder.Legend,
+        applyAttrs = attrs,
+        content = content
+    )
+}
+
+@Composable
+fun Meter(
+    attrs: AttrBuilderContext<HTMLMeterElement> = {},
+    content: ContentBuilder<HTMLMeterElement>? = null
+) {
+    TagElement(
+        elementBuilder = ElementBuilder.Meter,
+        applyAttrs = attrs,
+        content = content
+    )
+}
+
+@Composable
+fun Output(
+    attrs: AttrBuilderContext<HTMLOutputElement> = {},
+    content: ContentBuilder<HTMLOutputElement>? = null
+) {
+    TagElement(
+        elementBuilder = ElementBuilder.Output,
+        applyAttrs = attrs,
+        content = content
+    )
+}
+
+@Composable
+fun Progress(
+    attrs: AttrBuilderContext<HTMLProgressElement> = {},
+    content: ContentBuilder<HTMLProgressElement>? = null
+) {
+    TagElement(
+        elementBuilder = ElementBuilder.Progress,
         applyAttrs = attrs,
         content = content
     )
