@@ -332,8 +332,6 @@ package androidx.compose.ui.graphics {
     method public long getUnspecified-0d7_KjU();
     method public long getWhite-0d7_KjU();
     method public long getYellow-0d7_KjU();
-    method @androidx.compose.ui.graphics.ExperimentalGraphicsApi public long hsl-0d7_KjU(float hue, float saturation, float lightness, optional float alpha, optional androidx.compose.ui.graphics.colorspace.Rgb colorSpace);
-    method @androidx.compose.ui.graphics.ExperimentalGraphicsApi public long hsv-0d7_KjU(float hue, float saturation, float value, optional float alpha, optional androidx.compose.ui.graphics.colorspace.Rgb colorSpace);
     property public final long Black;
     property public final long Blue;
     property public final long Cyan;
@@ -397,9 +395,6 @@ package androidx.compose.ui.graphics {
   }
 
   public final class DegreesKt {
-  }
-
-  @kotlin.RequiresOptIn(message="This API is experimental and is likely to change in the future.") public @interface ExperimentalGraphicsApi {
   }
 
   @androidx.compose.runtime.Immutable public final inline class FilterQuality {
