@@ -18,7 +18,6 @@
 package androidx.compose.desktop.examples.windowapi
 
 import androidx.compose.desktop.ComposeWindow
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.padding
@@ -35,12 +34,8 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.focus.FocusRequester
-import androidx.compose.ui.focus.focusRequester
-import androidx.compose.ui.focus.focusTarget
 import androidx.compose.ui.input.key.Key
 import androidx.compose.ui.input.key.key
-import androidx.compose.ui.input.key.onPreviewKeyEvent
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.ApplicationScope
 import androidx.compose.ui.window.AwtWindow
@@ -354,7 +349,7 @@ fun setParameters() = GlobalScope.launchApplication {
     val state = rememberWindowState()
     Window(
         onCloseRequest = ::exitApplication,
-        state = state, resizable = false, undecorated = true, alwaysOnTop = true
+        state = state, undecorated = true, resizable = false, alwaysOnTop = true
     ) {
         Button(onClick = ::exitApplication) {
             Text("Close")
@@ -368,7 +363,7 @@ fun setPosition() = GlobalScope.launchApplication {
     val state = rememberWindowState(position = WindowPosition(0.dp, 0.dp))
 
     if (isOpen) {
-        Window(onCloseRequest = ::exitApplication, state) {}
+        Window(onCloseRequest = ::exitApplication, state = state) {}
     }
 
     Window(onCloseRequest = ::exitApplication) {
@@ -400,7 +395,7 @@ fun initiallyCenteredWindow() = GlobalScope.launchApplication {
     val state = rememberWindowState(position = WindowPosition(Alignment.Center))
 
     if (isOpen) {
-        Window(onCloseRequest = ::exitApplication, state) {}
+        Window(onCloseRequest = ::exitApplication, state = state) {}
     }
 
     Window(onCloseRequest = ::exitApplication) {
@@ -432,7 +427,7 @@ fun setSize() = GlobalScope.launchApplication {
     val state = rememberWindowState(size = WindowSize(400.dp, 100.dp))
 
     if (isOpen) {
-        Window(onCloseRequest = ::exitApplication, state) {}
+        Window(onCloseRequest = ::exitApplication, state = state) {}
     }
 
     Window(onCloseRequest = ::exitApplication) {
@@ -459,7 +454,7 @@ fun setSize() = GlobalScope.launchApplication {
 fun setStatus() = GlobalScope.launchApplication {
     val state = rememberWindowState(placement = WindowPlacement.Maximized)
 
-    Window(onCloseRequest = ::exitApplication, state) {
+    Window(onCloseRequest = ::exitApplication, state = state) {
         Column {
             Text(state.size.toString())
 
@@ -503,28 +498,20 @@ fun setStatus() = GlobalScope.launchApplication {
 fun hotKeys() = GlobalScope.launchApplication {
     val state = rememberWindowState()
 
-    Window(onCloseRequest = ::exitApplication, state) {
-        val focusRequester = remember(::FocusRequester)
-        LaunchedEffect(Unit) {
-            focusRequester.requestFocus()
-        }
-
-        Box(
-            Modifier
-                .focusRequester(focusRequester)
-                .focusTarget()
-                .onPreviewKeyEvent {
-                    when (it.key) {
-                        Key.Escape -> {
-                            exitApplication()
-                            true
-                        }
-                        else -> false
-                    }
+    Window(
+        onCloseRequest = ::exitApplication,
+        state = state,
+        onPreviewKeyEvent = {
+            when (it.key) {
+                Key.Escape -> {
+                    exitApplication()
+                    true
                 }
-        ) {
-            TextField("Text", {})
+                else -> false
+            }
         }
+    ) {
+        TextField("Text", {})
     }
 }
 
@@ -574,7 +561,7 @@ fun menu() = GlobalScope.launchApplication {
 fun trayAndNotifications() = GlobalScope.launchApplication {
     val state = remember(::AppState)
 
-    Window(onCloseRequest = ::exitApplication, state.window) {
+    Window(onCloseRequest = ::exitApplication, state = state.window) {
         TrayScreen(state)
     }
 

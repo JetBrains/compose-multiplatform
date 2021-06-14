@@ -26,6 +26,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.input.key.KeyEvent
 import androidx.compose.ui.layout.Layout
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.platform.DesktopOwner
@@ -51,6 +52,14 @@ import androidx.compose.ui.unit.round
  * will be subtracted from it.
  * @param focusable Indicates if the popup can grab the focus.
  * @param onDismissRequest Executes when the user clicks outside of the popup.
+ * @param onPreviewKeyEvent This callback is invoked when the user interacts with the hardware
+ * keyboard. It gives ancestors of a focused component the chance to intercept a [KeyEvent].
+ * Return true to stop propagation of this event. If you return false, the key event will be
+ * sent to this [onPreviewKeyEvent]'s child. If none of the children consume the event,
+ * it will be sent back up to the root using the onKeyEvent callback.
+ * @param onKeyEvent This callback is invoked when the user interacts with the hardware
+ * keyboard. While implementing this callback, return true to stop propagation of this event.
+ * If you return false, the key event will be sent to this [onKeyEvent]'s parent.
  * @param content The content to be displayed inside the popup.
  */
 @Composable
@@ -59,6 +68,8 @@ fun Popup(
     offset: IntOffset = IntOffset(0, 0),
     focusable: Boolean = false,
     onDismissRequest: (() -> Unit)? = null,
+    onPreviewKeyEvent: ((KeyEvent) -> Boolean) = { false },
+    onKeyEvent: ((KeyEvent) -> Boolean) = { false },
     content: @Composable () -> Unit
 ) {
     val popupPositioner = remember(alignment, offset) {
@@ -71,6 +82,8 @@ fun Popup(
     Popup(
         popupPositionProvider = popupPositioner,
         onDismissRequest = onDismissRequest,
+        onKeyEvent = onKeyEvent,
+        onPreviewKeyEvent = onPreviewKeyEvent,
         focusable = focusable,
         content = content
     )
@@ -88,17 +101,35 @@ fun Popup(
  * @param focusable Indicates if the popup can grab the focus.
  * @property contextMenu Places the popup window below the lower-right rectangle of the mouse
  * cursor image (basic context menu behaviour).
+ * @param onPreviewKeyEvent This callback is invoked when the user interacts with the hardware
+ * keyboard. It gives ancestors of a focused component the chance to intercept a [KeyEvent].
+ * Return true to stop propagation of this event. If you return false, the key event will be
+ * sent to this [onPreviewKeyEvent]'s child. If none of the children consume the event,
+ * it will be sent back up to the root using the onKeyEvent callback.
+ * @param onKeyEvent This callback is invoked when the user interacts with the hardware
+ * keyboard. While implementing this callback, return true to stop propagation of this event.
+ * If you return false, the key event will be sent to this [onKeyEvent]'s parent.
  * @param content The content to be displayed inside the popup.
  */
 @Composable
 fun Popup(
     popupPositionProvider: PopupPositionProvider,
     onDismissRequest: (() -> Unit)? = null,
+    onPreviewKeyEvent: ((KeyEvent) -> Boolean) = { false },
+    onKeyEvent: ((KeyEvent) -> Boolean) = { false },
     focusable: Boolean = false,
     contextMenu: Boolean = false,
     content: @Composable () -> Unit
 ) {
-    PopupLayout(popupPositionProvider, focusable, contextMenu, onDismissRequest, content)
+    PopupLayout(
+        popupPositionProvider,
+        focusable,
+        contextMenu,
+        onDismissRequest,
+        onPreviewKeyEvent,
+        onKeyEvent,
+        content
+    )
 }
 
 @Composable
@@ -107,6 +138,8 @@ private fun PopupLayout(
     focusable: Boolean,
     contextMenu: Boolean,
     onDismissRequest: (() -> Unit)?,
+    onPreviewKeyEvent: ((KeyEvent) -> Boolean) = { false },
+    onKeyEvent: ((KeyEvent) -> Boolean) = { false },
     content: @Composable () -> Unit
 ) {
     val owners = LocalDesktopOwners.current
@@ -139,7 +172,9 @@ private fun PopupLayout(
             density = density,
             isPopup = true,
             isFocusable = focusable,
-            onDismissRequest = onDismissRequest
+            onDismissRequest = onDismissRequest,
+            onPreviewKeyEvent = onPreviewKeyEvent,
+            onKeyEvent = onKeyEvent
         )
         val composition = owner.setContent(parent = parentComposition) {
             Layout(

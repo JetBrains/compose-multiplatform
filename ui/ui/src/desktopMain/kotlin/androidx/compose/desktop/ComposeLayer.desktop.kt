@@ -45,6 +45,7 @@ import java.awt.event.MouseEvent
 import java.awt.event.MouseMotionAdapter
 import java.awt.event.MouseWheelEvent
 import java.awt.im.InputMethodRequests
+import androidx.compose.ui.input.key.KeyEvent as ComposeKeyEvent
 
 internal class ComposeLayer {
     private var isDisposed = false
@@ -69,8 +70,7 @@ internal class ComposeLayer {
     private var owner: DesktopOwner? = null
     private var composition: Composition? = null
 
-    private var content: (@Composable () -> Unit)? = null
-    private var parentComposition: CompositionContext? = null
+    private var initOwner: (() -> Unit)? = null
 
     private lateinit var density: Density
 
@@ -84,7 +84,7 @@ internal class ComposeLayer {
             super.init()
             isInit = true
             resetDensity()
-            initOwner()
+            initOwner?.invoke()
         }
 
         internal fun resetDensity() {
@@ -245,27 +245,33 @@ internal class ComposeLayer {
         events.cancel()
         coroutineScope.cancel()
         wrapped.dispose()
+        initOwner = null
         isDisposed = true
     }
 
     internal fun setContent(
         parentComposition: CompositionContext? = null,
+        onPreviewKeyEvent: (ComposeKeyEvent) -> Boolean = { false },
+        onKeyEvent: (ComposeKeyEvent) -> Boolean = { false },
         content: @Composable () -> Unit
     ) {
         check(!isDisposed)
-        check(this.content == null) { "Cannot set content twice" }
-        this.content = content
-        this.parentComposition = parentComposition
+        check(composition == null && initOwner == null) { "Cannot set content twice" }
+        initOwner = {
+            check(!isDisposed)
+            if (wrapped.isInit && owner == null) {
+                owner = DesktopOwner(
+                    owners,
+                    density,
+                    onPreviewKeyEvent = onPreviewKeyEvent,
+                    onKeyEvent = onKeyEvent
+                )
+                composition = owner!!.setContent(parent = parentComposition, content = content)
+                initOwner = null
+            }
+        }
         // We can't create DesktopOwner now, because we don't know density yet.
         // We will know density only after SkiaLayer will be visible.
-        initOwner()
-    }
-
-    private fun initOwner() {
-        check(!isDisposed)
-        if (wrapped.isInit && owner == null && content != null) {
-            owner = DesktopOwner(owners, density)
-            composition = owner!!.setContent(parent = parentComposition, content = content!!)
-        }
+        initOwner!!()
     }
 }

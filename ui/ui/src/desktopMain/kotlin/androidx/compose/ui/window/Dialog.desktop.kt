@@ -23,6 +23,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCompositionContext
 import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.ui.ExperimentalComposeUiApi
+import androidx.compose.ui.input.key.KeyEvent
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.util.ComponentUpdater
 import androidx.compose.ui.util.setPositionSafely
@@ -78,6 +79,14 @@ import javax.swing.JDialog
  * changing [state])
  * @param enabled Can dialog react to input events
  * @param focusable Can dialog receive focus
+ * @param onPreviewKeyEvent This callback is invoked when the user interacts with the hardware
+ * keyboard. It gives ancestors of a focused component the chance to intercept a [KeyEvent].
+ * Return true to stop propagation of this event. If you return false, the key event will be
+ * sent to this [onPreviewKeyEvent]'s child. If none of the children consume the event,
+ * it will be sent back up to the root using the onKeyEvent callback.
+ * @param onKeyEvent This callback is invoked when the user interacts with the hardware
+ * keyboard. While implementing this callback, return true to stop propagation of this event.
+ * If you return false, the key event will be sent to this [onKeyEvent]'s parent.
  * @param content content of the dialog
  *
  * This API is experimental and will eventually replace [androidx.compose.ui.window.v1.Dialog]
@@ -95,6 +104,8 @@ fun OwnerWindowScope.Dialog(
     resizable: Boolean = true,
     enabled: Boolean = true,
     focusable: Boolean = true,
+    onPreviewKeyEvent: ((KeyEvent) -> Boolean) = { false },
+    onKeyEvent: ((KeyEvent) -> Boolean) = { false },
     content: @Composable DialogScope.() -> Unit
 ) {
     val owner = this.ownerWindow
@@ -112,6 +123,8 @@ fun OwnerWindowScope.Dialog(
 
     Dialog(
         visible = visible,
+        onPreviewKeyEvent = onPreviewKeyEvent,
+        onKeyEvent = onKeyEvent,
         create = {
             ComposeDialog(owner, ModalityType.DOCUMENT_MODAL).apply {
                 // close state is controlled by DialogState.isOpen
@@ -179,6 +192,14 @@ fun OwnerWindowScope.Dialog(
  * will be visible;
  * - native resources will not be released. They will be released only when [Dialog]
  * will leave the composition.
+ * @param onPreviewKeyEvent This callback is invoked when the user interacts with the hardware
+ * keyboard. It gives ancestors of a focused component the chance to intercept a [KeyEvent].
+ * Return true to stop propagation of this event. If you return false, the key event will be
+ * sent to this [onPreviewKeyEvent]'s child. If none of the children consume the event,
+ * it will be sent back up to the root using the onKeyEvent callback.
+ * @param onKeyEvent This callback is invoked when the user interacts with the hardware
+ * keyboard. While implementing this callback, return true to stop propagation of this event.
+ * If you return false, the key event will be sent to this [onKeyEvent]'s parent.
  * @param create The block creating the [ComposeDialog] to be composed.
  * @param dispose The block to dispose [ComposeDialog] and free native resources.
  * Usually it is simple `ComposeDialog::dispose`
@@ -190,6 +211,8 @@ fun OwnerWindowScope.Dialog(
 @Composable
 fun OwnerWindowScope.Dialog(
     visible: Boolean = true,
+    onPreviewKeyEvent: ((KeyEvent) -> Boolean) = { false },
+    onKeyEvent: ((KeyEvent) -> Boolean) = { false },
     create: () -> ComposeDialog,
     dispose: (ComposeDialog) -> Unit,
     update: (ComposeDialog) -> Unit = {},
@@ -203,7 +226,7 @@ fun OwnerWindowScope.Dialog(
                 val scope = object : DialogScope {
                     override val dialog: ComposeDialog get() = this@apply
                 }
-                setContent(composition) {
+                setContent(composition, onPreviewKeyEvent, onKeyEvent) {
                     scope.content()
                 }
             }

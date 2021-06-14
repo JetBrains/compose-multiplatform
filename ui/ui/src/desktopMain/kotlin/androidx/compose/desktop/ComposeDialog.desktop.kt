@@ -18,6 +18,7 @@ package androidx.compose.desktop
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionContext
 import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.ui.input.key.KeyEvent
 import org.jetbrains.skiko.ClipComponent
 import org.jetbrains.skiko.GraphicsApi
 import org.jetbrains.skiko.SkiaLayer
@@ -80,16 +81,28 @@ class ComposeDialog(
      * through the two compositions as if they were not separate.
      *
      * @param parentComposition The parent composition reference to coordinate
-     *        scheduling of composition updates.
-     *        If null then default root composition will be used.
+     * scheduling of composition updates.
+     * If null then default root composition will be used.
+     * @param onKeyEvent This callback is invoked when the user interacts with the hardware
+     * keyboard. While implementing this callback, return true to stop propagation of this event.
+     * If you return false, the key event will be sent to this [onKeyEvent]'s parent.
+     * @param onPreviewKeyEvent This callback is invoked when the user interacts with the hardware
+     * keyboard. It gives ancestors of a focused component the chance to intercept a [KeyEvent].
+     * Return true to stop propagation of this event. If you return false, the key event will be
+     * sent to this [onPreviewKeyEvent]'s child. If none of the children consume the event,
+     * it will be sent back up to the root using the onKeyEvent callback.
      * @param content Composable content of the ComposeWindow.
      */
     fun setContent(
         parentComposition: CompositionContext? = null,
+        onKeyEvent: ((KeyEvent) -> Boolean) = { false },
+        onPreviewKeyEvent: ((KeyEvent) -> Boolean) = { false },
         content: @Composable () -> Unit
     ) {
         layer.setContent(
             parentComposition = parentComposition,
+            onPreviewKeyEvent = onPreviewKeyEvent,
+            onKeyEvent = onKeyEvent
         ) {
             CompositionLocalProvider(
                 LocalLayerContainer provides pane

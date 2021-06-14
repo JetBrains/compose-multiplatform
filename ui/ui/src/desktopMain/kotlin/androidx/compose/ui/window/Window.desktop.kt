@@ -26,6 +26,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCompositionContext
 import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.ui.ExperimentalComposeUiApi
+import androidx.compose.ui.input.key.KeyEvent
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.util.ComponentUpdater
 import androidx.compose.ui.util.setPositionSafely
@@ -93,6 +94,14 @@ import javax.swing.JMenuBar
  * @param enabled Can window react to input events
  * @param focusable Can window receive focus
  * @param alwaysOnTop Should window always be on top of another windows
+ * @param onPreviewKeyEvent This callback is invoked when the user interacts with the hardware
+ * keyboard. It gives ancestors of a focused component the chance to intercept a [KeyEvent].
+ * Return true to stop propagation of this event. If you return false, the key event will be
+ * sent to this [onPreviewKeyEvent]'s child. If none of the children consume the event,
+ * it will be sent back up to the root using the onKeyEvent callback.
+ * @param onKeyEvent This callback is invoked when the user interacts with the hardware
+ * keyboard. While implementing this callback, return true to stop propagation of this event.
+ * If you return false, the key event will be sent to this [onKeyEvent]'s parent.
  * @param content Content of the window
  *
  * This API is experimental and will eventually replace [AppWindow] / [AppManager]
@@ -112,6 +121,8 @@ fun ApplicationScope.Window(
     enabled: Boolean = true,
     focusable: Boolean = true,
     alwaysOnTop: Boolean = false,
+    onPreviewKeyEvent: (KeyEvent) -> Boolean = { false },
+    onKeyEvent: (KeyEvent) -> Boolean = { false },
     content: @Composable WindowScope.() -> Unit
 ) {
     val currentState by rememberUpdatedState(state)
@@ -128,6 +139,8 @@ fun ApplicationScope.Window(
 
     Window(
         visible = visible,
+        onPreviewKeyEvent = onPreviewKeyEvent,
+        onKeyEvent = onKeyEvent,
         create = {
             ComposeWindow().apply {
                 // close state is controlled by WindowState.isOpen
@@ -200,6 +213,14 @@ fun ApplicationScope.Window(
  * will be visible;
  * - native resources will not be released. They will be released only when [Window]
  * will leave the composition.
+ * @param onPreviewKeyEvent This callback is invoked when the user interacts with the hardware
+ * keyboard. It gives ancestors of a focused component the chance to intercept a [KeyEvent].
+ * Return true to stop propagation of this event. If you return false, the key event will be
+ * sent to this [onPreviewKeyEvent]'s child. If none of the children consume the event,
+ * it will be sent back up to the root using the onKeyEvent callback.
+ * @param onKeyEvent This callback is invoked when the user interacts with the hardware
+ * keyboard. While implementing this callback, return true to stop propagation of this event.
+ * If you return false, the key event will be sent to this [onKeyEvent]'s parent.
  * @param create The block creating the [ComposeWindow] to be composed.
  * @param dispose The block to dispose [ComposeWindow] and free native resources.
  * Usually it is simple `ComposeWindow::dispose`
@@ -211,6 +232,8 @@ fun ApplicationScope.Window(
 @Composable
 fun ApplicationScope.Window(
     visible: Boolean = true,
+    onPreviewKeyEvent: (KeyEvent) -> Boolean = { false },
+    onKeyEvent: (KeyEvent) -> Boolean = { false },
     create: () -> ComposeWindow,
     dispose: (ComposeWindow) -> Unit,
     update: (ComposeWindow) -> Unit = {},
@@ -224,7 +247,7 @@ fun ApplicationScope.Window(
                 val scope = object : WindowScope {
                     override val window: ComposeWindow get() = this@apply
                 }
-                setContent(composition) {
+                setContent(composition, onPreviewKeyEvent, onKeyEvent) {
                     scope.content()
                 }
             }
