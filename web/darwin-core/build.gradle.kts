@@ -7,9 +7,10 @@ plugins {
 
 kotlin {
 
-    val knTargets = listOf(
-        iosX64()
-    )
+    iosX64("darwin")
+//    val knTargets = listOf(
+//        iosX64()
+//    )
 
     sourceSets {
         val commonMain by getting {
@@ -26,18 +27,20 @@ kotlin {
             }
         }
 
-        val darwinMain = sourceSets.getOrCreate("darwinMain")
+        /*val darwinMain = sourceSets.getOrCreate("darwinMain")
         darwinMain.dependsOn(commonMain)
         val darwinTest = sourceSets.getOrCreate("darwinTest")
-        darwinMain.dependsOn(commonTest)
+        darwinMain.dependsOn(commonTest)*/
 
-//        val appleMain = sourceSets.maybeCreate("appleMain").apply {
-//            dependsOn(nativeCommonMain)
+
+
+//        knTargets.forEach { target ->
+//                target.compilations.getByName("main").source(darwinMain)
+//                target.compilations.getByName("test").source(darwinTest)
 //        }
-        knTargets.forEach { target ->
-                target.compilations.getByName("main").source(darwinMain)
-                target.compilations.getByName("test").source(darwinTest)
-        }
+
+
+
 /*
         val jsMain by getting {
             dependencies {
