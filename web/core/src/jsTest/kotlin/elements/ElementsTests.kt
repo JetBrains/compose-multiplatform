@@ -9,6 +9,9 @@ import androidx.compose.runtime.Composable
 import org.jetbrains.compose.web.attributes.AttrsBuilder
 import org.jetbrains.compose.web.core.tests.runTest
 import org.jetbrains.compose.web.dom.A
+import org.jetbrains.compose.web.dom.Address
+import org.jetbrains.compose.web.dom.Article
+import org.jetbrains.compose.web.dom.Aside
 import org.jetbrains.compose.web.dom.B
 import org.jetbrains.compose.web.dom.Br
 import org.jetbrains.compose.web.dom.Button
@@ -27,6 +30,7 @@ import org.jetbrains.compose.web.dom.H3
 import org.jetbrains.compose.web.dom.H4
 import org.jetbrains.compose.web.dom.H5
 import org.jetbrains.compose.web.dom.H6
+import org.jetbrains.compose.web.dom.Header
 import org.jetbrains.compose.web.dom.Hr
 import org.jetbrains.compose.web.dom.I
 import org.jetbrains.compose.web.dom.Img
@@ -58,11 +62,15 @@ import org.w3c.dom.get
 import kotlin.test.Test
 import kotlin.test.assertEquals
 
-
 class ElementsTests {
     @Test
     fun nodeNames() = runTest {
         val nodes = listOf<Pair<@Composable () -> Unit, String>>(
+            Pair({ Address() }, "ADDRESS"),
+            Pair({ Article() }, "ARTICLE"),
+            Pair({ Aside() }, "ASIDE"),
+            Pair({ Header() }, "HEADER"),
+
             Pair({ Div() }, "DIV"),
             Pair({ A() }, "A"),
             Pair({ Button() }, "BUTTON"),

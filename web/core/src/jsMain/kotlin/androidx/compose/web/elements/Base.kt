@@ -88,6 +88,11 @@ interface ElementBuilder<TElement : Element> {
             return object  : ElementBuilderImplementation<TElement>(tagName) {}
         }
 
+        val Address: ElementBuilder<HTMLElement> = ElementBuilderImplementation("address")
+        val Article: ElementBuilder<HTMLElement> = ElementBuilderImplementation("article")
+        val Aside: ElementBuilder<HTMLElement> = ElementBuilderImplementation("aside")
+        val Header: ElementBuilder<HTMLElement> = ElementBuilderImplementation("header")
+
         val Div: ElementBuilder<HTMLDivElement> = ElementBuilderImplementation("div")
         val A: ElementBuilder<HTMLAnchorElement> = ElementBuilderImplementation("a")
         val Input: ElementBuilder<HTMLInputElement> = ElementBuilderImplementation("input")

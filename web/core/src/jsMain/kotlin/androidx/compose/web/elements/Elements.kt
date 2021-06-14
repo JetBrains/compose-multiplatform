@@ -48,6 +48,54 @@ typealias AttrBuilderContext<T> = AttrsBuilder<T>.() -> Unit
 typealias ContentBuilder<T> = @Composable ElementScope<T>.() -> Unit
 
 @Composable
+fun Address(
+    attrs: AttrBuilderContext<HTMLElement> = {},
+    content: ContentBuilder<HTMLElement>? = null
+) {
+    TagElement(
+        elementBuilder = ElementBuilder.Address,
+        applyAttrs = attrs,
+        content = content
+    )
+}
+
+@Composable
+fun Article(
+    attrs: AttrBuilderContext<HTMLElement> = {},
+    content: ContentBuilder<HTMLElement>? = null
+) {
+    TagElement(
+        elementBuilder = ElementBuilder.Article,
+        applyAttrs = attrs,
+        content = content
+    )
+}
+
+@Composable
+fun Aside(
+    attrs: AttrBuilderContext<HTMLElement> = {},
+    content: ContentBuilder<HTMLElement>? = null
+) {
+    TagElement(
+        elementBuilder = ElementBuilder.Aside,
+        applyAttrs = attrs,
+        content = content
+    )
+}
+
+@Composable
+fun Header(
+    attrs: AttrBuilderContext<HTMLElement> = {},
+    content: ContentBuilder<HTMLElement>? = null
+) {
+    TagElement(
+        elementBuilder = ElementBuilder.Header,
+        applyAttrs = attrs,
+        content = content
+    )
+}
+
+@Composable
 fun Text(value: String) {
     ComposeNode<DomNodeWrapper, DomApplier>(
         factory = { DomNodeWrapper(document.createTextNode("")) },
