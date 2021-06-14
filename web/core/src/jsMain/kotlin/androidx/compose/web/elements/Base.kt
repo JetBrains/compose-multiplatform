@@ -28,6 +28,7 @@ import org.w3c.dom.HTMLHeadingElement
 import org.w3c.dom.HTMLImageElement
 import org.w3c.dom.HTMLInputElement
 import org.w3c.dom.HTMLLIElement
+import org.w3c.dom.HTMLLabelElement
 import org.w3c.dom.HTMLOListElement
 import org.w3c.dom.HTMLOptGroupElement
 import org.w3c.dom.HTMLOptionElement
@@ -133,7 +134,7 @@ interface ElementBuilder<TElement : Element> {
         val Main: ElementBuilder<HTMLElement> = ElementBuilderImplementation("main")
         val Footer: ElementBuilder<HTMLElement> = ElementBuilderImplementation("footer")
         val Hr: ElementBuilder<HTMLHRElement> = ElementBuilderImplementation("hr")
-        val Label: ElementBuilder<HTMLElement> = ElementBuilderImplementation("label")
+        val Label: ElementBuilder<HTMLLabelElement> = ElementBuilderImplementation("label")
         val Table: ElementBuilder<HTMLTableElement> = ElementBuilderImplementation("table")
         val Caption: ElementBuilder<HTMLTableCaptionElement> = ElementBuilderImplementation("caption")
         val Col: ElementBuilder<HTMLTableColElement> = ElementBuilderImplementation("col")

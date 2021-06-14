@@ -27,6 +27,7 @@ import org.w3c.dom.HTMLHRElement
 import org.w3c.dom.HTMLImageElement
 import org.w3c.dom.HTMLInputElement
 import org.w3c.dom.HTMLLIElement
+import org.w3c.dom.HTMLLabelElement
 import org.w3c.dom.HTMLOListElement
 import org.w3c.dom.HTMLOptGroupElement
 import org.w3c.dom.HTMLOptionElement
@@ -371,9 +372,9 @@ fun Hr(
 fun Label(
     forId: String? = null,
     attrs: AttrBuilderContext<Tag.Label> = {},
-    content: ContentBuilder<HTMLElement>? = null
+    content: ContentBuilder<HTMLLabelElement>? = null
 ) {
-    TagElement<Tag.Label, HTMLElement>(
+    TagElement<Tag.Label, HTMLLabelElement>(
         elementBuilder = ElementBuilder.Label,
         applyAttrs = {
             forId(forId)
