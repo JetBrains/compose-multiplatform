@@ -14,8 +14,11 @@ import org.jetbrains.compose.web.DomApplier
 import org.jetbrains.compose.web.DomElementWrapper
 import org.jetbrains.compose.web.attributes.AttrsBuilder
 import kotlinx.browser.document
+import org.w3c.dom.Audio
 import org.w3c.dom.Element
 import org.w3c.dom.HTMLAnchorElement
+import org.w3c.dom.HTMLAreaElement
+import org.w3c.dom.HTMLAudioElement
 import org.w3c.dom.HTMLBRElement
 import org.w3c.dom.HTMLButtonElement
 import org.w3c.dom.HTMLDivElement
@@ -27,6 +30,7 @@ import org.w3c.dom.HTMLImageElement
 import org.w3c.dom.HTMLInputElement
 import org.w3c.dom.HTMLLIElement
 import org.w3c.dom.HTMLLabelElement
+import org.w3c.dom.HTMLMapElement
 import org.w3c.dom.HTMLOListElement
 import org.w3c.dom.HTMLOptGroupElement
 import org.w3c.dom.HTMLOptionElement
@@ -42,7 +46,9 @@ import org.w3c.dom.HTMLTableElement
 import org.w3c.dom.HTMLTableRowElement
 import org.w3c.dom.HTMLTableSectionElement
 import org.w3c.dom.HTMLTextAreaElement
+import org.w3c.dom.HTMLTrackElement
 import org.w3c.dom.HTMLUListElement
+import org.w3c.dom.HTMLVideoElement
 
 @OptIn(ComposeCompilerApi::class)
 @Composable
@@ -92,6 +98,12 @@ interface ElementBuilder<TElement : Element> {
         val Article: ElementBuilder<HTMLElement> = ElementBuilderImplementation("article")
         val Aside: ElementBuilder<HTMLElement> = ElementBuilderImplementation("aside")
         val Header: ElementBuilder<HTMLElement> = ElementBuilderImplementation("header")
+
+        val Area: ElementBuilder<HTMLAreaElement> = ElementBuilderImplementation("area")
+        val Audio: ElementBuilder<HTMLAudioElement> = ElementBuilderImplementation("audio")
+        val Map: ElementBuilder<HTMLMapElement> = ElementBuilderImplementation("map")
+        val Track: ElementBuilder<HTMLTrackElement> = ElementBuilderImplementation("track")
+        val Video: ElementBuilder<HTMLVideoElement> = ElementBuilderImplementation("video")
 
         val Div: ElementBuilder<HTMLDivElement> = ElementBuilderImplementation("div")
         val A: ElementBuilder<HTMLAnchorElement> = ElementBuilderImplementation("a")

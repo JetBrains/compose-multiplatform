@@ -16,6 +16,8 @@ import org.jetbrains.compose.web.attributes.type
 import org.jetbrains.compose.web.attributes.value
 import kotlinx.browser.document
 import org.w3c.dom.HTMLAnchorElement
+import org.w3c.dom.HTMLAreaElement
+import org.w3c.dom.HTMLAudioElement
 import org.w3c.dom.HTMLBRElement
 import org.w3c.dom.HTMLButtonElement
 import org.w3c.dom.HTMLDivElement
@@ -27,6 +29,7 @@ import org.w3c.dom.HTMLImageElement
 import org.w3c.dom.HTMLInputElement
 import org.w3c.dom.HTMLLIElement
 import org.w3c.dom.HTMLLabelElement
+import org.w3c.dom.HTMLMapElement
 import org.w3c.dom.HTMLOListElement
 import org.w3c.dom.HTMLOptGroupElement
 import org.w3c.dom.HTMLOptionElement
@@ -41,7 +44,9 @@ import org.w3c.dom.HTMLTableElement
 import org.w3c.dom.HTMLTableRowElement
 import org.w3c.dom.HTMLTableSectionElement
 import org.w3c.dom.HTMLTextAreaElement
+import org.w3c.dom.HTMLTrackElement
 import org.w3c.dom.HTMLUListElement
+import org.w3c.dom.HTMLVideoElement
 import org.w3c.dom.Text
 
 typealias AttrBuilderContext<T> = AttrsBuilder<T>.() -> Unit
@@ -90,6 +95,66 @@ fun Header(
 ) {
     TagElement(
         elementBuilder = ElementBuilder.Header,
+        applyAttrs = attrs,
+        content = content
+    )
+}
+
+@Composable
+fun Area(
+    attrs: AttrBuilderContext<HTMLAreaElement> = {},
+    content: ContentBuilder<HTMLAreaElement>? = null
+) {
+    TagElement(
+        elementBuilder = ElementBuilder.Area,
+        applyAttrs = attrs,
+        content = content
+    )
+}
+
+@Composable
+fun Audio(
+    attrs: AttrBuilderContext<HTMLAudioElement> = {},
+    content: ContentBuilder<HTMLAudioElement>? = null
+) {
+    TagElement(
+        elementBuilder = ElementBuilder.Audio,
+        applyAttrs = attrs,
+        content = content
+    )
+}
+
+@Composable
+fun HTMLMap(
+    attrs: AttrBuilderContext<HTMLMapElement> = {},
+    content: ContentBuilder<HTMLMapElement>? = null
+) {
+    TagElement(
+        elementBuilder = ElementBuilder.Map,
+        applyAttrs = attrs,
+        content = content
+    )
+}
+
+@Composable
+fun Track(
+    attrs: AttrBuilderContext<HTMLTrackElement> = {},
+    content: ContentBuilder<HTMLTrackElement>? = null
+) {
+    TagElement(
+        elementBuilder = ElementBuilder.Track,
+        applyAttrs = attrs,
+        content = content
+    )
+}
+
+@Composable
+fun Video(
+    attrs: AttrBuilderContext<HTMLVideoElement> = {},
+    content: ContentBuilder<HTMLVideoElement>? = null
+) {
+    TagElement(
+        elementBuilder = ElementBuilder.Video,
         applyAttrs = attrs,
         content = content
     )

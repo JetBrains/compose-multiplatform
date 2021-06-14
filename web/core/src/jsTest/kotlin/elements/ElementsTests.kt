@@ -10,8 +10,10 @@ import org.jetbrains.compose.web.attributes.AttrsBuilder
 import org.jetbrains.compose.web.core.tests.runTest
 import org.jetbrains.compose.web.dom.A
 import org.jetbrains.compose.web.dom.Address
+import org.jetbrains.compose.web.dom.Area
 import org.jetbrains.compose.web.dom.Article
 import org.jetbrains.compose.web.dom.Aside
+import org.jetbrains.compose.web.dom.Audio
 import org.jetbrains.compose.web.dom.B
 import org.jetbrains.compose.web.dom.Br
 import org.jetbrains.compose.web.dom.Button
@@ -30,6 +32,7 @@ import org.jetbrains.compose.web.dom.H3
 import org.jetbrains.compose.web.dom.H4
 import org.jetbrains.compose.web.dom.H5
 import org.jetbrains.compose.web.dom.H6
+import org.jetbrains.compose.web.dom.HTMLMap
 import org.jetbrains.compose.web.dom.Header
 import org.jetbrains.compose.web.dom.Hr
 import org.jetbrains.compose.web.dom.I
@@ -56,7 +59,9 @@ import org.jetbrains.compose.web.dom.Tfoot
 import org.jetbrains.compose.web.dom.Th
 import org.jetbrains.compose.web.dom.Thead
 import org.jetbrains.compose.web.dom.Tr
+import org.jetbrains.compose.web.dom.Track
 import org.jetbrains.compose.web.dom.Ul
+import org.jetbrains.compose.web.dom.Video
 import org.w3c.dom.HTMLElement
 import org.w3c.dom.get
 import kotlin.test.Test
@@ -70,6 +75,12 @@ class ElementsTests {
             Pair({ Article() }, "ARTICLE"),
             Pair({ Aside() }, "ASIDE"),
             Pair({ Header() }, "HEADER"),
+
+            Pair({ Area() }, "AREA"),
+            Pair({ Audio() }, "AUDIO"),
+            Pair({ HTMLMap() }, "MAP"),
+            Pair({ Track() }, "TRACK"),
+            Pair({ Video() }, "VIDEO"),
 
             Pair({ Div() }, "DIV"),
             Pair({ A() }, "A"),
