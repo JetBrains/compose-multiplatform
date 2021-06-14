@@ -16,6 +16,7 @@
 
 package androidx.compose.foundation.lazy
 
+import androidx.compose.foundation.AutoTestFrameClock
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.gestures.scrollBy
 import androidx.compose.foundation.layout.PaddingValues
@@ -23,6 +24,9 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.height
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.layout.Remeasurement
+import androidx.compose.ui.layout.RemeasurementModifier
+import androidx.compose.ui.layout.SubcomposeLayout
 import androidx.compose.ui.layout.layout
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.test.assertIsDisplayed
@@ -310,6 +314,56 @@ class LazyListPrefetcherTest {
             .assertIsDisplayed()
         rule.onNodeWithTag("1")
             .assertIsDisplayed()
+    }
+
+    @Test
+    fun disposingWhilePrefetchingScheduled() {
+        var emit = true
+        lateinit var remeasure: Remeasurement
+        rule.setContent {
+            SubcomposeLayout(
+                modifier = object : RemeasurementModifier {
+                    override fun onRemeasurementAvailable(remeasurement: Remeasurement) {
+                        remeasure = remeasurement
+                    }
+                }
+            ) { constraints ->
+                val placeable = if (emit) {
+                    subcompose(Unit) {
+                        state = rememberLazyListState()
+                        LazyColumn(
+                            Modifier.height(itemsSizeDp * 1.5f),
+                            state,
+                        ) {
+                            items(1000) {
+                                Spacer(
+                                    Modifier
+                                        .height(itemsSizeDp)
+                                        .fillParentMaxWidth()
+                                )
+                            }
+                        }
+                    }.first().measure(constraints)
+                } else {
+                    null
+                }
+                layout(constraints.maxWidth, constraints.maxHeight) {
+                    placeable?.place(0, 0)
+                }
+            }
+        }
+
+        rule.runOnIdle {
+            // this will schedule the prefetching
+            runBlocking(AutoTestFrameClock()) {
+                state.scrollBy(itemsSizePx.toFloat())
+            }
+            // then we synchronously dispose LazyColumn
+            emit = false
+            remeasure.forceRemeasure()
+        }
+
+        rule.runOnIdle { }
     }
 
     private fun waitForPrefetch(index: Int) {
