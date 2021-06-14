@@ -45,6 +45,7 @@ fun <T> Modifier.getTestTag(name: String, default: T): T = foldIn(default) { acc
     if (element is TestTagModifier<*> && element.name == name) element.value as T else acc
 }
 
+@Suppress("UnnecessaryComposedModifier")
 @OptIn(InternalComposeApi::class)
 class ComposedModifierTest {
 

@@ -14,6 +14,8 @@
  * limitations under the License.
  */
 
+@file:Suppress("UnstableApiUsage")
+
 package androidx.compose.ui.lint
 
 import com.android.tools.lint.client.api.IssueRegistry
@@ -28,6 +30,7 @@ class UiIssueRegistry : IssueRegistry() {
     override val api = 10
     override val minApi = CURRENT_API
     override val issues get() = listOf(
+        ComposedModifierDetector.UnnecessaryComposedModifier,
         ModifierDeclarationDetector.ComposableModifierFactory,
         ModifierDeclarationDetector.ModifierFactoryExtensionFunction,
         ModifierDeclarationDetector.ModifierFactoryReturnType,

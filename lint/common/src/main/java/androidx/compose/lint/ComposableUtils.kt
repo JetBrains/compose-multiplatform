@@ -74,14 +74,11 @@ fun UCallExpression.isInvokedWithinComposable(): Boolean {
 // TODO: https://youtrack.jetbrains.com/issue/KT-45406
 // KotlinUMethodWithFakeLightDelegate.hasAnnotation() (for reified functions for example)
 // doesn't find annotations, so just look at the annotations directly.
-// Note: annotations is deprecated but the replacement uAnnotations isn't available on the
-// version of lint / uast we compile against, shouldn't be an issue when the above issue is fixed.
 /**
  * Returns whether this method is @Composable or not
  */
-@Suppress("DEPRECATION")
 val UMethod.isComposable
-    get() = annotations.any { it.qualifiedName == Names.Runtime.Composable.javaFqn }
+    get() = uAnnotations.any { it.qualifiedName == Names.Runtime.Composable.javaFqn }
 
 /**
  * Returns whether this variable's type is @Composable or not
