@@ -80,13 +80,13 @@ class DisposableEffectHolder(
 interface ElementBuilder<TElement : Element> {
     fun create(): TElement
 
-    private open class ElementBuilderImplementation<TElement : HTMLElement>(private val tagName: String) : ElementBuilder<TElement> {
+    private open class ElementBuilderImplementation<TElement : Element>(private val tagName: String) : ElementBuilder<TElement> {
         private val el: Element by lazy { document.createElement(tagName) }
         override fun create(): TElement = el.cloneNode() as TElement
     }
 
     companion object {
-        fun <TElement : HTMLElement> createBuilder(tagName: String): ElementBuilder<TElement> {
+        fun <TElement : Element> createBuilder(tagName: String): ElementBuilder<TElement> {
             return object  : ElementBuilderImplementation<TElement>(tagName) {}
         }
 
