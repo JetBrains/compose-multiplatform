@@ -38,6 +38,7 @@ import android.widget.Button
 import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.ScrollState
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -47,11 +48,15 @@ import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.requiredSize
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyRow
+import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.progressSemantics
 import androidx.compose.foundation.selection.selectable
 import androidx.compose.foundation.selection.toggleable
 import androidx.compose.foundation.text.BasicText
 import androidx.compose.foundation.text.BasicTextField
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -104,6 +109,7 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.LargeTest
 import androidx.test.filters.SdkSuppress
 import androidx.test.platform.app.InstrumentationRegistry
+import com.google.common.truth.Truth.assertThat
 import com.nhaarman.mockitokotlin2.argThat
 import com.nhaarman.mockitokotlin2.atLeastOnce
 import com.nhaarman.mockitokotlin2.doReturn
@@ -492,6 +498,147 @@ class AndroidAccessibilityTest {
 
         assertEquals("Label", accessibilityNodeInfo.text.toString())
         assertEquals(true, accessibilityNodeInfo.isShowingHintText)
+    }
+
+    @Test
+    fun testPerformAction_showOnScreen() {
+        val scrollState = ScrollState(initial = 0)
+        val target1Tag = "target1"
+        val target2Tag = "target2"
+        container.setContent {
+            Box {
+                Column(
+                    Modifier
+                        .size(200.dp)
+                        .verticalScroll(scrollState)
+                ) {
+                    BasicText("Backward", Modifier.testTag(target2Tag).size(150.dp))
+                    BasicText("Forward", Modifier.testTag(target1Tag).size(150.dp))
+                }
+            }
+        }
+
+        waitForSubtreeEventToSend()
+        assertThat(scrollState.value).isEqualTo(0)
+
+        val showOnScreen = android.R.id.accessibilityActionShowOnScreen
+        val targetNode1 = rule.onNodeWithTag(target1Tag)
+            .fetchSemanticsNode("couldn't find node with tag $target1Tag")
+        rule.runOnUiThread {
+            assertTrue(provider.performAction(targetNode1.id, showOnScreen, null))
+        }
+        with(rule.density) {
+            assertThat(scrollState.value).isGreaterThan(99.dp.toPx().toInt())
+        }
+
+        val targetNode2 = rule.onNodeWithTag(target2Tag)
+            .fetchSemanticsNode("couldn't find node with tag $target2Tag")
+        rule.runOnUiThread {
+            assertTrue(provider.performAction(targetNode2.id, showOnScreen, null))
+        }
+        assertThat(scrollState.value).isEqualTo(0)
+    }
+
+    @Test
+    fun testPerformAction_showOnScreen_lazy() {
+        val lazyState = LazyListState()
+        val target1Tag = "target1"
+        val target2Tag = "target2"
+        container.setContent {
+            Box {
+                LazyColumn(
+                    modifier = Modifier.size(200.dp),
+                    state = lazyState
+                ) {
+                    item {
+                        BasicText("Backward", Modifier.testTag(target2Tag).size(150.dp))
+                    }
+                    item {
+                        BasicText("Forward", Modifier.testTag(target1Tag).size(150.dp))
+                    }
+                }
+            }
+        }
+
+        waitForSubtreeEventToSend()
+        assertThat(lazyState.firstVisibleItemScrollOffset).isEqualTo(0)
+
+        val showOnScreen = android.R.id.accessibilityActionShowOnScreen
+        val targetNode1 = rule.onNodeWithTag(target1Tag)
+            .fetchSemanticsNode("couldn't find node with tag $target1Tag")
+        rule.runOnUiThread {
+            assertTrue(provider.performAction(targetNode1.id, showOnScreen, null))
+        }
+        with(rule.density) {
+            assertThat(lazyState.firstVisibleItemIndex).isEqualTo(0)
+            assertThat(lazyState.firstVisibleItemScrollOffset).isGreaterThan(99.dp.toPx().toInt())
+        }
+
+        val targetNode2 = rule.onNodeWithTag(target2Tag)
+            .fetchSemanticsNode("couldn't find node with tag $target2Tag")
+        rule.runOnUiThread {
+            assertTrue(provider.performAction(targetNode2.id, showOnScreen, null))
+        }
+        assertThat(lazyState.firstVisibleItemIndex).isEqualTo(0)
+        assertThat(lazyState.firstVisibleItemScrollOffset).isEqualTo(0)
+    }
+
+    @Test
+    fun testPerformAction_showOnScreen_lazynested() {
+        val parentLazyState = LazyListState()
+        val lazyState = LazyListState()
+        val target1Tag = "target1"
+        val target2Tag = "target2"
+        container.setContent {
+            Box {
+                LazyRow(
+                    modifier = Modifier.size(250.dp),
+                    state = parentLazyState
+                ) {
+                    item {
+                        LazyColumn(
+                            modifier = Modifier.size(200.dp),
+                            state = lazyState
+                        ) {
+                            item {
+                                BasicText("Backward", Modifier.testTag(target2Tag).size(150.dp))
+                            }
+                            item {
+                                BasicText("Forward", Modifier.testTag(target1Tag).size(150.dp))
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        waitForSubtreeEventToSend()
+        assertThat(lazyState.firstVisibleItemIndex).isEqualTo(0)
+        assertThat(lazyState.firstVisibleItemScrollOffset).isEqualTo(0)
+
+        // Test that child column scrolls to make it fully visible in its context, without being
+        // influenced by or influencing the parent row.
+        // TODO(b/190865803): Is this the ultimate right behavior we want?
+        val showOnScreen = android.R.id.accessibilityActionShowOnScreen
+        val targetNode1 = rule.onNodeWithTag(target1Tag)
+            .fetchSemanticsNode("couldn't find node with tag $target1Tag")
+        rule.runOnUiThread {
+            assertTrue(provider.performAction(targetNode1.id, showOnScreen, null))
+        }
+        with(rule.density) {
+            assertThat(lazyState.firstVisibleItemIndex).isEqualTo(0)
+            assertThat(lazyState.firstVisibleItemScrollOffset).isGreaterThan(99.dp.toPx().toInt())
+        }
+        assertThat(parentLazyState.firstVisibleItemScrollOffset).isEqualTo(0)
+
+        val targetNode2 = rule.onNodeWithTag(target2Tag)
+            .fetchSemanticsNode("couldn't find node with tag $target2Tag")
+        rule.runOnUiThread {
+            assertTrue(provider.performAction(targetNode2.id, showOnScreen, null))
+        }
+        assertThat(lazyState.firstVisibleItemIndex).isEqualTo(0)
+        assertThat(lazyState.firstVisibleItemScrollOffset).isEqualTo(0)
+        assertThat(parentLazyState.firstVisibleItemScrollOffset).isEqualTo(0)
     }
 
     @Test
