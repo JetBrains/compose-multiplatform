@@ -60,7 +60,7 @@ fun Text(value: String) {
 
 @Composable
 fun Div(
-    attrs: AttrBuilderContext<Tag.Div> = {},
+    attrs: AttrBuilderContext<HTMLDivElement> = {},
     content: ContentBuilder<HTMLDivElement>? = null
 ) {
     TagElement(
@@ -73,10 +73,10 @@ fun Div(
 @Composable
 fun A(
     href: String? = null,
-    attrs: AttrBuilderContext<Tag.A> = {},
+    attrs: AttrBuilderContext<HTMLAnchorElement> = {},
     content: ContentBuilder<HTMLAnchorElement>? = null
 ) {
-    TagElement<Tag.A, HTMLAnchorElement>(
+    TagElement(
         elementBuilder = ElementBuilder.A,
         applyAttrs = {
             href(href)
@@ -90,9 +90,9 @@ fun A(
 fun Input(
     type: InputType = InputType.Text,
     value: String = "",
-    attrs: AttrBuilderContext<Tag.Input> = {}
+    attrs: AttrBuilderContext<HTMLInputElement> = {}
 ) {
-    TagElement<Tag.Input, HTMLInputElement>(
+    TagElement(
         elementBuilder = ElementBuilder.Input,
         applyAttrs = {
             type(type)
@@ -105,107 +105,107 @@ fun Input(
 
 @Composable
 fun Button(
-    attrs: AttrBuilderContext<Tag.Button> = {},
+    attrs: AttrBuilderContext<HTMLButtonElement> = {},
     content: ContentBuilder<HTMLButtonElement>? = null
 ) = TagElement(elementBuilder = ElementBuilder.Button, applyAttrs = attrs, content = content)
 
 @Composable
 fun H1(
-    attrs: AttrBuilderContext<Tag.H> = {},
+    attrs: AttrBuilderContext<HTMLHeadingElement> = {},
     content: ContentBuilder<HTMLHeadingElement>? = null
 ) = TagElement(elementBuilder = ElementBuilder.H1, applyAttrs = attrs, content = content)
 
 @Composable
 fun H2(
-    attrs: AttrBuilderContext<Tag.H> = {},
+    attrs: AttrBuilderContext<HTMLHeadingElement> = {},
     content: ContentBuilder<HTMLHeadingElement>? = null
 ) = TagElement(elementBuilder = ElementBuilder.H2, applyAttrs = attrs, content = content)
 
 @Composable
 fun H3(
-    attrs: AttrBuilderContext<Tag.H> = {},
+    attrs: AttrBuilderContext<HTMLHeadingElement> = {},
     content: ContentBuilder<HTMLHeadingElement>? = null
 ) = TagElement(elementBuilder = ElementBuilder.H3, applyAttrs = attrs, content = content)
 
 @Composable
 fun H4(
-    attrs: AttrBuilderContext<Tag.H> = {},
+    attrs: AttrBuilderContext<HTMLHeadingElement> = {},
     content: ContentBuilder<HTMLHeadingElement>? = null
 ) = TagElement(elementBuilder = ElementBuilder.H4, applyAttrs = attrs, content = content)
 
 @Composable
 fun H5(
-    attrs: AttrBuilderContext<Tag.H> = {},
+    attrs: AttrBuilderContext<HTMLHeadingElement> = {},
     content: ContentBuilder<HTMLHeadingElement>? = null
 ) = TagElement(elementBuilder = ElementBuilder.H5, applyAttrs = attrs, content = content)
 
 @Composable
 fun H6(
-    attrs: AttrBuilderContext<Tag.H> = {},
+    attrs: AttrBuilderContext<HTMLHeadingElement> = {},
     content: ContentBuilder<HTMLHeadingElement>? = null
 ) = TagElement(elementBuilder = ElementBuilder.H6, applyAttrs = attrs, content = content)
 
 @Composable
 fun P(
-    attrs: AttrBuilderContext<Tag.P> = {},
+    attrs: AttrBuilderContext<HTMLParagraphElement> = {},
     content: ContentBuilder<HTMLParagraphElement>? = null
 ) = TagElement(elementBuilder = ElementBuilder.P, applyAttrs = attrs, content = content)
 
 @Composable
 fun Em(
-    attrs: AttrBuilderContext<Tag> = {},
+    attrs: AttrBuilderContext<HTMLElement> = {},
     content: ContentBuilder<HTMLElement>? = null
 ) = TagElement(elementBuilder = ElementBuilder.Em, applyAttrs = attrs, content = content)
 
 @Composable
 fun I(
-    attrs: AttrBuilderContext<Tag> = {},
+    attrs: AttrBuilderContext<HTMLElement> = {},
     content: ContentBuilder<HTMLElement>? = null
 ) = TagElement(elementBuilder = ElementBuilder.I, applyAttrs = attrs, content = content)
 
 @Composable
 fun B(
-    attrs: AttrBuilderContext<Tag> = {},
+    attrs: AttrBuilderContext<HTMLElement> = {},
     content: ContentBuilder<HTMLElement>? = null
 ) = TagElement(elementBuilder = ElementBuilder.B, applyAttrs = attrs, content = content)
 
 @Composable
 fun Small(
-    attrs: AttrBuilderContext<Tag> = {},
+    attrs: AttrBuilderContext<HTMLElement> = {},
     content: ContentBuilder<HTMLElement>? = null
 ) = TagElement(elementBuilder = ElementBuilder.Small, applyAttrs = attrs, content = content)
 
 @Composable
 fun Span(
-    attrs: AttrBuilderContext<Tag.Span> = {},
+    attrs: AttrBuilderContext<HTMLSpanElement> = {},
     content: ContentBuilder<HTMLSpanElement>? = null
 ) = TagElement(elementBuilder = ElementBuilder.Span, applyAttrs = attrs, content = content)
 
 @Composable
-fun Br(attrs: AttrBuilderContext<Tag.Br> = {}) =
-    TagElement<Tag.Br, HTMLBRElement>(elementBuilder = ElementBuilder.Br, applyAttrs = attrs, content = null)
+fun Br(attrs: AttrBuilderContext<HTMLBRElement> = {}) =
+    TagElement(elementBuilder = ElementBuilder.Br, applyAttrs = attrs, content = null)
 
 @Composable
 fun Ul(
-    attrs: AttrBuilderContext<Tag.Ul> = {},
+    attrs: AttrBuilderContext<HTMLUListElement> = {},
     content: ContentBuilder<HTMLUListElement>? = null
 ) = TagElement(elementBuilder = ElementBuilder.Ul, applyAttrs = attrs, content = content)
 
 @Composable
 fun Ol(
-    attrs: AttrBuilderContext<Tag.Ol> = {},
+    attrs: AttrBuilderContext<HTMLOListElement> = {},
     content: ContentBuilder<HTMLOListElement>? = null
 ) = TagElement(elementBuilder = ElementBuilder.Ol, applyAttrs = attrs, content = content)
 
 @Composable
 fun DOMScope<HTMLOListElement>.Li(
-    attrs: AttrBuilderContext<Tag.Li> = {},
+    attrs: AttrBuilderContext<HTMLLIElement> = {},
     content: ContentBuilder<HTMLLIElement>? = null
 ) = TagElement(elementBuilder = ElementBuilder.Li, applyAttrs = attrs, content = content)
 
 @Composable
 fun DOMScope<HTMLUListElement>.Li(
-    attrs: AttrBuilderContext<Tag.Li> = {},
+    attrs: AttrBuilderContext<HTMLLIElement> = {},
     content: ContentBuilder<HTMLLIElement>? = null
 ) = TagElement(elementBuilder = ElementBuilder.Li, applyAttrs = attrs, content = content)
 
@@ -213,8 +213,8 @@ fun DOMScope<HTMLUListElement>.Li(
 fun Img(
     src: String,
     alt: String = "",
-    attrs: AttrBuilderContext<Tag.Img> = {}
-) = TagElement<Tag.Img, HTMLImageElement>(
+    attrs: AttrBuilderContext<HTMLImageElement> = {}
+) = TagElement(
     elementBuilder = ElementBuilder.Img,
     applyAttrs = {
         src(src).alt(alt)
@@ -226,9 +226,9 @@ fun Img(
 @Composable
 fun Form(
     action: String? = null,
-    attrs: AttrBuilderContext<Tag.Form> = {},
+    attrs: AttrBuilderContext<HTMLFormElement> = {},
     content: ContentBuilder<HTMLFormElement>? = null
-) = TagElement<Tag.Form, HTMLFormElement>(
+) = TagElement(
     elementBuilder = ElementBuilder.Form,
     applyAttrs = {
         if (!action.isNullOrEmpty()) action(action)
@@ -239,7 +239,7 @@ fun Form(
 
 @Composable
 fun Select(
-    attrs: AttrBuilderContext<Tag.Select> = {},
+    attrs: AttrBuilderContext<HTMLSelectElement> = {},
     content: ContentBuilder<HTMLSelectElement>? = null
 ) = TagElement(
     elementBuilder = ElementBuilder.Select,
@@ -250,9 +250,9 @@ fun Select(
 @Composable
 fun Option(
     value: String,
-    attrs: AttrBuilderContext<Tag.Option> = {},
+    attrs: AttrBuilderContext<HTMLOptionElement> = {},
     content: ContentBuilder<HTMLOptionElement>? = null
-) = TagElement<Tag.Option, HTMLOptionElement>(
+) = TagElement(
     elementBuilder = ElementBuilder.Option,
     applyAttrs = {
         value(value)
@@ -264,9 +264,9 @@ fun Option(
 @Composable
 fun OptGroup(
     label: String,
-    attrs: AttrBuilderContext<Tag.OptGroup> = {},
+    attrs: AttrBuilderContext<HTMLOptGroupElement> = {},
     content: ContentBuilder<HTMLOptGroupElement>? = null
-) = TagElement<Tag.OptGroup, HTMLOptGroupElement>(
+) = TagElement(
     elementBuilder = ElementBuilder.OptGroup,
     applyAttrs = {
         label(label)
@@ -277,7 +277,7 @@ fun OptGroup(
 
 @Composable
 fun Section(
-    attrs: AttrBuilderContext<Tag> = {},
+    attrs: AttrBuilderContext<HTMLElement> = {},
     content: ContentBuilder<HTMLElement>? = null
 ) = TagElement(
     elementBuilder = ElementBuilder.Section,
@@ -287,9 +287,9 @@ fun Section(
 
 @Composable
 fun TextArea(
-    attrs: AttrBuilderContext<Tag.TextArea> = {},
+    attrs: AttrBuilderContext<HTMLTextAreaElement> = {},
     value: String
-) = TagElement<Tag.TextArea, HTMLTextAreaElement>(
+) = TagElement(
     elementBuilder = ElementBuilder.TextArea,
     applyAttrs = {
         value(value)
@@ -301,7 +301,7 @@ fun TextArea(
 
 @Composable
 fun Nav(
-    attrs: AttrBuilderContext<Tag.Nav> = {},
+    attrs: AttrBuilderContext<HTMLElement> = {},
     content: ContentBuilder<HTMLElement>? = null
 ) = TagElement(
     elementBuilder = ElementBuilder.Nav,
@@ -311,7 +311,7 @@ fun Nav(
 
 @Composable
 fun Pre(
-    attrs: AttrBuilderContext<Tag.Pre> = {},
+    attrs: AttrBuilderContext<HTMLPreElement> = {},
     content: ContentBuilder<HTMLPreElement>? = null
 ) {
     TagElement(
@@ -323,7 +323,7 @@ fun Pre(
 
 @Composable
 fun Code(
-    attrs: AttrBuilderContext<Tag.Code> = {},
+    attrs: AttrBuilderContext<HTMLElement> = {},
     content: ContentBuilder<HTMLElement>? = null
 ) {
     TagElement(
@@ -335,10 +335,10 @@ fun Code(
 
 @Composable
 fun Main(
-    attrs: AttrBuilderContext<Tag.Div> = {},
+    attrs: AttrBuilderContext<HTMLElement> = {},
     content: ContentBuilder<HTMLElement>? = null
 ) {
-    TagElement<Tag.Div, HTMLElement>(
+    TagElement(
         elementBuilder = ElementBuilder.Main,
         applyAttrs = attrs,
         content = content
@@ -347,10 +347,10 @@ fun Main(
 
 @Composable
 fun Footer(
-    attrs: AttrBuilderContext<Tag.Div> = {},
+    attrs: AttrBuilderContext<HTMLElement> = {},
     content: ContentBuilder<HTMLElement>? = null
 ) {
-    TagElement<Tag.Div, HTMLElement>(
+    TagElement(
         elementBuilder = ElementBuilder.Footer,
         applyAttrs = attrs,
         content = content
@@ -359,9 +359,9 @@ fun Footer(
 
 @Composable
 fun Hr(
-    attrs: AttrBuilderContext<Tag.Hr> = {}
+    attrs: AttrBuilderContext<HTMLHRElement> = {}
 ) {
-    TagElement<Tag.Hr, HTMLHRElement>(
+    TagElement(
         elementBuilder = ElementBuilder.Hr,
         applyAttrs = attrs,
         content = null
@@ -371,10 +371,10 @@ fun Hr(
 @Composable
 fun Label(
     forId: String? = null,
-    attrs: AttrBuilderContext<Tag.Label> = {},
+    attrs: AttrBuilderContext<HTMLLabelElement> = {},
     content: ContentBuilder<HTMLLabelElement>? = null
 ) {
-    TagElement<Tag.Label, HTMLLabelElement>(
+    TagElement(
         elementBuilder = ElementBuilder.Label,
         applyAttrs = {
             forId(forId)
@@ -386,7 +386,7 @@ fun Label(
 
 @Composable
 fun Table(
-    attrs: AttrBuilderContext<Tag.Table> = {},
+    attrs: AttrBuilderContext<HTMLTableElement> = {},
     content: ContentBuilder<HTMLTableElement>? = null
 ) {
     TagElement(
@@ -398,7 +398,7 @@ fun Table(
 
 @Composable
 fun Caption(
-    attrs: AttrBuilderContext<Tag.Caption> = {},
+    attrs: AttrBuilderContext<HTMLTableCaptionElement> = {},
     content: ContentBuilder<HTMLTableCaptionElement>? = null
 ) {
     TagElement(
@@ -410,9 +410,9 @@ fun Caption(
 
 @Composable
 fun Col(
-    attrs: AttrBuilderContext<Tag.Col> = {}
+    attrs: AttrBuilderContext<HTMLTableColElement> = {}
 ) {
-    TagElement<Tag.Col, HTMLTableColElement>(
+    TagElement(
         elementBuilder = ElementBuilder.Col,
         applyAttrs = attrs,
         content = null
@@ -421,7 +421,7 @@ fun Col(
 
 @Composable
 fun Colgroup(
-    attrs: AttrBuilderContext<Tag.Colgroup> = {},
+    attrs: AttrBuilderContext<HTMLTableColElement> = {},
     content: ContentBuilder<HTMLTableColElement>? = null
 ) {
     TagElement(
@@ -433,7 +433,7 @@ fun Colgroup(
 
 @Composable
 fun Tr(
-    attrs: AttrBuilderContext<Tag.Tr> = {},
+    attrs: AttrBuilderContext<HTMLTableRowElement> = {},
     content: ContentBuilder<HTMLTableRowElement>? = null
 ) {
     TagElement(
@@ -445,7 +445,7 @@ fun Tr(
 
 @Composable
 fun Thead(
-    attrs: AttrBuilderContext<Tag.Thead> = {},
+    attrs: AttrBuilderContext<HTMLTableSectionElement> = {},
     content: ContentBuilder<HTMLTableSectionElement>? = null
 ) {
     TagElement(
@@ -457,7 +457,7 @@ fun Thead(
 
 @Composable
 fun Th(
-    attrs: AttrBuilderContext<Tag.Th> = {},
+    attrs: AttrBuilderContext<HTMLTableCellElement> = {},
     content: ContentBuilder<HTMLTableCellElement>? = null
 ) {
     TagElement(
@@ -469,7 +469,7 @@ fun Th(
 
 @Composable
 fun Td(
-    attrs: AttrBuilderContext<Tag.Td> = {},
+    attrs: AttrBuilderContext<HTMLTableCellElement> = {},
     content: ContentBuilder<HTMLTableCellElement>? = null
 ) {
     TagElement(
@@ -481,7 +481,7 @@ fun Td(
 
 @Composable
 fun Tbody(
-    attrs: AttrBuilderContext<Tag.Tbody> = {},
+    attrs: AttrBuilderContext<HTMLTableSectionElement> = {},
     content: ContentBuilder<HTMLTableSectionElement>? = null
 ) {
     TagElement(
@@ -493,7 +493,7 @@ fun Tbody(
 
 @Composable
 fun Tfoot(
-    attrs: AttrBuilderContext<Tag.Tfoot> = {},
+    attrs: AttrBuilderContext<HTMLTableSectionElement> = {},
     content: ContentBuilder<HTMLTableSectionElement>? = null
 ) {
     TagElement(

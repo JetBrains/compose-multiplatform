@@ -130,7 +130,7 @@ class ElementsTests {
     fun rawCreation() = runTest {
         @Composable
         fun CustomElement(
-            attrs: AttrsBuilder<Tag.Div>.() -> Unit,
+            attrs: AttrsBuilder<HTMLElement>.() -> Unit,
             content: ContentBuilder<HTMLElement>? = null
         ) {
             TagElement(

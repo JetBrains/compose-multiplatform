@@ -18,7 +18,7 @@ import org.jetbrains.compose.web.css.*
  */
 @Composable
 inline fun Style(
-    crossinline applyAttrs: AttrsBuilder<Tag.Style>.() -> Unit = {},
+    crossinline applyAttrs: AttrsBuilder<HTMLStyleElement>.() -> Unit = {},
     rulesBuild: StyleSheetBuilder.() -> Unit
 ) {
     val builder = StyleSheetBuilderImpl()
@@ -34,10 +34,10 @@ inline fun Style(
  */
 @Composable
 inline fun Style(
-    crossinline applyAttrs: AttrsBuilder<Tag.Style>.() -> Unit = {},
+    crossinline applyAttrs: AttrsBuilder<HTMLStyleElement>.() -> Unit = {},
     cssRules: CSSRuleDeclarationList
 ) {
-    TagElement<Tag.Style, HTMLStyleElement>(
+    TagElement(
         elementBuilder = ElementBuilder.Style,
         applyAttrs = {
             applyAttrs()

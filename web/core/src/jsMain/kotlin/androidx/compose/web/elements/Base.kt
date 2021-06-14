@@ -151,9 +151,9 @@ interface ElementBuilder<TElement : Element> {
 }
 
 @Composable
-fun <TTag : Tag, TElement : Element> TagElement(
+fun <TElement : Element> TagElement(
     elementBuilder: ElementBuilder<TElement>,
-    applyAttrs: AttrsBuilder<TTag>.() -> Unit,
+    applyAttrs: AttrsBuilder<TElement>.() -> Unit,
     content: (@Composable ElementScope<TElement>.() -> Unit)?
 ) {
     val scope = remember { ElementScopeImpl<TElement>() }
@@ -166,7 +166,7 @@ fun <TTag : Tag, TElement : Element> TagElement(
             }
         },
         attrsSkippableUpdate = {
-            val attrsApplied = AttrsBuilder<TTag>().also { it.applyAttrs() }
+            val attrsApplied = AttrsBuilder<TElement>().also { it.applyAttrs() }
             refEffect.effect = attrsApplied.refEffect
             val attrsCollected = attrsApplied.collect()
             val events = attrsApplied.collectListeners()
@@ -188,9 +188,9 @@ fun <TTag : Tag, TElement : Element> TagElement(
 }
 
 @Composable
-fun <TTag : Tag, TElement : Element> TagElement(
+fun <TElement : Element> TagElement(
     tagName: String,
-    applyAttrs: AttrsBuilder<TTag>.() -> Unit,
+    applyAttrs: AttrsBuilder<TElement>.() -> Unit,
     content: (@Composable ElementScope<TElement>.() -> Unit)?
 ) = TagElement(
     elementBuilder = ElementBuilder.createBuilder(tagName),
