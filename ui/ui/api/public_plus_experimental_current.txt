@@ -1622,6 +1622,30 @@ package androidx.compose.ui.input.pointer {
     method public static boolean isTertiaryPressed(int);
   }
 
+  public interface PointerIcon {
+  }
+
+  @androidx.compose.ui.ExperimentalComposeUiApi public final class PointerIconDefaults {
+    method public androidx.compose.ui.input.pointer.PointerIcon getCrosshair();
+    method public androidx.compose.ui.input.pointer.PointerIcon getDefault();
+    method public androidx.compose.ui.input.pointer.PointerIcon getHand();
+    method public androidx.compose.ui.input.pointer.PointerIcon getText();
+    property public final androidx.compose.ui.input.pointer.PointerIcon Crosshair;
+    property public final androidx.compose.ui.input.pointer.PointerIcon Default;
+    property public final androidx.compose.ui.input.pointer.PointerIcon Hand;
+    property public final androidx.compose.ui.input.pointer.PointerIcon Text;
+    field public static final androidx.compose.ui.input.pointer.PointerIconDefaults INSTANCE;
+  }
+
+  public final class PointerIconKt {
+    method public static androidx.compose.ui.Modifier pointerHoverIcon(androidx.compose.ui.Modifier, androidx.compose.ui.input.pointer.PointerIcon icon, optional boolean overrideDescendants);
+  }
+
+  public final class PointerIcon_androidKt {
+    method public static androidx.compose.ui.input.pointer.PointerIcon PointerIcon(android.view.PointerIcon pointerIcon);
+    method public static androidx.compose.ui.input.pointer.PointerIcon PointerIcon(int pointerIconType);
+  }
+
   public final inline class PointerId {
     ctor public PointerId();
     method public long getValue();

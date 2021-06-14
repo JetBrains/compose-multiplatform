@@ -34,6 +34,7 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.drawscope.drawIntoCanvas
 import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.input.pointer.pointerHoverIcon
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.FirstBaseline
 import androidx.compose.ui.layout.IntrinsicMeasurable
@@ -268,7 +269,7 @@ internal class TextController(val state: TextState) : RememberObserver {
                 Modifier.pointerInput(mouseSelectionObserver) {
                     mouseSelectionDetector(mouseSelectionObserver)
                 }
-            }
+            }.pointerHoverIcon(textPointerIcon)
         } else {
             Modifier
         }

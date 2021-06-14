@@ -25,6 +25,7 @@ import androidx.compose.ui.graphics.Canvas
 import androidx.compose.ui.hapticfeedback.HapticFeedback
 import androidx.compose.ui.input.InputModeManager
 import androidx.compose.ui.input.key.KeyEvent
+import androidx.compose.ui.input.pointer.PointerIconService
 import androidx.compose.ui.platform.AccessibilityManager
 import androidx.compose.ui.platform.ClipboardManager
 import androidx.compose.ui.platform.TextToolbar
@@ -103,6 +104,8 @@ internal interface Owner {
     val density: Density
 
     val textInputService: TextInputService
+
+    val pointerIconService: PointerIconService
 
     /**
      * Provide a focus manager that controls focus within Compose.

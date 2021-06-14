@@ -17,12 +17,18 @@
 package androidx.compose.ui.platform
 
 import androidx.compose.ui.unit.Density
+import java.awt.Cursor
 import java.awt.Point
 import java.awt.im.InputMethodRequests
 
-internal actual interface PlatformComponent : PlatformInputComponent
+internal actual interface PlatformComponent : PlatformInputComponent, PlatformComponentWithCursor
+
+internal actual interface PlatformComponentWithCursor {
+    var componentCursor: Cursor
+}
 
 internal actual object DummyPlatformComponent : PlatformComponent {
+    override var componentCursor: Cursor = Cursor(Cursor.CROSSHAIR_CURSOR)
     var enabledInput: InputMethodRequests? = null
     override fun enableInput(inputMethodRequests: InputMethodRequests) {
         enabledInput = inputMethodRequests

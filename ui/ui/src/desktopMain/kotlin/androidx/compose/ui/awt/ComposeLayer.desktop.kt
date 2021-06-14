@@ -33,6 +33,7 @@ import kotlinx.coroutines.swing.Swing
 import org.jetbrains.skia.Canvas
 import org.jetbrains.skiko.SkiaLayer
 import org.jetbrains.skiko.SkiaRenderer
+import java.awt.Cursor
 import java.awt.Dimension
 import java.awt.Graphics
 import java.awt.Point
@@ -83,6 +84,9 @@ internal class ComposeLayer {
         }
 
         override fun getInputMethodRequests() = currentInputMethodRequests
+        override var componentCursor: Cursor
+            get() = super.getCursor()
+            set(value) { super.setCursor(value) }
 
         override fun enableInput(inputMethodRequests: InputMethodRequests) {
             currentInputMethodRequests = inputMethodRequests
