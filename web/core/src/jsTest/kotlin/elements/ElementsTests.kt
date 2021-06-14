@@ -25,6 +25,7 @@ import org.jetbrains.compose.web.dom.ContentBuilder
 import org.jetbrains.compose.web.dom.Datalist
 import org.jetbrains.compose.web.dom.Div
 import org.jetbrains.compose.web.dom.Em
+import org.jetbrains.compose.web.dom.Embed
 import org.jetbrains.compose.web.dom.Fieldset
 import org.jetbrains.compose.web.dom.Footer
 import org.jetbrains.compose.web.dom.Form
@@ -38,22 +39,27 @@ import org.jetbrains.compose.web.dom.HTMLMap
 import org.jetbrains.compose.web.dom.Header
 import org.jetbrains.compose.web.dom.Hr
 import org.jetbrains.compose.web.dom.I
+import org.jetbrains.compose.web.dom.Iframe
 import org.jetbrains.compose.web.dom.Img
 import org.jetbrains.compose.web.dom.Label
 import org.jetbrains.compose.web.dom.Legend
 import org.jetbrains.compose.web.dom.Main
 import org.jetbrains.compose.web.dom.Meter
 import org.jetbrains.compose.web.dom.Nav
+import org.jetbrains.compose.web.dom.Object
 import org.jetbrains.compose.web.dom.Ol
 import org.jetbrains.compose.web.dom.OptGroup
 import org.jetbrains.compose.web.dom.Option
 import org.jetbrains.compose.web.dom.Output
 import org.jetbrains.compose.web.dom.P
+import org.jetbrains.compose.web.dom.Param
+import org.jetbrains.compose.web.dom.Picture
 import org.jetbrains.compose.web.dom.Pre
 import org.jetbrains.compose.web.dom.Progress
 import org.jetbrains.compose.web.dom.Section
 import org.jetbrains.compose.web.dom.Select
 import org.jetbrains.compose.web.dom.Small
+import org.jetbrains.compose.web.dom.Source
 import org.jetbrains.compose.web.dom.Span
 import org.jetbrains.compose.web.dom.Table
 import org.jetbrains.compose.web.dom.TagElement
@@ -94,6 +100,13 @@ class ElementsTests {
             Pair({ Meter() }, "METER"),
             Pair({ Output() }, "OUTPUT"),
             Pair({ Progress() }, "PROGRESS"),
+
+            Pair({ Embed() }, "EMBED"),
+            Pair({ Iframe() }, "IFRAME"),
+            Pair({ Object() }, "OBJECT"),
+            Pair({ Param() }, "PARAM"),
+            Pair({ Picture() }, "PICTURE"),
+            Pair({ Source() }, "SOURCE"),
 
             Pair({ Div() }, "DIV"),
             Pair({ A() }, "A"),

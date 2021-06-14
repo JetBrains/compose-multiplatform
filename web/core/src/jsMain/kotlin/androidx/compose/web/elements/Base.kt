@@ -24,10 +24,12 @@ import org.w3c.dom.HTMLButtonElement
 import org.w3c.dom.HTMLDataListElement
 import org.w3c.dom.HTMLDivElement
 import org.w3c.dom.HTMLElement
+import org.w3c.dom.HTMLEmbedElement
 import org.w3c.dom.HTMLFieldSetElement
 import org.w3c.dom.HTMLFormElement
 import org.w3c.dom.HTMLHRElement
 import org.w3c.dom.HTMLHeadingElement
+import org.w3c.dom.HTMLIFrameElement
 import org.w3c.dom.HTMLImageElement
 import org.w3c.dom.HTMLInputElement
 import org.w3c.dom.HTMLLIElement
@@ -36,13 +38,17 @@ import org.w3c.dom.HTMLLegendElement
 import org.w3c.dom.HTMLMapElement
 import org.w3c.dom.HTMLMeterElement
 import org.w3c.dom.HTMLOListElement
+import org.w3c.dom.HTMLObjectElement
 import org.w3c.dom.HTMLOptGroupElement
 import org.w3c.dom.HTMLOptionElement
 import org.w3c.dom.HTMLOutputElement
 import org.w3c.dom.HTMLParagraphElement
+import org.w3c.dom.HTMLParamElement
+import org.w3c.dom.HTMLPictureElement
 import org.w3c.dom.HTMLPreElement
 import org.w3c.dom.HTMLProgressElement
 import org.w3c.dom.HTMLSelectElement
+import org.w3c.dom.HTMLSourceElement
 import org.w3c.dom.HTMLSpanElement
 import org.w3c.dom.HTMLStyleElement
 import org.w3c.dom.HTMLTableCaptionElement
@@ -117,6 +123,13 @@ interface ElementBuilder<TElement : Element> {
         val Meter: ElementBuilder<HTMLMeterElement> = ElementBuilderImplementation("meter")
         val Output: ElementBuilder<HTMLOutputElement> = ElementBuilderImplementation("output")
         val Progress: ElementBuilder<HTMLProgressElement> = ElementBuilderImplementation("progress")
+
+        val Embed: ElementBuilder<HTMLEmbedElement> = ElementBuilderImplementation("embed")
+        val Iframe: ElementBuilder<HTMLIFrameElement> = ElementBuilderImplementation("iframe")
+        val Object: ElementBuilder<HTMLObjectElement> = ElementBuilderImplementation("object")
+        val Param: ElementBuilder<HTMLParamElement> = ElementBuilderImplementation("param")
+        val Picture: ElementBuilder<HTMLPictureElement> = ElementBuilderImplementation("picture")
+        val Source: ElementBuilder<HTMLSourceElement> = ElementBuilderImplementation("source")
 
         val Div: ElementBuilder<HTMLDivElement> = ElementBuilderImplementation("div")
         val A: ElementBuilder<HTMLAnchorElement> = ElementBuilderImplementation("a")

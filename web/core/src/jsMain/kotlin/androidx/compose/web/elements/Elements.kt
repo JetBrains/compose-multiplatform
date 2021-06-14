@@ -23,10 +23,12 @@ import org.w3c.dom.HTMLButtonElement
 import org.w3c.dom.HTMLDataListElement
 import org.w3c.dom.HTMLDivElement
 import org.w3c.dom.HTMLElement
+import org.w3c.dom.HTMLEmbedElement
 import org.w3c.dom.HTMLFieldSetElement
 import org.w3c.dom.HTMLFormElement
 import org.w3c.dom.HTMLHeadingElement
 import org.w3c.dom.HTMLHRElement
+import org.w3c.dom.HTMLIFrameElement
 import org.w3c.dom.HTMLImageElement
 import org.w3c.dom.HTMLInputElement
 import org.w3c.dom.HTMLLIElement
@@ -35,13 +37,17 @@ import org.w3c.dom.HTMLLegendElement
 import org.w3c.dom.HTMLMapElement
 import org.w3c.dom.HTMLMeterElement
 import org.w3c.dom.HTMLOListElement
+import org.w3c.dom.HTMLObjectElement
 import org.w3c.dom.HTMLOptGroupElement
 import org.w3c.dom.HTMLOptionElement
 import org.w3c.dom.HTMLOutputElement
 import org.w3c.dom.HTMLParagraphElement
+import org.w3c.dom.HTMLParamElement
+import org.w3c.dom.HTMLPictureElement
 import org.w3c.dom.HTMLPreElement
 import org.w3c.dom.HTMLProgressElement
 import org.w3c.dom.HTMLSelectElement
+import org.w3c.dom.HTMLSourceElement
 import org.w3c.dom.HTMLSpanElement
 import org.w3c.dom.HTMLTableCaptionElement
 import org.w3c.dom.HTMLTableCellElement
@@ -233,6 +239,78 @@ fun Progress(
 ) {
     TagElement(
         elementBuilder = ElementBuilder.Progress,
+        applyAttrs = attrs,
+        content = content
+    )
+}
+
+@Composable
+fun Embed(
+    attrs: AttrBuilderContext<HTMLEmbedElement> = {},
+    content: ContentBuilder<HTMLEmbedElement>? = null
+) {
+    TagElement(
+        elementBuilder = ElementBuilder.Embed,
+        applyAttrs = attrs,
+        content = content
+    )
+}
+
+@Composable
+fun Iframe(
+    attrs: AttrBuilderContext<HTMLIFrameElement> = {},
+    content: ContentBuilder<HTMLIFrameElement>? = null
+) {
+    TagElement(
+        elementBuilder = ElementBuilder.Iframe,
+        applyAttrs = attrs,
+        content = content
+    )
+}
+
+@Composable
+fun Object(
+    attrs: AttrBuilderContext<HTMLObjectElement> = {},
+    content: ContentBuilder<HTMLObjectElement>? = null
+) {
+    TagElement(
+        elementBuilder = ElementBuilder.Object,
+        applyAttrs = attrs,
+        content = content
+    )
+}
+
+@Composable
+fun Param(
+    attrs: AttrBuilderContext<HTMLParamElement> = {},
+    content: ContentBuilder<HTMLParamElement>? = null
+) {
+    TagElement(
+        elementBuilder = ElementBuilder.Param,
+        applyAttrs = attrs,
+        content = content
+    )
+}
+
+@Composable
+fun Picture(
+    attrs: AttrBuilderContext<HTMLPictureElement> = {},
+    content: ContentBuilder<HTMLPictureElement>? = null
+) {
+    TagElement(
+        elementBuilder = ElementBuilder.Picture,
+        applyAttrs = attrs,
+        content = content
+    )
+}
+
+@Composable
+fun Source(
+    attrs: AttrBuilderContext<HTMLSourceElement> = {},
+    content: ContentBuilder<HTMLSourceElement>? = null
+) {
+    TagElement(
+        elementBuilder = ElementBuilder.Source,
         applyAttrs = attrs,
         content = content
     )
