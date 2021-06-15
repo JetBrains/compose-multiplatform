@@ -102,7 +102,7 @@ private open class ElementBuilderImplementation<TElement : Element>(private val 
     override fun create(): TElement = DomProvider.get(tagName).cloneNode() as TElement
 }
 
-interface ElementBuilder<TElement : Element> {
+fun interface ElementBuilder<TElement : Element> {
     fun create(): TElement
 
     companion object {
