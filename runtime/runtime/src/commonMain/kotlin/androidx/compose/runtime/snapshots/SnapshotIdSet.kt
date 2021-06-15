@@ -50,7 +50,7 @@ internal class SnapshotIdSet private constructor(
 ) : Iterable<Int> {
 
     /**
-     * The the value of the bit at index [bit]
+     * The value of the bit at index [bit]
      */
     fun get(bit: Int): Boolean {
         val offset = bit - lowerBound
