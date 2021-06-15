@@ -34,13 +34,8 @@ class AttrsBuilder<TElement : Element> : EventsListenerBuilder() {
         this.refEffect = effect
     }
 
-    fun attr(attr: String, value: String?): AttrsBuilder<TElement> {
-        if (value == null) {
-            attributesMap.remove(attr)
-        } else {
-            attributesMap[attr] = value
-        }
-
+    fun attr(attr: String, value: String): AttrsBuilder<TElement> {
+        attributesMap[attr] = value
         return this
     }
 

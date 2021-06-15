@@ -347,7 +347,9 @@ fun A(
     TagElement(
         elementBuilder = ElementBuilder.A,
         applyAttrs = {
-            href(href)
+            if (href != null) {
+                this.href(href)
+            }
             attrs()
         },
         content = content
@@ -645,7 +647,9 @@ fun Label(
     TagElement(
         elementBuilder = ElementBuilder.Label,
         applyAttrs = {
-            forId(forId)
+            if (forId != null) {
+                forId(forId)
+            }
             attrs()
         },
         content = content

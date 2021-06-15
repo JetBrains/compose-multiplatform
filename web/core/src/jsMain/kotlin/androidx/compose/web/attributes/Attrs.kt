@@ -13,7 +13,7 @@ import org.w3c.dom.HTMLTableCellElement
 import org.w3c.dom.HTMLTableColElement
 import org.w3c.dom.HTMLTextAreaElement
 
-fun AttrsBuilder<HTMLAnchorElement>.href(value: String?) =
+fun AttrsBuilder<HTMLAnchorElement>.href(value: String) =
     attr("href", value)
 
 fun AttrsBuilder<HTMLAnchorElement>.target(value: ATarget = ATarget.Self) =
@@ -36,11 +36,11 @@ fun AttrsBuilder<HTMLAnchorElement>.download(value: String = "") =
 
 /* Button attributes */
 
-fun AttrsBuilder<HTMLButtonElement>.autoFocus(value: Boolean = true) =
-    attr("autofocus", if (value) "" else null)
+fun AttrsBuilder<HTMLButtonElement>.autoFocus() =
+    attr("autofocus", "")
 
-fun AttrsBuilder<HTMLButtonElement>.disabled(value: Boolean = true) =
-    attr("disabled", if (value) "" else null)
+fun AttrsBuilder<HTMLButtonElement>.disabled() =
+    attr("disabled", "")
 
 fun AttrsBuilder<HTMLButtonElement>.form(formId: String) =
     attr("form", formId)
@@ -54,8 +54,8 @@ fun AttrsBuilder<HTMLButtonElement>.formEncType(value: ButtonFormEncType) =
 fun AttrsBuilder<HTMLButtonElement>.formMethod(value: ButtonFormMethod) =
     attr("formmethod", value.methodStr)
 
-fun AttrsBuilder<HTMLButtonElement>.formNoValidate(value: Boolean = true) =
-    attr("formnovalidate", if (value) "" else null)
+fun AttrsBuilder<HTMLButtonElement>.formNoValidate() =
+    attr("formnovalidate", "")
 
 fun AttrsBuilder<HTMLButtonElement>.formTarget(value: ButtonFormTarget) =
     attr("formtarget", value.targetStr)
@@ -77,8 +77,8 @@ fun AttrsBuilder<HTMLFormElement>.action(value: String) =
 fun AttrsBuilder<HTMLFormElement>.acceptCharset(value: String) =
     attr("accept-charset", value)
 
-fun AttrsBuilder<HTMLFormElement>.autoComplete(value: Boolean) =
-    attr("autocomplete", if (value) "" else null)
+fun AttrsBuilder<HTMLFormElement>.autoComplete() =
+    attr("autocomplete", "")
 
 fun AttrsBuilder<HTMLFormElement>.encType(value: FormEncType) =
     attr("enctype", value.typeStr)
@@ -86,8 +86,8 @@ fun AttrsBuilder<HTMLFormElement>.encType(value: FormEncType) =
 fun AttrsBuilder<HTMLFormElement>.method(value: FormMethod) =
     attr("method", value.methodStr)
 
-fun AttrsBuilder<HTMLFormElement>.noValidate(value: Boolean = true) =
-    attr("novalidate", if (value) "" else null)
+fun AttrsBuilder<HTMLFormElement>.noValidate() =
+    attr("novalidate", "")
 
 fun AttrsBuilder<HTMLFormElement>.target(value: FormTarget) =
     attr("target", value.targetStr)
@@ -103,23 +103,23 @@ fun AttrsBuilder<HTMLInputElement>.accept(value: String) =
 fun AttrsBuilder<HTMLInputElement>.alt(value: String) =
     attr("alt", value) // type: image only
 
-fun AttrsBuilder<HTMLInputElement>.autoComplete(value: Boolean = true) =
-    attr("autocomplete", if (value) "" else null)
+fun AttrsBuilder<HTMLInputElement>.autoComplete() =
+    attr("autocomplete", "")
 
-fun AttrsBuilder<HTMLInputElement>.autoFocus(value: Boolean = true) =
-    attr("autofocus", if (value) "" else null)
+fun AttrsBuilder<HTMLInputElement>.autoFocus() =
+    attr("autofocus", "")
 
 fun AttrsBuilder<HTMLInputElement>.capture(value: String) =
     attr("capture", value) // type: file only
 
-fun AttrsBuilder<HTMLInputElement>.checked(value: Boolean = true) =
-    attr("checked", if (value) "" else null) // radio, checkbox
+fun AttrsBuilder<HTMLInputElement>.checked() =
+    attr("checked", "") // radio, checkbox
 
 fun AttrsBuilder<HTMLInputElement>.dirName(value: String) =
     attr("dirname", value) // text, search
 
-fun AttrsBuilder<HTMLInputElement>.disabled(value: Boolean = true) =
-    attr("disabled", if (value) "" else null)
+fun AttrsBuilder<HTMLInputElement>.disabled() =
+    attr("disabled", "")
 
 fun AttrsBuilder<HTMLInputElement>.form(id: String) =
     attr("form", id)
@@ -133,8 +133,8 @@ fun AttrsBuilder<HTMLInputElement>.formEncType(value: InputFormEncType) =
 fun AttrsBuilder<HTMLInputElement>.formMethod(value: InputFormMethod) =
     attr("formmethod", value.methodStr)
 
-fun AttrsBuilder<HTMLInputElement>.formNoValidate(value: Boolean = true) =
-    attr("formnovalidate", if (value) "" else null)
+fun AttrsBuilder<HTMLInputElement>.formNoValidate() =
+    attr("formnovalidate", "")
 
 fun AttrsBuilder<HTMLInputElement>.formTarget(value: InputFormTarget) =
     attr("formtarget", value.targetStr)
@@ -160,8 +160,8 @@ fun AttrsBuilder<HTMLInputElement>.min(value: String) =
 fun AttrsBuilder<HTMLInputElement>.minLength(value: Int) =
     attr("minlength", value.toString())
 
-fun AttrsBuilder<HTMLInputElement>.multiple(value: Boolean = true) =
-    attr("multiple", if (value) "" else null)
+fun AttrsBuilder<HTMLInputElement>.multiple() =
+    attr("multiple", "")
 
 fun AttrsBuilder<HTMLInputElement>.name(value: String) =
     attr("name", value)
@@ -172,8 +172,8 @@ fun AttrsBuilder<HTMLInputElement>.pattern(value: String) =
 fun AttrsBuilder<HTMLInputElement>.placeholder(value: String) =
     attr("placeholder", value)
 
-fun AttrsBuilder<HTMLInputElement>.readOnly(value: Boolean = true) =
-    attr("readonly", if (value) "" else null)
+fun AttrsBuilder<HTMLInputElement>.readOnly() =
+    attr("readonly", "")
 
 fun AttrsBuilder<HTMLInputElement>.required(value: Boolean = true) =
     attr("required", value.toString())
@@ -182,7 +182,7 @@ fun AttrsBuilder<HTMLInputElement>.size(value: Int) =
     attr("size", value.toString())
 
 fun AttrsBuilder<HTMLInputElement>.src(value: String) =
-    attr("src", value.toString()) // image only
+    attr("src", value) // image only
 
 fun AttrsBuilder<HTMLInputElement>.step(value: Int) =
     attr("step", value.toString()) // numeric types only
@@ -200,11 +200,11 @@ fun AttrsBuilder<HTMLInputElement>.value(value: String): AttrsBuilder<HTMLInputE
 fun AttrsBuilder<HTMLOptionElement>.value(value: String) =
     attr("value", value)
 
-fun AttrsBuilder<HTMLOptionElement>.disabled(value: Boolean = true) =
-    attr("disabled", if (value) "" else null)
+fun AttrsBuilder<HTMLOptionElement>.disabled() =
+    attr("disabled", "")
 
-fun AttrsBuilder<HTMLOptionElement>.selected(value: Boolean = true) =
-    attr("selected", if (value) "" else null)
+fun AttrsBuilder<HTMLOptionElement>.selected() =
+    attr("selected", "")
 
 fun AttrsBuilder<HTMLOptionElement>.label(value: String) =
     attr("label", value)
@@ -214,23 +214,23 @@ fun AttrsBuilder<HTMLOptionElement>.label(value: String) =
 fun AttrsBuilder<HTMLSelectElement>.autocomplete(value: String) =
     attr("autocomplete", value)
 
-fun AttrsBuilder<HTMLSelectElement>.autofocus(value: Boolean = true) =
-    attr("autofocus", if (value) "" else null)
+fun AttrsBuilder<HTMLSelectElement>.autofocus() =
+    attr("autofocus", "")
 
-fun AttrsBuilder<HTMLSelectElement>.disabled(value: Boolean = true) =
-    attr("disabled", if (value) "" else null)
+fun AttrsBuilder<HTMLSelectElement>.disabled() =
+    attr("disabled", "")
 
 fun AttrsBuilder<HTMLSelectElement>.form(formId: String) =
     attr("form", formId)
 
-fun AttrsBuilder<HTMLSelectElement>.multiple(value: Boolean = true) =
-    attr("multiple", if (value) "" else null)
+fun AttrsBuilder<HTMLSelectElement>.multiple() =
+    attr("multiple", "")
 
 fun AttrsBuilder<HTMLSelectElement>.name(value: String) =
     attr("name", value)
 
-fun AttrsBuilder<HTMLSelectElement>.required(value: Boolean = true) =
-    attr("required", if (value) "" else null)
+fun AttrsBuilder<HTMLSelectElement>.required() =
+    attr("required", "")
 
 fun AttrsBuilder<HTMLSelectElement>.size(numberOfRows: Int) =
     attr("size", numberOfRows.toString())
@@ -240,22 +240,22 @@ fun AttrsBuilder<HTMLSelectElement>.size(numberOfRows: Int) =
 fun AttrsBuilder<HTMLOptGroupElement>.label(value: String) =
     attr("label", value)
 
-fun AttrsBuilder<HTMLOptGroupElement>.disabled(value: Boolean = true) =
-    attr("disabled", if (value) "" else null)
+fun AttrsBuilder<HTMLOptGroupElement>.disabled() =
+    attr("disabled", "")
 
 /* TextArea attributes */
 
 fun AttrsBuilder<HTMLTextAreaElement>.autoComplete(value: Boolean = true) =
     attr("autocomplete", if (value) "on" else "off")
 
-fun AttrsBuilder<HTMLTextAreaElement>.autoFocus(value: Boolean = true) =
-    attr("autofocus", if (value) "" else null)
+fun AttrsBuilder<HTMLTextAreaElement>.autoFocus() =
+    attr("autofocus", "")
 
 fun AttrsBuilder<HTMLTextAreaElement>.cols(value: Int) =
     attr("cols", value.toString())
 
-fun AttrsBuilder<HTMLTextAreaElement>.disabled(value: Boolean = true) =
-    attr("disabled", if (value) "" else null)
+fun AttrsBuilder<HTMLTextAreaElement>.disabled() =
+    attr("disabled", "")
 
 fun AttrsBuilder<HTMLTextAreaElement>.form(formId: String) =
     attr("form", formId)
@@ -272,11 +272,11 @@ fun AttrsBuilder<HTMLTextAreaElement>.name(value: String) =
 fun AttrsBuilder<HTMLTextAreaElement>.placeholder(value: String) =
     attr("placeholder", value)
 
-fun AttrsBuilder<HTMLTextAreaElement>.readOnly(value: Boolean = true) =
-    attr("readonly", if (value) "" else null)
+fun AttrsBuilder<HTMLTextAreaElement>.readOnly() =
+    attr("readonly", "")
 
-fun AttrsBuilder<HTMLTextAreaElement>.required(value: Boolean = true) =
-    attr("required", if (value) "" else null)
+fun AttrsBuilder<HTMLTextAreaElement>.required() =
+    attr("required", "")
 
 fun AttrsBuilder<HTMLTextAreaElement>.rows(value: Int) =
     attr("rows", value.toString())
@@ -291,10 +291,10 @@ fun AttrsBuilder<HTMLTextAreaElement>.value(value: String): AttrsBuilder<HTMLTex
 
 /* Img attributes */
 
-fun AttrsBuilder<HTMLImageElement>.src(value: String?): AttrsBuilder<HTMLImageElement> =
+fun AttrsBuilder<HTMLImageElement>.src(value: String): AttrsBuilder<HTMLImageElement> =
     attr("src", value)
 
-fun AttrsBuilder<HTMLImageElement>.alt(value: String?): AttrsBuilder<HTMLImageElement> =
+fun AttrsBuilder<HTMLImageElement>.alt(value: String): AttrsBuilder<HTMLImageElement> =
     attr("alt", value)
 
 private val setInputValue: (HTMLInputElement, String) -> Unit = { e, v ->
@@ -302,15 +302,15 @@ private val setInputValue: (HTMLInputElement, String) -> Unit = { e, v ->
 }
 
 /* Img attributes */
-fun AttrsBuilder<HTMLLabelElement>.forId(value: String?): AttrsBuilder<HTMLLabelElement> =
+fun AttrsBuilder<HTMLLabelElement>.forId(value: String): AttrsBuilder<HTMLLabelElement> =
     attr("for", value)
 
 /* Table attributes */
 fun AttrsBuilder<HTMLTableColElement>.span(value: Int): AttrsBuilder<HTMLTableColElement> =
     attr("span", value.toString())
 
-fun AttrsBuilder<HTMLTableCellElement>.scope(value: Scope?): AttrsBuilder<HTMLTableCellElement> =
-    attr("scope", value?.str)
+fun AttrsBuilder<HTMLTableCellElement>.scope(value: Scope): AttrsBuilder<HTMLTableCellElement> =
+    attr("scope", value.str)
 
 fun AttrsBuilder<HTMLTableCellElement>.colspan(value: Int): AttrsBuilder<HTMLTableCellElement> =
     attr("colspan", value.toString())

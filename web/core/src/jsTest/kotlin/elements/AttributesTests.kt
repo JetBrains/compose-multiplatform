@@ -68,7 +68,9 @@ class AttributesTests {
         composition {
             Button(
                 {
-                    disabled(disabled)
+                    if (disabled) {
+                        disabled()
+                    }
                 }
             ) {}
         }
