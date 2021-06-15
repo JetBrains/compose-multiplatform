@@ -369,7 +369,7 @@ class PopupTest {
             Popup {
                 Box(Modifier.fillMaxSize().onSizeChanged { box1Width = it.width })
             }
-            Popup(properties = PopupProperties(useDefaultMaxWidth = true)) {
+            Popup(properties = PopupProperties(usePlatformDefaultWidth = true)) {
                 Box(Modifier.fillMaxSize().onSizeChanged { box2Width = it.width })
             }
         }
