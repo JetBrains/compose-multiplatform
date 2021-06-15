@@ -82,7 +82,7 @@ interface DraggableState {
      * [draggable].
      *
      * This method is used internally for low level operations, allowing implementers of
-     * [DraggableState] influence the consumption as suits them, e.g introduce nested scrolling.
+     * [DraggableState] influence the consumption as suits them, e.g. introduce nested scrolling.
      * Manually dispatching delta via this method will likely result in a bad user experience,
      * you must prefer [drag] method over this one.
      *

@@ -32,7 +32,7 @@ import kotlin.math.abs
 import kotlin.math.atan2
 
 /**
- * A gesture detector for rotationg, panning, and zoom. Once touch slop has been reached, the
+ * A gesture detector for rotation, panning, and zoom. Once touch slop has been reached, the
  * user can use rotation, panning and zoom gestures. [onGesture] will be called when any of the
  * rotation, zoom or pan occurs, passing the rotation angle in degrees, zoom in scale factor and
  * pan as an offset in pixels. Each of these changes is a difference between the previous call
