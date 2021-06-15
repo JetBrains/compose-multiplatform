@@ -93,13 +93,17 @@ class DisposableEffectHolder(
     var effect: (DisposableEffectScope.(Element) -> DisposableEffectResult)? = null
 )
 
+private object DomProvider {
+    private val nodes = mutableMapOf<String, Element>()
+    fun get(name: String) = nodes.getOrPut(name) { document.createElement(name) }
+}
+
+private open class ElementBuilderImplementation<TElement : Element>(private val tagName: String) : ElementBuilder<TElement> {
+    override fun create(): TElement = DomProvider.get(tagName).cloneNode() as TElement
+}
+
 interface ElementBuilder<TElement : Element> {
     fun create(): TElement
-
-    private open class ElementBuilderImplementation<TElement : Element>(private val tagName: String) : ElementBuilder<TElement> {
-        private val el: Element by lazy { document.createElement(tagName) }
-        override fun create(): TElement = el.cloneNode() as TElement
-    }
 
     companion object {
         fun <TElement : Element> createBuilder(tagName: String): ElementBuilder<TElement> {
