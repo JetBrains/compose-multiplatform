@@ -479,15 +479,15 @@ private fun IconsWithTextFieldLayout(
         // on top we offset either by default padding or by label's half height if its too big
         // minWidth must not be set to 0 due to how foundation TextField treats zero minWidth
         val topPadding = max(heightOrZero(labelPlaceable) / 2, bottomPadding)
-        val textContraints = incomingConstraints.offset(
+        val textConstraints = incomingConstraints.offset(
             horizontal = -occupiedSpaceHorizontally,
             vertical = -bottomPadding - topPadding
         ).copy(minHeight = 0)
         val textFieldPlaceable =
-            measurables.first { it.layoutId == TextFieldId }.measure(textContraints)
+            measurables.first { it.layoutId == TextFieldId }.measure(textConstraints)
 
         // measure placeholder
-        val placeholderConstraints = textContraints.copy(minWidth = 0)
+        val placeholderConstraints = textConstraints.copy(minWidth = 0)
         val placeholderPlaceable =
             measurables.find { it.layoutId == PlaceholderId }?.measure(placeholderConstraints)
 

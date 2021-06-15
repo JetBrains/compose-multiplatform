@@ -61,7 +61,7 @@ import kotlin.math.max
  * of the [SnackbarHost] to the [Scaffold]:
  * @sample androidx.compose.material.samples.ScaffoldWithCustomSnackbar
  *
- * @param modifier modifiers for the the Snackbar layout
+ * @param modifier modifiers for the Snackbar layout
  * @param action action / button component to add as an action to the snackbar. Consider using
  * [SnackbarDefaults.primaryActionColor] as the color for the action, if you do not
  * have a predefined color you wish to use instead.
@@ -205,7 +205,7 @@ object SnackbarDefaults {
 
     /**
      * Provides a best-effort 'primary' color to be used as the primary color inside a [Snackbar].
-     * Given that [Snackbar]s have an 'inverted' theme, i.e in a light theme they appear dark, and
+     * Given that [Snackbar]s have an 'inverted' theme, i.e. in a light theme they appear dark, and
      * in a dark theme they appear light, just using [Colors.primary] will not work, and has
      * incorrect contrast.
      *

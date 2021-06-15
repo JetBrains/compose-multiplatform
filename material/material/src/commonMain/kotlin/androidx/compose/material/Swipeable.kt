@@ -485,7 +485,7 @@ fun <T : Any> rememberSwipeableState(
 }
 
 /**
- * Create and [remember] a [SwipeableState] which is kept in sync with another state, i.e:
+ * Create and [remember] a [SwipeableState] which is kept in sync with another state, i.e.:
  *  1. Whenever the [value] changes, the [SwipeableState] will be animated to that new value.
  *  2. Whenever the value of the [SwipeableState] changes (e.g. after a swipe), the owner of the
  *  [value] will be notified to update their state to the new value of the [SwipeableState] by
