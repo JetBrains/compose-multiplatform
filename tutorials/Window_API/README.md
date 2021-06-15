@@ -92,6 +92,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material.Button
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.input.key.Key
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.IntOffset
@@ -103,6 +104,7 @@ import androidx.compose.ui.window.v1.MenuBar
 import java.awt.Color
 import java.awt.image.BufferedImage
 
+@OptIn(ExperimentalComposeUiApi::class)
 fun main() {
     val count = mutableStateOf(0)
     val windowPos = mutableStateOf(IntOffset.Zero)
