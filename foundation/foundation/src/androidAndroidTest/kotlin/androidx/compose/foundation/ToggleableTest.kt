@@ -216,6 +216,52 @@ class ToggleableTest {
     }
 
     @Test
+    fun toggleableTest_toggle_consumedWhenDisabled() {
+        val enabled = mutableStateOf(false)
+        var checked = true
+        val onCheckedChange: (Boolean) -> Unit = { checked = it }
+        var outerChecked = true
+        val outerOnCheckedChange: (Boolean) -> Unit = { outerChecked = it }
+
+        rule.setContent {
+            Box(
+                Modifier.toggleable(
+                    value = outerChecked,
+                    onValueChange = outerOnCheckedChange
+                )
+            ) {
+                BasicText(
+                    "ToggleableText",
+                    modifier = Modifier
+                        .testTag("myToggleable")
+                        .toggleable(
+                            value = checked,
+                            onValueChange = onCheckedChange,
+                            enabled = enabled.value
+                        )
+                )
+            }
+        }
+
+        rule.onNodeWithTag("myToggleable")
+            .performClick()
+
+        rule.runOnIdle {
+            assertThat(checked).isTrue()
+            assertThat(outerChecked).isTrue()
+            enabled.value = true
+        }
+
+        rule.onNodeWithTag("myToggleable")
+            .performClick()
+
+        rule.runOnIdle {
+            assertThat(checked).isFalse()
+            assertThat(outerChecked).isTrue()
+        }
+    }
+
+    @Test
     fun toggleableTest_interactionSource() {
         val interactionSource = MutableInteractionSource()
 
