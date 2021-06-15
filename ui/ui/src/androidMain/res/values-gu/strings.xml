@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- 
+  Copyright 2021 The Android Open Source Project
+
+  Licensed under the Apache License, Version 2.0 (the "License");
+  you may not use this file except in compliance with the License.
+  You may obtain a copy of the License at
+
+       http://www.apache.org/licenses/LICENSE-2.0
+
+  Unless required by applicable law or agreed to in writing, software
+  distributed under the License is distributed on an "AS IS" BASIS,
+  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  See the License for the specific language governing permissions and
+  limitations under the License.
+   -->
+
+<resources xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:xliff="urn:oasis:names:tc:xliff:document:1.2">
+    <string name="indeterminate" msgid="2486394087603402002">"ન ચેક કરેલું કે ન અનચેક કરેલું"</string>
+    <string name="on" msgid="8655164131929253426">"ચાલુ છે"</string>
+    <string name="off" msgid="875452955155264703">"બંધ છે"</string>
+    <string name="selected" msgid="6043586758067023">"પસંદગી કરી"</string>
+    <string name="not_selected" msgid="6610465462668679431">"પસંદગી કરી નથી"</string>
+    <string name="template_percent" msgid="5946805113151406391">"<xliff:g id="PERCENTAGE">%1$d</xliff:g> ટકા."</string>
+    <string name="in_progress" msgid="6827826412747255547">"પ્રક્રિયામાં છે"</string>
+    <string name="tab" msgid="1672349317127674378">"ટૅબ"</string>
+    <string name="navigation_menu" msgid="542007171693138492">"નૅવિગેશન મેનૂ"</string>
+    <string name="close_drawer" msgid="406453423630273620">"નૅવિગેશન મેનૂ બંધ કરો"</string>
+    <string name="close_sheet" msgid="7573152094250666567">"શીટ બંધ કરો"</string>
+    <string name="default_error_message" msgid="8038256446254964252">"અમાન્ય ઇનપુટ"</string>
+</resources>
