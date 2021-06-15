@@ -16,6 +16,10 @@ repositories {
     mavenCentral()
 }
 
+dependencies {
+    implementation("org.jetbrains.compose:preview-rpc")
+}
+
 intellij {
     pluginName = "Compose Multiplatform IDE Support"
     type = properties("platform.type")
@@ -57,5 +61,10 @@ tasks {
     runPluginVerifier {
         ideVersions(properties("plugin.verifier.ide.versions"))
         downloadDirectory("${project.buildDir}/pluginVerifier/ides")
+    }
+
+    runIde {
+        val gradleComponents = gradle.includedBuild("compose-gradle-components")
+        dependsOn(gradleComponents.task(":publishToMavenLocal"))
     }
 }

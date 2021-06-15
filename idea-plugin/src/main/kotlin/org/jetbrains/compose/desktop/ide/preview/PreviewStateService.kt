@@ -7,108 +7,51 @@ package org.jetbrains.compose.desktop.ide.preview
 
 import com.intellij.openapi.Disposable
 import com.intellij.openapi.components.Service
-import com.intellij.openapi.project.Project
-import com.intellij.openapi.util.Disposer
-import com.intellij.openapi.wm.ToolWindowManager
-import org.jetbrains.compose.desktop.ide.preview.remote.PreviewClient
-import org.jetbrains.compose.desktop.ide.preview.remote.PreviewProcessBuilder
-import org.jetbrains.compose.desktop.ide.preview.remote.PreviewState
-import org.jetbrains.compose.desktop.ide.preview.remote.PreviewStateUpdaterListener
-import java.io.*
-import java.net.InetAddress.getByName
-import java.net.ServerSocket
-import java.util.concurrent.atomic.AtomicBoolean
-import javax.swing.JPanel
-import javax.swing.SwingUtilities
-import kotlin.concurrent.thread
+import org.jetbrains.compose.desktop.ui.tooling.preview.rpc.PreviewManager
+import org.jetbrains.compose.desktop.ui.tooling.preview.rpc.PreviewManagerImpl
+import java.io.ByteArrayInputStream
+import javax.imageio.ImageIO
+import javax.swing.JComponent
+import javax.swing.event.AncestorEvent
+import javax.swing.event.AncestorListener
 
 @Service
-class PreviewStateService(private val myProject: Project) : Disposable {
-    private val isAlive = AtomicBoolean(true)
-    private var preview: PreviewClient? = null
-
-    // todo: handle ipv6
-    private val gradleCallbackSocket =
-        ServerSocket(0, 0, getByName("127.0.0.1"))
-            .apply { reuseAddress = true }
-
-    val gradleCallbackPort: Int
-        get() = gradleCallbackSocket.localPort
-
-    private val gradleCallbackThread = thread {
-        while (isAlive.get()) {
-            // todo: catch interrupted?
-            gradleCallbackSocket.accept().getInputStream().use { ins ->
-                ins.reader().buffered().use { reader ->
-                    val javaHome = reader.readLine()
-                    val serverCP = reader.readLine()
-                    val target = reader.readLine()
-                    val cp = reader.readLine()
-
-                    synchronized(this@PreviewStateService) {
-                        preview?.let { Disposer.dispose(it) }
-                        preview = PreviewProcessBuilder(
-                            File(javaHome),
-                            serverCP,
-                            target,
-                            cp
-                        ).start()
-
-                        Disposer.register(this@PreviewStateService, preview!!)
-
-                        // todo: Show after getting first screenshot
-                        SwingUtilities.invokeLater {
-                            ToolWindowManager.getInstance(myProject)
-                                .getToolWindow("Desktop Preview")
-                                ?.let { it.activate {} }
-                        }
-                    }
-                }
-            }
+class PreviewStateService : Disposable {
+    private var myPanel: PreviewPanel? = null
+    private val previewManager: PreviewManager = PreviewManagerImpl { frameBytes ->
+        ByteArrayInputStream(frameBytes).use { input ->
+            val image = ImageIO.read(input)
+            myPanel?.previewImage(image)
         }
     }
+    val gradleCallbackPort: Int
+        get() = previewManager.gradleCallbackPort
 
-    private val idePreviewState = PreviewState()
-    private val idePreviewStateUpdater = PreviewStateUpdaterListener(idePreviewState)
+    private val myListener = object : AncestorListener {
+        private fun updateFrameSize(c: JComponent) {
+            previewManager.updateFrameSize(c.width, c.height)
+        }
 
-    private val stateSyncThread = thread {
-        while (isAlive.get()) {
-            try {
-                Thread.sleep(16)
-                preview?.syncState(idePreviewState)
-            } catch (e: InterruptedException) {
-            }
+        override fun ancestorAdded(event: AncestorEvent) {
+            updateFrameSize(event.component)
+        }
+
+        override fun ancestorRemoved(event: AncestorEvent) {
+        }
+
+        override fun ancestorMoved(event: AncestorEvent) {
+            updateFrameSize(event.component)
         }
     }
 
     override fun dispose() {
-        isAlive.set(false)
-
-        // todo: correct
-        gradleCallbackThread.join(1000)
-        if (gradleCallbackThread.isAlive) {
-            gradleCallbackThread.interrupt()
-        }
-        gradleCallbackSocket.close()
-
-        stateSyncThread.join(1000)
-        if (stateSyncThread.isAlive) {
-            stateSyncThread.interrupt()
-        }
+        myPanel?.removeAncestorListener(myListener)
+        previewManager.close()
     }
 
-    fun registerPreviewPanel(panel: JPanel) {
-        val window = SwingUtilities.getWindowAncestor(panel)
-        Disposer.register(this) {
-            panel.removeAncestorListener(idePreviewStateUpdater)
-            window.removeWindowFocusListener(idePreviewStateUpdater)
-        }
-
-        panel.addAncestorListener(idePreviewStateUpdater)
-        idePreviewState.updatePreviewPanelState(panel)
-
-        window.addWindowFocusListener(idePreviewStateUpdater)
-        idePreviewState.updateIdeWindowState(window)
+    internal fun registerPreviewPanel(panel: PreviewPanel) {
+        myPanel = panel
+        panel.addAncestorListener(myListener)
     }
 }
 

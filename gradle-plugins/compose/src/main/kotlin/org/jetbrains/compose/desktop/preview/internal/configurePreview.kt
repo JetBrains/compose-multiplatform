@@ -12,7 +12,7 @@ fun Project.initializePreview() {
 internal fun AbstractConfigureDesktopPreviewTask.configureConfigureDesktopPreviewTask(app: Application) {
     app._configurationSource?.let { configSource ->
         dependsOn(configSource.jarTaskName)
-        classpath = configSource.runtimeClasspath(project)
+        previewClasspath = configSource.runtimeClasspath(project)
         javaHome.set(provider { app.javaHomeOrDefault() })
         jvmArgs.set(provider { app.jvmArgs })
     }

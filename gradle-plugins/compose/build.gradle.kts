@@ -35,6 +35,8 @@ dependencies {
     compileOnly(localGroovy())
     compileOnly(kotlin("gradle-plugin-api"))
     compileOnly(kotlin("gradle-plugin"))
+    implementation(project(":preview-rpc"))
+
     testImplementation(gradleTestKit())
     testImplementation(platform("org.junit:junit-bom:5.7.0"))
     testImplementation("org.junit.jupiter:junit-jupiter")
@@ -97,22 +99,13 @@ fun testGradleVersion(gradleVersion: String) {
     }
 }
 
+configureJUnit()
+
 tasks.withType<Test>().configureEach {
-    useJUnitPlatform()
-    testLogging {
-        events("passed", "skipped", "failed")
-    }
+    configureJavaForComposeTest()
 
     dependsOn("publishToMavenLocal")
     systemProperty("compose.plugin.version", BuildProperties.deployVersion(project))
-
-    if (javaHomeForTests != null) {
-        val executableFileName = if (isWindows) "java.exe" else "java"
-        executable = File(javaHomeForTests).resolve("bin/$executableFileName").absolutePath
-    } else {
-        doFirst { error("Use JDK 15+ to run tests or set up JDK_15/JDK_FOR_GRADLE_TESTS env. var") }
-    }
-
 }
 
 task("printAllAndroidxReplacements") {

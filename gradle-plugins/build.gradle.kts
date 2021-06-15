@@ -115,3 +115,9 @@ fun Project.configureGradlePlugin(
         }
     }
 }
+
+tasks.register("publishToMavenLocal") {
+    for (subproject in subprojects) {
+        dependsOn(subproject.tasks.named("publishToMavenLocal"))
+    }
+}

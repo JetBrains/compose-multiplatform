@@ -9,8 +9,6 @@ import com.intellij.openapi.project.DumbAware
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.wm.ToolWindow
 import com.intellij.openapi.wm.ToolWindowFactory
-import java.awt.Canvas
-import javax.swing.JPanel
 
 class PreviewToolWindow : ToolWindowFactory, DumbAware {
     override fun isApplicable(project: Project): Boolean {
@@ -20,9 +18,7 @@ class PreviewToolWindow : ToolWindowFactory, DumbAware {
 
     override fun createToolWindowContent(project: Project, toolWindow: ToolWindow) {
         toolWindow.contentManager.let { content ->
-            val panel = JPanel()
-            val canvas = Canvas()
-            panel.add(canvas)
+            val panel = PreviewPanel()
             content.addContent(content.factory.createContent(panel, null, false))
             project.service<PreviewStateService>().registerPreviewPanel(panel)
         }
