@@ -1,0 +1,9 @@
+[submodule "compose/frameworks/support"]
+	path = compose/frameworks/support
+	url = https://github.com/JetBrains/androidx
+[submodule "compose/golden"]
+	path = compose/golden
+	url = https://android.googlesource.com/platform/frameworks/support-golden
+[submodule "compose/external/doclava"]
+	path = compose/external/doclava
+	url = https://android.googlesource.com/platform/external/doclava

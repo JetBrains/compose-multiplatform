@@ -1,0 +1,48 @@
+#!/bin/bash
+
+cd "$(dirname "$0")"
+
+clone() {
+    mkdir -p $1
+    pushd $1
+    git init
+    git config advice.detachedHead false
+    git fetch --depth=1 $2 $3
+    git checkout FETCH_HEAD
+    popd
+}
+
+downloadLinuxSDK() {
+    clone ../prebuilts/fullsdk-linux/platforms/android-30 https://android.googlesource.com/platform/prebuilts/fullsdk/platforms/android-30 master
+    clone ../prebuilts/fullsdk-linux/sources/android-30 https://android.googlesource.com/platform/prebuilts/fullsdk/sources/android-30 master
+    clone ../prebuilts/fullsdk-linux/ndk https://android.googlesource.com/toolchain/prebuilts/ndk/r21 master
+    clone ../prebuilts/fullsdk-linux/build-tools/30.0.2 https://android.googlesource.com/platform/prebuilts/fullsdk-linux/build-tools/30.0.2 master
+    clone ../prebuilts/fullsdk-linux/platform-tools https://android.googlesource.com/platform/prebuilts/fullsdk-linux/platform-tools master
+    clone ../prebuilts/fullsdk-linux/tools https://android.googlesource.com/platform/prebuilts/fullsdk-linux/tools master
+    clone ../prebuilts/fullsdk-linux/cmake https://android.googlesource.com/platform/prebuilts/cmake/linux-x86 de5fa1c66d3bdcbf2bbc62d2504ec6b0b0fb74e1
+}
+
+downloadMacOsSDK() {
+    clone ../prebuilts/fullsdk-darwin/platforms/android-30 https://android.googlesource.com/platform/prebuilts/fullsdk/platforms/android-30 master
+    clone ../prebuilts/fullsdk-darwin/sources/android-30 https://android.googlesource.com/platform/prebuilts/fullsdk/sources/android-30 master
+    clone ../prebuilts/fullsdk-darwin/ndk https://android.googlesource.com/toolchain/prebuilts/ndk-darwin/r21 master
+    clone ../prebuilts/fullsdk-darwin/build-tools/30.0.2 https://android.googlesource.com/platform/prebuilts/fullsdk-darwin/build-tools/30.0.2 master
+    clone ../prebuilts/fullsdk-darwin/platform-tools https://android.googlesource.com/platform/prebuilts/fullsdk-darwin/platform-tools master
+    clone ../prebuilts/fullsdk-darwin/tools https://android.googlesource.com/platform/prebuilts/fullsdk-darwin/tools master
+    clone ../prebuilts/fullsdk-darwin/cmake https://android.googlesource.com/platform/prebuilts/cmake/darwin-x86 de5fa1c66d3bdcbf2bbc62d2504ec6b0b0fb74e1
+}
+
+if [[ "$OSTYPE" == "linux-gnu"* ]]; then
+    downloadLinuxSDK
+elif [[ "$OSTYPE" == "darwin"* ]]; then
+    downloadMacOsSDK
+elif [[ "$OSTYPE" == "cygwin" ]]; then
+    echo "Please download Android SDK manually (https://developer.android.com/studio)"
+elif [[ "$OSTYPE" == "msys" ]]; then
+    echo "Please download Android SDK manually (https://developer.android.com/studio)"
+elif [[ "$OSTYPE" == "win32" ]]; then
+    echo "Please download Android SDK manually (https://developer.android.com/studio)"
+else
+    echo "Unknown OS"
+fi
+
