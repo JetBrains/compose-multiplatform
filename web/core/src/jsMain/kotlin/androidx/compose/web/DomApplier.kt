@@ -40,8 +40,6 @@ class DomApplier(
 }
 
 open class DomNodeWrapper(open val node: Node) {
-    constructor(tag: String) : this(document.createElement(tag))
-
     private var currentListeners = emptyList<WrappedEventListener<*>>()
 
     fun updateEventListeners(list: List<WrappedEventListener<*>>) {
