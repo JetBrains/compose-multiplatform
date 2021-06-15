@@ -10,6 +10,13 @@ pluginManagement {
         maven {
             url = uri("https://packages.jetbrains.team/maven/p/ui/dev")
         }
+
+        maven("https://maven.pkg.jetbrains.space/kotlin/p/kotlin/dev/")
+    }
+
+    plugins {
+        id("com.chromaticnoise.multiplatform-swiftpackage") version "2.0.3"
+        kotlin("native.cocoapods") version "1.5.10"
     }
 
     resolutionStrategy {

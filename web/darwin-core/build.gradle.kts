@@ -3,11 +3,30 @@ import org.jetbrains.kotlin.gradle.plugin.KotlinSourceSet
 plugins {
     kotlin("multiplatform")
     id("org.jetbrains.compose")
+    kotlin("native.cocoapods")
 }
 
 kotlin {
+    val onPhone = System.getenv("SDK_NAME")?.startsWith("iphoneos") ?: false
+    if (onPhone) {
+        iosArm64("darwin")
+    } else {
+        iosX64("darwin")
+    }
 
-    iosX64("darwin")
+    cocoapods {
+        summary = "Example of Kotlin Gradle Plugin Playground"
+        homepage = "https://github.com/touchlab/CompilerPluginPlayground"
+    }
+
+    // iosX64("darwin") {
+    //     binaries {
+    //         this.staticLib {
+    //             baseName = "PlaygroundExampleKit"
+    //             // embedBitcode = org.jetbrains.kotlin.gradle.plugin.mpp.Framework.BitcodeEmbeddingMode.DISABLE
+    //         }
+    //     }
+    // }
 //    val knTargets = listOf(
 //        iosX64()
 //    )
@@ -17,6 +36,10 @@ kotlin {
             dependencies {
                 implementation(compose.runtime)
                 implementation(kotlin("stdlib-common"))
+
+                implementation( "org.jetbrains.kotlinx:kotlinx-coroutines-core") {
+                    version { strictly("1.4.3-native-mt") }
+                }
             }
         }
 
@@ -55,7 +78,16 @@ kotlin {
             }
         }*/
     }
+
 }
 
 typealias SourceSets = NamedDomainObjectContainer<KotlinSourceSet>
 fun SourceSets.getOrCreate(name: String): KotlinSourceSet = findByName(name) ?: create(name)
+
+tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinNativeCompile> {
+    kotlinOptions {
+        freeCompilerArgs += listOf(
+            "-P", "plugin:androidx.compose.compiler.plugins.kotlin:suppressKotlinVersionCompatibilityCheck=true"
+        )
+    }
+}
