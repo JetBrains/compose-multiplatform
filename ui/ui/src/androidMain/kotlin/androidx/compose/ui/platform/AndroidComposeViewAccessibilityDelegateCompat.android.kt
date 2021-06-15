@@ -555,7 +555,10 @@ internal class AndroidComposeViewAccessibilityDelegateCompat(val view: AndroidCo
                 SemanticsProperties.ContentDescription
             )
             if (contentDescription.isNullOrEmpty() &&
-                semanticsNode.unmergedConfig.contains(SemanticsActions.GetTextLayoutResult)
+                semanticsNode.unmergedConfig.contains(SemanticsActions.GetTextLayoutResult) &&
+                // Talkback does not handle below granularities for text field (which includes
+                // label/hint) when text field is not in focus
+                !semanticsNode.excludeLineAndPageGranularities()
             ) {
                 info.movementGranularities = info.movementGranularities or
                     AccessibilityNodeInfoCompat.MOVEMENT_GRANULARITY_LINE or
@@ -2290,6 +2293,23 @@ private fun SemanticsNode.propertiesDeleted(
 private fun SemanticsNode.hasPaneTitle() = config.contains(SemanticsProperties.PaneTitle)
 private val SemanticsNode.isPassword: Boolean get() = config.contains(SemanticsProperties.Password)
 private val SemanticsNode.isTextField get() = this.unmergedConfig.contains(SemanticsActions.SetText)
+
+private fun SemanticsNode.excludeLineAndPageGranularities(): Boolean {
+    // text field that is not in focus
+    if (isTextField && unmergedConfig.getOrNull(SemanticsProperties.Focused) != true) return true
+
+    // text nodes that are part of the 'merged' text field, for example hint or label.
+    val ancestor = layoutNode.findClosestParentNode {
+        // looking for text field merging node
+        val ancestorSemanticsConfiguration = it.outerSemantics?.collapsedSemanticsConfiguration()
+        ancestorSemanticsConfiguration?.isMergingSemanticsOfDescendants == true &&
+            ancestorSemanticsConfiguration.contains(SemanticsActions.SetText)
+    }
+    return ancestor != null &&
+        ancestor.outerSemantics
+        ?.collapsedSemanticsConfiguration()
+        ?.getOrNull(SemanticsProperties.Focused) != true
+}
 
 private fun AccessibilityAction<*>.accessibilityEquals(other: Any?): Boolean {
     if (this === other) return true

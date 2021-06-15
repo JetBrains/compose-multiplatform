@@ -427,7 +427,7 @@ class AndroidComposeViewAccessibilityDelegateCompatTest {
     }
 
     @Test
-    fun testPopulateAccessibilityNodeInfoProperties_EditText() {
+    fun testPopulateAccessibilityNodeInfoProperties_textField() {
         val setSelectionActionLabel = "setSelection"
         val setTextActionLabel = "setText"
         val text = "hello"
@@ -477,6 +477,26 @@ class AndroidComposeViewAccessibilityDelegateCompatTest {
                     .ACTION_PREVIOUS_AT_MOVEMENT_GRANULARITY
             )
         )
+        if (Build.VERSION.SDK_INT >= 26) {
+            assertEquals(
+                listOf(AccessibilityNodeInfo.EXTRA_DATA_TEXT_CHARACTER_LOCATION_KEY),
+                info.unwrap().availableExtraData
+            )
+        }
+    }
+
+    @Test
+    fun testMovementGranularities_textField_focused() {
+        val semanticsNode = createSemanticsNodeWithProperties(1, true) {
+            this.text = AnnotatedString("text")
+            this.textSelectionRange = TextRange(1)
+            this.focused = true
+            getTextLayoutResult { true }
+            setText { true }
+            setSelection { _, _, _ -> true }
+        }
+        accessibilityDelegate.populateAccessibilityNodeInfoProperties(1, info, semanticsNode)
+
         assertEquals(
             AccessibilityNodeInfoCompat.MOVEMENT_GRANULARITY_CHARACTER or
                 AccessibilityNodeInfoCompat.MOVEMENT_GRANULARITY_WORD or
@@ -485,12 +505,25 @@ class AndroidComposeViewAccessibilityDelegateCompatTest {
                 AccessibilityNodeInfoCompat.MOVEMENT_GRANULARITY_PAGE,
             info.movementGranularities
         )
-        if (Build.VERSION.SDK_INT >= 26) {
-            assertEquals(
-                listOf(AccessibilityNodeInfo.EXTRA_DATA_TEXT_CHARACTER_LOCATION_KEY),
-                info.unwrap().availableExtraData
-            )
+    }
+
+    @Test
+    fun testMovementGranularities_textField_notFocused() {
+        val semanticsNode = createSemanticsNodeWithProperties(1, true) {
+            this.text = AnnotatedString("text")
+            this.textSelectionRange = TextRange(1)
+            getTextLayoutResult { true }
+            setText { true }
+            setSelection { _, _, _ -> true }
         }
+        accessibilityDelegate.populateAccessibilityNodeInfoProperties(1, info, semanticsNode)
+
+        assertEquals(
+            AccessibilityNodeInfoCompat.MOVEMENT_GRANULARITY_CHARACTER or
+                AccessibilityNodeInfoCompat.MOVEMENT_GRANULARITY_WORD or
+                AccessibilityNodeInfoCompat.MOVEMENT_GRANULARITY_PARAGRAPH,
+            info.movementGranularities
+        )
     }
 
     @Test

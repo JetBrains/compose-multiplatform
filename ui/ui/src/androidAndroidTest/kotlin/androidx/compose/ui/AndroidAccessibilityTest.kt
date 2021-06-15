@@ -445,14 +445,6 @@ class AndroidAccessibilityTest {
                 )
             )
         )
-        assertEquals(
-            AccessibilityNodeInfo.MOVEMENT_GRANULARITY_CHARACTER or
-                AccessibilityNodeInfo.MOVEMENT_GRANULARITY_WORD or
-                AccessibilityNodeInfo.MOVEMENT_GRANULARITY_PARAGRAPH or
-                AccessibilityNodeInfo.MOVEMENT_GRANULARITY_LINE or
-                AccessibilityNodeInfo.MOVEMENT_GRANULARITY_PAGE,
-            accessibilityNodeInfo.movementGranularities
-        )
         if (Build.VERSION.SDK_INT >= 26) {
             assertEquals(
                 listOf(AccessibilityNodeInfo.EXTRA_DATA_TEXT_CHARACTER_LOCATION_KEY),
