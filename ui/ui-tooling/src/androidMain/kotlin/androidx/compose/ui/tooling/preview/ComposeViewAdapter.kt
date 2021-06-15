@@ -25,6 +25,13 @@ import android.os.Bundle
 import android.util.AttributeSet
 import android.util.Log
 import android.widget.FrameLayout
+import androidx.activity.OnBackPressedDispatcher
+import androidx.activity.OnBackPressedDispatcherOwner
+import androidx.activity.compose.LocalActivityResultRegistryOwner
+import androidx.activity.compose.LocalOnBackPressedDispatcherOwner
+import androidx.activity.result.ActivityResultRegistry
+import androidx.activity.result.ActivityResultRegistryOwner
+import androidx.activity.result.contract.ActivityResultContract
 import androidx.annotation.VisibleForTesting
 import androidx.compose.animation.core.InternalAnimationApi
 import androidx.compose.animation.core.Transition
@@ -49,6 +56,7 @@ import androidx.compose.ui.tooling.data.asTree
 import androidx.compose.ui.tooling.preview.animation.PreviewAnimationClock
 import androidx.compose.ui.tooling.preview.CommonPreviewUtils.invokeComposableViaReflection
 import androidx.compose.ui.unit.IntRect
+import androidx.core.app.ActivityOptionsCompat
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleRegistry
 import androidx.lifecycle.ViewModelStoreOwner
@@ -479,7 +487,11 @@ internal class ComposeViewAdapter : FrameLayout {
         // We need to replace the FontResourceLoader to avoid using ResourcesCompat.
         // ResourcesCompat can not load fonts within Layoutlib and, since Layoutlib always runs
         // the latest version, we do not need it.
-        CompositionLocalProvider(LocalFontLoader provides LayoutlibFontResourceLoader(context)) {
+        CompositionLocalProvider(
+            LocalFontLoader provides LayoutlibFontResourceLoader(context),
+            LocalOnBackPressedDispatcherOwner provides FakeOnBackPressedDispatcherOwner,
+            LocalActivityResultRegistryOwner provides FakeActivityResultRegistryOwner,
+        ) {
             Inspectable(slotTableRecord, content)
         }
     }
@@ -677,5 +689,27 @@ internal class ComposeViewAdapter : FrameLayout {
 
     private val FakeViewModelStoreOwner = ViewModelStoreOwner {
         throw IllegalStateException("ViewModels creation is not supported in Preview")
+    }
+
+    private val FakeOnBackPressedDispatcherOwner = object : OnBackPressedDispatcherOwner {
+        private val onBackPressedDispatcher = OnBackPressedDispatcher()
+
+        override fun getOnBackPressedDispatcher() = onBackPressedDispatcher
+        override fun getLifecycle() = FakeSavedStateRegistryOwner.lifecycle
+    }
+
+    private val FakeActivityResultRegistryOwner = object : ActivityResultRegistryOwner {
+        private val activityResultRegistry = object : ActivityResultRegistry() {
+            override fun <I : Any?, O : Any?> onLaunch(
+                requestCode: Int,
+                contract: ActivityResultContract<I, O>,
+                input: I,
+                options: ActivityOptionsCompat?
+            ) {
+                throw IllegalStateException("Calling launch() is not supported in Preview")
+            }
+        }
+
+        override fun getActivityResultRegistry(): ActivityResultRegistry = activityResultRegistry
     }
 }
