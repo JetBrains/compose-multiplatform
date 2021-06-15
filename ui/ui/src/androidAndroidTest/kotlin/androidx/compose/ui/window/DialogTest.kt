@@ -291,7 +291,7 @@ class DialogTest {
             }
             Dialog(
                 onDismissRequest = {},
-                properties = DialogProperties(useDefaultMaxWidth = true)
+                properties = DialogProperties(usePlatformDefaultWidth = true)
             ) {
                 Box(Modifier.fillMaxSize().onSizeChanged { box2Width = it.width })
             }

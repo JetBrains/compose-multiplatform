@@ -65,7 +65,7 @@ class AlertDialogScreenshotTest {
                         Text("Dismiss")
                     }
                 },
-                properties = DialogProperties(useDefaultMaxWidth = true)
+                properties = DialogProperties(usePlatformDefaultWidth = true)
             )
         }
 
@@ -91,7 +91,7 @@ class AlertDialogScreenshotTest {
                         Text("Very long dismiss button")
                     }
                 },
-                properties = DialogProperties(useDefaultMaxWidth = true)
+                properties = DialogProperties(usePlatformDefaultWidth = true)
             )
         }
 
@@ -111,7 +111,7 @@ class AlertDialogScreenshotTest {
                         Text("Ok")
                     }
                 },
-                properties = DialogProperties(useDefaultMaxWidth = true)
+                properties = DialogProperties(usePlatformDefaultWidth = true)
             )
         }
 
@@ -131,7 +131,7 @@ class AlertDialogScreenshotTest {
                         Text("Ok")
                     }
                 },
-                properties = DialogProperties(useDefaultMaxWidth = true)
+                properties = DialogProperties(usePlatformDefaultWidth = true)
             )
         }
 
@@ -150,7 +150,7 @@ class AlertDialogScreenshotTest {
                         Text("Ok")
                     }
                 },
-                properties = DialogProperties(useDefaultMaxWidth = true)
+                properties = DialogProperties(usePlatformDefaultWidth = true)
             )
         }
 
@@ -175,7 +175,7 @@ class AlertDialogScreenshotTest {
                         Text("Ok")
                     }
                 },
-                properties = DialogProperties(useDefaultMaxWidth = true)
+                properties = DialogProperties(usePlatformDefaultWidth = true)
             )
         }
 
@@ -201,7 +201,7 @@ class AlertDialogScreenshotTest {
                         Text("Ok")
                     }
                 },
-                properties = DialogProperties(useDefaultMaxWidth = true)
+                properties = DialogProperties(usePlatformDefaultWidth = true)
             )
         }
 
@@ -232,7 +232,7 @@ class AlertDialogScreenshotTest {
                         Text("Ok")
                     }
                 },
-                properties = DialogProperties(useDefaultMaxWidth = true)
+                properties = DialogProperties(usePlatformDefaultWidth = true)
             )
         }
 
