@@ -230,6 +230,8 @@ fun Modifier.pointerInput(
 
 private val DownChangeConsumed = ConsumedData(downChange = true)
 
+private val EmptyPointerEvent = PointerEvent(emptyList())
+
 /**
  * Implementation notes:
  * This class does a lot of lifting. It is both a [PointerInputModifier] and that modifier's
@@ -256,7 +258,7 @@ internal class SuspendingPointerInputFilter(
     override val pointerInputFilter: PointerInputFilter
         get() = this
 
-    private var currentEvent: PointerEvent? = null
+    private var currentEvent: PointerEvent = EmptyPointerEvent
 
     /**
      * Actively registered input handlers from currently ongoing calls to [awaitPointerEventScope].
@@ -416,9 +418,7 @@ internal class SuspendingPointerInputFilter(
         private var awaitPass: PointerEventPass = PointerEventPass.Main
 
         override val currentEvent: PointerEvent
-            get() = checkNotNull(this@SuspendingPointerInputFilter.currentEvent) {
-                "cannot access currentEvent outside of input dispatch"
-            }
+            get() = this@SuspendingPointerInputFilter.currentEvent
         override val size: IntSize
             get() = this@SuspendingPointerInputFilter.boundsSize
         override val viewConfiguration: ViewConfiguration
