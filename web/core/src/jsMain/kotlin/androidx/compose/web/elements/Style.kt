@@ -16,41 +16,13 @@ import org.jetbrains.compose.web.css.*
  * @param rulesBuild allows to define the style rules using [StyleSheetBuilder]
  */
 @Composable
-inline fun Style(
-    crossinline applyAttrs: AttrsBuilder<HTMLStyleElement>.() -> Unit = {},
+fun Style(
+    applyAttrs: AttrsBuilder<HTMLStyleElement>.() -> Unit = {},
     rulesBuild: StyleSheetBuilder.() -> Unit
 ) {
     val builder = StyleSheetBuilderImpl()
     builder.rulesBuild()
     Style(applyAttrs, builder.cssRules)
-}
-
-/**
- * Use this function to mount the <style> tag into the DOM tree.
- *
- * @param cssRules - is a list of style rules.
- * Usually, it's [org.jetbrains.compose.web.css.StyleSheet] instance
- */
-@Composable
-inline fun Style(
-    crossinline applyAttrs: AttrsBuilder<HTMLStyleElement>.() -> Unit = {},
-    cssRules: CSSRuleDeclarationList
-) {
-    TagElement(
-        elementBuilder = ElementBuilder.Style,
-        applyAttrs = {
-            applyAttrs()
-        },
-    ) {
-        DomSideEffect(cssRules) { style ->
-            style.sheet?.let { sheet ->
-                setCSSRules(sheet, cssRules)
-                onDispose {
-                    clearCSSRules(sheet)
-                }
-            }
-        }
-    }
 }
 
 fun clearCSSRules(sheet: StyleSheet) {
