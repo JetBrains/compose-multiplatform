@@ -15,7 +15,10 @@
  */
 
 // Ignore lint warnings in documentation snippets
-@file:Suppress("CanBeVal", "UNUSED_VARIABLE", "RemoveExplicitTypeArguments", "unused")
+@file:Suppress(
+    "CanBeVal", "UNUSED_VARIABLE", "RemoveExplicitTypeArguments", "unused",
+    "MemberVisibilityCanBePrivate"
+)
 @file:SuppressLint("ModifierInspectorInfo", "NewApi")
 
 package androidx.compose.integration.docs.animation
@@ -95,6 +98,7 @@ import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.input.pointer.positionChange
 import androidx.compose.ui.input.pointer.util.VelocityTracker
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.test.captureToImage
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onRoot
@@ -128,11 +132,12 @@ fun AnimatedVisibilitySimple() {
 @Composable
 fun AnimatedVisibilityWithEnterAndExit() {
     var visible by remember { mutableStateOf(true) }
+    val density = LocalDensity.current
     AnimatedVisibility(
         visible = visible,
         enter = slideInVertically(
-            // Slide in from 40 px from the top.
-            initialOffsetY = { -40 }
+            // Slide in from 40 dp from the top.
+            initialOffsetY = { with(density) { -40.dp.roundToPx() } }
         ) + expandVertically(
             // Expand from the top.
             expandFrom = Alignment.Top
@@ -477,13 +482,15 @@ object GestureAndAnimationSwipeToDismiss {
     ): Modifier = composed {
         val offsetX = remember { Animatable(0f) }
         pointerInput(Unit) {
+            // Used to calculate fling decay.
             val decay = splineBasedDecay<Float>(this)
+            // Use suspend functions for touch events and the Animatable.
             coroutineScope {
                 while (true) {
                     // Detect a touch down event.
                     val pointerId = awaitPointerEventScope { awaitFirstDown().id }
                     val velocityTracker = VelocityTracker()
-                    // Intercept an ongoing animation (if there's one).
+                    // Stop any ongoing animation.
                     offsetX.stop()
                     awaitPointerEventScope {
                         horizontalDrag(pointerId) { change ->
@@ -499,6 +506,7 @@ object GestureAndAnimationSwipeToDismiss {
                             )
                         }
                     }
+                    // No longer receiving touch events. Prepare the animation.
                     val velocity = velocityTracker.calculateVelocity().x
                     val targetOffsetX = decay.calculateTargetValue(
                         offsetX.value,
