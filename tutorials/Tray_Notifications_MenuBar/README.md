@@ -165,6 +165,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.input.key.Key
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.window.v1.KeyStroke
@@ -172,10 +173,11 @@ import androidx.compose.ui.window.v1.MenuItem
 import androidx.compose.ui.window.v1.Menu
 import androidx.compose.ui.window.v1.MenuBar
 
+@OptIn(ExperimentalComposeUiApi::class)
 fun main() {
     // To use Apple global menu.
     System.setProperty("apple.laf.useScreenMenuBar", "true")
-    
+
     val action = mutableStateOf("Last action: None")
 
     AppManager.setMenu(
@@ -234,6 +236,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material.Button
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.input.key.Key
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.window.v1.KeyStroke
@@ -243,6 +246,7 @@ import androidx.compose.ui.window.v1.MenuBar
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.IntSize
 
+@OptIn(ExperimentalComposeUiApi::class)
 fun main() {
     // To use Apple global menu.
     System.setProperty("apple.laf.useScreenMenuBar", "true")
