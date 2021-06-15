@@ -40,6 +40,12 @@ import androidx.compose.ui.unit.Constraints
  * Note that if you provide a non-zero [shadowElevation] and if the passed [shape] is concave the
  * shadow will not be drawn on Android versions less than 10.
  *
+ * Also note that alpha values less than 1.0f will have their contents implicitly clipped to their
+ * bounds. This is because an intermediate compositing layer is created to render contents into
+ * first before being drawn into the destination with the desired alpha.
+ * This layer is sized to the bounds of the composable this modifier is configured on, and contents
+ * outside of these bounds are omitted.
+ *
  * If the layer parameters are backed by a [androidx.compose.runtime.State] or an animated value
  * prefer an overload with a lambda block on [GraphicsLayerScope] as reading a state inside the block
  * will only cause the layer properties update without triggering recomposition and relayout.
