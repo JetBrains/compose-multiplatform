@@ -74,7 +74,7 @@ fun CodeSampleSwitcher(count: Int, current: Int, onSelect: (Int) -> Unit) {
             Input(type = InputType.Radio, value = "snippet$ix", attrs = {
                 name("code-snippet")
                 id("snippet$ix")
-                if (current == ix) checked(true)
+                if (current == ix) checked()
                 onRadioInput { onSelect(ix) }
             })
             Label(forId = "snippet$ix") { Text("${ix + 1}") }

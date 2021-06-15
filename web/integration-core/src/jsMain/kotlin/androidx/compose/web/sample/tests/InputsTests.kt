@@ -49,7 +49,9 @@ class InputsTests {
             type = InputType.Checkbox,
             attrs = {
                 id("checkbox")
-                checked(checked)
+                if (checked) {
+                    checked()
+                }
                 onCheckboxInput {
                     checked = !checked
                 }
