@@ -70,7 +70,11 @@ internal class TextInputServiceAndroid(
     private val layoutListener = ViewTreeObserver.OnGlobalLayoutListener {
         // focusedRect is null if there is not ongoing text input session. So safe to request
         // latest focused rectangle whenever global layout has changed.
-        focusedRect?.let { view.requestRectangleOnScreen(it) }
+        focusedRect?.let {
+            // Notice that view.requestRectangleOnScreen may modify the input Rect, we have to
+            // create another Rect and then pass it.
+            view.requestRectangleOnScreen(android.graphics.Rect(it))
+        }
     }
 
     internal constructor(view: View) : this(view, InputMethodManagerImpl(view.context))
@@ -236,7 +240,11 @@ internal class TextInputServiceAndroid(
         // Even if we miss all the timing of requesting rectangle during initial text field focus,
         // focused rectangle will be requested when software keyboard has shown.
         if (ic == null) {
-            view.requestRectangleOnScreen(focusedRect)
+            focusedRect?.let {
+                // Notice that view.requestRectangleOnScreen may modify the input Rect, we have to
+                // create another Rect and then pass it.
+                view.requestRectangleOnScreen(android.graphics.Rect(it))
+            }
         }
     }
 }
