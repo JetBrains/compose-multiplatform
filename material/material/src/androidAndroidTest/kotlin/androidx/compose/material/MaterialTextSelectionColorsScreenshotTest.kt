@@ -36,6 +36,7 @@ import androidx.compose.ui.text.TextRange
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import androidx.test.filters.FlakyTest
 import androidx.test.filters.LargeTest
 import androidx.test.filters.SdkSuppress
 import androidx.test.screenshot.AndroidXScreenshotTestRule
@@ -85,6 +86,7 @@ class MaterialTextSelectionColorsScreenshotTest {
             .isEqualTo(darkPrimary.copy(alpha = 0.375f))
     }
 
+    @FlakyTest(bugId = 191141357)
     @Test
     fun text_lightThemeSelectionColors() {
         rule.setContent {
@@ -103,6 +105,7 @@ class MaterialTextSelectionColorsScreenshotTest {
             .assertAgainstGolden(screenshotRule, "text_lightThemeSelectionColors")
     }
 
+    @FlakyTest(bugId = 191141357)
     @Test
     fun text_darkThemeSelectionColors() {
         rule.setContent {
