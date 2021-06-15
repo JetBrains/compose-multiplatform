@@ -3,7 +3,6 @@ package com.sample.content
 import androidx.compose.runtime.*
 import org.jetbrains.compose.web.attributes.ATarget
 import org.jetbrains.compose.web.attributes.AttrsBuilder
-import org.jetbrains.compose.web.attributes.Tag
 import org.jetbrains.compose.web.attributes.target
 import org.jetbrains.compose.web.css.*
 import org.jetbrains.compose.web.dom.*
