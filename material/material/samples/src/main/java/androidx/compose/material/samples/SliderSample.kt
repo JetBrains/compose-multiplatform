@@ -17,7 +17,9 @@
 package androidx.compose.material.samples
 
 import androidx.annotation.Sampled
+import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.MaterialTheme
+import androidx.compose.material.RangeSlider
 import androidx.compose.material.Slider
 import androidx.compose.material.SliderDefaults
 import androidx.compose.material.Text
@@ -49,6 +51,45 @@ fun StepsSliderSample() {
             // viewModel.updateSelectedSliderValue(sliderPosition)
         },
         steps = 5,
+        colors = SliderDefaults.colors(
+            thumbColor = MaterialTheme.colors.secondary,
+            activeTrackColor = MaterialTheme.colors.secondary
+        )
+    )
+}
+
+@Sampled
+@Composable
+@OptIn(ExperimentalMaterialApi::class)
+fun RangeSliderSample() {
+    var sliderPosition by remember { mutableStateOf(0f..100f) }
+    Text(text = sliderPosition.toString())
+    RangeSlider(
+        values = sliderPosition,
+        onValueChange = { sliderPosition = it },
+        valueRange = 0f..100f,
+        onValueChangeFinished = {
+            // launch some business logic update with the state you hold
+            // viewModel.updateSelectedSliderValue(sliderPosition)
+        },
+    )
+}
+
+@Sampled
+@Composable
+@OptIn(ExperimentalMaterialApi::class)
+fun StepRangeSliderSample() {
+    var sliderPosition by remember { mutableStateOf(0f..100f) }
+    Text(text = sliderPosition.toString())
+    RangeSlider(
+        steps = 5,
+        values = sliderPosition,
+        onValueChange = { sliderPosition = it },
+        valueRange = 0f..100f,
+        onValueChangeFinished = {
+            // launch some business logic update with the state you hold
+            // viewModel.updateSelectedSliderValue(sliderPosition)
+        },
         colors = SliderDefaults.colors(
             thumbColor = MaterialTheme.colors.secondary,
             activeTrackColor = MaterialTheme.colors.secondary

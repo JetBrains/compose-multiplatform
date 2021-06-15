@@ -175,4 +175,52 @@ class SliderScreenshotTest {
             .captureToImage()
             .assertAgainstGolden(screenshotRule, goldenName)
     }
+
+    @Test
+    @ExperimentalMaterialApi
+    fun rangeSliderTest_middle_steps_disabled() {
+        rule.setMaterialContent {
+            Box(wrap.testTag(wrapperTestTag)) {
+                var position by remember { mutableStateOf(0.5f..1f) }
+                RangeSlider(position, { position = it }, steps = 5, enabled = false)
+            }
+        }
+        assertSliderAgainstGolden("rangeSlider_middle_steps_disabled")
+    }
+
+    @Test
+    @ExperimentalMaterialApi
+    fun rangeSliderTest_middle_steps_enabled() {
+        rule.setMaterialContent {
+            Box(wrap.testTag(wrapperTestTag)) {
+                var position by remember { mutableStateOf(0.5f..1f) }
+                RangeSlider(position, { position = it }, steps = 5)
+            }
+        }
+        assertSliderAgainstGolden("rangeSlider_middle_steps_enabled")
+    }
+
+    @Test
+    @ExperimentalMaterialApi
+    fun rangeSliderTest_overlapingThumbs() {
+        rule.setMaterialContent {
+            Box(wrap.testTag(wrapperTestTag)) {
+                var position by remember { mutableStateOf(0.5f..0.51f) }
+                RangeSlider(position, { position = it })
+            }
+        }
+        assertSliderAgainstGolden("rangeSlider_overlapingThumbs")
+    }
+
+    @Test
+    @ExperimentalMaterialApi
+    fun rangeSliderTest_fullRange() {
+        rule.setMaterialContent {
+            Box(wrap.testTag(wrapperTestTag)) {
+                var position by remember { mutableStateOf(0f..1f) }
+                RangeSlider(position, { position = it })
+            }
+        }
+        assertSliderAgainstGolden("rangeSlider_fullRange")
+    }
 }
