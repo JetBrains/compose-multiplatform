@@ -345,10 +345,10 @@ enum class EnterExitState {
  *
  * @param visibleState defines whether the content should be visible
  * @param modifier modifier for the [Layout] created to contain the [content]
- * @param enter EnterTransition(s) used for the appearing animation, fading in while expanding
- *              vertically by default
+ * @param enter EnterTransition(s) used for the appearing animation, fading in while expanding by
+ *              default
  * @param exit ExitTransition(s) used for the disappearing animation, fading out while
- *             shrinking vertically by default
+ *             shrinking by default
  * @param content Content to appear or disappear based on the value of [visibleState]
  *
  * @see EnterTransition
@@ -366,8 +366,8 @@ enum class EnterExitState {
 fun AnimatedVisibility(
     visibleState: MutableTransitionState<Boolean>,
     modifier: Modifier = Modifier,
-    enter: EnterTransition,
-    exit: ExitTransition,
+    enter: EnterTransition = fadeIn() + expandIn(),
+    exit: ExitTransition = fadeOut() + shrinkOut(),
     content: @Composable() AnimatedVisibilityScope.() -> Unit
 ) {
     val transition = updateTransition(visibleState)
