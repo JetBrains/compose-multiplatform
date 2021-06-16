@@ -32,7 +32,7 @@ internal val testCases = mutableMapOf<String, TestCase>()
 
 fun launchTestCase(testCaseId: String) {
     // this makes test cases get initialised:
-    listOf<Any>(TestCases1(), InputsTests())
+    listOf<Any>(TestCases1(), InputsTests(), EventsTests())
 
     if (testCaseId !in testCases) error("Test Case '$testCaseId' not found")
 

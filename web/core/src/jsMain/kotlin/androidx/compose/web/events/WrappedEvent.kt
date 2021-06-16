@@ -34,8 +34,8 @@ open class WrappedWheelEvent(
 ) : GenericWrappedEvent<WheelEvent>
 
 open class WrappedInputEvent(
-    override val nativeEvent: InputEvent
-) : GenericWrappedEvent<InputEvent>
+    override val nativeEvent: Event
+) : GenericWrappedEvent<Event>
 
 open class WrappedKeyboardEvent(
     override val nativeEvent: KeyboardEvent
@@ -88,7 +88,7 @@ open class WrappedClipboardEvent(
 ) : GenericWrappedEvent<ClipboardEvent>
 
 class WrappedTextInputEvent(
-    nativeEvent: InputEvent,
+    nativeEvent: Event,
     val inputValue: String
 ) : WrappedInputEvent(nativeEvent)
 
