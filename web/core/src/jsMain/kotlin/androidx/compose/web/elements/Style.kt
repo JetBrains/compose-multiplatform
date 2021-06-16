@@ -37,7 +37,7 @@ fun Style(
     cssRules: CSSRuleDeclarationList
 ) {
     TagElement(
-        elementBuilder = ElementBuilder.Style,
+        elementBuilder = { createElement<HTMLStyleElement>("style") },
         applyAttrs = {
             applyAttrs()
         },
