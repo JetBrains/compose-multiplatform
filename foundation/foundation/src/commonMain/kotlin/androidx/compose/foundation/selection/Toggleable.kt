@@ -251,18 +251,18 @@ private fun Modifier.toggleableImpl(
         }
     }
     val onClickState = rememberUpdatedState(onClick)
-    val gestures = if (enabled) {
+    if (enabled) {
         PressedInteractionSourceDisposableEffect(interactionSource, pressedInteraction)
-        Modifier.pointerInput(interactionSource) {
-            detectTapAndPress(
-                onPress = { offset ->
+    }
+    val gestures = Modifier.pointerInput(interactionSource, enabled) {
+        detectTapAndPress(
+            onPress = { offset ->
+                if (enabled) {
                     handlePressInteraction(offset, interactionSource, pressedInteraction)
-                },
-                onTap = { onClickState.value.invoke() }
-            )
-        }
-    } else {
-        Modifier
+                }
+            },
+            onTap = { if (enabled) onClickState.value.invoke() }
+        )
     }
     this
         .then(semantics)
