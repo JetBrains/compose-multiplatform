@@ -106,4 +106,20 @@ class DesktopSvgResourcesTest {
         }
         screenshotRule.snap(window.surface)
     }
+
+    @Test
+    fun `load SVG with unspecified viewbox and fill bounds`() {
+        assumeTrue(isLinux || isWindows)
+
+        val window = TestComposeWindow(width = 200, height = 300)
+        window.setContent {
+            Image(
+                svgResource("androidx/compose/ui/res/star-viewbox-unspecified.svg"),
+                contentDescription = "Star",
+                contentScale = ContentScale.FillBounds,
+                modifier = Modifier.fillMaxSize()
+            )
+        }
+        screenshotRule.snap(window.surface)
+    }
 }
