@@ -19,19 +19,22 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionContext
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.input.key.KeyEvent
-import androidx.compose.ui.window.WindowPlacement
 import org.jetbrains.skiko.ClipComponent
 import org.jetbrains.skiko.GraphicsApi
 import org.jetbrains.skiko.SkiaLayer
 import java.awt.Component
-import javax.swing.JFrame
+import java.awt.Window
+import javax.swing.JDialog
 import javax.swing.JLayeredPane
 
 /**
- * ComposeWindow is a window for building UI using Compose for Desktop.
- * ComposeWindow inherits javax.swing.JFrame.
+ * ComposeDialog is a dialog for building UI using Compose for Desktop.
+ * ComposeDialog inherits javax.swing.JDialog.
  */
-class ComposeWindow : JFrame() {
+class ComposeDialog(
+    owner: Window? = null,
+    modalityType: ModalityType = ModalityType.MODELESS
+) : JDialog(owner, modalityType) {
     private var isDisposed = false
     internal val layer = ComposeLayer()
     private val pane = object : JLayeredPane() {
@@ -57,7 +60,7 @@ class ComposeWindow : JFrame() {
     private val clipMap = mutableMapOf<Component, ClipComponent>()
 
     init {
-        pane.setLayout(null)
+        pane.layout = null
         pane.add(layer.component, Integer.valueOf(1))
         contentPane.add(pane)
     }
@@ -71,7 +74,7 @@ class ComposeWindow : JFrame() {
     }
 
     /**
-     * Composes the given composable into the ComposeWindow.
+     * Composes the given composable into the ComposeDialog.
      *
      * The new composition can be logically "linked" to an existing one, by providing a
      * [parentComposition]. This will ensure that invalidations and CompositionLocals will flow
@@ -92,14 +95,14 @@ class ComposeWindow : JFrame() {
      */
     fun setContent(
         parentComposition: CompositionContext? = null,
-        onPreviewKeyEvent: (KeyEvent) -> Boolean = { false },
-        onKeyEvent: (KeyEvent) -> Boolean = { false },
+        onKeyEvent: ((KeyEvent) -> Boolean) = { false },
+        onPreviewKeyEvent: ((KeyEvent) -> Boolean) = { false },
         content: @Composable () -> Unit
     ) {
         layer.setContent(
             parentComposition = parentComposition,
             onPreviewKeyEvent = onPreviewKeyEvent,
-            onKeyEvent = onKeyEvent,
+            onKeyEvent = onKeyEvent
         ) {
             CompositionLocalProvider(
                 LocalLayerContainer provides pane
@@ -120,67 +123,9 @@ class ComposeWindow : JFrame() {
     override fun setVisible(value: Boolean) {
         if (value != isVisible) {
             super.setVisible(value)
-            if (value) {
-                layer.component.requestFocus()
-            }
+            layer.component.requestFocus()
         }
     }
-
-    var placement: WindowPlacement
-        get() = when {
-            isFullscreen -> WindowPlacement.Fullscreen
-            isMaximized -> WindowPlacement.Maximized
-            else -> WindowPlacement.Floating
-        }
-        set(value) {
-            when (value) {
-                WindowPlacement.Fullscreen -> {
-                    isFullscreen = true
-                }
-                WindowPlacement.Maximized -> {
-                    isMaximized = true
-                }
-                WindowPlacement.Floating -> {
-                    isFullscreen = false
-                    isMaximized = false
-                }
-            }
-        }
-
-    /**
-     * `true` if the window is in fullscreen mode, `false` otherwise
-     */
-    private var isFullscreen: Boolean
-        get() = layer.component.fullscreen
-        set(value) {
-            layer.component.fullscreen = value
-        }
-
-    /**
-     * `true` if the window is maximized to fill all available screen space, `false` otherwise
-     */
-    private var isMaximized: Boolean
-        get() = extendedState and MAXIMIZED_BOTH != 0
-        set(value) {
-            extendedState = if (value) {
-                extendedState or MAXIMIZED_BOTH
-            } else {
-                extendedState and MAXIMIZED_BOTH.inv()
-            }
-        }
-
-    /**
-     * `true` if the window is minimized to the taskbar, `false` otherwise
-     */
-    var isMinimized: Boolean
-        get() = extendedState and ICONIFIED != 0
-        set(value) {
-            extendedState = if (value) {
-                extendedState or ICONIFIED
-            } else {
-                extendedState and ICONIFIED.inv()
-            }
-        }
 
     /**
      * Registers a task to run when the rendering API changes.
@@ -193,14 +138,14 @@ class ComposeWindow : JFrame() {
 
     /**
      * Retrieve underlying platform-specific operating system handle for the root window where
-     * ComposeWindow is rendered. Currently returns HWND on Windows, Display on X11 and NSWindow
+     * ComposeDialog is rendered. Currently returns HWND on Windows, Display on X11 and NSWindow
      * on macOS.
      */
     val windowHandle: Long
         get() = layer.component.windowHandle
 
     /**
-     * Returns low-level rendering API used for rendering in this ComposeWindow. API is
+     * Returns low-level rendering API used for rendering in this ComposeDialog. API is
      * automatically selected based on operating system, graphical hardware and `SKIKO_RENDER_API`
      * environment variable.
      */

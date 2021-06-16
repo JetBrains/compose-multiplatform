@@ -156,6 +156,7 @@ if(AndroidXComposePlugin.isMultiplatformEnabled(project)) {
             androidMain.dependsOn(jvmMain)
             desktopMain {
                 dependencies {
+                    implementation(libs.kotlinStdlibJdk8)
                     api(libs.kotlinCoroutinesSwing)
                 }
                 dependsOn(jvmMain)
