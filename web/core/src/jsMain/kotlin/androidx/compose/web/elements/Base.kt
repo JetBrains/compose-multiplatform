@@ -99,7 +99,7 @@ private object DomProvider {
 }
 
 private open class ElementBuilderImplementation<TElement : Element>(private val tagName: String) : ElementBuilder<TElement> {
-    override fun create(): TElement = DomProvider.get(tagName).cloneNode() as TElement
+    override fun create(): TElement = DomProvider.get(tagName).cloneNode().unsafeCast<TElement>()
 }
 
 fun interface ElementBuilder<TElement : Element> {
