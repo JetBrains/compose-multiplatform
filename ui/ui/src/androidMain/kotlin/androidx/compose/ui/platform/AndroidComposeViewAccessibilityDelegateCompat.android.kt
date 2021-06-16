@@ -410,9 +410,7 @@ internal class AndroidComposeViewAccessibilityDelegateCompat(val view: AndroidCo
                 // Tab in native android uses selected property
                 info.isSelected = it
             } else {
-                // Make a workaround here so talkback doesn't say "double tap to toggle" for
-                // selected items(this will be different from native android).
-                info.isCheckable = !it
+                info.isCheckable = true
                 info.isChecked = it
                 if (info.stateDescription == null) {
                     // If a radio entry (radio button + text) is selectable, it won't have the role
@@ -1674,12 +1672,50 @@ internal class AndroidComposeViewAccessibilityDelegateCompat(val view: AndroidCo
                         }
                     }
                     SemanticsProperties.StateDescription, SemanticsProperties.ToggleableState,
-                    SemanticsProperties.Selected, SemanticsProperties.ProgressBarRangeInfo -> {
+                    SemanticsProperties.ProgressBarRangeInfo -> {
                         sendEventForVirtualView(
                             semanticsNodeIdToAccessibilityVirtualNodeId(id),
                             AccessibilityEvent.TYPE_WINDOW_CONTENT_CHANGED,
                             AccessibilityEventCompat.CONTENT_CHANGE_TYPE_STATE_DESCRIPTION
                         )
+                    }
+                    SemanticsProperties.Selected -> {
+                        // The assumption is among widgets using SemanticsProperties.Selected, only
+                        // Tab is using AccessibilityNodeInfo#isSelected, and all others are using
+                        // AccessibilityNodeInfo#isChekable and setting
+                        // AccessibilityNodeInfo#stateDescription in this delegate.
+                        if (newNode.config.getOrNull(SemanticsProperties.Role) == Role.Tab) {
+                            if (newNode.config.getOrNull(SemanticsProperties.Selected) == true) {
+                                val event = createEvent(
+                                    semanticsNodeIdToAccessibilityVirtualNodeId(id),
+                                    AccessibilityEvent.TYPE_VIEW_SELECTED
+                                )
+                                // Here we use the merged node
+                                val mergedNode =
+                                    SemanticsNode(newNode.outerSemanticsNodeWrapper, true)
+                                val contentDescription = mergedNode.config.getOrNull(
+                                    SemanticsProperties.ContentDescription
+                                )?.fastJoinToString(",")
+                                val text = mergedNode.config.getOrNull(SemanticsProperties.Text)
+                                    ?.fastJoinToString(",")
+                                contentDescription?.let { event.contentDescription = it }
+                                text?.let { event.text.add(it) }
+                                sendEvent(event)
+                            } else {
+                                // Send this event to match View.java.
+                                sendEventForVirtualView(
+                                    semanticsNodeIdToAccessibilityVirtualNodeId(id),
+                                    AccessibilityEvent.TYPE_WINDOW_CONTENT_CHANGED,
+                                    AccessibilityEventCompat.CONTENT_CHANGE_TYPE_UNDEFINED
+                                )
+                            }
+                        } else {
+                            sendEventForVirtualView(
+                                semanticsNodeIdToAccessibilityVirtualNodeId(id),
+                                AccessibilityEvent.TYPE_WINDOW_CONTENT_CHANGED,
+                                AccessibilityEventCompat.CONTENT_CHANGE_TYPE_STATE_DESCRIPTION
+                            )
+                        }
                     }
                     SemanticsProperties.ContentDescription -> {
                         sendEventForVirtualView(

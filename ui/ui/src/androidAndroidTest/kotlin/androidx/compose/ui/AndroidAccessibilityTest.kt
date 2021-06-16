@@ -286,7 +286,7 @@ class AndroidAccessibilityTest {
         assertEquals("Selected", stateDescription)
         assertFalse(accessibilityNodeInfo.isClickable)
         assertTrue(accessibilityNodeInfo.isVisibleToUser)
-        assertFalse(accessibilityNodeInfo.isCheckable)
+        assertTrue(accessibilityNodeInfo.isCheckable)
         assertFalse(
             accessibilityNodeInfo.actionList.contains(
                 AccessibilityNodeInfo.AccessibilityAction(ACTION_CLICK, null)
@@ -877,6 +877,46 @@ class AndroidAccessibilityTest {
                             it.eventType == AccessibilityEvent.TYPE_WINDOW_CONTENT_CHANGED &&
                             it.contentChangeTypes ==
                             AccessibilityEvent.CONTENT_CHANGE_TYPE_STATE_DESCRIPTION
+                    }
+                )
+            )
+        }
+    }
+
+    @Test
+    fun sendViewSelectedEvent_whenSelectedChange_forTab() {
+        val tag = "Tab"
+        container.setContent {
+            var selected by remember { mutableStateOf(false) }
+            Box(
+                Modifier
+                    .selectable(selected = selected, onClick = { selected = true }, role = Role.Tab)
+                    .testTag(tag)
+            ) {
+                BasicText("Text")
+            }
+        }
+
+        rule.onNodeWithTag(tag)
+            .assertIsDisplayed()
+            .assertIsNotSelected()
+
+        waitForSubtreeEventToSend()
+        rule.onNodeWithTag(tag)
+            .performClick()
+            .assertIsSelected()
+
+        val node = rule.onNodeWithTag(tag)
+            .fetchSemanticsNode("couldn't find node with tag $tag")
+        rule.runOnIdle {
+            verify(container, times(1)).requestSendAccessibilityEvent(
+                eq(androidComposeView),
+                argThat(
+                    ArgumentMatcher {
+                        getAccessibilityEventSourceSemanticsNodeId(it) == node.id &&
+                            it.eventType == AccessibilityEvent.TYPE_VIEW_SELECTED &&
+                            it.text.size == 1 &&
+                            it.text[0].toString() == "Text"
                     }
                 )
             )
