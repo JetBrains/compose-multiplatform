@@ -59,10 +59,7 @@ import kotlinx.coroutines.flow.collect
  *
  * ![Contained button image](https://developer.android.com/images/reference/androidx/compose/material/contained-button.png)
  *
- * The default text style for internal [Text] components will be set to [Typography.button]. Text
- * color will try to match the correlated color for the background color. For example if the
- * background color is set to [Colors.primary] then the text will by default use
- * [Colors.onPrimary].
+ * The default text style for internal [Text] components will be set to [Typography.button].
  *
  * @sample androidx.compose.material.samples.ButtonSample
  *
@@ -144,10 +141,7 @@ fun Button(
  *
  * ![Outlined button image](https://developer.android.com/images/reference/androidx/compose/material/outlined-button.png)
  *
- * The default text style for internal [Text] components will be set to [Typography.button]. Text
- * color will try to match the correlated color for the background color. For example if the
- * background color is set to [Colors.primary] then the text will by default use
- * [Colors.onPrimary].
+ * The default text style for internal [Text] components will be set to [Typography.button].
  *
  * @sample androidx.compose.material.samples.OutlinedButtonSample
  *
@@ -200,10 +194,7 @@ fun OutlinedButton(
  *
  * ![Text button image](https://developer.android.com/images/reference/androidx/compose/material/text-button.png)
  *
- * The default text style for internal [Text] components will be set to [Typography.button]. Text
- * color will try to match the correlated color for the background color. For example if the
- * background color is set to [Colors.primary] then the text will by default use
- * [Colors.onPrimary].
+ * The default text style for internal [Text] components will be set to [Typography.button].
  *
  * @sample androidx.compose.material.samples.TextButtonSample
  *
