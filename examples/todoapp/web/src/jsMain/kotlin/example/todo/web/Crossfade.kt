@@ -7,7 +7,6 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import kotlinx.coroutines.delay
-import org.jetbrains.compose.web.attributes.Tag
 import org.jetbrains.compose.web.css.Position
 import org.jetbrains.compose.web.css.height
 import org.jetbrains.compose.web.css.left
@@ -23,7 +22,7 @@ import kotlin.js.Date
 import kotlin.math.sqrt
 
 @Composable
-fun <T : Any> Crossfade(target: T, attrs: AttrBuilderContext<out Tag> = {}, content: @Composable (T) -> Unit) {
+fun <T : Any> Crossfade(target: T, attrs: AttrBuilderContext<*> = {}, content: @Composable (T) -> Unit) {
     val holder = remember { TargetHolder<T>(null) }
     val previousTarget: T? = holder.value
 

@@ -3,7 +3,6 @@ package example.todo.web
 import androidx.compose.runtime.Composable
 import org.jetbrains.compose.common.material.Text
 import org.jetbrains.compose.web.attributes.InputType
-import org.jetbrains.compose.web.attributes.Tag
 import org.jetbrains.compose.web.attributes.checked
 import org.jetbrains.compose.web.css.AlignItems
 import org.jetbrains.compose.web.css.DisplayStyle
@@ -34,7 +33,7 @@ import org.w3c.dom.HTMLUListElement
 fun MaterialCheckbox(
     checked: Boolean,
     onCheckedChange: (Boolean) -> Unit,
-    attrs: AttrBuilderContext<out Tag> = {},
+    attrs: AttrBuilderContext<*> = {},
     content: @Composable () -> Unit = {}
 ) {
     Div(attrs = attrs) {
@@ -43,7 +42,7 @@ fun MaterialCheckbox(
                 type = InputType.Checkbox,
                 attrs = {
                     classes("filled-in")
-                    checked(value = checked)
+                    if (checked) checked()
                     onCheckboxInput { onCheckedChange(it.checked) }
                 }
             )
@@ -56,7 +55,7 @@ fun MaterialCheckbox(
 }
 
 @Composable
-fun Card(attrs: AttrBuilderContext<out Tag> = {}, content: @Composable () -> Unit) {
+fun Card(attrs: AttrBuilderContext<*> = {}, content: @Composable () -> Unit) {
     Div(
         attrs = {
             classes("card")
@@ -73,7 +72,7 @@ fun MaterialTextArea(
     label: String,
     text: String,
     onTextChanged: (String) -> Unit,
-    attrs: AttrBuilderContext<out Tag> = {}
+    attrs: AttrBuilderContext<*> = {}
 ) {
     Div(
         attrs = {
@@ -104,7 +103,7 @@ fun MaterialTextArea(
 fun ImageButton(
     onClick: () -> Unit,
     iconName: String,
-    attrs: AttrBuilderContext<out Tag> = {}
+    attrs: AttrBuilderContext<*> = {}
 ) {
     A(
         attrs = {
