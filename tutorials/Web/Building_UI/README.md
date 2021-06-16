@@ -165,7 +165,7 @@ Div(
         padding(20.px)
         
         // custom property
-        property("font-family", value("Arial, Helvetica, sans-serif"))
+        property("font-family", "Arial, Helvetica, sans-serif")
     }
 ) { /* content goes here */ }
 ```
@@ -247,7 +247,7 @@ fun main() {
                 padding(20.px)
 
                 // custom property
-                property("font-family", value("Arial, Helvetica, sans-serif"))
+                property("font-family", "Arial, Helvetica, sans-serif")
             }
         }) { Text("Text in Div with inline style") }
     }

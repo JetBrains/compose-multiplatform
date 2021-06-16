@@ -16,7 +16,7 @@ Div({
         padding(20.px)
         
         // custom property (or not supported out of a box)
-        property("font-family", value("Arial, Helvetica, sans-serif"))
+        property("font-family", "Arial, Helvetica, sans-serif")
     }
 }) { /* content goes here */ }
 ```
@@ -38,7 +38,7 @@ object AppStylesheet : StyleSheet() {
         padding(20.px)
 
         // custom property (or not supported out of a box)
-        property("font-family", value("Arial, Helvetica, sans-serif"))
+        property("font-family", "Arial, Helvetica, sans-serif")
     }
 }
 
@@ -84,7 +84,7 @@ object AppStylesheet : StyleSheet() {
         
         // raw selector
         "h1, h2, h3, h4, h5, h6" style {
-            property("font-family", value("Arial, Helvetica, sans-serif"))
+            property("font-family", "Arial, Helvetica, sans-serif")
             
         }
 
@@ -175,7 +175,7 @@ object AppStylesheet : StyleSheet() {
         padding(20.px)
 
         // custom property (or not supported out of a box)
-        property("font-family", value("Arial, Helvetica, sans-serif"))
+        property("font-family", "Arial, Helvetica, sans-serif")
     }
 }
 
@@ -196,7 +196,7 @@ fun main() {
                 padding(20.px)
 
                 // custom property (or not supported out of a box)
-                property("font-family", value("Arial, Helvetica, sans-serif"))
+                property("font-family", "Arial, Helvetica, sans-serif")
             }
         }) { /* content goes here */ }
 
