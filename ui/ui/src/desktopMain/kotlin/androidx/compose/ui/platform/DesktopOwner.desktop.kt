@@ -84,7 +84,9 @@ internal class DesktopOwner(
     density: Density = Density(1f, 1f),
     val isPopup: Boolean = false,
     val isFocusable: Boolean = true,
-    val onDismissRequest: (() -> Unit)? = null
+    val onDismissRequest: (() -> Unit)? = null,
+    private val onPreviewKeyEvent: (KeyEvent) -> Boolean = { false },
+    private val onKeyEvent: (KeyEvent) -> Boolean = { false },
 ) : Owner, RootForTest, DesktopRootForTest, PositionCalculator {
 
     internal fun isHovered(point: IntOffset): Boolean {
@@ -132,6 +134,12 @@ internal class DesktopOwner(
         it.modifier = semanticsModifier
             .then(_focusManager.modifier)
             .then(keyInputModifier)
+            .then(
+                KeyInputModifier(
+                    onKeyEvent = onKeyEvent,
+                    onPreviewKeyEvent = onPreviewKeyEvent
+                )
+            )
     }
 
     override val rootForTest = this
