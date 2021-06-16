@@ -213,7 +213,8 @@ fun hasContentDescriptionExactly(
     ) { node ->
         node.config.getOrNull(SemanticsProperties.ContentDescription)
             ?.let { given ->
-                given.containsAll(expected) && expected.containsAll(given)
+                given.size == expected.size &&
+                    given.containsAll(expected) && expected.containsAll(given)
             } ?: values.isEmpty()
     }
 }

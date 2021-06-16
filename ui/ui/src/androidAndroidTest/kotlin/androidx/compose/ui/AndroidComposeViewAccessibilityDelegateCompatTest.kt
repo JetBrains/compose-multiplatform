@@ -23,15 +23,11 @@ import android.view.ViewGroup
 import android.view.accessibility.AccessibilityEvent
 import android.view.accessibility.AccessibilityNodeInfo
 import android.widget.FrameLayout
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.size
-import androidx.compose.runtime.snapshots.Snapshot
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
+import androidx.compose.runtime.snapshots.Snapshot
 import androidx.compose.runtime.structuralEqualityPolicy
-import androidx.compose.ui.geometry.Offset
-import androidx.compose.ui.geometry.Rect
 import androidx.compose.ui.node.InnerPlaceable
 import androidx.compose.ui.node.LayoutNode
 import androidx.compose.ui.platform.AndroidComposeView
@@ -39,7 +35,6 @@ import androidx.compose.ui.platform.AndroidComposeViewAccessibilityDelegateCompa
 import androidx.compose.ui.platform.LocalClipboardManager
 import androidx.compose.ui.platform.SemanticsNodeWithAdjustedBounds
 import androidx.compose.ui.platform.getAllUncoveredSemanticsNodesToMap
-import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.semantics.CustomAccessibilityAction
 import androidx.compose.ui.semantics.LiveRegionMode
 import androidx.compose.ui.semantics.ProgressBarRangeInfo
@@ -78,10 +73,8 @@ import androidx.compose.ui.semantics.textSelectionRange
 import androidx.compose.ui.semantics.verticalScrollAxisRange
 import androidx.compose.ui.test.TestActivity
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
-import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.TextRange
-import androidx.compose.ui.unit.dp
 import androidx.core.view.ViewCompat
 import androidx.core.view.accessibility.AccessibilityNodeInfoCompat
 import androidx.test.ext.junit.runners.AndroidJUnit4
@@ -836,28 +829,6 @@ class AndroidComposeViewAccessibilityDelegateCompatTest {
                 }
             )
         )
-    }
-
-    @Test
-    fun testSemanticsNodePositionAndBounds_doesNotThrow_whenLayoutNodeNotAttached() {
-        var emitNode by mutableStateOf(true)
-        rule.setContent {
-            if (emitNode) {
-                Box(Modifier.size(100.dp).testTag("tag"))
-            }
-        }
-
-        val semanticNode = rule.onNodeWithTag("tag").fetchSemanticsNode()
-        rule.runOnIdle {
-            emitNode = false
-        }
-
-        rule.runOnIdle {
-            assertEquals(Offset.Zero, semanticNode.positionInRoot)
-            assertEquals(Offset.Zero, semanticNode.positionInWindow)
-            assertEquals(Rect.Zero, semanticNode.boundsInRoot)
-            assertEquals(Rect.Zero, semanticNode.boundsInWindow)
-        }
     }
 
     @Test

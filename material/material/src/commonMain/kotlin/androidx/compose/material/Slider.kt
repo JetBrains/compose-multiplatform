@@ -156,6 +156,7 @@ fun Slider(
         modifier
             .requiredSizeIn(minWidth = ThumbRadius * 2, minHeight = ThumbRadius * 2)
             .sliderSemantics(value, tickFractions, enabled, onValueChange, valueRange, steps)
+            .focusable(enabled, interactionSource)
     ) {
         val isRtl = LocalLayoutDirection.current == LayoutDirection.Rtl
         val maxPx = constraints.maxWidth.toFloat()
@@ -619,7 +620,6 @@ private fun SliderThumb(
         Spacer(
             Modifier
                 .size(thumbSize, thumbSize)
-                .focusable(interactionSource = interactionSource)
                 .indication(
                     interactionSource = interactionSource,
                     indication = rememberRipple(bounded = false, radius = ThumbRippleRadius)
