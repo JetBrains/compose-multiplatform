@@ -21,6 +21,7 @@ package androidx.compose.runtime.snapshots
 import androidx.compose.runtime.InternalComposeApi
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.State
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.neverEqualPolicy
@@ -621,6 +622,51 @@ class SnapshotTests {
         assertEquals(1, changes)
     }
 
+    @Test
+    fun toStringOfMutableStateDoesNotTriggerReadObserver() {
+        val state = mutableStateOf(0)
+        val normalReads = readsOf {
+            state.value
+        }
+        assertEquals(1, normalReads)
+        val toStringReads = readsOf {
+            state.toString()
+        }
+        assertEquals(0, toStringReads)
+    }
+
+    @Test
+    fun toStringOfDerivedStateDoesNotTriggerReadObservers() {
+        val state = mutableStateOf(0)
+        val derived = derivedStateOf { state.value + 1 }
+        val toStringReads = readsOf {
+            derived.toString()
+        }
+        assertEquals(0, toStringReads)
+    }
+
+    @Test
+    fun toStringValueOfMutableState() {
+        val state = mutableStateOf(10)
+        assertEquals("MutableState(value=10)@${state.hashCode()}", state.toString())
+        state.value = 20
+        assertEquals("MutableState(value=20)@${state.hashCode()}", state.toString())
+    }
+
+    @Test
+    fun toStringValueOfDerivedState() {
+        val state = mutableStateOf(10)
+        val derivedState = derivedStateOf { state.value + 10 }
+        val hash = derivedState.hashCode()
+        assertEquals("DerivedState(value=<Not calculated>)@$hash", derivedState.toString())
+        assertEquals(20, derivedState.value)
+        assertEquals("DerivedState(value=20)@$hash", derivedState.toString())
+        state.value = 20
+        assertEquals("DerivedState(value=<Not calculated>)@$hash", derivedState.toString())
+        assertEquals(30, derivedState.value)
+        assertEquals("DerivedState(value=30)@$hash", derivedState.toString())
+    }
+
     @Test // Regression test for b/181162478
     fun nestedSnapshotsAreIsolated() {
         var state1 by mutableStateOf(0)
@@ -683,6 +729,17 @@ internal fun <T> changesOf(state: State<T>, block: () -> Unit): Int {
         removeObserver.dispose()
     }
     return changes
+}
+
+internal fun readsOf(block: () -> Unit): Int {
+    var reads = 0
+    val snapshot = Snapshot.takeSnapshot(readObserver = { reads++ })
+    try {
+        snapshot.enter(block)
+    } finally {
+        snapshot.dispose()
+    }
+    return reads
 }
 
 internal inline fun <T> atomic(block: () -> T): T {
