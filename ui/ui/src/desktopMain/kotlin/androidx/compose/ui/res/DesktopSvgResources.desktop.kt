@@ -30,6 +30,7 @@ import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.IntSize
 import org.jetbrains.skija.Data
+import org.jetbrains.skija.Rect
 import org.jetbrains.skija.svg.SVGDOM
 import org.jetbrains.skija.svg.SVGLength
 import org.jetbrains.skija.svg.SVGLengthUnit
@@ -81,6 +82,12 @@ private class SVGPainter(
             Size.Unspecified
         } else {
             Size(width, height)
+        }
+    }
+
+    init {
+        if (root?.viewBox == null && defaultSizePx.isSpecified) {
+            root?.setViewBox(Rect.makeXYWH(0f, 0f, defaultSizePx.width, defaultSizePx.height))
         }
     }
 
