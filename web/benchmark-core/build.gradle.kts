@@ -76,5 +76,5 @@ val printBenchmarkResults by tasks.registering {
     }
 }
 
-tasks.named("jsTest") { finalizedBy(printBenchmarkResults) }
-tasks.named("build") { finalizedBy(printBundleSize) }
+//tasks.named("jsTest") { finalizedBy(printBenchmarkResults) }
+//tasks.named("build") { finalizedBy(printBundleSize) }
