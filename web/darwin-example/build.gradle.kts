@@ -3,16 +3,29 @@ import org.jetbrains.kotlin.gradle.plugin.KotlinSourceSet
 plugins {
     kotlin("multiplatform")
     id("org.jetbrains.compose")
+    kotlin("native.cocoapods")
 }
 
 kotlin {
     val onPhone = System.getenv("SDK_NAME")?.startsWith("iphoneos") ?: false
-    if (onPhone) {
+    val darwin = if (onPhone) {
         iosArm64("darwin")
     } else {
         iosX64("darwin")
     }
 
+    cocoapods {
+        summary = "Example of Kotlin Gradle Plugin Playground"
+        homepage = "https://github.com/touchlab/CompilerPluginPlayground"
+    }
+
+    darwin.binaries {
+        forEach { binary ->
+            if (binary is org.jetbrains.kotlin.gradle.plugin.mpp.Framework) {
+                // binary.export(project(":darwin-core"))
+            }
+        }
+    }
     // iosX64("darwin") {
     //     binaries {
     //         this.staticLib {
@@ -41,6 +54,12 @@ kotlin {
             dependencies {
                 implementation(kotlin("test-common"))
                 implementation(kotlin("test-annotations-common"))
+            }
+        }
+
+        val darwinMain by getting {
+            dependencies {
+                implementation(project(":darwin-core"))
             }
         }
 

@@ -8,16 +8,25 @@ import androidx.compose.runtime.DefaultMonotonicFrameClock
 import androidx.compose.runtime.Recomposer
 import androidx.compose.runtime.snapshots.ObserverHandle
 import androidx.compose.runtime.snapshots.Snapshot
+import co.touchlab.compose.darwin.RootUIKitWrapper
 import co.touchlab.compose.darwin.UIKitApplier
+import co.touchlab.compose.darwin.UIKitWrapper
 import co.touchlab.compose.darwin.UIViewWrapper
+import kotlinx.cinterop.convert
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.CoroutineStart
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.launch
 import platform.UIKit.UILabel
+import platform.UIKit.UILayoutConstraintAxisHorizontal
+import platform.UIKit.UILayoutConstraintAxisVertical
+import platform.UIKit.UIStackView
 import platform.UIKit.UIView
 import platform.UIKit.UIViewController
+import platform.UIKit.insertSubview
+import platform.UIKit.removeFromSuperview
+import platform.UIKit.subviews
 
 interface UIViewScope<out TView : UIView>
 
@@ -87,18 +96,53 @@ internal object GlobalSnapshotManager {
 
 @Composable
 fun Text(value: String) {
-    ComposeNode<UIViewWrapper, UIKitApplier>(
+    ComposeNode<UIViewWrapper<UILabel>, UIKitApplier>(
         factory = { UIViewWrapper(UILabel()) },
         update = {
-            set(value) { value -> (view as UILabel).text = value }
+            set(value) { value -> view.text = value }
         },
     )
 }
 
-fun UIViewController.startComposable() {
-    renderComposable(view) {
-        Text("Hello world")
+class UIStackViewWrapper(override val view: UIStackView): UIKitWrapper<UIStackView> {
+    override fun insert(index: Int, nodeWrapper: UIKitWrapper<*>){
+        view.insertArrangedSubview(nodeWrapper.view, index.convert())
     }
+
+    override fun remove(index: Int, count: Int) {
+        super.remove(index, count)
+    }
+
+    override fun move(from: Int, to: Int, count: Int) {
+        if (from == to) {
+            return // nothing to do
+        }
+
+        val allViews = view.subviews.subList(from, from + count).map { it as UIView }
+
+        repeat(count) { vindex ->
+            allViews[vindex].removeFromSuperview()
+        }
+
+        repeat(count) { vindex ->
+            view.insertArrangedSubview(allViews[vindex], (to + vindex).convert())
+        }
+    }
+}
+
+@Composable
+fun VStack(spacing: Double = 0.0, content: @Composable () -> Unit) {
+    ComposeNode<UIStackViewWrapper, UIKitApplier>(
+        factory = {
+            UIStackViewWrapper(UIStackView().apply {
+                axis = UILayoutConstraintAxisVertical
+            })
+        },
+        update = {
+            set(spacing) { value -> view.spacing = value }
+        },
+        content = content,
+    )
 }
 
 /**
@@ -118,7 +162,7 @@ fun <TView : UIView> renderComposable(
     val context = DefaultMonotonicFrameClock + Dispatchers.Main // JsMicrotasksDispatcher()
     val recomposer = Recomposer(context)
     val composition = ControlledComposition(
-        applier = UIKitApplier(UIViewWrapper(root)),
+        applier = UIKitApplier(RootUIKitWrapper(root)),
         parent = recomposer
     )
     val scope = object : UIViewScope<TView> {}

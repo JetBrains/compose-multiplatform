@@ -17,6 +17,7 @@
             <option value="$PROJECT_DIR$/benchmark-core" />
             <option value="$PROJECT_DIR$/core" />
             <option value="$PROJECT_DIR$/darwin-core" />
+            <option value="$PROJECT_DIR$/darwin-example" />
             <option value="$PROJECT_DIR$/examples" />
             <option value="$PROJECT_DIR$/integration-core" />
             <option value="$PROJECT_DIR$/integration-widgets" />

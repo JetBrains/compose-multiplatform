@@ -1,0 +1,16 @@
+PODS:
+  - darwin_example (0.0.12-SNAPSHOT)
+
+DEPENDENCIES:
+  - darwin_example (from `..`)
+
+EXTERNAL SOURCES:
+  darwin_example:
+    :path: ".."
+
+SPEC CHECKSUMS:
+  darwin_example: 4a70053b14284ae237e91948e289c6dfa39eff3b
+
+PODFILE CHECKSUM: 824a1b3438142a0e857eff1db486f61f8fd514df
+
+COCOAPODS: 1.10.1

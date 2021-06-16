@@ -1,0 +1,389 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 50;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		1856672F267A407900CAD33F /* DarwinExampleApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1856672E267A407900CAD33F /* DarwinExampleApp.swift */; };
+		18566731267A407900CAD33F /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 18566730267A407900CAD33F /* ContentView.swift */; };
+		18566733267A407A00CAD33F /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 18566732267A407A00CAD33F /* Assets.xcassets */; };
+		18566736267A407A00CAD33F /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 18566735267A407A00CAD33F /* Preview Assets.xcassets */; };
+		1856674B267A463500CAD33F /* darwin-core in Resources */ = {isa = PBXBuildFile; fileRef = 1856674A267A463500CAD33F /* darwin-core */; };
+		EBA4F6B1D067BB2DEEB3C690 /* Pods_DarwinExample.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = BE9596634E8053E696886EBA /* Pods_DarwinExample.framework */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXFileReference section */
+		1856672B267A407900CAD33F /* DarwinExample.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = DarwinExample.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		1856672E267A407900CAD33F /* DarwinExampleApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DarwinExampleApp.swift; sourceTree = "<group>"; };
+		18566730267A407900CAD33F /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
+		18566732267A407A00CAD33F /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		18566735267A407A00CAD33F /* Preview Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = "Preview Assets.xcassets"; sourceTree = "<group>"; };
+		18566737267A407A00CAD33F /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		1856674A267A463500CAD33F /* darwin-core */ = {isa = PBXFileReference; lastKnownFileType = folder; name = "darwin-core"; path = "../../darwin-core"; sourceTree = "<group>"; };
+		3A24E22D570FA38E8A19DFBD /* Pods-DarwinExample.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-DarwinExample.debug.xcconfig"; path = "Target Support Files/Pods-DarwinExample/Pods-DarwinExample.debug.xcconfig"; sourceTree = "<group>"; };
+		7BD928CD86125F991EBE46C3 /* Pods-DarwinExample.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-DarwinExample.release.xcconfig"; path = "Target Support Files/Pods-DarwinExample/Pods-DarwinExample.release.xcconfig"; sourceTree = "<group>"; };
+		BE9596634E8053E696886EBA /* Pods_DarwinExample.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_DarwinExample.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		18566728267A407800CAD33F /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				EBA4F6B1D067BB2DEEB3C690 /* Pods_DarwinExample.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		18566722267A407800CAD33F = {
+			isa = PBXGroup;
+			children = (
+				1856674A267A463500CAD33F /* darwin-core */,
+				1856672D267A407900CAD33F /* DarwinExample */,
+				1856672C267A407900CAD33F /* Products */,
+				986B6AE8CC1E35CEE74E2F4B /* Pods */,
+				6C6D1605A51BC35740214C62 /* Frameworks */,
+			);
+			sourceTree = "<group>";
+		};
+		1856672C267A407900CAD33F /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				1856672B267A407900CAD33F /* DarwinExample.app */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		1856672D267A407900CAD33F /* DarwinExample */ = {
+			isa = PBXGroup;
+			children = (
+				1856672E267A407900CAD33F /* DarwinExampleApp.swift */,
+				18566730267A407900CAD33F /* ContentView.swift */,
+				18566732267A407A00CAD33F /* Assets.xcassets */,
+				18566737267A407A00CAD33F /* Info.plist */,
+				18566734267A407A00CAD33F /* Preview Content */,
+			);
+			path = DarwinExample;
+			sourceTree = "<group>";
+		};
+		18566734267A407A00CAD33F /* Preview Content */ = {
+			isa = PBXGroup;
+			children = (
+				18566735267A407A00CAD33F /* Preview Assets.xcassets */,
+			);
+			path = "Preview Content";
+			sourceTree = "<group>";
+		};
+		6C6D1605A51BC35740214C62 /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				BE9596634E8053E696886EBA /* Pods_DarwinExample.framework */,
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
+		986B6AE8CC1E35CEE74E2F4B /* Pods */ = {
+			isa = PBXGroup;
+			children = (
+				3A24E22D570FA38E8A19DFBD /* Pods-DarwinExample.debug.xcconfig */,
+				7BD928CD86125F991EBE46C3 /* Pods-DarwinExample.release.xcconfig */,
+			);
+			path = Pods;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		1856672A267A407800CAD33F /* DarwinExample */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 1856673A267A407A00CAD33F /* Build configuration list for PBXNativeTarget "DarwinExample" */;
+			buildPhases = (
+				77EA9CB183754CB5F11F3739 /* [CP] Check Pods Manifest.lock */,
+				18566727267A407800CAD33F /* Sources */,
+				18566728267A407800CAD33F /* Frameworks */,
+				18566729267A407800CAD33F /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = DarwinExample;
+			productName = DarwinExample;
+			productReference = 1856672B267A407900CAD33F /* DarwinExample.app */;
+			productType = "com.apple.product-type.application";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		18566723267A407800CAD33F /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				LastSwiftUpdateCheck = 1240;
+				LastUpgradeCheck = 1240;
+				TargetAttributes = {
+					1856672A267A407800CAD33F = {
+						CreatedOnToolsVersion = 12.4;
+					};
+				};
+			};
+			buildConfigurationList = 18566726267A407800CAD33F /* Build configuration list for PBXProject "DarwinExample" */;
+			compatibilityVersion = "Xcode 9.3";
+			developmentRegion = en;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+				Base,
+			);
+			mainGroup = 18566722267A407800CAD33F;
+			productRefGroup = 1856672C267A407900CAD33F /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				1856672A267A407800CAD33F /* DarwinExample */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		18566729267A407800CAD33F /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				18566736267A407A00CAD33F /* Preview Assets.xcassets in Resources */,
+				1856674B267A463500CAD33F /* darwin-core in Resources */,
+				18566733267A407A00CAD33F /* Assets.xcassets in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXShellScriptBuildPhase section */
+		77EA9CB183754CB5F11F3739 /* [CP] Check Pods Manifest.lock */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+				"${PODS_PODFILE_DIR_PATH}/Podfile.lock",
+				"${PODS_ROOT}/Manifest.lock",
+			);
+			name = "[CP] Check Pods Manifest.lock";
+			outputFileListPaths = (
+			);
+			outputPaths = (
+				"$(DERIVED_FILE_DIR)/Pods-DarwinExample-checkManifestLockResult.txt",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
+			showEnvVarsInLog = 0;
+		};
+/* End PBXShellScriptBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		18566727267A407800CAD33F /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				18566731267A407900CAD33F /* ContentView.swift in Sources */,
+				1856672F267A407900CAD33F /* DarwinExampleApp.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin XCBuildConfiguration section */
+		18566738267A407A00CAD33F /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 14.4;
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				MTL_FAST_MATH = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				SDKROOT = iphoneos;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+			};
+			name = Debug;
+		};
+		18566739267A407A00CAD33F /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 14.4;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				MTL_FAST_MATH = YES;
+				SDKROOT = iphoneos;
+				SWIFT_COMPILATION_MODE = wholemodule;
+				SWIFT_OPTIMIZATION_LEVEL = "-O";
+				VALIDATE_PRODUCT = YES;
+			};
+			name = Release;
+		};
+		1856673B267A407A00CAD33F /* Debug */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = 3A24E22D570FA38E8A19DFBD /* Pods-DarwinExample.debug.xcconfig */;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_ASSET_PATHS = "\"DarwinExample/Preview Content\"";
+				DEVELOPMENT_TEAM = Z4J75M6GAC;
+				ENABLE_PREVIEWS = YES;
+				INFOPLIST_FILE = DarwinExample/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 14.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = org.brightify.hyperdrive.DarwinExample;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		1856673C267A407A00CAD33F /* Release */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = 7BD928CD86125F991EBE46C3 /* Pods-DarwinExample.release.xcconfig */;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_ASSET_PATHS = "\"DarwinExample/Preview Content\"";
+				DEVELOPMENT_TEAM = Z4J75M6GAC;
+				ENABLE_PREVIEWS = YES;
+				INFOPLIST_FILE = DarwinExample/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 14.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = org.brightify.hyperdrive.DarwinExample;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		18566726267A407800CAD33F /* Build configuration list for PBXProject "DarwinExample" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				18566738267A407A00CAD33F /* Debug */,
+				18566739267A407A00CAD33F /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		1856673A267A407A00CAD33F /* Build configuration list for PBXNativeTarget "DarwinExample" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				1856673B267A407A00CAD33F /* Debug */,
+				1856673C267A407A00CAD33F /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = 18566723267A407800CAD33F /* Project object */;
+}

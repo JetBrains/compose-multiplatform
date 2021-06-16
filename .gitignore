@@ -35,3 +35,6 @@ build/
 # Android
 /captures
 /local.properties
+xcuserdata/
+web/darwin-example/DarwinExample/DarwinExample.xcworkspace
+web/darwin-example/DarwinExample/Pods
