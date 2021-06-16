@@ -1078,6 +1078,180 @@ class ClickableTest {
     }
 
     @Test
+    @LargeTest
+    fun combinedClickableTest_clicks_consumedWhenDisabled() {
+        val enabled = mutableStateOf(false)
+        var clickCounter = 0
+        var doubleClickCounter = 0
+        var longClickCounter = 0
+        val onClick: () -> Unit = { ++clickCounter }
+        val onDoubleClick: () -> Unit = { ++doubleClickCounter }
+        val onLongClick: () -> Unit = { ++longClickCounter }
+        var outerClickCounter = 0
+        var outerDoubleClickCounter = 0
+        var outerLongClickCounter = 0
+        val outerOnClick: () -> Unit = { ++outerClickCounter }
+        val outerOnDoubleClick: () -> Unit = { ++outerDoubleClickCounter }
+        val outerOnLongClick: () -> Unit = { ++outerLongClickCounter }
+
+        rule.setContent {
+            Box(
+                Modifier.combinedClickable(
+                    onDoubleClick = outerOnDoubleClick,
+                    onLongClick = outerOnLongClick,
+                    onClick = outerOnClick
+                )
+            ) {
+                BasicText(
+                    "ClickableText",
+                    modifier = Modifier
+                        .testTag("myClickable")
+                        .combinedClickable(
+                            enabled = enabled.value,
+                            onDoubleClick = onDoubleClick,
+                            onLongClick = onLongClick,
+                            onClick = onClick
+                        )
+                )
+            }
+        }
+
+        rule.onNodeWithTag("myClickable")
+            .performClick()
+
+        // Process gestures
+        rule.mainClock.advanceTimeBy(1000)
+
+        rule.runOnIdle {
+            assertThat(doubleClickCounter).isEqualTo(0)
+            assertThat(longClickCounter).isEqualTo(0)
+            assertThat(clickCounter).isEqualTo(0)
+            assertThat(outerDoubleClickCounter).isEqualTo(0)
+            assertThat(outerLongClickCounter).isEqualTo(0)
+            assertThat(outerClickCounter).isEqualTo(0)
+        }
+
+        rule.onNodeWithTag("myClickable")
+            .performGesture {
+                doubleClick()
+            }
+
+        // Process gestures
+        rule.mainClock.advanceTimeBy(1000)
+
+        rule.runOnIdle {
+            assertThat(doubleClickCounter).isEqualTo(0)
+            assertThat(longClickCounter).isEqualTo(0)
+            assertThat(clickCounter).isEqualTo(0)
+            assertThat(outerDoubleClickCounter).isEqualTo(0)
+            assertThat(outerLongClickCounter).isEqualTo(0)
+            assertThat(outerClickCounter).isEqualTo(0)
+        }
+
+        rule.onNodeWithTag("myClickable")
+            .performGesture {
+                longClick()
+            }
+
+        // Process gestures
+        rule.mainClock.advanceTimeBy(1000)
+
+        rule.runOnIdle {
+            assertThat(doubleClickCounter).isEqualTo(0)
+            assertThat(longClickCounter).isEqualTo(0)
+            assertThat(clickCounter).isEqualTo(0)
+            assertThat(outerDoubleClickCounter).isEqualTo(0)
+            assertThat(outerLongClickCounter).isEqualTo(0)
+            assertThat(outerClickCounter).isEqualTo(0)
+            enabled.value = true
+        }
+
+        rule.onNodeWithTag("myClickable")
+            .performClick()
+
+        rule.mainClock.advanceTimeUntil { clickCounter == 1 }
+
+        rule.runOnIdle {
+            assertThat(doubleClickCounter).isEqualTo(0)
+            assertThat(longClickCounter).isEqualTo(0)
+            assertThat(clickCounter).isEqualTo(1)
+            assertThat(outerDoubleClickCounter).isEqualTo(0)
+            assertThat(outerLongClickCounter).isEqualTo(0)
+            assertThat(outerClickCounter).isEqualTo(0)
+        }
+
+        rule.onNodeWithTag("myClickable")
+            .performGesture {
+                doubleClick()
+            }
+
+        rule.mainClock.advanceTimeUntil { doubleClickCounter == 1 }
+
+        rule.runOnIdle {
+            assertThat(doubleClickCounter).isEqualTo(1)
+            assertThat(longClickCounter).isEqualTo(0)
+            assertThat(clickCounter).isEqualTo(1)
+            assertThat(outerDoubleClickCounter).isEqualTo(0)
+            assertThat(outerLongClickCounter).isEqualTo(0)
+            assertThat(outerClickCounter).isEqualTo(0)
+        }
+
+        rule.onNodeWithTag("myClickable")
+            .performGesture {
+                longClick()
+            }
+
+        rule.mainClock.advanceTimeUntil { longClickCounter == 1 }
+
+        rule.runOnIdle {
+            assertThat(doubleClickCounter).isEqualTo(1)
+            assertThat(longClickCounter).isEqualTo(1)
+            assertThat(clickCounter).isEqualTo(1)
+            assertThat(outerDoubleClickCounter).isEqualTo(0)
+            assertThat(outerLongClickCounter).isEqualTo(0)
+            assertThat(outerClickCounter).isEqualTo(0)
+        }
+    }
+
+    @Test
+    @LargeTest
+    fun clickableTest_click_consumedWhenDisabled() {
+        val enabled = mutableStateOf(false)
+        var clickCounter = 0
+        var outerCounter = 0
+        val onClick: () -> Unit = { ++clickCounter }
+        val onOuterClick: () -> Unit = { ++outerCounter }
+
+        rule.setContent {
+            Box(Modifier.clickable(onClick = onOuterClick)) {
+                BasicText(
+                    "ClickableText",
+                    modifier = Modifier
+                        .testTag("myClickable")
+                        .clickable(enabled = enabled.value, onClick = onClick)
+                )
+            }
+        }
+
+        rule.onNodeWithTag("myClickable")
+            .performClick()
+
+        rule.runOnIdle {
+            assertThat(clickCounter).isEqualTo(0)
+            assertThat(outerCounter).isEqualTo(0)
+            enabled.value = true
+        }
+
+        rule.onNodeWithTag("myClickable")
+            .performClick()
+
+        rule.runOnIdle {
+            assertThat(clickCounter).isEqualTo(1)
+            assertThat(outerCounter).isEqualTo(0)
+        }
+    }
+
+    @Test
     fun clickable_testInspectorValue_noIndicationOverload() {
         val onClick: () -> Unit = { }
         rule.setContent {
