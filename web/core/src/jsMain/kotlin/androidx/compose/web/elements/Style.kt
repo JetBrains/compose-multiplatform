@@ -16,8 +16,8 @@ import org.jetbrains.compose.web.css.*
  * @param rulesBuild allows to define the style rules using [StyleSheetBuilder]
  */
 @Composable
-inline fun Style(
-    crossinline applyAttrs: AttrsBuilder<HTMLStyleElement>.() -> Unit = {},
+fun Style(
+    applyAttrs: AttrsBuilder<HTMLStyleElement>.() -> Unit = {},
     rulesBuild: StyleSheetBuilder.() -> Unit
 ) {
     val builder = StyleSheetBuilderImpl()
@@ -32,8 +32,8 @@ inline fun Style(
  * Usually, it's [org.jetbrains.compose.web.css.StyleSheet] instance
  */
 @Composable
-inline fun Style(
-    crossinline applyAttrs: AttrsBuilder<HTMLStyleElement>.() -> Unit = {},
+fun Style(
+    applyAttrs: AttrsBuilder<HTMLStyleElement>.() -> Unit = {},
     cssRules: CSSRuleDeclarationList
 ) {
     TagElement(
