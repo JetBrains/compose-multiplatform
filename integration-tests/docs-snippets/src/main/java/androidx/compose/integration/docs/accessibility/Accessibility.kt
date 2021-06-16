@@ -19,7 +19,6 @@
 
 package androidx.compose.integration.docs.accessibility
 
-import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
@@ -85,16 +84,6 @@ private object AccessibilitySnippet2 {
                 .size(40.dp, 40.dp)
                 .clip(MaterialTheme.shapes.small)
         )
-    }
-}
-
-private object AccessibilitySnippet3 {
-    @Composable
-    fun CustomShareIcon(modifier: Modifier = Modifier) {
-        val cd = stringResource(R.string.custom_share_icon_content_description)
-        Canvas(modifier.semantics { contentDescription = cd }) {
-            /* Draw custom icon here */
-        }
     }
 }
 
@@ -186,7 +175,6 @@ Fakes needed for snippets to build:
 private object R {
     object string {
         const val label_share = 4
-        const val custom_share_icon_content_description = 5
         const val unfavorite = 6
         const val favorite = 7
         const val subscribed = 8
