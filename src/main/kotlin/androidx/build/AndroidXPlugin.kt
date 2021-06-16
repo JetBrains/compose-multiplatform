@@ -516,6 +516,10 @@ class AndroidXPlugin : Plugin<Project> {
         project: Project,
         androidXExtension: AndroidXExtension
     ) {
+        // Note, this should really match COMPILE_SDK_VERSION, however
+        // this API takes an integer and we are unable to set it to a
+        // pre-release SDK.
+        defaultConfig.aarMetadata.minCompileSdk = TARGET_SDK_VERSION
         project.configurations.all { config ->
             val isTestConfig = config.name.toLowerCase(Locale.US).contains("test")
 
