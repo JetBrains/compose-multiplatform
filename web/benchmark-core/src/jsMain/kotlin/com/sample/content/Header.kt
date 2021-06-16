@@ -2,10 +2,8 @@ package com.sample.content
 
 import androidx.compose.runtime.Composable
 import org.jetbrains.compose.web.css.*
-import org.jetbrains.compose.web.css.selectors.*
 import org.jetbrains.compose.web.attributes.*
 import org.jetbrains.compose.web.dom.*
-import org.jetbrains.compose.web.*
 import com.sample.style.*
 import kotlinx.browser.window
 

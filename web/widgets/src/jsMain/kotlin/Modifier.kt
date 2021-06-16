@@ -7,7 +7,6 @@ import org.jetbrains.compose.web.css.margin
 import org.jetbrains.compose.web.css.px
 import org.jetbrains.compose.web.css.Color.RGB
 import org.jetbrains.compose.common.internal.castOrCreate
-import org.jetbrains.compose.web.css.StyleBuilder
 import org.jetbrains.compose.web.attributes.AttrsBuilder
 
 actual fun Modifier.background(color: Color): Modifier = castOrCreate().apply {

@@ -134,14 +134,15 @@ class StaticComposableTests {
         }
 
         assertEquals("border: 1px solid red;", (root.children[0] as HTMLElement).style.cssText)
-        root.children[1]?.let { el ->
+        root.children[1]?.let {
+            val el = it.unsafeCast<HTMLElement>()
             assertEquals(
                 "green",
-                el.asDynamic().attributeStyleMap.get("border-color").toString(),
+                el.style.getPropertyValue("border-color")
             )
             assertEquals(
                 "3px",
-                el.asDynamic().attributeStyleMap.get("border-width").toString(),
+                el.style.getPropertyValue("border-width"),
             )
         }
     }
@@ -444,7 +445,7 @@ class StaticComposableTests {
     @Test
     fun stylesDisplay() {
         val root = "div".asHtmlElement()
-        val enumValues = enumValues<DisplayStyle>()
+        val enumValues = DisplayStyle.values()
         renderComposable(
             root = root
         ) {
@@ -470,7 +471,7 @@ class StaticComposableTests {
     @Test
     fun stylesFlexDirection() {
         val root = "div".asHtmlElement()
-        val enumValues = enumValues<FlexDirection>()
+        val enumValues = FlexDirection.values()
         renderComposable(
             root = root
         ) {
@@ -496,7 +497,7 @@ class StaticComposableTests {
     @Test
     fun stylesFlexWrap() {
         val root = "div".asHtmlElement()
-        val enumValues = enumValues<FlexWrap>()
+        val enumValues = FlexWrap.values()
         renderComposable(
             root = root
         ) {
@@ -522,8 +523,8 @@ class StaticComposableTests {
     @Test
     fun stylesFlexFlow() {
         val root = "div".asHtmlElement()
-        val flexWraps = enumValues<FlexWrap>()
-        val flexDirections = enumValues<FlexDirection>()
+        val flexWraps = FlexWrap.values()
+        val flexDirections = FlexDirection.values()
         renderComposable(
             root = root
         ) {
@@ -553,7 +554,7 @@ class StaticComposableTests {
     @Test
     fun stylesJustifyContent() {
         val root = "div".asHtmlElement()
-        val enumValues = enumValues<JustifyContent>()
+        val enumValues = JustifyContent.values()
         renderComposable(
             root = root
         ) {
@@ -579,7 +580,7 @@ class StaticComposableTests {
     @Test
     fun stylesAlignSelf() {
         val root = "div".asHtmlElement()
-        val enumValues = enumValues<AlignSelf>()
+        val enumValues = AlignSelf.values()
         renderComposable(
             root = root
         ) {
@@ -605,7 +606,7 @@ class StaticComposableTests {
     @Test
     fun stylesAlignItems() {
         val root = "div".asHtmlElement()
-        val enumValues = enumValues<AlignItems>()
+        val enumValues = AlignItems.values()
         renderComposable(
             root = root
         ) {
@@ -631,7 +632,7 @@ class StaticComposableTests {
     @Test
     fun stylesAlignContent() {
         val root = "div".asHtmlElement()
-        val enumValues = enumValues<AlignContent>()
+        val enumValues = AlignContent.values()
         renderComposable(
             root = root
         ) {
@@ -657,7 +658,7 @@ class StaticComposableTests {
     @Test
     fun stylesPosition() {
         val root = "div".asHtmlElement()
-        val enumValues = enumValues<Position>()
+        val enumValues = Position.values()
         renderComposable(
             root = root
         ) {

@@ -1,3 +1,5 @@
+@file:Suppress("EqualsOrHashCode", "unused", "MemberVisibilityCanBePrivate")
+
 package org.jetbrains.compose.web.css.selectors
 
 import org.jetbrains.compose.web.css.LanguageCode

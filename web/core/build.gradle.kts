@@ -31,7 +31,6 @@ kotlin {
         val jsMain by getting {
             dependencies {
                 implementation(kotlin("stdlib-js"))
-                implementation(npm("css-typed-om", "0.4.0"))
             }
         }
 

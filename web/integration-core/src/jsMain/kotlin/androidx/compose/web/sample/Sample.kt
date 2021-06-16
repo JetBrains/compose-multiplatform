@@ -11,30 +11,9 @@ import androidx.compose.runtime.setValue
 import org.jetbrains.compose.web.attributes.Draggable
 import org.jetbrains.compose.web.attributes.InputType
 import org.jetbrains.compose.web.attributes.name
-import org.jetbrains.compose.web.css.CSSVariables
-import org.jetbrains.compose.web.css.Color
-import org.jetbrains.compose.web.css.LineStyle
-import org.jetbrains.compose.web.css.Style
-import org.jetbrains.compose.web.css.StyleSheet
-import org.jetbrains.compose.web.css.and
-import org.jetbrains.compose.web.css.backgroundColor
-import org.jetbrains.compose.web.css.border
-import org.jetbrains.compose.web.css.color
-import org.jetbrains.compose.web.css.fontSize
-import org.jetbrains.compose.web.css.margin
-import org.jetbrains.compose.web.css.maxWidth
-import org.jetbrains.compose.web.css.media
-import org.jetbrains.compose.web.css.minWidth
-import org.jetbrains.compose.web.css.opacity
-import org.jetbrains.compose.web.css.padding
-import org.jetbrains.compose.web.css.percent
-import org.jetbrains.compose.web.css.px
 import org.jetbrains.compose.web.css.selectors.className
 import org.jetbrains.compose.web.css.selectors.hover
 import org.jetbrains.compose.web.css.selectors.plus
-import org.jetbrains.compose.web.css.value
-import org.jetbrains.compose.web.css.variable
-import org.jetbrains.compose.web.css.width
 import org.jetbrains.compose.web.dom.A
 import org.jetbrains.compose.web.dom.Button
 import org.jetbrains.compose.web.dom.Div
@@ -48,6 +27,7 @@ import kotlinx.browser.window
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import org.jetbrains.compose.web.css.*
 import org.w3c.dom.url.URLSearchParams
 
 class State {
@@ -59,7 +39,7 @@ val globalInt = mutableStateOf(1)
 
 object MyCSSVariables : CSSVariables {
     val myVar by variable<Color>()
-    val myVar2 by variable<String>()
+    val myVar2 by variable<StylePropertyString>()
 }
 
 object AppStyleSheet : StyleSheet() {

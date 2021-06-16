@@ -51,40 +51,40 @@ class CSSUnitApiTests {
     @Test
     fun postfixInvocation() {
         // TODO: review what exactly number does - most likely we don't need it in our ecosystem
-        assertEquals("4number", 4.number.asString())
+        assertEquals("4number", 4.number.toString())
 
-        assertEquals("4%", 4.percent.asString())
+        assertEquals("4%", 4.percent.toString())
 
-        assertEquals("4em", 4.em.asString())
-        assertEquals("4ch", 4.ch.asString())
+        assertEquals("4em", 4.em.toString())
+        assertEquals("4ch", 4.ch.toString())
 
-        assertEquals("4rem", 4.cssRem.asString())
+        assertEquals("4rem", 4.cssRem.toString())
 
-        assertEquals("4vw", 4.vw.asString())
-        assertEquals("4vh", 4.vh.asString())
+        assertEquals("4vw", 4.vw.toString())
+        assertEquals("4vh", 4.vh.toString())
 
-        assertEquals("4vmin", 4.vmin.asString())
-        assertEquals("4vmax", 4.vmax.asString())
-        assertEquals("4cm", 4.cm.asString())
-        assertEquals("4mm", 4.mm.asString())
+        assertEquals("4vmin", 4.vmin.toString())
+        assertEquals("4vmax", 4.vmax.toString())
+        assertEquals("4cm", 4.cm.toString())
+        assertEquals("4mm", 4.mm.toString())
 
-        assertEquals("4pt", 4.pt.asString())
-        assertEquals("4pc", 4.pc.asString())
-        assertEquals("4px", 4.px.asString())
+        assertEquals("4pt", 4.pt.toString())
+        assertEquals("4pc", 4.pc.toString())
+        assertEquals("4px", 4.px.toString())
 
-        assertEquals("4deg", 4.deg.asString())
-        assertEquals("4grad", 4.grad.asString())
-        assertEquals("4rad", 4.rad.asString())
-        assertEquals("4turn", 4.turn.asString())
+        assertEquals("4deg", 4.deg.toString())
+        assertEquals("4grad", 4.grad.toString())
+        assertEquals("4rad", 4.rad.toString())
+        assertEquals("4turn", 4.turn.toString())
 
-        assertEquals("4s", 4.s.asString())
-        assertEquals("4ms", 4.ms.asString())
+        assertEquals("4s", 4.s.toString())
+        assertEquals("4ms", 4.ms.toString())
 
-        assertEquals("4dpi", 4.dpi.asString())
-        assertEquals("4dpcm", 4.dpcm.asString())
-        assertEquals("4dppx", 4.dppx.asString())
+        assertEquals("4dpi", 4.dpi.toString())
+        assertEquals("4dpcm", 4.dpcm.toString())
+        assertEquals("4dppx", 4.dppx.toString())
 
-        assertEquals("4fr", 4.fr.asString())
+        assertEquals("4fr", 4.fr.toString())
     }
 
     @Test
