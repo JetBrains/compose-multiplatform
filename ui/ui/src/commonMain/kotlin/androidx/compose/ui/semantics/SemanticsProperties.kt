@@ -634,6 +634,11 @@ interface SemanticsPropertyReceiver {
  *
  * If this is not set, accessibility services will present the [text][SemanticsProperties.Text] of
  * this node as the content.
+ *
+ * This typically should not be set directly by applications, because some screen readers will
+ * cease presenting other relevant information when this property is present. This is intended
+ * to be used via Foundation components which are inherently intractable to automatically
+ * describe, such as Image, Icon, and Canvas.
  */
 var SemanticsPropertyReceiver.contentDescription: String
     get() = throwSemanticsGetNotSupported()
