@@ -4,11 +4,8 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
-import org.jetbrains.compose.web.attributes.InputType
-import org.jetbrains.compose.web.attributes.checked
-import org.jetbrains.compose.web.attributes.name
-import org.jetbrains.compose.web.dom.Input
-import org.jetbrains.compose.web.dom.TextArea
+import org.jetbrains.compose.web.attributes.*
+import org.jetbrains.compose.web.dom.*
 
 class InputsTests {
     val textAreaInputGetsPrinted by testCase {
@@ -193,5 +190,43 @@ class InputsTests {
                 }
             }
         )
+    }
+
+    val invalidInputUpdatesText by testCase {
+        var state by remember { mutableStateOf("None") }
+
+        P { TestText(state) }
+
+        Form(attrs = {
+            action("#")
+        }) {
+            Input(type = InputType.Number, attrs = {
+                id("numberInput")
+                min("1")
+                max("5")
+
+                onInvalid {
+                    state = "INVALID VALUE ENTERED"
+                }
+
+                onInput { state = "SOMETHING ENTERED" }
+            })
+
+            Input(type = InputType.Submit, value = "submit", attrs = { id("submitBtn") })
+        }
+    }
+
+
+    val changeEventUpdatesText by testCase {
+        var state by remember { mutableStateOf("None") }
+
+        P { TestText(state) }
+
+        Div {
+            Input(type = InputType.Number, attrs = {
+                id("numberInput")
+                onChange { state = "INPUT HAS CHANGED" }
+            })
+        }
     }
 }
