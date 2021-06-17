@@ -11,11 +11,11 @@ import com.arkivanov.decompose.extensions.compose.jetbrains.rememberRootComponen
 import com.arkivanov.mvikotlin.main.store.DefaultStoreFactory
 import com.badoo.reaktive.coroutinesinterop.asScheduler
 import com.badoo.reaktive.scheduler.overrideSchedulers
+import example.todo.common.database.DefaultTodoSharedDatabase
 import example.todo.common.database.TodoDatabaseDriver
 import example.todo.common.root.TodoRoot
 import example.todo.common.root.integration.TodoRootComponent
 import example.todo.common.ui.TodoRootContent
-import example.todo.database.TodoDatabase
 import kotlinx.coroutines.Dispatchers
 
 fun main() {
@@ -36,5 +36,5 @@ private fun todoRoot(componentContext: ComponentContext): TodoRoot =
     TodoRootComponent(
         componentContext = componentContext,
         storeFactory = DefaultStoreFactory,
-        database = TodoDatabase(TodoDatabaseDriver())
+        database = DefaultTodoSharedDatabase(TodoDatabaseDriver())
     )

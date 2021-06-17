@@ -10,11 +10,11 @@ import com.arkivanov.decompose.extensions.compose.jetbrains.rememberRootComponen
 import com.arkivanov.mvikotlin.logging.store.LoggingStoreFactory
 import com.arkivanov.mvikotlin.main.store.DefaultStoreFactory
 import com.arkivanov.mvikotlin.timetravel.store.TimeTravelStoreFactory
+import example.todo.common.database.DefaultTodoSharedDatabase
 import example.todo.common.database.TodoDatabaseDriver
 import example.todo.common.root.TodoRoot
 import example.todo.common.root.integration.TodoRootComponent
 import example.todo.common.ui.TodoRootContent
-import example.todo.database.TodoDatabase
 
 class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -33,6 +33,6 @@ class MainActivity : AppCompatActivity() {
         TodoRootComponent(
             componentContext = componentContext,
             storeFactory = LoggingStoreFactory(TimeTravelStoreFactory(DefaultStoreFactory)),
-            database = TodoDatabase(TodoDatabaseDriver(context = this))
+            database = DefaultTodoSharedDatabase(TodoDatabaseDriver(context = this))
         )
 }

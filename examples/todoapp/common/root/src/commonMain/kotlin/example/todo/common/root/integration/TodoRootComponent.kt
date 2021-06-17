@@ -10,6 +10,7 @@ import com.arkivanov.decompose.statekeeper.Parcelize
 import com.arkivanov.decompose.value.Value
 import com.arkivanov.mvikotlin.core.store.StoreFactory
 import com.badoo.reaktive.base.Consumer
+import example.todo.common.database.TodoSharedDatabase
 import example.todo.common.edit.TodoEdit
 import example.todo.common.edit.integration.TodoEditComponent
 import example.todo.common.main.TodoMain
@@ -17,7 +18,6 @@ import example.todo.common.main.integration.TodoMainComponent
 import example.todo.common.root.TodoRoot
 import example.todo.common.root.TodoRoot.Child
 import example.todo.common.utils.Consumer
-import example.todo.database.TodoDatabase
 
 class TodoRootComponent internal constructor(
     componentContext: ComponentContext,
@@ -28,7 +28,7 @@ class TodoRootComponent internal constructor(
     constructor(
         componentContext: ComponentContext,
         storeFactory: StoreFactory,
-        database: TodoDatabase
+        database: TodoSharedDatabase
     ) : this(
         componentContext = componentContext,
         todoMain = { childContext, output ->

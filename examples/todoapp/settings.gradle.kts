@@ -6,5 +6,6 @@ include(
     ":common:root",
     ":common:compose-ui",
     ":android",
-    ":desktop"
+    ":desktop",
+    ":web"
 )

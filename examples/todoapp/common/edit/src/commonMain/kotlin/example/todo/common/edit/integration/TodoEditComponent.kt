@@ -6,6 +6,7 @@ import com.arkivanov.decompose.value.operator.map
 import com.arkivanov.mvikotlin.core.store.StoreFactory
 import com.badoo.reaktive.base.Consumer
 import com.badoo.reaktive.base.invoke
+import example.todo.common.database.TodoSharedDatabase
 import example.todo.common.edit.TodoEdit
 import example.todo.common.edit.TodoEdit.Model
 import example.todo.common.edit.TodoEdit.Output
@@ -13,12 +14,11 @@ import example.todo.common.edit.store.TodoEditStore.Intent
 import example.todo.common.edit.store.TodoEditStoreProvider
 import example.todo.common.utils.asValue
 import example.todo.common.utils.getStore
-import example.todo.database.TodoDatabase
 
 class TodoEditComponent(
     componentContext: ComponentContext,
     storeFactory: StoreFactory,
-    database: TodoDatabase,
+    database: TodoSharedDatabase,
     itemId: Long,
     private val output: Consumer<Output>
 ) : TodoEdit, ComponentContext by componentContext {
@@ -27,7 +27,7 @@ class TodoEditComponent(
         instanceKeeper.getStore {
             TodoEditStoreProvider(
                 storeFactory = storeFactory,
-                database = TodoEditStoreDatabase(queries = database.todoDatabaseQueries),
+                database = TodoEditStoreDatabase(database = database),
                 id = itemId
             ).provide()
         }

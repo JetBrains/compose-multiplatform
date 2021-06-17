@@ -7,12 +7,13 @@ object Deps {
             const val gradlePlugin = "org.jetbrains.kotlin:kotlin-gradle-plugin:$VERSION"
             const val testCommon = "org.jetbrains.kotlin:kotlin-test-common:$VERSION"
             const val testJunit = "org.jetbrains.kotlin:kotlin-test-junit:$VERSION"
+            const val testJs = "org.jetbrains.kotlin:kotlin-test-js:$VERSION"
             const val testAnnotationsCommon = "org.jetbrains.kotlin:kotlin-test-annotations-common:$VERSION"
         }
 
         object Compose {
             // __LATEST_COMPOSE_RELEASE_VERSION__
-            private const val VERSION = "0.4.0"
+            private const val VERSION = "0.5.0-build225"
             const val gradlePlugin = "org.jetbrains.compose:compose-gradle-plugin:$VERSION"
         }
     }
@@ -37,7 +38,7 @@ object Deps {
 
     object ArkIvanov {
         object MVIKotlin {
-            private const val VERSION = "2.0.2"
+            private const val VERSION = "2.0.3"
             const val rx = "com.arkivanov.mvikotlin:rx:$VERSION"
             const val mvikotlin = "com.arkivanov.mvikotlin:mvikotlin:$VERSION"
             const val mvikotlinMain = "com.arkivanov.mvikotlin:mvikotlin-main:$VERSION"
@@ -71,6 +72,7 @@ object Deps {
             const val androidDriver = "com.squareup.sqldelight:android-driver:$VERSION"
             const val sqliteDriver = "com.squareup.sqldelight:sqlite-driver:$VERSION"
             const val nativeDriver = "com.squareup.sqldelight:native-driver:$VERSION"
+            const val sqljsDriver = "com.squareup.sqldelight:sqljs-driver:$VERSION"
         }
     }
 }

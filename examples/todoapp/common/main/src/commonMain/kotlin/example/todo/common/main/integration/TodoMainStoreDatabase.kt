@@ -1,26 +1,20 @@
 package example.todo.common.main.integration
 
 import com.badoo.reaktive.completable.Completable
-import com.badoo.reaktive.completable.completableFromFunction
-import com.badoo.reaktive.completable.subscribeOn
 import com.badoo.reaktive.observable.Observable
 import com.badoo.reaktive.observable.mapIterable
-import com.badoo.reaktive.scheduler.ioScheduler
-import com.squareup.sqldelight.Query
-import example.todo.common.database.TodoDatabaseQueries
 import example.todo.common.database.TodoItemEntity
-import example.todo.common.database.asObservable
+import example.todo.common.database.TodoSharedDatabase
 import example.todo.common.main.TodoItem
 import example.todo.common.main.store.TodoMainStoreProvider
 
 internal class TodoMainStoreDatabase(
-    private val queries: TodoDatabaseQueries
+    private val database: TodoSharedDatabase
 ) : TodoMainStoreProvider.Database {
 
     override val updates: Observable<List<TodoItem>> =
-        queries
-            .selectAll()
-            .asObservable(Query<TodoItemEntity>::executeAsList)
+        database
+            .observeAll()
             .mapIterable { it.toItem() }
 
     private fun TodoItemEntity.toItem(): TodoItem =
@@ -32,14 +26,11 @@ internal class TodoMainStoreDatabase(
         )
 
     override fun setDone(id: Long, isDone: Boolean): Completable =
-        completableFromFunction { queries.setDone(id = id, isDone = isDone) }
-            .subscribeOn(ioScheduler)
+        database.setDone(id = id, isDone = isDone)
 
     override fun delete(id: Long): Completable =
-        completableFromFunction { queries.delete(id = id) }
-            .subscribeOn(ioScheduler)
+        database.delete(id = id)
 
     override fun add(text: String): Completable =
-        completableFromFunction { queries.add(text = text) }
-            .subscribeOn(ioScheduler)
+        database.add(text = text)
 }
