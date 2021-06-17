@@ -26,5 +26,8 @@
         <activity android:name="androidx.compose.ui.test.junit4.MultipleActivitiesFirstDrawTest$Activity1" />
         <activity android:name="androidx.compose.ui.test.junit4.MultipleActivitiesFirstDrawTest$Activity2" />
         <activity android:name="androidx.compose.ui.test.junit4.LateSetContentTest$Activity" />
+        <activity android:name=".MultipleActivitiesWithoutComposeTest$Activity1" />
+        <activity android:name=".MultipleActivitiesWithoutComposeTest$Activity2" />
+        <activity android:name=".MultipleActivitiesWithoutComposeTest$Activity3" />
     </application>
 </manifest>
