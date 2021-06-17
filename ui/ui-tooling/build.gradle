@@ -36,6 +36,7 @@ dependencies {
 
         api(project(":compose:runtime:runtime"))
         api(project(":compose:ui:ui"))
+        api(project(":compose:ui:ui-tooling-preview"))
         api(project(":compose:ui:ui-tooling-data"))
         implementation(project(":compose:material:material"))
         implementation(project(":activity:activity-compose"))
@@ -77,6 +78,7 @@ if(AndroidXComposePlugin.isMultiplatformEnabled(project)) {
 
                 api(project(":compose:runtime:runtime"))
                 api(project(":compose:ui:ui"))
+                api(project(":compose:ui:ui-tooling-preview"))
                 api(project(":compose:ui:ui-tooling-data"))
                 implementation(project(":compose:material:material"))
                 implementation(project(":activity:activity-compose"))

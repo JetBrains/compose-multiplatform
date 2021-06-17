@@ -35,7 +35,7 @@ dependencies {
     implementation(project(":compose:runtime:runtime-livedata"))
     implementation(project(":compose:ui:ui-graphics"))
     implementation(project(":compose:ui:ui-test-junit4"))
-    implementation(project(":compose:ui:ui-tooling"))
+    implementation(project(":compose:ui:ui-tooling-preview"))
     implementation(project(":compose:ui:ui-viewbinding"))
     implementation(project(":navigation:navigation-compose"))
     implementation(project(":activity:activity-compose"))

@@ -1,5 +1,5 @@
 /*
- * Copyright 2020 The Android Open Source Project
+ * Copyright 2021 The Android Open Source Project
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package androidx.compose.ui.tooling.preview
+package androidx.compose.ui.tooling
 
 import androidx.compose.material.Colors
 import androidx.compose.material.darkColors
@@ -48,7 +48,7 @@ class PreviewParameterTest {
     fun loremIpsumProvider() {
         activityTestRule.runOnUiThread {
             composeViewAdapter.init(
-                "androidx.compose.ui.tooling.preview.ParameterProviderComposableKt",
+                "androidx.compose.ui.tooling.ParameterProviderComposableKt",
                 "OneStringParameter",
                 parameterProvider = LoremIpsum::class.java,
                 debugViewInfos = true
@@ -62,7 +62,7 @@ class PreviewParameterTest {
     fun checkIntParameterProvider() {
         activityTestRule.runOnUiThread {
             composeViewAdapter.init(
-                "androidx.compose.ui.tooling.preview.ParameterProviderComposableKt",
+                "androidx.compose.ui.tooling.ParameterProviderComposableKt",
                 "OneIntParameter",
                 parameterProvider = MyListProvider::class.java,
                 debugViewInfos = true
@@ -78,7 +78,7 @@ class PreviewParameterTest {
     fun checkColorsProvider() {
         activityTestRule.runOnUiThread {
             composeViewAdapter.init(
-                "androidx.compose.ui.tooling.preview.ParameterProviderComposableKt",
+                "androidx.compose.ui.tooling.ParameterProviderComposableKt",
                 "ColorsParameter",
                 parameterProvider = MyColorsProvider::class.java,
                 debugViewInfos = true
