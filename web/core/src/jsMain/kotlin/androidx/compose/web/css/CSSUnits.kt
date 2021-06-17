@@ -32,6 +32,7 @@ typealias CSSLengthOrPercentageValue = CSSSizeValue<out CSSUnitLengthOrPercentag
 typealias CSSLengthValue = CSSSizeValue<out CSSUnitLength>
 typealias CSSPercentageValue = CSSSizeValue<out CSSUnitPercentage>
 typealias CSSUnitValue = CSSSizeValue<out CSSUnit>
+typealias CSSNumeric = CSSNumericValue<out CSSUnit>
 typealias CSSpxValue = CSSSizeValue<CSSUnit.px>
 
 // fake interfaces to distinguish units
