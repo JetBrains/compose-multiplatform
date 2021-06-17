@@ -27,6 +27,7 @@ import kotlinx.browser.window
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import org.jetbrains.compose.web.attributes.value
 import org.jetbrains.compose.web.css.*
 import org.w3c.dom.url.URLSearchParams
 
@@ -265,15 +266,15 @@ fun MyInputComponent(text: State<String>, onChange: (String) -> Unit) {
             }
         )
     }
-    Div(
-        attrs = {
+    Div {
+        Input(type = InputType.Checkbox, attrs = {
             onCheckboxInput {
                 println("From div - Checked: " + it.checked)
             }
-        }
-    ) {
-        Input(type = InputType.Checkbox, attrs = {})
-        Input(value = "Hi, ")
+        })
+        Input(type = InputType.Text, attrs = {
+            value(value = "Hi, ")
+        })
     }
     Div {
         Input(
@@ -294,6 +295,7 @@ fun MyInputComponent(text: State<String>, onChange: (String) -> Unit) {
                 name("f1")
             }
         )
+        Input(type = InputType.Radio, attrs = {})
     }
 }
 

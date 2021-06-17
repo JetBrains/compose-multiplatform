@@ -17,7 +17,7 @@ class InputsTests {
             value = state,
             attrs = {
                 id("input")
-                onTextInput { state = it.inputValue }
+                onInput { state = it.value }
             }
         )
     }
@@ -29,10 +29,10 @@ class InputsTests {
 
         Input(
             type = InputType.Text,
-            value = state,
             attrs = {
+                value(state)
                 id("input")
-                onTextInput { state = it.inputValue }
+                onInput { state = it.value }
             }
         )
     }
@@ -49,9 +49,7 @@ class InputsTests {
                 if (checked) {
                     checked()
                 }
-                onCheckboxInput {
-                    checked = !checked
-                }
+                onInput { checked = !checked }
             }
         )
     }
@@ -67,9 +65,7 @@ class InputsTests {
                 id("r1")
                 name("f1")
 
-                onRadioInput {
-                    text = "r1"
-                }
+                onInput { text = "r1" }
             }
         )
 
@@ -79,9 +75,7 @@ class InputsTests {
                 id("r2")
                 name("f1")
 
-                onRadioInput {
-                    text = "r2"
-                }
+                onInput { text = "r2" }
             }
         )
     }
@@ -99,9 +93,8 @@ class InputsTests {
                 attr("max", "100")
                 attr("step", "5")
 
-                onRangeInput {
-                    val value: String = it.nativeEvent.target.asDynamic().value
-                    rangeState = value.toInt()
+                onInput {
+                    rangeState = it.value?.toInt() ?: 0
                 }
             }
         )
@@ -116,9 +109,8 @@ class InputsTests {
             type = InputType.Time,
             attrs = {
                 id("time")
-                onGenericInput {
-                    val value: String = it.nativeEvent.target.asDynamic().value
-                    timeState = value
+                onInput {
+                    timeState = it.value
                 }
             }
         )
@@ -133,9 +125,8 @@ class InputsTests {
             type = InputType.Date,
             attrs = {
                 id("date")
-                onGenericInput {
-                    val value: String = it.nativeEvent.target.asDynamic().value
-                    timeState = value
+                onInput {
+                    timeState = it.value
                 }
             }
         )
@@ -150,9 +141,8 @@ class InputsTests {
             type = InputType.DateTimeLocal,
             attrs = {
                 id("dateTimeLocal")
-                onGenericInput {
-                    val value: String = it.nativeEvent.target.asDynamic().value
-                    timeState = value
+                onInput {
+                    timeState = it.value
                 }
             }
         )
@@ -167,9 +157,8 @@ class InputsTests {
             type = InputType.File,
             attrs = {
                 id("file")
-                onGenericInput {
-                    val value: String = it.nativeEvent.target.asDynamic().value
-                    filePath = value
+                onInput {
+                    filePath = it.value
                 }
             }
         )
@@ -184,9 +173,8 @@ class InputsTests {
             type = InputType.Color,
             attrs = {
                 id("color")
-                onGenericInput {
-                    val value: String = it.nativeEvent.target.asDynamic().value
-                    color = value
+                onInput {
+                    color = it.value
                 }
             }
         )
@@ -212,7 +200,10 @@ class InputsTests {
                 onInput { state = "SOMETHING ENTERED" }
             })
 
-            Input(type = InputType.Submit, value = "submit", attrs = { id("submitBtn") })
+            Input(type = InputType.Submit, attrs = {
+                value("submit")
+                id("submitBtn")
+            })
         }
     }
 

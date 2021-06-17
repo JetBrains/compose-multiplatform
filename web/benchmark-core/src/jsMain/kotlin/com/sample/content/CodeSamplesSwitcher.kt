@@ -70,8 +70,9 @@ fun CodeSampleSwitcher(count: Int, current: Int, onSelect: (Int) -> Unit) {
         classes(SwitcherStylesheet.boxed)
     }) {
         repeat(count) { ix ->
-            Input(type = InputType.Radio, value = "snippet$ix", attrs = {
+            Input(type = InputType.Radio, attrs = {
                 name("code-snippet")
+                value("snippet$ix")
                 id("snippet$ix")
                 if (current == ix) checked()
                 onRadioInput { onSelect(ix) }

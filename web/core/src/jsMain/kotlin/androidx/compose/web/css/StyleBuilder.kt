@@ -106,6 +106,11 @@ open class StyleBuilderImpl : StyleBuilder, StyleHolder {
                 variables.nativeEquals(other.variables)
         } else false
     }
+
+    internal fun copyFrom(sb: StyleBuilderImpl) {
+        properties.addAll(sb.properties)
+        variables.addAll(sb.variables)
+    }
 }
 
 data class StylePropertyDeclaration(
