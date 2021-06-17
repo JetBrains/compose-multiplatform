@@ -28,6 +28,8 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.snapshots.Snapshot
 import androidx.compose.runtime.structuralEqualityPolicy
+import androidx.compose.ui.geometry.Rect
+import androidx.compose.ui.graphics.toAndroidRect
 import androidx.compose.ui.node.InnerPlaceable
 import androidx.compose.ui.node.LayoutNode
 import androidx.compose.ui.platform.AndroidComposeView
@@ -77,6 +79,7 @@ import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.TextRange
 import androidx.core.view.ViewCompat
 import androidx.core.view.accessibility.AccessibilityNodeInfoCompat
+import androidx.core.view.accessibility.AccessibilityNodeProviderCompat
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.MediumTest
 import androidx.test.platform.app.InstrumentationRegistry
@@ -832,7 +835,7 @@ class AndroidComposeViewAccessibilityDelegateCompatTest {
     }
 
     @Test
-    fun testNotPlacedNodesAreNotIncluded() {
+    fun testUncoveredNodes_notPlacedNodes_notIncluded() {
         val nodes = SemanticsOwner(
             LayoutNode().also {
                 it.modifier = SemanticsModifierCore(
@@ -844,6 +847,18 @@ class AndroidComposeViewAccessibilityDelegateCompatTest {
             }
         ).getAllUncoveredSemanticsNodesToMap()
         assertEquals(0, nodes.size)
+    }
+
+    @Test
+    fun testUncoveredNodes_zeroBoundsRoot_included() {
+        val nodes = SemanticsOwner(androidComposeView.root).getAllUncoveredSemanticsNodesToMap()
+
+        assertEquals(1, nodes.size)
+        assertEquals(AccessibilityNodeProviderCompat.HOST_VIEW_ID, nodes.keys.first())
+        assertEquals(
+            Rect.Zero.toAndroidRect(),
+            nodes[AccessibilityNodeProviderCompat.HOST_VIEW_ID]!!.adjustedBounds
+        )
     }
 
     @Test
