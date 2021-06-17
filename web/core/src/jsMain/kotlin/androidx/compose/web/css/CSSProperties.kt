@@ -28,12 +28,12 @@ fun StyleBuilder.color(value: String) {
     property("color", value)
 }
 
-fun StyleBuilder.color(value: Color) {
+fun StyleBuilder.color(value: CSSColorValue) {
     // color hasn't Typed OM yet
     property("color", value)
 }
 
-fun StyleBuilder.backgroundColor(value: Color) {
+fun StyleBuilder.backgroundColor(value: CSSColorValue) {
     property("background-color", value)
 }
 
@@ -67,7 +67,7 @@ inline fun CSSBorder.style(style: LineStyle) {
     this.style = CSSStyleValue(style.name)
 }
 
-inline fun CSSBorder.color(color: Color) {
+inline fun CSSBorder.color(color: CSSColorValue) {
     this.color = color
 }
 
@@ -78,7 +78,7 @@ inline fun StyleBuilder.border(crossinline borderBuild: CSSBorder.() -> Unit) {
 fun StyleBuilder.border(
     width: CSSLengthValue? = null,
     style: LineStyle? = null,
-    color: Color? = null
+    color: CSSColorValue? = null
 ) {
     border {
         width?.let { width(it) }
