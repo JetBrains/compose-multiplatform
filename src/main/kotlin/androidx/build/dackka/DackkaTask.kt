@@ -102,7 +102,9 @@ abstract class DackkaTask @Inject constructor(
             // Configuration of sources. The generated string looks like this:
             // "-sourceSet -src /path/to/src -samples /path/to/samples ..."
             "-sourceSet",
-            "-src $sourcesDir -samples $samplesDir -classpath $classPath $includesString"
+            "-src $sourcesDir -samples $samplesDir -classpath $classPath $includesString",
+
+            "-offlineMode"
         )
     }
 
