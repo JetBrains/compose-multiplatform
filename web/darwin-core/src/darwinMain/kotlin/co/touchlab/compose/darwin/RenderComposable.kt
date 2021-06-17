@@ -9,6 +9,7 @@ import androidx.compose.runtime.Recomposer
 import androidx.compose.runtime.snapshots.ObserverHandle
 import androidx.compose.runtime.snapshots.Snapshot
 import co.touchlab.compose.darwin.RootUIKitWrapper
+import co.touchlab.compose.darwin.UIControlWrapper
 import co.touchlab.compose.darwin.UIKitApplier
 import co.touchlab.compose.darwin.UIKitWrapper
 import co.touchlab.compose.darwin.UIViewWrapper
@@ -22,6 +23,7 @@ import kotlinx.coroutines.launch
 import org.jetbrains.compose.web.GlobalSnapshotManager.ensureStarted
 import platform.CoreGraphics.CGRectMake
 import platform.UIKit.UIButton
+import platform.UIKit.UIColor
 import platform.UIKit.UIControlEventTouchUpInside
 import platform.UIKit.UIControlStateNormal
 import platform.UIKit.UILabel
@@ -114,8 +116,10 @@ fun Button(
     value: String,
     onClick: () -> Unit
 ) {
-    ComposeNode<UIViewWrapper<UIButton>, UIKitApplier>(
-        factory = { UIViewWrapper(UIButton()) },
+    ComposeNode<UIControlWrapper<UIButton>, UIKitApplier>(
+        factory = { UIControlWrapper(UIButton().apply {
+            setTitleColor(UIColor.blackColor, UIControlStateNormal)
+        }) },
         update = {
             set(value) { value -> view.setTitle(value, UIControlStateNormal) }
             set(onClick) { oc -> updateOnClick(onClick) }
@@ -129,7 +133,9 @@ fun KotlinButton(
     onClick: () -> Unit
 ) {
     ComposeNode<UIViewWrapper<KButton>, UIKitApplier>(
-        factory = { UIViewWrapper(KButton()) },
+        factory = { UIViewWrapper(KButton().apply {
+            setTitleColor(UIColor.blackColor, UIControlStateNormal)
+        }) },
         update = {
             set(value) { value -> view.setTitle(value, UIControlStateNormal) }
             set(onClick) { oc -> view.updateOnClick(onClick) }

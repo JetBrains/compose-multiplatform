@@ -1,9 +1,11 @@
 package co.touchlab.compose.darwin
 
 import androidx.compose.runtime.AbstractApplier
+import kotlinx.cinterop.COpaquePointer
 import kotlinx.cinterop.ObjCAction
 import kotlinx.cinterop.convert
 import platform.UIKit.UIControl
+import platform.UIKit.UIControlEventAllEvents
 import platform.UIKit.UIControlEventTouchUpInside
 import platform.UIKit.UIView
 import platform.UIKit.bottomAnchor
@@ -15,6 +17,7 @@ import platform.UIKit.subviews
 import platform.UIKit.topAnchor
 import platform.UIKit.trailingAnchor
 import platform.darwin.NSInteger
+import platform.darwin.NSObject
 import platform.objc.sel_registerName
 
 class UIKitApplier(root: UIKitWrapper<*>) : AbstractApplier<UIKitWrapper<*>>(root) {
@@ -70,24 +73,40 @@ interface UIKitWrapper<TView: UIView> {
   }
 }
 
-class UIViewWrapper<TView : UIView>(override val view: TView) : UIKitWrapper<TView>{
-    private var onClick: (() -> Unit)? = null
-
-    private val clickedPointer = sel_registerName("clicked")
+class UIControlWrapper<TControl: UIControl>(override val view: TControl): UIKitWrapper<TControl> {
+    lateinit var delegate: Delegate
 
     fun updateOnClick(onClick: () -> Unit) {
-        if(this.onClick == null) {
-            (view as UIControl).addTarget(this, clickedPointer, UIControlEventTouchUpInside)
+        if (::delegate.isInitialized) {
+            delegate.detach(view)
         }
-        this.onClick = onClick
+        delegate = Delegate(onClick)
+        delegate.attach(view)
     }
 
-    @ObjCAction
-    fun clicked() {
-        onClick?.invoke()
+    class Delegate(private val onClick: () -> Unit): NSObject() {
+        private val clickedPointer = sel_registerName("clicked")
+
+        @ObjCAction
+        fun clicked() {
+            onClick()
+        }
+
+        override fun respondsToSelector(aSelector: COpaquePointer?): Boolean {
+            return super.respondsToSelector(aSelector)
+        }
+
+        fun attach(control: UIControl) {
+            control.addTarget(this, clickedPointer, UIControlEventTouchUpInside)
+        }
+
+        fun detach(control: UIControl) {
+            control.removeTarget(this, clickedPointer, UIControlEventAllEvents)
+        }
     }
 }
 
+class UIViewWrapper<TView : UIView>(override val view: TView): UIKitWrapper<TView>
 /*open class UIClickableViewWrapper<TView : UIView>(view: TView) : UIViewWrapper<TView>(view) {
     private var onClick: (() -> Unit)? = null
 
