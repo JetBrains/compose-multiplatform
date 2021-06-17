@@ -25,6 +25,7 @@ import platform.UIKit.UIButton
 import platform.UIKit.UIControlEventTouchUpInside
 import platform.UIKit.UIControlStateNormal
 import platform.UIKit.UILabel
+import platform.UIKit.UILayoutConstraintAxisHorizontal
 import platform.UIKit.UILayoutConstraintAxisVertical
 import platform.UIKit.UIStackView
 import platform.UIKit.UIView
@@ -187,6 +188,21 @@ fun VStack(spacing: Double = 0.0, content: @Composable () -> Unit) {
         factory = {
             UIStackViewWrapper(UIStackView().apply {
                 axis = UILayoutConstraintAxisVertical
+            })
+        },
+        update = {
+            set(spacing) { value -> view.spacing = value }
+        },
+        content = content,
+    )
+}
+
+@Composable
+fun HStack(spacing: Double = 0.0, content: @Composable () -> Unit) {
+    ComposeNode<UIStackViewWrapper, UIKitApplier>(
+        factory = {
+            UIStackViewWrapper(UIStackView().apply {
+                axis = UILayoutConstraintAxisHorizontal
             })
         },
         update = {
