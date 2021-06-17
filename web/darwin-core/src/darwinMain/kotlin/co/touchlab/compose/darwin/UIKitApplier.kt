@@ -1,7 +1,10 @@
 package co.touchlab.compose.darwin
 
 import androidx.compose.runtime.AbstractApplier
+import kotlinx.cinterop.ObjCAction
 import kotlinx.cinterop.convert
+import platform.UIKit.UIControl
+import platform.UIKit.UIControlEventTouchUpInside
 import platform.UIKit.UIView
 import platform.UIKit.bottomAnchor
 import platform.UIKit.insertSubview
@@ -12,6 +15,7 @@ import platform.UIKit.subviews
 import platform.UIKit.topAnchor
 import platform.UIKit.trailingAnchor
 import platform.darwin.NSInteger
+import platform.objc.sel_registerName
 
 class UIKitApplier(root: UIKitWrapper<*>) : AbstractApplier<UIKitWrapper<*>>(root) {
   override fun onClear() {
@@ -66,6 +70,38 @@ interface UIKitWrapper<TView: UIView> {
   }
 }
 
-class UIViewWrapper<TView: UIView>(override val view: TView): UIKitWrapper<TView>
+class UIViewWrapper<TView : UIView>(override val view: TView) : UIKitWrapper<TView>{
+    private var onClick: (() -> Unit)? = null
+
+    private val clickedPointer = sel_registerName("clicked")
+
+    fun updateOnClick(onClick: () -> Unit) {
+        if(this.onClick == null) {
+            (view as UIControl).addTarget(this, clickedPointer, UIControlEventTouchUpInside)
+        }
+        this.onClick = onClick
+    }
+
+    @ObjCAction
+    fun clicked() {
+        onClick?.invoke()
+    }
+}
+
+/*open class UIClickableViewWrapper<TView : UIView>(view: TView) : UIViewWrapper<TView>(view) {
+    private var onClick: (() -> Unit)? = null
+
+    fun updateOnClick(onClick: () -> Unit) {
+        if(this.onClick == null) {
+            (view as UIControl).addTarget(this, sel_registerName("clicked"), UIControlEventTouchUpInside)
+        }
+        this.onClick = onClick
+    }
+
+    @ObjCAction
+    fun clicked() {
+        this.onClick?.invoke()
+    }
+}*/
 
 class RootUIKitWrapper(override val view: UIView): UIKitWrapper<UIView>

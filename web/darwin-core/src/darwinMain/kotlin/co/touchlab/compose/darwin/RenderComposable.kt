@@ -12,21 +12,25 @@ import co.touchlab.compose.darwin.RootUIKitWrapper
 import co.touchlab.compose.darwin.UIKitApplier
 import co.touchlab.compose.darwin.UIKitWrapper
 import co.touchlab.compose.darwin.UIViewWrapper
+import kotlinx.cinterop.ObjCAction
 import kotlinx.cinterop.convert
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.CoroutineStart
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.launch
+import org.jetbrains.compose.web.GlobalSnapshotManager.ensureStarted
+import platform.CoreGraphics.CGRectMake
+import platform.UIKit.UIButton
+import platform.UIKit.UIControlEventTouchUpInside
+import platform.UIKit.UIControlStateNormal
 import platform.UIKit.UILabel
-import platform.UIKit.UILayoutConstraintAxisHorizontal
 import platform.UIKit.UILayoutConstraintAxisVertical
 import platform.UIKit.UIStackView
 import platform.UIKit.UIView
-import platform.UIKit.UIViewController
-import platform.UIKit.insertSubview
 import platform.UIKit.removeFromSuperview
 import platform.UIKit.subviews
+import platform.objc.sel_registerName
 
 interface UIViewScope<out TView : UIView>
 
@@ -102,6 +106,53 @@ fun Text(value: String) {
             set(value) { value -> view.text = value }
         },
     )
+}
+
+@Composable
+fun Button(
+    value: String,
+    onClick: () -> Unit
+) {
+    ComposeNode<UIViewWrapper<UIButton>, UIKitApplier>(
+        factory = { UIViewWrapper(UIButton()) },
+        update = {
+            set(value) { value -> view.setTitle(value, UIControlStateNormal) }
+            set(onClick) { oc -> updateOnClick(onClick) }
+        },
+    )
+}
+
+@Composable
+fun KotlinButton(
+    value: String,
+    onClick: () -> Unit
+) {
+    ComposeNode<UIViewWrapper<KButton>, UIKitApplier>(
+        factory = { UIViewWrapper(KButton()) },
+        update = {
+            set(value) { value -> view.setTitle(value, UIControlStateNormal) }
+            set(onClick) { oc -> view.updateOnClick(onClick) }
+        },
+    )
+}
+
+private fun makeRect() = CGRectMake(0.toDouble(), 0.toDouble(), 300.toDouble(), 100.toDouble())
+
+internal class KButton():UIButton(frame = makeRect()){
+    private var onClick: () -> Unit = {}
+
+    fun updateOnClick(onClick: () -> Unit){
+        this.onClick = onClick
+    }
+
+    init {
+        addTarget(this, sel_registerName("clicked"), UIControlEventTouchUpInside)
+    }
+
+    @ObjCAction
+    fun clicked() {
+        this.onClick()
+    }
 }
 
 class UIStackViewWrapper(override val view: UIStackView): UIKitWrapper<UIStackView> {
