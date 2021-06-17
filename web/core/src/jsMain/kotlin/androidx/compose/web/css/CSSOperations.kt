@@ -50,15 +50,15 @@ data class CSSDiv<T : CSSUnit>(
     override fun toString(): String = "($l / $r)"
 }
 
-operator fun <T: CSSUnit> CSSSizeValue<out T>.plus(b: CSSSizeValue<out T>): CSSCalcValue<T> = CSSCalcValue(CSSPlus(this, b))
-operator fun <T: CSSUnit> CSSSizeValue<out T>.minus(b: CSSSizeValue<out T>): CSSCalcValue<T> = CSSCalcValue(CSSMinus(this, b))
+operator fun <T: CSSUnit> CSSNumericValue<out T>.plus(b: CSSNumericValue<out T>): CSSCalcValue<T> = CSSCalcValue(CSSPlus(this, b))
+operator fun <T: CSSUnit> CSSCalcValue<out T>.plus(b: CSSNumericValue<out T>): CSSCalcValue<T> = CSSCalcValue(CSSPlus(this.op, b))
+operator fun <T: CSSUnit> CSSNumericValue<out T>.plus(b: CSSCalcValue<out T>): CSSCalcValue<T> = CSSCalcValue(CSSPlus(this, b.op))
 
-operator fun <T: CSSUnit> CSSCalcValue<out T>.plus(b: CSSSizeValue<out T>): CSSCalcValue<T> = CSSCalcValue(CSSPlus(this.op, b))
-operator fun <T: CSSUnit> CSSCalcValue<out T>.minus(b: CSSSizeValue<out T>): CSSCalcValue<T> = CSSCalcValue(CSSMinus(this.op, b))
-
-operator fun <T: CSSUnit> CSSSizeValue<out T>.plus(b: CSSCalcValue<out T>): CSSCalcValue<T> = CSSCalcValue(CSSPlus(this, b.op))
-operator fun <T: CSSUnit> CSSSizeValue<out T>.minus(b: CSSCalcValue<out T>): CSSCalcValue<T> = CSSCalcValue(CSSMinus(this, b.op))
+operator fun <T: CSSUnit> CSSNumericValue<out T>.minus(b: CSSNumericValue<out T>): CSSCalcValue<T> = CSSCalcValue(CSSMinus(this, b))
+operator fun <T: CSSUnit> CSSCalcValue<out T>.minus(b: CSSNumericValue<out T>): CSSCalcValue<T> = CSSCalcValue(CSSMinus(this.op, b))
+operator fun <T: CSSUnit> CSSNumericValue<out T>.minus(b: CSSCalcValue<out T>): CSSCalcValue<T> = CSSCalcValue(CSSMinus(this, b.op))
 
 operator fun <T: CSSUnit> CSSCalcValue<out T>.times(b: Number): CSSCalcValue<T> = CSSCalcValue(CSSTimes(this.op, b))
 operator fun <T: CSSUnit> Number.times(b: CSSCalcValue<out T>): CSSCalcValue<T> = CSSCalcValue(CSSTimes(b.op, this, false))
+
 operator fun <T: CSSUnit> CSSCalcValue<out T>.div(b: Number): CSSCalcValue<T> = CSSCalcValue(CSSDiv(this.op, b))

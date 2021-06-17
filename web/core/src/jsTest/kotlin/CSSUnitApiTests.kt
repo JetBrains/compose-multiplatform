@@ -418,6 +418,18 @@ class CSSUnitApiTests {
     }
 
     @Test
+    fun calcVaraiables() {
+        val variables = object : CSSVariables {
+            val pxVar by variable<CSSSizeValue<CSSUnit.px>>()
+        }
+        val typedResultLength: CSSNumericValue<CSSUnitLength> = 4.pt + variables.pxVar.value()
+        assertEquals("calc(4pt + var(--pxVar))", typedResultLength.toString())
+
+        val typedResultLengthFallback: CSSNumericValue<CSSUnitLength> = 4.pt + variables.pxVar.value(4.px)
+        assertEquals("calc(4pt + var(--pxVar, 4px))", typedResultLengthFallback.toString())
+    }
+
+    @Test
     fun staticEvaluation() = runTest {
         composition {
             Div({

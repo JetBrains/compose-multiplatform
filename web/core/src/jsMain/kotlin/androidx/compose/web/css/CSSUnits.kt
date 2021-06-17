@@ -2,7 +2,7 @@
 
 package org.jetbrains.compose.web.css
 
-external interface CSSNumericValue<T : CSSUnit> : StylePropertyValue
+external interface CSSNumericValue<T : CSSUnit> : StylePropertyValue, CSSVariableValueAs<CSSNumericValue<T>>
 
 external interface CSSSizeValue<T : CSSUnit> : CSSNumericValue<T> {
     val value: Float

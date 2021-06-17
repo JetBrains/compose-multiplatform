@@ -33,10 +33,6 @@ fun StyleBuilder.color(value: Color) {
     property("color", value)
 }
 
-fun StyleBuilder.backgroundColor(value: CSSVariableValue<Color>) {
-    property("background-color", value)
-}
-
 fun StyleBuilder.backgroundColor(value: Color) {
     property("background-color", value)
 }
@@ -72,10 +68,6 @@ inline fun CSSBorder.style(style: LineStyle) {
 }
 
 inline fun CSSBorder.color(color: Color) {
-    this.color = color
-}
-
-inline fun CSSBorder.color(color: CSSVariableValue<Color>) {
     this.color = color
 }
 
