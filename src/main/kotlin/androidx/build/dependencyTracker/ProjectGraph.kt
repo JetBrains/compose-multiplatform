@@ -33,7 +33,13 @@ class ProjectGraph(project: Project, val logger: Logger? = null) {
         logger?.info("initializing ProjectGraph")
         rootNode = Node(logger)
         val rootProjectDir = project.getSupportRootFolder().canonicalFile
-        project.subprojects.forEach {
+        val projects = if (rootProjectDir == project.rootDir.canonicalFile) {
+            project.subprojects
+        } else {
+            // include root project if it is not the main AndroidX project.
+            project.subprojects + project
+        }
+        projects.forEach {
             logger?.info("creating node for ${it.path}")
             val relativePath = it.projectDir.canonicalFile.toRelativeString(rootProjectDir)
             val sections = relativePath.split(File.separatorChar)
