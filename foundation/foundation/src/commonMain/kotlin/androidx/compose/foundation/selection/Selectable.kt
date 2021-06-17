@@ -102,6 +102,8 @@ fun Modifier.selectable(
  * to describe the element or do customizations
  * @param onClick callback to invoke when this item is clicked
  */
+// TODO: b/191017532 remove Modifier.composed
+@Suppress("UnnecessaryComposedModifier")
 fun Modifier.selectable(
     selected: Boolean,
     interactionSource: MutableInteractionSource,

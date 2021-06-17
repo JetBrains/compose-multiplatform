@@ -41,7 +41,6 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.Saver
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.composed
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.graphics.isSpecified
@@ -319,9 +318,9 @@ private fun Modifier.bottomSheetSwipeable(
     sheetState: ModalBottomSheetState,
     fullHeight: Float,
     sheetHeightState: State<Float?>
-) = composed {
+): Modifier {
     val sheetHeight = sheetHeightState.value
-    if (sheetHeight != null) {
+    val modifier = if (sheetHeight != null) {
         val anchors = if (sheetHeight < fullHeight / 2) {
             mapOf(
                 fullHeight to Hidden,
@@ -344,6 +343,8 @@ private fun Modifier.bottomSheetSwipeable(
     } else {
         Modifier
     }
+
+    return this.then(modifier)
 }
 
 @Composable

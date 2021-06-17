@@ -30,6 +30,8 @@ import androidx.compose.ui.platform.debugInspectorInfo
  * While implementing this callback, return true to stop propagation of this event. If you return
  * false, the key event will be sent to this [onKeyEvent]'s parent.
  */
+// TODO: b/191017532 remove Modifier.composed
+@Suppress("UnnecessaryComposedModifier")
 fun Modifier.onKeyEvent(onKeyEvent: (KeyEvent) -> Boolean): Modifier = composed(
     inspectorInfo = debugInspectorInfo {
         name = "onKeyEvent"
@@ -49,6 +51,8 @@ fun Modifier.onKeyEvent(onKeyEvent: (KeyEvent) -> Boolean): Modifier = composed(
  * to this [onPreviewKeyEvent]'s child. If none of the children consume the event, it will be
  * sent back up to the root [KeyInputModifier] using the onKeyEvent callback.
  */
+// TODO: b/191017532 remove Modifier.composed
+@Suppress("UnnecessaryComposedModifier")
 fun Modifier.onPreviewKeyEvent(onPreviewKeyEvent: (KeyEvent) -> Boolean): Modifier = composed(
     inspectorInfo = debugInspectorInfo {
         name = "onPreviewKeyEvent"
