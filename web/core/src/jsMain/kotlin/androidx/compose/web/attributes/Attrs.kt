@@ -94,7 +94,7 @@ fun AttrsBuilder<HTMLFormElement>.target(value: FormTarget) =
 
 /* Input attributes */
 
-fun AttrsBuilder<HTMLInputElement>.type(value: InputType) =
+fun AttrsBuilder<HTMLInputElement>.type(value: InputType<*>) =
     attr("type", value.typeStr)
 
 fun AttrsBuilder<HTMLInputElement>.accept(value: String) =

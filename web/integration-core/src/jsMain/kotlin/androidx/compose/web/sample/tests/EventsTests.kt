@@ -95,7 +95,8 @@ class EventsTests {
 
         P(attrs = { style { height(50.px) } }) { TestText(state) }
 
-        Input(type = InputType.Text, value = "This is a text to be selected", attrs = {
+        Input(type = InputType.Text, attrs = {
+            value("This is a text to be selected")
             id("selectableText")
             onSelect {
                 state = "Text Selected"

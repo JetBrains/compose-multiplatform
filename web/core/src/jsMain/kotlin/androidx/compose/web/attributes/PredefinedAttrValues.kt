@@ -1,26 +1,101 @@
 package org.jetbrains.compose.web.attributes
 
-sealed class InputType(val typeStr: String) {
-    object Button : InputType("button")
-    object Checkbox : InputType("checkbox")
-    object Color : InputType("color")
-    object Date : InputType("date")
-    object DateTimeLocal : InputType("datetime-local")
-    object Email : InputType("email")
-    object File : InputType("file")
-    object Hidden : InputType("hidden")
-    object Month : InputType("month")
-    object Number : InputType("number")
-    object Password : InputType("password")
-    object Radio : InputType("radio")
-    object Range : InputType("range")
-    object Search : InputType("search")
-    object Submit : InputType("submit")
-    object Tel : InputType("tel")
-    object Text : InputType("text")
-    object Time : InputType("time")
-    object Url : InputType("url")
-    object Week : InputType("week")
+import org.w3c.dom.events.Event
+
+sealed class InputType<T>(val typeStr: String) {
+
+    object Button : InputType<Unit>("button") {
+        override fun inputValue(event: Event) = Unit
+    }
+
+    object Checkbox : InputType<Boolean>("checkbox") {
+        override fun inputValue(event: Event): Boolean {
+            return event.target?.asDynamic()?.checked?.unsafeCast<Boolean>() ?: false
+        }
+    }
+
+    object Color : InputType<String>("color") {
+        override fun inputValue(event: Event) = valueAsString(event)
+    }
+
+    object Date : InputType<String>("date") {
+        override fun inputValue(event: Event) = valueAsString(event)
+    }
+
+    object DateTimeLocal : InputType<String>("datetime-local") {
+        override fun inputValue(event: Event) = valueAsString(event)
+    }
+
+    object Email : InputType<String>("email") {
+        override fun inputValue(event: Event) = valueAsString(event)
+    }
+
+    object File : InputType<String>("file") {
+        override fun inputValue(event: Event) = valueAsString(event)
+    }
+
+    object Hidden : InputType<String>("hidden") {
+        override fun inputValue(event: Event) = valueAsString(event)
+    }
+
+    object Month : InputType<String>("month") {
+        override fun inputValue(event: Event) = valueAsString(event)
+    }
+
+    object Number : InputType<kotlin.Number?>("number") {
+        override fun inputValue(event: Event): kotlin.Number? {
+            return event.target?.asDynamic()?.value ?: null
+        }
+    }
+
+    object Password : InputType<String>("password") {
+        override fun inputValue(event: Event) = valueAsString(event)
+    }
+
+    object Radio : InputType<Boolean>("radio") {
+        override fun inputValue(event: Event): Boolean {
+            return event.target?.asDynamic()?.checked?.unsafeCast<Boolean>() ?: false
+        }
+    }
+
+    object Range : InputType<kotlin.Number?>("range") {
+        override fun inputValue(event: Event): kotlin.Number? {
+            return event.target?.asDynamic()?.valueAsNumber ?: null
+        }
+    }
+
+    object Search : InputType<String>("search") {
+        override fun inputValue(event: Event) = valueAsString(event)
+    }
+
+    object Submit : InputType<Unit>("submit") {
+        override fun inputValue(event: Event) = Unit
+    }
+
+    object Tel : InputType<String>("tel") {
+        override fun inputValue(event: Event) = valueAsString(event)
+    }
+
+    object Text : InputType<String>("text") {
+        override fun inputValue(event: Event) = valueAsString(event)
+    }
+
+    object Time : InputType<String>("time") {
+        override fun inputValue(event: Event) = Search.valueAsString(event)
+    }
+
+    object Url : InputType<String>("url") {
+        override fun inputValue(event: Event) = valueAsString(event)
+    }
+    object Week : InputType<String>("week") {
+        override fun inputValue(event: Event) = valueAsString(event)
+    }
+
+    abstract fun inputValue(event: Event): T
+
+    protected fun valueAsString(event: Event): String {
+        return event.target?.asDynamic()?.value?.unsafeCast<String>() ?: ""
+    }
 }
 
 sealed class DirType(val dirStr: String) {
