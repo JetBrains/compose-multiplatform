@@ -23,6 +23,7 @@ import androidx.compose.material.samples.AlertDialogSample
 import androidx.compose.material.samples.BackdropScaffoldSample
 import androidx.compose.material.samples.BottomDrawerSample
 import androidx.compose.material.samples.BottomNavigationSample
+import androidx.compose.material.samples.BottomNavigationItemWithBadge
 import androidx.compose.material.samples.BottomNavigationWithOnlySelectedLabelsSample
 import androidx.compose.material.samples.BottomSheetScaffoldSample
 import androidx.compose.material.samples.ButtonSample
@@ -122,6 +123,18 @@ val BackdropExamples = listOf(
         sourceUrl = BackdropExampleSourceUrl
     ) {
         BackdropScaffoldSample()
+    }
+)
+
+private const val BadgeExampleDescription = "Badge examples"
+private const val BadgeExampleSourceUrl = "$SampleSourceUrl/BadgeSamples.kt"
+val BadgeExamples = listOf(
+    Example(
+        name = ::BottomNavigationItemWithBadge.name,
+        description = BadgeExampleDescription,
+        sourceUrl = BadgeExampleSourceUrl
+    ) {
+        BottomNavigationItemWithBadge()
     }
 )
 
