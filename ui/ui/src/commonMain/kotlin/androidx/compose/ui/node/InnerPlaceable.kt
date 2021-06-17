@@ -27,6 +27,7 @@ import androidx.compose.ui.input.pointer.PointerInputFilter
 import androidx.compose.ui.layout.AlignmentLine
 import androidx.compose.ui.layout.LayoutCoordinates
 import androidx.compose.ui.layout.Placeable
+import androidx.compose.ui.semantics.SemanticsWrapper
 import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.IntOffset
@@ -113,14 +114,29 @@ internal class InnerPlaceable(
         pointerPosition: Offset,
         hitPointerInputFilters: MutableList<PointerInputFilter>
     ) {
+        hitTestSubtree(pointerPosition, hitPointerInputFilters, LayoutNode::hitTest)
+    }
+
+    override fun hitTestSemantics(
+        pointerPosition: Offset,
+        hitSemanticsWrappers: MutableList<SemanticsWrapper>
+    ) {
+        hitTestSubtree(pointerPosition, hitSemanticsWrappers, LayoutNode::hitTestSemantics)
+    }
+
+    private inline fun <T> hitTestSubtree(
+        pointerPosition: Offset,
+        hitResult: MutableList<T>,
+        nodeHitTest: LayoutNode.(Offset, MutableList<T>) -> Unit
+    ) {
         if (withinLayerBounds(pointerPosition)) {
+            val originalSize = hitResult.size
             // Any because as soon as true is returned, we know we have found a hit path and we must
-            // not add PointerInputFilters on different paths so we should not even go looking.
-            val originalSize = hitPointerInputFilters.size
+            // not add hit results on different paths so we should not even go looking.
             layoutNode.zSortedChildren.reversedAny { child ->
                 if (child.isPlaced) {
-                    callHitTest(child, pointerPosition, hitPointerInputFilters)
-                    hitPointerInputFilters.size > originalSize
+                    child.nodeHitTest(pointerPosition, hitResult)
+                    hitResult.size > originalSize
                 } else {
                     false
                 }
@@ -137,14 +153,6 @@ internal class InnerPlaceable(
             paint.color = Color.Red
             paint.strokeWidth = 1f
             paint.style = PaintingStyle.Stroke
-        }
-
-        private fun callHitTest(
-            node: LayoutNode,
-            pointerPosition: Offset,
-            hitPointerInputFilters: MutableList<PointerInputFilter>
-        ) {
-            node.hitTest(pointerPosition, hitPointerInputFilters)
         }
     }
 }

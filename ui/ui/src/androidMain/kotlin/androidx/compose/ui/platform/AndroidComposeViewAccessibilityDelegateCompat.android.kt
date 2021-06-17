@@ -46,6 +46,7 @@ import androidx.compose.ui.graphics.toAndroidRect
 import androidx.compose.ui.layout.boundsInParent
 import androidx.compose.ui.node.LayoutNode
 import androidx.compose.ui.node.OwnerScope
+import androidx.compose.ui.semantics.outerSemantics
 import androidx.compose.ui.semantics.CustomAccessibilityAction
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.semantics.ScrollAxisRange
@@ -54,6 +55,7 @@ import androidx.compose.ui.semantics.SemanticsActions.CustomActions
 import androidx.compose.ui.semantics.SemanticsNode
 import androidx.compose.ui.semantics.SemanticsOwner
 import androidx.compose.ui.semantics.SemanticsProperties
+import androidx.compose.ui.semantics.SemanticsWrapper
 import androidx.compose.ui.semantics.getOrNull
 import androidx.compose.ui.semantics.outerSemantics
 import androidx.compose.ui.text.AnnotatedString
@@ -1367,16 +1369,7 @@ internal class AndroidComposeViewAccessibilityDelegateCompat(val view: AndroidCo
 
         when (event.action) {
             MotionEvent.ACTION_HOVER_MOVE, MotionEvent.ACTION_HOVER_ENTER -> {
-                val rootNode = view.semanticsOwner.unmergedRootSemanticsNode
-                val node = findSemanticsNodeAt(event.x, event.y, rootNode)
-                var virtualViewId = InvalidId
-                if (node != null) {
-                    val hoveredView =
-                        view.androidViewsHandler.layoutNodeToHolder[node.layoutNode]
-                    if (hoveredView == null) {
-                        virtualViewId = semanticsNodeIdToAccessibilityVirtualNodeId(node.id)
-                    }
-                }
+                val virtualViewId = hitTestSemanticsAt(event.x, event.y)
                 // The android views could be view groups, so the event must be dispatched to the
                 // views. Android ViewGroup.java will take care of synthesizing hover enter/exit
                 // actions from hover moves.
@@ -1404,27 +1397,29 @@ internal class AndroidComposeViewAccessibilityDelegateCompat(val view: AndroidCo
         }
     }
 
-    // TODO(b/151729467): compose accessibility findSemanticsNodeAt needs to be more efficient
     /**
-     * Find the semantics node at the specified location. The location is relative to the root.
+     * Hit test the layout tree for semantics wrappers.
+     * The return value is a virtual view id, or InvalidId if an embedded Android View was hit.
      */
     @VisibleForTesting
-    internal fun findSemanticsNodeAt(x: Float, y: Float, node: SemanticsNode): SemanticsNode? {
-        val children = node.children
-        for (i in children.size - 1 downTo 0) {
-            val target = findSemanticsNodeAt(x, y, children[i])
-            if (target != null) {
-                return target
+    internal fun hitTestSemanticsAt(x: Float, y: Float): Int {
+        view.measureAndLayout()
+
+        val hitSemanticsWrappers: MutableList<SemanticsWrapper> = mutableListOf()
+        view.root.hitTestSemantics(
+            pointerPosition = Offset(x, y),
+            hitSemanticsWrappers = hitSemanticsWrappers
+        )
+
+        val wrapper = hitSemanticsWrappers.lastOrNull()?.layoutNode?.outerSemantics
+        var virtualViewId = InvalidId
+        if (wrapper != null) {
+            val androidView = view.androidViewsHandler.layoutNodeToHolder[wrapper.layoutNode]
+            if (androidView == null) {
+                virtualViewId = semanticsNodeIdToAccessibilityVirtualNodeId(wrapper.modifier.id)
             }
         }
-
-        if (node.boundsInRoot.left < x && node.boundsInRoot.right > x &&
-            node.boundsInRoot.top < y && node.boundsInRoot.bottom > y
-        ) {
-            return node
-        }
-
-        return null
+        return virtualViewId
     }
 
     /**

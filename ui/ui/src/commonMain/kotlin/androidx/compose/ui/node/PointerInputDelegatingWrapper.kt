@@ -50,14 +50,4 @@ internal class PointerInputDelegatingWrapper(
             wrapped.hitTest(positionInWrapped, hitPointerInputFilters)
         }
     }
-
-    /**
-     * Whether a pointer that is relative to the [LayoutNodeWrapper] is in the bounds of this
-     * LayoutNodeWrapper.
-     */
-    private fun isPointerInBounds(pointerPosition: Offset): Boolean {
-        val x = pointerPosition.x
-        val y = pointerPosition.y
-        return x >= 0f && y >= 0f && x < measuredWidth && y < measuredHeight
-    }
 }
