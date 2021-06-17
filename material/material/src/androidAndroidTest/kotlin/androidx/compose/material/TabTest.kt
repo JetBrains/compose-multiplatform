@@ -662,6 +662,56 @@ class TabTest {
     }
 
     @Test
+    fun tabRowIndicator_animatesWidthChange() {
+        rule.mainClock.autoAdvance = false
+
+        rule.setMaterialContent {
+            var state by remember { mutableStateOf(0) }
+            val titles = listOf("TAB 1", "TAB 2", "TAB 3 WITH LOTS OF TEXT")
+
+            val indicator = @Composable { tabPositions: List<TabPosition> ->
+                TabRowDefaults.Indicator(
+                    Modifier.tabIndicatorOffset(tabPositions[state])
+                        .testTag("indicator")
+                )
+            }
+
+            Box {
+                ScrollableTabRow(
+                    selectedTabIndex = state,
+                    indicator = indicator
+                ) {
+                    titles.forEachIndexed { index, title ->
+                        Tab(
+                            text = { Text(title) },
+                            selected = state == index,
+                            onClick = { state = index }
+                        )
+                    }
+                }
+            }
+        }
+
+        val initialWidth = rule.onNodeWithTag("indicator").getUnclippedBoundsInRoot().width
+
+        // Click the third tab, which is wider than the first
+        rule.onAllNodes(isSelectable())[2].performClick()
+
+        // Ensure animation starts
+        rule.mainClock.advanceTimeBy(50)
+
+        val midAnimationWidth = rule.onNodeWithTag("indicator").getUnclippedBoundsInRoot().width
+        assertThat(initialWidth).isLessThan(midAnimationWidth)
+
+        // Allow animation to complete
+        rule.mainClock.autoAdvance = true
+        rule.waitForIdle()
+
+        val finalWidth = rule.onNodeWithTag("indicator").getUnclippedBoundsInRoot().width
+        assertThat(midAnimationWidth).isLessThan(finalWidth)
+    }
+
+    @Test
     fun testInspectorValue() {
         val pos = TabPosition(10.0.dp, 200.0.dp)
         rule.setContent {
