@@ -44,8 +44,8 @@ fun StyleBuilder.backgroundColor(value: String) {
 @Suppress("EqualsOrHashCode")
 class CSSBorder : CSSStyleValue {
     var width: CSSNumeric? = null
-    var style: StylePropertyValue? = null
-    var color: StylePropertyValue? = null
+    var style: LineStyle? = null
+    var color: CSSColorValue? = null
 
     override fun equals(other: Any?): Boolean {
         return if (other is CSSBorder) {
@@ -64,7 +64,7 @@ inline fun CSSBorder.width(size: CSSNumeric) {
 }
 
 inline fun CSSBorder.style(style: LineStyle) {
-    this.style = CSSStyleValue(style.name)
+    this.style = style
 }
 
 inline fun CSSBorder.color(color: CSSColorValue) {
