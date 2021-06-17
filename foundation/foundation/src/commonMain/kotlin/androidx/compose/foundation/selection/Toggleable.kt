@@ -105,6 +105,8 @@ fun Modifier.toggleable(
  * @param onValueChange callback to be invoked when toggleable is clicked,
  * therefore the change of the state in requested.
  */
+// TODO: b/191017532 remove Modifier.composed
+@Suppress("UnnecessaryComposedModifier")
 fun Modifier.toggleable(
     value: Boolean,
     interactionSource: MutableInteractionSource,
@@ -206,6 +208,8 @@ fun Modifier.triStateToggleable(
  * to describe the element or do customizations
  * @param onClick will be called when user clicks the toggleable.
  */
+// TODO: b/191017532 remove Modifier.composed
+@Suppress("UnnecessaryComposedModifier")
 fun Modifier.triStateToggleable(
     state: ToggleableState,
     interactionSource: MutableInteractionSource,

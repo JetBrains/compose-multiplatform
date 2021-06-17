@@ -24,6 +24,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.debugInspectorInfo
 import androidx.compose.ui.unit.Dp
 
+@Suppress("UnnecessaryComposedModifier")
 @Composable
 @Sampled
 fun InspectorInfoInComposedModifierSample() {
@@ -45,6 +46,7 @@ fun InspectorInfoInComposedModifierSample() {
     )
 }
 
+@Suppress("UnnecessaryComposedModifier")
 @Composable
 @Sampled
 fun InspectorInfoInComposedModifierWithArgumentsSample() {

@@ -41,6 +41,7 @@ object Names {
     }
     object Ui {
         val PackageName = Package("androidx.compose.ui")
+        val Composed = Name(PackageName, "composed")
         val Modifier = Name(PackageName, "Modifier")
         object Layout {
             val PackageName = Package("androidx.compose.ui.layout")
