@@ -1216,8 +1216,14 @@ internal class LayoutNode : Measurable, Remeasurement, OwnerScope, LayoutInfo, C
      * Return true if the measured size has been changed
      */
     internal fun remeasure(
-        constraints: Constraints = outerMeasurablePlaceable.lastConstraints
-    ) = outerMeasurablePlaceable.remeasure(constraints)
+        constraints: Constraints? = outerMeasurablePlaceable.lastConstraints
+    ): Boolean {
+        return if (constraints != null) {
+            outerMeasurablePlaceable.remeasure(constraints)
+        } else {
+            false
+        }
+    }
 
     override val parentData: Any? get() = outerMeasurablePlaceable.parentData
 

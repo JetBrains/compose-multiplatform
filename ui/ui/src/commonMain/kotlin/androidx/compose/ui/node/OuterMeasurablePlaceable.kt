@@ -32,10 +32,12 @@ internal class OuterMeasurablePlaceable(
 
     private var measuredOnce = false
     private var placedOnce = false
-    val lastConstraints: Constraints get() {
-        check(measuredOnce)
-        return measurementConstraints
-    }
+    val lastConstraints: Constraints?
+        get() = if (measuredOnce) {
+            measurementConstraints
+        } else {
+            null
+        }
     internal var duringAlignmentLinesQuery = false
 
     private var lastPosition: IntOffset = IntOffset.Zero
