@@ -181,3 +181,74 @@ external interface Position: StylePropertyEnum {
 inline fun Position(value: String) = value.unsafeCast<Position>()
 
 typealias LanguageCode = String
+
+external interface StepPosition: StylePropertyEnum {
+    companion object {
+        inline val JumpStart get() = StepPosition("jump-start")
+        inline val JumpEnd get() = StepPosition("jump-end")
+        inline val JumpNone get() = StepPosition("jump-none")
+        inline val JumpBoth get() = StepPosition("jump-both")
+        inline val Start get() = StepPosition("start")
+        inline val End get() = StepPosition("end")
+    }
+}
+inline fun StepPosition(value: String) = value.unsafeCast<StepPosition>()
+
+external interface AnimationTimingFunction: StylePropertyEnum {
+    companion object {
+        inline val Ease get() = AnimationTimingFunction("ease")
+        inline val EaseIn get() = AnimationTimingFunction("ease-in")
+        inline val EaseOut get() = AnimationTimingFunction("ease-out")
+        inline val EaseInOut get() = AnimationTimingFunction("ease-in-out")
+        inline val Linear get() = AnimationTimingFunction("linear")
+        inline val StepStart get() = AnimationTimingFunction("step-start")
+        inline val StepEnd get() = AnimationTimingFunction("step-end")
+
+        inline fun cubicBezier(x1: Double, y1: Double, x2: Double, y2: Double) = AnimationTimingFunction("cubic-bezier($x1, $y1, $x2, $y2)")
+        inline fun steps(count: Int, stepPosition: StepPosition) = AnimationTimingFunction("steps($count, $stepPosition)")
+        inline fun steps(count: Int) = AnimationTimingFunction("steps($count)")
+
+        inline val Inherit get() = AnimationTimingFunction("inherit")
+        inline val Initial get() = AnimationTimingFunction("initial")
+        inline val Unset get() = AnimationTimingFunction("unset")
+    }
+}
+inline fun AnimationTimingFunction(value: String) = value.unsafeCast<AnimationTimingFunction>()
+
+external interface AnimationDirection: StylePropertyEnum {
+    companion object {
+        inline val Normal get() = AnimationDirection("normal")
+        inline val Reverse get() = AnimationDirection("reverse")
+        inline val Alternate get() = AnimationDirection("alternate")
+        inline val AlternateReverse get() = AnimationDirection("alternate-reverse")
+
+        inline val Inherit get() = AnimationDirection("inherit")
+        inline val Initial get() = AnimationDirection("initial")
+        inline val Unset get() = AnimationDirection("unset")
+    }
+}
+inline fun AnimationDirection(value: String) = value.unsafeCast<AnimationDirection>()
+
+external interface AnimationFillMode: StylePropertyEnum {
+    companion object {
+        inline val None get() = AnimationFillMode("none")
+        inline val Forwards get() = AnimationFillMode("forwards")
+        inline val Backwards get() = AnimationFillMode("backwards")
+        inline val Both get() = AnimationFillMode("both")
+    }
+}
+inline fun AnimationFillMode(value: String) = value.unsafeCast<AnimationFillMode>()
+
+external interface AnimationPlayState: StylePropertyEnum {
+    companion object {
+        inline val Running get() = AnimationPlayState("running")
+        inline val Paused get() = AnimationPlayState("Paused")
+        inline val Backwards get() = AnimationPlayState("backwards")
+        inline val Both get() = AnimationPlayState("both")
+
+        inline val Inherit get() = AnimationPlayState("inherit")
+        inline val Initial get() = AnimationPlayState("initial")
+        inline val Unset get() = AnimationPlayState("unset")
+    }
+}
+inline fun AnimationPlayState(value: String) = value.unsafeCast<AnimationPlayState>()

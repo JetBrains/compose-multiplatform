@@ -6,6 +6,19 @@
 @file:Suppress("UNUSED", "NOTHING_TO_INLINE", "FunctionName")
 package org.jetbrains.compose.web.css
 
+import org.w3c.dom.css.CSSRule
+import org.w3c.dom.css.CSSRuleList
+
+
+external class CSSKeyframesRule: CSSRule {
+    val name: String
+    val cssRules: CSSRuleList
+}
+
+inline fun CSSKeyframesRule.appendRule(cssRule: String) {
+    this.asDynamic().appendRule(cssRule)
+}
+
 @Suppress("NOTHING_TO_INLINE")
 inline fun <T : Any> jsObject(): T =
     js("({})")

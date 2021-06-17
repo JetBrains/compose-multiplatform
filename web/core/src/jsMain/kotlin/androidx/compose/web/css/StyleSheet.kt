@@ -14,6 +14,7 @@ class CSSRulesHolderState : CSSRulesHolder {
     override var cssRules: CSSRuleDeclarationList by mutableStateOf(listOf())
 
     override fun add(cssRule: CSSRuleDeclaration) {
+        @Suppress("SuspiciousCollectionReassignment")
         cssRules += cssRule
     }
 }
@@ -39,17 +40,21 @@ class CSSRulesHolderState : CSSRulesHolder {
  * ```
  */
 open class StyleSheet(
-    private val rulesHolder: CSSRulesHolder = CSSRulesHolderState()
+    private val rulesHolder: CSSRulesHolder = CSSRulesHolderState(),
+    val usePrefix: Boolean = true,
 ) : StyleSheetBuilder, CSSRulesHolder by rulesHolder {
     private val boundClasses = mutableMapOf<String, CSSRuleDeclarationList>()
 
-    protected fun style(cssRule: CSSBuilder.() -> Unit) = CSSHolder(cssRule)
+    protected fun style(cssRule: CSSBuilder.() -> Unit) = CSSHolder(usePrefix, cssRule)
+
+    protected fun keyframes(cssKeyframes: CSSKeyframesBuilder.() -> Unit) = CSSKeyframesHolder(usePrefix, cssKeyframes)
 
     companion object {
         var counter = 0
     }
 
-    data class CSSSelfSelector(var selector: CSSSelector? = null) : CSSSelector() {
+    @Suppress("EqualsOrHashCode")
+    class CSSSelfSelector(var selector: CSSSelector? = null) : CSSSelector() {
         override fun toString(): String = selector.toString()
         override fun equals(other: Any?): Boolean {
             return other is CSSSelfSelector
@@ -77,12 +82,12 @@ open class StyleSheet(
         }
     }
 
-    protected class CSSHolder(val cssBuilder: CSSBuilder.() -> Unit) {
+    protected class CSSHolder(private val usePrefix: Boolean, private val cssBuilder: CSSBuilder.() -> Unit) {
         operator fun provideDelegate(
             sheet: StyleSheet,
             property: KProperty<*>
         ): ReadOnlyProperty<Any?, String> {
-            val sheetName = "${sheet::class.simpleName}-"
+            val sheetName = if (usePrefix) "${sheet::class.simpleName}-" else ""
             val selector = className("$sheetName${property.name}")
             val (properties, rules) = buildCSS(selector, selector, cssBuilder)
             sheet.add(selector, properties)
@@ -90,6 +95,22 @@ open class StyleSheet(
 
             return ReadOnlyProperty { _, _ ->
                 selector.className
+            }
+        }
+    }
+
+    protected class CSSKeyframesHolder(private val usePrefix: Boolean, private val keyframesBuilder: CSSKeyframesBuilder.() -> Unit) {
+        operator fun provideDelegate(
+            sheet: StyleSheet,
+            property: KProperty<*>
+        ): ReadOnlyProperty<Any?, CSSNamedKeyframes> {
+            val sheetName = if (usePrefix) "${sheet::class.simpleName}-" else ""
+            val keyframesName = "$sheetName${property.name}"
+            val rule = buildKeyframes(keyframesName, keyframesBuilder)
+            sheet.add(rule)
+
+            return ReadOnlyProperty { _, _ ->
+                rule
             }
         }
     }
