@@ -41,6 +41,7 @@ import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.ScrollState
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.gestures.scrollBy
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -59,9 +60,11 @@ import androidx.compose.foundation.text.BasicText
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.ImageBitmap
@@ -122,6 +125,8 @@ import com.nhaarman.mockitokotlin2.eq
 import com.nhaarman.mockitokotlin2.spy
 import com.nhaarman.mockitokotlin2.times
 import com.nhaarman.mockitokotlin2.verify
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.launch
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertNotEquals
@@ -1232,7 +1237,7 @@ class AndroidAccessibilityTest {
     }
 
     @Test
-    fun testGetVirtualViewAt() {
+    fun testSemanticsHitTest() {
         val tag = "Toggleable"
         container.setContent {
             var checked by remember { mutableStateOf(true) }
@@ -1249,17 +1254,15 @@ class AndroidAccessibilityTest {
             .fetchSemanticsNode("couldn't find node with tag $tag")
         val toggleableNodeBounds = toggleableNode.boundsInRoot
 
-        val toggleableNodeFound = delegate.findSemanticsNodeAt(
+        val toggleableNodeId = delegate.hitTestSemanticsAt(
             (toggleableNodeBounds.left + toggleableNodeBounds.right) / 2,
             (toggleableNodeBounds.top + toggleableNodeBounds.bottom) / 2,
-            androidComposeView.semanticsOwner.unmergedRootSemanticsNode
         )
-        assertNotNull(toggleableNodeFound)
-        assertEquals(toggleableNode.id, toggleableNodeFound!!.id)
+        assertEquals(toggleableNode.id, toggleableNodeId)
     }
 
     @Test
-    fun testGetVirtualViewAt_overlappedChildren() {
+    fun testSemanticsHitTest_overlappedChildren() {
         val childOneTag = "OverlappedChildOne"
         val childTwoTag = "OverlappedChildTwo"
         container.setContent {
@@ -1285,14 +1288,56 @@ class AndroidAccessibilityTest {
         val overlappedChildTwoNode = rule.onNodeWithTag(childTwoTag)
             .fetchSemanticsNode("couldn't find node with tag $childTwoTag")
         val overlappedChildNodeBounds = overlappedChildTwoNode.boundsInRoot
-        val overlappedChildNode = delegate.findSemanticsNodeAt(
+        val overlappedChildNodeId = delegate.hitTestSemanticsAt(
             (overlappedChildNodeBounds.left + overlappedChildNodeBounds.right) / 2,
-            (overlappedChildNodeBounds.top + overlappedChildNodeBounds.bottom) / 2,
-            androidComposeView.semanticsOwner.unmergedRootSemanticsNode
+            (overlappedChildNodeBounds.top + overlappedChildNodeBounds.bottom) / 2
         )
-        assertNotNull(overlappedChildNode)
-        assertEquals(overlappedChildOneNode.id, overlappedChildNode!!.id)
-        assertNotEquals(overlappedChildTwoNode.id, overlappedChildNode.id)
+        assertEquals(overlappedChildOneNode.id, overlappedChildNodeId)
+        assertNotEquals(overlappedChildTwoNode.id, overlappedChildNodeId)
+    }
+
+    @Test
+    fun testSemanticsHitTest_scrolled() {
+        val scrollState = ScrollState(initial = 0)
+        val targetTag = "target"
+        var scope: CoroutineScope? = null
+        container.setContent {
+            val actualScope = rememberCoroutineScope()
+            SideEffect { scope = actualScope }
+
+            Box {
+                Column(
+                    Modifier
+                        .size(200.dp)
+                        .verticalScroll(scrollState)
+                ) {
+                    BasicText("Before scroll", Modifier.size(200.dp))
+                    BasicText("After scroll", Modifier.testTag(targetTag).size(200.dp))
+                }
+            }
+        }
+
+        waitForSubtreeEventToSend()
+        assertThat(scrollState.value).isEqualTo(0)
+
+        scope!!.launch {
+            // Scroll to the bottom
+            scrollState.scrollBy(10000f)
+        }
+        rule.waitForIdle()
+
+        with(rule.density) {
+            assertThat(scrollState.value).isGreaterThan(199.dp.toPx().toInt())
+        }
+
+        val childNode = rule.onNodeWithTag(targetTag)
+            .fetchSemanticsNode("couldn't find node with tag $targetTag")
+        val childNodeBounds = childNode.boundsInRoot
+        val hitTestedId = delegate.hitTestSemanticsAt(
+            (childNodeBounds.left + childNodeBounds.right) / 2,
+            (childNodeBounds.top + childNodeBounds.bottom) / 2
+        )
+        assertEquals(childNode.id, hitTestedId)
     }
 
     @Test

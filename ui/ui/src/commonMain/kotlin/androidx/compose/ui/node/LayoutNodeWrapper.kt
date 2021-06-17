@@ -39,6 +39,7 @@ import androidx.compose.ui.layout.Placeable
 import androidx.compose.ui.layout.VerticalAlignmentLine
 import androidx.compose.ui.layout.findRoot
 import androidx.compose.ui.layout.positionInRoot
+import androidx.compose.ui.semantics.SemanticsWrapper
 import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.IntOffset
@@ -363,6 +364,11 @@ internal abstract class LayoutNodeWrapper(
         hitPointerInputFilters: MutableList<PointerInputFilter>
     )
 
+    abstract fun hitTestSemantics(
+        pointerPosition: Offset,
+        hitSemanticsWrappers: MutableList<SemanticsWrapper>
+    )
+
     override fun windowToLocal(relativeToWindow: Offset): Offset {
         check(isAttached) { ExpectAttachedLayoutCoordinates }
         val root = findRoot()
@@ -599,6 +605,16 @@ internal abstract class LayoutNodeWrapper(
         // If we are here, either we aren't clipping to bounds or we are and the pointer was in
         // bounds.
         return true
+    }
+
+    /**
+     * Whether a pointer that is relative to the [LayoutNodeWrapper] is in the bounds of this
+     * LayoutNodeWrapper.
+     */
+    protected fun isPointerInBounds(pointerPosition: Offset): Boolean {
+        val x = pointerPosition.x
+        val y = pointerPosition.y
+        return x >= 0f && y >= 0f && x < measuredWidth && y < measuredHeight
     }
 
     /**
