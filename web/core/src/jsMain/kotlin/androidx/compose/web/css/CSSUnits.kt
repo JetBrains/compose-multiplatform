@@ -1,180 +1,173 @@
+@file:Suppress("Unused", "NOTHING_TO_INLINE", "NESTED_CLASS_IN_EXTERNAL_INTERFACE", "INLINE_EXTERNAL_DECLARATION", "WRONG_BODY_OF_EXTERNAL_DECLARATION", "NESTED_EXTERNAL_DECLARATION", "ClassName")
+
 package org.jetbrains.compose.web.css
 
-interface CSSSizeValue<out T : CSSUnit> : StylePropertyValue {
+external interface CSSNumericValue<T : CSSUnit> : StylePropertyValue
+
+external interface CSSSizeValue<T : CSSUnit> : CSSNumericValue<T> {
     val value: Float
     val unit: T
-    fun asString(): String = "${value}${unit.value}"
-    fun newUnit(value: Float): CSSSizeValue<T>
 }
 
-private data class CSSUnitValueTyped<out T : CSSUnit>(
+data class CSSUnitValueTyped<T : CSSUnit>(
     override val value: Float,
     override val unit: T
 ) : CSSSizeValue<T> {
-    override fun newUnit(value: Float): CSSSizeValue<T> = copy(value = value)
-    override fun toString(): String = asString()
+    override fun toString(): String = "$value$unit"
 }
 
-operator fun <T : CSSUnit> CSSSizeValue<T>.times(num: Number): CSSSizeValue<T> = newUnit(value * num.toFloat())
-operator fun <T : CSSUnit> Number.times(unit: CSSSizeValue<T>): CSSSizeValue<T> = unit.newUnit(unit.value * toFloat())
+external interface CSSUnitLengthOrPercentage: CSSUnit
+external interface CSSUnitPercentage: CSSUnitLengthOrPercentage
+external interface CSSUnitLength: CSSUnitLengthOrPercentage
+external interface CSSUnitRel : CSSUnitLength
+external interface CSSUnitAbs: CSSUnitLength
+external interface CSSUnitAngle: CSSUnit
+external interface CSSUnitTime: CSSUnit
+external interface CSSUnitFrequency: CSSUnit
+external interface CSSUnitResolution: CSSUnit
+external interface CSSUnitFlex: CSSUnit
 
-operator fun <T : CSSUnit> CSSSizeValue<T>.div(num: Number): CSSSizeValue<T> = newUnit(value / num.toFloat())
-
-operator fun <T: CSSUnit> CSSSizeValue<T>.plus(b: CSSSizeValue<T>): CSSSizeValue<T> = newUnit(value + b.value)
-operator fun <T: CSSUnit> CSSSizeValue<T>.minus(b: CSSSizeValue<T>): CSSSizeValue<T> = newUnit(value - b.value)
-
-interface CSSUnitLengthOrPercentage: CSSUnit
-interface CSSUnitPercentage: CSSUnitLengthOrPercentage
-interface CSSUnitLength: CSSUnitLengthOrPercentage
-interface CSSUnitRel : CSSUnitLength
-interface CSSUnitAbs: CSSUnitLength
-interface CSSUnitAngle: CSSUnit
-interface CSSUnitTime: CSSUnit
-interface CSSUnitFrequency: CSSUnit
-interface CSSUnitResolution: CSSUnit
-interface CSSUnitFlex: CSSUnit
-
-typealias CSSAngleValue = CSSSizeValue<CSSUnitAngle>
-typealias CSSLengthOrPercentageValue = CSSSizeValue<CSSUnitLengthOrPercentage>
-typealias CSSLengthValue = CSSSizeValue<CSSUnitLength>
-typealias CSSPercentageValue = CSSSizeValue<CSSUnitPercentage>
-typealias CSSUnitValue = CSSSizeValue<CSSUnit>
+typealias CSSAngleValue = CSSSizeValue<out CSSUnitAngle>
+typealias CSSLengthOrPercentageValue = CSSSizeValue<out CSSUnitLengthOrPercentage>
+typealias CSSLengthValue = CSSSizeValue<out CSSUnitLength>
+typealias CSSPercentageValue = CSSSizeValue<out CSSUnitPercentage>
+typealias CSSUnitValue = CSSSizeValue<out CSSUnit>
 typealias CSSpxValue = CSSSizeValue<CSSUnit.px>
 
+// fake interfaces to distinguish units
+external interface CSSUnit {
+    external interface percent: CSSUnitPercentage
 
-sealed interface CSSUnit {
-    val value: String
+    external interface em: CSSUnitRel
 
-    object percent: CSSUnitPercentage {
-        override val value: String = "%"
-    }
+    external interface ex: CSSUnitRel
 
-    object em: CSSUnitRel {
-        override val value = "em"
-    }
+    external interface ch: CSSUnitRel
 
-    object ex: CSSUnitRel {
-        override val value = "ex"
-    }
+    external interface ic: CSSUnitRel
 
-    object ch: CSSUnitRel {
-        override val value = "ch"
-    }
+    external interface rem: CSSUnitRel
 
-    object ic: CSSUnitRel {
-        override val value = "ic"
-    }
+    external interface lh: CSSUnitRel
 
-    object rem: CSSUnitRel {
-        override val value = "rem"
-    }
+    external interface rlh: CSSUnitRel
 
-    object lh: CSSUnitRel {
-        override val value = "lh"
-    }
+    external interface vw: CSSUnitRel
 
-    object rlh: CSSUnitRel {
-        override val value = "rlh"
-    }
+    external interface vh: CSSUnitRel
 
-    object vw: CSSUnitRel {
-        override val value = "vw"
-    }
+    external interface vi: CSSUnitRel
 
-    object vh: CSSUnitRel {
-        override val value = "vh"
-    }
+    external interface vb: CSSUnitRel
 
-    object vi: CSSUnitRel {
-        override val value = "vi"
-    }
+    external interface vmin: CSSUnitRel
 
-    object vb: CSSUnitRel {
-        override val value = "vb"
-    }
+    external interface vmax: CSSUnitRel
 
-    object vmin: CSSUnitRel {
-        override val value = "vmin"
-    }
+    external interface cm: CSSUnitRel
 
-    object vmax: CSSUnitRel {
-        override val value = "vmax"
-    }
+    external interface mm: CSSUnitRel
 
-    object cm: CSSUnitRel {
-        override val value = "cm"
-    }
+    external interface Q: CSSUnitRel
 
-    object mm: CSSUnitRel {
-        override val value = "mm"
-    }
+    external interface pt: CSSUnitAbs
 
-    object q: CSSUnitRel {
-        override val value = "q"
-    }
+    external interface pc: CSSUnitAbs
 
-    object pt: CSSUnitAbs {
-        override val value = "pt"
-    }
+    external interface px: CSSUnitAbs
 
-    object pc: CSSUnitAbs {
-        override val value = "pc"
-    }
+    external interface deg: CSSUnitAngle
 
-    object px: CSSUnitAbs {
-        override val value = "px"
-    }
+    external interface grad: CSSUnitAngle
 
-    object deg: CSSUnitAngle {
-        override val value = "deg"
-    }
+    external interface rad: CSSUnitAngle
 
-    object grad: CSSUnitAngle {
-        override val value = "grad"
-    }
+    external interface turn: CSSUnitAngle
 
-    object rad: CSSUnitAngle {
-        override val value = "rad"
-    }
+    external interface s: CSSUnitTime
 
-    object turn: CSSUnitAngle {
-        override val value = "turn"
-    }
+    external interface ms: CSSUnitTime
 
-    object s: CSSUnitTime {
-        override val value = "s"
-    }
+    external interface Hz: CSSUnitFrequency
 
-    object ms: CSSUnitTime {
-        override val value = "ms"
-    }
+    external interface kHz: CSSUnitFrequency
 
-    object hz: CSSUnitFrequency {
-        override val value = "hz"
-    }
+    external interface dpi: CSSUnitResolution
 
-    object khz: CSSUnitFrequency {
-        override val value = "khz"
-    }
+    external interface dpcm: CSSUnitResolution
 
-    object dpi: CSSUnitResolution {
-        override val value = "dpi"
-    }
+    external interface dppx: CSSUnitResolution
 
-    object dpcm: CSSUnitResolution {
-        override val value = "dpcm"
-    }
+    external interface fr: CSSUnitFlex
 
-    object dppx: CSSUnitResolution {
-        override val value = "dppx"
-    }
+    external interface number: CSSUnit
+    
+    external companion object {
+        inline val percent get() = "%".unsafeCast<percent>()
 
-    object fr: CSSUnitFlex {
-        override val value = "fr"
-    }
+        inline val em get() = "em".unsafeCast<em>()
+        
+        inline val ex get() = "ex".unsafeCast<ex>()
 
-    object number: CSSUnit {
-        override val value = "number"
+        inline val ch get() = "ch".unsafeCast<ch>()
+        
+        inline val ic get() = "ic".unsafeCast<ic>()
+
+        inline val rem get() = "rem".unsafeCast<rem>()
+
+        inline val lh get() = "lh".unsafeCast<lh>()
+
+        inline val rlh get() = "rlh".unsafeCast<rlh>()
+        
+        inline val vw get() = "vw".unsafeCast<vw>()
+
+        inline val vh get() = "vh".unsafeCast<vh>()
+
+        inline val vi get() = "vi".unsafeCast<vi>()
+
+        inline val vb get() = "vb".unsafeCast<vb>()
+
+        inline val vmin get() = "vmin".unsafeCast<vmin>()
+
+        inline val vmax get() = "vmax".unsafeCast<vmax>()
+
+        inline val cm get() = "cm".unsafeCast<cm>()
+
+        inline val mm get() = "mm".unsafeCast<mm>()
+
+        inline val Q get() = "Q".unsafeCast<Q>()
+
+        inline val pt get() = "pt".unsafeCast<pt>()
+
+        inline val pc get() = "pc".unsafeCast<pc>()
+
+        inline val px get() = "px".unsafeCast<px>()
+
+        inline val deg get() = "deg".unsafeCast<deg>()
+
+        inline val grad get() = "grad".unsafeCast<grad>()
+
+        inline val rad get() = "rad".unsafeCast<rad>()
+
+        inline val turn get() = "turn".unsafeCast<turn>()
+
+        inline val s get() = "s".unsafeCast<s>()
+
+        inline val ms get() = "ms".unsafeCast<ms>()
+
+        inline val Hz get() = "Hz".unsafeCast<Hz>()
+
+        inline val kHz get() = "kHz".unsafeCast<kHz>()
+
+        inline val dpi get() = "dpi".unsafeCast<dpi>()
+
+        inline val dpcm get() = "dpcm".unsafeCast<dpcm>()
+
+        inline val dppx get() = "dppx".unsafeCast<dppx>()
+
+        inline val fr get() = "fr".unsafeCast<fr>()
+
+        inline val number get() = "number".unsafeCast<number>()
     }
 }
 
@@ -216,7 +209,7 @@ val Number.mm
     get(): CSSSizeValue<CSSUnit.mm> = CSSUnitValueTyped(this.toFloat(), CSSUnit.mm)
 
 val Number.Q
-    get() : CSSSizeValue<CSSUnit.q> = CSSUnitValueTyped(this.toFloat(), CSSUnit.q)
+    get() : CSSSizeValue<CSSUnit.Q> = CSSUnitValueTyped(this.toFloat(), CSSUnit.Q)
 
 val Number.pt
     get(): CSSSizeValue<CSSUnit.pt> = CSSUnitValueTyped(this.toFloat(), CSSUnit.pt)
@@ -240,9 +233,9 @@ val Number.ms
     get(): CSSSizeValue<CSSUnit.ms> = CSSUnitValueTyped(this.toFloat(), CSSUnit.ms)
 
 val Number.Hz
-    get(): CSSSizeValue<CSSUnit.hz> = CSSUnitValueTyped(this.toFloat(), CSSUnit.hz)
+    get(): CSSSizeValue<CSSUnit.Hz> = CSSUnitValueTyped(this.toFloat(), CSSUnit.Hz)
 val Number.kHz
-    get(): CSSSizeValue<CSSUnit.khz> = CSSUnitValueTyped(this.toFloat(), CSSUnit.khz)
+    get(): CSSSizeValue<CSSUnit.kHz> = CSSUnitValueTyped(this.toFloat(), CSSUnit.kHz)
 
 val Number.dpi
     get(): CSSSizeValue<CSSUnit.dpi> = CSSUnitValueTyped(this.toFloat(), CSSUnit.dpi)

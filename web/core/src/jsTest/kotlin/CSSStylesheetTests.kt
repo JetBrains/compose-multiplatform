@@ -16,8 +16,8 @@ object AppCSSVariables : CSSVariables {
     val width by variable<CSSUnitValue>()
     val height by variable<CSSUnitValue>()
 
-    val stringWidth by variable<String>()
-    val stringHeight by variable<String>()
+    val stringWidth by variable<StylePropertyString>()
+    val stringHeight by variable<StylePropertyString>()
 }
 
 object AppStylesheet : StyleSheet() {

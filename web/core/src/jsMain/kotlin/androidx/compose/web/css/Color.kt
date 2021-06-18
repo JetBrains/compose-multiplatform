@@ -1,8 +1,8 @@
+@file:Suppress("unused", "MemberVisibilityCanBePrivate")
+
 package org.jetbrains.compose.web.css
 
-abstract class Color : CustomStyleValue {
-    override fun styleValue(): StylePropertyValue = toString().unsafeCast<StylePropertyValue>()
-
+abstract class Color : CSSStyleValue {
     data class Named(val value: String) : Color() {
         override fun toString(): String = value
     }
@@ -18,16 +18,15 @@ abstract class Color : CustomStyleValue {
     data class HSL(val h: CSSAngleValue, val s: Number, val l: Number) : Color() {
         constructor(h: Number, s: Number, l: Number) : this(h.deg, s, l)
 
-        override fun toString(): String = "hsl(${h.asString()}, $s%, $l%)"
+        override fun toString(): String = "hsl($h, $s%, $l%)"
     }
 
     data class HSLA(val h: CSSAngleValue, val s: Number, val l: Number, val a: Number) : Color() {
         constructor(h: Number, s: Number, l: Number, a: Number) : this(h.deg, s, l, a)
 
-        override fun toString(): String = "hsla(${h.asString()}, $s%, $l%, $a)"
+        override fun toString(): String = "hsla($h, $s%, $l%, $a)"
     }
 
-    companion object {
-        operator fun invoke(name: String) = Named(name)
-    }
 }
+
+fun Color(name: String): Color = Color.Named(name)

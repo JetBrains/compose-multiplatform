@@ -1,3 +1,5 @@
+@file:Suppress("unused", "MemberVisibilityCanBePrivate")
+
 package org.jetbrains.compose.web.css
 
 interface CSSMediaQuery {
@@ -9,12 +11,13 @@ interface CSSMediaQuery {
     }
     data class MediaType(val type: Enum) : Atomic {
         enum class Enum {
-            all, print, screen, speech
+            All, Print, Screen, Speech
         }
 
         override fun toString() = type.name
     }
 
+    @Suppress("EqualsOrHashCode")
     data class MediaFeature(
         val name: String,
         val value: StylePropertyValue? = null
@@ -55,6 +58,7 @@ interface CSSMediaQuery {
     }
 }
 
+@Suppress("EqualsOrHashCode")
 class CSSMediaRuleDeclaration(
     val query: CSSMediaQuery,
     rules: CSSRuleDeclarationList

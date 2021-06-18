@@ -1,4 +1,8 @@
+@file:Suppress("Unused", "NOTHING_TO_INLINE")
+
 package org.jetbrains.compose.web.css
+
+import org.jetbrains.compose.web.css.keywords.CSSAutoKeyword
 
 fun StyleBuilder.opacity(value: Number) {
     property("opacity", value)
@@ -17,7 +21,7 @@ fun StyleBuilder.flexShrink(value: Number) {
 }
 
 fun StyleBuilder.opacity(value: CSSSizeValue<CSSUnit.percent>) {
-    property("opacity", (value.value as Double / 100))
+    property("opacity", (value.value / 100))
 }
 
 fun StyleBuilder.color(value: String) {
@@ -26,7 +30,7 @@ fun StyleBuilder.color(value: String) {
 
 fun StyleBuilder.color(value: Color) {
     // color hasn't Typed OM yet
-    property("color", value.styleValue())
+    property("color", value)
 }
 
 fun StyleBuilder.backgroundColor(value: CSSVariableValue<Color>) {
@@ -34,196 +38,49 @@ fun StyleBuilder.backgroundColor(value: CSSVariableValue<Color>) {
 }
 
 fun StyleBuilder.backgroundColor(value: Color) {
-    property("background-color", value.styleValue())
+    property("background-color", value)
 }
 
 fun StyleBuilder.backgroundColor(value: String) {
     property("background-color", value)
 }
 
-enum class LineStyle {
-    None,
-    Hidden,
-    Dotted,
-    Dashed,
-    Solid,
-    Double,
-    Groove,
-    Ridge,
-    Inset,
-    Outset
-}
-
-enum class DisplayStyle(val value: String) {
-    Block("block"),
-    Inline("inline"),
-    InlineBlock("inline-block"),
-    Flex("flex"),
-    LegacyInlineFlex("inline-flex"),
-    Grid("grid"),
-    LegacyInlineGrid("inline-grid"),
-    FlowRoot("flow-root"),
-
-    None("none"),
-    Contents("contents"),
-
-// TODO(shabunc): This properties behave them iconsistenly in both Chrome and Firefox so I turned the off so far
-//    BlockFlow("block flow"),
-//    InlineFlow("inline flow"),
-//    InlineFlowRoot("inline flow-root"),
-//    BlocklFlex("block flex"),
-//    InlineFlex("inline flex"),
-//    BlockGrid("block grid"),
-//    InlineGrid("inline grid"),
-//    BlockFlowRoot("block flow-root"),
-
-    Table("table"),
-    TableRow("table-row"),
-    ListItem("list-item"),
-
-    Inherit("inherit"),
-    Initial("initial"),
-    Unset("unset")
-}
-
-enum class FlexDirection(val value: String) {
-    Row("row"),
-    RowReverse("row-reverse"),
-    Column("column"),
-    ColumnReverse("column-reverse")
-}
-
-enum class FlexWrap(val value: String) {
-    Wrap("wrap"),
-    Nowrap("nowrap"),
-    WrapReverse("wrap-reverse")
-}
-
-enum class JustifyContent(val value: String) {
-    Center("center"),
-    Start("start"),
-    End("end"),
-    FlexStart("flex-start"),
-    FlexEnd("flex-end"),
-    Left("left"),
-    Right("right"),
-    Normal("normal"),
-    SpaceBetween("space-between"),
-    SpaceAround("space-around"),
-    SpaceEvenly("space-evenly"),
-    Stretch("stretch"),
-    Inherit("inherit"),
-    Initial("initial"),
-    Unset("unset"),
-    SafeCenter("safe center"),
-    UnsafeCenter("unsafe center"),
-}
-
-enum class AlignSelf(val value: String) {
-    Auto("auto"),
-    Normal("normal"),
-    Center("center"),
-    Start("start"),
-    End("end"),
-    SelfStart("self-start"),
-    SelfEnd("self-end"),
-    FlexStart("flex-start"),
-    FlexEnd("flex-end"),
-    Baseline("baseline"),
-//    FirstBaseline("first baseline"),
-//    LastBaseline("last baseline"),
-    Stretch("stretch"),
-    SafeCenter("safe center"),
-    UnsafeCenter("unsafe center"),
-    Inherit("inherit"),
-    Initial("initial"),
-    Unset("unset")
-}
-
-enum class AlignItems(val value: String) {
-    Normal("normal"),
-    Stretch("stretch"),
-    Center("center"),
-    Start("start"),
-    End("end"),
-    FlexStart("flex-start"),
-    FlexEnd("flex-end"),
-    Baseline("baseline"),
-//    FirstBaseline("first baseline"),
-//    LastBaseline("last baseline"),
-    SafeCenter("safe center"),
-    UnsafeCenter("unsafe center"),
-
-    Inherit("inherit"),
-    Initial("initial"),
-    Unset("unset")
-}
-
-enum class AlignContent(val value: String) {
-    Center("center"),
-    Start("start"),
-    End("end"),
-    FlexStart("flex-start"),
-    FlexEnd("flex-end"),
-    Baseline("baseline"),
-//    FirstBaseline("first baseline"),
-//    LastBaseline("last baseline"),
-    SafeCenter("safe center"),
-    UnsafeCenter("unsafe center"),
-    SpaceBetween("space-between"),
-    SpaceAround("space-around"),
-    SpaceEvenly("space-evenly"),
-    Stretch("stretch"),
-
-    Inherit("inherit"),
-    Initial("initial"),
-    Unset("unset")
-}
-
-enum class Position(val value: String) {
-    Static("static"),
-    Relative("relative"),
-    Absolute("absolute"),
-    Sticky("sticky"),
-    Fixed("fixed")
-}
-
-class CSSBorder : CustomStyleValue {
+@Suppress("EqualsOrHashCode")
+class CSSBorder : CSSStyleValue {
     var width: CSSUnitValue? = null
     var style: StylePropertyValue? = null
     var color: StylePropertyValue? = null
 
-    fun width(size: CSSUnitValue) {
-        width = size
-    }
-
-    fun style(style: LineStyle) {
-        this.style = style.name.unsafeCast<StylePropertyValue>()
-    }
-
-    fun color(color: Color) {
-        this.color = color.styleValue()
-    }
-
-    fun color(color: CSSVariableValue<Color>) {
-        this.color = color
-    }
-
     override fun equals(other: Any?): Boolean {
         return if (other is CSSBorder) {
-            styleValue().toString() == other.styleValue().toString()
+            width == other.width && style == other.style && color == other.color
         } else false
     }
 
-    override fun styleValue(): StylePropertyValue {
-        val values = listOfNotNull(width?.asString(), style, color)
-        return values.joinToString(" ").unsafeCast<StylePropertyValue>()
+    override fun toString(): String {
+        val values = listOfNotNull(width, style, color)
+        return values.joinToString(" ")
     }
 }
 
+inline fun CSSBorder.width(size: CSSUnitValue) {
+    width = size
+}
+
+inline fun CSSBorder.style(style: LineStyle) {
+    this.style = CSSStyleValue(style.name)
+}
+
+inline fun CSSBorder.color(color: Color) {
+    this.color = color
+}
+
+inline fun CSSBorder.color(color: CSSVariableValue<Color>) {
+    this.color = color
+}
+
 inline fun StyleBuilder.border(crossinline borderBuild: CSSBorder.() -> Unit) {
-    val border = CSSBorder().apply(borderBuild)
-    property("border", border.styleValue())
+    property("border", CSSBorder().apply(borderBuild))
 }
 
 fun StyleBuilder.border(
@@ -296,7 +153,7 @@ fun StyleBuilder.borderRadius(r: CSSUnitValue) {
 }
 
 fun StyleBuilder.borderRadius(topLeft: CSSUnitValue, bottomRight: CSSUnitValue) {
-    property("border-radius", "${topLeft.asString()} ${bottomRight.asString()}")
+    property("border-radius", "$topLeft $bottomRight")
 }
 
 fun StyleBuilder.borderRadius(
@@ -304,7 +161,7 @@ fun StyleBuilder.borderRadius(
     topRightAndBottomLeft: CSSUnitValue,
     bottomRight: CSSUnitValue
 ) {
-    property("border-radius", "${topLeft.asString()} ${topRightAndBottomLeft.asString()} ${bottomRight.asString()}")
+    property("border-radius", "$topLeft $topRightAndBottomLeft $bottomRight")
 }
 
 fun StyleBuilder.borderRadius(
@@ -315,7 +172,7 @@ fun StyleBuilder.borderRadius(
 ) {
     property(
         "border-radius",
-        "${topLeft.asString()} ${topRight.asString()} ${bottomRight.asString()} ${bottomLeft.asString()}"
+        "$topLeft $topRight $bottomRight $bottomLeft"
     )
 }
 
@@ -323,7 +180,7 @@ fun StyleBuilder.width(value: CSSUnitValue) {
     property("width", value)
 }
 
-fun StyleBuilder.width(value: CSSAutoValue) {
+fun StyleBuilder.width(value: CSSAutoKeyword) {
     property("width", value)
 }
 
@@ -331,7 +188,7 @@ fun StyleBuilder.height(value: CSSUnitValue) {
     property("height", value)
 }
 
-fun StyleBuilder.height(value: CSSAutoValue) {
+fun StyleBuilder.height(value: CSSAutoKeyword) {
     property("height", value)
 }
 
@@ -339,7 +196,7 @@ fun StyleBuilder.top(value: CSSLengthOrPercentageValue) {
     property("top", value)
 }
 
-fun StyleBuilder.top(value: CSSAutoValue) {
+fun StyleBuilder.top(value: CSSAutoKeyword) {
     property("top", value)
 }
 
@@ -347,7 +204,7 @@ fun StyleBuilder.bottom(value: CSSLengthOrPercentageValue) {
     property("bottom", value)
 }
 
-fun StyleBuilder.bottom(value: CSSAutoValue) {
+fun StyleBuilder.bottom(value: CSSAutoKeyword) {
     property("bottom", value)
 }
 
@@ -355,7 +212,7 @@ fun StyleBuilder.left(value: CSSLengthOrPercentageValue) {
     property("left", value)
 }
 
-fun StyleBuilder.left(value: CSSAutoValue) {
+fun StyleBuilder.left(value: CSSAutoKeyword) {
     property("left", value)
 }
 
@@ -363,7 +220,7 @@ fun StyleBuilder.right(value: CSSLengthOrPercentageValue) {
     property("right", value)
 }
 
-fun StyleBuilder.right(value: CSSAutoValue) {
+fun StyleBuilder.right(value: CSSAutoKeyword) {
     property("right", value)
 }
 

@@ -1,3 +1,10 @@
+/*
+ * Copyright 2020-2021 JetBrains s.r.o. and respective authors and developers.
+ * Use of this source code is governed by the Apache 2.0 license that can be found in the LICENSE.txt file.
+ */
+
+@file:Suppress("NOTHING_TO_INLINE", "unused")
+
 package org.jetbrains.compose.web.css
 
 import kotlin.properties.ReadOnlyProperty
@@ -6,36 +13,40 @@ interface StyleBuilder {
     fun property(propertyName: String, value: StylePropertyValue)
     fun variable(variableName: String, value: StylePropertyValue)
 
-    fun property(propertyName: String, value: String) = property(propertyName, value.unsafeCast<StylePropertyValue>())
-    fun property(propertyName: String, value: Number) = property(propertyName, value.unsafeCast<StylePropertyValue>())
-    fun variable(variableName: String, value: Number) = variable(variableName, value.unsafeCast<StylePropertyValue>())
-    fun variable(variableName: String, value: String) = variable(variableName, value.unsafeCast<StylePropertyValue>())
+    fun property(propertyName: String, value: String) = property(propertyName, StylePropertyValue(value))
+    fun property(propertyName: String, value: Number) = property(propertyName, StylePropertyValue(value))
+    fun variable(variableName: String, value: String) = variable(variableName, StylePropertyValue(value))
+    fun variable(variableName: String, value: Number) = variable(variableName, StylePropertyValue(value))
 
-    operator fun <TValue> CSSStyleVariable<TValue>.invoke(value: TValue) {
-        if (value is CustomStyleValue) {
-            variable(name, value.styleValue())
-        } else {
-            variable(name, value.toString())
-        }
+    operator fun <TValue: StylePropertyValue> CSSStyleVariable<TValue>.invoke(value: TValue) {
+        variable(name, value.toString())
+    }
+
+    operator fun CSSStyleVariable<StylePropertyString>.invoke(value: String) {
+        variable(name, value)
+    }
+
+    operator fun CSSStyleVariable<StylePropertyNumber>.invoke(value: Number) {
+        variable(name, value)
     }
 }
 
-fun variableValue(variableName: String, fallback: StylePropertyValue? = null) =
+inline fun variableValue(variableName: String, fallback: StylePropertyValue? = null) =
     "var(--$variableName${fallback?.let { ", $it" } ?: ""})"
 
-interface CSSVariableValue<TValue> : StylePropertyValue {
-    companion object {
-        operator fun <TValue> invoke(value: String) =
-            value.unsafeCast<CSSVariableValue<TValue>>()
-        operator fun <TValue> invoke(value: Number) =
-            value.unsafeCast<CSSVariableValue<TValue>>()
-        operator fun <TValue : CSSStyleValue> invoke(value: TValue) =
-            value.unsafeCast<CSSVariableValue<TValue>>()
+external interface CSSVariableValue<TValue> : StylePropertyValue
 
-        operator fun <TValue> invoke(value: StylePropertyValue) =
-            value.unsafeCast<CSSVariableValue<TValue>>()
-    }
-}
+inline fun <TValue> CSSVariableValue(value: String) =
+    StylePropertyValue(value).unsafeCast<CSSVariableValue<TValue>>()
+
+//fun <TValue> CSSVariableValue(value: Number) =
+//    value.unsafeCast<CSSVariableValue<TValue>>()
+//
+//fun <TValue : CSSStyleValue> CSSVariableValue(value: TValue) =
+//    value.unsafeCast<CSSVariableValue<TValue>>()
+//
+//fun <TValue> CSSVariableValue(value: StylePropertyValue) =
+//    value.unsafeCast<CSSVariableValue<TValue>>()
 
 // after adding `variable` word `add` became ambiguous
 @Deprecated(
@@ -53,24 +64,17 @@ interface CSSVariable {
     val name: String
 }
 
-interface CustomStyleValue {
-    fun styleValue(): StylePropertyValue
-}
+class CSSStyleVariable<out TValue: StylePropertyValue>(override val name: String) : CSSVariable
 
-data class CSSStyleVariable<TValue>(override val name: String) : CSSVariable
-
-fun <TValue> CSSStyleVariable<TValue>.value(fallback: TValue? = null) =
+fun <TValue: StylePropertyValue> CSSStyleVariable<TValue>.value(fallback: TValue? = null) =
     CSSVariableValue<TValue>(
         variableValue(
             name,
-            fallback?.let {
-                (fallback as? CustomStyleValue)?.styleValue()
-                    ?: fallback.toString().unsafeCast<StylePropertyValue>()
-            }
+            fallback
         )
     )
 
-fun <TValue> CSSVariables.variable() =
+fun <TValue: StylePropertyValue> CSSVariables.variable() =
     ReadOnlyProperty<Any?, CSSStyleVariable<TValue>> { _, property ->
         CSSStyleVariable(property.name)
     }
@@ -80,22 +84,17 @@ interface StyleHolder {
     val variables: StylePropertyList
 }
 
+@Suppress("EqualsOrHashCode")
 open class StyleBuilderImpl : StyleBuilder, StyleHolder {
     override val properties: MutableStylePropertyList = mutableListOf()
     override val variables: MutableStylePropertyList = mutableListOf()
 
     override fun property(propertyName: String, value: StylePropertyValue) {
-        properties.add(when (value) {
-            is CSSSizeValue<*> -> StylePropertyDeclaration(propertyName, value.asString())
-            else -> StylePropertyDeclaration(propertyName, value)
-        })
+        properties.add(StylePropertyDeclaration(propertyName, value))
     }
 
     override fun variable(variableName: String, value: StylePropertyValue) {
-        variables.add(when (value) {
-            is CSSSizeValue<*> -> StylePropertyDeclaration(variableName, value.asString())
-            else -> StylePropertyDeclaration(variableName, value)
-        })
+        variables.add(StylePropertyDeclaration(variableName, value))
     }
 
     // StylePropertyValue is js native object without equals

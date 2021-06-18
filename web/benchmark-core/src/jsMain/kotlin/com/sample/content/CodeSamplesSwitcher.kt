@@ -5,7 +5,6 @@ import org.jetbrains.compose.web.css.*
 import org.jetbrains.compose.web.css.selectors.*
 import org.jetbrains.compose.web.attributes.*
 import org.jetbrains.compose.web.dom.*
-import org.jetbrains.compose.web.*
 import com.sample.style.AppStylesheet
 
 private object SwitcherVariables : CSSVariables {

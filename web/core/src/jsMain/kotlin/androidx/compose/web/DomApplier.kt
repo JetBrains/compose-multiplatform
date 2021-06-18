@@ -3,7 +3,6 @@ package org.jetbrains.compose.web
 import androidx.compose.runtime.AbstractApplier
 import org.jetbrains.compose.web.attributes.WrappedEventListener
 import org.jetbrains.compose.web.css.StyleHolder
-import org.jetbrains.compose.web.css.attributeStyleMap
 import org.jetbrains.compose.web.dom.setProperty
 import org.jetbrains.compose.web.dom.setVariable
 import kotlinx.browser.document
@@ -109,7 +108,7 @@ class DomElementWrapper(override val node: HTMLElement): DomNodeWrapper(node) {
         node.removeAttribute("style")
 
         style?.properties?.forEach { (name, value) ->
-            setProperty(node.attributeStyleMap, name, value)
+            setProperty(node.style, name, value)
         }
         style?.variables?.forEach { (name, value) ->
             setVariable(node.style, name, value)

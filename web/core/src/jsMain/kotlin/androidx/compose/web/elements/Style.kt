@@ -29,7 +29,7 @@ inline fun Style(
  * Use this function to mount the <style> tag into the DOM tree.
  *
  * @param cssRules - is a list of style rules.
- * Usually, it's [org.jetbrains.compose.web.css.StyleSheet] instance
+ * Usually, it's [androidx.compose.web.css.StyleSheet] instance
  */
 @Composable
 inline fun Style(
@@ -93,7 +93,7 @@ private fun fillRule(
         is CSSStyleRuleDeclaration -> {
             val cssStyleRule = cssRule.unsafeCast<CSSStyleRule>()
             cssRuleDeclaration.style.properties.forEach { (name, value) ->
-                setProperty(cssStyleRule.styleMap, name, value)
+                setProperty(cssStyleRule.style, name, value)
             }
             cssRuleDeclaration.style.variables.forEach { (name, value) ->
                 setVariable(cssStyleRule.style, name, value)
@@ -109,11 +109,11 @@ private fun fillRule(
 }
 
 fun setProperty(
-    styleMap: StylePropertyMap,
+    style: CSSStyleDeclaration,
     name: String,
     value: StylePropertyValue
 ) {
-    styleMap.set(name, value)
+    style.setProperty(name, value.toString())
 }
 
 fun setVariable(
