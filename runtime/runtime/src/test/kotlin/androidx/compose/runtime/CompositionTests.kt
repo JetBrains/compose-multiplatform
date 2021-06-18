@@ -3003,6 +3003,15 @@ class CompositionTests {
             assertEquals(1, nodes[1].changeCount, "node 1 recomposition changeCount")
         }
     }
+
+    @Test
+    fun internalErrorsAreReportedAsInternal() = compositionTest {
+        expectError("internal") {
+            compose {
+                currentComposer.createNode { null }
+            }
+        }
+    }
 }
 
 var stateA by mutableStateOf(1000)
