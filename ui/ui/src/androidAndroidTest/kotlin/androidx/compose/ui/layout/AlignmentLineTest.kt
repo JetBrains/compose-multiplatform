@@ -30,6 +30,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
 import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.IntOffset
+import androidx.compose.ui.unit.dp
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.MediumTest
 import org.junit.Assert.assertEquals
@@ -1141,6 +1142,39 @@ class AlignmentLineTest {
             assertEquals(1, measures)
             assertEquals(2, layouts)
         }
+    }
+
+    @Test
+    fun notMeasuredChildIsNotCrashingWhenGrandParentQueriesAlignments() {
+        var emit by mutableStateOf(false)
+
+        rule.setContent {
+            Layout(
+                content = {
+                    Layout(
+                        content = {
+                            if (emit) {
+                                Box(Modifier.size(10.dp))
+                            }
+                        }
+                    ) { _, constraints ->
+                        layout(constraints.maxWidth, constraints.maxHeight) {}
+                    }
+                }
+            ) { measurables, constraints ->
+                val placeable = measurables.first().measure(constraints)
+                placeable[FirstBaseline]
+                layout(placeable.width, placeable.height) {
+                    placeable.place(0, 0)
+                }
+            }
+        }
+
+        rule.runOnIdle {
+            emit = true
+        }
+
+        rule.runOnIdle {}
     }
 
     private var linePosition = 10
