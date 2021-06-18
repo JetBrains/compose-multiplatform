@@ -186,8 +186,8 @@ internal class SlotTable : CompositionData, Iterable<CompositionGroup> {
      * @see SlotWriter
      */
     fun openWriter(): SlotWriter {
-        check(!writer) { "Cannot start a writer when another writer is pending" }
-        check(readers <= 0) { "Cannot start a writer when a reader is pending" }
+        runtimeCheck(!writer) { "Cannot start a writer when another writer is pending" }
+        runtimeCheck(readers <= 0) { "Cannot start a writer when a reader is pending" }
         writer = true
         version++
         return SlotWriter(this)
@@ -200,7 +200,7 @@ internal class SlotTable : CompositionData, Iterable<CompositionGroup> {
      * might be affected by the modifications being performed by the [SlotWriter].
      */
     fun anchorIndex(anchor: Anchor): Int {
-        check(!writer) { "Use active SlotWriter to determine anchor location instead" }
+        runtimeCheck(!writer) { "Use active SlotWriter to determine anchor location instead" }
         require(anchor.valid) { "Anchor refers to a group that was removed" }
         return anchor.location
     }
@@ -1120,7 +1120,7 @@ internal class SlotWriter(
      */
     fun updateAux(value: Any?) {
         val address = groupIndexToAddress(currentGroup)
-        check(groups.hasAux(address)) {
+        runtimeCheck(groups.hasAux(address)) {
             "Updating the data of a group that was not created with a data slot"
         }
         slots[dataIndexToDataAddress(groups.auxIndex(address))] = value
@@ -1133,10 +1133,10 @@ internal class SlotWriter(
      * the group.
      */
     fun insertAux(value: Any?) {
-        check(insertCount >= 0) { "Cannot insert auxiliary data when not inserting" }
+        runtimeCheck(insertCount >= 0) { "Cannot insert auxiliary data when not inserting" }
         val parent = parent
         val parentGroupAddress = groupIndexToAddress(parent)
-        check(!groups.hasAux(parentGroupAddress)) { "Group already has auxiliary data" }
+        runtimeCheck(!groups.hasAux(parentGroupAddress)) { "Group already has auxiliary data" }
         insertSlots(1, parent)
         val auxIndex = groups.auxIndex(parentGroupAddress)
         val auxAddress = dataIndexToDataAddress(auxIndex)
@@ -1176,7 +1176,7 @@ internal class SlotWriter(
      * Set the value at the groups current data slot
      */
     fun set(value: Any?) {
-        check(currentSlot <= currentSlotEnd) {
+        runtimeCheck(currentSlot <= currentSlotEnd) {
             "Writing to an invalid slot"
         }
         slots[dataIndexToDataAddress(currentSlot - 1)] = value
@@ -1191,7 +1191,7 @@ internal class SlotWriter(
         val slotsEnd = groups.dataIndex(groupIndexToAddress(currentGroup + 1))
         val slotsIndex = slotsStart + index
         @Suppress("ConvertTwoComparisonsToRangeCheck")
-        check(slotsIndex >= slotsStart && slotsIndex < slotsEnd) {
+        runtimeCheck(slotsIndex >= slotsStart && slotsIndex < slotsEnd) {
             "Write to an invalid slot index $index for group $currentGroup"
         }
         val slotAddress = dataIndexToDataAddress(slotsIndex)
@@ -1220,7 +1220,7 @@ internal class SlotWriter(
         check(insertCount <= 0) { "Cannot call seek() while inserting" }
         val index = currentGroup + amount
         @Suppress("ConvertTwoComparisonsToRangeCheck")
-        check(index >= parent && index <= currentGroupEnd) {
+        runtimeCheck(index >= parent && index <= currentGroupEnd) {
             "Cannot seek outside the current group ($parent-$currentGroupEnd)"
         }
         this.currentGroup = index
@@ -1260,7 +1260,7 @@ internal class SlotWriter(
     fun endInsert() {
         check(insertCount > 0) { "Unbalanced begin/end insert" }
         if (--insertCount == 0) {
-            check(nodeCountStack.size == startStack.size) {
+            runtimeCheck(nodeCountStack.size == startStack.size) {
                 "startGroup/endGroup mismatch while inserting"
             }
             restoreCurrentGroupEnd()
@@ -1639,7 +1639,7 @@ internal class SlotWriter(
 
         //  7) remove the old groups
         val anchorsRemoved = removeGroups(groupToMove + moveLen, moveLen)
-        check(!anchorsRemoved) { "Unexpectedly removed anchors" }
+        runtimeCheck(!anchorsRemoved) { "Unexpectedly removed anchors" }
 
         //  8) fix parent anchors
         fixParentAnchorsFor(parent, currentGroupEnd, current)
@@ -1793,7 +1793,7 @@ internal class SlotWriter(
             }
 
             // Ensure we correctly transplanted the correct groups.
-            check(!anchorsRemoved) { "Unexpectedly removed anchors" }
+            runtimeCheck(!anchorsRemoved) { "Unexpectedly removed anchors" }
 
             // Update the node count.
             nodeCount += if (groups.isNode(currentGroup)) 1 else groups.nodeCount(currentGroup)
@@ -1895,7 +1895,7 @@ internal class SlotWriter(
             // anchors that refer to these groups must be updated.
             var groupAddress = if (index < gapStart) index + gapLen else gapStart
             val capacity = capacity
-            check(groupAddress < capacity)
+            runtimeCheck(groupAddress < capacity)
             while (groupAddress < capacity) {
                 val oldAnchor = groups.parentAnchor(groupAddress)
                 val oldIndex = parentAnchorToIndex(oldAnchor)
@@ -1951,7 +1951,7 @@ internal class SlotWriter(
                 val groupGapStart = groupGapStart
                 while (updateAddress < stopUpdateAddress) {
                     val anchor = groups.dataAnchor(updateAddress)
-                    check(anchor >= 0) {
+                    runtimeCheck(anchor >= 0) {
                         "Unexpected anchor value, expected a positive anchor"
                     }
                     groups.updateDataAnchor(updateAddress, -(slotsSize - anchor + 1))
@@ -1963,7 +1963,7 @@ internal class SlotWriter(
                 val stopUpdateAddress = groupIndexToAddress(newSlotsGapOwner)
                 while (updateAddress < stopUpdateAddress) {
                     val anchor = groups.dataAnchor(updateAddress)
-                    check(anchor < 0) {
+                    runtimeCheck(anchor < 0) {
                         "Unexpected anchor value, expected a negative anchor"
                     }
                     groups.updateDataAnchor(updateAddress, slotsSize + anchor + 1)
@@ -2148,7 +2148,7 @@ internal class SlotWriter(
      */
     private fun updateNodeOfGroup(index: Int, value: Any?) {
         val address = groupIndexToAddress(index)
-        check(address < groups.size && groups.isNode(address)) {
+        runtimeCheck(address < groups.size && groups.isNode(address)) {
             "Updating the node of a group at $index that was not created with as a node group"
         }
         slots[dataIndexToDataAddress(groups.nodeIndex(address))] = value
