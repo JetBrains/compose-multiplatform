@@ -23,6 +23,8 @@ import androidx.compose.ui.ExperimentalComposeUiApi
  *
  * @param keyCode a Long value representing the key pressed. Note: This keycode can be used to
  * uniquely identify a hardware key. It is different from the native keycode.
+ *
+ * @sample androidx.compose.ui.samples.KeyEventIsAltPressedSample
  */
 @Suppress("INLINE_CLASS_DEPRECATED", "EXPERIMENTAL_FEATURE_WARNING")
 expect inline class Key(val keyCode: Long) {

@@ -25,9 +25,12 @@ import androidx.compose.ui.platform.debugInspectorInfo
 
 /**
  * Add this modifier to a component to observe focus state events. [onFocusChanged] is invoked
- * only when the focus state changes.
+ * when the focus state changes. The [onFocusChanged] modifier listens to the state of the first
+ * [focusTarget] following this modifier.
  *
- * If you want to be notified every time the internal focus state is written to (even if it
+ * @sample androidx.compose.ui.samples.FocusableSample
+ *
+ * Note: If you want to be notified every time the internal focus state is written to (even if it
  * hasn't changed), use [onFocusEvent] instead.
  */
 fun Modifier.onFocusChanged(onFocusChanged: (FocusState) -> Unit): Modifier =

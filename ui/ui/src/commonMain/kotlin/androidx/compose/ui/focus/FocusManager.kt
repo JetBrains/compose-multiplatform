@@ -16,7 +16,6 @@
 
 package androidx.compose.ui.focus
 
-import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusStateImpl.Active
 import androidx.compose.ui.focus.FocusStateImpl.ActiveParent
@@ -31,6 +30,8 @@ interface FocusManager {
      *
      *  @param force: Whether we should forcefully clear focus regardless of whether we have
      *  any components that have Captured focus.
+     *
+     *  @sample androidx.compose.ui.samples.ClearFocusSample
      */
     fun clearFocus(force: Boolean = false)
 
@@ -41,42 +42,10 @@ interface FocusManager {
      * [Modifier.focusOrder()][focusOrder].
      *
      * @return true if focus was moved successfully. false if the focused item is unchanged.
+     *
+     * @sample androidx.compose.ui.samples.MoveFocusSample
      */
     fun moveFocus(focusDirection: FocusDirection): Boolean
-
-    /**
-     * Moves focus to one of the children of the currently focused item.
-     *
-     * This function is deprecated. Use FocusManager.moveFocus(FocusDirection.In) instead.
-     *
-     * @return true if focus was moved successfully.
-     */
-    @ExperimentalComposeUiApi
-    @Deprecated(
-        message = "Use FocusManager.moveFocus(FocusDirection.In) instead",
-        ReplaceWith(
-            "moveFocus(In)",
-            "androidx.compose.ui.focus.FocusDirection.Companion.In"
-        )
-    )
-    fun moveFocusIn(): Boolean = false
-
-    /**
-     * Moves focus to the nearest focusable parent of the currently focused item.
-     *
-     *  This function is deprecated. Use FocusManager.moveFocus(FocusDirection.Out) instead.
-     *
-     * @return true if focus was moved successfully.
-     */
-    @ExperimentalComposeUiApi
-    @Deprecated(
-        message = "Use FocusManager.moveFocus(FocusDirection.Out) instead",
-        ReplaceWith(
-            "moveFocus(Out)",
-            "androidx.compose.ui.focus.FocusDirection.Companion.Out"
-        )
-    )
-    fun moveFocusOut(): Boolean = false
 }
 
 /**
