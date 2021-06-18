@@ -28,16 +28,12 @@ fun StyleBuilder.color(value: String) {
     property("color", value)
 }
 
-fun StyleBuilder.color(value: Color) {
+fun StyleBuilder.color(value: CSSColorValue) {
     // color hasn't Typed OM yet
     property("color", value)
 }
 
-fun StyleBuilder.backgroundColor(value: CSSVariableValue<Color>) {
-    property("background-color", value)
-}
-
-fun StyleBuilder.backgroundColor(value: Color) {
+fun StyleBuilder.backgroundColor(value: CSSColorValue) {
     property("background-color", value)
 }
 
@@ -47,9 +43,9 @@ fun StyleBuilder.backgroundColor(value: String) {
 
 @Suppress("EqualsOrHashCode")
 class CSSBorder : CSSStyleValue {
-    var width: CSSUnitValue? = null
-    var style: StylePropertyValue? = null
-    var color: StylePropertyValue? = null
+    var width: CSSNumeric? = null
+    var style: LineStyle? = null
+    var color: CSSColorValue? = null
 
     override fun equals(other: Any?): Boolean {
         return if (other is CSSBorder) {
@@ -63,19 +59,15 @@ class CSSBorder : CSSStyleValue {
     }
 }
 
-inline fun CSSBorder.width(size: CSSUnitValue) {
+inline fun CSSBorder.width(size: CSSNumeric) {
     width = size
 }
 
 inline fun CSSBorder.style(style: LineStyle) {
-    this.style = CSSStyleValue(style.name)
+    this.style = style
 }
 
-inline fun CSSBorder.color(color: Color) {
-    this.color = color
-}
-
-inline fun CSSBorder.color(color: CSSVariableValue<Color>) {
+inline fun CSSBorder.color(color: CSSColorValue) {
     this.color = color
 }
 
@@ -86,7 +78,7 @@ inline fun StyleBuilder.border(crossinline borderBuild: CSSBorder.() -> Unit) {
 fun StyleBuilder.border(
     width: CSSLengthValue? = null,
     style: LineStyle? = null,
-    color: Color? = null
+    color: CSSColorValue? = null
 ) {
     border {
         width?.let { width(it) }
@@ -148,27 +140,27 @@ fun StyleBuilder.position(position: Position) {
     )
 }
 
-fun StyleBuilder.borderRadius(r: CSSUnitValue) {
+fun StyleBuilder.borderRadius(r: CSSNumeric) {
     property("border-radius", r)
 }
 
-fun StyleBuilder.borderRadius(topLeft: CSSUnitValue, bottomRight: CSSUnitValue) {
+fun StyleBuilder.borderRadius(topLeft: CSSNumeric, bottomRight: CSSNumeric) {
     property("border-radius", "$topLeft $bottomRight")
 }
 
 fun StyleBuilder.borderRadius(
-    topLeft: CSSUnitValue,
-    topRightAndBottomLeft: CSSUnitValue,
-    bottomRight: CSSUnitValue
+    topLeft: CSSNumeric,
+    topRightAndBottomLeft: CSSNumeric,
+    bottomRight: CSSNumeric
 ) {
     property("border-radius", "$topLeft $topRightAndBottomLeft $bottomRight")
 }
 
 fun StyleBuilder.borderRadius(
-    topLeft: CSSUnitValue,
-    topRight: CSSUnitValue,
-    bottomRight: CSSUnitValue,
-    bottomLeft: CSSUnitValue
+    topLeft: CSSNumeric,
+    topRight: CSSNumeric,
+    bottomRight: CSSNumeric,
+    bottomLeft: CSSNumeric
 ) {
     property(
         "border-radius",
@@ -176,7 +168,7 @@ fun StyleBuilder.borderRadius(
     )
 }
 
-fun StyleBuilder.width(value: CSSUnitValue) {
+fun StyleBuilder.width(value: CSSNumeric) {
     property("width", value)
 }
 
@@ -184,7 +176,7 @@ fun StyleBuilder.width(value: CSSAutoKeyword) {
     property("width", value)
 }
 
-fun StyleBuilder.height(value: CSSUnitValue) {
+fun StyleBuilder.height(value: CSSNumeric) {
     property("height", value)
 }
 
@@ -224,24 +216,24 @@ fun StyleBuilder.right(value: CSSAutoKeyword) {
     property("right", value)
 }
 
-fun StyleBuilder.fontSize(value: CSSUnitValue) {
+fun StyleBuilder.fontSize(value: CSSNumeric) {
     property("font-size", value)
 }
 
-fun StyleBuilder.margin(value: CSSUnitValue) {
+fun StyleBuilder.margin(value: CSSNumeric) {
     // marign hasn't Typed OM yet
     property("margin", value)
 }
 
-fun StyleBuilder.marginLeft(value: CSSUnitValue) {
+fun StyleBuilder.marginLeft(value: CSSNumeric) {
     property("margin-left", value)
 }
 
-fun StyleBuilder.marginTop(value: CSSUnitValue) {
+fun StyleBuilder.marginTop(value: CSSNumeric) {
     property("margin-top", value)
 }
 
-fun StyleBuilder.padding(value: CSSUnitValue) {
+fun StyleBuilder.padding(value: CSSNumeric) {
     // padding hasn't Typed OM yet
     property("padding", value)
 }

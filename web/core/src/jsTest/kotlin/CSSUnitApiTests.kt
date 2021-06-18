@@ -5,40 +5,7 @@
 
 package org.jetbrains.compose.web.core.tests
 
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
-import org.jetbrains.compose.web.css.ch
-import org.jetbrains.compose.web.css.cm
-import org.jetbrains.compose.web.css.cssRem
-import org.jetbrains.compose.web.css.deg
-import org.jetbrains.compose.web.css.div
-import org.jetbrains.compose.web.css.dpcm
-import org.jetbrains.compose.web.css.dpi
-import org.jetbrains.compose.web.css.dppx
-import org.jetbrains.compose.web.css.em
-import org.jetbrains.compose.web.css.fr
-import org.jetbrains.compose.web.css.grad
-import org.jetbrains.compose.web.css.left
-import org.jetbrains.compose.web.css.minus
-import org.jetbrains.compose.web.css.mm
-import org.jetbrains.compose.web.css.ms
-import org.jetbrains.compose.web.css.number
-import org.jetbrains.compose.web.css.pc
-import org.jetbrains.compose.web.css.percent
-import org.jetbrains.compose.web.css.plus
-import org.jetbrains.compose.web.css.pt
-import org.jetbrains.compose.web.css.px
-import org.jetbrains.compose.web.css.rad
-import org.jetbrains.compose.web.css.s
-import org.jetbrains.compose.web.css.times
-import org.jetbrains.compose.web.css.top
-import org.jetbrains.compose.web.css.turn
-import org.jetbrains.compose.web.css.vh
-import org.jetbrains.compose.web.css.vmax
-import org.jetbrains.compose.web.css.vmin
-import org.jetbrains.compose.web.css.vw
+import org.jetbrains.compose.web.css.*
 import org.jetbrains.compose.web.dom.Div
 import org.w3c.dom.HTMLElement
 import org.w3c.dom.get
@@ -304,6 +271,162 @@ class CSSUnitApiTests {
         assertEquals(1.dppx, 7.dppx - 4.dppx - 2.dppx)
 
         assertEquals(1.fr, 7.fr - 4.fr - 2.fr)
+    }
+
+    @Test
+    fun calcMultiplicationLeft() {
+        val typedResultAbs: CSSNumericValue<CSSUnitAbs> = ((4.pt + 4.px) * 4)
+        assertEquals("calc((4pt + 4px) * 4)", typedResultAbs.toString())
+
+        val typedResultRel: CSSNumericValue<CSSUnitRel> = ((4.ex + 4.em) * 4)
+        assertEquals("calc((4ex + 4em) * 4)", typedResultRel.toString())
+
+        val typedResultLength: CSSNumericValue<CSSUnitLength> = ((4.pt + 4.em) * 4)
+        assertEquals("calc((4pt + 4em) * 4)", typedResultLength.toString())
+
+        val typedResultLengthOrPercentage: CSSNumericValue<CSSUnitLengthOrPercentage> = ((4.percent + 4.px) * 4)
+        assertEquals("calc((4% + 4px) * 4)", typedResultLengthOrPercentage.toString())
+
+        val typedResultAngle: CSSNumericValue<CSSUnitAngle> = ((4.deg + 4.grad) * 4)
+        assertEquals("calc((4deg + 4grad) * 4)", typedResultAngle.toString())
+
+        val typedResultTime: CSSNumericValue<CSSUnitTime> = ((4.s + 4.ms) * 4)
+        assertEquals("calc((4s + 4ms) * 4)", typedResultTime.toString())
+
+        val typedResultFrequency: CSSNumericValue<CSSUnitFrequency> = ((4.Hz + 4.kHz) * 4)
+        assertEquals("calc((4Hz + 4kHz) * 4)", typedResultFrequency.toString())
+
+        val typedResultResolution: CSSNumericValue<CSSUnitResolution> = ((4.dpi + 4.dppx) * 4)
+        assertEquals("calc((4dpi + 4dppx) * 4)", typedResultResolution.toString())
+    }
+
+    @Test
+    fun calcDivisionLeft() {
+        val typedResultAbs: CSSNumericValue<CSSUnitAbs> = ((4.pt + 4.px) / 4)
+        assertEquals("calc((4pt + 4px) / 4)", typedResultAbs.toString())
+
+        val typedResultRel: CSSNumericValue<CSSUnitRel> = ((4.ex + 4.em) / 4)
+        assertEquals("calc((4ex + 4em) / 4)", typedResultRel.toString())
+
+        val typedResultLength: CSSNumericValue<CSSUnitLength> = ((4.pt + 4.em) / 4)
+        assertEquals("calc((4pt + 4em) / 4)", typedResultLength.toString())
+
+        val typedResultLengthOrPercentage: CSSNumericValue<CSSUnitLengthOrPercentage> = ((4.percent + 4.px) / 4)
+        assertEquals("calc((4% + 4px) / 4)", typedResultLengthOrPercentage.toString())
+
+        val typedResultAngle: CSSNumericValue<CSSUnitAngle> = ((4.deg + 4.grad) / 4)
+        assertEquals("calc((4deg + 4grad) / 4)", typedResultAngle.toString())
+
+        val typedResultTime: CSSNumericValue<CSSUnitTime> = ((4.s + 4.ms) / 4)
+        assertEquals("calc((4s + 4ms) / 4)", typedResultTime.toString())
+
+        val typedResultFrequency: CSSNumericValue<CSSUnitFrequency> = ((4.Hz + 4.kHz) / 4)
+        assertEquals("calc((4Hz + 4kHz) / 4)", typedResultFrequency.toString())
+
+        val typedResultResolution: CSSNumericValue<CSSUnitResolution> = ((4.dpi + 4.dppx) / 4)
+        assertEquals("calc((4dpi + 4dppx) / 4)", typedResultResolution.toString())
+    }
+
+    @Test
+    fun calcMultiplicationRight() {
+        val typedResultAbs: CSSNumericValue<CSSUnitAbs> = (4 * (4.pt + 4.px))
+        assertEquals("calc(4 * (4pt + 4px))", typedResultAbs.toString())
+
+        val typedResultRel: CSSNumericValue<CSSUnitRel> = (4 * (4.ex + 4.em))
+        assertEquals("calc(4 * (4ex + 4em))", typedResultRel.toString())
+
+        val typedResultLength: CSSNumericValue<CSSUnitLength> = (4 * (4.pt + 4.em))
+        assertEquals("calc(4 * (4pt + 4em))", typedResultLength.toString())
+
+        val typedResultLengthOrPercentage: CSSNumericValue<CSSUnitLengthOrPercentage> = (4 * (4.percent + 4.px))
+        assertEquals("calc(4 * (4% + 4px))", typedResultLengthOrPercentage.toString())
+
+        val typedResultAngle: CSSNumericValue<CSSUnitAngle> = (4 * (4.deg + 4.grad))
+        assertEquals("calc(4 * (4deg + 4grad))", typedResultAngle.toString())
+
+        val typedResultTime: CSSNumericValue<CSSUnitTime> = (4 * (4.s + 4.ms))
+        assertEquals("calc(4 * (4s + 4ms))", typedResultTime.toString())
+
+        val typedResultFrequency: CSSNumericValue<CSSUnitFrequency> = (4 * (4.Hz + 4.kHz))
+        assertEquals("calc(4 * (4Hz + 4kHz))", typedResultFrequency.toString())
+
+        val typedResultResolution: CSSNumericValue<CSSUnitResolution> = (4 * (4.dpi + 4.dppx))
+        assertEquals("calc(4 * (4dpi + 4dppx))", typedResultResolution.toString())
+    }
+
+    @Test
+    fun calcAdd() {
+        val typedResultAbs: CSSNumericValue<CSSUnitAbs> = 4.pt + 4.px
+        assertEquals("calc(4pt + 4px)", typedResultAbs.toString())
+
+        val typedResultRel: CSSNumericValue<CSSUnitRel> = 4.ex + 4.em
+        assertEquals("calc(4ex + 4em)", typedResultRel.toString())
+
+        val typedResultLength: CSSNumericValue<CSSUnitLength> = 4.pt + 4.em
+        assertEquals("calc(4pt + 4em)", typedResultLength.toString())
+
+        val typedResultLengthOrPercentage: CSSNumericValue<CSSUnitLengthOrPercentage> = 4.percent + 4.px
+        assertEquals("calc(4% + 4px)", typedResultLengthOrPercentage.toString())
+
+        val typedResultAngle: CSSNumericValue<CSSUnitAngle> = 4.deg + 4.grad
+        assertEquals("calc(4deg + 4grad)", typedResultAngle.toString())
+
+        val typedResultTime: CSSNumericValue<CSSUnitTime> = 4.s + 4.ms
+        assertEquals("calc(4s + 4ms)", typedResultTime.toString())
+
+        val typedResultFrequency: CSSNumericValue<CSSUnitFrequency> = 4.Hz + 4.kHz
+        assertEquals("calc(4Hz + 4kHz)", typedResultFrequency.toString())
+
+        val typedResultResolution: CSSNumericValue<CSSUnitResolution> = 4.dpi + 4.dppx
+        assertEquals("calc(4dpi + 4dppx)", typedResultResolution.toString())
+    }
+
+    @Test
+    fun calcSubstract() {
+        val typedResultAbs: CSSNumericValue<CSSUnitAbs> = 4.pt - 4.px
+        assertEquals("calc(4pt - 4px)", typedResultAbs.toString())
+
+        val typedResultRel: CSSNumericValue<CSSUnitRel> = 4.ex - 4.em
+        assertEquals("calc(4ex - 4em)", typedResultRel.toString())
+
+        val typedResultLength: CSSNumericValue<CSSUnitLength> = 4.pt - 4.em
+        assertEquals("calc(4pt - 4em)", typedResultLength.toString())
+
+        val typedResultLengthOrPercentage: CSSNumericValue<CSSUnitLengthOrPercentage> = 4.percent - 4.px
+        assertEquals("calc(4% - 4px)", typedResultLengthOrPercentage.toString())
+
+        val typedResultAngle: CSSNumericValue<CSSUnitAngle> = 4.deg - 4.grad
+        assertEquals("calc(4deg - 4grad)", typedResultAngle.toString())
+
+        val typedResultTime: CSSNumericValue<CSSUnitTime> = 4.s - 4.ms
+        assertEquals("calc(4s - 4ms)", typedResultTime.toString())
+
+        val typedResultFrequency: CSSNumericValue<CSSUnitFrequency> = 4.Hz - 4.kHz
+        assertEquals("calc(4Hz - 4kHz)", typedResultFrequency.toString())
+
+        val typedResultResolution: CSSNumericValue<CSSUnitResolution> = 4.dpi - 4.dppx
+        assertEquals("calc(4dpi - 4dppx)", typedResultResolution.toString())
+    }
+
+    @Test
+    fun calcAssociative() {
+        val typedResultLengthLeft: CSSNumericValue<CSSUnitLength> = 4.pt - 4.px + 4.em
+        assertEquals("calc((4pt - 4px) + 4em)", typedResultLengthLeft.toString())
+
+        val typedResultLengthRight: CSSNumericValue<CSSUnitLength> = 4.pt - (4.px + 4.em)
+        assertEquals("calc(4pt - (4px + 4em))", typedResultLengthRight.toString())
+    }
+
+    @Test
+    fun calcVaraiables() {
+        val variables = object : CSSVariables {
+            val pxVar by variable<CSSSizeValue<CSSUnit.px>>()
+        }
+        val typedResultLength: CSSNumericValue<CSSUnitLength> = 4.pt + variables.pxVar.value()
+        assertEquals("calc(4pt + var(--pxVar))", typedResultLength.toString())
+
+        val typedResultLengthFallback: CSSNumericValue<CSSUnitLength> = 4.pt + variables.pxVar.value(4.px)
+        assertEquals("calc(4pt + var(--pxVar, 4px))", typedResultLengthFallback.toString())
     }
 
     @Test

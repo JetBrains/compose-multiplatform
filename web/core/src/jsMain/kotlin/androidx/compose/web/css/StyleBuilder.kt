@@ -34,19 +34,13 @@ interface StyleBuilder {
 inline fun variableValue(variableName: String, fallback: StylePropertyValue? = null) =
     "var(--$variableName${fallback?.let { ", $it" } ?: ""})"
 
-external interface CSSVariableValue<TValue> : StylePropertyValue
+external interface CSSVariableValueAs<out T: StylePropertyValue>: StylePropertyValue
+
+inline fun <TValue> CSSVariableValue(value: StylePropertyValue) =
+    value.unsafeCast<TValue>()
 
 inline fun <TValue> CSSVariableValue(value: String) =
-    StylePropertyValue(value).unsafeCast<CSSVariableValue<TValue>>()
-
-//fun <TValue> CSSVariableValue(value: Number) =
-//    value.unsafeCast<CSSVariableValue<TValue>>()
-//
-//fun <TValue : CSSStyleValue> CSSVariableValue(value: TValue) =
-//    value.unsafeCast<CSSVariableValue<TValue>>()
-//
-//fun <TValue> CSSVariableValue(value: StylePropertyValue) =
-//    value.unsafeCast<CSSVariableValue<TValue>>()
+    CSSVariableValue<TValue>(StylePropertyValue(value))
 
 // after adding `variable` word `add` became ambiguous
 @Deprecated(
@@ -67,6 +61,14 @@ interface CSSVariable {
 class CSSStyleVariable<out TValue: StylePropertyValue>(override val name: String) : CSSVariable
 
 fun <TValue: StylePropertyValue> CSSStyleVariable<TValue>.value(fallback: TValue? = null) =
+    CSSVariableValue<TValue>(
+        variableValue(
+            name,
+            fallback
+        )
+    )
+
+fun <TValue: CSSVariableValueAs<TValue>> CSSStyleVariable<TValue>.value(fallback: TValue? = null) =
     CSSVariableValue<TValue>(
         variableValue(
             name,

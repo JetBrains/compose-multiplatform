@@ -2,7 +2,7 @@
 
 package org.jetbrains.compose.web.css
 
-external interface CSSNumericValue<T : CSSUnit> : StylePropertyValue
+external interface CSSNumericValue<T : CSSUnit> : StylePropertyValue, CSSVariableValueAs<CSSNumericValue<T>>
 
 external interface CSSSizeValue<T : CSSUnit> : CSSNumericValue<T> {
     val value: Float
@@ -32,6 +32,7 @@ typealias CSSLengthOrPercentageValue = CSSSizeValue<out CSSUnitLengthOrPercentag
 typealias CSSLengthValue = CSSSizeValue<out CSSUnitLength>
 typealias CSSPercentageValue = CSSSizeValue<out CSSUnitPercentage>
 typealias CSSUnitValue = CSSSizeValue<out CSSUnit>
+typealias CSSNumeric = CSSNumericValue<out CSSUnit>
 typealias CSSpxValue = CSSSizeValue<CSSUnit.px>
 
 // fake interfaces to distinguish units

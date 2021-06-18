@@ -2,7 +2,9 @@
 
 package org.jetbrains.compose.web.css
 
-abstract class Color : CSSStyleValue {
+external interface CSSColorValue: StylePropertyValue, CSSVariableValueAs<CSSColorValue>
+
+abstract class Color : CSSStyleValue, CSSColorValue {
     data class Named(val value: String) : Color() {
         override fun toString(): String = value
     }
