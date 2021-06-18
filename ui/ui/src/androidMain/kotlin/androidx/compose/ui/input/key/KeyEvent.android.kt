@@ -29,6 +29,8 @@ actual typealias NativeKeyEvent = android.view.KeyEvent
 
 /**
  * The key that was pressed.
+ *
+ * @sample androidx.compose.ui.samples.KeyEventIsAltPressedSample
  */
 actual val KeyEvent.key: Key
     get() = Key(nativeKeyEvent.keyCode)
@@ -54,6 +56,8 @@ actual val KeyEvent.utf16CodePoint: Int
 
 /**
  * The [type][KeyEventType] of key event.
+ *
+ * @sample androidx.compose.ui.samples.KeyEventTypeSample
  */
 actual val KeyEvent.type: KeyEventType
     get() = when (nativeKeyEvent.action) {
@@ -64,24 +68,32 @@ actual val KeyEvent.type: KeyEventType
 
 /**
  * Indicates whether the Alt key is pressed.
+ *
+ * @sample androidx.compose.ui.samples.KeyEventIsAltPressedSample
  */
 actual val KeyEvent.isAltPressed: Boolean
     get() = nativeKeyEvent.isAltPressed
 
 /**
  * Indicates whether the Ctrl key is pressed.
+ *
+ * @sample androidx.compose.ui.samples.KeyEventIsCtrlPressedSample
  */
 actual val KeyEvent.isCtrlPressed: Boolean
     get() = nativeKeyEvent.isCtrlPressed
 
 /**
  * Indicates whether the Meta key is pressed.
+ *
+ * @sample androidx.compose.ui.samples.KeyEventIsMetaPressedSample
  */
 actual val KeyEvent.isMetaPressed: Boolean
     get() = nativeKeyEvent.isMetaPressed
 
 /**
  * Indicates whether the Shift key is pressed.
+ *
+ * @sample androidx.compose.ui.samples.KeyEventIsShiftPressedSample
  */
 actual val KeyEvent.isShiftPressed: Boolean
     get() = nativeKeyEvent.isShiftPressed

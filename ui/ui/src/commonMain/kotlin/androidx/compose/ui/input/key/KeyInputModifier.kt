@@ -24,11 +24,13 @@ import androidx.compose.ui.platform.debugInspectorInfo
 
 /**
  * Adding this [modifier][Modifier] to the [modifier][Modifier] parameter of a component will
- * allow it to intercept hardware key events.
+ * allow it to intercept hardware key events when it (or one of its children) is focused.
  *
  * @param onKeyEvent This callback is invoked when the user interacts with the hardware keyboard.
  * While implementing this callback, return true to stop propagation of this event. If you return
  * false, the key event will be sent to this [onKeyEvent]'s parent.
+ *
+ * @sample androidx.compose.ui.samples.KeyEventSample
  */
 // TODO: b/191017532 remove Modifier.composed
 @Suppress("UnnecessaryComposedModifier")
@@ -43,13 +45,15 @@ fun Modifier.onKeyEvent(onKeyEvent: (KeyEvent) -> Boolean): Modifier = composed(
 
 /**
  * Adding this [modifier][Modifier] to the [modifier][Modifier] parameter of a component will
- * allow it to intercept hardware key events.
+ * allow it to intercept hardware key events when it (or one of its children) is focused.
  *
  * @param onPreviewKeyEvent This callback is invoked when the user interacts with the hardware
  * keyboard. It gives ancestors of a focused component the chance to intercept a [KeyEvent].
  * Return true to stop propagation of this event. If you return false, the key event will be sent
  * to this [onPreviewKeyEvent]'s child. If none of the children consume the event, it will be
  * sent back up to the root [KeyInputModifier] using the onKeyEvent callback.
+ *
+ * @sample androidx.compose.ui.samples.KeyEventSample
  */
 // TODO: b/191017532 remove Modifier.composed
 @Suppress("UnnecessaryComposedModifier")

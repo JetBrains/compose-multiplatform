@@ -17,8 +17,8 @@
 package androidx.compose.ui.input.key
 
 import android.view.KeyEvent
-import android.view.KeyEvent.KEYCODE_TV_AUDIO_DESCRIPTION_MIX_UP
 import android.view.KeyEvent.KEYCODE_TV_AUDIO_DESCRIPTION_MIX_DOWN
+import android.view.KeyEvent.KEYCODE_TV_AUDIO_DESCRIPTION_MIX_UP
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.input.key.Key.Companion.Number
 import androidx.compose.ui.util.packInts
@@ -28,6 +28,8 @@ import androidx.compose.ui.util.unpackInt1
  * Actual implementation of [Key] for Android.
  *
  * @param keyCode an integer code representing the key pressed.
+ *
+ * @sample androidx.compose.ui.samples.KeyEventIsAltPressedSample
  */
 @Suppress("INLINE_CLASS_DEPRECATED", "EXPERIMENTAL_FEATURE_WARNING")
 actual inline class Key(val keyCode: Long) {

@@ -20,6 +20,7 @@ import androidx.compose.foundation.demos.text.SoftwareKeyboardControllerDemo
 import androidx.compose.integration.demos.common.ComposableDemo
 import androidx.compose.integration.demos.common.DemoCategory
 import androidx.compose.ui.demos.autofill.ExplicitAutofillTypesDemo
+import androidx.compose.ui.demos.focus.CaptureFocusDemo
 import androidx.compose.ui.demos.focus.CustomFocusOrderDemo
 import androidx.compose.ui.demos.focus.FocusInDialogDemo
 import androidx.compose.ui.demos.focus.FocusInPopupDemo
@@ -118,7 +119,8 @@ private val FocusDemos = DemoCategory(
         ComposableDemo("Reuse Focus Requester") { ReuseFocusRequesterDemo() },
         ComposableDemo("Focus Search") { FocusSearchDemo() },
         ComposableDemo("Custom Focus Order") { CustomFocusOrderDemo() },
-        ComposableDemo("FocusManager.moveFocus()") { FocusManagerMoveFocusDemo() }
+        ComposableDemo("FocusManager.moveFocus()") { FocusManagerMoveFocusDemo() },
+        ComposableDemo("Capture/Free Focus") { CaptureFocusDemo() }
     )
 )
 
