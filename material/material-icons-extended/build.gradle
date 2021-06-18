@@ -19,6 +19,7 @@ import androidx.build.LibraryGroups
 import androidx.build.LibraryType
 import androidx.build.RunApiTasks
 import androidx.compose.material.icons.generator.tasks.IconGenerationTask
+import androidx.compose.material.icons.generator.tasks.ExtendedIconGenerationTask
 
 plugins {
     id("AndroidXPlugin")
@@ -121,6 +122,8 @@ if (!AndroidXComposePlugin.isMultiplatformEnabled(project)) {
             } else {
                 v.registerPostJavacGeneratedBytecode(configurations.embedThemesRelease)
             }
+            // Manually set up source jar generation
+            ExtendedIconGenerationTask.registerSourceJarOnly(project, v)
         }
     }
 } else {
