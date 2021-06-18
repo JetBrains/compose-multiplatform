@@ -2340,17 +2340,19 @@ internal fun SemanticsOwner
     val unaccountedSpace = Region().also { it.set(root.boundsInRoot.toAndroidRect()) }
 
     fun findAllSemanticNodesRecursive(currentNode: SemanticsNode) {
-        if (unaccountedSpace.isEmpty || (!currentNode.layoutNode.isPlaced && !currentNode.isFake)) {
+        if ((unaccountedSpace.isEmpty && currentNode.id != root.id) ||
+            (!currentNode.layoutNode.isPlaced && !currentNode.isFake)
+        ) {
             return
         }
-        val rect = currentNode.boundsInRoot.toAndroidRect()
-        val region = Region().also { it.set(rect) }
+        val boundsInRoot = currentNode.boundsInRoot.toAndroidRect()
+        val region = Region().also { it.set(boundsInRoot) }
+        val virtualViewId = if (currentNode.id == root.id) {
+            AccessibilityNodeProviderCompat.HOST_VIEW_ID
+        } else {
+            currentNode.id
+        }
         if (region.op(unaccountedSpace, region, Region.Op.INTERSECT)) {
-            val virtualViewId = if (currentNode.id == root.id) {
-                AccessibilityNodeProviderCompat.HOST_VIEW_ID
-            } else {
-                currentNode.id
-            }
             nodes[virtualViewId] = SemanticsNodeWithAdjustedBounds(currentNode, region.bounds)
             // Children could be drawn outside of parent, but we are using clipped bounds for
             // accessibility now, so let's put the children recursion inside of this if. If later
@@ -2360,14 +2362,20 @@ internal fun SemanticsOwner
             for (i in children.size - 1 downTo 0) {
                 findAllSemanticNodesRecursive(children[i])
             }
-            unaccountedSpace.op(rect, unaccountedSpace, Region.Op.REVERSE_DIFFERENCE)
+            unaccountedSpace.op(boundsInRoot, unaccountedSpace, Region.Op.REVERSE_DIFFERENCE)
         } else {
             if (currentNode.isFake) {
-                nodes[currentNode.id] = SemanticsNodeWithAdjustedBounds(
+                nodes[virtualViewId] = SemanticsNodeWithAdjustedBounds(
                     currentNode,
                     // provide some non-zero size as otherwise it will be ignored
                     Rect(0f, 0f, 10f, 10f).toAndroidRect()
                 )
+            } else if (virtualViewId == AccessibilityNodeProviderCompat.HOST_VIEW_ID) {
+                // Root view might have WRAP_CONTENT layout params in which case it will have zero
+                // bounds if there is no other content with semantics. But we need to always send the
+                // root view info as there are some other apps (e.g. Google Assistant) that depend
+                // on accessibility info
+                nodes[virtualViewId] = SemanticsNodeWithAdjustedBounds(currentNode, region.bounds)
             }
         }
     }
