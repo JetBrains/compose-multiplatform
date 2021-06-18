@@ -47,6 +47,9 @@ package androidx.compose.material {
   public final class BackdropScaffoldKt {
   }
 
+  public final class BadgeKt {
+  }
+
   public final class BottomNavigationDefaults {
     method public float getElevation-D9Ej5fM();
     property public final float Elevation;

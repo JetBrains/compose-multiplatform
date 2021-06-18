@@ -71,6 +71,10 @@ package androidx.compose.material {
     enum_constant public static final androidx.compose.material.BackdropValue Revealed;
   }
 
+  public final class BadgeKt {
+    method @androidx.compose.material.ExperimentalMaterialApi @androidx.compose.runtime.Composable public static void BadgeBox-X41NPXw(optional androidx.compose.ui.Modifier modifier, optional long backgroundColor, optional long contentColor, optional kotlin.jvm.functions.Function1<? super androidx.compose.foundation.layout.RowScope,kotlin.Unit>? badgeContent, kotlin.jvm.functions.Function1<? super androidx.compose.foundation.layout.BoxScope,kotlin.Unit> content);
+  }
+
   @androidx.compose.material.ExperimentalMaterialApi public final class BottomDrawerState extends androidx.compose.material.SwipeableState<androidx.compose.material.BottomDrawerValue> {
     ctor public BottomDrawerState(androidx.compose.material.BottomDrawerValue initialValue, optional kotlin.jvm.functions.Function1<? super androidx.compose.material.BottomDrawerValue,java.lang.Boolean> confirmStateChange);
     method public suspend Object? close(kotlin.coroutines.Continuation<? super kotlin.Unit> p);
