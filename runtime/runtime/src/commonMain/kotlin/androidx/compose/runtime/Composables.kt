@@ -178,6 +178,7 @@ val currentRecomposeScope: RecomposeScope
  */
 val currentCompositeKeyHash: Int
     @Composable
+    @ExplicitGroupsComposable
     @OptIn(InternalComposeApi::class)
     get() = currentComposer.compoundKeyHash
 

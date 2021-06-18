@@ -2923,6 +2923,36 @@ class CompositionTests {
         assertEquals(1, count)
     }
 
+    @Test
+    fun enumCompositeKeyShouldBeStable() = compositionTest {
+        var parentHash: Int = 0
+        var compositeHash: Int = 0
+        compose {
+            parentHash = currentCompositeKeyHash
+            key(MyEnum.First) {
+                compositeHash = currentCompositeKeyHash
+            }
+        }
+
+        val effectiveHash = compositeHash xor (parentHash rol 3)
+        assertEquals(0, effectiveHash)
+    }
+
+    @Test
+    fun enumCompositeKeysShouldBeStable() = compositionTest {
+        var parentHash: Int = 0
+        var compositeHash: Int = 0
+        compose {
+            parentHash = currentCompositeKeyHash
+            key(MyEnum.First, MyEnum.Second) {
+                compositeHash = currentCompositeKeyHash
+            }
+        }
+
+        val effectiveHash = compositeHash xor (parentHash rol 3)
+        assertEquals(1, effectiveHash)
+    }
+
     @Test // regression test for b/188015757
     fun testRestartOfDefaultFunctions() = compositionTest {
 
@@ -2943,6 +2973,11 @@ class CompositionTests {
         // Force Defaults to recompose
         stateA++
         advance()
+    }
+
+    enum class MyEnum {
+        First,
+        Second
     }
 
     /**
