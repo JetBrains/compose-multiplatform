@@ -61,4 +61,9 @@ operator fun <T: CSSUnit> CSSNumericValue<out T>.minus(b: CSSCalcValue<out T>): 
 operator fun <T: CSSUnit> CSSCalcValue<out T>.times(b: Number): CSSCalcValue<T> = CSSCalcValue(CSSTimes(this.op, b))
 operator fun <T: CSSUnit> Number.times(b: CSSCalcValue<out T>): CSSCalcValue<T> = CSSCalcValue(CSSTimes(b.op, this, false))
 
+operator fun <T: CSSUnit> CSSNumericValue<T>.div(b: Number): CSSCalcValue<T> = CSSCalcValue(CSSDiv(this, b))
 operator fun <T: CSSUnit> CSSCalcValue<out T>.div(b: Number): CSSCalcValue<T> = CSSCalcValue(CSSDiv(this.op, b))
+
+operator fun <T: CSSUnit> CSSNumericValue<T>.times(b: Number): CSSCalcValue<T> = CSSCalcValue(CSSTimes(this, b))
+operator fun <T: CSSUnit> Number.times(b: CSSNumericValue<T>): CSSCalcValue<T> = CSSCalcValue(CSSTimes(b, this, false))
+
