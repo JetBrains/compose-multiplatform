@@ -399,9 +399,10 @@ object TabRowDefaults {
             value = currentTabPosition
         }
     ) {
-        // TODO: should we animate the width of the indicator as it moves between tabs of different
-        // sizes inside a scrollable tab row?
-        val currentTabWidth = currentTabPosition.width
+        val currentTabWidth by animateDpAsState(
+            targetValue = currentTabPosition.width,
+            animationSpec = tween(durationMillis = 250, easing = FastOutSlowInEasing)
+        )
         val indicatorOffset by animateDpAsState(
             targetValue = currentTabPosition.left,
             animationSpec = tween(durationMillis = 250, easing = FastOutSlowInEasing)
