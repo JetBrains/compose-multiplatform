@@ -20,31 +20,38 @@
 
 package androidx.compose.integration.docs.layout
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.paddingFromBaseline
+import androidx.compose.foundation.layout.requiredSize
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.verticalScroll
-import androidx.compose.integration.docs.layout.LayoutSnippet12.firstBaselineToTop
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.wrapContentWidth
+import androidx.compose.integration.docs.layout.LayoutSnippet20.firstBaselineToTop
 import androidx.compose.material.Card
+import androidx.compose.material.Divider
+import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Scaffold
 import androidx.compose.material.Surface
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.AlignmentLine
 import androidx.compose.ui.layout.FirstBaseline
 import androidx.compose.ui.layout.Layout
 import androidx.compose.ui.layout.layout
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 
@@ -86,7 +93,20 @@ private object LayoutSnippet3 {
     }
 }
 
-private object LayoutSnippet3bis {
+private object LayoutSnippet4 {
+    @Composable
+    fun ArtistCard(artist: Artist) {
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.End
+        ) {
+            Image(/*...*/)
+            Column { /*...*/ }
+        }
+    }
+}
+
+private object LayoutSnippet5 {
     @Composable
     fun ArtistCard(
         artist: Artist,
@@ -106,67 +126,147 @@ private object LayoutSnippet3bis {
     }
 }
 
-private object LayoutSnippet4 {
-    @Composable
-    fun ArtistCard(/*...*/) {
-        val padding = 16.dp
-        Column(
-            Modifier
-                .clickable(onClick = onClick)
-                .padding(padding)
-                .fillMaxWidth()
-        ) {
-            // rest of the implementation
-        }
-    }
-}
-
-private object LayoutSnippet5 {
-    @Composable
-    fun ArtistCard(/*...*/) {
-        val padding = 16.dp
-        Column(
-            Modifier
-                .padding(padding)
-                .clickable(onClick = onClick)
-                .fillMaxWidth()
-        ) {
-            // rest of the implementation
-        }
-    }
-}
-
 private object LayoutSnippet6 {
     @Composable
-    fun Feed(
-        feedItems: List<Artist>,
-        onSelected: (Artist) -> Unit
-    ) {
-        Column(Modifier.fillMaxSize().verticalScroll(rememberScrollState())) {
-            feedItems.forEach {
-                ArtistCard(it, onSelected)
-            }
+    fun ArtistCard(/*...*/) {
+        val padding = 16.dp
+        Column(
+            Modifier
+                .clickable(onClick = onClick)
+                .padding(padding)
+                .fillMaxWidth()
+        ) {
+            // rest of the implementation
         }
     }
 }
 
 private object LayoutSnippet7 {
     @Composable
-    fun Feed(
-        feedItems: List<Artist>,
-        onSelected: (Artist) -> Unit
-    ) {
-        Surface(Modifier.fillMaxSize()) {
-            LazyColumn {
-                items(feedItems) { item ->
-                    ArtistCard(item, onSelected)
-                }
-            }
+    fun ArtistCard(/*...*/) {
+        val padding = 16.dp
+        Column(
+            Modifier
+                .padding(padding)
+                .clickable(onClick = onClick)
+                .fillMaxWidth()
+        ) {
+            // rest of the implementation
         }
     }
 }
 
 private object LayoutSnippet8 {
+    @Composable
+    fun ArtistCard(/*...*/) {
+        Row(
+            modifier = Modifier.size(width = 400.dp, height = 100.dp)
+        ) {
+            Image(/*...*/)
+            Column { /*...*/ }
+        }
+    }
+}
+
+private object LayoutSnippet9 {
+    @Composable
+    fun ArtistCard(/*...*/) {
+        Row(
+            modifier = Modifier.size(width = 400.dp, height = 100.dp)
+        ) {
+            Image(
+                /*...*/
+                modifier = Modifier.requiredSize(150.dp)
+            )
+            Column { /*...*/ }
+        }
+    }
+}
+
+private object LayoutSnippet10 {
+    @Composable
+    fun ArtistCard(/*...*/) {
+        Row(
+            modifier = Modifier.size(width = 400.dp, height = 100.dp)
+        ) {
+            Image(
+                /*...*/
+                modifier = Modifier.fillMaxHeight()
+            )
+            Column { /*...*/ }
+        }
+    }
+}
+
+private object LayoutSnippet11 {
+    @Composable
+    fun MatchParentSizeComposable() {
+        Box {
+            Spacer(Modifier.matchParentSize().background(Color.LightGray))
+            ArtistCard()
+        }
+    }
+}
+
+private object LayoutSnippet12 {
+    @Composable
+    fun ArtistCard(artist: Artist) {
+        Row(/*...*/) {
+            Column {
+                Text(
+                    text = artist.name,
+                    modifier = Modifier.paddingFromBaseline(top = 50.dp)
+                )
+                Text(artist.lastSeenOnline)
+            }
+        }
+    }
+}
+
+private object LayoutSnippet13 {
+    @Composable
+    fun ArtistCard(artist: Artist) {
+        Row(/*...*/) {
+            Column {
+                Text(artist.name)
+                Text(
+                    text = artist.lastSeenOnline,
+                    modifier = Modifier.offset(x = 4.dp)
+                )
+            }
+        }
+    }
+}
+
+private object LayoutSnippet14 {
+    @Composable
+    fun ArtistCard(/*...*/) {
+        Row(
+            modifier = Modifier.fillMaxWidth()
+        ) {
+            Image(
+                /*...*/
+                modifier = Modifier.weight(2f)
+            )
+            Column(
+                modifier = Modifier.weight(1f)
+            ) {
+                /*...*/
+            }
+        }
+    }
+}
+
+private object LayoutSnippet15 {
+    @Composable
+    fun WithConstraintsComposable() {
+        BoxWithConstraints {
+            Text("My minHeight is $minHeight while my maxWidth is $maxWidth")
+        }
+    }
+}
+
+private object LayoutSnippet16 {
     @Composable
     fun HomeScreen(/*...*/) {
         Scaffold(
@@ -181,7 +281,7 @@ private object LayoutSnippet8 {
 /* ktlint-disable indent *//*
 
 @Suppress("Deprecation")
-private object LayoutSnippet9 {
+private object LayoutSnippet17 {
     @Composable
     fun ConstraintLayoutContent() {
         ConstraintLayout {
@@ -219,7 +319,7 @@ private object LayoutSnippet9 {
  *//*
 
 @Suppress("Deprecation")
-private object LayoutSnippet10 {
+private object LayoutSnippet18 {
     @Composable
     fun DecoupledConstraintLayout() {
         BoxWithConstraints {
@@ -260,7 +360,7 @@ private object LayoutSnippet10 {
 }
 */
 
-private object LayoutSnippet11 {
+private object LayoutSnippet19 {
     /* Can't be compiled without returning layout() from Modifier.layout. See next snippet for
     possible changes.
 
@@ -271,7 +371,7 @@ private object LayoutSnippet11 {
      */
 }
 
-private object LayoutSnippet12 {
+private object LayoutSnippet20 {
     fun Modifier.firstBaselineToTop(
         firstBaselineToTop: Dp
     ) = layout { measurable, constraints ->
@@ -292,8 +392,8 @@ private object LayoutSnippet12 {
     }
 }
 
-private object LayoutSnippet13 {
-    @Preview
+private object LayoutSnippet21 {
+
     @Composable
     fun TextWithPaddingToBaselinePreview() {
         MyApplicationTheme {
@@ -301,7 +401,7 @@ private object LayoutSnippet13 {
         }
     }
 
-    @Preview
+//    @Preview
     @Composable
     fun TextWithNormalPaddingPreview() {
         MyApplicationTheme {
@@ -310,14 +410,14 @@ private object LayoutSnippet13 {
     }
 }
 
-private object LayoutSnippet14 {
+private object LayoutSnippet22 {
     /* Can't be compiled without returning layout() from Layout. See previous snippet for possible
     changes.
 
     @Composable
-    fun MyOwnColumn(
+    fun MyBasicColumn(
         modifier: Modifier = Modifier,
-        content: @Composable() () -> Unit
+        content: @Composable () -> Unit
     ) {
         Layout(
             modifier = modifier,
@@ -330,11 +430,11 @@ private object LayoutSnippet14 {
      */
 }
 
-private object LayoutSnippet15and16 {
+private object LayoutSnippet23and24 {
     @Composable
-    fun MyOwnColumn(
+    fun MyBasicColumn(
         modifier: Modifier = Modifier,
-        content: @Composable() () -> Unit
+        content: @Composable () -> Unit
     ) {
         Layout(
             modifier = modifier,
@@ -364,12 +464,12 @@ private object LayoutSnippet15and16 {
         }
     }
 
-    // Snippet 16
+    // Snippet 25
 
     @Composable
     fun CallingComposable(modifier: Modifier = Modifier) {
-        MyOwnColumn(modifier.padding(8.dp)) {
-            Text("MyOwnColumn")
+        MyBasicColumn(modifier.padding(8.dp)) {
+            Text("MyBasicColumn")
             Text("places items")
             Text("vertically.")
             Text("We've done it by hand!")
@@ -377,12 +477,101 @@ private object LayoutSnippet15and16 {
     }
 }
 
+private object LayoutSnippet26and27 {
+
+    @Composable
+    fun TwoTexts(modifier: Modifier = Modifier, text1: String, text2: String) {
+        Row(modifier = modifier) {
+            Text(
+                modifier = Modifier
+                    .weight(1f)
+                    .padding(start = 4.dp)
+                    .wrapContentWidth(Alignment.Start),
+                text = text1
+            )
+            Divider(
+                color = Color.Black,
+                modifier = Modifier.fillMaxHeight().width(1.dp)
+            )
+            Text(
+                modifier = Modifier
+                    .weight(1f)
+
+                    .padding(end = 4.dp)
+                    .wrapContentWidth(Alignment.End),
+
+                text = text2
+            )
+        }
+    }
+
+    // @Preview
+    @Composable
+    fun TwoTextsPreview() {
+        MaterialTheme {
+            Surface {
+                TwoTexts(text1 = "Hi", text2 = "there")
+            }
+        }
+    }
+}
+
+private object LayoutSnippet28and29 {
+
+    @Composable
+    fun TwoTexts(modifier: Modifier = Modifier, text1: String, text2: String) {
+        Row(modifier = modifier) {
+            Text(
+                modifier = Modifier
+                    .weight(1f)
+                    .padding(start = 4.dp)
+                    .wrapContentWidth(Alignment.Start),
+                text = text1
+            )
+            Divider(
+                color = Color.Black,
+                modifier = Modifier.fillMaxHeight().width(1.dp)
+            )
+            Text(
+                modifier = Modifier
+                    .weight(1f)
+                    .padding(end = 4.dp)
+                    .wrapContentWidth(Alignment.End),
+
+                text = text2
+            )
+        }
+    }
+
+    // @Preview
+    @Composable
+    fun TwoTextsPreview() {
+        MaterialTheme {
+            Surface {
+                TwoTexts(text1 = "Hi", text2 = "there")
+            }
+        }
+    }
+}
 /*
 Fakes needed for snippets to build:
  */
 
 private data class Artist(val name: String, val lastSeenOnline: String)
 private class Image
+
+@Composable
+private fun Image(modifier: Modifier = Modifier) {
+}
+
+@Composable
+private fun ArtistCard(modifier: Modifier = Modifier) {
+}
+
 private val onClick = {}
+
 private data class ArtistCard(val artist: Artist, val onSomething: (Artist) -> Unit)
-@Composable private fun MyApplicationTheme(content: @Composable() () -> Unit) {}
+
+@Composable
+private fun MyApplicationTheme(content: @Composable () -> Unit) {
+}
