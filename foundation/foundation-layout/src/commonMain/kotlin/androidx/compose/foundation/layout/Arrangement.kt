@@ -169,7 +169,7 @@ object Arrangement {
             outPositions: IntArray
         ) = placeRightOrBottom(totalSize, sizes, outPositions, reverseInput = false)
 
-        override fun toString() = "Arrangement#Start"
+        override fun toString() = "Arrangement#Bottom"
     }
 
     /**
