@@ -427,6 +427,12 @@ class CSSUnitApiTests {
 
         val typedResultLengthFallback: CSSNumericValue<CSSUnitLength> = 4.pt + variables.pxVar.value(4.px)
         assertEquals("calc(4pt + var(--pxVar, 4px))", typedResultLengthFallback.toString())
+
+        val typedResultLengthMultiplyLeft: CSSNumericValue<CSSUnit.px> = variables.pxVar.value(4.px) * 4
+        assertEquals("calc(var(--pxVar, 4px) * 4)", typedResultLengthMultiplyLeft.toString())
+
+        val typedResultLengthMultiplyRight: CSSNumericValue<CSSUnit.px> = 4 * variables.pxVar.value(4.px)
+        assertEquals("calc(4 * var(--pxVar, 4px))", typedResultLengthMultiplyRight.toString())
     }
 
     @Test
