@@ -278,6 +278,7 @@ internal class AndroidComposeView(context: Context) :
     private val tmpCalculationMatrix = Matrix()
     @VisibleForTesting
     internal var lastMatrixRecalculationAnimationTime = -1L
+    private var forceUseMatrixCache = false
 
     /**
      * On some devices, the `getLocationOnScreen()` returns `(0, 0)` even when the Window
@@ -848,25 +849,32 @@ internal class AndroidComposeView(context: Context) :
         ) {
             return false // Bad MotionEvent. Don't handle it.
         }
-        measureAndLayout()
-        val processResult = trace("AndroidOwner:onTouch") {
-            val pointerInputEvent = motionEventAdapter.convertToPointerInputEvent(motionEvent, this)
-            if (pointerInputEvent != null) {
-                pointerInputEventProcessor.process(pointerInputEvent, this)
-            } else {
-                pointerInputEventProcessor.processCancel()
-                ProcessResult(
-                    dispatchedToAPointerInputModifier = false,
-                    anyMovementConsumed = false
-                )
+        try {
+            recalculateWindowPosition(motionEvent)
+            forceUseMatrixCache = true
+            measureAndLayout()
+            val processResult = trace("AndroidOwner:onTouch") {
+                val pointerInputEvent =
+                    motionEventAdapter.convertToPointerInputEvent(motionEvent, this)
+                if (pointerInputEvent != null) {
+                    pointerInputEventProcessor.process(pointerInputEvent, this)
+                } else {
+                    pointerInputEventProcessor.processCancel()
+                    ProcessResult(
+                        dispatchedToAPointerInputModifier = false,
+                        anyMovementConsumed = false
+                    )
+                }
             }
-        }
 
-        if (processResult.anyMovementConsumed) {
-            parent.requestDisallowInterceptTouchEvent(true)
-        }
+            if (processResult.anyMovementConsumed) {
+                parent.requestDisallowInterceptTouchEvent(true)
+            }
 
-        return processResult.dispatchedToAPointerInputModifier
+            return processResult.dispatchedToAPointerInputModifier
+        } finally {
+            forceUseMatrixCache = false
+        }
     }
 
     override fun localToScreen(localPosition: Offset): Offset {
@@ -886,24 +894,43 @@ internal class AndroidComposeView(context: Context) :
     }
 
     private fun recalculateWindowPosition() {
-        val animationTime = AnimationUtils.currentAnimationTimeMillis()
-        if (animationTime != lastMatrixRecalculationAnimationTime) {
-            lastMatrixRecalculationAnimationTime = animationTime
-            recalculateWindowViewTransforms()
-            var viewParent = parent
-            var view: View = this
-            while (viewParent is ViewGroup) {
-                view = viewParent
-                viewParent = view.parent
+        if (!forceUseMatrixCache) {
+            val animationTime = AnimationUtils.currentAnimationTimeMillis()
+            if (animationTime != lastMatrixRecalculationAnimationTime) {
+                lastMatrixRecalculationAnimationTime = animationTime
+                recalculateWindowViewTransforms()
+                var viewParent = parent
+                var view: View = this
+                while (viewParent is ViewGroup) {
+                    view = viewParent
+                    viewParent = view.parent
+                }
+                view.getLocationOnScreen(tmpPositionArray)
+                val screenX = tmpPositionArray[0].toFloat()
+                val screenY = tmpPositionArray[1].toFloat()
+                view.getLocationInWindow(tmpPositionArray)
+                val windowX = tmpPositionArray[0].toFloat()
+                val windowY = tmpPositionArray[1].toFloat()
+                windowPosition = Offset(screenX - windowX, screenY - windowY)
             }
-            view.getLocationOnScreen(tmpPositionArray)
-            val screenX = tmpPositionArray[0].toFloat()
-            val screenY = tmpPositionArray[1].toFloat()
-            view.getLocationInWindow(tmpPositionArray)
-            val windowX = tmpPositionArray[0].toFloat()
-            val windowY = tmpPositionArray[1].toFloat()
-            windowPosition = Offset(screenX - windowX, screenY - windowY)
         }
+    }
+
+    /**
+     * Recalculates the window position based on the [motionEvent]'s coordinates and
+     * screen coordinates. Some devices give false positions for [getLocationOnScreen] in
+     * some unusual circumstances, so a different mechanism must be used to determine the
+     * actual position.
+     */
+    private fun recalculateWindowPosition(motionEvent: MotionEvent) {
+        lastMatrixRecalculationAnimationTime = AnimationUtils.currentAnimationTimeMillis()
+        recalculateWindowViewTransforms()
+        val positionInWindow = viewToWindowMatrix.map(Offset(motionEvent.x, motionEvent.y))
+
+        windowPosition = Offset(
+            motionEvent.rawX - positionInWindow.x,
+            motionEvent.rawY - positionInWindow.y
+        )
     }
 
     private fun recalculateWindowViewTransforms() {
