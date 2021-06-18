@@ -1,0 +1,8 @@
+<component name="ArtifactManager">
+  <artifact type="jar" name="compose-bird-js-1.0.0-alpha01">
+    <output-path>$PROJECT_DIR$/build/libs</output-path>
+    <root id="archive" name="compose-bird-js-1.0.0-alpha01.jar">
+      <element id="module-output" name="compose-bird.jsMain" />
+    </root>
+  </artifact>
+</component>

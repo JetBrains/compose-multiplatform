@@ -1,0 +1,8 @@
+<component name="ArtifactManager">
+  <artifact type="jar" name="compose-web-template-js-1.0.0-alpha01">
+    <output-path>$PROJECT_DIR$/build/libs</output-path>
+    <root id="archive" name="compose-web-template-js-1.0.0-alpha01.jar">
+      <element id="module-output" name="compose-web-template.jsMain" />
+    </root>
+  </artifact>
+</component>
