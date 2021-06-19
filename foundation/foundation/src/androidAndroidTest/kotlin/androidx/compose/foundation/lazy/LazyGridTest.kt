@@ -25,6 +25,7 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.requiredHeight
+import androidx.compose.foundation.layout.requiredSize
 import androidx.compose.foundation.layout.requiredWidth
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -653,5 +654,37 @@ class LazyGridTest {
             }
             Truth.assertThat(state.firstVisibleItemIndex).isEqualTo(9)
         }
+    }
+
+    @Test
+    fun maxIntElements() {
+        val itemSize = with(rule.density) { 15.toDp() }
+
+        rule.setContent {
+            LazyVerticalGrid(
+                cells = GridCells.Fixed(2),
+                modifier = Modifier.requiredSize(itemSize * 2).testTag(LazyGridTag),
+                state = LazyListState(firstVisibleItemIndex = Int.MAX_VALUE - 3)
+            ) {
+                items(Int.MAX_VALUE) {
+                    Box(Modifier.size(itemSize).testTag("$it"))
+                }
+            }
+        }
+
+        rule.onNodeWithTag("${Int.MAX_VALUE - 3}")
+            .assertTopPositionInRootIsEqualTo(0.dp)
+            .assertLeftPositionInRootIsEqualTo(0.dp)
+
+        rule.onNodeWithTag("${Int.MAX_VALUE - 2}")
+            .assertTopPositionInRootIsEqualTo(0.dp)
+            .assertLeftPositionInRootIsEqualTo(itemSize)
+
+        rule.onNodeWithTag("${Int.MAX_VALUE - 1}")
+            .assertTopPositionInRootIsEqualTo(itemSize)
+            .assertLeftPositionInRootIsEqualTo(0.dp)
+
+        rule.onNodeWithTag("${Int.MAX_VALUE}").assertDoesNotExist()
+        rule.onNodeWithTag("0").assertDoesNotExist()
     }
 }
