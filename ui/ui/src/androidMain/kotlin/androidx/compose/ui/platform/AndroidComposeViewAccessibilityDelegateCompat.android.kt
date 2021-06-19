@@ -1887,10 +1887,22 @@ internal class AndroidComposeViewAccessibilityDelegateCompat(val view: AndroidCo
             }
 
             if (deltaX != 0f || deltaY != 0f) {
+                val virtualNodeId = semanticsNodeIdToAccessibilityVirtualNodeId(
+                    scrollObservationScope.semanticsNodeId
+                )
+
+                // View System sends a content changed event before each scroll event. TalkBack
+                // uses the content changed event to synchronize the focus rect along with touch
+                // scroll, and uses the scroll event to hear feedback that the app reacted to scroll
+                // actions that it initiated.
+                sendEventForVirtualView(
+                    virtualNodeId,
+                    AccessibilityEvent.TYPE_WINDOW_CONTENT_CHANGED,
+                    AccessibilityEvent.CONTENT_CHANGE_TYPE_SUBTREE
+                )
+
                 val event = createEvent(
-                    semanticsNodeIdToAccessibilityVirtualNodeId(
-                        scrollObservationScope.semanticsNodeId
-                    ),
+                    virtualNodeId,
                     AccessibilityEvent.TYPE_VIEW_SCROLLED
                 )
                 if (newXState != null) {
