@@ -19,6 +19,8 @@ kotlin {
         binaries.executable()
     }
 
+//    iosX64("darwin")
+
     sourceSets {
         val commonMain by getting {
             dependencies {
@@ -47,5 +49,11 @@ kotlin {
                 implementation(compose.desktop.currentOs)
             }
         }
+
+        /*val darwinMain by getting {
+            dependencies {
+                implementation(project(":darwin-core"))
+            }
+        }*/
     }
 }

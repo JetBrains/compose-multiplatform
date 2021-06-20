@@ -100,7 +100,7 @@ internal object GlobalSnapshotManager {
         }
     }
 }
-
+/*
 @Composable
 fun Text(value: String) {
     ComposeNode<UIViewWrapper<UILabel>, UIKitApplier>(
@@ -125,8 +125,9 @@ fun Button(
             set(onClick) { oc -> updateOnClick(onClick) }
         },
     )
-}
+}*/
 
+/*
 @Composable
 fun KotlinButton(
     value: String,
@@ -142,6 +143,7 @@ fun KotlinButton(
         },
     )
 }
+*/
 
 private fun makeRect() = CGRectMake(0.toDouble(), 0.toDouble(), 300.toDouble(), 100.toDouble())
 
