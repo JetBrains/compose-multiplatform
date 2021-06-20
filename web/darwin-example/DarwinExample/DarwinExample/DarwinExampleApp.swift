@@ -35,6 +35,6 @@ struct ComposableView: UIViewRepresentable {
     }
 
     func updateUIView(_ uiView: UIViewType, context: Context) {
-        What().attachMain(view: uiView)
+        IosApp().attachMain(view: uiView)
     }
 }

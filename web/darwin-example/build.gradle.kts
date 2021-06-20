@@ -1,4 +1,6 @@
 import org.jetbrains.kotlin.gradle.plugin.KotlinSourceSet
+import org.jetbrains.compose.compose
+import org.jetbrains.compose.desktop.application.dsl.TargetFormat
 
 plugins {
     kotlin("multiplatform")
@@ -13,6 +15,7 @@ kotlin {
     } else {
         iosX64("darwin")
     }
+    jvm()
 
     cocoapods {
         summary = "Example of Kotlin Gradle Plugin Playground"
@@ -43,6 +46,7 @@ kotlin {
             dependencies {
                 implementation(compose.runtime)
                 implementation(kotlin("stdlib-common"))
+                implementation(project(":darwin-core"))
 
                 implementation( "org.jetbrains.kotlinx:kotlinx-coroutines-core") {
                     version { strictly("1.4.3-native-mt") }
@@ -57,9 +61,9 @@ kotlin {
             }
         }
 
-        val darwinMain by getting {
+        val jvmMain by getting {
             dependencies {
-                implementation(project(":darwin-core"))
+                implementation(compose.desktop.currentOs)
             }
         }
 
@@ -92,6 +96,18 @@ kotlin {
         }*/
     }
 
+}
+
+compose.desktop {
+    application {
+        mainClass = "co.touchlab.ckit.desktop.AppKt"
+
+        nativeDistributions {
+            targetFormats(TargetFormat.Dmg, TargetFormat.Msi, TargetFormat.Deb)
+            packageName = "ImageViewer"
+            packageVersion = "1.0.0"
+        }
+    }
 }
 
 typealias SourceSets = NamedDomainObjectContainer<KotlinSourceSet>
