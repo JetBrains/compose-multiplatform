@@ -25,6 +25,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.requiredWidth
@@ -50,6 +51,7 @@ import androidx.compose.material.setMaterialContentForSizeAssertions
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.testutils.assertPixels
 import androidx.compose.testutils.assertShape
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.onFocusChanged
@@ -989,6 +991,31 @@ class OutlinedTextFieldTest {
             assertThat(dividerSize).isNotNull()
             assertThat(textFieldSize).isNotNull()
             assertThat(dividerSize!!.width).isEqualTo(textFieldSize!!.width)
+        }
+    }
+
+    @Test
+    @SdkSuppress(minSdkVersion = Build.VERSION_CODES.O)
+    fun testOutlinedTextField_label_notUsingErrorColor_notFocused_withoutInput() {
+        rule.setMaterialContent {
+            Box(Modifier.background(Color.White).padding(10.dp)) {
+                OutlinedTextField(
+                    value = "",
+                    onValueChange = {},
+                    modifier = Modifier.testTag(TextfieldTag),
+                    label = { Text("Label") },
+                    isError = true,
+                    colors = TextFieldDefaults.outlinedTextFieldColors(
+                        unfocusedLabelColor = Color.White,
+                        errorLabelColor = Color.Red,
+                        errorBorderColor = Color.White
+                    )
+                )
+            }
+        }
+
+        rule.onNodeWithTag(TextfieldTag).captureToImage().assertPixels {
+            Color.White
         }
     }
 }

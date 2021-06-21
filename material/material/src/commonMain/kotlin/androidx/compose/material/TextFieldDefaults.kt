@@ -67,7 +67,9 @@ interface TextFieldColors {
      * Represents the color used for the label of this text field.
      *
      * @param enabled whether the text field is enabled
-     * @param error whether the text field's current value is in error
+     * @param error whether the text field should show error color according to the Material
+     * specifications. If the label is being used as a placeholder, this will be false even if
+     * the input is invalid, as the placeholder should not use the error color
      * @param interactionSource the [InteractionSource] of this text field. Helps to determine if
      * the text field is in focus or not
      */
