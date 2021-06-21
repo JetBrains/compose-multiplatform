@@ -21,7 +21,7 @@ class AttrsBuilder<TElement : Element> : EventsListenerBuilder() {
     fun classes(vararg classes: String) = prop(setClassList, classes)
 
     fun id(value: String) = attr(ID, value)
-    fun hidden(value: Boolean) = attr(HIDDEN, value.toString())
+    fun hidden() = attr(HIDDEN, true.toString())
     fun title(value: String) = attr(TITLE, value)
     fun dir(value: DirType) = attr(DIR, value.dirStr)
     fun draggable(value: Draggable) = attr(DRAGGABLE, value.str)
