@@ -16,6 +16,7 @@
 
 package androidx.compose.foundation
 
+import androidx.compose.animation.core.keyframes
 import androidx.compose.foundation.gestures.FlingBehavior
 import androidx.compose.foundation.gestures.Orientation
 import androidx.compose.foundation.gestures.ScrollScope
@@ -1444,6 +1445,85 @@ class ScrollableTest {
         rule.runOnIdle {
             assertThat(total).isEqualTo(prevTotal + 123)
             assertThat(returned).isEqualTo(123f)
+        }
+    }
+
+    @Test
+    fun scrollable_scrollByWorksWithRepeatableAnimations() {
+        rule.mainClock.autoAdvance = false
+
+        var total = 0f
+        val controller = ScrollableState(
+            consumeScrollDelta = {
+                total += it
+                it
+            }
+        )
+        rule.setContentAndGetScope {
+            Box(
+                modifier = Modifier
+                    .size(100.dp).scrollable(
+                        state = controller,
+                        orientation = Orientation.Horizontal
+                    )
+            )
+        }
+
+        rule.runOnIdle {
+            scope.launch {
+                controller.animateScrollBy(
+                    100f,
+                    keyframes {
+                        durationMillis = 2500
+                        // emulate a repeatable animation:
+                        0f at 0
+                        100f at 500
+                        100f at 1000
+                        0f at 1500
+                        0f at 2000
+                        100f at 2500
+                    }
+                )
+            }
+        }
+
+        rule.mainClock.advanceTimeBy(250)
+        rule.runOnIdle {
+            // in the middle of the first animation
+            assertThat(total).isGreaterThan(0f)
+            assertThat(total).isLessThan(100f)
+        }
+
+        rule.mainClock.advanceTimeBy(500) // 750 ms
+        rule.runOnIdle {
+            // first animation finished
+            assertThat(total).isEqualTo(100)
+        }
+
+        rule.mainClock.advanceTimeBy(250) // 1250 ms
+        rule.runOnIdle {
+            // in the middle of the second animation
+            assertThat(total).isGreaterThan(0f)
+            assertThat(total).isLessThan(100f)
+        }
+
+        rule.mainClock.advanceTimeBy(500) // 1750 ms
+        rule.runOnIdle {
+            // second animation finished
+            assertThat(total).isEqualTo(0)
+        }
+
+        rule.mainClock.advanceTimeBy(500) // 2250 ms
+        rule.runOnIdle {
+            // in the middle of the third animation
+            assertThat(total).isGreaterThan(0f)
+            assertThat(total).isLessThan(100f)
+        }
+
+        rule.mainClock.advanceTimeBy(500) // 2750 ms
+        rule.runOnIdle {
+            // third animation finished
+            assertThat(total).isEqualTo(100)
         }
     }
 
