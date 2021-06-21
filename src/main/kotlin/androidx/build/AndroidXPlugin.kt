@@ -42,7 +42,6 @@ import com.android.build.gradle.AppPlugin
 import com.android.build.gradle.LibraryExtension
 import com.android.build.gradle.LibraryPlugin
 import com.android.build.gradle.TestedExtension
-import com.android.build.gradle.api.ApkVariant
 import org.gradle.api.GradleException
 import org.gradle.api.JavaVersion.VERSION_1_8
 import org.gradle.api.Plugin
@@ -486,7 +485,8 @@ class AndroidXPlugin : Plugin<Project> {
             File(project.buildDir, "../nativeBuildStaging")
     }
 
-    private fun ApkVariant.configureApkCopy(
+    @Suppress("DEPRECATION") // ApkVariant
+    private fun com.android.build.gradle.api.ApkVariant.configureApkCopy(
         project: Project,
         testApk: Boolean
     ) {

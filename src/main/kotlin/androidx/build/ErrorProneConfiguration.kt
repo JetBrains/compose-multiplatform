@@ -18,7 +18,6 @@ package androidx.build
 
 import androidx.build.checkapi.jvmCompileInputsFromKmpProject
 import androidx.build.java.JavaCompileInputs
-import com.android.build.gradle.api.BaseVariant
 import com.android.builder.core.BuilderConstants
 import org.gradle.api.DomainObjectSet
 import org.gradle.api.Project
@@ -61,15 +60,17 @@ fun Project.configureErrorProneForJava() {
     }
 }
 
-fun Project.configureErrorProneForAndroid(variants: DomainObjectSet<out BaseVariant>) {
+@Suppress("DEPRECATION") // BaseVariant
+fun Project.configureErrorProneForAndroid(
+    variants: DomainObjectSet<out com.android.build.gradle.api.BaseVariant>
+) {
     val errorProneConfiguration = createErrorProneConfiguration()
     variants.all { variant ->
         // Using getName() instead of name due to b/150427408
         if (variant.buildType.getName() == BuilderConstants.RELEASE) {
             val task = variant.javaCompileProvider
-            (variant as BaseVariant).annotationProcessorConfiguration.extendsFrom(
-                errorProneConfiguration
-            )
+            (variant as com.android.build.gradle.api.BaseVariant)
+                .annotationProcessorConfiguration.extendsFrom(errorProneConfiguration)
 
             log.info("Configuring error-prone for ${variant.name}'s java compile")
             makeErrorProneTask(task)
