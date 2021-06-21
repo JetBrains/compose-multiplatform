@@ -277,7 +277,7 @@ class RecomposerTests {
                 val threadLog = Channel<Thread>(Channel.BUFFERED)
                 lateinit var recomposeScope: RecomposeScope
                 composition.setContent {
-                    threadLog.offer(Thread.currentThread())
+                    threadLog.trySend(Thread.currentThread())
                     val scope = currentRecomposeScope
                     SideEffect {
                         recomposeScope = scope
@@ -356,7 +356,7 @@ class RecomposerTests {
             val recompositionThread = Channel<Thread>(1)
             composition.setContent {
                 if (recomposition) {
-                    recompositionThread.offer(Thread.currentThread())
+                    recompositionThread.trySend(Thread.currentThread())
                 }
             }
 

@@ -56,7 +56,7 @@ fun CustomFocusOrderDemo() {
             )
         }
         Column(Modifier.fillMaxSize(), SpaceEvenly) {
-            val (item1, item2, item3, item4) = FocusRequester.createRefs()
+            val (item1, item2, item3, item4) = remember { FocusRequester.createRefs() }
             Row(Modifier.fillMaxWidth(), SpaceEvenly) {
                 FocusableText(
                     text = "1",
@@ -108,7 +108,7 @@ fun CustomFocusOrderDemo() {
 @Composable
 private fun FocusableText(text: String, modifier: Modifier = Modifier) {
     var color by remember { mutableStateOf(Black) }
-    val focusRequester = FocusRequester()
+    val focusRequester = remember { FocusRequester() }
     Text(
         modifier = modifier
             .border(width = 1.dp, color = Black)

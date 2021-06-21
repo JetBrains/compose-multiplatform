@@ -19,6 +19,8 @@ package androidx.compose.ui.graphics
 import android.annotation.SuppressLint
 import android.graphics.Canvas
 import android.os.Build
+import androidx.annotation.DoNotInline
+import androidx.annotation.RequiresApi
 import java.lang.reflect.InvocationTargetException
 import java.lang.reflect.Method
 
@@ -35,11 +37,7 @@ internal object CanvasUtils {
     @SuppressLint("SoonBlockedPrivateApi")
     fun enableZ(canvas: Canvas, enable: Boolean) {
         if (Build.VERSION.SDK_INT >= 29) {
-            if (enable) {
-                canvas.enableZ()
-            } else {
-                canvas.disableZ()
-            }
+            CanvasZHelper.enableZ(canvas, enable)
         } else {
             if (!orderMethodsFetched) {
                 try {
@@ -86,6 +84,18 @@ internal object CanvasUtils {
             } catch (ignore: IllegalAccessException) { // Do nothing
             } catch (ignore: InvocationTargetException) { // Do nothing
             }
+        }
+    }
+}
+
+@RequiresApi(29)
+private object CanvasZHelper {
+    @DoNotInline
+    fun enableZ(canvas: Canvas, enable: Boolean) {
+        if (enable) {
+            canvas.enableZ()
+        } else {
+            canvas.disableZ()
         }
     }
 }

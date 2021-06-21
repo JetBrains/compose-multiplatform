@@ -247,11 +247,15 @@ class LazyListLayoutInfoTest(
     @Test
     fun viewportOffsetsAreCorrectWithContentPadding() {
         val sizePx = 45
-        val topPaddingPx = 10
-        val bottomPaddingPx = 15
+        val startPaddingPx = 10
+        val endPaddingPx = 15
         val sizeDp = with(rule.density) { sizePx.toDp() }
-        val topPaddingDp = with(rule.density) { topPaddingPx.toDp() }
-        val bottomPaddingDp = with(rule.density) { bottomPaddingPx.toDp() }
+        val topPaddingDp = with(rule.density) {
+            if (!reverseLayout) startPaddingPx.toDp() else endPaddingPx.toDp()
+        }
+        val bottomPaddingDp = with(rule.density) {
+            if (!reverseLayout) endPaddingPx.toDp() else startPaddingPx.toDp()
+        }
         lateinit var state: LazyListState
         rule.setContent {
             LazyColumn(
@@ -267,8 +271,8 @@ class LazyListLayoutInfoTest(
         }
 
         rule.runOnIdle {
-            assertThat(state.layoutInfo.viewportStartOffset).isEqualTo(-topPaddingPx)
-            assertThat(state.layoutInfo.viewportEndOffset).isEqualTo(sizePx - topPaddingPx)
+            assertThat(state.layoutInfo.viewportStartOffset).isEqualTo(-startPaddingPx)
+            assertThat(state.layoutInfo.viewportEndOffset).isEqualTo(sizePx - startPaddingPx)
         }
     }
 

@@ -289,7 +289,7 @@ fun ScaffoldWithCoroutinesSnackbar() {
                 text = { Text("Show snackbar") },
                 onClick = {
                     // offset snackbar data to the business logic
-                    channel.offer(++clickCount)
+                    channel.trySend(++clickCount)
                 }
             )
         },

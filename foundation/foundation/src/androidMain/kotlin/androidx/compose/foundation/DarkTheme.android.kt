@@ -44,7 +44,7 @@ import androidx.compose.ui.platform.LocalConfiguration
  */
 @Composable
 @ReadOnlyComposable
-fun isSystemInDarkTheme(): Boolean {
+internal actual fun _isSystemInDarkTheme(): Boolean {
     val uiMode = LocalConfiguration.current.uiMode
     return (uiMode and Configuration.UI_MODE_NIGHT_MASK) == Configuration.UI_MODE_NIGHT_YES
 }

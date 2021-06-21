@@ -35,7 +35,7 @@ object Arrangement {
     /**
      * Used to specify the horizontal arrangement of the layout's children in layouts like [Row].
      */
-    @Immutable
+    @Stable
     interface Horizontal {
         /**
          * Spacing that should be added between any two adjacent layout children.
@@ -63,7 +63,7 @@ object Arrangement {
     /**
      * Used to specify the vertical arrangement of the layout's children in layouts like [Column].
      */
-    @Immutable
+    @Stable
     interface Vertical {
         /**
          * Spacing that should be added between any two adjacent layout children.
@@ -90,7 +90,7 @@ object Arrangement {
      * like [Row], or the vertical arrangement of the layout's children in vertical layouts like
      * [Column].
      */
-    @Immutable
+    @Stable
     interface HorizontalOrVertical : Horizontal, Vertical {
         /**
          * Spacing that should be added between any two adjacent layout children.
@@ -169,7 +169,7 @@ object Arrangement {
             outPositions: IntArray
         ) = placeRightOrBottom(totalSize, sizes, outPositions, reverseInput = false)
 
-        override fun toString() = "Arrangement#Start"
+        override fun toString() = "Arrangement#Bottom"
     }
 
     /**

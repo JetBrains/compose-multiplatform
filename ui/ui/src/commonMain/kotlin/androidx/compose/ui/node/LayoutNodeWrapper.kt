@@ -39,6 +39,7 @@ import androidx.compose.ui.layout.Placeable
 import androidx.compose.ui.layout.VerticalAlignmentLine
 import androidx.compose.ui.layout.findRoot
 import androidx.compose.ui.layout.positionInRoot
+import androidx.compose.ui.semantics.SemanticsWrapper
 import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.IntOffset
@@ -121,6 +122,9 @@ internal abstract class LayoutNodeWrapper(
             }
         }
 
+    private val hasMeasureResult: Boolean
+        get() = _measureResult != null
+
     private var oldAlignmentLines: MutableMap<AlignmentLine, Int>? = null
 
     override val providedAlignmentLines: Set<AlignmentLine>
@@ -175,16 +179,6 @@ internal abstract class LayoutNodeWrapper(
 
     private val snapshotObserver get() = layoutNode.requireOwner().snapshotObserver
 
-    /**
-     * Whether a pointer that is relative to the [LayoutNodeWrapper] is in the bounds of this
-     * LayoutNodeWrapper.
-     */
-    fun isPointerInBounds(pointerPosition: Offset): Boolean {
-        val x = pointerPosition.x
-        val y = pointerPosition.y
-        return x >= 0f && y >= 0f && x < measuredWidth && y < measuredHeight
-    }
-
     protected inline fun performingMeasure(
         constraints: Constraints,
         block: () -> Placeable
@@ -198,6 +192,7 @@ internal abstract class LayoutNodeWrapper(
     abstract fun calculateAlignmentLine(alignmentLine: AlignmentLine): Int
 
     final override fun get(alignmentLine: AlignmentLine): Int {
+        if (!hasMeasureResult) return AlignmentLine.Unspecified
         val measuredPosition = calculateAlignmentLine(alignmentLine)
         if (measuredPosition == AlignmentLine.Unspecified) return AlignmentLine.Unspecified
         return measuredPosition + if (alignmentLine is VerticalAlignmentLine) {
@@ -367,6 +362,11 @@ internal abstract class LayoutNodeWrapper(
     abstract fun hitTest(
         pointerPosition: Offset,
         hitPointerInputFilters: MutableList<PointerInputFilter>
+    )
+
+    abstract fun hitTestSemantics(
+        pointerPosition: Offset,
+        hitSemanticsWrappers: MutableList<SemanticsWrapper>
     )
 
     override fun windowToLocal(relativeToWindow: Offset): Offset {
@@ -597,13 +597,24 @@ internal abstract class LayoutNodeWrapper(
     }
 
     protected fun withinLayerBounds(pointerPosition: Offset): Boolean {
+        val layer = layer
         if (layer != null && isClipping) {
-            return isPointerInBounds(pointerPosition)
+            return layer.isInLayer(pointerPosition)
         }
 
         // If we are here, either we aren't clipping to bounds or we are and the pointer was in
         // bounds.
         return true
+    }
+
+    /**
+     * Whether a pointer that is relative to the [LayoutNodeWrapper] is in the bounds of this
+     * LayoutNodeWrapper.
+     */
+    protected fun isPointerInBounds(pointerPosition: Offset): Boolean {
+        val x = pointerPosition.x
+        val y = pointerPosition.y
+        return x >= 0f && y >= 0f && x < measuredWidth && y < measuredHeight
     }
 
     /**

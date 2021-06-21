@@ -1853,6 +1853,8 @@ private class MockOwner(
             ) {
             }
 
+            override fun isInLayer(position: Offset) = true
+
             override fun move(position: IntOffset) {
             }
 

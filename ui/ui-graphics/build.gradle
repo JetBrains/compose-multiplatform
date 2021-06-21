@@ -14,22 +14,20 @@
  * limitations under the License.
  */
 
-import androidx.build.AndroidXUiPlugin
+import androidx.build.AndroidXComposePlugin
 import androidx.build.LibraryGroups
 import androidx.build.LibraryType
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
-import static androidx.build.dependencies.DependenciesKt.*
-
 plugins {
     id("AndroidXPlugin")
     id("com.android.library")
-    id("AndroidXUiPlugin")
+    id("AndroidXComposePlugin")
 }
 
-AndroidXUiPlugin.applyAndConfigureKotlinPlugin(project)
+AndroidXComposePlugin.applyAndConfigureKotlinPlugin(project)
 
-if(!AndroidXUiPlugin.isMultiplatformEnabled(project)) {
+if(!AndroidXComposePlugin.isMultiplatformEnabled(project)) {
     dependencies {
         /*
          * When updating dependencies, make sure to make the an an analogous update in the
@@ -41,27 +39,27 @@ if(!AndroidXUiPlugin.isMultiplatformEnabled(project)) {
 
         implementation(project(":compose:runtime:runtime"))
         implementation(project(":compose:ui:ui-util"))
-        implementation(KOTLIN_STDLIB_COMMON)
+        implementation(libs.kotlinStdlibCommon)
 
-        testImplementation(ANDROIDX_TEST_RULES)
-        testImplementation(ANDROIDX_TEST_RUNNER)
-        testImplementation(JUNIT)
-        testImplementation(TRUTH)
+        testImplementation(libs.testRules)
+        testImplementation(libs.testRunner)
+        testImplementation(libs.junit)
+        testImplementation(libs.truth)
 
         androidTestImplementation(project(":compose:ui:ui-graphics:ui-graphics-samples"))
         androidTestImplementation(project(":compose:ui:ui-test-junit4"))
         androidTestImplementation(project(":compose:test-utils"))
-        androidTestImplementation(ANDROIDX_TEST_RULES)
-        androidTestImplementation(ANDROIDX_TEST_RUNNER)
-        androidTestImplementation(ESPRESSO_CORE)
-        androidTestImplementation(JUNIT)
-        androidTestImplementation(TRUTH)
+        androidTestImplementation(libs.testRules)
+        androidTestImplementation(libs.testRunner)
+        androidTestImplementation(libs.espressoCore)
+        androidTestImplementation(libs.junit)
+        androidTestImplementation(libs.truth)
 
         lintPublish(project(":compose:ui:ui-graphics-lint"))
     }
 }
 
-if(AndroidXUiPlugin.isMultiplatformEnabled(project)) {
+if(AndroidXComposePlugin.isMultiplatformEnabled(project)) {
     kotlin {
         android()
         jvm("desktop")
@@ -73,7 +71,7 @@ if(AndroidXUiPlugin.isMultiplatformEnabled(project)) {
 
         sourceSets {
             commonMain.dependencies {
-                implementation(KOTLIN_STDLIB_COMMON)
+                implementation(libs.kotlinStdlibCommon)
 
                 api(project(":compose:ui:ui-unit"))
                 implementation(project(":compose:runtime:runtime"))
@@ -85,35 +83,35 @@ if(AndroidXUiPlugin.isMultiplatformEnabled(project)) {
             }
 
             desktopMain.dependencies {
-                implementation(KOTLIN_STDLIB)
-                implementation(KOTLIN_STDLIB_JDK8)
-                api(SKIKO)
+                implementation(libs.kotlinStdlib)
+                implementation(libs.kotlinStdlibJdk8)
+                api(libs.skiko)
             }
 
             androidTest.dependencies {
-                implementation(ANDROIDX_TEST_RULES)
-                implementation(ANDROIDX_TEST_RUNNER)
-                implementation(JUNIT)
-                implementation(TRUTH)
+                implementation(libs.testRules)
+                implementation(libs.testRunner)
+                implementation(libs.junit)
+                implementation(libs.truth)
             }
 
             androidAndroidTest.dependencies {
                 implementation(project(":compose:ui:ui-graphics:ui-graphics-samples"))
                 implementation(project(":compose:ui:ui-test-junit4"))
                 implementation(project(":compose:test-utils"))
-                implementation(ANDROIDX_TEST_RULES)
-                implementation(ANDROIDX_TEST_RUNNER)
-                implementation(ESPRESSO_CORE)
-                implementation(JUNIT)
+                implementation(libs.testRules)
+                implementation(libs.testRunner)
+                implementation(libs.espressoCore)
+                implementation(libs.junit)
             }
 
             desktopTest {
                 resources.srcDirs += "src/desktopTest/res"
                 dependencies {
                     implementation(project(":compose:ui:ui-test-junit4"))
-                    implementation(JUNIT)
-                    implementation(TRUTH)
-                    implementation(SKIKO_CURRENT_OS)
+                    implementation(libs.junit)
+                    implementation(libs.truth)
+                    implementation(libs.skikoCurrentOs)
                 }
             }
         }
@@ -129,7 +127,7 @@ androidx {
     legacyDisableKotlinStrictApiMode = true
 }
 
-if(AndroidXUiPlugin.isMultiplatformEnabled(project)) {
+if(AndroidXComposePlugin.isMultiplatformEnabled(project)) {
     tasks.findByName("desktopTest").configure {
         systemProperties["GOLDEN_PATH"] = project.rootDir.absolutePath + "/../../golden"
     }

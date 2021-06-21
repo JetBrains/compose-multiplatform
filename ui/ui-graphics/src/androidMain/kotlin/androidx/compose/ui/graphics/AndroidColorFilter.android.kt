@@ -16,10 +16,11 @@
 
 package androidx.compose.ui.graphics
 
-import android.annotation.SuppressLint
 import android.graphics.BlendModeColorFilter
 import android.graphics.PorterDuffColorFilter
 import android.os.Build
+import androidx.annotation.DoNotInline
+import androidx.annotation.RequiresApi
 
 internal actual typealias NativeColorFilter = android.graphics.ColorFilter
 
@@ -34,9 +35,8 @@ fun ColorFilter.asAndroidColorFilter(): android.graphics.ColorFilter = nativeCol
 fun android.graphics.ColorFilter.asComposeColorFilter(): ColorFilter = ColorFilter(this)
 
 internal actual fun actualTintColorFilter(color: Color, blendMode: BlendMode): ColorFilter {
-    @SuppressLint("UnsafeNewApiCall")
     val androidColorFilter = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-        BlendModeColorFilter(color.toArgb(), blendMode.toAndroidBlendMode())
+        BlendModeColorFilterHelper.BlendModeColorFilter(color, blendMode)
     } else {
         PorterDuffColorFilter(color.toArgb(), blendMode.toPorterDuffMode())
     }
@@ -48,3 +48,11 @@ internal actual fun actualColorMatrixColorFilter(colorMatrix: ColorMatrix): Colo
 
 internal actual fun actualLightingColorFilter(multiply: Color, add: Color): ColorFilter =
     ColorFilter(android.graphics.LightingColorFilter(multiply.toArgb(), add.toArgb()))
+
+@RequiresApi(Build.VERSION_CODES.Q)
+private object BlendModeColorFilterHelper {
+    @DoNotInline
+    fun BlendModeColorFilter(color: Color, blendMode: BlendMode): BlendModeColorFilter {
+        return BlendModeColorFilter(color.toArgb(), blendMode.toAndroidBlendMode())
+    }
+}

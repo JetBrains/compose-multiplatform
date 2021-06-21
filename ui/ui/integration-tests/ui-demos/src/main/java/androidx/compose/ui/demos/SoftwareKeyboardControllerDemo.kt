@@ -42,7 +42,7 @@ fun SoftwareKeyboardControllerDemo() {
     Column(Modifier.padding(16.dp)) {
         var isHidden by remember { mutableStateOf(true) }
 
-        val focusRequester = FocusRequester()
+        val focusRequester = remember { FocusRequester() }
 
         val text = if (isHidden) {
             "Click on TextField to show keyboard, even after hiding"

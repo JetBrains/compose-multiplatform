@@ -19,7 +19,6 @@ package androidx.compose.foundation.selection
 import androidx.compose.foundation.Indication
 import androidx.compose.foundation.PressedInteractionSourceDisposableEffect
 import androidx.compose.foundation.LocalIndication
-import androidx.compose.foundation.Strings
 import androidx.compose.foundation.gestures.detectTapAndPress
 import androidx.compose.foundation.handlePressInteraction
 import androidx.compose.foundation.indication
@@ -37,12 +36,8 @@ import androidx.compose.ui.semantics.disabled
 import androidx.compose.ui.semantics.onClick
 import androidx.compose.ui.semantics.role
 import androidx.compose.ui.semantics.semantics
-import androidx.compose.ui.semantics.stateDescription
 import androidx.compose.ui.semantics.toggleableState
 import androidx.compose.ui.state.ToggleableState
-import androidx.compose.ui.state.ToggleableState.Indeterminate
-import androidx.compose.ui.state.ToggleableState.Off
-import androidx.compose.ui.state.ToggleableState.On
 
 /**
  * Configure component to make it toggleable via input and accessibility events
@@ -110,6 +105,8 @@ fun Modifier.toggleable(
  * @param onValueChange callback to be invoked when toggleable is clicked,
  * therefore the change of the state in requested.
  */
+// TODO: b/191017532 remove Modifier.composed
+@Suppress("UnnecessaryComposedModifier")
 fun Modifier.toggleable(
     value: Boolean,
     interactionSource: MutableInteractionSource,
@@ -211,6 +208,8 @@ fun Modifier.triStateToggleable(
  * to describe the element or do customizations
  * @param onClick will be called when user clicks the toggleable.
  */
+// TODO: b/191017532 remove Modifier.composed
+@Suppress("UnnecessaryComposedModifier")
 fun Modifier.triStateToggleable(
     state: ToggleableState,
     interactionSource: MutableInteractionSource,
@@ -248,31 +247,26 @@ private fun Modifier.toggleableImpl(
         if (role != null) {
             this.role = role
         }
-        this.stateDescription = when (state) {
-            On -> if (role == Role.Switch) Strings.On else Strings.Checked
-            Off -> if (role == Role.Switch) Strings.Off else Strings.Unchecked
-            Indeterminate -> Strings.Indeterminate
-        }
         this.toggleableState = state
 
-        onClick(action = { onClick(); return@onClick true }, label = Strings.Toggle)
+        onClick(action = { onClick(); true })
         if (!enabled) {
             disabled()
         }
     }
     val onClickState = rememberUpdatedState(onClick)
-    val gestures = if (enabled) {
+    if (enabled) {
         PressedInteractionSourceDisposableEffect(interactionSource, pressedInteraction)
-        Modifier.pointerInput(interactionSource) {
-            detectTapAndPress(
-                onPress = { offset ->
+    }
+    val gestures = Modifier.pointerInput(interactionSource, enabled) {
+        detectTapAndPress(
+            onPress = { offset ->
+                if (enabled) {
                     handlePressInteraction(offset, interactionSource, pressedInteraction)
-                },
-                onTap = { onClickState.value.invoke() }
-            )
-        }
-    } else {
-        Modifier
+                }
+            },
+            onTap = { if (enabled) onClickState.value.invoke() }
+        )
     }
     this
         .then(semantics)

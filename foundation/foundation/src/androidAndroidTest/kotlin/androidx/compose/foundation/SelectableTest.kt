@@ -30,6 +30,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.InspectableValue
 import androidx.compose.ui.platform.isDebugInspectorInfoEnabled
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.semantics.SemanticsProperties
 import androidx.compose.ui.test.SemanticsMatcher
 import androidx.compose.ui.test.assert
@@ -41,6 +42,7 @@ import androidx.compose.ui.test.down
 import androidx.compose.ui.test.isSelectable
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onFirst
+import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.performGesture
@@ -127,6 +129,48 @@ class SelectableTest {
         rule.onNode(isSelectable())
             .assertIsNotSelected()
             .performClick()
+            .assertIsNotSelected()
+    }
+
+    @Test
+    fun selectable_clicks_noPropagationWhenDisabled() {
+        val enabled = mutableStateOf(false)
+        rule.setContent {
+            val state = remember { mutableStateOf(false) }
+            val outerState = remember { mutableStateOf(false) }
+            Box(
+                Modifier
+                    .testTag("outerBox")
+                    .selectable(
+                        selected = outerState.value,
+                        onClick = { outerState.value = !outerState.value }
+                    )
+            ) {
+                BasicText(
+                    "Text in item",
+                    modifier = Modifier.selectable(
+                        selected = state.value,
+                        onClick = { state.value = !state.value },
+                        enabled = enabled.value
+                    )
+                )
+            }
+        }
+
+        rule.onNodeWithText("Text in item")
+            .assertIsNotSelected()
+            .performClick()
+            .assertIsNotSelected()
+
+        rule.onNodeWithTag("outerBox")
+            .assertIsNotSelected()
+        rule.runOnIdle { enabled.value = true }
+
+        rule.onNodeWithText("Text in item")
+            .performClick()
+            .assertIsSelected()
+
+        rule.onNodeWithTag("outerBox")
             .assertIsNotSelected()
     }
 

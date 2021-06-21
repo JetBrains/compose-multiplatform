@@ -24,7 +24,6 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.LargeTest
 import androidx.test.filters.MediumTest
 import com.google.common.truth.Truth.assertThat
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
@@ -33,8 +32,6 @@ import org.junit.Test
 import org.junit.runner.RunWith
 import java.util.concurrent.CountDownLatch
 import java.util.concurrent.atomic.AtomicBoolean
-import kotlin.coroutines.CoroutineContext
-import kotlin.coroutines.EmptyCoroutineContext
 
 @MediumTest
 @RunWith(AndroidJUnit4::class)
@@ -124,14 +121,7 @@ class WaitingForOnCommitCallbackTest {
     }
 
     @Test
-    fun cascadingOnCommits_suspendedWait_defaultDispatcher() =
-        cascadingOnCommits_suspendedWait(EmptyCoroutineContext)
-
-    @Test
-    fun cascadingOnCommits_suspendedWait_mainDispatcher() =
-        cascadingOnCommits_suspendedWait(Dispatchers.Main)
-
-    fun cascadingOnCommits_suspendedWait(context: CoroutineContext) = runBlocking(context) {
+    fun cascadingOnCommits_suspendedWait_defaultDispatcher() = runBlocking {
         // Collect unique values (markers) at each step during the process and
         // at the end verify that they were collected in the right order
         val values = mutableListOf<Int>()

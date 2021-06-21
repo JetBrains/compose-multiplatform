@@ -64,6 +64,12 @@ class SemanticsNode internal constructor(
      */
     val mergingEnabled: Boolean
 ) {
+    // We emit fake nodes for several cases. One is to prevent the content description clobbering
+    // issue. Another case is  temporary workaround to retrieve default role ordering for Button
+    // and other selection controls.
+    internal var isFake = false
+    private var fakeNodeParent: SemanticsNode? = null
+
     internal val unmergedConfig = outerSemanticsNodeWrapper.collapsedSemanticsConfiguration()
     val id: Int = outerSemanticsNodeWrapper.modifier.id
 
@@ -94,36 +100,40 @@ class SemanticsNode internal constructor(
      * clipping applied. To get the bounds with no clipping applied, use
      * Rect([positionInRoot], [size].toSize())
      */
-    val boundsInRoot: Rect get() {
-        if (!layoutNode.isAttached) return Rect.Zero
-        return this.findWrapperToGetBounds().boundsInRoot()
-    }
+    val boundsInRoot: Rect
+        get() {
+            if (!layoutNode.isAttached) return Rect.Zero
+            return this.findWrapperToGetBounds().boundsInRoot()
+        }
 
     /**
      * The position of this node relative to the root of this Compose hierarchy, with no clipping
      * applied
      */
-    val positionInRoot: Offset get() {
-        if (!layoutNode.isAttached) return Offset.Zero
-        return findWrapperToGetBounds().positionInRoot()
-    }
+    val positionInRoot: Offset
+        get() {
+            if (!layoutNode.isAttached) return Offset.Zero
+            return findWrapperToGetBounds().positionInRoot()
+        }
 
     /**
      * The bounding box for this node relative to the screen, with clipping applied. To get the
      * bounds with no clipping applied, use PxBounds([positionInWindow], [size].toSize())
      */
-    val boundsInWindow: Rect get() {
-        if (!layoutNode.isAttached) return Rect.Zero
-        return findWrapperToGetBounds().boundsInWindow()
-    }
+    val boundsInWindow: Rect
+        get() {
+            if (!layoutNode.isAttached) return Rect.Zero
+            return findWrapperToGetBounds().boundsInWindow()
+        }
 
     /**
      * The position of this node relative to the screen, with no clipping applied
      */
-    val positionInWindow: Offset get() {
-        if (!layoutNode.isAttached) return Offset.Zero
-        return findWrapperToGetBounds().positionInWindow()
-    }
+    val positionInWindow: Offset
+        get() {
+            if (!layoutNode.isAttached) return Offset.Zero
+            return findWrapperToGetBounds().positionInWindow()
+        }
 
     /**
      * Returns the position of an [alignment line][AlignmentLine], or [AlignmentLine.Unspecified]
@@ -160,7 +170,7 @@ class SemanticsNode internal constructor(
             unmergedChildren().fastForEach { child ->
                 // Don't merge children that themselves merge all their descendants (because that
                 // indicates they're independently screen-reader-focusable).
-                if (!child.isMergingSemanticsOfDescendants) {
+                if (!child.isFake && !child.isMergingSemanticsOfDescendants) {
                     mergedConfig.mergeChild(child.unmergedConfig)
                     child.mergeConfig(mergedConfig)
                 }
@@ -172,6 +182,7 @@ class SemanticsNode internal constructor(
         get() = mergingEnabled && unmergedConfig.isMergingSemanticsOfDescendants
 
     internal fun unmergedChildren(sortByBounds: Boolean = false): List<SemanticsNode> {
+        if (this.isFake) return listOf()
         val unmergedChildren: MutableList<SemanticsNode> = mutableListOf()
 
         val semanticsChildren = if (sortByBounds) {
@@ -182,6 +193,8 @@ class SemanticsNode internal constructor(
         semanticsChildren.fastForEach { semanticsChild ->
             unmergedChildren.add(SemanticsNode(semanticsChild, mergingEnabled))
         }
+
+        emitFakeNodes(unmergedChildren)
 
         return unmergedChildren
     }
@@ -262,6 +275,7 @@ class SemanticsNode internal constructor(
     /** The parent of this node in the tree. */
     val parent: SemanticsNode?
         get() {
+            if (fakeNodeParent != null) return fakeNodeParent
             var node: LayoutNode? = null
             if (mergingEnabled) {
                 node = this.layoutNode.findClosestParentNode {
@@ -305,11 +319,59 @@ class SemanticsNode internal constructor(
      * Otherwise the outermost semantics will be used to report bounds, size and position.
      */
     private fun findWrapperToGetBounds(): LayoutNodeWrapper {
-        return if (isMergingSemanticsOfDescendants) {
+        return if (unmergedConfig.isMergingSemanticsOfDescendants) {
             layoutNode.outerMergingSemantics ?: outerSemanticsNodeWrapper
         } else {
             outerSemanticsNodeWrapper
         }
+    }
+
+    // Fake nodes
+    private fun emitFakeNodes(unmergedChildren: MutableList<SemanticsNode>) {
+        val nodeRole = this.role
+        if (nodeRole != null && unmergedConfig.isMergingSemanticsOfDescendants &&
+            unmergedChildren.isNotEmpty()
+        ) {
+            val fakeNode = fakeSemanticsNode(nodeRole) {
+                this.role = nodeRole
+            }
+            unmergedChildren.add(fakeNode)
+        }
+
+        // Fake node for contentDescription clobbering issue
+        if (unmergedConfig.contains(SemanticsProperties.ContentDescription) &&
+            unmergedChildren.isNotEmpty() && unmergedConfig.isMergingSemanticsOfDescendants
+        ) {
+            val contentDescription =
+                this.unmergedConfig.getOrNull(SemanticsProperties.ContentDescription)?.firstOrNull()
+            if (contentDescription != null) {
+                val fakeNode = fakeSemanticsNode(null) {
+                    this.contentDescription = contentDescription
+                }
+                unmergedChildren.add(0, fakeNode)
+            }
+        }
+    }
+
+    private fun fakeSemanticsNode(
+        role: Role?,
+        properties: SemanticsPropertyReceiver.() -> Unit
+    ): SemanticsNode {
+        val fakeNode = SemanticsNode(
+            outerSemanticsNodeWrapper = SemanticsWrapper(
+                wrapped = LayoutNode(isVirtual = true).innerLayoutNodeWrapper,
+                semanticsModifier = SemanticsModifierCore(
+                    if (role != null) this.roleFakeNodeId() else contentDescriptionFakeNodeId(),
+                    mergeDescendants = false,
+                    clearAndSetSemantics = false,
+                    properties = properties
+                )
+            ),
+            mergingEnabled = false
+        )
+        fakeNode.isFake = true
+        fakeNode.fakeNodeParent = this
+        return fakeNode
     }
 }
 
@@ -378,3 +440,7 @@ private fun LayoutNode.findClosestParentNode(selector: (LayoutNode) -> Boolean):
 
     return null
 }
+
+private val SemanticsNode.role get() = this.unmergedConfig.getOrNull(SemanticsProperties.Role)
+private fun SemanticsNode.contentDescriptionFakeNodeId() = this.id + 2_000_000_000
+private fun SemanticsNode.roleFakeNodeId() = this.id + 1_000_000_000

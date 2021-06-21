@@ -83,12 +83,6 @@ internal class DesktopInputDispatcher(
         batchedEvents.clear()
         copy.forEach {
             val eventTime = it.first().uptime
-            if (dispatchInRealTime) {
-                val delayMs = eventTime - now
-                if (delayMs > 0) {
-                    Thread.sleep(delayMs)
-                }
-            }
             root.processPointerInput(eventTime, it)
         }
     }

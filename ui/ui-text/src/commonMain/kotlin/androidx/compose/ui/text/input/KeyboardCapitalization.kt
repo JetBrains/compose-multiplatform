@@ -20,24 +20,38 @@ package androidx.compose.ui.text.input
  * Options to request software keyboard to capitalize the text. Applies to languages which
  * has upper-case and lower-case letters.
  */
-enum class KeyboardCapitalization {
-    /**
-     * Do not auto-capitalize text.
-     */
-    None,
+@Suppress("INLINE_CLASS_DEPRECATED")
+inline class KeyboardCapitalization internal constructor(internal val value: Int) {
 
-    /**
-     * Capitalize all characters.
-     */
-    Characters,
+    override fun toString(): String {
+        return when (this) {
+            None -> "None"
+            Characters -> "Characters"
+            Words -> "Words"
+            Sentences -> "Sentences"
+            else -> "Invalid"
+        }
+    }
 
-    /**
-     * Capitalize the first character of every word.
-     */
-    Words,
+    companion object {
+        /**
+         * Do not auto-capitalize text.
+         */
+        val None = KeyboardCapitalization(0)
 
-    /**
-     * Capitalize the first character of each sentence.
-     */
-    Sentences
+        /**
+         * Capitalize all characters.
+         */
+        val Characters = KeyboardCapitalization(1)
+
+        /**
+         * Capitalize the first character of every word.
+         */
+        val Words = KeyboardCapitalization(2)
+
+        /**
+         * Capitalize the first character of each sentence.
+         */
+        val Sentences = KeyboardCapitalization(3)
+    }
 }

@@ -1,21 +1,33 @@
 // Baseline format: 1.0
-AddedAbstractMethod: androidx.compose.foundation.text.KeyboardActionScope#defaultKeyboardAction-KlQnJC8(int):
-    Added method androidx.compose.foundation.text.KeyboardActionScope.defaultKeyboardAction-KlQnJC8(int)
+InvalidNullConversion: Field KeyboardOptions.capitalization:
+    Attempted to remove @NonNull annotation from Field KeyboardOptions.capitalization
 
 
-InvalidNullConversion: Field KeyboardOptions.imeAction:
-    Attempted to remove @NonNull annotation from Field KeyboardOptions.imeAction
-InvalidNullConversion: Field KeyboardOptions.keyboardType:
-    Attempted to remove @NonNull annotation from Field KeyboardOptions.keyboardType
-
-
-RemovedMethod: androidx.compose.foundation.text.KeyboardActionScope#defaultKeyboardAction(androidx.compose.ui.text.input.ImeAction):
-    Removed method androidx.compose.foundation.text.KeyboardActionScope.defaultKeyboardAction(androidx.compose.ui.text.input.ImeAction)
-RemovedMethod: androidx.compose.foundation.text.KeyboardOptions#KeyboardOptions(androidx.compose.ui.text.input.KeyboardCapitalization, boolean, androidx.compose.ui.text.input.KeyboardType, androidx.compose.ui.text.input.ImeAction):
-    Removed constructor androidx.compose.foundation.text.KeyboardOptions(androidx.compose.ui.text.input.KeyboardCapitalization,boolean,androidx.compose.ui.text.input.KeyboardType,androidx.compose.ui.text.input.ImeAction)
-RemovedMethod: androidx.compose.foundation.text.KeyboardOptions#copy(androidx.compose.ui.text.input.KeyboardCapitalization, boolean, androidx.compose.ui.text.input.KeyboardType, androidx.compose.ui.text.input.ImeAction):
-    Removed method androidx.compose.foundation.text.KeyboardOptions.copy(androidx.compose.ui.text.input.KeyboardCapitalization,boolean,androidx.compose.ui.text.input.KeyboardType,androidx.compose.ui.text.input.ImeAction)
-RemovedMethod: androidx.compose.foundation.text.KeyboardOptions#getImeAction():
-    Removed method androidx.compose.foundation.text.KeyboardOptions.getImeAction()
-RemovedMethod: androidx.compose.foundation.text.KeyboardOptions#getKeyboardType():
-    Removed method androidx.compose.foundation.text.KeyboardOptions.getKeyboardType()
+RemovedMethod: androidx.compose.foundation.ClickableKt#clickable(androidx.compose.ui.Modifier, androidx.compose.foundation.interaction.MutableInteractionSource, androidx.compose.foundation.Indication, boolean, String, androidx.compose.ui.semantics.Role, kotlin.jvm.functions.Function0<kotlin.Unit>):
+    Removed method androidx.compose.foundation.ClickableKt.clickable(androidx.compose.ui.Modifier,androidx.compose.foundation.interaction.MutableInteractionSource,androidx.compose.foundation.Indication,boolean,String,androidx.compose.ui.semantics.Role,kotlin.jvm.functions.Function0<kotlin.Unit>)
+RemovedMethod: androidx.compose.foundation.ClickableKt#clickable(androidx.compose.ui.Modifier, boolean, String, androidx.compose.ui.semantics.Role, kotlin.jvm.functions.Function0<kotlin.Unit>):
+    Removed method androidx.compose.foundation.ClickableKt.clickable(androidx.compose.ui.Modifier,boolean,String,androidx.compose.ui.semantics.Role,kotlin.jvm.functions.Function0<kotlin.Unit>)
+RemovedMethod: androidx.compose.foundation.DarkTheme_androidKt#isSystemInDarkTheme():
+    Removed method androidx.compose.foundation.DarkTheme_androidKt.isSystemInDarkTheme()
+RemovedMethod: androidx.compose.foundation.selection.SelectableKt#selectable(androidx.compose.ui.Modifier, boolean, androidx.compose.foundation.interaction.MutableInteractionSource, androidx.compose.foundation.Indication, boolean, androidx.compose.ui.semantics.Role, kotlin.jvm.functions.Function0<kotlin.Unit>):
+    Removed method androidx.compose.foundation.selection.SelectableKt.selectable(androidx.compose.ui.Modifier,boolean,androidx.compose.foundation.interaction.MutableInteractionSource,androidx.compose.foundation.Indication,boolean,androidx.compose.ui.semantics.Role,kotlin.jvm.functions.Function0<kotlin.Unit>)
+RemovedMethod: androidx.compose.foundation.selection.SelectableKt#selectable(androidx.compose.ui.Modifier, boolean, boolean, androidx.compose.ui.semantics.Role, kotlin.jvm.functions.Function0<kotlin.Unit>):
+    Removed method androidx.compose.foundation.selection.SelectableKt.selectable(androidx.compose.ui.Modifier,boolean,boolean,androidx.compose.ui.semantics.Role,kotlin.jvm.functions.Function0<kotlin.Unit>)
+RemovedMethod: androidx.compose.foundation.selection.ToggleableKt#toggleable(androidx.compose.ui.Modifier, boolean, androidx.compose.foundation.interaction.MutableInteractionSource, androidx.compose.foundation.Indication, boolean, androidx.compose.ui.semantics.Role, kotlin.jvm.functions.Function1<? super java.lang.Boolean,kotlin.Unit>):
+    Removed method androidx.compose.foundation.selection.ToggleableKt.toggleable(androidx.compose.ui.Modifier,boolean,androidx.compose.foundation.interaction.MutableInteractionSource,androidx.compose.foundation.Indication,boolean,androidx.compose.ui.semantics.Role,kotlin.jvm.functions.Function1<? super java.lang.Boolean,kotlin.Unit>)
+RemovedMethod: androidx.compose.foundation.selection.ToggleableKt#toggleable(androidx.compose.ui.Modifier, boolean, boolean, androidx.compose.ui.semantics.Role, kotlin.jvm.functions.Function1<? super java.lang.Boolean,kotlin.Unit>):
+    Removed method androidx.compose.foundation.selection.ToggleableKt.toggleable(androidx.compose.ui.Modifier,boolean,boolean,androidx.compose.ui.semantics.Role,kotlin.jvm.functions.Function1<? super java.lang.Boolean,kotlin.Unit>)
+RemovedMethod: androidx.compose.foundation.selection.ToggleableKt#triStateToggleable(androidx.compose.ui.Modifier, androidx.compose.ui.state.ToggleableState, androidx.compose.foundation.interaction.MutableInteractionSource, androidx.compose.foundation.Indication, boolean, androidx.compose.ui.semantics.Role, kotlin.jvm.functions.Function0<kotlin.Unit>):
+    Removed method androidx.compose.foundation.selection.ToggleableKt.triStateToggleable(androidx.compose.ui.Modifier,androidx.compose.ui.state.ToggleableState,androidx.compose.foundation.interaction.MutableInteractionSource,androidx.compose.foundation.Indication,boolean,androidx.compose.ui.semantics.Role,kotlin.jvm.functions.Function0<kotlin.Unit>)
+RemovedMethod: androidx.compose.foundation.selection.ToggleableKt#triStateToggleable(androidx.compose.ui.Modifier, androidx.compose.ui.state.ToggleableState, boolean, androidx.compose.ui.semantics.Role, kotlin.jvm.functions.Function0<kotlin.Unit>):
+    Removed method androidx.compose.foundation.selection.ToggleableKt.triStateToggleable(androidx.compose.ui.Modifier,androidx.compose.ui.state.ToggleableState,boolean,androidx.compose.ui.semantics.Role,kotlin.jvm.functions.Function0<kotlin.Unit>)
+RemovedMethod: androidx.compose.foundation.text.BasicTextKt#BasicText(String, androidx.compose.ui.Modifier, androidx.compose.ui.text.TextStyle, kotlin.jvm.functions.Function1<? super androidx.compose.ui.text.TextLayoutResult,kotlin.Unit>, androidx.compose.ui.text.style.TextOverflow, boolean, int):
+    Removed method androidx.compose.foundation.text.BasicTextKt.BasicText(String,androidx.compose.ui.Modifier,androidx.compose.ui.text.TextStyle,kotlin.jvm.functions.Function1<? super androidx.compose.ui.text.TextLayoutResult,kotlin.Unit>,androidx.compose.ui.text.style.TextOverflow,boolean,int)
+RemovedMethod: androidx.compose.foundation.text.BasicTextKt#BasicText(androidx.compose.ui.text.AnnotatedString, androidx.compose.ui.Modifier, androidx.compose.ui.text.TextStyle, kotlin.jvm.functions.Function1<? super androidx.compose.ui.text.TextLayoutResult,kotlin.Unit>, androidx.compose.ui.text.style.TextOverflow, boolean, int, java.util.Map<java.lang.String,androidx.compose.foundation.text.InlineTextContent>):
+    Removed method androidx.compose.foundation.text.BasicTextKt.BasicText(androidx.compose.ui.text.AnnotatedString,androidx.compose.ui.Modifier,androidx.compose.ui.text.TextStyle,kotlin.jvm.functions.Function1<? super androidx.compose.ui.text.TextLayoutResult,kotlin.Unit>,androidx.compose.ui.text.style.TextOverflow,boolean,int,java.util.Map<java.lang.String,androidx.compose.foundation.text.InlineTextContent>)
+RemovedMethod: androidx.compose.foundation.text.ClickableTextKt#ClickableText(androidx.compose.ui.text.AnnotatedString, androidx.compose.ui.Modifier, androidx.compose.ui.text.TextStyle, boolean, androidx.compose.ui.text.style.TextOverflow, int, kotlin.jvm.functions.Function1<? super androidx.compose.ui.text.TextLayoutResult,kotlin.Unit>, kotlin.jvm.functions.Function1<? super java.lang.Integer,kotlin.Unit>):
+    Removed method androidx.compose.foundation.text.ClickableTextKt.ClickableText(androidx.compose.ui.text.AnnotatedString,androidx.compose.ui.Modifier,androidx.compose.ui.text.TextStyle,boolean,androidx.compose.ui.text.style.TextOverflow,int,kotlin.jvm.functions.Function1<? super androidx.compose.ui.text.TextLayoutResult,kotlin.Unit>,kotlin.jvm.functions.Function1<? super java.lang.Integer,kotlin.Unit>)
+RemovedMethod: androidx.compose.foundation.text.KeyboardOptions#copy-C1cpEnM(androidx.compose.ui.text.input.KeyboardCapitalization, boolean, int, int):
+    Removed method androidx.compose.foundation.text.KeyboardOptions.copy-C1cpEnM(androidx.compose.ui.text.input.KeyboardCapitalization,boolean,int,int)
+RemovedMethod: androidx.compose.foundation.text.KeyboardOptions#getCapitalization():
+    Removed method androidx.compose.foundation.text.KeyboardOptions.getCapitalization()

@@ -36,16 +36,16 @@ val AnimationDemos = DemoCategory(
             "Layout Animation Demos",
             listOf(
                 ComposableDemo("Animate Content Size") { AnimateContentSizeDemo() },
+                ComposableDemo("Animate Increment/Decrement") { AnimateIncrementDecrementDemo() },
                 ComposableDemo("Animate Visibility Demo") { AnimatedVisibilityDemo() },
                 ComposableDemo("Animate Visibility Lazy Column Demo") {
                     AnimatedVisibilityLazyColumnDemo()
                 },
-                ComposableDemo("Animate Visibility Content Size Change Demo") {
-                    AnimatedVisibilityContentSizeChangeDemo()
-                },
                 ComposableDemo("Cross Fade") { CrossfadeDemo() },
-                ComposableDemo("Enter/ExitTransition Combo Demo") { EnterExitCombinationDemo() },
                 ComposableDemo("Modifier.animateEnterExit Demo") { AnimateEnterExitDemo() },
+                ComposableDemo("Nested Menu") { NestedMenuDemo() },
+                ComposableDemo("Shrine Cart") { ShrineCartDemo() },
+                ComposableDemo("Screen Transition") { ScreenTransitionDemo() },
             )
         ),
         DemoCategory(
@@ -59,8 +59,22 @@ val AnimationDemos = DemoCategory(
                 ComposableDemo("Swipe to dismiss") { SwipeToDismissDemo() },
             )
         ),
+
         DemoCategory(
-            "Fun Demos",
+            "⛔ DO NOT ENTER ⛔",
+            listOf(
+                ComposableDemo("AnimatedContent alignment/slideInto") {
+                    InspectionSlideInContentVariedSizes()
+                },
+                ComposableDemo("Enter/ExitTransition Combo") { InspectionEnterExitCombination() },
+                ComposableDemo("AnimatedVisibility with Content Size Change") {
+                    InspectionAnimatedVisibilityContentSizeChange()
+                },
+            )
+        ),
+
+        DemoCategory(
+            "\uD83C\uDF89 Fun Demos",
             listOf(
                 ComposableDemo("Animated clock") { AnimatedClockDemo() },
                 ComposableDemo("Animated dots") { AnimatedDotsDemo() },

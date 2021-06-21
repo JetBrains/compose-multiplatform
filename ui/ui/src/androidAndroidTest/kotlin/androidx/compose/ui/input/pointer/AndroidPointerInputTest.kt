@@ -21,9 +21,11 @@ import android.view.MotionEvent
 import android.view.View
 import android.view.ViewGroup
 import androidx.activity.ComponentActivity
+import androidx.compose.foundation.gestures.awaitFirstDown
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -35,13 +37,16 @@ import androidx.compose.ui.AbsoluteAlignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.OpenComposeView
 import androidx.compose.ui.composed
+import androidx.compose.ui.findAndroidComposeView
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.gesture.PointerCoords
 import androidx.compose.ui.gesture.PointerProperties
 import androidx.compose.ui.layout.Layout
+import androidx.compose.ui.layout.layout
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.platform.AndroidComposeView
 import androidx.compose.ui.platform.ComposeView
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.util.fastForEach
 import androidx.compose.ui.viewinterop.AndroidView
@@ -86,6 +91,39 @@ class AndroidPointerInputTest {
                     ViewGroup.LayoutParams.WRAP_CONTENT
                 )
             )
+        }
+    }
+
+    @Test
+    fun dispatchTouchEvent_invalidCoordinates() {
+        countDown { latch ->
+            rule.runOnUiThread {
+                container.setContent {
+                    FillLayout(
+                        Modifier
+                            .consumeMovementGestureFilter()
+                            .onGloballyPositioned { latch.countDown() }
+                    )
+                }
+            }
+        }
+
+        rule.runOnUiThread {
+            val motionEvent = MotionEvent(
+                0,
+                MotionEvent.ACTION_DOWN,
+                1,
+                0,
+                arrayOf(PointerProperties(0)),
+                arrayOf(PointerCoords(Float.NaN, Float.NaN))
+            )
+
+            val androidComposeView = findAndroidComposeView(container)!!
+            // Act
+            val actual = androidComposeView.dispatchTouchEvent(motionEvent)
+
+            // Assert
+            assertThat(actual).isFalse()
         }
     }
 
@@ -489,6 +527,54 @@ class AndroidPointerInputTest {
             val upEvent = createPointerEventAt(2200, MotionEvent.ACTION_UP, locationInWindow)
             findRootView(container).dispatchTouchEvent(upEvent)
         }
+        assertTrue(tapLatch.await(1, TimeUnit.SECONDS))
+    }
+
+    /**
+     * There are times that getLocationOnScreen() returns (0, 0). Touch input should still arrive
+     * at the correct place even if getLocationOnScreen() gives a different result than the
+     * rawX, rawY indicate.
+     */
+    @Test
+    fun badGetLocationOnScreen() {
+        val tapLatch = CountDownLatch(1)
+        val layoutLatch = CountDownLatch(1)
+        rule.runOnUiThread {
+            container.setContent {
+                with(LocalDensity.current) {
+                    Box(
+                        Modifier
+                            .size(250.toDp())
+                            .layout { measurable, constraints ->
+                                val p = measurable.measure(constraints)
+                                layout(p.width, p.height) {
+                                    p.place(0, 0)
+                                    layoutLatch.countDown()
+                                }
+                            }
+                    ) {
+                        Box(
+                            Modifier
+                                .align(AbsoluteAlignment.TopLeft)
+                                .pointerInput(Unit) {
+                                    awaitPointerEventScope {
+                                        awaitFirstDown()
+                                        tapLatch.countDown()
+                                    }
+                                }.size(10.toDp())
+                        )
+                    }
+                }
+            }
+        }
+        assertTrue(layoutLatch.await(1, TimeUnit.SECONDS))
+        rule.runOnUiThread { }
+
+        val down = createPointerEventAt(0, MotionEvent.ACTION_DOWN, intArrayOf(105, 205))
+        down.offsetLocation(-100f, -200f)
+        val composeView = findAndroidComposeView(container) as AndroidComposeView
+        composeView.dispatchTouchEvent(down)
+
         assertTrue(tapLatch.await(1, TimeUnit.SECONDS))
     }
 

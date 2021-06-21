@@ -25,9 +25,10 @@ import androidx.compose.animation.core.updateTransition
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.interaction.collectIsFocusedAsState
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.defaultMinSize
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.material.Strings.DefaultErrorMessage
+import androidx.compose.material.Strings.Companion.DefaultErrorMessage
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.getValue
@@ -37,24 +38,15 @@ import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.graphics.takeOrElse
-import androidx.compose.ui.layout.LayoutModifier
-import androidx.compose.ui.layout.Measurable
-import androidx.compose.ui.layout.MeasureResult
-import androidx.compose.ui.layout.MeasureScope
 import androidx.compose.ui.layout.Placeable
-import androidx.compose.ui.platform.InspectorValueInfo
-import androidx.compose.ui.platform.debugInspectorInfo
 import androidx.compose.ui.semantics.error
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.text.lerp
-import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.Dp
-import androidx.compose.ui.unit.constrainWidth
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.offset
 
 internal enum class TextFieldType {
     Filled, Outlined
@@ -115,7 +107,14 @@ internal fun TextFieldImpl(
                         labelProgress
                     )
                     Decoration(
-                        contentColor = colors.labelColor(enabled, isError, interactionSource).value,
+                        contentColor = colors
+                            .labelColor(
+                                enabled,
+                                // if label is used as a placeholder (aka not as a small header
+                                // at the top), we don't use an error color
+                                if (inputState == InputPhase.UnfocusedEmpty) false else isError,
+                                interactionSource
+                            ).value,
                         typography = labelAnimatedStyle,
                         content = label
                     )
@@ -138,7 +137,8 @@ internal fun TextFieldImpl(
         // Developers need to handle invalid input manually. But since we don't provide error
         // message slot API, we can set the default error message in case developers forget about
         // it.
-        val textFieldModifier = modifier.semantics { if (isError) error(DefaultErrorMessage) }
+        val defaultErrorMessage = getString(DefaultErrorMessage)
+        val textFieldModifier = modifier.semantics { if (isError) error(defaultErrorMessage) }
         when (type) {
             TextFieldType.Filled -> {
                 TextFieldLayout(
@@ -193,6 +193,7 @@ internal fun TextFieldImpl(
                     indicatorWidth = indicatorWidth,
                     indicatorColor =
                         colors.indicatorColor(enabled, isError, interactionSource).value,
+                    shape = shape,
                     cursorColor = colors.cursorColor(isError).value
                 )
             }
@@ -231,37 +232,6 @@ internal fun Decoration(
 private val Placeable.nonZero: Boolean get() = this.width != 0 || this.height != 0
 internal fun widthOrZero(placeable: Placeable?) = placeable?.width ?: 0
 internal fun heightOrZero(placeable: Placeable?) = placeable?.height ?: 0
-
-/**
- * A modifier that applies padding only if the size of the element is not zero
- */
-internal fun Modifier.iconPadding(start: Dp = 0.dp, end: Dp = 0.dp) =
-    this.then(
-        @Suppress("ModifierInspectorInfo")
-        object : LayoutModifier, InspectorValueInfo(
-            debugInspectorInfo {
-                name = "iconPadding"
-                properties["start"] = start
-                properties["end"] = end
-            }
-        ) {
-            override fun MeasureScope.measure(
-                measurable: Measurable,
-                constraints: Constraints
-            ): MeasureResult {
-                val horizontal = start.roundToPx() + end.roundToPx()
-                val placeable = measurable.measure(constraints.offset(-horizontal))
-                val width = if (placeable.nonZero) {
-                    constraints.constrainWidth(placeable.width + horizontal)
-                } else {
-                    0
-                }
-                return layout(width, placeable.height) {
-                    placeable.placeRelative(start.roundToPx(), 0)
-                }
-            }
-        }
-    )
 
 private object TextFieldTransitionScope {
     @Composable
@@ -351,6 +321,8 @@ private enum class InputPhase {
 internal const val TextFieldId = "TextField"
 internal const val PlaceholderId = "Hint"
 internal const val LabelId = "Label"
+internal const val LeadingId = "Leading"
+internal const val TrailingId = "Trailing"
 
 internal const val AnimationDuration = 150
 private const val PlaceholderAnimationDuration = 83
@@ -360,3 +332,5 @@ private val IndicatorUnfocusedWidth = 1.dp
 private val IndicatorFocusedWidth = 2.dp
 internal val TextFieldPadding = 16.dp
 internal val HorizontalIconPadding = 12.dp
+
+internal val IconDefaultSizeModifier = Modifier.defaultMinSize(48.dp, 48.dp)

@@ -16,6 +16,7 @@
 
 package androidx.compose.material
 
+import androidx.compose.foundation.border
 import androidx.compose.foundation.interaction.Interaction
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Box
@@ -27,19 +28,19 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.TextFieldDefaults.MinHeight
 import androidx.compose.material.TextFieldDefaults.MinWidth
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.Stable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.drawBehind
+import androidx.compose.ui.draw.drawWithContent
+import androidx.compose.ui.geometry.Size
+import androidx.compose.ui.graphics.ClipOp
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.Path
-import androidx.compose.ui.graphics.RectangleShape
+import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.graphics.SolidColor
-import androidx.compose.ui.graphics.drawscope.Stroke
+import androidx.compose.ui.graphics.drawscope.clipRect
 import androidx.compose.ui.layout.Layout
 import androidx.compose.ui.layout.Placeable
 import androidx.compose.ui.layout.layoutId
@@ -50,6 +51,7 @@ import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.Dp
+import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.offset
@@ -115,6 +117,7 @@ import kotlin.math.roundToInt
  * [Interaction]s for this OutlinedTextField. You can create and pass in your own remembered
  * [MutableInteractionSource] if you want to observe [Interaction]s and customize the
  * appearance / behavior of this OutlinedTextField in different [Interaction]s.
+ * @param shape the shape of the text field's border
  * @param colors [TextFieldColors] that will be used to resolve color of the text and content
  * (including label, placeholder, leading and trailing icons, border) for this text field in
  * different states. See [TextFieldDefaults.outlinedTextFieldColors]
@@ -138,6 +141,7 @@ fun OutlinedTextField(
     singleLine: Boolean = false,
     maxLines: Int = Int.MAX_VALUE,
     interactionSource: MutableInteractionSource = remember { MutableInteractionSource() },
+    shape: Shape = MaterialTheme.shapes.small,
     colors: TextFieldColors = TextFieldDefaults.outlinedTextFieldColors()
 ) {
     var textFieldValueState by remember { mutableStateOf(TextFieldValue(text = value)) }
@@ -166,6 +170,7 @@ fun OutlinedTextField(
         keyboardActions = keyboardActions,
         maxLines = maxLines,
         interactionSource = interactionSource,
+        shape = shape,
         colors = colors
     )
 }
@@ -228,6 +233,7 @@ fun OutlinedTextField(
  * [Interaction]s for this OutlinedTextField. You can create and pass in your own remembered
  * [MutableInteractionSource] if you want to observe [Interaction]s and customize the
  * appearance / behavior of this OutlinedTextField in different [Interaction]s.
+ * @param shape the shape of the text field's border
  * @param colors [TextFieldColors] that will be used to resolve color of the text and content
  * (including label, placeholder, leading and trailing icons, border) for this text field in
  * different states. See [TextFieldDefaults.outlinedTextFieldColors]
@@ -251,6 +257,7 @@ fun OutlinedTextField(
     singleLine: Boolean = false,
     maxLines: Int = Int.MAX_VALUE,
     interactionSource: MutableInteractionSource = remember { MutableInteractionSource() },
+    shape: Shape = MaterialTheme.shapes.small,
     colors: TextFieldColors = TextFieldDefaults.outlinedTextFieldColors()
 ) {
     TextFieldImpl(
@@ -272,7 +279,7 @@ fun OutlinedTextField(
         keyboardActions = keyboardActions,
         maxLines = maxLines,
         interactionSource = interactionSource,
-        shape = RectangleShape,
+        shape = shape,
         colors = colors
     )
 }
@@ -300,30 +307,24 @@ internal fun OutlinedTextFieldLayout(
     labelProgress: Float,
     indicatorWidth: Dp,
     indicatorColor: Color,
-    cursorColor: Color
+    cursorColor: Color,
+    shape: Shape
 ) {
-    val outlinedBorderParams = remember {
-        OutlinedBorderParams(
-            indicatorWidth,
-            indicatorColor
-        )
-    }
-    if (indicatorColor != outlinedBorderParams.color.value ||
-        indicatorWidth != outlinedBorderParams.borderWidth.value
-    ) {
-        outlinedBorderParams.color.value = indicatorColor
-        outlinedBorderParams.borderWidth.value = indicatorWidth
-    }
-
+    val labelSize = remember { mutableStateOf(Size.Zero) }
     BasicTextField(
         value = value,
         modifier = modifier
+            .then(
+                if (decoratedLabel != null) {
+                    Modifier.padding(top = OutlinedTextFieldTopPadding)
+                } else {
+                    Modifier
+                }
+            )
             .defaultMinSize(
                 minWidth = MinWidth,
-                minHeight = MinHeight + OutlinedTextFieldTopPadding,
-            )
-            .padding(top = OutlinedTextFieldTopPadding)
-            .drawOutlinedBorder(outlinedBorderParams),
+                minHeight = MinHeight,
+            ),
         onValueChange = onValueChange,
         enabled = enabled,
         readOnly = readOnly,
@@ -345,14 +346,21 @@ internal fun OutlinedTextFieldLayout(
                 leadingColor = leadingColor,
                 trailingColor = trailingColor,
                 onLabelMeasured = {
-                    val labelWidth = it * labelProgress
-                    if (outlinedBorderParams.labelWidth.value != labelWidth) {
-                        outlinedBorderParams.labelWidth.value = labelWidth
+                    val labelWidth = it.width * labelProgress
+                    val labelHeight = it.height * labelProgress
+                    if (labelSize.value.width != labelWidth ||
+                        labelSize.value.height != labelHeight
+                    ) {
+                        labelSize.value = Size(labelWidth, labelHeight)
                     }
                 },
                 animationProgress = labelProgress,
                 placeholder = decoratedPlaceholder,
-                label = decoratedLabel
+                label = decoratedLabel,
+                shape = shape,
+                borderWidth = indicatorWidth,
+                borderColor = indicatorColor,
+                labelSize = labelSize.value
             )
         }
     )
@@ -375,12 +383,30 @@ private fun IconsWithTextFieldLayout(
     leadingColor: Color,
     trailingColor: Color,
     animationProgress: Float,
-    onLabelMeasured: (Int) -> Unit
+    onLabelMeasured: (Size) -> Unit,
+    shape: Shape,
+    borderWidth: Dp,
+    borderColor: Color,
+    labelSize: Size
 ) {
     Layout(
         content = {
+            // We use additional box here to place an outlined cutout border as a sibling after the
+            // rest of UI. This allows us to use Modifier.border to draw an outline on top of the
+            // text field. We can't use the border modifier directly on the IconsWithTextFieldLayout
+            // as we also need to do the clipping (to form the cutout) which should not affect
+            // the rest of text field UI
+            Box(
+                Modifier
+                    .layoutId("border")
+                    .outlinedBorder(shape, borderWidth, borderColor, labelSize)
+            )
+
             if (leading != null) {
-                Box(Modifier.layoutId("leading").iconPadding(start = HorizontalIconPadding)) {
+                Box(
+                    modifier = Modifier.layoutId(LeadingId).then(IconDefaultSizeModifier),
+                    contentAlignment = Alignment.Center
+                ) {
                     Decoration(
                         contentColor = leadingColor,
                         content = leading
@@ -388,19 +414,27 @@ private fun IconsWithTextFieldLayout(
                 }
             }
             if (trailing != null) {
-                Box(Modifier.layoutId("trailing").iconPadding(end = HorizontalIconPadding)) {
+                Box(
+                    modifier = Modifier.layoutId(TrailingId).then(IconDefaultSizeModifier),
+                    contentAlignment = Alignment.Center
+                ) {
                     Decoration(
                         contentColor = trailingColor,
                         content = trailing
                     )
                 }
             }
+            val paddingToIcon = TextFieldPadding - HorizontalIconPadding
+            val padding = Modifier.padding(
+                start = if (leading != null) paddingToIcon else TextFieldPadding,
+                end = if (trailing != null) paddingToIcon else TextFieldPadding
+            )
             if (placeholder != null) {
-                placeholder(Modifier.layoutId(PlaceholderId).padding(horizontal = TextFieldPadding))
+                placeholder(Modifier.layoutId(PlaceholderId).then(padding))
             }
 
             Box(
-                modifier = Modifier.layoutId(TextFieldId).padding(horizontal = TextFieldPadding),
+                modifier = Modifier.layoutId(TextFieldId).then(padding),
                 propagateMinConstraints = true
             ) {
                 textField()
@@ -418,13 +452,13 @@ private fun IconsWithTextFieldLayout(
         // measure leading icon
         val constraints =
             incomingConstraints.copy(minWidth = 0, minHeight = 0)
-        val leadingPlaceable = measurables.find { it.layoutId == "leading" }?.measure(constraints)
+        val leadingPlaceable = measurables.find { it.layoutId == LeadingId }?.measure(constraints)
         occupiedSpaceHorizontally += widthOrZero(
             leadingPlaceable
         )
 
         // measure trailing icon
-        val trailingPlaceable = measurables.find { it.layoutId == "trailing" }
+        val trailingPlaceable = measurables.find { it.layoutId == TrailingId }
             ?.measure(constraints.offset(horizontal = -occupiedSpaceHorizontally))
         occupiedSpaceHorizontally += widthOrZero(
             trailingPlaceable
@@ -438,22 +472,22 @@ private fun IconsWithTextFieldLayout(
         val labelPlaceable =
             measurables.find { it.layoutId == LabelId }?.measure(labelConstraints)
         labelPlaceable?.let {
-            onLabelMeasured(it.width)
+            onLabelMeasured(Size(it.width.toFloat(), it.height.toFloat()))
         }
 
         // measure text field
         // on top we offset either by default padding or by label's half height if its too big
         // minWidth must not be set to 0 due to how foundation TextField treats zero minWidth
         val topPadding = max(heightOrZero(labelPlaceable) / 2, bottomPadding)
-        val textContraints = incomingConstraints.offset(
+        val textConstraints = incomingConstraints.offset(
             horizontal = -occupiedSpaceHorizontally,
             vertical = -bottomPadding - topPadding
         ).copy(minHeight = 0)
         val textFieldPlaceable =
-            measurables.first { it.layoutId == TextFieldId }.measure(textContraints)
+            measurables.first { it.layoutId == TextFieldId }.measure(textConstraints)
 
         // measure placeholder
-        val placeholderConstraints = textContraints.copy(minWidth = 0)
+        val placeholderConstraints = textConstraints.copy(minWidth = 0)
         val placeholderPlaceable =
             measurables.find { it.layoutId == PlaceholderId }?.measure(placeholderConstraints)
 
@@ -476,6 +510,15 @@ private fun IconsWithTextFieldLayout(
                 incomingConstraints,
                 density
             )
+
+        val borderPlaceable = measurables.first { it.layoutId == "border" }.measure(
+            Constraints(
+                minWidth = if (width != Constraints.Infinity) width else 0,
+                maxWidth = width,
+                minHeight = if (height != Constraints.Infinity) height else 0,
+                maxHeight = height
+            )
+        )
         layout(width, height) {
             place(
                 height,
@@ -485,6 +528,7 @@ private fun IconsWithTextFieldLayout(
                 textFieldPlaceable,
                 labelPlaceable,
                 placeholderPlaceable,
+                borderPlaceable,
                 animationProgress,
                 singleLine,
                 density
@@ -564,11 +608,13 @@ private fun Placeable.PlacementScope.place(
     textFieldPlaceable: Placeable,
     labelPlaceable: Placeable?,
     placeholderPlaceable: Placeable?,
+    borderPlaceable: Placeable,
     animationProgress: Float,
     singleLine: Boolean,
     density: Float
 ) {
     val topBottomPadding = (TextFieldPadding.value * density).roundToInt()
+    val iconPadding = HorizontalIconPadding.value * density
 
     // placed center vertically and to the start edge horizontally
     leadingPlaceable?.placeRelative(
@@ -592,9 +638,14 @@ private fun Placeable.PlacementScope.place(
         }
         val positionY =
             startPositionY * (1 - animationProgress) - (it.height / 2) * animationProgress
-        val positionX = (TextFieldPadding.value * density) +
-            widthOrZero(leadingPlaceable) * (1 - animationProgress)
-        it.placeRelative(positionX.roundToInt(), positionY.roundToInt())
+        val positionX = (
+            if (leadingPlaceable == null) {
+                0f
+            } else {
+                (widthOrZero(leadingPlaceable) - iconPadding) * (1 - animationProgress)
+            }
+            ).roundToInt() + topBottomPadding
+        it.placeRelative(positionX, positionY.roundToInt())
     }
 
     // placed center vertically and after the leading icon horizontally if single line text field
@@ -615,88 +666,53 @@ private fun Placeable.PlacementScope.place(
         }
         it.placeRelative(widthOrZero(leadingPlaceable), placeholderVerticalPosition)
     }
+
+    // place border
+    borderPlaceable.place(IntOffset.Zero)
 }
 
 /**
- * A draw modifier to draw a border line in [OutlinedTextField]
+ * Draws an outlined border with label cutout
  */
-private fun Modifier.drawOutlinedBorder(
-    borderParams: OutlinedBorderParams
-): Modifier = drawBehind {
-    val padding = TextFieldPadding.value * density
-    val innerPadding = OutlinedTextFieldInnerPadding.value * density
+private fun Modifier.outlinedBorder(
+    shape: Shape,
+    borderWidth: Dp,
+    borderColor: Color,
+    labelSize: Size
+) = this
+    .outlineCutout(labelSize)
+    .border(
+        width = borderWidth,
+        color = borderColor,
+        shape = shape
+    )
 
-    val lineWidth = borderParams.borderWidth.value.value * density
-    val width: Float = size.width
-    val height: Float = size.height
-
-    val radius = borderParams.cornerRadius.value * density
-    val dx = if (radius > width / 2) width / 2 else radius
-    val dy = if (radius > height / 2) height / 2 else radius
-
-    val path = Path().apply {
-        // width and height minus corners and line width
-        val effectiveWidth: Float = width - 2 * dx - lineWidth
-        val effectiveHeight: Float = height - 2 * dy - lineWidth
-
-        // top-right corner
-        moveTo(width - lineWidth / 2, dy + lineWidth / 2)
-        relativeQuadraticBezierTo(0f, -dy, -dx, -dy)
-
-        // top line with gap
-        val diff = borderParams.labelWidth.value
-        if (diff == 0f) {
-            relativeLineTo(-effectiveWidth, 0f)
-        } else {
-            val effectivePadding = padding - innerPadding - dx - lineWidth / 2
-            val gap = diff + 2 * innerPadding
-            if (layoutDirection == LayoutDirection.Ltr) {
-                relativeLineTo(-effectiveWidth + effectivePadding + gap, 0f)
-                relativeMoveTo(-gap, 0f)
-                relativeLineTo(-effectivePadding, 0f)
-            } else {
-                relativeLineTo(-effectivePadding, 0f)
-                relativeMoveTo(-gap, 0f)
-                relativeLineTo(-effectiveWidth + gap + effectivePadding, 0f)
+private fun Modifier.outlineCutout(labelSize: Size) =
+    this.drawWithContent {
+        val labelWidth = labelSize.width
+        if (labelWidth > 0f) {
+            val innerPadding = OutlinedTextFieldInnerPadding.toPx()
+            val leftLtr = TextFieldPadding.toPx() - innerPadding
+            val rightLtr = leftLtr + labelWidth + 2 * innerPadding
+            val left = when (layoutDirection) {
+                LayoutDirection.Ltr -> leftLtr
+                LayoutDirection.Rtl -> size.width - rightLtr
             }
+            val right = when (layoutDirection) {
+                LayoutDirection.Ltr -> rightLtr
+                LayoutDirection.Rtl -> size.width - leftLtr
+            }
+            val labelHeight = labelSize.height
+            // using label height as a cutout area to make sure that no hairline artifacts are
+            // left when we clip the border
+            clipRect(left, -labelHeight / 2, right, labelHeight / 2, ClipOp.Difference) {
+                this@drawWithContent.drawContent()
+            }
+        } else {
+            this@drawWithContent.drawContent()
         }
-
-        // top-left corner and left line
-        relativeQuadraticBezierTo(-dx, 0f, -dx, dy)
-        relativeLineTo(0f, effectiveHeight)
-
-        // bottom-left corner and bottom line
-        relativeQuadraticBezierTo(0f, dy, dx, dy)
-        relativeLineTo(effectiveWidth, 0f)
-
-        // bottom-right corner and right line
-        relativeQuadraticBezierTo(dx, 0f, dx, -dy)
-        relativeLineTo(0f, -effectiveHeight)
     }
 
-    drawPath(
-        path = path,
-        color = borderParams.color.value,
-        style = Stroke(width = lineWidth)
-    )
-}
-
-/**
- * A data class that stores parameters needed for [drawOutlinedBorder] modifier
- */
-@Stable
-private class OutlinedBorderParams(
-    initialBorderWidth: Dp,
-    initialColor: Color
-) {
-    val borderWidth = mutableStateOf(initialBorderWidth)
-    val color = mutableStateOf(initialColor)
-    val cornerRadius = OutlinedTextFieldCornerRadius
-    val labelWidth = mutableStateOf(0f)
-}
-
-// TODO(b/158077409) support shape in OutlinedTextField
-private val OutlinedTextFieldCornerRadius = 4.dp
 private val OutlinedTextFieldInnerPadding = 4.dp
 
 /*

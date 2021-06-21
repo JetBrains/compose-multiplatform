@@ -18,8 +18,10 @@ package androidx.compose.foundation.lazy
 
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.size
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
@@ -205,6 +207,33 @@ class LazyCustomKeysTest {
     }
 
     @Test
+    fun updatingTheDataSetIsCorrectlyApplied() {
+        val state = mutableStateOf(emptyList<Int>())
+
+        rule.setContent {
+            LaunchedEffect(Unit) {
+                state.value = listOf(4, 1, 3)
+            }
+
+            val list = state.value
+
+            LazyColumn(Modifier.fillMaxSize()) {
+                items(list, key = { it }) {
+                    Item(it.toString())
+                }
+            }
+        }
+
+        assertItems("4", "1", "3")
+
+        rule.runOnIdle {
+            state.value = listOf(2, 4, 6, 1, 3, 5)
+        }
+
+        assertItems("2", "4", "6", "1", "3", "5")
+    }
+
+    @Test
     fun reordering_usingMutableStateListOf() {
         val list = mutableStateListOf(MyClass(0), MyClass(1), MyClass(2))
 
@@ -239,7 +268,7 @@ class LazyCustomKeysTest {
 
         rule.runOnIdle {
             assertThat(
-                state.layoutInfo.visibleItemsInfo.map { it.key }
+                state.visibleKeys
             ).isEqualTo(listOf(0, 1, 2))
         }
     }
@@ -264,8 +293,133 @@ class LazyCustomKeysTest {
 
         rule.runOnIdle {
             assertThat(
-                state.layoutInfo.visibleItemsInfo.map { it.key }
+                state.visibleKeys
             ).isEqualTo(listOf(0, 2, 1))
+        }
+    }
+
+    @Test
+    fun addingItemsBeforeWithoutKeysIsMaintainingTheIndex() {
+        var list by mutableStateOf((10..15).toList())
+        lateinit var state: LazyListState
+
+        rule.setContent {
+            state = rememberLazyListState()
+            LazyColumn(Modifier.size(itemSize * 2.5f), state) {
+                items(list) {
+                    Item(remember { "$it" })
+                }
+            }
+        }
+
+        rule.runOnIdle {
+            list = (0..15).toList()
+        }
+
+        rule.runOnIdle {
+            assertThat(state.firstVisibleItemIndex).isEqualTo(0)
+        }
+    }
+
+    @Test
+    fun addingItemsBeforeKeepingThisItemFirst() {
+        var list by mutableStateOf((10..15).toList())
+        lateinit var state: LazyListState
+
+        rule.setContent {
+            state = rememberLazyListState()
+            LazyColumn(Modifier.size(itemSize * 2.5f), state) {
+                items(list, key = { it }) {
+                    Item(remember { "$it" })
+                }
+            }
+        }
+
+        rule.runOnIdle {
+            list = (0..15).toList()
+        }
+
+        rule.runOnIdle {
+            assertThat(state.firstVisibleItemIndex).isEqualTo(10)
+            assertThat(
+                state.visibleKeys
+            ).isEqualTo(listOf(10, 11, 12))
+        }
+    }
+
+    @Test
+    fun addingItemsRightAfterKeepingThisItemFirst() {
+        var list by mutableStateOf((0..5).toList() + (10..15).toList())
+        lateinit var state: LazyListState
+
+        rule.setContent {
+            state = rememberLazyListState(5)
+            LazyColumn(Modifier.size(itemSize * 2.5f), state) {
+                items(list, key = { it }) {
+                    Item(remember { "$it" })
+                }
+            }
+        }
+
+        rule.runOnIdle {
+            list = (0..15).toList()
+        }
+
+        rule.runOnIdle {
+            assertThat(state.firstVisibleItemIndex).isEqualTo(5)
+            assertThat(
+                state.visibleKeys
+            ).isEqualTo(listOf(5, 6, 7))
+        }
+    }
+
+    @Test
+    fun addingItemsBeforeWhileCurrentItemIsNotInTheBeginning() {
+        var list by mutableStateOf((10..30).toList())
+        lateinit var state: LazyListState
+
+        rule.setContent {
+            state = rememberLazyListState(10) // key 20 is the first item
+            LazyColumn(Modifier.size(itemSize * 2.5f), state) {
+                items(list, key = { it }) {
+                    Item(remember { "$it" })
+                }
+            }
+        }
+
+        rule.runOnIdle {
+            list = (0..30).toList()
+        }
+
+        rule.runOnIdle {
+            assertThat(state.firstVisibleItemIndex).isEqualTo(20)
+            assertThat(
+                state.visibleKeys
+            ).isEqualTo(listOf(20, 21, 22))
+        }
+    }
+
+    @Test
+    fun removingTheCurrentItemMaintainsTheIndex() {
+        var list by mutableStateOf((0..20).toList())
+        lateinit var state: LazyListState
+
+        rule.setContent {
+            state = rememberLazyListState(5)
+            LazyColumn(Modifier.size(itemSize * 2.5f), state) {
+                items(list, key = { it }) {
+                    Item(remember { "$it" })
+                }
+            }
+        }
+
+        rule.runOnIdle {
+            list = (0..20) - 5
+        }
+
+        rule.runOnIdle {
+            assertThat(state.firstVisibleItemIndex).isEqualTo(5)
+            assertThat(state.visibleKeys).isEqualTo(listOf(6, 7, 8))
         }
     }
 
@@ -304,3 +458,5 @@ class LazyCustomKeysTest {
 
     private class MyClass(val id: Int)
 }
+
+val LazyListState.visibleKeys: List<Any> get() = layoutInfo.visibleItemsInfo.map { it.key }

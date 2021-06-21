@@ -24,6 +24,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalLayoutDirection
@@ -42,6 +43,7 @@ import androidx.compose.ui.test.centerLeft
 import androidx.compose.ui.test.click
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onChildAt
+import androidx.compose.ui.test.onNodeWithContentDescription
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onParent
 import androidx.compose.ui.test.performClick
@@ -230,19 +232,41 @@ class DrawerTest {
     @Test
     @SmallTest
     fun bottomDrawer_hasPaneTitle() {
+        lateinit var navigationMenu: String
         rule.setMaterialContent {
             BottomDrawer(
-                drawerState = rememberBottomDrawerState(BottomDrawerValue.Closed),
+                drawerState = rememberBottomDrawerState(BottomDrawerValue.Open),
                 drawerContent = {
                     Box(Modifier.fillMaxSize().testTag(bottomDrawerTag))
                 },
                 content = {}
             )
+            navigationMenu = getString(Strings.NavigationMenu)
         }
 
         rule.onNodeWithTag(bottomDrawerTag, useUnmergedTree = true)
             .onParent()
-            .assert(SemanticsMatcher.keyIsDefined(SemanticsProperties.PaneTitle))
+            .assert(SemanticsMatcher.expectValue(SemanticsProperties.PaneTitle, navigationMenu))
+    }
+
+    @Test
+    @SmallTest
+    fun modalDrawer_hasPaneTitle() {
+        lateinit var navigationMenu: String
+        rule.setMaterialContent {
+            ModalDrawer(
+                drawerState = rememberDrawerState(DrawerValue.Open),
+                drawerContent = {
+                    Box(Modifier.fillMaxSize().testTag("modalDrawerTag"))
+                },
+                content = {}
+            )
+            navigationMenu = getString(Strings.NavigationMenu)
+        }
+
+        rule.onNodeWithTag("modalDrawerTag", useUnmergedTree = true)
+            .onParent()
+            .assert(SemanticsMatcher.expectValue(SemanticsProperties.PaneTitle, navigationMenu))
     }
 
     @Test
@@ -481,6 +505,51 @@ class DrawerTest {
 
     @Test
     @LargeTest
+    fun modalDrawer_confirmStateChangeRespect() {
+        lateinit var drawerState: DrawerState
+        rule.setMaterialContent {
+            drawerState = rememberDrawerState(
+                DrawerValue.Open,
+                confirmStateChange = {
+                    it != DrawerValue.Closed
+                }
+            )
+            Box(Modifier.testTag("Drawer")) {
+                ModalDrawer(
+                    drawerState = drawerState,
+                    drawerContent = {
+                        Box(
+                            Modifier.fillMaxSize()
+                                .testTag("content")
+                                .background(color = Color.Magenta)
+                        )
+                    },
+                    content = {
+                        Box(Modifier.fillMaxSize().background(color = Color.Red))
+                    }
+                )
+            }
+        }
+
+        rule.onNodeWithTag("Drawer")
+            .performGesture { swipeLeft() }
+
+        // still open
+        rule.runOnIdle {
+            assertThat(drawerState.currentValue).isEqualTo(DrawerValue.Open)
+        }
+
+        rule.onNodeWithTag("content", useUnmergedTree = true)
+            .onParent()
+            .performSemanticsAction(SemanticsActions.Dismiss)
+
+        rule.runOnIdle {
+            assertThat(drawerState.currentValue).isEqualTo(DrawerValue.Open)
+        }
+    }
+
+    @Test
+    @LargeTest
     fun modalDrawer_openBySwipe_rtl() {
         lateinit var drawerState: DrawerState
         rule.setMaterialContent {
@@ -685,6 +754,127 @@ class DrawerTest {
 
         rule.runOnIdle {
             assertThat(drawerState.currentValue).isEqualTo(BottomDrawerValue.Closed)
+        }
+    }
+
+    @Test
+    fun bottomDrawer_scrim_doesNotClickWhenTransparent() {
+        val topTag = "BottomDrawer"
+        val scrimColor = mutableStateOf(Color.Red)
+        lateinit var closeDrawer: String
+        rule.setMaterialContent {
+            BottomDrawer(
+                modifier = Modifier.testTag(topTag),
+                scrimColor = scrimColor.value,
+                drawerState = rememberBottomDrawerState(BottomDrawerValue.Open),
+                drawerContent = {
+                    Box(Modifier.height(shortBottomDrawerHeight).testTag(bottomDrawerTag))
+                },
+                content = {
+                    Box(Modifier.fillMaxSize().testTag("body"))
+                }
+            )
+            closeDrawer = getString(Strings.CloseDrawer)
+        }
+
+        val height = rule.rootHeight()
+        val topWhenOpened = height - shortBottomDrawerHeight
+
+        // The drawer should be opened
+        rule.onNodeWithTag(bottomDrawerTag).assertTopPositionInRootIsEqualTo(topWhenOpened)
+
+        var topNode = rule.onNodeWithTag(topTag).fetchSemanticsNode()
+        assertEquals(3, topNode.children.size)
+
+        rule.onNodeWithContentDescription(closeDrawer)
+            .assertHasClickAction()
+
+        rule.runOnIdle {
+            scrimColor.value = Color.Unspecified
+        }
+        rule.waitForIdle()
+
+        topNode = rule.onNodeWithTag(topTag).fetchSemanticsNode()
+        // should be 2 children now
+        assertEquals(2, topNode.children.size)
+    }
+
+    @Test
+    fun bottomDrawer_scrim_disabledWhenGesturesDisabled() {
+        val topTag = "BottomDrawer"
+        rule.setMaterialContent {
+            BottomDrawer(
+                modifier = Modifier.testTag(topTag),
+                scrimColor = Color.Red,
+                drawerState = rememberBottomDrawerState(BottomDrawerValue.Open),
+                gesturesEnabled = false,
+                drawerContent = {
+                    Box(Modifier.height(shortBottomDrawerHeight).testTag(bottomDrawerTag))
+                },
+                content = {
+                    Box(Modifier.fillMaxSize().testTag("body"))
+                }
+            )
+        }
+
+        val height = rule.rootHeight()
+        val topWhenOpened = height - shortBottomDrawerHeight
+
+        // The drawer should be opened
+        rule.onNodeWithTag(bottomDrawerTag).assertTopPositionInRootIsEqualTo(topWhenOpened)
+
+        rule.onNodeWithTag(topTag)
+            .onChildAt(1)
+            .assertHasClickAction()
+            .performClick()
+        // still open since the scrim should be disabled
+        rule.onNodeWithTag(bottomDrawerTag).assertTopPositionInRootIsEqualTo(topWhenOpened)
+    }
+
+    @Test
+    @LargeTest
+    fun bottomDrawer_respectsConfirmStateChange(): Unit = runBlocking(AutoTestFrameClock()) {
+        val contentTag = "contentTestTag"
+        lateinit var drawerState: BottomDrawerState
+        rule.setMaterialContent {
+            drawerState = rememberBottomDrawerState(
+                BottomDrawerValue.Expanded,
+                confirmStateChange = {
+                    it != BottomDrawerValue.Closed
+                }
+            )
+            BottomDrawer(
+                drawerState = drawerState,
+                drawerContent = {
+                    Box(
+                        Modifier.height(shortBottomDrawerHeight).testTag(bottomDrawerTag)
+                    )
+                },
+                content = { Box(Modifier.fillMaxSize().testTag(contentTag)) }
+            )
+        }
+
+        rule.runOnIdle {
+            assertThat(drawerState.currentValue).isEqualTo(BottomDrawerValue.Expanded)
+        }
+
+        rule.onNodeWithTag(contentTag)
+            .performGesture { swipeDown() }
+
+        advanceClock()
+
+        rule.runOnIdle {
+            assertThat(drawerState.currentValue).isEqualTo(BottomDrawerValue.Expanded)
+        }
+
+        rule.onNodeWithTag(bottomDrawerTag, useUnmergedTree = true)
+            .onParent()
+            .performSemanticsAction(SemanticsActions.Dismiss)
+
+        advanceClock()
+
+        rule.runOnIdle {
+            assertThat(drawerState.currentValue).isEqualTo(BottomDrawerValue.Expanded)
         }
     }
 
@@ -932,6 +1122,7 @@ class DrawerTest {
     @Test
     fun modalDrawer_scrimNode_reportToSemanticsWhenOpen_notReportToSemanticsWhenClosed() {
         val topTag = "ModalDrawer"
+        lateinit var closeDrawer: String
         rule.setMaterialContent {
             ModalDrawer(
                 modifier = Modifier.testTag(topTag),
@@ -943,6 +1134,7 @@ class DrawerTest {
                     Box(Modifier.fillMaxSize().testTag("body"))
                 }
             )
+            closeDrawer = getString(Strings.CloseDrawer)
         }
 
         // The drawer should be opened
@@ -950,8 +1142,7 @@ class DrawerTest {
 
         var topNode = rule.onNodeWithTag(topTag).fetchSemanticsNode()
         assertEquals(3, topNode.children.size)
-        rule.onNodeWithTag(topTag)
-            .onChildAt(1)
+        rule.onNodeWithContentDescription(closeDrawer)
             .assertHasClickAction()
             .performSemanticsAction(SemanticsActions.OnClick)
 

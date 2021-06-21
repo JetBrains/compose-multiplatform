@@ -61,7 +61,7 @@ class LazyColumnActivity : ComponentActivity() {
     }
 }
 
-private fun ComponentActivity.launchIdlenessTracking() {
+internal fun ComponentActivity.launchIdlenessTracking() {
     val contentView: View = findViewById(android.R.id.content)
     val callback: Choreographer.FrameCallback = object : Choreographer.FrameCallback {
         override fun doFrame(frameTimeNanos: Long) {

@@ -16,6 +16,7 @@
 
 package androidx.compose.ui.layout
 
+import android.annotation.SuppressLint
 import android.os.Build
 import android.widget.FrameLayout
 import androidx.compose.foundation.layout.Box
@@ -26,16 +27,22 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.ReusableContent
+import androidx.compose.runtime.compositionLocalOf
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.background
+import androidx.compose.ui.composed
 import androidx.compose.ui.draw.assertColor
+import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.asAndroidBitmap
-import androidx.compose.ui.layout.RootMeasurePolicy.measure
 import androidx.compose.ui.platform.AndroidOwnerExtraAssertionsRule
 import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.platform.LocalDensity
@@ -972,6 +979,151 @@ class SubcomposeLayoutTest {
         )
     }
 
+    @SuppressLint("RememberReturnType")
+    @Test
+    fun reusedCompositionResetsRememberedObject() {
+        val slotState = mutableStateOf(0)
+        var lastRememberedSlot: Any? = null
+        var lastRememberedComposedModifierSlot: Any? = null
+
+        rule.setContent {
+            SubcomposeLayout(remember { SubcomposeLayoutState(1) }) { _ ->
+                val slot = slotState.value
+                subcompose(slot) {
+                    ReusableContent(slot) {
+                        remember {
+                            lastRememberedSlot = slot
+                        }
+                        Box(
+                            Modifier.composed {
+                                remember {
+                                    lastRememberedComposedModifierSlot = slot
+                                }
+                                Modifier
+                            }
+                        )
+                    }
+                }
+                layout(10, 10) {}
+            }
+        }
+
+        rule.runOnIdle {
+            assertThat(lastRememberedSlot).isEqualTo(0)
+            assertThat(lastRememberedComposedModifierSlot).isEqualTo(0)
+            slotState.value = 1
+        }
+
+        rule.runOnIdle {
+            assertThat(lastRememberedSlot).isEqualTo(1)
+            assertThat(lastRememberedComposedModifierSlot).isEqualTo(1)
+            slotState.value = 2
+        }
+
+        rule.runOnIdle {
+            assertThat(lastRememberedSlot).isEqualTo(2)
+            assertThat(lastRememberedComposedModifierSlot).isEqualTo(2)
+        }
+    }
+
+    @Test
+    fun subcomposeLayoutInsideLayoutUsingAlignmentsIsNotCrashing() {
+        // fix for regression from b/189965769
+        val emit = mutableStateOf(false)
+        rule.setContent {
+            LayoutUsingAlignments {
+                Box {
+                    if (emit.value) {
+                        SubcomposeLayout {
+                            subcompose(Unit) {}
+                            layout(10, 10) {}
+                        }
+                    }
+                }
+            }
+        }
+
+        rule.runOnIdle {
+            emit.value = true
+        }
+
+        // awaits that the change is applied and no crash happened
+        rule.runOnIdle { }
+    }
+
+    @Test
+    fun compositionLocalChangeInMainCompositionRecomposesSubcomposition() {
+        var flag by mutableStateOf(true)
+        val compositionLocal = compositionLocalOf<Boolean> { error("") }
+        var subcomposionValue: Boolean? = null
+        val subcomposeLambda = @Composable {
+            // makes sure the recomposition happens only once after the change
+            assertThat(compositionLocal.current).isNotEqualTo(subcomposionValue)
+            subcomposionValue = compositionLocal.current
+        }
+
+        rule.setContent {
+            CompositionLocalProvider(compositionLocal provides flag) {
+                val mainCompositionValue = flag
+                SubcomposeLayout(
+                    Modifier.drawBehind {
+                        // makes sure we never draw inconsistent states
+                        assertThat(subcomposionValue).isEqualTo(mainCompositionValue)
+                    }
+                ) {
+                    subcompose(Unit, subcomposeLambda)
+                    layout(100, 100) {}
+                }
+            }
+        }
+
+        rule.runOnIdle {
+            assertThat(subcomposionValue).isTrue()
+            flag = false
+        }
+
+        rule.runOnIdle {
+            assertThat(subcomposionValue).isFalse()
+        }
+    }
+
+    @Test
+    fun derivedStateChangeInMainCompositionRecomposesSubcomposition() {
+        var flag by mutableStateOf(true)
+        var subcomposionValue: Boolean? = null
+
+        rule.setContent {
+            val updatedState = rememberUpdatedState(flag)
+            val derivedState = remember { derivedStateOf { updatedState.value } }
+            val subcomposeLambda = remember<@Composable () -> Unit> {
+                {
+                    // makes sure the recomposition happens only once after the change
+                    assertThat(derivedState.value).isNotEqualTo(subcomposionValue)
+                    subcomposionValue = derivedState.value
+                }
+            }
+
+            SubcomposeLayout(
+                Modifier.drawBehind {
+                    // makes sure we never draw inconsistent states
+                    assertThat(subcomposionValue).isEqualTo(updatedState.value)
+                }
+            ) {
+                subcompose(Unit, subcomposeLambda)
+                layout(100, 100) {}
+            }
+        }
+
+        rule.runOnIdle {
+            assertThat(subcomposionValue).isTrue()
+            flag = false
+        }
+
+        rule.runOnIdle {
+            assertThat(subcomposionValue).isFalse()
+        }
+    }
+
     private fun composeItems(
         state: SubcomposeLayoutState,
         items: MutableState<List<Int>>
@@ -1009,4 +1161,15 @@ class SubcomposeLayoutTest {
 
 fun ImageBitmap.assertCenterPixelColor(expectedColor: Color) {
     asAndroidBitmap().assertColor(expectedColor, width / 2, height / 2)
+}
+
+@Composable
+private fun LayoutUsingAlignments(content: @Composable () -> Unit) {
+    Layout(content) { measurables, constraints ->
+        val placeable = measurables.first().measure(constraints)
+        placeable[FirstBaseline]
+        layout(placeable.width, placeable.height) {
+            placeable.place(0, 0)
+        }
+    }
 }

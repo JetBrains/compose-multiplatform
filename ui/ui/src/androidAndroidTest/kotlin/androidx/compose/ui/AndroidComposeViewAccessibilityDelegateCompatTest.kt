@@ -23,13 +23,13 @@ import android.view.ViewGroup
 import android.view.accessibility.AccessibilityEvent
 import android.view.accessibility.AccessibilityNodeInfo
 import android.widget.FrameLayout
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.size
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.geometry.Offset
+import androidx.compose.runtime.snapshots.Snapshot
+import androidx.compose.runtime.structuralEqualityPolicy
 import androidx.compose.ui.geometry.Rect
+import androidx.compose.ui.graphics.toAndroidRect
 import androidx.compose.ui.node.InnerPlaceable
 import androidx.compose.ui.node.LayoutNode
 import androidx.compose.ui.platform.AndroidComposeView
@@ -37,7 +37,6 @@ import androidx.compose.ui.platform.AndroidComposeViewAccessibilityDelegateCompa
 import androidx.compose.ui.platform.LocalClipboardManager
 import androidx.compose.ui.platform.SemanticsNodeWithAdjustedBounds
 import androidx.compose.ui.platform.getAllUncoveredSemanticsNodesToMap
-import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.semantics.CustomAccessibilityAction
 import androidx.compose.ui.semantics.LiveRegionMode
 import androidx.compose.ui.semantics.ProgressBarRangeInfo
@@ -49,6 +48,7 @@ import androidx.compose.ui.semantics.SemanticsOwner
 import androidx.compose.ui.semantics.SemanticsPropertyReceiver
 import androidx.compose.ui.semantics.SemanticsWrapper
 import androidx.compose.ui.semantics.collapse
+import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.copyText
 import androidx.compose.ui.semantics.customActions
 import androidx.compose.ui.semantics.cutText
@@ -75,12 +75,11 @@ import androidx.compose.ui.semantics.textSelectionRange
 import androidx.compose.ui.semantics.verticalScrollAxisRange
 import androidx.compose.ui.test.TestActivity
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
-import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.TextRange
-import androidx.compose.ui.unit.dp
 import androidx.core.view.ViewCompat
 import androidx.core.view.accessibility.AccessibilityNodeInfoCompat
+import androidx.core.view.accessibility.AccessibilityNodeProviderCompat
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.MediumTest
 import androidx.test.platform.app.InstrumentationRegistry
@@ -431,7 +430,7 @@ class AndroidComposeViewAccessibilityDelegateCompatTest {
     }
 
     @Test
-    fun testPopulateAccessibilityNodeInfoProperties_EditText() {
+    fun testPopulateAccessibilityNodeInfoProperties_textField() {
         val setSelectionActionLabel = "setSelection"
         val setTextActionLabel = "setText"
         val text = "hello"
@@ -481,6 +480,26 @@ class AndroidComposeViewAccessibilityDelegateCompatTest {
                     .ACTION_PREVIOUS_AT_MOVEMENT_GRANULARITY
             )
         )
+        if (Build.VERSION.SDK_INT >= 26) {
+            assertEquals(
+                listOf(AccessibilityNodeInfo.EXTRA_DATA_TEXT_CHARACTER_LOCATION_KEY),
+                info.unwrap().availableExtraData
+            )
+        }
+    }
+
+    @Test
+    fun testMovementGranularities_textField_focused() {
+        val semanticsNode = createSemanticsNodeWithProperties(1, true) {
+            this.text = AnnotatedString("text")
+            this.textSelectionRange = TextRange(1)
+            this.focused = true
+            getTextLayoutResult { true }
+            setText { true }
+            setSelection { _, _, _ -> true }
+        }
+        accessibilityDelegate.populateAccessibilityNodeInfoProperties(1, info, semanticsNode)
+
         assertEquals(
             AccessibilityNodeInfoCompat.MOVEMENT_GRANULARITY_CHARACTER or
                 AccessibilityNodeInfoCompat.MOVEMENT_GRANULARITY_WORD or
@@ -489,12 +508,25 @@ class AndroidComposeViewAccessibilityDelegateCompatTest {
                 AccessibilityNodeInfoCompat.MOVEMENT_GRANULARITY_PAGE,
             info.movementGranularities
         )
-        if (Build.VERSION.SDK_INT >= 26) {
-            assertEquals(
-                listOf(AccessibilityNodeInfo.EXTRA_DATA_TEXT_CHARACTER_LOCATION_KEY),
-                info.unwrap().availableExtraData
-            )
+    }
+
+    @Test
+    fun testMovementGranularities_textField_notFocused() {
+        val semanticsNode = createSemanticsNodeWithProperties(1, true) {
+            this.text = AnnotatedString("text")
+            this.textSelectionRange = TextRange(1)
+            getTextLayoutResult { true }
+            setText { true }
+            setSelection { _, _, _ -> true }
         }
+        accessibilityDelegate.populateAccessibilityNodeInfoProperties(1, info, semanticsNode)
+
+        assertEquals(
+            AccessibilityNodeInfoCompat.MOVEMENT_GRANULARITY_CHARACTER or
+                AccessibilityNodeInfoCompat.MOVEMENT_GRANULARITY_WORD or
+                AccessibilityNodeInfoCompat.MOVEMENT_GRANULARITY_PARAGRAPH,
+            info.movementGranularities
+        )
     }
 
     @Test
@@ -596,55 +628,56 @@ class AndroidComposeViewAccessibilityDelegateCompatTest {
     }
 
     @Test
-    fun notSendScrollEvent_whenOnlyScrollAxisRangeMaxValueChanges() {
-        val oldSemanticsNode = createSemanticsNodeWithProperties(1, true) {
-            this.verticalScrollAxisRange = ScrollAxisRange({ 0f }, { 0f }, false)
+    fun sendScrollEvent_byStateObservation() {
+        var scrollValue by mutableStateOf(0f, structuralEqualityPolicy())
+        var scrollMaxValue by mutableStateOf(100f, structuralEqualityPolicy())
+
+        val semanticsNode = createSemanticsNodeWithProperties(1, false) {
+            verticalScrollAxisRange = ScrollAxisRange({ scrollValue }, { scrollMaxValue })
         }
+
         accessibilityDelegate.previousSemanticsNodes[1] =
             AndroidComposeViewAccessibilityDelegateCompat.SemanticsNodeCopy(
-                oldSemanticsNode,
+                semanticsNode,
                 mapOf()
             )
         val newNodes = mutableMapOf<Int, SemanticsNodeWithAdjustedBounds>()
-        newNodes[1] = createSemanticsNodeWithAdjustedBoundsWithProperties(1, true) {
-            this.verticalScrollAxisRange = ScrollAxisRange({ 0f }, { 5f }, false)
-        }
-        accessibilityDelegate.sendSemanticsPropertyChangeEvents(newNodes)
-
-        verify(container, never()).requestSendAccessibilityEvent(
-            eq(androidComposeView),
-            argThat(
-                ArgumentMatcher {
-                    it.eventType == AccessibilityEvent.TYPE_VIEW_SCROLLED
-                }
-            )
+        newNodes[1] = SemanticsNodeWithAdjustedBounds(
+            semanticsNode,
+            android.graphics.Rect()
         )
-    }
 
-    @Test
-    fun sendScrollEvent_whenScrollAxisRangeValueChanges() {
-        val oldSemanticsNode = createSemanticsNodeWithProperties(2, false) {
-            this.verticalScrollAxisRange = ScrollAxisRange({ 0f }, { 5f }, false)
+        try {
+            accessibilityDelegate.view.snapshotObserver.startObserving()
+
+            accessibilityDelegate.sendSemanticsPropertyChangeEvents(newNodes)
+
+            Snapshot.notifyObjectsInitialized()
+            scrollValue = 1f
+            Snapshot.sendApplyNotifications()
+        } finally {
+            accessibilityDelegate.view.snapshotObserver.stopObserving()
         }
-        accessibilityDelegate.previousSemanticsNodes[2] =
-            AndroidComposeViewAccessibilityDelegateCompat.SemanticsNodeCopy(
-                oldSemanticsNode,
-                mapOf()
-            )
-        val newNodes = mutableMapOf<Int, SemanticsNodeWithAdjustedBounds>()
-        newNodes[2] = createSemanticsNodeWithAdjustedBoundsWithProperties(2, false) {
-            this.verticalScrollAxisRange = ScrollAxisRange({ 2f }, { 5f }, false)
-        }
-        accessibilityDelegate.sendSemanticsPropertyChangeEvents(newNodes)
 
         verify(container, times(1)).requestSendAccessibilityEvent(
             eq(androidComposeView),
             argThat(
                 ArgumentMatcher {
-                    it.eventType == AccessibilityEvent.TYPE_VIEW_SCROLLED && it.scrollY == 2 &&
-                        it.maxScrollY == 5 &&
+                    it.eventType == AccessibilityEvent.TYPE_WINDOW_CONTENT_CHANGED &&
+                        it.contentChangeTypes == AccessibilityEvent.CONTENT_CHANGE_TYPE_SUBTREE
+                }
+            )
+        )
+
+        verify(container, times(1)).requestSendAccessibilityEvent(
+            eq(androidComposeView),
+            argThat(
+                ArgumentMatcher {
+                    it.eventType == AccessibilityEvent.TYPE_VIEW_SCROLLED &&
+                        it.scrollY == 1 &&
+                        it.maxScrollY == 100 &&
                         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
-                            it.scrollDeltaY == 2
+                            it.scrollDeltaY == 1
                         } else {
                             true
                         }
@@ -845,29 +878,7 @@ class AndroidComposeViewAccessibilityDelegateCompatTest {
     }
 
     @Test
-    fun testSemanticsNodePositionAndBounds_doesNotThrow_whenLayoutNodeNotAttached() {
-        var emitNode by mutableStateOf(true)
-        rule.setContent {
-            if (emitNode) {
-                Box(Modifier.size(100.dp).testTag("tag"))
-            }
-        }
-
-        val semanticNode = rule.onNodeWithTag("tag").fetchSemanticsNode()
-        rule.runOnIdle {
-            emitNode = false
-        }
-
-        rule.runOnIdle {
-            assertEquals(Offset.Zero, semanticNode.positionInRoot)
-            assertEquals(Offset.Zero, semanticNode.positionInWindow)
-            assertEquals(Rect.Zero, semanticNode.boundsInRoot)
-            assertEquals(Rect.Zero, semanticNode.boundsInWindow)
-        }
-    }
-
-    @Test
-    fun testNotPlacedNodesAreNotIncluded() {
+    fun testUncoveredNodes_notPlacedNodes_notIncluded() {
         val nodes = SemanticsOwner(
             LayoutNode().also {
                 it.modifier = SemanticsModifierCore(
@@ -879,6 +890,34 @@ class AndroidComposeViewAccessibilityDelegateCompatTest {
             }
         ).getAllUncoveredSemanticsNodesToMap()
         assertEquals(0, nodes.size)
+    }
+
+    @Test
+    fun testUncoveredNodes_zeroBoundsRoot_included() {
+        val nodes = SemanticsOwner(androidComposeView.root).getAllUncoveredSemanticsNodesToMap()
+
+        assertEquals(1, nodes.size)
+        assertEquals(AccessibilityNodeProviderCompat.HOST_VIEW_ID, nodes.keys.first())
+        assertEquals(
+            Rect.Zero.toAndroidRect(),
+            nodes[AccessibilityNodeProviderCompat.HOST_VIEW_ID]!!.adjustedBounds
+        )
+    }
+
+    @Test
+    fun testContentDescriptionCastSuccess() {
+        val oldSemanticsNode = createSemanticsNodeWithProperties(1, true) {
+        }
+        accessibilityDelegate.previousSemanticsNodes[1] =
+            AndroidComposeViewAccessibilityDelegateCompat.SemanticsNodeCopy(
+                oldSemanticsNode,
+                mapOf()
+            )
+        val newNodes = mutableMapOf<Int, SemanticsNodeWithAdjustedBounds>()
+        newNodes[1] = createSemanticsNodeWithAdjustedBoundsWithProperties(1, true) {
+            this.contentDescription = "Hello" // To trigger content description casting
+        }
+        accessibilityDelegate.sendSemanticsPropertyChangeEvents(newNodes)
     }
 
     private fun createSemanticsNodeWithProperties(

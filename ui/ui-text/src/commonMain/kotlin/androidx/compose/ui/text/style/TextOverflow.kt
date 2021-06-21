@@ -17,37 +17,50 @@
 package androidx.compose.ui.text.style
 
 /** How overflowing text should be handled. */
-enum class TextOverflow {
-    /**
-     * Clip the overflowing text to fix its container.
-     * @sample androidx.compose.ui.text.samples.TextOverflowClipSample
-     */
-    Clip,
+@Suppress("INLINE_CLASS_DEPRECATED")
+inline class TextOverflow internal constructor(internal val value: Int) {
 
-    /**
-     * Use an ellipsis to indicate that the text has overflowed.
-     * @sample androidx.compose.ui.text.samples.TextOverflowEllipsisSample
-     */
-    Ellipsis,
+    override fun toString(): String {
+        return when (this) {
+            Clip -> "Clip"
+            Ellipsis -> "Ellipsis"
+            Visible -> "Visible"
+            else -> "Invalid"
+        }
+    }
 
-    /**
-     * Display all text, even if there is not enough space in the specified bounds.
-     * When overflow is visible, text may be rendered outside the bounds of the composable
-     * displaying the text. This ensures that all text is displayed to the user, and is typically
-     * the right choice for most text display. It does mean that the text may visually occupy a
-     * region larger than the bounds of it's composable. This can lead to situations where text
-     * displays outside the bounds of the background and clickable on a Text composable with a
-     * fixed height and width.
-     *
-     * @sample androidx.compose.ui.text.samples.TextOverflowVisibleFixedSizeSample
-     *
-     * To make the background and click region expand to match the size of the text, allow it to
-     * expand vertically/horizontally using `Modifier.heightIn`/`Modifier.widthIn` or similar.
-     *
-     * @sample androidx.compose.ui.text.samples.TextOverflowVisibleMinHeightSample
-     *
-     * Note: text that expands past its bounds using `Visible` may be clipped by other modifiers
-     * such as `Modifier.clipToBounds`.
-     */
-    Visible
+    companion object {
+        /**
+         * Clip the overflowing text to fix its container.
+         * @sample androidx.compose.ui.text.samples.TextOverflowClipSample
+         */
+        val Clip = TextOverflow(1)
+
+        /**
+         * Use an ellipsis to indicate that the text has overflowed.
+         * @sample androidx.compose.ui.text.samples.TextOverflowEllipsisSample
+         */
+        val Ellipsis = TextOverflow(2)
+
+        /**
+         * Display all text, even if there is not enough space in the specified bounds.
+         * When overflow is visible, text may be rendered outside the bounds of the composable
+         * displaying the text. This ensures that all text is displayed to the user, and is typically
+         * the right choice for most text display. It does mean that the text may visually occupy a
+         * region larger than the bounds of it's composable. This can lead to situations where text
+         * displays outside the bounds of the background and clickable on a Text composable with a
+         * fixed height and width.
+         *
+         * @sample androidx.compose.ui.text.samples.TextOverflowVisibleFixedSizeSample
+         *
+         * To make the background and click region expand to match the size of the text, allow it to
+         * expand vertically/horizontally using `Modifier.heightIn`/`Modifier.widthIn` or similar.
+         *
+         * @sample androidx.compose.ui.text.samples.TextOverflowVisibleMinHeightSample
+         *
+         * Note: text that expands past its bounds using `Visible` may be clipped by other modifiers
+         * such as `Modifier.clipToBounds`.
+         */
+        val Visible = TextOverflow(3)
+    }
 }

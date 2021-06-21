@@ -18,6 +18,7 @@ package androidx.compose.ui.inspection.inspector
 
 import android.util.Log
 import android.view.View
+import androidx.annotation.RequiresApi
 import androidx.compose.runtime.internal.ComposableLambda
 import androidx.compose.ui.AbsoluteAlignment
 import androidx.compose.ui.Modifier
@@ -64,6 +65,7 @@ private val reflectionScope: ReflectionScope = ReflectionScope()
  *
  * Each parameter value is converted to a user readable value.
  */
+@RequiresApi(29)
 internal class ParameterFactory(private val inlineClassConverter: InlineClassConverter) {
     /**
      * A map from known values to a user readable string representation.
@@ -190,9 +192,9 @@ internal class ParameterFactory(private val inlineClassConverter: InlineClassCon
         }
     }
 
-    fun clearCacheFor(rootId: Long) {
+    fun clearReferenceCache() {
         val creator = creatorCache ?: return
-        creator.clearCacheFor(rootId)
+        creator.clearReferenceCache()
     }
 
     private fun loadConstantsFrom(javaClass: Class<*>) {
@@ -382,8 +384,8 @@ internal class ParameterFactory(private val inlineClassConverter: InlineClassCon
             return parameter
         }
 
-        fun clearCacheFor(rootId: Long) {
-            rootValueIndexCache.remove(rootId)
+        fun clearReferenceCache() {
+            rootValueIndexCache.clear()
         }
 
         private fun setup(
@@ -925,7 +927,7 @@ internal class ParameterFactory(private val inlineClassConverter: InlineClassCon
          */
         private fun findBestResourceFont(value: FontListFontFamily): ResourceFont? =
             value.fonts.asSequence().filterIsInstance<ResourceFont>().minByOrNull {
-                abs(it.weight.weight - FontWeight.Normal.weight) + it.style.ordinal
+                abs(it.weight.weight - FontWeight.Normal.weight) + it.style.value
             }
     }
 }

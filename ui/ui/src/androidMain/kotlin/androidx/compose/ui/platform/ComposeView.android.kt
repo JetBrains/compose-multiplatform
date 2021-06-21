@@ -262,6 +262,11 @@ abstract class AbstractComposeView @JvmOverloads constructor(
 
     final override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
         ensureCompositionCreated()
+        internalOnMeasure(widthMeasureSpec, heightMeasureSpec)
+    }
+
+    @Suppress("WrongCall")
+    internal open fun internalOnMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
         val child = getChildAt(0)
         if (child == null) {
             super.onMeasure(widthMeasureSpec, heightMeasureSpec)
@@ -280,7 +285,16 @@ abstract class AbstractComposeView @JvmOverloads constructor(
         )
     }
 
-    final override fun onLayout(changed: Boolean, left: Int, top: Int, right: Int, bottom: Int) {
+    final override fun onLayout(changed: Boolean, left: Int, top: Int, right: Int, bottom: Int) =
+        internalOnLayout(changed, left, top, right, bottom)
+
+    internal open fun internalOnLayout(
+        changed: Boolean,
+        left: Int,
+        top: Int,
+        right: Int,
+        bottom: Int
+    ) {
         getChildAt(0)?.layout(
             paddingLeft,
             paddingTop,

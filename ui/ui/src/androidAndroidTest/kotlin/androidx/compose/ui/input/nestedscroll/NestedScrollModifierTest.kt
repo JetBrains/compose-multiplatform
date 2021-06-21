@@ -31,6 +31,7 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.MediumTest
 import com.google.common.truth.Truth.assertThat
 import com.google.common.truth.Truth.assertWithMessage
+import kotlinx.coroutines.isActive
 import kotlinx.coroutines.runBlocking
 import org.junit.Rule
 import org.junit.Test
@@ -817,6 +818,35 @@ class NestedScrollModifierTest {
 
             isConnection1Parent.value = !isConnection1Parent.value
             rule.waitForIdle()
+        }
+    }
+
+    @Test
+    fun nestedScroll_rootParentRemoval_childHasProperDispatchScope() {
+        val emitParent = mutableStateOf(true)
+        val parentConnection = object : NestedScrollConnection {}
+        val childConnection = object : NestedScrollConnection {}
+        val childDispatcher = NestedScrollDispatcher()
+        rule.setContent {
+            val parent =
+                if (emitParent.value) {
+                    Modifier.nestedScroll(parentConnection)
+                } else {
+                    Modifier
+                }
+            Box(parent) {
+                Box(Modifier.nestedScroll(childConnection, childDispatcher))
+            }
+        }
+
+        rule.runOnIdle {
+            assertThat(childDispatcher.coroutineScope.isActive).isTrue()
+            emitParent.value = false
+        }
+
+        rule.runOnIdle {
+            // still not null as we took origin
+            assertThat(childDispatcher.coroutineScope.isActive).isTrue()
         }
     }
 

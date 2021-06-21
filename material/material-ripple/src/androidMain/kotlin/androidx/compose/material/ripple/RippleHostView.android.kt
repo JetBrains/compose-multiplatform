@@ -24,6 +24,7 @@ import android.graphics.drawable.Drawable
 import android.graphics.drawable.RippleDrawable
 import android.os.Build
 import android.view.View
+import android.view.animation.AnimationUtils
 import androidx.annotation.DoNotInline
 import androidx.annotation.RequiresApi
 import androidx.compose.foundation.interaction.PressInteraction
@@ -72,6 +73,14 @@ internal class RippleHostView(
      */
     private var ripple: UnprojectedRipple? = null
     private var bounded: Boolean? = null
+
+    /**
+     * The last time in millis that we called [setRippleState], needed to ensure that we don't
+     * instantly fade out if [setRippleState] is called on the exact same millisecond twice.
+     */
+    private var lastRippleStateChangeTimeMillis: Long? = null
+
+    private var resetRippleRunnable: Runnable? = null
 
     /**
      * Creates a new [UnprojectedRipple] and assigns it to [ripple].
@@ -141,7 +150,7 @@ internal class RippleHostView(
                 ripple.bounds.centerY().toFloat()
             )
         }
-        ripple.state = PressedState
+        setRippleState(pressed = true)
     }
 
     /**
@@ -149,7 +158,7 @@ internal class RippleHostView(
      * separate from immediately cancelling existing ripples - see [disposeRipple].
      */
     fun removeRipple() {
-        ripple?.state = RestingState
+        setRippleState(pressed = false)
     }
 
     /**
@@ -187,13 +196,72 @@ internal class RippleHostView(
      */
     fun disposeRipple() {
         onInvalidateRipple = null
+        if (resetRippleRunnable != null) {
+            removeCallbacks(resetRippleRunnable)
+            resetRippleRunnable!!.run()
+        } else {
+            ripple?.state = RestingState
+        }
         val ripple = ripple ?: return
-        ripple.state = RestingState
         ripple.setVisible(false, false)
         unscheduleDrawable(ripple)
     }
 
+    /**
+     * Calls [RippleDrawable.setState] depending on [pressed]. Also makes sure that the fade out
+     * will not happen instantly if the enter and exit events happen to occur on the same
+     * millisecond.
+     */
+    private fun setRippleState(pressed: Boolean) {
+        val currentTime = AnimationUtils.currentAnimationTimeMillis()
+        resetRippleRunnable?.let { runnable ->
+            removeCallbacks(runnable)
+            runnable.run()
+        }
+        val timeSinceLastStateChange = currentTime - (lastRippleStateChangeTimeMillis ?: 0)
+        // When fading out, if the exit happens on the same millisecond (as returned by
+        // currentAnimationTimeMillis), RippleForeground will instantly fade out without showing
+        // the minimum duration ripple. Handle this specific case by posting the exit event to
+        // make sure it is shown for its minimum time, if the last state change was recent.
+        // Since it is possible for currentAnimationTimeMillis to be different between here, and
+        // when it is called inside RippleForeground, we post for any small difference just to be
+        // safe.
+        if (!pressed && timeSinceLastStateChange < MinimumRippleStateChangeTime) {
+            resetRippleRunnable = Runnable {
+                ripple?.state = RestingState
+                resetRippleRunnable = null
+            }
+            postDelayed(resetRippleRunnable, ResetRippleDelayDuration)
+        } else {
+            val state = if (pressed) PressedState else RestingState
+            ripple?.state = state
+        }
+        lastRippleStateChangeTimeMillis = currentTime
+    }
+
     companion object {
+        /**
+         * Minimum time between moving to [PressedState] and [RestingState] - for values smaller
+         * than this it is possible that the value of [AnimationUtils.currentAnimationTimeMillis]
+         * might be different between where we check in [setRippleState], and where it is checked
+         * inside [RippleDrawable] - so even if it appears different here, it might be the same
+         * value inside [RippleDrawable]. As a result if the time is smaller than this, we post
+         * the resting state change to be safe.
+         */
+        private const val MinimumRippleStateChangeTime = 5L
+
+        /**
+         * Delay between moving to [PressedState] and [RestingState], to ensure that the move to
+         * [RestingState] happens on a new value for [AnimationUtils.currentAnimationTimeMillis],
+         * so the ripple will cleanly animate out instead of instantly cancelling.
+         *
+         * The actual value of this number doesn't matter, provided it is long enough that it is
+         * guaranteed to happen on another frame / value for
+         * [AnimationUtils.currentAnimationTimeMillis], and that it is short enough that it will
+         * happen before the minimum ripple duration (225ms).
+         */
+        private const val ResetRippleDelayDuration = 50L
+
         private val PressedState = intArrayOf(
             android.R.attr.state_pressed,
             android.R.attr.state_enabled

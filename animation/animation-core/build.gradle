@@ -15,25 +15,23 @@
  */
 
 
-import androidx.build.AndroidXUiPlugin
+import androidx.build.AndroidXComposePlugin
 import androidx.build.LibraryGroups
 import androidx.build.LibraryType
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
-import static androidx.build.dependencies.DependenciesKt.*
-
 plugins {
     id("AndroidXPlugin")
     id("com.android.library")
-    id("AndroidXUiPlugin")
+    id("AndroidXComposePlugin")
 }
 
-AndroidXUiPlugin.applyAndConfigureKotlinPlugin(project)
+AndroidXComposePlugin.applyAndConfigureKotlinPlugin(project)
 
 dependencies {
     kotlinPlugin(project(":compose:compiler:compiler"))
 
-    if (!AndroidXUiPlugin.isMultiplatformEnabled(project)) {
+    if (!AndroidXComposePlugin.isMultiplatformEnabled(project)) {
         /*
          * When updating dependencies, make sure to make the an an analogous update in the
          * corresponding block below
@@ -44,19 +42,19 @@ dependencies {
         implementation(project(":compose:runtime:runtime"))
         implementation(project(":compose:ui:ui-unit"))
         implementation(project(":compose:ui:ui-util"))
-        implementation(KOTLIN_STDLIB)
-        api(KOTLIN_COROUTINES_CORE)
+        implementation(libs.kotlinStdlib)
+        api(libs.kotlinCoroutinesCore)
 
-        testImplementation(ANDROIDX_TEST_RULES)
-        testImplementation(ANDROIDX_TEST_RUNNER)
-        testImplementation(JUNIT)
-        testImplementation(TRUTH)
-        testImplementation(KOTLIN_COROUTINES_CORE)
+        testImplementation(libs.testRules)
+        testImplementation(libs.testRunner)
+        testImplementation(libs.junit)
+        testImplementation(libs.truth)
+        testImplementation(libs.kotlinCoroutinesCore)
 
-        androidTestImplementation(ANDROIDX_TEST_RULES)
-        androidTestImplementation(ANDROIDX_TEST_RUNNER)
-        androidTestImplementation(ANDROIDX_TEST_CORE)
-        androidTestImplementation(JUNIT)
+        androidTestImplementation(libs.testRules)
+        androidTestImplementation(libs.testRunner)
+        androidTestImplementation(libs.testCore)
+        androidTestImplementation(libs.junit)
         androidTestImplementation(project(":compose:animation:animation"))
         androidTestImplementation(project(":compose:ui:ui-test-junit4"))
         androidTestImplementation(project(":compose:test-utils"))
@@ -65,7 +63,7 @@ dependencies {
     }
 }
 
-if (AndroidXUiPlugin.isMultiplatformEnabled(project)) {
+if (AndroidXComposePlugin.isMultiplatformEnabled(project)) {
     kotlin {
         android()
         jvm("desktop")
@@ -78,8 +76,8 @@ if (AndroidXUiPlugin.isMultiplatformEnabled(project)) {
 
             jvmMain {
                 dependencies {
-                    implementation(KOTLIN_STDLIB)
-                    api(KOTLIN_COROUTINES_CORE)
+                    implementation(libs.kotlinStdlib)
+                    api(libs.kotlinCoroutinesCore)
                 }
             }
 
@@ -87,37 +85,37 @@ if (AndroidXUiPlugin.isMultiplatformEnabled(project)) {
                 implementation(project(":compose:runtime:runtime"))
                 implementation(project(":compose:ui:ui-unit"))
                 implementation(project(":compose:ui:ui-util"))
-                implementation(KOTLIN_STDLIB_COMMON)
-                api(KOTLIN_COROUTINES_CORE)
+                implementation(libs.kotlinStdlibCommon)
+                api(libs.kotlinCoroutinesCore)
             }
 
             androidMain {
                 dependencies {
                     api("androidx.annotation:annotation:1.1.0")
-                    implementation(KOTLIN_STDLIB)
+                    implementation(libs.kotlinStdlib)
                 }
                 dependsOn(jvmMain)
             }
             desktopMain {
                 dependencies {
-                    implementation(KOTLIN_STDLIB)
+                    implementation(libs.kotlinStdlib)
                 }
                 dependsOn(jvmMain)
             }
 
             androidTest.dependencies {
-                implementation(ANDROIDX_TEST_RULES)
-                implementation(ANDROIDX_TEST_RUNNER)
-                implementation(JUNIT)
-                implementation(TRUTH)
-                implementation(KOTLIN_COROUTINES_CORE)
+                implementation(libs.testRules)
+                implementation(libs.testRunner)
+                implementation(libs.junit)
+                implementation(libs.truth)
+                implementation(libs.kotlinCoroutinesCore)
             }
 
             androidAndroidTest.dependencies {
-                implementation(ANDROIDX_TEST_RULES)
-                implementation(ANDROIDX_TEST_RUNNER)
-                implementation(ANDROIDX_TEST_CORE)
-                implementation(JUNIT)
+                implementation(libs.testRules)
+                implementation(libs.testRunner)
+                implementation(libs.testCore)
+                implementation(libs.junit)
                 implementation(project(":compose:animation:animation"))
                 implementation(project(":compose:ui:ui-test-junit4"))
                 implementation(project(":compose:test-utils"))

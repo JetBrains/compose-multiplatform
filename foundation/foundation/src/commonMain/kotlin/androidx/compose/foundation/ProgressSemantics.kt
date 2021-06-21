@@ -19,10 +19,8 @@ package androidx.compose.foundation
 import androidx.compose.runtime.Stable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.semantics.ProgressBarRangeInfo
-import androidx.compose.ui.semantics.stateDescription
 import androidx.compose.ui.semantics.progressBarRangeInfo
 import androidx.compose.ui.semantics.semantics
-import kotlin.math.roundToInt
 
 /**
  * Contains the [semantics] required for a determinate progress indicator or the progress part of
@@ -46,20 +44,7 @@ fun Modifier.progressSemantics(
     /*@IntRange(from = 0)*/
     steps: Int = 0
 ): Modifier {
-    val progress = (
-        if (valueRange.endInclusive - valueRange.start == 0f) 0f
-        else (value - valueRange.start) / (valueRange.endInclusive - valueRange.start)
-        ).coerceIn(0f, 1f)
-
-    // We only display 0% or 100% when it is exactly 0% or 100%.
-    val percent = when (progress) {
-        0f -> 0
-        1f -> 100
-        else -> (progress * 100).roundToInt().coerceIn(1, 99)
-    }
-
     return semantics {
-        stateDescription = "$percent percent"
         progressBarRangeInfo =
             ProgressBarRangeInfo(value.coerceIn(valueRange), valueRange, steps)
     }
@@ -78,7 +63,6 @@ fun Modifier.progressSemantics(
 @Stable
 fun Modifier.progressSemantics(): Modifier {
     return semantics {
-        stateDescription = Strings.InProgress
         progressBarRangeInfo = ProgressBarRangeInfo.Indeterminate
     }
 }

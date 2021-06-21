@@ -65,7 +65,7 @@ fun KeyInputDemo() {
 @Composable
 private fun FocusableText(text: MutableState<String>) {
     var color by remember { mutableStateOf(Color.Black) }
-    val focusRequester = FocusRequester()
+    val focusRequester = remember { FocusRequester() }
     Text(
         modifier = Modifier
             .focusRequester(focusRequester)

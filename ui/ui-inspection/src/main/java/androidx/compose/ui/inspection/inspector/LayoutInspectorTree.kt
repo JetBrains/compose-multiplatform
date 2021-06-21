@@ -17,6 +17,7 @@
 package androidx.compose.ui.inspection.inspector
 
 import android.view.View
+import androidx.annotation.RequiresApi
 import androidx.annotation.VisibleForTesting
 import androidx.compose.runtime.InternalComposeApi
 import androidx.compose.runtime.tooling.CompositionData
@@ -75,6 +76,7 @@ private val unwantedCalls = setOf(
     "ProvideCommonCompositionLocals",
 )
 
+@OptIn(ExperimentalStdlibApi::class)
 @VisibleForTesting
 fun packageNameHash(packageName: String) =
     packageName.fold(0) { hash, char -> hash * 31 + char.code }.absoluteValue
@@ -82,6 +84,7 @@ fun packageNameHash(packageName: String) =
 /**
  * Generator of a tree for the Layout Inspector.
  */
+@RequiresApi(29)
 class LayoutInspectorTree {
     @Suppress("MemberVisibilityCanBePrivate")
     var hideSystemNodes = true
@@ -202,6 +205,7 @@ class LayoutInspectorTree {
     @Suppress("unused")
     fun resetAccumulativeState() {
         subCompositions.resetAccumulativeState()
+        parameterFactory.clearReferenceCache()
         // Reset the generated id. Nodes are assigned an id if there isn't a layout node id present.
         generatedId = -1L
     }
@@ -547,9 +551,12 @@ class LayoutInspectorTree {
     @OptIn(UiToolingDataApi::class)
     private fun castValue(parameter: ParameterInformation): Any? {
         val value = parameter.value ?: return null
-        if (parameter.inlineClass == null) return value
+        if (parameter.inlineClass == null || !isPrimitive(value.javaClass)) return value
         return inlineClassConverter.castParameterValue(parameter.inlineClass, value)
     }
+
+    private fun isPrimitive(cls: Class<*>): Boolean =
+        cls.kotlin.javaPrimitiveType != null
 
     private fun unwantedGroup(node: MutableInspectorNode): Boolean =
         (node.packageHash in systemPackages && hideSystemNodes) ||

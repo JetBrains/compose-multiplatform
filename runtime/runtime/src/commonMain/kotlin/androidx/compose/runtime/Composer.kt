@@ -21,13 +21,13 @@ package androidx.compose.runtime
 
 import androidx.compose.runtime.collection.IdentityArrayMap
 import androidx.compose.runtime.collection.IdentityArraySet
+import androidx.compose.runtime.external.kotlinx.collections.immutable.PersistentMap
+import androidx.compose.runtime.external.kotlinx.collections.immutable.persistentHashMapOf
 import androidx.compose.runtime.snapshots.currentSnapshot
 import androidx.compose.runtime.snapshots.fastForEach
 import androidx.compose.runtime.snapshots.fastToSet
 import androidx.compose.runtime.tooling.CompositionData
 import androidx.compose.runtime.tooling.LocalInspectionTables
-import androidx.compose.runtime.external.kotlinx.collections.immutable.PersistentMap
-import androidx.compose.runtime.external.kotlinx.collections.immutable.persistentHashMapOf
 import kotlin.coroutines.CoroutineContext
 
 internal typealias Change = (
@@ -1353,7 +1353,7 @@ internal class ComposerImpl(
     @Suppress("UNUSED")
     override fun <T> createNode(factory: () -> T) {
         validateNodeExpected()
-        check(inserting) { "createNode() can only be called when inserting" }
+        runtimeCheck(inserting) { "createNode() can only be called when inserting" }
         val insertIndex = nodeIndexStack.peek()
         val groupAnchor = writer.anchor(writer.parent)
         groupNodeCount++
@@ -1380,7 +1380,7 @@ internal class ComposerImpl(
     @OptIn(InternalComposeApi::class)
     override fun useNode() {
         validateNodeExpected()
-        check(!inserting) { "useNode() called while inserting" }
+        runtimeCheck(!inserting) { "useNode() called while inserting" }
         recordDown(reader.node)
     }
 
@@ -2412,7 +2412,9 @@ internal class ComposerImpl(
      */
     @ComposeCompilerApi
     override fun skipToGroupEnd() {
-        check(groupNodeCount == 0) { "No nodes can be emitted before calling skipAndEndGroup" }
+        runtimeCheck(groupNodeCount == 0) {
+            "No nodes can be emitted before calling skipAndEndGroup"
+        }
         currentRecomposeScope?.scopeSkipped()
         if (invalidations.isEmpty()) {
             skipReaderToGroupEnd()
@@ -2511,12 +2513,12 @@ internal class ComposerImpl(
         invalidationsRequested: IdentityArrayMap<RecomposeScopeImpl, IdentityArraySet<Any>?>,
         content: @Composable () -> Unit
     ) {
-        check(changes.isEmpty()) { "Expected applyChanges() to have been called" }
+        runtimeCheck(changes.isEmpty()) { "Expected applyChanges() to have been called" }
         doCompose(invalidationsRequested, content)
     }
 
     internal fun prepareCompose(block: () -> Unit) {
-        check(!isComposing) { "Preparing a composition while composing is not supported" }
+        runtimeCheck(!isComposing) { "Preparing a composition while composing is not supported" }
         isComposing = true
         try {
             block()
@@ -2531,8 +2533,12 @@ internal class ComposerImpl(
     internal fun recompose(
         invalidationsRequested: IdentityArrayMap<RecomposeScopeImpl, IdentityArraySet<Any>?>
     ): Boolean {
-        check(changes.isEmpty()) { "Expected applyChanges() to have been called" }
-        if (invalidationsRequested.isNotEmpty()) {
+        runtimeCheck(changes.isEmpty()) { "Expected applyChanges() to have been called" }
+        // even if invalidationsRequested is empty we still need to recompose if the Composer has
+        // some invalidations scheduled already. it can happen when during some parent composition
+        // there were a change for a state which was used by the child composition. such changes
+        // will be tracked and added into `invalidations` list.
+        if (invalidationsRequested.isNotEmpty() || invalidations.isNotEmpty()) {
             doCompose(invalidationsRequested, null)
             return changes.isNotEmpty()
         }
@@ -2543,7 +2549,7 @@ internal class ComposerImpl(
         invalidationsRequested: IdentityArrayMap<RecomposeScopeImpl, IdentityArraySet<Any>?>,
         content: (@Composable () -> Unit)?
     ) {
-        check(!isComposing) { "Reentrant composition is not supported" }
+        runtimeCheck(!isComposing) { "Reentrant composition is not supported" }
         trace("Compose:recompose") {
             snapshot = currentSnapshot()
             invalidationsRequested.forEach { scope, set ->
@@ -2592,14 +2598,14 @@ internal class ComposerImpl(
     private fun SlotReader.nodeAt(index: Int) = node(index)
 
     private fun validateNodeExpected() {
-        check(nodeExpected) {
+        runtimeCheck(nodeExpected) {
             "A call to createNode(), emitNode() or useNode() expected was not expected"
         }
         nodeExpected = false
     }
 
     private fun validateNodeNotExpected() {
-        check(!nodeExpected) { "A call to createNode(), emitNode() or useNode() expected" }
+        runtimeCheck(!nodeExpected) { "A call to createNode(), emitNode() or useNode() expected" }
     }
 
     /**
@@ -2821,7 +2827,7 @@ internal class ComposerImpl(
     private fun recordEndGroup() {
         val location = reader.parent
         val currentStartedGroup = startedGroups.peekOr(-1)
-        check(currentStartedGroup <= location) { "Missed recording an endGroup" }
+        runtimeCheck(currentStartedGroup <= location) { "Missed recording an endGroup" }
         if (startedGroups.peekOr(-1) == location) {
             startedGroups.pop()
             recordSlotTableOperation(change = endGroupInstance)
@@ -2837,8 +2843,8 @@ internal class ComposerImpl(
 
     private fun finalizeCompose() {
         realizeUps()
-        check(pendingStack.isEmpty()) { "Start/end imbalance" }
-        check(startedGroups.isEmpty()) { "Missed recording an endGroup()" }
+        runtimeCheck(pendingStack.isEmpty()) { "Start/end imbalance" }
+        runtimeCheck(startedGroups.isEmpty()) { "Missed recording an endGroup()" }
         cleanUpCompose()
     }
 
@@ -2862,7 +2868,7 @@ internal class ComposerImpl(
 
     private fun recordRemoveNode(nodeIndex: Int, count: Int) {
         if (count > 0) {
-            check(nodeIndex >= 0) { "Invalid remove index $nodeIndex" }
+            runtimeCheck(nodeIndex >= 0) { "Invalid remove index $nodeIndex" }
             if (previousRemove == nodeIndex) previousCount += count
             else {
                 realizeMovement()
@@ -3029,6 +3035,8 @@ internal class ComposerImpl(
                 updateCompoundKeyWhenWeEnterGroupKeyHash(data.hashCode())
             else
                 updateCompoundKeyWhenWeEnterGroupKeyHash(groupKey)
+        else if (dataKey is Enum<*>)
+            updateCompoundKeyWhenWeEnterGroupKeyHash(dataKey.ordinal)
         else
             updateCompoundKeyWhenWeEnterGroupKeyHash(dataKey.hashCode())
     }
@@ -3043,6 +3051,8 @@ internal class ComposerImpl(
                 updateCompoundKeyWhenWeExitGroupKeyHash(data.hashCode())
             else
                 updateCompoundKeyWhenWeExitGroupKeyHash(groupKey)
+        else if (dataKey is Enum<*>)
+            updateCompoundKeyWhenWeExitGroupKeyHash(dataKey.ordinal)
         else
             updateCompoundKeyWhenWeExitGroupKeyHash(dataKey.hashCode())
     }
@@ -3431,3 +3441,20 @@ internal val reference: Any = OpaqueKey("reference")
 
 @PublishedApi
 internal const val reuseKey = 207
+
+internal inline fun runtimeCheck(value: Boolean, lazyMessage: () -> Any) {
+    if (!value) {
+        val message = lazyMessage()
+        composeRuntimeError(message.toString())
+    }
+}
+
+internal fun runtimeCheck(value: Boolean) = runtimeCheck(value) { "Check failed" }
+
+internal fun composeRuntimeError(message: String): Nothing {
+    error(
+        "Compose Runtime internal error. Unexpected or incorrect use of the Compose " +
+            "internal runtime API ($message). Please report to Google or use " +
+            "https://goo.gle/compose-feedback"
+    )
+}

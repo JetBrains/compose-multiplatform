@@ -27,7 +27,7 @@ import androidx.compose.runtime.Immutable
 // These enum values must be kept in sync with SkCanvas::PointMode.
 @Suppress("INLINE_CLASS_DEPRECATED", "EXPERIMENTAL_FEATURE_WARNING")
 @Immutable
-inline class PointMode internal constructor(val value: Int) {
+inline class PointMode internal constructor(@Suppress("unused") private val value: Int) {
     companion object {
         /**
          * Draw each point separately.

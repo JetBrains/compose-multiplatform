@@ -181,6 +181,7 @@ class SubcomposeLayoutState(
     private var precomposedCount = 0
 
     internal fun subcompose(slotId: Any?, content: @Composable () -> Unit): List<Measurable> {
+        makeSureStateIsConsistent()
         val layoutState = root.layoutState
         check(layoutState == LayoutState.Measuring || layoutState == LayoutState.LayingOut) {
             "subcompose can only be used inside the measure or layout blocks"
@@ -285,6 +286,16 @@ class SubcomposeLayoutState(
                 root.removeAt(currentIndex, nodesToDispose)
             }
         }
+
+        makeSureStateIsConsistent()
+    }
+
+    private fun makeSureStateIsConsistent() {
+        require(nodeToNodeState.size == root.foldedChildren.size) {
+            "Inconsistency between the count of nodes tracked by the state (${nodeToNodeState
+                .size}) and the children count on the SubcomposeLayout (${root.foldedChildren
+                .size}). Are you trying to use the state of the disposed SubcomposeLayout?"
+        }
     }
 
     private fun takeNodeFromReusables(slotId: Any?): LayoutNode {
@@ -322,9 +333,7 @@ class SubcomposeLayoutState(
 
     private fun createMeasurePolicy(
         block: SubcomposeMeasureScope.(Constraints) -> MeasureResult
-    ): MeasurePolicy = object : LayoutNode.NoIntrinsicsMeasurePolicy(
-        error = "Intrinsic measurements are not currently supported by SubcomposeLayout"
-    ) {
+    ): MeasurePolicy = object : LayoutNode.NoIntrinsicsMeasurePolicy(error = NoIntrinsicsMessage) {
         override fun MeasureScope.measure(
             measurables: List<Measurable>,
             constraints: Constraints
@@ -352,6 +361,16 @@ class SubcomposeLayoutState(
         }
     }
 
+    private val NoIntrinsicsMessage = "Asking for intrinsic measurements of SubcomposeLayout " +
+        "layouts is not supported. This includes components that are built on top of " +
+        "SubcomposeLayout, such as lazy lists, BoxWithConstraints, TabRow, etc. To mitigate " +
+        "this:\n" +
+        "- if intrinsic measurements are used to achieve 'match parent' sizing,, consider " +
+        "replacing the parent of the component with a custom layout which controls the order in " +
+        "which children are measured, making intrinsic measurement not needed\n" +
+        "- adding a size modifier to the component, in order to fast return the queried " +
+        "intrinsic measurement."
+
     internal fun disposeCurrentNodes() {
         nodeToNodeState.values.forEach {
             it.composition!!.dispose()
@@ -374,6 +393,7 @@ class SubcomposeLayoutState(
      * @return [PrecomposedSlotHandle] instance which allows you to dispose the content.
      */
     fun precompose(slotId: Any?, content: @Composable () -> Unit): PrecomposedSlotHandle {
+        makeSureStateIsConsistent()
         if (!slotIdToNode.containsKey(slotId)) {
             val node = precomposeMap.getOrPut(slotId) {
                 if (reusableCount > 0) {

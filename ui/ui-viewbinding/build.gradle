@@ -17,31 +17,29 @@
 import androidx.build.LibraryGroups
 import androidx.build.LibraryType
 
-import static androidx.build.dependencies.DependenciesKt.*
-
 plugins {
     id("AndroidXPlugin")
     id("com.android.library")
-    id("AndroidXUiPlugin")
+    id("AndroidXComposePlugin")
     id("org.jetbrains.kotlin.android")
 }
 
 dependencies {
     kotlinPlugin(project(":compose:compiler:compiler"))
 
-    implementation(KOTLIN_STDLIB)
+    implementation(libs.kotlinStdlib)
     implementation(project(":compose:ui:ui"))
     implementation(project(":compose:ui:ui-util"))
-    implementation(VIEW_BINDING)
+    implementation(libs.viewBinding)
     // Required to ensure that Fragments inflated by AndroidViewBinding
     // actually appear after configuration changes
     implementation("androidx.fragment:fragment-ktx:1.3.2")
 
     androidTestImplementation(project(":compose:foundation:foundation"))
     androidTestImplementation(project(":compose:test-utils"))
-    androidTestImplementation(ANDROIDX_TEST_RUNNER)
-    androidTestImplementation(JUNIT)
-    androidTestImplementation(TRUTH)
+    androidTestImplementation(libs.testRunner)
+    androidTestImplementation(libs.junit)
+    androidTestImplementation(libs.truth)
 }
 
 androidx {

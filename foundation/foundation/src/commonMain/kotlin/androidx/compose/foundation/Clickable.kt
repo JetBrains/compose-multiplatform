@@ -124,18 +124,18 @@ fun Modifier.clickable(
     factory = {
         val onClickState = rememberUpdatedState(onClick)
         val pressedInteraction = remember { mutableStateOf<PressInteraction.Press?>(null) }
-        val gesture = if (enabled) {
+        if (enabled) {
             PressedInteractionSourceDisposableEffect(interactionSource, pressedInteraction)
-            Modifier.pointerInput(interactionSource) {
-                detectTapAndPress(
-                    onPress = { offset ->
+        }
+        val gesture = Modifier.pointerInput(interactionSource, enabled) {
+            detectTapAndPress(
+                onPress = { offset ->
+                    if (enabled) {
                         handlePressInteraction(offset, interactionSource, pressedInteraction)
-                    },
-                    onTap = { onClickState.value.invoke() }
-                )
-            }
-        } else {
-            Modifier
+                    }
+                },
+                onTap = { if (enabled) onClickState.value.invoke() }
+            )
         }
         Modifier
             .genericClickableWithoutGesture(
@@ -266,7 +266,7 @@ fun Modifier.combinedClickable(
         val hasLongClick = onLongClick != null
         val hasDoubleClick = onDoubleClick != null
         val pressedInteraction = remember { mutableStateOf<PressInteraction.Press?>(null) }
-        val gesture = if (enabled) {
+        if (enabled) {
             // Handles the case where a long click causes a null onLongClick lambda to be passed,
             // so we can cancel the existing press.
             DisposableEffect(hasLongClick) {
@@ -279,27 +279,28 @@ fun Modifier.combinedClickable(
                 }
             }
             PressedInteractionSourceDisposableEffect(interactionSource, pressedInteraction)
-            Modifier.pointerInput(interactionSource, hasLongClick, hasDoubleClick) {
+        }
+        val gesture =
+            Modifier.pointerInput(interactionSource, hasLongClick, hasDoubleClick, enabled) {
                 detectTapGestures(
-                    onDoubleTap = if (hasDoubleClick) {
+                    onDoubleTap = if (hasDoubleClick && enabled) {
                         { onDoubleClickState.value?.invoke() }
                     } else {
                         null
                     },
-                    onLongPress = if (hasLongClick) {
+                    onLongPress = if (hasLongClick && enabled) {
                         { onLongClickState.value?.invoke() }
                     } else {
                         null
                     },
                     onPress = { offset ->
-                        handlePressInteraction(offset, interactionSource, pressedInteraction)
+                        if (enabled) {
+                            handlePressInteraction(offset, interactionSource, pressedInteraction)
+                        }
                     },
-                    onTap = { onClickState.value.invoke() }
+                    onTap = { if (enabled) onClickState.value.invoke() }
                 )
             }
-        } else {
-            Modifier
-        }
         Modifier
             .genericClickableWithoutGesture(
                 gestureModifiers = gesture,

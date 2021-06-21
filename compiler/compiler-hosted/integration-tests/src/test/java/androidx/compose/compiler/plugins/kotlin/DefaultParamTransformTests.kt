@@ -122,7 +122,7 @@ class DefaultParamTransformTests : ComposeIrTransformTest() {
               %composer = %composer.startRestartGroup(<>)
               sourceInformation(%composer, "C(Test)<Exampl...>:Test.kt")
               if (%changed !== 0 || !%composer.skipping) {
-                Example(Foo(0), %composer, 0, 0b0001)
+                Example(<unsafe-coerce>(0), %composer, 0, 0b0001)
               } else {
                 %composer.skipToGroupEnd()
               }
@@ -159,6 +159,33 @@ class DefaultParamTransformTests : ComposeIrTransformTest() {
               %composer.endRestartGroup()?.updateScope { %composer: Composer?, %force: Int ->
                 Test(%composer, %changed or 0b0001)
               }
+            }
+        """
+    )
+
+    @Test
+    fun testUnusedDefaultComposableLambda(): Unit = defaultParams(
+        """
+        """,
+        """
+            inline fun Bar(unused: @Composable () -> Unit = { }) {}
+            fun Foo() { Bar() }
+        """,
+        """
+            fun Bar(unused: Function2<Composer, Int, Unit> = { %composer: Composer?, %changed: Int ->
+              %composer.startReplaceableGroup(<>)
+              sourceInformation(%composer, "C:Test.kt")
+              if (%changed and 0b1011 xor 0b0010 !== 0 || !%composer.skipping) {
+                Unit
+              } else {
+                %composer.skipToGroupEnd()
+              }
+              %composer.endReplaceableGroup()
+            }
+            ) { }
+            fun Foo() {
+              Bar(
+              )
             }
         """
     )

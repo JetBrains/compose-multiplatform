@@ -16,16 +16,21 @@
 
 package androidx.compose.ui.input.key
 
+import androidx.compose.ui.ExperimentalComposeUiApi
+
 /**
  * Represents keys on a keyboard.
  *
  * @param keyCode a Long value representing the key pressed. Note: This keycode can be used to
  * uniquely identify a hardware key. It is different from the native keycode.
+ *
+ * @sample androidx.compose.ui.samples.KeyEventIsAltPressedSample
  */
 @Suppress("INLINE_CLASS_DEPRECATED", "EXPERIMENTAL_FEATURE_WARNING")
 expect inline class Key(val keyCode: Long) {
     companion object {
         /** Unknown key. */
+        @ExperimentalComposeUiApi
         val Unknown: Key
 
         /**
@@ -35,6 +40,7 @@ expect inline class Key(val keyCode: Long) {
          * feature key for selecting a software defined function shown on the bottom left
          * of the display.
          */
+        @ExperimentalComposeUiApi
         val SoftLeft: Key
 
         /**
@@ -44,6 +50,7 @@ expect inline class Key(val keyCode: Long) {
          * feature key for selecting a software defined function shown on the bottom right
          * of the display.
          */
+        @ExperimentalComposeUiApi
         val SoftRight: Key
 
         /**
@@ -51,12 +58,15 @@ expect inline class Key(val keyCode: Long) {
          *
          * This key is handled by the framework and is never delivered to applications.
          */
+        @ExperimentalComposeUiApi
         val Home: Key
 
         /** Back key. */
+        @ExperimentalComposeUiApi
         val Back: Key
 
         /** Help key. */
+        @ExperimentalComposeUiApi
         val Help: Key
 
         /**
@@ -64,6 +74,7 @@ expect inline class Key(val keyCode: Long) {
          *
          * Goes backward by one item in an ordered collection of items.
          */
+        @ExperimentalComposeUiApi
         val NavigatePrevious: Key
 
         /**
@@ -71,6 +82,7 @@ expect inline class Key(val keyCode: Long) {
          *
          * Advances to the next item in an ordered collection of items.
          */
+        @ExperimentalComposeUiApi
         val NavigateNext: Key
 
         /**
@@ -79,6 +91,7 @@ expect inline class Key(val keyCode: Long) {
          * Activates the item that currently has focus or expands to the next level of a navigation
          * hierarchy.
          */
+        @ExperimentalComposeUiApi
         val NavigateIn: Key
 
         /**
@@ -87,24 +100,31 @@ expect inline class Key(val keyCode: Long) {
          * Backs out one level of a navigation hierarchy or collapses the item that currently has
          * focus.
          */
+        @ExperimentalComposeUiApi
         val NavigateOut: Key
 
         /** Consumed by the system for navigation up. */
+        @ExperimentalComposeUiApi
         val SystemNavigationUp: Key
 
         /** Consumed by the system for navigation down. */
+        @ExperimentalComposeUiApi
         val SystemNavigationDown: Key
 
         /** Consumed by the system for navigation left. */
+        @ExperimentalComposeUiApi
         val SystemNavigationLeft: Key
 
         /** Consumed by the system for navigation right. */
+        @ExperimentalComposeUiApi
         val SystemNavigationRight: Key
 
         /** Call key. */
+        @ExperimentalComposeUiApi
         val Call: Key
 
         /** End Call key. */
+        @ExperimentalComposeUiApi
         val EndCall: Key
 
         /**
@@ -112,6 +132,7 @@ expect inline class Key(val keyCode: Long) {
          *
          * May also be synthesized from trackball motions.
          */
+        @ExperimentalComposeUiApi
         val DirectionUp: Key
 
         /**
@@ -119,6 +140,7 @@ expect inline class Key(val keyCode: Long) {
          *
          * May also be synthesized from trackball motions.
          */
+        @ExperimentalComposeUiApi
         val DirectionDown: Key
 
         /**
@@ -126,6 +148,7 @@ expect inline class Key(val keyCode: Long) {
          *
          * May also be synthesized from trackball motions.
          */
+        @ExperimentalComposeUiApi
         val DirectionLeft: Key
 
         /**
@@ -133,6 +156,7 @@ expect inline class Key(val keyCode: Long) {
          *
          * May also be synthesized from trackball motions.
          */
+        @ExperimentalComposeUiApi
         val DirectionRight: Key
 
         /**
@@ -140,18 +164,23 @@ expect inline class Key(val keyCode: Long) {
          *
          * May also be synthesized from trackball motions.
          */
+        @ExperimentalComposeUiApi
         val DirectionCenter: Key
 
         /** Directional Pad Up-Left. */
+        @ExperimentalComposeUiApi
         val DirectionUpLeft: Key
 
         /** Directional Pad Down-Left. */
+        @ExperimentalComposeUiApi
         val DirectionDownLeft: Key
 
         /** Directional Pad Up-Right. */
+        @ExperimentalComposeUiApi
         val DirectionUpRight: Key
 
         /** Directional Pad Down-Right. */
+        @ExperimentalComposeUiApi
         val DirectionDownRight: Key
 
         /**
@@ -159,6 +188,7 @@ expect inline class Key(val keyCode: Long) {
          *
          * Adjusts the speaker volume up.
          */
+        @ExperimentalComposeUiApi
         val VolumeUp: Key
 
         /**
@@ -166,9 +196,11 @@ expect inline class Key(val keyCode: Long) {
          *
          * Adjusts the speaker volume down.
          */
+        @ExperimentalComposeUiApi
         val VolumeDown: Key
 
         /** Power key.  */
+        @ExperimentalComposeUiApi
         val Power: Key
 
         /**
@@ -176,156 +208,207 @@ expect inline class Key(val keyCode: Long) {
          *
          * Used to launch a camera application or take pictures.
          */
+        @ExperimentalComposeUiApi
         val Camera: Key
 
         /** Clear key. */
+        @ExperimentalComposeUiApi
         val Clear: Key
 
         /** '0' key. */
+        @ExperimentalComposeUiApi
         val Zero: Key
 
         /** '1' key. */
+        @ExperimentalComposeUiApi
         val One: Key
 
         /** '2' key. */
+        @ExperimentalComposeUiApi
         val Two: Key
 
         /** '3' key. */
+        @ExperimentalComposeUiApi
         val Three: Key
 
         /** '4' key. */
+        @ExperimentalComposeUiApi
         val Four: Key
 
         /** '5' key. */
+        @ExperimentalComposeUiApi
         val Five: Key
 
         /** '6' key. */
+        @ExperimentalComposeUiApi
         val Six: Key
 
         /** '7' key. */
+        @ExperimentalComposeUiApi
         val Seven: Key
 
         /** '8' key. */
+        @ExperimentalComposeUiApi
         val Eight: Key
 
         /** '9' key. */
+        @ExperimentalComposeUiApi
         val Nine: Key
 
         /** '+' key. */
+        @ExperimentalComposeUiApi
         val Plus: Key
 
         /** '-' key. */
+        @ExperimentalComposeUiApi
         val Minus: Key
 
         /** '*' key. */
+        @ExperimentalComposeUiApi
         val Multiply: Key
 
         /** '=' key. */
+        @ExperimentalComposeUiApi
         val Equals: Key
 
         /** '#' key. */
+        @ExperimentalComposeUiApi
         val Pound: Key
 
         /** 'A' key. */
+        @ExperimentalComposeUiApi
         val A: Key
 
         /** 'B' key. */
+        @ExperimentalComposeUiApi
         val B: Key
 
         /** 'C' key. */
+        @ExperimentalComposeUiApi
         val C: Key
 
         /** 'D' key. */
+        @ExperimentalComposeUiApi
         val D: Key
 
         /** 'E' key. */
+        @ExperimentalComposeUiApi
         val E: Key
 
         /** 'F' key. */
+        @ExperimentalComposeUiApi
         val F: Key
 
         /** 'G' key. */
+        @ExperimentalComposeUiApi
         val G: Key
 
         /** 'H' key. */
+        @ExperimentalComposeUiApi
         val H: Key
 
         /** 'I' key. */
+        @ExperimentalComposeUiApi
         val I: Key
 
         /** 'J' key. */
+        @ExperimentalComposeUiApi
         val J: Key
 
         /** 'K' key. */
+        @ExperimentalComposeUiApi
         val K: Key
 
         /** 'L' key. */
+        @ExperimentalComposeUiApi
         val L: Key
 
         /** 'M' key. */
+        @ExperimentalComposeUiApi
         val M: Key
 
         /** 'N' key. */
+        @ExperimentalComposeUiApi
         val N: Key
 
         /** 'O' key. */
+        @ExperimentalComposeUiApi
         val O: Key
 
         /** 'P' key. */
+        @ExperimentalComposeUiApi
         val P: Key
 
         /** 'Q' key. */
+        @ExperimentalComposeUiApi
         val Q: Key
 
         /** 'R' key. */
+        @ExperimentalComposeUiApi
         val R: Key
 
         /** 'S' key. */
+        @ExperimentalComposeUiApi
         val S: Key
 
         /** 'T' key. */
+        @ExperimentalComposeUiApi
         val T: Key
 
         /** 'U' key. */
+        @ExperimentalComposeUiApi
         val U: Key
 
         /** 'V' key. */
+        @ExperimentalComposeUiApi
         val V: Key
 
         /** 'W' key. */
+        @ExperimentalComposeUiApi
         val W: Key
 
         /** 'X' key. */
+        @ExperimentalComposeUiApi
         val X: Key
 
         /** 'Y' key. */
+        @ExperimentalComposeUiApi
         val Y: Key
 
         /** 'Z' key. */
+        @ExperimentalComposeUiApi
         val Z: Key
 
         /** ',' key. */
+        @ExperimentalComposeUiApi
         val Comma: Key
 
         /** '.' key. */
+        @ExperimentalComposeUiApi
         val Period: Key
 
         /** Left Alt modifier key. */
+        @ExperimentalComposeUiApi
         val AltLeft: Key
 
         /** Right Alt modifier key. */
+        @ExperimentalComposeUiApi
         val AltRight: Key
 
         /** Left Shift modifier key. */
+        @ExperimentalComposeUiApi
         val ShiftLeft: Key
 
         /** Right Shift modifier key. */
+        @ExperimentalComposeUiApi
         val ShiftRight: Key
 
         /** Tab key. */
+        @ExperimentalComposeUiApi
         val Tab: Key
 
         /** Space key. */
+        @ExperimentalComposeUiApi
         val Spacebar: Key
 
         /**
@@ -333,6 +416,7 @@ expect inline class Key(val keyCode: Long) {
          *
          * Used to enter alternate symbols.
          */
+        @ExperimentalComposeUiApi
         val Symbol: Key
 
         /**
@@ -340,6 +424,7 @@ expect inline class Key(val keyCode: Long) {
          *
          * Used to launch a browser application.
          */
+        @ExperimentalComposeUiApi
         val Browser: Key
 
         /**
@@ -347,9 +432,11 @@ expect inline class Key(val keyCode: Long) {
          *
          * Used to launch a mail application.
          */
+        @ExperimentalComposeUiApi
         val Envelope: Key
 
         /** Enter key. */
+        @ExperimentalComposeUiApi
         val Enter: Key
 
         /**
@@ -357,6 +444,7 @@ expect inline class Key(val keyCode: Long) {
          *
          * Deletes characters before the insertion point, unlike [Delete].
          */
+        @ExperimentalComposeUiApi
         val Backspace: Key
 
         /**
@@ -364,36 +452,47 @@ expect inline class Key(val keyCode: Long) {
          *
          * Deletes characters ahead of the insertion point, unlike [Backspace].
          */
+        @ExperimentalComposeUiApi
         val Delete: Key
 
         /** Escape key. */
+        @ExperimentalComposeUiApi
         val Escape: Key
 
         /** Left Control modifier key. */
+        @ExperimentalComposeUiApi
         val CtrlLeft: Key
 
         /** Right Control modifier key. */
+        @ExperimentalComposeUiApi
         val CtrlRight: Key
 
         /** Caps Lock key. */
+        @ExperimentalComposeUiApi
         val CapsLock: Key
 
         /** Scroll Lock key. */
+        @ExperimentalComposeUiApi
         val ScrollLock: Key
 
         /** Left Meta modifier key. */
+        @ExperimentalComposeUiApi
         val MetaLeft: Key
 
         /** Right Meta modifier key. */
+        @ExperimentalComposeUiApi
         val MetaRight: Key
 
         /** Function modifier key. */
+        @ExperimentalComposeUiApi
         val Function: Key
 
         /** System Request / Print Screen key. */
+        @ExperimentalComposeUiApi
         val PrintScreen: Key
 
         /** Break / Pause key. */
+        @ExperimentalComposeUiApi
         val Break: Key
 
         /**
@@ -402,6 +501,7 @@ expect inline class Key(val keyCode: Long) {
          * Used for scrolling or moving the cursor around to the start of a line
          * or to the top of a list.
          */
+        @ExperimentalComposeUiApi
         val MoveHome: Key
 
         /**
@@ -410,6 +510,7 @@ expect inline class Key(val keyCode: Long) {
          * Used for scrolling or moving the cursor around to the end of a line
          * or to the bottom of a list.
          */
+        @ExperimentalComposeUiApi
         val MoveEnd: Key
 
         /**
@@ -417,39 +518,51 @@ expect inline class Key(val keyCode: Long) {
          *
          * Toggles insert / overwrite edit mode.
          */
+        @ExperimentalComposeUiApi
         val Insert: Key
 
         /** Cut key. */
+        @ExperimentalComposeUiApi
         val Cut: Key
 
         /** Copy key. */
+        @ExperimentalComposeUiApi
         val Copy: Key
 
         /** Paste key. */
+        @ExperimentalComposeUiApi
         val Paste: Key
 
         /** '`' (backtick) key. */
+        @ExperimentalComposeUiApi
         val Grave: Key
 
         /** '[' key. */
+        @ExperimentalComposeUiApi
         val LeftBracket: Key
 
         /** ']' key. */
+        @ExperimentalComposeUiApi
         val RightBracket: Key
 
         /** '/' key. */
+        @ExperimentalComposeUiApi
         val Slash: Key
 
         /** '\' key. */
+        @ExperimentalComposeUiApi
         val Backslash: Key
 
         /** ';' key. */
+        @ExperimentalComposeUiApi
         val Semicolon: Key
 
         /** ''' (apostrophe) key. */
+        @ExperimentalComposeUiApi
         val Apostrophe: Key
 
         /** '@' key. */
+        @ExperimentalComposeUiApi
         val At: Key
 
         /**
@@ -458,6 +571,7 @@ expect inline class Key(val keyCode: Long) {
          * Used to enter numeric symbols.
          * This key is not Num Lock; it is more like  [AltLeft].
          */
+        @ExperimentalComposeUiApi
         val Number: Key
 
         /**
@@ -465,6 +579,7 @@ expect inline class Key(val keyCode: Long) {
          *
          * Used to hang up calls and stop media.
          */
+        @ExperimentalComposeUiApi
         val HeadsetHook: Key
 
         /**
@@ -472,21 +587,27 @@ expect inline class Key(val keyCode: Long) {
          *
          * Used to focus the camera.
          */
+        @ExperimentalComposeUiApi
         val Focus: Key
 
         /** Menu key. */
+        @ExperimentalComposeUiApi
         val Menu: Key
 
         /** Notification key. */
+        @ExperimentalComposeUiApi
         val Notification: Key
 
         /** Search key. */
+        @ExperimentalComposeUiApi
         val Search: Key
 
         /** Page Up key. */
+        @ExperimentalComposeUiApi
         val PageUp: Key
 
         /** Page Down key. */
+        @ExperimentalComposeUiApi
         val PageDown: Key
 
         /**
@@ -494,6 +615,7 @@ expect inline class Key(val keyCode: Long) {
          *
          * Used to switch symbol sets (Emoji, Kao-moji).
          */
+        @ExperimentalComposeUiApi
         val PictureSymbols: Key
 
         /**
@@ -501,6 +623,7 @@ expect inline class Key(val keyCode: Long) {
          *
          * Used to switch character sets (Kanji, Katakana).
          */
+        @ExperimentalComposeUiApi
         val SwitchCharset: Key
 
         /**
@@ -509,6 +632,7 @@ expect inline class Key(val keyCode: Long) {
          * On a game controller, the A button should be either the button labeled A
          * or the first button on the bottom row of controller buttons.
          */
+        @ExperimentalComposeUiApi
         val ButtonA: Key
 
         /**
@@ -517,6 +641,7 @@ expect inline class Key(val keyCode: Long) {
          * On a game controller, the B button should be either the button labeled B
          * or the second button on the bottom row of controller buttons.
          */
+        @ExperimentalComposeUiApi
         val ButtonB: Key
 
         /**
@@ -525,6 +650,7 @@ expect inline class Key(val keyCode: Long) {
          * On a game controller, the C button should be either the button labeled C
          * or the third button on the bottom row of controller buttons.
          */
+        @ExperimentalComposeUiApi
         val ButtonC: Key
 
         /**
@@ -533,6 +659,7 @@ expect inline class Key(val keyCode: Long) {
          * On a game controller, the X button should be either the button labeled X
          * or the first button on the upper row of controller buttons.
          */
+        @ExperimentalComposeUiApi
         val ButtonX: Key
 
         /**
@@ -541,6 +668,7 @@ expect inline class Key(val keyCode: Long) {
          * On a game controller, the Y button should be either the button labeled Y
          * or the second button on the upper row of controller buttons.
          */
+        @ExperimentalComposeUiApi
         val ButtonY: Key
 
         /**
@@ -549,6 +677,7 @@ expect inline class Key(val keyCode: Long) {
          * On a game controller, the Z button should be either the button labeled Z
          * or the third button on the upper row of controller buttons.
          */
+        @ExperimentalComposeUiApi
         val ButtonZ: Key
 
         /**
@@ -557,6 +686,7 @@ expect inline class Key(val keyCode: Long) {
          * On a game controller, the L1 button should be either the button labeled L1 (or L)
          * or the top left trigger button.
          */
+        @ExperimentalComposeUiApi
         val ButtonL1: Key
 
         /**
@@ -565,6 +695,7 @@ expect inline class Key(val keyCode: Long) {
          * On a game controller, the R1 button should be either the button labeled R1 (or R)
          * or the top right trigger button.
          */
+        @ExperimentalComposeUiApi
         val ButtonR1: Key
 
         /**
@@ -573,6 +704,7 @@ expect inline class Key(val keyCode: Long) {
          * On a game controller, the L2 button should be either the button labeled L2
          * or the bottom left trigger button.
          */
+        @ExperimentalComposeUiApi
         val ButtonL2: Key
 
         /**
@@ -581,6 +713,7 @@ expect inline class Key(val keyCode: Long) {
          * On a game controller, the R2 button should be either the button labeled R2
          * or the bottom right trigger button.
          */
+        @ExperimentalComposeUiApi
         val ButtonR2: Key
 
         /**
@@ -589,6 +722,7 @@ expect inline class Key(val keyCode: Long) {
          * On a game controller, the left thumb button indicates that the left (or only)
          * joystick is pressed.
          */
+        @ExperimentalComposeUiApi
         val ButtonThumbLeft: Key
 
         /**
@@ -597,6 +731,7 @@ expect inline class Key(val keyCode: Long) {
          * On a game controller, the right thumb button indicates that the right
          * joystick is pressed.
          */
+        @ExperimentalComposeUiApi
         val ButtonThumbRight: Key
 
         /**
@@ -604,6 +739,7 @@ expect inline class Key(val keyCode: Long) {
          *
          * On a game controller, the button labeled Start.
          */
+        @ExperimentalComposeUiApi
         val ButtonStart: Key
 
         /**
@@ -611,6 +747,7 @@ expect inline class Key(val keyCode: Long) {
          *
          * On a game controller, the button labeled Select.
          */
+        @ExperimentalComposeUiApi
         val ButtonSelect: Key
 
         /**
@@ -618,54 +755,71 @@ expect inline class Key(val keyCode: Long) {
          *
          * On a game controller, the button labeled Mode.
          */
+        @ExperimentalComposeUiApi
         val ButtonMode: Key
 
         /** Generic Game Pad Button #1. */
+        @ExperimentalComposeUiApi
         val Button1: Key
 
         /** Generic Game Pad Button #2. */
+        @ExperimentalComposeUiApi
         val Button2: Key
 
         /** Generic Game Pad Button #3. */
+        @ExperimentalComposeUiApi
         val Button3: Key
 
         /** Generic Game Pad Button #4. */
+        @ExperimentalComposeUiApi
         val Button4: Key
 
         /** Generic Game Pad Button #5. */
+        @ExperimentalComposeUiApi
         val Button5: Key
 
         /** Generic Game Pad Button #6. */
+        @ExperimentalComposeUiApi
         val Button6: Key
 
         /** Generic Game Pad Button #7. */
+        @ExperimentalComposeUiApi
         val Button7: Key
 
         /** Generic Game Pad Button #8. */
+        @ExperimentalComposeUiApi
         val Button8: Key
 
         /** Generic Game Pad Button #9. */
+        @ExperimentalComposeUiApi
         val Button9: Key
 
         /** Generic Game Pad Button #10. */
+        @ExperimentalComposeUiApi
         val Button10: Key
 
         /** Generic Game Pad Button #11. */
+        @ExperimentalComposeUiApi
         val Button11: Key
 
         /** Generic Game Pad Button #12. */
+        @ExperimentalComposeUiApi
         val Button12: Key
 
         /** Generic Game Pad Button #13. */
+        @ExperimentalComposeUiApi
         val Button13: Key
 
         /** Generic Game Pad Button #14. */
+        @ExperimentalComposeUiApi
         val Button14: Key
 
         /** Generic Game Pad Button #15. */
+        @ExperimentalComposeUiApi
         val Button15: Key
 
         /** Generic Game Pad Button #16. */
+        @ExperimentalComposeUiApi
         val Button16: Key
 
         /**
@@ -673,42 +827,55 @@ expect inline class Key(val keyCode: Long) {
          *
          * Navigates forward in the history stack. Complement of [Back].
          */
+        @ExperimentalComposeUiApi
         val Forward: Key
 
         /** F1 key. */
+        @ExperimentalComposeUiApi
         val F1: Key
 
         /** F2 key. */
+        @ExperimentalComposeUiApi
         val F2: Key
 
         /** F3 key. */
+        @ExperimentalComposeUiApi
         val F3: Key
 
         /** F4 key. */
+        @ExperimentalComposeUiApi
         val F4: Key
 
         /** F5 key. */
+        @ExperimentalComposeUiApi
         val F5: Key
 
         /** F6 key. */
+        @ExperimentalComposeUiApi
         val F6: Key
 
         /** F7 key. */
+        @ExperimentalComposeUiApi
         val F7: Key
 
         /** F8 key. */
+        @ExperimentalComposeUiApi
         val F8: Key
 
         /** F9 key. */
+        @ExperimentalComposeUiApi
         val F9: Key
 
         /** F10 key. */
+        @ExperimentalComposeUiApi
         val F10: Key
 
         /** F11 key. */
+        @ExperimentalComposeUiApi
         val F11: Key
 
         /** F12 key. */
+        @ExperimentalComposeUiApi
         val F12: Key
 
         /**
@@ -717,93 +884,123 @@ expect inline class Key(val keyCode: Long) {
          * This is the Num Lock key; it is different from [Number].
          * This key alters the behavior of other keys on the numeric keypad.
          */
+        @ExperimentalComposeUiApi
         val NumLock: Key
 
         /** Numeric keypad '0' key. */
+        @ExperimentalComposeUiApi
         val NumPad0: Key
 
         /** Numeric keypad '1' key. */
+        @ExperimentalComposeUiApi
         val NumPad1: Key
 
         /** Numeric keypad '2' key. */
+        @ExperimentalComposeUiApi
         val NumPad2: Key
 
         /** Numeric keypad '3' key. */
+        @ExperimentalComposeUiApi
         val NumPad3: Key
 
         /** Numeric keypad '4' key. */
+        @ExperimentalComposeUiApi
         val NumPad4: Key
 
         /** Numeric keypad '5' key. */
+        @ExperimentalComposeUiApi
         val NumPad5: Key
 
         /** Numeric keypad '6' key. */
+        @ExperimentalComposeUiApi
         val NumPad6: Key
 
         /** Numeric keypad '7' key. */
+        @ExperimentalComposeUiApi
         val NumPad7: Key
 
         /** Numeric keypad '8' key. */
+        @ExperimentalComposeUiApi
         val NumPad8: Key
 
         /** Numeric keypad '9' key. */
+        @ExperimentalComposeUiApi
         val NumPad9: Key
 
         /** Numeric keypad '/' key (for division). */
+        @ExperimentalComposeUiApi
         val NumPadDivide: Key
 
         /** Numeric keypad '*' key (for multiplication). */
+        @ExperimentalComposeUiApi
         val NumPadMultiply: Key
 
         /** Numeric keypad '-' key (for subtraction). */
+        @ExperimentalComposeUiApi
         val NumPadSubtract: Key
 
         /** Numeric keypad '+' key (for addition). */
+        @ExperimentalComposeUiApi
         val NumPadAdd: Key
 
         /** Numeric keypad '.' key (for decimals or digit grouping). */
+        @ExperimentalComposeUiApi
         val NumPadDot: Key
 
         /** Numeric keypad ',' key (for decimals or digit grouping). */
+        @ExperimentalComposeUiApi
         val NumPadComma: Key
 
         /** Numeric keypad Enter key. */
+        @ExperimentalComposeUiApi
         val NumPadEnter: Key
 
         /** Numeric keypad '=' key. */
+        @ExperimentalComposeUiApi
         val NumPadEquals: Key
 
         /** Numeric keypad '(' key. */
+        @ExperimentalComposeUiApi
         val NumPadLeftParenthesis: Key
 
         /** Numeric keypad ')' key. */
+        @ExperimentalComposeUiApi
         val NumPadRightParenthesis: Key
 
         /** Play media key. */
+        @ExperimentalComposeUiApi
         val MediaPlay: Key
 
         /** Pause media key. */
+        @ExperimentalComposeUiApi
         val MediaPause: Key
 
         /** Play/Pause media key. */
+        @ExperimentalComposeUiApi
         val MediaPlayPause: Key
 
         /** Stop media key. */
+        @ExperimentalComposeUiApi
         val MediaStop: Key
 
         /** Record media key. */
+        @ExperimentalComposeUiApi
         val MediaRecord: Key
 
         /** Play Next media key. */
+        @ExperimentalComposeUiApi
         val MediaNext: Key
 
         /** Play Previous media key. */
+        @ExperimentalComposeUiApi
         val MediaPrevious: Key
 
         /** Rewind media key. */
+        @ExperimentalComposeUiApi
         val MediaRewind: Key
 
         /** Fast Forward media key. */
+        @ExperimentalComposeUiApi
         val MediaFastForward: Key
 
         /**
@@ -811,6 +1008,7 @@ expect inline class Key(val keyCode: Long) {
          *
          * May be used to close a CD tray, for example.
          */
+        @ExperimentalComposeUiApi
         val MediaClose: Key
 
         /**
@@ -818,6 +1016,7 @@ expect inline class Key(val keyCode: Long) {
          *
          * Switches the audio tracks.
          */
+        @ExperimentalComposeUiApi
         val MediaAudioTrack: Key
 
         /**
@@ -825,6 +1024,7 @@ expect inline class Key(val keyCode: Long) {
          *
          * May be used to eject a CD tray, for example.
          */
+        @ExperimentalComposeUiApi
         val MediaEject: Key
 
         /**
@@ -832,12 +1032,15 @@ expect inline class Key(val keyCode: Long) {
          *
          * Goes to the top of media menu.
          */
+        @ExperimentalComposeUiApi
         val MediaTopMenu: Key
 
         /** Skip forward media key. */
+        @ExperimentalComposeUiApi
         val MediaSkipForward: Key
 
         /** Skip backward media key. */
+        @ExperimentalComposeUiApi
         val MediaSkipBackward: Key
 
         /**
@@ -845,6 +1048,7 @@ expect inline class Key(val keyCode: Long) {
          *
          * Steps media forward, one frame at a time.
          */
+        @ExperimentalComposeUiApi
         val MediaStepForward: Key
 
         /**
@@ -852,6 +1056,7 @@ expect inline class Key(val keyCode: Long) {
          *
          * Steps media backward, one frame at a time.
          */
+        @ExperimentalComposeUiApi
         val MediaStepBackward: Key
 
         /**
@@ -859,6 +1064,7 @@ expect inline class Key(val keyCode: Long) {
          *
          * Mutes the microphone, unlike [VolumeMute].
          */
+        @ExperimentalComposeUiApi
         val MicrophoneMute: Key
 
         /**
@@ -869,6 +1075,7 @@ expect inline class Key(val keyCode: Long) {
          * This key should normally be implemented as a toggle such that the first press
          * mutes the speaker and the second press restores the original volume.
          */
+        @ExperimentalComposeUiApi
         val VolumeMute: Key
 
         /**
@@ -877,6 +1084,7 @@ expect inline class Key(val keyCode: Long) {
          * Common on TV remotes to show additional information related to what is
          * currently being viewed.
          */
+        @ExperimentalComposeUiApi
         val Info: Key
 
         /**
@@ -884,6 +1092,7 @@ expect inline class Key(val keyCode: Long) {
          *
          * On TV remotes, increments the television channel.
          */
+        @ExperimentalComposeUiApi
         val ChannelUp: Key
 
         /**
@@ -891,12 +1100,15 @@ expect inline class Key(val keyCode: Long) {
          *
          * On TV remotes, decrements the television channel.
          */
+        @ExperimentalComposeUiApi
         val ChannelDown: Key
 
         /** Zoom in key. */
+        @ExperimentalComposeUiApi
         val ZoomIn: Key
 
         /** Zoom out key. */
+        @ExperimentalComposeUiApi
         val ZoomOut: Key
 
         /**
@@ -904,6 +1116,7 @@ expect inline class Key(val keyCode: Long) {
          *
          * On TV remotes, switches to viewing live TV.
          */
+        @ExperimentalComposeUiApi
         val Tv: Key
 
         /**
@@ -912,6 +1125,7 @@ expect inline class Key(val keyCode: Long) {
          * On TV remotes, toggles picture-in-picture mode or other windowing functions.
          * On Android Wear devices, triggers a display offset.
          */
+        @ExperimentalComposeUiApi
         val Window: Key
 
         /**
@@ -919,6 +1133,7 @@ expect inline class Key(val keyCode: Long) {
          *
          * On TV remotes, shows a programming guide.
          */
+        @ExperimentalComposeUiApi
         val Guide: Key
 
         /**
@@ -926,6 +1141,7 @@ expect inline class Key(val keyCode: Long) {
          *
          * On some TV remotes, switches to a DVR mode for recorded shows.
          */
+        @ExperimentalComposeUiApi
         val Dvr: Key
 
         /**
@@ -933,6 +1149,7 @@ expect inline class Key(val keyCode: Long) {
          *
          * On some TV remotes, bookmarks content or web pages.
          */
+        @ExperimentalComposeUiApi
         val Bookmark: Key
 
         /**
@@ -940,6 +1157,7 @@ expect inline class Key(val keyCode: Long) {
          *
          * Switches the mode for closed-captioning text, for example during television shows.
          */
+        @ExperimentalComposeUiApi
         val Captions: Key
 
         /**
@@ -947,6 +1165,7 @@ expect inline class Key(val keyCode: Long) {
          *
          * Starts the system settings activity.
          */
+        @ExperimentalComposeUiApi
         val Settings: Key
 
         /**
@@ -954,6 +1173,7 @@ expect inline class Key(val keyCode: Long) {
          *
          * On TV remotes, toggles the power on a television screen.
          */
+        @ExperimentalComposeUiApi
         val TvPower: Key
 
         /**
@@ -961,6 +1181,7 @@ expect inline class Key(val keyCode: Long) {
          *
          * On TV remotes, switches the input on a television screen.
          */
+        @ExperimentalComposeUiApi
         val TvInput: Key
 
         /**
@@ -968,6 +1189,7 @@ expect inline class Key(val keyCode: Long) {
          *
          * On TV remotes, toggles the power on an external Set-top-box.
          */
+        @ExperimentalComposeUiApi
         val SetTopBoxPower: Key
 
         /**
@@ -975,6 +1197,7 @@ expect inline class Key(val keyCode: Long) {
          *
          * On TV remotes, switches the input mode on an external Set-top-box.
          */
+        @ExperimentalComposeUiApi
         val SetTopBoxInput: Key
 
         /**
@@ -982,6 +1205,7 @@ expect inline class Key(val keyCode: Long) {
          *
          * On TV remotes, toggles the power on an external A/V Receiver.
          */
+        @ExperimentalComposeUiApi
         val AvReceiverPower: Key
 
         /**
@@ -989,6 +1213,7 @@ expect inline class Key(val keyCode: Long) {
          *
          * On TV remotes, switches the input mode on an external A/V Receiver.
          */
+        @ExperimentalComposeUiApi
         val AvReceiverInput: Key
 
         /**
@@ -996,6 +1221,7 @@ expect inline class Key(val keyCode: Long) {
          *
          * On TV remotes, acts as a contextual/programmable key.
          */
+        @ExperimentalComposeUiApi
         val ProgramRed: Key
 
         /**
@@ -1003,6 +1229,7 @@ expect inline class Key(val keyCode: Long) {
          *
          * On TV remotes, acts as a contextual/programmable key.
          */
+        @ExperimentalComposeUiApi
         val ProgramGreen: Key
 
         /**
@@ -1010,6 +1237,7 @@ expect inline class Key(val keyCode: Long) {
          *
          * On TV remotes, acts as a contextual/programmable key.
          */
+        @ExperimentalComposeUiApi
         val ProgramYellow: Key
 
         /**
@@ -1017,6 +1245,7 @@ expect inline class Key(val keyCode: Long) {
          *
          * On TV remotes, acts as a contextual/programmable key.
          */
+        @ExperimentalComposeUiApi
         val ProgramBlue: Key
 
         /**
@@ -1024,6 +1253,7 @@ expect inline class Key(val keyCode: Long) {
          *
          * Should bring up the application switcher dialog.
          */
+        @ExperimentalComposeUiApi
         val AppSwitch: Key
 
         /**
@@ -1033,6 +1263,7 @@ expect inline class Key(val keyCode: Long) {
          * a QWERTY keyboard.  On some devices, the same function may be performed by
          * pressing Shift+Space.
          */
+        @ExperimentalComposeUiApi
         val LanguageSwitch: Key
 
         /**
@@ -1042,6 +1273,7 @@ expect inline class Key(val keyCode: Long) {
          * in certain settings such as on a crowded train.  On some devices, the key may only
          * operate when long-pressed.
          */
+        @ExperimentalComposeUiApi
         val MannerMode: Key
 
         /**
@@ -1049,6 +1281,7 @@ expect inline class Key(val keyCode: Long) {
          *
          * Toggles the display between 2D and 3D mode.
          */
+        @ExperimentalComposeUiApi
         val Toggle2D3D: Key
 
         /**
@@ -1056,6 +1289,7 @@ expect inline class Key(val keyCode: Long) {
          *
          * Used to launch an address book application.
          */
+        @ExperimentalComposeUiApi
         val Contacts: Key
 
         /**
@@ -1063,6 +1297,7 @@ expect inline class Key(val keyCode: Long) {
          *
          * Used to launch a calendar application.
          */
+        @ExperimentalComposeUiApi
         val Calendar: Key
 
         /**
@@ -1070,6 +1305,7 @@ expect inline class Key(val keyCode: Long) {
          *
          * Used to launch a music player application.
          */
+        @ExperimentalComposeUiApi
         val Music: Key
 
         /**
@@ -1077,30 +1313,39 @@ expect inline class Key(val keyCode: Long) {
          *
          * Used to launch a calculator application.
          */
+        @ExperimentalComposeUiApi
         val Calculator: Key
 
         /** Japanese full-width / half-width key. */
+        @ExperimentalComposeUiApi
         val ZenkakuHankaru: Key
 
         /** Japanese alphanumeric key. */
+        @ExperimentalComposeUiApi
         val Eisu: Key
 
         /** Japanese non-conversion key. */
+        @ExperimentalComposeUiApi
         val Muhenkan: Key
 
         /** Japanese conversion key. */
+        @ExperimentalComposeUiApi
         val Henkan: Key
 
         /** Japanese katakana / hiragana key. */
+        @ExperimentalComposeUiApi
         val KatakanaHiragana: Key
 
         /** Japanese Yen key. */
+        @ExperimentalComposeUiApi
         val Yen: Key
 
         /** Japanese Ro key. */
+        @ExperimentalComposeUiApi
         val Ro: Key
 
         /** Japanese kana key. */
+        @ExperimentalComposeUiApi
         val Kana: Key
 
         /**
@@ -1108,6 +1353,7 @@ expect inline class Key(val keyCode: Long) {
          *
          * Launches the global assist activity.  Not delivered to applications.
          */
+        @ExperimentalComposeUiApi
         val Assist: Key
 
         /**
@@ -1115,6 +1361,7 @@ expect inline class Key(val keyCode: Long) {
          *
          * Adjusts the screen brightness down.
          */
+        @ExperimentalComposeUiApi
         val BrightnessDown: Key
 
         /**
@@ -1122,6 +1369,7 @@ expect inline class Key(val keyCode: Long) {
          *
          * Adjusts the screen brightness up.
          */
+        @ExperimentalComposeUiApi
         val BrightnessUp: Key
 
         /**
@@ -1130,6 +1378,7 @@ expect inline class Key(val keyCode: Long) {
          * Puts the device to sleep. Behaves somewhat like [Power] but it
          * has no effect if the device is already asleep.
          */
+        @ExperimentalComposeUiApi
         val Sleep: Key
 
         /**
@@ -1138,9 +1387,11 @@ expect inline class Key(val keyCode: Long) {
          * Wakes up the device.  Behaves somewhat like [Power] but it
          * has no effect if the device is already awake.
          */
+        @ExperimentalComposeUiApi
         val WakeUp: Key
 
         /** Put device to sleep unless a wakelock is held.  */
+        @ExperimentalComposeUiApi
         val SoftSleep: Key
 
         /**
@@ -1150,6 +1401,7 @@ expect inline class Key(val keyCode: Long) {
          * devices or game controllers, especially if no other input mode is
          * available.
          */
+        @ExperimentalComposeUiApi
         val Pairing: Key
 
         /**
@@ -1157,6 +1409,7 @@ expect inline class Key(val keyCode: Long) {
          *
          * Goes to the last viewed channel.
          */
+        @ExperimentalComposeUiApi
         val LastChannel: Key
 
         /**
@@ -1164,6 +1417,7 @@ expect inline class Key(val keyCode: Long) {
          *
          * Displays data services like weather, sports.
          */
+        @ExperimentalComposeUiApi
         val TvDataService: Key
 
         /**
@@ -1171,6 +1425,7 @@ expect inline class Key(val keyCode: Long) {
          *
          * Launches the global voice assist activity. Not delivered to applications.
          */
+        @ExperimentalComposeUiApi
         val VoiceAssist: Key
 
         /**
@@ -1178,6 +1433,7 @@ expect inline class Key(val keyCode: Long) {
          *
          * Toggles TV service / Radio service.
          */
+        @ExperimentalComposeUiApi
         val TvRadioService: Key
 
         /**
@@ -1185,6 +1441,7 @@ expect inline class Key(val keyCode: Long) {
          *
          * Displays Teletext service.
          */
+        @ExperimentalComposeUiApi
         val TvTeletext: Key
 
         /**
@@ -1194,6 +1451,7 @@ expect inline class Key(val keyCode: Long) {
          * for selecting separate channel. Corresponds to Number Entry Mode (0x1D) of CEC
          * User Control Code.
          */
+        @ExperimentalComposeUiApi
         val TvNumberEntry: Key
 
         /**
@@ -1201,6 +1459,7 @@ expect inline class Key(val keyCode: Long) {
          *
          * Switches to analog terrestrial broadcast service.
          */
+        @ExperimentalComposeUiApi
         val TvTerrestrialAnalog: Key
 
         /**
@@ -1208,6 +1467,7 @@ expect inline class Key(val keyCode: Long) {
          *
          * Switches to digital terrestrial broadcast service.
          */
+        @ExperimentalComposeUiApi
         val TvTerrestrialDigital: Key
 
         /**
@@ -1215,6 +1475,7 @@ expect inline class Key(val keyCode: Long) {
          *
          * Switches to digital satellite broadcast service.
          */
+        @ExperimentalComposeUiApi
         val TvSatellite: Key
 
         /**
@@ -1222,6 +1483,7 @@ expect inline class Key(val keyCode: Long) {
          *
          * Switches to BS digital satellite broadcasting service available in Japan.
          */
+        @ExperimentalComposeUiApi
         val TvSatelliteBs: Key
 
         /**
@@ -1229,6 +1491,7 @@ expect inline class Key(val keyCode: Long) {
          *
          * Switches to CS digital satellite broadcasting service available in Japan.
          */
+        @ExperimentalComposeUiApi
         val TvSatelliteCs: Key
 
         /**
@@ -1236,6 +1499,7 @@ expect inline class Key(val keyCode: Long) {
          *
          * Toggles between BS and CS digital satellite services.
          */
+        @ExperimentalComposeUiApi
         val TvSatelliteService: Key
 
         /**
@@ -1243,6 +1507,7 @@ expect inline class Key(val keyCode: Long) {
          *
          * Toggles selecting broadcast services.
          */
+        @ExperimentalComposeUiApi
         val TvNetwork: Key
 
         /**
@@ -1250,6 +1515,7 @@ expect inline class Key(val keyCode: Long) {
          *
          * Toggles broadcast input source between antenna and cable.
          */
+        @ExperimentalComposeUiApi
         val TvAntennaCable: Key
 
         /**
@@ -1257,6 +1523,7 @@ expect inline class Key(val keyCode: Long) {
          *
          * Switches to HDMI input #1.
          */
+        @ExperimentalComposeUiApi
         val TvInputHdmi1: Key
 
         /**
@@ -1264,6 +1531,7 @@ expect inline class Key(val keyCode: Long) {
          *
          * Switches to HDMI input #2.
          */
+        @ExperimentalComposeUiApi
         val TvInputHdmi2: Key
 
         /**
@@ -1271,6 +1539,7 @@ expect inline class Key(val keyCode: Long) {
          *
          * Switches to HDMI input #3.
          */
+        @ExperimentalComposeUiApi
         val TvInputHdmi3: Key
 
         /**
@@ -1278,6 +1547,7 @@ expect inline class Key(val keyCode: Long) {
          *
          * Switches to HDMI input #4.
          */
+        @ExperimentalComposeUiApi
         val TvInputHdmi4: Key
 
         /**
@@ -1285,6 +1555,7 @@ expect inline class Key(val keyCode: Long) {
          *
          * Switches to composite video input #1.
          */
+        @ExperimentalComposeUiApi
         val TvInputComposite1: Key
 
         /**
@@ -1292,6 +1563,7 @@ expect inline class Key(val keyCode: Long) {
          *
          * Switches to composite video input #2.
          */
+        @ExperimentalComposeUiApi
         val TvInputComposite2: Key
 
         /**
@@ -1299,6 +1571,7 @@ expect inline class Key(val keyCode: Long) {
          *
          * Switches to component video input #1.
          */
+        @ExperimentalComposeUiApi
         val TvInputComponent1: Key
 
         /**
@@ -1306,6 +1579,7 @@ expect inline class Key(val keyCode: Long) {
          *
          * Switches to component video input #2.
          */
+        @ExperimentalComposeUiApi
         val TvInputComponent2: Key
 
         /**
@@ -1313,6 +1587,7 @@ expect inline class Key(val keyCode: Long) {
          *
          * Switches to VGA (analog RGB) input #1.
          */
+        @ExperimentalComposeUiApi
         val TvInputVga1: Key
 
         /**
@@ -1320,6 +1595,7 @@ expect inline class Key(val keyCode: Long) {
          *
          * Toggles audio description off / on.
          */
+        @ExperimentalComposeUiApi
         val TvAudioDescription: Key
 
         /**
@@ -1327,6 +1603,7 @@ expect inline class Key(val keyCode: Long) {
          *
          * Increase the audio description volume as compared with normal audio volume.
          */
+        @ExperimentalComposeUiApi
         val TvAudioDescriptionMixingVolumeUp: Key
 
         /**
@@ -1334,6 +1611,7 @@ expect inline class Key(val keyCode: Long) {
          *
          * Lessen audio description volume as compared with normal audio volume.
          */
+        @ExperimentalComposeUiApi
         val TvAudioDescriptionMixingVolumeDown: Key
 
         /**
@@ -1341,6 +1619,7 @@ expect inline class Key(val keyCode: Long) {
          *
          * Changes Zoom mode (Normal, Full, Zoom, Wide-zoom, etc.)
          */
+        @ExperimentalComposeUiApi
         val TvZoomMode: Key
 
         /**
@@ -1348,6 +1627,7 @@ expect inline class Key(val keyCode: Long) {
          *
          * Goes to the title list. Corresponds to Contents Menu (0x0B) of CEC User Control Code
          */
+        @ExperimentalComposeUiApi
         val TvContentsMenu: Key
 
         /**
@@ -1356,6 +1636,7 @@ expect inline class Key(val keyCode: Long) {
          * Goes to the context menu of media contents. Corresponds to Media Context-sensitive
          * Menu (0x11) of CEC User Control Code.
          */
+        @ExperimentalComposeUiApi
         val TvMediaContextMenu: Key
 
         /**
@@ -1364,6 +1645,7 @@ expect inline class Key(val keyCode: Long) {
          * Goes to the timer recording menu. Corresponds to Timer Programming (0x54) of
          * CEC User Control Code.
          */
+        @ExperimentalComposeUiApi
         val TvTimerProgramming: Key
 
         /**
@@ -1371,33 +1653,42 @@ expect inline class Key(val keyCode: Long) {
          *
          * Main power/reset button.
          */
+        @ExperimentalComposeUiApi
         val StemPrimary: Key
 
         /** Generic stem key 1 for Wearables. */
+        @ExperimentalComposeUiApi
         val Stem1: Key
 
         /** Generic stem key 2 for Wearables. */
+        @ExperimentalComposeUiApi
         val Stem2: Key
 
         /** Generic stem key 3 for Wearables. */
+        @ExperimentalComposeUiApi
         val Stem3: Key
 
         /** Show all apps. */
+        @ExperimentalComposeUiApi
         val AllApps: Key
 
         /** Refresh key. */
+        @ExperimentalComposeUiApi
         val Refresh: Key
 
         /** Thumbs up key. Apps can use this to let user up-vote content. */
+        @ExperimentalComposeUiApi
         val ThumbsUp: Key
 
         /** Thumbs down key. Apps can use this to let user down-vote content. */
+        @ExperimentalComposeUiApi
         val ThumbsDown: Key
 
         /**
          * Used to switch current [account][android.accounts.Account] that is
          * consuming content. May be consumed by system to set account globally.
          */
+        @ExperimentalComposeUiApi
         val ProfileSwitch: Key
     }
 

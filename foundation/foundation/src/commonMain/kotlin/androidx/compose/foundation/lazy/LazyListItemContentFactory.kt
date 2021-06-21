@@ -73,10 +73,12 @@ internal class LazyListItemContentFactory(
         val itemsProvider = itemsProvider.value
         val itemsCount = itemsProvider.itemsCount
         if (itemsCount > 0) {
+            state.updateScrollPositionIfTheFirstItemWasMoved(itemsProvider)
             val firstVisible = state.firstVisibleItemIndexNonObservable.value
-            val lastVisible = state.lastVisibleItemIndexNonObservable.value
-            for (i in firstVisible..minOf(itemsCount - 1, lastVisible)) {
-                lambdasCache[itemsProvider.getKey(i)]?.index = i
+            val count = state.visibleItemsCount
+            for (i in firstVisible until minOf(itemsCount, firstVisible + count)) {
+                val key = itemsProvider.getKey(i)
+                lambdasCache[key]?.index = i
             }
         }
     }
@@ -85,9 +87,14 @@ internal class LazyListItemContentFactory(
      * Return cached item content lambda or creates a new lambda and puts it in the cache.
      */
     fun getContent(index: Int, key: Any): @Composable () -> Unit {
-        val cachedContent = lambdasCache.getOrPut(key) { CachedItemContent(index, itemScope, key) }
-        cachedContent.index = index
-        return cachedContent.content
+        val cachedContent = lambdasCache[key]
+        return if (cachedContent != null && cachedContent.index == index) {
+            cachedContent.content
+        } else {
+            val newContent = CachedItemContent(index, itemScope, key)
+            lambdasCache[key] = newContent
+            newContent.content
+        }
     }
 
     private inner class CachedItemContent(

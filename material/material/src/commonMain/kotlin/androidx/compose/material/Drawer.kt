@@ -43,6 +43,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shape
+import androidx.compose.ui.graphics.isSpecified
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.onGloballyPositioned
@@ -410,12 +411,20 @@ fun ModalDrawer(
             }
             Scrim(
                 open = drawerState.isOpen,
-                onClose = { scope.launch { drawerState.close() } },
+                onClose = {
+                    if (
+                        gesturesEnabled &&
+                        drawerState.swipeableState.confirmStateChange(DrawerValue.Closed)
+                    ) {
+                        scope.launch { drawerState.close() }
+                    }
+                },
                 fraction = {
                     calculateFraction(minValue, maxValue, drawerState.offset.value)
                 },
                 color = scrimColor
             )
+            val navigationMenu = getString(Strings.NavigationMenu)
             Surface(
                 modifier = with(LocalDensity.current) {
                     Modifier
@@ -429,9 +438,16 @@ fun ModalDrawer(
                     .offset { IntOffset(drawerState.offset.value.roundToInt(), 0) }
                     .padding(end = EndDrawerPadding)
                     .semantics {
-                        paneTitle = Strings.NavigationMenu
+                        paneTitle = navigationMenu
                         if (drawerState.isOpen) {
-                            dismiss(action = { scope.launch { drawerState.close() }; true })
+                            dismiss {
+                                if (
+                                    drawerState.swipeableState
+                                        .confirmStateChange(DrawerValue.Closed)
+                                ) {
+                                    scope.launch { drawerState.close() }
+                                }; true
+                            }
                         }
                     },
                 shape = drawerShape,
@@ -468,7 +484,9 @@ fun ModalDrawer(
  * @param drawerContentColor color of the content to use inside the drawer sheet. Defaults to
  * either the matching content color for [drawerBackgroundColor], or, if it is not a color from
  * the theme, this will keep the same value set above this Surface.
- * @param scrimColor color of the scrim that obscures content when the drawer is open
+ * @param scrimColor color of the scrim that obscures content when the drawer is open. If the
+ * color passed is [Color.Unspecified], then a scrim will no longer be applied and the bottom
+ * drawer will not block interaction with the rest of the screen when visible.
  * @param content content of the rest of the UI
  *
  */
@@ -516,8 +534,13 @@ fun BottomDrawer(
                     maxHeight = constraints.maxHeight.toDp()
                 )
         }
+        val nestedScroll = if (gesturesEnabled) {
+            Modifier.nestedScroll(drawerState.nestedScrollConnection)
+        } else {
+            Modifier
+        }
         val swipeable = Modifier
-            .nestedScroll(drawerState.nestedScrollConnection)
+            .then(nestedScroll)
             .swipeable(
                 state = drawerState,
                 anchors = anchors,
@@ -530,9 +553,16 @@ fun BottomDrawer(
             content()
             BottomDrawerScrim(
                 color = scrimColor,
-                onDismiss = { scope.launch { drawerState.close() } },
+                onDismiss = {
+                    if (
+                        gesturesEnabled && drawerState.confirmStateChange(BottomDrawerValue.Closed)
+                    ) {
+                        scope.launch { drawerState.close() }
+                    }
+                },
                 visible = drawerState.targetValue != BottomDrawerValue.Closed
             )
+            val navigationMenu = getString(Strings.NavigationMenu)
             Surface(
                 drawerConstraints
                     .offset { IntOffset(x = 0, y = drawerState.offset.value.roundToInt()) }
@@ -540,10 +570,14 @@ fun BottomDrawer(
                         drawerHeight = position.size.height.toFloat()
                     }
                     .semantics {
-                        paneTitle = Strings.NavigationMenu
+                        paneTitle = navigationMenu
                         if (drawerState.isOpen) {
                             // TODO(b/180101663) The action currently doesn't return the correct results
-                            dismiss(action = { scope.launch { drawerState.close() }; true })
+                            dismiss {
+                                if (drawerState.confirmStateChange(BottomDrawerValue.Closed)) {
+                                    scope.launch { drawerState.close() }
+                                }; true
+                            }
                         }
                     },
                 shape = drawerShape,
@@ -586,18 +620,19 @@ private fun BottomDrawerScrim(
     onDismiss: () -> Unit,
     visible: Boolean
 ) {
-    if (color != Color.Transparent) {
+    if (color.isSpecified) {
         val alpha by animateFloatAsState(
             targetValue = if (visible) 1f else 0f,
             animationSpec = TweenSpec()
         )
+        val closeDrawer = getString(Strings.CloseDrawer)
         val dismissModifier = if (visible) {
             Modifier
                 .pointerInput(onDismiss) {
                     detectTapGestures { onDismiss() }
                 }
                 .semantics(mergeDescendants = true) {
-                    contentDescription = Strings.CloseDrawer
+                    contentDescription = closeDrawer
                     onClick { onDismiss(); true }
                 }
         } else {
@@ -621,11 +656,12 @@ private fun Scrim(
     fraction: () -> Float,
     color: Color
 ) {
+    val closeDrawer = getString(Strings.CloseDrawer)
     val dismissDrawer = if (open) {
         Modifier
             .pointerInput(onClose) { detectTapGestures { onClose() } }
             .semantics(mergeDescendants = true) {
-                contentDescription = Strings.CloseDrawer
+                contentDescription = closeDrawer
                 onClick { onClose(); true }
             }
     } else {

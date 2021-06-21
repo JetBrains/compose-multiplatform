@@ -17,11 +17,10 @@
 import androidx.build.SupportConfigKt
 
 import static androidx.build.AndroidXPlugin.BUILD_ON_SERVER_TASK
-import static androidx.build.dependencies.DependenciesKt.*
 
 plugins {
     id("AndroidXPlugin")
-    id("AndroidXUiPlugin")
+    id("AndroidXComposePlugin")
     id("kotlin-multiplatform")
 }
 
@@ -39,7 +38,7 @@ kotlin {
         }
 
         jvmMain.dependencies {
-            implementation(SKIKO_CURRENT_OS)
+            implementation(libs.skikoCurrentOs)
             implementation(project(":compose:desktop:desktop"))
         }
     }
@@ -87,6 +86,17 @@ task runVsync(type: JavaExec) {
     main = "androidx.compose.desktop.examples.vsynctest.Main_jvmKt"
     jvmArgs("-verbose:gc")
     def compilation = kotlin.jvm().compilations["main"]
+    classpath =
+        compilation.output.allOutputs +
+        compilation.runtimeDependencyFiles
+}
+
+task runWindowApi(type: JavaExec) {
+    dependsOn(":compose:desktop:desktop:jar")
+    main = "androidx.compose.desktop.examples.windowapi.Main_jvmKt"
+    def compilation = kotlin.jvm().compilations["main"]
+    systemProperty("skiko.rendering.laf.global", "true")
+    systemProperty("skiko.rendering.useScreenMenuBar", "true")
     classpath =
         compilation.output.allOutputs +
         compilation.runtimeDependencyFiles

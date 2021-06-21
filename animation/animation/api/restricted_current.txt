@@ -5,6 +5,9 @@ package androidx.compose.animation {
     method @Deprecated @androidx.compose.runtime.Composable public static androidx.compose.animation.core.DecayAnimationSpec<java.lang.Float> defaultDecayAnimationSpec();
   }
 
+  public final class AnimatedContentKt {
+  }
+
   public final class AnimatedVisibilityKt {
   }
 

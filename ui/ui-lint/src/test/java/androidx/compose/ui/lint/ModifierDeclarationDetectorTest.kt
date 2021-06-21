@@ -18,7 +18,8 @@
 
 package androidx.compose.ui.lint
 
-import androidx.compose.lint.Stubs
+import androidx.compose.lint.test.Stubs
+import androidx.compose.lint.test.compiledStub
 import com.android.tools.lint.checks.infrastructure.LintDetectorTest
 import com.android.tools.lint.detector.api.Detector
 import com.android.tools.lint.detector.api.Issue
@@ -44,16 +45,34 @@ class ModifierDeclarationDetectorTest : LintDetectorTest() {
         )
 
     // Simplified Density.kt stubs
-    private val DensityStub = kotlin(
+    private val DensityStub = compiledStub(
+        filename = "Density.kt",
+        filepath = "androidx/compose/ui/unit",
         """
             package androidx.compose.ui.unit
 
             interface Density
+        """,
+"""
+        androidx/compose/ui/unit/Density.class:
+        H4sIAAAAAAAAAIVOTUvDQBB9s7FNjV+pH1Bv4g9w2+LNkyBCoCIoeMlpm6yy
+        Tbor3U2pt/4uD9KzP0qcqHdn4M17M/DefH69fwC4xDHhTNly4Uy5koWbvzqv
+        ZWNkY02QN9p6E95iECGdqaWStbIv8n4600WIERH6k8qF2lh5p4MqVVBXBDFf
+        RuxNLXQIVPFqZVo1ZFaOCCebdS8RA5GIlNnzYLMeiyG1xzHhfPLfP5wBQvKn
+        LqrA4tE1i0LfmloTTh8aG8xcPxlvprW+ttYFFYyzvssZ2MJvCRz+YB9HPEds
+        2eHu5ogyxBl6jNhuIcmwg90c5LGH/RzC48Aj/QaMxaG1RAEAAA==
+        """,
+        """
+        META-INF/main.kotlin_module:
+        H4sIAAAAAAAAAGNgYGBmYGBgBGJWKM3ApcIlnpiXUpSfmVKhl5yfW5BfnKpX
+        mqmXlp8vxOmWn++SWJLoXaLEoMUAAALEmjo+AAAA
         """
     )
 
     // Simplified ParentDataModifier.kt / Measurable.kt merged stubs
-    private val MeasurableAndParentDataModifierStub = kotlin(
+    private val MeasurableAndParentDataModifierStub = compiledStub(
+        filename = "Measurable.kt",
+        filepath = "androidx/compose/ui/layout",
         """
             package androidx.compose.ui.layout
 
@@ -67,6 +86,54 @@ class ModifierDeclarationDetectorTest : LintDetectorTest() {
             interface Measurable {
                 val parentData: Any?
             }
+        """,
+"""
+        androidx/compose/ui/layout/ParentDataModifier＄DefaultImpls.class:
+        H4sIAAAAAAAAAKVSW08TQRT+pqW01FZKtSii9UKVXoSVxCf7ZECTTdpKxPTF
+        p+nuUKbdnSGzsw3+Kx+JD8Znf5TxbGkQK0GJm+y5f9/MnHO+//jyFcBLOAyv
+        uPKNlv6J4+nwWEfCiaUT8E86ts4+N0LZPW55V/vyUApT2xOHPA6sGx4HURaM
+        oTTiE04ANXTeDUbCs1mkGRbskVAMYb1zLfr2peXn2cbVaYaNjjZDZyTswHCp
+        IocrpS23UpPd07YXB0F7ejkZ5ZBjqI61DaRyRpPQkcoKo3jguMoaAkuPHphn
+        qHhHwhvP0HRlHgoqZNisd+af3r4QOUhIhu1Gv4ACinncwE2GjKa+mBxKDLWr
+        nlJ7E4iQepNFmWHnXyrnBnObwb+89/PA/2t5ARms5lHBHQbnmrOm9v9tniud
+        2YC6wnKfwBRLhZM0LS9LRIaBjRODVi51IhPrBcPWte6RxQZD4WL7GIpdwaPY
+        8EEgtseWNmZX+4JhuSOV6MXhQJgPSY6h3NEeD/rcyMSfBdffx8rKULhqIiNJ
+        ode/1pAGP58936nfygquUsLsBjyKBLn5Ax0bT7yVyQFrM4r+H/TYQQoLSD6G
+        JRrOItLYJK9L8RTpSrO8dIrlVnmFZPMbbrVOcfczJVKok8yTLoD2h8AN8lfP
+        QMhhbUpaQQn3iLpJ9iLpLOkW/cXUzDmTaTyfktFUUMNTAm9Nj3iGbdJViq9T
+        zf2PSLt44KJKEg9dPMJjF09+As+nXNieBAAA
+        """,
+        """
+        androidx/compose/ui/layout/Measurable.class:
+        H4sIAAAAAAAAAI1PwU7bQBB9YzuO65Li0AAJvVK1veAEcaInpAopUmirIKFK
+        OW2SJdrE2UXedURv+ZYe+hE9oChHPgoxRkhB7aV7eDPz5s3Om/uHP3cATtAi
+        vBd6nBs1vk1HZn5jrEwLlWbipylceiGFLXIxzGQVREimYiG4pyfpt+FUjlwV
+        PqE2ke67yKV2X4QThMbHT72/hZ8Jhz2TT9KpdMNcKG1TobVxwinD+dciy8ot
+        LKv3ZsZlSvNuJ8b8IXPefOGzXSqhQqAZU7eqrNqcjTuEzmq5FXtNL/aS1TL2
+        Ij+6bq6Wx16b+o3EOwia1KYf69/B+lcYHgSRnwTl4DHhQ++/zmcTIMQ3L86s
+        bbpHM0d41y+0U3PZ1QtlFbNnmwN59NIU+Uieq0wSWs/Sq3+EIdtCgPIRW6wg
+        5LV7XJWxytHD/hPuosnxlNmIVa8G8LuIu3jNiK0Sal28wfYAZJGgPkDFYsfi
+        rUXDlnn4CLI2KhoDAgAA
+        """,
+        """
+        androidx/compose/ui/layout/ParentDataModifier.class:
+        H4sIAAAAAAAAAJVRTW/TQBB963w4mARSKJC0fLWNqoIEDhEnqh4QAdUogQok
+        Ljlt4k21ib0beddRc8vv4oBy5kchxgHUkgYQh52d9/xmdjzv67fPXwA8xx7D
+        E67CRMvwzB/oeKKN8FPpR3ymU+uf8EQo2+aWd3Uoh1IkLhhDdcSnnDTq1H/f
+        H4mBdZFjaKxr9Kuu8ToSMfVyUaD6OGNn590Zjg8668pTJa3fFspIOzvsrD57
+        +OgyRXN0dHLqj4TtJ1wq43OltOVWasrfpVHE+5Eg2d7fZNpmSlJtdMbaRlL5
+        XWF5SKMS58TTHG2PZYH+ho2JOpMZalIWPmM4Wsw3PafmLM9i7jnVLCzz0rC2
+        mLecJntbqzpb+Rpr5h47zXyrVC38QMf7WZMWg792I390hgbbX1uxagEJwbD7
+        730zeJMLFr34r3EabTHkaWSDeBIZF1sM5YsMQ6UruEmTzI2nY8uw/SFVVsYi
+        UFNpJLEvzw0hU1e/0os8FlYkv8nKgVIieRVxYwRB76NOk4F4IyPBUP/Z4tOl
+        9kXaOPK0lGJma57BRYmY+4SKxF6h+wGdikPAyyRLKoeHFD1C2yS+izp2CDu4
+        h126j4i/igLKPeQCVAJco4jrWagG2MCNHpjBTWz2UDS4ZXDbwDW4Y1AzqH8H
+        FbjiFqEDAAA=
+        """,
+        """
+        META-INF/main.kotlin_module:
+        H4sIAAAAAAAAAGNgYGBmYGBgBGJWKM3ApcIlnpiXUpSfmVKhl5yfW5BfnKpX
+        mqmXlp8vxOmWn++SWJLoXaLEoMUAAALEmjo+AAAA
         """
     )
 
@@ -86,7 +153,7 @@ class ModifierDeclarationDetectorTest : LintDetectorTest() {
                 }
             """
             ),
-            kotlin(Stubs.Modifier)
+            Stubs.Modifier
         )
             .run()
             .expect(
@@ -129,7 +196,7 @@ Fix for src/androidx/compose/ui/foo/TestModifier.kt line 8: Change return type t
                 val Modifier.fooModifier3: Modifier.Element get() = this.then(TestModifier)
             """
             ),
-            kotlin(Stubs.Modifier)
+            Stubs.Modifier
         )
             .run()
             .expect(
@@ -178,7 +245,7 @@ Fix for src/androidx/compose/ui/foo/TestModifier.kt line 16: Change return type 
                 fun Modifier.fooModifier() = TestModifier
             """
             ),
-            kotlin(Stubs.Modifier)
+            Stubs.Modifier
         )
             .run()
             .expect(
@@ -216,7 +283,7 @@ Fix for src/androidx/compose/ui/foo/TestModifier.kt line 8: Add explicit Modifie
                 val Modifier.fooModifier get() = TestModifier
             """
             ),
-            kotlin(Stubs.Modifier)
+            Stubs.Modifier
         )
             .run()
             .expect(
@@ -256,7 +323,7 @@ Fix for src/androidx/compose/ui/foo/TestModifier.kt line 8: Add explicit Modifie
                 }
             """
             ),
-            kotlin(Stubs.Modifier)
+            Stubs.Modifier
         )
             .run()
             .expect(
@@ -311,7 +378,7 @@ Fix for src/androidx/compose/ui/foo/TestModifier.kt line 8: Change return type t
                 }
             """
             ),
-            kotlin(Stubs.Modifier)
+            Stubs.Modifier
         )
             .run()
             .expectClean()
@@ -346,7 +413,7 @@ Fix for src/androidx/compose/ui/foo/TestModifier.kt line 8: Change return type t
                 }
             """
             ),
-            kotlin(Stubs.Modifier)
+            Stubs.Modifier
         )
             .run()
             .expectClean()
@@ -378,7 +445,7 @@ Fix for src/androidx/compose/ui/foo/TestModifier.kt line 8: Change return type t
                 val fooModifier3: Modifier get() = TestModifier
             """
             ),
-            kotlin(Stubs.Modifier)
+            Stubs.Modifier
         )
             .run()
             .expect(
@@ -446,7 +513,7 @@ Fix for src/androidx/compose/ui/foo/TestModifier.kt line 20: Add Modifier receiv
                 val TestModifier.fooModifier3: Modifier get() = this.then(TestModifier)
             """
             ),
-            kotlin(Stubs.Modifier)
+            Stubs.Modifier
         )
             .run()
             .expect(
@@ -524,8 +591,8 @@ Fix for src/androidx/compose/ui/foo/TestModifier.kt line 20: Change receiver to 
                     this.then(TestModifier(someComposableCall(3)))
             """
             ),
-            kotlin(Stubs.Modifier),
-            kotlin(Stubs.Composable)
+            Stubs.Modifier,
+            Stubs.Composable
         )
             .run()
             .expect(
@@ -621,8 +688,8 @@ Fix for src/androidx/compose/ui/foo/TestModifier.kt line 29: Replace @Composable
                 }
             """
             ),
-            kotlin(Stubs.Modifier),
-            kotlin(Stubs.Composable)
+            Stubs.Modifier,
+            Stubs.Composable
         )
             .run()
             .expect(
@@ -674,7 +741,7 @@ src/androidx/compose/ui/foo/TestModifier.kt:34: Error: Modifier factory function
                 }
             """
             ),
-            kotlin(Stubs.Modifier),
+            Stubs.Modifier,
             DensityStub,
             MeasurableAndParentDataModifierStub
         )
@@ -706,7 +773,7 @@ src/androidx/compose/ui/foo/TestModifier.kt:34: Error: Modifier factory function
                 }
             """
             ),
-            kotlin(Stubs.Modifier)
+            Stubs.Modifier
         )
             .run()
             .expectClean()

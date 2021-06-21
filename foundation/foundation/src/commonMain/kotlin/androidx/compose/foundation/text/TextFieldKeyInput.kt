@@ -29,6 +29,7 @@ import androidx.compose.ui.input.key.type
 import androidx.compose.ui.input.key.utf16CodePoint
 import androidx.compose.ui.text.input.CommitTextCommand
 import androidx.compose.ui.text.input.EditCommand
+import androidx.compose.ui.text.input.FinishComposingTextCommand
 import androidx.compose.ui.text.input.OffsetMapping
 import androidx.compose.ui.text.input.TextFieldValue
 
@@ -56,7 +57,7 @@ internal class TextFieldKeyInput(
     private val keyMapping: KeyMapping = platformDefaultKeyMapping,
 ) {
     private fun EditCommand.apply() {
-        state.onValueChange(state.processor.apply(listOf(this)))
+        state.onValueChange(state.processor.apply(listOf(FinishComposingTextCommand(), this)))
     }
 
     private fun typedCommand(event: KeyEvent): CommitTextCommand? =

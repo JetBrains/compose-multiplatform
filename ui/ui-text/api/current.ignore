@@ -1,89 +1,121 @@
 // Baseline format: 1.0
-AddedAbstractMethod: androidx.compose.ui.text.input.InputEventCallback#onImeAction-KlQnJC8(int):
-    Added method androidx.compose.ui.text.input.InputEventCallback.onImeAction-KlQnJC8(int)
+AddedAbstractMethod: androidx.compose.ui.text.font.Font#getStyle-_-LCdwA():
+    Added method androidx.compose.ui.text.font.Font.getStyle-_-LCdwA()
 
 
-ChangedSuperclass: androidx.compose.ui.text.PlaceholderVerticalAlign:
-    Class androidx.compose.ui.text.PlaceholderVerticalAlign superclass changed from java.lang.Enum to java.lang.Object
-ChangedSuperclass: androidx.compose.ui.text.input.ImeAction:
-    Class androidx.compose.ui.text.input.ImeAction superclass changed from java.lang.Enum to java.lang.Object
-ChangedSuperclass: androidx.compose.ui.text.input.KeyboardType:
-    Class androidx.compose.ui.text.input.KeyboardType superclass changed from java.lang.Enum to java.lang.Object
+ChangedSuperclass: androidx.compose.ui.text.font.FontStyle:
+    Class androidx.compose.ui.text.font.FontStyle superclass changed from java.lang.Enum to java.lang.Object
+ChangedSuperclass: androidx.compose.ui.text.font.FontSynthesis:
+    Class androidx.compose.ui.text.font.FontSynthesis superclass changed from java.lang.Enum to java.lang.Object
+ChangedSuperclass: androidx.compose.ui.text.input.KeyboardCapitalization:
+    Class androidx.compose.ui.text.input.KeyboardCapitalization superclass changed from java.lang.Enum to java.lang.Object
+ChangedSuperclass: androidx.compose.ui.text.style.TextAlign:
+    Class androidx.compose.ui.text.style.TextAlign superclass changed from java.lang.Enum to java.lang.Object
+ChangedSuperclass: androidx.compose.ui.text.style.TextDirection:
+    Class androidx.compose.ui.text.style.TextDirection superclass changed from java.lang.Enum to java.lang.Object
+ChangedSuperclass: androidx.compose.ui.text.style.TextOverflow:
+    Class androidx.compose.ui.text.style.TextOverflow superclass changed from java.lang.Enum to java.lang.Object
 
 
-InvalidNullConversion: Field ImeOptions.imeAction:
-    Attempted to remove @NonNull annotation from Field ImeOptions.imeAction
-InvalidNullConversion: Field ImeOptions.keyboardType:
-    Attempted to remove @NonNull annotation from Field ImeOptions.keyboardType
-InvalidNullConversion: Field Placeholder.placeholderVerticalAlign:
-    Attempted to remove @NonNull annotation from Field Placeholder.placeholderVerticalAlign
+InvalidNullConversion: Field Font.style:
+    Attempted to remove @NonNull annotation from Field Font.style
+InvalidNullConversion: Field ImeOptions.capitalization:
+    Attempted to remove @NonNull annotation from Field ImeOptions.capitalization
+InvalidNullConversion: Field ResourceFont.style:
+    Attempted to remove @NonNull annotation from Field ResourceFont.style
+InvalidNullConversion: Field TextLayoutInput.overflow:
+    Attempted to remove @NonNull annotation from Field TextLayoutInput.overflow
 
 
-RemovedClass: androidx.compose.ui.text.JvmCharHelpers_jvmKt:
-    Removed class androidx.compose.ui.text.JvmCharHelpers_jvmKt
+RemovedField: androidx.compose.ui.text.font.FontStyle#Italic:
+    Removed enum constant androidx.compose.ui.text.font.FontStyle.Italic
+RemovedField: androidx.compose.ui.text.font.FontStyle#Normal:
+    Removed enum constant androidx.compose.ui.text.font.FontStyle.Normal
+RemovedField: androidx.compose.ui.text.font.FontSynthesis#All:
+    Removed enum constant androidx.compose.ui.text.font.FontSynthesis.All
+RemovedField: androidx.compose.ui.text.font.FontSynthesis#None:
+    Removed enum constant androidx.compose.ui.text.font.FontSynthesis.None
+RemovedField: androidx.compose.ui.text.font.FontSynthesis#Style:
+    Removed enum constant androidx.compose.ui.text.font.FontSynthesis.Style
+RemovedField: androidx.compose.ui.text.font.FontSynthesis#Weight:
+    Removed enum constant androidx.compose.ui.text.font.FontSynthesis.Weight
+RemovedField: androidx.compose.ui.text.input.KeyboardCapitalization#Characters:
+    Removed enum constant androidx.compose.ui.text.input.KeyboardCapitalization.Characters
+RemovedField: androidx.compose.ui.text.input.KeyboardCapitalization#None:
+    Removed enum constant androidx.compose.ui.text.input.KeyboardCapitalization.None
+RemovedField: androidx.compose.ui.text.input.KeyboardCapitalization#Sentences:
+    Removed enum constant androidx.compose.ui.text.input.KeyboardCapitalization.Sentences
+RemovedField: androidx.compose.ui.text.input.KeyboardCapitalization#Words:
+    Removed enum constant androidx.compose.ui.text.input.KeyboardCapitalization.Words
+RemovedField: androidx.compose.ui.text.style.TextAlign#Center:
+    Removed enum constant androidx.compose.ui.text.style.TextAlign.Center
+RemovedField: androidx.compose.ui.text.style.TextAlign#End:
+    Removed enum constant androidx.compose.ui.text.style.TextAlign.End
+RemovedField: androidx.compose.ui.text.style.TextAlign#Justify:
+    Removed enum constant androidx.compose.ui.text.style.TextAlign.Justify
+RemovedField: androidx.compose.ui.text.style.TextAlign#Left:
+    Removed enum constant androidx.compose.ui.text.style.TextAlign.Left
+RemovedField: androidx.compose.ui.text.style.TextAlign#Right:
+    Removed enum constant androidx.compose.ui.text.style.TextAlign.Right
+RemovedField: androidx.compose.ui.text.style.TextAlign#Start:
+    Removed enum constant androidx.compose.ui.text.style.TextAlign.Start
+RemovedField: androidx.compose.ui.text.style.TextDirection#Content:
+    Removed enum constant androidx.compose.ui.text.style.TextDirection.Content
+RemovedField: androidx.compose.ui.text.style.TextDirection#ContentOrLtr:
+    Removed enum constant androidx.compose.ui.text.style.TextDirection.ContentOrLtr
+RemovedField: androidx.compose.ui.text.style.TextDirection#ContentOrRtl:
+    Removed enum constant androidx.compose.ui.text.style.TextDirection.ContentOrRtl
+RemovedField: androidx.compose.ui.text.style.TextDirection#Ltr:
+    Removed enum constant androidx.compose.ui.text.style.TextDirection.Ltr
+RemovedField: androidx.compose.ui.text.style.TextDirection#Rtl:
+    Removed enum constant androidx.compose.ui.text.style.TextDirection.Rtl
+RemovedField: androidx.compose.ui.text.style.TextOverflow#Clip:
+    Removed enum constant androidx.compose.ui.text.style.TextOverflow.Clip
+RemovedField: androidx.compose.ui.text.style.TextOverflow#Ellipsis:
+    Removed enum constant androidx.compose.ui.text.style.TextOverflow.Ellipsis
+RemovedField: androidx.compose.ui.text.style.TextOverflow#Visible:
+    Removed enum constant androidx.compose.ui.text.style.TextOverflow.Visible
 
 
-RemovedDeprecatedMethod: androidx.compose.ui.text.input.InputEventCallback#onImeAction(androidx.compose.ui.text.input.ImeAction):
-    Removed deprecated method androidx.compose.ui.text.input.InputEventCallback.onImeAction(androidx.compose.ui.text.input.ImeAction)
-
-
-RemovedField: androidx.compose.ui.text.PlaceholderVerticalAlign#AboveBaseline:
-    Removed enum constant androidx.compose.ui.text.PlaceholderVerticalAlign.AboveBaseline
-RemovedField: androidx.compose.ui.text.PlaceholderVerticalAlign#Bottom:
-    Removed enum constant androidx.compose.ui.text.PlaceholderVerticalAlign.Bottom
-RemovedField: androidx.compose.ui.text.PlaceholderVerticalAlign#Center:
-    Removed enum constant androidx.compose.ui.text.PlaceholderVerticalAlign.Center
-RemovedField: androidx.compose.ui.text.PlaceholderVerticalAlign#TextBottom:
-    Removed enum constant androidx.compose.ui.text.PlaceholderVerticalAlign.TextBottom
-RemovedField: androidx.compose.ui.text.PlaceholderVerticalAlign#TextCenter:
-    Removed enum constant androidx.compose.ui.text.PlaceholderVerticalAlign.TextCenter
-RemovedField: androidx.compose.ui.text.PlaceholderVerticalAlign#TextTop:
-    Removed enum constant androidx.compose.ui.text.PlaceholderVerticalAlign.TextTop
-RemovedField: androidx.compose.ui.text.PlaceholderVerticalAlign#Top:
-    Removed enum constant androidx.compose.ui.text.PlaceholderVerticalAlign.Top
-RemovedField: androidx.compose.ui.text.input.ImeAction#Default:
-    Removed enum constant androidx.compose.ui.text.input.ImeAction.Default
-RemovedField: androidx.compose.ui.text.input.ImeAction#Done:
-    Removed enum constant androidx.compose.ui.text.input.ImeAction.Done
-RemovedField: androidx.compose.ui.text.input.ImeAction#Go:
-    Removed enum constant androidx.compose.ui.text.input.ImeAction.Go
-RemovedField: androidx.compose.ui.text.input.ImeAction#Next:
-    Removed enum constant androidx.compose.ui.text.input.ImeAction.Next
-RemovedField: androidx.compose.ui.text.input.ImeAction#None:
-    Removed enum constant androidx.compose.ui.text.input.ImeAction.None
-RemovedField: androidx.compose.ui.text.input.ImeAction#Previous:
-    Removed enum constant androidx.compose.ui.text.input.ImeAction.Previous
-RemovedField: androidx.compose.ui.text.input.ImeAction#Search:
-    Removed enum constant androidx.compose.ui.text.input.ImeAction.Search
-RemovedField: androidx.compose.ui.text.input.ImeAction#Send:
-    Removed enum constant androidx.compose.ui.text.input.ImeAction.Send
-RemovedField: androidx.compose.ui.text.input.KeyboardType#Ascii:
-    Removed enum constant androidx.compose.ui.text.input.KeyboardType.Ascii
-RemovedField: androidx.compose.ui.text.input.KeyboardType#Email:
-    Removed enum constant androidx.compose.ui.text.input.KeyboardType.Email
-RemovedField: androidx.compose.ui.text.input.KeyboardType#Number:
-    Removed enum constant androidx.compose.ui.text.input.KeyboardType.Number
-RemovedField: androidx.compose.ui.text.input.KeyboardType#NumberPassword:
-    Removed enum constant androidx.compose.ui.text.input.KeyboardType.NumberPassword
-RemovedField: androidx.compose.ui.text.input.KeyboardType#Password:
-    Removed enum constant androidx.compose.ui.text.input.KeyboardType.Password
-RemovedField: androidx.compose.ui.text.input.KeyboardType#Phone:
-    Removed enum constant androidx.compose.ui.text.input.KeyboardType.Phone
-RemovedField: androidx.compose.ui.text.input.KeyboardType#Text:
-    Removed enum constant androidx.compose.ui.text.input.KeyboardType.Text
-RemovedField: androidx.compose.ui.text.input.KeyboardType#Uri:
-    Removed enum constant androidx.compose.ui.text.input.KeyboardType.Uri
-
-
-RemovedMethod: androidx.compose.ui.text.Placeholder#copy-KJSDsNM(long, long, androidx.compose.ui.text.PlaceholderVerticalAlign):
-    Removed method androidx.compose.ui.text.Placeholder.copy-KJSDsNM(long,long,androidx.compose.ui.text.PlaceholderVerticalAlign)
-RemovedMethod: androidx.compose.ui.text.Placeholder#getPlaceholderVerticalAlign():
-    Removed method androidx.compose.ui.text.Placeholder.getPlaceholderVerticalAlign()
-RemovedMethod: androidx.compose.ui.text.input.ImeOptions#ImeOptions(boolean, androidx.compose.ui.text.input.KeyboardCapitalization, boolean, androidx.compose.ui.text.input.KeyboardType, androidx.compose.ui.text.input.ImeAction):
-    Removed constructor androidx.compose.ui.text.input.ImeOptions(boolean,androidx.compose.ui.text.input.KeyboardCapitalization,boolean,androidx.compose.ui.text.input.KeyboardType,androidx.compose.ui.text.input.ImeAction)
-RemovedMethod: androidx.compose.ui.text.input.ImeOptions#copy(boolean, androidx.compose.ui.text.input.KeyboardCapitalization, boolean, androidx.compose.ui.text.input.KeyboardType, androidx.compose.ui.text.input.ImeAction):
-    Removed method androidx.compose.ui.text.input.ImeOptions.copy(boolean,androidx.compose.ui.text.input.KeyboardCapitalization,boolean,androidx.compose.ui.text.input.KeyboardType,androidx.compose.ui.text.input.ImeAction)
-RemovedMethod: androidx.compose.ui.text.input.ImeOptions#getImeAction():
-    Removed method androidx.compose.ui.text.input.ImeOptions.getImeAction()
-RemovedMethod: androidx.compose.ui.text.input.ImeOptions#getKeyboardType():
-    Removed method androidx.compose.ui.text.input.ImeOptions.getKeyboardType()
+RemovedMethod: androidx.compose.ui.text.ParagraphStyle#getTextAlign():
+    Removed method androidx.compose.ui.text.ParagraphStyle.getTextAlign()
+RemovedMethod: androidx.compose.ui.text.ParagraphStyle#getTextDirection():
+    Removed method androidx.compose.ui.text.ParagraphStyle.getTextDirection()
+RemovedMethod: androidx.compose.ui.text.PlaceholderVerticalAlign#constructor-impl(int):
+    Removed method androidx.compose.ui.text.PlaceholderVerticalAlign.constructor-impl(int)
+RemovedMethod: androidx.compose.ui.text.PlaceholderVerticalAlign#getValue():
+    Removed method androidx.compose.ui.text.PlaceholderVerticalAlign.getValue()
+RemovedMethod: androidx.compose.ui.text.SpanStyle#getFontStyle():
+    Removed method androidx.compose.ui.text.SpanStyle.getFontStyle()
+RemovedMethod: androidx.compose.ui.text.SpanStyle#getFontSynthesis():
+    Removed method androidx.compose.ui.text.SpanStyle.getFontSynthesis()
+RemovedMethod: androidx.compose.ui.text.TextLayoutInput#copy-ih31NyA(androidx.compose.ui.text.AnnotatedString, androidx.compose.ui.text.TextStyle, java.util.List<androidx.compose.ui.text.AnnotatedString.Range<androidx.compose.ui.text.Placeholder>>, int, boolean, androidx.compose.ui.text.style.TextOverflow, androidx.compose.ui.unit.Density, androidx.compose.ui.unit.LayoutDirection, androidx.compose.ui.text.font.Font.ResourceLoader, long):
+    Removed method androidx.compose.ui.text.TextLayoutInput.copy-ih31NyA(androidx.compose.ui.text.AnnotatedString,androidx.compose.ui.text.TextStyle,java.util.List<androidx.compose.ui.text.AnnotatedString.Range<androidx.compose.ui.text.Placeholder>>,int,boolean,androidx.compose.ui.text.style.TextOverflow,androidx.compose.ui.unit.Density,androidx.compose.ui.unit.LayoutDirection,androidx.compose.ui.text.font.Font.ResourceLoader,long)
+RemovedMethod: androidx.compose.ui.text.TextLayoutInput#getOverflow():
+    Removed method androidx.compose.ui.text.TextLayoutInput.getOverflow()
+RemovedMethod: androidx.compose.ui.text.TextStyle#getFontStyle():
+    Removed method androidx.compose.ui.text.TextStyle.getFontStyle()
+RemovedMethod: androidx.compose.ui.text.TextStyle#getFontSynthesis():
+    Removed method androidx.compose.ui.text.TextStyle.getFontSynthesis()
+RemovedMethod: androidx.compose.ui.text.TextStyle#getTextAlign():
+    Removed method androidx.compose.ui.text.TextStyle.getTextAlign()
+RemovedMethod: androidx.compose.ui.text.TextStyle#getTextDirection():
+    Removed method androidx.compose.ui.text.TextStyle.getTextDirection()
+RemovedMethod: androidx.compose.ui.text.font.Font#getStyle():
+    Removed method androidx.compose.ui.text.font.Font.getStyle()
+RemovedMethod: androidx.compose.ui.text.font.FontKt#Font(int, androidx.compose.ui.text.font.FontWeight, androidx.compose.ui.text.font.FontStyle):
+    Removed method androidx.compose.ui.text.font.FontKt.Font(int,androidx.compose.ui.text.font.FontWeight,androidx.compose.ui.text.font.FontStyle)
+RemovedMethod: androidx.compose.ui.text.font.ResourceFont#copy(int, androidx.compose.ui.text.font.FontWeight, androidx.compose.ui.text.font.FontStyle):
+    Removed method androidx.compose.ui.text.font.ResourceFont.copy(int,androidx.compose.ui.text.font.FontWeight,androidx.compose.ui.text.font.FontStyle)
+RemovedMethod: androidx.compose.ui.text.font.ResourceFont#getStyle():
+    Removed method androidx.compose.ui.text.font.ResourceFont.getStyle()
+RemovedMethod: androidx.compose.ui.text.input.ImeAction#constructor-impl(int):
+    Removed method androidx.compose.ui.text.input.ImeAction.constructor-impl(int)
+RemovedMethod: androidx.compose.ui.text.input.ImeAction#getValue():
+    Removed method androidx.compose.ui.text.input.ImeAction.getValue()
+RemovedMethod: androidx.compose.ui.text.input.ImeOptions#copy-TWIFjAI(boolean, androidx.compose.ui.text.input.KeyboardCapitalization, boolean, int, int):
+    Removed method androidx.compose.ui.text.input.ImeOptions.copy-TWIFjAI(boolean,androidx.compose.ui.text.input.KeyboardCapitalization,boolean,int,int)
+RemovedMethod: androidx.compose.ui.text.input.ImeOptions#getCapitalization():
+    Removed method androidx.compose.ui.text.input.ImeOptions.getCapitalization()
+RemovedMethod: androidx.compose.ui.text.input.KeyboardType#constructor-impl(int):
+    Removed method androidx.compose.ui.text.input.KeyboardType.constructor-impl(int)

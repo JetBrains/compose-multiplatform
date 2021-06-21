@@ -1,5 +1,0 @@
-// Baseline format: 1.0
-AddedAbstractMethod: androidx.compose.runtime.ControlledComposition#observesAnyOf(java.util.Set<?>):
-    Added method androidx.compose.runtime.ControlledComposition.observesAnyOf(java.util.Set<?>)
-AddedAbstractMethod: androidx.compose.runtime.ControlledComposition#prepareCompose(kotlin.jvm.functions.Function0<kotlin.Unit>):
-    Added method androidx.compose.runtime.ControlledComposition.prepareCompose(kotlin.jvm.functions.Function0<kotlin.Unit>)

@@ -26,6 +26,7 @@ import androidx.compose.ui.layout.MeasureResult
 import androidx.compose.ui.layout.MeasureScope
 import androidx.compose.ui.layout.Placeable
 import androidx.compose.ui.platform.nativeClass
+import androidx.compose.ui.semantics.SemanticsWrapper
 import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.IntOffset
 
@@ -74,6 +75,16 @@ internal open class DelegatingLayoutNodeWrapper<T : Modifier.Element>(
         if (withinLayerBounds(pointerPosition)) {
             val positionInWrapped = wrapped.fromParentPosition(pointerPosition)
             wrapped.hitTest(positionInWrapped, hitPointerInputFilters)
+        }
+    }
+
+    override fun hitTestSemantics(
+        pointerPosition: Offset,
+        hitSemanticsWrappers: MutableList<SemanticsWrapper>
+    ) {
+        if (withinLayerBounds(pointerPosition)) {
+            val positionInWrapped = wrapped.fromParentPosition(pointerPosition)
+            wrapped.hitTestSemantics(positionInWrapped, hitSemanticsWrappers)
         }
     }
 

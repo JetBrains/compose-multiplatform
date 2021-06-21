@@ -44,6 +44,7 @@ val MaterialDemos = DemoCategory(
         ),
         ComposableDemo("App Bars") { AppBarDemo() },
         ComposableDemo("Backdrop") { BackdropScaffoldSample() },
+        ComposableDemo("Badge") { BadgeDemo() },
         ComposableDemo("Bottom Navigation") { BottomNavigationDemo() },
         DemoCategory(
             "Bottom Sheets",

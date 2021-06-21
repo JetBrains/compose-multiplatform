@@ -16,17 +16,20 @@
 
 package androidx.compose.testutils
 
-import android.annotation.SuppressLint
 import android.app.Activity
 import android.content.Context
 import android.content.ContextWrapper
 import android.graphics.Bitmap
+import android.graphics.Rect
 import android.os.Build
 import android.os.Handler
 import android.os.Looper
 import android.view.PixelCopy
+import android.view.PixelCopy.OnPixelCopyFinishedListener
 import android.view.View
 import android.view.ViewTreeObserver
+import android.view.Window
+import androidx.annotation.DoNotInline
 import androidx.annotation.RequiresApi
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.asImageBitmap
@@ -41,13 +44,12 @@ import java.util.concurrent.TimeUnit
  * in the bitmap as this is taken from the component's window surface.
  */
 @RequiresApi(Build.VERSION_CODES.O)
-@SuppressLint("UnsafeNewApiCall") // Seems like lint is giving false red flags
 fun View.captureToImage(): ImageBitmap {
     val locationInWindow = intArrayOf(0, 0)
     getLocationInWindow(locationInWindow)
     val x = locationInWindow[0]
     val y = locationInWindow[1]
-    val boundsInWindow = android.graphics.Rect(x, y, x + width, y + height)
+    val boundsInWindow = Rect(x, y, x + width, y + height)
 
     fun Context.getActivity(): Activity? {
         return when (this) {
@@ -65,7 +67,7 @@ fun View.captureToImage(): ImageBitmap {
     val decorView = windowToCapture.decorView
     handler.post {
         if (Build.VERSION.SDK_INT >= 29 && decorView.isHardwareAccelerated) {
-            decorView.viewTreeObserver.registerFrameCommitCallback {
+            FrameCommitCallbackHelper.registerFrameCommitCallback(decorView.viewTreeObserver) {
                 drawLatch.countDown()
             }
         } else {
@@ -97,11 +99,11 @@ fun View.captureToImage(): ImageBitmap {
 
     val latch = CountDownLatch(1)
     var copyResult = 0
-    val onCopyFinished = PixelCopy.OnPixelCopyFinishedListener { result ->
+    val onCopyFinished = OnPixelCopyFinishedListener { result ->
         copyResult = result
         latch.countDown()
     }
-    PixelCopy.request(windowToCapture, boundsInWindow, destBitmap, onCopyFinished, handler)
+    PixelCopyHelper.request(windowToCapture, boundsInWindow, destBitmap, onCopyFinished, handler)
 
     if (!latch.await(1, TimeUnit.SECONDS)) {
         throw AssertionError("Failed waiting for PixelCopy!")
@@ -110,4 +112,26 @@ fun View.captureToImage(): ImageBitmap {
         throw AssertionError("PixelCopy failed!")
     }
     return destBitmap.asImageBitmap()
+}
+
+@RequiresApi(29)
+private object FrameCommitCallbackHelper {
+    @DoNotInline
+    fun registerFrameCommitCallback(viewTreeObserver: ViewTreeObserver, runnable: Runnable) {
+        viewTreeObserver.registerFrameCommitCallback(runnable)
+    }
+}
+
+@RequiresApi(Build.VERSION_CODES.O)
+private object PixelCopyHelper {
+    @DoNotInline
+    fun request(
+        source: Window,
+        srcRect: Rect?,
+        dest: Bitmap,
+        listener: OnPixelCopyFinishedListener,
+        listenerThread: Handler
+    ) {
+        PixelCopy.request(source, srcRect, dest, listener, listenerThread)
+    }
 }

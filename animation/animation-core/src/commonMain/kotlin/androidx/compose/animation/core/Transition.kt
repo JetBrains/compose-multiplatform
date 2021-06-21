@@ -22,6 +22,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.Stable
 import androidx.compose.runtime.State
 import androidx.compose.runtime.collection.mutableVectorOf
 import androidx.compose.runtime.getValue
@@ -75,6 +76,8 @@ fun <T> updateTransition(
     }
     return transition
 }
+
+internal const val AnimationDebugDurationScale = 1
 
 /**
  * MutableTransitionState contains two fields: [currentState] and [targetState]. [currentState] is
@@ -179,6 +182,7 @@ fun <T> updateTransition(
  * @see androidx.compose.animation.animateColor
  */
 // TODO: Support creating Transition outside of composition and support imperative use of Transition
+@Stable
 class Transition<S> @PublishedApi internal constructor(
     private val transitionState: MutableTransitionState<S>,
     val label: String? = null
@@ -210,7 +214,7 @@ class Transition<S> @PublishedApi internal constructor(
      * [segment] contains the initial state and the target state of the currently on-going
      * transition.
      */
-    var segment: Segment<S> by mutableStateOf(Segment(currentState, currentState))
+    var segment: Segment<S> by mutableStateOf(SegmentImpl(currentState, currentState))
         private set
 
     /**
@@ -310,7 +314,7 @@ class Transition<S> @PublishedApi internal constructor(
             this.currentState = initialState
             this.targetState = targetState
             isSeeking = true
-            segment = Segment(initialState, targetState)
+            segment = SegmentImpl(initialState, targetState)
         }
 
         if (playTimeNanos != lastSeekedTimeNanos) {
@@ -322,21 +326,14 @@ class Transition<S> @PublishedApi internal constructor(
         }
     }
 
-    @PublishedApi
     internal fun addTransition(transition: Transition<*>) = _transitions.add(transition)
-
-    @PublishedApi
     internal fun removeTransition(transition: Transition<*>) = _transitions.remove(transition)
 
-    @PublishedApi
     internal fun addAnimation(
-        @Suppress("HiddenTypeParameter")
         animation: TransitionAnimationState<*, *>
     ) = _animations.add(animation)
 
-    @PublishedApi
     internal fun removeAnimation(
-        @Suppress("HiddenTypeParameter")
         animation: TransitionAnimationState<*, *>
     ) {
         _animations.remove(animation)
@@ -345,7 +342,6 @@ class Transition<S> @PublishedApi internal constructor(
     // This target state should only be used to modify "mutableState"s, as it could potentially
     // roll back. The
     @Suppress("ComposableNaming")
-    @PublishedApi
     @Composable
     internal fun updateTarget(targetState: S) {
         if (!isSeeking) {
@@ -353,7 +349,7 @@ class Transition<S> @PublishedApi internal constructor(
             // update their animation specs
             if (this.targetState != targetState) {
                 // Starting state should be the "next" state when waypoints are impl'ed
-                segment = Segment(this.targetState, targetState)
+                segment = SegmentImpl(this.targetState, targetState)
                 currentState = this.targetState
                 this.targetState = targetState
                 if (!isRunning) {
@@ -381,7 +377,7 @@ class Transition<S> @PublishedApi internal constructor(
                 LaunchedEffect(this) {
                     while (true) {
                         withFrameNanos {
-                            onFrame(it)
+                            onFrame(it / AnimationDebugDurationScale)
                         }
                     }
                 }
@@ -408,8 +404,7 @@ class Transition<S> @PublishedApi internal constructor(
     // TODO: Consider making this public
     /** @suppress **/
     @InternalAnimationApi
-    inner class TransitionAnimationState<T, V : AnimationVector>
-    @PublishedApi @Suppress("ShowingMemberInHiddenClass") internal constructor(
+    inner class TransitionAnimationState<T, V : AnimationVector> internal constructor(
         initialValue: T,
         initialVelocityVector: V,
         val typeConverter: TwoWayConverter<T, V>,
@@ -488,8 +483,6 @@ class Transition<S> @PublishedApi internal constructor(
             needsReset = true
         }
 
-        @PublishedApi
-        @Suppress("ShowingMemberInHiddenClass")
         // This gets called *during* composition
         internal fun updateTargetValue(targetValue: T, animationSpec: FiniteAnimationSpec<T>) {
             if (this.targetValue != targetValue || needsReset) {
@@ -503,8 +496,6 @@ class Transition<S> @PublishedApi internal constructor(
             }
         }
 
-        @PublishedApi
-        @Suppress("ControlFlowWithEmptyBody", "ShowingMemberInHiddenClass")
         // This gets called *during* composition
         internal fun updateInitialAndTargetValue(
             initialValue: T,
@@ -520,12 +511,36 @@ class Transition<S> @PublishedApi internal constructor(
         }
     }
 
+    private class SegmentImpl<S>(
+        override val initialState: S,
+        override val targetState: S
+    ) : Segment<S> {
+        override fun equals(other: Any?): Boolean {
+            return other is Segment<*> && initialState == other.initialState &&
+                targetState == other.targetState
+        }
+
+        override fun hashCode(): Int {
+            return initialState.hashCode() * 31 + targetState.hashCode()
+        }
+    }
+
     /**
      * [Segment] holds [initialState] and [targetState], which are the beginning and end of a
      * transition. These states will be used to obtain the animation spec that will be used for this
      * transition from the child animations.
      */
-    class Segment<S>(val initialState: S, val targetState: S) {
+    interface Segment<S> {
+        /**
+         * Initial state of a Transition Segment. This is the state that transition starts from.
+         */
+        val initialState: S
+
+        /**
+         * Target state of a Transition Segment. This is the state that transition will end on.
+         */
+        val targetState: S
+
         /**
          * Returns whether the provided state matches the [initialState] && the provided
          * [targetState] matches [Segment.targetState].
@@ -674,8 +689,19 @@ inline fun <S, T> Transition<S>.createChildTransition(
 ): Transition<T> {
     val initialParentState = remember(this) { this.currentState }
     val initialState = transformToChildState(initialParentState)
+    val targetState = transformToChildState(this.targetState)
+    return createChildTransitionInternal(initialState, targetState, label)
+}
+
+@PublishedApi
+@Composable
+internal fun <S, T> Transition<S>.createChildTransitionInternal(
+    initialState: T,
+    targetState: T,
+    label: String,
+): Transition<T> {
     val transition = remember(this) {
-        Transition<T>(MutableTransitionState(initialState), label)
+        Transition(MutableTransitionState(initialState), label)
     }
 
     DisposableEffect(transition) {
@@ -685,7 +711,6 @@ inline fun <S, T> Transition<S>.createChildTransition(
         }
     }
 
-    val targetState = transformToChildState(this.targetState)
     transition.updateTarget(targetState)
     return transition
 }
@@ -726,6 +751,20 @@ inline fun <S, T, V : AnimationVector> Transition<S>.animateValue(
 
     val initialValue = targetValueByState(currentState)
     val targetValue = targetValueByState(targetState)
+    val animationSpec = transitionSpec(segment)
+
+    return createTransitionAnimation(initialValue, targetValue, animationSpec, typeConverter, label)
+}
+
+@PublishedApi
+@Composable
+internal fun <S, T, V : AnimationVector> Transition<S>.createTransitionAnimation(
+    initialValue: T,
+    targetValue: T,
+    animationSpec: FiniteAnimationSpec<T>,
+    typeConverter: TwoWayConverter<T, V>,
+    label: String
+): State<T> {
     val transitionAnimation = remember(this) {
         // Initialize the animation state to initialState value, so if it's added during a
         // transition run, it'll participate in the animation.
@@ -738,7 +777,6 @@ inline fun <S, T, V : AnimationVector> Transition<S>.animateValue(
             label
         )
     }
-    val animationSpec = transitionSpec(segment)
     if (isSeeking) {
         // In the case of seeking, we also need to update initial value as needed
         transitionAnimation.updateInitialAndTargetValue(

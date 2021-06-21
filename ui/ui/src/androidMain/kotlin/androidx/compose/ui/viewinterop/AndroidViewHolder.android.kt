@@ -18,18 +18,23 @@ package androidx.compose.ui.viewinterop
 
 import android.content.Context
 import android.graphics.Rect
+import android.graphics.Region
 import android.os.Looper
 import android.view.View
 import android.view.ViewGroup
 import android.view.ViewParent
 import androidx.compose.runtime.CompositionContext
 import androidx.compose.runtime.snapshots.SnapshotStateObserver
+import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.graphics.drawscope.drawIntoCanvas
 import androidx.compose.ui.graphics.nativeCanvas
 import androidx.compose.ui.input.pointer.pointerInteropFilter
+import androidx.compose.ui.layout.IntrinsicMeasurable
+import androidx.compose.ui.layout.IntrinsicMeasureScope
 import androidx.compose.ui.layout.Measurable
+import androidx.compose.ui.layout.MeasurePolicy
 import androidx.compose.ui.layout.MeasureResult
 import androidx.compose.ui.layout.MeasureScope
 import androidx.compose.ui.layout.onGloballyPositioned
@@ -46,6 +51,7 @@ import kotlin.math.roundToInt
  * This API is not designed to be used directly, but rather using the [AndroidView] and
  * `AndroidViewBinding` APIs, which are built on top of [AndroidViewHolder].
  */
+@OptIn(ExperimentalComposeUiApi::class)
 internal abstract class AndroidViewHolder(
     context: Context,
     parentContext: CompositionContext?
@@ -57,6 +63,8 @@ internal abstract class AndroidViewHolder(
         parentContext?.let {
             compositionContext = it
         }
+        // We save state ourselves, depending on composition.
+        isSaveFromParentEnabled = false
     }
 
     /**
@@ -131,9 +139,25 @@ internal abstract class AndroidViewHolder(
 
     internal var onRequestDisallowInterceptTouchEvent: ((Boolean) -> Unit)? = null
 
+    private val location = IntArray(2)
+
+    private var lastWidthMeasureSpec: Int = Unmeasured
+    private var lastHeightMeasureSpec: Int = Unmeasured
+
     override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
         view?.measure(widthMeasureSpec, heightMeasureSpec)
         setMeasuredDimension(view?.measuredWidth ?: 0, view?.measuredHeight ?: 0)
+        lastWidthMeasureSpec = widthMeasureSpec
+        lastHeightMeasureSpec = heightMeasureSpec
+    }
+
+    fun remeasure() {
+        if (lastWidthMeasureSpec == Unmeasured || lastHeightMeasureSpec == Unmeasured) {
+            // This should never happen: it means that the views handler was measured without
+            // the AndroidComposeView having been measured.
+            return
+        }
+        measure(lastWidthMeasureSpec, lastHeightMeasureSpec)
     }
 
     override fun onLayout(changed: Boolean, l: Int, t: Int, r: Int, b: Int) {
@@ -178,13 +202,28 @@ internal abstract class AndroidViewHolder(
         layoutNode.invalidateLayer()
     }
 
+    // Always mark the region of the View to not be transparent to disable an optimisation which
+    // would otherwise cause certain buggy drawing scenarios. For example, Compose drawing on top
+    // of SurfaceViews included in Compose would sometimes not be displayed, as the drawing is
+    // not done by Views, therefore the area is not known as non-transparent to the View system.
+    override fun gatherTransparentRegion(region: Region?): Boolean {
+        if (region == null) return true
+        getLocationInWindow(location)
+        region.op(
+            location[0],
+            location[1],
+            location[0] + width,
+            location[1] + height,
+            Region.Op.DIFFERENCE
+        )
+        return true
+    }
+
     /**
      * A [LayoutNode] tree representation for this Android [View] holder.
      * The [LayoutNode] will proxy the Compose core calls to the [View].
      */
     val layoutNode: LayoutNode = run {
-        // TODO(soboleva): add layout direction here?
-        // TODO(popam): forward pointer input and focus
         // Prepare layout node that proxies measure and layout passes to the View.
         val layoutNode = LayoutNode()
 
@@ -217,9 +256,7 @@ internal abstract class AndroidViewHolder(
             view = null
         }
 
-        layoutNode.measurePolicy = object : LayoutNode.NoIntrinsicsMeasurePolicy(
-            "Intrinsics not supported for Android views"
-        ) {
+        layoutNode.measurePolicy = object : MeasurePolicy {
             override fun MeasureScope.measure(
                 measurables: List<Measurable>,
                 constraints: Constraints
@@ -230,9 +267,7 @@ internal abstract class AndroidViewHolder(
                 if (constraints.minHeight != 0) {
                     getChildAt(0).minimumHeight = constraints.minHeight
                 }
-                // TODO (soboleva): native view should get LD value from Compose?
 
-                // TODO(shepshapard): !! necessary?
                 measure(
                     obtainMeasureSpec(
                         constraints.minWidth,
@@ -248,6 +283,42 @@ internal abstract class AndroidViewHolder(
                 return layout(measuredWidth, measuredHeight) {
                     layoutAccordingTo(layoutNode)
                 }
+            }
+
+            override fun IntrinsicMeasureScope.minIntrinsicWidth(
+                measurables: List<IntrinsicMeasurable>,
+                height: Int
+            ) = intrinsicWidth(height)
+
+            override fun IntrinsicMeasureScope.maxIntrinsicWidth(
+                measurables: List<IntrinsicMeasurable>,
+                height: Int
+            ) = intrinsicWidth(height)
+
+            private fun intrinsicWidth(height: Int): Int {
+                measure(
+                    MeasureSpec.makeMeasureSpec(0, MeasureSpec.UNSPECIFIED),
+                    obtainMeasureSpec(0, height, layoutParams!!.height)
+                )
+                return measuredWidth
+            }
+
+            override fun IntrinsicMeasureScope.minIntrinsicHeight(
+                measurables: List<IntrinsicMeasurable>,
+                width: Int
+            ) = intrinsicHeight(width)
+
+            override fun IntrinsicMeasureScope.maxIntrinsicHeight(
+                measurables: List<IntrinsicMeasurable>,
+                width: Int
+            ) = intrinsicHeight(width)
+
+            private fun intrinsicHeight(width: Int): Int {
+                measure(
+                    obtainMeasureSpec(0, width, layoutParams!!.width),
+                    MeasureSpec.makeMeasureSpec(0, MeasureSpec.UNSPECIFIED)
+                )
+                return measuredHeight
             }
         }
         layoutNode
@@ -288,3 +359,5 @@ private fun View.layoutAccordingTo(layoutNode: LayoutNode) {
     val y = position.y.roundToInt()
     layout(x, y, x + measuredWidth, y + measuredHeight)
 }
+
+private const val Unmeasured = Int.MIN_VALUE

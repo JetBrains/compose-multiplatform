@@ -16,11 +16,19 @@
 
 package androidx.compose.material
 
-// TODO(b/138327849): (STOPSHIP) Move all of these to resources once we have a real resources system,
-//  then delete this class
-internal object Strings {
-    const val NavigationMenu = "Navigation menu"
-    const val CloseDrawer = "Close navigation menu"
-    const val CloseSheet = "Close sheet"
-    const val DefaultErrorMessage = "Invalid input"
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.Immutable
+
+@Suppress("INLINE_CLASS_DEPRECATED")
+@Immutable
+internal inline class Strings private constructor(@Suppress("unused") private val value: Int) {
+    companion object {
+        val NavigationMenu = Strings(0)
+        val CloseDrawer = Strings(1)
+        val CloseSheet = Strings(2)
+        val DefaultErrorMessage = Strings(3)
+    }
 }
+
+@Composable
+internal expect fun getString(string: Strings): String

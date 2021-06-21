@@ -17,14 +17,29 @@
 package androidx.compose.ui.test.junit4.android
 
 import androidx.compose.ui.test.junit4.IdlingResourceRegistry
+import androidx.compose.ui.test.junit4.IdlingStrategy
+import androidx.compose.ui.test.junit4.isOnUiThread
 import androidx.test.espresso.AppNotIdleException
 import androidx.test.espresso.Espresso
 import androidx.test.espresso.IdlingRegistry
 import androidx.test.espresso.IdlingResource
 import androidx.test.espresso.IdlingResourceTimeoutException
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 import org.junit.runners.model.Statement
 
-internal class EspressoLink(private val registry: IdlingResourceRegistry) : IdlingResource {
+/**
+ * Idling strategy for regular Android Instrumented tests, built on Espresso.
+ *
+ * This installs the [IdlingResourceRegistry] as an [IdlingResource] into Espresso and delegates
+ * all the work to Espresso. We wrap [Espresso.onIdle] so we can print more informative error
+ * messages.
+ */
+internal class EspressoLink(
+    private val registry: IdlingResourceRegistry
+) : IdlingResource, IdlingStrategy {
+
+    override val canSynchronizeOnUiThread: Boolean = false
 
     override fun getName(): String = "Compose-Espresso link"
 
@@ -40,7 +55,7 @@ internal class EspressoLink(private val registry: IdlingResourceRegistry) : Idli
 
     fun getDiagnosticMessageIfBusy(): String? = registry.getDiagnosticMessageIfBusy()
 
-    fun getStatementFor(base: Statement): Statement {
+    override fun getStatementFor(base: Statement): Statement {
         return object : Statement() {
             override fun evaluate() {
                 try {
@@ -52,10 +67,25 @@ internal class EspressoLink(private val registry: IdlingResourceRegistry) : Idli
             }
         }
     }
+
+    override fun runUntilIdle() {
+        check(!isOnUiThread()) {
+            "Functions that involve synchronization (Assertions, Actions, Synchronization; " +
+                "e.g. assertIsSelected(), doClick(), runOnIdle()) cannot be run " +
+                "from the main thread. Did you nest such a function inside " +
+                "runOnIdle {}, runOnUiThread {} or setContent {}?"
+        }
+        runEspressoOnIdle()
+    }
+
+    override suspend fun awaitIdle() {
+        // Espresso.onIdle() must be called from a non-ui thread; so use Dispatchers.IO
+        withContext(Dispatchers.IO) {
+            runUntilIdle()
+        }
+    }
 }
 
-// TODO(b/168223213): Make the CompositionAwaiter a suspend fun, remove ComposeIdlingResource
-//  and blocking await Espresso.onIdle().
 internal fun runEspressoOnIdle() {
     try {
         Espresso.onIdle()

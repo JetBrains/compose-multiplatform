@@ -18,10 +18,10 @@
 
 package androidx.compose.lint
 
+import androidx.compose.lint.test.Stubs
 import com.android.tools.lint.checks.infrastructure.LintDetectorTest
 import com.android.tools.lint.detector.api.Detector
 import com.android.tools.lint.detector.api.Issue
-import org.junit.Ignore
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.junit.runners.JUnit4
@@ -121,7 +121,7 @@ class ModifierInspectorInfoDetectorTest : LintDetectorTest() {
     @Test
     fun existingInspectorInfo() {
         lint().files(
-            kotlin(Stubs.Modifier),
+            Stubs.Modifier,
             composedStub,
             inspectableInfoStub,
             kotlin(
@@ -156,7 +156,7 @@ class ModifierInspectorInfoDetectorTest : LintDetectorTest() {
     @Test
     fun existingInspectorInfoWithStatementsBeforeDefinition() {
         lint().files(
-            kotlin(Stubs.Modifier),
+            Stubs.Modifier,
             composedStub,
             inspectableInfoStub,
             kotlin(
@@ -206,7 +206,7 @@ class ModifierInspectorInfoDetectorTest : LintDetectorTest() {
     @Test
     fun existingInspectorInfoWithValue() {
         lint().files(
-            kotlin(Stubs.Modifier),
+            Stubs.Modifier,
             composedStub,
             inspectableInfoStub,
             kotlin(
@@ -240,7 +240,7 @@ class ModifierInspectorInfoDetectorTest : LintDetectorTest() {
     @Test
     fun existingInspectorInfoViaSynonym() {
         lint().files(
-            kotlin(Stubs.Modifier),
+            Stubs.Modifier,
             composedStub,
             inspectableInfoStub,
             kotlin(
@@ -281,11 +281,10 @@ class ModifierInspectorInfoDetectorTest : LintDetectorTest() {
             .expectClean()
     }
 
-    @Ignore("b/187539985")
     @Test
     fun existingInspectorInfoWithAnonymousClass() {
         lint().files(
-            kotlin(Stubs.Modifier),
+            Stubs.Modifier,
             composedStub,
             inspectableInfoStub,
             kotlin(
@@ -309,7 +308,7 @@ class ModifierInspectorInfoDetectorTest : LintDetectorTest() {
     @Test
     fun existingInspectorInfoWithDataClassMemberValues() {
         lint().files(
-            kotlin(Stubs.Modifier),
+            Stubs.Modifier,
             composedStub,
             inspectableInfoStub,
             kotlin(
@@ -377,7 +376,7 @@ class ModifierInspectorInfoDetectorTest : LintDetectorTest() {
     @Test
     fun existingInspectorInfoWithConditional() {
         lint().files(
-            kotlin(Stubs.Modifier),
+            Stubs.Modifier,
             composedStub,
             inspectableInfoStub,
             kotlin(
@@ -427,7 +426,7 @@ class ModifierInspectorInfoDetectorTest : LintDetectorTest() {
     @Test
     fun existingInspectorInfoWithWhen() {
         lint().files(
-            kotlin(Stubs.Modifier),
+            Stubs.Modifier,
             composedStub,
             inspectableInfoStub,
             kotlin(
@@ -468,7 +467,7 @@ class ModifierInspectorInfoDetectorTest : LintDetectorTest() {
     @Test
     fun existingInspectorInfoWithConditionals() {
         lint().files(
-            kotlin(Stubs.Modifier),
+            Stubs.Modifier,
             composedStub,
             inspectableInfoStub,
             kotlin(
@@ -527,7 +526,7 @@ class ModifierInspectorInfoDetectorTest : LintDetectorTest() {
     @Test
     fun composedModifierWithInspectorInfo() {
         lint().files(
-            kotlin(Stubs.Modifier),
+            Stubs.Modifier,
             composedStub,
             inspectableInfoStub,
             kotlin(
@@ -568,9 +567,9 @@ class ModifierInspectorInfoDetectorTest : LintDetectorTest() {
     @Test
     fun rememberModifierInfo() {
         lint().files(
-            kotlin(Stubs.Modifier),
+            Stubs.Modifier,
             composedStub,
-            kotlin(Stubs.Remember),
+            Stubs.Remember,
             inspectableInfoStub,
             kotlin(
                 """
@@ -606,7 +605,7 @@ class ModifierInspectorInfoDetectorTest : LintDetectorTest() {
     @Test
     fun emptyModifier() {
         lint().files(
-            kotlin(Stubs.Modifier),
+            Stubs.Modifier,
             composedStub,
             kotlin(
                 """
@@ -626,7 +625,7 @@ class ModifierInspectorInfoDetectorTest : LintDetectorTest() {
     @Test
     fun acceptMissingInspectorInfoInSamples() {
         lint().files(
-            kotlin(Stubs.Modifier),
+            Stubs.Modifier,
             composedStub,
             inspectableInfoStub,
             kotlin(
@@ -654,7 +653,7 @@ class ModifierInspectorInfoDetectorTest : LintDetectorTest() {
     @Test
     fun missingInspectorInfo() {
         lint().files(
-            kotlin(Stubs.Modifier),
+            Stubs.Modifier,
             composedStub,
             inspectableInfoStub,
             kotlin(
@@ -689,7 +688,7 @@ class ModifierInspectorInfoDetectorTest : LintDetectorTest() {
     @Test
     fun composedModifierWithMissingInspectorInfo() {
         lint().files(
-            kotlin(Stubs.Modifier),
+            Stubs.Modifier,
             composedStub,
             inspectableInfoStub,
             kotlin(
@@ -724,7 +723,7 @@ class ModifierInspectorInfoDetectorTest : LintDetectorTest() {
     @Test
     fun missingInspectorInfoFromInnerClassImplementation() {
         lint().files(
-            kotlin(Stubs.Modifier),
+            Stubs.Modifier,
             composedStub,
             inspectableInfoStub,
             kotlin(
@@ -764,7 +763,7 @@ class ModifierInspectorInfoDetectorTest : LintDetectorTest() {
     @Test
     fun inspectorInfoWithWrongName() {
         lint().files(
-            kotlin(Stubs.Modifier),
+            Stubs.Modifier,
             composedStub,
             inspectableInfoStub,
             kotlin(
@@ -805,7 +804,7 @@ class ModifierInspectorInfoDetectorTest : LintDetectorTest() {
     @Test
     fun inspectorInfoWithWrongValue() {
         lint().files(
-            kotlin(Stubs.Modifier),
+            Stubs.Modifier,
             composedStub,
             inspectableInfoStub,
             kotlin(
@@ -846,7 +845,7 @@ class ModifierInspectorInfoDetectorTest : LintDetectorTest() {
     @Test
     fun inspectorInfoWithWrongValueWhenMultipleAreAvailable() {
         lint().files(
-            kotlin(Stubs.Modifier),
+            Stubs.Modifier,
             composedStub,
             inspectableInfoStub,
             kotlin(
@@ -887,7 +886,7 @@ class ModifierInspectorInfoDetectorTest : LintDetectorTest() {
     @Test
     fun inspectorInfoWithWrongParameterNameInProperties() {
         lint().files(
-            kotlin(Stubs.Modifier),
+            Stubs.Modifier,
             composedStub,
             inspectableInfoStub,
             kotlin(
@@ -929,7 +928,7 @@ class ModifierInspectorInfoDetectorTest : LintDetectorTest() {
     @Test
     fun inspectorInfoWithMismatchInProperties() {
         lint().files(
-            kotlin(Stubs.Modifier),
+            Stubs.Modifier,
             composedStub,
             inspectableInfoStub,
             kotlin(
@@ -970,7 +969,7 @@ class ModifierInspectorInfoDetectorTest : LintDetectorTest() {
     @Test
     fun inspectorInfoWithMissingDebugSelector() {
         lint().files(
-            kotlin(Stubs.Modifier),
+            Stubs.Modifier,
             composedStub,
             inspectableInfoStub,
             kotlin(
@@ -1012,7 +1011,7 @@ class ModifierInspectorInfoDetectorTest : LintDetectorTest() {
     @Test
     fun inspectorInfoWithMissingName() {
         lint().files(
-            kotlin(Stubs.Modifier),
+            Stubs.Modifier,
             composedStub,
             inspectableInfoStub,
             kotlin(
@@ -1052,7 +1051,7 @@ class ModifierInspectorInfoDetectorTest : LintDetectorTest() {
     @Test
     fun inspectorInfoWithMissingVariables() {
         lint().files(
-            kotlin(Stubs.Modifier),
+            Stubs.Modifier,
             composedStub,
             inspectableInfoStub,
             kotlin(
@@ -1099,7 +1098,7 @@ class ModifierInspectorInfoDetectorTest : LintDetectorTest() {
     @Test
     fun inspectorInfoWithMissingDataClassMemberValues() {
         lint().files(
-            kotlin(Stubs.Modifier),
+            Stubs.Modifier,
             composedStub,
             inspectableInfoStub,
             kotlin(
@@ -1145,7 +1144,7 @@ class ModifierInspectorInfoDetectorTest : LintDetectorTest() {
     @Test
     fun missingInfoInConditionals() {
         lint().files(
-            kotlin(Stubs.Modifier),
+            Stubs.Modifier,
             composedStub,
             inspectableInfoStub,
             kotlin(

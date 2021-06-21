@@ -18,6 +18,8 @@ package androidx.compose.desktop
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionContext
 import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.ui.input.key.KeyEvent
+import androidx.compose.ui.window.WindowPlacement
 import org.jetbrains.skiko.ClipComponent
 import org.jetbrains.skiko.GraphicsApi
 import org.jetbrains.skiko.SkiaLayer
@@ -69,19 +71,35 @@ class ComposeWindow : JFrame() {
     }
 
     /**
-     * Sets Compose content of the ComposeWindow.
+     * Composes the given composable into the ComposeWindow.
+     *
+     * The new composition can be logically "linked" to an existing one, by providing a
+     * [parentComposition]. This will ensure that invalidations and CompositionLocals will flow
+     * through the two compositions as if they were not separate.
      *
      * @param parentComposition The parent composition reference to coordinate
-     *        scheduling of composition updates.
-     *        If null then default root composition will be used.
+     * scheduling of composition updates.
+     * If null then default root composition will be used.
+     * @param onKeyEvent This callback is invoked when the user interacts with the hardware
+     * keyboard. While implementing this callback, return true to stop propagation of this event.
+     * If you return false, the key event will be sent to this [onKeyEvent]'s parent.
+     * @param onPreviewKeyEvent This callback is invoked when the user interacts with the hardware
+     * keyboard. It gives ancestors of a focused component the chance to intercept a [KeyEvent].
+     * Return true to stop propagation of this event. If you return false, the key event will be
+     * sent to this [onPreviewKeyEvent]'s child. If none of the children consume the event,
+     * it will be sent back up to the root using the onKeyEvent callback.
      * @param content Composable content of the ComposeWindow.
      */
     fun setContent(
         parentComposition: CompositionContext? = null,
+        onPreviewKeyEvent: (KeyEvent) -> Boolean = { false },
+        onKeyEvent: (KeyEvent) -> Boolean = { false },
         content: @Composable () -> Unit
     ) {
         layer.setContent(
             parentComposition = parentComposition,
+            onPreviewKeyEvent = onPreviewKeyEvent,
+            onKeyEvent = onKeyEvent,
         ) {
             CompositionLocalProvider(
                 LocalLayerContainer provides pane
@@ -102,9 +120,67 @@ class ComposeWindow : JFrame() {
     override fun setVisible(value: Boolean) {
         if (value != isVisible) {
             super.setVisible(value)
-            layer.component.requestFocus()
+            if (value) {
+                layer.component.requestFocus()
+            }
         }
     }
+
+    var placement: WindowPlacement
+        get() = when {
+            isFullscreen -> WindowPlacement.Fullscreen
+            isMaximized -> WindowPlacement.Maximized
+            else -> WindowPlacement.Floating
+        }
+        set(value) {
+            when (value) {
+                WindowPlacement.Fullscreen -> {
+                    isFullscreen = true
+                }
+                WindowPlacement.Maximized -> {
+                    isMaximized = true
+                }
+                WindowPlacement.Floating -> {
+                    isFullscreen = false
+                    isMaximized = false
+                }
+            }
+        }
+
+    /**
+     * `true` if the window is in fullscreen mode, `false` otherwise
+     */
+    private var isFullscreen: Boolean
+        get() = layer.component.fullscreen
+        set(value) {
+            layer.component.fullscreen = value
+        }
+
+    /**
+     * `true` if the window is maximized to fill all available screen space, `false` otherwise
+     */
+    private var isMaximized: Boolean
+        get() = extendedState and MAXIMIZED_BOTH != 0
+        set(value) {
+            extendedState = if (value) {
+                extendedState or MAXIMIZED_BOTH
+            } else {
+                extendedState and MAXIMIZED_BOTH.inv()
+            }
+        }
+
+    /**
+     * `true` if the window is minimized to the taskbar, `false` otherwise
+     */
+    var isMinimized: Boolean
+        get() = extendedState and ICONIFIED != 0
+        set(value) {
+            extendedState = if (value) {
+                extendedState or ICONIFIED
+            } else {
+                extendedState and ICONIFIED.inv()
+            }
+        }
 
     /**
      * Registers a task to run when the rendering API changes.

@@ -33,23 +33,35 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Surface
+import androidx.compose.material.TextField
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clipToBounds
+import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.FocusState
+import androidx.compose.ui.focus.focusOrder
+import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.input.key.Key
+import androidx.compose.ui.input.key.KeyEventType
+import androidx.compose.ui.input.key.keyEvent
 import androidx.compose.ui.input.mouse.MouseScrollEvent
 import androidx.compose.ui.input.mouse.MouseScrollOrientation
 import androidx.compose.ui.input.mouse.MouseScrollUnit
 import androidx.compose.ui.layout.Layout
 import androidx.compose.ui.test.junit4.DesktopScreenshotTestRule
 import androidx.compose.ui.test.junit4.createComposeRule
+import androidx.compose.ui.test.onRoot
+import androidx.compose.ui.test.performKeyPress
 import androidx.compose.ui.unit.dp
 import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.Dispatchers
@@ -57,6 +69,7 @@ import kotlinx.coroutines.runBlocking
 import org.junit.Assert.assertFalse
 import org.junit.Rule
 import org.junit.Test
+import java.awt.event.KeyEvent
 
 class DesktopOwnerTest {
     @get:Rule
@@ -436,4 +449,59 @@ class DesktopOwnerTest {
     }
 
     private class TestException : RuntimeException()
+
+    @ExperimentalComposeUiApi
+    @Test
+    fun `focus management by keys`() {
+        var field1FocusState: FocusState? = null
+        var field2FocusState: FocusState? = null
+        val (focusItem1, focusItem2) = FocusRequester.createRefs()
+        composeRule.setContent {
+            var text by remember { mutableStateOf("") }
+            Row {
+                TextField(
+                    text,
+                    onValueChange = { text = it },
+                    maxLines = 1,
+                    modifier = Modifier
+                        .onFocusChanged { field1FocusState = it }
+                        .focusOrder(focusItem1) {
+                            next = focusItem2
+                        }
+                )
+                TextField(
+                    text,
+                    onValueChange = { text = it },
+                    maxLines = 1,
+                    modifier = Modifier
+                        .onFocusChanged { field2FocusState = it }
+                        .focusOrder(focusItem2) {
+                            previous = focusItem1
+                        }
+                )
+            }
+        }
+        composeRule.runOnIdle { focusItem1.requestFocus() }
+
+        composeRule.runOnIdle {
+            assertThat(field1FocusState!!.isFocused).isTrue()
+            assertThat(field2FocusState!!.isFocused).isFalse()
+        }
+
+        composeRule.onRoot().performKeyPress(keyEvent(Key.Tab, KeyEventType.KeyDown))
+
+        composeRule.runOnIdle {
+            assertThat(field1FocusState!!.isFocused).isFalse()
+            assertThat(field2FocusState!!.isFocused).isTrue()
+        }
+
+        composeRule.onRoot().performKeyPress(
+            keyEvent(Key.Tab, KeyEventType.KeyDown, KeyEvent.SHIFT_DOWN_MASK)
+        )
+
+        composeRule.runOnIdle {
+            assertThat(field1FocusState!!.isFocused).isTrue()
+            assertThat(field2FocusState!!.isFocused).isFalse()
+        }
+    }
 }

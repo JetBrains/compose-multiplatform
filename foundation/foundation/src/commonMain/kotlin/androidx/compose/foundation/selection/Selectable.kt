@@ -19,7 +19,6 @@ package androidx.compose.foundation.selection
 import androidx.compose.foundation.Indication
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.LocalIndication
-import androidx.compose.foundation.Strings
 import androidx.compose.foundation.clickable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
@@ -28,7 +27,6 @@ import androidx.compose.ui.platform.debugInspectorInfo
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.semantics.selected
 import androidx.compose.ui.semantics.semantics
-import androidx.compose.ui.semantics.stateDescription
 
 /**
  * Configure component to be selectable, usually as a part of a mutually exclusive group, where
@@ -104,6 +102,8 @@ fun Modifier.selectable(
  * to describe the element or do customizations
  * @param onClick callback to invoke when this item is clicked
  */
+// TODO: b/191017532 remove Modifier.composed
+@Suppress("UnnecessaryComposedModifier")
 fun Modifier.selectable(
     selected: Boolean,
     interactionSource: MutableInteractionSource,
@@ -121,7 +121,6 @@ fun Modifier.selectable(
             onClick = onClick
         ).semantics {
             this.selected = selected
-            this.stateDescription = if (selected) Strings.Selected else Strings.NotSelected
         }
     },
     inspectorInfo = debugInspectorInfo {

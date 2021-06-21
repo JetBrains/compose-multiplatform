@@ -96,6 +96,7 @@ internal fun LazyList(
         constraints.assertNotNestingScrollableContainers(isVertical)
 
         val itemsProvider = stateOfItemsProvider.value
+        state.updateScrollPositionIfTheFirstItemWasMoved(itemsProvider)
 
         // Update the state's cached Density
         state.density = Density(density, fontScale)
@@ -149,37 +150,34 @@ internal fun LazyList(
         }
 
         val measureResult = measureLazyList(
-            itemsCount,
-            itemProvider,
-            mainAxisMaxSize,
-            startContentPadding,
-            endContentPadding,
-            state.firstVisibleItemIndexNonObservable,
-            state.firstVisibleItemScrollOffsetNonObservable,
-            state.scrollToBeConsumed
+            itemsCount = itemsCount,
+            itemProvider = itemProvider,
+            mainAxisMaxSize = mainAxisMaxSize,
+            startContentPadding = if (reverseLayout) endContentPadding else startContentPadding,
+            endContentPadding = if (reverseLayout) startContentPadding else endContentPadding,
+            firstVisibleItemIndex = state.firstVisibleItemIndexNonObservable,
+            firstVisibleItemScrollOffset = state.firstVisibleItemScrollOffsetNonObservable,
+            scrollToBeConsumed = state.scrollToBeConsumed,
+            constraints = constraints,
+            isVertical = isVertical,
+            headerIndexes = itemsProvider.headerIndexes,
+            verticalArrangement = verticalArrangement,
+            horizontalArrangement = horizontalArrangement,
+            reverseLayout = reverseLayout,
+            density = this,
+            layoutDirection = layoutDirection
         )
 
         state.applyMeasureResult(measureResult)
 
-        val headers = if (itemsProvider.headerIndexes.isNotEmpty()) {
-            LazyListHeaders(
-                itemProvider,
-                itemsProvider.headerIndexes,
-                measureResult,
-                startContentPadding
-            )
-        } else {
-            null
+        state.onPostMeasureListener?.apply {
+            onPostMeasure(itemProvider.childConstraints, measureResult)
         }
 
-        layoutLazyList(
-            constraints,
-            isVertical,
-            verticalArrangement,
-            horizontalArrangement,
-            measureResult,
-            reverseLayout,
-            headers
+        layout(
+            width = measureResult.layoutWidth,
+            height = measureResult.layoutHeight,
+            placementBlock = measureResult.placementBlock
         )
     }
 }

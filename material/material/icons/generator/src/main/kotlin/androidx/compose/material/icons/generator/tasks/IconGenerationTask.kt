@@ -150,8 +150,8 @@ abstract class IconGenerationTask : DefaultTask() {
 
         /**
          * Registers the extended [project]. The core project contains all icons except for the
-         * icons defined in [androidx.compose.material.icons.generator.CoreIcons], as well as a bitmap comparison
-         * test for every icon in both the core and extended project.
+         * icons defined in [androidx.compose.material.icons.generator.CoreIcons], as well as a
+         * bitmap comparison test for every icon in both the core and extended project.
          */
         @JvmStatic
         fun registerExtendedIconThemeProject(

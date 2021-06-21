@@ -29,6 +29,13 @@ private class ItemFoundInScroll(val item: LazyListItemInfo) : CancellationExcept
 private val TargetDistance = 2500.dp
 private val BoundDistance = 1500.dp
 
+private const val DEBUG = false
+private inline fun debugLog(generateMsg: () -> String) {
+    if (DEBUG) {
+        println("LazyListScrolling: ${generateMsg()}")
+    }
+}
+
 internal suspend fun LazyListState.doSmoothScrollToItem(
     index: Int,
     scrollOffset: Int
@@ -40,10 +47,8 @@ internal suspend fun LazyListState.doSmoothScrollToItem(
     scroll {
         val targetDistancePx = with(density) { TargetDistance.toPx() }
         val boundDistancePx = with(density) { BoundDistance.toPx() }
-        var prevValue = 0f
-        val anim = AnimationState(0f)
-        var target: Float
         var loop = true
+        var prevVelocity = 0f
         try {
             val targetItemInitialInfo = getTargetItem()
             if (targetItemInitialInfo != null) {
@@ -51,90 +56,155 @@ internal suspend fun LazyListState.doSmoothScrollToItem(
                 throw ItemFoundInScroll(targetItemInitialInfo)
             }
             val forward = index > firstVisibleItemIndex
+            val target = if (forward) targetDistancePx else -targetDistancePx
+            var loops = 1
             while (loop) {
-                val bound: Float
-                // Magic constants for teleportation chosen arbitrarily by experiment
-                if (forward) {
-                    if (anim.value >= targetDistancePx * 2 &&
-                        index - layoutInfo.visibleItemsInfo.last().index > 100
-                    ) {
-                        // Teleport
-                        snapToItemIndexInternal(index = index - 100, scrollOffset = 0)
-                    }
-                    target = anim.value + targetDistancePx
-                    bound = anim.value + boundDistancePx
-                } else {
-                    if (anim.value >= targetDistancePx * -2 &&
-                        layoutInfo.visibleItemsInfo.first().index - index > 100
-                    ) {
-                        // Teleport
-                        snapToItemIndexInternal(index = index + 100, scrollOffset = 0)
-                    }
-                    target = anim.value - targetDistancePx
-                    bound = anim.value - boundDistancePx
-                }
+                val anim = AnimationState(
+                    initialValue = 0f,
+                    initialVelocity = prevVelocity
+                )
+                var prevValue = 0f
                 anim.animateTo(
                     target,
                     animationSpec = animationSpec,
                     sequentialAnimation = (anim.velocity != 0f)
                 ) {
                     // If we haven't found the item yet, check if it's visible.
-                    val targetItem = getTargetItem()
-                    // Did we scroll far enough that we're completely past the item?
-                    val pastItem = targetItem == null && (
-                        (forward && firstVisibleItemIndex > index) ||
-                            (!forward && layoutInfo.visibleItemsInfo.last().index < index)
-                        )
-                    // We don't throw ItemFoundInScroll when we snap, because once we've snapped to
-                    // the final position, there's no need to animate to it.
-                    if (pastItem) {
-                        snapToItemIndexInternal(index = index, scrollOffset = scrollOffset)
-                        cancelAnimation()
-                        return@animateTo
-                    }
-                    if (targetItem != null) {
-                        // Check for overshoot on the offset
-                        val overshotButVisible = when {
-                            forward && targetItem.offset < scrollOffset -> true
-                            !forward && targetItem.offset > scrollOffset -> true
-                            else -> false
-                        }
-                        if (overshotButVisible) {
-                            snapToItemIndexInternal(index = index, scrollOffset = scrollOffset)
-                            cancelAnimation()
-                            return@animateTo
+                    var targetItem = getTargetItem()
+
+                    if (targetItem == null) {
+                        // Springs can overshoot their target, clamp to the desired range
+                        val coercedValue = if (target > 0) {
+                            value.coerceAtMost(target)
                         } else {
-                            throw ItemFoundInScroll(targetItem)
+                            value.coerceAtLeast(target)
+                        }
+                        val delta = coercedValue - prevValue
+                        debugLog {
+                            "Scrolling by $delta (target: $target, coercedValue: $coercedValue)"
+                        }
+
+                        val consumed = scrollBy(delta)
+                        targetItem = getTargetItem()
+                        if (targetItem != null) {
+                            debugLog { "Found the item after performing scrollBy()" }
+                        } else {
+                            if (delta != consumed) {
+                                debugLog { "Hit end without finding the item" }
+                                cancelAnimation()
+                                loop = false
+                                return@animateTo
+                            }
+                            prevValue += delta
+                            if (forward) {
+                                if (value > boundDistancePx) {
+                                    debugLog { "Struck bound going forward" }
+                                    cancelAnimation()
+                                }
+                            } else {
+                                if (value < -boundDistancePx) {
+                                    debugLog { "Struck bound going backward" }
+                                    cancelAnimation()
+                                }
+                            }
+
+                            // Magic constants for teleportation chosen arbitrarily by experiment
+                            if (forward) {
+                                if (
+                                    loops >= 2 &&
+                                    index - layoutInfo.visibleItemsInfo.last().index > 100
+                                ) {
+                                    // Teleport
+                                    debugLog { "Teleport forward" }
+                                    snapToItemIndexInternal(index = index - 100, scrollOffset = 0)
+                                }
+                            } else {
+                                if (
+                                    loops >= 2 &&
+                                    layoutInfo.visibleItemsInfo.first().index - index > 100
+                                ) {
+                                    // Teleport
+                                    debugLog { "Teleport backward" }
+                                    snapToItemIndexInternal(index = index + 100, scrollOffset = 0)
+                                }
+                            }
+                        }
+                    }
+                    // Did we scroll past the item?
+                    @Suppress("RedundantIf") // It's way easier to understand the logic this way
+                    val overshot = if (forward) {
+                        if (firstVisibleItemIndex > index) {
+                            true
+                        } else if (
+                            firstVisibleItemIndex == index &&
+                            firstVisibleItemScrollOffset > scrollOffset
+                        ) {
+                            true
+                        } else {
+                            false
+                        }
+                    } else { // backward
+                        if (firstVisibleItemIndex < index) {
+                            true
+                        } else if (
+                            firstVisibleItemIndex == index &&
+                            firstVisibleItemScrollOffset < scrollOffset
+                        ) {
+                            true
+                        } else {
+                            false
                         }
                     }
 
-                    val delta = value - prevValue
-                    val consumed = scrollBy(delta)
-                    if (delta != consumed) {
-                        cancelAnimation()
+                    // We don't throw ItemFoundInScroll when we snap, because once we've snapped to
+                    // the final position, there's no need to animate to it.
+                    if (overshot) {
+                        debugLog { "Overshot" }
+                        snapToItemIndexInternal(index = index, scrollOffset = scrollOffset)
                         loop = false
-                    }
-                    prevValue += delta
-                    if (forward) {
-                        if (value > bound) {
-                            cancelAnimation()
-                        }
-                    } else {
-                        if (value < bound) {
-                            cancelAnimation()
-                        }
+                        cancelAnimation()
+                        return@animateTo
+                    } else if (targetItem != null) {
+                        debugLog { "Found item" }
+                        throw ItemFoundInScroll(targetItem)
                     }
                 }
+
+                prevVelocity = anim.velocity
+                loops++
             }
         } catch (itemFound: ItemFoundInScroll) {
             // We found it, animate to it
             // Bring to the requested position - will be automatically stopped if not possible
-            target = anim.value + itemFound.item.offset + scrollOffset
-            prevValue = anim.value
+            val anim = AnimationState(
+                initialValue = 0f,
+                initialVelocity = prevVelocity
+            )
+            val target = (itemFound.item.offset + scrollOffset).toFloat()
+            var prevValue = 0f
+            debugLog {
+                "Seeking by $target at velocity $prevVelocity, sequential: ${anim.velocity != 0f}"
+            }
             anim.animateTo(target, sequentialAnimation = (anim.velocity != 0f)) {
-                val delta = value - prevValue
+                // Springs can overshoot their target, clamp to the desired range
+                val coercedValue = when {
+                    target > 0 -> {
+                        value.coerceAtMost(target)
+                    }
+                    target < 0 -> {
+                        value.coerceAtLeast(target)
+                    }
+                    else -> {
+                        debugLog { "WARNING: somehow ended up seeking 0px, this shouldn't happen" }
+                        0f
+                    }
+                }
+                val delta = coercedValue - prevValue
+                debugLog { "Seeking by $delta (coercedValue = $coercedValue)" }
                 val consumed = scrollBy(delta)
-                if (delta != consumed) {
+                if (delta != consumed /* hit the end, stop */ ||
+                    coercedValue != value /* would have overshot, stop */
+                ) {
                     cancelAnimation()
                 }
                 prevValue += delta

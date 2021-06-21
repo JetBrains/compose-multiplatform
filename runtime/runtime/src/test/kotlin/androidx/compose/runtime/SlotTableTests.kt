@@ -3228,6 +3228,14 @@ class SlotTableTests {
             reader.endGroup()
         }
     }
+
+    @Test
+    fun incorrectUsageReportsInternalException() = expectError("internal") {
+        val table = SlotTable()
+        table.write {
+            table.write { }
+        }
+    }
 }
 
 @OptIn(InternalComposeApi::class)
@@ -3479,4 +3487,21 @@ private fun <T> Iterator<T>.toList(): List<T> {
         list.add(next())
     }
     return list
+}
+
+internal fun expectError(message: String, block: () -> Unit) {
+    var exceptionThrown = false
+    try {
+        block()
+    } catch (e: Throwable) {
+        exceptionThrown = true
+        assertTrue(
+            e.message?.contains(message) == true,
+            "Expected \"${e.message}\" to contain \"$message\""
+        )
+    }
+    assertTrue(
+        exceptionThrown,
+        "Expected test to throw an exception containing \"$message\""
+    )
 }

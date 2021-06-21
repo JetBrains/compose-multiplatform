@@ -68,16 +68,14 @@ class TextFieldFocusTest {
     fun requestFocus() {
         lateinit var testDataList: List<FocusTestData>
 
-        rule.runOnUiThread {
-            rule.setContent {
-                testDataList = listOf(
-                    FocusTestData(FocusRequester()),
-                    FocusTestData(FocusRequester()),
-                    FocusTestData(FocusRequester())
-                )
+        rule.setContent {
+            testDataList = listOf(
+                FocusTestData(FocusRequester()),
+                FocusTestData(FocusRequester()),
+                FocusTestData(FocusRequester())
+            )
 
-                TextFieldApp(testDataList)
-            }
+            TextFieldApp(testDataList)
         }
 
         rule.runOnIdle { testDataList[0].focusRequester.requestFocus() }

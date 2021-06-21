@@ -16,7 +16,6 @@
 
 package androidx.compose.integration.demos
 
-import androidx.compose.androidview.demos.AndroidViewDemos
 import androidx.compose.animation.demos.AnimationDemos
 import androidx.compose.foundation.demos.FoundationDemos
 import androidx.compose.foundation.layout.demos.LayoutDemos
@@ -32,7 +31,6 @@ import androidx.navigation.compose.demos.NavigationDemos
 val AllDemosCategory = DemoCategory(
     "Jetpack Compose Demos",
     listOf(
-        AndroidViewDemos,
         AnimationDemos,
         FoundationDemos,
         CoreDemos,

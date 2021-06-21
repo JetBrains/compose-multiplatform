@@ -18,7 +18,7 @@
 
 package androidx.compose.ui.lint
 
-import androidx.compose.lint.Stubs
+import androidx.compose.lint.test.Stubs
 import com.android.tools.lint.checks.infrastructure.LintDetectorTest
 import com.android.tools.lint.detector.api.Detector
 import com.android.tools.lint.detector.api.Issue
@@ -59,8 +59,8 @@ class ModifierParameterDetectorTest : LintDetectorTest() {
                 ) {}
             """
             ),
-            kotlin(Stubs.Composable),
-            kotlin(Stubs.Modifier)
+            Stubs.Composable,
+            Stubs.Modifier
         )
             .run()
             .expect(
@@ -100,8 +100,8 @@ Fix for src/androidx/compose/ui/foo/test.kt line 10: Change name to modifier:
                 ) {}
             """
             ),
-            kotlin(Stubs.Composable),
-            kotlin(Stubs.Modifier)
+            Stubs.Composable,
+            Stubs.Modifier
         )
             .run()
             .expect(
@@ -143,8 +143,8 @@ Fix for src/androidx/compose/ui/foo/test.kt line 10: Change type to Modifier:
                 ) {}
             """
             ),
-            kotlin(Stubs.Composable),
-            kotlin(Stubs.Modifier)
+            Stubs.Composable,
+            Stubs.Modifier
         )
             .run()
             .expect(
@@ -184,8 +184,8 @@ Fix for src/androidx/compose/ui/foo/TestModifier.kt line 12: Change default valu
                 ) {}
             """
             ),
-            kotlin(Stubs.Composable),
-            kotlin(Stubs.Modifier)
+            Stubs.Composable,
+            Stubs.Modifier
         )
             .run()
             .expect(
@@ -219,8 +219,8 @@ src/androidx/compose/ui/foo/test.kt:11: Warning: Modifier parameter should be th
                 ) {}
             """
             ),
-            kotlin(Stubs.Composable),
-            kotlin(Stubs.Modifier)
+            Stubs.Composable,
+            Stubs.Modifier
         )
             .run()
             .expect(
@@ -274,8 +274,8 @@ Fix for src/androidx/compose/ui/foo/TestModifier.kt line 13: Change default valu
                 ) {}
             """
             ),
-            kotlin(Stubs.Composable),
-            kotlin(Stubs.Modifier)
+            Stubs.Composable,
+            Stubs.Modifier
         )
             .run()
             .expectClean()
@@ -303,8 +303,8 @@ Fix for src/androidx/compose/ui/foo/TestModifier.kt line 13: Change default valu
                 ) {}
             """
             ),
-            kotlin(Stubs.Composable),
-            kotlin(Stubs.Modifier)
+            Stubs.Composable,
+            Stubs.Modifier
         )
             .run()
             .expectClean()
@@ -337,8 +337,8 @@ Fix for src/androidx/compose/ui/foo/TestModifier.kt line 13: Change default valu
                 ) {}
             """
             ),
-            kotlin(Stubs.Composable),
-            kotlin(Stubs.Modifier)
+            Stubs.Composable,
+            Stubs.Modifier
         )
             .run()
             .expectClean()

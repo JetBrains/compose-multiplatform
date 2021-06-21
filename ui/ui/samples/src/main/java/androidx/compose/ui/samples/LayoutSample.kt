@@ -26,6 +26,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.IntrinsicMeasurable
 import androidx.compose.ui.layout.IntrinsicMeasureScope
+import androidx.compose.ui.layout.LayoutModifier
 import androidx.compose.ui.layout.Measurable
 import androidx.compose.ui.layout.MeasurePolicy
 import androidx.compose.ui.layout.MeasureResult
@@ -166,19 +167,39 @@ fun LayoutTagChildrenUsage(header: @Composable () -> Unit, footer: @Composable (
 
 @Sampled
 @Composable
+fun LayoutModifierSample() {
+    val verticalPadding = object : LayoutModifier {
+        override fun MeasureScope.measure(
+            measurable: Measurable,
+            constraints: Constraints
+        ): MeasureResult {
+            // an example modifier that adds 50 pixels of vertical padding.
+            val padding = 50
+            val placeable = measurable.measure(constraints.offset(vertical = -padding))
+            return layout(placeable.width, placeable.height + padding) {
+                placeable.placeRelative(0, padding)
+            }
+        }
+    }
+    Box(Modifier.background(Color.Gray).then(verticalPadding)) {
+        Box(Modifier.fillMaxSize().background(Color.DarkGray))
+    }
+}
+
+@Sampled
+@Composable
 fun ConvenienceLayoutModifierSample() {
     Box(
-        modifier = Modifier
-            .background(Color.Gray)
+        Modifier.background(Color.Gray)
             .layout { measurable, constraints ->
-                // an example modifier that adds 50 pixels of vertical padding
+                // an example modifier that adds 50 pixels of vertical padding.
                 val padding = 50
                 val placeable = measurable.measure(constraints.offset(vertical = -padding))
-                this.layout(placeable.width, placeable.height + padding) {
+                layout(placeable.width, placeable.height + padding) {
                     placeable.placeRelative(0, padding)
                 }
             }
     ) {
-        Box(Modifier.fillMaxSize().background(Color.DarkGray)) {}
+        Box(Modifier.fillMaxSize().background(Color.DarkGray))
     }
 }

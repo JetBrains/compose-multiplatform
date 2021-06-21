@@ -31,7 +31,7 @@ class HapticFeedbackTest {
     @Test
     fun HapticFeedBack_TextHandleMove_Constant() {
         val view = spy(View(mock()))
-        val hapticFeedBack = AndroidHapticFeedback(view)
+        val hapticFeedBack = PlatformHapticFeedback(view)
 
         hapticFeedBack.performHapticFeedback(HapticFeedbackType.TextHandleMove)
 
@@ -44,7 +44,7 @@ class HapticFeedbackTest {
     @Test
     fun HapticFeedBack_LongPress_constant() {
         val view = spy(View(mock()))
-        val hapticFeedBack = AndroidHapticFeedback(view)
+        val hapticFeedBack = PlatformHapticFeedback(view)
 
         hapticFeedBack.performHapticFeedback(HapticFeedbackType.LongPress)
 

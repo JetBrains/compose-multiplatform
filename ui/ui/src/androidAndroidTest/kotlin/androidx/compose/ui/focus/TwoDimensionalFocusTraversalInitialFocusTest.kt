@@ -43,16 +43,22 @@ private const val invalid = "Not applicable to a 2D focus search."
 
 @MediumTest
 @RunWith(Parameterized::class)
-class TwoDimensionalFocusTraversalInitialFocusTest(focusDirectionInt: Int) {
+class TwoDimensionalFocusTraversalInitialFocusTest(param: Param) {
     @get:Rule
     val rule = createComposeRule()
 
-    private val focusDirection = FocusDirection(focusDirectionInt)
+    // We need to wrap the inline class parameter in another class because Java can't instantiate
+    // the inline class.
+    class Param(val focusDirection: FocusDirection) {
+        override fun toString() = focusDirection.toString()
+    }
+
+    private val focusDirection = param.focusDirection
 
     companion object {
         @JvmStatic
         @Parameterized.Parameters(name = "{0}")
-        fun initParameters() = listOf(Left, Right, Up, Down).map { it.value }
+        fun initParameters() = listOf(Param(Left), Param(Right), Param(Up), Param(Down))
     }
 
     @Test

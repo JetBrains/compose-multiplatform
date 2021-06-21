@@ -26,6 +26,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.requiredHeight
 import androidx.compose.foundation.layout.requiredSize
@@ -33,7 +34,9 @@ import androidx.compose.foundation.layout.requiredSizeIn
 import androidx.compose.foundation.layout.requiredWidth
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.text.BasicText
 import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
@@ -62,6 +65,7 @@ import androidx.compose.ui.test.junit4.StateRestorationTester
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.moveBy
 import androidx.compose.ui.test.onNodeWithTag
+import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performGesture
 import androidx.compose.ui.test.up
 import androidx.compose.ui.unit.Dp
@@ -729,6 +733,7 @@ class LazyRowTest {
         lateinit var state: LazyListState
         rule.setContentWithTestViewConfiguration {
             state = rememberLazyListState()
+            state.prefetchingEnabled = false
             LazyRow(Modifier.requiredSize(100.dp), state = state) {
                 items(items) {
                     Spacer(Modifier.requiredSize(20.dp).testTag("$it"))
@@ -1226,6 +1231,113 @@ class LazyRowTest {
             assertThat(state.firstVisibleItemIndex).isEqualTo(2)
             assertThat(state.firstVisibleItemScrollOffset).isEqualTo(10)
         }
+    }
+
+    @Test
+    fun animateScrollToItemDoesNotScrollPastItem() {
+        lateinit var state: LazyListState
+        var target = 0
+        var reverse = false
+        rule.setContent {
+            val listState = rememberLazyListState()
+            SideEffect {
+                state = listState
+            }
+            LazyRow(Modifier.fillMaxSize(), listState) {
+                items(2500) { _ ->
+                    Box(Modifier.size(100.dp))
+                }
+            }
+
+            if (reverse) {
+                assertThat(listState.firstVisibleItemIndex).isAtLeast(target)
+            } else {
+                assertThat(listState.firstVisibleItemIndex).isAtMost(target)
+            }
+        }
+
+        // Try a bunch of different targets with varying spacing
+        listOf(500, 800, 1500, 1600, 1800).forEach {
+            target = it
+            rule.runOnIdle {
+                runBlocking(AutoTestFrameClock()) {
+                    state.animateScrollToItem(target)
+                }
+            }
+
+            rule.runOnIdle {
+                assertThat(state.firstVisibleItemIndex).isEqualTo(target)
+                assertThat(state.firstVisibleItemScrollOffset).isEqualTo(0)
+            }
+        }
+
+        reverse = true
+
+        listOf(1600, 1500, 800, 500, 0).forEach {
+            target = it
+            rule.runOnIdle {
+                runBlocking(AutoTestFrameClock()) {
+                    state.animateScrollToItem(target)
+                }
+            }
+
+            rule.runOnIdle {
+                assertThat(state.firstVisibleItemIndex).isEqualTo(target)
+                assertThat(state.firstVisibleItemScrollOffset).isEqualTo(0)
+            }
+        }
+    }
+
+    @Test
+    fun animateScrollToTheLastItemWhenItemsAreLargerThenTheScreen() {
+        lateinit var state: LazyListState
+        rule.setContent {
+            state = rememberLazyListState()
+            LazyRow(Modifier.height(150.dp).width(100.dp), state) {
+                items(20) {
+                    Box(Modifier.size(150.dp))
+                }
+            }
+        }
+
+        // Try a bunch of different start indexes
+        listOf(0, 5, 12).forEach {
+            val startIndex = it
+            rule.runOnIdle {
+                runBlocking(AutoTestFrameClock()) {
+                    state.scrollToItem(startIndex)
+                    state.animateScrollToItem(19)
+                }
+            }
+
+            rule.runOnIdle {
+                assertThat(state.firstVisibleItemIndex).isEqualTo(19)
+                assertThat(state.firstVisibleItemScrollOffset).isEqualTo(0)
+            }
+        }
+    }
+
+    @Test
+    fun recreatingContentLambdaTriggersItemRecomposition() {
+        val countState = mutableStateOf(0)
+        rule.setContent {
+            val count = countState.value
+            LazyRow {
+                item {
+                    BasicText(text = "Count $count")
+                }
+            }
+        }
+
+        rule.onNodeWithText("Count 0")
+            .assertIsDisplayed()
+
+        rule.runOnIdle {
+            countState.value++
+        }
+
+        rule.onNodeWithText("Count 1")
+            .assertIsDisplayed()
     }
 
     private fun LazyListState.scrollBy(offset: Dp) {

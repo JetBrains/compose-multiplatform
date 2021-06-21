@@ -2071,7 +2071,7 @@ class CompositionTests {
             }
         }
 
-        fun MockViewValidator.numbers(numbers: List<Int>) {
+        fun MockViewValidator.validateNumbers(numbers: List<Int>) {
             Linear {
                 Linear {
                     for (number in numbers) {
@@ -2081,17 +2081,17 @@ class CompositionTests {
             }
         }
 
-        fun MockViewValidator.item(number: Int, numbers: List<Int>) {
+        fun MockViewValidator.validateItem(number: Int, numbers: List<Int>) {
             Linear {
                 Text("$number")
-                numbers(numbers)
+                validateNumbers(numbers)
             }
         }
 
         fun MockViewValidator.Test() {
             Linear {
                 for ((number, numbers) in items) {
-                    item(number, numbers)
+                    validateItem(number, numbers)
                 }
             }
         }
@@ -2923,6 +2923,36 @@ class CompositionTests {
         assertEquals(1, count)
     }
 
+    @Test
+    fun enumCompositeKeyShouldBeStable() = compositionTest {
+        var parentHash: Int = 0
+        var compositeHash: Int = 0
+        compose {
+            parentHash = currentCompositeKeyHash
+            key(MyEnum.First) {
+                compositeHash = currentCompositeKeyHash
+            }
+        }
+
+        val effectiveHash = compositeHash xor (parentHash rol 3)
+        assertEquals(0, effectiveHash)
+    }
+
+    @Test
+    fun enumCompositeKeysShouldBeStable() = compositionTest {
+        var parentHash: Int = 0
+        var compositeHash: Int = 0
+        compose {
+            parentHash = currentCompositeKeyHash
+            key(MyEnum.First, MyEnum.Second) {
+                compositeHash = currentCompositeKeyHash
+            }
+        }
+
+        val effectiveHash = compositeHash xor (parentHash rol 3)
+        assertEquals(1, effectiveHash)
+    }
+
     @Test // regression test for b/188015757
     fun testRestartOfDefaultFunctions() = compositionTest {
 
@@ -2943,6 +2973,11 @@ class CompositionTests {
         // Force Defaults to recompose
         stateA++
         advance()
+    }
+
+    enum class MyEnum {
+        First,
+        Second
     }
 
     /**
@@ -3001,6 +3036,15 @@ class CompositionTests {
             assertEquals("changed", nodes[1].property, "node 1 recomposition value")
             assertEquals(2, nodes[0].changeCount, "node 0 recomposition changeCount")
             assertEquals(1, nodes[1].changeCount, "node 1 recomposition changeCount")
+        }
+    }
+
+    @Test
+    fun internalErrorsAreReportedAsInternal() = compositionTest {
+        expectError("internal") {
+            compose {
+                currentComposer.createNode { null }
+            }
         }
     }
 }

@@ -164,17 +164,31 @@ open class SwipeableState<T>(
             // instead. Note that this stops any ongoing animation.
             minBound = Float.NEGATIVE_INFINITY
             maxBound = Float.POSITIVE_INFINITY
-            val targetOffset = newAnchors.getOffset(currentValue)
-                ?: newAnchors.keys.minByOrNull { abs(it - offset.value) }!!
+            val animationTargetValue = animationTarget.value
+            // if we're in the animation already, let's find it a new home
+            val targetOffset = if (animationTargetValue != null) {
+                // first, try to map old state to the new state
+                val oldState = oldAnchors[animationTargetValue]
+                val newState = newAnchors.getOffset(oldState)
+                // return new state if exists, or find the closes one among new anchors
+                newState ?: newAnchors.keys.minByOrNull { abs(it - animationTargetValue) }!!
+            } else {
+                // we're not animating, proceed by finding the new anchors for an old value
+                val actualOldValue = oldAnchors[offset.value]
+                val value = if (actualOldValue == currentValue) currentValue else actualOldValue
+                newAnchors.getOffset(value) ?: newAnchors
+                    .keys.minByOrNull { abs(it - offset.value) }!!
+            }
             try {
                 animateInternalToOffset(targetOffset, animationSpec)
             } catch (c: CancellationException) {
                 // If the animation was interrupted for any reason, snap as a last resort.
                 snapInternalToOffset(targetOffset)
+            } finally {
+                currentValue = newAnchors.getValue(targetOffset)
+                minBound = newAnchors.keys.minOrNull()!!
+                maxBound = newAnchors.keys.maxOrNull()!!
             }
-            currentValue = newAnchors.getValue(targetOffset)
-            minBound = newAnchors.keys.minOrNull()!!
-            maxBound = newAnchors.keys.maxOrNull()!!
         }
     }
 
@@ -471,7 +485,7 @@ fun <T : Any> rememberSwipeableState(
 }
 
 /**
- * Create and [remember] a [SwipeableState] which is kept in sync with another state, i.e:
+ * Create and [remember] a [SwipeableState] which is kept in sync with another state, i.e.:
  *  1. Whenever the [value] changes, the [SwipeableState] will be animated to that new value.
  *  2. Whenever the value of the [SwipeableState] changes (e.g. after a swipe), the owner of the
  *  [value] will be notified to update their state to the new value of the [SwipeableState] by
@@ -485,10 +499,13 @@ internal fun <T : Any> rememberSwipeableStateFor(
     onValueChange: (T) -> Unit,
     animationSpec: AnimationSpec<Float> = AnimationSpec
 ): SwipeableState<T> {
-    val swipeableState = rememberSwipeableState(
-        initialValue = value,
-        animationSpec = animationSpec
-    )
+    val swipeableState = remember {
+        SwipeableState(
+            initialValue = value,
+            animationSpec = animationSpec,
+            confirmStateChange = { true }
+        )
+    }
     val forceAnimationCheck = remember { mutableStateOf(false) }
     LaunchedEffect(value, forceAnimationCheck.value) {
         if (value != swipeableState.currentValue) {

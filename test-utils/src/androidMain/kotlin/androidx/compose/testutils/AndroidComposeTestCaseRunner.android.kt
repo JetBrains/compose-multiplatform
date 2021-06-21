@@ -16,7 +16,6 @@
 
 package androidx.compose.testutils
 
-import android.annotation.TargetApi
 import android.app.Activity
 import android.graphics.Bitmap
 import android.graphics.Canvas
@@ -28,13 +27,12 @@ import android.view.DisplayListCanvas
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
+import androidx.annotation.RequiresApi
 import androidx.activity.ComponentActivity
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.CompositionContext
-import androidx.compose.runtime.MonotonicFrameClock
+import androidx.activity.compose.setContent
+import androidx.annotation.DoNotInline
 import androidx.compose.runtime.Recomposer
 import androidx.compose.runtime.snapshots.Snapshot
-import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.platform.ViewRootForTest
 import androidx.compose.ui.test.TestMonotonicFrameClock
 import androidx.compose.ui.test.frameDelayMillis
@@ -43,7 +41,6 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.test.TestCoroutineDispatcher
-import java.util.concurrent.atomic.AtomicLong
 
 /**
  * Factory method to provide implementation of [ComposeBenchmarkScope].
@@ -79,6 +76,8 @@ internal class AndroidComposeTestCaseRunner<T : ComposeTestCase>(
 
     private val screenWithSpec: Int
     private val screenHeightSpec: Int
+
+    @Suppress("NewApi") // NewApi doesn't understand Kotlin `when` (b/189459502)
     private val capture = when {
         supportsRenderNode -> RenderNodeCapture()
         supportsMRenderNode -> MRenderNodeCapture()
@@ -86,15 +85,6 @@ internal class AndroidComposeTestCaseRunner<T : ComposeTestCase>(
     }
 
     private var canvas: Canvas? = null
-
-    private class AutoFrameClock(
-        private val singleFrameTimeNanos: Long = 16_000_000
-    ) : MonotonicFrameClock {
-        private val lastFrameTime = AtomicLong(0L)
-
-        override suspend fun <R> withFrameNanos(onFrame: (Long) -> R): R =
-            onFrame(lastFrameTime.getAndAdd(singleFrameTimeNanos))
-    }
 
     private val testCoroutineDispatcher = TestCoroutineDispatcher()
     private val frameClock = TestMonotonicFrameClock(CoroutineScope(testCoroutineDispatcher))
@@ -271,7 +261,7 @@ internal class AndroidComposeTestCaseRunner<T : ComposeTestCase>(
         val imageView = ImageView(activity)
         val bitmap: Bitmap
         if (Build.VERSION.SDK_INT >= 28) {
-            bitmap = Bitmap.createBitmap(picture)
+            bitmap = BitmapHelper.createBitmap(picture)
         } else {
             val width = picture.width.coerceAtLeast(1)
             val height = picture.height.coerceAtLeast(1)
@@ -342,7 +332,7 @@ private interface DrawCapture {
     fun endRecording()
 }
 
-@TargetApi(Build.VERSION_CODES.Q)
+@RequiresApi(Build.VERSION_CODES.Q)
 private class RenderNodeCapture : DrawCapture {
     private val renderNode = RenderNode("Test")
 
@@ -385,27 +375,10 @@ private class MRenderNodeCapture : DrawCapture {
     }
 }
 
-private fun ComponentActivity.setContent(
-    parent: CompositionContext? = null,
-    content: @Composable () -> Unit
-) {
-    val existingComposeView = window.decorView
-        .findViewById<ViewGroup>(android.R.id.content)
-        .getChildAt(0) as? ComposeView
-
-    if (existingComposeView != null) with(existingComposeView) {
-        setParentCompositionContext(parent)
-        setContent(content)
-    } else ComposeView(this).apply {
-        // Set content and parent **before** setContentView
-        // to have ComposeView create the composition on attach
-        setParentCompositionContext(parent)
-        setContent(content)
-        setContentView(this, DefaultActivityContentLayoutParams)
+@RequiresApi(28)
+private object BitmapHelper {
+    @DoNotInline
+    fun createBitmap(picture: Picture): Bitmap {
+        return Bitmap.createBitmap(picture)
     }
 }
-
-private val DefaultActivityContentLayoutParams = ViewGroup.LayoutParams(
-    ViewGroup.LayoutParams.WRAP_CONTENT,
-    ViewGroup.LayoutParams.WRAP_CONTENT
-)

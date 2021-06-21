@@ -25,14 +25,10 @@ import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.autofill.Autofill
 import androidx.compose.ui.autofill.AutofillTree
 import androidx.compose.ui.focus.FocusDirection
-import androidx.compose.ui.focus.FocusDirection.Companion.Down
 import androidx.compose.ui.focus.FocusDirection.Companion.In
-import androidx.compose.ui.focus.FocusDirection.Companion.Left
 import androidx.compose.ui.focus.FocusDirection.Companion.Next
 import androidx.compose.ui.focus.FocusDirection.Companion.Out
 import androidx.compose.ui.focus.FocusDirection.Companion.Previous
-import androidx.compose.ui.focus.FocusDirection.Companion.Right
-import androidx.compose.ui.focus.FocusDirection.Companion.Up
 import androidx.compose.ui.focus.FocusManager
 import androidx.compose.ui.focus.FocusManagerImpl
 import androidx.compose.ui.geometry.Offset
@@ -41,10 +37,6 @@ import androidx.compose.ui.graphics.Canvas
 import androidx.compose.ui.graphics.DesktopCanvas
 import androidx.compose.ui.input.key.Key.Companion.Back
 import androidx.compose.ui.input.key.Key.Companion.DirectionCenter
-import androidx.compose.ui.input.key.Key.Companion.DirectionDown
-import androidx.compose.ui.input.key.Key.Companion.DirectionLeft
-import androidx.compose.ui.input.key.Key.Companion.DirectionRight
-import androidx.compose.ui.input.key.Key.Companion.DirectionUp
 import androidx.compose.ui.input.key.Key.Companion.Tab
 import androidx.compose.ui.input.key.KeyEvent
 import androidx.compose.ui.input.key.KeyEventType
@@ -77,6 +69,8 @@ import androidx.compose.ui.text.platform.FontLoader
 import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.IntSize
+import androidx.compose.ui.unit.IntOffset
+import androidx.compose.ui.unit.IntRect
 import androidx.compose.ui.unit.LayoutDirection
 
 private typealias Command = () -> Unit
@@ -87,9 +81,19 @@ private typealias Command = () -> Unit
 )
 internal class DesktopOwner(
     val container: DesktopOwners,
-    density: Density = Density(1f, 1f)
+    density: Density = Density(1f, 1f),
+    val isPopup: Boolean = false,
+    val isFocusable: Boolean = true,
+    val onDismissRequest: (() -> Unit)? = null,
+    private val onPreviewKeyEvent: (KeyEvent) -> Boolean = { false },
+    private val onKeyEvent: (KeyEvent) -> Boolean = { false },
 ) : Owner, RootForTest, DesktopRootForTest, PositionCalculator {
-    internal var size by mutableStateOf(IntSize(0, 0))
+
+    internal fun isHovered(point: IntOffset): Boolean {
+        return bounds.contains(point)
+    }
+
+    internal var bounds by mutableStateOf(IntRect.Zero)
 
     override var density by mutableStateOf(density)
 
@@ -130,6 +134,12 @@ internal class DesktopOwner(
         it.modifier = semanticsModifier
             .then(_focusManager.modifier)
             .then(keyInputModifier)
+            .then(
+                KeyInputModifier(
+                    onKeyEvent = onKeyEvent,
+                    onPreviewKeyEvent = onPreviewKeyEvent
+                )
+            )
     }
 
     override val rootForTest = this
@@ -144,6 +154,9 @@ internal class DesktopOwner(
         container.register(this)
         snapshotObserver.startObserving()
         root.attach(this)
+        if (isFocusable) {
+            container.focusedOwner = this
+        }
         _focusManager.takeFocus()
     }
 
@@ -277,10 +290,6 @@ internal class DesktopOwner(
     override fun getFocusDirection(keyEvent: KeyEvent): FocusDirection? {
         return when (keyEvent.key) {
             Tab -> if (keyEvent.isShiftPressed) Previous else Next
-            DirectionRight -> Right
-            DirectionLeft -> Left
-            DirectionUp -> Up
-            DirectionDown -> Down
             DirectionCenter -> In
             Back -> Out
             else -> null
@@ -301,7 +310,12 @@ internal class DesktopOwner(
 
     fun setSize(width: Int, height: Int) {
         val constraints = Constraints(0, width, 0, height)
-        this.size = IntSize(width, height)
+        if (!isPopup) {
+            this.bounds = IntRect(
+                IntOffset(bounds.left, bounds.top),
+                IntSize(width, height)
+            )
+        }
         measureAndLayoutDelegate.updateRootConstraints(constraints)
     }
 

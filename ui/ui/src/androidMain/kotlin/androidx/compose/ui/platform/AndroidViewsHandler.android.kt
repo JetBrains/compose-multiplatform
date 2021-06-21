@@ -23,7 +23,6 @@ import android.view.MotionEvent
 import android.view.View
 import android.view.ViewGroup
 import androidx.compose.ui.node.LayoutNode
-import androidx.compose.ui.node.LayoutNode.LayoutState.NeedsRemeasure
 import androidx.compose.ui.viewinterop.AndroidViewHolder
 
 /**
@@ -41,12 +40,18 @@ internal class AndroidViewsHandler(context: Context) : ViewGroup(context) {
     val layoutNodeToHolder = hashMapOf<LayoutNode, AndroidViewHolder>()
 
     override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
-        // Layout will be handled by component nodes.
-        setMeasuredDimension(0, 0)
-    }
-
-    override fun measureChildren(widthMeasureSpec: Int, heightMeasureSpec: Int) {
-        // Layout will be handled by component nodes.
+        // Layout will be handled by component nodes. However, we act like proper measurement
+        // here in case ViewRootImpl did forceLayout().
+        require(MeasureSpec.getMode(widthMeasureSpec) == MeasureSpec.EXACTLY)
+        require(MeasureSpec.getMode(heightMeasureSpec) == MeasureSpec.EXACTLY)
+        setMeasuredDimension(
+            MeasureSpec.getSize(widthMeasureSpec),
+            MeasureSpec.getSize(heightMeasureSpec)
+        )
+        // Remeasure children, such that, if ViewRootImpl did forceLayout(), the holders
+        // will be set PFLAG_LAYOUT_REQUIRED and they will be relaid out during the next layout.
+        // This will ensure that the need relayout flags will be cleared correctly.
+        holderToLayoutNode.keys.forEach { it.remeasure() }
     }
 
     override fun onLayout(changed: Boolean, l: Int, t: Int, r: Int, b: Int) {
@@ -82,10 +87,8 @@ internal class AndroidViewsHandler(context: Context) : ViewGroup(context) {
         for (i in 0 until childCount) {
             val child = getChildAt(i)
             val node = holderToLayoutNode[child]
-            if (child.isLayoutRequested && node != null &&
-                node.layoutState != NeedsRemeasure
-            ) {
-                holderToLayoutNode[child]!!.requestRemeasure()
+            if (child.isLayoutRequested && node != null) {
+                node.requestRemeasure()
             }
         }
     }

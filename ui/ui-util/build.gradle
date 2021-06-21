@@ -14,38 +14,35 @@
  * limitations under the License.
  */
 
-
-import androidx.build.AndroidXUiPlugin
+import androidx.build.AndroidXComposePlugin
 import androidx.build.LibraryGroups
 import androidx.build.LibraryType
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
-import static androidx.build.dependencies.DependenciesKt.*
-
 plugins {
     id("AndroidXPlugin")
     id("com.android.library")
-    id("AndroidXUiPlugin")
+    id("AndroidXComposePlugin")
 }
 
-AndroidXUiPlugin.applyAndConfigureKotlinPlugin(project)
+AndroidXComposePlugin.applyAndConfigureKotlinPlugin(project)
 
-if(!AndroidXUiPlugin.isMultiplatformEnabled(project)) {
+if(!AndroidXComposePlugin.isMultiplatformEnabled(project)) {
     dependencies {
         /*
          * When updating dependencies, make sure to make the an an analogous update in the
          * corresponding block below
          */
 
-        implementation(KOTLIN_STDLIB)
+        implementation(libs.kotlinStdlib)
 
-        testImplementation(JUNIT)
-        testImplementation(TRUTH)
-        testImplementation(KOTLIN_TEST)
+        testImplementation(libs.junit)
+        testImplementation(libs.truth)
+        testImplementation(libs.kotlinTest)
     }
 }
 
-if(AndroidXUiPlugin.isMultiplatformEnabled(project)) {
+if(AndroidXComposePlugin.isMultiplatformEnabled(project)) {
     kotlin {
         android()
         jvm("desktop")
@@ -56,15 +53,15 @@ if(AndroidXUiPlugin.isMultiplatformEnabled(project)) {
          */
         sourceSets {
             commonMain.dependencies {
-                implementation(KOTLIN_STDLIB_COMMON)
+                implementation(libs.kotlinStdlibCommon)
             }
 
             jvmMain.dependencies {
-                implementation(KOTLIN_STDLIB)
+                implementation(libs.kotlinStdlib)
             }
 
             androidMain.dependencies {
-                implementation(KOTLIN_STDLIB)
+                implementation(libs.kotlinStdlib)
             }
 
             desktopMain.dependsOn(jvmMain)
@@ -74,7 +71,7 @@ if(AndroidXUiPlugin.isMultiplatformEnabled(project)) {
             }
 
             androidTest.dependencies {
-                implementation(TRUTH)
+                implementation(libs.truth)
             }
         }
     }

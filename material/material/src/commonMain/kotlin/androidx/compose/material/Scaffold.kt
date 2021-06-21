@@ -70,7 +70,7 @@ fun rememberScaffoldState(
  * The possible positions for a [FloatingActionButton] attached to a [Scaffold].
  */
 @Suppress("INLINE_CLASS_DEPRECATED", "EXPERIMENTAL_FEATURE_WARNING")
-inline class FabPosition internal constructor(val value: Int) {
+inline class FabPosition internal constructor(@Suppress("unused") private val value: Int) {
     companion object {
         /**
          * Position FAB at the bottom of the screen in the center, above the [BottomAppBar] (if it

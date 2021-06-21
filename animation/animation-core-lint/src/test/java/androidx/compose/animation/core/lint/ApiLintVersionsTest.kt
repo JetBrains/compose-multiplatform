@@ -33,10 +33,7 @@ class ApiLintVersionsTest {
         LintClient.clientName = LintClient.CLIENT_UNIT_TESTS
 
         val registry = AnimationCoreIssueRegistry()
-        // we hardcode version registry.api to the version that is used to run tests
         assertThat(registry.api).isEqualTo(CURRENT_API)
-        // Intentionally fails in IDE, because we use different API version in
-        // studio and command line
-        assertThat(registry.minApi).isEqualTo(3)
+        assertThat(registry.minApi).isEqualTo(10)
     }
 }

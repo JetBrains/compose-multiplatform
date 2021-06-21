@@ -27,23 +27,21 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.testutils.assertAgainstGolden
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.test.captureToImage
 import androidx.compose.ui.test.center
 import androidx.compose.ui.test.click
-import androidx.compose.ui.test.height
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.longClick
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performGesture
-import androidx.compose.ui.test.width
+import androidx.compose.ui.text.TextRange
+import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.style.ResolvedTextDirection
 import androidx.compose.ui.unit.dp
 import androidx.test.ext.junit.runners.AndroidJUnit4
-import androidx.test.filters.FlakyTest
 import androidx.test.filters.LargeTest
 import androidx.test.filters.SdkSuppress
 import androidx.test.screenshot.AndroidXScreenshotTestRule
@@ -68,7 +66,6 @@ class TextSelectionColorsScreenshotTest {
     @get:Rule
     val screenshotRule = AndroidXScreenshotTestRule(GOLDEN_UI)
 
-    @FlakyTest(bugId = 179770443)
     @Test
     fun text_defaultSelectionColors() {
         rule.setContent {
@@ -87,7 +84,6 @@ class TextSelectionColorsScreenshotTest {
             .assertAgainstGolden(screenshotRule, "text_defaultSelectionColors")
     }
 
-    @FlakyTest(bugId = 179770443)
     @Test
     fun text_customSelectionColors() {
         rule.setContent {
@@ -111,7 +107,6 @@ class TextSelectionColorsScreenshotTest {
             .assertAgainstGolden(screenshotRule, "text_customSelectionColors")
     }
 
-    @FlakyTest(bugId = 179770443)
     @Test
     fun textField_defaultSelectionColors() {
         rule.setContent {
@@ -127,20 +122,11 @@ class TextSelectionColorsScreenshotTest {
 
         rule.waitForIdle()
 
-        // Long click to start text selection
-        rule.onNodeWithText(Text)
-            .performGesture {
-                longClick(Offset(width / 5f, height / 2f))
-            }
-
-        rule.waitForIdle()
-
         rule.onNodeWithTag(Tag)
             .captureToImage()
             .assertAgainstGolden(screenshotRule, "textField_defaultSelectionColors")
     }
 
-    @FlakyTest(bugId = 188572883)
     @Test
     fun textField_customSelectionColors() {
         rule.setContent {
@@ -157,14 +143,6 @@ class TextSelectionColorsScreenshotTest {
             .performGesture {
                 click()
                 longClick()
-            }
-
-        rule.waitForIdle()
-
-        // Long click to start text selection
-        rule.onNodeWithText(Text)
-            .performGesture {
-                longClick(Offset(width / 5f, height / 2f))
             }
 
         rule.waitForIdle()
@@ -205,10 +183,15 @@ private fun TextTestContent(textSelectionColors: TextSelectionColors) {
 private fun TextFieldTestContent(textSelectionColors: TextSelectionColors) {
     CompositionLocalProvider(LocalTextSelectionColors provides textSelectionColors) {
         Box(Modifier.testTag(Tag)) {
-            BasicTextField(value = Text, onValueChange = {})
+            BasicTextField(value = TextFieldText, onValueChange = {})
         }
     }
 }
 
 private const val Text = "Selected text"
+private val TextFieldText = TextFieldValue(
+    text = "Selected text",
+    selection = TextRange(0, 8),
+    composition = TextRange(0, 8)
+)
 private const val Tag = "TestTag"

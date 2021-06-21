@@ -290,7 +290,7 @@ class TabTest {
     }
 
     @Test
-    fun singleLineTab_textBaseline() {
+    fun singleLineTab_textPosition() {
         rule.setMaterialContent {
             var state by remember { mutableStateOf(0) }
             val titles = listOf("TAB")
@@ -313,19 +313,11 @@ class TabTest {
             }
         }
 
-        val expectedBaseline = 18.dp
-        val indicatorHeight = 2.dp
-        val expectedBaselineDistance = expectedBaseline + indicatorHeight
-
         val tabRowBounds = rule.onNodeWithTag("tabRow").getUnclippedBoundsInRoot()
         val textBounds =
             rule.onNodeWithTag("text", useUnmergedTree = true).getUnclippedBoundsInRoot()
-        val textBaselinePos =
-            rule.onNodeWithTag("text", useUnmergedTree = true).getLastBaselinePosition()
-
-        val baselinePositionY = textBounds.top + textBaselinePos
-        val expectedPositionY = tabRowBounds.height - expectedBaselineDistance
-        baselinePositionY.assertIsEqualTo(expectedPositionY, "baseline y-position")
+        val expectedPositionY = (tabRowBounds.height - textBounds.height) / 2
+        textBounds.top.assertIsEqualTo(expectedPositionY, "text bounds top y-position")
     }
 
     @Test
@@ -369,7 +361,7 @@ class TabTest {
     }
 
     @Test
-    fun twoLineTab_textBaseline() {
+    fun twoLineTab_textPosition() {
         rule.setMaterialContent {
             var state by remember { mutableStateOf(0) }
             val titles = listOf("Two line \n text")
@@ -392,20 +384,12 @@ class TabTest {
             }
         }
 
-        val expectedBaseline = 10.dp
-        val indicatorHeight = 2.dp
-
         val tabRowBounds = rule.onNodeWithTag("tabRow").getUnclippedBoundsInRoot()
         val textBounds =
             rule.onNodeWithTag("text", useUnmergedTree = true).getUnclippedBoundsInRoot()
-        val textBaselinePos =
-            rule.onNodeWithTag("text", useUnmergedTree = true).getLastBaselinePosition()
 
-        val expectedBaselineDistance = expectedBaseline + indicatorHeight
-
-        val baselinePositionY = textBounds.top + textBaselinePos
-        val expectedPositionY = (tabRowBounds.height - expectedBaselineDistance)
-        baselinePositionY.assertIsEqualTo(expectedPositionY, "baseline y-position")
+        val expectedPositionY = (tabRowBounds.height - textBounds.height) / 2
+        textBounds.top.assertIsEqualTo(expectedPositionY, "text bounds top y-position")
     }
 
     @OptIn(ExperimentalMaterialApi::class)
@@ -675,6 +659,56 @@ class TabTest {
                     get(it).assertIsNotSelected()
                 }
             }
+    }
+
+    @Test
+    fun tabRowIndicator_animatesWidthChange() {
+        rule.mainClock.autoAdvance = false
+
+        rule.setMaterialContent {
+            var state by remember { mutableStateOf(0) }
+            val titles = listOf("TAB 1", "TAB 2", "TAB 3 WITH LOTS OF TEXT")
+
+            val indicator = @Composable { tabPositions: List<TabPosition> ->
+                TabRowDefaults.Indicator(
+                    Modifier.tabIndicatorOffset(tabPositions[state])
+                        .testTag("indicator")
+                )
+            }
+
+            Box {
+                ScrollableTabRow(
+                    selectedTabIndex = state,
+                    indicator = indicator
+                ) {
+                    titles.forEachIndexed { index, title ->
+                        Tab(
+                            text = { Text(title) },
+                            selected = state == index,
+                            onClick = { state = index }
+                        )
+                    }
+                }
+            }
+        }
+
+        val initialWidth = rule.onNodeWithTag("indicator").getUnclippedBoundsInRoot().width
+
+        // Click the third tab, which is wider than the first
+        rule.onAllNodes(isSelectable())[2].performClick()
+
+        // Ensure animation starts
+        rule.mainClock.advanceTimeBy(50)
+
+        val midAnimationWidth = rule.onNodeWithTag("indicator").getUnclippedBoundsInRoot().width
+        assertThat(initialWidth).isLessThan(midAnimationWidth)
+
+        // Allow animation to complete
+        rule.mainClock.autoAdvance = true
+        rule.waitForIdle()
+
+        val finalWidth = rule.onNodeWithTag("indicator").getUnclippedBoundsInRoot().width
+        assertThat(midAnimationWidth).isLessThan(finalWidth)
     }
 
     @Test

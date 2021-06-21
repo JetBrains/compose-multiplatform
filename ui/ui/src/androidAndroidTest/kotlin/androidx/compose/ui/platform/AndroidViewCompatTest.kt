@@ -26,9 +26,12 @@ import android.view.View.MeasureSpec
 import android.view.ViewGroup
 import android.view.ViewGroup.LayoutParams.MATCH_PARENT
 import android.view.ViewGroup.LayoutParams.WRAP_CONTENT
+import android.webkit.WebView
+import android.webkit.WebViewClient
 import android.widget.FrameLayout
 import android.widget.LinearLayout
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
@@ -43,6 +46,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.testutils.assertPixels
 import androidx.compose.ui.Align
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
@@ -55,6 +59,7 @@ import androidx.compose.ui.layout.Measurable
 import androidx.compose.ui.layout.MeasureResult
 import androidx.compose.ui.layout.MeasureScope
 import androidx.compose.ui.layout.onGloballyPositioned
+import androidx.compose.ui.layout.positionInRoot
 import androidx.compose.ui.layout.positionInWindow
 import androidx.compose.ui.node.ComposeUiNode
 import androidx.compose.ui.node.LayoutNode
@@ -89,6 +94,8 @@ import org.junit.Assert.assertTrue
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
+import java.util.concurrent.CountDownLatch
+import java.util.concurrent.TimeUnit
 import kotlin.math.roundToInt
 
 /**
@@ -398,6 +405,72 @@ class AndroidViewCompatTest {
         }
     }
 
+    // Intrinsic measurements.
+
+    @Test
+    fun testIntrinsicMeasurement() {
+        var obtainedWidthMeasureSpec: Int = -1
+        var obtainedHeightMeasureSpec: Int = -1
+        class MeasureSpecsSaver(context: Context) : View(context) {
+            override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
+                obtainedWidthMeasureSpec = widthMeasureSpec
+                obtainedHeightMeasureSpec = heightMeasureSpec
+                setMeasuredDimension(20, 40)
+            }
+        }
+        rule.setContent {
+            Layout(
+                content = {
+                    AndroidView(::MeasureSpecsSaver)
+                }
+            ) { measurables, _ ->
+                val view = measurables.first()
+                assertEquals(20, view.minIntrinsicWidth(70))
+                assertEquals(MeasureSpec.UNSPECIFIED, MeasureSpec.getMode(obtainedWidthMeasureSpec))
+                assertEquals(
+                    MeasureSpec.makeMeasureSpec(70, MeasureSpec.AT_MOST),
+                    obtainedHeightMeasureSpec
+                )
+                assertEquals(20, view.maxIntrinsicWidth(80))
+                assertEquals(MeasureSpec.UNSPECIFIED, MeasureSpec.getMode(obtainedWidthMeasureSpec))
+                assertEquals(
+                    MeasureSpec.makeMeasureSpec(80, MeasureSpec.AT_MOST),
+                    obtainedHeightMeasureSpec
+                )
+                assertEquals(40, view.minIntrinsicHeight(70))
+                assertEquals(
+                    MeasureSpec.makeMeasureSpec(70, MeasureSpec.AT_MOST),
+                    obtainedWidthMeasureSpec
+                )
+                assertEquals(
+                    MeasureSpec.UNSPECIFIED,
+                    MeasureSpec.getMode(obtainedHeightMeasureSpec)
+                )
+                assertEquals(40, view.minIntrinsicHeight(80))
+                assertEquals(
+                    MeasureSpec.makeMeasureSpec(80, MeasureSpec.AT_MOST),
+                    obtainedWidthMeasureSpec
+                )
+                assertEquals(
+                    MeasureSpec.UNSPECIFIED,
+                    MeasureSpec.getMode(obtainedHeightMeasureSpec)
+                )
+                view.measure(Constraints(maxWidth = 50, maxHeight = 50))
+                assertEquals(
+                    MeasureSpec.makeMeasureSpec(50, MeasureSpec.AT_MOST),
+                    obtainedWidthMeasureSpec
+                )
+                assertEquals(
+                    MeasureSpec.makeMeasureSpec(50, MeasureSpec.AT_MOST),
+                    obtainedHeightMeasureSpec
+                )
+                layout(0, 0) {}
+            }
+        }
+    }
+
+    // Other tests.
+
     @Test
     @SdkSuppress(minSdkVersion = Build.VERSION_CODES.O)
     fun testRedrawing_onSubsequentRemeasuring() {
@@ -681,6 +754,57 @@ class AndroidViewCompatTest {
         }
 
         rule.runOnIdle { assertEquals(invalidatesDuringScroll + 1, view!!.draws) }
+    }
+
+    @Test
+    fun testWebViewIsRelaidOut_afterPageLoad() {
+        var boxY = 0
+        var pageFinished = false
+        val latch = CountDownLatch(2)
+        rule.setContent {
+            Column {
+                AndroidView(
+                    factory = {
+                        val webView = WebView(it)
+                        webView.webViewClient = object : WebViewClient() {
+                            override fun onPageFinished(view: WebView?, url: String?) {
+                                super.onPageFinished(view, url)
+                                latch.countDown()
+                                pageFinished = true
+                            }
+                        }
+                        webView.loadData("This is a test text", "text/html", "UTF-8")
+                        webView
+                    },
+                    modifier = Modifier.drawBehind {
+                        // We would like to use onPageCommitVisible instead of onPageFinished,
+                        // such that this modifier would not be needed at all, but
+                        // onPageCommitVisible was only added in API 23.
+                        if (pageFinished) latch.countDown()
+                    }
+                )
+                Box(Modifier.onGloballyPositioned { boxY = it.positionInRoot().y.roundToInt() })
+            }
+        }
+        assertTrue(latch.await(3, TimeUnit.SECONDS))
+        rule.runOnIdle { assertTrue(boxY > 0) }
+    }
+
+    @Test
+    fun testView_isNotLayoutRequested_afterFirstLayout() {
+        var view: View? = null
+
+        rule.setContent {
+            AndroidView(
+                factory = { context ->
+                    View(context).also { view = it }
+                }
+            )
+        }
+
+        rule.runOnIdle {
+            assertFalse(view!!.isLayoutRequested)
+        }
     }
 
     class ColoredSquareView(context: Context) : View(context) {

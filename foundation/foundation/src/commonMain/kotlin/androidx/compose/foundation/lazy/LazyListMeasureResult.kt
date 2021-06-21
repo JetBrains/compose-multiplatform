@@ -16,31 +16,37 @@
 
 package androidx.compose.foundation.lazy
 
+import androidx.compose.ui.layout.Placeable
+
 /**
  * The result of the measure pass for lazy list layout.
  */
 internal class LazyListMeasureResult(
-    /** Calculated size for the main axis.*/
-    val mainAxisSize: Int,
-    /** Calculated size for the cross axis.*/
-    val crossAxisSize: Int,
-    /** The list of items to be placed during the layout pass.*/
-    val items: List<LazyMeasuredItem>,
-    /** The main axis offset to be used for the first item in the [items] list.*/
-    val itemsScrollOffset: Int,
-    /** The new value for [LazyListState.firstVisibleItemIndex].*/
-    val firstVisibleItemIndex: DataIndex,
+    // properties defining the scroll position:
+    /** The new first visible item.*/
+    val firstVisibleItem: LazyMeasuredItem?,
     /** The new value for [LazyListState.firstVisibleItemScrollOffset].*/
     val firstVisibleItemScrollOffset: Int,
     /** True if there is some space available to continue scrolling in the forward direction.*/
     val canScrollForward: Boolean,
     /** The amount of scroll consumed during the measure pass.*/
     val consumedScroll: Float,
-    /** The composed MeasuredItem which we are not going to place as they are out of screen.*/
-    val notUsedButComposedItems: MutableList<LazyMeasuredItem>?,
+    /** List of items which were composed, but are not a part of [visibleItemsInfo].*/
+    val composedButNotVisibleItems: List<LazyMeasuredItem>?,
+    // properties to be used by the Layout's measure result
+    /** The calculated layout width */
+    val layoutWidth: Int,
+    /** The calculated layout height */
+    val layoutHeight: Int,
+    /** The placement block */
+    val placementBlock: Placeable.PlacementScope.() -> Unit,
+    // properties representing the info needed for LazyListLayoutInfo
+    /** see [LazyListLayoutInfo.visibleItemsInfo] */
+    override val visibleItemsInfo: List<LazyListItemInfo>,
+    /** see [LazyListLayoutInfo.viewportStartOffset] */
     override val viewportStartOffset: Int,
+    /** see [LazyListLayoutInfo.viewportEndOffset] */
     override val viewportEndOffset: Int,
-    override val totalItemsCount: Int
-) : LazyListLayoutInfo {
-    override val visibleItemsInfo: List<LazyListItemInfo> get() = items
-}
+    /** see [LazyListLayoutInfo.totalItemsCount] */
+    override val totalItemsCount: Int,
+) : LazyListLayoutInfo

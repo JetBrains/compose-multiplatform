@@ -184,6 +184,10 @@ internal open class SnapshotMutableStateImpl<T>(
         }
     }
 
+    override fun toString(): String = next.withCurrent {
+        "MutableState(value=${it.value})@${hashCode()}"
+    }
+
     private class StateStateRecord<T>(myValue: T) : StateRecord() {
         override fun assign(value: StateRecord) {
             @Suppress("UNCHECKED_CAST")
@@ -473,6 +477,19 @@ private class DerivedSnapshotState<T>(
         get() = first.withCurrent {
             currentRecord(it, Snapshot.current, calculation).dependencies ?: emptySet()
         }
+
+    override fun toString(): String = first.withCurrent {
+        "DerivedState(value=${displayValue()})@${hashCode()}"
+    }
+
+    private fun displayValue(): String {
+        first.withCurrent {
+            if (it.isValid(this, Snapshot.current)) {
+                return it.result.toString()
+            }
+            return "<Not calculated>"
+        }
+    }
 }
 
 private inline fun <R> notifyObservers(derivedState: DerivedState<*>, block: () -> R): R {
@@ -831,13 +848,13 @@ fun <T> snapshotFlow(
     val readSet = mutableSetOf<Any>()
     val readObserver: (Any) -> Unit = { readSet.add(it) }
 
-    // This channel may not block or lose data on an offer call.
+    // This channel may not block or lose data on a trySend call.
     val appliedChanges = Channel<Set<Any>>(Channel.UNLIMITED)
 
     // Register the apply observer before running for the first time
     // so that we don't miss updates.
     val unregisterApplyObserver = Snapshot.registerApplyObserver { changed, _ ->
-        appliedChanges.offer(changed)
+        appliedChanges.trySend(changed)
     }
 
     try {
@@ -859,7 +876,7 @@ fun <T> snapshotFlow(
             while (true) {
                 // Assumption: readSet will typically be smaller than changed
                 found = found || readSet.intersects(changedObjects)
-                changedObjects = appliedChanges.poll() ?: break
+                changedObjects = appliedChanges.tryReceive().getOrNull() ?: break
             }
 
             if (found) {

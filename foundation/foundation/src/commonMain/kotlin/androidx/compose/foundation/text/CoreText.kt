@@ -93,7 +93,10 @@ private typealias InlineContentRange = AnnotatedString.Range<@Composable (String
  * [overflow] and [softWrap]. If it is not null, then it must be greater than zero.
  * @param inlineContent A map store composables that replaces certain ranges of the text. It's
  * used to insert composables into text layout. Check [InlineTextContent] for more information.
- * @param onTextLayout Callback that is executed when a new text layout is calculated.
+ * @param onTextLayout Callback that is executed when a new text layout is calculated. A
+ * [TextLayoutResult] object that callback provides contains paragraph information, size of the
+ * text, baselines and other details. The callback can be used to add additional decoration or
+ * functionality to the text. For example, to draw selection around the text.
  */
 @Composable
 @OptIn(InternalFoundationTextApi::class)
@@ -176,7 +179,7 @@ internal fun CoreText(
                             )
                         }
                     } else {
-                        Modifier.pointerInput(Unit) {
+                        Modifier.pointerInput(controller.mouseSelectionObserver) {
                             mouseSelectionDetector(
                                 controller.mouseSelectionObserver,
                                 finalPass = true

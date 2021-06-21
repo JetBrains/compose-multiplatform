@@ -17,6 +17,7 @@
 package androidx.compose.material
 
 import android.os.Build
+import androidx.compose.foundation.gestures.forEachGesture
 import androidx.compose.foundation.interaction.Interaction
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.interaction.PressInteraction
@@ -36,6 +37,8 @@ import androidx.compose.ui.composed
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.graphics.asAndroidBitmap
+import androidx.compose.ui.input.pointer.PointerEventPass
+import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.semantics.SemanticsProperties
@@ -328,7 +331,7 @@ class SurfaceTest {
     }
 
     @Test
-    fun surface_blockClicks() {
+    fun surface_blockClicksBehind() {
         val state = mutableStateOf(0)
         rule.setContent {
             Box(Modifier.fillMaxSize()) {
@@ -348,5 +351,40 @@ class SurfaceTest {
             .performClick()
         // still 0
         Truth.assertThat(state.value).isEqualTo(0)
+    }
+
+    // regression test for b/189411183
+    @Test
+    fun surface_allowsFinalPassChildren() {
+        val hitTested = mutableStateOf(false)
+        rule.setContent {
+            Box(Modifier.fillMaxSize()) {
+                Surface(
+                    Modifier.fillMaxSize().testTag("surface"),
+                ) {
+                    Box(
+                        Modifier
+                            .fillMaxSize()
+                            .testTag("clickable")
+                            .pointerInput(Unit) {
+                                forEachGesture {
+                                    awaitPointerEventScope {
+                                        hitTested.value = true
+                                        val event = awaitPointerEvent(PointerEventPass.Final)
+                                        Truth.assertThat(event.changes[0].consumed.downChange)
+                                            .isFalse()
+                                    }
+                                }
+                            }
+                    )
+                }
+            }
+        }
+        rule.onNodeWithTag("clickable")
+            .performGesture {
+                down(center)
+                up()
+            }
+        Truth.assertThat(hitTested.value).isTrue()
     }
 }

@@ -65,7 +65,7 @@ class SendDoubleClickTest(private val config: TestConfig) {
     val rule = createComposeRule()
 
     @get:Rule
-    val inputDispatcherRule: TestRule = InputDispatcherTestRule(disableDispatchInRealTime = true)
+    val inputDispatcherRule: TestRule = InputDispatcherTestRule()
 
     private val recordedDoubleClicks = mutableListOf<Offset>()
     private val expectedClickPosition =

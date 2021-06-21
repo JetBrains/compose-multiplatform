@@ -18,8 +18,6 @@ import androidx.build.BundleInsideHelper
 import androidx.build.LibraryGroups
 import androidx.build.LibraryType
 
-import static androidx.build.dependencies.DependenciesKt.*
-
 plugins {
     id("AndroidXPlugin")
     id("kotlin")
@@ -28,16 +26,17 @@ plugins {
 BundleInsideHelper.forInsideLintJar(project)
 
 dependencies {
-    compileOnly(LINT_API_MIN)
-    compileOnly(KOTLIN_STDLIB)
+    compileOnly(libs.androidLintMinComposeApi)
+    compileOnly(libs.kotlinStdlib)
 
     bundleInside(project(":compose:lint:common"))
 
-    testImplementation(KOTLIN_STDLIB)
-    testImplementation(LINT_CORE)
-    testImplementation(LINT_TESTS)
-    testImplementation(JUNIT)
-    testImplementation(TRUTH)
+    testImplementation(project(":compose:lint:common-test"))
+    testImplementation(libs.kotlinStdlib)
+    testImplementation(libs.androidLint)
+    testImplementation(libs.androidLintTests)
+    testImplementation(libs.junit)
+    testImplementation(libs.truth)
 }
 
 androidx {

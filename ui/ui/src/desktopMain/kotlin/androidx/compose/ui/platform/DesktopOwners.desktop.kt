@@ -25,6 +25,7 @@ import androidx.compose.ui.input.pointer.PointerId
 import androidx.compose.ui.input.pointer.PointerInputEvent
 import androidx.compose.ui.input.pointer.PointerInputEventData
 import androidx.compose.ui.input.pointer.PointerType
+import androidx.compose.ui.unit.IntOffset
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.CoroutineStart
 import kotlinx.coroutines.launch
@@ -129,45 +130,83 @@ internal class DesktopOwners(
         invalidateIfNeeded()
     }
 
-    private val lastOwner: DesktopOwner?
-        get() = list.lastOrNull()
+    internal var focusedOwner: DesktopOwner? = null
+    private val hoveredOwner: DesktopOwner?
+        get() {
+            listCopy.addAll(list)
+            for (i in (listCopy.size - 1) downTo 0) {
+                val owner = listCopy[i]
+                if (owner.isHovered(pointLocation)) {
+                    listCopy.clear()
+                    return owner
+                }
+            }
+            listCopy.clear()
+            return list.lastOrNull()
+        }
 
     fun onMousePressed(x: Int, y: Int, nativeEvent: MouseEvent? = null) {
         isMousePressed = true
-        lastOwner?.processPointerInput(pointerInputEvent(nativeEvent, x, y, isMousePressed))
+        val currentOwner = hoveredOwner
+        if (currentOwner != null) {
+            if (currentOwner.isFocusable && focusedOwner != currentOwner) {
+                focusedOwner?.onDismissRequest?.invoke()
+                focusedOwner = currentOwner
+            } else {
+                currentOwner.processPointerInput(
+                    pointerInputEvent(nativeEvent, x, y, isMousePressed)
+                )
+                return
+            }
+        }
+        focusedOwner?.processPointerInput(pointerInputEvent(nativeEvent, x, y, isMousePressed))
     }
 
     fun onMouseReleased(x: Int, y: Int, nativeEvent: MouseEvent? = null) {
         isMousePressed = false
-        lastOwner?.processPointerInput(pointerInputEvent(nativeEvent, x, y, isMousePressed))
+        val currentOwner = hoveredOwner
+        if (currentOwner != null) {
+            if (currentOwner.isFocusable) {
+                focusedOwner = currentOwner
+            } else {
+                currentOwner.processPointerInput(
+                    pointerInputEvent(nativeEvent, x, y, isMousePressed)
+                )
+                return
+            }
+        }
+        focusedOwner?.processPointerInput(pointerInputEvent(nativeEvent, x, y, isMousePressed))
         pointerId += 1
     }
 
+    private var pointLocation = IntOffset.Zero
+
     fun onMouseMoved(x: Int, y: Int, nativeEvent: MouseEvent? = null) {
+        pointLocation = IntOffset(x, y)
         val event = pointerInputEvent(nativeEvent, x, y, isMousePressed)
-        val result = lastOwner?.processPointerInput(event)
+        val result = hoveredOwner?.processPointerInput(event)
         if (result?.anyMovementConsumed != true) {
             val position = Offset(x.toFloat(), y.toFloat())
-            lastOwner?.onPointerMove(position)
+            hoveredOwner?.onPointerMove(position)
         }
     }
 
     fun onMouseScroll(x: Int, y: Int, event: MouseScrollEvent) {
         val position = Offset(x.toFloat(), y.toFloat())
-        lastOwner?.onMouseScroll(position, event)
+        hoveredOwner?.onMouseScroll(position, event)
     }
 
     fun onMouseEntered(x: Int, y: Int) {
         val position = Offset(x.toFloat(), y.toFloat())
-        lastOwner?.onPointerEnter(position)
+        hoveredOwner?.onPointerEnter(position)
     }
 
     fun onMouseExited() {
-        lastOwner?.onPointerExit()
+        hoveredOwner?.onPointerExit()
     }
 
     private fun consumeKeyEvent(event: KeyEvent) {
-        list.lastOrNull()?.sendKeyEvent(ComposeKeyEvent(event))
+        focusedOwner?.sendKeyEvent(ComposeKeyEvent(event))
     }
 
     fun onKeyPressed(event: KeyEvent) = consumeKeyEvent(event)

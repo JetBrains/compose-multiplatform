@@ -17,10 +17,9 @@
 package androidx.compose.foundation.gestures
 
 import androidx.compose.animation.core.AnimationSpec
-import androidx.compose.animation.core.VectorConverter
+import androidx.compose.animation.core.animate
 import androidx.compose.animation.core.spring
 import androidx.compose.foundation.MutatePriority
-import androidx.compose.runtime.withFrameNanos
 
 /**
  * Scroll by [value] pixels with animation.
@@ -37,37 +36,11 @@ suspend fun ScrollableState.animateScrollBy(
     value: Float,
     animationSpec: AnimationSpec<Float> = spring()
 ): Float {
-    val animSpec = animationSpec.vectorize(Float.VectorConverter)
-    val conv = Float.VectorConverter
-    val zeroVector = conv.convertToVector(0f)
-    val targetVector = conv.convertToVector(value)
     var previousValue = 0f
-
     scroll {
-        val startTimeNanos = withFrameNanos { it }
-        do {
-            val finished = withFrameNanos { frameTimeNanos ->
-                val newValue = conv.convertFromVector(
-                    animSpec.getValueFromNanos(
-                        playTimeNanos = frameTimeNanos - startTimeNanos,
-                        initialValue = zeroVector,
-                        targetValue = targetVector,
-                        // TODO: figure out if/how we should incorporate existing velocity
-                        initialVelocity = zeroVector
-                    )
-                )
-                val delta = newValue - previousValue
-                val consumed = scrollBy(delta)
-
-                if (consumed != delta) {
-                    previousValue += consumed
-                    true
-                } else {
-                    previousValue = newValue
-                    previousValue == value
-                }
-            }
-        } while (!finished)
+        animate(0f, value, animationSpec = animationSpec) { currentValue, _ ->
+            previousValue += scrollBy(currentValue - previousValue)
+        }
     }
     return previousValue
 }

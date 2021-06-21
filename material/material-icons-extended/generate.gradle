@@ -16,18 +16,16 @@
 
 // This file contains logic used for compiling the individual themes of material-icons-extended
 
-import androidx.build.AndroidXUiPlugin
+import androidx.build.AndroidXComposePlugin
 import androidx.build.LibraryGroups
 import androidx.build.LibraryType
 import androidx.build.Publish
 import androidx.build.RunApiTasks
 import androidx.compose.material.icons.generator.tasks.IconGenerationTask
 
-import static androidx.build.dependencies.DependenciesKt.*
-
 apply plugin: "AndroidXPlugin"
 apply plugin: "com.android.library"
-apply plugin: "AndroidXUiPlugin"
+apply plugin: "AndroidXComposePlugin"
 
 apply from: "${buildscript.sourceFile.parentFile}/shared-dependencies.gradle"
 
@@ -35,12 +33,12 @@ dependencies {
     kotlinPlugin(project(":compose:compiler:compiler"))
 }
 
-if (!AndroidXUiPlugin.isMultiplatformEnabled(project)) {
+if (!AndroidXComposePlugin.isMultiplatformEnabled(project)) {
     // We're not sure how to merge icons jars when multiplatform is enabled
     IconGenerationTask.registerExtendedIconThemeProject(
             project,
             android,
-            AndroidXUiPlugin.isMultiplatformEnabled(project)
+            AndroidXComposePlugin.isMultiplatformEnabled(project)
     )
 }
 

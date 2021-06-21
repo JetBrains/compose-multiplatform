@@ -15,22 +15,20 @@
  */
 
 
-import androidx.build.AndroidXUiPlugin
+import androidx.build.AndroidXComposePlugin
 import androidx.build.LibraryGroups
 import androidx.build.LibraryType
 import androidx.compose.material.icons.generator.tasks.IconGenerationTask
 
-import static androidx.build.dependencies.DependenciesKt.*
-
 plugins {
     id("AndroidXPlugin")
     id("com.android.library")
-    id("AndroidXUiPlugin")
+    id("AndroidXComposePlugin")
 }
 
-AndroidXUiPlugin.applyAndConfigureKotlinPlugin(project)
+AndroidXComposePlugin.applyAndConfigureKotlinPlugin(project)
 
-if (!AndroidXUiPlugin.isMultiplatformEnabled(project)) {
+if (!AndroidXComposePlugin.isMultiplatformEnabled(project)) {
     dependencies {
         /*
          * When updating dependencies, make sure to make the an an analogous update in the
@@ -39,11 +37,11 @@ if (!AndroidXUiPlugin.isMultiplatformEnabled(project)) {
         kotlinPlugin(project(":compose:compiler:compiler"))
 
         api(project(":compose:ui:ui"))
-        implementation(KOTLIN_STDLIB)
+        implementation(libs.kotlinStdlib)
     }
 }
 
-if (AndroidXUiPlugin.isMultiplatformEnabled(project)) {
+if (AndroidXComposePlugin.isMultiplatformEnabled(project)) {
     kotlin {
         android()
         jvm("desktop")
@@ -54,12 +52,12 @@ if (AndroidXUiPlugin.isMultiplatformEnabled(project)) {
          */
         sourceSets {
             commonMain.dependencies {
-                implementation(KOTLIN_STDLIB_COMMON)
+                implementation(libs.kotlinStdlibCommon)
                 api(project(":compose:ui:ui"))
             }
 
             androidMain.dependencies {
-                implementation(KOTLIN_STDLIB)
+                implementation(libs.kotlinStdlib)
             }
         }
     }
@@ -68,7 +66,7 @@ if (AndroidXUiPlugin.isMultiplatformEnabled(project)) {
 IconGenerationTask.registerCoreIconProject(
         project,
         android,
-        AndroidXUiPlugin.isMultiplatformEnabled(project)
+        AndroidXComposePlugin.isMultiplatformEnabled(project)
 )
 
 androidx {

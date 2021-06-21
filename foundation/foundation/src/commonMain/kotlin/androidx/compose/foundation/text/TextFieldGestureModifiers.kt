@@ -52,4 +52,6 @@ internal fun Modifier.textFieldFocusModifier(
 internal fun Modifier.mouseDragGestureDetector(
     observer: MouseSelectionObserver,
     enabled: Boolean
-) = if (enabled) Modifier.pointerInput(Unit) { mouseSelectionDetector(observer, false) } else this
+) = if (enabled) Modifier.pointerInput(observer) {
+    mouseSelectionDetector(observer, false)
+} else this

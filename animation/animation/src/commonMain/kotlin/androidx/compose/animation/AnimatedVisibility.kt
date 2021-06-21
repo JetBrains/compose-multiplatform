@@ -38,6 +38,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.composed
 import androidx.compose.ui.layout.Layout
 import androidx.compose.ui.platform.debugInspectorInfo
+import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.util.fastForEach
 import androidx.compose.ui.util.fastMaxBy
 import kotlinx.coroutines.flow.collect
@@ -344,10 +345,10 @@ enum class EnterExitState {
  *
  * @param visibleState defines whether the content should be visible
  * @param modifier modifier for the [Layout] created to contain the [content]
- * @param enter EnterTransition(s) used for the appearing animation, fading in while expanding
- *              vertically by default
+ * @param enter EnterTransition(s) used for the appearing animation, fading in while expanding by
+ *              default
  * @param exit ExitTransition(s) used for the disappearing animation, fading out while
- *             shrinking vertically by default
+ *             shrinking by default
  * @param content Content to appear or disappear based on the value of [visibleState]
  *
  * @see EnterTransition
@@ -365,8 +366,8 @@ enum class EnterExitState {
 fun AnimatedVisibility(
     visibleState: MutableTransitionState<Boolean>,
     modifier: Modifier = Modifier,
-    enter: EnterTransition,
-    exit: ExitTransition,
+    enter: EnterTransition = fadeIn() + expandIn(),
+    exit: ExitTransition = fadeOut() + shrinkOut(),
     content: @Composable() AnimatedVisibilityScope.() -> Unit
 ) {
     val transition = updateTransition(visibleState)
@@ -611,13 +612,12 @@ fun <T> Transition<T>.AnimatedVisibility(
  * @sample androidx.compose.animation.samples.AVScopeAnimateEnterExit
  */
 @ExperimentalAnimationApi
-class AnimatedVisibilityScope internal constructor(transition: Transition<EnterExitState>) {
+interface AnimatedVisibilityScope {
     /**
      * [transition] allows custom enter/exit animations to be specified. It will run simultaneously
      * with the built-in enter/exit transitions specified in [AnimatedVisibility].
      */
-    var transition: Transition<EnterExitState> = transition
-        internal set
+    val transition: Transition<EnterExitState>
 
     /**
      * [animateEnterExit] modifier can be used for any direct or indirect children of
@@ -660,9 +660,18 @@ class AnimatedVisibilityScope internal constructor(transition: Transition<EnterE
 }
 
 @ExperimentalAnimationApi
+internal class AnimatedVisibilityScopeImpl internal constructor(
+    transition: Transition<EnterExitState>
+) : AnimatedVisibilityScope {
+    override var transition = transition
+    internal val targetSize = mutableStateOf(IntSize.Zero)
+}
+
+@ExperimentalAnimationApi
 @Composable
 @Deprecated(
-    "AnimatedVisibility no longer accepts initiallyVisible as a parameter",
+    "AnimatedVisibility no longer accepts initiallyVisible as a parameter, please use " +
+        "AnimatedVisibility(MutableTransitionState, Modifier, ...) API instead",
     replaceWith = ReplaceWith(
         "AnimatedVisibility(" +
             "transitionState = remember { MutableTransitionState(initiallyVisible) }\n" +
@@ -747,7 +756,7 @@ private inline fun AnimatedEnterExitImpl(
     if (transition.currentState == EnterExitState.Visible ||
         transition.targetState == EnterExitState.Visible
     ) {
-        val scope = remember(transition) { AnimatedVisibilityScope(transition) }
+        val scope = remember(transition) { AnimatedVisibilityScopeImpl(transition) }
         Layout(
             content = { scope.content() },
             modifier = modifier.then(transition.createModifier(enter, exit))
@@ -756,6 +765,7 @@ private inline fun AnimatedEnterExitImpl(
             val maxWidth: Int = placeables.fastMaxBy { it.width }?.width ?: 0
             val maxHeight = placeables.fastMaxBy { it.height }?.height ?: 0
             // Position the children.
+            scope.targetSize.value = IntSize(maxWidth, maxHeight)
             layout(maxWidth, maxHeight) {
                 placeables.fastForEach {
                     it.place(0, 0)

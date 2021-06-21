@@ -147,12 +147,15 @@ internal class LayoutNode : Measurable, Remeasurement, OwnerScope, LayoutInfo, C
      * The parent node in the LayoutNode hierarchy. This is `null` when the [LayoutNode]
      * is not attached to a hierarchy or is the root of the hierarchy.
      */
-    internal var parent: LayoutNode? = null
+    private var _foldedParent: LayoutNode? = null
+
+    /*
+     * The parent node in the LayoutNode hierarchy, skipping over virtual nodes.
+     */
+    internal val parent: LayoutNode?
         get() {
-            val parent = field
-            return if (parent != null && parent.isVirtual) parent.parent else parent
+            return if (_foldedParent?.isVirtual == true) _foldedParent?.parent else _foldedParent
         }
-        private set
 
     /**
      * The view system [Owner]. This `null` until [attach] is called
@@ -194,18 +197,22 @@ internal class LayoutNode : Measurable, Remeasurement, OwnerScope, LayoutInfo, C
      * then [instance] will become [attach]ed also. [instance] must have a `null` [parent].
      */
     internal fun insertAt(index: Int, instance: LayoutNode) {
-        check(instance.parent == null) {
-            "Cannot insert $instance because it already has a parent"
+        check(instance._foldedParent == null) {
+            "Cannot insert $instance because it already has a parent." +
+                " This tree: " + debugTreeToString() +
+                " Other tree: " + instance._foldedParent?.debugTreeToString()
         }
         check(instance.owner == null) {
-            "Cannot insert $instance because it already has an owner"
+            "Cannot insert $instance because it already has an owner." +
+                " This tree: " + debugTreeToString() +
+                " Other tree: " + instance.debugTreeToString()
         }
 
         if (DebugChanges) {
             println("$instance added to $this at index $index")
         }
 
-        instance.parent = this
+        instance._foldedParent = this
         _foldedChildren.add(index, instance)
         onZSortedChildrenInvalidated()
 
@@ -249,7 +256,7 @@ internal class LayoutNode : Measurable, Remeasurement, OwnerScope, LayoutInfo, C
             if (attached) {
                 child.detach()
             }
-            child.parent = null
+            child._foldedParent = null
 
             if (child.isVirtual) {
                 virtualChildrenCount--
@@ -268,7 +275,7 @@ internal class LayoutNode : Measurable, Remeasurement, OwnerScope, LayoutInfo, C
             if (attached) {
                 child.detach()
             }
-            child.parent = null
+            child._foldedParent = null
         }
         _foldedChildren.clear()
         onZSortedChildrenInvalidated()
@@ -313,12 +320,14 @@ internal class LayoutNode : Measurable, Remeasurement, OwnerScope, LayoutInfo, C
      */
     internal fun attach(owner: Owner) {
         check(this.owner == null) {
-            "Cannot attach $this as it already is attached"
+            "Cannot attach $this as it already is attached.  Tree: " + debugTreeToString()
+        }
+        check(_foldedParent == null || _foldedParent?.owner == owner) {
+            "Attaching to a different owner($owner) than the parent's owner(${parent?.owner})." +
+                " This tree: " + debugTreeToString() +
+                " Parent tree: " + _foldedParent?.debugTreeToString()
         }
         val parent = this.parent
-        check(parent == null || parent.owner == owner) {
-            "Attaching to a different owner($owner) than the parent's owner(${parent?.owner})"
-        }
         if (parent == null) {
             // it is a root node and attached root nodes are always placed (as there is no parent
             // to place them explicitly)
@@ -350,7 +359,7 @@ internal class LayoutNode : Measurable, Remeasurement, OwnerScope, LayoutInfo, C
     internal fun detach() {
         val owner = owner
         checkNotNull(owner) {
-            "Cannot detach node that is already detached!"
+            "Cannot detach node that is already detached!  Tree: " + parent?.debugTreeToString()
         }
         val parent = this.parent
         if (parent != null) {
@@ -358,7 +367,6 @@ internal class LayoutNode : Measurable, Remeasurement, OwnerScope, LayoutInfo, C
             parent.requestRemeasure()
         }
         alignmentLines.reset()
-        alignmentUsageByParent = UsageByParent.NotUsed
         onDetach?.invoke(owner)
         forEachDelegate { it.detach() }
         innerLayoutNodeWrapper.detach()
@@ -463,9 +471,17 @@ internal class LayoutNode : Measurable, Remeasurement, OwnerScope, LayoutInfo, C
         set(value) {
             if (field != value) {
                 field = value
+                intrinsicsPolicy.updateFrom(measurePolicy)
                 requestRemeasure()
             }
         }
+
+    /**
+     * The intrinsic measurements of this layout, backed up by states to trigger
+     * correct remeasurement for layouts using the intrinsics of this layout
+     * when the [measurePolicy] is changing.
+     */
+    internal val intrinsicsPolicy = IntrinsicsPolicy(this)
 
     /**
      * The screen density to be used by this layout.
@@ -518,9 +534,9 @@ internal class LayoutNode : Measurable, Remeasurement, OwnerScope, LayoutInfo, C
     override val height: Int get() = outerMeasurablePlaceable.height
 
     /**
-     * State corresponding to the alignment lines of this layout, inherited + intrinsic
+     * State corresponding to the alignment lines of this layout, inherited + intrinsic.
      */
-    internal var alignmentLines = LayoutNodeAlignmentLines(this)
+    internal val alignmentLines = LayoutNodeAlignmentLines(this)
 
     internal val mDrawScope: LayoutNodeDrawScope = sharedDrawScope
 
@@ -556,8 +572,6 @@ internal class LayoutNode : Measurable, Remeasurement, OwnerScope, LayoutInfo, C
      * Remembers how the node was measured by the parent.
      */
     internal var measuredByParent: UsageByParent = UsageByParent.NotUsed
-
-    internal var alignmentUsageByParent = UsageByParent.NotUsed
 
     @Deprecated("Temporary API to support ConstraintLayout prototyping.")
     internal var canMultiMeasure: Boolean = false
@@ -817,7 +831,21 @@ internal class LayoutNode : Measurable, Remeasurement, OwnerScope, LayoutInfo, C
         hitPointerInputFilters: MutableList<PointerInputFilter>
     ) {
         val positionInWrapped = outerLayoutNodeWrapper.fromParentPosition(pointerPosition)
-        outerLayoutNodeWrapper.hitTest(positionInWrapped, hitPointerInputFilters)
+        outerLayoutNodeWrapper.hitTest(
+            positionInWrapped,
+            hitPointerInputFilters
+        )
+    }
+
+    internal fun hitTestSemantics(
+        pointerPosition: Offset,
+        hitSemanticsWrappers: MutableList<SemanticsWrapper>
+    ) {
+        val positionInWrapped = outerLayoutNodeWrapper.fromParentPosition(pointerPosition)
+        outerLayoutNodeWrapper.hitTestSemantics(
+            positionInWrapped,
+            hitSemanticsWrappers
+        )
     }
 
     /**
@@ -1050,8 +1078,9 @@ internal class LayoutNode : Measurable, Remeasurement, OwnerScope, LayoutInfo, C
      * Used to request a new measurement + layout pass from the owner.
      */
     internal fun requestRemeasure() {
-        if (!ignoreRemeasureRequests) {
-            owner?.onRequestMeasure(this)
+        val owner = owner ?: return
+        if (!ignoreRemeasureRequests && !isVirtual) {
+            owner.onRequestMeasure(this)
         }
     }
 
@@ -1065,7 +1094,9 @@ internal class LayoutNode : Measurable, Remeasurement, OwnerScope, LayoutInfo, C
      * Used to request a new layout pass from the owner.
      */
     internal fun requestRelayout() {
-        owner?.onRequestRelayout(this)
+        if (!isVirtual) {
+            owner?.onRequestRelayout(this)
+        }
     }
 
     /**
@@ -1199,8 +1230,14 @@ internal class LayoutNode : Measurable, Remeasurement, OwnerScope, LayoutInfo, C
      * Return true if the measured size has been changed
      */
     internal fun remeasure(
-        constraints: Constraints = outerMeasurablePlaceable.lastConstraints
-    ) = outerMeasurablePlaceable.remeasure(constraints)
+        constraints: Constraints? = outerMeasurablePlaceable.lastConstraints
+    ): Boolean {
+        return if (constraints != null) {
+            outerMeasurablePlaceable.remeasure(constraints)
+        } else {
+            false
+        }
+    }
 
     override val parentData: Any? get() = outerMeasurablePlaceable.parentData
 

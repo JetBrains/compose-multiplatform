@@ -20,8 +20,11 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.layout.positionInRoot
 import androidx.compose.ui.platform.testTag
@@ -32,6 +35,7 @@ import androidx.compose.ui.test.assertHasClickAction
 import androidx.compose.ui.test.assertTopPositionInRootIsEqualTo
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onChildAt
+import androidx.compose.ui.test.onNodeWithContentDescription
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onParent
 import androidx.compose.ui.test.performGesture
@@ -434,6 +438,39 @@ class ModalBottomSheetTest {
     }
 
     @Test
+    fun modalBottomSheet_scrim_doesNotClickWhenClosed_hasContentDescriptionWhenOpen() {
+        val topTag = "ModalBottomSheetLayout"
+        val scrimColor = mutableStateOf(Color.Red)
+        lateinit var closeSheet: String
+        rule.setMaterialContent {
+            ModalBottomSheetLayout(
+                modifier = Modifier.testTag(topTag),
+                scrimColor = scrimColor.value,
+                sheetState = rememberModalBottomSheetState(ModalBottomSheetValue.HalfExpanded),
+                content = { Box(Modifier.fillMaxSize().testTag(contentTag)) },
+                sheetContent = { Box(Modifier.fillMaxSize().testTag(sheetTag)) }
+            )
+            closeSheet = getString(Strings.CloseSheet)
+        }
+
+        val height = rule.rootHeight()
+        rule.onNodeWithTag(sheetTag)
+            .assertTopPositionInRootIsEqualTo(height / 2)
+        var topNode = rule.onNodeWithTag(topTag).fetchSemanticsNode()
+        assertEquals(3, topNode.children.size)
+        rule.onNodeWithContentDescription(closeSheet)
+            .assertHasClickAction()
+
+        rule.runOnIdle {
+            scrimColor.value = Color.Unspecified
+        }
+
+        topNode = rule.onNodeWithTag(topTag).fetchSemanticsNode()
+        // only two nodes since there's no scrim
+        assertEquals(2, topNode.children.size)
+    }
+
+    @Test
     fun modalBottomSheet_hideBySwiping_tallBottomSheet() {
         lateinit var sheetState: ModalBottomSheetState
         rule.setMaterialContent {
@@ -468,6 +505,58 @@ class ModalBottomSheetTest {
 
         rule.runOnIdle {
             assertThat(sheetState.currentValue).isEqualTo(ModalBottomSheetValue.Hidden)
+        }
+    }
+
+    @Test
+    fun modalBottomSheet_respectsConfirmStateChange() {
+        lateinit var sheetState: ModalBottomSheetState
+        rule.setMaterialContent {
+            sheetState = rememberModalBottomSheetState(
+                ModalBottomSheetValue.Expanded,
+                confirmStateChange = { newState ->
+                    newState != ModalBottomSheetValue.Hidden
+                }
+            )
+            ModalBottomSheetLayout(
+                sheetState = sheetState,
+                content = {
+                    Box(
+                        Modifier
+                            .fillMaxSize()
+                            .testTag(contentTag)
+                    )
+                },
+                sheetContent = {
+                    Box(
+                        Modifier
+                            .fillMaxSize()
+                            .testTag(sheetTag)
+                    )
+                }
+            )
+        }
+
+        rule.runOnIdle {
+            assertThat(sheetState.currentValue).isEqualTo(ModalBottomSheetValue.Expanded)
+        }
+
+        rule.onNodeWithTag(sheetTag)
+            .performGesture { swipeDown() }
+
+        advanceClock()
+
+        rule.runOnIdle {
+            assertThat(sheetState.currentValue).isEqualTo(ModalBottomSheetValue.Expanded)
+        }
+
+        rule.onNodeWithTag(sheetTag).onParent()
+            .performSemanticsAction(SemanticsActions.Dismiss)
+
+        advanceClock()
+
+        rule.runOnIdle {
+            assertThat(sheetState.currentValue).isEqualTo(ModalBottomSheetValue.Expanded)
         }
     }
 
@@ -564,5 +653,45 @@ class ModalBottomSheetTest {
         val height = rule.rootHeight()
         rule.onNodeWithTag(sheetTag)
             .assertTopPositionInRootIsEqualTo(height)
+    }
+
+    @Test
+    fun modalBottomSheet_missingAnchors_findsClosest() {
+        val topTag = "ModalBottomSheetLayout"
+        val showShortContent = mutableStateOf(false)
+        val sheetState = ModalBottomSheetState(ModalBottomSheetValue.Hidden)
+        rule.setMaterialContent {
+            LaunchedEffect(showShortContent.value) {
+                sheetState.show()
+            }
+            ModalBottomSheetLayout(
+                modifier = Modifier.testTag(topTag),
+                sheetState = sheetState,
+                content = { Box(Modifier.fillMaxSize().testTag(contentTag)) },
+                sheetContent = {
+                    if (!showShortContent.value) {
+                        Box(Modifier.fillMaxSize().testTag(sheetTag))
+                    } else {
+                        Box(Modifier.fillMaxWidth().height(100.dp))
+                    }
+                }
+            )
+        }
+
+        rule.onNodeWithTag(topTag).performGesture {
+            swipeDown()
+            swipeDown()
+        }
+
+        rule.runOnIdle {
+            assertThat(sheetState.currentValue).isEqualTo(ModalBottomSheetValue.Hidden)
+        }
+
+        rule.runOnIdle {
+            showShortContent.value = true
+        }
+        rule.runOnIdle {
+            assertThat(sheetState.currentValue).isEqualTo(ModalBottomSheetValue.Expanded)
+        }
     }
 }
