@@ -85,7 +85,13 @@ fun androidJarFile(project: Project): FileCollection =
             File(
                 project.getSdkPath(),
                 "platforms/${SupportConfig.COMPILE_SDK_VERSION}/android.jar"
+            ),
+            // Allow using optional android.car APIs
+            File(
+                project.getSdkPath(),
+                "platforms/${SupportConfig.COMPILE_SDK_VERSION}/optional/android.car.jar"
             )
+
         )
     )
 
