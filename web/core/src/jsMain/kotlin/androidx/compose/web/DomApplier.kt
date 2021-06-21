@@ -5,8 +5,9 @@ import org.jetbrains.compose.web.attributes.WrappedEventListener
 import org.jetbrains.compose.web.css.StyleHolder
 import org.jetbrains.compose.web.dom.setProperty
 import org.jetbrains.compose.web.dom.setVariable
-import kotlinx.browser.document
 import kotlinx.dom.clear
+import org.jetbrains.compose.web.attributes.Options
+import org.jetbrains.compose.web.css.jsObject
 import org.w3c.dom.Element
 import org.w3c.dom.HTMLElement
 import org.w3c.dom.Node
@@ -38,6 +39,12 @@ class DomApplier(
     }
 }
 
+external interface EventListenerOptions {
+    var once: Boolean
+    var passive: Boolean
+    var capture: Boolean
+}
+
 open class DomNodeWrapper(open val node: Node) {
     private var currentListeners = emptyList<WrappedEventListener<*>>()
 
@@ -45,13 +52,29 @@ open class DomNodeWrapper(open val node: Node) {
         val htmlElement = node as? HTMLElement ?: return
 
         currentListeners.forEach {
-            htmlElement.removeEventListener(it.event, it)
+            htmlElement.removeEventListener(it.event, it, it.options.toJsObject())
         }
 
         currentListeners = list
 
         currentListeners.forEach {
-            htmlElement.addEventListener(it.event, it)
+            htmlElement.addEventListener(it.event, it, it.options.toJsObject())
+        }
+    }
+
+    private fun Options.BooleanValue.toBoolean(): Boolean? = when (this) {
+        Options.BooleanValue.True -> true
+        Options.BooleanValue.False -> false
+        Options.BooleanValue.Default -> null
+    }
+
+    // This conversion helps to preserve the default values of options parameters (defaults can vary per browser)
+    private fun Options.toJsObject(): EventListenerOptions {
+        val options = this
+        return jsObject {
+            if (options.once != Options.BooleanValue.Default) once = options.once.toBoolean()!!
+            if (options.passive != Options.BooleanValue.Default) passive = options.passive.toBoolean()!!
+            if (options.capture != Options.BooleanValue.Default) capture = options.capture.toBoolean()!!
         }
     }
 
