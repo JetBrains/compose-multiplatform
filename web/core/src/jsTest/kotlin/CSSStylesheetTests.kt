@@ -5,6 +5,7 @@
 
 package org.jetbrains.compose.web.core.tests
 
+import kotlinx.browser.window
 import org.jetbrains.compose.web.css.*
 import org.jetbrains.compose.web.dom.Div
 import org.w3c.dom.HTMLElement
@@ -43,6 +44,24 @@ object AppStylesheet : StyleSheet() {
         AppCSSVariables.height(200.px)
         property("width", AppCSSVariables.width.value())
         property("height", AppCSSVariables.height.value())
+    }
+
+    val withMedia by style {
+        color("lime")
+        backgroundColor("lime")
+
+        media(minWidth(20000.px)) {
+            self style {
+                color("red")
+            }
+        }
+
+        media(minWidth(20.px)) {
+            self style {
+                backgroundColor("green")
+            }
+        }
+
     }
 }
 
@@ -102,5 +121,20 @@ class CSSVariableTests {
         val boundingRect = (root.children[1] as HTMLElement).getBoundingClientRect()
         assertEquals(100.toDouble(), boundingRect.width)
         assertEquals(200.toDouble(), boundingRect.height)
+    }
+
+    @Test
+    fun withMediaQuery() = runTest {
+        composition {
+            Style(AppStylesheet)
+            Div({
+                classes(AppStylesheet.withMedia)
+            })
+        }
+
+        root.children[1]?.let { el ->
+            assertEquals("rgb(0, 255, 0)", window.getComputedStyle(el).color)
+            assertEquals("rgb(0, 128, 0)", window.getComputedStyle(el).backgroundColor)
+        }
     }
 }
