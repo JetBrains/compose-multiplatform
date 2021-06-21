@@ -6,7 +6,8 @@
 @file:Suppress("UNUSED", "NOTHING_TO_INLINE", "FunctionName")
 package org.jetbrains.compose.web.css
 
-import org.w3c.dom.css.*
+import org.w3c.dom.css.CSSRule
+import org.w3c.dom.css.CSSRuleList
 import org.w3c.dom.css.StyleSheet
 
 inline val StyleSheet.cssRules
