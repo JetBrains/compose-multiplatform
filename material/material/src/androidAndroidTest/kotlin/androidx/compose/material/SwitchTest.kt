@@ -18,19 +18,23 @@ package androidx.compose.material
 
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveableStateHolder
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.platform.testTag
-import androidx.compose.ui.test.assertHasClickAction
-import androidx.compose.ui.semantics.SemanticsProperties
 import androidx.compose.ui.semantics.Role
+import androidx.compose.ui.semantics.SemanticsProperties
 import androidx.compose.ui.semantics.focused
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.test.SemanticsMatcher
 import androidx.compose.ui.test.assert
+import androidx.compose.ui.test.assertHasClickAction
 import androidx.compose.ui.test.assertHasNoClickAction
 import androidx.compose.ui.test.assertHeightIsEqualTo
 import androidx.compose.ui.test.assertIsEnabled
@@ -255,6 +259,61 @@ class SwitchTest {
         rule.runOnIdle {
             Truth.assertThat(state.value).isEqualTo(false)
         }
+    }
+
+    // regression test for b/191375128
+    @Test
+    fun switch_stateRestoration_stateChangeWhileSaved() {
+        val screenTwo = mutableStateOf(false)
+        var items by mutableStateOf(listOf(1 to false, 2 to true))
+        rule.setContent {
+            Column {
+                Button(onClick = { screenTwo.value = !screenTwo.value }) {
+                    Text("switch screen")
+                }
+                val holder = rememberSaveableStateHolder()
+                holder.SaveableStateProvider(screenTwo.value) {
+                    if (screenTwo.value) {
+                        // second screen, just some random content
+                        Text("Second screen")
+                    } else {
+                        Column {
+                            Text("screen one")
+                            items.forEachIndexed { index, item ->
+                                Row {
+                                    Text("Item ${item.first}")
+                                    Switch(
+                                        modifier = Modifier.testTag(item.first.toString()),
+                                        checked = item.second,
+                                        onCheckedChange = {
+                                            items = items.toMutableList().also {
+                                                it[index] = item.first to !item.second
+                                            }
+                                        }
+                                    )
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        rule.onNodeWithTag("1").assertIsOff()
+        rule.onNodeWithTag("2").assertIsOn()
+        rule.runOnIdle {
+            screenTwo.value = true
+        }
+        rule.runOnIdle {
+            items = items.toMutableList().also {
+                it[0] = items[0].first to !items[0].second
+                it[1] = items[1].first to !items[1].second
+            }
+        }
+        rule.runOnIdle {
+            screenTwo.value = false
+        }
+        rule.onNodeWithTag("1").assertIsOn()
+        rule.onNodeWithTag("2").assertIsOff()
     }
 
     private fun materialSizesTestForValue(checked: Boolean) {
