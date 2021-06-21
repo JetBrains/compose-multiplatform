@@ -3035,6 +3035,8 @@ internal class ComposerImpl(
                 updateCompoundKeyWhenWeEnterGroupKeyHash(data.hashCode())
             else
                 updateCompoundKeyWhenWeEnterGroupKeyHash(groupKey)
+        else if (dataKey is Enum<*>)
+            updateCompoundKeyWhenWeEnterGroupKeyHash(dataKey.ordinal)
         else
             updateCompoundKeyWhenWeEnterGroupKeyHash(dataKey.hashCode())
     }
@@ -3049,6 +3051,8 @@ internal class ComposerImpl(
                 updateCompoundKeyWhenWeExitGroupKeyHash(data.hashCode())
             else
                 updateCompoundKeyWhenWeExitGroupKeyHash(groupKey)
+        else if (dataKey is Enum<*>)
+            updateCompoundKeyWhenWeExitGroupKeyHash(dataKey.ordinal)
         else
             updateCompoundKeyWhenWeExitGroupKeyHash(dataKey.hashCode())
     }
