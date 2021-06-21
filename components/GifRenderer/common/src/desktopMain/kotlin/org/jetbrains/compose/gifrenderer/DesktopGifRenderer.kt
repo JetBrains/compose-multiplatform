@@ -2,15 +2,16 @@ package org.jetbrains.compose.gifrenderer
 
 import androidx.compose.animation.core.*
 import androidx.compose.runtime.*
-import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.asImageBitmap
+import androidx.compose.ui.graphics.painter.BitmapPainter
+import androidx.compose.ui.graphics.painter.Painter
 import org.jetbrains.skija.Bitmap
 import org.jetbrains.skija.Codec
 import org.jetbrains.skija.Data
 import java.net.URL
 
 @Composable
-internal actual fun rememberGifRendererImpl(url: String): State<ImageBitmap> {
+internal actual fun rememberGifRendererImpl(url: String): State<Painter> {
     val codec = remember(url) {
         println("Gif renderer for $url")
         val bytes = URL(url).readBytes()
@@ -23,7 +24,7 @@ internal actual fun rememberGifRendererImpl(url: String): State<ImageBitmap> {
             val bitmap = Bitmap()
             bitmap.allocPixels(codec.imageInfo)
             codec.readPixels(bitmap, frameIndex)
-            bitmap.asImageBitmap()
+            BitmapPainter(bitmap.asImageBitmap())
         }
     }
 
