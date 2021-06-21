@@ -663,6 +663,16 @@ class AndroidComposeViewAccessibilityDelegateCompatTest {
             eq(androidComposeView),
             argThat(
                 ArgumentMatcher {
+                    it.eventType == AccessibilityEvent.TYPE_WINDOW_CONTENT_CHANGED &&
+                        it.contentChangeTypes == AccessibilityEvent.CONTENT_CHANGE_TYPE_SUBTREE
+                }
+            )
+        )
+
+        verify(container, times(1)).requestSendAccessibilityEvent(
+            eq(androidComposeView),
+            argThat(
+                ArgumentMatcher {
                     it.eventType == AccessibilityEvent.TYPE_VIEW_SCROLLED &&
                         it.scrollY == 1 &&
                         it.maxScrollY == 100 &&
