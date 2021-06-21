@@ -18,8 +18,6 @@ package androidx.build.java
 
 import androidx.build.doclava.androidJarFile
 import androidx.build.multiplatformExtension
-import com.android.build.gradle.api.BaseVariant
-import com.android.build.gradle.api.SourceKind
 import org.gradle.api.Project
 import org.gradle.api.file.FileCollection
 import org.gradle.api.tasks.SourceSet
@@ -38,8 +36,9 @@ data class JavaCompileInputs(
 ) {
     companion object {
         // Constructs a JavaCompileInputs from a library and its variant
+        @Suppress("DEPRECATION") // BaseVariant
         fun fromLibraryVariant(
-            variant: BaseVariant,
+            variant: com.android.build.gradle.api.BaseVariant,
             project: Project,
             bootClasspath: FileCollection
         ): JavaCompileInputs {
@@ -59,15 +58,19 @@ data class JavaCompileInputs(
         // Constructs a JavaCompileInputs from a sourceset
         fun fromSourceSet(sourceSet: SourceSet, project: Project): JavaCompileInputs {
             val sourcePaths: FileCollection = project.files(
-                project.provider({
+                project.provider {
                     sourceSet.allSource.srcDirs
-                })
+                }
             )
             val dependencyClasspath = sourceSet.compileClasspath
             return JavaCompileInputs(sourcePaths, dependencyClasspath, androidJarFile(project))
         }
 
-        private fun getSourceCollection(variant: BaseVariant, project: Project): FileCollection {
+        @Suppress("DEPRECATION") // BaseVariant, SourceKind
+        private fun getSourceCollection(
+            variant: com.android.build.gradle.api.BaseVariant,
+            project: Project
+        ): FileCollection {
             // If the project has the kotlin-multiplatform plugin, we want to return a combined
             // collection of all the source files inside '*main' source sets. I.e, given a module
             // with a common and Android source set, this will look inside commonMain and
@@ -80,16 +83,16 @@ data class JavaCompileInputs(
                     .filterNot { it.name == "desktopMain" }
                     .flatMap { it.kotlin.sourceDirectories }
                     .also { require(it.isNotEmpty()) }
-            } ?: project.provider({
+            } ?: project.provider {
                 variant
-                    .getSourceFolders(SourceKind.JAVA)
+                    .getSourceFolders(com.android.build.gradle.api.SourceKind.JAVA)
                     .map { folder ->
                         for (builtBy in folder.builtBy) {
                             taskDependencies.add(builtBy)
                         }
                         folder.dir
                     }
-            })
+            }
 
             val sourceCollection = project.files(sourceFiles)
             for (dep in taskDependencies) {
