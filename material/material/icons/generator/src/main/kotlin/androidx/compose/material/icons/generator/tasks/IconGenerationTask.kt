@@ -19,7 +19,6 @@ package androidx.compose.material.icons.generator.tasks
 import androidx.compose.material.icons.generator.Icon
 import androidx.compose.material.icons.generator.IconProcessor
 import com.android.build.gradle.LibraryExtension
-import com.android.build.gradle.api.BaseVariant
 import org.gradle.api.DefaultTask
 import org.gradle.api.Project
 import org.gradle.api.tasks.Input
@@ -204,15 +203,16 @@ private const val GeneratorProject = ":compose:material:material:icons:generator
  * Registers a new [T] in [this], and sets [IconGenerationTask.buildDirectory] depending on
  * [variant].
  *
- * @param variant the [BaseVariant] to associate this task with, or `null` if this task does not
- * change between variants.
+ * @param variant the [com.android.build.gradle.api.BaseVariant] to associate this task with, or
+ * `null` if this task does not change between variants.
  * @return a [Pair] of the created [TaskProvider] of [T] of [IconGenerationTask], and the [File]
  * for the directory that files will be generated to
  */
+@Suppress("DEPRECATION") // BaseVariant
 fun <T : IconGenerationTask> Project.registerGenerationTask(
     taskName: String,
     taskClass: Class<T>,
-    variant: BaseVariant? = null
+    variant: com.android.build.gradle.api.BaseVariant? = null
 ): Pair<TaskProvider<T>, File> {
     val variantName = variant?.name ?: "allVariants"
 
