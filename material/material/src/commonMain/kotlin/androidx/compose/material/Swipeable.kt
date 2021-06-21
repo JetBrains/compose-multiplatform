@@ -499,10 +499,13 @@ internal fun <T : Any> rememberSwipeableStateFor(
     onValueChange: (T) -> Unit,
     animationSpec: AnimationSpec<Float> = AnimationSpec
 ): SwipeableState<T> {
-    val swipeableState = rememberSwipeableState(
-        initialValue = value,
-        animationSpec = animationSpec
-    )
+    val swipeableState = remember {
+        SwipeableState(
+            initialValue = value,
+            animationSpec = animationSpec,
+            confirmStateChange = { true }
+        )
+    }
     val forceAnimationCheck = remember { mutableStateOf(false) }
     LaunchedEffect(value, forceAnimationCheck.value) {
         if (value != swipeableState.currentValue) {
