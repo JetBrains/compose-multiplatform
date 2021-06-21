@@ -32,6 +32,7 @@ import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.requiredHeight
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.requiredWidth
 import androidx.compose.foundation.layout.width
@@ -1308,6 +1309,32 @@ class TextFieldTest {
             assertThat(dividerSize).isNotNull()
             assertThat(textFieldSize).isNotNull()
             assertThat(dividerSize!!.width).isEqualTo(textFieldSize!!.width)
+        }
+    }
+
+    @Test
+    @SdkSuppress(minSdkVersion = Build.VERSION_CODES.O)
+    fun testTextField_label_notUsingErrorColor_notFocused_withoutInput() {
+        rule.setMaterialContent {
+            Box(Modifier.background(Color.White).padding(10.dp)) {
+                TextField(
+                    value = "",
+                    onValueChange = {},
+                    modifier = Modifier.testTag(TextfieldTag),
+                    label = { Text("Label") },
+                    isError = true,
+                    colors = TextFieldDefaults.textFieldColors(
+                        unfocusedLabelColor = Color.White,
+                        errorLabelColor = Color.Red,
+                        backgroundColor = Color.White,
+                        errorIndicatorColor = Color.White
+                    )
+                )
+            }
+        }
+
+        rule.onNodeWithTag(TextfieldTag).captureToImage().assertPixels {
+            Color.White
         }
     }
 }
