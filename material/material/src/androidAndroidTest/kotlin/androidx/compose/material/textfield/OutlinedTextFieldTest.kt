@@ -50,6 +50,7 @@ import androidx.compose.material.setMaterialContentForSizeAssertions
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.testutils.assertPixels
 import androidx.compose.testutils.assertShape
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.onFocusChanged
@@ -958,6 +959,27 @@ class OutlinedTextFieldTest {
             assertThat(dividerSize).isNotNull()
             assertThat(textFieldSize).isNotNull()
             assertThat(dividerSize!!.height).isEqualTo(textFieldSize!!.height)
+        }
+    }
+
+    @Test
+    @SdkSuppress(minSdkVersion = Build.VERSION_CODES.O)
+    fun testOutlinedTextField_appliesBackgroundColor() {
+        rule.setMaterialContent {
+            OutlinedTextField(
+                value = "",
+                onValueChange = {},
+                modifier = Modifier.testTag(TextfieldTag),
+                colors = TextFieldDefaults.outlinedTextFieldColors(
+                    backgroundColor = Color.Red,
+                    unfocusedBorderColor = Color.Red
+                ),
+                shape = RectangleShape
+            )
+        }
+
+        rule.onNodeWithTag(TextfieldTag).captureToImage().assertPixels {
+            Color.Red
         }
     }
 
