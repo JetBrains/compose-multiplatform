@@ -790,6 +790,23 @@ class AndroidViewCompatTest {
         rule.runOnIdle { assertTrue(boxY > 0) }
     }
 
+    @Test
+    fun testView_isNotLayoutRequested_afterFirstLayout() {
+        var view: View? = null
+
+        rule.setContent {
+            AndroidView(
+                factory = { context ->
+                    View(context).also { view = it }
+                }
+            )
+        }
+
+        rule.runOnIdle {
+            assertFalse(view!!.isLayoutRequested)
+        }
+    }
+
     class ColoredSquareView(context: Context) : View(context) {
         var size: Int = 100
             set(value) {

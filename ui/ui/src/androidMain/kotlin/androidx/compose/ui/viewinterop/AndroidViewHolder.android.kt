@@ -141,9 +141,23 @@ internal abstract class AndroidViewHolder(
 
     private val location = IntArray(2)
 
+    private var lastWidthMeasureSpec: Int = Unmeasured
+    private var lastHeightMeasureSpec: Int = Unmeasured
+
     override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
         view?.measure(widthMeasureSpec, heightMeasureSpec)
         setMeasuredDimension(view?.measuredWidth ?: 0, view?.measuredHeight ?: 0)
+        lastWidthMeasureSpec = widthMeasureSpec
+        lastHeightMeasureSpec = heightMeasureSpec
+    }
+
+    fun remeasure() {
+        if (lastWidthMeasureSpec == Unmeasured || lastHeightMeasureSpec == Unmeasured) {
+            // This should never happen: it means that the views handler was measured without
+            // the AndroidComposeView having been measured.
+            return
+        }
+        measure(lastWidthMeasureSpec, lastHeightMeasureSpec)
     }
 
     override fun onLayout(changed: Boolean, l: Int, t: Int, r: Int, b: Int) {
@@ -345,3 +359,5 @@ private fun View.layoutAccordingTo(layoutNode: LayoutNode) {
     val y = position.y.roundToInt()
     layout(x, y, x + measuredWidth, y + measuredHeight)
 }
+
+private const val Unmeasured = Int.MIN_VALUE

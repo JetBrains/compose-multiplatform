@@ -48,18 +48,10 @@ internal class AndroidViewsHandler(context: Context) : ViewGroup(context) {
             MeasureSpec.getSize(widthMeasureSpec),
             MeasureSpec.getSize(heightMeasureSpec)
         )
-    }
-
-    override fun measureChildren(widthMeasureSpec: Int, heightMeasureSpec: Int) {
-        // Layout has already been handled by component nodes and we know the size of each View.
-        // However, we act like proper measurement here in case ViewRootImpl did forceLayout(),
-        // in order to clear properly the layout state of the handler & holders.
-        holderToLayoutNode.keys.forEach {
-            it.measure(
-                MeasureSpec.makeMeasureSpec(it.measuredWidth, MeasureSpec.EXACTLY),
-                MeasureSpec.makeMeasureSpec(it.measuredHeight, MeasureSpec.EXACTLY)
-            )
-        }
+        // Remeasure children, such that, if ViewRootImpl did forceLayout(), the holders
+        // will be set PFLAG_LAYOUT_REQUIRED and they will be relaid out during the next layout.
+        // This will ensure that the need relayout flags will be cleared correctly.
+        holderToLayoutNode.keys.forEach { it.remeasure() }
     }
 
     override fun onLayout(changed: Boolean, l: Int, t: Int, r: Int, b: Int) {
