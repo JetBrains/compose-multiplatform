@@ -23,6 +23,7 @@ import androidx.build.gradle.isRoot
 import androidx.build.license.CheckExternalDependencyLicensesTask
 import androidx.build.playground.VerifyPlaygroundGradlePropertiesTask
 import androidx.build.studio.StudioTask.Companion.registerStudioTask
+import androidx.build.testConfiguration.registerOwnersServiceTasks
 import androidx.build.uptodatedness.TaskUpToDateValidator
 import com.android.build.gradle.api.AndroidBasePlugin
 import org.gradle.api.GradleException
@@ -33,12 +34,12 @@ import org.gradle.api.artifacts.component.ModuleComponentSelector
 import org.gradle.api.plugins.JavaPlugin
 import org.gradle.api.tasks.bundling.Zip
 import org.gradle.api.tasks.bundling.ZipEntryCompression
+import org.gradle.build.event.BuildEventsListenerRegistry
 import org.gradle.kotlin.dsl.KotlinClosure1
 import org.gradle.kotlin.dsl.extra
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 import java.io.File
 import java.util.concurrent.ConcurrentHashMap
-import org.gradle.build.event.BuildEventsListenerRegistry
 
 abstract class AndroidXRootPlugin : Plugin<Project> {
     @get:javax.inject.Inject
@@ -177,6 +178,7 @@ abstract class AndroidXRootPlugin : Plugin<Project> {
 
         // Needs to be called before evaluationDependsOnChildren in usingMaxDepVersions block
         publishInspectionArtifacts()
+        registerOwnersServiceTasks()
 
         // If useMaxDepVersions is set, iterate through all the project and substitute any androidx
         // artifact dependency with the local tip of tree version of the library.

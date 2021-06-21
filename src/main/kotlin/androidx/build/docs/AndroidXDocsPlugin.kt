@@ -559,12 +559,14 @@ abstract class SourcesVariantRule : ComponentMetadataRule {
     }
 }
 
-private const val DACKKA_DEPENDENCY = "com.google.devsite:dackka:0.0.5"
+private const val DACKKA_DEPENDENCY = "com.google.devsite:dackka:0.0.6"
 private const val DOCLAVA_DEPENDENCY = "com.android:doclava:1.0.6"
 
 // Allowlist for directories that should be processed by Dackka
 private val dackkaDirsToProcess = listOf(
+    "androidx/annotation/**",
     "androidx/benchmark/**",
+    "androidx/biometric/**",
     "androidx/collection/**",
     "androidx/compose/**",
     "androidx/datastore/**",
@@ -572,7 +574,9 @@ private val dackkaDirsToProcess = listOf(
     "androidx/navigation/**",
     "androidx/paging/**",
     "androidx/room/**",
-    "androidx/window/**"
+    "androidx/wear/**",
+    "androidx/window/**",
+    "androidx/work/**"
 )
 
 private val hiddenPackages = listOf(

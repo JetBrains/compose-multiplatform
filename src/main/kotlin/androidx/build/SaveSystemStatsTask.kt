@@ -36,6 +36,7 @@ abstract class SaveSystemStatsTask : DefaultTask() {
     }
 
     @Input
+    @Suppress("DEPRECATION")
     fun getTotalMemory(): Long {
         val bean = ManagementFactory.getOperatingSystemMXBean() as OperatingSystemMXBean
         return bean.getTotalPhysicalMemorySize()

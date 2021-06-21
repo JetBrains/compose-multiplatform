@@ -163,7 +163,10 @@ fun Project.configureProjectForApiTasks(
 
                 javaInputs = JavaCompileInputs.fromLibraryVariant(
                     variant,
-                    project
+                    project,
+                    // Note, in addition to androidx, bootClasspath will also include stub jars
+                    // from android { useLibrary "android.foo" } block.
+                    files(config.library.bootClasspath)
                 )
                 processManifest = config.library.buildOutputs.getByName(variant.name)
                     .processManifestProvider.get() as ProcessLibraryManifest

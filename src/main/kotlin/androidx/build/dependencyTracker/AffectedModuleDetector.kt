@@ -18,11 +18,8 @@ package androidx.build.dependencyTracker
 
 import androidx.build.dependencyTracker.AffectedModuleDetector.Companion.ENABLE_ARG
 import androidx.build.getDistributionDirectory
-import androidx.build.gitclient.GitClient
 import androidx.build.gitclient.GitClientImpl
 import androidx.build.gradle.isRoot
-import androidx.build.isPresubmitBuild
-import org.gradle.BuildAdapter
 import org.gradle.api.GradleException
 import org.gradle.api.Project
 import org.gradle.api.Task
@@ -47,6 +44,14 @@ import org.gradle.api.logging.Logger
  *  NONE -- A status to return for a project when it is not supposed to be built.
  */
 enum class ProjectSubset { DEPENDENT_PROJECTS, CHANGED_PROJECTS, NONE }
+
+/**
+ * Provides the list of file paths (relative to the git root) that have changed (can include
+ * removed files).
+ *
+ * Returns `null` if changed files cannot be detected.
+ */
+typealias ChangedFilesProvider = () -> List<String>?
 
 /**
  * A utility class that can discover which files are changed based on git history.
@@ -101,39 +106,40 @@ abstract class AffectedModuleDetector(
                 setInstance(rootProject, AcceptAll())
                 return
             }
-            val logger = ToStringLogger.createWithLifecycle(gradle) { log ->
-                val distDir = rootProject.getDistributionDirectory()
-                distDir.let {
-                    val outputFile = it.resolve(LOG_FILE_NAME)
-                    outputFile.writeText(log)
-                    println("wrote dependency log to ${outputFile.absolutePath}")
-                }
-            }
+            val distDir = rootProject.getDistributionDirectory()
+            val outputFile = distDir.resolve(LOG_FILE_NAME)
+            val logger = FileLogger(outputFile)
             logger.info("setup: enabled: $enabled")
             val baseCommitOverride: String? = rootProject.findProperty(BASE_COMMIT_ARG) as String?
             if (baseCommitOverride != null) {
                 logger.info("using base commit override $baseCommitOverride")
             }
-            gradle.addBuildListener(object : BuildAdapter() {
-                override fun projectsEvaluated(gradle: Gradle?) {
-                    logger.lifecycle("projects evaluated")
-                    AffectedModuleDetectorImpl(
-                        rootProject = rootProject,
-                        logger = logger,
-                        ignoreUnknownProjects = false,
-                        baseCommitOverride = baseCommitOverride
-                    ).also {
-                        if (!enabled) {
-                            logger.info("swapping with accept all")
-                            // doing it just for testing
-                            setInstance(rootProject, AcceptAll(it, logger))
-                        } else {
-                            logger.info("using real detector")
-                            setInstance(rootProject, it)
-                        }
+            val gitClient = GitClientImpl(
+                workingDir = rootProject.projectDir,
+                logger = rootProject.logger
+            )
+            val changedFilesProvider: ChangedFilesProvider = {
+                val baseSha = baseCommitOverride ?: gitClient.findPreviousSubmittedChange()
+                baseSha?.let(gitClient::findChangedFilesSince)
+            }
+            gradle.taskGraph.whenReady {
+                logger.lifecycle("projects evaluated")
+                AffectedModuleDetectorImpl(
+                    rootProject = rootProject,
+                    logger = logger,
+                    ignoreUnknownProjects = false,
+                    changedFilesProvider = changedFilesProvider
+                ).also {
+                    if (!enabled) {
+                        logger.info("swapping with accept all")
+                        // doing it just for testing
+                        setInstance(rootProject, AcceptAll(it, logger))
+                    } else {
+                        logger.info("using real detector")
+                        setInstance(rootProject, it)
                     }
                 }
-            })
+            }
         }
 
         private fun setInstance(
@@ -218,17 +224,13 @@ class AffectedModuleDetectorImpl constructor(
     private val rootProject: Project,
     logger: Logger?,
     // used for debugging purposes when we want to ignore non module files
+    @Suppress("unused")
     private val ignoreUnknownProjects: Boolean = false,
     private val cobuiltTestPaths: Set<Set<String>> = COBUILT_TEST_PATHS,
     private val alwaysBuildIfExistsPaths: Set<String> = ALWAYS_BUILD_IF_EXISTS,
-    private val injectedGitClient: GitClient? = null,
-    private val isPresubmit: Boolean = isPresubmitBuild(),
-    private val baseCommitOverride: String? = null
+    private val ignoredPaths: Set<String> = IGNORED_PATHS,
+    private val changedFilesProvider: ChangedFilesProvider
 ) : AffectedModuleDetector(logger) {
-    private val git by lazy {
-        injectedGitClient ?: GitClientImpl(rootProject.projectDir, logger)
-    }
-
     private val dependencyTracker by lazy {
         DependencyTracker(rootProject, logger)
     }
@@ -254,6 +256,9 @@ class AffectedModuleDetectorImpl constructor(
     }
 
     private var unknownFiles: MutableSet<String> = mutableSetOf()
+
+    // Files tracked by git that are not expected to effect the build, thus require no consideration
+    private var ignoredFiles: MutableSet<String> = mutableSetOf()
 
     val buildAll by lazy {
         shouldBuildAll()
@@ -287,11 +292,10 @@ class AffectedModuleDetectorImpl constructor(
             changedProjects.contains(project) -> {
                 ProjectSubset.CHANGED_PROJECTS
             }
-            dependentProjects.contains(project) ||
-                isPresubmit ||
-                buildContainsNonProjectFileChanges -> {
+            dependentProjects.contains(project) -> {
                 ProjectSubset.DEPENDENT_PROJECTS
             }
+            // projects that are only included because of buildAll
             else -> {
                 ProjectSubset.NONE
             }
@@ -307,28 +311,31 @@ class AffectedModuleDetectorImpl constructor(
      * Returns allProjects if there are no previous merge CLs, which shouldn't happen.
      */
     private fun findChangedProjects(): Set<Project> {
-        val lastMergeSha = baseCommitOverride
-            ?: git.findPreviousSubmittedChange() ?: return allProjects
-        val changedFiles = git.findChangedFilesSince(
-            sha = lastMergeSha,
-            includeUncommitted = true
-        )
+        val changedFiles = changedFilesProvider() ?: return allProjects
 
         val changedProjects: MutableSet<Project> = alwaysBuild.toMutableSet()
 
         for (filePath in changedFiles) {
-            val containingProject = findContainingProject(filePath)
-            if (containingProject == null) {
-                unknownFiles.add(filePath)
+            if (ignoredPaths.any { filePath.startsWith(it) }) {
+                ignoredFiles.add(filePath)
                 logger?.info(
-                    "Couldn't find containing project for file$filePath. Adding to unknownFiles."
+                    "Ignoring file: $filePath"
                 )
             } else {
-                changedProjects.add(containingProject)
-                logger?.info(
-                    "For file $filePath containing project is $containingProject. " +
-                        "Adding to changedProjects."
-                )
+                val containingProject = findContainingProject(filePath)
+                if (containingProject == null) {
+                    unknownFiles.add(filePath)
+                    logger?.info(
+                        "Couldn't find containing project for file: $filePath. Adding to " +
+                            "unknownFiles."
+                    )
+                } else {
+                    changedProjects.add(containingProject)
+                    logger?.info(
+                        "For file $filePath containing project is $containingProject. " +
+                            "Adding to changedProjects."
+                    )
+                }
             }
         }
 
@@ -355,10 +362,12 @@ class AffectedModuleDetectorImpl constructor(
      * we determine there are no changes within our repository (e.g. prebuilts change only)
      */
     private fun shouldBuildAll(): Boolean {
-
         var shouldBuildAll = false
-        // Should only trigger if there are no changedFiles
-        if (changedProjects.size == alwaysBuild.size && unknownFiles.isEmpty()) {
+        // Should only trigger if there are no changedFiles and no ignored files
+        if (changedProjects.size == alwaysBuild.size &&
+            unknownFiles.isEmpty() &&
+            ignoredFiles.isEmpty()
+        ) {
             shouldBuildAll = true
         } else if (unknownFiles.isNotEmpty() && !isGithubInfraChange()) {
             shouldBuildAll = true
@@ -373,7 +382,7 @@ class AffectedModuleDetectorImpl constructor(
             if (unknownFiles.isEmpty()) {
                 logger?.info("because no changed files were detected")
             } else {
-                logger?.info("because one of the unknown files affects everything in the build")
+                logger?.info("because one of the unknown files may affect everything in the build")
                 logger?.info(
                     """
                     The modules detected as affected by changed files are
@@ -498,6 +507,11 @@ class AffectedModuleDetectorImpl constructor(
                 ":emoji2:integration-tests:init-enabled-macrobenchmark",
                 ":emoji2:integration-tests:init-enabled-macrobenchmark-target",
             ),
+        )
+
+        private val IGNORED_PATHS = setOf(
+            "docs/",
+            "development/"
         )
     }
 }

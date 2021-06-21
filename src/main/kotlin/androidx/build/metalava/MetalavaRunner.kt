@@ -69,7 +69,7 @@ abstract class MetalavaWorkAction @Inject constructor (
                 "java.base/java.util=ALL-UNNAMED"
             )
             it.classpath(parameters.metalavaClasspath.get())
-            it.main = "com.android.tools.metalava.Driver"
+            it.mainClass.set("com.android.tools.metalava.Driver")
             it.args = parameters.args.get()
         }
     }
@@ -307,7 +307,10 @@ fun getGenerateApiArgs(
             args += HIDE_EXPERIMENTAL_ARGS
         }
         is GenerateApiMode.ExperimentalApi -> {
-            // No additional args needed.
+            args += listOf(
+                "--hide-annotation", "androidx.annotation.RestrictTo"
+            )
+            args += listOf("--show-unannotated")
         }
     }
 

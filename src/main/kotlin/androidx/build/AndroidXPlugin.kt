@@ -37,7 +37,6 @@ import androidx.build.studio.StudioTask
 import androidx.build.testConfiguration.addAppApkToTestConfigGeneration
 import androidx.build.testConfiguration.addToTestZips
 import androidx.build.testConfiguration.configureTestConfigGeneration
-import com.android.build.api.extension.LibraryAndroidComponentsExtension
 import com.android.build.gradle.AppExtension
 import com.android.build.gradle.AppPlugin
 import com.android.build.gradle.LibraryExtension
@@ -51,7 +50,7 @@ import org.gradle.api.Project
 import org.gradle.api.Task
 import org.gradle.api.file.DuplicatesStrategy
 import org.gradle.api.plugins.JavaPlugin
-import org.gradle.api.plugins.JavaPluginConvention
+import org.gradle.api.plugins.JavaPluginExtension
 import org.gradle.api.tasks.Copy
 import org.gradle.api.tasks.TaskProvider
 import org.gradle.api.tasks.bundling.Jar
@@ -61,11 +60,9 @@ import org.gradle.api.tasks.javadoc.Javadoc
 import org.gradle.api.tasks.testing.Test
 import org.gradle.api.tasks.testing.logging.TestExceptionFormat
 import org.gradle.api.tasks.testing.logging.TestLogEvent
-import org.gradle.kotlin.dsl.apply
 import org.gradle.kotlin.dsl.create
 import org.gradle.kotlin.dsl.extra
 import org.gradle.kotlin.dsl.findByType
-import org.gradle.kotlin.dsl.getPlugin
 import org.jetbrains.kotlin.gradle.dsl.KotlinAndroidProjectExtension
 import org.jetbrains.kotlin.gradle.dsl.KotlinMultiplatformExtension
 import org.jetbrains.kotlin.gradle.plugin.KotlinBasePluginWrapper
@@ -107,6 +104,7 @@ class AndroidXPlugin : Plugin<Project> {
         project.configureTaskTimeouts()
         project.configureMavenArtifactUpload(extension)
         project.configureExternalDependencyLicenseCheck()
+        project.configureProjectStructureValidation(extension)
     }
 
     /**
@@ -168,11 +166,11 @@ class AndroidXPlugin : Plugin<Project> {
             task.finalizedBy(zipHtmlTask)
             task.doFirst {
                 zipHtmlTask.configure {
-                    it.from(htmlReport.destination)
+                    it.from(htmlReport.outputLocation)
                 }
             }
             val xmlReport = task.reports.junitXml
-            if (xmlReport.isEnabled) {
+            if (xmlReport.required.get()) {
                 val zipXmlTask = project.tasks.register(
                     "zipXmlResultsOf${task.name.capitalize()}",
                     Zip::class.java
@@ -186,7 +184,7 @@ class AndroidXPlugin : Plugin<Project> {
                 task.finalizedBy(zipXmlTask)
                 task.doFirst {
                     zipXmlTask.configure {
-                        it.from(xmlReport.destination)
+                        it.from(xmlReport.outputLocation)
                     }
                 }
             }
@@ -208,16 +206,17 @@ class AndroidXPlugin : Plugin<Project> {
         project.tasks.withType(KotlinCompile::class.java).configureEach { task ->
             task.kotlinOptions.jvmTarget = "1.8"
             project.configureJavaCompilationWarnings(task)
-            if (project.hasProperty(EXPERIMENTAL_KOTLIN_BACKEND_ENABLED)) {
-                task.kotlinOptions.freeCompilerArgs += listOf("-Xuse-ir=true")
-            }
 
             // Not directly impacting us, but a bunch of issues like KT-46512, probably prudent
             // for us to just disable until Kotlin 1.5.10+ to avoid end users hitting users
             task.kotlinOptions.freeCompilerArgs += listOf("-Xsam-conversions=class")
         }
         project.afterEvaluate {
-            if (extension.shouldEnforceKotlinStrictApiMode()) {
+            val isAndroidProject = project.plugins.hasPlugin(LibraryPlugin::class.java) ||
+                project.plugins.hasPlugin(AppPlugin::class.java)
+            // Explicit API mode is broken for Android projects
+            // https://youtrack.jetbrains.com/issue/KT-37652
+            if (extension.shouldEnforceKotlinStrictApiMode() && !isAndroidProject) {
                 project.tasks.withType(KotlinCompile::class.java).configureEach { task ->
                     // Workaround for https://youtrack.jetbrains.com/issue/KT-37652
                     if (task.name.endsWith("TestKotlin")) return@configureEach
@@ -266,7 +265,11 @@ class AndroidXPlugin : Plugin<Project> {
             configureAndroidLibraryOptions(project, androidXExtension)
         }
 
-        project.extensions.getByType<LibraryAndroidComponentsExtension>().apply {
+        // TODO(aurimas): migrate away from this when upgrading to AGP 7.1.0-alpha03 or newer
+        @Suppress("DEPRECATION")
+        project.extensions.getByType<
+            com.android.build.api.extension.LibraryAndroidComponentsExtension
+            >().apply {
             beforeVariants(selector().withBuildType("release")) { variant ->
                 variant.enableUnitTest = false
             }
@@ -328,8 +331,8 @@ class AndroidXPlugin : Plugin<Project> {
         project.configureSourceJarForJava()
 
         // Force Java 1.8 source- and target-compatibilty for all Java libraries.
-        val convention = project.convention.getPlugin<JavaPluginConvention>()
-        convention.apply {
+        val javaExtension = project.extensions.getByType<JavaPluginExtension>()
+        javaExtension.apply {
             sourceCompatibility = VERSION_1_8
             targetCompatibility = VERSION_1_8
         }
@@ -368,6 +371,23 @@ class AndroidXPlugin : Plugin<Project> {
         }
 
         project.addToProjectMap(extension)
+    }
+
+    private fun Project.configureProjectStructureValidation(
+        extension: AndroidXExtension
+    ) {
+        val validateProjectStructure = tasks.register(
+            "validateProjectStructure",
+            ValidateProjectStructureTask::class.java,
+        )
+
+        // AndroidXExtension.mavenGroup is not readable until afterEvaluate.
+        afterEvaluate {
+            validateProjectStructure.configure { task ->
+                task.enabled = extension.mavenGroup != null
+                task.libraryGroup.set(extension.mavenGroup)
+            }
+        }
     }
 
     private fun TestedExtension.configureAndroidCommonOptions(
@@ -496,6 +516,10 @@ class AndroidXPlugin : Plugin<Project> {
         project: Project,
         androidXExtension: AndroidXExtension
     ) {
+        // Note, this should really match COMPILE_SDK_VERSION, however
+        // this API takes an integer and we are unable to set it to a
+        // pre-release SDK.
+        defaultConfig.aarMetadata.minCompileSdk = TARGET_SDK_VERSION
         project.configurations.all { config ->
             val isTestConfig = config.name.toLowerCase(Locale.US).contains("test")
 
@@ -645,7 +669,7 @@ class AndroidXPlugin : Plugin<Project> {
         /**
          * Fail the build if a non-Studio task runs longer than expected
          */
-        const val TASK_TIMEOUT_MINUTES = 45L
+        const val TASK_TIMEOUT_MINUTES = 60L
     }
 }
 

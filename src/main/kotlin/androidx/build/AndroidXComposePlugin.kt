@@ -25,7 +25,6 @@ import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.api.artifacts.type.ArtifactTypeDefinition
 import org.gradle.api.attributes.Attribute
-import org.gradle.api.file.DuplicatesStrategy
 import org.gradle.api.tasks.ClasspathNormalizer
 import org.gradle.kotlin.dsl.apply
 import org.gradle.kotlin.dsl.findByType
@@ -37,9 +36,9 @@ const val composeSourceOption =
     "plugin:androidx.compose.compiler.plugins.kotlin:sourceInformation=true"
 
 /**
- * Plugin to apply options across all of the androidx.ui projects
+ * Plugin to apply common configuration for Compose projects.
  */
-class AndroidXUiPlugin : Plugin<Project> {
+class AndroidXComposePlugin : Plugin<Project> {
     override fun apply(project: Project) {
         project.plugins.all { plugin ->
             when (plugin) {
@@ -168,10 +167,11 @@ class AndroidXUiPlugin : Plugin<Project> {
                     error("ModifierFactoryReturnType")
                     error("ModifierFactoryExtensionFunction")
                     error("ModifierParameter")
+                    error("UnnecessaryComposedModifier")
 
-                    // Paths we want to enable ListIterator checks for - for higher level levels it
-                    // won't have a noticeable performance impact, and we don't want developers
-                    // reading high level library code to worry about this.
+                    // Paths we want to enable ListIterator checks for - for higher level
+                    // libraries it won't have a noticeable performance impact, and we don't want
+                    // developers reading high level library code to worry about this.
                     val listIteratorPaths = listOf(
                         "compose:foundation",
                         "compose:runtime",
@@ -283,14 +283,6 @@ class AndroidXUiPlugin : Plugin<Project> {
                     "multiplatformExtension is null (multiplatform plugin not enabled?)"
             }
 
-            /**
-             * Temporary workaround for https://youtrack.jetbrains.com/issue/KT-46096
-             * Should be removed once the build switches to Kotlin 1.5
-             */
-            tasks.withType(org.gradle.jvm.tasks.Jar::class.java).configureEach { jar ->
-                jar.duplicatesStrategy = DuplicatesStrategy.INCLUDE
-            }
-
             /*
             The following configures source sets - note:
 
@@ -322,23 +314,6 @@ class AndroidXUiPlugin : Plugin<Project> {
                     tasks.named("desktopTestClasses").also(::addToBuildOnServer)
                 }
             }
-
-            // workaround after migration to AGP 7.0.0-alpha15
-            // https://youtrack.jetbrains.com/issue/KT-43944#focus=Comments-27-4612683.0-0
-            // TODO(demin): remove after migration to Kotlin 1.5.0:
-            //  https://android-review.googlesource.com/c/platform/frameworks/support/+/1651538
-            fun createNonExistentConfiguration(name: String) {
-                if (project.configurations.findByName(name) == null) {
-                    project.configurations.create(name)
-                }
-            }
-
-            createNonExistentConfiguration("androidTestApi")
-            createNonExistentConfiguration("androidTestDebugApi")
-            createNonExistentConfiguration("androidTestReleaseApi")
-            createNonExistentConfiguration("testApi")
-            createNonExistentConfiguration("testDebugApi")
-            createNonExistentConfiguration("testReleaseApi")
         }
     }
 }

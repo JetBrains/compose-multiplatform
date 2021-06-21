@@ -112,11 +112,19 @@ abstract class GenerateTestConfigurationTask : DefaultTask() {
                 configBuilder.appApkName(appName)
             }
         }
-        configBuilder.isPostsubmit(!isPresubmitBuild())
+        val isPresubmit = isPresubmitBuild()
+        configBuilder.isPostsubmit(!isPresubmit)
         when (affectedModuleDetectorSubset.get()) {
             ProjectSubset.DEPENDENT_PROJECTS -> {
                 // Don't ever run full tests of RV if it is dependent, since they take > 45 minutes
                 if (isConstrained || testProjectPath.get().contains("recyclerview")) {
+                    configBuilder.runAllTests(false)
+                } else {
+                    configBuilder.runAllTests(true)
+                }
+            }
+            ProjectSubset.NONE -> {
+                if (isPresubmit) {
                     configBuilder.runAllTests(false)
                 } else {
                     configBuilder.runAllTests(true)

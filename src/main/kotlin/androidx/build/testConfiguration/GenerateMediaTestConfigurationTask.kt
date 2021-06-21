@@ -175,10 +175,18 @@ abstract class GenerateMediaTestConfigurationTask : DefaultTask() {
             .isServicePrevious(isServicePrevious)
             .tag("androidx_unit_tests")
             .tag("media_compat")
-        configBuilder.isPostsubmit(!isPresubmitBuild())
+        val isPresubmit = isPresubmitBuild()
+        configBuilder.isPostsubmit(!isPresubmit)
         when (affectedModuleDetectorSubset.get()) {
             ProjectSubset.DEPENDENT_PROJECTS -> {
                 if (isConstrained) {
+                    configBuilder.runAllTests(false)
+                } else {
+                    configBuilder.runAllTests(true)
+                }
+            }
+            ProjectSubset.NONE -> {
+                if (isPresubmit) {
                     configBuilder.runAllTests(false)
                 } else {
                     configBuilder.runAllTests(true)
