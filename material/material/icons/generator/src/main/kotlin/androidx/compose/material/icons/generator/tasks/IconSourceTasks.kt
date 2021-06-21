@@ -18,7 +18,6 @@ package androidx.compose.material.icons.generator.tasks
 
 import androidx.compose.material.icons.generator.CoreIcons
 import androidx.compose.material.icons.generator.IconWriter
-import com.android.build.gradle.api.BaseVariant
 import org.gradle.api.Project
 import org.gradle.api.tasks.CacheableTask
 import org.gradle.api.tasks.TaskProvider
@@ -38,7 +37,8 @@ open class CoreIconGenerationTask : IconGenerationTask() {
         /**
          * Registers [CoreIconGenerationTask] in [project].
          */
-        fun register(project: Project, variant: BaseVariant? = null) {
+        @Suppress("DEPRECATION") // BaseVariant
+        fun register(project: Project, variant: com.android.build.gradle.api.BaseVariant? = null) {
             val (task, buildDirectory) = project.registerGenerationTask(
                 "generateCoreIcons",
                 CoreIconGenerationTask::class.java,
@@ -66,7 +66,8 @@ open class ExtendedIconGenerationTask : IconGenerationTask() {
         /**
          * Registers [ExtendedIconGenerationTask] in [project]. (for use with mpp)
          */
-        fun register(project: Project, variant: BaseVariant? = null) {
+        @Suppress("DEPRECATION") // BaseVariant
+        fun register(project: Project, variant: com.android.build.gradle.api.BaseVariant? = null) {
             val (task, buildDirectory) = project.registerGenerationTask(
                 "generateExtendedIcons",
                 ExtendedIconGenerationTask::class.java,
@@ -87,7 +88,11 @@ open class ExtendedIconGenerationTask : IconGenerationTask() {
          * we can remove this too.
          */
         @JvmStatic
-        fun registerSourceJarOnly(project: Project, variant: BaseVariant) {
+        @Suppress("DEPRECATION") // BaseVariant
+        fun registerSourceJarOnly(
+            project: Project,
+            variant: com.android.build.gradle.api.BaseVariant
+        ) {
             // Setup the source jar task if this is the release variant
             if (variant.name == "release") {
                 val (task, buildDirectory) = project.registerGenerationTask(
@@ -120,7 +125,8 @@ private fun registerIconGenerationTask(
 /**
  * Helper to register [task] as the java source generating task that outputs to [buildDirectory].
  */
-private fun BaseVariant.registerIconGenerationTask(
+@Suppress("DEPRECATION") // BaseVariant
+private fun com.android.build.gradle.api.BaseVariant.registerIconGenerationTask(
     project: Project,
     task: TaskProvider<*>,
     buildDirectory: File
