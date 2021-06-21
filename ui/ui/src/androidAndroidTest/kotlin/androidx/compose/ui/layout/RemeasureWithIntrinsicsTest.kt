@@ -16,21 +16,27 @@
 
 package androidx.compose.ui.layout
 
+import android.os.Build
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.requiredSize
-import androidx.compose.foundation.layout.requiredSizeIn
 import androidx.compose.foundation.layout.size
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.neverEqualPolicy
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.testutils.assertShape
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.drawBehind
+import androidx.compose.ui.geometry.Rect
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.AndroidOwnerExtraAssertionsRule
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.test.TestActivity
 import androidx.compose.ui.test.assertHeightIsEqualTo
 import androidx.compose.ui.test.assertWidthIsEqualTo
+import androidx.compose.ui.test.captureToImage
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.unit.Constraints
@@ -38,6 +44,7 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.MediumTest
+import androidx.test.filters.SdkSuppress
 import org.junit.Assert.assertEquals
 import org.junit.Rule
 import org.junit.Test
@@ -238,43 +245,6 @@ class RemeasureWithIntrinsicsTest {
     }
 
     @Test
-    fun whenOwnerDoesNotQueryAnymore() {
-        var measures1 = 0
-        var measures2 = 0
-        var intrinsicWidth by mutableStateOf(40.dp)
-        var intrinsicHeight by mutableStateOf(50.dp)
-        var uses by mutableStateOf(true)
-        rule.setContent {
-            LayoutUsingIntrinsics(onMeasure = { ++measures1 }) {
-                // Box needed to ensure its child is measured with the same constraints,
-                // so remeasurement can be skipped, but is not fixed size such that intrinsics
-                // can be skipped.
-                Box(Modifier.requiredSizeIn(0.dp, 0.dp, 1.dp, 1.dp)) {
-                    LayoutMaybeUsingIntrinsics({ uses }, onMeasure = { ++measures2 }) {
-                        LayoutWithIntrinsics(intrinsicWidth, intrinsicHeight)
-                    }
-                }
-            }
-        }
-
-        rule.runOnIdle {
-            uses = false
-        }
-
-        rule.runOnIdle {
-            measures1 = 0
-            measures2 = 0
-            intrinsicWidth = 30.dp
-            intrinsicHeight = 20.dp
-        }
-
-        rule.runOnIdle {
-            assertEquals(1, measures1)
-            assertEquals(0, measures2)
-        }
-    }
-
-    @Test
     fun whenConnectionFromOwnerDoesNotQueryAnymore() {
         var measures = 0
         var intrinsicWidth by mutableStateOf(40.dp)
@@ -381,6 +351,60 @@ class RemeasureWithIntrinsicsTest {
         rule.onNodeWithTag("box")
             .assertWidthIsEqualTo(30.dp)
             .assertHeightIsEqualTo(20.dp)
+    }
+
+    @Test
+    @SdkSuppress(minSdkVersion = Build.VERSION_CODES.O)
+    fun childWithStatefulMeasureBlock() {
+        val offsetPx = 20f
+        val offsetDp = with(rule.density) { offsetPx.toDp() }
+        val remeasureState = mutableStateOf(Unit, neverEqualPolicy())
+        rule.setContent {
+            Layout(
+                content = {
+                    var rect by remember { mutableStateOf(Rect.Zero) }
+                    Box(
+                        Modifier
+                            .testTag("box")
+                            .layout { measurable, constraints ->
+                                val placeable = measurable.measure(constraints)
+                                rect = Rect(
+                                    offsetPx, offsetPx,
+                                    placeable.width - offsetPx, placeable.height - offsetPx
+                                )
+                                layout(placeable.width, placeable.height) {
+                                    placeable.place(0, 0)
+                                }
+                            }.drawBehind {
+                                drawRect(Color.Black)
+                                drawRect(Color.Red, topLeft = rect.topLeft, rect.size)
+                            }
+                    )
+                }
+            ) { measurables, _ ->
+                remeasureState.value
+                val measurable = measurables.first()
+                measurable.minIntrinsicHeight(50)
+                val placeable = measurable.measure(Constraints.fixed(100, 100))
+                layout(100, 100) {
+                    placeable.place(0, 0)
+                }
+            }
+        }
+
+        rule.runOnIdle {
+            remeasureState.value = Unit
+        }
+
+        rule.onNodeWithTag("box")
+            .captureToImage()
+            .assertShape(
+                density = rule.density,
+                horizontalPadding = offsetDp,
+                verticalPadding = offsetDp,
+                backgroundColor = Color.Black,
+                shapeColor = Color.Red
+            )
     }
 }
 

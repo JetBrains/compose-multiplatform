@@ -161,13 +161,37 @@ internal class OuterMeasurablePlaceable(
         placeAt(lastPosition, lastZIndex, lastLayerBlock)
     }
 
-    override fun minIntrinsicWidth(height: Int): Int = outerWrapper.minIntrinsicWidth(height)
+    override fun minIntrinsicWidth(height: Int): Int {
+        onIntrinsicsQueried()
+        return outerWrapper.minIntrinsicWidth(height)
+    }
 
-    override fun maxIntrinsicWidth(height: Int): Int = outerWrapper.maxIntrinsicWidth(height)
+    override fun maxIntrinsicWidth(height: Int): Int {
+        onIntrinsicsQueried()
+        return outerWrapper.maxIntrinsicWidth(height)
+    }
 
-    override fun minIntrinsicHeight(width: Int): Int = outerWrapper.minIntrinsicHeight(width)
+    override fun minIntrinsicHeight(width: Int): Int {
+        onIntrinsicsQueried()
+        return outerWrapper.minIntrinsicHeight(width)
+    }
 
-    override fun maxIntrinsicHeight(width: Int): Int = outerWrapper.maxIntrinsicHeight(width)
+    override fun maxIntrinsicHeight(width: Int): Int {
+        onIntrinsicsQueried()
+        return outerWrapper.maxIntrinsicHeight(width)
+    }
+
+    private fun onIntrinsicsQueried() {
+        // How intrinsics work when specific / custom intrinsics are not provided to the custom
+        // layout is we essentially run the measure block of a child with not-final constraints
+        // and fake measurables. It is possible that some measure blocks are not pure and have
+        // side effects, like save some state calculated during the measurement.
+        // In order to make it possible we always have to rerun the measure block with the real
+        // final constraints after the intrinsics run. Sometimes it will cause unnecessary
+        // remeasurements, but it makes sure such component states are using the correct final
+        // constraints/sizes.
+        layoutNode.requestRemeasure()
+    }
 
     /**
      * Recalculates the parent data.
