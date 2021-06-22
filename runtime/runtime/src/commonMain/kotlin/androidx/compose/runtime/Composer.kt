@@ -326,9 +326,13 @@ interface Composer {
     /**
      * A Compose compiler plugin API. DO NOT call directly.
      *
-     * This is the instance that changes that are calculated by the composer will be played to.
-     * During while invoking [Composable] functions none of the [applier] methods are called.
-     * The changes are made in a batch after the all [Composable] functions have completed.
+     * Changes calculated and recorded during composition and are sent to [applier] which makes
+     * the physical changes to the node tree implied by a composition.
+     *
+     * Composition has two discrete phases, 1) calculate and record changes and 2) making the
+     * changes via the [applier]. While a [Composable] functions is executing, none of the
+     * [applier] methods are called. The recorded changes are sent to the [applier] all at once
+     * after all [Composable] functions have completed.
      */
     @ComposeCompilerApi
     val applier: Applier<*>
