@@ -19,7 +19,7 @@ import androidx.compose.ui.window.application
 
 @OptIn(ExperimentalComposeUiApi::class)
 fun main() = application {
-    Window {
+    Window(onCloseRequest = ::exitApplication) {
         // Content
     }
 }
@@ -41,7 +41,7 @@ import androidx.compose.ui.window.application
 fun main() = application {
     var fileName by remember { mutableStateOf("Untitled") }
 
-    Window(title = "$fileName - Editor") {
+    Window(onCloseRequest = ::exitApplication, title = "$fileName - Editor") {
         Button(onClick = { fileName = "note.txt" }) {
             Text("Save")
         }
@@ -74,11 +74,11 @@ fun main() = application {
         isPerformingTask = false
     }
     if (isPerformingTask) {
-        Window {
+        Window(onCloseRequest = ::exitApplication) {
             Text("Performing some tasks. Please wait!")
         }
     } else {
-        Window {
+        Window(onCloseRequest = ::exitApplication) {
             Text("Hello, World!")
         }
     }
@@ -112,8 +112,8 @@ fun main() = application {
         ) {
             if (isAskingToClose) {
                 Dialog(
+                    onCloseRequest = { isAskingToClose = false },
                     title = "Close the document without saving?",
-                    onCloseRequest = { isAskingToClose = false }
                 ) {
                     Button(
                         onClick = { isOpen = false }
@@ -150,9 +150,9 @@ fun main() = application {
     val state = rememberWindowState()
 
     Window(
+        onCloseRequest = { state.isVisible = false },
         state,
         title = "Counter",
-        onCloseRequest = { state.isVisible = false }
     ) {
         var counter by remember { mutableStateOf(0) }
         LaunchedEffect(Unit) {
@@ -211,7 +211,7 @@ fun main() = application {
 @Composable
 private fun MyWindow(
     state: MyWindowState
-) = Window(title = state.title, onCloseRequest = state::close) {
+) = Window(onCloseRequest = state::close, title = state.title) {
     MenuBar {
         Menu("File") {
             Item("New window", onClick = state.openNewWindow)
@@ -272,22 +272,41 @@ import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Window
+import androidx.compose.ui.window.WindowPlacement
 import androidx.compose.ui.window.application
 import androidx.compose.ui.window.rememberWindowState
 
 @OptIn(ExperimentalComposeUiApi::class)
 fun main() = application {
-    val state = rememberWindowState(isMaximized = true)
+    val state = rememberWindowState(placement = WindowPlacement.Maximized)
 
-    Window(state) {
+    Window(onCloseRequest = ::exitApplication, state) {
         Column {
             Row(verticalAlignment = Alignment.CenterVertically) {
-                Checkbox(state.isFullscreen, { state.isFullscreen = !state.isFullscreen })
+                Checkbox(
+                    state.placement == WindowPlacement.Fullscreen,
+                    {
+                        state.placement = if (it) {
+                            WindowPlacement.Fullscreen
+                        } else {
+                            WindowPlacement.Floating
+                        }
+                    }
+                )
                 Text("isFullscreen")
             }
 
             Row(verticalAlignment = Alignment.CenterVertically) {
-                Checkbox(state.isMaximized, { state.isMaximized = !state.isMaximized })
+                Checkbox(
+                    state.placement == WindowPlacement.Fullscreen,
+                    {
+                        state.placement = if (it) {
+                            WindowPlacement.Maximized
+                        } else {
+                            WindowPlacement.Floating
+                        }
+                    }
+                )
                 Text("isMaximized")
             }
 
@@ -299,7 +318,10 @@ fun main() = application {
             Text(
                 "Position ${state.position}",
                 Modifier.clickable {
-                    state.position = state.position.copy(x = state.position.x + 10.dp)
+                    val position = state.position
+                    if (position is WindowPosition.Absolute) {
+                        state.position = position.copy(x = state.position.x + 10.dp)
+                    }
                 }
             )
 
@@ -362,52 +384,28 @@ private fun onWindowRelocate(position: WindowPosition) {
 
 ## Handle window-level shortcuts
 ```kotlin
-import androidx.compose.foundation.layout.Box
 import androidx.compose.material.TextField
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.ExperimentalComposeUiApi
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.focus.FocusRequester
-import androidx.compose.ui.focus.focusRequester
-import androidx.compose.ui.focus.focusTarget
 import androidx.compose.ui.input.key.Key
 import androidx.compose.ui.input.key.key
-import androidx.compose.ui.input.key.onPreviewKeyEvent
 import androidx.compose.ui.window.Window
 import androidx.compose.ui.window.application
 
 @OptIn(ExperimentalComposeUiApi::class)
 fun main() = application {
-    var isOpen by remember { mutableStateOf(true) }
-
-    if (isOpen) {
-        Window {
-            val focusRequester = remember(::FocusRequester)
-            LaunchedEffect(Unit) {
-                focusRequester.requestFocus()
-            }
-
-            Box(
-                Modifier
-                    .focusRequester(focusRequester)
-                    .focusTarget()
-                    .onPreviewKeyEvent {
-                        when (it.key) {
-                            Key.Escape -> {
-                                isOpen = false
-                                true
-                            }
-                            else -> false
-                        }
-                    }
-            ) {
-                TextField("Text", {})
+    Window(
+        onCloseRequest = ::exitApplication,
+        onPreviewKeyEvent = {
+            when (it.key) {
+                Key.Escape -> {
+                    exitApplication()
+                    true
+                }
+                else -> false
             }
         }
+    ) {
+        TextField("Text", {})
     }
 }
 ```
@@ -445,8 +443,8 @@ fun main() = application {
 
         if (isDialogOpen) {
             Dialog(
-                initialAlignment = Alignment.Center,
-                onCloseRequest = { isDialogOpen = false }
+                onCloseRequest = { isDialogOpen = false },
+                initialAlignment = Alignment.Center
             ) {
                 // Dialog's content
             }
@@ -487,7 +485,7 @@ import java.awt.Cursor
 
 @OptIn(ExperimentalComposeUiApi::class)
 fun main() = application {
-    Window {
+    Window(onCloseRequest = ::exitApplication) {
         LaunchedEffect(Unit) {
             window.cursor = Cursor(Cursor.CROSSHAIR_CURSOR)
         }
