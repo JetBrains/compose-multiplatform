@@ -1,5 +1,5 @@
 /*
- * Copyright 2020 The Android Open Source Project
+ * Copyright 2021 The Android Open Source Project
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -39,17 +39,6 @@ orci in neque euismod a blandit libero vehicula.
 """.trim().split(" ")
 
 /**
- * Generate a Lorem Ipsum [words] long.
- */
-private fun generateLoremIpsum(words: Int): String {
-    var wordsUsed = 0
-    val loremIpsumMaxSize = LOREM_IPSUM_SOURCE.size
-    return generateSequence {
-        LOREM_IPSUM_SOURCE[wordsUsed++ % loremIpsumMaxSize]
-    }.take(words).joinToString(" ")
-}
-
-/**
  * [PreviewParameterProvider] with 1 value containing Lorem Ipsum.
  *
  * @param words Number of words from "Lorem Ipsum" to use.
@@ -61,4 +50,15 @@ class LoremIpsum(private val words: Int) : PreviewParameterProvider<String> {
 
     override val values: Sequence<String>
         get() = sequenceOf(generateLoremIpsum(words))
+
+    /**
+     * Generate a Lorem Ipsum [words] long.
+     */
+    private fun generateLoremIpsum(words: Int): String {
+        var wordsUsed = 0
+        val loremIpsumMaxSize = LOREM_IPSUM_SOURCE.size
+        return generateSequence {
+            LOREM_IPSUM_SOURCE[wordsUsed++ % loremIpsumMaxSize]
+        }.take(words).joinToString(" ")
+    }
 }

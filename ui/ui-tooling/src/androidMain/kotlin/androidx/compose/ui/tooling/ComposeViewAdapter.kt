@@ -1,5 +1,5 @@
 /*
- * Copyright 2019 The Android Open Source Project
+ * Copyright 2021 The Android Open Source Project
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package androidx.compose.ui.tooling.preview
+package androidx.compose.ui.tooling
 
 import android.annotation.SuppressLint
 import android.content.Context
@@ -47,14 +47,14 @@ import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.platform.LocalFontLoader
 import androidx.compose.ui.platform.ViewRootForTest
-import androidx.compose.ui.tooling.CompositionDataRecord
-import androidx.compose.ui.tooling.Inspectable
+import androidx.compose.ui.tooling.CommonPreviewUtils.invokeComposableViaReflection
 import androidx.compose.ui.tooling.data.Group
 import androidx.compose.ui.tooling.data.SourceLocation
 import androidx.compose.ui.tooling.data.UiToolingDataApi
 import androidx.compose.ui.tooling.data.asTree
-import androidx.compose.ui.tooling.preview.animation.PreviewAnimationClock
-import androidx.compose.ui.tooling.preview.CommonPreviewUtils.invokeComposableViaReflection
+import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.tooling.preview.PreviewParameterProvider
+import androidx.compose.ui.tooling.animation.PreviewAnimationClock
 import androidx.compose.ui.unit.IntRect
 import androidx.core.app.ActivityOptionsCompat
 import androidx.lifecycle.Lifecycle
@@ -68,7 +68,7 @@ import androidx.savedstate.SavedStateRegistryOwner
 import androidx.savedstate.ViewTreeSavedStateRegistryOwner
 import java.lang.reflect.Method
 
-const val TOOLS_NS_URI = "http://schemas.android.com/tools"
+private const val TOOLS_NS_URI = "http://schemas.android.com/tools"
 private const val DESIGN_INFO_METHOD = "getDesignInfo"
 
 private val emptyContent: @Composable () -> Unit = @Composable {}

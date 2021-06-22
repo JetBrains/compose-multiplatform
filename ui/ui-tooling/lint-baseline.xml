@@ -7,7 +7,7 @@
         errorLine1="        return invoke(instance, *arguments)"
         errorLine2="               ~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
-            file="src/jvmMain/kotlin/androidx/compose/ui/tooling/preview/CommonPreviewUtils.kt"
+            file="src/jvmMain/kotlin/androidx/compose/ui/tooling/CommonPreviewUtils.kt"
             line="149"
             column="16"/>
     </issue>
@@ -18,7 +18,7 @@
         errorLine1="                val result = designInfoMethod.invoke("
         errorLine2="                             ^">
         <location
-            file="src/androidMain/kotlin/androidx/compose/ui/tooling/preview/ComposeViewAdapter.kt"
+            file="src/androidMain/kotlin/androidx/compose/ui/tooling/ComposeViewAdapter.kt"
             line="385"
             column="30"/>
     </issue>

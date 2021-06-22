@@ -1,5 +1,5 @@
 /*
- * Copyright 2019 The Android Open Source Project
+ * Copyright 2021 The Android Open Source Project
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package androidx.compose.ui.tooling.preview
+package androidx.compose.ui.tooling
 
 import android.content.pm.ApplicationInfo
 import android.os.Bundle
@@ -27,7 +27,7 @@ import androidx.compose.material.Text
 import androidx.compose.runtime.currentComposer
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.ui.tooling.preview.CommonPreviewUtils.invokeComposableViaReflection
+import androidx.compose.ui.tooling.CommonPreviewUtils.invokeComposableViaReflection
 
 /**
  * Activity used to run `@Composable` previews from Android Studio.

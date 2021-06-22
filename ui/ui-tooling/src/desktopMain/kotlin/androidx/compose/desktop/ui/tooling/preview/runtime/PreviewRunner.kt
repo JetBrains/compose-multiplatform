@@ -19,7 +19,7 @@ package androidx.compose.desktop.ui.tooling.preview.runtime
 import androidx.compose.desktop.Window
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.currentComposer
-import androidx.compose.ui.tooling.preview.CommonPreviewUtils.invokeComposableViaReflection
+import androidx.compose.ui.tooling.CommonPreviewUtils.invokeComposableViaReflection
 
 internal class PreviewRunner {
     companion object {

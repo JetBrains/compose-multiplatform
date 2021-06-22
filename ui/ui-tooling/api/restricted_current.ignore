@@ -1,0 +1,7 @@
+// Baseline format: 1.0
+RemovedPackage: androidx.compose.ui.tooling.preview:
+    Removed package androidx.compose.ui.tooling.preview
+RemovedPackage: androidx.compose.ui.tooling.preview.animation:
+    Removed package androidx.compose.ui.tooling.preview.animation
+RemovedPackage: androidx.compose.ui.tooling.preview.datasource:
+    Removed package androidx.compose.ui.tooling.preview.datasource

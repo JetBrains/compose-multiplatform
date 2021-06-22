@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package androidx.compose.ui.tooling.preview
+package androidx.compose.ui.tooling
 
 import androidx.compose.runtime.Composer
 import java.lang.reflect.Method

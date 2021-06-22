@@ -14,11 +14,12 @@
  * limitations under the License.
  */
 
-package androidx.compose.ui.tooling.preview
+package androidx.compose.ui.tooling
 
 import androidx.compose.material.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
+import androidx.compose.ui.tooling.preview.Preview
 
 @Composable
 fun DesignInfoProviderA() {
