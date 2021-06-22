@@ -1,6 +1,7 @@
 package org.jetbrains.compose.web.tests.integration
 
 import org.jetbrains.compose.web.tests.integration.common.BaseIntegrationTests
+import org.jetbrains.compose.web.tests.integration.common.Drivers
 import org.jetbrains.compose.web.tests.integration.common.openTestPage
 import org.jetbrains.compose.web.tests.integration.common.waitTextToBe
 import org.junit.jupiter.api.Test
@@ -8,7 +9,7 @@ import org.openqa.selenium.By
 import org.openqa.selenium.Keys
 import org.openqa.selenium.interactions.Actions
 
-class InputsTests : BaseIntegrationTests() {
+class InputsTests : BaseIntegrationTests(Drivers.Chrome) {
 
     @Test
     fun `text area input gets printed`() {

@@ -1,6 +1,7 @@
 package org.jetbrains.compose.web.tests.integration
 
 import org.jetbrains.compose.web.tests.integration.common.BaseIntegrationTests
+import org.jetbrains.compose.web.tests.integration.common.Drivers
 import org.jetbrains.compose.web.tests.integration.common.openTestPage
 import org.jetbrains.compose.web.tests.integration.common.waitTextToBe
 import org.junit.jupiter.api.Assertions.assertEquals
@@ -9,7 +10,7 @@ import org.openqa.selenium.By
 import org.openqa.selenium.Dimension
 import org.openqa.selenium.interactions.Actions
 
-class IntegrationTests : BaseIntegrationTests() {
+class IntegrationTests : BaseIntegrationTests(Drivers.Chrome) {
 
     @Test
     fun `text contains Hello World`() {

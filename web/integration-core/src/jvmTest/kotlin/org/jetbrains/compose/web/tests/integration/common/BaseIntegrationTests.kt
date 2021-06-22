@@ -30,12 +30,7 @@ object Drivers {
 }
 
 @ExtendWith(value = [StaticServerSetupExtension::class])
-abstract class BaseIntegrationTests {
-
+abstract class BaseIntegrationTests(val driver: RemoteWebDriver) {
     fun openTestPage(test: String) = driver.openTestPage(test)
     fun waitTextToBe(textId: String = "txt", value: String)  = driver.waitTextToBe(textId, value)
-
-    companion object  {
-        val driver: RemoteWebDriver = Drivers.Chrome
-    }
 }
