@@ -56,7 +56,7 @@ object LibraryVersions {
     val CORE_ROLE = Version("1.1.0-alpha02")
     val CURSORADAPTER = Version("1.1.0-alpha01")
     val CUSTOMVIEW = Version("1.2.0-alpha01")
-    val DATASTORE = Version("1.0.0-beta03")
+    val DATASTORE = Version("1.0.0-rc01")
     val DOCUMENTFILE = Version("1.1.0-alpha01")
     val DRAWERLAYOUT = Version("1.2.0-alpha01")
     val DYNAMICANIMATION = Version("1.1.0-alpha04")
