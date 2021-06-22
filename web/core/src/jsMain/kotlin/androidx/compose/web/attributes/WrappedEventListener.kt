@@ -37,26 +37,11 @@ open class WrappedEventListener<T : GenericWrappedEvent<*>>(
     }
 }
 
-/**
- * https://developer.mozilla.org/en-US/docs/Web/API/EventTarget/addEventListener#parameters
- *
- * Parameter `signal` of type [AbortSignal](https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal) is not added here.
- * The reason is that its usage is most often not compliant with Compose concepts.
- *
- * TODO: Parameter `once` is also not compliant with Compose concepts (similar to `signal`). Consider its necessity.
- */
-class Options(
-    val capture: BooleanValue = BooleanValue.Default,
-    val once: BooleanValue = BooleanValue.Default,
-    val passive: BooleanValue = BooleanValue.Default,
-) {
+class Options {
+    // TODO: add options for addEventListener
 
     companion object {
         val DEFAULT = Options()
-    }
-
-    enum class BooleanValue {
-        True, False, Default;
     }
 }
 

@@ -4,91 +4,45 @@ import org.w3c.dom.events.Event
 
 sealed class InputType<T>(val typeStr: String) {
 
-    object Button : InputType<Unit>("button") {
+    object Button : InputTypeWithUnitValue("button")
+    object Checkbox : InputTypeCheckedValue("checkbox")
+    object Color : InputTypeWithStringValue("color")
+    object Date : InputTypeWithStringValue("date")
+    object DateTimeLocal : InputTypeWithStringValue("datetime-local")
+    object Email : InputTypeWithStringValue("email")
+    object File : InputTypeWithStringValue("file")
+    object Hidden : InputTypeWithStringValue("hidden")
+    object Month : InputTypeWithStringValue("month")
+    object Number : InputTypeNumberValue("number")
+    object Password : InputTypeWithStringValue("password")
+    object Radio : InputTypeCheckedValue("radio")
+    object Range : InputTypeNumberValue("range")
+    object Search : InputTypeWithStringValue("search")
+    object Submit : InputTypeWithUnitValue("submit")
+    object Tel : InputTypeWithStringValue("tel")
+    object Text : InputTypeWithStringValue("text")
+    object Time : InputTypeWithStringValue("time")
+    object Url : InputTypeWithStringValue("url")
+    object Week : InputTypeWithStringValue("week")
+
+    open class InputTypeWithStringValue(name: String) : InputType<String>(name) {
+        override fun inputValue(event: Event) = Week.valueAsString(event)
+    }
+
+    open class InputTypeWithUnitValue(name: String) : InputType<Unit>(name) {
         override fun inputValue(event: Event) = Unit
     }
 
-    object Checkbox : InputType<Boolean>("checkbox") {
+    open class InputTypeCheckedValue(name: String) : InputType<Boolean>(name) {
         override fun inputValue(event: Event): Boolean {
             return event.target?.asDynamic()?.checked?.unsafeCast<Boolean>() ?: false
         }
     }
 
-    object Color : InputType<String>("color") {
-        override fun inputValue(event: Event) = valueAsString(event)
-    }
-
-    object Date : InputType<String>("date") {
-        override fun inputValue(event: Event) = valueAsString(event)
-    }
-
-    object DateTimeLocal : InputType<String>("datetime-local") {
-        override fun inputValue(event: Event) = valueAsString(event)
-    }
-
-    object Email : InputType<String>("email") {
-        override fun inputValue(event: Event) = valueAsString(event)
-    }
-
-    object File : InputType<String>("file") {
-        override fun inputValue(event: Event) = valueAsString(event)
-    }
-
-    object Hidden : InputType<String>("hidden") {
-        override fun inputValue(event: Event) = valueAsString(event)
-    }
-
-    object Month : InputType<String>("month") {
-        override fun inputValue(event: Event) = valueAsString(event)
-    }
-
-    object Number : InputType<kotlin.Number?>("number") {
-        override fun inputValue(event: Event): kotlin.Number? {
-            return event.target?.asDynamic()?.value ?: null
-        }
-    }
-
-    object Password : InputType<String>("password") {
-        override fun inputValue(event: Event) = valueAsString(event)
-    }
-
-    object Radio : InputType<Boolean>("radio") {
-        override fun inputValue(event: Event): Boolean {
-            return event.target?.asDynamic()?.checked?.unsafeCast<Boolean>() ?: false
-        }
-    }
-
-    object Range : InputType<kotlin.Number?>("range") {
+    open class InputTypeNumberValue(name: String) : InputType<kotlin.Number?>(name) {
         override fun inputValue(event: Event): kotlin.Number? {
             return event.target?.asDynamic()?.valueAsNumber ?: null
         }
-    }
-
-    object Search : InputType<String>("search") {
-        override fun inputValue(event: Event) = valueAsString(event)
-    }
-
-    object Submit : InputType<Unit>("submit") {
-        override fun inputValue(event: Event) = Unit
-    }
-
-    object Tel : InputType<String>("tel") {
-        override fun inputValue(event: Event) = valueAsString(event)
-    }
-
-    object Text : InputType<String>("text") {
-        override fun inputValue(event: Event) = valueAsString(event)
-    }
-
-    object Time : InputType<String>("time") {
-        override fun inputValue(event: Event) = Search.valueAsString(event)
-    }
-
-    object Url : InputType<String>("url") {
-        override fun inputValue(event: Event) = valueAsString(event)
-    }
-    object Week : InputType<String>("week") {
-        override fun inputValue(event: Event) = valueAsString(event)
     }
 
     abstract fun inputValue(event: Event): T

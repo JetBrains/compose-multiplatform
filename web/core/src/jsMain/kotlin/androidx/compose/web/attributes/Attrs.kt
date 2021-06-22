@@ -184,7 +184,7 @@ fun AttrsBuilder<HTMLInputElement>.size(value: Int) =
 fun AttrsBuilder<HTMLInputElement>.src(value: String) =
     attr("src", value) // image only
 
-fun AttrsBuilder<HTMLInputElement>.step(value: Int) =
+fun AttrsBuilder<HTMLInputElement>.step(value: Number) =
     attr("step", value.toString()) // numeric types only
 
 fun AttrsBuilder<HTMLInputElement>.valueAttr(value: String) =

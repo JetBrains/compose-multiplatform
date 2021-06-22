@@ -23,7 +23,6 @@ import org.w3c.dom.HTMLHeadingElement
 import org.w3c.dom.HTMLHRElement
 import org.w3c.dom.HTMLIFrameElement
 import org.w3c.dom.HTMLImageElement
-import org.w3c.dom.HTMLInputElement
 import org.w3c.dom.HTMLLIElement
 import org.w3c.dom.HTMLLabelElement
 import org.w3c.dom.HTMLLegendElement
@@ -48,7 +47,6 @@ import org.w3c.dom.HTMLTableColElement
 import org.w3c.dom.HTMLTableElement
 import org.w3c.dom.HTMLTableRowElement
 import org.w3c.dom.HTMLTableSectionElement
-import org.w3c.dom.HTMLTextAreaElement
 import org.w3c.dom.HTMLTrackElement
 import org.w3c.dom.HTMLUListElement
 import org.w3c.dom.HTMLVideoElement
@@ -348,38 +346,6 @@ fun A(
             }
         },
         content = content
-    )
-}
-
-@Composable
-fun <K> Input(
-    type: InputType<K>,
-    attrs: (InputAttrsBuilder<K>.() -> Unit)? = null
-) {
-    TagElement(
-        elementBuilder = ElementBuilder.Input,
-        applyAttrs = {
-            val iab = InputAttrsBuilder(type)
-            iab.type(type)
-            if (attrs != null) {
-                iab.attrs()
-            }
-            this.copyFrom(iab)
-        },
-        content = null
-    )
-}
-
-@Composable
-fun <K> Input(type: InputType<K>) {
-    TagElement(
-        elementBuilder = ElementBuilder.Input,
-        applyAttrs = {
-            val iab = InputAttrsBuilder(type)
-            iab.type(type)
-            this.copyFrom(iab)
-        },
-        content = null
     )
 }
 

@@ -39,10 +39,10 @@ class SyntheticInputEvent<ValueType, Element : HTMLElement>(
 
 class InputAttrsBuilder<T>(val inputType: InputType<T>) : AttrsBuilder<HTMLInputElement>() {
 
-    fun onInput(options: Options = Options.DEFAULT, f: (SyntheticInputEvent<T, HTMLInputElement>) -> Unit) {
+    fun onInput(options: Options = Options.DEFAULT, listener: (SyntheticInputEvent<T, HTMLInputElement>) -> Unit) {
         addEventListener(INPUT, options) {
             val value = inputType.inputValue(it.nativeEvent)
-            f(SyntheticInputEvent(value, it.nativeEvent.target as HTMLInputElement, it.nativeEvent))
+            listener(SyntheticInputEvent(value, it.nativeEvent.target as HTMLInputElement, it.nativeEvent))
         }
     }
 
