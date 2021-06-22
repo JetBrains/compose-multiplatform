@@ -25,11 +25,11 @@ import org.gradle.api.attributes.DocsType
 import org.gradle.api.attributes.Usage
 import org.gradle.api.component.AdhocComponentWithVariants
 import org.gradle.api.file.DuplicatesStrategy
-import org.gradle.api.plugins.JavaPluginExtension
+import org.gradle.api.plugins.JavaPluginConvention
 import org.gradle.api.tasks.TaskProvider
 import org.gradle.api.tasks.bundling.Jar
 import org.gradle.kotlin.dsl.extra
-import org.gradle.kotlin.dsl.getByType
+import org.gradle.kotlin.dsl.getPlugin
 import org.gradle.kotlin.dsl.named
 import org.jetbrains.kotlin.gradle.dsl.KotlinProjectExtension
 
@@ -70,8 +70,8 @@ fun Project.configureSourceJarForAndroid(extension: LibraryExtension) {
 fun Project.configureSourceJarForJava() {
     val sourceJar = tasks.register("sourceJar", Jar::class.java) {
         it.archiveClassifier.set("sources")
-        val extension = extensions.getByType<JavaPluginExtension>()
-        it.from(extension.sourceSets.getByName("main").allSource.srcDirs)
+        val convention = convention.getPlugin<JavaPluginConvention>()
+        it.from(convention.sourceSets.getByName("main").allSource.srcDirs)
         // Do not allow source files with duplicate names, information would be lost otherwise.
         it.duplicatesStrategy = DuplicatesStrategy.FAIL
     }
