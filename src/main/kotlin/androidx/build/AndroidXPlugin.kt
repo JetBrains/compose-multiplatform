@@ -19,6 +19,7 @@ package androidx.build
 import androidx.benchmark.gradle.BenchmarkPlugin
 import androidx.build.AndroidXPlugin.Companion.CHECK_RELEASE_READY_TASK
 import androidx.build.AndroidXPlugin.Companion.TASK_TIMEOUT_MINUTES
+import androidx.build.Release.DEFAULT_PUBLISH_CONFIG
 import androidx.build.SupportConfig.BUILD_TOOLS_VERSION
 import androidx.build.SupportConfig.COMPILE_SDK_VERSION
 import androidx.build.SupportConfig.DEFAULT_MIN_SDK_VERSION
@@ -262,6 +263,12 @@ class AndroidXPlugin : Plugin<Project> {
         val libraryExtension = project.extensions.getByType<LibraryExtension>().apply {
             configureAndroidCommonOptions(project, androidXExtension)
             configureAndroidLibraryOptions(project, androidXExtension)
+        }
+
+        project.extensions.getByType<com.android.build.api.dsl.LibraryExtension>().apply {
+            publishing {
+                singleVariant(DEFAULT_PUBLISH_CONFIG)
+            }
         }
 
         // TODO(aurimas): migrate away from this when upgrading to AGP 7.1.0-alpha03 or newer
