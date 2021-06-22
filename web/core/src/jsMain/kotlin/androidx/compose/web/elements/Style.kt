@@ -68,7 +68,7 @@ fun setCSSRules(sheet: CSSStyleSheet, cssRules: CSSRuleDeclarationList) {
 
 private fun CSSStyleSheet.addRule(cssRule: String): CSSRule {
     val cssRuleIndex = this.insertRule(cssRule, this.cssRules.length)
-    return this.cssRules[cssRuleIndex]
+    return this.cssRules.item(cssRuleIndex)!!
 }
 
 private fun CSSStyleSheet.addRule(cssRuleDeclaration: CSSRuleDeclaration) {
@@ -78,7 +78,7 @@ private fun CSSStyleSheet.addRule(cssRuleDeclaration: CSSRuleDeclaration) {
 
 private fun CSSGroupingRule.addRule(cssRule: String): CSSRule {
     val cssRuleIndex = this.insertRule(cssRule, this.cssRules.length)
-    return this.cssRules[cssRuleIndex]
+    return this.cssRules.item(cssRuleIndex)!!
 }
 
 private fun CSSGroupingRule.addRule(cssRuleDeclaration: CSSRuleDeclaration) {
@@ -108,7 +108,7 @@ private fun fillRule(
         }
     }
 }
-    
+
 fun setProperty(
     style: CSSStyleDeclaration,
     name: String,

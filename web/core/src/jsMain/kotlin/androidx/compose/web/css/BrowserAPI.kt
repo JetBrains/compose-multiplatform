@@ -6,13 +6,6 @@
 @file:Suppress("UNUSED", "NOTHING_TO_INLINE", "FunctionName")
 package org.jetbrains.compose.web.css
 
-import org.w3c.dom.css.CSSRule
-import org.w3c.dom.css.CSSRuleList
-
-inline operator fun CSSRuleList.get(index: Int): CSSRule {
-    return this.asDynamic()[index].unsafeCast<CSSRule>()
-}
-
 @Suppress("NOTHING_TO_INLINE")
 inline fun <T : Any> jsObject(): T =
     js("({})")
