@@ -25,7 +25,6 @@ import androidx.build.checkapi.getRequiredCompatibilityApiLocation
 import androidx.build.dependencyTracker.AffectedModuleDetector
 import androidx.build.java.JavaCompileInputs
 import androidx.build.uptodatedness.cacheEvenIfNoOutputs
-import com.android.build.gradle.api.LibraryVariant
 import com.android.build.gradle.tasks.ProcessLibraryManifest
 import org.gradle.api.Project
 import org.gradle.api.tasks.TaskProvider
@@ -198,11 +197,11 @@ object MetalavaTasks {
         task.bootClasspath = inputs.bootClasspath
     }
 
-    @Suppress("unused")
+    @Suppress("unused", "DEPRECATION") // deprecation for LibraryVariant
     private fun setupStubs(
         project: Project,
         javaCompileInputs: JavaCompileInputs,
-        variant: LibraryVariant
+        variant: com.android.build.gradle.api.LibraryVariant
     ) {
         if (hasKotlinCode(project, variant)) return
 
@@ -256,7 +255,11 @@ object MetalavaTasks {
          */
     }
 
-    private fun hasKotlinCode(project: Project, variant: LibraryVariant): Boolean {
+    @Suppress("DEPRECATION") // LibraryVariant
+    private fun hasKotlinCode(
+        project: Project,
+        variant: com.android.build.gradle.api.LibraryVariant
+    ): Boolean {
         return project.files(variant.sourceSets.flatMap { it.javaDirectories })
             .asFileTree
             .files
