@@ -20,6 +20,15 @@ fun WebDriver.waitTextToBe(textId: String = "txt", value: String) {
     WebDriverWait(this, 1).until(ExpectedConditions.textToBe(By.id(textId), value))
 }
 
+object Drivers {
+    val Chrome = ChromeDriver(
+        ChromeOptions().apply {
+            setHeadless(true)
+            addArguments("--no-sandbox")
+        }
+    )
+}
+
 @ExtendWith(value = [StaticServerSetupExtension::class])
 abstract class BaseIntegrationTests {
 
@@ -27,11 +36,6 @@ abstract class BaseIntegrationTests {
     fun waitTextToBe(textId: String = "txt", value: String)  = driver.waitTextToBe(textId, value)
 
     companion object  {
-        val driver: RemoteWebDriver = ChromeDriver(
-            ChromeOptions().apply {
-                setHeadless(true)
-                addArguments("--no-sandbox")
-            }
-        )
+        val driver: RemoteWebDriver = Drivers.Chrome
     }
 }
