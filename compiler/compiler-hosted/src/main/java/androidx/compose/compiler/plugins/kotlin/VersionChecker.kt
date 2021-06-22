@@ -45,7 +45,7 @@ class VersionChecker(val context: IrPluginContext) {
             2800 to "1.0.0-beta07",
             2900 to "1.0.0-beta08",
             3000 to "1.0.0-beta09",
-            3100 to "1.0.0-beta10",
+            3100 to "1.0.0-rc01",
         )
 
         /**
@@ -58,7 +58,7 @@ class VersionChecker(val context: IrPluginContext) {
          * The maven version string of this compiler. This string should be updated before/after every
          * release.
          */
-        val compilerVersion: String = "1.0.0-beta10"
+        val compilerVersion: String = "1.0.0-rc01"
         private val minimumRuntimeVersion: String
             get() = versionTable[minimumRuntimeVersionInt] ?: "unknown"
     }
