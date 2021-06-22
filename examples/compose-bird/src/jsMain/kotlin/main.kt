@@ -7,9 +7,7 @@ import data.GameFrame
 import kotlinx.browser.document
 import kotlinx.browser.window
 import kotlinx.coroutines.delay
-import org.jetbrains.compose.web.attributes.InputType
-import org.jetbrains.compose.web.attributes.checked
-import org.jetbrains.compose.web.attributes.disabled
+import org.jetbrains.compose.web.attributes.*
 import org.jetbrains.compose.web.css.*
 import org.jetbrains.compose.web.dom.*
 import org.jetbrains.compose.web.renderComposable
@@ -93,6 +91,11 @@ fun main() {
 
                                     attrs = {
 
+                                        style {
+                                            width(25.px)
+                                            height(25.px)
+                                        }
+
                                         val tube = gameFrame.tubes.find { it.position == columnIndex }
                                         val isTube = tube?.coordinates?.get(rowIndex) ?: false
                                         val isBird =
@@ -100,24 +103,15 @@ fun main() {
 
                                         if (isTube || isBird) {
                                             // if it's either a tube node or bird, check it
-                                            checked(true)
-                                        } else {
-                                            // otherwise, uncheck
-                                            checked(false)
+                                            checked()
                                         }
 
-                                        if (isBird) {
+                                        if (!isBird) {
                                             // if it's a bird, enable it. (to change to blue color)
-                                            disabled(false)
-                                        } else {
-                                            // if it's not a bird, disable it. (to change to grey color)
-                                            disabled(true)
+                                            disabled()
                                         }
 
-                                        style {
-                                            width(25.px)
-                                            height(25.px)
-                                        }
+
                                     }
                                 )
                             }
