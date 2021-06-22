@@ -20,7 +20,7 @@ package androidx.build
  * The list of versions codes of all the libraries in this project.
  */
 object LibraryVersions {
-    val ACTIVITY = Version("1.3.0-beta03")
+    val ACTIVITY = Version("1.4.0-alpha01")
     val ADS_IDENTIFIER = Version("1.0.0-alpha05")
     val ANNOTATION = Version("1.3.0-alpha01")
     val ANNOTATION_EXPERIMENTAL = Version("1.2.0-alpha01")
@@ -46,7 +46,7 @@ object LibraryVersions {
     val CAR_APP_PRE_RELEASE = Version("1.0.0-alpha01")
     val COLLECTION = Version("1.2.0-alpha02")
     val CONTENTPAGER = Version("1.1.0-alpha01")
-    val COMPOSE = Version(System.getenv("COMPOSE_CUSTOM_VERSION") ?: "1.0.0-beta10")
+    val COMPOSE = Version(System.getenv("COMPOSE_CUSTOM_VERSION") ?: "1.1.0-alpha01")
     val COORDINATORLAYOUT = Version("1.2.0-alpha01")
     val CORE = Version("1.7.0-alpha01")
     val CORE_ANIMATION = Version("1.0.0-alpha03")
@@ -96,7 +96,7 @@ object LibraryVersions {
     val PRINT = Version("1.1.0-beta01")
     val PERCENTLAYOUT = Version("1.1.0-alpha01")
     val PREFERENCE = Version("1.2.0-alpha01")
-    val PROFILEINSTALLER = Version("1.0.0-beta02")
+    val PROFILEINSTALLER = Version("1.1.0-alpha01")
     val RECOMMENDATION = Version("1.1.0-alpha01")
     val RECYCLERVIEW = Version("1.3.0-alpha01")
     val RECYCLERVIEW_SELECTION = Version("1.2.0-alpha02")
