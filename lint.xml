@@ -4,4 +4,15 @@
     <issue id="LintBaseline" severity="ignore">
         <ignore regexp=".* filtered out because .* listed in the baseline file.*"/>
     </issue>
+    <!-- Disable all lint checks on tests by default. -->
+    <issue id="all">
+        <ignore path="**/src/test/**" />
+        <ignore path="**/src/androidTest/**" />
+        <!-- Required for Kotlin multi-platform tests. -->
+        <ignore path="**/src/androidAndroidTest/**" />
+        <!-- Required for AppSearch icing tests. -->
+        <ignore path="**/java/tests/**" />
+    </issue>
+    <!-- Re-enable NewApi for tests (and everything else). -->
+    <issue id="NewApi" severity="fatal" />
 </lint>
