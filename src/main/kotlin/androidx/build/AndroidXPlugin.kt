@@ -37,7 +37,6 @@ import androidx.build.studio.StudioTask
 import androidx.build.testConfiguration.addAppApkToTestConfigGeneration
 import androidx.build.testConfiguration.addToTestZips
 import androidx.build.testConfiguration.configureTestConfigGeneration
-import com.android.build.api.extension.ApplicationAndroidComponentsExtension
 import com.android.build.gradle.AppExtension
 import com.android.build.gradle.AppPlugin
 import com.android.build.gradle.LibraryExtension
@@ -238,18 +237,19 @@ class AndroidXPlugin : Plugin<Project> {
             configureAndroidApplicationOptions(project)
         }
 
-        project.extensions.getByType<ApplicationAndroidComponentsExtension>().apply {
-            onVariants { variant ->
-                variant.androidTest?.packaging?.resources?.apply {
-                    // Workaround a limitation in AGP that fails to merge these META-INF license files.
-                    pickFirsts.add("/META-INF/AL2.0")
-                    // In addition to working around the above issue, we exclude the LGPL2.1 license as we're
-                    // approved to distribute code via AL2.0 and the only dependencies which pull in LGPL2.1
-                    // are currently dual-licensed with AL2.0 and LGPL2.1. The affected dependencies are:
-                    //   - net.java.dev.jna:jna:5.5.0
-                    excludes.add("/META-INF/LGPL2.1")
-                }
-            }
+        // TODO: Replace this with a per-variant packagingOption for androidTest specifically once
+        //  b/69953968 is resolved.
+        appExtension.packagingOptions.resources {
+            // Workaround for b/161465530 in AGP that fails to strip these <module>.kotlin_module files,
+            // which causes mergeDebugAndroidTestJavaResource to fail for sample apps.
+            excludes.add("/META-INF/*.kotlin_module")
+            // Workaround a limitation in AGP that fails to merge these META-INF license files.
+            pickFirsts.add("/META-INF/AL2.0")
+            // In addition to working around the above issue, we exclude the LGPL2.1 license as we're
+            // approved to distribute code via AL2.0 and the only dependencies which pull in LGPL2.1
+            // are currently dual-licensed with AL2.0 and LGPL2.1. The affected dependencies are:
+            //   - net.java.dev.jna:jna:5.5.0
+            excludes.add("/META-INF/LGPL2.1")
         }
         project.configureAndroidProjectForLint(appExtension.lintOptions, androidXExtension)
     }
