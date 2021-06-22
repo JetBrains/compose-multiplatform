@@ -1,0 +1,114 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<issues format="6" by="lint 7.1.0-alpha02" type="baseline" client="cli" name="Lint" variant="all" version="7.1.0-alpha02">
+
+    <issue
+        id="NewApi"
+        message="Call requires API level 29 (current min is 28): `MacrobenchmarkRule`"
+        errorLine1="    val benchmarkRule = MacrobenchmarkRule()"
+        errorLine2="                        ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/androidTest/java/androidx/compose/integration/macrobenchmark/IoSettingsStartupBenchmark.kt"
+            line="37"
+            column="25"/>
+    </issue>
+
+    <issue
+        id="NewApi"
+        message="Call requires API level 29 (current min is 28): `measureStartup`"
+        errorLine1="    fun startup() = benchmarkRule.measureStartup("
+        errorLine2="                                  ~~~~~~~~~~~~~~">
+        <location
+            file="src/androidTest/java/androidx/compose/integration/macrobenchmark/IoSettingsStartupBenchmark.kt"
+            line="40"
+            column="35"/>
+    </issue>
+
+    <issue
+        id="NewApi"
+        message="Call requires API level 29 (current min is 28): `MacrobenchmarkRule`"
+        errorLine1="    val benchmarkRule = MacrobenchmarkRule()"
+        errorLine2="                        ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/androidTest/java/androidx/compose/integration/macrobenchmark/NestedListsScrollBenchmark.kt"
+            line="42"
+            column="25"/>
+    </issue>
+
+    <issue
+        id="NewApi"
+        message="Call requires API level 29 (current min is 28): `measureRepeated`"
+        errorLine1="        benchmarkRule.measureRepeated("
+        errorLine2="                      ~~~~~~~~~~~~~~~">
+        <location
+            file="src/androidTest/java/androidx/compose/integration/macrobenchmark/NestedListsScrollBenchmark.kt"
+            line="54"
+            column="23"/>
+    </issue>
+
+    <issue
+        id="NewApi"
+        message="Call requires API level 29 (current min is 28): `MacrobenchmarkRule`"
+        errorLine1="    val benchmarkRule = MacrobenchmarkRule()"
+        errorLine2="                        ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/androidTest/java/androidx/compose/integration/macrobenchmark/SmallListStartupBenchmark.kt"
+            line="37"
+            column="25"/>
+    </issue>
+
+    <issue
+        id="NewApi"
+        message="Call requires API level 29 (current min is 28): `measureStartup`"
+        errorLine1="    fun startup() = benchmarkRule.measureStartup("
+        errorLine2="                                  ~~~~~~~~~~~~~~">
+        <location
+            file="src/androidTest/java/androidx/compose/integration/macrobenchmark/SmallListStartupBenchmark.kt"
+            line="40"
+            column="35"/>
+    </issue>
+
+    <issue
+        id="NewApi"
+        message="Call requires API level 29 (current min is 28): `MacrobenchmarkRule`"
+        errorLine1="    val benchmarkRule = MacrobenchmarkRule()"
+        errorLine2="                        ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/androidTest/java/androidx/compose/integration/macrobenchmark/TrivialListScrollBenchmark.kt"
+            line="42"
+            column="25"/>
+    </issue>
+
+    <issue
+        id="NewApi"
+        message="Call requires API level 29 (current min is 28): `measureRepeated`"
+        errorLine1="        benchmarkRule.measureRepeated("
+        errorLine2="                      ~~~~~~~~~~~~~~~">
+        <location
+            file="src/androidTest/java/androidx/compose/integration/macrobenchmark/TrivialListScrollBenchmark.kt"
+            line="54"
+            column="23"/>
+    </issue>
+
+    <issue
+        id="NewApi"
+        message="Call requires API level 29 (current min is 28): `MacrobenchmarkRule`"
+        errorLine1="    val benchmarkRule = MacrobenchmarkRule()"
+        errorLine2="                        ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/androidTest/java/androidx/compose/integration/macrobenchmark/TrivialStartupBenchmark.kt"
+            line="37"
+            column="25"/>
+    </issue>
+
+    <issue
+        id="NewApi"
+        message="Call requires API level 29 (current min is 28): `measureStartup`"
+        errorLine1="    fun startup() = benchmarkRule.measureStartup("
+        errorLine2="                                  ~~~~~~~~~~~~~~">
+        <location
+            file="src/androidTest/java/androidx/compose/integration/macrobenchmark/TrivialStartupBenchmark.kt"
+            line="40"
+            column="35"/>
+    </issue>
+
+</issues>

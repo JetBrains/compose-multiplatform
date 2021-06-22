@@ -1,0 +1,543 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<issues format="6" by="lint 7.1.0-alpha02" type="baseline" client="cli" name="Lint" variant="all" version="7.1.0-alpha02">
+
+    <issue
+        id="NewApi"
+        message="Call requires API level 26 (current min is 21): `waitAndScreenShot`"
+        errorLine1="        val bitmap = rule.waitAndScreenShot()"
+        errorLine2="                          ~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/androidAndroidTest/kotlin/androidx/compose/ui/draw/AlphaTest.kt"
+            line="231"
+            column="27"/>
+    </issue>
+
+    <issue
+        id="NewApi"
+        message="Call requires API level 29 (current min is 21): `RenderNodeApi29`"
+        errorLine1="        RenderNodeApi29(AndroidComposeView(activity)).apply {"
+        errorLine2="        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/androidAndroidTest/kotlin/androidx/compose/ui/AndroidLayoutDrawTest.kt"
+            line="224"
+            column="9"/>
+    </issue>
+
+    <issue
+        id="NewApi"
+        message="Call requires API level 29 (current min is 21): `dumpRenderNodeData`"
+        errorLine1="        }.dumpRenderNodeData().cameraDistance == cameraDistance"
+        errorLine2="          ~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/androidAndroidTest/kotlin/androidx/compose/ui/AndroidLayoutDrawTest.kt"
+            line="226"
+            column="11"/>
+    </issue>
+
+    <issue
+        id="NewApi"
+        message="Call requires API level 23 (current min is 21): `RenderNodeApi23`"
+        errorLine1="        RenderNodeApi23(AndroidComposeView(activity)).apply {"
+        errorLine2="        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/androidAndroidTest/kotlin/androidx/compose/ui/AndroidLayoutDrawTest.kt"
+            line="231"
+            column="9"/>
+    </issue>
+
+    <issue
+        id="NewApi"
+        message="Call requires API level 23 (current min is 21): `dumpRenderNodeData`"
+        errorLine1="        }.dumpRenderNodeData().cameraDistance == -cameraDistance // Camera distance is negative"
+        errorLine2="          ~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/androidAndroidTest/kotlin/androidx/compose/ui/AndroidLayoutDrawTest.kt"
+            line="233"
+            column="11"/>
+    </issue>
+
+    <issue
+        id="NewApi"
+        message="Call requires API level 26 (current min is 21): `waitAndScreenShot`"
+        errorLine1="    val bitmap = waitAndScreenShot()"
+        errorLine2="                 ~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/androidAndroidTest/kotlin/androidx/compose/ui/AndroidLayoutDrawTest.kt"
+            line="3707"
+            column="18"/>
+    </issue>
+
+    <issue
+        id="NewApi"
+        message="Call requires API level 26 (current min is 21): `AndroidAutofill`"
+        errorLine1="        androidAutofill = AndroidAutofill(view, autofillTree)"
+        errorLine2="                          ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/test/kotlin/androidx/compose/ui/autofill/AndroidPerformAutofillTest.kt"
+            line="46"
+            column="27"/>
+    </issue>
+
+    <issue
+        id="NewApi"
+        message="Call requires API level 26 (current min is 21): `android.view.autofill.AutofillValue#forText`"
+        errorLine1="            .apply { append(autofillNode.id, AutofillValue.forText(expectedValue)) }"
+        errorLine2="                                                           ~~~~~~~">
+        <location
+            file="src/test/kotlin/androidx/compose/ui/autofill/AndroidPerformAutofillTest.kt"
+            line="62"
+            column="60"/>
+    </issue>
+
+    <issue
+        id="NewApi"
+        message="Call requires API level 26 (current min is 21): `performAutofill`"
+        errorLine1="        androidAutofill.performAutofill(autofillValues)"
+        errorLine2="                        ~~~~~~~~~~~~~~~">
+        <location
+            file="src/test/kotlin/androidx/compose/ui/autofill/AndroidPerformAutofillTest.kt"
+            line="65"
+            column="25"/>
+    </issue>
+
+    <issue
+        id="NewApi"
+        message="Call requires API level 26 (current min is 21): `android.view.autofill.AutofillValue#forText`"
+        errorLine1="            .apply { append(autofillNode.id, AutofillValue.forText(expectedValue)) }"
+        errorLine2="                                                           ~~~~~~~">
+        <location
+            file="src/test/kotlin/androidx/compose/ui/autofill/AndroidPerformAutofillTest.kt"
+            line="84"
+            column="60"/>
+    </issue>
+
+    <issue
+        id="NewApi"
+        message="Call requires API level 26 (current min is 21): `performAutofill`"
+        errorLine1="        androidAutofill.performAutofill(autofillValues)"
+        errorLine2="                        ~~~~~~~~~~~~~~~">
+        <location
+            file="src/test/kotlin/androidx/compose/ui/autofill/AndroidPerformAutofillTest.kt"
+            line="87"
+            column="25"/>
+    </issue>
+
+    <issue
+        id="NewApi"
+        message="Call requires API level 26 (current min is 21): `AndroidAutofill`"
+        errorLine1="        androidAutofill = AndroidAutofill(view, autofillTree)"
+        errorLine2="                          ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/test/kotlin/androidx/compose/ui/autofill/AndroidPopulateViewStructureTest.kt"
+            line="50"
+            column="27"/>
+    </issue>
+
+    <issue
+        id="NewApi"
+        message="Call requires API level 26 (current min is 21): `FakeAndroidViewStructure`"
+        errorLine1="        val viewStructure: ViewStructure = FakeAndroidViewStructure()"
+        errorLine2="                                           ~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/test/kotlin/androidx/compose/ui/autofill/AndroidPopulateViewStructureTest.kt"
+            line="57"
+            column="44"/>
+    </issue>
+
+    <issue
+        id="NewApi"
+        message="Call requires API level 26 (current min is 21): `populateViewStructure`"
+        errorLine1="        androidAutofill.populateViewStructure(viewStructure)"
+        errorLine2="                        ~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/test/kotlin/androidx/compose/ui/autofill/AndroidPopulateViewStructureTest.kt"
+            line="60"
+            column="25"/>
+    </issue>
+
+    <issue
+        id="NewApi"
+        message="Call requires API level 23 (current min is 21): `android.view.ViewStructure#getChildCount`"
+        errorLine1="        assertThat(viewStructure.childCount).isEqualTo(0)"
+        errorLine2="                                 ~~~~~~~~~~">
+        <location
+            file="src/test/kotlin/androidx/compose/ui/autofill/AndroidPopulateViewStructureTest.kt"
+            line="63"
+            column="34"/>
+    </issue>
+
+    <issue
+        id="NewApi"
+        message="Call requires API level 26 (current min is 21): `FakeAndroidViewStructure`"
+        errorLine1="        val viewStructure = FakeAndroidViewStructure()"
+        errorLine2="                            ~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/test/kotlin/androidx/compose/ui/autofill/AndroidPopulateViewStructureTest.kt"
+            line="77"
+            column="29"/>
+    </issue>
+
+    <issue
+        id="NewApi"
+        message="Call requires API level 26 (current min is 21): `populateViewStructure`"
+        errorLine1="        androidAutofill.populateViewStructure(viewStructure)"
+        errorLine2="                        ~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/test/kotlin/androidx/compose/ui/autofill/AndroidPopulateViewStructureTest.kt"
+            line="78"
+            column="25"/>
+    </issue>
+
+    <issue
+        id="NewApi"
+        message="Call requires API level 26 (current min is 21): `FakeAndroidViewStructure`"
+        errorLine1="            FakeAndroidViewStructure().apply {"
+        errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/test/kotlin/androidx/compose/ui/autofill/AndroidPopulateViewStructureTest.kt"
+            line="82"
+            column="13"/>
+    </issue>
+
+    <issue
+        id="NewApi"
+        message="Call requires API level 26 (current min is 21): `FakeAndroidViewStructure`"
+        errorLine1="                    FakeAndroidViewStructure().apply {"
+        errorLine2="                    ~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/test/kotlin/androidx/compose/ui/autofill/AndroidPopulateViewStructureTest.kt"
+            line="84"
+            column="21"/>
+    </issue>
+
+    <issue
+        id="NewApi"
+        message="Call requires API level 26 (current min is 21): `setAutofillType`"
+        errorLine1="                        setAutofillType(View.AUTOFILL_TYPE_TEXT)"
+        errorLine2="                        ~~~~~~~~~~~~~~~">
+        <location
+            file="src/test/kotlin/androidx/compose/ui/autofill/AndroidPopulateViewStructureTest.kt"
+            line="87"
+            column="25"/>
+    </issue>
+
+    <issue
+        id="NewApi"
+        message="Call requires API level 26 (current min is 21): `setAutofillHints`"
+        errorLine1="                        setAutofillHints(arrayOf(AUTOFILL_HINT_PERSON_NAME))"
+        errorLine2="                        ~~~~~~~~~~~~~~~~">
+        <location
+            file="src/test/kotlin/androidx/compose/ui/autofill/AndroidPopulateViewStructureTest.kt"
+            line="88"
+            column="25"/>
+    </issue>
+
+    <issue
+        id="NewApi"
+        message="Call requires API level 26 (current min is 21): `setDimens`"
+        errorLine1="                        setDimens(0, 0, 0, 0, 0, 0)"
+        errorLine2="                        ~~~~~~~~~">
+        <location
+            file="src/test/kotlin/androidx/compose/ui/autofill/AndroidPopulateViewStructureTest.kt"
+            line="89"
+            column="25"/>
+    </issue>
+
+    <issue
+        id="NewApi"
+        message="Call requires API level 26 (current min is 21): `FakeAndroidViewStructure`"
+        errorLine1="        val viewStructure: ViewStructure = FakeAndroidViewStructure()"
+        errorLine2="                                           ~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/test/kotlin/androidx/compose/ui/autofill/AndroidPopulateViewStructureTest.kt"
+            line="114"
+            column="44"/>
+    </issue>
+
+    <issue
+        id="NewApi"
+        message="Call requires API level 26 (current min is 21): `populateViewStructure`"
+        errorLine1="        androidAutofill.populateViewStructure(viewStructure)"
+        errorLine2="                        ~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/test/kotlin/androidx/compose/ui/autofill/AndroidPopulateViewStructureTest.kt"
+            line="115"
+            column="25"/>
+    </issue>
+
+    <issue
+        id="NewApi"
+        message="Call requires API level 26 (current min is 21): `FakeAndroidViewStructure`"
+        errorLine1="            FakeAndroidViewStructure().apply {"
+        errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/test/kotlin/androidx/compose/ui/autofill/AndroidPopulateViewStructureTest.kt"
+            line="119"
+            column="13"/>
+    </issue>
+
+    <issue
+        id="NewApi"
+        message="Call requires API level 26 (current min is 21): `FakeAndroidViewStructure`"
+        errorLine1="                    FakeAndroidViewStructure().apply {"
+        errorLine2="                    ~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/test/kotlin/androidx/compose/ui/autofill/AndroidPopulateViewStructureTest.kt"
+            line="121"
+            column="21"/>
+    </issue>
+
+    <issue
+        id="NewApi"
+        message="Call requires API level 26 (current min is 21): `setAutofillType`"
+        errorLine1="                        setAutofillType(View.AUTOFILL_TYPE_TEXT)"
+        errorLine2="                        ~~~~~~~~~~~~~~~">
+        <location
+            file="src/test/kotlin/androidx/compose/ui/autofill/AndroidPopulateViewStructureTest.kt"
+            line="124"
+            column="25"/>
+    </issue>
+
+    <issue
+        id="NewApi"
+        message="Call requires API level 26 (current min is 21): `setAutofillHints`"
+        errorLine1="                        setAutofillHints(arrayOf(AUTOFILL_HINT_PERSON_NAME))"
+        errorLine2="                        ~~~~~~~~~~~~~~~~">
+        <location
+            file="src/test/kotlin/androidx/compose/ui/autofill/AndroidPopulateViewStructureTest.kt"
+            line="125"
+            column="25"/>
+    </issue>
+
+    <issue
+        id="NewApi"
+        message="Call requires API level 26 (current min is 21): `setDimens`"
+        errorLine1="                        setDimens(0, 0, 0, 0, 0, 0)"
+        errorLine2="                        ~~~~~~~~~">
+        <location
+            file="src/test/kotlin/androidx/compose/ui/autofill/AndroidPopulateViewStructureTest.kt"
+            line="126"
+            column="25"/>
+    </issue>
+
+    <issue
+        id="NewApi"
+        message="Call requires API level 26 (current min is 21): `FakeAndroidViewStructure`"
+        errorLine1="                    FakeAndroidViewStructure().apply {"
+        errorLine2="                    ~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/test/kotlin/androidx/compose/ui/autofill/AndroidPopulateViewStructureTest.kt"
+            line="130"
+            column="21"/>
+    </issue>
+
+    <issue
+        id="NewApi"
+        message="Call requires API level 26 (current min is 21): `setAutofillType`"
+        errorLine1="                        setAutofillType(View.AUTOFILL_TYPE_TEXT)"
+        errorLine2="                        ~~~~~~~~~~~~~~~">
+        <location
+            file="src/test/kotlin/androidx/compose/ui/autofill/AndroidPopulateViewStructureTest.kt"
+            line="133"
+            column="25"/>
+    </issue>
+
+    <issue
+        id="NewApi"
+        message="Call requires API level 26 (current min is 21): `setAutofillHints`"
+        errorLine1="                        setAutofillHints(arrayOf(View.AUTOFILL_HINT_EMAIL_ADDRESS))"
+        errorLine2="                        ~~~~~~~~~~~~~~~~">
+        <location
+            file="src/test/kotlin/androidx/compose/ui/autofill/AndroidPopulateViewStructureTest.kt"
+            line="134"
+            column="25"/>
+    </issue>
+
+    <issue
+        id="NewApi"
+        message="Call requires API level 26 (current min is 21): `setDimens`"
+        errorLine1="                        setDimens(0, 0, 0, 0, 0, 0)"
+        errorLine2="                        ~~~~~~~~~">
+        <location
+            file="src/test/kotlin/androidx/compose/ui/autofill/AndroidPopulateViewStructureTest.kt"
+            line="135"
+            column="25"/>
+    </issue>
+
+    <issue
+        id="NewApi"
+        message="Call requires API level 23 (current min is 21): `android.content.Context#getSystemService`"
+        errorLine1="            activity.getSystemService(AutofillManager::class.java)"
+        errorLine2="                     ~~~~~~~~~~~~~~~~">
+        <location
+            file="src/test/kotlin/androidx/compose/ui/autofill/AutofillNodeTest.kt"
+            line="60"
+            column="22"/>
+    </issue>
+
+    <issue
+        id="NewApi"
+        message="Class requires API level 26 (current min is 21): `android.view.autofill.AutofillManager`"
+        errorLine1="            activity.getSystemService(AutofillManager::class.java)"
+        errorLine2="                                      ~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/test/kotlin/androidx/compose/ui/autofill/AutofillNodeTest.kt"
+            line="60"
+            column="39"/>
+    </issue>
+
+    <issue
+        id="NewApi"
+        message="Call requires API level 26 (current min is 21): `AndroidAutofill`"
+        errorLine1="        androidAutofill = AndroidAutofill(view, autofillTree)"
+        errorLine2="                          ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/test/kotlin/androidx/compose/ui/autofill/AutofillNodeTest.kt"
+            line="63"
+            column="27"/>
+    </issue>
+
+    <issue
+        id="NewApi"
+        message="Call requires API level 26 (current min is 21): `android.view.View#getImportantForAutofill`"
+        errorLine1="        assertThat(view.importantForAutofill).isEqualTo(View.IMPORTANT_FOR_AUTOFILL_YES)"
+        errorLine2="                        ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/test/kotlin/androidx/compose/ui/autofill/AutofillNodeTest.kt"
+            line="74"
+            column="25"/>
+    </issue>
+
+    <issue
+        id="NewApi"
+        message="Call requires API level 26 (current min is 21): `requestAutofillForNode`"
+        errorLine1="        androidAutofill.requestAutofillForNode(autofillNode)"
+        errorLine2="                        ~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/test/kotlin/androidx/compose/ui/autofill/AutofillNodeTest.kt"
+            line="84"
+            column="25"/>
+    </issue>
+
+    <issue
+        id="NewApi"
+        message="Call requires API level 26 (current min is 21): `requestAutofillForNode`"
+        errorLine1="        androidAutofill.requestAutofillForNode(autofillNode)"
+        errorLine2="                        ~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/test/kotlin/androidx/compose/ui/autofill/AutofillNodeTest.kt"
+            line="101"
+            column="25"/>
+    </issue>
+
+    <issue
+        id="NewApi"
+        message="Call requires API level 26 (current min is 21): `cancelAutofillForNode`"
+        errorLine1="        androidAutofill.cancelAutofillForNode(autofillNode)"
+        errorLine2="                        ~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/test/kotlin/androidx/compose/ui/autofill/AutofillNodeTest.kt"
+            line="110"
+            column="25"/>
+    </issue>
+
+    <issue
+        id="NewApi"
+        message="Call requires API level 26 (current min is 21): `waitAndScreenShot`"
+        errorLine1="        val bitmap = rule.waitAndScreenShot()"
+        errorLine2="                          ~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/androidAndroidTest/kotlin/androidx/compose/ui/draw/ClipDrawTest.kt"
+            line="524"
+            column="27"/>
+    </issue>
+
+    <issue
+        id="NewApi"
+        message="Call requires API level 29 (current min is 21): `android.os.Parcel#readBoolean`"
+        errorLine1="        parcel?.readBoolean()"
+        errorLine2="                ~~~~~~~~~~~">
+        <location
+            file="src/androidAndroidTest/kotlin/androidx/compose/ui/platform/DisposableSaveableStateRegistryTest.kt"
+            line="184"
+            column="17"/>
+    </issue>
+
+    <issue
+        id="NewApi"
+        message="Call requires API level 29 (current min is 21): `android.os.Parcel#readBoolean`"
+        errorLine1="        parcel?.readBoolean()"
+        errorLine2="                ~~~~~~~~~~~">
+        <location
+            file="src/androidAndroidTest/kotlin/androidx/compose/ui/platform/DisposableSaveableStateRegistryTest.kt"
+            line="184"
+            column="17"/>
+    </issue>
+
+    <issue
+        id="NewApi"
+        message="Call requires API level 29 (current min is 21): `android.os.Parcel#writeBoolean`"
+        errorLine1="        parcel.writeBoolean(true)"
+        errorLine2="               ~~~~~~~~~~~~">
+        <location
+            file="src/androidAndroidTest/kotlin/androidx/compose/ui/platform/DisposableSaveableStateRegistryTest.kt"
+            line="188"
+            column="16"/>
+    </issue>
+
+    <issue
+        id="NewApi"
+        message="Call requires API level 26 (current min is 21): `captureToImage`"
+        errorLine1="    fun SemanticsNodeInteraction.captureToBitmap() = captureToImage().asAndroidBitmap()"
+        errorLine2="                                                     ~~~~~~~~~~~~~~">
+        <location
+            file="src/androidAndroidTest/kotlin/androidx/compose/ui/draw/DrawModifierTest.kt"
+            line="638"
+            column="54"/>
+    </issue>
+
+    <issue
+        id="NewApi"
+        message="Call requires API level 26 (current min is 21): `captureToImage`"
+        errorLine1="            .captureToImage()"
+        errorLine2="             ~~~~~~~~~~~~~~">
+        <location
+            file="src/androidAndroidTest/kotlin/androidx/compose/ui/draw/InvalidatingNotPlacedChildTest.kt"
+            line="378"
+            column="14"/>
+    </issue>
+
+    <issue
+        id="NewApi"
+        message="Call requires API level 26 (current min is 21): `captureToImage`"
+        errorLine1="    val bitmap = onRoot().captureToImage()"
+        errorLine2="                          ~~~~~~~~~~~~~~">
+        <location
+            file="src/androidAndroidTest/kotlin/androidx/compose/ui/draw/PainterModifierTest.kt"
+            line="720"
+            column="27"/>
+    </issue>
+
+    <issue
+        id="NewApi"
+        message="Call requires API level 26 (current min is 21): `waitAndScreenShot`"
+        errorLine1="        val bitmap = rule.waitAndScreenShot()"
+        errorLine2="                          ~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/androidAndroidTest/kotlin/androidx/compose/ui/draw/ShadowTest.kt"
+            line="342"
+            column="27"/>
+    </issue>
+
+    <issue
+        id="NewApi"
+        message="Call requires API level 26 (current min is 21): `captureToImage`"
+        errorLine1="        val bitmap = rule.onRoot().captureToImage().asAndroidBitmap()"
+        errorLine2="                                   ~~~~~~~~~~~~~~">
+        <location
+            file="src/androidAndroidTest/kotlin/androidx/compose/ui/graphics/vector/VectorTest.kt"
+            line="481"
+            column="36"/>
+    </issue>
+
+</issues>
