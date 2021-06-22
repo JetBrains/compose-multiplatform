@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package androidx.compose.ui.tooling.preview.animation
+package androidx.compose.ui.tooling.animation
 
 import android.util.Log
 import androidx.compose.animation.core.Transition

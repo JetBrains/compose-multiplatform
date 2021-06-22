@@ -18,7 +18,7 @@
 
     <application>
         <activity
-            android:name=".preview.PreviewActivity"
+            android:name=".PreviewActivity"
             android:exported="true" />
     </application>
 
