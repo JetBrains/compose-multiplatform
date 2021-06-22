@@ -410,7 +410,6 @@ fun main() = application {
     }
 }
 ```
-(Currently it is a bit verbose, but in the future we will investigate how we can provide a simple API for handling window key events).
 
 ## Dialogs
 There are two types of window – modal and regular. Below are the functions for creating each:
