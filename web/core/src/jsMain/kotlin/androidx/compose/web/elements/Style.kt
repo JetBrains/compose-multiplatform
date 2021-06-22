@@ -70,14 +70,14 @@ private fun StyleSheet.addRule(cssRule: String): CSSRule {
     return this.cssRules[cssRuleIndex]
 }
 
-private fun CSSGroupingRule.addRule(cssRule: String): CSSRule {
-    val cssRuleIndex = this.insertRule(cssRule, this.cssRules.length)
-    return this.cssRules[cssRuleIndex]
-}
-
 private fun StyleSheet.addRule(cssRuleDeclaration: CSSRuleDeclaration) {
     val cssRule = addRule("${cssRuleDeclaration.header} {}")
     fillRule(cssRuleDeclaration, cssRule)
+}
+
+private fun CSSGroupingRule.addRule(cssRule: String): CSSRule {
+    val cssRuleIndex = this.insertRule(cssRule, this.cssRules.length)
+    return this.cssRules[cssRuleIndex]
 }
 
 private fun CSSGroupingRule.addRule(cssRuleDeclaration: CSSRuleDeclaration) {
