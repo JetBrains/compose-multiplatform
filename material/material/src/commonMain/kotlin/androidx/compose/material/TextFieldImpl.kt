@@ -194,6 +194,7 @@ internal fun TextFieldImpl(
                     indicatorColor =
                         colors.indicatorColor(enabled, isError, interactionSource).value,
                     shape = shape,
+                    backgroundColor = colors.backgroundColor(enabled).value,
                     cursorColor = colors.cursorColor(isError).value
                 )
             }
