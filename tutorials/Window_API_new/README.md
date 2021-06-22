@@ -147,11 +147,11 @@ import java.awt.image.BufferedImage
 
 @OptIn(ExperimentalComposeUiApi::class)
 fun main() = application {
-    val state = rememberWindowState()
+    var isVisible by remember { mutableStateOf(true) }
 
     Window(
-        onCloseRequest = { state.isVisible = false },
-        state,
+        onCloseRequest = { isVisible = false },
+        visible = isVisible,
         title = "Counter",
     ) {
         var counter by remember { mutableStateOf(0) }
@@ -164,13 +164,13 @@ fun main() = application {
         Text(counter.toString())
     }
 
-    if (!state.isVisible && state.isOpen) {
+    if (!isVisible) {
         Tray(
             remember { getTrayIcon() },
             hint = "Counter",
-            onAction = { state.isVisible = true },
+            onAction = { isVisible = true },
             menu = {
-                Item("Exit", onClick = { state.isOpen = false })
+                Item("Exit", onClick = ::exitApplication)
             },
         )
     }
@@ -273,6 +273,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Window
 import androidx.compose.ui.window.WindowPlacement
+import androidx.compose.ui.window.WindowPosition
 import androidx.compose.ui.window.application
 import androidx.compose.ui.window.rememberWindowState
 
@@ -429,12 +430,17 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.window.Dialog
+import androidx.compose.ui.window.DialogState
 import androidx.compose.ui.window.Window
+import androidx.compose.ui.window.WindowPosition
+import androidx.compose.ui.window.WindowState
 import androidx.compose.ui.window.application
 
 @OptIn(ExperimentalComposeUiApi::class)
 fun main() = application {
-    Window {
+    Window(
+        onCloseRequest = ::exitApplication,
+    ) {
         var isDialogOpen by remember { mutableStateOf(false) }
 
         Button(onClick = { isDialogOpen = true }) {
@@ -444,7 +450,7 @@ fun main() = application {
         if (isDialogOpen) {
             Dialog(
                 onCloseRequest = { isDialogOpen = false },
-                initialAlignment = Alignment.Center
+                state = DialogState(position = WindowPosition(Alignment.Center))
             ) {
                 // Dialog's content
             }
