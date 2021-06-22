@@ -19,6 +19,7 @@ at https://android.googlesource.com/platform/frameworks/support.
        * [issues](examples/issues) - GitHub issue tracker with an adaptive UI and ktor-client
        * [game](examples/falling_balls) - Simple game
        * [game](examples/falling_balls_with_web) - Simple game for web target
+       * [compose-bird](examples/compose-bird) - A flappy bird clone using Compose for Web
        * [notepad](examples/notepad) - Notepad, using the new experimental Composable Window API
        * [todoapp](examples/todoapp) - TODO items tracker with persistence and multiple screens
        * [widgetsgallery](examples/widgetsgallery) - Gallery of standard widgets
