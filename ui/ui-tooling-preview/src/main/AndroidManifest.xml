@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--
-  Copyright 2019 The Android Open Source Project
+  Copyright 2021 The Android Open Source Project
 
   Licensed under the Apache License, Version 2.0 (the "License");
   you may not use this file except in compliance with the License.
@@ -15,8 +15,7 @@
   limitations under the License.
   -->
 
-<androidx.compose.ui.tooling.ComposeViewAdapter
-    xmlns:android="http://schemas.android.com/apk/res/android"
-    android:id="@+id/compose_view_adapter"
-    android:orientation="vertical" android:layout_width="match_parent"
-    android:layout_height="match_parent" />
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    package="androidx.compose.ui.tooling.preview">
+
+</manifest>
