@@ -16,6 +16,7 @@
 
 package androidx.compose.material
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.interaction.Interaction
 import androidx.compose.foundation.interaction.MutableInteractionSource
@@ -308,6 +309,7 @@ internal fun OutlinedTextFieldLayout(
     indicatorWidth: Dp,
     indicatorColor: Color,
     cursorColor: Color,
+    backgroundColor: Color,
     shape: Shape
 ) {
     val labelSize = remember { mutableStateOf(Size.Zero) }
@@ -323,8 +325,9 @@ internal fun OutlinedTextFieldLayout(
             )
             .defaultMinSize(
                 minWidth = MinWidth,
-                minHeight = MinHeight,
-            ),
+                minHeight = MinHeight
+            )
+            .background(backgroundColor, shape),
         onValueChange = onValueChange,
         enabled = enabled,
         readOnly = readOnly,

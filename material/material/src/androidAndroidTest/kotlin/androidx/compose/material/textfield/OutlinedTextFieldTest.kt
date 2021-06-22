@@ -964,6 +964,27 @@ class OutlinedTextFieldTest {
     }
 
     @Test
+    @SdkSuppress(minSdkVersion = Build.VERSION_CODES.O)
+    fun testOutlinedTextField_appliesBackgroundColor() {
+        rule.setMaterialContent {
+            OutlinedTextField(
+                value = "",
+                onValueChange = {},
+                modifier = Modifier.testTag(TextfieldTag),
+                colors = TextFieldDefaults.outlinedTextFieldColors(
+                    backgroundColor = Color.Red,
+                    unfocusedBorderColor = Color.Red
+                ),
+                shape = RectangleShape
+            )
+        }
+
+        rule.onNodeWithTag(TextfieldTag).captureToImage().assertPixels {
+            Color.Red
+        }
+    }
+
+    @Test
     fun testOutlinedTextField_doesNotCrash_columnWidthWithMinIntrinsics() {
         var textFieldSize: IntSize? = null
         var dividerSize: IntSize? = null
