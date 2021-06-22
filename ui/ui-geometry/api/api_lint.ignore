@@ -1,3 +1,9 @@
 // Baseline format: 1.0
+KotlinOperator: androidx.compose.ui.geometry.MutableRect#contains(long):
+    Note that adding the `operator` keyword would allow calling this method using operator syntax
 KotlinOperator: androidx.compose.ui.geometry.MutableRect#set(float, float, float, float):
+    Note that adding the `operator` keyword would allow calling this method using operator syntax
+KotlinOperator: androidx.compose.ui.geometry.Rect#contains(long):
+    Note that adding the `operator` keyword would allow calling this method using operator syntax
+KotlinOperator: androidx.compose.ui.geometry.RoundRect#contains(long):
     Note that adding the `operator` keyword would allow calling this method using operator syntax

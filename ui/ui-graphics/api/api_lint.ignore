@@ -47,58 +47,6 @@ MissingBuildMethod: androidx.compose.ui.graphics.vector.PathBuilder:
     androidx.compose.ui.graphics.vector.PathBuilder does not declare a `build()` method, but builder classes are expected to
 
 
-MissingNullability: androidx.compose.ui.graphics.BlendMode#toString-impl(int):
-    Missing nullability on method `toString-impl` return
-MissingNullability: androidx.compose.ui.graphics.ClipOp#toString-impl(int):
-    Missing nullability on method `toString-impl` return
-MissingNullability: androidx.compose.ui.graphics.ColorMatrix#constructor-impl(float[]):
-    Missing nullability on method `constructor-impl` return
-MissingNullability: androidx.compose.ui.graphics.ColorMatrix#convertRgbToYuv-impl(float[]) parameter #0:
-    Missing nullability on parameter `$this` in method `convertRgbToYuv-impl`
-MissingNullability: androidx.compose.ui.graphics.ColorMatrix#convertYuvToRgb-impl(float[]) parameter #0:
-    Missing nullability on parameter `$this` in method `convertYuvToRgb-impl`
-MissingNullability: androidx.compose.ui.graphics.ColorMatrix#equals-impl(float[], Object) parameter #0:
-    Missing nullability on parameter `p` in method `equals-impl`
-MissingNullability: androidx.compose.ui.graphics.ColorMatrix#hashCode-impl(float[]) parameter #0:
-    Missing nullability on parameter `p` in method `hashCode-impl`
-MissingNullability: androidx.compose.ui.graphics.ColorMatrix#reset-impl(float[]) parameter #0:
-    Missing nullability on parameter `$this` in method `reset-impl`
-MissingNullability: androidx.compose.ui.graphics.ColorMatrix#toString-impl(float[]):
-    Missing nullability on method `toString-impl` return
-MissingNullability: androidx.compose.ui.graphics.ColorMatrix#toString-impl(float[]) parameter #0:
-    Missing nullability on parameter `p` in method `toString-impl`
-MissingNullability: androidx.compose.ui.graphics.FilterQuality#toString-impl(int):
-    Missing nullability on method `toString-impl` return
-MissingNullability: androidx.compose.ui.graphics.ImageBitmapConfig#toString-impl(int):
-    Missing nullability on method `toString-impl` return
-MissingNullability: androidx.compose.ui.graphics.Matrix#constructor-impl(float[]):
-    Missing nullability on method `constructor-impl` return
-MissingNullability: androidx.compose.ui.graphics.Matrix#equals-impl(float[], Object) parameter #0:
-    Missing nullability on parameter `p` in method `equals-impl`
-MissingNullability: androidx.compose.ui.graphics.Matrix#hashCode-impl(float[]) parameter #0:
-    Missing nullability on parameter `p` in method `hashCode-impl`
-MissingNullability: androidx.compose.ui.graphics.Matrix#invert-impl(float[]) parameter #0:
-    Missing nullability on parameter `$this` in method `invert-impl`
-MissingNullability: androidx.compose.ui.graphics.Matrix#reset-impl(float[]) parameter #0:
-    Missing nullability on parameter `$this` in method `reset-impl`
-MissingNullability: androidx.compose.ui.graphics.Matrix#toString-impl(float[]) parameter #0:
-    Missing nullability on parameter `$this` in method `toString-impl`
-MissingNullability: androidx.compose.ui.graphics.PaintingStyle#toString-impl(int):
-    Missing nullability on method `toString-impl` return
-MissingNullability: androidx.compose.ui.graphics.PathFillType#toString-impl(int):
-    Missing nullability on method `toString-impl` return
-MissingNullability: androidx.compose.ui.graphics.PathOperation#toString-impl(int):
-    Missing nullability on method `toString-impl` return
-MissingNullability: androidx.compose.ui.graphics.StampedPathEffectStyle#toString-impl(int):
-    Missing nullability on method `toString-impl` return
-MissingNullability: androidx.compose.ui.graphics.StrokeJoin#toString-impl(int):
-    Missing nullability on method `toString-impl` return
-MissingNullability: androidx.compose.ui.graphics.TileMode#toString-impl(int):
-    Missing nullability on method `toString-impl` return
-MissingNullability: androidx.compose.ui.graphics.colorspace.ColorModel#toString-impl(long):
-    Missing nullability on method `toString-impl` return
-
-
 NotCloseable: androidx.compose.ui.graphics.AndroidPath:
     Classes that release resources (close()) should implement AutoClosable and CloseGuard: class androidx.compose.ui.graphics.AndroidPath
 NotCloseable: androidx.compose.ui.graphics.Path:

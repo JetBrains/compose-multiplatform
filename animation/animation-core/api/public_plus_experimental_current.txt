@@ -35,14 +35,14 @@ package androidx.compose.animation.core {
   }
 
   public final class AnimateAsStateKt {
-    method @androidx.compose.runtime.Composable public static androidx.compose.runtime.State<androidx.compose.ui.unit.Dp> animateDpAsState-Lz7ev7o(float targetValue, optional androidx.compose.animation.core.AnimationSpec<androidx.compose.ui.unit.Dp> animationSpec, optional kotlin.jvm.functions.Function1<? super androidx.compose.ui.unit.Dp,kotlin.Unit>? finishedListener);
+    method @androidx.compose.runtime.Composable public static androidx.compose.runtime.State<androidx.compose.ui.unit.Dp> animateDpAsState(float targetValue, optional androidx.compose.animation.core.AnimationSpec<androidx.compose.ui.unit.Dp> animationSpec, optional kotlin.jvm.functions.Function1<? super androidx.compose.ui.unit.Dp,kotlin.Unit>? finishedListener);
     method @androidx.compose.runtime.Composable public static androidx.compose.runtime.State<java.lang.Float> animateFloatAsState(float targetValue, optional androidx.compose.animation.core.AnimationSpec<java.lang.Float> animationSpec, optional float visibilityThreshold, optional kotlin.jvm.functions.Function1<? super java.lang.Float,kotlin.Unit>? finishedListener);
     method @androidx.compose.runtime.Composable public static androidx.compose.runtime.State<java.lang.Integer> animateIntAsState(int targetValue, optional androidx.compose.animation.core.AnimationSpec<java.lang.Integer> animationSpec, optional kotlin.jvm.functions.Function1<? super java.lang.Integer,kotlin.Unit>? finishedListener);
-    method @androidx.compose.runtime.Composable public static androidx.compose.runtime.State<androidx.compose.ui.unit.IntOffset> animateIntOffsetAsState-2AXSKHY(long targetValue, optional androidx.compose.animation.core.AnimationSpec<androidx.compose.ui.unit.IntOffset> animationSpec, optional kotlin.jvm.functions.Function1<? super androidx.compose.ui.unit.IntOffset,kotlin.Unit>? finishedListener);
-    method @androidx.compose.runtime.Composable public static androidx.compose.runtime.State<androidx.compose.ui.unit.IntSize> animateIntSizeAsState-Cmzki-s(long targetValue, optional androidx.compose.animation.core.AnimationSpec<androidx.compose.ui.unit.IntSize> animationSpec, optional kotlin.jvm.functions.Function1<? super androidx.compose.ui.unit.IntSize,kotlin.Unit>? finishedListener);
-    method @androidx.compose.runtime.Composable public static androidx.compose.runtime.State<androidx.compose.ui.geometry.Offset> animateOffsetAsState-t81mtYE(long targetValue, optional androidx.compose.animation.core.AnimationSpec<androidx.compose.ui.geometry.Offset> animationSpec, optional kotlin.jvm.functions.Function1<? super androidx.compose.ui.geometry.Offset,kotlin.Unit>? finishedListener);
+    method @androidx.compose.runtime.Composable public static androidx.compose.runtime.State<androidx.compose.ui.unit.IntOffset> animateIntOffsetAsState(long targetValue, optional androidx.compose.animation.core.AnimationSpec<androidx.compose.ui.unit.IntOffset> animationSpec, optional kotlin.jvm.functions.Function1<? super androidx.compose.ui.unit.IntOffset,kotlin.Unit>? finishedListener);
+    method @androidx.compose.runtime.Composable public static androidx.compose.runtime.State<androidx.compose.ui.unit.IntSize> animateIntSizeAsState(long targetValue, optional androidx.compose.animation.core.AnimationSpec<androidx.compose.ui.unit.IntSize> animationSpec, optional kotlin.jvm.functions.Function1<? super androidx.compose.ui.unit.IntSize,kotlin.Unit>? finishedListener);
+    method @androidx.compose.runtime.Composable public static androidx.compose.runtime.State<androidx.compose.ui.geometry.Offset> animateOffsetAsState(long targetValue, optional androidx.compose.animation.core.AnimationSpec<androidx.compose.ui.geometry.Offset> animationSpec, optional kotlin.jvm.functions.Function1<? super androidx.compose.ui.geometry.Offset,kotlin.Unit>? finishedListener);
     method @androidx.compose.runtime.Composable public static androidx.compose.runtime.State<androidx.compose.ui.geometry.Rect> animateRectAsState(androidx.compose.ui.geometry.Rect targetValue, optional androidx.compose.animation.core.AnimationSpec<androidx.compose.ui.geometry.Rect> animationSpec, optional kotlin.jvm.functions.Function1<? super androidx.compose.ui.geometry.Rect,kotlin.Unit>? finishedListener);
-    method @androidx.compose.runtime.Composable public static androidx.compose.runtime.State<androidx.compose.ui.geometry.Size> animateSizeAsState-rlPqr8Y(long targetValue, optional androidx.compose.animation.core.AnimationSpec<androidx.compose.ui.geometry.Size> animationSpec, optional kotlin.jvm.functions.Function1<? super androidx.compose.ui.geometry.Size,kotlin.Unit>? finishedListener);
+    method @androidx.compose.runtime.Composable public static androidx.compose.runtime.State<androidx.compose.ui.geometry.Size> animateSizeAsState(long targetValue, optional androidx.compose.animation.core.AnimationSpec<androidx.compose.ui.geometry.Size> animationSpec, optional kotlin.jvm.functions.Function1<? super androidx.compose.ui.geometry.Size,kotlin.Unit>? finishedListener);
     method @androidx.compose.runtime.Composable public static <T, V extends androidx.compose.animation.core.AnimationVector> androidx.compose.runtime.State<T> animateValueAsState(T? targetValue, androidx.compose.animation.core.TwoWayConverter<T,V> typeConverter, optional androidx.compose.animation.core.AnimationSpec<T> animationSpec, optional T? visibilityThreshold, optional kotlin.jvm.functions.Function1<? super T,kotlin.Unit>? finishedListener);
   }
 
@@ -372,8 +372,8 @@ package androidx.compose.animation.core {
     method public infix androidx.compose.animation.core.KeyframesSpec.KeyframeEntity<T> at(T?, int timeStamp);
     method public int getDelayMillis();
     method public int getDurationMillis();
-    method public void setDelayMillis(int p);
-    method public void setDurationMillis(int p);
+    method public void setDelayMillis(int delayMillis);
+    method public void setDurationMillis(int durationMillis);
     method public infix void with(androidx.compose.animation.core.KeyframesSpec.KeyframeEntity<T>, androidx.compose.animation.core.Easing easing);
     property public final int delayMillis;
     property public final int durationMillis;
@@ -384,7 +384,7 @@ package androidx.compose.animation.core {
     method public S! getCurrentState();
     method public S! getTargetState();
     method @androidx.compose.animation.core.ExperimentalTransitionApi public boolean isIdle();
-    method public void setTargetState(S! p);
+    method public void setTargetState(S! targetState);
     property public final S! currentState;
     property @androidx.compose.animation.core.ExperimentalTransitionApi public final boolean isIdle;
     property public final S! targetState;
