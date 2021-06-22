@@ -115,4 +115,59 @@ class EventTests : BaseIntegrationTests() {
 
         waitTextToBe(value = "Text Selected")
     }
+
+    @Test
+    fun `stopImmediatePropagation prevents consequent listeners from being called`() {
+        openTestPage("stopOnInputImmediatePropagationWorks")
+        waitTextToBe(value = "None")
+
+        val checkBox = driver.findElement(By.id("checkbox"))
+        val radioButtonToStopImmediatePropagation = driver.findElement(By.id("radioBtn"))
+
+        checkBox.click()
+        waitTextToBe(value = "onInput2")
+
+        radioButtonToStopImmediatePropagation.click()
+        waitTextToBe(value = "None")
+
+        checkBox.click()
+        waitTextToBe(value = "onInput1")
+    }
+
+    @Test
+    fun `preventDefault works as expected`() {
+        openTestPage("preventDefaultWorks")
+
+        waitTextToBe(value = "None")
+        waitTextToBe(textId = "txt2", value = "None")
+
+        val checkBox = driver.findElement(By.id("checkbox"))
+        checkBox.click()
+
+        waitTextToBe(value = "Clicked but check should be prevented")
+        waitTextToBe(textId = "txt2", value = "None")
+    }
+
+    @Test
+    fun `stopPropagation works as expected`() {
+        openTestPage("stopPropagationWorks")
+
+        waitTextToBe(value = "None")
+        waitTextToBe(textId = "txt2", value = "None")
+
+        val checkBox = driver.findElement(By.id("checkbox"))
+        val radioButtonToStopImmediatePropagation = driver.findElement(By.id("radioBtn"))
+
+        checkBox.click()
+        waitTextToBe(value = "childInput")
+        waitTextToBe(textId = "txt2", value = "div caught an input")
+
+        radioButtonToStopImmediatePropagation.click()
+        waitTextToBe(value = "None")
+        waitTextToBe(textId = "txt2", value = "None")
+
+        checkBox.click()
+        waitTextToBe(value = "childInput")
+        waitTextToBe(textId = "txt2", value = "None")
+    }
 }
