@@ -66,24 +66,26 @@ fun setCSSRules(sheet: CSSStyleSheet, cssRules: CSSRuleDeclarationList) {
     }
 }
 
-private fun CSSStyleSheet.addRule(cssRule: String): CSSRule {
+private fun CSSStyleSheet.addRule(cssRule: String): CSSRule? {
     val cssRuleIndex = this.insertRule(cssRule, this.cssRules.length)
-    return this.cssRules.item(cssRuleIndex)!!
+    return this.cssRules.item(cssRuleIndex)
 }
 
 private fun CSSStyleSheet.addRule(cssRuleDeclaration: CSSRuleDeclaration) {
-    val cssRule = addRule("${cssRuleDeclaration.header} {}")
-    fillRule(cssRuleDeclaration, cssRule)
+    addRule("${cssRuleDeclaration.header} {}")?.let { cssRule ->
+        fillRule(cssRuleDeclaration, cssRule)
+    }
 }
 
-private fun CSSGroupingRule.addRule(cssRule: String): CSSRule {
+private fun CSSGroupingRule.addRule(cssRule: String): CSSRule? {
     val cssRuleIndex = this.insertRule(cssRule, this.cssRules.length)
-    return this.cssRules.item(cssRuleIndex)!!
+    return this.cssRules.item(cssRuleIndex)
 }
 
 private fun CSSGroupingRule.addRule(cssRuleDeclaration: CSSRuleDeclaration) {
-    val cssRule = addRule("${cssRuleDeclaration.header} {}")
-    fillRule(cssRuleDeclaration, cssRule)
+    addRule("${cssRuleDeclaration.header} {}")?.let { cssRule ->
+        fillRule(cssRuleDeclaration, cssRule)
+    }
 }
 
 private fun fillRule(
