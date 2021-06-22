@@ -4,11 +4,10 @@ import androidx.compose.runtime.RecomposeScope
 import androidx.compose.runtime.currentRecomposeScope
 import org.jetbrains.compose.web.attributes.InputType
 import org.jetbrains.compose.web.attributes.Options
-import org.jetbrains.compose.web.dom.Button
-import org.jetbrains.compose.web.dom.Input
-import org.jetbrains.compose.web.dom.TextArea
+import org.jetbrains.compose.web.dom.*
 import org.w3c.dom.HTMLElement
 import org.w3c.dom.HTMLInputElement
+import org.w3c.dom.HTMLParagraphElement
 import org.w3c.dom.HTMLTextAreaElement
 import org.w3c.dom.events.Event
 import org.w3c.dom.events.InputEvent
@@ -256,5 +255,35 @@ class EventTests {
         assertEquals("", radio.value)
 
         assertTrue(handeled)
+    }
+
+    @Test
+    fun captureOptionEnsuresCorrectOrderOfListeners() = runTest {
+        var callOrder = ""
+
+        composition {
+            Div(attrs = {
+                onClick(options = Options(capture = Options.BooleanValue.True)) {
+                    callOrder += "1"
+                }
+            }) {
+                Div(attrs = {
+                    onClick(options = Options(capture = Options.BooleanValue.True)) {
+                        callOrder += "2"
+                    }
+                }) {
+                    P(attrs = {
+                        onClick {
+                            callOrder += "3"
+                        }
+                    }) { Text("SomeText") }
+                }
+            }
+        }
+
+        val paragraph = root.firstChild!!.firstChild!!.firstChild as HTMLParagraphElement
+        paragraph.dispatchEvent(MouseEvent("click"))
+
+        assertEquals("123", callOrder)
     }
 }
