@@ -7,15 +7,3 @@ package androidx.compose.ui.viewinterop {
 
 }
 
-package androidx.compose.ui.viewinterop.databinding {
-
-  public final class TestLayoutBinding implements androidx.viewbinding.ViewBinding {
-    method public static androidx.compose.ui.viewinterop.databinding.TestLayoutBinding bind(android.view.View);
-    method public android.widget.LinearLayout getRoot();
-    method public static androidx.compose.ui.viewinterop.databinding.TestLayoutBinding inflate(android.view.LayoutInflater);
-    method public static androidx.compose.ui.viewinterop.databinding.TestLayoutBinding inflate(android.view.LayoutInflater, android.view.ViewGroup?, boolean);
-    field public final android.widget.FrameLayout second;
-  }
-
-}
-

@@ -49,7 +49,7 @@ package androidx.compose.ui.tooling.inspector {
     method public java.util.List<androidx.compose.ui.tooling.inspector.NodeParameter> convertParameters(androidx.compose.ui.tooling.inspector.InspectorNode node);
     method public boolean getHideSystemNodes();
     method public void resetGeneratedId();
-    method public void setHideSystemNodes(boolean p);
+    method public void setHideSystemNodes(boolean hideSystemNodes);
     property public final boolean hideSystemNodes;
   }
 
@@ -128,18 +128,18 @@ package androidx.compose.ui.tooling.preview {
   }
 
   @kotlin.annotation.MustBeDocumented @kotlin.annotation.Repeatable @kotlin.annotation.Retention(kotlin.annotation.AnnotationRetention) @kotlin.annotation.Target(allowedTargets=kotlin.annotation.AnnotationTarget) public @interface Preview {
-    method public abstract int apiLevel() default -1;
-    method public abstract long backgroundColor() default 0L;
-    method public abstract String device() default "";
-    method public abstract float fontScale() default 1.0f;
-    method public abstract String group() default "";
-    method public abstract int heightDp() default -1;
-    method public abstract String locale() default "";
-    method public abstract String name() default "";
-    method public abstract boolean showBackground() default false;
-    method public abstract boolean showSystemUi() default false;
-    method public abstract int uiMode() default 0;
-    method public abstract int widthDp() default -1;
+    method public abstract int apiLevel();
+    method public abstract long backgroundColor();
+    method public abstract String device();
+    method public abstract float fontScale();
+    method public abstract String group();
+    method public abstract int heightDp();
+    method public abstract String locale();
+    method public abstract String name();
+    method public abstract boolean showBackground();
+    method public abstract boolean showSystemUi();
+    method public abstract int uiMode();
+    method public abstract int widthDp();
     property public abstract int apiLevel;
     property public abstract long backgroundColor;
     property public abstract String device;
@@ -155,10 +155,10 @@ package androidx.compose.ui.tooling.preview {
   }
 
   @java.lang.annotation.Retention(java.lang.annotation.RetentionPolicy.RUNTIME) public @interface PreviewParameter {
-    method public abstract int limit() default 2147483647;
-    method public abstract Class<? extends androidx.compose.ui.tooling.preview.PreviewParameterProvider<?>> provider();
+    method public abstract int limit();
+    method public abstract kotlin.reflect.KClass<? extends androidx.compose.ui.tooling.preview.PreviewParameterProvider<?>> provider();
     property public abstract int limit;
-    property public abstract Class<? extends androidx.compose.ui.tooling.preview.PreviewParameterProvider<?>> provider;
+    property public abstract kotlin.reflect.KClass<? extends androidx.compose.ui.tooling.preview.PreviewParameterProvider<?>> provider;
   }
 
   public interface PreviewParameterProvider<T> {
