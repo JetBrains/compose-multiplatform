@@ -31,8 +31,8 @@ import com.android.build.gradle.LibraryExtension
 import com.android.build.gradle.tasks.ProcessLibraryManifest
 import org.gradle.api.GradleException
 import org.gradle.api.Project
-import org.gradle.api.plugins.JavaPluginExtension
-import org.gradle.kotlin.dsl.getByType
+import org.gradle.api.plugins.JavaPluginConvention
+import org.gradle.kotlin.dsl.getPlugin
 
 sealed class ApiTaskConfig
 data class LibraryApiTaskConfig(val library: LibraryExtension) : ApiTaskConfig()
@@ -176,8 +176,8 @@ fun Project.configureProjectForApiTasks(
                 processManifest = null
             }
             is JavaApiTaskConfig -> {
-                val javaExtension = extensions.getByType<JavaPluginExtension>()
-                val mainSourceSet = javaExtension.sourceSets.getByName("main")
+                val javaPluginConvention = convention.getPlugin<JavaPluginConvention>()
+                val mainSourceSet = javaPluginConvention.sourceSets.getByName("main")
                 javaInputs = JavaCompileInputs.fromSourceSet(mainSourceSet, this)
                 processManifest = null
             }
@@ -208,8 +208,8 @@ fun Project.jvmCompileInputsFromKmpProject(): JavaCompileInputs {
         throw GradleException("Expected KMP project but got ${project.name}")
     }
 
-    val javaExtension = extensions.getByType<JavaPluginExtension>()
-    val mainSourceSet = javaExtension.sourceSets.getByName("main")
+    val javaPluginConvention = convention.getPlugin<JavaPluginConvention>()
+    val mainSourceSet = javaPluginConvention.sourceSets.getByName("main")
     val dependencyClasspath = mainSourceSet.compileClasspath
     val mainSourcePaths = project.files(
         provider { mainSourceSet.allSource.srcDirs }
