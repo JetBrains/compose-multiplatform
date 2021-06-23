@@ -3,18 +3,17 @@ package org.jetbrains.compose.web.tests.integration
 import org.jetbrains.compose.web.tests.integration.common.BaseIntegrationTests
 import org.jetbrains.compose.web.tests.integration.common.Drivers
 import org.jetbrains.compose.web.tests.integration.common.ResolveDrivers
-import org.jetbrains.compose.web.tests.integration.common.findElement
 import org.jetbrains.compose.web.tests.integration.common.openTestPage
-import org.jetbrains.compose.web.tests.integration.common.resolveDriver
 import org.jetbrains.compose.web.tests.integration.common.waitTextToBe
 import org.openqa.selenium.By
 import org.openqa.selenium.Keys
+import org.openqa.selenium.WebDriver
 import org.openqa.selenium.interactions.Actions
 
 class InputsTests : BaseIntegrationTests(Drivers.Chrome) {
 
     @ResolveDrivers
-    fun `text area input gets printed`(driver: String) {
+    fun `text area input gets printed`(driver: WebDriver) {
         driver.openTestPage("textAreaInputGetsPrinted")
 
         val input = driver.findElement(By.id("input"))
@@ -24,7 +23,7 @@ class InputsTests : BaseIntegrationTests(Drivers.Chrome) {
     }
 
     @ResolveDrivers
-    fun `text input gets printed`(driver: String) {
+    fun `text input gets printed`(driver: WebDriver) {
         openTestPage("textInputGetsPrinted")
 
         val input = driver.findElement(By.id("input"))
@@ -34,7 +33,7 @@ class InputsTests : BaseIntegrationTests(Drivers.Chrome) {
     }
 
     @ResolveDrivers
-    fun `checkbox changes the text`(driver: String) {
+    fun `checkbox changes the text`(driver: WebDriver) {
         openTestPage("checkBoxChangesText")
 
         waitTextToBe(textId = "txt", value = "not checked")
@@ -49,7 +48,7 @@ class InputsTests : BaseIntegrationTests(Drivers.Chrome) {
     }
 
     @ResolveDrivers
-    fun `radio buttons change the text`(driver: String) {
+    fun `radio buttons change the text`(driver: WebDriver) {
         openTestPage("radioButtonsChangeText")
 
         waitTextToBe(textId = "txt", value = "-")
@@ -71,13 +70,13 @@ class InputsTests : BaseIntegrationTests(Drivers.Chrome) {
     }
 
     @ResolveDrivers
-    fun `range updates the text`(driver: String) {
+    fun `range updates the text`(driver: WebDriver) {
         openTestPage("rangeInputChangesText")
         waitTextToBe(value = "0")
 
         val slider = driver.findElement(By.id("slider"))
 
-        val actions = Actions(driver.resolveDriver())
+        val actions = Actions(driver)
 
         actions.moveToElement(slider)
             .moveByOffset(-(slider.size.width / 2), 0)
@@ -89,7 +88,7 @@ class InputsTests : BaseIntegrationTests(Drivers.Chrome) {
     }
 
     @ResolveDrivers
-    fun `time input updates the text`(driver: String) {
+    fun `time input updates the text`(driver: WebDriver) {
         openTestPage("timeInputChangesText")
 
         waitTextToBe(value = "")
@@ -125,7 +124,7 @@ class InputsTests : BaseIntegrationTests(Drivers.Chrome) {
 //    }
 
     @ResolveDrivers
-    fun `file input updates the text`(driver: String) {
+    fun `file input updates the text`(driver: WebDriver) {
         openTestPage("fileInputChangesText")
         waitTextToBe(value = "")
 

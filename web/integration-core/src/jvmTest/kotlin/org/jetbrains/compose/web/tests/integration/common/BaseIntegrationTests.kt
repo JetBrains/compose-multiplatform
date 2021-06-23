@@ -1,8 +1,6 @@
 package org.jetbrains.compose.web.tests.integration.common
 
 import org.junit.jupiter.api.DisplayNameGeneration
-import org.junit.jupiter.api.DisplayNameGenerator
-import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.MethodSource
@@ -16,9 +14,6 @@ import org.openqa.selenium.remote.RemoteWebDriver
 import org.openqa.selenium.safari.SafariDriver
 import org.openqa.selenium.support.ui.ExpectedConditions
 import org.openqa.selenium.support.ui.WebDriverWait
-import java.lang.annotation.ElementType
-import java.lang.annotation.RetentionPolicy
-import java.lang.reflect.Method
 
 
 private val PATH = "http://localhost:${ServerLauncher.port}"
@@ -33,40 +28,35 @@ fun WebDriver.waitTextToBe(textId: String = "txt", value: String) {
 
 object Drivers {
     val Chrome by lazy {
-        ChromeDriver(
+        object : ChromeDriver(
             ChromeOptions().apply {
                 setHeadless(true)
                 addArguments("--no-sandbox")
             }
-        )
+        ) {
+            override fun toString(): String = "chrome"
+        }
     }
 
     val Firefox by lazy {
-        FirefoxDriver(
+        object : FirefoxDriver(
             FirefoxOptions().apply {
                 setHeadless(true)
             }
-        )
+        ) {
+            override fun toString(): String = "firefox"
+        }
     }
 
     val Safari by lazy {
-        SafariDriver()
+       object : SafariDriver() {
+           override fun toString(): String = "safari"
+       }
     }
 
-    internal fun resolve(id: String): WebDriver {
-        return when(id) {
-            "chrome" -> Chrome
-            "firefox" -> Firefox
-            "safari" -> Safari
-            else -> throw Exception("unknown id: $id")
-        }
-    }
 }
 
-internal fun String.openTestPage(test: String) = Drivers.resolve(this).openTestPage(test)
-internal fun String.waitTextToBe(textId: String = "txt", value: String) = Drivers.resolve(this).waitTextToBe(textId, value)
-internal fun String.findElement(by: By) = Drivers.resolve(this).findElement(by)
-internal fun String.resolveDriver() = Drivers.resolve(this)
+fun WebDriver.toString() = "CHROME"
 
 @Target(AnnotationTarget.FUNCTION)
 @ParameterizedTest(name = "{displayName} [{0}]")
@@ -83,8 +73,8 @@ abstract class BaseIntegrationTests(val driver: RemoteWebDriver) {
         @JvmStatic
         fun resolveDrivers(): Array<Array<Any>> {
             return arrayOf(
-                arrayOf("chrome"),
-                //arrayOf("firefox")
+                arrayOf(Drivers.Chrome),
+                arrayOf(Drivers.Firefox)
             )
         }
     }

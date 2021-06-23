@@ -12,7 +12,7 @@ class DisplayNameSimplifier : DisplayNameGenerator.Standard() {
     override fun generateDisplayNameForMethod(testClass: Class<*>?, testMethod: Method?): String {
         return super
             .generateDisplayNameForMethod(testClass, testMethod)
-            .replace("String", "")
+            .replace("WebDriver", "")
             .replace("()", "")
             .plus(" ")
     }
