@@ -54,7 +54,7 @@ dependencies {
 
         androidTestImplementation(project(":compose:material:material:material-samples"))
         androidTestImplementation(project(":compose:test-utils"))
-        androidTestImplementation(project(":test-screenshot"))
+        androidTestImplementation(project(":test:screenshot:test-screenshot"))
         androidTestImplementation(libs.testRules)
         androidTestImplementation(libs.testRunner)
         androidTestImplementation(libs.junit)
@@ -110,7 +110,7 @@ if(AndroidXComposePlugin.isMultiplatformEnabled(project)) {
             androidAndroidTest.dependencies {
                 implementation(project(":compose:material:material:material-samples"))
                 implementation(project(":compose:test-utils"))
-                implementation(project(":test-screenshot"))
+                implementation(project(":test:screenshot:test-screenshot"))
 
                 implementation(libs.testRules)
                 implementation(libs.testRunner)
