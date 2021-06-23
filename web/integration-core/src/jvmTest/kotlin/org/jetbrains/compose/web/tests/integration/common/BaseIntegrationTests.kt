@@ -1,5 +1,7 @@
 package org.jetbrains.compose.web.tests.integration.common
 
+import org.junit.jupiter.api.DisplayNameGeneration
+import org.junit.jupiter.api.DisplayNameGenerator
 import org.junit.jupiter.api.extension.ExtendWith
 import org.openqa.selenium.By
 import org.openqa.selenium.WebDriver
@@ -11,6 +13,7 @@ import org.openqa.selenium.remote.RemoteWebDriver
 import org.openqa.selenium.safari.SafariDriver
 import org.openqa.selenium.support.ui.ExpectedConditions
 import org.openqa.selenium.support.ui.WebDriverWait
+import java.lang.reflect.Method
 
 private val PATH = "http://localhost:${ServerLauncher.port}"
 
@@ -45,8 +48,23 @@ object Drivers {
     }
 }
 
+class DisplayNameSimplifier : DisplayNameGenerator.Standard() {
+    override fun generateDisplayNameForMethod(testClass: Class<*>?, testMethod: Method?): String {
+        return super.generateDisplayNameForMethod(testClass, testMethod)
+            .replace("(String, WebDriver)", "")
+    }
+}
+
+@DisplayNameGeneration(DisplayNameSimplifier::class)
 @ExtendWith(value = [StaticServerSetupExtension::class])
 abstract class BaseIntegrationTests(val driver: RemoteWebDriver) {
     fun openTestPage(test: String) = driver.openTestPage(test)
     fun waitTextToBe(textId: String = "txt", value: String) = driver.waitTextToBe(textId, value)
+
+    companion object {
+        @JvmStatic
+        fun resolveDrivers(): Array<Array<Any>> {
+            return arrayOf(arrayOf("chrome", Drivers.Chrome))
+        }
+    }
 }

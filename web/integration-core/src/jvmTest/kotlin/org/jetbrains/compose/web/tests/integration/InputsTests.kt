@@ -1,24 +1,33 @@
 package org.jetbrains.compose.web.tests.integration
 
 import org.jetbrains.compose.web.tests.integration.common.BaseIntegrationTests
+import org.jetbrains.compose.web.tests.integration.common.DisplayNameSimplifier
 import org.jetbrains.compose.web.tests.integration.common.Drivers
 import org.jetbrains.compose.web.tests.integration.common.openTestPage
 import org.jetbrains.compose.web.tests.integration.common.waitTextToBe
+import org.junit.jupiter.api.DisplayName
+import org.junit.jupiter.api.DisplayNameGeneration
+import org.junit.jupiter.api.DisplayNameGenerator
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.params.ParameterizedTest
+import org.junit.jupiter.params.provider.MethodSource
 import org.openqa.selenium.By
 import org.openqa.selenium.Keys
+import org.openqa.selenium.WebDriver
 import org.openqa.selenium.interactions.Actions
+import java.lang.reflect.Method
 
 class InputsTests : BaseIntegrationTests(Drivers.Chrome) {
 
-    @Test
-    fun `text area input gets printed`() {
-        openTestPage("textAreaInputGetsPrinted")
+    @ParameterizedTest(name = "{displayName} [{0}]")
+    @MethodSource("resolveDrivers")
+    fun `text area input gets printed`(id: String, driver: WebDriver) {
+        driver.openTestPage("textAreaInputGetsPrinted")
 
         val input = driver.findElement(By.id("input"))
         input.sendKeys("Hello textArea!")
 
-        waitTextToBe(textId = "txt", value = "Hello textArea!")
+        driver.waitTextToBe(textId = "txt", value = "Hello textArea!")
     }
 
     @Test
