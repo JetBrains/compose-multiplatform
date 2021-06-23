@@ -143,7 +143,7 @@ abstract class AndroidXRootPlugin : Plugin<Project> {
         }
 
         if (partiallyDejetifyArchiveTask != null) {
-            project(":jetifier-standalone").afterEvaluate { standAloneProject ->
+            project(":jetifier:jetifier-standalone").afterEvaluate { standAloneProject ->
                 partiallyDejetifyArchiveTask.configure {
                     it.dependsOn(standAloneProject.tasks.named("installDist"))
                 }
