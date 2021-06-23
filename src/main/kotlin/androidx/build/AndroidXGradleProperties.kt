@@ -112,6 +112,12 @@ const val VALIDATE_NO_UNRECOGNIZED_MESSAGES = "androidx.validateNoUnrecognizedMe
  */
 const val VERIFY_UP_TO_DATE = "androidx.verifyUpToDate"
 
+/**
+ * If true, we are building in GitHub and should enable build features related to KMP.
+ * If false, we are in AOSP, where not all KMP features are enabled.
+ */
+const val KMP_GITHUB_BUILD = "androidx.kmp.github.build"
+
 val ALL_ANDROIDX_PROPERTIES = setOf(
     ALL_WARNINGS_AS_ERRORS,
     ALTERNATIVE_PROJECT_URL,
@@ -131,7 +137,8 @@ val ALL_ANDROIDX_PROPERTIES = setOf(
     AffectedModuleDetector.BASE_COMMIT_ARG,
     PLAYGROUND_SNAPSHOT_BUILD_ID,
     PLAYGROUND_METALAVA_BUILD_ID,
-    PLAYGROUND_DOKKA_BUILD_ID
+    PLAYGROUND_DOKKA_BUILD_ID,
+    KMP_GITHUB_BUILD
 )
 
 /**
