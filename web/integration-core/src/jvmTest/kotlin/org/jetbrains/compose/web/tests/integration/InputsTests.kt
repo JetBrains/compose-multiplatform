@@ -3,6 +3,8 @@ package org.jetbrains.compose.web.tests.integration
 import org.jetbrains.compose.web.tests.integration.common.BaseIntegrationTests
 import org.jetbrains.compose.web.tests.integration.common.DisplayNameSimplifier
 import org.jetbrains.compose.web.tests.integration.common.Drivers
+import org.jetbrains.compose.web.tests.integration.common.ResolveDrivers
+import org.jetbrains.compose.web.tests.integration.common.findElement
 import org.jetbrains.compose.web.tests.integration.common.openTestPage
 import org.jetbrains.compose.web.tests.integration.common.waitTextToBe
 import org.junit.jupiter.api.DisplayName
@@ -19,9 +21,8 @@ import java.lang.reflect.Method
 
 class InputsTests : BaseIntegrationTests(Drivers.Chrome) {
 
-    @ParameterizedTest(name = "{displayName} [{0}]")
-    @MethodSource("resolveDrivers")
-    fun `text area input gets printed`(id: String, driver: WebDriver) {
+    @ResolveDrivers
+    fun `text area input gets printed`(driver: String) {
         driver.openTestPage("textAreaInputGetsPrinted")
 
         val input = driver.findElement(By.id("input"))
