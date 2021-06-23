@@ -57,7 +57,6 @@ import androidx.compose.ui.semantics.SemanticsOwner
 import androidx.compose.ui.semantics.SemanticsProperties
 import androidx.compose.ui.semantics.SemanticsWrapper
 import androidx.compose.ui.semantics.getOrNull
-import androidx.compose.ui.semantics.outerSemantics
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.TextLayoutResult
 import androidx.compose.ui.text.platform.toAccessibilitySpannableString
@@ -229,7 +228,7 @@ internal class AndroidComposeViewAccessibilityDelegateCompat(val view: AndroidCo
         val children: MutableSet<Int> = mutableSetOf()
 
         init {
-            semanticsNode.children.fastForEach { child ->
+            semanticsNode.replacedChildren.fastForEach { child ->
                 if (currentSemanticsNodes.contains(child.id)) {
                     children.add(child.id)
                 }
@@ -311,7 +310,7 @@ internal class AndroidComposeViewAccessibilityDelegateCompat(val view: AndroidCo
         info.className = ClassName
         val role = semanticsNode.unmergedConfig.getOrNull(SemanticsProperties.Role)
         role?.let {
-            if (semanticsNode.isFake || semanticsNode.children.isEmpty()) {
+            if (semanticsNode.isFake || semanticsNode.replacedChildren.isEmpty()) {
                 if (role == Role.Tab) {
                     info.roleDescription = view.context.resources.getString(R.string.tab)
                 } else {
@@ -346,7 +345,7 @@ internal class AndroidComposeViewAccessibilityDelegateCompat(val view: AndroidCo
 
         info.packageName = view.context.packageName
 
-        semanticsNode.childrenSortedByBounds.fastForEach { child ->
+        semanticsNode.replacedChildrenSortedByBounds.fastForEach { child ->
             if (currentSemanticsNodes.contains(child.id)) {
                 val holder = view.androidViewsHandler.layoutNodeToHolder[child.layoutNode]
                 if (holder != null) {
@@ -427,7 +426,11 @@ internal class AndroidComposeViewAccessibilityDelegateCompat(val view: AndroidCo
             }
         }
 
-        if (!semanticsNode.unmergedConfig.isMergingSemanticsOfDescendants) {
+        if (!semanticsNode.unmergedConfig.isMergingSemanticsOfDescendants ||
+            // we don't emit fake nodes for nodes without children, therefore we should assign
+            // content description for such nodes
+            semanticsNode.replacedChildren.isEmpty()
+        ) {
             info.contentDescription = semanticsNode.unmergedConfig.getOrNull(
                 SemanticsProperties.ContentDescription
             )?.firstOrNull()
@@ -1990,7 +1993,7 @@ internal class AndroidComposeViewAccessibilityDelegateCompat(val view: AndroidCo
         val newChildren: MutableSet<Int> = mutableSetOf()
 
         // If any child is added, clear the subtree rooted at this node and return.
-        newNode.children.fastForEach { child ->
+        newNode.replacedChildren.fastForEach { child ->
             if (currentSemanticsNodes.contains(child.id)) {
                 if (!oldNode.children.contains(child.id)) {
                     notifySubtreeAccessibilityStateChangedIfNeeded(newNode.layoutNode)
@@ -2008,7 +2011,7 @@ internal class AndroidComposeViewAccessibilityDelegateCompat(val view: AndroidCo
             }
         }
 
-        newNode.children.fastForEach { child ->
+        newNode.replacedChildren.fastForEach { child ->
             if (currentSemanticsNodes.contains(child.id)) {
                 sendSemanticsStructureChangeEvents(child, previousSemanticsNodes[child.id]!!)
             }
@@ -2406,7 +2409,7 @@ internal fun SemanticsOwner
             // accessibility now, so let's put the children recursion inside of this if. If later
             // we decide to support children drawn outside of parent, we can move it out of the
             // if block.
-            val children = currentNode.children
+            val children = currentNode.replacedChildren
             for (i in children.size - 1 downTo 0) {
                 findAllSemanticNodesRecursive(children[i])
             }

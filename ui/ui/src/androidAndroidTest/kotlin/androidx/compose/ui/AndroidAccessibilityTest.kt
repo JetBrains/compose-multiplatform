@@ -235,7 +235,7 @@ class AndroidAccessibilityTest {
         val accessibilityNodeInfo = provider.createAccessibilityNodeInfo(toggleableNode.id)
 
         // We temporary send Switch role as a separate fake node
-        val switchRoleNode = toggleableNode.children.last()
+        val switchRoleNode = toggleableNode.replacedChildren.last()
         val switchRoleNodeInfo = provider.createAccessibilityNodeInfo(switchRoleNode.id)
         assertEquals("android.widget.Switch", switchRoleNodeInfo.className)
 
@@ -1458,9 +1458,9 @@ class AndroidAccessibilityTest {
             .fetchSemanticsNode("can't find node with tag $colTag")
         val colAccessibilityNode = provider.createAccessibilityNodeInfo(colSemanticsNode.id)
         assertEquals(2, colAccessibilityNode.childCount)
-        assertEquals(2, colSemanticsNode.children.size)
+        assertEquals(2, colSemanticsNode.replacedChildren.size)
         val buttonHolder = androidComposeView.androidViewsHandler
-            .layoutNodeToHolder[colSemanticsNode.children[0].layoutNode]
+            .layoutNodeToHolder[colSemanticsNode.replacedChildren[0].layoutNode]
         assertNotNull(buttonHolder)
         assertEquals(
             ViewCompat.IMPORTANT_FOR_ACCESSIBILITY_YES,
@@ -1487,7 +1487,7 @@ class AndroidAccessibilityTest {
         val colSemanticsNode = rule.onNodeWithTag(colTag)
             .fetchSemanticsNode("can't find node with tag $colTag")
         rule.runOnUiThread {
-            val bounds = colSemanticsNode.children[0].boundsInRoot
+            val bounds = colSemanticsNode.replacedChildren[0].boundsInRoot
             val hoverEnter = MotionEvent.obtain(
                 0 /* downTime */, 0 /* eventTime */,
                 ACTION_HOVER_ENTER, (bounds.left + bounds.right) / 2 /* x */,
@@ -1937,6 +1937,53 @@ class AndroidAccessibilityTest {
     }
 
     @Test
+    fun testContentDescription_singleNode_notMergingDescendants() {
+        val tag = "box"
+        container.setContent {
+            Box(Modifier.size(100.dp).testTag(tag).semantics { contentDescription = "Box" })
+        }
+
+        val node = rule.onNodeWithTag(tag).fetchSemanticsNode()
+        val info = provider.createAccessibilityNodeInfo(node.id)
+
+        assertEquals("Box", info.contentDescription)
+    }
+
+    @Test
+    fun testContentDescription_singleNode_mergingDescendants() {
+        val tag = "box"
+        container.setContent {
+            Box(Modifier.size(100.dp).testTag(tag).semantics(true) { contentDescription = "Box" })
+        }
+
+        val node = rule.onNodeWithTag(tag).fetchSemanticsNode()
+        val info = provider.createAccessibilityNodeInfo(node.id)
+
+        assertEquals("Box", info.contentDescription)
+    }
+
+    @Test
+    fun testContentDescription_replacingSemanticsNode() {
+        val tag = "box"
+        container.setContent {
+            Column(
+                Modifier
+                    .size(100.dp)
+                    .testTag(tag)
+                    .clearAndSetSemantics { contentDescription = "Replacing description" }
+            ) {
+                Box(Modifier.size(100.dp).semantics { contentDescription = "Box one" })
+                Box(Modifier.size(100.dp).semantics(true) { contentDescription = "Box two" })
+            }
+        }
+
+        val node = rule.onNodeWithTag(tag).fetchSemanticsNode()
+        val info = provider.createAccessibilityNodeInfo(node.id)
+
+        assertEquals("Replacing description", info.contentDescription)
+    }
+
+    @Test
     fun testRole_doesNotMerge() {
         container.setContent {
             Row(Modifier.semantics(true) {}.testTag("Row")) {
@@ -2228,7 +2275,7 @@ class AndroidAccessibilityTest {
         }
 
         val columnNode = rule.onNodeWithTag("Column", true).fetchSemanticsNode()
-        val firstChild = columnNode.children.firstOrNull()
+        val firstChild = columnNode.replacedChildren.firstOrNull()
         assertNotNull(firstChild)
         assertTrue(firstChild!!.isFake)
         assertEquals(
@@ -2246,7 +2293,7 @@ class AndroidAccessibilityTest {
         }
 
         val buttonNode = rule.onNodeWithTag("button", true).fetchSemanticsNode()
-        val lastChild = buttonNode.children.lastOrNull()
+        val lastChild = buttonNode.replacedChildren.lastOrNull()
         assertNotNull("Button has no children", lastChild)
         assertTrue("Last child should be fake Button role node", lastChild!!.isFake)
         assertEquals(
