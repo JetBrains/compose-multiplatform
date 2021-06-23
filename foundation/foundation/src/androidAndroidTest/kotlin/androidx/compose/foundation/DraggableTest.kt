@@ -561,13 +561,13 @@ class DraggableTest {
             assertThat(modifier.inspectableElements.map { it.name }.asIterable()).containsExactly(
                 "orientation",
                 "enabled",
+                "canDrag",
                 "reverseDirection",
                 "interactionSource",
                 "startDragImmediately",
                 "onDragStarted",
                 "onDragStopped",
-                "stateFactory",
-                "canDrag"
+                "state",
             )
         }
     }
