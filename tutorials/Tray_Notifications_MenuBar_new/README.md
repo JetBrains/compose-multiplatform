@@ -38,6 +38,7 @@ fun main() = application {
 
     if (isOpen) {
         Window(
+            onCloseRequest = ::exitApplication,
             icon = remember { getMyAppIcon() }
         ) {
             val trayState = rememberTrayState()
@@ -136,7 +137,7 @@ fun main() {
         if (isOpen) {
             var isSubmenuShowing by remember { mutableStateOf(false) }
 
-            Window {
+            Window(onCloseRequest = { isOpen = false }) {
                 MenuBar {
                     Menu("Actions") {
                         Item(

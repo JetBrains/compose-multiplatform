@@ -9,6 +9,7 @@ import org.w3c.dom.css.CSSStyleDeclaration
 import org.w3c.dom.css.CSSStyleRule
 import org.w3c.dom.css.StyleSheet
 import org.jetbrains.compose.web.css.*
+import org.w3c.dom.css.CSSStyleSheet
 
 /**
  * Use this function to mount the <style> tag into the DOM tree.
@@ -43,46 +44,48 @@ inline fun Style(
         },
     ) {
         DomSideEffect(cssRules) { style ->
-            style.sheet?.let { sheet ->
-                setCSSRules(sheet, cssRules)
+            (style.sheet as? CSSStyleSheet)?.let { cssStylesheet ->
+                setCSSRules(cssStylesheet, cssRules)
                 onDispose {
-                    clearCSSRules(sheet)
+                    clearCSSRules(cssStylesheet)
                 }
             }
         }
     }
 }
 
-fun clearCSSRules(sheet: StyleSheet) {
+fun clearCSSRules(sheet: CSSStyleSheet) {
     repeat(sheet.cssRules.length) {
         sheet.deleteRule(0)
     }
 }
 
-fun setCSSRules(sheet: StyleSheet, cssRules: CSSRuleDeclarationList) {
+fun setCSSRules(sheet: CSSStyleSheet, cssRules: CSSRuleDeclarationList) {
     cssRules.forEach { cssRule ->
         sheet.addRule(cssRule)
     }
 }
 
-private fun StyleSheet.addRule(cssRule: String): CSSRule {
+private fun CSSStyleSheet.addRule(cssRule: String): CSSRule? {
     val cssRuleIndex = this.insertRule(cssRule, this.cssRules.length)
-    return this.cssRules[cssRuleIndex]
+    return this.cssRules.item(cssRuleIndex)
 }
 
-private fun CSSGroupingRule.addRule(cssRule: String): CSSRule {
-    val cssRuleIndex = this.insertRule(cssRule, this.cssRules.length)
-    return this.cssRules[cssRuleIndex]
+private fun CSSStyleSheet.addRule(cssRuleDeclaration: CSSRuleDeclaration) {
+    addRule("${cssRuleDeclaration.header} {}")?.let { cssRule ->
+        fillRule(cssRuleDeclaration, cssRule)
+    }
 }
 
-private fun StyleSheet.addRule(cssRuleDeclaration: CSSRuleDeclaration) {
-    val cssRule = addRule("${cssRuleDeclaration.header} {}")
-    fillRule(cssRuleDeclaration, cssRule)
+private fun CSSGroupingRule.addRule(cssRule: String): CSSRule? {
+    val cssRuleIndex = this.insertRule(cssRule, this.cssRules.length)
+    return this.cssRules.item(cssRuleIndex)
 }
 
 private fun CSSGroupingRule.addRule(cssRuleDeclaration: CSSRuleDeclaration) {
-    val cssRule = addRule("${cssRuleDeclaration.header} {}")
-    fillRule(cssRuleDeclaration, cssRule)
+    addRule("${cssRuleDeclaration.header} {}")?.let { cssRule ->
+        fillRule(cssRuleDeclaration, cssRule)
+    }
 }
 
 private fun fillRule(

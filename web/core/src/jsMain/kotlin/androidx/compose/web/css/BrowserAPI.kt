@@ -6,30 +6,6 @@
 @file:Suppress("UNUSED", "NOTHING_TO_INLINE", "FunctionName")
 package org.jetbrains.compose.web.css
 
-import org.w3c.dom.css.*
-import org.w3c.dom.css.StyleSheet
-
-inline val StyleSheet.cssRules
-    get() = this.asDynamic().cssRules.unsafeCast<CSSRuleList>()
-
-
-inline fun StyleSheet.deleteRule(index: Int) {
-    this.asDynamic().deleteRule(index)
-}
-
-fun StyleSheet.insertRule(cssRule: String, index: Int? = null): Int {
-    return if (index != null) {
-        this.asDynamic().insertRule(cssRule, index).unsafeCast<Int>()
-    } else {
-        this.asDynamic().insertRule(cssRule).unsafeCast<Int>()
-    }
-}
-
-
-inline operator fun CSSRuleList.get(index: Int): CSSRule {
-    return this.asDynamic()[index].unsafeCast<CSSRule>()
-}
-
 @Suppress("NOTHING_TO_INLINE")
 inline fun <T : Any> jsObject(): T =
     js("({})")
