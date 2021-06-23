@@ -27,7 +27,7 @@ internal fun getLocalSocketOrNull(
 }
 
 internal val localhost: InetAddress
-    get() = InetAddress.getByName("127.0.0.1")
+    get() = InetAddress.getLoopbackAddress()
 
 internal fun newServerSocket() =
     ServerSocket(0, 0, localhost).apply {
