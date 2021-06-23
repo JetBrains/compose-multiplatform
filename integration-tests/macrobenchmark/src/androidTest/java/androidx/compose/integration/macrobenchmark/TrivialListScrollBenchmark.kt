@@ -83,6 +83,8 @@ class TrivialListScrollBenchmark(
 
         @Parameterized.Parameters(name = "compilation={0}")
         @JvmStatic
-        fun parameters() = createCompilationParams()
+        fun parameters() = createCompilationParams(
+            compilationModes = COMPOSE_COMPILATION_MODES
+        )
     }
 }
