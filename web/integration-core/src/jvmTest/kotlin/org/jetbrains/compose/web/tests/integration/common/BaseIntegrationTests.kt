@@ -65,16 +65,13 @@ annotation class ResolveDrivers
 
 @DisplayNameGeneration(DisplayNameSimplifier::class)
 @ExtendWith(value = [StaticServerSetupExtension::class])
-abstract class BaseIntegrationTests(val driver: RemoteWebDriver) {
-    fun openTestPage(test: String) = driver.openTestPage(test)
-    fun waitTextToBe(textId: String = "txt", value: String) = driver.waitTextToBe(textId, value)
-
+abstract class BaseIntegrationTests() {
     companion object {
         @JvmStatic
         fun resolveDrivers(): Array<Array<Any>> {
             return arrayOf(
                 arrayOf(Drivers.Chrome),
-                arrayOf(Drivers.Firefox)
+                //arrayOf(Drivers.Firefox)
             )
         }
     }
