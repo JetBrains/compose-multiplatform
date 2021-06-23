@@ -1,7 +1,7 @@
 package com.sample.style
 
 import org.jetbrains.compose.web.css.*
-import org.jetbrains.compose.web.css.selectors.*
+import org.jetbrains.compose.web.css.selectors.CSSSelector
 
 object AppCSSVariables : CSSVariables {
     val wtColorGreyLight by variable<Color>()

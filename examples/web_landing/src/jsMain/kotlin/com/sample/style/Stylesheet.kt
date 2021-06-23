@@ -20,7 +20,7 @@ object AppCSSVariables : CSSVariables {
     val wtH3FontSize by variable<CSSUnitValue>()
     val wtH3LineHeight by variable<CSSUnitValue>()
 
-    val wtColCount by variable<Int>()
+    val wtColCount by variable<StylePropertyNumber>()
 }
 
 
