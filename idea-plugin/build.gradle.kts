@@ -62,9 +62,4 @@ tasks {
         ideVersions(properties("plugin.verifier.ide.versions"))
         downloadDirectory("${project.buildDir}/pluginVerifier/ides")
     }
-
-    runIde {
-        val gradleComponents = gradle.includedBuild("compose-gradle-components")
-        dependsOn(gradleComponents.task(":publishToMavenLocal"))
-    }
 }
