@@ -1,23 +1,15 @@
 package org.jetbrains.compose.web.tests.integration
 
 import org.jetbrains.compose.web.tests.integration.common.BaseIntegrationTests
-import org.jetbrains.compose.web.tests.integration.common.DisplayNameSimplifier
 import org.jetbrains.compose.web.tests.integration.common.Drivers
 import org.jetbrains.compose.web.tests.integration.common.ResolveDrivers
 import org.jetbrains.compose.web.tests.integration.common.findElement
 import org.jetbrains.compose.web.tests.integration.common.openTestPage
+import org.jetbrains.compose.web.tests.integration.common.resolveDriver
 import org.jetbrains.compose.web.tests.integration.common.waitTextToBe
-import org.junit.jupiter.api.DisplayName
-import org.junit.jupiter.api.DisplayNameGeneration
-import org.junit.jupiter.api.DisplayNameGenerator
-import org.junit.jupiter.api.Test
-import org.junit.jupiter.params.ParameterizedTest
-import org.junit.jupiter.params.provider.MethodSource
 import org.openqa.selenium.By
 import org.openqa.selenium.Keys
-import org.openqa.selenium.WebDriver
 import org.openqa.selenium.interactions.Actions
-import java.lang.reflect.Method
 
 class InputsTests : BaseIntegrationTests(Drivers.Chrome) {
 
@@ -31,8 +23,8 @@ class InputsTests : BaseIntegrationTests(Drivers.Chrome) {
         driver.waitTextToBe(textId = "txt", value = "Hello textArea!")
     }
 
-    @Test
-    fun `text input gets printed`() {
+    @ResolveDrivers
+    fun `text input gets printed`(driver: String) {
         openTestPage("textInputGetsPrinted")
 
         val input = driver.findElement(By.id("input"))
@@ -41,8 +33,8 @@ class InputsTests : BaseIntegrationTests(Drivers.Chrome) {
         waitTextToBe(textId = "txt", value = "Hello World!")
     }
 
-    @Test
-    fun `checkbox changes the text`() {
+    @ResolveDrivers
+    fun `checkbox changes the text`(driver: String) {
         openTestPage("checkBoxChangesText")
 
         waitTextToBe(textId = "txt", value = "not checked")
@@ -56,8 +48,8 @@ class InputsTests : BaseIntegrationTests(Drivers.Chrome) {
         waitTextToBe(textId = "txt", value = "not checked")
     }
 
-    @Test
-    fun `radio buttons change the text`() {
+    @ResolveDrivers
+    fun `radio buttons change the text`(driver: String) {
         openTestPage("radioButtonsChangeText")
 
         waitTextToBe(textId = "txt", value = "-")
@@ -78,14 +70,14 @@ class InputsTests : BaseIntegrationTests(Drivers.Chrome) {
         waitTextToBe(textId = "txt", "r2")
     }
 
-    @Test
-    fun `range updates the text`() {
+    @ResolveDrivers
+    fun `range updates the text`(driver: String) {
         openTestPage("rangeInputChangesText")
         waitTextToBe(value = "0")
 
         val slider = driver.findElement(By.id("slider"))
 
-        val actions = Actions(driver)
+        val actions = Actions(driver.resolveDriver())
 
         actions.moveToElement(slider)
             .moveByOffset(-(slider.size.width / 2), 0)
@@ -96,8 +88,8 @@ class InputsTests : BaseIntegrationTests(Drivers.Chrome) {
         waitTextToBe(value = "10")
     }
 
-    @Test
-    fun `time input updates the text`() {
+    @ResolveDrivers
+    fun `time input updates the text`(driver: String) {
         openTestPage("timeInputChangesText")
 
         waitTextToBe(value = "")
@@ -108,7 +100,7 @@ class InputsTests : BaseIntegrationTests(Drivers.Chrome) {
         waitTextToBe(value = "15:00")
     }
 
-//    @Test
+//    @_root_ide_package_.org.jetbrains.compose.web.tests.integration.common.ResolveDrivers
 //    fun `date input updates the text`() {
 //        openTestPage("dateInputChangesText")
 //
@@ -120,7 +112,7 @@ class InputsTests : BaseIntegrationTests(Drivers.Chrome) {
 //        waitTextToBe(value = "2021-10-12")
 //    }
 
-//    @Test
+//    @_root_ide_package_.org.jetbrains.compose.web.tests.integration.common.ResolveDrivers
 //    fun `dateTimeLocal input updates the text`() { // WARNING: It's not supported in Firefox
 //        openTestPage("dateTimeLocalInputChangesText")
 //
@@ -132,8 +124,8 @@ class InputsTests : BaseIntegrationTests(Drivers.Chrome) {
 //        waitTextToBe(value = "2021-10-12T09:25")
 //    }
 
-    @Test
-    fun `file input updates the text`() {
+    @ResolveDrivers
+    fun `file input updates the text`(driver: String) {
         openTestPage("fileInputChangesText")
         waitTextToBe(value = "")
 

@@ -66,6 +66,7 @@ object Drivers {
 internal fun String.openTestPage(test: String) = Drivers.resolve(this).openTestPage(test)
 internal fun String.waitTextToBe(textId: String = "txt", value: String) = Drivers.resolve(this).waitTextToBe(textId, value)
 internal fun String.findElement(by: By) = Drivers.resolve(this).findElement(by)
+internal fun String.resolveDriver() = Drivers.resolve(this)
 
 @Target(AnnotationTarget.FUNCTION)
 @ParameterizedTest(name = "{displayName} [{0}]")
@@ -81,7 +82,10 @@ abstract class BaseIntegrationTests(val driver: RemoteWebDriver) {
     companion object {
         @JvmStatic
         fun resolveDrivers(): Array<Array<Any>> {
-            return arrayOf(arrayOf("chrome"))
+            return arrayOf(
+                arrayOf("chrome"),
+                //arrayOf("firefox")
+            )
         }
     }
 }
