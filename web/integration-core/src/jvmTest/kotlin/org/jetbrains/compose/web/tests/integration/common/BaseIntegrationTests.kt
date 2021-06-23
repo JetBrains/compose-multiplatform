@@ -71,7 +71,7 @@ abstract class BaseIntegrationTests() {
         fun resolveDrivers(): Array<Array<Any>> {
             return arrayOf(
                 arrayOf(Drivers.Chrome),
-                //arrayOf(Drivers.Firefox)
+                arrayOf(Drivers.Firefox)
             )
         }
     }
