@@ -5,7 +5,9 @@
 
 package org.jetbrains.compose.desktop.ui.tooling.preview.rpc
 
+import java.io.ByteArrayOutputStream
 import java.io.IOException
+import java.io.PrintStream
 import java.net.InetAddress
 import java.net.ServerSocket
 import java.net.Socket
@@ -37,3 +39,12 @@ internal fun newServerSocket() =
 
 internal fun <T> Iterator<T>.nextOrNull(): T? =
     if (hasNext()) next() else null
+
+internal val Throwable.stackTraceString: String
+    get() {
+        val output = ByteArrayOutputStream()
+        PrintStream(output).use {
+            printStackTrace(it)
+        }
+        return output.toString(Charsets.UTF_8)
+    }

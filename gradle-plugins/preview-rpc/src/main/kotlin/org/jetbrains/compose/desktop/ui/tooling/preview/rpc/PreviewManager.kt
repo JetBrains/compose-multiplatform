@@ -14,6 +14,7 @@ import java.util.concurrent.atomic.AtomicBoolean
 import java.util.concurrent.atomic.AtomicLong
 import java.util.concurrent.atomic.AtomicReference
 import kotlin.concurrent.thread
+import kotlin.system.measureTimeMillis
 
 data class PreviewHostConfig(
     val javaExecutable: String,
@@ -57,7 +58,7 @@ class PreviewManagerImpl(private val onNewFrame: (ByteArray) -> Unit) : PreviewM
     private val runningPreview = AtomicReference<RunningPreview>(null)
     private val threads = arrayListOf<Thread>()
 
-    private val runPreviewThread = repeatWhileAliveThread {
+    private val runPreviewThread = repeatWhileAliveThread("runPreview") {
         fun startPreviewProcess(config: PreviewHostConfig): Process =
             ProcessBuilder(
                 config.javaExecutable,
@@ -83,7 +84,7 @@ class PreviewManagerImpl(private val onNewFrame: (ByteArray) -> Unit) : PreviewM
         }
     }
 
-    private val sendPreviewRequestThread = repeatWhileAliveThread {
+    private val sendPreviewRequestThread = repeatWhileAliveThread("sendPreviewRequest") {
         withLivePreviewConnection {
             val classpath = previewClasspath.get()
             val fqName = previewFqName.get()
@@ -104,7 +105,7 @@ class PreviewManagerImpl(private val onNewFrame: (ByteArray) -> Unit) : PreviewM
         }
     }
 
-    private val receivePreviewResponseThread = repeatWhileAliveThread {
+    private val receivePreviewResponseThread = repeatWhileAliveThread("receivePreviewResponse") {
         withLivePreviewConnection {
             receiveFrame { bytes ->
                 frameRequest.get()?.let { request ->
@@ -115,7 +116,7 @@ class PreviewManagerImpl(private val onNewFrame: (ByteArray) -> Unit) : PreviewM
         }
     }
 
-    private val gradleCallbackThread = repeatWhileAliveThread {
+    private val gradleCallbackThread = repeatWhileAliveThread("gradleCallback") {
         tryAcceptConnection(gradleCallbackSocket, "GRADLE_CALLBACK")?.let { connection ->
             while (isAlive.get() && connection.isAlive) {
                 connection.receiveConfigFromGradle(
@@ -130,8 +131,55 @@ class PreviewManagerImpl(private val onNewFrame: (ByteArray) -> Unit) : PreviewM
     }
 
     override fun close() {
-        if (isAlive.compareAndSet(true, false)) {
-            closeImpl()
+        if (!isAlive.compareAndSet(true, false)) return
+
+        closeService("PREVIEW MANAGER") {
+            val runningPreview = runningPreview.getAndSet(null)
+            val previewConnection = runningPreview?.connection
+            val previewProcess = runningPreview?.process
+            threads.forEach { it.interrupt() }
+
+            closeService("PREVIEW HOST CONNECTION") { previewConnection?.close() }
+            closeService("PREVIEW SOCKET") { previewSocket.close() }
+            closeService("GRADLE SOCKET") { gradleCallbackSocket.close() }
+            closeService("THREADS") {
+                for (i in 0..3) {
+                    var aliveThreads = 0
+                    for (t in threads) {
+                        if (t.isAlive) {
+                            aliveThreads++
+                            t.interrupt()
+                        }
+                    }
+                    if (aliveThreads == 0) break
+                    else Thread.sleep(300)
+                }
+                val aliveThreads = threads.filter { it.isAlive }
+                if (aliveThreads.isNotEmpty()) {
+                    error("Could not stop threads: ${aliveThreads.joinToString(", ") { it.name }}")
+                }
+            }
+            closeService("PREVIEW HOST PROCESS") {
+                previewProcess?.let { process ->
+                    if (!process.waitFor(5, TimeUnit.SECONDS)) {
+                        log { "FORCIBLY DESTROYING PREVIEW HOST PROCESS" }
+                        // todo: check exit code
+                        process.destroyForcibly()
+                    }
+                }
+            }
+        }
+    }
+
+    private inline fun closeService(name: String, doClose: () -> Unit) {
+        try {
+            log { "CLOSING $name" }
+            val ms = measureTimeMillis {
+                doClose()
+            }
+            log { "CLOSED $name in $ms ms" }
+        } catch (e: Exception) {
+            log.error { "ERROR CLOSING $name: ${e.stackTraceString}" }
         }
     }
 
@@ -143,28 +191,6 @@ class PreviewManagerImpl(private val onNewFrame: (ByteArray) -> Unit) : PreviewM
 
     override val gradleCallbackPort: Int
         get() = gradleCallbackSocket.localPort
-
-    private fun closeImpl() {
-        log { "CLOSING THREADS" }
-        threads.forEach { it.interrupt() }
-        threads.forEach {
-            it.join(1000)
-        }
-        log { "CLOSING PREVIEW HOST" }
-        runningPreview.get()?.let { (connection, process) ->
-            connection.close()
-            if (!process.waitFor(5, TimeUnit.SECONDS)) {
-                // todo: check exit code
-                process.destroyForcibly()
-            }
-
-        }
-        log { "CLOSING PREVIEW SOCKET" }
-        previewSocket.close()
-        log { "CLOSING GRADLE SOCKET" }
-        gradleCallbackSocket.close()
-        log { "CLOSED" }
-    }
 
     private fun tryAcceptConnection(
         serverSocket: ServerSocket, socketType: String
@@ -181,7 +207,9 @@ class PreviewManagerImpl(private val onNewFrame: (ByteArray) -> Unit) : PreviewM
                 )
             } catch (e: IOException) {
                 if (e !is SocketTimeoutException) {
-                    log.error { e.stackTraceToString() }
+                    if (isAlive.get()) {
+                        log.error { e.stackTraceToString() }
+                    }
                 }
             }
         }
@@ -197,9 +225,10 @@ class PreviewManagerImpl(private val onNewFrame: (ByteArray) -> Unit) : PreviewM
     }
 
     private inline fun repeatWhileAliveThread(
+        name: String,
         sleepDelayMs: Long = DEFAULT_SLEEP_DELAY_MS,
         crossinline fn: () -> Unit
-    ) = thread(start = false) {
+    ) = thread(name = name, start = false) {
         while (isAlive.get()) {
             try {
                 fn()
