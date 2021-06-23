@@ -279,9 +279,9 @@ class EffectsTests {
                 "onCommit:b2",
                 "onCommit:b1",
                 "recompose",
+                "onDispose:b1",
                 "onDispose:b2",
                 "onDispose:a2",
-                "onDispose:b1",
                 "onDispose:a1",
                 "onCommit:a1",
                 "onCommit:b1"
