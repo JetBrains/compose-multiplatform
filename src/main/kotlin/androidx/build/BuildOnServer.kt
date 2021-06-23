@@ -61,7 +61,7 @@ open class BuildOnServer : DefaultTask() {
             filesNames.add("dokka-public-docs-$buildId.zip")
         }
 
-        if (project.findProject(":jetifier-standalone") != null) {
+        if (project.findProject(":jetifier:jetifier-standalone") != null) {
             filesNames.add("jetifier-standalone.zip")
             filesNames.add("top-of-tree-m2repository-partially-dejetified-$buildId.zip")
         }

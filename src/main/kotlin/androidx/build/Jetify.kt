@@ -97,7 +97,7 @@ val archivesToDejetify = listOf(
 )
 
 fun Project.partiallyDejetifyArchiveTask(archiveFile: Provider<RegularFile>): TaskProvider<Exec>? {
-    return findProject(":jetifier-standalone")?.let { standaloneProject ->
+    return findProject(":jetifier:jetifier-standalone")?.let { standaloneProject ->
         val stripTask = stripArchiveForPartialDejetificationTask(archiveFile)
 
         tasks.register("partiallyDejetifyArchive", Exec::class.java) {
