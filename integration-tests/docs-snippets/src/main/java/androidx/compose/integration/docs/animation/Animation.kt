@@ -17,7 +17,8 @@
 // Ignore lint warnings in documentation snippets
 @file:Suppress(
     "CanBeVal", "UNUSED_VARIABLE", "RemoveExplicitTypeArguments", "unused",
-    "MemberVisibilityCanBePrivate"
+    "MemberVisibilityCanBePrivate", "TransitionPropertiesLabel", "UpdateTransitionLabel",
+    "UNUSED_PARAMETER"
 )
 @file:SuppressLint("ModifierInspectorInfo", "NewApi")
 
@@ -25,9 +26,12 @@ package androidx.compose.integration.docs.animation
 
 import android.annotation.SuppressLint
 import androidx.compose.animation.Animatable
+import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.Crossfade
+import androidx.compose.animation.EnterExitState
 import androidx.compose.animation.ExperimentalAnimationApi
+import androidx.compose.animation.SizeTransform
 import androidx.compose.animation.animateColor
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.animateContentSize
@@ -35,6 +39,7 @@ import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.AnimationVector1D
 import androidx.compose.animation.core.AnimationVector2D
 import androidx.compose.animation.core.Easing
+import androidx.compose.animation.core.ExperimentalTransitionApi
 import androidx.compose.animation.core.FastOutLinearInEasing
 import androidx.compose.animation.core.FastOutSlowInEasing
 import androidx.compose.animation.core.LinearEasing
@@ -51,6 +56,7 @@ import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.animateRect
 import androidx.compose.animation.core.animateValueAsState
 import androidx.compose.animation.core.calculateTargetValue
+import androidx.compose.animation.core.createChildTransition
 import androidx.compose.animation.core.infiniteRepeatable
 import androidx.compose.animation.core.keyframes
 import androidx.compose.animation.core.rememberInfiniteTransition
@@ -66,19 +72,31 @@ import androidx.compose.animation.shrinkVertically
 import androidx.compose.animation.slideInVertically
 import androidx.compose.animation.slideOutVertically
 import androidx.compose.animation.splineBasedDecay
+import androidx.compose.animation.with
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.gestures.awaitFirstDown
 import androidx.compose.foundation.gestures.horizontalDrag
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.offset
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.layout.sizeIn
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.integration.docs.animation.UpdateTransitionEnumState.BoxState
+import androidx.compose.material.Button
+import androidx.compose.material.ExperimentalMaterialApi
+import androidx.compose.material.Icon
 import androidx.compose.material.MaterialTheme
+import androidx.compose.material.Surface
 import androidx.compose.material.Text
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Phone
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.State
@@ -104,6 +122,7 @@ import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onRoot
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.IntOffset
+import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.launch
@@ -121,7 +140,7 @@ import kotlin.math.roundToInt
 
 @OptIn(ExperimentalAnimationApi::class)
 @Composable
-fun AnimatedVisibilitySimple() {
+private fun AnimatedVisibilitySimple() {
     var editable by remember { mutableStateOf(true) }
     AnimatedVisibility(visible = editable) {
         Text(text = "Edit")
@@ -130,7 +149,7 @@ fun AnimatedVisibilitySimple() {
 
 @OptIn(ExperimentalAnimationApi::class)
 @Composable
-fun AnimatedVisibilityWithEnterAndExit() {
+private fun AnimatedVisibilityWithEnterAndExit() {
     var visible by remember { mutableStateOf(true) }
     val density = LocalDensity.current
     AnimatedVisibility(
@@ -151,8 +170,162 @@ fun AnimatedVisibilityWithEnterAndExit() {
     }
 }
 
+@OptIn(ExperimentalAnimationApi::class)
 @Composable
-fun AnimateContentSizeSimple() {
+private fun AnimatedVisibilityMutable() {
+    // Create a MutableTransitionState<Boolean> for the AnimatedVisibility.
+    val state = remember {
+        MutableTransitionState(false).apply {
+            // Start the animation immediately.
+            targetState = true
+        }
+    }
+    Column {
+        AnimatedVisibility(visibleState = state) {
+            Text(text = "Hello, world!")
+        }
+
+        // Use the MutableTransitionState to know the current animation state
+        // of the AnimatedVisibility.
+        Text(
+            text = when {
+                state.isIdle && state.currentState -> "Visible"
+                !state.isIdle && state.currentState -> "Disappearing"
+                state.isIdle && !state.currentState -> "Invisible"
+                else -> "Appearing"
+            }
+        )
+    }
+}
+
+@OptIn(ExperimentalAnimationApi::class)
+@Composable
+private fun AnimatedVisibilityAnimateEnterExit(visible: Boolean) {
+    AnimatedVisibility(
+        visible = visible,
+        enter = fadeIn(),
+        exit = fadeOut()
+    ) {
+        // Fade in/out the background and the foreground.
+        Box(Modifier.fillMaxSize().background(Color.DarkGray)) {
+            Box(
+                Modifier
+                    .align(Alignment.Center)
+                    .animateEnterExit(
+                        // Slide in/out the inner box.
+                        enter = slideInVertically(),
+                        exit = slideOutVertically()
+                    )
+                    .sizeIn(minWidth = 256.dp, minHeight = 64.dp)
+                    .background(Color.Red)
+            ) {
+                // Content of the notification…
+            }
+        }
+    }
+}
+
+@OptIn(ExperimentalAnimationApi::class)
+@Composable
+private fun AnimatedVisibilityTransition(visible: Boolean) {
+    AnimatedVisibility(
+        visible = visible,
+        enter = fadeIn(),
+        exit = fadeOut()
+    ) { // this: AnimatedVisibilityScope
+        // Use AnimatedVisibilityScope#transition to add a custom animation
+        // to the AnimatedVisibility.
+        val background by transition.animateColor { state ->
+            if (state == EnterExitState.Visible) Color.Blue else Color.Gray
+        }
+        Box(modifier = Modifier.size(128.dp).background(background))
+    }
+}
+
+@OptIn(ExperimentalAnimationApi::class)
+@Composable
+private fun AnimatedContentSimple() {
+    Row {
+        var count by remember { mutableStateOf(0) }
+        Button(onClick = { count++ }) {
+            Text("Add")
+        }
+        AnimatedContent(targetState = count) { targetCount ->
+            // Make sure to use `targetCount`, not `count`.
+            Text(text = "Count: $targetCount")
+        }
+    }
+}
+
+@OptIn(ExperimentalAnimationApi::class)
+@Composable
+private fun AnimatedContentTransitionSpec(count: Int) {
+    AnimatedContent(
+        targetState = count,
+        transitionSpec = {
+            // Compare the incoming number with the previous number.
+            if (targetState > initialState) {
+                // If the target number is larger, it slides up and fades in
+                // while the initial (smaller) number slides up and fades out.
+                slideInVertically({ height -> height }) + fadeIn() with
+                    slideOutVertically({ height -> -height }) + fadeOut()
+            } else {
+                // If the target number is smaller, it slides down and fades in
+                // while the initial number slides down and fades out.
+                slideInVertically({ height -> -height }) + fadeIn() with
+                    slideOutVertically({ height -> height }) + fadeOut()
+            }.using(
+                // Disable clipping since the faded slide-in/out should
+                // be displayed out of bounds.
+                SizeTransform(clip = false)
+            )
+        }
+    ) { targetCount ->
+        Text(text = "$targetCount")
+    }
+}
+
+@OptIn(ExperimentalAnimationApi::class, ExperimentalMaterialApi::class)
+@Composable
+private fun AnimatedContentSizeTransform() {
+    var expanded by remember { mutableStateOf(false) }
+    Surface(
+        color = MaterialTheme.colors.primary,
+        onClick = { expanded = !expanded }
+    ) {
+        AnimatedContent(
+            targetState = expanded,
+            transitionSpec = {
+                fadeIn(animationSpec = tween(150, 150)) with
+                    fadeOut(animationSpec = tween(150)) using
+                    SizeTransform { initialSize, targetSize ->
+                        if (targetState) {
+                            keyframes {
+                                // Expand horizontally first.
+                                IntSize(targetSize.width, initialSize.height) at 150
+                                durationMillis = 300
+                            }
+                        } else {
+                            keyframes {
+                                // Shrink vertically first.
+                                IntSize(initialSize.width, targetSize.height) at 150
+                                durationMillis = 300
+                            }
+                        }
+                    }
+            }
+        ) { targetExpanded ->
+            if (targetExpanded) {
+                Expanded()
+            } else {
+                ContentIcon()
+            }
+        }
+    }
+}
+
+@Composable
+private fun AnimateContentSizeSimple() {
     var message by remember { mutableStateOf("Hello") }
     Box(
         modifier = Modifier.background(Color.Blue).animateContentSize()
@@ -162,7 +335,7 @@ fun AnimateContentSizeSimple() {
 }
 
 @Composable
-fun CrossfadeSimple() {
+private fun CrossfadeSimple() {
     var currentPage by remember { mutableStateOf("A") }
     Crossfade(targetState = currentPage) { screen ->
         when (screen) {
@@ -173,7 +346,7 @@ fun CrossfadeSimple() {
 }
 
 @Composable
-fun AnimateAsStateSimple(enabled: Boolean) {
+private fun AnimateAsStateSimple(enabled: Boolean) {
     val alpha: Float by animateFloatAsState(if (enabled) 1f else 0.5f)
     Box(
         Modifier.fillMaxSize()
@@ -183,7 +356,7 @@ fun AnimateAsStateSimple(enabled: Boolean) {
 }
 
 @Composable
-fun AnimatableSimple(ok: Boolean) {
+private fun AnimatableSimple(ok: Boolean) {
     // Start out gray and animate to green/red based on `ok`
     val color = remember { Animatable(Color.Gray) }
     LaunchedEffect(ok) {
@@ -192,7 +365,7 @@ fun AnimatableSimple(ok: Boolean) {
     Box(Modifier.fillMaxSize().background(color.value))
 }
 
-object UpdateTransitionEnumState {
+private object UpdateTransitionEnumState {
     enum class BoxState {
         Collapsed,
         Expanded
@@ -200,13 +373,13 @@ object UpdateTransitionEnumState {
 }
 
 @Composable
-fun UpdateTransitionInstance() {
+private fun UpdateTransitionInstance() {
     var currentState by remember { mutableStateOf(BoxState.Collapsed) }
     val transition = updateTransition(currentState)
 }
 
 @Composable
-fun UpdateTransitionAnimationValues(transition: Transition<BoxState>) {
+private fun UpdateTransitionAnimationValues(transition: Transition<BoxState>) {
     val rect by transition.animateRect { state ->
         when (state) {
             BoxState.Collapsed -> Rect(0f, 0f, 100f, 100f)
@@ -222,7 +395,7 @@ fun UpdateTransitionAnimationValues(transition: Transition<BoxState>) {
 }
 
 @Composable
-fun UpdateTransitionTransitionSpec(transition: Transition<BoxState>) {
+private fun UpdateTransitionTransitionSpec(transition: Transition<BoxState>) {
     val color by transition.animateColor(
         transitionSpec = {
             when {
@@ -241,7 +414,7 @@ fun UpdateTransitionTransitionSpec(transition: Transition<BoxState>) {
 }
 
 @Composable
-fun UpdateTransitionMutableTransitionState() {
+private fun UpdateTransitionMutableTransitionState() {
     // Start in collapsed state and immediately animate to expanded
     var currentState = remember { MutableTransitionState(BoxState.Collapsed) }
     currentState.targetState = BoxState.Expanded
@@ -249,7 +422,87 @@ fun UpdateTransitionMutableTransitionState() {
     // ……
 }
 
-object UpdateTransitionEncapsulating {
+@OptIn(ExperimentalTransitionApi::class)
+private object UpdateTransitionCreateChildTransition {
+
+    enum class DialerState { DialerMinimized, NumberPad }
+
+    @Composable
+    fun DialerButton(isVisibleTransition: Transition<Boolean>) {
+        // `isVisibleTransition` spares the need for the content to know
+        // about other DialerStates. Instead, the content can focus on
+        // animating the state change between visible and not visible.
+    }
+
+    @Composable
+    fun NumberPad(isVisibleTransition: Transition<Boolean>) {
+        // `isVisibleTransition` spares the need for the content to know
+        // about other DialerStates. Instead, the content can focus on
+        // animating the state change between visible and not visible.
+    }
+
+    @Composable
+    fun Dialer(dialerState: DialerState) {
+        val transition = updateTransition(dialerState)
+        Box {
+            // Creates separate child transitions of Boolean type for NumberPad
+            // and DialerButton for any content animation between visible and
+            // not visible
+            NumberPad(
+                transition.createChildTransition {
+                    it == DialerState.NumberPad
+                }
+            )
+            DialerButton(
+                transition.createChildTransition {
+                    it == DialerState.DialerMinimized
+                }
+            )
+        }
+    }
+}
+
+@OptIn(ExperimentalAnimationApi::class, ExperimentalMaterialApi::class)
+@Composable
+private fun UpdateTransitionAnimatedVisibility() {
+    var selected by remember { mutableStateOf(false) }
+    // Animates changes when `selected` is changed.
+    val transition = updateTransition(selected)
+    val borderColor by transition.animateColor { isSelected ->
+        if (isSelected) Color.Magenta else Color.White
+    }
+    val elevation by transition.animateDp { isSelected ->
+        if (isSelected) 10.dp else 2.dp
+    }
+    Surface(
+        onClick = { selected = !selected },
+        shape = RoundedCornerShape(8.dp),
+        border = BorderStroke(2.dp, borderColor),
+        elevation = elevation
+    ) {
+        Column(modifier = Modifier.fillMaxWidth().padding(16.dp)) {
+            Text(text = "Hello, world!")
+            // AnimatedVisibility as a part of the transition.
+            transition.AnimatedVisibility(
+                visible = { targetSelected -> targetSelected },
+                enter = expandVertically(),
+                exit = shrinkVertically()
+            ) {
+                Text(text = "It is fine today.")
+            }
+            // AnimatedContent as a part of the transition.
+            transition.AnimatedContent { targetState ->
+                if (targetState) {
+                    Text(text = "Selected")
+                } else {
+                    Icon(imageVector = Icons.Default.Phone, contentDescription = "Phone")
+                }
+            }
+        }
+    }
+}
+
+private object UpdateTransitionEncapsulating {
     enum class BoxState { Collapsed, Expanded }
 
     @Composable
@@ -293,7 +546,7 @@ object UpdateTransitionEncapsulating {
 }
 
 @Composable
-fun RememberInfiniteTransitionSimple() {
+private fun RememberInfiniteTransitionSimple() {
     val infiniteTransition = rememberInfiniteTransition()
     val color by infiniteTransition.animateColor(
         initialValue = Color.Red,
@@ -308,7 +561,7 @@ fun RememberInfiniteTransitionSimple() {
 }
 
 @Composable
-fun TargetBasedAnimationSimple(someCustomCondition: () -> Boolean) {
+private fun TargetBasedAnimationSimple(someCustomCondition: () -> Boolean) {
     val anim = remember {
         TargetBasedAnimation(
             animationSpec = tween(200),
@@ -330,7 +583,7 @@ fun TargetBasedAnimationSimple(someCustomCondition: () -> Boolean) {
 }
 
 @Composable
-fun AnimationSpecTween(enabled: Boolean) {
+private fun AnimationSpecTween(enabled: Boolean) {
     val alpha: Float by animateFloatAsState(
         targetValue = if (enabled) 1f else 0.5f,
         // Configure the animation duration and easing.
@@ -339,7 +592,7 @@ fun AnimationSpecTween(enabled: Boolean) {
 }
 
 @Composable
-fun AnimationSpecSpring() {
+private fun AnimationSpecSpring() {
     val value by animateFloatAsState(
         targetValue = 1f,
         animationSpec = spring(
@@ -350,7 +603,7 @@ fun AnimationSpecSpring() {
 }
 
 @Composable
-fun AnimationSpecTween() {
+private fun AnimationSpecTween() {
     val value by animateFloatAsState(
         targetValue = 1f,
         animationSpec = tween(
@@ -362,7 +615,7 @@ fun AnimationSpecTween() {
 }
 
 @Composable
-fun AnimationSpecKeyframe() {
+private fun AnimationSpecKeyframe() {
     val value by animateFloatAsState(
         targetValue = 1f,
         animationSpec = keyframes {
@@ -376,7 +629,7 @@ fun AnimationSpecKeyframe() {
 }
 
 @Composable
-fun AnimationSpecRepeatable() {
+private fun AnimationSpecRepeatable() {
     val value by animateFloatAsState(
         targetValue = 1f,
         animationSpec = repeatable(
@@ -388,7 +641,7 @@ fun AnimationSpecRepeatable() {
 }
 
 @Composable
-fun AnimationSpecInfiniteRepeatable() {
+private fun AnimationSpecInfiniteRepeatable() {
     val value by animateFloatAsState(
         targetValue = 1f,
         animationSpec = infiniteRepeatable(
@@ -399,14 +652,14 @@ fun AnimationSpecInfiniteRepeatable() {
 }
 
 @Composable
-fun AnimationSpecSnap() {
+private fun AnimationSpecSnap() {
     val value by animateFloatAsState(
         targetValue = 1f,
         animationSpec = snap(delayMillis = 50)
     )
 }
 
-object Easing {
+private object Easing {
     val CustomEasing = Easing { fraction -> fraction * fraction }
 
     @Composable
@@ -422,12 +675,12 @@ object Easing {
     }
 }
 
-object AnimationVectorTwoWayConverter {
+private object AnimationVectorTwoWayConverter {
     val IntToVector: TwoWayConverter<Int, AnimationVector1D> =
         TwoWayConverter({ AnimationVector1D(it.toFloat()) }, { it.value.toInt() })
 }
 
-object AnimationVectorCustomType {
+private object AnimationVectorCustomType {
     data class MySize(val width: Dp, val height: Dp)
 
     @Composable
@@ -447,7 +700,7 @@ object AnimationVectorCustomType {
     }
 }
 
-object GestureAndAnimationSimple {
+private object GestureAndAnimationSimple {
     @Composable
     fun Gesture() {
         val offset = remember { Animatable(Offset(0f, 0f), Offset.VectorConverter) }
@@ -476,7 +729,7 @@ object GestureAndAnimationSimple {
     private fun Offset.toIntOffset() = IntOffset(x.roundToInt(), y.roundToInt())
 }
 
-object GestureAndAnimationSwipeToDismiss {
+private object GestureAndAnimationSwipeToDismiss {
     fun Modifier.swipeToDismiss(
         onDismissed: () -> Unit
     ): Modifier = composed {
@@ -537,7 +790,7 @@ object GestureAndAnimationSwipeToDismiss {
     }
 }
 
-object Testing {
+private object Testing {
     @get:Rule
     val rule = createComposeRule()
 
@@ -565,14 +818,21 @@ object Testing {
     }
 }
 
+/*
+Fakes needed for snippets to build:
+ */
+
 private fun ImageBitmap.assertAgainstGolden() {
 }
 
 @Composable
 private fun Circle(modifier: Modifier = Modifier) {
-    Box(
-        modifier = modifier
-            .size(64.dp)
-            .background(Color.Gray, CircleShape)
-    )
+}
+
+@Composable
+private fun Expanded() {
+}
+
+@Composable
+private fun ContentIcon() {
 }
