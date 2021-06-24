@@ -303,7 +303,7 @@ enum class EnterExitState {
  * [AnimatedVisibility] composable animates the appearance and disappearance of its content, as
  * [visibleState]'s [targetState][MutableTransitionState.targetState] changes. The [visibleState]
  * can also be used to observe the state of [AnimatedVisibility]. For example:
- * `visibleState.idIdle` indicates whether the all animations have finished in [AnimatedVisibility],
+ * `visibleState.isIdle` indicates whether all the animations have finished in [AnimatedVisibility],
  * and `visibleState.currentState` returns the initial state of the current animations.
  *
  * Different [EnterTransition]s and [ExitTransition]s can be defined in
@@ -379,7 +379,7 @@ fun AnimatedVisibility(
  * content as [visibleState]'s [targetState][MutableTransitionState.targetState] changes. The
  * default [enter] and [exit] transitions are tailored specific to the [Row] layout. See more
  * details below. The [visibleState] can also be used to observe the state of [AnimatedVisibility].
- * For example: `visibleState.idIdle` indicates whether the all animations have finished in
+ * For example: `visibleState.isIdle` indicates whether all the animations have finished in
  * [AnimatedVisibility], and `visibleState.currentState` returns the initial state of the current
  * animations.
  *
@@ -454,7 +454,7 @@ fun RowScope.AnimatedVisibility(
  * content as [visibleState]'s [targetState][MutableTransitionState.targetState] changes. The
  * default [enter] and [exit] transitions are tailored specific to the [Column] layout. See more
  * details below. The [visibleState] can also be used to observe the state of [AnimatedVisibility].
- * For example: `visibleState.idIdle` indicates whether the all animations have finished in
+ * For example: `visibleState.isIdle` indicates whether all the animations have finished in
  * [AnimatedVisibility], and `visibleState.currentState` returns the initial state of the current
  * animations.
  *
