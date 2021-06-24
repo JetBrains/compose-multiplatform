@@ -5,7 +5,7 @@ package androidx.compose.ui.tooling {
   }
 
   public final class InspectableKt {
-    method @androidx.compose.runtime.Composable public static void InInspectionModeOnly(kotlin.jvm.functions.Function0<kotlin.Unit> content);
+    method @Deprecated @androidx.compose.runtime.Composable public static void InInspectionModeOnly(kotlin.jvm.functions.Function0<kotlin.Unit> content);
   }
 
   public final class PreviewUtilsKt {
