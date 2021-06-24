@@ -249,10 +249,9 @@ abstract class AndroidXRootPlugin : Plugin<Project> {
             }
         }
         androidx.build.dependencies.kotlinVersion = getVersion("kotlin")
-        androidx.build.dependencies.kotlinCoroutinesVersion = getVersion("kotlinCoroutines")
         androidx.build.dependencies.kspVersion = getVersion("ksp")
         androidx.build.dependencies.agpVersion = getVersion("androidGradlePlugin")
-        androidx.build.dependencies.lintVersion = getVersion("androidLint")
+        androidx.build.dependencies.guavaVersion = getVersion("guavaJre")
     }
 
     // Experimental workaround for https://youtrack.jetbrains.com/issue/KT-46820
